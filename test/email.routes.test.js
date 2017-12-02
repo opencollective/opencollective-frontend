@@ -186,6 +186,64 @@ describe("email.routes.test", () => {
       });
   });
 
+  describe("send email to event", () => {
+
+    let spy;
+    const slug = `event1-ev111`;
+    const subject = "email reminder for event 1";
+
+    before(async () => {
+
+      const event = await models.Collective.create({
+        type: "EVENT",
+        name: "event 1",
+        ParentCollectiveId: collective.id,
+        slug
+      });
+
+      await models.Member.create({
+        CreatedByUserId: users[0].id,
+        MemberCollectiveId: users[0].CollectiveId,
+        CollectiveId: event.id,
+        role: 'FOLLOWER'
+      });
+
+      await models.Member.create({
+        CreatedByUserId: users[1].id,
+        MemberCollectiveId: users[1].CollectiveId,
+        CollectiveId: event.id,
+        role: 'ATTENDEE'
+      });
+
+    });
+
+    it("send please approve email when sending email to eventSlug@parentCollectiveSlug.opencollective.com", async () => {
+      spy = sandbox.spy(emailLib, 'sendMessage');
+      return request(app)
+      .post('/webhooks/mailgun')
+      .send(Object.assign({}, webhookBodyPayload, { recipient: `${slug}@${collective.slug}.opencollective.com`, subject }))
+      .then((res) => {
+        expect(res.statusCode).to.equal(200);
+        expect(spy.args[0][0]).to.equal(`admins@${collective.slug}.opencollective.com`);
+        expect(spy.args[0][1]).to.equal(`Please approve: ${subject}`);
+        expect(usersData.map(u => u.email).indexOf(spy.args[0][3].bcc) !== -1).to.be.true;
+      });
+    });
+
+    it("approves an email sent to eventSlug@parentCollectiveSlug.opencollective.com", (done) => {
+
+      spy = sandbox.spy(emailLib, 'send');
+      request(app)
+        .get(`/services/email/approve?messageId=abJwIjpmYWxzZSwiayI6Ijc3NjFlZTBjLTc1NGQtNGIwZi05ZDlkLWU1NTgxODJkMTlkOSIsInMiOiI2NDhjZDg1ZTE1IiwiYyI6InNhb3JkIn0=&approver=${encodeURIComponent(usersData[1].email)}`)
+        .then(() => {
+          expect([users[0].email, users[1].email].indexOf(spy.args[0][3].bcc) !== -1).to.be.true;
+          expect([users[0].email, users[1].email].indexOf(spy.args[1][3].bcc) !== -1).to.be.true;
+          done();
+        });
+
+    });
+  });
+
   describe("unsubscribe", () => {
 
     const template = 'mailinglist.admins';

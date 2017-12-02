@@ -33,6 +33,7 @@ export const unsubscribe = (req, res, next) => {
 
 // TODO: move to emailLib.js
 const sendEmailToList = (to, email) => {
+  debug("email")("sendEmailToList", to, "email data: ", email);
   const { mailinglist, collectiveSlug, type } = getNotificationType(to);  
   email.from = email.from || `${collectiveSlug} collective <hello@${collectiveSlug}.opencollective.com>`;
   email.collective = email.collective || { slug: collectiveSlug }; // used for the unsubscribe url
@@ -46,10 +47,8 @@ const sendEmailToList = (to, email) => {
     console.log(`Sending email from ${email.from} to ${to} (${recipients.length} recipient(s))`);
     return Promise.map(recipients, (recipient) => {
       if (email.template) {
-        debug('preview')(`preview: http://localhost:3060/templates/email/${email.template}?data=${encodeURIComponent(JSON.stringify(email))}`);
         return emailLib.send(email.template, to, email, { from: email.from, bcc: recipient, type });
       } else {
-        debug('preview')("Subject: ", email.subject);
         email.body += '\n<!-- OpenCollective.com -->\n'; // watermark to identify if email has already been processed
         return emailLib.sendMessage(to, email.subject, email.body, { from: email.from, bcc: recipient, type });
       }
@@ -120,6 +119,7 @@ export const approve = (req, res, next) => {
 
 export const getNotificationType = (email) => {
   const tokens = email.match(/(.+)@(.+)\.opencollective\.com/i);
+  if (!tokens) return {};
   const collectiveSlug = tokens[2];
   let mailinglist = tokens[1];
   if (['info','hello','members','admins', 'admins'].indexOf(mailinglist) !== -1) {
@@ -135,6 +135,11 @@ export const webhook = (req, res, next) => {
   debug('webhook')(">>> webhook received", JSON.stringify(email));
   const { mailinglist, collectiveSlug } = getNotificationType(recipient);
 
+  if (!collectiveSlug) {
+    return res.send(`Invalid recipient (${recipient}), skipping`);
+  }
+
+  debug("webhook")(`email received for ${mailinglist} mailinglist of ${collectiveSlug}`);
   const body = email['body-html'] || email['body-plain'];
 
   let collective;
