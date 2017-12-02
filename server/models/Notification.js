@@ -67,12 +67,16 @@ export default function(Sequelize, DataTypes) {
         )
         .then(subscriptions => subscriptions.map(s => s.User))        
 
+    const getUsers = (memberships) => {
+      return models.User.findAll({ where: { CollectiveId: { $in: memberships.map(m => m.MemberCollectiveId )}}});
+    }
+
     const getSubscribersForEvent = () => models.Collective
       .findOne({
-        where: { slug: collectiveSlug, type: 'EVENT' }
+        where: { slug: mailinglist, type: 'EVENT' }
       })
       .then(event => {
-          if (event) return event.getMembers().then(excludeUnsubscribed)
+          if (event) return event.getMembers().then(excludeUnsubscribed).then(getUsers)
       })
 
     const excludeUnsubscribed = (members) => 
@@ -82,13 +86,13 @@ export default function(Sequelize, DataTypes) {
           active: false,
           type: `mailinglist`
         },
-        include: [ { model: models.Collective, where: { slug: collectiveSlug } } ]
+        include: [ { model: models.Collective, where: { slug: mailinglist } } ]
       }).then(notifications => notifications.map(s => s.UserId ))
       .then(excludeIds => {
         return members.filter(m => excludeIds.indexOf(m.CreatedByUserId) === -1)
       })
 
-    return getSubscribersForEvent(collectiveSlug)
+    return getSubscribersForEvent()
     .then(subscribers => {
       if (!subscribers) return getSubscribersForMailingList(mailinglist)
       else return subscribers;
