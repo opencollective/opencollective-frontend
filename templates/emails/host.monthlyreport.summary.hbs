@@ -39,28 +39,29 @@ td p.muted {
 </style>
 
 <div style="display:none;font-size:1px;color:#333333;line-height:1px;max-height:0px;max-width:0px;opacity:0;overflow:hidden;">
-  Hosts: {{totalHosts}} ({{totalActiveHosts}} active) //
-  Collectives: {{totalCollectives}} ({{totalActiveCollectives}} active) //
-  Transactions: {{numberTransactions}} ({{platformStats.numberDonations}} donations, {{platformStats.numberPaidExpenses}} expenses paid) //
-  Donations: {{{currency platformStats.totalAmountDonations.totalInHostCurrency currency='USD'}}} //  
-  Paid expenses: {{{currency platformStats.totalAmountPaidExpenses.totalInHostCurrency currency='USD'}}} //
-  Host fees: {{{currency platformStats.totalHostFees.totalInHostCurrency currency='USD'}}} //  
+  Donations: {{{currency platformStats.deltaPlatformDonations.totalInHostCurrency currency='USD' sign=true}}} //  
+  Paid expenses: {{{currency platformStats.deltaAmountPaidExpenses.totalInHostCurrency currency='USD' sign=true}}} //
+  Host fees: {{{currency platformStats.deltaHostFees.totalInHostCurrency currency='USD' sign=true}}} //  
+  Hosts: {{{number totalHosts}}} ({{{number totalActiveHosts}}} active) //
+  Collectives: {{{number totalCollectives}}} ({{{number totalActiveCollectives}}} active) //
+  Transactions: {{{number numberTransactions}}} ({{{number numberDonations}}} donations, {{{number numberPaidExpenses}}} expenses paid) //
 </div>
 
 <table>
-  <tr><td>Hosts:</td><td width=20></td><td>{{totalHosts}} ({{totalActiveHosts}} active)</td></tr>
-  <tr><td>Collectives:</td><td></td><td>{{totalCollectives}} ({{totalActiveCollectives}} active)</td></tr>
-  <tr><td>Backers:</td><td></td><td>{{platformStats.backers.total}} ({{platformStats.backers.new}} new, {{platformStats.backers.repeat}} repeat, {{platformStats.backers.inactive}} inactive)</td></tr>
+  <tr><td>Hosts:</td><td width=20></td><td>{{{number totalHosts}}} ({{{number totalActiveHosts}}} active)</td></tr>
+  <tr><td>Collectives:</td><td></td><td>{{{number totalCollectives}}} ({{{number totalActiveCollectives}}} active)</td></tr>
+  <tr><td>Backers:</td><td></td><td>{{{number platformStats.backers.total}}} ({{{number platformStats.backers.new}}} new, {{{number platformStats.backers.repeat}}} repeat, {{{number platformStats.backers.inactive}}} inactive)</td></tr>
   <tr><td colspan=3 height=10></td></tr>
-  <tr><td>Transactions:</td><td></td><td>{{numberTransactions}} ({{numberDonations}} {{{pluralize "donation" n=numberDonations}}}, {{numberPaidExpenses}} {{{pluralize "expense" n=numberPaidExpenses}}} paid)</td></tr>
-  <tr><td>Donations received:</td><td></td><td>{{{currency platformStats.totalAmountDonations.totalInHostCurrency currency='USD'}}}</td></tr>
-  <tr><td>Paid Expenses:</td><td></td><td>{{{currency platformStats.totalAmountPaidExpenses.totalInHostCurrency currency='USD'}}}</td></tr>
+  <tr><td>Transactions:</td><td></td><td>{{{number numberTransactions}}} ({{{ number numberDonations}}} {{{pluralize "donation" n=numberDonations}}}, {{{number numberPaidExpenses}}} {{{pluralize "expense" n=numberPaidExpenses}}} paid)</td></tr>
+  <tr><td>Donations (platform):</td><td></td><td>{{{currency platformStats.totalPlatformDonations.totalInHostCurrency currency='USD'}}} ({{{currency platformStats.deltaPlatformDonations.totalInHostCurrency currency='USD' sign=true}}})</td></tr>
+  <tr><td>Donations (external funds):</td><td></td><td>{{{currency platformStats.totalAddFunds.totalInHostCurrency currency='USD'}}} ({{{currency platformStats.deltaAddFunds.totalInHostCurrency currency='USD' sign=true}}})</td></tr>
+  <tr><td>Paid Expenses:</td><td></td><td>{{{currency platformStats.totalAmountPaidExpenses.totalInHostCurrency currency='USD'}}} ({{{currency platformStats.deltaAmountPaidExpenses.totalInHostCurrency currency='USD' sign=true}}})</td></tr>
   <tr><td colspan=3 height=10></td></tr>
-  <tr><td>Hosts fees:</td><td></td><td>{{{currency platformStats.totalHostFees.totalInHostCurrency currency='USD'}}}</td></tr>
-  <tr><td>Payment Processor Fees:</td><td></td><td>{{{currency platformStats.totalPaymentProcessorFees.totalInHostCurrency currency='USD'}}}</td></tr>
-  <tr><td>Platform fees:</td><td></td><td>{{{currency platformStats.totalPlatformFees.totalInHostCurrency currency='USD'}}}</td></tr>
+  <tr><td>Hosts fees:</td><td></td><td>{{{currency platformStats.totalHostFees.totalInHostCurrency currency='USD'}}} ({{{currency platformStats.deltaHostFees.totalInHostCurrency currency='USD' sign=true}}})</td></tr>
+  <tr><td>Payment Processor Fees:</td><td></td><td>{{{currency platformStats.totalPaymentProcessorFees.totalInHostCurrency currency='USD'}}} ({{{currency platformStats.deltaPaymentProcessorFees.totalInHostCurrency currency='USD' sign=true}}})</td></tr>
+  <tr><td>Platform fees:</td><td></td><td>{{{currency platformStats.totalPlatformFees.totalInHostCurrency currency='USD'}}} ({{{currency platformStats.deltaPlatformFees.totalInHostCurrency currency='USD' sign=true}}})</td></tr>
   <tr><td colspan=3 height=10></td></tr>
-  <tr><td>Total Hosts Balance:</td><td></td><td>{{{currency platformStats.totalHostBalance.totalInHostCurrency currency='USD'}}}</td></tr>
+  <tr><td>Total Hosts Balance:</td><td></td><td>{{{currency platformStats.totalHostBalance.totalInHostCurrency currency='USD'}}} ({{{currency platformStats.deltaHostBalance.totalInHostCurrency currency='USD' sign=true}}})</td></tr>
 </table>
 
 <br /><br />
@@ -78,10 +79,10 @@ td p.muted {
   </tr>
 {{#each hosts}}
 <tr>
-  <td>{{host.username}}</td>
+  <td><a href="https://opencollective.com/{{host.slug}}">{{host.slug}}</a></td>
   <td align="center">{{{currency stats.balance.totalInHostCurrency currency=host.currency}}}</td>
-  <td align="center">{{stats.totalCollectives}}<br /><p class="muted">({{stats.totalActiveCollectives}})</p></td>
-  <td align="center">{{stats.backers.total}}<br /><p class="muted">({{stats.backers.new}}/{{stats.backers.repeat}})</p></td>
+  <td align="center">{{{number stats.totalCollectives}}}<br /><p class="muted">({{{number stats.totalActiveCollectives}}})</p></td>
+  <td align="center">{{{number stats.backers.total}}}<br /><p class="muted">({{{number stats.backers.new}}}/{{{number stats.backers.repeat}}})</p></td>
   <td align="center">{{{currency stats.totalAmountDonations.totalInHostCurrency currency=host.currency sign=true}}}</td>
   <td align="center">{{{currency stats.totalAmountPaidExpenses.totalInHostCurrency currency=host.currency}}}</td>
 </tr>

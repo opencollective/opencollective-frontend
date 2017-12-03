@@ -2,7 +2,7 @@
 
 // Only run on the first of the month
 const today = new Date();
-if (process.env.NODE_ENV === 'production' && today.getDate() !== 7) { // Need to change back to 1 when ready
+if (process.env.NODE_ENV === 'production' && today.getDate() !== 4) { // Need to change back to 1 when ready
   console.log('NODE_ENV is production and today is not the first of month, script aborted!');
   process.exit();
 }
@@ -23,15 +23,24 @@ import path from 'path';
 import fs from 'fs';
 
 const d = new Date;
-d.setMonth(d.getMonth() - 1);
+d.setMonth(d.getMonth() - 2);
 const month = moment(d).format('MMMM');
 const year = d.getFullYear();
 
 const csv_filename = `${moment(d).format('YYYYMM')}-transactions.csv`;
 const pdf_filename = `${moment(d).format('YYYYMM')}-expenses.pdf`;
 
-const startDate = new Date(d.getFullYear(), d.getMonth(), 1);
-const endDate = new Date(d.getFullYear(), d.getMonth()+1, 1);
+const previousStartDate = new Date(d.getFullYear(), d.getMonth(), 1);
+const startDate = new Date(d.getFullYear(), d.getMonth()+1, 1);
+const endDate = new Date(d.getFullYear(), d.getMonth()+2, 1);
+
+const dateRange = {
+  createdAt: { $gte: startDate, $lt: endDate }
+};
+
+const previousDateRange = {
+  createdAt: { $gte: previousStartDate, $lt: startDate }
+}
 
 console.log("startDate", startDate,"endDate", endDate);
 
@@ -47,6 +56,14 @@ const summary = {
   numberPaidExpenses: 0,
   hosts: []
 };
+
+const deltaAmount = (a, b) => {
+  const r = {};
+  for (const attr in a) {
+    r[attr] = a[attr] - b[attr];
+  }
+  return r;
+}
 
 const init = () => {
 
@@ -80,13 +97,20 @@ const init = () => {
     summary.platformStats = {
       totalHostBalance: platformStats[0],
       deltaHostBalance: platformStats[1],
-      totalAmountDonations: platformStats[2],
-      totalNetAmountReceived: platformStats[3],
-      totalAmountPaidExpenses: platformStats[4],
-      totalHostFees: platformStats[5],
-      totalPaymentProcessorFees: platformStats[6],
-      totalPlatformFees: platformStats[7],
-      backers: platformStats[8]
+      totalPlatformDonations: platformStats[2],
+      deltaPlatformDonations: deltaAmount(platformStats[2], platformStats[3]),
+      totalAddFunds: platformStats[4],
+      deltaAddFunds: deltaAmount(platformStats[4], platformStats[5]),
+      totalNetAmountReceived: platformStats[6],
+      totalAmountPaidExpenses: platformStats[7],
+      deltaAmountPaidExpenses: deltaAmount(platformStats[7], platformStats[8]),
+      totalHostFees: platformStats[9],
+      deltaHostFees: deltaAmount(platformStats[9], platformStats[10]),
+      totalPaymentProcessorFees: platformStats[11],
+      deltaPaymentProcessorFees: deltaAmount(platformStats[11], platformStats[12]),
+      totalPlatformFees: platformStats[13],
+      deltaPlatformFees: deltaAmount(platformStats[13], platformStats[14]),
+      backers: platformStats[15]
     };
     summary.hosts.sort((a, b) => {
       return b.stats.backers.new - a.stats.backers.new;
@@ -102,28 +126,34 @@ const init = () => {
 
 const getPlatformStats = () => {
 
-  const dateRange = {
-    createdAt: { $gte: startDate, $lt: endDate }
-  };
+  return models.Collective.findAll({ where: { type: { $in: ['COLLECTIVE', 'EVENT'] } } })
+    .then((collectives) => {
+      const where = {
+        CollectiveId: { $in: collectives.map(c => c.id) }
+      };
 
-  return Promise.all([
-    sumTransactions('netAmountInCollectiveCurrency', {}, 'USD'),                      // total host balance
-    sumTransactions('netAmountInCollectiveCurrency', { ...dateRange}, 'USD'),   // delta host balance last month
-    sumTransactions('amount', { type: 'CREDIT', ...dateRange}, 'USD'), // total donations last month
-    sumTransactions('netAmountInCollectiveCurrency', { type: 'CREDIT', ...dateRange}, 'USD'), // total net amount received last month (after processing fee and host fees)
-    sumTransactions('netAmountInCollectiveCurrency', { type: 'DEBIT', ...dateRange}, 'USD'),  // total net amount paid out last month
-    sumTransactions("hostFeeInHostCurrency", dateRange, 'USD'),
-    sumTransactions("paymentProcessorFeeInHostCurrency", dateRange, 'USD'),
-    sumTransactions("platformFeeInHostCurrency", dateRange, 'USD'),
-    getBackersStats(startDate, endDate)
-  ]);
+      return Promise.all([
+        sumTransactions('netAmountInCollectiveCurrency', where, 'USD'),                      // total host balance
+        sumTransactions('netAmountInCollectiveCurrency', { ...where, ...dateRange}, 'USD'),   // delta host balance last month
+        sumTransactions('amount', { ...where, type: 'CREDIT', ...dateRange, platformFeeInHostCurrency: { $gt: 0 }}, 'USD'), // total donations last month excluding  "add funds"
+        sumTransactions('amount', { ...where, type: 'CREDIT', ...previousDateRange, platformFeeInHostCurrency: { $gt: 0 }}, 'USD'), // total donations last month excluding  "add funds" previous month
+        sumTransactions('amount', { ...where, type: 'CREDIT', ...dateRange, platformFeeInHostCurrency: { $or: [null, 0 ] } }, 'USD'), // total "add funds" last month
+        sumTransactions('amount', { ...where, type: 'CREDIT', ...previousDateRange, platformFeeInHostCurrency: { $or: [null, 0 ] } }, 'USD'), // total "add funds" previous month
+        sumTransactions('netAmountInCollectiveCurrency', { ...where, type: 'CREDIT', ...dateRange}, 'USD'), // total net amount received last month (after processing fee and host fees)
+        sumTransactions('netAmountInCollectiveCurrency', { ...where, type: 'DEBIT', ...dateRange}, 'USD'),  // total net amount paid out last month
+        sumTransactions('netAmountInCollectiveCurrency', { ...where, type: 'DEBIT', ...previousDateRange}, 'USD'),  // total net amount paid out previous month
+        sumTransactions("hostFeeInHostCurrency", { ...where, ...dateRange }, 'USD'),
+        sumTransactions("hostFeeInHostCurrency", { ...where, ...previousDateRange }, 'USD'),
+        sumTransactions("paymentProcessorFeeInHostCurrency", { ...where, ...dateRange }, 'USD'),
+        sumTransactions("paymentProcessorFeeInHostCurrency", { ...where, ...previousDateRange }, 'USD'),
+        sumTransactions("platformFeeInHostCurrency", { ...where, ...dateRange }, 'USD'),
+        sumTransactions("platformFeeInHostCurrency", { ...where, ...previousDateRange }, 'USD'),
+        getBackersStats(startDate, endDate)
+      ])
+    });
 }
 
 const getHostStats = (host, collectiveids) => {
-
-  const dateRange = {
-    createdAt: { $gte: startDate, $lt: endDate }
-  };
 
   const where = {
     CollectiveId: { $in: collectiveids }
@@ -296,7 +326,7 @@ const processHost = (host) => {
         totalInHostCurrency: data.stats.totalNetAmountReceivedForCollectives.totalInHostCurrency + data.stats.totalHostFees.totalInHostCurrency
       };
       summary.hosts.push({
-        host: { name: host.name, username: host.username, currency: host.currency },
+        host: { name: host.name, slug: host.slug, currency: host.currency },
         stats: data.stats
       });
       summary.totalActiveHosts++;

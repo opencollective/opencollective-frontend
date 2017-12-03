@@ -85,6 +85,18 @@ handlebars.registerHelper('currency', (value, props) => {
   return res;
 });
 
+handlebars.registerHelper('number', (value, props) => {
+  const { precision, currency } = props.hash;
+  let locale = 'en-US';
+  if (currency === 'EUR') {
+    locale = 'fr-FR';
+  }
+  return value.toLocaleString(locale, {
+    minimumFractionDigits : precision || 0,
+    maximumFractionDigits : precision || 0
+  });
+});
+
 handlebars.registerHelper('resizeImage', (imageUrl, props) => resizeImage(imageUrl, props.hash));
 handlebars.registerHelper('capitalize', (str) => capitalize(str));
 handlebars.registerHelper('pluralize', (str, props) => pluralize(str, props.hash.n || props.hash.count));

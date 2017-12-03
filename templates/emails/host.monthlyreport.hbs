@@ -37,8 +37,8 @@ th {
 </style>
 
 <div style="display:none;font-size:1px;color:#333333;line-height:1px;max-height:0px;max-width:0px;opacity:0;overflow:hidden;">
-  Collectives: {{stats.totalCollectives}} ({{stats.totalActiveCollectives}} active) //
-  Backers: {{stats.backers.total}} (+{{stats.backers.new}}{{#if stats.backers.lost}}, -{{stats.backers.lost}}{{/if}}) //  
+  Collectives: {{{number stats.totalCollectives}}} ({{{number stats.totalActiveCollectives}}} active) //
+  Backers: {{{number stats.backers.total}}} (+{{{number stats.backers.new}}}{{#if stats.backers.lost}}, -{{{number stats.backers.lost}}}{{/if}}) //  
   Balance: {{{currency stats.balance.totalInHostCurrency currency=host.currency}}} ({{{currency stats.delta.totalInHostCurrency currency=host.currency sign=true}}}) //       
   Host fees: {{{currency stats.totalHostFees.totalInHostCurrency currency=host.currency}}} //  
 </div>
@@ -52,7 +52,7 @@ th {
   <tr>
     <td align="center"><span class="counter">{{{currency stats.balance.totalInHostCurrency currency=host.currency}}}</span></td>
     <td width=200>&nbsp;</td>
-    <td align="center"><span class="counter">{{stats.backers.total}}</span></td>
+    <td align="center"><span class="counter">{{{number stats.backers.total}}}</span></td>
   </tr>
   <tr>
     <td align="center" nowrap><span class="label">current balance</span></td>
@@ -66,7 +66,7 @@ th {
     </td>
     <td></td>
     <td align="center">
-      <span class="positive">(+{{stats.backers.new}})</span><br />
+      <span class="positive">(+{{{number stats.backers.new}}})</span><br />
       <span class="negative">&nbsp;{{#if stats.backers.lost}}(-{{host.stats.backers.lost}}){{/if}}&nbsp;</span>
     </td>
   </tr>
@@ -75,8 +75,8 @@ th {
 
 <h2>Details for the month</h2>
 <table border=0 width="100%">
-  <tr><td>Number of collectives:</td><td></td><td>{{stats.totalCollectives}} ({{stats.totalActiveCollectives}} active)</td></tr>
-  <tr><td>Number of transactions:</td><td></td><td>{{stats.numberTransactions}} ({{stats.numberDonations}} {{{pluralize "donation" n=stats.numberDonations}}}, {{stats.numberPaidExpenses}} {{{pluralize "expense" n=stats.numberPaidExpenses}}} paid)</td></tr>
+  <tr><td>Number of collectives:</td><td></td><td>{{{number stats.totalCollectives}}} ({{{number stats.totalActiveCollectives}}} active)</td></tr>
+  <tr><td>Number of transactions:</td><td></td><td>{{{number stats.numberTransactions}}} ({{{number stats.numberDonations}}} {{{pluralize "donation" n=stats.numberDonations}}}, {{{number stats.numberPaidExpenses}}} {{{pluralize "expense" n=stats.numberPaidExpenses}}} paid)</td></tr>
   <tr><td colspan=3 height=10></td></tr>
   <tr><td>Donations received:</td><td></td><td>{{{currency stats.totalAmountDonations.totalInHostCurrency currency=host.currency}}}</td></tr>
   <tr><td>Expenses paid:</td><td></td><td>{{{currency stats.totalAmountPaidExpenses.totalInHostCurrency currency=host.currency}}}</td></tr>
@@ -92,7 +92,7 @@ th {
   <tr><td colspan=3 class="muted">(Total commission for {{host.name}})</td></tr>
   <tr><td colspan=3 height=10></td></tr>
   <tr><td>Net amount:</td><td></td><td>{{{currency stats.totalNetAmountReceivedForCollectives.totalInHostCurrency currency=host.currency}}}</td></tr>
-  <tr><td colspan=3 class="muted">(Net amount received for your {{stats.totalCollectives}} {{{pluralize "collective" n=stats.totalCollectives}}}</td></tr>
+  <tr><td colspan=3 class="muted">(Net amount received for your {{{number stats.totalCollectives}}} {{{pluralize "collective" n=stats.totalCollectives}}}</td></tr>
 </table>
 
 
