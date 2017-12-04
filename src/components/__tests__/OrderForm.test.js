@@ -247,6 +247,7 @@ describe("OrderForm component", () => {
 
       component = mountComponent({ collective, order }, () => Promise.resolve({ data: null}));
 
+      component.find('.gift-card-expander').simulate('click');
       fillValue(component, 'prepaidcard', 'BB-FTC1900');
 
       component.find('.prepaidapply.btn').simulate('click');
@@ -267,6 +268,7 @@ describe("OrderForm component", () => {
           }
       }}));
 
+      component.find('.gift-card-expander').simulate('click');
       fillValue(component, 'prepaidcard', 'BB-FTC1900');
 
       component.find('.prepaidapply.btn').simulate('click');

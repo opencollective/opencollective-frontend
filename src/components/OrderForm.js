@@ -12,6 +12,7 @@ import { pick } from 'lodash';
 import withIntl from '../lib/withIntl';
 import { checkUserExistence, signin } from '../lib/api';
 import { getPrepaidCardBalanceQuery } from '../graphql/queries';
+import colors from '../constants/colors';
 
 class OrderForm extends React.Component {
 
@@ -41,6 +42,7 @@ class OrderForm extends React.Component {
       prepaidcard: {
         applySent: false,
         loading: false,
+        expanded: this.props.redeemFlow
       },
       orgDetails: {
         show: !this.props.redeemFlow
@@ -223,6 +225,9 @@ class OrderForm extends React.Component {
       fromCollective,
       orgDetails: {
         show: Boolean(fromCollective)
+      },
+      creditcard: {
+        show: true
       }
     };
     this.populatePaymentMethods(CollectiveId);
@@ -252,6 +257,10 @@ class OrderForm extends React.Component {
       newState[obj] = {};
     } else {
       newState[obj] = Object.assign({}, this.state[obj], attr);
+    }
+
+    if (obj === 'creditcard' && attr.uuid === 'other') {
+      newState.creditcard.show = true;
     }
 
     if (attr === 'tier') {
@@ -522,6 +531,10 @@ class OrderForm extends React.Component {
           margin-top: -2.5rem;
           color: #737373;
         }
+        .gift-card-expander {
+          color: ${colors.blue};
+          margin-left: 183px;
+        }
         @media (min-width: 768px) {
           .actions {
             margin: 6rem 0 6rem 26%;
@@ -645,14 +658,22 @@ class OrderForm extends React.Component {
                   </div>
                 }
                 <div>
-                  <Row key={`prepaidcard.input`}>
-                    <Col sm={12}>
-                      <InputField
-                        className="horizontal"
-                        {...inputPrepaidcard}
-                        />
-                    </Col>
-                  </Row>
+                  {!prepaidcard.expanded && 
+                    <a className='gift-card-expander' onClick={() => this.setState({
+                      prepaidcard: Object.assign({}, this.state.prepaidcard, {expanded: true})
+                    })}> Use a Gift Card </a>
+                  }
+                  {prepaidcard.expanded && 
+                    <Row key={`prepaidcard.input`}>
+                      <Col sm={12}>
+                        <InputField
+                          className="horizontal"
+                          {...inputPrepaidcard}
+                          />
+                      </Col>
+                    </Row>
+                  }
+
                 </div>
               </Col>
             </Row>
