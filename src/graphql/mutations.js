@@ -76,14 +76,6 @@ const editCollectiveQuery = gql`
         role
         description
       }
-      tiers {
-        id
-        amount
-        description
-        interval
-        maxQuantity
-        type
-      }
     }
   }
 `;
