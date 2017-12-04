@@ -70,7 +70,7 @@ describe('lib.imageUrlToAmazonUrl.js', () => {
           expect(multiPartStub.firstCall.args[0].headers).to.deep.equal({
             'Content-Type': 'image/png',
             'x-amz-acl': 'public-read',
-            'Cache-Control': 60*60*24*30
+            'Cache-Control': `max-age=${60*60*24*30}`
           });
           expect(aws_src).to.equal(returnUrl);
           done();
