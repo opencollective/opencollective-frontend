@@ -41,11 +41,10 @@ class CollectivePickerWithData extends React.Component {
     }
     this.setState({ loading: true });
     const hostCollective = this.hostCollective;
-    const selectedCollective = cloneDeep(this.state.selectedCollective);
     console.log(">>> addFunds", form, "host: ", hostCollective);
     const order = pick(form, ['totalAmount', 'description']);
     order.collective = {
-      id: selectedCollective.id
+      id: this.state.CollectiveId
     };
     if (form.email) {
       order.user = {
@@ -74,10 +73,7 @@ class CollectivePickerWithData extends React.Component {
     console.log(">>> add funds order: ", order);
     try {
       const res = await this.props.createOrder(order)
-      console.log(">>> res", res);
-      selectedCollective.stats.balance = res.data.createOrder.collective.stats.balance;
-      console.log(">>> selectedCollective", selectedCollective);
-      this.setState({ showAddFunds: false, loading: false, selectedCollective });
+      this.setState({ showAddFunds: false, loading: false });
     } catch (e) {
       const error = e.message && e.message.replace(/GraphQL error:/, "");
       this.setState({ error, loading: false });
@@ -91,8 +87,7 @@ class CollectivePickerWithData extends React.Component {
   onChange(CollectiveId) {
     const collectives = this.hostCollective.collectives;
     const selectedCollective = CollectiveId > 0 && collectives.find(c => c.id === CollectiveId);
-    this.setState({ selectedCollective });
-    console.log(">>> CollectivePicker onChange", selectedCollective);
+    this.setState({ CollectiveId });
     this.props.onChange(selectedCollective);
   }
 
@@ -170,7 +165,7 @@ class CollectivePickerWithData extends React.Component {
       return (<Error message="GraphQL error" />)
     }
 
-    this.hostCollective = this.hostCollective || Collective;
+    this.hostCollective = Collective || this.hostCollective;
     const canAddFunds = LoggedInUser && LoggedInUser.canEditCollective(this.hostCollective);
 
     if (loading || !this.hostCollective) {
@@ -184,7 +179,7 @@ class CollectivePickerWithData extends React.Component {
       return (b.name.toUpperCase() < a.name.toUpperCase()) ? 1 : -1;
     });
 
-    const selectedCollective = this.state.selectedCollective;
+    const selectedCollective = collectives.find(c => c.id === this.state.CollectiveId);
     const selectedTitle = selectedCollective ? this.renderCollectiveMenuItem(selectedCollective, 'selected') : <div className="defaultTitle"><FormattedMessage id="expenses.allCollectives" defaultMessage="All Collectives" /></div>;
 
     return (
@@ -271,6 +266,11 @@ class CollectivePickerWithData extends React.Component {
             { collectives.length > 0 &&
               <div className="collectivesFilter">
                 <DropdownButton bsStyle="default" title={selectedTitle} onSelect={this.onChange}>
+                  { this.state.CollectiveId &&
+                    <MenuItem key={null} eventKey={null}>
+                      <FormattedMessage id="expenses.allCollectives" defaultMessage="All Collectives" />
+                    </MenuItem>
+                  }
                   { collectives.map(collective => (
                     <MenuItem key={collective.id} eventKey={collective.id} title={collective.name}>
                     { this.renderCollectiveMenuItem(collective) }
