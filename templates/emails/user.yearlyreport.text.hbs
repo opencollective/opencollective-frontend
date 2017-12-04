@@ -1,18 +1,15 @@
-Hi {{recipient.firstName}}!
+Hi {{collective.name}}!
 
-2016 is finally ending 🎉 and frankly, we can't wait for this year to be over 😱.
+{{year}} is already ending 🎉. That was fast!
 
-It's been a heck of a year all over the world, but as we say: "never let a good crisis go to waste".
+We believe in communities. They make us strong and give everyone the opportunity to learn and give back to the world 🌎.
 
-Crisis are opportunities to change, opportunities to reinvent the way we live and work together, for the better 🌱.
-
-We believe in communities. We believe that they are the best positioned to give everyone the opportunity to learn and give back to the world 🌎.
-
-To enable those communities to sustain themselves and thrive, we need a new form of association that would be open and transparent by design. We call them "open collectives". In 2016, we created 155 of them and together, they already have a yearly budget of more than $350k 💰💰💰.
+To enable those communities to sustain themselves and thrive, we need a new form of association that would be open and transparent by design. We call them "open collectives". In {{year}}, {{platformStats.totalCollectives}} collectives joined our community. Together, we already have a yearly budget of more than {{{currency platformStats.totalAnnualBudget currency="USD"}}} 💰💰💰.
 
 We would like to thank you for the contributions that you made this year to help us build this future 🙏.
 
-In 2016 you have contributed to {{stats.totalCollectives}} {{{pluralize "collective" n=stats.totalCollectives}}}:
+In {{year}} you have contributed a total of {{stats.totalDonationsString}} across {{stats.totalCollectives}} {{{pluralize "collective" n=stats.totalCollectives}}}:
+
 {{#each hosts}}
 {{name}}
   {{#each collectives}}

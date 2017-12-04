@@ -547,12 +547,14 @@ const getMembersWithBalance = (where, options = {}) => {
   });
 };
 
-const getTotalNumberOfActiveCollectives = () => {
+const getTotalNumberOfActiveCollectives = (since, until) => {
+  const sinceClause = (since) ? `AND t."createdAt" >= '${since.toISOString()}'`: '';
+  const untilClause = (until) ? `AND t."createdAt" < '${until.toISOString()}'` : '';
   return sequelize.query(`
     SELECT COUNT(DISTINCT("CollectiveId")) as count
     FROM "Transactions" t
       LEFT JOIN "Collectives" c ON t."CollectiveId" = c.id
-    WHERE c.type='COLLECTIVE'
+    WHERE c.type='COLLECTIVE' ${sinceClause} ${untilClause}
   `, {
     type: sequelize.QueryTypes.SELECT
   })
