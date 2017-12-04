@@ -35,7 +35,7 @@ function imageUrlToAmazonUrl(knox_client, src, callback) {
         stream: request.get(src),
         headers: {
           'Content-Type': contentType,
-          'Cache-Control': 2592000, // 30 days, in seconds
+          'Cache-Control': 60*60*24*30, // 30 days, in seconds
           'x-amz-acl': 'public-read'
         }
       }, (err, body) => err ? callback(err) : callback(null, body.Location));
