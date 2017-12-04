@@ -62,6 +62,13 @@ mutation payExpense($id: Int!) {
   payExpense(id: $id) {
     id
     status
+    collective {
+      id
+      stats {
+        id
+        balance
+      }
+    }
   }
 }
 `;
