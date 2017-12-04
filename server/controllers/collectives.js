@@ -3,7 +3,7 @@
  */
 import _ from 'lodash';
 import async from 'async';
-import { defaultHostCollective, getLinkHeader, getRequestedUrl } from '../lib/utils';
+import { defaultHostCollective, getLinkHeader, getRequestedUrl, resizeImage } from '../lib/utils';
 import Promise from 'bluebird';
 import roles from '../constants/roles';
 import activities from '../constants/activities';
@@ -94,7 +94,7 @@ export const getUsers = (req, res, next) => {
 
   return promise
     .map(userCollective => {
-      let avatar = userCollective.image;
+      let avatar = resizeImage(userCollective.image, { height: 96 });
       if (avatar && avatar.match(/^\//)) {
         avatar = `${config.host.website}${avatar}`
       }
