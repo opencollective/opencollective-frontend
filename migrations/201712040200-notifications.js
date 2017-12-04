@@ -25,12 +25,12 @@ const updateNotifications = (sequelize) => {
       return Promise.resolve();
     }
     notificationsProcessed++;
-    console.log(">>> updating", notification);
     if (DRY_RUN) {
+      console.log(">>> updating", notification);
       return Promise.resolve();
     }
     return sequelize.query(`UPDATE "Notifications" SET "CollectiveId"=:CollectiveId WHERE id=:id`, { replacements: notification }).catch(e => {
-      console.log(">>> error when updating", notification,":", e);
+      console.log(">>> error when updating", notification,":", e.message);
       if (notification.id > 0) {
         console.log("deleting Notification id", notification.id);
         return sequelize.query(`DELETE FROM "Notifications" WHERE id=:id`, { replacements: notification });
