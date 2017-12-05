@@ -68,7 +68,7 @@ class UserCollective extends React.Component {
   }
 
   render() {
-    let collectiveCreated = {};
+    let collectiveCreated;
     const { intl, LoggedInUser, query } = this.props;
 
     const type = this.collective.type.toLowerCase();
@@ -79,7 +79,6 @@ class UserCollective extends React.Component {
     const memberOf = groupBy(this.collective.memberOf, 'role');
     const actions = [];
     Object.keys(memberOf).map(role => {
-      console.log(">>> role", role);
       actions.push(
         {
           className: 'whiteblue',
@@ -96,7 +95,7 @@ class UserCollective extends React.Component {
     }
 
     if (query && query.CollectiveId) {
-      collectiveCreated = (this.collective.memberOf.find(m => m.collective.id === parseInt(query.CollectiveId)) || {}).collective || {};
+      collectiveCreated = this.collective.memberOf.find(m => m.collective.id === parseInt(query.CollectiveId));
     }
 
     return (
@@ -179,10 +178,14 @@ class UserCollective extends React.Component {
                   { query && query.status === 'orderCreated' &&
                     <div className="orderCreated">
                       <p className="thankyou"><FormattedMessage id="collective.user.orderCreated.thankyou" defaultMessage="Thank you for your donation! 🙏" /></p>
-                      <p><FormattedMessage id="collective.user.orderCreated.message" defaultMessage="We have added {collective} to your profile" values={{ collective: collectiveCreated.name }} /></p>
-                      { memberOf['BACKER'] && memberOf['BACKER'].length > 10 &&
-                        <div className="collectiveCard">
-                          <CollectiveCard collective={collectiveCreated} />
+                      { collectiveCreated &&
+                        <div>
+                          <p><FormattedMessage id="collective.user.orderCreated.message" defaultMessage="We have added {collective} to your profile" values={{ collective: collectiveCreated.name }} /></p>
+                          { memberOf['BACKER'] && memberOf['BACKER'].length > 10 &&
+                            <div className="collectiveCard">
+                              <CollectiveCard collective={collectiveCreated} />
+                            </div>
+                          }
                         </div>
                       }
                     </div>
