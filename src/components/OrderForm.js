@@ -583,7 +583,7 @@ class OrderForm extends React.Component {
             <InputField
               className="horizontal"
               type="select"
-              label={intl.formatMessage(this.messages[order.tier.type === 'ticket' ? 'order.rsvpAs' : 'order.contributeAs'])}
+              label={intl.formatMessage(this.messages[order.tier.type === 'TICKET' ? 'order.rsvpAs' : 'order.contributeAs'])}
               name="fromCollectiveSelector"
               onChange={CollectiveId => this.selectProfile(CollectiveId)}
               options={this.populateOrganizations(LoggedInUser)}

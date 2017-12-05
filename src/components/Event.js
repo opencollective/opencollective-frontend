@@ -35,6 +35,7 @@ class Event extends React.Component {
 
   constructor(props) {
     super(props);
+    this.event = this.props.event; // pre-loaded by SSR
     this.setInterested = this.setInterested.bind(this);
     this.removeInterested = this.removeInterested.bind(this);
     this.updateOrder = this.updateOrder.bind(this);
@@ -133,17 +134,17 @@ class Event extends React.Component {
   async createOrder(order) {
     order.tier = order.tier || {};
     const OrderInputType = {
-      ... order,
-      collective: { slug: this.collective.slug },
+      ...order,
+      collective: { slug: this.event.slug },
       tier: { id: order.tier.id }
     };
-
     this.setState( { status: 'loading' });
     try {
       await this.props.createOrder(OrderInputType);
       this.setState({ status: 'idle', order, view: 'default', modal: 'TicketsConfirmed' });
     } catch (err) {
       console.error(">>> createOrder error: ", err);
+      this.setState({ status: 'error', error: err.graphQLErrors[0].message });
       throw new Error(err.graphQLErrors[0].message);
     }
   }
@@ -197,26 +198,6 @@ class Event extends React.Component {
     window.scrollTo(0,0);
   }
 
-  async createResponse(response) {
-    response.tier = response.tier || {};
-    const ResponseInputType = {
-      collective: { slug: this.state.event.slug },
-      tier: { id: response.tier.id },
-      quantity: response.quantity,
-      user: response.user,
-      status: response.status
-    };
-
-    this.setState( { status: 'loading' });
-    try {
-      await this.props.createResponse(ResponseInputType);
-      this.setState( { status: 'idle' });
-    } catch (err) {
-      console.error(">>> createResponse error: ", err);
-      throw new Error(err.graphQLErrors[0].message);
-    }
-  }
-
   error(msg) {
     this.setState( {status: 'error', error: msg });
     setTimeout(() => {
@@ -247,11 +228,6 @@ class Event extends React.Component {
     const { event, order } = this.state;
     order.tier = { id: tier.id };
     
-    // If the total amount is 0 and the user is logged in, we can directly RSVP.
-    if (order.totalAmount === 0 && this.props.LoggedInUser) {
-      order.user = { id: this.props.LoggedInUser.id };
-      return this.createOrder(order);
-    }
     this.setState({ order, showInterestedForm: false });
     const params = trimObject({
       eventSlug: event.slug,
