@@ -1,6 +1,5 @@
 import { download, chromeless } from '../utils';
-const WEBSITE_URL = "https://staging.opencollective.com";
-// const WEBSITE_URL = "http://localhost:3030";
+const WEBSITE_URL = process.env.WEBSITE_URL || "https://staging.opencollective.com";
 
 describe("user.profile", () => {
   let browser;
