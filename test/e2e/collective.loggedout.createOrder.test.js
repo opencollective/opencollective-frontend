@@ -1,7 +1,6 @@
 import { download, chromeless } from '../utils';
 
-const WEBSITE_URL = "https://staging.opencollective.com";
-// const WEBSITE_URL = "http://localhost:3030";
+const WEBSITE_URL = process.env.WEBSITE_URL || "https://staging.opencollective.com";
 
 describe("collective.loggedout.createOrder", () => {
   let browser;
@@ -31,7 +30,8 @@ describe("collective.loggedout.createOrder", () => {
         .type("111", "input[name='CCcvc']")
         .click(".presetBtn")
         .type("Public message", "textarea[name='publicMessage']")
-        .scrollToElement('.submit button')
+        .scrollToElement('.Footer')
+        .wait(2000)
         .click('.submit button')
         .screenshot();
 
