@@ -320,6 +320,7 @@ class EditCollectiveForm extends React.Component {
             <EditTiers
               title="Tiers"
               tiers={this.state.tiers}
+              collective={collective}
               currency={collective.currency}
               onChange={this.handleObjectChange}
               defaultType={this.defaultTierType}

@@ -63,7 +63,8 @@ class OrderForm extends React.Component {
     this.populateOrganizations = this.populateOrganizations.bind(this);
     
     this.messages = defineMessages({
-      'order.profile': { id: 'tier.order.profile', defaultMessage: `Contribute as` },
+      'order.contributeAs': { id: 'tier.order.contributeAs', defaultMessage: `Contribute as` },
+      'order.rsvpAs': { id: 'tier.order.rsvpAs', defaultMessage: `RSVP as` },
       'order.profile.myself': { id: 'tier.order.profile.myself', defaultMessage: `myself` },
       'order.success': { id: 'tier.order.success', defaultMessage: '🎉 Your order has been processed successfully' },
       'order.error': { id: 'tier.order.error', defaultMessage: `An error occured 😳. The order didn't go through. Please try again in a few.` },
@@ -582,7 +583,7 @@ class OrderForm extends React.Component {
             <InputField
               className="horizontal"
               type="select"
-              label={intl.formatMessage(this.messages['order.profile'])}
+              label={intl.formatMessage(this.messages[order.tier.type === 'ticket' ? 'order.rsvpAs' : 'order.contributeAs'])}
               name="fromCollectiveSelector"
               onChange={CollectiveId => this.selectProfile(CollectiveId)}
               options={this.populateOrganizations(LoggedInUser)}

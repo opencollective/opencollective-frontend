@@ -25,9 +25,6 @@ describe("event.loggedout.register", () => {
       .type("https://xdamman.com", "input[name='website']")
       .type("xdamman", "input[name='twitterHandle']")
       .type("short bio", "input[name='description']")
-      .type("Open Collective Inc.", "input[name='organization_name']")
-      .type("http://opencollective.com.com", "input[name='organization_website']")
-      .type("opencollect", "input[name='organization_twitterHandle']")
       .type("Public message", "textarea[name='publicMessage']")
       .screenshot();
 
