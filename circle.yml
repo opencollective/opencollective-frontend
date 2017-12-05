@@ -13,5 +13,3 @@ machine:
     version: 8.4.0
   environment:
     NODE_ENV: circleci
-    PORT: 3000
-    WEBSITE_URL: http://localhost:3000
