@@ -227,7 +227,7 @@ class OrderForm extends React.Component {
     }
     const newState = {
       ...this.state,
-      isNewUser: !Boolean(collective),
+      isNewUser: !Boolean(this.props.LoggedInUser),
       fromCollective,
       orgDetails: {
         show: Boolean(CollectiveId === 'organization')

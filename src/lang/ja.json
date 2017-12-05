@@ -339,7 +339,7 @@
   "user.collective.menu.attendee": "attended {n} {n, plural, one {event} other {events}}",
   "collective.user.orderCreated.thankyou": "ご支援ありがとうございます! 🙏",
   "collective.user.orderCreated.message": "We have added {collective} to your profile",
-  "collective.user.emptyProfile": "Your profile looks a bit empty ¯\\_(ツ)_/¯",
+  "collective.user.emptyProfile": "Your profile looks a bit empty ¯\\\\_(ツ)_/¯",
   "utils.free": "free",
   "tier.order.donation.title": "貢献",
   "tier.name.donation": "支援",

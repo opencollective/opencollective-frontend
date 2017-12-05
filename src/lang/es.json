@@ -339,7 +339,7 @@
   "user.collective.menu.attendee": "attended {n} {n, plural, one {event} other {events}}",
   "collective.user.orderCreated.thankyou": "Gracias por tu contribución! 🙏",
   "collective.user.orderCreated.message": "Hemos agregado a {collective} a tu perfil",
-  "collective.user.emptyProfile": "Tu perfil está un poco vacío ¯\\_(ツ)_/¯",
+  "collective.user.emptyProfile": "Tu perfil está un poco vacío ¯\\\\_(ツ)_/¯",
   "utils.free": "gratis",
   "tier.order.donation.title": "Contribuye",
   "tier.name.donation": "donación",
