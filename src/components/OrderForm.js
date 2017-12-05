@@ -27,9 +27,8 @@ class OrderForm extends React.Component {
   constructor(props) {
     super(props);
     const { intl, order } = props;
-
     const tier = { ...order.tier };
-
+    
     this.state = {
       isNewUser: true,
       loginSent: false,
@@ -45,25 +44,27 @@ class OrderForm extends React.Component {
         expanded: this.props.redeemFlow
       },
       orgDetails: {
-        show: !this.props.redeemFlow
+        show: false
       },
       order: order || {},
       result: {}
     };
     
     this.state.order.totalAmount = this.state.order.totalAmount || tier.amount * (tier.quantity || 1);
-
+    
     this.paymentMethodsOptions = [];
-
+    
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.error = this.error.bind(this);
     this.resetError = this.resetError.bind(this);
     this.validate = this.validate.bind(this);
     this.resetOrder = this.resetOrder.bind(this);
-
+    this.populateOrganizations = this.populateOrganizations.bind(this);
+    
     this.messages = defineMessages({
-      'order.profile': { id: 'tier.order.profile', defaultMessage: `Profile` },
+      'order.profile': { id: 'tier.order.profile', defaultMessage: `Contribute as` },
+      'order.profile.myself': { id: 'tier.order.profile.myself', defaultMessage: `myself` },
       'order.success': { id: 'tier.order.success', defaultMessage: '🎉 Your order has been processed successfully' },
       'order.error': { id: 'tier.order.error', defaultMessage: `An error occured 😳. The order didn't go through. Please try again in a few.` },
       'order.button': { id: 'tier.order.button', defaultMessage: 'place order' },
@@ -184,33 +185,37 @@ class OrderForm extends React.Component {
     const { intl } = this.props;
     const fromCollectiveOptions = [], collectivesById = {};
 
-    fromCollectiveOptions.push({ [LoggedInUser.CollectiveId]: LoggedInUser.collective.name });
-    collectivesById[LoggedInUser.CollectiveId] = LoggedInUser.collective;
-    LoggedInUser.memberOf.map(membership => {
-      if (membership.collective.type === 'COLLECTIVE') return;
-      if (['ADMIN','HOST'].indexOf(membership.role) === -1) return;
-      const value = membership.collective.id;
-      const label = membership.collective.name;
-      collectivesById[value] = pick(membership.collective, ['id', 'type', 'name', 'paymentMethods'])
-      fromCollectiveOptions.push({ [value]: label });
-    })
-    collectivesById[0] = null;
-    fromCollectiveOptions.push({ 0: intl.formatMessage(this.messages['order.organization.create']) });
+    if (LoggedInUser) {
+      fromCollectiveOptions.push({ [LoggedInUser.CollectiveId]: LoggedInUser.collective.name });
+      collectivesById[LoggedInUser.CollectiveId] = LoggedInUser.collective;
+      LoggedInUser.memberOf.map(membership => {
+        if (membership.collective.type === 'COLLECTIVE') return;
+        if (membership.collective.type === 'EVENT') return;
+        if (['ADMIN','HOST'].indexOf(membership.role) === -1) return;
+        const value = membership.collective.id;
+        const label = membership.collective.name;
+        collectivesById[value] = pick(membership.collective, ['id', 'type', 'name', 'paymentMethods'])
+        fromCollectiveOptions.push({ [value]: label });
+      })
+    } else {
+      fromCollectiveOptions.push({ 'myself': intl.formatMessage(this.messages['order.profile.myself']) });
+    }
+    fromCollectiveOptions.push({ 'organization': intl.formatMessage(this.messages['order.organization.create']) });
     this.collectivesById = collectivesById;
     this.fromCollectiveOptions = fromCollectiveOptions;
+    return fromCollectiveOptions;
   }
 
   componentWillReceiveProps(props) {
     const { LoggedInUser } = props;
     if (!LoggedInUser) return;
-    this.populateOrganizations(LoggedInUser);
     if (!this._isMounted) return;
     this.setState({ LoggedInUser }); // Error: Can only update a mounted or mounting component
     this.selectProfile(LoggedInUser.CollectiveId);
   }
 
   selectProfile(CollectiveId) {
-    const collective = this.collectivesById[CollectiveId];
+    const collective = (typeof CollectiveId === 'string') ? null : this.collectivesById[CollectiveId];
     let fromCollective = {};
     if (collective) {
       fromCollective = {
@@ -221,20 +226,22 @@ class OrderForm extends React.Component {
     }
     const newState = {
       ...this.state,
-      isNewUser: false,
+      isNewUser: !Boolean(collective),
       fromCollective,
       orgDetails: {
-        show: Boolean(fromCollective)
+        show: Boolean(CollectiveId === 'organization')
       },
       creditcard: {
         show: true
       }
     };
-    this.populatePaymentMethods(CollectiveId);
-    if (this.paymentMethods.length > 0) {
-      newState.creditcard = { uuid: this.paymentMethods[0].uuid };
-    } else {
-      newState.creditcard = { save: true }; // reset to default value
+    if (collective) {
+      this.populatePaymentMethods(CollectiveId);
+      if (this.paymentMethods.length > 0) {
+        newState.creditcard = { uuid: this.paymentMethods[0].uuid };
+      } else {
+        newState.creditcard = { save: true }; // reset to default value
+      }
     }
 
     this.setState(newState);
@@ -548,16 +555,7 @@ class OrderForm extends React.Component {
               { !LoggedInUser && <FormattedMessage id="tier.order.userdetails.description" defaultMessage="If you wish to remain anonymous, only provide an email address without any other personal details." /> }
               { LoggedInUser && <FormattedMessage id="tier.order.userdetails.description.loggedin" defaultMessage="If you wish to remain anonymous, logout and use another email address without providing any other personal details." /> }
             </p>
-            { LoggedInUser &&
-              <InputField
-                className="horizontal"
-                type="select"
-                label={intl.formatMessage(this.messages['order.profile'])}
-                name="fromCollectiveSelector"
-                onChange={CollectiveId => this.selectProfile(CollectiveId)}
-                options={this.fromCollectiveOptions}
-                />
-            }
+
             { !LoggedInUser &&
               <Row key={`email.input`}>
                 <Col sm={12}>
@@ -580,11 +578,20 @@ class OrderForm extends React.Component {
                 </Col>
               </Row>
             ))}
+
+            <InputField
+              className="horizontal"
+              type="select"
+              label={intl.formatMessage(this.messages['order.profile'])}
+              name="fromCollectiveSelector"
+              onChange={CollectiveId => this.selectProfile(CollectiveId)}
+              options={this.populateOrganizations(LoggedInUser)}
+              />
         </div>
         { !fromCollective.id && this.state.orgDetails.show &&
           <div className="organizationDetailsForm">
             <h2><FormattedMessage id="tier.order.organizationDetails" defaultMessage="Organization details" /></h2>
-            <p><FormattedMessage id="tier.order.organizationDetails.description" defaultMessage="If you wish to contribute as an organization, please enter the information below. Otherwise you can leave this empty." /></p>
+            <p><FormattedMessage id="tier.order.organizationDetails.description" defaultMessage="Create an organization. You can edit it later to add other members." /></p>
             <Row key={`organization.name.input`}>
               <Col sm={12}>
                 <InputField
