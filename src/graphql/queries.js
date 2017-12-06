@@ -16,6 +16,7 @@ export const getLoggedInUserQuery = gql`
         id
         name
         type
+        slug
         paymentMethods {
           id
           uuid
@@ -490,7 +491,11 @@ export const addGetLoggedInUserFunction = (component) => {
                  */
                 LoggedInUser.canPayExpense = (expense) => {
                   const hostSlug = get(expense, 'collective.host.slug');
-                  if (intersection(roles[hostSlug], ['HOST', 'ADMIN']).length > 0) return true;
+                  // second part of if statement is a hack, in case this User's Collective is the Host
+                  if ((intersection(roles[hostSlug], ['HOST', 'ADMIN']).length > 0) 
+                    || (LoggedInUser.collective.slug === hostSlug)) {
+                    return true;
+                  }
                   return false;                  
                 }
               }
