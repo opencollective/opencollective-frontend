@@ -58,6 +58,7 @@ export default function(Sequelize, DataTypes) {
     },
 
     name: DataTypes.STRING,
+    company: DataTypes.STRING,
 
     CreatedByUserId: {
       type: DataTypes.INTEGER,
