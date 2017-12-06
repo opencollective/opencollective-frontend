@@ -53,15 +53,16 @@ class OrderForm extends React.Component {
     this.state.order.totalAmount = this.state.order.totalAmount || tier.amount * (tier.quantity || 1);
     
     this.paymentMethodsOptions = [];
-    
+    this.allowOrganizations = (order.tier.type !== 'TICKET');
+
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.error = this.error.bind(this);
     this.resetError = this.resetError.bind(this);
     this.validate = this.validate.bind(this);
     this.resetOrder = this.resetOrder.bind(this);
-    this.populateOrganizations = this.populateOrganizations.bind(this);
-    
+    this.populateProfiles = this.populateProfiles.bind(this);
+
     this.messages = defineMessages({
       'order.contributeAs': { id: 'tier.order.contributeAs', defaultMessage: `Contribute as` },
       'order.rsvpAs': { id: 'tier.order.rsvpAs', defaultMessage: `RSVP as` },
@@ -70,6 +71,7 @@ class OrderForm extends React.Component {
       'order.error': { id: 'tier.order.error', defaultMessage: `An error occured 😳. The order didn't go through. Please try again in a few.` },
       'order.button': { id: 'tier.order.button', defaultMessage: 'place order' },
       'order.organization.create': { id: 'tier.order.organization.create', defaultMessage: `create an organization` },
+      'order.profile.logout': { id: 'tier.order.profile.logout', defaultMessage: `logout to create a new profile` },
       'order.organization.name': { id: 'tier.order.organization.name', defaultMessage: `name` },
       'order.organization.website': { id: 'tier.order.organization.website', defaultMessage: `website` },
       'order.organization.twitterHandle': { id: 'tier.order.organization.twitterHandle', defaultMessage: `Twitter` },
@@ -92,6 +94,7 @@ class OrderForm extends React.Component {
       'type.label': { id: 'tier.type.label', defaultMessage: 'type' },
       'firstName.label': { id: 'user.firstName.label', defaultMessage: 'first name' },
       'lastName.label': { id: 'user.lastName.label', defaultMessage: 'last name' },
+      'company.label': { id: 'user.company.label', defaultMessage: 'company' },
       'website.label': { id: 'user.website.label', defaultMessage: 'website' },
       'twitterHandle.label': { id: 'user.twitterHandle.label', defaultMessage: 'twitter' },
       'twitterHandle.description': { id: 'user.twitterHandle.description', defaultMessage: 'If any' },
@@ -115,6 +118,9 @@ class OrderForm extends React.Component {
         name: 'lastName'
       },
       {
+        name: 'company'
+      },
+      {
         name: 'website'
       },
       {
@@ -136,6 +142,8 @@ class OrderForm extends React.Component {
       }
       return field;
     })
+
+    this.populateProfiles();
   }
 
   componentDidMount() {
@@ -182,7 +190,13 @@ class OrderForm extends React.Component {
     return paymentMethodsOptions;
   }
 
-  populateOrganizations(LoggedInUser) {
+  /**
+   * Populate the profiles available based on the current logged in user
+   * If the tier is a ticket, you can only order the ticket as an individual
+   * Otherwise, you can order a tier as an individual or as any organization that you are an admin of
+   * @param {*} LoggedInUser 
+   */
+  populateProfiles(LoggedInUser) {
     const { intl } = this.props;
     const fromCollectiveOptions = [], collectivesById = {};
 
@@ -192,6 +206,7 @@ class OrderForm extends React.Component {
       LoggedInUser.memberOf.map(membership => {
         if (membership.collective.type === 'COLLECTIVE') return;
         if (membership.collective.type === 'EVENT') return;
+        if (membership.collective.type === 'ORGANIZATION' && !this.allowOrganizations) return;
         if (['ADMIN','HOST'].indexOf(membership.role) === -1) return;
         const value = membership.collective.id;
         const label = membership.collective.name;
@@ -201,7 +216,13 @@ class OrderForm extends React.Component {
     } else {
       fromCollectiveOptions.push({ 'myself': intl.formatMessage(this.messages['order.profile.myself']) });
     }
-    fromCollectiveOptions.push({ 'organization': intl.formatMessage(this.messages['order.organization.create']) });
+
+    if (this.allowOrganizations) {
+      fromCollectiveOptions.push({ 'organization': intl.formatMessage(this.messages['order.organization.create']) });
+    } else if (LoggedInUser) {
+      fromCollectiveOptions.push({ 'logout': intl.formatMessage(this.messages['order.profile.logout']) });
+    }
+
     this.collectivesById = collectivesById;
     this.fromCollectiveOptions = fromCollectiveOptions;
     return fromCollectiveOptions;
@@ -212,11 +233,22 @@ class OrderForm extends React.Component {
     if (!LoggedInUser) return;
     if (!this._isMounted) return;
     this.setState({ LoggedInUser }); // Error: Can only update a mounted or mounting component
+    this.populateProfiles(LoggedInUser);
     this.selectProfile(LoggedInUser.CollectiveId);
   }
 
-  selectProfile(CollectiveId) {
-    const collective = (typeof CollectiveId === 'string') ? null : this.collectivesById[CollectiveId];
+  logout() {
+    window.localStorage.removeItem('accessToken');
+    window.location.replace(window.location.href);
+  }
+
+  selectProfile(profile) {
+    if (profile === 'logout') {
+      return this.logout();
+    }
+
+    const CollectiveId = (typeof profile === 'number') ? profile : null;
+    const collective = CollectiveId && this.collectivesById[CollectiveId];
     let fromCollective = {};
     if (collective) {
       fromCollective = {
@@ -230,12 +262,13 @@ class OrderForm extends React.Component {
       isNewUser: !Boolean(this.props.LoggedInUser),
       fromCollective,
       orgDetails: {
-        show: Boolean(CollectiveId === 'organization')
+        show: Boolean(profile === 'organization')
       },
       creditcard: {
         show: true
       }
     };
+
     if (collective) {
       this.populatePaymentMethods(CollectiveId);
       if (this.paymentMethods.length > 0) {
@@ -580,14 +613,17 @@ class OrderForm extends React.Component {
               </Row>
             ))}
 
-            <InputField
+            { this.fromCollectiveOptions.length > 1 &&
+              <InputField
               className="horizontal"
               type="select"
               label={intl.formatMessage(this.messages[order.tier.type === 'TICKET' ? 'order.rsvpAs' : 'order.contributeAs'])}
               name="fromCollectiveSelector"
               onChange={CollectiveId => this.selectProfile(CollectiveId)}
-              options={this.populateOrganizations(LoggedInUser)}
+              options={this.fromCollectiveOptions}
               />
+            }
+
         </div>
         { !fromCollective.id && this.state.orgDetails.show &&
           <div className="organizationDetailsForm">
@@ -681,19 +717,24 @@ class OrderForm extends React.Component {
                       </Col>
                     </Row>
                   }
-
                 </div>
               </Col>
             </Row>
           </div>
         }
-        
+
         <div className="order">
-          <h2><FormattedMessage id="tier.order.contributionDetails" defaultMessage="Contribution details" /></h2>
+          <h2>
+            { order.tier.type === 'TIER' && <FormattedMessage id="tier.order.contributionDetails" defaultMessage="Contribution details" /> }
+            { order.tier.type === 'TICKET' && <FormattedMessage id="tier.order.ticketDetails" defaultMessage="Ticket details" /> }
+          </h2>
           <Row>
             <Col sm={12}>
               <div className="form-group">
-                <label className="col-sm-3 control-label"><FormattedMessage id="tier.order.contribution" defaultMessage="Contribution" /></label>
+                <label className="col-sm-3 control-label">
+                  { order.tier.type === 'TIER' && <FormattedMessage id="tier.order.contribution" defaultMessage="Contribution" /> }
+                  { order.tier.type === 'TICKET' && <FormattedMessage id="tier.order.ticket" defaultMessage="Ticket" /> }
+                </label>
                 <Col sm={9}>
                   <TierComponent
                     tier={order.tier}

@@ -81,7 +81,7 @@ class TopBarProfileMenu extends React.Component {
           return 3;
       }
     }
-    const collectives = [ ...LoggedInUser.memberOf ].sort((a, b) => {
+    const collectives = [ ...LoggedInUser.memberOf.filter(m => m.collective.type !== 'EVENT') ].sort((a, b) => {
       return (`${score(a)}-${a.collective.slug}` > `${score(b)}-${b.collective.slug}`) ? 1 : -1
     }); // order by role then az
 
@@ -187,7 +187,7 @@ class TopBarProfileMenu extends React.Component {
         `}</style>
         <div>
           <div className='LoginTopBarProfileMenuHeading'>
-            <span><FormattedMessage id="collective" defaultMessage="{n} {n, plural, one {collective} other {collectives}}" values={{ n: 2}} /></span>
+            <span><FormattedMessage id="collective" defaultMessage="{n, plural, one {collective} other {collectives}}" values={{ n: collectives.length }} /></span>
             <div className='-dash'></div>
           </div>
           <ul>

@@ -48,6 +48,8 @@ class EditCollectiveForm extends React.Component {
       'slug.label': { id: 'collective.slug.label', defaultMessage: 'url' },
       'type.label': { id: 'collective.type.label', defaultMessage: 'type' },
       'name.label': { id: 'collective.name.label', defaultMessage: 'name' },
+      'company.label': { id: 'collective.company.label', defaultMessage: 'company' },
+      'company.description': { id: 'collective.company.description', defaultMessage: 'Start with a @ to reference an organization (e.g. @airbnb)' },
       'amount.label': { id: 'collective.amount.label', defaultMessage: 'amount' },
       'description.label': { id: 'collective.description.label', defaultMessage: 'Short description' },
       'longDescription.label': { id: 'collective.longDescription.label', defaultMessage: 'Long description' },
@@ -121,6 +123,11 @@ class EditCollectiveForm extends React.Component {
         {
           name: 'name',
           placeholder: ''
+        },
+        {
+          name: 'company',
+          placeholder: '',
+          when: () => collective.type === 'USER'
         },
         {
           name: 'description',

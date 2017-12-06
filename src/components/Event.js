@@ -249,6 +249,10 @@ class Event extends React.Component {
     const guests = {};
     guests.interested = [];
     filterCollection(event.members, { role: 'FOLLOWER' }).map(follower => {
+      if (!follower.member) {
+        console.error(">>> no user collective for membership", follower);
+        return;
+      }
       guests.interested.push({
         user: follower.member,
         status: 'INTERESTED'
@@ -256,6 +260,10 @@ class Event extends React.Component {
     });
     guests.confirmed = [];
     event.orders.map(order => {
+      if (!order.fromCollective) {
+        console.error(">>> no user collective for order", order);
+        return;
+      }
       guests.confirmed.push({
         user: order.fromCollective,
         createdAt: order.createdAt,
@@ -264,7 +272,7 @@ class Event extends React.Component {
     });
 
     const allGuests = union(guests.interested, guests.confirmed).sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-    responses.guests = uniqBy(allGuests, (r) => r.user.id);
+    responses.guests = uniqBy(allGuests, (r) => r.user && r.user.id);
     responses.going = filterCollection(responses.guests, { status: 'YES' });
     responses.interested = filterCollection(responses.guests, { status: 'INTERESTED' });
 

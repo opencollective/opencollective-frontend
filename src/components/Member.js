@@ -53,6 +53,10 @@ class Member extends React.Component {
     memberSinceStr += ` ${intl.formatMessage(this.messages['membership.since'], { createdAt: formatDate(membership.createdAt) })}`;
     const totalDonationsStr = `${intl.formatMessage(this.messages['membership.totalDonations'])}: ${formatCurrency(membership.stats.totalDonations, collective.currency)}`;
     let title = member.name;
+    if (member.company) {
+      title += `
+${member.company}`;
+    }
     if (member.description) {
       title += `
 ${member.description}`;
