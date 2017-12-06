@@ -22,8 +22,8 @@ class Expense extends React.Component {
     includeHostedCollectives: PropTypes.bool,
     LoggedInUser: PropTypes.object,
     allowPayAction: PropTypes.bool,
-    lockPayAction: PropTypes.bool,
-    unlockPayAction: PropTypes.bool 
+    lockPayAction: PropTypes.func,
+    unlockPayAction: PropTypes.func 
   }
 
   constructor(props) {
@@ -89,7 +89,6 @@ class Expense extends React.Component {
   }
 
   handleChange(expense) {
-    console.log(">>> handleChange", expense);
     this.setState({ modified: true, expense });
   }
 
@@ -100,7 +99,6 @@ class Expense extends React.Component {
     }
     const res = await this.props.editExpense(expense);
     this.setState({ modified: false, mode: 'details' });
-    console.log(">>> expense saved:", res);
   }
 
   render() {
@@ -260,8 +258,8 @@ class Expense extends React.Component {
                 <PayExpenseBtn 
                   expense={expense} 
                   disabled={!this.props.allowPayAction} 
-                  lock={lockPay}
-                  unlock={unlockPay} />
+                  lock={this.props.lockPayAction}
+                  unlock={this.props.unlockPayAction} />
               </div>
             }
           </div>
