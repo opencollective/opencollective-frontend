@@ -21,9 +21,10 @@ function canUpdateExpenseStatus(remoteUser, expense) {
 }
 
 /**
- * Only the author or an admin of the collective or collective.host can edit an expense
+ * Only the author or an admin of the collective or collective.host can edit an expense when it hasn't been paid yet
  */
 function canEditExpense(remoteUser, expense) {
+  if (expense.status === statuses.PAID) return false;
   if (remoteUser.id === expense.UserId) {
     return true;
   }
