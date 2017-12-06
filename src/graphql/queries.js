@@ -475,13 +475,14 @@ export const addGetLoggedInUserFunction = (component) => {
                 }
 
                 /**
-                 * CanEditExpense if LoggedInUser is:
+                 * CanEditExpense if not paid yet and LoggedInUser is:
                  * - author of the expense and expense.status === 'PENDING'
                  * - can approve expense (admin or host of expense.collective or expense.collective.host)
                  */
                 LoggedInUser.canEditExpense = (expense) => {
                   if (!expense) return false;
-                  if (expense.fromCollective && expense.fromCollective.id === LoggedInUser.collective.id && expense.status === 'PENDING') return true;
+                  if (expense.status === 'PAID') return false;
+                  if ( expense.status === 'PENDING' && expense.fromCollective && expense.fromCollective.id === LoggedInUser.collective.id) return true;
                   return LoggedInUser.canApproveExpense(expense);
                 }
 
