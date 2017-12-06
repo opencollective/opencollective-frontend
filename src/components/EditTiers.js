@@ -11,6 +11,7 @@ class EditTiers extends React.Component {
 
   static propTypes = {
     tiers: PropTypes.arrayOf(PropTypes.object).isRequired,
+    collective: PropTypes.object,
     currency: PropTypes.string.isRequired,
     defaultType: PropTypes.string,
     onChange: PropTypes.func.isRequired
@@ -26,7 +27,7 @@ class EditTiers extends React.Component {
     this.removeTier = this.removeTier.bind(this);
     this.editTier = this.editTier.bind(this);
     this.onChange = props.onChange.bind(this);
-    this.defaultType = this.props.defaultType || 'TICKET';
+    this.defaultType = this.props.defaultType || this.props.collective.type === 'EVENT' ? 'TICKET' : 'TIER';
 
     this.messages = defineMessages({
       'TIER': { id: 'tier.type.tier', defaultMessage: 'tier (only one per order)' },
@@ -69,7 +70,8 @@ class EditTiers extends React.Component {
         type: 'select',
         options: getOptions(['TIER', 'TICKET']),
         defaultValue: this.defaultType,
-        label: intl.formatMessage(this.messages['type.label'])
+        label: intl.formatMessage(this.messages['type.label']),
+        when: () => props.collective.type === 'EVENT'
       },
       {
         name: 'name',

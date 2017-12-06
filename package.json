@@ -90,7 +90,7 @@
     "dev": "babel-node src/server",
     "build": "npm run build:server && next build build",
     "start": "node build/server",
-    "test": "jest src/* && npm run test:server",
+    "test": "jest src/* && npm run test:server && npm run test:e2e",
     "test:server": "jest test/server/*",
     "test:e2e": "jest test/e2e/* -w 1",
     "build:server": "./node_modules/.bin/babel -D ./src -d ./build",

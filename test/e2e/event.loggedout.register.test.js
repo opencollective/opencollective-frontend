@@ -1,7 +1,6 @@
 import { download, chromeless } from '../utils';
 
-const WEBSITE_URL = "https://staging.opencollective.com";
-// const WEBSITE_URL = "http://localhost:3030";
+const WEBSITE_URL = process.env.WEBSITE_URL || "https://staging.opencollective.com";
 
 describe("event.loggedout.register", () => {
   let browser;
@@ -25,9 +24,6 @@ describe("event.loggedout.register", () => {
       .type("https://xdamman.com", "input[name='website']")
       .type("xdamman", "input[name='twitterHandle']")
       .type("short bio", "input[name='description']")
-      .type("Open Collective Inc.", "input[name='organization_name']")
-      .type("http://opencollective.com.com", "input[name='organization_website']")
-      .type("opencollect", "input[name='organization_twitterHandle']")
       .type("Public message", "textarea[name='publicMessage']")
       .screenshot();
 

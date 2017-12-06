@@ -95,7 +95,7 @@ class UserCollective extends React.Component {
     }
 
     if (query && query.CollectiveId) {
-      collectiveCreated = this.collective.memberOf.find(m => m.collective.id === parseInt(query.CollectiveId));
+      collectiveCreated = (this.collective.memberOf.find(m => m.collective.id === parseInt(query.CollectiveId)) || {}).collective;
     }
 
     return (
@@ -192,7 +192,7 @@ class UserCollective extends React.Component {
                   }
                   { query && query.status === 'orderCreated' && (!this.collective.image || !this.collective.longDescription) &&
                     <div>
-                      <FormattedMessage id="collective.user.emptyProfile" defaultMessage={"Your profile looks a bit empty ¯\_(ツ)_/¯"} />
+                      <FormattedMessage id="collective.user.emptyProfile" defaultMessage={`Your profile looks a bit empty ¯\\\\_(ツ)_/¯`} />
                     </div>
                   }
                   { !LoggedInUser && (!this.collective.image || !this.collective.longDescription) &&

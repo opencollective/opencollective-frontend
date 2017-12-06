@@ -84,6 +84,7 @@ class EditTiers extends React.Component {
             <EditTiersComponent
               title={`Edit tiers for ${Collective.name}`}
               tiers={this.state.tiers}
+              collective={Collective}
               defaultType="BACKER"
               currency={Collective.currency}
               onChange={this.handleTiersChange}
