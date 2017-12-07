@@ -968,7 +968,7 @@ export default function(Sequelize, DataTypes) {
   };
 
   Collective.prototype.isHost = function() {
-    return models.ConnectedAccount.findOne({ where: { service: 'stripe', CollectiveId: this.id }}).then(r => Boolean(r));
+    return models.Member.findOne({ where: { MemberCollectiveId: this.id, role: 'HOST' }}).then(r => Boolean(r));
   }
 
   Collective.prototype.isHostOf = function(CollectiveId) {
