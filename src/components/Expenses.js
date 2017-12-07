@@ -135,7 +135,7 @@ class Expenses extends React.Component {
               editable={editable}
               includeHostedCollectives={includeHostedCollectives}
               LoggedInUser={LoggedInUser}
-              allowPayAction={!this.state.payActionLocked}
+              allowPayAction={!this.state.isPayActionLocked}
               lockPayAction={this.setPayActionLock.bind(this, true)}
               unlockPayAction={this.setPayActionLock.bind(this, false)}
               />

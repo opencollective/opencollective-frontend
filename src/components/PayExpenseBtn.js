@@ -23,6 +23,9 @@ class PayExpenseBtn extends React.Component {
 
   async onClick() {
     const { expense, lock, unlock } = this.props;
+    if (this.props.disabled) {
+      return;
+    }
     lock();
     this.setState({ loading: true });
     try {
@@ -39,7 +42,6 @@ class PayExpenseBtn extends React.Component {
 
   render() {
     const { expense } = this.props;
-
     return (
       <div className="PayExpenseBtn">
         <style jsx>{`
