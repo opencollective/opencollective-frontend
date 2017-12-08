@@ -107,9 +107,10 @@ describe('graphql.collective.test.js', () => {
     expect(result.errors).to.not.exist;
     const collective = result.data.Collective;
     expect(collective.website).to.equal('http://apex.run');
-    expect(collective.members).to.have.length(29);
+    expect(collective.members).to.have.length(27);
     const memberships = collective.members;
     memberships.sort((a, b) => a.id - b.id)
+    console.log(memberships);
     expect(memberships[0].role).to.equal('HOST');
     expect(memberships[1].role).to.equal('ADMIN');
     expect(memberships[2].role).to.equal('ADMIN');
