@@ -20,7 +20,10 @@ class Expense extends React.Component {
     expense: PropTypes.object,
     editable: PropTypes.bool,
     includeHostedCollectives: PropTypes.bool,
-    LoggedInUser: PropTypes.object
+    LoggedInUser: PropTypes.object,
+    allowPayAction: PropTypes.bool,
+    lockPayAction: PropTypes.func,
+    unlockPayAction: PropTypes.func 
   }
 
   constructor(props) {
@@ -253,7 +256,11 @@ class Expense extends React.Component {
             }
             { this.state.mode !== 'edit' && expense.status === 'APPROVED' && LoggedInUser && LoggedInUser.canPayExpense(expense) &&
               <div>
-                <PayExpenseBtn expense={expense} />
+                <PayExpenseBtn 
+                  expense={expense} 
+                  disabled={!this.props.allowPayAction} 
+                  lock={this.props.lockPayAction}
+                  unlock={this.props.unlockPayAction} />
               </div>
             }
           </div>
