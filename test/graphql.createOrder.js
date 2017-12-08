@@ -156,7 +156,6 @@ describe('createOrder', () => {
       res.errors && console.error(res.errors);
       expect(res.errors).to.not.exist;
       const fromCollective = res.data.createOrder.fromCollective;
-      console.log(">>> fromCollective", fromCollective);
       expect(fromCollective.slug).to.match(/anonymous/);
       expect(fromCollective.name).to.match(/anonymous/);
     });
