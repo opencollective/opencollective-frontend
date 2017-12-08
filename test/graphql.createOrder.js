@@ -144,15 +144,16 @@ describe('createOrder', () => {
 
     it('creates an order as new anonymous user', async () => {
 
-      order.user = {
+      const newOrder = cloneDeep(order);
+      newOrder.user = {
         firstName: "",
         lastName: "",
         email: "jsmith@email.com"
       };
-      order.totalAmount = 0;
-      delete order.paymentMethod;
+      newOrder.totalAmount = 0;
+      delete newOrder.paymentMethod;
 
-      const res = await utils.graphqlQuery(createOrderQuery, { order });
+      const res = await utils.graphqlQuery(createOrderQuery, { order: newOrder });
       res.errors && console.error(res.errors);
       expect(res.errors).to.not.exist;
       const fromCollective = res.data.createOrder.fromCollective;
