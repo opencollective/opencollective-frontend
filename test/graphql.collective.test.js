@@ -107,10 +107,9 @@ describe('graphql.collective.test.js', () => {
     expect(result.errors).to.not.exist;
     const collective = result.data.Collective;
     expect(collective.website).to.equal('http://apex.run');
-    expect(collective.members).to.have.length(27);
+    expect(collective.members).to.have.length(29);
     const memberships = collective.members;
     memberships.sort((a, b) => a.id - b.id)
-    console.log(memberships);
     expect(memberships[0].role).to.equal('HOST');
     expect(memberships[1].role).to.equal('ADMIN');
     expect(memberships[2].role).to.equal('ADMIN');
@@ -123,9 +122,9 @@ describe('graphql.collective.test.js', () => {
     expect(collective.tiers).to.have.length(2);
     expect(collective.stats).to.deep.equal({
       backers: { all: 26, users: 25, organizations: 1 },
-      yearlyBudget: 311320,
-      topExpenses: {"byCategory":[{"category":"Engineering","count":6,"totalExpenses":324729}],"byCollective":[{"slug":"tjholowaychuk","image":"https://opencollective-production.s3-us-west-1.amazonaws.com/25254v3s400_acc93f90-0085-11e7-951e-491568b1a942.jpeg","name":"TJ Holowaychuk","totalExpenses":-280914}]},
-      topFundingSources: {"byCollective":[{"slug":"pubnub","image":"https://opencollective-production.s3-us-west-1.amazonaws.com/pubnublogopng_38ab9250-d2c4-11e6-8ba3-b7985935397d.png","name":"PubNub","totalDonations":147560},{"slug":"harlow_ward","image":"https://opencollective-production.s3-us-west-1.amazonaws.com/168a47c0-d41d-11e6-b711-1589373fcf88.jpg","name":"Harlow Ward","totalDonations":38646},{"slug":"breck7","image":"https://opencollective-production.s3-us-west-1.amazonaws.com/bb14acd098624944ac160008b79fb9e5_30e998d0-619b-11e7-9eab-c17f21ef8eb7.png","name":"Breck Yunits","totalDonations":26040}],"byCollectiveType":[{"type":"USER","totalDonations":163077}]}
+      yearlyBudget: 227940,
+      topExpenses: {"byCategory":[{"category":"Engineering","count":7,"totalExpenses":380829}],"byCollective":[{"slug":"tjholowaychuk","image":"https://opencollective-production.s3-us-west-1.amazonaws.com/25254v3s400_acc93f90-0085-11e7-951e-491568b1a942.jpeg","name":"TJ Holowaychuk","totalExpenses":-339120}]},
+      topFundingSources: {"byCollective":[{"slug":"pubnub","image":"https://opencollective-production.s3-us-west-1.amazonaws.com/pubnublogopng_38ab9250-d2c4-11e6-8ba3-b7985935397d.png","name":"PubNub","totalDonations":147560},{"slug":"harlow_ward","image":"https://opencollective-production.s3-us-west-1.amazonaws.com/168a47c0-d41d-11e6-b711-1589373fcf88.jpg","name":"Harlow Ward","totalDonations":42940},{"slug":"breck7","image":"https://opencollective-production.s3-us-west-1.amazonaws.com/bb14acd098624944ac160008b79fb9e5_30e998d0-619b-11e7-9eab-c17f21ef8eb7.png","name":"Breck Yunits","totalDonations":34720}],"byCollectiveType":[{"type":"USER","totalDonations":192031}]}
       });
   });
 
@@ -143,7 +142,7 @@ describe('graphql.collective.test.js', () => {
     const result = await utils.graphqlQuery(query, { slug: "meetup-5" });
     result.errors && console.error(result.errors);
     expect(result.errors).to.not.exist;
-    expect(result.data.Collective.host.id).to.equal(207);
+    expect(result.data.Collective.host.id).to.equal(9802);
     expect(result.data.Collective.host.slug).to.equal("brusselstogether");
   });
 
@@ -182,28 +181,28 @@ describe('graphql.collective.test.js', () => {
     expect(result.errors).to.not.exist;
     expect(result.data.Collective.collectives).to.deep.equal([
       {
-        "id": 407,
-        "slug": "veganizerbxl",
+        "id": 207,
+        "slug": "brusselstogether-collective",
         "stats": {
           "expenses": {
-            "all": 3,
-            "paid": 2,
-            "pending": 1,
-            "rejected": 0,
+            "all": 18,
+            "paid": 15,
+            "pending": 0,
+            "rejected": 3,
             "approved": 0
           }
         }
       },
       {
-        "id": 207,
-        "slug": "brusselstogether",
+        "id": 407,
+        "slug": "veganizerbxl",
         "stats": {
           "expenses": {
-            "all": 12,
-            "paid": 5,
+            "all": 15,
+            "paid": 10,
             "pending": 0,
-            "rejected": 3,
-            "approved": 4
+            "rejected": 4,
+            "approved": 1
           }
         }
       }
@@ -237,7 +236,7 @@ describe('graphql.collective.test.js', () => {
     }
     `;
     const fetchMembersByType = async (type) => {
-      const result = await utils.graphqlQuery(query, { slug: "brusselstogether", type });
+      const result = await utils.graphqlQuery(query, { slug: "brusselstogether-collective", type });
       result.errors && console.error(result.errors);
       expect(result.errors).to.not.exist;
       return result.data.Collective.members;
@@ -249,12 +248,12 @@ describe('graphql.collective.test.js', () => {
      * a bug from the v2 migration
      */
     const members = await fetchMembersByType('USER');
-    expect(members[2].transactions).to.have.length(4);
-    expect(members[2].transactions[0].amount).to.equal(1000);
-    expect(members[2].orders).to.have.length(1);
-    expect(members[2].stats.totalDonations).to.equal(4000);
+    expect(members[1].transactions).to.have.length(20);
+    expect(members[1].transactions[0].amount).to.equal(1000);
+    expect(members[1].orders).to.have.length(2);
+    expect(members[1].stats.totalDonations).to.equal(514000);
     expect(members).to.have.length(10);
-    expect(await fetchMembersByType('ORGANIZATION')).to.have.length(2);
+    expect(await fetchMembersByType('ORGANIZATION')).to.have.length(3);
   });
 
   describe("allMembers query", () => {
@@ -280,13 +279,13 @@ describe('graphql.collective.test.js', () => {
     `;
 
     it('gets the members by collectiveSlug', async () => {
-      const result = await utils.graphqlQuery(allMembersQuery, { collectiveSlug: "brusselstogether" });
+      const result = await utils.graphqlQuery(allMembersQuery, { collectiveSlug: "brusselstogether-collective" });
       result.errors && console.error(result.errors);
       expect(result.errors).to.not.exist;
       const members = result.data.allMembers;
       expect(members).to.have.length(10);
-      expect(members[0].collective.slug).to.equal('brusselstogether');
-      expect(members[0].member.slug).to.equal('anisbedda');
+      expect(members[0].collective.slug).to.equal('brusselstogether-collective');
+      expect(members[0].member.slug).to.equal('hubletlaurent');
     });
 
     it('gets the members by memberCollectiveSlug by role', async () => {
@@ -295,9 +294,9 @@ describe('graphql.collective.test.js', () => {
       expect(result.errors).to.not.exist;
       const members = result.data.allMembers;
       expect(members[0].role).to.equal('ADMIN');
-      expect(members[0].collective.slug).to.equal('brusselstogether');
+      expect(members[0].collective.slug).to.equal('brusselstogether-collective');
       expect(members[0].member.slug).to.equal('xdamman');
-      expect(members).to.have.length(1);
+      expect(members).to.have.length(10);
     });
 
     it('gets the members by memberCollectiveSlug sorted by totalDonations', async () => {
@@ -305,9 +304,9 @@ describe('graphql.collective.test.js', () => {
       result.errors && console.error(result.errors);
       expect(result.errors).to.not.exist;
       const members = result.data.allMembers;
-      expect(members[0].collective.slug).to.equal('brusselstogether');
+      expect(members[0].collective.slug).to.equal('brusselstogether-collective');
       expect(members[0].member.slug).to.equal('xdamman');
-      expect(members).to.have.length(3);
+      expect(members).to.have.length(10);
     });
 
     it('gets the members by memberCollectiveSlug sorted by balance', async () => {
@@ -315,10 +314,9 @@ describe('graphql.collective.test.js', () => {
       result.errors && console.error(result.errors);
       expect(result.errors).to.not.exist;
       const members = result.data.allMembers;
-      console.log(members);
       expect(members[0].collective.slug).to.equal('opensource');
       expect(members[0].member.slug).to.equal('piamancini');
-      expect(members).to.have.length(2);
+      expect(members).to.have.length(7);
     });
 
   });

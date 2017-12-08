@@ -48,6 +48,9 @@ export const UserType = new GraphQLObjectType({
       collective: {
         type: CollectiveInterfaceType,
         resolve(user, args, req) {
+          if (!user.CollectiveId) {
+            return console.error(">>> user", user.id, "does not have a CollectiveId", user.CollectiveId);
+          }
           return req.loaders.collective.findById.load(user.CollectiveId);
         }
       },

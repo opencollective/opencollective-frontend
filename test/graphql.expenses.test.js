@@ -10,7 +10,7 @@ describe('graphql.collective.test.js', () => {
   describe("read", () => {
 
     before(() => utils.loadDB('opencollective_dvl'));  
-    before(() => models.Collective.findOne({ where: { slug: 'opensource' }}).then(c => host = c));
+    before(() => models.Collective.findOne({ where: { slug: 'opensourceorg' }}).then(c => host = c));
     before(() => models.Collective.findOne({ where: { slug: 'railsgirlsatl' }}).then(c => collective = c));
     
     const query = `
@@ -58,7 +58,7 @@ describe('graphql.collective.test.js', () => {
       expect(result.errors).to.not.exist;
       const expenses = result.data.allExpenses;
       expect(expenses).to.have.length(5);
-      expect(expenses.map(e => e.collective.slug)).to.deep.equal([ 'apex', 'railsgirlsatl', 'apex', 'opensource', 'railsgirlsatl' ]);
+      expect(expenses.map(e => e.collective.slug)).to.deep.equal([ 'apex', 'opensource', 'opensource', 'opensource', 'apex' ]);
     });
   });
 
