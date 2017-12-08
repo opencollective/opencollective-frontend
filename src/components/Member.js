@@ -21,7 +21,7 @@ class Member extends React.Component {
     this.onClick = this.onClick.bind(this);
 
     this.messages = defineMessages({
-      'membership.since': { id: 'membership.since', defaultMessage: 'since {createdAt}'},
+      'membership.since': { id: 'membership.since', defaultMessage: 'since'},
       'ADMIN': { id: 'roles.admin.label', defaultMessage: 'Core Contributor' },
       'MEMBER': { id: 'roles.member.label', defaultMessage: 'Contributor' },
       'BACKER': { id: 'roles.backer.label', defaultMessage: 'Backer' },
@@ -50,7 +50,7 @@ class Member extends React.Component {
     if (tierName) {
       memberSinceStr = capitalize(tierName);
     }
-    memberSinceStr += ` ${intl.formatMessage(this.messages['membership.since'], { createdAt: formatDate(membership.createdAt) })}`;
+    memberSinceStr += ` ${intl.formatMessage(this.messages['membership.since'])} ${formatDate(membership.createdAt)}`;
     const totalDonationsStr = `${intl.formatMessage(this.messages['membership.totalDonations'])}: ${formatCurrency(membership.stats.totalDonations, collective.currency)}`;
     let title = member.name;
     if (member.description) {
