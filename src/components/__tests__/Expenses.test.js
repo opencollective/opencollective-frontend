@@ -52,10 +52,7 @@ describe("Expenses component", () => {
         expenses={expenses}
         editable={true}
         LoggedInUser={loggedInUser}
-        payExpense={() => setTimeout(() => {
-          console.log('reached inside stub')
-          return Promise.resolve();
-        }, 2000)}
+        payExpense={() => setTimeout(() => Promise.resolve(), 2000)}
         />
       </IntlProvider>
   );
