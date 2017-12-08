@@ -142,7 +142,7 @@ describe('createOrder', () => {
       expect(charge.source.last4).to.equal('4242');
     });
 
-    it.only('creates an order as new anonymous user', async () => {
+    it('creates an order as new anonymous user', async () => {
 
       order.user = {
         firstName: "",
