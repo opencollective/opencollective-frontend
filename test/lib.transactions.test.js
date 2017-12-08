@@ -18,13 +18,13 @@ describe('lib.transactions.test.js', () => {
 
   beforeEach('get transactions', () => models.Transaction.findAll({ where }).then(ts => {
     transactions = ts;
-    expect(transactions.length).to.equal(19);
+    expect(transactions.length).to.equal(40);
   }));
 
   it('exports transactions', (done) => {
     const csv = tlib.exportTransactions(transactions);
     const lines = csv.split('\n');
-    expect(lines.length).to.equal(20);
+    expect(lines.length).to.equal(41);
     expect(lines[0].split('","').length).to.equal(12);
     done();
   });
