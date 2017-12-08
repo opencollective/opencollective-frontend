@@ -10,6 +10,8 @@ export async function list(req, res, next) {
 
   const {
     collectiveSlug,
+    eventSlug,
+    role,
     tierSlug
   } = req.params;
 
@@ -40,10 +42,10 @@ export async function list(req, res, next) {
 
 
   const query = `
-  query Collective($collectiveSlug: String!, $backerType: String, $tierSlug: String, $TierId: Int, $limit: Int, $offset: Int) {
+  query Collective($collectiveSlug: String!, $backerType: String, $tierSlug: String, $TierId: Int, $limit: Int, $offset: Int, $role: String) {
     Collective(slug:$collectiveSlug) {
       currency
-      members(type: $backerType, tierSlug: $tierSlug, TierId: $TierId, limit: $limit, offset: $offset) {
+      members(type: $backerType, role: $role, tierSlug: $tierSlug, TierId: $TierId, limit: $limit, offset: $offset) {
         id
         createdAt
         role
@@ -82,7 +84,10 @@ export async function list(req, res, next) {
     }
   }
   `; 
-  const vars = { collectiveSlug };
+  const vars = { collectiveSlug: eventSlug || collectiveSlug };
+  if (role === 'attendees') vars.role = 'ATTENDEE';
+  if (role === 'followers') vars.role = 'FOLLOWER';
+  if (role === 'organizers') vars.role = 'ADMIN';
   if (tierSlug) vars.tierSlug = tierSlug;
   if (backerType) vars.backerType = backerType;
   if (req.query.TierId) vars.TierId = req.query.TierId;

@@ -136,7 +136,7 @@ class EditCollective extends React.Component {
 
     const collective = this.props.collective || {};
 
-    if (!collective.name) return (<div />);
+    if (!collective.slug) return (<div />);
 
     const { LoggedInUser } = this.props;
 

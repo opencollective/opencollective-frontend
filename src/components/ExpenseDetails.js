@@ -308,7 +308,7 @@ query Expense($id: Int!) {
 `;
 
 export const addGetExpense = (component) => {
-const accessToken = typeof window !== 'undefined' && window.localStorage.getItem('accessToken');
+const accessToken = typeof window !== 'undefined' && window.localStorage && window.localStorage.getItem('accessToken');
 
 // if we don't have an accessToken, there is no need to get the details of a expense
 // as we won't have access to any more information than the allExpenses query

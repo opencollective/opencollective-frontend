@@ -1,6 +1,7 @@
 import React from 'react';
 import { Button } from 'react-bootstrap';
-  
+import colors from '../constants/colors';
+
 class SmallButton extends React.Component {
   render() {
     return (
@@ -29,6 +30,10 @@ class SmallButton extends React.Component {
             background: #55aa00;
             border-color: #18191a;
             color: white;
+          }
+          .SmallButton.pay button[disabled] {            
+            border-color: ${colors.darkgray};
+            background: ${colors.darkgray};
           }
           .SmallButton:hover button {
             font-weight: bold;
