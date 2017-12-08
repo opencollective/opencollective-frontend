@@ -510,7 +510,7 @@ export default (Sequelize, DataTypes) => {
         }
         const userCollective = {
           type: 'USER',
-          name: userData.name || name || user.email && user.email.split(/@|\+/)[0],
+          name: userData.name || name || "anonymous",
           image: userData.image,
           mission: userData.mission,
           description: userData.description,

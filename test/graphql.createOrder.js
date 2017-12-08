@@ -40,6 +40,7 @@ const createOrderQuery = `
       totalAmount
       fromCollective {
         id
+        slug
         name
         website
       }
@@ -139,6 +140,25 @@ describe('createOrder', () => {
       });
       const charge = await Stripe(hostStripeAccount.token).charges.retrieve(transaction.data.charge.id);
       expect(charge.source.last4).to.equal('4242');
+    });
+
+    it.only('creates an order as new anonymous user', async () => {
+
+      order.user = {
+        firstName: "",
+        lastName: "",
+        email: "jsmith@email.com"
+      };
+      order.totalAmount = 0;
+      delete order.paymentMethod;
+
+      const res = await utils.graphqlQuery(createOrderQuery, { order });
+      res.errors && console.error(res.errors);
+      expect(res.errors).to.not.exist;
+      const fromCollective = res.data.createOrder.fromCollective;
+      console.log(">>> fromCollective", fromCollective);
+      expect(fromCollective.slug).to.match(/anonymous/);
+      expect(fromCollective.name).to.match(/anonymous/);
     });
 
     it('creates an order as logged in user', async () => {
