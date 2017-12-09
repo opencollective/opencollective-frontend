@@ -135,7 +135,7 @@ td.tdpadding {
   {{#each this}}
     <div class="page">
 
-      <div class="header">
+      <div class="header" style="overflow: hidden;z-index:10; min-height: 150px;">
         <table class="category">
           <tr>
             <th>Date</th>
@@ -176,7 +176,7 @@ td.tdpadding {
         </table>
       </div>
 
-      <div class="preview" style="background-image: url('https://res.cloudinary.com/opencollective/image/fetch/w_640,f_jpg/{{Expense.attachment}}')"></div>
+      <div class="preview" style="z-index:0; background-size: contain; background-image: url('https://res.cloudinary.com/opencollective/image/fetch/w_640,f_jpg/{{Expense.attachment}}')"></div>
 
       <div class="footer">{{@root.host.name}} {{@root.month}} {{@root.year}} expense receipts - page {{page}}/{{@root.totalPaidExpenses}} - opencollective.com</div>
 

@@ -24,7 +24,6 @@ import fs from 'fs';
 
 const d = new Date;
 d.setMonth(d.getMonth() - 2);
-const month = moment(d).format('MMMM');
 const year = d.getFullYear();
 
 const csv_filename = `${moment(d).format('YYYYMM')}-transactions.csv`;
@@ -32,6 +31,7 @@ const pdf_filename = `${moment(d).format('YYYYMM')}-expenses.pdf`;
 
 const previousStartDate = new Date(d.getFullYear(), d.getMonth(), 1);
 const startDate = new Date(d.getFullYear(), d.getMonth()+1, 1);
+const month = moment(startDate).format('MMMM');
 const endDate = new Date(d.getFullYear(), d.getMonth()+2, 1);
 
 const dateRange = {
@@ -264,7 +264,7 @@ const processHost = (host) => {
         throw new Error(`No transaction found`);
       }
     })
-    .then(transactions => Promise.map(transactions, processTransaction, { concurrency: 1 }))
+    .map(processTransaction)
     .tap(transactions => {
 
       const getColumnName = (attr) => {
@@ -293,7 +293,6 @@ const processHost = (host) => {
         filename: csv_filename,
         content: csv
       });
-
     })
     .then(transactions => data.transactions = transactions)
     .then(() => exportToPDF("expenses", data, {
