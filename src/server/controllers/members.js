@@ -62,6 +62,7 @@ export async function list(req, res, next) {
           slug
           type
           name
+          company
           description
           image
           website
@@ -92,8 +93,6 @@ export async function list(req, res, next) {
   if (req.query.TierId) vars.TierId = req.query.TierId;
   if (req.query.limit) vars.limit = req.query.limit;
   if (req.query.offset) vars.offset = req.query.offset;
-  
-  console.log(">>> vars", vars);
 
   // Only return max 50 at a time
   if (req.params.format === 'json') {
@@ -124,6 +123,7 @@ export async function list(req, res, next) {
     'lastTransactionAmount': (r) => (get(r, 'transactions[0].amount') || 0) / 100,
     'profile': (r) => `${process.env.WEBSITE_URL}/${r.member.slug}`,
     'name': 'member.name',
+    'company': 'member.company',
     'description': 'member.description',
     'image': 'member.image',
     'email': 'member.email',

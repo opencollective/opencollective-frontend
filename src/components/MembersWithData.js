@@ -161,6 +161,7 @@ query Members($CollectiveId: Int!, $TierId: Int, $role: String, $type: String, $
       id
       type
       name
+      company
       description
       slug
       image

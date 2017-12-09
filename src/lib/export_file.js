@@ -38,6 +38,7 @@ export async function exportRSVPs(event) {
       status: r.status,
       quantity: r.quantity,
       name: r.fromCollective.name,
+      company: r.fromCollective.company,
       email: r.fromCollective.email,
       twitter: r.fromCollective.twitterHandle && `https://twitter.com/${r.fromCollective.twitterHandle}`,
       description: r.description || r.fromCollective.description

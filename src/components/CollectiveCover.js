@@ -49,11 +49,11 @@ ${description}`
     const {
       collective,
       className,
-      title,
       href
     } = this.props;
 
     const {
+      company,
       description,
       type,
       website,
@@ -61,6 +61,7 @@ ${description}`
       stats
     } = collective;
 
+    const title = this.props.title || collective.name;
     const formattedYearlyIncome = stats && stats.yearlyBudget > 0 && formatCurrency(stats.yearlyBudget, collective.currency, { precision: 0 });
     const backgroundImage = imagePreview(collective.backgroundImage || get(collective,'parentCollective.backgroundImage'), defaultBackgroundImage[collective.type], { height: 500 });
     const customStyles = get(collective, 'settings.style.hero.cover') || get(collective.parentCollective, 'settings.style.hero.cover');
@@ -129,6 +130,9 @@ ${description}`
         .content a {
           color: black;
         }
+        .content a:hover {
+          color: #444;
+        }
         .USER .cover {
           display: block;
         }
@@ -155,7 +159,6 @@ ${description}`
         }
         h1 {
           font-size: 3rem;
-          color: white;
           margin: 1.5rem;
         }
         .contact {
@@ -249,6 +252,8 @@ ${description}`
               { collective.type !== 'USER' && <Logo src={logo} className="logo" height="10rem" /> }
             </a></Link>
             <h1>{title}</h1>
+            { company && company.substr(0,1) === '@' && <p className="company"><Link route={`/${company.substr(1)}`}><a>{company.substr(1)}</a></Link></p> }
+            { company && company.substr(0,1) !== '@' && <p className="company">{company}</p> }
             { description && <p className="description">{description}</p> }
             { (twitterHandle || website) &&
               <div className="contact">

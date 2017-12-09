@@ -91,6 +91,7 @@ const getCollectiveToEditQuery = gql`
         id
       }
       name
+      company
       image
       backgroundImage
       description
@@ -204,6 +205,7 @@ const getCollectiveQuery = gql`
         id
       }
       name
+      company
       image
       backgroundImage
       description
@@ -371,6 +373,7 @@ const getEventCollectiveQuery = gql`
         fromCollective {
           id
           name
+          company
           image
           slug
           twitterHandle

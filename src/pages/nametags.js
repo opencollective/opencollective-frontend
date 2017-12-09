@@ -75,6 +75,7 @@ class Nametags extends React.Component {
     return (
       <div className="nametag" key={index}>
         <h1><span className="firstName">{userCollective.name}</span></h1>
+        {userCollective.company && <h2 className="company">{userCollective.company}</h2> }
         {userCollective.twitterHandle && <h2 className="twitterHandle">@{userCollective.twitterHandle}</h2> }
         <p className="description">{firstSentence(order.description || userCollective.description, 60)}</p>
         <div className="eventInfo">
@@ -237,6 +238,7 @@ query Collective($slug: String!) {
       fromCollective {
         id
         name
+        company
         image
         slug
         twitterHandle
