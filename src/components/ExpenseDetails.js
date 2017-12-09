@@ -163,6 +163,7 @@ class ExpenseDetails extends React.Component {
             { editMode &&
               <InputField
                 type="dropzone"
+                options={{ accept: "image/jpeg, image/png, application/pdf" }}
                 name="attachment"
                 className="attachmentField"
                 onChange={attachment => this.handleChange('attachment', attachment)}
