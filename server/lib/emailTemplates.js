@@ -21,6 +21,7 @@ const templateNames = [
   'collective.expense.created',
   'collective.expense.paid',
   'collective.order.created',
+  'collective.member.created',
   'collective.monthlyreport',
   'collective.monthlyreport.text',
   'collective.newmember',

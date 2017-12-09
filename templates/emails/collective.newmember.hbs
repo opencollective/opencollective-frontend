@@ -19,16 +19,18 @@ Subject: {{remoteUser.collective.name}} added you as a {{role}} to {{collective.
 {{/if}}
 
 <h2>Your current profile details are:</h2>
-{{#if recipient.collective.image}}
-<b>Avatar:</b><br />
-<img src="{{recipient.collective.image}}" height="64" /><br />
-{{else}}
-<b>Avatar:</b> No avatar<br />
-{{/if}}
-<b>Name:</b> {{recipient.collective.name}}<br />
-<b>Short description:</b> {{recipient.collective.description}}<br />
-<b>Website:</b> {{recipient.collective.website}}<br />
-<b>Twitter:</b> {{recipient.collective.twitterHandle}}<br />
+
+<table>
+  {{#if recipient.collective.previewImage}}
+    <tr><th>Avatar:</th><td><img src="{{recipient.collective.previewImage}}" height="64" /></td></tr>
+  {{else}}
+  <tr><th>Avatar:</th><td>No avatar</td></tr>
+  {{/if}}
+  <tr><th>Name:</th><td>{{recipient.collective.name}}</td></tr>
+  <tr><th>Short description:</th><td>{{recipient.collective.description}}</td></tr>
+  <tr><th>Website:</th><td>{{recipient.collective.website}}</td></tr>
+  <tr><th>Twitter:</th><td>{{recipient.collective.twitterHandle}}</td></tr>
+</table>
 
 <p>You can login and edit your profile by <a href="{{loginLink}}">clicking here</a></p>
 
