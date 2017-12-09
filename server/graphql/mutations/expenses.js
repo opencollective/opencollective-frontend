@@ -61,7 +61,7 @@ export async function createExpense(remoteUser, expenseData) {
     if (!expenseData.user || !expenseData.user.email) {
       throw new errors.Unauthorized("Missing expense.user.email");
     }
-    const user = await models.User.findOrCreateByEmail(expenseData.user.email);
+    const user = await models.User.findOrCreateByEmail(expenseData.user.email, expenseData.user);
     expenseData.UserId = user.id;
   }
 

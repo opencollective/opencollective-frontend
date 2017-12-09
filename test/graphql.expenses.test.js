@@ -117,8 +117,7 @@ describe('graphql.collective.test.js', () => {
       const res = await utils.graphqlQuery(createExpenseQuery, { expense: newExpenseData });
       expect(res.errors).to.exist;
       expect(res.errors[0].message).to.equal('Missing expense.user.email');
-      newExpenseData.user = { email: "testuser@email.com" };
-      console.log(">>> newExpenseData", newExpenseData)
+      newExpenseData.user = { email: "testuser@email.com", name: "testuser" };
       const res2 = await utils.graphqlQuery(createExpenseQuery, { expense: newExpenseData });
       res2.errors && console.error(res2.errors[0]);
       expect(res2.errors).to.not.exist;
