@@ -63,6 +63,7 @@ export const UserInputType = new GraphQLInputObjectType({
       firstName: { type: GraphQLString },
       lastName: { type: GraphQLString },
       name: { type: GraphQLString },
+      company: { type: GraphQLString },
       image: { type: GraphQLString },
       username: { type: GraphQLString },
       description: { type: GraphQLString },
@@ -92,6 +93,7 @@ export const CollectiveInputType = new GraphQLInputObjectType({
     slug: { type: GraphQLString },
     type: { type: GraphQLString },
     name: { type: GraphQLString },
+    company: { type: GraphQLString },
     website: { type: GraphQLString },
     twitterHandle: { type: GraphQLString },
     description: { type: GraphQLString },
@@ -124,6 +126,7 @@ export const CollectiveAttributesInputType = new GraphQLInputObjectType({
     slug: { type: GraphQLString },
     type: { type: GraphQLString },
     name: { type: GraphQLString },
+    company: { type: GraphQLString },
     firstName: { type: GraphQLString }, // for Collective type USER
     lastName: { type: GraphQLString }, // for Collective type USER
     email: { type: GraphQLString }, // for Collective type USER

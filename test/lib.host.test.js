@@ -11,7 +11,7 @@ import * as currencyLib from '../server/lib/currency';
  */
 describe('hostlib', () => {
   
-  const hostid = 51; // WWCode collective host
+  const hostid = 9804; // WWCode collective host
   const startDate = new Date("2017-02-01");
   const endDate = new Date("2017-03-01");
   let collectiveids;
@@ -38,14 +38,14 @@ describe('hostlib', () => {
   beforeEach('get hosted collectives', () => hostlib.getHostedCollectives(hostid).then(collectives => {
     collectiveids = collectives.map(g => g.id).filter(id => id !== hostid); // We remove the host collective
     where.CollectiveId = { $in: collectiveids };
-    expect(collectives.length).to.equal(74);
+    expect(collectives.length).to.equal(73);
   }));
 
   it('get the backers stats', () => hostlib.getBackersStats(startDate, endDate, collectiveids).then(stats => {
     expect(stats.new).to.equal(4);
     expect(stats.repeat).to.equal(5);
-    expect(stats.inactive).to.equal(35);
-    expect(stats.total).to.equal(44);
+    expect(stats.inactive).to.equal(56);
+    expect(stats.total).to.equal(65);
     return true;
   }));
 
