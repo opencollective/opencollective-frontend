@@ -125,6 +125,9 @@ class CollectivePickerWithData extends React.Component {
         .collectiveName {
           float: left;
           margin-right: 0.2rem;
+          max-width: 25rem;
+          text-overflow: ellipsis;
+          overflow: hidden;
         }
 
         .NameBalance {
