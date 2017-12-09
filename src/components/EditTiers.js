@@ -27,7 +27,7 @@ class EditTiers extends React.Component {
     this.removeTier = this.removeTier.bind(this);
     this.editTier = this.editTier.bind(this);
     this.onChange = props.onChange.bind(this);
-    this.defaultType = this.props.defaultType || this.props.collective.type === 'EVENT' ? 'TICKET' : 'TIER';
+    this.defaultType = this.props.defaultType || (this.props.collective.type === 'EVENT' ? 'TICKET' : 'TIER');
 
     this.messages = defineMessages({
       'TIER': { id: 'tier.type.tier', defaultMessage: 'tier (only one per order)' },
@@ -93,7 +93,7 @@ class EditTiers extends React.Component {
         type: 'select',
         options: getOptions(['onetime','month','year']),
         label: intl.formatMessage(this.messages['interval.label']),
-        when: (tier) => tier.type && tier.type !== 'TICKET'
+        when: (tier) => !tier || tier.type !== 'TICKET'
       },
       {
         name: 'maxQuantity',
