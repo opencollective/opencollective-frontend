@@ -169,7 +169,7 @@ describe('createOrder', () => {
       // make sure the payment has been recorded in the connected Stripe Account of the host
       const hostMember = await models.Member.findOne({ where: { CollectiveId: collective.id, role: 'HOST' } });
       const hostStripeAccount = await models.ConnectedAccount.findOne({
-        where: { service: 'stripe', CollectiveId: hostMember.CollectiveId }
+        where: { service: 'stripe', CollectiveId: hostMember.MemberCollectiveId }
       });
       const charge = await Stripe(hostStripeAccount.token).charges.retrieve(transaction.data.charge.id);
       expect(charge.source.last4).to.equal('4242');
@@ -229,7 +229,7 @@ describe('createOrder', () => {
       // make sure the payment has been recorded in the connected Stripe Account of the host
       const hostMember = await models.Member.findOne({ where: { CollectiveId: collective.id, role: 'HOST' } });
       const hostStripeAccount = await models.ConnectedAccount.findOne({
-        where: { service: 'stripe', CollectiveId: hostMember.CollectiveId }
+        where: { service: 'stripe', CollectiveId: hostMember.MemberCollectiveId }
       });
       const charge = await Stripe(hostStripeAccount.token).charges.retrieve(transaction.data.charge.id);
       expect(charge.source.last4).to.equal('4242');
@@ -272,7 +272,7 @@ describe('createOrder', () => {
       // make sure the subscription has been recorded in the connected Stripe Account of the host
       const hostMember = await models.Member.findOne({ where: { CollectiveId: collective.id, role: 'HOST' } });
       const hostStripeAccount = await models.ConnectedAccount.findOne({
-        where: { service: 'stripe', CollectiveId: hostMember.CollectiveId }
+        where: { service: 'stripe', CollectiveId: hostMember.MemberCollectiveId }
       });
 
       const paymentMethod = await models.PaymentMethod.findById(orderCreated.paymentMethod.id);
@@ -464,7 +464,7 @@ describe('createOrder', () => {
       // Should fail if not enough funds in the fromCollective
       let res = await utils.graphqlQuery(createOrderQuery, { order }, xdamman);
       expect(res.errors).to.exist;
-      expect(res.errors[0].message).to.equal("You don't have enough funds available ($5,394 left) to execute this order ($100,000)");
+      expect(res.errors[0].message).to.equal("You don't have enough funds available ($7,461 left) to execute this order ($100,000)");
 
       order.totalAmount = 20000;
 
@@ -473,7 +473,7 @@ describe('createOrder', () => {
       expect(res.errors).to.not.exist;
 
       const availableBalance = await paymentMethod.getBalanceForUser(xdamman);
-      expect(availableBalance.amount).to.equal(519433);
+      expect(availableBalance.amount).to.equal(726149);
 
       const orderCreated = res.data.createOrder;
       const transactions = await models.Transaction.findAll({ where: { OrderId: orderCreated.id }});

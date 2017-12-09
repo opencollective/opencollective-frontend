@@ -278,6 +278,7 @@ export const CollectiveInterfaceType = new GraphQLInterfaceType({
       type: { type: GraphQLString },
       isActive: { type: GraphQLBoolean },
       name: { type: GraphQLString },
+      company: { type: GraphQLString },
       description: { type: GraphQLString },
       longDescription: { type: GraphQLString },
       mission: { type: GraphQLString },
@@ -428,6 +429,12 @@ const CollectiveFields = () => {
       type: GraphQLString,
       resolve(collective) {
         return collective.name;
+      }
+    },
+    company: {
+      type: GraphQLString,
+      resolve(collective) {
+        return collective.company;
       }
     },
     description: {
