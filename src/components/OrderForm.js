@@ -231,8 +231,8 @@ class OrderForm extends React.Component {
   componentWillReceiveProps(props) {
     const { LoggedInUser } = props;
     if (!LoggedInUser) return;
-    if (!this._isMounted) return;
-    this.setState({ LoggedInUser }); // Error: Can only update a mounted or mounting component
+    if (!this._isMounted) return; // Fixes error: Can only update a mounted or mounting component
+    this.setState({ LoggedInUser, isNewUser: !Boolean(LoggedInUser) });
     this.populateProfiles(LoggedInUser);
     this.selectProfile(LoggedInUser.CollectiveId);
   }
@@ -259,7 +259,6 @@ class OrderForm extends React.Component {
     }
     const newState = {
       ...this.state,
-      isNewUser: !Boolean(this.props.LoggedInUser),
       fromCollective,
       orgDetails: {
         show: Boolean(profile === 'organization')

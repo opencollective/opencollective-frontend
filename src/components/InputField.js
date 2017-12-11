@@ -193,7 +193,6 @@ class InputField extends React.Component {
         )
         break;
       case 'component':
-      console.log(">>> input field", field);
         this.input = (
         <FormGroup>
           {field.className === 'horizontal' &&

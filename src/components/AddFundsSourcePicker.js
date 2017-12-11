@@ -38,7 +38,6 @@ class AddFundsSourcePicker extends React.Component {
     }
 
     let dashes = '';
-
     for (let i=0; i < (40 - label.length) / 2; i++) {
       dashes += '-';
     }
