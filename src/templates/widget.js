@@ -28,7 +28,7 @@
     return window.getComputedStyle(element, null).getPropertyValue(property);
   }
 
-  const styles = {
+  const style = `{{style}}` || JSON.stringify({
     body: {
       fontFamily: css('body', 'font-family')
     },
@@ -47,7 +47,7 @@
       fontSize: css('a', 'font-size'),
       color: css('a', 'color')
     }
-  };
+  });
 
   function OpenCollectiveWidget(widget, collectiveSlug, anchor) {
     this.anchor = anchor;
@@ -81,7 +81,7 @@
     this.loading.appendChild(this.logo);
     this.iframe = document.createElement('iframe');
     this.iframe.id = this.id;
-    this.iframe.src = `{{host}}/${collectiveSlug}/${widget}.html?limit=${limit}&id=${this.id}&style=${JSON.stringify(styles)}`;
+    this.iframe.src = `{{host}}/${collectiveSlug}/${widget}.html?limit=${limit}&id=${this.id}&style=${style}`;
     this.iframe.width = width;
     this.iframe.height = height;
     this.iframe.frameBorder = 0;

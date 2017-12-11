@@ -122,6 +122,7 @@ module.exports = (server, app) => {
     const compiled = _.template(content);
     res.setHeader('content-type', 'application/javascript');
     res.send(compiled({
+      style: "{}",
       ...req.query,
       collectiveSlug: req.params.collectiveSlug,
       widget: req.params.widget,

@@ -62,7 +62,7 @@ class Banner extends React.Component {
           <title>{`${this.props.collectiveSlug} collectives`}</title>
         </Head>
 
-        <style global>{`
+        <style>{`
         @font-face {
           font-family: 'montserratlight';
           src: url('/static/fonts/montserrat/montserrat-light-webfont.eot');
