@@ -524,13 +524,14 @@ describe('Mutation Tests', () => {
 
       let emailSendSpy;
 
-      beforeEach(() => {
-        sandbox = sinon.sandbox.create();
+      before(() => {
         emailSendSpy = sandbox.spy(emailLib, 'sendMessageFromActivity');
-        executeOrderStub.reset();
-      });
+      })
 
-      afterEach(() => sandbox.restore());
+      beforeEach(() => {
+        executeOrderStub.reset();
+        emailSendSpy.reset();
+      });
 
       describe('as an organization', () => {
 
