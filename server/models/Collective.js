@@ -605,7 +605,7 @@ export default function(Sequelize, DataTypes) {
                 order: order && {
                   ...order.activity,
                   tier: order.Tier && order.Tier.minimal,
-                  subscription: order.Subscription && { interval: order.Subscription.interval }
+                  subscription: { interval: order.Subscription && order.Subscription.interval }
                 }
               };
               return models.Activity.create({

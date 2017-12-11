@@ -1,3 +1,6 @@
+import dotenv from 'dotenv';
+dotenv.config();
+
 import 'newrelic';
 import 'babel-polyfill';
 import './lib/load-dot-env'; // important to load first for environment config
@@ -5,7 +8,6 @@ import express from 'express';
 import routes from './routes';
 import os from 'os';
 import expressLib from './lib/express';
-
 const app = express();
 
 expressLib(app);

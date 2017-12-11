@@ -10,10 +10,10 @@ import * as utils from './utils';
 describe('graphql.collective.test.js', () => {
   let pubnubCollective, pubnubAdmin, adminMembership;
 
-  before(() => utils.loadDB('opencollective_dvl'));
-  before(() => models.Collective.findOne({ where: { slug: 'pubnub' }}).then(c => pubnubCollective = c));
-  before(() => models.User.createUserWithCollective({ name: "PubNub Administrator", email: 'admin@pubnub.com'}).then(c => pubnubAdmin = c));
-  before(() => models.Member.create({
+  before('load db', () => utils.loadDB('opencollective_dvl'));
+  before('fetch pubnub', () => models.Collective.findOne({ where: { slug: 'pubnub' }}).then(c => pubnubCollective = c));
+  before('create admin user with collective', () => models.User.createUserWithCollective({ name: "PubNub Administrator", email: 'admin@pubnub.com'}).then(c => pubnubAdmin = c));
+  before('create member', () => models.Member.create({
       CreatedByUserId: pubnubAdmin.id,
       MemberCollectiveId: pubnubAdmin.CollectiveId,
       CollectiveId: pubnubCollective.id,
@@ -122,7 +122,7 @@ describe('graphql.collective.test.js', () => {
     expect(collective.tiers).to.have.length(2);
     expect(collective.stats).to.deep.equal({
       backers: { all: 26, users: 25, organizations: 1 },
-      yearlyBudget: 227940,
+      yearlyBudget: 227796,
       topExpenses: {"byCategory":[{"category":"Engineering","count":7,"totalExpenses":380829}],"byCollective":[{"slug":"tjholowaychuk","image":"https://opencollective-production.s3-us-west-1.amazonaws.com/25254v3s400_acc93f90-0085-11e7-951e-491568b1a942.jpeg","name":"TJ Holowaychuk","totalExpenses":-339120}]},
       topFundingSources: {"byCollective":[{"slug":"pubnub","image":"https://opencollective-production.s3-us-west-1.amazonaws.com/pubnublogopng_38ab9250-d2c4-11e6-8ba3-b7985935397d.png","name":"PubNub","totalDonations":147560},{"slug":"harlow_ward","image":"https://opencollective-production.s3-us-west-1.amazonaws.com/168a47c0-d41d-11e6-b711-1589373fcf88.jpg","name":"Harlow Ward","totalDonations":42940},{"slug":"breck7","image":"https://opencollective-production.s3-us-west-1.amazonaws.com/bb14acd098624944ac160008b79fb9e5_30e998d0-619b-11e7-9eab-c17f21ef8eb7.png","name":"Breck Yunits","totalDonations":34720}],"byCollectiveType":[{"type":"USER","totalDonations":192031}]}
       });
