@@ -175,7 +175,7 @@ describe('members.routes.test.js', () => {
 
             setTimeout(() => {
               models.Activity.findAndCountAll({}).then((res) => {
-                expect(res.count).to.equal(1);
+                expect(res.count).to.equal(2);
                 done();
               });
             }, 50);
