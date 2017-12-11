@@ -2,9 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage, FormattedDate } from 'react-intl';
 import Currency from './Currency';
+import Link from './Link';
 import { pickLogo } from '../lib/collective.lib';
 import { get } from 'lodash';
-import { Router, Link } from '../server/pages';
+import { Router } from '../server/pages';
 import { firstSentence, imagePreview } from '../lib/utils';
 import { defaultBackgroundImage } from '../constants/collectives';
 
@@ -55,7 +56,7 @@ class CollectiveCard extends React.Component {
    const description = (collective.description && firstSentence(collective.description, 64)) ||(collective.longDescription && firstSentence(collective.longDescription, 64))
 
     return (
-      <Link route={'collective'} params={{ slug: this.props.collective.slug}}>
+      <Link route={'collective'} params={{ slug: this.props.collective.slug}} target="_top">
         <a className={`CollectiveCard ${collective.type}`} >
           <style jsx>{`
           .CollectiveCard {

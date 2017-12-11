@@ -5,6 +5,7 @@ import { Router } from '../server/pages';
 
 import { defineMessages, injectIntl } from 'react-intl';
 import { formatCurrency, formatDate, firstSentence, singular, capitalize } from '../lib/utils';
+import Link from './Link';
 import CollectiveCard from './CollectiveCard';
 import Avatar from './Avatar';
 
@@ -18,7 +19,6 @@ class Member extends React.Component {
 
   constructor(props) {
     super(props);
-    this.onClick = this.onClick.bind(this);
 
     this.messages = defineMessages({
       'membership.since': { id: 'membership.since', defaultMessage: 'since'},
@@ -27,10 +27,6 @@ class Member extends React.Component {
       'BACKER': { id: 'roles.backer.label', defaultMessage: 'Backer' },
       'membership.totalDonations': { id: 'membership.totalDonations', defaultMessage: 'Total amount contributed' }
     });
-  }
-
-  onClick() {
-    Router.pushRoute(`/${this.props.member.member.slug}`);
   }
 
   render() {
@@ -122,21 +118,23 @@ ${totalDonationsStr}`
         `}</style>          
         <div>
           { viewMode === 'USER' &&
-            <a onClick={this.onClick} title={title}>
-              <Avatar src={member.image} radius={45} />
-              <div className="bubble">
-                <div className="name">{name}</div>
-                <div className="description" style={{color: colors.darkgray}}>{firstSentence(description || member.description, 64)}</div>
-                <div className="meta since" style={{color: colors.darkgray}}>
-                  {memberSinceStr}
-                </div>
-                { membership.stats.totalDonations > 0 &&
-                  <div className="meta totalDonations" style={{color: colors.darkgray}}>
-                    {totalDonationsStr}
+            <Link route={'collective'} params={{ slug: this.props.member.member.slug}} target="_top" title={title}>
+              <a>
+                <Avatar src={member.image} radius={45} />
+                <div className="bubble">
+                  <div className="name">{name}</div>
+                  <div className="description" style={{color: colors.darkgray}}>{firstSentence(description || member.description, 64)}</div>
+                  <div className="meta since" style={{color: colors.darkgray}}>
+                    {memberSinceStr}
                   </div>
-                }
-              </div>
-            </a>
+                  { membership.stats.totalDonations > 0 &&
+                    <div className="meta totalDonations" style={{color: colors.darkgray}}>
+                      {totalDonationsStr}
+                    </div>
+                  }
+                </div>
+              </a>
+            </Link>
           }
           { viewMode === 'ORGANIZATION' &&
             <CollectiveCard collective={member} membership={membership} />
