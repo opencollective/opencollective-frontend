@@ -390,7 +390,7 @@ export default (Sequelize, DataTypes) => {
       return Promise.resolve(this.rolesByCollectiveId);
     }
 
-    return this.rolesByCollectiveId || models.Member.findAll({ where: { MemberCollectiveId: this.CollectiveId }})
+    return models.Member.findAll({ where: { MemberCollectiveId: this.CollectiveId }})
       .then(memberships => {
         const rolesByCollectiveId = {};
         memberships.map(m => {
@@ -428,6 +428,12 @@ export default (Sequelize, DataTypes) => {
   User.prototype.isMember = function(CollectiveId) {
     const result = (this.CollectiveId === CollectiveId) || this.hasRole([roles.HOST, roles.ADMIN, roles.MEMBER], CollectiveId);
     debug("isMember of CollectiveId", CollectiveId,"?", result);
+    return result;
+  }
+
+  User.prototype.isRoot = function() {
+    const result = this.hasRole([roles.ADMIN], 1);
+    debug("isRoot ?", result);
     return result;
   }
 

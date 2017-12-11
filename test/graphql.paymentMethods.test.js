@@ -146,6 +146,17 @@ describe('graphql.paymentMethods.test.js', () => {
       expect(result2.errors[0].message).to.equal(`You don't have sufficient permissions to access this payment method`);
     });
 
+    it('fails to change platformFeePercent if not root', async () => {
+      order.fromCollective = {
+        id: host.id
+      };
+      order.platformFeePercent = 5;
+      const result = await utils.graphqlQuery(createOrderQuery, { order }, user);
+      result.errors && console.error(result.errors[0]);
+      expect(result.errors).to.exist;
+      expect(result.errors[0].message).to.equal(`Only a root can change the platformFeePercent`);
+    });
+
     it('fails to add funds to a collective not hosted on the same host', async () => {
 
       const collective2 = await models.Collective.create({
@@ -202,7 +213,8 @@ describe('graphql.paymentMethods.test.js', () => {
       .times(2)
       .query({"base":"EUR","symbols":"USD"})
       .reply(200, {"base":"EUR","date":"2017-11-10","rates":{"USD":fxrate}});
-
+      const hostFeePercent = 4;
+      order.hostFeePercent = hostFeePercent;
       order.user = {
         email: 'admin@neworg.com',
         name: 'Paul Newman'
@@ -220,13 +232,13 @@ describe('graphql.paymentMethods.test.js', () => {
       expect(transaction.CreatedByUserId).to.equal(admin.id);
       expect(org.CreatedByUserId).to.equal(admin.id);
       expect(transaction.FromCollectiveId).to.equal(org.id);
-      expect(transaction.hostFeeInHostCurrency).to.equal(Math.round(collective.hostFeePercent/100*order.totalAmount*fxrate));
+      expect(transaction.hostFeeInHostCurrency).to.equal(Math.round(hostFeePercent/100*order.totalAmount*fxrate));
       expect(transaction.platformFeeInHostCurrency).to.equal(0);
       expect(transaction.paymentProcessorFeeInHostCurrency).to.equal(0);
       expect(transaction.hostCurrency).to.equal(host.currency);
       expect(transaction.currency).to.equal(collective.currency);
       expect(transaction.amount).to.equal(order.totalAmount);
-      expect(transaction.netAmountInCollectiveCurrency).to.equal(order.totalAmount * (1-collective.hostFeePercent/100));
+      expect(transaction.netAmountInCollectiveCurrency).to.equal(order.totalAmount * (1-hostFeePercent/100));
       expect(transaction.amountInHostCurrency).to.equal(Math.round(order.totalAmount * fxrate));
       expect(transaction.hostCurrencyFxRate).to.equal(Number((1/fxrate).toFixed(15)));
       expect(transaction.amountInHostCurrency).to.equal(1165);
