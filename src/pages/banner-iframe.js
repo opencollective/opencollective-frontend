@@ -15,8 +15,8 @@ class Banner extends React.Component {
     this.onChange = this.onChange.bind(this);
   }
 
-  static getInitialProps ({ query: { collectiveSlug, id, role, orderBy, limit } }) {
-    return { collectiveSlug, id, role, orderBy, limit }
+  static getInitialProps ({ query: { collectiveSlug, id, style } }) {
+    return { collectiveSlug, id, style }
   }
 
   sendMessageToParentWindow() {
@@ -38,6 +38,13 @@ class Banner extends React.Component {
   render() {
     const { collectiveSlug, data } = this.props;
 
+    let style;
+    try {
+      style = JSON.parse(this.props.style || '{}');
+    } catch (e) {
+      style = {};
+    }
+
     if (data.loading) {
       return <div><FormattedMessage id="loading" defaultMessage="loading" /></div>;
     }
@@ -55,7 +62,7 @@ class Banner extends React.Component {
           <title>{`${this.props.collectiveSlug} collectives`}</title>
         </Head>
 
-        <style jsx global>{`
+        <style global>{`
         @font-face {
           font-family: 'montserratlight';
           src: url('/static/fonts/montserrat/montserrat-light-webfont.eot');
@@ -79,7 +86,7 @@ class Banner extends React.Component {
           height: 100%;
           padding: 0;
           margin: 0;
-          font-family: Lato,Helvetica,sans-serif;
+          font-family: ${style.body && `${style.body.fontFamily},`}Lato,Helvetica,sans-serif;
           font-weight: 300;
           font-size: 1rem;
           line-height: 1.5;
@@ -88,7 +95,7 @@ class Banner extends React.Component {
 
         a {
           text-decoration: none;
-          color: #46b0ed;
+          color: ${style.a && style.a.color || "#46b0ed"};
           cursor: pointer;
         }
 
@@ -104,6 +111,7 @@ class Banner extends React.Component {
         h2 {
           font-size: 16px;
           margin-top: 0;
+          font-weight: 300;
         }
 
         ul {
@@ -152,43 +160,47 @@ class Banner extends React.Component {
         `}
         </style>
 
-        <section id="organizations" className="tier">
-          <h1>
-            <FormattedMessage
-              id="collective.section.backers.organizations.title"
-              values={{ n: collective.stats.backers.organizations, collective: collective.name }}
-              defaultMessage={`{n} {n, plural, one {organization is} other {organizations are}} supporting {collective}`}
+        { collective.stats.backers.organizations > 0 &&
+          <section id="organizations" className="tier">
+            <h1 style={style.h1}>
+              <FormattedMessage
+                id="collective.section.backers.organizations.title"
+                values={{ n: collective.stats.backers.organizations, collective: collective.name }}
+                defaultMessage={`{n} {n, plural, one {organization is} other {organizations are}} supporting {collective}`}
+                />
+            </h1>
+            <h2 style={style.h2}><a href={`https://opencollective.com/${collectiveSlug}`} target="_blank" style={style.a}><FormattedMessage id="widget.becomeSponsor" defaultMessage="Become a sponsor" /></a></h2>
+            <MembersWithData
+              collective={collective}
+              onChange={this.onChange}
+              type="ORGANIZATION"
+              role='BACKER'
+              limit={100}
               />
-          </h1>
-          <h2><a href={`https://opencollective.com/${collectiveSlug}`} target="_blank"><FormattedMessage id="widget.becomeSponsor" defaultMessage="Become a sponsor" /></a></h2>
-          <MembersWithData
-            collective={collective}
-            onChange={this.onChange}
-            type="ORGANIZATION"
-            role='BACKER'
-            limit={100}
-            />
-        </section>
+          </section>
+        }
 
-        <section id="backers" className="tier">
-          <h1>
-            <FormattedMessage
-              id="collective.section.backers.users.title"
-              values={{ n: collective.stats.backers.users, collective: collective.name }}
-              defaultMessage={`{n} {n, plural, one {person is} other {people are}} supporting {collective}`}
+        { collective.stats.backers.users > 0 &&
+          <section id="backers" className="tier">
+            <h1 style={style.h1}>
+              <FormattedMessage
+                id="collective.section.backers.users.title"
+                values={{ n: collective.stats.backers.users, collective: collective.name }}
+                defaultMessage={`{n} {n, plural, one {person is} other {people are}} supporting {collective}`}
+                />
+            </h1>
+
+            <h2 style={style.h2}><a href={`https://opencollective.com/${collectiveSlug}`} target="_blank" style={style.a}><FormattedMessage id="widget.becomeBacker" defaultMessage="Become a backer" /></a></h2>
+            <MembersWithData
+              collective={collective}
+              onChange={this.onChange}
+              type="USER"
+              role='BACKER'
+              limit={100}
+              orderBy="totalDonations"
               />
-          </h1>
-
-          <h2><a href={`https://opencollective.com/${collectiveSlug}`} target="_blank"><FormattedMessage id="widget.becomeBacker" defaultMessage="Become a backer" /></a></h2>
-          <MembersWithData
-            collective={collective}
-            onChange={this.onChange}
-            type="USER"
-            role='BACKER'
-            limit={100}
-            orderBy="totalDonations"
-            />
-        </section>
+          </section>
+        }
 
       </div>
     );

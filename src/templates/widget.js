@@ -22,6 +22,33 @@
     }
   });
 
+  function css(selector, property ) {
+    const element = document.querySelector(selector);
+    if (!element) return null;
+    return window.getComputedStyle(element, null).getPropertyValue(property);
+  }
+
+  const styles = {
+    body: {
+      fontFamily: css('body', 'font-family')
+    },
+    h1: {
+      fontFamily: css('h1', 'font-family'),
+      fontSize: css('h1', 'font-size'),
+      color: css('h1', 'color')
+    },
+    h2: {
+      fontFamily: css('h2', 'font-family'),
+      fontSize: css('h2', 'font-size'),
+      color: css('h2', 'color')
+    },
+    a: {
+      fontFamily: css('a', 'font-family'),
+      fontSize: css('a', 'font-size'),
+      color: css('a', 'color')
+    }
+  };
+
   function OpenCollectiveWidget(widget, collectiveSlug, anchor) {
     this.anchor = anchor;
     this.styles = window.getComputedStyle(anchor.parentNode, null);
@@ -54,7 +81,7 @@
     this.loading.appendChild(this.logo);
     this.iframe = document.createElement('iframe');
     this.iframe.id = this.id;
-    this.iframe.src = `{{host}}/${collectiveSlug}/${widget}.html?limit=${limit}&id=${this.id}`;
+    this.iframe.src = `{{host}}/${collectiveSlug}/${widget}.html?limit=${limit}&id=${this.id}&style=${JSON.stringify(styles)}`;
     this.iframe.width = width;
     this.iframe.height = height;
     this.iframe.frameBorder = 0;
