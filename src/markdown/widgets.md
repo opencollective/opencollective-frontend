@@ -32,7 +32,9 @@ where `:collectiveSlug` is the slug of your collective, e.g. `apex` for https://
 
 ### Examples:
 - http://apex.run/#links
-![](https://cl.ly/3g2V3M200U2d/Screen%20Shot%202016-07-18%20at%204.34.48%20PM.png)
+- https://www.spinacms.com/
+
+<script src="https://opencollective.com/apex/banner.js" width="500"></script>
 
 ### How to customize it?
 
@@ -65,6 +67,10 @@ Leave it empty or remove it to show all the collectives that you are a member of
 E.g. http://polycode.co.uk
 
 ![](https://cl.ly/01082x0W042G/Screen%20Shot%202017-02-27%20at%205.22.09%20PM.png)
+
+
+# Customize styling
+You can add your own custom stylesheet [using this method](https://codepen.io/anon/pen/wpwMLV).
 
 
 # Feedback

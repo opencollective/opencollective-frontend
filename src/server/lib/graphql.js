@@ -1,3 +1,5 @@
+import dotenv from 'dotenv';
+dotenv.config();
 import { GraphQLClient } from 'graphql-request';
 import { uniqBy } from 'lodash';
 const graphqlServerUrl = `${process.env.API_URL}/graphql?api_key=${process.env.API_KEY}`;

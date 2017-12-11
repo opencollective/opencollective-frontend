@@ -116,7 +116,7 @@ module.exports = (server, app) => {
     }))
   });
 
-  server.get('/:collectiveSlug/:widget(widget|events|collectives).js', (req, res) => {
+  server.get('/:collectiveSlug/:widget(widget|events|collectives|banner).js', (req, res) => {
     const content = fs.readFileSync(path.join(__dirname,'../templates/widget.js'), 'utf8');
     _.templateSettings.interpolate = /{{([\s\S]+?)}}/g;
     const compiled = _.template(content);

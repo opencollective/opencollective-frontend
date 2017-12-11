@@ -10,7 +10,7 @@
   window.OC.widgets = { "{{widget}}": [] };
   window.addEventListener('message', (e) => {
     if (e.origin !== "{{host}}") return;
-    if (typeof e.data === 'string' && e.data.substr(0,3) !=='oc-') return;
+    if (typeof e.data !== 'string' || e.data.substr(0,3) !=='oc-') return;
     const data = JSON.parse(e.data.substr(3));
     const widget = data.id.substr(0,data.id.indexOf('-'));
     for (let i=0; i < window.OC.widgets[widget].length; i++) {
@@ -59,7 +59,7 @@
     this.iframe.height = height;
     this.iframe.frameBorder = 0;
     this.iframe.scrolling = 'no';
-
+    
     this.el = document.createElement('div');
     this.el.className = `opencollective-${widget}`;
     this.el.appendChild(this.loading);

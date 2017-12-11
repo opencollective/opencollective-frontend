@@ -19,6 +19,7 @@
     "babel-preset-stage-0": "6.22.0",
     "cached-request": "1.1.2",
     "card-react": "1.2.7",
+    "dotenv": "^4.0.0",
     "enzyme": "2.9.1",
     "eslint": "3.15.0",
     "eslint-config-opencollective": "1.1.6",
@@ -120,6 +121,8 @@
       "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/test/mocks/fileMock.js",
       "\\.(css|less)$": "<rootDir>/test/mocks/styleMock.js"
     },
-    "setupFiles": ["<rootDir>/test/setup.js"]
+    "setupFiles": [
+      "<rootDir>/test/setup.js"
+    ]
   }
 }
