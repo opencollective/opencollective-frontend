@@ -102,7 +102,7 @@ class Banner extends React.Component {
         }
 
         h2 {
-          font-size: 18px;
+          font-size: 16px;
           margin-top: 0;
         }
 
@@ -112,7 +112,7 @@ class Banner extends React.Component {
         }
 
         h1 {
-          font-size: 24px;
+          font-size: 20px;
           margin-bottom: 0;
         }
 
