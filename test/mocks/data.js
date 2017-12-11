@@ -30,7 +30,12 @@ export default {
     "firstName": "Anish",
     "lastName": "Bas",
     "username": "abas",
+    "image": "https://pbs.twimg.com/profile_images/3075727251/5c825534ad62223ae6a539f6a5076d3c_400x400.jpeg",
+    "description": "small guy",
     "email": "Xdam@opencollective.com",
+    "twitterHandle": "xdamman",
+    "company": "Open Collective Inc.",
+    "website": "http://xdamman.com",
     "password": "ssapssap"
   },
 

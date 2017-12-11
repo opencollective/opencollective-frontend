@@ -134,13 +134,14 @@ describe("notification.model.test.js", () => {
         expect(types).to.deep.equal([
           'collective.expense.created',
           'collective.expense.created',
+          'collective.member.created',
           'collective.monthlyreport',
           'collective.transaction.created',
           'mailinglist.admins',
           'mailinglist.host'
         ]);
       })
-      .tap(res => expect(res.count).to.equal(6)));
+      .tap(res => expect(res.count).to.equal(7)));
 
   describe('getSubscribers', () => {
 

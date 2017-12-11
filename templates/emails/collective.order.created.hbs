@@ -5,7 +5,9 @@ Subject: New donation to {{collective.name}}: {{{currency transaction.amountInHo
 <center>
   <h1>{{{currency transaction.amountInHostCurrency currency=transaction.hostCurrency}}}</h1>
   <div>{{transaction.description}}</div>
-
+{{#if order.publicMessage}}
+  <div><b>Public message:</b>{{order.publicMessage}}</div>
+{{/if}}
   <br /><br />
 
 {{#if fromCollective.image}}

@@ -228,6 +228,18 @@ export default function(Sequelize, DataTypes) {
         }
       },
 
+      previewImage() {
+        if (!this.image) return null;
+
+        const cloudinaryBaseUrl = 'https://res.cloudinary.com/opencollective/image/fetch';
+
+        const format = (this.image.match(/\.png$/)) ? 'png' : 'jpg';
+
+        const queryurl = (this.type === 'USER') ? `/c_thumb,g_face,h_48,r_max,w_48,bo_3px_solid_white/c_thumb,h_48,r_max,w_48,bo_2px_solid_rgb:66C71A/e_trim` : `/h_96,c_fill`;
+
+        return `${cloudinaryBaseUrl}${queryurl}/f_${format}/${encodeURIComponent(this.image)}`;
+      },
+
       // Info.
       info() {
         return {
@@ -281,6 +293,7 @@ export default function(Sequelize, DataTypes) {
       minimal() {
         return {
           id: this.id,
+          type: this.type,
           name: this.name,
           image: this.image,
           slug: this.slug,
@@ -288,6 +301,19 @@ export default function(Sequelize, DataTypes) {
           publicUrl: this.publicUrl,
           mission: this.mission,
           isSupercollective: this.isSupercollective
+        }
+      },
+      activity() {
+        return {
+          id: this.id,
+          type: this.type,
+          slug: this.slug,
+          name: this.name,
+          company: this.company,
+          website: this.website,
+          twitterHandle: this.twitterHandle,
+          description: this.description,
+          previewImage: this.previewImage
         }
       }
     },
@@ -347,6 +373,19 @@ export default function(Sequelize, DataTypes) {
           currency: this.currency
         });
       })
+  };
+
+  // This is quite ugly, and only needed for events.
+  // I'd argue that we should store the event slug as `${parentCollectiveSlug}/events/${eventSlug}`
+  Collective.prototype.getUrlPath = function() {
+    if (this.type === types.EVENT) {
+      return models.Collective.findById(this.ParentCollectiveId, { attributes: ['slug'] })
+        .then(parent => {
+          return `/${parent.slug}/events/${this.slug}`;
+        })
+    } else {
+      return Promise.resolve(`/${this.slug}`);
+    }
   };
 
   Collective.prototype.getUser = function() {
@@ -507,17 +546,19 @@ export default function(Sequelize, DataTypes) {
     lists[roles.ADMIN] = 'admins';
     lists[roles.HOST] = 'host';
 
-    const notifications = [ { type:`mailinglist.${lists[role]}` } ];
+    const notifications = [
+      { type: `mailinglist.${lists[role]}` },
+      { type: activities.COLLECTIVE_EXPENSE_CREATED }
+    ];
 
     switch (role) {
       case roles.HOST:
-        notifications.push({ type:activities.COLLECTIVE_TRANSACTION_CREATED });
-        notifications.push({ type:activities.COLLECTIVE_EXPENSE_CREATED });
+        notifications.push({ type: activities.COLLECTIVE_TRANSACTION_CREATED });
         this.update({ HostCollectiveId: user.CollectiveId });
         break;
       case roles.ADMIN:
-        notifications.push({ type:activities.COLLECTIVE_EXPENSE_CREATED });
-        notifications.push({ type:'collective.monthlyreport' });
+        notifications.push({ type: activities.COLLECTIVE_MEMBER_CREATED });
+        notifications.push({ type: 'collective.monthlyreport' });
         break;
     }
 
@@ -539,29 +580,64 @@ export default function(Sequelize, DataTypes) {
     .then(results => {
       const member = results[0];
       const remoteUser = results[2];
-      const recipient = results[3];
-      if ([roles.ADMIN, roles.MEMBER].indexOf(role) === -1) {
-        return member;
+      const memberUser = results[3];
+
+      switch (role) {
+
+        case roles.BACKER:
+        case roles.ATTENDEE:
+        case roles.FOLLOWER:
+          return Promise.props({
+              memberCollective: models.Collective.findById(member.MemberCollectiveId),
+              order: models.Order.findOne({
+                where: { CollectiveId: this.id, FromCollectiveId: member.MemberCollectiveId },
+                include: [ { model: models.Tier }, { model: models.Subscription } ],
+                order: [['createdAt', 'ASC']]
+              }),
+              urlPath: this.getUrlPath()
+            })
+            .then(({ order, urlPath, memberCollective }) => {
+              const data = {
+                collective: { ...this.minimal, urlPath },
+                member: { ...member.info,
+                  memberCollective: memberCollective.activity,
+                },
+                order: order && {
+                  ...order.activity,
+                  tier: order.Tier && order.Tier.minimal,
+                  subscription: { interval: order.Subscription && order.Subscription.interval }
+                }
+              };
+              return models.Activity.create({
+                CollectiveId: this.id,
+                type: activities.COLLECTIVE_MEMBER_CREATED,
+                data
+              });
+            });
+
+        case roles.MEMBER:
+        case roles.ADMIN:
+          // We only send the notification for new member for role MEMBER and ADMIN
+          return emailLib.send('collective.newmember', memberUser.email, {
+            remoteUser: {
+              email: remoteUser.email,
+              collective: pick(remoteUser.collective, ['slug', 'name', 'image'])
+            },
+            role: role.toLowerCase(),
+            isAdmin: role === roles.ADMIN,
+            collective: {
+              slug: this.slug,
+              name: this.name,
+              type: this.type.toLowerCase()
+            },
+            recipient: {
+              collective: memberUser.collective.activity
+            },
+            loginLink: results[3].generateLoginLink(`/${memberUser.collective.slug}/edit`)
+          }, { cc: remoteUser.email });
+        default:
+          return member;
       }
-      // We only send the notification for new member for role MEMBER and ADMIN
-      emailLib.send('collective.newmember', recipient.email, {
-        remoteUser: {
-          email: remoteUser.email,
-          collective: pick(remoteUser.collective, ['slug', 'name', 'image'])
-        },
-        role: role.toLowerCase(),
-        isAdmin: role === roles.ADMIN,
-        collective: {
-          slug: this.slug,
-          name: this.name,
-          type: this.type.toLowerCase()
-        },
-        recipient: {
-          collective: pick(recipient.collective, ['name', 'slug', 'website', 'twitterHandle', 'description', 'image'])
-        },
-        loginLink: results[3].generateLoginLink(`/${recipient.collective.slug}/edit`)
-      }, { cc: remoteUser.email });
-      return member;
     });
   };
 

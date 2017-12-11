@@ -132,7 +132,7 @@ export function createOrder(_, args, req) {
     const tierNameInfo = (tier && tier.name) ? ` (${tier.name})` : '';
     let defaultDescription;
     if (interval) {
-      defaultDescription = capitalize(`${interval}ly donation to ${collective.name}${tierNameInfo}`);
+      defaultDescription = `${capitalize(interval)}ly donation to ${collective.name}${tierNameInfo}`;
     } else {
       defaultDescription = `Donation to ${collective.name}${tierNameInfo}`
     }

@@ -140,6 +140,14 @@ export default function(Sequelize, DataTypes) {
         }
       },
 
+      minimal() {
+        return {
+          id: this.id,
+          type: this.type,
+          name: this.name
+        }
+      },
+
       title() {
         return capitalize(pluralize(this.name));
       }

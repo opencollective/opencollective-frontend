@@ -150,6 +150,16 @@ export default function(Sequelize, DataTypes) {
           createdAt: this.createdAt,
           updatedAt: this.updatedAt
         }
+      },
+
+      activity() {
+        return {
+          id: this.id,
+          totalAmount: this.totalAmount,
+          currency: this.currency,
+          description: this.description,
+          publicMessage: this.publicMessage
+        }
       }
     }
   });
