@@ -51,7 +51,7 @@ class Member extends React.Component {
       memberSinceStr = capitalize(tierName);
     }
     memberSinceStr += ` ${intl.formatMessage(this.messages['membership.since'])} ${formatDate(membership.createdAt)}`;
-    const totalDonationsStr = `${intl.formatMessage(this.messages['membership.totalDonations'])}: ${formatCurrency(membership.stats.totalDonations, collective.currency)}`;
+    const totalDonationsStr = `${intl.formatMessage(this.messages['membership.totalDonations'])}: ${formatCurrency(membership.stats.totalDonations, collective.currency, { precision: 0})}`;
     let title = member.name;
     if (member.company) {
       title += `

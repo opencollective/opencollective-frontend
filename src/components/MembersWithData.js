@@ -18,6 +18,7 @@ class MembersWithData extends React.Component {
     collective: PropTypes.object,
     tier: PropTypes.object,
     limit: PropTypes.number,
+    onChange: PropTypes.func,
     LoggedInUser: PropTypes.object
   }
 
@@ -25,10 +26,20 @@ class MembersWithData extends React.Component {
     super(props);
     this.fetchMore = this.fetchMore.bind(this);
     this.refetch = this.refetch.bind(this);
+    this.onChange = this.onChange.bind(this);
     this.state = {
       role: null,
       loading: false
     };
+  }
+
+  onChange() {
+    const { onChange } = this.props; 
+    onChange && this.node && onChange({ height: this.node.offsetHeight });    
+  }
+
+  componentDidMount() {
+    this.onChange();
   }
 
   fetchMore(e) {
@@ -36,6 +47,7 @@ class MembersWithData extends React.Component {
     this.setState({ loading: true });
     this.props.fetchMore().then(() => {
       this.setState({ loading: false });
+      this.onChange();
     });
   }
 
@@ -72,7 +84,7 @@ class MembersWithData extends React.Component {
     }
     const limit = this.props.limit || MEMBERS_PER_PAGE * 2;
     return (
-      <div className="MembersContainer">
+      <div className="MembersContainer" ref={(node) => this.node = node}>
         <style jsx>{`
           :global(.loadMoreBtn) {
             margin: 1rem;
