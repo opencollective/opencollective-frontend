@@ -32,7 +32,7 @@ where `:collectiveSlug` is the slug of your collective, e.g. `apex` for https://
 
 You can also add a style object (react style), e.g.
 
-    <script src='https://opencollective.com/:collectiveSlug/banner.js?style={"a":{"color":"red"},"h1":{"fontFamily":"Verdana","fontWeight":"normal","fontSize":"20px"}}'></script>
+    <script src='https://opencollective.com/:collectiveSlug/banner.js?style={"a":{"color":"red"},"h2":{"fontFamily":"Verdana","fontWeight":"normal","fontSize":"20px"}}'></script>
 
 Note: make sure that your style object is parsable with `JSON.stringify`.
 

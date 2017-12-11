@@ -32,11 +32,6 @@
     body: {
       fontFamily: css('body', 'font-family')
     },
-    h1: {
-      fontFamily: css('h1', 'font-family'),
-      fontSize: css('h1', 'font-size'),
-      color: css('h1', 'color')
-    },
     h2: {
       fontFamily: css('h2', 'font-family'),
       fontSize: css('h2', 'font-size'),

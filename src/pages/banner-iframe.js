@@ -97,6 +97,11 @@ class Banner extends React.Component {
           text-decoration: none;
           color: ${style.a && style.a.color || "#46b0ed"};
           cursor: pointer;
+          font-size: 14px;
+        }
+
+        .actions {
+          text-align: center;
         }
 
         .title {
@@ -110,18 +115,13 @@ class Banner extends React.Component {
 
         h2 {
           font-size: 16px;
-          margin-top: 0;
+          margin-bottom: 0;
           font-weight: 300;
         }
 
         ul {
           list-style: none;
           padding: 0;
-        }
-
-        h1 {
-          font-size: 20px;
-          margin-bottom: 0;
         }
 
         section h1, section h2 {
@@ -162,14 +162,16 @@ class Banner extends React.Component {
 
         { collective.stats.backers.organizations > 0 &&
           <section id="organizations" className="tier">
-            <h1 style={style.h1}>
+            <h2 style={style.h2}>
               <FormattedMessage
                 id="collective.section.backers.organizations.title"
                 values={{ n: collective.stats.backers.organizations, collective: collective.name }}
                 defaultMessage={`{n} {n, plural, one {organization is} other {organizations are}} supporting {collective}`}
                 />
-            </h1>
-            <h2 style={style.h2}><a href={`https://opencollective.com/${collectiveSlug}`} target="_blank" style={style.a}><FormattedMessage id="widget.becomeSponsor" defaultMessage="Become a sponsor" /></a></h2>
+            </h2>
+            <div className="actions">
+              <a href={`https://opencollective.com/${collectiveSlug}`} target="_blank" style={style.a}><FormattedMessage id="widget.becomeSponsor" defaultMessage="Become a sponsor" /></a>
+            </div>
             <MembersWithData
               collective={collective}
               onChange={this.onChange}
@@ -182,15 +184,17 @@ class Banner extends React.Component {
 
         { collective.stats.backers.users > 0 &&
           <section id="backers" className="tier">
-            <h1 style={style.h1}>
+            <h2 style={style.h2}>
               <FormattedMessage
                 id="collective.section.backers.users.title"
                 values={{ n: collective.stats.backers.users, collective: collective.name }}
                 defaultMessage={`{n} {n, plural, one {person is} other {people are}} supporting {collective}`}
                 />
-            </h1>
+            </h2>
 
-            <h2 style={style.h2}><a href={`https://opencollective.com/${collectiveSlug}`} target="_blank" style={style.a}><FormattedMessage id="widget.becomeBacker" defaultMessage="Become a backer" /></a></h2>
+            <div className="actions">
+              <a href={`https://opencollective.com/${collectiveSlug}`} target="_blank" style={style.a}><FormattedMessage id="widget.becomeBacker" defaultMessage="Become a backer" /></a>
+            </div>
             <MembersWithData
               collective={collective}
               onChange={this.onChange}
