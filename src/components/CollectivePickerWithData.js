@@ -41,8 +41,7 @@ class CollectivePickerWithData extends React.Component {
     }
     this.setState({ loading: true });
     const hostCollective = this.hostCollective;
-    console.log(">>> addFunds", form, "host: ", hostCollective);
-    const order = pick(form, ['totalAmount', 'description']);
+    const order = pick(form, ['totalAmount', 'description', 'hostFeePercent', 'platformFeePercent']);
     order.collective = {
       id: this.state.CollectiveId
     };
@@ -59,7 +58,7 @@ class CollectivePickerWithData extends React.Component {
       }
     } else {
       order.fromCollective = {
-        id: hostCollective.id
+        id: form.FromCollectiveId || hostCollective.id
       }
     }
     const pm = hostCollective.paymentMethods.find(pm => pm.service === 'opencollective');
@@ -303,6 +302,7 @@ class CollectivePickerWithData extends React.Component {
                   onSubmit={this.addFunds}
                   onCancel={this.toggleAddFunds}
                   loading={this.state.loading}
+                  LoggedInUser={LoggedInUser}
                   />
                 <div className="results">
                   <div className="error">{this.state.error}</div>

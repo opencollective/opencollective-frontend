@@ -10,7 +10,7 @@ import InputTypeLocation from './InputTypeLocation';
 import InputTypeCreditCard from './InputTypeCreditCard';
 import { Col, HelpBlock, FormGroup, InputGroup, FormControl, ControlLabel, Checkbox } from 'react-bootstrap';
 
-function FieldGroup({ controlId, label, help, pre, button, className, ...props }) {
+function FieldGroup({ controlId, label, help, pre, post, button, className, ...props }) {
 
   const validationState = props.validationState === 'error' ? 'error' : null;
   delete props.validationState;
@@ -30,6 +30,7 @@ function FieldGroup({ controlId, label, help, pre, button, className, ...props }
           <InputGroup>
           { pre && <InputGroup.Addon>{pre}</InputGroup.Addon>}
           <FormControl {...inputProps} />
+          { post && <InputGroup.Addon>{post}</InputGroup.Addon>}
           { validationState && <FormControl.Feedback /> }
           { button && <InputGroup.Button>{button}</InputGroup.Button>}
           </InputGroup>
@@ -45,11 +46,12 @@ function FieldGroup({ controlId, label, help, pre, button, className, ...props }
           <InputGroup>
           { pre && <InputGroup.Addon>{pre}</InputGroup.Addon>}
           <FormControl {...inputProps} ref={inputRef => inputRef && props.focus && inputRef.focus()} />
+          { post && <InputGroup.Addon>{post}</InputGroup.Addon>}
           { validationState && <FormControl.Feedback /> }
           { button && <InputGroup.Button>{button}</InputGroup.Button>}
           </InputGroup>
         }
-        { !pre && !button &&
+        { !pre && !post && !button &&
           <FormControl {...inputProps} ref={inputRef => inputRef && props.focus && inputRef.focus()} />
         }
         {help && <HelpBlock>{help}</HelpBlock>}
@@ -65,10 +67,11 @@ class InputField extends React.Component {
     value: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.object]),
     defaultValue: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.object, PropTypes.bool]),
     validate: PropTypes.func,
-    options: PropTypes.arrayOf(PropTypes.object),
+    options: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.object), PropTypes.object]),
     context: PropTypes.object,
     placeholder: PropTypes.string,
     pre: PropTypes.string,
+    post: PropTypes.string,
     button: PropTypes.node,
     className: PropTypes.string,
     type: PropTypes.string,
@@ -189,6 +192,30 @@ class InputField extends React.Component {
         </FormGroup>
         )
         break;
+      case 'component':
+      console.log(">>> input field", field);
+        this.input = (
+        <FormGroup>
+          {field.className === 'horizontal' &&
+            <div>
+              <Col componentClass={ControlLabel} sm={3}>
+                {capitalize(field.label)}
+              </Col>
+              <Col sm={9}>
+                <field.component onChange={this.handleChange} {...field.options} />
+              </Col>
+            </div>
+          }
+          {field.className !== 'horizontal' &&
+            <div>
+              {field.label && <ControlLabel>{`${capitalize(field.label)}`}</ControlLabel>}
+              <field.component onChange={this.handleChange} {...field.options} />
+              {field.description && <HelpBlock>{field.description}</HelpBlock>}
+            </div>
+          }
+        </FormGroup>
+        )
+        break;
       case 'location':
         this.input = (
         <FormGroup>
@@ -245,6 +272,7 @@ class InputField extends React.Component {
           onChange={event => this.handleChange(event.target.value*100)}
           type="number"
           pre={field.pre}
+          post={field.post}
           name={field.name}
           min={field.min / 100}
           label={field.label && `${capitalize(field.label)}`}
@@ -307,6 +335,7 @@ class InputField extends React.Component {
           onChange={event => this.handleChange(event.target.value)}
           type={field.type}
           pre={field.pre}
+          post={field.post}
           button={field.button}
           name={field.name}
           disabled={field.disabled}
@@ -316,6 +345,7 @@ class InputField extends React.Component {
           placeholder={field.placeholder}
           className={field.className}
           value={this.state.value || field.defaultValue}
+          defaultValue={field.defaultValue}
           validationState={this.state.validationState}
         />)
 
