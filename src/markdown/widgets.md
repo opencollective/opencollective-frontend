@@ -69,10 +69,6 @@ E.g. http://polycode.co.uk
 ![](https://cl.ly/01082x0W042G/Screen%20Shot%202017-02-27%20at%205.22.09%20PM.png)
 
 
-# Customize styling
-You can add your own custom stylesheet [using this method](https://codepen.io/anon/pen/wpwMLV).
-
-
 # Feedback
 
 If you would like a different or custom widget, let us know. Send us your feedback to info@opencollective.com or join us on our slack: https://slack.opencollective.com.
