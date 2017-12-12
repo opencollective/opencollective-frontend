@@ -328,7 +328,16 @@ const getCollectivesByTag = (tag, limit, excludeList, minTotalDonationInCents, r
 * Get list of all unique tags for collectives.
 */
 const getUniqueCollectiveTags = () => {
-  return sequelize.query('SELECT DISTINCT UNNEST(tags) FROM "Collectives" WHERE ARRAY_LENGTH(tags, 1) > 0')
+  return sequelize.query(`
+    WITH
+      tags as (
+        SELECT UNNEST(tags) as tag FROM "Collectives" WHERE type='COLLECTIVE' AND ARRAY_LENGTH(tags, 1) > 0
+      ),
+      top_tags as (
+        SELECT tag, count(*) as count FROM tags GROUP BY tag ORDER BY count DESC
+      )
+    SELECT * FROM top_tags WHERE count > 20 ORDER BY tag ASC
+  `)
   .then(results => results[0].map(x => x.unnest).sort())
 }
 
