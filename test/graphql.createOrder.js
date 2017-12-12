@@ -345,7 +345,7 @@ describe('createOrder', () => {
     it('creates an order as a logged in user for an existing organization', async () => {
 
       const token = await utils.createStripeToken();
-      const xdamman = await models.User.findById(2);
+      const duc = await models.User.findById(65);
       const newco = await models.Collective.create({
         type: 'ORGANIZATION',
         name: "newco",
@@ -360,25 +360,25 @@ describe('createOrder', () => {
       }
 
       // Should fail if not an admin or member of the organization
-      let res = await utils.graphqlQuery(createOrderQuery, { order }, xdamman);
+      let res = await utils.graphqlQuery(createOrderQuery, { order }, duc);
       expect(res.errors).to.exist;
       expect(res.errors[0].message).to.equal("You don't have sufficient permissions to create an order on behalf of the newco organization");
 
       await models.Member.create({
         CollectiveId: newco.id,
-        MemberCollectiveId: xdamman.CollectiveId,
+        MemberCollectiveId: duc.CollectiveId,
         role: 'MEMBER',
-        CreatedByUserId: xdamman.id
+        CreatedByUserId: duc.id
       });
 
-      res = await utils.graphqlQuery(createOrderQuery, { order }, xdamman);
+      res = await utils.graphqlQuery(createOrderQuery, { order }, duc);
       res.errors && console.error(res.errors);
       expect(res.errors).to.not.exist;
       const orderCreated = res.data.createOrder;
       const fromCollective = orderCreated.fromCollective;
       const collective = orderCreated.collective;
       const transactions = await models.Transaction.findAll({ where: { OrderId: orderCreated.id }});
-      expect(orderCreated.createdByUser.id).to.equal(xdamman.id);
+      expect(orderCreated.createdByUser.id).to.equal(duc.id);
       expect(transactions.length).to.equal(2);
       expect(transactions[0].type).to.equal('DEBIT');
       expect(transactions[0].FromCollectiveId).to.equal(collective.id);
@@ -391,11 +391,11 @@ describe('createOrder', () => {
     it(`creates an order as a logged in user for an existing collective using the collective's payment method`, async () => {
 
       const token = await utils.createStripeToken();
-      const xdamman = await models.User.findById(2);
+      const duc = await models.User.findById(65);
       const newco = await models.Collective.create({
         type: 'ORGANIZATION',
         name: "newco",
-        CreatedByUserId: xdamman.id
+        CreatedByUserId: duc.id
       });
 
       order.fromCollective = { id: newco.id };
@@ -410,35 +410,35 @@ describe('createOrder', () => {
       order.paymentMethod = { uuid: paymentMethod.uuid };
 
       // Should fail if not an admin or member of the organization
-      let res = await utils.graphqlQuery(createOrderQuery, { order }, xdamman);
+      let res = await utils.graphqlQuery(createOrderQuery, { order }, duc);
       expect(res.errors).to.exist;
       expect(res.errors[0].message).to.equal("You don't have sufficient permissions to create an order on behalf of the newco organization");
 
       await models.Member.create({
         CollectiveId: newco.id,
-        MemberCollectiveId: xdamman.CollectiveId,
+        MemberCollectiveId: duc.CollectiveId,
         role: 'MEMBER',
-        CreatedByUserId: xdamman.id
+        CreatedByUserId: duc.id
       });
 
       // Should fail if order.totalAmount > PaymentMethod.monthlyLimitPerMember
-      res = await utils.graphqlQuery(createOrderQuery, { order }, xdamman);
+      res = await utils.graphqlQuery(createOrderQuery, { order }, duc);
       expect(res.errors).to.exist;
       expect(res.errors[0].message).to.equal("The total amount of this order (€200 ~= $239) is higher than your monthly spending limit on this payment method ($100)");
 
       await paymentMethod.update({ monthlyLimitPerMember: 25000 }); // $250 limit
-      res = await utils.graphqlQuery(createOrderQuery, { order }, xdamman);
+      res = await utils.graphqlQuery(createOrderQuery, { order }, duc);
       res.errors && console.error(res.errors);
       expect(res.errors).to.not.exist;
 
-      const availableBalance = await paymentMethod.getBalanceForUser(xdamman);
+      const availableBalance = await paymentMethod.getBalanceForUser(duc);
       expect(availableBalance.amount).to.equal(1160);
 
       const orderCreated = res.data.createOrder;
       const fromCollective = orderCreated.fromCollective;
       const collective = orderCreated.collective;
       const transactions = await models.Transaction.findAll({ where: { OrderId: orderCreated.id }, order: [['id','ASC']]});
-      expect(orderCreated.createdByUser.id).to.equal(xdamman.id);
+      expect(orderCreated.createdByUser.id).to.equal(duc.id);
       expect(transactions.length).to.equal(2);
       expect(transactions[0].type).to.equal('DEBIT');
       expect(transactions[0].FromCollectiveId).to.equal(collective.id);
@@ -448,7 +448,7 @@ describe('createOrder', () => {
       expect(transactions[1].CollectiveId).to.equal(collective.id);
 
       // Should fail if order.totalAmount > PaymentMethod.getBalanceForUser
-      res = await utils.graphqlQuery(createOrderQuery, { order }, xdamman);
+      res = await utils.graphqlQuery(createOrderQuery, { order }, duc);
       expect(res.errors).to.exist;
       expect(res.errors[0].message).to.equal("You don't have enough funds available ($12 left) to execute this order (€200 ~= $238)");
 

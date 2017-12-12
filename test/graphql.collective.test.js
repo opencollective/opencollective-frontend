@@ -285,7 +285,7 @@ describe('graphql.collective.test.js', () => {
       const members = result.data.allMembers;
       expect(members).to.have.length(10);
       expect(members[0].collective.slug).to.equal('brusselstogether-collective');
-      expect(members[0].member.slug).to.equal('hubletlaurent');
+      expect(members[0].member.slug).to.equal('alexandrasaveljeva');
     });
 
     it('gets the members by memberCollectiveSlug by role', async () => {
@@ -294,7 +294,7 @@ describe('graphql.collective.test.js', () => {
       expect(result.errors).to.not.exist;
       const members = result.data.allMembers;
       expect(members[0].role).to.equal('ADMIN');
-      expect(members[0].collective.slug).to.equal('brusselstogether-collective');
+      expect(members[0].collective.slug).to.equal('brusselstogether');
       expect(members[0].member.slug).to.equal('xdamman');
       expect(members).to.have.length(10);
     });
