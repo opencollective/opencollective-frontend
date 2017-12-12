@@ -350,7 +350,7 @@ export function exportToPDF(template, data, options) {
 export const defaultHostCollective = (tag) => {
   if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV  === 'staging') {
     if (tag === 'opensource') {
-      return { id: 772, CollectiveId: 9805, ParentCollectiveId: 83 }; // Open Source Host Collective
+      return { id: 772, CollectiveId: 11004, ParentCollectiveId: 83 }; // Open Source Host Collective
     } else {
       return { id: 7944, CollectiveId: 8674, ParentCollectiveId: 83 }; // Non-open source Host Collective ('host-other')
     }
