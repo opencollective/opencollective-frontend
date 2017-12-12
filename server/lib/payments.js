@@ -10,8 +10,9 @@ import * as paymentProviders from '../paymentProviders';
  * Execute an order as user using paymentMethod
  * It validates the paymentMethod and makes sure the user can use it
  * @param {*} order { tier, description, totalAmount, currency, interval (null|month|year), paymentMethod }
+ * @param options { hostFeePercent, platformFeePercent} (only for add funds and if remoteUser is admin of host or root)
  */
-export const executeOrder = (user, order) => {
+export const executeOrder = (user, order, options) => {
 
   if (! (order instanceof models.Order)) {
     return Promise.reject(new Error("order should be an instance of the Order model"));
@@ -47,7 +48,7 @@ export const executeOrder = (user, order) => {
     })
     .then(() => {
       const paymentProvider = (order.paymentMethod) ? order.paymentMethod.service : 'manual';
-      return paymentProviders[paymentProvider].processOrder(order); // eslint-disable-line import/namespace
+      return paymentProviders[paymentProvider].processOrder(order, options); // eslint-disable-line import/namespace
     })
     .then(transaction => {
       // for gift cards

@@ -24,7 +24,7 @@ import {
   PaymentMethodType
 } from './types';
 
-import models from '../models';
+import models, { sequelize } from '../models';
 import rawQueries from '../lib/queries';
 import { fetchCollectiveId } from '../lib/cache';
 
@@ -235,6 +235,10 @@ const queries = {
     args: {
       CollectiveId: { type: GraphQLInt },
       collectiveSlug: { type: GraphQLString },
+      includeHostedCollectives: {
+        type: GraphQLBoolean,
+        description: "Include the members of the hosted collectives. Useful to get the list of all users/organizations from a host."
+      },
       memberCollectiveSlug: { type: GraphQLString },
       TierId: { type: GraphQLInt },
       role: { type: GraphQLString },
@@ -244,7 +248,8 @@ const queries = {
       limit: { type: GraphQLInt },
       offset: { type: GraphQLInt }
     },
-    async resolve(_, args) {
+    async resolve(_, args, req) {
+
       if (!args.CollectiveId && !args.collectiveSlug && !args.memberCollectiveSlug) {
         throw new Error("Please provide a CollectiveId, a collectiveSlug or a memberCollectiveSlug");
       }
@@ -257,12 +262,27 @@ const queries = {
         args.MemberCollectiveId = await fetchCollectiveId(args.memberCollectiveSlug);
       }
 
+      const memberTable = args.MemberCollectiveId ? 'collective' : 'memberCollective';
       const attr = args.CollectiveId ? 'CollectiveId' : 'MemberCollectiveId';
       const where = { [attr]: args[attr] };
       if (args.role) where.role = args.role.toUpperCase();
       if (where.role === 'HOST') {
         where.HostCollectiveId = args.MemberCollectiveId;
       }
+      
+      const getCollectiveIds = () => {
+        if (args.includeHostedCollectives) {
+          return models.Member.findAll({
+            where: {
+              MemberCollectiveId: args.CollectiveId,
+              role: 'HOST'
+            }
+          }).map(members => members.CollectiveId)
+        } else {
+          return Promise.resolve([args[attr]]);
+        }
+      }
+
       if (["totalDonations", "balance"].indexOf(args.orderBy) !== -1) {
         const queryName = (args.orderBy === 'totalDonations') ? "getMembersWithTotalDonations" : "getMembersWithBalance";
         return rawQueries[queryName](where, args)
@@ -275,33 +295,38 @@ const queries = {
               MemberCollectiveId: collective.dataValues.MemberCollectiveId,
               totalDonations: collective.dataValues.totalDonations
             }
-            if (attr === 'CollectiveId') {
-              res.memberCollective = collective;
-            } else {
-              res.collective = collective;
-            }
+            res[memberTable] = collective;
             return res;
           });
       } else {
-        const query = { where: {}, include: [] };
-        if (args.CollectiveId) query.where.CollectiveId = args.CollectiveId;
-        if (args.MemberCollectiveId) query.where.MemberCollectiveId = args.MemberCollectiveId;
+        const query = { where, include: [] };
         if (args.TierId) query.where.TierId = args.TierId;
-        if (args.role) query.where.role = args.role;
-        if (args.type) {
-          const types = args.type.split(',');
+
+        // If we request the data of the member, we do a JOIN query
+        // that allows us to sort by Member.member.name
+        if (req.body.query.match(/ member ?\{/) || args.type) {
+          const memberCond = {};
+          if (args.type) {
+            const types = args.type.split(',');
+            memberCond.type = { $in: types };
+          }
           query.include.push(
             {
               model: models.Collective,
-              as: 'memberCollective',
+              as: memberTable,
               required: true,
-              where: { type: { $in: types } }
+              where: memberCond
             }
           );
+          query.order = [[sequelize.literal(`"${memberTable}".name`), 'ASC']];
         }
         if (args.limit) query.limit = args.limit;
         if (args.offset) query.offset = args.offset;
-        return models.Member.findAll(query);
+        
+        return getCollectiveIds().then(collectiveIds => {
+          query.where[attr] = { $in: collectiveIds };
+          return models.Member.findAll(query);
+        })
       }
     }
   },

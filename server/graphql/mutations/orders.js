@@ -5,11 +5,11 @@ import emailLib from '../../lib/email';
 import Promise from 'bluebird';
 import { types } from '../../constants/collectives';
 import roles from '../../constants/roles';
+import { pick } from 'lodash';
 
 export function createOrder(_, args, req) {
   let tier, collective, fromCollective, paymentRequired, interval, orderCreated, user;
   const order = args.order;
-
 
   if (order.paymentMethod && order.paymentMethod.service === 'stripe' && order.paymentMethod.uuid && !req.remoteUser) {
     throw new Error("You need to be logged in to be able to use a payment method on file");
@@ -17,6 +17,10 @@ export function createOrder(_, args, req) {
 
   if (!order.collective.id) {
     throw new Error("No collective id provided");
+  }
+
+  if (order.platformFeePercent && !req.remoteUser.isRoot()) {
+    throw new Error(`Only a root can change the platformFeePercent`);
   }
 
   // Check the existence of the recipient Collective
@@ -35,6 +39,13 @@ export function createOrder(_, args, req) {
       throw new Error(`Well tried. But no you can't order yourself something ;-)`);
     }
 
+    if (order.hostFeePercent) {
+      return collective.getHostCollectiveId().then(HostCollectiveId => {
+        if (!req.remoteUser.isAdmin(HostCollectiveId)) {
+          throw new Error(`Only an admin of the host can change the hostFeePercent`);
+        }
+      });
+    }
   })
   // Check the existence of the tier
   .then(() => {
@@ -106,7 +117,14 @@ export function createOrder(_, args, req) {
             possibleRoles.push(roles.MEMBER);
           }
           if (!req.remoteUser.hasRole(possibleRoles, order.fromCollective.id)) {
-            throw new Error(`You don't have sufficient permissions to create an order on behalf of the ${c.name} ${c.type.toLowerCase()}`);
+            // We only allow to add funds on behalf of a collective if the user is an admin of that collective or an admin of the host of the collective that receives the money
+            return collective.getHostCollectiveId().then(HostCollectiveId => {
+              if (!req.remoteUser.isAdmin(HostCollectiveId)) {
+                throw new Error(`You don't have sufficient permissions to create an order on behalf of the ${c.name} ${c.type.toLowerCase()}`);
+              } else {
+                return c;
+              }
+            });
           }
           return c;
       });
@@ -165,7 +183,7 @@ export function createOrder(_, args, req) {
     if (paymentRequired) {
       return orderCreated
         .setPaymentMethod(order.paymentMethod)
-        .then(() => executeOrder(req.remoteUser || user, orderCreated)); // also adds the user as a BACKER of collective
+        .then(() => executeOrder(req.remoteUser || user, orderCreated, pick(order, ['hostFeePercent', 'platformFeePercent']))); // also adds the user as a BACKER of collective
     } else {
       // Free ticket, add user as an ATTENDEE
       const email = (req.remoteUser) ? req.remoteUser.email : args.order.user.email;
