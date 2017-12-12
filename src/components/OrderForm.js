@@ -234,7 +234,7 @@ class OrderForm extends React.Component {
     if (!this._isMounted) return; // Fixes error: Can only update a mounted or mounting component
     this.setState({ LoggedInUser, isNewUser: !Boolean(LoggedInUser) });
     this.populateProfiles(LoggedInUser);
-    this.selectProfile(LoggedInUser.CollectiveId);
+    setTimeout(() => this.selectProfile(LoggedInUser.CollectiveId), 0); // need to pass a cycle to let setState take effect
   }
 
   logout() {
