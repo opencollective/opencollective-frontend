@@ -338,7 +338,7 @@ const getUniqueCollectiveTags = () => {
       )
     SELECT * FROM top_tags WHERE count > 20 ORDER BY tag ASC
   `)
-  .then(results => results[0].map(x => x.unnest).sort())
+  .then(results => results[0].map(x => x.tag))
 }
 
 /**
