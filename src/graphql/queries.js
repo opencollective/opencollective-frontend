@@ -502,6 +502,10 @@ export const addGetLoggedInUserFunction = (component) => {
                   }
                   return false;                  
                 }
+
+                LoggedInUser.isRoot = () => {
+                  return intersection(LoggedInUser.roles['opencollectiveinc_internal'], ['ADMIN']).length > 0;
+                }
               }
               console.log(">>> LoggedInUser", LoggedInUser);
               return resolve(LoggedInUser);

@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import InputField from '../components/InputField';
+import AddFundsSourcePicker from '../components/AddFundsSourcePicker';
 import { Button, Row, Col, Form } from 'react-bootstrap';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import { isValidEmail } from '../lib/utils';
@@ -35,13 +36,13 @@ class AddFundsForm extends React.Component {
       'api.error.unreachable': { id: 'api.error.unreachable', defaultMessage: "Can't reach the API. Please try again in a few." },
       'totalAmount.label': { id: 'addfunds.amount.label', defaultMessage: 'amount' },
       'description.label': { id: 'addfunds.description.label', defaultMessage: 'description' },
-      'fromCollective.label': { id: 'addfunds.fromCollective.label', defaultMessage: 'source' },
+      'FromCollectiveId.label': { id: 'addfunds.FromCollectiveId.label', defaultMessage: 'source' },
+      'hostFeePercent.label': { id: 'addfunds.hostFeePercent.label', defaultMessage: 'Host fee' },
+      'platformFeePercent.label': { id: 'addfunds.platformFeePercent.label', defaultMessage: 'Platform fee' },
       'name.label': { id: 'user.name.label', defaultMessage: 'name' },
       'email.label': { id: 'user.email.label', defaultMessage: 'email' },
       'organization.label': { id: 'addfunds.organization.label', defaultMessage: 'organization' },
-      'website.label': { id: 'user.website.label', defaultMessage: 'website' },
-      'host': { id: 'addfunds.fromCollective.host', defaultMessage: 'host ({host})' },
-      'other': { id: 'addfunds.fromCollective.other', defaultMessage: 'other (please specify)' }
+      'website.label': { id: 'user.website.label', defaultMessage: 'website' }
     });
 
     const getOptions = (arr, vars) => {
@@ -63,25 +64,40 @@ class AddFundsForm extends React.Component {
         name: 'description'
       },
       {
-        name: "fromCollective",
-        type: "select",
-        options: getOptions(['host', 'other'], { host: props.host.name })
+        name: "FromCollectiveId",
+        type: "component",
+        component: AddFundsSourcePicker,
+        options: {
+          collective: this.props.collective,
+          host: this.props.host
+        }
       },
       {
         name: 'name',
-        when: (form) => form.fromCollective === 'other'
+        when: (form) => form.FromCollectiveId === 'other'
       },
       {
         name: 'email',
-        when: (form) => form.fromCollective === 'other'
+        when: (form) => form.FromCollectiveId === 'other'
       },
       {
         name: 'organization',
-        when: (form) => form.fromCollective === 'other'
+        when: (form) => form.FromCollectiveId === 'other'
       },
       {
         name: 'website',
-        when: (form) => form.fromCollective === 'other'
+        when: (form) => form.FromCollectiveId === 'other'
+      },
+      {
+        name: "hostFeePercent",
+        type: 'number',
+        post: '%'
+      },
+      {
+        name: "platformFeePercent",
+        type: 'number',
+        post: '%',
+        when: () => this.props.LoggedInUser && this.props.LoggedInUser.isRoot()
       }
     ]
 
@@ -97,7 +113,7 @@ class AddFundsForm extends React.Component {
   }
 
   handleChange(obj, attr, value) {
-    const { intl } = this.props;
+    const { intl, host } = this.props;
 
     const newState = { ... this.state };
     if (value !== undefined) {
@@ -106,10 +122,12 @@ class AddFundsForm extends React.Component {
       newState[obj] = Object.assign({}, this.state[obj], attr);
     }
 
-    if (newState.form.fromCollective === 'other') {
-      newState.hostFeePercent = this.props.collective.hostFeePercent;
-    } else {
-      newState.hostFeePercent = 0;
+    if (attr === 'FromCollectiveId') {
+      if (value !== host.id) {
+        newState[obj].hostFeePercent = this.props.collective.hostFeePercent;
+      } else {
+        newState[obj].hostFeePercent = 0;
+      }
     }
     
     this.setState(newState);
@@ -126,7 +144,8 @@ class AddFundsForm extends React.Component {
 
   render() {
     const { intl, loading } = this.props;
-
+    const hostFeePercent = this.state.form.hostFeePercent || 0;
+    const platformFeePercent = this.state.form.platformFeePercent || 0;
     return (
       <div className="AddFundsForm">
         <style jsx>{`
@@ -216,15 +235,21 @@ class AddFundsForm extends React.Component {
                               <td className="amount">{formatCurrency(this.state.form.totalAmount, this.props.collective.currency, { precision: 2 })}</td>
                             </tr>
                             <tr>
-                              <td><FormattedMessage id="addfunds.hostFees" defaultMessage="Host fees ({hostFees})" values={{ hostFees: `${this.state.hostFeePercent}%` }} /></td>
-                              <td className="amount">{formatCurrency(this.state.hostFeePercent/100 * this.state.form.totalAmount, this.props.collective.currency, { precision: 2 })}</td>
+                              <td><FormattedMessage id="addfunds.hostFees" defaultMessage="Host fees ({hostFees})" values={{ hostFees: `${hostFeePercent}%` }} /></td>
+                              <td className="amount">{formatCurrency(hostFeePercent/100 * this.state.form.totalAmount, this.props.collective.currency, { precision: 2 })}</td>
                             </tr>
+                            { platformFeePercent > 0 &&
+                              <tr>
+                                <td><FormattedMessage id="addfunds.platformFees" defaultMessage="Platform fees ({platformFees})" values={{ platformFees: `${platformFeePercent}%` }} /></td>
+                                <td className="amount">{formatCurrency(platformFeePercent/100 * this.state.form.totalAmount, this.props.collective.currency, { precision: 2 })}</td>
+                              </tr>
+                            }
                             <tr>
                               <td colSpan={2}><hr size={1} /></td>
                             </tr>
                             <tr>
                               <td><FormattedMessage id="addfunds.netAmount" defaultMessage="Net amount" /></td>
-                              <td className="amount">{formatCurrency(this.state.form.totalAmount * (1 - this.state.hostFeePercent/100), this.props.collective.currency, { precision: 2 })}</td>
+                              <td className="amount">{formatCurrency(this.state.form.totalAmount * (1 - (hostFeePercent + platformFeePercent)/100), this.props.collective.currency, { precision: 2 })}</td>
                             </tr>
                           </tbody>
                         </table>
