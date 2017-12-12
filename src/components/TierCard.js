@@ -75,7 +75,7 @@ class TierCard extends React.Component {
     } else if (!collective.isActive) {
       errorMsg = 'collectiveInactive';
     }
-    const tooltip = disabled && intl.formatMessage(this.messages[`tier.error.${errorMsg}`]);
+    const tooltip = disabled ? intl.formatMessage(this.messages[`tier.error.${errorMsg}`]) : '';
 
     const onClick = () => {
       if (disabled) return;
