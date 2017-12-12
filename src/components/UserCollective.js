@@ -266,7 +266,7 @@ class UserCollective extends React.Component {
                   <h1>{intl.formatMessage(this.messages[`${type}.collective.memberOf.${role.toLowerCase()}.title`], { n: memberOf[role].length })}</h1>
                   <Memberships
                     className={role}
-                    memberships={memberOf[role]}
+                    memberships={role === 'ADMIN' ? memberOf[role].filter(m => m.collective.type === 'COLLECTIVE') : memberOf[role]}
                     />
                 </section>
               ))}

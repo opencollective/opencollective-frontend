@@ -283,7 +283,7 @@ const getCollectiveQuery = gql`
         }
       }
       ... on User {
-        memberOf(limit: 50) {
+        memberOf(limit: 60) {
           id
           role
           createdAt
