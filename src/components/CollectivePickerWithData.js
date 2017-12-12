@@ -175,9 +175,6 @@ class CollectivePickerWithData extends React.Component {
     }
 
     const collectives = [...this.hostCollective.collectives].sort((a, b) => {
-      const badgeCount = (c) => c.stats.expenses.pending + c.stats.expenses.approved;
-      if (badgeCount(b) > badgeCount(a)) return 1;
-      if (badgeCount(b) < badgeCount(a)) return -1;
       return (b.name.toUpperCase() < a.name.toUpperCase()) ? 1 : -1;
     });
 

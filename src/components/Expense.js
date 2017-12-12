@@ -248,19 +248,18 @@ class Expense extends React.Component {
                 </div>
               </div>
             }
-            { this.state.mode !== 'edit' && expense.status === 'PENDING' && LoggedInUser && LoggedInUser.canApproveExpense(expense) &&
+            { this.state.mode !== 'edit' && LoggedInUser && LoggedInUser.canApproveExpense(expense) &&
               <div>
-                <ApproveExpenseBtn id={expense.id} />
-                <RejectExpenseBtn id={expense.id} />
-              </div>
-            }
-            { this.state.mode !== 'edit' && expense.status === 'APPROVED' && LoggedInUser && LoggedInUser.canPayExpense(expense) &&
-              <div>
-                <PayExpenseBtn 
-                  expense={expense} 
-                  disabled={!this.props.allowPayAction} 
-                  lock={this.props.lockPayAction}
-                  unlock={this.props.unlockPayAction} />
+                { expense.status === 'APPROVED' && LoggedInUser.canPayExpense(expense) &&
+                  <PayExpenseBtn
+                    expense={expense}
+                    disabled={!this.props.allowPayAction}
+                    lock={this.props.lockPayAction}
+                    unlock={this.props.unlockPayAction}
+                    />
+                }
+                { expense.status !== 'APPROVED' && <ApproveExpenseBtn id={expense.id} /> }
+                { expense.status !== 'REJECTED' && <RejectExpenseBtn id={expense.id} /> }
               </div>
             }
           </div>
