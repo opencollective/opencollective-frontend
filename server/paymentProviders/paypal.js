@@ -101,6 +101,7 @@ export default {
 
   // Returns the balance in the currency of the paymentMethod
   getBalance: (paymentMethod) => {
+    // TODO: fix using call to paypal to get real balance
     let totalSpent = 0, totalTransactions = 0, firstTransactionAt, lastTransactionAt;
     return models.Transaction.findAll({
       attributes: [
@@ -145,15 +146,15 @@ export default {
             const lowerLimit = collective.currency === 'USD' ? 2000 : Math.floor(0.95 * limit);
             console.log(">>> requesting a paykey for ", formatCurrency(lowerLimit*100, collective.currency));
             return {
-              currencyCode: collective.currency,
+              currencyCode: 'USD', // collective.currency, // we should use the currency of the host collective but still waiting on PayPal to resolve that issue.
               startingDate: new Date().toISOString(),
               endingDate: expiryDate.toISOString(),
               returnUrl: `${config.host.api}/connected-accounts/paypal/callback?paypalApprovalStatus=success&preapprovalKey=\${preapprovalKey}`,
               cancelUrl: `${config.host.api}/connected-accounts/paypal/callback?paypalApprovalStatus=error&preapprovalKey=\${preapprovalKey}`,
               displayMaxTotalAmount: false,
               feesPayer: 'SENDER',
-              maxAmountPerPayment: lowerLimit, // PayPal claims this can go up to $10k without needing additional permissions from them.
-              maxTotalAmountOfAllPayments: lowerLimit, // PayPal claims this isn't needed but Live errors out if we don't send it.
+              maxAmountPerPayment: 2000.00, // lowerLimit, // PayPal claims this can go up to $10k without needing additional permissions from them.
+              maxTotalAmountOfAllPayments: 2000.00, //, // PayPal claims this isn't needed but Live errors out if we don't send it.
               clientDetails: CollectiveId
             };
           });
