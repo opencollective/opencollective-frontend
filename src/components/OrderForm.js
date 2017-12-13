@@ -246,8 +246,7 @@ class OrderForm extends React.Component {
     if (profile === 'logout') {
       return this.logout();
     }
-
-    const CollectiveId = (typeof profile === 'number') ? profile : null;
+    const CollectiveId = isNaN(profile) ? null : profile;
     const collective = CollectiveId && this.collectivesById[CollectiveId];
     let fromCollective = {};
     if (collective) {
