@@ -182,9 +182,16 @@ export const authenticateService = (req, res, next) => {
   const opts = { callbackURL: getOAuthCallbackUrl(req) };
 
   if (service === 'github') {
-    // 'repo' gives us access to organizational repositories as well
-    // vs. 'public_repo' which requires the org to give separate access to app
-    opts.scope = [ 'user:email', 'repo' ]; 
+    /*
+      'repo' gives us access to org repos and private repos (latter is an issue for some people)
+      'public_repo' should give us all public_repos but in some cases users report not 
+        being able to see their repos. 
+
+      We have fluctuated back and forth. With the new simplified GitHub signup flow,
+      it's possible that 'public_repo' is enough. 
+    */
+
+    opts.scope = [ 'user:email', 'public_repo' ]; 
     return passport.authenticate(service, opts)(req, res, next);
   }
 
