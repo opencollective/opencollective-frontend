@@ -14,6 +14,7 @@ import { graphql } from 'react-apollo'
 import gql from 'graphql-tag'
 import Loading from '../components/Loading';
 import NotFound from '../components/NotFound';
+import { pick } from 'lodash';
 
 class CreateOrderPage extends React.Component {
 
@@ -58,6 +59,7 @@ class CreateOrderPage extends React.Component {
   async createOrder(order) {
     const { intl, data } = this.props;
     order.collective = { id: data.Collective.id };
+    order.paymentMethod = pick(order.paymentMethod, ['uuid', 'service', 'type', 'token', 'customerId', 'data', 'name', 'currency', 'save']);
     if (this.state.LoggedInUser) {
       delete order.user;
     }

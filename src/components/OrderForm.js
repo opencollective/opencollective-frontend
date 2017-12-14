@@ -3,12 +3,13 @@ import { withApollo } from 'react-apollo';
 import PropTypes from 'prop-types';
 import TierComponent from '../components/Tier';
 import InputField from '../components/InputField';
+import RequestBitcoin from '../components/RequestBitcoin';
 import ActionButton from '../components/Button';
 import { Button, Row, Col, Form, InputGroup, FormControl } from 'react-bootstrap';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import { capitalize, formatCurrency, isValidEmail } from '../lib/utils';
 import { getStripeToken, isValidCard } from '../lib/stripe';
-import { pick } from 'lodash';
+import { pick, get } from 'lodash';
 import withIntl from '../lib/withIntl';
 import { checkUserExistence, signin } from '../lib/api';
 import { getPrepaidCardBalanceQuery } from '../graphql/queries';
@@ -34,6 +35,9 @@ class OrderForm extends React.Component {
       loginSent: false,
       user: {},
       fromCollective: {},
+      paymentMethod: {
+        type: 'creditcard'
+      },
       creditcard: { 
         show: !this.props.redeemFlow,
         save: true,
@@ -51,7 +55,7 @@ class OrderForm extends React.Component {
     };
     
     this.state.order.totalAmount = this.state.order.totalAmount || tier.amount * (tier.quantity || 1);
-    
+
     this.paymentMethodsOptions = [];
     this.allowOrganizations = (order.tier.type !== 'TICKET');
 
@@ -80,6 +84,9 @@ class OrderForm extends React.Component {
       'creditcard.save': { id: 'creditcard.save', defaultMessage: 'Save credit card to {type, select, user {my account} other {{type} account}}' },
       'creditcard.missing': { id: 'creditcard.missing', defaultMessage: 'Mmmm... 🤔 looks like you forgot to provide your credit card details.' },
       'creditcard.error': { id: 'creditcard.error', defaultMessage: 'Invalid credit card' },
+      'paymentMethod.type': { id: 'paymentMethod.type', defaultMessage: 'Payment method' },
+      'paymentMethod.creditcard': { id: 'paymentMethod.creditcard', defaultMessage: 'credit card' },
+      'paymentMethod.bitcoin': { id: 'paymentMethod.bitcoin', defaultMessage: 'bitcoin' },
       'prepaidcard.label': {id: 'prepaidcard.label', defaultMessage: 'Gift Card'},
       'prepaidcard.apply': {id: 'prepaidcard.apply', defaultMessage: 'Apply'},
       'prepaidcard.invalid': {id: 'prepaidcard.invalid', defaultMessage: 'Invalid code'},
@@ -148,12 +155,17 @@ class OrderForm extends React.Component {
 
   componentDidMount() {
     this._isMounted = true;
-    if (typeof Stripe !== "undefined") {
-      const stripePublishableKey = (typeof window !== "undefined" && (window.location.hostname === 'localhost' || window.location.hostname === 'staging.opencollective.com')) ? 'pk_test_5aBB887rPuzvWzbdRiSzV3QB' : 'pk_live_qZ0OnX69UlIL6pRODicRzsZy';
-      // eslint-disable-next-line
-      Stripe.setPublishableKey(stripePublishableKey);
-    }
     this.componentWillReceiveProps(this.props);
+  }
+
+  populatePaymentMethodTypes() {
+    const { intl, collective } = this.props;
+    const paymentMethodTypeOptions = [];
+    paymentMethodTypeOptions.push({'creditcard': intl.formatMessage(this.messages['paymentMethod.creditcard'])});
+    if (collective.currency === 'USD' && !this.state.order.interval) {
+      paymentMethodTypeOptions.push({'bitcoin': intl.formatMessage(this.messages['paymentMethod.bitcoin'])});
+    }
+    return paymentMethodTypeOptions;
   }
 
   populatePaymentMethods(CollectiveId) {
@@ -309,12 +321,24 @@ class OrderForm extends React.Component {
       }
       if (newState.order.tier.hasOwnProperty('interval')) {
         newState.order.interval = newState.order.tier.interval;
+        if (newState.order.interval) {
+          newState.paymentMethod.type = 'creditcard';
+        }
       }
     }
+
     if (attr === 'email') {
       checkUserExistence(value).then(exists => {
         this.setState({ isNewUser: !exists });
       });
+    }
+
+    if (newState.paymentMethod.type === 'bitcoin') {
+      // We regenerate a new BTC address if we don't have one yet
+      // or if we change the details of the user (email, fromCollective) or of the order (tier)
+      if (!this.state.paymentMethod.uri || (attr === 'tier' || attr === 'fromCollective' || attr === 'email')) {
+        this.getBTCPaymentAddress(newState);
+      }
     }
 
     this.setState(newState);
@@ -327,7 +351,7 @@ class OrderForm extends React.Component {
     if (! await this.validate()) return false;
     this.setState({ loading: true });
 
-    const { sanitizedCard, order, fromCollective, user } = this.state;
+    const { paymentMethod, order, fromCollective, user } = this.state;
     const tier = order.tier;
 
     const quantity = tier.quantity || 1;
@@ -338,12 +362,13 @@ class OrderForm extends React.Component {
       quantity,
       interval: order.interval || tier.interval,
       totalAmount: (quantity * tier.amount) || order.totalAmount,
-      paymentMethod: sanitizedCard
+      paymentMethod
     };
 
     if (tier.id) {
       OrderInputType.tier = { id: tier.id, amount: tier.amount };
     }
+    console.log(">>> OrderForm onSubmit", OrderInputType);
     await this.props.onSubmit(OrderInputType);
     this.setState({ loading: false });
   }
@@ -358,7 +383,7 @@ class OrderForm extends React.Component {
 
   async validate() {
     const { intl } = this.props;
-    const { order, user, creditcard, prepaidcard } = this.state;
+    const { order, user, creditcard, prepaidcard, paymentMethod } = this.state;
     const newState = {...this.state};
     // validate email
     if (this.state.isNewUser && !isValidEmail(user.email)) {
@@ -368,31 +393,33 @@ class OrderForm extends React.Component {
 
     // validate payment method
     if (order.totalAmount > 0) {
-
+      if (paymentMethod.type === 'bitcoin') {
+        return true;
+      }
       // favors prepaidcard over credit card
       if (prepaidcard.valid) {
         if (prepaidcard.balance < order.totalAmount) {
           this.setState({ result: { error: intl.formatMessage(this.messages['prepaidcard.amounterror'])}});
           return false;
         }
-        newState.sanitizedCard = { token: prepaidcard.token,  service: 'prepaid', uuid: prepaidcard.uuid };
+        newState.paymentMethod = { token: prepaidcard.token,  service: 'prepaid', uuid: prepaidcard.uuid };
         this.setState(newState);
         return true;
 
       } else if (creditcard.uuid && creditcard.uuid.length === 36) {
-        newState.sanitizedCard = { uuid: creditcard.uuid };
+        newState.paymentMethod = { uuid: creditcard.uuid };
         this.setState(newState);
         return true;
       } else if (isValidCard(creditcard)) {
         let res;
         try {
-          res = await getStripeToken(creditcard);
+          res = await getStripeToken('cc', creditcard);
         } catch (e) {
           this.setState({ result: { error: e }})
           return false;
         }
         const last4 = creditcard.number.replace(/ /g, '').substr(-4);
-        const sanitizedCard = {
+        const paymentMethod = {
           name: last4,
           token: res.token,
           service: 'stripe',
@@ -406,7 +433,7 @@ class OrderForm extends React.Component {
           },
           save: creditcard.save
         };
-        newState.sanitizedCard = sanitizedCard;
+        newState.paymentMethod = paymentMethod;
         this.setState(newState);
         return true;
       } else {
@@ -458,6 +485,38 @@ class OrderForm extends React.Component {
         order: Object.assign(order, {interval: null, totalAmount: result.data.prepaidPaymentMethod.balance, tier})
       });
     }
+  }
+
+  getBTCPaymentAddress(state) {
+    const { order } = state;
+    if (!get(order, 'totalAmount')) return;
+    const { LoggedInUser, collective } = this.props;
+    console.log(">>> getBTCPaymentAddress", state, "LoggedInUser", LoggedInUser);
+    const email = LoggedInUser ? LoggedInUser.email : get(state, 'user.email');
+    const name = LoggedInUser ? LoggedInUser.name : get(state, 'user.name');
+
+    if (!email) {
+      return console.error("Impossible to create a bitcoin address without an email address");
+    }
+
+    const metadata = {
+      CollectiveId: collective.id,
+      UserId: get(LoggedInUser, 'id'),
+      FromCollectiveId: get(state, 'fromCollective.id'),
+      TierId: get(state, 'tier.id'),
+    };
+
+    return getStripeToken('btc', { email, name, metadata, amount: order.totalAmount }).then(res => {
+      const paymentMethod = {
+        service: "stripe",
+        type: "bitcoin",
+        currency: "BTC",
+        amount: res.data.amount,
+        uri: res.data.uri,
+        token: res.token
+      };
+      this.setState({ paymentMethod });
+    });
   }
 
   render() {
@@ -613,13 +672,14 @@ class OrderForm extends React.Component {
 
             { this.fromCollectiveOptions.length > 1 &&
               <InputField
-              className="horizontal"
-              type="select"
-              label={intl.formatMessage(this.messages[order.tier.type === 'TICKET' ? 'order.rsvpAs' : 'order.contributeAs'])}
-              name="fromCollectiveSelector"
-              onChange={CollectiveId => this.selectProfile(CollectiveId)}
-              options={this.fromCollectiveOptions}
-              />
+                className="horizontal"
+                type="select"
+                label={intl.formatMessage(this.messages[order.tier.type === 'TICKET' ? 'order.rsvpAs' : 'order.contributeAs'])}
+                name="fromCollectiveSelector"
+                defaultValue={get(this.state, 'fromCollective.id')}
+                onChange={CollectiveId => this.selectProfile(CollectiveId)}
+                options={this.fromCollectiveOptions}
+                />
             }
 
         </div>
@@ -664,73 +724,17 @@ class OrderForm extends React.Component {
             </Row>
           </div>
         }
-        { order.totalAmount > 0 &&
-          <div className="paymentDetails">
-            <h2><FormattedMessage id="tier.order.paymentDetails" defaultMessage="Payment details" /></h2>
-            <Row>
-              <Col sm={12}>
-                { this.paymentMethodsOptions && this.paymentMethodsOptions.length > 1 &&
-                  <InputField
-                    type="select"
-                    className="horizontal"
-                    type="select"
-                    label={intl.formatMessage(this.messages['creditcard.label'])}
-                    name="creditcardSelector"
-                    onChange={uuid => this.handleChange("creditcard", { uuid })}
-                    options={this.paymentMethodsOptions}
-                    />
-                }
-                { showNewCreditCardForm &&
-                  <div>
-                    <InputField
-                      label={intl.formatMessage(this.messages['creditcard.label'])}
-                      type="creditcard"
-                      name="creditcard"
-                      className="horizontal"
-                      onChange={(creditcardObject) => this.handleChange("creditcard", creditcardObject)}
-                      />
-                    <InputField
-                      description={intl.formatMessage(this.messages['creditcard.save'], { type: fromCollective.type && fromCollective.type.toLowerCase() || 'user' })}
-                      className="horizontal"
-                      name="saveCreditCard"
-                      type="checkbox"
-                      defaultValue={true}
-                      onChange={value => this.handleChange("creditcard", "save", value)}
-                      />
-                  </div>
-                }
-                <div>
-                  {!prepaidcard.expanded && 
-                    <a className='gift-card-expander' onClick={() => this.setState({
-                      prepaidcard: Object.assign({}, this.state.prepaidcard, {expanded: true})
-                    })}> Use a Gift Card </a>
-                  }
-                  {prepaidcard.expanded && 
-                    <Row key={`prepaidcard.input`}>
-                      <Col sm={12}>
-                        <InputField
-                          className="horizontal"
-                          {...inputPrepaidcard}
-                          />
-                      </Col>
-                    </Row>
-                  }
-                </div>
-              </Col>
-            </Row>
-          </div>
-        }
 
         <div className="order">
           <h2>
-            { order.tier.type === 'TIER' && <FormattedMessage id="tier.order.contributionDetails" defaultMessage="Contribution details" /> }
+            { order.tier.type !== 'TICKET' && <FormattedMessage id="tier.order.contributionDetails" defaultMessage="Contribution details" /> }
             { order.tier.type === 'TICKET' && <FormattedMessage id="tier.order.ticketDetails" defaultMessage="Ticket details" /> }
           </h2>
           <Row>
             <Col sm={12}>
               <div className="form-group">
                 <label className="col-sm-3 control-label">
-                  { order.tier.type === 'TIER' && <FormattedMessage id="tier.order.contribution" defaultMessage="Contribution" /> }
+                  { order.tier.type !== 'TICKET' && <FormattedMessage id="tier.order.contribution" defaultMessage="Contribution" /> }
                   { order.tier.type === 'TICKET' && <FormattedMessage id="tier.order.ticket" defaultMessage="Ticket" /> }
                 </label>
                 <Col sm={9}>
@@ -761,6 +765,95 @@ class OrderForm extends React.Component {
             </Col>
           </Row>
         </div>
+
+        { order.totalAmount > 0 &&
+          <div className="paymentDetails">
+            <h2><FormattedMessage id="tier.order.paymentDetails" defaultMessage="Payment details" /></h2>
+            <Row>
+              <Col sm={12}>
+                <InputField
+                className="horizontal"
+                type="select"
+                name="paymentMethodTypeSelector"
+                options={this.populatePaymentMethodTypes()}
+                label={intl.formatMessage(this.messages['paymentMethod.type'])}
+                onChange={(value) => this.handleChange("paymentMethod", "type", value)}
+                />
+              </Col>
+            </Row>
+            { this.state.paymentMethod.type === 'bitcoin' &&
+              <Row>
+                <Col sm={12}>
+                <div className="form-group">
+                  <label className="col-sm-3 control-label">
+                  </label>
+                  <Col sm={9}>
+                    <RequestBitcoin
+                      USDamount={order.totalAmount}
+                      satoshis={this.state.paymentMethod.amount}
+                      uri={this.state.paymentMethod.uri}
+                      email={get(this.state, 'user.email')}
+                      />
+                  </Col>
+                </div>
+                </Col>
+              </Row>
+            }
+
+            { this.state.paymentMethod.type === 'creditcard' &&
+              <Row>
+                <Col sm={12}>
+                  { this.paymentMethodsOptions && this.paymentMethodsOptions.length > 1 &&
+                    <InputField
+                      type="select"
+                      className="horizontal"
+                      label={intl.formatMessage(this.messages['creditcard.label'])}
+                      name="creditcardSelector"
+                      onChange={uuid => this.handleChange("creditcard", { uuid })}
+                      options={this.paymentMethodsOptions}
+                      />
+                  }
+                  { showNewCreditCardForm &&
+                    <div>
+                      <InputField
+                        label={intl.formatMessage(this.messages['creditcard.label'])}
+                        type="creditcard"
+                        name="creditcard"
+                        className="horizontal"
+                        onChange={(creditcardObject) => this.handleChange("creditcard", creditcardObject)}
+                        />
+                      <InputField
+                        description={intl.formatMessage(this.messages['creditcard.save'], { type: fromCollective.type && fromCollective.type.toLowerCase() || 'user' })}
+                        className="horizontal"
+                        name="saveCreditCard"
+                        type="checkbox"
+                        defaultValue={true}
+                        onChange={value => this.handleChange("creditcard", "save", value)}
+                        />
+                    </div>
+                  }
+                  <div>
+                    {!prepaidcard.expanded &&
+                      <a className='gift-card-expander' onClick={() => this.setState({
+                        prepaidcard: Object.assign({}, this.state.prepaidcard, {expanded: true})
+                      })}> Use a Gift Card </a>
+                    }
+                    {prepaidcard.expanded && 
+                      <Row key={`prepaidcard.input`}>
+                        <Col sm={12}>
+                          <InputField
+                            className="horizontal"
+                            {...inputPrepaidcard}
+                            />
+                        </Col>
+                      </Row>
+                    }
+                  </div>
+                </Col>
+              </Row>
+            }
+          </div>
+        }
 
         { order.totalAmount > 0 && !collective.host &&
           <div className="error">

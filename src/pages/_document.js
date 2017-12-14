@@ -19,7 +19,7 @@ export default class IntlDocument extends Document {
     // Polyfill Intl API for older browsers
     const scriptsUrls = {
       intl: `https://cdn.polyfill.io/v2/polyfill.min.js?features=Intl.~locale.${this.props.locale}`,
-      stripe: "https://js.stripe.com/v2/",
+      stripe: "https://js.stripe.com/v3/",
       google: "https://maps.googleapis.com/maps/api/js?key=AIzaSyCRLIexl7EkMQk_0_yNsjO4Vqb_MccD-RI&libraries=places"
     };
 
