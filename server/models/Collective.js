@@ -633,7 +633,7 @@ export default function(Sequelize, DataTypes) {
             recipient: {
               collective: memberUser.collective.activity
             },
-            loginLink: results[3].generateLoginLink(`/${memberUser.collective.slug}/edit`)
+            loginLink: `${config.host.website}/signin?next=/${memberUser.collective.slug}/edit`
           }, { cc: remoteUser.email });
         default:
           return member;
