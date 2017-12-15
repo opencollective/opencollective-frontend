@@ -191,7 +191,7 @@ export async function payExpense(remoteUser, expenseId) {
       expense.setPaid(remoteUser.id);
     } catch (err) {
       if (err.message.indexOf('The total amount of all payments exceeds the maximum total amount for all payments') !==-1) {
-        return new errors.BadRequest(`Not enough funds in your existing Paypal preapproval. Please reapprove through https://opencollective.com/${host.slug}/edit#connectedAccounts`);
+        return new errors.BadRequest(`Not enough funds in your existing Paypal preapproval. Please refill your PayPal payment balance.`);
       } else {
         return new errors.BadRequest(err.message)
       }
