@@ -1,6 +1,7 @@
 import { graphql } from 'react-apollo'
 import gql from 'graphql-tag'
 import { intersection, get } from 'lodash';
+import LoggedInUser from '../classes/LoggedInUser';
 
 export const getLoggedInUserQuery = gql`
   query LoggedInUser {
@@ -437,78 +438,18 @@ export const addGetLoggedInUserFunction = (component) => {
         }
         return new Promise(async (resolve) => {
             let res;
+            if (data.LoggedInUser) {
+              const user = new LoggedInUser(data.LoggedInUser);
+              console.log(">>> data", data.LoggedInUser, "class: ", user);
+              return resolve(user);
+            }
             try {
               res = await data.refetch();
               if (!res.data || !res.data.LoggedInUser) {
                 return resolve(null);
               }
-              const LoggedInUser = {...res.data.LoggedInUser};
-              if (LoggedInUser && LoggedInUser.memberOf) {
-                const roles = {};
-                LoggedInUser.memberOf.map(member => {
-                  if (!member.collective) return;
-                  roles[member.collective.slug] = roles[member.collective.slug] || [];
-                  roles[member.collective.slug].push(member.role);
-                });
-                LoggedInUser.roles = roles;
-
-                /**
-                 * CanEditCollective if LoggedInUser is
-                 * - creator of the collective
-                 * - is admin or host of the collective
-                 */
-                LoggedInUser.canEditCollective = (collective) => {
-                  if (!collective) return false;
-                  return (collective.createdByUser && collective.createdByUser.id === LoggedInUser.id) 
-                  || intersection(LoggedInUser.roles[collective.slug], ['HOST','ADMIN']).length > 0;
-                }
-
-                /**
-                 * CanApproveExpense if LoggedInUser is:
-                 * - admin or host of expense.collective
-                 * - admin or host of expense.collective.host
-                 */
-                LoggedInUser.canApproveExpense = (expense) => {
-                  if (!expense) return false;
-                  if (expense.collective) {
-                    if (intersection(roles[expense.collective.slug], ['HOST', 'ADMIN']).length > 0) return true;
-                    const hostSlug = get(expense, 'collective.host.slug');
-                    if (intersection(roles[hostSlug], ['HOST', 'ADMIN']).length > 0) return true;
-                  } 
-                  return false;
-                }
-
-                /**
-                 * CanEditExpense if not paid yet and LoggedInUser is:
-                 * - author of the expense and expense.status === 'PENDING'
-                 * - can approve expense (admin or host of expense.collective or expense.collective.host)
-                 */
-                LoggedInUser.canEditExpense = (expense) => {
-                  if (!expense) return false;
-                  if (expense.status === 'PAID') return false;
-                  if ( expense.status === 'PENDING' && expense.fromCollective && expense.fromCollective.id === LoggedInUser.collective.id) return true;
-                  return LoggedInUser.canApproveExpense(expense);
-                }
-
-                /**
-                 * CanPayExpense if LoggedInUser is HOST or ADMIN of the HOST of the collective
-                 */
-                LoggedInUser.canPayExpense = (expense) => {
-                  const hostSlug = get(expense, 'collective.host.slug');
-                  // second part of if statement is a hack, in case this User's Collective is the Host
-                  if ((intersection(roles[hostSlug], ['HOST', 'ADMIN']).length > 0) 
-                    || (LoggedInUser.collective.slug === hostSlug)) {
-                    return true;
-                  }
-                  return false;                  
-                }
-
-                LoggedInUser.isRoot = () => {
-                  return intersection(LoggedInUser.roles['opencollectiveinc_internal'], ['ADMIN']).length > 0;
-                }
-              }
-              console.log(">>> LoggedInUser", LoggedInUser);
-              return resolve(LoggedInUser);
+              const user = new LoggedInUser(res.data.LoggedInUser);
+              return resolve(user);
             } catch (e) {
               console.error(">>> getLoggedInUser error:", e);
               return resolve(null);

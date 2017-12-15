@@ -160,6 +160,7 @@ class InputField extends React.Component {
                       )
         break;
       case 'datetime':
+      console.log(">>> datetime", field);
         this.input = (
         <FormGroup>
           {field.className === 'horizontal' &&

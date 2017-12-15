@@ -121,8 +121,8 @@ export const addEventMutations = compose(addCreateOrderMutation, addCreateMember
 
 export const addCreateCollectiveMutation = graphql(createCollectiveQuery, {
   props: ( { mutate }) => ({
-    createCollective: async (event) => {
-      const CollectiveInputType = pick(event, [
+    createCollective: async (collective) => {
+      const CollectiveInputType = pick(collective, [
         'slug',
         'type',
         'name',
@@ -134,10 +134,11 @@ export const addCreateCollectiveMutation = graphql(createCollectiveQuery, {
         'maxAmount',
         'currency',
         'quantity',
+        'HostCollectiveId',
         'ParentCollectiveId'
       ]);
-      CollectiveInputType.tiers = event.tiers.map(tier => pick(tier, ['type', 'name', 'description', 'amount', 'maxQuantity', 'maxQuantityPerUser']));
-      CollectiveInputType.location = pick(event.location, ['name','address','lat','long']);
+      CollectiveInputType.tiers = (collective.tiers || []).map(tier => pick(tier, ['type', 'name', 'description', 'amount', 'maxQuantity', 'maxQuantityPerUser']));
+      CollectiveInputType.location = pick(collective.location, ['name','address','lat','long']);
       return await mutate({ variables: { collective: CollectiveInputType } })
     }
   })

@@ -35,6 +35,7 @@ class Collective extends React.Component {
   constructor(props) {
     super(props);
     this.collective = this.props.collective; // pre-loaded by SSR
+    console.log(">>> this.collective", this.collective, props);
     this.updateOrder = this.updateOrder.bind(this);
     this.resetOrder = this.resetOrder.bind(this);
     this.handleOrderTier = this.handleOrderTier.bind(this);
@@ -276,7 +277,7 @@ class Collective extends React.Component {
 
                 <div className="content" >
                   <div className="longDescription" >
-                    <Markdown source={this.collective.longDescription || this.collective.description} />
+                    <Markdown source={this.collective.longDescription || this.collective.description || ''} />
                   </div>
                   <div id="events">
                     <h1><FormattedMessage id="collective.events.title" defaultMessage="Events" /></h1>
