@@ -162,7 +162,7 @@ class OrderForm extends React.Component {
     const { intl, collective } = this.props;
     const paymentMethodTypeOptions = [];
     paymentMethodTypeOptions.push({'creditcard': intl.formatMessage(this.messages['paymentMethod.creditcard'])});
-    if (collective.currency === 'USD' && !this.state.order.interval) {
+    if (collective.currency === 'USD' && !get(this.state, 'order.interval') && !get(this.state, 'order.tier.interval')) {
       paymentMethodTypeOptions.push({'bitcoin': intl.formatMessage(this.messages['paymentMethod.bitcoin'])});
     }
     return paymentMethodTypeOptions;
