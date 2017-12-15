@@ -8,7 +8,7 @@ import ActionButton from '../components/Button';
 import { Button, Row, Col, Form, InputGroup, FormControl } from 'react-bootstrap';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import { capitalize, formatCurrency, isValidEmail } from '../lib/utils';
-import { getStripeToken, isValidCard } from '../lib/stripe';
+import { getStripeToken } from '../lib/stripe';
 import { pick, get } from 'lodash';
 import withIntl from '../lib/withIntl';
 import { checkUserExistence, signin } from '../lib/api';
@@ -410,35 +410,35 @@ class OrderForm extends React.Component {
         newState.paymentMethod = { uuid: creditcard.uuid };
         this.setState(newState);
         return true;
-      } else if (isValidCard(creditcard)) {
+      } else {
         let res;
         try {
           res = await getStripeToken('cc', creditcard);
+          console.log(">>> getStripeToken", res);
         } catch (e) {
+          console.log(">>> error: ", e);
           this.setState({ result: { error: e }})
           return false;
         }
-        const last4 = creditcard.number.replace(/ /g, '').substr(-4);
+        const last4 = res.card.last4;
         const paymentMethod = {
           name: last4,
           token: res.token,
           service: 'stripe',
           data: {
-            fullName: creditcard.full_name,
-            expMonth: creditcard.exp_month,
-            expYear: creditcard.exp_year,
+            fullName: res.card.full_name,
+            expMonth: res.card.exp_month,
+            expYear: res.card.exp_year,
             brand: res.card.brand,
             country: res.card.country,
             funding: res.card.funding,
+            zip: res.card.address_zip
           },
           save: creditcard.save
         };
         newState.paymentMethod = paymentMethod;
         this.setState(newState);
         return true;
-      } else {
-        this.setState({ result: { error: intl.formatMessage(this.messages['creditcard.error']) }})
-        return false;
       }
     } 
     return true;
@@ -838,7 +838,7 @@ class OrderForm extends React.Component {
                         prepaidcard: Object.assign({}, this.state.prepaidcard, {expanded: true})
                       })}> Use a Gift Card </a>
                     }
-                    {prepaidcard.expanded && 
+                    {prepaidcard.expanded &&
                       <Row key={`prepaidcard.input`}>
                         <Col sm={12}>
                           <InputField

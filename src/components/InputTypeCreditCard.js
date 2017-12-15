@@ -1,11 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import stylesheet from '../styles/card.css';
-import CardReactFormContainer from 'card-react';
 import { FormGroup, FormControl } from 'react-bootstrap';
 import Payment from 'payment';
 import withIntl from '../lib/withIntl';
-import { defineMessages } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
 
 class InputTypeCreditCard extends React.Component {
 
@@ -19,35 +17,45 @@ class InputTypeCreditCard extends React.Component {
   constructor(props) {
     super(props);
     this.handleChange = this.handleChange.bind(this);
-    this.state = {};
-    this.messages = defineMessages({
-      'creditcard.number.placeholder': { id: 'creditcard.number.placeholder', defaultMessage: 'Card number' },
-      'creditcard.name.placeholder': { id: 'creditcard.name.placeholder', defaultMessage: 'Full name' },
-      'creditcard.expiry.placeholder': { id: 'creditcard.expiry.placeholder', defaultMessage: 'MM/YY' },
-      'creditcard.cvc.placeholder': { id: 'creditcard.cvc.placeholder', defaultMessage: 'CVC' },
-    });
+    this.state = { loading: true };
   }
 
   handleChange(fieldname, value) {
+    this.setState({ [fieldname]: value });
+    this.props.onChange({ [fieldname]: value });
+  }
 
-    const newState = {...this.state};
+  componentDidMount() {
+    if (typeof stripe !== "undefined") {
 
-    if (fieldname === 'number') {
-      value = value.replace(/ /g, '');
+      const style = {
+        base: {
+          // Add your base input styles here. For example:
+          fontSize: '16px',
+          color: "#32325d",
+        }
+      };
+
+      const elements = stripe.elements();
+      const card = elements.create('card', {style: style});
+
+      // Add an instance of the card Element into the `card-element` <div>
+      card.mount('#card-element');
+      card.on('ready', () => {
+        this.setState({ loading: false });
+      })
+      card.addEventListener('change', (event) => {
+        var displayError = document.getElementById('card-errors');
+        if (event.error) {
+          this.setState({ error: event.error.message })
+        } else {
+          this.props.onChange(card);
+          console.log(">>> stripe onchange", card);
+          this.setState({ error: '' })
+        }
+      });
+      
     }
-
-    if (fieldname === 'expiry') {
-      const expiration = value.split('/');
-      newState['exp_month'] = Number((expiration[0] || '').trim());
-      if (expiration.length > 0) {
-        const year = Number((expiration[1] || '').trim());
-        newState['exp_year'] = (year > 2000) ? year : 2000 + year;
-      }
-    } else {
-      newState[fieldname] = value;
-    }
-    this.setState(newState);
-    this.props.onChange(newState);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -65,31 +73,15 @@ class InputTypeCreditCard extends React.Component {
 
     return (
       <div className="CreditCardForm">
-        <style dangerouslySetInnerHTML={{ __html: stylesheet }} />
         <style jsx>{`
         .CreditCardForm {
           max-width: 350px;
-        }
-        .CreditCardForm :global(.form-group) {
-          margin: 0;
-        }
-        #card-wrapper {
-          margin: 0 0 2rem 0;
+          margin: 1rem 0;
         }
         .oneline {
           display: flex;
           flex-direction: row;
           margin-top: 0.5rem;
-        }
-        :global(.ccinput) {
-          margin-left: 0.5rem;
-        }
-        :global(#CCname) {
-          width: 18rem;;
-        }
-        :global(#CCnumber) {
-          width: 100%;
-          margin: 0;
         }
         :global(.creditcardSelector) {
           margin-bottom: 2rem;
@@ -116,40 +108,13 @@ class InputTypeCreditCard extends React.Component {
 
       { showNewCreditCardForm &&
         <div>
-          <div id="card-wrapper"></div>
-          <CardReactFormContainer 
-            container="card-wrapper"
-            placeholder={this.props.placeholder}
-            value={this.state.value || this.props.placeholder}
-            onChange={event => this.handleChange(event.target.value)}
-            formInputsNames={
-                {
-                  number: 'CCnumber', // optional — default "number"
-                  expiry: 'CCexpiry',// optional — default "expiry"
-                  cvc: 'CCcvc', // optional — default "cvc"
-                  name: 'CCname' // optional - default "name"
-                }
-              }
-            >
-              <div className="ccform">
-                <FormGroup validationState={(!this.state.number || Payment.fns.validateCardNumber(this.state.number)) ? null : 'error'} controlId="CCnumber">
-                  <FormControl
-                    placeholder={intl.formatMessage(this.messages['creditcard.number.placeholder'])}
-                    type="text"
-                    name="CCnumber"
-                    key="CCnumber"
-                    defaultValue={this.props.number}
-                    onChange={(e) => this.handleChange("number", e.target.value)}
-                    />
-                  <FormControl.Feedback />
-                </FormGroup>
-                <div className="oneline">
-                  <FormControl placeholder={intl.formatMessage(this.messages['creditcard.name.placeholder'])} type="text" name="CCname" key="CCname" onChange={(e) => this.handleChange("fullName", e.target.value)} />
-                  <FormControl placeholder={intl.formatMessage(this.messages['creditcard.expiry.placeholder'])} type="text" name="CCexpiry" key="CCexpiry" className="ccinput" onChange={(e) => this.handleChange("expiry", e.target.value)} />
-                  <FormControl placeholder={intl.formatMessage(this.messages['creditcard.cvc.placeholder'])}type="text" name="CCcvc" key="CCcvc" className="ccinput" onChange={(e) => this.handleChange("cvc", e.target.value)} />
-                </div>
-              </div>
-          </CardReactFormContainer>
+          { this.state.loading &&
+            <div className="loading">
+              <FormattedMessage id="loading" defaultMessage="loading" />
+            </div>
+          }
+          <div id="card-element"></div>
+          <div id="card-errors" role="alert">{this.state.error}</div>
         </div>
         }
     </div>
