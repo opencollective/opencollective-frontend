@@ -6,7 +6,6 @@ const getStripeToken = (type = 'cc', data) => {
   switch (type) {
     case 'cc': // credit card
       return stripe.createToken(data).then(res => {
-        console.log(">>> stripe createToken result", res)
         return { token: res.token.id, card: res.token.card };
       });
       break;
