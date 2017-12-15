@@ -9,6 +9,7 @@
     "npm": "5.4.1"
   },
   "dependencies": {
+    "apollo-errors": "^1.5.1",
     "async": "0.9.2",
     "axios": "0.7.0",
     "babel-cli": "6.26.0",

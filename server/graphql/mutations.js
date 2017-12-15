@@ -1,4 +1,4 @@
-import { createCollective, editCollective, deleteCollective } from './mutations/collectives';
+import { createCollective, editCollective, deleteCollective, approveCollective } from './mutations/collectives';
 import { createOrder } from './mutations/orders';
 import { createMember, removeMember } from './mutations/members';
 import { editTiers } from './mutations/tiers';
@@ -57,6 +57,16 @@ const mutations = {
     },
     resolve(_, args, req) {
       return deleteCollective(_, args, req);
+    }
+  },
+  approveCollective: {
+    type: CollectiveInterfaceType,
+    description: "Approve a collective",
+    args: {
+      id: { type: new GraphQLNonNull(GraphQLInt) }
+    },
+    resolve(_, args, req) {
+      return approveCollective(req.remoteUser, args.id);
     }
   },
   approveExpense: {

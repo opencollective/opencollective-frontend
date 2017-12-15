@@ -1,5 +1,5 @@
 import models from '../../models';
-import errors from '../../lib/errors';
+import * as errors from '../errors';
 import slugify from 'slug';
 import { types } from '../../constants/collectives';
 import roles from '../../constants/roles';
@@ -63,15 +63,19 @@ export function createCollective(_, args, req) {
     // To ensure uniqueness of the slug, if the type of collective is not COLLECTIVE (e.g. EVENT)
     // we force the slug to be of the form of `${slug}-${ParentCollectiveId}${collective.type.substr(0,2)}`
     const slug = slugify(args.collective.slug || args.collective.name);
-    if (collectiveData.type !== 'COLLECTIVE') {
+    if (collectiveData.ParentCollectiveId) {
       collectiveData.slug = `${slug}-${parentCollective.id}${collectiveData.type.substr(0,2)}`.toLowerCase();
-      return req.remoteUser.hasRole(['ADMIN', 'HOST', 'BACKER'], parentCollective.id);
-    } else {
-      return req.remoteUser.hasRole(['ADMIN', 'HOST'], collectiveData.id);
+      return req.remoteUser.hasRole(['ADMIN', 'HOST', 'BACKER'], parentCollective.id)
+        .then(canCreateEvent => {
+          if (!canCreateEvent) return Promise.reject(new errors.Unauthorized(`You must be logged in as a member of the ${parentCollective.slug} collective to create an event`));
+        });
+    } else if (collectiveData.HostCollectiveData) {
+      if (!hostCollective.settings.apply) {
+        return Promise.reject(new errors.Unauthorized(`This host does not accept applications for new collectives`))
+      } else {
+        collectiveData.isActive = false;
+      }
     }
-  })
-  .then(canCreateCollective => {
-    if (!canCreateCollective) return Promise.reject(new errors.Unauthorized(`You must be logged in as a member of the ${parentCollective.slug} collective to create an event`));
   })
   .then(() => models.Collective.create(collectiveData))
   .then(c => collective = c)
@@ -179,16 +183,34 @@ export function editCollective(_, args, req) {
   .then(() => collective);
 }
 
+export async function approveCollective(remoteUser, CollectiveId) {
+  if (!remoteUser) {
+    throw new errors.Unauthorized({ message: "You need to be logged in to approve a collective" });
+  }
+
+  const collective = await models.Collective.findById(CollectiveId);
+  if (!collective) {
+    throw new errors.NotFound({ message: `Collective with id ${CollectiveId} not found` });
+  }
+
+  const HostCollectiveId = await collective.getHostCollectiveId();
+  if (!remoteUser.isAdmin(HostCollectiveId)) {
+    throw new errors.Unauthorized({ message: "You need to be logged in as an admin of the host of this collective to approve it", data: { HostCollectiveId } });
+  }
+
+  return collective.update({ isActive: true });
+}
+
 export function deleteCollective(_, args, req) {
   if (!req.remoteUser) {
-    throw new errors.Unauthorized("You need to be logged in to delete a collective");
+    throw new errors.Unauthorized({ message: "You need to be logged in to delete a collective" });
   }
 
   return models.Collective.findById(args.id)
     .then(collective => {
-      if (!collective) throw new errors.NotFound(`Collective with id ${args.id} not found`);
+      if (!collective) throw new errors.NotFound({ message: `Collective with id ${args.id} not found` });
       if (!req.remoteUser.isAdmin(collective.id) && !req.remoteUser.isAdmin(collective.ParentCollectiveId)) {
-        throw new errors.Unauthorized("You need to be logged in as a core contributor or as a host to delete this collective");
+        throw new errors.Unauthorized({ message: "You need to be logged in as a core contributor or as a host to delete this collective" });
       }
 
       return collective.destroy();

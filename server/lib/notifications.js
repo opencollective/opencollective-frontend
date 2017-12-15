@@ -7,6 +7,7 @@ import slackLib from './slack';
 import {tweetActivity} from './twitter';
 import emailLib from '../lib/email';
 import activityType from '../constants/activities';
+import models from '../models';
 
 export default (Sequelize, activity) => {
   // publish everything to our private channel
@@ -42,9 +43,9 @@ export default (Sequelize, activity) => {
         active: true
       };
 
-      // TODO host.id is not referencing a user anymore
       if (activity.type === activityType.COLLECTIVE_CREATED) {
-        where.UserId = activity.data.host.id;
+        notify(activity);
+        return [];
       } else {
         where.CollectiveId = activity.CollectiveId;
       }
@@ -92,4 +93,44 @@ function publishToSlack(activity, webhookUrl, options) {
 
 function publishToSlackPrivateChannel(activity) {
   return slackLib.postActivityOnPrivateChannel(activity);
+}
+
+/**
+ * Send the notification email to all users that have not unsubscribed
+ * @param {*} users: [ { id, email, firstName, lastName }]
+ * @param {*} activity [ { type, CollectiveId }]
+ */
+async function notifySubscribers(users, activity) {
+  const unsubscriptions = await models.Notification.findAll({
+    where: {
+      CollectiveId: activity.CollectiveId,
+      type: activity.type,
+      active: false
+    }
+  });
+  const unsubscribedUserIds = unsubscriptions.map(n => n.UserId);
+  return users.map(u => {
+    // skip users that have unsubscribed
+    if (unsubscribedUserIds.indexOf(u.id) === -1) {
+      return emailLib.sendMessageFromActivity(activity, {
+        UserId: u.id,
+        User: u
+      });
+    }
+  });
+}
+
+async function notify(activity) {
+  if (activity.type === activityType.COLLECTIVE_CREATED) {
+    const collective = await models.Collective.findById(activity.data.collective.id)
+    const host = await collective.getHostCollective();
+    const admins = await host.getAdmins();
+    const adminUsers = await models.User.findAll({
+      where: {
+        CollectiveId: { $in: admins.map(a => a.id) }
+      }
+    });
+    activity.CollectiveId = host.id;
+    notifySubscribers(adminUsers, activity);
+  }
 }

@@ -408,6 +408,18 @@ export default function(Sequelize, DataTypes) {
     .then(users => uniq(users, (user) => user.id));
   };
 
+  Collective.prototype.getAdmins = function() {
+    return models.Member.findAll({
+      where: {
+        CollectiveId: this.id,
+        role: roles.ADMIN
+      },
+      include: [
+        { model: models.Collective, as: 'memberCollective' }
+      ]
+    }).map(member => member.memberCollective);
+  }
+
   Collective.prototype.getEvents = function(query = {}) {
     return Collective.findAll({
       ...query,

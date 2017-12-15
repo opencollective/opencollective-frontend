@@ -30,6 +30,7 @@ import errorHandler from './middleware/error_handler';
 import cache from './middleware/cache';
 import * as params from './middleware/params';
 import errors from './lib/errors';
+import { formatError } from 'apollo-errors';
 
 import sanitizer from './middleware/sanitizer';
 
@@ -91,6 +92,7 @@ export default (app) => {
    * GraphQL
    */
   app.use('/graphql', GraphHTTP({
+    formatError,
     schema: schema,
     pretty: process.env.NODE_ENV !== 'production' && process.env.NODE_ENV !== 'staging',
     graphiql: process.env.NODE_ENV !== 'production' && process.env.NODE_ENV !== 'staging'

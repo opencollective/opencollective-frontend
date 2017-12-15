@@ -26,7 +26,7 @@ const transactionsData = utils.data('transactions1').transactions;
  */
 describe('groups.routes.test.js', () => {
 
-  let host, user, sandbox;
+  let host, hostAdmin1, hostAdmin2, user, sandbox;
 
   before(() => {
     sandbox = sinon.sandbox.create();
@@ -38,7 +38,12 @@ describe('groups.routes.test.js', () => {
   beforeEach(() => utils.resetTestDB());
 
   beforeEach('create host', () => models.User.createUserWithCollective(utils.data('host1')).tap(u => host = u));
+  beforeEach('create host admin1', () => models.User.createUserWithCollective({ name: "finance", email: "finance@opencollective.com"}).tap(u => hostAdmin1 = u));
+  beforeEach('create host admin2', () => models.User.createUserWithCollective({ firstName: "finance2", email: "finance2+wwcode@opencollective.com"}).tap(u => hostAdmin2 = u));
   beforeEach('create user', () => models.User.createUserWithCollective(userData).tap(u => user = u));
+  beforeEach('add host admin1', () => host.collective.addUserWithRole(hostAdmin1, 'ADMIN'));
+  beforeEach('add host admin2', () => host.collective.addUserWithRole(hostAdmin2, 'ADMIN'));
+  beforeEach('unsubscribe admin2', () => models.Notification.create({ UserId: hostAdmin2.id, CollectiveId: host.collective.id, type: 'collective.created', active: false}));
 
   // Stripe stub.
   beforeEach(() => {
@@ -63,10 +68,8 @@ describe('groups.routes.test.js', () => {
         .expect(400)
     );
 
-    describe('successfully create a group', () => {
+    describe.only('successfully create a group', () => {
       let group;
-
-      beforeEach('subscribe host to collective.created notification', () => models.Notification.create({UserId: host.id, type: 'collective.created', channel: 'email'}));
 
       beforeEach('spy on emailLib', () => sinon.spy(emailLib, 'sendMessageFromActivity'));
       beforeEach('create the group', (done) => {
@@ -96,11 +99,13 @@ describe('groups.routes.test.js', () => {
       it('sends an email to the host', done => {
         setTimeout(() => {
           const activity = emailLib.sendMessageFromActivity.args[0][0];
+          expect(emailLib.sendMessageFromActivity.args.length).to.equal(1); // send the email to the two admins of the host - one unsubscribed;
           expect(activity.type).to.equal('collective.created');
           expect(activity.data).to.have.property('collective');
           expect(activity.data).to.have.property('host');
           expect(activity.data).to.have.property('user');
-          expect(emailLib.sendMessageFromActivity.args[0][1].User.email).to.equal(host.email);
+
+          expect(emailLib.sendMessageFromActivity.args[0][1].User.email).to.equal(hostAdmin1.email);
           done();
         }, 200);
 
@@ -130,7 +135,7 @@ describe('groups.routes.test.js', () => {
         .then(results => {
           expect(results[0].CollectiveId).to.equal(group.id);
           expect(results[1]).to.equal(2);
-          expect(results[2].LastEditedByUserId).to.equal(3);
+          expect(results[2].LastEditedByUserId).to.equal(5);
         });
       });
 
