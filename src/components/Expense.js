@@ -258,8 +258,8 @@ class Expense extends React.Component {
                     unlock={this.props.unlockPayAction}
                     />
                 }
-                { expense.status !== 'APPROVED' && <ApproveExpenseBtn id={expense.id} /> }
-                { expense.status !== 'REJECTED' && <RejectExpenseBtn id={expense.id} /> }
+                { expense.status !== 'APPROVED' && expense.status !== 'PAID' && <ApproveExpenseBtn id={expense.id} /> }
+                { expense.status !== 'REJECTED' && expense.status !== 'PAID' && <RejectExpenseBtn id={expense.id} /> }
               </div>
             }
           </div>
