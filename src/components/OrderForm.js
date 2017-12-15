@@ -792,7 +792,7 @@ class OrderForm extends React.Component {
                       USDamount={order.totalAmount}
                       satoshis={this.state.paymentMethod.amount}
                       uri={this.state.paymentMethod.uri}
-                      email={get(this.state, 'user.email')}
+                      email={LoggedInUser ? LoggedInUser.email : get(this.state, 'user.email')}
                       />
                   </Col>
                 </div>
