@@ -9,6 +9,7 @@ import InputField from './InputField';
 import SmallButton from './SmallButton';
 import { getCurrencySymbol } from '../lib/utils';
 import categories from '../constants/categories';
+import { get } from 'lodash';
 
 class ExpenseDetails extends React.Component {
 
@@ -27,9 +28,9 @@ class ExpenseDetails extends React.Component {
     this.currencyStyle = { style: 'currency', currencyDisplay: 'symbol', minimumFractionDigits: 0, maximumFractionDigits: 2};
 
     this.messages = defineMessages({
-      'paypal': { id: 'expense.payoutMethod.paypal', defaultMessage: 'PayPal ({paypalEmail})' },
+      'paypal': { id: 'expense.payoutMethod.paypal', defaultMessage: 'PayPal ({paypalEmail, select, missing {missing} other {paypalEmail}})' },
       // 'manual': { id: 'expense.payoutMethod.donation', defaultMessage: 'Consider as donation' },
-      'other': { id: 'expense.payoutMethod.manual', defaultMessage: 'Other (give instructions)' }
+      'other': { id: 'expense.payoutMethod.manual', defaultMessage: 'Other (see instructions)' }
     });
 
     this.state = { modified: false, expense: {} };
@@ -54,7 +55,7 @@ class ExpenseDetails extends React.Component {
   }
 
   render() {
-    const { LoggedInUser, data } = this.props;
+    const { LoggedInUser, data, intl } = this.props;
 
     const expense = (data && data.Expense) || this.props.expense;
 
@@ -64,7 +65,7 @@ class ExpenseDetails extends React.Component {
     const editMode = canEditExpense && this.props.mode === 'edit';
     const previewAttachmentImage = expense.attachment ? imagePreview(expense.attachment) : '/static/images/receipt.svg';
     const payoutMethod = this.state.expense.payoutMethod || expense.payoutMethod;
-    const payoutMethods = this.getOptions(['paypal', 'other'], { paypalEmail: expense.user && expense.user.paypalEmail });
+    const payoutMethods = this.getOptions(['paypal', 'other'], { paypalEmail: get(expense, 'user.paypalEmail') || "missing" });
     const categoriesOptions = categories(expense.collective.slug).map(category => {
       return { [category]: category }
     });
@@ -153,7 +154,7 @@ class ExpenseDetails extends React.Component {
           }
 
           .ExpenseDetails textarea[name="privateMessage"] {
-            width: 50rem;
+            width: 47.5rem;
             max-width: 100%;
           }
         `}</style>
@@ -243,7 +244,7 @@ class ExpenseDetails extends React.Component {
 
           <div className="col">
             <label><FormattedMessage id='expense.payoutMethod' defaultMessage='payout method' /></label>
-            { !editMode && capitalize(expense.payoutMethod)}
+            { !editMode && capitalize(intl.formatMessage(this.messages[expense.payoutMethod], { paypalEmail: get(expense, 'user.paypalEmail') || "missing"}))}
             { editMode &&
               <InputField
                 type="select"
