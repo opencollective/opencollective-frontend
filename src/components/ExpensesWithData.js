@@ -91,6 +91,10 @@ query Expenses($CollectiveId: Int!, $status: String, $limit: Int, $offset: Int, 
       slug
       image
     }
+    user {
+      id
+      paypalEmail
+    }
   }
 }
 `;
