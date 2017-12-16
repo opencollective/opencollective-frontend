@@ -20,13 +20,13 @@ const WEBSITE_URL = process.env.WEBSITE_URL || "https://opencollective.com";
  */
 export async function badge(req, res) {
   try {
-    const { style } = req.query;
+    const { style, label } = req.query;
     const color = req.query.color || 'brightgreen';
 
     let imageUrl;
     try {
       const stats = await fetchMembersStats(req.params);
-      const filename = `${stats.name}-${stats.count? stats.count : 0}-${color}.svg`;
+      const filename = `${label || stats.name}-${stats.count? stats.count : 0}-${color}.svg`;
       imageUrl = `https://img.shields.io/badge/${filename}?style=${style}`;
     } catch (e) {
       return res.status(404).send('Not found');
