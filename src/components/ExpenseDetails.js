@@ -28,7 +28,7 @@ class ExpenseDetails extends React.Component {
     this.currencyStyle = { style: 'currency', currencyDisplay: 'symbol', minimumFractionDigits: 0, maximumFractionDigits: 2};
 
     this.messages = defineMessages({
-      'paypal': { id: 'expense.payoutMethod.paypal', defaultMessage: 'PayPal ({paypalEmail, select, missing {missing} other {paypalEmail}})' },
+      'paypal': { id: 'expense.payoutMethod.paypal', defaultMessage: 'PayPal ({paypalEmail, select, missing {missing} other {{paypalEmail}}})' },
       // 'manual': { id: 'expense.payoutMethod.donation', defaultMessage: 'Consider as donation' },
       'other': { id: 'expense.payoutMethod.manual', defaultMessage: 'Other (see instructions)' }
     });
@@ -58,7 +58,6 @@ class ExpenseDetails extends React.Component {
     const { LoggedInUser, data, intl } = this.props;
 
     const expense = (data && data.Expense) || this.props.expense;
-
     const canEditExpense = LoggedInUser && LoggedInUser.canEditExpense(expense);
     const isAuthor = LoggedInUser && LoggedInUser.collective.id === expense.fromCollective.id;
     const canEditAmount = expense.status !== 'PAID' || expense.payoutMethod !== 'paypal';

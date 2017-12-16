@@ -170,7 +170,7 @@
   "expense.cancelEdit": "cancel edit",
   "expense.viewDetails": "Ver Detalles",
   "expense.save": "save",
-  "expense.payoutMethod.paypal": "PayPal ({paypalEmail})",
+  "expense.payoutMethod.paypal": "PayPal ({paypalEmail, select, missing {missing} other {{paypalEmail}}})",
   "expense.payoutMethod.manual": "Other (see instructions)",
   "expense.description": "description",
   "expense.category": "category",
