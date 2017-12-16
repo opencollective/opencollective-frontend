@@ -352,12 +352,14 @@ class EditCollectiveForm extends React.Component {
               />
           }
         </div>
-        <div className="actions">
-          <Button bsStyle="primary" type="submit" ref="submit" onClick={this.handleSubmit} disabled={loading || !this.state.modified} >{submitBtnLabel}</Button>
-          <div className="backToProfile">
-            <Link route={`/${collective.slug}`}><a><FormattedMessage id="collective.edit.backToProfile" defaultMessage="or go back to the {type} page" values={{ type }} /></a></Link>
+        { this.state.section !== 'export' &&
+          <div className="actions">
+            <Button bsStyle="primary" type="submit" ref="submit" onClick={this.handleSubmit} disabled={loading || !this.state.modified} >{submitBtnLabel}</Button>
+            <div className="backToProfile">
+              <Link route={`/${collective.slug}`}><a><FormattedMessage id="collective.edit.backToProfile" defaultMessage="or go back to the {type} page" values={{ type }} /></a></Link>
+            </div>
           </div>
-        </div>
+        }
       </div>
     );
   }
