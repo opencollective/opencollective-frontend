@@ -1,8 +1,6 @@
 import { type } from '../constants/transactions';
 import Promise from 'bluebird';
 import CustomDataTypes from './DataTypes';
-import { formatCurrency } from '../lib/utils';
-import { getFxRate } from '../lib/currency';
 
 import debugLib from 'debug';
 const debug = debugLib('order');

@@ -1,4 +1,4 @@
-import models, { sequelize } from '../../models';
+import models from '../../models';
 import { capitalize, pluralize } from '../../lib/utils';
 import { executeOrder } from '../../lib/payments';
 import emailLib from '../../lib/email';

@@ -2,8 +2,6 @@ import { expect } from 'chai';
 import { describe, it } from 'mocha';
 import models from '../server/models';
 import * as utils from './utils';
-import Stripe from 'stripe';
-import config from 'config';
 import nock from 'nock';
 import initNock from './graphql.matchingFund.nock';
 
@@ -57,8 +55,8 @@ const createOrderQuery = `
 
 describe('graphql.matchingFund.test.js', () => {
   
-  let collective, host, hostStripeAccount, admin, user1, user2;
-  // before(initNock);
+  let collective, host, admin, user1, user2;
+  before(initNock);
 
   after(() => {
     nock.cleanAll();
@@ -71,7 +69,7 @@ describe('graphql.matchingFund.test.js', () => {
     user2 = await models.User.createUserWithCollective({ name: "user2", email: "user2@opencollective.com" });
     host = await models.Collective.create({ type: "ORGANIZATION", name: "host", isActive: true});
     collective = await models.Collective.create({ name: "tipbox", slug: "tipbox", currency: "USD", hostFeePercent: 5, isActive: true, HostCollectiveId: host.id });
-    hostStripeAccount = await models.ConnectedAccount.create({
+    await models.ConnectedAccount.create({
       CreatedByUserId: admin.id,    
       service: 'stripe',
       username: 'acct_18KWlTLzdXg9xKNS', // using opensource host test stripe account
@@ -135,7 +133,7 @@ describe('graphql.matchingFund.test.js', () => {
     res.errors && console.error(res.errors);
     expect(res.errors).to.not.exist;
     const orderCreated = res.data.createOrder;
-    console.log(">>> orderCreated.transactions", orderCreated.transactions);
+
     const fromCollective = res.data.createOrder.fromCollective;
     const transactions = await models.Transaction.findAll({
       where: { OrderId: orderCreated.id }
