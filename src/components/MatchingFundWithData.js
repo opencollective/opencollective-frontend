@@ -99,7 +99,7 @@ class MatchingFundWithData extends React.Component {
                 <div className="amount">{`+${formatCurrency(amounts.totalAmount, currency, { precision: 0 })}`}</div>
                 <div className="description">{MatchingFund.description}</div>
                 <div className="disclaimer">
-                  <FormattedMessage id="order.matchingfund.text" defaultMessage="{name} has set up a {initialBalance} matching fund to match {factor} {factor, plural, one {time} other {times}} your first donation to {collective}. There is {balance} left in this fund." values={{ initialBalance: formatCurrency(MatchingFund.initialBalance, MatchingFund.currency, { precision: 0 }), balance: formatCurrency(MatchingFund.balance, MatchingFund.currency, { precision: 0 }), name: MatchingFund.collective.name, collective: collective.name, factor: MatchingFund.matching }} />
+                  <FormattedMessage id="order.matchingfund.text" defaultMessage="{name} has set up a {initialBalance} matching fund to match {factor, select, 1 {} other {{factor} times}} your first donation to {collective}. There is {balance} left in this fund." values={{ initialBalance: formatCurrency(MatchingFund.initialBalance, MatchingFund.currency, { precision: 0 }), balance: formatCurrency(MatchingFund.balance, MatchingFund.currency, { precision: 0 }), name: MatchingFund.collective.name, collective: collective.name, factor: MatchingFund.matching }} />
                   { !amounts.enough &&
                     <div className="error">
                       <FormattedMessage id="order.matchingfund.notEnoughFund" defaultMessage="There isn't enough fund left in this matching fund." values={{ balance: formatCurrency(MatchingFund.balance, MatchingFund.currency)}} />

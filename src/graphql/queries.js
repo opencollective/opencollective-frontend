@@ -232,6 +232,7 @@ const getCollectiveQuery = gql`
           all
         }
         totalAmountSent
+        totalAmountRaised
       }
       tiers {
         id
@@ -289,6 +290,7 @@ const getCollectiveQuery = gql`
           createdAt
           stats {
             totalDonations
+            totalRaised
           }
           collective {
             id

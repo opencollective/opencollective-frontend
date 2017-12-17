@@ -196,9 +196,13 @@ ${description}`
         }
         .stats {
           font-size: 1.3rem;
+          display: flex;
         }
         .stats .value {
           font-size: 3rem;
+        }
+        .stat {
+          margin: 1rem;
         }
         .counter {
           margin: 1rem 0px;
@@ -277,18 +281,30 @@ ${description}`
             }
             { collective.type === 'COLLECTIVE' && stats && stats.yearlyBudget > 0 &&
               <div className="stats">
-                <div className="yearlyBudget value counter">
-                  { formattedYearlyIncome.split('').map((character, index) => <span key={`char-${index}`} className={/[^0-9]/.test(character) ? '-character' : '-digit'}>{character}</span>) }
+                <div className="stat">
+                  <div className="yearlyBudget value counter">
+                    { formattedYearlyIncome.split('').map((character, index) => <span key={`char-${index}`} className={/[^0-9]/.test(character) ? '-character' : '-digit'}>{character}</span>) }
+                  </div>
+                  <FormattedMessage id="collective.stats.yearlyBudget.label" defaultMessage="Estimated annual budget based on current donations" />
                 </div>
-                <FormattedMessage id="collective.stats.yearlyBudget.label" defaultMessage="Estimated annual budget based on current donations" />
               </div>
             }
             { ['USER','ORGANIZATION'].indexOf(collective.type) !== -1 && stats && stats.totalAmountSent > 0 && !collective.isHost &&
               <div className="stats">
-                <div className="totalAmountSent value">
-                  <Currency value={stats.totalAmountSent} currency={collective.currency} />
+                <div className="stat">
+                  <div className="totalAmountSent value">
+                    <Currency value={stats.totalAmountSent} currency={collective.currency} />
+                  </div>
+                  <FormattedMessage id="collective.stats.totalAmountSent.label" defaultMessage="Total amount donated" />
                 </div>
-                <FormattedMessage id="collective.stats.totalAmountSent.label" defaultMessage="Total amount donated" />
+                { stats.totalAmountRaised &&
+                  <div className="stat">
+                    <div className="totalAmountRaised value">
+                      <Currency value={stats.totalAmountRaised} currency={collective.currency} />
+                    </div>
+                    <FormattedMessage id="collective.stats.totalAmountRaised.label" defaultMessage="Total amount raised" />
+                  </div>
+                }
               </div>
             }
             { this.props.cta &&

@@ -146,7 +146,7 @@ class CollectiveCard extends React.Component {
             text-align: center;
           }
 
-          .membership, .stats, .totalDonations {
+          .membership, .stats, .totalDonations, .totalRaised {
             border-top: 1px solid #f2f2f2;
             padding: 1rem;
             color: #303233;
@@ -159,7 +159,7 @@ class CollectiveCard extends React.Component {
             justify-content: space-around;
           }
 
-          .totalDonationsAmount {
+          .totalDonationsAmount, .totalRaisedAmount {
             font-size: 2rem;
           }
 
@@ -251,6 +251,14 @@ class CollectiveCard extends React.Component {
                   <Currency value={membership.stats.totalDonations} currency={membership.collective.currency} />
                 </div>
                 <FormattedMessage id='membership.totalDonations.title' defaultMessage={`amount contributed`} />
+              </div>
+            }
+            { membership && membership.role === 'FUNDRAISER' && membership.stats.totalRaised > 0 &&
+              <div className="totalRaised">
+                <div className="totalRaisedAmount">
+                  <Currency value={membership.stats.totalRaised} currency={membership.collective.currency} />
+                </div>
+                <FormattedMessage id='membership.totalRaised.title' defaultMessage={`amount raised`} />
               </div>
             }
           </div>

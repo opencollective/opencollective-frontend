@@ -46,6 +46,7 @@ class UserCollective extends React.Component {
       'user.collective.memberOf.member.title': { id: 'user.collective.memberOf.member.title', defaultMessage: `I'm a member of {n, plural, one {this collective} other {these collectives}}`},
       'user.collective.memberOf.backer.title': { id: 'user.collective.memberOf.backer.title', defaultMessage: `I'm backing {n, plural, one {this collective} other {these collectives}}`},
       'user.collective.memberOf.attendee.title': { id: 'user.collective.memberOf.attendee.title', defaultMessage: `I've attended {n, plural, one {this event} other {these events}}`},
+      'user.collective.memberOf.fundraiser.title': { id: 'user.collective.memberOf.fundraiser.title', defaultMessage: `I've helped raised money for {n, plural, one {this collective} other {these collectives}}`},
       'user.collective.memberOf.follower.title': { id: 'user.collective.memberOf.follower.title', defaultMessage: `I'm following {n, plural, one {this collective} other {these collectives}}`},
       'organization.collective.memberOf.host.title': { id: 'organization.collective.memberOf.host.title', defaultMessage: `We are hosting {n, plural, one {this collective} other {{n} collectives}}`},
       'organization.collective.memberOf.admin.title': { id: 'organization.collective.memberOf.admin.title', defaultMessage: `We are a core contributor of {n, plural, one {this collective} other {these collectives}}`},
@@ -58,6 +59,7 @@ class UserCollective extends React.Component {
       'user.collective.menu.member': { id: 'user.collective.menu.member', defaultMessage: `member of {n} {n, plural, one {collective} other {collectives}}`},
       'user.collective.menu.backer': { id: 'user.collective.menu.backer', defaultMessage: `backing {n} {n, plural, one {collective} other {collectives}}`},
       'user.collective.menu.attendee': { id: 'user.collective.menu.attendee', defaultMessage: `attended {n} {n, plural, one {event} other {events}}`},
+      'user.collective.menu.fundraiser': { id: 'user.collective.menu.fundraiser', defaultMessage: `raised money for {n} {n, plural, one {collective} other {collectives}}`},
       'user.collective.menu.follower': { id: 'user.collective.menu.follower', defaultMessage: `following {n} {n, plural, one {collective} other {collectives}}`},
     })
 
