@@ -634,7 +634,7 @@ export default function(Sequelize, DataTypes) {
                   subscription: { interval: order.Subscription && order.Subscription.interval }
                 }
               };
-              if (order.referral) {
+              if (order && order.referral) {
                 data.order.referral = order.referral.minimal;
               }
               return models.Activity.create({

@@ -85,6 +85,7 @@ describe('graphql.paymentMethods.test.js', () => {
     const fxrate = 1.1654; // 1 EUR = 1.1654 USD
 
     beforeEach(() => {
+      nock.cleanAll();
       return models.PaymentMethod.findOne({
         where: {
           service: 'opencollective',
