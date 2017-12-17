@@ -207,6 +207,13 @@ export const CollectiveStatsType = new GraphQLObjectType({
           return collective.getTotalAmountSent();
         }
       },
+      totalAmountRaised: {
+        description: 'Total amount raised through referral',
+        type: GraphQLInt,
+        resolve(collective) {
+          return collective.getTotalAmountRaised();
+        }
+      },
       yearlyBudget: {
         type: GraphQLInt,
         resolve(collective) {

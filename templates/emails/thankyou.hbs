@@ -17,16 +17,16 @@ Subject: Thank you for your {{{currency order.totalAmount currency=order.currenc
 {{#if interval}}
   {{#if firstPayment }}
     <p>We would like to thank you for your pledge to give {{{currency order.totalAmount currency=order.currency}}} per {{interval}}.
-      Your first payment was received on {{{moment order.createdAt}}}. Your donation helps us continue our activities.</p>
+      Your first payment was received on {{{moment order.createdAt}}}. Your donation helps us continue our work.</p>
       {{> charge_date_notice}}
   {{else}}
     <p>We would like to thank you for your continued support. Your latest {{interval}}ly donation of {{{currency order.totalAmount currency=order.currency}}} was received on {{{moment transaction.createdAt}}}.
-      Your donation helps us continue our activities.</p>
+      Your donation helps us continue our work.</p>
   {{/if}}
 {{else}}
 
 <p>We would like to thank you for your donation of {{{currency order.totalAmount currency=order.currency}}} on {{{moment order.createdAt}}}.
-  Your gift will help us continue our activities.</p>
+  Your gift will help us continue our work.</p>
 {{/if}}
 
 {{#if matchingFund}}

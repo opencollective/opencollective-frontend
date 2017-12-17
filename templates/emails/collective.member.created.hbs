@@ -59,6 +59,9 @@ Subject: {{member.memberCollective.name}} joined {{collective.name}} as {{{toLow
     <tr><th>Frequency:</th><td>one time</td></tr>
     {{/if}}
     <tr><th>Public message:</th><td>{{order.publicMessage}}</td></tr>
+    {{#if order.referral}}
+    <tr><th>Referral:</th><td><a href="{{config.host.website}}/{{order.referral.slug}}">{{order.referral.name}}</a> {{#if order.referral.twitterHandle}}<a href="https://twitter.com/{{order.referral.twitterHandle}}">@{{order.referral.twitterHandle}}</a>{{/if}}</td></tr>
+    {{/if}}
   </table>
 {{/if}}
 

@@ -147,7 +147,11 @@ export function createOrder(_, args, req) {
       }
     })
     .then((matchingFund) => {
-      order.matchingFund = matchingFund;
+      if (matchingFund) {
+        order.matchingFund = matchingFund;
+        order.MatchingPaymentMethodId = matchingFund.id;
+        order.ReferralCollectiveId = matchingFund.CollectiveId; // if there is a matching fund, we force the referral to be the owner of the fund
+      }
       const currency = tier && tier.currency || collective.currency;
       const quantity = order.quantity || 1;
       let totalAmount;
@@ -177,7 +181,9 @@ export function createOrder(_, args, req) {
         description: order.description || defaultDescription,
         publicMessage: order.publicMessage,
         privateMessage: order.privateMessage,
-        processedAt: paymentRequired ? null : new Date
+        processedAt: paymentRequired ? null : new Date,
+        ReferralCollectiveId: order.ReferralCollectiveId,
+        MatchingPaymentMethodId: order.MatchingPaymentMethodId
       };
 
       if (order.referral && order.referral.id) {
@@ -213,6 +219,13 @@ export function createOrder(_, args, req) {
     })
     // make sure we return the latest version of the Order Instance
     .then(() => models.Order.findById(orderCreated.id))
+    .then(order => {
+      // If there was a referral for this order, we add it as a FUNDRAISER role
+      if (order.ReferralCollectiveId) {
+        collective.addUserWithRole({ id: user.id, CollectiveId: order.ReferralCollectiveId }, roles.FUNDRAISER);
+      }
+      return order;
+    })
     .catch(e => {
       // helps debugging
       console.error(">>> createOrder mutation error: ", e)

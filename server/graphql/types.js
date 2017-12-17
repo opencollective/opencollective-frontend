@@ -137,6 +137,16 @@ export const StatsMemberType = new GraphQLObjectType({
             CollectiveId: member.CollectiveId,
           });
         }
+      },
+      totalRaised: {
+        type: GraphQLInt,
+        description: "total amount raised by this member",
+        resolve(member, args, req) {
+          return member.totalRaised || req.loaders.members.totalAmountRaised.load({
+            ReferralCollectiveId: member.MemberCollectiveId,
+            CollectiveId: member.CollectiveId,
+          });
+        }
       }
     }
   }
