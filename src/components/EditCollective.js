@@ -37,7 +37,6 @@ class EditCollective extends React.Component {
 
   async validate(CollectiveInputType) {
     const { intl } = this.props;
-    console.log("validate", CollectiveInputType);
     if (!CollectiveInputType.paymentMethods) return CollectiveInputType;
 
     let newPaymentMethod, index;
@@ -54,7 +53,6 @@ class EditCollective extends React.Component {
     let res;
     try {
       res = await getStripeToken('cc', card)
-      console.log(">>> getStripeToken res: ", res);
       const last4 = res.card.last4;
       const paymentMethod = {
         name: last4,
