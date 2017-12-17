@@ -359,8 +359,8 @@ export const ExpenseType = new GraphQLObjectType({
       },
       collective: {
         type: CollectiveInterfaceType,
-        resolve(expense) {
-          return expense.getCollective();
+        resolve(expense, args, req) {
+          return req.loaders.collective.findById.load(expense.CollectiveId);
         }
       },
       transaction: {
@@ -655,15 +655,22 @@ export const OrderType = new GraphQLObjectType({
       fromCollective: {
         description: 'Collective ordering (most of the time it will be the collective of the createdByUser)',
         type: CollectiveInterfaceType,
-        resolve(order) {
-          return order.getFromCollective();
+        resolve(order, args, req) {
+          return req.loaders.collective.findById.load(order.FromCollectiveId);
         }
       },
       collective: {
         description: 'Collective that receives the order',
         type: CollectiveInterfaceType,
-        resolve(order) {
-          return order.getCollective();
+        resolve(order, args, req) {
+          return req.loaders.collective.findById.load(order.CollectiveId);
+        }
+      },
+      referral: {
+        description: 'Referral user collective',
+        type: CollectiveInterfaceType,
+        resolve(order, args, req) {
+          return req.loaders.collective.findById.load(order.ReferralCollectiveId);
         }
       },
       tier: {
@@ -677,6 +684,13 @@ export const OrderType = new GraphQLObjectType({
         type: PaymentMethodType,
         resolve(order) {
           return order.getPaymentMethod();
+        }
+      },
+      matchingFund: {
+        description: 'Payment method used if this order was matched by a matching fund.',
+        type: PaymentMethodType,
+        resolve(order) {
+          return order.getMatchingPaymentMethod();
         }
       },
       transactions: {
@@ -803,10 +817,23 @@ export const PaymentMethodType = new GraphQLObjectType({
           return paymentMethod.name;
         }
       },
+      description: {
+        type: GraphQLString,
+        resolve(paymentMethod) {
+          return paymentMethod.description;
+        }
+      },
       primary: {
         type: GraphQLBoolean,
         resolve(paymentMethod) {
           return paymentMethod.primary;
+        }
+      },
+      matching: {
+        type: GraphQLInt,
+        description: "Matching factor",
+        resolve(paymentMethod) {
+          return paymentMethod.matching;
         }
       },
       monthlyLimitPerMember: {
@@ -815,11 +842,36 @@ export const PaymentMethodType = new GraphQLObjectType({
           return paymentMethod.monthlyLimitPerMember;
         }
       },
+      initialBalance: {
+        type: GraphQLInt,
+        resolve(paymentMethod) {
+          return paymentMethod.initialBalance;
+        }
+      },
       balance: {
         type: GraphQLInt,
         description: "Returns the balance in the currency of this paymentMethod",
+        async resolve(paymentMethod, args, req) {
+          const balance = await paymentMethod.getBalanceForUser(req.remoteUser);
+          return balance.amount;
+        }
+      },
+      collective: {
+        type: CollectiveInterfaceType,
         resolve(paymentMethod, args, req) {
-          return paymentMethod.getBalanceForUser(req.remoteUser).then(balance => balance.amount);
+          return req.loaders.collective.findById.load(paymentMethod.CollectiveId);
+        }
+      },
+      limitedToTags: {
+        type: GraphQLJSON,
+        resolve(paymentMethod) {
+          return paymentMethod.limitedToTags;
+        }
+      },
+      limitedToCollectiveIds: {
+        type: GraphQLJSON,
+        resolve(paymentMethod) {
+          return paymentMethod.limitedToCollectiveIds;
         }
       },
       orders: {

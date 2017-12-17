@@ -48,8 +48,21 @@ export const executeOrder = (user, order, options) => {
     })
     .then(() => {
       const paymentProvider = (order.paymentMethod) ? order.paymentMethod.service : 'manual';
-      return paymentProviders[paymentProvider].processOrder(order, options); // eslint-disable-line import/namespace
+      return paymentProviders[paymentProvider].processOrder(order, options)  // eslint-disable-line import/namespace
+        .tap(async () => {
+          if (!order.matchingFund) return;
+          // if there is a matching fund, we execute the order
+          // also adds the owner of the matching fund as a BACKER of collective
+          order.paymentMethod = order.matchingFund;
+          order.totalAmount = order.totalAmount * order.matchingFund.matching;
+          order.FromCollectiveId = order.matchingFund.CollectiveId;
+          order.description = `Matching ${order.matchingFund.matching}x donation from ${order.fromCollective.name}`;
+          order.interval = null; // we only match the first donation (don't create another subscription)
+          return paymentProviders[order.paymentMethod.service].processOrder(order, options) // eslint-disable-line import/namespace
+        });
     })
+    // Mark order row as processed
+    .tap(() => order.update({ processedAt: new Date() }))
     .then(transaction => {
       // for gift cards
       if (!transaction && order.paymentMethod.service === 'prepaid') {
@@ -76,7 +89,7 @@ const validatePayment = (payment) => {
   }
 }
 
-const sendConfirmationEmail = (order) => {
+const sendConfirmationEmail = async (order) => {
 
   const { collective, tier, interval, fromCollective } = order;
   const user = order.createdByUser;
@@ -94,25 +107,34 @@ const sendConfirmationEmail = (order) => {
       })
   } else {
     // normal order
-    return collective.getRelatedCollectives(2, 0)
-    .then((relatedCollectives) => emailLib.send(
-      'thankyou',
-      user.email,
-      { order: order.info,
-        transaction: pick(order.transaction, ['createdAt', 'uuid']),
-        user: user.info,
-        collective: collective.info,
-        fromCollective: fromCollective.minimal,
-        relatedCollectives,
-        interval,
-        monthlyInterval: (interval === 'month'),
-        firstPayment: true,
-        subscriptionsLink: user.generateLoginLink('/subscriptions')
-      },
-      {
-        from: `${collective.name} <hello@${collective.slug}.opencollective.com>`
+    const relatedCollectives = await collective.getRelatedCollectives(2, 0);
+    const emailOptions = { from: `${collective.name} <hello@${collective.slug}.opencollective.com>` };
+    const data = { order: order.info,
+      transaction: pick(order.transaction, ['createdAt', 'uuid']),
+      user: user.info,
+      collective: collective.info,
+      fromCollective: fromCollective.minimal,
+      interval,
+      relatedCollectives,
+      monthlyInterval: (interval === 'month'),
+      firstPayment: true,
+      subscriptionsLink: interval && user.generateLoginLink('/subscriptions')
+    };
+
+    if (order.matchingFund) {
+      const matchingFundCollective = await models.Collective.findById(order.matchingFund.CollectiveId)
+      data.matchingFund = {
+        collective: pick(matchingFundCollective, ['slug', 'name', 'image']),
+        matching: order.matchingFund.matching,
+        amount: order.matchingFund.matching * order.totalAmount
       }
-    ));
+      order.matchingFund.info;
+      if (order.matchingFund.id === order.paymentMethod.id) {
+        const recipients = await matchingFundCollective.getEmails();
+        emailLib.send('donationmatched', recipients, data, emailOptions)
+      }
+    }
+    emailLib.send('thankyou', user.email, data, emailOptions)
   }
 }
 

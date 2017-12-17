@@ -26,18 +26,19 @@ export function getFxRate(fromCurrency, toCurrency, date = 'latest') {
 
   date = getDate(date);
 
-  const key = `${date}-${fromCurrency}-${toCurrency}`;
+  let dateKey = date;
+  if (dateKey === 'latest') {
+    dateKey = getDate(new Date);
+  }
+  const key = `${dateKey}-${fromCurrency}-${toCurrency}`;
   if (cache[key]) return Promise.resolve(cache[key]);
-
   return new Promise((resolve, reject) => {
     fetch(`http://api.fixer.io/${date}?base=${fromCurrency}&symbols=${toCurrency}`)
       .then(res => res.json())
       .then(json => {
         try {
           const fxrate = parseFloat(json.rates[toCurrency]);
-          if (date != 'latest') {
-            cache[key] = fxrate;
-          }
+          cache[key] = fxrate;
           return resolve(fxrate);
         } catch (e) {
           const msg = `>>> lib/currency: can't fetch fxrate from ${fromCurrency} to ${toCurrency} for date ${date}`;

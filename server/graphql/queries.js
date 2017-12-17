@@ -49,6 +49,17 @@ const queries = {
     }
   },
 
+  MatchingFund: {
+    type: PaymentMethodType,
+    description: "Fetch data about a matching fund from the short version of its UUID (first part)",
+    args: {
+      uuid: { type: new GraphQLNonNull(GraphQLString) }
+    },
+    resolve(_, args) {
+      return models.PaymentMethod.getMatchingFund(args.uuid);
+    }
+  },
+
   LoggedInUser: {
     type: UserType,
     resolve(_, args, req) {

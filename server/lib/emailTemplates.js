@@ -10,8 +10,7 @@ const templates = {};
 const templateNames = [
   'announcement',
   'announcement.text',
-  'user.monthlyreport',
-  'user.monthlyreport.text',
+  'donationmatched',
   'email.approve',
   'email.message',
   'github.signup',
@@ -41,6 +40,8 @@ const templateNames = [
   'thankyou.fr',
   'thankyou.laprimaire',
   'user.forgot.password',
+  'user.monthlyreport',
+  'user.monthlyreport.text',
   'user.new.token',
   'user.yearlyreport',
   'user.yearlyreport.text'

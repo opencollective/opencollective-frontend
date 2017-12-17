@@ -35,26 +35,25 @@ describe("paymentmethod.model.test.js", () => {
       monthlyLimitPerMember: 10000
     }).then(pm => paymentMethod = pm));
     before('create many transactions', () => models.Transaction.createMany([
-      { amount: 500 },
-      { amount: 200 },
-      { amount: 1000 }
+      { netAmountInCollectiveCurrency: -500 },
+      { netAmountInCollectiveCurrency: -200 },
+      { netAmountInCollectiveCurrency: -1000 }
     ],
     {
       CreatedByUserId: user.id,
-      FromCollectiveId: organization.id,
-      CollectiveId: collective.id,
+      FromCollectiveId: collective.id,
+      CollectiveId: organization.id,
       PaymentMethodId: paymentMethod.id,
       currency: collective.currency,
       HostCollectiveId: collective.id,
-      type: 'CREDIT'
+      type: 'DEBIT'
     }));
 
-    it(`computes the balance in the currency of the payment method's collective`, () => paymentMethod
-      .getBalanceForUser(user)
-      .then(balance => {
-        expect(balance.currency).to.equal(organization.currency);
-        expect(balance.amount).to.equal(7974); // $100 - (€5 + €2 + €10)
-      }));
+    it(`computes the balance in the currency of the payment method's collective`, async () => {
+      const balance = await paymentMethod.getBalanceForUser(user);
+      expect(balance.currency).to.equal(organization.currency);
+      expect(balance.amount).to.equal(7974); // $100 - (€5 + €2 + €10)
+    });
 
   });
 

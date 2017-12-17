@@ -116,6 +116,8 @@ export default (app) => {
    */
   app.get('/discover', getDiscoverPage);
 
+  app.get('/fxrate/:fromCurrency/:toCurrency/:date?', transactions.getFxRateController);
+
   /**
    * Users.
    */

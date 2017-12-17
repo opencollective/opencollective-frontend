@@ -278,9 +278,6 @@ export default {
       // add user to the collective
       .tap(() => collective.findOrAddUserWithRole({ id: user.id, CollectiveId: fromCollective.id}, roles.BACKER, { CreatedByUserId: user.id, TierId: order.TierId }))
 
-      // Mark order row as processed
-      .tap(() => order.update({ processedAt: new Date() }))
-
       // Mark paymentMethod as confirmed
       .tap(() => paymentMethod.update({ confirmedAt: new Date }))
 

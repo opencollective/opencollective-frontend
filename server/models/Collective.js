@@ -408,6 +408,21 @@ export default function(Sequelize, DataTypes) {
     .then(users => uniq(users, (user) => user.id));
   };
 
+  Collective.prototype.getEmails = async function() {
+    if (this.type === 'USER') {
+      const user = await this.getUser();
+      return [user.email];
+    }
+    const admins = await models.Member.findAll({
+      where: {
+        CollectiveId: this.id,
+        role: roles.ADMIN
+      }
+    });
+    const emails = await Promise.map(admins, admin => models.User.findOne({ where: { CollectiveId: admin.MemberCollectiveId }}).then(u => u.email));
+    return emails;
+  }
+
   Collective.prototype.getEvents = function(query = {}) {
     return Collective.findAll({
       ...query,

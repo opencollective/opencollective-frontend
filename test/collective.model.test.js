@@ -339,6 +339,25 @@ describe('Collective model', () => {
   });
 
   describe("members", () => {
+    it("gets email addresses of admins", async () => {
+      await collective.editMembers([
+        {
+          id: user1.id,
+          MemberCollectiveId: user1.CollectiveId,
+          role: 'ADMIN'
+        },
+        {
+          role: 'ADMIN',
+          member: {
+            name: 'Etienne Dupont',
+            email: 'etiennedupont@email.com'
+          }
+        }
+      ]);
+      const emails = await collective.getEmails();
+      expect(emails.length).to.equal(2);
+    });
+
     it("add/update/remove members", (done) => {
       collective.editMembers([
         {
