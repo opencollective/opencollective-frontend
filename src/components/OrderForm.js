@@ -3,6 +3,7 @@ import { withApollo } from 'react-apollo';
 import PropTypes from 'prop-types';
 import TierComponent from '../components/Tier';
 import InputField from '../components/InputField';
+import MatchingFundWithData from '../components/MatchingFundWithData';
 import ActionButton from '../components/Button';
 import { Button, Row, Col, Form, InputGroup, FormControl } from 'react-bootstrap';
 import { defineMessages, FormattedMessage } from 'react-intl';
@@ -21,6 +22,7 @@ class OrderForm extends React.Component {
     collective: PropTypes.object.isRequired,
     LoggedInUser: PropTypes.object,
     onSubmit: PropTypes.func.isRequired,
+    matchingFund: PropTypes.string,
     redeemFlow: PropTypes.bool
   }
 
@@ -338,6 +340,7 @@ class OrderForm extends React.Component {
       quantity,
       interval: order.interval || tier.interval,
       totalAmount: (quantity * tier.amount) || order.totalAmount,
+      matchingFund: order.matchingFund,
       paymentMethod: sanitizedCard
     };
 
@@ -747,6 +750,18 @@ class OrderForm extends React.Component {
               </div>
             </Col>
           </Row>
+          { this.props.matchingFund &&
+            <Row>
+              <Col sm={12}>
+                <MatchingFundWithData
+                  collective={collective}
+                  order={order}
+                  uuid={this.props.matchingFund}
+                  onChange={(matchingFund => this.handleChange('order', 'matchingFund', matchingFund))}
+                  />
+              </Col>
+            </Row>
+          }
           <Row>
             <Col sm={12}>
             <InputField
