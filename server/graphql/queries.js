@@ -53,10 +53,11 @@ const queries = {
     type: PaymentMethodType,
     description: "Fetch data about a matching fund from the short version of its UUID (first part)",
     args: {
-      uuid: { type: new GraphQLNonNull(GraphQLString) }
+      uuid: { type: new GraphQLNonNull(GraphQLString) },
+      ForCollectiveId: { type: GraphQLInt }
     },
     resolve(_, args) {
-      return models.PaymentMethod.getMatchingFund(args.uuid);
+      return models.PaymentMethod.getMatchingFund(args.uuid, { ForCollectiveId: args.ForCollectiveId });
     }
   },
 

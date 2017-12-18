@@ -6,7 +6,7 @@ import debugLib from 'debug';
 const debug = debugLib('PaymentMethod');
 import { sumTransactions } from '../lib/hostlib';
 import CustomDataTypes from './DataTypes';
-import { get } from 'lodash';
+import { get, intersection } from 'lodash';
 import { formatCurrency } from '../lib/utils';
 import { getFxRate } from '../lib/currency';
 
@@ -329,7 +329,7 @@ export default function(Sequelize, DataTypes) {
           return pm;
         }
       })
-    } else if (paymentMethod.uuid && paymentMethod.matching > 0) {
+    } else if (paymentMethod.uuid && paymentMethod.uuid.length === 8) {
       return PaymentMethod.getMatchingFund(paymentMethod.uuid);
     } else {
       // if the user is trying to reuse an existing payment method,
@@ -359,12 +359,32 @@ export default function(Sequelize, DataTypes) {
     }
   }
 
-  PaymentMethod.getMatchingFund = (shortUUID) => {
+  PaymentMethod.getMatchingFund = (shortUUID, options = {}) => {
+    const where = {};
+    if (options.ForCollectiveId) {
+      where.limitedToCollectiveIds = Sequelize.or({ limitedToCollectiveIds: {$eq: null } }, { limitedToCollectiveIds: options.ForCollectiveId });
+    }
     return PaymentMethod.findOne({
       where: Sequelize.and(
         Sequelize.where(Sequelize.cast(Sequelize.col('uuid'), 'text'), { $like: `${shortUUID}%` }),
         { matching: { $ne: null } }
       )
+    }).then(async (pm) => {
+      if (pm.limitedToCollectiveIds) {
+        if (!options.ForCollectiveId || pm.limitedToCollectiveIds.indexOf(options.ForCollectiveId) === -1) {
+          throw new Error("This matching fund is not available for this collective");
+        }
+      }
+      if (pm.limitedToTags) {
+        if (!options.ForCollectiveId) {
+          throw new Error("Please provide a ForCollectiveId");
+        }
+        const collective = await models.Collective.findById(options.ForCollectiveId);
+        if (intersection(collective.tags, pm.limitedToTags).length === 0) {
+          throw new Error("This matching fund is not available to collectives in this category")
+        }
+      }
+      return pm;
     });
   }
 
