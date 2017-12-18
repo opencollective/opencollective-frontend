@@ -5,7 +5,8 @@ import Membership from './Membership';
 class Collectives extends React.Component {
 
   static propTypes = {
-    memberships: PropTypes.arrayOf(PropTypes.object).isRequired
+    memberships: PropTypes.arrayOf(PropTypes.object).isRequired,
+    LoggedInUser: PropTypes.object
   }
 
   render() {
@@ -27,7 +28,11 @@ class Collectives extends React.Component {
         }
         `}</style>
         {memberships.map((membership, index) =>
-          <Membership key={`membership${index}`} membership={membership} />
+          <Membership
+            key={`membership${index}`}
+            membership={membership}
+            LoggedInUser={this.props.LoggedInUser}
+            />
         )}
       </div>
     )

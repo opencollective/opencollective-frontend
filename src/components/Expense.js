@@ -98,7 +98,6 @@ class Expense extends React.Component {
 
     let { mode } = this.state;
     if (LoggedInUser && !mode) {
-      console.log(">>> expense.status", expense.status, LoggedInUser.canApproveExpense(expense), LoggedInUser.canPayExpense(expense));
       if (expense.status === 'PENDING' && LoggedInUser.canApproveExpense(expense)) {
         mode = 'details';
       }

@@ -47,6 +47,7 @@ class UserCollective extends React.Component {
       'user.collective.memberOf.backer.title': { id: 'user.collective.memberOf.backer.title', defaultMessage: `I'm backing {n, plural, one {this collective} other {these collectives}}`},
       'user.collective.memberOf.attendee.title': { id: 'user.collective.memberOf.attendee.title', defaultMessage: `I've attended {n, plural, one {this event} other {these events}}`},
       'user.collective.memberOf.fundraiser.title': { id: 'user.collective.memberOf.fundraiser.title', defaultMessage: `I've helped raised money for {n, plural, one {this collective} other {these collectives}}`},
+      'user.collective.memberOf.fundraiser.LoggedInDescription': { id: 'user.collective.memberOf.fundraiser.LoggedInDescription', defaultMessage: `Share the URL in the email receipt for each of your donation to track how much money you helped raised! (Alternatively, you can also click on any collective that you are contributing to on this page. We will add your referral id to the URL.)`},
       'user.collective.memberOf.follower.title': { id: 'user.collective.memberOf.follower.title', defaultMessage: `I'm following {n, plural, one {this collective} other {these collectives}}`},
       'organization.collective.memberOf.host.title': { id: 'organization.collective.memberOf.host.title', defaultMessage: `We are hosting {n, plural, one {this collective} other {{n} collectives}}`},
       'organization.collective.memberOf.admin.title': { id: 'organization.collective.memberOf.admin.title', defaultMessage: `We are a core contributor of {n, plural, one {this collective} other {these collectives}}`},
@@ -102,8 +103,7 @@ class UserCollective extends React.Component {
 
     return (
       <div className="UserCollectivePage">
-
-        <style>{`
+        <style jsx>{`
           h1 {
             font-size: 2rem;
           }
@@ -142,6 +142,22 @@ class UserCollective extends React.Component {
           }
           .cardsList {
             margin: 0 2rem;
+          }
+          .description {
+            font-size: 1.4rem;
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto;
+          }
+          #tiers {
+            overflow: hidden
+            width: 100%;
+            display: flex;
+          }
+          #tiers :global(.tier) {
+            margin: 4rem auto;
+            max-width: 300px;
+            float: left;
           }
         `}</style>
 
@@ -214,18 +230,6 @@ class UserCollective extends React.Component {
                   </div>
                 }
                 <div id="tiers">
-                  <style jsx>{`
-                    #tiers {
-                      overflow: hidden
-                      width: 100%;
-                      display: flex;
-                    }
-                    #tiers :global(.tier) {
-                      margin: 4rem auto;
-                      max-width: 300px;
-                      float: left;
-                    }
-                  `}</style>
                   {this.collective.tiers.map((tier) =>
                     <Tier
                       key={tier.id}
@@ -266,8 +270,12 @@ class UserCollective extends React.Component {
               { Object.keys(memberOf).map(role => role !== 'HOST' && (
                 <section id={role}>
                   <h1>{intl.formatMessage(this.messages[`${type}.collective.memberOf.${role.toLowerCase()}.title`], { n: memberOf[role].length })}</h1>
+                  { LoggedInUser && this.messages[`${type}.collective.memberOf.${role.toLowerCase()}.LoggedInDescription`] &&
+                    <div className="description">{intl.formatMessage(this.messages[`${type}.collective.memberOf.${role.toLowerCase()}.LoggedInDescription`])}</div>
+                  }
                   <Memberships
                     className={role}
+                    LoggedInUser={LoggedInUser}
                     memberships={role === 'ADMIN' ? memberOf[role].filter(m => m.collective.type === 'COLLECTIVE') : memberOf[role]}
                     />
                 </section>

@@ -13,7 +13,8 @@ class CollectiveCard extends React.Component {
 
   static propTypes = {
     collective: PropTypes.object.isRequired,
-    membership: PropTypes.object
+    membership: PropTypes.object,
+    LoggedInUser: PropTypes.object
   }
 
   constructor(props) {
@@ -22,7 +23,7 @@ class CollectiveCard extends React.Component {
 
 
   render() {
-    const { collective, membership } = this.props;
+    const { collective, membership, LoggedInUser } = this.props;
 
     const logo = imagePreview(collective.image, pickLogo(collective.id), { height: 128 });
 
@@ -53,10 +54,14 @@ class CollectiveCard extends React.Component {
       coverStyle.backgroundPosition = 'center center';
     }
 
-   const description = (collective.description && firstSentence(collective.description, 64)) ||(collective.longDescription && firstSentence(collective.longDescription, 64))
+    const description = (collective.description && firstSentence(collective.description, 64)) ||(collective.longDescription && firstSentence(collective.longDescription, 64))
 
+    const linkParams = { slug: this.props.collective.slug};
+    if (LoggedInUser) {
+      linkParams.referral = LoggedInUser.CollectiveId;
+    }
     return (
-      <Link route={'collective'} params={{ slug: this.props.collective.slug}} target="_top">
+      <Link route={'collective'} params={linkParams} target="_top">
         <a className={`CollectiveCard ${collective.type}`} >
           <style jsx>{`
           .CollectiveCard {
