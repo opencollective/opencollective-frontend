@@ -34,8 +34,7 @@ class Header extends React.Component {
       storage.set('referral', urlParams.referral, 48 * 60 * 60 * 1000); // we keep the referral for 48h or until we receive a new ?referral=
     }
     if (urlParams.matchingFund) {
-      // storage.set('matchingFund', urlParams.matchingFund, 24 * 60 * 60 * 1000); // we keep the matchingFund for 24h or until we receive a new ?matchingFund=
-      storage.set('matchingFund', urlParams.matchingFund, 10 * 1000); // we keep the matchingFund for 24h or until we receive a new ?matchingFund=
+      storage.set('matchingFund', urlParams.matchingFund, 1 * 60 * 60 * 1000); // we keep the matchingFund for 1h or until we receive a new ?matchingFund=
     }
   }
 
