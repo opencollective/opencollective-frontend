@@ -370,6 +370,11 @@ export default function(Sequelize, DataTypes) {
         { matching: { $ne: null } }
       )
     }).then(async (pm) => {
+      if (pm.expiryDate) {
+        if (new Date(pm.expiryDate) < new Date) {
+          throw new Error("This matching fund is expired");
+        }
+      }
       if (pm.limitedToCollectiveIds) {
         if (!options.ForCollectiveId || pm.limitedToCollectiveIds.indexOf(options.ForCollectiveId) === -1) {
           throw new Error("This matching fund is not available for this collective");
