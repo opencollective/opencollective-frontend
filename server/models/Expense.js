@@ -160,12 +160,18 @@ export default function (Sequelize, DataTypes) {
    * Instance Methods
    */
   Expense.prototype.setApproved = function(lastEditedById) {
+    if (this.status === status.PAID) {
+      throw new Error("Can't approve an expense that is PAID");
+    }
     this.status = status.APPROVED;
     this.lastEditedById = lastEditedById;
     return this.save();
   };
 
   Expense.prototype.setRejected = function(lastEditedById) {
+    if (this.status === status.PAID) {
+      throw new Error("Can't reject an expense that is PAID");
+    }
     this.status = status.REJECTED;
     this.lastEditedById = lastEditedById;
     return this.save();
