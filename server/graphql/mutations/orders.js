@@ -150,7 +150,7 @@ export function createOrder(_, args, req) {
       if (matchingFund) {
         order.matchingFund = matchingFund;
         order.MatchingPaymentMethodId = matchingFund.id;
-        order.ReferralCollectiveId = matchingFund.CollectiveId; // if there is a matching fund, we force the referral to be the owner of the fund
+        order.referral = { id: matchingFund.CollectiveId }; // if there is a matching fund, we force the referral to be the owner of the fund
       }
       const currency = tier && tier.currency || collective.currency;
       const quantity = order.quantity || 1;
@@ -182,11 +182,10 @@ export function createOrder(_, args, req) {
         publicMessage: order.publicMessage,
         privateMessage: order.privateMessage,
         processedAt: paymentRequired ? null : new Date,
-        ReferralCollectiveId: order.ReferralCollectiveId,
         MatchingPaymentMethodId: order.MatchingPaymentMethodId
       };
 
-      if (order.referral && order.referral.id) {
+      if (order.referral && order.referral.id && order.referral.id !== order.FromCollectiveId) {
         orderData.ReferralCollectiveId = order.referral.id;
       }
 
