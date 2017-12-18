@@ -150,7 +150,7 @@ export async function payExpense(remoteUser, expenseId) {
   if (!expense) {
     throw new errors.Unauthorized("Expense not found");
   }
-  
+
   if (expense.status === statuses.PAID) {
     throw new errors.Unauthorized("Expense has already been paid");
   }
