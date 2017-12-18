@@ -17,11 +17,6 @@ class MatchingFundWithData extends React.Component {
     collective: PropTypes.object.isRequired,
   }
 
-  static getInitialProps ({ query: { matchingFund } }) {
-    console.log(">>> MatchingFundWithData getInitialProps", matchingFund);
-    return {}
-  }
-
   constructor(props) {
     super(props);
     this.fxrate = 1;
@@ -121,8 +116,8 @@ class MatchingFundWithData extends React.Component {
 
 
 const getMatchingFundQuery = gql`
-query MatchingFund($uuid: String!) {
-  MatchingFund(uuid: $uuid) {
+query MatchingFund($uuid: String!, $ForCollectiveId: Int) {
+  MatchingFund(uuid: $uuid, ForCollectiveId: $ForCollectiveId) {
     id
     description
     matching
@@ -143,7 +138,16 @@ query MatchingFund($uuid: String!) {
 }
 `;
 
-const addMatchingFundData = graphql(getMatchingFundQuery);
+const addMatchingFundData = graphql(getMatchingFundQuery, {
+  options(props) {
+    return {
+      variables: {
+        uuid: props.uuid,
+        ForCollectiveId: get(props, 'collective.id')
+      }
+    }
+  }
+});
 
 
 export default addMatchingFundData(MatchingFundWithData);

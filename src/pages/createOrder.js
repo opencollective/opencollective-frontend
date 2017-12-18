@@ -14,11 +14,12 @@ import { graphql } from 'react-apollo'
 import gql from 'graphql-tag'
 import Loading from '../components/Loading';
 import NotFound from '../components/NotFound';
+import storage from '../lib/storage';
 
 class CreateOrderPage extends React.Component {
 
-  static getInitialProps ({ query: { collectiveSlug, eventSlug, TierId, amount, quantity, totalAmount, interval, description, verb, redeem, referral, matchingFund } }) {
-    return { slug: eventSlug || collectiveSlug, TierId, quantity, totalAmount: totalAmount || amount * 100, interval, description, verb, redeem, referral, matchingFund }
+  static getInitialProps ({ query: { collectiveSlug, eventSlug, TierId, amount, quantity, totalAmount, interval, description, verb, redeem } }) {
+    return { slug: eventSlug || collectiveSlug, TierId, quantity, totalAmount: totalAmount || amount * 100, interval, description, verb, redeem }
   }
 
   constructor(props) {
@@ -48,18 +49,28 @@ class CreateOrderPage extends React.Component {
 
   async componentDidMount() {
     const { getLoggedInUser, data } = this.props;
+    const newState = {};
     const LoggedInUser = getLoggedInUser && await getLoggedInUser();
     if (!data.Tier && data.fetchData) {
       data.fetchData();
     }
-    this.setState({ LoggedInUser });
+    if (LoggedInUser) {
+      newState.LoggedInUser = LoggedInUser;
+    }
+    this.referral = storage.get('referral');
+    const matchingFund = storage.get('matchingFund');
+    if (matchingFund) {
+      newState.matchingFund = matchingFund;
+    }
+    this.setState(newState);
   }
 
   async createOrder(order) {
-    const { intl, data, referral, matchingFund } = this.props;
+    const { intl, data } = this.props;
     order.collective = { id: data.Collective.id };
-    if (referral) {
-      order.referral = { id: referral }
+
+    if (this.referral) {
+      order.referral = { id: this.referral }
     }
     if (this.state.LoggedInUser) {
       delete order.user;
@@ -162,7 +173,7 @@ class CreateOrderPage extends React.Component {
               LoggedInUser={this.state.LoggedInUser}
               onSubmit={this.createOrder}
               redeemFlow={this.props.redeem}
-              matchingFund={this.props.matchingFund}
+              matchingFund={this.state.matchingFund}
               />
             <div className="result">
               <div className="success">{this.state.result.success}</div>

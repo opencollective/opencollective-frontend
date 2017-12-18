@@ -2,7 +2,8 @@ import React from 'react'
 import Head from 'next/head';
 import TopBar from './TopBar';
 
-import { truncate } from '../lib/utils';
+import { truncate, getQueryParams } from '../lib/utils';
+import storage from '../lib/storage';
 
 class Header extends React.Component {
 
@@ -23,6 +24,18 @@ class Header extends React.Component {
         name,
         content: meta[name]
       })
+    }
+  }
+
+  componentDidMount() {
+    const urlParams = getQueryParams();
+    console.log(">>> url query params: ", urlParams);
+    if (urlParams.referral) {
+      storage.set('referral', urlParams.referral, 48 * 60 * 60 * 1000); // we keep the referral for 48h or until we receive a new ?referral=
+    }
+    if (urlParams.matchingFund) {
+      // storage.set('matchingFund', urlParams.matchingFund, 24 * 60 * 60 * 1000); // we keep the matchingFund for 24h or until we receive a new ?matchingFund=
+      storage.set('matchingFund', urlParams.matchingFund, 10 * 1000); // we keep the matchingFund for 24h or until we receive a new ?matchingFund=
     }
   }
 
