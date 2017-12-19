@@ -414,7 +414,6 @@ class OrderForm extends React.Component {
         let res;
         try {
           res = await getStripeToken('cc', creditcard);
-          console.log(">>> getStripeToken", res);
         } catch (e) {
           console.log(">>> error: ", e);
           this.setState({ result: { error: e }})
@@ -425,6 +424,7 @@ class OrderForm extends React.Component {
           name: last4,
           token: res.token,
           service: 'stripe',
+          type: 'creditcard',
           data: {
             fullName: res.card.full_name,
             expMonth: res.card.exp_month,
