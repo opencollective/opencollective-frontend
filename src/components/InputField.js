@@ -268,7 +268,7 @@ class InputField extends React.Component {
       case 'currency':
         this.input = (
         <FieldGroup
-          onChange={event => this.handleChange(event.target.value*100)}
+          onChange={event => this.handleChange(Math.round(event.target.value*100))}
           type="number"
           pre={field.pre}
           post={field.post}

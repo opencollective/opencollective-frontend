@@ -25,7 +25,7 @@ class ExpenseDetails extends React.Component {
     super(props);
     this.getOptions = this.getOptions.bind(this);
     this.handleChange = this.handleChange.bind(this);
-    this.currencyStyle = { style: 'currency', currencyDisplay: 'symbol', minimumFractionDigits: 0, maximumFractionDigits: 2};
+    this.currencyStyle = { style: 'currency', currencyDisplay: 'symbol', minimumFractionDigits: 2, maximumFractionDigits: 2};
 
     this.messages = defineMessages({
       'paypal': { id: 'expense.payoutMethod.paypal', defaultMessage: 'PayPal ({paypalEmail, select, missing {missing} other {{paypalEmail}}})' },
@@ -187,7 +187,7 @@ class ExpenseDetails extends React.Component {
               <div className="col large">
                 <label><FormattedMessage id='expense.description' defaultMessage='description' /></label>
                 <div className="description">
-                  <span className="amount">
+                  <span className="description">
                     <InputField
                       type="text"
                       value={expense.description}
@@ -204,7 +204,7 @@ class ExpenseDetails extends React.Component {
             <div className="col">
               <label><FormattedMessage id='expense.category' defaultMessage='category' /></label>
               <div className="category">
-                <span className="amount">
+                <span className="category">
                   <InputField
                     type="select"
                     options={categoriesOptions}
