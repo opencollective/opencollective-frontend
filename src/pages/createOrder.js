@@ -132,6 +132,9 @@ class CreateOrderPage extends React.Component {
           .success {
             color: green;
           }
+          .result {
+            text-align: center;
+          }
           .error {
             color: red;
           }
