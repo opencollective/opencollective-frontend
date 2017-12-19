@@ -82,7 +82,6 @@ class OrderForm extends React.Component {
       'error.email.invalid': { id: 'error.email.invalid', defaultMessage: 'Invalid email address' },
       'creditcard.label': { id: 'creditcard.label', defaultMessage: 'Credit Card' },
       'creditcard.save': { id: 'creditcard.save', defaultMessage: 'Save credit card to {type, select, user {my account} other {{type} account}}' },
-      'creditcard.missing': { id: 'creditcard.missing', defaultMessage: 'Mmmm... 🤔 looks like you forgot to provide your credit card details.' },
       'creditcard.error': { id: 'creditcard.error', defaultMessage: 'Invalid credit card' },
       'paymentMethod.type': { id: 'paymentMethod.type', defaultMessage: 'Payment method' },
       'paymentMethod.creditcard': { id: 'paymentMethod.creditcard', defaultMessage: 'credit card' },
