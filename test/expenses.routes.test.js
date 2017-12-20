@@ -7,7 +7,7 @@ import * as utils from '../test/utils';
 import roles from '../server/constants/roles';
 import { missingRequired } from './lib/expectHelpers';
 import paypalMock from './mocks/paypal';
-import paypalAdaptive from '../server/gateways/paypalAdaptive';
+import paypalAdaptive from '../server/paymentProviders/paypal/adaptiveGateway';
 import models from '../server/models';
 import emailLib from '../server/lib/email';
 
@@ -650,6 +650,7 @@ describe('expenses.routes.test.js', () => {
                   beforeEach('create paypal payment method', () => {
                     PaymentMethod.create({
                       service: 'paypal',
+                      type: 'adaptive',
                       token: 'abc',
                       CreatedByUserId: host.id,
                       CollectiveId: host.CollectiveId,

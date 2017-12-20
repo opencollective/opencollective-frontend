@@ -14,7 +14,7 @@ describe("paymentmethod.model.test.js", () => {
 
   describe("validation", () => {
     it('validates the token for Stripe', (done) => {
-      models.PaymentMethod.create({ service: 'stripe', token: 'invalid token' })
+      models.PaymentMethod.create({ service: 'stripe', type: 'creditcard', token: 'invalid token' })
         .catch(e => {
           expect(e.message).to.equal("Invalid Stripe token invalid token");
           done();
@@ -30,6 +30,7 @@ describe("paymentmethod.model.test.js", () => {
     before('create a payment method', () => models.PaymentMethod.create({
       name: '4242',
       service: 'stripe',
+      type: 'creditcard',
       token: 'tok_123456781234567812345678',
       CollectiveId: organization.id,
       monthlyLimitPerMember: 10000

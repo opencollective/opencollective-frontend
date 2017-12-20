@@ -1,4 +1,4 @@
-import * as stripe from '../gateways/stripe';
+import * as stripe from '../paymentProviders/stripe/gateway';
 import { types as CollectiveTypes } from '../constants/collectives';
 import { type as TransactionTypes } from '../constants/transactions';
 import * as paymentProviders from '../paymentProviders';
@@ -69,6 +69,10 @@ export default function(Sequelize, DataTypes) {
       }
     },
 
+    type: {
+      type: DataTypes.STRING
+    },
+
     data: DataTypes.JSON,
 
     createdAt: {
@@ -102,8 +106,12 @@ export default function(Sequelize, DataTypes) {
           if (!instance.token) {
             throw new Error(`${instance.service} payment method requires a token`);
           }
-          if (instance.service === 'stripe' && !instance.token.match(/^tok_[a-zA-Z0-9]{24}/)) {
-            throw new Error(`Invalid Stripe token ${instance.token}`);
+          if (instance.service === 'stripe' && !instance.token.match(/^(tok|src)_[a-zA-Z0-9]{24}/)) {
+            if (process.env.NODE_ENV !== 'production' && instance.token === 'tok_bypassPending' && instance.data.expMonth === 11 && instance.data.expYear === 23 && instance.data.zip === 10014) {
+              // test token for end to end tests
+            } else {
+              throw new Error(`Invalid Stripe token ${instance.token}`);
+            }
           }
         }
       }
@@ -128,7 +136,7 @@ export default function(Sequelize, DataTypes) {
 
       features() {
         const paymentProvider = paymentProviders[this.service]; // eslint-disable-line import/namespace
-        return paymentProvider.features || {};
+        return paymentProvider.types[this.type || 'default'].features;
       },
 
       minimal() {
@@ -162,15 +170,15 @@ export default function(Sequelize, DataTypes) {
   PaymentMethod.prototype.getBalanceForUser = function(user) {
     const paymentProvider = paymentProviders[this.service]; // eslint-disable-line import/namespace
     let getBalance;
-    if (paymentProvider && paymentProvider.getBalance) {
-      getBalance = paymentProvider.getBalance;
+    if (paymentProvider && paymentProvider.types[this.type || 'default'].getBalance) {
+      getBalance = paymentProvider.types[this.type || 'default'].getBalance;
     } else {
       getBalance = () => Promise.resolve(10000000); // GraphQL doesn't like Infinity
     }
 
     // needed because prepaid payment method can be accessed without logged in
-    if (this.service === 'prepaid') {
-      return paymentProvider.getBalance(this);
+    if (this.service === 'opencollective' && this.type === 'prepaid') {
+      return paymentProvider.types.prepaid.getBalance(this);
     }
 
     if (!user) return Promise.resolve({});

@@ -1,11 +1,12 @@
-import models, { sequelize } from '../models';
-import { type as TransactionTypes } from '../constants/transactions';
+import models, { sequelize } from '../../models';
+import { type as TransactionTypes } from '../../constants/transactions';
 import Promise from 'bluebird';
-import { getFxRate } from '../lib/currency';
+import { getFxRate } from '../../lib/currency';
 
 export default {
   features: {
-    recurring: false
+    recurring: false,
+    waitToCharge: false
   },
   // Returns the balance in the currency of the paymentMethod (ie. currency of the Collective)
   getBalance: (paymentMethod) => {

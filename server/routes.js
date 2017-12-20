@@ -16,7 +16,7 @@ import getPaymentMethods from './controllers/paymentMethods';
 import * as subscriptions from './controllers/subscriptions';
 import * as test from './controllers/test';
 import * as users from './controllers/users';
-import stripeWebhook from './controllers/stripeWebhook';
+import stripeWebhook from './controllers/webhooks';
 
 import * as email from './controllers/services/email';
 import syncMeetup from './controllers/services/meetup';

@@ -1,16 +1,15 @@
+/*
+ * All calls to stripe are meant to go through this gateway
+ */
+
 import _ from 'lodash';
 import Stripe from 'stripe';
 import config from 'config';
-
-import { planId } from '../lib/utils';
 import debugLib from 'debug';
+
+import { planId } from '../../lib/utils';
 const debug = debugLib('stripe');
 export const appStripe = Stripe(config.stripe.secret);
-
-/**
- * Get the stripe client for the connected account
- */
-const client = stripeAccount => Stripe(stripeAccount.token);
 
 /**
  * Create a plan if it doesn not find it
@@ -74,13 +73,14 @@ export const cancelSubscription = (stripeAccount, stripeSubscriptionId) => {
  */
 export const createCustomer = (stripeAccount, token, options = {}) => {
   const collective = options.collective || {};
-  const email = options.email || '';
-  debug("createCustomer", "stripeAccount", stripeAccount && { username: stripeAccount.username, CollectiveId: stripeAccount.CollectiveId }, "and token", token);
-  return appStripe.customers.create({
+
+  const payload = {
     source: token,
     description:  `https://opencollective.com/${collective.slug}`,
-    email
-  }, { stripe_account: stripeAccount && stripeAccount.username });
+    email: options.email || '',
+  };
+
+  return appStripe.customers.create(payload, { stripe_account: stripeAccount && stripeAccount.username });
 };
 
 /**
@@ -112,8 +112,7 @@ export const createCharge = (stripeAccount, charge) => {
  * Fetch charge
  */
 export const retrieveCharge = (stripeAccount, chargeId) => {
-  debug("retrieveCharge");
-  return client(stripeAccount).charges.retrieve(chargeId);
+  return appStripe.charges.retrieve(chargeId, { stripe_account: stripeAccount.username});
 };
 
 /**
@@ -123,6 +122,13 @@ export const retrieveBalanceTransaction = (stripeAccount, txn) => {
   debug("retrieveBalanceTransaction", { username: stripeAccount.username, CollectiveId: stripeAccount.CollectiveId }, txn);
   return appStripe.balance.retrieveTransaction(txn, { stripe_account: stripeAccount.username });
 };
+
+/**
+ * Retreive an event (for webhook)
+ */
+export const retrieveEvent = (stripeAccount, eventId) => {
+  return appStripe.events.retrieve(eventId, { stripe_account: stripeAccount.username })
+}
 
 export const extractFees = (balance) => {
   const fees = {

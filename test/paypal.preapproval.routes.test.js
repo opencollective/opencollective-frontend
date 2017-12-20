@@ -7,7 +7,7 @@ import * as utils from '../test/utils';
 import sinon from 'sinon';
 import models from '../server/models';
 import paypalMock from './mocks/paypal';
-import paypalAdaptive from '../server/gateways/paypalAdaptive';
+import paypalAdaptive from '../server/paymentProviders/paypal/adaptiveGateway';
 
 const application = utils.data('application');
 
@@ -246,6 +246,7 @@ describe('paypal.preapproval.routes.test.js', () => {
       beforeEach(() => {
         return models.PaymentMethod.create({
           service: 'paypal',
+          type: 'adaptive',
           CreatedByUserId: user.id,
           CollectiveId: user.CollectiveId,
           token: 'blah'

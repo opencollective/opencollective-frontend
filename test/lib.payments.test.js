@@ -5,7 +5,7 @@ import models from '../server/models';
 import * as utils from '../test/utils';
 import * as payments from '../server/lib/payments';
 import roles from '../server/constants/roles';
-import * as stripe from '../server/gateways/stripe';
+import * as stripe from '../server/paymentProviders/stripe/gateway';
 import Promise from 'bluebird';
 
 const AMOUNT = 1099;

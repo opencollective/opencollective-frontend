@@ -9,7 +9,7 @@ import sinon from 'sinon';
 import emailLib from '../server/lib/email';
 import stripeMock from './mocks/stripe';
 import models from '../server/models';
-import {appStripe} from '../server/gateways/stripe';
+import {appStripe} from '../server/paymentProviders/stripe/gateway';
 
 const chance = chanceLib.Chance();
 
@@ -291,6 +291,7 @@ describe('groups.routes.test.js', () => {
     beforeEach('create a new payment method for user', () => models.PaymentMethod.create({
       CollectiveId: user.CollectiveId,
       service: 'stripe',
+      type: 'creditcard',
       token: 'tok_123456781234567812345678'
     }))
 

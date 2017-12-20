@@ -4,7 +4,7 @@ import statuses from '../../constants/expense_status';
 import models from '../../models';
 import paymentProviders from '../../paymentProviders';
 import { formatCurrency } from '../../lib/utils';
-import paypalAdaptive from '../../gateways/paypalAdaptive';
+import paypalAdaptive from '../../paymentProviders/paypal/adaptiveGateway';
 import { createFromPaidExpense as createTransactionFromPaidExpense } from '../../lib/transactions';
 
 /**
@@ -171,7 +171,7 @@ export async function payExpense(remoteUser, expenseId) {
 
   const host = await expense.collective.getHostCollective();
 
-  const paymentProcessFees = paymentProviders[expense.payoutMethod] ? await paymentProviders[expense.payoutMethod].fees({
+  const paymentProcessFees = paymentProviders[expense.payoutMethod] ? await paymentProviders[expense.payoutMethod].types['adaptive'].fees({
     amount: expense.amount,
     currency: expense.collective.currency,
     host
@@ -185,7 +185,7 @@ export async function payExpense(remoteUser, expenseId) {
     const paymentMethod = await host.getPaymentMethod({ service: expense.payoutMethod });
 
     try {
-      const paymentResponse = await paymentProviders[expense.payoutMethod].pay(expense.collective, expense, paypalEmail, paymentMethod.token);
+      const paymentResponse = await paymentProviders[expense.payoutMethod].types['adaptive'].pay(expense.collective, expense, paypalEmail, paymentMethod.token);
       const preapprovalDetailsResponse = await paypalAdaptive.preapprovalDetails(paymentMethod.token);
       await createTransactionFromPaidExpense(host, paymentMethod, expense, paymentResponse, preapprovalDetailsResponse, expense.UserId);
       expense.setPaid(remoteUser.id);

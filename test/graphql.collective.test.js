@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import { describe, it } from 'mocha';
 import models from '../server/models';
 import sinon from 'sinon';
-import { appStripe } from '../server/gateways/stripe';
+import { appStripe } from '../server/paymentProviders/stripe/gateway';
 import stripeMock from './mocks/stripe';
 
 import * as utils from './utils';
