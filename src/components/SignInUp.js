@@ -20,6 +20,7 @@ class SignInUp extends React.Component {
   constructor(props) {
     super(props);
     this.state = { user: {} };
+    this.nodes = {};
     this.renderInputField = this.renderInputField.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleCardAdded = this.handleCardAdded.bind(this);
@@ -66,9 +67,9 @@ class SignInUp extends React.Component {
     const { intl } = this.props;
 
     return (
-      <div className="field" key={field.name} >
+      <div className="field" key={field.name}>
         {this.props.showLabels && this.messages[`${field.name}.label`] && <label>{`${capitalize(intl.formatMessage(this.messages[`${field.name}.label`]))}:`}</label>}
-        <input type="text" ref={field.name} placeholder={field.placeholder} onChange={(event) => debouncedHandleEvent(field.name, event.target.value)} />
+        <input type="text" ref={ref => this.nodes[field.name] = ref} placeholder={field.placeholder} onChange={(event) => debouncedHandleEvent(field.name, event.target.value)} />
         {this.messages[`${field.name}.help`] && <span className="description">{intl.formatMessage(this.messages[`${field.name}.help`])}</span>}
       </div>
     );
@@ -79,8 +80,8 @@ class SignInUp extends React.Component {
     this.setState({ user: this.state.user });
   }
 
-  async handleSubmit(event) {
-    event.preventDefault();
+  async handleSubmit(e) {
+    e && e.preventDefault();
     this.setState({ loading: true });
     this.state.user.email = this.state.user.email.trim().toLowerCase();
     await this.props.onSubmit(this.state.user);
@@ -88,7 +89,7 @@ class SignInUp extends React.Component {
   }
 
   componentDidMount() {
-    this.refs.email.focus();
+    this.nodes.email && this.nodes.email.focus();
   }
 
   render() {
@@ -124,6 +125,7 @@ class SignInUp extends React.Component {
             color: ${colors.darkgray};
           }
         `}</style>
+
         <form onSubmit={this.handleSubmit}>
           {this.renderInputField({
             name: 'email',
@@ -139,7 +141,7 @@ class SignInUp extends React.Component {
           }
 
           <div id="actions" className="actions">
-            <Button type="submit" disabled={!isFormValid || isLoading} className="green" label={submitBtnLabel} />
+            <Button type="submit" disabled={!isFormValid || isLoading} className="green" label={submitBtnLabel} onClick={this.handleSubmit}/>
           </div>
         </form>
       </div>
