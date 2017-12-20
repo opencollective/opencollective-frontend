@@ -2,6 +2,19 @@ import Payment from 'payment';
 
 const getStripeToken = (type = 'cc', data) => {
 
+  // for testing only
+  if (typeof window !== 'undefined' && window.location.hostname === 'staging.opencollective.com' || window.location.hostname === 'localhost' && window.location.search.match(/test=e2e/)) {
+    return Promise.resolve({ token: `tok_bypassPending`, card: {
+      last4: 4242,
+      exp_month: 11,
+      exp_year: 23,
+      brand: 'visa',
+      country: 'us',
+      funding: 'credit',
+      address_zip: 10014
+    }});
+  }
+
   // eslint-disable-next-line
   switch (type) {
     case 'cc': // credit card
