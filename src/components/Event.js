@@ -83,7 +83,9 @@ class Event extends React.Component {
   }
 
   async removeInterested() {
-    const res = await this.props.removeMember({ id: this.props.LoggedInUser.CollectiveId }, { id: this.state.event.id }, 'FOLLOWER');
+    const { LoggedInUser } = this.props;
+    const memberCollectiveId = this.state.interestedUserCollectiveId || LoggedInUser && LoggedInUser.CollectiveId;
+    const res = await this.props.removeMember({ id: memberCollectiveId }, { id: this.state.event.id }, 'FOLLOWER');
     const memberRemoved = res.data.removeMember;
     const event = { ... this.state.event };
     event.members = event.members.filter(member => member.id !== memberRemoved.id);
@@ -108,9 +110,11 @@ class Event extends React.Component {
       }
       try {
         const res = await this.props.createMember(member, { id: this.state.event.id }, 'FOLLOWER');
+        const memberCreated = res.data.createMember;
+        const interestedUserCollectiveId = memberCreated.member.id;
         const event = { ... this.state.event };
-        event.members = [ ...event.members, res.data.createMember ];
-        this.setState({ showInterestedForm: false, event });
+        event.members = [ ...event.members, memberCreated ];
+        this.setState({ showInterestedForm: false, event, interestedUserCollectiveId });
         const actions = this.state.actions;
         actions[0].className = 'selected';
         actions[0].icon = 'star';

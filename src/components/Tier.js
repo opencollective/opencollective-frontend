@@ -248,7 +248,7 @@ class Tier extends React.Component {
             { presets &&
               <div>
                 <div className="inputRow">
-                  <label><FormattedMessage id="tier.amount.select" defaultMessage="Select amount" /></label>
+                  <label><FormattedMessage id="tier.amount.select" defaultMessage="Select {interval, select, month {monthly} year {yearly} other {one time}} amount" values={{ interval }} /></label>
                   <div className="presets">
                     <ButtonGroup className="presetBtnGroup">
                       { presets.map(preset => !isNaN(preset) && (
@@ -271,16 +271,18 @@ class Tier extends React.Component {
                       onChange={(amount) => this.handleChange('amount', amount)} />
                     </div>
                 </div>
-                <div className="inputRow">
-                  <label><FormattedMessage id="tier.interval.select" defaultMessage="Select frequency" /></label>
-                  <ButtonGroup className="intervalBtnGroup">
-                    { intervals.map(i => (
-                      <Button className="intervalBtn" bsStyle={interval === i ? 'primary' : 'default'} onClick={() => this.handleChange('interval', i)}>
-                        {intl.formatMessage(this.messages[`interval.${i || 'onetime'}`])}
-                      </Button>
-                    ))}
-                  </ButtonGroup>                
-                </div>
+                { type === 'DONATION' &&
+                  <div className="inputRow">
+                    <label><FormattedMessage id="tier.interval.select" defaultMessage="Select frequency" /></label>
+                    <ButtonGroup className="intervalBtnGroup">
+                      { intervals.map(i => (
+                        <Button className="intervalBtn" bsStyle={interval === i ? 'primary' : 'default'} onClick={() => this.handleChange('interval', i)}>
+                          {intl.formatMessage(this.messages[`interval.${i || 'onetime'}`])}
+                        </Button>
+                      ))}
+                    </ButtonGroup>
+                  </div>
+                }
               </div>
             }
           </div>

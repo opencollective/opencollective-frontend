@@ -62,11 +62,11 @@ describe("Tier component", () => {
 
       const component = mountComponent({ tier: donorTier, values: {amount: 5000, interval: 'year', quantity: 1}, onClick })
 
-      expect(component.find('.presetBtn').length).toEqual(3);
-      expect(component.find('.presetBtn').at(1).text()).toEqual('$50');
-      expect(component.find('input[name="amount"]').node.value).toEqual('50');
-      expect(component.find('.ctabtn').text()).toEqual('donate');
-      component.find('.ctabtn').simulate('click');
+      expect(component.find('.presetBtn').hostNodes().length).toEqual(3);
+      expect(component.find('.presetBtn').hostNodes().at(1).text()).toEqual('$50');
+      expect(component.find('input[name="amount"]').props().value).toEqual(50);
+      expect(component.find('.ctabtn').hostNodes().text()).toEqual('donate');
+      component.find('.ctabtn').hostNodes().simulate('click');
     });
   })
 
@@ -84,7 +84,6 @@ describe("Tier component", () => {
         }
 
       const onClick = (tier) => {
-        console.log(">>> onClick", tier);
         expect(tier).toEqual({
           quantity: 1,
           id: 1,
@@ -96,8 +95,8 @@ describe("Tier component", () => {
 
       const component = mountComponent({ tier: backerTier, onClick })
 
-      expect(component.find('.ctabtn').text()).toEqual('become a backer');
-      component.find('.ctabtn').simulate('click');
+      expect(component.find('.ctabtn').hostNodes().text()).toEqual('become a backer');
+      component.find('.ctabtn').hostNodes().simulate('click');
     });
   })
 
@@ -114,7 +113,6 @@ describe("Tier component", () => {
         }
 
       const onClick = (tier) => {
-        console.log(">>> onClick", tier);
         expect(tier).toEqual({
           quantity: 2,
           amount: 2 * ticket.amount,
@@ -126,8 +124,8 @@ describe("Tier component", () => {
       const component = mountComponent({ tier: ticket, values: {quantity: 2}, onClick })
 
       expect(component.find('.title').first().text()).toEqual(capitalize(ticket.name));
-      expect(component.find('.ctabtn').text()).toEqual('get tickets');
-      component.find('.ctabtn').simulate('click');
+      expect(component.find('.ctabtn').hostNodes().text()).toEqual('get tickets');
+      component.find('.ctabtn').hostNodes().simulate('click');
       console.log(">>> state", component.state());
     });
   })
