@@ -510,8 +510,8 @@ class OrderForm extends React.Component {
         service: "stripe",
         type: "bitcoin",
         currency: "BTC",
-        amount: res.data.amount,
-        uri: res.data.uri,
+        amount: res.card.amount,
+        uri: res.card.uri,
         token: res.token
       };
       this.setState({ paymentMethod });

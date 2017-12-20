@@ -3,7 +3,7 @@ import Payment from 'payment';
 const getStripeToken = (type = 'cc', data) => {
 
   // for testing only
-  if (typeof window !== 'undefined' && window.location.hostname === 'staging.opencollective.com' || window.location.hostname === 'localhost' && window.location.search.match(/test=e2e/)) {
+  if (typeof window !== 'undefined' && window.location.search.match(/test=e2e/) && (window.location.hostname === 'staging.opencollective.com' || window.location.hostname === 'localhost')) {
     return Promise.resolve({ token: `tok_bypassPending`, card: {
       last4: 4242,
       exp_month: 11,
@@ -34,7 +34,7 @@ const getStripeToken = (type = 'cc', data) => {
           name: data.name
         }
       }).then(function(res) {
-        return { token: res.source.id, data: res.source.bitcoin };
+        return { token: res.source.id, card: res.source.bitcoin };
       });
   }
 }
