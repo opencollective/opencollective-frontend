@@ -189,9 +189,11 @@ export const authenticateService = (req, res, next) => {
 
       We have fluctuated back and forth. With the new simplified GitHub signup flow,
       it's possible that 'public_repo' is enough. 
+
+      Update: removing public_repo as well, since technically we shouldn't need it.
     */
 
-    opts.scope = [ 'user:email', 'public_repo' ]; 
+    opts.scope = [ 'user:email' ]; 
     return passport.authenticate(service, opts)(req, res, next);
   }
 
