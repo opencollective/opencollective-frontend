@@ -29,7 +29,7 @@ export function createOrder(_, args, req) {
     if (!c) {
       throw new Error(`No collective found with id: ${order.collective.id}`);
     }
-    collective = c;
+    order.collective = collective = c;
 
     if (!collective.isActive) {
       throw new Error(`This collective is not active`);
@@ -68,7 +68,6 @@ export function createOrder(_, args, req) {
   })
 
   // make sure that we have a payment method attached if this order requires a payment (totalAmount > 0)
-  // or that there is enough funds in the fromCollective
   .then(() => {
     if (paymentRequired) {
       if (!order.paymentMethod || !(order.paymentMethod.uuid || order.paymentMethod.token)) {
@@ -84,31 +83,31 @@ export function createOrder(_, args, req) {
       Promise.reject(new Error(`You can buy up to ${tier.maxQuantityPerUser} ${pluralize('ticket', tier.maxQuantityPerUser)} per person`));
     }
     return tier.checkAvailableQuantity(order.quantity)
-      .then(enoughQuantityAvailable => enoughQuantityAvailable ? 
-        Promise.resolve() : Promise.reject(new Error(`No more tickets left for ${tier.name}`)))
-  })
-
-  // find or create user, check permissions to set `fromCollective`
-  .then(() => {
-    if (order.user && order.user.email) return models.User.findOrCreateByEmail(order.user.email, { ...order.user, CreatedByUserId: req.remoteUser ? req.remoteUser.id : null });
-    if (req.remoteUser) return req.remoteUser;
-  })
-
-  // returns the fromCollective
-  .then(u => {
-    user = u;
-
-    if (!order.fromCollective || (!order.fromCollective.id && !order.fromCollective.name)) {
-      return {
-        id: user.CollectiveId,
-        CreatedByUserId: user.id
-      };
-    }
-
-    // If a `fromCollective` is provided, we check its existence and if the user can create an order on its behalf
-    if (order.fromCollective.id) {
-      if (!req.remoteUser) throw new Error(`You need to be logged in to create an order for an existing open collective`);
-      return req.loaders
+    .then(enoughQuantityAvailable => enoughQuantityAvailable ? 
+      Promise.resolve() : Promise.reject(new Error(`No more tickets left for ${tier.name}`)))
+    })
+    
+    // find or create user, check permissions to set `fromCollective`
+    .then(() => {
+      if (order.user && order.user.email) return models.User.findOrCreateByEmail(order.user.email, { ...order.user, CreatedByUserId: req.remoteUser ? req.remoteUser.id : null });
+      if (req.remoteUser) return req.remoteUser;
+    })
+    
+    // returns the fromCollective
+    .then(u => {
+      user = u;
+      
+      if (!order.fromCollective || (!order.fromCollective.id && !order.fromCollective.name)) {
+        return {
+          id: user.CollectiveId,
+          CreatedByUserId: user.id
+        };
+      }
+      
+      // If a `fromCollective` is provided, we check its existence and if the user can create an order on its behalf
+      if (order.fromCollective.id) {
+        if (!req.remoteUser) throw new Error(`You need to be logged in to create an order for an existing open collective`);
+        return req.loaders
         .collective.findById.load(order.fromCollective.id)
         .then(c => {
           if (!c) throw new Error(`From collective id ${order.fromCollective.id} not found`);
@@ -127,80 +126,108 @@ export function createOrder(_, args, req) {
             });
           }
           return c;
-      });
-    } else {
-      // Create new organization collective
-      if (req.remoteUser) {
-        order.fromCollective.CreatedByUserId = req.remoteUser.id;
+        });
+      } else {
+        // Create new organization collective
+        if (req.remoteUser) {
+          order.fromCollective.CreatedByUserId = req.remoteUser.id;
+        }
+        return models.Collective.createOrganization(order.fromCollective, user)
       }
-      return models.Collective.createOrganization(order.fromCollective, user)
-    }
-  })
-  .then(c => fromCollective = c)
-  .then(() => {
-    const currency = tier && tier.currency || collective.currency;
-    const quantity = order.quantity || 1;
-    let totalAmount;
-    if (tier && tier.amount && !tier.presets) { // if the tier has presets, we can't enforce tier.amount
-      totalAmount = tier.amount * quantity;
-    } else {
-      totalAmount = order.totalAmount; // e.g. the donor tier doesn't set an amount
-    }
+    })
+    .then(c => fromCollective = c)
+    
+    // check if the MatchingFund is valid and has enough funds
+    .then(async () => {
+      if (order.matchingFund) {
+        const matchingPaymentMethod = await models.PaymentMethod.getMatchingFund(order.matchingFund, { ForCollectiveId: collective.id });
+        const canBeUsedForOrder = await matchingPaymentMethod.canBeUsedForOrder(order, user);
+        if (canBeUsedForOrder) return matchingPaymentMethod;
+        else return null;
+      }
+    })
+    .then((matchingFund) => {
+      if (matchingFund) {
+        order.matchingFund = matchingFund;
+        order.MatchingPaymentMethodId = matchingFund.id;
+        order.referral = { id: matchingFund.CollectiveId }; // if there is a matching fund, we force the referral to be the owner of the fund
+      }
+      const currency = tier && tier.currency || collective.currency;
+      const quantity = order.quantity || 1;
+      let totalAmount;
+      if (tier && tier.amount && !tier.presets) { // if the tier has presets, we can't enforce tier.amount
+        totalAmount = tier.amount * quantity;
+      } else {
+        totalAmount = order.totalAmount; // e.g. the donor tier doesn't set an amount
+      }
 
-    const tierNameInfo = (tier && tier.name) ? ` (${tier.name})` : '';
-    let defaultDescription;
-    if (interval) {
-      defaultDescription = `${capitalize(interval)}ly donation to ${collective.name}${tierNameInfo}`;
-    } else {
-      defaultDescription = `Donation to ${collective.name}${tierNameInfo}`
-    }
+      const tierNameInfo = (tier && tier.name) ? ` (${tier.name})` : '';
+      let defaultDescription;
+      if (interval) {
+        defaultDescription = `${capitalize(interval)}ly donation to ${collective.name}${tierNameInfo}`;
+      } else {
+        defaultDescription = `Donation to ${collective.name}${tierNameInfo}`
+      }
 
-    const orderData = {
-      CreatedByUserId: req.remoteUser ? req.remoteUser.id : user.id,
-      FromCollectiveId: fromCollective.id,
-      CollectiveId: collective.id,
-      TierId: tier && tier.id,
-      quantity,
-      totalAmount,
-      currency,
-      interval,
-      description: order.description || defaultDescription,
-      publicMessage: order.publicMessage,
-      privateMessage: order.privateMessage,
-      processedAt: paymentRequired ? null : new Date
-    };
+      const orderData = {
+        CreatedByUserId: req.remoteUser ? req.remoteUser.id : user.id,
+        FromCollectiveId: fromCollective.id,
+        CollectiveId: collective.id,
+        TierId: tier && tier.id,
+        quantity,
+        totalAmount,
+        currency,
+        interval,
+        description: order.description || defaultDescription,
+        publicMessage: order.publicMessage,
+        privateMessage: order.privateMessage,
+        processedAt: paymentRequired ? null : new Date,
+        MatchingPaymentMethodId: order.MatchingPaymentMethodId
+      };
 
-    return models.Order.create(orderData)
-  })
+      if (order.referral && order.referral.id && order.referral.id !== order.FromCollectiveId) {
+        orderData.ReferralCollectiveId = order.referral.id;
+      }
 
-  // process payment, if needed
-  .then(oi => {
-    orderCreated = oi;
-    orderCreated.interval = interval;
-    if (order.paymentMethod && order.paymentMethod.save) {
-      order.paymentMethod.CollectiveId = orderCreated.FromCollectiveId;
-    }
-    if (paymentRequired) {
-      return orderCreated
-        .setPaymentMethod(order.paymentMethod)
-        .then(() => executeOrder(req.remoteUser || user, orderCreated, pick(order, ['hostFeePercent', 'platformFeePercent']))); // also adds the user as a BACKER of collective
-    } else {
-      // Free ticket, add user as an ATTENDEE
-      const email = (req.remoteUser) ? req.remoteUser.email : args.order.user.email;
-      return collective.addUserWithRole(user, roles.ATTENDEE)
-        .then(() => emailLib.send('ticket.confirmed', email, {
-        recipient: { name: fromCollective.name },
-        collective: collective.info,
-        order: orderCreated.info,
-        tier: tier && tier.info
-      }));
-    }
-  })
-  // make sure we return the latest version of the Order Instance
-  .then(() => models.Order.findById(orderCreated.id))
-  .catch(e => {
-    // helps debugging
-    console.error(">>> createOrder mutation error: ", e)
-    throw e;
-  })
+      return models.Order.create(orderData)
+    })
+
+    // process payment, if needed
+    .then(oi => {
+      orderCreated = oi;
+      orderCreated.interval = interval;
+      orderCreated.matchingFund = order.matchingFund;
+      if (order.paymentMethod && order.paymentMethod.save) {
+        order.paymentMethod.CollectiveId = orderCreated.FromCollectiveId;
+      }
+      if (paymentRequired) {
+        return orderCreated
+          .setPaymentMethod(order.paymentMethod)
+          .then(() => executeOrder(req.remoteUser || user, orderCreated, pick(order, ['hostFeePercent', 'platformFeePercent']))) // also adds the user as a BACKER of collective
+      } else {
+        // Free ticket, add user as an ATTENDEE
+        const email = (req.remoteUser) ? req.remoteUser.email : args.order.user.email;
+        return collective.addUserWithRole(user, roles.ATTENDEE)
+          .then(() => emailLib.send('ticket.confirmed', email, {
+          recipient: { name: fromCollective.name },
+          collective: collective.info,
+          order: orderCreated.info,
+          tier: tier && tier.info
+        }));
+      }
+    })
+    // make sure we return the latest version of the Order Instance
+    .then(() => models.Order.findById(orderCreated.id))
+    .then(order => {
+      // If there was a referral for this order, we add it as a FUNDRAISER role
+      if (order.ReferralCollectiveId) {
+        collective.addUserWithRole({ id: user.id, CollectiveId: order.ReferralCollectiveId }, roles.FUNDRAISER);
+      }
+      return order;
+    })
+    .catch(e => {
+      // helps debugging
+      console.error(">>> createOrder mutation error: ", e)
+      throw e;
+    })
 }

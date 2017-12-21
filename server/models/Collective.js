@@ -16,10 +16,10 @@ import activities from '../constants/activities';
 import Promise from 'bluebird';
 import userlib from '../lib/userlib';
 import CustomDataTypes from './DataTypes';
+import { convertToCurrency } from '../lib/currency';
 import emailLib from '../lib/email';
 import debugLib from 'debug';
 const debug = debugLib('collective');
-
 
 /**
  * Collective Model.
@@ -410,6 +410,21 @@ export default function(Sequelize, DataTypes) {
     .then(users => uniq(users, (user) => user.id));
   };
 
+  Collective.prototype.getEmails = async function() {
+    if (this.type === 'USER') {
+      const user = await this.getUser();
+      return [user.email];
+    }
+    const admins = await models.Member.findAll({
+      where: {
+        CollectiveId: this.id,
+        role: roles.ADMIN
+      }
+    });
+    const emails = await Promise.map(admins, admin => models.User.findOne({ where: { CollectiveId: admin.MemberCollectiveId }}).then(u => u.email));
+    return emails;
+  }
+
   Collective.prototype.getEvents = function(query = {}) {
     return Collective.findAll({
       ...query,
@@ -541,6 +556,13 @@ export default function(Sequelize, DataTypes) {
     }).then(order => order && order.Tier);
   };
 
+  /**
+   * Add User to the Collective
+   * @post Member( { CreatedByUserId: user.id, MemberCollectiveId: user.CollectiveId, CollectiveId: this.id })
+   * @param {*} user { id, CollectiveId }
+   * @param {*} role 
+   * @param {*} defaultAttributes 
+   */
   Collective.prototype.addUserWithRole = function(user, role, defaultAttributes) {
 
     const lists = {};
@@ -593,7 +615,11 @@ export default function(Sequelize, DataTypes) {
               memberCollective: models.Collective.findById(member.MemberCollectiveId),
               order: models.Order.findOne({
                 where: { CollectiveId: this.id, FromCollectiveId: member.MemberCollectiveId },
-                include: [ { model: models.Tier }, { model: models.Subscription } ],
+                include: [
+                  { model: models.Tier },
+                  { model: models.Subscription },
+                  { model: models.Collective, as: 'referral' }
+                ],
                 order: [['createdAt', 'ASC']]
               }),
               urlPath: this.getUrlPath()
@@ -610,6 +636,9 @@ export default function(Sequelize, DataTypes) {
                   subscription: { interval: order.Subscription && order.Subscription.interval }
                 }
               };
+              if (order && order.referral) {
+                data.order.referral = order.referral.minimal;
+              }
               return models.Activity.create({
                 CollectiveId: this.id,
                 type: activities.COLLECTIVE_MEMBER_CREATED,
@@ -906,6 +935,28 @@ export default function(Sequelize, DataTypes) {
       where
     })
     .then(result => Promise.resolve(parseInt(result.toJSON().total, 10)));
+  };
+
+  // Get the total amount raised through referral
+  Collective.prototype.getTotalAmountRaised = function() {
+    return models.Order.findAll({
+      attributes: [
+        [Sequelize.fn('COALESCE', Sequelize.fn('SUM', Sequelize.col('totalAmount')), 0), 'total'],
+        [Sequelize.fn('MAX', Sequelize.col('createdAt')), 'createdAt'],
+        [Sequelize.fn('MAX', Sequelize.col('currency')), 'currency']
+      ],
+      where: {
+        ReferralCollectiveId: this.id
+      },
+      group: ['currency']
+    })
+    .then(rows => rows.map(r => r.dataValues))
+    .then(amounts => Promise.map(amounts, s => convertToCurrency(s.total, s.currency, this.currency, s.createdAt)))
+    .then(amounts => {
+      let total = 0;
+      amounts.map(a => total += a);
+      return Math.round(total);
+    })
   };
 
   Collective.prototype.getTotalTransactions = function(startDate, endDate, type) {

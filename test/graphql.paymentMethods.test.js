@@ -4,7 +4,8 @@ import { describe, it } from 'mocha';
 import * as utils from './utils';
 import models from '../server/models';
 import roles from '../server/constants/roles';
-import nock from 'nock';
+import sinon from 'sinon';
+import * as libcurrency from '../server/lib/currency';
 
 let host, admin, user, collective, paypalPaymentMethod;
 
@@ -82,10 +83,12 @@ describe('graphql.paymentMethods.test.js', () => {
   });
 
   describe('add funds', () => {
-    let order;
+    let order, sandbox;
     const fxrate = 1.1654; // 1 EUR = 1.1654 USD
 
     beforeEach(() => {
+      sandbox = sinon.sandbox.create();
+      sandbox.stub(libcurrency, 'getFxRate', () => Promise.resolve(fxrate));
       return models.PaymentMethod.findOne({
         where: {
           service: 'opencollective',
@@ -104,6 +107,10 @@ describe('graphql.paymentMethods.test.js', () => {
         }
       })
     })
+
+    afterEach(() => {
+      sandbox.restore();
+    });
 
     const createOrderQuery = `
     mutation createOrder($order: OrderInputType!) {
@@ -181,12 +188,6 @@ describe('graphql.paymentMethods.test.js', () => {
 
     it('adds funds from the host (USD) to the collective (EUR)', async () => {
 
-      nock('http://api.fixer.io:80', {"encodedQueryParams":true})
-      .get('/latest')
-      .times(2)
-      .query({"base":"EUR","symbols":"USD"})
-      .reply(200, {"base":"EUR","date":"2017-11-10","rates":{"USD":fxrate}});
-
       order.fromCollective = {
         id: host.id
       };
@@ -210,11 +211,6 @@ describe('graphql.paymentMethods.test.js', () => {
 
     it('adds funds from the host (USD) to the collective (EUR) on behalf of a new organization', async () => {
 
-      nock('http://api.fixer.io:80', {"encodedQueryParams":true})
-      .get('/latest')
-      .times(2)
-      .query({"base":"EUR","symbols":"USD"})
-      .reply(200, {"base":"EUR","date":"2017-11-10","rates":{"USD":fxrate}});
       const hostFeePercent = 4;
       order.hostFeePercent = hostFeePercent;
       order.user = {

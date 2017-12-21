@@ -393,6 +393,11 @@ export function capitalize(str) {
   return str[0].toUpperCase() + str.slice(1).toLowerCase();
 }
 
+export function uncapitalize(str) {
+  if (!str) return '';
+  return str[0].toLowerCase() + str.slice(1);
+}
+
 export function pluralize(str, count) {
   if (count <= 1) return str;
   return `${str}s`.replace(/s+$/,'s');

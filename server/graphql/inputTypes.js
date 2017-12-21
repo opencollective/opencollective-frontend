@@ -188,6 +188,8 @@ export const OrderInputType = new GraphQLInputObjectType({
     publicMessage: { type: GraphQLString },
     privateMessage: { type: GraphQLString },
     paymentMethod: { type: PaymentMethodInputType },
+    matchingFund: { type: GraphQLString, description: "The first part of the UUID of the PaymentMethod that can be used to match the donation" },
+    referral: { type: CollectiveAttributesInputType, description: "The referral collective" },
     user: { type: UserInputType },
     fromCollective: { type: CollectiveAttributesInputType },
     collective: { type: new GraphQLNonNull(CollectiveAttributesInputType) },
