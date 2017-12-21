@@ -15,6 +15,7 @@ import gql from 'graphql-tag'
 import Loading from '../components/Loading';
 import NotFound from '../components/NotFound';
 import storage from '../lib/storage';
+import { pick } from 'lodash';
 
 class CreateOrderPage extends React.Component {
 
@@ -72,6 +73,7 @@ class CreateOrderPage extends React.Component {
     if (this.referral) {
       order.referral = { id: this.referral }
     }
+    order.paymentMethod = pick(order.paymentMethod, ['uuid', 'service', 'type', 'token', 'customerId', 'data', 'name', 'currency', 'save']);
     if (this.state.LoggedInUser) {
       delete order.user;
     }
@@ -83,7 +85,7 @@ class CreateOrderPage extends React.Component {
       this.setState({ loading: false, order, result: { success: intl.formatMessage(this.messages['order.success']) } });
       Router.pushRoute('collective', { 
         slug: orderCreated.fromCollective.slug,
-        status: 'orderCreated',
+        status: order.paymentMethod.type === 'bitcoin' ? 'orderProcessing' : 'orderCreated',
         CollectiveId: order.collective.id,
         TierId: order.tier && order.tier.id,
         type: data.Collective.type,
@@ -144,6 +146,9 @@ class CreateOrderPage extends React.Component {
         <style jsx>{`
           .success {
             color: green;
+          }
+          .result {
+            text-align: center;
           }
           .error {
             color: red;

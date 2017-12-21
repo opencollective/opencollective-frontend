@@ -1,5 +1,8 @@
 /* setup.js */
 
+import Enzyme from 'enzyme';
+import Adapter from 'enzyme-adapter-react-16';
+
 const { jsdom } = require('jsdom');
 
 global.document = jsdom('');
@@ -18,3 +21,6 @@ function copyProps(src, target) {
   Object.defineProperties(target, props);
 }
 copyProps(document.defaultView, global);
+
+
+Enzyme.configure({ adapter: new Adapter() });

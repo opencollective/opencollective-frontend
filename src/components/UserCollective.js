@@ -208,6 +208,21 @@ class UserCollective extends React.Component {
                       }
                     </div>
                   }
+                  { query && query.status === 'orderProcessing' &&
+                    <div className="orderCreated">
+                      <p className="thankyou"><FormattedMessage id="collective.user.orderCreated.thankyou" defaultMessage="Thank you for your donation! 🙏" /></p>
+                      { collectiveCreated &&
+                        <div>
+                          <p><FormattedMessage id="collective.user.orderProcessing.message" defaultMessage="We are currently processing your donation to {collective}. We will add it to your profile and we will send you a confirmation email once the payment is confirmed." values={{ collective: collectiveCreated.name }} /></p>
+                          { memberOf['BACKER'] && memberOf['BACKER'].length > 10 &&
+                            <div className="collectiveCard">
+                              <CollectiveCard collective={collectiveCreated} />
+                            </div>
+                          }
+                        </div>
+                      }
+                    </div>
+                  }
                   { query && query.status === 'orderCreated' && (!this.collective.image || !this.collective.longDescription) &&
                     <div>
                       <FormattedMessage id="collective.user.emptyProfile" defaultMessage={`Your profile looks a bit empty ¯\\\\_(ツ)_/¯`} />

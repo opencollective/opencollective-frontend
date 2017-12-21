@@ -37,8 +37,7 @@ describe("Register for free", () => {
   ).dive();
 
   it('only shows the email field', () => {
-    expect(component.find('input').map(c => c.node.ref)).toEqual([ 'email', 'firstName', 'lastName', 'description', 'twitterHandle' ]);
-    expect(component.find('input').length).toEqual(5); // [ 'email', 'firstname', 'lastname', 'description', 'twitter' ]
+    expect(component.find('input').hostNodes().length).toEqual(5); // [ 'email', 'firstname', 'lastname', 'description', 'twitter' ]
   });
 
 })

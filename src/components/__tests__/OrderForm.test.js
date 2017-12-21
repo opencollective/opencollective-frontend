@@ -1,5 +1,4 @@
 import { ApolloProvider } from 'react-apollo'
-import { mount } from 'enzyme';
 import React from 'react';
 import OrderForm from '../OrderForm';
 import sinon from 'sinon';
@@ -8,6 +7,10 @@ import * as api from '../../lib/api';
 import { IntlProvider, addLocaleData } from 'react-intl';
 import en from 'react-intl/locale-data/en';
 addLocaleData([...en]);
+
+import Enzyme, { mount } from 'enzyme';
+import Adapter from 'enzyme-adapter-react-16';
+Enzyme.configure({ adapter: new Adapter() });
 
 const getStripeToken = sinon.stub(stripe, 'getStripeToken', () => {
   return {
@@ -55,7 +58,8 @@ describe("OrderForm component", () => {
   }
 
   const fillValue = (component, field, value) => {
-    component.find({ name: field }).simulate('change', { target: { value } });
+    const c = component.find({ name: field }).hostNodes();
+    c.simulate('change', { target: { value } });
   }
 
   const mountComponent = (props, queryStub) => mount(
@@ -77,34 +81,14 @@ describe("OrderForm component", () => {
   })
 
   describe('error messages', () => {
-    it('creditcard.missing', (done) => {
+
+    it('error.email.invalid', (done) => {
       component = mountComponent({ collective, order })
-      fillValue(component, 'email', 'testuser@email.com');
+      fillValue(component, 'email', 'testuser');
       setTimeout(() => {
         component.find('.submit button').simulate('click');
-        expect(component.find('.result .error').text()).toEqual("Invalid credit card");
-        done()
-      }, 1000);
-    });
-
-    it('creditcard.error', (done) => {
-      component = mountComponent({ collective, order })
-
-      const card = {
-        CCnumber: '424242424242424',
-        CCname: 'Xavier Damman',
-        CCexpiry: '11/22',
-        CCcvc: 111
-      };
-
-      fillValue(component, 'email', 'testuser@email.com');
-      for (const prop in card) {
-        fillValue(component, prop, card[prop]);
-      }
-
-      setTimeout(() => {
-        component.find('.submit button').simulate('click');
-        expect(component.find('.result .error').text()).toEqual("Invalid credit card");
+        const errorNode = component.find('.result .error').hostNodes();
+        expect(errorNode.text()).toEqual("Invalid email address");
         done();
       }, 500);
     });
@@ -140,13 +124,6 @@ describe("OrderForm component", () => {
         description: 'entrepreneur'
       };
 
-      const card = {
-        CCnumber: '4242424242424242',
-        CCname: 'Xavier Damman',
-        CCexpiry: '11/22',
-        CCcvc: 111
-      };
-
       component = mountComponent({ collective, order, onSubmit })
 
       expect(component.find('input[type="email"]').exists()).toBeTrue;
@@ -155,9 +132,6 @@ describe("OrderForm component", () => {
       }
       fillValue(component, 'publicMessage', 'public message');
 
-      for (const prop in card) {
-        fillValue(component, prop, card[prop]);
-      }
       component.find('.presetBtn').last().simulate('click');
       setTimeout(() => {
         component.find('.submit button').simulate('click');

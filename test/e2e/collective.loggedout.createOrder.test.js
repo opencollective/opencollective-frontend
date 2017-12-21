@@ -17,17 +17,13 @@ describe("collective.loggedout.createOrder", () => {
       const email = `testuser+${Math.round(Math.random()*1000000)}@gmail.com`;
 
       const screenshot = await browser
-        .goto(`${WEBSITE_URL}/webpack/donate`)
+        .goto(`${WEBSITE_URL}/webpack/donate?test=e2e`)
         .type(email, "input[name='email']")
         .type("Xavier", "input[name='firstName']")
         .type("Damman", "input[name='lastName']")
         .type("https://xdamman.com", "input[name='website']")
         .type("xdamman", "input[name='twitterHandle']")
         .type("short bio", "input[name='description']")
-        .type("4242424242424242", "input[name='CCnumber']")
-        .type("Full Name", "input[name='CCname']")
-        .type("11/22", "input[name='CCexpiry']")
-        .type("111", "input[name='CCcvc']")
         .click(".presetBtn")
         .type("Public message", "textarea[name='publicMessage']")
         .scrollToElement('.Footer')
