@@ -571,8 +571,7 @@ export default function(Sequelize, DataTypes) {
     lists[roles.HOST] = 'host';
 
     const notifications = [
-      { type: `mailinglist.${lists[role]}` },
-      { type: activities.COLLECTIVE_EXPENSE_CREATED }
+      { type: `mailinglist.${lists[role]}` }
     ];
 
     switch (role) {
@@ -581,6 +580,7 @@ export default function(Sequelize, DataTypes) {
         this.update({ HostCollectiveId: user.CollectiveId });
         break;
       case roles.ADMIN:
+        notifications.push({ type: activities.COLLECTIVE_EXPENSE_CREATED });
         notifications.push({ type: activities.COLLECTIVE_MEMBER_CREATED });
         notifications.push({ type: 'collective.monthlyreport' });
         break;

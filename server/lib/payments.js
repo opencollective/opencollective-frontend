@@ -56,7 +56,7 @@ export const executeOrder = (user, order, options) => {
           order.paymentMethod = order.matchingFund;
           order.totalAmount = order.totalAmount * order.matchingFund.matching;
           order.FromCollectiveId = order.matchingFund.CollectiveId;
-          order.description = `Matching ${order.matchingFund.matching}x donation from ${order.fromCollective.name}`;
+          order.description = `Matching ${order.matchingFund.matching}x ${order.fromCollective.name}'s donation`;
           order.interval = null; // we only match the first donation (don't create another subscription)
           return paymentProviders[order.paymentMethod.service].types[order.paymentMethod.type || 'default'].processOrder(order, options) // eslint-disable-line import/namespace
         });
