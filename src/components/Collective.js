@@ -45,6 +45,7 @@ class Collective extends React.Component {
     };
 
     this.messages = defineMessages({      
+      'collective.donate': { id: 'collective.donate', defaultMessage: `donate`},
       'collective.since': { id: 'usercollective.since', defaultMessage: `Established in {year}`},
       'collective.members.admin.title': { id: 'collective.members.admin.title', defaultMessage: `{n} {n, plural, one {core contributor} other {core contributors}}`},
       'collective.members.member.title': { id: 'collective.members.member.title', defaultMessage: `{n} {n, plural, one {member} other {members}}`},
@@ -140,11 +141,8 @@ class Collective extends React.Component {
       },
       {
         className: 'blue',
-        component: <Link route={'donate'} params={{ collectiveSlug: this.collective.slug, verb: 'donate', referral }}><a>
-            <FormattedMessage
-              id="collective.donate"
-              defaultMessage={`donate`}
-              /></a>
+        component: <Link route={'donate'} params={{ collectiveSlug: this.collective.slug, verb: 'donate', referral }}>
+            <a><b>{intl.formatMessage(this.messages['collective.donate']).toUpperCase()}</b></a>
           </Link>
       }
     ];
