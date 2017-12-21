@@ -221,8 +221,8 @@ class OrderForm extends React.Component {
         if (membership.collective.type === 'EVENT') return;
         if (membership.collective.type === 'ORGANIZATION' && !this.allowOrganizations) return;
         if (['ADMIN','HOST'].indexOf(membership.role) === -1) return;
-        const value = membership.collective.id;
-        const label = membership.collective.name;
+        const value = get(membership, 'collective.id');
+        const label = get(membership, 'collective.name');
         collectivesById[value] = pick(membership.collective, ['id', 'type', 'name', 'paymentMethods'])
         fromCollectiveOptions.push({ [value]: label });
       })
@@ -367,7 +367,7 @@ class OrderForm extends React.Component {
       paymentMethod
     };
 
-    if (tier.id) {
+    if (tier && tier.id) {
       OrderInputType.tier = { id: tier.id, amount: tier.amount };
     }
     console.log(">>> OrderForm onSubmit", OrderInputType);
