@@ -351,13 +351,13 @@ class OrderForm extends React.Component {
   async handleSubmit() {
     if (! await this.validate()) return false;
     this.setState({ loading: true });
-
     const { paymentMethod, order, fromCollective, user } = this.state;
     const tier = order.tier;
-
+    
     const quantity = tier.quantity || 1;
     const OrderInputType = {
       user,
+      collective: { id: this.props.collective.id},
       fromCollective,
       publicMessage: order.publicMessage,
       quantity,
@@ -763,7 +763,7 @@ class OrderForm extends React.Component {
                   collective={collective}
                   order={order}
                   uuid={this.props.matchingFund}
-                  onChange={(matchingFund => this.handleChange('order', 'matchingFund', matchingFund))}
+                  onChange={(matchingFund) => this.handleChange('order', 'matchingFund', matchingFund)}
                   />
               </Col>
             </Row>
