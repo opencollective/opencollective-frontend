@@ -4,10 +4,10 @@ export default function() {
 
   nock('https://api.stripe.com:443', {"encodedQueryParams":true})
   .post('/v1/tokens', "card%5Bnumber%5D=4242424242424242&card%5Bexp_month%5D=12&card%5Bexp_year%5D=2028&card%5Bcvc%5D=222")
-  .reply(200, {"id":"tok_1BZuPhDjPFcHOcTmcMFkbXLs","object":"token","card":{"id":"card_1BZuPhDjPFcHOcTmaqX5a6GE","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","cvc_check":"unchecked","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"ftgJeBXvQSZ4HMCg","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null},"client_ip":"68.173.154.69","created":1513487413,"livemode":false,"type":"card","used":false}, [ 'Server',
+  .reply(200, {"id":"tok_1BbcNJDjPFcHOcTmIlIAF11R","object":"token","card":{"id":"card_1BbcNIDjPFcHOcTm1VD2t0iN","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","cvc_check":"unchecked","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"ftgJeBXvQSZ4HMCg","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null},"client_ip":"68.173.154.69","created":1513894729,"livemode":false,"type":"card","used":false}, [ 'Server',
   'nginx',
   'Date',
-  'Sun, 17 Dec 2017 05:10:13 GMT',
+  'Thu, 21 Dec 2017 22:18:49 GMT',
   'Content-Type',
   'application/json',
   'Content-Length',
@@ -27,7 +27,7 @@ export default function() {
   'Cache-Control',
   'no-cache, no-store',
   'Request-Id',
-  'req_4ak21U7Ig4MzDm',
+  'req_hK2XQCSklDFxj6',
   'Stripe-Version',
   '2015-04-07',
   'Strict-Transport-Security',
@@ -35,10 +35,10 @@ export default function() {
 
 nock('https://api.stripe.com:443', {"encodedQueryParams":true})
   .post('/v1/tokens', "card%5Bnumber%5D=4242424242424242&card%5Bexp_month%5D=12&card%5Bexp_year%5D=2028&card%5Bcvc%5D=222")
-  .reply(200, {"id":"tok_1BZuPiDjPFcHOcTmRmsUF3rj","object":"token","card":{"id":"card_1BZuPiDjPFcHOcTmKktj6Yq8","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","cvc_check":"unchecked","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"ftgJeBXvQSZ4HMCg","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null},"client_ip":"68.173.154.69","created":1513487414,"livemode":false,"type":"card","used":false}, [ 'Server',
+  .reply(200, {"id":"tok_1BbcNJDjPFcHOcTmL4izWYAx","object":"token","card":{"id":"card_1BbcNJDjPFcHOcTmlTChhbZ5","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","cvc_check":"unchecked","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"ftgJeBXvQSZ4HMCg","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null},"client_ip":"68.173.154.69","created":1513894729,"livemode":false,"type":"card","used":false}, [ 'Server',
   'nginx',
   'Date',
-  'Sun, 17 Dec 2017 05:10:14 GMT',
+  'Thu, 21 Dec 2017 22:18:49 GMT',
   'Content-Type',
   'application/json',
   'Content-Length',
@@ -58,7 +58,7 @@ nock('https://api.stripe.com:443', {"encodedQueryParams":true})
   'Cache-Control',
   'no-cache, no-store',
   'Request-Id',
-  'req_7kRLaetJT7nu73',
+  'req_614eT8L3Wm1puK',
   'Stripe-Version',
   '2015-04-07',
   'Strict-Transport-Security',
@@ -67,10 +67,10 @@ nock('https://api.stripe.com:443', {"encodedQueryParams":true})
 nock('http://api.fixer.io:80', {"encodedQueryParams":true})
   .get('/latest')
   .query({"base":"USD","symbols":"EUR"})
-  .reply(200, {"base":"USD","date":"2017-12-15","rates":{"EUR":0.84703}}, [ 'Server',
+  .reply(200, {"base":"USD","date":"2017-12-21","rates":{"EUR":0.84324}}, [ 'Server',
   'nginx/1.13.6',
   'Date',
-  'Sun, 17 Dec 2017 05:10:14 GMT',
+  'Thu, 21 Dec 2017 22:18:50 GMT',
   'Content-Type',
   'application/json',
   'Content-Length',
@@ -80,18 +80,18 @@ nock('http://api.fixer.io:80', {"encodedQueryParams":true})
   'Cache-Control',
   'public, must-revalidate, max-age=900',
   'Last-Modified',
-  'Fri, 15 Dec 2017 00:00:00 GMT',
+  'Thu, 21 Dec 2017 00:00:00 GMT',
   'Vary',
   'Origin',
   'X-Content-Type-Options',
   'nosniff' ]);
 
 nock('https://api.stripe.com:443', {"encodedQueryParams":true})
-  .post('/v1/customers', "source=tok_1BZuPiDjPFcHOcTmRmsUF3rj&description=https%3A%2F%2Fopencollective.com%2Fuser2&email=user2%40opencollective.com")
-  .reply(200, {"id":"cus_Bxq57QOIa1EUZu","object":"customer","account_balance":0,"created":1513487415,"currency":null,"default_source":"card_1BZuPiDjPFcHOcTmKktj6Yq8","delinquent":false,"description":"https://opencollective.com/user2","discount":null,"email":"user2@opencollective.com","livemode":false,"metadata":{},"shipping":null,"sources":{"object":"list","data":[{"id":"card_1BZuPiDjPFcHOcTmKktj6Yq8","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","customer":"cus_Bxq57QOIa1EUZu","cvc_check":"pass","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"ftgJeBXvQSZ4HMCg","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null}],"has_more":false,"total_count":1,"url":"/v1/customers/cus_Bxq57QOIa1EUZu/sources"},"subscriptions":{"object":"list","data":[],"has_more":false,"total_count":0,"url":"/v1/customers/cus_Bxq57QOIa1EUZu/subscriptions"}}, [ 'Server',
+  .post('/v1/customers', "source=tok_1BbcNJDjPFcHOcTmL4izWYAx&description=https%3A%2F%2Fopencollective.com%2Fuser2&email=user2%40opencollective.com")
+  .reply(200, {"id":"cus_Bzba8k5ae9FUi5","object":"customer","account_balance":0,"created":1513894730,"currency":null,"default_source":"card_1BbcNJDjPFcHOcTmlTChhbZ5","delinquent":false,"description":"https://opencollective.com/user2","discount":null,"email":"user2@opencollective.com","livemode":false,"metadata":{},"shipping":null,"sources":{"object":"list","data":[{"id":"card_1BbcNJDjPFcHOcTmlTChhbZ5","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","customer":"cus_Bzba8k5ae9FUi5","cvc_check":"pass","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"ftgJeBXvQSZ4HMCg","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null}],"has_more":false,"total_count":1,"url":"/v1/customers/cus_Bzba8k5ae9FUi5/sources"},"subscriptions":{"object":"list","data":[],"has_more":false,"total_count":0,"url":"/v1/customers/cus_Bzba8k5ae9FUi5/subscriptions"}}, [ 'Server',
   'nginx',
   'Date',
-  'Sun, 17 Dec 2017 05:10:15 GMT',
+  'Thu, 21 Dec 2017 22:18:51 GMT',
   'Content-Type',
   'application/json',
   'Content-Length',
@@ -111,18 +111,18 @@ nock('https://api.stripe.com:443', {"encodedQueryParams":true})
   'Cache-Control',
   'no-cache, no-store',
   'Request-Id',
-  'req_0AJtAYmtWfY4kh',
+  'req_Hj4HsS1ergB72V',
   'Stripe-Version',
   '2015-04-07',
   'Strict-Transport-Security',
   'max-age=31556926; includeSubDomains; preload' ]);
 
 nock('https://api.stripe.com:443', {"encodedQueryParams":true})
-  .post('/v1/tokens', "customer=cus_Bxq57QOIa1EUZu")
-  .reply(200, {"id":"tok_1BZuPkLzdXg9xKNSuHrEE0k2","object":"token","card":{"id":"card_1BZuPkLzdXg9xKNSjFAFAHg9","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","cvc_check":"pass","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"1ePEQxDFh2TKt5lo","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null},"client_ip":"68.173.154.69","created":1513487416,"livemode":false,"type":"card","used":false}, [ 'Server',
+  .post('/v1/tokens', "customer=cus_Bzba8k5ae9FUi5")
+  .reply(200, {"id":"tok_1BbcNMLzdXg9xKNSV3OOMESx","object":"token","card":{"id":"card_1BbcNMLzdXg9xKNSq5c6UfKe","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","cvc_check":"pass","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"1ePEQxDFh2TKt5lo","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null},"client_ip":"68.173.154.69","created":1513894732,"livemode":false,"type":"card","used":false}, [ 'Server',
   'nginx',
   'Date',
-  'Sun, 17 Dec 2017 05:10:16 GMT',
+  'Thu, 21 Dec 2017 22:18:52 GMT',
   'Content-Type',
   'application/json',
   'Content-Length',
@@ -142,7 +142,7 @@ nock('https://api.stripe.com:443', {"encodedQueryParams":true})
   'Cache-Control',
   'no-cache, no-store',
   'Request-Id',
-  'req_rgdpwdLqjOf5O3',
+  'req_cJK8VUhPAjBN8r',
   'Stripe-Account',
   'acct_18KWlTLzdXg9xKNS',
   'Stripe-Version',
@@ -151,11 +151,11 @@ nock('https://api.stripe.com:443', {"encodedQueryParams":true})
   'max-age=31556926; includeSubDomains; preload' ]);
 
 nock('https://api.stripe.com:443', {"encodedQueryParams":true})
-  .post('/v1/customers', "source=tok_1BZuPkLzdXg9xKNSuHrEE0k2&description=https%3A%2F%2Fopencollective.com%2Fuser2&email=user2%40opencollective.com")
-  .reply(200, {"id":"cus_Bxq5NRHDWefKPe","object":"customer","account_balance":0,"created":1513487417,"currency":null,"default_source":"card_1BZuPkLzdXg9xKNSjFAFAHg9","delinquent":false,"description":"https://opencollective.com/user2","discount":null,"email":"user2@opencollective.com","livemode":false,"metadata":{},"shipping":null,"sources":{"object":"list","data":[{"id":"card_1BZuPkLzdXg9xKNSjFAFAHg9","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","customer":"cus_Bxq5NRHDWefKPe","cvc_check":"pass","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"1ePEQxDFh2TKt5lo","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null}],"has_more":false,"total_count":1,"url":"/v1/customers/cus_Bxq5NRHDWefKPe/sources"},"subscriptions":{"object":"list","data":[],"has_more":false,"total_count":0,"url":"/v1/customers/cus_Bxq5NRHDWefKPe/subscriptions"}}, [ 'Server',
+  .post('/v1/customers', "source=tok_1BbcNMLzdXg9xKNSV3OOMESx&description=https%3A%2F%2Fopencollective.com%2Fuser2&email=user2%40opencollective.com")
+  .reply(200, {"id":"cus_BzbaxFjxW8Df3M","object":"customer","account_balance":0,"created":1513894732,"currency":null,"default_source":"card_1BbcNMLzdXg9xKNSq5c6UfKe","delinquent":false,"description":"https://opencollective.com/user2","discount":null,"email":"user2@opencollective.com","livemode":false,"metadata":{},"shipping":null,"sources":{"object":"list","data":[{"id":"card_1BbcNMLzdXg9xKNSq5c6UfKe","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","customer":"cus_BzbaxFjxW8Df3M","cvc_check":"pass","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"1ePEQxDFh2TKt5lo","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null}],"has_more":false,"total_count":1,"url":"/v1/customers/cus_BzbaxFjxW8Df3M/sources"},"subscriptions":{"object":"list","data":[],"has_more":false,"total_count":0,"url":"/v1/customers/cus_BzbaxFjxW8Df3M/subscriptions"}}, [ 'Server',
   'nginx',
   'Date',
-  'Sun, 17 Dec 2017 05:10:17 GMT',
+  'Thu, 21 Dec 2017 22:18:53 GMT',
   'Content-Type',
   'application/json',
   'Content-Length',
@@ -175,7 +175,7 @@ nock('https://api.stripe.com:443', {"encodedQueryParams":true})
   'Cache-Control',
   'no-cache, no-store',
   'Request-Id',
-  'req_0cyJbvelW4iosg',
+  'req_2DhdL7Xc0XEE3I',
   'Stripe-Account',
   'acct_18KWlTLzdXg9xKNS',
   'Stripe-Version',
@@ -184,11 +184,11 @@ nock('https://api.stripe.com:443', {"encodedQueryParams":true})
   'max-age=31556926; includeSubDomains; preload' ]);
 
 nock('https://api.stripe.com:443', {"encodedQueryParams":true})
-  .post('/v1/charges', "amount=5000&currency=USD&customer=cus_Bxq5NRHDWefKPe&description=Donation%20to%20tipbox&application_fee=250&metadata%5Bfrom%5D=http%3A%2F%2Flocalhost%3A3000%2Fuser2&metadata%5Bto%5D=http%3A%2F%2Flocalhost%3A3000%2Ftipbox&metadata%5BcustomerEmail%5D=user2%40opencollective.com&metadata%5BPaymentMethodId%5D=3")
-  .reply(200, {"id":"ch_1BZuPmLzdXg9xKNSvFrBJl0W","object":"charge","amount":5000,"amount_refunded":0,"application":"ca_68FQcZXEcV66Kjg7egLnR1Ce87cqwoue","application_fee":"fee_1BZuPmLzdXg9xKNSoK0XTBTt","balance_transaction":"txn_1BZuPmLzdXg9xKNSCk5it57h","captured":true,"created":1513487418,"currency":"usd","customer":"cus_Bxq5NRHDWefKPe","description":"Donation to tipbox","destination":null,"dispute":null,"failure_code":null,"failure_message":null,"fraud_details":{},"invoice":null,"livemode":false,"metadata":{"from":"http://localhost:3000/user2","to":"http://localhost:3000/tipbox","customerEmail":"user2@opencollective.com","PaymentMethodId":"3"},"on_behalf_of":null,"order":null,"outcome":{"network_status":"approved_by_network","reason":null,"risk_level":"normal","seller_message":"Payment complete.","type":"authorized"},"paid":true,"receipt_email":null,"receipt_number":null,"refunded":false,"refunds":{"object":"list","data":[],"has_more":false,"total_count":0,"url":"/v1/charges/ch_1BZuPmLzdXg9xKNSvFrBJl0W/refunds"},"review":null,"shipping":null,"source":{"id":"card_1BZuPkLzdXg9xKNSjFAFAHg9","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","customer":"cus_Bxq5NRHDWefKPe","cvc_check":"pass","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"1ePEQxDFh2TKt5lo","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null},"source_transfer":null,"statement_descriptor":null,"status":"succeeded","transfer_group":null}, [ 'Server',
+  .post('/v1/charges', "amount=5000&currency=USD&customer=cus_BzbaxFjxW8Df3M&description=Donation%20to%20tipbox&application_fee=250&metadata%5Bfrom%5D=http%3A%2F%2Flocalhost%3A3000%2Fuser2&metadata%5Bto%5D=http%3A%2F%2Flocalhost%3A3000%2Ftipbox&metadata%5BcustomerEmail%5D=user2%40opencollective.com&metadata%5BPaymentMethodId%5D=3")
+  .reply(200, {"id":"ch_1BbcNOLzdXg9xKNSQsltIjhv","object":"charge","amount":5000,"amount_refunded":0,"application":"ca_68FQcZXEcV66Kjg7egLnR1Ce87cqwoue","application_fee":"fee_1BbcNOLzdXg9xKNSTGml6ijw","balance_transaction":"txn_1BbcNOLzdXg9xKNSfdDMCIm2","captured":true,"created":1513894734,"currency":"usd","customer":"cus_BzbaxFjxW8Df3M","description":"Donation to tipbox","destination":null,"dispute":null,"failure_code":null,"failure_message":null,"fraud_details":{},"invoice":null,"livemode":false,"metadata":{"from":"http://localhost:3000/user2","to":"http://localhost:3000/tipbox","customerEmail":"user2@opencollective.com","PaymentMethodId":"3"},"on_behalf_of":null,"order":null,"outcome":{"network_status":"approved_by_network","reason":null,"risk_level":"normal","seller_message":"Payment complete.","type":"authorized"},"paid":true,"receipt_email":null,"receipt_number":null,"refunded":false,"refunds":{"object":"list","data":[],"has_more":false,"total_count":0,"url":"/v1/charges/ch_1BbcNOLzdXg9xKNSQsltIjhv/refunds"},"review":null,"shipping":null,"source":{"id":"card_1BbcNMLzdXg9xKNSq5c6UfKe","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","customer":"cus_BzbaxFjxW8Df3M","cvc_check":"pass","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"1ePEQxDFh2TKt5lo","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null},"source_transfer":null,"statement_descriptor":null,"status":"succeeded","transfer_group":null}, [ 'Server',
   'nginx',
   'Date',
-  'Sun, 17 Dec 2017 05:10:19 GMT',
+  'Thu, 21 Dec 2017 22:18:55 GMT',
   'Content-Type',
   'application/json',
   'Content-Length',
@@ -208,7 +208,7 @@ nock('https://api.stripe.com:443', {"encodedQueryParams":true})
   'Cache-Control',
   'no-cache, no-store',
   'Request-Id',
-  'req_vRMqfSdmwrWf9J',
+  'req_F3g6lA8DVbQAaC',
   'Stripe-Account',
   'acct_18KWlTLzdXg9xKNS',
   'Stripe-Version',
@@ -217,11 +217,11 @@ nock('https://api.stripe.com:443', {"encodedQueryParams":true})
   'max-age=31556926; includeSubDomains; preload' ]);
 
 nock('https://api.stripe.com:443', {"encodedQueryParams":true})
-  .get('/v1/balance/history/txn_1BZuPmLzdXg9xKNSCk5it57h')
-  .reply(200, {"id":"txn_1BZuPmLzdXg9xKNSCk5it57h","object":"balance_transaction","amount":5000,"available_on":1513728000,"created":1513487418,"currency":"usd","description":"Donation to tipbox","fee":425,"fee_details":[{"amount":250,"application":"ca_68FQcZXEcV66Kjg7egLnR1Ce87cqwoue","currency":"usd","description":"OpenCollective application fee","type":"application_fee"},{"amount":175,"application":null,"currency":"usd","description":"Stripe processing fees","type":"stripe_fee"}],"net":4575,"source":"ch_1BZuPmLzdXg9xKNSvFrBJl0W","sourced_transfers":{"object":"list","data":[],"has_more":false,"total_count":0,"url":"/v1/transfers?source_transaction=ch_1BZuPmLzdXg9xKNSvFrBJl0W"},"status":"pending","type":"charge"}, [ 'Server',
+  .get('/v1/balance/history/txn_1BbcNOLzdXg9xKNSfdDMCIm2')
+  .reply(200, {"id":"txn_1BbcNOLzdXg9xKNSfdDMCIm2","object":"balance_transaction","amount":5000,"available_on":1514246400,"created":1513894734,"currency":"usd","description":"Donation to tipbox","fee":425,"fee_details":[{"amount":250,"application":"ca_68FQcZXEcV66Kjg7egLnR1Ce87cqwoue","currency":"usd","description":"OpenCollective application fee","type":"application_fee"},{"amount":175,"application":null,"currency":"usd","description":"Stripe processing fees","type":"stripe_fee"}],"net":4575,"source":"ch_1BbcNOLzdXg9xKNSQsltIjhv","sourced_transfers":{"object":"list","data":[],"has_more":false,"total_count":0,"url":"/v1/transfers?source_transaction=ch_1BbcNOLzdXg9xKNSQsltIjhv"},"status":"pending","type":"charge"}, [ 'Server',
   'nginx',
   'Date',
-  'Sun, 17 Dec 2017 05:10:19 GMT',
+  'Thu, 21 Dec 2017 22:18:55 GMT',
   'Content-Type',
   'application/json',
   'Content-Length',
@@ -241,7 +241,7 @@ nock('https://api.stripe.com:443', {"encodedQueryParams":true})
   'Cache-Control',
   'no-cache, no-store',
   'Request-Id',
-  'req_IDw1amu8jI4h3V',
+  'req_nyWB8Y4fskXqR3',
   'Stripe-Account',
   'acct_18KWlTLzdXg9xKNS',
   'Stripe-Version',
@@ -250,11 +250,11 @@ nock('https://api.stripe.com:443', {"encodedQueryParams":true})
   'max-age=31556926; includeSubDomains; preload' ]);
 
 nock('https://api.stripe.com:443', {"encodedQueryParams":true})
-  .post('/v1/customers', "source=tok_1BZuPhDjPFcHOcTmcMFkbXLs&description=https%3A%2F%2Fopencollective.com%2Fuser2&email=user2%40opencollective.com")
-  .reply(200, {"id":"cus_Bxq6kU3bXLRj97","object":"customer","account_balance":0,"created":1513487420,"currency":null,"default_source":"card_1BZuPhDjPFcHOcTmaqX5a6GE","delinquent":false,"description":"https://opencollective.com/user2","discount":null,"email":"user2@opencollective.com","livemode":false,"metadata":{},"shipping":null,"sources":{"object":"list","data":[{"id":"card_1BZuPhDjPFcHOcTmaqX5a6GE","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","customer":"cus_Bxq6kU3bXLRj97","cvc_check":"pass","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"ftgJeBXvQSZ4HMCg","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null}],"has_more":false,"total_count":1,"url":"/v1/customers/cus_Bxq6kU3bXLRj97/sources"},"subscriptions":{"object":"list","data":[],"has_more":false,"total_count":0,"url":"/v1/customers/cus_Bxq6kU3bXLRj97/subscriptions"}}, [ 'Server',
+  .post('/v1/customers', "source=tok_1BbcNJDjPFcHOcTmIlIAF11R&description=https%3A%2F%2Fopencollective.com%2Fuser2&email=user1%40opencollective.com")
+  .reply(200, {"id":"cus_BzbazHrL3szEUn","object":"customer","account_balance":0,"created":1513894736,"currency":null,"default_source":"card_1BbcNIDjPFcHOcTm1VD2t0iN","delinquent":false,"description":"https://opencollective.com/user2","discount":null,"email":"user1@opencollective.com","livemode":false,"metadata":{},"shipping":null,"sources":{"object":"list","data":[{"id":"card_1BbcNIDjPFcHOcTm1VD2t0iN","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","customer":"cus_BzbazHrL3szEUn","cvc_check":"pass","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"ftgJeBXvQSZ4HMCg","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null}],"has_more":false,"total_count":1,"url":"/v1/customers/cus_BzbazHrL3szEUn/sources"},"subscriptions":{"object":"list","data":[],"has_more":false,"total_count":0,"url":"/v1/customers/cus_BzbazHrL3szEUn/subscriptions"}}, [ 'Server',
   'nginx',
   'Date',
-  'Sun, 17 Dec 2017 05:10:21 GMT',
+  'Thu, 21 Dec 2017 22:18:57 GMT',
   'Content-Type',
   'application/json',
   'Content-Length',
@@ -274,18 +274,18 @@ nock('https://api.stripe.com:443', {"encodedQueryParams":true})
   'Cache-Control',
   'no-cache, no-store',
   'Request-Id',
-  'req_QfFZLKus1zMkon',
+  'req_qjkvwtycKha1JR',
   'Stripe-Version',
   '2015-04-07',
   'Strict-Transport-Security',
   'max-age=31556926; includeSubDomains; preload' ]);
 
 nock('https://api.stripe.com:443', {"encodedQueryParams":true})
-  .post('/v1/tokens', "customer=cus_Bxq6kU3bXLRj97")
-  .reply(200, {"id":"tok_1BZuPpLzdXg9xKNSuLSzuBQO","object":"token","card":{"id":"card_1BZuPpLzdXg9xKNSvKf0jd8F","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","cvc_check":"pass","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"1ePEQxDFh2TKt5lo","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null},"client_ip":"68.173.154.69","created":1513487421,"livemode":false,"type":"card","used":false}, [ 'Server',
+  .post('/v1/tokens', "customer=cus_BzbazHrL3szEUn")
+  .reply(200, {"id":"tok_1BbcNSLzdXg9xKNSaRqIlxZz","object":"token","card":{"id":"card_1BbcNRLzdXg9xKNSAeGTcVT5","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","cvc_check":"pass","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"1ePEQxDFh2TKt5lo","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null},"client_ip":"68.173.154.69","created":1513894738,"livemode":false,"type":"card","used":false}, [ 'Server',
   'nginx',
   'Date',
-  'Sun, 17 Dec 2017 05:10:21 GMT',
+  'Thu, 21 Dec 2017 22:18:58 GMT',
   'Content-Type',
   'application/json',
   'Content-Length',
@@ -305,7 +305,7 @@ nock('https://api.stripe.com:443', {"encodedQueryParams":true})
   'Cache-Control',
   'no-cache, no-store',
   'Request-Id',
-  'req_wQLiOidPWamsYA',
+  'req_xdav9LBU75he8e',
   'Stripe-Account',
   'acct_18KWlTLzdXg9xKNS',
   'Stripe-Version',
@@ -314,11 +314,11 @@ nock('https://api.stripe.com:443', {"encodedQueryParams":true})
   'max-age=31556926; includeSubDomains; preload' ]);
 
 nock('https://api.stripe.com:443', {"encodedQueryParams":true})
-  .post('/v1/customers', "source=tok_1BZuPpLzdXg9xKNSuLSzuBQO&description=https%3A%2F%2Fopencollective.com%2Fuser2&email=user2%40opencollective.com")
-  .reply(200, {"id":"cus_Bxq6UUn3PPKBRF","object":"customer","account_balance":0,"created":1513487422,"currency":null,"default_source":"card_1BZuPpLzdXg9xKNSvKf0jd8F","delinquent":false,"description":"https://opencollective.com/user2","discount":null,"email":"user2@opencollective.com","livemode":false,"metadata":{},"shipping":null,"sources":{"object":"list","data":[{"id":"card_1BZuPpLzdXg9xKNSvKf0jd8F","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","customer":"cus_Bxq6UUn3PPKBRF","cvc_check":"pass","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"1ePEQxDFh2TKt5lo","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null}],"has_more":false,"total_count":1,"url":"/v1/customers/cus_Bxq6UUn3PPKBRF/sources"},"subscriptions":{"object":"list","data":[],"has_more":false,"total_count":0,"url":"/v1/customers/cus_Bxq6UUn3PPKBRF/subscriptions"}}, [ 'Server',
+  .post('/v1/customers', "source=tok_1BbcNSLzdXg9xKNSaRqIlxZz&description=https%3A%2F%2Fopencollective.com%2Fuser2&email=user1%40opencollective.com")
+  .reply(200, {"id":"cus_BzbaEAqpPsnfoX","object":"customer","account_balance":0,"created":1513894739,"currency":null,"default_source":"card_1BbcNRLzdXg9xKNSAeGTcVT5","delinquent":false,"description":"https://opencollective.com/user2","discount":null,"email":"user1@opencollective.com","livemode":false,"metadata":{},"shipping":null,"sources":{"object":"list","data":[{"id":"card_1BbcNRLzdXg9xKNSAeGTcVT5","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","customer":"cus_BzbaEAqpPsnfoX","cvc_check":"pass","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"1ePEQxDFh2TKt5lo","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null}],"has_more":false,"total_count":1,"url":"/v1/customers/cus_BzbaEAqpPsnfoX/sources"},"subscriptions":{"object":"list","data":[],"has_more":false,"total_count":0,"url":"/v1/customers/cus_BzbaEAqpPsnfoX/subscriptions"}}, [ 'Server',
   'nginx',
   'Date',
-  'Sun, 17 Dec 2017 05:10:22 GMT',
+  'Thu, 21 Dec 2017 22:19:00 GMT',
   'Content-Type',
   'application/json',
   'Content-Length',
@@ -338,7 +338,7 @@ nock('https://api.stripe.com:443', {"encodedQueryParams":true})
   'Cache-Control',
   'no-cache, no-store',
   'Request-Id',
-  'req_wlkO0I0wfhorbe',
+  'req_jlH13Vdn6cYT7O',
   'Stripe-Account',
   'acct_18KWlTLzdXg9xKNS',
   'Stripe-Version',
@@ -347,15 +347,15 @@ nock('https://api.stripe.com:443', {"encodedQueryParams":true})
   'max-age=31556926; includeSubDomains; preload' ]);
 
 nock('https://api.stripe.com:443', {"encodedQueryParams":true})
-  .post('/v1/charges', "amount=10000&currency=USD&customer=cus_Bxq6UUn3PPKBRF&description=Matching%202x%20user2's%20donation&application_fee=500&metadata%5Bfrom%5D=http%3A%2F%2Flocalhost%3A3000%2Fuser2&metadata%5Bto%5D=http%3A%2F%2Flocalhost%3A3000%2Ftipbox&metadata%5BcustomerEmail%5D=user2%40opencollective.com&metadata%5BPaymentMethodId%5D=2")
-  .reply(200, {"id":"ch_1BZuPrLzdXg9xKNSn7yYwicg","object":"charge","amount":10000,"amount_refunded":0,"application":"ca_68FQcZXEcV66Kjg7egLnR1Ce87cqwoue","application_fee":"fee_1BZuPsLzdXg9xKNShxwPDP2r","balance_transaction":"txn_1BZuPsLzdXg9xKNSA1B6zZ8J","captured":true,"created":1513487423,"currency":"usd","customer":"cus_Bxq6UUn3PPKBRF","description":"Matching 2x user2's donation","destination":null,"dispute":null,"failure_code":null,"failure_message":null,"fraud_details":{},"invoice":null,"livemode":false,"metadata":{"from":"http://localhost:3000/user2","to":"http://localhost:3000/tipbox","customerEmail":"user2@opencollective.com","PaymentMethodId":"2"},"on_behalf_of":null,"order":null,"outcome":{"network_status":"approved_by_network","reason":null,"risk_level":"normal","seller_message":"Payment complete.","type":"authorized"},"paid":true,"receipt_email":null,"receipt_number":null,"refunded":false,"refunds":{"object":"list","data":[],"has_more":false,"total_count":0,"url":"/v1/charges/ch_1BZuPrLzdXg9xKNSn7yYwicg/refunds"},"review":null,"shipping":null,"source":{"id":"card_1BZuPpLzdXg9xKNSvKf0jd8F","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","customer":"cus_Bxq6UUn3PPKBRF","cvc_check":"pass","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"1ePEQxDFh2TKt5lo","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null},"source_transfer":null,"statement_descriptor":null,"status":"succeeded","transfer_group":null}, [ 'Server',
+  .post('/v1/charges', "amount=10000&currency=USD&customer=cus_BzbaEAqpPsnfoX&description=Matching%202x%20user2%27s%20donation&application_fee=500&metadata%5Bfrom%5D=http%3A%2F%2Flocalhost%3A3000%2Fuser2&metadata%5Bto%5D=http%3A%2F%2Flocalhost%3A3000%2Ftipbox&metadata%5BcustomerEmail%5D=user1%40opencollective.com&metadata%5BPaymentMethodId%5D=2")
+  .reply(200, {"id":"ch_1BbcNULzdXg9xKNSB1VJURDh","object":"charge","amount":10000,"amount_refunded":0,"application":"ca_68FQcZXEcV66Kjg7egLnR1Ce87cqwoue","application_fee":"fee_1BbcNULzdXg9xKNS0uUXXfWh","balance_transaction":"txn_1BbcNVLzdXg9xKNSCEaOBrtH","captured":true,"created":1513894740,"currency":"usd","customer":"cus_BzbaEAqpPsnfoX","description":"Matching 2x user2's donation","destination":null,"dispute":null,"failure_code":null,"failure_message":null,"fraud_details":{},"invoice":null,"livemode":false,"metadata":{"from":"http://localhost:3000/user2","to":"http://localhost:3000/tipbox","customerEmail":"user1@opencollective.com","PaymentMethodId":"2"},"on_behalf_of":null,"order":null,"outcome":{"network_status":"approved_by_network","reason":null,"risk_level":"normal","seller_message":"Payment complete.","type":"authorized"},"paid":true,"receipt_email":null,"receipt_number":null,"refunded":false,"refunds":{"object":"list","data":[],"has_more":false,"total_count":0,"url":"/v1/charges/ch_1BbcNULzdXg9xKNSB1VJURDh/refunds"},"review":null,"shipping":null,"source":{"id":"card_1BbcNRLzdXg9xKNSAeGTcVT5","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","customer":"cus_BzbaEAqpPsnfoX","cvc_check":"pass","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"1ePEQxDFh2TKt5lo","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null},"source_transfer":null,"statement_descriptor":null,"status":"succeeded","transfer_group":null}, [ 'Server',
   'nginx',
   'Date',
-  'Sun, 17 Dec 2017 05:10:24 GMT',
+  'Thu, 21 Dec 2017 22:19:01 GMT',
   'Content-Type',
   'application/json',
   'Content-Length',
-  '2026',
+  '2023',
   'Connection',
   'close',
   'Access-Control-Allow-Credentials',
@@ -371,7 +371,7 @@ nock('https://api.stripe.com:443', {"encodedQueryParams":true})
   'Cache-Control',
   'no-cache, no-store',
   'Request-Id',
-  'req_oWnOiHudN0V09I',
+  'req_CnR0czru7mmgp1',
   'Stripe-Account',
   'acct_18KWlTLzdXg9xKNS',
   'Stripe-Version',
@@ -380,15 +380,15 @@ nock('https://api.stripe.com:443', {"encodedQueryParams":true})
   'max-age=31556926; includeSubDomains; preload' ]);
 
 nock('https://api.stripe.com:443', {"encodedQueryParams":true})
-  .get('/v1/balance/history/txn_1BZuPsLzdXg9xKNSA1B6zZ8J')
-  .reply(200, {"id":"txn_1BZuPsLzdXg9xKNSA1B6zZ8J","object":"balance_transaction","amount":10000,"available_on":1513728000,"created":1513487423,"currency":"usd","description":"Matching 2x user2's donation","fee":820,"fee_details":[{"amount":320,"application":null,"currency":"usd","description":"Stripe processing fees","type":"stripe_fee"},{"amount":500,"application":"ca_68FQcZXEcV66Kjg7egLnR1Ce87cqwoue","currency":"usd","description":"OpenCollective application fee","type":"application_fee"}],"net":9180,"source":"ch_1BZuPrLzdXg9xKNSn7yYwicg","sourced_transfers":{"object":"list","data":[],"has_more":false,"total_count":0,"url":"/v1/transfers?source_transaction=ch_1BZuPrLzdXg9xKNSn7yYwicg"},"status":"pending","type":"charge"}, [ 'Server',
+  .get('/v1/balance/history/txn_1BbcNVLzdXg9xKNSCEaOBrtH')
+  .reply(200, {"id":"txn_1BbcNVLzdXg9xKNSCEaOBrtH","object":"balance_transaction","amount":10000,"available_on":1514246400,"created":1513894740,"currency":"usd","description":"Matching 2x user2's donation","fee":820,"fee_details":[{"amount":500,"application":"ca_68FQcZXEcV66Kjg7egLnR1Ce87cqwoue","currency":"usd","description":"OpenCollective application fee","type":"application_fee"},{"amount":320,"application":null,"currency":"usd","description":"Stripe processing fees","type":"stripe_fee"}],"net":9180,"source":"ch_1BbcNULzdXg9xKNSB1VJURDh","sourced_transfers":{"object":"list","data":[],"has_more":false,"total_count":0,"url":"/v1/transfers?source_transaction=ch_1BbcNULzdXg9xKNSB1VJURDh"},"status":"pending","type":"charge"}, [ 'Server',
   'nginx',
   'Date',
-  'Sun, 17 Dec 2017 05:10:25 GMT',
+  'Thu, 21 Dec 2017 22:19:02 GMT',
   'Content-Type',
   'application/json',
   'Content-Length',
-  '916',
+  '913',
   'Connection',
   'close',
   'Access-Control-Allow-Credentials',
@@ -404,7 +404,7 @@ nock('https://api.stripe.com:443', {"encodedQueryParams":true})
   'Cache-Control',
   'no-cache, no-store',
   'Request-Id',
-  'req_kcD31GZipsYbEc',
+  'req_grUposnLVlJPJL',
   'Stripe-Account',
   'acct_18KWlTLzdXg9xKNS',
   'Stripe-Version',
@@ -414,10 +414,10 @@ nock('https://api.stripe.com:443', {"encodedQueryParams":true})
 
 nock('https://api.stripe.com:443', {"encodedQueryParams":true})
   .post('/v1/tokens', "card%5Bnumber%5D=4242424242424242&card%5Bexp_month%5D=12&card%5Bexp_year%5D=2028&card%5Bcvc%5D=222")
-  .reply(200, {"id":"tok_1BZuPwDjPFcHOcTmB3tvvXCp","object":"token","card":{"id":"card_1BZuPwDjPFcHOcTmie1AXZV9","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","cvc_check":"unchecked","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"ftgJeBXvQSZ4HMCg","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null},"client_ip":"68.173.154.69","created":1513487428,"livemode":false,"type":"card","used":false}, [ 'Server',
+  .reply(200, {"id":"tok_1BbcNZDjPFcHOcTmxYufJH2r","object":"token","card":{"id":"card_1BbcNZDjPFcHOcTm3eh3hrQR","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","cvc_check":"unchecked","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"ftgJeBXvQSZ4HMCg","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null},"client_ip":"68.173.154.69","created":1513894745,"livemode":false,"type":"card","used":false}, [ 'Server',
   'nginx',
   'Date',
-  'Sun, 17 Dec 2017 05:10:28 GMT',
+  'Thu, 21 Dec 2017 22:19:05 GMT',
   'Content-Type',
   'application/json',
   'Content-Length',
@@ -437,7 +437,7 @@ nock('https://api.stripe.com:443', {"encodedQueryParams":true})
   'Cache-Control',
   'no-cache, no-store',
   'Request-Id',
-  'req_Bim8iB5Cbfj4P3',
+  'req_zs5COZIPyCqoxI',
   'Stripe-Version',
   '2015-04-07',
   'Strict-Transport-Security',
@@ -445,10 +445,10 @@ nock('https://api.stripe.com:443', {"encodedQueryParams":true})
 
 nock('https://api.stripe.com:443', {"encodedQueryParams":true})
   .post('/v1/tokens', "card%5Bnumber%5D=4242424242424242&card%5Bexp_month%5D=12&card%5Bexp_year%5D=2028&card%5Bcvc%5D=222")
-  .reply(200, {"id":"tok_1BZuPwDjPFcHOcTm63oGyk6w","object":"token","card":{"id":"card_1BZuPwDjPFcHOcTmN1kmeCi1","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","cvc_check":"unchecked","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"ftgJeBXvQSZ4HMCg","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null},"client_ip":"68.173.154.69","created":1513487428,"livemode":false,"type":"card","used":false}, [ 'Server',
+  .reply(200, {"id":"tok_1BbcNZDjPFcHOcTmRFLb4lBB","object":"token","card":{"id":"card_1BbcNZDjPFcHOcTmnBY9LGiv","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","cvc_check":"unchecked","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"ftgJeBXvQSZ4HMCg","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null},"client_ip":"68.173.154.69","created":1513894745,"livemode":false,"type":"card","used":false}, [ 'Server',
   'nginx',
   'Date',
-  'Sun, 17 Dec 2017 05:10:28 GMT',
+  'Thu, 21 Dec 2017 22:19:05 GMT',
   'Content-Type',
   'application/json',
   'Content-Length',
@@ -468,7 +468,7 @@ nock('https://api.stripe.com:443', {"encodedQueryParams":true})
   'Cache-Control',
   'no-cache, no-store',
   'Request-Id',
-  'req_M4w9B5Gqqc9px3',
+  'req_YcbgRE6QJszNxz',
   'Stripe-Version',
   '2015-04-07',
   'Strict-Transport-Security',

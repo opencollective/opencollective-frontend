@@ -148,7 +148,7 @@ describe('graphql.matchingFund.test.js', () => {
     expect(transactions[3].amount).to.equal(user1.paymentMethod.matching * order.totalAmount);
 
     const balance = await user1.paymentMethod.getBalanceForUser(user2);
-    expect(balance.amount).to.equal(141530); // €1,500 - $100
+    expect(balance.amount).to.equal(141568); // €1,500 - $100
 
   });
 
