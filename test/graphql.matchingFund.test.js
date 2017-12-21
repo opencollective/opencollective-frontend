@@ -144,7 +144,7 @@ describe('graphql.matchingFund.test.js', () => {
     expect(transactions[0].CollectiveId).to.equal(user2.CollectiveId);
     expect(transactions[0].description).to.equal(`Donation to tipbox`);
     expect(transactions[2].CollectiveId).to.equal(user1.CollectiveId);
-    expect(transactions[2].description).to.equal(`Matching 2x donation from user2`);
+    expect(transactions[2].description).to.equal(`Matching 2x user2's donation`);
     expect(transactions[3].amount).to.equal(user1.paymentMethod.matching * order.totalAmount);
 
     const balance = await user1.paymentMethod.getBalanceForUser(user2);
