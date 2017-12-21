@@ -194,6 +194,10 @@ const generateEmailFromTemplate = (template, recipient, data, options = {}) => {
       template += '.sustainoss';
   }
 
+  if (template === 'donationmatched') {
+    if (data.collective.slug.match(/wwcode/))
+      template += '.wwcode';
+  }
   if (template === 'thankyou') {
     if (data.collective.slug.match(/wwcode/))
       template += '.wwcode';

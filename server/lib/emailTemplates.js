@@ -11,6 +11,7 @@ const templateNames = [
   'announcement',
   'announcement.text',
   'donationmatched',
+  'donationmatched.wwcode',
   'email.approve',
   'email.message',
   'github.signup',
