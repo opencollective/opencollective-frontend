@@ -13,7 +13,8 @@ class CollectiveCard extends React.Component {
 
   static propTypes = {
     collective: PropTypes.object.isRequired,
-    membership: PropTypes.object
+    membership: PropTypes.object,
+    LoggedInUser: PropTypes.object
   }
 
   constructor(props) {
@@ -22,7 +23,7 @@ class CollectiveCard extends React.Component {
 
 
   render() {
-    const { collective, membership } = this.props;
+    const { collective, membership, LoggedInUser } = this.props;
 
     const logo = imagePreview(collective.image, pickLogo(collective.id), { height: 128 });
 
@@ -53,10 +54,14 @@ class CollectiveCard extends React.Component {
       coverStyle.backgroundPosition = 'center center';
     }
 
-   const description = (collective.description && firstSentence(collective.description, 64)) ||(collective.longDescription && firstSentence(collective.longDescription, 64))
+    const description = (collective.description && firstSentence(collective.description, 64)) ||(collective.longDescription && firstSentence(collective.longDescription, 64))
 
+    const linkParams = { slug: this.props.collective.slug};
+    if (LoggedInUser) {
+      linkParams.referral = LoggedInUser.CollectiveId;
+    }
     return (
-      <Link route={'collective'} params={{ slug: this.props.collective.slug}} target="_top">
+      <Link route={'collective'} params={linkParams} target="_top">
         <a className={`CollectiveCard ${collective.type}`} >
           <style jsx>{`
           .CollectiveCard {
@@ -146,7 +151,7 @@ class CollectiveCard extends React.Component {
             text-align: center;
           }
 
-          .membership, .stats, .totalDonations {
+          .membership, .stats, .totalDonations, .totalRaised {
             border-top: 1px solid #f2f2f2;
             padding: 1rem;
             color: #303233;
@@ -159,7 +164,7 @@ class CollectiveCard extends React.Component {
             justify-content: space-around;
           }
 
-          .totalDonationsAmount {
+          .totalDonationsAmount, .totalRaisedAmount {
             font-size: 2rem;
           }
 
@@ -251,6 +256,14 @@ class CollectiveCard extends React.Component {
                   <Currency value={membership.stats.totalDonations} currency={membership.collective.currency} />
                 </div>
                 <FormattedMessage id='membership.totalDonations.title' defaultMessage={`amount contributed`} />
+              </div>
+            }
+            { membership && membership.role === 'FUNDRAISER' && membership.stats.totalRaised > 0 &&
+              <div className="totalRaised">
+                <div className="totalRaisedAmount">
+                  <Currency value={membership.stats.totalRaised} currency={membership.collective.currency} />
+                </div>
+                <FormattedMessage id='membership.totalRaised.title' defaultMessage={`amount raised`} />
               </div>
             }
           </div>

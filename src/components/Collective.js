@@ -37,7 +37,6 @@ class Collective extends React.Component {
     this.collective = this.props.collective; // pre-loaded by SSR
     this.updateOrder = this.updateOrder.bind(this);
     this.resetOrder = this.resetOrder.bind(this);
-    this.handleOrderTier = this.handleOrderTier.bind(this);
 
     this.state = {
       view: 'default',
@@ -50,11 +49,13 @@ class Collective extends React.Component {
       'collective.members.admin.title': { id: 'collective.members.admin.title', defaultMessage: `{n} {n, plural, one {core contributor} other {core contributors}}`},
       'collective.members.member.title': { id: 'collective.members.member.title', defaultMessage: `{n} {n, plural, one {member} other {members}}`},
       'collective.members.backer.title': { id: 'collective.members.backer.title', defaultMessage: `{n} {n, plural, one {backer} other {backers}}`},
+      'collective.members.fundraiser.title': { id: 'collective.members.fundraiser.title', defaultMessage: `{n} {n, plural, one {fundraiser} other {fundraisers}}`},
       'collective.members.follower.title': { id: 'collective.members.follower.title', defaultMessage: `{n} {n, plural, one {follower} other {followers}}`},
       'collective.menu.host': { id: 'collective.menu.host', defaultMessage: `contributing to {n} {n, plural, one {collective} other {collectives}}`},
       'collective.menu.admin': { id: 'collective.menu.admin', defaultMessage: `contributing to {n} {n, plural, one {collective} other {collectives}}`},
       'collective.menu.member': { id: 'collective.menu.member', defaultMessage: `member of {n} {n, plural, one {collective} other {collectives}}`},
       'collective.menu.backer': { id: 'collective.menu.backer', defaultMessage: `backing {n} {n, plural, one {collective} other {collectives}}`},
+      'collective.menu.fundraiser': { id: 'collective.menu.fundraiser', defaultMessage: `raised money for {n} {n, plural, one {collective} other {collectives}}`},
       'collective.menu.follower': { id: 'collective.menu.follower', defaultMessage: `following {n} {n, plural, one {collective} other {collectives}}`},
     });
   }
@@ -105,29 +106,8 @@ class Collective extends React.Component {
     this.setState({ order: {} });
   }
 
-  handleOrderTier(tier) {
-    this.updateOrder(tier);
-    const order = this.state.order;
-    order.tier = { id: tier.id };
-
-    // If the total amount is 0 and the user is logged in, we can directly RSVP.
-    if (order.totalAmount === 0 && this.props.LoggedInUser) {
-      order.user = { id: this.props.LoggedInUser.id };
-      return this.createOrder(order);
-    }
-    this.setState({ order });
-    let route = `/${this.props.collective.slug}/order/${order.tier.id}`;
-    if (order.totalAmount) {
-      route += `/${order.totalAmount / 100}`;
-    }
-    if (order.interval) {
-      route += `/${order.interval}`;
-    }
-    Router.pushRoute(route);
-  }
-
   render() {
-    const { intl, LoggedInUser } = this.props;
+    const { intl, LoggedInUser, query: { referral } } = this.props;
 
     const actions = [
       {
@@ -160,7 +140,7 @@ class Collective extends React.Component {
       },
       {
         className: 'blue',
-        component: <Link route={'donate'} params={{ collectiveSlug: this.collective.slug, verb: 'donate'}}><a>
+        component: <Link route={'donate'} params={{ collectiveSlug: this.collective.slug, verb: 'donate', referral }}><a>
             <FormattedMessage
               id="collective.donate"
               defaultMessage={`donate`}
@@ -270,6 +250,7 @@ class Collective extends React.Component {
                     <TierCard
                       collective={this.collective}
                       tier={tier}
+                      referral={referral}
                       />
                   ))}
                 </div>

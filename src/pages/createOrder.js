@@ -14,6 +14,7 @@ import { graphql } from 'react-apollo'
 import gql from 'graphql-tag'
 import Loading from '../components/Loading';
 import NotFound from '../components/NotFound';
+import storage from '../lib/storage';
 import { pick } from 'lodash';
 
 class CreateOrderPage extends React.Component {
@@ -49,22 +50,39 @@ class CreateOrderPage extends React.Component {
 
   async componentDidMount() {
     const { getLoggedInUser, data } = this.props;
+    const newState = {};
     const LoggedInUser = getLoggedInUser && await getLoggedInUser();
     if (!data.Tier && data.fetchData) {
       data.fetchData();
     }
-    this.setState({ LoggedInUser });
+    if (LoggedInUser) {
+      newState.LoggedInUser = LoggedInUser;
+    }
+    this.referral = storage.get('referral');
+    const matchingFund = storage.get('matchingFund');
+    if (matchingFund) {
+      newState.matchingFund = matchingFund;
+    }
+    this.setState(newState);
   }
 
   async createOrder(order) {
     const { intl, data } = this.props;
     order.collective = { id: data.Collective.id };
+
+    if (this.referral) {
+      order.referral = { id: this.referral }
+    }
+    if (this.state.matchingFund) {
+      order.matchingFund = this.state.matchingFund;
+    }
     order.paymentMethod = pick(order.paymentMethod, ['uuid', 'service', 'type', 'token', 'customerId', 'data', 'name', 'currency', 'save']);
     if (this.state.LoggedInUser) {
       delete order.user;
     }
     try {
       this.setState({ loading: true});
+      console.log(">>> createOrder", order);
       const res = await this.props.createOrder(order);
       const orderCreated = res.data.createOrder;
       this.setState({ loading: false, order, result: { success: intl.formatMessage(this.messages['order.success']) } });
@@ -163,6 +181,7 @@ class CreateOrderPage extends React.Component {
               LoggedInUser={this.state.LoggedInUser}
               onSubmit={this.createOrder}
               redeemFlow={this.props.redeem}
+              matchingFund={this.state.matchingFund}
               />
             <div className="result">
               <div className="success">{this.state.result.success}</div>

@@ -79,7 +79,12 @@ class TierCard extends React.Component {
 
     const onClick = () => {
       if (disabled) return;
-      Router.pushRoute(`/${collective.slug}/order/${tier.id}`);
+      const { referral } = this.props;
+      const params = { collectiveSlug: collective.slug, TierId: tier.id };
+      if (referral) {
+        params.referral = referral;
+      }
+      Router.pushRoute('orderCollectiveTier', params);
     }
 
     return (
