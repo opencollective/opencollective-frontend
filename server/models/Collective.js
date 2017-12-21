@@ -571,8 +571,7 @@ export default function(Sequelize, DataTypes) {
     lists[roles.HOST] = 'host';
 
     const notifications = [
-      { type: `mailinglist.${lists[role]}` },
-      { type: activities.COLLECTIVE_EXPENSE_CREATED }
+      { type: `mailinglist.${lists[role]}` }
     ];
 
     switch (role) {
@@ -581,6 +580,7 @@ export default function(Sequelize, DataTypes) {
         this.update({ HostCollectiveId: user.CollectiveId });
         break;
       case roles.ADMIN:
+        notifications.push({ type: activities.COLLECTIVE_EXPENSE_CREATED });
         notifications.push({ type: activities.COLLECTIVE_MEMBER_CREATED });
         notifications.push({ type: 'collective.monthlyreport' });
         break;
@@ -597,7 +597,7 @@ export default function(Sequelize, DataTypes) {
     debug("addUserWithRole", user.id, role, "member", member);
     return Promise.all([
       models.Member.create(member),
-      models.Notification.createMany(notifications, { UserId: user.id, CollectiveId: this.id, channel: 'email' }),
+      models.Notification.createMany(notifications, { UserId: user.id, CollectiveId: this.id, channel: 'email' }).catch(e => console.error(`Collective.addUserWithRole error while creating entries in Notifications table for UserId ${user.id} (role: ${role}, CollectiveId: ${this.id}): `, e)),
       models.User.findById(member.CreatedByUserId, { include: [ { model: models.Collective, as: 'collective' }] }),
       models.User.findById(user.id, { include: [ { model: models.Collective, as: 'collective' }] })
     ])
