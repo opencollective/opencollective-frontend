@@ -185,7 +185,7 @@ const checkOrders = () => {
   return sequelize.query(`
     SELECT o.id from "Orders" o
     LEFT JOIN "PaymentMethods" pm on o."PaymentMethodId" = pm.id
-    WHERE o."deletedAt" is null AND o."processedAt" is not null AND o."CollectiveId" != 1 AND pm.service not ilike 'prepaid'
+    WHERE o."deletedAt" is null AND o."processedAt" is not null AND o."CollectiveId" != 1 AND pm.service not ilike 'opencollective' AND pm.type not ilike 'prepaid'
     `, { type: sequelize.QueryTypes.SELECT
     })
     .then(o => {
