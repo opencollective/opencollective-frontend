@@ -597,7 +597,7 @@ export default function(Sequelize, DataTypes) {
     debug("addUserWithRole", user.id, role, "member", member);
     return Promise.all([
       models.Member.create(member),
-      models.Notification.createMany(notifications, { UserId: user.id, CollectiveId: this.id, channel: 'email' }),
+      models.Notification.createMany(notifications, { UserId: user.id, CollectiveId: this.id, channel: 'email' }).catch(e => console.error(`Collective.addUserWithRole error while creating entries in Notifications table for UserId ${user.id} (role: ${role}, CollectiveId: ${this.id}): `, e)),
       models.User.findById(member.CreatedByUserId, { include: [ { model: models.Collective, as: 'collective' }] }),
       models.User.findById(user.id, { include: [ { model: models.Collective, as: 'collective' }] })
     ])
