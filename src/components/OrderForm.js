@@ -624,6 +624,9 @@ class OrderForm extends React.Component {
           margin: 0.5rem;
           font-size: 1.2rem;
         }
+        .bitcoin.disclaimer {
+          margin: -1rem 0 2rem;
+        }
         p {
           margin-top: -2.5rem;
           color: #737373;
@@ -787,6 +790,9 @@ class OrderForm extends React.Component {
                   <label className="col-sm-3 control-label">
                   </label>
                   <Col sm={9}>
+                    <div className="bitcoin disclaimer">
+                      <FormattedMessage id="paymentMethod.bitcoin.disclaimer" defaultMessage="Note: Bitcoin donations are automatically converted to US dollars (USD). Only one time donations are supported. The bitcoin address (and QR code) is different for each donation (so please don't share this address)." />
+                    </div>
                     <RequestBitcoin
                       USDamount={order.totalAmount}
                       satoshis={this.state.paymentMethod.amount}

@@ -70,7 +70,7 @@ class CreateOrderPage extends React.Component {
       this.setState({ loading: false, order, result: { success: intl.formatMessage(this.messages['order.success']) } });
       Router.pushRoute('collective', { 
         slug: orderCreated.fromCollective.slug,
-        status: 'orderCreated',
+        status: order.paymentMethod.type === 'bitcoin' ? 'orderProcessing' : 'orderCreated',
         CollectiveId: order.collective.id,
         TierId: order.tier && order.tier.id,
         type: data.Collective.type,
