@@ -90,11 +90,7 @@ const validatePayment = (payment) => {
   }
 }
 
-<<<<<<< HEAD
 const sendConfirmationEmail = async (order) => {
-=======
-const sendOrderConfirmedEmail = (order) => {
->>>>>>> 685b60f44601785df2ebbb7237d99cbe9ddbea84
 
   const { collective, tier, interval, fromCollective } = order;
   const user = order.createdByUser;
