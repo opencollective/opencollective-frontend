@@ -140,7 +140,7 @@ export function createOrder(_, args, req) {
     // check if the MatchingFund is valid and has enough funds
     .then(async () => {
       if (order.matchingFund) {
-        const matchingPaymentMethod = await models.PaymentMethod.getMatchingFund(order.matchingFund);
+        const matchingPaymentMethod = await models.PaymentMethod.getMatchingFund(order.matchingFund, { ForCollectiveId: collective.id });
         const canBeUsedForOrder = await matchingPaymentMethod.canBeUsedForOrder(order, user);
         if (canBeUsedForOrder) return matchingPaymentMethod;
         else return null;

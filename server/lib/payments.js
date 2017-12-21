@@ -48,7 +48,7 @@ export const executeOrder = (user, order, options) => {
     })
     .then(() => {
       const paymentProvider = (order.paymentMethod) ? order.paymentMethod.service : 'manual';
-      return ppaymentProviders[paymentProvider].types[order.paymentMethod.type || 'default'].processOrder(order, options)  // eslint-disable-line import/namespace
+      return paymentProviders[paymentProvider].types[order.paymentMethod.type || 'default'].processOrder(order, options)  // eslint-disable-line import/namespace
         .tap(async () => {
           if (!order.matchingFund) return;
           // if there is a matching fund, we execute the order
@@ -90,7 +90,7 @@ const validatePayment = (payment) => {
   }
 }
 
-const sendConfirmationEmail = async (order) => {
+const sendOrderConfirmedEmail = async (order) => {
 
   const { collective, tier, interval, fromCollective } = order;
   const user = order.createdByUser;
