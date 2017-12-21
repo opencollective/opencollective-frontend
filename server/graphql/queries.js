@@ -35,7 +35,7 @@ const queries = {
       slug: { type: new GraphQLNonNull(GraphQLString) }
     },
     resolve(_, args) {
-      return models.Collective.findBySlug(args.slug);
+      return models.Collective.findBySlug(args.slug.toLowerCase());
     }
   },
 
@@ -267,11 +267,11 @@ const queries = {
       }
 
       if (args.collectiveSlug) {
-        args.CollectiveId = await fetchCollectiveId(args.collectiveSlug);
+        args.CollectiveId = await fetchCollectiveId(args.collectiveSlug.toLowerCase());
       }
 
       if (args.memberCollectiveSlug) {
-        args.MemberCollectiveId = await fetchCollectiveId(args.memberCollectiveSlug);
+        args.MemberCollectiveId = await fetchCollectiveId(args.memberCollectiveSlug.toLowerCase());
       }
 
       const memberTable = args.MemberCollectiveId ? 'collective' : 'memberCollective';
