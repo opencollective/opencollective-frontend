@@ -324,7 +324,7 @@ export default {
             if (!charge) {
               throw new errors.BadRequest(`ChargeId not found: ${chargeId}`);
             }
-            // retreive balance, which has info we need to record transaction
+            // retrieve balance, which has info we need to record transaction
             return retrieveBalanceTransaction({ username: requestBody.user_id }, charge.balance_transaction)
             .then(balanceTransaction => {
               if (!balanceTransaction) {
