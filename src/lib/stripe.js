@@ -19,6 +19,9 @@ const getStripeToken = (type = 'cc', data) => {
   switch (type) {
     case 'cc': // credit card
       return stripe.createToken(data).then(res => {
+        if (res.error) {
+          throw new Error(res.error.message);
+        }
         return { token: res.token.id, card: res.token.card };
       });
       break;
@@ -34,6 +37,9 @@ const getStripeToken = (type = 'cc', data) => {
           name: data.name
         }
       }).then(function(res) {
+        if (res.error) {
+          throw new Error(res.error.message);
+        }
         return { token: res.source.id, card: res.source.bitcoin };
       });
   }
