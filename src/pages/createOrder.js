@@ -68,13 +68,9 @@ class CreateOrderPage extends React.Component {
 
   async createOrder(order) {
     const { intl, data } = this.props;
-    order.collective = { id: data.Collective.id };
 
-    if (this.referral) {
+    if (this.referral && this.referral > 0) {
       order.referral = { id: this.referral }
-    }
-    if (this.state.matchingFund) {
-      order.matchingFund = this.state.matchingFund;
     }
     order.paymentMethod = pick(order.paymentMethod, ['uuid', 'service', 'type', 'token', 'customerId', 'data', 'name', 'currency', 'save']);
     if (this.state.LoggedInUser) {
