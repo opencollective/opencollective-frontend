@@ -1,13 +1,15 @@
 import Promise from 'bluebird';
 
-import models from '../models';
-import { type as TransactionTypes } from '../constants/transactions';
-import roles from '../constants/roles';
+import models from '../../models';
+import { type as TransactionTypes } from '../../constants/transactions';
+import roles from '../../constants/roles';
 
 export default {
   features: {
-    recurring: false
+    recurring: false,
+    waitToCharge: false
   },
+  
   getBalance: (paymentMethod) => {
     return Promise.resolve({ amount: paymentMethod.monthlyLimitPerMember, currency: paymentMethod.currency});
   },
@@ -62,7 +64,8 @@ export default {
           // create new payment method to allow User to use the money
           .then(() => models.PaymentMethod.create({
             name: originalPM.name,
-            service: 'opencollective', // now becomes paymentMethod of type 'opencollective', instead of 'prepaid'
+            service: 'opencollective', 
+            type: 'collective', // changes to type collective
             confirmedAt: new Date(),
             CollectiveId: user.CollectiveId,
             CreatedByUserId: user.id,

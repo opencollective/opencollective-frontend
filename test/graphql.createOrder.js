@@ -64,6 +64,7 @@ const createOrderQuery = `
   const constants = {
   paymentMethod: {
     service: "stripe",
+    type: 'creditcard',
     data: {
       expMonth: 11,
       expYear: 2025
@@ -112,7 +113,6 @@ describe('createOrder', () => {
         email: "jsmith@email.com"
       };
       order.paymentMethod.token = stripeCardToken;
-
       const res = await utils.graphqlQuery(createOrderQuery, { order });
       res.errors && console.error(res.errors);
       expect(res.errors).to.not.exist;
@@ -470,6 +470,7 @@ describe('createOrder', () => {
       const paymentMethod = await models.PaymentMethod.create({
         CreatedByUserId: xdamman.id,
         service: 'opencollective',
+        type: 'collective',
         CollectiveId: fromCollective.id
       });
 

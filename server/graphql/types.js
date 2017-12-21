@@ -815,6 +815,12 @@ export const PaymentMethodType = new GraphQLObjectType({
           return paymentMethod.service;
         }
       },
+      type: {
+        type: GraphQLString,
+        resolve(paymentMethod) {
+          return paymentMethod.type;
+        }
+      },
       data: {
         type: GraphQLJSON,
         resolve(paymentMethod) {

@@ -346,6 +346,7 @@ export default function(Sequelize, DataTypes) {
         models.PaymentMethod.create({
           CollectiveId: instance.id,
           service: 'opencollective',
+          type: 'collective',
           name: `${capitalize(instance.name)} Collective`,
           primary: true,
           currency: instance.currency
@@ -368,6 +369,7 @@ export default function(Sequelize, DataTypes) {
         return models.PaymentMethod.create({
           CollectiveId: this.id,
           service: 'opencollective',
+          type: 'collective',
           name: `${capitalize(this.name)} Collective`,
           primary: true,
           currency: this.currency
@@ -797,7 +799,7 @@ export default function(Sequelize, DataTypes) {
           pm.CollectiveId = this.id;
           pm.currency = pm.currency || this.currency;
           models.PaymentMethod.update({ primary: false }, { where: { CollectiveId: this.id, archivedAt: { $eq: null } }});
-          return models.PaymentMethod.createFromStripeSourceToken({ ...defaultAttributes, ...pm });
+          return models.PaymentMethod.createFromStripeSourceToken({ ...defaultAttributes, ...pm, type: 'creditcard' }); // TODO: nicer to not have to hard code 'creditcard'
         }
       });
     })

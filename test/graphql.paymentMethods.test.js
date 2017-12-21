@@ -56,6 +56,7 @@ describe('graphql.paymentMethods.test.js', () => {
 
   beforeEach('create a paypal paymentMethod', () => models.PaymentMethod.create({
     service: 'paypal',
+    type: 'adaptive',
     name: 'host@paypal.com',
     data:  { redirect: "http://localhost:3000/brusselstogether/collectives/expenses" },
     token: 'PA-5GM04696CF662222W',
@@ -91,7 +92,8 @@ describe('graphql.paymentMethods.test.js', () => {
       return models.PaymentMethod.findOne({
         where: {
           service: 'opencollective',
-          CollectiveId: host.id
+          CollectiveId: host.id,
+          type: 'collective'
         }
       }).then(pm => {
         order = {
@@ -252,6 +254,7 @@ describe('graphql.paymentMethods.test.js', () => {
           paymentMethods {
             id
             service
+            type
             balance
             currency
           }

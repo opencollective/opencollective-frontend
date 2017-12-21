@@ -448,6 +448,9 @@ export default (Sequelize, DataTypes) => {
         debug("getPersonalDetails", "remoteUser id:", remoteUser.id, "is admin of collective ids:", adminOfCollectives, "this user id:", this.id, "is member of", memberOfCollectives, "canAccess?", canAccess);
         return canAccess;
       })
+      .then(canAccess => {
+        return canAccess ? this.info : this.public;
+      });
   }
 
 

@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
 import sinon from 'sinon';
-import * as stripe from '../server/gateways/stripe';
+import * as stripe from '../server/paymentProviders/stripe/gateway';
 import Promise from 'bluebird';
 import * as utils from './utils';
 import models from '../server/models';
