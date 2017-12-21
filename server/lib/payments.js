@@ -53,6 +53,7 @@ export const executeOrder = (user, order, options) => {
           if (!order.matchingFund) return;
           // if there is a matching fund, we execute the order
           // also adds the owner of the matching fund as a BACKER of collective
+          order.createdByUser = await models.User.findOne({ where: { CollectiveId: order.matchingFund.CollectiveId }});
           order.paymentMethod = order.matchingFund;
           order.totalAmount = order.totalAmount * order.matchingFund.matching;
           order.FromCollectiveId = order.matchingFund.CollectiveId;
