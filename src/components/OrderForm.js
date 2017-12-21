@@ -777,6 +777,7 @@ class OrderForm extends React.Component {
               className="horizontal"
               placeholder={intl.formatMessage(this.messages['order.publicMessage.placeholder'])}
               defaultValue={order.publicMessage}
+              maxlength={255}
               onChange={(value) => this.handleChange("order", "publicMessage", value)}
               />
             </Col>

@@ -73,6 +73,9 @@ class CreateOrderPage extends React.Component {
     if (this.referral) {
       order.referral = { id: this.referral }
     }
+    if (this.state.matchingFund) {
+      order.matchingFund = this.state.matchingFund;
+    }
     order.paymentMethod = pick(order.paymentMethod, ['uuid', 'service', 'type', 'token', 'customerId', 'data', 'name', 'currency', 'save']);
     if (this.state.LoggedInUser) {
       delete order.user;

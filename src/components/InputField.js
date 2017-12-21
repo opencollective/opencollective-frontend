@@ -154,6 +154,7 @@ class InputField extends React.Component {
                           placeholder={this.props.placeholder}
                           name={field.name}
                           help={field.help}
+                          maxlength={field.maxlength}
                           value={this.state.value || this.props.defaultValue}
                           onChange={event => this.handleChange(event.target.value)}
                         />

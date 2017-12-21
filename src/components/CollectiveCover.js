@@ -297,7 +297,7 @@ ${description}`
                   </div>
                   <FormattedMessage id="collective.stats.totalAmountSent.label" defaultMessage="Total amount donated" />
                 </div>
-                { stats.totalAmountRaised &&
+                { stats.totalAmountRaised > 0 &&
                   <div className="stat">
                     <div className="totalAmountRaised value">
                       <Currency value={stats.totalAmountRaised} currency={collective.currency} />
