@@ -110,10 +110,11 @@ class Collective extends React.Component {
   render() {
     const { intl, LoggedInUser, query: { referral } } = this.props;
 
+    const backersHash = this.collective.stats.backers.organizations > 0 ? '#organizations' : '#backers';
     const actions = [
       {
         className: 'whiteblue',
-        component: <HashLink to={`#organizations`}>
+        component: <HashLink to={backersHash}>
               <FormattedMessage
                 id="collective.stats.backers.users"
                 defaultMessage="{n} {n, plural, one {backer} other {backers}}"
