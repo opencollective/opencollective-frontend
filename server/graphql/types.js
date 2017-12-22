@@ -293,6 +293,12 @@ export const ExpenseType = new GraphQLObjectType({
           return expense.createdAt;
         }
       },
+      updatedAt: {
+        type: GraphQLString,
+        resolve(expense) {
+          return expense.updatedAt;
+        }
+      },
       incurredAt: {
         type: GraphQLString,
         resolve(expense) {
