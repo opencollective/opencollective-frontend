@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Dropzone from 'react-dropzone'
 import fetch from 'isomorphic-fetch';
+import { imagePreview } from '../lib/utils';
 
 class InputTypeDropzone extends React.Component {
 
@@ -15,7 +16,7 @@ class InputTypeDropzone extends React.Component {
   constructor(props) {
     super(props);
     this.handleChange = this.handleChange.bind(this);
-    this.state = { value: props.value };
+    this.state = { value: props.value, url: props.value }; // value can be base64 encoded after upload, url is always an url
   }
 
   /**
@@ -64,6 +65,7 @@ class InputTypeDropzone extends React.Component {
     .then(this.checkStatus)
     .then(json => {
       console.log(">>> upload response", json);
+      this.setState({ url: json.url });
       return this.props.onChange(json.url);
     })
     .catch(err => {
@@ -124,7 +126,7 @@ class InputTypeDropzone extends React.Component {
             return (
               <div>
                 <div className="placeholder">Drop an image or click to upload</div>
-                <img className="preview" src={this.state.value} />
+                <img className="preview" src={imagePreview(this.state.url, 128)} />
               </div>
             );
           }}
