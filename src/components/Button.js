@@ -26,8 +26,10 @@ class Button extends React.Component {
   }
 
   onClick(e) {
+    const { onClick, disabled } = this.props;
+    if (!onClick) return;
     e.preventDefault();
-    return !this.props.disabled && this.props.onClick && this.props.onClick();
+    return !disabled && onClick && onClick();
   }
 
   render() {
