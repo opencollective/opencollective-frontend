@@ -166,6 +166,7 @@ class OrderForm extends React.Component {
     if (collective.currency === 'USD' && !get(this.state, 'order.interval') && !get(this.state, 'order.tier.interval')) {
       paymentMethodTypeOptions.push({'bitcoin': intl.formatMessage(this.messages['paymentMethod.bitcoin'])});
     }
+    this.paymentMethodTypeOptions = paymentMethodTypeOptions;
     return paymentMethodTypeOptions;
   }
 
@@ -285,7 +286,7 @@ class OrderForm extends React.Component {
       if (this.paymentMethods.length > 0) {
         newState.creditcard = { uuid: this.paymentMethods[0].uuid };
       } else {
-        newState.creditcard = { save: true }; // reset to default value
+        newState.creditcard = { show: true, save: true }; // reset to default value
       }
     }
 
@@ -781,7 +782,7 @@ class OrderForm extends React.Component {
                   className="horizontal"
                   placeholder={intl.formatMessage(this.messages['order.publicMessage.placeholder'])}
                   defaultValue={order.publicMessage}
-                  maxlength={255}
+                  maxLength={255}
                   onChange={(value) => this.handleChange("order", "publicMessage", value)}
                   />
                 </Col>
@@ -790,18 +791,20 @@ class OrderForm extends React.Component {
             { order.totalAmount > 0 &&
               <div className="paymentDetails">
                 <h2><FormattedMessage id="tier.order.paymentDetails" defaultMessage="Payment details" /></h2>
-                <Row>
-                  <Col sm={12}>
-                    <InputField
-                    className="horizontal"
-                    type="select"
-                    name="paymentMethodTypeSelector"
-                    options={this.populatePaymentMethodTypes()}
-                    label={intl.formatMessage(this.messages['paymentMethod.type'])}
-                    onChange={(value) => this.handleChange("paymentMethod", "type", value)}
-                    />
-                  </Col>
-                </Row>
+                { this.paymentMethodTypeOptions > 0 &&
+                  <Row>
+                    <Col sm={12}>
+                      <InputField
+                      className="horizontal"
+                      type="select"
+                      name="paymentMethodTypeSelector"
+                      options={this.paymentMethodTypeOptions}
+                      label={intl.formatMessage(this.messages['paymentMethod.type'])}
+                      onChange={(value) => this.handleChange("paymentMethod", "type", value)}
+                      />
+                    </Col>
+                  </Row>
+                }
                 { this.state.paymentMethod.type === 'bitcoin' &&
                   <Row>
                     <Col sm={12}>

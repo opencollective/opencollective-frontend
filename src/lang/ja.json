@@ -242,7 +242,7 @@
   "user.twitterHandle.label": "twitter",
   "user.twitterHandle.description": "If any",
   "user.email.description": "* が必要です",
-  "signin.createAccount.description": "Welcome back! Click on \"Login\" (or hit Enter) and we will send you a link to login by email.",
+  "signin.createAccount.description": "There is no user with this email address. Click on \"Sign Up\" to create a new Open Collective Account.",
   "signin.emailSent.description": "メールが送信されました。メールに記載された手順に従ってログインしてください。",
   "user.description.description": "Present yourself in 60 characters or less, if you can!",
   "tier.totalAmount.label": "Total amount",
