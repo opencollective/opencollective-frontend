@@ -107,6 +107,13 @@ class Expense extends React.Component {
     }
     mode = mode || 'summary';
 
+    const canReject = LoggedInUser
+      && LoggedInUser.canApproveExpense(expense)
+      && (
+        expense.status === 'PENDING'
+        || (expense.status === 'APPROVED' && (Date.now() - (new Date(expense.updatedAt).getTime())) < 60 * 1000 * 15) // we can reject an expense for up to 10mn after approving it
+      );
+
     return (
       <div className={`expense ${status} ${this.state.mode}View`}>
         <style jsx>{`
@@ -252,7 +259,7 @@ class Expense extends React.Component {
                     />
                 }
                 { expense.status !== 'APPROVED' && expense.status !== 'PAID' && <ApproveExpenseBtn id={expense.id} /> }
-                { expense.status !== 'REJECTED' && expense.status !== 'PAID' && <RejectExpenseBtn id={expense.id} /> }
+                { canReject && <RejectExpenseBtn id={expense.id} /> }
               </div>
             }
           </div>
