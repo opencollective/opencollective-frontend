@@ -267,7 +267,7 @@ class UserCollective extends React.Component {
                         <li><Link route={`/${this.collective.slug}/collectives/expenses`}><a><FormattedMessage id="host.collectives.manage" defaultMessage="Manage expenses" /></a></Link></li>
                       }
                       { this.collective.settings.apply &&
-                        <li><Link><a href={`/${this.collective.slug}/apply`}><FormattedMessage id="host.apply" defaultMessage="Apply to create a collective" /></a></Link></li>
+                        <li><a href={`/${this.collective.slug}/apply`}><FormattedMessage id="host.apply" defaultMessage="Apply to create a collective" /></a></li>
                       }
                     </ul>
                   </div>
