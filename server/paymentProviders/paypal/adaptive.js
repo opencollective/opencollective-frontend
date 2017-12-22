@@ -19,7 +19,13 @@ export default {
 
   fees: async ({ amount, currency, host }) => {
     if (host.currency === currency)
-      return (0.029 * amount + 30);
+      /*
+        Paypal fees can vary from 2.9% + $0.30 to as much as 5% (maybe higher)
+        with 2.9%, we saw a collective go in negative. Changing minimum to 3.9% to 
+        reduce risk of negative balance (and taking on some risk of an expense not 
+        able to be paid out)
+       */
+      return (0.039 * amount + 30);
     else {
       return (0.05 * amount + 30);
     }
