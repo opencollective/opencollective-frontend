@@ -92,9 +92,10 @@ class LoginForm extends React.Component {
       if (isValidEmail(email)) {
         api.checkUserExistence(email).then(exists => {
           if (exists) {
-            this.setState({ signup: false, loginSent: false });
+            this.setState({ isNewUser: false, signup: false, loginSent: false });
+          } else {
+            this.setState({ isNewUser: true });
           }
-          this.setState({ isNewUser: !exists });
         })
         .catch(e => {
           if (e.message === "ECONNREFUSED") {
