@@ -44,7 +44,7 @@ class ExpensesWithData extends React.Component {
           expenses={expenses}
           refetch={data.refetch}
           editable={editable}
-          fetchMore={data.fetchMore}
+          fetchMore={this.props.fetchMore}
           LoggedInUser={LoggedInUser}
           includeHostedCollectives={includeHostedCollectives}
           />
