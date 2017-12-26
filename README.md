@@ -1,35 +1,85 @@
-# OpenCollective frontend for Events
+# Open Collective Frontend
 
-We are developing this new frontend for OpenCollective.com using [next](https://zeit.co/next)*.
+[![Circle CI](https://circleci.com/gh/opencollective/frontend/tree/master.svg?style=shield)](https://circleci.com/gh/opencollective/frontend/tree/master)
+[![Slack Status](https://slack.opencollective.com/badge.svg)](https://slack.opencollective.org)
 
-Our goal is to speed up development time thanks to Webpack and hot-module-reloading.
+![](https://d.pr/i/MOS677+)
 
-We also want to simplify the stack by removing Redux which seems overkill for our use (at least for now).
+## How to get started
 
-We are starting by implementing the new Events feature, as described in https://github.com/OpenCollective/OpenCollective/issues/177
+Note: If you see a step below that could be improved (or is outdated), please update instructions. We rarely go through this process ourselves, so your fresh pair of eyes and your recent experience with it, makes you the best candidate to improve them for other users.
 
-As we were brainstorming about the architecture ([whiteboard](https://cl.ly/3j160b3j203C/DB%20schema%20for%20events.jpg)), we realized that an Event is actually a collective on its own. Like a collective, an Event can have revenue and expenses. And tickets are the equivalent of the different membership/sponsorship Tiers of a collective. 
-Likewise, a campaign to raise money for a certain feature is also an "Event" where the tickets are the equivalent of the different "rewards" that you can find on crowdfunding platforms.
-So we have a path towards progressively moving the entire frontend to this new architecture.
+## Installation
 
-But, let's go step by step and for now the goal is to release the ability for a collective to create an event, issue tickets at different prices (including free and discounted prices for existing members), and check in the guests.
+1. Install the API
 
-## Live examples:
+We recommend creating a new directory in your dev folder for `opencollective`
 
-- https://opencollective.com/sustainoss/events/2017
-- https://opencollective.com/opencollective/events/meetup-1
-- https://opencollective.com/brusselstogether/events/meetup-2
+```
+mkdir opencollective;
+cd opencollective;
+git clone git@github.com:opencollective/opencollective-api.git api;
+cd api;
+npm install;
+```
 
-## TODO
+See the [API Github Repo](https://github.com/opencollective/opencollective-api) for more details.
 
-- [x] Implement the EventPage (including Google Maps)
-- [x] Implement the flow to show your interest for an event
-- [x] Implement the flow to register to a free event
-- [x] Implement the flow to register to a paid event
-- [ ] Implement the flow to register for a password protected ticket / discount code
-- [ ] Implement the flow for creating/editing an event
-- [ ] Add tests with Jest
-- [x] Find a solution for Server Side Rendering (SSR)
-- [ ] Implement check in guests
+2. Install the Frontend
 
-`* (we initially started with [create-react-app](https://github.com/facebookincubator/create-react-app) but their lack of support for Server Side Rendering made us switch to Next)
+```
+git clone git@github.com:opencollective/frontend.git frontend;
+cd frontend;
+npm install;
+```
+
+If you are using Ubuntu, make sure you have [GraphicsMagick](http://www.graphicsmagick.org) installed:
+
+```
+sudo apt-get install GraphicsMagick
+```
+
+3. Run
+
+```
+$> npm run dev
+```
+
+This will start the Frontend on http://localhost:3000 in development environment. It will automatically update whenever a file changes (using hot module reloading).
+
+The API comes with a sanitized version of the database that includes the following collectives:
+- [http://localhost:3000/opensource](http://localhost:3000/opensource)
+- [http://localhost:3000/apex](http://localhost:3000/apex)
+- [http://localhost:3000/railsgirlsatl](http://localhost:3000/railsgirlsatl)
+- [http://localhost:3000/tipbox](http://localhost:3000/tipbox)
+- [http://localhost:3000/brusselstogether](http://localhost:3000/brusselstogether)
+- [http://localhost:3000/veganizerbxl](http://localhost:3000/veganizerbxl)
+
+## Tests
+
+We are using [Jest](https://facebook.github.io/jest/) for testing.
+You can run the tests using `npm test` or more specifically `npm run test:server`, `npm run test:e2e`.
+
+End-to-end tests are using [Chromeless](https://github.com/graphcool/chromeless). If you are using Ubuntu, make sure you have Google Chrome installed (`sudo apt-get install google-chrome`).
+
+## Stack
+
+We are using NodeJS.
+
+The Frontend is using [next](https://zeit.co/next) (which includes Webpack and hot module reloading), React.
+
+The API is using Postgres, GraphQL.
+
+## Localize
+
+To add a translation to a new language, copy paste the `en.json` from `frontend/src/lang` and rename the copy using the 2 or 4 letter code for your country/language (e.g. `fr-BE.json` or `fr.json`).
+
+You will also need to copy paste the last line in `frontend/scripts/translate.js`:
+```
+fs.writeFileSync(LANG_DIR + 'ja.json', JSON.stringify(translatedMessages('ja'), null, 2));
+```
+
+and replace `ja` with your 2-4 letter locale code.
+
+Then you can submit a pull request, like this one :-)
+https://github.com/opencollective/frontend/pull/119
