@@ -167,7 +167,7 @@ class ExpenseDetails extends React.Component {
                 name="attachment"
                 className="attachmentField"
                 onChange={attachment => this.handleChange('attachment', attachment)}
-                value={previewAttachmentImage}
+                value={expense.attachment || '/static/images/receipt.svg'}
                 />
             }
             { !editMode && expense.attachment &&
