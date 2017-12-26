@@ -1,9 +1,11 @@
 # OpenCollective API
 
 [![Circle CI](https://circleci.com/gh/opencollective/opencollective-api/tree/master.svg?style=shield)](https://circleci.com/gh/opencollective/opencollective-api/tree/master)
-[![Slack Status](https://slack.opencollective.com/badge.svg)](https://slack.opencollective.com)
+[![Slack Status](https://slack.opencollective.org/badge.svg)](https://slack.opencollective.org)
 [![Dependency Status](https://david-dm.org/opencollective/opencollective-api.svg)](https://david-dm.org/opencollective/opencollective-api)
 [![Coverage Status](https://coveralls.io/repos/github/opencollective/opencollective-api/badge.svg)](https://coveralls.io/github/opencollective/opencollective-api)
+
+![](http://d.pr/i/Vxm1rw+)
 
 ## How to get started
 
