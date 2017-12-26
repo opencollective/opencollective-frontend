@@ -46,7 +46,9 @@ export default (app) => {
    */
   app.use('/status', serverStatus(app));
 
-  app.use('*', auth.authorizeApiKey);
+  if (process.env.NODE_ENV !== 'development') {
+    app.use('*', auth.authorizeApiKey);
+  }
 
   if (process.env.DEBUG) {
     app.use('*', (req, res, next) => {
