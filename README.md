@@ -1,7 +1,9 @@
 # Open Collective Frontend
 
 [![Circle CI](https://circleci.com/gh/opencollective/frontend/tree/master.svg?style=shield)](https://circleci.com/gh/opencollective/frontend/tree/master)
-[![Slack Status](https://slack.opencollective.com/badge.svg)](https://slack.opencollective.com)
+[![Slack Status](https://slack.opencollective.com/badge.svg)](https://slack.opencollective.org)
+
+![](https://d.pr/i/MOS677+)
 
 ## How to get started
 
@@ -14,11 +16,11 @@ Note: If you see a step below that could be improved (or is outdated), please up
 We recommend creating a new directory in your dev folder for `opencollective`
 
 ```
-mkdir opencollective
-cd opencollective
-git clone git@github.com:opencollective/opencollective-api.git api
-cd api
-npm install
+mkdir opencollective;
+cd opencollective;
+git clone git@github.com:opencollective/opencollective-api.git api;
+cd api;
+npm install;
 ```
 
 See the [API Github Repo](https://github.com/opencollective/opencollective-api) for more details.
@@ -26,9 +28,15 @@ See the [API Github Repo](https://github.com/opencollective/opencollective-api) 
 2. Install the Frontend
 
 ```
-git clone git@github.com:opencollective/frontend.git frontend
-cd frontend
-npm install
+git clone git@github.com:opencollective/frontend.git frontend;
+cd frontend;
+npm install;
+```
+
+If you are using Ubuntu, make sure you have [GraphicsMagick](http://www.graphicsmagick.org) installed:
+
+```
+sudo apt-get install GraphicsMagick
 ```
 
 3. Run
@@ -40,23 +48,26 @@ $> npm run dev
 This will start the Frontend on http://localhost:3000 in development environment. It will automatically update whenever a file changes (using hot module reloading).
 
 The API comes with a sanitized version of the database that includes the following collectives:
-- [/opensource](http://localhost:3000/opensource)
-- [/apex](http://localhost:3000/apex)
-- [/railsgirlsatl](http://localhost:3000/railsgirlsatl)
-- [/tipbox](http://localhost:3000/tipbox)
-- [/brusselstogether](http://localhost:3000/brusselstogether)
-- [/veganizerbxl](http://localhost:3000/veganizerbxl)
+- [http://localhost:3000/opensource](http://localhost:3000/opensource)
+- [http://localhost:3000/apex](http://localhost:3000/apex)
+- [http://localhost:3000/railsgirlsatl](http://localhost:3000/railsgirlsatl)
+- [http://localhost:3000/tipbox](http://localhost:3000/tipbox)
+- [http://localhost:3000/brusselstogether](http://localhost:3000/brusselstogether)
+- [http://localhost:3000/veganizerbxl](http://localhost:3000/veganizerbxl)
 
 ## Tests
 
-We are using Jest for testing.
+We are using [Jest](https://facebook.github.io/jest/) for testing.
 You can run the tests using `npm test` or more specifically `npm run test:server`, `npm run test:e2e`.
+
+End-to-end tests are using [Chromeless](https://github.com/graphcool/chromeless). If you are using Ubuntu, make sure you have Google Chrome installed (`sudo apt-get install google-chrome`).
 
 ## Stack
 
 We are using NodeJS.
 
-The Frontend is using [next](https://zeit.co/next) (which includes Webpack and hot module reloading), React
+The Frontend is using [next](https://zeit.co/next) (which includes Webpack and hot module reloading), React.
+
 The API is using Postgres, GraphQL.
 
 ## Localize
