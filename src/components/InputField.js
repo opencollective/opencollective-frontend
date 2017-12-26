@@ -240,7 +240,7 @@ class InputField extends React.Component {
               </Col>
               <Col sm={9}>
                 <InputTypeDropzone
-                  value={this.state.value}
+                  defaultValue={field.defaultValue}
                   name={field.name}
                   onChange={event => this.handleChange(event)}
                   placeholder={field.placeholder}
@@ -253,7 +253,7 @@ class InputField extends React.Component {
             <div>
               {field.label && <ControlLabel>{`${capitalize(field.label)}`}</ControlLabel>}
               <InputTypeDropzone
-                value={this.state.value}
+                defaultValue={field.defaultValue}
                 name={field.name}
                 onChange={event => this.handleChange(event)}
                 placeholder={field.placeholder}

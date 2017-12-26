@@ -7,7 +7,7 @@ import { imagePreview } from '../lib/utils';
 class InputTypeDropzone extends React.Component {
 
   static propTypes = {
-    value: PropTypes.object,
+    defaultValue: PropTypes.string,
     className: PropTypes.string,
     onChange: PropTypes.func.isRequired,
     options: PropTypes.object
@@ -16,7 +16,7 @@ class InputTypeDropzone extends React.Component {
   constructor(props) {
     super(props);
     this.handleChange = this.handleChange.bind(this);
-    this.state = { value: props.value, url: props.value }; // value can be base64 encoded after upload, url is always an url
+    this.state = { value: props.defaultValue, url: props.defaultValue }; // value can be base64 encoded after upload, url is always an url
   }
 
   /**

@@ -302,9 +302,8 @@ class EditCollectiveForm extends React.Component {
             <div className="inputs">
               {this.fields[key].map((field) => (!field.when || field.when()) && <InputField
                 key={field.name}
-                value={this.state.collective[field.name]}
                 className={field.className}
-                defaultValue={field.defaultValue}
+                defaultValue={field.defaultValue || this.state.collective[field.name]}
                 validate={field.validate}
                 ref={field.name}
                 name={field.name}
