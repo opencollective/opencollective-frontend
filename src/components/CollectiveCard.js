@@ -253,7 +253,7 @@ class CollectiveCard extends React.Component {
             { role === 'BACKER' && get(membership, 'stats.totalDonations') > 0 &&
               <div className="totalDonations">
                 <div className="totalDonationsAmount">
-                  <Currency value={membership.stats.totalDonations} currency={membership.collective.currency} />
+                  <Currency value={get(membership, 'stats.totalDonations')} currency={get(membership, 'collective.currency')} />
                 </div>
                 <FormattedMessage id='membership.totalDonations.title' defaultMessage={`amount contributed`} />
               </div>
@@ -261,7 +261,7 @@ class CollectiveCard extends React.Component {
             { role === 'FUNDRAISER' && get(membership, 'stats.totalRaised') > 0 &&
               <div className="totalRaised">
                 <div className="totalRaisedAmount">
-                  <Currency value={membership.stats.totalRaised} currency={membership.collective.currency} />
+                  <Currency value={get(membership, 'stats.totalRaised')} currency={get(membership, 'collective.currency')} />
                 </div>
                 <FormattedMessage id='membership.totalRaised.title' defaultMessage={`amount raised`} />
               </div>

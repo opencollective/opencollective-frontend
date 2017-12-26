@@ -1,7 +1,7 @@
 # Open Collective Frontend
 
 [![Circle CI](https://circleci.com/gh/opencollective/frontend/tree/master.svg?style=shield)](https://circleci.com/gh/opencollective/frontend/tree/master)
-[![Slack Status](https://slack.opencollective.com/badge.svg)](https://slack.opencollective.org)
+[![Slack Status](https://slack.opencollective.org/badge.svg)](https://slack.opencollective.org)
 
 ![](https://d.pr/i/MOS677+)
 

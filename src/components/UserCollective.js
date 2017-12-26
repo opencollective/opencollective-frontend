@@ -11,11 +11,11 @@ import Memberships from './Memberships';
 import CollectivesWithData from './CollectivesWithData';
 import Markdown from 'react-markdown';
 import { defineMessages, FormattedMessage } from 'react-intl';
-import { get, groupBy } from 'lodash';
+import { pick, get, groupBy } from 'lodash';
 import HashLink from 'react-scrollchor';
 import MenuBar from './MenuBar';
 import MessageModal from './MessageModal';
-import CollectiveCard from './CollectiveCard';
+import OrderCreated from './OrderCreated';
 import { Button } from 'react-bootstrap';
 import { Router, Link } from '../server/pages';
 
@@ -71,7 +71,7 @@ class UserCollective extends React.Component {
   }
 
   render() {
-    let collectiveCreated;
+    const order = { fromCollective: this.collective };
     const { intl, LoggedInUser, query } = this.props;
 
     const type = this.collective.type.toLowerCase();
@@ -98,7 +98,11 @@ class UserCollective extends React.Component {
     }
 
     if (query && query.CollectiveId) {
-      collectiveCreated = (this.collective.memberOf.find(m => m.collective.id === parseInt(query.CollectiveId)) || {}).collective;
+      Object.assign(order, {
+        ...order,
+        ...pick(query || {}, 'totalAmount', 'CollectiveId', 'TierId'),
+        collective: (this.collective.memberOf.find(m => m.collective.id === parseInt(query.CollectiveId)) || {}).collective
+      });
     }
 
     return (
@@ -106,19 +110,6 @@ class UserCollective extends React.Component {
         <style jsx>{`
           h1 {
             font-size: 2rem;
-          }
-          .message {
-            text-align: center;
-          }
-          .message .thankyou {
-            font-weight: bold;
-          }
-          .message .editBtn {
-            margin: 2rem;
-          }
-          .orderCreated .collectiveCard {
-            display: flex;
-            justify-content: center;
           }
           .adminActions {
             text-align: center;
@@ -191,39 +182,11 @@ class UserCollective extends React.Component {
 
             <div>
 
+              { get(query, 'status') &&  <OrderCreated order={order} status={query.status} /> }
+
               <div className="content" >
                 <div className="message">
-                  { query && query.status === 'orderCreated' &&
-                    <div className="orderCreated">
-                      <p className="thankyou"><FormattedMessage id="collective.user.orderCreated.thankyou" defaultMessage="Thank you for your donation! 🙏" /></p>
-                      { collectiveCreated &&
-                        <div>
-                          <p><FormattedMessage id="collective.user.orderCreated.message" defaultMessage="We have added {collective} to your profile" values={{ collective: collectiveCreated.name }} /></p>
-                          { memberOf['BACKER'] && memberOf['BACKER'].length > 10 &&
-                            <div className="collectiveCard">
-                              <CollectiveCard collective={collectiveCreated} />
-                            </div>
-                          }
-                        </div>
-                      }
-                    </div>
-                  }
-                  { query && query.status === 'orderProcessing' &&
-                    <div className="orderCreated">
-                      <p className="thankyou"><FormattedMessage id="collective.user.orderCreated.thankyou" defaultMessage="Thank you for your donation! 🙏" /></p>
-                      { collectiveCreated &&
-                        <div>
-                          <p><FormattedMessage id="collective.user.orderProcessing.message" defaultMessage="We are currently processing your donation to {collective}. We will add it to your profile and we will send you a confirmation email once the payment is confirmed." values={{ collective: collectiveCreated.name }} /></p>
-                          { memberOf['BACKER'] && memberOf['BACKER'].length > 10 &&
-                            <div className="collectiveCard">
-                              <CollectiveCard collective={collectiveCreated} />
-                            </div>
-                          }
-                        </div>
-                      }
-                    </div>
-                  }
-                  { query && query.status === 'orderCreated' && (!this.collective.image || !this.collective.longDescription) &&
+                  { query && query.status && (!this.collective.image || !this.collective.longDescription) &&
                     <div>
                       <FormattedMessage id="collective.user.emptyProfile" defaultMessage={`Your profile looks a bit empty ¯\\\\_(ツ)_/¯`} />
                     </div>
