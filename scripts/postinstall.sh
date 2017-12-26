@@ -22,8 +22,10 @@ else
     echo "✓ opencollective_dvl exists, running migration if any"
     PG_DATABASE=opencollective_dvl npm run db:migrate:dev
   else
-    echo "Restoring opencollective_dvl";
-    ./scripts/db_restore.sh -d opencollective_dvl -f test/dbdumps/opencollective_dvl.pgsql
+    if [ ! "$SEQUELIZE_ENV" = "circleci" ]; then
+      echo "> Restoring opencollective_dvl";
+      ./scripts/db_restore.sh -d opencollective_dvl -f test/dbdumps/opencollective_dvl.pgsql
+    fi
   fi
 
   echo ""
