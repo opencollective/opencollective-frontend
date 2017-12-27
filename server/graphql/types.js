@@ -815,6 +815,12 @@ export const PaymentMethodType = new GraphQLObjectType({
           return paymentMethod.createdAt;
         }
       },
+      expiryDate: {
+        type: GraphQLString,
+        resolve(paymentMethod) {
+          return paymentMethod.expiryDate;
+        }
+      },
       service: {
         type: GraphQLString,
         resolve(paymentMethod) {
