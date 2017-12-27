@@ -15,7 +15,7 @@ import gql from 'graphql-tag'
 import Loading from '../components/Loading';
 import NotFound from '../components/NotFound';
 import storage from '../lib/storage';
-import { pick } from 'lodash';
+import { get, pick } from 'lodash';
 
 class CreateOrderPage extends React.Component {
 
@@ -59,7 +59,7 @@ class CreateOrderPage extends React.Component {
       newState.LoggedInUser = LoggedInUser;
     }
     this.referral = storage.get('referral');
-    const matchingFund = storage.get('matchingFund');
+    const matchingFund = storage.get('matchingFund') || get(data, 'Collective.settings.matchingFund');
     if (matchingFund) {
       newState.matchingFund = matchingFund;
     }
