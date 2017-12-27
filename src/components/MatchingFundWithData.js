@@ -6,7 +6,7 @@ import gql from 'graphql-tag'
 import { FormattedMessage } from 'react-intl';
 import Member from './Member';
 import { get } from 'lodash';
-import { formatCurrency } from '../lib/utils';
+import { formatCurrency, days } from '../lib/utils';
 import { getFxRate } from '../lib/api';
 
 class MatchingFundWithData extends React.Component {
@@ -76,21 +76,28 @@ class MatchingFundWithData extends React.Component {
       <FormGroup className="MatchingFundWithData">
         <style jsx>{`
           .amount {
-            font-size: 3rem;
+            font-size: 4rem;
+            text-align: center;
+            margin: 3rem;
           }
           .description {
-            font-size: 1.3rem;
+            font-size: 1.4rem;
+            margin-bottom: 1rem;
           }
           .disclaimer {
-            font-size: 1.1rem;
+            font-size: 1.2rem;
           }
-          .container {
+          .header {
             display: flex;
+            align-items: center;
+            justify-content: space-around;
           }
           .info {
-            max-width: 20rem;
           }
-          .error {
+          .expiryDate {
+            margin-left: 0.5rem;
+          }
+          .error, .expiryDate {
             color: red;
           }
         `}</style>
@@ -99,23 +106,26 @@ class MatchingFundWithData extends React.Component {
             <ControlLabel><FormattedMessage id="order.matchingfund.label" defaultMessage="Matching fund" /></ControlLabel>
           </Col>
           <Col sm={9}>
-            <div className="container">
+            <div className="header">
               <div className="info">
                 <div className="amount">{`+${formatCurrency(amounts.totalAmount, currency, { precision: 0 })}`}</div>
-                <div className="description">{MatchingFund.description}</div>
-                <div className="disclaimer">
-                  <FormattedMessage id="order.matchingfund.text" defaultMessage="{name} has set up a {initialBalance} matching fund to match {factor, select, 1 {} other {{factor} times}} your first donation to {collective}. There is {balance} left in this fund." values={{ initialBalance: formatCurrency(MatchingFund.initialBalance, MatchingFund.currency, { precision: 0 }), balance: formatCurrency(MatchingFund.balance, MatchingFund.currency, { precision: 0 }), name: MatchingFund.collective.name, collective: collective.name, factor: MatchingFund.matching }} />
-                  { !amounts.enough &&
-                    <div className="error">
-                      <FormattedMessage id="order.matchingfund.notEnoughFund" defaultMessage="There isn't enough fund left in this matching fund." values={{ balance: formatCurrency(MatchingFund.balance, MatchingFund.currency)}} />
-                    </div>
-                  }
-                </div>
               </div>
               <div>
                 <Member member={member} />
               </div>
             </div>
+            <div className="description">{MatchingFund.description}</div>
+            <div className="disclaimer">
+              <span><FormattedMessage id="order.matchingfund.text" defaultMessage="{name} has set up a {initialBalance} matching fund to match {factor, select, 1 {} other {{factor} times}} your first donation to {collective}. There is {balance} left in this fund." values={{ initialBalance: formatCurrency(MatchingFund.initialBalance, MatchingFund.currency, { precision: 0 }), balance: formatCurrency(MatchingFund.balance, MatchingFund.currency, { precision: 0 }), name: MatchingFund.collective.name, collective: collective.name, factor: MatchingFund.matching }} /></span>
+              { MatchingFund.expiryDate &&
+                <span className="expiryDate"><FormattedMessage id="order.matchingFund.expire" defaultMessage="This matching fund expires in {n, plural, one {one day} other {{n} days}}." values={{n: days(MatchingFund.expiryDate)}} /></span>
+              }
+              { !amounts.enough &&
+                <div className="error">
+                  <FormattedMessage id="order.matchingfund.notEnoughFund" defaultMessage="There isn't enough fund left in this matching fund." values={{ balance: formatCurrency(MatchingFund.balance, MatchingFund.currency)}} />
+                </div>
+              }
+            </div>            
           </Col>
         </div>
       </FormGroup>
@@ -132,6 +142,7 @@ query MatchingFund($uuid: String!, $ForCollectiveId: Int) {
     description
     matching
     initialBalance
+    expiryDate
     balance
     currency
     collective {

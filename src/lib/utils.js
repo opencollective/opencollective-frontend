@@ -1,5 +1,5 @@
 export function truncate(str, length) {
-  if (!str || str.length <= length) {
+  if (!str || typeof str !== 'string' || str.length <= length) {
     return str;
   }
   const subString = str.substr(0, length-1);
@@ -21,7 +21,7 @@ export function trimObject(obj) {
  */
 export const days = (d1, d2 = new Date) => {
   const oneDay = 24*60*60*1000; // hours*minutes*seconds*milliseconds
-  return Math.round(Math.abs((d1.getTime() - d2.getTime())/(oneDay)));
+  return Math.round(Math.abs((new Date(d1).getTime() - new Date(d2).getTime())/(oneDay)));
 }
 
 export function filterCollection(array, cond, inverse) {

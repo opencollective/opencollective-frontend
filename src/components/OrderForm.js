@@ -179,7 +179,7 @@ class OrderForm extends React.Component {
     const generateOptionsForCollective = (collective) => {
       return paymentMethods.map(pm => {
         const value = pm.uuid
-        const label = `💳  \xA0\xA0${collective.name} - ${pm.data.brand} ${pm.data.funding} ${pm.name} - exp ${pm.data.expMonth}/${pm.data.expYear}`;
+        const label = `💳  \xA0\xA0${collective.name} - ${get(pm, 'data.brand')} ${get(pm, 'data.funding')} ${pm.name} - exp ${get(pm, 'data.expMonth')}/${get(pm, 'data.expYear')}`;
         const option = {};
         option[value] = label;
         return option;
