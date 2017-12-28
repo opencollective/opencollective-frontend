@@ -274,6 +274,7 @@ const run = () => {
   console.log("Using args: ", options);
 
   return migrateSubscriptions(options)
+  .then(() => done())
   .catch(done)
 }
 
