@@ -243,6 +243,8 @@ const migrateSubscriptions = (options) => {
         } else {
           console.log("Shared Customer id with customer on both old and new stripe account");
           sharedCustomersOnOldAndNewStripeAccountsCount += 1;
+
+          return processSubscription();
         }
       })
   })
