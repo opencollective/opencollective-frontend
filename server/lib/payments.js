@@ -51,20 +51,23 @@ export const executeOrder = (user, order, options) => {
       return paymentProviders[paymentProvider].types[order.paymentMethod.type || 'default'].processOrder(order, options)  // eslint-disable-line import/namespace
         .tap(async () => {
           if (!order.matchingFund) return;
+
           // if there is a matching fund, we execute the order
           // also adds the owner of the matching fund as a BACKER of collective
-          order.createdByUser = await models.User.findOne({ where: { CollectiveId: order.matchingFund.CollectiveId }});
-          order.paymentMethod = order.matchingFund;
-          order.totalAmount = order.totalAmount * order.matchingFund.matching;
-          order.FromCollectiveId = order.matchingFund.CollectiveId;
-          order.description = `Matching ${order.matchingFund.matching}x ${order.fromCollective.name}'s donation`;
+          const matchingOrder = {
+            ...pick(order, ['id', 'collective', 'tier', 'currency']),
+            totalAmount: order.totalAmount * order.matchingFund.matching,
+            paymentMethod: order.matchingFund,
+            FromCollectiveId: order.matchingFund.CollectiveId,
+            fromCollective: await models.Collective.findById(order.matchingFund.CollectiveId),
+            description: `Matching ${order.matchingFund.matching}x ${order.fromCollective.name}'s donation`,
+            createdByUser: await models.User.findOne({ where: { CollectiveId: order.matchingFund.CollectiveId }})
+          };
 
-          // we only match the first donation (don't create another subscription)
-          order.interval = null;
-          order.SubscriptionId = null;
-          order.subscription = null;
+          // processOrder expects an update function to update `order.processedAt`
+          matchingOrder.update = () => {};
 
-          return paymentProviders[order.paymentMethod.service].types[order.paymentMethod.type || 'default'].processOrder(order, options) // eslint-disable-line import/namespace
+          return paymentProviders[order.paymentMethod.service].types[order.paymentMethod.type || 'default'].processOrder(matchingOrder, options) // eslint-disable-line import/namespace
         });
     })
     .then(transaction => {
