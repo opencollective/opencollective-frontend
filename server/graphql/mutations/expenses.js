@@ -6,6 +6,7 @@ import paymentProviders from '../../paymentProviders';
 import { formatCurrency } from '../../lib/utils';
 import paypalAdaptive from '../../paymentProviders/paypal/adaptiveGateway';
 import { createFromPaidExpense as createTransactionFromPaidExpense } from '../../lib/transactions';
+import { get } from 'lodash';
 
 /**
  * Only admin of expense.collective or of expense.collective.host can approve/reject expenses
@@ -57,11 +58,16 @@ export async function createExpense(remoteUser, expenseData) {
 
   if (remoteUser) {
     expenseData.UserId = remoteUser.id;
-  } else {
-    if (!expenseData.user || !expenseData.user.email) {
-      throw new errors.Unauthorized("Missing expense.user.email");
+  
+    if (get(expense, 'user.paypalEmail') !== remoteUser.paypalEmail) {
+      remoteUser.paypalEmail = get(expense, 'user.paypalEmail');
+      remoteUser.save();
     }
-    const user = await models.User.findOrCreateByEmail(expenseData.user.email, expenseData.user);
+  } else {
+    if (!(get(expenseData, 'user.email') || get(expenseData, 'user.paypalEmail'))) {
+      throw new errors.Unauthorized("Missing expense.user.email or expense.user.paypalEmail");
+    }
+    const user = await models.User.findOrCreateByEmail(get(expenseData, 'user.email') || get(expenseData, 'user.paypalEmail'), expenseData.user);
     expenseData.UserId = user.id;
   }
 
