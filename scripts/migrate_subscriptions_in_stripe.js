@@ -34,26 +34,34 @@ const done = (err) => {
 }
 
 const migrateSubscriptions = (options) => {
-  const { oldStripeAccountId, newStripeAccountId, limit, dryRun } = options;
+  const { oldHostCollectiveId, newHostCollectiveId, limit, dryRun } = options;
 
 
   let oldStripeAccount, newStripeAccount, currentOCSubscription;
   // fetch old stripe account
-  return models.ConnectedAccount.findById(oldStripeAccountId)
-  .then(stripeAccount => {
-    if (!stripeAccount) {
+  return models.ConnectedAccount.findAll({ where: {CollectiveId: oldHostCollectiveId}})
+  .then(stripeAccounts => {
+    if (!stripeAccounts || stripeAccounts.length === 0) {
       throw new Error('Old stripe account not found');
     }
-    oldStripeAccount = stripeAccount
+
+    if (stripeAccounts.length > 1) {
+      throw new Error('More than one old stripe account found');
+    }
+    oldStripeAccount = stripeAccounts[0]
   })
 
   // fetch new stripe account
-  .then(() => models.ConnectedAccount.findById(newStripeAccountId))
-  .then(stripeAccount => {
-    if (!stripeAccount) {
+  .then(() => models.ConnectedAccount.findAll({ where: {CollectiveId: newHostCollectiveId}}))
+  .then(stripeAccounts => {
+    if (!stripeAccounts || stripeAccounts.length === 0) {
       throw new Error('New stripe account not found')
     }
-    newStripeAccount = stripeAccount
+
+    if (stripeAccounts.length > 1) {
+      throw new Error('More than one new stripe account found');
+    }
+    newStripeAccount = stripeAccounts[0]
   })
 
   // fetch subscriptions from old stripe account
@@ -224,14 +232,14 @@ const run = () => {
     description: 'Migrate stripe subscriptions from one host to another'
   });
   parser.addArgument(
-    [ '-f', '--fromId'],
+    [ '-f', '--fromHostCollectiveId'],
     {
       help: 'Stripe ConnectedAccount Id of Host to move FROM',
       required: true
     }
   );
   parser.addArgument(
-    ['-t', '--toId'],
+    ['-t', '--toHostCollectiveId'],
     {
       help: 'Stripe ConnectedAccount Id of Host to move TO',
       required: true
@@ -264,8 +272,8 @@ const run = () => {
   const args = parser.parseArgs();
 
   const options = {
-    oldStripeAccountId: args.fromId,
-    newStripeAccountId: args.toId,
+    oldHostCollectiveId: args.fromHostCollectiveId,
+    newHostCollectiveId: args.toHostCollectiveId,
     dryRun: !args.notdryrun,
     limit: args.limit || 1,
     verbose: args.verbose
