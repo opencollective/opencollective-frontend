@@ -21,20 +21,30 @@ import * as constants from '../server/constants/transactions';
 
 */
 
-let sharedCustomersCount = 0, nonSharedCustomersCount = 0, subsUpdatedCount = 0, subsSkippedCount = 0;
+let sharedCustomersOnOldStripeAccountCount = 0, sharedCustomersOnOldAndNewStripeAccountsCount = 0,nonSharedCustomersCount = 0, subsUpdatedCount = 0, subsSkippedCount = 0;
 
 const done = (err) => {
   if (err) console.log('err', err);
+  console.log('\n')
   console.log('Non-shared customers found: ', nonSharedCustomersCount);
-  console.log('Shared customers found: ', sharedCustomersCount);
+  console.log('Shared customers only on old stripe account found: ', sharedCustomersOnOldStripeAccountCount);
+  console.log('Shared customers on both old and new stripe accounts found: ', sharedCustomersOnOldAndNewStripeAccountsCount);
   console.log('Total subscriptions updated: ', subsUpdatedCount);
   console.log('Total subscriptions skipped: ', subsSkippedCount);
+  console.log('\n')
   console.log('done!');
   process.exit();
 }
 
 const migrateSubscriptions = (options) => {
-  const { oldHostCollectiveId, newHostCollectiveId, limit, dryRun } = options;
+  const { 
+    oldHostCollectiveId, 
+    newHostCollectiveId, 
+    limit, 
+    dryRun, 
+    startingAfter, 
+    endingBefore,
+    plan } = options;
 
 
   let oldStripeAccount, newStripeAccount, currentOCSubscription;
@@ -65,7 +75,7 @@ const migrateSubscriptions = (options) => {
   })
 
   // fetch subscriptions from old stripe account
-  .then(() => stripeGateway.getSubscriptionsList(oldStripeAccount, limit))
+  .then(() => stripeGateway.getSubscriptionsList(oldStripeAccount, { limit, startingAfter, endingBefore, plan }))
 
   .then(oldStripeSubscriptionList => {
     console.log("Subscriptions fetched: ", oldStripeSubscriptionList.data.length);
@@ -108,11 +118,15 @@ const migrateSubscriptions = (options) => {
       })
       .then(order => {
         const pm = order.paymentMethod;
-        const customerIdForHostsList = pm.data && pm.data.CustomerIdForHost;
+        const customerIdForHostsList = pm.data && pm.data.customerIdForHost;
 
         platformCustomerId = pm.customerId;
         customerIdOnOldStripeAccount = customerIdForHostsList && customerIdForHostsList[oldStripeAccount.username];
         customerIdOnNewStripeAccount = customerIdForHostsList && customerIdForHostsList[newStripeAccount.username];
+
+        console.log("platformCustomerId", platformCustomerId)
+        console.log("Old customerId", customerIdOnOldStripeAccount);
+        console.log("New customerId", customerIdOnNewStripeAccount);
 
         const processSubscription = () => {
 
@@ -148,8 +162,12 @@ const migrateSubscriptions = (options) => {
 
           // store the new stripeSubscription info in our table
           .then(newStripeSubscription => {
-            const preMigrationData = currentOCSubscription.data;
+            const preMigrationData = currentOCSubscription.data || {};
 
+            // storing this for any subscriptions still in trial period
+            // since they have no past data recorded
+            preMigrationData.stripeSubscriptionId = oldStripeSubscription.id
+            console.log('New stripeSubscriptionId', newStripeSubscription.id);
             return currentOCSubscription.updateAttributes({
               data: Object.assign({}, newStripeSubscription, { preMigrationData }),
               stripeSubscriptionId: newStripeSubscription.id
@@ -205,20 +223,26 @@ const migrateSubscriptions = (options) => {
           // Case 2
           console.log("Shared Customer id found on old stripe account, creating one on new stripe acount")
 
-          sharedCustomersCount += 1;
+          sharedCustomersOnOldStripeAccountCount += 1;
           if (dryRun) {
             console.log('Dry run: Exiting without making any changes on Stripe');
             return Promise.resolve();
           }
-
           return stripeGateway.createToken(newStripeAccount, platformCustomerId)
+            .then(token => stripeGateway.createCustomer(newStripeAccount, token.id, {
+              email: order.createdByUser.email,
+            }))
             .then(stripeCustomer => {
+              console.log("New customerId created: ", stripeCustomer.id);
               customerIdOnNewStripeAccount = stripeCustomer.id;
               const pmData = pm.data;
               pmData.customerIdForHost = Object.assign({}, pmData.customerIdForHost, {[newStripeAccount.username]: stripeCustomer.id})
               return pm.update({data: pmData})
                 .then(() => processSubscription())
             })
+        } else {
+          console.log("Shared Customer id with customer on both old and new stripe account");
+          sharedCustomersOnOldAndNewStripeAccountsCount += 1;
         }
       })
   })
@@ -268,6 +292,24 @@ const run = () => {
       action: 'storeConst',
       constant: true
     })
+  parser.addArgument(
+    ['--starting_after'],
+    {
+      help: 'subscription id on Stripe to start after',
+      defaultValue: null
+    })
+  parser.addArgument(
+    ['--ending_before'],
+    {
+      help: 'subscription id on Stripe to fetch before',
+      defaultValue: null
+    })
+  parser.addArgument(
+    ['--plan'],
+    {
+      help: 'filter subscriptions by this plan',
+      defaultValue: null
+    })
 
   const args = parser.parseArgs();
 
@@ -276,8 +318,20 @@ const run = () => {
     newHostCollectiveId: args.toHostCollectiveId,
     dryRun: !args.notdryrun,
     limit: args.limit || 1,
-    verbose: args.verbose
+    verbose: args.verbose,
+    startingAfter: args.starting_after,
+    endingBefore: args.ending_before,
+    plan: args.plan
   }
+
+    console.log("\n\n******************************************")
+  if (options.dryRun) {
+    console.log(  "***************** dry run ****************")
+  } else {
+    console.log(  "*************** NOT DRY RUN **************")
+    console.log(  "**** THIS WILL MAKE CHANGES ON STRIPE ****")
+  }
+    console.log(  "******************************************\n\n")
 
   console.log("Using args: ", options);
 

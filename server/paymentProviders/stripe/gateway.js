@@ -65,6 +65,10 @@ export const getSubscriptionsList = (stripeAccount, options = {}) => {
     params.ending_before = options.endingBefore;
   }
 
+  if (options.plan) {
+    params.plan = options.plan;
+  }
+
   debug("getSubscriptionsList");
   return appStripe.subscriptions.list(params, { stripe_account: stripeAccount.username });
 };
