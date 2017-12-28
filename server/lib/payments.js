@@ -58,7 +58,12 @@ export const executeOrder = (user, order, options) => {
           order.totalAmount = order.totalAmount * order.matchingFund.matching;
           order.FromCollectiveId = order.matchingFund.CollectiveId;
           order.description = `Matching ${order.matchingFund.matching}x ${order.fromCollective.name}'s donation`;
-          order.interval = null; // we only match the first donation (don't create another subscription)
+
+          // we only match the first donation (don't create another subscription)
+          order.interval = null;
+          order.SubscriptionId = null;
+          order.subscription = null;
+
           return paymentProviders[order.paymentMethod.service].types[order.paymentMethod.type || 'default'].processOrder(order, options) // eslint-disable-line import/namespace
         });
     })
