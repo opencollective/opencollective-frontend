@@ -231,7 +231,7 @@ const run = () => {
     }
   );
   parser.addArgument(
-    ['-t', '--toHostCollectiveId'],
+    ['-t', '--toId'],
     {
       help: 'Stripe ConnectedAccount Id of Host to move TO',
       required: true
