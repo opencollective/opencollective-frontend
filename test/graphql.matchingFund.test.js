@@ -152,7 +152,7 @@ describe('graphql.matchingFund.test.js', () => {
 
   });
 
-  it('happy path recurring donation', async function () {
+  it('happy path recurring donation', async () => {
     const order = {
       "fromCollective": {
         "id": user2.CollectiveId
