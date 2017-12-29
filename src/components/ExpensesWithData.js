@@ -3,8 +3,10 @@ import PropTypes from 'prop-types';
 import Error from '../components/Error';
 import withIntl from '../lib/withIntl';
 import Expenses from '../components/Expenses';
-import { graphql } from 'react-apollo'
+import CreateExpenseForm from '../components/CreateExpenseForm';
+import { graphql, compose } from 'react-apollo'
 import gql from 'graphql-tag'
+import { FormattedMessage } from 'react-intl'
 
 class ExpensesWithData extends React.Component {
 
@@ -18,6 +20,22 @@ class ExpensesWithData extends React.Component {
 
   constructor(props) {
     super(props);
+    this.createExpense = this.createExpense.bind(this);
+  }
+
+  async createExpense(expense) {
+    try {
+      expense.collective = { id: this.props.collective.id };
+      expense.user = {
+        paypalEmail: expense.paypalEmail
+      }
+      delete expense.paypalEmail;
+      console.log(">>> createExpense", expense);
+      const res = await this.props.createExpense(expense);
+      console.log(">>> createExpense res", res);
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   render() {
@@ -38,6 +56,16 @@ class ExpensesWithData extends React.Component {
 
     return (
       <div className="ExpensesContainer">
+
+        <CreateExpenseForm
+          collective={collective}
+          LoggedInUser={LoggedInUser}
+          onSubmit={this.createExpense}
+          />
+
+        <h1>
+          <FormattedMessage id="collective.Expenses.title" defaultMessage="{n, plural, one {Latest Expense} other {Latest Expenses}}" values={{n: 2 }} />
+        </h1>
 
         <Expenses
           collective={collective}
@@ -135,5 +163,29 @@ export const addExpensesData = graphql(getExpensesQuery, {
   })  
 });
 
+const createExpenseQuery = gql`
+mutation createExpense($expense: ExpenseInputType!) {
+  createExpense(expense: $expense) {
+    id
+    description
+    amount
+    attachment
+    category
+    privateMessage
+    payoutMethod
+    status
+  }
+}
+`;
 
-export default addExpensesData(withIntl(ExpensesWithData));
+const addMutation = graphql(createExpenseQuery, {
+  props: ( { mutate }) => ({
+    createExpense: async (expense) => {
+      return await mutate({ variables: { expense } })
+    }
+  })
+  });
+
+const addData = compose(addExpensesData, addMutation);
+
+export default addData(withIntl(ExpensesWithData));

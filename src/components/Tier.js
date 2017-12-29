@@ -267,7 +267,7 @@ class Tier extends React.Component {
                       min={tier.presets && tier.presets[0]}
                       pre={getCurrencySymbol(currency)}
                       type='currency'
-                      value={amount}
+                      defaultValue={amount}
                       onChange={(amount) => this.handleChange('amount', amount)} />
                     </div>
                 </div>
@@ -276,7 +276,7 @@ class Tier extends React.Component {
                     <label><FormattedMessage id="tier.interval.select" defaultMessage="Select frequency" /></label>
                     <ButtonGroup className="intervalBtnGroup">
                       { intervals.map(i => (
-                        <Button className="intervalBtn" bsStyle={interval === i ? 'primary' : 'default'} onClick={() => this.handleChange('interval', i)}>
+                        <Button key={`key-${i}`} className="intervalBtn" bsStyle={interval === i ? 'primary' : 'default'} onClick={() => this.handleChange('interval', i)}>
                           {intl.formatMessage(this.messages[`interval.${i || 'onetime'}`])}
                         </Button>
                       ))}

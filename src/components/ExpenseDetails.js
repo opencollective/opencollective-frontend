@@ -152,9 +152,8 @@ class ExpenseDetails extends React.Component {
             margin: 0;
           }
 
-          .ExpenseDetails textarea[name="privateMessage"] {
-            width: 47.5rem;
-            max-width: 100%;
+          .col.privateMessage {
+            width: 100%;
           }
         `}</style>
 
@@ -190,7 +189,7 @@ class ExpenseDetails extends React.Component {
                   <span className="description">
                     <InputField
                       type="text"
-                      value={expense.description}
+                      defaultValue={expense.description}
                       className="descriptionField"
                       onChange={description => this.handleChange('description', description)}
                       />
@@ -208,7 +207,7 @@ class ExpenseDetails extends React.Component {
                   <InputField
                     type="select"
                     options={categoriesOptions}
-                    value={expense.category}
+                    defaultValue={expense.category}
                     className="categoryField"
                     onChange={category => this.handleChange('category', category)}
                     />
@@ -223,7 +222,7 @@ class ExpenseDetails extends React.Component {
               <span className="amount">
                 { editMode && canEditAmount &&
                   <InputField
-                    value={expense.amount}
+                    defaultValue={expense.amount}
                     pre={getCurrencySymbol(expense.currency)}
                     type='currency'
                     className="amountField"
@@ -248,14 +247,14 @@ class ExpenseDetails extends React.Component {
               <InputField
                 type="select"
                 options={payoutMethods}
-                value={expense.payoutMethod}
+                defaultValue={expense.payoutMethod}
                 onChange={payoutMethod => this.handleChange('payoutMethod', payoutMethod)}
                 />
             }
           </div>
 
           { (expense.privateMessage || ((isAuthor || canEditExpense) && payoutMethod === 'other')) &&
-            <div className="col">
+            <div className="col privateMessage">
               <label><FormattedMessage id='expense.privateMessage' defaultMessage='private note' /></label>
               { (!editMode || !isAuthor) && capitalize(expense.privateMessage)}
               { editMode && (isAuthor || canEditExpense) &&

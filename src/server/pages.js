@@ -24,6 +24,7 @@ pages
   .add('tiers-iframe', '/:collectiveSlug/tiers/iframe')
   .add('transactions', '/:collectiveSlug/transactions')
   .add('expenses', '/:collectiveSlug/expenses')
+  .add('newExpense', '/:collectiveSlug/expenses/new')
   .add('host.expenses', '/:hostCollectiveSlug/collectives/expenses')
   .add('nametags', '/:parentCollectiveSlug/events/:eventSlug/nametags')
   .add('collective', '/:slug')
