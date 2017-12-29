@@ -55,7 +55,7 @@ export const executeOrder = (user, order, options) => {
           // if there is a matching fund, we execute the order
           // also adds the owner of the matching fund as a BACKER of collective
           const matchingOrder = {
-            ...pick(order, ['id', 'collective', 'tier', 'currency', 'matchingFund']),
+            ...pick(order, ['id', 'collective', 'tier', 'currency']),
             totalAmount: order.totalAmount * order.matchingFund.matching,
             paymentMethod: order.matchingFund,
             FromCollectiveId: order.matchingFund.CollectiveId,
@@ -106,26 +106,26 @@ const validatePayment = (payment) => {
 }
 
 const sendOrderConfirmedEmail = async (order) => {
-  console.log(">>> sendOrderConfirmedEmail", order);
   const { collective, tier, interval, fromCollective } = order;
   const user = order.createdByUser;
 
   if (collective.type === types.EVENT) {
-    return emailLib.send(
-      'ticket.confirmed',
-      user.email,
-      { order: order.info,
+    return emailLib.send('ticket.confirmed', user.email,
+      {
+        order: pick(order, ['totalAmount', 'currency', 'createdAt']),
         user: user.info,
         collective: collective.info,
         tier: tier.info
-      }, {
+      },
+      {
         from: `${collective.name} <hello@${collective.slug}.opencollective.com>`
-      })
+      });
   } else {
     // normal order
     const relatedCollectives = await collective.getRelatedCollectives(2, 0);
     const emailOptions = { from: `${collective.name} <hello@${collective.slug}.opencollective.com>` };
-    const data = { order: order.info,
+    const data = {
+      order: pick(order, ['totalAmount', 'currency', 'createdAt']),
       transaction: pick(order.transaction, ['createdAt', 'uuid']),
       user: user.info,
       collective: collective.info,
