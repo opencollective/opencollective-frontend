@@ -69,9 +69,10 @@ export const executeOrder = (user, order, options) => {
 
           return paymentProviders[order.paymentMethod.service].types[order.paymentMethod.type || 'default'].processOrder(matchingOrder, options) // eslint-disable-line import/namespace
             .then(transaction => {
-              matchingOrder.transaction = transaction;
-              matchingOrder.fromCollective = order.fromCollective;
-              sendOrderConfirmedEmail(matchingOrder);
+              sendOrderConfirmedEmail({
+                ...order,
+                transaction
+              });
             })
         });
     })
@@ -147,7 +148,7 @@ const sendOrderConfirmedEmail = async (order) => {
     }
 
     // sending the order confirmed email to the matching fund owner or to the donor
-    if (get(order, 'matchingFund.id') === get(order, 'paymentMethod.id')) {
+    if (get(order, 'transaction.FromCollectiveId') === get(order, 'matchingFund.CollectiveId')) {
       order.matchingFund.info;
       const recipients = await matchingFundCollective.getEmails();
       emailLib.send('donationmatched', recipients, data, emailOptions)
