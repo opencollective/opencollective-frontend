@@ -4,7 +4,7 @@ import statuses from '../../constants/expense_status';
 import models from '../../models';
 import paymentProviders from '../../paymentProviders';
 import { formatCurrency } from '../../lib/utils';
-import paypalAdaptive from '../../gateways/paypalAdaptive';
+import paypalAdaptive from '../../paymentProviders/paypal/adaptiveGateway';
 import { createFromPaidExpense as createTransactionFromPaidExpense } from '../../lib/transactions';
 
 /**
@@ -21,9 +21,10 @@ function canUpdateExpenseStatus(remoteUser, expense) {
 }
 
 /**
- * Only the author or an admin of the collective or collective.host can edit an expense
+ * Only the author or an admin of the collective or collective.host can edit an expense when it hasn't been paid yet
  */
 function canEditExpense(remoteUser, expense) {
+  if (expense.status === statuses.PAID) return false;
   if (remoteUser.id === expense.UserId) {
     return true;
   }
@@ -60,7 +61,7 @@ export async function createExpense(remoteUser, expenseData) {
     if (!expenseData.user || !expenseData.user.email) {
       throw new errors.Unauthorized("Missing expense.user.email");
     }
-    const user = await models.User.findOrCreateByEmail(expenseData.user.email);
+    const user = await models.User.findOrCreateByEmail(expenseData.user.email, expenseData.user);
     expenseData.UserId = user.id;
   }
 
@@ -149,7 +150,7 @@ export async function payExpense(remoteUser, expenseId) {
   if (!expense) {
     throw new errors.Unauthorized("Expense not found");
   }
-  
+
   if (expense.status === statuses.PAID) {
     throw new errors.Unauthorized("Expense has already been paid");
   }
@@ -170,7 +171,7 @@ export async function payExpense(remoteUser, expenseId) {
 
   const host = await expense.collective.getHostCollective();
 
-  const paymentProcessFees = paymentProviders[expense.payoutMethod] ? await paymentProviders[expense.payoutMethod].fees({
+  const paymentProcessFees = paymentProviders[expense.payoutMethod] ? await paymentProviders[expense.payoutMethod].types['adaptive'].fees({
     amount: expense.amount,
     currency: expense.collective.currency,
     host
@@ -184,13 +185,13 @@ export async function payExpense(remoteUser, expenseId) {
     const paymentMethod = await host.getPaymentMethod({ service: expense.payoutMethod });
 
     try {
-      const paymentResponse = await paymentProviders[expense.payoutMethod].pay(expense.collective, expense, paypalEmail, paymentMethod.token);
+      const paymentResponse = await paymentProviders[expense.payoutMethod].types['adaptive'].pay(expense.collective, expense, paypalEmail, paymentMethod.token);
       const preapprovalDetailsResponse = await paypalAdaptive.preapprovalDetails(paymentMethod.token);
       await createTransactionFromPaidExpense(host, paymentMethod, expense, paymentResponse, preapprovalDetailsResponse, expense.UserId);
       expense.setPaid(remoteUser.id);
     } catch (err) {
       if (err.message.indexOf('The total amount of all payments exceeds the maximum total amount for all payments') !==-1) {
-        return new errors.BadRequest(`Not enough funds in your existing Paypal preapproval. Please reapprove through https://opencollective.com/${host.slug}/edit#connectedAccounts`);
+        return new errors.BadRequest(`Not enough funds in your existing Paypal preapproval. Please refill your PayPal payment balance.`);
       } else {
         return new errors.BadRequest(err.message)
       }

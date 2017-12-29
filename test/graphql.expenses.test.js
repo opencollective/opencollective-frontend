@@ -10,7 +10,7 @@ describe('graphql.collective.test.js', () => {
   describe("read", () => {
 
     before(() => utils.loadDB('opencollective_dvl'));  
-    before(() => models.Collective.findOne({ where: { slug: 'opensource' }}).then(c => host = c));
+    before(() => models.Collective.findOne({ where: { slug: 'opensourceorg' }}).then(c => host = c));
     before(() => models.Collective.findOne({ where: { slug: 'railsgirlsatl' }}).then(c => collective = c));
     
     const query = `
@@ -58,7 +58,7 @@ describe('graphql.collective.test.js', () => {
       expect(result.errors).to.not.exist;
       const expenses = result.data.allExpenses;
       expect(expenses).to.have.length(5);
-      expect(expenses.map(e => e.collective.slug)).to.deep.equal([ 'apex', 'railsgirlsatl', 'apex', 'opensource', 'railsgirlsatl' ]);
+      expect(expenses.map(e => e.collective.slug)).to.deep.equal([ 'apex', 'opensource', 'opensource', 'opensource', 'apex' ]);
     });
   });
 
@@ -117,8 +117,7 @@ describe('graphql.collective.test.js', () => {
       const res = await utils.graphqlQuery(createExpenseQuery, { expense: newExpenseData });
       expect(res.errors).to.exist;
       expect(res.errors[0].message).to.equal('Missing expense.user.email');
-      newExpenseData.user = { email: "testuser@email.com" };
-      console.log(">>> newExpenseData", newExpenseData)
+      newExpenseData.user = { email: "testuser@email.com", name: "testuser" };
       const res2 = await utils.graphqlQuery(createExpenseQuery, { expense: newExpenseData });
       res2.errors && console.error(res2.errors[0]);
       expect(res2.errors).to.not.exist;

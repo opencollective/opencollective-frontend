@@ -70,9 +70,10 @@ export const stringify = (json) => {
   return JSON.stringify(json, null, '>>>>').replace(/\n>>>>+"([^"]+)"/g,'$1').replace(/\n|>>>>+/g,'')
 }
 
-export const makeRequest = (remoteUser) => {
+export const makeRequest = (remoteUser, query) => {
   return {
     remoteUser,
+    body: { query },
     loaders: loaders({ remoteUser })
   }
 }
@@ -99,7 +100,7 @@ export const graphqlQuery = async (query, variables, remoteUser) => {
       schema,
       query,
       null, // rootValue
-      makeRequest(remoteUser), // context
+      makeRequest(remoteUser, query), // context
       variables
     ));
 }

@@ -350,7 +350,7 @@ export function exportToPDF(template, data, options) {
 export const defaultHostCollective = (tag) => {
   if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV  === 'staging') {
     if (tag === 'opensource') {
-      return { id: 772, CollectiveId: 9805, ParentCollectiveId: 83 }; // Open Source Host Collective
+      return { id: 772, CollectiveId: 11004, ParentCollectiveId: 83 }; // Open Source Host Collective
     } else {
       return { id: 7944, CollectiveId: 8674, ParentCollectiveId: 83 }; // Non-open source Host Collective ('host-other')
     }
@@ -390,7 +390,12 @@ export const isEmailInternal = (email) => {
 
 export function capitalize(str) {
   if (!str) return '';
-  return str[0].toUpperCase() + str.slice(1);
+  return str[0].toUpperCase() + str.slice(1).toLowerCase();
+}
+
+export function uncapitalize(str) {
+  if (!str) return '';
+  return str[0].toLowerCase() + str.slice(1);
 }
 
 export function pluralize(str, count) {
@@ -452,7 +457,9 @@ export function formatCurrency(amount, currency, precision = 0) {
 export function formatCurrencyObject(currencyObj, options = { precision: 0 }) {
   const array = [];
   for (const currency in currencyObj) {
-    array.push({ value: currencyObj[currency], str: formatCurrency(currencyObj[currency], currency, options.precision) });
+    if (currencyObj[currency] > 0) {
+      array.push({ value: currencyObj[currency], str: formatCurrency(currencyObj[currency], currency, options.precision) });
+    }
   }
   if (array.length === 1) return array[0].str;
   array.sort((a, b) => b.value - a.value)

@@ -1,13 +1,12 @@
-import models from '../models';
-import errors from '../lib/errors';
-import paypalAdaptive from '../gateways/paypalAdaptive';
+import models from '../../models';
+import errors from '../../lib/errors';
+import paypalAdaptive from './adaptiveGateway';
 import moment from 'moment';
 import config from 'config';
-import uuid from 'node-uuid';
-import { convertToCurrency } from '../lib/currency';
-import { formatCurrency } from '../lib/utils';
-import debugLib from 'debug';
-const debug = debugLib('paypal');
+import { convertToCurrency } from '../../lib/currency';
+import { formatCurrency } from '../../lib/utils';
+import adaptive from './adaptive';
+
 
 /**
  * PayPal paymentProvider
@@ -49,79 +48,9 @@ const getPreapprovalDetailsAndUpdatePaymentMethod = function(paymentMethod) {
 }
 
 export default {
-  features: {
-    recurring: false,
-    paymentMethod: true // creates a payment method that can be used to pay up to $2,000 USD or equivalent
-  },
-
-  fees: async ({ amount, currency, host }) => {
-    if (host.currency === currency)
-      return (0.029 * amount + 30);
-    else {
-      return (0.05 * amount + 30);
-    }
-  },
-
-  pay: (collective, expense, email, preapprovalKey) => {
-    const uri = `/collectives/${collective.id}/expenses/${expense.id}/paykey/`;
-    const baseUrl = config.host.webapp + uri;
-    const amount = expense.amount/100;
-    let createPaymentResponse;
-    const payload = {
-      // Note: if we change this to 'PAY', payment will complete in one step
-      // but we won't get any info on fees or conversion rates.
-      // By creating payment, we get that info in the first response.
-      actionType: 'CREATE',
-      // TODO does PayPal accept all the currencies that we support in our expenses?
-      currencyCode: expense.currency,
-      feesPayer: 'SENDER',
-      memo: `Reimbursement from ${collective.name}: ${expense.description}`,
-      trackingId: [uuid.v1().substr(0, 8), expense.id].join(':'),
-      preapprovalKey,
-      returnUrl: `${baseUrl}/success`,
-      cancelUrl: `${baseUrl}/cancel`,
-      receiverList: {
-        receiver: [
-          {
-            email,
-            amount,
-            paymentType: 'SERVICE'
-          }
-        ]
-      }
-    };
-
-    return paypalAdaptive.pay(payload)
-      .tap(payResponse => createPaymentResponse = payResponse)
-      .then(payResponse => paypalAdaptive.executePayment(payResponse.payKey))
-      .then(executePaymentResponse => {
-        return { createPaymentResponse, executePaymentResponse}
-      });
-  },
-
-  // Returns the balance in the currency of the paymentMethod
-  getBalance: (paymentMethod) => {
-    let totalSpent = 0, totalTransactions = 0, firstTransactionAt, lastTransactionAt;
-    return models.Transaction.findAll({
-      attributes: [
-        'amountInHostCurrency', 'paymentProcessorFeeInHostCurrency', 'platformFeeInHostCurrency', 'hostFeeInHostCurrency'
-      ],
-      where: {
-        type: 'DEBIT',
-        PaymentMethodId: paymentMethod.id
-      }
-    }).map(t => {
-      totalTransactions++;
-      if (!firstTransactionAt) {
-        firstTransactionAt = t.createdAt;
-      }
-      lastTransactionAt = t.createdAt;
-      totalSpent += t.netAmountInHostCurrency;
-    })
-    .then(() => {
-      debug(`Total spent: ${formatCurrency(totalSpent, paymentMethod.currency)} across ${totalTransactions} transactions between ${firstTransactionAt} and ${lastTransactionAt}`);
-      return 200000 + totalSpent; // total spent has a negative value (in cents)
-    })
+  types: {
+    default: adaptive,
+    adaptive
   },
 
   oauth: {
@@ -145,15 +74,15 @@ export default {
             const lowerLimit = collective.currency === 'USD' ? 2000 : Math.floor(0.95 * limit);
             console.log(">>> requesting a paykey for ", formatCurrency(lowerLimit*100, collective.currency));
             return {
-              currencyCode: collective.currency,
+              currencyCode: 'USD', // collective.currency, // we should use the currency of the host collective but still waiting on PayPal to resolve that issue.
               startingDate: new Date().toISOString(),
               endingDate: expiryDate.toISOString(),
               returnUrl: `${config.host.api}/connected-accounts/paypal/callback?paypalApprovalStatus=success&preapprovalKey=\${preapprovalKey}`,
               cancelUrl: `${config.host.api}/connected-accounts/paypal/callback?paypalApprovalStatus=error&preapprovalKey=\${preapprovalKey}`,
               displayMaxTotalAmount: false,
               feesPayer: 'SENDER',
-              maxAmountPerPayment: lowerLimit, // PayPal claims this can go up to $10k without needing additional permissions from them.
-              maxTotalAmountOfAllPayments: lowerLimit, // PayPal claims this isn't needed but Live errors out if we don't send it.
+              maxAmountPerPayment: 2000.00, // lowerLimit, // PayPal claims this can go up to $10k without needing additional permissions from them.
+              maxTotalAmountOfAllPayments: 2000.00, //, // PayPal claims this isn't needed but Live errors out if we don't send it.
               clientDetails: CollectiveId
             };
           });

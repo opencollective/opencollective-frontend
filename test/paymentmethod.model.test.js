@@ -14,7 +14,7 @@ describe("paymentmethod.model.test.js", () => {
 
   describe("validation", () => {
     it('validates the token for Stripe', (done) => {
-      models.PaymentMethod.create({ service: 'stripe', token: 'invalid token' })
+      models.PaymentMethod.create({ service: 'stripe', type: 'creditcard', token: 'invalid token' })
         .catch(e => {
           expect(e.message).to.equal("Invalid Stripe token invalid token");
           done();
@@ -30,31 +30,31 @@ describe("paymentmethod.model.test.js", () => {
     before('create a payment method', () => models.PaymentMethod.create({
       name: '4242',
       service: 'stripe',
+      type: 'creditcard',
       token: 'tok_123456781234567812345678',
       CollectiveId: organization.id,
       monthlyLimitPerMember: 10000
     }).then(pm => paymentMethod = pm));
     before('create many transactions', () => models.Transaction.createMany([
-      { amount: 500 },
-      { amount: 200 },
-      { amount: 1000 }
+      { netAmountInCollectiveCurrency: -500 },
+      { netAmountInCollectiveCurrency: -200 },
+      { netAmountInCollectiveCurrency: -1000 }
     ],
     {
       CreatedByUserId: user.id,
-      FromCollectiveId: organization.id,
-      CollectiveId: collective.id,
+      FromCollectiveId: collective.id,
+      CollectiveId: organization.id,
       PaymentMethodId: paymentMethod.id,
       currency: collective.currency,
       HostCollectiveId: collective.id,
-      type: 'CREDIT'
+      type: 'DEBIT'
     }));
 
-    it(`computes the balance in the currency of the payment method's collective`, () => paymentMethod
-      .getBalanceForUser(user)
-      .then(balance => {
-        expect(balance.currency).to.equal(organization.currency);
-        expect(balance.amount).to.equal(7974); // $100 - (€5 + €2 + €10)
-      }));
+    it(`computes the balance in the currency of the payment method's collective`, async () => {
+      const balance = await paymentMethod.getBalanceForUser(user);
+      expect(balance.currency).to.equal(organization.currency);
+      expect(balance.amount).to.equal(7974); // $100 - (€5 + €2 + €10)
+    });
 
   });
 

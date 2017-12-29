@@ -174,6 +174,7 @@ const getNotificationLabel = (template, recipients) => {
     'collective.order.created': 'notifications of new donations for this collective',
     'collective.expense.created': 'notifications of new expenses submitted to this collective',
     'collective.monthlyreport': 'monthly reports for collectives',
+    'collective.member.created': 'notifications of new members',
     'host.monthlyreport': 'monthly reports for host',
     'collective.transaction.created': 'notifications of new transactions for this collective',
     'user.monthlyreport': 'monthly reports for backers',
@@ -193,6 +194,10 @@ const generateEmailFromTemplate = (template, recipient, data, options = {}) => {
       template += '.sustainoss';
   }
 
+  if (template === 'donationmatched') {
+    if (data.collective.slug.match(/wwcode/))
+      template += '.wwcode';
+  }
   if (template === 'thankyou') {
     if (data.collective.slug.match(/wwcode/))
       template += '.wwcode';
@@ -274,6 +279,9 @@ const sendMessageFromActivity = (activity, notification) => {
   switch (activity.type) {
     case activities.COLLECTIVE_TRANSACTION_CREATED:
       return generateEmailFromTemplateAndSend('collective.transaction.created', userEmail, data);
+
+    case activities.COLLECTIVE_MEMBER_CREATED:
+      return generateEmailFromTemplateAndSend('collective.member.created', userEmail, data);
 
     case activities.COLLECTIVE_EXPENSE_CREATED:
       data.actions = {

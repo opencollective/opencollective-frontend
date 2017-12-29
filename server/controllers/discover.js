@@ -20,7 +20,7 @@ export default (req, res, next) => {
     !show || show === 'all' ? '' : show,
     12,
     [],
-    1000,
+    500,
     false,
     orderBy,
     'desc',

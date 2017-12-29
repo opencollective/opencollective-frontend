@@ -44,6 +44,7 @@ export const PaymentMethodInputType = new GraphQLInputObjectType({
     uuid: { type: GraphQLString }, // used to fetch an existing payment method
     token: { type: GraphQLString },
     service: { type: GraphQLString },
+    type: { type: GraphQLString, description: "creditcard or bitcoin" },
     customerId: { type: GraphQLString },
     data: { type: GraphQLJSON },
     name: { type: GraphQLString },
@@ -63,6 +64,7 @@ export const UserInputType = new GraphQLInputObjectType({
       firstName: { type: GraphQLString },
       lastName: { type: GraphQLString },
       name: { type: GraphQLString },
+      company: { type: GraphQLString },
       image: { type: GraphQLString },
       username: { type: GraphQLString },
       description: { type: GraphQLString },
@@ -92,6 +94,7 @@ export const CollectiveInputType = new GraphQLInputObjectType({
     slug: { type: GraphQLString },
     type: { type: GraphQLString },
     name: { type: GraphQLString },
+    company: { type: GraphQLString },
     website: { type: GraphQLString },
     twitterHandle: { type: GraphQLString },
     description: { type: GraphQLString },
@@ -124,6 +127,7 @@ export const CollectiveAttributesInputType = new GraphQLInputObjectType({
     slug: { type: GraphQLString },
     type: { type: GraphQLString },
     name: { type: GraphQLString },
+    company: { type: GraphQLString },
     firstName: { type: GraphQLString }, // for Collective type USER
     lastName: { type: GraphQLString }, // for Collective type USER
     email: { type: GraphQLString }, // for Collective type USER
@@ -177,11 +181,15 @@ export const OrderInputType = new GraphQLInputObjectType({
   fields: () => ({
     quantity: { type: GraphQLInt },
     totalAmount: { type: GraphQLInt },
+    hostFeePercent: { type: GraphQLInt },
+    platformFeePercent: { type: GraphQLInt },
     interval: { type: GraphQLString },
     description: { type: GraphQLString },
     publicMessage: { type: GraphQLString },
     privateMessage: { type: GraphQLString },
     paymentMethod: { type: PaymentMethodInputType },
+    matchingFund: { type: GraphQLString, description: "The first part of the UUID of the PaymentMethod that can be used to match the donation" },
+    referral: { type: CollectiveAttributesInputType, description: "The referral collective" },
     user: { type: UserInputType },
     fromCollective: { type: CollectiveAttributesInputType },
     collective: { type: new GraphQLNonNull(CollectiveAttributesInputType) },

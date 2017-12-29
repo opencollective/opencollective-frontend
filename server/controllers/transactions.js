@@ -1,4 +1,17 @@
 import models, { sequelize } from '../models';
+import { getFxRate } from '../lib/currency';
+
+export const getFxRateController = (req, res, next) => {
+  const { 
+    fromCurrency,
+    toCurrency,
+    date
+  } = req.params;
+
+  return getFxRate(fromCurrency, toCurrency, date).then(fxrate => {
+    return res.send({fxrate});
+  }).catch(next);
+}
 
 /**
  * Get a transaction

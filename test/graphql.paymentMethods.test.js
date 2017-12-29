@@ -4,7 +4,8 @@ import { describe, it } from 'mocha';
 import * as utils from './utils';
 import models from '../server/models';
 import roles from '../server/constants/roles';
-import nock from 'nock';
+import sinon from 'sinon';
+import * as libcurrency from '../server/lib/currency';
 
 let host, admin, user, collective, paypalPaymentMethod;
 
@@ -55,6 +56,7 @@ describe('graphql.paymentMethods.test.js', () => {
 
   beforeEach('create a paypal paymentMethod', () => models.PaymentMethod.create({
     service: 'paypal',
+    type: 'adaptive',
     name: 'host@paypal.com',
     data:  { redirect: "http://localhost:3000/brusselstogether/collectives/expenses" },
     token: 'PA-5GM04696CF662222W',
@@ -81,14 +83,17 @@ describe('graphql.paymentMethods.test.js', () => {
   });
 
   describe('add funds', () => {
-    let order;
+    let order, sandbox;
     const fxrate = 1.1654; // 1 EUR = 1.1654 USD
 
     beforeEach(() => {
+      sandbox = sinon.sandbox.create();
+      sandbox.stub(libcurrency, 'getFxRate', () => Promise.resolve(fxrate));
       return models.PaymentMethod.findOne({
         where: {
           service: 'opencollective',
-          CollectiveId: host.id
+          CollectiveId: host.id,
+          type: 'collective'
         }
       }).then(pm => {
         order = {
@@ -102,6 +107,10 @@ describe('graphql.paymentMethods.test.js', () => {
         }
       })
     })
+
+    afterEach(() => {
+      sandbox.restore();
+    });
 
     const createOrderQuery = `
     mutation createOrder($order: OrderInputType!) {
@@ -146,6 +155,17 @@ describe('graphql.paymentMethods.test.js', () => {
       expect(result2.errors[0].message).to.equal(`You don't have sufficient permissions to access this payment method`);
     });
 
+    it('fails to change platformFeePercent if not root', async () => {
+      order.fromCollective = {
+        id: host.id
+      };
+      order.platformFeePercent = 5;
+      const result = await utils.graphqlQuery(createOrderQuery, { order }, user);
+      result.errors && console.error(result.errors[0]);
+      expect(result.errors).to.exist;
+      expect(result.errors[0].message).to.equal(`Only a root can change the platformFeePercent`);
+    });
+
     it('fails to add funds to a collective not hosted on the same host', async () => {
 
       const collective2 = await models.Collective.create({
@@ -167,12 +187,6 @@ describe('graphql.paymentMethods.test.js', () => {
     });
 
     it('adds funds from the host (USD) to the collective (EUR)', async () => {
-
-      nock('http://api.fixer.io:80', {"encodedQueryParams":true})
-      .get('/latest')
-      .times(2)
-      .query({"base":"EUR","symbols":"USD"})
-      .reply(200, {"base":"EUR","date":"2017-11-10","rates":{"USD":fxrate}});
 
       order.fromCollective = {
         id: host.id
@@ -197,12 +211,8 @@ describe('graphql.paymentMethods.test.js', () => {
 
     it('adds funds from the host (USD) to the collective (EUR) on behalf of a new organization', async () => {
 
-      nock('http://api.fixer.io:80', {"encodedQueryParams":true})
-      .get('/latest')
-      .times(2)
-      .query({"base":"EUR","symbols":"USD"})
-      .reply(200, {"base":"EUR","date":"2017-11-10","rates":{"USD":fxrate}});
-
+      const hostFeePercent = 4;
+      order.hostFeePercent = hostFeePercent;
       order.user = {
         email: 'admin@neworg.com',
         name: 'Paul Newman'
@@ -220,13 +230,13 @@ describe('graphql.paymentMethods.test.js', () => {
       expect(transaction.CreatedByUserId).to.equal(admin.id);
       expect(org.CreatedByUserId).to.equal(admin.id);
       expect(transaction.FromCollectiveId).to.equal(org.id);
-      expect(transaction.hostFeeInHostCurrency).to.equal(Math.round(collective.hostFeePercent/100*order.totalAmount*fxrate));
+      expect(transaction.hostFeeInHostCurrency).to.equal(Math.round(hostFeePercent/100*order.totalAmount*fxrate));
       expect(transaction.platformFeeInHostCurrency).to.equal(0);
       expect(transaction.paymentProcessorFeeInHostCurrency).to.equal(0);
       expect(transaction.hostCurrency).to.equal(host.currency);
       expect(transaction.currency).to.equal(collective.currency);
       expect(transaction.amount).to.equal(order.totalAmount);
-      expect(transaction.netAmountInCollectiveCurrency).to.equal(order.totalAmount * (1-collective.hostFeePercent/100));
+      expect(transaction.netAmountInCollectiveCurrency).to.equal(order.totalAmount * (1-hostFeePercent/100));
       expect(transaction.amountInHostCurrency).to.equal(Math.round(order.totalAmount * fxrate));
       expect(transaction.hostCurrencyFxRate).to.equal(Number((1/fxrate).toFixed(15)));
       expect(transaction.amountInHostCurrency).to.equal(1165);
@@ -244,6 +254,7 @@ describe('graphql.paymentMethods.test.js', () => {
           paymentMethods {
             id
             service
+            type
             balance
             currency
           }

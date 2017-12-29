@@ -1,11 +1,12 @@
-import models, { sequelize } from '../models';
-import { type as TransactionTypes } from '../constants/transactions';
+import models, { sequelize } from '../../models';
+import { type as TransactionTypes } from '../../constants/transactions';
 import Promise from 'bluebird';
-import { getFxRate } from '../lib/currency';
+import { getFxRate } from '../../lib/currency';
 
 export default {
   features: {
-    recurring: false
+    recurring: false,
+    waitToCharge: false
   },
   // Returns the balance in the currency of the paymentMethod (ie. currency of the Collective)
   getBalance: (paymentMethod) => {
@@ -50,21 +51,18 @@ export default {
       });
     });
   },
-  processOrder: (order) => {
+  processOrder: (order, options = {}) => {
     // Get the host of the fromCollective and collective
     return Promise.props({
       fromCollectiveHost: order.fromCollective.getHostCollective(),
       collectiveHost: order.collective.getHostCollective(),
     })
     .then(results => {
-      let hostFeePercent = 0;
+
+      const hostFeePercent = options.hostFeePercent || 0;
+      const platformFeePercent = options.platformFeePercent || 0;
+
       if (!results.fromCollectiveHost) {
-
-        // We only add the host fees when adding funds on behalf of another user/organization
-        if (order.fromCollective.id !== order.collective.HostCollectiveId) {
-          hostFeePercent = order.collective.hostFeePercent;
-        }
-
         // If the fromCollective has no Host (ie. when we add fund on behalf of a user/organization),
         // we check if the payment method belongs to the Host of the Order.collective (aka add funds)
         if (order.collective.HostCollectiveId !== order.paymentMethod.CollectiveId) {
@@ -88,6 +86,7 @@ export default {
       .then(fxrate => {
         const totalAmountInPaymentMethodCurrency = order.totalAmount * fxrate;
         const hostFeeInHostCurrency = hostFeePercent / 100 * order.totalAmount * fxrate;
+        const platformFeeInHostCurrency = platformFeePercent / 100 * order.totalAmount * fxrate;
         payload.transaction = {
           type: TransactionTypes.CREDIT,
           OrderId: order.id,
@@ -98,7 +97,7 @@ export default {
           netAmountInCollectiveCurrency: order.totalAmount * (1 - hostFeePercent/100),
           amountInHostCurrency: totalAmountInPaymentMethodCurrency,
           hostFeeInHostCurrency,
-          platformFeeInHostCurrency: 0,
+          platformFeeInHostCurrency,
           paymentProcessorFeeInHostCurrency: 0,
           description: order.description,
         };

@@ -115,15 +115,15 @@ describe('user.models.test.js', () => {
 
     it('creates a new user collective and generates a unique slug', () => {
       const email = 'xavier.damman@email.com';
-      return User.createUserWithCollective({ email })
+      return User.createUserWithCollective({ email, firstName: "Xavier", lastName: "Damman" })
         .then(user => {
           expect(user.email).to.equal(email);
-          expect(user.collective.slug).to.equal('xavierdamman');
+          expect(user.collective.slug).to.equal('xavier-damman');
           expect(user.collective.type).to.equal('USER');
           return User.createUserWithCollective({ firstName: 'Xavier', lastName: 'Damman', email: 'xavierdamman+test@mail.com' });
         })
         .then(user2 => {
-          expect(user2.collective.slug).to.equal('xavier-damman');
+          expect(user2.collective.slug).to.equal('xavier-damman1');
           expect(user2.collective.name).to.equal('Xavier Damman');        
           expect(user2.firstName).to.equal('Xavier');
           expect(user2.lastName).to.equal('Damman');

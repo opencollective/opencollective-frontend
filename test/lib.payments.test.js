@@ -5,7 +5,7 @@ import models from '../server/models';
 import * as utils from '../test/utils';
 import * as payments from '../server/lib/payments';
 import roles from '../server/constants/roles';
-import * as stripe from '../server/gateways/stripe';
+import * as stripe from '../server/paymentProviders/stripe/gateway';
 import Promise from 'bluebird';
 
 const AMOUNT = 1099;
@@ -55,7 +55,7 @@ describe('lib.payments.test.js', () => {
   });
 
   beforeEach('create a user', () => models.User.createUserWithCollective(userData).then(u => user = u));
-  beforeEach('create a user', () => models.User.createUserWithCollective({email: EMAIL}).then(u => user2 = u));
+  beforeEach('create a user', () => models.User.createUserWithCollective({ email: EMAIL, name: "anotheruser"}).then(u => user2 = u));
   beforeEach('create a host', () => models.User.createUserWithCollective(utils.data('host1')).then(u => host = u));
   beforeEach('create a collective', () => models.Collective.create(utils.data('collective1')).then(g => collective = g));
   beforeEach('create a collective', () => models.Collective.create(utils.data('collective2')).then(g => collective2 = g));

@@ -75,8 +75,8 @@ describe('graphql.transaction.test.js', () => {
       expect(expense).to.have.property('attachment');
       expect(expense.attachment).to.equal(null); // can't see attachment if not logged in
       expect(order).to.have.property('paymentMethod');
-      expect(order.createdByUser.id).to.equal(4720); // Nicole user
-      expect(order.host.id).to.equal(857); // wwcode host collective
+      expect(order.createdByUser.id).to.equal(4348); // Nicole user
+      expect(order.host.id).to.equal(9804); // wwcode host collective
       expect(order.createdByUser.email).to.equal(null); // can't see email if not logged in
       expect(order.host.email).to.equal(null);
     });
@@ -193,7 +193,7 @@ describe('graphql.transaction.test.js', () => {
       expect(result.errors).to.not.exist;
       const transactions = result.data.allTransactions;
       expect(transactions.length).to.equal(limit);
-      expect(transactions[0].id).to.equal(3587);
+      expect(transactions[0].id).to.equal(9595);
       const expense = transactions.find(t => t.type === 'DEBIT');
       expect(expense.attachment).to.equal(null);
       return models.User.findOne({ where: { id: expense.createdByUser.id } }).then(async (user) => {

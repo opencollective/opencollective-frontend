@@ -16,7 +16,7 @@ import getPaymentMethods from './controllers/paymentMethods';
 import * as subscriptions from './controllers/subscriptions';
 import * as test from './controllers/test';
 import * as users from './controllers/users';
-import stripeWebhook from './controllers/stripeWebhook';
+import stripeWebhook from './controllers/webhooks';
 
 import * as email from './controllers/services/email';
 import syncMeetup from './controllers/services/meetup';
@@ -46,7 +46,9 @@ export default (app) => {
    */
   app.use('/status', serverStatus(app));
 
-  app.use('*', auth.authorizeApiKey);
+  if (process.env.NODE_ENV !== 'development') {
+    app.use('*', auth.authorizeApiKey);
+  }
 
   if (process.env.DEBUG) {
     app.use('*', (req, res, next) => {
@@ -115,6 +117,8 @@ export default (app) => {
    * Discover
    */
   app.get('/discover', getDiscoverPage);
+
+  app.get('/fxrate/:fromCurrency/:toCurrency/:date?', transactions.getFxRateController);
 
   /**
    * Users.

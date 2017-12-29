@@ -30,7 +30,12 @@ export default {
     "firstName": "Anish",
     "lastName": "Bas",
     "username": "abas",
+    "image": "https://pbs.twimg.com/profile_images/3075727251/5c825534ad62223ae6a539f6a5076d3c_400x400.jpeg",
+    "description": "small guy",
     "email": "Xdam@opencollective.com",
+    "twitterHandle": "xdamman",
+    "company": "Open Collective Inc.",
+    "website": "http://xdamman.com",
     "password": "ssapssap"
   },
 
@@ -152,6 +157,7 @@ export default {
   "paymentMethod1": {
     "token": "PA-1B0110758V169653C",
     "service": "paypal",
+    "type": "adaptive",
     "startDate": "2017-01-30T07:31:37.747Z",
     "endDate": "2018-01-30T07:31:37.747Z",
     "confirmedAt": "2017-01-30T07:31:37.747Z"
@@ -160,6 +166,7 @@ export default {
   "paymentMethod2": {
     "token": "tok_123456781234567812345678",
     "service": "stripe",
+    "type": "creditcard",
     "customerId": "cus_123",
     "confirmedAt": "2017-01-30T07:31:37.747Z",
     "name": "4242",

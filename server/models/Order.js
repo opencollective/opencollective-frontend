@@ -1,8 +1,6 @@
 import { type } from '../constants/transactions';
 import Promise from 'bluebird';
 import CustomDataTypes from './DataTypes';
-import { formatCurrency } from '../lib/utils';
-import { getFxRate } from '../lib/currency';
 
 import debugLib from 'debug';
 const debug = debugLib('order');
@@ -97,6 +95,24 @@ export default function(Sequelize, DataTypes) {
       onUpdate: 'CASCADE'
     },
 
+    MatchingPaymentMethodId: {
+      type: DataTypes.INTEGER,
+      references: { model: 'PaymentMethods', key: 'id' },
+      onDelete: 'SET NULL',
+      onUpdate: 'CASCADE',
+      allowNull: true,
+      description: "References the PaymentMethod used to match"
+    },
+
+    ReferralCollectiveId: {
+      type: DataTypes.INTEGER,
+      references: { model: 'Collectives', key: 'id' },
+      onDelete: 'SET NULL',
+      onUpdate: 'CASCADE',
+      allowNull: true,
+      description: "Referral"
+    },
+
     processedAt: DataTypes.DATE,
 
     createdAt: {
@@ -150,6 +166,16 @@ export default function(Sequelize, DataTypes) {
           createdAt: this.createdAt,
           updatedAt: this.updatedAt
         }
+      },
+
+      activity() {
+        return {
+          id: this.id,
+          totalAmount: this.totalAmount,
+          currency: this.currency,
+          description: this.description,
+          publicMessage: this.publicMessage
+        }
       }
     }
   });
@@ -177,32 +203,10 @@ export default function(Sequelize, DataTypes) {
    */
   Order.prototype.validatePaymentMethod = function(paymentMethod) {
     debug("validatePaymentMethod", paymentMethod.dataValues, "this.user", this.CreatedByUserId);
-
-    if (this.interval && !paymentMethod.features.recurring) {
-      throw new Error("This payment method doesn't support recurring payments");
-    }
-
-    // We get an estimate of the total amount of the order in the currency of the payment method
-    return getFxRate(this.currency, paymentMethod.currency)
-      .then(fxrate => {
-        const totalAmountInPaymentMethodCurrency = this.totalAmount * fxrate;
-        let orderAmountInfo = formatCurrency(this.totalAmount, this.currency);
-        if (this.currency !== paymentMethod.currency) {
-          orderAmountInfo += ` ~= ${formatCurrency(totalAmountInPaymentMethodCurrency, paymentMethod.currency)}`;
-        }
-        if (paymentMethod.monthlyLimitPerMember && totalAmountInPaymentMethodCurrency > paymentMethod.monthlyLimitPerMember) {
-          throw new Error(`The total amount of this order (${orderAmountInfo}) is higher than your monthly spending limit on this payment method (${formatCurrency(paymentMethod.monthlyLimitPerMember, paymentMethod.currency)})`);
-        }
-        return paymentMethod.getBalanceForUser(this.createdByUser, paymentMethod)
-          .then(balance => {
-            debug("validatePaymentMethod", "balance", balance, "totalAmountInPaymentMethodCurrency:", totalAmountInPaymentMethodCurrency, "bool: ", totalAmountInPaymentMethodCurrency > balance.amount);
-            if (balance && totalAmountInPaymentMethodCurrency > balance.amount) {
-              console.log(`>>> throwing error: You don't have enough funds available (${formatCurrency(balance.amount, balance.currency)} left) to execute this order (${orderAmountInfo})`);
-              throw new Error(`You don't have enough funds available (${formatCurrency(balance.amount, balance.currency)} left) to execute this order (${orderAmountInfo})`)
-            }
-            return paymentMethod;
-          })
-        });
+    return paymentMethod.canBeUsedForOrder(this, this.createdByUser).then(canBeUsedForOrder => {
+      if (canBeUsedForOrder) return paymentMethod;
+      else return null;
+    });
   }
 
   Order.prototype.getUser = function() {

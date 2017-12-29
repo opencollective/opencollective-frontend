@@ -2,6 +2,10 @@ import paypal from 'paypal-rest-sdk';
 import async from 'async';
 import config from 'config';
 
+// NOT USED CURRENTLY.
+// Leaving here for now so we can bring this back in near future
+// TODO: should be moved to paypal payment provider under paymentProviders/
+
 /**
  * We will pass the config in all the subsequent calls to be sure we don't
  * overwrite the configuration of the global sdk

@@ -1,4 +1,4 @@
-import * as stripe from '../gateways/stripe';
+import * as stripe from '../paymentProviders/stripe/gateway';
 import { types as CollectiveTypes } from '../constants/collectives';
 import { type as TransactionTypes } from '../constants/transactions';
 import * as paymentProviders from '../paymentProviders';
@@ -6,6 +6,9 @@ import debugLib from 'debug';
 const debug = debugLib('PaymentMethod');
 import { sumTransactions } from '../lib/hostlib';
 import CustomDataTypes from './DataTypes';
+import { get, intersection } from 'lodash';
+import { formatCurrency } from '../lib/utils';
+import { getFxRate } from '../lib/currency';
 
 export default function(Sequelize, DataTypes) {
 
@@ -47,6 +50,7 @@ export default function(Sequelize, DataTypes) {
     },
 
     name: DataTypes.STRING, // custom human readable identifier for the payment method 
+    description: DataTypes.STRING, // custom human readable description (useful for matching fund)
     customerId: DataTypes.STRING, // stores the id of the customer from the payment processor at the platform level
     token: DataTypes.STRING,
     primary: DataTypes.BOOLEAN,
@@ -67,6 +71,10 @@ export default function(Sequelize, DataTypes) {
           msg: `Must be in ${payoutMethods}`
         }
       }
+    },
+
+    type: {
+      type: DataTypes.STRING
     },
 
     data: DataTypes.JSON,
@@ -91,7 +99,28 @@ export default function(Sequelize, DataTypes) {
 
     expiryDate: {
       type: DataTypes.DATE
+    },
+
+    initialBalance: {
+      type: DataTypes.INTEGER,
+      description: "Initial balance on this payment method. Current balance should be a computed value based on transactions."
+    },
+
+    matching: {
+      type: DataTypes.INTEGER,
+      description: "if not null, this payment method can only be used to match x times the donation amount"
+    },
+
+    limitedToTags: {
+      type: DataTypes.ARRAY(DataTypes.STRING),
+      description: "if not null, this payment method can only be used for collectives that have one the tags"
+    },
+
+    limitedToCollectiveIds: {
+      type: DataTypes.ARRAY(DataTypes.INTEGER),
+      description: "if not null, this payment method can only be used for collectives listed by their id"
     }
+
   }, {
     paranoid: true,
 
@@ -102,8 +131,12 @@ export default function(Sequelize, DataTypes) {
           if (!instance.token) {
             throw new Error(`${instance.service} payment method requires a token`);
           }
-          if (instance.service === 'stripe' && !instance.token.match(/^tok_[a-zA-Z0-9]{24}/)) {
-            throw new Error(`Invalid Stripe token ${instance.token}`);
+          if (instance.service === 'stripe' && !instance.token.match(/^(tok|src)_[a-zA-Z0-9]{24}/)) {
+            if (process.env.NODE_ENV !== 'production' && instance.token === 'tok_bypassPending' && instance.data.expMonth === 11 && instance.data.expYear === 23 && instance.data.zip === 10014) {
+              // test token for end to end tests
+            } else {
+              throw new Error(`Invalid Stripe token ${instance.token}`);
+            }
           }
         }
       }
@@ -128,7 +161,7 @@ export default function(Sequelize, DataTypes) {
 
       features() {
         const paymentProvider = paymentProviders[this.service]; // eslint-disable-line import/namespace
-        return paymentProvider.features || {};
+        return paymentProvider.types[this.type || 'default'].features || {};
       },
 
       minimal() {
@@ -153,51 +186,109 @@ export default function(Sequelize, DataTypes) {
    */
 
   /**
+   * Returns true if this payment method can be used for the given order
+   * based on available balance and user
+   * @param order: { totalAmount, currency }
+   * @param user: instanceof models.User
+   */
+  PaymentMethod.prototype.canBeUsedForOrder = async function(order, user) {
+    const name = (this.matching) ? 'matching fund' : 'payment method';
+
+    if (this.expiryDate && new Date(this.expiryDate) < new Date) {
+      throw new Error(`This ${name} has expired`);
+    }
+
+    if (order.interval && !this.features.recurring) {
+      throw new Error(`This ${name} doesn't support recurring payments`);
+    }
+
+    // We get an estimate of the total amount of the order in the currency of the payment method
+    const orderCurrency = order.currency || get(order, 'collective.currency');
+    const fxrate = await getFxRate(orderCurrency, this.currency);
+    const totalAmountInPaymentMethodCurrency = order.totalAmount * fxrate;
+    let orderAmountInfo = formatCurrency(order.totalAmount, orderCurrency);
+    if (orderCurrency !== this.currency) {
+      orderAmountInfo += ` ~= ${formatCurrency(totalAmountInPaymentMethodCurrency, this.currency)}`;
+    }
+    if (this.monthlyLimitPerMember && totalAmountInPaymentMethodCurrency > this.monthlyLimitPerMember) {
+      throw new Error(`The total amount of this order (${orderAmountInfo}) is higher than your monthly spending limit on this ${name} (${formatCurrency(this.monthlyLimitPerMember, this.currency)})`);
+    }
+
+    const balance = await this.getBalanceForUser(user);
+    if (totalAmountInPaymentMethodCurrency * this.matching > balance.amount) {
+      throw new Error(`There is not enough funds left on this ${name} to match your order (balance: ${formatCurrency(balance.amount, this.currency)}`)
+    }
+
+    if (balance && totalAmountInPaymentMethodCurrency > balance.amount) {
+      throw new Error(`You don't have enough funds available (${formatCurrency(balance.amount, this.currency)} left) to execute this order (${orderAmountInfo})`)
+    }
+
+    return true;
+  }
+
+  /**
    * getBalanceForUser
    * Returns the available balance of the current payment method based on:
    * - the balance of CollectiveId if service is opencollective
    * - the monthlyLimitPerMember if any and if the user is a member
    * - the available balance on the paykey for PayPal (not implemented yet)
    */
-  PaymentMethod.prototype.getBalanceForUser = function(user) {
+  PaymentMethod.prototype.getBalanceForUser = async function(user) {
+    if (user && !(user instanceof models.User)) {
+      throw new Error(`Internal error at PaymentMethod.getBalanceForUser(user): user is not an instance of User`);
+    }
+
     const paymentProvider = paymentProviders[this.service]; // eslint-disable-line import/namespace
     let getBalance;
-    if (paymentProvider && paymentProvider.getBalance) {
-      getBalance = paymentProvider.getBalance;
+    if (paymentProvider && paymentProvider.types[this.type || 'default'].getBalance) {
+      getBalance = paymentProvider.types[this.type || 'default'].getBalance;
     } else {
       getBalance = () => Promise.resolve(10000000); // GraphQL doesn't like Infinity
     }
 
     // needed because prepaid payment method can be accessed without logged in
-    if (this.service === 'prepaid') {
-      return paymentProvider.getBalance(this);
+    if (this.service === 'opencollective' && this.type === 'prepaid') {
+      return paymentProvider.types.prepaid.getBalance(this);
     }
 
-    if (!user) return Promise.resolve({});
-    debug("getBalanceForUser", user.dataValues, "paymentProvider:", this.service);
+    if (this.monthlyLimitPerMember && !user) {
+      console.error(">>> this payment method has a monthly limit. Please provide a user to be able to compute their balance.");
+      return { amount: 0, currency: this.currency };
+    }
 
-    return user.populateRoles()
-      .then(() => getBalance(this))
-      .then(balance => {
+    if (user) {
+      await user.populateRoles();
+    }
 
-        if (!this.monthlyLimitPerMember || user.isAdmin(this.CollectiveId)) {
-          return { amount: balance, currency: this.currency };
-        }
+    const balance = await getBalance(this);
 
-        const d = new Date;
-        const firstOfTheMonth = new Date(d.getFullYear(), d.getMonth(), 1);
-        const where = {
-          PaymentMethodId: this.id,
-          CreatedByUserId: user.id,
-          type: TransactionTypes.CREDIT,
-          createdAt: { $gte: firstOfTheMonth }
-        };
-        return sumTransactions('amount', where, this.currency)
-          .then(result => {
-            const availableBalance = this.monthlyLimitPerMember - result.totalInHostCurrency;
-            return { amount: availableBalance, currency: this.currency };
-          });
-      });
+    // Independently of the balance of the external source, the owner of the payment method
+    // may have set up a monthlyLimitPerMember or an initialBalance
+    if (!this.initialBalance && (!this.monthlyLimitPerMember || user && user.isAdmin(this.CollectiveId))) {
+      return { amount: balance, currency: this.currency };
+    }
+
+    let limit = Infinity; // no no, no no no no, no no no no limit!
+    const where = {
+      PaymentMethodId: this.id,
+      type: TransactionTypes.DEBIT
+    };
+
+    if (this.monthlyLimitPerMember) {
+      limit = this.monthlyLimitPerMember;
+      const d = new Date;
+      const firstOfTheMonth = new Date(d.getFullYear(), d.getMonth(), 1);
+      where.createdAt = { $gte: firstOfTheMonth };
+      where.CreatedByUserId = user.id;
+    }
+
+    if (this.initialBalance) {
+      limit = (this.initialBalance > limit) ? limit : this.initialBalance;
+    }
+
+    const result = await sumTransactions('netAmountInCollectiveCurrency', where, this.currency);
+    const availableBalance = limit + result.totalInHostCurrency; // result.totalInHostCurrency is negative
+    return { amount: availableBalance, currency: this.currency };
   };
 
   /**
@@ -247,6 +338,8 @@ export default function(Sequelize, DataTypes) {
           return pm;
         }
       })
+    } else if (paymentMethod.uuid && paymentMethod.uuid.length === 8) {
+      return PaymentMethod.getMatchingFund(paymentMethod.uuid);
     } else {
       // if the user is trying to reuse an existing payment method,
       // we make sure it belongs to the logged in user or to a collective that the user is an admin of
@@ -273,6 +366,40 @@ export default function(Sequelize, DataTypes) {
             });
         })
     }
+  }
+
+  PaymentMethod.getMatchingFund = (shortUUID, options = {}) => {
+    const where = {};
+    if (options.ForCollectiveId) {
+      where.limitedToCollectiveIds = Sequelize.or({ limitedToCollectiveIds: {$eq: null } }, { limitedToCollectiveIds: options.ForCollectiveId });
+    }
+    return PaymentMethod.findOne({
+      where: Sequelize.and(
+        Sequelize.where(Sequelize.cast(Sequelize.col('uuid'), 'text'), { $like: `${shortUUID}%` }),
+        { matching: { $ne: null } }
+      )
+    }).then(async (pm) => {
+      if (pm.expiryDate) {
+        if (new Date(pm.expiryDate) < new Date) {
+          throw new Error("This matching fund is expired");
+        }
+      }
+      if (pm.limitedToCollectiveIds) {
+        if (!options.ForCollectiveId || pm.limitedToCollectiveIds.indexOf(options.ForCollectiveId) === -1) {
+          throw new Error("This matching fund is not available for this collective");
+        }
+      }
+      if (pm.limitedToTags) {
+        if (!options.ForCollectiveId) {
+          throw new Error("Please provide a ForCollectiveId");
+        }
+        const collective = await models.Collective.findById(options.ForCollectiveId);
+        if (intersection(collective.tags, pm.limitedToTags).length === 0) {
+          throw new Error("This matching fund is not available to collectives in this category")
+        }
+      }
+      return pm;
+    });
   }
 
   return PaymentMethod;

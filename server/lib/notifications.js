@@ -57,8 +57,8 @@ export default (Sequelize, activity) => {
         where
       })
     })
-    .then(notifConfigs =>
-      Promise.map(notifConfigs, notifConfig => {
+    .then(notifConfigs => {
+      return Promise.map(notifConfigs, notifConfig => {
         if (notifConfig.channel === 'gitter') {
           return publishToGitter(activity, notifConfig);
         } else if (notifConfig.channel === 'slack') {
@@ -70,7 +70,8 @@ export default (Sequelize, activity) => {
         } else {
           return Promise.resolve();
         }
-      }))
+      })
+    })
     .catch(err => {
       console.error(`Error while publishing activity type ${activity.type} for collective ${activity.CollectiveId}`, err);
     });

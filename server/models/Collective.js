@@ -16,10 +16,10 @@ import activities from '../constants/activities';
 import Promise from 'bluebird';
 import userlib from '../lib/userlib';
 import CustomDataTypes from './DataTypes';
+import { convertToCurrency } from '../lib/currency';
 import emailLib from '../lib/email';
 import debugLib from 'debug';
 const debug = debugLib('collective');
-
 
 /**
  * Collective Model.
@@ -58,6 +58,7 @@ export default function(Sequelize, DataTypes) {
     },
 
     name: DataTypes.STRING,
+    company: DataTypes.STRING,
 
     CreatedByUserId: {
       type: DataTypes.INTEGER,
@@ -227,6 +228,18 @@ export default function(Sequelize, DataTypes) {
         }
       },
 
+      previewImage() {
+        if (!this.image) return null;
+
+        const cloudinaryBaseUrl = 'https://res.cloudinary.com/opencollective/image/fetch';
+
+        const format = (this.image.match(/\.png$/)) ? 'png' : 'jpg';
+
+        const queryurl = (this.type === 'USER') ? `/c_thumb,g_face,h_48,r_max,w_48,bo_3px_solid_white/c_thumb,h_48,r_max,w_48,bo_2px_solid_rgb:66C71A/e_trim` : `/h_96,c_fill`;
+
+        return `${cloudinaryBaseUrl}${queryurl}/f_${format}/${encodeURIComponent(this.image)}`;
+      },
+
       // Info.
       info() {
         return {
@@ -280,6 +293,7 @@ export default function(Sequelize, DataTypes) {
       minimal() {
         return {
           id: this.id,
+          type: this.type,
           name: this.name,
           image: this.image,
           slug: this.slug,
@@ -287,6 +301,19 @@ export default function(Sequelize, DataTypes) {
           publicUrl: this.publicUrl,
           mission: this.mission,
           isSupercollective: this.isSupercollective
+        }
+      },
+      activity() {
+        return {
+          id: this.id,
+          type: this.type,
+          slug: this.slug,
+          name: this.name,
+          company: this.company,
+          website: this.website,
+          twitterHandle: this.twitterHandle,
+          description: this.description,
+          previewImage: this.previewImage
         }
       }
     },
@@ -319,6 +346,7 @@ export default function(Sequelize, DataTypes) {
         models.PaymentMethod.create({
           CollectiveId: instance.id,
           service: 'opencollective',
+          type: 'collective',
           name: `${capitalize(instance.name)} Collective`,
           primary: true,
           currency: instance.currency
@@ -341,11 +369,25 @@ export default function(Sequelize, DataTypes) {
         return models.PaymentMethod.create({
           CollectiveId: this.id,
           service: 'opencollective',
+          type: 'collective',
           name: `${capitalize(this.name)} Collective`,
           primary: true,
           currency: this.currency
         });
       })
+  };
+
+  // This is quite ugly, and only needed for events.
+  // I'd argue that we should store the event slug as `${parentCollectiveSlug}/events/${eventSlug}`
+  Collective.prototype.getUrlPath = function() {
+    if (this.type === types.EVENT) {
+      return models.Collective.findById(this.ParentCollectiveId, { attributes: ['slug'] })
+        .then(parent => {
+          return `/${parent.slug}/events/${this.slug}`;
+        })
+    } else {
+      return Promise.resolve(`/${this.slug}`);
+    }
   };
 
   Collective.prototype.getUser = function() {
@@ -367,6 +409,21 @@ export default function(Sequelize, DataTypes) {
     .map(memberCollective => memberCollective.getUser())
     .then(users => uniq(users, (user) => user.id));
   };
+
+  Collective.prototype.getEmails = async function() {
+    if (this.type === 'USER') {
+      const user = await this.getUser();
+      return [user.email];
+    }
+    const admins = await models.Member.findAll({
+      where: {
+        CollectiveId: this.id,
+        role: roles.ADMIN
+      }
+    });
+    const emails = await Promise.map(admins, admin => models.User.findOne({ where: { CollectiveId: admin.MemberCollectiveId }}).then(u => u.email));
+    return emails;
+  }
 
   Collective.prototype.getEvents = function(query = {}) {
     return Collective.findAll({
@@ -499,6 +556,13 @@ export default function(Sequelize, DataTypes) {
     }).then(order => order && order.Tier);
   };
 
+  /**
+   * Add User to the Collective
+   * @post Member( { CreatedByUserId: user.id, MemberCollectiveId: user.CollectiveId, CollectiveId: this.id })
+   * @param {*} user { id, CollectiveId }
+   * @param {*} role 
+   * @param {*} defaultAttributes 
+   */
   Collective.prototype.addUserWithRole = function(user, role, defaultAttributes) {
 
     const lists = {};
@@ -506,17 +570,19 @@ export default function(Sequelize, DataTypes) {
     lists[roles.ADMIN] = 'admins';
     lists[roles.HOST] = 'host';
 
-    const notifications = [ { type:`mailinglist.${lists[role]}` } ];
+    const notifications = [
+      { type: `mailinglist.${lists[role]}` }
+    ];
 
     switch (role) {
       case roles.HOST:
-        notifications.push({ type:activities.COLLECTIVE_TRANSACTION_CREATED });
-        notifications.push({ type:activities.COLLECTIVE_EXPENSE_CREATED });
+        notifications.push({ type: activities.COLLECTIVE_TRANSACTION_CREATED });
         this.update({ HostCollectiveId: user.CollectiveId });
         break;
       case roles.ADMIN:
-        notifications.push({ type:activities.COLLECTIVE_EXPENSE_CREATED });
-        notifications.push({ type:'collective.monthlyreport' });
+        notifications.push({ type: activities.COLLECTIVE_EXPENSE_CREATED });
+        notifications.push({ type: activities.COLLECTIVE_MEMBER_CREATED });
+        notifications.push({ type: 'collective.monthlyreport' });
         break;
     }
 
@@ -531,36 +597,78 @@ export default function(Sequelize, DataTypes) {
     debug("addUserWithRole", user.id, role, "member", member);
     return Promise.all([
       models.Member.create(member),
-      models.Notification.createMany(notifications, { UserId: user.id, CollectiveId: this.id, channel: 'email' }),
+      models.Notification.createMany(notifications, { UserId: user.id, CollectiveId: this.id, channel: 'email' }).catch(e => console.error(`Collective.addUserWithRole error while creating entries in Notifications table for UserId ${user.id} (role: ${role}, CollectiveId: ${this.id}): `, e)),
       models.User.findById(member.CreatedByUserId, { include: [ { model: models.Collective, as: 'collective' }] }),
       models.User.findById(user.id, { include: [ { model: models.Collective, as: 'collective' }] })
     ])
     .then(results => {
       const member = results[0];
       const remoteUser = results[2];
-      const recipient = results[3];
-      if ([roles.ADMIN, roles.MEMBER].indexOf(role) === -1) {
-        return member;
+      const memberUser = results[3];
+
+      switch (role) {
+
+        case roles.BACKER:
+        case roles.ATTENDEE:
+        case roles.FOLLOWER:
+          return Promise.props({
+              memberCollective: models.Collective.findById(member.MemberCollectiveId),
+              order: models.Order.findOne({
+                where: { CollectiveId: this.id, FromCollectiveId: member.MemberCollectiveId },
+                include: [
+                  { model: models.Tier },
+                  { model: models.Subscription },
+                  { model: models.Collective, as: 'referral' }
+                ],
+                order: [['createdAt', 'ASC']]
+              }),
+              urlPath: this.getUrlPath()
+            })
+            .then(({ order, urlPath, memberCollective }) => {
+              const data = {
+                collective: { ...this.minimal, urlPath },
+                member: { ...member.info,
+                  memberCollective: memberCollective.activity,
+                },
+                order: order && {
+                  ...order.activity,
+                  tier: order.Tier && order.Tier.minimal,
+                  subscription: { interval: order.Subscription && order.Subscription.interval }
+                }
+              };
+              if (order && order.referral) {
+                data.order.referral = order.referral.minimal;
+              }
+              return models.Activity.create({
+                CollectiveId: this.id,
+                type: activities.COLLECTIVE_MEMBER_CREATED,
+                data
+              });
+            });
+
+        case roles.MEMBER:
+        case roles.ADMIN:
+          // We only send the notification for new member for role MEMBER and ADMIN
+          return emailLib.send('collective.newmember', memberUser.email, {
+            remoteUser: {
+              email: remoteUser.email,
+              collective: pick(remoteUser.collective, ['slug', 'name', 'image'])
+            },
+            role: role.toLowerCase(),
+            isAdmin: role === roles.ADMIN,
+            collective: {
+              slug: this.slug,
+              name: this.name,
+              type: this.type.toLowerCase()
+            },
+            recipient: {
+              collective: memberUser.collective.activity
+            },
+            loginLink: `${config.host.website}/signin?next=/${memberUser.collective.slug}/edit`
+          }, { cc: remoteUser.email });
+        default:
+          return member;
       }
-      // We only send the notification for new member for role MEMBER and ADMIN
-      emailLib.send('collective.newmember', recipient.email, {
-        remoteUser: {
-          email: remoteUser.email,
-          collective: pick(remoteUser.collective, ['slug', 'name', 'image'])
-        },
-        role: role.toLowerCase(),
-        isAdmin: role === roles.ADMIN,
-        collective: {
-          slug: this.slug,
-          name: this.name,
-          type: this.type.toLowerCase()
-        },
-        recipient: {
-          collective: pick(recipient.collective, ['name', 'slug', 'website', 'twitterHandle', 'description', 'image'])
-        },
-        loginLink: results[3].generateLoginLink(`/${recipient.collective.slug}/edit`)
-      }, { cc: remoteUser.email });
-      return member;
     });
   };
 
@@ -691,7 +799,7 @@ export default function(Sequelize, DataTypes) {
           pm.CollectiveId = this.id;
           pm.currency = pm.currency || this.currency;
           models.PaymentMethod.update({ primary: false }, { where: { CollectiveId: this.id, archivedAt: { $eq: null } }});
-          return models.PaymentMethod.createFromStripeSourceToken({ ...defaultAttributes, ...pm });
+          return models.PaymentMethod.createFromStripeSourceToken({ ...defaultAttributes, ...pm, type: 'creditcard' }); // TODO: nicer to not have to hard code 'creditcard'
         }
       });
     })
@@ -827,6 +935,28 @@ export default function(Sequelize, DataTypes) {
       where
     })
     .then(result => Promise.resolve(parseInt(result.toJSON().total, 10)));
+  };
+
+  // Get the total amount raised through referral
+  Collective.prototype.getTotalAmountRaised = function() {
+    return models.Order.findAll({
+      attributes: [
+        [Sequelize.fn('COALESCE', Sequelize.fn('SUM', Sequelize.col('totalAmount')), 0), 'total'],
+        [Sequelize.fn('MAX', Sequelize.col('createdAt')), 'createdAt'],
+        [Sequelize.fn('MAX', Sequelize.col('currency')), 'currency']
+      ],
+      where: {
+        ReferralCollectiveId: this.id
+      },
+      group: ['currency']
+    })
+    .then(rows => rows.map(r => r.dataValues))
+    .then(amounts => Promise.map(amounts, s => convertToCurrency(s.total, s.currency, this.currency, s.createdAt)))
+    .then(amounts => {
+      let total = 0;
+      amounts.map(a => total += a);
+      return Math.round(total);
+    })
   };
 
   Collective.prototype.getTotalTransactions = function(startDate, endDate, type) {
@@ -968,7 +1098,7 @@ export default function(Sequelize, DataTypes) {
   };
 
   Collective.prototype.isHost = function() {
-    return models.ConnectedAccount.findOne({ where: { service: 'stripe', CollectiveId: this.id }}).then(r => Boolean(r));
+    return models.Member.findOne({ where: { MemberCollectiveId: this.id, role: 'HOST' }}).then(r => Boolean(r));
   }
 
   Collective.prototype.isHostOf = function(CollectiveId) {

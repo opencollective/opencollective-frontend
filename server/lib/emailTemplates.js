@@ -10,8 +10,8 @@ const templates = {};
 const templateNames = [
   'announcement',
   'announcement.text',
-  'user.monthlyreport',
-  'user.monthlyreport.text',
+  'donationmatched',
+  'donationmatched.wwcode',
   'email.approve',
   'email.message',
   'github.signup',
@@ -21,6 +21,7 @@ const templateNames = [
   'collective.expense.created',
   'collective.expense.paid',
   'collective.order.created',
+  'collective.member.created',
   'collective.monthlyreport',
   'collective.monthlyreport.text',
   'collective.newmember',
@@ -40,6 +41,8 @@ const templateNames = [
   'thankyou.fr',
   'thankyou.laprimaire',
   'user.forgot.password',
+  'user.monthlyreport',
+  'user.monthlyreport.text',
   'user.new.token',
   'user.yearlyreport',
   'user.yearlyreport.text'

@@ -207,6 +207,13 @@ export const CollectiveStatsType = new GraphQLObjectType({
           return collective.getTotalAmountSent();
         }
       },
+      totalAmountRaised: {
+        description: 'Total amount raised through referral',
+        type: GraphQLInt,
+        resolve(collective) {
+          return collective.getTotalAmountRaised();
+        }
+      },
       yearlyBudget: {
         type: GraphQLInt,
         resolve(collective) {
@@ -278,6 +285,7 @@ export const CollectiveInterfaceType = new GraphQLInterfaceType({
       type: { type: GraphQLString },
       isActive: { type: GraphQLBoolean },
       name: { type: GraphQLString },
+      company: { type: GraphQLString },
       description: { type: GraphQLString },
       longDescription: { type: GraphQLString },
       mission: { type: GraphQLString },
@@ -430,6 +438,12 @@ const CollectiveFields = () => {
         return collective.name;
       }
     },
+    company: {
+      type: GraphQLString,
+      resolve(collective) {
+        return collective.company;
+      }
+    },
     description: {
       type: GraphQLString,
       resolve(collective) {
@@ -577,10 +591,10 @@ const CollectiveFields = () => {
 
         query.where = { CollectiveId: collective.id };
         if (args.TierId) query.where.TierId = args.TierId;
-        const roles = args.roles || args.role && [ args.role ];
+        const roles = args.roles || (args.role && [ args.role ]);
 
         if (roles && roles.length > 0) {
-          query.where.role = { $in: args.roles };
+          query.where.role = { $in: roles };
         }
         
         let conditionOnMemberCollective;
@@ -619,9 +633,9 @@ const CollectiveFields = () => {
       },
       resolve(collective, args) {
         const where = { MemberCollectiveId: collective.id };
-        const roles = args.roles || args.role && [ args.role ];
+        const roles = args.roles || (args.role && [ args.role ]);
         if (roles && roles.length > 0) {
-          where.role = { $in: args.roles };
+          where.role = { $in: roles };
         }
         return models.Member.findAll({ where, limit: args.limit, offset: args.offset });
       }

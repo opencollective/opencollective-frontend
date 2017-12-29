@@ -389,7 +389,7 @@ export default (Sequelize, DataTypes) => {
       return Promise.resolve(this.rolesByCollectiveId);
     }
 
-    return this.rolesByCollectiveId || models.Member.findAll({ where: { MemberCollectiveId: this.CollectiveId }})
+    return models.Member.findAll({ where: { MemberCollectiveId: this.CollectiveId }})
       .then(memberships => {
         const rolesByCollectiveId = {};
         memberships.map(m => {
@@ -430,6 +430,12 @@ export default (Sequelize, DataTypes) => {
     return result;
   }
 
+  User.prototype.isRoot = function() {
+    const result = this.hasRole([roles.ADMIN], 1);
+    debug("isRoot ?", result);
+    return result;
+  }
+
   User.prototype.getPersonalDetails = function(remoteUser) {
     if (!remoteUser) return Promise.resolve({});
     return this.populateRoles()
@@ -441,6 +447,9 @@ export default (Sequelize, DataTypes) => {
         debug("getPersonalDetails", "remoteUser id:", remoteUser.id, "is admin of collective ids:", adminOfCollectives, "this user id:", this.id, "is member of", memberOfCollectives, "canAccess?", canAccess);
         return canAccess;
       })
+      .then(canAccess => {
+        return canAccess ? this.info : this.public;
+      });
   }
 
 
@@ -509,7 +518,7 @@ export default (Sequelize, DataTypes) => {
         }
         const userCollective = {
           type: 'USER',
-          name: userData.name || name || user.email && user.email.split(/@|\+/)[0],
+          name: userData.name || name || "anonymous",
           image: userData.image,
           mission: userData.mission,
           description: userData.description,

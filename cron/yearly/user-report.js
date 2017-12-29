@@ -10,9 +10,9 @@ import emailLib from '../../server/lib/email';
 import queries from '../../server/lib/queries';
 
 const d = new Date;
-const startDate = new Date(`${d.getFullYear()}`);
-const endDate = new Date(`${d.getFullYear()+1}`);
-const year = d.getFullYear();
+const startDate = new Date(`${d.getFullYear()-1}`);
+const endDate = new Date(`${d.getFullYear()}`);
+const year = startDate.getFullYear();
 
 console.log("startDate", startDate, "endDate", endDate);
 
@@ -239,7 +239,7 @@ const init = () => {
     if (hosts.indexOf(collective.id) !== -1) {
       return console.log(collective.slug, "is a host, skipping");
     }
-    processCollective(collective);
+    return processCollective(collective);
   })
   .then(() => {
     const timeLapsed = Math.round((new Date - startTime)/1000);
