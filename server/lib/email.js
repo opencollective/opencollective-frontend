@@ -1,5 +1,5 @@
 import config from 'config';
-import _, { isArray } from 'lodash';
+import _, { isArray, pick } from 'lodash';
 import Promise from 'bluebird';
 import juice from 'juice';
 import nodemailer from 'nodemailer';
@@ -9,7 +9,6 @@ import activities from '../constants/activities';
 import {isEmailInternal} from './utils';
 import crypto from 'crypto';
 import fs from 'fs';
-
 const debug = debugLib('email');
 
 const render = (template, data) => {
@@ -243,7 +242,7 @@ const generateEmailFromTemplate = (template, recipient, data, options = {}) => {
 
   data.unsubscribeUrl = `${config.host.website}/api/services/email/unsubscribe/${encodeURIComponent(options.bcc || recipient)}/${slug}/${options.type || template}/${generateUnsubscribeToken(options.bcc || recipient, slug, options.type || template)}`;
   data.notificationTypeLabel = getNotificationLabel(template, recipient);
-  data.config = config;
+  data.config = pick(config, ['host']);
   data.utm = `utm_source=opencollective&utm_campaign=${template}&utm_medium=email`;
 
   if (!templates[template]) {

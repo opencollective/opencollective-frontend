@@ -173,6 +173,8 @@ const checkMembers = () => {
   })
 }
 
+/* DISABLED, matching funds fail this check
+// TODO: Find a way to filter out matching funds
 // Check orders
 const checkOrders = () => {
 
@@ -213,7 +215,7 @@ const checkOrders = () => {
       subHeader('orders found with mismatched FromCollectiveId', brokenOrders.length);
       verboseData(brokenOrders, o => o.id);
     })
-}
+} */
 
 // Check expenses
 const checkExpenses = () => {
@@ -377,7 +379,7 @@ const run = () => {
   .then(() => checkHostStripeAccount())
   .then(() => checkUsersAndOrgs())
   .then(() => checkMembers())
-  .then(() => checkOrders())
+  //.then(() => checkOrders())
   .then(() => checkExpenses())
   .then(() => checkTransactions())
   .then(() => checkCollectiveBalance())

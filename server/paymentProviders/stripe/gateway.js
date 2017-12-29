@@ -51,12 +51,26 @@ export const retrieveSubscription = (stripeAccount, stripeSubsriptionId) => {
 /**
  * Get all subscriptions
  */
-export const getSubscriptionsList = (stripeAccount, limit) => {
-  if (!limit) {
-    limit = 10;
+export const getSubscriptionsList = (stripeAccount, options = {}) => {
+
+  const params = {
+    limit: options.limit || 10
+  };
+
+  if (options.startingAfter) {
+    params.starting_after =  options.startingAfter;
   }
+
+  if (options.endingBefore) {
+    params.ending_before = options.endingBefore;
+  }
+
+  if (options.plan) {
+    params.plan = options.plan;
+  }
+
   debug("getSubscriptionsList");
-  return appStripe.subscriptions.list({ limit }, { stripe_account: stripeAccount.username });
+  return appStripe.subscriptions.list(params, { stripe_account: stripeAccount.username });
 };
 
 /**
