@@ -4,6 +4,8 @@ import models from '../server/models';
 import * as utils from './utils';
 import nock from 'nock';
 import initNock from './graphql.matchingFund.nock';
+import sinon from 'sinon';
+import emailLib from '../server/lib/email';
 
 const createOrderQuery = `
   mutation createOrder($order: OrderInputType!) {
@@ -55,8 +57,13 @@ const createOrderQuery = `
 
 describe('graphql.matchingFund.test.js', () => {
   
-  let collective, host, admin, user1, user2;
+  let collective, host, admin, user1, user2, sandbox, emailSendSpy;
   before(initNock);
+
+  before(() => {
+    sandbox = sinon.sandbox.create();
+    emailSendSpy = sandbox.spy(emailLib, 'send');
+  });
 
   after(() => {
     nock.cleanAll();
@@ -64,6 +71,7 @@ describe('graphql.matchingFund.test.js', () => {
 
   beforeEach(() => utils.resetTestDB());
   beforeEach(async () => {
+    emailSendSpy.reset();
     admin = await models.User.createUserWithCollective({ name: "admin" });
     user1 = await models.User.createUserWithCollective({ name: "user1", email: "user1@opencollective.com" });
     user2 = await models.User.createUserWithCollective({ name: "user2", email: "user2@opencollective.com" });
@@ -189,7 +197,6 @@ describe('graphql.matchingFund.test.js', () => {
     const balance = await user1.paymentMethod.getBalanceForUser(user2);
     expect(balance.amount).to.equal(141621); // €1,500 - $100
 
-
     const subscriptions = await models.Subscription.findAll();
     expect(subscriptions.length).to.equal(1);
     expect(subscriptions[0].interval).to.equal('month');
@@ -197,6 +204,18 @@ describe('graphql.matchingFund.test.js', () => {
     expect(subscriptions[0].stripeSubscriptionId).to.match(/^sub_.{14}$/);
     const dbOrder = await models.Order.findById(orderCreated.id);
     expect(dbOrder.SubscriptionId).to.equal(subscriptions[0].id);
+    const matchingTransaction = await models.Transaction.findOne({ where: { type: 'CREDIT', FromCollectiveId: user1.CollectiveId, OrderId: dbOrder.id }});
+    expect(matchingTransaction).to.exist;
+
+    // check that email went out
+    expect(emailSendSpy.callCount).to.equal(2);
+    expect(emailSendSpy.firstCall.args[0]).to.equal('thankyou');
+    expect(emailSendSpy.firstCall.args[1]).to.equal(user2.email);
+    expect(emailSendSpy.firstCall.args[2].matchingFund.collective.slug).to.equal(user1.collective.slug);
+    expect(emailSendSpy.secondCall.args[0]).to.equal('donationmatched');
+    expect(emailSendSpy.secondCall.args[1][0]).to.equal(user1.email);
+    expect(emailSendSpy.secondCall.args[2].fromCollective.slug).to.equal(user2.collective.slug);
+    expect(emailSendSpy.secondCall.args[2].transaction.uuid).to.equal(matchingTransaction.uuid);
 
   });
 

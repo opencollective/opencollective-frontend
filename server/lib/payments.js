@@ -1,5 +1,5 @@
 import Promise from 'bluebird';
-import { includes, pick } from 'lodash';
+import { includes, pick, get } from 'lodash';
 
 import models from '../models';
 import emailLib from './email';
@@ -55,7 +55,7 @@ export const executeOrder = (user, order, options) => {
           // if there is a matching fund, we execute the order
           // also adds the owner of the matching fund as a BACKER of collective
           const matchingOrder = {
-            ...pick(order, ['id', 'collective', 'tier', 'currency']),
+            ...pick(order, ['id', 'collective', 'tier', 'currency', 'matchingFund']),
             totalAmount: order.totalAmount * order.matchingFund.matching,
             paymentMethod: order.matchingFund,
             FromCollectiveId: order.matchingFund.CollectiveId,
@@ -68,6 +68,11 @@ export const executeOrder = (user, order, options) => {
           matchingOrder.update = () => {};
 
           return paymentProviders[order.paymentMethod.service].types[order.paymentMethod.type || 'default'].processOrder(matchingOrder, options) // eslint-disable-line import/namespace
+            .then(transaction => {
+              matchingOrder.transaction = transaction;
+              matchingOrder.fromCollective = order.fromCollective;
+              sendOrderConfirmedEmail(matchingOrder);
+            })
         });
     })
     .then(transaction => {
@@ -100,7 +105,7 @@ const validatePayment = (payment) => {
 }
 
 const sendOrderConfirmedEmail = async (order) => {
-
+  console.log(">>> sendOrderConfirmedEmail", order);
   const { collective, tier, interval, fromCollective } = order;
   const user = order.createdByUser;
 
@@ -131,20 +136,24 @@ const sendOrderConfirmedEmail = async (order) => {
       subscriptionsLink: interval && user.generateLoginLink('/subscriptions')
     };
 
+    let matchingFundCollective;
     if (order.matchingFund) {
-      const matchingFundCollective = await models.Collective.findById(order.matchingFund.CollectiveId)
+      matchingFundCollective = await models.Collective.findById(order.matchingFund.CollectiveId)
       data.matchingFund = {
         collective: pick(matchingFundCollective, ['slug', 'name', 'image']),
         matching: order.matchingFund.matching,
         amount: order.matchingFund.matching * order.totalAmount
       }
-      order.matchingFund.info;
-      if (order.matchingFund.id === order.paymentMethod.id) {
-        const recipients = await matchingFundCollective.getEmails();
-        emailLib.send('donationmatched', recipients, data, emailOptions)
-      }
     }
-    emailLib.send('thankyou', user.email, data, emailOptions)
+
+    // sending the order confirmed email to the matching fund owner or to the donor
+    if (get(order, 'matchingFund.id') === get(order, 'paymentMethod.id')) {
+      order.matchingFund.info;
+      const recipients = await matchingFundCollective.getEmails();
+      emailLib.send('donationmatched', recipients, data, emailOptions)
+    } else {
+      emailLib.send('thankyou', user.email, data, emailOptions)
+    }
   }
 }
 
