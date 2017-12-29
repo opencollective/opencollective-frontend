@@ -67,6 +67,7 @@ describe('graphql.matchingFund.test.js', () => {
 
   after(() => {
     nock.cleanAll();
+    sandbox.restore();
   });
 
   beforeEach(() => utils.resetTestDB());
