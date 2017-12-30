@@ -406,6 +406,12 @@ const getCollectiveCoverQuery = gql`
       settings
       image
       isHost
+      host {
+        id
+        slug
+        name
+        image
+      }
     }
   }
 `;

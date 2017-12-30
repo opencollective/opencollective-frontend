@@ -44,7 +44,8 @@ class CreateExpense extends React.Component {
         category: Object.keys(this.categoriesOptions[0])[0],
         payoutMethod: 'paypal'
       },
-      isExpenseValid: false
+      isExpenseValid: false,
+      loading: false
     };
  
   }
@@ -95,8 +96,9 @@ class CreateExpense extends React.Component {
   async onSubmit() {
     try {
       await this.props.onSubmit(this.state.expense);
-      this.setState({ modified: false, isExpenseValid: false, expense: {} });
+      this.setState({ modified: false, isExpenseValid: false, expense: {}, loading: false });
     } catch (e) {
+      this.setState({ loading: false });
       console.error("CreateExpenseForm onSubmit error", e);
     }
   }
@@ -343,8 +345,9 @@ class CreateExpense extends React.Component {
 
           <div className="row">
             <div className="col large">
-              <Button bsStyle="primary" type="submit" ref="submit" onClick={this.onSubmit} disabled= {this.props.loading || !this.state.isExpenseValid} >
-                <FormattedMessage id="expense.new.submit" defaultMessage="Submit Expense" />
+              <Button bsStyle="primary" type="submit" ref="submit" onClick={this.onSubmit} disabled= {this.state.loading || !this.state.isExpenseValid} >
+                { this.state.loading && <FormattedMessage id="form.processing" defaultMessage="processing" /> }
+                { !this.state.loading && <FormattedMessage id="expense.new.submit" defaultMessage="Submit Expense" /> }
               </Button>
             </div>
           </div>

@@ -28,7 +28,7 @@ class ExpenseDetails extends React.Component {
     this.currencyStyle = { style: 'currency', currencyDisplay: 'symbol', minimumFractionDigits: 2, maximumFractionDigits: 2};
 
     this.messages = defineMessages({
-      'paypal': { id: 'expense.payoutMethod.paypal', defaultMessage: 'PayPal ({paypalEmail, select, missing {missing} other {{paypalEmail}}})' },
+      'paypal': { id: 'expense.payoutMethod.paypal', defaultMessage: 'PayPal ({paypalEmail, select, missing {missing} hidden {hidden} other {{paypalEmail}}})' },
       // 'manual': { id: 'expense.payoutMethod.donation', defaultMessage: 'Consider as donation' },
       'other': { id: 'expense.payoutMethod.manual', defaultMessage: 'Other (see instructions)' }
     });
@@ -63,7 +63,7 @@ class ExpenseDetails extends React.Component {
     const editMode = canEditExpense && this.props.mode === 'edit';
     const previewAttachmentImage = expense.attachment ? imagePreview(expense.attachment) : '/static/images/receipt.svg';
     const payoutMethod = this.state.expense.payoutMethod || expense.payoutMethod;
-    const payoutMethods = this.getOptions(['paypal', 'other'], { paypalEmail: get(expense, 'user.paypalEmail') || "missing" });
+    const payoutMethods = this.getOptions(['paypal', 'other'], { paypalEmail: get(expense, 'user.paypalEmail') || canEditExpense ? "missing" : "hidden" });
     const categoriesOptions = categories(expense.collective.slug).map(category => {
       return { [category]: category }
     });
@@ -241,7 +241,7 @@ class ExpenseDetails extends React.Component {
 
           <div className="col">
             <label><FormattedMessage id='expense.payoutMethod' defaultMessage='payout method' /></label>
-            { !editMode && capitalize(intl.formatMessage(this.messages[expense.payoutMethod], { paypalEmail: get(expense, 'user.paypalEmail') || "missing"}))}
+            { !editMode && capitalize(intl.formatMessage(this.messages[expense.payoutMethod], { paypalEmail: get(expense, 'user.paypalEmail') || canEditExpense ? "missing" : "hidden"}))}
             { editMode &&
               <InputField
                 type="select"

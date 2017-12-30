@@ -43,7 +43,7 @@ class ExpensesWithData extends React.Component {
       console.log(">>> createExpense", expense);
       const res = await this.props.createExpense(expense);
       console.log(">>> createExpense res", res);
-      this.setState({ showNewExpenseForm: false })
+      this.setState({ showNewExpenseForm: false, expenseCreated: res.data.createExpense })
     } catch (e) {
       console.error(e);
     }
@@ -102,8 +102,14 @@ class ExpensesWithData extends React.Component {
             />
         }
 
+        { this.state.expenseCreated &&
+          <div>
+            <FormattedMessage id="expense.created" defaultMessage="Your expense has been submitted with success. It is now pending approval from one of the core contributors of the collective. You will be notified by email once it has been approved. Then, the host ({host}) will proceed to reimburse your expense." values={{ host: collective.host.name }} />
+          </div>
+        }
+
         <h1>
-          <FormattedMessage id="collective.Expenses.title" defaultMessage="{n, plural, one {Latest Expense} other {Latest Expenses}}" values={{n: 2 }} />
+          <FormattedMessage id="collective.latestExpenses.title" defaultMessage="{n, plural, one {Latest Expense} other {Latest Expenses}}" values={{n: 2 }} />
         </h1>
         <div className="adminActions">
           <ul>
@@ -268,6 +274,7 @@ const addMutation = graphql(createExpenseQuery, {
             query: getExpensesQuery,
             variables: getExpensesVariables(ownProps)
           });
+          createExpense.isNew = true;
           data.allExpenses.unshift(createExpense);
           proxy.writeQuery({
             query: getExpensesQuery,

@@ -114,7 +114,7 @@ class Expense extends React.Component {
         || (expense.status === 'APPROVED' && (Date.now() - (new Date(expense.updatedAt).getTime())) < 60 * 1000 * 15) // we can reject an expense for up to 10mn after approving it
       );
 
-    return (
+      return (
       <div className={`expense ${status} ${this.state.mode}View`}>
         <style jsx>{`
           .expense {
