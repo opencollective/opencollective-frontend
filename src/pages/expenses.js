@@ -15,8 +15,8 @@ import { FormattedMessage } from 'react-intl'
 class ExpensesPage extends React.Component {
 
   static getInitialProps (props) {
-    const { query: { collectiveSlug }, data, } = props;
-    return { slug: collectiveSlug, data }
+    const { query: { collectiveSlug, action }, data } = props;
+    return { slug: collectiveSlug, data, action }
   }
 
   constructor(props) {
@@ -31,7 +31,7 @@ class ExpensesPage extends React.Component {
   }
 
   render() {
-    const { data } = this.props;
+    const { data, action } = this.props;
     const { LoggedInUser } = this.state;
     if (!data.Collective) return (<NotFound />);
 
@@ -70,6 +70,7 @@ class ExpensesPage extends React.Component {
               collective={collective}
               includeHostedCollectives={collective.isHost}
               editable={true}
+              defaultAction={action}
               LoggedInUser={this.state.LoggedInUser}
               />
 

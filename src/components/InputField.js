@@ -154,7 +154,7 @@ class InputField extends React.Component {
                           className={field.className}
                           placeholder={this.props.placeholder}
                           name={field.name}
-                          help={field.help}
+                          help={field.description}
                           maxLength={field.maxLength}
                           value={this.state.value || this.props.defaultValue}
                           onChange={event => this.handleChange(event.target.value)}
@@ -251,6 +251,7 @@ class InputField extends React.Component {
                   placeholder={field.placeholder}
                   options={field.options}
                   />
+                { field.description && <HelpBlock>{field.description}</HelpBlock> }
               </Col>
             </div>
           }
@@ -264,7 +265,7 @@ class InputField extends React.Component {
                 placeholder={field.placeholder}
                 options={field.options}
                 />
-              {field.description && <HelpBlock>{field.description}</HelpBlock>}
+              { field.description && <HelpBlock>{field.description}</HelpBlock> }
             </div>
           }
         </FormGroup>

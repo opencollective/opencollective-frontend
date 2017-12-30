@@ -23,6 +23,7 @@ class CreateExpense extends React.Component {
     super(props);
     this.getOptions = this.getOptions.bind(this);
     this.handleChange = this.handleChange.bind(this);
+    this.onSubmit = this.onSubmit.bind(this);
 
     this.messages = defineMessages({
       'paypal': { id: 'expense.payoutMethod.paypal', defaultMessage: 'PayPal ({paypalEmail, select, missing {missing} other {{paypalEmail}}})' },
@@ -91,6 +92,15 @@ class CreateExpense extends React.Component {
     }
   }
 
+  async onSubmit() {
+    try {
+      await this.props.onSubmit(this.state.expense);
+      this.setState({ modified: false, isExpenseValid: false, expense: {} });
+    } catch (e) {
+      console.error("CreateExpenseForm onSubmit error", e);
+    }
+  }
+
   render() {
     const { LoggedInUser, intl, collective } = this.props;
     const { expense } = this.state;
@@ -107,15 +117,22 @@ class CreateExpense extends React.Component {
             overflow: hidden;
             margin: 0 1rem 5rem 1rem;
           }
+          .disclaimer {
+            font-size: 1.4rem;
+            margin: 2rem 0;
+          }
+          .description {
+            font-size: 1.4rem;
+          }
           .CreateExpense .frame {
             padding: 4px;
             margin-top: 1rem;
             margin-right: 1rem;
             float: left;
-            background-color: #f3f4f5;
+            width: 128px;
           }
           .CreateExpense img {
-            width: 128px;
+            width: 100%;
           }
           .leftColumn, .rightColumn {
             overflow: hidden;
@@ -123,6 +140,8 @@ class CreateExpense extends React.Component {
           .leftColumn {
             float: left;
             margin-right: 2rem;
+            display: flex;
+            flex-direction: column;
           }
           .col {
             float: left;
@@ -130,6 +149,9 @@ class CreateExpense extends React.Component {
             flex-direction: column;
             margin-right: 1rem;
             margin-top: 1rem;
+          }
+          .col.incurredAt {
+            width: 11rem;
           }
           .row {
             clear: both;
@@ -157,6 +179,7 @@ class CreateExpense extends React.Component {
               float: none;
               display: flex;
               justify-content: center;
+              align-items: center;
             }
             .attachment img {
               width: 90%;
@@ -189,8 +212,12 @@ class CreateExpense extends React.Component {
             margin: 0;
           }
 
-          .col.privateMessage {
+          .CreateExpense .col.privateMessage {
             width: 100%;
+          }
+
+          .CreateExpense .help-block {
+            font-size: 1.2rem;
           }
 
           @media(max-width: 600px) {
@@ -199,6 +226,10 @@ class CreateExpense extends React.Component {
             }
           }
         `}</style>
+
+        <div className="disclaimer">
+          <FormattedMessage id="expense.disclaimer" defaultMessage="Please make sure to upload a valid receipt or invoice. We should be able to see clearly on the picture (or PDF) the total amount paid, the date, the items purchased and the legal address." />
+        </div>
 
         <div className="leftColumn">
           <div className="frame">
@@ -209,6 +240,7 @@ class CreateExpense extends React.Component {
               className="attachmentField"
               onChange={attachment => this.handleChange('attachment', attachment)}
               defaultValue={expense.attachment || '/static/images/receipt.svg'}
+              description={<FormattedMessage id="expense.attachment.description" defaultMessage="Upload receipt (photo or PDF)" />}
               />
           </div>
         </div>
@@ -245,7 +277,7 @@ class CreateExpense extends React.Component {
             </div>
           </div>
 
-          <div className="col">
+          <div className="col incurredAt">
             <label><FormattedMessage id='expense.incurredAt' defaultMessage='Date' /></label>
             <div className="incurredAt">
               <span className="incurredAt">
@@ -289,6 +321,7 @@ class CreateExpense extends React.Component {
               <label><FormattedMessage id='expense.payoutMethod.paypal.label' defaultMessage='PayPal address' /></label>
               <InputField
                 type="email"
+                key={`paypalEmail-${get(LoggedInUser, 'id')}`}
                 defaultValue={this.state.expense.paypalEmail}
                 onChange={paypalEmail => this.handleChange('paypalEmail', paypalEmail)}
                 />
@@ -296,18 +329,21 @@ class CreateExpense extends React.Component {
           }
 
           <div className="col privateMessage">
-            <label><FormattedMessage id='expense.privateMessage' defaultMessage='private note' /></label>
+            <label>
+              <FormattedMessage id='expense.privateMessage' defaultMessage='Private instructions' />
+            </label>
             <InputField
               type="textarea"
               name="privateMessage"
               onChange={privateMessage => this.handleChange('privateMessage', privateMessage)}
               defaultValue={expense.privateMessage}
+              description={<FormattedMessage id="expense.privateMessage.description" defaultMessage="Private instructions for the host to reimburse your expense" />}
               />
           </div>
 
           <div className="row">
             <div className="col large">
-              <Button bsStyle="primary" type="submit" ref="submit" onClick={() => this.props.onSubmit(this.state.expense)} disabled= {this.props.loading || !this.state.isExpenseValid} >
+              <Button bsStyle="primary" type="submit" ref="submit" onClick={this.onSubmit} disabled= {this.props.loading || !this.state.isExpenseValid} >
                 <FormattedMessage id="expense.new.submit" defaultMessage="Submit Expense" />
               </Button>
             </div>

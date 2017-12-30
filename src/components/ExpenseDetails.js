@@ -56,7 +56,6 @@ class ExpenseDetails extends React.Component {
 
   render() {
     const { LoggedInUser, data, intl } = this.props;
-
     const expense = (data && data.Expense) || this.props.expense;
     const canEditExpense = LoggedInUser && LoggedInUser.canEditExpense(expense);
     const isAuthor = LoggedInUser && LoggedInUser.collective.id === expense.fromCollective.id;
@@ -281,6 +280,7 @@ query Expense($id: Int!) {
     createdAt
     category
     amount
+    status
     currency
     attachment
     payoutMethod

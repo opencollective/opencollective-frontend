@@ -14,6 +14,7 @@ class ExpensesWithData extends React.Component {
     collective: PropTypes.object,
     limit: PropTypes.number,
     editable: PropTypes.bool,
+    defaultAction: PropTypes.string, // "new" to open the new expense form by default
     includeHostedCollectives: PropTypes.bool,
     LoggedInUser: PropTypes.object
   }
@@ -21,18 +22,28 @@ class ExpensesWithData extends React.Component {
   constructor(props) {
     super(props);
     this.createExpense = this.createExpense.bind(this);
+    this.state = {
+      showNewExpenseForm: props.defaultAction === 'new' ? true : false
+    }
   }
 
   async createExpense(expense) {
+    const { LoggedInUser, collective } = this.props;
     try {
-      expense.collective = { id: this.props.collective.id };
+      expense.collective = { id: collective.id };
+      expense.currency = collective.currency;
       expense.user = {
         paypalEmail: expense.paypalEmail
       }
       delete expense.paypalEmail;
+
+      if (LoggedInUser) {
+        expense.user.id = LoggedInUser.id;
+      }
       console.log(">>> createExpense", expense);
       const res = await this.props.createExpense(expense);
       console.log(">>> createExpense res", res);
+      this.setState({ showNewExpenseForm: false })
     } catch (e) {
       console.error(e);
     }
@@ -56,16 +67,53 @@ class ExpensesWithData extends React.Component {
 
     return (
       <div className="ExpensesContainer">
+        <style jsx>{`
+          h1 {
+            margin-bottom: 1rem;
+          }
+          .adminActions {
+            text-align: center;
+            text-transform: uppercase;
+            font-size: 1.3rem;
+            font-weight: 600;
+            letter-spacing: 0.05rem;
+            margin-bottom: 3rem;
+          }
+          .adminActions ul {
+            overflow: hidden;
+            text-align: center;
+            margin: 0 auto;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            flex-direction: row;
+            list-style: none;
+          }
+          .adminActions ul li {
+            margin: 0 2rem;
+          }
+        `}</style>
 
-        <CreateExpenseForm
-          collective={collective}
-          LoggedInUser={LoggedInUser}
-          onSubmit={this.createExpense}
-          />
+        { this.state.showNewExpenseForm &&
+          <CreateExpenseForm
+            collective={collective}
+            LoggedInUser={LoggedInUser}
+            onSubmit={this.createExpense}
+            />
+        }
 
         <h1>
           <FormattedMessage id="collective.Expenses.title" defaultMessage="{n, plural, one {Latest Expense} other {Latest Expenses}}" values={{n: 2 }} />
         </h1>
+        <div className="adminActions">
+          <ul>
+          { !this.state.showNewExpenseForm &&
+            <li><a onClick={() => this.setState({ showNewExpenseForm: true })}>
+              <FormattedMessage id="expense.new.button" defaultMessage="Submit a new expense" />
+            </a></li>
+          }
+          </ul>
+        </div>
 
         <Expenses
           collective={collective}
@@ -128,17 +176,20 @@ query Expenses($CollectiveId: Int!, $status: String, $limit: Int, $offset: Int, 
 }
 `;
 
+const getExpensesVariables = (props) => {
+  return {
+    CollectiveId: props.collective.id,
+    offset: 0,
+    limit: props.limit || EXPENSES_PER_PAGE * 2,
+    includeHostedCollectives: props.includeHostedCollectives || false
+  }
+}
 
 const EXPENSES_PER_PAGE = 10;
 export const addExpensesData = graphql(getExpensesQuery, {
   options(props) {
     return {
-      variables: {
-        CollectiveId: props.collective.id,
-        offset: 0,
-        limit: props.limit || EXPENSES_PER_PAGE * 2,
-        includeHostedCollectives: props.includeHostedCollectives || false
-      }
+      variables: getExpensesVariables(props)
     }
   },
   props: ({ data }) => ({
@@ -168,23 +219,66 @@ mutation createExpense($expense: ExpenseInputType!) {
   createExpense(expense: $expense) {
     id
     description
-    amount
-    attachment
-    category
-    privateMessage
-    payoutMethod
     status
+    createdAt
+    updatedAt
+    incurredAt
+    category
+    amount
+    currency
+    payoutMethod
+    privateMessage
+    attachment
+    collective {
+      id
+      slug
+      currency
+      name
+      host {
+        id
+        slug
+      }
+      stats {
+        id
+        balance
+      }
+    }
+    fromCollective {
+      id
+      type
+      name
+      slug
+      image
+    }
+    user {
+      id
+      paypalEmail
+    }
   }
 }
 `;
 
 const addMutation = graphql(createExpenseQuery, {
-  props: ( { mutate }) => ({
+  props: ( { ownProps, mutate }) => ({
     createExpense: async (expense) => {
-      return await mutate({ variables: { expense } })
+      return await mutate({
+        variables: { expense },
+        update: (proxy, { data: { createExpense} }) => {
+          const data = proxy.readQuery({
+            query: getExpensesQuery,
+            variables: getExpensesVariables(ownProps)
+          });
+          data.allExpenses.unshift(createExpense);
+          proxy.writeQuery({
+            query: getExpensesQuery,
+            variables: getExpensesVariables(ownProps),
+            data
+          });
+        },
+      })
     }
   })
-  });
+});
 
 const addData = compose(addExpensesData, addMutation);
 
