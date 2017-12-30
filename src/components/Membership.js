@@ -5,7 +5,8 @@ import CollectiveCard from './CollectiveCard';
 class Membership extends React.Component {
 
   static propTypes = {
-    membership: PropTypes.object.isRequired
+    membership: PropTypes.object.isRequired,
+    LoggedInUser: PropTypes.object
   }
 
   constructor(props) {
@@ -14,7 +15,7 @@ class Membership extends React.Component {
   }
 
   render() {
-    const { membership } = this.props;
+    const { membership, LoggedInUser } = this.props;
     const { collective } = membership;
 
     if (!collective) {
@@ -35,7 +36,11 @@ class Membership extends React.Component {
         }
         `}</style>
         <div className="Membership">
-          <CollectiveCard membership={membership} collective={collective} />
+          <CollectiveCard
+            membership={membership}
+            collective={collective}
+            LoggedInUser={LoggedInUser}
+            />
         </div>
       </div>
     )

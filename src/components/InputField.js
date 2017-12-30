@@ -154,6 +154,7 @@ class InputField extends React.Component {
                           placeholder={this.props.placeholder}
                           name={field.name}
                           help={field.help}
+                          maxLength={field.maxLength}
                           value={this.state.value || this.props.defaultValue}
                           onChange={event => this.handleChange(event.target.value)}
                         />
@@ -239,7 +240,7 @@ class InputField extends React.Component {
               </Col>
               <Col sm={9}>
                 <InputTypeDropzone
-                  value={this.state.value}
+                  defaultValue={field.defaultValue}
                   name={field.name}
                   onChange={event => this.handleChange(event)}
                   placeholder={field.placeholder}
@@ -252,7 +253,7 @@ class InputField extends React.Component {
             <div>
               {field.label && <ControlLabel>{`${capitalize(field.label)}`}</ControlLabel>}
               <InputTypeDropzone
-                value={this.state.value}
+                defaultValue={field.defaultValue}
                 name={field.name}
                 onChange={event => this.handleChange(event)}
                 placeholder={field.placeholder}
@@ -343,7 +344,6 @@ class InputField extends React.Component {
           autoFocus={field.focus}
           placeholder={field.placeholder}
           className={field.className}
-          value={this.state.value || field.defaultValue}
           defaultValue={field.defaultValue}
           validationState={this.state.validationState}
         />)

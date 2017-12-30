@@ -58,6 +58,12 @@ export function checkUserExistence(email) {
     .then(json => Boolean(json.exists));
 }
 
+export function getFxRate(fromCurrency, toCurrency, date = 'latest') {
+  return fetch(`/api/fxrate/${fromCurrency}/${toCurrency}/${date}`)
+    .then(checkResponseStatus)
+    .then(json => Number(json.fxrate));
+}
+
 /**
  * Old api
  * Expecting order = { name, email, totalAmount, description, privateMessage }

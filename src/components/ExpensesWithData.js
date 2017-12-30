@@ -44,7 +44,7 @@ class ExpensesWithData extends React.Component {
           expenses={expenses}
           refetch={data.refetch}
           editable={editable}
-          fetchMore={data.fetchMore}
+          fetchMore={this.props.fetchMore}
           LoggedInUser={LoggedInUser}
           includeHostedCollectives={includeHostedCollectives}
           />
@@ -63,6 +63,7 @@ query Expenses($CollectiveId: Int!, $status: String, $limit: Int, $offset: Int, 
     description
     status
     createdAt
+    updatedAt
     incurredAt
     category
     amount

@@ -42,7 +42,7 @@ class Transaction extends React.Component {
     const type = transaction.type.toLowerCase();
 
     let title = transaction.description;
-    if (type === 'credit' && (!title || title.match(/donation to /i))) {
+    if (type === 'credit' && (!title || !title.match(/Matching/) && title.match(/donation to /i))) {
       title = intl.formatMessage(this.messages['credit.title'], {collective: collective.name, interval: get(transaction, 'subscription.interval')})
     }
 
