@@ -13,7 +13,7 @@ class ExpensesWithData extends React.Component {
   static propTypes = {
     collective: PropTypes.object,
     limit: PropTypes.number,
-    editable: PropTypes.bool,
+    compact: PropTypes.bool, // compact view for homepage (can't edit expense, don't show header)
     defaultAction: PropTypes.string, // "new" to open the new expense form by default
     includeHostedCollectives: PropTypes.bool,
     LoggedInUser: PropTypes.object
@@ -54,7 +54,7 @@ class ExpensesWithData extends React.Component {
       data,
       LoggedInUser,
       collective,
-      editable,
+      compact,
       includeHostedCollectives
     } = this.props;
 
@@ -108,24 +108,28 @@ class ExpensesWithData extends React.Component {
           </div>
         }
 
-        <h1>
-          <FormattedMessage id="collective.latestExpenses.title" defaultMessage="{n, plural, one {Latest Expense} other {Latest Expenses}}" values={{n: 2 }} />
-        </h1>
-        <div className="adminActions">
-          <ul>
-          { !this.state.showNewExpenseForm &&
-            <li><a onClick={() => this.setState({ showNewExpenseForm: true })}>
-              <FormattedMessage id="expense.new.button" defaultMessage="Submit a new expense" />
-            </a></li>
-          }
-          </ul>
-        </div>
+        { !compact &&
+          <div>
+            <h1>
+              <FormattedMessage id="collective.latestExpenses.title" defaultMessage="{n, plural, one {Latest Expense} other {Latest Expenses}}" values={{n: 2 }} />
+            </h1>
+            <div className="adminActions">
+              <ul>
+              { !this.state.showNewExpenseForm &&
+                <li><a onClick={() => this.setState({ showNewExpenseForm: true })}>
+                  <FormattedMessage id="expense.new.button" defaultMessage="Submit a new expense" />
+                </a></li>
+              }
+              </ul>
+            </div>
+          </div>
+        }
 
         <Expenses
           collective={collective}
           expenses={expenses}
           refetch={data.refetch}
-          editable={editable}
+          editable={!Boolean(compact)}
           fetchMore={this.props.fetchMore}
           LoggedInUser={LoggedInUser}
           includeHostedCollectives={includeHostedCollectives}
