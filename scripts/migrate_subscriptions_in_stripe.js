@@ -208,6 +208,7 @@ const migrateSubscriptions = (options) => {
           nonSharedCustomersCount += 1;
           return stripeGateway.retrieveCustomer(newStripeAccount, oldStripeSubscription.customer)
             .then(() => {
+              customerIdOnNewStripeAccount = oldStripeSubscription.customer;
               return processSubscription();
             })
             // if customer not found, stripe will throw this error
