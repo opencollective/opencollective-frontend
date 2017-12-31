@@ -80,6 +80,7 @@
   "newExpense.paypal.label": "Veuillez fournir une adresse",
   "expense.payoutMethod.manual": "Autre (voir instructions)",
   "expense.error.descriptionMissing": "Description manquante",
+  "expense.error.amountMissing": "Le montant doit être plus grand que 0",
   "expense.error.privateMessageMissing": "Veuillez préciser les instructions pour le remboursement de votre dépense dans la note privée.",
   "expense.error.emailMissing": "Veuillez fournir votre adresse email",
   "expense.error.paypalEmailMissing": "Veuillez fournir votre adresse PayPal (ou changez de méthode de paiement)",

@@ -30,6 +30,7 @@ class CreateExpense extends React.Component {
       'newExpense.paypal.label': { id: 'newExpense.paypal.label', defaultMessage: 'Please provide address' },
       'other': { id: 'expense.payoutMethod.manual', defaultMessage: 'Other (see instructions)' },
       'error.descriptionMissing': { id: 'expense.error.descriptionMissing', defaultMessage: 'Missing description' },
+      'error.amountMissing': { id: 'expense.error.amountMissing', defaultMessage: 'Amount must be greater than 0' },
       'error.privateMessageMissing': { id: 'expense.error.privateMessageMissing', defaultMessage: `Please provide instructions on how you'd like to be reimbursed as a private note` },
       'error.emailMissing': { id: 'expense.error.emailMissing', defaultMessage: 'Please provide your email address' },
       'error.paypalEmailMissing': { id: 'expense.error.paypalEmailMissing', defaultMessage: 'Please provide your PayPal email address (or change the payout the method)' },
@@ -64,6 +65,10 @@ class CreateExpense extends React.Component {
     const { intl, LoggedInUser } = this.props;
     if (!expense.description) {
       this.setState({ error: intl.formatMessage(this.messages['error.descriptionMissing'])});
+      return false;
+    }
+    if (!expense.amount > 0) {
+      this.setState({ error: intl.formatMessage(this.messages['error.amountMissing'])});
       return false;
     }
     if (!expense.attachment) {

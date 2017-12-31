@@ -80,6 +80,7 @@
   "newExpense.paypal.label": "Please provide address",
   "expense.payoutMethod.manual": "Other (see instructions)",
   "expense.error.descriptionMissing": "Missing description",
+  "expense.error.amountMissing": "Amount must be greater than 0",
   "expense.error.privateMessageMissing": "Please provide instructions on how you'd like to be reimbursed as a private note",
   "expense.error.emailMissing": "Please provide your email address",
   "expense.error.paypalEmailMissing": "Please provide your PayPal email address (or change the payout the method)",
