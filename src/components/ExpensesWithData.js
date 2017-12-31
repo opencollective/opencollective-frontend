@@ -7,6 +7,7 @@ import CreateExpenseForm from '../components/CreateExpenseForm';
 import { graphql, compose } from 'react-apollo'
 import gql from 'graphql-tag'
 import { FormattedMessage } from 'react-intl'
+import { pick } from 'lodash';
 
 class ExpensesWithData extends React.Component {
 
@@ -32,9 +33,8 @@ class ExpensesWithData extends React.Component {
     try {
       expense.collective = { id: collective.id };
       expense.currency = collective.currency;
-      expense.user = {
-        paypalEmail: expense.paypalEmail
-      }
+      expense.user = pick(expense, ['email', 'paypalEmail']);
+      delete expense.email;
       delete expense.paypalEmail;
 
       if (LoggedInUser) {
