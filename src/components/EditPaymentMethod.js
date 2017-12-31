@@ -61,7 +61,7 @@ class EditPaymentMethod extends React.Component {
               label="Credit Card"
               type="creditcard"
               name="creditcard"
-              value={paymentMethod}
+              defaultValue={paymentMethod}
               className="horizontal"
               onChange={(creditcard) => this.handleChange({ card: creditcard })}
               />
@@ -96,7 +96,7 @@ class EditPaymentMethod extends React.Component {
               type="currency"
               name="monthlyLimitPerMember"
               pre={getCurrencySymbol(currency)}
-              value={paymentMethod.monthlyLimitPerMember}
+              defaultValue={paymentMethod.monthlyLimitPerMember}
               description={intl.formatMessage(this.messages['paymentMethod.monthlyLimitPerMember.description'])}
               onChange={(value) => this.handleChange({'monthlyLimitPerMember': value})}
               />

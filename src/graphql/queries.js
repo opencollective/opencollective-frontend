@@ -10,6 +10,7 @@ export const getLoggedInUserQuery = gql`
       firstName
       lastName
       email
+      paypalEmail
       image
       CollectiveId
       collective {
@@ -405,6 +406,12 @@ const getCollectiveCoverQuery = gql`
       settings
       image
       isHost
+      host {
+        id
+        slug
+        name
+        image
+      }
     }
   }
 `;

@@ -158,7 +158,7 @@ class EditCollectiveForm extends React.Component {
           name: 'longDescription',
           type: 'textarea',
           placeholder: '',
-          help: 'Protip: you can use markdown'
+          description: 'Protip: you can use markdown'
         }
       ],
       images: [
@@ -312,7 +312,6 @@ class EditCollectiveForm extends React.Component {
                 options={field.options}
                 placeholder={field.placeholder}
                 type={field.type}
-                help={field.help}
                 pre={field.pre}
                 context={this.state.collective}
                 onChange={(value) => this.handleChange(field.name, value)}

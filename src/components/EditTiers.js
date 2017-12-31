@@ -146,8 +146,7 @@ class EditTiers extends React.Component {
               label={field.label}
               description={field.description}
               type={field.type}
-              defaultValue={field.defaultValue}
-              value={tier[field.name]}
+              defaultValue={tier[field.name] || field.defaultValue}
               options={field.options}
               pre={field.pre}
               placeholder={field.placeholder}

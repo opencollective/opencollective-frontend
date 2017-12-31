@@ -167,8 +167,7 @@ class EditEventForm extends React.Component {
           <div className="inputs">
             {this.fields.map((field) => <InputField
               key={field.name}
-              value={this.state.event[field.name]}
-              defaultValue={field.defaultValue}
+              defaultValue={this.state.event[field.name] || field.defaultValue}
               validate={field.validate}
               ref={field.name}
               name={field.name}
