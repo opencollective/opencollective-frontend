@@ -437,7 +437,7 @@ export default (Sequelize, DataTypes) => {
   }
 
   User.prototype.getPersonalDetails = function(remoteUser) {
-    if (!remoteUser) return Promise.resolve({});
+    if (!remoteUser) return Promise.resolve(this.public);
     return this.populateRoles()
       .then(() => {
         // all the CollectiveIds that the remoteUser is admin of.

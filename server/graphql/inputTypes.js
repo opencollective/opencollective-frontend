@@ -60,7 +60,7 @@ export const UserInputType = new GraphQLInputObjectType({
   description: 'Input type for UserType',
   fields: () => ({
       id: { type: GraphQLInt },
-      email: { type: new GraphQLNonNull(EmailType) },
+      email: { type: EmailType },
       firstName: { type: GraphQLString },
       lastName: { type: GraphQLString },
       name: { type: GraphQLString },

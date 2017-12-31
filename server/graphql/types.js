@@ -107,8 +107,8 @@ export const UserType = new GraphQLObjectType({
       },
       paypalEmail: {
         type: GraphQLString,
-        resolve(user) {
-          return user.paypalEmail;
+        resolve(user, args, req) {
+          return user.getPersonalDetails(req.remoteUser).then(user => user.paypalEmail);
         }
       }
     }

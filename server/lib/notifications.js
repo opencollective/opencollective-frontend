@@ -73,7 +73,7 @@ export default (Sequelize, activity) => {
       })
     })
     .catch(err => {
-      console.error(`Error while publishing activity type ${activity.type} for collective ${activity.CollectiveId}`, err);
+      console.error(`Error while publishing activity type ${activity.type} for collective ${activity.CollectiveId}`, activity, "error: ", err);
     });
 };
 
