@@ -224,14 +224,13 @@ class Event extends React.Component {
     }
     tierInfo[tier.id] = tier;
     this.setState({ order, tierInfo });
+    return order;
   }
 
   handleOrderTier(tier) {
-    this.updateOrder(tier);
+    const order = this.updateOrder(tier);
+    const { event } = this.state;
 
-    const { event, order } = this.state;
-    order.tier = { id: tier.id };
-    
     this.setState({ order, showInterestedForm: false });
     const params = trimObject({
       eventSlug: event.slug,
