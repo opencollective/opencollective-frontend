@@ -281,6 +281,10 @@ export default {
         throw new errors.BadRequest('Order not found: unknown subscription id');
       }
 
+      if (!order.Subscription.isActive) {
+        throw new errors.BadRequest('This subscription is marked inActive');
+      }
+
       // Confirm that this is a unique charge
       // deals with an bug where we found multiple transactions per chargeId
       const chargeId = event.data.object.charge;

@@ -213,8 +213,7 @@ export default (Sequelize, DataTypes) => {
 
     hooks: {
       afterCreate: (instance) => {
-        models.Notification.createMany([{ type: 'user.yearlyreport' }, { type: 'user.monthlyreport' }], { channel: 'email', UserId: instance.id })
-          .then(() => userLib.updateUserInfoFromClearbit(instance));
+        userLib.updateUserInfoFromClearbit(instance);
         return null;
       }
     }

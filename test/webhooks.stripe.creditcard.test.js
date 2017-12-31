@@ -80,8 +80,13 @@ describe('webhooks.stripe.creditcard.test.js', () => {
 
   afterEach(() => utils.clearbitStubAfterEach(sandbox));
 
-  describe('success', () => {
+  describe('order is setup', () => {
     let charge2WebhookEvent;
+
+    /*
+     * These beforeEach calls are setting up for webhook
+     */
+
     beforeEach('Generate a new stripe token', async () => {
       stripeToken = await utils.createStripeToken();
       charge2WebhookEvent = _.extend({}, webhookEvent, {
@@ -145,100 +150,124 @@ describe('webhooks.stripe.creditcard.test.js', () => {
         .catch(done);
     });
 
-    /*
-     * These beforeEach calls are setting up for webhook
-     */
-
-    // Now we send the webhook
-    beforeEach('send webhook', (done) => {
-      request(app)
-        .post('/webhooks/stripe')
-        .send(charge2WebhookEvent)
-        .expect(200)
-        .end((err) => {
-          expect(err).to.not.exist;
-          done();
-        });
-    });
-
-    it('adds a transaction', (done) => {
-      models.Transaction.findAndCountAll({
-        where: {
-          OrderId: order.id
-        },
-        include: [{
-          model: models.Order,
-          include: [{
-            model: models.Subscription
-          }]
-        }]
+    describe('error', () => {
+      beforeEach('set an inactive sub', () => {
+        return models.Subscription.findById(1)
+        .then(sub => sub.update({isActive: false}))
       })
-      .tap((res) => {
-        expect(res.count).to.equal(4);
-        const transaction = res.rows[1];
-        expect(transaction.OrderId).to.be.equal(order.id);
-        expect(transaction.CollectiveId).to.be.equal(order.CollectiveId);
-        expect(transaction.CreatedByUserId).to.be.equal(order.CreatedByUserId);
-        expect(transaction.PaymentMethodId).to.be.equal(paymentMethod.id);
-        expect(transaction.currency).to.be.equal(CURRENCY);
-        expect(transaction.type).to.be.equal(type.CREDIT);
-        expect(transaction).to.have.property('amountInHostCurrency', 140000); // taken from stripe mocks
-        expect(transaction).to.have.property('hostCurrency', 'USD');
-        expect(transaction).to.have.property('hostFeeInHostCurrency', 14000);
-        expect(transaction).to.have.property('platformFeeInHostCurrency', 7000);
-        expect(transaction).to.have.property('paymentProcessorFeeInHostCurrency', 15500);
-        expect(transaction).to.have.property('hostCurrencyFxRate', 0.25);
-        expect(transaction).to.have.property('netAmountInCollectiveCurrency', 25875)
-        expect(transaction.amount).to.be.equal(webhookSubscription.amount);
-        expect(transaction.Order.Subscription.isActive).to.be.equal(true);
-        expect(transaction.Order.Subscription).to.have.property('activatedAt');
-        done();
-      })
-      .catch(done);
-    });
 
-    it('creates an activity', (done) => {
-      models.Activity
-        .findAndCountAll({
+      it('fails if the subscription is marked inactive', (done) => {
+
+        request(app)
+          .post('/webhooks/stripe')
+          .send(charge2WebhookEvent)
+          .expect(400, {
+            error: {
+              code: 400,
+              type: 'bad_request',
+              message: 'This subscription is marked inActive'
+            }
+          })
+          .end(err => {
+            expect(err).to.not.exist;
+            done();
+          });
+      });
+    })
+
+
+    describe('success', () => {
+      // Now we send the webhook
+      beforeEach('send webhook', (done) => {
+        request(app)
+          .post('/webhooks/stripe')
+          .send(charge2WebhookEvent)
+          .expect(200)
+          .end((err) => {
+            expect(err).to.not.exist;
+            done();
+          });
+      });
+
+      it('adds a transaction', (done) => {
+        models.Transaction.findAndCountAll({
           where: {
-            type: activities.WEBHOOK_STRIPE_RECEIVED
-          }
+            OrderId: order.id
+          },
+          include: [{
+            model: models.Order,
+            include: [{
+              model: models.Subscription
+            }]
+          }]
         })
         .tap((res) => {
-          const e = res.rows[0].data.event;
-          expect(res.count).to.equal(1);
-          expect(e.id).to.be.equal(webhookEvent.id);
+          expect(res.count).to.equal(4);
+          const transaction = res.rows[1];
+          expect(transaction.OrderId).to.be.equal(order.id);
+          expect(transaction.CollectiveId).to.be.equal(order.CollectiveId);
+          expect(transaction.CreatedByUserId).to.be.equal(order.CreatedByUserId);
+          expect(transaction.PaymentMethodId).to.be.equal(paymentMethod.id);
+          expect(transaction.currency).to.be.equal(CURRENCY);
+          expect(transaction.type).to.be.equal(type.CREDIT);
+          expect(transaction).to.have.property('amountInHostCurrency', 140000); // taken from stripe mocks
+          expect(transaction).to.have.property('hostCurrency', 'USD');
+          expect(transaction).to.have.property('hostFeeInHostCurrency', 14000);
+          expect(transaction).to.have.property('platformFeeInHostCurrency', 7000);
+          expect(transaction).to.have.property('paymentProcessorFeeInHostCurrency', 15500);
+          expect(transaction).to.have.property('hostCurrencyFxRate', 0.25);
+          expect(transaction).to.have.property('netAmountInCollectiveCurrency', 25875)
+          expect(transaction.amount).to.be.equal(webhookSubscription.amount);
+          expect(transaction.Order.Subscription.isActive).to.be.equal(true);
+          expect(transaction.Order.Subscription).to.have.property('activatedAt');
           done();
         })
         .catch(done);
-    });
+      });
 
-    it('fail to create a second transaction with the same charge id', done => {
-      request(app)
-        .post('/webhooks/stripe')
-        .send(charge2WebhookEvent)
-        .expect(400, {
-          error: {
-            code: 400,
-            type: 'bad_request',
-            message: `This chargeId: ${stripeMock.charges.create.id} already exists.`
-          }
-        })
-        .end(done)
-    });
+      it('creates an activity', (done) => {
+        models.Activity
+          .findAndCountAll({
+            where: {
+              type: activities.WEBHOOK_STRIPE_RECEIVED
+            }
+          })
+          .tap((res) => {
+            const e = res.rows[0].data.event;
+            expect(res.count).to.equal(1);
+            expect(e.id).to.be.equal(webhookEvent.id);
+            done();
+          })
+          .catch(done);
+      });
 
-    it('successfully sends out an invoice by email to donor', () => {
-      expect(emailSendSpy.callCount).to.equal(2);
-      expect(emailSendSpy.secondCall.args[0])
-      expect(emailSendSpy.secondCall.args[2].firstPayment).to.be.false;
-      expect(emailSendSpy.secondCall.args[1]).to.equal(user.email);
+      it('fail to create a second transaction with the same charge id', done => {
+        request(app)
+          .post('/webhooks/stripe')
+          .send(charge2WebhookEvent)
+          .expect(400, {
+            error: {
+              code: 400,
+              type: 'bad_request',
+              message: `This chargeId: ${stripeMock.charges.create.id} already exists.`
+            }
+          })
+          .end(done)
+      });
+
+      it('successfully sends out an invoice by email to donor', () => {
+        expect(emailSendSpy.callCount).to.equal(2);
+        expect(emailSendSpy.secondCall.args[0])
+        expect(emailSendSpy.secondCall.args[2].firstPayment).to.be.false;
+        expect(emailSendSpy.secondCall.args[1]).to.equal(user.email);
+      });
     });
   });
 
   describe('errors', () => {
 
 
-    it('returns an error if the subscription id does not appear in an exisiting transaction in production', (done) => {
+    it('returns an error if the subscription id does not appear in an existing transaction in production', (done) => {
       const e = _.extend({}, webhookEvent, { type: 'invoice.payment_succeeded' });
       e.data.object.lines.data[0].id = 'abc';
 

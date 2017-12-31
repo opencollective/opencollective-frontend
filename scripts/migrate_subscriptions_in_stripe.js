@@ -6,9 +6,9 @@ import * as constants from '../server/constants/transactions';
 
 
 /*
-  - Find all subscriptions on oldStripeAccount
-  - For each one that exists in our database, create new customer based on:
-    case 1: Old data 
+  - Find all subscriptions on oldStripeAccount (11004)
+  - For each one that exists in our database and collective's host is the new HostCollectiveId, create new customer based on:
+    case 1: Old data (requires Stripe to run a script on their end)
       only has pm.customerId
     case 2: Post-v2 migration data
       has pm.customerId and data.CustomerIdForHost
@@ -21,7 +21,12 @@ import * as constants from '../server/constants/transactions';
 
 */
 
-let sharedCustomersOnOldStripeAccountCount = 0, sharedCustomersOnOldAndNewStripeAccountsCount = 0,nonSharedCustomersCount = 0, subsUpdatedCount = 0, subsSkippedCount = 0;
+let sharedCustomersOnOldStripeAccountCount = 0,
+    sharedCustomersOnOldAndNewStripeAccountsCount = 0,
+    nonSharedCustomersCount = 0, 
+    subsUpdatedCount = 0, 
+    subsSkippedCustomerNotFoundCount = 0,
+    subsSkippedMismatchedHostCollectiveId = 0;
 
 const done = (err) => {
   if (err) console.log('err', err);
@@ -30,7 +35,8 @@ const done = (err) => {
   console.log('Shared customers only on old stripe account found: ', sharedCustomersOnOldStripeAccountCount);
   console.log('Shared customers on both old and new stripe accounts found: ', sharedCustomersOnOldAndNewStripeAccountsCount);
   console.log('Total subscriptions updated: ', subsUpdatedCount);
-  console.log('Total subscriptions skipped: ', subsSkippedCount);
+  console.log('Total subscriptions skipped (customer not found): ', subsSkippedCustomerNotFoundCount);
+  console.log('Total subscriptions skipped (mismatched HostCollectiveId)', subsSkippedMismatchedHostCollectiveId);
   console.log('\n')
   console.log('done!');
   process.exit();
@@ -112,11 +118,21 @@ const migrateSubscriptions = (options) => {
           include: [
           { model: models.Subscription },
           { model: models.PaymentMethod, as: 'paymentMethod'},
-          { model: models.User, as: 'createdByUser' }
+          { model: models.User, as: 'createdByUser' },
+          { model: models.Collective, as: 'collective', where: {
+            HostCollectiveId: newHostCollectiveId
+          }} // only fetches orders where Collective is hosted by new StripeAccount
           ]
         })
       })
       .then(order => {
+        if (!order) {
+          console.log(`HostCollectiveId !== ${newHostCollectiveId}, skipping`)
+          subsSkippedMismatchedHostCollectiveId += 1;
+          return Promise.resolve();
+        } else {
+          console.log('HostCollectiveId', order.collective.HostCollectiveId)
+        }
         const pm = order.paymentMethod;
         const customerIdForHostsList = pm.data && pm.data.customerIdForHost;
 
@@ -176,6 +192,7 @@ const migrateSubscriptions = (options) => {
           // delete new subscription from stripe
           .then(() => stripeGateway.cancelSubscription(
             oldStripeAccount, oldStripeSubscription.id))
+          .then(() => subsUpdatedCount += 1)
           .catch(err => {
             console.log("ERROR: ", err, oldStripeSubscription)
             return err;
@@ -215,7 +232,7 @@ const migrateSubscriptions = (options) => {
             .catch(err => {
               if (err.message.indexOf('No such customer') !== -1) {
                 console.log('Customer not found on new stripe account, skipping')
-                subsSkippedCount += 1;
+                subsSkippedCustomerNotFoundCount += 1;
               } else {
                 return done(err)
               }
