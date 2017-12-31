@@ -368,7 +368,7 @@
   "user.collective.memberOf.member.title": "Je suis un membre de {n, plural, one {ce collectif} other {ces collectifs}}",
   "user.collective.memberOf.backer.title": "Je soutiens {n, plural, one {ce collectif} other {ces collectifs}}",
   "user.collective.memberOf.attendee.title": "J'ai participé à {n, plural, one {cet événement} other {ces événements}}",
-  "user.collective.memberOf.fundraiser.title": "I've helped raised money for {n, plural, one {this collective} other {these collectives}}",
+  "user.collective.memberOf.fundraiser.title": "J'ai aidé à collecter des fonds pour {n, plural, one {ce collectif} other {ces collectifs}}",
   "user.collective.memberOf.fundraiser.LoggedInDescription": "Share the URL in the email receipt for each of your donation to track how much money you helped raised! (Alternatively, you can also click on any collective that you are contributing to on this page. We will add your referral id to the URL.)",
   "user.collective.memberOf.follower.title": "Je suis {n, plural, one {ce collectif} other {ces collectifs}}",
   "organization.collective.memberOf.host.title": "Nous hébergeons {n, plural, one {ce collectif} other {ces collectifs}}",
