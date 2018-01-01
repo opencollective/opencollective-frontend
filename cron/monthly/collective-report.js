@@ -56,9 +56,16 @@ const init = () => {
       include: [ { model: models.Transaction, required: true }]
   };
 
-  if (process.env.DEBUG && process.env.DEBUG.match(/preview/))
-    query.where.slug = { $in: ['vuejs', 'webpack', 'wwcodeaustin','railsgirlsatl','cyclejs','mochajs','chsf','freeridetovote','tipbox'] };
-  // query.where.slug = { $in: ['vuejs'] };
+  let slugs;
+  if (process.env.DEBUG && process.env.DEBUG.match(/preview/)) {
+    slugs = ['vuejs', 'webpack', 'wwcodeaustin','railsgirlsatl','cyclejs','mochajs','chsf','freeridetovote','tipbox'];
+  }
+  if (process.env.SLUGS) {
+    slugs = process.env.SLUGS.split(',');
+  }
+  if (slugs) {
+    query.where.slug = { $in: slugs };
+  }
 
   Collective.findAll(query)
   .tap(collectives => {
@@ -185,7 +192,9 @@ const getRecipients = (collective) => {
       active: true
     },
     include: [{ model: User }]
-  }).then(results => results.map(r => r.User.dataValues));
+  }).then(results => {
+    return results.filter(r => Boolean(r.User)).map(r => r.User.dataValues)
+  });
 }
 
 const sendEmail = (recipients, data) => {

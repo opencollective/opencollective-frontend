@@ -74,6 +74,11 @@ const init = () => {
     previewCondition = "AND c.id IN (9805, 9804, 9802, 9801)"; // open source collective host, wwcode host, brusselstogether, changex
     // previewCondition = "AND c.id IN (9802)"; // brusselstogether
 
+  if (process.env.SLUGS) {
+    const slugs = process.env.SLUGS.split(',');
+    previewCondition = `AND c.slug IN ('${slugs.join("','")}')`
+  }
+
   const query = `
   with "hosts" as (SELECT DISTINCT "HostCollectiveId" AS id FROM "Collectives" WHERE "deletedAt" IS NULL AND "isActive" IS TRUE AND "HostCollectiveId" IS NOT NULL)
   SELECT c.* FROM "Collectives" c WHERE c.id IN (SELECT h.id FROM hosts h) ${previewCondition}
@@ -198,6 +203,9 @@ const processHost = (host) => {
   };
 
   const getHostAdminsEmails = (host) => {
+    if (host.type === 'USER') {
+      return models.User.findAll({ where: { CollectiveId: host.id }}).map(u => u.email);
+    }
     return models.Member.findAll({
       where: {
         CollectiveId: host.id,
@@ -338,13 +346,17 @@ const processHost = (host) => {
     .then(() => getHostAdminsEmails(host))
     .then((admins) => sendEmail(admins, data, attachments))
     .catch(e => {
-      console.error(`Error in processing host ${host.slug}:`, e.message);
+      console.error(`Error in processing host ${host.slug}:`, e.message, e);
       debug(e);
     });
 };
 
 const sendEmail = (recipients, data, attachments) => {
     debug("Sending email to ", recipients);
+    if (!recipients || recipients.length === 0){
+      console.error("Unable to send host report for ", data.host.slug, "No recipient to send to");
+      return;
+    }
     // debug("email data transactions", data.transactions);
     debug("email data stats", data.stats);
     debug("email data stats.backers", data.stats.backers);

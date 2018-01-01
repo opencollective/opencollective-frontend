@@ -507,9 +507,9 @@ export default function(Sequelize, DataTypes) {
    */
   Collective.prototype.getTiersWithUsers = function(options = { active: false, attributes: ['id', 'username', 'image', 'firstDonation', 'lastDonation', 'totalDonations', 'website'] }) {
     const tiersById = {};
-      // Get the list of tiers for the collective
+      // Get the list of tiers for the collective (including deleted ones)
     return models.Tier
-      .findAll({ where: { CollectiveId: this.id, type: 'TIER' } })
+      .findAll({ where: { CollectiveId: this.id }, paranoid: false })
       .then(tiers => tiers.map(t => {
         tiersById[t.id] = t;
       }))
@@ -528,6 +528,10 @@ export default function(Sequelize, DataTypes) {
           }
           const TierId = order.TierId;
           tiersById[TierId] = tiersById[TierId] || order.Tier;
+          if (!tiersById[TierId]) {
+            console.error(">>> Couldn't find a tier with id", order.TierId, "collective: ", this.slug);
+            tiersById[TierId] = { dataValues: { users: [] } };
+          }
           tiersById[TierId].dataValues.users = tiersById[TierId].dataValues.users || [];
           if (options.active) {
             backerCollective.isActive = order.Subscription.isActive;
