@@ -1,5 +1,12 @@
 #!/usr/bin/env node
 
+// Only run on the first of the year
+const today = new Date();
+if (process.env.NODE_ENV === 'production' && today.getDate() !== 1 && today.getMonth() !== 0) {
+  console.log('NODE_ENV is production and today is not the first of year, script aborted!');
+  process.exit();
+}
+
 process.env.PORT = 3066;
 
 import models, { sequelize } from '../../server/models';
@@ -16,7 +23,7 @@ const year = startDate.getFullYear();
 
 console.log("startDate", startDate, "endDate", endDate);
 
-let platformStats;
+let platformStats, totalUsersProcessed = 0, totalUsersSkipped = 0;
 
 const GetCollectiveTransactionsQuery = `
 with "CollectiveTransactions" as (
@@ -76,15 +83,17 @@ const getPlatformStats = () => {
 }
 
 const processCollective = (collective) => {
-  console.log(">>> processing collective", collective.slug);
   return sequelize.query(GetCollectiveTransactionsQuery, {
     type: sequelize.QueryTypes.SELECT,
     replacements: { FromCollectiveId: collective.id, startDate, endDate }
   })
   .then(transactions => {
     if (!transactions || transactions.length === 0) {
+      totalUsersSkipped++;
       return Promise.reject(`No transaction for ${collective.slug}, skipping`);
     }
+    console.log(">>> processing collective", collective.slug);
+    totalUsersProcessed++;
     const hosts = { opencollective: { name: 'Platform fees'}, stripe: { name: 'Credit Card Processing Fees (Stripe)' } };
     const totalCollectives = transactions.length;
     const totalDonations = {};
@@ -169,8 +178,12 @@ const processCollective = (collective) => {
       data.collective = collective;
       data.platformStats = platformStats;
       data.recipients = users.map(u => u.email);
-      console.log(">>> recipients for ", collective.type.toLowerCase(), collective.slug, ":", data.recipients);
-      return emailLib.send('user.yearlyreport', data.recipients, data);
+      if (data.recipients.length > 1) {
+        console.log(">>> recipients for ", collective.type.toLowerCase(), collective.slug, ":", data.recipients);
+      }
+      if (data.recipients.length > 0) {
+        return emailLib.send('user.yearlyreport', data.recipients, data);
+      }
     })
   })
   .catch(console.error);
@@ -205,8 +218,10 @@ const getUsers = (collective) => {
   }).then(unsubscriptions => {
     const excludeUnsubscribed = {};
     const unsubscribedUserIds = unsubscriptions.map(u => u.UserId);
-    console.log(`${unsubscribedUserIds.length} users have unsubscribed from this report`);
-    
+    if (unsubscribedUserIds.length > 0) {
+      console.log(`${unsubscribedUserIds.length} users have unsubscribed from the user.yearlyreport report for collective ${collective.slug}`);
+    }
+
     if (unsubscribedUserIds.length > 0) {
       excludeUnsubscribed.id = { $notIn: unsubscribedUserIds };
     }
@@ -237,12 +252,15 @@ const init = () => {
   .then(() => getCollectives())
   .map(collective => {
     if (hosts.indexOf(collective.id) !== -1) {
+      totalUsersSkipped++;
       return console.log(collective.slug, "is a host, skipping");
     }
     return processCollective(collective);
   })
   .then(() => {
     const timeLapsed = Math.round((new Date - startTime)/1000);
+    console.log(`Total user/organizations processed: `, totalUsersProcessed);
+    console.log(`Total user/organizations skipped: `, totalUsersSkipped);
     console.log(`Total run time: ${timeLapsed}s`);
     process.exit(0);
   });
