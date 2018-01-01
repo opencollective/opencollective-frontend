@@ -507,9 +507,9 @@ export default function(Sequelize, DataTypes) {
    */
   Collective.prototype.getTiersWithUsers = function(options = { active: false, attributes: ['id', 'username', 'image', 'firstDonation', 'lastDonation', 'totalDonations', 'website'] }) {
     const tiersById = {};
-      // Get the list of tiers for the collective
+      // Get the list of tiers for the collective (including deleted ones)
     return models.Tier
-      .findAll({ where: { CollectiveId: this.id, type: 'TIER' } })
+      .findAll({ where: { CollectiveId: this.id, type: 'TIER' }, paranoid: false })
       .then(tiers => tiers.map(t => {
         tiersById[t.id] = t;
       }))
