@@ -10,7 +10,9 @@ else
 fi
 
 # Install Google Chrome
+mkdir ~/cache
 cd ~/cache
+
 if [ ! -e "google-chrome-stable_current_amd64.deb" ]; then
   wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
 fi;
@@ -21,7 +23,7 @@ sudo apt-get install -f
 sudo apt-get install GraphicsMagick
 
 API_TARBALL_URL="https://codeload.github.com/opencollective/opencollective-api/tar.gz/";
-if curl -s --head  --request GET ${API_TARBALL_URL} | grep "200" > /dev/null
+if curl -s --head  --request GET "${API_TARBALL_URL}${CIRCLE_BRANCH}" | grep "200" > /dev/null
 then
   BRANCH=$CIRCLE_BRANCH;
 else
@@ -32,7 +34,6 @@ if [ ! -e "${BRANCH}.tgz" ];
 then
   echo "> Downloading tarball ${API_TARBALL_URL}${BRANCH}"
   curl  "${API_TARBALL_URL}${BRANCH}" -o "${BRANCH}.tgz"
-  sleep 2
   echo "> Extracting ${BRANCH}.tgz"
   tar -xzf "${BRANCH}.tgz"
   sleep 2
