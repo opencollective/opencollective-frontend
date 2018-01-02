@@ -224,10 +224,10 @@ class Expense extends React.Component {
             <span className="status">{intl.formatMessage(this.messages[status])}</span> | 
             {` ${capitalize(expense.category)}`}
             { editable && LoggedInUser && LoggedInUser.canEditExpense(expense) &&
-              <span> | <a onClick={this.toggleEdit}>{intl.formatMessage(this.messages[`${mode === 'edit' ? 'cancelEdit' : 'edit'}`])}</a></span>
+              <span> | <a className="toggleEditExpense" onClick={this.toggleEdit}>{intl.formatMessage(this.messages[`${mode === 'edit' ? 'cancelEdit' : 'edit'}`])}</a></span>
             }
             { mode !== 'edit' &&
-              <span> | <a onClick={this.toggleDetails}>{intl.formatMessage(this.messages[`${mode === 'details' ? 'closeDetails' : 'viewDetails'}`])}</a></span>
+              <span> | <a className="toggleDetails" onClick={this.toggleDetails}>{intl.formatMessage(this.messages[`${mode === 'details' ? 'closeDetails' : 'viewDetails'}`])}</a></span>
             }
           </div>
 
@@ -245,7 +245,7 @@ class Expense extends React.Component {
                 <div>
                   <div className="leftColumn"></div>
                   <div className="rightColumn">
-                    <SmallButton className="primary" onClick={this.save}><FormattedMessage id="expense.save" defaultMessage="save" /></SmallButton>
+                    <SmallButton className="primary save" onClick={this.save}><FormattedMessage id="expense.save" defaultMessage="save" /></SmallButton>
                   </div>
                 </div>
               }

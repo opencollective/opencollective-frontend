@@ -109,6 +109,7 @@
     "babel-polyfill": "6.26.0",
     "chai": "4.1.2",
     "chromeless": "1.3.0",
+    "cypress": "^1.4.1",
     "file-loader": "0.10.1",
     "image-webpack-loader": "3.2.0",
     "jest": "21.2.1",

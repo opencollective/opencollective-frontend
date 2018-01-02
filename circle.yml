@@ -13,3 +13,6 @@ machine:
     version: 8.4.0
   environment:
     NODE_ENV: circleci
+test:
+  override:
+    - cypress run --record
