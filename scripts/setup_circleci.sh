@@ -49,11 +49,6 @@ echo "> Restoring opencollective_dvl database for e2e testing";
 echo "> Starting api"
 PG_DATABASE=opencollective_dvl npm start &
 
-echo "> Starting frontend"
-cd
-cd frontend
-npm start
-
 sleep 5
 if curl -s --head  --request GET http://localhost:3060/status | grep "200" > /dev/null
 then
@@ -61,11 +56,3 @@ then
 else
   echo "𐄂 API is not responding";
 fi
-
-if curl -s --head  --request GET http://localhost:3000/testcollective | grep "200" > /dev/null
-then
-  echo "✓ Frontend is running";
-else
-  echo "𐄂 Frontend is not responding";
-fi
-
