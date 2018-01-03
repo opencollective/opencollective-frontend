@@ -47,7 +47,7 @@
   "collective.section.backers.users.title": "{n} {n, plural one {personne soutient} other {personnes soutiennent}} {collective}",
   "collective.budget.title": "Budget",
   "collective.stats.balance.title": "Solde disponible:",
-  "collective.expenses.title": "Dépenses",
+  "collective.expenses.title": "{n, plural, one {Dernières dépense} other {Dernières dépenses}}",
   "expenses.viewAll": "Voir toutes les dépenses",
   "expenses.submit": "Soumettre une dépense",
   "collective.transactions.title": "{n, plural, one {Latest transaction} other {Latest transactions}}",
@@ -68,8 +68,7 @@
   "expenses.badge.tooltip.approved": "{approved, plural, one {une dépense prête à être payée} other {{approved} dépenses prêtes à être payées}}",
   "expenses.balance.label": "balance:",
   "expenses.allCollectives": "Tous les collectifs",
-  "expenses.title": "Finances",
-  "expenses.latest.title": "Dernières dépenses",
+  "expenses.collectivePicker.title": "Finances",
   "loading": "chargement",
   "loadMore": "voir plus",
   "collective.connectedAccounts.paypal.connected": "Compte Paypal connecté le {createdAt, date, short}",
@@ -398,6 +397,7 @@
   "tier.description.donation": "Merci pour votre donation 🙏",
   "discover.title": "Découvre de super collectifs à supporter",
   "discover.subtitle": "Chaque contribution compte",
+  "expenses.title": "Dépenses",
   "collective.newExpense.title": "Soumettre une nouvelle dépense",
   "tiers.title": "Rejoins le collectif"
 }

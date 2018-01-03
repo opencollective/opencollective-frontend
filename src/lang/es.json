@@ -47,7 +47,7 @@
   "collective.section.backers.users.title": "{n} {n, plural, one {person is} other {people are}} supporting {collective}",
   "collective.budget.title": "Presupuesto",
   "collective.stats.balance.title": "Balance disponible:",
-  "collective.expenses.title": "Gastos",
+  "collective.expenses.title": "{n, plural, one {Último gast} other {Últimos gastos}",
   "expenses.viewAll": "Ver todos los gastos",
   "expenses.submit": "Presentar un gasto",
   "collective.transactions.title": "{n, plural, one {Última transacción} other {Últimas transacciones}}",
@@ -68,8 +68,7 @@
   "expenses.badge.tooltip.approved": "{approved} ready to be paid",
   "expenses.balance.label": "balance:",
   "expenses.allCollectives": "All Collectives",
-  "expenses.title": "Finances",
-  "expenses.latest.title": "Latest expenses",
+  "expenses.collectivePicker.title": "Finances",
   "loading": "cargando",
   "loadMore": "cargar más",
   "collective.connectedAccounts.paypal.connected": "Paypal account connected on {createdAt, date, short}",
@@ -398,6 +397,7 @@
   "tier.description.donation": "Gracias por tu amable contribución",
   "discover.title": "Discover awesome collectives to support",
   "discover.subtitle": "Every contribution matters",
+  "expenses.title": "Gastos",
   "collective.newExpense.title": "Submit a new expense",
   "tiers.title": "Súmate al colectivo"
 }
