@@ -10,7 +10,9 @@ else
 fi
 
 # Install Google Chrome
-mkdir ~/cache
+if [ ! -d "~/cache" ]; then
+  mkdir ~/cache
+fi
 cd ~/cache
 
 if [ ! -e "google-chrome-stable_current_amd64.deb" ]; then
@@ -30,20 +32,42 @@ else
   BRANCH="master";
 fi
 
+TARBALL_SIZE=$(curl -s --head  --request GET "${API_TARBALL_URL}${CIRCLE_BRANCH}" | grep "200" > /dev/null | sed -E "s/[^0-9]*//")
+
+
+# If we already have an archive of the branch locally (in ~/cache)
+# Then we check to see if the size matches the online version
+# If they do, we proceed to start the api server
+# Otherwise we remove the local cache and install latest version of the branch
+if [ -e "${BRANCH}.tgz" ];
+then
+  LSIZE=$(wc -c cypress.tgz | sed -E "s/([0-9]+).*/\1/")
+  if [ $TARBALL_SIZE -eq $LSIZE ];
+  then
+    echo "Size matches"
+  else
+    echo "Size is different ($TARBALL_SIZE !== $LSIZE). Downloading new tarball."
+    rm "${BRANCH}.tgz"
+  fi
+fi
+
 if [ ! -e "${BRANCH}.tgz" ];
 then
   echo "> Downloading tarball ${API_TARBALL_URL}${BRANCH}"
   curl  "${API_TARBALL_URL}${BRANCH}" -o "${BRANCH}.tgz"
   echo "> Extracting ${BRANCH}.tgz"
   tar -xzf "${BRANCH}.tgz"
-  sleep 2
-  cd "opencollective-api-${BRANCH}"
+  if [ -d "opencollective-api" ]; then
+    rm -rf opencollective-api
+  fi
+  mv "opencollective-api-${BRANCH}" opencollective-api
+  cd "opencollective-api"
   echo "> Running npm install for api"
   npm install
   cd ..
 fi
 
-cd "opencollective-api-${BRANCH}"
+cd "opencollective-api"
 echo "> Restoring opencollective_dvl database for e2e testing";
 ./scripts/db_restore.sh -U ubuntu -d opencollective_dvl -f test/dbdumps/opencollective_dvl.pgsql
 
