@@ -38,12 +38,12 @@ fi
 # If they do, we proceed to start the api server
 # Otherwise we remove the local cache and install latest version of the branch
 
-TARBALL_SIZE=$(curl -s --head  --request GET "${API_TARBALL_URL}${BRANCH}" | grep "Content-Length" | sed -E "s/[^0-9]*//")
+TARBALL_SIZE=$(curl -s --head  --request GET "${API_TARBALL_URL}${BRANCH}" | grep "Content-Length" | sed -E "s/.*: *([0-9]+).*/\1/")
 
 if [ -e "${BRANCH}.tgz" ];
 then
-  LSIZE=$(wc -c ${BRANCH}.tgz | sed -E "s/([0-9]+).*/\1/")
-  test $TARBALL_SIZE = $LSIZE && echo "Size matches" || echo "> Removing old ${BRANCH}.tgz (size doesn't match: ${TARBALL_SIZE} != ${LSIZE})"; rm "${BRANCH}.tgz";
+  LSIZE=$(wc -c ${BRANCH}.tgz | sed -E "s/ ?([0-9]+).*/\1/")
+  test $TARBALL_SIZE = $LSIZE && echo "Size matches $BRANCH.tgz (${TARBALL_SIZE}:${LSIZE})" || (echo "> Removing old ${BRANCH}.tgz (size doesn't match: ${TARBALL_SIZE}:${LSIZE})"; rm "${BRANCH}.tgz"; echo "File removed";)
 fi
 
 if [ ! -e "${BRANCH}.tgz" ];
