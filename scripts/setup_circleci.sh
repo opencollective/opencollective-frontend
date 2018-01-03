@@ -38,18 +38,12 @@ fi
 # If they do, we proceed to start the api server
 # Otherwise we remove the local cache and install latest version of the branch
 
-TARBALL_SIZE=$(curl -s --head  --request GET "${API_TARBALL_URL}${CIRCLE_BRANCH}" | grep "Content-Length" | sed -E "s/[^0-9]*//")
+TARBALL_SIZE=$(curl -s --head  --request GET "${API_TARBALL_URL}${BRANCH}" | grep "Content-Length" | sed -E "s/[^0-9]*//")
 
 if [ -e "${BRANCH}.tgz" ];
 then
-  LSIZE=$(wc -c cypress.tgz | sed -E "s/([0-9]+).*/\1/")
-  if [ "$TARBALL_SIZE" -eq "$LSIZE" ];
-  then
-    echo "Size matches"
-  else
-    echo "Size is different ($TARBALL_SIZE !== $LSIZE). Downloading new tarball."
-    rm "${BRANCH}.tgz"
-  fi
+  LSIZE=$(wc -c ${BRANCH}.tgz | sed -E "s/([0-9]+).*/\1/")
+  test $TARBALL_SIZE = $LSIZE && echo "Size matches" || echo "> Removing old ${BRANCH}.tgz (size doesn't match: ${TARBALL_SIZE} != ${LSIZE})"; rm "${BRANCH}.tgz";
 fi
 
 if [ ! -e "${BRANCH}.tgz" ];
