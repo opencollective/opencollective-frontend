@@ -47,15 +47,4 @@ cd "opencollective-api-${BRANCH}"
 echo "> Restoring opencollective_dvl database for e2e testing";
 ./scripts/db_restore.sh -d opencollective_dvl -f test/dbdumps/opencollective_dvl.pgsql
 
-echo "> Starting api"
-PG_DATABASE=opencollective_dvl npm start &
-
-sleep 5
-curl http://localhost:3060/status
-
-if curl -s --head  --request GET http://localhost:3060/status | grep "200" > /dev/null
-then
-  echo "✓ API is running";
-else
-  echo "✗ API is not responding";
-fi
+echo "✓ API is setup";
