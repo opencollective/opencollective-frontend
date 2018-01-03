@@ -45,6 +45,6 @@ fi
 
 cd "opencollective-api-${BRANCH}"
 echo "> Restoring opencollective_dvl database for e2e testing";
-./scripts/db_restore.sh -d opencollective_dvl -f test/dbdumps/opencollective_dvl.pgsql
+./scripts/db_restore.sh -U ubuntu -d opencollective_dvl -f test/dbdumps/opencollective_dvl.pgsql
 
 echo "✓ API is setup";

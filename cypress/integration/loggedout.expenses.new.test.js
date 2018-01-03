@@ -38,6 +38,7 @@ describe("new expense", () => {
     cy.get('.error').should('have.text', 'Please provide your email address');
     cy.get('.inputField.email input').type('user@test.com');
     cy.get('button[type=submit]').click();
+    cy.screenshot("expenseCreatedPaypalLoggedOut");
     cy.get('.expenseCreated').contains('success');
     cy.get('.Expenses .expense:first .description').contains(expenseDescription)
     cy.get('.Expenses .expense:first .status').contains("pending")
@@ -58,6 +59,7 @@ describe("new expense", () => {
     cy.get('.inputField.privateMessage textarea').type("Some private note for the host");
     cy.get('.inputField.email input').type('user@test.com');
     cy.get('button[type=submit]').click();
+    cy.screenshot("expenseCreatedOtherLoggedOut");
     cy.get('.expenseCreated').contains('success');
     cy.get('.Expenses .expense:first .description').contains(expenseDescription);    
     cy.get('.Expenses .expense:first .status').contains("pending")
@@ -77,12 +79,14 @@ describe("new expense", () => {
     cy.get('.LoginTopBarProfileButton').contains("testuseradmin", { timeout: 15000 })
     cy.get('.inputField.privateMessage textarea').type("Some private note for the host");
     cy.get('button[type=submit]').click();
+    cy.screenshot("expenseCreatedLoggedIn");
     cy.get('.expenseCreated').contains('success');
     cy.get('.Expenses .expense:first .description').contains(expenseDescription);
     cy.get('.Expenses .expense:first .status').contains("pending")
     cy.get('.Expenses .expense:first .privateMessage').contains("Some private note for the host");
     cy.get('.Expenses .expense:first .ApproveExpenseBtn button').click();
     cy.get('.Expenses .expense:first .status').contains("approved")
+    cy.screenshot("expenseApproved");
     cy.get('.Expenses .expense:first .toggleEditExpense').click();
     cy.get('.Expenses .expense:first .inputField.description input').type(" edited")
     cy.get('.Expenses .expense:first .inputField.amount input').type("13")
@@ -90,11 +94,13 @@ describe("new expense", () => {
     cy.get('.Expenses .expense:first .inputField.privateMessage textarea').type('{selectall}Another private note (edited)')
     cy.get('.Expenses .expense:first .inputField.description input').focus();
     cy.wait(300)
+    cy.screenshot("editExpense");
     cy.get('.Expenses .expense:first button.save').click();
     cy.get('.Expenses .expense:first .status').contains("pending") // editing an expense should switch status back to pending
     cy.get('.Expenses .expense:first .description').contains("edited");
     cy.get('.Expenses .expense:first .privateMessage').contains("edited");
     cy.get('.Expenses .expense:first .amount').contains("$13.00");
+    cy.screenshot("expenseSaved");
     cy.get('.Expenses .expense:first .ApproveExpenseBtn button').click();
     cy.get('.Expenses .expense:first .status').contains("approved")    
   })
