@@ -83,7 +83,7 @@
   "expense.error.amountMissing": "Amount must be greater than 0",
   "expense.error.privateMessageMissing": "Please provide instructions on how you'd like to be reimbursed as a private note",
   "expense.error.emailMissing": "Please provide your email address",
-  "expense.error.paypalEmailMissing": "Please provide your PayPal email address (or change the payout the method)",
+  "expense.error.paypalEmailMissing": "Please provide your PayPal email address (or change the payout method)",
   "expense.error.attachmentMissing": "Missing attachment",
   "expense.disclaimer": "Please make sure to upload a valid receipt or invoice. We should be able to see clearly on the picture (or PDF) the total amount paid, the date, the items purchased and the legal address.",
   "expense.attachment.description": "Upload receipt (photo or PDF)",

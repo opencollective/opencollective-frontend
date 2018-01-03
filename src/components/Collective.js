@@ -244,7 +244,7 @@ class Collective extends React.Component {
             <div>
 
               <section id="about">
-                <div className="sidebar" id="contribute">
+                <div className="sidebar tiers" id="contribute">
                   { this.collective.tiers.map(tier => (
                     <TierCard
                       collective={this.collective}

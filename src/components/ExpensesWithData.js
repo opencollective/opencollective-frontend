@@ -103,7 +103,7 @@ class ExpensesWithData extends React.Component {
         }
 
         { this.state.expenseCreated &&
-          <div>
+          <div className="expenseCreated">
             <FormattedMessage id="expense.created" defaultMessage="Your expense has been submitted with success. It is now pending approval from one of the core contributors of the collective. You will be notified by email once it has been approved. Then, the host ({host}) will proceed to reimburse your expense." values={{ host: collective.host.name }} />
           </div>
         }
@@ -116,7 +116,7 @@ class ExpensesWithData extends React.Component {
             <div className="adminActions">
               <ul>
               { !this.state.showNewExpenseForm &&
-                <li><a onClick={() => this.setState({ showNewExpenseForm: true })}>
+                <li><a className="submitNewExpense" onClick={() => this.setState({ showNewExpenseForm: true })}>
                   <FormattedMessage id="expense.new.button" defaultMessage="Submit a new expense" />
                 </a></li>
               }

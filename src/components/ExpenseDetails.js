@@ -188,6 +188,7 @@ class ExpenseDetails extends React.Component {
                   <span className="description">
                     <InputField
                       type="text"
+                      name="description"
                       defaultValue={expense.description}
                       className="descriptionField"
                       onChange={description => this.handleChange('description', description)}
@@ -205,6 +206,7 @@ class ExpenseDetails extends React.Component {
                 <span className="category">
                   <InputField
                     type="select"
+                    name="category"
                     options={categoriesOptions}
                     defaultValue={expense.category}
                     className="categoryField"
@@ -221,6 +223,7 @@ class ExpenseDetails extends React.Component {
               <span className="amount">
                 { editMode && canEditAmount &&
                   <InputField
+                    name="amount"
                     defaultValue={expense.amount}
                     pre={getCurrencySymbol(expense.currency)}
                     type='currency'
@@ -244,6 +247,7 @@ class ExpenseDetails extends React.Component {
             { !editMode && capitalize(intl.formatMessage(this.messages[expense.payoutMethod], { paypalEmail: get(expense, 'user.paypalEmail') || canEditExpense ? "missing" : "hidden"}))}
             { editMode &&
               <InputField
+                name="payoutMethod"
                 type="select"
                 options={payoutMethods}
                 defaultValue={expense.payoutMethod}

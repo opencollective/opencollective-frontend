@@ -33,7 +33,7 @@ class CreateExpense extends React.Component {
       'error.amountMissing': { id: 'expense.error.amountMissing', defaultMessage: 'Amount must be greater than 0' },
       'error.privateMessageMissing': { id: 'expense.error.privateMessageMissing', defaultMessage: `Please provide instructions on how you'd like to be reimbursed as a private note` },
       'error.emailMissing': { id: 'expense.error.emailMissing', defaultMessage: 'Please provide your email address' },
-      'error.paypalEmailMissing': { id: 'expense.error.paypalEmailMissing', defaultMessage: 'Please provide your PayPal email address (or change the payout the method)' },
+      'error.paypalEmailMissing': { id: 'expense.error.paypalEmailMissing', defaultMessage: 'Please provide your PayPal email address (or change the payout method)' },
       'error.attachmentMissing': { id: 'expense.error.attachmentMissing', defaultMessage: 'Missing attachment' }
     });
 
@@ -110,7 +110,10 @@ class CreateExpense extends React.Component {
     }
   }
 
-  async onSubmit() {
+  async onSubmit(e) {
+    if (e) {
+      e.preventDefault();
+    }
     try {
       await this.props.onSubmit(this.state.expense);
       this.setState({ modified: false, isExpenseValid: false, expense: {}, loading: false });
@@ -118,6 +121,7 @@ class CreateExpense extends React.Component {
       this.setState({ loading: false });
       console.error("CreateExpenseForm onSubmit error", e);
     }
+    return false;
   }
 
   render() {
@@ -249,152 +253,157 @@ class CreateExpense extends React.Component {
           }
         `}</style>
 
-        <div className="disclaimer">
-          <FormattedMessage id="expense.disclaimer" defaultMessage="Please make sure to upload a valid receipt or invoice. We should be able to see clearly on the picture (or PDF) the total amount paid, the date, the items purchased and the legal address." />
-        </div>
-
-        <div className="leftColumn">
-          <div className="frame">
-            <InputField
-              type="dropzone"
-              options={{ accept: "image/jpeg, image/png, application/pdf" }}
-              name="attachment"
-              className="attachmentField"
-              onChange={attachment => this.handleChange('attachment', attachment)}
-              defaultValue={expense.attachment || '/static/images/receipt.svg'}
-              description={<FormattedMessage id="expense.attachment.description" defaultMessage="Upload receipt (photo or PDF)" />}
-              />
+        <form onSubmit={this.onSubmit}>
+          <div className="disclaimer">
+            <FormattedMessage id="expense.disclaimer" defaultMessage="Please make sure to upload a valid receipt or invoice. We should be able to see clearly on the picture (or PDF) the total amount paid, the date, the items purchased and the legal address." />
           </div>
-        </div>
 
-        <div className="rightColumn">
-          <div className="row">
-            <div className="col large">
-              <label><FormattedMessage id='expense.description' defaultMessage='description' /></label>
-              <div className="description">
-                <span className="description">
+          <div className="leftColumn">
+            <div className="frame">
+              <InputField
+                type="dropzone"
+                options={{ accept: "image/jpeg, image/png, application/pdf" }}
+                name="attachment"
+                className="attachmentField"
+                onChange={attachment => this.handleChange('attachment', attachment)}
+                defaultValue={expense.attachment || '/static/images/receipt.svg'}
+                description={<FormattedMessage id="expense.attachment.description" defaultMessage="Upload receipt (photo or PDF)" />}
+                />
+            </div>
+          </div>
+
+          <div className="rightColumn">
+            <div className="row">
+              <div className="col large">
+                <label><FormattedMessage id='expense.description' defaultMessage='description' /></label>
+                <div className="description">
+                  <span className="description">
+                    <InputField
+                      type="text"
+                      defaultValue={expense.description}
+                      className="descriptionField"
+                      onChange={description => this.handleChange('description', description)}
+                      />
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div className="col">
+              <label><FormattedMessage id='expense.amount' defaultMessage='amount' /></label>
+              <div className="amountDetails">
+                <span className="amount">
                   <InputField
-                    type="text"
-                    defaultValue={expense.description}
-                    className="descriptionField"
-                    onChange={description => this.handleChange('description', description)}
+                    defaultValue={expense.amount}
+                    pre={getCurrencySymbol(collective.currency)}
+                    type='currency'
+                    className="amountField"
+                    onChange={amount => this.handleChange('amount', amount)}
                     />
                 </span>
               </div>
             </div>
-          </div>
 
-          <div className="col">
-            <label><FormattedMessage id='expense.amount' defaultMessage='amount' /></label>
-            <div className="amountDetails">
-              <span className="amount">
-                <InputField
-                  defaultValue={expense.amount}
-                  pre={getCurrencySymbol(collective.currency)}
-                  type='currency'
-                  className="amountField"
-                  onChange={amount => this.handleChange('amount', amount)}
-                  />
-              </span>
+            <div className="col incurredAt">
+              <label><FormattedMessage id='expense.incurredAt' defaultMessage='Date' /></label>
+              <div className="incurredAt">
+                <span className="incurredAt">
+                  <InputField
+                    defaultValue={new Date}
+                    type='date'
+                    className="incurredAtField"
+                    onChange={incurredAt => this.handleChange('incurredAt', incurredAt)}
+                    />
+                </span>
+              </div>
             </div>
-          </div>
 
-          <div className="col incurredAt">
-            <label><FormattedMessage id='expense.incurredAt' defaultMessage='Date' /></label>
-            <div className="incurredAt">
-              <span className="incurredAt">
-                <InputField
-                  defaultValue={new Date}
-                  type='date'
-                  className="incurredAtField"
-                  onChange={incurredAt => this.handleChange('incurredAt', incurredAt)}
-                  />
-              </span>
+            <div className="col">
+              <label><FormattedMessage id='expense.category' defaultMessage='category' /></label>
+              <div className="category">
+                <span className="category">
+                  <InputField
+                    type="select"
+                    options={this.categoriesOptions}
+                    defaultValue={expense.category}
+                    className="categoryField"
+                    onChange={category => this.handleChange('category', category)}
+                    />
+                </span>
+              </div>
             </div>
-          </div>
 
-          <div className="col">
-            <label><FormattedMessage id='expense.category' defaultMessage='category' /></label>
-            <div className="category">
-              <span className="category">
-                <InputField
-                  type="select"
-                  options={this.categoriesOptions}
-                  defaultValue={expense.category}
-                  className="categoryField"
-                  onChange={category => this.handleChange('category', category)}
-                  />
-              </span>
-            </div>
-          </div>
-
-          <div className="col">
-            <label><FormattedMessage id='expense.payoutMethod' defaultMessage='payout method' /></label>
-            <InputField
-              type="select"
-              options={payoutMethods}
-              defaultValue={expense.payoutMethod}
-              onChange={payoutMethod => this.handleChange('payoutMethod', payoutMethod)}
-              />
-          </div>
-
-          { this.state.expense.payoutMethod === 'paypal' &&
-            <div className="col emailInput">
-              <label><FormattedMessage id='expense.payoutMethod.paypal.label' defaultMessage='PayPal address' /></label>
+            <div className="col">
+              <label><FormattedMessage id='expense.payoutMethod' defaultMessage='payout method' /></label>
               <InputField
-                type="email"
-                key={`paypalEmail-${get(LoggedInUser, 'id')}`}
-                defaultValue={this.state.expense.paypalEmail}
-                onChange={paypalEmail => this.handleChange('paypalEmail', paypalEmail)}
+                type="select"
+                name="payoutMethod"
+                options={payoutMethods}
+                defaultValue={expense.payoutMethod}
+                onChange={payoutMethod => this.handleChange('payoutMethod', payoutMethod)}
                 />
             </div>
-          }
 
-          <div className="col privateMessage">
-            <label>
-              <FormattedMessage id='expense.privateMessage' defaultMessage='Private instructions' />
-            </label>
-            <InputField
-              type="textarea"
-              name="privateMessage"
-              onChange={privateMessage => this.handleChange('privateMessage', privateMessage)}
-              defaultValue={expense.privateMessage}
-              description={<FormattedMessage id="expense.privateMessage.description" defaultMessage="Private instructions for the host to reimburse your expense" />}
-              />
-          </div>
+            { this.state.expense.payoutMethod === 'paypal' &&
+              <div className="col emailInput">
+                <label><FormattedMessage id='expense.payoutMethod.paypal.label' defaultMessage='PayPal address' /></label>
+                <InputField
+                  type="email"
+                  name="paypalEmail"
+                  key={`paypalEmail-${get(LoggedInUser, 'id')}`}
+                  defaultValue={this.state.expense.paypalEmail}
+                  onChange={paypalEmail => this.handleChange('paypalEmail', paypalEmail)}
+                  />
+              </div>
+            }
 
-          { !LoggedInUser &&
-            <div className="col emailInput">
-              <label><FormattedMessage id='expense.email.label' defaultMessage='Your email address' /></label>
+            <div className="col privateMessage">
+              <label>
+                <FormattedMessage id='expense.privateMessage' defaultMessage='Private instructions' />
+              </label>
               <InputField
-                type="email"
-                key={`email-${this.state.expense.paypalEmail}`}
-                defaultValue={this.state.expense.paypalEmail}
-                onChange={email => this.handleChange('email', email)}
+                type="textarea"
+                name="privateMessage"
+                onChange={privateMessage => this.handleChange('privateMessage', privateMessage)}
+                defaultValue={expense.privateMessage}
+                description={<FormattedMessage id="expense.privateMessage.description" defaultMessage="Private instructions for the host to reimburse your expense" />}
                 />
             </div>
-          }
 
-          <div className="row">
-            <div className="col large">
-              <Button bsStyle="primary" type="submit" ref="submit" onClick={this.onSubmit} disabled= {this.state.loading || !this.state.isExpenseValid} >
-                { this.state.loading && <FormattedMessage id="form.processing" defaultMessage="processing" /> }
-                { !this.state.loading && <FormattedMessage id="expense.new.submit" defaultMessage="Submit Expense" /> }
-              </Button>
+            { !LoggedInUser &&
+              <div className="col emailInput">
+                <label><FormattedMessage id='expense.email.label' defaultMessage='Your email address' /></label>
+                <InputField
+                  type="email"
+                  name="email"
+                  key={`email-${this.state.expense.paypalEmail}`}
+                  defaultValue={this.state.expense.paypalEmail}
+                  onChange={email => this.handleChange('email', email)}
+                  />
+              </div>
+            }
+
+            <div className="row">
+              <div className="col large">
+                <Button bsStyle="primary" type="submit" ref="submit" disabled= {this.state.loading || !this.state.isExpenseValid} >
+                  { this.state.loading && <FormattedMessage id="form.processing" defaultMessage="processing" /> }
+                  { !this.state.loading && <FormattedMessage id="expense.new.submit" defaultMessage="Submit Expense" /> }
+                </Button>
+              </div>
             </div>
-          </div>
 
-          <div className="row">
-            <div className="col large">
-              { this.state.error &&
-                <div className="error">
-                  {this.state.error}
-                </div>
-              }
+            <div className="row">
+              <div className="col large">
+                { this.state.error &&
+                  <div className="error">
+                    {this.state.error}
+                  </div>
+                }
+              </div>
             </div>
-          </div>
 
-        </div>
+          </div>
+        </form>
       </div>
     );
   }
