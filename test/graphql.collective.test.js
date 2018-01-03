@@ -179,7 +179,8 @@ describe('graphql.collective.test.js', () => {
     const result = await utils.graphqlQuery(query, { slug: "brusselstogether" });
     result.errors && console.error(result.errors);
     expect(result.errors).to.not.exist;
-    expect(result.data.Collective.collectives).to.deep.equal([
+    const collectives = result.data.Collective.collectives;
+    expect(collectives.sort((a, b) => a.id - b.id)).to.deep.equal([
       {
         "id": 207,
         "slug": "brusselstogether-collective",

@@ -432,7 +432,7 @@ describe('createOrder', () => {
       expect(res.errors).to.not.exist;
 
       const availableBalance = await paymentMethod.getBalanceForUser(duc);
-      expect(availableBalance.amount).to.equal(1078);
+      expect(availableBalance.amount).to.equal(1160);
 
       const orderCreated = res.data.createOrder;
       const fromCollective = orderCreated.fromCollective;
