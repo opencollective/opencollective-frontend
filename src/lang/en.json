@@ -68,8 +68,7 @@
   "expenses.badge.tooltip.approved": "{approved} {approved, plural, one {expense} other {expenses}} ready to be paid",
   "expenses.balance.label": "balance:",
   "expenses.allCollectives": "All Collectives",
-  "expenses.title": "Finances",
-  "expenses.latest.title": "Latest expenses",
+  "expenses.collectivePicker.title": "Finances",
   "loading": "loading",
   "loadMore": "load more",
   "collective.connectedAccounts.paypal.connected": "Paypal account connected on {createdAt, date, short}",
@@ -398,6 +397,7 @@
   "tier.description.donation": "Thank you for your kind donation 🙏",
   "discover.title": "Discover awesome collectives to support",
   "discover.subtitle": "Every contribution matters",
+  "expenses.title": "Expenses",
   "collective.newExpense.title": "Submit a new expense",
   "tiers.title": "Join the collective"
 }

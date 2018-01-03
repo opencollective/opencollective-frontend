@@ -68,8 +68,7 @@
   "expenses.badge.tooltip.approved": "{approved} {approved, plural, one {expense} other {expenses}} ready to be paid",
   "expenses.balance.label": "balance:",
   "expenses.allCollectives": "All Collectives",
-  "expenses.title": "Finances",
-  "expenses.latest.title": "Latest expenses",
+  "expenses.collectivePicker.title": "Finances",
   "loading": "読み込み中",
   "loadMore": "もっと見る",
   "collective.connectedAccounts.paypal.connected": "{createdAt, date, short}にPaypal連携されました",
@@ -398,6 +397,7 @@
   "tier.description.donation": "温かいご支援ありがとうございます 🙏",
   "discover.title": "Discover awesome collectives to support",
   "discover.subtitle": "Every contribution matters",
+  "expenses.title": "Expenses",
   "collective.newExpense.title": "Submit a new expense",
   "tiers.title": "参加する"
 }

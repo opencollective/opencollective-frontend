@@ -59,7 +59,7 @@ class ExpensesPage extends React.Component {
           <CollectiveCover
             collective={collective}
             href={`/${collective.slug}`}
-            title={<FormattedMessage id="collective.expenses.title" defaultMessage="Expenses" />}
+            title={<FormattedMessage id="expenses.title" defaultMessage="Expenses" />}
             className="small"
             style={get(collective, 'settings.style.hero.cover')}
             />
