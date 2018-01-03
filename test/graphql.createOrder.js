@@ -432,7 +432,7 @@ describe('createOrder', () => {
       expect(res.errors).to.not.exist;
 
       const availableBalance = await paymentMethod.getBalanceForUser(duc);
-      expect(availableBalance.amount).to.equal(1078);
+      expect(availableBalance.amount).to.equal(1160);
 
       const orderCreated = res.data.createOrder;
       const fromCollective = orderCreated.fromCollective;
@@ -450,7 +450,7 @@ describe('createOrder', () => {
       // Should fail if order.totalAmount > PaymentMethod.getBalanceForUser
       res = await utils.graphqlQuery(createOrderQuery, { order }, duc);
       expect(res.errors).to.exist;
-      expect(res.errors[0].message).to.equal("You don't have enough funds available ($11 left) to execute this order (€200 ~= $239)");
+      expect(res.errors[0].message).to.equal("You don't have enough funds available ($12 left) to execute this order (€200 ~= $239)");
 
     });
 
