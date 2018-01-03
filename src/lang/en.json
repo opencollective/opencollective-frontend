@@ -69,6 +69,7 @@
   "expenses.balance.label": "balance:",
   "expenses.allCollectives": "All Collectives",
   "expenses.collectivePicker.title": "Finances",
+  "expenses.collectivePicker.subtitle": "for {n} {n, plural, one {collective} other {collectives}}",
   "loading": "loading",
   "loadMore": "load more",
   "collective.connectedAccounts.paypal.connected": "Paypal account connected on {createdAt, date, short}",
