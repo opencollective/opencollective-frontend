@@ -18,7 +18,7 @@ class Tiers extends React.Component {
     const { tiers } = this.props;
 
     return (
-      <div id="tickets">
+      <div id="tickets" className="tiers">
         {tiers.map((tier) =>
           <Tier
             key={tier.id}

@@ -126,7 +126,7 @@ class TierCard extends React.Component {
             justify-content: space-between;
             position: relative;
           }
-          .title {
+          .name {
             margin: 3rem 0rem 1rem 3rem;
             width: 160px;
             font-family: Rubik;
@@ -164,7 +164,7 @@ class TierCard extends React.Component {
             color: #e69900;
             color: var(--attention);
           }
-          .body {
+          .description {
             margin: 1rem 3rem;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -213,7 +213,7 @@ class TierCard extends React.Component {
             color: var(--cool-grey);
           }
         `}</style>
-        <div className="title">
+        <div className="name">
           {tier.name}
         </div>
         { tier.amount > 0 &&
@@ -242,7 +242,7 @@ class TierCard extends React.Component {
               />
           </div>
         }
-        <div className="body">
+        <div className="description">
           {tier.description || <FormattedMessage id="tier.defaultDescription" defaultMessage="Become a {name} for {amount} per {interval} and help us sustain our activities!" values={{ name: tier.name, amount: formatCurrency(tier.amount, tier.currency || collective.currency), interval: tier.interval}}/>}
         </div>
         { tier.stats.totalOrders > 0 &&
