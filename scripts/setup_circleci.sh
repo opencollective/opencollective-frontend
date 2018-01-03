@@ -32,17 +32,18 @@ else
   BRANCH="master";
 fi
 
-TARBALL_SIZE=$(curl -s --head  --request GET "${API_TARBALL_URL}${CIRCLE_BRANCH}" | grep "200" > /dev/null | sed -E "s/[^0-9]*//")
-
 
 # If we already have an archive of the branch locally (in ~/cache)
 # Then we check to see if the size matches the online version
 # If they do, we proceed to start the api server
 # Otherwise we remove the local cache and install latest version of the branch
+
+TARBALL_SIZE=$(curl -s --head  --request GET "${API_TARBALL_URL}${CIRCLE_BRANCH}" | grep "Content-Length" | sed -E "s/[^0-9]*//")
+
 if [ -e "${BRANCH}.tgz" ];
 then
   LSIZE=$(wc -c cypress.tgz | sed -E "s/([0-9]+).*/\1/")
-  if [ $TARBALL_SIZE -eq $LSIZE ];
+  if [ "$TARBALL_SIZE" -eq "$LSIZE" ];
   then
     echo "Size matches"
   else
