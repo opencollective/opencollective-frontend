@@ -46,9 +46,7 @@ const render = (template, data) => {
 
   // When in development mode, we log the data used to compile the template
   // (useful to get login token without sending an email)
-  if (process.env.NODE_ENV === 'development' && process.env.DEBUG && process.env.DEBUG.match(/email/)) {
-    console.log(`Rendering ${template} with data`, data);
-  }
+  debug(`Rendering ${template} with data`, data);
 
   return {text, html};
 };
@@ -150,9 +148,7 @@ const sendMessage = (recipients, subject, html, options = {}) => {
       })
     });
   } else {
-    if (process.env.DEBUG && process.env.DEBUG.match(/email/)) {
-      console.warn("Warning: No mail sent - Mailgun is not configured");
-    }
+    console.warn("Warning: No email sent - Mailgun is not configured");
     return Promise.resolve();
   }
 };
@@ -175,6 +171,7 @@ const getNotificationLabel = (template, recipients) => {
     'collective.monthlyreport': 'monthly reports for collectives',
     'collective.member.created': 'notifications of new members',
     'host.monthlyreport': 'monthly reports for host',
+    'host.yearlyreport': 'yearly reports for host',
     'collective.transaction.created': 'notifications of new transactions for this collective',
     'user.monthlyreport': 'monthly reports for backers',
     'user.yearlyreport': 'yearly reports'
@@ -188,30 +185,40 @@ const getNotificationLabel = (template, recipients) => {
  */
 const generateEmailFromTemplate = (template, recipient, data, options = {}) => {
 
-  if (template === 'ticket.confirmed') {
-    if (data.collective.slug === 'sustainoss')
-      template += '.sustainoss';
+  const slug = _.get(data, 'collective.slug') || 'undefined';
+
+  // If we are sending the same email to multiple recipients, it doesn't make sense to allow them to unsubscribe
+  if (!_.isArray(recipient)) {
+    data.notificationTypeLabel = getNotificationLabel(template, recipient);
+    data.unsubscribeUrl = `${config.host.website}/api/services/email/unsubscribe/${encodeURIComponent(options.bcc || recipient)}/${slug}/${options.type || template}/${generateUnsubscribeToken(options.bcc || recipient, slug, options.type || template)}`;
   }
 
+  if (template === 'ticket.confirmed') {
+    if (slug === 'sustainoss')
+      template += '.sustainoss';
+  }
+  if (template.match(/^host\.(monthly|yearly)report$/)) {
+    template = 'host.report';
+  }
   if (template === 'donationmatched') {
-    if (data.collective.slug.match(/wwcode/))
+    if (slug.match(/wwcode/))
       template += '.wwcode';
   }
   if (template === 'thankyou') {
-    if (data.collective.slug.match(/wwcode/))
+    if (slug.match(/wwcode/))
       template += '.wwcode';
     if (data.collective.name.match(/ispcwa/i))
       template += '.ispcwa';
-    if (data.collective.slug === 'kendraio')
+    if (slug === 'kendraio')
       template = 'thankyou.kendraio';
-    if (data.collective.slug === 'brusselstogether')
+    if (slug === 'brusselstogether')
       template = 'thankyou.brusselstogether';
-    if (data.collective.slug === 'sustainoss')
+    if (slug === 'sustainoss')
       template = 'thankyou.sustainoss';
-    if (_.contains(['lesbarbares', 'nuitdebout', 'laprimaire', 'enmarchebe'], data.collective.slug)) {
+    if (_.contains(['lesbarbares', 'nuitdebout', 'laprimaire', 'enmarchebe'], slug)) {
       template += '.fr';
 
-      if (data.collective.slug === 'laprimaire')
+      if (slug === 'laprimaire')
         template = 'thankyou.laprimaire';
 
       // xdamman: hack
@@ -230,7 +237,7 @@ const generateEmailFromTemplate = (template, recipient, data, options = {}) => {
     template = (data.transaction.amount > 0) ? 'collective.order.created' : 'collective.expense.paid';
     if (data.user && data.user.twitterHandle) {
       const collectiveMention = (data.collective.twitterHandle) ? `@${data.collective.twitterHandle}` : data.collective.name;
-      const text = `Hi @${data.user.twitterHandle} thanks for your donation to ${collectiveMention} https://opencollective.com/${data.collective.slug} 🎉😊`;
+      const text = `Hi @${data.user.twitterHandle} thanks for your donation to ${collectiveMention} https://opencollective.com/${slug} 🎉😊`;
       data.tweet = {
         text,
         encoded: encodeURIComponent(text)
@@ -238,10 +245,6 @@ const generateEmailFromTemplate = (template, recipient, data, options = {}) => {
     }
   }
 
-  const slug = (data.collective && data.collective.slug) ? data.collective.slug : 'undefined';
-
-  data.unsubscribeUrl = `${config.host.website}/api/services/email/unsubscribe/${encodeURIComponent(options.bcc || recipient)}/${slug}/${options.type || template}/${generateUnsubscribeToken(options.bcc || recipient, slug, options.type || template)}`;
-  data.notificationTypeLabel = getNotificationLabel(template, recipient);
   data.config = pick(config, ['host']);
   data.utm = `utm_source=opencollective&utm_campaign=${template}&utm_medium=email`;
 

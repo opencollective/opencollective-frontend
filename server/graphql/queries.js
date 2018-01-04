@@ -122,7 +122,7 @@ const queries = {
                   MemberCollectiveId: collective.id,
                   role: 'HOST'
                 }
-              }).map(members => members.CollectiveId)
+              }).map(member => member.CollectiveId)
             } else {
               return Promise.resolve([args.CollectiveId]);
             }

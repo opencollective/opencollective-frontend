@@ -205,8 +205,8 @@ export default (Sequelize, DataTypes) => {
   };
 
   Transaction.prototype.getSource = function() {
-    if (this.OrderId) return this.getOrder();
-    if (this.ExpenseId) return this.getExpense();
+    if (this.OrderId) return this.getOrder({ paranoid: false });
+    if (this.ExpenseId) return this.getExpense({ paranoid: false });
   };
 
   /**
