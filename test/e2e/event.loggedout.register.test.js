@@ -13,6 +13,8 @@ describe("event.loggedout.register", () => {
     const email = `testuser+${Math.round(Math.random()*1000000)}@gmail.com`;
     let screenshot = await browser
       .goto(`${WEBSITE_URL}/opensource/events/webpack-webinar`)
+      .evaluate(() => window.localStorage.removeItem('accessToken'))
+      .goto(`${WEBSITE_URL}/opensource/events/webpack-webinar`)
       .wait('#free.tier')
       .scrollToElement('#free.tier')
       .click('#free.tier .btn.increase')

@@ -75,11 +75,11 @@ export function svg2png(svg) {
 
 export function generateSVGBannerForUsers(users, options) {
   console.log(">>> generateSVGBannerForUsers", users.length, "users, options: ", options);
-  
+
   const {
     format, style, limit, buttonImage, collectiveSlug
   } = options;
-  
+
   const imageWidth = options.width;
   const imageHeight = options.height;
   const count = Math.min(limit, users.length);
@@ -161,12 +161,13 @@ export function generateSVGBannerForUsers(users, options) {
           posX = margin;
         }
         const image = `<image x="${posX}" y="${posY}" width="${avatarWidth}" height="${avatarHeight}" xlink:href="data:${contentType};base64,${base64data}"/>`;
-        const imageLink = `<a xlink:href="${website.replace(/&/g,'&amp;')}" target="_blank" id="${user.slug}">${image}</a>`;
+        const imageLink = `<a xlink:href="${website.replace(/&/g,'&amp;')}" class="opencollective-svg" target="_blank" id="${user.slug}">${image}</a>`;
         images.push(imageLink);
         posX += avatarWidth + margin;
       }
 
       return `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${imageWidth || posX}" height="${imageHeight || posY + avatarHeight + margin}">
+        <style>.opencollective-svg { cursor: pointer; }</style>
         ${images.join('\n')}
       </svg>`;
     })

@@ -8,6 +8,7 @@ import { formatCurrency, formatDate, firstSentence, singular, capitalize } from 
 import Link from './Link';
 import CollectiveCard from './CollectiveCard';
 import Avatar from './Avatar';
+import { get } from 'lodash';
 
 class Member extends React.Component {
 
@@ -30,24 +31,23 @@ class Member extends React.Component {
   }
 
   render() {
-    const { viewMode, collective, intl } = this.props;
+    const { collective, intl } = this.props;
     const membership = { ...this.props.member };
     membership.collective = collective;
     const { member, description } = membership;
-
+    const viewMode = this.props.viewMode || (get(member, 'type') === 'USER' ? 'USER' : 'ORGANIZATION');
     const user = member.user || {};
     const name = ((member.name && member.name.match(/^null/)) ? null : member.name) || member.slug || user.email && user.email.substr(0, user.email.indexOf('@'));
-
     if (!name) return (<div/>);
 
     const tierName = membership.tier ? singular(membership.tier.name) : this.messages[membership.role] ? intl.formatMessage(this.messages[membership.role]) : membership.role;
-    const className = this.props.className;
+    const className = this.props.className || '';
     let memberSinceStr = ``;
     if (tierName) {
       memberSinceStr = capitalize(tierName);
     }
     memberSinceStr += ` ${intl.formatMessage(this.messages['membership.since'])} ${formatDate(membership.createdAt)}`;
-    const totalDonationsStr = `${intl.formatMessage(this.messages['membership.totalDonations'])}: ${formatCurrency(membership.stats.totalDonations, collective.currency, { precision: 0})}`;
+    const totalDonationsStr = membership.stats ? `${intl.formatMessage(this.messages['membership.totalDonations'])}: ${formatCurrency(membership.stats.totalDonations, collective.currency, { precision: 0})}` : '';
     let title = member.name;
     if (member.company) {
       title += `
@@ -127,7 +127,7 @@ ${totalDonationsStr}`
                   <div className="meta since" style={{color: colors.darkgray}}>
                     {memberSinceStr}
                   </div>
-                  { membership.stats.totalDonations > 0 &&
+                  { totalDonationsStr &&
                     <div className="meta totalDonations" style={{color: colors.darkgray}}>
                       {totalDonationsStr}
                     </div>

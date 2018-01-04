@@ -2,9 +2,11 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import withIntl from '../lib/withIntl';
 import { graphql } from 'react-apollo'
-import { FormattedMessage } from 'react-intl';
+import { defineMessages, FormattedMessage } from 'react-intl';
 import gql from 'graphql-tag'
 import SmallButton from './SmallButton';
+import { get } from 'lodash';
+import { isValidEmail } from '../lib/utils';
 
 class PayExpenseBtn extends React.Component {
 
@@ -19,6 +21,9 @@ class PayExpenseBtn extends React.Component {
     super(props);
     this.state = { loading: false };
     this.onClick = this.onClick.bind(this);
+    this.messages = defineMessages({
+      'paypal.missing': { id: 'expense.payoutMethod.paypal.missing', defaultMessage: "Please provide a valid paypal email address"}
+    });
   }
 
   async onClick() {
@@ -41,7 +46,13 @@ class PayExpenseBtn extends React.Component {
   }
 
   render() {
-    const { expense } = this.props;
+    const { expense, intl } = this.props;
+    let disabled = this.state.loading, title = '';
+    if (expense.payoutMethod === 'paypal' && !isValidEmail(get(expense, 'user.paypalEmail'))) {
+      disabled = true;
+      title = intl.formatMessage(this.messages['paypal.missing']);
+    }
+
     return (
       <div className="PayExpenseBtn">
         <style jsx>{`
@@ -54,7 +65,7 @@ class PayExpenseBtn extends React.Component {
             padding-left: 1rem;
           }
         `}</style>
-        <SmallButton className="pay" onClick={this.onClick} disabled={this.state.loading || this.props.disabled}>
+        <SmallButton className="pay" onClick={this.onClick} disabled={this.props.disabled || disabled} title={title}>
           { expense.payoutMethod === 'other' && <FormattedMessage id="expense.pay.manual.btn" defaultMessage="record as paid" />}
           { expense.payoutMethod !== 'other' && <FormattedMessage id="expense.pay.btn" defaultMessage="pay with {paymentMethod}" values={{ paymentMethod: expense.payoutMethod }} />}
         </SmallButton>

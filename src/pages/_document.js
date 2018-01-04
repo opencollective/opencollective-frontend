@@ -25,7 +25,6 @@ export default class IntlDocument extends Document {
 
     const scripts = [];
     const page = this.props.__NEXT_DATA__.pathname.substr(1);
-
     const noScriptPages = ['nametags', 'events', 'events-iframe', 'collectives-iframe'];
     if (noScriptPages.indexOf(page) === -1) {
       const requiredScripts = Object.keys(scriptsUrls);
@@ -71,6 +70,18 @@ export default class IntlDocument extends Document {
         <body>
           <Main />
           {scripts.map((script) => <script type="text/javascript" src={script} />)}
+          {/* TODO: use the official react-stripe-elements; this is ugly */}
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `              
+              if (typeof Stripe !== undefined) {
+                const stripePublishableKey = (typeof window !== "undefined" && (window.location.hostname === 'localhost' || window.location.hostname === 'staging.opencollective.com')) ? 'pk_test_5aBB887rPuzvWzbdRiSzV3QB' : 'pk_live_qZ0OnX69UlIL6pRODicRzsZy';
+                // eslint-disable-next-line
+                stripe = Stripe(stripePublishableKey);
+              }
+              `
+            }}
+          />
           <script
             dangerouslySetInnerHTML={{
               __html: this.props.localeDataScript

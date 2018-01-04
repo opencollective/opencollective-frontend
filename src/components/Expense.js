@@ -32,7 +32,7 @@ class Expense extends React.Component {
     this.state = {
       modified: false,
       expense: {},
-      mode: 'summary'
+      mode: undefined
     };
 
     this.save = this.save.bind(this);
@@ -52,27 +52,9 @@ class Expense extends React.Component {
     this.currencyStyle = { style: 'currency', currencyDisplay: 'symbol', minimumFractionDigits: 2, maximumFractionDigits: 2};
   }
 
-  componentWillReceiveProps(newProps) {
-    const { LoggedInUser } = newProps;
-    const { expense } = this.props;
-    if (LoggedInUser && this.state.mode === 'summary') {
-      let mode = 'summary';
-      if (LoggedInUser) {
-        if (expense.status === 'PENDING' && LoggedInUser.canApproveExpense(expense)) {
-          mode = 'details';
-        }
-        if (expense.status === 'APPROVED' && LoggedInUser.canPayExpense(expense)) {
-          mode = 'details';
-        }
-      }
-
-      this.setState({ mode });
-    }
-  }
-
   toggleDetails() {
     this.setState({
-      mode: this.state.mode === 'details' ? 'summary' : 'details',
+      mode: this.state.mode === 'details' ? 'summary': 'details',
     });
   }
 
@@ -114,7 +96,25 @@ class Expense extends React.Component {
     const title = expense.description;
     const status = expense.status.toLowerCase();
 
-    return (
+    let { mode } = this.state;
+    if (editable && LoggedInUser && !mode) {
+      if (expense.status === 'PENDING' && LoggedInUser.canApproveExpense(expense)) {
+        mode = 'details';
+      }
+      if (expense.status === 'APPROVED' && LoggedInUser.canPayExpense(expense)) {
+        mode = 'details';
+      }
+    }
+    mode = mode || 'summary';
+
+    const canReject = LoggedInUser
+      && LoggedInUser.canApproveExpense(expense)
+      && (
+        expense.status === 'PENDING'
+        || (expense.status === 'APPROVED' && (Date.now() - (new Date(expense.updatedAt).getTime())) < 60 * 1000 * 15) // we can reject an expense for up to 10mn after approving it
+      );
+
+      return (
       <div className={`expense ${status} ${this.state.mode}View`}>
         <style jsx>{`
           .expense {
@@ -224,10 +224,10 @@ class Expense extends React.Component {
             <span className="status">{intl.formatMessage(this.messages[status])}</span> | 
             {` ${capitalize(expense.category)}`}
             { editable && LoggedInUser && LoggedInUser.canEditExpense(expense) &&
-              <span> | <a onClick={this.toggleEdit}>{intl.formatMessage(this.messages[`${this.state.mode === 'edit' ? 'cancelEdit' : 'edit'}`])}</a></span>
+              <span> | <a className="toggleEditExpense" onClick={this.toggleEdit}>{intl.formatMessage(this.messages[`${mode === 'edit' ? 'cancelEdit' : 'edit'}`])}</a></span>
             }
-            { this.state.mode !== 'edit' &&
-              <span> | <a onClick={this.toggleDetails}>{intl.formatMessage(this.messages[`${this.state.mode === 'details' ? 'closeDetails' : 'viewDetails'}`])}</a></span>
+            { mode !== 'edit' &&
+              <span> | <a className="toggleDetails" onClick={this.toggleDetails}>{intl.formatMessage(this.messages[`${mode === 'details' ? 'closeDetails' : 'viewDetails'}`])}</a></span>
             }
           </div>
 
@@ -236,33 +236,35 @@ class Expense extends React.Component {
             expense={expense}
             collective={collective}
             onChange={this.handleChange}
-            mode={this.state.mode}
+            mode={mode}
             />
 
-          <div className="actions">
-            { this.state.mode === 'edit' && this.state.modified &&
-              <div>
-                <div className="leftColumn"></div>
-                <div className="rightColumn">
-                  <SmallButton className="primary" onClick={this.save}><FormattedMessage id="expense.save" defaultMessage="save" /></SmallButton>
+          { editable &&
+            <div className="actions">
+              { mode === 'edit' && this.state.modified &&
+                <div>
+                  <div className="leftColumn"></div>
+                  <div className="rightColumn">
+                    <SmallButton className="primary save" onClick={this.save}><FormattedMessage id="expense.save" defaultMessage="save" /></SmallButton>
+                  </div>
                 </div>
-              </div>
-            }
-            { this.state.mode !== 'edit' && LoggedInUser && LoggedInUser.canApproveExpense(expense) &&
-              <div>
-                { expense.status === 'APPROVED' && LoggedInUser.canPayExpense(expense) &&
-                  <PayExpenseBtn
-                    expense={expense}
-                    disabled={!this.props.allowPayAction}
-                    lock={this.props.lockPayAction}
-                    unlock={this.props.unlockPayAction}
-                    />
-                }
-                { expense.status !== 'APPROVED' && <ApproveExpenseBtn id={expense.id} /> }
-                { expense.status !== 'REJECTED' && <RejectExpenseBtn id={expense.id} /> }
-              </div>
-            }
-          </div>
+              }
+              { mode !== 'edit' && LoggedInUser && LoggedInUser.canApproveExpense(expense) &&
+                <div>
+                  { expense.status === 'APPROVED' && LoggedInUser.canPayExpense(expense) &&
+                    <PayExpenseBtn
+                      expense={expense}
+                      disabled={!this.props.allowPayAction}
+                      lock={this.props.lockPayAction}
+                      unlock={this.props.unlockPayAction}
+                      />
+                  }
+                  { expense.status !== 'APPROVED' && expense.status !== 'PAID' && <ApproveExpenseBtn id={expense.id} /> }
+                  { canReject && <RejectExpenseBtn id={expense.id} /> }
+                </div>
+              }
+            </div>
+          }
         </div>
         <div className="amount">
           <FormattedNumber

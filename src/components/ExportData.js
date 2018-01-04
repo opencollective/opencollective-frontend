@@ -5,6 +5,7 @@ import { Row, Col, Checkbox, Button, Form } from 'react-bootstrap';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import withIntl from '../lib/withIntl';
 import { exportMembers } from '../lib/export_file';
+import ExportImages from './ExportImages';
 
 class ExportData extends React.Component {
 
@@ -19,6 +20,7 @@ class ExportData extends React.Component {
 
   render() {
     const { intl, collective } = this.props;
+    const widgetCode = `<script src="https://opencollective.com/${collective.slug}/banner.js"></script>`;
 
     return (
       <div className="ExportData">
@@ -34,7 +36,22 @@ class ExportData extends React.Component {
           .actions {
             text-align: center;
           }
+          .code {
+            font-size: 1.4rem;
+            font-family: Courrier;
+            padding: 0.1rem 0.3rem;
+            background: #ddd;
+            margin: 0.5rem;
+            border: 1px solid #ccc;
+          }
         `}</style>
+
+        <h1><FormattedMessage id="export.widget.title" defaultMessage="Widget" /></h1>
+        <div className="code">
+          {widgetCode}
+        </div>
+
+        <ExportImages collective={collective} />
 
         <h1><FormattedMessage id="export.csv.title" defaultMessage="Export in CSV" /></h1>
         <p><FormattedMessage id="export.csv.description" defaultMessage="Export all your members in CSV (comma separated values) that can be easily imported into any spreadsheet application" /></p>
@@ -51,11 +68,11 @@ class ExportData extends React.Component {
         </ul>
 
         <h2><FormattedMessage id="export.json.parameters.title" defaultMessage="Parameters" /></h2>
-        <table>
+        <table><tbody>
           <tr><td className="param">limit</td><td><FormattedMessage id="export.json.parameters.limit" defaultMessage="number of members to return" /></td></tr>
           <tr><td className="param">offset</td><td><FormattedMessage id="export.json.parameters.offset" defaultMessage="number of members to skip (for paging)" /></td></tr>
           <tr><td className="param">TierId</td><td><FormattedMessage id="export.json.parameters.TierId" defaultMessage="only return the members that belong to this TierId. You can find the TierId as part of the URL after selecting a tier on your collective page." /></td></tr>
-        </table>
+        </tbody></table>
         e.g.<br /><a href={`/${collective.slug}/members/all.json?limit=10&offset=0&TierId=${collective.tiers[0].id}`}>https://opencollective.com/{collective.slug}/members/all.json?limit=10&offset=0&TierId={collective.tiers[0].id}</a>
       </div>
     );

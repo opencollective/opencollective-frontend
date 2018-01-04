@@ -11,11 +11,11 @@ import Memberships from './Memberships';
 import CollectivesWithData from './CollectivesWithData';
 import Markdown from 'react-markdown';
 import { defineMessages, FormattedMessage } from 'react-intl';
-import { get, groupBy } from 'lodash';
+import { pick, get, groupBy } from 'lodash';
 import HashLink from 'react-scrollchor';
 import MenuBar from './MenuBar';
 import MessageModal from './MessageModal';
-import CollectiveCard from './CollectiveCard';
+import OrderCreated from './OrderCreated';
 import { Button } from 'react-bootstrap';
 import { Router, Link } from '../server/pages';
 
@@ -46,6 +46,8 @@ class UserCollective extends React.Component {
       'user.collective.memberOf.member.title': { id: 'user.collective.memberOf.member.title', defaultMessage: `I'm a member of {n, plural, one {this collective} other {these collectives}}`},
       'user.collective.memberOf.backer.title': { id: 'user.collective.memberOf.backer.title', defaultMessage: `I'm backing {n, plural, one {this collective} other {these collectives}}`},
       'user.collective.memberOf.attendee.title': { id: 'user.collective.memberOf.attendee.title', defaultMessage: `I've attended {n, plural, one {this event} other {these events}}`},
+      'user.collective.memberOf.fundraiser.title': { id: 'user.collective.memberOf.fundraiser.title', defaultMessage: `I've helped raise money for {n, plural, one {this collective} other {these collectives}}`},
+      'user.collective.memberOf.fundraiser.LoggedInDescription': { id: 'user.collective.memberOf.fundraiser.LoggedInDescription', defaultMessage: `Share the URL in the email receipt for each of your donation to track how much money you helped raised! (Alternatively, you can also click on any collective that you are contributing to on this page. We will add your referral id to the URL.)`},
       'user.collective.memberOf.follower.title': { id: 'user.collective.memberOf.follower.title', defaultMessage: `I'm following {n, plural, one {this collective} other {these collectives}}`},
       'organization.collective.memberOf.host.title': { id: 'organization.collective.memberOf.host.title', defaultMessage: `We are hosting {n, plural, one {this collective} other {{n} collectives}}`},
       'organization.collective.memberOf.admin.title': { id: 'organization.collective.memberOf.admin.title', defaultMessage: `We are a core contributor of {n, plural, one {this collective} other {these collectives}}`},
@@ -58,6 +60,7 @@ class UserCollective extends React.Component {
       'user.collective.menu.member': { id: 'user.collective.menu.member', defaultMessage: `member of {n} {n, plural, one {collective} other {collectives}}`},
       'user.collective.menu.backer': { id: 'user.collective.menu.backer', defaultMessage: `backing {n} {n, plural, one {collective} other {collectives}}`},
       'user.collective.menu.attendee': { id: 'user.collective.menu.attendee', defaultMessage: `attended {n} {n, plural, one {event} other {events}}`},
+      'user.collective.menu.fundraiser': { id: 'user.collective.menu.fundraiser', defaultMessage: `raised money for {n} {n, plural, one {collective} other {collectives}}`},
       'user.collective.menu.follower': { id: 'user.collective.menu.follower', defaultMessage: `following {n} {n, plural, one {collective} other {collectives}}`},
     })
 
@@ -68,7 +71,7 @@ class UserCollective extends React.Component {
   }
 
   render() {
-    let collectiveCreated;
+    const order = { fromCollective: this.collective };
     const { intl, LoggedInUser, query } = this.props;
 
     const type = this.collective.type.toLowerCase();
@@ -95,28 +98,18 @@ class UserCollective extends React.Component {
     }
 
     if (query && query.CollectiveId) {
-      collectiveCreated = (this.collective.memberOf.find(m => m.collective.id === parseInt(query.CollectiveId)) || {}).collective;
+      Object.assign(order, {
+        ...order,
+        ...pick(query || {}, 'totalAmount', 'CollectiveId', 'TierId'),
+        collective: (this.collective.memberOf.find(m => m.collective.id === parseInt(query.CollectiveId)) || {}).collective
+      });
     }
 
     return (
       <div className="UserCollectivePage">
-
-        <style>{`
+        <style jsx>{`
           h1 {
             font-size: 2rem;
-          }
-          .message {
-            text-align: center;
-          }
-          .message .thankyou {
-            font-weight: bold;
-          }
-          .message .editBtn {
-            margin: 2rem;
-          }
-          .orderCreated .collectiveCard {
-            display: flex;
-            justify-content: center;
           }
           .adminActions {
             text-align: center;
@@ -140,6 +133,22 @@ class UserCollective extends React.Component {
           }
           .cardsList {
             margin: 0 2rem;
+          }
+          .description {
+            font-size: 1.4rem;
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto;
+          }
+          #tiers {
+            overflow: hidden
+            width: 100%;
+            display: flex;
+          }
+          #tiers :global(.tier) {
+            margin: 4rem auto;
+            max-width: 300px;
+            float: left;
           }
         `}</style>
 
@@ -173,24 +182,11 @@ class UserCollective extends React.Component {
 
             <div>
 
+              { get(query, 'status') &&  <OrderCreated order={order} status={query.status} /> }
+
               <div className="content" >
                 <div className="message">
-                  { query && query.status === 'orderCreated' &&
-                    <div className="orderCreated">
-                      <p className="thankyou"><FormattedMessage id="collective.user.orderCreated.thankyou" defaultMessage="Thank you for your donation! 🙏" /></p>
-                      { collectiveCreated &&
-                        <div>
-                          <p><FormattedMessage id="collective.user.orderCreated.message" defaultMessage="We have added {collective} to your profile" values={{ collective: collectiveCreated.name }} /></p>
-                          { memberOf['BACKER'] && memberOf['BACKER'].length > 10 &&
-                            <div className="collectiveCard">
-                              <CollectiveCard collective={collectiveCreated} />
-                            </div>
-                          }
-                        </div>
-                      }
-                    </div>
-                  }
-                  { query && query.status === 'orderCreated' && (!this.collective.image || !this.collective.longDescription) &&
+                  { query && query.status && (!this.collective.image || !this.collective.longDescription) &&
                     <div>
                       <FormattedMessage id="collective.user.emptyProfile" defaultMessage={`Your profile looks a bit empty ¯\\\\_(ツ)_/¯`} />
                     </div>
@@ -212,18 +208,6 @@ class UserCollective extends React.Component {
                   </div>
                 }
                 <div id="tiers">
-                  <style jsx>{`
-                    #tiers {
-                      overflow: hidden
-                      width: 100%;
-                      display: flex;
-                    }
-                    #tiers :global(.tier) {
-                      margin: 4rem auto;
-                      max-width: 300px;
-                      float: left;
-                    }
-                  `}</style>
                   {this.collective.tiers.map((tier) =>
                     <Tier
                       key={tier.id}
@@ -246,7 +230,7 @@ class UserCollective extends React.Component {
                         <li><Link route={`/${this.collective.slug}/collectives/expenses`}><a><FormattedMessage id="host.collectives.manage" defaultMessage="Manage expenses" /></a></Link></li>
                       }
                       { this.collective.settings.apply &&
-                        <li><Link><a href={`/${this.collective.slug}/apply`}><FormattedMessage id="host.apply" defaultMessage="Apply to create a collective" /></a></Link></li>
+                        <li><a href={`/${this.collective.slug}/apply`}><FormattedMessage id="host.apply" defaultMessage="Apply to create a collective" /></a></li>
                       }
                     </ul>
                   </div>
@@ -264,8 +248,12 @@ class UserCollective extends React.Component {
               { Object.keys(memberOf).map(role => role !== 'HOST' && (
                 <section id={role}>
                   <h1>{intl.formatMessage(this.messages[`${type}.collective.memberOf.${role.toLowerCase()}.title`], { n: memberOf[role].length })}</h1>
+                  { LoggedInUser && this.messages[`${type}.collective.memberOf.${role.toLowerCase()}.LoggedInDescription`] &&
+                    <div className="description">{intl.formatMessage(this.messages[`${type}.collective.memberOf.${role.toLowerCase()}.LoggedInDescription`])}</div>
+                  }
                   <Memberships
                     className={role}
+                    LoggedInUser={LoggedInUser}
                     memberships={role === 'ADMIN' ? memberOf[role].filter(m => m.collective.type === 'COLLECTIVE') : memberOf[role]}
                     />
                 </section>

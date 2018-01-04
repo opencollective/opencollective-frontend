@@ -158,7 +158,7 @@ class EditCollectiveForm extends React.Component {
           name: 'longDescription',
           type: 'textarea',
           placeholder: '',
-          help: 'Protip: you can use markdown'
+          description: 'Protip: you can use markdown'
         }
       ],
       images: [
@@ -302,9 +302,8 @@ class EditCollectiveForm extends React.Component {
             <div className="inputs">
               {this.fields[key].map((field) => (!field.when || field.when()) && <InputField
                 key={field.name}
-                value={this.state.collective[field.name]}
                 className={field.className}
-                defaultValue={field.defaultValue}
+                defaultValue={field.defaultValue || this.state.collective[field.name]}
                 validate={field.validate}
                 ref={field.name}
                 name={field.name}
@@ -313,7 +312,6 @@ class EditCollectiveForm extends React.Component {
                 options={field.options}
                 placeholder={field.placeholder}
                 type={field.type}
-                help={field.help}
                 pre={field.pre}
                 context={this.state.collective}
                 onChange={(value) => this.handleChange(field.name, value)}
@@ -352,12 +350,14 @@ class EditCollectiveForm extends React.Component {
               />
           }
         </div>
-        <div className="actions">
-          <Button bsStyle="primary" type="submit" ref="submit" onClick={this.handleSubmit} disabled={loading || !this.state.modified} >{submitBtnLabel}</Button>
-          <div className="backToProfile">
-            <Link route={`/${collective.slug}`}><a><FormattedMessage id="collective.edit.backToProfile" defaultMessage="or go back to the {type} page" values={{ type }} /></a></Link>
+        { this.state.section !== 'export' &&
+          <div className="actions">
+            <Button bsStyle="primary" type="submit" ref="submit" onClick={this.handleSubmit} disabled={loading || !this.state.modified} >{submitBtnLabel}</Button>
+            <div className="backToProfile">
+              <Link route={`/${collective.slug}`}><a><FormattedMessage id="collective.edit.backToProfile" defaultMessage="or go back to the {type} page" values={{ type }} /></a></Link>
+            </div>
           </div>
-        </div>
+        }
       </div>
     );
   }

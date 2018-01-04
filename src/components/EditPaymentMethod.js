@@ -11,7 +11,8 @@ class EditPaymentMethod extends React.Component {
 
   static propTypes = {
     paymentMethod: PropTypes.object.isRequired,
-    onChange: PropTypes.func.isRequired
+    onChange: PropTypes.func.isRequired,
+    editMode: PropTypes.bool
   };
 
   constructor(props) {
@@ -56,14 +57,14 @@ class EditPaymentMethod extends React.Component {
 
         <div>
           { this.state.editMode &&
-          <InputField
-            label="Credit Card"
-            type="creditcard"
-            name="creditcard"
-            value={paymentMethod}
-            className="horizontal"
-            onChange={(creditcard) => this.handleChange({ card: creditcard })}
-            />
+            <InputField
+              label="Credit Card"
+              type="creditcard"
+              name="creditcard"
+              defaultValue={paymentMethod}
+              className="horizontal"
+              onChange={(creditcard) => this.handleChange({ card: creditcard })}
+              />
           }
           { !this.state.editMode &&
             <Row>
@@ -95,7 +96,7 @@ class EditPaymentMethod extends React.Component {
               type="currency"
               name="monthlyLimitPerMember"
               pre={getCurrencySymbol(currency)}
-              value={paymentMethod.monthlyLimitPerMember}
+              defaultValue={paymentMethod.monthlyLimitPerMember}
               description={intl.formatMessage(this.messages['paymentMethod.monthlyLimitPerMember.description'])}
               onChange={(value) => this.handleChange({'monthlyLimitPerMember': value})}
               />

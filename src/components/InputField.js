@@ -96,7 +96,8 @@ class InputField extends React.Component {
 
   validate(value) {
     if (!value) return !this.props.required;
-    if (this.props.validate && this.props.type !== 'datetime') {
+    const type = this.props.type || "text";
+    if (this.props.validate && !type.match(/^date/)) {
       return this.props.validate(value);
     }
     switch (this.props.type) {
@@ -153,14 +154,16 @@ class InputField extends React.Component {
                           className={field.className}
                           placeholder={this.props.placeholder}
                           name={field.name}
-                          help={field.help}
+                          help={field.description}
+                          maxLength={field.maxLength}
                           value={this.state.value || this.props.defaultValue}
                           onChange={event => this.handleChange(event.target.value)}
                         />
                       )
         break;
+      case 'date':
       case 'datetime':
-      console.log(">>> datetime", field);
+        const timeFormat = field.type === 'date' ? false : true;
         this.input = (
         <FormGroup>
           {field.className === 'horizontal' &&
@@ -171,6 +174,7 @@ class InputField extends React.Component {
               <Col sm={9}>
                 <DateTime
                   name={field.name}
+                  timeFormat={field.timeFormat || timeFormat}
                   value={moment.tz(new Date(this.state.value || field.defaultValue), context.timezone)}
                   isValidDate={field.validate}
                   onChange={date => this.handleChange(date.toISOString())}
@@ -183,6 +187,7 @@ class InputField extends React.Component {
               {field.label && <ControlLabel>{`${capitalize(field.label)}`}</ControlLabel>}
               <DateTime
                 name={field.name}
+                timeFormat={field.timeFormat || timeFormat}
                 value={moment.tz(new Date(this.state.value || field.defaultValue), context.timezone)}
                 isValidDate={field.validate}
                 onChange={date => this.handleChange(date.toISOString())}
@@ -221,7 +226,7 @@ class InputField extends React.Component {
         <FormGroup>
           {field.label && <ControlLabel>{`${capitalize(field.label)}`}</ControlLabel>}
           <InputTypeLocation
-            value={this.state.value}
+            value={this.state.value || field.defaultValue}
             onChange={event => this.handleChange(event)}
             placeholder={field.placeholder}
             options={field.options}
@@ -240,12 +245,13 @@ class InputField extends React.Component {
               </Col>
               <Col sm={9}>
                 <InputTypeDropzone
-                  value={this.state.value}
+                  defaultValue={field.defaultValue}
                   name={field.name}
                   onChange={event => this.handleChange(event)}
                   placeholder={field.placeholder}
                   options={field.options}
                   />
+                { field.description && <HelpBlock>{field.description}</HelpBlock> }
               </Col>
             </div>
           }
@@ -253,13 +259,13 @@ class InputField extends React.Component {
             <div>
               {field.label && <ControlLabel>{`${capitalize(field.label)}`}</ControlLabel>}
               <InputTypeDropzone
-                value={this.state.value}
+                defaultValue={field.defaultValue}
                 name={field.name}
                 onChange={event => this.handleChange(event)}
                 placeholder={field.placeholder}
                 options={field.options}
                 />
-              {field.description && <HelpBlock>{field.description}</HelpBlock>}
+              { field.description && <HelpBlock>{field.description}</HelpBlock> }
             </div>
           }
         </FormGroup>
@@ -269,19 +275,19 @@ class InputField extends React.Component {
       case 'currency':
         this.input = (
         <FieldGroup
-          onChange={event => this.handleChange(event.target.value*100)}
+          onChange={event => this.handleChange(Math.round(event.target.value*100))}
           type="number"
           pre={field.pre}
           post={field.post}
           name={field.name}
-          min={field.min / 100}
+          min={(field.min || 0) / 100}
           label={field.label && `${capitalize(field.label)}`}
           help={field.description}
           placeholder={field.placeholder}
           className={field.className}
           onFocus={(event) => event.target.select()}
-          value={this.state.value ? this.state.value / 100 : ''}
-          defaultValue={(field.value || field.defaultValue || 0)/100}
+          value={this.state.value ? this.state.value / 100 : (field.defaultValue || 0)/100}
+          defaultValue={(field.defaultValue || 0)/100}
         />
         )
         break;
@@ -297,7 +303,7 @@ class InputField extends React.Component {
             placeholder={field.placeholder}
             className={field.className}
             autoFocus={field.focus}
-            value={field.value || field.defaultValue}
+            defaultValue={field.value || field.defaultValue}
             onChange={event => this.handleChange(event.target.value)}
             >
             { field.options && field.options.map(option => {
@@ -344,7 +350,6 @@ class InputField extends React.Component {
           autoFocus={field.focus}
           placeholder={field.placeholder}
           className={field.className}
-          value={this.state.value || field.defaultValue}
           defaultValue={field.defaultValue}
           validationState={this.state.validationState}
         />)

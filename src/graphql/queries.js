@@ -11,6 +11,7 @@ export const getLoggedInUserQuery = gql`
       firstName
       lastName
       email
+      paypalEmail
       image
       CollectiveId
       collective {
@@ -38,10 +39,6 @@ export const getLoggedInUserQuery = gql`
           stats {
             id
             balance
-            expenses {
-              id
-              pending
-            }
           }
           paymentMethods {
             id
@@ -233,6 +230,7 @@ const getCollectiveQuery = gql`
           all
         }
         totalAmountSent
+        totalAmountRaised
       }
       tiers {
         id
@@ -290,6 +288,7 @@ const getCollectiveQuery = gql`
           createdAt
           stats {
             totalDonations
+            totalRaised
           }
           collective {
             id
@@ -404,6 +403,12 @@ const getCollectiveCoverQuery = gql`
       settings
       image
       isHost
+      host {
+        id
+        slug
+        name
+        image
+      }
     }
   }
 `;
