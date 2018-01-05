@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import _ from 'lodash';
+import _, { get } from 'lodash';
 import { capitalize } from '../lib/utils';
 import DateTime from 'react-datetime';
 import stylesheet from '../styles/react-datetime.css';
@@ -280,6 +280,7 @@ class InputField extends React.Component {
           pre={field.pre}
           post={field.post}
           name={field.name}
+          step={get(field, 'options.step') || "0.01"}
           min={(field.min || 0) / 100}
           label={field.label && `${capitalize(field.label)}`}
           help={field.description}
