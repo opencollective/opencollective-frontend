@@ -81,8 +81,6 @@ async function HostReport(year, month) {
     previewCondition = `AND c.slug IN ('${slugs.join("','")}')`
   }
 
-
-
   const getPlatformStats = () => {
   
     return models.Collective.findAll({ where: { type: { $in: ['COLLECTIVE', 'EVENT'] } } })
