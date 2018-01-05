@@ -12,5 +12,5 @@ process.env.PORT = 3066;
 import HostReport from '../../reports/host-report';
 
 const d = new Date;
-const year = (new Date(d.getFullYear() -1, 1, 1)).getFullYear();
+const year = (new Date(d.getFullYear() - 1, 1, 1)).getFullYear();
 HostReport(year)

@@ -43,9 +43,10 @@ async function HostReport(year, month) {
   
   if (!month) {
     // yearly report
-    previousStartDate = new Date(d.getFullYear()-2, 0, 1);
-    startDate = new Date(d.getFullYear() -1, 0, 1);
-    endDate = new Date(d.getFullYear(), 0, 1);
+    d.setFullYear(year);
+    previousStartDate = new Date(d.getFullYear()-1, 0, 1);
+    startDate = new Date(d.getFullYear(), 0, 1);
+    endDate = new Date(d.getFullYear() + 1, 0, 1);
   } else {
     d.setMonth(d.getMonth() - 2);
     previousStartDate = new Date(d.getFullYear(), d.getMonth(), 1);
@@ -373,6 +374,10 @@ async function HostReport(year, month) {
     });
     summary.numberDonations = summary.numberTransactions - summary.numberPaidExpenses;
     return emailLib.send('host.report.summary', 'info@opencollective.com', summary);
+  })
+  .then(() => {
+    console.log(">>> All done. Exiting.");
+    process.exit(0);
   })
 
 }
