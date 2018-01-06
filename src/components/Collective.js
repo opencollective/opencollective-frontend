@@ -109,7 +109,10 @@ class Collective extends React.Component {
 
   render() {
     const { intl, LoggedInUser, query: { referral } } = this.props;
-
+    const donateParams = { collectiveSlug: this.collective.slug, verb: 'donate' };
+    if (referral) {
+      donateParams.referral = referral;
+    }
     const backersHash = this.collective.stats.backers.organizations > 0 ? '#organizations' : '#backers';
     const actions = [
       {
@@ -142,7 +145,7 @@ class Collective extends React.Component {
       },
       {
         className: 'blue',
-        component: <Link route={'donate'} params={{ collectiveSlug: this.collective.slug, verb: 'donate', referral }}>
+        component: <Link route={'donate'} params={donateParams}>
             <a><b>{intl.formatMessage(this.messages['collective.donate']).toUpperCase()}</b></a>
           </Link>
       }
