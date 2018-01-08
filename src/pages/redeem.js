@@ -168,7 +168,7 @@ class RedeemPage extends React.Component {
             <div className='Redeem-listing'>
               <div className="cardsList">
                 <CollectivesForRedeemPageWithData
-                  HostCollectiveId={9805} // hard-coded to only show open source projects
+                  HostCollectiveId={11004} // hard-coded to only show open source projects
                   orderBy="balance"
                   orderDirection="DESC"
                   limit={12}
