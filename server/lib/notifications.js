@@ -8,6 +8,8 @@ import {tweetActivity} from './twitter';
 import emailLib from '../lib/email';
 import activityType from '../constants/activities';
 import models from '../models';
+import debugLib from 'debug';
+const debug = debugLib("notification");
 
 export default (Sequelize, activity) => {
   // publish everything to our private channel
@@ -101,6 +103,7 @@ function publishToSlackPrivateChannel(activity) {
  * @param {*} activity [ { type, CollectiveId }]
  */
 async function notifySubscribers(users, activity) {
+  debug("notifySubscribers", users.length, users, activity);
   const unsubscriptions = await models.Notification.findAll({
     where: {
       CollectiveId: activity.CollectiveId,
@@ -109,6 +112,7 @@ async function notifySubscribers(users, activity) {
     }
   });
   const unsubscribedUserIds = unsubscriptions.map(n => n.UserId);
+  debug("Skipping unsubscribedUserIds", unsubscribedUserIds);
   return users.map(u => {
     // skip users that have unsubscribed
     if (unsubscribedUserIds.indexOf(u.id) === -1) {
@@ -122,8 +126,7 @@ async function notifySubscribers(users, activity) {
 
 async function notify(activity) {
   if (activity.type === activityType.COLLECTIVE_CREATED) {
-    const collective = await models.Collective.findById(activity.data.collective.id)
-    const host = await collective.getHostCollective();
+    const host = await models.Collective.findById(activity.data.host.id)
     const admins = await host.getAdmins();
     const adminUsers = await models.User.findAll({
       where: {

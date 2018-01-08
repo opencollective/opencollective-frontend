@@ -3,6 +3,7 @@ import * as errors from '../errors';
 import slugify from 'slug';
 import { types } from '../../constants/collectives';
 import roles from '../../constants/roles';
+import activities from '../../constants/activities';
 
 export function createCollective(_, args, req) {
   if (!req.remoteUser) {
@@ -82,7 +83,27 @@ export function createCollective(_, args, req) {
   .then(() => collective.editTiers(args.collective.tiers))
   .then(() => collective.addUserWithRole(req.remoteUser, roles.ADMIN, { CreatedByUserId: req.remoteUser.id }))
   .then(() => collective.editPaymentMethods(args.collective.paymentMethods, { CreatedByUserId: req.remoteUser.id }))
-  .then(() => collective)
+  .then(async () => {
+    // if the type of collective is an organization or an event, we don't notify the host
+    if (collective.type !== types.COLLECTIVE) {
+      return collective;
+    }
+    const remoteUserCollective = await models.Collective.findById(req.remoteUser.CollectiveId);
+    models.Activity.create({
+      type: activities.COLLECTIVE_CREATED,
+      UserId: req.remoteUser.id,
+      CollectiveId: hostCollective.id,
+      data: {
+        collective: collective.info,
+        host: hostCollective.info,
+        user: {
+          email: req.remoteUser.email,
+          collective: remoteUserCollective.info
+        }
+      }
+    })
+    return collective;
+  })
   .catch(e => {
     let msg;
     switch (e.name) {

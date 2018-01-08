@@ -7,11 +7,13 @@ Subject: New collective pending {{collective.name}}
 </style>
 
 <h2>Creator</h2>
+https://opencollective.com/{{user.collective.slug}}
+<br /><br />
 <table>
-  <tr><th>Name</th><td>{{user.name}}</td></tr>
+  <tr><th>Name</th><td>{{user.collective.name}}</td></tr>
   <tr><th>Email</th><td>{{user.email}}</td></tr>
-  <tr><th>Website</th><td>{{user.website}}</td></tr>
-  <tr><th>Twitter</th><td>{{user.twitterHandle}}</td></tr>
+  <tr><th>Website</th><td>{{user.collective.website}}</td></tr>
+  <tr><th>Twitter</th><td>{{user.collective.twitterHandle}}</td></tr>
 </table>
 
 <h2>Collective</h2>
