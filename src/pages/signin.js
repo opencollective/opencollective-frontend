@@ -44,6 +44,7 @@ class LoginPage extends React.Component {
         `}
         </style>
         <Body>
+          <h2><FormattedMessage id="loginform.title" defaultMessage="login" /></h2>
           <SignInForm next={this.props.next} />
         </Body>
         <Footer />

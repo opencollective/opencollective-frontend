@@ -46,6 +46,8 @@ class Collective extends React.Component {
     };
 
     this.messages = defineMessages({      
+      'collective.created': { id: 'collective.created', defaultMessage: `Your collective has been created with success.`},
+      'collective.created.description': { id: 'collective.created.description', defaultMessage: `While you are waiting for approval from your host ({host}), you can already customize your collective, file expenses and even create events.`},
       'collective.donate': { id: 'collective.donate', defaultMessage: `donate`},
       'collective.since': { id: 'usercollective.since', defaultMessage: `Established in {year}`},
       'collective.members.admin.title': { id: 'collective.members.admin.title', defaultMessage: `{n} {n, plural, one {core contributor} other {core contributors}}`},
@@ -109,7 +111,7 @@ class Collective extends React.Component {
   }
 
   render() {
-    const { intl, LoggedInUser, query: { referral } } = this.props;
+    const { intl, LoggedInUser, query } = this.props;
 
     const backersHash = this.collective.stats.backers.organizations > 0 ? '#organizations' : '#backers';
     const actions = [
@@ -143,7 +145,7 @@ class Collective extends React.Component {
       },
       {
         className: 'blue',
-        component: <Link route={'donate'} params={{ collectiveSlug: this.collective.slug, verb: 'donate', referral }}>
+        component: <Link route={'donate'} params={{ collectiveSlug: this.collective.slug, verb: 'donate', referral: query.referral }}>
             <a><b>{intl.formatMessage(this.messages['collective.donate']).toUpperCase()}</b></a>
           </Link>
       }
@@ -157,6 +159,12 @@ class Collective extends React.Component {
     }
 
     const backgroundImage = this.collective.backgroundImage || get(this.collective,'parentCollective.backgroundImage') || defaultBackgroundImage;
+
+    const notification = {};
+    if (get(query, 'status') === 'collectiveCreated') {
+      notification.title = intl.formatMessage(this.messages['collective.created']);
+      notification.description = intl.formatMessage(this.messages['collective.created.description'], { host: this.collective.host.name });
+    }
 
     return (
       <div className="CollectivePage">
@@ -229,7 +237,12 @@ class Collective extends React.Component {
 
           <div className="CollectivePage">
 
-            <NotificationBar status={this.state.status} error={this.state.error} />
+            <NotificationBar
+              status={this.state.status}
+              title={notification.title}
+              description={notification.description}
+              error={this.state.error}
+              />
 
             <CollectiveCover
               collective={this.collective}
@@ -250,7 +263,7 @@ class Collective extends React.Component {
                     <TierCard
                       collective={this.collective}
                       tier={tier}
-                      referral={referral}
+                      referral={query.referral}
                       />
                   ))}
                 </div>

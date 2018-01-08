@@ -11,6 +11,7 @@ pages
   .add('button', '/:collectiveSlug/:verb(contribute|donate)/button')
   .add('createEvent', '/:parentCollectiveSlug/events/(new|create)')
   .add('createCollective', '/:hostCollectiveSlug/apply')
+  .add('createOrganization', '/organizations/new')
   .add('events-iframe', '/:collectiveSlug/events.html')
   .add('collectives-iframe', '/:collectiveSlug/collectives.html')
   .add('banner-iframe', '/:collectiveSlug/banner.html')
