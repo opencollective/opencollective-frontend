@@ -1,0 +1,39 @@
+Subject: {{remoteUser.collective.name}} added you as a {{role}} to {{collective.name}} {{collective.type}} on Open Collective
+
+{{> header}}
+
+{{> toplogo}}
+
+{{#if recipient.collective.name}}
+<p>{{recipient.collective.name}},</p>
+{{else}}
+<p>Hi,</p>
+{{/if}}
+
+<p>Just a quick note to let you know that {{remoteUser.collective.name}} (cced) added you as a {{role}} to <a href="https://opencollective.com/{{collective.slug}}">{{collective.name}} {{collective.type}}</a> on Open Collective.</p>
+
+{{#if isAdmin }}
+<p>As a core contributor you have ADMIN permissions. That means that you can approve and reject expenses that have been submitted to the collective of the event. You can do so with one click from the email notification or via the interface on https://opencollective.com/{{collective.slug}}/expenses.</p>
+{{else}}
+<p>As a contributor you have MEMBER permissions. That means that you can submit expenses (https://opencollective.com/{{collective.slug}}/expenses/new).</p>
+{{/if}}
+
+<h2>Your current profile details are:</h2>
+
+<table>
+  {{#if recipient.collective.previewImage}}
+    <tr><th>Avatar:</th><td><img src="{{recipient.collective.previewImage}}" height="64" /></td></tr>
+  {{else}}
+  <tr><th>Avatar:</th><td>No avatar</td></tr>
+  {{/if}}
+  <tr><th>Name:</th><td>{{recipient.collective.name}}</td></tr>
+  <tr><th>Short description:</th><td>{{recipient.collective.description}}</td></tr>
+  <tr><th>Website:</th><td>{{recipient.collective.website}}</td></tr>
+  <tr><th>Twitter:</th><td>{{recipient.collective.twitterHandle}}</td></tr>
+</table>
+
+<p>You can login and edit your profile by <a href="{{loginLink}}">clicking here</a></p>
+
+<p>If you have questions about Open Collective, feel free to reply to this email.</p>
+
+{{> footer}}

@@ -1,7 +1,7 @@
 /**
  * Dependencies.
  */
-import _ from 'lodash';
+import _, { get } from 'lodash';
 import Temporal from 'sequelize-temporal';
 import config from 'config';
 import deepmerge from 'deepmerge';
@@ -664,8 +664,12 @@ export default function(Sequelize, DataTypes) {
 
         case roles.MEMBER:
         case roles.ADMIN:
+          // We don't notify if the new member is the logged in user
+          if (get(remoteUser, 'collective.id') === get(memberUser, 'collective.id')) {
+            return member;
+          }
           // We only send the notification for new member for role MEMBER and ADMIN
-          return emailLib.send('collective.newmember', memberUser.email, {
+          return emailLib.send(`${this.type}.newmember`.toLowerCase(), memberUser.email, {
             remoteUser: {
               email: remoteUser.email,
               collective: pick(remoteUser.collective, ['slug', 'name', 'image'])
