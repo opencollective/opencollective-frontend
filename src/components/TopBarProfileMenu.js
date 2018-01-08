@@ -5,6 +5,7 @@ import { FormattedMessage, defineMessages } from 'react-intl';
 import withIntl from '../lib/withIntl';
 import { formatCurrency } from '../lib/utils';
 import { Badge } from 'react-bootstrap';
+import { get } from 'lodash';
 
 class TopBarProfileMenu extends React.Component {
 
@@ -58,9 +59,9 @@ class TopBarProfileMenu extends React.Component {
   tooltip(membership) {
     const { intl } = this.props;
     const { collective } = membership;
-    const balance = collective.stats.balance;
+    const balance = get(collective, 'stats.balance');
     let str = intl.formatMessage(this.messages['tooltip.balance'], { balance: formatCurrency(balance, collective.currency) });
-    const pendingExpenses = collective.stats.expenses.pending;
+    const pendingExpenses = get(collective, 'stats.expenses.pending');
     if (pendingExpenses > 0) {
       str += ` - ${intl.formatMessage(this.messages['tooltip.pendingExpenses'], { n: pendingExpenses })}`;
     }
@@ -194,9 +195,11 @@ class TopBarProfileMenu extends React.Component {
           {this.showCreateBtn && <li><a href='/create'><FormattedMessage id="menu.createCollective" defaultMessage="Create a Collective" /></a></li>}
           <li><a href='/discover'><FormattedMessage id="menu.discover" defaultMessage="discover" /></a></li>
           { collectives.map(membership => (
-            <li><Link route={`/${membership.collective.slug}`}><a title={this.tooltip(membership)} className={membership.role.toLowerCase()}>{membership.collective.slug}</a>
-            </Link>
-            { membership.collective.stats.expenses.pending > 0 && <Badge>{membership.collective.stats.expenses.pending}</Badge> }
+            <li key={`LoggedInMenu-Collective-${get(membership, 'collective.slug')}`}>
+              <Link route={`/${get(membership, 'collective.slug')}`}>
+                <a title={this.tooltip(membership)} className={membership.role.toLowerCase()}>{get(membership, 'collective.slug')}</a>
+              </Link>
+              { get(membership, 'collective.stats.expenses.pending') > 0 && <Badge>{get(membership, 'collective.stats.expenses.pending')}</Badge> }
             </li>
           ))}
           </ul>

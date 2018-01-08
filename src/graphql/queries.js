@@ -10,6 +10,7 @@ export const getLoggedInUserQuery = gql`
       firstName
       lastName
       email
+      paypalEmail
       image
       CollectiveId
       collective {
@@ -37,10 +38,6 @@ export const getLoggedInUserQuery = gql`
           stats {
             id
             balance
-            expenses {
-              id
-              pending
-            }
           }
           paymentMethods {
             id
@@ -405,6 +402,12 @@ const getCollectiveCoverQuery = gql`
       settings
       image
       isHost
+      host {
+        id
+        slug
+        name
+        image
+      }
     }
   }
 `;

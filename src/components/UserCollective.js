@@ -46,7 +46,7 @@ class UserCollective extends React.Component {
       'user.collective.memberOf.member.title': { id: 'user.collective.memberOf.member.title', defaultMessage: `I'm a member of {n, plural, one {this collective} other {these collectives}}`},
       'user.collective.memberOf.backer.title': { id: 'user.collective.memberOf.backer.title', defaultMessage: `I'm backing {n, plural, one {this collective} other {these collectives}}`},
       'user.collective.memberOf.attendee.title': { id: 'user.collective.memberOf.attendee.title', defaultMessage: `I've attended {n, plural, one {this event} other {these events}}`},
-      'user.collective.memberOf.fundraiser.title': { id: 'user.collective.memberOf.fundraiser.title', defaultMessage: `I've helped raised money for {n, plural, one {this collective} other {these collectives}}`},
+      'user.collective.memberOf.fundraiser.title': { id: 'user.collective.memberOf.fundraiser.title', defaultMessage: `I've helped raise money for {n, plural, one {this collective} other {these collectives}}`},
       'user.collective.memberOf.fundraiser.LoggedInDescription': { id: 'user.collective.memberOf.fundraiser.LoggedInDescription', defaultMessage: `Share the URL in the email receipt for each of your donation to track how much money you helped raised! (Alternatively, you can also click on any collective that you are contributing to on this page. We will add your referral id to the URL.)`},
       'user.collective.memberOf.follower.title': { id: 'user.collective.memberOf.follower.title', defaultMessage: `I'm following {n, plural, one {this collective} other {these collectives}}`},
       'organization.collective.memberOf.host.title': { id: 'organization.collective.memberOf.host.title', defaultMessage: `We are hosting {n, plural, one {this collective} other {{n} collectives}}`},
@@ -54,6 +54,7 @@ class UserCollective extends React.Component {
       'organization.collective.memberOf.member.title': { id: 'organization.collective.memberOf.member.title', defaultMessage: `We are a member of {n, plural, one {this collective} other {these collectives}}`},
       'organization.collective.memberOf.backer.title': { id: 'organization.collective.memberOf.backer.title', defaultMessage: `We are backing {n, plural, one {this collective} other {these collectives}}`},
       'organization.collective.memberOf.follower.title': { id: 'organization.collective.memberOf.follower.title', defaultMessage: `We are following {n, plural, one {this collective} other {these collectives}}`},
+      'organization.collective.memberOf.fundraiser.title': { id: 'organization.collective.memberOf.fundraiser.title', defaultMessage: `We've helped raise money for {n, plural, one {this collective} other {these collectives}}`},
       'user.collective.menu.host': { id: 'user.collective.menu.host', defaultMessage: `hosting {n} {n, plural, one {collective} other {collectives}}`},
       'user.collective.menu.admin': { id: 'user.collective.menu.admin', defaultMessage: `contributing to {n} {n, plural, one {collective} other {collectives}}`},
       'user.collective.menu.host': { id: 'user.collective.menu.host', defaultMessage: `hosting {n} {n, plural, one {collective} other {collectives}}`},
@@ -248,8 +249,8 @@ class UserCollective extends React.Component {
               { Object.keys(memberOf).map(role => role !== 'HOST' && (
                 <section id={role}>
                   <h1>{intl.formatMessage(this.messages[`${type}.collective.memberOf.${role.toLowerCase()}.title`], { n: memberOf[role].length })}</h1>
-                  { LoggedInUser && this.messages[`${type}.collective.memberOf.${role.toLowerCase()}.LoggedInDescription`] &&
-                    <div className="description">{intl.formatMessage(this.messages[`${type}.collective.memberOf.${role.toLowerCase()}.LoggedInDescription`])}</div>
+                  { LoggedInUser && this.messages[`user.collective.memberOf.${role.toLowerCase()}.LoggedInDescription`] &&
+                    <div className="description">{intl.formatMessage(this.messages[`user.collective.memberOf.${role.toLowerCase()}.LoggedInDescription`])}</div>
                   }
                   <Memberships
                     className={role}

@@ -259,8 +259,8 @@ class CollectivePickerWithData extends React.Component {
          <div className="submenu">
             <div className="">
               <div className="title">
-                <h1><FormattedMessage id="expenses.title" defaultMessage="Finances" /></h1>
-                <h2><FormattedMessage id="expenses.latest.title" defaultMessage="Latest expenses" /></h2>
+                <h1><FormattedMessage id="expenses.collectivePicker.title" defaultMessage="Finances" /></h1>
+                <h2><FormattedMessage id="expenses.collectivePicker.subtitle" defaultMessage="for {n} {n, plural, one {collective} other {collectives}}" values={{n: collectives.length}} /></h2>
               </div>
             { collectives.length > 0 &&
               <div className="collectivesFilter">

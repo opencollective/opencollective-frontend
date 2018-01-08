@@ -109,7 +109,10 @@ class Collective extends React.Component {
 
   render() {
     const { intl, LoggedInUser, query: { referral } } = this.props;
-
+    const donateParams = { collectiveSlug: this.collective.slug, verb: 'donate' };
+    if (referral) {
+      donateParams.referral = referral;
+    }
     const backersHash = this.collective.stats.backers.organizations > 0 ? '#organizations' : '#backers';
     const actions = [
       {
@@ -142,7 +145,7 @@ class Collective extends React.Component {
       },
       {
         className: 'blue',
-        component: <Link route={'donate'} params={{ collectiveSlug: this.collective.slug, verb: 'donate', referral }}>
+        component: <Link route={'donate'} params={donateParams}>
             <a><b>{intl.formatMessage(this.messages['collective.donate']).toUpperCase()}</b></a>
           </Link>
       }
@@ -244,7 +247,7 @@ class Collective extends React.Component {
             <div>
 
               <section id="about">
-                <div className="sidebar" id="contribute">
+                <div className="sidebar tiers" id="contribute">
                   { this.collective.tiers.map(tier => (
                     <TierCard
                       collective={this.collective}
@@ -342,12 +345,12 @@ class Collective extends React.Component {
                     <ExpensesWithData
                       collective={this.collective}
                       LoggedInUser={LoggedInUser}
-                      editable={false}
+                      compact={true}
                       limit={5}
                       />
                     <div className="actions">
                       <Button className="ViewAllExpensesBtn" bsStyle="default" onClick={() => Router.pushRoute(`/${this.collective.slug}/expenses`)}><FormattedMessage id="expenses.viewAll" defaultMessage="View All Expenses" /></Button>
-                      <Button className="SubmitExpenseBtn" bsStyle="default" onClick={() => window.location.replace(`${window.location.protocol}//${window.location.host}/${this.collective.slug}/expenses/new`)}><FormattedMessage id="expenses.submit" defaultMessage="Submit an Expense" /></Button>
+                      <Button className="SubmitExpenseBtn" bsStyle="default" onClick={() => Router.pushRoute(`/${this.collective.slug}/expenses/new`)}><FormattedMessage id="expenses.submit" defaultMessage="Submit an Expense" /></Button>
                     </div>
                   </div>
 

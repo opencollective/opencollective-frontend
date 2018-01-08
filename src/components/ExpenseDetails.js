@@ -28,7 +28,7 @@ class ExpenseDetails extends React.Component {
     this.currencyStyle = { style: 'currency', currencyDisplay: 'symbol', minimumFractionDigits: 2, maximumFractionDigits: 2};
 
     this.messages = defineMessages({
-      'paypal': { id: 'expense.payoutMethod.paypal', defaultMessage: 'PayPal ({paypalEmail, select, missing {missing} other {{paypalEmail}}})' },
+      'paypal': { id: 'expense.payoutMethod.paypal', defaultMessage: 'PayPal ({paypalEmail, select, missing {missing} hidden {hidden} other {{paypalEmail}}})' },
       // 'manual': { id: 'expense.payoutMethod.donation', defaultMessage: 'Consider as donation' },
       'other': { id: 'expense.payoutMethod.manual', defaultMessage: 'Other (see instructions)' }
     });
@@ -56,7 +56,6 @@ class ExpenseDetails extends React.Component {
 
   render() {
     const { LoggedInUser, data, intl } = this.props;
-
     const expense = (data && data.Expense) || this.props.expense;
     const canEditExpense = LoggedInUser && LoggedInUser.canEditExpense(expense);
     const isAuthor = LoggedInUser && LoggedInUser.collective.id === expense.fromCollective.id;
@@ -64,7 +63,7 @@ class ExpenseDetails extends React.Component {
     const editMode = canEditExpense && this.props.mode === 'edit';
     const previewAttachmentImage = expense.attachment ? imagePreview(expense.attachment) : '/static/images/receipt.svg';
     const payoutMethod = this.state.expense.payoutMethod || expense.payoutMethod;
-    const payoutMethods = this.getOptions(['paypal', 'other'], { paypalEmail: get(expense, 'user.paypalEmail') || "missing" });
+    const payoutMethods = this.getOptions(['paypal', 'other'], { paypalEmail: get(expense, 'user.paypalEmail') || canEditExpense ? "missing" : "hidden" });
     const categoriesOptions = categories(expense.collective.slug).map(category => {
       return { [category]: category }
     });
@@ -152,9 +151,8 @@ class ExpenseDetails extends React.Component {
             margin: 0;
           }
 
-          .ExpenseDetails textarea[name="privateMessage"] {
-            width: 47.5rem;
-            max-width: 100%;
+          .col.privateMessage {
+            width: 100%;
           }
         `}</style>
 
@@ -190,7 +188,8 @@ class ExpenseDetails extends React.Component {
                   <span className="description">
                     <InputField
                       type="text"
-                      value={expense.description}
+                      name="description"
+                      defaultValue={expense.description}
                       className="descriptionField"
                       onChange={description => this.handleChange('description', description)}
                       />
@@ -207,8 +206,9 @@ class ExpenseDetails extends React.Component {
                 <span className="category">
                   <InputField
                     type="select"
+                    name="category"
                     options={categoriesOptions}
-                    value={expense.category}
+                    defaultValue={expense.category}
                     className="categoryField"
                     onChange={category => this.handleChange('category', category)}
                     />
@@ -223,7 +223,8 @@ class ExpenseDetails extends React.Component {
               <span className="amount">
                 { editMode && canEditAmount &&
                   <InputField
-                    value={expense.amount}
+                    name="amount"
+                    defaultValue={expense.amount}
                     pre={getCurrencySymbol(expense.currency)}
                     type='currency'
                     className="amountField"
@@ -243,19 +244,20 @@ class ExpenseDetails extends React.Component {
 
           <div className="col">
             <label><FormattedMessage id='expense.payoutMethod' defaultMessage='payout method' /></label>
-            { !editMode && capitalize(intl.formatMessage(this.messages[expense.payoutMethod], { paypalEmail: get(expense, 'user.paypalEmail') || "missing"}))}
+            { !editMode && capitalize(intl.formatMessage(this.messages[expense.payoutMethod], { paypalEmail: get(expense, 'user.paypalEmail') || canEditExpense ? "missing" : "hidden"}))}
             { editMode &&
               <InputField
+                name="payoutMethod"
                 type="select"
                 options={payoutMethods}
-                value={expense.payoutMethod}
+                defaultValue={expense.payoutMethod}
                 onChange={payoutMethod => this.handleChange('payoutMethod', payoutMethod)}
                 />
             }
           </div>
 
           { (expense.privateMessage || ((isAuthor || canEditExpense) && payoutMethod === 'other')) &&
-            <div className="col">
+            <div className="col privateMessage">
               <label><FormattedMessage id='expense.privateMessage' defaultMessage='private note' /></label>
               { (!editMode || !isAuthor) && capitalize(expense.privateMessage)}
               { editMode && (isAuthor || canEditExpense) &&
@@ -282,6 +284,7 @@ query Expense($id: Int!) {
     createdAt
     category
     amount
+    status
     currency
     attachment
     payoutMethod
