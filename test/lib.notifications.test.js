@@ -28,7 +28,7 @@ describe('lib.notifications.test.js', () => {
     return Promise.all(promises).then(results => {
       user = results[0];
       collective = results[1];
-      return collective.addUserWithRole(user, 'HOST')
+      return collective.addUserWithRole(user, 'ADMIN')
     })
   });
 

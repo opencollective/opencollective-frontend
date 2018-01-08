@@ -49,7 +49,8 @@ export const TransactionInterfaceType = new GraphQLInterfaceType({
       type: { type: GraphQLString },
       description: { type: GraphQLString },
       privateMessage: { type: GraphQLString },
-      createdAt: { type: GraphQLString }
+      createdAt: { type: GraphQLString },
+      updatedAt: { type: GraphQLString }
     }
   }
 });
@@ -150,6 +151,12 @@ const TransactionFields = () => {
       type: GraphQLString,
       resolve(transaction) {
         return transaction.createdAt;
+      }
+    },
+    updatedAt: {
+      type: GraphQLString,
+      resolve(transaction) {
+        return transaction.updatedAt;
       }
     },
     paymentMethod: {

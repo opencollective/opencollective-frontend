@@ -2,6 +2,7 @@ import Paypal from 'paypal-adaptive';
 import config from 'config';
 import Promise from 'bluebird';
 import { get } from 'lodash';
+
 const paypalAdaptiveClient = new Paypal({
   userId: config.paypal.classic.userId,
   password: config.paypal.classic.password,

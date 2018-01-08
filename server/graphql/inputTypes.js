@@ -44,6 +44,7 @@ export const PaymentMethodInputType = new GraphQLInputObjectType({
     uuid: { type: GraphQLString }, // used to fetch an existing payment method
     token: { type: GraphQLString },
     service: { type: GraphQLString },
+    type: { type: GraphQLString, description: "creditcard or bitcoin" },
     customerId: { type: GraphQLString },
     data: { type: GraphQLJSON },
     name: { type: GraphQLString },
@@ -59,7 +60,7 @@ export const UserInputType = new GraphQLInputObjectType({
   description: 'Input type for UserType',
   fields: () => ({
       id: { type: GraphQLInt },
-      email: { type: new GraphQLNonNull(EmailType) },
+      email: { type: EmailType },
       firstName: { type: GraphQLString },
       lastName: { type: GraphQLString },
       name: { type: GraphQLString },
@@ -187,6 +188,8 @@ export const OrderInputType = new GraphQLInputObjectType({
     publicMessage: { type: GraphQLString },
     privateMessage: { type: GraphQLString },
     paymentMethod: { type: PaymentMethodInputType },
+    matchingFund: { type: GraphQLString, description: "The first part of the UUID of the PaymentMethod that can be used to match the donation" },
+    referral: { type: CollectiveAttributesInputType, description: "The referral collective" },
     user: { type: UserInputType },
     fromCollective: { type: CollectiveAttributesInputType },
     collective: { type: new GraphQLNonNull(CollectiveAttributesInputType) },

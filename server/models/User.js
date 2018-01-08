@@ -213,8 +213,7 @@ export default (Sequelize, DataTypes) => {
 
     hooks: {
       afterCreate: (instance) => {
-        models.Notification.createMany([{ type: 'user.yearlyreport' }, { type: 'user.monthlyreport' }], { channel: 'email', UserId: instance.id })
-          .then(() => userLib.updateUserInfoFromClearbit(instance));
+        userLib.updateUserInfoFromClearbit(instance);
         return null;
       }
     }
@@ -438,7 +437,7 @@ export default (Sequelize, DataTypes) => {
   }
 
   User.prototype.getPersonalDetails = function(remoteUser) {
-    if (!remoteUser) return Promise.resolve({});
+    if (!remoteUser) return Promise.resolve(this.public);
     return this.populateRoles()
       .then(() => {
         // all the CollectiveIds that the remoteUser is admin of.
@@ -448,6 +447,9 @@ export default (Sequelize, DataTypes) => {
         debug("getPersonalDetails", "remoteUser id:", remoteUser.id, "is admin of collective ids:", adminOfCollectives, "this user id:", this.id, "is member of", memberOfCollectives, "canAccess?", canAccess);
         return canAccess;
       })
+      .then(canAccess => {
+        return canAccess ? this.info : this.public;
+      });
   }
 
 

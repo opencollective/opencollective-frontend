@@ -1,7 +1,7 @@
 import config from 'config';
 import uuid from 'node-uuid';
 import errors from './errors';
-import paypalAdaptive from '../gateways/paypalAdaptive';
+import paypalAdaptive from '../paymentProviders/paypal/adaptiveGateway';
 
 const services = {
   paypal: (collective, expense, email, preapprovalKey) => {

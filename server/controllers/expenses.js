@@ -5,7 +5,7 @@ import includes from 'lodash/collection/includes';
 import status from '../constants/expense_status';
 import { getLinkHeader, getRequestedUrl } from '../lib/utils';
 import { createFromPaidExpense as createTransaction } from '../lib/transactions';
-import paypalAdaptive from '../gateways/paypalAdaptive';
+import paypalAdaptive from '../paymentProviders/paypal/adaptiveGateway';
 import payExpense from '../lib/payExpense';
 import errors from '../lib/errors';
 import models from '../models';

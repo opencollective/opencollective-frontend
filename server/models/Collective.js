@@ -16,10 +16,10 @@ import activities from '../constants/activities';
 import Promise from 'bluebird';
 import userlib from '../lib/userlib';
 import CustomDataTypes from './DataTypes';
+import { convertToCurrency } from '../lib/currency';
 import emailLib from '../lib/email';
 import debugLib from 'debug';
 const debug = debugLib('collective');
-
 
 /**
  * Collective Model.
@@ -346,6 +346,7 @@ export default function(Sequelize, DataTypes) {
         models.PaymentMethod.create({
           CollectiveId: instance.id,
           service: 'opencollective',
+          type: 'collective',
           name: `${capitalize(instance.name)} Collective`,
           primary: true,
           currency: instance.currency
@@ -368,6 +369,7 @@ export default function(Sequelize, DataTypes) {
         return models.PaymentMethod.create({
           CollectiveId: this.id,
           service: 'opencollective',
+          type: 'collective',
           name: `${capitalize(this.name)} Collective`,
           primary: true,
           currency: this.currency
@@ -418,6 +420,21 @@ export default function(Sequelize, DataTypes) {
         { model: models.Collective, as: 'memberCollective' }
       ]
     }).map(member => member.memberCollective);
+  }
+
+  Collective.prototype.getEmails = async function() {
+    if (this.type === 'USER') {
+      const user = await this.getUser();
+      return [user.email];
+    }
+    const admins = await models.Member.findAll({
+      where: {
+        CollectiveId: this.id,
+        role: roles.ADMIN
+      }
+    });
+    const emails = await Promise.map(admins, admin => models.User.findOne({ where: { CollectiveId: admin.MemberCollectiveId }}).then(u => u.email));
+    return emails;
   }
 
   Collective.prototype.getEvents = function(query = {}) {
@@ -502,9 +519,9 @@ export default function(Sequelize, DataTypes) {
    */
   Collective.prototype.getTiersWithUsers = function(options = { active: false, attributes: ['id', 'username', 'image', 'firstDonation', 'lastDonation', 'totalDonations', 'website'] }) {
     const tiersById = {};
-      // Get the list of tiers for the collective
+      // Get the list of tiers for the collective (including deleted ones)
     return models.Tier
-      .findAll({ where: { CollectiveId: this.id, type: 'TIER' } })
+      .findAll({ where: { CollectiveId: this.id }, paranoid: false })
       .then(tiers => tiers.map(t => {
         tiersById[t.id] = t;
       }))
@@ -523,6 +540,10 @@ export default function(Sequelize, DataTypes) {
           }
           const TierId = order.TierId;
           tiersById[TierId] = tiersById[TierId] || order.Tier;
+          if (!tiersById[TierId]) {
+            console.error(">>> Couldn't find a tier with id", order.TierId, "collective: ", this.slug);
+            tiersById[TierId] = { dataValues: { users: [] } };
+          }
           tiersById[TierId].dataValues.users = tiersById[TierId].dataValues.users || [];
           if (options.active) {
             backerCollective.isActive = order.Subscription.isActive;
@@ -551,6 +572,13 @@ export default function(Sequelize, DataTypes) {
     }).then(order => order && order.Tier);
   };
 
+  /**
+   * Add User to the Collective
+   * @post Member( { CreatedByUserId: user.id, MemberCollectiveId: user.CollectiveId, CollectiveId: this.id })
+   * @param {*} user { id, CollectiveId }
+   * @param {*} role 
+   * @param {*} defaultAttributes 
+   */
   Collective.prototype.addUserWithRole = function(user, role, defaultAttributes) {
 
     const lists = {};
@@ -559,8 +587,7 @@ export default function(Sequelize, DataTypes) {
     lists[roles.HOST] = 'host';
 
     const notifications = [
-      { type: `mailinglist.${lists[role]}` },
-      { type: activities.COLLECTIVE_EXPENSE_CREATED }
+      { type: `mailinglist.${lists[role]}` }
     ];
 
     switch (role) {
@@ -569,6 +596,7 @@ export default function(Sequelize, DataTypes) {
         this.update({ HostCollectiveId: user.CollectiveId });
         break;
       case roles.ADMIN:
+        notifications.push({ type: activities.COLLECTIVE_EXPENSE_CREATED });
         notifications.push({ type: activities.COLLECTIVE_MEMBER_CREATED });
         notifications.push({ type: 'collective.monthlyreport' });
         break;
@@ -585,7 +613,7 @@ export default function(Sequelize, DataTypes) {
     debug("addUserWithRole", user.id, role, "member", member);
     return Promise.all([
       models.Member.create(member),
-      models.Notification.createMany(notifications, { UserId: user.id, CollectiveId: this.id, channel: 'email' }),
+      models.Notification.createMany(notifications, { UserId: user.id, CollectiveId: this.id, channel: 'email' }).catch(e => console.error(`Collective.addUserWithRole error while creating entries in Notifications table for UserId ${user.id} (role: ${role}, CollectiveId: ${this.id}): `, e)),
       models.User.findById(member.CreatedByUserId, { include: [ { model: models.Collective, as: 'collective' }] }),
       models.User.findById(user.id, { include: [ { model: models.Collective, as: 'collective' }] })
     ])
@@ -603,7 +631,11 @@ export default function(Sequelize, DataTypes) {
               memberCollective: models.Collective.findById(member.MemberCollectiveId),
               order: models.Order.findOne({
                 where: { CollectiveId: this.id, FromCollectiveId: member.MemberCollectiveId },
-                include: [ { model: models.Tier }, { model: models.Subscription } ],
+                include: [
+                  { model: models.Tier },
+                  { model: models.Subscription },
+                  { model: models.Collective, as: 'referral' }
+                ],
                 order: [['createdAt', 'ASC']]
               }),
               urlPath: this.getUrlPath()
@@ -620,6 +652,9 @@ export default function(Sequelize, DataTypes) {
                   subscription: { interval: order.Subscription && order.Subscription.interval }
                 }
               };
+              if (order && order.referral) {
+                data.order.referral = order.referral.minimal;
+              }
               return models.Activity.create({
                 CollectiveId: this.id,
                 type: activities.COLLECTIVE_MEMBER_CREATED,
@@ -780,7 +815,7 @@ export default function(Sequelize, DataTypes) {
           pm.CollectiveId = this.id;
           pm.currency = pm.currency || this.currency;
           models.PaymentMethod.update({ primary: false }, { where: { CollectiveId: this.id, archivedAt: { $eq: null } }});
-          return models.PaymentMethod.createFromStripeSourceToken({ ...defaultAttributes, ...pm });
+          return models.PaymentMethod.createFromStripeSourceToken({ ...defaultAttributes, ...pm, type: 'creditcard' }); // TODO: nicer to not have to hard code 'creditcard'
         }
       });
     })
@@ -916,6 +951,28 @@ export default function(Sequelize, DataTypes) {
       where
     })
     .then(result => Promise.resolve(parseInt(result.toJSON().total, 10)));
+  };
+
+  // Get the total amount raised through referral
+  Collective.prototype.getTotalAmountRaised = function() {
+    return models.Order.findAll({
+      attributes: [
+        [Sequelize.fn('COALESCE', Sequelize.fn('SUM', Sequelize.col('totalAmount')), 0), 'total'],
+        [Sequelize.fn('MAX', Sequelize.col('createdAt')), 'createdAt'],
+        [Sequelize.fn('MAX', Sequelize.col('currency')), 'currency']
+      ],
+      where: {
+        ReferralCollectiveId: this.id
+      },
+      group: ['currency']
+    })
+    .then(rows => rows.map(r => r.dataValues))
+    .then(amounts => Promise.map(amounts, s => convertToCurrency(s.total, s.currency, this.currency, s.createdAt)))
+    .then(amounts => {
+      let total = 0;
+      amounts.map(a => total += a);
+      return Math.round(total);
+    })
   };
 
   Collective.prototype.getTotalTransactions = function(startDate, endDate, type) {

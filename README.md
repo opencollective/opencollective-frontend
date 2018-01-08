@@ -1,58 +1,81 @@
 # OpenCollective API
 
-[![Circle CI](https://circleci.com/gh/OpenCollective/opencollective-api/tree/master.svg?style=shield)](https://circleci.com/gh/OpenCollective/opencollective-api/tree/master)
-[![Slack Status](https://slack.opencollective.com/badge.svg)](https://slack.opencollective.com)
-[![Gitter chat](https://badges.gitter.im/OpenCollective/OpenCollective.svg)](https://gitter.im/OpenCollective/OpenCollective)
+[![Circle CI](https://circleci.com/gh/opencollective/opencollective-api/tree/master.svg?style=shield)](https://circleci.com/gh/opencollective/opencollective-api/tree/master)
+[![Slack Status](https://slack.opencollective.org/badge.svg)](https://slack.opencollective.org)
 [![Dependency Status](https://david-dm.org/opencollective/opencollective-api.svg)](https://david-dm.org/opencollective/opencollective-api)
-[![Coverage Status](https://coveralls.io/repos/github/OpenCollective/opencollective-api/badge.svg)](https://coveralls.io/github/OpenCollective/opencollective-api)
+[![Coverage Status](https://coveralls.io/repos/github/opencollective/opencollective-api/badge.svg)](https://coveralls.io/github/opencollective/opencollective-api)
 
-# TODO
-
-- Update card on Stripe for active subscriptions
-
-## Payment flows:
-- Pay with new credit card
-- Pay with existing credit card attached to user
-- Pay with existing credit card attached to organization
-- Pay with balance of a collective
-
+![](http://d.pr/i/Vxm1rw+)
 
 ## How to get started
 
 Note: If you see a step below that could be improved (or is outdated), please update instructions. We rarely go through this process ourselves, so your fresh pair of eyes and your recent experience with it, makes you the best candidate to improve them for other users.
 
 ### Database
-Install Postgres 9.x. Start the database server, if necessary.
 
-For development, ensure that local connections do not require a password. Locate your `pg_hba.conf` file by running `SHOW hba_file;` from the psql prompt (`sudo -i -u postgres` + `psql` after clean install). This should look something like `/etc/postgresql/9.5/main/pg_hba.conf`. We'll call the parent directory of `pg_hba.conf` the `$POSTGRES_DATADIR`. `cd` to `$POSTGRES_DATADIR`, and edit `pg_hba.conf` to `trust` local socket connections and local IP connections. Restart `postgres` - on Mac OS X, there may be restart scripts already in place with `brew`, if not use `pg_ctl -D $POSTGRES_DATADIR restart`.
-
-Now, assuming the postgres database superuser is `postgres`, let's create the databases.
-```
-createdb -U postgres opencollective_localhost
-createdb -U postgres opencollective_test
-createuser -U postgres opencollective
-psql -U postgres
-> GRANT ALL PRIVILEGES ON DATABASE opencollective_localhost TO opencollective;
-> GRANT ALL PRIVILEGES ON DATABASE opencollective_test TO opencollective;
-```
-
-### Configuration and secrets
-- From the OpenCollective DropBox: `cp $DROPBOX/OpenCollective/Engineering/Keys/config/DOTenv .env`
-- There are other config files there, but for now they seem to be duplicated in `config`
+Install Postgres 9.x. Start the database server, if necessary. If you face any issue with this step, see [troubleshooting postgres](docs/postgres.md)
 
 ### Node and npm
 
-`npm install`
+```
+$> npm install
+```
 
-(you might need to run `npm install -g nodemon` as well.)
+This will create the `opencollective_dvl` database if it doesn't exist yet (in which case it will just attempts to run the latest migration if any).
+This sanitized version of the database includes the data for a very small subset of collectives:
+- /opensource
+- /apex
+- /railsgirlsatl
+- /tipbox
+- /brusselstogether
+- /veganizerbxl
 
-If you haven't already: `export PATH=./node_modules/bin:$PATH`. You probably want to add
-that to your shell profile.
+You can test that the API is working by opening:
+http://localhost:3060/status
 
+And you can play with GraphQL by opening:
+http://localhost:3060/graphql
+
+For example, try this query:
+
+```
+query {
+  Collective(slug:"apex") {
+      id,
+      slug,
+      name,
+      description,
+      tiers {
+        id,
+        name,
+        description,
+        amount,
+        currency,
+        maxQuantity
+      }
+      members{
+        id
+        role
+        member {
+          id
+          slug
+          name
+        }
+        stats {
+          totalDonations
+        }
+      }
+    }
+}
+```
 
 ## Tests
 
-See [Wiki](https://github.com/OpenCollective/OpenCollective/wiki/Software-testing).
+```
+$> npm test
+```
+
+The tests delete all the `opencollective_test` database's tables and re-create them with the latest models.
 
 All the calls to 3rd party services are stubbed using either `sinon` or `nock`.
 
@@ -63,70 +86,32 @@ alias pgstart='pg_ctl -l $PGDATA/server.log start'
 alias pgstop='pg_ctl stop -m fast'
 ```
 
+See [Wiki](https://github.com/OpenCollective/OpenCollective/wiki/Software-testing) for more info about the tests.
+
 ## Start server
-`npm run start`
 
-## Reset db with fixtures
+In development environment: 
 
-Run the server on the side (in parallel because the reset scripts hits directly the api):
-`DEBUG=email npm run dev`
+```
+npm run dev
+```
 
-Run the script afterwards:
-`npm run db:reset`
+This will watch for file changes and automatically restart the server
 
-You can now login on development (website repo) with `user@opencollective.com` and the token will show up in your console.
-You can auth to the paypal sandbox with `ops@opencollective.com` and `paypal123`.
+On production:
 
-Feel free to modify `scripts/create_user_and_collective.js` to create your own user/collective.
+```
+npm run start
+```
 
 ## Documentation
-WIP
+WIP. Help welcome!
 
-## Deployment
+## Questions
 
-If you want to deploy to staging, you need to push your code to the `staging` branch. CircleCI will run the tests on this branch and push to Heroku for you if successful.
+If you have any questions, ping us on Slack (https://slack.opencollective.org) or on Twitter ([@opencollect](https://twitter.com/opencollect)).
 
-### Manually
+## TODO
 
-If you want to deploy the app on Heroku manually (only for production), you need to add the remotes:
-
-```
-git remote add heroku-production https://git.heroku.com/opencollective-prod-api.git
-```
-
-Then you can run:
-
-```
-git push heroku-production master
-```
-
-## Databases migrations
-
-The tests delete all the `opencollective_test` database's tables and re-create them with the latest models.
-
-For localhost or other environments, the migrations has to be run manually.
-
-### Create a new migration file
-
-`npm run migration:create`
-
-### Apply migrations locally
-
-`npm run db:migrate:dev`
-
-### Apply migrations on Heroku
-
-The migrations are run automatically for `staging`.
-
-The migration script uses `SEQUELIZE_ENV` to know which Postgres config to take (check `sequelize_cli.json`). On staging and production, it will use `PG_URL`. We don't use `NODE_ENV` because heroku overrides the variable during the build process.
-
-1) Push application with migration scripts to Heroku
-
-2) `heroku run bash -a opencollective-production-api`
-
-3) `npm run db:migrate`
-
-# TODO
-
-- The User model is confusing with the concept of User Collective, we should rename the "User" model to "Login" or "Email" so that we could have multiple emails per User.
-- CreatedByUserId is confusing
+- The User model is confusing with the concept of User Collective, we should merge the "User" model with the "ConnectedAccount" model so that we could have multiple emails per User.
+- CreatedByUserId is confusing, it should be "CreatedByCollectiveId"

@@ -1,5 +1,5 @@
 import Promise from 'bluebird';
-import { includes, pick } from 'lodash';
+import { includes, pick, get } from 'lodash';
 
 import models from '../models';
 import emailLib from './email';
@@ -48,15 +48,44 @@ export const executeOrder = (user, order, options) => {
     })
     .then(() => {
       const paymentProvider = (order.paymentMethod) ? order.paymentMethod.service : 'manual';
-      return paymentProviders[paymentProvider].processOrder(order, options); // eslint-disable-line import/namespace
+      return paymentProviders[paymentProvider].types[order.paymentMethod.type || 'default'].processOrder(order, options)  // eslint-disable-line import/namespace
+        .tap(async () => {
+          if (!order.matchingFund) return;
+
+          // if there is a matching fund, we execute the order
+          // also adds the owner of the matching fund as a BACKER of collective
+          const matchingOrder = {
+            ...pick(order, ['id', 'collective', 'tier', 'currency']),
+            totalAmount: order.totalAmount * order.matchingFund.matching,
+            paymentMethod: order.matchingFund,
+            FromCollectiveId: order.matchingFund.CollectiveId,
+            fromCollective: await models.Collective.findById(order.matchingFund.CollectiveId),
+            description: `Matching ${order.matchingFund.matching}x ${order.fromCollective.name}'s donation`,
+            createdByUser: await models.User.findOne({ where: { CollectiveId: order.matchingFund.CollectiveId }})
+          };
+
+          // processOrder expects an update function to update `order.processedAt`
+          matchingOrder.update = () => {};
+
+          return paymentProviders[order.paymentMethod.service].types[order.paymentMethod.type || 'default'].processOrder(matchingOrder, options) // eslint-disable-line import/namespace
+            .then(transaction => {
+              sendOrderConfirmedEmail({
+                ...order,
+                transaction
+              });
+            })
+        });
     })
     .then(transaction => {
       // for gift cards
-      if (!transaction && order.paymentMethod.service === 'prepaid') {
-        sendProcessingEmail(order); // async
+      if (!transaction && order.paymentMethod.service === 'opencollective' && order.paymentMethod.type === 'prepaid') {
+        sendOrderProcessingEmail(order)
+        .then(() => sendSupportEmailForManualIntervention(order)); // async
+      } else if (!transaction && order.paymentMethod.service === 'stripe' && order.paymentMethod.type === 'bitcoin') {
+        sendOrderProcessingEmail(order); // async
       } else {
         order.transaction = transaction;
-        sendConfirmationEmail(order); // async
+        sendOrderConfirmedEmail(order); // async
       }
       return null;
     });
@@ -76,49 +105,70 @@ const validatePayment = (payment) => {
   }
 }
 
-const sendConfirmationEmail = (order) => {
-
+const sendOrderConfirmedEmail = async (order) => {
   const { collective, tier, interval, fromCollective } = order;
   const user = order.createdByUser;
 
   if (collective.type === types.EVENT) {
-    return emailLib.send(
-      'ticket.confirmed',
-      user.email,
-      { order: order.info,
+    return emailLib.send('ticket.confirmed', user.email,
+      {
+        order: pick(order, ['totalAmount', 'currency', 'createdAt']),
         user: user.info,
         collective: collective.info,
         tier: tier.info
-      }, {
-        from: `${collective.name} <hello@${collective.slug}.opencollective.com>`
-      })
-  } else {
-    // normal order
-    return collective.getRelatedCollectives(2, 0)
-    .then((relatedCollectives) => emailLib.send(
-      'thankyou',
-      user.email,
-      { order: order.info,
-        transaction: pick(order.transaction, ['createdAt', 'uuid']),
-        user: user.info,
-        collective: collective.info,
-        fromCollective: fromCollective.minimal,
-        relatedCollectives,
-        interval,
-        monthlyInterval: (interval === 'month'),
-        firstPayment: true,
-        subscriptionsLink: user.generateLoginLink('/subscriptions')
       },
       {
         from: `${collective.name} <hello@${collective.slug}.opencollective.com>`
+      });
+  } else {
+    // normal order
+    const relatedCollectives = await collective.getRelatedCollectives(2, 0);
+    const emailOptions = { from: `${collective.name} <hello@${collective.slug}.opencollective.com>` };
+    const data = {
+      order: pick(order, ['totalAmount', 'currency', 'createdAt']),
+      transaction: pick(order.transaction, ['createdAt', 'uuid']),
+      user: user.info,
+      collective: collective.info,
+      fromCollective: fromCollective.minimal,
+      interval,
+      relatedCollectives,
+      monthlyInterval: (interval === 'month'),
+      firstPayment: true,
+      subscriptionsLink: interval && user.generateLoginLink('/subscriptions')
+    };
+
+    let matchingFundCollective;
+    if (order.matchingFund) {
+      matchingFundCollective = await models.Collective.findById(order.matchingFund.CollectiveId)
+      data.matchingFund = {
+        collective: pick(matchingFundCollective, ['slug', 'name', 'image']),
+        matching: order.matchingFund.matching,
+        amount: order.matchingFund.matching * order.totalAmount
       }
-    ));
+    }
+
+    // sending the order confirmed email to the matching fund owner or to the donor
+    if (get(order, 'transaction.FromCollectiveId') === get(order, 'matchingFund.CollectiveId')) {
+      order.matchingFund.info;
+      const recipients = await matchingFundCollective.getEmails();
+      emailLib.send('donationmatched', recipients, data, emailOptions)
+    } else {
+      emailLib.send('thankyou', user.email, data, emailOptions)
+    }
   }
 }
 
-// Needed for Gift cards when users donate to a non-open source host
-// Assumes one-time payments
-const sendProcessingEmail = (order) => {
+const sendSupportEmailForManualIntervention = (order) => {
+  const user = order.createdByUser;
+  return emailLib.sendMessage(
+    'support@opencollective.com', 
+    'Gift card order needs manual attention', 
+    null, 
+    { text: `Order Id: ${order.id} by userId: ${user.id}`});
+}
+
+// Assumes one-time payments, 
+const sendOrderProcessingEmail = (order) => {
     const { collective, fromCollective } = order;
   const user = order.createdByUser;
 
@@ -126,7 +176,6 @@ const sendProcessingEmail = (order) => {
       'processing',
       user.email,
       { order: order.info,
-        transaction: pick(order.transaction, ['createdAt', 'uuid']),
         user: user.info,
         collective: collective.info,
         fromCollective: fromCollective.minimal,
@@ -134,5 +183,4 @@ const sendProcessingEmail = (order) => {
       }, {
         from: `${collective.name} <hello@${collective.slug}.opencollective.com>`
       })
-    .then(() => emailLib.sendMessage('support@opencollective.com', 'Gift card order needs manual attention', null, { text: `Order Id: ${order.id} by userId: ${user.id}`}));
 }

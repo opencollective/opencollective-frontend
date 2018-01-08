@@ -16,7 +16,7 @@ import moment from 'moment';
 import config from 'config';
 import Promise from 'bluebird';
 import debugLib from 'debug';
-import models from '../../server/models';
+import models, { sequelize } from '../../server/models';
 import emailLib from '../../server/lib/email';
 
 const d = new Date;
@@ -44,20 +44,24 @@ const init = () => {
   const startTime = new Date;
 
   const where = {};
-  const query = {
-    where: {
-      type: 'user.monthlyreport',
-      active: true
-    },
-    include: [{ model: User, where }]
-  };
-
   if (process.env.DEBUG && process.env.DEBUG.match(/preview/))
     where.id = {$in: [2, 30, 1391, 2031, 8, 41]}; // xdamman, pia, aseem, aseem, aseem, aseem
   // where.id = {$in: [2]}; // xdamman
 
-  Notification.findAll(query)
-  .then(results => results.map(r => r.User))
+  Notification.findAll({
+    attributes: ['UserId'],
+    where: {
+      type: 'user.monthlyreport',
+      active: false
+    }
+  })
+  .then(notifications => notifications.map(n => n.UserId))
+  .then(unsubscribedUserIds => {
+    console.log(`${unsubscribedUserIds.length} users have unsubscribed from this report`);
+    return models.User.findAll({
+      where: { id: { [sequelize.Op.notIn]: unsubscribedUserIds }, ...where }
+    })
+  })
   .tap(users => {
       console.log(`Preparing the ${month} report for ${users.length} users`);
   })

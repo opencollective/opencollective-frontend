@@ -393,6 +393,11 @@ export function capitalize(str) {
   return str[0].toUpperCase() + str.slice(1).toLowerCase();
 }
 
+export function uncapitalize(str) {
+  if (!str) return '';
+  return str[0].toLowerCase() + str.slice(1);
+}
+
 export function pluralize(str, count) {
   if (count <= 1) return str;
   return `${str}s`.replace(/s+$/,'s');
@@ -420,7 +425,7 @@ export function resizeImage(imageUrl, { width, height, query, defaultImage }) {
 }
 
 export function formatArrayToString(arr) {
-  return arr.join(', ').replace(/, ([^,]*)$/,' and $1');
+  return `${arr.slice(0, arr.length -1).join(', ')} and ${arr.slice(-1)}`;
 }
 
 export function formatCurrency(amount, currency, precision = 0) {
@@ -447,14 +452,18 @@ export function formatCurrency(amount, currency, precision = 0) {
 
 /**
  * @PRE: { USD: 1000, EUR: 6000 }
- * @POST: "$10 and €60"
+ * @POST: "€60 and $10"
  */
 export function formatCurrencyObject(currencyObj, options = { precision: 0 }) {
   const array = [];
   for (const currency in currencyObj) {
-    array.push(formatCurrency(currencyObj[currency], currency, options.precision));
+    if (currencyObj[currency] > 0) {
+      array.push({ value: currencyObj[currency], str: formatCurrency(currencyObj[currency], currency, options.precision) });
+    }
   }
-  return formatArrayToString(array);
+  if (array.length === 1) return array[0].str;
+  array.sort((a, b) => b.value - a.value)
+  return formatArrayToString(array.map(r => r.str));
 }
 
 export function isUUID(str) {

@@ -35,7 +35,7 @@ const queries = {
       slug: { type: new GraphQLNonNull(GraphQLString) }
     },
     resolve(_, args) {
-      return models.Collective.findBySlug(args.slug);
+      return models.Collective.findBySlug(args.slug.toLowerCase());
     }
   },
 
@@ -46,6 +46,18 @@ const queries = {
     },
     resolve(_, args) {
       return models.Tier.findById(args.id);
+    }
+  },
+
+  MatchingFund: {
+    type: PaymentMethodType,
+    description: "Fetch data about a matching fund from the short version of its UUID (first part)",
+    args: {
+      uuid: { type: new GraphQLNonNull(GraphQLString) },
+      ForCollectiveId: { type: GraphQLInt }
+    },
+    resolve(_, args) {
+      return models.PaymentMethod.getMatchingFund(args.uuid, { ForCollectiveId: args.ForCollectiveId });
     }
   },
 
@@ -255,11 +267,11 @@ const queries = {
       }
 
       if (args.collectiveSlug) {
-        args.CollectiveId = await fetchCollectiveId(args.collectiveSlug);
+        args.CollectiveId = await fetchCollectiveId(args.collectiveSlug.toLowerCase());
       }
 
       if (args.memberCollectiveSlug) {
-        args.MemberCollectiveId = await fetchCollectiveId(args.memberCollectiveSlug);
+        args.MemberCollectiveId = await fetchCollectiveId(args.memberCollectiveSlug.toLowerCase());
       }
 
       const memberTable = args.MemberCollectiveId ? 'collective' : 'memberCollective';

@@ -118,7 +118,7 @@ export const resetTestDatabase = function(req, res, next) {
       token: 'EILQQAMVCuCTyNDDOWTGtS7xBQmfzdMcgSVZJrCaPzRbpGjQFdd8sylTGE-8dutpcV0gJkGnfDE0PmD8',
       CollectiveId: testHost.CollectivedId
     }))
-    .then(() => models.PaymentMethod.create({ service: 'paypal', token: 'abc', CollectiveId: testHost.CollectiveId}))
+    .then(() => models.PaymentMethod.create({ service: 'paypal', type: 'adaptive', token: 'abc', CollectiveId: testHost.CollectiveId}))
     .then(() => models.Order.create({
       description: "Donation 1",
       totalAmount: 100,
