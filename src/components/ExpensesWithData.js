@@ -181,6 +181,7 @@ query Expenses($CollectiveId: Int!, $status: String, $limit: Int, $offset: Int, 
     user {
       id
       paypalEmail
+      email
     }
   }
 }

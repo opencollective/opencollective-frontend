@@ -63,7 +63,8 @@ class ExpenseDetails extends React.Component {
     const editMode = canEditExpense && this.props.mode === 'edit';
     const previewAttachmentImage = expense.attachment ? imagePreview(expense.attachment) : '/static/images/receipt.svg';
     const payoutMethod = this.state.expense.payoutMethod || expense.payoutMethod;
-    const payoutMethods = this.getOptions(['paypal', 'other'], { paypalEmail: get(expense, 'user.paypalEmail') || canEditExpense ? "missing" : "hidden" });
+    const paypalEmail = get(expense, 'user.paypalEmail') || get(expense, 'user.email');
+    const payoutMethods = this.getOptions(['paypal', 'other'], { paypalEmail: paypalEmail || (canEditExpense ? "missing" : "hidden") });
     const categoriesOptions = categories(expense.collective.slug).map(category => {
       return { [category]: category }
     });
@@ -244,7 +245,7 @@ class ExpenseDetails extends React.Component {
 
           <div className="col">
             <label><FormattedMessage id='expense.payoutMethod' defaultMessage='payout method' /></label>
-            { !editMode && capitalize(intl.formatMessage(this.messages[expense.payoutMethod], { paypalEmail: get(expense, 'user.paypalEmail') || canEditExpense ? "missing" : "hidden"}))}
+            { !editMode && capitalize(intl.formatMessage(this.messages[expense.payoutMethod], { paypalEmail: paypalEmail || (canEditExpense ? "missing" : "hidden")}))}
             { editMode &&
               <InputField
                 name="payoutMethod"
@@ -306,6 +307,7 @@ query Expense($id: Int!) {
       username
       image
       paypalEmail
+      email
     }
   }
 }
