@@ -122,7 +122,7 @@ describe('graphql.collective.test.js', () => {
     expect(collective.tiers).to.have.length(2);
     expect(collective.stats).to.deep.equal({
       backers: { all: 26, users: 25, organizations: 1 },
-      yearlyBudget: 215287,
+      yearlyBudget: 214882,
       topExpenses: {"byCategory":[{"category":"Engineering","count":7,"totalExpenses":380829}],"byCollective":[{"slug":"tjholowaychuk","image":"https://opencollective-production.s3-us-west-1.amazonaws.com/25254v3s400_acc93f90-0085-11e7-951e-491568b1a942.jpeg","name":"TJ Holowaychuk","totalExpenses":-339120}]},
       topFundingSources: {"byCollective":[{"slug":"pubnub","image":"https://opencollective-production.s3-us-west-1.amazonaws.com/pubnublogopng_38ab9250-d2c4-11e6-8ba3-b7985935397d.png","name":"PubNub","totalDonations":147560},{"slug":"harlow_ward","image":"https://opencollective-production.s3-us-west-1.amazonaws.com/168a47c0-d41d-11e6-b711-1589373fcf88.jpg","name":"Harlow Ward","totalDonations":42940},{"slug":"breck7","image":"https://opencollective-production.s3-us-west-1.amazonaws.com/bb14acd098624944ac160008b79fb9e5_30e998d0-619b-11e7-9eab-c17f21ef8eb7.png","name":"Breck Yunits","totalDonations":34720}],"byCollectiveType":[{"type":"USER","totalDonations":192031}]}
       });
@@ -260,8 +260,8 @@ describe('graphql.collective.test.js', () => {
   describe("allMembers query", () => {
 
     const allMembersQuery = `
-    query allMembers($collectiveSlug: String, $memberCollectiveSlug: String, $orderBy: String, $role: String) {
-      allMembers(collectiveSlug: $collectiveSlug, memberCollectiveSlug: $memberCollectiveSlug, role: $role, limit: 10, offset: 1, orderBy: $orderBy) {
+    query allMembers($collectiveSlug: String, $memberCollectiveSlug: String, $orderBy: String, $role: String, $type: String) {
+      allMembers(collectiveSlug: $collectiveSlug, memberCollectiveSlug: $memberCollectiveSlug, role: $role, type: $type, limit: 10, offset: 1, orderBy: $orderBy) {
         id
         role
         stats {
@@ -274,12 +274,15 @@ describe('graphql.collective.test.js', () => {
         member {
           id
           slug
+          ... on User {
+            email
+          }
         }
       }
     }
     `;
 
-    it('gets the members by collectiveSlug', async () => {
+    it('gets the members by collectiveSlug without email', async () => {
       const result = await utils.graphqlQuery(allMembersQuery, { collectiveSlug: "brusselstogether-collective" });
       result.errors && console.error(result.errors);
       expect(result.errors).to.not.exist;
@@ -287,6 +290,31 @@ describe('graphql.collective.test.js', () => {
       expect(members).to.have.length(10);
       expect(members[0].collective.slug).to.equal('brusselstogether-collective');
       expect(members[0].member.slug).to.equal('alexandrasaveljeva');
+      members.map(m => {
+        expect(m.member.email).to.be.null;
+      });
+    });
+
+    it('gets the user members by collectiveSlug with email', async () => {
+      const hostAdmin = await models.User.findById(2); // xdamman (admin of brusselstogether host)
+      const result = await utils.graphqlQuery(allMembersQuery, { collectiveSlug: "veganizerbxl", type: "USER" }, hostAdmin);
+      result.errors && console.error(result.errors);
+      expect(result.errors).to.not.exist;
+      const members = result.data.allMembers;
+      members.map(m => {
+        expect(m.member.email).to.not.be.null;
+      });
+    });
+
+    it('gets the user members by collectiveSlug without email if logged in as admin of another host', async () => {
+      const hostAdmin = await models.User.findById(30); // pia (admin of a host but not of brusselstogether host)
+      const result = await utils.graphqlQuery(allMembersQuery, { collectiveSlug: "veganizerbxl", type: "USER" }, hostAdmin);
+      result.errors && console.error(result.errors);
+      expect(result.errors).to.not.exist;
+      const members = result.data.allMembers;
+      members.map(m => {
+        expect(m.member.email).to.be.null;
+      });
     });
 
     it('gets the members by memberCollectiveSlug by role', async () => {

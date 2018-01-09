@@ -60,7 +60,7 @@ export async function createExpense(remoteUser, expenseData) {
     expenseData.UserId = remoteUser.id;
   
     if (get(expense, 'user.paypalEmail') !== remoteUser.paypalEmail) {
-      remoteUser.paypalEmail = get(expense, 'user.paypalEmail');
+      remoteUser.paypalEmail = get(expenseData, 'user.paypalEmail');
       remoteUser.save();
     }
   } else {
