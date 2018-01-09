@@ -1,0 +1,71 @@
+{{#if interval }}
+Subject: Thank you for your {{{currency order.totalAmount currency=order.currency}}}/{{interval}} donation to {{collective.name}}
+{{else}}
+Subject: Thank you for your {{{currency order.totalAmount currency=order.currency}}} donation to {{collective.name}} {{#if matchingFund}}(matched {{matchingFund.matching}}x by {{matchingFund.collective.name}}!){{/if}}
+{{/if}}
+
+{{> header}}
+
+{{> toplogo}}
+
+{{#if fromCollective.name}}
+<p>Dear {{fromCollective.name}},</p>
+{{else}}
+<p>Hi!</p>
+{{/if}}
+
+<p> Welcome to the Consciousness Hacking family!</p>
+
+{{#if interval}}
+  {{#if firstPayment }}
+    <p>We would like to thank you for your pledge to give {{{currency order.totalAmount currency=order.currency}}} per {{interval}}.
+      Your first payment was received on {{{moment order.createdAt}}}. Your donation helps us continue our work.</p>
+      {{> charge_date_notice}}
+  {{else}}
+    <p>We would like to thank you for your continued support. Your latest {{interval}}ly donation of {{{currency order.totalAmount currency=order.currency}}} was received on {{{moment transaction.createdAt}}}.
+      Your donation helps us continue our work.</p>
+  {{/if}}
+{{else}}
+
+<p>We would like to thank you for your donation of {{{currency order.totalAmount currency=order.currency}}} on {{{moment order.createdAt}}}.
+  Your gift will help us continue our work.</p>
+{{/if}}
+
+{{#if matchingFund}}
+<p>🎉 Your donation has been matched {{matchingFund.matching}}x by <a href="https://opencollective.com/{{matchingFund.collective.slug}}">{{matchingFund.collective.name}}</a>!</p>
+{{/if}}
+
+<p>As a CH member, you get 1 free event per month. To get your free event, all you have to do is type in the email address you used to register for membership in eventbrite's purchase ticket section "<a href="https://res.cloudinary.com/opencollective/image/upload/v1515428737/Screen_Shot_2018-01-08_at_4.02.31_PM_qydkx7.png">Enter Promotional Code"</a> ...and your coded access will be accessed! </p>
+
+<p>You only get 1 FREE event per month as a member, so please pay for the other event so Consciousness Hacking can stay alive. If you register for more than 1 event per month using your code, we have the right to terminate your membership, and you may experience some karmic discomfort.</p>
+
+<p>You can follow our future activities and how we will be spending the money on our open collective page:
+  <a href="https://opencollective.com/{{collective.slug}}">https://opencollective.com/{{collective.slug}}</a>.
+</p>
+
+<h2>Help us raise more money!</h2>
+<p>Share this URL: <a href="https://opencollective.com/{{collective.slug}}/donate?referral={{fromCollective.id}}">https://opencollective.com/{{collective.slug}}/donate?referral={{fromCollective.id}}</a><br />
+The total amount that you will help us raise will be shown on your profile! <a href="https://opencollective.com/{{fromCollective.slug}}">https://opencollective.com/{{fromCollective.slug}}</a>
+</p>
+
+{{> subscriptions}}
+
+<p>P.S: You can download a receipt for your donation in PDF <a href="{{config.host.website}}/{{collective.slug}}/transactions/{{transaction.uuid}}/invoice.pdf">here</a></p>
+
+<p>Warmly,</p>
+
+<p>
+  – The {{collective.name}} open collective
+</p>
+
+{{> relatedcollectives}}
+
+{{> footer}}
+
+<p style="text-align:center;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;box-sizing:border-box;font-size:12px;color:#999;">
+OpenCollective, Inc.<br />
+EIN: 47-3896707<br />
+340 S LEMON AVE #3717<br />
+Walnut CA 91789<br />
+USA
+</p>

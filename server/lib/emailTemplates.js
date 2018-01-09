@@ -33,6 +33,7 @@ const templateNames = [
   'ticket.confirmed',
   'ticket.confirmed.sustainoss',
   'thankyou',
+  'thankyou.chsf',
   'thankyou.sustain',
   'thankyou.wwcode',
   'thankyou.kendraio',

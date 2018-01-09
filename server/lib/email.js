@@ -200,19 +200,13 @@ const generateEmailFromTemplate = (template, recipient, data, options = {}) => {
   if (template === 'thankyou') {
     if (data.collective.slug.match(/wwcode/))
       template += '.wwcode';
-    if (data.collective.name.match(/ispcwa/i))
-      template += '.ispcwa';
-    if (data.collective.slug === 'kendraio')
-      template = 'thankyou.kendraio';
-    if (data.collective.slug === 'brusselstogether')
-      template = 'thankyou.brusselstogether';
-    if (data.collective.slug === 'sustainoss')
-      template = 'thankyou.sustainoss';
+
+    if (_.contains(['chsf', 'kendraio', 'brusselstogether', 'sustainoss', 'ispcwa', 'laprimaire'], data.collective.slug)) {
+      template = `thankyou.${data.collective.slug}`;
+    }
+
     if (_.contains(['lesbarbares', 'nuitdebout', 'laprimaire', 'enmarchebe'], data.collective.slug)) {
       template += '.fr';
-
-      if (data.collective.slug === 'laprimaire')
-        template = 'thankyou.laprimaire';
 
       // xdamman: hack
       switch (data.interval) {
