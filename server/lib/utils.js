@@ -336,6 +336,8 @@ export function exportToPDF(template, data, options) {
   if (options.format === 'html') return Promise.resolve(html);
   options.format = options.paper;
 
+  options.timeout = 60000;
+
   return new Promise((resolve, reject) => {
     pdf.create(html, options).toBuffer((err, buffer) => {
       if (err) return reject(err);
