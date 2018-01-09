@@ -574,9 +574,10 @@ export default function(Sequelize, DataTypes) {
     lists[roles.ADMIN] = 'admins';
     lists[roles.HOST] = 'host';
 
-    const notifications = [
-      { type: `mailinglist.${lists[role]}` }
-    ];
+    const notifications = [];
+    if (lists[role]) {
+      notifications.push({ type: `mailinglist.${lists[role]}` });
+    }
 
     switch (role) {
       case roles.HOST:
