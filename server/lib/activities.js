@@ -304,9 +304,8 @@ const linkify = (format, link, text) => {
  * Generates a userString given a user's info
  */
 const getUserString = (format, userCollective, email) => {
-  if (!userCollective) return 'someone';
-
-  const userString = userCollective.name || userCollective.twitterHandle;
+  userCollective = userCollective || {};
+  const userString = userCollective.name || userCollective.twitterHandle || 'someone';
   const link = userCollective.twitterHandle ? `https://twitter.com/${userCollective.twitterHandle}` : userCollective.website;
 
   let returnVal;
