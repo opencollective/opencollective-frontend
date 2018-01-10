@@ -128,12 +128,21 @@ describe('graphql.collective.test.js', () => {
 
     it("creates a new expense logged in", async () => {
       newExpenseData.collective = { id: collective.id };      
-      const res = await utils.graphqlQuery(createExpenseQuery, { expense: newExpenseData }, user);
+      let res;
+      res = await utils.graphqlQuery(createExpenseQuery, { expense: newExpenseData }, user);
       res.errors && console.error(res.errors[0].message);
       expect(res.errors).to.not.exist;
       const expense = res.data.createExpense;
       expect(expense.status).to.equal('PENDING');
       expect(expense.user.id).to.equal(user.id);
+      const membership = await models.Member.findOne({ where: { CollectiveId: collective.id, role: 'CONTRIBUTOR' }});
+      expect(membership).to.exist;
+      expect(membership.MemberCollectiveId).to.equal(user.CollectiveId);
+
+      // doesn't scream when adding another expense from same user
+      res = await utils.graphqlQuery(createExpenseQuery, { expense: newExpenseData }, user);
+      res.errors && console.error(res.errors[0].message);
+      expect(res.errors).to.not.exist;
     })
 
     describe("delete an expense", () => {

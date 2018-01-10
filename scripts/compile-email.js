@@ -26,6 +26,12 @@ data['ticket.confirmed'] = {
   }
 };
 data['ticket.confirmed.sustainoss'] = data['ticket.confirmed'];
+data['github.signup'] = {
+  collective: {
+    name: "webpack",
+    slug: "webpack"
+  }
+};
 data['user.monthlyreport'] = {
   recipient: { firstName: 'Xavier' },
   month: 'march', year: '2017',
@@ -122,6 +128,14 @@ data['user.monthlyreport'] = {
   ],
 };
 
+const defaultData = {
+  config: {
+    host: {
+      website: 'https://opencollective.com'
+    }
+  }
+}
+
 if (!templateName) {
   console.log('\nCompiles a registered email template to stdout.\n');
   console.log('Usage: npm run compile:email <name>\n');
@@ -139,7 +153,7 @@ if (!templateName) {
   const libEmailTemplates = require('../server/lib/emailTemplates');
   const template = libEmailTemplates[templateName];
   if (template) {
-    process.stdout.write(juice(template(data[templateName])));
+    process.stdout.write(juice(template({ ...data[templateName], ...defaultData })));
   } else {
     console.log(`The email template "${templateName}" does not exist.`);
   }

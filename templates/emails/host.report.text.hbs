@@ -1,6 +1,6 @@
 Hi {{recipient.firstName}}!
 
-Here is your monthly report.
+Here is your {{#if month}}monthly{{else}}yearly{{/if}} report.
 
 Balance as of {{{moment reportDate}}}: {{{currency stats.balance.totalInHostCurrency currency=host.currency}}} ({{{currency stats.delta.totalInHostCurrency currency=host.currency sign=true}}})
 
@@ -47,7 +47,7 @@ No transaction.
 {{/if}}
 
 📎 Attachments
-- A CSV export of all the transactions of the month
+- A CSV export of all the transactions of the {{#if month}}month{{else}}year{{/if}}
 - A PDF with all the receipts
 
 

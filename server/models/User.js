@@ -382,24 +382,39 @@ export default (Sequelize, DataTypes) => {
     })
   };
 
-  User.prototype.populateRoles = function() {
+  User.prototype.populateRoles = async function() {
 
     if (this.rolesByCollectiveId) {
       debug("roles already populated", this.rolesByCollectiveId);
       return Promise.resolve(this.rolesByCollectiveId);
     }
-
-    return models.Member.findAll({ where: { MemberCollectiveId: this.CollectiveId }})
-      .then(memberships => {
-        const rolesByCollectiveId = {};
-        memberships.map(m => {
-          rolesByCollectiveId[m.CollectiveId] = rolesByCollectiveId[m.CollectiveId] || [];
-          rolesByCollectiveId[m.CollectiveId].push(m.role);
-        });
-        this.rolesByCollectiveId = rolesByCollectiveId;
-        debug("populateRoles", this.rolesByCollectiveId);
-        return this;
-      })
+    const rolesByCollectiveId = {};
+    const adminOf = [];
+    const memberships = await models.Member.findAll({ where: { MemberCollectiveId: this.CollectiveId }});
+    memberships.map(m => {
+      rolesByCollectiveId[m.CollectiveId] = rolesByCollectiveId[m.CollectiveId] || [];
+      rolesByCollectiveId[m.CollectiveId].push(m.role);
+      if (m.role === roles.ADMIN) {
+        adminOf.push(m.CollectiveId);
+      }
+    });
+    // If this User is an admin of a host, we also populate the role ADMIN for all the hosted collectives
+    if (adminOf.length > 0) {
+      const hostedMemberships = await models.Member.findAll({
+        where: {
+          MemberCollectiveId: { $in: adminOf },
+          role: roles.HOST
+        }
+      });
+      hostedMemberships.map(m => {
+        rolesByCollectiveId[m.CollectiveId] = rolesByCollectiveId[m.CollectiveId] || [];
+        rolesByCollectiveId[m.CollectiveId].push(roles.ADMIN);
+        debug(">>> adding UserId ", this.id, "as admin of hosted collective ", m.CollectiveId);
+      });
+    }
+    this.rolesByCollectiveId = rolesByCollectiveId;
+    debug("populateRoles", this.rolesByCollectiveId);
+    return this;
   }
 
   User.prototype.hasRole = function(roles, CollectiveId) {
@@ -426,7 +441,7 @@ export default (Sequelize, DataTypes) => {
 
   User.prototype.isMember = function(CollectiveId) {
     const result = (this.CollectiveId === CollectiveId) || this.hasRole([roles.HOST, roles.ADMIN, roles.MEMBER], CollectiveId);
-    debug("isMember of CollectiveId", CollectiveId,"?", result);
+    debug("isMember of CollectiveId", CollectiveId, "?", result);
     return result;
   }
 

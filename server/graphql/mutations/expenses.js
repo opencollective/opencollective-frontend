@@ -56,9 +56,9 @@ export async function createExpense(remoteUser, expenseData) {
     throw new errors.Unauthorized("Missing expense.collective.id");
   }
 
+  let user;
   if (remoteUser) {
-    expenseData.UserId = remoteUser.id;
-  
+    user = remoteUser;
     if (get(expense, 'user.paypalEmail') !== remoteUser.paypalEmail) {
       remoteUser.paypalEmail = get(expenseData, 'user.paypalEmail');
       remoteUser.save();
@@ -67,9 +67,9 @@ export async function createExpense(remoteUser, expenseData) {
     if (!(get(expenseData, 'user.email') || get(expenseData, 'user.paypalEmail'))) {
       throw new errors.Unauthorized("Missing expense.user.email or expense.user.paypalEmail");
     }
-    const user = await models.User.findOrCreateByEmail(get(expenseData, 'user.email') || get(expenseData, 'user.paypalEmail'), expenseData.user);
-    expenseData.UserId = user.id;
+    user = await models.User.findOrCreateByEmail(get(expenseData, 'user.email') || get(expenseData, 'user.paypalEmail'), expenseData.user);
   }
+  expenseData.UserId = user.id;
 
   const collective = await models.Collective.findById(expenseData.collective.id);
 
@@ -91,6 +91,14 @@ export async function createExpense(remoteUser, expenseData) {
     CollectiveId: collective.id,
     lastEditedById: expenseData.UserId,
     incurredAt: expenseData.incurredAt || new Date
+  });
+
+  collective.addUserWithRole(user, roles.CONTRIBUTOR).catch(e => {
+    if (e.name === 'SequelizeUniqueConstraintError') {
+      console.log("User ", user.id, "is already a contributor");
+    } else {
+      console.error(e);
+    }
   });
 
   return expense;
