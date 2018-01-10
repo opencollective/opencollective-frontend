@@ -192,13 +192,12 @@ describe('groups.routes.test.js', () => {
         })
         .then(ca => {
           preCA = ca;
-          return User.createUserWithCollective({email: 'githubuser@gmail.com'});
+          return User.createUserWithCollective({ email: 'githubuser@gmail.com'} );
         })
         .then(user => user.collective.addConnectedAccount(preCA));
       });
 
       beforeEach(() => sinon.spy(emailLib, 'send'));
-
       afterEach(() => emailLib.send.restore());
 
       it('assigns contributors as users with connectedAccounts', () =>
@@ -219,7 +218,7 @@ describe('groups.routes.test.js', () => {
         })
         .expect(200)
         .toPromise()
-        .tap(res => {
+        .then(res => {
           expect(res.body).to.have.property('id');
           expect(res.body).to.have.property('name', 'Loot');
           expect(res.body).to.have.property('slug', 'loot');
@@ -228,19 +227,21 @@ describe('groups.routes.test.js', () => {
           expect(res.body).to.have.property('longDescription');
           expect(res.body).to.have.property('isActive', true);
           expect(emailLib.send.lastCall.args[1]).to.equal('githubuser@gmail.com');
+          return models.Member.findAll({ where: { CollectiveId: res.body.id }});
+        })
+        .then(members => {
+          expect(members).to.have.length(2);
+          expect(members[0]).to.have.property('role', roles.ADMIN);
+          expect(members[1]).to.have.property('role', roles.HOST);
+          return null;
         })
         .then(() => ConnectedAccount.findOne({where: { username: 'asood123' }}))
         .then(ca => {
           expect(ca).to.have.property('service', 'github');
           return ca.getCollective();
         })
-        .then(userCollective => expect(userCollective).to.exist)
-        .then(() => models.Member.findAll())
-        .then(Members => {
-          expect(Members).to.have.length(2);
-          expect(Members[0]).to.have.property('role', roles.ADMIN);
-          expect(Members[1]).to.have.property('role', roles.HOST);
-          return null;
+        .then(userCollective => {
+          expect(userCollective).to.exist
         }))
     });
 
