@@ -7,11 +7,11 @@ import activities from '../../constants/activities';
 
 export function createCollective(_, args, req) {
   if (!req.remoteUser) {
-    return Promise.reject(new errors.Unauthorized("You need to be logged in to create a collective"));
+    return Promise.reject(new errors.Unauthorized({ message: "You need to be logged in to create a collective"}));
   }
 
   if (!args.collective.name) {
-    return Promise.reject(new errors.ValidationFailed("collective.name required"));
+    return Promise.reject(new errors.ValidationFailed({ message: "collective.name required" }));
   }
 
   let hostCollective, parentCollective, collective;
@@ -66,13 +66,13 @@ export function createCollective(_, args, req) {
     const slug = slugify(args.collective.slug || args.collective.name);
     if (collectiveData.ParentCollectiveId) {
       collectiveData.slug = `${slug}-${parentCollective.id}${collectiveData.type.substr(0,2)}`.toLowerCase();
-      return req.remoteUser.hasRole(['ADMIN', 'HOST', 'BACKER'], parentCollective.id)
-        .then(canCreateEvent => {
-          if (!canCreateEvent) return Promise.reject(new errors.Unauthorized(`You must be logged in as a member of the ${parentCollective.slug} collective to create an event`));
-        });
+      const canCreateEvent = req.remoteUser.hasRole(['ADMIN', 'HOST', 'BACKER'], parentCollective.id);
+      if (!canCreateEvent) {
+        return Promise.reject(new errors.Unauthorized({ message: `You must be logged in as a member of the ${parentCollective.slug} collective to create an event`}));
+      }
     } else if (collectiveData.HostCollectiveData) {
       if (!hostCollective.settings.apply) {
-        return Promise.reject(new errors.Unauthorized(`This host does not accept applications for new collectives`))
+        return Promise.reject(new errors.Unauthorized({ message: `This host does not accept applications for new collectives` }))
       } else {
         collectiveData.isActive = false;
       }
@@ -120,11 +120,11 @@ export function createCollective(_, args, req) {
 
 export function editCollective(_, args, req) {
   if (!req.remoteUser) {
-    throw new errors.Unauthorized("You need to be logged in to edit a collective");
+    throw new errors.Unauthorized({ message: "You need to be logged in to edit a collective" });
   }
 
   if (!args.collective.id) {
-    return Promise.reject(new errors.ValidationFailed("collective.id required"));
+    return Promise.reject(new errors.ValidationFailed({ message: "collective.id required" }));
   }
 
   const location = args.collective.location || {};
@@ -194,7 +194,7 @@ export function editCollective(_, args, req) {
         default:
           errorMsg = `You must be logged in as an admin or as the host of this ${updatedCollectiveData.type.toLowerCase()} collective to edit it`;            
       }
-      return Promise.reject(new errors.Unauthorized(errorMsg));
+      return Promise.reject(new errors.Unauthorized({ message: errorMsg }));
     }
   })
   .then(() => collective.update(updatedCollectiveData))
