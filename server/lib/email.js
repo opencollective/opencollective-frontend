@@ -297,6 +297,9 @@ const sendMessageFromActivity = (activity, notification) => {
       return generateEmailFromTemplateAndSend('collective.expense.approved.for.host', userEmail, data);
 
     case activities.COLLECTIVE_CREATED:
+      data.actions = {
+        approve: notification.User.generateLoginLink(`/${data.host.slug}/collectives/${data.collective.id}/approve`),
+      };
       return generateEmailFromTemplateAndSend('collective.created', userEmail, data);
 
     case activities.SUBSCRIPTION_CANCELED:

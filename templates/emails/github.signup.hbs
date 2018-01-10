@@ -8,24 +8,24 @@ ol {
 }
 li {
   margin: 15px 0px;
-  line-height: 1.4;
+  line-height: 1.4; 
 }
 </style>
-
-{{#if firstName}}
-<p>Dear {{firstName}},</p>
-{{else}}
-<p>Hi!</p>
+  
+{{#if firstName}} 
+<p>Dear {{firstName}},</p> 
+{{else}} 
+<p>Hi!!</p>  
 {{/if}}
 
 <p>Thanks for signing up on Open Collective! Your collective has been created: <strong><a href="{{config.host.website}}/{{collective.slug}}">{{collective.name}}</a></strong>.</p>
-
+  
 <p>Your collective is pre-approved and you can receive donations up to $500 while we review it. We will make a PR to your README file in Github once it's approved.</p>
 <p>Check out our helpful how-to guide: <strong><a href="https://medium.com/open-collective/ten-steps-to-successful-open-source-crowdfunding-fa2b43e82687">Ten Steps to Successful Open Source Crowdfunding</a></strong>.</p>
-
+ 
 <p>Top tips:</p>
-<ol type="1">
-<li><strong>Make your collective your own.</strong> <a href="{{config.host.website}}/login">Login</a> to edit it, add members and set up your preferred contribution tiers. </li>
+<ol type="1"> 
+<li><strong>Make your collective your own.</strong> <a href="{{config.host.website}}/login">Login</a> to edit it, add members and set up your preferred contribution tiers.  </li> 
 
 <li><strong>Feature your backers & sponsors on your Github & website.</strong> Find instructions to add your backers to your website <a href="https://opencollective.com/widgets">here</a>.</li>
 

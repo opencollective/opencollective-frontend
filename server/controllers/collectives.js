@@ -258,6 +258,9 @@ export const create = (req, res, next) => {
 export const createFromGithub = (req, res, next) => {
 
   const { payload } = req.required;
+  if (!req.jwtPayload) {
+    return next(new errors.BadRequest("createFromGithub: jwtPayload missing"));
+  }
   const { connectedAccountId } = req.jwtPayload;
   const debug = debugLib("github");
   let creatorUser, creatorCollective, options;

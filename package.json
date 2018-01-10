@@ -9,6 +9,7 @@
     "npm": "5.4.1"
   },
   "dependencies": {
+    "apollo-errors": "^1.5.1",
     "argparse": "1.0.9",
     "async": "0.9.2",
     "axios": "0.7.0",

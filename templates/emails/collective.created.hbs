@@ -7,11 +7,13 @@ Subject: New collective pending {{collective.name}}
 </style>
 
 <h2>Creator</h2>
+https://opencollective.com/{{user.collective.slug}}
+<br /><br />
 <table>
-  <tr><th>Name</th><td>{{user.name}}</td></tr>
+  <tr><th>Name</th><td>{{user.collective.name}}</td></tr>
   <tr><th>Email</th><td>{{user.email}}</td></tr>
-  <tr><th>Website</th><td>{{user.website}}</td></tr>
-  <tr><th>Twitter</th><td>{{user.twitterHandle}}</td></tr>
+  <tr><th>Website</th><td>{{user.collective.website}}</td></tr>
+  <tr><th>Twitter</th><td>{{user.collective.twitterHandle}}</td></tr>
 </table>
 
 <h2>Collective</h2>
@@ -23,8 +25,9 @@ Subject: New collective pending {{collective.name}}
   <tr><th>Tags</th><td>{{{json collective.tags}}}</td></tr>
 </table>
 
-<p>
-Please reply to this email to confirm the creation of this collective.
-</p>
+<br /><br />
+<center>
+  <a href="{{actions.approve}}"><div class="btn">APPROVE</div></a>
+</center>
 
 {{> footer}}

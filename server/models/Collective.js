@@ -1,7 +1,7 @@
 /**
  * Dependencies.
  */
-import _ from 'lodash';
+import _, { get } from 'lodash';
 import Temporal from 'sequelize-temporal';
 import config from 'config';
 import deepmerge from 'deepmerge';
@@ -413,6 +413,18 @@ export default function(Sequelize, DataTypes) {
     .then(users => uniq(users, (user) => user.id));
   };
 
+  Collective.prototype.getAdmins = function() {
+    return models.Member.findAll({
+      where: {
+        CollectiveId: this.id,
+        role: roles.ADMIN
+      },
+      include: [
+        { model: models.Collective, as: 'memberCollective' }
+      ]
+    }).map(member => member.memberCollective);
+  }
+
   Collective.prototype.getEmails = async function() {
     if (this.type === 'USER') {
       const user = await this.getUser();
@@ -572,27 +584,7 @@ export default function(Sequelize, DataTypes) {
    */
   Collective.prototype.addUserWithRole = function(user, role, defaultAttributes) {
 
-    const lists = {};
-    lists[roles.BACKER] = 'backers';
-    lists[roles.ADMIN] = 'admins';
-    lists[roles.HOST] = 'host';
-
-    const notifications = [];
-    if (lists[role]) {
-      notifications.push({ type: `mailinglist.${lists[role]}` });
-    }
-
-    switch (role) {
-      case roles.HOST:
-        notifications.push({ type: activities.COLLECTIVE_TRANSACTION_CREATED });
-        this.update({ HostCollectiveId: user.CollectiveId });
-        break;
-      case roles.ADMIN:
-        notifications.push({ type: activities.COLLECTIVE_EXPENSE_CREATED });
-        notifications.push({ type: activities.COLLECTIVE_MEMBER_CREATED });
-        notifications.push({ type: 'collective.monthlyreport' });
-        break;
-    }
+    models.Notification.subscribeUserWithRole(user.id, this.id, role);
 
     const member = {
       role,
@@ -605,16 +597,17 @@ export default function(Sequelize, DataTypes) {
     debug("addUserWithRole", user.id, role, "member", member);
     return Promise.all([
       models.Member.create(member),
-      models.Notification.createMany(notifications, { UserId: user.id, CollectiveId: this.id, channel: 'email' }).catch(e => console.error(`Collective.addUserWithRole error while creating entries in Notifications table for UserId ${user.id} (role: ${role}, CollectiveId: ${this.id}): `, e)),
       models.User.findById(member.CreatedByUserId, { include: [ { model: models.Collective, as: 'collective' }] }),
       models.User.findById(user.id, { include: [ { model: models.Collective, as: 'collective' }] })
     ])
     .then(results => {
       const member = results[0];
-      const remoteUser = results[2];
-      const memberUser = results[3];
+      const remoteUser = results[1];
+      const memberUser = results[2];
 
       switch (role) {
+        case roles.HOST:
+          return this.update({ HostCollectiveId: user.CollectiveId });
 
         case roles.BACKER:
         case roles.ATTENDEE:
@@ -656,8 +649,12 @@ export default function(Sequelize, DataTypes) {
 
         case roles.MEMBER:
         case roles.ADMIN:
+          // We don't notify if the new member is the logged in user
+          if (get(remoteUser, 'collective.id') === get(memberUser, 'collective.id')) {
+            return member;
+          }
           // We only send the notification for new member for role MEMBER and ADMIN
-          return emailLib.send('collective.newmember', memberUser.email, {
+          return emailLib.send(`${this.type}.newmember`.toLowerCase(), memberUser.email, {
             remoteUser: {
               email: remoteUser.email,
               collective: pick(remoteUser.collective, ['slug', 'name', 'image'])
@@ -699,11 +696,8 @@ export default function(Sequelize, DataTypes) {
   };
 
   Collective.prototype.addHost = function(hostCollective, creatorUser) {
-    const notifications = [ { type:`mailinglist.host` } ];
 
-      notifications.push({ type:activities.COLLECTIVE_TRANSACTION_CREATED });
-      notifications.push({ type:activities.COLLECTIVE_EXPENSE_CREATED });
-      this.update({ HostCollectiveId: hostCollective.id });
+    models.Notification.subscribeUserWithRole(creatorUser.id, this.id, roles.HOST);
 
     const member = {
       role: roles.HOST,
@@ -712,13 +706,7 @@ export default function(Sequelize, DataTypes) {
       CollectiveId: this.id,
     };
 
-    return Promise.all([
-      models.Member.create(member),
-      models.Notification.createMany(notifications, { UserId: creatorUser.id, CollectiveId: this.id, channel: 'email' }),
-    ])
-    .then(results => {
-      return results[0];
-    });
+    return models.Member.create(member);
   };
 
   // edit the list of members and admins of this collective (create/update/remove)

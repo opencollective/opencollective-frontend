@@ -8,6 +8,8 @@
  */
 import Promise from 'bluebird';
 import _ from 'lodash';
+import roles from '../constants/roles';
+import activities from '../constants/activities';
 
 export default function(Sequelize, DataTypes) {
 
@@ -40,6 +42,42 @@ export default function(Sequelize, DataTypes) {
   Notification.createMany = (notifications, defaultValues) => {
     return Promise.map(notifications, u => Notification.create(_.defaults({},u,defaultValues))).catch(console.error);
   };
+
+  Notification.subscribeUserWithRole = (UserId, CollectiveId, role) => {
+
+    if (!UserId) {
+      throw new Error("Notification.subscribeUserWithRole UserId missing");
+    }
+
+    const notifications = [], lists = {};
+
+    lists[roles.BACKER] = 'backers';
+    lists[roles.ADMIN] = 'admins';
+    lists[roles.HOST] = 'host';
+
+    if (lists[role]) {
+      notifications.push({ type: `mailinglist.${lists[role]}` });
+    }
+
+    switch (role) {
+      case roles.HOST:
+        notifications.push({ type: activities.COLLECTIVE_EXPENSE_CREATED });
+        notifications.push({ type: activities.COLLECTIVE_TRANSACTION_CREATED });
+        break;
+      case roles.ADMIN:
+        notifications.push({ type: activities.COLLECTIVE_EXPENSE_CREATED });
+        notifications.push({ type: activities.COLLECTIVE_MEMBER_CREATED });
+        notifications.push({ type: 'collective.monthlyreport' });
+        break;
+    }
+
+    Promise.map(notifications, (notification) => {
+      return models.Notification
+        .create({ ...notification, UserId: UserId, CollectiveId: CollectiveId, channel: 'email' })
+        .catch(e => console.error(e.name, `User ${UserId} is already subscribed to ${notification.type}`))
+    })
+    .catch(e => console.error(`Collective.addUserWithRole error while creating entries in Notifications table for UserId ${UserId} (role: ${role}, CollectiveId: ${CollectiveId}): `, e));
+  }
 
   /**
    * Get the list of subscribers to a mailing list (e.g. backers@:collectiveSlug.opencollective.com)
