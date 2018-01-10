@@ -114,9 +114,10 @@ describe("email.routes.test", () => {
       .send(Object.assign({}, webhookBodyPayload, { recipient: 'info@testcollective.opencollective.com' }))
       .then((res) => {
         expect(res.statusCode).to.equal(200);
-        expect(spy.args[4][0]).to.equal('info@testcollective.opencollective.com');
-        expect(spy.args[4][1]).to.equal(webhookBodyPayload.subject);
-        expect(usersData.map(u => u.email).indexOf(spy.args[4][3].bcc) !== -1).to.be.true;
+        console.log(">>> spy", spy.lastCall.args);
+        expect(spy.lastCall.args[0]).to.equal('info@testcollective.opencollective.com');
+        expect(spy.lastCall.args[1]).to.equal(webhookBodyPayload.subject);
+        expect(usersData.map(u => u.email).indexOf(spy.lastCall.args[3].bcc) !== -1).to.be.true;
       });
   });
 
