@@ -117,7 +117,7 @@ describe("email.routes.test", () => {
         console.log(">>> spy", spy.lastCall.args);
         expect(spy.lastCall.args[0]).to.equal('info@testcollective.opencollective.com');
         expect(spy.lastCall.args[1]).to.equal(webhookBodyPayload.subject);
-        expect(usersData.map(u => u.email).indexOf(spy.args[4][3].bcc) !== -1).to.be.true;
+        expect(usersData.map(u => u.email).indexOf(spy.lastCall.args[3].bcc) !== -1).to.be.true;
       });
   });
 
