@@ -149,7 +149,7 @@ class UserCollective extends React.Component {
             margin: 0 auto;
           }
           #tiers {
-            overflow: hidden
+            overflow: hidden;
             width: 100%;
             display: flex;
           }
