@@ -68,7 +68,7 @@ describe('groups.routes.test.js', () => {
         .expect(400)
     );
 
-    describe.only('successfully create a group', () => {
+    describe('successfully create a group', () => {
       let group;
 
       beforeEach('spy on emailLib', () => sinon.spy(emailLib, 'sendMessageFromActivity'));
