@@ -56,6 +56,7 @@ class UserCollective extends React.Component {
       'organization.collective.memberOf.member.title': { id: 'organization.collective.memberOf.member.title', defaultMessage: `We are a member of {n, plural, one {this collective} other {these collectives}}`},
       'organization.collective.memberOf.backer.title': { id: 'organization.collective.memberOf.backer.title', defaultMessage: `We are backing {n, plural, one {this collective} other {these collectives}}`},
       'organization.collective.memberOf.follower.title': { id: 'organization.collective.memberOf.follower.title', defaultMessage: `We are following {n, plural, one {this collective} other {these collectives}}`},
+      'organization.collective.memberOf.fundraiser.title': { id: 'organization.collective.memberOf.fundraiser.title', defaultMessage: `We've helped raise money for {n, plural, one {this collective} other {these collectives}}`},
       'user.collective.menu.host': { id: 'user.collective.menu.host', defaultMessage: `hosting {n} {n, plural, one {collective} other {collectives}}`},
       'user.collective.menu.admin': { id: 'user.collective.menu.admin', defaultMessage: `contributing to {n} {n, plural, one {collective} other {collectives}}`},
       'user.collective.menu.host': { id: 'user.collective.menu.host', defaultMessage: `hosting {n} {n, plural, one {collective} other {collectives}}`},
@@ -260,8 +261,8 @@ class UserCollective extends React.Component {
               { Object.keys(memberOf).map(role => role !== 'HOST' && (
                 <section id={role}>
                   <h1>{intl.formatMessage(this.messages[`${type}.collective.memberOf.${role.toLowerCase()}.title`], { n: memberOf[role].length })}</h1>
-                  { LoggedInUser && this.messages[`${type}.collective.memberOf.${role.toLowerCase()}.LoggedInDescription`] &&
-                    <div className="description">{intl.formatMessage(this.messages[`${type}.collective.memberOf.${role.toLowerCase()}.LoggedInDescription`])}</div>
+                  { LoggedInUser && this.messages[`user.collective.memberOf.${role.toLowerCase()}.LoggedInDescription`] &&
+                    <div className="description">{intl.formatMessage(this.messages[`user.collective.memberOf.${role.toLowerCase()}.LoggedInDescription`])}</div>
                   }
                   <Memberships
                     className={role}

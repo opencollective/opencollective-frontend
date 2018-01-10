@@ -94,7 +94,7 @@ class ExpensesWithData extends React.Component {
           }
         `}</style>
 
-        { this.state.showNewExpenseForm &&
+        { !includeHostedCollectives && this.state.showNewExpenseForm &&
           <CreateExpenseForm
             collective={collective}
             LoggedInUser={LoggedInUser}
@@ -115,7 +115,7 @@ class ExpensesWithData extends React.Component {
             </h1>
             <div className="adminActions">
               <ul>
-              { !this.state.showNewExpenseForm &&
+              { !includeHostedCollectives && !this.state.showNewExpenseForm &&
                 <li><a className="submitNewExpense" onClick={() => this.setState({ showNewExpenseForm: true })}>
                   <FormattedMessage id="expense.new.button" defaultMessage="Submit a new expense" />
                 </a></li>
@@ -181,6 +181,7 @@ query Expenses($CollectiveId: Int!, $status: String, $limit: Int, $offset: Int, 
     user {
       id
       paypalEmail
+      email
     }
   }
 }

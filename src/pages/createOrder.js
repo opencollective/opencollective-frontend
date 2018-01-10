@@ -59,11 +59,19 @@ class CreateOrderPage extends React.Component {
       newState.LoggedInUser = LoggedInUser;
     }
     this.referral = storage.get('referral');
-    const matchingFund = storage.get('matchingFund') || get(data, 'Collective.settings.matchingFund');
+    const matchingFund = storage.get('matchingFund');
     if (matchingFund) {
       newState.matchingFund = matchingFund;
     }
     this.setState(newState);
+  }
+
+  componentWillReceiveProps(newProps) {
+    if (this.state.matchingFund) return;
+    const matchingFund = get(newProps, 'data.Collective.settings.matchingFund');
+    if (matchingFund) {
+      this.setState({ matchingFund });
+    }
   }
 
   async createOrder(order) {

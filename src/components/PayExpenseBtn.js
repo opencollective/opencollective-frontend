@@ -48,7 +48,7 @@ class PayExpenseBtn extends React.Component {
   render() {
     const { expense, intl } = this.props;
     let disabled = this.state.loading, title = '';
-    if (expense.payoutMethod === 'paypal' && !isValidEmail(get(expense, 'user.paypalEmail'))) {
+    if (expense.payoutMethod === 'paypal' && !isValidEmail(get(expense, 'user.paypalEmail')) && !isValidEmail(get(expense, 'user.email'))) {
       disabled = true;
       title = intl.formatMessage(this.messages['paypal.missing']);
     }
