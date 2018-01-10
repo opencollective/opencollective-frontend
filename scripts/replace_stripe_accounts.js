@@ -29,17 +29,11 @@ const testStripeAccounts = {
       publishableKey: 'pk_test_OSQ8IaRSyLe9FVHMivgRjQng'
     },
     CollectiveId: 9802
-  },
-  'wwcode': {
-    service: 'stripe',
-    username: 'acct_xxxxxxxxxxxxxxxx',
-    token: 'sk_test_Hcsz2JJdMzEsU2xxxxxxxxxx',
-    data: {
-      publishableKey: 'pk_test_OSQ8IaRSyLe9FVxxxxxxxxxx'
-    },
-    CollectiveId: 9804
   }
 }
+
+testStripeAccounts.wwcode = testStripeAccounts.opensource;
+testStripeAccounts.wwcode.CollectiveId = 9804;
 
 const done = (err) => {
   if (err) console.log('err', err);

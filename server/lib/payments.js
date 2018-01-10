@@ -51,7 +51,7 @@ export const executeOrder = (user, order, options) => {
       return paymentProviders[paymentProvider].types[order.paymentMethod.type || 'default'].processOrder(order, options)  // eslint-disable-line import/namespace
         .tap(async () => {
           if (!order.matchingFund) return;
-
+          const matchingFundCollective = await models.Collective.findById(order.matchingFund.CollectiveId);
           // if there is a matching fund, we execute the order
           // also adds the owner of the matching fund as a BACKER of collective
           const matchingOrder = {
@@ -59,9 +59,9 @@ export const executeOrder = (user, order, options) => {
             totalAmount: order.totalAmount * order.matchingFund.matching,
             paymentMethod: order.matchingFund,
             FromCollectiveId: order.matchingFund.CollectiveId,
-            fromCollective: await models.Collective.findById(order.matchingFund.CollectiveId),
+            fromCollective: matchingFundCollective,
             description: `Matching ${order.matchingFund.matching}x ${order.fromCollective.name}'s donation`,
-            createdByUser: await models.User.findOne({ where: { CollectiveId: order.matchingFund.CollectiveId }})
+            createdByUser: await matchingFundCollective.getUser()
           };
 
           // processOrder expects an update function to update `order.processedAt`

@@ -390,11 +390,14 @@ export default function(Sequelize, DataTypes) {
     }
   };
 
+  // Returns the User model of the User that created this collective
   Collective.prototype.getUser = function() {
-    if ([ types.USER, types.ORGANIZATION ].includes(this.type)) {
-      return models.User.findOne({ where: { CollectiveId: this.id } });
-    } else {
-      return Promise.resolve(null);
+    switch (this.type) {
+      case types.USER:
+      case types.ORGANIZATION:
+        return models.User.findById(this.CreatedByUserId);
+      default:
+        return Promise.resolve(null);
     }
   };
 
