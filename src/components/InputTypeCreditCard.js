@@ -50,7 +50,6 @@ class InputTypeCreditCard extends React.Component {
           this.setState({ error: event.error.message })
         } else {
           this.props.onChange(card);
-          console.log(">>> stripe onchange", card);
           this.setState({ error: '' })
         }
       });

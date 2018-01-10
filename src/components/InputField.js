@@ -305,6 +305,7 @@ class InputField extends React.Component {
             className={field.className}
             autoFocus={field.focus}
             defaultValue={field.value || field.defaultValue}
+            value={field.value || field.defaultValue}
             onChange={event => this.handleChange(event.target.value)}
             >
             { field.options && field.options.map(option => {
