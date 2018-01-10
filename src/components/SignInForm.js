@@ -224,7 +224,6 @@ class LoginForm extends React.Component {
         <div className="content">
           <Form horizontal onSubmit={this.handleSubmit}>
             <div className="userDetailsForm">
-              <h2><FormattedMessage id="loginform.title" defaultMessage="login" /></h2>
                 <Row key={`email.input`}>
                   <Col sm={12}>
                     <InputField

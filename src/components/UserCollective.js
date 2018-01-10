@@ -37,6 +37,8 @@ class UserCollective extends React.Component {
     };
 
     this.messages = defineMessages({
+      'organization.created': { id: 'organization.created', defaultMessage: `Your organization has been created with success.`},
+      'organization.created.description': { id: 'organization.created.description', defaultMessage: `You can now make contributions as an organization. You can also edit your organization profile, add members and other administrators and attach a credit card that can be used by its members within a monthly limit.`},
       'organization.collective.since': { id: 'organization.collective.since', defaultMessage: `Contributing Since {year}`},
       'user.collective.since': { id: 'user.collective.since', defaultMessage: `Contributing Since {year}`},
       'organization.collective.edit': { id: 'organization.collective.edit', defaultMessage: `edit organization`},
@@ -98,7 +100,12 @@ class UserCollective extends React.Component {
       });
     }
 
+    const notification = {};
     if (query && query.CollectiveId) {
+      if (query.status === 'collectiveCreated' && this.collective.type === 'ORGANIZATION') {
+        notification.title = intl.formatMessage(this.messages['organization.created']);
+        notification.description = intl.formatMessage(this.messages['organization.created.description']);
+      }
       Object.assign(order, {
         ...order,
         ...pick(query || {}, 'totalAmount', 'CollectiveId', 'TierId'),
@@ -142,7 +149,7 @@ class UserCollective extends React.Component {
             margin: 0 auto;
           }
           #tiers {
-            overflow: hidden
+            overflow: hidden;
             width: 100%;
             display: flex;
           }
@@ -167,7 +174,12 @@ class UserCollective extends React.Component {
 
           <div>
 
-            <NotificationBar status={this.state.status} error={this.state.error} />
+            <NotificationBar
+              status={this.state.status}
+              title={notification.title}
+              description={notification.description}
+              error={this.state.error}
+              />
 
             { this.props.message && <MessageModal message={this.props.message} /> }
 
@@ -183,7 +195,7 @@ class UserCollective extends React.Component {
 
             <div>
 
-              { get(query, 'status') &&  <OrderCreated order={order} status={query.status} /> }
+              { (get(query, 'status') === 'orderCreated' || get(query, 'status') === 'orderProcessing') &&  <OrderCreated order={order} status={query.status} /> }
 
               <div className="content" >
                 <div className="message">
@@ -204,7 +216,7 @@ class UserCollective extends React.Component {
                   }
                 </div>
                 { this.collective.longDescription &&
-                  <div className="collectiveDescription" >
+                  <div className="longDescription" >
                     <Markdown source={this.collective.longDescription} />
                   </div>
                 }
