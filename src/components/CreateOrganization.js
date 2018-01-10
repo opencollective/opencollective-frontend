@@ -83,6 +83,9 @@ class CreateOrganization extends React.Component {
             margin: 0 auto;
             text-align: center;
           }
+          .signin {
+            text-align: center;
+          }
         `}</style>
 
           <Header
@@ -101,9 +104,9 @@ class CreateOrganization extends React.Component {
           <div className="content" >
 
             { !LoggedInUser &&
-              <div>
+              <div className="signin">
                 <h2><FormattedMessage id="collectives.create.signin" defaultMessage="Sign in or create an Open Collective account" /></h2>
-                <SignInForm next={`/${host.slug}/apply`} />
+                <SignInForm next={`/organizations/new`} />
               </div>
             }
             { LoggedInUser &&
