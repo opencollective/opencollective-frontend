@@ -129,7 +129,7 @@ class CreateCollectiveForm extends React.Component {
           placeholder: 'Search cities',
           type: 'location',
           options: {
-            types: ['cities']
+            types: ['(cities)']
           }
         },
         {
