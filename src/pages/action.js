@@ -55,8 +55,6 @@ class ActionPage extends React.Component {
 
     return (
       <div className="ActionPage">
-        <style jsx>{`
-        `}</style>
 
         <Header
           title={action}

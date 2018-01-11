@@ -2,7 +2,9 @@
   "presets": [
     "es2015",
     "stage-0",
-    "next/babel",
+    ["next/babel", {
+      "styled-jsx": { "optimizeForSpeed": true }
+    }],
     "react"
   ],
   "plugins": [
