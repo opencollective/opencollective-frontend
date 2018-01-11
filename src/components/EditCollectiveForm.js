@@ -42,6 +42,7 @@ class EditCollectiveForm extends React.Component {
     this.showEditTiers = ['COLLECTIVE', 'EVENT'].includes(collective.type);
     this.defaultTierType = collective.type === 'EVENT' ? 'TICKET' : 'TIER';
     this.showEditMembers = ['COLLECTIVE', 'ORGANIZATION'].includes(collective.type);
+    this.showPaymentMethods = ['USER', 'ORGANIZATION'].includes(collective.type);
     this.members = collective.members && collective.members.filter(m => ['ADMIN','MEMBER'].includes(m.role));
 
     this.messages = defineMessages({
@@ -280,9 +281,11 @@ class EditCollectiveForm extends React.Component {
                 <FormattedMessage id='editCollective.menu.tiers' defaultMessage='tiers' />
               </Button>
             }
-            <Button className="menuBtn paymentMethods" bsStyle={this.state.section === 'paymentMethods' ? 'primary' : 'default'} onClick={() => this.showSection('paymentMethods')}>
-              <FormattedMessage id='editCollective.menu.paymentMethods' defaultMessage='Payment Methods' />
-            </Button>
+            { this.showPaymentMethods &&
+              <Button className="menuBtn paymentMethods" bsStyle={this.state.section === 'paymentMethods' ? 'primary' : 'default'} onClick={() => this.showSection('paymentMethods')}>
+                <FormattedMessage id='editCollective.menu.paymentMethods' defaultMessage='Payment Methods' />
+              </Button>
+            }
             <Button className="menuBtn connectedAccounts" bsStyle={this.state.section === 'connectedAccounts' ? 'primary' : 'default'} onClick={() => this.showSection('connectedAccounts')}>
               <FormattedMessage id='editCollective.menu.connectedAccounts' defaultMessage='Connected Accounts' />
             </Button>
