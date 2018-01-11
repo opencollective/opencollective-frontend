@@ -76,7 +76,7 @@ class UserCollective extends React.Component {
   render() {
     const order = { fromCollective: this.collective };
     const { intl, LoggedInUser, query } = this.props;
-
+    const isProfileEmpty = (!this.collective.image || !this.collective.longDescription);
     const type = this.collective.type.toLowerCase();
     let cta;
     if (this.collective.canApply) {
@@ -142,6 +142,13 @@ class UserCollective extends React.Component {
           .cardsList {
             margin: 0 2rem;
           }
+          .message {
+            margin: 5rem;
+            text-align: center;
+          }
+          .message .editBtn {
+            margin: 2rem;
+          }
           .description {
             font-size: 1.4rem;
             text-align: center;
@@ -199,17 +206,17 @@ class UserCollective extends React.Component {
 
               <div className="content" >
                 <div className="message">
-                  { query && query.status && (!this.collective.image || !this.collective.longDescription) &&
+                  { isProfileEmpty &&
                     <div>
                       <FormattedMessage id="collective.user.emptyProfile" defaultMessage={`Your profile looks a bit empty ¯\\\\_(ツ)_/¯`} />
                     </div>
                   }
-                  { !LoggedInUser && (!this.collective.image || !this.collective.longDescription) &&
+                  { !LoggedInUser && isProfileEmpty &&
                     <div>
                       <FormattedMessage id="collective.user.loggedout.editProfile" defaultMessage="Please login to edit your profile" />
                     </div>
                   }
-                  { LoggedInUser && (!this.collective.image || !this.collective.longDescription) &&
+                  { isProfileEmpty && LoggedInUser && LoggedInUser.canEditCollective(this.collective) &&
                     <div className="editBtn">
                       <Button onClick={() => Router.pushRoute(`/${this.collective.slug}/edit`)}>{intl.formatMessage(this.messages[`${type}.collective.edit`])}</Button>
                     </div>
