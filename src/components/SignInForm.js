@@ -37,6 +37,7 @@ class LoginForm extends React.Component {
       'firstName.label': { id: 'user.firstName.label', defaultMessage: 'first name' },
       'lastName.label': { id: 'user.lastName.label', defaultMessage: 'last name' },
       'website.label': { id: 'user.website.label', defaultMessage: 'website' },
+      'website.description': { id: 'user.website.description', defaultMessage: 'If any' },
       'twitterHandle.label': { id: 'user.twitterHandle.label', defaultMessage: 'twitter' },
       'twitterHandle.description': { id: 'user.twitterHandle.description', defaultMessage: 'If any' },
       'email.label': { id: 'user.email.label', defaultMessage: 'email' },
@@ -133,9 +134,27 @@ class LoginForm extends React.Component {
     })
   }
 
+  signup() {
+    this.state.user.email = this.state.user.email && this.state.user.email.trim();
+    if (!isValidEmail(this.state.user.email)) {
+      return;
+    }
+    this.setState({ loading: true });
+    api.signin(this.state.user, this.props.next).then((result) => {
+      this.setState({ loginSent: true, signup: true, isNewUser: true, loading: false });
+      if (result.redirect) {
+        window.location.replace(result.redirect);
+      }
+    })    
+  }
+
   handleSubmit(e) {
     e && e.preventDefault();
-    this.signin();
+    if (this.state.isNewUser) {
+      this.setState({ signup: true });
+    } else {
+      this.signin();
+    }
     return false;
   }
 
@@ -170,6 +189,9 @@ class LoginForm extends React.Component {
       }
     }
 
+    const signupSuccessful = this.state.loginSent && this.state.signup;
+    const showForm = !signupSuccessful;
+
     return (
       <div className="LoginForm">
         <style jsx>{`
@@ -179,6 +201,7 @@ class LoginForm extends React.Component {
         .LoginForm {
           max-width: 700px;
           margin: 0 auto;
+          text-align: left;
         }
         .userDetailsForm {
           overflow: hidden;
@@ -210,6 +233,9 @@ class LoginForm extends React.Component {
           padding-top: 7px;
           display: inline-block;
         }
+        .signupSuccessful {
+          text-align: center;
+        }
         @media (min-width: 768px) {
           .actions {
             margin: 6rem 0 6rem 26%;
@@ -222,54 +248,62 @@ class LoginForm extends React.Component {
         }
         `}</style>
         <div className="content">
-          <Form horizontal onSubmit={this.handleSubmit}>
-            <div className="userDetailsForm">
-                <Row key={`email.input`}>
-                  <Col sm={12}>
-                    <InputField
-                      className="horizontal"
-                      {...inputEmail}
-                      />
-                  </Col>
-                </Row>
-              {this.state.isNewUser && this.state.signup &&
-                <div>
-                  { this.fields.map(field => (
-                    <Row key={`${field.name}.input`}>
-                      <Col sm={12}>
-                        <InputField
-                          className="horizontal"
-                          {...field}
-                          defaultValue={this.state.user[field.name]}
-                          onChange={(value) => this.handleChange("user", field.name, value)}
-                          />
-                      </Col>
-                    </Row>
-                  ))}
-                  <Row>
-                    <Col sm={3}></Col>
-                    <Col sm={9}>
-                      <Button bsStyle="primary" onClick={() => this.handleSubmit()}>
-                        <FormattedMessage id="signin.createAccount" defaultMessage="Sign Up" />
-                      </Button>
+          { signupSuccessful &&
+            <div className="signupSuccessful">
+              <h2><FormattedMessage id="signin.signup.success.title" defaultMessage="✓ Account created with success" /></h2>
+              <p><FormattedMessage id="signup.success.description" defaultMessage="An email has been sent with a link to login to your account. You can now safely close this tab." /></p>
+            </div>
+          }
+          { showForm &&
+            <Form horizontal onSubmit={this.handleSubmit}>
+              <div className="userDetailsForm">
+                  <Row key={`email.input`}>
+                    <Col sm={12}>
+                      <InputField
+                        className="horizontal"
+                        {...inputEmail}
+                        />
                     </Col>
                   </Row>
+                {this.state.isNewUser && this.state.signup &&
+                  <div>
+                    { this.fields.map(field => (
+                      <Row key={`${field.name}.input`}>
+                        <Col sm={12}>
+                          <InputField
+                            className="horizontal"
+                            {...field}
+                            defaultValue={this.state.user[field.name]}
+                            onChange={(value) => this.handleChange("user", field.name, value)}
+                            />
+                        </Col>
+                      </Row>
+                    ))}
+                    <Row>
+                      <Col sm={3}></Col>
+                      <Col sm={9}>
+                        <Button className="signup" bsStyle="primary" onClick={() => this.signup()}>
+                          <FormattedMessage id="signin.createAccount" defaultMessage="Sign Up" />
+                        </Button>
+                      </Col>
+                    </Row>
+                  </div>
+                }
+            </div>
+            <div className="result">
+              {this.state.result.success &&
+                <div className="success">
+                  {this.state.result.success}
                 </div>
               }
-          </div>
-          <div className="result">
-            {this.state.result.success &&
-              <div className="success">
-                {this.state.result.success}
-              </div>
-            }
-            { this.state.result.error &&
-              <div className="error">
-                {this.state.result.error}
-              </div>
-            }
-          </div>
-        </Form>
+              { this.state.result.error &&
+                <div className="error">
+                  {this.state.result.error}
+                </div>
+              }
+            </div>
+          </Form>
+        }
         </div>
       </div>
     )

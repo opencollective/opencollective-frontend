@@ -38,15 +38,22 @@ class LoginPage extends React.Component {
           description="Create your profile on Open Collective and show the world the open collectives that you are contributing to."
         />
         <style jsx>{`
-        h1 {
+        .signin {
+          max-width: 60rem;
+          margin: 15rem auto;
           text-align:center;
-          padding: 8rem;
+        }
+        h2 {
+          font-size: 2rem;
+          padding: 2rem;
         }
         `}
         </style>
         <Body>
-          <h2><FormattedMessage id="loginform.title" defaultMessage="login" /></h2>
-          <SignInForm next={this.props.next} />
+          <div className="signin">
+            <h2><FormattedMessage id="loginform.title" defaultMessage="Sign in or Create an Account" /></h2>
+            <SignInForm next={this.props.next} />
+          </div>
         </Body>
         <Footer />
 
