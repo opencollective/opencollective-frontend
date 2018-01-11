@@ -2,13 +2,23 @@
   "presets": [
     "es2015",
     "stage-0",
-    "next/babel",
+    ["next/babel", {
+      "styled-jsx": { "optimizeForSpeed": true }
+    }],
     "react"
   ],
   "plugins": [
     [
       "styled-jsx/babel", { "plugins": ["styled-jsx-plugin-postcss"] }
     ],
+    ["module-resolver", {
+      "root": ["."],
+      "alias": {
+        "styles": "./src/styles",
+        "markdown": "./src/markdown"
+      },
+      "cwd": "babelrc"
+    }],
     "markdown-in-js/babel",
     [
       "wrap-in-js",
