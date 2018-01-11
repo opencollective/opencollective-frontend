@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="762px" height="400px" viewBox="0 0 762 400" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 48.2 (47327) - http://www.bohemiancoding.com/sketch -->
+    <title>:: confetti</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <linearGradient x1="50%" y1="19.3939209%" x2="50%" y2="100%" id="linearGradient-1">
+            <stop stop-color="#FFFFFF" offset="0%"></stop>
+            <stop stop-color="#FFFFFF" stop-opacity="0" offset="100%"></stop>
+        </linearGradient>
+        <rect id="path-2" x="0" y="0" width="768" height="400"></rect>
+    </defs>
+    <g id="::-email-template-m-›-welcome-email" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" transform="translate(0.000000, -92.000000)">
+        <g id="::-intro" transform="translate(0.000000, 92.000000)">
+            <g id="::-bg-header">
+                <g id="::-confetti">
+                    <mask id="mask-3" fill="white">
+                        <use xlink:href="#path-2"></use>
+                    </mask>
+                    <use id="mask" fill="url(#linearGradient-1)" xlink:href="#path-2"></use>
+                    <g id="::-shapes" opacity="0.12" mask="url(#mask-3)" stroke="#3399FF" stroke-width="4">
+                        <g transform="translate(-1404.000000, 0.000000)">
+                            <path d="M1996.08322,163.164882 C1996.54327,170.373274 2002.57998,175.833966 2009.56821,175.36174 C2016.55644,174.889514 2021.85035,168.662612 2021.39254,161.451906 L1996.08322,163.164882 Z" id="Stroke-16" stroke-linecap="round" stroke-linejoin="round"></path>
+                            <polyline id="Stroke-30" stroke-linecap="round" stroke-linejoin="round" points="1924.14243 293.865699 1922.37584 282.907675 1933.95147 281.233171 1932.68896 269.624433 1944.25772 267.962943 1942.72942 256.696915"></polyline>
+                            <path d="M2087.56693,314.290942 C2091.43638,310.485251 2091.51495,304.234146 2087.73934,300.329406 C2083.96591,296.426867 2077.7678,296.347628 2073.89616,300.155519 C2070.0267,303.96121 2069.94814,310.212315 2073.72375,314.117055 C2077.49936,318.019594 2083.69747,318.098833 2087.56693,314.290942 Z" id="Stroke-32"></path>
+                            <polyline id="Stroke-34" stroke-linecap="round" stroke-linejoin="round" points="2131.98121 223.014433 2138.44503 217.205082 2143.85408 224.147257 2150.92868 218.395999 2156.32646 225.335753 2163.07651 219.555448"></polyline>
+                            <polygon id="Stroke-2" stroke-linejoin="round" points="2127.07517 80.1451906 2106.6443 83.9316525 2110.39645 104.537205 2130.82953 100.750743"></polygon>
+                            <polyline id="Stroke-5" stroke-linecap="round" stroke-linejoin="round" points="1913.16242 262.504537 1915.28998 254.666927 1923.23918 256.765202 1925.88379 248.632488 1933.82419 250.737273 1936.19597 242.758621"></polyline>
+                            <polygon id="Stroke-6-Copy-2" stroke-linecap="round" stroke-linejoin="round" points="1853.09928 193.159266 1864.02271 193.070581 1869.40828 202.478405 1863.87041 211.974914 1852.94698 212.063598 1847.56141 202.655774"></polygon>
+                            <path d="M2041.75214,49.9035772 C2025.93592,36.3003312 2021.90367,22.7569816 2029.65539,9.27352849 L2041.75214,49.9035772 Z" id="Path-2-Copy" stroke-linecap="round" stroke-linejoin="round"></path>
+                            <path d="M1860.69633,27.6196916 C1837.92738,40.8777469 1829.69252,17.2424967 1843.25037,13.0176929 L1860.69633,27.6196916 Z" id="Path-3-Copy" stroke-linecap="round" stroke-linejoin="round"></path>
+                            <ellipse id="Oval-2-Copy" cx="1940.80268" cy="87.1143376" rx="11.5167785" ry="11.615245"></ellipse>
+                            <ellipse id="Oval-Copy-2" cx="1953.47114" cy="81.3067151" rx="5.75838926" ry="5.8076225"></ellipse>
+                            <path d="M2040.63753,385.466916 C2017.86858,398.724972 2009.63372,375.089721 2023.19157,370.864918 L2040.63753,385.466916 Z" id="Path-3-Copy" stroke-linecap="round" stroke-linejoin="round"></path>
+                            <polyline id="Stroke-12" stroke-linecap="round" stroke-linejoin="round" points="1935.0443 391.433757 1945.16117 398.617846 1937.93991 408.68485 1948.20556 416.757009 1940.98207 426.808549 1951.16779 434.410163"></polyline>
+                            <path d="M1860.18523,364.712236 C1865.81876,343.286166 1868.34302,380.1305 1882.06711,359.175566" id="Path-6" stroke-linecap="round" stroke-linejoin="round"></path>
+                            <path d="M1396.1751,208.912886 C1389.47054,212.370955 1386.73102,220.827255 1390.05836,227.796893 C1393.38569,234.768153 1401.51692,237.615021 1408.22148,234.156952 L1396.1751,208.912886 Z" id="Stroke-8" stroke-linecap="round" stroke-linejoin="round"></path>
+                            <polyline id="Stroke-12" stroke-linecap="round" stroke-linejoin="round" points="1549.87785 24.23049 1559.99473 31.4145794 1552.77346 41.4815828 1563.03911 49.5537422 1555.81563 59.6052817 1566.00134 67.2068966"></polyline>
+                            <polygon id="Stroke-38" stroke-linejoin="round" points="1523.38926 298.350272 1540.20458 290.676973 1542.96779 269.31216 1526.15247 276.985459"></polygon>
+                            <path d="M1416.28322,118.67428 C1436.68002,116.655867 1448.96458,123.117737 1453.13691,138.059891" id="Path-2" stroke-linecap="round" stroke-linejoin="round"></path>
+                            <ellipse id="Oval-2" cx="1564.84966" cy="215.882033" rx="6.91006711" ry="6.96914701"></ellipse>
+                            <path d="M1466.95705,7.96268965 C1472.59057,-13.4633802 1475.11483,23.3809534 1488.83893,2.42601998" id="Path-6" stroke-linecap="round" stroke-linejoin="round"></path>
+                            <polyline id="Stroke-12" stroke-linecap="round" stroke-linejoin="round" points="1721.47785 392.433757 1731.59473 399.617846 1724.37346 409.68485 1734.63911 417.757009 1727.41563 427.808549 1737.60134 435.410163"></polyline>
+                            <polygon id="Stroke-2" stroke-linejoin="round" points="1424.04564 376.172414 1403.61477 379.958876 1407.36692 400.564428 1427.8 396.777966"></polygon>
+                            <polygon id="Stroke-6-Copy" stroke-linecap="round" stroke-linejoin="round" points="1537.78523 397.079855 1548.72617 403.177858 1548.72617 415.373866 1537.78523 421.471869 1526.8443 415.373866 1526.8443 403.177858"></polygon>
+                            <polygon id="Stroke-6-Copy-3" stroke-linecap="round" stroke-linejoin="round" points="1556.72549 121.950808 1567.64892 121.862123 1573.03449 131.269947 1567.49662 140.766456 1556.57319 140.855141 1551.18762 131.447317"></polygon>
+                            <path d="M1647.77047,365.712236 C1653.404,344.286166 1655.92825,381.1305 1669.65235,360.175566" id="Path-6" stroke-linecap="round" stroke-linejoin="round"></path>
+                            <polyline id="Stroke-34" stroke-linecap="round" stroke-linejoin="round" points="1653.52886 148.515341 1659.99268 142.705989 1665.40173 149.648164 1672.47633 143.896906 1677.87411 150.836661 1684.62416 145.056356"></polyline>
+                            <ellipse id="Oval" cx="1775.93557" cy="121.856624" rx="9.78926174" ry="9.87295826"></ellipse>
+                            <ellipse id="Oval-Copy" cx="1785.14899" cy="110.241379" rx="14.3959732" ry="14.5190563"></ellipse>
+                            <path d="M1688.70127,12.615245 C1681.99671,16.0733141 1679.2572,24.5296142 1682.58453,31.4992528 C1685.91186,38.4705125 1694.04309,41.3173804 1700.74765,37.8593113 L1688.70127,12.615245 Z" id="Stroke-8" stroke-linecap="round" stroke-linejoin="round"></path>
+                            <path d="M1767.70679,249.718155 C1744.93783,262.976211 1736.70298,239.34096 1750.26082,235.116157 L1767.70679,249.718155 Z" id="Path-3-Copy" stroke-linecap="round" stroke-linejoin="round"></path>
+                            <path d="M1645.46711,275.671235 C1645.92716,282.879626 1651.96388,288.340318 1658.9521,287.868092 C1665.94033,287.395866 1671.23424,281.168964 1670.77644,273.958258 L1645.46711,275.671235 Z" id="Stroke-16" stroke-linecap="round" stroke-linejoin="round"></path>
+                            <polygon id="compressed-hexagon" points="1759.31774 319.488333 1766.74238 319.038872 1770.06876 324.849587 1765.97049 331.109762 1758.54585 331.559222 1755.21947 325.748508"></polygon>
+                            <path d="M1432.90787,317.613991 C1436.77732,313.8083 1436.85589,307.557195 1433.08028,303.652455 C1429.30685,299.749916 1423.10874,299.670677 1419.2371,303.478568 C1415.36764,307.284259 1415.28908,313.535364 1419.06469,317.440104 C1422.8403,321.342643 1429.03841,321.421882 1432.90787,317.613991 Z" id="Stroke-32"></path>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
