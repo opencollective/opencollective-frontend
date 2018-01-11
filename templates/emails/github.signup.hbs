@@ -7,6 +7,12 @@ Subject: {{collective.name}}: Your Collective is live!
   margin: 0 auto;
   text-align: center;
 }
+.actions a {
+  margin: 5px;
+}
+img.step {
+  margin-top: 5px;
+}
 ol {
   padding: 0px 20px 5px;
 }
@@ -20,20 +26,26 @@ h3 {
   font-size: 20px;
   font-weight: bold;
   line-height: 25px;
+  margin-top: 0;
 }
 .grey {
   color: #AAAEB3;
 }
+.cover {
+  background: url('{{config.host.website}}/static/images/email/confetti.png') no-repeat center center;
+  text-align: center;
+}
 </style>
   
-<h1>Welcome {{collective.name}},</h1>
 
-<h2>Thanks for signing up on Open Collective!</h2>
-<p class="center">We encourage collectives to show their backers and sponsors on their <b>GitHub README</b> file to acknowledge their financial contribution.</p>
+<div class="cover">
 
-<div class="actions">
-  <a href="https://github.com/opencollective/opencollective/wiki/Github-banner" class="btn"><div>More Info</div></a>
-  <a href="https://github.com/parcel-bundler/parcel/pull/228/files" class="btn"><div>See an example</div></a>
+  <img src="{{config.host.website}}/static/images/email/welcome.png" />
+
+  <h1>Welcome {{collective.name}},</h1>
+
+  <h2>Thanks for signing up on Open Collective!</h2>
+
 </div>
 
 <br />
@@ -54,7 +66,7 @@ h3 {
     </tr>
     <tr><td colspan="3" height="30"></td></tr>
     <tr>
-      <td valign="top" width="50"><img src="{{config.host.website}}/static/images/email/vertical-line-grey.png" width="30" /></td>
+      <td valign="top" width="50"><img src="{{config.host.website}}/static/images/email/vertical-line-grey.png" width="30"  class="step"/></td>
       <td valign="top">
         <h3>Customize</h3>
         <p>Make this collective your own. Add you logo, edit it, add members, and create your own tiers and rewards.</p>
@@ -67,11 +79,14 @@ h3 {
     </tr>
     <tr><td colspan="3" height="30"></td></tr>
     <tr>
-      <td valign="top" width="50"><img src="{{config.host.website}}/static/images/email/vertical-line-grey.png" width="30" /></td>
+      <td valign="top" width="50"><img src="{{config.host.website}}/static/images/email/vertical-line-grey.png" width="30"  class="step"/></td>
       <td valign="top">
-        <h3>Share</h3>
-        <p>Spread the word! Donations won’t come on their own. You need to hustle for them. Regularly tweet about it, share on Facebook, Meetup, WhatsApp, etc. Ask your community to chip in. And publicly acknowledge people who do so.</p>
-        <p>Check out our helpful how-to guide: <strong><a href="https://medium.com/open-collective/ten-steps-to-successful-open-source-crowdfunding-fa2b43e82687">Ten Steps to Successful Open Source Crowdfunding</a></strong>.</p>
+        <h3>Integrate</h3>
+        <p>We encourage collectives to show their backers and sponsors on their GitHub README and on their website to acknowledge their financial contribution.</p>
+        <div class="actions">
+          <a href="https://github.com/opencollective/opencollective/wiki/Widgets" class="btn"><div>More Info</div></a>
+          <a href="https://github.com/parcel-bundler/parcel/pull/228/files" class="btn"><div>See an example</div></a>
+        </div>
       </td>
       <td valign="top">
         <img src="{{config.host.website}}/static/images/email/github.signup.step3.png" width="180" />
@@ -79,13 +94,24 @@ h3 {
     </tr>
     <tr><td colspan="3" height="30"></td></tr>
     <tr>
-      <td valign="top" width="50"><img src="{{config.host.website}}/static/images/email/vertical-line-grey.png" width="30" /></td>
+      <td valign="top" width="50"><img src="{{config.host.website}}/static/images/email/vertical-line-grey.png" width="30"  class="step"/></td>
+      <td valign="top">
+        <h3>Share</h3>
+        <p>Spread the word! Donations won’t come on their own. You need to hustle for them. Regularly tweet about it, share on Facebook, Meetup, WhatsApp, etc. Ask your community to chip in. And publicly acknowledge people who do so.</p>
+      </td>
+      <td valign="top">
+        <img src="{{config.host.website}}/static/images/email/github.signup.step4.png" width="180" />
+      </td>
+    </tr>
+    <tr><td colspan="3" height="30"></td></tr>
+    <tr>
+      <td valign="top" width="50"><img src="{{config.host.website}}/static/images/email/vertical-line-grey.png" width="30"  class="step"/></td>
       <td valign="top">
         <h3>Get & Manage Funds</h3>
         <p>File expenses on {{config.host.website}}/{{collective.slug}}/expenses/new and don't forget to approve them (any admin of the collective –aka core contributor– can approve or reject expenses). Your host organization (the <a href="https://opencollective.com/opensource">Open Source Collective 501c6</a>) pays out once a week all the expenses that have been approuved.</p>
       </td>
       <td valign="top">
-        <img src="{{config.host.website}}/static/images/email/github.signup.step4.png" width="180" />
+        <img src="{{config.host.website}}/static/images/email/github.signup.step5.png" width="180" />
       </td>
     </tr>
   </tbody>

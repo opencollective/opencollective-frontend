@@ -2,6 +2,7 @@ const _ = require('lodash');
 import models from '../server/models';
 
 const testStripeAccounts = {
+  // Open Source Collective 501c6
   'opensource': {
     service: 'stripe',
     username: 'acct_18KWlTLzdXg9xKNS',
@@ -9,7 +10,7 @@ const testStripeAccounts = {
     data: {
       publishableKey: 'pk_test_l7H1cDlh2AekeETfq742VJbC'
     },
-    CollectiveId: 9805
+    CollectiveId: 11004
   },
   // Open Collective Inc. host for meetups
   'other': {

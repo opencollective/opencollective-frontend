@@ -1,3 +1,6 @@
+import nodemailer from 'nodemailer';
+import config from 'config';
+
 const templateName =  process.argv[2];
 const data = {};
 data['ticket.confirmed'] = {
@@ -136,6 +139,26 @@ const defaultData = {
   }
 }
 
+/*
+ * Gets the body from a string (usually a template)
+ */
+const getTemplateAttributes = (str) => {
+  let index = 0;
+  const lines = str.split('\n');
+  const attributes = {};
+  let tokens;
+  do {
+    tokens = lines[index++].match(/^([a-z]+):(.+)/i);
+    if (tokens) {
+      attributes[tokens[1].toLowerCase()] = tokens[2].replace(/<br( \/)?>/g,'\n').trim();
+    }
+  } while (tokens);
+
+  attributes.body = lines.slice(index).join('\n').trim();
+  return attributes;
+};
+
+
 if (!templateName) {
   console.log('\nCompiles a registered email template to stdout.\n');
   console.log('Usage: npm run compile:email <name>\n');
@@ -153,7 +176,22 @@ if (!templateName) {
   const libEmailTemplates = require('../server/lib/emailTemplates');
   const template = libEmailTemplates[templateName];
   if (template) {
-    process.stdout.write(juice(template({ ...data[templateName], ...defaultData })));
+    const html = juice(template({ ...data[templateName], ...defaultData }));
+    if (process.env.MAILGUN_PASSWORD) {
+      const attributes = getTemplateAttributes(html);
+      const mailgun = nodemailer.createTransport({
+        service: 'Mailgun',
+        auth: {
+          user: config.mailgun.user,
+          pass: config.mailgun.password
+        }
+      });
+      console.log(">>> Sending by email to ", process.env.EMAIL);
+      mailgun.sendMail({ from: config.email.from, to: process.env.EMAIL, subject: attributes.subject, html: attributes.body }, (err, info) => {
+        console.log("email sent");
+      });
+    }
+    process.stdout.write(html);
   } else {
     console.log(`The email template "${templateName}" does not exist.`);
   }
