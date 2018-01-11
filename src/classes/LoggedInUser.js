@@ -59,7 +59,7 @@ LoggedInUser.prototype.canEditExpense = function(expense) {
 LoggedInUser.prototype.canPayExpense = function(expense) {
   const hostSlug = get(expense, 'collective.host.slug');
   // second part of if statement is a hack, in case this User's Collective is the Host
-  if ((intersection(roles[hostSlug], ['HOST', 'ADMIN']).length > 0) 
+  if ((intersection(this.roles[hostSlug], ['HOST', 'ADMIN']).length > 0)
     || (this.collective.slug === hostSlug)) {
     return true;
   }
