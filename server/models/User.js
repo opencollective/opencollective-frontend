@@ -385,7 +385,7 @@ export default (Sequelize, DataTypes) => {
   User.prototype.populateRoles = async function() {
 
     if (this.rolesByCollectiveId) {
-      debug("roles already populated", this.rolesByCollectiveId);
+      debug("roles already populated");
       return Promise.resolve(this.rolesByCollectiveId);
     }
     const rolesByCollectiveId = {};
@@ -409,7 +409,6 @@ export default (Sequelize, DataTypes) => {
       hostedMemberships.map(m => {
         rolesByCollectiveId[m.CollectiveId] = rolesByCollectiveId[m.CollectiveId] || [];
         rolesByCollectiveId[m.CollectiveId].push(roles.ADMIN);
-        debug(">>> adding UserId ", this.id, "as admin of hosted collective ", m.CollectiveId);
       });
     }
     this.rolesByCollectiveId = rolesByCollectiveId;

@@ -5,6 +5,11 @@
       "dialect": "postgres",
       "protocol": "postgres",
       "logging": true,
+      "pool": {
+        "min": 4,
+        "max": 10,
+        "acquire": 60000
+      },
       "dialectOptions": {
         "ssl": true
       }
