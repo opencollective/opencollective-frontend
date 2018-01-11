@@ -33,8 +33,10 @@ const testStripeAccounts = {
   }
 }
 
-testStripeAccounts.wwcode = testStripeAccounts.opensource;
-testStripeAccounts.wwcode.CollectiveId = 9804;
+testStripeAccounts.wwcode = {
+  ...testStripeAccounts.opensource,
+  CollectiveId: 9804
+};
 
 const done = (err) => {
   if (err) console.log('err', err);
