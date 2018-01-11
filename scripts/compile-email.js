@@ -131,7 +131,7 @@ data['user.monthlyreport'] = {
 const defaultData = {
   config: {
     host: {
-      website: 'https://opencollective.com'
+      website: process.env.WEBSITE_URL || 'https://opencollective.com'
     }
   }
 }

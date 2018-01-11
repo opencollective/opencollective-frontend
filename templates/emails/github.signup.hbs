@@ -3,6 +3,10 @@ Subject: {{collective.name}}: Your Collective is live!
 {{> header}}
 
 <style>
+.actions {
+  margin: 0 auto;
+  text-align: center;
+}
 ol {
   padding: 0px 20px 5px;
 }
@@ -10,39 +14,106 @@ li {
   margin: 15px 0px;
   line-height: 1.4; 
 }
+h3 {
+	color: #303233;
+  font-family: "Helvetica Neue";
+  font-size: 20px;
+  font-weight: bold;
+  line-height: 25px;
+}
+.grey {
+  color: #AAAEB3;
+}
 </style>
   
-{{#if firstName}} 
-<p>Dear {{firstName}},</p> 
-{{else}} 
-<p>Hi!!</p>  
-{{/if}}
+<h1>Welcome {{collective.name}},</h1>
 
-<p>Thanks for signing up on Open Collective! Your collective has been created: <strong><a href="{{config.host.website}}/{{collective.slug}}">{{collective.name}}</a></strong>.</p>
-  
-<p>Your collective is pre-approved and you can receive donations up to $500 while we review it. We will make a PR to your README file in Github once it's approved.</p>
-<p>Check out our helpful how-to guide: <strong><a href="https://medium.com/open-collective/ten-steps-to-successful-open-source-crowdfunding-fa2b43e82687">Ten Steps to Successful Open Source Crowdfunding</a></strong>.</p>
- 
-<p>Top tips:</p>
-<ol type="1"> 
-<li><strong>Make your collective your own.</strong> <a href="{{config.host.website}}/login">Login</a> to edit it, add members and set up your preferred contribution tiers.  </li> 
+<h2>thanks for signing up on Open Collective!</h2>
+<p class="center">We encourage collectives to show their backers and sponsors on their <b>GitHub README</b> file to acknowledge their financial contribution.</p>
 
-<li><strong>Feature your backers & sponsors on your Github & website.</strong> Find instructions to add your backers to your website <a href="https://opencollective.com/widgets">here</a>.</li>
+<div class="actions">
+  <a href="https://github.com/opencollective/opencollective/wiki/Github-banner" class="btn"><div>More Info</div></a>
+  <a href="https://github.com/parcel-bundler/parcel/pull/228/files" class="btn"><div>See an example</div></a>
+</div>
 
-<li><strong>Submit expenses:</strong> <a href="{{config.host.website}}/{{collective.slug}}/expenses">{{config.host.website}}/{{collective.slug}}/expenses</a>, to let potential backers know what they're helping to fund.</li>
+<br />
+<br />
+<br />
 
-<li><strong>Spread the word.</strong> You can <a href="{{config.host.website}}/{{collective.slug}}/connect/twitter">connect your Twitter account to your collective</a> and automatically thank your backers. You can also <a href="https://github.com/OpenCollective/OpenCollective/wiki/Slack-and-Gitter">connect your Slack/Gitter</a> for notifications.</li>
+<table>
+  <tbody>
+    <tr class="grey">
+      <td valign="top" width="50"><img src="{{config.host.website}}/static/images/email/vertical-line-green.png" width="30" /></td>
+      <td valign="top">
+        <h3 class="grey">Create</h3>
+        <p class="grey">Your collective <a href="{{config.host.website}}/{{collective.slug}}">{{collective.name}}</a> has been created and you are now a few steps away from receiving donations!</p>
+      </td>
+      <td valign="top">
+        <img src="{{config.host.website}}/static/images/email/github.signup.step1.png" width="180" />
+      </td>
+    </tr>
+    <tr><td colspan="3" height="30"></td></tr>
+    <tr>
+      <td valign="top" width="50"><img src="{{config.host.website}}/static/images/email/vertical-line-grey.png" width="30" /></td>
+      <td valign="top">
+        <h3>Customize</h3>
+        <p>Make this collective your own. Add you logo, edit it, add members, and create your own tiers and rewards.</p>
+        <p><strong>Feature your backers & sponsors on your Github & website.</strong> Find instructions to add your backers to your website <a href="https://opencollective.com/widgets">here</a>.</p>
+        <a href="{{config.host.website}}/{{collective.slug}}/edit" class="btn blue"><div>Edit your Collective</div></a>
+      </td>
+      <td valign="top">
+        <img src="{{config.host.website}}/static/images/email/github.signup.step2.png" width="180" />
+      </td>
+    </tr>
+    <tr><td colspan="3" height="30"></td></tr>
+    <tr>
+      <td valign="top" width="50"><img src="{{config.host.website}}/static/images/email/vertical-line-grey.png" width="30" /></td>
+      <td valign="top">
+        <h3>Share</h3>
+        <p>Spread the word! Donations won’t come on their own. You need to hustle for them. Regularly tweet about it, share on Facebook, Meetup, WhatsApp, etc. Ask your community to chip in. And publicly acknowledge people who do so.</p>
+        <p>Check out our helpful how-to guide: <strong><a href="https://medium.com/open-collective/ten-steps-to-successful-open-source-crowdfunding-fa2b43e82687">Ten Steps to Successful Open Source Crowdfunding</a></strong>.</p>
+      </td>
+      <td valign="top">
+        <img src="{{config.host.website}}/static/images/email/github.signup.step3.png" width="180" />
+      </td>
+    </tr>
+    <tr><td colspan="3" height="30"></td></tr>
+    <tr>
+      <td valign="top" width="50"><img src="{{config.host.website}}/static/images/email/vertical-line-grey.png" width="30" /></td>
+      <td valign="top">
+        <h3>Get & Manage Funds</h3>
+        <p>File expenses on {{config.host.website}}/{{collective.slug}}/expenses/new and don't forget to approve them (any admin of the collective –aka core contributor– can approve or reject expenses). Your host organization (the <a href="https://opencollective.com/opensource">Open Source Collective 501c6</a>) pays out once a week all the expenses that have been approuved.</p>
+      </td>
+      <td valign="top">
+        <img src="{{config.host.website}}/static/images/email/github.signup.step4.png" width="180" />
+      </td>
+    </tr>
+  </tbody>
+</table>
 
-</ol>
+<br />
+<br />
+<br />
 
-<p>Looking for inspiration? Check out <a href="https://opencollective.com/opensource">some other collectives</a> to see how they're raising and spending funds.</p>
+<h1>Need inspiration?</h1>
+<h2>See how other collectives are raising and spending funds.</h2>
 
-<p>If you have questions, <a href="https://slack.opencollective.com">join our Slack</a>, check our <a href="https://github.com/opencollective/opencollective/wiki">wiki</a> or the <a href="https://forum.opencollective.com">forum</a>. We're here to help!</p>
+<div class="center">
+  <a class="btn" href="https://opencollective.com/discover"><div>Discover</div></a>
+</div>
 
-<p>Cheers,</p>
+<br />
+<br />
+<br />
 
-<p>
-  – Open Collective Team
+<p class="center">
+  If you have questions, <a href="https://slack.opencollective.com">join our Slack</a>, check our <a href="https://github.com/opencollective/opencollective/wiki">wiki</a> or the <a href="https://forum.opencollective.com">forum</a>. We're here to help!
+</p>
+
+<p class="center">Cheers,</p>
+
+<p class="center">
+  <strong>– Open Collective Team</strong>
 </p>
 
 {{> footer}}
