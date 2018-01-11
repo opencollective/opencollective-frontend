@@ -11,6 +11,14 @@
     [
       "styled-jsx/babel", { "plugins": ["styled-jsx-plugin-postcss"] }
     ],
+    ["module-resolver", {
+      "root": ["."],
+      "alias": {
+        "styles": "./src/styles",
+        "markdown": "./src/markdown"
+      },
+      "cwd": "babelrc"
+    }],
     "markdown-in-js/babel",
     [
       "wrap-in-js",
