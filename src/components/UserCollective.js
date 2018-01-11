@@ -85,6 +85,7 @@ class UserCollective extends React.Component {
     const memberOf = groupBy(this.collective.memberOf, 'role');
     const actions = [];
     Object.keys(memberOf).map(role => {
+      if (!this.messages[`user.collective.menu.${role.toLowerCase()}`]) return;
       actions.push(
         {
           className: 'whiteblue',
@@ -265,7 +266,7 @@ class UserCollective extends React.Component {
                   </div>
                 </section>
               }
-              { Object.keys(memberOf).map(role => role !== 'HOST' && (
+              { Object.keys(memberOf).map(role => role !== 'HOST' && this.messages[`${type}.collective.memberOf.${role.toLowerCase()}.title`] && (
                 <section id={role}>
                   <h1>{intl.formatMessage(this.messages[`${type}.collective.memberOf.${role.toLowerCase()}.title`], { n: memberOf[role].length })}</h1>
                   { LoggedInUser && this.messages[`user.collective.memberOf.${role.toLowerCase()}.LoggedInDescription`] &&
