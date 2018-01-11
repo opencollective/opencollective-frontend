@@ -19,7 +19,7 @@ const init = (skip_signin = false) => {
 describe("create an organization", () => {
 
   it ("edit info", () => {
-    init(true);
+    init();
     fill("name", "New org");
     fill("twitterHandle", "twitterHandle");
     fill("description", "short description for new org");

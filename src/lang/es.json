@@ -307,9 +307,12 @@
   "paymentMethod.bitcoin.instructions": "You can then proceed with the donation. We will send you an email to {email} once the transaction is confirmed.",
   "response.status.interested": "{name} se interesa",
   "response.status.yes": "{name} atenderá",
+  "user.website.description": "If any",
   "signin.loading.description": "Un momento por favor...",
   "signin.createAccount": "Crear una cuenta",
   "signin.login.description": "¡Qué bueno verte de vuelta! Haz click en \"Login\" (o dale a Enter) y te enviaremos un link a tu correo para ingresar.",
+  "signin.signup.success.title": "✓ Account created with success",
+  "signup.success.description": "An email has been sent with a link to login to your account. You can now safely close this tab.",
   "signinup.email.label": "correo electrónico",
   "signinup.firstName.label": "nombre",
   "signinup.lastName.label": "apellido",
@@ -415,5 +418,6 @@
   "discover.subtitle": "Every contribution matters",
   "expenses.title": "Gastos",
   "collective.newExpense.title": "Submit a new expense",
+  "loginform.title": "Sign in or Create an Account",
   "tiers.title": "Súmate al colectivo"
 }
