@@ -22,7 +22,6 @@ class Footer extends React.Component {
           display: flex;
           align-items: center;
           justify-content: space-around;
-          justify-content: 
           max-width: 1070px;
           margin: 0 auto;
         }

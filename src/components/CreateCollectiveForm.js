@@ -12,7 +12,7 @@ import withIntl from '../lib/withIntl';
 import { ButtonGroup, Button } from 'react-bootstrap';
 import { Link } from '../server/pages';
 
-class EditCollectiveForm extends React.Component {
+class CreateCollectiveForm extends React.Component {
 
   static propTypes = {
     collective: PropTypes.object,
@@ -25,7 +25,6 @@ class EditCollectiveForm extends React.Component {
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.handleObjectChange = this.handleObjectChange.bind(this);
-    this.showSection = this.showSection.bind(this);
 
     const collective = { ... props.collective || {} };
     collective.slug = collective.slug ? collective.slug.replace(/.*\//, '') : '';
@@ -33,17 +32,8 @@ class EditCollectiveForm extends React.Component {
     this.state = {
       modified: false,
       section: 'info',
-      collective,
-      members: collective.members || [{}],
-      tiers: collective.tiers || [{}],
-      paymentMethods: collective.paymentMethods || [{}]
+      collective
     };
-
-    this.showEditTiers = ['COLLECTIVE', 'EVENT'].includes(collective.type);
-    this.defaultTierType = collective.type === 'EVENT' ? 'TICKET' : 'TIER';
-    this.showEditMembers = ['COLLECTIVE', 'ORGANIZATION'].includes(collective.type);
-    this.showPaymentMethods = ['USER', 'ORGANIZATION'].includes(collective.type);
-    this.members = collective.members && collective.members.filter(m => ['ADMIN','MEMBER'].includes(m.role));
 
     this.messages = defineMessages({
       'slug.label': { id: 'collective.slug.label', defaultMessage: 'url' },
@@ -67,11 +57,6 @@ class EditCollectiveForm extends React.Component {
     window.OC = { collective, state: this.state };
   }
 
-  showSection(section) {
-    window.location.hash = `#${section}`;
-    this.setState({section});
-  }
-
   componentDidMount() {
     const hash = window.location.hash;
     if (hash) {
@@ -92,19 +77,12 @@ class EditCollectiveForm extends React.Component {
   }
 
   handleObjectChange(obj) {
-    console.log(">>> handleObjectChange", obj);
     this.setState({ ...obj, modified: true });
     window.state = this.state;
   }
 
   async handleSubmit() {
-    const collective = {
-      ...this.state.collective,
-      tiers: this.state.tiers,
-      members: this.state.members,
-      paymentMethods: this.state.paymentMethods
-    };
-    this.props.onSubmit(collective);
+    this.props.onSubmit(this.state.collective);
     this.setState({ modified: false })
   }
 
@@ -113,7 +91,6 @@ class EditCollectiveForm extends React.Component {
     const { collective, loading, intl } = this.props;
 
     const isNew = !(collective && collective.id);
-    const submitBtnLabel = loading ? "loading" : isNew ? "Create Event" : "Save";
     const defaultStartsAt = new Date;
     const type = collective.type.toLowerCase();
     defaultStartsAt.setHours(19);
@@ -147,43 +124,19 @@ class EditCollectiveForm extends React.Component {
           pre: 'http://',
           placeholder: ''
         },
-        // {
-        //   name: 'location',
-        //   placeholder: 'Search cities',
-        //   type: 'location',
-        //   options: {
-        //     types: ['cities']
-        //   }
-        // },
+        {
+          name: 'location',
+          placeholder: 'Search cities',
+          type: 'location',
+          options: {
+            types: ['(cities)']
+          }
+        },
         {
           name: 'longDescription',
           type: 'textarea',
           placeholder: '',
-          description: 'Protip: you can use markdown'
-        }
-      ],
-      images: [
-        {
-          name: 'image',
-          type: 'dropzone',
-          placeholder: 'Drop an image or click to upload',
-          className: 'horizontal',
-          when: () => this.state.section === 'images'
-        },
-        {
-          name: 'backgroundImage',
-          type: 'dropzone',
-          placeholder: 'Drop an image or click to upload',
-          className: 'horizontal',
-          when: () => this.state.section === 'images'
-        }
-      ],
-      advanced: [
-        {
-          name: 'slug',
-          pre: `https://opencollective.com/`,
-          placeholder: '',
-          when: () => this.state.section === 'advanced'
+          help: 'Protip: you can use markdown'
         }
       ]
     }
@@ -202,7 +155,7 @@ class EditCollectiveForm extends React.Component {
     });
 
     return (
-      <div className="EditCollectiveForm">
+      <div className="CreateCollectiveForm">
         <style jsx>{`
         :global(.field) {
           margin: 1rem;
@@ -263,50 +216,14 @@ class EditCollectiveForm extends React.Component {
         }
         `}</style>
 
-        <div className="menu">
-          <ButtonGroup className="menuBtnGroup">
-            <Button className="menuBtn info" bsStyle={this.state.section === 'info' ? 'primary' : 'default'} onClick={() => this.showSection('info')}>
-              <FormattedMessage id='editCollective.menu.info' defaultMessage='info' />
-            </Button>
-            <Button className="menuBtn images" bsStyle={this.state.section === 'images' ? 'primary' : 'default'} onClick={() => this.showSection('images')}>
-              <FormattedMessage id='editCollective.menu.' defaultMessage='images' />
-            </Button>
-            { this.showEditMembers &&
-              <Button className="menuBtn members" bsStyle={this.state.section === 'members' ? 'primary' : 'default'} onClick={() => this.showSection('members')}>
-                <FormattedMessage id='editCollective.menu.members' defaultMessage='members' />
-              </Button>
-            }
-            { this.showEditTiers &&
-              <Button className="menuBtn tiers" bsStyle={this.state.section === 'tiers' ? 'primary' : 'default'} onClick={() => this.showSection('tiers')}>
-                <FormattedMessage id='editCollective.menu.tiers' defaultMessage='tiers' />
-              </Button>
-            }
-            { this.showPaymentMethods &&
-              <Button className="menuBtn paymentMethods" bsStyle={this.state.section === 'paymentMethods' ? 'primary' : 'default'} onClick={() => this.showSection('paymentMethods')}>
-                <FormattedMessage id='editCollective.menu.paymentMethods' defaultMessage='Payment Methods' />
-              </Button>
-            }
-            <Button className="menuBtn connectedAccounts" bsStyle={this.state.section === 'connectedAccounts' ? 'primary' : 'default'} onClick={() => this.showSection('connectedAccounts')}>
-              <FormattedMessage id='editCollective.menu.connectedAccounts' defaultMessage='Connected Accounts' />
-            </Button>
-            { collective.type === 'COLLECTIVE' &&
-            <Button className="menuBtn export" bsStyle={this.state.section === 'export' ? 'primary' : 'default'} onClick={() => this.showSection('export')}>
-              <FormattedMessage id='editCollective.menu.export' defaultMessage='export' />
-            </Button>
-            }
-            <Button className="menuBtn advanced" bsStyle={this.state.section === 'advanced' ? 'primary' : 'default'} onClick={() => this.showSection('advanced')}>
-              <FormattedMessage id='editCollective.menu.advanced' defaultMessage='advanced' />
-            </Button>
-          </ButtonGroup>
-        </div>
-
         <div className="FormInputs">
           { Object.keys(this.fields).map(key => this.state.section === key &&
             <div className="inputs">
               {this.fields[key].map((field) => (!field.when || field.when()) && <InputField
                 key={field.name}
+                value={this.state.collective[field.name]}
                 className={field.className}
-                defaultValue={field.defaultValue || this.state.collective[field.name]}
+                defaultValue={field.defaultValue}
                 validate={field.validate}
                 ref={field.name}
                 name={field.name}
@@ -315,56 +232,25 @@ class EditCollectiveForm extends React.Component {
                 options={field.options}
                 placeholder={field.placeholder}
                 type={field.type}
+                help={field.help}
                 pre={field.pre}
                 context={this.state.collective}
                 onChange={(value) => this.handleChange(field.name, value)}
                 />)}
             </div>
           )}
-          { this.state.section === 'members' &&
-            <EditMembers title="Edit members" members={this.members} collective={collective} onChange={this.handleObjectChange} />
-          }
-          { this.state.section === 'tiers' &&
-            <EditTiers
-              title="Tiers"
-              tiers={this.state.tiers}
-              collective={collective}
-              currency={collective.currency}
-              onChange={this.handleObjectChange}
-              defaultType={this.defaultTierType}
-              />
-          }
-          { this.state.section === 'paymentMethods' &&
-            <EditPaymentMethods
-              paymentMethods={this.state.paymentMethods}
-              collective={collective}
-              onChange={this.handleObjectChange}
-              />
-          }
-          { this.state.section === 'connectedAccounts' &&
-            <EditConnectedAccounts
-              collective={collective}
-              connectedAccounts={collective.connectedAccounts}
-              />
-          }
-          { this.state.section === 'export' &&
-            <ExportData
-              collective={collective}
-              />
-          }
         </div>
-        { this.state.section !== 'export' &&
-          <div className="actions">
-            <Button bsStyle="primary" type="submit" ref="submit" onClick={this.handleSubmit} disabled={loading || !this.state.modified} >{submitBtnLabel}</Button>
-            <div className="backToProfile">
-              <Link route={`/${collective.slug}`}><a><FormattedMessage id="collective.edit.backToProfile" defaultMessage="or go back to the {type} page" values={{ type }} /></a></Link>
-            </div>
-          </div>
-        }
+        <div className="actions">
+          <Button bsStyle="primary" type="submit" ref="submit" onClick={this.handleSubmit} disabled={loading || !this.state.modified} >
+            { loading && <FormattedMessage id="loading" defaultMessage="loading" /> }
+            { !loading && collective.type === 'COLLECTIVE' && <FormattedMessage id="host.apply" defaultMessage="Apply to create a collective" /> }
+            { !loading && collective.type === 'ORGANIZATION' && <FormattedMessage id="organization.create" defaultMessage="Create organization" /> }
+          </Button>
+        </div>
       </div>
     );
   }
 
 }
 
-export default withIntl(EditCollectiveForm);
+export default withIntl(CreateCollectiveForm);

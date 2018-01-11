@@ -54,8 +54,7 @@ class HostExpensesPage extends React.Component {
 
     return (
       <div className="HostExpensesPage">
-        <style jsx>{`
-        `}</style>
+
         <Header
           title={collective.name}
           description={collective.description}

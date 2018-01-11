@@ -212,6 +212,11 @@ class TopBarProfileMenu extends React.Component {
           <ul>
             <li><a href={`/${LoggedInUser.username}`}><FormattedMessage id="menu.profile" defaultMessage="profile" /></a></li>
             <li><a href='/subscriptions'><FormattedMessage id="menu.subscriptions" defaultMessage="Subscriptions" /></a></li>
+            <li>
+              <Link route="/organizations/new">
+                <a><FormattedMessage id="menu.createOrganization" defaultMessage="Create an Organization" /></a>
+              </Link>
+            </li>
             <li><a className='-blue' href='#' onClick={this.logout}><FormattedMessage id="menu.logout" defaultMessage="logout" /></a></li>
           </ul>
         </div>
