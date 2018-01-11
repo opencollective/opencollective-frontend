@@ -74,11 +74,11 @@ class HostExpensesPage extends React.Component {
             style={get(collective, 'settings.style.hero.cover')}
             />
 
-          <CollectivePicker
+          {/* <CollectivePicker
             hostCollectiveSlug={this.props.collectiveSlug}
             LoggedInUser={LoggedInUser}
             onChange={(selectedCollective => this.pickCollective(selectedCollective))}
-            />
+            /> */}
 
           <div className="content" >
 
