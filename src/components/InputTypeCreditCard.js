@@ -75,7 +75,11 @@ class InputTypeCreditCard extends React.Component {
         <style jsx>{`
         .CreditCardForm {
           max-width: 350px;
-          margin: 1rem 0;
+          margin: 0;
+          border: 1px solid #ccc;
+          padding: 1rem;
+          max-height: 55px;
+          border-radius: 3px;
         }
         .oneline {
           display: flex;
