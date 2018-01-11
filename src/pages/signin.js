@@ -7,6 +7,7 @@ import Loading from '../components/Loading';
 import SignInForm from '../components/SignInForm';
 import withIntl from '../lib/withIntl';
 import { isValidUrl } from '../lib/utils';
+import { FormattedMessage } from 'react-intl';
 
 class LoginPage extends React.Component {
 
