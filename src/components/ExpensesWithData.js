@@ -3,11 +3,12 @@ import PropTypes from 'prop-types';
 import Error from '../components/Error';
 import withIntl from '../lib/withIntl';
 import Expenses from '../components/Expenses';
+import Currency from '../components/Currency';
 import CreateExpenseForm from '../components/CreateExpenseForm';
 import { graphql, compose } from 'react-apollo'
 import gql from 'graphql-tag'
 import { FormattedMessage } from 'react-intl'
-import { pick } from 'lodash';
+import { pick, get } from 'lodash';
 
 class ExpensesWithData extends React.Component {
 
@@ -64,6 +65,7 @@ class ExpensesWithData extends React.Component {
     }
 
     const expenses = data.allExpenses;
+    const availableBalance = get(collective, 'stats.balance');
 
     return (
       <div className="ExpensesContainer">
@@ -92,6 +94,13 @@ class ExpensesWithData extends React.Component {
           .adminActions ul li {
             margin: 0 2rem;
           }
+          .availableBalance {
+            text-align: center;
+            margin: 1rem;
+          }
+          .availableBalance span {
+            margin-right: 0.5rem;
+          }
         `}</style>
 
         { !includeHostedCollectives && this.state.showNewExpenseForm &&
@@ -113,6 +122,12 @@ class ExpensesWithData extends React.Component {
             <h1>
               <FormattedMessage id="collective.latestExpenses.title" defaultMessage="{n, plural, one {Latest Expense} other {Latest Expenses}}" values={{n: 2 }} />
             </h1>
+            { !includeHostedCollectives && availableBalance &&
+              <div className="availableBalance">
+                <FormattedMessage id="collective.stats.balance.title" defaultMessage="Available balance:" />
+                <Currency value={availableBalance} currency={collective.currency} precision={2} />
+              </div>
+            }
             <div className="adminActions">
               <ul>
               { !includeHostedCollectives && !this.state.showNewExpenseForm &&

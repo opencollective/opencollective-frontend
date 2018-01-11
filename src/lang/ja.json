@@ -257,6 +257,7 @@
   "error.email.invalid": "メールアドレスが違います",
   "creditcard.label": "クレジットカード",
   "creditcard.save": "Save credit card to {type, select, user {my account} other {{type} account}}",
+  "creditcard.missing": "Credit card missing",
   "paymentMethod.type": "Payment method",
   "paymentMethod.creditcard": "credit card",
   "paymentMethod.bitcoin": "bitcoin",
@@ -399,7 +400,6 @@
   "collective.user.emptyProfile": "Your profile looks a bit empty ¯\\\\_(ツ)_/¯",
   "collective.user.loggedout.editProfile": "プロフィール編集のためにはログインが必要です",
   "host.collectives.manage": "Manage expenses",
-  "utils.free": "free",
   "actions.approveCollective.processing": "Approving collective",
   "actions.approveExpense.processing": "Approving expense",
   "actions.rejectExpense.processing": "Rejecting expense",
@@ -414,10 +414,7 @@
   "tier.name.payment": "payment",
   "tier.button.donation": "支援する",
   "tier.description.donation": "温かいご支援ありがとうございます 🙏",
-  "discover.title": "Discover awesome collectives to support",
-  "discover.subtitle": "Every contribution matters",
   "expenses.title": "Expenses",
-  "collective.newExpense.title": "Submit a new expense",
   "loginform.title": "Sign in or Create an Account",
   "tiers.title": "参加する"
 }

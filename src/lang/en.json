@@ -257,6 +257,7 @@
   "error.email.invalid": "Invalid email address",
   "creditcard.label": "Credit Card",
   "creditcard.save": "Save credit card to {type, select, user {my account} other {{type} account}}",
+  "creditcard.missing": "Credit card missing",
   "paymentMethod.type": "Payment method",
   "paymentMethod.creditcard": "credit card",
   "paymentMethod.bitcoin": "bitcoin",
@@ -399,7 +400,6 @@
   "collective.user.emptyProfile": "Your profile looks a bit empty ¯\\\\_(ツ)_/¯",
   "collective.user.loggedout.editProfile": "Please login to edit your profile",
   "host.collectives.manage": "Manage expenses",
-  "utils.free": "free",
   "actions.approveCollective.processing": "Approving collective",
   "actions.approveExpense.processing": "Approving expense",
   "actions.rejectExpense.processing": "Rejecting expense",
@@ -414,10 +414,7 @@
   "tier.name.payment": "payment",
   "tier.button.donation": "donate",
   "tier.description.donation": "Thank you for your kind donation 🙏",
-  "discover.title": "Discover awesome collectives to support",
-  "discover.subtitle": "Every contribution matters",
   "expenses.title": "Expenses",
-  "collective.newExpense.title": "Submit a new expense",
   "loginform.title": "Sign in or Create an Account",
   "tiers.title": "Join the collective"
 }

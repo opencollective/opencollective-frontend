@@ -257,6 +257,7 @@
   "error.email.invalid": "correo electrónico inválido",
   "creditcard.label": "Tarjeta de crédito",
   "creditcard.save": "Guardar esta tarjeta de crédito en {type, select, user {mi cuenta} other {{type} cuenta}}",
+  "creditcard.missing": "Credit card missing",
   "paymentMethod.type": "tipo",
   "paymentMethod.creditcard": "credit card",
   "paymentMethod.bitcoin": "bitcoin",
@@ -399,7 +400,6 @@
   "collective.user.emptyProfile": "Tu perfil está un poco vacío ¯\\\\_(ツ)_/¯",
   "collective.user.loggedout.editProfile": "Por favor ingresa para poder editar tu perfil",
   "host.collectives.manage": "Manage expenses",
-  "utils.free": "free",
   "actions.approveCollective.processing": "Approving collective",
   "actions.approveExpense.processing": "Approving expense",
   "actions.rejectExpense.processing": "Rejecting expense",
@@ -414,10 +414,7 @@
   "tier.name.payment": "payment",
   "tier.button.donation": "donar",
   "tier.description.donation": "Gracias por tu amable contribución",
-  "discover.title": "Discover awesome collectives to support",
-  "discover.subtitle": "Every contribution matters",
   "expenses.title": "Gastos",
-  "collective.newExpense.title": "Submit a new expense",
   "loginform.title": "Sign in or Create an Account",
   "tiers.title": "Súmate al colectivo"
 }
