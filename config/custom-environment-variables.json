@@ -71,5 +71,9 @@
   },
   "expressperf": {
     "api_key": "EXPRESS_PERF_API_KEY"
+  },
+  "algolia": {
+    "appId": "ALGOLIA_APP_ID",
+    "appKey": "ALGOLIA_KEY"
   }
 }
