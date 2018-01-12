@@ -7,11 +7,13 @@ if [ "$NODE_ENV" = "circleci" ]; then
   cd -
   echo "> Starting frontend server"
   npm start &
-  echo "> Running cypress tests"
-  cypress run --record
-else
-  echo "> Running cypress tests"
-  cypress run --record
 fi
-echo "Starting e2e jest tests"
+echo ""
+echo "> Starting server jest tests"
+jest test/server/*
+echo ""
+echo "> Running cypress tests"
+cypress run --record
+echo ""
+echo "> Starting e2e jest tests"
 jest test/e2e/* -w 1
