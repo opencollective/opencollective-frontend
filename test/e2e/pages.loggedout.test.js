@@ -10,7 +10,7 @@ describe("pages.loggedout", () => {
   test("goes to a custom donate URL", async () => {
     jest.setTimeout(10000);
     const screenshot = await browser
-      .goto(`${WEBSITE_URL}/webpack/donate/50/month/custom%20description`)
+      .goto(`${WEBSITE_URL}/apex/donate/50/month/custom%20description`)
       .wait('.tier')
       .scrollToElement('.tier')
       .screenshot();
@@ -39,13 +39,13 @@ describe("pages.loggedout", () => {
   test("loads the /collectives iframe", async () => {
     jest.setTimeout(10000);
     const screenshot = await browser
-      .goto(`${WEBSITE_URL}/brusselstogetherasbl/collectives.html?role=host&limit=5`)
+      .goto(`${WEBSITE_URL}/brusselstogether/collectives.html?role=host&limit=5`)
       .wait('.CollectiveCard')
       .screenshot();
 
     download("collectives.iframe", screenshot);
     const numberOfCollectives = await browser.evaluate(() => document.querySelectorAll('.CollectiveCard').length);
-    expect(numberOfCollectives).toEqual(5);
+    expect(numberOfCollectives).toEqual(2);
   });
 
 });

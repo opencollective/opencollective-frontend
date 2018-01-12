@@ -17,7 +17,7 @@ describe("collective.loggedout.createOrder", () => {
       const email = `testuser+${Math.round(Math.random()*1000000)}@gmail.com`;
 
       const screenshot = await browser
-        .goto(`${WEBSITE_URL}/webpack/donate?test=e2e`)
+        .goto(`${WEBSITE_URL}/apex/donate?test=e2e`)
         .type(email, "input[name='email']")
         .type("Xavier", "input[name='firstName']")
         .type("Damman", "input[name='lastName']")
@@ -42,7 +42,7 @@ describe("collective.loggedout.createOrder", () => {
       const thankyou = await browser.exists('p.thankyou');
       expect(thankyou).toBeTruthy();
       const messageContent = await browser.evaluate(() => document.querySelector('.message').innerText);
-      expect(messageContent).toEqual(expect.stringContaining('webpack'));
+      expect(messageContent).toEqual(expect.stringContaining('apex'));
     }
 
     try {
