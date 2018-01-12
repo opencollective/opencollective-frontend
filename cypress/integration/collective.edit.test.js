@@ -61,6 +61,7 @@ describe("edit collective", () => {
       .last().should('contain', 'Donor (one time donation)')
     cy.visit(`${WEBSITE_URL}/testcollective/edit#tiers`);
     cy.get('.EditTiers .tier').last().find('.removeTier').click();
+    cy.wait(500)
     cy.get('.actions > .btn').click(); // save changes
     cy.get('.backToProfile a').click(); // back to profile
     cy.get('.CollectivePage .tiers', { timeout: 10000 }).find('.TierCard')
