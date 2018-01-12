@@ -67,6 +67,7 @@ module.exports = (server, app) => {
   server.get('/:collectiveSlug/:backerType/:position/website(.:format(png|jpg|svg))?', mw.ga, controllers.collectives.website);
 
   server.get('/:collectiveSlug/tiers/:tierSlug.:format(png|jpg|svg)', controllers.collectives.banner);
+  server.get('/:collectiveSlug.:format(json)', controllers.collectives.info);
   server.get('/:collectiveSlug/members.:format(json|csv)', controllers.members.list);
   server.get('/:collectiveSlug/members/:backerType(all|users|organizations).:format(json|csv)', controllers.members.list);
   server.get('/:collectiveSlug/tiers/:tierSlug/:backerType(all|users|organizations).:format(json|csv)', controllers.members.list);

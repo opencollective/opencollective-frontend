@@ -11,6 +11,30 @@ export async function fetchCollective(collectiveSlug) {
   query Collective($collectiveSlug: String!) {
     Collective(slug:$collectiveSlug) {
       id
+      slug
+      image
+      currency
+      data
+      stats {
+        balance
+        backers {
+          all
+        }
+        yearlyBudget
+      }
+    }
+  }
+  `;
+
+  const result = await client.request(query, { collectiveSlug });
+  return result.Collective;
+}
+
+export async function fetchCollectiveImage(collectiveSlug) {
+  const query = `
+  query Collective($collectiveSlug: String!) {
+    Collective(slug:$collectiveSlug) {
+      id
       image
     }
   }

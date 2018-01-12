@@ -24,6 +24,16 @@ describe("api.json.test.js", () => {
 
   describe("collective", () => {
 
+    test("return /:collectiveSlug.json", async () => {
+      const collective = await r2(`${WEBSITE_URL}/railsgirlsatl.json${cacheBurst}`).json;
+      expect(collective.slug).toEqual('railsgirlsatl');
+      expect(collective.currency).toEqual('USD');
+      expect(collective.balance).toBeGreaterThan(100);
+      expect(collective.yearlyIncome).toBeGreaterThan(100);
+      expect(collective.backersCount).toBeGreaterThan(1);
+      expect(collective.contributorsCount).toEqual(0);
+    });
+
     test("return /:collectiveSlug/members.json", async () => {
       const res = await r2(`${WEBSITE_URL}/railsgirlsatl/members.json${cacheBurst}`).json;
       expect(res.length).toBeGreaterThan(5);
