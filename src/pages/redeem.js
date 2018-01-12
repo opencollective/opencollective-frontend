@@ -6,6 +6,7 @@ import Footer from '../components/Footer';
 import Loading from '../components/Loading';
 import CollectivesForRedeemPageWithData from '../components/CollectivesForRedeemPageWithData';
 import OrderForm from '../components/OrderForm';
+import Search from '../components/Search';
 import withIntl from '../lib/withIntl';
 import withData from '../lib/withData'
 import { isValidUrl } from '../lib/utils';
@@ -54,7 +55,6 @@ class RedeemPage extends React.Component {
           text-align: center;
           min-height: 500px;
           width: 100%;
-          overflow: hidden;
         }
         .small .Redeem-hero {
           height: 22rem;
@@ -101,6 +101,9 @@ class RedeemPage extends React.Component {
           text-align: center;
           color: ${colors.white};
           text-align: center;
+        }
+        .Redeem-search-container {
+          width: 100%;
         }
         .Redeem-hero-line3 {
           margin: auto;
@@ -158,6 +161,9 @@ class RedeemPage extends React.Component {
                   Open Collective helps communities - like open source projects, meetups, etc - raise money and operate transparently. 
 
                   It's easy. Enter your gift code at the bottom of a project and we'll credit them with your gift card amount.
+                </div>
+                <div className='Redeem-search-container'>
+                  <Search />
                 </div>
                 <div className='Redeem-hero-line3'>
                   Check out some of our popular collectives below!
