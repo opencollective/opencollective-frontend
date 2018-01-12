@@ -96,7 +96,7 @@
     "dev": "babel-node src/server",
     "build": "npm run build:server && next build build",
     "start": "node build/server",
-    "test": "jest src/* && npm run test:server && npm run test:e2e",
+    "test": "jest src/* && npm run test:e2e && npm run test:server",
     "test:server": "jest test/server/*",
     "test:e2e": "./scripts/run_e2e_tests.sh",
     "build:server": "./node_modules/.bin/babel -D ./src -d ./build --ignore widget.js && cp src/templates/widget.js build/templates/",
