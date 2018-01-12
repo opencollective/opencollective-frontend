@@ -387,6 +387,8 @@ class OrderForm extends React.Component {
   }
 
   async validate() {
+    const TEST_ENVIRONMENT = (typeof window !== 'undefined' && window.location.search.match(/test=e2e/) && (window.location.hostname === 'staging.opencollective.com' || window.location.hostname === 'localhost'));
+
     const { intl } = this.props;
     const { order, user, creditcard, prepaidcard, paymentMethod } = this.state;
     const newState = {...this.state};
@@ -417,7 +419,7 @@ class OrderForm extends React.Component {
         return true;
       } else {
         let res;
-        if (!creditcard.addEventListener) {
+        if (!creditcard.addEventListener && !TEST_ENVIRONMENT) {
           this.error(intl.formatMessage(this.messages['creditcard.missing']));
           return false;
         }
