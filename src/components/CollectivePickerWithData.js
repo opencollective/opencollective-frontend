@@ -50,8 +50,7 @@ class CollectivePickerWithData extends React.Component {
         email: form.email,
         name: form.name
       }
-    }
-    if (form.organization) {
+    } else if (form.organization) {
       order.fromCollective = {
         name: form.organization,
         website: form.website
