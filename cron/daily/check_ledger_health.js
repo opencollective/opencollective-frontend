@@ -2,20 +2,22 @@
  * This script runs through a few checks and lets us know if something is off
  */
 
+import Promise from 'bluebird';
 import models, { sequelize } from '../../server/models';
 import emailLib from '../../server/lib/email';
-
+import { getSubscriptionsList } from '../../server/paymentProviders/stripe/gateway';
 
 const VERBOSE = true;
 let result = '';
 let start;
+let issuesFound = false;
 
 const done = (err) => {
   if (err) result = result.concat('err', err);
   result = result.concat("\n\nTotal time taken: ", new Date() - start, "ms")
   console.log(result);
   console.log('\ndone!\n');``
-  const subject = `Daily ledger health report - ${(new Date()).toLocaleDateString()}`;
+  const subject = `${issuesFound ? '❌' : '✅'} Daily ledger health report - ${(new Date()).toLocaleDateString()}`;
   return emailLib.sendMessage(
     'ops@opencollective.com', 
     subject, 
@@ -27,20 +29,32 @@ const done = (err) => {
     .catch(console.error)
 }
 
+/* Helper functions */
 const judgment = (value, goodFunc) => {
   if ((goodFunc && goodFunc(value)) || (!goodFunc && value === 0)) {
     return '✅'
   } else {
+    issuesFound = true;
     return '❌'
   }
 }
 
 const header = (str) => {
-  result = result.concat(`\n>>> ${str}\n`);
+  const newString = `\n>>> ${str}\n`;
+  result = result.concat(newString);
+  console.log(newString)
 }
 
 const subHeader = (str, value, goodFunc) => {
-  result = result.concat(`\t${judgment(value, goodFunc)}  ${str}: ${value}\n`);
+  const newString = `\t${judgment(value, goodFunc)}  ${str}: ${value}\n`;
+  result = result.concat(newString);
+  console.log(newString);
+}
+
+const subsubHeader = (str, value, goodFunc) => {
+  const newString = `\t\t${judgment(value, goodFunc)}  ${str}: ${value}\n`;
+  result = result.concat(newString);
+  console.log(newString);
 }
 
 const verboseData = (values, mapFunction) => {
@@ -48,12 +62,36 @@ const verboseData = (values, mapFunction) => {
   if (VERBOSE && values.length > 0) {
     const slice = 5;
     const output = values.slice(0, slice).map(mapFunc);
-    output.forEach(v => result = result.concat(`\t\t▫️ ${JSON.stringify(v)}\n`))
+    output.forEach(v => {
+      const newString = `\t\t▫️ ${JSON.stringify(v)}\n`;
+      result = result.concat(newString)
+      console.log(newString);
+    })
     if (values.length > 10) {
-      result = result.concat(`\t\t... and ${values.length - slice} more`);
+      const newString = `\t\t... and ${values.length - slice} more`;
+      result = result.concat(newString);
+      console.log(newString);
     }
   }
 }
+
+// Used to fetch external data that only comes in batches
+// Like stripe subscription list, only 100 at a time
+const fetchAll = (func, options) => {
+  return func(options)
+    .then(results => {
+      // if fetched less than the limit, stop fetching
+      if (results.data.length < options.limit) {
+        return results.data;
+      }
+      // otherwise, keep fetching from the end of last set of results
+      options.startingAfter = results.data.slice(-1)[0].id;
+      return fetchAll(func, options)
+        .then(result2 => results.data.concat(result2))
+    })
+} 
+
+/* **** functions that check for various things **** */
 
 const checkHostsUserOrOrg = () => {
 
@@ -102,21 +140,6 @@ const checkHostCollectives = () => {
   })
 }
 
-const checkHostStripeAccount = () => {
-  return sequelize.query(`
-  WITH hosts AS 
-    (SELECT DISTINCT("HostCollectiveId") AS id FROM "Collectives" c 
-      WHERE "HostCollectiveId" IS NOT NULL)
-    
-  SELECT h.id FROM hosts h
-  LEFT JOIN "ConnectedAccounts" ca ON (h.id = ca."CollectiveId")
-  WHERE ca."CollectiveId" IS NULL
-    `, { type: sequelize.QueryTypes.SELECT})
-  .then(hostsWithoutStripe => {
-    subHeader('Hosts without Stripe', hostsWithoutStripe.length);
-    verboseData(hostsWithoutStripe, h => h.id)
-  })
-}
 
 const checkUsersAndOrgs = () => {
 
@@ -346,7 +369,7 @@ const checkCollectiveBalance = () => {
     where: {
       $or: [{type: 'COLLECTIVE'}, {type: 'EVENT'}],
       id: {
-        $ne: 7
+        $notIn: [7, 34]
       }
     }
   })
@@ -370,19 +393,73 @@ const checkCollectiveBalance = () => {
 
 }
 
+const checkSubscriptionsFromStripeForAHost = (hostCollectiveId) => {
+  let stripeAccount;
+  let stripeSubscriptionsList = [];
+
+  // for each of those stripe accounts, fetch each subscription and verify
+  return models.ConnectedAccount.findAll({ where: {CollectiveId: hostCollectiveId}})
+  .then(stripeAccounts => {
+    if (!stripeAccounts || stripeAccounts.length === 0) {
+      throw new Error('stripe account not found');
+    }
+
+    if (stripeAccounts.length > 1) {
+      throw new Error('More than one old stripe account found');
+    }
+    stripeAccount = stripeAccounts[0];
+  })
+  .then(() => fetchAll(getSubscriptionsList.bind(null, stripeAccount), { limit: 100 }))
+  .then(stripeSubscriptions => {
+    subHeader('HostCollectiveId', hostCollectiveId, h => h > 0);
+    subsubHeader('Stripe subscriptions found: ', stripeSubscriptions.length, s => s > 0);
+    stripeSubscriptionsList = stripeSubscriptions.map(x => x.id);
+  })
+  .then(() => models.Subscription.findAll({
+    where: {
+      stripeSubscriptionId: {
+        $in: stripeSubscriptionsList
+      }
+    },
+    attributes: [ 'id', 'stripeSubscriptionId' ]
+  }))
+  .then(ocSubscriptions => {
+    const ocList = ocSubscriptions.map(x => x.stripeSubscriptionId);
+    subsubHeader('OC Subscriptions found: ', ocList.length, s => s > 0)
+
+    const ocListSet = new Set(ocList);
+    return stripeSubscriptionsList.filter(n => !ocListSet.has(n));
+  })
+  .then(missingSubs => {
+    subsubHeader(`Subscriptions missing in our DB on Host Collective Id ${hostCollectiveId}`, missingSubs.length);
+    verboseData(missingSubs)
+  })
+
+}
+
+const checkSubscriptionsOnStripe = () => {
+  
+  header('Checking that all subscriptions on Stripe are present in our database');
+
+  // These are all the hosts that are only used for subscriptions on OC, so easy to test
+  const hostCollectiveIds = [8674, 9806, 9807, 11004, 11049];
+
+  return Promise.map(hostCollectiveIds, checkSubscriptionsFromStripeForAHost);
+}
+
 const run = () => {
   console.log('\nStarting check_ledger_health script...')
   start = new Date();
   
   return checkHostsUserOrOrg()
   .then(() => checkHostCollectives())
-  .then(() => checkHostStripeAccount())
   .then(() => checkUsersAndOrgs())
   .then(() => checkMembers())
   //.then(() => checkOrders())
   .then(() => checkExpenses())
   .then(() => checkTransactions())
   .then(() => checkCollectiveBalance())
+  .then(() => checkSubscriptionsOnStripe())
   .then(() => done())
   .catch(done)
 }
