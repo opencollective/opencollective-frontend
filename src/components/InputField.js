@@ -177,7 +177,7 @@ class InputField extends React.Component {
                   timeFormat={field.timeFormat || timeFormat}
                   value={moment.tz(new Date(this.state.value || field.defaultValue), context.timezone)}
                   isValidDate={field.validate}
-                  onChange={date => this.handleChange(date.toISOString())}
+                  onChange={date => date.toISOString ? this.handleChange(date.toISOString()) : false}
                   />
               </Col>
             </div>
@@ -190,7 +190,7 @@ class InputField extends React.Component {
                 timeFormat={field.timeFormat || timeFormat}
                 value={moment.tz(new Date(this.state.value || field.defaultValue), context.timezone)}
                 isValidDate={field.validate}
-                onChange={date => this.handleChange(date.toISOString())}
+                onChange={date => date.toISOString ? this.handleChange(date.toISOString()) : false}
                 />
               {field.description && <HelpBlock>{field.description}</HelpBlock>}
             </div>
