@@ -205,6 +205,35 @@ describe('graphql.collective.test.js', () => {
       });
     });
 
+    describe("update status of an expense", () => {
+
+      const approveExpenseQuery = `
+        mutation approveExpense($id: Int!) {
+          approveExpense(id: $id) {
+            id
+            status
+          }
+        }
+      `;
+
+      it("fails to approve expense if expense.status is PAID", async () => {
+        expense.status = 'PAID';
+        await expense.save();
+        const res = await utils.graphqlQuery(approveExpenseQuery, { id: expense.id }, host);
+        expect(res.errors).to.exist;
+        expect(res.errors[0].message).to.equal("You can't reject an expense that is already paid")
+      });
+
+      it("successfully approve expense if expense.status is PENDING", async () => {
+        expense.status = 'PENDING';
+        await expense.save();
+        const res = await utils.graphqlQuery(approveExpenseQuery, { id: expense.id }, host);
+        expect(res.errors).to.not.exist;
+        expect(res.data.approveExpense.status).to.equal('APPROVED');
+      });
+
+    });
+
     describe("pay an expense", () => {
 
       const payExpenseQuery = `
@@ -227,14 +256,27 @@ describe('graphql.collective.test.js', () => {
         });
       }
 
-      beforeEach(async () => {
+      it("fails if expense is not approved", async () => {
+        let res;
+        expense.status = 'PENDING';
+        await expense.save();
+        res = await utils.graphqlQuery(payExpenseQuery, { id: expense.id }, host);
+        expect(res.errors).to.exist;
+        expect(res.errors[0].message).to.equal("Expense needs to be approved. Current status of the expense: PENDING.");
+
+        expense.status = 'REJECTED';
+        await expense.save();
+        res = await utils.graphqlQuery(payExpenseQuery, { id: expense.id }, host);
+        expect(res.errors).to.exist;
+        expect(res.errors[0].message).to.equal("Expense needs to be approved. Current status of the expense: REJECTED.");
+      });
+
+      it("fails if not enough funds", async () => {
         // approve expense
         expense.status = 'APPROVED';
         expense.payoutMethod = 'paypal';
         await expense.save();
-      });
 
-      it("fails if not enough funds", async () => {
         // add funds to the collective
         await addFunds(500);
         const res = await utils.graphqlQuery(payExpenseQuery, { id: expense.id }, host);
@@ -243,6 +285,11 @@ describe('graphql.collective.test.js', () => {
       });
 
       it("fails if not enough funds to cover the fees", async () => {
+        // approve expense
+        expense.status = 'APPROVED';
+        expense.payoutMethod = 'paypal';
+        await expense.save();
+
         // add funds to the collective
         await addFunds(1000);
         const res = await utils.graphqlQuery(payExpenseQuery, { id: expense.id }, host);

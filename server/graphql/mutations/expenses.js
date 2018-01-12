@@ -1,12 +1,30 @@
 import errors from '../../lib/errors';
 import roles from '../../constants/roles';
 import statuses from '../../constants/expense_status';
+import activities from '../../constants/activities';
 import models from '../../models';
 import paymentProviders from '../../paymentProviders';
 import { formatCurrency } from '../../lib/utils';
 import paypalAdaptive from '../../paymentProviders/paypal/adaptiveGateway';
 import { createFromPaidExpense as createTransactionFromPaidExpense } from '../../lib/transactions';
 import { get } from 'lodash';
+
+
+async function _createActivity(expense, type) {
+  const user = expense.user || await models.User.findById(expense.UserId);
+  const userCollective = await models.Collective.findById(user.CollectiveId);
+  models.Activity.create({
+    type,
+    UserId: expense.UserId,
+    CollectiveId: expense.collective.id,
+    data: {
+      collective: expense.collective.minimal,
+      user: user.minimal,
+      fromCollective: userCollective.minimal,
+      expense: expense.info
+    }
+  });
+}
 
 /**
  * Only admin of expense.collective or of expense.collective.host can approve/reject expenses
@@ -37,6 +55,10 @@ export async function updateExpenseStatus(remoteUser, expenseId, status) {
     throw new errors.Unauthorized("You need to be logged in to update the status of an expense");
   }
 
+  if (Object.keys(statuses).indexOf(status) === -1) {
+    throw new errors.ValidationFailed("Invalid status, status must be one of ", Object.keys(statuses).join(', '));
+  }
+
   const expense = await models.Expense.findById(expenseId, { include: [ { model: models.Collective, as: 'collective' } ] });
 
   if (!expense) {
@@ -45,6 +67,24 @@ export async function updateExpenseStatus(remoteUser, expenseId, status) {
 
   if (!canUpdateExpenseStatus(remoteUser, expense)) {
     throw new errors.Unauthorized("You don't have permission to approve this expense");
+  }
+
+  switch (status) {
+    case statuses.APPROVED:
+      if (expense.status === statuses.PAID) {
+        throw new errors.Unauthorized("You can't reject an expense that is already paid");
+      }
+      break;
+    case statuses.REJECTED:
+      if (expense.status === statuses.PAID) {
+        throw new errors.Unauthorized("You can't approve an expense that is already paid");
+      }
+      break;
+    case statuses.PAID:
+      if (expense.status !== statuses.APPROVED) {
+        throw new errors.Unauthorized("The expense must be approved before you can set it to paid");
+      }
+      break;
   }
 
   const res = await expense.update({ status });
@@ -101,6 +141,10 @@ export async function createExpense(remoteUser, expenseData) {
     }
   });
 
+  expense.user = user;
+  expense.collective = collective;
+  _createActivity(expense, activities.COLLECTIVE_EXPENSE_CREATED);
+
   return expense;
 }
 
@@ -129,10 +173,15 @@ export async function editExpense(remoteUser, expenseData) {
     || expenseData.attachment !== expense.attachment) {
 
     expenseData.status = statuses.PENDING;
+  } else {
+    // make sure that we don't override the status of the expense.
+    delete expenseData.status;
   }
 
-  const res = await expense.update(expenseData);
-  return res;
+  expenseData.lastEditedById = remoteUser.id;
+  await expense.update(expenseData);
+  _createActivity(expense, activities.COLLECTIVE_EXPENSE_UPDATED);
+  return expense;
 }
 
 export async function deleteExpense(remoteUser, expenseId) {
