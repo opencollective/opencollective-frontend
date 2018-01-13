@@ -4,9 +4,11 @@ if [ "$NODE_ENV" = "circleci" ]; then
   echo "> Starting api server"
   cd ~/cache/opencollective-api
   PG_DATABASE=opencollective_dvl npm start &
+  API_PID=$!
   cd -
   echo "> Starting frontend server"
   npm start &
+  FRONTEND_PID=$!
 fi
 echo ""
 echo "> Starting server jest tests"
@@ -21,7 +23,8 @@ RETURN_CODE=$?
 
 if [ "$NODE_ENV" = "circleci" ]; then
   echo "Killing all node processes"
-  killall node
+  kill $API_PID;
+  kill $FRONTEND_PID;
   echo "Exiting with code $RETURN_CODE"
   exit $RETURN_CODE
 fi
