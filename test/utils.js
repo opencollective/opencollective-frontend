@@ -46,19 +46,23 @@ export const chromeless = {
 
 export function download(filename, url) {
   return new Promise((resolve, reject) => {
-    if (!process.env.DOWNLOAD_SCREENSHOT) {
-      console.log(">>> screenshot", url);
-      return false;
-    }
-    console.log(">>> downloading", url);
-    request.head(url, (err, res) => {
-      if (err) return reject(err);
-      const filepath = path.join(screenshotsDirectory, `${filename}.png`);
-      console.log(">>> saved in", filepath, `${Math.round(Number(res.headers['content-length']) / 1024)}KB`);
-      request(url).pipe(fs.createWriteStream(filepath)).on('close', (err) => {
+    console.log(">>> screenshot", url);
+    if (process.env.DOWNLOAD_SCREENSHOT) {
+      console.log(">>> downloading", url);
+      request.head(url, (err, res) => {
         if (err) return reject(err);
-        resolve();
+        const filepath = path.join(screenshotsDirectory, `${filename}.png`);
+        console.log(">>> saved in", filepath, `${Math.round(Number(res.headers['content-length']) / 1024)}KB`);
+        request(url).pipe(fs.createWriteStream(filepath)).on('close', (err) => {
+          if (err) return reject(err);
+          resolve();
+        });
       });
-    });
+    }
+    if (process.env.CIRCLE_ARTIFACTS) {
+      const filepath = path.join(process.env.CIRCLE_ARTIFACTS, `${filename}.png`);
+      fs.renameSync(url, filepath);
+      console.log(">>> saved in", filepath);
+    }
   });
 }

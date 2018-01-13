@@ -120,9 +120,9 @@ class ExpensesWithData extends React.Component {
         { !compact &&
           <div>
             <h1>
-              <FormattedMessage id="collective.latestExpenses.title" defaultMessage="{n, plural, one {Latest Expense} other {Latest Expenses}}" values={{n: 2 }} />
+              <FormattedMessage id="collective.latestExpenses.title" defaultMessage="{n, plural, one {Latest Expense} other {Latest Expenses}}" values={{n: 2}} />
             </h1>
-            { !includeHostedCollectives && availableBalance &&
+            { !includeHostedCollectives && Boolean(availableBalance) &&
               <div className="availableBalance">
                 <FormattedMessage id="collective.stats.balance.title" defaultMessage="Available balance:" />
                 <Currency value={availableBalance} currency={collective.currency} precision={2} />
@@ -278,6 +278,7 @@ mutation createExpense($expense: ExpenseInputType!) {
     }
     user {
       id
+      email
       paypalEmail
     }
   }

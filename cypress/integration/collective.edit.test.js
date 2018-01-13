@@ -6,9 +6,9 @@ const expenseDescription = `New expense ${random}`;
 const signin = (redirect) => {
   cy.visit(`${WEBSITE_URL}/signin?next=${redirect}`)
   cy.get('.email.inputField input').type('testuser+admin@opencollective.com');
-  cy.wait(500)
+  cy.wait(400)
   cy.get('.email.inputField input').type('{enter}');
-  cy.wait(500)
+  cy.wait(700)
 }
 
 const addTier = () => {
@@ -39,7 +39,7 @@ describe("edit collective", () => {
     cy.get('.CollectivePage .longDescription a').contains("link to google");
   })
 
-  it.only ("edit tiers", () => {
+  it ("edit tiers", () => {
     signin(`/testcollective/edit`);
     cy.get('.menuBtnGroup .tiers').click();
     cy.get('.EditTiers .tier:first .name.inputField input').type("{selectall}Backer edited")
@@ -61,6 +61,7 @@ describe("edit collective", () => {
       .last().should('contain', 'Donor (one time donation)')
     cy.visit(`${WEBSITE_URL}/testcollective/edit#tiers`);
     cy.get('.EditTiers .tier').last().find('.removeTier').click();
+    cy.wait(500)
     cy.get('.actions > .btn').click(); // save changes
     cy.get('.backToProfile a').click(); // back to profile
     cy.get('.CollectivePage .tiers', { timeout: 10000 }).find('.TierCard')

@@ -382,7 +382,7 @@ class Collective extends React.Component {
                       limit={5}
                       />
                       <div className="actions">
-                      <Button bsStyle="default" onClick={() => Router.pushRoute(`/${this.collective.slug}/transactions`)}><FormattedMessage id="transactions.viewAll" defaultMessage="View All Transactions" /></Button>
+                      <Button className="ViewAllTransactionsBtn" bsStyle="default" onClick={() => Router.pushRoute(`/${this.collective.slug}/transactions`)}><FormattedMessage id="transactions.viewAll" defaultMessage="View All Transactions" /></Button>
                     </div>
                   </div>
                 </div>
