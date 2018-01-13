@@ -32,7 +32,7 @@ describe("collective.loggedout.createOrder", () => {
         .screenshot();
 
       download("createOrder", screenshot);
-      const screenshot2 = await browser.wait('.UserCollectivePage', 10000).screenshot();
+      const screenshot2 = await browser.wait('.UserCollectivePage', 15000).screenshot();
       download("orderCreated", screenshot2);
       
       const url = await browser.evaluate(() => window.location.href)

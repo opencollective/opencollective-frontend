@@ -16,4 +16,11 @@ echo "> Running cypress tests"
 cypress run --record
 echo ""
 echo "> Starting e2e jest tests"
-jest test/e2e/* -w 1
+RETURN_CODE=jest test/e2e/* -w 1
+
+if [ "$NODE_ENV" = "circleci" ]; then
+  echo "Killing all node processes"
+  killall node
+  echo "Exiting with code $RETURN_CODE"
+  exit $RETURN_CODE
+fi
