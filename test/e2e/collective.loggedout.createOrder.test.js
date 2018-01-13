@@ -17,7 +17,7 @@ describe("collective.loggedout.createOrder", () => {
       const email = `testuser+${Math.round(Math.random()*1000000)}@gmail.com`;
 
       const screenshot = await browser
-        .goto(`${WEBSITE_URL}/webpack/donate?test=e2e`)
+        .goto(`${WEBSITE_URL}/apex/donate?test=e2e`)
         .type(email, "input[name='email']")
         .type("Xavier", "input[name='firstName']")
         .type("Damman", "input[name='lastName']")
@@ -32,17 +32,17 @@ describe("collective.loggedout.createOrder", () => {
         .screenshot();
 
       download("createOrder", screenshot);
-      const screenshot2 = await browser.wait('.UserCollectivePage', 10000).screenshot();
+      const screenshot2 = await browser.wait('.UserCollectivePage', 15000).screenshot();
       download("orderCreated", screenshot2);
       
       const url = await browser.evaluate(() => window.location.href)
       console.log(">>> url", url);
       expect(url).toEqual(expect.stringContaining(`${WEBSITE_URL}/xdamman`));
-      expect(url).toEqual(expect.stringContaining(`?status=orderCreated&CollectiveId=302`));
+      expect(url).toEqual(expect.stringContaining(`?status=orderCreated&CollectiveId=43`));
       const thankyou = await browser.exists('p.thankyou');
       expect(thankyou).toBeTruthy();
       const messageContent = await browser.evaluate(() => document.querySelector('.message').innerText);
-      expect(messageContent).toEqual(expect.stringContaining('webpack'));
+      expect(messageContent).toEqual(expect.stringContaining('apex'));
     }
 
     try {
@@ -51,7 +51,8 @@ describe("collective.loggedout.createOrder", () => {
       // Sadly this doesn't work yet: https://github.com/graphcool/browser/issues/279
       const screenshot = await browser.screenshot();
       console.error(">>> error: ", e);
-      console.log(">>> screenshot", screenshot);
+      download("createOrderError", screenshot);
+      throw e;
     }
   })
 

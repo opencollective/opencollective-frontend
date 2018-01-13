@@ -109,13 +109,13 @@ class Expenses extends React.Component {
 
         <div className="filter">
           <ButtonGroup className="filterBtnGroup">
-            <Button className="filterBtn" bsSize="small" bsStyle={!this.state.status ? 'primary' : 'default'} onClick={() => this.refetch()}>
+            <Button className="filterBtn all" bsSize="small" bsStyle={!this.state.status ? 'primary' : 'default'} onClick={() => this.refetch()}>
               <FormattedMessage id='expenses.all' defaultMessage='all' />
             </Button>
-            <Button className="filterBtn" bsSize="small" bsStyle={this.state.status === 'PENDING' ? 'primary' : 'default'} onClick={() => this.refetch('PENDING')}>
+            <Button className="filterBtn pending" bsSize="small" bsStyle={this.state.status === 'PENDING' ? 'primary' : 'default'} onClick={() => this.refetch('PENDING')}>
               <FormattedMessage id='expenses.pending' defaultMessage='pending' />
             </Button>
-            <Button className="filterBtn" bsSize="small" bsStyle={this.state.status === 'PAID' ? 'primary' : 'default'} onClick={() => this.refetch('PAID')}>
+            <Button className="filterBtn paid" bsSize="small" bsStyle={this.state.status === 'PAID' ? 'primary' : 'default'} onClick={() => this.refetch('PAID')}>
               <FormattedMessage id='expenses.paid' defaultMessage='paid' />
             </Button>
           </ButtonGroup>

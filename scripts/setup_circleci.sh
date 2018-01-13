@@ -40,6 +40,11 @@ fi
 
 TARBALL_SIZE=$(curl -s --head  --request GET "${API_TARBALL_URL}${BRANCH}" | grep "Content-Length" | sed -E "s/.*: *([0-9]+).*/\1/")
 
+if [ ! $TARBALL_SIZE ]; then
+  # First request doesn't always provide the content length for some reason (it's probably added by their caching layer)
+  TARBALL_SIZE=$(curl -s --head  --request GET "${API_TARBALL_URL}${BRANCH}" | grep "Content-Length" | sed -E "s/.*: *([0-9]+).*/\1/")
+fi
+
 if [ -e "${BRANCH}.tgz" ];
 then
   LSIZE=$(wc -c ${BRANCH}.tgz | sed -E "s/ ?([0-9]+).*/\1/")
