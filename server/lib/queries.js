@@ -349,7 +349,7 @@ const getTopSponsors = () => {
     SELECT
       MAX(c.id), MAX(c.name) as name, MAX(c.slug) as slug, MAX(c.mission) as mission, MAX(c.description) as description, MAX(c.image) as image, "CollectiveId", -SUM(amount) as "totalDonations", MAX(c.currency) as currency, COUNT(DISTINCT t."FromCollectiveId") as collectives
     FROM "Collectives" c LEFT JOIN "Transactions" t ON t."CollectiveId" = c.id
-    WHERE c.type = 'ORGANIZATION' AND t.type='DEBIT' AND t.currency='USD' AND "PaymentMethodId" IS NOT NULL
+    WHERE c.type = 'ORGANIZATION' AND t.type='DEBIT' AND t.currency='USD' AND "PaymentMethodId" IS NOT NULL AND t."platformFeeInHostCurrency" > 0
     GROUP BY t."CollectiveId"
     ORDER BY "totalDonations" DESC, collectives DESC LIMIT :limit
     `.replace(/\s\s+/g, ' '), // this is to remove the new lines and save log space.
