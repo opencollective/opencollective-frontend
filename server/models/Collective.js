@@ -334,10 +334,10 @@ export default function(Sequelize, DataTypes) {
           currency: this.currency,
           longDescription: this.longDescription,
           slug: this.slug,
-          publicUrl: this.publicUrl,
           mission: this.mission,
           tags: this.tags,
-          locationName: this.locationName
+          locationName: this.locationName,
+          image: this.previewImage() // Useful for displaying in results
         }
       },
     },
