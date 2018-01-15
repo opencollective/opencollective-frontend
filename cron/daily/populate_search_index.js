@@ -42,23 +42,35 @@ const populateIndex = () => {
     },
 
     attributes: { 
-      exclude: ['settings', 'data'] 
+      exclude: ['settings', 'data', 'longDescription'] 
     }, // exclude json fields to not fetch a lot of data
     order: ['id']
   })
-  .map(c => c.searchIndex)
   .then(collectives => {
     console.log("Collectives found", collectives.length);
     /*
       TODO: process data
       - remove repeating words like 'we are on a mission'
-      - include other metadata: budget, amount available, backers, etc. (useful for ranking)
       - include events (currently not included because no way to redirect directly to the event without parentCollective info). Might be easiest to include a publicUrl in the metadata
     */
 
     // objectID is needed for algolia to build their own index
-    return collectives.map(el => Object.assign(el, { objectID: el.id }));
+    return Promise.map(collectives, c => {
+      Object.assign(c, { objectID: c.id })
+      return Promise.all([
+        c.getBackersCount(),
+        c.getBalance(),
+        c.getYearlyIncome()
+      ])
+      .then(results => {
+        c.backersCount = results[0],
+        c.balance = results[1],
+        c.yearlyBudget = results[2]
+        return c;
+      })
+    })
   })
+  .map(c => c.searchIndex)
   .then(data => {
     console.log("initializing search index");
     const index = initializeClientandIndex(ALGOLIA_INDEX);
