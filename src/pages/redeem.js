@@ -6,6 +6,7 @@ import Footer from '../components/Footer';
 import Loading from '../components/Loading';
 import CollectivesForRedeemPageWithData from '../components/CollectivesForRedeemPageWithData';
 import OrderForm from '../components/OrderForm';
+import Search from '../components/Search';
 import withIntl from '../lib/withIntl';
 import withData from '../lib/withData'
 import { isValidUrl } from '../lib/utils';
@@ -54,7 +55,6 @@ class RedeemPage extends React.Component {
           text-align: center;
           min-height: 500px;
           width: 100%;
-          overflow: hidden;
         }
         .small .Redeem-hero {
           height: 22rem;
@@ -94,13 +94,17 @@ class RedeemPage extends React.Component {
         .Redeem-hero-line2 {
           margin: auto;
           margin-top: 40px;      
-          height: 78px;
+          height: 60px;
           font-family: Rubik;
           font-size: 16px;
           line-height: 1.63;
           text-align: center;
           color: ${colors.white};
           text-align: center;
+        }
+        .Redeem-search-container {
+          width: 100%;
+          margin-bottom: 50px;
         }
         .Redeem-hero-line3 {
           margin: auto;
@@ -111,6 +115,7 @@ class RedeemPage extends React.Component {
           line-height: 1.44;
           text-align: center;
           color: ${colors.white};
+          margin-bottom: 80px;
         }
         .Redeem-hero :global(.ctabtn) {
           width: auto;
@@ -157,11 +162,11 @@ class RedeemPage extends React.Component {
                 <div className='Redeem-hero-line2'>
                   Open Collective helps communities - like open source projects, meetups, etc - raise money and operate transparently. 
 
-                  It's easy. Enter your gift code at the bottom of a project and we'll credit them with your gift card amount.
+                  It's easy. Find your project and enter your gift code.
                 </div>
-                <div className='Redeem-hero-line3'>
-                  Check out some of our popular collectives below!
-                </div>
+                <div className='Redeem-search-container'>
+                  <Search />
+                </div> 
               </div>
             </div>
 
