@@ -46,8 +46,6 @@ class EditConnectedAccounts extends React.Component {
 
     return (
       <div className="EditConnectedAccounts">
-        <style global jsx>{`
-        `}</style>
 
       { this.state.services.map(service =>
         <div>

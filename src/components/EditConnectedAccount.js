@@ -63,8 +63,6 @@ class EditConnectedAccount extends React.Component {
     }
     return (
       <div className="EditConnectedAccount">
-        <style global jsx>{`
-        `}</style>
 
       { !connectedAccount &&
         <div>
