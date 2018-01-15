@@ -29,6 +29,8 @@ const templateNames = [
   'host.report',
   'host.report.text',
   'host.report.summary',
+  'onboarding.30days.active',
+  'onboarding.30days.inactive',
   'organization.newmember',
   'processing',
   'subscription.canceled',

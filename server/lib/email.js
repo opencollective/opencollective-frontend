@@ -104,9 +104,18 @@ const sendMessage = (recipients, subject, html, options = {}) => {
     subject = `[TESTING] ${subject}`;
   }
 
+  let to;
+  if (recipients.length > 0) {
+    to = recipients.join(', ');
+  }
   if (process.env.ONLY) {
     debug("Only sending email to ", process.env.ONLY);
-    recipients = [process.env.ONLY];
+    to = process.env.ONLY;
+  } else if (process.env.NODE_ENV !== 'production') {
+    if (!to) {
+      return Promise.reject(new Error("No recipient defined"));
+  }
+    to = `emailbcc+${to.replace(/@/g, '-at-')}@opencollective.com`;
   }
 
   debug(`sending email to ${recipients.join(', ')}`);
@@ -124,25 +133,20 @@ const sendMessage = (recipients, subject, html, options = {}) => {
     });
 
     return new Promise((resolve, reject) => {
-      let to;
-      if (recipients.length > 0) {
-        to = recipients.join(', ');
-      }
-      if (process.env.NODE_ENV !== 'production') {
-        to = `emailbcc+${to.replace(/@/g, '-at-')}@opencollective.com`;
-      }
       const from = options.from || config.email.from;
       const cc = options.cc;
       const bcc = options.bcc;
       const text = options.text;
       const attachments = options.attachments;
       const headers = { 'o:tag': options.tag, 'X-Mailgun-Dkim': 'yes' };
-      debug("mailgun> sending email to ", to,"bcc", bcc, "text", text);
+      debug("mailgun> sending email to ", to, "bcc", bcc, "text", text);
 
       mailgun.sendMail({ from, cc, to, bcc, subject, text, html, headers, attachments }, (err, info) => {
         if (err) {
+          debug(">>> mailgun.sendMail error", err);
           return reject(err);
         } else {
+          debug(">>> mailgun.sendMail success", info);
           return resolve(info);
         }
       })
@@ -173,6 +177,7 @@ const getNotificationLabel = (template, recipients) => {
     'host.monthlyreport': 'monthly reports for host',
     'host.yearlyreport': 'yearly reports for host',
     'collective.transaction.created': 'notifications of new transactions for this collective',
+    'onboarding': 'onboarding emails',
     'user.monthlyreport': 'monthly reports for backers',
     'user.yearlyreport': 'yearly reports'
   }
@@ -183,13 +188,13 @@ const getNotificationLabel = (template, recipients) => {
 /*
  * Given a template, recipient and data, generates email.
  */
-const generateEmailFromTemplate = (template, recipient, data, options = {}) => {
+const generateEmailFromTemplate = (template, recipient, data = {}, options = {}) => {
 
   const slug = _.get(data, 'collective.slug') || 'undefined';
 
   // If we are sending the same email to multiple recipients, it doesn't make sense to allow them to unsubscribe
   if (!_.isArray(recipient)) {
-    data.notificationTypeLabel = getNotificationLabel(template, recipient);
+    data.notificationTypeLabel = getNotificationLabel(options.type || template, recipient);
     data.unsubscribeUrl = `${config.host.website}/api/services/email/unsubscribe/${encodeURIComponent(options.bcc || recipient)}/${slug}/${options.type || template}/${generateUnsubscribeToken(options.bcc || recipient, slug, options.type || template)}`;
   }
 
@@ -254,7 +259,6 @@ const generateEmailFromTemplate = (template, recipient, data, options = {}) => {
 
 /*
  * Given a template, recipient and data, generates email and sends it.
- * Deprecated. Should use sendMessageFromActivity() for sending new emails.
  */
 const generateEmailFromTemplateAndSend = (template, recipient, data, options = {}) => {
   if (!recipient) {
@@ -298,7 +302,7 @@ const sendMessageFromActivity = (activity, notification) => {
 
     case activities.COLLECTIVE_CREATED:
       data.actions = {
-        approve: notification.User.generateLoginLink(`/${data.host.slug}/collectives/${data.collective.id}/approve`),
+        approve: notification.User.generateLoginLink(`/${data.host.slug}/collectives/${data.collective.id}/approve`)
       };
       return generateEmailFromTemplateAndSend('collective.created', userEmail, data);
 
