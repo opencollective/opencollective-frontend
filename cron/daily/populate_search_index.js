@@ -56,7 +56,6 @@ const populateIndex = () => {
 
     // objectID is needed for algolia to build their own index
     return Promise.map(collectives, c => {
-      Object.assign(c, { objectID: c.id })
       return Promise.all([
         c.getBackersCount(),
         c.getBalance(),
@@ -71,6 +70,7 @@ const populateIndex = () => {
     })
   })
   .map(c => c.searchIndex)
+  .map(c => Object.assign(c, { objectID: c.id }))
   .then(data => {
     console.log("initializing search index");
     const index = initializeClientandIndex(ALGOLIA_INDEX);
