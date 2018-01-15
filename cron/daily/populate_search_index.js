@@ -68,9 +68,11 @@ const populateIndex = () => {
     const splitData = chunkArray(data, chunkSize); 
   
     return Promise.each(splitData, (collectives) => {
-      console.log("Adding to index: ", `${collectives.length}`);
       return index.addObjects(data)
-        .then(() => recordsUpdated += collectives.length)
+        .then(() => {
+          recordsUpdated += collectives.length
+          console.log("Records added/updated: ", recordsUpdated);
+        })
       })
     .then(() => console.log("Total collectives indexed: ", recordsUpdated));
   })
