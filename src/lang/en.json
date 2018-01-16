@@ -382,7 +382,7 @@
   "user.collective.memberOf.collective.admin.title": "I'm a core contributor of {n, plural, one {this collective} other {these collectives}}",
   "user.collective.memberOf.collective.member.title": "I'm a member of {n, plural, one {this collective} other {these collectives}}",
   "user.collective.memberOf.collective.backer.title": "I'm backing {n, plural, one {this collective} other {these collectives}}",
-  "user.collective.memberOf.collective.attendee.title": "I've attended {n, plural, one {this event} other {these events}}",
+  "user.collective.memberOf.event.attendee.title": "I've attended {n, plural, one {this event} other {these events}}",
   "user.collective.memberOf.collective.fundraiser.title": "I've helped raise money for {n, plural, one {this collective} other {these collectives}}",
   "user.collective.memberOf.collective.fundraiser.LoggedInDescription": "Share the URL in the email receipt for each of your donation to track how much money you helped raised! (Alternatively, you can also click on any collective that you are contributing to on this page. We will add your referral id to the URL.)",
   "user.collective.memberOf.collective.follower.title": "I'm following {n, plural, one {this collective} other {these collectives}}",

@@ -51,7 +51,7 @@ class UserCollective extends React.Component {
       'user.collective.memberOf.collective.admin.title': { id: 'user.collective.memberOf.collective.admin.title', defaultMessage: `I'm a core contributor of {n, plural, one {this collective} other {these collectives}}`},
       'user.collective.memberOf.collective.member.title': { id: 'user.collective.memberOf.collective.member.title', defaultMessage: `I'm a member of {n, plural, one {this collective} other {these collectives}}`},
       'user.collective.memberOf.collective.backer.title': { id: 'user.collective.memberOf.collective.backer.title', defaultMessage: `I'm backing {n, plural, one {this collective} other {these collectives}}`},
-      'user.collective.memberOf.collective.attendee.title': { id: 'user.collective.memberOf.collective.attendee.title', defaultMessage: `I've attended {n, plural, one {this event} other {these events}}`},
+      'user.collective.memberOf.event.attendee.title': { id: 'user.collective.memberOf.event.attendee.title', defaultMessage: `I've attended {n, plural, one {this event} other {these events}}`},
       'user.collective.memberOf.collective.fundraiser.title': { id: 'user.collective.memberOf.collective.fundraiser.title', defaultMessage: `I've helped raise money for {n, plural, one {this collective} other {these collectives}}`},
       'user.collective.memberOf.collective.fundraiser.LoggedInDescription': { id: 'user.collective.memberOf.collective.fundraiser.LoggedInDescription', defaultMessage: `Share the URL in the email receipt for each of your donation to track how much money you helped raised! (Alternatively, you can also click on any collective that you are contributing to on this page. We will add your referral id to the URL.)`},
       'user.collective.memberOf.collective.follower.title': { id: 'user.collective.memberOf.collective.follower.title', defaultMessage: `I'm following {n, plural, one {this collective} other {these collectives}}`},
@@ -88,7 +88,7 @@ class UserCollective extends React.Component {
       const memberships = this.memberOfByRole[role].filter(m => get(m, 'collective.type') === memberOfCollectiveType);
       if (memberships.length === 0) return;
       return (
-        <section id={role}>
+        <section id={role.toLowerCase()} className={collectiveType}>
           <h1>{intl.formatMessage(title, { n: this.memberOfByRole[role].length })}</h1>
           { LoggedInUser && this.messages[`${type}.collective.memberOf.${collectiveType}.${role.toLowerCase()}.LoggedInDescription`] &&
             <div className="description">{intl.formatMessage(this.messages[`${type}.collective.memberOf.${collectiveType}.${role.toLowerCase()}.LoggedInDescription`])}</div>
@@ -106,6 +106,7 @@ class UserCollective extends React.Component {
       <div>
         { renderRoleForType('ORGANIZATION') }
         { renderRoleForType('COLLECTIVE') }
+        { renderRoleForType('EVENT') }
       </div>
     )
 
@@ -123,10 +124,11 @@ class UserCollective extends React.Component {
     const actions = [];
     Object.keys(this.memberOfByRole).map(role => {
       if (!this.messages[`menu.${role.toLowerCase()}`]) return;
+      const n = (role === 'ADMIN') ? this.memberOfByRole[role].filter(c => get(c, 'collective.type') === 'COLLECTIVE').length : this.memberOfByRole[role].length;
       actions.push(
         {
           className: 'whiteblue',
-          component: <HashLink to={`#${role}`}>{intl.formatMessage(this.messages[`menu.${role.toLowerCase()}`], { n: this.memberOfByRole[role].length })}</HashLink>
+          component: <HashLink to={`#${role.toLowerCase()}`}>{intl.formatMessage(this.messages[`menu.${role.toLowerCase()}`], { n })}</HashLink>
         }
       );
     });
