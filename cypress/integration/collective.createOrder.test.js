@@ -6,11 +6,14 @@ const fill = (fieldname, value) => {
 
 describe("collective.createOrder page", () => {
 
-  before(() => {
-    cy.visit(`${WEBSITE_URL}/apex/donate`)
+  it ("loads custom donate page", () => {
+    cy.visit(`${WEBSITE_URL}/apex/donate/50/month/custom%20description`)
+    cy.get('.tier .description').contains("custom description");
+    cy.get('.tier .amount').contains("$50/monthly");
   });
 
   it ("shows the bitcoin payment method type", () => {
+    cy.visit(`${WEBSITE_URL}/apex/donate`)
     cy.get('.paymentMethodTypeSelector select option').should('have.length', 2);
     cy.get('.paymentMethodTypeSelector select').select('bitcoin');
     cy.get('.paymentDetails .error').contains("We can't generate a bitcoin address without a valid email address.");
@@ -18,7 +21,6 @@ describe("collective.createOrder page", () => {
     cy.get('.btcAddress').contains("to this BTC address");
     cy.get('.intervalBtn.month').click();
     cy.get('.paymentMethodTypeSelector select option').should('have.length', 1);
-
   });
 
 })
