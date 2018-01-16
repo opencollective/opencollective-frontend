@@ -13,7 +13,7 @@ pages
   .add('createCollective', '/:hostCollectiveSlug/apply')
   .add('createOrganization', '/organizations/new')
   .add('events-iframe', '/:collectiveSlug/events.html')
-  .add('collectives-iframe', '/:collectiveSlug/collectives.html')
+  .add('collectives-iframe', '/:collectiveSlug/(collectives|widget).html')
   .add('banner-iframe', '/:collectiveSlug/banner.html')
   .add('event', '/:parentCollectiveSlug/events/:eventSlug')
   .add('editEvent', '/:parentCollectiveSlug/events/:eventSlug/edit')

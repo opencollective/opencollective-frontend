@@ -121,9 +121,6 @@
         if (src && src.match(regex) && src.match(new RegExp(`${widget}\.js`))) {
           const tokens = src.match(new RegExp(`\/([^\/]+)\/${widget}\.js`));
           const collectiveSlug = tokens[1];
-          if (widget === 'widget') {
-            widget = 'collectives';
-          }
           return window.OC.widgets[widget].push(new OpenCollectiveWidget(widget, collectiveSlug, s));
         }        
       })
