@@ -535,6 +535,7 @@ class OrderForm extends React.Component {
     const { order, prepaidcard, creditcard, fromCollective } = this.state;
     const currency = order.tier.currency || collective.currency;
 
+    this.populatePaymentMethodTypes();
     const showNewCreditCardForm = !prepaidcard.show && creditcard.show && (!creditcard.uuid || creditcard.uuid === 'other');
     const requireLogin = !this.state.isNewUser && !LoggedInUser;
     const inputEmail = {
@@ -798,7 +799,7 @@ class OrderForm extends React.Component {
             { order.totalAmount > 0 &&
               <div className="paymentDetails">
                 <h2><FormattedMessage id="tier.order.paymentDetails" defaultMessage="Payment details" /></h2>
-                { this.paymentMethodTypeOptions > 0 &&
+                { this.paymentMethodTypeOptions.length > 0 &&
                   <Row>
                     <Col sm={12}>
                       <InputField
