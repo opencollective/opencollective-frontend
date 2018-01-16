@@ -276,7 +276,7 @@ class Tier extends React.Component {
                     <label><FormattedMessage id="tier.interval.select" defaultMessage="Select frequency" /></label>
                     <ButtonGroup className="intervalBtnGroup">
                       { intervals.map(i => (
-                        <Button key={`key-${i}`} className="intervalBtn" bsStyle={interval === i ? 'primary' : 'default'} onClick={() => this.handleChange('interval', i)}>
+                        <Button key={`key-${i}`} className={`intervalBtn ${i}`} bsStyle={interval === i ? 'primary' : 'default'} onClick={() => this.handleChange('interval', i)}>
                           {intl.formatMessage(this.messages[`interval.${i || 'onetime'}`])}
                         </Button>
                       ))}
