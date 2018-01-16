@@ -430,7 +430,7 @@ export default function(Sequelize, DataTypes) {
    */
   Collective.prototype.getAdminUsers = async function() {
     if (this.type === 'USER') {
-      return await this.getUser();
+      return [await this.getUser()];
     }
     const admins = await models.Member.findAll({
       where: {
