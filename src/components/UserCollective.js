@@ -22,13 +22,15 @@ import { Router, Link } from '../server/pages';
 class UserCollective extends React.Component {
 
   static propTypes = {
-    event: PropTypes.object.isRequired,
-    LoggedInUser: PropTypes.object
+    collective: PropTypes.object.isRequired,
+    LoggedInUser: PropTypes.object,
+    query: PropTypes.object
   }
 
   constructor(props) {
     super(props);
     this.collective = this.props.collective; // pre-loaded by SSR
+    this.memberOfByRole = groupBy(this.collective.memberOf, 'role');
 
     this.state = {
       view: 'default',
@@ -43,34 +45,71 @@ class UserCollective extends React.Component {
       'user.collective.since': { id: 'user.collective.since', defaultMessage: `Contributing Since {year}`},
       'organization.collective.edit': { id: 'organization.collective.edit', defaultMessage: `edit organization`},
       'user.collective.edit': { id: 'user.collective.edit', defaultMessage: `edit profile`},
-      'user.collective.memberOf.host.title': { id: 'user.collective.memberOf.host.title', defaultMessage: `I'm hosting {n, plural, one {this collective} other {these collectives}}`},
-      'user.collective.memberOf.admin.title': { id: 'user.collective.memberOf.admin.title', defaultMessage: `I'm a core contributor of {n, plural, one {this collective} other {these collectives}}`},
-      'user.collective.memberOf.member.title': { id: 'user.collective.memberOf.member.title', defaultMessage: `I'm a member of {n, plural, one {this collective} other {these collectives}}`},
-      'user.collective.memberOf.backer.title': { id: 'user.collective.memberOf.backer.title', defaultMessage: `I'm backing {n, plural, one {this collective} other {these collectives}}`},
-      'user.collective.memberOf.attendee.title': { id: 'user.collective.memberOf.attendee.title', defaultMessage: `I've attended {n, plural, one {this event} other {these events}}`},
-      'user.collective.memberOf.fundraiser.title': { id: 'user.collective.memberOf.fundraiser.title', defaultMessage: `I've helped raise money for {n, plural, one {this collective} other {these collectives}}`},
-      'user.collective.memberOf.fundraiser.LoggedInDescription': { id: 'user.collective.memberOf.fundraiser.LoggedInDescription', defaultMessage: `Share the URL in the email receipt for each of your donation to track how much money you helped raised! (Alternatively, you can also click on any collective that you are contributing to on this page. We will add your referral id to the URL.)`},
-      'user.collective.memberOf.follower.title': { id: 'user.collective.memberOf.follower.title', defaultMessage: `I'm following {n, plural, one {this collective} other {these collectives}}`},
-      'organization.collective.memberOf.host.title': { id: 'organization.collective.memberOf.host.title', defaultMessage: `We are hosting {n, plural, one {this collective} other {{n} collectives}}`},
-      'organization.collective.memberOf.admin.title': { id: 'organization.collective.memberOf.admin.title', defaultMessage: `We are a core contributor of {n, plural, one {this collective} other {these collectives}}`},
-      'organization.collective.memberOf.member.title': { id: 'organization.collective.memberOf.member.title', defaultMessage: `We are a member of {n, plural, one {this collective} other {these collectives}}`},
-      'organization.collective.memberOf.backer.title': { id: 'organization.collective.memberOf.backer.title', defaultMessage: `We are backing {n, plural, one {this collective} other {these collectives}}`},
-      'organization.collective.memberOf.follower.title': { id: 'organization.collective.memberOf.follower.title', defaultMessage: `We are following {n, plural, one {this collective} other {these collectives}}`},
-      'organization.collective.memberOf.fundraiser.title': { id: 'organization.collective.memberOf.fundraiser.title', defaultMessage: `We've helped raise money for {n, plural, one {this collective} other {these collectives}}`},
-      'user.collective.menu.host': { id: 'user.collective.menu.host', defaultMessage: `hosting {n} {n, plural, one {collective} other {collectives}}`},
-      'user.collective.menu.admin': { id: 'user.collective.menu.admin', defaultMessage: `contributing to {n} {n, plural, one {collective} other {collectives}}`},
-      'user.collective.menu.host': { id: 'user.collective.menu.host', defaultMessage: `hosting {n} {n, plural, one {collective} other {collectives}}`},
-      'user.collective.menu.member': { id: 'user.collective.menu.member', defaultMessage: `member of {n} {n, plural, one {collective} other {collectives}}`},
-      'user.collective.menu.backer': { id: 'user.collective.menu.backer', defaultMessage: `backing {n} {n, plural, one {collective} other {collectives}}`},
-      'user.collective.menu.attendee': { id: 'user.collective.menu.attendee', defaultMessage: `attended {n} {n, plural, one {event} other {events}}`},
-      'user.collective.menu.fundraiser': { id: 'user.collective.menu.fundraiser', defaultMessage: `raised money for {n} {n, plural, one {collective} other {collectives}}`},
-      'user.collective.menu.follower': { id: 'user.collective.menu.follower', defaultMessage: `following {n} {n, plural, one {collective} other {collectives}}`},
+      'user.collective.memberOf.collective.host.title': { id: 'user.collective.memberOf.collective.host.title', defaultMessage: `I'm hosting {n, plural, one {this collective} other {these collectives}}`},
+      'user.collective.memberOf.organization.admin.title': { id: 'user.collective.memberOf.organization.admin.title', defaultMessage: `I'm an administrator of {n, plural, one {this organization} other {these organizations}}`},
+      'user.collective.memberOf.organization.member.title': { id: 'user.collective.memberOf.organization.member.title', defaultMessage: `I'm a member of {n, plural, one {this organization} other {these organizations}}`},
+      'user.collective.memberOf.collective.admin.title': { id: 'user.collective.memberOf.collective.admin.title', defaultMessage: `I'm a core contributor of {n, plural, one {this collective} other {these collectives}}`},
+      'user.collective.memberOf.collective.member.title': { id: 'user.collective.memberOf.collective.member.title', defaultMessage: `I'm a member of {n, plural, one {this collective} other {these collectives}}`},
+      'user.collective.memberOf.collective.backer.title': { id: 'user.collective.memberOf.collective.backer.title', defaultMessage: `I'm backing {n, plural, one {this collective} other {these collectives}}`},
+      'user.collective.memberOf.event.attendee.title': { id: 'user.collective.memberOf.event.attendee.title', defaultMessage: `I've attended {n, plural, one {this event} other {these events}}`},
+      'user.collective.memberOf.collective.fundraiser.title': { id: 'user.collective.memberOf.collective.fundraiser.title', defaultMessage: `I've helped raise money for {n, plural, one {this collective} other {these collectives}}`},
+      'user.collective.memberOf.collective.fundraiser.LoggedInDescription': { id: 'user.collective.memberOf.collective.fundraiser.LoggedInDescription', defaultMessage: `Share the URL in the email receipt for each of your donation to track how much money you helped raised! (Alternatively, you can also click on any collective that you are contributing to on this page. We will add your referral id to the URL.)`},
+      'user.collective.memberOf.collective.follower.title': { id: 'user.collective.memberOf.collective.follower.title', defaultMessage: `I'm following {n, plural, one {this collective} other {these collectives}}`},
+      'organization.collective.memberOf.collective.host.title': { id: 'organization.collective.memberOf.collective.host.title', defaultMessage: `We are hosting {n, plural, one {this collective} other {{n} collectives}}`},
+      'organization.collective.memberOf.collective.admin.title': { id: 'organization.collective.memberOf.collective.admin.title', defaultMessage: `We are a core contributor of {n, plural, one {this collective} other {these collectives}}`},
+      'organization.collective.memberOf.collective.member.title': { id: 'organization.collective.memberOf.collective.member.title', defaultMessage: `We are a member of {n, plural, one {this collective} other {these collectives}}`},
+      'organization.collective.memberOf.collective.backer.title': { id: 'organization.collective.memberOf.collective.backer.title', defaultMessage: `We are backing {n, plural, one {this collective} other {these collectives}}`},
+      'organization.collective.memberOf.collective.follower.title': { id: 'organization.collective.memberOf.collective.follower.title', defaultMessage: `We are following {n, plural, one {this collective} other {these collectives}}`},
+      'organization.collective.memberOf.collective.fundraiser.title': { id: 'organization.collective.memberOf.collective.fundraiser.title', defaultMessage: `We've helped raise money for {n, plural, one {this collective} other {these collectives}}`},
+      'menu.host': { id: 'user.collective.menu.host', defaultMessage: `hosting {n} {n, plural, one {collective} other {collectives}}`},
+      'menu.admin': { id: 'user.collective.menu.admin', defaultMessage: `contributing to {n} {n, plural, one {collective} other {collectives}}`},
+      'menu.host': { id: 'user.collective.menu.host', defaultMessage: `hosting {n} {n, plural, one {collective} other {collectives}}`},
+      'menu.member': { id: 'user.collective.menu.member', defaultMessage: `member of {n} {n, plural, one {collective} other {collectives}}`},
+      'menu.backer': { id: 'user.collective.menu.backer', defaultMessage: `backing {n} {n, plural, one {collective} other {collectives}}`},
+      'menu.attendee': { id: 'user.collective.menu.attendee', defaultMessage: `attended {n} {n, plural, one {event} other {events}}`},
+      'menu.fundraiser': { id: 'user.collective.menu.fundraiser', defaultMessage: `raised money for {n} {n, plural, one {collective} other {collectives}}`},
+      'menu.follower': { id: 'user.collective.menu.follower', defaultMessage: `following {n} {n, plural, one {collective} other {collectives}}`},
     })
 
   }
 
   componentDidMount() {
     window.oc = { collective: this.collective }; // for easy debugging
+  }
+
+  renderRole(role) {
+    const { intl, collective, LoggedInUser } = this.props;
+    const type = collective.type.toLowerCase();
+
+    const renderRoleForType = (memberOfCollectiveType) => {
+      const collectiveType = memberOfCollectiveType.toLowerCase();
+      const title = this.messages[`${type}.collective.memberOf.${collectiveType}.${role.toLowerCase()}.title`];
+      if (!title) return;
+      const memberships = this.memberOfByRole[role].filter(m => get(m, 'collective.type') === memberOfCollectiveType);
+      if (memberships.length === 0) return;
+      return (
+        <section id={role.toLowerCase()} className={collectiveType}>
+          <h1>{intl.formatMessage(title, { n: this.memberOfByRole[role].length })}</h1>
+          { LoggedInUser && this.messages[`${type}.collective.memberOf.${collectiveType}.${role.toLowerCase()}.LoggedInDescription`] &&
+            <div className="description">{intl.formatMessage(this.messages[`${type}.collective.memberOf.${collectiveType}.${role.toLowerCase()}.LoggedInDescription`])}</div>
+          }
+          <Memberships
+            className={role}
+            LoggedInUser={LoggedInUser}
+            memberships={memberships}
+            />
+        </section>
+      )
+    }
+
+    return (
+      <div>
+        { renderRoleForType('ORGANIZATION') }
+        { renderRoleForType('COLLECTIVE') }
+        { renderRoleForType('EVENT') }
+      </div>
+    )
+
   }
 
   render() {
@@ -82,14 +121,14 @@ class UserCollective extends React.Component {
     if (this.collective.canApply) {
       cta = <a href={`/${this.collective.slug}/apply`}><FormattedMessage id="host.apply" defaultMessage="Apply to create a collective" /></a>
     }
-    const memberOf = groupBy(this.collective.memberOf, 'role');
     const actions = [];
-    Object.keys(memberOf).map(role => {
-      if (!this.messages[`user.collective.menu.${role.toLowerCase()}`]) return;
+    Object.keys(this.memberOfByRole).map(role => {
+      if (!this.messages[`menu.${role.toLowerCase()}`]) return;
+      const n = (role === 'ADMIN') ? this.memberOfByRole[role].filter(c => get(c, 'collective.type') === 'COLLECTIVE').length : this.memberOfByRole[role].length;
       actions.push(
         {
           className: 'whiteblue',
-          component: <HashLink to={`#${role}`}>{intl.formatMessage(this.messages[`user.collective.menu.${role.toLowerCase()}`], { n: memberOf[role].length })}</HashLink>
+          component: <HashLink to={`#${role.toLowerCase()}`}>{intl.formatMessage(this.messages[`menu.${role.toLowerCase()}`], { n })}</HashLink>
         }
       );
     });
@@ -266,19 +305,8 @@ class UserCollective extends React.Component {
                   </div>
                 </section>
               }
-              { Object.keys(memberOf).map(role => role !== 'HOST' && this.messages[`${type}.collective.memberOf.${role.toLowerCase()}.title`] && (
-                <section id={role}>
-                  <h1>{intl.formatMessage(this.messages[`${type}.collective.memberOf.${role.toLowerCase()}.title`], { n: memberOf[role].length })}</h1>
-                  { LoggedInUser && this.messages[`user.collective.memberOf.${role.toLowerCase()}.LoggedInDescription`] &&
-                    <div className="description">{intl.formatMessage(this.messages[`user.collective.memberOf.${role.toLowerCase()}.LoggedInDescription`])}</div>
-                  }
-                  <Memberships
-                    className={role}
-                    LoggedInUser={LoggedInUser}
-                    memberships={role === 'ADMIN' ? memberOf[role].filter(m => m.collective.type === 'COLLECTIVE') : memberOf[role]}
-                    />
-                </section>
-              ))}
+
+              { Object.keys(this.memberOfByRole).map(role => role !== 'HOST' && this.renderRole(role)) }
 
             </div>
           </div>
