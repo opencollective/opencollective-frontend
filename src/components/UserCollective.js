@@ -282,7 +282,7 @@ class UserCollective extends React.Component {
               { this.collective.stats.collectives > 0 &&
                 <section id="hosting">
                   <h1>
-                    {intl.formatMessage(this.messages[`${type}.collective.memberOf.host.title`], { n: this.collective.stats.collectives })}
+                    {intl.formatMessage(this.messages[`${type}.collective.memberOf.collective.host.title`], { n: this.collective.stats.collectives })}
                   </h1>
                   <div className="adminActions" id="adminActions">
                     <ul>
