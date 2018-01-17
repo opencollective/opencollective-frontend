@@ -425,10 +425,12 @@ export default function(Sequelize, DataTypes) {
     }).map(member => member.memberCollective);
   }
 
-  Collective.prototype.getEmails = async function() {
+  /**
+   * Get the admin users { id, email } of this collective
+   */
+  Collective.prototype.getAdminUsers = async function() {
     if (this.type === 'USER') {
-      const user = await this.getUser();
-      return [user.email];
+      return [await this.getUser()];
     }
     const admins = await models.Member.findAll({
       where: {
@@ -436,8 +438,15 @@ export default function(Sequelize, DataTypes) {
         role: roles.ADMIN
       }
     });
-    const emails = await Promise.map(admins, admin => models.User.findOne({ where: { CollectiveId: admin.MemberCollectiveId }}).then(u => u.email));
-    return emails;
+    const users = await Promise.map(admins, admin => models.User.findOne({ where: { CollectiveId: admin.MemberCollectiveId }}));
+    return users;
+  }
+
+  /**
+   * Get the email addresses of the admins of this collective
+   */
+  Collective.prototype.getEmails = async function() {
+    return this.getAdminUsers().then(users => users.map(u => u && u.email));
   }
 
   Collective.prototype.getEvents = function(query = {}) {

@@ -430,6 +430,7 @@ const getMembersWithTotalDonations = (where, options = {}) => {
       max(c.type) as type,
       max(c."HostCollectiveId") as "HostCollectiveId",
       max(c.name) as name,
+      max(c.description) as description,
       max(u."firstName") as "firstName",
       max(u."lastName") as "lastName",
       max(c.slug) as slug,

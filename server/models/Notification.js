@@ -134,6 +134,21 @@ export default function(Sequelize, DataTypes) {
     });
   }
 
+  /**
+   * Get an array of all the UserId that have unsubscribed from the `notificationType` notification for (optional) CollectiveId
+   * @param {*} notificationType 
+   * @param {*} CollectiveId (optional)
+   */
+  Notification.getUnsubscribers = (notificationType, CollectiveId) => {
+    return models.Notification.findAll({
+      where: {
+        CollectiveId: CollectiveId,
+        type: notificationType,
+        active: false
+      }
+    }).then(us => us.map(us => us.UserId));
+  }
+
   return Notification;
 }
 
