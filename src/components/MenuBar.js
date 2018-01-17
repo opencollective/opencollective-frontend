@@ -1,22 +1,36 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import colors from '../constants/colors';
+import HashLink from 'react-scrollchor';
+import Logo from './Logo';
 
 class MenuBar extends React.Component {
 
   static propTypes = {
-    actions: PropTypes.arrayOf(PropTypes.object).isRequired,
-    info: PropTypes.node
+    collective: PropTypes.object.isRequired
   }
 
   render() {
+    const { collective } = this.props;
+
+    const menuItems = [
+      'about', 'events', 'updates', 'budget', 'backers', 'sponsors'
+    ];
+
     return (
       <div className="MenuBar">
         <style jsx>{`
         .MenuBar {
-          box-shadow: 0px 2px 4px rgba(0,0,0,.1);
-          border-top: 1px solid #E6E6E6;
-          border-bottom: 1px solid #E6E6E6;
+          background-color: #F5F8FF;
+          height: 8rem;
+        }
+
+        .item {
+          color: #666F80;
+          font-family: Rubik;
+          font-size: 14px;
+          line-height: 17px;
+          margin: 32px;
         }
 
         .content {
@@ -25,18 +39,9 @@ class MenuBar extends React.Component {
           flex-direction: row;
         }
 
-        .item {
-          float: left;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          text-align: center;
-          padding: 1rem;
-          font-size: 1.4rem;
-          width: 100%;
-          height: 6rem;
-          border-left: 1px solid #E6E6E6;
-          border-right: 1px solid #E6E6E6;
+        .logo {
+          height: 64px;
+          margin: 8px;
         }
 
         .allcaps {
@@ -54,26 +59,25 @@ class MenuBar extends React.Component {
         }
         `}
         </style>
+        <style jsx global>{`
+        .MenuBar .item a {
+          color: #666F80;
+        }
+
+        .MenuBar .selected a {
+          color: #2E8AE6;
+          font-weight: 500;
+        }        
+        `}</style>
         <div className="content">
-          <div className="item">
-            {this.props.info}
+          <div className="logo">
+            <Logo src={collective.image} type='COLLECTIVE' height={64} />
           </div>
-          {this.props.actions.map((action, index) =>
-            <div className={`item ${action.className}`} key={`item-${index}`}>
-              { action.onClick &&
-                <a
-                  key={`actionItem${index}`}
-                  style={{borderColor: colors.lightgray}}
-                  className={action.className}
-                  style={action.className === 'selected' ? { color: colors.green } : {}}
-                  label={action.label}
-                  icon={action.icon}
-                  onClick={() => action.onClick && action.onClick()}
-                  >{action.component}</a>
-              }
-              { !action.onClick &&
-                action.component
-              }
+          {menuItems.map((item, index) =>
+            <div className={`item ${item}`} key={`item-${index}`}>
+              <HashLink to={item}>
+                {item}
+              </HashLink>
             </div>
           )}
         </div>

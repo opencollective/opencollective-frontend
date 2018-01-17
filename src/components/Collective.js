@@ -13,6 +13,7 @@ import Markdown from 'react-markdown';
 import { get } from 'lodash';
 import { Router } from '../server/pages';
 import MenuBar from './MenuBar';
+import StatsBar from './StatsBar';
 import HashLink from 'react-scrollchor';
 import { FormattedMessage, defineMessages } from 'react-intl';
 import CollectivesWithData from './CollectivesWithData';
@@ -254,6 +255,10 @@ class Collective extends React.Component {
               />
 
             <MenuBar
+              collective={this.collective}
+              />
+
+            <StatsBar
               info={intl.formatMessage(this.messages['collective.since'], { year: (new Date(this.collective.createdAt)).getFullYear() })}
               actions={actions}
               />
