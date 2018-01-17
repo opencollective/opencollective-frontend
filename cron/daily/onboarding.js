@@ -2,56 +2,82 @@ import Promise from 'bluebird';
 import models from '../../server/models';
 import emailLib from '../../server/lib/email';
 
-let totalCollectives = 0, totalActives = 0;
+let totalCollectives = 0;
 
-const d = new Date;
-const startsAt = new Date(d.getFullYear(), d.getMonth() - 1, d.getDate());
-const endsAt = new Date(d.getFullYear(), d.getMonth() - 1, d.getDate() + 1);
+const emailOptions = {
+  from: "Pia Mancini<pia@opencollective.com",
+  type: "onboarding"
+}
 
-console.log(">>> Fetching all new active collectives created between ", startsAt, endsAt);
+const XDaysAgo = (days) => {
+  const d = new Date;
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate() - days);
+}
 
-models.Collective.findAll({
-  where: {
-    type: "COLLECTIVE",
-    isActive: true,
-    createdAt: { $gte: startsAt, $lt: endsAt }
-  }
-})
-.tap(collectives => console.log(`>>> Processing ${collectives.length} collectives`))
-.map(processCollective)
-.then(() => {
-  console.log(`${totalCollectives} collectives processed, ${totalActives} active.`)
+Date.prototype.toString = function() {
+  const mm = this.getMonth() + 1; // getMonth() is zero-based
+  const dd = this.getDate();
+
+  return [this.getFullYear(),
+          (mm>9 ? '' : '0') + mm,
+          (dd>9 ? '' : '0') + dd
+         ].join('-');
+};
+
+const onlyInactiveCollectives = (collective) => {
+  return models.Transaction.count({ where: { CollectiveId: collective.id }}).then(count => count === 0);
+}
+
+const onlyCollectivesWithoutExpenses = (collective) => {
+  return models.Expense.count({ where: { CollectiveId: collective.id }}).then(count => count === 0);
+}
+
+Promise.all([
+  processOnBoardingTemplate("onboarding.day30.inactive", XDaysAgo(30), onlyInactiveCollectives),
+  processOnBoardingTemplate("onboarding.day14.noExpenses", XDaysAgo(14), onlyCollectivesWithoutExpenses),
+  processOnBoardingTemplate("onboarding.day7.widgets", XDaysAgo(7)),
+  processOnBoardingTemplate("onboarding.day2", XDaysAgo(2))
+]).then(() => {
   console.log(">>> all done");
   process.exit(0);
-})
-.catch(e => {
-  console.log(">>> error caught", e);
 });
 
-async function processCollective(collective) {
+async function processOnBoardingTemplate(template, startsAt, filter = () => true) {
+
+  const endsAt = new Date(startsAt.getFullYear(), startsAt.getMonth(), startsAt.getDate() + 1);
+  console.log(`\n>>> ${template} (from ${startsAt.toString()} to ${endsAt.toString()})`);
+  
+  return models.Collective.findAll({
+    where: {
+      type: "COLLECTIVE",
+      isActive: true,
+      createdAt: { $gte: startsAt, $lt: endsAt }
+    }
+  })
+  .tap(collectives => console.log(`${template}> processing ${collectives.length} collectives`))
+  .filter(filter)
+  .tap(collectives => console.log(`${template}> processing ${collectives.length} collectives after filter`))
+  .map(c => processCollective(c, template))
+  .then(() => {
+    console.log(`${totalCollectives} collectives processed.`)
+  })
+  .catch(e => {
+    console.log(">>> error caught", e);
+  });
+
+}
+
+async function processCollective(collective, template) {
   totalCollectives++;
+  console.log("-", collective.slug);
   const users = await collective.getAdminUsers();
   const unsubscribers = await models.Notification.getUnsubscribers('onboarding', collective.id);
   const recipients = users.filter(u => u && unsubscribers.indexOf(u.id) === -1).map(u => u.email);
-  console.log(`>>> Sending onboarding 30 days inactive email to the ${recipients.length} admin(s) of`, collective.slug);
   if (!recipients || recipients.length === 0) {
     return;
   }
-  const options = {
-    from: "Pia Mancini<pia@opencollective.com",
-    type: "onboarding"
-  }
-  const numberOfTransactions = await models.Transaction.count({ where: { CollectiveId: collective.id }});
-  let template;
-  if (numberOfTransactions > 0) {
-    totalActives++;
-    template = "onboarding.30days.active";
-    console.log(`${collective.slug} collective is active with ${numberOfTransactions} transactions, skipping.`);
-    return; // skipping
-  } else {
-    template = "onboarding.30days.inactive";
-  }
-  return Promise.map(recipients, recipient => emailLib.send(template, recipient, { collective }, options).catch(e => {
+  console.log(`>>> Sending ${template} email to the ${recipients.length} admin(s) of`, collective.slug);
+  return Promise.map(recipients, recipient => emailLib.send(template, recipient, { collective }, emailOptions).catch(e => {
     console.warn("Unable to send email to ", collective.slug, recipient, "error:", e);
   }));
 }
