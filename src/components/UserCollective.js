@@ -115,7 +115,7 @@ class UserCollective extends React.Component {
   render() {
     const order = { fromCollective: this.collective };
     const { intl, LoggedInUser, query } = this.props;
-    const isProfileEmpty = (!this.collective.image || !this.collective.longDescription);
+    const isProfileEmpty = !(this.collective.description || this.collective.longDescription);
     const type = this.collective.type.toLowerCase();
     let cta;
     if (this.collective.canApply) {
@@ -279,25 +279,19 @@ class UserCollective extends React.Component {
                   )}
                 </div>
               </div>
+
               { this.collective.stats.collectives > 0 &&
                 <section id="hosting">
                   <h1>
-                    {intl.formatMessage(this.messages[`${type}.collective.memberOf.collective.host.title`], { n: this.collective.stats.collectives })}
+                    <FormattedMessage
+                      id="collective"
+                      values={{ n: this.collective.stats.collectives }}
+                      defaultMessage={`{n} {n, plural, one {collective} other {collectives}}`}
+                      />
                   </h1>
-                  <div className="adminActions" id="adminActions">
-                    <ul>
-                      { LoggedInUser && LoggedInUser.canEditCollective(this.collective) &&
-                        <li><Link route={`/${this.collective.slug}/collectives/expenses`}><a><FormattedMessage id="host.collectives.manage" defaultMessage="Manage expenses" /></a></Link></li>
-                      }
-                      { this.collective.settings.apply &&
-                        <li><a href={`/${this.collective.slug}/apply`}><FormattedMessage id="host.apply" defaultMessage="Apply to create a collective" /></a></li>
-                      }
-                    </ul>
-                  </div>
-
                   <div className="cardsList">
                     <CollectivesWithData
-                      HostCollectiveId={this.collective.id}
+                      ParentCollectiveId={this.collective.id}
                       orderBy="balance"
                       orderDirection="DESC"
                       limit={20}
