@@ -4,6 +4,7 @@ import TopBar from './TopBar';
 
 import { truncate, getQueryParams } from '../lib/utils';
 import storage from '../lib/storage';
+import colors from '../constants/colors';
 
 class Header extends React.Component {
 
@@ -148,14 +149,33 @@ class Header extends React.Component {
         flex-direction: row;
       }
 
-      @media(max-width: 600px) {
+      .btn-primary {
+        background-color: ${colors.blue};
+        border-color: ${colors.blue};
+      }
+
+      .mobileOnly {
+        display: none;
+      }
+      .mediumScreenOnly {
+        display: none;
+      }
+      .desktopOnly {
+        display: none;
+      }
+      @media(min-width: 1024px) {
         .desktopOnly {
-          display: none !important;
+          display: block !important;
         }
       }
-      #media(max-width: 400px) {
+      @media(min-width: 420px) and (max-width: 1024px) {
         .mediumScreenOnly {
-          display: none !important;
+          display: block !important;
+        }
+      }
+      @media(max-width: 420px) {
+        .mobileOnly {
+          display: block !important;
         }
       }
 

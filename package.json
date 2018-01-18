@@ -78,6 +78,7 @@
     "react-router": "4.2.0",
     "react-script-loader": "0.0.1",
     "react-scrollchor": "4.1.0",
+    "react-stickynode": "^1.4.0",
     "request": "2.81.0",
     "sass-loader": "6.0.3",
     "serve": "3.3.1",

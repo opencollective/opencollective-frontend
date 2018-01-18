@@ -229,8 +229,12 @@ class TopBarProfileMenu extends React.Component {
     const { LoggedInUser } = this.props;
     
     return (
-      <div className={showProfileMenu ? '-active' : ''} onClick={this.toggleProfileMenu}>
+      <div className={`TopBarProfileMenu ${showProfileMenu ? '-active' : ''}`} onClick={this.toggleProfileMenu}>
         <style jsx>{`
+        .TopBarProfileMenu {
+          display: flex;
+          align-items: center;          
+        }
         .LoginTopBarProfileMenu {
           line-height: 3.1rem;
         }
@@ -262,7 +266,7 @@ class TopBarProfileMenu extends React.Component {
         }
         .LoginTopBarProfileButton-name {
           display: inline-block;
-          height: 1.4rem;
+          height: 1.8rem;
           font-size: 1.2rem;
           font-weight: bold;
           color: #46b0ed;

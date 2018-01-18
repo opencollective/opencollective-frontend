@@ -5,8 +5,7 @@ import colors from '../constants/colors';
 class StatsBar extends React.Component {
 
   static propTypes = {
-    actions: PropTypes.arrayOf(PropTypes.object).isRequired,
-    info: PropTypes.node
+    collective: PropTypes.object.isRequired
   }
 
   render() {
@@ -14,9 +13,7 @@ class StatsBar extends React.Component {
       <div className="StatsBar">
         <style jsx>{`
         .StatsBar {
-          box-shadow: 0px 2px 4px rgba(0,0,0,.1);
-          border-top: 1px solid #E6E6E6;
-          border-bottom: 1px solid #E6E6E6;
+          background-color: #2E3033;
         }
 
         .content {
@@ -35,8 +32,6 @@ class StatsBar extends React.Component {
           font-size: 1.4rem;
           width: 100%;
           height: 6rem;
-          border-left: 1px solid #E6E6E6;
-          border-right: 1px solid #E6E6E6;
         }
 
         .allcaps {
@@ -56,26 +51,7 @@ class StatsBar extends React.Component {
         </style>
         <div className="content">
           <div className="item">
-            {this.props.info}
           </div>
-          {this.props.actions.map((action, index) =>
-            <div className={`item ${action.className}`} key={`item-${index}`}>
-              { action.onClick &&
-                <a
-                  key={`actionItem${index}`}
-                  style={{borderColor: colors.lightgray}}
-                  className={action.className}
-                  style={action.className === 'selected' ? { color: colors.green } : {}}
-                  label={action.label}
-                  icon={action.icon}
-                  onClick={() => action.onClick && action.onClick()}
-                  >{action.component}</a>
-              }
-              { !action.onClick &&
-                action.component
-              }
-            </div>
-          )}
         </div>
       </div>
     )

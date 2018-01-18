@@ -118,50 +118,6 @@ class Collective extends React.Component {
       donateParams.referral = query.referral;
     }
     const backersHash = this.collective.stats.backers.organizations > 0 ? '#organizations' : '#backers';
-    const actions = [
-      {
-        className: 'whiteblue',
-        component: <HashLink to={backersHash}>
-              <FormattedMessage
-                id="collective.stats.backers.users"
-                defaultMessage="{n} {n, plural, one {backer} other {backers}}"
-                values={{ n: this.collective.stats.backers.users }}
-                />
-              { this.collective.stats.backers.organizations > 0 &&
-                <div>
-                  <FormattedMessage
-                    id="collective.stats.backers.organizations"
-                    defaultMessage="{n} {n, plural, one {organization} other {organizations}}"
-                    values={{ n: this.collective.stats.backers.organizations}}
-                    />
-                </div>
-              }
-          </HashLink>
-      },
-      {
-        className: 'whiteblue',
-        component: <HashLink to={`#budget`}>
-            <FormattedMessage
-              id="collective.budget"
-              defaultMessage="budget"
-              />
-          </HashLink>
-      },
-      {
-        className: 'blue',
-        component: <Link route={'donate'} params={donateParams}>
-            <a><b>{intl.formatMessage(this.messages['collective.donate']).toUpperCase()}</b></a>
-          </Link>
-      }
-    ];
-
-    if (LoggedInUser && LoggedInUser.canEditCollective(this.collective)) {
-      actions.push({
-        className: 'whiteblue small',
-        component: <a href={`/${this.collective.slug}/edit`}>EDIT COLLECTIVE</a>
-      });
-    }
-
     const backgroundImage = this.collective.backgroundImage || get(this.collective,'parentCollective.backgroundImage') || defaultBackgroundImage;
 
     const notification = {};
@@ -200,12 +156,6 @@ class Collective extends React.Component {
             max-width: 400px;
             width: 100%;
           }
-          .columns .actions {
-            text-align: center;
-          }
-          .columns .actions :global(button) {
-            margin: 0.5rem;
-          }
           .cardsList {
             display: flex;
             flex-wrap: wrap;
@@ -218,6 +168,12 @@ class Collective extends React.Component {
           .balance label {
             margin: 0 0.5rem;
             font-weight: 500;
+          }
+          .actions {
+            text-align: center;
+          }
+          .actions :global(button.btn) {
+            margin-right: 5px;
           }
           @media(min-width: 600px) {
             .sidebar {
@@ -256,11 +212,11 @@ class Collective extends React.Component {
 
             <MenuBar
               collective={this.collective}
+              LoggedInUser={LoggedInUser}
               />
 
             <StatsBar
-              info={intl.formatMessage(this.messages['collective.since'], { year: (new Date(this.collective.createdAt)).getFullYear() })}
-              actions={actions}
+              collective={this.collective}
               />
 
             <div>
@@ -274,6 +230,11 @@ class Collective extends React.Component {
                       referral={query.referral}
                       />
                   ))}
+                  <div className="CustomDonationTierCard">
+                    <Link route={`/${this.collective.slug}/donate`}>
+                      <a><FormattedMessage id="collective.tiers.donate" defaultMessage="Or make a one time donation" /></a>
+                    </Link>
+                  </div>
                 </div>
 
                 <div className="content" >

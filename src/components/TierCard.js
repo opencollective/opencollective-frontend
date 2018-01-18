@@ -188,9 +188,7 @@ class TierCard extends React.Component {
             width: 280px;
             height: 56px;
             border-radius: 0 0 8px 8px;
-            background-color: #8f47b3;
-            background-color: var(--main-custom-color);
-            box-shadow: inset 0 -4px 0 0 rgba(37, 39, 41, 0.15);
+            background-color: ${colors.blue};
             font-family: Rubik, sans-serif;
             font-size: 14px;
             font-weight: 500;
@@ -199,6 +197,12 @@ class TierCard extends React.Component {
             display: flex;
             justify-content: center;
             align-items: center;
+          }
+          .action:hover {
+            background-color: ${colors.blueHover};
+          }
+          .action:active {
+            background-color: ${colors.blueActive};
           }
           .action.disabled {
             background-color: var(--silver-four);

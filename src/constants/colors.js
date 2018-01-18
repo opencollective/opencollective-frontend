@@ -4,7 +4,9 @@ export default {
   gray: '#303233',
   darkgray: '#797D7F',
   green: '#75CC1F',
-  blue: '#46B0ED',
+  blue: '#2E8AE6',
+  blueHover: '#4DA6FF',
+  blueActive: '#297ACC',
   black: '#484B4C',
   white: '#FFFFFF',
   offwhite: '#F5F6F7'
