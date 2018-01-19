@@ -178,6 +178,7 @@ query Members($CollectiveId: Int!, $TierId: Int, $role: String, $type: String, $
       slug
       image
       backgroundImage
+      website
     }
   }
 }
