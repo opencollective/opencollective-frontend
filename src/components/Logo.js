@@ -6,9 +6,13 @@ export default ({ src, style = {}, height, type = 'ORGANIZATION', website }) => 
   if (!src && website) {
     src = `https://logo.clearbit.com/${getDomain(website)}`;
   }
+  const backgroundStyle = { height, minWidth: height };
+  if (!src) {
+    backgroundStyle.backgroundImage = `url(${defaultImage[type]})`
+  }
   const image = imagePreview(src, defaultImage[type], { height: style.height });
   return (
-    <div className="Logo" style={{ width: height, height, backgroundImage: `url(${defaultImage[type]})` }}>
+    <div className="Logo" style={backgroundStyle}>
       <style jsx>{`
         .Logo {
           background-repeat: no-repeat;

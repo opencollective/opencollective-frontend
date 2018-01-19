@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { FormattedMessage, FormattedDate } from 'react-intl';
 import Currency from './Currency';
 import Link from './Link';
+import Logo from './Logo';
 import { pickLogo } from '../lib/collective.lib';
 import { get } from 'lodash';
 import { Router } from '../server/pages';
@@ -24,8 +25,6 @@ class CollectiveCard extends React.Component {
 
   render() {
     const { collective, membership, LoggedInUser } = this.props;
-
-    const logo = imagePreview(collective.image, pickLogo(collective.id), { height: 128 });
 
     let tierName = get(membership, 'tier.name');
     const role = get(membership, 'role');
@@ -99,18 +98,16 @@ class CollectiveCard extends React.Component {
             background-position: center;
           }
 
-          .image {
-            background-size: contain;
-            background-repeat: no-repeat;
-            background-position: center;
+          .logo {
+            display: flex;
+            height: 100%;
+            align-items: center;
+            justify-content: center;
             position: absolute;
             left: 0;
             right: 0;
             top: 0;
             bottom: 0;
-            width: 65%;
-            height: 55%;
-            margin: auto;
           }
 
           .body {
@@ -212,8 +209,10 @@ class CollectiveCard extends React.Component {
           }
           `}</style>
           <div className='head'>
-            <div className='background' style={coverStyle}></div>
-            <div className='image' style={{backgroundImage: `url(${logo})`}}></div>
+            <div className='background' style={coverStyle} />
+            <div className='logo'>
+              <Logo src={collective.image} type={collective.type} website={collective.website} height={65} />
+            </div>
           </div>
           <div className='body'>
             <div className='name'>{collective.name}</div>
