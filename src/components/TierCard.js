@@ -54,7 +54,7 @@ class TierCard extends React.Component {
                   <Avatar src={fromCollective.image} radius={32} />
                 }
                 { fromCollectiveTypeArray.indexOf('USER') === -1 &&
-                  <Logo src={fromCollective.image} height={32} />
+                  <Logo src={fromCollective.image} website={fromCollective.website} height={32} />
                 }
               </a></Link>
             </div>

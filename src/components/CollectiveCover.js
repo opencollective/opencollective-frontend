@@ -245,7 +245,7 @@ ${description}`
           <div className="content">
             <Link route={href}><a className="goBack">
               { collective.type === 'USER' && <Avatar src={logo} className="logo" radius="10rem" /> }
-              { collective.type !== 'USER' && <Logo src={logo} className="logo" type={collective.type} height="10rem" /> }
+              { collective.type !== 'USER' && <Logo src={logo} className="logo" type={collective.type} website={collective.website} height="10rem" /> }
             </a></Link>
             <h1>{title}</h1>
             { company && company.substr(0,1) === '@' && <p className="company"><Link route={`/${company.substr(1)}`}><a>{company.substr(1)}</a></Link></p> }
