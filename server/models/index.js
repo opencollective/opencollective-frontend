@@ -64,6 +64,7 @@ export function setupModels(client) {
     'Subscription',
     'Tier',
     'Transaction',
+    'Update',
     'User'
   ].forEach((model) => {
     m[model] = client.import(`${__dirname}/${model}`);

@@ -394,6 +394,105 @@ export const ExpenseType = new GraphQLObjectType({
   }
 });
 
+export const UpdateType = new GraphQLObjectType({
+  name: 'UpdateType',
+  description: 'This represents an Update',
+  fields: () => {
+    return {
+      id: {
+        type: GraphQLInt,
+        resolve(expense) {
+          return expense.id;
+        }
+      },
+      views: {
+        type: GraphQLInt,
+        resolve(update) {
+          return update.views;
+        }
+      },
+      slug: {
+        type: GraphQLString,
+        resolve(update) {
+          return update.slug;
+        }
+      },
+      image: {
+        type: GraphQLString,
+        resolve(update) {
+          return update.image;
+        }
+      },
+      title: {
+        type: GraphQLString,
+        resolve(update) {
+          return update.title;
+        }
+      },
+      createdAt: {
+        type: GraphQLString,
+        resolve(update) {
+          return update.createdAt;
+        }
+      },
+      updatedAt: {
+        type: GraphQLString,
+        resolve(update) {
+          return update.updatedAt;
+        }
+      },
+      publishedAt: {
+        type: GraphQLString,
+        resolve(update) {
+          return update.publishedAt;
+        }
+      },
+      summary: {
+        type: GraphQLString,
+        resolve(update) {
+          return update.text.substr(0,255);
+        }
+      },
+      text: {
+        type: GraphQLString,
+        resolve(update) {
+          return update.text;
+        }
+      },
+      tags: {
+        type: new GraphQLList(GraphQLString),
+        resolve(update) {
+          return update.tags;
+        }
+      },
+      user: {
+        type: UserType,
+        resolve(update) {
+          return update.getUser();
+        }
+      },
+      fromCollective: {
+        type: CollectiveInterfaceType,
+        resolve(update, args, req) {
+          return req.loaders.collective.findById.load(update.FromCollectiveId);
+        }
+      },
+      collective: {
+        type: CollectiveInterfaceType,
+        resolve(update, args, req) {
+          return req.loaders.collective.findById.load(update.CollectiveId);
+        }
+      },
+      tier: {
+        type: TierType,
+        resolve(update, args, req) {
+          return req.loaders.tiers.findById.load(update.TierId);
+        }
+      }
+    }
+  }
+});
+
 export const TierStatsType = new GraphQLObjectType({
   name: 'TierStatsType',
   description: 'Stats about a tier',

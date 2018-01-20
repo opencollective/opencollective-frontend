@@ -14,6 +14,8 @@ export default {
   COLLECTIVE_EXPENSE_PAID: 'collective.expense.paid',
   COLLECTIVE_MEMBER_CREATED: 'collective.member.created',
   COLLECTIVE_TRANSACTION_CREATED: 'collective.transaction.created',
+  COLLECTIVE_UPDATE_CREATED: 'collective.update.created',
+  COLLECTIVE_UPDATE_PUBLISHED: 'collective.update.published',
   COLLECTIVE_USER_ADDED: 'collective.user.added',
   SUBSCRIPTION_CONFIRMED: 'subscription.confirmed',
   SUBSCRIPTION_CANCELED: 'subscription.canceled',

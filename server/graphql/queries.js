@@ -20,6 +20,7 @@ import {
   UserType,
   TierType,
   ExpenseType,
+  UpdateType,
   MemberType,
   PaymentMethodType
 } from './types';
@@ -88,6 +89,63 @@ const queries = {
       if (args.limit) query.limit = args.limit;
       if (args.offset) query.offset = args.offset;
       return models.Transaction.findAll(query);
+    }
+  },
+
+  Update: {
+    type: UpdateType,
+    args: {
+      id: { type: new GraphQLNonNull(GraphQLInt) }
+    },
+    resolve(_, args) {
+      return models.Update.findById(args.id);
+    }
+  },
+
+  /*
+   * Given a collective slug, returns all expenses
+   */
+  allUpdates: {
+    type: new GraphQLList(UpdateType),
+    args: {
+      CollectiveId: { type: new GraphQLNonNull(GraphQLInt) },
+      includeHostedCollectives: { type: GraphQLBoolean },
+      limit: { type: GraphQLInt },
+      offset: { type: GraphQLInt }
+    },
+    resolve(_, args, req) {
+      const query = { where: {} };
+      if (args.limit) query.limit = args.limit;
+      if (args.offset) query.offset = args.offset;
+      query.order = [['publishedAt', 'DESC']];
+      if (!req.remoteUser || !req.remoteUser.isAdmin(args.CollectiveId)) {
+        query.where.publishedAt = { $ne: null };
+      }
+      return req.loaders.collective.findById.load(args.CollectiveId)
+        .then(collective => {
+          if (!collective) {
+            throw new Error('Collective not found');
+          }
+          const getCollectiveIds = () => {
+            // if is host, we get all the expenses across all the hosted collectives
+            if (args.includeHostedCollectives) {
+              return models.Member.findAll({
+                where: {
+                  MemberCollectiveId: collective.id,
+                  role: 'HOST'
+                }
+              }).map(member => member.CollectiveId)
+            } else {
+              return Promise.resolve([args.CollectiveId]);
+            }
+          }
+          return getCollectiveIds().then(collectiveIds => {
+            query.where.CollectiveId = { $in: collectiveIds };
+            console.log(">>> query", JSON.stringify(query));
+            query.logging = console.log;
+            return models.Update.findAll(query).tap(console.log);
+          })
+        })
     }
   },
 

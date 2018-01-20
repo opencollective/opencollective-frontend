@@ -3,6 +3,8 @@ import { createOrder } from './mutations/orders';
 import { createMember, removeMember } from './mutations/members';
 import { editTiers } from './mutations/tiers';
 import { createExpense, editExpense, updateExpenseStatus, payExpense, deleteExpense } from './mutations/expenses';
+import * as updateMutations from './mutations/updates';
+
 import statuses from '../constants/expense_status';
 
 import {
@@ -16,7 +18,8 @@ import {
   OrderType,
   TierType,
   MemberType,
-  ExpenseType
+  ExpenseType,
+  UpdateType
 } from './types';
 
 import {
@@ -28,7 +31,9 @@ import {
   CollectiveAttributesInputType,
   OrderInputType,
   TierInputType,
-  ExpenseInputType
+  ExpenseInputType,
+  UpdateInputType,
+  UpdateAttributesInputType
 } from './inputTypes';
 
 const mutations = {
@@ -164,6 +169,61 @@ const mutations = {
     },
     resolve(_, args, req) {
       return createOrder(_, args, req);
+    }
+  },
+  createUpdate: {
+    type: UpdateType,
+    args: {
+      update: {
+        type: new GraphQLNonNull(UpdateInputType)
+      }
+    },
+    resolve(_, args, req) {
+      return updateMutations.createUpdate(_, args, req);
+    }
+  },
+  editUpdate: {
+    type: UpdateType,
+    args: {
+      update: {
+        type: new GraphQLNonNull(UpdateAttributesInputType)
+      }
+    },
+    resolve(_, args, req) {
+      return updateMutations.editUpdate(_, args, req);
+    }
+  },
+  publishUpdate: {
+    type: UpdateType,
+    args: {
+      id: {
+        type: new GraphQLNonNull(GraphQLInt)
+      }
+    },
+    resolve(_, args, req) {
+      return updateMutations.publishUpdate(_, args, req);
+    }
+  },
+  unpublishUpdate: {
+    type: UpdateType,
+    args: {
+      id: {
+        type: new GraphQLNonNull(GraphQLInt)
+      }
+    },
+    resolve(_, args, req) {
+      return updateMutations.unpublishUpdate(_, args, req);
+    }
+  },
+  deleteUpdate: {
+    type: UpdateType,
+    args: {
+      id: {
+        type: new GraphQLNonNull(GraphQLInt)
+      }
+    },
+    resolve(_, args, req) {
+      return updateMutations.deleteUpdate(_, args, req);
     }
   }
 }
