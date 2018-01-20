@@ -53,6 +53,13 @@ LoggedInUser.prototype.canEditExpense = function(expense) {
   return this.canApproveExpense(expense);
 }
 
+LoggedInUser.prototype.canEditUpdate = function(update) {
+  if (!update) return false;
+  if ( get(update, 'fromCollective.id') === this.collective.id) return true;
+  if (intersection(this.roles[get(update, 'collective.slug')], ['ADMIN']).length > 0) return true;
+  return false;
+}
+
 /**
  * CanPayExpense if LoggedInUser is HOST or ADMIN of the HOST of the collective
  */

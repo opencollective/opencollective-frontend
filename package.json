@@ -75,6 +75,7 @@
     "react-gmaps": "1.7.0",
     "react-intl": "2.4.0",
     "react-markdown": "3.1.1",
+    "react-quill": "^1.2.3",
     "react-router": "4.2.0",
     "react-script-loader": "0.0.1",
     "react-scrollchor": "4.1.0",
