@@ -36,7 +36,7 @@ npm install;
 If you are using Ubuntu, make sure you have [GraphicsMagick](http://www.graphicsmagick.org) installed:
 
 ```
-sudo apt-get install GraphicsMagick
+sudo apt-get install graphicsmagick
 ```
 
 3. Run
