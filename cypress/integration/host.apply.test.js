@@ -11,6 +11,7 @@ const init = (skip_signin = false) => {
     cy.visit(`http://localhost:3000/signin/eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzY29wZSI6ImxvZ2luIiwiaWQiOjk0NzQsImVtYWlsIjoidGVzdHVzZXIrYWRtaW5Ab3BlbmNvbGxlY3RpdmUuY29tIiwiaWF0IjoxNTE1NDA5ODkxLCJleHAiOjE1MTgwMDE4OTEsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6MzA2MCIsInN1YiI6OTQ3NH0.FdisGSpfUyCgVJaWnnV5hp_IhRfO4_27kDc6DcCwqcI?next=/brusselstogether/apply`);
   } else {
     cy.visit(`${WEBSITE_URL}/brusselstogether`);
+    cy.get('#hosting h1').contains("We are hosting 2 collectives")
     cy.get('.CollectiveCover button')
       .contains('Apply to create a collective')
       .click();
@@ -39,6 +40,11 @@ describe("apply to host", () => {
     cy.get('.CollectivePage .longDescription').contains(longDescription.replace(/\*/g, ""));
     cy.get('.NotificationBar h1').contains("success");
     cy.get('.NotificationBar p').contains("BrusselsTogether ASBL");
+    cy.url().then(currentUrl => {
+      const CollectiveId = currentUrl.match(/CollectiveId=([0-9]+)/)[1];
+      return cy.visit(`${WEBSITE_URL}/brusselstogether/collectives/${CollectiveId}/approve`);
+    });
+    cy.get('.error .message').contains("You need to be logged in as an admin of the host of this collective to approve it");
   })
 
 })

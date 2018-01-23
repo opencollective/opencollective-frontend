@@ -109,7 +109,7 @@ class OrderForm extends React.Component {
       'twitterHandle.description': { id: 'user.twitterHandle.description', defaultMessage: 'If any' },
       'email.label': { id: 'user.email.label', defaultMessage: 'email' },
       'email.description': { id: 'user.email.description', defaultMessage: '* required' },
-      'email.description.login': { id: 'signin.createAccount.description', defaultMessage: 'Welcome back! Click on \"Login\" (or hit Enter) and we will send you a link to login by email.' },
+      'email.description.login': { id: 'signin.createAccount.description', defaultMessage: 'There is no user with this email address. Click on "Sign Up" to create a new Open Collective Account.' },
       'email.description.signup': { id: 'signin.emailSent.description', defaultMessage: 'Login email sent. Please follow the instructions in that email to proceed.'},
       'description.label': { id: 'user.description.label', defaultMessage: 'Short bio' },
       'description.description': { id: 'user.description.description', defaultMessage: 'Present yourself in 60 characters or less, if you can!' },

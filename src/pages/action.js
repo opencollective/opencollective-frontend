@@ -72,7 +72,7 @@ class ActionPage extends React.Component {
             { this.state.error &&
               <div className="error">
                 <h2><FormattedMessage id="error.label" defaultMessage="Error" /></h2>
-                <div className="messge">{this.state.error.message}</div>
+                <div className="message">{this.state.error.message}</div>
               </div>
             }
           </div>
