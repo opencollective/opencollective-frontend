@@ -6,17 +6,13 @@ import request from 'supertest-as-promised';
 import config from 'config';
 import jwt from 'jsonwebtoken';
 import Promise from 'bluebird';
-
 import app from '../server/index';
 import * as utils from '../test/utils';
 import stripeMock from './mocks/stripe';
 import models from '../server/models';
-import roles from '../server/constants/roles';
 import * as payments from '../server/lib/payments';
 
-
 const application = utils.data('application');
-
 const STRIPE_URL = 'https://api.stripe.com:443';
 const ordersData = utils.data('orders');
 
