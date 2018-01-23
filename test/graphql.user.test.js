@@ -35,7 +35,7 @@ describe('Query Tests', () => {
 
   beforeEach(() => collective1.addUserWithRole(user1, 'BACKER'));
   beforeEach(() => collective2.addUserWithRole(user1, 'ADMIN'));
-  beforeEach(() => collective1.addUserWithRole(host, 'HOST'));
+  beforeEach(() => collective1.addHost(host.collective));
 
   beforeEach('create stripe account', () => models.ConnectedAccount.create({
     service: 'stripe',

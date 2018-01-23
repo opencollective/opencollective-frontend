@@ -74,6 +74,63 @@ export const BackersStatsType = new GraphQLObjectType({
   }
 });
 
+export const CollectivesStatsType = new GraphQLObjectType({
+  name: "CollectivesStatsType",
+  description: "Breakdown of collectives under this collective by role (all/host/member)",
+  fields: () => {
+    return {
+      // We always have to return an id for apollo's caching
+      id: {
+        type: GraphQLInt,
+        resolve(collective) {
+          return collective.id;
+        }
+      },
+      all: {
+        type: GraphQLInt,
+        async resolve(collective) {
+          return models.Collective.count({
+            where: {
+              $or: {
+                ParentCollectiveId: collective.id,
+                HostCollectiveId: collective.id
+              },
+              type: types.COLLECTIVE,
+              isActive: true
+            }
+          });
+        }
+      },
+      host: {
+        type: GraphQLInt,
+        description: "Returns the collectives hosted by this collective",
+        async resolve(collective) {
+          return models.Collective.count({
+            where: {
+              HostCollectiveId: collective.id,
+              type: types.COLLECTIVE,
+              isActive: true
+            }
+          });
+        }
+      },
+      parent: {
+        type: GraphQLInt,
+        description: "Returns the number of collectives that have this collective has parent",
+        async resolve(collective) {
+          return models.Collective.count({
+            where: {
+              ParentCollectiveId: collective.id,
+              type: types.COLLECTIVE,
+              isActive: true
+            }
+          });
+        }
+      }
+    }
+  }
+});
+
 export const ExpensesStatsType = new GraphQLObjectType({
   name: "ExpensesStatsType",
   description: "Breakdown of expenses per status (ALL/PENDING/APPROVED/PAID/REJECTED)",
@@ -159,17 +216,9 @@ export const CollectiveStatsType = new GraphQLObjectType({
       },
       collectives: {
         description: "Number of collectives under this collective",
-        type: GraphQLInt,
+        type: CollectivesStatsType,
         resolve(collective) {
-          return models.Collective.count({
-            where: {
-              $or: {
-                ParentCollectiveId: collective.id,
-                HostCollectiveId: collective.id
-              },
-              type: types.COLLECTIVE
-            }
-          });
+          return collective;
         }
       },
       updates: {

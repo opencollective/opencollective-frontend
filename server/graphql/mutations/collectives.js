@@ -16,17 +16,18 @@ export function createCollective(_, args, req) {
 
   let hostCollective, parentCollective, collective;
 
-  const location = args.collective.location;
-
   const collectiveData = {
     ...args.collective,
-    locationName: location.name,
-    address: location.address,
     CreatedByUserId: req.remoteUser.id
   };
 
-  if (location && location.lat) {
-    collectiveData.geoLocationLatLong = { type: 'Point', coordinates: [location.lat, location.long] };
+  const location = args.collective.location;
+  if (location) {
+    collectiveData.locationName = location.name;
+    collectiveData.address = location.address;
+    if (location.lat) {
+      collectiveData.geoLocationLatLong = { type: 'Point', coordinates: [location.lat, location.long] };
+    }
   }
 
   const promises = [];
@@ -82,6 +83,11 @@ export function createCollective(_, args, req) {
   .then(c => collective = c)
   .then(() => collective.editTiers(args.collective.tiers))
   .then(() => collective.addUserWithRole(req.remoteUser, roles.ADMIN, { CreatedByUserId: req.remoteUser.id }))
+  .then(() => {
+    if (collective.HostCollectiveId) {
+      collective.addHost(hostCollective, req.remoteUser);
+    }
+  })
   .then(() => collective.editPaymentMethods(args.collective.paymentMethods, { CreatedByUserId: req.remoteUser.id }))
   .then(async () => {
     // if the type of collective is an organization or an event, we don't notify the host

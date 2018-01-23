@@ -66,8 +66,8 @@ describe('lib.payments.test.js', () => {
     totalAmount: AMOUNT,
     currency: CURRENCY
   }).then(o => o.setPaymentMethod({ token: STRIPE_TOKEN })).then(t => order = t))
-  beforeEach('add user to collective as host', () => collective.addUserWithRole(host, roles.HOST));
-  beforeEach('add user to collective2 as host', () => collective2.addUserWithRole(host, roles.HOST));
+  beforeEach('add host to collective', () => collective.addHost(host.collective));
+  beforeEach('add host to collective2', () => collective2.addHost(host.collective));
 
   beforeEach('create stripe account', (done) => {
     models.ConnectedAccount.create({

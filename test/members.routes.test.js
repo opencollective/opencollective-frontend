@@ -56,7 +56,7 @@ describe('members.routes.test.js', () => {
   // Add the host and a backer to the collective.
   beforeEach('add host and backer', (done) => {
     const promises = [
-      collective.addUserWithRole(users[0], roles.HOST),
+      collective.addHost(users[0].collective),
       collective.addUserWithRole(users[1], roles.ADMIN),
       collective.addUserWithRole(users[2], roles.BACKER)
     ];

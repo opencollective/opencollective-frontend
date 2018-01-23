@@ -9,8 +9,7 @@ import _ from 'lodash';
 import Promise from 'bluebird';
 
 const application = utils.data('application');
-const userData = utils.data('user1');
-const user2Data = utils.data('user2');
+const hostUserData = utils.data('host1');
 const collectiveData = utils.data('collective1');
 const collective2Data = utils.data('collective2');
 const collective3Data = utils.data('collective3');
@@ -26,21 +25,23 @@ const {
 
 describe("notification.model.test.js", () => {
 
-  let user;
-  let user2;
+  let hostUser;
   let collective;
   let collective2;
 
   beforeEach(() => utils.resetTestDB());
 
   beforeEach(() => {
-    const promises = [User.createUserWithCollective(userData), User.createUserWithCollective(user2Data), Collective.create(collectiveData), Collective.create(collective2Data)];
+    const promises = [
+      User.createUserWithCollective(hostUserData),
+      Collective.create(collectiveData),
+      Collective.create(collective2Data)
+    ];
     return Promise.all(promises).then((results) => {
-      user = results[0];
-      user2 = results[1];
-      collective = results[2];
-      collective2 = results[3];
-      return collective.addUserWithRole(user, 'HOST')
+      hostUser = results[0];
+      collective = results[1];
+      collective2 = results[2];
+      return collective.addHost(hostUser.collective)
     })
   });
 
@@ -48,7 +49,7 @@ describe("notification.model.test.js", () => {
   it('subscribes to the notifications for the `collective.transaction.approved` email', () =>
     request(app)
       .post(`/groups/${collective.id}/activities/collective.transaction.approved/subscribe`)
-      .set('Authorization', `Bearer ${user.jwt()}`)
+      .set('Authorization', `Bearer ${hostUser.jwt()}`)
       .send({ api_key: application.api_key })
       .expect(200)
       .then(res => {
@@ -56,7 +57,7 @@ describe("notification.model.test.js", () => {
 
         return Notification.findAndCountAll({
           where: {
-            UserId: user.id,
+            UserId: hostUser.id,
             CollectiveId: collective.id,
             type: 'collective.transaction.approved',
             active: true
@@ -68,12 +69,12 @@ describe("notification.model.test.js", () => {
   it(`disables notification for the ${notificationData.type} email`, () =>
     request(app)
       .post(`/groups/${collective.id}/activities/${notificationData.type}/unsubscribe`)
-      .set('Authorization', `Bearer ${user.jwt()}`)
+      .set('Authorization', `Bearer ${hostUser.jwt()}`)
       .send({ api_key: application.api_key })
       .expect(200)
       .then(() =>
         Notification.findAndCountAll({where: {
-          UserId: user.id,
+          UserId: hostUser.id,
           CollectiveId: collective.id,
           type: notificationData.type,
           active: true
@@ -83,14 +84,14 @@ describe("notification.model.test.js", () => {
   it('fails to add another notification if one exists', () =>
     request(app)
       .post(`/groups/${collective.id}/activities/${notificationData.type}/subscribe`)
-      .set('Authorization', `Bearer ${user.jwt()}`)
+      .set('Authorization', `Bearer ${hostUser.jwt()}`)
       .send({ api_key: application.api_key })
       .expect(400)
       .then(res => {
         expect(res.body.error.message).to.equal('Already subscribed to this type of activity');
         return Notification.findAndCountAll({
           where: {
-            UserId: user.id,
+            UserId: hostUser.id,
             CollectiveId: collective.id,
             type: notificationData.type,
             active: true
@@ -102,26 +103,28 @@ describe("notification.model.test.js", () => {
   it('fails to add a notification if not a member of the collective', () =>
     request(app)
       .post(`/groups/${collective2.id}/activities/collective.transaction.approved/subscribe`)
-      .set('Authorization', `Bearer ${user.jwt()}`)
+      .set('Authorization', `Bearer ${hostUser.jwt()}`)
       .send({ api_key: application.api_key })
       .expect(403)
       .then(() => Notification.findAndCountAll({where: {
-          UserId: user.id,
+          UserId: hostUser.id,
           CollectiveId: collective2.id,
           type: notificationData.type,
           active: true
         }}))
       .tap(res => expect(res.count).to.equal(0)));
 
-  it('automatically subscribe new members to `collective.transaction.created`, `collective.expense.created` and `collective.monthlyreport` events', () =>
-    request(app)
+  it('automatically subscribe new members to `collective.transaction.created`, `collective.expense.created` and `collective.monthlyreport` events', () => {
+    return request(app)
       .post('/groups')
       .send({
         api_key: application.api_key,
-        group: Object.assign(collective3Data, { users: [
-          { email: user2.email, role: roles.HOST },
-          { email: utils.data("user3").email, role: roles.ADMIN }
-        ]})
+        group: Object.assign(collective3Data, {
+          hostId: hostUser.CollectiveId,
+          users: [
+            { email: utils.data("user3").email, role: roles.ADMIN }
+          ]
+        })
       })
       .expect(200)
       .then(res => Notification.findAndCountAll({where: {
@@ -141,7 +144,8 @@ describe("notification.model.test.js", () => {
           'mailinglist.host'
         ]);
       })
-      .tap(res => expect(res.count).to.equal(7)));
+      .tap(res => expect(res.count).to.equal(7))
+    });
 
   describe('getSubscribers', () => {
 

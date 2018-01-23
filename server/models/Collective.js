@@ -593,6 +593,10 @@ export default function(Sequelize, DataTypes) {
    */
   Collective.prototype.addUserWithRole = function(user, role, defaultAttributes) {
 
+    if (role === roles.HOST) {
+      return console.error("Please use Collective.addHost(hostCollective, remoteUser);");
+    }
+
     models.Notification.subscribeUserWithRole(user.id, this.id, role);
 
     const member = {
@@ -615,9 +619,6 @@ export default function(Sequelize, DataTypes) {
       const memberUser = results[2];
 
       switch (role) {
-        case roles.HOST:
-          return this.update({ HostCollectiveId: user.CollectiveId });
-
         case roles.BACKER:
         case roles.ATTENDEE:
         case roles.FOLLOWER:
@@ -704,17 +705,22 @@ export default function(Sequelize, DataTypes) {
     });
   };
 
+  /**
+   * Add the host in the Members table and updates HostCollectiveId
+   * @param {*} hostCollective instanceof models.Collective
+   * @param {*} creatorUser { id } (optional, falls back to hostCollective.CreatedByUserId)
+   */
   Collective.prototype.addHost = function(hostCollective, creatorUser) {
 
-    models.Notification.subscribeUserWithRole(creatorUser.id, this.id, roles.HOST);
+    models.Notification.subscribeCollectiveWithRole(hostCollective, this.id, roles.HOST);
 
     const member = {
       role: roles.HOST,
-      CreatedByUserId: creatorUser.id,
+      CreatedByUserId: creatorUser ? creatorUser.id : hostCollective.CreatedByUserId,
       MemberCollectiveId: hostCollective.id,
       CollectiveId: this.id,
     };
-
+    this.update({ HostCollectiveId: hostCollective.id });
     return models.Member.create(member);
   };
 

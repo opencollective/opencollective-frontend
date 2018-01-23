@@ -2,7 +2,6 @@ import _ from 'lodash';
 import { expect } from 'chai';
 import * as script from '../scripts/populate_recurring_paypal_transactions';
 import * as utils from '../test/utils';
-import roles from '../server/constants/roles';
 import models from '../server/models';
 
 const { data } = utils;
@@ -51,7 +50,7 @@ describe.skip('scripts/populate_recurring_paypal_transactions', () => {
 
   beforeEach(() => models.Collective.create(data('collective1')).tap(g => collective = g));
 
-  beforeEach(() => collective.addUserWithRole(user, roles.HOST));
+  beforeEach(() => collective.addHost(user.collective));
 
   beforeEach(() =>
     models.ConnectedAccount.create({
