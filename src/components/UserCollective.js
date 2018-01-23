@@ -280,13 +280,33 @@ class UserCollective extends React.Component {
                 </div>
               </div>
 
-              { this.collective.stats.collectives > 0 &&
+              { get(this.collective, 'stats.collectives.host') > 0 &&
                 <section id="hosting">
                   <h1>
                     <FormattedMessage
-                      id="collective"
-                      values={{ n: this.collective.stats.collectives }}
-                      defaultMessage={`{n} {n, plural, one {collective} other {collectives}}`}
+                      id="organization.collective.memberOf.collective.host.title"
+                      values={{ n: this.collective.stats.collectives.host }}
+                      defaultMessage={`We are hosting {n, plural, one {this collective} other {{n} collectives}}`}
+                      />
+                  </h1>
+                  <div className="cardsList">
+                    <CollectivesWithData
+                      HostCollectiveId={this.collective.id}
+                      orderBy="balance"
+                      orderDirection="DESC"
+                      limit={20}
+                      />
+                  </div>
+                </section>
+              }
+
+              { get(this.collective, 'stats.collectives.parent') > 0 &&
+                <section id="parenting">
+                  <h1>
+                    <FormattedMessage
+                      id="organization.collective.memberOf.collective.parent.title"
+                      values={{ n: this.collective.stats.collectives.parent }}
+                      defaultMessage={`{n, plural, one {this collective is} other {{n} collectives are}} part of our organization`}
                       />
                   </h1>
                   <div className="cardsList">
