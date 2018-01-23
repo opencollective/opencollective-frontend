@@ -145,6 +145,55 @@ describe('graphql.transaction.test.js', () => {
       });
     });
 
+    it('with dateFrom', async () => {
+      // Given the followin query
+      const query = `
+        query allTransactions($CollectiveId: Int!, $limit: Int, $offset: Int, $type: String, $dateFrom: String $dateTo: String) {
+          allTransactions(CollectiveId: $CollectiveId, limit: $limit, offset: $offset, type: $type, dateFrom: $dateFrom, dateTo: $dateTo) {
+            id,
+          }
+        }
+      `;
+
+      // When the query is executed with the parameter `dateFrom`
+      const result = await utils.graphqlQuery(query, {
+        CollectiveId: 2,
+        dateFrom: '2017-10-01',
+      });
+
+      // Then the result should contain no errors
+      expect(result.errors).to.not.exist;
+
+      // TODO: If the database rows change, this test will likely fail
+      // And then the results should only include the rows with
+      // `createdAt` after `dateFrom`.
+      expect(result.data.allTransactions.length).to.equal(5);
+    });
+
+    it('with dateTo', async () => {
+      // Given the followin query
+      const query = `
+        query allTransactions($CollectiveId: Int!, $limit: Int, $offset: Int, $type: String, $dateFrom: String $dateTo: String) {
+          allTransactions(CollectiveId: $CollectiveId, limit: $limit, offset: $offset, type: $type, dateFrom: $dateFrom, dateTo: $dateTo) {
+            id,
+          }
+        }
+      `;
+
+      // When the query is executed with the parameter `dateFrom`
+      const result = await utils.graphqlQuery(query, {
+        CollectiveId: 2,
+        dateTo: '2017-10-01',
+      });
+
+      // Then the result should contain no errors
+      expect(result.errors).to.not.exist;
+
+      // TODO: If the database rows change, this test will likely fail
+      // And then there should bring all the rows created before `2017-10-01`
+      expect(result.data.allTransactions.length).to.equal(78);
+    });
+
     it('with pagination', async () => {
       const limit = 20;
       const offset = 20;
