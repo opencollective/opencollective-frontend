@@ -1,7 +1,8 @@
 import models from '../../models';
 import * as errors from '../errors';
 import { mustHaveRole } from '../../lib/auth';
-import { pick, get } from 'lodash';
+import { get } from 'lodash';
+import { strip_tags } from '../../lib/utils';
 
 function require(args, path) {
   if (!get(args, path)) throw new errors.ValidationFailed({ message: `${path} required` });
@@ -13,10 +14,12 @@ export async function createUpdate(_, args, req) {
   require(args, 'update.title');
 
   const update = await models.Update.create({
-    ...pick(args.update, 'title', 'text'),
+    title: args.update.title,
+    html: strip_tags(args.update.html, '<a><b><i><strong><img><blockquote><iframe>'),
     CollectiveId,
     TierId: get(args, 'update.tier.id'),
-    CreatedByUserId: req.remoteUser.id
+    CreatedByUserId: req.remoteUser.id,
+    FromCollectiveId: req.remoteUser.CollectiveId
   });
 
   return update;

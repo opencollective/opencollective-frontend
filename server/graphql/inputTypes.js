@@ -206,7 +206,7 @@ export const UpdateInputType = new GraphQLInputObjectType({
     slug: { type: GraphQLString },
     title: { type: GraphQLString },
     image: { type: GraphQLString },
-    text: { type: GraphQLString },
+    html: { type: GraphQLString },
     fromCollective: { type: CollectiveAttributesInputType },
     collective: { type: new GraphQLNonNull(CollectiveAttributesInputType) },
     tier: { type: TierInputType }
@@ -222,7 +222,7 @@ export const UpdateAttributesInputType = new GraphQLInputObjectType({
     slug: { type: GraphQLString },
     title: { type: GraphQLString },
     image: { type: GraphQLString },
-    text: { type: GraphQLString },
+    html: { type: GraphQLString },
     fromCollective: { type: CollectiveAttributesInputType },
     tier: { type: TierInputType }
   })

@@ -92,7 +92,7 @@ export default function(Sequelize, DataTypes) {
     },
 
     title: DataTypes.STRING, 
-    text: DataTypes.STRING,
+    html: DataTypes.STRING,
 
     image: DataTypes.STRING,
 
@@ -128,7 +128,7 @@ export default function(Sequelize, DataTypes) {
         return {
           id: this.id,
           title: this.title,
-          text: this.text,
+          html: this.html,
           image: this.image,
           createdAt: this.createdAt,
           updatedAt: this.updatedAt,
@@ -197,7 +197,7 @@ export default function(Sequelize, DataTypes) {
         throw new errors.ValidationFailed({ message: "Cannot link this update to a Tier that doesn't belong to this collective" });
       }
     }
-    const editableAttributes = ['TierId', 'FromCollectiveId', 'title', 'text', 'image', 'tags'];
+    const editableAttributes = ['TierId', 'FromCollectiveId', 'title', 'html', 'image', 'tags'];
     return await this.update({
       ...pick(newUpdateData, editableAttributes),
       LastEditedByUserId: remoteUser.id

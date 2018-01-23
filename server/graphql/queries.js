@@ -117,7 +117,7 @@ const queries = {
       const query = { where: {} };
       if (args.limit) query.limit = args.limit;
       if (args.offset) query.offset = args.offset;
-      query.order = [['publishedAt', 'DESC']];
+      query.order = [['publishedAt', 'DESC'], ['createdAt', 'DESC']];
       if (!req.remoteUser || !req.remoteUser.isAdmin(args.CollectiveId)) {
         query.where.publishedAt = { $ne: null };
       }

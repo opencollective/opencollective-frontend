@@ -32,6 +32,29 @@ export const decrypt = (text) => {
   return dec;
 };
 
+export function strip_tags(str, allowed) {
+
+  // making sure the allowed arg is a string containing only tags in lowercase (<a><b><c>)
+  allowed = ((`${(allowed || '')}`).toLowerCase().match(/<[a-z][a-z0-9]*>/g) || []).join('')
+
+  const tags = /<\/?([a-z][a-z0-9]*)\b[^>]*>/gi
+  const commentsAndPhpTags = /<!--[\s\S]*?-->|<\?(?:php)?[\s\S]*?\?>/gi
+
+  let after = str;
+  // recursively remove tags to ensure that the returned string doesn't contain forbidden tags after previous passes (e.g. '<<bait/>switch/>')
+  while (true) { // eslint-disable-line
+    const before = after
+    after = before.replace(commentsAndPhpTags, '').replace(tags, ($0, $1) => {
+      return allowed.indexOf(`<${$1.toLowerCase()}>`) > -1 ? $0 : ''
+    })
+
+    // return once no more tags are removed
+    if (before === after) {
+      return after
+    }
+  }  
+}
+
 /**
  * Generate a secured token that works inside URLs
  * http://stackoverflow.com/a/25690754

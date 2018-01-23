@@ -39,7 +39,7 @@ describe('graphql.updates.test', () => {
       CollectiveId: collective1.id,
       CreatedByUserId: user1.id,
       title: "first update",
-      text: "long text for the update #1"
+      html: "long text for the update #1"
     }).then(u => update1 = u)
   });
 
@@ -53,7 +53,7 @@ describe('graphql.updates.test', () => {
   before(() => {
     update = {
       title: "Monthly update 1",
-      text: "This is the update",
+      html: "This is the update",
       collective: {
         id: collective1.id
       }

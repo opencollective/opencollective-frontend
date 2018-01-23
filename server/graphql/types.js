@@ -19,6 +19,7 @@ import {
 
 import models from '../models';
 import dataloaderSequelize from 'dataloader-sequelize';
+import { strip_tags } from '../lib/utils';
 
 dataloaderSequelize(models.Order);
 dataloaderSequelize(models.Transaction);
@@ -450,13 +451,13 @@ export const UpdateType = new GraphQLObjectType({
       summary: {
         type: GraphQLString,
         resolve(update) {
-          return update.text.substr(0,255);
+          return strip_tags(update.html || "").substr(0,255);
         }
       },
-      text: {
+      html: {
         type: GraphQLString,
         resolve(update) {
-          return update.text;
+          return update.html;
         }
       },
       tags: {
@@ -465,7 +466,7 @@ export const UpdateType = new GraphQLObjectType({
           return update.tags;
         }
       },
-      user: {
+      createdByUser: {
         type: UserType,
         resolve(update) {
           return update.getUser();

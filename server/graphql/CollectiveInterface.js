@@ -172,6 +172,13 @@ export const CollectiveStatsType = new GraphQLObjectType({
           });
         }
       },
+      updates: {
+        description: "Number of updates published by this collective",
+        type: GraphQLInt,
+        resolve(collective) {
+          return models.Update.count({ where: { CollectiveId: collective.id, publishedAt: { $ne: null } } });
+        }
+      },
       events: {
         description: "Number of events under this collective",
         type: GraphQLInt,
@@ -381,6 +388,13 @@ export const CollectiveInterfaceType = new GraphQLInterfaceType({
       role: { type: GraphQLString },
       twitterHandle: { type: GraphQLString },
       website: { type: GraphQLString },
+      updates: {
+        type: new GraphQLList(EventCollectiveType),
+        args: {
+          limit: { type: GraphQLInt },
+          offset: { type: GraphQLInt }
+        }
+      },
       events: {
         type: new GraphQLList(EventCollectiveType),
         args: {
@@ -771,6 +785,19 @@ const CollectiveFields = () => {
       type: GraphQLString,
       resolve(collective) {
         return collective.website;
+      }
+    },
+    updates: {
+      type: new GraphQLList(EventCollectiveType),
+      args: {
+        limit: { type: GraphQLInt },
+        offset: { type: GraphQLInt }
+      },
+      resolve(collective, args) {
+        const query = { CollectiveId: collective.id, publishedAt: { $ne: null } };
+        if (args.limit) query.limit = args.limit;
+        if (args.offset) query.offset = args.offset;
+        return models.Update.findAll(query);
       }
     },
     events: {
