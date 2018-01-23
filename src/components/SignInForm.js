@@ -95,7 +95,7 @@ class LoginForm extends React.Component {
           if (exists) {
             this.setState({ isNewUser: false, signup: false, loginSent: false });
           } else {
-            this.setState({ isNewUser: true });
+            this.setState({ isNewUser: true, signup: true, loginSent: false });
           }
         })
         .catch(e => {
