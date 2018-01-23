@@ -69,6 +69,7 @@ class TransactionsPage extends React.Component {
             <TransactionsWithData
               collective={collective}
               LoggedInUser={this.state.LoggedInUser}
+              showCSVlink={true}
               />
 
           </div>

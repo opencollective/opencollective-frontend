@@ -54,6 +54,8 @@
   "expenses.submit": "Submit an Expense",
   "collective.transactions.title": "{n, plural, one {Latest transaction} other {Latest transactions}}",
   "transactions.viewAll": "View All Transactions",
+  "transactions.emptysearch": "There are no transactions in this date range.",
+  "transactions.downloadcsvbutton": "Download CSV",
   "membership.role.host": "host",
   "roles.admin.label": "Core Contributor",
   "roles.member.label": "Contributor",

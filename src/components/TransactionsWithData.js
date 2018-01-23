@@ -19,7 +19,7 @@ class TransactionsPage extends React.Component {
   }
 
   render() {
-    const { data, LoggedInUser, collective, fetchMore } = this.props;
+    const { data, LoggedInUser, collective, fetchMore, showCSVlink } = this.props;
 
     if (data.error) {
       console.error("graphql error>>>", data.error.message);
@@ -37,6 +37,7 @@ class TransactionsPage extends React.Component {
           refetch={data.refetch}
           fetchMore={fetchMore}
           LoggedInUser={LoggedInUser}
+          showCSVlink={showCSVlink}
           />
 
       </div>
@@ -46,9 +47,9 @@ class TransactionsPage extends React.Component {
 }
 
 
-const getTransactionsQuery = gql`
-query Transactions($CollectiveId: Int!, $type: String, $limit: Int, $offset: Int) {
-  allTransactions(CollectiveId: $CollectiveId, type: $type, limit: $limit, offset: $offset) {
+export const getTransactionsQuery = gql`
+query Transactions($CollectiveId: Int!, $type: String, $limit: Int, $offset: Int, $dateFrom: String, $dateTo: String) {
+  allTransactions(CollectiveId: $CollectiveId, type: $type, limit: $limit, offset: $offset, dateFrom: $dateFrom, dateTo: $dateTo) {
     id
     uuid
     description
@@ -72,6 +73,7 @@ query Transactions($CollectiveId: Int!, $type: String, $limit: Int, $offset: Int
     host {
       id
       name
+      currency
     }
     ... on Expense {
       category
