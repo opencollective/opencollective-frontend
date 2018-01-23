@@ -164,6 +164,8 @@ class InputField extends React.Component {
       case 'date':
       case 'datetime':
         const timeFormat = field.type === 'date' ? false : true;
+        const { closeOnSelect } = this.props;
+
         this.input = (
         <FormGroup>
           {field.className === 'horizontal' &&
@@ -178,7 +180,8 @@ class InputField extends React.Component {
                   value={moment.tz(new Date(this.state.value || field.defaultValue), context.timezone)}
                   isValidDate={field.validate}
                   onChange={date => date.toISOString ? this.handleChange(date.toISOString()) : false}
-                  />
+                  closeOnSelect={closeOnSelect}
+                />
               </Col>
             </div>
           }
@@ -191,7 +194,8 @@ class InputField extends React.Component {
                 value={moment.tz(new Date(this.state.value || field.defaultValue), context.timezone)}
                 isValidDate={field.validate}
                 onChange={date => date.toISOString ? this.handleChange(date.toISOString()) : false}
-                />
+                closeOnSelect={closeOnSelect}
+              />
               {field.description && <HelpBlock>{field.description}</HelpBlock>}
             </div>
           }
