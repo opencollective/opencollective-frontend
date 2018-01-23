@@ -43,6 +43,12 @@ export default function(Sequelize, DataTypes) {
     return Promise.map(notifications, u => Notification.create(_.defaults({},u,defaultValues))).catch(console.error);
   };
 
+  Notification.subscribeCollectiveWithRole = (collective, CollectiveId, role) => {
+    return collective.getAdminUsers().then(adminUsers => {
+      return Promise.each(adminUsers, adminUser => Notification.subscribeUserWithRole(adminUser.id, CollectiveId, role));
+    });
+  }
+
   Notification.subscribeUserWithRole = (UserId, CollectiveId, role) => {
 
     if (!UserId) {
@@ -71,7 +77,7 @@ export default function(Sequelize, DataTypes) {
         break;
     }
 
-    Promise.map(notifications, (notification) => {
+    return Promise.map(notifications, (notification) => {
       return models.Notification
         .create({ ...notification, UserId: UserId, CollectiveId: CollectiveId, channel: 'email' })
         .catch(e => console.error(e.name, `User ${UserId} is already subscribed to ${notification.type}`))

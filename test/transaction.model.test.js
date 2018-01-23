@@ -1,7 +1,6 @@
 import {expect} from 'chai';
 import sinon from 'sinon';
 import * as utils from '../test/utils';
-import roles from '../server/constants/roles';
 import models from '../server/models';
 
 const {Transaction} = models;
@@ -30,7 +29,7 @@ describe('transaction model', () => {
           HostCollectiveId: host.CollectiveId
         };
       })
-      .then(() => collective.addUserWithRole(host, roles.HOST)));
+      .then(() => collective.addHost(host.collective)));
 
   it('automatically generates uuid', done => {
     Transaction.create({

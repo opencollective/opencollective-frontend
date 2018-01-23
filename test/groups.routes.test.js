@@ -97,7 +97,10 @@ describe('groups.routes.test.js', () => {
       afterEach('restore emailLib', () => emailLib.sendMessageFromActivity.restore());
 
       it('sends an email to the host', done => {
-        setTimeout(() => {
+        const expectEmail = () => {
+          if (emailLib.sendMessageFromActivity.callCount === 0) {
+            return setTimeout(expectEmail, 100);
+          }
           const activity = emailLib.sendMessageFromActivity.args[0][0];
           expect(emailLib.sendMessageFromActivity.args.length).to.equal(1); // send the email to the two admins of the host - one unsubscribed;
           expect(activity.type).to.equal('collective.created');
@@ -107,8 +110,8 @@ describe('groups.routes.test.js', () => {
 
           expect(emailLib.sendMessageFromActivity.args[0][1].User.email).to.equal(hostAdmin1.email);
           done();
-        }, 200);
-
+        }
+        setTimeout(expectEmail, 100);
       });
 
       it('returns the attributes of the group', () => {

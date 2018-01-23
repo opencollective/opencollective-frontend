@@ -25,8 +25,8 @@ describe('transactions.routes.test.js', () => {
   before('create collective2', () => models.Collective.create(_.omit(utils.data('collective2'), ['slug'])).tap(g => collective2 = g));
 
   // Add users to collectives
-  before('add host to collective2', () => collective2.addUserWithRole(host, roles.HOST));
-  before('add host to publicCollective', () => publicCollective.addUserWithRole(host, roles.HOST));
+  before('add host to collective2', () => collective2.addHost(host.collective));
+  before('add host to publicCollective', () => publicCollective.addHost(host.collective));
   before('add user to publicCollective as a member', () => publicCollective.addUserWithRole(user, roles.ADMIN));
 
   /**

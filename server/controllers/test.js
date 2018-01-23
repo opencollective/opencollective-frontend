@@ -89,7 +89,7 @@ export const resetTestDatabase = function(req, res, next) {
       return models.Collective.create(groupData);
     })
     .then(g => testGroup = g)
-    .then(() => testGroup.addUserWithRole(testHost, roles.HOST))
+    .then(() => testGroup.addHost(testHost.collective))
     .then(() => models.User.createUserWithCollective(memberData))
     .tap(m => testMember = m)
     .then(() => testGroup.addUserWithRole(testMember, roles.MEMBER))

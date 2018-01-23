@@ -20,7 +20,7 @@ describe('stripe.routes.test.js', () => {
   beforeEach('create a host', () => models.User.createUserWithCollective(utils.data('host1')).tap(u => host = u));
   beforeEach('create a user', () => models.User.createUserWithCollective(utils.data('user1')).tap(u => user = u));
   beforeEach('create a collective', () => models.Collective.create(utils.data('collective1')).tap(c => collective = c));
-  beforeEach('add host', () => collective.addUserWithRole(host, roles.HOST));
+  beforeEach('add host', () => collective.addHost(host.collective));
   beforeEach('add backer', () => collective.addUserWithRole(user, roles.BACKER));
 
   afterEach(() => {
