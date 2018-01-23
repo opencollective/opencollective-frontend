@@ -9,7 +9,6 @@ import _ from 'lodash';
 import Promise from 'bluebird';
 
 const application = utils.data('application');
-const userData = utils.data('user1');
 const hostUserData = utils.data('host1');
 const collectiveData = utils.data('collective1');
 const collective2Data = utils.data('collective2');
@@ -26,7 +25,6 @@ const {
 
 describe("notification.model.test.js", () => {
 
-  let user;
   let hostUser;
   let collective;
   let collective2;
@@ -35,16 +33,14 @@ describe("notification.model.test.js", () => {
 
   beforeEach(() => {
     const promises = [
-      User.createUserWithCollective(userData),
       User.createUserWithCollective(hostUserData),
       Collective.create(collectiveData),
       Collective.create(collective2Data)
     ];
     return Promise.all(promises).then((results) => {
-      user = results[0];
-      hostUser = results[1];
-      collective = results[2];
-      collective2 = results[3];
+      hostUser = results[0];
+      collective = results[1];
+      collective2 = results[2];
       return collective.addHost(hostUser.collective)
     })
   });
