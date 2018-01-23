@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { upload } from '../lib/api';
 
 /* 
  * Simple editor component that takes placeholder text as a prop 
@@ -7,7 +8,9 @@ import PropTypes from 'prop-types';
 class HTMLEditor extends React.Component {
 
   static propTypes = {
-    placeholder: PropTypes.string
+    placeholder: PropTypes.string,
+    defaultValue: PropTypes.string,
+    onChange: PropTypes.func
   };
 
   constructor (props) {
@@ -27,13 +30,12 @@ class HTMLEditor extends React.Component {
     this.modules = {
       toolbar: {
         container: [
-          [{ 'header': '1'}, {'header': '2'}, { 'font': [] }],
+          [{ 'header': '1'}, {'header': '2'}],
           [{size: []}],
-          ['bold', 'italic', 'underline', 'strike', 'blockquote'],
+          ['bold', 'italic', 'underline', 'blockquote'],
           [{'list': 'ordered'}, {'list': 'bullet'}, 
-          {'indent': '-1'}, {'indent': '+1'}],
-          ['link', 'image', 'video'],
-          ['clean']
+          ],
+          ['link', 'image', 'video']
         ],
         handlers: {
           'image': () => {
@@ -61,7 +63,7 @@ class HTMLEditor extends React.Component {
   
   handleChange (html) {
     this.setState({ editorHtml: html });
-    console.log(">>> html: ", html);
+    this.props.onChange(html);
   }
 
   selectLocalImage() {
@@ -77,7 +79,7 @@ class HTMLEditor extends React.Component {
       if (/^image\//.test(file.type)) {
         this.saveToServer(file);
       } else {
-        console.warn('You could only upload images.');
+        console.warn('You can only upload images.');
       }
     };
   }
@@ -88,21 +90,13 @@ class HTMLEditor extends React.Component {
    * @param {File} file
    */
   saveToServer(file: File) {
-    console.log(">>> saveToServer");
-    return this.insertToEditor("https://d.pr/i/BIMCK1+");
-    const fd = new FormData();
-    fd.append('image', file);
-
-    const xhr = new XMLHttpRequest();
-    xhr.open('POST', 'http://localhost:3000/upload/image', true);
-    xhr.onload = () => {
-      if (xhr.status === 200) {
-        // this is callback data: url
-        const url = JSON.parse(xhr.responseText).data;
-        this.insertToEditor(url);
-      }
-    };
-    xhr.send(fd);
+    upload(file)
+      .then(fileUrl => {
+        return this.insertToEditor(fileUrl);
+      })
+      .catch(e => {
+        console.error("Error uploading image", e);
+      })
   }
 
   /**
@@ -124,12 +118,19 @@ class HTMLEditor extends React.Component {
     }
 
     return (
-      <div>
+      <div className="HTMLEditor">
+        <style jsx>{`
+          .HTMLEditor :global(.quill) {
+            height: 1rem;
+            min-height: 40rem;
+          }
+        `}</style>
         <this.ReactQuill 
           ref={(el) => { this.reactQuillRef = el }}
           theme="snow"
           onChange={this.handleChange}
-          value={this.state.editorHtml}
+          // value={this.state.editorHtml}
+          defaultValue={this.props.defaultValue}
           modules={this.modules}
           formats={this.formats}
           bounds={'.app'}

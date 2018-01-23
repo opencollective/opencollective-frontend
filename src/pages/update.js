@@ -8,15 +8,15 @@ import NotFound from '../components/NotFound';
 import ErrorPage from '../components/ErrorPage';
 import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
-import UpdatesWithData from '../components/UpdatesWithData';
+import UpdateWithData from '../components/UpdateWithData';
 import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl'
 
 class UpdatesPage extends React.Component {
 
   static getInitialProps (props) {
-    const { query: { collectiveSlug, action }, data } = props;
-    return { slug: collectiveSlug, data, action }
+    const { query: { collectiveSlug, id }, data } = props;
+    return { slug: collectiveSlug, data, id }
   }
 
   constructor(props) {
@@ -31,7 +31,7 @@ class UpdatesPage extends React.Component {
   }
 
   render() {
-    const { data, action } = this.props;
+    const { data, id } = this.props;
     const { LoggedInUser } = this.state;
     if (!data.Collective) return (<NotFound />);
 
@@ -44,11 +44,7 @@ class UpdatesPage extends React.Component {
     const css = LoggedInUser && "//cdn.quilljs.com/1.2.6/quill.snow.css"; // only load html editor css when logged in
     return (
       <div className="UpdatesPage">
-        <style jsx global>{`
-          .UpdatesPage .Updates .update {
-            border-top: 1px solid #CACBCC;
-          }
-        `}</style>
+
         <Header
           title={collective.name}
           description={collective.description}
@@ -70,14 +66,11 @@ class UpdatesPage extends React.Component {
             />
 
           <div className="content" >
-
-            <UpdatesWithData
-              collective={collective}
-              includeHostedCollectives={collective.isHost}
-              defaultAction={action}
-              LoggedInUser={this.state.LoggedInUser}
+            <UpdateWithData
+              id={id}
+              editable={true}
+              LoggedInUser={LoggedInUser}
               />
-
           </div>
 
         </Body>

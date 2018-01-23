@@ -28,8 +28,9 @@ class Button extends React.Component {
   }
 
   onClick(e) {
+    const { type, href, onClick, disabled } = this.props;
+    if (type === "submit") return;
     e.preventDefault();
-    const { href, onClick, disabled } = this.props;
     if (href) {
       return Router.pushRoute(href);
     }
@@ -60,6 +61,10 @@ class Button extends React.Component {
         }
         .Button:hover {
           border: 2px solid #2E8AE6;
+        }
+        .bluewhite {
+          border: 2px solid #CACBCC;
+          color: #3399FF;
         }
         .Button:focus {
           outline: 0;

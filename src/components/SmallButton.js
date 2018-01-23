@@ -38,7 +38,7 @@ class SmallButton extends React.Component {
           .SmallButton:hover button {
             font-weight: bold;
           }
-          .SmallButton.approve button {
+          .SmallButton.approve button, .SmallButton.publish button {
             background: #3399ff;
             border-color: #18191a;
             color: white;

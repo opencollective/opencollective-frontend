@@ -58,8 +58,6 @@ class Updates extends React.Component {
             text-align: center;
           }
           .empty {
-            text-align: center;
-            margin: 4rem;
             color: ${colors.darkgray}
           }
           .itemsList {
@@ -85,7 +83,6 @@ class Updates extends React.Component {
           }
           .update {
             padding: 3rem 0;
-            border-top: 1px solid #CACBCC;            
           }
         `}</style>
 
@@ -96,18 +93,16 @@ class Updates extends React.Component {
               <FormattedMessage id="loading" defaultMessage="loading" />
             </div>
           }
-          {updates.map((update) =>
+          { updates.map((update) =>
             <div className="update">
               <Update
                 key={update.id}
+                compact={true}
                 collective={collective}
                 update={update}
                 editable={editable}
                 includeHostedCollectives={includeHostedCollectives}
                 LoggedInUser={LoggedInUser}
-                allowPayAction={!this.state.isPayActionLocked}
-                lockPayAction={this.setPayActionLock.bind(this, true)}
-                unlockPayAction={this.setPayActionLock.bind(this, false)}
                 />
             </div>
           )}

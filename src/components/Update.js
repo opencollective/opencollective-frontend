@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import withIntl from '../lib/withIntl';
 import { defineMessages, FormattedMessage, FormattedNumber, FormattedDate } from 'react-intl';
-import { capitalize, formatCurrency } from '../lib/utils';
+import { capitalize, formatCurrency, formatDate } from '../lib/utils';
 import { graphql } from 'react-apollo'
 import gql from 'graphql-tag'
 import Avatar from './Avatar';
@@ -11,12 +11,16 @@ import UpdateTextWithData from './UpdateTextWithData';
 import Markdown from 'react-markdown';
 import { Link } from '../server/pages';
 import SmallButton from './SmallButton';
+import EditUpdateForm from './EditUpdateForm';
+import PublishUpdateBtn from './PublishUpdateBtn';
+import { get } from 'lodash';
 
 class Update extends React.Component {
 
   static propTypes = {
     collective: PropTypes.object,
     update: PropTypes.object,
+    compact: PropTypes.bool, // if compact true, only show the summary
     editable: PropTypes.bool,
     includeHostedCollectives: PropTypes.bool,
     LoggedInUser: PropTypes.object
@@ -28,29 +32,21 @@ class Update extends React.Component {
     this.state = {
       modified: false,
       update: {},
-      mode: "summary"
+      mode: props.compact ? "summary" : "details"
     };
 
     this.save = this.save.bind(this);
     this.handleChange = this.handleChange.bind(this);
-    this.toggleDetails = this.toggleDetails.bind(this);
     this.toggleEdit = this.toggleEdit.bind(this);
     this.messages = defineMessages({
       'pending': { id: 'update.pending', defaultMessage: 'pending' },
       'paid': { id: 'update.paid', defaultMessage: 'paid' },
       'approved': { id: 'update.approved', defaultMessage: 'approved' },
       'rejected': { id: 'update.rejected', defaultMessage: 'rejected' },
-      'viewLess': { id: 'update.viewLess', defaultMessage: 'View Less' },
       'edit': { id: 'update.edit', defaultMessage: 'edit' },
       'cancelEdit': { id: 'update.cancelEdit', defaultMessage: 'cancel edit' },
-      'viewMore': { id: 'update.viewMore', defaultMessage: 'View More' }
-    });
-    this.currencyStyle = { style: 'currency', currencyDisplay: 'symbol', minimumFractionDigits: 2, maximumFractionDigits: 2};
-  }
-
-  toggleDetails() {
-    this.setState({
-      mode: this.state.mode === 'details' ? 'summary': 'details',
+      'viewMore': { id: 'update.viewMore', defaultMessage: 'View More' },
+      'viewLatestUpdates': { id: 'update.viewLatestUpdates', defaultMessage: "View latest updates" }
     });
   }
 
@@ -70,13 +66,28 @@ class Update extends React.Component {
     this.setState({ modified: true, update });
   }
 
-  async save() {
-    const update = {
-      id: this.props.update.id,
-      ...this.state.update
-    }
+  async save(update) {
+    update.id = get(this.props, 'update.id');
+    console.log(">>> updating ", update);
     const res = await this.props.editUpdate(update);
+    console.log(">>> save res", res);
     this.setState({ modified: false, mode: 'details' });
+  }
+
+  renderViewMoreLink() {
+    const { intl, collective, update } = this.props;
+    return (
+      <div className="viewMore">
+        <style jsx>{`
+          .viewMore {
+            margin-top: 2rem;
+          }
+        `}</style>
+        <Link route={`/${collective.slug}/updates/${update.id}`}>
+          <a>{intl.formatMessage(this.messages['viewMore'])}</a>
+        </Link>
+      </div>
+    );
   }
 
   render() {
@@ -85,26 +96,23 @@ class Update extends React.Component {
       collective,
       update,
       includeHostedCollectives,
-      LoggedInUser,
-      editable
+      LoggedInUser
     } = this.props;
 
     const { mode } = this.state;
-
+    const canEditUpdate = LoggedInUser && LoggedInUser.canEditUpdate(update);
+    const canPublishUpdate = LoggedInUser && LoggedInUser.canEditCollective(collective) && !update.publishedAt;
+    const editable = !this.props.compact && this.props.editable && canEditUpdate;
     return (
-      <div className={`update ${this.state.mode}View`}>
+      <div className={`Update ${this.state.mode}View`}>
         <style jsx>{`
-          .update {
-            width: 100%;
+          .Update {
             margin: 0.5em 0;
             padding: 0.5em;
             transition: max-height 1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             overflow: hidden;
             position: relative;
             display: flex;
-          }
-          .update.detailsView {
-            background-color: #fafafa;
           }
           a {
             cursor: pointer;
@@ -175,11 +183,17 @@ class Update extends React.Component {
         <div className="body">
           <div className="meta">
             <div className="author"><Link route={`/${update.fromCollective.slug}`}><a>{update.fromCollective.name}</a></Link></div> 
-            <div className="publishedAt"><FormattedDate value={update.publishedAt} day="numeric" month="numeric" /></div>
-            { includeHostedCollectives &&
-              <div className="collective"><Link route={`/${update.collective.slug}`}><a>{update.collective.slug}</a></Link> (balance: {formatCurrency(update.collective.stats.balance, update.collective.currency)})</div>
+            { update.publishedAt && 
+              <div className="publishedAt">
+                <FormattedMessage id="update.publishedAt" defaultMessage={"published on {date}"} values={{date: formatDate(update.publishedAt, { day: 'numeric', month: 'long', year: 'numeric' })}} />
+              </div>
             }
-            { editable && LoggedInUser && LoggedInUser.canEditUpdate(update) &&
+            { !update.publishedAt && 
+              <div className="createdAt">
+                <FormattedMessage id="update.createdAt" defaultMessage={"created on {date} (draft)"} values={{date: formatDate(update.createdAt)}} />
+              </div>
+            }
+            { editable &&
               <div><a className="toggleEditUpdate" onClick={this.toggleEdit}>{intl.formatMessage(this.messages[`${mode === 'edit' ? 'cancelEdit' : 'edit'}`])}</a></div>
             }
             <Role role='ADMIN' />
@@ -188,30 +202,47 @@ class Update extends React.Component {
           <div className="title">
             {capitalize(update.title)}
           </div>
-          { this.state.mode === "details" && 
-            <div>
-              <UpdateTextWithData id={update.id} />
-              <span><a className="toggleDetails" onClick={this.toggleDetails}>{intl.formatMessage(this.messages[`${this.state.mode === "details" ? 'viewLess' : 'viewMore'}`])}</a></span>
-            </div>
-          }
+
           { this.state.mode === "summary" &&
-            <div>
-              <Markdown source={update.summary} />
-              <span><a className="toggleDetails" onClick={this.toggleDetails}>{intl.formatMessage(this.messages[`${this.state.mode === "details" ? 'viewLess' : 'viewMore'}`])}</a></span>
+            <div className="summary">
+              {update.summary}
+              { this.renderViewMoreLink() }
             </div>
           }
 
-          { editable &&
-            <div className="actions">
-              { mode === 'edit' && this.state.modified &&
+          { this.state.mode === "details" && 
+            <div>
+              { this.props.compact && this.renderViewMoreLink() }
+              { !this.props.compact &&
                 <div>
-                  <div className="leftColumn"></div>
-                  <div className="rightColumn">
-                    <SmallButton className="primary save" onClick={this.save}><FormattedMessage id="update.save" defaultMessage="save" /></SmallButton>
-                  </div>
+                  { update.html && <div dangerouslySetInnerHTML={{ __html: update.html }} /> }
+                  { !update.html && <UpdateTextWithData id={update.id} /> }
+                  <Link route={`/${collective.slug}/updates`}><a className="viewLatestUpdates">
+                    {intl.formatMessage(this.messages[`viewLatestUpdates`])}</a>
+                  </Link>
                 </div>
               }
             </div>
+          }
+
+          { mode === 'edit' &&
+            <div className="edit">
+              <EditUpdateForm update={update} onSubmit={this.save} />
+              <div className="actions">
+                { mode === 'edit' && this.state.modified &&
+                  <div>
+                    <div className="leftColumn"></div>
+                    <div className="rightColumn">
+                      <SmallButton className="primary save" onClick={this.save}><FormattedMessage id="update.save" defaultMessage="save" /></SmallButton>
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+
+          { canPublishUpdate &&
+            <PublishUpdateBtn id={update.id} />
           }
         </div>
       </div>
@@ -220,11 +251,12 @@ class Update extends React.Component {
 }
 
 const editUpdateQuery = gql`
-mutation editUpdate($update: UpdateInputType!) {
+mutation editUpdate($update: UpdateAttributesInputType!) {
   editUpdate(update: $update) {
     id
+    updatedAt
     title
-    text
+    html
   }
 }
 `;

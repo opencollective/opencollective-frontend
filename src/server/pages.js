@@ -25,6 +25,7 @@ pages
   .add('donate', '/:collectiveSlug/:verb(donate|pay|contribute)/:amount?/:interval(month|monthly|year|yearly)?/:description?', 'createOrder')
   .add('tiers-iframe', '/:collectiveSlug/tiers/iframe')
   .add('transactions', '/:collectiveSlug/transactions')
+  .add('update', '/:collectiveSlug/updates/:id')
   .add('updates', '/:collectiveSlug/updates')
   .add('expenses', '/:collectiveSlug/expenses/:action(new)?')
   .add('host.expenses', '/:hostCollectiveSlug/collectives/expenses')

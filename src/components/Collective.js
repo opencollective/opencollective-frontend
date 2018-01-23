@@ -18,6 +18,7 @@ import HashLink from 'react-scrollchor';
 import { FormattedMessage, defineMessages } from 'react-intl';
 import CollectivesWithData from './CollectivesWithData';
 import ExpensesWithData from './ExpensesWithData';
+import UpdatesWithData from './UpdatesWithData';
 import EventsWithData from './EventsWithData';
 import TransactionsWithData from './TransactionsWithData';
 import { Button } from 'react-bootstrap';
@@ -221,7 +222,7 @@ class Collective extends React.Component {
 
             <div>
 
-              <section id="about">
+              <section>
                 <div className="sidebar tiers" id="contribute">
                   { this.collective.tiers.map(tier => (
                     <TierCard
@@ -238,12 +239,21 @@ class Collective extends React.Component {
                 </div>
 
                 <div className="content" >
-                  <div className="longDescription" >
-                    <Markdown source={this.collective.longDescription || this.collective.description || ''} />
+                  <div id="updates">
+                    <h1><FormattedMessage id="collective.updates.title" defaultMessage="Latest update" /></h1>
+                    <UpdatesWithData
+                      collective={this.collective}
+                      compact={true}
+                      limit={1}
+                      />
                   </div>
                   <div id="events">
                     <h1><FormattedMessage id="collective.events.title" defaultMessage="Events" /></h1>
                     <EventsWithData collectiveSlug={this.collective.slug} />
+                  </div>
+                  <div id="about" className="longDescription" >
+                    <h1><FormattedMessage id="collective.about.title" defaultMessage="About" /></h1>
+                    <Markdown source={this.collective.longDescription || this.collective.description || ''} />
                   </div>
                 </div>
               </section>

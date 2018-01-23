@@ -155,6 +155,10 @@ class MenuBar extends React.Component {
   render() {
     const { collective } = this.props;
 
+    if (!collective) {
+      return (<div />);
+    }
+
     return (
       <div className="MenuBar">
         <style jsx>{`

@@ -22,7 +22,7 @@ class LoggedInUser {
  */
 LoggedInUser.prototype.canEditCollective = function(collective) {
   if (!collective) return false;
-  return (collective.createdByUser && collective.createdByUser.id === this.id) 
+  return (get(collective, 'createdByUser.id') === this.id) 
   || intersection(this.roles[collective.slug], ['HOST','ADMIN']).length > 0;
 }
 
@@ -55,7 +55,9 @@ LoggedInUser.prototype.canEditExpense = function(expense) {
 
 LoggedInUser.prototype.canEditUpdate = function(update) {
   if (!update) return false;
-  if ( get(update, 'fromCollective.id') === this.collective.id) return true;
+  if ( get(update, 'createdByUser.id') === this.id) return true; // if author
+  if ( this.canEditCollective(update.fromCollective)) return true; // if admin of collective author
+  if ( this.canEditCollective(update.collective)) return true; // if admin of collective
   if (intersection(this.roles[get(update, 'collective.slug')], ['ADMIN']).length > 0) return true;
   return false;
 }

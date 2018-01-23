@@ -19,16 +19,20 @@ class UpdateText extends React.Component {
 
   render() {
     const { data: { loading, Update }, intl } = this.props;
-    const text = get(Update, 'text');
+    const html = get(Update, 'html');
 
-    if (!text) {
+    if (!html) {
       return (<div />);
     }
 
     return (
       <div className={`UpdateText ${this.props.mode}`}>
-        <Markdown source={text} />
-      </div>
+        <div 
+          dangerouslySetInnerHTML={{
+            __html: html
+          }}
+          />
+    </div>
     );
   }
 }
@@ -37,7 +41,7 @@ const getUpdateQuery = gql`
   query Update($id: Int!) {
     Update(id: $id) {
       id
-      text
+      html
     }
   }
 `;

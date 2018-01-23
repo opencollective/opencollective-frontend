@@ -4,7 +4,7 @@ import Error from '../components/Error';
 import withIntl from '../lib/withIntl';
 import Updates from '../components/Updates';
 import Currency from '../components/Currency';
-import CreateUpdateForm from '../components/CreateUpdateForm';
+import EditUpdateForm from '../components/EditUpdateForm';
 import { graphql, compose } from 'react-apollo'
 import gql from 'graphql-tag'
 import { FormattedMessage } from 'react-intl'
@@ -25,27 +25,35 @@ class UpdatesWithData extends React.Component {
   constructor(props) {
     super(props);
     this.createUpdate = this.createUpdate.bind(this);
+    this.handleChange = this.handleChange.bind(this);
     this.state = {
       showNewUpdateForm: props.defaultAction === 'new' ? true : false
     }
+  }
+
+  componentWillReceiveProps(newProps) {
+    const { data, collective } = this.props;
+    const { LoggedInUser } = newProps;
+    if (LoggedInUser && LoggedInUser.canEditCollective(collective)) {
+      // We refetch the data to get the updates thare not published yet
+      data.refetch({ options: { fetchPolicy: 'network-only' }});
+    }
+  }
+
+  handleChange(attr, value) {
+    const update = this.state.update;
+    update[attr] = value;
+    this.setState({ update, isModified: true });
   }
 
   async createUpdate(update) {
     const { LoggedInUser, collective } = this.props;
     try {
       update.collective = { id: collective.id };
-      update.currency = collective.currency;
-      update.user = pick(update, ['email', 'paypalEmail']);
-      delete update.email;
-      delete update.paypalEmail;
-
-      if (LoggedInUser) {
-        update.user.id = LoggedInUser.id;
-      }
       console.log(">>> createUpdate", update);
       const res = await this.props.createUpdate(update);
       console.log(">>> createUpdate res", res);
-      this.setState({ showNewUpdateForm: false, updateCreated: res.data.createUpdate })
+      this.setState({ showNewUpdateForm: false, updateCreated: res.data.createUpdate, isModified: false })
     } catch (e) {
       console.error(e);
     }
@@ -66,6 +74,7 @@ class UpdatesWithData extends React.Component {
     }
 
     const updates = data.allUpdates;
+    const showAdminActions = LoggedInUser && LoggedInUser.canEditCollective(collective) && !includeHostedCollectives;
 
     return (
       <div className="UpdatesContainer">
@@ -94,7 +103,6 @@ class UpdatesWithData extends React.Component {
             line-height: 19px;
           }
           .adminActions {
-            text-align: center;
             text-transform: uppercase;
             font-size: 1.3rem;
             font-weight: 600;
@@ -103,32 +111,14 @@ class UpdatesWithData extends React.Component {
           }
           .adminActions ul {
             overflow: hidden;
-            text-align: center;
             margin: 0 auto;
             padding: 0;
-            display: flex;
-            justify-content: center;
             flex-direction: row;
             list-style: none;
           }
           .adminActions ul li {
-            margin: 0 2rem;
           }
         `}</style>
-
-        { !includeHostedCollectives && this.state.showNewUpdateForm &&
-          <CreateUpdateForm
-            collective={collective}
-            LoggedInUser={LoggedInUser}
-            onSubmit={this.createUpdate}
-            />
-        }
-
-        { this.state.updateCreated &&
-          <div className="updateCreated">
-            <FormattedMessage id="update.created" defaultMessage="Your update has been submitted with success. It is now pending approval from one of the core contributors of the collective. You will be notified by email once it has been approved." />
-          </div>
-        }
 
         { !compact &&
           <div>
@@ -142,17 +132,18 @@ class UpdatesWithData extends React.Component {
             </div>
             <div className="adminActions">
               <ul>
-              { !includeHostedCollectives && !this.state.showNewUpdateForm &&
+              { showAdminActions && !this.state.showNewUpdateForm &&
                 <li><a className="submitNewUpdate" onClick={() => this.setState({ showNewUpdateForm: true })}>
                   <FormattedMessage id="update.new.button" defaultMessage="Submit a new update" />
                 </a></li>
               }
               </ul>
             </div>
-            { LoggedInUser && LoggedInUser.canEditCollective(collective) &&
-              <HTMLEditor placeholder={'Write something...'}/>
-            }
           </div>
+        }
+
+        { !includeHostedCollectives && this.state.showNewUpdateForm &&
+          <EditUpdateForm collective={collective} onSubmit={this.createUpdate} />
         }
 
         <Updates
@@ -177,6 +168,7 @@ query Updates($CollectiveId: Int!, $limit: Int, $offset: Int, $includeHostedColl
     id
     title
     summary
+    createdAt
     publishedAt
     updatedAt
     tags
@@ -240,11 +232,16 @@ mutation createUpdate($update: UpdateInputType!) {
     id
     title
     summary
-    text
+    html
+    createdAt
     publishedAt
     updatedAt
     tags
     image
+    collective {
+      id
+      slug
+    }
     fromCollective {
       id
       type
