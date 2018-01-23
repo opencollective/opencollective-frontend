@@ -39,7 +39,7 @@ describe('subscriptions.routes.test.js', () => {
 
   beforeEach(() => models.Collective.create(utils.data('collective1')).tap((g => collective = g)));
 
-  beforeEach(() => collective.addUserWithRole(user, roles.HOST));
+  beforeEach(() => collective.addHost(user.collective));
 
   // create stripe account
   beforeEach(() => {

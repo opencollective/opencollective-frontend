@@ -49,7 +49,7 @@ describe('Mutation Tests', () => {
 
   beforeEach(() => models.User.createUserWithCollective(utils.data('user2')).tap(u => user2 = u));
   beforeEach(() => models.Collective.create(utils.data('collective1')).tap(g => collective1 = g));
-  beforeEach(() => collective1.addUserWithRole(host, roles.HOST));
+  beforeEach(() => collective1.addHost(host.collective));
   beforeEach(() => collective1.addUserWithRole(user1, roles.ADMIN));
 
   beforeEach('create stripe account', (done) => {
@@ -68,6 +68,24 @@ describe('Mutation Tests', () => {
   beforeEach(() => event1.addUserWithRole(user1, roles.ADMIN));
     
   describe('createCollective tests', () => {
+
+    const createCollectiveQuery = `
+    mutation createCollective($collective: CollectiveInputType!) {
+      createCollective(collective: $collective) {
+        id
+        slug
+        host {
+          id
+        }
+        isActive
+        tiers {
+          id
+          name
+          amount
+        }
+      }
+    }
+    `;
 
     describe('creates an event collective', () => {
 
@@ -88,66 +106,39 @@ describe('Mutation Tests', () => {
       };
 
       it("fails if not authenticated", async () => {
-
-        const query = `
-        mutation createCollective($collective: CollectiveInputType!) {
-          createCollective(collective: $collective) {
-            id,
-            slug,
-            tiers {
-              id,
-              name,
-              amount
-            }
-          }
-        }
-        `;
-        const result = await utils.graphqlQuery(query, { collective: getEventData(collective1) });
+        const result = await utils.graphqlQuery(createCollectiveQuery, { collective: getEventData(collective1) });
         expect(result.errors).to.have.length(1);
         expect(result.errors[0].message).to.equal("You need to be logged in to create a collective");
       });
 
 
       it("fails if authenticated but cannot edit collective", async () => {
-
-        const query = `
-        mutation createCollective($collective: CollectiveInputType!) {
-          createCollective(collective: $collective) {
-            id,
-            slug,
-            tiers {
-              id,
-              name,
-              amount
-            }
-          }
-        }
-        `;
-
-        const result = await utils.graphqlQuery(query, { collective: getEventData(collective1) }, user2);
+        const result = await utils.graphqlQuery(createCollectiveQuery, { collective: getEventData(collective1) }, user2);
         expect(result.errors).to.have.length(1);
         expect(result.errors[0].message).to.equal("You must be logged in as a member of the scouts collective to create an event");
+      });
+
+      it("creates a collective on a host", async () => {
+        const collective = {
+          name: "new collective",
+          HostCollectiveId: host.CollectiveId
+        }
+        const result = await utils.graphqlQuery(createCollectiveQuery, { collective }, user1);
+        result.errors && console.error(result.errors[0]);
+        const createdCollective = result.data.createCollective;
+        const hostMembership = await models.Member.findOne({ where: { CollectiveId: createdCollective.id, role: 'HOST' }});
+        const adminMembership = await models.Member.findOne({ where: { CollectiveId: createdCollective.id, role: 'ADMIN' }});
+        expect(createdCollective.host.id).to.equal(host.CollectiveId);
+        expect(createdCollective.isActive).to.be.false;
+        expect(hostMembership.MemberCollectiveId).to.equal(host.CollectiveId);
+        expect(adminMembership.MemberCollectiveId).to.equal(user1.CollectiveId);
       });
 
       it("creates an event with multiple tiers", async () => {
 
         const event = getEventData(collective1);
 
-        const query = `
-        mutation createCollective($collective: CollectiveInputType!) {
-          createCollective(collective: $collective) {
-            id
-            slug
-            isActive
-            tiers {
-              id
-              name
-              amount
-            }
-          }
-        }
-        `;
-        const result = await utils.graphqlQuery(query, { collective: event }, user1);
+        const result = await utils.graphqlQuery(createCollectiveQuery, { collective: event }, user1);
         result.errors && console.error(result.errors[0]);
         const createdEvent = result.data.createCollective;
         expect(createdEvent.slug).to.equal(`brusselstogether-meetup-3-4ev`);

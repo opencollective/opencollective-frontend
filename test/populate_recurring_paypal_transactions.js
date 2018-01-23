@@ -51,7 +51,7 @@ describe.skip('scripts/populate_recurring_paypal_transactions', () => {
 
   beforeEach(() => models.Collective.create(data('collective1')).tap(g => collective = g));
 
-  beforeEach(() => collective.addUserWithRole(user, roles.HOST));
+  beforeEach(() => collective.addHost(user.collective));
 
   beforeEach(() =>
     models.ConnectedAccount.create({

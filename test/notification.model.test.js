@@ -40,7 +40,7 @@ describe("notification.model.test.js", () => {
       user2 = results[1];
       collective = results[2];
       collective2 = results[3];
-      return collective.addUserWithRole(user, 'HOST')
+      return collective.addHost(user.collective)
     })
   });
 

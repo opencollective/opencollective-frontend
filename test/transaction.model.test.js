@@ -30,7 +30,7 @@ describe('transaction model', () => {
           HostCollectiveId: host.CollectiveId
         };
       })
-      .then(() => collective.addUserWithRole(host, roles.HOST)));
+      .then(() => collective.addHost(host.collective)));
 
   it('automatically generates uuid', done => {
     Transaction.create({

@@ -66,7 +66,7 @@ describe('expenses.routes.test.js', () => {
 
   beforeEach(() => models.User.createUserWithCollective(utils.data('user4')).tap(u => expenseFiler = u));
 
-  beforeEach(() => collective.addUserWithRole(host, roles.HOST));
+  beforeEach(() => collective.addHost(host.collective));
 
   beforeEach(() => collective.addUserWithRole(member, roles.ADMIN));
 

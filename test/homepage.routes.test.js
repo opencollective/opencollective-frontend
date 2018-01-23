@@ -25,7 +25,7 @@ describe('homepage.routes.test.js', () => {
     models.Collective
       .create(collectiveData).tap(g => {
         collective = g;
-        return collective.addUserWithRole(user, 'HOST');
+        return collective.addHost(user.collective);
       })
       .then(() => models.PaymentMethod.create({
         CreatedByUserId: user.id,
