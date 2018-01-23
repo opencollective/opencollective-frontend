@@ -153,7 +153,11 @@ describe('graphql.collective.test.js', () => {
         id
         slug
         stats {
-          collectives
+          collectives {
+            all
+            host
+            parent
+          }
           expenses {
             pending
             approved
@@ -180,6 +184,9 @@ describe('graphql.collective.test.js', () => {
     result.errors && console.error(result.errors);
     expect(result.errors).to.not.exist;
     const collectives = result.data.Collective.collectives;
+    expect(result.data.Collective.stats.collectives.all).to.equal(2);
+    expect(result.data.Collective.stats.collectives.host).to.equal(2);
+    expect(result.data.Collective.stats.collectives.parent).to.equal(0);
     expect(collectives.sort((a, b) => a.id - b.id)).to.deep.equal([
       {
         "id": 207,
