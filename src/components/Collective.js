@@ -380,6 +380,7 @@ class Collective extends React.Component {
                       collective={this.collective}
                       LoggedInUser={LoggedInUser}
                       limit={5}
+                      showCSVlink={false}
                       />
                       <div className="actions">
                       <Button className="ViewAllTransactionsBtn" bsStyle="default" onClick={() => Router.pushRoute(`/${this.collective.slug}/transactions`)}><FormattedMessage id="transactions.viewAll" defaultMessage="View All Transactions" /></Button>

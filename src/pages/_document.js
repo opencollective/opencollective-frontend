@@ -35,7 +35,7 @@ export default class IntlDocument extends Document {
       <html>
         <style jsx global>{`
           @font-face {
-            font-family: 'montserratlight';
+            font-family: 'lato','montserratlight';
             src: url('/static/fonts/montserrat/montserrat-light-webfont.eot');
             src: url('/static/fonts/montserrat/montserrat-light-webfont.eot?#iefix') format('embedded-opentype'),
               url('/static/fonts/montserrat/montserrat-light-webfont.woff2') format('woff2'),

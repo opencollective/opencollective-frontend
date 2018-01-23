@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="10px" height="13px" viewBox="0 0 10 13" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 48.2 (47327) - http://www.bohemiancoding.com/sketch -->
+    <title>icon (download)</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Collective-Page-›-Generic-›-Budget-(USER)" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" transform="translate(-1050.000000, -694.000000)">
+        <g id="TRANSACTIONS" transform="translate(0.000000, 556.000000)" fill="#AAAEB3" fill-rule="nonzero">
+            <g id="::-header">
+                <g id="::-admin-actions" transform="translate(1043.000000, 128.000000)">
+                    <g id="::-button-(download-csv)" transform="translate(0.000000, 4.000000)">
+                        <path d="M17,10.4257703 L14.1428571,10.4257703 L14.1428571,6.19047619 L9.85714286,6.19047619 L9.85714286,10.4257703 L7,10.4257703 L12,15.3669468 L17,10.4257703 Z M7,16.7787115 L7,18.1904762 L17,18.1904762 L17,16.7787115 L7,16.7787115 Z" id="icon-(download)"></path>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
