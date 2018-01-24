@@ -51,6 +51,7 @@ const transformResultInCSV = (json) => {
       q(profile),                             /* User Profile  */
       d(i.createdAt),                         /* Transaction Date  */
       q(i.currency),                          /* Currency */
+      q(hostCurrency),                        /* Host Currency */
       f(i.amount),                            /* Transaction Amount */
       f(i.hostFeeInHostCurrency),             /* Host Fee */
       f(i.platformFeeInHostCurrency),         /* Platform Fee */
