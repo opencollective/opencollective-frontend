@@ -92,7 +92,6 @@ class EditCollectiveForm extends React.Component {
   }
 
   handleObjectChange(obj) {
-    console.log(">>> handleObjectChange", obj);
     this.setState({ ...obj, modified: true });
     window.state = this.state;
   }
@@ -189,8 +188,8 @@ class EditCollectiveForm extends React.Component {
     }
 
 
-    Object.keys(this.fields).map(key => {
-      this.fields[key] = this.fields[key].map(field => {
+    Object.keys(this.fields).map(fieldname => {
+      this.fields[fieldname] = this.fields[fieldname].map(field => {
       if (this.messages[`${field.name}.label`]) {
         field.label = intl.formatMessage(this.messages[`${field.name}.label`]);
       }
@@ -301,9 +300,9 @@ class EditCollectiveForm extends React.Component {
         </div>
 
         <div className="FormInputs">
-          { Object.keys(this.fields).map(key => this.state.section === key &&
-            <div className="inputs">
-              {this.fields[key].map((field) => (!field.when || field.when()) && <InputField
+          { Object.keys(this.fields).map(section => this.state.section === section &&
+            <div className="inputs" key={section}>
+              {this.fields[section].map((field) => (!field.when || field.when()) && <InputField
                 key={field.name}
                 className={field.className}
                 defaultValue={field.defaultValue || this.state.collective[field.name]}

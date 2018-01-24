@@ -5,6 +5,7 @@ import { Button, Form } from 'react-bootstrap';
 import { defineMessages, injectIntl } from 'react-intl';
 
 import InputField from '../components/InputField';
+import InputFieldPresets from '../components/InputFieldPresets';
 import { getCurrencySymbol } from '../lib/utils';
 
 class EditTiers extends React.Component {
@@ -31,6 +32,10 @@ class EditTiers extends React.Component {
 
     this.messages = defineMessages({
       'TIER': { id: 'tier.type.tier', defaultMessage: 'tier (only one per order)' },
+      'MEMBERSHIP': { id: 'tier.type.membership', defaultMessage: 'membership (recurring)' },
+      'SERVICE': { id: 'tier.type.service', defaultMessage: 'service (e.g. support)' },
+      'PRODUCT': { id: 'tier.type.product', defaultMessage: 'product (e.g. t-shirt)' },
+      'DONATION': { id: 'tier.type.donation', defaultMessage: 'donation (gift)' },
       'TICKET': { id: 'tier.type.ticket', defaultMessage: 'ticket (allow multiple tickets per order)' },
       'TIER.remove': { id: 'tier.type.tier.remove', defaultMessage: 'remove tier' },
       'TICKET.remove': { id: 'tier.type.ticket.remove', defaultMessage: 'remove ticket' },
@@ -43,11 +48,16 @@ class EditTiers extends React.Component {
       'CUSTOM': { id: 'tier.type.custom', defaultMessage: 'custom tier' },
       'type.label': { id: 'tier.type.label', defaultMessage: 'type' },
       'name.label': { id: 'tier.name.label', defaultMessage: 'name' },
+      'amountType.label': { id: 'tier.amountType.label', defaultMessage: 'Amount type' },
       'amount.label': { id: 'tier.amount.label', defaultMessage: 'amount' },
+      'defaultAmount.label': { id: 'tier.defaultAmount.label', defaultMessage: 'default amount' },
       'interval.label': { id: 'tier.interval.label', defaultMessage: 'interval' },
+      'fixed': { id: 'tier.amountType.fixed', defaultMessage: 'fixed amount' },
+      'flexible': { id: 'tier.amountType.flexible', defaultMessage: 'flexible amount' },
       'onetime': { id: 'tier.interval.onetime', defaultMessage: 'one time' },
       'month': { id: 'tier.interval.month', defaultMessage: 'monthly' },
       'year': { id: 'tier.interval.year', defaultMessage: 'yearly' },
+      'presets.label': { id: 'tier.presets.label', defaultMessage: 'suggested amounts' },
       'description.label': { id: 'tier.description.label', defaultMessage: 'description' },
       'startsAt.label': { id: 'tier.startsAt.label', defaultMessage: 'start date and time' },
       'endsAt.label': { id: 'tier.endsAt.label', defaultMessage: 'Expiration' },
@@ -68,10 +78,8 @@ class EditTiers extends React.Component {
       {
         name: 'type',
         type: 'select',
-        options: getOptions(['TIER', 'TICKET']),
-        defaultValue: this.defaultType,
-        label: intl.formatMessage(this.messages['type.label']),
-        when: () => props.collective.type === 'EVENT'
+        options: getOptions(['TIER', 'TICKET', 'MEMBERSHIP', 'SERVICE', 'PRODUCT', 'DONATION']),
+        label: intl.formatMessage(this.messages['type.label'])
       },
       {
         name: 'name',
@@ -83,23 +91,48 @@ class EditTiers extends React.Component {
         label: intl.formatMessage(this.messages['description.label'])
       },
       {
+        name: '_amountType',
+        type: 'select',
+        options: getOptions(['fixed', 'flexible']),
+        label: intl.formatMessage(this.messages['amountType.label']),
+        when: (tier) => ['DONATION', 'TIER'].indexOf(tier.type) !== -1
+      },
+      {
         name: 'amount',
         pre: getCurrencySymbol(props.currency),
         type: 'currency',
-        label: intl.formatMessage(this.messages['amount.label'])
+        label: intl.formatMessage(this.messages['amount.label']),
+        when: (tier) => tier._amountType === 'fixed'
+      },
+      {
+        name: 'presets',
+        pre: getCurrencySymbol(props.currency),
+        type: 'component',
+        component: InputFieldPresets,
+        pre: getCurrencySymbol(props.currency),
+        label: intl.formatMessage(this.messages['presets.label']),
+        when: (tier) => tier._amountType === 'flexible'
+      },
+      {
+        name: 'amount',
+        pre: getCurrencySymbol(props.currency),
+        type: 'currency',
+        label: intl.formatMessage(this.messages['defaultAmount.label']),
+        when: (tier) => tier._amountType === 'flexible'
       },
       {
         name: 'interval',
         type: 'select',
         options: getOptions(['onetime','month','year']),
         label: intl.formatMessage(this.messages['interval.label']),
-        when: (tier) => !tier || tier.type !== 'TICKET'
+        when: (tier) => !tier || ['DONATION', 'MEMBERSHIP', 'TIER', 'SERVICE'].indexOf(tier.type) !== -1
       },
       {
         name: 'maxQuantity',
         type: 'number',
         label: intl.formatMessage(this.messages['maxQuantity.label']),
-        description: intl.formatMessage(this.messages['maxQuantity.description'])
+        description: intl.formatMessage(this.messages['maxQuantity.description']),
+        when: (tier) => ['TICKET', 'PRODUCT', 'TIER'].indexOf(tier.type) !== -1
       }
     ];
   }
@@ -110,8 +143,8 @@ class EditTiers extends React.Component {
       value = null;
     }
     tiers[index] = { ...tiers[index], type: tiers[index]['type'] || this.defaultType, [fieldname]:value} ;
-    this.setState({tiers});
-    this.onChange({tiers});
+    this.setState({ tiers });
+    this.onChange({ tiers });
   }
 
   addTier(tier) {
@@ -131,22 +164,28 @@ class EditTiers extends React.Component {
   renderTier(tier, index) {
     const { intl } = this.props;
 
-    const type = tier.type || this.defaultType;
+    const defaultValues = {
+      ...tier,
+      type: tier.type || this.defaultType,
+      _amountType: tier._amountType || (tier.presets ? 'flexible' : 'fixed')
+    }
+
     return (
       <div className={`tier ${tier.slug}`} key={`tier-${index}`}>
         <div className="tierActions">
-          <a className="removeTier" href="#" onClick={() => this.removeTier(index)}>{intl.formatMessage(this.messages[`${type}.remove`])}</a>
+          <a className="removeTier" href="#" onClick={() => this.removeTier(index)}>{intl.formatMessage(this.messages[`${this.defaultType}.remove`])}</a>
         </div>
         <Form horizontal>
-          { this.fields.map(field => (!field.when || field.when(tier)) &&
+          { this.fields.map(field => (!field.when || field.when(defaultValues)) &&
             <InputField
               className="horizontal"
               key={field.name}
               name={field.name}
               label={field.label}
+              component={field.component}
               description={field.description}
               type={field.type}
-              defaultValue={tier[field.name] || field.defaultValue}
+              defaultValue={defaultValues[field.name] || field.defaultValue}
               options={field.options}
               pre={field.pre}
               placeholder={field.placeholder}
