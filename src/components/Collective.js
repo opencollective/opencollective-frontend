@@ -35,7 +35,6 @@ class Collective extends React.Component {
   constructor(props) {
     super(props);
     this.collective = this.props.collective; // pre-loaded by SSR
-    console.log(">>> this.collective", this.collective, props);
     this.updateOrder = this.updateOrder.bind(this);
     this.resetOrder = this.resetOrder.bind(this);
 
@@ -282,7 +281,7 @@ class Collective extends React.Component {
                 </div>
               </section>
 
-              { get(this.collective, 'stats.collectives.host') > 0 &&
+              { get(this.collective, 'stats.collectives.parent') > 0 &&
                 <section id="parenting">
                   <h1>
                     <FormattedMessage

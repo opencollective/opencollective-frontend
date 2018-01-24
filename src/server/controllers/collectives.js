@@ -2,7 +2,7 @@ import r2 from 'r2';
 import sizeOf from 'image-size';
 import request from 'request';
 import { queryString, getCloudinaryUrl } from '../lib/utils';
-import { fetchCollective, fetchMembersStats, fetchMembers } from '../lib/graphql';
+import { fetchCollective, fetchCollectiveImage, fetchMembersStats, fetchMembers } from '../lib/graphql';
 import url from 'url';
 import { svg2png, generateSVGBannerForUsers, generateAsciiFromImage } from '../lib/image-generator';
 import gm from 'gm';
