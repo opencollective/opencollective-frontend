@@ -186,7 +186,11 @@ query Transaction($id: Int!) {
 `;
 
 export const addGetTransaction = (component) => {
-const accessToken = typeof window !== 'undefined' && window.localStorage.getItem('accessToken');
+  let accessToken = null;
+
+  if (typeof window !== 'undefined' && window.localStorage) {
+    accessToken = window.localStorage.getItem('accessToken');
+  }
 
 // if we don't have an accessToken, there is no need to get the details of a transaction
 // as we won't have access to any more information than the allTransactions query
