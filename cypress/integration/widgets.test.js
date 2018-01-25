@@ -4,7 +4,7 @@ describe("widgets", () => {
 
   it ("shows the collectives hosted by the host", () => {
     cy.visit(`${WEBSITE_URL}/brusselstogether/collectives.html?role=host`)
-    cy.get('.CollectiveCard').should('have.length', 2);
+    cy.get('.CollectiveCard').its('length').should('be.gt', 1)
   })
 
   it ("shows the collectives backed by a user", () => {

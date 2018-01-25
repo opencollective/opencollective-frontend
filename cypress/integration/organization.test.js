@@ -4,7 +4,7 @@ describe("organization profile page", () => {
 
   it ("shows the collectives backed by the organization", () => {
     cy.visit(`${WEBSITE_URL}/pubnub`)
-    cy.get("#BACKER");
+    cy.get("#backer");
     cy.get('.CollectiveCard').first().find('.totalDonations').contains('$1,700')
   })
 

@@ -57,6 +57,10 @@ class InputTypeDropzone extends React.Component {
     reader.readAsDataURL(file);
     const formData = new FormData();
     formData.append('file', file);
+    // for e2e testing purposes
+    if (window.location.hostname === 'localhost') {
+      return this.props.onChange(`http://${window.location.host}/static/images/receipt.svg`);
+    }
     fetch('/api/images', {
       method: 'post',
       headers: this.addAuthTokenToHeader(),
