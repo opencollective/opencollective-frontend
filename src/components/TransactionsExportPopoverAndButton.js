@@ -16,7 +16,7 @@ import { getTransactionsQuery } from './TransactionsWithData';
 
 /* Convert the output of the allTransactions query into a CSV payload
    that can be downloaded directly by the user */
-const transformResultInCSV = (json) => {
+export const transformResultInCSV = (json) => {
   const q = (value) => `"${value}"`              /* Quote value */
   const f = (value) => (value / 100).toFixed(2); /* Add cents */
   const d = (value) => moment(new Date(value)).format("YYYY-MM-DD HH:mm:ss");
@@ -27,7 +27,7 @@ const transformResultInCSV = (json) => {
   // All the json lines contain the same values for these two
   // variables. It's save to get them from any index.
   const hostCurrency = json[0].host.currency;
-  const collectiveCurrency = json[0].host.currency;
+  const collectiveCurrency = json[0].currency;
 
   const header = [
     "Transaction Description",
@@ -41,7 +41,7 @@ const transformResultInCSV = (json) => {
     `OpenCollective Fee (${hostCurrency})`,
     `Payment Processor Fee (${hostCurrency})`,
     `Net Amount (${collectiveCurrency})`,
-  ].map((i) => q(i)).join(',');
+  ].join(',');
 
   const lines = json.map((i) => {
     const profile = `http://opencollective.com/${i.fromCollective.slug}`;
@@ -168,7 +168,7 @@ class PopoverButton extends React.Component {
     const form = <ExportFormWithClient collective={this.props.collective} />;
     return (
       <OverlayTrigger trigger="click" placement="bottom" overlay={form} rootClose>
-        <a role="button" style={{ float: 'right', fontSize: '12px', padding: 7 }}>
+        <a class="download-csv" role="button" style={{ float: 'right', fontSize: '12px', padding: 7 }}>
           <img src="/static/images/icons/download.svg" style={{ paddingRight: 5 }} />
           <FormattedMessage id='transactions.downloadcsvbutton' defaultMessage='Download CSV' />
         </a>
