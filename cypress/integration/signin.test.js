@@ -10,7 +10,6 @@ describe("signin", () => {
   it("signin", () => {
     cy.visit(`${WEBSITE_URL}/signin?next=/testuseradmin`);
     fill("email", "testuser+admin@opencollective.com");
-    cy.wait(500);
     cy.get('.LoginForm button').click();
     cy.get('.LoginTopBarProfileButton-name').contains('testuseradmin');
   })
