@@ -37,6 +37,7 @@ class EditCollective extends React.Component {
 
   async validate(CollectiveInputType) {
     const { intl } = this.props;
+    CollectiveInputType.tiers = this.cleanTiers(CollectiveInputType.tiers);
     if (!CollectiveInputType.paymentMethods) return CollectiveInputType;
 
     let newPaymentMethod, index;
@@ -78,6 +79,34 @@ class EditCollective extends React.Component {
     }
   }
 
+  cleanTiers(tiers) {
+    if (!tiers) return null;
+    return tiers.map(tier => {
+      let resetAttributes = [];
+      switch (tier.type) {
+        case 'TICKET':
+        case 'PRODUCT':
+          resetAttributes = ['interval', 'presets'];
+          break;
+        case 'MEMBERSHIP':
+        case 'SERVICE':
+          resetAttributes = ['presets', 'maxQuantity'];
+          break;
+        case 'DONATION':
+          resetAttributes = ['maxQuantity'];
+          break;
+      }
+      const cleanTier = { ...tier };
+      resetAttributes.map(attr => {
+        cleanTier[attr] = null;
+      })
+      if (tier._amountType === 'fixed') {
+        cleanTier.presets = null;
+      }
+      delete cleanTier._amountType;
+      return cleanTier;
+    })
+  }
 
   async editCollective(CollectiveInputType) {
     CollectiveInputType = await this.validate(CollectiveInputType);
@@ -89,7 +118,7 @@ class EditCollective extends React.Component {
       if (CollectiveInputType.backgroundImage === defaultBackgroundImage[CollectiveInputType.type]) {
         delete CollectiveInputType.backgroundImage;
       }
-      console.log(">>> editCollective CollectiveInputType", CollectiveInputType);
+
       const res = await this.props.editCollective(CollectiveInputType);
       const type = res.data.editCollective.type.toLowerCase();
       this.setState({ status: 'idle', result: { success: `${capitalize(type)} saved` }});

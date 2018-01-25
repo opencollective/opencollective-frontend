@@ -247,8 +247,10 @@ class Tier extends React.Component {
             {description}
             { presets &&
               <div>
-                <div className="inputRow">
-                  <label><FormattedMessage id="tier.amount.select" defaultMessage="Select {interval, select, month {monthly} year {yearly} other {one time}} amount" values={{ interval }} /></label>
+                <div className="selectPreset inputRow">
+                  <label>
+                    <FormattedMessage id="tier.amount.select" defaultMessage="Select {interval, select, month {monthly} year {yearly} other {one time}} amount" values={{ interval }} />
+                  </label>
                   <div className="presets">
                     <ButtonGroup className="presetBtnGroup">
                       { presets.map(preset => !isNaN(preset) && (
@@ -272,7 +274,7 @@ class Tier extends React.Component {
                     </div>
                 </div>
                 { type === 'DONATION' &&
-                  <div className="inputRow">
+                  <div className="selectInterval inputRow">
                     <label><FormattedMessage id="tier.interval.select" defaultMessage="Select frequency" /></label>
                     <ButtonGroup className="intervalBtnGroup">
                       { intervals.map(i => (

@@ -16,6 +16,10 @@ jest test/server/*
 echo ""
 echo "> Running cypress tests"
 cypress run --record
+if [ $? -ne 0 ]; then
+  echo "Error with cypress e2e tests, exiting"
+  exit 1;
+fi
 echo ""
 echo "> Starting e2e jest tests"
 jest test/e2e/* -w 1

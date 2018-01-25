@@ -178,7 +178,7 @@ export const addEditCollectiveMutation = graphql(editCollectiveQuery, {
         CollectiveInputType.paymentMethods = []; // force removing existing payment methods
       }
       if (collective.tiers && collective.tiers.length > 0) {
-        CollectiveInputType.tiers = collective.tiers.map(tier => pick(tier, ['id', 'type', 'name', 'description', 'amount', 'interval', 'maxQuantity', 'maxQuantityPerUser']));
+        CollectiveInputType.tiers = collective.tiers.map(tier => pick(tier, ['id', 'type', 'name', 'description', 'amount', 'interval', 'maxQuantity', 'maxQuantityPerUser', 'presets']));
       }
       if (collective.members && collective.members.length > 0) {
         CollectiveInputType.members = collective.members.map(member => {
