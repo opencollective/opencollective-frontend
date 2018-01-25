@@ -164,6 +164,7 @@ export const TierInputType = new GraphQLInputObjectType({
     name: { type: GraphQLString },
     description: { type: GraphQLString },
     amount: { type: GraphQLInt },
+    presets: { type: new GraphQLList(GraphQLInt) },
     interval: { type: GraphQLString },
     currency: { type: GraphQLString },
     maxQuantity: { type: GraphQLInt },

@@ -580,7 +580,7 @@ export default function(Sequelize, DataTypes) {
         FromCollectiveId: backerCollective.id,
         CollectiveId: this.id
       },
-      include: [ { model: models.Tier, where: { type: 'TIER' } } ]
+      include: [ { model: models.Tier } ]
     }).then(order => order && order.Tier);
   };
 

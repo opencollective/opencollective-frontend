@@ -78,7 +78,9 @@ const queries = {
       CollectiveId: { type: new GraphQLNonNull(GraphQLInt) },
       type: { type: GraphQLString },
       limit: { type: GraphQLInt },
-      offset: { type: GraphQLInt }
+      offset: { type: GraphQLInt },
+      dateFrom: { type: GraphQLString },
+      dateTo: { type: GraphQLString },
     },
     resolve(_, args) {
       const query = {
@@ -88,6 +90,13 @@ const queries = {
       if (args.type) query.where.type = args.type;
       if (args.limit) query.limit = args.limit;
       if (args.offset) query.offset = args.offset;
+
+      // Add date ranges to the query
+      if (args.dateFrom || args.dateTo) {
+        query.where.createdAt = {};
+        if (args.dateFrom) query.where.createdAt['$gte'] = args.dateFrom;
+        if (args.dateTo) query.where.createdAt['$lte'] = args.dateTo;
+      }
       return models.Transaction.findAll(query);
     }
   },

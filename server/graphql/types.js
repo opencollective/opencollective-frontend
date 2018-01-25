@@ -592,7 +592,7 @@ export const TierType = new GraphQLObjectType({
         }
       },
       presets: {
-        type: new GraphQLList(GraphQLString),
+        type: new GraphQLList(GraphQLInt),
         resolve(tier) {
           return tier.presets;
         }
@@ -997,7 +997,7 @@ export const PaymentMethodType = new GraphQLObjectType({
         }
       },
       limitedToCollectiveIds: {
-        type: GraphQLJSON,
+        type: new GraphQLList(GraphQLInt),
         resolve(paymentMethod) {
           return paymentMethod.limitedToCollectiveIds;
         }

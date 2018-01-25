@@ -9,13 +9,12 @@ const client = GitHubClient({logLevel: 'verbose'});
 const { log } = client; // repurpose the logger
 const { Collective } = models;
 
+// TODO: As number of collectives grow, we need to consider fetching 100 at a time,
+// otherwise, we end up fetching a lot of data.
+// Note: Picking attributes doesn't work with Histories table because Histories 
+// ends up recording on the attributes that were pulled out
+
 Collective.findAll({
-  attributes: [
-    'id',
-    'name',
-    'settings',
-    'data'
-  ], 
   where: {
     type: "COLLECTIVE"
   }
@@ -72,12 +71,12 @@ Collective.findAll({
     }
 
     return fetchPromise
-      .then(data => {
-        collective.data = _.assign(collective.data || {}, {
-          githubContributors: data.contributorData,
-          repos: data.repoData
+      .then(githubData => {
+        const data =_.assign(collective.data || {}, {
+          githubContributors: githubData.contributorData,
+          repos: githubData.repoData
         });
-        return collective.save();
+        return collective.update({ data });
       })
       .then(() => {
         log.info(collective.name,
