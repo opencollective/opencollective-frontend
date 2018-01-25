@@ -77,7 +77,7 @@
     "passport-twitter": "1.0.4",
     "paypal-adaptive": "0.4.2",
     "paypal-rest-sdk": "1.6.8",
-    "pg": "4.5.5",
+    "pg": "7.4.1",
     "pg-hstore": "2.3.2",
     "querystring": "0.2.0",
     "request-as-curl": "0.1.0",
