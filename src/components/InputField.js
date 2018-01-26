@@ -304,8 +304,10 @@ class InputField extends React.Component {
         break;
 
       case 'select':
+        const firstOptionValue = Object.keys(field.options[0])[0];
         this.input = (
           <FieldGroup
+            key={`${field.name}-${firstOptionValue}`} // make sure we instantiate a new component if first value changes
             componentClass="select"
             type={field.type}
             name={field.name}
@@ -314,7 +316,7 @@ class InputField extends React.Component {
             placeholder={field.placeholder}
             className={field.className}
             autoFocus={field.focus}
-            defaultValue={field.value || field.defaultValue}
+            defaultValue={field.value || field.defaultValue || firstOptionValue}
             value={field.value}
             onChange={event => this.handleChange(event.target.value)}
             >

@@ -116,6 +116,8 @@ class OrderForm extends React.Component {
       'totalAmount.label': { id: 'tier.totalAmount.label', defaultMessage: 'Total amount' },
       'startsAt.label': { id: 'tier.startsAt.label', defaultMessage: 'start date and time' },
       'endsAt.label': { id: 'tier.endsAt.label', defaultMessage: 'end date and time' },
+      'order.error.organization.name.required': { id: 'order.error.organization.name.required', defaultMessage: 'Please provide a name for the new organization' },
+      'order.error.organization.website.required': { id: 'order.error.organization.website.required', defaultMessage: 'Please provide a website for the new organization' },
       'order.publicMessage.placeholder': { id: 'order.publicMessage.placeholder', defaultMessage: 'Use this space to add a personal message (public)' }
     });
 
@@ -396,6 +398,23 @@ class OrderForm extends React.Component {
     if (this.state.isNewUser && !isValidEmail(user.email)) {
       this.setState({ result: { error: intl.formatMessage(this.messages['error.email.invalid']) }});
       return false;
+    }
+
+    const required = (obj, attrPath, messageId) => {
+      if (!get(obj, attrPath)) {
+        throw new Error(intl.formatMessage(this.messages[messageId]));
+      }
+    }
+
+    // validate new org
+    if (this.state.orgDetails.show) {
+      try {
+        required(this.state, 'fromCollective.name', 'order.error.organization.name.required');
+        required(this.state, 'fromCollective.website', 'order.error.organization.website.required');
+      } catch (e) {
+        this.setState({ result: { error: e.message }});
+        return false;
+      }
     }
 
     // validate payment method
@@ -691,7 +710,6 @@ class OrderForm extends React.Component {
                 type="select"
                 label={intl.formatMessage(this.messages[order.tier.type === 'TICKET' ? 'order.rsvpAs' : 'order.contributeAs'])}
                 name="fromCollectiveSelector"
-                defaultValue={get(this.state, 'fromCollective.id')}
                 onChange={CollectiveId => this.selectProfile(CollectiveId)}
                 options={this.fromCollectiveOptions}
                 />
