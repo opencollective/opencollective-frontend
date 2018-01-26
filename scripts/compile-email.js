@@ -3,6 +3,9 @@ import config from 'config';
 
 const templateName =  process.argv[2];
 const data = {};
+data['user.new.token'] = {
+  loginLink: "https://opencollective.com/signin?next="
+}
 data['ticket.confirmed'] = {
   user: {
     name: "Xavier Damman"
