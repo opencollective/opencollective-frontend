@@ -2,12 +2,10 @@
  * Dependencies.
  */
 import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
 import config from 'config';
-import moment from 'moment';
 import Promise from 'bluebird';
 
-import { decrypt, encrypt } from '../lib/utils';
+import * as auth from '../lib/auth';
 import errors from '../lib/errors';
 import userLib from '../lib/userlib';
 import knox from '../gateways/knox';
@@ -222,69 +220,27 @@ export default (Sequelize, DataTypes) => {
   /**
    * Instance Methods
    */
-  User.prototype.jwt = function(payload, expiresInHours) {
-    const { secret } = config.keys.opencollective;
-    expiresInHours = expiresInHours || 24*30; // 1 month
+  User.prototype.jwt = function(payload, expiration) {
+    expiration = expiration || auth.TOKEN_EXPIRATION_LOGIN;
 
     // We are sending too much data (large jwt) but the app and website
-    // need the id and email. We will refactor that progressively to have
-    // a smaller token.
+    // need the id and email. We will refactor that progressively to
+    // have a smaller token.
     const data = extend({}, payload, {
       id: this.id,
       email: this.email
     });
-
-    return jwt.sign(data, secret, {
-      expiresIn: 60 * 60 * expiresInHours,
-      subject: this.id, // user
-      issuer: config.host.api
-    });
-  };
-
-  User.prototype.hasMissingInfo = function() {
-    return !(this.firstName && this.image);
-  };
-
-  User.prototype.encryptId = function() {
-    return encrypt(String(this.id));
-  };
-
-  User.prototype.generateResetUrl = function(plainToken) {
-    const encId = this.encryptId();
-    return `${config.host.webapp}/reset/${encId}/${plainToken}/`;
-  };
-
-  User.prototype.checkResetToken = function(token, cb) {
-    const today = moment();
-    const resetPasswordSentAt = moment(this.resetPasswordSentAt);
-    const daysDifference = today.diff(resetPasswordSentAt, 'days');
-
-    if (daysDifference > 0) {
-      return cb(new errors.BadRequest('The reset token has expired'));
-    }
-
-    if (!this.resetPasswordTokenHash) {
-      return cb(new errors.BadRequest('The reset token does not exist'))
-    }
-
-    bcrypt.compare(token, this.resetPasswordTokenHash, (err, matched) => {
-      if (err) return cb(err);
-      if (!matched) return cb(new errors.BadRequest('The reset token is invalid'));
-
-      cb();
-    });
+    return auth.createJwt(this.id, data, expiration);
   };
 
   User.prototype.generateLoginLink = function(redirect) {
-    const expiresInHours = 24*30;
-    const token = this.jwt({ scope: 'login' }, expiresInHours);
-
+    const token = this.jwt({ scope: 'login' });
     return `${config.host.website}/signin/${token}?next=${redirect}`;
   };
 
   User.prototype.generateConnectedAccountVerifiedToken = function(connectedAccountId, username) {
-    const expiresInHours = 24;
-    return this.jwt({ scope: 'connected-account', connectedAccountId, username }, expiresInHours);
+    const payload = { scope: 'connected-account', connectedAccountId, username };
+    return this.jwt(payload, auth.TOKEN_EXPIRATION_CONNECTED_ACCOUNT);
   };
 
   User.prototype.getMemberships = function(options = {}) {
@@ -295,13 +251,6 @@ export default (Sequelize, DataTypes) => {
       ...options
     };
     return models.Member.findAll(query);
-  };
-
-  User.prototype.getCollectives = function(options = {}) {
-    return this.getMemberships({
-      ... options,
-      include: [ { model: models.Collective, as: 'collective' } ]
-    }).map(membership => membership.collective);
   };
 
   User.prototype.unsubscribe = function(CollectiveId, type, channel = 'email') {
@@ -499,10 +448,6 @@ export default (Sequelize, DataTypes) => {
       });
     })
     .catch(cb);
-  };
-
-  User.decryptId = (encrypted) => {
-    return decrypt(encrypted);
   };
 
   User.findOrCreateByEmail = (email, otherAttributes) => {

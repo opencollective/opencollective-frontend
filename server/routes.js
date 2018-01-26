@@ -1,5 +1,5 @@
 import serverStatus from 'express-server-status';
-import GraphHTTP from 'express-graphql'
+import GraphHTTP from 'express-graphql';
 import curlify from 'request-as-curl';
 
 import schema from './graphql/schema';
@@ -72,6 +72,10 @@ export default (app) => {
    * User reset password or new token flow (no jwt verification)
    */
   app.post('/users/signin', required('user'), users.signin);
+  app.post('/users/update-token', auth.mustBeLoggedIn, users.updateToken);
+
+  // These two endpoints are used by opencollective-website and might
+  // be removed when the new frontend replaces it.
   app.post('/users/new_login_token', required('email'), mw.getOrCreateUser, users.sendNewTokenByEmail);
   app.post('/users/refresh_login_token', aN.authenticateUserByJwtNoExpiry(), users.refreshTokenByEmail);
 
