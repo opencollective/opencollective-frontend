@@ -20,7 +20,10 @@ module.exports = (server, app) => {
     return next();
   });
 
-  server.get('/favicon.*', (req, res) => res.send(404));
+  server.get('/favicon.*', (req, res) => {
+    res.setHeader('cache-control', 'max-age=300000');
+    return res.sendFile(path.join(__dirname, '../public/images/favicon.ico.png'));
+  });
 
   server.all('/api/*', (req, res) => {
     console.log(">>> api request", translateApiUrl(req.url));
