@@ -8,6 +8,7 @@ import SignInForm from '../components/SignInForm';
 import withIntl from '../lib/withIntl';
 import { isValidUrl } from '../lib/utils';
 import { FormattedMessage } from 'react-intl';
+import * as api from '../lib/api';
 
 class LoginPage extends React.Component {
 
@@ -17,9 +18,12 @@ class LoginPage extends React.Component {
 
   componentDidMount() {
     if (this.props.token) {
-      window.localStorage.setItem('accessToken', this.props.token);
-      const redirect = (this.props.next || '/');
-      window.location.replace(redirect);
+      api.refreshToken(this.props.token).then((newToken) => {
+        window.localStorage.setItem('accessToken', newToken);
+        window.location.replace(this.props.next || '/');
+      }).catch((error) => {
+        console.log(error);
+      });
     }
   }
 
