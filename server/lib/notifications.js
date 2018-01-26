@@ -11,73 +11,45 @@ import models from '../models';
 import debugLib from 'debug';
 const debug = debugLib("notification");
 
-export default (Sequelize, activity) => {
+export default async (Sequelize, activity) => {
   // publish everything to our private channel
-  return publishToSlackPrivateChannel(activity)
+  publishToSlackPrivateChannel(activity)
 
-    // publish a filtered version to our public channel
-    .then(() => publishToSlack(activity, config.slack.webhookUrl,
-      {
-        channel: config.slack.publicActivityChannel
-      }))
+  // publish a filtered version to our public channel
+  publishToSlack(activity, config.slack.webhookUrl, { channel: config.slack.publicActivityChannel });
   
-    // process certain types of notifications without a notification entry
-    // like subscription cancellation emails
-    // TODO: add donation confirmation emails to this flow as well.
-    .then(() => {
-      if (activity.type === activityType.SUBSCRIPTION_CANCELED) {
-        return emailLib.sendMessageFromActivity(activity)
-      }
+  notifyByEmail(activity);
+
+  // process notification entries for slack, twitter, gitter
+  if (!activity.CollectiveId || !activity.type) {
+    return;
+  }
+  const where = {
+    CollectiveId: activity.CollectiveId,
+    type: [
+      activityType.ACTIVITY_ALL,
+      activity.type
+    ],
+    channel: ['gitter', 'slack', 'twitter'],
+    active: true
+  };
+
+  const notificationChannels = await models.Notification.findAll({ where })
+
+  return Promise.map(notificationChannels, notifConfig => {
+    if (notifConfig.channel === 'gitter') {
+      return publishToGitter(activity, notifConfig);
+    } else if (notifConfig.channel === 'slack') {
+      return publishToSlack(activity, notifConfig.webhookUrl, {});
+    } else if (notifConfig.channel === 'twitter') {
+      return tweetActivity(Sequelize, activity);
+    } else {
       return Promise.resolve();
-    })
-
-    // process notification entries
-    .then(() => {
-      if (!activity.CollectiveId || !activity.type) {
-        return Promise.resolve([]);
-      }
-      const where = {
-        type: [
-          activityType.ACTIVITY_ALL,
-          activity.type
-        ],
-        channel: ['gitter', 'slack', 'twitter', 'email'],
-        active: true
-      };
-
-      if (activity.type === activityType.COLLECTIVE_CREATED) {
-        notify(activity);
-        return [];
-      } else {
-        where.CollectiveId = activity.CollectiveId;
-      }
-
-      return Sequelize.models.Notification.findAll({
-        include: {
-          model: Sequelize.models.User,
-          attributes: ['id', 'email']
-        },
-        where
-      })
-    })
-    .then(notifConfigs => {
-      return Promise.map(notifConfigs, notifConfig => {
-        if (notifConfig.channel === 'gitter') {
-          return publishToGitter(activity, notifConfig);
-        } else if (notifConfig.channel === 'slack') {
-          return publishToSlack(activity, notifConfig.webhookUrl, {});
-        } else if (notifConfig.channel === 'twitter') {
-          return tweetActivity(Sequelize, activity);
-        } else if (notifConfig.channel === 'email') {
-          return emailLib.sendMessageFromActivity(activity, notifConfig);
-        } else {
-          return Promise.resolve();
-        }
-      })
-    })
-    .catch(err => {
-      console.error(`Error while publishing activity type ${activity.type} for collective ${activity.CollectiveId}`, activity, "error: ", err);
-    });
+    }
+  })
+  .catch(err => {
+    console.error(`Error while publishing activity type ${activity.type} for collective ${activity.CollectiveId}`, activity, "error: ", err);
+  });
 };
 
 function publishToGitter(activity, notifConfig) {
@@ -98,7 +70,8 @@ function publishToSlackPrivateChannel(activity) {
 }
 
 /**
- * Send the notification email to all users that have not unsubscribed
+ * Send the notification email (using emailLib.sendMessageFromActivity)
+ * to all users that have not unsubscribed
  * @param {*} users: [ { id, email, firstName, lastName }]
  * @param {*} activity [ { type, CollectiveId }]
  */
@@ -124,16 +97,33 @@ async function notifySubscribers(users, activity) {
   });
 }
 
-async function notify(activity) {
-  if (activity.type === activityType.COLLECTIVE_CREATED) {
-    const host = await models.Collective.findById(activity.data.host.id)
-    const admins = await host.getAdmins();
-    const adminUsers = await models.User.findAll({
-      where: {
-        CollectiveId: { $in: admins.map(a => a.id) }
-      }
-    });
-    activity.CollectiveId = host.id;
-    notifySubscribers(adminUsers, activity);
+async function notifyAdminsOfCollective(CollectiveId, activity) {
+  const collective = await models.Collective.findById(CollectiveId)
+  const admins = await collective.getAdmins();
+  const adminUsers = await models.User.findAll({
+    where: {
+      CollectiveId: { $in: admins.map(a => a.id) }
+    }
+  });
+  activity.CollectiveId = collective.id;
+  return notifySubscribers(adminUsers, activity);
+}
+
+async function notifyByEmail(activity) {
+
+  switch (activity.type) {
+
+    case activityType.SUBSCRIPTION_CANCELED:
+      return emailLib.sendMessageFromActivity(activity);
+
+    case activityType.COLLECTIVE_MEMBER_CREATED:
+    case activityType.COLLECTIVE_TRANSACTION_CREATED:
+    case activityType.COLLECTIVE_EXPENSE_CREATED:
+      return await notifyAdminsOfCollective(activity.data.collective.id, activity);
+
+    case activityType.COLLECTIVE_EXPENSE_APPROVED:
+    case activityType.COLLECTIVE_CREATED:
+      return await notifyAdminsOfCollective(activity.data.host.id, activity);
+
   }
 }

@@ -86,58 +86,59 @@ export default function(Sequelize, DataTypes) {
   }
 
   /**
-   * Get the list of subscribers to a mailing list (e.g. backers@:collectiveSlug.opencollective.com)
-   * For members, backers, and info: opt-in: we look for rows in the Notifications table
-   * For events, it's opt-out. We exclude people who have explicitly unsubscribed
+   * Get the list of subscribers to a mailing list
+   * (e.g. backers@:collectiveSlug.opencollective.com, :eventSlug@:collectiveSlug.opencollective.com)
+   * We exclude users that have unsubscibed (by looking for rows in the Notifications table that are active: false)
    */
-  Notification.getSubscribers = (collectiveSlug, mailinglist) => {
+  Notification.getSubscribers = async (collectiveSlug, mailinglist) => {
 
-    const getSubscribersForMailingList = () =>
-      models.Notification.findAll(
-          {
-            where: {
-              channel: 'email',
-              type: `mailinglist.${mailinglist}`,
-              active: true
-            },
-            include: [
-              { model: models.User },
-              { model: models.Collective, where: { slug: collectiveSlug } }
-            ]
-          }
-        )
-        .then(subscriptions => subscriptions.map(s => s.User))        
+    const findByAttribute = isNaN(collectiveSlug) ? "findBySlug" : "findById";
+    const collective = await models.Collective[findByAttribute(collective.slug);
 
+    const getMembersForEvent = (mailinglist) => models.Collective
+    .findOne({ where: { slug: mailinglist, type: 'EVENT' } })
+    .then(event => {
+      if (event) return event.getMembers();
+    });
+
+    const excludeUnsubscribed = (members) => {
+      if (!members || members.length === 0) return [];
+
+      return models.Notification.findAll({
+          where: {
+            channel: 'email',
+            active: false,
+            type: `mailinglist.${mailinglist}`
+          },
+          include: [ { model: models.Collective, where: { slug: mailinglist } } ]
+        })
+        .then(notifications => notifications.map(s => s.UserId ))
+        .then(excludeIds => {
+          return members.filter(m => excludeIds.indexOf(m.CreatedByUserId) === -1)
+        });
+      }
+
+    const getMembersForMailingList = () => {
+      switch (mailinglist) {
+        case 'backers':
+          return collective.getMembers({ where: { role: 'BACKER'}});
+        case 'admins':
+          return collective.getMembers({ where: { role: 'ADMIN'}});
+        default:
+          return getMembersForEvent(mailinglist);
+      }
+    }
+
+    return getMembersForMailingList().then(excludeUnsubscribed);
+  }
+
+  Notification.getSubscribersUsers = async (collectiveSlug, mailinglist) => {
     const getUsers = (memberships) => {
+      if (!memberships || memberships.length === 0) return [];
       return models.User.findAll({ where: { CollectiveId: { $in: memberships.map(m => m.MemberCollectiveId )}}});
     }
 
-    const getSubscribersForEvent = () => models.Collective
-      .findOne({
-        where: { slug: mailinglist, type: 'EVENT' }
-      })
-      .then(event => {
-          if (event) return event.getMembers().then(excludeUnsubscribed).then(getUsers)
-      })
-
-    const excludeUnsubscribed = (members) => 
-      models.Notification.findAll({
-        where: {
-          channel: 'email',
-          active: false,
-          type: `mailinglist`
-        },
-        include: [ { model: models.Collective, where: { slug: mailinglist } } ]
-      }).then(notifications => notifications.map(s => s.UserId ))
-      .then(excludeIds => {
-        return members.filter(m => excludeIds.indexOf(m.CreatedByUserId) === -1)
-      })
-
-    return getSubscribersForEvent()
-    .then(subscribers => {
-      if (!subscribers) return getSubscribersForMailingList(mailinglist)
-      else return subscribers;
-    });
+    return await Notification.getSubscribers(collectiveSlug, mailinglist).then(getUsers);
   }
 
   /**
