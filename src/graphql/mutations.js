@@ -1,6 +1,6 @@
 import { graphql, compose } from 'react-apollo';
 import gql from 'graphql-tag';
-import { pick } from 'lodash';
+import { pick, isArray } from 'lodash';
 
 const createOrderQuery = gql`
   mutation createOrder($order: OrderInputType!) {
@@ -177,10 +177,10 @@ export const addEditCollectiveMutation = graphql(editCollectiveQuery, {
       } else {
         CollectiveInputType.paymentMethods = []; // force removing existing payment methods
       }
-      if (collective.tiers && collective.tiers.length > 0) {
+      if (isArray(collective.tiers)) {
         CollectiveInputType.tiers = collective.tiers.map(tier => pick(tier, ['id', 'type', 'name', 'description', 'amount', 'interval', 'maxQuantity', 'maxQuantityPerUser', 'presets']));
       }
-      if (collective.members && collective.members.length > 0) {
+      if (isArray(collective.members)) {
         CollectiveInputType.members = collective.members.map(member => {
           return {
             id: member.id,

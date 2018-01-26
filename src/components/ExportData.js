@@ -73,7 +73,16 @@ class ExportData extends React.Component {
           <tr><td className="param">offset</td><td><FormattedMessage id="export.json.parameters.offset" defaultMessage="number of members to skip (for paging)" /></td></tr>
           <tr><td className="param">TierId</td><td><FormattedMessage id="export.json.parameters.TierId" defaultMessage="only return the members that belong to this TierId. You can find the TierId as part of the URL after selecting a tier on your collective page." /></td></tr>
         </tbody></table>
-        e.g.<br /><a href={`/${collective.slug}/members/all.json?limit=10&offset=0&TierId=${collective.tiers[0].id}`}>https://opencollective.com/{collective.slug}/members/all.json?limit=10&offset=0&TierId={collective.tiers[0].id}</a>
+        { collective.tiers[0] &&
+          <div>
+            e.g.<br /><a href={`/${collective.slug}/members/all.json?limit=10&offset=0&TierId=${collective.tiers[0].id}`}>https://opencollective.com/{collective.slug}/members/all.json?limit=10&offset=0&TierId={collective.tiers[0].id}</a>
+          </div>
+        }
+        { !collective.tiers[0] &&
+          <div>
+            e.g.<br /><a href={`/${collective.slug}/members/all.json?limit=10&offset=0`}>https://opencollective.com/{collective.slug}/members/all.json?limit=10&offset=0</a>
+          </div>
+        }
       </div>
     );
   }
