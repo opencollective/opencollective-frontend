@@ -93,7 +93,7 @@ export default function(Sequelize, DataTypes) {
   Notification.getSubscribers = async (collectiveSlug, mailinglist) => {
 
     const findByAttribute = isNaN(collectiveSlug) ? "findBySlug" : "findById";
-    const collective = await models.Collective[findByAttribute(collective.slug);
+    const collective = await models.Collective[findByAttribute](collective.slug);
 
     const getMembersForEvent = (mailinglist) => models.Collective
     .findOne({ where: { slug: mailinglist, type: 'EVENT' } })
