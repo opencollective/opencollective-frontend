@@ -13,7 +13,7 @@ import { Router } from '../server/pages';
 import { graphql } from 'react-apollo'
 import gql from 'graphql-tag'
 import Loading from '../components/Loading';
-import NotFound from '../components/NotFound';
+import NotFound from '../components/NotFoundPage';
 import storage from '../lib/storage';
 import { get, pick } from 'lodash';
 

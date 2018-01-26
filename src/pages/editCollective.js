@@ -2,7 +2,7 @@ import withData from '../lib/withData'
 import withIntl from '../lib/withIntl';
 import React from 'react'
 import { addCollectiveToEditData, addGetLoggedInUserFunction } from '../graphql/queries';
-import NotFound from '../components/NotFound';
+import NotFound from '../components/NotFoundPage';
 import Loading from '../components/Loading';
 import EditCollective from '../components/EditCollective';
 import { intersection } from 'lodash';

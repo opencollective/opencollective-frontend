@@ -6,6 +6,7 @@ import { graphql } from 'react-apollo'
 import gql from 'graphql-tag'
 import { get } from 'lodash';
 import Update from './Update';
+import NotFound from './NotFound';
 
 class UpdateWithData extends React.Component {
 
@@ -22,6 +23,7 @@ class UpdateWithData extends React.Component {
     const { data, intl, editable, LoggedInUser } = this.props;
     if (data.loading) return (<div />);
     const update = data.Update;
+    if (!update) return (<NotFound />);
     console.log(">>> rendering update", update);
     return (
       <div className={`UpdateWithData`}>
