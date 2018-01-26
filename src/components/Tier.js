@@ -254,7 +254,7 @@ class Tier extends React.Component {
                   <div className="presets">
                     <ButtonGroup className="presetBtnGroup">
                       { presets.map(preset => !isNaN(preset) && (
-                        <Button className="presetBtn" bsStyle={amount === preset ? 'primary' : 'default'} onClick={() => this.handleChange('amount', preset)}>
+                        <Button key={`presetBtn-${preset}`} className="presetBtn" bsStyle={amount === preset ? 'primary' : 'default'} onClick={() => this.handleChange('amount', preset)}>
                           <FormattedNumber
                             value={preset / 100}
                             currency={currency}
