@@ -68,11 +68,11 @@ describe('graphql.collective.test.js', () => {
     let hostCollective, hostAdmin, user, collective, expense;
     let sandbox, emailSendMessageSpy;
 
-    before(() => {
+    beforeEach(() => {
       sandbox = sinon.sandbox.create();
       emailSendMessageSpy = sandbox.spy(emailLib, 'sendMessage');
     })
-    after(() => sandbox.restore());
+    afterEach(() => sandbox.restore());
     
     beforeEach(() => utils.resetTestDB());
     beforeEach('create test user', () => models.User.createUserWithCollective({ name: "Test User", email: "testuser@opencollective.com", paypalEmail: "testuser@paypal.com" }).then(u => user = u));
@@ -335,7 +335,7 @@ describe('graphql.collective.test.js', () => {
         expect(res.data.payExpense.status).to.equal('PAID');
         balance = await collective.getBalance();
         expect(balance).to.equal(500);
-        await utils.waitForCondition(() => emailSendMessageSpy.callCount > 0, { delay: 300 });
+        await utils.waitForCondition(() => emailSendMessageSpy.callCount > 0, { delay: 500 });
         expect(emailSendMessageSpy.callCount).to.equal(2);
         expect(emailSendMessageSpy.firstCall.args[0]).to.equal("testuser@opencollective.com");
         expect(emailSendMessageSpy.firstCall.args[1]).to.contain("Your $10 expense submitted to Test Collective has been paid");
