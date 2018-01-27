@@ -16,6 +16,11 @@ Subject: {{member.memberCollective.name}} joined {{collective.name}} as {{{toLow
   <p class="pullQuote">“{{order.publicMessage}}”<br />- {{member.memberCollective.name}}</p>
 {{/if}}
 
+{{#if tweet}}
+  {{tweet.text}}<br />      
+  <a href="https://twitter.com/intent/tweet?status={{tweet.encoded}}" class="btn"><div>Thank that person on Twitter!</div></a>
+{{/if}}
+
 <h2>About {{member.memberCollective.name}}</h2>
 <table>
   <tr>

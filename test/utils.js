@@ -78,6 +78,20 @@ export const makeRequest = (remoteUser, query) => {
   }
 }
 
+/**
+ * Wait for condition to be met
+ * E.g. await waitForCondition(() => emailSendMessageSpy.callCount === 1)
+ * @param {*} cond 
+ * @param {*} options: { timeout, delay }
+ */
+export const waitForCondition = (cond, options = { timeout: 10000, delay: 0 }) => new Promise(resolve => {
+  setTimeout(() => {
+    throw new Error("Timeout waiting for condition", cond);
+  }, options.timeout || 10000);
+  const isConditionMet = () => cond() ? setTimeout(resolve, options.delay || 0) : setTimeout(isConditionMet, 100);
+  isConditionMet();
+});
+
 export const graphqlQuery = async (query, variables, remoteUser) => {
 
   const prepare = () => {

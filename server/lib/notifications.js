@@ -75,42 +75,46 @@ function publishToSlackPrivateChannel(activity) {
  * @param {*} users: [ { id, email, firstName, lastName }]
  * @param {*} activity [ { type, CollectiveId }]
  */
-async function notifySubscribers(users, activity) {
-  debug("notifySubscribers", users.length, users, activity);
-  const unsubscriptions = await models.Notification.findAll({
-    where: {
-      CollectiveId: activity.CollectiveId,
-      type: activity.type,
-      active: false
-    }
-  });
-  const unsubscribedUserIds = unsubscriptions.map(n => n.UserId);
-  debug("Skipping unsubscribedUserIds", unsubscribedUserIds);
+async function notifySubscribers(users, activity, options) {
+  debug("notifySubscribers", users.length, users.map(u => u.email), activity.type);
+  if (!users || users.length === 0) {
+    debug("notifySubscribers: no user to notify");
+    return;
+  }
+  const unsubscribedUserIds = await models.Notification.getUnsubscribersUserIds(activity.type, activity.CollectiveId);
+  debug("unsubscribedUserIds", unsubscribedUserIds);
   return users.map(u => {
     // skip users that have unsubscribed
     if (unsubscribedUserIds.indexOf(u.id) === -1) {
+      debug("sendMessageFromActivity", activity.type, "UserId", u.id);
       return emailLib.sendMessageFromActivity(activity, {
         UserId: u.id,
         User: u
-      });
+      }, options);
     }
   });
 }
 
-async function notifyAdminsOfCollective(CollectiveId, activity) {
-  const collective = await models.Collective.findById(CollectiveId)
-  const admins = await collective.getAdmins();
-  const adminUsers = await models.User.findAll({
-    where: {
-      CollectiveId: { $in: admins.map(a => a.id) }
-    }
+async function notifyUserId(UserId, activity) {
+  const user = await models.User.findById(UserId);
+  debug("notifyUserId", UserId, user.email);
+  return emailLib.sendMessageFromActivity(activity, {
+    UserId: UserId,
+    User: user
   });
+}
+
+async function notifyAdminsOfCollective(CollectiveId, activity, options) {
+  debug("notifyAdminsOfCollective", CollectiveId);
+  const collective = await models.Collective.findById(CollectiveId)
+  const adminUsers = await collective.getAdminUsers();
   activity.CollectiveId = collective.id;
-  return notifySubscribers(adminUsers, activity);
+  return notifySubscribers(adminUsers, activity, options);
 }
 
 async function notifyByEmail(activity) {
-
+  debug("notifyByEmail", activity.type);
+  debugLib("activity.data")("activity.data", activity.data);
   switch (activity.type) {
 
     case activityType.SUBSCRIPTION_CANCELED:
@@ -119,11 +123,22 @@ async function notifyByEmail(activity) {
     case activityType.COLLECTIVE_MEMBER_CREATED:
     case activityType.COLLECTIVE_TRANSACTION_CREATED:
     case activityType.COLLECTIVE_EXPENSE_CREATED:
-      return await notifyAdminsOfCollective(activity.data.collective.id, activity);
+      notifyAdminsOfCollective(activity.data.collective.id, activity);
+      break;
 
     case activityType.COLLECTIVE_EXPENSE_APPROVED:
+      notifyUserId(activity.data.expense.UserId, activity);
+      notifyAdminsOfCollective(activity.data.host.id, activity, { template: 'collective.expense.approved.for.host' })
+      break;
+
+    case activityType.COLLECTIVE_EXPENSE_PAID:
+      notifyUserId(activity.data.expense.UserId, activity);
+      notifyAdminsOfCollective(activity.data.host.id, activity, { template: 'collective.expense.paid.for.host' })
+      break;
+
     case activityType.COLLECTIVE_CREATED:
-      return await notifyAdminsOfCollective(activity.data.host.id, activity);
+      notifyAdminsOfCollective(activity.data.host.id, activity);
+      break;
 
   }
 }

@@ -8,8 +8,8 @@
  */
 import Promise from 'bluebird';
 import _ from 'lodash';
-import roles from '../constants/roles';
-import activities from '../constants/activities';
+import debugLib from 'debug';
+const debug = debugLib("notification");
 
 export default function(Sequelize, DataTypes) {
 
@@ -43,52 +43,10 @@ export default function(Sequelize, DataTypes) {
     return Promise.map(notifications, u => Notification.create(_.defaults({},u,defaultValues))).catch(console.error);
   };
 
-  Notification.subscribeCollectiveWithRole = (collective, CollectiveId, role) => {
-    return collective.getAdminUsers().then(adminUsers => {
-      return Promise.each(adminUsers, adminUser => Notification.subscribeUserWithRole(adminUser.id, CollectiveId, role));
-    });
-  }
-
-  Notification.subscribeUserWithRole = (UserId, CollectiveId, role) => {
-
-    if (!UserId) {
-      throw new Error("Notification.subscribeUserWithRole UserId missing");
-    }
-
-    const notifications = [], lists = {};
-
-    lists[roles.BACKER] = 'backers';
-    lists[roles.ADMIN] = 'admins';
-    lists[roles.HOST] = 'host';
-
-    if (lists[role]) {
-      notifications.push({ type: `mailinglist.${lists[role]}` });
-    }
-
-    switch (role) {
-      case roles.HOST:
-        notifications.push({ type: activities.COLLECTIVE_EXPENSE_CREATED });
-        notifications.push({ type: activities.COLLECTIVE_TRANSACTION_CREATED });
-        break;
-      case roles.ADMIN:
-        notifications.push({ type: activities.COLLECTIVE_EXPENSE_CREATED });
-        notifications.push({ type: activities.COLLECTIVE_MEMBER_CREATED });
-        notifications.push({ type: 'collective.monthlyreport' });
-        break;
-    }
-
-    return Promise.map(notifications, (notification) => {
-      return models.Notification
-        .create({ ...notification, UserId: UserId, CollectiveId: CollectiveId, channel: 'email' })
-        .catch(e => console.error(e.name, `User ${UserId} is already subscribed to ${notification.type}`))
-    })
-    .catch(e => console.error(`Collective.addUserWithRole error while creating entries in Notifications table for UserId ${UserId} (role: ${role}, CollectiveId: ${CollectiveId}): `, e));
-  }
-
   /**
    * Get the list of subscribers to a mailing list
    * (e.g. backers@:collectiveSlug.opencollective.com, :eventSlug@:collectiveSlug.opencollective.com)
-   * We exclude users that have unsubscibed (by looking for rows in the Notifications table that are active: false)
+   * We exclude users that have unsubscribed (by looking for rows in the Notifications table that are active: false)
    */
   Notification.getSubscribers = async (collectiveSlug, mailinglist) => {
 
@@ -104,15 +62,7 @@ export default function(Sequelize, DataTypes) {
     const excludeUnsubscribed = (members) => {
       if (!members || members.length === 0) return [];
 
-      return models.Notification.findAll({
-          where: {
-            channel: 'email',
-            active: false,
-            type: `mailinglist.${mailinglist}`
-          },
-          include: [ { model: models.Collective, where: { slug: mailinglist } } ]
-        })
-        .then(notifications => notifications.map(s => s.UserId ))
+      return Notification.getUnsubscribersUserIds(`mailinglist.${mailinglist}`, collective.id)
         .then(excludeIds => {
           return members.filter(m => excludeIds.indexOf(m.CreatedByUserId) === -1)
         });
@@ -146,10 +96,11 @@ export default function(Sequelize, DataTypes) {
    * @param {*} notificationType 
    * @param {*} CollectiveId (optional)
    */
-  Notification.getUnsubscribers = (notificationType, CollectiveId) => {
+  Notification.getUnsubscribersUserIds = (notificationType, CollectiveId) => {
+    debug("getUnsubscribersUserIds", notificationType, CollectiveId);
     return models.Notification.findAll({
       where: {
-        CollectiveId: CollectiveId,
+        CollectiveId,
         type: notificationType,
         active: false
       }
