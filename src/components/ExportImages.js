@@ -22,6 +22,10 @@ class ExportImages extends React.Component {
   render() {
     const { intl, collective } = this.props;
 
+    if (collective.tiers.length === 0) {
+      return <div />
+    }
+
     let i = 0;
     const tiers = collective.tiers.map(tier => {
       return {
