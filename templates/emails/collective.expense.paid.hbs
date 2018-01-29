@@ -1,37 +1,16 @@
-Subject: Expense paid on {{collective.name}}: {{{currency transaction.netAmountInCollectiveCurrency currency=transaction.currency}}} for {{transaction.description}}
+Subject: Your {{{currency expense.amount currency=transaction.currency}}} expense submitted to {{collective.name}} has been paid
 
 {{> header}}
 
-<style>
-.btn {
-  color: #fff;
-  background: #80d823;
-  border: 1px solid transparent;
-  border-radius: 28px;
-  display: inline-block;
-  padding: .75rem 1rem;
-  text-transform: uppercase;
-  text-align: center;
-  font-weight: 700;
-  min-width: 150px;
-  box-sizing: border-box;
-  vertical-align: middle;
-}
-
-.btn.red {
-  background: #dd2663;
-}
-</style>
-
 <center>
-  <h3> Hi there! Just a note to let you know that an expense was paid in {{collective.name}}. </h3>
-  <h2>{{{currency transaction.netAmountInCollectiveCurrency currency=transaction.currency precision=2}}}</h2>
+  <h3> Hi there! Just a note to let you know that your expense was paid in {{collective.name}}. </h3>
+  <h2>{{{currency expense.amount currency=transaction.currency precision=2}}}</h2>
   <div>{{transaction.description}}</div>
   <div>To: {{fromCollective.name}}</div>
   <div>Paypal email: {{user.paypalEmail}}</div>
 
   <br /><br />
-  <a href="{{config.host.website}}/{{collective.slug}}/expenses" style="color:#7fadf2;text-decoration:none;">View this expense on the Open Collective website</a>
+  <a href="{{config.host.website}}/{{collective.slug}}/expenses" class="btn"><div>View Latest Expenses</div></a>
 
 </center>
 

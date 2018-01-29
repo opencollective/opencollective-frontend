@@ -13,15 +13,19 @@ import { get } from 'lodash';
 async function _createActivity(expense, type) {
   const user = expense.user || await models.User.findById(expense.UserId);
   const userCollective = await models.Collective.findById(user.CollectiveId);
+  const host = await expense.collective.getHostCollective();
+  const transaction = expense.status === statuses.PAID && await models.Transaction.findOne({ where: { type: 'DEBIT', ExpenseId: expense.id }});
   models.Activity.create({
     type,
     UserId: expense.UserId,
     CollectiveId: expense.collective.id,
     data: {
+      host: host.minimal,
       collective: expense.collective.minimal,
       user: user.minimal,
       fromCollective: userCollective.minimal,
-      expense: expense.info
+      expense: expense.info,
+      transaction: transaction.info
     }
   });
 }
@@ -88,6 +92,10 @@ export async function updateExpenseStatus(remoteUser, expenseId, status) {
   }
 
   const res = await expense.update({ status });
+  if (status === statuses.APPROVED) {
+    _createActivity(expense, activities.COLLECTIVE_EXPENSE_APPROVED);    
+  }
+
   return res;
 }
 
@@ -267,5 +275,6 @@ export async function payExpense(remoteUser, expenseId) {
   }
 
   const updatedExpense = await expense.update({ status: statuses.PAID });
+  _createActivity(expense, activities.COLLECTIVE_EXPENSE_PAID);
   return updatedExpense;
 }

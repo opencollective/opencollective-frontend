@@ -597,8 +597,6 @@ export default function(Sequelize, DataTypes) {
       return console.error("Please use Collective.addHost(hostCollective, remoteUser);");
     }
 
-    models.Notification.subscribeUserWithRole(user.id, this.id, role);
-
     const member = {
       role,
       CreatedByUserId: user.id,
@@ -711,9 +709,6 @@ export default function(Sequelize, DataTypes) {
    * @param {*} creatorUser { id } (optional, falls back to hostCollective.CreatedByUserId)
    */
   Collective.prototype.addHost = function(hostCollective, creatorUser) {
-
-    models.Notification.subscribeCollectiveWithRole(hostCollective, this.id, roles.HOST);
-
     const member = {
       role: roles.HOST,
       CreatedByUserId: creatorUser ? creatorUser.id : hostCollective.CreatedByUserId,

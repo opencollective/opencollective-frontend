@@ -9,7 +9,7 @@ import * as payments from '../server/lib/payments';
 import emailLib from '../server/lib/email';
 
 let host, user1, user2, collective1, event1, ticket1;
-let sandbox, executeOrderStub;
+let sandbox, executeOrderStub, emailSendSpy, emailSendMessageSpy;
 
 describe('Mutation Tests', () => {
 
@@ -20,6 +20,8 @@ describe('Mutation Tests', () => {
 
   before(() => {
     sandbox = sinon.sandbox.create();
+    emailSendSpy = sandbox.spy(emailLib, 'sendMessageFromActivity');
+    emailSendMessageSpy = sandbox.spy(emailLib, 'sendMessage');
     executeOrderStub = sandbox.stub(payments, 'executeOrder',
       (user, order) => {
         // assumes payment goes through and marks Order as confirmedAt
@@ -42,15 +44,15 @@ describe('Mutation Tests', () => {
 
   after(() => sandbox.restore());
 
-  beforeEach(() => utils.resetTestDB());
+  beforeEach("reset db", () => utils.resetTestDB());
 
-  beforeEach(() => models.User.createUserWithCollective(utils.data('user1')).tap(u => user1 = u));
-  beforeEach(() => models.User.createUserWithCollective(utils.data('host1')).tap(u => host = u));
+  beforeEach("create user1", () => models.User.createUserWithCollective(utils.data('user1')).tap(u => user1 = u));
+  beforeEach("create host user 1", () => models.User.createUserWithCollective(utils.data('host1')).tap(u => host = u));
 
-  beforeEach(() => models.User.createUserWithCollective(utils.data('user2')).tap(u => user2 = u));
-  beforeEach(() => models.Collective.create(utils.data('collective1')).tap(g => collective1 = g));
-  beforeEach(() => collective1.addHost(host.collective));
-  beforeEach(() => collective1.addUserWithRole(user1, roles.ADMIN));
+  beforeEach("create user2", () => models.User.createUserWithCollective(utils.data('user2')).tap(u => user2 = u));
+  beforeEach("create collective1", () => models.Collective.create(utils.data('collective1')).tap(g => collective1 = g));
+  beforeEach("add host", () => collective1.addHost(host.collective));
+  beforeEach("add user1 as admin to collective1", () => collective1.addUserWithRole(user1, roles.ADMIN));
 
   beforeEach('create stripe account', (done) => {
     models.ConnectedAccount.create({
@@ -62,10 +64,10 @@ describe('Mutation Tests', () => {
     .catch(done);
   });
 
-  beforeEach('create an event collective', () => models.Collective.create(
+  beforeEach("create an event collective", () => models.Collective.create(
     Object.assign(utils.data('event1'), { CreatedByUserId: user1.id, ParentCollectiveId: collective1.id }))
     .tap(e => event1 = e));
-  beforeEach(() => event1.addUserWithRole(user1, roles.ADMIN));
+  beforeEach("add user1 as admin of event1", () => event1.addUserWithRole(user1, roles.ADMIN));
     
   describe('createCollective tests', () => {
 
@@ -195,6 +197,38 @@ describe('Mutation Tests', () => {
       })
     })
 
+    describe('apply to create a collective', () => {
+      let newCollectiveData;
+
+      beforeEach(() => {
+        newCollectiveData = {
+          slug: "newcollective",
+          name: "new collective",
+          website: "http://newcollective.org",
+          twitterHandle: "newcollective",
+          HostCollectiveId: host.collective.id
+        };
+      })
+
+      it("fails if not logged in", async () => {
+        const res = await utils.graphqlQuery(createCollectiveQuery, { collective: newCollectiveData });
+        expect(res.errors).to.exist;
+        expect(res.errors[0].message).to.contain("You need to be logged in to create a collective");
+      });
+
+      it("creates a collective", async () => {
+        const res = await utils.graphqlQuery(createCollectiveQuery, { collective: newCollectiveData }, user1);
+        res.errors && console.error(res.errors[0]);
+        const newCollective = res.data.createCollective;
+        expect(newCollective.isActive).to.be.false;
+        expect(newCollective.host.id).to.equal(host.collective.id);
+        await utils.waitForCondition(() => emailSendMessageSpy.callCount > 0);
+        expect(emailSendMessageSpy.callCount).to.equal(1);
+        expect(emailSendMessageSpy.firstCall.args[0]).to.equal(host.email);
+        expect(emailSendMessageSpy.firstCall.args[1]).to.contain("New collective pending new collective");
+      });
+    })
+
     describe('edit tiers', () => {
 
       const editTiersQuery = `
@@ -288,14 +322,14 @@ describe('Mutation Tests', () => {
 
   describe('createOrder tests', () => {
 
-    beforeEach(() => models.Tier.create(
+    beforeEach("create ticket 1", () => models.Tier.create(
       Object.assign(utils.data('ticket1'), { CollectiveId: event1.id }))
       .tap(t => ticket1 = t));
 
-    beforeEach(() => models.Tier.create(
+    beforeEach("create ticket 2", () => models.Tier.create(
       Object.assign(utils.data('ticket2'), { CollectiveId: event1.id })));
 
-    beforeEach(() => models.Tier.create(
+    beforeEach("create tier 1", () => models.Tier.create(
       Object.assign(utils.data('tier1'), { CollectiveId: collective1.id })));
 
     describe('throws an error', () => {
@@ -513,15 +547,10 @@ describe('Mutation Tests', () => {
 
     describe('creates an order', () => {
 
-      let emailSendSpy;
-
-      before(() => {
-        emailSendSpy = sandbox.spy(emailLib, 'sendMessageFromActivity');
-      })
-
-      beforeEach(() => {
+      beforeEach("reset spies", () => {
         executeOrderStub.reset();
         emailSendSpy.reset();
+        emailSendMessageSpy.reset();
       });
 
       describe('as an organization', () => {
@@ -535,6 +564,7 @@ describe('Mutation Tests', () => {
               },
               fromCollective {
                 slug
+                twitterHandle
               },
               collective {
                 id,
@@ -550,7 +580,8 @@ describe('Mutation Tests', () => {
             user: { email: user2.email },
             fromCollective: {
               name: "Google",
-              website: "https://google.com"
+              website: "https://google.com",
+              twitterHandle: "google"
             },
             paymentMethod: {
               token: "tok_123456781234567812345678",
@@ -571,7 +602,8 @@ describe('Mutation Tests', () => {
           expect(result.data).to.deep.equal({
             "createOrder": {
               "fromCollective": {
-                "slug": "google"
+                "slug": "google",
+                "twitterHandle": "google"
               },
               "collective": {
                 "id": collective1.id,
@@ -591,18 +623,15 @@ describe('Mutation Tests', () => {
               role: roles.BACKER
             }
           });
+          await utils.waitForCondition(() => emailSendMessageSpy.callCount > 0);
           expect(members).to.have.length(1);
-          expect(emailSendSpy.callCount).to.equal(1);
-          const activity = emailSendSpy.lastCall.args[0].dataValues;
-          expect(activity.data.member.role).to.equal(roles.BACKER);
-          expect(activity.data.collective.type).to.equal("COLLECTIVE");
-          expect(activity.data.order.publicMessage).to.equal("Looking forward!");
-          expect(activity.data.order.subscription.interval).to.equal("month");
-          expect(activity.data.collective.slug).to.equal(collective1.slug);
-          expect(activity.data.member.memberCollective.slug).to.equal("google");
-          const notification = emailSendSpy.lastCall.args[1].dataValues;
-          expect(activity.type).to.equal("collective.member.created");
-          expect(notification.User.email).to.equal(user1.email);
+
+          // Make sure we send the collective.member.created email notification to core contributor of collective1
+          expect(emailSendMessageSpy.callCount).to.equal(1);
+          expect(emailSendMessageSpy.firstCall.args[0]).to.equal("user1@opencollective.com");
+          expect(emailSendMessageSpy.firstCall.args[1]).to.equal("Google joined Scouts d&#x27;Arlon as backer");
+          expect(emailSendMessageSpy.firstCall.args[2]).to.contain("Looking forward!"); // publicMessage
+          expect(emailSendMessageSpy.firstCall.args[2]).to.contain("@google thanks for your donation to @scouts");
         });
 
         it('as an existing organization', async () => {
@@ -642,7 +671,8 @@ describe('Mutation Tests', () => {
           expect(result.data).to.deep.equal({
             "createOrder": {
               "fromCollective": {
-                "slug": "slack"
+                "slug": "slack",
+                "twitterHandle": "slack"
               },
               "collective": {
                 "id": collective1.id,
@@ -663,6 +693,7 @@ describe('Mutation Tests', () => {
             }
           });
           expect(members).to.have.length(1);
+          await utils.waitForCondition(() => emailSendMessageSpy.callCount > 0);
           expect(emailSendSpy.callCount).to.equal(1);
           const activity = emailSendSpy.lastCall.args[0].dataValues;
           expect(activity.data.member.role).to.equal(roles.BACKER);
@@ -671,9 +702,8 @@ describe('Mutation Tests', () => {
           expect(activity.data.order.subscription.interval).to.equal("month");
           expect(activity.data.collective.slug).to.equal(collective1.slug);
           expect(activity.data.member.memberCollective.slug).to.equal("slack");
-          const notification = emailSendSpy.lastCall.args[1].dataValues;
           expect(activity.type).to.equal("collective.member.created");
-          expect(notification.User.email).to.equal(user1.email);
+          expect(emailSendMessageSpy.firstCall.args[0]).to.equal(user1.email);
         });
       });
 
@@ -762,9 +792,14 @@ describe('Mutation Tests', () => {
           expect(activity.data.order.publicMessage).to.equal("Looking forward!");
           expect(activity.data.collective.slug).to.equal(event1.slug);
           expect(activity.data.member.memberCollective.slug).to.equal(user2.collective.slug);
-          const notification = emailSendSpy.lastCall.args[1].dataValues;
-          expect(activity.type).to.equal("collective.member.created");
-          expect(notification.User.email).to.equal(user1.email);
+          expect(emailSendSpy.callCount).to.equal(1);
+          expect(emailSendSpy.firstCall.args[0].dataValues.type).to.equal('collective.member.created');
+          await utils.waitForCondition(() => emailSendMessageSpy.callCount > 0);
+          expect(emailSendMessageSpy.callCount).to.equal(2);
+          expect(emailSendMessageSpy.firstCall.args[0]).to.equal("user2@opencollective.com");
+          expect(emailSendMessageSpy.firstCall.args[1]).to.equal("2 tickets confirmed for January meetup");
+          expect(emailSendMessageSpy.secondCall.args[0]).to.equal("user1@opencollective.com");
+          expect(emailSendMessageSpy.secondCall.args[1]).to.equal("Anish Bas joined January meetup as attendee");
         });
 
         it('from a new user', async () => {
@@ -875,6 +910,7 @@ describe('Mutation Tests', () => {
             quantity:2
           };
           const result = await utils.graphqlQuery(query, { order });
+          result.errors && console.error(result.errors[0]);
           expect(result.data).to.deep.equal({
             "createOrder": {
               "id": 1,
@@ -907,9 +943,13 @@ describe('Mutation Tests', () => {
           expect(executeOrderArgument[1].totalAmount).to.equal(4000);
           expect(executeOrderArgument[1].currency).to.equal('USD');
           expect(executeOrderArgument[1].paymentMethod.token).to.equal('tok_123456781234567812345678');
+          await utils.waitForCondition(() => emailSendMessageSpy.callCount > 0);
+          expect(emailSendMessageSpy.callCount).to.equal(1);
+          expect(emailSendMessageSpy.firstCall.args[0]).to.equal(user1.email);
+          expect(emailSendMessageSpy.firstCall.args[1]).to.contain(`Anish Bas joined ${event1.name} as backer`);
         });
 
-        it('from an existing user', async () => {
+        it('from a new user', async () => {
           const query = `
             mutation createOrder($order: OrderInputType!) {
               createOrder(order: $order) {
@@ -952,6 +992,7 @@ describe('Mutation Tests', () => {
             quantity: 2
           };
           const result = await utils.graphqlQuery(query, { order });
+          result.errors && console.error(result.errors[0]);
           const executeOrderArgument = executeOrderStub.firstCall.args;
           expect(result).to.deep.equal({
             data: {
@@ -986,6 +1027,10 @@ describe('Mutation Tests', () => {
           expect(executeOrderArgument[1].totalAmount).to.equal(4000);
           expect(executeOrderArgument[1].currency).to.equal('USD');
           expect(executeOrderArgument[1].paymentMethod.token).to.equal('tok_123456781234567812345678');
+          await utils.waitForCondition(() => emailSendMessageSpy.callCount > 0);
+          expect(emailSendMessageSpy.callCount).to.equal(1);
+          expect(emailSendMessageSpy.firstCall.args[0]).to.equal(user1.email);
+          expect(emailSendMessageSpy.firstCall.args[1]).to.contain("anonymous joined January meetup as backer");
         });
       });
     });

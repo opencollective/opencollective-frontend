@@ -9,16 +9,17 @@ Subject: New expense on {{collective.name}}: {{{currency expense.amount currency
   <div>Paypal Email: {{user.paypalEmail}}</div>
   <p><font color="#999">{{expense.notes}}</font></p>
 
-  <a href="{{config.host.website}}/{{collective.slug}}/expenses#exp{{expense.id}}" style="color:#7fadf2">
+  <a href="{{config.host.website}}/{{collective.slug}}/expenses#exp{{expense.id}}">
     <img src="https://res.cloudinary.com/opencollective/image/fetch/w_640,f_jpg/{{expense.attachment}}" width="100%" />
   </a>
+  <br />
+  <a href="{{config.host.website}}/{{collective.slug}}/expenses#expense{{expense.id}}">View this expense on the Open Collective website</a>
 
   <br /><br />
-  <a href="{{actions.approve}}"><div class="btn">APPROVE</div></a>
-  <a href="{{actions.reject}}"><div class="btn red">REJECT</div></a>
+  <a href="{{actions.approve}}" class="btn blue"><div>APPROVE</div></a>
+  <a href="{{actions.reject}}" class="btn red"><div>REJECT</div></a>
 
   <br /><br />
-  <a href="{{config.host.website}}/{{collective.slug}}/expenses#exp{{expense.id}}" style="color:#7fadf2;text-decoration:none;">View this expense on the Open Collective website</a>
 
 </center>
 

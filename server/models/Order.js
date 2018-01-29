@@ -158,6 +158,7 @@ export default function(Sequelize, DataTypes) {
           FromCollectiveId: this.FromCollectiveId,
           CollectiveId: this.CollectiveId,
           currency: this.currency,
+          quantity: this.quantity,
           totalAmount: this.totalAmount,
           description: this.description,
           privateMessage: this.privateMessage,
