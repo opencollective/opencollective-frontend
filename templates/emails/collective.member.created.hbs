@@ -2,7 +2,7 @@ Subject: {{member.memberCollective.name}} joined {{collective.name}} as {{{toLow
 
 {{> header}}
 
-{{> toplogo}}
+<h1>🎉 New backer</h1>
 
 {{#if recipient.collective.name}}
 <p>{{recipient.collective.name}},</p>
@@ -17,8 +17,10 @@ Subject: {{member.memberCollective.name}} joined {{collective.name}} as {{{toLow
 {{/if}}
 
 {{#if tweet}}
+<center>
   {{tweet.text}}<br />      
-  <a href="https://twitter.com/intent/tweet?status={{tweet.encoded}}" class="btn"><div>Thank that person on Twitter!</div></a>
+  <a href="https://twitter.com/intent/tweet?status={{tweet.encoded}}" class="btn blue"><div>Thank that person on Twitter!</div></a>
+</center>
 {{/if}}
 
 <h2>About {{member.memberCollective.name}}</h2>

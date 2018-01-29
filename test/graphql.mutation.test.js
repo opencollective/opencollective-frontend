@@ -7,6 +7,7 @@ import models from '../server/models';
 import roles from '../server/constants/roles';
 import * as payments from '../server/lib/payments';
 import emailLib from '../server/lib/email';
+import { createCollective } from '../server/graphql/mutations/collectives';
 
 let host, user1, user2, collective1, event1, ticket1;
 let sandbox, executeOrderStub;
@@ -193,6 +194,46 @@ describe('Mutation Tests', () => {
         expect(updatedEvent.tiers[0].amount).to.equal(event.tiers[0].amount);
 
       })
+    })
+
+    describe.only('apply to create a collective', () => {
+      let newCollectiveData, emailSendMessageSpy;
+
+      before("create spy", () => {
+        emailSendMessageSpy = sandbox.spy(emailLib, 'sendMessage');
+      })
+
+      beforeEach("reset spy", () => {
+        emailSendMessageSpy.reset();
+      });
+
+      beforeEach(() => {
+        newCollectiveData = {
+          slug: "newcollective",
+          name: "new collective",
+          website: "http://newcollective.org",
+          twitterHandle: "newcollective",
+          HostCollectiveId: host.collective.id
+        };
+      })
+
+      it("fails if not logged in", async () => {
+        const res = await utils.graphqlQuery(createCollectiveQuery, { collective: newCollectiveData });
+        expect(res.errors).to.exist;
+        expect(res.errors[0].message).to.contain("You need to be logged in to create a collective");
+      });
+
+      it("creates a collective", async () => {
+        const res = await utils.graphqlQuery(createCollectiveQuery, { collective: newCollectiveData }, user1);
+        res.errors && console.error(res.errors[0]);
+        const newCollective = res.data.createCollective;
+        expect(newCollective.isActive).to.be.false;
+        expect(newCollective.host.id).to.equal(host.collective.id);
+        await utils.waitForCondition(() => emailSendMessageSpy.callCount > 0);
+        expect(emailSendMessageSpy.callCount).to.equal(1);
+        expect(emailSendMessageSpy.firstCall.args[0]).to.equal(host.email);
+        expect(emailSendMessageSpy.firstCall.args[1]).to.contain("New collective pending new collective");
+      });
     })
 
     describe('edit tiers', () => {
@@ -768,11 +809,8 @@ describe('Mutation Tests', () => {
           expect(emailSendSpy.callCount).to.equal(1);
           expect(emailSendSpy.firstCall.args[0].dataValues.type).to.equal('collective.member.created');
           await utils.waitForCondition(() => emailSendMessageSpy.callCount > 0);
-          // for (let i=0; i <  emailSendMessageSpy.callCount; i++) {
-          //   console.log(`>>> emailSendMessageSpy.args[${i}]`,  emailSendMessageSpy.args[i][0], emailSendMessageSpy.args[i][1]);
-          // }
           expect(emailSendMessageSpy.callCount).to.equal(2);
-          expect(emailSendMessageSpy.firstCall.args[0]).to.equal("xdam@opencollective.com");
+          expect(emailSendMessageSpy.firstCall.args[0]).to.equal("user2@opencollective.com");
           expect(emailSendMessageSpy.firstCall.args[1]).to.equal("2 tickets confirmed for January meetup");
           expect(emailSendMessageSpy.secondCall.args[0]).to.equal("user1@opencollective.com");
           expect(emailSendMessageSpy.secondCall.args[1]).to.equal("Anish Bas joined January meetup as attendee");
@@ -920,6 +958,9 @@ describe('Mutation Tests', () => {
           expect(executeOrderArgument[1].currency).to.equal('USD');
           expect(executeOrderArgument[1].paymentMethod.token).to.equal('tok_123456781234567812345678');
           await utils.waitForCondition(() => emailSendMessageSpy.callCount > 0);
+          expect(emailSendMessageSpy.callCount).to.equal(1);
+          expect(emailSendMessageSpy.firstCall.args[0]).to.equal(user1.email);
+          expect(emailSendMessageSpy.firstCall.args[1]).to.contain(`Anish Bas joined ${event1.name} as backer`);
         });
 
         it('from a new user', async () => {
@@ -1000,6 +1041,10 @@ describe('Mutation Tests', () => {
           expect(executeOrderArgument[1].totalAmount).to.equal(4000);
           expect(executeOrderArgument[1].currency).to.equal('USD');
           expect(executeOrderArgument[1].paymentMethod.token).to.equal('tok_123456781234567812345678');
+          await utils.waitForCondition(() => emailSendMessageSpy.callCount > 0);
+          expect(emailSendMessageSpy.callCount).to.equal(1);
+          expect(emailSendMessageSpy.firstCall.args[0]).to.equal(user1.email);
+          expect(emailSendMessageSpy.firstCall.args[1]).to.contain("anonymous joined January meetup as backer");
         });
       });
     });

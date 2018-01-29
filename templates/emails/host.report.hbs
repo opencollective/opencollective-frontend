@@ -36,7 +36,7 @@ th {
 }
 </style>
 
-<div style="display:none;font-size:1px;color:#333333;line-height:1px;max-height:0px;max-width:0px;opacity:0;overflow:hidden;">
+<div class="hidden">
   Collectives: {{{number stats.totalCollectives}}} ({{{number stats.totalActiveCollectives}}} active) //
   Backers: {{{number stats.backers.total}}} (+{{{number stats.backers.new}}}{{#if stats.backers.lost}}, -{{{number stats.backers.lost}}}{{/if}}) //  
   Balance: {{{currency stats.balance.totalInHostCurrency currency=host.currency}}} ({{{currency stats.delta.totalInHostCurrency currency=host.currency sign=true}}}) //       

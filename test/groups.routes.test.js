@@ -26,7 +26,7 @@ const transactionsData = utils.data('transactions1').transactions;
  */
 describe('groups.routes.test.js', () => {
 
-  let host, hostAdmin1, hostAdmin2, user, sandbox;
+  let hostCollective, hostAdmin1, hostAdmin2, user, sandbox;
 
   before(() => {
     sandbox = sinon.sandbox.create();
@@ -37,13 +37,13 @@ describe('groups.routes.test.js', () => {
 
   beforeEach(() => utils.resetTestDB());
 
-  beforeEach('create host', () => models.User.createUserWithCollective(utils.data('host1')).tap(u => host = u));
+  beforeEach('create host org', () => models.Collective.create({ slug: "wwcode", name: "Women Who Code 501c3" }).tap(c => hostCollective = c));
   beforeEach('create host admin1', () => models.User.createUserWithCollective({ name: "finance", email: "finance@opencollective.com"}).tap(u => hostAdmin1 = u));
   beforeEach('create host admin2', () => models.User.createUserWithCollective({ firstName: "finance2", email: "finance2+wwcode@opencollective.com"}).tap(u => hostAdmin2 = u));
   beforeEach('create user', () => models.User.createUserWithCollective(userData).tap(u => user = u));
-  beforeEach('add host admin1', () => host.collective.addUserWithRole(hostAdmin1, 'ADMIN'));
-  beforeEach('add host admin2', () => host.collective.addUserWithRole(hostAdmin2, 'ADMIN'));
-  beforeEach('unsubscribe admin2', () => models.Notification.create({ UserId: hostAdmin2.id, CollectiveId: host.collective.id, type: 'collective.created', active: false}));
+  beforeEach('add host admin1', () => hostCollective.addUserWithRole(hostAdmin1, 'ADMIN'));
+  beforeEach('add host admin2', () => hostCollective.addUserWithRole(hostAdmin2, 'ADMIN'));
+  beforeEach('unsubscribe admin2', () => models.Notification.create({ UserId: hostAdmin2.id, CollectiveId: hostCollective.id, type: 'collective.created', active: false}));
 
   // Stripe stub.
   beforeEach(() => {
@@ -52,98 +52,6 @@ describe('groups.routes.test.js', () => {
   });
   afterEach(() => {
     appStripe.accounts.create.restore();
-  });
-
-  /**
-   * Create.
-   */
-  describe('#create', () => {
-
-    it('fails creating a group if no api_key', () =>
-      request(app)
-        .post('/groups')
-        .send({
-          group: publicGroupData
-        })
-        .expect(400)
-    );
-
-    describe('successfully create a group', () => {
-      let group;
-
-      beforeEach('spy on emailLib', () => sinon.spy(emailLib, 'sendMessageFromActivity'));
-      beforeEach('create the group', (done) => {
-        const users = [
-              _.assign(_.omit(userData2, 'password'), { role: roles.ADMIN }),
-              _.assign(_.omit(userData3, 'password'), { role: roles.ADMIN })];
-
-        group = Object.assign({}, publicGroupData, {users})
-        group.HostId = host.id;
-
-        request(app)
-          .post('/groups')
-          .send({
-            api_key: application.api_key,
-            group
-          })
-          .expect(200)
-          .end((e, res) => {
-            expect(e).to.not.exist;
-            group = res.body;
-            done();
-          })
-      });
-
-      afterEach('restore emailLib', () => emailLib.sendMessageFromActivity.restore());
-
-      it('sends an email to the host', done => {
-        const expectEmail = () => {
-          if (emailLib.sendMessageFromActivity.callCount === 0) {
-            return setTimeout(expectEmail, 100);
-          }
-          const activity = emailLib.sendMessageFromActivity.args[0][0];
-          expect(emailLib.sendMessageFromActivity.args.length).to.equal(1); // send the email to the two admins of the host - one unsubscribed;
-          expect(activity.type).to.equal('collective.created');
-          expect(activity.data).to.have.property('collective');
-          expect(activity.data).to.have.property('host');
-          expect(activity.data).to.have.property('user');
-
-          expect(emailLib.sendMessageFromActivity.args[0][1].User.email).to.equal(hostAdmin1.email);
-          done();
-        }
-        setTimeout(expectEmail, 100);
-      });
-
-      it('returns the attributes of the group', () => {
-        expect(group).to.have.property('id');
-        expect(group).to.have.property('name');
-        expect(group).to.have.property('mission');
-        expect(group).to.have.property('description');
-        expect(group).to.have.property('longDescription');
-        expect(group).to.have.property('image');
-        expect(group).to.have.property('backgroundImage');
-        expect(group).to.have.property('createdAt');
-        expect(group).to.have.property('updatedAt');
-        expect(group).to.have.property('twitterHandle');
-        expect(group).to.have.property('website');
-        expect(group).to.have.property('isActive', true);
-      });
-
-      it('assigns the users as members', () => {
-        return Promise.all([
-          models.Member.findOne({ where: { MemberCollectiveId: host.CollectiveId, role: roles.HOST } }),
-          models.Member.count({ where: { CollectiveId: group.id, role: roles.ADMIN } }),
-          models.Collective.find({ where: { slug: group.slug } })
-          ])
-        .then(results => {
-          expect(results[0].CollectiveId).to.equal(group.id);
-          expect(results[1]).to.equal(2);
-          expect(results[2].LastEditedByUserId).to.equal(5);
-        });
-      });
-
-    });
-
   });
 
   /**
@@ -277,7 +185,7 @@ describe('groups.routes.test.js', () => {
         .post('/groups')
         .send({
           api_key: application.api_key,
-          group: Object.assign({}, publicGroupData, { isActive: true, slug: 'another', HostId: host.id, users: [ Object.assign({}, userData, { role: roles.ADMIN} )]})
+          group: Object.assign({}, publicGroupData, { isActive: true, slug: 'another', users: [ Object.assign({}, userData, { role: roles.ADMIN} )]})
         })
         .expect(200)
         .end((e, res) => {
@@ -293,7 +201,7 @@ describe('groups.routes.test.js', () => {
     });
 
     const stripeAccount = { data: { publishableKey: stripeMock.accounts.create.keys.publishable } };
-    beforeEach(() => host.collective
+    beforeEach(() => hostCollective
       .setStripeAccount(stripeAccount)
       .then(() => user.collective.setStripeAccount(stripeAccount)));
 
@@ -312,7 +220,7 @@ describe('groups.routes.test.js', () => {
         CreatedByUserId: user.id,
         FromCollectiveId: user.CollectiveId,
         CollectiveId: publicCollective.id,
-        HostCollectiveId: host.CollectiveId
+        HostCollectiveId: hostCollective.id
       }));
 
     beforeEach('add user as backer', () => models.Member.create({
@@ -375,7 +283,7 @@ describe('groups.routes.test.js', () => {
 
       // Create group2
       beforeEach('create group 2', () =>
-        models.Collective.create({HostCollectiveId: host.CollectiveId, name: "group 2", slug: "group2"})
+        models.Collective.create({HostCollectiveId: hostCollective.id, name: "group 2", slug: "group2"})
       );
 
         // Create transactions for publicCollective.
@@ -384,7 +292,7 @@ describe('groups.routes.test.js', () => {
           CreatedByUserId: user.id,
           FromCollectiveId: user.CollectiveId,
           CollectiveId: publicCollective.id,
-          HostCollectiveId: host.CollectiveId,
+          HostCollectiveId: hostCollective.id,
           approved: true
         })
       );
@@ -474,7 +382,7 @@ describe('groups.routes.test.js', () => {
           group: Object.assign({}, publicGroupData, {
             slug: 'public-group',
             name: 'public group with host',
-            HostCollectiveId: host.CollectiveId,
+            HostCollectiveId: hostCollective.id,
             users: [ Object.assign({}, userData, { role: roles.ADMIN} ) ]
           })
         })

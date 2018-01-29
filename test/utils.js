@@ -78,6 +78,12 @@ export const makeRequest = (remoteUser, query) => {
   }
 }
 
+export const inspectSpy = (spy, argsCount) => {
+  for (let i=0; i <  spy.callCount; i++) {
+    console.log(`>>> spy.args[${i}]`,  { ...spy.args[i].slice(0, argsCount)});
+  }
+}
+
 /**
  * Wait for condition to be met
  * E.g. await waitForCondition(() => emailSendMessageSpy.callCount === 1)
