@@ -1,10 +1,9 @@
-import * as constants from '../constants';
-import {type} from '../constants/transactions';
+import Promise from 'bluebird';
 import models from '../models';
 import errors from '../lib/errors';
+import { type } from '../constants/transactions';
 import { getFxRate } from '../lib/currency';
 import { exportToCSV } from '../lib/utils';
-import Promise from 'bluebird';
 
 /**
  * Export transactions as CSV
@@ -111,31 +110,5 @@ export function createFromPaidExpense(host, paymentMethod, expense, paymentRespo
       transaction.FromCollectiveId = user.CollectiveId;
       return transaction;
     })
-    .then(transaction => models.Transaction.createDoubleEntry(transaction))
-    .then(t => createPaidExpenseActivity(t, paymentResponses, preapprovalDetails));
-}
-
-function createPaidExpenseActivity(transaction, paymentResponses, preapprovalDetails) {
-  const payload = {
-    type: constants.activities.COLLECTIVE_EXPENSE_PAID,
-    UserId: transaction.CreatedByUserId,
-    CollectiveId: transaction.CollectiveId,
-    TransactionId: transaction.id,
-    data: {
-      transaction: transaction.info
-    }
-  };
-  if (paymentResponses) {
-    payload.data.paymentResponses = paymentResponses;
+    .then(transaction => models.Transaction.createDoubleEntry(transaction));
   }
-  if (preapprovalDetails) {
-    payload.data.preapprovalDetails = preapprovalDetails;
-  }
-  return transaction.getUser()
-    .tap(user => payload.data.user = user.minimal)
-    .then(() => transaction.getCollective())
-    .tap(collective => payload.data.collective = collective.minimal)
-    .then(() => models.Collective.findById(transaction.FromCollectiveId))
-    .tap(fromCollective => payload.data.fromCollective = fromCollective.minimal)
-    .then(() => models.Activity.create(payload));
-}

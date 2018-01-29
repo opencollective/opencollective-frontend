@@ -112,8 +112,9 @@ const sendOrderConfirmedEmail = async (order) => {
   if (collective.type === types.EVENT) {
     return emailLib.send('ticket.confirmed', user.email,
       {
-        order: pick(order, ['totalAmount', 'currency', 'createdAt']),
+        order: pick(order, ['totalAmount', 'currency', 'createdAt', 'quantity']),
         user: user.info,
+        recipient: { name: fromCollective.name },
         collective: collective.info,
         tier: tier.info
       },

@@ -2,9 +2,23 @@ Subject: New collective pending {{collective.name}}
 
 {{> header}}
 
+<div class="hidden">{{collective.name}} ({{collective.website}}) would love to be hosted by you.</div>
+
+<h1>🎉 New collective pending</h1>
+
 <style>
   th { text-align: left; }
 </style>
+
+
+<h2>Collective</h2>
+<table>
+  <tr><th>Name</th><td>{{collective.name}}</td></tr>
+  <tr><th>Website</th><td>{{collective.website}}</td></tr>
+  <tr><th>Twitter</th><td>{{collective.twitterHandle}}</td></tr>
+  <tr><th>Mission</th><td>{{collective.mission}}</td></tr>
+  <tr><th>Tags</th><td>{{{json collective.tags}}}</td></tr>
+</table>
 
 <h2>Creator</h2>
 https://opencollective.com/{{user.collective.slug}}
@@ -16,18 +30,9 @@ https://opencollective.com/{{user.collective.slug}}
   <tr><th>Twitter</th><td>{{user.collective.twitterHandle}}</td></tr>
 </table>
 
-<h2>Collective</h2>
-<table>
-  <tr><th>Name</th><td>{{collective.name}}</td></tr>
-  <tr><th>Website</th><td>{{collective.website}}</td></tr>
-  <tr><th>Twitter</th><td>{{collective.twitterHandle}}</td></tr>
-  <tr><th>Mission</th><td>{{collective.mission}}</td></tr>
-  <tr><th>Tags</th><td>{{{json collective.tags}}}</td></tr>
-</table>
-
 <br /><br />
 <center>
-  <a href="{{actions.approve}}"><div class="btn">APPROVE</div></a>
+  <a href="{{actions.approve}}" class="btn blue"><div>APPROVE</div></a>
 </center>
 
 {{> footer}}

@@ -71,7 +71,7 @@ async function processCollective(collective, template) {
   totalCollectives++;
   console.log("-", collective.slug);
   const users = await collective.getAdminUsers();
-  const unsubscribers = await models.Notification.getUnsubscribers('onboarding', collective.id);
+  const unsubscribers = await models.Notification.getUnsubscribersUserIds('onboarding', collective.id);
   const recipients = users.filter(u => u && unsubscribers.indexOf(u.id) === -1).map(u => u.email);
   if (!recipients || recipients.length === 0) {
     return;

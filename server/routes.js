@@ -6,7 +6,6 @@ import schema from './graphql/schema';
 import * as connectedAccounts from './controllers/connectedAccounts';
 import getDiscoverPage from './controllers/discover';
 import * as transactions from './controllers/transactions';
-import * as expenses from './controllers/expenses';
 import * as collectives from './controllers/collectives';
 import getHomePage from './controllers/homepage';
 import uploadImage from './controllers/images';
@@ -21,7 +20,6 @@ import stripeWebhook from './controllers/webhooks';
 import * as email from './controllers/services/email';
 import syncMeetup from './controllers/services/meetup';
 
-import roles from './constants/roles';
 import required from './middleware/required_param';
 import ifParam from './middleware/if_param';
 import * as aN from './middleware/security/authentication';
@@ -179,27 +177,12 @@ export default (app) => {
    */
   app.get('/transactions/:transactionuuid', transactions.getOne); // Get the transaction details
   app.get('/groups/:collectiveid/transactions', mw.paginate(), mw.sorting({key: 'createdAt', dir: 'DESC'}), collectives.getTransactions); // Get a group's transactions.
-  
-  /**
-   * Expenses
-   */
-   // TODO: Built a better frontend and remove hack 
-   // mw.paginate({default: 50}) is a hack to unblock hosts from finding expenses that have more than 20 expenses
-  app.get('/groups/:collectiveid/expenses', mw.paginate({default: 50}), mw.sorting({key: 'incurredAt', dir: 'DESC'}), expenses.list); // Get expenses.
-  app.get('/groups/:collectiveid/expenses/:expenseid', expenses.getOne); // Get an expense.
-  app.post('/groups/:collectiveid/expenses', required('expense'), mw.getOrCreateUser, expenses.create); // Create an expense as visitor or logged in user
-  app.put('/groups/:collectiveid/expenses/:expenseid', auth.canEditExpense, required('expense'), expenses.update); // Update an expense.
-  app.delete('/groups/:collectiveid/expenses/:expenseid', auth.canEditExpense, expenses.deleteExpense); // Delete an expense.
-  app.post('/groups/:collectiveid/expenses/:expenseid/approve', auth.canEditCollective, required('approved'), expenses.setApprovalStatus); // Approve an expense.
-  app.post('/groups/:collectiveid/expenses/:expenseid/pay', auth.mustHaveRole(roles.HOST), expenses.pay); // Pay an expense.
-
 
   /**
    * Notifications.
    *
    *  A user can subscribe by email to any type of activity of a Collective.
    */
-  app.post('/groups/:collectiveid/activities/:activityType/subscribe', auth.mustBePartOfTheCollective, notifications.subscribe); // Subscribe to a collective's activities
   app.post('/groups/:collectiveid/activities/:activityType/unsubscribe', notifications.unsubscribe); // Unsubscribe to a collective's activities
 
   /**
