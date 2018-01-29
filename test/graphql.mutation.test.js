@@ -7,7 +7,6 @@ import models from '../server/models';
 import roles from '../server/constants/roles';
 import * as payments from '../server/lib/payments';
 import emailLib from '../server/lib/email';
-import { createCollective } from '../server/graphql/mutations/collectives';
 
 let host, user1, user2, collective1, event1, ticket1;
 let sandbox, executeOrderStub;
@@ -196,7 +195,7 @@ describe('Mutation Tests', () => {
       })
     })
 
-    describe.only('apply to create a collective', () => {
+    describe('apply to create a collective', () => {
       let newCollectiveData, emailSendMessageSpy;
 
       before("create spy", () => {

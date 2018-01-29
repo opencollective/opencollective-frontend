@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import app from '../server/index';
 import { expect } from 'chai';
 import request from 'supertest-as-promised';
@@ -15,8 +14,6 @@ const chance = chanceLib.Chance();
 
 const application = utils.data('application');
 const userData = utils.data('user1');
-const userData2 = utils.data('user2');
-const userData3 = utils.data('user3');
 const publicGroupData = utils.data('collective1');
 const transactionsData = utils.data('transactions1').transactions;
 
