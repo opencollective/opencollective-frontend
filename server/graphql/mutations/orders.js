@@ -98,10 +98,7 @@ export function createOrder(_, args, req) {
       user = u;
       
       if (!order.fromCollective || (!order.fromCollective.id && !order.fromCollective.name)) {
-        return {
-          id: user.CollectiveId,
-          CreatedByUserId: user.id
-        };
+        return models.Collective.findById(user.CollectiveId);
       }
       
       // If a `fromCollective` is provided, we check its existence and if the user can create an order on its behalf

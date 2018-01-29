@@ -81,14 +81,28 @@ export const makeRequest = (remoteUser, query) => {
 /**
  * Wait for condition to be met
  * E.g. await waitForCondition(() => emailSendMessageSpy.callCount === 1)
- * @param {*} cond 
+ * @param {*} cond
  * @param {*} options: { timeout, delay }
  */
 export const waitForCondition = (cond, options = { timeout: 10000, delay: 0 }) => new Promise(resolve => {
+  let hasConditionBeenMet = false;
   setTimeout(() => {
+    if (hasConditionBeenMet) return;
+    console.log(">>> waitForCondition Timeout Error");
+    console.trace();
     throw new Error("Timeout waiting for condition", cond);
   }, options.timeout || 10000);
-  const isConditionMet = () => cond() ? setTimeout(resolve, options.delay || 0) : setTimeout(isConditionMet, 100);
+  const isConditionMet = () => {
+    hasConditionBeenMet = Boolean(cond());
+    if (options.tag) {
+      console.log(new Date().getTime(), ">>> ", options.tag, "is condition met?", hasConditionBeenMet);
+    }
+    if (hasConditionBeenMet) {
+      return setTimeout(resolve, options.delay || 0);
+    } else {
+      return setTimeout(isConditionMet, options.step || 100);
+    }
+  }
   isConditionMet();
 });
 
