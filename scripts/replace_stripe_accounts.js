@@ -12,6 +12,15 @@ const testStripeAccounts = {
     },
     CollectiveId: 11004
   },
+  'opensource_dvl': { // legacy for opencollective_dvl.pgsql
+    service: 'stripe',
+    username: 'acct_18KWlTLzdXg9xKNS',
+    token: 'sk_test_iDWQubtz4ixk0FQg1csgCi6p',
+    data: {
+      publishableKey: 'pk_test_l7H1cDlh2AekeETfq742VJbC'
+    },
+    CollectiveId: 9805
+  },
   // Open Collective Inc. host for meetups
   'other': {
     service: 'stripe',
@@ -58,6 +67,7 @@ const createConnectedAccount = (hostname) => {
 
 models.ConnectedAccount.destroy({ where: { service: 'stripe' }, force: true})
 .then(() => createConnectedAccount('opensource'))
+.then(() => createConnectedAccount('opensource_dvl'))
 .then(() => createConnectedAccount('other'))
 .then(() => createConnectedAccount('brussesltogether'))
 .then(() => createConnectedAccount('wwcode'))

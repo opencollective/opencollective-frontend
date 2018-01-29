@@ -776,6 +776,12 @@ export const ConnectedAccountType = new GraphQLObjectType({
           return ca.username;
         }
       },
+      settings: {
+        type: GraphQLJSON,
+        resolve(ca) {
+          return ca.settings;
+        }
+      },
       createdAt: {
         type: GraphQLString,
         resolve(ca) {

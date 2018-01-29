@@ -119,6 +119,15 @@ export const CollectiveInputType = new GraphQLInputObjectType({
   })
 });
 
+export const ConnectedAccountInputType = new GraphQLInputObjectType({
+  name: 'ConnectedAccountInputType',
+  description: 'Input type for ConnectedAccountInputType',
+  fields: () => ({
+    id: { type: GraphQLInt },
+    settings: { type: GraphQLJSON }
+  })
+});
+
 export const CollectiveAttributesInputType = new GraphQLInputObjectType({
   name: 'CollectiveAttributesInputType',
   description: 'Input type for attributes of CollectiveInputType',

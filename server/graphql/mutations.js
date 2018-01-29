@@ -2,6 +2,7 @@ import { createCollective, editCollective, deleteCollective, approveCollective }
 import { createOrder } from './mutations/orders';
 import { createMember, removeMember } from './mutations/members';
 import { editTiers } from './mutations/tiers';
+import { editConnectedAccount } from './mutations/connectedAccounts';
 import { createExpense, editExpense, updateExpenseStatus, payExpense, deleteExpense } from './mutations/expenses';
 import statuses from '../constants/expense_status';
 
@@ -16,7 +17,8 @@ import {
   OrderType,
   TierType,
   MemberType,
-  ExpenseType
+  ExpenseType,
+  ConnectedAccountType
 } from './types';
 
 import {
@@ -28,7 +30,8 @@ import {
   CollectiveAttributesInputType,
   OrderInputType,
   TierInputType,
-  ExpenseInputType
+  ExpenseInputType,
+  ConnectedAccountInputType
 } from './inputTypes';
 
 const mutations = {
@@ -67,6 +70,15 @@ const mutations = {
     },
     resolve(_, args, req) {
       return approveCollective(req.remoteUser, args.id);
+    }
+  },
+  editConnectedAccount: {
+    type: ConnectedAccountType,
+    args: {
+      connectedAccount: { type: new GraphQLNonNull(ConnectedAccountInputType) }
+    },
+    resolve(_, args, req) {
+      return editConnectedAccount(req.remoteUser, args.connectedAccount);
     }
   },
   approveExpense: {
