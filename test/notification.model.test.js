@@ -5,14 +5,12 @@ import * as utils from '../test/utils';
 import constants from '../server/constants/activities';
 import models from '../server/models';
 import roles from '../server/constants/roles';
-import _ from 'lodash';
 import Promise from 'bluebird';
 
 const application = utils.data('application');
 const hostUserData = utils.data('host1');
 const collectiveData = utils.data('collective1');
 const collective2Data = utils.data('collective2');
-const collective3Data = utils.data('collective3');
 const notificationData = { type: constants.COLLECTIVE_TRANSACTION_CREATED };
 
 const {
@@ -27,7 +25,6 @@ describe("notification.model.test.js", () => {
 
   let hostUser;
   let collective;
-  let collective2;
 
   beforeEach(() => utils.resetTestDB());
 
@@ -40,7 +37,6 @@ describe("notification.model.test.js", () => {
     return Promise.all(promises).then((results) => {
       hostUser = results[0];
       collective = results[1];
-      collective2 = results[2];
       return collective.addHost(hostUser.collective)
     })
   });
