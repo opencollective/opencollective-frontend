@@ -41,27 +41,6 @@ describe("notification.model.test.js", () => {
     })
   });
 
-
-  it('subscribes to the notifications for the `collective.transaction.approved` email', () =>
-    request(app)
-      .post(`/groups/${collective.id}/activities/collective.transaction.approved/subscribe`)
-      .set('Authorization', `Bearer ${hostUser.jwt()}`)
-      .send({ api_key: application.api_key })
-      .expect(200)
-      .then(res => {
-        expect(res.body.active).to.be.true;
-
-        return Notification.findAndCountAll({
-          where: {
-            UserId: hostUser.id,
-            CollectiveId: collective.id,
-            type: 'collective.transaction.approved',
-            active: true
-          }
-        });
-      })
-      .tap(res => expect(res.count).to.equal(1)));
-
   it(`disables notification for the ${notificationData.type} email`, () =>
     request(app)
       .post(`/groups/${collective.id}/activities/${notificationData.type}/unsubscribe`)
@@ -83,7 +62,7 @@ describe("notification.model.test.js", () => {
     beforeEach(() => Promise.map([utils.data('user3'), utils.data('user4')], user => models.User.createUserWithCollective(user)).then(result => users = result))
 
     it('getSubscribers to the backers mailinglist', () => Promise.map(users, user => collective.addUserWithRole(user, 'BACKER').catch(e => console.error(e)))
-      .then(() => Notification.getSubscribers(collective.slug, 'backers').catch(e => console.error(e)))
+      .then(() => Notification.getSubscribersUsers(collective.slug, 'backers').catch(e => console.error(e)))
       .tap(subscribers => {
         expect(subscribers.length).to.equal(2);
       })
