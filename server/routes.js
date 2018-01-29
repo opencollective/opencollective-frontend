@@ -183,7 +183,6 @@ export default (app) => {
    *
    *  A user can subscribe by email to any type of activity of a Collective.
    */
-  app.post('/groups/:collectiveid/activities/:activityType/subscribe', auth.mustBePartOfTheCollective, notifications.subscribe); // Subscribe to a collective's activities
   app.post('/groups/:collectiveid/activities/:activityType/unsubscribe', notifications.unsubscribe); // Unsubscribe to a collective's activities
 
   /**

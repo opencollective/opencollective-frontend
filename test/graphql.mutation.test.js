@@ -9,7 +9,7 @@ import * as payments from '../server/lib/payments';
 import emailLib from '../server/lib/email';
 
 let host, user1, user2, collective1, event1, ticket1;
-let sandbox, executeOrderStub;
+let sandbox, executeOrderStub, emailSendSpy, emailSendMessageSpy;
 
 describe('Mutation Tests', () => {
 
@@ -20,6 +20,8 @@ describe('Mutation Tests', () => {
 
   before(() => {
     sandbox = sinon.sandbox.create();
+    emailSendSpy = sandbox.spy(emailLib, 'sendMessageFromActivity');
+    emailSendMessageSpy = sandbox.spy(emailLib, 'sendMessage');
     executeOrderStub = sandbox.stub(payments, 'executeOrder',
       (user, order) => {
         // assumes payment goes through and marks Order as confirmedAt
@@ -196,15 +198,7 @@ describe('Mutation Tests', () => {
     })
 
     describe('apply to create a collective', () => {
-      let newCollectiveData, emailSendMessageSpy;
-
-      before("create spy", () => {
-        emailSendMessageSpy = sandbox.spy(emailLib, 'sendMessage');
-      })
-
-      beforeEach("reset spy", () => {
-        emailSendMessageSpy.reset();
-      });
+      let newCollectiveData;
 
       beforeEach(() => {
         newCollectiveData = {
@@ -552,13 +546,6 @@ describe('Mutation Tests', () => {
     });
 
     describe('creates an order', () => {
-
-      let emailSendSpy, emailSendMessageSpy;
-
-      before("create spies", () => {
-        emailSendSpy = sandbox.spy(emailLib, 'sendMessageFromActivity');
-        emailSendMessageSpy = sandbox.spy(emailLib, 'sendMessage');
-      })
 
       beforeEach("reset spies", () => {
         executeOrderStub.reset();
