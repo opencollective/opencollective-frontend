@@ -24,8 +24,16 @@ class EditTwitterAccount extends React.Component {
       'backer.created.toggle.description': { id: 'connectedAccounts.twitter.backer.created.toggle.description', defaultMessage: 'Whenever you have a new backer that has provided a twitter username, a tweet will be sent from your connected account' },
       'backer.created.tweet': { id: 'connectedAccounts.twitter.backer.created.tweet', defaultMessage: '{backerTwitterHandle} thank you for your {amount} donation 🙏 - your contribution makes a difference!' }
     });
+
+    const defaultSettings = {
+      'backer.created': {
+        active: false,
+        tweet: props.intl.formatMessage(this.messages['backer.created.tweet'])
+      }
+    };
+
     this.state = { connectedAccount: cloneDeep(props.connectedAccount) };
-    this.state.connectedAccount.settings = this.state.connectedAccount.settings || { 'backer.created': {} };
+    this.state.connectedAccount.settings = this.state.connectedAccount.settings || defaultSettings;
   }
 
   async onClick() {
