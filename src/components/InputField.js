@@ -350,6 +350,29 @@ class InputField extends React.Component {
                       </FormGroup>)
         break;
 
+      case 'toggle':
+        this.input =  (<FormGroup controlId={field.name} help={field.description}>
+                        {field.className === 'horizontal' &&
+                          <div>
+                            <Col componentClass={ControlLabel} sm={3}>
+                              {capitalize(field.label)}
+                            </Col>
+                            <Col sm={9}>
+                              <Checkbox defaultChecked={field.defaultValue} onChange={event => this.handleChange(event.target.checked)}></Checkbox>
+                              {field.description && <HelpBlock>{field.description}</HelpBlock>}
+                            </Col>
+                          </div>
+                        }
+                        {field.className !== 'horizontal' &&
+                          <div>
+                            <ControlLabel>{capitalize(field.label)}</ControlLabel>
+                            <Checkbox defaultChecked={field.defaultValue} onChange={event => this.handleChange(event.target.checked)}></Checkbox>
+                            {field.description && <HelpBlock>{field.description}</HelpBlock>}
+                          </div>
+                        }
+                      </FormGroup>)
+        break;
+
       default:
       this.input = (<FieldGroup
           onChange={event => this.handleChange(event.target.value)}

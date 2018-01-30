@@ -5,6 +5,7 @@ import { HelpBlock, Button } from 'react-bootstrap';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import withIntl from '../lib/withIntl';
 import { connectAccount } from '../lib/api';
+import EditTwitterAccount from './EditTwitterAccount';
 
 class EditConnectedAccount extends React.Component {
 
@@ -75,6 +76,9 @@ class EditConnectedAccount extends React.Component {
           <div>{intl.formatMessage(this.messages[`collective.connectedAccounts.${service}.connected`], vars)}</div>
           <Button onClick={() => this.connect(service)}>{intl.formatMessage(this.messages[`collective.connectedAccounts.reconnect.button`])}</Button>
         </div>
+      }
+      { connectedAccount && connectedAccount.service === 'twitter' &&
+        <EditTwitterAccount connectedAccount={connectedAccount} />
       }
       </div>
     );
