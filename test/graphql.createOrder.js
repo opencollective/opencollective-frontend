@@ -7,6 +7,8 @@ import config from 'config';
 import { cloneDeep } from 'lodash';
 import nock from 'nock';
 import initNock from './graphql.createOrder.nock';
+import sinon from 'sinon';
+import twitter from '../server/lib/twitter';
 
 const order = {
     "quantity": 1,
@@ -91,6 +93,15 @@ describe('createOrder', () => {
       expect(res.errors[0].message).to.equal("This collective is not active");
     });
 
+    it("sends a tweet", async () => {
+      const collective = await models.Collective.create({ name: "tipbox", isActive: true });
+      const user = await models.User.createUserWithCollective({ name: "Xavier", twitterHandle: "xdamman" });
+      const thisOrder = cloneDeep(order);
+      thisOrder.collective.id = collective.id;
+      const res = await utils.graphqlQuery(createOrderQuery, { order: thisOrder });
+      console.log(res);
+    });
+
   });
 
   describe("using opencollective_dvl db", () => {
@@ -101,16 +112,38 @@ describe('createOrder', () => {
       nock.cleanAll();
     });
 
+    let sandbox, tweetStatusSpy;
+
+    beforeEach(() => {
+      sandbox = sinon.sandbox.create();
+      tweetStatusSpy = sandbox.spy(twitter, 'tweetStatus');
+    })
+    afterEach(() => sandbox.restore());
+
     beforeEach(() => utils.loadDB('opencollective_dvl'));
 
-    it('creates an order as new user', async () => {
+    it('creates an order as new user and sends a tweet', async () => {
+
+      await models.ConnectedAccount.create({
+        CollectiveId: 207,
+        service: "twitter",
+        clientId: "clientid",
+        token: "xxxx",
+        settings: {
+          "backer.created": {
+            active: true,
+            tweet: "{backerTwitterHandle} thank you for your {amount} donation!"
+          }
+        }
+      });
 
       const stripeCardToken = await utils.createStripeToken();
 
       order.user = {
         firstName: "John",
         lastName: "Smith",
-        email: "jsmith@email.com"
+        email: "jsmith@email.com",
+        twitterHandle: "johnsmith"
       };
       order.paymentMethod.token = stripeCardToken;
       const res = await utils.graphqlQuery(createOrderQuery, { order });
@@ -140,6 +173,8 @@ describe('createOrder', () => {
       });
       const charge = await Stripe(hostStripeAccount.token).charges.retrieve(transaction.data.charge.id);
       expect(charge.source.last4).to.equal('4242');
+      await utils.waitForCondition(() => tweetStatusSpy.callCount > 0);
+      expect(tweetStatusSpy.firstCall.args[1]).to.contain("@johnsmith thank you for your €1,543 donation!");
     });
 
     it('creates an order as new anonymous user', async () => {

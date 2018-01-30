@@ -4,7 +4,7 @@ import Promise from 'bluebird';
 
 import activitiesLib from '../lib/activities';
 import slackLib from './slack';
-import {tweetActivity} from './twitter';
+import twitter from './twitter';
 import emailLib from '../lib/email';
 import activityType from '../constants/activities';
 import models from '../models';
@@ -42,7 +42,7 @@ export default async (Sequelize, activity) => {
     } else if (notifConfig.channel === 'slack') {
       return publishToSlack(activity, notifConfig.webhookUrl, {});
     } else if (notifConfig.channel === 'twitter') {
-      return tweetActivity(Sequelize, activity);
+      return twitter.tweetActivity(activity);
     } else {
       return Promise.resolve();
     }
@@ -121,6 +121,10 @@ async function notifyByEmail(activity) {
       return emailLib.sendMessageFromActivity(activity);
 
     case activityType.COLLECTIVE_MEMBER_CREATED:
+      twitter.tweetActivity(activity);
+      notifyAdminsOfCollective(activity.data.collective.id, activity);
+      break;
+
     case activityType.COLLECTIVE_TRANSACTION_CREATED:
     case activityType.COLLECTIVE_EXPENSE_CREATED:
       notifyAdminsOfCollective(activity.data.collective.id, activity);
