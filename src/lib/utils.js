@@ -204,8 +204,8 @@ export const translateApiUrl = (url) => {
 
 export const capitalize = (str) => {
   if (typeof str !== 'string') return '';
-  if (str.length === 0) return '';
   str = str.trim();
+  if (str.length === 0) return '';
   return `${str[0].toUpperCase()}${str.substr(1)}`;
 }
 
