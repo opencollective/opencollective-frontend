@@ -93,15 +93,6 @@ describe('createOrder', () => {
       expect(res.errors[0].message).to.equal("This collective is not active");
     });
 
-    it("sends a tweet", async () => {
-      const collective = await models.Collective.create({ name: "tipbox", isActive: true });
-      const user = await models.User.createUserWithCollective({ name: "Xavier", twitterHandle: "xdamman" });
-      const thisOrder = cloneDeep(order);
-      thisOrder.collective.id = collective.id;
-      const res = await utils.graphqlQuery(createOrderQuery, { order: thisOrder });
-      console.log(res);
-    });
-
   });
 
   describe("using opencollective_dvl db", () => {
