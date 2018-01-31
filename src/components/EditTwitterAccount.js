@@ -32,9 +32,9 @@ class EditTwitterAccount extends React.Component {
     this.state = { connectedAccount: cloneDeep(props.connectedAccount) };
     this.state.connectedAccount.settings = this.state.connectedAccount.settings || {};
     this.notificationTypes.forEach(notificationType => {
-      this.state.connectedAccount.settings[notificationType] = this.state.connectedAccount.settings[notificationType] || {
-        active: false,
-        tweet: props.intl.formatMessage(this.messages[`${notificationType}.tweet`])
+      this.state.connectedAccount.settings[notificationType] = this.state.connectedAccount.settings[notificationType] || { active: false };
+      if (this.messages[`${notificationType}.tweet`]) {
+        this.state.connectedAccount.settings[notificationType].tweet = this.state.connectedAccount.settings[notificationType].tweet || props.intl.formatMessage(this.messages[`${notificationType}.tweet`]);
       }
     })
   }
