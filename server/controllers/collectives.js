@@ -469,7 +469,6 @@ export const getOne = (req, res, next) => {
     req.collective.getYearlyIncome(),
     req.collective.getTotalAmountReceived(),
     req.collective.getBackersCount(),
-    req.collective.getTwitterSettings(),
     getRelatedCollectives(),
     req.collective.getSuperCollectiveData(),
     req.collective.getHostCollective(),
@@ -483,10 +482,9 @@ export const getOne = (req, res, next) => {
     collective.backersCount = values[4];
     collective.contributorsCount = (collective.data && collective.data.githubContributors) ? Object.keys(collective.data.githubContributors).length : 0;
     collective.settings = collective.settings || {};
-    collective.settings.twitter = values[5];
-    collective.related = values[6];
-    collective.superCollectiveData = values[7];
-    collective.host = values[8] && values[8].info;
+    collective.related = values[5];
+    collective.superCollectiveData = values[6];
+    collective.host = values[7] && values[7].info;
 
     if (collective.host) {
       collective.host.admins = values[9];

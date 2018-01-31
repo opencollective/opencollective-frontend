@@ -461,7 +461,7 @@ export default function(Sequelize, DataTypes) {
   };
 
   /**
-   * Return stats about backers
+   * Return stats about backers based on the Members table
    *  - stats.backers.lastMonth: number of backers by endDate
    *  - stats.backers.previousMonth: number of backers by startDate
    *  - stats.backers.new: the number of backers whose first donation was after startDate
@@ -825,6 +825,14 @@ export default function(Sequelize, DataTypes) {
     });
   };
 
+  Collective.prototype.getTopExpenseCategories = function(startDate, endDate) {
+    return queries.getTopExpenseCategories(this.id, { since: startDate, until: endDate });
+  };
+
+  Collective.prototype.getTopVendors = function(startDate, endDate) {
+    return queries.getTopVendorsForCollective(this.id, { since: startDate, until: endDate });
+  };
+
   // Returns the last payment method that has been confirmed attached to this collective
   Collective.prototype.getPaymentMethod = async function(where) {
     return models.PaymentMethod.findOne({
@@ -965,7 +973,7 @@ export default function(Sequelize, DataTypes) {
     })
   };
 
-  Collective.prototype.getTotalTransactions = function(startDate, endDate, type) {
+  Collective.prototype.getTotalTransactions = function(startDate, endDate, type, attribute = 'netAmountInCollectiveCurrency') {
     endDate = endDate || new Date;
     const where = {
       createdAt: { $lt: endDate },
@@ -976,7 +984,7 @@ export default function(Sequelize, DataTypes) {
     if (type === 'expense') where.amount = { $lt: 0 };
     return models.Transaction.find({
       attributes: [
-        [Sequelize.fn('COALESCE', Sequelize.fn('SUM', Sequelize.col('netAmountInCollectiveCurrency')), 0), 'total']
+        [Sequelize.fn('COALESCE', Sequelize.fn('SUM', Sequelize.col(attribute)), 0), 'total']
       ],
       where
     })
@@ -997,7 +1005,7 @@ export default function(Sequelize, DataTypes) {
 
   /**
    * Get the total number of backers (individuals or organizations that have given money to the collective)
-   * @params: { type, until }
+   * @params: { type, since, until }
    * type: COLLECTIVE/USER/ORGANIZATION or an array of types
    * until: date till when to count the number of backers
    */
@@ -1014,8 +1022,12 @@ export default function(Sequelize, DataTypes) {
       }
     };
 
+    query.where.createdAt = {};
+    if (options.since) {
+      query.where.createdAt.$gte = options.since;
+    }
     if (options.until) {
-      query.where.createdAt = { $lt: options.until };
+      query.where.createdAt.$lt = options.until;
     }
 
     if (options.type) {
@@ -1032,7 +1044,7 @@ export default function(Sequelize, DataTypes) {
       query.raw = true; // need this otherwise it automatically also fetches Transaction.id which messes up everything
     }
 
-    let promise;
+    let method;
     if (options.group) {
       query.attributes.push('fromCollective.type');
       query.include = [
@@ -1045,61 +1057,27 @@ export default function(Sequelize, DataTypes) {
       ];
       query.raw = true; // need this otherwise it automatically also fetches Transaction.id which messes up everything
       query.group = options.group;
-      promise = models.Transaction.findAll(query);
+      method = "findAll";
     } else {
-      promise = models.Transaction.findOne(query);
+      method = "findOne";
     }
 
-    return promise
-    .then(res => {
-      if (options.group) {
-        const stats = { id: this.id };
-        let all = 0;
-        res.forEach(r => {
-          stats[r.type] = r.count;
-          all += r.count;
-        })
-        stats.all = all;
-        debug("getBackersCount", stats);
-        return stats;
-      } else {
-        // when it's a raw query, the result is not in dataValues
-        const result = res.dataValues || res || {};
-        debug("getBackersCount", result);
-        if (!result.count) return 0;
-        return Promise.resolve(Number(result.count));
-      }
-    });
-  };
-
-  Collective.prototype.getTwitterSettings = function() {
-    const settings = this.settings || {};
-    settings.twitter = settings.twitter || {};
-
-    const defaults = {
-      // thank you message immediately when receiving donation
-      thankDonation: '$backer thanks for backing us!',
-
-      // thank you message to all backers on 1st day of the month
-      monthlyThankDonationsEnabled: false,
-      monthlyThankDonationsSingular: 'Thank you $backer for supporting our collective',
-      monthlyThankDonationsPlural: 'Thanks to our $backerCount backers and sponsors $backerList for supporting our collective'
-    };
-
-    const isThankDonationEnabled = (CollectiveId) => {
-      return models.Notification.findOne({where: {
-        channel: 'twitter',
-        type: activities.COLLECTIVE_TRANSACTION_CREATED,
-        CollectiveId,
-        active: true
-      }}).then(n => !!n);
-    }
-
-    return isThankDonationEnabled(this.id)
-      .then(thankDonationEnabled => {
-        settings.twitter.thankDonationEnabled = thankDonationEnabled;
-        _.defaults(settings.twitter, defaults);
-        return settings.twitter;
+    return models.Transaction[method](query).then(res => {
+        if (options.group) {
+          const stats = { id: this.id };
+          let all = 0;
+          // when it's a raw query, the result is not in dataValues
+          res.forEach(r => {
+            stats[r.type] = r.count;
+            all += r.count;
+          })
+          stats.all = all;
+          debug("getBackersCount", stats);
+          return stats;
+        } else {
+          debug("getBackersCount", res.dataValues);
+          return Number(res.dataValues.count);
+        }
       });
   };
 
@@ -1179,7 +1157,13 @@ export default function(Sequelize, DataTypes) {
     }
     return Promise.resolve();
   };
+
+  Collective.prototype.getTopBackers = function(since, until, limit) {
+    return queries.getMembersWithTotalDonations({ CollectiveId: this.id }, { since, until, limit })
+      .tap(backers => debug("getTopBackers", backers.map(b => b.dataValues)));
+  };
   
+
   /**
    * Class Methods
    */
