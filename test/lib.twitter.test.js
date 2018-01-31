@@ -21,7 +21,7 @@ describe('lib.twitter.test.js', () => {
       "totalAmountReceived": "$1,277",
       "topBackersTwitterHandles": "@webflowapp, @dalmaer, @stickermule",
       "newBackersTwitterHandles": "@bakkenbaeck, @mziehlke",
-      "topExpenseCategories": ""
+      "topExpenseCategories": "none"
     };
 
     
