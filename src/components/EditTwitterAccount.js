@@ -18,22 +18,25 @@ class EditTwitterAccount extends React.Component {
   constructor(props) {
     super(props);
     this.onClick = this.onClick.bind(this);
+    this.renderNotification = this.renderNotification.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.messages = defineMessages({
-      'backer.created.toggle.label': { id: 'connectedAccounts.twitter.backer.created.toggle.label', defaultMessage: 'New backers' },
-      'backer.created.toggle.description': { id: 'connectedAccounts.twitter.backer.created.toggle.description', defaultMessage: 'Whenever you have a new backer that has provided a twitter username, a tweet will be sent from your connected account' },
-      'backer.created.tweet': { id: 'connectedAccounts.twitter.backer.created.tweet', defaultMessage: '{backerTwitterHandle} thank you for your {amount} donation 🙏 - your contribution makes a difference!' }
+      'newBacker.toggle.label': { id: 'connectedAccounts.twitter.newBacker.toggle.label', defaultMessage: 'New backers' },
+      'newBacker.toggle.description': { id: 'connectedAccounts.twitter.newBacker.toggle.description', defaultMessage: 'Whenever you have a new backer that has provided a twitter username, a tweet will be sent from your connected account' },
+      'newBacker.tweet': { id: 'connectedAccounts.twitter.newBacker.tweet', defaultMessage: '{backerTwitterHandle} thank you for your {amount} donation 🙏 - your contribution makes a difference!' },
+      'monthlyStats.toggle.label': { id: 'connectedAccounts.twitter.monthlyStats.toggle.label', defaultMessage: 'Monthly stats' },
+      'monthlyStats.toggle.description': { id: 'connectedAccounts.twitter.monthlyStats.toggle.description', defaultMessage: 'Every first of the month, automatically send a public tweet with the latest stats, the new backers and the all time top backers' }
     });
 
-    const defaultSettings = {
-      'backer.created': {
-        active: false,
-        tweet: props.intl.formatMessage(this.messages['backer.created.tweet'])
-      }
-    };
-
+    this.notificationTypes = ['newBacker', 'monthlyStats'];
     this.state = { connectedAccount: cloneDeep(props.connectedAccount) };
-    this.state.connectedAccount.settings = this.state.connectedAccount.settings || defaultSettings;
+    this.state.connectedAccount.settings = this.state.connectedAccount.settings || {};
+    this.notificationTypes.forEach(notificationType => {
+      this.state.connectedAccount.settings[notificationType] = this.state.connectedAccount.settings[notificationType] || {
+        active: false,
+        tweet: props.intl.formatMessage(this.messages[`${notificationType}.tweet`])
+      }
+    })
   }
 
   async onClick() {
@@ -48,38 +51,57 @@ class EditTwitterAccount extends React.Component {
     this.setState({ connectedAccount, isModified: true });
   }
 
-  render() {
+  renderNotification(notificationType) {
     const { intl } = this.props;
     const { connectedAccount } = this.state;
 
     return (
-      <div className="EditTwitterAccount">
-        <Form horizontal>
-          <h3><FormattedMessage id="connectedAccounts.twitter.settings" defaultMessage="Settings" /></h3>
-          <Row>
-            <Col sm={12}>
-              <InputField
-                  type="toggle"
-                  name="backer.created.active"
-                  className="horizontal"
-                  defaultValue={connectedAccount.settings['backer.created'].active}
-                  label={intl.formatMessage(this.messages['backer.created.toggle.label'])}
-                  description={intl.formatMessage(this.messages['backer.created.toggle.description'])}
-                  onChange={(activateNewBacker) => this.handleChange("backer.created", "active", activateNewBacker)}
-                  />
-            </Col>
-          </Row>
-          <Row>
-            <Col sm={12}>
+      <div className="notificationSettings" key={notificationType}>
+        <style jsx>{`
+        .notificationSettings :global(label) {
+          margin-top: 0.7rem;
+        }
+        .notificationSettings :global(.form-group) {
+          margin-bottom: 0rem;
+        }
+        .notificationSettings :global(.inputField textarea) {
+          height: 14rem;
+        }
+        `}</style>
+        <Row>
+          <Col sm={12}>
+            <InputField
+                type="switch"
+                name={`${notificationType}.active`}
+                className="horizontal"
+                defaultValue={connectedAccount.settings[notificationType].active}
+                label={intl.formatMessage(this.messages[`${notificationType}.toggle.label`])}
+                description={intl.formatMessage(this.messages[`${notificationType}.toggle.description`])}
+                onChange={(activateNewBacker) => this.handleChange(notificationType, "active", activateNewBacker)}
+                />
+            { this.messages[`${notificationType}.tweet`] &&
               <InputField
                 type="textarea"
                 className="horizontal"
-                name="backer.created.tweet"
-                defaultValue={connectedAccount.settings['backer.created'].tweet || intl.formatMessage(this.messages['backer.created.tweet'])}
-                onChange={(tweet) => this.handleChange("backer.created", "tweet", tweet)}
+                maxLength={280}
+                charCount={true}
+                name={`${notificationType}.tweet`}
+                defaultValue={connectedAccount.settings[notificationType].tweet || intl.formatMessage(this.messages[`${notificationType}.tweet`])}
+                onChange={(tweet) => this.handleChange(notificationType, "tweet", tweet)}
                 />
-            </Col>
-          </Row>
+            }
+          </Col>
+        </Row>
+      </div>
+    );
+  }
+
+  render() {
+    return (
+      <div className="EditTwitterAccount">
+        <Form horizontal>
+          <h3><FormattedMessage id="connectedAccounts.twitter.settings" defaultMessage="Settings" /></h3>
+          { this.notificationTypes.map(this.renderNotification) }
           <Row>
             <Col sm={3}></Col>
             <Col sm={9}>
