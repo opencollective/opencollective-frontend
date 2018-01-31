@@ -289,11 +289,11 @@ export const createFromGithub = (req, res, next) => {
   ConnectedAccount
     .findOne({
       where: { id: connectedAccountId },
-      include: { model: Collective }
+      include: { model: Collective, as: 'collective' }
     })
     .then(ca => {
       debug("connected account found", ca && ca.username);
-      creatorCollective = ca.Collective;
+      creatorCollective = ca.collective;
       return models.User.findById(creatorCollective.CreatedByUserId);
     })
     .then(user => {
