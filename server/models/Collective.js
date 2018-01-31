@@ -1022,11 +1022,12 @@ export default function(Sequelize, DataTypes) {
       }
     };
 
-    query.where.createdAt = {};
     if (options.since) {
+      query.where.createdAt = query.where.createdAt || {};
       query.where.createdAt.$gte = options.since;
     }
     if (options.until) {
+      query.where.createdAt = query.where.createdAt || {};
       query.where.createdAt.$lt = options.until;
     }
 
@@ -1075,8 +1076,10 @@ export default function(Sequelize, DataTypes) {
           debug("getBackersCount", stats);
           return stats;
         } else {
-          debug("getBackersCount", res.dataValues);
-          return Number(res.dataValues.count);
+          const result = res.dataValues || res || {};
+          debug("getBackersCount", result);
+          if (!result.count) return 0;
+          return Promise.resolve(Number(result.count));
         }
       });
   };
