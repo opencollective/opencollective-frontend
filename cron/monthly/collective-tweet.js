@@ -84,6 +84,8 @@ const processCollective = (collective) => {
   } else {
     console.log(">>> processing collective", collective.slug);
   }
+  // for testing:
+  // if (['material-ui', 'dim', 'electricsheep'].indexOf(collective.slug) === -1) return;
 
   const promises = [
     collective.getTopBackers(null, null, 10),
@@ -121,9 +123,10 @@ const processCollective = (collective) => {
 
 const compileTwitterHandles = (userCollectives, total, limit) => {
   const twitterHandles = userCollectives.map(backer => backer.twitterHandle).filter(handle => Boolean(handle));
-  let res = twitterHandles.map(handle => `@${handle}`).slice(0, Math.min(twitterHandles.length, limit)).join(', ');
-  if (twitterHandles.length < total) {
-    res += `, +${total-twitterHandles.length}`;
+  const limitToShow = Math.min(twitterHandles.length, limit);
+  let res = _.uniq(twitterHandles).map(handle => `@${handle}`).slice(0, limitToShow).join(', ');
+  if (limitToShow < total) {
+    res += `, +${total-limitToShow}`;
   }
   return res;
 }
@@ -137,18 +140,19 @@ const sendTweet = (twitterAccount, data) => {
     totalNewBackers: stats.backers.new,
     totalBackers: stats.backers.lastMonth,
     totalActiveBackers: stats.backers.totalActive,
-    balance: formatCurrency(stats.balance, data.collective.currency),
-    totalAmountSpent: formatCurrency(-stats.totalSpent, data.collective.currency),
+    balance: formatCurrency(Math.abs(stats.balance), data.collective.currency),
+    totalAmountSpent: formatCurrency(Math.abs(stats.totalSpent), data.collective.currency),
     totalAmountReceived: formatCurrency(stats.totalReceived, data.collective.currency),
-    topBackersTwitterHandles: compileTwitterHandles(data.topBackers, 3, 3),
+    topBackersTwitterHandles: compileTwitterHandles(data.topBackers, 0, 3),
     newBackersTwitterHandles: compileTwitterHandles(data.topNewBackers, stats.backers.new, 5),
-    topExpenseCategories: stats.topExpenseCategories.slice(0,2).map(ec => ec.category).join(' & ').toLowerCase()
+    topExpenseCategories: stats.topExpenseCategories.length === 0 ? 'none' : stats.topExpenseCategories.slice(0,2).map(ec => ec.category).join(' & ').toLowerCase()
   }
 
   const template = stats.totalReceived === 0 ? 'monthlyStatsNoNewDonation' : 'monthlyStats';
   const tweet = twitter.compileTweet(template, replacements);
   twitter.tweetStatus(twitterAccount, tweet, { attachment_url: `https://opencollective.com/${data.collective.slug}`});
-  console.log(">>> sending tweet:", tweet.length, tweet);
+  console.log(">>> sending tweet:", tweet.length);
+  console.log(tweet);
 }
 
 init();

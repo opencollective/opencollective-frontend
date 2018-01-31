@@ -75,22 +75,22 @@ const compileTweet = (template, data) => {
   const messages = {
     'en-US': {
       monthlyStats: `In {month}, {totalNewBackers, select, 
-  0 {no new backer joined 😑} 
-  1 {one new backer joined} 
+  0 {no new backer joined. 😑} 
+  1 {one new backer joined.} 
   other {{totalNewBackers} {totalNewBackers, plural, one {backer} other {backers}} joined ({newBackersTwitterHandles}) - you are the best! 🙌 }
 }
 
-We received {totalAmountReceived} from {totalActiveBackers} {totalActiveBackers, plural, one {backer} other {backers}} and we spent {totalAmountSpent, select,
-  $0 {$0}
+We received {totalAmountReceived} from {totalActiveBackers} {totalActiveBackers, plural, one {backer} other {backers}} and we spent {topExpenseCategories, select,
+  none {{totalAmountSpent}}
   other {{totalAmountSpent} on {topExpenseCategories}}
 }. Our current balance is {balance}.
 
 Top backers: {topBackersTwitterHandles}`,
-    monthlyStatsNoNewDonation: `In {month}, we haven't received any new donation.
+    monthlyStatsNoNewDonation: `In {month}, we haven't received any new donation. 😑
     
 Our current balance is {balance}.
 
-Become a backer!`
+Become a backer! 😃`
     }
   }
 
