@@ -26,6 +26,7 @@ const templateNames = [
   'collective.monthlyreport',
   'collective.monthlyreport.text',
   'collective.newmember',
+  'collective.update.published',
   'event.newmember',
   'host.report',
   'host.report.text',

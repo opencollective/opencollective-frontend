@@ -1,14 +1,14 @@
 /**
  * Dependencies.
  */
+import config from 'config';
 import _, { pick } from 'lodash';
 import Temporal from 'sequelize-temporal';
 import slugify from 'slug';
 import activities from '../constants/activities';
 import { mustBeLoggedInTo, mustHaveRole } from '../lib/auth';
 import Promise from 'bluebird';
-import debugLib from 'debug';
-const debug = debugLib('update');
+
 import * as errors from '../graphql/errors';
 /**
  * Update Model.
@@ -208,12 +208,15 @@ export default function(Sequelize, DataTypes) {
   Update.prototype.publish = async function(remoteUser) {
     mustHaveRole(remoteUser, 'ADMIN', this.CollectiveId, 'publish this update');
     this.publishedAt = new Date;
+    this.collective = this.collective || await models.Collective.findById(this.CollectiveId);
     models.Activity.create({
       type: activities.COLLECTIVE_UPDATE_PUBLISHED,
       UserId: remoteUser.id,
       CollectiveId: this.CollectiveId,
       data: {
-        update: this.activity
+        collective: this.collective.activity,
+        update: this.activity,
+        url: `${config.host.website}/${this.collective.slug}/updates/${this.slug}`
       }
     });
     return await this.save();

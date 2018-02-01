@@ -178,6 +178,12 @@ export const days = (d1, d2) => {
   return Math.round(Math.abs((d1.getTime() - d2.getTime())/(oneDay)));
 }
 
+export const flattenArray = (arr) => {
+  return arr.reduce((flat, toFlatten) => {
+    return flat.concat(Array.isArray(toFlatten) ? flattenArray(toFlatten) : toFlatten);
+  }, []);
+}
+
 /**
  * Returns stats for each tier compared to previousMonth
  * 

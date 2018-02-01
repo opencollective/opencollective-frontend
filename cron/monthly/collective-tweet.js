@@ -150,7 +150,7 @@ const sendTweet = (twitterAccount, data) => {
 
   const template = stats.totalReceived === 0 ? 'monthlyStatsNoNewDonation' : 'monthlyStats';
   const tweet = twitter.compileTweet(template, replacements);
-  twitter.tweetStatus(twitterAccount, tweet, { attachment_url: `https://opencollective.com/${data.collective.slug}`});
+  twitter.tweetStatus(twitterAccount, tweet, `https://opencollective.com/${data.collective.slug}`);
   console.log(">>> sending tweet:", tweet.length);
   debug(replacements);
   console.log(tweet);

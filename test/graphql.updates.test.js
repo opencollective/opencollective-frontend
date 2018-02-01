@@ -6,9 +6,10 @@ import * as utils from './utils';
 import models from '../server/models';
 import roles from '../server/constants/roles';
 import emailLib from '../server/lib/email';
+import twitterLib from '../server/lib/twitter';
 
 let host, user1, user2, collective1, event1, update1;
-let sandbox, executeOrderStub;
+let sandbox, sendEmailSpy, sendTweetSpy;
 
 describe('graphql.updates.test', () => {
 
@@ -20,6 +21,8 @@ describe('graphql.updates.test', () => {
 
   before(() => {
     sandbox = sinon.sandbox.create();
+    sendEmailSpy = sandbox.spy(emailLib, 'sendMessage');
+    sendTweetSpy = sandbox.spy(twitterLib, 'tweetStatus');
   });
 
   after(() => sandbox.restore());
@@ -37,9 +40,10 @@ describe('graphql.updates.test', () => {
   before(() => {
     return models.Update.create({
       CollectiveId: collective1.id,
+      FromCollectiveId: user1.CollectiveId,
       CreatedByUserId: user1.id,
       title: "first update",
-      html: "long text for the update #1"
+      html: `long text for the update #1 <a href="https://google.com">here is a link</a>`,
     }).then(u => update1 = u)
   });
 
@@ -157,11 +161,48 @@ describe('graphql.updates.test', () => {
       expect(result.errors[0].message).to.equal("You don't have sufficient permissions to publish this update");
     });
 
-    it('publishes an update successfully', async () => {
-      const result = await utils.graphqlQuery(publishUpdateQuery, { id: update1.id }, user1);
-      expect(result.errors).to.not.exist;
-      expect(result.data.publishUpdate.slug).to.equal('first-update');
-      expect(result.data.publishUpdate.publishedAt).to.not.be.null;
+    describe('publishes an update', async () => {
+      let user3;
+
+      before(async () => {
+        await collective1.addUserWithRole(user2, roles.BACKER);
+        user3 = await models.User.createUserWithCollective(utils.data('user3'));
+        const org = await models.Collective.create({ name: "facebook", type: "ORGANIZATION"});
+        org.addUserWithRole(user3, roles.ADMIN);
+        await models.Member.create({
+          CollectiveId: collective1.id,
+          MemberCollectiveId: org.id,
+          role: roles.BACKER,
+          CreatedByUserId: user1.id
+        })
+        await models.ConnectedAccount.create({
+          CollectiveId: collective1.id,
+          service: "twitter",
+          settings: { "updatePublished": { active: true } }
+        })
+      });
+
+      it("published the update successfully", async () => {
+        const result = await utils.graphqlQuery(publishUpdateQuery, { id: update1.id }, user1);
+        expect(result.errors).to.not.exist;
+        expect(result.data.publishUpdate.slug).to.equal('first-update');
+        expect(result.data.publishUpdate.publishedAt).to.not.be.null;
+      });
+
+      it("sends the update to all users including admins of sponsor org", async () => {
+        await utils.waitForCondition(() => sendEmailSpy.callCount > 1);
+        expect(sendEmailSpy.callCount).to.equal(4);
+        expect(sendEmailSpy.args[0][0]).to.equal(user1.email);
+        expect(sendEmailSpy.args[1][0]).to.equal(user1.email);
+        expect(sendEmailSpy.args[2][0]).to.equal(user2.email);
+        expect(sendEmailSpy.args[3][0]).to.equal(user3.email);
+      })
+
+      it("sends a tweet", async () => {
+        expect(sendTweetSpy.callCount).to.equal(1);
+        expect(sendTweetSpy.firstCall.args[1]).to.equal("Latest update from the collective: first update");
+        expect(sendTweetSpy.firstCall.args[2]).to.contain("/scouts/updates/first-update");
+      });
     });
 
     it('unpublishes an update successfully', async () => {
