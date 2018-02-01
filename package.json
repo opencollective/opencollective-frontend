@@ -51,6 +51,7 @@
     "handlebars": "4.0.5",
     "helmet": "3.5.0",
     "html-pdf": "2.2.0",
+    "intl-messageformat": "^2.2.0",
     "isomorphic-fetch": "2.2.1",
     "joi": "7.3.0",
     "json2csv": "3.4.2",
