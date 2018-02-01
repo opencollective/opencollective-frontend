@@ -1,0 +1,24 @@
+Subject: Your expense to {{collective.name}} for {{{currency expense.amount currency=expense.currency}}} has been approved ✓
+
+{{> header}}
+
+<p>Quick message to let you know that your expense for {{expense.description}} has been approved.</p>
+<p>Next step: the host of the <a href="{{config.host.website}}/{{collective.slug}}">{{collective.name}} collective</a> (<a href="{{config.host.website}}/{{host.slug}}">{{host.name}}</a>) will reimburse your expense shortly (may take a couple of days depending on the host)</p>
+
+<center>
+  <h1>{{{currency expense.amount currency=expense.currency}}}</h1>
+  <div>{{expense.description}}</div>
+  <div>Submitted by: {{fromCollective.name}}</div>
+  <div>Paypal Email: {{user.paypalEmail}}</div>
+  <p><font color="#999">{{expense.privateMessage}}</font></p>
+
+  <a href="{{actions.view}}">
+    <img src="https://res.cloudinary.com/opencollective/image/fetch/w_640,f_jpg/{{expense.attachment}}" width="100%" />
+  </a>
+
+  <br /><br />
+  <a href="{{actions.viewLatestExpenses}}" class="btn"><div>View Latest Expenses</div></a>
+
+</center>
+
+{{> footer}}

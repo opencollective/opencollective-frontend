@@ -5,14 +5,12 @@ import * as utils from '../test/utils';
 import constants from '../server/constants/activities';
 import models from '../server/models';
 import roles from '../server/constants/roles';
-import _ from 'lodash';
 import Promise from 'bluebird';
 
 const application = utils.data('application');
 const hostUserData = utils.data('host1');
 const collectiveData = utils.data('collective1');
 const collective2Data = utils.data('collective2');
-const collective3Data = utils.data('collective3');
 const notificationData = { type: constants.COLLECTIVE_TRANSACTION_CREATED };
 
 const {
@@ -27,7 +25,6 @@ describe("notification.model.test.js", () => {
 
   let hostUser;
   let collective;
-  let collective2;
 
   beforeEach(() => utils.resetTestDB());
 
@@ -40,31 +37,9 @@ describe("notification.model.test.js", () => {
     return Promise.all(promises).then((results) => {
       hostUser = results[0];
       collective = results[1];
-      collective2 = results[2];
       return collective.addHost(hostUser.collective)
     })
   });
-
-
-  it('subscribes to the notifications for the `collective.transaction.approved` email', () =>
-    request(app)
-      .post(`/groups/${collective.id}/activities/collective.transaction.approved/subscribe`)
-      .set('Authorization', `Bearer ${hostUser.jwt()}`)
-      .send({ api_key: application.api_key })
-      .expect(200)
-      .then(res => {
-        expect(res.body.active).to.be.true;
-
-        return Notification.findAndCountAll({
-          where: {
-            UserId: hostUser.id,
-            CollectiveId: collective.id,
-            type: 'collective.transaction.approved',
-            active: true
-          }
-        });
-      })
-      .tap(res => expect(res.count).to.equal(1)));
 
   it(`disables notification for the ${notificationData.type} email`, () =>
     request(app)
@@ -81,79 +56,13 @@ describe("notification.model.test.js", () => {
         }}))
       .tap(res => expect(res.count).to.equal(0)));
 
-  it('fails to add another notification if one exists', () =>
-    request(app)
-      .post(`/groups/${collective.id}/activities/${notificationData.type}/subscribe`)
-      .set('Authorization', `Bearer ${hostUser.jwt()}`)
-      .send({ api_key: application.api_key })
-      .expect(400)
-      .then(res => {
-        expect(res.body.error.message).to.equal('Already subscribed to this type of activity');
-        return Notification.findAndCountAll({
-          where: {
-            UserId: hostUser.id,
-            CollectiveId: collective.id,
-            type: notificationData.type,
-            active: true
-          }
-        });
-      })
-      .tap(res => expect(res.count).to.equal(1)));
-
-  it('fails to add a notification if not a member of the collective', () =>
-    request(app)
-      .post(`/groups/${collective2.id}/activities/collective.transaction.approved/subscribe`)
-      .set('Authorization', `Bearer ${hostUser.jwt()}`)
-      .send({ api_key: application.api_key })
-      .expect(403)
-      .then(() => Notification.findAndCountAll({where: {
-          UserId: hostUser.id,
-          CollectiveId: collective2.id,
-          type: notificationData.type,
-          active: true
-        }}))
-      .tap(res => expect(res.count).to.equal(0)));
-
-  it('automatically subscribe new members to `collective.transaction.created`, `collective.expense.created` and `collective.monthlyreport` events', () => {
-    return request(app)
-      .post('/groups')
-      .send({
-        api_key: application.api_key,
-        group: Object.assign(collective3Data, {
-          hostId: hostUser.CollectiveId,
-          users: [
-            { email: utils.data("user3").email, role: roles.ADMIN }
-          ]
-        })
-      })
-      .expect(200)
-      .then(res => Notification.findAndCountAll({where: {
-          CollectiveId: res.body.id,
-          active: true
-        }}))
-      .tap(res => {
-        const notifications = res.rows;
-        const types = _.map(notifications, 'type').sort();
-        expect(types).to.deep.equal([
-          'collective.expense.created',
-          'collective.expense.created',
-          'collective.member.created',
-          'collective.monthlyreport',
-          'collective.transaction.created',
-          'mailinglist.admins',
-          'mailinglist.host'
-        ]);
-      })
-      .tap(res => expect(res.count).to.equal(7))
-    });
-
   describe('getSubscribers', () => {
 
     let users;
     beforeEach(() => Promise.map([utils.data('user3'), utils.data('user4')], user => models.User.createUserWithCollective(user)).then(result => users = result))
 
     it('getSubscribers to the backers mailinglist', () => Promise.map(users, user => collective.addUserWithRole(user, 'BACKER').catch(e => console.error(e)))
-      .then(() => Notification.getSubscribers(collective.slug, 'backers').catch(e => console.error(e)))
+      .then(() => Notification.getSubscribersUsers(collective.slug, 'backers').catch(e => console.error(e)))
       .tap(subscribers => {
         expect(subscribers.length).to.equal(2);
       })

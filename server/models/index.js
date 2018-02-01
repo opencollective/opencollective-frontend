@@ -94,7 +94,7 @@ export function setupModels(client) {
   m.Member.belongsTo(m.Tier);
 
   // ConnectedAccount
-  m.ConnectedAccount.belongsTo(m.Collective);
+  m.ConnectedAccount.belongsTo(m.Collective, { foreignKey: 'CollectiveId', as: 'collective' });
 
   // Activity.
   m.Activity.belongsTo(m.Collective);

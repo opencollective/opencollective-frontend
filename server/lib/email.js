@@ -1,5 +1,5 @@
 import config from 'config';
-import _, { isArray, pick } from 'lodash';
+import _, { isArray, pick, get } from 'lodash';
 import Promise from 'bluebird';
 import juice from 'juice';
 import nodemailer from 'nodemailer';
@@ -28,7 +28,7 @@ const render = (template, data) => {
     text = templates[`${template}.text`](data);
   }
   const html = juice(templates[template](data));
-  const recipient = _.get(data, 'recipient.dataValues') || data.recipient || {};
+  const recipient = get(data, 'recipient.dataValues') || data.recipient || {};
   const slug = data.collective && data.collective.slug || recipient.slug || recipient.email && recipient.email.substr(0, recipient.email.indexOf('@')) || recipient.substr && recipient.substr(0, recipient.indexOf('@'));
 
   // When in preview mode, we export an HTML version of the email in `/tmp/:template.:slug.html`
@@ -82,7 +82,7 @@ const getTemplateAttributes = (str) => {
 const sendMessage = (recipients, subject, html, options = {}) => {
   options.bcc = options.bcc || `emailbcc@opencollective.com`;
 
-  if (!_.isArray(recipients)) recipients = [ recipients ];
+  if (!isArray(recipients)) recipients = [ recipients ];
 
   recipients = recipients.filter(recipient => {
     if (!recipient || !recipient.match(/.+@.+\..+/)) {
@@ -190,10 +190,10 @@ const getNotificationLabel = (template, recipients) => {
  */
 const generateEmailFromTemplate = (template, recipient, data = {}, options = {}) => {
 
-  const slug = _.get(data, 'collective.slug') || 'undefined';
+  const slug = get(data, 'collective.slug') || 'undefined';
 
   // If we are sending the same email to multiple recipients, it doesn't make sense to allow them to unsubscribe
-  if (!_.isArray(recipient)) {
+  if (!isArray(recipient)) {
     data.notificationTypeLabel = getNotificationLabel(options.type || template, recipient);
     data.unsubscribeUrl = `${config.host.website}/api/services/email/unsubscribe/${encodeURIComponent(options.bcc || recipient)}/${slug}/${options.type || template}/${generateUnsubscribeToken(options.bcc || recipient, slug, options.type || template)}`;
   }
@@ -236,11 +236,10 @@ const generateEmailFromTemplate = (template, recipient, data = {}, options = {})
     }
   }
 
-  if (template === 'collective.transaction.created') {
-    template = (data.transaction.amount > 0) ? 'collective.order.created' : 'collective.expense.paid';
-    if (data.user && data.user.twitterHandle) {
-      const collectiveMention = (data.collective.twitterHandle) ? `@${data.collective.twitterHandle}` : data.collective.name;
-      const text = `Hi @${data.user.twitterHandle} thanks for your donation to ${collectiveMention} https://opencollective.com/${slug} 🎉😊`;
+  if (template === 'collective.member.created') {
+    if (get(data, 'member.memberCollective.twitterHandle') && get(data, 'member.role') === 'BACKER') {
+      const collectiveMention = (get(data, 'collective.twitterHandle')) ? `@${data.collective.twitterHandle}` : data.collective.name;
+      const text = `Hi @${data.member.memberCollective.twitterHandle} thanks for your donation to ${collectiveMention} https://opencollective.com/${slug} 🎉😊`;
       data.tweet = {
         text,
         encoded: encodeURIComponent(text)
@@ -276,13 +275,11 @@ const generateEmailFromTemplateAndSend = (template, recipient, data, options = {
 /*
  * Given an activity, it sends out an email to the right people and right template
  */
-const sendMessageFromActivity = (activity, notification) => {
+const sendMessageFromActivity = (activity, notification, options = {}) => {
   const data = activity.data;
   const userEmail = notification && notification.User ? notification.User.email : activity.data.user.email;
 
   switch (activity.type) {
-    case activities.COLLECTIVE_TRANSACTION_CREATED:
-      return generateEmailFromTemplateAndSend('collective.transaction.created', userEmail, data);
 
     case activities.COLLECTIVE_MEMBER_CREATED:
       return generateEmailFromTemplateAndSend('collective.member.created', userEmail, data);
@@ -294,11 +291,17 @@ const sendMessageFromActivity = (activity, notification) => {
       };
       return generateEmailFromTemplateAndSend('collective.expense.created', userEmail, data);
 
+    case activities.COLLECTIVE_EXPENSE_PAID:
+      data.actions = {
+        viewLatestExpenses: `${config.host.website}/${data.collective.slug}/expenses#expense${data.expense.id}`
+      }
+      return generateEmailFromTemplateAndSend(options.template || 'collective.expense.paid', userEmail, data);
+
     case activities.COLLECTIVE_EXPENSE_APPROVED:
       data.actions = {
-        viewExpenseUrl: notification.User.generateLoginLink(`/${data.collective.slug}/transactions/expenses#exp${data.expense.id}`)
+        viewLatestExpenses: `${config.host.website}/${data.collective.slug}/expenses#expense${data.expense.id}`
       }
-      return generateEmailFromTemplateAndSend('collective.expense.approved.for.host', userEmail, data);
+      return generateEmailFromTemplateAndSend(options.template || 'collective.expense.approved', userEmail, data);
 
     case activities.COLLECTIVE_CREATED:
       data.actions = {

@@ -166,8 +166,15 @@ const getTopDonorsForCollective = (CollectiveId, options = {}) => {
  */
 const getTopVendorsForCollective = (CollectiveId, options = {}) => {
   options.limit = options.limit || 3;
+  const since = (options.since) ? `AND t."createdAt" >= '${options.since.toISOString()}'`: '';
+  const until = (options.until) ? `AND t."createdAt" < '${options.until.toISOString()}'` : '';
   return sequelize.query(`
-    SELECT MAX(c.slug) as slug, MAX(c.image) as image, MAX(c.name) as name, SUM("netAmountInCollectiveCurrency") as "totalExpenses" FROM "Transactions" t LEFT JOIN "Collectives" c ON t."FromCollectiveId" = c.id WHERE t."CollectiveId"=:CollectiveId and t.type='DEBIT' GROUP BY c.id ORDER BY "totalExpenses" ASC LIMIT :limit
+    SELECT MAX(c.slug) as slug, MAX(c."twitterHandle") as "twitterHandle", MAX(c.image) as image, MAX(c.name) as name, SUM("netAmountInCollectiveCurrency") as "totalExpenses"
+    FROM "Transactions" t LEFT JOIN "Collectives" c ON t."FromCollectiveId" = c.id
+    WHERE t."CollectiveId"=:CollectiveId
+      AND t.type='DEBIT'
+      ${since} ${until}
+    GROUP BY c.id ORDER BY "totalExpenses" ASC LIMIT :limit
   `, {
     replacements: { CollectiveId, limit: options.limit },
     type: sequelize.QueryTypes.SELECT
@@ -185,7 +192,11 @@ const getTopExpenseCategories = (CollectiveId, options = {}) => {
   const until = (options.until) ? `AND e."createdAt" < '${options.until.toISOString()}'` : '';
 
   return sequelize.query(`
-    SELECT category, COUNT(*) as "count", SUM("amount") as "totalExpenses" FROM "Expenses" e WHERE "CollectiveId"=:CollectiveId ${since} ${until} GROUP BY category ORDER BY "totalExpenses" DESC LIMIT :limit
+    SELECT category, COUNT(*) as "count", SUM("amount") as "totalExpenses"
+    FROM "Expenses" e
+    WHERE "CollectiveId"=:CollectiveId ${since} ${until}
+    GROUP BY category
+    ORDER BY "totalExpenses" DESC LIMIT :limit
   `, {
     replacements: { CollectiveId, limit: options.limit },
     type: sequelize.QueryTypes.SELECT
@@ -387,8 +398,18 @@ const getMembersOfCollectiveWithRole = (CollectiveIds) => {
  * Returns all the users of a collective with their `totalDonations` and `role` (HOST/ADMIN/BACKER)
  */
 const getMembersWithTotalDonations = (where, options = {}) => {
-  const { until } = options;
-  const untilCondition = (table) => until ? `AND ${table}."createdAt" < '${until.toISOString().toString().substr(0,10)}'` : '';
+
+  const untilCondition = (table) => {
+    let condition = '';
+    if (options.since) {
+      condition += `AND ${table}."createdAt" >= '${options.since.toISOString().toString().substr(0,10)}'`;
+    }
+    if (options.until) {
+      condition += `AND ${table}."createdAt" < '${options.until.toISOString().toString().substr(0,10)}'`;
+    }
+    return condition;
+  }
+
   const roleCond = (where.role) ? `AND member.role = '${where.role}'` : '';
 
   let types, filterByMemberCollectiveType = '';

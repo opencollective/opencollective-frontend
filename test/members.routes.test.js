@@ -184,42 +184,6 @@ describe('members.routes.test.js', () => {
         });
     });
 
-    it('successfully adds the user to the mailing list', (done) => {
-      models.Notification.findOne({where: {
-        CollectiveId: collective.id,
-        UserId: users[2].id,
-        type: 'mailinglist.admins',
-        active: true
-      }}).then(notification => {
-        expect(notification).to.not.exist;
-      })
-      .then(() => {
-        request(app)
-          .post(`/groups/${collective.id}/users/${users[2].id}`)
-          .set('Authorization', `Bearer ${users[0].jwt()}`)
-          .send({
-            api_key: application.api_key,
-            role: roles.ADMIN
-          })
-          .expect(200)
-          .end((e, res) => {
-            expect(e).to.not.exist;
-            expect(res.body).to.have.property('success', true);
-
-            models.Notification.findOne({where: {
-              CollectiveId: collective.id,
-              UserId: users[2].id,
-              type: 'mailinglist.admins',
-              active: true
-            }}).then(notification => {
-              expect(notification.type).to.equal('mailinglist.admins');
-              expect(notification.channel).to.equal('email');
-              expect(notification.active).to.be.true;
-              done();
-            });
-          });
-      });
-    });
   });
 
   /**

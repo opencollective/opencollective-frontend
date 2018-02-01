@@ -17,9 +17,8 @@ export default {
     "lastName": "Mod",
     "name": "Phil Mod",
     "username": "philmod",
-    "email": "User1@opencollective.com",
+    "email": "user1@opencollective.com",
     "paypalEmail": "User1+paypal@opencollective.com",
-    "password": "passpass",
     "description": "engineer",
     "longDescription": "This is a long description with some *markdown* **style**",
     "twitterHandle": "philmod",
@@ -32,19 +31,17 @@ export default {
     "username": "abas",
     "image": "https://pbs.twimg.com/profile_images/3075727251/5c825534ad62223ae6a539f6a5076d3c_400x400.jpeg",
     "description": "small guy",
-    "email": "Xdam@opencollective.com",
-    "twitterHandle": "xdamman",
+    "email": "user2@opencollective.com",
+    "twitterHandle": "abas",
     "company": "Open Collective Inc.",
-    "website": "http://xdamman.com",
-    "password": "ssapssap"
+    "website": "http://abas.com"
   },
 
   "user3": {
     "firstName": "Xavier",
     "lastName": "Damman",
     "username": "xdamman",
-    "email": "User3@opencollective.com",
-    "password": "passssap",
+    "email": "user3@opencollective.com",
     "billingAddress": "Rue du paradis\n1000 Brussels\nBelgium"
   },
 
@@ -52,15 +49,14 @@ export default {
     "firstName": "Bo",
     "lastName": "Ki",
     "username": "boki",
-    "email": "user4@opencollective.com",
-    "password": "passssas"
+    "email": "user4@opencollective.com"
   },
 
   "user5": {
     "firstName": "Bo",
     "lastName": "Ki",
     "username": "boki",
-    "email": "uSer5@opencollective.org"
+    "email": "user5@opencollective.org"
   },
 
   "user6": {

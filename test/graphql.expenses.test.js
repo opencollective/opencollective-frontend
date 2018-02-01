@@ -1,8 +1,11 @@
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
 import models from '../server/models';
+import emailLib from '../server/lib/email';
+import sinon from 'sinon';
 
 import * as utils from './utils';
+import { waitForCondition } from './utils';
 
 describe('graphql.collective.test.js', () => {
   let host, collective;
@@ -63,13 +66,23 @@ describe('graphql.collective.test.js', () => {
   });
 
   describe("write", () => {
-    let host, user, collective, expense;
+    let hostCollective, hostAdmin, user, collective, expense;
+    let sandbox, emailSendMessageSpy;
 
-    before(() => utils.resetTestDB());
-    beforeEach(() => models.User.createUserWithCollective({ name: "Test User" }).then(u => user = u));
-    beforeEach(() => models.User.createUserWithCollective({ name: "Test Host User" }).then(u => host = u));
-    beforeEach(() => models.Collective.create({ name: "Test Collective", HostCollectiveId: host.CollectiveId }).then(c => collective = c));
-    beforeEach(() => models.Expense.create({
+    beforeEach(() => {
+      sandbox = sinon.sandbox.create();
+      emailSendMessageSpy = sandbox.spy(emailLib, 'sendMessage');
+    })
+    afterEach(() => sandbox.restore());
+    
+    beforeEach(() => utils.resetTestDB());
+    beforeEach('create test user', () => models.User.createUserWithCollective({ name: "Test User", email: "testuser@opencollective.com", paypalEmail: "testuser@paypal.com" }).then(u => user = u));
+    beforeEach('create test host admin user', () => models.User.createUserWithCollective({ name: "Test Host Admin User", email: "host.admin@opencollective.com" }).then(u => hostAdmin = u));
+    beforeEach('create test host org', () => models.Collective.create({ name: "Test Host Org", type: "ORGANIZATION" }).then(c => hostCollective = c));
+    beforeEach('create test collective', () => models.Collective.create({ name: "Test Collective", HostCollectiveId: hostCollective.id }).then(c => collective = c));
+    beforeEach('add user admin role', () => collective.addUserWithRole(user, 'ADMIN'));
+    beforeEach('add host admin role', () => hostCollective.addUserWithRole(hostAdmin, 'ADMIN'));
+    beforeEach('create expense', () => models.Expense.create({
       CollectiveId: collective.id,
       UserId: user.id,
       amount: 1000,
@@ -112,18 +125,23 @@ describe('graphql.collective.test.js', () => {
       payoutMethod: 'manual'
     };
 
-    it("creates a new expense logged out", async () => {
+    it("creates a new expense logged out and send email to collective admin for approval", async () => {
       newExpenseData.collective = { id: collective.id };      
       const res = await utils.graphqlQuery(createExpenseQuery, { expense: newExpenseData });
       expect(res.errors).to.exist;
       expect(res.errors[0].message).to.equal('Missing expense.user.email or expense.user.paypalEmail');
-      newExpenseData.user = { email: "testuser@email.com", name: "testuser" };
+      newExpenseData.user = { email: "testuser+contributor@email.com", name: "testuser" };
       const res2 = await utils.graphqlQuery(createExpenseQuery, { expense: newExpenseData });
       res2.errors && console.error(res2.errors[0]);
       expect(res2.errors).to.not.exist;
       const expense = res2.data.createExpense;
       expect(expense.status).to.equal('PENDING');
       expect(expense.user.collective.slug).to.equal("testuser");
+      await waitForCondition(() => emailSendMessageSpy.callCount > 0);
+      expect(emailSendMessageSpy.callCount).to.equal(1);
+      expect(emailSendMessageSpy.firstCall.args[0]).to.equal("testuser@opencollective.com");
+      expect(emailSendMessageSpy.firstCall.args[1]).to.equal("New expense on Test Collective: $10 for Test expense for pizza");
+      expect(emailSendMessageSpy.firstCall.args[2]).to.contain("/test-collective/expenses/2/approve");      
     })
 
     it("creates a new expense logged in", async () => {
@@ -160,13 +178,13 @@ describe('graphql.collective.test.js', () => {
       });
       
       it("fails if logged in as backer of collective", async () => {
-        const admin = await models.User.createUserWithCollective({ name: "test admin user"});
+        const backer = await models.User.createUserWithCollective({ name: "test backer user"});
         await models.Member.create({
           CollectiveId: collective.id,
-          MemberCollectiveId: admin.CollectiveId,
+          MemberCollectiveId: backer.CollectiveId,
           role: "BACKER"
         });
-        const res = await utils.graphqlQuery(deleteExpenseQuery, { id: expense.id }, admin);
+        const res = await utils.graphqlQuery(deleteExpenseQuery, { id: expense.id }, backer);
         expect(res.errors).to.exist;
         expect(res.errors[0].message).to.equal("You don't have permission to delete this expense");
       });
@@ -192,13 +210,7 @@ describe('graphql.collective.test.js', () => {
       });
 
       it("works if logged in as admin of host collective", async () => {
-        const admin = await models.User.createUserWithCollective({ name: "test admin user"});
-        await models.Member.create({
-          CollectiveId: host.collective.id,
-          MemberCollectiveId: admin.CollectiveId,
-          role: "ADMIN"
-        });
-        const res = await utils.graphqlQuery(deleteExpenseQuery, { id: expense.id }, admin);
+        const res = await utils.graphqlQuery(deleteExpenseQuery, { id: expense.id }, hostAdmin);
         expect(res.errors).to.not.exist;
         const deletedExpense = await models.Expense.findById(expense.id);
         expect(deletedExpense).to.be.null;
@@ -219,17 +231,34 @@ describe('graphql.collective.test.js', () => {
       it("fails to approve expense if expense.status is PAID", async () => {
         expense.status = 'PAID';
         await expense.save();
-        const res = await utils.graphqlQuery(approveExpenseQuery, { id: expense.id }, host);
+        const res = await utils.graphqlQuery(approveExpenseQuery, { id: expense.id }, hostAdmin);
         expect(res.errors).to.exist;
         expect(res.errors[0].message).to.equal("You can't reject an expense that is already paid")
       });
 
-      it("successfully approve expense if expense.status is PENDING", async () => {
+      it("successfully approve expense if expense.status is PENDING and send notification email to author of expense and host admin (unless unsubscribed)", async () => {
+
+        const hostAdmin2 = await models.User.createUserWithCollective({ name: "Another host admin", email: "host.admin2@opencollective.com"});
+        await hostCollective.addUserWithRole(hostAdmin2, 'ADMIN');
+        await models.Notification.create({
+          UserId: hostAdmin2.id,
+          CollectiveId: hostCollective.id,
+          channel: "email",
+          active: false,
+          type: "collective.expense.approved"
+        });
         expense.status = 'PENDING';
         await expense.save();
-        const res = await utils.graphqlQuery(approveExpenseQuery, { id: expense.id }, host);
+        const res = await utils.graphqlQuery(approveExpenseQuery, { id: expense.id }, hostAdmin);
         expect(res.errors).to.not.exist;
         expect(res.data.approveExpense.status).to.equal('APPROVED');
+        await utils.waitForCondition(() => emailSendMessageSpy.callCount === 2);
+        expect(emailSendMessageSpy.callCount).to.equal(2);
+        expect(emailSendMessageSpy.firstCall.args[0]).to.equal("testuser@opencollective.com");
+        expect(emailSendMessageSpy.firstCall.args[1]).to.contain("Your expense");
+        expect(emailSendMessageSpy.firstCall.args[1]).to.contain("has been approved");
+        expect(emailSendMessageSpy.secondCall.args[0]).to.equal("host.admin@opencollective.com");
+        expect(emailSendMessageSpy.secondCall.args[1]).to.contain("New expense approved on Test Collective: $10 for Test expense for pizza");
       });
 
     });
@@ -248,7 +277,7 @@ describe('graphql.collective.test.js', () => {
       const addFunds = async (amount) => {
         await models.Transaction.create({
           CreatedByUserId: user.id,
-          HostCollectiveId: host.CollectiveId,
+          HostCollectiveId: hostCollective.id,
           type: 'CREDIT',
           netAmountInCollectiveCurrency: amount,
           currency: 'USD',  
@@ -260,13 +289,13 @@ describe('graphql.collective.test.js', () => {
         let res;
         expense.status = 'PENDING';
         await expense.save();
-        res = await utils.graphqlQuery(payExpenseQuery, { id: expense.id }, host);
+        res = await utils.graphqlQuery(payExpenseQuery, { id: expense.id }, hostAdmin);
         expect(res.errors).to.exist;
         expect(res.errors[0].message).to.equal("Expense needs to be approved. Current status of the expense: PENDING.");
 
         expense.status = 'REJECTED';
         await expense.save();
-        res = await utils.graphqlQuery(payExpenseQuery, { id: expense.id }, host);
+        res = await utils.graphqlQuery(payExpenseQuery, { id: expense.id }, hostAdmin);
         expect(res.errors).to.exist;
         expect(res.errors[0].message).to.equal("Expense needs to be approved. Current status of the expense: REJECTED.");
       });
@@ -279,7 +308,7 @@ describe('graphql.collective.test.js', () => {
 
         // add funds to the collective
         await addFunds(500);
-        const res = await utils.graphqlQuery(payExpenseQuery, { id: expense.id }, host);
+        const res = await utils.graphqlQuery(payExpenseQuery, { id: expense.id }, hostAdmin);
         expect(res.errors).to.exist;
         expect(res.errors[0].message).to.equal("You don't have enough funds to pay this expense. Current balance: $5, Expense amount: $10");
       });
@@ -292,9 +321,33 @@ describe('graphql.collective.test.js', () => {
 
         // add funds to the collective
         await addFunds(1000);
-        const res = await utils.graphqlQuery(payExpenseQuery, { id: expense.id }, host);
+        const res = await utils.graphqlQuery(payExpenseQuery, { id: expense.id }, hostAdmin);
         expect(res.errors).to.exist;
         expect(res.errors[0].message).to.equal("You don't have enough funds to cover for the fees of this payment method. Current balance: $10, Expense amount: $10, Estimated paypal fees: $1");
+      });
+
+      it("pays the expense manually and reduces the balance of the collective", async () => {
+        // approve expense
+        expense.status = 'APPROVED';
+        expense.payoutMethod = 'other';
+        await expense.save();
+
+        let balance;
+        // add funds to the collective
+        await addFunds(1500);
+        balance = await collective.getBalance();
+        expect(balance).to.equal(1500);
+        const res = await utils.graphqlQuery(payExpenseQuery, { id: expense.id }, hostAdmin);
+        expect(res.errors).to.not.exist;
+        expect(res.data.payExpense.status).to.equal('PAID');
+        balance = await collective.getBalance();
+        expect(balance).to.equal(500);
+        await utils.waitForCondition(() => emailSendMessageSpy.callCount > 0, { delay: 500 });
+        expect(emailSendMessageSpy.callCount).to.equal(2);
+        expect(emailSendMessageSpy.firstCall.args[0]).to.equal("testuser@opencollective.com");
+        expect(emailSendMessageSpy.firstCall.args[1]).to.contain("Your $10 expense submitted to Test Collective has been paid");
+        expect(emailSendMessageSpy.secondCall.args[0]).to.equal("host.admin@opencollective.com");
+        expect(emailSendMessageSpy.secondCall.args[1]).to.contain("Expense paid on Test Collective");
       });
     })
   });

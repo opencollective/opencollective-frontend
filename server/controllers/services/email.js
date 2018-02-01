@@ -38,7 +38,7 @@ const sendEmailToList = (to, email) => {
   email.from = email.from || `${collectiveSlug} collective <hello@${collectiveSlug}.opencollective.com>`;
   email.collective = email.collective || { slug: collectiveSlug }; // used for the unsubscribe url
 
-  return models.Notification.getSubscribers(collectiveSlug, mailinglist)
+  return models.Notification.getSubscribersUsers(collectiveSlug, mailinglist)
   .tap(subscribers => {
     if (subscribers.length === 0) throw new errors.NotFound(`No subscribers found in ${collectiveSlug} for email type ${type}`);
   })
