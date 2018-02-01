@@ -1,9 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Transaction from './Transaction';
 import { ButtonGroup, Button } from 'react-bootstrap';
 import { FormattedMessage } from 'react-intl';
+
 import colors from '../constants/colors';
+import Transaction from './Transaction';
+import TransactionsExportPopoverAndButton from './TransactionsExportPopoverAndButton';
 
 class Transactions extends React.Component {
 
@@ -38,7 +40,7 @@ class Transactions extends React.Component {
   }
 
   render() {
-    const { collective, transactions, LoggedInUser } = this.props;
+    const { collective, transactions, LoggedInUser, showCSVlink } = this.props;
 
     if (!transactions) {
       return (<div />);
@@ -94,6 +96,8 @@ class Transactions extends React.Component {
           }
         `}</style>
 
+        {showCSVlink && <TransactionsExportPopoverAndButton collective={collective} />}
+
         <div className="filter">
           <ButtonGroup className="filterBtnGroup">
             <Button className="filterBtn all" bsSize="small" bsStyle={!this.state.type ? 'primary' : 'default'} onClick={() => this.refetch()}>
@@ -120,7 +124,7 @@ class Transactions extends React.Component {
               collective={collective}
               transaction={transaction}
               LoggedInUser={LoggedInUser}
-              />
+            />
           )}
           { transactions.length === 0 &&
             <div className="empty">

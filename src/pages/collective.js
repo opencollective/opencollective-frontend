@@ -18,7 +18,6 @@ class CollectivePage extends React.Component {
   }
 
   static getInitialProps ({ query }) {
-    console.log(">>> pages/collective: getInitialProps", query);
     return { slug: query.slug, query }
   }
 
@@ -41,7 +40,7 @@ class CollectivePage extends React.Component {
     }
 
     const collective = data.Collective;
-    console.log(">>> pages/collective: collective", collective);
+
     return (
       <div>
         { collective.type === 'COLLECTIVE' &&

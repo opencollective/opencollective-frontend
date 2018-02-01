@@ -30,6 +30,7 @@ describe("collective page", () => {
   
   it ("opens new expense page", () => {
     cy.get("#expenses .SubmitExpenseBtn").click();
+    cy.wait(500);
     cy.get(".ExpensesPage .CollectiveCover h1").contains("Expenses");
     cy.get(".ExpensesPage .inputField.descriptionField")
     cy.get(".ExpensesPage .CollectiveCover .goBack").click();
@@ -47,6 +48,7 @@ describe("collective page", () => {
   
   it ("opens all transactions page", () => {
     cy.get("#transactions .ViewAllTransactionsBtn").click();
+    cy.wait(500);
     cy.get(".TransactionsPage .CollectiveCover h1").contains("Latest transactions");
     cy.get(".TransactionsPage .itemsList .transaction").should("have.length", 20);
     cy.get(".TransactionsPage .loadMoreBtn");

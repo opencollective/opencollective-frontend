@@ -16,7 +16,7 @@ class CollectiveCover extends React.Component {
   static propTypes = {
     collective: PropTypes.object.isRequired,
     href: PropTypes.string,
-    title: PropTypes.oneOf([PropTypes.string, PropTypes.node]),
+    title: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
     style: PropTypes.object,
   }
 

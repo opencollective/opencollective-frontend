@@ -111,6 +111,15 @@ export function signin(user, redirect) {
   .then(checkResponseStatus);
 }
 
+export async function refreshToken(currentToken) {
+  const response = await fetch('/api/users/update-token', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${currentToken}` }
+  });
+  const json = await response.json();
+  return json.token;
+}
+
 export function get(path, options) {
   if (path.substr(0,1) !== '/') throw new Error("Can only get resources with a relative path");
 

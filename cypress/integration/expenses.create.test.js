@@ -6,8 +6,7 @@ const expenseDescription = `New expense ${random}`;
 const uploadReceipt = (dropzoneElement = '.InputTypeDropzone') => {
   const dropEvent = {
     dataTransfer: {
-        files: [
-        ],
+        files: [],
     },
   };
   
@@ -45,7 +44,7 @@ describe("new expense", () => {
     cy.get('.Expenses .expense:first .meta').contains("Team")
     cy.get('.submitNewExpense').click();
     cy.get('.descriptionField input').should('have.value', '');
-    cy.get('.amountField input').should('have.value', '0');
+    cy.get('.amountField input').should('have.value', '');
   })
 
   it ("submits a new expense payout method: other", () => {
