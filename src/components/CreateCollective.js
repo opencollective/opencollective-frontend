@@ -40,8 +40,12 @@ class CreateCollective extends React.Component {
     this.setState( { status: 'loading' });
     CollectiveInputType.type = 'COLLECTIVE';
     CollectiveInputType.HostCollectiveId = host.id;
-    CollectiveInputType.tags = [...(host.tags || []), CollectiveInputType.category ];
+    CollectiveInputType.tags = [...host.tags] || [];
+    if (CollectiveInputType.category) {
+      CollectiveInputType.tags.push(CollectiveInputType.category);
+    }
     delete CollectiveInputType.category;
+
     try {
       const res = await this.props.createCollective(CollectiveInputType);
       const collective = res.data.createCollective;
@@ -123,6 +127,7 @@ class CreateCollective extends React.Component {
               <div>
 
                 <CreateCollectiveForm
+                  host={host}
                   collective={this.state.collective}
                   onSubmit={this.createCollective}
                   onChange={this.resetError}

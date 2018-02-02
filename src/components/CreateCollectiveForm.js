@@ -11,10 +11,12 @@ import { defaultBackgroundImage } from '../constants/collectives';
 import withIntl from '../lib/withIntl';
 import { ButtonGroup, Button } from 'react-bootstrap';
 import { Link } from '../server/pages';
+import { get } from 'lodash';
 
 class CreateCollectiveForm extends React.Component {
 
   static propTypes = {
+    host: PropTypes.object,
     collective: PropTypes.object,
     loading: PropTypes.bool,
     onSubmit: PropTypes.func
@@ -109,14 +111,17 @@ class CreateCollectiveForm extends React.Component {
           type: 'textarea',
           placeholder: '',
           help: 'Protip: you can use markdown'
-        },
-        {
-          name: 'category',
-          type: 'select',
-          defaultValue: "association",
-          options: getOptions(["association","coop","lobby","meetup","movement","neighborhood","opensource","politicalparty","pta","studentclub","other"])
         }
       ]
+    }
+
+    if (get(props.host, 'settings.categories')) {
+      this.fields.info.push({
+        name: 'category',
+        type: 'select',
+        defaultValue: "association",
+        options: getOptions(get(props.host, 'settings.categories'))
+      });
     }
 
     this.state = {
