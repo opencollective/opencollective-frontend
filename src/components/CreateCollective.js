@@ -40,8 +40,8 @@ class CreateCollective extends React.Component {
     this.setState( { status: 'loading' });
     CollectiveInputType.type = 'COLLECTIVE';
     CollectiveInputType.HostCollectiveId = host.id;
-    CollectiveInputType.tags = host.tags;
-    console.log(">>> createCollective", CollectiveInputType);
+    CollectiveInputType.tags = [...(host.tags || []), CollectiveInputType.category ];
+    delete CollectiveInputType.category;
     try {
       const res = await this.props.createCollective(CollectiveInputType);
       const collective = res.data.createCollective;

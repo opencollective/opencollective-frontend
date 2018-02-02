@@ -246,16 +246,6 @@ class UserCollective extends React.Component {
 
               <div className="content" >
                 <div className="message">
-                  { isProfileEmpty &&
-                    <div>
-                      <FormattedMessage id="collective.user.emptyProfile" defaultMessage={`Your profile looks a bit empty ¯\\\\_(ツ)_/¯`} />
-                    </div>
-                  }
-                  { !LoggedInUser && isProfileEmpty &&
-                    <div>
-                      <FormattedMessage id="collective.user.loggedout.editProfile" defaultMessage="Please login to edit your profile" />
-                    </div>
-                  }
                   { isProfileEmpty && LoggedInUser && LoggedInUser.canEditCollective(this.collective) &&
                     <div className="editBtn">
                       <Button onClick={() => Router.pushRoute(`/${this.collective.slug}/edit`)}>{intl.formatMessage(this.messages[`${type}.collective.edit`])}</Button>
