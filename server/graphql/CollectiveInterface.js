@@ -345,6 +345,7 @@ export const CollectiveInterfaceType = new GraphQLInterfaceType({
       description: { type: GraphQLString },
       longDescription: { type: GraphQLString },
       mission: { type: GraphQLString },
+      tags: { type: new GraphQLList(GraphQLString) },
       location: {
         type: LocationType,
         description: 'Name, address, lat, long of the location.'
@@ -523,6 +524,12 @@ const CollectiveFields = () => {
       type: GraphQLString,
       resolve(collective) {
         return collective.mission;
+      }
+    },
+    tags: {
+      type: new GraphQLList(GraphQLString),
+      resolve(collective) {
+        return collective.tags;
       }
     },
     location: {

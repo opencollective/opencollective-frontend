@@ -171,6 +171,7 @@ const getNotificationLabel = (template, recipients) => {
     'email.message': `the ${recipients[0].substr(0, recipients[0].indexOf('@'))} mailing list`,
     'collective.order.created': 'notifications of new donations for this collective',
     'collective.expense.created': 'notifications of new expenses submitted to this collective',
+    'collective.expense.approved.for.host': 'notifications of new expenses approved under this host',
     'collective.monthlyreport': 'monthly reports for collectives',
     'collective.member.created': 'notifications of new members',
     'collective.update.published': 'notifications of new updates from this collective',
