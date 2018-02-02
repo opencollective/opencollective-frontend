@@ -107,6 +107,7 @@ export const CollectiveInputType = new GraphQLInputObjectType({
     currency: { type: GraphQLString },
     image: { type: GraphQLString },
     backgroundImage: { type: GraphQLString },
+    tags: { type: new GraphQLList(GraphQLString) },
     tiers: { type: new GraphQLList(TierInputType) },
     members: { type: new GraphQLList(MemberInputType) },
     paymentMethods: { type: new GraphQLList(PaymentMethodInputType) },
