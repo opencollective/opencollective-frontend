@@ -8,6 +8,7 @@
     "react"
   ],
   "plugins": [
+    "transform-css-import-to-string",
     [
       "styled-jsx/babel", { "plugins": ["styled-jsx-plugin-postcss"] }
     ],

@@ -15,8 +15,8 @@ import { FormattedMessage } from 'react-intl'
 class UpdatesPage extends React.Component {
 
   static getInitialProps (props) {
-    const { query: { collectiveSlug, id }, data } = props;
-    return { slug: collectiveSlug, data, id }
+    const { query: { collectiveSlug, updateSlug }, data } = props;
+    return { collectiveSlug, updateSlug, data }
   }
 
   constructor(props) {
@@ -31,7 +31,7 @@ class UpdatesPage extends React.Component {
   }
 
   render() {
-    const { data, id } = this.props;
+    const { data, updateSlug } = this.props;
     const { LoggedInUser } = this.state;
     if (!data.Collective) return (<NotFound />);
 
@@ -41,7 +41,7 @@ class UpdatesPage extends React.Component {
     }
 
     const collective = data.Collective;
-    const css = LoggedInUser && "//cdn.quilljs.com/1.2.6/quill.snow.css"; // only load html editor css when logged in
+
     return (
       <div className="UpdatesPage">
 
@@ -52,7 +52,6 @@ class UpdatesPage extends React.Component {
           image={collective.image || collective.backgroundImage}
           className={this.state.status}
           LoggedInUser={LoggedInUser}
-          css={css}
           />
 
         <Body>
@@ -67,7 +66,8 @@ class UpdatesPage extends React.Component {
 
           <div className="content" >
             <UpdateWithData
-              id={id}
+              collectiveSlug={collective.slug}
+              updateSlug={updateSlug}
               editable={true}
               LoggedInUser={LoggedInUser}
               />

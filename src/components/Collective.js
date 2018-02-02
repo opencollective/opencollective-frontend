@@ -244,6 +244,7 @@ class Collective extends React.Component {
                       collective={this.collective}
                       compact={true}
                       limit={1}
+                      LoggedInUser={LoggedInUser}
                       />
                   </div>
                   <div id="events">

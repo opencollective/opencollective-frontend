@@ -41,8 +41,8 @@ class UpdateWithData extends React.Component {
 }
 
 const getUpdateQuery = gql`
-  query Update($id: Int!) {
-    Update(id: $id) {
+  query Update($collectiveSlug: String!, $updateSlug: String!) {
+    Update(collectiveSlug: $collectiveSlug, updateSlug: $updateSlug) {
       id
       title
       createdAt

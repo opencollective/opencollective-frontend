@@ -10,6 +10,7 @@ import gql from 'graphql-tag'
 import { FormattedMessage } from 'react-intl'
 import { pick, get } from 'lodash';
 import HTMLEditor from './HTMLEditor';
+import { Link } from '../server/pages';
 
 class UpdatesWithData extends React.Component {
 
@@ -102,7 +103,7 @@ class UpdatesWithData extends React.Component {
             font-size: 16px;
             line-height: 19px;
           }
-          .adminActions {
+          .FullPage .adminActions {
             text-transform: uppercase;
             font-size: 1.3rem;
             font-weight: 600;
@@ -118,10 +119,13 @@ class UpdatesWithData extends React.Component {
           }
           .adminActions ul li {
           }
+          .adminActions .compact ul li {
+            text-align: center;
+          }
         `}</style>
 
         { !compact &&
-          <div>
+          <div className="FullPage">
             <div className="title">
               <h1>
                 <FormattedMessage id="collective.latestUpdates.title" defaultMessage="{n, plural, one {Latest Update} other {Latest Updates}}" values={{n: 2}} />
@@ -139,6 +143,19 @@ class UpdatesWithData extends React.Component {
               }
               </ul>
             </div>
+          </div>
+        }
+        { compact &&
+          <div className="adminActions compact">
+            <ul>
+            { showAdminActions && !this.state.showNewUpdateForm &&
+              <li>
+                <Link route={`/${collective.slug}/updates/new`}><a className="btn btn-default">
+                  <FormattedMessage id="update.new.button" defaultMessage="Submit a new update" />
+                </a></Link>
+              </li>
+            }
+            </ul>
           </div>
         }
 
@@ -166,6 +183,7 @@ const getUpdatesQuery = gql`
 query Updates($CollectiveId: Int!, $limit: Int, $offset: Int, $includeHostedCollectives: Boolean) {
   allUpdates(CollectiveId: $CollectiveId, limit: $limit, offset: $offset, includeHostedCollectives: $includeHostedCollectives) {
     id
+    slug
     title
     summary
     createdAt
@@ -230,6 +248,7 @@ const createUpdateQuery = gql`
 mutation createUpdate($update: UpdateInputType!) {
   createUpdate(update: $update) {
     id
+    slug
     title
     summary
     html

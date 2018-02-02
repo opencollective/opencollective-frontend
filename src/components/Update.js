@@ -83,7 +83,7 @@ class Update extends React.Component {
             margin-top: 2rem;
           }
         `}</style>
-        <Link route={`/${collective.slug}/updates/${update.id}`}>
+        <Link route={`/${collective.slug}/updates/${update.slug}`}>
           <a>{intl.formatMessage(this.messages['viewMore'])}</a>
         </Link>
       </div>

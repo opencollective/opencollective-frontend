@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { upload } from '../lib/api';
+import stylesheet from '../../node_modules/react-quill/dist/quill.snow.css';
 
 /* 
  * Simple editor component that takes placeholder text as a prop 
@@ -63,6 +64,7 @@ class HTMLEditor extends React.Component {
   
   handleChange (html) {
     this.setState({ editorHtml: html });
+    console.log(html);
     this.props.onChange(html);
   }
 
@@ -119,6 +121,7 @@ class HTMLEditor extends React.Component {
 
     return (
       <div className="HTMLEditor">
+        <style dangerouslySetInnerHTML={{ __html: stylesheet }} />
         <style jsx>{`
           .HTMLEditor :global(.quill) {
             height: 1rem;

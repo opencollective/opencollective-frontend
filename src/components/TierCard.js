@@ -48,7 +48,7 @@ class TierCard extends React.Component {
         `}</style>
         <div className={`fromCollectives ${fromCollectiveTypeArray[0].toLowerCase()}`}>
           { fromCollectives.slice(0, limit).map(fromCollective => (
-            <div className="image" key={`image-${fromCollective.id}`}>
+            <div className="image" key={`${tier.slug}-fromCollective-${fromCollective.id}`}>
               <Link route={`/${fromCollective.slug}`}><a title={fromCollective.name}>
                 { fromCollectiveTypeArray.indexOf('USER') !== -1 &&
                   <Avatar src={fromCollective.image} radius={32} />

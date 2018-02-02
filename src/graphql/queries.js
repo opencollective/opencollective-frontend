@@ -435,7 +435,15 @@ export const getPrepaidCardBalanceQuery = gql`
 `;
 
 export const addCollectiveData = graphql(getCollectiveQuery);
-export const addCollectiveCoverData = graphql(getCollectiveCoverQuery);
+export const addCollectiveCoverData = graphql(getCollectiveCoverQuery, {
+  options(props) {
+    return {
+      variables: {
+        slug: props.collectiveSlug || props.slug
+      }
+    }
+  }
+});
 export const addCollectiveToEditData = graphql(getCollectiveToEditQuery);
 export const addEventCollectiveData = graphql(getEventCollectiveQuery);
 export const addTiersData = graphql(getTiersQuery);
