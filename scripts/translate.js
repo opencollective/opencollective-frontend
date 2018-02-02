@@ -18,7 +18,6 @@ let defaultMessages = globSync(MESSAGES_PATTERN)
                 console.error(`Duplicate message id: ${id}`);
                 return;
             }
-
             collection[id] = defaultMessage;
         });
 
