@@ -11,10 +11,12 @@ import { defaultBackgroundImage } from '../constants/collectives';
 import withIntl from '../lib/withIntl';
 import { ButtonGroup, Button } from 'react-bootstrap';
 import { Link } from '../server/pages';
+import { get } from 'lodash';
 
 class CreateCollectiveForm extends React.Component {
 
   static propTypes = {
+    host: PropTypes.object,
     collective: PropTypes.object,
     loading: PropTypes.bool,
     onSubmit: PropTypes.func
@@ -28,12 +30,6 @@ class CreateCollectiveForm extends React.Component {
 
     const collective = { ... props.collective || {} };
     collective.slug = collective.slug ? collective.slug.replace(/.*\//, '') : '';
-
-    this.state = {
-      modified: false,
-      section: 'info',
-      collective
-    };
 
     this.messages = defineMessages({
       'slug.label': { id: 'collective.slug.label', defaultMessage: 'url' },
@@ -49,52 +45,30 @@ class CreateCollectiveForm extends React.Component {
       'backgroundImage.label': { id: 'collective.backgroundImage.label', defaultMessage: 'Cover image' },
       'twitterHandle.label': { id: 'collective.twitterHandle.label', defaultMessage: 'Twitter' },
       'website.label': { id: 'collective.website.label', defaultMessage: 'Website' },
-      'location.label': { id: 'collective.location.label', defaultMessage: 'City' }
+      'location.label': { id: 'collective.location.label', defaultMessage: 'City' },
+      'category.label': { id: 'collective.category.label', defaultMessage: 'Category' },
+      'association': { id: 'collective.category.association', defaultMessage: 'Association' },
+      'pta': { id: 'collective.category.pta', defaultMessage: 'Parent Teacher Association' },
+      'other': { id: 'collective.category.other', defaultMessage: 'Other' },
+      'studentclub': { id: 'collective.category.studentclub', defaultMessage: 'Student Club' },
+      'meetup': { id: 'collective.category.meetup', defaultMessage: 'Meetup' },
+      'movement': { id: 'collective.category.movement', defaultMessage: 'Movement' },
+      'neighborhood': { id: 'collective.category.neighborhood', defaultMessage: 'Neighborhood Association' },
+      'opensource': { id: 'collective.category.opensource', defaultMessage: 'Open Source Project' },
+      'politicalparty': { id: 'collective.category.politicalparty', defaultMessage: 'Political Party' },
+      'lobby': { id: 'collective.category.lobby', defaultMessage: 'Lobbying Group' },
+      'coop': { id: 'collective.category.coop', defaultMessage: 'Cooperative' }
     });
 
     collective.backgroundImage = collective.backgroundImage || defaultBackgroundImage[collective.type];
 
-    window.OC = { collective, state: this.state };
-  }
-
-  componentDidMount() {
-    const hash = window.location.hash;
-    if (hash) {
-      this.setState({ section: hash.substr(1) });
+    const getOptions = (arr) => {
+      return arr.map(key => {
+        const obj = {};
+        obj[key] = props.intl.formatMessage(this.messages[key]);
+        return obj;
+      })
     }
-  }
-
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.collective && (!this.props.collective || nextProps.collective.name != this.props.collective.name)) {
-      this.setState({ collective: nextProps.collective, tiers: nextProps.collective.tiers });
-    }
-  }
-
-  handleChange(fieldname, value) {
-    const collective = {};
-    collective[fieldname] = value;
-    this.setState( { modified: true, collective: Object.assign({}, this.state.collective, collective) });
-  }
-
-  handleObjectChange(obj) {
-    this.setState({ ...obj, modified: true });
-    window.state = this.state;
-  }
-
-  async handleSubmit() {
-    this.props.onSubmit(this.state.collective);
-    this.setState({ modified: false })
-  }
-
-  render() {
-
-    const { collective, loading, intl } = this.props;
-
-    const isNew = !(collective && collective.id);
-    const defaultStartsAt = new Date;
-    const type = collective.type.toLowerCase();
-    defaultStartsAt.setHours(19);
-    defaultStartsAt.setMinutes(0);
 
     this.fields = {
       info: [
@@ -141,18 +115,78 @@ class CreateCollectiveForm extends React.Component {
       ]
     }
 
+    if (get(props.host, 'settings.categories')) {
+      this.fields.info.push({
+        name: 'category',
+        type: 'select',
+        defaultValue: "association",
+        options: getOptions(get(props.host, 'settings.categories'))
+      });
+    }
+
+    this.state = {
+      modified: false,
+      section: 'info',
+      collective
+    };
+    this.fields.info.map(field => {
+    });
 
     Object.keys(this.fields).map(key => {
       this.fields[key] = this.fields[key].map(field => {
       if (this.messages[`${field.name}.label`]) {
-        field.label = intl.formatMessage(this.messages[`${field.name}.label`]);
+        field.label = props.intl.formatMessage(this.messages[`${field.name}.label`]);
       }
       if (this.messages[`${field.name}.description`]) {
-        field.description = intl.formatMessage(this.messages[`${field.name}.description`]);
+        field.description = props.intl.formatMessage(this.messages[`${field.name}.description`]);
       }
+      this.state.collective[field.name] = this.state.collective[field.name] || field.defaultValue;
       return field;
       });
     });
+
+    window.OC = { collective, state: this.state };
+
+  }
+
+  componentDidMount() {
+    const hash = window.location.hash;
+    if (hash) {
+      this.setState({ section: hash.substr(1) });
+    }
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.collective && (!this.props.collective || nextProps.collective.name != this.props.collective.name)) {
+      this.setState({ collective: nextProps.collective, tiers: nextProps.collective.tiers });
+    }
+  }
+
+  handleChange(fieldname, value) {
+    const collective = {};
+    collective[fieldname] = value;
+    this.setState( { modified: true, collective: Object.assign({}, this.state.collective, collective) });
+  }
+
+  handleObjectChange(obj) {
+    this.setState({ ...obj, modified: true });
+    window.state = this.state;
+  }
+
+  async handleSubmit() {
+    this.props.onSubmit(this.state.collective);
+    this.setState({ modified: false })
+  }
+
+  render() {
+
+    const { collective, loading, intl } = this.props;
+
+    const isNew = !(collective && collective.id);
+    const defaultStartsAt = new Date;
+    const type = collective.type.toLowerCase();
+    defaultStartsAt.setHours(19);
+    defaultStartsAt.setMinutes(0);
 
     return (
       <div className="CreateCollectiveForm">

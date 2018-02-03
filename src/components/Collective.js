@@ -225,6 +225,7 @@ class Collective extends React.Component {
                 <div className="sidebar tiers" id="contribute">
                   { this.collective.tiers.map(tier => (
                     <TierCard
+                      key={`TierCard-${tier.slug}`}
                       collective={this.collective}
                       tier={tier}
                       referral={query.referral}

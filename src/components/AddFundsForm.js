@@ -46,7 +46,7 @@ class AddFundsForm extends React.Component {
     });
 
     const getOptions = (arr, vars) => {
-      return arr.map(key => { 
+      return arr.map(key => {
         const obj = {};
         obj[key] = intl.formatMessage(this.messages[key], vars);
         return obj;

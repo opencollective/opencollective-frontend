@@ -10,7 +10,7 @@ pages
   .add('signin', '/signin/:token?')
   .add('button', '/:collectiveSlug/:verb(contribute|donate)/button')
   .add('createEvent', '/:parentCollectiveSlug/events/(new|create)')
-  .add('createCollective', '/:hostCollectiveSlug/apply')
+  .add('createCollective', '/:hostCollectiveSlug?/(apply|create)')
   .add('createOrganization', '/organizations/new')
   .add('events-iframe', '/:collectiveSlug/events.html')
   .add('collectives-iframe', '/:collectiveSlug/(collectives|widget).html')

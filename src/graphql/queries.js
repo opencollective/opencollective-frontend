@@ -408,6 +408,7 @@ const getCollectiveCoverQuery = gql`
       settings
       image
       isHost
+      tags
       stats {
         id
         balance
