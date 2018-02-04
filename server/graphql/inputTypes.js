@@ -217,6 +217,7 @@ export const UpdateInputType = new GraphQLInputObjectType({
     slug: { type: GraphQLString },
     title: { type: GraphQLString },
     image: { type: GraphQLString },
+    markdown: { type: GraphQLString },
     html: { type: GraphQLString },
     fromCollective: { type: CollectiveAttributesInputType },
     collective: { type: new GraphQLNonNull(CollectiveAttributesInputType) },

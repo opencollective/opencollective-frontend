@@ -3,6 +3,17 @@
 module.exports = {
   up: function (queryInterface, DataTypes) {
 
+    const updateCollectiveSettings = () => {
+      const update = (collective) => {
+        const { id } = collective;
+        const settingsData = collective.settings || {};
+        settingsData.editor = 'markdown';
+        const settings = JSON.stringify(settingsData);
+        return queryInterface.sequelize.query(`UPDATE "Collectives" SET settings=:settings WHERE id=:id`, { replacements: { id, settings }});
+      }
+      return queryInterface.sequelize.query(`SELECT id, settings FROM "Collectives" WHERE tags @> '{"open source"}'`, { type: queryInterface.sequelize.QueryTypes.SELECT }).map(update);
+    }
+
     const updateAttributes = {
       id: {
         type: DataTypes.INTEGER,
@@ -67,7 +78,8 @@ module.exports = {
         allowNull: true
       },
   
-      title: DataTypes.STRING,        
+      title: DataTypes.STRING,
+      markdown: DataTypes.TEXT,
       html: DataTypes.TEXT,
       image: DataTypes.STRING,
       tags: DataTypes.ARRAY(DataTypes.STRING),
@@ -117,7 +129,8 @@ module.exports = {
       .then(() => queryInterface.createTable('UpdateHistories', {
         ...updateAttributes,
         ...updateHistoriesAttributes
-      }));
+      }))
+      .then(updateCollectiveSettings);
   },
 
   down: function (queryInterface) {

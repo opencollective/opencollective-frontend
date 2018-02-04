@@ -104,10 +104,14 @@ const queries = {
   Update: {
     type: UpdateType,
     args: {
-      collectiveSlug: { type: new GraphQLNonNull(GraphQLString) },
-      updateSlug: { type: new GraphQLNonNull(GraphQLString) }
+      collectiveSlug: { type: GraphQLString },
+      updateSlug: { type: GraphQLString },
+      id: { type: GraphQLInt }
     },
     async resolve(_, args) {
+      if (args.id) {
+        return models.Update.findById(args.id);
+      }
       const CollectiveId = await fetchCollectiveId(args.collectiveSlug);
       return models.Update.findOne({ where: { CollectiveId, slug: args.updateSlug } });
     }

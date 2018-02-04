@@ -460,6 +460,12 @@ export const UpdateType = new GraphQLObjectType({
           return update.html;
         }
       },
+      markdown: {
+        type: GraphQLString,
+        resolve(update) {
+          return update.markdown;
+        }
+      },
       tags: {
         type: new GraphQLList(GraphQLString),
         resolve(update) {

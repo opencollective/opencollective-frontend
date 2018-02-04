@@ -8,6 +8,8 @@ import slugify from 'slug';
 import activities from '../constants/activities';
 import { mustBeLoggedInTo, mustHaveRole } from '../lib/auth';
 import Promise from 'bluebird';
+import showdown from 'showdown';
+const markdownConverter = new showdown.Converter();
 
 import * as errors from '../graphql/errors';
 /**
@@ -92,7 +94,13 @@ export default function(Sequelize, DataTypes) {
     },
 
     title: DataTypes.STRING, 
-    html: DataTypes.STRING,
+    markdown: DataTypes.STRING,
+    html: {
+      type: DataTypes.STRING,
+      get() {
+        return this.getDataValue('html') || markdownConverter.makeHtml(this.getDataValue('markdown'));        
+      }
+    },
 
     image: DataTypes.STRING,
 
@@ -197,7 +205,7 @@ export default function(Sequelize, DataTypes) {
         throw new errors.ValidationFailed({ message: "Cannot link this update to a Tier that doesn't belong to this collective" });
       }
     }
-    const editableAttributes = ['TierId', 'FromCollectiveId', 'title', 'html', 'image', 'tags'];
+    const editableAttributes = ['TierId', 'FromCollectiveId', 'title', 'html', 'markdown', 'image', 'tags'];
     return await this.update({
       ...pick(newUpdateData, editableAttributes),
       LastEditedByUserId: remoteUser.id
