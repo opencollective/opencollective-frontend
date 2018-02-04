@@ -19,7 +19,6 @@ class SmallButton extends React.Component {
             background: white;
             padding: 0 2rem;
           }
-
           .SmallButton.primary button {
             background: #297acc;
             border-color: #18191a;
@@ -35,11 +34,10 @@ class SmallButton extends React.Component {
             background: ${colors.darkgray};
           }
           .SmallButton:hover button {
-            font-weight: bold;
+            border-color: ${colors.darkgray};
           }
           .SmallButton.approve button, .SmallButton.publish button {
             background: #3399ff;
-            border-color: #18191a;
             color: white;
           }
           .SmallButton.reject button {

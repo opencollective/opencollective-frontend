@@ -44,11 +44,6 @@ class UpdatesPage extends React.Component {
 
     return (
       <div className="UpdatesPage">
-        <style jsx global>{`
-          .UpdatesPage .Updates .update {
-            border-top: 1px solid #CACBCC;
-          }
-        `}</style>
         <Header
           title={collective.name}
           description={collective.description}

@@ -24,7 +24,7 @@ class UpdateWithData extends React.Component {
     if (data.loading) return (<div />);
     const update = data.Update;
     if (!update) return (<NotFound />);
-    console.log(">>> rendering update", update);
+
     return (
       <div className={`UpdateWithData`}>
         <Update
@@ -41,7 +41,7 @@ class UpdateWithData extends React.Component {
 }
 
 const getUpdateQuery = gql`
-  query Update($collectiveSlug: String!, $updateSlug: String!) {
+  query Update($collectiveSlug: String, $updateSlug: String) {
     Update(collectiveSlug: $collectiveSlug, updateSlug: $updateSlug) {
       id
       title
@@ -50,6 +50,12 @@ const getUpdateQuery = gql`
       collective {
         id
         slug
+        stats {
+          id
+          backers {
+            all
+          }
+        }
       }
       fromCollective {
         id

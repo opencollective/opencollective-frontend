@@ -38,7 +38,7 @@ class UpdateText extends React.Component {
 }
 
 const getUpdateQuery = gql`
-  query Update($id: Int!) {
+  query Update($id: Int) {
     Update(id: $id) {
       id
       html

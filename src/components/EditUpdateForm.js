@@ -7,6 +7,7 @@ import { graphql } from 'react-apollo'
 import gql from 'graphql-tag'
 import InputField from './InputField';
 import HTMLEditor from './HTMLEditor';
+import MarkdownEditor from './MarkdownEditor';
 import Button from './Button';
 import { pick, get } from 'lodash';
 import storage from '../lib/storage';
@@ -14,6 +15,7 @@ import storage from '../lib/storage';
 class EditUpdateForm extends React.Component {
 
   static propTypes = {
+    collective: PropTypes.object,
     update: PropTypes.object,
     LoggedInUser: PropTypes.object,
     onSubmit: PropTypes.func
@@ -75,9 +77,10 @@ class EditUpdateForm extends React.Component {
   }
 
   render() {
-    const { LoggedInUser, intl } = this.props;
+    const { LoggedInUser, intl, collective } = this.props;
     const { update } = this.state;
     if (!this._isMounted) return (<div />);
+    const editor = get(collective, 'settings.editor') === 'markdown' ? 'markdown' : 'html';
 
     return (
         <div className={`EditUpdateForm ${this.props.mode}`}>
@@ -143,10 +146,18 @@ class EditUpdateForm extends React.Component {
           </div>
           <div className="row">
             <div className="col large">
-              <HTMLEditor
-                onChange={(html) => this.handleChange('html', html)}
-                defaultValue={update.html}
-                />
+              { editor === 'markdown' &&
+                <MarkdownEditor
+                  onChange={(markdown) => this.handleChange('markdown', markdown)}
+                  defaultValue={update.markdown}
+                  />
+              }
+              { editor === 'html' &&
+                <HTMLEditor
+                  onChange={(html) => this.handleChange('html', html)}
+                  defaultValue={update.html}
+                  />
+              }
             </div>
           </div>
 

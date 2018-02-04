@@ -12,7 +12,7 @@ import Markdown from 'react-markdown';
 import { Link } from '../server/pages';
 import SmallButton from './SmallButton';
 import EditUpdateForm from './EditUpdateForm';
-import PublishUpdateBtn from './PublishUpdateBtn';
+import PublishUpdateBtnWithData from './PublishUpdateBtnWithData';
 import { get } from 'lodash';
 
 class Update extends React.Component {
@@ -199,19 +199,23 @@ class Update extends React.Component {
             <Role role='ADMIN' />
           </div>
 
-          <div className="title">
-            {capitalize(update.title)}
-          </div>
-
           { this.state.mode === "summary" &&
-            <div className="summary">
-              {update.summary}
-              { this.renderViewMoreLink() }
+            <div>
+              <div className="title">
+                <Link route={`/${collective.slug}/updates/${update.slug}`}><a>{capitalize(update.title)}</a></Link>
+              </div>
+              <div className="summary">
+                {update.summary}
+                { this.renderViewMoreLink() }
+              </div>
             </div>
           }
 
           { this.state.mode === "details" && 
             <div>
+              <div className="title">
+                {capitalize(update.title)}
+              </div>
               { this.props.compact && this.renderViewMoreLink() }
               { !this.props.compact &&
                 <div>
@@ -241,8 +245,8 @@ class Update extends React.Component {
             </div>
           }
 
-          { canPublishUpdate &&
-            <PublishUpdateBtn id={update.id} />
+          { this.state.mode === "details" && canPublishUpdate &&
+            <PublishUpdateBtnWithData id={update.id} />
           }
         </div>
       </div>

@@ -5,7 +5,7 @@ import withIntl from '../lib/withIntl';
 import Updates from '../components/Updates';
 import Currency from '../components/Currency';
 import EditUpdateForm from '../components/EditUpdateForm';
-import { graphql, compose } from 'react-apollo'
+import { graphql } from 'react-apollo'
 import gql from 'graphql-tag'
 import { FormattedMessage } from 'react-intl'
 import { pick, get } from 'lodash';
@@ -25,8 +25,7 @@ class UpdatesWithData extends React.Component {
 
   constructor(props) {
     super(props);
-    this.createUpdate = this.createUpdate.bind(this);
-    this.handleChange = this.handleChange.bind(this);
+    this.renderAdminActions = this.renderAdminActions.bind(this);
     this.state = {
       showNewUpdateForm: props.defaultAction === 'new' ? true : false
     }
@@ -36,28 +35,40 @@ class UpdatesWithData extends React.Component {
     const { data, collective } = this.props;
     const { LoggedInUser } = newProps;
     if (LoggedInUser && LoggedInUser.canEditCollective(collective)) {
-      // We refetch the data to get the updates thare not published yet
+      // We refetch the data to get the updates that are not published yet
       data.refetch({ options: { fetchPolicy: 'network-only' }});
     }
   }
 
-  handleChange(attr, value) {
-    const update = this.state.update;
-    update[attr] = value;
-    this.setState({ update, isModified: true });
-  }
-
-  async createUpdate(update) {
-    const { LoggedInUser, collective } = this.props;
-    try {
-      update.collective = { id: collective.id };
-      console.log(">>> createUpdate", update);
-      const res = await this.props.createUpdate(update);
-      console.log(">>> createUpdate res", res);
-      this.setState({ showNewUpdateForm: false, updateCreated: res.data.createUpdate, isModified: false })
-    } catch (e) {
-      console.error(e);
-    }
+  renderAdminActions(compact) {
+    const { collective } = this.props;
+    const className = compact ? "compact" : "";
+    return (
+      <div className={`adminActions ${className}`}>
+        <style jsx>{`
+          .adminActions ul {
+            overflow: hidden;
+            margin: 0 auto;
+            padding: 0;
+            flex-direction: row;
+            list-style: none;
+          }
+          .adminActions ul li {
+            text-align: center;
+          }
+          .adminActions .compact ul li {
+            text-align: center;
+          }
+        `}</style>
+        <ul>
+          <li>
+            <Link route={`/${collective.slug}/updates/new`}><a className="btn btn-default">
+              <FormattedMessage id="update.new.button" defaultMessage="Submit a new update" />
+            </a></Link>
+          </li>
+        </ul>
+      </div>
+    )
   }
 
   render() {
@@ -110,58 +121,22 @@ class UpdatesWithData extends React.Component {
             letter-spacing: 0.05rem;
             margin-bottom: 3rem;
           }
-          .adminActions ul {
-            overflow: hidden;
-            margin: 0 auto;
-            padding: 0;
-            flex-direction: row;
-            list-style: none;
-          }
-          .adminActions ul li {
-          }
-          .adminActions .compact ul li {
-            text-align: center;
-          }
         `}</style>
 
         { !compact &&
           <div className="FullPage">
             <div className="title">
               <h1>
-                <FormattedMessage id="collective.latestUpdates.title" defaultMessage="{n, plural, one {Latest Update} other {Latest Updates}}" values={{n: 2}} />
+                <FormattedMessage id="collective.latestUpdates.title" defaultMessage="Latest Updates" />
               </h1>
               <div className="subtitle">
                 <FormattedMessage id="collective.latestUpdates.subtitle" defaultMessage="Find out how everyone's contributions take us closer to our goals." />
               </div>
             </div>
-            <div className="adminActions">
-              <ul>
-              { showAdminActions && !this.state.showNewUpdateForm &&
-                <li><a className="submitNewUpdate" onClick={() => this.setState({ showNewUpdateForm: true })}>
-                  <FormattedMessage id="update.new.button" defaultMessage="Submit a new update" />
-                </a></li>
-              }
-              </ul>
-            </div>
-          </div>
-        }
-        { compact &&
-          <div className="adminActions compact">
-            <ul>
-            { showAdminActions && !this.state.showNewUpdateForm &&
-              <li>
-                <Link route={`/${collective.slug}/updates/new`}><a className="btn btn-default">
-                  <FormattedMessage id="update.new.button" defaultMessage="Submit a new update" />
-                </a></Link>
-              </li>
-            }
-            </ul>
           </div>
         }
 
-        { !includeHostedCollectives && this.state.showNewUpdateForm &&
-          <EditUpdateForm collective={collective} onSubmit={this.createUpdate} />
-        }
+        { showAdminActions && this.renderAdminActions(compact) }
 
         <Updates
           collective={collective}
@@ -244,57 +219,4 @@ export const addUpdatesData = graphql(getUpdatesQuery, {
   })  
 });
 
-const createUpdateQuery = gql`
-mutation createUpdate($update: UpdateInputType!) {
-  createUpdate(update: $update) {
-    id
-    slug
-    title
-    summary
-    html
-    createdAt
-    publishedAt
-    updatedAt
-    tags
-    image
-    collective {
-      id
-      slug
-    }
-    fromCollective {
-      id
-      type
-      name
-      slug
-      image
-    }
-  }
-}
-`;
-
-const addMutation = graphql(createUpdateQuery, {
-  props: ( { ownProps, mutate }) => ({
-    createUpdate: async (update) => {
-      return await mutate({
-        variables: { update },
-        update: (proxy, { data: { createUpdate} }) => {
-          const data = proxy.readQuery({
-            query: getUpdatesQuery,
-            variables: getUpdatesVariables(ownProps)
-          });
-          createUpdate.isNew = true;
-          data.allUpdates.unshift(createUpdate);
-          proxy.writeQuery({
-            query: getUpdatesQuery,
-            variables: getUpdatesVariables(ownProps),
-            data
-          });
-        },
-      })
-    }
-  })
-});
-
-const addData = compose(addUpdatesData, addMutation);
-
-export default addData(withIntl(UpdatesWithData));
+export default addUpdatesData(withIntl(UpdatesWithData));
