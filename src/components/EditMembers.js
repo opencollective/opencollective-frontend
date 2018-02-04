@@ -40,7 +40,7 @@ class EditMembers extends React.Component {
     });
 
     const getOptions = (arr) => {
-      return arr.map(key => { 
+      return arr.map(key => {
         const obj = {};
         obj[key] = intl.formatMessage(this.messages[key]);
         return obj;

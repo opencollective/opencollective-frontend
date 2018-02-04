@@ -38,7 +38,7 @@ class ExpenseDetails extends React.Component {
   }
 
   getOptions(arr, intlVars) {
-    return arr.map(key => { 
+    return arr.map(key => {
       const obj = {};
       obj[key] = this.props.intl.formatMessage(this.messages[key], intlVars);
       return obj;
