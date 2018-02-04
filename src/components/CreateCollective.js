@@ -37,6 +37,10 @@ class CreateCollective extends React.Component {
 
   async createCollective(CollectiveInputType) {
     const { host, LoggedInUser } = this.props;
+    if (!CollectiveInputType.tos || (get(host, 'settings.tos') && !CollectiveInputType.hostTos)) {
+      this.setState( { result: { error: "Please accept the terms of service" }})
+      return;
+    }
     this.setState( { status: 'loading' });
     CollectiveInputType.type = 'COLLECTIVE';
     CollectiveInputType.HostCollectiveId = host.id;
@@ -45,17 +49,19 @@ class CreateCollective extends React.Component {
       CollectiveInputType.tags.push(CollectiveInputType.category);
     }
     delete CollectiveInputType.category;
+    delete CollectiveInputType.tos;
+    delete CollectiveInputType.hostTos;
 
     try {
       const res = await this.props.createCollective(CollectiveInputType);
       const collective = res.data.createCollective;
       const collectiveUrl = `${window.location.protocol}//${window.location.host}/${collective.slug}?status=collectiveCreated&CollectiveId=${collective.id}`;
-      this.setState({ status: 'idle', result: { success: `Collective created successfully: ${collectiveUrl}` }});
+      this.setState({ status: 'idle', result: { success: `Collective created successfully` }});
       window.location.replace(collectiveUrl);
     } catch (err) {
       console.error(">>> createCollective error: ", JSON.stringify(err));
       const errorMsg = (err.graphQLErrors && err.graphQLErrors[0]) ? err.graphQLErrors[0].message : err.message;
-      this.setState( { result: { error: errorMsg }})
+      this.setState( { status: 'idle', result: { error: errorMsg }})
       throw new Error(errorMsg);
     }
   }
