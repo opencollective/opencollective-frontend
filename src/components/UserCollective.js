@@ -271,12 +271,12 @@ class UserCollective extends React.Component {
                 </div>
               </div>
 
-              { get(this.collective, 'stats.collectives.host') > 0 &&
+              { get(this.collective, 'stats.collectives.hosted') > 0 &&
                 <section id="hosting">
                   <h1>
                     <FormattedMessage
                       id="organization.collective.memberOf.collective.host.title"
-                      values={{ n: this.collective.stats.collectives.host }}
+                      values={{ n: this.collective.stats.collectives.hosted }}
                       defaultMessage={`We are hosting {n, plural, one {this collective} other {{n} collectives}}`}
                       />
                   </h1>

@@ -77,11 +77,17 @@ class MenuBar extends React.Component {
       <div className="buttons">
         <style jsx>{`
         .buttons {
+          height: 88px;
           display: flex;
           padding: 5px;
           text-align: center;
           align-items: center;
         }
+
+        :global(.mobileOnly) .buttons {
+          height: 64px;
+        }
+
         `}</style>
         { this.state.sticky &&
           <HashLink to="contribute" animate={{offset}}>
@@ -104,7 +110,6 @@ class MenuBar extends React.Component {
         .menu {
           display: flex;
           flex-direction: row;
-          width: 100%;
           justify-content: space-evenly;
         }
         .item {
@@ -117,8 +122,11 @@ class MenuBar extends React.Component {
         :global(.mediumScreenOnly) .item {
           margin: 24px 12px;
         }
+        :global(.mobileOnly) .menu {
+          margin-bottom: 8px;
+        }
         :global(.mobileOnly) .item {
-          margin: 24px 5px;
+          margin: 0px 5px;
         }
         .admin {
           display: flex;
@@ -183,6 +191,7 @@ class MenuBar extends React.Component {
         <style jsx>{`
         .MenuBar {
           background-color: #17181A;
+          overflow: hidden;
         }
 
         .stickyBar {
@@ -190,15 +199,17 @@ class MenuBar extends React.Component {
         }
 
         .content {
-          display: flex;
-          flex-direction: row;
+          display: block;
           padding: 0;
-          justify-content: space-between;
         }
 
         .pullLeft {
-          display: flex;
+          float: left;
           padding: 0;
+        }
+        
+        .flexColumns {
+          display: flex;
           flex-direction: row;
         }
 
@@ -221,8 +232,10 @@ class MenuBar extends React.Component {
 
         .pullRight {
           float: right;
-          display: flex;
-          min-height: 88px;
+        }
+
+        .actionBar {
+          overflow: hidden;
         }
         `}
         </style>
@@ -232,6 +245,8 @@ class MenuBar extends React.Component {
         }
         .sticky-inner-wrapper {
           z-index: 10;
+          overflow: hidden;
+          background-color: #17181A;
         }
         .MenuBar .item a {
           color: #AAAEB3;
@@ -258,10 +273,14 @@ class MenuBar extends React.Component {
         `}</style>
         <div className="mobileOnly">
           <div className="actionBar">
-            <div className="logo">
-              <Logo src={collective.image} type='COLLECTIVE' />
+            <div className="row1">
+              <div className="pullRight">
+                { this.renderButtons() }
+              </div>
+              <div className="logo">
+                <Logo src={collective.image} type='COLLECTIVE' />
+              </div>
             </div>
-            { this.renderButtons() }
           </div>
           <div className="menu">
             { this.renderMenu() }
@@ -271,14 +290,14 @@ class MenuBar extends React.Component {
           <Sticky enabled={true} top={0} onStateChange={this.handleChange}>
             <div className="stickyBar">
               <div className="content">
-                <div className="pullLeft">
-                  <div className="logo">
-                    <Logo src={collective.image} type='COLLECTIVE' />
-                  </div>
-                  { this.renderMenu() }
-                </div>
                 <div className="pullRight">
                   { this.renderButtons() }
+                </div>
+                <div className="logo">
+                  <Logo src={collective.image} type='COLLECTIVE' />
+                </div>
+                <div className="pullLeft">
+                  { this.renderMenu() }
                 </div>
               </div>
             </div>

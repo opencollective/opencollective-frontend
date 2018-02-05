@@ -264,12 +264,12 @@ class Collective extends React.Component {
                 </div>
               </section>
 
-              { get(this.collective, 'stats.collectives.parent') > 0 &&
+              { get(this.collective, 'stats.collectives.memberOf') > 0 &&
                 <section id="parenting">
                   <h1>
                     <FormattedMessage
                       id="collective.collective.memberOf.collective.parent.title"
-                      values={{ n: this.collective.stats.collectives.parent }}
+                      values={{ n: this.collective.stats.collectives.memberOf }}
                       defaultMessage={`{n, plural, one {this collective is} other {{n} collectives are}} part of our collective`}
                       />
                   </h1>
@@ -277,6 +277,7 @@ class Collective extends React.Component {
                     <CollectivesWithData
                       ParentCollectiveId={this.collective.id}
                       orderBy="balance"
+                      type="COLLECTIVE"
                       orderDirection="DESC"
                       limit={20}
                       />
