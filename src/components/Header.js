@@ -55,7 +55,7 @@ class Header extends React.Component {
         <meta property="og:logo" content="/static/images/opencollectivelogo480x80@2x" size="960x160" />
 
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css" />
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/latest/css/bootstrap.min.css" />
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
         <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,900|Rubik" />
         { css && <link rel="stylesheet" href={css} /> }
         <title>{title}</title>
