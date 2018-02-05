@@ -3,7 +3,7 @@ import { imagePreview, getDomain } from '../lib/utils';
 
 export default ({ src, style = {}, height, type = 'ORGANIZATION', website }) => {
   style.height = style.height || height;
-  if (!src && website) {
+  if (!src && website && type==='ORGANIZATION') {
     src = `https://logo.clearbit.com/${getDomain(website)}`;
   }
   const backgroundStyle = { height, minWidth: height };
