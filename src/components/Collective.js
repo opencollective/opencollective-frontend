@@ -176,6 +176,9 @@ class Collective extends React.Component {
           .actions :global(button.btn) {
             margin-right: 5px;
           }
+          #budget .columns {
+            margin-top: 2rem;
+          }
           @media(min-width: 600px) {
             .sidebar {
               float: right;

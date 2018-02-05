@@ -53,13 +53,10 @@ class MenuBar extends React.Component {
 
   componentDidMount() {
     window.onscroll = throttle(this.onscroll, 300);
-    const menuItems = [
-      { anchor: 'about', position: 0 },
-      { anchor: 'events', position: 0 },
-      { anchor: 'updates', position: 0 },
-      { anchor: 'budget', position: 0 },
-      { anchor: 'contributors', position: 0 }
-    ];
+    const menuItems = [];
+    this.menuItems.push({ anchor: 'events', position: 0 });
+    this.menuItems.push({ anchor: 'updates', position: 0 });
+
     this.menuItems.forEach((menuItem, index) => {
       const el = document.querySelector(`#${menuItem.anchor}`);
       if (!el) return;
@@ -69,8 +66,6 @@ class MenuBar extends React.Component {
     this.menuItems = menuItems.sort((a, b) => {
       return a.position > b.position;
     })
-
-    console.log(">>> this.menuItems", this.menuItems);
   }
 
   // Render Contribute and Submit Expense buttons
