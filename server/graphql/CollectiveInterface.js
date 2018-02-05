@@ -76,7 +76,7 @@ export const BackersStatsType = new GraphQLObjectType({
 
 export const CollectivesStatsType = new GraphQLObjectType({
   name: "CollectivesStatsType",
-  description: "Breakdown of collectives under this collective by role (all/host/member)",
+  description: "Breakdown of collectives under this collective by role (all/hosted/memberOf/events)",
   fields: () => {
     return {
       // We always have to return an id for apollo's caching
@@ -95,13 +95,12 @@ export const CollectivesStatsType = new GraphQLObjectType({
                 ParentCollectiveId: collective.id,
                 HostCollectiveId: collective.id
               },
-              type: types.COLLECTIVE,
               isActive: true
             }
           });
         }
       },
-      host: {
+      hosted: {
         type: GraphQLInt,
         description: "Returns the collectives hosted by this collective",
         async resolve(collective) {
@@ -114,7 +113,7 @@ export const CollectivesStatsType = new GraphQLObjectType({
           });
         }
       },
-      parent: {
+      memberOf: {
         type: GraphQLInt,
         description: "Returns the number of collectives that have this collective has parent",
         async resolve(collective) {
@@ -122,6 +121,19 @@ export const CollectivesStatsType = new GraphQLObjectType({
             where: {
               ParentCollectiveId: collective.id,
               type: types.COLLECTIVE,
+              isActive: true
+            }
+          });
+        }
+      },
+      events: {
+        type: GraphQLInt,
+        description: "Returns the number of events that have this collective has parent",
+        async resolve(collective) {
+          return models.Collective.count({
+            where: {
+              ParentCollectiveId: collective.id,
+              type: types.EVENT,
               isActive: true
             }
           });

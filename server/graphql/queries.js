@@ -245,7 +245,7 @@ const queries = {
       tags: { type: new GraphQLList(GraphQLString) },
       type: {
         type: GraphQLString,
-        description: "COLLECTIVE (default), USER, ORGANIZATION, EVENT"
+        description: "COLLECTIVE, USER, ORGANIZATION, EVENT"
       },
       HostCollectiveId: { type: GraphQLInt },
       hostCollectiveSlug: {
@@ -298,6 +298,7 @@ const queries = {
 
       if (args.HostCollectiveId) query.where.HostCollectiveId = args.HostCollectiveId;
       if (args.ParentCollectiveId) query.where.ParentCollectiveId = args.ParentCollectiveId;
+      if (args.type) query.where.type = args.type;
 
       if (args.orderBy === 'balance' && (args.ParentCollectiveId || args.HostCollectiveId)) {
         return rawQueries.getCollectivesWithBalance(query.where, args);
@@ -306,8 +307,8 @@ const queries = {
       }
 
       if (args.tags) query.where.tags = { $overlap: args.tags };
-      if (args.type) query.where.type = args.type;
       if (args.offset) query.offset = args.offset;
+      console.log(">>>> query", query);
       return models.Collective.findAll(query);
     }
   },

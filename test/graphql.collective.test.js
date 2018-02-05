@@ -152,8 +152,8 @@ describe('graphql.collective.test.js', () => {
         stats {
           collectives {
             all
-            host
-            parent
+            hosted
+            memberOf
           }
           expenses {
             pending
@@ -182,8 +182,8 @@ describe('graphql.collective.test.js', () => {
     expect(result.errors).to.not.exist;
     const collectives = result.data.Collective.collectives;
     expect(result.data.Collective.stats.collectives.all).to.equal(2);
-    expect(result.data.Collective.stats.collectives.host).to.equal(2);
-    expect(result.data.Collective.stats.collectives.parent).to.equal(0);
+    expect(result.data.Collective.stats.collectives.hosted).to.equal(2);
+    expect(result.data.Collective.stats.collectives.memberOf).to.equal(0);
     expect(collectives.sort((a, b) => a.id - b.id)).to.deep.equal([
       {
         "id": 207,
