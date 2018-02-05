@@ -23,8 +23,6 @@ class MenuBar extends React.Component {
     this.height = 100;
     this.menuItems = [
       { anchor: 'about', position: 0 },
-      { anchor: 'events', position: 0 },
-      { anchor: 'updates', position: 0 },
       { anchor: 'budget', position: 0 },
       { anchor: 'contributors', position: 0 }
     ];
@@ -55,7 +53,13 @@ class MenuBar extends React.Component {
 
   componentDidMount() {
     window.onscroll = throttle(this.onscroll, 300);
-    const menuItems = [];
+    const menuItems = [
+      { anchor: 'about', position: 0 },
+      { anchor: 'events', position: 0 },
+      { anchor: 'updates', position: 0 },
+      { anchor: 'budget', position: 0 },
+      { anchor: 'contributors', position: 0 }
+    ];
     this.menuItems.forEach((menuItem, index) => {
       const el = document.querySelector(`#${menuItem.anchor}`);
       if (!el) return;
