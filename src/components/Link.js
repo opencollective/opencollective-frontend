@@ -23,7 +23,12 @@ class Link extends React.Component {
   render() {
     const { route, params, children, ...otherProps } = this.props;
     if (this.isIframe) {
-      const path = router.findByName(route).getAs(params);
+      const routeFromRouter = router.findByName(route);
+      if (!routeFromRouter) {
+        console.error(">>> cannot find route ", route);
+        return (<div>ERROR (see console)</div>);
+      }
+      const path = routeFromRouter.getAs(params);
       return (<a href={path} {...otherProps}>{children}</a>);
     } else {
       return (<router.Link {...pick(this.props, ['route', 'params', 'href'])}>{children}</router.Link>);
