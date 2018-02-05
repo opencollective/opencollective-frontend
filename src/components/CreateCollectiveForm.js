@@ -47,6 +47,7 @@ class CreateCollectiveForm extends React.Component {
       'website.label': { id: 'collective.website.label', defaultMessage: 'Website' },
       'location.label': { id: 'collective.location.label', defaultMessage: 'City' },
       'category.label': { id: 'collective.category.label', defaultMessage: 'Category' },
+      'tos.label': { id: 'collective.tos.label', defaultMessage: 'Terms of Service' },
       'association': { id: 'collective.category.association', defaultMessage: 'Association' },
       'pta': { id: 'collective.category.pta', defaultMessage: 'Parent Teacher Association' },
       'other': { id: 'collective.category.other', defaultMessage: 'Other' },
@@ -180,7 +181,7 @@ class CreateCollectiveForm extends React.Component {
 
   render() {
 
-    const { collective, loading, intl } = this.props;
+    const { host, collective, loading, intl } = this.props;
 
     const isNew = !(collective && collective.id);
     const defaultStartsAt = new Date;
@@ -221,6 +222,9 @@ class CreateCollectiveForm extends React.Component {
         .backToProfile {
           font-size: 1.3rem;
           margin: 1rem;
+        }
+        input[type="checkbox"] {
+          width: 25px;
         }
         `}</style>
         <style global jsx>{`
@@ -273,6 +277,19 @@ class CreateCollectiveForm extends React.Component {
                 />)}
             </div>
           )}
+          <div className="tos">
+            <label>{intl.formatMessage(this.messages['tos.label'])}</label>
+            <div>
+              <input type="checkbox" name="tos" onChange={(value) => this.handleChange("tos", value)} />
+              <span>I agree with the <a href="/tos" target="_blank">terms of service of Open Collective</a></span>
+            </div>
+            { (get(host, 'settings.tos')) &&
+              <div>
+                <input type="checkbox" name="hostTos" onChange={(value) => this.handleChange("hostTos", value)} />
+                <span>I agree with the <a href={get(host, 'settings.tos')} target="_blank">terms of service of the host</a> (<a href={`/${host.slug}`} target="_blank">{host.name}</a>) that will collect money on behalf of our collective</span>
+              </div>
+            }
+          </div>
         </div>
         <div className="actions">
           <Button bsStyle="primary" type="submit" ref="submit" onClick={this.handleSubmit} disabled={loading || !this.state.modified} >
