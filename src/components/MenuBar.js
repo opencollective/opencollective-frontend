@@ -19,6 +19,7 @@ class MenuBar extends React.Component {
   constructor(props) {
     super(props);
     this.onscroll = this.onscroll.bind(this);
+    this.handleChange = this.handleChange.bind(this);
     this.height = 100;
     this.menuItems = [
       { anchor: 'about', position: 0 },
@@ -27,7 +28,7 @@ class MenuBar extends React.Component {
       { anchor: 'budget', position: 0 },
       { anchor: 'contributors', position: 0 }
     ];
-    this.state = { selectedAnchor: null };
+    this.state = { selectedAnchor: null, sticky: false };
     this.messages = defineMessages({
       'about': { id: 'collective.menu.about', defaultMessage: "about" },
       'events': { id: 'collective.menu.events', defaultMessage: "events" },
@@ -48,15 +49,24 @@ class MenuBar extends React.Component {
     }
   }
 
+  handleChange(status) {
+    this.setState({ sticky: status.status === Sticky.STATUS_FIXED });
+  }
+
   componentDidMount() {
     window.onscroll = throttle(this.onscroll, 300);
+    const menuItems = [];
     this.menuItems.forEach((menuItem, index) => {
       const el = document.querySelector(`#${menuItem.anchor}`);
-      this.menuItems[index].position = el && el.offsetTop;
+      if (!el) return;
+      this.menuItems[index].position = el.offsetTop;
+      menuItems.push(this.menuItems[index]);
     })
-    this.menuItems.sort((a, b) => {
+    this.menuItems = menuItems.sort((a, b) => {
       return a.position > b.position;
     })
+
+    console.log(">>> this.menuItems", this.menuItems);
   }
 
   // Render Contribute and Submit Expense buttons
@@ -67,15 +77,19 @@ class MenuBar extends React.Component {
       <div className="buttons">
         <style jsx>{`
         .buttons {
+          display: flex;
+          padding: 5px;
           text-align: center;
-          padding: 16px 5px;
+          align-items: center;
         }
         `}</style>
-        <HashLink to="contribute" animate={{offset}}>
-          <Button className="blue">
-            <FormattedMessage id="collective.menu.contribute" defaultMessage="Contribute" />
-          </Button>
-        </HashLink>
+        { this.state.sticky &&
+          <HashLink to="contribute" animate={{offset}}>
+            <Button className="blue">
+              <FormattedMessage id="collective.menu.contribute" defaultMessage="Contribute" />
+            </Button>
+          </HashLink>
+        }
         <Button href={`/${collective.slug}/expenses/new`}><FormattedMessage id="collective.menu.submitExpense" defaultMessage="Submit Expense" /></Button>
       </div>
     )
@@ -89,17 +103,22 @@ class MenuBar extends React.Component {
         <style jsx>{`
         .menu {
           display: flex;
-          flex-direction: row;          
+          flex-direction: row;
+          width: 100%;
+          justify-content: space-evenly;
         }
         .item {
           color: #FAFAFA;
           font-family: Rubik;
           font-size: 14px;
-          line-height: 24px;
+          line-height: 40px;
           margin: 32px;
         }
         :global(.mediumScreenOnly) .item {
-          margin: 24px;
+          margin: 24px 12px;
+        }
+        :global(.mobileOnly) .item {
+          margin: 24px 5px;
         }
         .admin {
           display: flex;
@@ -203,12 +222,14 @@ class MenuBar extends React.Component {
         .pullRight {
           float: right;
           display: flex;
-          align-items: center;
           min-height: 88px;
         }
         `}
         </style>
         <style jsx global>{`
+        .sticky-outer-wrapper {
+          width: 100%;
+        }
         .sticky-inner-wrapper {
           z-index: 10;
         }
@@ -235,19 +256,19 @@ class MenuBar extends React.Component {
           height: 48px;
         }
         `}</style>
-        <div className="mobileOnly mediumScreenOnly">
+        <div className="mobileOnly">
           <div className="actionBar">
             <div className="logo">
               <Logo src={collective.image} type='COLLECTIVE' />
             </div>
             { this.renderButtons() }
           </div>
-          <div className="menu mediumScreenOnly">
+          <div className="menu">
             { this.renderMenu() }
           </div>
         </div>
-        <div className="desktopOnly">
-          <Sticky enabled={true} top={0} bottomBoundary={1200}>
+        <div className="desktopOnly mediumScreenOnly">
+          <Sticky enabled={true} top={0} onStateChange={this.handleChange}>
             <div className="stickyBar">
               <div className="content">
                 <div className="pullLeft">

@@ -78,7 +78,7 @@
     "react-gmaps": "1.7.0",
     "react-intl": "2.4.0",
     "react-markdown": "3.1.1",
-    "react-mde": "^2.3.2",
+    "react-mde": "git://github.com/xdamman/react-mde.git#npm",
     "react-quill": "^1.2.3",
     "react-router": "4.2.0",
     "react-script-loader": "0.0.1",

@@ -1,6 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import router from '../server/pages';
+import { pick } from 'lodash';
 
 class Link extends React.Component {
 
@@ -25,7 +26,7 @@ class Link extends React.Component {
       const path = router.findByName(route).getAs(params);
       return (<a href={path} {...otherProps}>{children}</a>);
     } else {
-      return (<router.Link {...this.props}>{children}</router.Link>);
+      return (<router.Link {...pick(this.props, ['route', 'params', 'href'])}>{children}</router.Link>);
     }
   }
 }

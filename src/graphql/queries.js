@@ -463,7 +463,6 @@ export const addGetLoggedInUserFunction = (component) => {
             let res;
             if (data.LoggedInUser) {
               const user = new LoggedInUser(data.LoggedInUser);
-              console.log(">>> data", data.LoggedInUser, "class: ", user);
               return resolve(user);
             }
             try {

@@ -127,6 +127,10 @@ class EditUpdateForm extends React.Component {
             margin: 0;
           }
 
+          .EditUpdateForm .inputField.title {
+            width: 50%;
+          }
+
           .EditUpdateForm .help-block {
             font-size: 1.2rem;
           }

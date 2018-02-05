@@ -46,7 +46,8 @@ class Collective extends React.Component {
       api: { status: 'idle' },
     };
 
-    this.messages = defineMessages({      
+    this.messages = defineMessages({
+      'collective.contribute': { id: 'collective.contribute', defaultMessage: 'contribute' },
       'collective.created': { id: 'collective.created', defaultMessage: `Your collective has been created with success.`},
       'collective.created.description': { id: 'collective.created.description', defaultMessage: `While you are waiting for approval from your host ({host}), you can already customize your collective, file expenses and even create events.`},
       'collective.donate': { id: 'collective.donate', defaultMessage: `donate`},
@@ -119,7 +120,7 @@ class Collective extends React.Component {
     }
     const backersHash = this.collective.stats.backers.organizations > 0 ? '#organizations' : '#backers';
     const backgroundImage = this.collective.backgroundImage || get(this.collective,'parentCollective.backgroundImage') || defaultBackgroundImage;
-
+    const canEditCollective = LoggedInUser && LoggedInUser.canEditCollective(this.collective);
     const notification = {};
     if (get(query, 'status') === 'collectiveCreated') {
       notification.title = intl.formatMessage(this.messages['collective.created']);
@@ -207,7 +208,7 @@ class Collective extends React.Component {
             <CollectiveCover
               collective={this.collective}
               style={get(this.collective, 'settings.style.hero.cover') || get(this.collective.parentCollective, 'settings.style.hero.cover')}
-              cta={<HashLink to={`#contribute`}><FormattedMessage id="collective.contribute" defaultMessage="contribute" /></HashLink>}
+              cta={{ href: `#contribute`, label: intl.formatMessage(this.messages['collective.contribute']) }}
               />
 
             <MenuBar
@@ -215,9 +216,9 @@ class Collective extends React.Component {
               LoggedInUser={LoggedInUser}
               />
 
-            <StatsBar
+            {/* <StatsBar
               collective={this.collective}
-              />
+              /> */}
 
             <div>
 
@@ -239,19 +240,23 @@ class Collective extends React.Component {
                 </div>
 
                 <div className="content" >
-                  <div id="updates">
-                    <h1><FormattedMessage id="collective.updates.title" defaultMessage="Latest update" /></h1>
-                    <UpdatesWithData
-                      collective={this.collective}
-                      compact={true}
-                      limit={1}
-                      LoggedInUser={LoggedInUser}
-                      />
-                  </div>
-                  <div id="events">
-                    <h1><FormattedMessage id="collective.events.title" defaultMessage="Events" /></h1>
-                    <EventsWithData collectiveSlug={this.collective.slug} />
-                  </div>
+                  { get(this.collective, 'stats.updates') > 0 || canEditCollective &&
+                    <div id="updates">
+                      <h1><FormattedMessage id="collective.updates.title" defaultMessage="Latest update" /></h1>
+                      <UpdatesWithData
+                        collective={this.collective}
+                        compact={true}
+                        limit={1}
+                        LoggedInUser={LoggedInUser}
+                        />
+                    </div>
+                  }
+                  { get(this.collective, 'stats.events') > 0 || canEditCollective &&
+                    <div id="events">
+                      <h1><FormattedMessage id="collective.events.title" defaultMessage="Events" /></h1>
+                      <EventsWithData collectiveSlug={this.collective.slug} />
+                    </div>
+                  }
                   <div id="about" className="longDescription" >
                     <h1><FormattedMessage id="collective.about.title" defaultMessage="About" /></h1>
                     <Markdown source={this.collective.longDescription || this.collective.description || ''} />
@@ -276,45 +281,6 @@ class Collective extends React.Component {
                       limit={20}
                       />
                   </div>
-                </section>
-              }
-
-              { get(this.collective, 'stats.backers.organizations') > 0 &&
-                <section id="organizations" className="tier">
-                  <h1>
-                    <FormattedMessage
-                      id="collective.section.backers.organizations.title"
-                      values={{ n: this.collective.stats.backers.organizations, collective: this.collective.name }}
-                      defaultMessage={`{n} {n, plural, one {organization is} other {organizations are}} supporting {collective}`}
-                      />
-                  </h1>
-                  <MembersWithData
-                    collective={this.collective}
-                    type="ORGANIZATION"
-                    LoggedInUser={LoggedInUser}
-                    role='BACKER'
-                    limit={100}
-                    />
-                </section>
-              }
-
-              { get(this.collective, 'stats.backers.users') > 0 &&
-                <section id="backers" className="tier">
-                  <h1>
-                    <FormattedMessage
-                      id="collective.section.backers.users.title"
-                      values={{ n: this.collective.stats.backers.users, collective: this.collective.name }}
-                      defaultMessage={`{n} {n, plural, one {person is} other {people are}} supporting {collective}`}
-                      />
-                  </h1>
-                  <MembersWithData
-                    collective={this.collective}
-                    LoggedInUser={LoggedInUser}
-                    type="USER"
-                    role='BACKER'
-                    limit={100}
-                    orderBy="totalDonations"
-                    />
                 </section>
               }
 
@@ -365,6 +331,46 @@ class Collective extends React.Component {
                   </div>
                 </div>
               </section>
+
+              <div id="contributors" />
+              { get(this.collective, 'stats.backers.organizations') > 0 &&
+                <section id="organizations" className="tier">
+                  <h1>
+                    <FormattedMessage
+                      id="collective.section.backers.organizations.title"
+                      values={{ n: this.collective.stats.backers.organizations, collective: this.collective.name }}
+                      defaultMessage={`{n} {n, plural, one {organization is} other {organizations are}} supporting {collective}`}
+                      />
+                  </h1>
+                  <MembersWithData
+                    collective={this.collective}
+                    type="ORGANIZATION"
+                    LoggedInUser={LoggedInUser}
+                    role='BACKER'
+                    limit={100}
+                    />
+                </section>
+              }
+
+              { get(this.collective, 'stats.backers.users') > 0 &&
+                <section id="backers" className="tier">
+                  <h1>
+                    <FormattedMessage
+                      id="collective.section.backers.users.title"
+                      values={{ n: this.collective.stats.backers.users, collective: this.collective.name }}
+                      defaultMessage={`{n} {n, plural, one {person is} other {people are}} supporting {collective}`}
+                      />
+                  </h1>
+                  <MembersWithData
+                    collective={this.collective}
+                    LoggedInUser={LoggedInUser}
+                    type="USER"
+                    role='BACKER'
+                    limit={100}
+                    orderBy="totalDonations"
+                    />
+                </section>
+              }
 
             </div>
           </div>

@@ -31,12 +31,24 @@ class MarkdownEditor extends React.Component {
     return (
       <div className="MarkdownEditor">
         <style dangerouslySetInnerHTML={{ __html: stylesheet }} />
+        <style jsx global>{`
+          .MarkdownEditor .react-mde-editor {
+            width: 50%;
+          }
+          .MarkdownEditor .react-mde-preview {
+            width: 50%;
+          }
+          .MarkdownEditor .column .mde-preview .mde-preview-content {
+            padding-top: 5px;
+          }
+        `}</style>
         <ReactMde
             textAreaProps={{
                 id: 'ta1',
                 name: 'ta1',
             }}
             value={this.state.reactMdeValue}
+            className="column"
             onChange={this.handleChange}
             commands={ReactMdeCommands.getDefaultCommands()}
             />

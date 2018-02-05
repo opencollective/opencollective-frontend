@@ -108,7 +108,7 @@ class Update extends React.Component {
         <style jsx>{`
           .Update {
             margin: 0.5em 0;
-            padding: 0.5em;
+            padding: 0.5em 0;
             transition: max-height 1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             overflow: hidden;
             position: relative;

@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import colors from '../constants/colors';
 import { Router } from '../server/pages';
+import HashLink from 'react-scrollchor';
 
 const star = '/static/images/icons/star.svg';
 
@@ -24,6 +25,7 @@ class Button extends React.Component {
 
   constructor(props) {
     super(props);
+    this.renderButton = this.renderButton.bind(this);
     this.onClick = this.onClick.bind(this);
   }
 
@@ -31,14 +33,14 @@ class Button extends React.Component {
     const { type, href, onClick, disabled } = this.props;
     if (type === "submit") return;
     e.preventDefault();
-    if (href) {
+    if (href && href.substr(0,1) !== '#') {
       return Router.pushRoute(href);
     }
     if (!onClick) return;
     return !disabled && onClick && onClick();
   }
 
-  render() {
+  renderButton() {
     return (
       <button 
         type={this.props.type}
@@ -138,6 +140,9 @@ class Button extends React.Component {
           border-color: ${colors.green};
           background: ${colors.green};
         }
+        .Button :global(span) {
+          white-space: nowrap;
+        }
         `}</style>
         <style jsx global>{`
         .mobileOnly .Button {
@@ -149,6 +154,15 @@ class Button extends React.Component {
         {this.props.children}
       </button>
     );
+  }
+
+  render() {
+    const { href } = this.props;
+    if (href && href.substr(0,1) === '#') {
+      return (<HashLink to={href}>{this.renderButton()}</HashLink>)
+    } else {
+      return this.renderButton();
+    }
   }
 }
 

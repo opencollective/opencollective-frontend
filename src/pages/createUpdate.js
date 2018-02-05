@@ -87,7 +87,7 @@ class CreateUpdatePage extends React.Component {
           <CollectiveCover
             collective={collective}
             href={`/${collective.slug}`}
-            title={<FormattedMessage id="updates.title" defaultMessage="Updates" />}
+            title={<FormattedMessage id="updates.new.title" defaultMessage="New update" />}
             className="small"
             style={get(collective, 'settings.style.hero.cover')}
             />

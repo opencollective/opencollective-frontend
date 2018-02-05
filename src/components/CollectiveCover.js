@@ -10,6 +10,7 @@ import Currency from './Currency';
 import Avatar from './Avatar';
 import Logo from './Logo';
 import { defaultBackgroundImage } from '../constants/collectives';
+import Button from './Button';
 
 class CollectiveCover extends React.Component {
 
@@ -19,6 +20,7 @@ class CollectiveCover extends React.Component {
     title: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
     description: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
     style: PropTypes.object,
+    cta: PropTypes.object // { href, label }
   }
 
   constructor(props) {
@@ -47,8 +49,7 @@ ${description}`
   render() {
     const {
       collective,
-      className,
-      href
+      className
     } = this.props;
 
     const {
@@ -59,6 +60,7 @@ ${description}`
       stats
     } = collective;
 
+    const href = this.props.href || `/${collective.slug}`;
     const title = this.props.title || collective.name;
     const description = this.props.description || collective.description;
     const formattedYearlyIncome = stats && stats.yearlyBudget > 0 && formatCurrency(stats.yearlyBudget, collective.currency, { precision: 0 });
@@ -253,9 +255,9 @@ ${description}`
             { company && company.substr(0,1) !== '@' && <p className="company">{company}</p> }
             { description && <p className="description">{description}</p> }
             <div className="contact">
+              { collective.host && <div className="host"><label><FormattedMessage id="collective.cover.hostedBy" defaultMessage="Hosted by" /></label><Link route={`/${collective.host.slug}`}><a>{collective.host.name} </a></Link></div> }
               { twitterHandle && <div className="twitterHandle"><a href={`https://twitter.com/${twitterHandle}`} target="_blank">@{twitterHandle}</a></div> }
               { website && <div className="website"><a href={website} target="_blank">{prettyUrl(website) }</a></div> }
-              { collective.host && <div className="host"><label><FormattedMessage id="collective.cover.hostedBy" defaultMessage="Hosted by" /></label><Link route={`/${collective.host.slug}`}><a>{collective.host.name} </a></Link></div> }
             </div>
             { membersPreview.length > 0 &&
               <div className="members">
@@ -298,6 +300,9 @@ ${description}`
                   </div>
                 }
               </div>
+            }
+            { this.props.cta &&
+              <Button className="blue" href={this.props.cta.href}>{this.props.cta.label}</Button>
             }
           </div>
         </div>

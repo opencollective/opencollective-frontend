@@ -160,6 +160,9 @@ class Header extends React.Component {
         border-color: ${colors.blue};
       }
 
+      .hidden {
+        display: none;
+      }
       .mobileOnly {
         display: none;
       }
@@ -171,17 +174,17 @@ class Header extends React.Component {
       }
       @media(min-width: 1024px) {
         .desktopOnly {
-          display: block !important;
+          display: inherit !important;
         }
       }
       @media(min-width: 420px) and (max-width: 1024px) {
         .mediumScreenOnly {
-          display: block !important;
+          display: inherit !important;
         }
       }
       @media(max-width: 420px) {
         .mobileOnly {
-          display: block !important;
+          display: inherit !important;
         }
       }
 

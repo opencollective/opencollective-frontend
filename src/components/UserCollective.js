@@ -39,6 +39,7 @@ class UserCollective extends React.Component {
     };
 
     this.messages = defineMessages({
+      'host.apply': { id: 'host.apply', defaultMessage: "Apply to create a collective" },
       'organization.created': { id: 'organization.created', defaultMessage: `Your organization has been created with success.`},
       'organization.created.description': { id: 'organization.created.description', defaultMessage: `You can now make contributions as an organization. You can also edit your organization profile, add members and other administrators and attach a credit card that can be used by its members within a monthly limit.`},
       'organization.collective.since': { id: 'organization.collective.since', defaultMessage: `Contributing Since {year}`},
@@ -119,7 +120,7 @@ class UserCollective extends React.Component {
     const type = this.collective.type.toLowerCase();
     let cta;
     if (this.collective.canApply) {
-      cta = <a href={`/${this.collective.slug}/apply`}><FormattedMessage id="host.apply" defaultMessage="Apply to create a collective" /></a>
+      cta = { href: `/${this.collective.slug}/apply`, label: intl.formatMessage(this.messages['host.apply']) }
     }
     const actions = [];
     Object.keys(this.memberOfByRole).map(role => {

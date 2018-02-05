@@ -193,7 +193,7 @@ class TierCard extends React.Component {
             font-size: 14px;
             font-weight: 500;
             text-align: center;
-            color: #ffffff;
+            color: #ffffff !important; /* needed for firefox :-/ */
             display: flex;
             justify-content: center;
             align-items: center;
