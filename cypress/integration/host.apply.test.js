@@ -28,6 +28,7 @@ describe("apply to host", () => {
     fill("twitterHandle", "twitterHandle");
     fill("description", "short description for new collective");
     fill("website", "https://xdamman.com");
+    cy.get('.tos input[type="checkbox"]').click()
     cy.get(".inputField.longDescription textarea")
       .type(longDescription)
       .blur();
