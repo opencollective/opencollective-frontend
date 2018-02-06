@@ -95,6 +95,9 @@ class CollectivesWithData extends React.Component {
             overflow: hidden;
             margin: 1rem 0;
           }
+          .CollectivesContainer :global(.CollectiveCard) {
+            margin: 1rem;
+          }
         `}</style>
 
         <div className="Collectives cardsList">

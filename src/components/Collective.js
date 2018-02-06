@@ -144,14 +144,14 @@ class Collective extends React.Component {
           }
           section {
             clear: both;
-            max-width: 900px;
+            max-width: 1244px;
             margin: 0 auto;
           }
           .columns {
             display: flex;
             flex-direction: row;
             flex-wrap: wrap;
-            justify-content: space-around;
+            justify-content: space-evenly;
           }
           .columns .col {
             max-width: 400px;
