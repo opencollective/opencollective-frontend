@@ -77,14 +77,15 @@ function publishToSlackPrivateChannel(activity) {
  */
 async function notifySubscribers(users, activity, options={}) {
   const { data } = activity;
-  debug("notifySubscribers", users.length, users.map(u => u.email), activity.type);
   if (!users || users.length === 0) {
-    debug("notifySubscribers: no user to notify");
+    debug("notifySubscribers: no user to notify for activity", activity.type);
     return;
   }
+  debug("notifySubscribers", users.length, users.map(u => u && u.email, activity.type));
   const unsubscribedUserIds = await models.Notification.getUnsubscribersUserIds(activity.type, activity.CollectiveId);
   debug("unsubscribedUserIds", unsubscribedUserIds);
   return users.map(u => {
+    if (!u) return;
     // skip users that have unsubscribed
     if (unsubscribedUserIds.indexOf(u.id) === -1) {
       debug("sendMessageFromActivity", activity.type, "UserId", u.id);

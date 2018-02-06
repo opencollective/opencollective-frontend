@@ -125,27 +125,15 @@ describe('graphql.collective.test.js', () => {
       payoutMethod: 'manual'
     };
 
-    it("creates a new expense logged out and send email to collective admin for approval", async () => {
+    it("fails to create an expense if not logged in", async () => {
       newExpenseData.collective = { id: collective.id };      
       const res = await utils.graphqlQuery(createExpenseQuery, { expense: newExpenseData });
       expect(res.errors).to.exist;
-      expect(res.errors[0].message).to.equal('Missing expense.user.email or expense.user.paypalEmail');
-      newExpenseData.user = { email: "testuser+contributor@email.com", name: "testuser" };
-      const res2 = await utils.graphqlQuery(createExpenseQuery, { expense: newExpenseData });
-      res2.errors && console.error(res2.errors[0]);
-      expect(res2.errors).to.not.exist;
-      const expense = res2.data.createExpense;
-      expect(expense.status).to.equal('PENDING');
-      expect(expense.user.collective.slug).to.equal("testuser");
-      await waitForCondition(() => emailSendMessageSpy.callCount > 0);
-      expect(emailSendMessageSpy.callCount).to.equal(1);
-      expect(emailSendMessageSpy.firstCall.args[0]).to.equal("testuser@opencollective.com");
-      expect(emailSendMessageSpy.firstCall.args[1]).to.equal("New expense on Test Collective: $10 for Test expense for pizza");
-      expect(emailSendMessageSpy.firstCall.args[2]).to.contain("/test-collective/expenses/2/approve");      
+      expect(res.errors[0].message).to.equal('You need to be logged in to create an expense');
     })
 
-    it("creates a new expense logged in", async () => {
-      newExpenseData.collective = { id: collective.id };      
+    it("creates a new expense logged in and send email to collective admin for approval", async () => {
+      newExpenseData.collective = { id: collective.id };
       let res;
       res = await utils.graphqlQuery(createExpenseQuery, { expense: newExpenseData }, user);
       res.errors && console.error(res.errors[0].message);
@@ -153,9 +141,16 @@ describe('graphql.collective.test.js', () => {
       const expense = res.data.createExpense;
       expect(expense.status).to.equal('PENDING');
       expect(expense.user.id).to.equal(user.id);
+
       const membership = await models.Member.findOne({ where: { CollectiveId: collective.id, role: 'CONTRIBUTOR' }});
       expect(membership).to.exist;
       expect(membership.MemberCollectiveId).to.equal(user.CollectiveId);
+
+      await waitForCondition(() => emailSendMessageSpy.callCount > 0);
+      expect(emailSendMessageSpy.callCount).to.equal(1);
+      expect(emailSendMessageSpy.firstCall.args[0]).to.equal("testuser@opencollective.com");
+      expect(emailSendMessageSpy.firstCall.args[1]).to.equal("New expense on Test Collective: $10 for Test expense for pizza");
+      expect(emailSendMessageSpy.firstCall.args[2]).to.contain("/test-collective/expenses/2/approve");
 
       // doesn't scream when adding another expense from same user
       res = await utils.graphqlQuery(createExpenseQuery, { expense: newExpenseData }, user);
