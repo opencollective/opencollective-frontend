@@ -448,6 +448,7 @@ export const addGetLoggedInUserFunction = (component) => {
     props: ({ data }) => ({
       data,
       getLoggedInUser: () => {
+        const startTime = new Date;
         if (!window.localStorage.getItem('accessToken')) {
           return Promise.resolve(null);
         }
@@ -455,7 +456,9 @@ export const addGetLoggedInUserFunction = (component) => {
             let res;
             if (data.LoggedInUser) {
               const user = new LoggedInUser(data.LoggedInUser);
-              console.log(">>> data", data.LoggedInUser, "class: ", user);
+              const endTime = new Date;
+              const elapsedTime = Math.round((endTime.getTime() - startTime.getTime()) / 1000);
+              console.info(`>>> LoggedInUser fetched in ${elapsedTime} seconds`);
               return resolve(user);
             }
             try {
@@ -464,6 +467,9 @@ export const addGetLoggedInUserFunction = (component) => {
                 return resolve(null);
               }
               const user = new LoggedInUser(res.data.LoggedInUser);
+              const endTime = new Date;
+              const elapsedTime = Math.round((endTime.getTime() - startTime.getTime()) / 1000);
+              console.info(`>>> LoggedInUser fetched in ${elapsedTime} seconds`);
               return resolve(user);
             } catch (e) {
               console.error(">>> getLoggedInUser error:", e);

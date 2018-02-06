@@ -67,7 +67,7 @@ class CreateEvent extends React.Component {
 
   render() {
     const { parentCollective, LoggedInUser } = this.props;
-    const canCreateEvent = LoggedInUser && LoggedInUser.canCreateEvent;
+    const canCreateEvent = LoggedInUser && LoggedInUser.canEditCollective(parentCollective);
 
     const collective = parentCollective || {};
     const title = `Create a New ${collective.name} Event`;

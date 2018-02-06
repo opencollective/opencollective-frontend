@@ -22,6 +22,7 @@ class CreateExpense extends React.Component {
   constructor(props) {
     super(props);
     this.getOptions = this.getOptions.bind(this);
+    this.renderForm = this.renderForm.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
 
@@ -32,7 +33,6 @@ class CreateExpense extends React.Component {
       'error.descriptionMissing': { id: 'expense.error.descriptionMissing', defaultMessage: 'Missing description' },
       'error.amountMissing': { id: 'expense.error.amountMissing', defaultMessage: 'Amount must be greater than 0' },
       'error.privateMessageMissing': { id: 'expense.error.privateMessageMissing', defaultMessage: `Please provide instructions on how you'd like to be reimbursed as a private note` },
-      'error.emailMissing': { id: 'expense.error.emailMissing', defaultMessage: 'Please provide your email address' },
       'error.paypalEmailMissing': { id: 'expense.error.paypalEmailMissing', defaultMessage: 'Please provide your PayPal email address (or change the payout method)' },
       'error.attachmentMissing': { id: 'expense.error.attachmentMissing', defaultMessage: 'Missing attachment' }
     });
@@ -83,10 +83,6 @@ class CreateExpense extends React.Component {
       this.setState({ error: intl.formatMessage(this.messages['error.paypalEmailMissing'])});
       return false;
     }
-    if (!LoggedInUser && !expense.email) {
-      this.setState({ error: intl.formatMessage(this.messages['error.emailMissing'])});
-      return false;
-    }
     this.setState({ error: null });
     return true;
   }
@@ -96,9 +92,6 @@ class CreateExpense extends React.Component {
       ...this.state.expense,
       [attr]: value
     };
-    if (attr === 'paypalEmail' && !expense.email) {
-      expense.email = value;
-    }
     const newState = { modified: true, expense, isExpenseValid: this.validate(expense) };
     this.setState(newState)
     this.props.onChange && this.props.onChange(expense);
@@ -124,7 +117,7 @@ class CreateExpense extends React.Component {
     return false;
   }
 
-  render() {
+  renderForm() {
     const { LoggedInUser, intl, collective } = this.props;
     const { expense } = this.state;
 
@@ -370,19 +363,6 @@ class CreateExpense extends React.Component {
                 />
             </div>
 
-            { !LoggedInUser &&
-              <div className="col emailInput">
-                <label><FormattedMessage id='expense.email.label' defaultMessage='Your email address' /></label>
-                <InputField
-                  type="email"
-                  name="email"
-                  key={`email-${this.state.expense.paypalEmail}`}
-                  defaultValue={this.state.expense.paypalEmail}
-                  onChange={email => this.handleChange('email', email)}
-                  />
-              </div>
-            }
-
             <div className="row">
               <div className="col large">
                 <Button bsStyle="primary" type="submit" ref="submit" disabled= {this.state.loading || !this.state.isExpenseValid} >
@@ -406,6 +386,21 @@ class CreateExpense extends React.Component {
         </form>
       </div>
     );
+  }
+
+  render() {
+    const { LoggedInUser, collective } = this.props;
+
+    if (!LoggedInUser) {
+      return (
+        <div className="login">
+          <p><FormattedMessage id="expenses.create.login" defaultMessage="Sign up or login to submit an expense." /></p>
+          <p><Button className="blue" href={`/signin?next=/${collective.slug}/expenses/new`}><FormattedMessage id="login.button" defaultMessage="login" /></Button></p>
+        </div>
+      )
+    } else {
+      return this.renderForm();
+    }
   }
 }
 
