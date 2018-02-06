@@ -153,7 +153,6 @@ async function notifyByEmail(activity) {
       notifyAdminsOfCollective(activity.data.collective.id, activity);
       break;
 
-    case activityType.COLLECTIVE_TRANSACTION_CREATED:
     case activityType.COLLECTIVE_EXPENSE_CREATED:
       notifyAdminsOfCollective(activity.data.collective.id, activity);
       break;
