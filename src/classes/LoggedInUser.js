@@ -16,6 +16,14 @@ class LoggedInUser {
 }
 
 /**
+ * hasRole if LoggedInUser has one of the roles for the given collective
+ */
+LoggedInUser.prototype.hasRole = function(roles, collective) {
+  if (typeof roles === 'string') roles = [roles];
+  return intersection(this.roles[collective.slug], roles).length > 0;
+}
+
+/**
  * CanEditCollective if LoggedInUser is
  * - creator of the collective
  * - is admin or host of the collective

@@ -11,7 +11,7 @@ import { getCurrencySymbol } from '../lib/utils';
 import categories from '../constants/categories';
 import { get } from 'lodash';
 
-class CreateExpense extends React.Component {
+class CreateExpenseForm extends React.Component {
 
   static propTypes = {
     collective: PropTypes.object,
@@ -22,6 +22,7 @@ class CreateExpense extends React.Component {
   constructor(props) {
     super(props);
     this.getOptions = this.getOptions.bind(this);
+    this.renderForm = this.renderForm.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
 
@@ -32,7 +33,6 @@ class CreateExpense extends React.Component {
       'error.descriptionMissing': { id: 'expense.error.descriptionMissing', defaultMessage: 'Missing description' },
       'error.amountMissing': { id: 'expense.error.amountMissing', defaultMessage: 'Amount must be greater than 0' },
       'error.privateMessageMissing': { id: 'expense.error.privateMessageMissing', defaultMessage: `Please provide instructions on how you'd like to be reimbursed as a private note` },
-      'error.emailMissing': { id: 'expense.error.emailMissing', defaultMessage: 'Please provide your email address' },
       'error.paypalEmailMissing': { id: 'expense.error.paypalEmailMissing', defaultMessage: 'Please provide your PayPal email address (or change the payout method)' },
       'error.attachmentMissing': { id: 'expense.error.attachmentMissing', defaultMessage: 'Missing attachment' }
     });
@@ -83,10 +83,6 @@ class CreateExpense extends React.Component {
       this.setState({ error: intl.formatMessage(this.messages['error.paypalEmailMissing'])});
       return false;
     }
-    if (!LoggedInUser && !expense.email) {
-      this.setState({ error: intl.formatMessage(this.messages['error.emailMissing'])});
-      return false;
-    }
     this.setState({ error: null });
     return true;
   }
@@ -96,9 +92,6 @@ class CreateExpense extends React.Component {
       ...this.state.expense,
       [attr]: value
     };
-    if (attr === 'paypalEmail' && !expense.email) {
-      expense.email = value;
-    }
     const newState = { modified: true, expense, isExpenseValid: this.validate(expense) };
     this.setState(newState)
     this.props.onChange && this.props.onChange(expense);
@@ -124,7 +117,7 @@ class CreateExpense extends React.Component {
     return false;
   }
 
-  render() {
+  renderForm() {
     const { LoggedInUser, intl, collective } = this.props;
     const { expense } = this.state;
 
@@ -133,9 +126,9 @@ class CreateExpense extends React.Component {
     const payoutMethods = this.getOptions(['paypal', 'other'], { paypalEmail: get(expense, 'user.paypalEmail') || intl.formatMessage(this.messages['newExpense.paypal.label']) });
 
     return (
-        <div className={`CreateExpense ${this.props.mode}`}>
+        <div className={`CreateExpenseForm ${this.props.mode}`}>
         <style jsx>{`
-          .CreateExpense {
+          .CreateExpenseForm {
             font-size: 1.2rem;
             overflow: hidden;
             margin: 0 1rem 5rem 1rem;
@@ -147,14 +140,14 @@ class CreateExpense extends React.Component {
           .description {
             font-size: 1.4rem;
           }
-          .CreateExpense .frame {
+          .CreateExpenseForm .frame {
             padding: 4px;
             margin-top: 1rem;
             margin-right: 1rem;
             float: left;
             width: 128px;
           }
-          .CreateExpense img {
+          .CreateExpenseForm img {
             width: 100%;
           }
           .leftColumn, .rightColumn {
@@ -213,36 +206,36 @@ class CreateExpense extends React.Component {
           }
         `}</style>
         <style global jsx>{`
-          .CreateExpense .inputField {
+          .CreateExpenseForm .inputField {
             margin: 0;
           }
 
-          .CreateExpense .descriptionField {
+          .CreateExpenseForm .descriptionField {
             width: 50rem;
             max-width: 100%;
           }
 
-          .CreateExpense .amountField {
+          .CreateExpenseForm .amountField {
             max-width: 15rem;
           }
 
-          .CreateExpense .inputField textarea {
+          .CreateExpenseForm .inputField textarea {
             font-size: 1.2rem;
           }
 
-          .CreateExpense .attachmentField {
+          .CreateExpenseForm .attachmentField {
             width: 128px;
           }
 
-          .CreateExpense .attachmentField .form-group {
+          .CreateExpenseForm .attachmentField .form-group {
             margin: 0;
           }
 
-          .CreateExpense .col.privateMessage {
+          .CreateExpenseForm .col.privateMessage {
             width: 100%;
           }
 
-          .CreateExpense .help-block {
+          .CreateExpenseForm .help-block {
             font-size: 1.2rem;
           }
 
@@ -370,19 +363,6 @@ class CreateExpense extends React.Component {
                 />
             </div>
 
-            { !LoggedInUser &&
-              <div className="col emailInput">
-                <label><FormattedMessage id='expense.email.label' defaultMessage='Your email address' /></label>
-                <InputField
-                  type="email"
-                  name="email"
-                  key={`email-${this.state.expense.paypalEmail}`}
-                  defaultValue={this.state.expense.paypalEmail}
-                  onChange={email => this.handleChange('email', email)}
-                  />
-              </div>
-            }
-
             <div className="row">
               <div className="col large">
                 <Button bsStyle="primary" type="submit" ref="submit" disabled= {this.state.loading || !this.state.isExpenseValid} >
@@ -407,6 +387,21 @@ class CreateExpense extends React.Component {
       </div>
     );
   }
+
+  render() {
+    const { LoggedInUser, collective } = this.props;
+
+    if (!LoggedInUser) {
+      return (
+        <div className="CreateExpenseForm">
+          <p><FormattedMessage id="expenses.create.login" defaultMessage="Sign up or login to submit an expense." /></p>
+          <p><Button className="blue login" href={`/signin?next=/${collective.slug}/expenses/new`}><FormattedMessage id="login.button" defaultMessage="login" /></Button></p>
+        </div>
+      )
+    } else {
+      return this.renderForm();
+    }
+  }
 }
 
-export default withIntl(CreateExpense);
+export default withIntl(CreateExpenseForm);

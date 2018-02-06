@@ -21,7 +21,7 @@ class EditEventPage extends React.Component {
   async componentDidMount() {
     const { getLoggedInUser } = this.props;
     const LoggedInUser = getLoggedInUser && await getLoggedInUser();
-    this.setState({LoggedInUser, loading: false});
+    this.setState({ LoggedInUser, loading: false });
   }
 
   render() {

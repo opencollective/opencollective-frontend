@@ -32,7 +32,6 @@ describe("collective page", () => {
     cy.get("#expenses .SubmitExpenseBtn").click();
     cy.wait(500);
     cy.get(".ExpensesPage .CollectiveCover h1").contains("Expenses");
-    cy.get(".ExpensesPage .inputField.descriptionField")
     cy.get(".ExpensesPage .CollectiveCover .goBack").click();
   });
   
