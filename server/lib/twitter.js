@@ -45,7 +45,7 @@ const tweetActivity = async (activity) => {
 
   status += `\nhttps://opencollective.com/${get(activity, 'data.collective.slug')}`
 
-  return await twitterLib.tweetStatus(twitterAccount, status, options);
+  return await twitterLib.tweetStatus(twitterAccount, status);
 }
 
 const tweetStatus = (twitterAccount, status, options = {}) => {
