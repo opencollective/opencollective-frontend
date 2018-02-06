@@ -11,7 +11,7 @@ import { getCurrencySymbol } from '../lib/utils';
 import categories from '../constants/categories';
 import { get } from 'lodash';
 
-class CreateExpense extends React.Component {
+class CreateExpenseForm extends React.Component {
 
   static propTypes = {
     collective: PropTypes.object,
@@ -126,9 +126,9 @@ class CreateExpense extends React.Component {
     const payoutMethods = this.getOptions(['paypal', 'other'], { paypalEmail: get(expense, 'user.paypalEmail') || intl.formatMessage(this.messages['newExpense.paypal.label']) });
 
     return (
-        <div className={`CreateExpense ${this.props.mode}`}>
+        <div className={`CreateExpenseForm ${this.props.mode}`}>
         <style jsx>{`
-          .CreateExpense {
+          .CreateExpenseForm {
             font-size: 1.2rem;
             overflow: hidden;
             margin: 0 1rem 5rem 1rem;
@@ -140,14 +140,14 @@ class CreateExpense extends React.Component {
           .description {
             font-size: 1.4rem;
           }
-          .CreateExpense .frame {
+          .CreateExpenseForm .frame {
             padding: 4px;
             margin-top: 1rem;
             margin-right: 1rem;
             float: left;
             width: 128px;
           }
-          .CreateExpense img {
+          .CreateExpenseForm img {
             width: 100%;
           }
           .leftColumn, .rightColumn {
@@ -206,36 +206,36 @@ class CreateExpense extends React.Component {
           }
         `}</style>
         <style global jsx>{`
-          .CreateExpense .inputField {
+          .CreateExpenseForm .inputField {
             margin: 0;
           }
 
-          .CreateExpense .descriptionField {
+          .CreateExpenseForm .descriptionField {
             width: 50rem;
             max-width: 100%;
           }
 
-          .CreateExpense .amountField {
+          .CreateExpenseForm .amountField {
             max-width: 15rem;
           }
 
-          .CreateExpense .inputField textarea {
+          .CreateExpenseForm .inputField textarea {
             font-size: 1.2rem;
           }
 
-          .CreateExpense .attachmentField {
+          .CreateExpenseForm .attachmentField {
             width: 128px;
           }
 
-          .CreateExpense .attachmentField .form-group {
+          .CreateExpenseForm .attachmentField .form-group {
             margin: 0;
           }
 
-          .CreateExpense .col.privateMessage {
+          .CreateExpenseForm .col.privateMessage {
             width: 100%;
           }
 
-          .CreateExpense .help-block {
+          .CreateExpenseForm .help-block {
             font-size: 1.2rem;
           }
 
@@ -393,9 +393,9 @@ class CreateExpense extends React.Component {
 
     if (!LoggedInUser) {
       return (
-        <div className="login">
+        <div className="CreateExpenseForm">
           <p><FormattedMessage id="expenses.create.login" defaultMessage="Sign up or login to submit an expense." /></p>
-          <p><Button className="blue" href={`/signin?next=/${collective.slug}/expenses/new`}><FormattedMessage id="login.button" defaultMessage="login" /></Button></p>
+          <p><Button className="blue login" href={`/signin?next=/${collective.slug}/expenses/new`}><FormattedMessage id="login.button" defaultMessage="login" /></Button></p>
         </div>
       )
     } else {
@@ -404,4 +404,4 @@ class CreateExpense extends React.Component {
   }
 }
 
-export default withIntl(CreateExpense);
+export default withIntl(CreateExpenseForm);
