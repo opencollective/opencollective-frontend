@@ -93,31 +93,26 @@ export async function updateExpenseStatus(remoteUser, expenseId, status) {
 
   const res = await expense.update({ status });
   if (status === statuses.APPROVED) {
-    _createActivity(expense, activities.COLLECTIVE_EXPENSE_APPROVED);    
+    _createActivity(expense, activities.COLLECTIVE_EXPENSE_APPROVED);
   }
 
   return res;
 }
 
 export async function createExpense(remoteUser, expenseData) {
-  if (!expenseData.collective || !expenseData.collective.id) {
+  if (!remoteUser) {
+    throw new errors.Unauthorized("You need to be logged in to create an expense");
+  }
+  if (!get(expenseData, 'collective.id')) {
     throw new errors.Unauthorized("Missing expense.collective.id");
   }
 
-  let user;
-  if (remoteUser) {
-    user = remoteUser;
-    if (get(expense, 'user.paypalEmail') !== remoteUser.paypalEmail) {
-      remoteUser.paypalEmail = get(expenseData, 'user.paypalEmail');
-      remoteUser.save();
-    }
-  } else {
-    if (!(get(expenseData, 'user.email') || get(expenseData, 'user.paypalEmail'))) {
-      throw new errors.Unauthorized("Missing expense.user.email or expense.user.paypalEmail");
-    }
-    user = await models.User.findOrCreateByEmail(get(expenseData, 'user.email') || get(expenseData, 'user.paypalEmail'), expenseData.user);
+  // Update remoteUser's paypal email if it has changed
+  if (get(expense, 'user.paypalEmail') !== remoteUser.paypalEmail) {
+    remoteUser.paypalEmail = get(expenseData, 'user.paypalEmail');
+    remoteUser.save();
   }
-  expenseData.UserId = user.id;
+  expenseData.UserId = remoteUser.id;
 
   const collective = await models.Collective.findById(expenseData.collective.id);
 
@@ -141,15 +136,15 @@ export async function createExpense(remoteUser, expenseData) {
     incurredAt: expenseData.incurredAt || new Date
   });
 
-  collective.addUserWithRole(user, roles.CONTRIBUTOR).catch(e => {
+  collective.addUserWithRole(remoteUser, roles.CONTRIBUTOR).catch(e => {
     if (e.name === 'SequelizeUniqueConstraintError') {
-      console.log("User ", user.id, "is already a contributor");
+      console.log("User ", remoteUser.id, "is already a contributor");
     } else {
       console.error(e);
     }
   });
 
-  expense.user = user;
+  expense.user = remoteUser;
   expense.collective = collective;
   _createActivity(expense, activities.COLLECTIVE_EXPENSE_CREATED);
 
