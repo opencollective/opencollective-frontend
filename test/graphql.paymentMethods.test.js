@@ -264,7 +264,6 @@ describe('graphql.paymentMethods.test.js', () => {
       const result = await utils.graphqlQuery(query, { slug: host.slug }, admin);
       result.errors && console.error(result.errors[0]);
       expect(result.errors).to.not.exist;
-      console.log(result.data.Collective);
       const paymentMethod = result.data.Collective.paymentMethods.find(pm => pm.service === 'paypal');
       expect(paymentMethod.balance).to.equal(198750); // $2000 - $12.50
     });

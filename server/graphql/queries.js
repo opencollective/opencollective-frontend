@@ -156,9 +156,7 @@ const queries = {
           }
           return getCollectiveIds().then(collectiveIds => {
             query.where.CollectiveId = { $in: collectiveIds };
-            console.log(">>> query", JSON.stringify(query));
-            query.logging = console.log;
-            return models.Update.findAll(query).tap(console.log);
+            return models.Update.findAll(query);
           })
         })
     }
@@ -308,7 +306,6 @@ const queries = {
 
       if (args.tags) query.where.tags = { $overlap: args.tags };
       if (args.offset) query.offset = args.offset;
-      console.log(">>>> query", query);
       return models.Collective.findAll(query);
     }
   },

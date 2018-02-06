@@ -413,7 +413,7 @@ export default function(Sequelize, DataTypes) {
         { model: models.Collective, as: 'memberCollective' }
       ]
     })
-    .tap(memberships => console.log(">>> members found", memberships.length))
+    .tap(memberships => debug(">>> members found", memberships.length))
     .map(membership => membership.memberCollective)
     .map(memberCollective => {
       debug(">>> fetching user for", memberCollective.slug, memberCollective.type);

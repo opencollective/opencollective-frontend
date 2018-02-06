@@ -97,46 +97,6 @@ describe('graphql.updates.test', () => {
     })
   })
 
-  describe('edit an update', () => {
-
-    const editUpdateQuery = `
-    mutation editUpdate($update: UpdateAttributesInputType!) {
-      editUpdate(update: $update) {
-        id
-        slug
-        publishedAt
-      }
-    }
-    `;
-
-    it('fails if not authenticated', async () => {
-      const result = await utils.graphqlQuery(editUpdateQuery, { update: { id: update1.id } });
-      expect(result.errors).to.exist;
-      expect(result.errors[0].message).to.equal("You must be logged in to edit this update");
-    });
-
-    it('fails if not authenticated as author or admin of collective', async () => {
-      const result = await utils.graphqlQuery(editUpdateQuery, { update: { id: update1.id } }, user2);
-      expect(result.errors).to.exist;
-      expect(result.errors[0].message).to.equal("You must be the author or an admin of this collective to edit this update");
-    });
-
-    it('edits an update successfully and changes the slug if not published', async () => {
-      const result = await utils.graphqlQuery(editUpdateQuery, { update: { id: update1.id, title: 'new title' } }, user1);
-      expect(result.errors).to.not.exist;
-      expect(result.data.editUpdate.slug).to.equal('new-title');
-    });
-
-    it('edits an update successfully and doesn\'t change the slug if published', async () => {
-      await models.Update.update({ slug: 'first-update', publishedAt: new Date }, { where: { id: update1.id }});
-      const result = await utils.graphqlQuery(editUpdateQuery, { update: { id: update1.id, title: 'new title' } }, user1);
-      expect(result.errors).to.not.exist;
-      expect(result.data.editUpdate.slug).to.equal('first-update');
-      await models.Update.update({ publishedAt: null }, { where: { id: update1.id }});
-    });
-
-  })
-
   describe('publish an update', () => {
 
     const publishUpdateQuery = `
@@ -182,6 +142,10 @@ describe('graphql.updates.test', () => {
         })
       });
 
+      beforeEach(() => {
+        sendEmailSpy.reset();
+      })
+
       it("published the update successfully", async () => {
         const result = await utils.graphqlQuery(publishUpdateQuery, { id: update1.id }, user1);
         expect(result.errors).to.not.exist;
@@ -191,11 +155,13 @@ describe('graphql.updates.test', () => {
 
       it("sends the update to all users including admins of sponsor org", async () => {
         await utils.waitForCondition(() => sendEmailSpy.callCount > 1);
-        expect(sendEmailSpy.callCount).to.equal(4);
+        expect(sendEmailSpy.callCount).to.equal(3);
         expect(sendEmailSpy.args[0][0]).to.equal(user1.email);
-        expect(sendEmailSpy.args[1][0]).to.equal(user1.email);
-        expect(sendEmailSpy.args[2][0]).to.equal(user2.email);
-        expect(sendEmailSpy.args[3][0]).to.equal(user3.email);
+        expect(sendEmailSpy.args[0][1]).to.equal("Collective update first update");
+        expect(sendEmailSpy.args[1][0]).to.equal(user2.email);
+        expect(sendEmailSpy.args[1][1]).to.equal("Collective update first update");
+        expect(sendEmailSpy.args[2][0]).to.equal(user3.email);
+        expect(sendEmailSpy.args[2][1]).to.equal("Collective update first update");
       })
 
       it("sends a tweet", async () => {
@@ -216,6 +182,46 @@ describe('graphql.updates.test', () => {
 
   })
 
+  describe('edit an update', () => {
+
+    const editUpdateQuery = `
+    mutation editUpdate($update: UpdateAttributesInputType!) {
+      editUpdate(update: $update) {
+        id
+        slug
+        publishedAt
+      }
+    }
+    `;
+
+    it('fails if not authenticated', async () => {
+      const result = await utils.graphqlQuery(editUpdateQuery, { update: { id: update1.id } });
+      expect(result.errors).to.exist;
+      expect(result.errors[0].message).to.equal("You must be logged in to edit this update");
+    });
+
+    it('fails if not authenticated as author or admin of collective', async () => {
+      const result = await utils.graphqlQuery(editUpdateQuery, { update: { id: update1.id } }, user2);
+      expect(result.errors).to.exist;
+      expect(result.errors[0].message).to.equal("You must be the author or an admin of this collective to edit this update");
+    });
+
+    it('edits an update successfully and changes the slug if not published', async () => {
+      await models.Update.update({ publishedAt: null }, { where: { id: update1.id }});
+      const result = await utils.graphqlQuery(editUpdateQuery, { update: { id: update1.id, title: 'new title' } }, user1);
+      expect(result.errors).to.not.exist;
+      expect(result.data.editUpdate.slug).to.equal('new-title');
+    });
+
+    it('edits an update successfully and doesn\'t change the slug if published', async () => {
+      await models.Update.update({ slug: 'first-update', publishedAt: new Date }, { where: { id: update1.id }});
+      const result = await utils.graphqlQuery(editUpdateQuery, { update: { id: update1.id, title: 'new title' } }, user1);
+      expect(result.errors).to.not.exist;
+      expect(result.data.editUpdate.slug).to.equal('first-update');
+      await models.Update.update({ publishedAt: null }, { where: { id: update1.id }});
+    });
+
+  })
   describe('delete Update', () => {
 
     const deleteUpdateQuery = `
@@ -269,19 +275,19 @@ describe('graphql.updates.test', () => {
     `;
 
     before(() => {
-      return models.Update.createMany([
-        { title: 'draft update 1', publishedAt: null },
-        { title: 'update 1', publishedAt: new Date },
-        { title: 'update 2', publishedAt: new Date },
-        { title: 'update 3', publishedAt: new Date },
-        { title: 'update 4', publishedAt: new Date },
-        { title: 'update 5', publishedAt: new Date },
-        { title: 'update 6', publishedAt: new Date },
-        { title: 'update 7', publishedAt: new Date },
-        { title: 'update 8', publishedAt: new Date },
-        { title: 'update 9', publishedAt: new Date },
-        { title: 'update 10', publishedAt: new Date },
-      ], { CreatedByUserId: user1.id, CollectiveId: collective1.id });
+      return models.Update.destroy({ where: {}, truncate: true }).then(() => models.Update.createMany([
+        { title: 'draft update 1', createdAt: new Date('2018-01-11'), publishedAt: null },
+        { title: 'update 1', publishedAt: new Date('2018-01-01') },
+        { title: 'update 2', publishedAt: new Date('2018-01-02') },
+        { title: 'update 3', publishedAt: new Date('2018-01-03') },
+        { title: 'update 4', publishedAt: new Date('2018-01-04') },
+        { title: 'update 5', publishedAt: new Date('2018-01-05') },
+        { title: 'update 6', publishedAt: new Date('2018-01-06') },
+        { title: 'update 7', publishedAt: new Date('2018-01-07') },
+        { title: 'update 8', publishedAt: new Date('2018-01-08') },
+        { title: 'update 9', publishedAt: new Date('2018-01-09') },
+        { title: 'update 10', publishedAt: new Date('2018-01-10') },
+      ], { CreatedByUserId: user1.id, CollectiveId: collective1.id }));
     });
 
     it('get all the updates that are published', async () => {
@@ -293,7 +299,7 @@ describe('graphql.updates.test', () => {
     });
 
     it('get all the updates that are published and unpublished if admin', async () => {
-      const result = await utils.graphqlQuery(allUpdatesQuery, { CollectiveId: collective1.id, limit: 5, offset: 1 }, user1);
+      const result = await utils.graphqlQuery(allUpdatesQuery, { CollectiveId: collective1.id, limit: 5, offset: 0 }, user1);
       const updates = result.data.allUpdates;
       expect(result.errors).to.not.exist;
       expect(updates).to.have.length(5);
