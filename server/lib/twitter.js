@@ -38,12 +38,14 @@ const tweetActivity = async (activity) => {
   const template = settings.tweet;
 
   // todo: we should use the handlebar templating system to support {{#if}}{{/if}}
-  const status = template
+  let status = template
     .replace('{backerTwitterHandle}', `@${get(activity, 'data.member.memberCollective.twitterHandle')}`)
     .replace('{referralTwitterHandle}', `@${get(activity, 'data.order.referral.twitterHandle')}`)
     .replace('{amount}', formatCurrency(get(activity, 'data.order.totalAmount'), get(activity, 'data.order.currency')));
 
-  twitterLib.tweetStatus(twitterAccount, status);
+  status += `\nhttps://opencollective.com/${get(activity, 'data.collective.slug')}`
+
+  return await twitterLib.tweetStatus(twitterAccount, status, options);
 }
 
 const tweetStatus = (twitterAccount, status, options = {}) => {
@@ -60,13 +62,13 @@ const tweetStatus = (twitterAccount, status, options = {}) => {
     access_token_secret: twitterAccount.token
   });
 
-  debug("tweeting status: ", status);
-  if (process.env.NODE_ENV === 'production') {
+  debug("tweeting status: ", status, "with options:", options);
+  if (config.twitter.consumerSecret) {
     const tweet = Promise.promisify(client.post, { context: client });
     return tweet("statuses/update", { status, ...options });
   } else {
-    console.log('No tweet sent: must be in production');
-    return null;
+    console.log('Tweet not sent: no twitter key/secret provided in env');
+    return Promise.resolve();
   }
 }
 

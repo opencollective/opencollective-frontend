@@ -35,6 +35,10 @@ const init = () => {
       include: [ { model: models.Collective, as: 'collective', required: true, where: { type: 'COLLECTIVE', isActive: true } }]
   };
 
+  if (process.env.SLUG) {
+    query.include[0].where.slug = process.env.SLUG;
+  }
+
   models.ConnectedAccount
     .findAll(query)
     .tap(connectedAccounts => {
@@ -131,7 +135,7 @@ const compileTwitterHandles = (userCollectives, total, limit) => {
   return res;
 }
 
-const sendTweet = (twitterAccount, data) => {
+const sendTweet = async (twitterAccount, data) => {
   const stats = data.collective.stats;
 
   const replacements = {
@@ -149,9 +153,13 @@ const sendTweet = (twitterAccount, data) => {
   }
 
   const template = stats.totalReceived === 0 ? 'monthlyStatsNoNewDonation' : 'monthlyStats';
-  const tweet = twitter.compileTweet(template, replacements);
-  twitter.tweetStatus(twitterAccount, tweet, { attachment_url: `https://opencollective.com/${data.collective.slug}`});
+  let tweet = await twitter.compileTweet(template, replacements);
+  tweet += `\nhttps://opencollective.com/${data.collective.slug}`;
+  const res = await twitter.tweetStatus(twitterAccount, tweet);
   console.log(">>> sending tweet:", tweet.length);
+  if (process.env.DEBUG) {
+    console.log(">>> twitter response: ", JSON.stringify(res));
+  }
   debug(replacements);
   console.log(tweet);
 }
