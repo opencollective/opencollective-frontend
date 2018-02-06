@@ -36,7 +36,7 @@ class EditUpdateForm extends React.Component {
       loading: false
     };
 
-    this.storageKey = `EditUpdateForm#${get(this.props, 'update.id') || ''}`;
+    this.storageKey = `EditUpdateForm#${get(this.props, 'update.id') || get(this.props, 'collective.slug')}`;
     console.log(">>> storageKey", this.storageKey);
   }
 
@@ -62,6 +62,7 @@ class EditUpdateForm extends React.Component {
   }
 
   async onSubmit(e) {
+    this.setState({ loading: true });
     if (e) {
       e.preventDefault();
     }

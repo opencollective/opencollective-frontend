@@ -14,6 +14,8 @@ import { FormattedMessage } from 'react-intl'
 import EditUpdateForm from '../components/EditUpdateForm';
 import { graphql, compose } from 'react-apollo'
 import gql from 'graphql-tag'
+import { Router } from '../server/pages';
+import Button from '../components/Button';
 
 class CreateUpdatePage extends React.Component {
 
@@ -42,13 +44,14 @@ class CreateUpdatePage extends React.Component {
   }
 
   async createUpdate(update) {
-    const { LoggedInUser, collective } = this.props;
+    const { LoggedInUser, data: { Collective } } = this.props;
     try {
-      update.collective = { id: collective.id };
+      update.collective = { id: Collective.id };
       console.log(">>> createUpdate", update);
       const res = await this.props.createUpdate(update);
       console.log(">>> createUpdate res", res);
-      this.setState({ showNewUpdateForm: false, updateCreated: res.data.createUpdate, isModified: false })
+      this.setState({ isModified: false });
+      return Router.pushRoute(`/${Collective.slug}/updates/${res.data.createUpdate.slug}`);
     } catch (e) {
       console.error(e);
     }
@@ -65,6 +68,7 @@ class CreateUpdatePage extends React.Component {
     }
 
     const collective = data.Collective;
+    const canCreateUpdate = LoggedInUser && LoggedInUser.canEditCollective(collective);
 
     return (
       <div className="CreateUpdatePage">
@@ -93,8 +97,15 @@ class CreateUpdatePage extends React.Component {
             />
 
           <div className="content" >
-
-            <EditUpdateForm collective={collective} onSubmit={this.createUpdate} />
+            {!canCreateUpdate &&
+              <div className="login">
+                <p><FormattedMessage id="events.create.login" defaultMessage="You need to be logged in as a core contributor of this collective to be able to create an update." /></p>
+                <p><Button className="blue" href={`/signin?next=/${collective.slug}/updates/new`}><FormattedMessage id="login.button" defaultMessage="login" /></Button></p>
+              </div>
+            }
+            { canCreateUpdate &&
+              <EditUpdateForm collective={collective} onSubmit={this.createUpdate} />
+            }
 
           </div>
 
@@ -136,24 +147,9 @@ mutation createUpdate($update: UpdateInputType!) {
 `;
 
 const addMutation = graphql(createUpdateQuery, {
-  props: ( { ownProps, mutate }) => ({
+  props: ( { mutate }) => ({
     createUpdate: async (update) => {
-      return await mutate({
-        variables: { update },
-        update: (proxy, { data: { createUpdate} }) => {
-          const data = proxy.readQuery({
-            query: getUpdatesQuery,
-            variables: getUpdatesVariables(ownProps)
-          });
-          createUpdate.isNew = true;
-          data.allUpdates.unshift(createUpdate);
-          proxy.writeQuery({
-            query: getUpdatesQuery,
-            variables: getUpdatesVariables(ownProps),
-            data
-          });
-        },
-      })
+      return await mutate({ variables: { update } })
     }
   })
 });

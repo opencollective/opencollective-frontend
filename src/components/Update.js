@@ -221,9 +221,11 @@ class Update extends React.Component {
                 <div>
                   { update.html && <div dangerouslySetInnerHTML={{ __html: update.html }} /> }
                   { !update.html && <UpdateTextWithData id={update.id} /> }
-                  <Link route={`/${collective.slug}/updates`}><a className="viewLatestUpdates">
-                    {intl.formatMessage(this.messages[`viewLatestUpdates`])}</a>
-                  </Link>
+                  { update.publishedAt &&
+                    <Link route={`/${collective.slug}/updates`}><a className="viewLatestUpdates">
+                      {intl.formatMessage(this.messages[`viewLatestUpdates`])}</a>
+                    </Link>
+                  }
                 </div>
               }
             </div>
@@ -266,11 +268,11 @@ mutation editUpdate($update: UpdateAttributesInputType!) {
 `;
 
 const addMutation = graphql(editUpdateQuery, {
-props: ( { mutate }) => ({
-  editUpdate: async (update) => {
-    return await mutate({ variables: { update } })
-  }
-})
+  props: ( { mutate }) => ({
+    editUpdate: async (update) => {
+      return await mutate({ variables: { update } })
+    }
+  })
 });
 
 export default withIntl(addMutation(Update));

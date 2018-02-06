@@ -12,7 +12,7 @@ import UpdateWithData from '../components/UpdateWithData';
 import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl'
 
-class UpdatesPage extends React.Component {
+class UpdatePage extends React.Component {
 
   static getInitialProps (props) {
     const { query: { collectiveSlug, updateSlug }, data } = props;
@@ -43,7 +43,7 @@ class UpdatesPage extends React.Component {
     const collective = data.Collective;
 
     return (
-      <div className="UpdatesPage">
+      <div className="UpdatePage">
 
         <Header
           title={collective.name}
@@ -83,4 +83,4 @@ class UpdatesPage extends React.Component {
 
 }
 
-export default withData(addGetLoggedInUserFunction(addCollectiveCoverData(withIntl(UpdatesPage))));
+export default withData(addGetLoggedInUserFunction(addCollectiveCoverData(withIntl(UpdatePage))));
