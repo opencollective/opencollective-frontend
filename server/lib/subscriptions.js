@@ -16,7 +16,10 @@ export const MAX_RETRIES = 3;
  */
 export async function ordersWithPendingCharges() {
   return models.Order.findAll({
-    where: { SubscriptionId: { [Op.ne]: null } },
+    where: {
+      SubscriptionId: { [Op.ne]: null },
+      deletedAt: null
+    },
     include: [
       { model: models.User, as: 'createdByUser'},
       { model: models.Collective, as: 'collective'},
