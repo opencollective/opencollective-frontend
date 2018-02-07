@@ -1,4 +1,3 @@
-import Stripe from 'stripe';
 import models from '../models';
 import errors from '../lib/errors';
 import activities from '../constants/activities';
@@ -53,22 +52,6 @@ export const cancel = (req, res, next) => {
   .tap(d => order = d)
   .then(d => d ? Promise.resolve() : 
       Promise.reject(new errors.BadRequest(`No subscription found with id ${subscriptionid}. Please contact support@opencollective.com for help.`)))
-
-  // get stripe account for access token
-  .then(() => order.collective.getHostStripeAccount())
-
-  // cancel subscription on Stripe
-  .then(stripeAccount => {
-    const stripe = Stripe(stripeAccount.token)
-    let customerId = order.paymentMethod.customerId;
-    const customerIdForHost = order.paymentMethod.data && order.paymentMethod.data.customerIdForHost;
-    if (customerIdForHost && customerIdForHost[stripeAccount.username]) {
-      customerId = customerIdForHost[stripeAccount.username];
-    }
-    return stripe.customers.cancelSubscription(
-      customerId,
-      order.Subscription.stripeSubscriptionId)
-  })
 
   // deactivate Subscription on our end
   .then(() => order.Subscription.deactivate())

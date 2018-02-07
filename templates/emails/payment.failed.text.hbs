@@ -1,0 +1,51 @@
+{{#if lastAttempt}}
+Subject: Payment failed: Subscription cancelled to {{collective.name}}
+{{else}}
+Subject: Payment failed: Update your info to continue supporting {{collective.name}}
+{{/if}}
+
+
+{{#if fromCollective.name}}
+Dear {{fromCollective.name}},
+{{else}}
+Hi!
+{{/if}}
+
+{{#if lastAttempt}}
+
+We wanted to let you know that due to your payment failure, we have
+cancelled your subscription of {{{currency order.totalAmount currency=order.currency}}}
+to {{collective.name}}.
+
+We are sad to see you go. You can resubscribe anytime at
+https://opencollective.com/{{collective.slug}}.
+
+{{else}}
+
+We are having trouble authorizing your payment of
+{{{ currency order.totalAmount currency=order.currency}}} to
+{{collective.name}}.
+
+Please check or update your payment info on your profile at
+https://opencollective.com/{{fromCollective.slug}}/edit#paymentMethods.
+
+We'll automatically retry your payment in a few days. If you believe
+your payment info is correct, please contact your bank for more
+details.
+
+{{/if}}
+
+You can always review your subscriptions at
+https://opencollective.com/subscriptions
+
+Warmly,
+
+  – Team Open Collective
+
+{{> footer.text}}
+
+OpenCollective, Inc.
+EIN: 47-3896707
+340 S LEMON AVE #3717
+Walnut CA 91789
+USA

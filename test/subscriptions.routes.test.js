@@ -1,4 +1,3 @@
-import nock from 'nock';
 import sinon from 'sinon';
 import nodemailer from 'nodemailer';
 import { expect } from 'chai';
@@ -8,12 +7,10 @@ import jwt from 'jsonwebtoken';
 import Promise from 'bluebird';
 import app from '../server/index';
 import * as utils from '../test/utils';
-import stripeMock from './mocks/stripe';
 import models from '../server/models';
 import * as payments from '../server/lib/payments';
 
 const application = utils.data('application');
-const STRIPE_URL = 'https://api.stripe.com:443';
 const ordersData = utils.data('orders');
 
 describe('subscriptions.routes.test.js', () => {
@@ -108,7 +105,6 @@ describe('subscriptions.routes.test.js', () => {
 
     const subscription = utils.data('subscription1');
     let order, nm;
-    const nocks = {};
 
     // create a fake nodemailer transport
     beforeEach(() => {
@@ -150,14 +146,6 @@ describe('subscriptions.routes.test.js', () => {
         .tap(d => order = d)
         .catch()
     });
-
-    beforeEach(() => {
-      nocks['subscriptions.delete'] = nock(STRIPE_URL)
-        .delete(`/v1/customers/${paymentMethod.customerId}/subscriptions/${subscription.stripeSubscriptionId}`)
-        .reply(200, stripeMock.subscriptions.create);
-    });
-
-    afterEach(() => nock.cleanAll());
 
     it('fails if if no authorization provided', (done) => {
       request(app)
@@ -217,7 +205,6 @@ describe('subscriptions.routes.test.js', () => {
 
           expect(err).to.not.exist;
           expect(res.body.success).to.be.true;
-          expect(nocks['subscriptions.delete'].isDone()).to.be.true;
 
           models.Subscription.findAll({})
             .then(subscriptions => {

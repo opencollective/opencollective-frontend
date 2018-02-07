@@ -1,4 +1,5 @@
 import CustomDataTypes from './DataTypes';
+import Temporal from 'sequelize-temporal';
 
 export default (Sequelize, DataTypes) => {
 
@@ -26,6 +27,12 @@ export default (Sequelize, DataTypes) => {
       defaultValue: false
     },
 
+    nextChargeDate: DataTypes.DATE,
+
+    nextPeriodStart: DataTypes.DATE,
+
+    chargeRetryCount: DataTypes.INTEGER,
+
     data: DataTypes.JSON,
 
     stripeSubscriptionId: DataTypes.STRING,
@@ -51,6 +58,7 @@ export default (Sequelize, DataTypes) => {
     return this.save();
   };
 
+  Temporal(Subscription, Sequelize);
   return Subscription;
 };
 
