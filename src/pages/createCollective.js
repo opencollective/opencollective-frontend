@@ -5,7 +5,6 @@ import CreateCollective from '../components/CreateCollective';
 import { addGetLoggedInUserFunction, addCollectiveCoverData } from '../graphql/queries';
 import NotFound from '../components/NotFoundPage';
 import Loading from '../components/Loading';
-import { intersection } from 'lodash';
 
 class CreateCollectivePage extends React.Component {
 

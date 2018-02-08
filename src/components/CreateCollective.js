@@ -74,7 +74,7 @@ class CreateCollective extends React.Component {
     if (!host) {
       return (<Loading />);
     }
-    const title = `Apply to create a new collective on ${host.name}`;
+    const title = `Apply to create a new collective hosted by ${host.name}`;
 
     return (
       <div className="CreateCollective">
@@ -127,12 +127,14 @@ class CreateCollective extends React.Component {
                 <p><FormattedMessage id="collectives.create.error.HostNotOpenToApplications" defaultMessage="This host is not open to applications" /></p>
               </div>
             }
+
             { canApply && !LoggedInUser &&
               <div>
                 <h2><FormattedMessage id="collectives.create.signin" defaultMessage="Sign in or create an Open Collective account" /></h2>
                 <SignInForm next={`/${host.slug}/apply`} />
               </div>
             }
+
             { canApply && LoggedInUser &&
               <div>
 

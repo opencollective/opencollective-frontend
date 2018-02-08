@@ -117,7 +117,7 @@ export async function refreshToken(currentToken) {
     headers: { Authorization: `Bearer ${currentToken}` }
   });
   const json = await response.json();
-  return json.token;
+  return json;
 }
 
 export function get(path, options) {
