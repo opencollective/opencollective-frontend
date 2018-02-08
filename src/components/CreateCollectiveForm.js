@@ -1,17 +1,18 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import InputField from '../components/InputField';
-import EditTiers from '../components/EditTiers';
-import EditMembers from '../components/EditMembers';
-import EditPaymentMethods from '../components/EditPaymentMethods';
-import EditConnectedAccounts from '../components/EditConnectedAccounts';
-import ExportData from '../components/ExportData';
+import InputField from './InputField';
+import EditTiers from './EditTiers';
+import EditMembers from './EditMembers';
+import EditPaymentMethods from './EditPaymentMethods';
+import EditConnectedAccounts from './EditConnectedAccounts';
+import ExportData from './ExportData';
 import { FormattedMessage, defineMessages } from 'react-intl';
 import { defaultBackgroundImage } from '../constants/collectives';
 import withIntl from '../lib/withIntl';
 import { ButtonGroup, Button } from 'react-bootstrap';
 import { Link } from '../server/pages';
 import { get } from 'lodash';
+import CollectiveCategoryPicker from './CollectiveCategoryPicker';
 
 class CreateCollectiveForm extends React.Component {
 
@@ -46,30 +47,10 @@ class CreateCollectiveForm extends React.Component {
       'twitterHandle.label': { id: 'collective.twitterHandle.label', defaultMessage: 'Twitter' },
       'website.label': { id: 'collective.website.label', defaultMessage: 'Website' },
       'location.label': { id: 'collective.location.label', defaultMessage: 'City' },
-      'category.label': { id: 'collective.category.label', defaultMessage: 'Category' },
-      'tos.label': { id: 'collective.tos.label', defaultMessage: 'Terms of Service' },
-      'association': { id: 'collective.category.association', defaultMessage: 'Association' },
-      'pta': { id: 'collective.category.pta', defaultMessage: 'Parent Teacher Association' },
-      'other': { id: 'collective.category.other', defaultMessage: 'Other' },
-      'studentclub': { id: 'collective.category.studentclub', defaultMessage: 'Student Club' },
-      'meetup': { id: 'collective.category.meetup', defaultMessage: 'Meetup' },
-      'movement': { id: 'collective.category.movement', defaultMessage: 'Movement' },
-      'neighborhood': { id: 'collective.category.neighborhood', defaultMessage: 'Neighborhood Association' },
-      'opensource': { id: 'collective.category.opensource', defaultMessage: 'Open Source Project' },
-      'politicalparty': { id: 'collective.category.politicalparty', defaultMessage: 'Political Party' },
-      'lobby': { id: 'collective.category.lobby', defaultMessage: 'Lobbying Group' },
-      'coop': { id: 'collective.category.coop', defaultMessage: 'Cooperative' }
+      'tos.label': { id: 'collective.tos.label', defaultMessage: 'Terms of Service' }
     });
 
     collective.backgroundImage = collective.backgroundImage || defaultBackgroundImage[collective.type];
-
-    const getOptions = (arr) => {
-      return arr.map(key => {
-        const obj = {};
-        obj[key] = props.intl.formatMessage(this.messages[key]);
-        return obj;
-      })
-    }
 
     this.fields = {
       info: [
@@ -116,14 +97,7 @@ class CreateCollectiveForm extends React.Component {
       ]
     }
 
-    if (get(props.host, 'settings.categories')) {
-      this.fields.info.push({
-        name: 'category',
-        type: 'select',
-        defaultValue: "association",
-        options: getOptions(get(props.host, 'settings.categories'))
-      });
-    }
+    this.categories = get(props.host, 'settings.categories');
 
     this.state = {
       modified: false,
@@ -164,6 +138,9 @@ class CreateCollectiveForm extends React.Component {
   }
 
   handleChange(fieldname, value) {
+    if (fieldname === 'category' && value === 'opensource') {
+      return window.location = '/opensource/apply';
+    }
     const collective = {};
     collective[fieldname] = value;
     this.setState( { modified: true, collective: Object.assign({}, this.state.collective, collective) });
@@ -183,6 +160,7 @@ class CreateCollectiveForm extends React.Component {
 
     const { host, collective, loading, intl } = this.props;
 
+    const showForm = Boolean(!this.categories || this.state.collective.category);
     const isNew = !(collective && collective.id);
     const defaultStartsAt = new Date;
     const type = collective.type.toLowerCase();
@@ -253,51 +231,58 @@ class CreateCollectiveForm extends React.Component {
           margin: 1rem 0 3rem 0;
         }
         `}</style>
+ 
+        { this.categories && <CollectiveCategoryPicker categories={this.categories} onChange={(value) => this.handleChange("category", value)} /> }
 
-        <div className="FormInputs">
-          { Object.keys(this.fields).map(key => this.state.section === key &&
-            <div className="inputs">
-              {this.fields[key].map((field) => (!field.when || field.when()) && <InputField
-                key={field.name}
-                value={this.state.collective[field.name]}
-                className={field.className}
-                defaultValue={field.defaultValue}
-                validate={field.validate}
-                ref={field.name}
-                name={field.name}
-                label={field.label}
-                description={field.description}
-                options={field.options}
-                placeholder={field.placeholder}
-                type={field.type}
-                help={field.help}
-                pre={field.pre}
-                context={this.state.collective}
-                onChange={(value) => this.handleChange(field.name, value)}
-                />)}
-            </div>
-          )}
-          <div className="tos">
-            <label>{intl.formatMessage(this.messages['tos.label'])}</label>
-            <div>
-              <input type="checkbox" name="tos" onChange={(value) => this.handleChange("tos", value)} />
-              <span>I agree with the <a href="/tos" target="_blank">terms of service of Open Collective</a></span>
-            </div>
-            { (get(host, 'settings.tos')) &&
-              <div>
-                <input type="checkbox" name="hostTos" onChange={(value) => this.handleChange("hostTos", value)} />
-                <span>I agree with the <a href={get(host, 'settings.tos')} target="_blank">terms of service of the host</a> (<a href={`/${host.slug}`} target="_blank">{host.name}</a>) that will collect money on behalf of our collective</span>
+        { showForm &&
+          <div className="FormInputs">
+            { Object.keys(this.fields).map(key => this.state.section === key &&
+              <div className="inputs">
+                {this.fields[key].map((field) => (!field.when || field.when()) && <InputField
+                  key={field.name}
+                  value={this.state.collective[field.name]}
+                  className={field.className}
+                  defaultValue={field.defaultValue}
+                  validate={field.validate}
+                  ref={field.name}
+                  name={field.name}
+                  label={field.label}
+                  description={field.description}
+                  options={field.options}
+                  placeholder={field.placeholder}
+                  type={field.type}
+                  help={field.help}
+                  pre={field.pre}
+                  context={this.state.collective}
+                  onChange={(value) => this.handleChange(field.name, value)}
+                  />)}
               </div>
-            }
+            )}
+
+            <div className="tos">
+              <label>{intl.formatMessage(this.messages['tos.label'])}</label>
+              <div>
+                <input type="checkbox" name="tos" onChange={(value) => this.handleChange("tos", value)} />
+                <span>I agree with the <a href="/tos" target="_blank">terms of service of Open Collective</a></span>
+              </div>
+              { (get(host, 'settings.tos')) &&
+                <div>
+                  <input type="checkbox" name="hostTos" onChange={(value) => this.handleChange("hostTos", value)} />
+                  <span>I agree with the <a href={get(host, 'settings.tos')} target="_blank">terms of service of the host</a> (<a href={`/${host.slug}`} target="_blank">{host.name}</a>) that will collect money on behalf of our collective</span>
+                </div>
+              }
+            </div>
+
+            <div className="actions">
+              <Button bsStyle="primary" type="submit" ref="submit" onClick={this.handleSubmit} disabled={loading || !this.state.modified} >
+                { loading && <FormattedMessage id="loading" defaultMessage="loading" /> }
+                { !loading && collective.type === 'COLLECTIVE' && <FormattedMessage id="host.apply" defaultMessage="Apply to create a collective" /> }
+                { !loading && collective.type === 'ORGANIZATION' && <FormattedMessage id="organization.create" defaultMessage="Create organization" /> }
+              </Button>
+            </div>
+
           </div>
-        </div>
-        <div className="actions">
-          <Button bsStyle="primary" type="submit" ref="submit" onClick={this.handleSubmit} disabled={loading || !this.state.modified} >
-            { loading && <FormattedMessage id="loading" defaultMessage="loading" /> }
-            { !loading && collective.type === 'COLLECTIVE' && <FormattedMessage id="host.apply" defaultMessage="Apply to create a collective" /> }
-            { !loading && collective.type === 'ORGANIZATION' && <FormattedMessage id="organization.create" defaultMessage="Create organization" /> }
-          </Button>
-        </div>
+        }
       </div>
     );
   }
