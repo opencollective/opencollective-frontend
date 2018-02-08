@@ -182,6 +182,7 @@ export const create = (req, res, next) => {
       name: 'backer',
       slug: 'backers',
       amount: 500,
+      presets: [500, 1000, 2500, 5000],
       interval: 'month'
     },
     {
@@ -189,6 +190,7 @@ export const create = (req, res, next) => {
       name: 'sponsor',
       slug: 'sponsors',
       amount: 10000,
+      presets: [10000, 25000, 50000],
       interval: 'month'
     }
   ];
