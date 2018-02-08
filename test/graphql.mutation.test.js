@@ -84,6 +84,7 @@ describe('Mutation Tests', () => {
           id
           name
           amount
+          presets
         }
       }
     }
@@ -131,6 +132,8 @@ describe('Mutation Tests', () => {
         const hostMembership = await models.Member.findOne({ where: { CollectiveId: createdCollective.id, role: 'HOST' }});
         const adminMembership = await models.Member.findOne({ where: { CollectiveId: createdCollective.id, role: 'ADMIN' }});
         expect(createdCollective.host.id).to.equal(host.CollectiveId);
+        expect(createdCollective.tiers).to.have.length(2);
+        expect(createdCollective.tiers[0].presets).to.have.length(4);
         expect(createdCollective.isActive).to.be.false;
         expect(hostMembership.MemberCollectiveId).to.equal(host.CollectiveId);
         expect(adminMembership.MemberCollectiveId).to.equal(user1.CollectiveId);

@@ -21,6 +21,25 @@ export function createCollective(_, args, req) {
     CreatedByUserId: req.remoteUser.id
   };
 
+  collectiveData.tiers = collectiveData.tiers || [
+    {
+      type: 'TIER',
+      name: 'backer',
+      slug: 'backers',
+      amount: 500,
+      presets: [500, 1000, 2500, 5000],
+      interval: 'month'
+    },
+    {
+      type: 'TIER',
+      name: 'sponsor',
+      slug: 'sponsors',
+      amount: 10000,
+      presets: [10000, 25000, 50000],
+      interval: 'month'
+    }
+  ];
+
   const location = args.collective.location;
   if (location) {
     collectiveData.locationName = location.name;
@@ -81,7 +100,7 @@ export function createCollective(_, args, req) {
   })
   .then(() => models.Collective.create(collectiveData))
   .then(c => collective = c)
-  .then(() => collective.editTiers(args.collective.tiers))
+  .then(() => collective.editTiers(collectiveData.tiers))
   .then(() => collective.addUserWithRole(req.remoteUser, roles.ADMIN, { CreatedByUserId: req.remoteUser.id }))
   .then(() => {
     if (collective.HostCollectiveId) {
