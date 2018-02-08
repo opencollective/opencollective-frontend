@@ -6,6 +6,7 @@ import gql from 'graphql-tag'
 import { defineMessages, FormattedMessage } from 'react-intl';
 import withIntl from '../lib/withIntl';
 import { capitalize } from '../lib/utils';
+import { get, uniqBy } from 'lodash';
 
 class AddFundsSourcePicker extends React.Component {
 
@@ -46,21 +47,21 @@ class AddFundsSourcePicker extends React.Component {
   }
 
   renderSourceEntry(member) {
-    return (<option key={member.member.id} value={member.member.id}>{member.member.name}</option>);
+    return (<option key={`${member.member.type}-${member.member.id}`} value={member.member.id}>{member.member.name}</option>);
   }
 
   render() {
     const { host, data: { loading, allMembers } } = this.props;
 
     if (loading) return (<div />);
-
+    const uniqueMembers = uniqBy(allMembers, m => get(m, 'member.id'));
     this.membersByType = {
-      user: allMembers.filter(m => m.member.type === 'USER' && m.member.id !== host.id),
-      organization: allMembers.filter(m => m.member.type === 'ORGANIZATION' && m.member.id !== host.id)
+      user: uniqueMembers.filter(m => m.member.type === 'USER' && m.member.id !== host.id),
+      organization: uniqueMembers.filter(m => m.member.type === 'ORGANIZATION' && m.member.id !== host.id)
     };
 
     return (
-      <FormControl name="template" componentClass="select" placeholder="select" onChange={this.onChange}>
+      <FormControl id="sourcePicker" name="template" componentClass="select" placeholder="select" onChange={this.onChange}>
         <option value={host.id}><FormattedMessage id="addfunds.fromCollective.host" values={{ host: host.name}} defaultMessage="Host ({host})"/></option>
         { this.membersByType['organization'].length > 0 && this.renderSeparator("organization") }
         { this.membersByType['organization'].map(this.renderSourceEntry) }

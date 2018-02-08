@@ -21,20 +21,21 @@ class SmallButton extends React.Component {
           }
           .SmallButton.primary button {
             background: #297acc;
-            border-color: #18191a;
+            border-color: rgba(24,25,26,0.12);
             color: white;
           }
           .SmallButton.pay button {
-            background: #55aa00;
-            border-color: #18191a;
+            background: rgba(85,170,0,1);
+            border-color: rgba(24,25,26,0.12);
             color: white;
           }
           .SmallButton.pay button[disabled] {            
             border-color: ${colors.darkgray};
             background: ${colors.darkgray};
           }
-          .SmallButton:hover button {
-            border-color: ${colors.darkgray};
+          .SmallButton button:hover {
+            border-color: rgba(85,170,0,1);
+            background: rgba(85,170,0,.9);
           }
           .SmallButton.approve button, .SmallButton.publish button {
             background: #3399ff;

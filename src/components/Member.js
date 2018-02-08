@@ -69,7 +69,6 @@ ${totalDonationsStr}`
         <style jsx>{`
         .Member {
           width: 100%;
-          margin: 1rem;
           max-width: 300px;
           float: left;
           position: relative;
@@ -77,7 +76,6 @@ ${totalDonationsStr}`
 
         .Member.small {
           width: 48px;
-          margin: 0.5rem 0.25rem;
         }
 
         .Member.viewMode-ORGANIZATION {

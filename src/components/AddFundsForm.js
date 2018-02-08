@@ -8,6 +8,7 @@ import { isValidEmail } from '../lib/utils';
 import withIntl from '../lib/withIntl';
 import * as api from '../lib/api';
 import { getCurrencySymbol, formatCurrency } from '../lib/utils';
+import { get } from 'lodash';
 
 class AddFundsForm extends React.Component {
 
@@ -24,8 +25,7 @@ class AddFundsForm extends React.Component {
     const { intl } = props;
 
     this.state = {
-      hostFeePercent: 0,
-      form: { totalAmount: 0 },
+      form: { totalAmount: 0, hostFeePercent: get(props, 'collective.hostFeePercent') },
       result: {}
     };
 
