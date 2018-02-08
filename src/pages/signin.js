@@ -14,16 +14,19 @@ class LoginPage extends React.Component {
 
   constructor(props) {
     super(props);
+    // Record the login error
+    this.state = { error: null };
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     if (this.props.token) {
-      api.refreshToken(this.props.token).then((newToken) => {
-        window.localStorage.setItem('accessToken', newToken);
+      const { error, token } = await api.refreshToken(this.props.token);
+      if (error) {
+        this.setState({ error });
+      } else {
+        window.localStorage.setItem('accessToken', token);
         window.location.replace(this.props.next || '/');
-      }).catch((error) => {
-        console.log(error);
-      });
+      }
     }
   }
 
@@ -32,7 +35,7 @@ class LoginPage extends React.Component {
   }
 
   render() {
-    if (this.props.token) {
+    if (this.props.token && !this.state.error) {
       return (<Loading />);
     }
     return (
@@ -55,6 +58,9 @@ class LoginPage extends React.Component {
         </style>
         <Body>
           <div className="signin">
+            {this.state.error &&
+             <h1>Authentication Failed. Please try to generate a new token.</h1>}
+
             <h2><FormattedMessage id="loginform.title" defaultMessage="Sign in or Create an Account" /></h2>
             <SignInForm next={this.props.next} />
           </div>
