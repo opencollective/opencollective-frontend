@@ -28,6 +28,7 @@ pages
   .add('createUpdate', '/:collectiveSlug/updates/new')
   .add('updates', '/:collectiveSlug/updates')
   .add('update', '/:collectiveSlug/updates/:updateSlug')
+  .add('createExpense', '/:collectiveSlug/expenses/new')
   .add('expenses', '/:collectiveSlug/expenses/:action(new)?')
   .add('host.expenses', '/:hostCollectiveSlug/collectives/expenses')
   .add('host.expenses.approve', '/:collectiveSlug/:table(expenses)/:id/:action(approve|reject)', 'action')

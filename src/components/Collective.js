@@ -17,12 +17,13 @@ import StatsBar from './StatsBar';
 import HashLink from 'react-scrollchor';
 import { FormattedMessage, defineMessages } from 'react-intl';
 import CollectivesWithData from './CollectivesWithData';
-import ExpensesWithData from './ExpensesWithData';
+import ExpensesSectionWithData from './ExpensesSectionWithData';
 import UpdatesWithData from './UpdatesWithData';
 import EventsWithData from './EventsWithData';
 import TransactionsWithData from './TransactionsWithData';
 import { Button } from 'react-bootstrap';
 import { Link } from '../server/pages';
+import SectionTitle from './SectionTitle';
 import Currency from './Currency';
 
 const defaultBackgroundImage = '/static/images/defaultBackgroundImage.png';
@@ -145,17 +146,7 @@ class Collective extends React.Component {
           section {
             clear: both;
             max-width: 1244px;
-            margin: 0 auto;
-          }
-          .columns {
-            display: flex;
-            flex-direction: row;
-            flex-wrap: wrap;
-            justify-content: space-evenly;
-          }
-          .columns .col {
-            max-width: 400px;
-            width: 100%;
+            margin: 0 auto 5rem;
           }
           .cardsList {
             display: flex;
@@ -175,9 +166,6 @@ class Collective extends React.Component {
           }
           .actions :global(button.btn) {
             margin-right: 5px;
-          }
-          #budget .columns {
-            margin-top: 2rem;
           }
           @media(min-width: 600px) {
             .sidebar {
@@ -261,7 +249,11 @@ class Collective extends React.Component {
                     </div>
                   }
                   <div id="about" className="longDescription" >
-                    <h1><FormattedMessage id="collective.about.title" defaultMessage="About" /></h1>
+                    <SectionTitle
+                      title={<FormattedMessage id="collective.about.title" defaultMessage="About" />}
+                      subtitle={intl.formatMessage(this.messages['collective.since'], { year: new Date(this.collective.createdAt).getFullYear()})}
+                      />
+
                     <Markdown source={this.collective.longDescription || this.collective.description || ''} />
                   </div>
                 </div>
@@ -269,13 +261,18 @@ class Collective extends React.Component {
 
               { get(this.collective, 'stats.collectives.memberOf') > 0 &&
                 <section id="parenting">
-                  <h1>
-                    <FormattedMessage
+                  <SectionTitle
+                    title={<FormattedMessage
                       id="collective.collective.memberOf.collective.parent.title"
+                      defaultMessage={`Member collectives`}
+                    />}
+                    subtitle={(<FormattedMessage
+                      id="collective.collective.memberOf.collective.parent.subtitle"
                       values={{ n: this.collective.stats.collectives.memberOf }}
                       defaultMessage={`{n, plural, one {this collective is} other {{n} collectives are}} part of our collective`}
-                      />
-                  </h1>
+                    />)}
+                    />
+
                   <div className="cardsList">
                     <CollectivesWithData
                       ParentCollectiveId={this.collective.id}
@@ -289,63 +286,32 @@ class Collective extends React.Component {
               }
 
               <section id="budget">
-                <h1><FormattedMessage id="collective.budget.title" defaultMessage="Budget" /></h1>
-                <div className="balance">
-                  <label><FormattedMessage id="collective.stats.balance.title" defaultMessage="Available balance:" /></label>
-                  <Currency value={this.collective.stats.balance} currency={this.collective.currency} />
-                </div>
-                <div className="columns">
-                  <div id="expenses" className="col">
-                    <h2>
-                      <FormattedMessage
-                        id="collective.expenses.title"
-                        values={{ n: this.collective.stats.expenses.all }}
-                        defaultMessage={`{n, plural, one {Latest expense} other {Latest expenses}}`}
-                        />
-                    </h2>
-                    <ExpensesWithData
-                      collective={this.collective}
-                      LoggedInUser={LoggedInUser}
-                      compact={true}
-                      limit={5}
-                      />
-                    <div className="actions">
-                      <Button className="ViewAllExpensesBtn" bsStyle="default" onClick={() => Router.pushRoute(`/${this.collective.slug}/expenses`)}><FormattedMessage id="expenses.viewAll" defaultMessage="View All Expenses" /></Button>
-                      <Button className="SubmitExpenseBtn" bsStyle="default" onClick={() => Router.pushRoute(`/${this.collective.slug}/expenses/new`)}><FormattedMessage id="expenses.submit" defaultMessage="Submit an Expense" /></Button>
-                    </div>
-                  </div>
+                <SectionTitle section="budget" />
 
-                  <div id="transactions" className="col">
-                    <h2>
-                      <FormattedMessage
-                        id="collective.transactions.title"
-                        values={{ n: this.collective.stats.transactions }}
-                        defaultMessage={`{n, plural, one {Latest transaction} other {Latest transactions}}`}
-                        />
-                    </h2>
-                    <TransactionsWithData
-                      collective={this.collective}
-                      LoggedInUser={LoggedInUser}
-                      limit={5}
-                      showCSVlink={false}
-                      />
-                      <div className="actions">
-                      <Button className="ViewAllTransactionsBtn" bsStyle="default" onClick={() => Router.pushRoute(`/${this.collective.slug}/transactions`)}><FormattedMessage id="transactions.viewAll" defaultMessage="View All Transactions" /></Button>
-                    </div>
-                  </div>
-                </div>
+                <ExpensesSectionWithData
+                  collective={this.collective}
+                  LoggedInUser={LoggedInUser}
+                  limit={10}
+                  />
+
               </section>
 
               <div id="contributors" />
-              { get(this.collective, 'stats.backers.organizations') > 0 &&
-                <section id="organizations" className="tier">
-                  <h1>
-                    <FormattedMessage
-                      id="collective.section.backers.organizations.title"
-                      values={{ n: this.collective.stats.backers.organizations, collective: this.collective.name }}
-                      defaultMessage={`{n} {n, plural, one {organization is} other {organizations are}} supporting {collective}`}
-                      />
-                  </h1>
+
+              <section id="organizations" className="tier">
+              { get(this.collective, 'stats.backers.all') === 0 &&
+                <SectionTitle
+                  section="contributors"
+                  subtitle={<FormattedMessage id="collective.section.contributors.empty" defaultMessage="You don't have any contributors yet." />}
+                  />
+              }
+              { get(this.collective, 'stats.backers.all') > 0 &&
+                <div>
+                  <SectionTitle
+                    section="contributors"
+                    values={ get(this.collective, 'stats.backers') }
+                    />
+
                   <MembersWithData
                     collective={this.collective}
                     type="ORGANIZATION"
@@ -353,18 +319,7 @@ class Collective extends React.Component {
                     role='BACKER'
                     limit={100}
                     />
-                </section>
-              }
-
-              { get(this.collective, 'stats.backers.users') > 0 &&
-                <section id="backers" className="tier">
-                  <h1>
-                    <FormattedMessage
-                      id="collective.section.backers.users.title"
-                      values={{ n: this.collective.stats.backers.users, collective: this.collective.name }}
-                      defaultMessage={`{n} {n, plural, one {person is} other {people are}} supporting {collective}`}
-                      />
-                  </h1>
+              
                   <MembersWithData
                     collective={this.collective}
                     LoggedInUser={LoggedInUser}
@@ -373,9 +328,9 @@ class Collective extends React.Component {
                     limit={100}
                     orderBy="totalDonations"
                     />
-                </section>
+                </div>
               }
-
+              </section>
             </div>
           </div>
         </Body>

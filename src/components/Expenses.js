@@ -14,6 +14,7 @@ class Expenses extends React.Component {
     fetchMore: PropTypes.func,
     editable: PropTypes.bool,
     includeHostedCollectives: PropTypes.bool,
+    filters: PropTypes.bool, // show or hide filters (all/pending/paid)
     LoggedInUser: PropTypes.object
   }
 
@@ -49,7 +50,8 @@ class Expenses extends React.Component {
       expenses,
       LoggedInUser,
       editable,
-      includeHostedCollectives
+      includeHostedCollectives,
+      filters
     } = this.props;
 
     if (!expenses) {
@@ -107,19 +109,21 @@ class Expenses extends React.Component {
           }
         `}</style>
 
-        <div className="filter">
-          <ButtonGroup className="filterBtnGroup">
-            <Button className="filterBtn all" bsSize="small" bsStyle={!this.state.status ? 'primary' : 'default'} onClick={() => this.refetch()}>
-              <FormattedMessage id='expenses.all' defaultMessage='all' />
-            </Button>
-            <Button className="filterBtn pending" bsSize="small" bsStyle={this.state.status === 'PENDING' ? 'primary' : 'default'} onClick={() => this.refetch('PENDING')}>
-              <FormattedMessage id='expenses.pending' defaultMessage='pending' />
-            </Button>
-            <Button className="filterBtn paid" bsSize="small" bsStyle={this.state.status === 'PAID' ? 'primary' : 'default'} onClick={() => this.refetch('PAID')}>
-              <FormattedMessage id='expenses.paid' defaultMessage='paid' />
-            </Button>
-          </ButtonGroup>
-        </div>
+        { filters &&
+          <div className="filter">
+            <ButtonGroup className="filterBtnGroup">
+              <Button className="filterBtn all" bsSize="small" bsStyle={!this.state.status ? 'primary' : 'default'} onClick={() => this.refetch()}>
+                <FormattedMessage id='expenses.all' defaultMessage='all' />
+              </Button>
+              <Button className="filterBtn pending" bsSize="small" bsStyle={this.state.status === 'PENDING' ? 'primary' : 'default'} onClick={() => this.refetch('PENDING')}>
+                <FormattedMessage id='expenses.pending' defaultMessage='pending' />
+              </Button>
+              <Button className="filterBtn paid" bsSize="small" bsStyle={this.state.status === 'PAID' ? 'primary' : 'default'} onClick={() => this.refetch('PAID')}>
+                <FormattedMessage id='expenses.paid' defaultMessage='paid' />
+              </Button>
+            </ButtonGroup>
+          </div>
+        }
 
         <div className="itemsList">
           { this.state.loading &&

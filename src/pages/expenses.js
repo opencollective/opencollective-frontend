@@ -9,14 +9,18 @@ import ErrorPage from '../components/ErrorPage';
 import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
 import ExpensesWithData from '../components/ExpensesWithData';
+import ExpensesStatsWithData from '../components/ExpensesStatsWithData';
 import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl'
+import Button from '../components/Button';
+import MenuBar from '../components/MenuBar';
+import Link from '../components/Link';
 
 class ExpensesPage extends React.Component {
 
   static getInitialProps (props) {
-    const { query: { collectiveSlug, action }, data } = props;
-    return { slug: collectiveSlug, data, action }
+    const { query: { collectiveSlug }, data } = props;
+    return { slug: collectiveSlug, data }
   }
 
   constructor(props) {
@@ -27,7 +31,7 @@ class ExpensesPage extends React.Component {
   async componentDidMount() {
     const { getLoggedInUser } = this.props;
     const LoggedInUser = getLoggedInUser && await getLoggedInUser(this.props.collectiveSlug);
-    this.setState({LoggedInUser});
+    this.setState({ LoggedInUser });
   }
 
   render() {
@@ -44,7 +48,18 @@ class ExpensesPage extends React.Component {
 
     return (
       <div className="ExpensesPage">
-
+        <style jsx>{`
+          .columns {
+            display: flex;
+          }
+          .rightColumn {
+            width: 300px;
+            margin-left: 5rem;
+          }
+          .largeColumn {
+            width: 900px;
+          }
+        `}</style>
         <Header
           title={collective.name}
           description={collective.description}
@@ -64,14 +79,24 @@ class ExpensesPage extends React.Component {
             style={get(collective, 'settings.style.hero.cover')}
             />
 
-          <div className="content" >
+          <MenuBar
+            collective={collective}
+            LoggedInUser={LoggedInUser}
+            />
 
-            <ExpensesWithData
-              collective={collective}
-              includeHostedCollectives={collective.isHost}
-              defaultAction={action}
-              LoggedInUser={this.state.LoggedInUser}
-              />
+          <div className="content columns" >
+
+            <div className="largeColumn">
+              <ExpensesWithData
+                collective={collective}
+                defaultAction={action}
+                LoggedInUser={this.state.LoggedInUser}
+                />
+            </div>
+
+            <div className="rightColumn">
+              <ExpensesStatsWithData slug={collective.slug} />
+            </div>
 
           </div>
 

@@ -12,6 +12,7 @@ import ExpensesWithData from '../components/ExpensesWithData';
 import { get, pick } from 'lodash';
 import { FormattedMessage } from 'react-intl'
 import CollectivePicker from '../components/CollectivePickerWithData';
+import ExpensesStatsWithData from '../components/ExpensesStatsWithData';
 import { graphql } from 'react-apollo'
 import gql from 'graphql-tag'
 
@@ -54,6 +55,14 @@ class HostExpensesPage extends React.Component {
 
     return (
       <div className="HostExpensesPage">
+        <style jsx>{`
+          .columns {
+            display: flex;
+          }
+          .columns :global(> div) {
+            margin-right: 5rem;
+          }
+        `}</style>
 
         <Header
           title={collective.name}
@@ -79,7 +88,11 @@ class HostExpensesPage extends React.Component {
             onChange={(selectedCollective => this.pickCollective(selectedCollective))}
             />
 
-          <div className="content" >
+          <div className="content columns" >
+
+            { this.state.selectedCollective &&
+              <ExpensesStatsWithData slug={selectedCollective.slug} />
+            }
 
             <ExpensesWithData
               collective={selectedCollective}

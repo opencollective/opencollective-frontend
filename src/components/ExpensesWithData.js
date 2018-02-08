@@ -4,8 +4,7 @@ import Error from '../components/Error';
 import withIntl from '../lib/withIntl';
 import Expenses from '../components/Expenses';
 import Currency from '../components/Currency';
-import CreateExpenseForm from '../components/CreateExpenseForm';
-import { graphql, compose } from 'react-apollo'
+import { graphql } from 'react-apollo'
 import gql from 'graphql-tag'
 import { FormattedMessage } from 'react-intl'
 import { pick, get } from 'lodash';
@@ -23,31 +22,6 @@ class ExpensesWithData extends React.Component {
 
   constructor(props) {
     super(props);
-    this.createExpense = this.createExpense.bind(this);
-    this.state = {
-      showNewExpenseForm: props.defaultAction === 'new' ? true : false
-    }
-  }
-
-  async createExpense(expense) {
-    const { LoggedInUser, collective } = this.props;
-    try {
-      expense.collective = { id: collective.id };
-      expense.currency = collective.currency;
-      expense.user = pick(expense, ['email', 'paypalEmail']);
-      delete expense.email;
-      delete expense.paypalEmail;
-
-      if (LoggedInUser) {
-        expense.user.id = LoggedInUser.id;
-      }
-      console.log(">>> createExpense", expense);
-      const res = await this.props.createExpense(expense);
-      console.log(">>> createExpense res", res);
-      this.setState({ showNewExpenseForm: false, expenseCreated: res.data.createExpense })
-    } catch (e) {
-      console.error(e);
-    }
   }
 
   render() {
@@ -65,80 +39,9 @@ class ExpensesWithData extends React.Component {
     }
 
     const expenses = data.allExpenses;
-    const availableBalance = get(collective, 'stats.balance');
 
     return (
-      <div className="ExpensesContainer">
-        <style jsx>{`
-          h1 {
-            margin-bottom: 1rem;
-          }
-          .adminActions {
-            text-align: center;
-            text-transform: uppercase;
-            font-size: 1.3rem;
-            font-weight: 600;
-            letter-spacing: 0.05rem;
-            margin-bottom: 3rem;
-          }
-          .adminActions ul {
-            overflow: hidden;
-            text-align: center;
-            margin: 0 auto;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            flex-direction: row;
-            list-style: none;
-          }
-          .adminActions ul li {
-            margin: 0 2rem;
-          }
-          .availableBalance {
-            text-align: center;
-            margin: 1rem;
-          }
-          .availableBalance span {
-            margin-right: 0.5rem;
-          }
-        `}</style>
-
-        { !includeHostedCollectives && this.state.showNewExpenseForm &&
-          <CreateExpenseForm
-            collective={collective}
-            LoggedInUser={LoggedInUser}
-            onSubmit={this.createExpense}
-            />
-        }
-
-        { this.state.expenseCreated &&
-          <div className="expenseCreated">
-            <FormattedMessage id="expense.created" defaultMessage="Your expense has been submitted with success. It is now pending approval from one of the core contributors of the collective. You will be notified by email once it has been approved. Then, the host ({host}) will proceed to reimburse your expense." values={{ host: collective.host.name }} />
-          </div>
-        }
-
-        { !compact &&
-          <div>
-            <h1>
-              <FormattedMessage id="collective.latestExpenses.title" defaultMessage="{n, plural, one {Latest Expense} other {Latest Expenses}}" values={{n: 2}} />
-            </h1>
-            { !includeHostedCollectives && Boolean(availableBalance) &&
-              <div className="availableBalance">
-                <FormattedMessage id="collective.stats.balance.title" defaultMessage="Available balance:" />
-                <Currency value={availableBalance} currency={collective.currency} precision={2} />
-              </div>
-            }
-            <div className="adminActions">
-              <ul>
-              { !includeHostedCollectives && !this.state.showNewExpenseForm &&
-                <li><a className="submitNewExpense" onClick={() => this.setState({ showNewExpenseForm: true })}>
-                  <FormattedMessage id="expense.new.button" defaultMessage="Submit a new expense" />
-                </a></li>
-              }
-              </ul>
-            </div>
-          </div>
-        }
+      <div className="ExpensesWithData">
 
         <Expenses
           collective={collective}
@@ -240,74 +143,4 @@ export const addExpensesData = graphql(getExpensesQuery, {
   })  
 });
 
-const createExpenseQuery = gql`
-mutation createExpense($expense: ExpenseInputType!) {
-  createExpense(expense: $expense) {
-    id
-    description
-    status
-    createdAt
-    updatedAt
-    incurredAt
-    category
-    amount
-    currency
-    payoutMethod
-    privateMessage
-    attachment
-    collective {
-      id
-      slug
-      currency
-      name
-      host {
-        id
-        slug
-      }
-      stats {
-        id
-        balance
-      }
-    }
-    fromCollective {
-      id
-      type
-      name
-      slug
-      image
-    }
-    user {
-      id
-      email
-      paypalEmail
-    }
-  }
-}
-`;
-
-const addMutation = graphql(createExpenseQuery, {
-  props: ( { ownProps, mutate }) => ({
-    createExpense: async (expense) => {
-      return await mutate({
-        variables: { expense },
-        update: (proxy, { data: { createExpense} }) => {
-          const data = proxy.readQuery({
-            query: getExpensesQuery,
-            variables: getExpensesVariables(ownProps)
-          });
-          createExpense.isNew = true;
-          data.allExpenses.unshift(createExpense);
-          proxy.writeQuery({
-            query: getExpensesQuery,
-            variables: getExpensesVariables(ownProps),
-            data
-          });
-        },
-      })
-    }
-  })
-});
-
-const addData = compose(addExpensesData, addMutation);
-
-export default addData(withIntl(ExpensesWithData));
+export default addExpensesData(withIntl(ExpensesWithData));

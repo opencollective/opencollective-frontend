@@ -7,7 +7,7 @@ import Sticky from 'react-stickynode';
 import { FormattedMessage, defineMessages } from 'react-intl';
 import Link from './Link';
 import Button from './Button';
-import { throttle } from 'lodash';
+import { get, throttle } from 'lodash';
 
 class MenuBar extends React.Component {
 
@@ -52,6 +52,7 @@ class MenuBar extends React.Component {
   }
 
   componentDidMount() {
+    const { collective } = this.props;
     window.onscroll = throttle(this.onscroll, 300);
     const menuItems = [];
     this.menuItems.push({ anchor: 'events', position: 0 });
@@ -61,11 +62,28 @@ class MenuBar extends React.Component {
       const el = document.querySelector(`#${menuItem.anchor}`);
       if (!el) return;
       this.menuItems[index].position = el.offsetTop;
+      this.menuItems[index].link = `#${menuItem.anchor}`;
       menuItems.push(this.menuItems[index]);
     })
-    this.menuItems = menuItems.sort((a, b) => {
-      return a.position > b.position;
-    })
+
+    // If we don't find the sections on the page, we link to their respective page
+    if (menuItems.length === 0) {
+      this.menuItems = [
+        { anchor: 'about', link: `/${collective.slug}#about` },
+        { anchor: 'budget', link: `/${collective.slug}#budget` },
+        { anchor: 'contributors', link: `/${collective.slug}#contributors` }          
+      ];
+      if (get(collective, 'stats.updates') > 0) {
+        menuItems.unshift({
+          anchor: 'updates',
+          link: `/${collective.slug}/updates`
+        });
+      }
+    } else {
+      this.menuItems = menuItems.sort((a, b) => {
+        return a.position > b.position;
+      });
+    }
   }
 
   // Render Contribute and Submit Expense buttons
@@ -156,9 +174,9 @@ class MenuBar extends React.Component {
         `}</style>
         {this.menuItems.map((item, index) =>
           <div className={`item ${item.anchor} ${this.state.selectedAnchor === item.anchor && 'selected'}`} key={`item-${index}`}>
-            <HashLink to={item.anchor} animate={{offset}}>
+            <Link route={item.link} animate={{offset}}><a>
               {item.anchor}
-            </HashLink>
+            </a></Link>
           </div>
         )}
         { LoggedInUser && LoggedInUser.canEditCollective(collective) &&
