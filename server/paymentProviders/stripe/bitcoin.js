@@ -98,6 +98,12 @@ export default {
     const sourceId = event.data.object.id;
     const isProduction = process.env.NODE_ENV === 'production';
 
+    // We only want to hear about type `bitcoin`; sometimes we get other types like `card`
+
+    if (event.data.object.type !== 'bitcoin') {
+      return Promise.resolve();
+    }
+
     let order, hostStripeAccount;
     // create activity to record webhook
     return models.Activity.create({
