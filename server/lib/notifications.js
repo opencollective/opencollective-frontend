@@ -2,6 +2,7 @@ import axios from 'axios';
 import config from 'config';
 import Promise from 'bluebird';
 
+import { get } from 'lodash';
 import activitiesLib from '../lib/activities';
 import slackLib from './slack';
 import twitter from './twitter';
@@ -132,6 +133,9 @@ async function notifyByEmail(activity) {
       break;
 
     case activityType.COLLECTIVE_EXPENSE_APPROVED:
+      if (get(activity, 'data.expense.payoutMethod') === 'paypal') {
+        activity.data.expense.payoutMethod = `PayPal (${activity.data.user.paypalEmail})`;
+      }
       notifyUserId(activity.data.expense.UserId, activity);
       notifyAdminsOfCollective(activity.data.host.id, activity, { template: 'collective.expense.approved.for.host' })
       break;
