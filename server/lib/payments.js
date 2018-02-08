@@ -4,7 +4,15 @@ import { includes, pick, get } from 'lodash';
 import models from '../models';
 import emailLib from './email';
 import { types } from '../constants/collectives';
-import * as paymentProviders from '../paymentProviders';
+import paymentProviders from '../paymentProviders';
+import * as libsubscription from './subscriptions';
+
+export async function processOrder(order, options) {
+  const provider = order.paymentMethod ? order.paymentMethod.service : 'manual';
+  const methodType = order.paymentMethod.type || 'default';
+  const method = paymentProviders[provider].types[methodType]; // eslint-disable-line import/namespace
+  return await method.processOrder(order, options);
+}
 
 /**
  * Execute an order as user using paymentMethod
@@ -39,16 +47,21 @@ export const executeOrder = (user, order, options) => {
   return order.populate()
     .then(() => {
       if (payment.interval) {
-        return models.Subscription.create(payment)
-          .then(subscription => {
-            order.subscription = subscription;
-            return order.update({ SubscriptionId: subscription.id });
-          })
+        return models.Subscription.create(payment).then(subscription => {
+          // The order instance doesn't have the Subscription field
+          // here because it was just created and no models were
+          // included so we're doing that manually here. Not the
+          // cutest but works.
+          order.Subscription = subscription;
+          libsubscription.updateNextChargeDate('new', order); // No DB access
+          return subscription.save();
+        }).then((subscription) => {
+          return order.update({ SubscriptionId: subscription.id });
+        })
       }
     })
     .then(() => {
-      const paymentProvider = (order.paymentMethod) ? order.paymentMethod.service : 'manual';
-      return paymentProviders[paymentProvider].types[order.paymentMethod.type || 'default'].processOrder(order, options)  // eslint-disable-line import/namespace
+      return processOrder(order, options)
         .tap(async () => {
           if (!order.matchingFund) return;
           const matchingFundCollective = await models.Collective.findById(order.matchingFund.CollectiveId);
@@ -87,7 +100,13 @@ export const executeOrder = (user, order, options) => {
         order.transaction = transaction;
         sendOrderConfirmedEmail(order); // async
       }
-      return null;
+      return transaction;
+    })
+    .tap(async (transaction) => {
+      // Credit card charges are synchronous. If the transaction is
+      // created here it means that the payment went through so it's
+      // safe to enable subscriptions after this.
+      if (payment.interval && transaction) await order.Subscription.activate();
     });
 }
 

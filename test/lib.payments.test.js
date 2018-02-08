@@ -41,8 +41,6 @@ describe('lib.payments.test.js', () => {
     sandbox.stub(stripe, "createToken", () => Promise.resolve({ id: "tok_1AzPXGD8MNtzsDcgwaltZuvp"}));
     sandbox.stub(stripe, "createCharge", () => Promise.resolve({ id: "ch_1AzPXHD8MNtzsDcgXpUhv4pm"}));
     sandbox.stub(stripe, "retrieveBalanceTransaction", () => Promise.resolve(stripeMocks.balance));
-    sandbox.stub(stripe, "getOrCreatePlan", () => Promise.resolve(stripeMocks.plans.create));
-    sandbox.stub(stripe, "createSubscription", () => Promise.resolve(stripeMocks.subscriptions.create));
     emailSendSpy = sandbox.spy(emailLib, 'send');
   });
 

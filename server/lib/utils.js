@@ -511,3 +511,27 @@ export function hashCode(str) {
   }
   return hash;
 }
+
+// This generates promises of n-length at a time
+// Useful so we don't go over api quota limit on Stripe
+export const promiseSeq = (arr, predicate, consecutive) => {
+  const chunkArray = (startArray, chunkSize) => {
+    let j = -1;
+    return startArray.reduce((arr, item, ix) => {
+      j += (ix % chunkSize) === 0 ? 1 : 0;
+      arr[j] = [...(arr[j] || []), item];
+      return arr;
+    }, []);
+  };
+
+  return chunkArray(arr, consecutive).reduce((prom, items, ix) => {
+    // wait for the previous Promise.all() to resolve
+    return prom.then(() => {
+      //console.log("processing batch", ix);
+      return Promise.all(
+        // then we build up the next set of simultaneous promises
+        items.map(async (item) => await predicate(item, ix))
+      );
+    });
+  }, Promise.resolve([]));
+};

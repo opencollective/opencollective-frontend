@@ -3,7 +3,6 @@ import { describe, it } from 'mocha';
 import models from '../server/models';
 import * as utils from './utils';
 import Stripe from 'stripe';
-import config from 'config';
 import { cloneDeep } from 'lodash';
 import nock from 'nock';
 import initNock from './graphql.createOrder.nock';
@@ -314,21 +313,6 @@ describe('createOrder', () => {
       expect(transaction.FromCollectiveId).to.equal(xdamman.CollectiveId);
       expect(transaction.CollectiveId).to.equal(collective.id);
       expect(transaction.currency).to.equal(collective.currency);
-
-      // make sure the subscription has been recorded in the connected Stripe Account of the host
-      const hostMember = await models.Member.findOne({ where: { CollectiveId: collective.id, role: 'HOST' } });
-      const hostStripeAccount = await models.ConnectedAccount.findOne({
-        where: { service: 'stripe', CollectiveId: hostMember.MemberCollectiveId }
-      });
-
-      const paymentMethod = await models.PaymentMethod.findById(orderCreated.paymentMethod.id);
-      const stripeSubscription = await Stripe(config.stripe.secret).subscriptions.retrieve(subscription.stripeSubscriptionId, { stripe_account: hostStripeAccount.username });
-
-      expect(stripeSubscription.application_fee_percent).to.equal(5);
-      expect(stripeSubscription.plan.id).to.equal('EUR-MONTH-1000');
-      expect(stripeSubscription.plan.interval).to.equal('month');
-
-      expect(paymentMethod.data.customerIdForHost[hostStripeAccount.username]).to.equal(stripeSubscription.customer);
     });
 
     it('creates an order as a new user for a new organization', async () => {

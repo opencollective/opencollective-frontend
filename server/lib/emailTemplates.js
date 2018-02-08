@@ -37,6 +37,8 @@ const templateNames = [
   'onboarding.day30.active',
   'onboarding.day30.inactive',
   'organization.newmember',
+  'payment.failed',
+  'payment.failed.text',
   'processing',
   'subscription.canceled',
   'ticket.confirmed',
