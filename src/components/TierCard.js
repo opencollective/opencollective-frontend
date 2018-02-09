@@ -88,7 +88,7 @@ class TierCard extends React.Component {
     }
 
     return (
-      <div className={`${this.props.className} TierCard`} id={this.anchor}>
+      <div className={`TierCard ${this.props.className} ${this.anchor}`}>
         <style jsx global>{`
           html {
             --charcoal-grey-two: #373a3d;
