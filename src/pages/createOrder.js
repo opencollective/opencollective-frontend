@@ -176,7 +176,7 @@ class CreateOrderPage extends React.Component {
           <CollectiveCover
             collective={collective}
             href={href}
-            title={intl.formatMessage(this.messages[`${tier.type.toLowerCase()}.title`])}
+            title={intl.formatMessage(this.messages[`${tier.type.toLowerCase()}.title`], {name: tier.name.replace(/[s]$/,'')})}
             className="small"
             />
 
