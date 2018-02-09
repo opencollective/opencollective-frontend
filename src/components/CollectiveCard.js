@@ -243,10 +243,12 @@ class CollectiveCard extends React.Component {
             { membership &&
               <div className="membership">
                 <div className='role'>{tierName}</div>
-                <div className='since'>
-                  <FormattedMessage id='membership.since' defaultMessage={`since`} />&nbsp;
-                  <FormattedDate value={membership.createdAt} month='long' year='numeric' />
-                </div>
+                { membership.createdAt &&
+                  <div className='since'>
+                    <FormattedMessage id='membership.since' defaultMessage={`since`} />&nbsp;
+                    <FormattedDate value={membership.createdAt} month='long' year='numeric' />
+                  </div>
+                }
               </div>
             }
             { role === 'BACKER' && get(membership, 'stats.totalDonations') > 0 &&
