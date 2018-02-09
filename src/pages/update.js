@@ -64,14 +64,8 @@ class UpdatePage extends React.Component {
 
           <CollectiveCover
             collective={collective}
-            style={get(collective, 'settings.style.hero.cover') || get(collective.parentCollective, 'settings.style.hero.cover')}
             cta={{ href: `#contribute`, label: intl.formatMessage(this.messages['collective.contribute']) }}
             href={`/${collective.slug}`}
-            />
-
-          <MenuBar
-            collective={collective}
-            LoggedInUser={LoggedInUser}
             />
 
           <div className="content" >
