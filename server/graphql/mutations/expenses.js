@@ -91,7 +91,7 @@ export async function updateExpenseStatus(remoteUser, expenseId, status) {
       break;
   }
 
-  const res = await expense.update({ status });
+  const res = await expense.update({ status, lastEditedById: remoteUser.id });
   if (status === statuses.APPROVED) {
     _createActivity(expense, activities.COLLECTIVE_EXPENSE_APPROVED);
   }
