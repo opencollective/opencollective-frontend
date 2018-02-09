@@ -88,7 +88,6 @@ class EditUpdateForm extends React.Component {
         <style jsx>{`
           .EditUpdateForm {
             font-size: 1.2rem;
-            overflow: hidden;
             margin: 0 1rem 5rem 1rem;
           }
           .col {

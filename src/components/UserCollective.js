@@ -102,7 +102,7 @@ class UserCollective extends React.Component {
       }
 
       return (
-        <section id={role.toLowerCase()} className={collectiveType}>
+        <section id={role.toLowerCase()} className={collectiveType} key={`${role}-${memberOfCollectiveType}`}>
           <div className="content">
             <SectionTitle
               title={title}
@@ -120,7 +120,7 @@ class UserCollective extends React.Component {
     }
 
     return (
-      <div>
+      <div key={role}>
         { renderRoleForType('ORGANIZATION') }
         { renderRoleForType('COLLECTIVE') }
         { renderRoleForType('EVENT') }

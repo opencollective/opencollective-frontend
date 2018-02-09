@@ -65,11 +65,6 @@ class UpdatesPage extends React.Component {
             cta={{ href: `/${collective.slug}#contribute`, label: 'contribute' }}
             />
 
-          <MenuBar
-            collective={collective}
-            LoggedInUser={LoggedInUser}
-            />
-
           <div className="content" >
 
             <UpdatesWithData

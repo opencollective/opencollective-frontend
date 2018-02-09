@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import withIntl from '../lib/withIntl';
 import { defineMessages } from 'react-intl';
+import Link from './Link';
 
 class SectionTitle extends React.Component {
 
@@ -9,7 +10,8 @@ class SectionTitle extends React.Component {
     section: PropTypes.string,
     title: PropTypes.node,
     subtitle: PropTypes.node,
-    values: PropTypes.object
+    values: PropTypes.object,
+    action: PropTypes.object // { label, href }
   }
 
   constructor(props) {
@@ -29,20 +31,27 @@ class SectionTitle extends React.Component {
   }
 
   render() {
-    const { section, intl, values } = this.props;
+    const { section, intl, values, action } = this.props;
 
     const title = this.props.title || (this.messages[`${section}.title`] ? intl.formatMessage(this.messages[`${section}.title`]) : section);
     const subtitle = this.props.subtitle || (this.messages[`${section}.subtitle`] ? intl.formatMessage(this.messages[`${section}.subtitle`], values) : '');
 
     return (
-      <div className="title">
+      <div className="SectionTitle">
         <style jsx>{`
-          .title {
+          .SectionTitle {
             margin-top: 4rem;
             overflow: hidden;
             border-left: 4px solid #3399FF;
             padding-left: 2.8rem;
             margin-bottom: 5rem;
+          }
+          .title {
+            display: flex;
+            align-items: baseline;
+          }
+          .SectionTitle .title :global(.action) {
+            font-size: 1.4rem;
           }
           h1 {
             color: #18191A;
@@ -54,6 +63,7 @@ class SectionTitle extends React.Component {
             margin-bottom: 0.8rem;
             text-align: left;
             text-align: left;
+            margin-right: 0.5rem;
           }
           .subtitle {
             color: #666F80;
@@ -68,7 +78,12 @@ class SectionTitle extends React.Component {
             }
           }
         `}</style>
-        <h1>{title}</h1>
+        <div className="title">
+          <h1>{title}</h1>
+          { action &&
+            <Link route={action.href} className="action">{action.label}</Link>
+          }
+        </div>
         <div className="subtitle">
           {subtitle}
         </div>

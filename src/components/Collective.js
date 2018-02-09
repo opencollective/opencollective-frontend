@@ -15,7 +15,7 @@ import { Router } from '../server/pages';
 import { FormattedMessage, defineMessages } from 'react-intl';
 import CollectivesWithData from './CollectivesWithData';
 import ExpensesSection from './ExpensesSection';
-import UpdatesWithData from './UpdatesWithData';
+import UpdatesSection from './UpdatesSection';
 import EventsWithData from './EventsWithData';
 import TransactionsWithData from './TransactionsWithData';
 import { Button } from 'react-bootstrap';
@@ -143,6 +143,9 @@ class Collective extends React.Component {
             max-width: 1244px;
             margin: 0 auto 5rem;
           }
+          #events .eventsList {
+            padding-left: 3rem;
+          }
           .cardsList {
             display: flex;
             flex-wrap: wrap;
@@ -217,21 +220,20 @@ class Collective extends React.Component {
                 </div>
 
                 <div className="content" >
-                  { get(this.collective, 'stats.updates') > 0 || canEditCollective &&
-                    <section id="updates">
-                      <SectionTitle section="updates" />
-                      <UpdatesWithData
-                        collective={this.collective}
-                        compact={true}
-                        limit={1}
-                        LoggedInUser={LoggedInUser}
-                        />
-                    </section>
+
+                  { (get(this.collective, 'stats.updates') > 0 || canEditCollective) &&
+                    <UpdatesSection
+                      LoggedInUser={LoggedInUser}
+                      collective={this.collective}
+                      />
                   }
+
                   { get(this.collective, 'stats.events') > 0 || canEditCollective &&
                     <section id="events">
                       <SectionTitle section="events" />
-                      <EventsWithData collectiveSlug={this.collective.slug} />
+                      <div className="eventsList">
+                        <EventsWithData collectiveSlug={this.collective.slug} />
+                      </div>
                     </section>
                   }
                   <section id="about" className="longDescription" >
@@ -246,7 +248,7 @@ class Collective extends React.Component {
               </div>
 
               { get(this.collective, 'stats.collectives.memberOf') > 0 &&
-                <section id="parenting">
+                <section id="members" className="clear">
                   <div className="content" >
                     <SectionTitle
                       title={<FormattedMessage

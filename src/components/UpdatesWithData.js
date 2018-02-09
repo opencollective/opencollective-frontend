@@ -26,7 +26,6 @@ class UpdatesWithData extends React.Component {
 
   constructor(props) {
     super(props);
-    this.renderAdminActions = this.renderAdminActions.bind(this);
     this.state = {
       showNewUpdateForm: props.defaultAction === 'new' ? true : false
     }
@@ -39,37 +38,6 @@ class UpdatesWithData extends React.Component {
       // We refetch the data to get the updates that are not published yet
       data.refetch({ options: { fetchPolicy: 'network-only' }});
     }
-  }
-
-  renderAdminActions(compact) {
-    const { collective } = this.props;
-    const className = compact ? "compact" : "";
-    return (
-      <div className={`adminActions ${className}`}>
-        <style jsx>{`
-          .adminActions ul {
-            overflow: hidden;
-            margin: 0 auto;
-            padding: 0;
-            flex-direction: row;
-            list-style: none;
-          }
-          .adminActions ul li {
-            text-align: center;
-          }
-          .adminActions .compact ul li {
-            text-align: center;
-          }
-        `}</style>
-        <ul>
-          <li>
-            <Link route={`/${collective.slug}/updates/new`}><a className="btn btn-default">
-              <FormattedMessage id="update.new.button" defaultMessage="Submit a new update" />
-            </a></Link>
-          </li>
-        </ul>
-      </div>
-    )
   }
 
   render() {
@@ -87,7 +55,14 @@ class UpdatesWithData extends React.Component {
     }
 
     const updates = data.allUpdates;
-    const showAdminActions = LoggedInUser && LoggedInUser.canEditCollective(collective) && !includeHostedCollectives;
+
+    let action;
+    if (LoggedInUser && LoggedInUser.canEditCollective(collective)) {
+      action = {
+        href: `/${collective.slug}/updates/new`,
+        label: <FormattedMessage id="sections.update.new" defaultMessage="Create an Update" />
+      }
+    }
 
     return (
       <div className="UpdatesContainer">
@@ -103,11 +78,9 @@ class UpdatesWithData extends React.Component {
 
         { !compact &&
           <div className="FullPage">
-            <SectionTitle section="updates" />
+            <SectionTitle section="updates" action={action} />
           </div>
         }
-
-        { showAdminActions && this.renderAdminActions(compact) }
 
         <Updates
           collective={collective}
