@@ -8,9 +8,11 @@ import NotFound from '../components/NotFoundPage';
 import ErrorPage from '../components/ErrorPage';
 import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
+import MenuBar from '../components/MenuBar';
 import UpdateWithData from '../components/UpdateWithData';
 import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl'
+import { defineMessages } from 'react-intl';
 
 class UpdatePage extends React.Component {
 
@@ -22,6 +24,10 @@ class UpdatePage extends React.Component {
   constructor(props) {
     super(props);
     this.state = {};
+
+    this.messages = defineMessages({
+      'collective.contribute': { id: 'collective.contribute', defaultMessage: 'contribute' }
+    });
   }
 
   async componentDidMount() {
@@ -31,7 +37,7 @@ class UpdatePage extends React.Component {
   }
 
   render() {
-    const { data, updateSlug } = this.props;
+    const { intl, data, updateSlug } = this.props;
     const { LoggedInUser } = this.state;
     if (!data.Collective) return (<NotFound />);
 
@@ -58,10 +64,14 @@ class UpdatePage extends React.Component {
 
           <CollectiveCover
             collective={collective}
+            style={get(collective, 'settings.style.hero.cover') || get(collective.parentCollective, 'settings.style.hero.cover')}
+            cta={{ href: `#contribute`, label: intl.formatMessage(this.messages['collective.contribute']) }}
             href={`/${collective.slug}`}
-            title={<FormattedMessage id="updates.title" defaultMessage="Updates" />}
-            className="small"
-            style={get(collective, 'settings.style.hero.cover')}
+            />
+
+          <MenuBar
+            collective={collective}
+            LoggedInUser={LoggedInUser}
             />
 
           <div className="content" >

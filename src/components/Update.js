@@ -147,15 +147,8 @@ class Update extends React.Component {
             margin-right: 0.2rem;
           }
           
-          .actions > div {
-            display: flex;
-            margin: 0.5rem 0;
-          }
-
-          .actions .leftColumn {
-            width: 72px;
-            margin-right: 1rem;
-            float: left;
+          .actions {
+            margin-top: 5rem;
           }
 
           @media(max-width: 600px) {
@@ -199,7 +192,7 @@ class Update extends React.Component {
             <Role role='ADMIN' />
           </div>
 
-          { this.state.mode === "summary" &&
+          { mode === "summary" &&
             <div>
               <div className="title">
                 <Link route={`/${collective.slug}/updates/${update.slug}`}><a>{capitalize(update.title)}</a></Link>
@@ -211,7 +204,7 @@ class Update extends React.Component {
             </div>
           }
 
-          { this.state.mode === "details" && 
+          { mode === "details" && 
             <div>
               <div className="title">
                 {capitalize(update.title)}
@@ -234,21 +227,18 @@ class Update extends React.Component {
           { mode === 'edit' &&
             <div className="edit">
               <EditUpdateForm update={update} onSubmit={this.save} />
-              <div className="actions">
-                { mode === 'edit' && this.state.modified &&
-                  <div>
-                    <div className="leftColumn"></div>
-                    <div className="rightColumn">
-                      <SmallButton className="primary save" onClick={this.save}><FormattedMessage id="update.save" defaultMessage="save" /></SmallButton>
-                    </div>
-                  </div>
-                }
-              </div>
             </div>
           }
 
-          { this.state.mode === "details" && canPublishUpdate &&
-            <PublishUpdateBtnWithData id={update.id} />
+          { mode !== 'summary' &&
+            <div className="actions">
+              { mode === 'edit' && this.state.modified &&
+                <SmallButton className="primary save" onClick={this.save}><FormattedMessage id="update.save" defaultMessage="save" /></SmallButton>
+              }
+              { mode === "details" && canPublishUpdate &&
+                <PublishUpdateBtnWithData id={update.id} />
+              }
+            </div>
           }
         </div>
       </div>

@@ -27,6 +27,7 @@ class TopBarProfileMenu extends React.Component {
   logout() {
     this.setState({ showProfileMenu: false, status: 'loggingout' })
     window.localStorage.removeItem('accessToken');
+    window.localStorage.removeItem('LoggedInUser');
     window.location.replace(window.location.href);
   }
 

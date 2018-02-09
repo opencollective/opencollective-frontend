@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import withIntl from '../lib/withIntl';
 import { defineMessages, FormattedMessage } from 'react-intl';
-import { get } from 'lodash';
+import { get, uniqBy } from 'lodash';
 import Avatar from './Avatar';
 import Logo from './Logo';
 import { Router } from '../server/pages';
@@ -36,7 +36,7 @@ class TierCard extends React.Component {
 
   showLastOrders(fromCollectiveTypeArray, limit) {
     const { tier } = this.props;
-    const fromCollectives = tier.orders.map(o => o.fromCollective).filter(c => c && fromCollectiveTypeArray.indexOf(c.type) !== -1);
+    const fromCollectives = uniqBy(tier.orders.map(o => o.fromCollective).filter(c => c && fromCollectiveTypeArray.indexOf(c.type) !== -1), c => c.id);
     if (fromCollectives.length === 0) return;
     return (
       <div>

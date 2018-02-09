@@ -89,6 +89,12 @@ export default class Body extends React.Component {
           display: inline-block;
           padding: 1rem;
         }
+
+        @media(max-width: 420px) {
+          .content {
+            padding: 1rem 1.5rem;
+          }
+        }
         `}</style>
         {this.props.children}
       </main>

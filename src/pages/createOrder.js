@@ -121,6 +121,7 @@ class CreateOrderPage extends React.Component {
 
   render() {
     const { intl, data, interval, verb } = this.props;
+    const { loading, LoggedInUser } = this.state;
     const description = decodeURIComponent(this.props.description || "");
     const collective = data.Collective;
     if (data.loading) return (<Loading />);
@@ -168,16 +169,16 @@ class CreateOrderPage extends React.Component {
           description={collective.description}
           twitterHandle={collective.twitterHandle}
           image={collective.image || collective.backgroundImage}
-          className={this.state.loading && 'loading'}
-          LoggedInUser={this.state.LoggedInUser}
+          className={loading && 'loading'}
+          LoggedInUser={LoggedInUser}
           />
 
         <Body>
+
           <CollectiveCover
             collective={collective}
-            href={href}
-            title={intl.formatMessage(this.messages[`${tier.type.toLowerCase()}.title`])}
-            className="small"
+            href={`/${collective.slug}`}
+            LoggedInUser={LoggedInUser}
             />
 
           <div className="content">

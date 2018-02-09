@@ -53,15 +53,35 @@ class HostExpensesPage extends React.Component {
     const selectedCollective = this.state.selectedCollective || collective;
     const includeHostedCollectives = (selectedCollective.id === collective.id);
 
+    if (!collective.isHost) {
+      return (<ErrorPage message="collective.is.not.host" />)
+    }
+
     return (
       <div className="HostExpensesPage">
         <style jsx>{`
+        .col.side {
+          width: 100%;
+          min-width: 20rem;
+          max-width: 25%;
+          margin-left: 5rem;
+        }
+
+        .col.large {
+          margin-left: 6rem;
+          min-width: 30rem;
+          width: 50%;
+          max-width: 75%;
+        }
+
+        @media(max-width: 600px) {
           .columns {
-            display: flex;
+            flex-direction: column-reverse;
+            .col {
+              max-width: 100%;
+            }
           }
-          .columns :global(> div) {
-            margin-right: 5rem;
-          }
+        }
         `}</style>
 
         <Header
@@ -88,18 +108,23 @@ class HostExpensesPage extends React.Component {
             onChange={(selectedCollective => this.pickCollective(selectedCollective))}
             />
 
-          <div className="content columns" >
+          <div className="content">
+
+            <div className="col large pullLeft">
+              <ExpensesWithData
+                collective={selectedCollective}
+                includeHostedCollectives={includeHostedCollectives}
+                LoggedInUser={this.state.LoggedInUser}
+                filters={true}
+                editable={true}
+                />
+            </div>
 
             { this.state.selectedCollective &&
-              <ExpensesStatsWithData slug={selectedCollective.slug} />
+              <div className="col side pullLeft">
+                <ExpensesStatsWithData slug={selectedCollective.slug} />
+              </div>
             }
-
-            <ExpensesWithData
-              collective={selectedCollective}
-              includeHostedCollectives={includeHostedCollectives}
-              LoggedInUser={this.state.LoggedInUser}
-              editable={true}
-              />
 
           </div>
 

@@ -11,6 +11,7 @@ class TransactionsPage extends React.Component {
   static propTypes = {
     collective: PropTypes.object,
     limit: PropTypes.number,
+    filters: PropTypes.bool,
     LoggedInUser: PropTypes.object
   }
 
@@ -19,7 +20,7 @@ class TransactionsPage extends React.Component {
   }
 
   render() {
-    const { data, LoggedInUser, collective, fetchMore, showCSVlink } = this.props;
+    const { data, LoggedInUser, collective, fetchMore, showCSVlink, filters } = this.props;
 
     if (data.error) {
       console.error("graphql error>>>", data.error.message);
@@ -36,6 +37,7 @@ class TransactionsPage extends React.Component {
           transactions={transactions}
           refetch={data.refetch}
           fetchMore={fetchMore}
+          filters={filters}
           LoggedInUser={LoggedInUser}
           showCSVlink={showCSVlink}
           />

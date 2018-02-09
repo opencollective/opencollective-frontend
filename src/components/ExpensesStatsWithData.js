@@ -55,7 +55,9 @@ class ExpensesStatsWithData extends React.Component {
           <h2><FormattedMessage id="expenses.stats.byCategory.title" defaultMessage="By category" /></h2>
           <ol>
           { topExpenses.byCategory.map(category => (
-            <li>{category.category} (<Currency value={category.totalExpenses} currency={Collective.currency} />)</li>
+            <li key={category.category}>
+              {category.category} (<Currency value={category.totalExpenses} currency={Collective.currency} />)
+            </li>
           ))}
           </ol>
         </div>
@@ -63,7 +65,9 @@ class ExpensesStatsWithData extends React.Component {
           <h2><FormattedMessage id="expenses.stats.byRecipient.title" defaultMessage="By recipient" /></h2>
           <ol>
           { topExpenses.byCollective.map(recipientCollective => (
-            <li><Link route={`/${recipientCollective.slug}`}><a>{recipientCollective.name}</a></Link> (<Currency value={-recipientCollective.totalExpenses} currency={Collective.currency} />)</li>
+            <li key={recipientCollective.id}>
+              <Link route={`/${recipientCollective.slug}`}>{recipientCollective.name}</Link> (<Currency value={-recipientCollective.totalExpenses} currency={Collective.currency} />)
+            </li>
           ))}
           </ol>
         </div>

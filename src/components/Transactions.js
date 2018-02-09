@@ -12,6 +12,7 @@ class Transactions extends React.Component {
   static propTypes = {
     collective: PropTypes.object,
     transactions: PropTypes.array,
+    filters: PropTypes.bool, // show or hide filters (all/credits/debits)
     refetch: PropTypes.func,
     fetchMore: PropTypes.func,
     LoggedInUser: PropTypes.object
@@ -40,7 +41,7 @@ class Transactions extends React.Component {
   }
 
   render() {
-    const { collective, transactions, LoggedInUser, showCSVlink } = this.props;
+    const { collective, transactions, LoggedInUser, showCSVlink, filters } = this.props;
 
     if (!transactions) {
       return (<div />);
@@ -50,7 +51,7 @@ class Transactions extends React.Component {
       <div className="Transactions">
         <style jsx>{`
           .Transactions {
-            min-width: 40rem;
+            min-width: 30rem;
             width: 100%;
           }
           :global(.loadMoreBtn) {
@@ -98,19 +99,21 @@ class Transactions extends React.Component {
 
         {showCSVlink && <TransactionsExportPopoverAndButton collective={collective} />}
 
-        <div className="filter">
-          <ButtonGroup className="filterBtnGroup">
-            <Button className="filterBtn all" bsSize="small" bsStyle={!this.state.type ? 'primary' : 'default'} onClick={() => this.refetch()}>
-              <FormattedMessage id='transactions.all' defaultMessage='all' />
-            </Button>
-            <Button className="filterBtn credit" bsSize="small" bsStyle={this.state.type === 'CREDIT' ? 'primary' : 'default'} onClick={() => this.refetch('CREDIT')}>
-              <FormattedMessage id='transactions.credits' defaultMessage='credits' />
-            </Button>
-            <Button className="filterBtn debit" bsSize="small" bsStyle={this.state.type === 'DEBIT' ? 'primary' : 'default'} onClick={() => this.refetch('DEBIT')}>
-              <FormattedMessage id='transactions.debits' defaultMessage='debits' />
-            </Button>
-          </ButtonGroup>
-        </div>
+        { filters &&
+          <div className="filter">
+            <ButtonGroup className="filterBtnGroup">
+              <Button className="filterBtn all" bsSize="small" bsStyle={!this.state.type ? 'primary' : 'default'} onClick={() => this.refetch()}>
+                <FormattedMessage id='transactions.all' defaultMessage='all' />
+              </Button>
+              <Button className="filterBtn credit" bsSize="small" bsStyle={this.state.type === 'CREDIT' ? 'primary' : 'default'} onClick={() => this.refetch('CREDIT')}>
+                <FormattedMessage id='transactions.credits' defaultMessage='credits' />
+              </Button>
+              <Button className="filterBtn debit" bsSize="small" bsStyle={this.state.type === 'DEBIT' ? 'primary' : 'default'} onClick={() => this.refetch('DEBIT')}>
+                <FormattedMessage id='transactions.debits' defaultMessage='debits' />
+              </Button>
+            </ButtonGroup>
+          </div>
+        }
 
         <div className="itemsList">
           { this.state.loading &&

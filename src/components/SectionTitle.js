@@ -6,7 +6,7 @@ import { defineMessages } from 'react-intl';
 class SectionTitle extends React.Component {
 
   static propTypes = {
-    section: PropTypes.string.isRequired,
+    section: PropTypes.string,
     title: PropTypes.node,
     subtitle: PropTypes.node,
     values: PropTypes.object
@@ -14,10 +14,15 @@ class SectionTitle extends React.Component {
 
   constructor(props) {
     super(props);
-    console.log(">>> props", props);
+
     this.messages = defineMessages({
+      'memberships.title': { id: 'section.memberships.title', defaultMessage: 'Memberships' },
+      'updates.title': { id: 'section.updates.title', defaultMessage: 'Updates' },
+      'updates.subtitle': { id: 'section.updates.subtitle', defaultMessage: 'Stay up to dates with our latest activities and progress.' },
+      'events.title': { id: 'section.events.title', defaultMessage: 'Events' },
+      'events.subtitle': { id: 'section.events.subtitle', defaultMessage: 'Meet the community!' },
       'budget.title': { id: 'section.budget.title', defaultMessage: 'Budget' },
-      'budget.subtitle': { id: 'section.budget.subtitle', defaultMessage: 'Find out how we are spending our money to achieve our goals.' },
+      'budget.subtitle': { id: 'section.budget.subtitle', defaultMessage: 'Current balance: {balance}' },
       'contributors.title': { id: 'section.contributors.title', defaultMessage: 'Contributors' },
       'contributors.subtitle': { id: 'section.contributors.subtitle', defaultMessage: `{organizations, plural, one {{organizations} organization and} other {{organizations} organizations and}} {users} {users, plural, one {person is} other {people are}} supporting us.` }
     });
@@ -56,6 +61,11 @@ class SectionTitle extends React.Component {
             font-size: 16px;
             line-height: 19px;
             text-align: left;
+          }
+          @media(max-width: 420px) {
+            .title {
+              padding-left: 1.5rem;
+            }
           }
         `}</style>
         <h1>{title}</h1>

@@ -4,10 +4,12 @@ import Body from '../components/Body';
 import Footer from '../components/Footer';
 import CollectiveCover from '../components/CollectiveCover';
 import { addCollectiveCoverData, addGetLoggedInUserFunction } from '../graphql/queries';
+import Loading from '../components/Loading';
 import NotFound from '../components/NotFoundPage';
 import ErrorPage from '../components/ErrorPage';
 import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
+import MenuBar from '../components/MenuBar';
 import UpdatesWithData from '../components/UpdatesWithData';
 import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl'
@@ -33,6 +35,8 @@ class UpdatesPage extends React.Component {
   render() {
     const { data, action } = this.props;
     const { LoggedInUser } = this.state;
+
+    if (data.loading) return (<Loading />);
     if (!data.Collective) return (<NotFound />);
 
     if (data.error) {
@@ -58,9 +62,12 @@ class UpdatesPage extends React.Component {
           <CollectiveCover
             collective={collective}
             href={`/${collective.slug}`}
-            title={<FormattedMessage id="updates.title" defaultMessage="Updates" />}
-            className="small"
-            style={get(collective, 'settings.style.hero.cover')}
+            cta={{ href: `/${collective.slug}#contribute`, label: 'contribute' }}
+            />
+
+          <MenuBar
+            collective={collective}
+            LoggedInUser={LoggedInUser}
             />
 
           <div className="content" >

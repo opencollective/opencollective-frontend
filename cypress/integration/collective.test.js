@@ -8,49 +8,43 @@ describe("collective page", () => {
 
   it ("loads the collective page", () => {
     cy.get('#contribute .TierCard').should('have.length', 2);
-    cy.get('#organizations h1').contains("1 organization is supporting APEX");
     cy.get("#organizations .CollectiveCard").first().find('.totalDonations').contains("$1,700");
-    cy.get("#backers h1").contains("25 people are supporting APEX");
-    cy.get("#backers .Member").should('have.length', 25);
+    cy.get("#budget .subtitle").contains("Current balance: $4.71");
+    cy.get(".Members.cardsList .Member").should('have.length', 26);
   });
 
   it ("loads the latest expenses", () => {
-    cy.get("#expenses .filter .pending").click();
-    cy.get("#expenses .itemsList .empty").contains("No expenses");
-    cy.get("#expenses .filter .paid").click();
     cy.get("#expenses .itemsList .expense").should("have.length", 5);
   });
 
   it ("opens all expenses page", () => {
     cy.get("#expenses .ViewAllExpensesBtn").click();
-    cy.get(".ExpensesPage .CollectiveCover h1").contains("Expenses");
+    cy.get(".ExpensesPage .ExpensesStats").contains("Available balance");
+    cy.get(".ExpensesPage .ExpensesStats").contains("Engineering ($3,808)");
+    cy.get(".ExpensesPage .ExpensesStats").contains("TJ Holowaychuk ($3,391)");
     cy.get(".ExpensesPage .itemsList .expense").should("have.length", 6);
-    cy.get(".ExpensesPage .CollectiveCover .goBack").click();
+    cy.get(".ExpensesPage .desktopOnly .menu .item.budget").click();
   });
   
-  it ("opens new expense page", () => {
-    cy.get("#expenses .SubmitExpenseBtn").click();
+  it("opens new expense page", () => {
+    cy.get(".desktopOnly button.submitExpense").click();
     cy.wait(500);
-    cy.get(".ExpensesPage .CollectiveCover h1").contains("Expenses");
-    cy.get(".ExpensesPage .CollectiveCover .goBack").click();
+    cy.get(".ExpensesPage .CreateExpenseForm").contains("Sign up or login to submit an expense");
+    cy.get(".ExpensesPage .desktopOnly .menu .item.budget").click();
   });
   
   it ("loads the latest transactions", () => {
-    cy.get("#transactions .filter .credit").click();
     cy.get("#transactions .itemsList .transaction").should("have.length", 5);
     cy.get("#transactions .itemsList .transaction:first .amount").contains("$2");
-    cy.get("#transactions .filter .debit").click();
-    cy.wait(500);
-    cy.get("#transactions .itemsList .transaction").should("have.length", 5);
-    cy.get("#transactions .itemsList .transaction:first .amount").contains("-$561.00");
   });
   
   it ("opens all transactions page", () => {
     cy.get("#transactions .ViewAllTransactionsBtn").click();
     cy.wait(500);
-    cy.get(".TransactionsPage .CollectiveCover h1").contains("Latest transactions");
     cy.get(".TransactionsPage .itemsList .transaction").should("have.length", 20);
     cy.get(".TransactionsPage .loadMoreBtn");
-    cy.get(".TransactionsPage .CollectiveCover .goBack").click();
+    cy.get(".TransactionsPage .filterBtnGroup button").last().click();
+    cy.get(".TransactionsPage .itemsList .transaction").should("have.length", 6);
+    cy.get(".TransactionsPage .desktopOnly .menu .item.about").click();
   });
 })

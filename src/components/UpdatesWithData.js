@@ -10,6 +10,7 @@ import gql from 'graphql-tag'
 import { FormattedMessage } from 'react-intl'
 import { pick, get } from 'lodash';
 import HTMLEditor from './HTMLEditor';
+import SectionTitle from './SectionTitle';
 import { Link } from '../server/pages';
 
 class UpdatesWithData extends React.Component {
@@ -91,29 +92,6 @@ class UpdatesWithData extends React.Component {
     return (
       <div className="UpdatesContainer">
         <style jsx>{`
-          .title {
-            margin-top: 8rem;
-            overflow: hidden;
-            border-left: 4px solid #3399FF;
-            padding-left: 2.8rem;
-            margin-bottom: 5rem;
-          }
-          h1 {
-            color: #18191A;
-            font-family: Rubik;
-            font-size: 32px;
-            font-weight: 500;
-            line-height: 38px;
-            margin-top: 0;
-            margin-bottom: 0.8rem;
-            text-align: left;
-          }
-          .subtitle {
-            color: #666F80;
-            font-family: Rubik;
-            font-size: 16px;
-            line-height: 19px;
-          }
           .FullPage .adminActions {
             text-transform: uppercase;
             font-size: 1.3rem;
@@ -125,14 +103,7 @@ class UpdatesWithData extends React.Component {
 
         { !compact &&
           <div className="FullPage">
-            <div className="title">
-              <h1>
-                <FormattedMessage id="collective.latestUpdates.title" defaultMessage="Latest Updates" />
-              </h1>
-              <div className="subtitle">
-                <FormattedMessage id="collective.latestUpdates.subtitle" defaultMessage="Find out how everyone's contributions take us closer to our goals." />
-              </div>
-            </div>
+            <SectionTitle section="updates" />
           </div>
         }
 

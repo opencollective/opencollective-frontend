@@ -18,7 +18,7 @@ class CollectivePage extends React.Component {
   }
 
   static getInitialProps ({ query }) {
-    return { slug: query.slug, query }
+    return { slug: query && query.slug, query }
   }
 
   async componentDidMount() {

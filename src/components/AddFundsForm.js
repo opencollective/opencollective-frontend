@@ -91,6 +91,7 @@ class AddFundsForm extends React.Component {
       {
         name: "hostFeePercent",
         type: 'number',
+        className: 'right',
         post: '%'
       },
       {
@@ -215,8 +216,8 @@ class AddFundsForm extends React.Component {
                   <Row key={`${field.name}.input`}>
                     <Col sm={12}>
                       <InputField
-                        className="horizontal"
                         {...field}
+                        className={`horizontal ${field.className}`}
                         defaultValue={this.state.form[field.name]}
                         onChange={(value) => this.handleChange("form", field.name, value)}
                         />

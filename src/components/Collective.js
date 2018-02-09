@@ -12,19 +12,16 @@ import { addCreateOrderMutation } from '../graphql/mutations';
 import Markdown from 'react-markdown';
 import { get } from 'lodash';
 import { Router } from '../server/pages';
-import MenuBar from './MenuBar';
-import StatsBar from './StatsBar';
-import HashLink from 'react-scrollchor';
 import { FormattedMessage, defineMessages } from 'react-intl';
 import CollectivesWithData from './CollectivesWithData';
-import ExpensesSectionWithData from './ExpensesSectionWithData';
+import ExpensesSection from './ExpensesSection';
 import UpdatesWithData from './UpdatesWithData';
 import EventsWithData from './EventsWithData';
 import TransactionsWithData from './TransactionsWithData';
 import { Button } from 'react-bootstrap';
 import { Link } from '../server/pages';
 import SectionTitle from './SectionTitle';
-import Currency from './Currency';
+import { formatCurrency } from '../lib/utils';
 
 const defaultBackgroundImage = '/static/images/defaultBackgroundImage.png';
 
@@ -48,11 +45,10 @@ class Collective extends React.Component {
     };
 
     this.messages = defineMessages({
-      'collective.contribute': { id: 'collective.contribute', defaultMessage: 'contribute' },
       'collective.created': { id: 'collective.created', defaultMessage: `Your collective has been created with success.`},
       'collective.created.description': { id: 'collective.created.description', defaultMessage: `While you are waiting for approval from your host ({host}), you can already customize your collective, file expenses and even create events.`},
       'collective.donate': { id: 'collective.donate', defaultMessage: `donate`},
-      'collective.since': { id: 'usercollective.since', defaultMessage: `Established in {year}`},
+      'collective.since': { id: 'usercollective.since', defaultMessage: `since {year}`},
       'collective.members.admin.title': { id: 'collective.members.admin.title', defaultMessage: `{n} {n, plural, one {core contributor} other {core contributors}}`},
       'collective.members.member.title': { id: 'collective.members.member.title', defaultMessage: `{n} {n, plural, one {member} other {members}}`},
       'collective.members.backer.title': { id: 'collective.members.backer.title', defaultMessage: `{n} {n, plural, one {backer} other {backers}}`},
@@ -144,7 +140,6 @@ class Collective extends React.Component {
             font-size: 1.4rem;
           }
           section {
-            clear: both;
             max-width: 1244px;
             margin: 0 auto 5rem;
           }
@@ -198,22 +193,13 @@ class Collective extends React.Component {
 
             <CollectiveCover
               collective={this.collective}
-              style={get(this.collective, 'settings.style.hero.cover') || get(this.collective.parentCollective, 'settings.style.hero.cover')}
-              cta={{ href: `#contribute`, label: intl.formatMessage(this.messages['collective.contribute']) }}
-              />
-
-            <MenuBar
-              collective={this.collective}
+              cta={{ href: `#contribute`, label: 'contribute' }}
               LoggedInUser={LoggedInUser}
               />
 
-            {/* <StatsBar
-              collective={this.collective}
-              /> */}
-
             <div>
 
-              <section>
+              <div>
                 <div className="sidebar tiers" id="contribute">
                   { this.collective.tiers.map(tier => (
                     <TierCard
@@ -232,104 +218,110 @@ class Collective extends React.Component {
 
                 <div className="content" >
                   { get(this.collective, 'stats.updates') > 0 || canEditCollective &&
-                    <div id="updates">
-                      <h1><FormattedMessage id="collective.updates.title" defaultMessage="Latest update" /></h1>
+                    <section id="updates">
+                      <SectionTitle section="updates" />
                       <UpdatesWithData
                         collective={this.collective}
                         compact={true}
                         limit={1}
                         LoggedInUser={LoggedInUser}
                         />
-                    </div>
+                    </section>
                   }
                   { get(this.collective, 'stats.events') > 0 || canEditCollective &&
-                    <div id="events">
-                      <h1><FormattedMessage id="collective.events.title" defaultMessage="Events" /></h1>
+                    <section id="events">
+                      <SectionTitle section="events" />
                       <EventsWithData collectiveSlug={this.collective.slug} />
-                    </div>
+                    </section>
                   }
-                  <div id="about" className="longDescription" >
+                  <section id="about" className="longDescription" >
                     <SectionTitle
                       title={<FormattedMessage id="collective.about.title" defaultMessage="About" />}
-                      subtitle={intl.formatMessage(this.messages['collective.since'], { year: new Date(this.collective.createdAt).getFullYear()})}
+                      subtitle={`${(this.collective.description || '').trim()}, ${intl.formatMessage(this.messages['collective.since'], { year: new Date(this.collective.createdAt).getFullYear()})}`}
                       />
 
-                    <Markdown source={this.collective.longDescription || this.collective.description || ''} />
-                  </div>
+                    <Markdown source={this.collective.longDescription || ''} />
+                  </section>
                 </div>
-              </section>
+              </div>
 
               { get(this.collective, 'stats.collectives.memberOf') > 0 &&
                 <section id="parenting">
-                  <SectionTitle
-                    title={<FormattedMessage
-                      id="collective.collective.memberOf.collective.parent.title"
-                      defaultMessage={`Member collectives`}
-                    />}
-                    subtitle={(<FormattedMessage
-                      id="collective.collective.memberOf.collective.parent.subtitle"
-                      values={{ n: this.collective.stats.collectives.memberOf }}
-                      defaultMessage={`{n, plural, one {this collective is} other {{n} collectives are}} part of our collective`}
-                    />)}
-                    />
-
-                  <div className="cardsList">
-                    <CollectivesWithData
-                      ParentCollectiveId={this.collective.id}
-                      orderBy="balance"
-                      type="COLLECTIVE"
-                      orderDirection="DESC"
-                      limit={20}
+                  <div className="content" >
+                    <SectionTitle
+                      title={<FormattedMessage
+                        id="collective.collective.memberOf.collective.parent.title"
+                        defaultMessage={`Member collectives`}
+                      />}
+                      subtitle={(<FormattedMessage
+                        id="collective.collective.memberOf.collective.parent.subtitle"
+                        values={{ n: this.collective.stats.collectives.memberOf }}
+                        defaultMessage={`{n, plural, one {this collective is} other {{n} collectives are}} part of our collective`}
+                      />)}
                       />
+
+                    <div className="cardsList">
+                      <CollectivesWithData
+                        ParentCollectiveId={this.collective.id}
+                        orderBy="balance"
+                        type="COLLECTIVE"
+                        orderDirection="DESC"
+                        limit={20}
+                        />
+                    </div>
                   </div>
                 </section>
               }
 
-              <section id="budget">
-                <SectionTitle section="budget" />
+              <section id="budget" className="clear">
+                <div className="content" >
+                  <SectionTitle section="budget" values={{ balance: formatCurrency(get(this.collective, 'stats.balance'), this.collective.currency) }}/>
 
-                <ExpensesSectionWithData
-                  collective={this.collective}
-                  LoggedInUser={LoggedInUser}
-                  limit={10}
-                  />
+                  <ExpensesSection
+                    collective={this.collective}
+                    LoggedInUser={LoggedInUser}
+                    limit={10}
+                    />
 
+                </div>
               </section>
 
               <div id="contributors" />
 
               <section id="organizations" className="tier">
-              { get(this.collective, 'stats.backers.all') === 0 &&
-                <SectionTitle
-                  section="contributors"
-                  subtitle={<FormattedMessage id="collective.section.contributors.empty" defaultMessage="You don't have any contributors yet." />}
-                  />
-              }
-              { get(this.collective, 'stats.backers.all') > 0 &&
-                <div>
+                <div className="content" >
+                { get(this.collective, 'stats.backers.all') === 0 &&
                   <SectionTitle
                     section="contributors"
-                    values={ get(this.collective, 'stats.backers') }
+                    subtitle={<FormattedMessage id="collective.section.contributors.empty" defaultMessage="You don't have any contributors yet." />}
                     />
+                }
+                { get(this.collective, 'stats.backers.all') > 0 &&
+                  <div>
+                    <SectionTitle
+                      section="contributors"
+                      values={ get(this.collective, 'stats.backers') }
+                      />
 
-                  <MembersWithData
-                    collective={this.collective}
-                    type="ORGANIZATION"
-                    LoggedInUser={LoggedInUser}
-                    role='BACKER'
-                    limit={100}
-                    />
-              
-                  <MembersWithData
-                    collective={this.collective}
-                    LoggedInUser={LoggedInUser}
-                    type="USER"
-                    role='BACKER'
-                    limit={100}
-                    orderBy="totalDonations"
-                    />
+                    <MembersWithData
+                      collective={this.collective}
+                      type="ORGANIZATION"
+                      LoggedInUser={LoggedInUser}
+                      role='BACKER'
+                      limit={100}
+                      />
+                
+                    <MembersWithData
+                      collective={this.collective}
+                      LoggedInUser={LoggedInUser}
+                      type="USER"
+                      role='BACKER'
+                      limit={100}
+                      orderBy="totalDonations"
+                      />
+                  </div>
+                }
                 </div>
-              }
               </section>
             </div>
           </div>

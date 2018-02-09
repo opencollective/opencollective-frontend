@@ -62,7 +62,8 @@ class Expenses extends React.Component {
       <div className="Expenses">
         <style jsx>{`
           .Expenses {
-            min-width: 40rem;
+            min-width: 30rem;
+            max-width: 80rem;
           }
           :global(.loadMoreBtn) {
             margin: 1rem;
@@ -117,6 +118,9 @@ class Expenses extends React.Component {
               </Button>
               <Button className="filterBtn pending" bsSize="small" bsStyle={this.state.status === 'PENDING' ? 'primary' : 'default'} onClick={() => this.refetch('PENDING')}>
                 <FormattedMessage id='expenses.pending' defaultMessage='pending' />
+              </Button>
+              <Button className="filterBtn approved" bsSize="small" bsStyle={this.state.status === 'APPROVED' ? 'primary' : 'default'} onClick={() => this.refetch('APPROVED')}>
+                <FormattedMessage id='expenses.approved' defaultMessage='approved' />
               </Button>
               <Button className="filterBtn paid" bsSize="small" bsStyle={this.state.status === 'PAID' ? 'primary' : 'default'} onClick={() => this.refetch('PAID')}>
                 <FormattedMessage id='expenses.paid' defaultMessage='paid' />

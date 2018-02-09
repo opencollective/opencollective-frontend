@@ -4,6 +4,7 @@ import Body from '../components/Body';
 import Footer from '../components/Footer';
 import CollectiveCover from '../components/CollectiveCover';
 import { addCollectiveCoverData, addGetLoggedInUserFunction } from '../graphql/queries';
+import Loading from '../components/Loading';
 import NotFound from '../components/NotFoundPage';
 import ErrorPage from '../components/ErrorPage';
 import withData from '../lib/withData';
@@ -16,7 +17,6 @@ import { graphql } from 'react-apollo'
 import gql from 'graphql-tag'
 import CreateExpenseForm from '../components/CreateExpenseForm';
 import Button from '../components/Button';
-import MenuBar from '../components/MenuBar';
 import Link from '../components/Link';
 
 class ExpensesPage extends React.Component {
@@ -63,6 +63,7 @@ class ExpensesPage extends React.Component {
   render() {
     const { data, action } = this.props;
     const { LoggedInUser, expenseCreated } = this.state;
+    if (data.loading) return (<Loading />);
     if (!data.Collective) return (<NotFound />);
 
     if (data.error) {
@@ -108,13 +109,7 @@ class ExpensesPage extends React.Component {
           <CollectiveCover
             collective={collective}
             href={`/${collective.slug}`}
-            title={<FormattedMessage id="expenses.title" defaultMessage="Expenses" />}
-            className="small"
-            style={get(collective, 'settings.style.hero.cover')}
-            />
-
-          <MenuBar
-            collective={collective}
+            cta={{ href: `/${collective.slug}#contribute`, label: 'contribute' }}
             LoggedInUser={LoggedInUser}
             />
 
@@ -131,7 +126,7 @@ class ExpensesPage extends React.Component {
                     <Button className="blue" onClick={() => this.setState({ expenseCreated: null, showNewExpenseForm: true })}>
                       <FormattedMessage id="expenses.sendAnotherExpense" defaultMessage="Submit Another Expense" />
                     </Button>
-                    <Button className="whiteblue" href={`/${collective.slug}/expenses`}>
+                    <Button className="whiteblue viewAllExpenses" href={`/${collective.slug}/expenses`}>
                       <FormattedMessage id="expenses.viewAll" defaultMessage="View All Expenses" />
                     </Button>
                   </div>
@@ -150,9 +145,9 @@ class ExpensesPage extends React.Component {
 
             <div className="rightColumn">
 
-              <Link route={`/${collective.slug}/expenses`}><a>
+              <Link route={`/${collective.slug}/expenses`}>
                 <FormattedMessage id="collective.expenses.title" defaultMessage="{n, plural, one {Latest expense} other {Latest expenses}}" values={{n: 2}} />
-              </a></Link>
+              </Link>
 
               <ExpensesStatsWithData slug={collective.slug} />
 

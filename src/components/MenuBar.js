@@ -7,7 +7,8 @@ import Sticky from 'react-stickynode';
 import { FormattedMessage, defineMessages } from 'react-intl';
 import Link from './Link';
 import Button from './Button';
-import { get, throttle } from 'lodash';
+import { get, throttle, uniqBy } from 'lodash';
+import withIntl from '../lib/withIntl';
 
 class MenuBar extends React.Component {
 
@@ -21,24 +22,46 @@ class MenuBar extends React.Component {
     this.onscroll = this.onscroll.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.height = 100;
-    this.menuItems = [
-      { anchor: 'about', position: 0 },
-      { anchor: 'budget', position: 0 },
-      { anchor: 'contributors', position: 0 }
+
+    const menuItems = [
+      { anchor: 'about', link: `/${props.collective.slug}#about`, position: 0 },
     ];
-    this.state = { selectedAnchor: null, sticky: false };
+
+    if (props.collective.type === 'COLLECTIVE') {
+      menuItems.push({ anchor: 'budget', link: `/${props.collective.slug}#budget`, position: 0 });
+      menuItems.push({ anchor: 'contributors', link: `/${props.collective.slug}#contributors`, position: 0 });
+    }
+
+    if (get(props.collective, 'stats.collectives.all') > 0) {
+      menuItems.push({ anchor: 'collectives', link: `/${props.collective.slug}#collectives`, position: 0 });
+    }
+
+    if (get(props.collective, 'stats.events') > 0) {
+      menuItems.push({ anchor: 'events', link: `/${props.collective.slug}#events`, position: 0 });
+    }
+
+    if (get(props.collective, 'stats.updates') > 0) {
+      menuItems.push({ anchor: 'updates', link: `/${props.collective.slug}#updates`, position: 0 });
+    }
+
+    this.state = { menuItems, selectedAnchor: null, sticky: false, logoLink: `/${props.collective.slug}` };
+
     this.messages = defineMessages({
-      'about': { id: 'collective.menu.about', defaultMessage: "about" },
-      'events': { id: 'collective.menu.events', defaultMessage: "events" },
-      'updates': { id: 'collective.menu.updates', defaultMessage: "updates" },
-      'budget': { id: 'collective.menu.budget', defaultMessage: "budget" },
-      'contributors': { id: 'collective.menu.contributors', defaultMessage: "contributors" }
+      'admin': { id: 'menu.admin', defaultMessage: "admin" },
+      'backer': { id: 'menu.backer', defaultMessage: "backer" },
+      'attendee': { id: 'menu.attendee', defaultMessage: "attendee" },
+      'fundraiser': { id: 'menu.fundraiser', defaultMessage: "fundraiser" },
+      'about': { id: 'menu.about', defaultMessage: "about" },
+      'events': { id: 'menu.events', defaultMessage: "events" },
+      'updates': { id: 'menu.updates', defaultMessage: "updates" },
+      'budget': { id: 'menu.budget', defaultMessage: "budget" },
+      'contributors': { id: 'menu.contributors', defaultMessage: "contributors" }
     })
   }
 
   onscroll(e) {
     const top = e.target.scrollingElement.scrollTop;
-    const selectedMenuItem = this.menuItems.find(menuItem => {
+    const selectedMenuItem = this.state.menuItems.find(menuItem => {
       return menuItem.position && menuItem.position > (top);
     })
     if (selectedMenuItem) {
@@ -52,43 +75,39 @@ class MenuBar extends React.Component {
   }
 
   componentDidMount() {
-    const { collective } = this.props;
     window.onscroll = throttle(this.onscroll, 300);
-    const menuItems = [];
-    this.menuItems.push({ anchor: 'events', position: 0 });
-    this.menuItems.push({ anchor: 'updates', position: 0 });
+    const { collective } = this.props;
+    const { menuItems } = this.state;
+    if (!collective) {
+      console.error(">>> this is a weird error, collective should always be set", this.props);
+      return;
+    }
 
-    this.menuItems.forEach((menuItem, index) => {
-      const el = document.querySelector(`#${menuItem.anchor}`);
-      if (!el) return;
-      this.menuItems[index].position = el.offsetTop;
-      this.menuItems[index].link = `#${menuItem.anchor}`;
-      menuItems.push(this.menuItems[index]);
+    const menuItemsFoundOnPage = [];
+    uniqBy(document.querySelectorAll('section'), el => el.id).forEach((el, index) => {
+      const menuItem = {
+        anchor: el.id,
+        link: `#${el.id}`,
+        position: el.offsetTop
+      };
+      menuItemsFoundOnPage.push(menuItem);
     })
 
-    // If we don't find the sections on the page, we link to their respective page
-    if (menuItems.length === 0) {
-      this.menuItems = [
-        { anchor: 'about', link: `/${collective.slug}#about` },
-        { anchor: 'budget', link: `/${collective.slug}#budget` },
-        { anchor: 'contributors', link: `/${collective.slug}#contributors` }          
-      ];
-      if (get(collective, 'stats.updates') > 0) {
-        menuItems.unshift({
-          anchor: 'updates',
-          link: `/${collective.slug}/updates`
-        });
-      }
-    } else {
-      this.menuItems = menuItems.sort((a, b) => {
+    // If we don't find the sections on the page, we link the logo to the homepage instead of #top
+    let logoLink;
+
+    if (menuItemsFoundOnPage.length > 0) {
+      logoLink = '#top';
+      menuItemsFoundOnPage.sort((a, b) => {
         return a.position > b.position;
       });
+      this.setState({ menuItems: menuItemsFoundOnPage, logoLink });
     }
   }
 
   // Render Contribute and Submit Expense buttons
   renderButtons() {
-    const { collective } = this.props;
+    const { collective, cta } = this.props;
     const offset = -this.height;
     return (
       <div className="buttons">
@@ -105,27 +124,36 @@ class MenuBar extends React.Component {
           height: 64px;
         }
 
-        `}</style>
-        { this.state.sticky &&
-          <HashLink to="contribute" animate={{offset}}>
-            <Button className="blue">
-              <FormattedMessage id="collective.menu.contribute" defaultMessage="Contribute" />
-            </Button>
-          </HashLink>
+        .MenuBar :global(button.blue) {
+          border-color: ${colors.blue}
         }
-        <Button href={`/${collective.slug}/expenses/new`}><FormattedMessage id="collective.menu.submitExpense" defaultMessage="Submit Expense" /></Button>
+
+        .MenuBar :global(button.darkbackground) {
+          color: #E3E4E6;
+        }
+
+        `}</style>
+        { this.state.sticky && cta &&
+          <Link route={cta.href} animate={{offset}}>
+            <Button className="blue">{cta.label}</Button>
+          </Link>
+        }
+        { collective.type === "COLLECTIVE" &&
+          <Button className="submitExpense darkbackground" href={`/${collective.slug}/expenses/new`}><FormattedMessage id="menu.submitExpense" defaultMessage="Submit Expense" /></Button>
+        }
       </div>
     )
   }
 
   renderMenu() {
-    const { LoggedInUser, collective } = this.props;
+    const { intl, LoggedInUser, collective } = this.props;
     const offset = -this.height; // offset for hashlink to leave room for the menu bar
     return (
       <div className="menu">
         <style jsx>{`
         .menu {
           display: flex;
+          padding: 0;
           flex-direction: row;
           justify-content: space-evenly;
         }
@@ -160,6 +188,7 @@ class MenuBar extends React.Component {
           float: left;
           background-repeat: no-repeat;
           background-position: center center;
+          margin-top: 8px;
           margin-right: 8px;
         }
         .edit {
@@ -172,11 +201,11 @@ class MenuBar extends React.Component {
           float: left;
         }
         `}</style>
-        {this.menuItems.map((item, index) =>
-          <div className={`item ${item.anchor} ${this.state.selectedAnchor === item.anchor && 'selected'}`} key={`item-${index}`}>
-            <Link route={item.link} animate={{offset}}><a>
-              {item.anchor}
-            </a></Link>
+        {this.state.menuItems.map((item, index) =>
+          <div className={`item ${item.anchor} ${this.state.selectedAnchor === item.anchor && 'selected'}`} key={`item-${index}-${item.link}`}>
+            <Link route={item.link} animate={{offset}}>
+              { this.messages[item.anchor] ? intl.formatMessage(this.messages[item.anchor]): item.anchor }
+            </Link>
           </div>
         )}
         { LoggedInUser && LoggedInUser.canEditCollective(collective) &&
@@ -184,10 +213,8 @@ class MenuBar extends React.Component {
             <div className="separator" />
             <div className="item editCollective">
               <Link route={`/${collective.slug}/edit`}>
-                <a>
-                  <div className="icon edit" />
-                  <FormattedMessage id="collective.menu.editCollective" defaultMessage="edit collective" />
-                </a>
+                <div className="icon edit" />
+                <FormattedMessage id="menu.editCollective" defaultMessage="edit collective" />
               </Link>
             </div>
           </div>
@@ -197,7 +224,8 @@ class MenuBar extends React.Component {
   }
 
   render() {
-    const { collective } = this.props;
+    const { collective, cta } = this.props;
+    const { logoLink } = this.state;
 
     if (!collective) {
       return (<div />);
@@ -220,11 +248,6 @@ class MenuBar extends React.Component {
           padding: 0;
         }
 
-        .pullLeft {
-          float: left;
-          padding: 0;
-        }
-        
         .flexColumns {
           display: flex;
           flex-direction: row;
@@ -245,10 +268,6 @@ class MenuBar extends React.Component {
 
         .allcaps {
           text-transform: uppercase;
-        }
-
-        .pullRight {
-          float: right;
         }
 
         .actionBar {
@@ -290,14 +309,18 @@ class MenuBar extends React.Component {
         `}</style>
         <div className="mobileOnly">
           <div className="actionBar">
-            <div className="row1">
-              <div className="pullRight">
-                { this.renderButtons() }
+            <Sticky enabled={true} top={0} onStateChange={this.handleChange}>
+              <div className="stickyBar">
+                <div className="row1">
+                  <div className="pullRight">
+                    { this.renderButtons() }
+                  </div>
+                  <div className="logo">
+                    <Link route={logoLink} key={logoLink}><Logo src={collective.image} type='COLLECTIVE' /></Link>
+                  </div>
+                </div>
               </div>
-              <div className="logo">
-                <Logo src={collective.image} type='COLLECTIVE' />
-              </div>
-            </div>
+            </Sticky>
           </div>
           <div className="menu">
             { this.renderMenu() }
@@ -311,9 +334,9 @@ class MenuBar extends React.Component {
                   { this.renderButtons() }
                 </div>
                 <div className="logo">
-                  <Logo src={collective.image} type='COLLECTIVE' />
+                  <Link route={logoLink} key={logoLink}><Logo src={collective.image} type='COLLECTIVE' /></Link>
                 </div>
-                <div className="pullLeft">
+                <div className="pullLeft menu">
                   { this.renderMenu() }
                 </div>
               </div>
@@ -326,4 +349,4 @@ class MenuBar extends React.Component {
 
 }
 
-export default MenuBar;
+export default withIntl(MenuBar);

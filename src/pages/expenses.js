@@ -4,6 +4,7 @@ import Body from '../components/Body';
 import Footer from '../components/Footer';
 import CollectiveCover from '../components/CollectiveCover';
 import { addCollectiveCoverData, addGetLoggedInUserFunction } from '../graphql/queries';
+import Loading from '../components/Loading';
 import NotFound from '../components/NotFoundPage';
 import ErrorPage from '../components/ErrorPage';
 import withData from '../lib/withData';
@@ -13,8 +14,6 @@ import ExpensesStatsWithData from '../components/ExpensesStatsWithData';
 import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl'
 import Button from '../components/Button';
-import MenuBar from '../components/MenuBar';
-import Link from '../components/Link';
 
 class ExpensesPage extends React.Component {
 
@@ -37,6 +36,8 @@ class ExpensesPage extends React.Component {
   render() {
     const { data, action } = this.props;
     const { LoggedInUser } = this.state;
+
+    if (!data.loading && !data.Collective) return (<Loading />);
     if (!data.Collective) return (<NotFound />);
 
     if (data.error) {
@@ -52,14 +53,30 @@ class ExpensesPage extends React.Component {
           .columns {
             display: flex;
           }
-          .rightColumn {
-            width: 300px;
+
+          .col.side {
+            width: 100%;
+            min-width: 20rem;
+            max-width: 25%;
             margin-left: 5rem;
           }
-          .largeColumn {
-            width: 900px;
+
+          .col.large {
+            width: 100%;
+            min-width: 30rem;
+            max-width: 75%;
+          }
+
+          @media(max-width: 600px) {
+            .columns {
+              flex-direction: column-reverse;
+              .col {
+                max-width: 100%;
+              }
+            }
           }
         `}</style>
+
         <Header
           title={collective.name}
           description={collective.description}
@@ -74,19 +91,13 @@ class ExpensesPage extends React.Component {
           <CollectiveCover
             collective={collective}
             href={`/${collective.slug}`}
-            title={<FormattedMessage id="expenses.title" defaultMessage="Expenses" />}
-            className="small"
-            style={get(collective, 'settings.style.hero.cover')}
-            />
-
-          <MenuBar
-            collective={collective}
+            cta={{ href: `/${collective.slug}#contribute`, label: 'contribute' }}
             LoggedInUser={LoggedInUser}
             />
 
           <div className="content columns" >
 
-            <div className="largeColumn">
+            <div className="col large">
               <ExpensesWithData
                 collective={collective}
                 defaultAction={action}
@@ -94,7 +105,7 @@ class ExpensesPage extends React.Component {
                 />
             </div>
 
-            <div className="rightColumn">
+            <div className="col side">
               <ExpensesStatsWithData slug={collective.slug} />
             </div>
 

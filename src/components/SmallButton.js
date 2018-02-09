@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button } from 'react-bootstrap';
+import Button from './Button';
 import colors from '../constants/colors';
 
 class SmallButton extends React.Component {
@@ -33,18 +33,24 @@ class SmallButton extends React.Component {
             border-color: ${colors.darkgray};
             background: ${colors.darkgray};
           }
-          .SmallButton button:hover {
+          .SmallButton.pay button:hover {
             border-color: rgba(85,170,0,1);
             background: rgba(85,170,0,.9);
           }
           .SmallButton.approve button, .SmallButton.publish button {
             background: #3399ff;
+            border-color: #3399ff;            
             color: white;
           }
           .SmallButton.reject button {
             background: white;
-            border: solid 1px #e63956;
+            border: solid 2px #e63956;
             color: #e63956;
+          }
+          .SmallButton.reject button:hover {
+            background: #e63956;
+            border: solid 2px #e63956;
+            color: white;
           }
         `}</style>
         <Button {...this.props}>{this.props.children}</Button>
