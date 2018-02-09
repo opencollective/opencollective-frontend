@@ -21,24 +21,25 @@ export function createCollective(_, args, req) {
     CreatedByUserId: req.remoteUser.id
   };
 
-  collectiveData.tiers = collectiveData.tiers || [
-    {
+  collectiveData.tiers = collectiveData.tiers || [];
+  if (collectiveData.tiers.length === 0) {
+    collectiveData.tiers.push({
       type: 'TIER',
       name: 'backer',
       slug: 'backers',
       amount: 500,
       presets: [500, 1000, 2500, 5000],
       interval: 'month'
-    },
-    {
+    });
+    collectiveData.tiers.push({
       type: 'TIER',
       name: 'sponsor',
       slug: 'sponsors',
       amount: 10000,
       presets: [10000, 25000, 50000],
       interval: 'month'
-    }
-  ];
+    });
+  }
 
   const location = args.collective.location;
   if (location) {
