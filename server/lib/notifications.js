@@ -2,6 +2,7 @@ import axios from 'axios';
 import config from 'config';
 import Promise from 'bluebird';
 
+import { get } from 'lodash';
 import activitiesLib from '../lib/activities';
 import slackLib from './slack';
 import twitter from './twitter';
@@ -161,6 +162,9 @@ async function notifyByEmail(activity) {
     case activityType.COLLECTIVE_EXPENSE_APPROVED:
       activity.data.actions = {
         viewLatestExpenses: `${config.host.website}/${activity.data.collective.slug}/expenses#expense${activity.data.expense.id}`
+      };
+      if (get(activity, 'data.expense.payoutMethod') === 'paypal') {
+        activity.data.expense.payoutMethod = `PayPal (${activity.data.user.paypalEmail})`;
       }
       notifyUserId(activity.data.expense.UserId, activity);
       notifyAdminsOfCollective(activity.data.host.id, activity, { template: 'collective.expense.approved.for.host' })

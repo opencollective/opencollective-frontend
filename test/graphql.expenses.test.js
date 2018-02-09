@@ -88,7 +88,9 @@ describe('graphql.collective.test.js', () => {
       amount: 1000,
       currency: 'USD',
       description: "Test expense for pizza",
-      payoutMethod: 'manual',
+      privateMessage: "Private instructions to reimburse this expense",
+      attachment: "https://opencollective-production.s3-us-west-1.amazonaws.com/imagejpg_969a1f70-9d47-11e5-80cb-dba89a9a10b0.jpg",
+      payoutMethod: 'paypal',
       incurredAt: new Date,
       lastEditedById: user.id,
       status: 'PENDING'
@@ -254,6 +256,8 @@ describe('graphql.collective.test.js', () => {
         expect(emailSendMessageSpy.firstCall.args[1]).to.contain("has been approved");
         expect(emailSendMessageSpy.secondCall.args[0]).to.equal("host.admin@opencollective.com");
         expect(emailSendMessageSpy.secondCall.args[1]).to.contain("New expense approved on Test Collective: $10 for Test expense for pizza");
+        expect(emailSendMessageSpy.secondCall.args[2]).to.contain("PayPal (testuser@paypal.com)");
+        expect(emailSendMessageSpy.secondCall.args[2]).to.contain("Private instructions to reimburse this expense");
       });
 
     });

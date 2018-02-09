@@ -5,17 +5,27 @@ Subject: New expense approved on {{collective.name}}: {{{currency expense.amount
 <center>
   <h1>{{{currency expense.amount currency=expense.currency}}}</h1>
   <div>{{expense.description}}</div>
-  <div>Submitted by: {{fromCollective.name}}</div>
-  <div>Paypal Email: {{user.paypalEmail}}</div>
-  <p><font color="#999">{{expense.notes}}</font></p>
+</center>
 
+<br />
+<br />
+
+<table>
+  <tr><th>Submitted by:</th><td><a href="{{config.host.website}}/{{fromCollective.slug}}">{{fromCollective.name}}</a></td></tr>
+  <tr><th>Payout method:</th><td>{{expense.payoutMethod}}</td></tr>
+  <tr><th valign="top">Private instructions:</th><td>{{expense.privateMessage}}</td></tr>
+</table>
+
+<br />
+<br />
+
+<center>
   <a href="{{actions.view}}">
     <img src="https://res.cloudinary.com/opencollective/image/fetch/w_640,f_jpg/{{expense.attachment}}" width="100%" />
   </a>
 
   <br /><br />
   <a href="{{actions.viewLatestExpenses}}" class="btn"><div>View Latest Expenses</div></a>
-
 </center>
 
 {{> footer}}
