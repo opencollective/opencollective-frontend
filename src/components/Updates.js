@@ -94,9 +94,8 @@ class Updates extends React.Component {
             </div>
           }
           { updates.map((update) =>
-            <div className="update">
+            <div key={update.id} className="update">
               <Update
-                key={update.id}
                 compact={true}
                 collective={collective}
                 update={update}

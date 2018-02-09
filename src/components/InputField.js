@@ -424,7 +424,7 @@ class InputField extends React.Component {
           .inputField .checkbox label {
             width: auto;
           }
-          .inputField input[type="number"] {
+          .inputField .right input[type="number"] {
             text-align: right;
           }
           .inputField .currency input[type="number"] {

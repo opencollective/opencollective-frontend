@@ -34,10 +34,10 @@ describe("new expense", () => {
   it ("requires to login to submit an expense", () => {
     cy.visit(`${WEBSITE_URL}/testcollective/expenses/new`)
     cy.get('.CreateExpenseForm').contains("Sign up or login to submit an expense");
+    cy.get('.inputField.email input').type("testuser+admin@opencollective.com");
     cy.get('.login').click();
-    cy.location().should(location => {
-      expect(location.search).to.eq('?next=/testcollective/expenses/new')
-    });
+    cy.wait(500);
+    cy.get('.inputField.description');
   });
 
   it ("submits new expense paypal", () => {
@@ -55,15 +55,17 @@ describe("new expense", () => {
     cy.get('button[type=submit]').click();
     cy.screenshot("expenseCreatedPaypalLoggedOut");
     cy.get('.expenseCreated').contains('success');
+    cy.get('.viewAllExpenses').click();
+    cy.wait(200);
     cy.get('.Expenses .expense:first .description').contains(expenseDescription)
     cy.get('.Expenses .expense:first .status').contains("pending")
     cy.get('.Expenses .expense:first .meta').contains("Team")
-    cy.get('.submitNewExpense').click();
+    cy.get('.desktopOnly .submitExpense').click();
     cy.get('.descriptionField input').should('have.value', '');
     cy.get('.amountField input').should('have.value', '');
   })
 
-  it ("submits a new expense other", () => {
+  it ("submits a new expense other, edit it and approve it", () => {
     init();
     cy.get('.descriptionField input').type(expenseDescription);
     cy.wait(500)
@@ -75,6 +77,8 @@ describe("new expense", () => {
     cy.get('button[type=submit]').click();
     cy.screenshot("expenseCreatedLoggedIn");
     cy.get('.expenseCreated').contains('success');
+    cy.get('.viewAllExpenses').click();
+    cy.wait(200);
     cy.get('.Expenses .expense:first .description').contains(expenseDescription);
     cy.get('.Expenses .expense:first .status').contains("pending")
     cy.get('.Expenses .expense:first .privateMessage').contains("Some private note for the host");

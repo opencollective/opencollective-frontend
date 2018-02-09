@@ -160,9 +160,22 @@ class Header extends React.Component {
         border-color: ${colors.blue};
       }
 
+      .clear {
+        clear: both;
+      }
+
+      .pullLeft {
+        float: left;
+      }      
+
+      .pullRight {
+        float: right;
+      }
+
       .hidden {
         display: none;
       }
+
       .mobileOnly {
         display: none;
       }
@@ -190,6 +203,7 @@ class Header extends React.Component {
 
       `}
       </style>
+      <div id="top" />
       <TopBar className={className} LoggedInUser={this.props.LoggedInUser} />
     </header>
     );

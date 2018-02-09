@@ -4,6 +4,7 @@ import Body from '../components/Body';
 import Footer from '../components/Footer';
 import CollectiveCover from '../components/CollectiveCover';
 import { addCollectiveCoverData, addGetLoggedInUserFunction } from '../graphql/queries';
+import Loading from '../components/Loading';
 import NotFound from '../components/NotFoundPage';
 import ErrorPage from '../components/ErrorPage';
 import withData from '../lib/withData';
@@ -33,6 +34,7 @@ class TransactionsPage extends React.Component {
     const { data } = this.props;
     const { LoggedInUser } = this.state;
 
+    if (data.loading) return (<Loading />);
     if (!data.Collective) return (<NotFound />);
 
     if (data.error) {
@@ -59,9 +61,8 @@ class TransactionsPage extends React.Component {
           <CollectiveCover
             collective={collective}
             href={`/${collective.slug}`}
-            title={<FormattedMessage id="collective.transactions.title" defaultMessage="{n, plural, one {Latest transaction} other {Latest transactions}}" values={{n: 2 }} />}
-            className="small"
-            style={get(collective, 'settings.style.hero.cover')}
+            cta={{ href: `/${collective.slug}#contribute`, label: 'contribute' }}
+            LoggedInUser={LoggedInUser}
             />
 
           <div className="content" >
@@ -70,6 +71,7 @@ class TransactionsPage extends React.Component {
               collective={collective}
               LoggedInUser={this.state.LoggedInUser}
               showCSVlink={true}
+              filters={true}
               />
 
           </div>

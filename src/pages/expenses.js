@@ -4,19 +4,22 @@ import Body from '../components/Body';
 import Footer from '../components/Footer';
 import CollectiveCover from '../components/CollectiveCover';
 import { addCollectiveCoverData, addGetLoggedInUserFunction } from '../graphql/queries';
+import Loading from '../components/Loading';
 import NotFound from '../components/NotFoundPage';
 import ErrorPage from '../components/ErrorPage';
 import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
 import ExpensesWithData from '../components/ExpensesWithData';
+import ExpensesStatsWithData from '../components/ExpensesStatsWithData';
 import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl'
+import Button from '../components/Button';
 
 class ExpensesPage extends React.Component {
 
   static getInitialProps (props) {
-    const { query: { collectiveSlug, action }, data } = props;
-    return { slug: collectiveSlug, data, action }
+    const { query: { collectiveSlug }, data } = props;
+    return { slug: collectiveSlug, data }
   }
 
   constructor(props) {
@@ -27,12 +30,14 @@ class ExpensesPage extends React.Component {
   async componentDidMount() {
     const { getLoggedInUser } = this.props;
     const LoggedInUser = getLoggedInUser && await getLoggedInUser(this.props.collectiveSlug);
-    this.setState({LoggedInUser});
+    this.setState({ LoggedInUser });
   }
 
   render() {
     const { data, action } = this.props;
     const { LoggedInUser } = this.state;
+
+    if (!data.loading && !data.Collective) return (<Loading />);
     if (!data.Collective) return (<NotFound />);
 
     if (data.error) {
@@ -44,6 +49,33 @@ class ExpensesPage extends React.Component {
 
     return (
       <div className="ExpensesPage">
+        <style jsx>{`
+          .columns {
+            display: flex;
+          }
+
+          .col.side {
+            width: 100%;
+            min-width: 20rem;
+            max-width: 25%;
+            margin-left: 5rem;
+          }
+
+          .col.large {
+            width: 100%;
+            min-width: 30rem;
+            max-width: 75%;
+          }
+
+          @media(max-width: 600px) {
+            .columns {
+              flex-direction: column-reverse;
+              .col {
+                max-width: 100%;
+              }
+            }
+          }
+        `}</style>
 
         <Header
           title={collective.name}
@@ -59,19 +91,23 @@ class ExpensesPage extends React.Component {
           <CollectiveCover
             collective={collective}
             href={`/${collective.slug}`}
-            title={<FormattedMessage id="expenses.title" defaultMessage="Expenses" />}
-            className="small"
-            style={get(collective, 'settings.style.hero.cover')}
+            cta={{ href: `/${collective.slug}#contribute`, label: 'contribute' }}
+            LoggedInUser={LoggedInUser}
             />
 
-          <div className="content" >
+          <div className="content columns" >
 
-            <ExpensesWithData
-              collective={collective}
-              includeHostedCollectives={collective.isHost}
-              defaultAction={action}
-              LoggedInUser={this.state.LoggedInUser}
-              />
+            <div className="col large">
+              <ExpensesWithData
+                collective={collective}
+                defaultAction={action}
+                LoggedInUser={this.state.LoggedInUser}
+                />
+            </div>
+
+            <div className="col side">
+              <ExpensesStatsWithData slug={collective.slug} />
+            </div>
 
           </div>
 

@@ -28,8 +28,22 @@ class PublishUpdateBtn extends React.Component {
 
     return (
       <div className="PublishUpdateBtn">
-        <SmallButton className="publish" bsStyle="success" onClick={this.onClick}><FormattedMessage id="update.publish.btn" defaultMessage="publish" /></SmallButton>
-        <FormattedMessage id="update.publish.backers" defaultMessage={`Your update will be sent to {n} backers`} values={{ n: get(update, 'collective.stats.backers.all') }} />
+        <style jsx>{`
+          .PublishUpdateBtn {
+            display: flex;
+            align-items: center;
+          }
+          .notice {
+            color: #525866;
+            font-family: Rubik;
+            font-size: 12px;
+            margin-left: 1rem;
+          }
+        `}</style>
+        <SmallButton className="publish" onClick={this.onClick}><FormattedMessage id="update.publish.btn" defaultMessage="publish" /></SmallButton>
+        <div className="notice">
+          <FormattedMessage id="update.publish.backers" defaultMessage={`Your update will be sent to {n} backers`} values={{ n: get(update, 'collective.stats.backers.all') }} />
+        </div>
       </div>
     );
   }

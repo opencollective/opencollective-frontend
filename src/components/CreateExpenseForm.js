@@ -6,6 +6,7 @@ import { imagePreview, capitalize } from '../lib/utils';
 import { graphql } from 'react-apollo'
 import gql from 'graphql-tag'
 import InputField from './InputField';
+import SignInForm from './SignInForm';
 import { Button } from 'react-bootstrap';
 import { getCurrencySymbol } from '../lib/utils';
 import categories from '../constants/categories';
@@ -273,6 +274,7 @@ class CreateExpenseForm extends React.Component {
                   <span className="description">
                     <InputField
                       type="text"
+                      name="description"
                       defaultValue={expense.description}
                       className="descriptionField"
                       onChange={description => this.handleChange('description', description)}
@@ -290,6 +292,7 @@ class CreateExpenseForm extends React.Component {
                     defaultValue={expense.amount}
                     pre={getCurrencySymbol(collective.currency)}
                     type='currency'
+                    name="amount"
                     className="amountField"
                     onChange={amount => this.handleChange('amount', amount)}
                     />
@@ -304,6 +307,7 @@ class CreateExpenseForm extends React.Component {
                   <InputField
                     defaultValue={new Date}
                     type='date'
+                    name="incurredAt"
                     className="incurredAtField"
                     onChange={incurredAt => this.handleChange('incurredAt', incurredAt)}
                     />
@@ -319,6 +323,7 @@ class CreateExpenseForm extends React.Component {
                     type="select"
                     options={this.categoriesOptions}
                     defaultValue={expense.category}
+                    name="category"
                     className="categoryField"
                     onChange={category => this.handleChange('category', category)}
                     />
@@ -395,7 +400,7 @@ class CreateExpenseForm extends React.Component {
       return (
         <div className="CreateExpenseForm">
           <p><FormattedMessage id="expenses.create.login" defaultMessage="Sign up or login to submit an expense." /></p>
-          <p><Button className="blue login" href={`/signin?next=/${collective.slug}/expenses/new`}><FormattedMessage id="login.button" defaultMessage="login" /></Button></p>
+          <SignInForm next={`/${collective.slug}/expenses/new`} />
         </div>
       )
     } else {

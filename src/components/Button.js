@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import colors from '../constants/colors';
-import { Router } from '../server/pages';
+import router from '../server/pages';
 import HashLink from 'react-scrollchor';
 
 const star = '/static/images/icons/star.svg';
@@ -34,7 +34,8 @@ class Button extends React.Component {
     if (type === "submit") return;
     e.preventDefault();
     if (href && href.substr(0,1) !== '#') {
-      return Router.pushRoute(href);
+      const routeFromRouter = router.findByName(href);
+      return router.Router.pushRoute(href);
     }
     if (!onClick) return;
     return !disabled && onClick && onClick();
@@ -58,7 +59,7 @@ class Button extends React.Component {
           border: 2px solid #45474D;
           border-radius: 500px;
           padding: 0 24px;
-          color: #E3E4E6;
+          color: #45474D;
           background-color: transparent;
         }
         .Button:hover {
@@ -110,7 +111,7 @@ class Button extends React.Component {
         }
         .blue {
           color: white;
-          border-color: ${colors.blue};
+          border-color: ${colors.white};
           background-color: ${colors.blue};
         }
         .blue:hover {

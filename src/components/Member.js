@@ -117,21 +117,19 @@ ${totalDonationsStr}`
         <div>
           { viewMode === 'USER' &&
             <Link route={'collective'} params={{ slug: this.props.member.member.slug}} target="_top" title={title}>
-              <a>
-                <Avatar src={member.image} radius={45} />
-                <div className="bubble">
-                  <div className="name">{name}</div>
-                  <div className="description" style={{color: colors.darkgray}}>{firstSentence(description || member.description, 64)}</div>
-                  <div className="meta since" style={{color: colors.darkgray}}>
-                    {memberSinceStr}
-                  </div>
-                  { totalDonationsStr &&
-                    <div className="meta totalDonations" style={{color: colors.darkgray}}>
-                      {totalDonationsStr}
-                    </div>
-                  }
+              <Avatar src={member.image} radius={45} />
+              <div className="bubble">
+                <div className="name">{name}</div>
+                <div className="description" style={{color: colors.darkgray}}>{firstSentence(description || member.description, 64)}</div>
+                <div className="meta since" style={{color: colors.darkgray}}>
+                  {memberSinceStr}
                 </div>
-              </a>
+                { totalDonationsStr &&
+                  <div className="meta totalDonations" style={{color: colors.darkgray}}>
+                    {totalDonationsStr}
+                  </div>
+                }
+              </div>
             </Link>
           }
           { viewMode === 'ORGANIZATION' &&

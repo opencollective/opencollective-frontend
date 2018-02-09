@@ -11,6 +11,7 @@ import Avatar from './Avatar';
 import Logo from './Logo';
 import { defaultBackgroundImage } from '../constants/collectives';
 import Button from './Button';
+import MenuBar from './MenuBar';
 
 class CollectiveCover extends React.Component {
 
@@ -26,9 +27,16 @@ class CollectiveCover extends React.Component {
   constructor(props) {
     super(props);
     this.messages = defineMessages({
+      'contribute': { id: 'collective.contribute', defaultMessage: 'contribute' },
+      'apply': { id: 'host.apply', defaultMessage: "Apply to create a collective" },
       'ADMIN': { id: 'roles.admin.label', defaultMessage: 'Core Contributor' },
       'MEMBER': { id: 'roles.member.label', defaultMessage: 'Contributor' }
     });
+
+    if (props.cta) {
+      const label = props.cta.label;
+      this.cta = { href: props.cta.href, label: this.messages[label] ? props.intl.formatMessage(this.messages[label]) : label };
+    }
   }
 
   getMemberTooltip(member) {
@@ -49,7 +57,8 @@ ${description}`
   render() {
     const {
       collective,
-      className
+      className,
+      LoggedInUser
     } = this.props;
 
     const {
@@ -85,6 +94,7 @@ ${description}`
       membersPreview = union(admins, members, backers).filter(m => m.member).slice(0, 5);
     }
     const additionalBackers = (get(stats, 'backers.all') || (get(collective, 'members') || []).length) - membersPreview.length;
+
     return (
       <div className={`CollectiveCover ${className} ${type}`}>
         <style jsx>{`
@@ -302,10 +312,19 @@ ${description}`
               </div>
             }
             { this.props.cta &&
-              <Button className="blue" href={this.props.cta.href}>{this.props.cta.label}</Button>
+              <Button className="blue" href={this.cta.href}>{this.cta.label}</Button>
             }
           </div>
         </div>
+
+        { className !== "small" &&
+          <MenuBar
+            collective={collective}
+            LoggedInUser={LoggedInUser}
+            cta={this.cta}
+            />
+        }
+
       </div>
     );
   }

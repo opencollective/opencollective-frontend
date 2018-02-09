@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import Header from '../components/Header';
 import Body from '../components/Body';
 import Footer from '../components/Footer';
+import SignInForm from '../components/SignInForm';
 import EditCollectiveForm from '../components/EditCollectiveForm';
 import CollectiveCover from '../components/CollectiveCover';
 import { Button } from 'react-bootstrap';
@@ -201,7 +202,7 @@ class EditCollective extends React.Component {
             {!canEditCollective &&
               <div className="login">
                 <p>You need to be logged in as the creator of this collective<br />or as a core contributor of the {collective.name} collective.</p>
-                <p><Button bsStyle="primary" href={`/signin?next=/${collective.slug}/edit`}>Login</Button></p>
+                <SignInForm next={`/${collective.slug}/edit`} />
               </div>
             }   
             { canEditCollective &&

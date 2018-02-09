@@ -60,8 +60,8 @@ class CollectiveCard extends React.Component {
       linkParams.referral = LoggedInUser.CollectiveId;
     }
     return (
-      <Link route={'collective'} params={linkParams} target="_top">
-        <a className={`CollectiveCard ${collective.type}`} >
+      <Link route={'collective'} params={linkParams} target="_top" >
+        <div className={`CollectiveCard ${collective.type}`}>
           <style jsx>{`
           .CollectiveCard {
             display: flex;
@@ -266,7 +266,7 @@ class CollectiveCard extends React.Component {
               </div>
             }
           </div>
-        </a>
+        </div>
       </Link>
       );
   }
