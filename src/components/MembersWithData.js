@@ -76,7 +76,18 @@ class MembersWithData extends React.Component {
       return (<div />)
     }
 
-    members.sort((a, b) => b.stats.totalDonations - a.stats.totalDonations);
+    // need to sort by totalDonations and then date
+    // browsers (chrome vs. firefox) appear to handle "0" return cases differently
+    members.sort((a, b) => {
+      if (b.stats.totalDonations !== a.stats.totalDonations) {
+        return b.stats.totalDonations - a.stats.totalDonations;
+      } else {
+        const aDate = new Date(a.createdAt);
+        const bDate = new Date(b.createdAt);
+        return aDate - bDate;
+      }
+    });
+    
     const size = members.length > 50 ? "small" : "large";
     let viewMode = (type && type.split(',')[0]) || "USER";
     if (tier && tier.name.match(/sponsor/i)) {
