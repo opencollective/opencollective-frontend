@@ -179,6 +179,7 @@ class CreateOrderPage extends React.Component {
             collective={collective}
             href={`/${collective.slug}`}
             LoggedInUser={LoggedInUser}
+            className="small"
             />
 
           <div className="content">
