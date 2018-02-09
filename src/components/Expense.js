@@ -114,6 +114,13 @@ class Expense extends React.Component {
         || (expense.status === 'APPROVED' && (Date.now() - (new Date(expense.updatedAt).getTime())) < 60 * 1000 * 15) // we can reject an expense for up to 10mn after approving it
       );
 
+    const canApprove = LoggedInUser
+      && LoggedInUser.canApproveExpense(expense)
+      && (
+        expense.status === 'PENDING'
+        || (expense.status === 'REJECTED' && (Date.now() - (new Date(expense.updatedAt).getTime())) < 60 * 1000 * 15) // we can approve an expense for up to 10mn after rejecting it
+      );
+
       return (
       <div className={`expense ${status} ${this.state.mode}View`}>
         <style jsx>{`
@@ -259,7 +266,7 @@ class Expense extends React.Component {
                       unlock={this.props.unlockPayAction}
                       />
                   }
-                  { expense.status !== 'APPROVED' && expense.status !== 'PAID' && <ApproveExpenseBtn id={expense.id} /> }
+                  { canApprove && <ApproveExpenseBtn id={expense.id} /> }
                   { canReject && <RejectExpenseBtn id={expense.id} /> }
                 </div>
               }
