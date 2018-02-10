@@ -35,6 +35,8 @@ class Role extends React.Component {
           box-sizing: border-box;
           height: 22px;
           padding: 0 1rem;
+          display: flex;
+          align-items: center;
           border: 1px solid #CACBCC;
           border-radius: 4px;
           background-color: #FFFFFF;

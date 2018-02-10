@@ -157,6 +157,19 @@ class Update extends React.Component {
           </a>
         </div>
         <div className="body">
+
+          { mode === "summary" &&
+            <div className="title">
+              <Link route={`/${collective.slug}/updates/${update.slug}`}><a>{capitalize(update.title)}</a></Link>
+            </div>
+          }
+
+          { mode === "details" &&
+            <div className="title">
+              {capitalize(update.title)}
+            </div>
+          }
+
           <div className="meta">
             <div className="author"><Link route={`/${update.fromCollective.slug}`}><a>{update.fromCollective.name}</a></Link></div> 
             <Role role='ADMIN' />
@@ -176,31 +189,19 @@ class Update extends React.Component {
           </div>
 
           { mode === "summary" &&
-            <div>
-              <div className="title">
-                <Link route={`/${collective.slug}/updates/${update.slug}`}><a>{capitalize(update.title)}</a></Link>
-              </div>
-              <div className="summary">
-                {update.summary}
-              </div>
+            <div className="summary">
+              {update.summary}
             </div>
           }
 
-          { mode === "details" && 
+          { mode === "details" && !this.props.compact &&
             <div>
-              <div className="title">
-                {capitalize(update.title)}
-              </div>
-              { !this.props.compact &&
-                <div>
-                  { update.html && <div dangerouslySetInnerHTML={{ __html: update.html }} /> }
-                  { !update.html && <UpdateTextWithData id={update.id} /> }
-                  { update.publishedAt &&
-                    <Link route={`/${collective.slug}/updates`}><a className="viewLatestUpdates">
-                      {intl.formatMessage(this.messages[`viewLatestUpdates`])}</a>
-                    </Link>
-                  }
-                </div>
+              { update.html && <div dangerouslySetInnerHTML={{ __html: update.html }} /> }
+              { !update.html && <UpdateTextWithData id={update.id} /> }
+              { update.publishedAt &&
+                <Link route={`/${collective.slug}/updates`}><a className="viewLatestUpdates">
+                  {intl.formatMessage(this.messages[`viewLatestUpdates`])}</a>
+                </Link>
               }
             </div>
           }
