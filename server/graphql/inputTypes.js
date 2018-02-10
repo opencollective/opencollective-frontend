@@ -234,6 +234,7 @@ export const UpdateAttributesInputType = new GraphQLInputObjectType({
     slug: { type: GraphQLString },
     title: { type: GraphQLString },
     image: { type: GraphQLString },
+    markdown: { type: GraphQLString },
     html: { type: GraphQLString },
     fromCollective: { type: CollectiveAttributesInputType },
     tier: { type: TierInputType }
