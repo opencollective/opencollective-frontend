@@ -144,6 +144,15 @@ class Button extends React.Component {
         .Button :global(span) {
           white-space: nowrap;
         }
+        .ticket {
+          width: 100%;
+          border-radius: 0;
+          height: 100%;
+          border-color: #2E8AE6;
+          text-transform: uppercase;
+          font-weight: bold;
+          font-size: 1.7rem;
+        }
         `}</style>
         <style jsx global>{`
         .mobileOnly .Button {

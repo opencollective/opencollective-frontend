@@ -4,7 +4,6 @@ import Header from '../components/Header';
 import Body from '../components/Body';
 import Footer from '../components/Footer';
 import CollectiveCover from '../components/CollectiveCover';
-import ActionBar from '../components/ActionBar';
 import Location from '../components/Location';
 import HashLink from 'react-scrollchor';
 import Tier from '../components/Tier';
@@ -345,15 +344,11 @@ class Event extends React.Component {
                 <CollectiveCover
                   collective={event}
                   title={event.name}
+                  description={info}
                   href={`/${event.parentCollective.slug}`}
                   style={get(event, 'settings.style.hero.cover') || get(event.parentCollective, 'settings.style.hero.cover')}
                   />
               }
-
-              <ActionBar
-                actions={this.state.actions}
-                info={info}
-                />
 
               {this.state.showInterestedForm &&
                 <InterestedForm onSubmit={this.setInterested} />
@@ -375,10 +370,10 @@ class Event extends React.Component {
                 <div>
                   <div className="content" >
                     <div className="eventDescription" >
-                      <Markdown source={event.description || event.longDescription} />
+                      <Markdown source={event.description || event.longDescription} escapeHtml={false} />
                     </div>
 
-                    <div id="tickets">
+                    <section id="tickets">
                       {event.tiers.map((tier) =>
                         <Tier
                           key={tier.id}
@@ -389,7 +384,7 @@ class Event extends React.Component {
                           onClick={(response) => this.handleOrderTier(response)}
                           />
                       )}
-                    </div>
+                    </section>
                   </div>
 
                   <Location location={event.location} />

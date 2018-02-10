@@ -55,7 +55,11 @@ class MenuBar extends React.Component {
       'events': { id: 'menu.events', defaultMessage: "events" },
       'updates': { id: 'menu.updates', defaultMessage: "updates" },
       'budget': { id: 'menu.budget', defaultMessage: "budget" },
-      'contributors': { id: 'menu.contributors', defaultMessage: "contributors" }
+      'contributors': { id: 'menu.contributors', defaultMessage: "contributors" },
+      'menu.edit.collective': { id: 'menu.edit.collective', defaultMessage: "edit collective" },
+      'menu.edit.user': { id: 'menu.edit.user', defaultMessage: "edit profile" },
+      'menu.edit.organization': { id: 'menu.edit.organization', defaultMessage: "edit organization" },
+      'menu.edit.event': { id: 'menu.edit.event', defaultMessage: "edit event" }
     })
   }
 
@@ -212,7 +216,7 @@ class MenuBar extends React.Component {
             <div className="item editCollective">
               <Link route={`/${collective.slug}/edit`}>
                 <div className="icon edit" />
-                <FormattedMessage id="menu.editCollective" defaultMessage="edit collective" />
+                { intl.formatMessage(this.messages[`menu.edit.${collective.type.toLowerCase()}`])}
               </Link>
             </div>
           </div>
