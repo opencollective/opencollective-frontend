@@ -64,7 +64,6 @@ export const sanitizeObject = (obj, attributes) => {
 }
 
 
-
 /**
  * Generate a secured token that works inside URLs
  * http://stackoverflow.com/a/25690754
