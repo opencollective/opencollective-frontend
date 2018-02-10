@@ -243,7 +243,8 @@ class MenuBar extends React.Component {
 
         .content {
           display: block;
-          padding: 0;
+          padding-top: 0;
+          padding-bottom: 0;
         }
 
         .flexColumns {
@@ -254,7 +255,7 @@ class MenuBar extends React.Component {
         .logo {
           height: 64px;
           min-width: 64px;
-          margin: 12px;
+          margin: 12px 12px 12px 0;
           float: left;
         }
 
@@ -295,7 +296,7 @@ class MenuBar extends React.Component {
         }
 
         .MenuBar .buttons button {
-          margin-right: 1rem;
+          margin-left: 1rem;
         }
 
         .MenuBar .logo img {

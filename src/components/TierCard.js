@@ -120,7 +120,7 @@ class TierCard extends React.Component {
             background-color: #ffffff;
             box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.04);
             border: solid 1px rgba(37, 39, 41, 0.16);
-            margin: 3rem;
+            margin: 3rem 0 3rem 3rem;
             display: flex;
             flex-direction: column;
             justify-content: space-between;

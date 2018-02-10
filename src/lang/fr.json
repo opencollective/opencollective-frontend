@@ -487,7 +487,7 @@
   "collective.section.backers.users.title": "{n} {n, plural one {personne soutient} other {personnes soutiennent}} {collective}",
   "widget.becomeBacker": "Deviens un contributeur",
   "expense.created": "Votre dépense a bien été soumise avec succès. Elle est maintenant en attente d'approbation par les administrateurs du collectif. Vous serez notifié dès qu'elle aura été approuvée. Ensuite, l'hôte du collectif {host} procèdera au remboursement.",
-  "expenses.sendAnotherExpense": "Submit Another Expense",
+  "expenses.sendAnotherExpense": "Soumettre une autre dépense",
   "tier.order.donation.title": "Contribution",
   "tier.order.membership.title": "Deviens un membre",
   "tier.order.service.title": "Commande",

@@ -168,7 +168,7 @@ class Collective extends React.Component {
           @media(min-width: 600px) {
             .sidebar {
               float: right;
-              margin: 3rem;
+              margin: 3rem 0 3rem 3rem;
             }
           }
         `}</style>
@@ -238,7 +238,7 @@ class Collective extends React.Component {
                   <section id="about" className="longDescription" >
                     <SectionTitle
                       title={<FormattedMessage id="collective.about.title" defaultMessage="About" />}
-                      subtitle={`${(this.collective.description || '').trim()}, ${intl.formatMessage(this.messages['collective.since'], { year: new Date(this.collective.createdAt).getFullYear()})}`}
+                      subtitle={`${this.collective.description || ''}`}
                       />
 
                     <Markdown source={this.collective.longDescription || ''} />

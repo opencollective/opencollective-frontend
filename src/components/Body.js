@@ -45,6 +45,7 @@ export default class Body extends React.Component {
           padding: 2rem 3rem;
           margin: 0 auto;
           line-height: 1.5;
+          overflow: hidden;
         }
 
         .content p {
