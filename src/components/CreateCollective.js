@@ -7,6 +7,7 @@ import { addCreateCollectiveMutation } from '../graphql/mutations';
 import moment from 'moment-timezone';
 import CreateCollectiveForm from '../components/CreateCollectiveForm';
 import CollectiveCover from '../components/CollectiveCover';
+import Loading from '../components/Loading';
 import SignInForm from '../components/SignInForm';
 import { Button } from 'react-bootstrap';
 import { get } from 'lodash';
@@ -70,6 +71,9 @@ class CreateCollective extends React.Component {
     const { LoggedInUser, host } = this.props;
     const canApply = get(host, 'settings.apply');
 
+    if (!host) {
+      return (<Loading />);
+    }
     const title = `Apply to create a new collective hosted by ${host.name}`;
 
     return (
@@ -113,7 +117,7 @@ class CreateCollective extends React.Component {
             href={`/${host.slug}`}
             title={title}
             collective={host}
-            style={get(host, 'settings.style.hero.cover')}
+            className="small"
             />
 
           <div className="content" >

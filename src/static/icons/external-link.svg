@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="14px" height="14px" viewBox="0 0 14 14" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 47.1 (45422) - http://www.bohemiancoding.com/sketch -->
+    <title>03 › glyphs/14px/external-link</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <path d="M10.9514719,2.2 L8.8,2.2 C8.46862915,2.2 8.2,1.93137085 8.2,1.6 C8.2,1.26862915 8.46862915,1 8.8,1 L12.4,1 C12.7313708,1 13,1.26862915 13,1.6 L13,5.2 C13,5.53137085 12.7313708,5.8 12.4,5.8 C12.0686292,5.8 11.8,5.53137085 11.8,5.2 L11.8,3.04852814 L6.22426407,8.62426407 C5.98994949,8.85857864 5.61005051,8.85857864 5.37573593,8.62426407 C5.14142136,8.38994949 5.14142136,8.01005051 5.37573593,7.77573593 L10.9514719,2.2 Z M10,7.6 C10,7.26862915 10.2686292,7 10.6,7 C10.9313708,7 11.2,7.26862915 11.2,7.6 L11.2,11.2 C11.2,12.1941125 10.3941125,13 9.4,13 L2.8,13 C1.80588745,13 1,12.1941125 1,11.2 L1,4.6 C1,3.60588745 1.80588745,2.8 2.8,2.8 L6.4,2.8 C6.73137085,2.8 7,3.06862915 7,3.4 C7,3.73137085 6.73137085,4 6.4,4 L2.8,4 C2.46862915,4 2.2,4.26862915 2.2,4.6 L2.2,11.2 C2.2,11.5313708 2.46862915,11.8 2.8,11.8 L9.4,11.8 C9.73137085,11.8 10,11.5313708 10,11.2 L10,7.6 Z" id="path-1"></path>
+    </defs>
+    <g id="Symbols" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="03-›-glyphs/14px/external-link">
+            <g id="glyph">
+                <rect id="container" x="0" y="0" width="14" height="14"></rect>
+                <mask id="mask-2" fill="white">
+                    <use xlink:href="#path-1"></use>
+                </mask>
+                <g id="glyp-external-link" fill-rule="nonzero"></g>
+                <g id="01-›-colors/flat/neutral/neutral-050" mask="url(#mask-2)" fill="#C2C7CC">
+                    <rect id="base" x="0" y="0" width="14" height="14"></rect>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

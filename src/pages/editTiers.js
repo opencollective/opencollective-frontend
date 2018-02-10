@@ -1,6 +1,5 @@
 import React from 'react';
 import { addTiersData } from '../graphql/queries';
-import Link from 'next/link';
 import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
 import { FormattedDate, FormattedMessage } from 'react-intl';

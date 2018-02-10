@@ -3,7 +3,7 @@ import withIntl from '../lib/withIntl';
 import React from 'react';
 import CreateCollective from '../components/CreateCollective';
 import { addGetLoggedInUserFunction, addCollectiveCoverData } from '../graphql/queries';
-import NotFound from '../components/NotFound';
+import NotFound from '../components/NotFoundPage';
 import Loading from '../components/Loading';
 
 class CreateCollectivePage extends React.Component {

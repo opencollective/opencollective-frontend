@@ -4,7 +4,7 @@ import React from 'react'
 import { addEventCollectiveData, addGetLoggedInUserFunction } from '../graphql/queries';
 import { intersection } from 'lodash';
 
-import NotFound from '../components/NotFound';
+import NotFound from '../components/NotFoundPage';
 import Loading from '../components/Loading';
 import ErrorPage from '../components/ErrorPage';
 import Event from '../components/Event';

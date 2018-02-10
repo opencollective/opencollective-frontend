@@ -4,6 +4,7 @@ import TopBar from './TopBar';
 
 import { truncate, getQueryParams } from '../lib/utils';
 import storage from '../lib/storage';
+import colors from '../constants/colors';
 
 class Header extends React.Component {
 
@@ -38,7 +39,7 @@ class Header extends React.Component {
   }
 
   render() {
-    const { className } = this.props;
+    const { css, className } = this.props;
     let title = this.props.title || "Open Collective - open your finances to your community";
     if (!title.match(/open collective/i)) {
       title += ` - Open Collective`;
@@ -56,6 +57,7 @@ class Header extends React.Component {
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css" />
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
         <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,900|Rubik" />
+        { css && <link rel="stylesheet" href={css} /> }
         <title>{title}</title>
         { this.meta.map(({name, content}, index) => <meta property={name} content={content} key={`meta-${index}`} />) }
       </Head>
@@ -153,19 +155,55 @@ class Header extends React.Component {
         flex-direction: row;
       }
 
-      @media(max-width: 600px) {
+      .btn-primary {
+        background-color: ${colors.blue};
+        border-color: ${colors.blue};
+      }
+
+      .clear {
+        clear: both;
+      }
+
+      .pullLeft {
+        float: left;
+      }      
+
+      .pullRight {
+        float: right;
+      }
+
+      .hidden {
+        display: none;
+      }
+
+      .mobileOnly {
+        display: none;
+      }
+      .mediumScreenOnly {
+        display: none;
+      }
+      .desktopOnly {
+        display: none;
+      }
+      @media(min-width: 1024px) {
         .desktopOnly {
-          display: none !important;
+          display: inherit !important;
         }
       }
-      #media(max-width: 400px) {
+      @media(min-width: 420px) and (max-width: 1024px) {
         .mediumScreenOnly {
-          display: none !important;
+          display: inherit !important;
+        }
+      }
+      @media(max-width: 420px) {
+        .mobileOnly {
+          display: inherit !important;
         }
       }
 
       `}
       </style>
+      <div id="top" />
       <TopBar className={className} LoggedInUser={this.props.LoggedInUser} />
     </header>
     );

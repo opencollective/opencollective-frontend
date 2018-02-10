@@ -1,7 +1,4 @@
 import React from 'react';
-import Header from './Header';
-import Body from './Body';
-import Footer from './Footer';
 
 export default () => {
   return (
@@ -17,12 +14,8 @@ export default () => {
       }
       `}
       </style>
-      <Header />
-      <Body>
-        <h1>Not Found</h1>
-        <div className="shrug">¯\_(ツ)_/¯ </div>
-      </Body>
-      <Footer />
+      <h1>Not Found</h1>
+      <div className="shrug">¯\_(ツ)_/¯ </div>
     </div>
   )
 }

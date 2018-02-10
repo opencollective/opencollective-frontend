@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import withIntl from '../lib/withIntl';
 import { defineMessages, FormattedMessage } from 'react-intl';
-import { get } from 'lodash';
+import { get, uniqBy } from 'lodash';
 import Avatar from './Avatar';
 import Logo from './Logo';
 import { Router } from '../server/pages';
@@ -36,7 +36,7 @@ class TierCard extends React.Component {
 
   showLastOrders(fromCollectiveTypeArray, limit) {
     const { tier } = this.props;
-    const fromCollectives = tier.orders.map(o => o.fromCollective).filter(c => c && fromCollectiveTypeArray.indexOf(c.type) !== -1);
+    const fromCollectives = uniqBy(tier.orders.map(o => o.fromCollective).filter(c => c && fromCollectiveTypeArray.indexOf(c.type) !== -1), c => c.id);
     if (fromCollectives.length === 0) return;
     return (
       <div>
@@ -48,7 +48,7 @@ class TierCard extends React.Component {
         `}</style>
         <div className={`fromCollectives ${fromCollectiveTypeArray[0].toLowerCase()}`}>
           { fromCollectives.slice(0, limit).map(fromCollective => (
-            <div className="image" key={`image-${fromCollective.id}`}>
+            <div className="image" key={`${tier.slug}-fromCollective-${fromCollective.id}`}>
               <Link route={`/${fromCollective.slug}`}><a title={fromCollective.name}>
                 { fromCollectiveTypeArray.indexOf('USER') !== -1 &&
                   <Avatar src={fromCollective.image} radius={32} />
@@ -88,7 +88,7 @@ class TierCard extends React.Component {
     }
 
     return (
-      <div className={`${this.props.className} TierCard`} id={this.anchor}>
+      <div className={`TierCard ${this.props.className} ${this.anchor}`}>
         <style jsx global>{`
           html {
             --charcoal-grey-two: #373a3d;
@@ -188,17 +188,21 @@ class TierCard extends React.Component {
             width: 280px;
             height: 56px;
             border-radius: 0 0 8px 8px;
-            background-color: #8f47b3;
-            background-color: var(--main-custom-color);
-            box-shadow: inset 0 -4px 0 0 rgba(37, 39, 41, 0.15);
+            background-color: ${colors.blue};
             font-family: Rubik, sans-serif;
             font-size: 14px;
             font-weight: 500;
             text-align: center;
-            color: #ffffff;
+            color: #ffffff !important; /* needed for firefox :-/ */
             display: flex;
             justify-content: center;
             align-items: center;
+          }
+          .action:hover {
+            background-color: ${colors.blueHover};
+          }
+          .action:active {
+            background-color: ${colors.blueActive};
           }
           .action.disabled {
             background-color: var(--silver-four);

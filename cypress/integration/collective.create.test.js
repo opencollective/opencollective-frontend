@@ -35,6 +35,7 @@ describe("create a collective on default host", () => {
     cy.get('.result').contains("Collective created successfully");
     cy.wait(1000);
     cy.get('.CollectivePage .NotificationLine').contains("Your collective has been created with success");
+    cy.get('.CollectivePage .TierCard').should("have.length", 2);
   })
 
 })

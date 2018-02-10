@@ -41,7 +41,8 @@ describe("edit collective", () => {
     cy.wait(500);
     cy.get('.actions > .btn').click(); // save changes
     cy.get('.backToProfile a').click(); // back to profile
-    cy.get('.cover h1').contains('edited');
+    cy.wait(500);
+    cy.get('.CollectivePage .cover h1').contains('edited');
     cy.get('.cover .twitterHandle').contains('@opencollect');
     cy.get('.cover .website').contains('opencollective.com');
     cy.get('.CollectivePage .longDescription').contains("Testing markdown link to google");
@@ -77,6 +78,7 @@ describe("edit collective", () => {
     cy.wait(500);
     cy.get('.actions > .btn').click(); // save changes
     cy.get('.backToProfile a').click(); // back to profile
+    cy.wait(500);
     cy.get('.TierCard', { timeout: 5000 })
     cy.screenshot("tierEdited");
     cy.get('.TierCard').first().find('.name').contains('Backer edited');
@@ -99,6 +101,7 @@ describe("edit collective", () => {
     cy.wait(500)
     cy.get('.actions > .btn').click(); // save changes
     cy.get('.backToProfile a').click(); // back to profile
+    cy.wait(500)
     cy.get('.CollectivePage .tiers', { timeout: 10000 }).find('.TierCard')
       .should('have.length', 2)
   })

@@ -1,5 +1,5 @@
-import Link from 'next/link'
 import React from 'react';
+import Link from '../components/Link';
 
 class Footer extends React.Component {
 
@@ -37,7 +37,7 @@ class Footer extends React.Component {
         li {
           display: inline-block;
         }
-        li a {
+        li :global(a) {
           opacity: 0.5;
           color: white;
           font-size: 1.2rem;
@@ -67,7 +67,7 @@ class Footer extends React.Component {
                 <li><a href="https://opencollective.com/#opensource">Use Cases</a></li>
                 <li><a href="https://opencollective.com/faq">FAQ</a></li>
                 <li><a href="https://forum.opencollective.com">Forum</a></li>
-                <li><Link href="/tos"><a>Terms Of Service</a></Link></li>
+                <li><Link route="/tos">Terms Of Service</Link></li>
                 <li><a href="https://opencollective.com/about">About</a></li>
                 <li><a href="mailto:info@opencollective.com">Contact</a></li>
               </ul>

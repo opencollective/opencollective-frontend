@@ -106,7 +106,7 @@ class Transaction extends React.Component {
 
           @media(max-width: 600px) {
             .transaction {
-              max-height: 13rem;
+              max-height: 23rem;
             }
             .transaction.detailsView {
               max-height: 45rem;

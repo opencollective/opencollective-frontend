@@ -10,25 +10,33 @@ import Currency from './Currency';
 import Avatar from './Avatar';
 import Logo from './Logo';
 import { defaultBackgroundImage } from '../constants/collectives';
-import CTAButton from './Button';
+import Button from './Button';
+import MenuBar from './MenuBar';
 
 class CollectiveCover extends React.Component {
 
   static propTypes = {
     collective: PropTypes.object.isRequired,
     href: PropTypes.string,
-    cta: PropTypes.node,
     title: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
     description: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
     style: PropTypes.object,
+    cta: PropTypes.object // { href, label }
   }
 
   constructor(props) {
     super(props);
     this.messages = defineMessages({
+      'contribute': { id: 'collective.contribute', defaultMessage: 'contribute' },
+      'apply': { id: 'host.apply', defaultMessage: "Apply to create a collective" },
       'ADMIN': { id: 'roles.admin.label', defaultMessage: 'Core Contributor' },
       'MEMBER': { id: 'roles.member.label', defaultMessage: 'Contributor' }
     });
+
+    if (props.cta) {
+      const label = props.cta.label;
+      this.cta = { href: props.cta.href, label: this.messages[label] ? props.intl.formatMessage(this.messages[label]) : label };
+    }
   }
 
   getMemberTooltip(member) {
@@ -50,7 +58,7 @@ ${description}`
     const {
       collective,
       className,
-      href
+      LoggedInUser
     } = this.props;
 
     const {
@@ -61,6 +69,7 @@ ${description}`
       stats
     } = collective;
 
+    const href = this.props.href || `/${collective.slug}`;
     const title = this.props.title || collective.name;
     const description = this.props.description || collective.description;
     const formattedYearlyIncome = stats && stats.yearlyBudget > 0 && formatCurrency(stats.yearlyBudget, collective.currency, { precision: 0 });
@@ -85,13 +94,9 @@ ${description}`
       membersPreview = union(admins, members, backers).filter(m => m.member).slice(0, 5);
     }
     const additionalBackers = (get(stats, 'backers.all') || (get(collective, 'members') || []).length) - membersPreview.length;
+
     return (
       <div className={`CollectiveCover ${className} ${type}`}>
-        <style jsx global>{`
-          .CollectiveCover .ctabtn a {
-            color: white !important;
-          }
-        `}</style>
         <style jsx>{`
         .cover {
           display: flex;
@@ -115,6 +120,19 @@ ${description}`
           left: 0;
           width: 100%;
           height: 100%;
+        }
+        .twitterHandle {
+          background: url('/static/icons/twitter-handler.svg') no-repeat 0px 6px;
+          padding-left: 22px;
+        }
+        .website {
+          background: url('/static/icons/external-link.svg') no-repeat 0px 6px;
+          padding-left: 22px;
+        }
+        .host label {
+          font-weight: 300;
+          margin-right: 5px;
+          opacity: 0.75;
         }
         .content {
           position: relative;
@@ -165,7 +183,8 @@ ${description}`
         .contact {
           display: flex;
           flex-direction: row;
-          justify-content: center
+          justify-content: center;
+          flex-wrap: wrap;
         }
         .contact div {
           margin: 1rem;
@@ -228,21 +247,6 @@ ${description}`
           line-height: 1.25;
           margin: 1px;
         }
-        .CollectiveCover :global(.ctabtn) {
-          width: auto;
-          min-width: 20rem;
-          padding: 0 2rem;
-          margin: 2rem 0 0 0;
-          font-family: Lato;
-          text-transform: uppercase;
-          background-color: #75cc1f;
-          font-size: 1.5rem;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          color: white !important;
-          border-radius: 2.8rem;
-        }
         @media(max-width: 600px) {
           h1 {
             font-size: 2.5rem;
@@ -260,12 +264,11 @@ ${description}`
             { company && company.substr(0,1) === '@' && <p className="company"><Link route={`/${company.substr(1)}`}><a>{company.substr(1)}</a></Link></p> }
             { company && company.substr(0,1) !== '@' && <p className="company">{company}</p> }
             { description && <p className="description">{description}</p> }
-            { (twitterHandle || website) &&
-              <div className="contact">
-                { twitterHandle && <div className="twitterHandle"><a href={`https://twitter.com/${twitterHandle}`} target="_blank">@{twitterHandle}</a></div> }
-                { website && <div className="website"><a href={website} target="_blank">{prettyUrl(website) }</a></div> }
-              </div>
-            }
+            <div className="contact">
+              { collective.host && <div className="host"><label><FormattedMessage id="collective.cover.hostedBy" defaultMessage="Hosted by" /></label><Link route={`/${collective.host.slug}`}><a>{collective.host.name} </a></Link></div> }
+              { twitterHandle && <div className="twitterHandle"><a href={`https://twitter.com/${twitterHandle}`} target="_blank">@{twitterHandle}</a></div> }
+              { website && <div className="website"><a href={website} target="_blank">{prettyUrl(website) }</a></div> }
+            </div>
             { membersPreview.length > 0 &&
               <div className="members">
                 { membersPreview.map(member => (
@@ -309,10 +312,19 @@ ${description}`
               </div>
             }
             { this.props.cta &&
-              <CTAButton className="ctabtn green">{this.props.cta}</CTAButton>
+              <Button className="blue" href={this.cta.href}>{this.cta.label}</Button>
             }
           </div>
         </div>
+
+        { className !== "small" &&
+          <MenuBar
+            collective={collective}
+            LoggedInUser={LoggedInUser}
+            cta={this.cta}
+            />
+        }
+
       </div>
     );
   }

@@ -13,7 +13,7 @@ import { Router } from '../server/pages';
 import { graphql } from 'react-apollo'
 import gql from 'graphql-tag'
 import Loading from '../components/Loading';
-import NotFound from '../components/NotFound';
+import NotFound from '../components/NotFoundPage';
 import storage from '../lib/storage';
 import { get, pick } from 'lodash';
 
@@ -121,6 +121,7 @@ class CreateOrderPage extends React.Component {
 
   render() {
     const { intl, data, interval, verb } = this.props;
+    const { loading, LoggedInUser } = this.state;
     const description = decodeURIComponent(this.props.description || "");
     const collective = data.Collective;
     if (data.loading) return (<Loading />);
@@ -168,15 +169,16 @@ class CreateOrderPage extends React.Component {
           description={collective.description}
           twitterHandle={collective.twitterHandle}
           image={collective.image || collective.backgroundImage}
-          className={this.state.loading && 'loading'}
-          LoggedInUser={this.state.LoggedInUser}
+          className={loading && 'loading'}
+          LoggedInUser={LoggedInUser}
           />
 
         <Body>
+
           <CollectiveCover
             collective={collective}
-            href={href}
-            title={intl.formatMessage(this.messages[`${tier.type.toLowerCase()}.title`], {name: tier.name.replace(/[s]$/,'')})}
+            href={`/${collective.slug}`}
+            LoggedInUser={LoggedInUser}
             className="small"
             />
 

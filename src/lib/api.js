@@ -37,6 +37,23 @@ function addAuthTokenToHeader(obj = {}) {
   };
 }
 
+export function upload(file) {
+  const reader = new FileReader();
+  reader.readAsDataURL(file);
+  const formData = new FormData();
+  formData.append('file', file);
+  return fetch('/api/images', {
+    method: 'post',
+    headers: addAuthTokenToHeader(),
+    body: formData,
+  })
+  .then(checkResponseStatus)
+  .then(json => {
+    console.log(">>> upload response", json);
+    return json.url;
+  })
+}
+
 export function connectAccount(CollectiveId, service) {
 
   const params = {

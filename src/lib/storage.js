@@ -1,4 +1,7 @@
-function set(key, value, ttl) {
+function set(key, value, ttl = 1000 * 60 * 60) {
+  if (!value) {
+    return localStorage.removeItem(key);
+  }
   const expire = new Date(Date.now() + ttl).getTime();
   localStorage.setItem(key, JSON.stringify({ timestamp: new Date().getTime(), expire, value }));
 }

@@ -195,9 +195,13 @@ class Expense extends React.Component {
             float: left;
           }
 
+          .expenseActions :global(> div) {
+            margin-right: 0.5rem;
+          }
+
           @media(max-width: 600px) {
             .expense {
-              max-height: 13rem;
+              max-height: 23rem;
             }
             .expense.detailsView {
               max-height: 45rem;
@@ -218,24 +222,33 @@ class Expense extends React.Component {
           </a>
         </div>
         <div className="body">
-          <div className="description">
-            <a onClick={this.toggleDetails} title={capitalize(title)}>{/* should link to `/${collective.slug}/expenses/${expense.uuid}` once we have a page for it */}
-              {capitalize(title)}
-            </a>
-          </div>
-          <div className="meta">
-            <span className="incurredAt"><FormattedDate value={expense.incurredAt} day="numeric" month="numeric" /></span> |&nbsp;
-            { includeHostedCollectives &&
-              <span className="collective"><Link route={`/${expense.collective.slug}`}><a>{expense.collective.slug}</a></Link> (balance: {formatCurrency(expense.collective.stats.balance, expense.collective.currency)}) | </span>
-            }
-            <span className="status">{intl.formatMessage(this.messages[status])}</span> | 
-            {` ${capitalize(expense.category)}`}
-            { editable && LoggedInUser && LoggedInUser.canEditExpense(expense) &&
-              <span> | <a className="toggleEditExpense" onClick={this.toggleEdit}>{intl.formatMessage(this.messages[`${mode === 'edit' ? 'cancelEdit' : 'edit'}`])}</a></span>
-            }
-            { mode !== 'edit' &&
-              <span> | <a className="toggleDetails" onClick={this.toggleDetails}>{intl.formatMessage(this.messages[`${mode === 'details' ? 'closeDetails' : 'viewDetails'}`])}</a></span>
-            }
+          <div className="header">
+            <div className="amount pullRight">
+              <FormattedNumber
+                value={expense.amount / 100}
+                currency={expense.currency}
+                {...this.currencyStyle}
+                />
+            </div>
+            <div className="description">
+              <a onClick={this.toggleDetails} title={capitalize(title)}>{/* should link to `/${collective.slug}/expenses/${expense.uuid}` once we have a page for it */}
+                {capitalize(title)}
+              </a>
+            </div>
+            <div className="meta">
+              <span className="incurredAt"><FormattedDate value={expense.incurredAt} day="numeric" month="numeric" /></span> |&nbsp;
+              { includeHostedCollectives &&
+                <span className="collective"><Link route={`/${expense.collective.slug}`}><a>{expense.collective.slug}</a></Link> (balance: {formatCurrency(expense.collective.stats.balance, expense.collective.currency)}) | </span>
+              }
+              <span className="status">{intl.formatMessage(this.messages[status])}</span> | 
+              {` ${capitalize(expense.category)}`}
+              { editable && LoggedInUser && LoggedInUser.canEditExpense(expense) &&
+                <span> | <a className="toggleEditExpense" onClick={this.toggleEdit}>{intl.formatMessage(this.messages[`${mode === 'edit' ? 'cancelEdit' : 'edit'}`])}</a></span>
+              }
+              { mode !== 'edit' &&
+                <span> | <a className="toggleDetails" onClick={this.toggleDetails}>{intl.formatMessage(this.messages[`${mode === 'details' ? 'closeDetails' : 'viewDetails'}`])}</a></span>
+              }
+            </div>
           </div>
 
           <ExpenseDetails
@@ -257,7 +270,7 @@ class Expense extends React.Component {
                 </div>
               }
               { mode !== 'edit' && LoggedInUser && LoggedInUser.canApproveExpense(expense) &&
-                <div>
+                <div className="expenseActions">
                   { expense.status === 'APPROVED' && LoggedInUser.canPayExpense(expense) &&
                     <PayExpenseBtn
                       expense={expense}
@@ -272,13 +285,6 @@ class Expense extends React.Component {
               }
             </div>
           }
-        </div>
-        <div className="amount">
-          <FormattedNumber
-            value={expense.amount / 100}
-            currency={expense.currency}
-            {...this.currencyStyle}
-            />
         </div>
       </div>
     );

@@ -41,7 +41,7 @@ export default class Body extends React.Component {
         }
 
         .content {
-          max-width: 768px;
+          max-width: 1244px;
           padding: 2rem 3rem;
           margin: 0 auto;
           line-height: 1.5;
@@ -88,6 +88,12 @@ export default class Body extends React.Component {
         .content code:first-child:last-child {
           display: inline-block;
           padding: 1rem;
+        }
+
+        @media(max-width: 420px) {
+          .content {
+            padding: 1rem 1.5rem;
+          }
         }
         `}</style>
         {this.props.children}

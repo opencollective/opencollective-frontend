@@ -97,7 +97,7 @@ class MembersWithData extends React.Component {
     return (
       <div className="MembersContainer" ref={(node) => this.node = node}>
         <style jsx>{`
-          :global(.loadMoreBtn) {
+          .MembersContainer :global(.loadMoreBtn) {
             margin: 1rem;
             text-align: center;
           }
@@ -119,6 +119,14 @@ class MembersWithData extends React.Component {
             justify-content: center;   
             overflow: hidden;
             margin: 1rem 0;
+          }
+        `}</style>
+        <style jsx global>{`
+          .cardsList .Member.ORGANIZATION {
+            margin: 1rem !important;
+          }
+          .cardsList .Member.USER {
+            margin: 0.5rem 0.25rem;
           }
         `}</style>
 

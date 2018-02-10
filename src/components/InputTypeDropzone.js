@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import Dropzone from 'react-dropzone'
 import fetch from 'isomorphic-fetch';
 import { imagePreview } from '../lib/utils';
+import { upload } from '../lib/api';
 
 class InputTypeDropzone extends React.Component {
 
@@ -49,33 +50,21 @@ class InputTypeDropzone extends React.Component {
   }
 
   handleChange(files) {
-    const file = files[0];
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      this.setState({ value: e.target.result })
-    }
-    reader.readAsDataURL(file);
-    const formData = new FormData();
-    formData.append('file', file);
     // for e2e testing purposes
     if (window.location.hostname === 'localhost') {
       return this.props.onChange(`http://${window.location.host}/static/images/receipt.svg`);
     }
-    fetch('/api/images', {
-      method: 'post',
-      headers: this.addAuthTokenToHeader(),
-      body: formData,
-    })
-    .then(this.checkStatus)
-    .then(json => {
-      console.log(">>> upload response", json);
-      this.setState({ url: json.url });
-      return this.props.onChange(json.url);
-    })
-    .catch(err => {
-      console.error(">>> error uploading image", file, err);
-      this.setState({ error: "error uploading image, please try again" });
-    });
+
+    const file = files[0];
+    upload(file)
+      .then(fileUrl => {
+        this.setState({ url: fileUrl });
+        return this.props.onChange(fileUrl);
+      })
+      .catch(err => {
+        console.error(">>> error uploading image", file, err);
+        this.setState({ error: "error uploading image, please try again" });
+      });
   }
 
   render() {

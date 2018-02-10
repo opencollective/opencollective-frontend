@@ -60,8 +60,8 @@ class CollectiveCard extends React.Component {
       linkParams.referral = LoggedInUser.CollectiveId;
     }
     return (
-      <Link route={'collective'} params={linkParams} target="_top">
-        <a className={`CollectiveCard ${collective.type}`} >
+      <Link route={'collective'} params={linkParams} target="_top" >
+        <div className={`CollectiveCard ${collective.type}`}>
           <style jsx>{`
           .CollectiveCard {
             display: flex;
@@ -77,7 +77,6 @@ class CollectiveCard extends React.Component {
             box-shadow: 0 1px 3px 0 rgba(45, 77, 97, 0.2);
             overflow: hidden;
             text-decoration: none !important;
-            margin: 1rem 1rem 1rem 0;
           }
 
           .head {
@@ -244,10 +243,12 @@ class CollectiveCard extends React.Component {
             { membership &&
               <div className="membership">
                 <div className='role'>{tierName}</div>
-                <div className='since'>
-                  <FormattedMessage id='membership.since' defaultMessage={`since`} />&nbsp;
-                  <FormattedDate value={membership.createdAt} month='long' year='numeric' />
-                </div>
+                { membership.createdAt &&
+                  <div className='since'>
+                    <FormattedMessage id='membership.since' defaultMessage={`since`} />&nbsp;
+                    <FormattedDate value={membership.createdAt} month='long' year='numeric' />
+                  </div>
+                }
               </div>
             }
             { role === 'BACKER' && get(membership, 'stats.totalDonations') > 0 &&
@@ -267,7 +268,7 @@ class CollectiveCard extends React.Component {
               </div>
             }
           </div>
-        </a>
+        </div>
       </Link>
       );
   }

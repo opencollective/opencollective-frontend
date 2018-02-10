@@ -16,6 +16,7 @@ class CollectivesWithData extends React.Component {
     HostCollectiveId: PropTypes.number,
     hostCollectiveSlug: PropTypes.string,
     memberOfCollectiveSlug: PropTypes.string,
+    type: PropTypes.string,
     role: PropTypes.string,
     ParentCollectiveId: PropTypes.number,
     onChange: PropTypes.func,
@@ -94,6 +95,9 @@ class CollectivesWithData extends React.Component {
             overflow: hidden;
             margin: 1rem 0;
           }
+          .CollectivesContainer :global(.CollectiveCard) {
+            margin: 1rem;
+          }
         `}</style>
 
         <div className="Collectives cardsList">
@@ -119,8 +123,8 @@ class CollectivesWithData extends React.Component {
 }
 
 const getCollectivesQuery = gql`
-query allCollectives($HostCollectiveId: Int, $hostCollectiveSlug: String, $ParentCollectiveId: Int, $memberOfCollectiveSlug: String, $role: String, $limit: Int, $offset: Int, $orderBy: String, $orderDirection: String) {
-  allCollectives(HostCollectiveId: $HostCollectiveId, hostCollectiveSlug: $hostCollectiveSlug, memberOfCollectiveSlug: $memberOfCollectiveSlug, role: $role, ParentCollectiveId: $ParentCollectiveId, limit: $limit, offset: $offset, orderBy: $orderBy, orderDirection: $orderDirection) {
+query allCollectives($HostCollectiveId: Int, $hostCollectiveSlug: String, $ParentCollectiveId: Int, $memberOfCollectiveSlug: String, $role: String, $type: String, $limit: Int, $offset: Int, $orderBy: String, $orderDirection: String) {
+  allCollectives(HostCollectiveId: $HostCollectiveId, hostCollectiveSlug: $hostCollectiveSlug, memberOfCollectiveSlug: $memberOfCollectiveSlug, role: $role, type: $type, ParentCollectiveId: $ParentCollectiveId, limit: $limit, offset: $offset, orderBy: $orderBy, orderDirection: $orderDirection) {
     id
     type
     createdAt
@@ -151,6 +155,7 @@ export const addCollectivesData = graphql(getCollectivesQuery, {
         hostCollectiveSlug: props.hostCollectiveSlug,
         memberOfCollectiveSlug: props.memberOfCollectiveSlug,
         role: props.role,
+        type: props.type,
         orderBy: props.orderBy,
         orderDirection: props.orderDirection,
         offset: 0,

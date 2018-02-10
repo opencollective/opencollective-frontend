@@ -92,9 +92,6 @@ class EventsWithData extends React.Component {
           margin-top: 0.5rem;
         }
 
-        .events {
-          padding: 10px;
-        }
         .createEvent {
           text-align: center;
         }

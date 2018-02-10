@@ -263,7 +263,7 @@ class CollectivePickerWithData extends React.Component {
               </div>
             { collectives.length > 0 &&
               <div className="collectivesFilter">
-                <DropdownButton bsStyle="default" title={selectedTitle} onSelect={this.onChange}>
+                <DropdownButton id="collectivePicker" bsStyle="default" title={selectedTitle} onSelect={this.onChange}>
                   { this.state.CollectiveId &&
                     <MenuItem key={null} eventKey={null}>
                       <FormattedMessage id="expenses.allCollectives" defaultMessage="All Collectives" />

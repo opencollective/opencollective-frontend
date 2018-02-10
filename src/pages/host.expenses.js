@@ -12,6 +12,7 @@ import ExpensesWithData from '../components/ExpensesWithData';
 import { get, pick } from 'lodash';
 import { FormattedMessage } from 'react-intl'
 import CollectivePicker from '../components/CollectivePickerWithData';
+import ExpensesStatsWithData from '../components/ExpensesStatsWithData';
 import { graphql } from 'react-apollo'
 import gql from 'graphql-tag'
 
@@ -52,8 +53,36 @@ class HostExpensesPage extends React.Component {
     const selectedCollective = this.state.selectedCollective || collective;
     const includeHostedCollectives = (selectedCollective.id === collective.id);
 
+    if (!collective.isHost) {
+      return (<ErrorPage message="collective.is.not.host" />)
+    }
+
     return (
       <div className="HostExpensesPage">
+        <style jsx>{`
+        .col.side {
+          width: 100%;
+          min-width: 20rem;
+          max-width: 25%;
+          margin-left: 5rem;
+        }
+
+        .col.large {
+          margin-left: 6rem;
+          min-width: 30rem;
+          width: 50%;
+          max-width: 75%;
+        }
+
+        @media(max-width: 600px) {
+          .columns {
+            flex-direction: column-reverse;
+            .col {
+              max-width: 100%;
+            }
+          }
+        }
+        `}</style>
 
         <Header
           title={collective.name}
@@ -79,14 +108,23 @@ class HostExpensesPage extends React.Component {
             onChange={(selectedCollective => this.pickCollective(selectedCollective))}
             />
 
-          <div className="content" >
+          <div className="content">
 
-            <ExpensesWithData
-              collective={selectedCollective}
-              includeHostedCollectives={includeHostedCollectives}
-              LoggedInUser={this.state.LoggedInUser}
-              editable={true}
-              />
+            <div className="col large pullLeft">
+              <ExpensesWithData
+                collective={selectedCollective}
+                includeHostedCollectives={includeHostedCollectives}
+                LoggedInUser={this.state.LoggedInUser}
+                filters={true}
+                editable={true}
+                />
+            </div>
+
+            { this.state.selectedCollective &&
+              <div className="col side pullLeft">
+                <ExpensesStatsWithData slug={selectedCollective.slug} />
+              </div>
+            }
 
           </div>
 

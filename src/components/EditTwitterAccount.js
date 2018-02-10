@@ -25,10 +25,12 @@ class EditTwitterAccount extends React.Component {
       'newBacker.toggle.description': { id: 'connectedAccounts.twitter.newBacker.toggle.description', defaultMessage: 'Whenever you have a new backer that has provided a twitter username, a tweet will be sent from your connected account' },
       'newBacker.tweet': { id: 'connectedAccounts.twitter.newBacker.tweet', defaultMessage: '{backerTwitterHandle} thank you for your {amount} donation 🙏 - your contribution makes a difference!' },
       'monthlyStats.toggle.label': { id: 'connectedAccounts.twitter.monthlyStats.toggle.label', defaultMessage: 'Monthly stats' },
-      'monthlyStats.toggle.description': { id: 'connectedAccounts.twitter.monthlyStats.toggle.description', defaultMessage: 'Every first of the month, automatically send a public tweet with the latest stats, the new backers and the all time top backers' }
+      'monthlyStats.toggle.description': { id: 'connectedAccounts.twitter.monthlyStats.toggle.description', defaultMessage: 'Every first of the month, automatically send a public tweet with the latest stats, the new backers and the all time top backers' },
+      'updatePublished.toggle.label': { id: 'connectedAccounts.twitter.updatePublished.toggle.label', defaultMessage: 'Update published' },
+      'updatePublished.toggle.description': { id: 'connectedAccounts.twitter.updatePublished.toggle.description', defaultMessage: 'Send a tweet whenever you publish an update' }
     });
 
-    this.notificationTypes = ['newBacker', 'monthlyStats'];
+    this.notificationTypes = ['newBacker', 'monthlyStats', 'updatePublished'];
     this.state = { connectedAccount: cloneDeep(props.connectedAccount) };
     this.state.connectedAccount.settings = this.state.connectedAccount.settings || {};
     this.notificationTypes.forEach(notificationType => {
@@ -76,7 +78,7 @@ class EditTwitterAccount extends React.Component {
                 className="horizontal"
                 defaultValue={connectedAccount.settings[notificationType].active}
                 label={intl.formatMessage(this.messages[`${notificationType}.toggle.label`])}
-                description={intl.formatMessage(this.messages[`${notificationType}.toggle.description`])}
+                description={this.messages[`${notificationType}.toggle.description`] && intl.formatMessage(this.messages[`${notificationType}.toggle.description`])}
                 onChange={(activateNewBacker) => this.handleChange(notificationType, "active", activateNewBacker)}
                 />
             { this.messages[`${notificationType}.tweet`] &&

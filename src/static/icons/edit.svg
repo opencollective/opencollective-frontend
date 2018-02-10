@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="12px" height="12px" viewBox="0 0 12 12" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 48.2 (47327) - http://www.bohemiancoding.com/sketch -->
+    <title>icon (edit)</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="::-collective-page-(grav)" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" transform="translate(-791.000000, -554.000000)">
+        <g id="NAV-COLLECTIVE" transform="translate(0.000000, 516.000000)" fill="#CACBCC" fill-rule="nonzero">
+            <g id="Group" transform="translate(366.000000, 30.000000)">
+                <g id="::-admin-link-(edit-collective)" transform="translate(394.000000, 0.000000)">
+                    <g id="::-icon-(edit)" transform="translate(25.000000, 2.000000)">
+                        <path d="M6,15.5052474 L6,18 L8.49475262,18 L15.5952024,10.8995502 L13.1004498,8.4047976 L6,15.5052474 Z M17.802099,8.70064968 C18.065967,8.43678161 18.065967,8.02098951 17.802099,7.75712144 L16.2428786,6.19790105 C15.9790105,5.93403298 15.5632184,5.93403298 15.2993503,6.19790105 L13.996002,7.50924538 L16.4907546,10.003998 L17.802099,8.70064968 Z" id="icon-(edit)"></path>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

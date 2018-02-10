@@ -1,6 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import colors from '../constants/colors';
+import router from '../server/pages';
+import HashLink from 'react-scrollchor';
 
 const star = '/static/images/icons/star.svg';
 
@@ -15,6 +17,7 @@ class Button extends React.Component {
     disabled: PropTypes.bool,
     type: PropTypes.string, // e.g. type="submit"
     onClick: PropTypes.func,
+    href: PropTypes.string,
     className: PropTypes.string,
     icon: PropTypes.string,
     style: PropTypes.object
@@ -22,17 +25,23 @@ class Button extends React.Component {
 
   constructor(props) {
     super(props);
+    this.renderButton = this.renderButton.bind(this);
     this.onClick = this.onClick.bind(this);
   }
 
   onClick(e) {
-    const { onClick, disabled } = this.props;
-    if (!onClick) return;
+    const { type, href, onClick, disabled } = this.props;
+    if (type === "submit") return;
     e.preventDefault();
+    if (href && href.substr(0,1) !== '#') {
+      const routeFromRouter = router.findByName(href);
+      return router.Router.pushRoute(href);
+    }
+    if (!onClick) return;
     return !disabled && onClick && onClick();
   }
 
-  render() {
+  renderButton() {
     return (
       <button 
         type={this.props.type}
@@ -42,30 +51,36 @@ class Button extends React.Component {
         onClick={this.onClick} >
         <style jsx>{`
         .Button {
-          width: 100%;
-          max-width: 400px;
           --webkit-appearance: none;
-          background: transparent;
-          font-family: montserratlight, Montserrat, arial;
-          font-weight: bold;
-          font-size: 1.3rem;
-          padding: 0;
-          height: 6rem;
-          border: 1px solid transparent;
-          text-transform: uppercase;
-          color: ${colors.darkgray};
-          letter-spacing: 4px;
+          font-family: Rubik;
+          font-size: 1.4rem;
+          font-weight: 500;
+          height: 3.6rem;
+          border: 2px solid #45474D;
+          border-radius: 500px;
+          padding: 0 24px;
+          color: #45474D;
+          background-color: transparent;
+        }
+        .Button:hover {
+          border: 2px solid #2E8AE6;
+        }
+        .bluewhite {
+          border: 2px solid #CACBCC;
+          color: #3399FF;
         }
         .Button:focus {
           outline: 0;
         }
+        .Button:active {
+          background-color: #297ACC;
+          border-color: #297ACC;
+        }
         .Button[disabled] {
-          border-color: ${colors.disabled};
-          background: ${colors.disabled};
+          opacity: 0.24;
         }
         .Button[type=submit] {
           height: 4rem;
-          border-radius: 2rem;
         }
         div {
           display: flex;
@@ -74,6 +89,7 @@ class Button extends React.Component {
           width: 100%;
           height: 100%;
           border: 2px solid;
+          line-height: 17px;
           border-color: ${colors.lightgray};
         }
         img {
@@ -86,32 +102,24 @@ class Button extends React.Component {
         .whiteblue, .whiteblue :global(a) {
           color: ${colors.blue};
           background: white;
-          background-image: linear-gradient(to bottom, #ffffff, #f3f6f8);
         }
         .whiteblue.small {
           width: 20rem;
         }
         .whiteblue:hover {
-          background-image: linear-gradient(to bottom, #ffffff, #f3f6f8);
           box-shadow: 0 0 4px 0 rgba(63, 175, 240, 0.4);
-        }
-        .whiteblue:active {
-          background-image: linear-gradient(to top, #ffffff, #f3f6f8);
-          box-shadow: inset 0 2px 0 0 rgba(0, 0, 0, 0.05);
         }
         .blue {
           color: white;
-          border-color: ${colors.blue};
-          background: ${colors.blue};
-          border-radius: 3px;
-          background-image: linear-gradient(to bottom, #52bbf8, #2fa8ee);
+          border-color: ${colors.white};
+          background-color: ${colors.blue};
         }
         .blue:hover {
-          background-image: linear-gradient(to bottom, #7acfff, #4cbeff);
+          background-color: ${colors.blueHover};
         }
         .blue:active {
-          background-image: linear-gradient(to top, #52bbf8, #2fa8ee);
-          box-shadow: inset 0 2px 0 0 rgba(0, 0, 0, 0.1);
+          background-color: ${colors.blueActive};
+          border-color: ${colors.blueActive};          
         }
         .gray {
           color: ${colors.darkgray};
@@ -133,12 +141,29 @@ class Button extends React.Component {
           border-color: ${colors.green};
           background: ${colors.green};
         }
+        .Button :global(span) {
+          white-space: nowrap;
+        }
+        `}</style>
+        <style jsx global>{`
+        .mobileOnly .Button {
+          padding: 0 16px;
+        }        
         `}</style>
         {this.props.icon && <img src={icons[this.props.icon]} />}
         {this.props.label && <span>{this.props.label}</span>}
         {this.props.children}
       </button>
     );
+  }
+
+  render() {
+    const { href } = this.props;
+    if (href && href.substr(0,1) === '#') {
+      return (<HashLink to={href}>{this.renderButton()}</HashLink>)
+    } else {
+      return this.renderButton();
+    }
   }
 }
 

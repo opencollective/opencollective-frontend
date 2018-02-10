@@ -8,6 +8,7 @@ import { isValidEmail } from '../lib/utils';
 import withIntl from '../lib/withIntl';
 import * as api from '../lib/api';
 import { getCurrencySymbol, formatCurrency } from '../lib/utils';
+import { get } from 'lodash';
 
 class AddFundsForm extends React.Component {
 
@@ -24,8 +25,7 @@ class AddFundsForm extends React.Component {
     const { intl } = props;
 
     this.state = {
-      hostFeePercent: 0,
-      form: { totalAmount: 0 },
+      form: { totalAmount: 0, hostFeePercent: get(props, 'collective.hostFeePercent') },
       result: {}
     };
 
@@ -91,6 +91,7 @@ class AddFundsForm extends React.Component {
       {
         name: "hostFeePercent",
         type: 'number',
+        className: 'right',
         post: '%'
       },
       {
@@ -215,8 +216,8 @@ class AddFundsForm extends React.Component {
                   <Row key={`${field.name}.input`}>
                     <Col sm={12}>
                       <InputField
-                        className="horizontal"
                         {...field}
+                        className={`horizontal ${field.className}`}
                         defaultValue={this.state.form[field.name]}
                         onChange={(value) => this.handleChange("form", field.name, value)}
                         />

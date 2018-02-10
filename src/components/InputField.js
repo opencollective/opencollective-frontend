@@ -21,9 +21,9 @@ function FieldGroup({ controlId, label, help, pre, post, after, button, classNam
   const inputProps = { ... props };
   delete inputProps.controlId;
 
-  if (className === 'horizontal') {
+  if (className && className.match(/horizontal/)) {
     return (
-      <FormGroup controlId={controlId} validationState={validationState}>
+      <FormGroup controlId={controlId} validationState={validationState} className={className}>
         <Col componentClass={ControlLabel} sm={3}>
           {label}
         </Col>
@@ -42,7 +42,7 @@ function FieldGroup({ controlId, label, help, pre, post, after, button, classNam
     );
   } else {
     return (
-      <FormGroup controlId={controlId} validationState={validationState}>
+      <FormGroup controlId={controlId} validationState={validationState} className={className}>
         {label && <ControlLabel>{label}</ControlLabel>}
         { (pre || button) &&
           <InputGroup>
@@ -308,7 +308,7 @@ class InputField extends React.Component {
             label={field.label && `${capitalize(field.label)}`}
             help={field.description}
             placeholder={field.placeholder}
-            className={field.className}
+            className={`currency ${field.className}`}
             onFocus={(event) => event.target.select()}
             value={value}
             />
@@ -423,6 +423,12 @@ class InputField extends React.Component {
           }
           .inputField .checkbox label {
             width: auto;
+          }
+          .inputField .right input[type="number"] {
+            text-align: right;
+          }
+          .inputField .currency input[type="number"] {
+            text-align: left;
           }
         `}</style>
         <style dangerouslySetInnerHTML={{ __html: stylesheet }} />
