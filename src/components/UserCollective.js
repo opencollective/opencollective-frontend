@@ -133,28 +133,11 @@ class UserCollective extends React.Component {
     const order = { fromCollective: this.collective };
     const { intl, LoggedInUser, query } = this.props;
     const isProfileEmpty = !(this.collective.description || this.collective.longDescription);
+    const canEditCollective = LoggedInUser && LoggedInUser.canEditCollective(this.collective);
     const type = this.collective.type.toLowerCase();
     let cta;
     if (this.collective.canApply) {
       cta = { href: `/${this.collective.slug}/apply`, label: 'apply' }
-    }
-    const actions = [];
-    Object.keys(this.memberOfByRole).map(role => {
-      if (!this.messages[`menu.${role.toLowerCase()}`]) return;
-      const n = (role === 'ADMIN') ? this.memberOfByRole[role].filter(c => get(c, 'collective.type') === 'COLLECTIVE').length : this.memberOfByRole[role].length;
-      actions.push(
-        {
-          className: 'whiteblue',
-          component: <HashLink to={`#${role.toLowerCase()}`}>{intl.formatMessage(this.messages[`menu.${role.toLowerCase()}`], { n })}</HashLink>
-        }
-      );
-    });
-
-    if (LoggedInUser && LoggedInUser.canEditCollective(this.collective)) {
-      actions.push({
-        className: 'whiteblue small allcaps',
-        component: <Link route={`/${this.collective.slug}/edit`}><a>{intl.formatMessage(this.messages[`${type}.collective.edit`])}</a></Link>
-      });
     }
 
     const notification = {};
@@ -175,26 +158,6 @@ class UserCollective extends React.Component {
         <style jsx>{`
           h1 {
             font-size: 2rem;
-          }
-          .adminActions {
-            text-align: center;
-            text-transform: uppercase;
-            font-size: 1.3rem;
-            font-weight: 600;
-            letter-spacing: 0.05rem;
-          }
-          .adminActions ul {
-            overflow: hidden;
-            text-align: center;
-            margin: 0 auto;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            flex-direction: row;
-            list-style: none;
-          }
-          .adminActions ul li {
-            margin: 0 2rem;
           }
           .cardsList {
             margin: 0 2rem;
@@ -257,31 +220,23 @@ class UserCollective extends React.Component {
 
               { (get(query, 'status') === 'orderCreated' || get(query, 'status') === 'orderProcessing') &&  <OrderCreated order={order} status={query.status} /> }
 
-              <div className="content" >
-                <div className="message">
-                  { isProfileEmpty && LoggedInUser && LoggedInUser.canEditCollective(this.collective) &&
-                    <div className="editBtn">
-                      <Button onClick={() => Router.pushRoute(`/${this.collective.slug}/edit`)}>{intl.formatMessage(this.messages[`${type}.collective.edit`])}</Button>
+              { /* Make sure we don't show an empty div.content if no description unless canEditCollective */ }
+              { (this.collective.longDescription || canEditCollective) &&
+                <div className="content" >
+                  { isProfileEmpty && canEditCollective &&
+                    <div className="message">
+                      <div className="editBtn">
+                        <Button onClick={() => Router.pushRoute(`/${this.collective.slug}/edit`)}>{intl.formatMessage(this.messages[`${type}.collective.edit`])}</Button>
+                      </div>
                     </div>
                   }
+                  { this.collective.longDescription &&
+                    <section id="about" className="longDescription" >
+                      <Markdown source={this.collective.longDescription} />
+                    </section>
+                  }
                 </div>
-                { this.collective.longDescription &&
-                  <section id="about" className="longDescription" >
-                    <Markdown source={this.collective.longDescription} />
-                  </section>
-                }
-                <div id="tiers">
-                  {this.collective.tiers.map((tier) =>
-                    <Tier
-                      key={tier.id}
-                      className="tier"
-                      tier={tier}
-                      onChange={(tier) => this.updateOrder(tier)}
-                      onClick={(tier) => this.handleOrderTier(tier)}
-                      />
-                  )}
-                </div>
-              </div>
+              }
 
               { get(this.collective, 'stats.collectives.hosted') > 0 &&
                 <section id="hosting">
