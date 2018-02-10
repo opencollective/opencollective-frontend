@@ -102,7 +102,7 @@ class CreateUpdatePage extends React.Component {
           <div className="content" >
             {!canCreateUpdate &&
               <div className="login">
-                <p><FormattedMessage id="events.create.login" defaultMessage="You need to be logged in as a core contributor of this collective to be able to create an update." /></p>
+                <p><FormattedMessage id="updates.create.login" defaultMessage="You need to be logged in as a core contributor of this collective to be able to create an update." /></p>
                 <p><Button className="blue" href={`/signin?next=/${collective.slug}/updates/new`}><FormattedMessage id="login.button" defaultMessage="login" /></Button></p>
               </div>
             }

@@ -96,7 +96,7 @@ class MenuBar extends React.Component {
 
     // If we don't find the sections on the page, we link the logo to the homepage instead of #top
     let logoLink;
-    console.log(">>> menuItemsFoundOnPage", menuItemsFoundOnPage);
+
     if (menuItemsFoundOnPage.length > 0) {
       logoLink = '#top';
       menuItemsFoundOnPage.sort((a, b) => {
@@ -167,9 +167,6 @@ class MenuBar extends React.Component {
         }
         :global(.mediumScreenOnly) .item {
           margin: 24px 12px;
-        }
-        :global(.mobileOnly) .menu {
-          margin-bottom: 8px;
         }
         :global(.mobileOnly) .item {
           margin: 0px 5px;
@@ -304,27 +301,33 @@ class MenuBar extends React.Component {
         .MenuBar .logo img {
           height: 64px;
         }
+        .USER .MenuBar .mobileOnly .innerMenu, .ORGANIZATION .MenuBar .mobileOnly .innerMenu {
+          display: flex;
+          align-items: center;
+        }
         .MenuBar .mobileOnly .logo img {
           height: 48px;
         }
         `}</style>
         <div className="mobileOnly">
-          <div className="actionBar">
-            <Sticky enabled={true} top={0} onStateChange={this.handleChange}>
-              <div className="stickyBar">
-                <div className="row1">
-                  <div className="pullRight">
-                    { this.renderButtons() }
-                  </div>
-                  <div className="logo">
-                    <Link route={logoLink} key={logoLink}><Logo src={collective.image} type='COLLECTIVE' /></Link>
+          <div className="innerMenu">
+            <div className="actionBar">
+              <Sticky enabled={true} top={0} onStateChange={this.handleChange}>
+                <div className="stickyBar">
+                  <div className="row1">
+                    <div className="pullRight">
+                      { this.renderButtons() }
+                    </div>
+                    <div className="logo">
+                      <Link route={logoLink} key={logoLink}><Logo src={collective.image} type='COLLECTIVE' /></Link>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </Sticky>
-          </div>
-          <div className="menu">
-            { this.renderMenu() }
+              </Sticky>
+            </div>
+            <div className="menu">
+              { this.renderMenu() }
+            </div>
           </div>
         </div>
         <div className="desktopOnly mediumScreenOnly">

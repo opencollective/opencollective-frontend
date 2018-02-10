@@ -32,12 +32,11 @@ class EditUpdateForm extends React.Component {
 
     this.state = {
       modified: false,
-      update: props.update ? pick(props.update, 'title', 'html') : {},
+      update: props.update ? pick(props.update, 'title', 'html', 'markdown') : {},
       loading: false
     };
 
     this.storageKey = `EditUpdateForm#${get(this.props, 'update.id') || get(this.props, 'collective.slug')}`;
-    console.log(">>> storageKey", this.storageKey);
   }
 
   componentDidMount() {

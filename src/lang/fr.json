@@ -439,7 +439,6 @@
   "update.rejected": "rejeté",
   "update.edit": "éditer",
   "update.cancelEdit": "annuler les changements",
-  "update.viewMore": "Voir plus",
   "update.viewLatestUpdates": "Voir les dernières news",
   "update.publishedAt": "publié le {date}",
   "update.createdAt": "créé le {date} (brouillon)",
@@ -498,6 +497,7 @@
   "tier.button.donation": "faire une donation",
   "tier.description.donation": "Merci pour votre donation 🙏",
   "updates.new.title": "New update",
+  "updates.create.login": "Vous devez vous identifier en tant qu'administrateur de ce collectif pour pouvoir créer un nouveau billet.",
   "loginform.title": "S'identifier ou créer un compte",
   "tiers.title": "Rejoins le collectif"
 }

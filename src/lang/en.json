@@ -439,7 +439,6 @@
   "update.rejected": "rejected",
   "update.edit": "edit",
   "update.cancelEdit": "cancel edit",
-  "update.viewMore": "View More",
   "update.viewLatestUpdates": "View latest updates",
   "update.publishedAt": "published on {date}",
   "update.createdAt": "created on {date} (draft)",
@@ -498,6 +497,7 @@
   "tier.button.donation": "donate",
   "tier.description.donation": "Thank you for your kind donation 🙏",
   "updates.new.title": "New update",
+  "updates.create.login": "You need to be logged in as a core contributor of this collective to be able to create an update.",
   "loginform.title": "Sign in or Create an Account",
   "tiers.title": "Join the collective"
 }

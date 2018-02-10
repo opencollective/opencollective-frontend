@@ -8,7 +8,6 @@ import gql from 'graphql-tag'
 import Avatar from './Avatar';
 import Role from './Role';
 import UpdateTextWithData from './UpdateTextWithData';
-import Markdown from 'react-markdown';
 import { Link } from '../server/pages';
 import SmallButton from './SmallButton';
 import EditUpdateForm from './EditUpdateForm';
@@ -45,7 +44,6 @@ class Update extends React.Component {
       'rejected': { id: 'update.rejected', defaultMessage: 'rejected' },
       'edit': { id: 'update.edit', defaultMessage: 'edit' },
       'cancelEdit': { id: 'update.cancelEdit', defaultMessage: 'cancel edit' },
-      'viewMore': { id: 'update.viewMore', defaultMessage: 'View More' },
       'viewLatestUpdates': { id: 'update.viewLatestUpdates', defaultMessage: "View latest updates" }
     });
   }
@@ -72,22 +70,6 @@ class Update extends React.Component {
     const res = await this.props.editUpdate(update);
     console.log(">>> save res", res);
     this.setState({ modified: false, mode: 'details' });
-  }
-
-  renderViewMoreLink() {
-    const { intl, collective, update } = this.props;
-    return (
-      <div className="viewMore">
-        <style jsx>{`
-          .viewMore {
-            margin-top: 2rem;
-          }
-        `}</style>
-        <Link route={`/${collective.slug}/updates/${update.slug}`}>
-          <a>{intl.formatMessage(this.messages['viewMore'])}</a>
-        </Link>
-      </div>
-    );
   }
 
   render() {
@@ -139,8 +121,9 @@ class Update extends React.Component {
             align-items: center;
             color: #919599;
             font-size: 1.2rem;
+            flex-wrap: wrap;
           }
-          .meta > div {
+          .Update .meta :global(> div) {
             margin-right: 0.5rem;
           }
           .meta .collective {
@@ -176,6 +159,7 @@ class Update extends React.Component {
         <div className="body">
           <div className="meta">
             <div className="author"><Link route={`/${update.fromCollective.slug}`}><a>{update.fromCollective.name}</a></Link></div> 
+            <Role role='ADMIN' />
             { update.publishedAt && 
               <div className="publishedAt">
                 <FormattedMessage id="update.publishedAt" defaultMessage={"published on {date}"} values={{date: formatDate(update.publishedAt, { day: 'numeric', month: 'long', year: 'numeric' })}} />
@@ -189,7 +173,6 @@ class Update extends React.Component {
             { editable &&
               <div><a className="toggleEditUpdate" onClick={this.toggleEdit}>{intl.formatMessage(this.messages[`${mode === 'edit' ? 'cancelEdit' : 'edit'}`])}</a></div>
             }
-            <Role role='ADMIN' />
           </div>
 
           { mode === "summary" &&
@@ -199,7 +182,6 @@ class Update extends React.Component {
               </div>
               <div className="summary">
                 {update.summary}
-                { this.renderViewMoreLink() }
               </div>
             </div>
           }
@@ -209,7 +191,6 @@ class Update extends React.Component {
               <div className="title">
                 {capitalize(update.title)}
               </div>
-              { this.props.compact && this.renderViewMoreLink() }
               { !this.props.compact &&
                 <div>
                   { update.html && <div dangerouslySetInnerHTML={{ __html: update.html }} /> }
@@ -226,7 +207,7 @@ class Update extends React.Component {
 
           { mode === 'edit' &&
             <div className="edit">
-              <EditUpdateForm update={update} onSubmit={this.save} />
+              <EditUpdateForm collective={collective} update={update} onSubmit={this.save} />
             </div>
           }
 
@@ -252,6 +233,7 @@ mutation editUpdate($update: UpdateAttributesInputType!) {
     id
     updatedAt
     title
+    markdown
     html
   }
 }
