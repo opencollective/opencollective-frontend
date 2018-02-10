@@ -179,7 +179,6 @@ class CreateOrderPage extends React.Component {
             collective={collective}
             href={`/${collective.slug}`}
             LoggedInUser={LoggedInUser}
-            className="small"
             />
 
           <div className="content">
@@ -196,6 +195,7 @@ class CreateOrderPage extends React.Component {
               <div className="error">{this.state.result.error}</div>
             </div>
           </div>
+
         </Body>
         <Footer />
       </div>
@@ -226,6 +226,24 @@ query Collective($slug: String!) {
       name
       image
       backgroundImage
+    }
+    stats {
+      id
+      yearlyBudget
+    }
+    members {
+      id
+      role
+      createdAt
+      description
+      member {
+        id
+        description
+        name
+        slug
+        type
+        image
+      }
     }
     backgroundImage
     settings

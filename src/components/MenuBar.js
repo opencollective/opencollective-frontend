@@ -85,6 +85,7 @@ class MenuBar extends React.Component {
 
     const menuItemsFoundOnPage = [];
     uniqBy(document.querySelectorAll('section'), el => el.id).forEach((el, index) => {
+      if (!el.id) return;
       const menuItem = {
         anchor: el.id,
         link: `#${el.id}`,
@@ -95,7 +96,7 @@ class MenuBar extends React.Component {
 
     // If we don't find the sections on the page, we link the logo to the homepage instead of #top
     let logoLink;
-
+    console.log(">>> menuItemsFoundOnPage", menuItemsFoundOnPage);
     if (menuItemsFoundOnPage.length > 0) {
       logoLink = '#top';
       menuItemsFoundOnPage.sort((a, b) => {

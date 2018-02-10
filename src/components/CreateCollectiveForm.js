@@ -236,8 +236,8 @@ class CreateCollectiveForm extends React.Component {
 
         { showForm &&
           <div className="FormInputs">
-            { Object.keys(this.fields).map(key => this.state.section === key &&
-              <div className="inputs">
+            { Object.keys(this.fields).map(key =>
+              <div className="inputs" key={key}>
                 {this.fields[key].map((field) => (!field.when || field.when()) && <InputField
                   key={field.name}
                   value={this.state.collective[field.name]}

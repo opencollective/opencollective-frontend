@@ -75,10 +75,12 @@ class MatchingFundWithData extends React.Component {
     return (
       <FormGroup className="MatchingFundWithData">
         <style jsx>{`
+          .main {
+            max-width: 50rem;
+          }
           .amount {
             font-size: 4rem;
             text-align: center;
-            margin: 3rem;
           }
           .description {
             font-size: 1.4rem;
@@ -100,32 +102,36 @@ class MatchingFundWithData extends React.Component {
           .error, .expiryDate {
             color: red;
           }
+          .MatcherCard {
+            float: right;
+            margin: 0 1rem;
+          }
         `}</style>
         <div>
-          <Col componentClass={ControlLabel} sm={3}>
+          <Col componentClass={ControlLabel} sm={2}>
             <ControlLabel><FormattedMessage id="order.matchingfund.label" defaultMessage="Matching fund" /></ControlLabel>
           </Col>
-          <Col sm={9}>
-            <div className="header">
-              <div className="info">
-                <div className="amount">{`+${formatCurrency(amounts.totalAmount, currency, { precision: 0 })}`}</div>
-              </div>
-              <div>
-                <Member member={member} />
-              </div>
-            </div>
-            <div className="description">{MatchingFund.description}</div>
-            <div className="disclaimer">
-              <span><FormattedMessage id="order.matchingfund.text" defaultMessage="{name} has set up a {initialBalance} matching fund to match {factor, select, 1 {} other {{factor} times}} your first donation to {collective}. There is {balance} left in this fund." values={{ initialBalance: formatCurrency(MatchingFund.initialBalance, MatchingFund.currency, { precision: 0 }), balance: formatCurrency(MatchingFund.balance, MatchingFund.currency, { precision: 0 }), name: MatchingFund.collective.name, collective: collective.name, factor: MatchingFund.matching }} /></span>
-              { MatchingFund.expiryDate &&
-                <span className="expiryDate"><FormattedMessage id="order.matchingFund.expire" defaultMessage="This matching fund expires in {n, plural, one {one day} other {{n} days}}." values={{n: days(MatchingFund.expiryDate)}} /></span>
-              }
-              { !amounts.enough &&
-                <div className="error">
-                  <FormattedMessage id="order.matchingfund.notEnoughFund" defaultMessage="There isn't enough fund left in this matching fund." values={{ balance: formatCurrency(MatchingFund.balance, MatchingFund.currency)}} />
+          <Col sm={10}>
+            <div className="main">
+              <div className="MatcherCard">
+                  <Member member={member} />
                 </div>
-              }
-            </div>            
+                <div className="info">
+                  <div className="amount">{`+${formatCurrency(amounts.totalAmount, currency, { precision: 0 })}`}</div>
+                  <div className="description">{MatchingFund.description}</div>
+                  <div className="disclaimer">
+                    <span><FormattedMessage id="order.matchingfund.text" defaultMessage="{name} has set up a {initialBalance} matching fund to match {factor, select, 1 {} other {{factor} times}} your first donation to {collective}. There is {balance} left in this fund." values={{ initialBalance: formatCurrency(MatchingFund.initialBalance, MatchingFund.currency, { precision: 0 }), balance: formatCurrency(MatchingFund.balance, MatchingFund.currency, { precision: 0 }), name: MatchingFund.collective.name, collective: collective.name, factor: MatchingFund.matching }} /></span>
+                    { MatchingFund.expiryDate &&
+                      <span className="expiryDate"><FormattedMessage id="order.matchingFund.expire" defaultMessage="This matching fund expires in {n, plural, one {one day} other {{n} days}}." values={{n: days(MatchingFund.expiryDate)}} /></span>
+                    }
+                    { !amounts.enough &&
+                      <div className="error">
+                        <FormattedMessage id="order.matchingfund.notEnoughFund" defaultMessage="There isn't enough fund left in this matching fund." values={{ balance: formatCurrency(MatchingFund.balance, MatchingFund.currency)}} />
+                      </div>
+                    }
+                  </div>
+                </div>
+            </div>
           </Col>
         </div>
       </FormGroup>
