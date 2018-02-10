@@ -8,7 +8,7 @@ describe("collective page", () => {
 
   it ("loads the collective page", () => {
     cy.get('#contribute .TierCard').should('have.length', 2);
-    cy.get("#organizations .CollectiveCard").first().find('.totalDonations').contains("$1,700");
+    cy.get("#contributors .CollectiveCard").first().find('.totalDonations').contains("$1,700");
     cy.get("#budget .subtitle").contains("Current balance: $4.71");
     cy.get(".Members.cardsList .Member").should('have.length', 26);
   });

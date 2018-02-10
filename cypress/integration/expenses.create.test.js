@@ -55,8 +55,9 @@ describe("new expense", () => {
     cy.get('button[type=submit]').click();
     cy.screenshot("expenseCreatedPaypalLoggedOut");
     cy.get('.expenseCreated').contains('success');
-    cy.get('.viewAllExpenses').click();
-    cy.wait(200);
+    cy.get('.actions .viewAllExpenses').click();
+    cy.wait(500);
+    cy.get('.itemsList .expense', { timeout: 10000 })
     cy.get('.Expenses .expense:first .description').contains(expenseDescription)
     cy.get('.Expenses .expense:first .status').contains("pending")
     cy.get('.Expenses .expense:first .meta').contains("Team")
@@ -68,7 +69,7 @@ describe("new expense", () => {
   it ("submits a new expense other, edit it and approve it", () => {
     init();
     cy.get('.descriptionField input').type(expenseDescription);
-    cy.wait(500)
+    cy.wait(300)
     cy.get('.amountField input').type(12);
     cy.get('.payoutMethod.inputField select').select('other');
     uploadReceipt();
@@ -77,8 +78,9 @@ describe("new expense", () => {
     cy.get('button[type=submit]').click();
     cy.screenshot("expenseCreatedLoggedIn");
     cy.get('.expenseCreated').contains('success');
-    cy.get('.viewAllExpenses').click();
-    cy.wait(200);
+    cy.get('.actions .viewAllExpenses').click();
+    cy.wait(300);
+    cy.get('.itemsList .expense', { timeout: 10000 })
     cy.get('.Expenses .expense:first .description').contains(expenseDescription);
     cy.get('.Expenses .expense:first .status').contains("pending")
     cy.get('.Expenses .expense:first .privateMessage').contains("Some private note for the host");
@@ -100,6 +102,7 @@ describe("new expense", () => {
     cy.get('.Expenses .expense:first .amount').contains("$13.00");
     cy.screenshot("expenseSaved");
     cy.get('.Expenses .expense:first .ApproveExpenseBtn button').click();
+    cy.wait(300);
     cy.get('.Expenses .expense:first .status').contains("approved")    
   })
 
