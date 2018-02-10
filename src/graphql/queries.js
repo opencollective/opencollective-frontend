@@ -20,7 +20,7 @@ export const getLoggedInUserQuery = gql`
         name
         type
         slug
-        paymentMethods {
+        paymentMethods(limit: 5) {
           id
           uuid
           service
@@ -41,7 +41,7 @@ export const getLoggedInUserQuery = gql`
             id
             balance
           }
-          paymentMethods {
+          paymentMethods(limit: 5) {
             id
             uuid
             name
@@ -482,6 +482,7 @@ const refreshLoggedInUser = async (data) => {
   try {
     res = await data.refetch();
     if (!res.data || !res.data.LoggedInUser) {
+      storage.set("LoggedInUser", null);
       return null;
     }
     const user = new LoggedInUser(res.data.LoggedInUser);

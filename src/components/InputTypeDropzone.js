@@ -20,39 +20,12 @@ class InputTypeDropzone extends React.Component {
     this.state = { value: props.defaultValue, url: props.defaultValue }; // value can be base64 encoded after upload, url is always an url
   }
 
-  /**
-   * The Promise returned from fetch() won't reject on HTTP error status. We
-   * need to throw an error ourselves.
-   */
-  checkStatus(response) {
-    const { status } = response;
-
-    if (status >= 200 && status < 300) {
-      return response.json();
-    } else {
-      return response.json()
-      .then((json) => {
-        const error = new Error(json.error.message);
-        error.json = json;
-        error.response = response;
-        throw error;
-      });
-    }
-  }
-
-  addAuthTokenToHeader(obj = {}) {
-    const accessToken = localStorage.getItem('accessToken');
-    if (!accessToken) return obj;
-    return {
-      Authorization: `Bearer ${accessToken}`,
-      ...obj,
-    };
-  }
-
   handleChange(files) {
     // for e2e testing purposes
     if (window.location.hostname === 'localhost') {
-      return this.props.onChange(`http://${window.location.host}/static/images/receipt.svg`);
+      const fileUrl = "https://d.pr/free/i/OlQVIb+";
+      this.setState({ url: fileUrl });
+      return this.props.onChange(fileUrl);
     }
 
     const file = files[0];
