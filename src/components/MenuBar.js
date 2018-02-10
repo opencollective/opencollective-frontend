@@ -43,7 +43,7 @@ class MenuBar extends React.Component {
     if (get(props.collective, 'stats.updates') > 0) {
       menuItems.push({ anchor: 'updates', link: `/${props.collective.slug}#updates`, position: 0 });
     }
-
+    console.log(">>> menuItems", menuItems);
     this.state = { menuItems, selectedAnchor: null, sticky: false, logoLink: `/${props.collective.slug}` };
 
     this.messages = defineMessages({

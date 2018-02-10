@@ -227,7 +227,7 @@ class Collective extends React.Component {
                       />
                   }
 
-                  { get(this.collective, 'stats.events') > 0 || canEditCollective &&
+                  { (get(this.collective, 'stats.events') > 0 || canEditCollective) &&
                     <section id="events">
                       <SectionTitle section="events" />
                       <div className="eventsList">

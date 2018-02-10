@@ -15,13 +15,18 @@ class Responses extends React.Component {
       <div className="Responses" >
         <style jsx>{`
         .Responses {
-          max-width: 640px;
-          margin: 3rem auto 3rem;
+          width: 100%;
+        }
+        .innerResponses {
+          margin: 3rem auto;
+          max-width: 960px;
         }
         `}</style>
-        {responses.map((response, index) =>
-          <Response key={`response${index}`} response={response} />
-        )}
+        <div className="innerResponses">
+          {responses.map((response, index) =>
+            <Response key={`response${index}`} response={response} />
+          )}
+        </div>
       </div>
     )
   }

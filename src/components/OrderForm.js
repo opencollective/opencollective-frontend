@@ -8,7 +8,7 @@ import RequestBitcoin from './RequestBitcoin';
 import ActionButton from './Button';
 import SectionTitle from './SectionTitle';
 import { Button, Row, Col, Form, InputGroup, FormControl } from 'react-bootstrap';
-import { defineMessages, FormattedMessage } from 'react-intl';
+import { defineMessages, FormattedMessage, FormattedDate, FormattedTime } from 'react-intl';
 import { capitalize, formatCurrency, isValidEmail } from '../lib/utils';
 import { getStripeToken } from '../lib/stripe';
 import { pick, get } from 'lodash';
@@ -672,7 +672,25 @@ class OrderForm extends React.Component {
           { !requireLogin &&
             <section className="order">
               { order.tier.type !== 'TICKET' && <SectionTitle section="contributionDetails" /> }
-              { order.tier.type === 'TICKET' && <SectionTitle section="ticketDetails" /> }
+              { order.tier.type === 'TICKET' && 
+                <div>
+                  <SectionTitle section="ticketDetails" />
+                  <Row>
+                    <Col sm={12}>
+                      <div className="form-group">
+                        <label className="col-sm-2 control-label">
+                          <FormattedMessage id="tier.order.ticket.info" defaultMessage="Event info" />
+                        </label>
+                        <Col sm={10}>
+                        <FormattedDate value={collective.startsAt} weekday='short' day='numeric' month='long' />, &nbsp;
+                        <FormattedTime value={collective.startsAt} timeZone={collective.timezone} />&nbsp; - &nbsp;
+                        { get(collective, 'location.name') }
+                        </Col>
+                      </div>
+                    </Col>
+                  </Row>
+                </div>
+              }
               <Row>
                 <Col sm={12}>
                   <div className="form-group">

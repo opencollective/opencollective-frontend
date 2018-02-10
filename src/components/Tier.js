@@ -291,7 +291,7 @@ class Tier extends React.Component {
           { type === 'TICKET' &&
             <div id="actions" className="actions">
               <TicketController value={quantity} onChange={(value) => this.handleTicketsChange(value)} />
-              {this.props.onClick && <CTAButton className="ctabtn blue" label={(<FormattedMessage id='tier.GetTicket' values={{ quantity }} defaultMessage={`{quantity, plural, one {get ticket} other {get tickets}}`} />)} onClick={() => this.props.onClick({id: tier.id, amount, quantity, interval})} />}
+              {this.props.onClick && <CTAButton className="ctabtn blue ticket" label={(<FormattedMessage id='tier.GetTicket' values={{ quantity }} defaultMessage={`{quantity, plural, one {get ticket} other {get tickets}}`} />)} onClick={() => this.props.onClick({id: tier.id, amount, quantity, interval})} />}
             </div>
           }
           { type !== 'TICKET' && this.props.onClick && 

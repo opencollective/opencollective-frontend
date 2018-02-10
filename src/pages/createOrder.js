@@ -150,6 +150,7 @@ class CreateOrderPage extends React.Component {
     // Tier names are inconsistent - singular or plural
     // To avoid header like "Become a backers", this hack removes the last character if it's an 's'
     const headerName = tier.name.charAt(tier.name.length-1) === 's' ? tier.name.slice(0, -1) : tier.name;
+    const coverClassName = collective.type === 'EVENT' ? 'small' : '';
 
     return (
       <div>
@@ -179,6 +180,7 @@ class CreateOrderPage extends React.Component {
             collective={collective}
             href={`/${collective.slug}`}
             LoggedInUser={LoggedInUser}
+            className={coverClassName}
             />
 
           <div className="content">
@@ -220,6 +222,11 @@ query Collective($slug: String!) {
       slug
       image
     }
+    location {
+      name
+    }
+    startsAt
+    endsAt
     parentCollective {
       id
       slug
