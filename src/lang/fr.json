@@ -360,7 +360,7 @@
   "section.events.subtitle": "Rencontrez la communauté!",
   "section.budget.title": "Budget",
   "section.budget.subtitle": "Solde courrant: {balance}",
-  "section.contributors.title": "Contributeurrs",
+  "section.contributors.title": "Contributeurs",
   "section.contributors.subtitle": "{organizations, plural, one {{organizations} organisation et} other {{organizations} organisations et}} {users} {users, plural, one {personne nous soutient} other {personnes nous soutiennent}}.",
   "tier.order.contributionDetails": "Détails de votre contribution",
   "tier.order.contributionDetails.description": "Merci pour votre participation à notre budget! 🙏",

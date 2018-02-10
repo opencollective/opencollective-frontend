@@ -42,7 +42,7 @@ class ExpensesSection extends React.Component {
           text-align: center;
           font-size: 1.4rem;
         }
-        @media(max-width: 900px) {
+        @media(max-width: 660px) {
           .columns {
             flex-direction: column;
           }
