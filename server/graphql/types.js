@@ -8,6 +8,7 @@ import {
 } from 'graphql';
 
 import GraphQLJSON from 'graphql-type-json';
+import he from 'he';
 
 import {
   CollectiveInterfaceType
@@ -456,7 +457,7 @@ export const UpdateType = new GraphQLObjectType({
       summary: {
         type: GraphQLString,
         resolve(update) {
-          return strip_tags(update.html || "").substr(0,255);
+          return he.decode(strip_tags(update.html || "")).substr(0,255);
         }
       },
       html: {

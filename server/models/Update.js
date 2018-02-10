@@ -10,6 +10,7 @@ import { mustBeLoggedInTo, mustHaveRole } from '../lib/auth';
 import Promise from 'bluebird';
 import showdown from 'showdown';
 const markdownConverter = new showdown.Converter();
+import { sanitizeObject } from '../lib/utils';
 
 import * as errors from '../graphql/errors';
 /**
@@ -98,7 +99,7 @@ export default function(Sequelize, DataTypes) {
     html: {
       type: DataTypes.STRING,
       get() {
-        return this.getDataValue('html') || markdownConverter.makeHtml(this.getDataValue('markdown'));        
+        return this.getDataValue('markdown') ? markdownConverter.makeHtml(this.getDataValue('markdown')) : this.getDataValue('html');
       }
     },
 
@@ -206,6 +207,7 @@ export default function(Sequelize, DataTypes) {
       }
     }
     const editableAttributes = ['TierId', 'FromCollectiveId', 'title', 'html', 'markdown', 'image', 'tags'];
+    sanitizeObject(newUpdateData, ['html', 'markdown']);
     return await this.update({
       ...pick(newUpdateData, editableAttributes),
       LastEditedByUserId: remoteUser.id
