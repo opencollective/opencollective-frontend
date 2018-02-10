@@ -1,11 +1,12 @@
 import React from 'react';
 import { withApollo } from 'react-apollo';
 import PropTypes from 'prop-types';
-import TierComponent from '../components/Tier';
-import InputField from '../components/InputField';
-import MatchingFundWithData from '../components/MatchingFundWithData';
-import RequestBitcoin from '../components/RequestBitcoin';
-import ActionButton from '../components/Button';
+import TierComponent from './Tier';
+import InputField from './InputField';
+import MatchingFundWithData from './MatchingFundWithData';
+import RequestBitcoin from './RequestBitcoin';
+import ActionButton from './Button';
+import SectionTitle from './SectionTitle';
 import { Button, Row, Col, Form, InputGroup, FormControl } from 'react-bootstrap';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import { capitalize, formatCurrency, isValidEmail } from '../lib/utils';
@@ -609,13 +610,15 @@ class OrderForm extends React.Component {
           .prepaidcard span {
             max-width: 350px;
           }
+          .OrderForm span.input-group {
+            max-width: 500px;
+          }
+          .OrderForm textarea[name="publicMessage"] {
+            height: 10rem;
+          }
         `}</style>
         <style jsx>{`
-        h2 {
-          margin: 3rem 0 3rem 0;
-        }
         .OrderForm {
-          max-width: 700px;
           margin: 0 auto;
         }
         .userDetailsForm {
@@ -632,9 +635,7 @@ class OrderForm extends React.Component {
           padding-right: 1rem;
         }
         .actions {
-          margin: 6rem auto;
-          text-align: center;
-          max-width: 400px
+          margin-top: 3rem;
         }
         .result {
           margin-top: 3rem;
@@ -645,9 +646,6 @@ class OrderForm extends React.Component {
         .error {
           color: red;
           font-weight: bold;
-        }
-        :global(.col-sm-12) {
-          width: 100%;
         }
         .value {
           padding-top: 7px;
@@ -666,115 +664,23 @@ class OrderForm extends React.Component {
         }
         .gift-card-expander {
           color: ${colors.blue};
-          margin-left: 183px;
-        }
-        @media (min-width: 768px) {
-          .actions {
-            margin: 6rem 0 6rem 26%;
-          }
+          margin-left: 205px;
         }
         `}</style>
         <Form horizontal>
-          <div className="userDetailsForm">
-            <h2><FormattedMessage id="tier.order.userDetails" defaultMessage="User details" /></h2>
-            <p>
-              { !LoggedInUser && <FormattedMessage id="tier.order.userdetails.description" defaultMessage="If you wish to remain anonymous, only provide an email address without any other personal details." /> }
-              { LoggedInUser && <FormattedMessage id="tier.order.userdetails.description.loggedin" defaultMessage="If you wish to remain anonymous, logout and use another email address without providing any other personal details." /> }
-            </p>
 
-            { !LoggedInUser &&
-              <Row key={`email.input`}>
-                <Col sm={12}>
-                  <InputField
-                    className="horizontal"
-                    {...inputEmail}
-                    />
-                </Col>
-              </Row>
-            }
-            { !LoggedInUser && this.state.isNewUser && this.fields.map(field => (
-              <Row key={`${field.name}.input`}>
-                <Col sm={12}>
-                  <InputField
-                    className="horizontal"
-                    {...field}
-                    defaultValue={this.state.user[field.name]}
-                    onChange={(value) => this.handleChange("user", field.name, value)}
-                    />
-                </Col>
-              </Row>
-            ))}
-
-            { !requireLogin && this.fromCollectiveOptions.length > 1 &&
-              <InputField
-                className="horizontal"
-                type="select"
-                label={intl.formatMessage(this.messages[order.tier.type === 'TICKET' ? 'order.rsvpAs' : 'order.contributeAs'])}
-                name="fromCollectiveSelector"
-                onChange={CollectiveId => this.selectProfile(CollectiveId)}
-                options={this.fromCollectiveOptions}
-                />
-            }
-
-        </div>
-
-        { !fromCollective.id && this.state.orgDetails.show &&
-          <div className="organizationDetailsForm">
-            <h2><FormattedMessage id="tier.order.organizationDetails" defaultMessage="Organization details" /></h2>
-            <p><FormattedMessage id="tier.order.organizationDetails.description" defaultMessage="Create an organization. You can edit it later to add other members." /></p>
-            <Row key={`organization.name.input`}>
-              <Col sm={12}>
-                <InputField
-                  className="horizontal"
-                  type="text"
-                  name="organization_name"
-                  label={intl.formatMessage(this.messages['order.organization.name'])}
-                  onChange={(value) => this.handleChange("fromCollective", "name", value)}
-                  />
-              </Col>
-            </Row>
-            <Row key={`organization.website.input`}>
-              <Col sm={12}>
-                <InputField
-                  className="horizontal"
-                  type="text"
-                  name="organization_website"
-                  pre="http://"
-                  label={intl.formatMessage(this.messages['order.organization.website'])}
-                  onChange={(value) => this.handleChange("fromCollective", "website", value)}
-                  />
-              </Col>
-            </Row>
-            <Row key={`organization.twitterHandle.input`}>
-              <Col sm={12}>
-                <InputField
-                  className="horizontal"
-                  type="text"
-                  name="organization_twitterHandle"
-                  pre="@"
-                  label={intl.formatMessage(this.messages['order.organization.twitterHandle'])}
-                  onChange={(value) => this.handleChange("fromCollective", "twitterHandle", value)}
-                  />
-              </Col>
-            </Row>
-          </div>
-        }
-
-        { !requireLogin &&
-          <div>
-            <div className="order">
-              <h2>
-                { order.tier.type !== 'TICKET' && <FormattedMessage id="tier.order.contributionDetails" defaultMessage="Contribution details" /> }
-                { order.tier.type === 'TICKET' && <FormattedMessage id="tier.order.ticketDetails" defaultMessage="Ticket details" /> }
-              </h2>
+          { !requireLogin &&
+            <section className="order">
+              { order.tier.type !== 'TICKET' && <SectionTitle section="contributionDetails" /> }
+              { order.tier.type === 'TICKET' && <SectionTitle section="ticketDetails" /> }
               <Row>
                 <Col sm={12}>
                   <div className="form-group">
-                    <label className="col-sm-3 control-label">
+                    <label className="col-sm-2 control-label">
                       { order.tier.type !== 'TICKET' && <FormattedMessage id="tier.order.contribution" defaultMessage="Contribution" /> }
                       { order.tier.type === 'TICKET' && <FormattedMessage id="tier.order.ticket" defaultMessage="Ticket" /> }
                     </label>
-                    <Col sm={9}>
+                    <Col sm={10}>
                       <TierComponent
                         tier={order.tier}
                         values={{
@@ -814,10 +720,98 @@ class OrderForm extends React.Component {
                   />
                 </Col>
               </Row>
-            </div>
+            </section>
+          }
+          <section className="userDetailsForm">
+            <SectionTitle section="userDetails" subtitle={
+              <div>
+                { !LoggedInUser && <FormattedMessage id="tier.order.userdetails.description" defaultMessage="If you wish to remain anonymous, only provide an email address without any other personal details." /> }
+                { LoggedInUser && <FormattedMessage id="tier.order.userdetails.description.loggedin" defaultMessage="If you wish to remain anonymous, logout and use another email address without providing any other personal details." /> }
+              </div>
+            } />
+
+            { !LoggedInUser &&
+              <Row key={`email.input`}>
+                <Col sm={12}>
+                  <InputField
+                    className="horizontal"
+                    {...inputEmail}
+                    />
+                </Col>
+              </Row>
+            }
+            { !LoggedInUser && this.state.isNewUser && this.fields.map(field => (
+              <Row key={`${field.name}.input`}>
+                <Col sm={12}>
+                  <InputField
+                    className="horizontal"
+                    {...field}
+                    defaultValue={this.state.user[field.name]}
+                    onChange={(value) => this.handleChange("user", field.name, value)}
+                    />
+                </Col>
+              </Row>
+            ))}
+
+            { !requireLogin && this.fromCollectiveOptions.length > 1 &&
+              <InputField
+                className="horizontal"
+                type="select"
+                label={intl.formatMessage(this.messages[order.tier.type === 'TICKET' ? 'order.rsvpAs' : 'order.contributeAs'])}
+                name="fromCollectiveSelector"
+                onChange={CollectiveId => this.selectProfile(CollectiveId)}
+                options={this.fromCollectiveOptions}
+                />
+            }
+
+        </section>
+
+        { !fromCollective.id && this.state.orgDetails.show &&
+          <section className="organizationDetailsForm">
+            <SectionTitle section="organizationDetails" />
+            <Row key={`organization.name.input`}>
+              <Col sm={12}>
+                <InputField
+                  className="horizontal"
+                  type="text"
+                  name="organization_name"
+                  label={intl.formatMessage(this.messages['order.organization.name'])}
+                  onChange={(value) => this.handleChange("fromCollective", "name", value)}
+                  />
+              </Col>
+            </Row>
+            <Row key={`organization.website.input`}>
+              <Col sm={12}>
+                <InputField
+                  className="horizontal"
+                  type="text"
+                  name="organization_website"
+                  pre="http://"
+                  label={intl.formatMessage(this.messages['order.organization.website'])}
+                  onChange={(value) => this.handleChange("fromCollective", "website", value)}
+                  />
+              </Col>
+            </Row>
+            <Row key={`organization.twitterHandle.input`}>
+              <Col sm={12}>
+                <InputField
+                  className="horizontal"
+                  type="text"
+                  name="organization_twitterHandle"
+                  pre="@"
+                  label={intl.formatMessage(this.messages['order.organization.twitterHandle'])}
+                  onChange={(value) => this.handleChange("fromCollective", "twitterHandle", value)}
+                  />
+              </Col>
+            </Row>
+          </section>
+        }
+
+        { !requireLogin &&
+          <div>
             { order.totalAmount > 0 &&
-              <div className="paymentDetails">
-                <h2><FormattedMessage id="tier.order.paymentDetails" defaultMessage="Payment details" /></h2>
+              <section className="paymentDetails">
+                <SectionTitle section="paymentDetails" />
                 { this.paymentMethodTypeOptions.length > 0 &&
                   <Row>
                     <Col sm={12}>
@@ -836,9 +830,9 @@ class OrderForm extends React.Component {
                   <Row>
                     <Col sm={12}>
                     <div className="form-group">
-                      <label className="col-sm-3 control-label">
+                      <label className="col-sm-2 control-label">
                       </label>
-                      <Col sm={9}>
+                      <Col sm={10}>
                         <div className="bitcoin disclaimer">
                           <FormattedMessage id="paymentMethod.bitcoin.disclaimer" defaultMessage="Note: Bitcoin donations are automatically converted to US dollars (USD). Only one time donations are supported. The bitcoin address (and QR code) is different for each donation (so please don't share this address)." />
                         </div>
@@ -887,12 +881,12 @@ class OrderForm extends React.Component {
                         </div>
                       }
                       <div>
-                        {!prepaidcard.expanded &&
+                        { !prepaidcard.expanded &&
                           <a className='gift-card-expander' onClick={() => this.setState({
                             prepaidcard: Object.assign({}, this.state.prepaidcard, {expanded: true})
-                          })}> Use a Gift Card </a>
+                          })}><FormattedMessage id="paymentMethod.useGiftCard" defaultMessage="Use a Gift Card" /></a>
                         }
-                        {prepaidcard.expanded &&
+                        { prepaidcard.expanded &&
                           <Row key={`prepaidcard.input`}>
                             <Col sm={12}>
                               <InputField
@@ -906,56 +900,61 @@ class OrderForm extends React.Component {
                     </Col>
                   </Row>
                 }
-              </div>
+              </section>
             }
 
-            { order.totalAmount > 0 && !collective.host &&
-              <div className="error">
-                <FormattedMessage id="order.error.hostRequired" defaultMessage="This collective doesn't have a host that can receive money on their behalf" />
-              </div>
-            }
-            { (collective.host || order.totalAmount === 0) &&
-              <div className="actions">
-                <div className="submit">
-                  <ActionButton className="blue" ref="submit" onClick={this.handleSubmit} disabled={this.state.loading}>
-                    {this.state.loading ? <FormattedMessage id='loading' defaultMessage='loading' /> : order.tier.button || capitalize(intl.formatMessage(this.messages['order.button']))}
-                  </ActionButton>
-                </div>
-                { order.totalAmount > 0 &&
-                  <div className="disclaimer">
-                    <FormattedMessage
-                      id="collective.host.disclaimer"
-                      defaultMessage="By clicking above, you are pledging to give the host ({hostname}) {amount} {interval, select, month {per month} year {per year} other {}} for {collective}."
-                      values={
-                        {
-                          hostname: collective.host.name,
-                          amount: formatCurrency(order.totalAmount, currency),
-                          interval: order.interval || order.tier.interval,
-                          collective: collective.name
-                        }
-                      } />
-                      { (order.interval || order.tier.interval) &&
-                        <div>
-                          <FormattedMessage id="collective.host.cancelanytime" defaultMessage="You can cancel anytime." />
-                        </div>
-                      }
+            <Row key={`prepaidcard.input`}>
+              <Col sm={2} />
+              <Col sm={10}>
+                { order.totalAmount > 0 && !collective.host &&
+                  <div className="error">
+                    <FormattedMessage id="order.error.hostRequired" defaultMessage="This collective doesn't have a host that can receive money on their behalf" />
                   </div>
                 }
-                <div className="result">
-                  { this.state.loading && <div className="loading">Processing...</div> }
-                  { this.state.result.success &&
-                    <div className="success">
-                      {this.state.result.success}
+                { (collective.host || order.totalAmount === 0) &&
+                  <div className="actions">
+                    <div className="submit">
+                      <ActionButton className="blue" ref="submit" onClick={this.handleSubmit} disabled={this.state.loading}>
+                        {this.state.loading ? <FormattedMessage id='loading' defaultMessage='loading' /> : order.tier.button || capitalize(intl.formatMessage(this.messages['order.button']))}
+                      </ActionButton>
                     </div>
-                  }
-                  { this.state.result.error &&
-                    <div className="error">
-                      {this.state.result.error}
+                    { order.totalAmount > 0 &&
+                      <div className="disclaimer">
+                        <FormattedMessage
+                          id="collective.host.disclaimer"
+                          defaultMessage="By clicking above, you are pledging to give the host ({hostname}) {amount} {interval, select, month {per month} year {per year} other {}} for {collective}."
+                          values={
+                            {
+                              hostname: collective.host.name,
+                              amount: formatCurrency(order.totalAmount, currency),
+                              interval: order.interval || order.tier.interval,
+                              collective: collective.name
+                            }
+                          } />
+                          { (order.interval || order.tier.interval) &&
+                            <div>
+                              <FormattedMessage id="collective.host.cancelanytime" defaultMessage="You can cancel anytime." />
+                            </div>
+                          }
+                      </div>
+                    }
+                    <div className="result">
+                      { this.state.loading && <div className="loading">Processing...</div> }
+                      { this.state.result.success &&
+                        <div className="success">
+                          {this.state.result.success}
+                        </div>
+                      }
+                      { this.state.result.error &&
+                        <div className="error">
+                          {this.state.result.error}
+                        </div>
+                      }
                     </div>
-                  }
-                </div>
-              </div>
-            }
+                  </div>
+                }
+              </Col>
+            </Row>
           </div>
         }
       </Form>

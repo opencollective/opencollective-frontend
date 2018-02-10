@@ -24,10 +24,10 @@ function FieldGroup({ controlId, label, help, pre, post, after, button, classNam
   if (className && className.match(/horizontal/)) {
     return (
       <FormGroup controlId={controlId} validationState={validationState} className={className}>
-        <Col componentClass={ControlLabel} sm={3}>
+        <Col componentClass={ControlLabel} sm={2}>
           {label}
         </Col>
-        <Col sm={9}>
+        <Col sm={10}>
           <InputGroup>
           { pre && <InputGroup.Addon>{pre}</InputGroup.Addon>}
           <FormControl {...inputProps} />
@@ -133,10 +133,10 @@ class InputField extends React.Component {
         this.input =  (<FormGroup controlId={field.name}>
                         {field.className === 'horizontal' &&
                           <div>
-                            <Col componentClass={ControlLabel} sm={3}>
+                            <Col componentClass={ControlLabel} sm={2}>
                               {capitalize(field.label)}
                             </Col>
-                            <Col sm={9}>
+                            <Col sm={10}>
                               <InputTypeCreditCard options={field.options} onChange={this.handleChange} />                   
                             </Col>
                           </div>
@@ -182,10 +182,10 @@ class InputField extends React.Component {
         <FormGroup>
           {field.className === 'horizontal' &&
             <div>
-              <Col componentClass={ControlLabel} sm={3}>
+              <Col componentClass={ControlLabel} sm={2}>
                 {capitalize(field.label)}
               </Col>
-              <Col sm={9}>
+              <Col sm={10}>
                 <DateTime
                   name={field.name}
                   timeFormat={field.timeFormat || timeFormat}
@@ -220,10 +220,10 @@ class InputField extends React.Component {
         <FormGroup>
           {field.className === 'horizontal' &&
             <div>
-              <Col componentClass={ControlLabel} sm={3}>
+              <Col componentClass={ControlLabel} sm={2}>
                 {capitalize(field.label)}
               </Col>
-              <Col sm={9}>
+              <Col sm={10}>
                 <field.component onChange={this.handleChange} {...field} {...field.options} />
               </Col>
             </div>
@@ -258,10 +258,10 @@ class InputField extends React.Component {
           <FormGroup>
           {field.className === 'horizontal' &&
             <div>
-              <Col componentClass={ControlLabel} sm={3}>
+              <Col componentClass={ControlLabel} sm={2}>
                 {capitalize(field.label)}
               </Col>
-              <Col sm={9}>
+              <Col sm={10}>
                 <InputTypeDropzone
                   defaultValue={field.defaultValue}
                   name={field.name}
@@ -345,10 +345,10 @@ class InputField extends React.Component {
         this.input =  (<FormGroup controlId={field.name}>
                         {field.className === 'horizontal' &&
                           <div>
-                            <Col componentClass={ControlLabel} sm={3}>
+                            <Col componentClass={ControlLabel} sm={2}>
                               {capitalize(field.label)}
                             </Col>
-                            <Col sm={9}>
+                            <Col sm={10}>
                               <Checkbox defaultChecked={field.defaultValue} onChange={event => this.handleChange(event.target.checked)}>{field.description}</Checkbox>
                             </Col>
                           </div>
@@ -366,10 +366,10 @@ class InputField extends React.Component {
         this.input =  (<FormGroup controlId={field.name} help={field.description}>
                         {field.className === 'horizontal' &&
                           <div>
-                            <Col componentClass={ControlLabel} sm={3}>
+                            <Col componentClass={ControlLabel} sm={2}>
                               {capitalize(field.label)}
                             </Col>
-                            <Col sm={9}>
+                            <Col sm={10}>
                               <Switch defaultChecked={field.defaultValue} onChange={event => this.handleChange(event.target.checked)}></Switch>
                               {field.description && <HelpBlock>{field.description}</HelpBlock>}
                             </Col>

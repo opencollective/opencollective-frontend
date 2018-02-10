@@ -17,7 +17,6 @@ import { graphql } from 'react-apollo'
 import gql from 'graphql-tag'
 import CreateExpenseForm from '../components/CreateExpenseForm';
 import Button from '../components/Button';
-import Link from '../components/Link';
 
 class ExpensesPage extends React.Component {
 
@@ -84,6 +83,9 @@ class ExpensesPage extends React.Component {
             width: 300px;
             margin-left: 5rem;
           }
+          .rightColumn .viewAllExpenses {
+            margin-top: 5rem;
+          }
           .largeColumn {
             width: 900px;
           }
@@ -145,11 +147,13 @@ class ExpensesPage extends React.Component {
 
             <div className="rightColumn">
 
-              <Link route={`/${collective.slug}/expenses`}>
-                <FormattedMessage id="collective.expenses.title" defaultMessage="{n, plural, one {Latest expense} other {Latest expenses}}" values={{n: 2}} />
-              </Link>
-
               <ExpensesStatsWithData slug={collective.slug} />
+
+              <div className="viewAllExpenses">
+                <Button href={`/${collective.slug}/expenses`}>
+                  <FormattedMessage id="expenses.viewAll" defaultMessage="View All Expenses" />
+                </Button>
+              </div>
 
             </div>
 

@@ -26,7 +26,14 @@ class SectionTitle extends React.Component {
       'budget.title': { id: 'section.budget.title', defaultMessage: 'Budget' },
       'budget.subtitle': { id: 'section.budget.subtitle', defaultMessage: 'Current balance: {balance}' },
       'contributors.title': { id: 'section.contributors.title', defaultMessage: 'Contributors' },
-      'contributors.subtitle': { id: 'section.contributors.subtitle', defaultMessage: `{organizations, plural, one {{organizations} organization and} other {{organizations} organizations and}} {users} {users, plural, one {person is} other {people are}} supporting us.` }
+      'contributors.subtitle': { id: 'section.contributors.subtitle', defaultMessage: `{organizations, plural, one {{organizations} organization and} other {{organizations} organizations and}} {users} {users, plural, one {person is} other {people are}} supporting us.` },
+      'contributionDetails.title': { id: 'tier.order.contributionDetails', defaultMessage: 'Contribution details' },
+      'contributionDetails.subtitle': { id: 'tier.order.contributionDetails.description', defaultMessage: 'Thank you for contributing to our budget! 🙏' },
+      'ticketDetails.title': { id: 'tier.order.ticketDetails', defaultMessage: 'Ticket details' },
+      'userDetails.title': { id: 'tier.order.userDetails', defaultMessage: 'Personal details' },
+      'organizationDetails.title': { id: 'tier.order.organizationDetails', defaultMessage: 'Organization details' },
+      'organizationDetails.subtitle': { id: 'tier.order.organizationDetails.description', defaultMessage: 'Create an organization. You can edit it later to add other members.' },
+      'paymentDetails.title': { id: 'tier.order.paymentDetails', defaultMessage: 'Payment details' }
     });
   }
 
@@ -59,18 +66,21 @@ class SectionTitle extends React.Component {
             font-size: 32px;
             font-weight: 500;
             line-height: 38px;
-            margin-top: 0;
-            margin-bottom: 0.8rem;
+            margin: 0;
             text-align: left;
             text-align: left;
             margin-right: 0.5rem;
           }
           .subtitle {
+            margin-top: 0.8rem;
             color: #666F80;
             font-family: Rubik;
             font-size: 16px;
             line-height: 19px;
             text-align: left;
+          }
+          .content {
+            padding: 0.8rem 0;
           }
           @media(max-width: 420px) {
             .title {
@@ -78,14 +88,14 @@ class SectionTitle extends React.Component {
             }
           }
         `}</style>
-        <div className="title">
-          <h1>{title}</h1>
-          { action &&
-            <Link route={action.href} className="action">{action.label}</Link>
-          }
-        </div>
-        <div className="subtitle">
-          {subtitle}
+        <div className="content">
+          <div className="title">
+            <h1>{title}</h1>
+            { action &&
+              <Link route={action.href} className="action">{action.label}</Link>
+            }
+          </div>
+          { subtitle && <div className="subtitle">{subtitle}</div> }
         </div>
       </div>
     );    
