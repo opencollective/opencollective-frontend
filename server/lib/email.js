@@ -8,6 +8,7 @@ import templates from './emailTemplates';
 import { isEmailInternal } from './utils';
 import crypto from 'crypto';
 import fs from 'fs';
+import he from 'he';
 const debug = debugLib('email');
 
 const render = (template, data) => {
@@ -26,7 +27,7 @@ const render = (template, data) => {
   if (templates[`${template}.text`]) {
     text = templates[`${template}.text`](data);
   }
-  const html = juice(templates[template](data));
+  const html = juice(he.decode(templates[template](data)));
   const recipient = get(data, 'recipient.dataValues') || data.recipient || {};
   const slug = data.collective && data.collective.slug || recipient.slug || recipient.email && recipient.email.substr(0, recipient.email.indexOf('@')) || recipient.substr && recipient.substr(0, recipient.indexOf('@'));
 
