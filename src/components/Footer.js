@@ -16,13 +16,14 @@ class Footer extends React.Component {
           bottom: 0;
           min-height: 7.5rem;
           width: 100%;
+          padding: 1rem;
         }
-        .container {
-          padding: 2rem;
+        .content {
+          padding: 1rem;
           display: flex;
+          justify-content: space-between;
           align-items: center;
-          justify-content: space-around;
-          max-width: 1070px;
+          max-width: 1244px;
           margin: 0 auto;
         }
         .logo {
@@ -34,10 +35,11 @@ class Footer extends React.Component {
           padding-left: 0;
           text-align: center;
         }
-        li {
+        .Footer li {
           display: inline-block;
+          margin: 0;
         }
-        li :global(a) {
+        .Footer li :global(a) {
           opacity: 0.5;
           color: white;
           font-size: 1.2rem;
@@ -46,9 +48,10 @@ class Footer extends React.Component {
           text-decoration: none;
           padding: 1rem;
           display: block;
+          margin: 0;
         }
         @media(max-width: 600px) {
-          .container {
+          .content {
             flex-direction: column;
           }
         }
@@ -56,17 +59,18 @@ class Footer extends React.Component {
           fill: red;
         }
         `}</style>
-        <div className="container">
-          <div className="left">
+        <div className="content">
+          <div>
             <object ref="svg" type="image/svg+xml" data="/static/images/opencollectivelogo-footer.svg" height='20' className="logo"></object>
           </div>
-          <div className="right">
+          <div>
             <nav>
               <ul>
                 <li><a href="/learn-more">How It Works</a></li>
                 <li><a href="https://opencollective.com/#opensource">Use Cases</a></li>
                 <li><a href="https://opencollective.com/faq">FAQ</a></li>
                 <li><a href="https://forum.opencollective.com">Forum</a></li>
+                <li><a href="https://medium.com/open-collective">Blog</a></li>
                 <li><Link route="/tos">Terms Of Service</Link></li>
                 <li><a href="https://opencollective.com/about">About</a></li>
                 <li><a href="mailto:info@opencollective.com">Contact</a></li>

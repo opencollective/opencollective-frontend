@@ -201,25 +201,24 @@ class Collective extends React.Component {
               />
 
             <div>
-
               <div>
-                <div className="sidebar tiers" id="contribute">
-                  { this.collective.tiers.map(tier => (
-                    <TierCard
-                      key={`TierCard-${tier.slug}`}
-                      collective={this.collective}
-                      tier={tier}
-                      referral={query.referral}
-                      />
-                  ))}
-                  <div className="CustomDonationTierCard">
-                    <Link route={`/${this.collective.slug}/donate`}>
-                      <a><FormattedMessage id="collective.tiers.donate" defaultMessage="Or make a one time donation" /></a>
-                    </Link>
-                  </div>
-                </div>
-
                 <div className="content" >
+
+                  <div className="sidebar tiers" id="contribute">
+                    { this.collective.tiers.map(tier => (
+                      <TierCard
+                        key={`TierCard-${tier.slug}`}
+                        collective={this.collective}
+                        tier={tier}
+                        referral={query.referral}
+                        />
+                    ))}
+                    <div className="CustomDonationTierCard">
+                      <Link route={`/${this.collective.slug}/donate`}>
+                        <a><FormattedMessage id="collective.tiers.donate" defaultMessage="Or make a one time donation" /></a>
+                      </Link>
+                    </div>
+                  </div>
 
                   { (get(this.collective, 'stats.updates') > 0 || canEditCollective) &&
                     <UpdatesSection
@@ -288,9 +287,7 @@ class Collective extends React.Component {
                 </div>
               </section>
 
-              <div id="contributors" />
-
-              <section id="organizations" className="tier">
+              <section id="contributors" className="tier">
                 <div className="content" >
                 { get(this.collective, 'stats.backers.all') === 0 &&
                   <SectionTitle

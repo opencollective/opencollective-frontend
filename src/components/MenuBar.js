@@ -21,7 +21,7 @@ class MenuBar extends React.Component {
     super(props);
     this.onscroll = this.onscroll.bind(this);
     this.handleChange = this.handleChange.bind(this);
-    this.height = 100;
+    this.height = 60;
 
     const menuItems = [
       { anchor: 'about', link: `/${props.collective.slug}#about`, position: 0 },
