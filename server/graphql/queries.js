@@ -20,6 +20,7 @@ import {
   UserType,
   TierType,
   ExpenseType,
+  UpdateType,
   MemberType,
   PaymentMethodType
 } from './types';
@@ -97,6 +98,67 @@ const queries = {
         if (args.dateTo) query.where.createdAt['$lte'] = args.dateTo;
       }
       return models.Transaction.findAll(query);
+    }
+  },
+
+  Update: {
+    type: UpdateType,
+    args: {
+      collectiveSlug: { type: GraphQLString },
+      updateSlug: { type: GraphQLString },
+      id: { type: GraphQLInt }
+    },
+    async resolve(_, args) {
+      if (args.id) {
+        return models.Update.findById(args.id);
+      }
+      const CollectiveId = await fetchCollectiveId(args.collectiveSlug);
+      return models.Update.findOne({ where: { CollectiveId, slug: args.updateSlug } });
+    }
+  },
+
+  /*
+   * Given a collective slug, returns all expenses
+   */
+  allUpdates: {
+    type: new GraphQLList(UpdateType),
+    args: {
+      CollectiveId: { type: new GraphQLNonNull(GraphQLInt) },
+      includeHostedCollectives: { type: GraphQLBoolean },
+      limit: { type: GraphQLInt },
+      offset: { type: GraphQLInt }
+    },
+    resolve(_, args, req) {
+      const query = { where: {} };
+      if (args.limit) query.limit = args.limit;
+      if (args.offset) query.offset = args.offset;
+      query.order = [['publishedAt', 'DESC'], ['createdAt', 'DESC']];
+      if (!req.remoteUser || !req.remoteUser.isAdmin(args.CollectiveId)) {
+        query.where.publishedAt = { $ne: null };
+      }
+      return req.loaders.collective.findById.load(args.CollectiveId)
+        .then(collective => {
+          if (!collective) {
+            throw new Error('Collective not found');
+          }
+          const getCollectiveIds = () => {
+            // if is host, we get all the expenses across all the hosted collectives
+            if (args.includeHostedCollectives) {
+              return models.Member.findAll({
+                where: {
+                  MemberCollectiveId: collective.id,
+                  role: 'HOST'
+                }
+              }).map(member => member.CollectiveId)
+            } else {
+              return Promise.resolve([args.CollectiveId]);
+            }
+          }
+          return getCollectiveIds().then(collectiveIds => {
+            query.where.CollectiveId = { $in: collectiveIds };
+            return models.Update.findAll(query);
+          })
+        })
     }
   },
 
@@ -181,7 +243,7 @@ const queries = {
       tags: { type: new GraphQLList(GraphQLString) },
       type: {
         type: GraphQLString,
-        description: "COLLECTIVE (default), USER, ORGANIZATION, EVENT"
+        description: "COLLECTIVE, USER, ORGANIZATION, EVENT"
       },
       HostCollectiveId: { type: GraphQLInt },
       hostCollectiveSlug: {
@@ -234,6 +296,7 @@ const queries = {
 
       if (args.HostCollectiveId) query.where.HostCollectiveId = args.HostCollectiveId;
       if (args.ParentCollectiveId) query.where.ParentCollectiveId = args.ParentCollectiveId;
+      if (args.type) query.where.type = args.type;
 
       if (args.orderBy === 'balance' && (args.ParentCollectiveId || args.HostCollectiveId)) {
         return rawQueries.getCollectivesWithBalance(query.where, args);
@@ -242,7 +305,6 @@ const queries = {
       }
 
       if (args.tags) query.where.tags = { $overlap: args.tags };
-      if (args.type) query.where.type = args.type;
       if (args.offset) query.offset = args.offset;
       return models.Collective.findAll(query);
     }

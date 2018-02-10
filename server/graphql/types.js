@@ -19,6 +19,7 @@ import {
 
 import models from '../models';
 import dataloaderSequelize from 'dataloader-sequelize';
+import { strip_tags } from '../lib/utils';
 
 dataloaderSequelize(models.Order);
 dataloaderSequelize(models.Transaction);
@@ -370,7 +371,12 @@ export const ExpenseType = new GraphQLObjectType({
       fromCollective: {
         type: CollectiveInterfaceType,
         resolve(expense) {
-          return expense.getUser().then(u => models.Collective.findById(u.CollectiveId));
+          return expense.getUser().then(u => {
+            if (!u) {
+              return console.error(`Cannot fetch the UserId ${expense.UserId} referenced in ExpenseId ${expense.id} -- has the user been deleted?`);
+            }
+            return models.Collective.findById(u.CollectiveId)
+          });
         }
       },
       collective: {
@@ -388,6 +394,111 @@ export const ExpenseType = new GraphQLObjectType({
               ExpenseId: expense.id
             }
           });
+        }
+      }
+    }
+  }
+});
+
+export const UpdateType = new GraphQLObjectType({
+  name: 'UpdateType',
+  description: 'This represents an Update',
+  fields: () => {
+    return {
+      id: {
+        type: GraphQLInt,
+        resolve(expense) {
+          return expense.id;
+        }
+      },
+      views: {
+        type: GraphQLInt,
+        resolve(update) {
+          return update.views;
+        }
+      },
+      slug: {
+        type: GraphQLString,
+        resolve(update) {
+          return update.slug;
+        }
+      },
+      image: {
+        type: GraphQLString,
+        resolve(update) {
+          return update.image;
+        }
+      },
+      title: {
+        type: GraphQLString,
+        resolve(update) {
+          return update.title;
+        }
+      },
+      createdAt: {
+        type: GraphQLString,
+        resolve(update) {
+          return update.createdAt;
+        }
+      },
+      updatedAt: {
+        type: GraphQLString,
+        resolve(update) {
+          return update.updatedAt;
+        }
+      },
+      publishedAt: {
+        type: GraphQLString,
+        resolve(update) {
+          return update.publishedAt;
+        }
+      },
+      summary: {
+        type: GraphQLString,
+        resolve(update) {
+          return strip_tags(update.html || "").substr(0,255);
+        }
+      },
+      html: {
+        type: GraphQLString,
+        resolve(update) {
+          return update.html;
+        }
+      },
+      markdown: {
+        type: GraphQLString,
+        resolve(update) {
+          return update.markdown;
+        }
+      },
+      tags: {
+        type: new GraphQLList(GraphQLString),
+        resolve(update) {
+          return update.tags;
+        }
+      },
+      createdByUser: {
+        type: UserType,
+        resolve(update) {
+          return update.getUser();
+        }
+      },
+      fromCollective: {
+        type: CollectiveInterfaceType,
+        resolve(update, args, req) {
+          return req.loaders.collective.findById.load(update.FromCollectiveId);
+        }
+      },
+      collective: {
+        type: CollectiveInterfaceType,
+        resolve(update, args, req) {
+          return req.loaders.collective.findById.load(update.CollectiveId);
+        }
+      },
+      tier: {
+        type: TierType,
+        resolve(update, args, req) {
+          return req.loaders.tiers.findById.load(update.TierId);
         }
       }
     }

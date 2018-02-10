@@ -5,8 +5,7 @@ import juice from 'juice';
 import nodemailer from 'nodemailer';
 import debugLib from 'debug';
 import templates from './emailTemplates';
-import activities from '../constants/activities';
-import {isEmailInternal} from './utils';
+import { isEmailInternal } from './utils';
 import crypto from 'crypto';
 import fs from 'fs';
 const debug = debugLib('email');
@@ -172,8 +171,10 @@ const getNotificationLabel = (template, recipients) => {
     'email.message': `the ${recipients[0].substr(0, recipients[0].indexOf('@'))} mailing list`,
     'collective.order.created': 'notifications of new donations for this collective',
     'collective.expense.created': 'notifications of new expenses submitted to this collective',
+    'collective.expense.approved.for.host': 'notifications of new expenses approved under this host',
     'collective.monthlyreport': 'monthly reports for collectives',
     'collective.member.created': 'notifications of new members',
+    'collective.update.published': 'notifications of new updates from this collective',
     'host.monthlyreport': 'monthly reports for host',
     'host.yearlyreport': 'yearly reports for host',
     'collective.transaction.created': 'notifications of new transactions for this collective',
@@ -272,58 +273,12 @@ const generateEmailFromTemplateAndSend = (template, recipient, data, options = {
     });
 };
 
-/*
- * Given an activity, it sends out an email to the right people and right template
- */
-const sendMessageFromActivity = (activity, notification, options = {}) => {
-  const data = activity.data;
-  const userEmail = notification && notification.User ? notification.User.email : activity.data.user.email;
-
-  switch (activity.type) {
-
-    case activities.COLLECTIVE_MEMBER_CREATED:
-      return generateEmailFromTemplateAndSend('collective.member.created', userEmail, data);
-
-    case activities.COLLECTIVE_EXPENSE_CREATED:
-      data.actions = {
-        approve: notification.User.generateLoginLink(`/${data.collective.slug}/expenses/${data.expense.id}/approve`),
-        reject: notification.User.generateLoginLink(`/${data.collective.slug}/expenses/${data.expense.id}/reject`)
-      };
-      return generateEmailFromTemplateAndSend('collective.expense.created', userEmail, data);
-
-    case activities.COLLECTIVE_EXPENSE_PAID:
-      data.actions = {
-        viewLatestExpenses: `${config.host.website}/${data.collective.slug}/expenses#expense${data.expense.id}`
-      }
-      return generateEmailFromTemplateAndSend(options.template || 'collective.expense.paid', userEmail, data);
-
-    case activities.COLLECTIVE_EXPENSE_APPROVED:
-      data.actions = {
-        viewLatestExpenses: `${config.host.website}/${data.collective.slug}/expenses#expense${data.expense.id}`
-      }
-      return generateEmailFromTemplateAndSend(options.template || 'collective.expense.approved', userEmail, data);
-
-    case activities.COLLECTIVE_CREATED:
-      data.actions = {
-        approve: notification.User.generateLoginLink(`/${data.host.slug}/collectives/${data.collective.id}/approve`)
-      };
-      return generateEmailFromTemplateAndSend('collective.created', userEmail, data);
-
-    case activities.SUBSCRIPTION_CANCELED:
-      return generateEmailFromTemplateAndSend('subscription.canceled', userEmail, data, { cc: `info@${data.collective.slug}.opencollective.com` });
-
-    default:
-      return Promise.resolve();
-  }
-}
-
 const emailLib = {
   render,
   getTemplateAttributes,
   sendMessage,
   generateEmailFromTemplate,
-  send: generateEmailFromTemplateAndSend,
-  sendMessageFromActivity
+  send: generateEmailFromTemplateAndSend
 };
 
 export default emailLib;

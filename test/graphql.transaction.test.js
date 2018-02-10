@@ -136,7 +136,7 @@ describe('graphql.transaction.test.js', () => {
         }
       `;
       const result = await utils.graphqlQuery(query, { CollectiveId: 2, limit, offset, type: 'CREDIT' });
-      result.errors && console.log(result.errors);
+      result.errors && console.error(result.errors);
       expect(result.errors).to.not.exist;
       const transactions = result.data.allTransactions;
       expect(transactions.length).to.equal(limit);

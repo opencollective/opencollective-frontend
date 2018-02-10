@@ -65,7 +65,7 @@ describe('Query Tests', () => {
 
       it('returns all collectives with role', async () => {
         const result = await utils.graphqlQuery(LoggedInUserQuery, null, user1);
-        result.errors && console.log(result.errors);
+        result.errors && console.error(result.errors);
         const data = result.data.LoggedInUser;
         expect(data.memberOf.length).to.equal(2);
         expect(data.memberOf[0].role).to.equal('BACKER');
@@ -74,7 +74,7 @@ describe('Query Tests', () => {
 
       it("doesn't return anything if not logged in", async () => {
         const result = await utils.graphqlQuery(LoggedInUserQuery);
-        result.errors && console.log(result.errors);
+        result.errors && console.error(result.errors);
         const data = result.data.LoggedInUser;
         expect(data).to.be.null;
       })
@@ -124,10 +124,10 @@ describe('Query Tests', () => {
         }`;
 
         const result = await utils.graphqlQuery(query, { order: generateOrder(user1) });
-        result.errors && console.log(result.errors);
+        result.errors && console.error(result.errors);
         expect(result.errors).to.not.exist;
         const paymentMethods = await models.PaymentMethod.findAll({ where: { CreatedByUserId: user1.id }});
-        paymentMethods.errors && console.log(paymentMethods.errors);
+        paymentMethods.errors && console.error(paymentMethods.errors);
         expect(paymentMethods).to.have.length(1);
         expect(paymentMethods[0].name).to.equal('4242');
         expect(paymentMethods[0].CollectiveId).to.equal(result.data.createOrder.fromCollective.id);
@@ -151,7 +151,7 @@ describe('Query Tests', () => {
         }`;
 
         const result = await utils.graphqlQuery(query, { order });
-        result.errors && console.log(result.errors);
+        result.errors && console.error(result.errors);
         expect(result.errors).to.not.exist;
         const paymentMethods = await models.PaymentMethod.findAll({where: { CreatedByUserId: user1.id }});
         expect(paymentMethods).to.have.length(1);
@@ -188,12 +188,12 @@ describe('Query Tests', () => {
           }
         `;
         const result = await utils.graphqlQuery(query, { id: ticket1.id });
-        result.errors && console.log(result.errors);
+        result.errors && console.error(result.errors);
         const orders = result.data.Tier.orders;
         expect(orders).to.have.length(1);
         expect(orders[0].paymentMethod).to.be.null;
         const result2 = await utils.graphqlQuery(query, { id: ticket1.id }, user2);
-        result2.errors && console.log(result2.errors);
+        result2.errors && console.error(result2.errors);
         const orders2 = result2.data.Tier.orders;
         expect(orders2).to.have.length(1);
         expect(orders2[0].paymentMethod).to.be.null;
@@ -230,7 +230,7 @@ describe('Query Tests', () => {
           }
         `;
         const result = await utils.graphqlQuery(query, { id: tier1.id }, user1);
-        result.errors && console.log(result.errors);
+        result.errors && console.error(result.errors);
         const orders = result.data.Tier.orders;
         expect(orders).to.have.length(1);
         expect(orders[0].paymentMethod.name).to.equal('4242');

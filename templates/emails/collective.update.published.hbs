@@ -1,0 +1,29 @@
+Subject: Collective update {{update.title}}
+
+{{> header}}
+
+<style>
+  .byline {
+    text-align: center;
+    font-size: 10pt;
+    margin-top: -10px;
+  }
+  .updateHtml {
+    margin-top: 2rem;
+  }
+</style>
+
+<center>
+  <a href="{{url}}" style="font-size: 10pt;">view online</a>
+</center>
+
+<br /><br />
+
+<h2>{{update.title}}</h2>
+<div class="byline">by <a href="{{config.host.website}}/{{update.fromCollective.slug}}">{{update.fromCollective.name}}</a></div>
+
+<div class="updateHtml">
+  {{{update.html}}}
+</div>
+
+{{> footer}}

@@ -10,7 +10,7 @@ import { difference, uniq, pick } from 'lodash';
 import { types } from '../constants/collectives';
 import roles from '../constants/roles';
 import { HOST_FEE_PERCENT } from '../constants/transactions';
-import { capitalize } from '../lib/utils';
+import { capitalize, flattenArray } from '../lib/utils';
 import slugify from 'slug';
 import activities from '../constants/activities';
 import Promise from 'bluebird';
@@ -401,16 +401,33 @@ export default function(Sequelize, DataTypes) {
     }
   };
 
+  /**
+   * Returns all the users of a collective (admins, members, backers, followers, attendees, ...)
+   * including all the admins of the organizations that are members/backers of this collective
+   */
   Collective.prototype.getUsers = function() {
+    debug("getUsers for ", this.id);
     return models.Member.findAll({
       where: { CollectiveId: this.id },
       include: [
         { model: models.Collective, as: 'memberCollective' }
       ]
     })
-    .then(memberships => memberships.memberCollective)
-    .map(memberCollective => memberCollective.getUser())
-    .then(users => uniq(users, (user) => user.id));
+    .tap(memberships => debug(">>> members found", memberships.length))
+    .map(membership => membership.memberCollective)
+    .map(memberCollective => {
+      debug(">>> fetching user for", memberCollective.slug, memberCollective.type);
+      if (memberCollective.type === types.USER) {
+        return memberCollective.getUser().then(user => [user]);
+      } else {
+        debug("User", memberCollective.slug, "type: ", memberCollective.type);
+        return memberCollective.getAdminUsers();
+      }
+    })
+    .then(users => {
+      const usersFlattened = flattenArray(users);
+      return uniq(usersFlattened, (user) => user.id);
+    });
   };
 
   Collective.prototype.getAdmins = function() {

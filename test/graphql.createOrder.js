@@ -120,7 +120,7 @@ describe('createOrder', () => {
         clientId: "clientid",
         token: "xxxx",
         settings: {
-          "backer.created": {
+          "newBacker": {
             active: true,
             tweet: "{backerTwitterHandle} thank you for your {amount} donation!"
           }

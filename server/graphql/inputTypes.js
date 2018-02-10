@@ -208,6 +208,38 @@ export const OrderInputType = new GraphQLInputObjectType({
   })
 });
 
+export const UpdateInputType = new GraphQLInputObjectType({
+  name: 'UpdateInputType',
+  description: 'Input type for UpdateType',
+  fields: () => ({
+    id: { type: GraphQLInt },
+    views: { type: GraphQLInt },
+    slug: { type: GraphQLString },
+    title: { type: GraphQLString },
+    image: { type: GraphQLString },
+    markdown: { type: GraphQLString },
+    html: { type: GraphQLString },
+    fromCollective: { type: CollectiveAttributesInputType },
+    collective: { type: new GraphQLNonNull(CollectiveAttributesInputType) },
+    tier: { type: TierInputType }
+  })
+});
+
+export const UpdateAttributesInputType = new GraphQLInputObjectType({
+  name: 'UpdateAttributesInputType',
+  description: 'Input type for UpdateType',
+  fields: () => ({
+    id: { type: GraphQLInt },
+    views: { type: GraphQLInt },
+    slug: { type: GraphQLString },
+    title: { type: GraphQLString },
+    image: { type: GraphQLString },
+    html: { type: GraphQLString },
+    fromCollective: { type: CollectiveAttributesInputType },
+    tier: { type: TierInputType }
+  })
+});
+
 export const ExpenseInputType = new GraphQLInputObjectType({
   name: 'ExpenseInputType',
   description: 'Input type for ExpenseType',

@@ -20,7 +20,7 @@ describe('Mutation Tests', () => {
 
   before(() => {
     sandbox = sinon.sandbox.create();
-    emailSendSpy = sandbox.spy(emailLib, 'sendMessageFromActivity');
+    emailSendSpy = sandbox.spy(emailLib, 'send');
     emailSendMessageSpy = sandbox.spy(emailLib, 'sendMessage');
     executeOrderStub = sandbox.stub(payments, 'executeOrder',
       (user, order) => {
@@ -698,15 +698,15 @@ describe('Mutation Tests', () => {
           expect(members).to.have.length(1);
           await utils.waitForCondition(() => emailSendMessageSpy.callCount > 0);
           expect(emailSendSpy.callCount).to.equal(1);
-          const activity = emailSendSpy.lastCall.args[0].dataValues;
-          expect(activity.data.member.role).to.equal(roles.BACKER);
-          expect(activity.data.collective.type).to.equal("COLLECTIVE");
-          expect(activity.data.order.publicMessage).to.equal("Looking forward!");
-          expect(activity.data.order.subscription.interval).to.equal("month");
-          expect(activity.data.collective.slug).to.equal(collective1.slug);
-          expect(activity.data.member.memberCollective.slug).to.equal("slack");
-          expect(activity.type).to.equal("collective.member.created");
-          expect(emailSendMessageSpy.firstCall.args[0]).to.equal(user1.email);
+          const activityData = emailSendSpy.lastCall.args[2];
+          expect(activityData.member.role).to.equal(roles.BACKER);
+          expect(activityData.collective.type).to.equal("COLLECTIVE");
+          expect(activityData.order.publicMessage).to.equal("Looking forward!");
+          expect(activityData.order.subscription.interval).to.equal("month");
+          expect(activityData.collective.slug).to.equal(collective1.slug);
+          expect(activityData.member.memberCollective.slug).to.equal("slack");
+          expect(emailSendSpy.lastCall.args[0]).to.equal("collective.member.created");
+          expect(emailSendMessageSpy.lastCall.args[0]).to.equal(user1.email);
         });
       });
 
@@ -788,15 +788,15 @@ describe('Mutation Tests', () => {
             }
           });
           expect(members).to.have.length(1);
-          expect(emailSendSpy.callCount).to.equal(1);
-          const activity = emailSendSpy.lastCall.args[0].dataValues;
-          expect(activity.data.member.role).to.equal("ATTENDEE");
-          expect(activity.data.collective.type).to.equal("EVENT");
-          expect(activity.data.order.publicMessage).to.equal("Looking forward!");
-          expect(activity.data.collective.slug).to.equal(event1.slug);
-          expect(activity.data.member.memberCollective.slug).to.equal(user2.collective.slug);
-          expect(emailSendSpy.callCount).to.equal(1);
-          expect(emailSendSpy.firstCall.args[0].dataValues.type).to.equal('collective.member.created');
+          expect(emailSendSpy.callCount).to.equal(2);
+          const activityData = emailSendSpy.lastCall.args[2];
+          expect(activityData.member.role).to.equal("ATTENDEE");
+          expect(activityData.collective.type).to.equal("EVENT");
+          expect(activityData.order.publicMessage).to.equal("Looking forward!");
+          expect(activityData.collective.slug).to.equal(event1.slug);
+          expect(activityData.member.memberCollective.slug).to.equal(user2.collective.slug);
+          expect(emailSendSpy.firstCall.args[0]).to.equal('ticket.confirmed');
+          expect(emailSendSpy.secondCall.args[0]).to.equal('collective.member.created');
           await utils.waitForCondition(() => emailSendMessageSpy.callCount > 0);
           expect(emailSendMessageSpy.callCount).to.equal(2);
           expect(emailSendMessageSpy.firstCall.args[0]).to.equal("user2@opencollective.com");

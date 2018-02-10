@@ -9,10 +9,26 @@ const debug = debugLib("twitter");
 import { formatCurrency } from '../lib/utils';
 import IntlMessageFormat from 'intl-messageformat';
 
-const tweetActivity = async (activity) => {
-  debug(">>> tweetActivity", activity);
-  debug(">>> tweetActivity.data", JSON.stringify(activity.data));
-  if (activity.type !== activityType.COLLECTIVE_MEMBER_CREATED || get(activity, 'data.member.role') !== 'BACKER') {
+
+const tweetUpdate = async (activity) => {
+  const tweet = twitterLib.compileTweet('updatePublished', { title: activity.data.update.title });
+  const twitterAccount = await models.ConnectedAccount.findOne({ where: { CollectiveId: activity.CollectiveId, service: 'twitter' }});
+  if (!twitterAccount) {
+    debug("no twitter account associated to ", activity.CollectiveId);
+    return;
+  }
+  twitterAccount.settings = twitterAccount.settings || {};
+  const settings = twitterAccount.settings['updatePublished'] || {};
+  if (!settings.active) {
+    debug("updatePublished.active false", settings);
+    return;
+  }
+
+  twitterLib.tweetStatus(twitterAccount, tweet, activity.data.url);
+}
+
+const tweetNewMember = async (activity) => {
+  if (get(activity, 'data.member.role') !== 'BACKER') {
     debug("skipping", activity.type, get(activity, 'data.member.role'));
     return;
   }
@@ -29,9 +45,9 @@ const tweetActivity = async (activity) => {
   }
   debug(twitterAccount.settings);
   twitterAccount.settings = twitterAccount.settings || {};
-  const settings = twitterAccount.settings['backer.created'] || {};
+  const settings = twitterAccount.settings['newBacker'] || {};
   if (!settings.active) {
-    debug("backer.created.active false", settings);
+    debug("newBacker.active false", settings);
     return;
   }
 
@@ -48,7 +64,19 @@ const tweetActivity = async (activity) => {
   return await twitterLib.tweetStatus(twitterAccount, status);
 }
 
-const tweetStatus = (twitterAccount, status, options = {}) => {
+const tweetActivity = async (activity) => {
+  debug(">>> tweetActivity", activity.type);
+  debug(">>> tweetActivity.data", JSON.stringify(activity.data));
+  switch (activity.type) {
+    case activityType.COLLECTIVE_MEMBER_CREATED:
+      return tweetNewMember(activity);
+
+    case activityType.COLLECTIVE_UPDATE_PUBLISHED:
+      return tweetUpdate(activity);
+  }
+}
+
+const tweetStatus = (twitterAccount, status, url, options = {}) => {
   // collectives without twitter credentials are ignored
   if (!twitterAccount) {
     debug(">>> tweetStatus: no twitter account connected");
@@ -65,7 +93,7 @@ const tweetStatus = (twitterAccount, status, options = {}) => {
   debug("tweeting status: ", status, "with options:", options);
   if (config.twitter.consumerSecret) {
     const tweet = Promise.promisify(client.post, { context: client });
-    return tweet("statuses/update", { status, ...options });
+    return tweet("statuses/update", { status, attachment_url: url, ...options });
   } else {
     console.log('Tweet not sent: no twitter key/secret provided in env');
     return Promise.resolve();
@@ -76,6 +104,7 @@ const compileTweet = (template, data) => {
 
   const messages = {
     'en-US': {
+      updatePublished: `Latest update from the collective: {title}`,
       monthlyStats: `In {month}, {totalNewBackers, select, 
   0 {no new backer joined. 😑} 
   1 {one new backer joined.} 
@@ -106,9 +135,11 @@ Become a backer! 😃`
   const compiled = new IntlMessageFormat(messages['en-US'][template], 'en-US');
   let tweet = compiled.format(data);
 
-  // A URL always takes 23 chars (+ space)
-  if (tweet.length < 280 - 24 - thankyou.length) {
-    tweet += thankyou;
+  if (template === 'monthlyStats') {
+    // A URL always takes 23 chars (+ space)
+    if (tweet.length < 280 - 24 - thankyou.length) {
+      tweet += thankyou;
+    }
   }
   return tweet;
 }
