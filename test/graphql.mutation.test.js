@@ -632,7 +632,7 @@ describe('Mutation Tests', () => {
           // Make sure we send the collective.member.created email notification to core contributor of collective1
           expect(emailSendMessageSpy.callCount).to.equal(1);
           expect(emailSendMessageSpy.firstCall.args[0]).to.equal("user1@opencollective.com");
-          expect(emailSendMessageSpy.firstCall.args[1]).to.equal("Google joined Scouts d&#x27;Arlon as backer");
+          expect(emailSendMessageSpy.firstCall.args[1]).to.equal("Google joined Scouts d'Arlon as backer");
           expect(emailSendMessageSpy.firstCall.args[2]).to.contain("Looking forward!"); // publicMessage
           expect(emailSendMessageSpy.firstCall.args[2]).to.contain("@google thanks for your donation to @scouts");
         });
