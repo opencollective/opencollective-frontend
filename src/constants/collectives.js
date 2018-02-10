@@ -1,8 +1,8 @@
 export const defaultBackgroundImage = {
   COLLECTIVE: '/static/images/defaultBackgroundImageCollective.jpg',
   EVENT: '/static/images/defaultBackgroundImage.png',
-  ORGANIZATION: '/static/images/defaultBackgroundImage-profile.svg',
-  USER: '/static/images/defaultBackgroundImage-profile.svg'
+  ORGANIZATION: '/static/images/defaultBackgroundImage.png',
+  USER: '/static/images/defaultBackgroundImage.png'
 };
 
 export const defaultImage = {

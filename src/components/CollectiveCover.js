@@ -158,7 +158,7 @@ ${description}`
         .COLLECTIVE .content {
           margin-top: 0px;
         }
-        .COLLECTIVE .content, .COLLECTIVE .content a {
+        .content, .content a {
           color: white;
         }
         .logo {

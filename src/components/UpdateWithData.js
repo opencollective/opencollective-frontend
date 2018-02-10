@@ -47,9 +47,12 @@ const getUpdateQuery = gql`
       title
       createdAt
       publishedAt
+      html
+      markdown
       collective {
         id
         slug
+        settings
         stats {
           id
           backers {
@@ -63,7 +66,6 @@ const getUpdateQuery = gql`
         name
         image
       }
-      html
     }
   }
 `;
