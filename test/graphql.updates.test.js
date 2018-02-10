@@ -42,7 +42,7 @@ describe('graphql.updates.test', () => {
       CollectiveId: collective1.id,
       FromCollectiveId: user1.CollectiveId,
       CreatedByUserId: user1.id,
-      title: "first update",
+      title: `first update & "love"`,
       html: `long text for the update #1 <a href="https://google.com">here is a link</a>`,
     }).then(u => update1 = u)
   });
@@ -56,7 +56,7 @@ describe('graphql.updates.test', () => {
   let update;
   before(() => {
     update = {
-      title: "Monthly update 1",
+      title: `Monthly update 2`,
       html: "This is the update",
       collective: {
         id: collective1.id
@@ -92,7 +92,7 @@ describe('graphql.updates.test', () => {
       const result = await utils.graphqlQuery(createUpdateQuery, { update }, user1);
       result.errors && console.error(result.errors[0]);
       const createdUpdate = result.data.createUpdate;
-      expect(createdUpdate.slug).to.equal(`monthly-update-1`);
+      expect(createdUpdate.slug).to.equal(`monthly-update-2`);
       expect(createdUpdate.publishedAt).to.be.null;
     })
   })
@@ -122,7 +122,7 @@ describe('graphql.updates.test', () => {
     });
 
     describe('publishes an update', async () => {
-      let user3;
+      let result, user3;
 
       before(async () => {
         await collective1.addUserWithRole(user2, roles.BACKER);
@@ -140,6 +140,7 @@ describe('graphql.updates.test', () => {
           service: "twitter",
           settings: { "updatePublished": { active: true } }
         })
+        result = await utils.graphqlQuery(publishUpdateQuery, { id: update1.id }, user1);
       });
 
       beforeEach(() => {
@@ -147,9 +148,8 @@ describe('graphql.updates.test', () => {
       })
 
       it("published the update successfully", async () => {
-        const result = await utils.graphqlQuery(publishUpdateQuery, { id: update1.id }, user1);
         expect(result.errors).to.not.exist;
-        expect(result.data.publishUpdate.slug).to.equal('first-update');
+        expect(result.data.publishUpdate.slug).to.equal('first-update-and-love');
         expect(result.data.publishUpdate.publishedAt).to.not.be.null;
       });
 
@@ -157,17 +157,17 @@ describe('graphql.updates.test', () => {
         await utils.waitForCondition(() => sendEmailSpy.callCount > 1);
         expect(sendEmailSpy.callCount).to.equal(3);
         expect(sendEmailSpy.args[0][0]).to.equal(user1.email);
-        expect(sendEmailSpy.args[0][1]).to.equal("Collective update first update");
+        expect(sendEmailSpy.args[0][1]).to.equal(`Collective update first update & "love"`);
         expect(sendEmailSpy.args[1][0]).to.equal(user2.email);
-        expect(sendEmailSpy.args[1][1]).to.equal("Collective update first update");
+        expect(sendEmailSpy.args[1][1]).to.equal(`Collective update first update & "love"`);
         expect(sendEmailSpy.args[2][0]).to.equal(user3.email);
-        expect(sendEmailSpy.args[2][1]).to.equal("Collective update first update");
+        expect(sendEmailSpy.args[2][1]).to.equal(`Collective update first update & "love"`);
       })
 
       it("sends a tweet", async () => {
         expect(sendTweetSpy.callCount).to.equal(1);
-        expect(sendTweetSpy.firstCall.args[1]).to.equal("Latest update from the collective: first update");
-        expect(sendTweetSpy.firstCall.args[2]).to.contain("/scouts/updates/first-update");
+        expect(sendTweetSpy.firstCall.args[1]).to.equal(`Latest update from the collective: first update & "love"`);
+        expect(sendTweetSpy.firstCall.args[2]).to.contain("/scouts/updates/first-update-and-love");
       });
     });
 
@@ -175,7 +175,7 @@ describe('graphql.updates.test', () => {
       await models.Update.update({ publishedAt: new Date }, { where: { id: update1.id }});
       const result = await utils.graphqlQuery(publishUpdateQuery.replace(/publish\(/g, 'unpublish('), { id: update1.id }, user1);
       expect(result.errors).to.not.exist;
-      expect(result.data.publishUpdate.slug).to.equal('first-update');
+      expect(result.data.publishUpdate.slug).to.equal('first-update-and-love');
       expect(result.data.publishUpdate.publishedAt).to.not.be.null;
       await models.Update.update({ publishedAt: null }, { where: { id: update1.id }});
     });
@@ -214,10 +214,10 @@ describe('graphql.updates.test', () => {
     });
 
     it('edits an update successfully and doesn\'t change the slug if published', async () => {
-      await models.Update.update({ slug: 'first-update', publishedAt: new Date }, { where: { id: update1.id }});
+      await models.Update.update({ slug: 'first-update-and-love', publishedAt: new Date }, { where: { id: update1.id }});
       const result = await utils.graphqlQuery(editUpdateQuery, { update: { id: update1.id, title: 'new title' } }, user1);
       expect(result.errors).to.not.exist;
-      expect(result.data.editUpdate.slug).to.equal('first-update');
+      expect(result.data.editUpdate.slug).to.equal('first-update-and-love');
       await models.Update.update({ publishedAt: null }, { where: { id: update1.id }});
     });
 

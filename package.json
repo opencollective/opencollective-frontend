@@ -49,6 +49,7 @@
     "graphql": "0.11.7",
     "graphql-type-json": "0.1.4",
     "handlebars": "4.0.5",
+    "he": "^1.1.1",
     "helmet": "3.5.0",
     "html-pdf": "2.2.0",
     "intl-messageformat": "^2.2.0",
