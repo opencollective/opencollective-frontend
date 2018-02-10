@@ -49,7 +49,6 @@ export function upload(file) {
   })
   .then(checkResponseStatus)
   .then(json => {
-    console.log(">>> upload response", json);
     return json.url;
   })
 }

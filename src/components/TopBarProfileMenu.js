@@ -5,7 +5,7 @@ import { FormattedMessage, defineMessages } from 'react-intl';
 import withIntl from '../lib/withIntl';
 import { formatCurrency } from '../lib/utils';
 import { Badge } from 'react-bootstrap';
-import { get } from 'lodash';
+import { get, uniqBy } from 'lodash';
 
 class TopBarProfileMenu extends React.Component {
 
@@ -83,7 +83,7 @@ class TopBarProfileMenu extends React.Component {
           return 3;
       }
     }
-    const collectives = [ ...LoggedInUser.memberOf.filter(m => m.collective.type !== 'EVENT') ].sort((a, b) => {
+    const collectives = uniqBy([ ...LoggedInUser.memberOf.filter(m => m.collective.type !== 'EVENT') ], m => m.collective.id).sort((a, b) => {
       return (`${score(a)}-${a.collective.slug}` > `${score(b)}-${b.collective.slug}`) ? 1 : -1
     }); // order by role then az
 
@@ -179,7 +179,7 @@ class TopBarProfileMenu extends React.Component {
         }
 
         a.admin {
-          color: red;
+          font-weight: bold;
         }
 
         a.member {
