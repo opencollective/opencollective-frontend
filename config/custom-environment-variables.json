@@ -14,6 +14,7 @@
   "keys": {
     "opencollective": {
       "api_key": "API_KEY",
+      "session_secret": "SESSION_SECRET",
       "secret": "JWT_SECRET",
       "resetPasswordSecret": "RESET_PASSWORD_SECRET"
     }
