@@ -55,12 +55,12 @@ class CollectiveCard extends React.Component {
 
     const description = (collective.description && firstSentence(collective.description, 64)) ||(collective.longDescription && firstSentence(collective.longDescription, 64))
 
-    const linkParams = { slug: this.props.collective.slug};
+    let route = this.props.collective.path || `/${this.props.collective.slug}`;
     if (LoggedInUser) {
-      linkParams.referral = LoggedInUser.CollectiveId;
+      route += `?referral=${LoggedInUser.CollectiveId}`;
     }
     return (
-      <Link route={'collective'} params={linkParams} target="_top" >
+      <Link route={route} target="_top">
         <div className={`CollectiveCard ${collective.type}`}>
           <style jsx>{`
           .CollectiveCard {
