@@ -125,13 +125,16 @@ describe('graphql.collective.test.js', () => {
     expect(collective.stats.topExpenses).to.deep.equal({"byCategory":[{"category":"Engineering","count":7,"totalExpenses":380829}],"byCollective":[{"slug":"tjholowaychuk","image":"https://opencollective-production.s3-us-west-1.amazonaws.com/25254v3s400_acc93f90-0085-11e7-951e-491568b1a942.jpeg","name":"TJ Holowaychuk","totalExpenses":-339120,"twitterHandle": "tjholowaychuk"}]});
   });
 
-  it('gets the host collective for an event', async () => {
+  it('gets the url path and the host collective for an event', async () => {
     const query = `
       query Collective($slug: String!) {
         Collective(slug: $slug) {
+          slug
+          path
           host {
             id
             slug
+            path
           }
         }
       }
@@ -141,6 +144,8 @@ describe('graphql.collective.test.js', () => {
     expect(result.errors).to.not.exist;
     expect(result.data.Collective.host.id).to.equal(9802);
     expect(result.data.Collective.host.slug).to.equal("brusselstogether");
+    expect(result.data.Collective.path).to.equal('/brusselstogether-collective/events/meetup-5');
+    expect(result.data.Collective.host.path).to.equal("/brusselstogether");
   });
 
   it('gets the expense stats across all hosted collectives', async () => {

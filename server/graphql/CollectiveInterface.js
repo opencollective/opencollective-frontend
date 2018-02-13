@@ -374,6 +374,7 @@ export const CollectiveInterfaceType = new GraphQLInterfaceType({
       settings: { type: GraphQLJSON },
       data: { type: GraphQLJSON },
       slug: { type: GraphQLString },
+      path: { type: GraphQLString },
       isHost: { type: GraphQLBoolean },
       canApply: { type: GraphQLBoolean },
       host: { type: CollectiveInterfaceType },
@@ -622,6 +623,12 @@ const CollectiveFields = () => {
       type: GraphQLString,
       resolve(collective) {
         return collective.slug;
+      }
+    },
+    path: {
+      type: GraphQLString,
+      async resolve(collective) {
+        return await collective.getUrlPath();
       }
     },
     isHost: {
