@@ -6,6 +6,13 @@ const data = {};
 data['user.new.token'] = {
   loginLink: "https://opencollective.com/signin?next="
 }
+data['onboarding.day21.noTwitter'] = {
+  collective: {
+    name: "yeoman",
+    slug: "yeoman"
+  }
+};
+data['onboarding.day28'] = data['onboarding.day35.inactive'] = data['onboarding.day21.noTwitter'];
 data['collective.expense.approved'] = {
   host: { id: 1, name: "WWCode", slug: "wwcode" },
   expense: { amount: 1250, currency: "USD", privateMessage: "Private instructions", attachment: "https://opencollective-production.s3-us-west-1.amazonaws.com/5bdc1850-60d9-11e7-9f4e-6f8999022d4b.JPG" },

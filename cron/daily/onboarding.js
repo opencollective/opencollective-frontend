@@ -1,6 +1,7 @@
 import Promise from 'bluebird';
 import models from '../../server/models';
 import emailLib from '../../server/lib/email';
+import { get } from 'lodash';
 
 let totalCollectives = 0;
 
@@ -32,8 +33,19 @@ const onlyCollectivesWithoutExpenses = (collective) => {
   return models.Expense.count({ where: { CollectiveId: collective.id }}).then(count => count === 0);
 }
 
+const onlyCollectivesWithoutTwitterActivated = (collective) => {
+  return models.ConnectedAccount.findOne({ where: { CollectiveId: collective.id, service: 'twitter' }})
+    .then(twitterAccount => {
+      if (!twitterAccount) return true;
+      if (get(twitterAccount, 'settings.monthlyStats.active') && get(twitterAccount, 'settings.newBacker.active')) return false;
+      return true;
+    });
+}
+
 Promise.all([
-  processOnBoardingTemplate("onboarding.day30.inactive", XDaysAgo(30), onlyInactiveCollectives),
+  processOnBoardingTemplate("onboarding.day35.inactive", XDaysAgo(35), onlyInactiveCollectives),
+  processOnBoardingTemplate("onboarding.day28", XDaysAgo(28)),
+  processOnBoardingTemplate("onboarding.day21.noTwitter", XDaysAgo(21), onlyCollectivesWithoutTwitterActivated),
   processOnBoardingTemplate("onboarding.day14.noExpenses", XDaysAgo(14), onlyCollectivesWithoutExpenses),
   processOnBoardingTemplate("onboarding.day7.widgets", XDaysAgo(7)),
   processOnBoardingTemplate("onboarding.day2", XDaysAgo(2))
