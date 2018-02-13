@@ -303,6 +303,7 @@ const getCollectiveQuery = gql`
             name
             currency
             slug
+            path
             type
             image
             description

@@ -12,21 +12,29 @@ class OrderCreated extends React.Component {
 
   static propTypes = {
     order: PropTypes.object.isRequired, // { collective: {}, totalAmount, TierId }
-    status: PropTypes.string // orderCreated | orderProcessing
+    status: PropTypes.string, // orderCreated || orderProcessing
+    type: PropTypes.string // COLLECTIVE || EVENT
   }
 
   constructor(props) {
     super(props);
     const { intl, order: { collective, fromCollective, totalAmount } } = props;
     this.messages = defineMessages({
-      tweet: { id: 'order.created.tweet', defaultMessage: `I've just donated {amount} to {collective}. Consider donating too, every little helps!` }
+      'tweet': { id: 'order.created.tweet', defaultMessage: `I've just donated {amount} to {collective}. Consider donating too, every little helps!` },
+      'tweet.event': { id: 'order.created.tweet.event', defaultMessage: `I'm attending {event}. Join me!` }
     })
     if (collective) {
-      const tweetText = intl.formatMessage(this.messages.tweet, {
+      let tweetId = 'tweet';
+      const values = {
         collective: collective.twitterHandle ? `@${collective.twitterHandle}` : collective.name,
         amount: formatCurrency(totalAmount, collective.currency, { precision: 0 })
-      });
-      const url = `https://opencollective.com/${collective.slug}?referral=${fromCollective.id}`;
+      };
+      if (collective.type === 'EVENT') {
+        tweetId = 'tweet.event';
+        values.event = collective.name;
+      }
+      const tweetText = intl.formatMessage(this.messages[tweetId], values);
+      const url = `https://opencollective.com${collective.path}?referral=${fromCollective.id}`;
       this.tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}&url=${encodeURIComponent(url)}`;
       this.fbUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
     }
@@ -50,7 +58,7 @@ class OrderCreated extends React.Component {
   }
 
   render() {
-    const { status, order: { collective, fromCollective, totalAmount } } = this.props;
+    const { status, type, order: { collective, fromCollective, totalAmount } } = this.props;
 
     const membership = {
       role: 'BACKER',
@@ -65,6 +73,9 @@ class OrderCreated extends React.Component {
       <div className="OrderCreated">
         <style jsx>{`
           .OrderCreated {
+            background: #f2f4f5;
+          }
+          .OrderCreated .content {
             display: flex;
             background: #f2f4f5;
             padding: 3rem;
@@ -108,46 +119,64 @@ class OrderCreated extends React.Component {
         `}
         </style>
 
-        { collective &&
-          <CollectiveCard collective={collective} membership={membership} />
-        }
+        <div className="content">
 
-        <div className="message">
-          <p className="thankyou">
-            <FormattedMessage id="collective.user.orderCreated.thankyou" defaultMessage="Thank you for your donation! 🙏" />
-          </p>
           { collective &&
-            <div>
-              <p>
-                { status === 'orderCreated' && collective &&
-                  <FormattedMessage id="collective.user.orderCreated.message" defaultMessage="We have added {collective} to your profile" values={{ collective: collective.name }} />
-                }
-                { status === 'orderProcessing' && collective &&
-                  <FormattedMessage id="collective.user.orderProcessing.message" defaultMessage="We are currently processing your donation to {collective}. We will add it to your profile and we will send you a confirmation email once the payment is confirmed." values={{ collective: collective.name }} />
-                }
-              </p>
-              <h2>
-                <FormattedMessage id="collective.user.orderCreated.helpUsRaise.title" defaultMessage="Help us raise more money!" />
-              </h2>
-              <p>
-                <FormattedMessage id="collective.user.orderCreated.helpUsRaise.shareUrl" defaultMessage="Share this URL:" />
-                <div>
-                  <a href={`https://opencollective.com/${collective.slug}/donate?referral=${fromCollective.id}`}>{`https://opencollective.com/${collective.slug}/donate?referral=${fromCollective.id}`}</a>
-                </div>
-                <FormattedMessage id="collective.user.orderCreated.helpUsRaise.description" defaultMessage="The total amount that you will help us raise will be shown on your profile." />
-              </p>
-              <p>
-                <Button onClick={() => this.open(this.tweetUrl)}>
-                  <TwitterLogo />
-                  <FormattedMessage id="collective.user.orderCreated.helpUsRaise.tweetUrl" defaultMessage="Share on Twitter" />
-                </Button>
-                <Button onClick={() => this.open(this.fbUrl, 550, 700)}>
-                  <FacebookLogo />
-                  <FormattedMessage id="collective.user.orderCreated.helpUsRaise.fbUrl" defaultMessage="Share on Facebook" />
-                </Button>
-              </p>
-            </div>
+            <CollectiveCard collective={collective} membership={membership} />
           }
+
+          <div className="message">
+            <p className="thankyou">
+              { type === 'COLLECTIVE' &&
+                <FormattedMessage id="collective.user.orderCreated.thankyou" defaultMessage="Thank you for your donation! 🙏" />
+              }
+              { type === 'EVENT' &&
+                <FormattedMessage id="collective.user.orderCreated.event.thankyou" defaultMessage="Thank you for your RSVP! See you soon! 😊" />
+              }
+            </p>
+            { collective &&
+              <div>
+                <p>
+                  { status === 'orderCreated' && collective &&
+                    <FormattedMessage id="collective.user.orderCreated.message" defaultMessage="We have added {collective} to your profile" values={{ collective: collective.name }} />
+                  }
+                  { status === 'orderProcessing' && collective &&
+                    <FormattedMessage id="collective.user.orderProcessing.message" defaultMessage="We are currently processing your donation to {collective}. We will add it to your profile and we will send you a confirmation email once the payment is confirmed." values={{ collective: collective.name }} />
+                  }
+                </p>
+                <h2>
+                  { type === 'COLLECTIVE' &&
+                    <FormattedMessage id="collective.user.orderCreated.helpUsRaise.title" defaultMessage="Help us raise more money!" />
+                  }
+                  { type === 'EVENT' &&
+                    <FormattedMessage id="collective.user.orderCreated.event.inviteFriends.title" defaultMessage="Invite your friends!" />
+                  }
+                </h2>
+                <p>
+                  <FormattedMessage id="collective.user.orderCreated.helpUsRaise.shareUrl" defaultMessage="Share this URL:" />
+                  <div>
+                    <a href={`https://opencollective.com${collective.path}?referral=${fromCollective.id}`}>{`https://opencollective.com${collective.path}?referral=${fromCollective.id}`}</a>
+                  </div>
+                  { type === 'COLLECTIVE' &&
+                    <FormattedMessage id="collective.user.orderCreated.helpUsRaise.description" defaultMessage="The total amount that you will help us raise will be shown on your profile." />
+                  }
+                  { type === 'EVENT' &&
+                    <FormattedMessage id="collective.user.orderCreated.event.inviteFriends.description" defaultMessage="The more people the merrier 😊" />
+                  }
+                </p>
+                <p>
+                  <Button onClick={() => this.open(this.tweetUrl)}>
+                    <TwitterLogo />
+                    <FormattedMessage id="collective.user.orderCreated.helpUsRaise.tweetUrl" defaultMessage="Share on Twitter" />
+                  </Button>
+                  <Button onClick={() => this.open(this.fbUrl, 550, 700)}>
+                    <FacebookLogo />
+                    <FormattedMessage id="collective.user.orderCreated.helpUsRaise.fbUrl" defaultMessage="Share on Facebook" />
+                  </Button>
+                </p>
+              </div>
+            }
+          </div>
         </div>
       </div>
     );

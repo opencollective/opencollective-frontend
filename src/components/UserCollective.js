@@ -218,7 +218,7 @@ class UserCollective extends React.Component {
 
             <div>
 
-              { (get(query, 'status') === 'orderCreated' || get(query, 'status') === 'orderProcessing') &&  <OrderCreated order={order} status={query.status} /> }
+              { (get(query, 'status') === 'orderCreated' || get(query, 'status') === 'orderProcessing') &&  <OrderCreated order={order} type={query.type} status={query.status} /> }
 
               { /* Make sure we don't show an empty div.content if no description unless canEditCollective */ }
               { (this.collective.longDescription || canEditCollective) &&
