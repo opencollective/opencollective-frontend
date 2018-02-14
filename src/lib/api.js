@@ -115,8 +115,11 @@ export async function refreshToken(currentToken) {
     method: 'POST',
     headers: { Authorization: `Bearer ${currentToken}` }
   });
-  const json = await response.json();
-  return json;
+  try {
+    return await response.json();
+  } catch (error) {
+    return { error: response.statusText };
+  }
 }
 
 export function get(path, options) {

@@ -23,6 +23,7 @@ class LoginPage extends React.Component {
       const { error, token } = await api.refreshToken(this.props.token);
       if (error) {
         this.setState({ error });
+        console.log(error);
       } else {
         window.localStorage.setItem('accessToken', token);
         window.location.replace(this.props.next || '/');
