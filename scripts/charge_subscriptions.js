@@ -49,22 +49,31 @@ async function run(options) {
   }, options.batchSize);
 
   if (data.length > 0) {
-    json2csv({ data, fields: csvFields }, (err, csv) => {
+    await json2csv({ data, fields: csvFields }, async (err, csv) => {
       vprint(options, 'Writing the output to a CSV file');
       if (err) console.log(err);
-      else fs.writeFileSync('charge_subscriptions.output.csv', csv);
+      else {
+        if (options.dryRun) {
+          fs.writeFileSync('charge_subscriptions.output.csv', csv);
+        } else {
+          if (!options.dryRun) {
+            vprint(options, 'Sending email report');
+            const attachments = [{
+              filename: `${(new Date).toLocaleDateString()}.csv`,
+              content: csv
+            }];
+            await emailReport(start, orders, data, attachments);
+          }
+        }
+      }
     });
   } else {
     vprint(options, 'Not generating CSV file');
   }
-  if (!options.dryRun) {
-    vprint(options, 'Sending email report');
-    await emailReport(start, orders, data);
-  }
 }
 
 /** Send an email with details of the subscriptions processed */
-async function emailReport(start, orders, data) {
+async function emailReport(start, orders, data, attachments) {
   const icon = (err) => err ? '❌' : '✅';
   let issuesFound = false;
   let result = [`Total Subscriptions pending charges found: ${orders.length}`, ''];
@@ -86,7 +95,11 @@ async function emailReport(start, orders, data) {
   const end = now - start;
   result.push(`\n\nTotal time taken: ${end}ms`);
   const subject = `${icon(issuesFound)} Daily Subscription Report - ${now.toLocaleDateString()}`;
-  return emailLib.sendMessage(REPORT_EMAIL, subject, '', { bcc: ' ', text: result.join('\n') });
+  return emailLib.sendMessage(REPORT_EMAIL, subject, '', {
+    bcc: ' ',
+    text: result.join('\n'),
+    attachments
+  });
 }
 
 /** Print `message` to console if `options.verbose` is true */
