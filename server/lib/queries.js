@@ -194,7 +194,7 @@ const getTopExpenseCategories = (CollectiveId, options = {}) => {
   return sequelize.query(`
     SELECT category, COUNT(*) as "count", SUM("amount") as "totalExpenses"
     FROM "Expenses" e
-    WHERE "CollectiveId"=:CollectiveId ${since} ${until}
+    WHERE "CollectiveId"=:CollectiveId AND e.status!='REJECTED' ${since} ${until}
     GROUP BY category
     ORDER BY "totalExpenses" DESC LIMIT :limit
   `, {
