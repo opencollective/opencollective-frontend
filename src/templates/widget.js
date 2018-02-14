@@ -101,6 +101,8 @@
       .oc-loading {
         text-align: center;
         animation: oc-rotate 0.8s infinite linear;
+        display: flex;
+        justify-content: center;
       }
     `);
     style.sheet.insertRule(`

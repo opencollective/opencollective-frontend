@@ -35,6 +35,10 @@ class Banner extends React.Component {
     this.onChange();
   }
 
+  componentDidUpdate() {
+    this.onChange();
+  }
+
   render() {
     const { collectiveSlug, data } = this.props;
 
@@ -46,23 +50,25 @@ class Banner extends React.Component {
     }
 
     if (data.loading) {
-      return <div><FormattedMessage id="loading" defaultMessage="loading" /></div>;
+      return <div ref={(node) => this.node = node}><FormattedMessage id="loading" defaultMessage="loading" /></div>;
     }
 
     const collective = data.Collective;
     if (!collective) {
-      return <div><FormattedMessage id="notFound" defaultMessage="not found" /></div>;
+      return <div ref={(node) => this.node = node}><FormattedMessage id="notFound" defaultMessage="not found" /></div>;
     }
 
+    const { backers } = collective.stats;
+
     return (
-      <div ref={(node) => this.node = node}>
+      <div className="iframeContainer" ref={(node) => this.node = node}>
         <Head>
           <meta name="viewport" content="width=device-width, initial-scale=1" />
           <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,900" />
           <title>{`${this.props.collectiveSlug} collectives`}</title>
         </Head>
 
-        <style>{`
+        <style jsx global>{`
         @font-face {
           font-family: 'montserratlight';
           src: url('/static/fonts/montserrat/montserrat-light-webfont.eot');
@@ -91,6 +97,10 @@ class Banner extends React.Component {
           font-size: 1rem;
           line-height: 1.5;
           overflow-x: hidden;
+        }
+
+        .iframeContainer {
+          overflow: hidden;
         }
 
         a {
@@ -128,44 +138,51 @@ class Banner extends React.Component {
           text-align: center;
         }
 
-        .btn {
-          display: inline-block;
-          padding: 6px 12px;
-          margin-bottom: 0;
-          font-size: 14px;
-          font-weight: 400;
-          line-height: 1.42857143;
-          text-align: center;
-          white-space: nowrap;
-          vertical-align: middle;
-          touch-action: manipulation;
+        .btn { 
+          width: 300px;
+          height: 50px;
+          overflow: hidden;
+          margin: 0;
+          padding: 0;
+          background-repeat: no-repeat;
+          float:left;
+          border: none;
+          background-color: transparent;
           cursor: pointer;
-          user-select: none;
-          background-image: none;
-          border: 1px solid transparent;
-          border-radius: 4px;
         }
-        .btn-default {
-          color: #333;
-          background-color: #fff;
-          border-color: #ccc;
+
+        .btn.contribute {
+          width: 338px;
         }
-        .btn-default:hover {
-          color: #333;
-          background-color: #e6e6e6;
-          border-color: #adadad;
-          text-decoration: none;
+        .contribute.btn.blue {
+          background-image: url(/static/images/buttons/contribute-button-blue.svg);
+        }
+        .btn:hover {
+          background-position: 0 -50px;
+        }
+        .btn:active {
+          background-position: 0 -100px;
+        }
+        .btn:focus {
           outline: 0;
         }
-        `}
-        </style>
 
-        { collective.stats.backers.organizations > 0 &&
+        .btn.hover {
+          background-position: 0 -100px;
+        }
+        `}</style>
+
+        { backers.organizations + backers.users === 0 &&
+          <a type="button" className="btn blue contribute" target="_blank" href={`https://opencollective.com/${collectiveSlug}`} />
+        }
+
+
+        { backers.organizations > 0 &&
           <section id="organizations" className="tier">
             <h2 style={style.h2}>
               <FormattedMessage
                 id="collective.section.backers.organizations.title"
-                values={{ n: collective.stats.backers.organizations, collective: collective.name }}
+                values={{ n: backers.organizations, collective: collective.name }}
                 defaultMessage={`{n} {n, plural, one {organization is} other {organizations are}} supporting {collective}`}
                 />
             </h2>
@@ -182,12 +199,12 @@ class Banner extends React.Component {
           </section>
         }
 
-        { collective.stats.backers.users > 0 &&
+        { backers.users > 0 &&
           <section id="backers" className="tier">
             <h2 style={style.h2}>
               <FormattedMessage
                 id="collective.section.backers.users.title"
-                values={{ n: collective.stats.backers.users, collective: collective.name }}
+                values={{ n: backers.users, collective: collective.name }}
                 defaultMessage={`{n} {n, plural, one {person is} other {people are}} supporting {collective}`}
                 />
             </h2>
