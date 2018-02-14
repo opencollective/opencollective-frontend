@@ -168,7 +168,7 @@ class PopoverButton extends React.Component {
     const form = <ExportFormWithClient collective={this.props.collective} />;
     return (
       <OverlayTrigger trigger="click" placement="bottom" overlay={form} rootClose>
-        <a class="download-csv" role="button" style={{ float: 'right', fontSize: '12px', padding: 7 }}>
+        <a className="download-csv" role="button" style={{ float: 'right', fontSize: '12px', padding: 7 }}>
           <img src="/static/images/icons/download.svg" style={{ paddingRight: 5 }} />
           <FormattedMessage id='transactions.downloadcsvbutton' defaultMessage='Download CSV' />
         </a>
