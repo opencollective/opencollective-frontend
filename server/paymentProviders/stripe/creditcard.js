@@ -54,6 +54,12 @@ export default {
      * @param {*} hostStripeAccount
      */
     const getOrCreateCustomerIdForHost = (hostStripeAccount) => {
+      // Customers pre-migration will have their stripe user connected
+      // to the platform stripe account, not to the host's stripe
+      // account. Since payment methods had no name before that
+      // migration, we're using it to test for pre-migration users;
+      if (!paymentMethod.name) return paymentMethod.customerId;
+
       const data = paymentMethod.data || {};
       data.customerIdForHost = data.customerIdForHost || {};
       return data.customerIdForHost[hostStripeAccount.username] || stripeGateway.createToken(hostStripeAccount, paymentMethod.customerId)
