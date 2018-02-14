@@ -11,7 +11,8 @@ class InputTypeCreditCard extends React.Component {
     name: PropTypes.string,
     value: PropTypes.object,
     options: PropTypes.arrayOf(PropTypes.object), // dropdown to select credit card on file
-    onChange: PropTypes.func.isRequired
+    onChange: PropTypes.func.isRequired,
+    style: PropTypes.object
   };
 
   constructor(props) {
@@ -28,13 +29,12 @@ class InputTypeCreditCard extends React.Component {
   componentDidMount() {
     if (typeof stripe !== "undefined") {
 
-      const style = {
+      const style = Object.assign({}, {
         base: {
-          // Add your base input styles here. For example:
           fontSize: '16px',
           color: "#32325d",
         }
-      };
+      }, this.props.style);
 
       const elements = stripe.elements();
       const card = elements.create('card', {style: style});

@@ -38,6 +38,7 @@ function createClient (initialState, options = {}) {
     dataIdFromObject: result => `${result.__typename}:${result.id || result.name || Math.floor(Math.random()*1000000)}`,
     fragmentMatcher,
     initialState,
+    shouldBatch: true, // should speed up performance
     networkInterface: createNetworkInterface({
       uri: options.uri,
       opts: {

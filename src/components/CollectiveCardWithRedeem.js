@@ -48,7 +48,7 @@ class CollectiveCardWithRedeem extends React.Component {
             vertical-align: top;
             position: relative;
             box-sizing: border-box;
-            width: 200px;
+            width: 225px;
             border-radius: 10px;
             background-color: #ffffff;
             box-shadow: 0 1px 3px 0 rgba(45, 77, 97, 0.2);

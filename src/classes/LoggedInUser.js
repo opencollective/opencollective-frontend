@@ -83,6 +83,17 @@ LoggedInUser.prototype.canPayExpense = function(expense) {
   return false;                  
 }
 
+/**
+ * canEditSubscription if LoggedInUser is ADMIN of the collective
+ */
+LoggedInUser.prototype.canEditSubscription = function(order) {
+  if (!order) return false;
+  if ((this.roles[order.fromCollective.slug] === 'ADMIN') || (order.fromCollective.createdByUser && order.fromCollective.createdByUser.id === this.id)) {
+    return true;
+  }
+  return false;
+}
+
 LoggedInUser.prototype.isRoot = function() {
   return intersection(this.roles['opencollectiveinc_internal'], ['ADMIN']).length > 0;
 }

@@ -72,7 +72,7 @@ class CollectiveCard extends React.Component {
             position: relative;
             box-sizing: border-box;
             width: 200px;
-            border-radius: 5px;
+            border-radius: 15px;
             background-color: #ffffff;
             box-shadow: 0 1px 3px 0 rgba(45, 77, 97, 0.2);
             overflow: hidden;
@@ -83,7 +83,7 @@ class CollectiveCard extends React.Component {
             position: relative;
             overflow: hidden;
             width: 100%;
-            height: 12rem;
+            height: 14rem;
             border-bottom: 5px solid #46b0ed;
           }
 
@@ -111,7 +111,7 @@ class CollectiveCard extends React.Component {
 
           .body {
             padding: 1rem;
-            min-height: 10rem;
+            min-height: 11rem;
           }
         
           .name, .description {
@@ -124,7 +124,7 @@ class CollectiveCard extends React.Component {
             font-size: 14px;
             margin: 5px;
             font-family: lato, Montserrat;
-            font-weight: 300;
+            font-weight: 700;
             text-align: center;
             color: #303233;
             white-space: nowrap;

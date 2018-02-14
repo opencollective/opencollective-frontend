@@ -888,14 +888,6 @@ class OrderForm extends React.Component {
                             className="horizontal"
                             onChange={(creditcardObject) => this.handleChange("creditcard", creditcardObject)}
                             />
-                          <InputField
-                            description={intl.formatMessage(this.messages['creditcard.save'], { type: fromCollective.type && fromCollective.type.toLowerCase() || 'user' })}
-                            className="horizontal"
-                            name="saveCreditCard"
-                            type="checkbox"
-                            defaultValue={true}
-                            onChange={value => this.handleChange("creditcard", "save", value)}
-                            />
                         </div>
                       }
                       <div>

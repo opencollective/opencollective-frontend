@@ -1,9 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { defineMessages, injectIntl, FormattedNumber, FormattedMessage } from 'react-intl';
+import { defineMessages, FormattedNumber, FormattedMessage } from 'react-intl';
 import { imagePreview, capitalize } from '../lib/utils';
-import { graphql } from 'react-apollo'
-import gql from 'graphql-tag'
+import withIntl from '../lib/withIntl';
 
 class TransactionDetails extends React.Component {
 
@@ -25,8 +24,7 @@ class TransactionDetails extends React.Component {
   }
 
   render() {
-    const { intl, collective, transaction, LoggedInUser } = this.props;
-    console.log(">>> transaction", transaction)
+    const { intl, collective, LoggedInUser, transaction } = this.props;
     const type = transaction.type.toLowerCase();
 
     const amountDetails = [intl.formatNumber(transaction.amount / 100, { currency: transaction.currency, ...this.currencyStyle})];
@@ -127,12 +125,12 @@ class TransactionDetails extends React.Component {
             </span>
           </div>
         </div>
-        { type === 'credit' && LoggedInUser && LoggedInUser.canEditCollective(collective) &&
+        { type === 'debit' && LoggedInUser && LoggedInUser.canEditCollective(collective) &&
           <div className="col invoice">
             <label><FormattedMessage id='transaction.invoice' defaultMessage='invoice' /></label>
             <div>
               <a href={`/${collective.slug}/transactions/${transaction.uuid}/invoice.pdf`}>
-                <FormattedMessage id='transaction.downloadPDF' defaultMessage='Download PDF' />
+                <FormattedMessage id='transaction.downloadPDF' defaultMessage='Download (pdf)' />
               </a>
             </div>
           </div>
@@ -142,70 +140,4 @@ class TransactionDetails extends React.Component {
   }
 }
 
-
-const getTransactionQuery = gql`
-query Transaction($id: Int!) {
-  Transaction(id: $id) {
-    id
-    uuid
-    description
-    createdAt
-    type
-    amount
-    currency
-    netAmountInCollectiveCurrency
-    hostFeeInHostCurrency
-    platformFeeInHostCurrency
-    paymentProcessorFeeInHostCurrency
-    paymentMethod {
-      name
-    }
-    createdByUser {
-      id
-      name
-      username
-      image
-    }
-    host {
-      id
-      name
-    }
-    ... on Expense {
-      category
-      privateMessage
-      attachment
-    }
-    ... on Donation {
-      publicMessage
-      subscription {
-        interval
-      }
-    }
-  }
-}
-`;
-
-export const addGetTransaction = (component) => {
-  let accessToken = null;
-
-  if (typeof window !== 'undefined' && window.localStorage) {
-    accessToken = window.localStorage.getItem('accessToken');
-  }
-
-// if we don't have an accessToken, there is no need to get the details of a transaction
-// as we won't have access to any more information than the allTransactions query
-if (!accessToken) return component;
-
-return graphql(getTransactionQuery, {
-  options(props) {
-    return {
-      variables: {
-        id: props.transaction.id
-      }
-    }
-  }
-})(component);
-}
-
-
-export default addGetTransaction(injectIntl(TransactionDetails));
+export default withIntl(TransactionDetails);
