@@ -420,9 +420,9 @@ const queries = {
   allEvents: {
     type: new GraphQLList(CollectiveInterfaceType),
     args: {
-      slug: {
-        type: GraphQLString
-      }
+      slug: { type: GraphQLString },
+      limit: { type: GraphQLInt },
+      offset: { type: GraphQLInt }
     },
     resolve(_, args) {
       if (args.slug) {
@@ -430,7 +430,9 @@ const queries = {
           .findBySlug(args.slug, { attributes: ['id'] })
           .then(collective => models.Collective.findAll({
             where: { ParentCollectiveId: collective.id, type: 'EVENT' },
-            order: [['startsAt', 'DESC'], ['createdAt', 'DESC']]
+            order: [['startsAt', 'DESC'], ['createdAt', 'DESC']],
+            limit: args.limit || 10,
+            offset: args.offset || 0
           }))
           .catch(e => {
             console.error(e.message);

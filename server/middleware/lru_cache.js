@@ -2,6 +2,8 @@ import LRUCache from 'lru-cache';
 
 import { hashCode } from '../lib/utils';
 import { EventEmitter } from 'events';
+import debugLib from 'debug';
+const debug = debugLib("cache");
 
 const cache = LRUCache({
   max: 1000,
@@ -31,8 +33,11 @@ export default () => {
 
       let cached = cache.get(checksum);
       if (cached) {
+        debug("cache hit", cached.status);
         switch (cached.status) {
           case 'finished':
+            debug("sending response", cached.contentType, cached.response);
+            res.setHeader("content-type", cached.contentType);
             return res.send(new Buffer(cached.response, "base64"));
           case 'running':
             return cached.once('finished', () => {
@@ -51,7 +56,11 @@ export default () => {
       if (req.cached && req.checksum) {
         req.cached.status = 'finished';
         req.cached.response = data;
+        if (typeof data === 'object') {
+          req.cached.contentType = "application/json; charset=utf-8";
+        }
         req.cached.emit('finished');
+        debug("set cache", req.checksum, req.cached);
         cache.set(req.checksum, req.cached)
       }
       temp.apply(this,arguments);
