@@ -574,7 +574,6 @@ const refreshLoggedInUser = async (data) => {
     const user = new LoggedInUser(res.data.LoggedInUser);
     const endTime = new Date;
     const elapsedTime = Math.round((endTime.getTime() - startTime.getTime()) / 1000);
-    console.info(`>>> LoggedInUser fetched in ${elapsedTime} seconds`);
     storage.set("LoggedInUser", user, 1000 * 60 * 60);
     return user;
   } catch (e) {

@@ -21,7 +21,6 @@ class TransactionsWithData extends React.Component {
 
   componentWillReceiveProps(nextProps) {
     if (!this.props.LoggedInUser && nextProps.LoggedInUser) {
-      console.log("refetching");
       return this.props.data.refetch();
     }
   }
@@ -33,8 +32,6 @@ class TransactionsWithData extends React.Component {
       console.error("graphql error>>>", data.error.message);
       return (<Error message="GraphQL error" />)
     }
-
-    console.log("data", data);
 
     const transactions = data.allTransactions;
 

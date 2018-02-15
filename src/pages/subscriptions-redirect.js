@@ -1,5 +1,5 @@
-import React from 'react'
-import Router from 'next/router'
+import React from 'react';
+import Router from 'next/router';
 
 import Header from '../components/Header';
 import Body from '../components/Body';
