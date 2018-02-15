@@ -27,6 +27,7 @@ class SubscriptionCard extends React.Component {
 
   static propTypes = {
     subscription: PropTypes.object.isRequired,
+    slug: PropTypes.string.isRequired,
     LoggedInUser: PropTypes.object,
     paymentMethods: PropTypes.arrayOf(PropTypes.object)
   }
@@ -438,33 +439,73 @@ mutation updateSubscription($id: Int!, $paymentMethod: PaymentMethodInputType) {
     paymentMethod {
       id
       uuid
+      service
+      type
       data
       name
-      expiryDate
     }
   }
 }
 `;
 
+const getPaymentMethodsQuery = gql`
+query Collective($slug: String!) {
+    Collective(slug: $slug) {
+      id
+      type
+      slug
+      name
+      company
+      image
+      backgroundImage
+      description
+      twitterHandle
+      website
+      currency
+      settings
+      createdAt
+      paymentMethods {
+        id
+        uuid
+        service
+        type
+        data
+        name
+      }
+    }
+  }
+`;
+
 const addMutation = graphql(updateSubscriptionQuery, {
   props: ( { ownProps, mutate }) => ({
-    updateSubscription: async (id, paymentMethod, amount) => {
+    updateSubscription: async (id, paymentMethod) => {
       return await mutate({ 
-        variables: { id, paymentMethod, amount },
-        /* update: (proxy, { data: { updateSubscription }}) => {
-          console.log("Reached inside update 1");
+        variables: { id, paymentMethod },
+
+        // this inserts a newly added credit card in one subscription to the list
+        // of all subscriptions, so it can be immediately selected.
+        update: (proxy, { data: { updateSubscription }}) => {
+
+          // this means an existing card was picked, so nothing to do
+          if (paymentMethod.uuid && paymentMethod.uuid.length === 36) {
+            return Promise.resolve();
+          }
+
+          // Otherwise, a new card was added and we need to add that back in our cache
           const data = proxy.readQuery({
             query: getSubscriptionsQuery,
             variables: { slug: ownProps.slug }
           });
-          console.log("reached inside update 2");
-          const origSub = data.allSubscriptions.find(s => s.id === id);
-          proxy.writeQuery({
-            query: getSubscriptionsQuery,
-            variables: { slug: ownProps.slug },
-            data
-          });
-        } */
+
+          // find the original list of payment methods fetched
+          const origPaymentMethodList = data.Collective.paymentMethods;
+
+          // insert it to the end
+          origPaymentMethodList.push(updateSubscription.paymentMethod);
+
+          // write data back for the query
+          proxy.writeQuery({ query: getSubscriptionsQuery, data}); 
+        }
       })
     }
   })

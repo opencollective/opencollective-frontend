@@ -132,14 +132,6 @@ class PaymentMethodChooser extends React.Component {
 
     this.setState({ loading: false })
     const result = await this.props.onSubmit(card);
-/*    let result;
-    try {
-      result = await this.props.onSubmit(card);
-      this.setState({ loading: false, result: { success: intl.formatMessage(this.messages['paymentMethod.success'])}});
-    } catch (e) {
-      this.setState({ loading: false })
-      this.error(err.graphQLErrors[0].message);
-    } */
   }
 
   generatePMString(pm) {

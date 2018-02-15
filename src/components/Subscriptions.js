@@ -111,6 +111,7 @@ class SubscriptionsWithData extends React.Component {
               key={subscription.id}
               LoggedInUser={LoggedInUser}
               paymentMethods={collective.paymentMethods}
+              slug={collective.slug}
             />
           )}
         </div>
