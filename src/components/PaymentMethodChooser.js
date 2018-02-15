@@ -51,6 +51,17 @@ class PaymentMethodChooser extends React.Component {
     });
   }
 
+  componentWillReceiveProps(newProps) {
+    // TODO: hacky fixes for state machine
+    // Most likely need to rework the component
+    this.setState({ modified: newProps.paymentMethodInUse.name ? false : true})
+
+    // hack to revert back to cc selector
+    if (!this.props.editMode && newProps.editMode) {
+      this.setState({ showNewCreditCardForm: false });
+    }
+  }
+
   resetForm() {
     this.setState({ 
       modified: false,
