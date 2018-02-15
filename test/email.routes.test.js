@@ -122,12 +122,15 @@ describe("email.routes.test", () => {
 
   it("forwards the email for approval to the core members", () => {
     const spy = sandbox.spy(emailLib, 'send');
-
     return request(app)
       .post('/webhooks/mailgun')
       .send(webhookBodyPayload)
       .then((res) => {
         expect(res.statusCode).to.equal(200);
+        if (spy.args[0][1] !== 'admins@testcollective.opencollective.com') {
+          console.log(">>> emailLib.send spy.callCount", spy.callCount);
+          utils.inspectSpy(spy, 4);
+        }
         expect(spy.args[0][1]).to.equal('admins@testcollective.opencollective.com');
         const emailSentTo = [spy.args[0][3].bcc,spy.args[1][3].bcc];
         expect(emailSentTo.indexOf(usersData[0].email) !== -1).to.be.true;
