@@ -51,7 +51,7 @@ export async function badge(req, res) {
 
 export async function info(req, res, next) {
 
-  // Keeping the resulting image for 1h days in the CDN cache (we purge that cache on deploy)
+  // Keeping the resulting image for 1h in the CDN cache (we purge that cache on deploy)
   res.setHeader('Cache-Control', `public, max-age=${60*60}`);
 
   let collective;
