@@ -77,7 +77,7 @@ describe('lib/email', () => {
         expect(nm.sendMail.lastCall.args[0].from).to.equal(options.from);
         expect(nm.sendMail.lastCall.args[0].to).to.equal('emailbcc+user1-at-opencollective.com@opencollective.com');
         expect(nm.sendMail.lastCall.args[0].subject).to.contain(`Merci pour votre donation de ${amountStr}/mois à La Primaire`);
-        expect(nm.sendMail.lastCall.args[0].headers['o:tag']).to.equal(template);
+        expect(nm.sendMail.lastCall.args[0].headers['X-Mailgun-Tag']).to.equal('internal');
       });
   });
 

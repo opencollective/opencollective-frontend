@@ -138,7 +138,10 @@ const sendMessage = (recipients, subject, html, options = {}) => {
       const bcc = options.bcc;
       const text = options.text;
       const attachments = options.attachments;
-      const headers = { 'o:tag': options.tag, 'X-Mailgun-Dkim': 'yes' };
+
+      // only attach tag in production to keep data clean
+      const tag = process.env.NODE_ENV === 'production' ? options.tag : 'internal';
+      const headers = { 'X-Mailgun-Tag': tag, 'X-Mailgun-Dkim': 'yes' };
       debug("mailgun> sending email to ", to, "bcc", bcc, "text", text);
 
       mailgun.sendMail({ from, cc, to, bcc, subject, text, html, headers, attachments }, (err, info) => {
