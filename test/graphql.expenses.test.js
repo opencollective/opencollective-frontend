@@ -17,8 +17,8 @@ describe('graphql.collective.test.js', () => {
     before(() => models.Collective.findOne({ where: { slug: 'railsgirlsatl' }}).then(c => collective = c));
     
     const query = `
-    query allExpenses($CollectiveId: Int!, $limit: Int, $includeHostedCollectives: Boolean) {
-      allExpenses(CollectiveId: $CollectiveId, limit: $limit, includeHostedCollectives: $includeHostedCollectives) {
+    query allExpenses($CollectiveId: Int!, $category: String, $limit: Int, $includeHostedCollectives: Boolean) {
+      allExpenses(CollectiveId: $CollectiveId, category: $category, limit: $limit, includeHostedCollectives: $includeHostedCollectives) {
         id
         description
         amount
@@ -62,6 +62,15 @@ describe('graphql.collective.test.js', () => {
       const expenses = result.data.allExpenses;
       expect(expenses).to.have.length(5);
       expect(expenses.map(e => e.collective.slug)).to.deep.equal([ 'apex', 'opensource', 'opensource', 'opensource', 'apex' ]);
+    });
+
+    it('gets the latest expenses from all the hosted collectives for one category', async () => {
+      const result = await utils.graphqlQuery(query, { category: "legal", CollectiveId: host.id, limit: 5, includeHostedCollectives: true });
+      result.errors && console.error(result.errors);
+      expect(result.errors).to.not.exist;
+      const expenses = result.data.allExpenses;
+      expect(expenses).to.have.length(5);
+      expect(expenses.map(e => e.category)).to.deep.equal([ 'Legal', 'Legal', 'Legal', 'Legal', 'Legal' ]);
     });
   });
 
