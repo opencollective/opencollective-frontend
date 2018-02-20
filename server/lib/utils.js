@@ -58,7 +58,7 @@ export function strip_tags(str, allowed) {
 export const sanitizeObject = (obj, attributes) => {
   attributes.forEach(attr => {
     if (!obj[attr]) return;
-    obj[attr] = strip_tags(obj[attr] || "", '<a><b><i><strong><img><blockquote><iframe><p><br>')
+    obj[attr] = strip_tags(obj[attr] || "", '<a><b><i><strong><img><blockquote><iframe><p><ol><ul><li><br>')
   });
   return obj;
 }
