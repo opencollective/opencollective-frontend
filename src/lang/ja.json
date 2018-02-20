@@ -69,6 +69,7 @@
   "collective.contribute": "貢献",
   "host.apply": "Apply to create a collective",
   "collective.cover.hostedBy": "Hosted by",
+  "collective.cover.pendingApprovalFrom": "Pending approval from",
   "collective.stats.yearlyBudget.label": "現在の支援金による年間予定支援額",
   "collective.stats.totalAmountSent.label": "支援金の総額",
   "collective.stats.totalAmountRaised.label": "Total amount raised",

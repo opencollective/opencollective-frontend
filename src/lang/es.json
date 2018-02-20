@@ -69,6 +69,7 @@
   "collective.contribute": "contribuye",
   "host.apply": "Apply to create a collective",
   "collective.cover.hostedBy": "Hosted by",
+  "collective.cover.pendingApprovalFrom": "Pending approval from",
   "collective.stats.yearlyBudget.label": "Presupuesto anual estimado en base a las donaciones existentes",
   "collective.stats.totalAmountSent.label": "Monto total donado",
   "collective.stats.totalAmountRaised.label": "Total amount raised",
