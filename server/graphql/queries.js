@@ -171,12 +171,14 @@ const queries = {
       CollectiveId: { type: new GraphQLNonNull(GraphQLInt) },
       includeHostedCollectives: { type: GraphQLBoolean },
       status: { type: GraphQLString },
+      category: { type: GraphQLString },
       limit: { type: GraphQLInt },
       offset: { type: GraphQLInt }
     },
     resolve(_, args, req) {
       const query = { where: {} };
       if (args.status) query.where.status = args.status;
+      if (args.category) query.where.category = { $iLike: args.category };
       if (args.limit) query.limit = args.limit;
       if (args.offset) query.offset = args.offset;
       query.order = [["incurredAt", "DESC"]];
