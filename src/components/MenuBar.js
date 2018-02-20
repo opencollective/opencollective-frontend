@@ -69,7 +69,7 @@ class MenuBar extends React.Component {
       return menuItem.position && menuItem.position > (top);
     })
     if (selectedMenuItem) {
-      history.replaceState(undefined, undefined, `#${selectedMenuItem.anchor}`);
+      history.replaceState(undefined, undefined, (selectedMenuItem.anchor === this.state.menuItems[0].anchor) ? '#' : `#${selectedMenuItem.anchor}`);
       this.setState({ selectedAnchor: selectedMenuItem.anchor });
     }
   }

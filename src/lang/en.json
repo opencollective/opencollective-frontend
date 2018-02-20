@@ -483,6 +483,7 @@
   "section.attendee": "Events",
   "section.fundraiser": "Fund raising",
   "section.follower": "Following",
+  "host.collectives.manageExpenses": "manage expenses",
   "organization.collective.memberOf.collective.parent.title": "{n, plural, one {this collective is} other {{n} collectives are}} part of our organization",
   "actions.approveCollective.processing": "Approving collective",
   "actions.approveExpense.processing": "Approving expense",
