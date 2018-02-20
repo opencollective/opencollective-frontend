@@ -19,7 +19,7 @@ class ExpensesStatsWithData extends React.Component {
   }
 
   render() {
-    const { data: { loading, Collective }, intl } = this.props;
+    const { slug, data: { loading, Collective }, intl } = this.props;
     const topExpenses = get(Collective, 'stats.topExpenses');
 
     if (!topExpenses) {
@@ -56,7 +56,7 @@ class ExpensesStatsWithData extends React.Component {
           <ol>
           { topExpenses.byCategory.map(category => (
             <li key={category.category}>
-              {category.category} (<Currency value={category.totalExpenses} currency={Collective.currency} />)
+              <Link route={`/${slug}/expenses/${category.category}`}>{category.category}</Link> (<Currency value={category.totalExpenses} currency={Collective.currency} />)
             </li>
           ))}
           </ol>

@@ -15,6 +15,7 @@ class ExpensesWithData extends React.Component {
     collective: PropTypes.object,
     limit: PropTypes.number,
     compact: PropTypes.bool, // compact view for homepage (can't edit expense, don't show header)
+    category: PropTypes.string,
     defaultAction: PropTypes.string, // "new" to open the new expense form by default
     includeHostedCollectives: PropTypes.bool,
     filters: PropTypes.bool,
@@ -64,8 +65,8 @@ class ExpensesWithData extends React.Component {
 
 
 const getExpensesQuery = gql`
-query Expenses($CollectiveId: Int!, $status: String, $limit: Int, $offset: Int, $includeHostedCollectives: Boolean) {
-  allExpenses(CollectiveId: $CollectiveId, status: $status, limit: $limit, offset: $offset, includeHostedCollectives: $includeHostedCollectives) {
+query Expenses($CollectiveId: Int!, $status: String, $category: String, $limit: Int, $offset: Int, $includeHostedCollectives: Boolean) {
+  allExpenses(CollectiveId: $CollectiveId, status: $status, category: $category, limit: $limit, offset: $offset, includeHostedCollectives: $includeHostedCollectives) {
     id
     description
     status
@@ -111,6 +112,7 @@ query Expenses($CollectiveId: Int!, $status: String, $limit: Int, $offset: Int, 
 const getExpensesVariables = (props) => {
   return {
     CollectiveId: props.collective.id,
+    category: props.category,
     offset: 0,
     limit: props.limit || EXPENSES_PER_PAGE * 2,
     includeHostedCollectives: props.includeHostedCollectives || false
