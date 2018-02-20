@@ -73,7 +73,7 @@
     "react-bootstrap": "0.32.1",
     "react-datetime": "2.11.1",
     "react-dom": "16.2.0",
-    "react-dropzone": "4.2.3",
+    "react-dropzone": "4.2.8",
     "react-geosuggest": "2.7.0",
     "react-gmaps": "1.7.0",
     "react-intl": "2.4.0",
