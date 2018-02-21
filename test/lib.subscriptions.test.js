@@ -247,7 +247,8 @@ describe('LibSubscription', () => {
         lastAttempt: false,
         order: order.info,
         collective: order.collective.info,
-        fromCollective: order.fromCollective.minimal
+        fromCollective: order.fromCollective.minimal,
+        subscriptionsLink: '/'
       });
 
       // When the status of the order is handled
@@ -272,7 +273,8 @@ describe('LibSubscription', () => {
         lastAttempt: true,
         order: order.info,
         collective: order.collective.info,
-        fromCollective: order.fromCollective.minimal
+        fromCollective: order.fromCollective.minimal,
+        subscriptionsLink: '/'
       });
 
       // When the status of the order is handled
