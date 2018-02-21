@@ -144,7 +144,7 @@ class Button extends React.Component {
         .Button :global(span) {
           white-space: nowrap;
         }
-        .ticket {
+        .ticket, :global(.EventPage .tier .Button) {
           width: 100%;
           border-radius: 0;
           height: 100%;
