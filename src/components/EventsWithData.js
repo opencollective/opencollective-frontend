@@ -98,7 +98,7 @@ class EventsWithData extends React.Component {
         `}
         </style>
         <div className="events">
-          {futureEvents.length === 0 && pastEvents.length === 0 &&
+          {futureEvents.length === 0 && pastEvents.length === 0 && this.isIframe &&
             <div className="createEvent">
               <p><FormattedMessage id='events.widget.noEventScheduled' defaultMessage={`No event has been scheduled yet.`} /></p>
               <a href={`/${this.props.collectiveSlug}/events/new`} onClick={this.createEvent} className="btn btn-default" target="_top"><FormattedMessage id='events.widget.createEvent' defaultMessage={`Create an Event`} /></a>

@@ -12,6 +12,7 @@ class EditTiers extends React.Component {
 
   static propTypes = {
     tiers: PropTypes.arrayOf(PropTypes.object).isRequired,
+    types: PropTypes.arrayOf(PropTypes.string),
     collective: PropTypes.object,
     currency: PropTypes.string.isRequired,
     defaultType: PropTypes.string,
@@ -78,7 +79,7 @@ class EditTiers extends React.Component {
       {
         name: 'type',
         type: 'select',
-        options: getOptions(['TIER', 'TICKET', 'MEMBERSHIP', 'SERVICE', 'PRODUCT', 'DONATION']),
+        options: getOptions(props.types || ['TIER', 'TICKET', 'MEMBERSHIP', 'SERVICE', 'PRODUCT', 'DONATION']),
         label: intl.formatMessage(this.messages['type.label'])
       },
       {
