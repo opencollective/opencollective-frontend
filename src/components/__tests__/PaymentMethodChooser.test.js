@@ -28,8 +28,6 @@ describe("PaymentMethodChooser.test.js", () => {
 
   const fillValue = (component, field, value) => {
     const c = component.find({ name: field }).hostNodes();
-
-    console.log("c found", c.html());
     c.simulate('change', { target: { value } });
   }
 
@@ -38,7 +36,6 @@ describe("PaymentMethodChooser.test.js", () => {
     const values = Object.assign({}, defaultValues, { paymentMethodInUse: {}});
 
     const component = mountComponent(values);
-
 
     expect(component.find('.paymentmethod-info').text()).toContain('(credit card info not available)');
   });
@@ -56,6 +53,7 @@ describe("PaymentMethodChooser.test.js", () => {
     expect(component.find('.creditcardSelector').length).toEqual(1);
   });
 
+  // TODO: skipping this to get subscriptions out in time :(
   it.skip('shows creditcard form when "add card" is selected', () => {
     const values = Object.assign({}, defaultValues, {editMode: true});
     const component = mountComponent(values);
