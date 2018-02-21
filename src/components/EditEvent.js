@@ -68,7 +68,7 @@ class EditEvent extends React.Component {
 
     const parentCollective = event.parentCollective;
     const title = `Edit ${event.name}`;
-    const canEditEvent = LoggedInUser && LoggedInUser.canEditEvent;
+    const canEditEvent = LoggedInUser && LoggedInUser.canEditEvent(event);
 
     return (
       <div className="EditEvent">

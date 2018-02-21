@@ -174,6 +174,8 @@ class Event extends React.Component {
   render() {
     const { event } = this.state;
     const { LoggedInUser } = this.props;
+
+    const canEditEvent = LoggedInUser && LoggedInUser.canEditEvent(event);
     const responses = {};
     responses.sponsors = filterCollection(event.orders, { tier: { name: /sponsor/i }});
 
@@ -330,7 +332,7 @@ class Event extends React.Component {
                           </span>
                         }
                       </h1>
-                      { LoggedInUser && LoggedInUser.canEditEvent &&
+                      { canEditEvent &&
                       <div className="adminActions" id="adminActions">
                         <ul>
                           <li><a href={`/${event.parentCollective.slug}/events/${event.slug}/nametags.pdf`}>Print name tags</a></li>
