@@ -43,19 +43,6 @@ class Event extends React.Component {
     this.createOrder = this.createOrder.bind(this);
     this.closeModal = this.closeModal.bind(this);
 
-    this.defaultActions = [
-      {
-        component: (<FormattedMessage id='actions.interested' defaultMessage='interested' />),
-        // className: 'selected', 
-        // icon: 'star',
-        onClick: this.setInterested
-      },
-      {
-        className: 'whiteblue',
-        component: <HashLink to="#tickets"><FormattedMessage id='actions.GetTicket' defaultMessage='get ticket' /></HashLink>
-      }
-    ];
-
     this.state = {
       view: 'default',
       showInterestedForm: false,
@@ -64,16 +51,6 @@ class Event extends React.Component {
       api: { status: 'idle' },
       event: this.props.event
     }
-
-    this.state.actions = this.getDefaultActions(this.props);
-
-    // To test confirmation screen, uncomment the following:
-    // this.state.view = "GetTicket";
-    // this.state.order = {
-    //   user: { email: "etienne@gmail.com"},
-    //   tier: this.state.event && this.state.event.tiers[1],
-    //   quantity: 2
-    // };
 
   }
 
@@ -88,11 +65,7 @@ class Event extends React.Component {
     const memberRemoved = res.data.removeMember;
     const event = { ... this.state.event };
     event.members = event.members.filter(member => member.id !== memberRemoved.id);
-    const actions = this.state.actions;
-    actions[0].className = '';
-    actions[0].icon = '';
-    actions[0].onClick = this.setInterested;
-    this.setState({ showInterestedForm: false, event, actions });
+    this.setState({ showInterestedForm: false, event });
   }
 
   /**
@@ -114,11 +87,7 @@ class Event extends React.Component {
         const event = { ... this.state.event };
         event.members = [ ...event.members, memberCreated ];
         this.setState({ showInterestedForm: false, event, interestedUserCollectiveId });
-        const actions = this.state.actions;
-        actions[0].className = 'selected';
-        actions[0].icon = 'star';
-        actions[0].onClick = this.removeInterested;
-        this.setState({ actions, showInterestedForm: false });
+        this.setState({ showInterestedForm: false });
       } catch (e) {
         console.error(e);
         let message = '';
@@ -156,55 +125,15 @@ class Event extends React.Component {
     this.setState({ modal: null });
   }
 
-  getDefaultActions(props) {
-    const { LoggedInUser } = props || this.props;
-    const editRoute = `/${this.state.event.parentCollective.slug}/events/${this.state.event.slug}/edit`;
-    if (LoggedInUser) {
-      const actions = [ ...this.defaultActions ];
-      if (LoggedInUser.canEditEvent) {
-        actions.push({
-          className: 'whiteblue small',
-          component: <Link route={editRoute}><a>EDIT</a></Link>
-        });
-      }
-      if (this.state.event.members.find( member => member.member.id === LoggedInUser.CollectiveId && member.role === 'FOLLOWER')) {
-        actions[0].className = 'selected';
-        actions[0].icon = 'star';
-        actions[0].onClick = this.removeInterested;
-      }
-      return actions;
-    } else {
-      return this.defaultActions;
-    }
-  }
-
-  componentWillReceiveProps(props) {
-    if (props) {
-      this.setState({ actions: this.getDefaultActions(props) });
-    }
-  }
-
   changeView(view) {
-    let actions;
-    switch (view) {
-      case 'GetTicket':
-        actions = [{
-          label: (<FormattedMessage id='actions.GoBack' defaultMessage={`go back`} />),
-          onClick: this.resetResponse
-        }];
-        break;
-      default:
-        actions = this.getDefaultActions();
-        break;
-    }
-    this.setState({view, actions});
+    this.setState({ view });
     window.scrollTo(0,0);
   }
 
   error(msg) {
-    this.setState( {status: 'error', error: msg });
+    this.setState({ status: 'error', error: msg });
     setTimeout(() => {
-      this.setState( { status: 'idle', error: null });
+      this.setState({ status: 'idle', error: null });
     }, 5000);
   }
 
@@ -245,6 +174,8 @@ class Event extends React.Component {
   render() {
     const { event } = this.state;
     const { LoggedInUser } = this.props;
+
+    const canEditEvent = LoggedInUser && LoggedInUser.canEditEvent(event);
     const responses = {};
     responses.sponsors = filterCollection(event.orders, { tier: { name: /sponsor/i }});
 
@@ -345,6 +276,7 @@ class Event extends React.Component {
                   collective={event}
                   title={event.name}
                   description={info}
+                  LoggedInUser={LoggedInUser}
                   href={`/${event.parentCollective.slug}`}
                   style={get(event, 'settings.style.hero.cover') || get(event.parentCollective, 'settings.style.hero.cover')}
                   />
@@ -400,7 +332,7 @@ class Event extends React.Component {
                           </span>
                         }
                       </h1>
-                      { LoggedInUser && LoggedInUser.canEditEvent &&
+                      { canEditEvent &&
                       <div className="adminActions" id="adminActions">
                         <ul>
                           <li><a href={`/${event.parentCollective.slug}/events/${event.slug}/nametags.pdf`}>Print name tags</a></li>
