@@ -208,7 +208,7 @@ export async function sendThankYouEmail(order, transaction) {
     relatedCollectives,
     config: { host: config.host },
     interval: order.Subscription.interval,
-    subscriptionsLink: user.generateLoginLink('/subscriptions')
+    subscriptionsLink: user.generateLoginLink(`/${order.fromCollective.slug}/subscriptions`),
   }, {
     from: `${order.collective.name} <hello@${order.collective.slug}.opencollective.com>`
   });

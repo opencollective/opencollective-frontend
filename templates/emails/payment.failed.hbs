@@ -22,13 +22,12 @@ We are sad to see you go. You can resubscribe anytime at <a href="https://openco
 {{else}}
 <p>We are having trouble authorizing your payment of {{{currency order.totalAmount currency=order.currency}}} to {{collective.name}}.</p>
 
-<p> Please check or update your payment info on your: <a href="https://opencollective.com/{{fromCollective.slug}}/edit#paymentMethods">profile</a>.</p>
+<p>Please check your <a href="{{subscriptionsLink}}">subscriptions and payment info</a>.</p>
 
 <p>We'll automatically retry your payment in a few days. If you believe your payment info is correct, please contact your bank for more details.</p>
 {{/if}}
 
-<p>You can always review your <a href="https://opencollective.com/subscriptions">subscriptions</a>.</p>
-
+<p>If you have questions, you can always email us at <a href="mailto:support@opencollective.com?Subject=Payment%20issue">support@opencollective.com</a>.</p>
 
 <p>Warmly,</p>
 
