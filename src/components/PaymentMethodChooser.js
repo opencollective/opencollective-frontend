@@ -5,6 +5,7 @@ import { Row, Col, Checkbox, Button, Form, Popover, OverlayTrigger } from 'react
 import { defineMessages, FormattedMessage } from 'react-intl';
 import withIntl from '../lib/withIntl';
 import InputField from '../components/InputField';
+import InputTypeCreditCard from '../components/InputTypeCreditCard';
 import { getCurrencySymbol, capitalize } from '../lib/utils';
 import { getStripeToken } from '../lib/stripe';
 
@@ -16,7 +17,6 @@ class PaymentMethodChooser extends React.Component {
     paymentMethodInUse: PropTypes.object.isRequired,
     paymentMethodsList: PropTypes.arrayOf(PropTypes.object),
     editMode: PropTypes.bool,
-    canEdit: PropTypes.bool,
     onSubmit: PropTypes.func,
     onCancel: PropTypes.func
   };
@@ -204,27 +204,39 @@ class PaymentMethodChooser extends React.Component {
     return (
       <div className="PaymentMethodChooser">
       <style jsx global>{`
-        .form-group .control-label {
+        .PaymentMethodChooser .form-group .control-label {
           display: none;
         }
-        .form-control {
+        .PaymentMethodChooser .form-control {
           font-size: 11px;
           height: 25px;
         }
+
+        .PaymentMethodChooser .horizontal.form-group {
+          overflow: hidden;
+        }
+
+        .PaymentMethodChooser .horizontal.creditcard {
+          overflow: hidden;
+        }
           
-        .CreditCardForm {
+        .PaymentMethodChooser .CreditCardForm {
           padding-top: 0.5rem;
         }
 
-        #card-errors {
+        .PaymentMethodChooser #card-errors {
           font-size: ${fontSize};
+        }
+
+        .PaymentMethodChooser .col-sm-10 {
+          width: 100%;
         }
       `}</style>
       <style jsx>{`
         .actions {
           display: flex;
           flex-direction: row;
-          width: 180px;
+          width: 200px;
           justify-content: space-evenly;
           margin: auto;
           margin-top: 6px;
@@ -239,7 +251,6 @@ class PaymentMethodChooser extends React.Component {
               <img className='help-image' src='/static/images/help-icon.svg' />
             </OverlayTrigger> 
             }
-          {false && this.props.canEdit && <span className='paymentmethod-update' onClick={() => this.setState({showSelector: true})}> Update </span>}
         </div>}
 
       { this.props.editMode && !this.state.showNewCreditCardForm &&
@@ -251,6 +262,7 @@ class PaymentMethodChooser extends React.Component {
             options={paymentMethodsOptions}
             defaultValue={this.props.paymentMethodInUse.uuid}
             />}
+
 
       { this.props.editMode && this.state.showNewCreditCardForm && 
          <div>

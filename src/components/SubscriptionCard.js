@@ -387,7 +387,6 @@ class SubscriptionCard extends React.Component {
                     paymentMethodInUse={subscription.paymentMethod} 
                     paymentMethodsList={this.props.paymentMethods}
                     editMode={this.state.visibleState === this.stateConstants.editPM }
-                    canEdit={Boolean(subscription.isSubscriptionActive)}
                     onCancel={this.resetState}
                     onSubmit={this.update}/>
               </div>}
