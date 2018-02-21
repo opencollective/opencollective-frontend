@@ -156,7 +156,7 @@ export default function(Sequelize, DataTypes) {
           confirmedAt: this.confirmedAt,
           name: this.name,
           data: this.data
-        };
+        }
       },
 
       features() {

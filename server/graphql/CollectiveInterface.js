@@ -429,6 +429,12 @@ export const CollectiveInterfaceType = new GraphQLInterfaceType({
         }
       },
       orders: { type: new GraphQLList(OrderType) },
+      ordersFromCollective: { 
+        type: new GraphQLList(OrderType),
+        args: {
+          subscriptionsOnly: { type: GraphQLBoolean }
+        }
+      },
       stats: { type: CollectiveStatsType },
       transactions: {
         type: new GraphQLList(TransactionInterfaceType),
@@ -784,6 +790,26 @@ const CollectiveFields = () => {
           where: { processedAt: { $ne: null } },
           order: [ ['createdAt', 'DESC'] ]
         });
+      }
+    },
+    ordersFromCollective: {
+      type: new GraphQLList(OrderType),
+      args: {
+        subscriptionsOnly: { type: GraphQLBoolean }
+      },
+      resolve(collective, args) {
+        const query = {
+          where: { }, // TODO: might need a filter of 'processedAt'
+          order: [ ['createdAt', 'DESC']]
+        };
+
+        if (args.subscriptionsOnly) {
+          query.include = [{ 
+            model: models.Subscription, 
+            required: true 
+          }]
+        }
+        return collective.getOutgoingOrders(query)
       }
     },
     transactions: {

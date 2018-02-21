@@ -335,7 +335,7 @@ export default (Sequelize, DataTypes) => {
 
     if (this.rolesByCollectiveId) {
       debug("roles already populated");
-      return Promise.resolve(this.rolesByCollectiveId);
+      return Promise.resolve(this);
     }
     const rolesByCollectiveId = {};
     const adminOf = [];

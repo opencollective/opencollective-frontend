@@ -214,7 +214,6 @@ describe('graphql.tiers.test', () => {
         const members = await models.Member.findAll({where: { MemberCollectiveId: user1.CollectiveId, CollectiveId: collective1.id }});
         const orders = await models.Order.findAll({where: { FromCollectiveId: user1.CollectiveId, CollectiveId: collective1.id }});
         // const subscription = await models.Subscription.findById(orders[0].SubscriptionId);
-        const order = await models.Order.findById(orders[0].id);
         const transactions = await models.Transaction.findAll({where: { FromCollectiveId: user1.CollectiveId, CollectiveId: collective1.id }});
 
         expect(members).to.have.length(1);
@@ -225,7 +224,6 @@ describe('graphql.tiers.test', () => {
         // expect(subscription.interval).to.equal(tier1.interval);
         expect(transactions).to.have.length(1);
         expect(transactions[0].amount).to.equal(tier1.amount);
-        expect(order.processedAt).to.not.be.null;
       });
       
       it("user1 becomes a backer of collective1 using a new payment method", async () => {

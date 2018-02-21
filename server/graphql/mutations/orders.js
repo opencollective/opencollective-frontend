@@ -1,11 +1,15 @@
+import { pick } from 'lodash';
+import Promise from 'bluebird';
+
 import models from '../../models';
 import { capitalize, pluralize } from '../../lib/utils';
 import { executeOrder } from '../../lib/payments';
 import emailLib from '../../lib/email';
-import Promise from 'bluebird';
 import { types } from '../../constants/collectives';
 import roles from '../../constants/roles';
-import { pick } from 'lodash';
+import * as errors from '../errors';
+import activities from '../../constants/activities';
+import { getNextChargeAndPeriodStartDates, getChargeRetryCount} from '../../lib/subscriptions';
 
 export function createOrder(_, args, req) {
   let tier, collective, fromCollective, paymentRequired, interval, orderCreated, user;
@@ -227,4 +231,138 @@ export function createOrder(_, args, req) {
       console.error(">>> createOrder mutation error: ", e)
       throw e;
     })
+}
+
+export function cancelSubscription(remoteUser, orderId) {
+
+  if (!remoteUser) {
+    throw new errors.Unauthorized({ message: "You need to be logged in to cancel a subscription" });
+  }
+
+  let order = null;
+  const query = {
+    where: {
+      id: orderId
+    },
+    include: [
+      { model: models.Subscription},
+      { model: models.Collective, as: 'collective'},
+      { model: models.Collective, as: 'fromCollective'}
+    ]
+  };
+  return models.Order.findOne(query)
+  .tap(o => order = o)
+  .tap(order => {
+    if (!order) {
+      throw new Error("Subscription not found")
+    } 
+    return Promise.resolve()
+  })
+  .tap(order => {
+    if (!remoteUser.isAdmin(order.FromCollectiveId)) {
+      throw new errors.Unauthorized({
+        message: "You don't have permission to cancel this subscription"
+      })
+    }
+    return Promise.resolve();
+  })
+  .tap(order => {
+    if (!order.Subscription.isActive) {
+      throw new Error("Subscription already canceled")
+    }
+    return Promise.resolve();
+  })
+  .then(order => order.Subscription.deactivate())
+
+  // createActivity - that sends out the email 
+  .then(() => models.Activity.create({
+        type: activities.SUBSCRIPTION_CANCELED,
+        CollectiveId: order.CollectiveId,
+        UserId: order.CreatedByUserId,
+        data: {
+          subscription: order.Subscription,
+          collective: order.collective.minimal,
+          user: remoteUser.minimal,
+          fromCollective: order.fromCollective.minimal
+        }
+      }))
+  .then(() => models.Order.findOne(query)) // need to fetch it second time to get updated data.
+}
+
+export function updateSubscription(remoteUser, args) {
+
+  if (!remoteUser) {
+    throw new errors.Unauthorized({ message: "You need to be logged in to update a subscription"});
+  }
+
+  const { id, paymentMethod } = args;
+
+
+  const query = { 
+    where: {
+      id,
+    },
+    include: [
+      { model: models.Subscription},
+      { model: models.PaymentMethod, as: 'paymentMethod'}
+    ]
+  };
+
+  return models.Order.findOne(query)
+  .tap(order => {
+    if (!order) {
+      throw new Error("Subscription not found")
+    }
+    return Promise.resolve();
+  })
+  .tap(order => {
+    if (!remoteUser.isAdmin(order.FromCollectiveId)) {
+      throw new errors.Unauthorized({
+        message: "You don't have permission to update this subscription"
+      })
+    }
+    return Promise.resolve();
+  })
+  .tap(order => {
+    if (!order.Subscription.isActive) {
+      throw new Error('Subscription must be active to be updated');
+    }
+    return Promise.resolve();
+  })
+  .tap(order => {
+
+    let updatePromise;
+    let newPm;
+    
+    // TODO: Would be even better if we could charge you here directly
+    // before letting you proceed
+
+    // means it's an existing paymentMethod
+    if (paymentMethod.uuid && paymentMethod.uuid.length === 36) {
+      updatePromise = models.PaymentMethod.findOne({where: { uuid: paymentMethod.uuid}})
+        .then(pm => {
+          if (!pm){
+            throw new Error('Payment method not found with this uuid', paymentMethod.uuid);
+          }
+          newPm = pm;
+        })
+    } else {
+      // means it's a new paymentMethod
+      const newPMData = Object.assign(paymentMethod, { CollectiveId: order.FromCollectiveId })
+      updatePromise = models.PaymentMethod.createFromStripeSourceToken(newPMData)
+        .then(pm => newPm = pm)
+    }
+
+    // determine if this order was pastdue
+    if (order.Subscription.chargeRetryCount > 0) {
+      const updatedDates = getNextChargeAndPeriodStartDates('updated', order);
+      const chargeRetryCount = getChargeRetryCount('updated', order);
+
+      updatePromise = updatePromise
+        .then(() => order.Subscription.update({ nextChargeDate: updatedDates.nextChargeDate, chargeRetryCount }))
+    }
+
+    return updatePromise
+        .then(() => order.update({ PaymentMethodId: newPm.id}))
+  })
 }

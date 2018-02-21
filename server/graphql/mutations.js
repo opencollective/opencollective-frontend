@@ -1,5 +1,5 @@
 import { createCollective, editCollective, deleteCollective, approveCollective } from './mutations/collectives';
-import { createOrder } from './mutations/orders';
+import { createOrder, cancelSubscription, updateSubscription } from './mutations/orders';
 import { createMember, removeMember } from './mutations/members';
 import { editTiers } from './mutations/tiers';
 import { editConnectedAccount } from './mutations/connectedAccounts';
@@ -36,7 +36,8 @@ import {
   ExpenseInputType,
   UpdateInputType,
   UpdateAttributesInputType,
-  ConnectedAccountInputType
+  ConnectedAccountInputType,
+  PaymentMethodInputType
 } from './inputTypes';
 
 const mutations = {
@@ -236,6 +237,26 @@ const mutations = {
     },
     resolve(_, args, req) {
       return updateMutations.deleteUpdate(_, args, req);
+    }
+  },
+  cancelSubscription: {
+    type: OrderType,
+    args: {
+      id: { type: new GraphQLNonNull(GraphQLInt)}
+    },
+    resolve(_, args, req) {
+      return cancelSubscription(req.remoteUser, args.id);
+    }
+  },
+
+  updateSubscription: {
+    type: OrderType,
+    args: {
+      id: { type: new GraphQLNonNull(GraphQLInt)},
+      paymentMethod: { type: PaymentMethodInputType}
+    },
+    resolve(_, args, req) {
+      return updateSubscription(req.remoteUser, args)
     }
   }
 }

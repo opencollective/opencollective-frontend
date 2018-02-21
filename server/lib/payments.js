@@ -53,7 +53,9 @@ export const executeOrder = (user, order, options) => {
           // included so we're doing that manually here. Not the
           // cutest but works.
           order.Subscription = subscription;
-          libsubscription.updateNextChargeDate('new', order); // No DB access
+          const updatedDates = libsubscription.getNextChargeAndPeriodStartDates('new', order);
+          order.Subscription.nextChargeDate = updatedDates.nextChargeDate;
+          order.Subscription.nextPeriodStart = updatedDates.nextPeriodStart || order.Subscription.nextPeriodStart;
           return subscription.save();
         }).then((subscription) => {
           return order.update({ SubscriptionId: subscription.id });
@@ -154,7 +156,7 @@ const sendOrderConfirmedEmail = async (order) => {
       relatedCollectives,
       monthlyInterval: (interval === 'month'),
       firstPayment: true,
-      subscriptionsLink: interval && user.generateLoginLink('/subscriptions')
+      subscriptionsLink: interval && user.generateLoginLink(`/${fromCollective.slug}/subscriptions`)
     };
 
     let matchingFundCollective;
@@ -199,7 +201,7 @@ const sendOrderProcessingEmail = (order) => {
         user: user.info,
         collective: collective.info,
         fromCollective: fromCollective.minimal,
-        subscriptionsLink: user.generateLoginLink('/subscriptions')
+        subscriptionsLink: user.generateLoginLink(`/${fromCollective.slug}/subscriptions`)
       }, {
         from: `${collective.name} <hello@${collective.slug}.opencollective.com>`
       })

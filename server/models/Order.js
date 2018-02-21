@@ -1,6 +1,7 @@
 import { type } from '../constants/transactions';
 import Promise from 'bluebird';
 import CustomDataTypes from './DataTypes';
+import Temporal from 'sequelize-temporal';
 
 import debugLib from 'debug';
 const debug = debugLib('order');
@@ -238,6 +239,35 @@ export default function(Sequelize, DataTypes) {
       })
     })
     .then(() => this);
-  }   
+  }
+
+  Order.prototype.getPaymentMethodForUser = function(user) {
+    return user.populateRoles()
+      .then(() => {
+        // this check is necessary to cover organizations as well as user collective
+        if (user.isAdmin(this.FromCollectiveId)) {
+          return models.PaymentMethod.findById(this.PaymentMethodId);
+        } else {
+          return null
+        }
+      })
+  }
+
+  Order.prototype.getSubscriptionForUser = function(user) {
+    if (!this.SubscriptionId) {
+      return null;
+    }
+    return user.populateRoles()
+      .then(() => {
+        // this check is necessary to cover organizations as well as user collective
+        if (user.isAdmin(this.FromCollectiveId)) {
+          return this.getSubscription()
+        } else {
+          return null
+        }
+      })
+  }
+  
+  Temporal(Order, Sequelize);
   return Order;
 }

@@ -65,8 +65,11 @@ const TransactionFields = () => {
     },
     uuid: {
       type: GraphQLString,
-      resolve(transaction) {
-        return transaction.uuid;
+      resolve(transaction, args, req) {
+        if (!req.remoteUser) {
+          return null;
+        }
+        return transaction.getDetailsForUser(req.remoteUser);
       }
     },
     type: {
@@ -163,6 +166,7 @@ const TransactionFields = () => {
       type: PaymentMethodType,
       resolve(transaction, args, req) {
         if (!transaction.PaymentMethodId) return null;
+        // TODO: put behind a login check
         return req.loaders.paymentMethods.findById.load(transaction.PaymentMethodId);
       }
     }    
@@ -219,7 +223,14 @@ export const TransactionOrderType = new GraphQLObjectType({
       privateMessage: {
         type: GraphQLString,
         resolve(transaction) {
+          // TODO: Put behind a login check
           return transaction.getOrder().then(order => order && order.privateMessage);
+        }
+      },
+      publicMessage: {
+        type: GraphQLString,
+        resolve(transaction) {
+          return transaction.getOrder().then(order => order && order.publicMessage);
         }
       },
       order: {

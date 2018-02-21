@@ -12,7 +12,6 @@ import uploadImage from './controllers/images';
 import * as mw from './controllers/middlewares';
 import * as notifications from './controllers/notifications';
 import getPaymentMethods from './controllers/paymentMethods';
-import * as subscriptions from './controllers/subscriptions';
 import * as test from './controllers/test';
 import * as users from './controllers/users';
 import stripeWebhook from './controllers/webhooks';
@@ -226,12 +225,6 @@ export default (app) => {
   app.get('/database/reset', test.resetTestDatabase);
   app.get('/test/loginlink', test.getTestUserLoginUrl);
   app.get('/test/pdf', test.exportPDF);
-
-  /**
-   * Stripe subscriptions (recurring payments)
-   */
-  app.get('/subscriptions', auth.mustBeLoggedIn, subscriptions.getAll);
-  app.post('/subscriptions/:subscriptionid/cancel', auth.mustBeLoggedIn, subscriptions.cancel);
 
   /**
    * Override default 404 handler to make sure to obfuscate api_key visible in URL

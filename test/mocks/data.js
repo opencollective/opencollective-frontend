@@ -576,7 +576,10 @@ export default {
     "currency": "EUR",
     "interval": "month",
     "isActive": true,
-    "stripeSubscriptionId": "sub_tokentest"
+    "stripeSubscriptionId": "sub_tokentest",
+    "nextChargeDate": '2018-02-01T07:31:37.747Z',
+    "nextPeriodStart": '2018-02-01T07:31:37.747Z',
+    "chargeRetryCount": 0
   },
   "expense1": {
     "description": "Expense 1: Lunch with Jenn",

@@ -52,7 +52,6 @@ const createOrderQuery = `
         isActive
         stripeSubscriptionId
       }
-      processedAt
     }
   }
   `;
@@ -93,7 +92,18 @@ describe('graphql.createOrder.bitcoin.test', () => {
       const collective = res.data.createOrder.collective;
       
       const paymentMethod = res.data.createOrder.paymentMethod;
-      expect(paymentMethod.customerId).to.not.equal('cus_BykOG8ivma78f2');
+
+      // paymentMethod shouldn't be sent back without a token;
+      expect(paymentMethod).to.equal(null);
+
+      const orderRow = await models.Order.findOne({
+        where: {
+          id: res.data.createOrder.id
+        }, 
+        include: [{ model: models.PaymentMethod, as: 'paymentMethod' }]
+      });
+      
+      expect(orderRow.paymentMethod.customerId).to.equal('cus_BykOG8ivma78f2');
 
       const transaction = await models.Transaction.findOne({
         where: { CollectiveId: collective.id, amount: order.totalAmount }
@@ -156,7 +166,18 @@ describe('graphql.createOrder.bitcoin.test', () => {
       const fromCollective = orderCreated.fromCollective;
 
       const paymentMethod = res.data.createOrder.paymentMethod;
-      expect(paymentMethod.customerId).to.not.equal('cus_BykOG8ivma78f2');
+
+      // payment method shouldn't be sent back without a logged in token
+      expect(paymentMethod).to.equal(null);
+
+      const orderRow = await models.Order.findOne({
+        where: {
+          id: res.data.createOrder.id
+        }, 
+        include: [{ model: models.PaymentMethod, as: 'paymentMethod' }]
+      });
+      
+      expect(orderRow.paymentMethod.customerId).to.equal('cus_BykOG8ivma78f2');
 
       const transaction = await models.Transaction.findOne({ where: { OrderId: orderCreated.id }});
       expect(transaction).to.not.exist;
@@ -189,7 +210,7 @@ describe('graphql.createOrder.bitcoin.test', () => {
       await models.Member.create({
         CollectiveId: newco.id,
         MemberCollectiveId: duc.CollectiveId,
-        role: 'MEMBER',
+        role: 'ADMIN',
         CreatedByUserId: duc.id
       });
 

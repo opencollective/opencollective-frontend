@@ -12,8 +12,8 @@ import * as paymentsLib from '../server/lib/payments';
 import {
   MAX_RETRIES,
   handleRetryStatus,
-  updateNextChargeDate,
-  updateChargeRetryCount,
+  getNextChargeAndPeriodStartDates,
+  getChargeRetryCount,
   ordersWithPendingCharges,
   processOrderWithSubscription,
 } from '../server/lib/subscriptions';
@@ -50,7 +50,7 @@ async function createOrderWithSubscription(interval, date) {
 }
 
 describe('LibSubscription', () => {
-  describe('#updateNextChargeDate', () => {
+  describe('#getNextChargeAndPeriodStartDates', () => {
     it("should use the next month's first day for monthly subscriptions", () => {
       // Given the following order with subscription
       const order = {
@@ -62,13 +62,13 @@ describe('LibSubscription', () => {
       };
 
       // When dates are updated with success
-      updateNextChargeDate('new', order);
+      const updatedDates = getNextChargeAndPeriodStartDates('new', order);
 
       // Then both dates should be advanced to the first day of the
       // next month
-      expect(order.Subscription.nextPeriodStart.getTime())
+      expect(updatedDates.nextPeriodStart.getTime())
         .to.equal((new Date("2018-02-01 0:0")).getTime());
-      expect(order.Subscription.nextChargeDate.getTime())
+      expect(updatedDates.nextChargeDate.getTime())
         .to.equal((new Date("2018-02-01 0:0")).getTime());
     });
 
@@ -83,12 +83,12 @@ describe('LibSubscription', () => {
       };
 
       // When dates are updated with success
-      updateNextChargeDate('new', order);
+      const updatedDates = getNextChargeAndPeriodStartDates('new', order);
 
       // Then both dates should be advanced
-      expect(order.Subscription.nextPeriodStart.getTime())
+      expect(updatedDates.nextPeriodStart.getTime())
         .to.equal((new Date("2019-01-01 0:0")).getTime());
-      expect(order.Subscription.nextChargeDate.getTime())
+      expect(updatedDates.nextChargeDate.getTime())
         .to.equal((new Date("2019-01-01 0:0")).getTime());
     });
 
@@ -106,14 +106,14 @@ describe('LibSubscription', () => {
       const clock = sinon.useFakeTimers((new Date("2018-01-28 0:0")).getTime());
 
       // When dates are updated with failure
-      updateNextChargeDate('failure', order);
+      const updatedDates = getNextChargeAndPeriodStartDates('failure', order);
 
       try {
         // Then just the nextCharge date should be updated. The date
         // that saves the last period's start should keep the same value
-        expect(order.Subscription.nextPeriodStart.getTime())
-          .to.equal((new Date("2018-01-20 0:0")).getTime());
-        expect(order.Subscription.nextChargeDate.getTime())
+        expect(updatedDates.nextPeriodStart)
+          .to.equal(undefined);
+        expect(updatedDates.nextChargeDate.getTime())
           .to.equal((new Date("2018-01-30 0:0")).getTime());
       } finally {
         clock.restore();
@@ -131,13 +131,13 @@ describe('LibSubscription', () => {
       };
 
       // When dates are updated with success
-      updateNextChargeDate('success', order);
+      const updatedDates = getNextChargeAndPeriodStartDates('success', order);
 
       // Then both dates should be updated based on nextPeriodStart
       // rather than nextChargeDate
-      expect(order.Subscription.nextPeriodStart.getTime())
+      expect(updatedDates.nextPeriodStart.getTime())
         .to.equal((new Date("2018-02-20 0:0")).getTime());
-      expect(order.Subscription.nextChargeDate.getTime())
+      expect(updatedDates.nextChargeDate.getTime())
         .to.equal((new Date("2018-02-20 0:0")).getTime());
     });
 
@@ -153,26 +153,57 @@ describe('LibSubscription', () => {
       };
 
       // When dates are updated with success
-      updateNextChargeDate('new', order);
+      const updatedDates = getNextChargeAndPeriodStartDates('new', order);
 
       // Then both dates should be updated according to createdAt
-      expect(order.Subscription.nextPeriodStart.getTime())
+      expect(updatedDates.nextPeriodStart.getTime())
         .to.equal((new Date("2018-02-01 0:0")).getTime());
-      expect(order.Subscription.nextChargeDate.getTime())
+      expect(updatedDates.nextChargeDate.getTime())
         .to.equal((new Date("2018-02-01 0:0")).getTime());
     });
+
+    it("should set the nextChargeDate to today and not modify nextPeriodStart when status is 'updated'", () => {
+        // Given the following order & subscription
+        const order = {
+          Subscription: {
+            interval: 'year',
+            nextPeriodStart: new Date("2018-01-20 0:0"),
+            nextChargeDate: new Date("2018-01-20 0:0")
+          }
+        };
+
+        // And given that we freeze time
+        const clock = sinon.useFakeTimers((new Date("2018-01-28 0:0")).getTime());
+
+        // when dates are updated with 'updated' status
+        const updatedDates = getNextChargeAndPeriodStartDates('updated', order);
+
+        try {
+          // Then only nextChargeDate should be set to today;
+          expect(updatedDates.nextChargeDate.getTime())
+            .to.equal((new Date()).getTime());          
+        } finally {
+          clock.restore();
+        }
+
+    })
   });
 
-  describe('#updateChargeRetryCount', () => {
+  describe('#getChargeRetryCount', () => {
     it('should increment the counter if status is fail', () => {
       const order = { Subscription: { chargeRetryCount: 0 } };
-      updateChargeRetryCount('failure', order);
-      expect(order.Subscription.chargeRetryCount).to.equal(1);
+      const chargeRetryCount = getChargeRetryCount('failure', order);
+      expect(chargeRetryCount).to.equal(1);
     });
     it('should reset the counter to zero on success', () => {
       const order = { Subscription: { chargeRetryCount: 5 } };
-      updateChargeRetryCount('success', order);
-      expect(order.Subscription.chargeRetryCount).to.equal(0);
+      const chargeRetryCount = getChargeRetryCount('success', order);
+      expect(chargeRetryCount).to.equal(0);
+    });
+    it('should reset the counter to zero on updated', () => {
+      const order = { Subscription: { chargeRetryCount: 5 } };
+      const chargeRetryCount = getChargeRetryCount('updated', order);
+      expect(chargeRetryCount).to.equal(0);
     });
   });
 
@@ -201,7 +232,7 @@ describe('LibSubscription', () => {
       emailMock.verify();
     });
 
-    it.skip('should send a failure email if retries are > 0 & < MAX_RETRIES', async () => {
+    it('should send a failure email if retries are > 0 & < MAX_RETRIES', async () => {
       // Given an order
       const order = {
         Subscription: { chargeRetryCount: 1 },

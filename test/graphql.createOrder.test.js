@@ -57,7 +57,6 @@ const createOrderQuery = `
         isActive
         stripeSubscriptionId
       }
-      processedAt
     }
   }
   `;
@@ -301,7 +300,6 @@ describe('createOrder', () => {
       const orderCreated = res.data.createOrder;
       const collective = orderCreated.collective;
       const subscription = orderCreated.subscription;
-      expect(orderCreated.processedAt).to.not.be.null;
       expect(subscription.interval).to.equal('month');
       expect(subscription.isActive).to.be.true;
       expect(subscription.amount).to.equal(order.totalAmount);

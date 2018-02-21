@@ -19,6 +19,7 @@ import CustomDataTypes from './DataTypes';
 import { convertToCurrency } from '../lib/currency';
 import emailLib from '../lib/email';
 import debugLib from 'debug';
+
 const debug = debugLib('collective');
 
 /**
@@ -515,6 +516,13 @@ export default function(Sequelize, DataTypes) {
     return models.Order.findAll(query);
   };
 
+  Collective.prototype.getOutgoingOrders = function(options) {
+    const query = deepmerge({
+      where: { FromCollectiveId: this.id }
+    }, options);
+    return models.Order.findAll(query);
+  };
+
   Collective.prototype.getRoleForMemberCollective = function(MemberCollectiveId) {
     if (!MemberCollectiveId) return null;
     return models.Member.findOne({
@@ -804,11 +812,21 @@ export default function(Sequelize, DataTypes) {
     .then(() => this.getTiers());
   };
 
+  /*
+   * Assumes: 
+   * - only credit cards on stripe can be updated
+   */
+
   Collective.prototype.editPaymentMethods = function(paymentMethods, defaultAttributes = {}) {
     if (!paymentMethods) return Promise.resolve();
     // We only allow editing of Stripe Payment Methods for the moment
     // (to avoid marking other types as archived see issue #698)
-    return models.PaymentMethod.findAll({ where: { CollectiveId: this.id, archivedAt: { $eq: null }, service: { $eq: 'stripe' } }})
+    return models.PaymentMethod.findAll({ where: { 
+      CollectiveId: this.id, 
+      archivedAt: { $eq: null }, 
+      service: 'stripe',
+      type: 'creditcard' 
+    }})
     .then(oldPaymentMethods => {
       // remove the paymentMethods that are not present anymore in the updated collective
       const diff = difference(oldPaymentMethods.map(t => t.id), paymentMethods.map(t => t.id));
@@ -827,6 +845,7 @@ export default function(Sequelize, DataTypes) {
       });
     })
   };
+
 
   Collective.prototype.getExpenses = function(status, startDate, endDate = new Date) {
     const where = {

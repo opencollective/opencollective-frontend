@@ -70,8 +70,8 @@ export async function processOrderWithSubscription(options, order) {
     }
   }
 
-  updateNextChargeDate(status, order);
-  updateChargeRetryCount(status, order);
+  order.Subscription = Object.assign(order.Subscription, getNextChargeAndPeriodStartDates(status, order));
+  order.Subscription.chargeRetryCount = getChargeRetryCount(status, order);
 
   csvEntry.status = status;
   csvEntry.retriesAfter = order.Subscription.chargeRetryCount;
@@ -111,14 +111,11 @@ export async function handleRetryStatus(order, transaction) {
   switch (order.Subscription.chargeRetryCount) {
   case 0: await sendThankYouEmail(order, transaction); break;
   case MAX_RETRIES: cancelSubscriptionAndNotifyUser(order); break;
-  //default: sendFailedEmail(order, false); break;
+  default: sendFailedEmail(order, false); break;
   }
 }
 
-/** Update the date an order should be charged again.
- *
- * The field `order.Subscription.nextChargeDate` is set to the next
- * date that the subscription should be charged.
+/** Get the date an order should be charged again and it's next period start date
  *
  * The status defines how much time it will take until the same
  * subscription can be charged again. Currently supported status
@@ -130,23 +127,27 @@ export async function handleRetryStatus(order, transaction) {
  *      yearly subscriptions
  *   2. failure: Two days after today.
  */
-export function updateNextChargeDate(status, order) {
+export function getNextChargeAndPeriodStartDates(status, order) {
   const initial = order.Subscription.nextPeriodStart || order.Subscription.createdAt;
-  let nextDate = moment(initial);
+  let nextChargeDate = moment(initial);
+  const response = {};
   if (status === 'new' || status === 'success') {
     if (order.Subscription.interval === 'month') {
-      nextDate.add(1, 'months');
+      nextChargeDate.add(1, 'months');
     } else if (order.Subscription.interval === 'year') {
-      nextDate.add(1, 'years');
+      nextChargeDate.add(1, 'years');
     }
     if (status === 'new') {
-      nextDate.startOf('month');
+      nextChargeDate.startOf('month');
     }
-    order.Subscription.nextPeriodStart = nextDate.toDate();
+    response.nextPeriodStart = nextChargeDate.toDate();
   } else if (status === 'failure') {
-    nextDate = moment(new Date).add(2, 'days');
+    nextChargeDate = moment(new Date).add(2, 'days');
+  } else if (status === 'updated') { // used when user updates payment method
+    nextChargeDate = moment(new Date); // sets next charge date to now
   }
-  order.Subscription.nextChargeDate = nextDate.toDate();
+  response.nextChargeDate = nextChargeDate.toDate();
+  return response;
 }
 
 /** Update counter that records retry attempts.
@@ -155,8 +156,8 @@ export function updateNextChargeDate(status, order) {
  * incremented by one. The counter is reset to zero if the status is
  * 'success'.
  */
-export function updateChargeRetryCount(status, order) {
-  order.Subscription.chargeRetryCount = (status === 'success')
+export function getChargeRetryCount(status, order) {
+  return (status === 'success' || status === 'updated')
     ? 0 : order.Subscription.chargeRetryCount + 1;
 }
 

@@ -104,7 +104,7 @@ export const UserType = new GraphQLObjectType({
       billingAddress: {
         type: GraphQLString,
         resolve(user) {
-          return user.billingAddress;
+          return user.billingAddress; // TODO: shouldn't this be behind a login check like email and paypalEmail?
         }
       },
       paypalEmail: {
@@ -738,7 +738,8 @@ export const OrderType = new GraphQLObjectType({
         description: `frequency of the subscription if any (could be either null, 'month' or 'year')`,
         type: GraphQLString,
         resolve(order) {
-          return order.getSubscription(s => s.interval);
+          return order.getSubscription()
+            .then(s => s ? s.interval : null);
         }
       },
       subscription: {
@@ -777,7 +778,7 @@ export const OrderType = new GraphQLObjectType({
         description: 'Private message for the admins and the host of the collective',
         type: GraphQLString,
         resolve(order) {
-          return order.privateMessage;
+          return order.privateMessage; // TODO: should be behind a login check
         }
       },
       fromCollective: {
@@ -810,8 +811,11 @@ export const OrderType = new GraphQLObjectType({
       paymentMethod: {
         description: 'Payment method used to pay for the order. The paymentMethod is also attached to individual transactions since a credit card can change over the lifetime of a subscription.',
         type: PaymentMethodType,
-        resolve(order) {
-          return order.getPaymentMethod();
+        resolve(order, args, req) {
+          if (!req.remoteUser) {
+            return null;
+          } 
+          return order.getPaymentMethodForUser(req.remoteUser);
         }
       },
       matchingFund: {
@@ -854,17 +858,35 @@ export const OrderType = new GraphQLObjectType({
           return order.createdAt;
         }
       },
-      processedAt: {
-        description: 'Date and time when the order has been processed by the payment processor if needed to be (if totalAmount > 0)',
-        type: GraphQLString,
+      // TODO: two fields below (isPastDue & isSubscriptionActive) an possibly be combined as one
+      // Leaving them separate for now to make it easy for logged in vs logged out data
+      isPastDue: {
+        description: 'Whether this subscription is past due or not',
+        type: GraphQLBoolean,
+        resolve(order, args, req) {
+          // if logged out experience, always return false
+          if (!req.remoteUser) {
+            return false;
+          }
+          // otherwise, check if this user has permission
+          return order.getSubscriptionForUser(req.remoteUser)
+            .then(subscription => subscription && subscription.isActive && subscription.chargeRetryCount > 0)
+        }
+      },
+      // Note this field is public
+      isSubscriptionActive: {
+        description: 'If there is a subscription, is it active?',
+        type: GraphQLBoolean,
         resolve(order) {
-          return order.processedAt;
+          return order.getSubscription()
+            .then(s => s ? s.isActive : null)
         }
       }
     }
   }
 });
 
+// Note: we assume that all of this data is publicly accessible without a login
 export const ConnectedAccountType = new GraphQLObjectType({
   name: "ConnectedAccountType",
   description: "Sanitized ConnectedAccount Info (ConnectedAccount model)",
@@ -910,6 +932,7 @@ export const ConnectedAccountType = new GraphQLObjectType({
   }
 });
 
+// TODO: Put behind a login token
 export const PaymentMethodType = new GraphQLObjectType({
   name: "PaymentMethodType",
   description: "Sanitized PaymentMethod Info (PaymentMethod model)",
@@ -924,13 +947,13 @@ export const PaymentMethodType = new GraphQLObjectType({
       uuid: {
         type: GraphQLString,
         resolve(paymentMethod) {
-          return paymentMethod.uuid;
+          return paymentMethod.uuid; 
         }
       },
       createdAt: {
         type: GraphQLString,
         resolve(paymentMethod) {
-          return paymentMethod.createdAt;
+          return paymentMethod.createdAt; 
         }
       },
       expiryDate: {
@@ -954,7 +977,20 @@ export const PaymentMethodType = new GraphQLObjectType({
       data: {
         type: GraphQLJSON,
         resolve(paymentMethod) {
-          return paymentMethod.data;
+          if (!paymentMethod.data) {
+            return null;
+          }
+          const data = paymentMethod.data;
+          // white list fields to send back; removes fields like CustomerIdForHost
+          const dataSubset = {
+            fullName: data.fullName,
+            expMonth: data.expMonth,
+            expYear: data.expYear,
+            brand: data.brand,
+            country: data.country,
+            last4: data.last4
+          }
+          return dataSubset;
         }
       },
       name: { // last 4 digit of card number for Stripe
@@ -1048,6 +1084,9 @@ export const PaymentMethodType = new GraphQLObjectType({
   }
 });
 
+
+// TODO: Do we even need this type? It's 1:1 mapping with Order. 
+// Already linked interval and isActive directly in Order table
 export const SubscriptionType = new GraphQLObjectType({
   name: "Subscription",
   description: "Subscription model",

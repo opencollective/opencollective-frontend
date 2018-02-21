@@ -213,7 +213,6 @@ describe('Query Tests', () => {
               Collective(slug: "${event1.slug}") {
                 orders {
                   createdAt,
-                  processedAt
                 }
               }
             }
@@ -223,7 +222,6 @@ describe('Query Tests', () => {
           result.errors && console.error(result.errors);
           const order = result.data.Collective.orders[0];
           expect(order).to.have.property("createdAt");
-          expect(order).to.have.property("processedAt");
         });
 
         it('when given only a collective slug1', async () => {

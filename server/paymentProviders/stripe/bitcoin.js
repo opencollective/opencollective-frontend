@@ -173,7 +173,7 @@ export default {
                 fromCollective: order.fromCollective.minimal,
                 relatedCollectives,
                 config: { host: config.host },
-                subscriptionsLink: user.generateLoginLink('/subscriptions')
+                subscriptionsLink: user.generateLoginLink(`/${order.fromCollective.slug}/subscriptions`)
               }, {
                 from: `${order.collective.name} <hello@${order.collective.slug}.opencollective.com>`
               }))

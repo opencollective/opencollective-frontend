@@ -209,6 +209,17 @@ export default (Sequelize, DataTypes) => {
     if (this.ExpenseId) return this.getExpense({ paranoid: false });
   };
 
+  Transaction.prototype.getDetailsForUser = function(user) {
+    return user.populateRoles()
+      .then(() => {
+        if (user.isAdmin(this.FromCollectiveId) || user.isAdmin(this.CollectiveId)) {
+          return this.uuid;
+        } else {
+          return null;
+        }
+      })
+  }
+
   /**
    * Class Methods
    */

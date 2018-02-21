@@ -2,16 +2,12 @@ import fs from 'fs';
 import json2csv from 'json2csv';
 import { ArgumentParser } from 'argparse';
 
-import * as payments from '../server/lib/payments';
 import emailLib from '../server/lib/email';
 import { promiseSeq } from '../server/lib/utils';
 import { sequelize } from '../server/models';
 import {
   ordersWithPendingCharges,
   processOrderWithSubscription,
-  updateNextChargeDate,
-  updateChargeRetryCount,
-  handleRetryStatus,
 } from '../server/lib/subscriptions';
 
 const REPORT_EMAIL = 'ops@opencollective.com';
