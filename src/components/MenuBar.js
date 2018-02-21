@@ -203,7 +203,7 @@ class MenuBar extends React.Component {
           float: left;
         }
         `}</style>
-        {this.state.menuItems.map((item, index) =>
+        { this.state.menuItems.map((item, index) =>
           <div className={`item ${item.anchor} ${this.state.selectedAnchor === item.anchor && 'selected'}`} key={`item-${index}-${item.link}`}>
             <Link route={item.link} animate={{offset}}>
               { this.messages[item.anchor] ? intl.formatMessage(this.messages[item.anchor]): item.anchor }
