@@ -171,3 +171,61 @@ export async function fetchMembers({ collectiveSlug, tierSlug, backerType }, opt
   const members = processResult(result);
   return members;
 }
+
+export async function fetchEvents(parentCollectiveSlug, options = { limit: 10 }) {
+  const query = `
+  query allEvents($slug: String!, $limit: Int) {
+    allEvents(slug:$slug, limit: $limit) {
+      id
+      name
+      description
+      slug
+      image
+      startsAt
+      endsAt
+      location {
+        name
+        address
+        lat
+        long
+      }
+    }
+  }
+  `;
+
+  const result = await client.request(query, { slug: parentCollectiveSlug, limit: options.limit || 10 });
+  return result.allEvents;
+}
+
+export async function fetchEvent(eventSlug) {
+  const query = `
+  query Collective($slug: String!) {
+    Collective(slug:$slug) {
+      id
+      name
+      description
+      longDescription
+      slug
+      image
+      startsAt
+      endsAt
+      location {
+        name
+        address
+        lat
+        long
+      }
+      currency
+      tiers {
+        id
+        name
+        description
+        amount
+      }
+    }
+  }
+  `;
+
+  const result = await client.request(query, { slug: eventSlug });
+  return result.Collective;
+}

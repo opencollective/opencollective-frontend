@@ -18,8 +18,8 @@ import Button from '../components/Button';
 class ExpensesPage extends React.Component {
 
   static getInitialProps (props) {
-    const { query: { collectiveSlug }, data } = props;
-    return { slug: collectiveSlug, data }
+    const { query: { collectiveSlug, category }, data } = props;
+    return { slug: collectiveSlug, data, category }
   }
 
   constructor(props) {
@@ -34,7 +34,7 @@ class ExpensesPage extends React.Component {
   }
 
   render() {
-    const { data, action } = this.props;
+    const { data, category } = this.props;
     const { LoggedInUser } = this.state;
 
     if (!data.loading && !data.Collective) return (<Loading />);
@@ -100,7 +100,7 @@ class ExpensesPage extends React.Component {
             <div className="col large">
               <ExpensesWithData
                 collective={collective}
-                defaultAction={action}
+                category={category}
                 LoggedInUser={this.state.LoggedInUser}
                 />
             </div>

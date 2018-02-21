@@ -6,6 +6,7 @@ import Body from './Body';
 import Footer from './Footer';
 import CollectiveCover from './CollectiveCover';
 import Tier from './Tier';
+import Link from './Link';
 import NotificationBar from './NotificationBar';
 import Memberships from './Memberships';
 import CollectivesWithData from './CollectivesWithData';
@@ -17,7 +18,7 @@ import MessageModal from './MessageModal';
 import SectionTitle from './SectionTitle';
 import OrderCreated from './OrderCreated';
 import { Button } from 'react-bootstrap';
-import { Router, Link } from '../server/pages';
+import { Router } from '../server/pages';
 
 class UserCollective extends React.Component {
 
@@ -185,6 +186,26 @@ class UserCollective extends React.Component {
             max-width: 300px;
             float: left;
           }
+          .adminActions {
+            text-align: center;
+            text-transform: uppercase;
+            font-size: 1.3rem;
+            font-weight: 600;
+            letter-spacing: 0.05rem;
+          }
+          .adminActions ul {
+            overflow: hidden;
+            text-align: center;
+            margin: 0 auto;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            flex-direction: row;
+            list-style: none;
+          }
+          .adminActions ul li {
+            margin: 0 2rem;
+          }
         `}</style>
 
         <Header
@@ -247,6 +268,13 @@ class UserCollective extends React.Component {
                       defaultMessage={`We are hosting {n, plural, one {this collective} other {{n} collectives}}`}
                       />
                   </h1>
+                  { LoggedInUser && LoggedInUser.canEditCollective(this.collective) &&
+                    <div className="adminActions" id="adminActions">
+                      <ul>
+                        <li><Link route={`/${this.collective.slug}/collectives/expenses`}><FormattedMessage id="host.collectives.manageExpenses" defaultMessage="manage expenses" /></Link></li>
+                      </ul>
+                    </div>
+                  }
                   <div className="cardsList">
                     <CollectivesWithData
                       HostCollectiveId={this.collective.id}

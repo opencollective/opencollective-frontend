@@ -260,7 +260,8 @@ class CreateExpenseForm extends React.Component {
                 name="attachment"
                 className="attachmentField"
                 onChange={attachment => this.handleChange('attachment', attachment)}
-                defaultValue={expense.attachment || '/static/images/receipt.svg'}
+                defaultValue={expense.attachment}
+                placeholder={'/static/images/receipt.svg'}
                 description={<FormattedMessage id="expense.attachment.description" defaultMessage="Upload receipt (photo or PDF)" />}
                 />
             </div>
