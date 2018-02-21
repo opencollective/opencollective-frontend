@@ -300,7 +300,8 @@ class SubscriptionCard extends React.Component {
 
           .past-due-msg {
             margin-top: 4px;
-            color: ${colors.blue}
+            color: ${colors.blue};
+            cursor: pointer;
           }
 
           .result div {
