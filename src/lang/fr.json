@@ -69,6 +69,7 @@
   "collective.contribute": "contribuer",
   "host.apply": "Créez votre collectif",
   "collective.cover.hostedBy": "Hébergé par",
+  "collective.cover.pendingApprovalFrom": "En attente d'acceptation de",
   "collective.stats.yearlyBudget.label": "Estimation du budget annuel basé sur les donations existantes",
   "collective.stats.totalAmountSent.label": "Montant total donné",
   "collective.stats.totalAmountRaised.label": "Montant total levé",
