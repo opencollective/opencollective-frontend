@@ -33,8 +33,9 @@ const csvFields = [
 /** Run the script with parameters read from the command line */
 async function run(options) {
   const start = new Date;
-  const orders = await ordersWithPendingCharges();
-  vprint(options, `${orders.length} subscriptions pending charges. dryRun: ${options.dryRun}`);
+  const allOrders = await ordersWithPendingCharges();
+  const orders = (options.limit) ? allOrders.slice(0, options.limit) : allOrders;
+  vprint(options, `${allOrders.length} subscriptions pending charges. Charging ${orders.length} subscriptions right now. dryRun: ${options.dryRun}`);
   const data = [];
   await promiseSeq(orders, async (order) => {
     vprint(options,
@@ -123,6 +124,9 @@ function parseCommandLineArguments() {
     action: 'storeConst',
     constant: true,
   });
+  parser.addArgument(['-l', '--limit'], {
+    help: 'total subscriptions to process'
+  });
   parser.addArgument(['-b', '--batch_size'], {
     help: 'batch size to fetch at a time',
     defaultValue: 10
@@ -131,6 +135,7 @@ function parseCommandLineArguments() {
   return {
     dryRun: !args.notdryrun,
     verbose: args.verbose,
+    limit: args.limit,
     batchSize: args.batch_size || 100
   };
 }
