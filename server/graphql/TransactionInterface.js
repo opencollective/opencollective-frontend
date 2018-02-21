@@ -42,7 +42,7 @@ export const TransactionInterfaceType = new GraphQLInterfaceType({
       platformFeeInHostCurrency: { type: GraphQLInt },
       paymentProcessorFeeInHostCurrency: { type: GraphQLInt },
       createdByUser: { type: UserType },
-      host: { type: UserCollectiveType },
+      host: { type: CollectiveInterfaceType },
       paymentMethod: { type: PaymentMethodType },
       fromCollective: { type: CollectiveInterfaceType },
       collective: { type: CollectiveInterfaceType },

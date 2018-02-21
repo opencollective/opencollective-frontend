@@ -33,30 +33,29 @@ describe('graphql.transaction.test.js', () => {
         query Collective($slug: String!, $limit: Int) {
           Collective(slug: $slug) {
             id,
-            slug,
+            slug
             transactions(limit: $limit) {
-              id,
-              type,
+              id
+              type
               createdByUser {
-                id,
-                firstName,
-                email
-              },
-              host {
                 id,
                 firstName
                 email
+              },
+              host {
+                id
+                slug
               },
               ... on Expense {
                 attachment
               }
               ... on Order {
                 paymentMethod {
-                  id,
+                  id
                   name
                 },
                 subscription {
-                  id,
+                  id
                   interval
                 }
               }
@@ -78,7 +77,7 @@ describe('graphql.transaction.test.js', () => {
       expect(order.createdByUser.id).to.equal(4348); // Nicole user
       expect(order.host.id).to.equal(9804); // wwcode host collective
       expect(order.createdByUser.email).to.equal(null); // can't see email if not logged in
-      expect(order.host.email).to.equal(null);
+      expect(order.host.slug).to.equal("wwcode");
     });
   });
 
@@ -88,28 +87,27 @@ describe('graphql.transaction.test.js', () => {
       const query = `
         query Transaction($id: Int!) {
           Transaction(id: $id) {
-            id,
-            type,
+            id
+            type
             createdByUser {
-              id,
-              firstName,
+              id
+              firstName
               email
             },
             host {
-              id,
-              firstName
-              email
+              id
+              slug
             },
             ... on Expense {
               attachment
             }
             ... on Order {
               paymentMethod {
-                id,
+                id
                 name
               },
               subscription {
-                id,
+                id
                 interval
               }
             }
@@ -130,7 +128,7 @@ describe('graphql.transaction.test.js', () => {
       const query = `
         query allTransactions($CollectiveId: Int!, $limit: Int, $offset: Int, $type: String) {
           allTransactions(CollectiveId: $CollectiveId, limit: $limit, offset: $offset, type: $type) {
-            id,
+            id
             type
           }
         }
@@ -200,10 +198,10 @@ describe('graphql.transaction.test.js', () => {
       const query = `
         query allTransactions($CollectiveId: Int!, $limit: Int, $offset: Int) {
           allTransactions(CollectiveId: $CollectiveId, limit: $limit, offset: $offset) {
-            id,
-            type,
+            id
+            type
             createdByUser {
-              id,
+              id
               firstName
               lastName
               email
@@ -217,20 +215,19 @@ describe('graphql.transaction.test.js', () => {
               slug
             }
             host {
-              id,
-              name
-              email
+              id
+              slug
             },
             ... on Expense {
               attachment
             }
             ... on Order {
               paymentMethod {
-                id,
+                id
                 name
               },
               subscription {
-                id,
+                id
                 interval
               }
             }
@@ -245,15 +242,13 @@ describe('graphql.transaction.test.js', () => {
       expect(transactions[0].id).to.equal(9595);
       const expense = transactions.find(t => t.type === 'DEBIT');
       expect(expense.attachment).to.equal(null);
-      return models.User.findOne({ where: { id: expense.createdByUser.id } }).then(async (user) => {
-        const result2 = await utils.graphqlQuery(query, { CollectiveId: 2 }, user);
-        result2.errors && console.error(result2.errors[0]);
-        const transactions2 = result2.data.allTransactions;
-        expect(result.errors).to.not.exist;
-        const expense2 = transactions2.find(t => t.type === 'DEBIT');
-        expect(expense2.attachment).to.equal('******');
-      })
-      
+      const user = await models.User.findOne({ where: { id: expense.createdByUser.id } });
+      const result2 = await utils.graphqlQuery(query, { CollectiveId: 2 }, user);
+      result2.errors && console.error(result2.errors[0]);
+      const transactions2 = result2.data.allTransactions;
+      expect(result.errors).to.not.exist;
+      const expense2 = transactions2.find(t => t.type === 'DEBIT');
+      expect(expense2.attachment).to.equal('******');      
     });
   });
 });
