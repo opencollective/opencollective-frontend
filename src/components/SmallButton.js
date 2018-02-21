@@ -52,6 +52,16 @@ class SmallButton extends React.Component {
             border: solid 2px #e63956;
             color: white;
           }
+          .SmallButton.no button {
+            background: white;
+            border-color: ${colors.bgBlue};
+            color: ${colors.bgBlue};
+          }
+          .SmallButton.yes button {
+            background: ${colors.bgBlue};
+            border-color: ${colors.bgBlue};
+            color: white;
+          }
         `}</style>
         <Button {...this.props}>{this.props.children}</Button>
       </div>);

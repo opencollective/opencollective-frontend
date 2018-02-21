@@ -37,11 +37,9 @@ class EditPaymentMethods extends React.Component {
   }
 
   editPaymentMethod(index, obj) {
-    console.log(">>> editPaymentMethod", index, obj);
     if (obj === null) return this.removePaymentMethod(index);
     const paymentMethods = [...this.state.paymentMethods];
     paymentMethods[index] = { ... paymentMethods[index], ...obj };
-    console.log(">>> payments methods", paymentMethods);
     this.setState({paymentMethods});
     this.onChange({paymentMethods});
   }
@@ -70,6 +68,7 @@ class EditPaymentMethods extends React.Component {
           editMode={paymentMethod.id ? false : true}
           monthlyLimitPerMember={collective.type === 'ORGANIZATION'}
           currency={collective.currency}
+          slug={collective.slug}
           />
       </div>
     );

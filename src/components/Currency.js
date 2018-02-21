@@ -6,7 +6,7 @@ export default ({value, currency, precision=0}) => (
     currency={currency}
     style='currency'
     currencyDisplay='symbol'
-    minimumFractionDigits={0}
+    minimumFractionDigits={precision}
     maximumFractionDigits={precision}
-    />
-);
+    />    
+);  

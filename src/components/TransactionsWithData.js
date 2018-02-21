@@ -6,7 +6,7 @@ import Transactions from '../components/Transactions';
 import { graphql } from 'react-apollo'
 import gql from 'graphql-tag'
 
-class TransactionsPage extends React.Component {
+class TransactionsWithData extends React.Component {
 
   static propTypes = {
     collective: PropTypes.object,
@@ -17,6 +17,12 @@ class TransactionsPage extends React.Component {
 
   constructor(props) {
     super(props);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (!this.props.LoggedInUser && nextProps.LoggedInUser) {
+      return this.props.data.refetch();
+    }
   }
 
   render() {
@@ -125,4 +131,4 @@ export const addTransactionsData = graphql(getTransactionsQuery, {
 });
 
 
-export default addTransactionsData(withIntl(TransactionsPage));
+export default addTransactionsData(withIntl(TransactionsWithData));

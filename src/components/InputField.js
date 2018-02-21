@@ -78,7 +78,8 @@ class InputField extends React.Component {
     className: PropTypes.string,
     type: PropTypes.string,
     onChange: PropTypes.func.isRequired,
-    required: PropTypes.bool
+    required: PropTypes.bool,
+    style: PropTypes.object
   }
 
   constructor(props) {
@@ -137,14 +138,14 @@ class InputField extends React.Component {
                               {capitalize(field.label)}
                             </Col>
                             <Col sm={10}>
-                              <InputTypeCreditCard options={field.options} onChange={this.handleChange} />                   
+                              <InputTypeCreditCard options={field.options} onChange={this.handleChange} style={this.props.style}/>                   
                             </Col>
                           </div>
                         }
                         {field.className !== 'horizontal' &&
                           <div>
                             <ControlLabel>{capitalize(field.label)}</ControlLabel>
-                            <InputTypeCreditCard onChange={this.handleChange} />                   
+                            <InputTypeCreditCard onChange={this.handleChange} style={this.props.style}/>                   
                           </div>
                         }
                       </FormGroup>)

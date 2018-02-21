@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import Router from 'next/router';
 
 import { Row, Col, Checkbox, Button, Form } from 'react-bootstrap';
 import { defineMessages, FormattedMessage } from 'react-intl';
@@ -12,7 +13,8 @@ class EditPaymentMethod extends React.Component {
   static propTypes = {
     paymentMethod: PropTypes.object.isRequired,
     onChange: PropTypes.func.isRequired,
-    editMode: PropTypes.bool
+    editMode: PropTypes.bool,
+    slug: PropTypes.string
   };
 
   constructor(props) {
@@ -45,7 +47,7 @@ class EditPaymentMethod extends React.Component {
 
   render() {
     const { intl, paymentMethod, currency } = this.props;
-    const label = paymentMethod.data && `💳  \xA0\xA0${paymentMethod.data.brand} ${paymentMethod.data.funding} ${paymentMethod.name} - exp ${paymentMethod.data.expMonth}/${paymentMethod.data.expYear}`;
+    const label = paymentMethod.data && `💳  \xA0\xA0${paymentMethod.data.brand} ${paymentMethod.name} - exp ${paymentMethod.data.expMonth}/${paymentMethod.data.expYear}`;
     return (
       <div className="EditPaymentMethod">
         <style global jsx>{`
@@ -75,7 +77,7 @@ class EditPaymentMethod extends React.Component {
                       { paymentMethod.orders.length > 0 &&
                         <div className="actions">
                           <FormattedMessage id="paymentMethod.activeSubscriptions" defaultMessage="{n} active {n, plural, one {subscription} other {subscriptions}}" values={{ n: paymentMethod.orders.length }} />&nbsp; 
-                          <Button bsStyle="default" bsSize="xsmall" href="/subscriptions">{intl.formatMessage(this.messages[`paymentMethod.editSubscriptions`])}</Button>
+                          <Button bsStyle="default" bsSize="xsmall" onClick={() => Router.push(`/subscriptions?collectiveSlug=${this.props.slug}`, `/subscriptions/${this.props.slug}`)}>{intl.formatMessage(this.messages[`paymentMethod.editSubscriptions`])}</Button>
                         </div>
                       }
                       { paymentMethod.orders.length === 0 &&

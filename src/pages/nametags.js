@@ -233,7 +233,6 @@ query Collective($slug: String!) {
       id
       createdAt
       quantity
-      processedAt
       description
       fromCollective {
         id
