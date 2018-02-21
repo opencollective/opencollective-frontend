@@ -214,7 +214,7 @@ class MenuBar extends React.Component {
           <div className="admin">
             <div className="separator" />
             <div className="item editCollective">
-              <Link route={`/${collective.slug}/edit`}>
+              <Link route={`${collective.path}/edit`}>
                 <div className="icon edit" />
                 { intl.formatMessage(this.messages[`menu.edit.${collective.type.toLowerCase()}`])}
               </Link>
