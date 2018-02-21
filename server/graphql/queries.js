@@ -75,18 +75,23 @@ const queries = {
   allTransactions: {
     type: new GraphQLList(TransactionInterfaceType),
     args: {
-      CollectiveId: { type: new GraphQLNonNull(GraphQLInt) },
+      CollectiveId: { type: GraphQLInt },
+      collectiveSlug: { type: GraphQLString },
       type: { type: GraphQLString },
       limit: { type: GraphQLInt },
       offset: { type: GraphQLInt },
       dateFrom: { type: GraphQLString },
       dateTo: { type: GraphQLString },
     },
-    resolve(_, args) {
+    async resolve(_, args) {
       const query = {
-        where: { CollectiveId: args.CollectiveId },
+        where: {},
         order: [ ['createdAt', 'DESC'] ]
       };
+
+      const CollectiveId = args.CollectiveId || await fetchCollectiveId(args.collectiveSlug);
+
+      if (CollectiveId) query.where.CollectiveId = CollectiveId;
       if (args.type) query.where.type = args.type;
       if (args.limit) query.limit = args.limit;
       if (args.offset) query.offset = args.offset;
