@@ -40,11 +40,8 @@ class Event extends React.Component {
     this.updateOrder = this.updateOrder.bind(this);
     this.resetResponse = this.resetResponse.bind(this);
     this.handleOrderTier = this.handleOrderTier.bind(this);
-    this.createOrder = this.createOrder.bind(this);
-    this.closeModal = this.closeModal.bind(this);
 
     this.state = {
-      view: 'default',
       showInterestedForm: false,
       order: { tier: {} },
       tierInfo: {},
@@ -103,33 +100,6 @@ class Event extends React.Component {
     }
   }
 
-  async createOrder(order) {
-    order.tier = order.tier || {};
-    const OrderInputType = {
-      ...order,
-      collective: { slug: this.event.slug },
-      tier: { id: order.tier.id }
-    };
-    this.setState( { status: 'loading' });
-    try {
-      await this.props.createOrder(OrderInputType);
-      this.setState({ status: 'idle', order, view: 'default', modal: 'TicketsConfirmed' });
-    } catch (err) {
-      console.error(">>> createOrder error: ", err);
-      this.setState({ status: 'error', error: err.graphQLErrors[0].message });
-      throw new Error(err.graphQLErrors[0].message);
-    }
-  }
-
-  closeModal() {
-    this.setState({ modal: null });
-  }
-
-  changeView(view) {
-    this.setState({ view });
-    window.scrollTo(0,0);
-  }
-
   error(msg) {
     this.setState({ status: 'error', error: msg });
     setTimeout(() => {
@@ -139,7 +109,6 @@ class Event extends React.Component {
 
   resetResponse() {
     this.setState({ response: {} });
-    this.changeView('default');
   }
 
   updateOrder(tier) {
@@ -248,11 +217,6 @@ class Event extends React.Component {
             margin: 4rem auto;
           }
         `}</style>
-        <TicketsConfirmed
-          show={this.state.modal === 'TicketsConfirmed'}
-          onClose={this.closeModal}
-          event={event}
-          response={this.state.order} />
 
         <div className="EventPage">
 
@@ -271,95 +235,78 @@ class Event extends React.Component {
 
               <NotificationBar status={this.state.status} error={this.state.error} />
 
-              {this.state.view === 'default' &&
-                <CollectiveCover
-                  collective={event}
-                  title={event.name}
-                  description={info}
-                  LoggedInUser={LoggedInUser}
-                  href={`/${event.parentCollective.slug}`}
-                  style={get(event, 'settings.style.hero.cover') || get(event.parentCollective, 'settings.style.hero.cover')}
-                  />
-              }
+              <CollectiveCover
+                collective={event}
+                title={event.name}
+                description={info}
+                LoggedInUser={LoggedInUser}
+                href={`/${event.parentCollective.slug}`}
+                style={get(event, 'settings.style.hero.cover') || get(event.parentCollective, 'settings.style.hero.cover')}
+                />
 
-              {this.state.showInterestedForm &&
+              { this.state.showInterestedForm &&
                 <InterestedForm onSubmit={this.setInterested} />
               }
 
-              {this.state.view == 'GetTicket' &&
-                <div className="content" >              
-                  <OrderForm
-                    collective={event}
-                    onSubmit={this.createOrder}
-                    quantity={this.state.order.quantity}
-                    tier={this.state.order.tier || event.tiers[0]}
-                    LoggedInUser={LoggedInUser}
-                    />
-                </div>
-              }
-
-              {this.state.view == 'default' &&
-                <div>
-                  <div className="content" >
-                    <div className="eventDescription" >
-                      <Markdown source={event.description || event.longDescription} escapeHtml={false} />
-                    </div>
-
-                    <section id="tickets">
-                      {event.tiers.map((tier) =>
-                        <Tier
-                          key={tier.id}
-                          className="tier"
-                          tier={tier}
-                          values={this.state.tierInfo[tier.id] || {}}
-                          onChange={(response) => this.updateOrder(response)}
-                          onClick={(response) => this.handleOrderTier(response)}
-                          />
-                      )}
-                    </section>
+              <div>
+                <div className="content" >
+                  <div className="eventDescription" >
+                    <Markdown source={event.description || event.longDescription} escapeHtml={false} />
                   </div>
 
-                  <Location location={event.location} />
-
-                  { responses.guests.length > 0 &&
-                    <section id="responses">
-                      <h1>
-                        <FormattedMessage id='event.responses.title.going' values={{n: responses.going.length}} defaultMessage={`{n} {n, plural, one {person going} other {people going}}`} />
-                        { responses.interested.length > 0 &&
-                          <span>
-                            <span> - </span>
-                            <FormattedMessage id='event.responses.title.interested' values={{n: responses.interested.length}} defaultMessage={`{n} interested`} />
-                          </span>
-                        }
-                      </h1>
-                      { canEditEvent &&
-                      <div className="adminActions" id="adminActions">
-                        <ul>
-                          <li><a href={`/${event.parentCollective.slug}/events/${event.slug}/nametags.pdf`}>Print name tags</a></li>
-                          <li><a href={`mailto:${event.slug}@${event.parentCollective.slug}.opencollective.com`}>Send email</a></li>
-                          <li><a onClick={ () => exportRSVPs(event) }>Export CSV</a></li>
-                        </ul>
-                      </div>
-                      }
-                      <Responses responses={responses.guests} />
-                    </section>
-                  }
-                  { responses.sponsors.length > 0 &&
-                    <section id="sponsors">
-                      <h1>
-                        <FormattedMessage id='event.sponsors.title' defaultMessage={`Sponsors`} />
-                      </h1>
-                      <Sponsors sponsors={responses.sponsors.map(r => {
-                        const user = Object.assign({}, r.user);
-                        user.tier = r.tier;
-                        user.createdAt = new Date(r.createdAt);
-                        return user;
-                      })} />
-                    </section>
-                  }
-
+                  <section id="tickets">
+                    { event.tiers.map((tier) =>
+                      <Tier
+                        key={tier.id}
+                        tier={tier}
+                        values={this.state.tierInfo[tier.id] || {}}
+                        onChange={(response) => this.updateOrder(response)}
+                        onClick={(response) => this.handleOrderTier(response)}
+                        />
+                    )}
+                  </section>
                 </div>
-              }
+
+                <Location location={event.location} />
+
+                { responses.guests.length > 0 &&
+                  <section id="responses">
+                    <h1>
+                      <FormattedMessage id='event.responses.title.going' values={{n: responses.going.length}} defaultMessage={`{n} {n, plural, one {person going} other {people going}}`} />
+                      { responses.interested.length > 0 &&
+                        <span>
+                          <span> - </span>
+                          <FormattedMessage id='event.responses.title.interested' values={{n: responses.interested.length}} defaultMessage={`{n} interested`} />
+                        </span>
+                      }
+                    </h1>
+                    { canEditEvent &&
+                    <div className="adminActions" id="adminActions">
+                      <ul>
+                        <li><a href={`/${event.parentCollective.slug}/events/${event.slug}/nametags.pdf`}>Print name tags</a></li>
+                        <li><a href={`mailto:${event.slug}@${event.parentCollective.slug}.opencollective.com`}>Send email</a></li>
+                        <li><a onClick={ () => exportRSVPs(event) }>Export CSV</a></li>
+                      </ul>
+                    </div>
+                    }
+                    <Responses responses={responses.guests} />
+                  </section>
+                }
+                { responses.sponsors.length > 0 &&
+                  <section id="sponsors">
+                    <h1>
+                      <FormattedMessage id='event.sponsors.title' defaultMessage={`Sponsors`} />
+                    </h1>
+                    <Sponsors sponsors={responses.sponsors.map(r => {
+                      const user = Object.assign({}, r.user);
+                      user.tier = r.tier;
+                      user.createdAt = new Date(r.createdAt);
+                      return user;
+                    })} />
+                  </section>
+                }
+
+              </div>
             </div>
           </Body>
           <Footer />
