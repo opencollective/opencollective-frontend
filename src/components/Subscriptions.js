@@ -29,7 +29,8 @@ class SubscriptionsWithData extends React.Component {
     super(props);
 
     this.messages = defineMessages({
-      'subscription.canceled.label': { id: 'subscription.cancelled.label', defaultMessage: 'Cancelled Subscriptions'}
+      'subscription.canceled.label': { id: 'subscription.cancelled.label', defaultMessage: 'Cancelled Subscriptions'},
+      'subscription.login.message': { id: 'subscription.login.message', defaultMessage: 'Are these your subscriptions? Login above to edit them'},
     })
   }
 
@@ -50,6 +51,10 @@ class SubscriptionsWithData extends React.Component {
     const activeSubs = subscriptions.filter(s => s.isSubscriptionActive).sort((s1, s2) => s1.id < s2.id);
     const canceledSubs = subscriptions.filter(s => !s.isSubscriptionActive).sort((s1, s2) => s1.id < s2.id)
 
+    let userString = `${collective.name || collective.slug} isn't`;
+    if (LoggedInUser && LoggedInUser.canEditCollective(collective)) {
+      userString = 'you aren\'t';
+    }
     return (
       <div className="Subscriptions">
         <style jsx>{`
@@ -98,9 +103,22 @@ class SubscriptionsWithData extends React.Component {
           }
           .subscriptions-noactive {
             text-align: left;
-            font-weight: 500;
-            font-size: 24px;
+            font-weight: 300;
+            font-size: 18px;
             margin-top: 50px;
+            text-align: center;
+            margin-bottom: 70px;
+          }
+          .subscriptions-noactive-image {
+            padding-left: 36px;
+          }
+          .subscriptions-noactive-text {
+            padding-top: 2rem;
+            width: 100%;
+          }
+          .subscriptions-noactive-link {
+            padding-top: 1rem;
+            padding-left: 104px;
           }
         `}</style>
 
@@ -117,7 +135,15 @@ class SubscriptionsWithData extends React.Component {
         </div>
         {activeSubs.length === 0 && 
           <div className='subscriptions-noactive'>
-            No active subscriptions. <a href='/discover'>Discover more collectives</a>.
+            <img className='subscriptions-noactive-image' src='/static/images/no-subscription-placeholder.svg' />
+            <div className='subscriptions-noactive-text'> Looks like {userString} contributing right now.</div>
+            <div className='subscriptions-noactive-link'> 
+              <a href='/discover'>Discover more collectives</a>
+            </div>
+          </div>}
+        {activeSubs.length > 1 && !LoggedInUser &&
+          <div className='subscriptions-login-message'>
+            {intl.formatMessage(this.messages['subscription.login.message'])}
           </div>}
         { canceledSubs.length > 0 && <div className="subscriptions-cancelled-label"> <span>{intl.formatMessage(this.messages['subscription.canceled.label'])} </span></div>}
         <div className='canceled'>
