@@ -377,7 +377,6 @@ const getEventCollectiveQuery = gql`
         id
         createdAt
         quantity
-        processedAt
         publicMessage
         fromCollective {
           id
@@ -420,6 +419,9 @@ const getCollectiveCoverQuery = gql`
         events
         yearlyBudget
       }
+      createdByUser {
+        id
+      }
       host {
         id
         slug
@@ -456,6 +458,89 @@ export const getPrepaidCardBalanceQuery = gql`
   }
 `;
 
+export const getSubscriptionsQuery = gql`
+  query Collective($slug: String!) {
+    Collective(slug: $slug) {
+      id
+      type
+      slug
+      createdByUser {
+        id
+      }
+      name
+      company
+      image
+      backgroundImage
+      description
+      twitterHandle
+      website
+      currency
+      settings
+      createdAt
+      stats {
+        id
+        totalAmountSent
+        totalAmountRaised
+      }
+      ordersFromCollective (subscriptionsOnly: true) {
+        id
+        currency
+        totalAmount
+        interval
+        createdAt
+        isSubscriptionActive
+        isPastDue
+        collective {
+          id
+          name
+          currency
+          slug
+          type
+          image
+          description
+          longDescription
+          backgroundImage
+        }
+        fromCollective {
+          id
+          slug
+          createdByUser {
+            id
+          }
+        }
+        paymentMethod {
+          id
+          uuid
+          data
+          name
+        }
+      }
+      paymentMethods {
+        id
+        uuid
+        service
+        type
+        data
+        name
+      }
+      ... on User {
+        memberOf(limit: 60) {
+          id
+          role
+          createdAt
+          stats {
+            totalDonations
+            totalRaised
+          }
+          collective {
+            id
+          }
+        }
+      }
+    }
+  }
+`;
+
 export const addCollectiveData = graphql(getCollectiveQuery);
 export const addCollectiveCoverData = graphql(getCollectiveCoverQuery, {
   options(props) {
@@ -469,6 +554,7 @@ export const addCollectiveCoverData = graphql(getCollectiveCoverQuery, {
 export const addCollectiveToEditData = graphql(getCollectiveToEditQuery);
 export const addEventCollectiveData = graphql(getEventCollectiveQuery);
 export const addTiersData = graphql(getTiersQuery);
+export const addSubscriptionsData = graphql(getSubscriptionsQuery);
 
 const refreshLoggedInUser = async (data) => {
   let res;
@@ -490,7 +576,6 @@ const refreshLoggedInUser = async (data) => {
     const user = new LoggedInUser(res.data.LoggedInUser);
     const endTime = new Date;
     const elapsedTime = Math.round((endTime.getTime() - startTime.getTime()) / 1000);
-    console.info(`>>> LoggedInUser fetched in ${elapsedTime} seconds`);
     storage.set("LoggedInUser", user, 1000 * 60 * 60);
     return user;
   } catch (e) {

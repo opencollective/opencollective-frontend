@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="13px" height="3px" viewBox="0 0 13 3" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 48.2 (47327) - http://www.bohemiancoding.com/sketch -->
+    <title>glyph-more</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="M-::-User-›-Subscriptions-(card-update)" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" transform="translate(-435.000000, -1228.000000)" opacity="0.7">
+        <g id="dots-glyph-more" transform="translate(160.000000, 223.000000)" fill="#000000" fill-rule="nonzero">
+            <g id="::-one-time" transform="translate(0.000000, 928.000000)">
+                <g id="::-07" transform="translate(16.000000, 55.000000)">
+                    <g id="::-more" transform="translate(254.000000, 12.000000)">
+                        <path d="M6.5,10 C5.67,10 5,10.67 5,11.5 C5,12.33 5.67,13 6.5,13 C7.33,13 8,12.33 8,11.5 C8,10.67 7.33,10 6.5,10 Z M16.5,10 C15.67,10 15,10.67 15,11.5 C15,12.33 15.67,13 16.5,13 C17.33,13 18,12.33 18,11.5 C18,10.67 17.33,10 16.5,10 Z M11.5,10 C10.67,10 10,10.67 10,11.5 C10,12.33 10.67,13 11.5,13 C12.33,13 13,12.33 13,11.5 C13,10.67 12.33,10 11.5,10 Z" id="glyph-more"></path>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

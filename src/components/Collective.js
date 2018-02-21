@@ -111,6 +111,7 @@ class Collective extends React.Component {
 
   render() {
     const { intl, LoggedInUser, query } = this.props;
+
     const donateParams = { collectiveSlug: this.collective.slug, verb: 'donate' };
     if (query.referral) {
       donateParams.referral = query.referral;

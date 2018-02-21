@@ -3,6 +3,8 @@ import PropTypes from 'prop-types';
 import { ButtonGroup, Button } from 'react-bootstrap';
 import { FormattedMessage } from 'react-intl';
 
+import withIntl from '../lib/withIntl';
+
 import colors from '../constants/colors';
 import Transaction from './Transaction';
 import TransactionsExportPopoverAndButton from './TransactionsExportPopoverAndButton';
@@ -148,4 +150,4 @@ class Transactions extends React.Component {
   }
 }
 
-export default Transactions;
+export default withIntl(Transactions);

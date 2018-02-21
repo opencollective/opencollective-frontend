@@ -34,7 +34,6 @@ class ActionPage extends React.Component {
 
   async componentDidMount() {
     const { getLoggedInUser } = this.props;
-    console.log(">>> performing", this.mutation, this.props[this.mutation]);
     try {
       const res = await this.props[this.mutation](this.props.id);
       console.log(">>> res", JSON.stringify(res));
@@ -43,9 +42,7 @@ class ActionPage extends React.Component {
       console.log(">>> error", JSON.stringify(error));
       this.setState({ loading: false, error: error.graphQLErrors[0] });
     }
-    console.log(">>> fetching logged in user");
     const LoggedInUser = getLoggedInUser && await getLoggedInUser(this.props.collectiveSlug);
-    console.log(">>> LoggedInUser fetched: ", LoggedInUser);
     this.setState({ LoggedInUser });
   }
 

@@ -11,7 +11,6 @@ function get(key) {
   if (!entry) return;
   try {
     const obj = JSON.parse(entry);
-    console.log(">>> storage: object found for ", key, obj);
     if (Number(obj.expire) < Date.now()) {
       console.error(">>> entry for ", key, "has expired");
       return;

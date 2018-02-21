@@ -1,17 +1,19 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { defineMessages, injectIntl, FormattedNumber } from 'react-intl';
+import { defineMessages, FormattedNumber } from 'react-intl';
 import { capitalize } from '../lib/utils';
 import { get } from 'lodash';
 import TransactionDetails from './TransactionDetails';
 import Avatar from './Avatar';
+import withIntl from '../lib/withIntl';
+
 
 class Transaction extends React.Component {
 
   static propTypes = {
     collective: PropTypes.object,
     transaction: PropTypes.object,
-    LoggedInUser: PropTypes.object
+    LoggedInUser: PropTypes.object,
   }
 
   constructor(props) {
@@ -118,7 +120,7 @@ class Transaction extends React.Component {
         `}</style>
         <div className="fromCollective">
           <a href={`/${transaction.fromCollective.slug}`} title={transaction.fromCollective.name}>
-            <Avatar src={transaction.fromCollective.image} key={transaction.fromCollective.id} radius={40} />
+            <Avatar src={transaction.fromCollective.image} key={transaction.fromCollective.id} id={transaction.fromCollective.id} radius={40} />
           </a>
         </div>
         <div className="body">
@@ -151,4 +153,4 @@ class Transaction extends React.Component {
   }
 }
 
-export default injectIntl(Transaction);
+export default withIntl(Transaction);
