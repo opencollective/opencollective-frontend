@@ -52,14 +52,30 @@ class PaymentMethodChooser extends React.Component {
   }
 
   componentWillReceiveProps(newProps) {
-    // TODO: hacky fixes for state machine
-    // Most likely need to rework the component
-    this.setState({ modified: newProps.paymentMethodInUse.name ? false : true})
+    // TODO: Remove these hacky fixes
+    // Most likely means need to rework the logic split between this and SubscriptionCard component
+
+    const { paymentMethodInUse, paymentMethodsList, editMode } = newProps;
+
+    if (!paymentMethodInUse.name) {
+      // set state to modified
+      this.setState({ modified: true })
+      // If there was an existing card, select that
+      if (paymentMethodsList.length > 0) {
+        this.handleChange({ uuid: paymentMethodsList[0].uuid });
+      }
+    }
 
     // hack to revert back to cc selector
-    if (!this.props.editMode && newProps.editMode) {
+    if (!this.props.editMode && editMode) {
       this.setState({ showNewCreditCardForm: false });
     }
+
+    // handles the case where there are no existing credit cards
+    if (paymentMethodsList.length === 0 && editMode) {
+      this.setState({ showNewCreditCardForm: true});
+    }
+
   }
 
   resetForm() {
@@ -209,7 +225,6 @@ class PaymentMethodChooser extends React.Component {
         }
         .PaymentMethodChooser .form-control {
           font-size: 11px;
-          height: 25px;
         }
 
         .PaymentMethodChooser .horizontal.form-group {
