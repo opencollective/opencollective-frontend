@@ -51,7 +51,7 @@ describe("event.create.test.js", () => {
     cy.get('#tickets .tier').should("have.length", 2);
     cy.get('#tickets .tier:nth-child(1) .amount').contains(15);
     cy.get(".desktopOnly .editCollective a").click();
-    cy.wait(300);
+    cy.wait(500);
     cy.get(".inputs .inputField.name input").type(`{selectall}${updatedTitle}`);
     cy.get(".EditTiers .tier:nth-child(2) .removeTier").click();
     cy.wait(300);
