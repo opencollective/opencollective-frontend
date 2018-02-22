@@ -60,6 +60,12 @@ class PaymentMethodChooser extends React.Component {
     if (!this.props.editMode && newProps.editMode) {
       this.setState({ showNewCreditCardForm: false });
     }
+
+    // handles the case where there are no existing credit cards
+    if (newProps.paymentMethodsList.length === 0 && newProps.editMode) {
+      this.setState({ showNewCreditCardForm: true});
+    }
+
   }
 
   resetForm() {
