@@ -16,7 +16,7 @@ import { FormattedMessage, defineMessages } from 'react-intl';
 import CollectivesWithData from './CollectivesWithData';
 import ExpensesSection from './ExpensesSection';
 import UpdatesSection from './UpdatesSection';
-import EventsWithData from './EventsWithData';
+import EventsSection from './EventsSection';
 import TransactionsWithData from './TransactionsWithData';
 import { Button } from 'react-bootstrap';
 import { Link } from '../server/pages';
@@ -229,12 +229,10 @@ class Collective extends React.Component {
                   }
 
                   { (get(this.collective, 'stats.events') > 0 || canEditCollective) &&
-                    <section id="events">
-                      <SectionTitle section="events" />
-                      <div className="eventsList">
-                        <EventsWithData collectiveSlug={this.collective.slug} />
-                      </div>
-                    </section>
+                    <EventsSection
+                      LoggedInUser={LoggedInUser}
+                      collective={this.collective}
+                      />
                   }
                   <section id="about" className="longDescription" >
                     <SectionTitle

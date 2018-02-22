@@ -182,6 +182,7 @@ class EditEventForm extends React.Component {
           </div>
           <EditTiers
             title="Tickets"
+            types={['TIER','TICKET','DONATION']}
             tiers={this.state.tiers}
             collective={{...event, type: 'EVENT' }}
             currency={event.parentCollective.currency}
