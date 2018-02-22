@@ -25,6 +25,8 @@ class SectionTitle extends React.Component {
       'events.subtitle': { id: 'section.events.subtitle', defaultMessage: 'Meet the community!' },
       'budget.title': { id: 'section.budget.title', defaultMessage: 'Budget' },
       'budget.subtitle': { id: 'section.budget.subtitle', defaultMessage: 'Current balance: {balance}' },
+      'expenses.title': { id: 'section.expenses.title', defaultMessage: 'Expenses' },
+      'expenses.subtitle': { id: 'section.expenses.subtitle', defaultMessage: 'All expenses' },
       'contributors.title': { id: 'section.contributors.title', defaultMessage: 'Contributors' },
       'contributors.subtitle': { id: 'section.contributors.subtitle', defaultMessage: `{organizations, plural, one {{organizations} organization and} other {{organizations} organizations and}} {users} {users, plural, one {person is} other {people are}} supporting us.` },
       'contributionDetails.title': { id: 'tier.order.contributionDetails', defaultMessage: 'Contribution details' },

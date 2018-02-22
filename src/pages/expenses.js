@@ -14,12 +14,13 @@ import ExpensesStatsWithData from '../components/ExpensesStatsWithData';
 import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl'
 import Button from '../components/Button';
+import SectionTitle from '../components/SectionTitle';
 
 class ExpensesPage extends React.Component {
 
   static getInitialProps (props) {
-    const { query: { collectiveSlug, category }, data } = props;
-    return { slug: collectiveSlug, data, category }
+    const { query: { collectiveSlug, filter, value }, data } = props;
+    return { slug: collectiveSlug, data, filter, value }
   }
 
   constructor(props) {
@@ -34,18 +35,37 @@ class ExpensesPage extends React.Component {
   }
 
   render() {
-    const { data, category } = this.props;
+    const { data } = this.props;
     const { LoggedInUser } = this.state;
-
+    
     if (!data.loading && !data.Collective) return (<Loading />);
     if (!data.Collective) return (<NotFound />);
-
+    
     if (data.error) {
       console.error("graphql error>>>", data.error.message);
       return (<ErrorPage message="GraphQL error" />)
     }
 
     const collective = data.Collective;
+
+    let action, subtitle, filter;
+    if (this.props.value) {
+      action = {
+        label: <FormattedMessage id="expenses.viewAll" defaultMessage="View All Expenses" />,
+        href: `/${collective.slug}/expenses`
+      }
+
+      if (this.props.filter === 'categories') {
+        const category = decodeURIComponent(this.props.value);
+        filter = { category };
+        subtitle = <FormattedMessage id="expenses.byCategory" defaultMessage="Expenses in {category}" values={{category }} />
+      }
+      if (this.props.filter === 'recipients') {
+        const recipient = decodeURIComponent(this.props.value);
+        filter = { recipient };
+        subtitle = <FormattedMessage id="expenses.byRecipient" defaultMessage="Expenses by {recipient}" values={{recipient}} />
+      }
+    }
 
     return (
       <div className="ExpensesPage">
@@ -95,20 +115,25 @@ class ExpensesPage extends React.Component {
             LoggedInUser={LoggedInUser}
             />
 
-          <div className="content columns" >
+          <div className="content" >
 
-            <div className="col large">
-              <ExpensesWithData
-                collective={collective}
-                category={category}
-                LoggedInUser={this.state.LoggedInUser}
-                />
+            <SectionTitle section="expenses" subtitle={subtitle} action={action} />
+
+            <div className=" columns" >
+
+              <div className="col large">
+                <ExpensesWithData
+                  collective={collective}
+                  LoggedInUser={this.state.LoggedInUser}
+                  filter={filter}
+                  />
+              </div>
+
+              <div className="col side">
+                <ExpensesStatsWithData slug={collective.slug} />
+              </div>
+
             </div>
-
-            <div className="col side">
-              <ExpensesStatsWithData slug={collective.slug} />
-            </div>
-
           </div>
 
         </Body>

@@ -10,7 +10,7 @@ import ExpenseDetails from './ExpenseDetails';
 import ApproveExpenseBtn from './ApproveExpenseBtn';
 import RejectExpenseBtn from './RejectExpenseBtn';
 import PayExpenseBtn from './PayExpenseBtn';
-import { Link } from '../server/pages';
+import Link from './Link';
 import SmallButton from './SmallButton';
 
 class Expense extends React.Component {

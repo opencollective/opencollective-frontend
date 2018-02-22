@@ -31,7 +31,7 @@ pages
   .add('updates', '/:collectiveSlug/updates')
   .add('update', '/:collectiveSlug/updates/:updateSlug')
   .add('createExpense', '/:collectiveSlug/expenses/new')
-  .add('expenses', '/:collectiveSlug/expenses/:category?')
+  .add('expenses', '/:collectiveSlug/expenses/:filter(categories|recipients)?/:value?')
   .add('host.expenses', '/:hostCollectiveSlug/collectives/expenses')
   .add('host.expenses.approve', '/:collectiveSlug/:table(expenses)/:id/:action(approve|reject)', 'action')
   .add('host.collectives.approve', '/:hostCollectiveSlug/:table(collectives)/:id/:action(approve)', 'action')
