@@ -177,11 +177,20 @@ const queries = {
       includeHostedCollectives: { type: GraphQLBoolean },
       status: { type: GraphQLString },
       category: { type: GraphQLString },
+      FromCollectiveId: { type: GraphQLInt },
+      fromCollectiveSlug: { type: GraphQLString },
       limit: { type: GraphQLInt },
       offset: { type: GraphQLInt }
     },
-    resolve(_, args, req) {
+    async resolve(_, args, req) {
       const query = { where: {} };
+      if (args.fromCollectiveSlug && !args.FromCollectiveId) {
+        args.FromCollectiveId = await fetchCollectiveId(args.fromCollectiveSlug);
+      }
+      if (args.FromCollectiveId) {
+        const user = await models.User.findOne({ attributes: ['id'], where: { CollectiveId: args.FromCollectiveId }});
+        query.where.UserId = user.id;
+      }
       if (args.status) query.where.status = args.status;
       if (args.category) query.where.category = { $iLike: args.category };
       if (args.limit) query.limit = args.limit;
