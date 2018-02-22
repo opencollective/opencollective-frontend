@@ -52,12 +52,13 @@ describe("event.create.test.js", () => {
     cy.get('#tickets .tier:nth-child(1) .amount').contains(15);
     cy.wait(300);
     cy.get(".desktopOnly .editCollective a").click();
-    cy.wait(300);
-    cy.get(".inputs .inputField.name input").type(`{selectall}${updatedTitle}`);
+    cy.wait(500);
+    cy.get(".inputs .inputField.name input", { timeout: 10000 }).type(`{selectall}${updatedTitle}`);
     cy.get(".EditTiers .tier:nth-child(2) .removeTier").click();
     cy.wait(300);
     cy.get('.actions button').click();
     cy.wait(1000);
+    cy.reload(true);
     cy.get('#tickets .tier').should("have.length", 1);
     cy.get('.CollectiveCover h1').contains(updatedTitle);
   })
