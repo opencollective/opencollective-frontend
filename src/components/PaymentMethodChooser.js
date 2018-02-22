@@ -215,7 +215,6 @@ class PaymentMethodChooser extends React.Component {
         }
         .PaymentMethodChooser .form-control {
           font-size: 11px;
-          height: 25px;
         }
 
         .PaymentMethodChooser .horizontal.form-group {
