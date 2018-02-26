@@ -82,6 +82,7 @@ class EditEventForm extends React.Component {
     this.fields = [
       {
         name: 'name',
+        maxLength: 255,
         placeholder: ''
       },
       {

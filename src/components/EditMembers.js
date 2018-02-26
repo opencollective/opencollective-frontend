@@ -57,6 +57,7 @@ class EditMembers extends React.Component {
       },
       {
         name: 'member.name',
+        maxLength: 255,
         disabled: (member) => (member.id > 0),
         label: intl.formatMessage(this.messages['user.name.label'])
       },
@@ -68,6 +69,7 @@ class EditMembers extends React.Component {
       },
       {
         name: 'description',
+        maxLength: 255,
         label: intl.formatMessage(this.messages['user.description.label'])
       }
     ];
