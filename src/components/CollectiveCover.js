@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import withIntl from '../lib/withIntl';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import { Link } from '../server/pages';
-import { union, get } from 'lodash';
+import { union, get, uniqBy } from 'lodash';
 import { prettyUrl, formatCurrency, imagePreview } from '../lib/utils';
 import { Router } from '../server/pages';
 import Currency from './Currency';
@@ -91,7 +91,7 @@ ${description}`
       const members = collective.members.filter(m => m.role === 'MEMBER');
       const backers = collective.members.filter(m => m.role === 'BACKER');
       backers.sort((a, b) => b.stats && b.stats.totalDonations - a.stats && a.stats.totalDonations);
-      membersPreview = union(admins, members, backers).filter(m => m.member).slice(0, 5);
+      membersPreview = uniqBy(union(admins, members, backers).filter(m => m.member), m => m.member.id).slice(0, 5);
     }
     const additionalBackers = (get(stats, 'backers.all') || (get(collective, 'members') || []).length) - membersPreview.length;
 
