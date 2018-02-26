@@ -56,28 +56,33 @@ class CreateCollectiveForm extends React.Component {
       info: [
         {
           name: 'name',
-          placeholder: ''
+          placeholder: '',
+          maxLength: 255
         },
         {
           name: 'company',
           placeholder: '',
+          maxLength: 255,
           when: () => collective.type === 'USER'
         },
         {
           name: 'description',
           type: 'text',
+          maxLength: 255,
           placeholder: ''
         },
         {
           name: 'twitterHandle',
           type: 'text',
           pre: 'https://twitter.com/',
+          maxLength: 255,
           placeholder: ''
         },
         {
           name: 'website',
           type: 'text',
           pre: 'http://',
+          maxLength: 255,
           placeholder: ''
         },
         {
