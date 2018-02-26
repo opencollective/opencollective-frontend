@@ -8,7 +8,7 @@ import { defineMessages, FormattedNumber, FormattedMessage } from 'react-intl';
 import withIntl from '../lib/withIntl';
 import { ButtonGroup, Button } from 'react-bootstrap';
 import InputField from './InputField';
-import { getCurrencySymbol, capitalize } from '../lib/utils';
+import { getCurrencySymbol, capitalize, formatCurrency } from '../lib/utils';
 import { get } from 'lodash';
 import Markdown from 'react-markdown';
 
