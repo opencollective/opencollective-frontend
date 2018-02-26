@@ -8,6 +8,7 @@ import { sequelize } from '../server/models';
 import {
   ordersWithPendingCharges,
   processOrderWithSubscription,
+  groupProcessedOrders,
 } from '../server/lib/subscriptions';
 
 const REPORT_EMAIL = 'ops@opencollective.com';
@@ -59,7 +60,7 @@ async function run(options) {
               filename: `${(new Date).toLocaleDateString()}.csv`,
               content: csv
             }];
-            await emailReport(start, orders, data, attachments);
+            await emailReport(start, orders, groupProcessedOrders(data), attachments);
           }
         }
       }
@@ -72,12 +73,12 @@ async function run(options) {
 /** Send an email with details of the subscriptions processed */
 async function emailReport(start, orders, data, attachments) {
   const icon = (err) => err ? '❌' : '✅';
-  let issuesFound = false;
   let result = [`Total Subscriptions pending charges found: ${orders.length}`, ''];
 
-  result = result.concat(data.map((i) => {
-    if (i.status === 'failure') issuesFound = true;
-    return ` ${i.status !== 'unattempted' ? icon(i.error) : ''} ` + [
+  // Add entries of each group to the result list
+  const printGroup = ([ name, { total, entries } ]) => {
+    result.push(`>>> ${entries.length} orders ${name} (sum of amounts: ${total})`);
+    result = result.concat(entries.map((i) => ` ${i.status !== 'unattempted' ? icon(i.error) : ''} ` + [
       `order: ${i.orderId}`,
       `subscription: ${i.subscriptionId}`,
       `amount: ${i.amount}`,
@@ -85,13 +86,23 @@ async function emailReport(start, orders, data, attachments) {
       `to: ${i.to}`,
       `status: ${i.status}`,
       `error: ${i.error}`,
-    ].join(', ');
-  }));
+    ].join(', ')));
+    result.push('');
+  };
 
-  const now = new Date;
-  const end = now - start;
+  // Iterate over grouped orders to populate the result list with
+  // details of each group
+  for (let group of data) printGroup(group);
+
+  // Time we spent running the whole script
+  const now = new Date, end = now - start;
   result.push(`\n\nTotal time taken: ${end}ms`);
+
+  // Subject line of the email
+  const issuesFound = data.get('canceled') || data.get('past_due');
   const subject = `${icon(issuesFound)} Daily Subscription Report - ${now.toLocaleDateString()}`;
+
+  // Actual send
   return emailLib.sendMessage(REPORT_EMAIL, subject, '', {
     bcc: ' ',
     text: result.join('\n'),

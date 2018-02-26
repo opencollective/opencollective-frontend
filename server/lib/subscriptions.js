@@ -175,6 +175,43 @@ export function cancelSubscription(order) {
   order.Subscription.deactivatedAt = new Date;
 }
 
+/** Group processed orders by their state
+ *
+ * This function groups a list of entries returned by the function
+ * `processOrderWithSubscription()`. Although they do contain
+ * information about the order processing, be aware that they aren't
+ * really model instances.
+ *
+ * There are two variables within each entry that decide which group
+ * they're going to belong to:
+ *
+ *  1. entry.status: If it's `success` then the entry is automatically
+ *     categorized within the group `charged`. If the value of this
+ *     field is `failure`, the other variable will be used in the
+ *     decision.
+ *
+ *  2. entry.retriesAfter: If that's less than MAX_RETRIES than the
+ *     entry is grouped under `past_due`. Otherwise, it's marked as
+ *     `canceled`.
+ */
+export function groupProcessedOrders(orders) {
+  return orders.reduce((map, value) => {
+    const key = value.status === 'success' ? 'charged' :
+          (value.retriesAfter >= MAX_RETRIES) ? 'canceled' : 'past_due';
+    const group = map.get(key);
+    if (group) {
+      group.total += value.amount;
+      group.entries.push(value);
+    } else {
+      map.set(key, {
+        total: value.amount,
+        entries: [value]
+      });
+    }
+    return map;
+  }, new Map);
+}
+
 /** Call cancelation function and then send confirmation email */
 export async function cancelSubscriptionAndNotifyUser(order) {
   cancelSubscription(order);

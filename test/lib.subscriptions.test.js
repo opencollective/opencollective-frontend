@@ -16,8 +16,8 @@ import {
   getChargeRetryCount,
   ordersWithPendingCharges,
   processOrderWithSubscription,
+  groupProcessedOrders,
 } from '../server/lib/subscriptions';
-
 
 async function createOrderWithSubscription(interval, date) {
   const payment = { amount: 1000, currency: 'USD', interval };
@@ -488,6 +488,43 @@ describe('LibSubscription', () => {
       // Then we get just one. The second one doesn't have a
       // subscription id
       expect(output.length).to.equal(1);
+    });
+  });
+
+  describe('#groupProcessedOrders', () => {
+    it('should group orders by their status charged, past due, and canceled', () => {
+      // Given three types of 
+      const data = [
+        { orderId: 1, status: 'success', amount: 1000, retriesAfter: 0 },
+        { orderId: 2, status: 'success', amount: 1000, retriesAfter: 0 },
+        { orderId: 3, status: 'failure', amount: 2000, retriesAfter: 1 },
+        { orderId: 4, status: 'failure', amount: 3000, retriesAfter: MAX_RETRIES }
+      ];
+
+      // When the orders are grouped by their different statuses
+      const groupedOrders = groupProcessedOrders(data);
+
+      // Then we see 3 groups in the iterator output
+      expect([...groupedOrders.keys()]).to.deep.equal(['charged', 'past_due', 'canceled']);
+
+      // And then we see that transaction OrderId=1 was successfuly charged
+      expect(groupedOrders.get('charged').total).to.equal(2000);
+      expect(groupedOrders.get('charged').entries.length).to.equal(2);
+      expect(groupedOrders.get('charged').entries[0].orderId).to.equal(1);
+      expect(groupedOrders.get('charged').entries[1].orderId).to.equal(2);
+
+      // And then we see that transaction OrderId=2 failed charging
+      // but it's still under MAX_RETRIES
+      expect(groupedOrders.get('past_due').total).to.equal(2000);
+      expect(groupedOrders.get('past_due').entries.length).to.equal(1);
+      expect(groupedOrders.get('past_due').entries[0].orderId).to.equal(3);
+
+      // And then we see that transaction OrderId=3 failed charging
+      // and it reached the maximum number of retries so it got
+      // canceled.
+      expect(groupedOrders.get('canceled').total).to.equal(3000);
+      expect(groupedOrders.get('canceled').entries.length).to.equal(1);
+      expect(groupedOrders.get('canceled').entries[0].orderId).to.equal(4);
     });
   });
 });
