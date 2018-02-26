@@ -10,6 +10,7 @@ import { ButtonGroup, Button } from 'react-bootstrap';
 import InputField from './InputField';
 import { getCurrencySymbol, capitalize } from '../lib/utils';
 import { get } from 'lodash';
+import Markdown from 'react-markdown';
 
 class Tier extends React.Component {
 
@@ -137,6 +138,10 @@ class Tier extends React.Component {
             position: relative;
             border: 1px solid ${colors.lightgray};
             color: ${colors.black};
+            box-shadow: 0 2px 4px 0 rgba(0,0,0,0.04);
+            border: solid 1px rgba(37,39,41,0.16);
+            border-radius: 8px;
+            padding: 2rem;
           }
           .header {
             margin: 1rem;
@@ -144,11 +149,27 @@ class Tier extends React.Component {
             justify-content: space-between;
           }
           .title {
-            font-size: 1.8rem;
+            font-size: 2.2rem;
+            color: var(--charcoal-grey-two);
+          }
+          .amount {
+            position: absolute;
+            top: 3rem;
+            right: 3rem;
+            font-family: Rubik;
+            font-size: 1.6rem;
+            font-weight: 500;
+            line-height: 1;
+            text-align: right;
+            color: #45484c;
+            color: var(--charcoal-grey-three);
+          }
+          .interval {
+            font-size: 1.2rem;
+            color: ${colors.darkgray};
           }
           .description {
-            margin: 1rem 1rem 2rem 1rem;
-            color: ${colors.darkgray};
+            margin: 0rem 1rem 1rem 1rem;
             font-size: 1.5rem;
           }
           .actions {
@@ -237,14 +258,22 @@ class Tier extends React.Component {
               <div className="title amount" >
                 { !amount && !presets && <FormattedMessage id="amount.free" defaultMessage="free" /> }
                 { amount > 0 && <Currency value={amount} currency={currency} /> }
-                { interval && '/' }
-                {interval && interval === 'month' && intl.formatMessage(this.messages[`interval.month`])}
-                {interval && interval === 'year' && intl.formatMessage(this.messages[`interval.year`])}
+                { interval &&
+                  <div className="interval">
+                    <FormattedMessage
+                      id="tier.interval"
+                      defaultMessage="per {interval, select, month {month} year {year} other {}}"
+                      values={{ interval }}
+                      />
+                  </div>
+                }
               </div>
             }
           </div>
           <div className="description">
-            {description}
+            { description && <Markdown source={description} /> }
+            { !description && <p><FormattedMessage id="tier.defaultDescription" defaultMessage="Become a {name} for {amount} per {interval} and help us sustain our activities!" values={{ name: tier.name, amount: formatCurrency(tier.amount, tier.currency), interval: tier.interval}}/></p> }
+
             { presets &&
               <div>
                 <div className="selectPreset inputRow">
