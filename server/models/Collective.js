@@ -1149,9 +1149,13 @@ export default function(Sequelize, DataTypes) {
 
     const where = { role: roles.HOST, CollectiveId: this.ParentCollectiveId || this.id };
     return models.Member.findOne({
-      attributes: ['MemberCollectiveId'],
-      where
-    }).then(member => member && member.MemberCollectiveId);
+        attributes: ['MemberCollectiveId'],
+        where
+      })
+      .then(member => {
+        this.HostCollectiveId = member && member.MemberCollectiveId;
+        return this.HostCollectiveId;
+      });
   };
 
   Collective.prototype.getHostStripeAccount = function() {

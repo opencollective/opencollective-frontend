@@ -9,12 +9,14 @@ if (process.env.NODE_ENV === 'production' && today.getDate() !== 1) {
 
 process.env.PORT = 3066;
 
+import config from 'config';
 import moment from 'moment';
 import Promise from 'bluebird';
 import debugLib from 'debug';
 import models from '../../server/models';
+import slackLib from '../../server/lib/slack';
 import twitter from '../../server/lib/twitter';
-import _, { pick, get } from 'lodash';
+import _, { pick, get, set } from 'lodash';
 const d = new Date;
 d.setMonth(d.getMonth() - 1);
 const month = moment(d).format('MMMM');
@@ -25,6 +27,15 @@ const endDate = new Date(d.getFullYear(), d.getMonth()+1, 1);
 console.log("startDate", startDate,"endDate", endDate);
 
 const debug = debugLib('monthlyreport');
+
+
+async function publishToSlack(message, webhookUrl, options) {
+  try {
+    return slackLib.postMessage(message, webhookUrl, options);
+  } catch (e) {
+    console.warn(`Unable to post to slack`, e);
+  }
+}
 
 const init = () => {
 
@@ -155,7 +166,17 @@ const sendTweet = async (twitterAccount, data) => {
   const template = stats.totalReceived === 0 ? 'monthlyStatsNoNewDonation' : 'monthlyStats';
   let tweet = await twitter.compileTweet(template, replacements);
   tweet += `\nhttps://opencollective.com/${data.collective.slug}`;
-  const res = await twitter.tweetStatus(twitterAccount, tweet);
+
+  // We thread the tweet with the previos monthly stats
+  const in_reply_to_tweet_id = get(twitterAccount, `settings.monthlyStats.lastTweetId`);
+  const res = await twitter.tweetStatus(twitterAccount, tweet, null, { in_reply_to_tweet_id });
+
+  // publish to slack.opencollective.com
+  await publishToSlack(res.url, config.slack.webhookUrl, { channel: config.slack.publicActivityChannel }); // TODO: check res.url
+
+  set(twitterAccount, `settings.monthlyStats.lastTweetId`, res.id_str);
+  set(twitterAccount, `settings.monthlyStats.lastTweetSentAt`, new Date); // TODO: check the value from res.
+  twitterAccount.save();
   console.log(">>> sending tweet:", tweet.length);
   if (process.env.DEBUG) {
     console.log(">>> twitter response: ", JSON.stringify(res));

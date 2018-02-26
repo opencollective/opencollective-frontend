@@ -158,6 +158,7 @@
     "report:monthly": "babel-node cron/monthly/slack-report.js",
     "check:transactions": "node scripts/check_transactions_on_stripe",
     "script": "node scripts/execute",
+    "cron:10mn": "PG_MAX_CONNECTIONS=1 ./scripts/cron.sh 10mn",
     "cron:daily": "PG_MAX_CONNECTIONS=1 ./scripts/cron.sh daily",
     "cron:weekly": "PG_MAX_CONNECTIONS=1 ./scripts/cron.sh weekly",
     "cron:monthly": "PG_MAX_CONNECTIONS=1 ./scripts/cron.sh monthly",
