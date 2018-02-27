@@ -151,10 +151,13 @@ class Button extends React.Component {
           width: 100%;
           border-radius: 0;
           height: 100%;
-          border-color: #2E8AE6;
+          border-color: #46B0ED;
           text-transform: uppercase;
           font-weight: bold;
           font-size: 1.7rem;
+        }
+        .ticket, :global(.EventPage .tier .Button:hover) {
+          border-color: #2E8AE6;
         }
         `}</style>
         <style jsx global>{`

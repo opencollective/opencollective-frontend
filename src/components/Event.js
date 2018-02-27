@@ -39,7 +39,6 @@ class Event extends React.Component {
 
   constructor(props) {
     super(props);
-    const { intl, LoggedInUser } = props;
     this.event = this.props.event; // pre-loaded by SSR
     this.setInterested = this.setInterested.bind(this);
     this.removeInterested = this.removeInterested.bind(this);
@@ -57,26 +56,11 @@ class Event extends React.Component {
 
     this.messages = defineMessages({
       'event.over.sendMoneyToParent.title': { id: 'event.over.sendMoneyToParent.title', defaultMessage: 'Event is over and still has a positive balance'},
-      'event.over.sendMoneyToParent.description': { id: 'event.over.sendMoneyToParent.description', defaultMessage: 'If you still have expenses related to this event, please file them. Otherwise consider moving the money to your collective {collective}'}
+      'event.over.sendMoneyToParent.description': { id: 'event.over.sendMoneyToParent.description', defaultMessage: 'If you still have expenses related to this event, please file them. Otherwise consider moving the money to your collective {collective}'},
+      'event.over.sendMoneyToParent.transaction.description': { id: 'event.over.sendMoneyToParent.transaction.description', defaultMessage: 'Balance of {event}'}
     });
 
-    this.notification = {};
-    // If event is over and has a positive balance, we ask the admins if they want to move the money to the parent collective
-    if ((new Date(this.event.endsAt)).getTime() < (new Date).getTime() && this.event.stats.balance >= 0 && LoggedInUser && LoggedInUser.canEditEvent(this.event)) {
-      this.notification.title = intl.formatMessage(this.messages['event.over.sendMoneyToParent.title']);
-      this.notification.description = intl.formatMessage(this.messages['event.over.sendMoneyToParent.description'], { collective: this.event.parentCollective.name });
-      this.notification.actions = [
-        <Button className="submitExpense gray" href={`${this.event.path}/expenses/new`}><FormattedMessage id="menu.submitExpense" defaultMessage="Submit Expense" /></Button>,
-        <SendMoneyToCollectiveBtn
-          fromCollective={this.event}
-          toCollective={this.event.parentCollective}
-          LoggedInUser={LoggedInUser}
-          amount={this.event.stats.balance}
-          currency={this.event.currency}
-          />
-      ]
-    }
-
+    this.isEventOver = (new Date(this.event.endsAt)).getTime() < (new Date).getTime();
   }
 
   componentDidMount() {
@@ -169,8 +153,8 @@ class Event extends React.Component {
   }
 
   render() {
+    const { LoggedInUser, intl } = this.props;
     const { event } = this.state;
-    const { LoggedInUser } = this.props;
 
     const canEditEvent = LoggedInUser && LoggedInUser.canEditEvent(event);
     const responses = {};
@@ -205,6 +189,26 @@ class Event extends React.Component {
     responses.guests = uniqBy(allGuests, (r) => r.user && r.user.id);
     responses.going = filterCollection(responses.guests, { status: 'YES' });
     responses.interested = filterCollection(responses.guests, { status: 'INTERESTED' });
+
+    let notification = {};
+    // If event is over and has a positive balance, we ask the admins if they want to move the money to the parent collective
+    if (this.isEventOver && get(this.props.event, 'stats.balance') > 0 && canEditEvent) {
+      notification = {
+        title: intl.formatMessage(this.messages['event.over.sendMoneyToParent.title']),
+        description: intl.formatMessage(this.messages['event.over.sendMoneyToParent.description'], { collective: event.parentCollective.name }),
+        actions: [
+          <Button className="submitExpense gray" href={`${event.path}/expenses/new`}><FormattedMessage id="menu.submitExpense" defaultMessage="Submit Expense" /></Button>,
+          <SendMoneyToCollectiveBtn
+            fromCollective={event}
+            toCollective={event.parentCollective}
+            LoggedInUser={LoggedInUser}
+            description={intl.formatMessage(this.messages['event.over.sendMoneyToParent.transaction.description'], { event: event.name })}
+            amount={event.stats.balance}
+            currency={event.currency}
+            />
+        ]
+      }
+    }
 
     const info = (
       <HashLink to="#location">
@@ -261,9 +265,9 @@ class Event extends React.Component {
 
               <NotificationBar
                 status={this.state.status}
-                title={this.notification.title}
-                description={this.notification.description}
-                actions={this.notification.actions}
+                title={notification.title}
+                description={notification.description}
+                actions={notification.actions}
                 error={this.state.error}
                 />
 

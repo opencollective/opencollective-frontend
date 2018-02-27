@@ -13,6 +13,7 @@ class SendMoneyToCollectiveBtn extends React.Component {
   static propTypes = {
     amount: PropTypes.number.isRequired,
     currency: PropTypes.string.isRequired,
+    description: PropTypes.string,
     fromCollective: PropTypes.object.isRequired,
     toCollective: PropTypes.object.isRequired,
     LoggedInUser: PropTypes.object.isRequired
@@ -21,27 +22,52 @@ class SendMoneyToCollectiveBtn extends React.Component {
   constructor(props) {
     super(props);
     this.onClick = this.onClick.bind(this);
+    this.state = {};
   }
 
   async onClick() {
-    const { currency, amount, fromCollective, toCollective } = this.props;
+    const { currency, amount, fromCollective, toCollective, description, data: { Collective: { paymentMethods }} } = this.props;
+    if (!paymentMethods || paymentMethods.length === 0) {
+      const error = "We couldn't find a payment method to make this transaction";
+      console.error(error);
+      this.setState({ error });
+      return;
+    }
+    this.setState({ loading: true });
     const order = {
       totalAmount: amount,
       currency,
       collective: pick(toCollective, ['id']),
-      fromCollective: pick(fromCollective, ['id'])
+      fromCollective: pick(fromCollective, ['id']),
+      description,
+      paymentMethod: { uuid: paymentMethods[0].uuid }
     }
-    console.log(">>> order: ", order);
-    const res = await this.props.createOrder(order);
-    console.log(">>> Res", res);
+    try {
+      const res = await this.props.createOrder(order);
+      console.log(">>> createOrder result:", res);
+      this.setState({ loading: false });
+    } catch(e) {
+      const error = e.message && e.message.replace(/GraphQL error:/, "");
+      this.setState({ error, loading: false });
+    }
   }
 
   render() {
-    console.log(">>> SendMoneyToCollectiveBtn paymentMethods", get(this.props.data, 'Collective.paymentMethods'));
     const { amount, currency, toCollective } = this.props;
     return (
       <div className="SendMoneyToCollectiveBtn">
-        <SmallButton className="approve" bsStyle="success" onClick={this.onClick}><FormattedMessage id="SendMoneyToCollective.btn" defaultMessage="Send {amount} to {collective}" values={{ amount: formatCurrency(amount, currency), collective: toCollective.name}} /></SmallButton>
+        <style jsx>{`
+        .error {
+          font-size: 1.1rem;
+        }
+        `}</style>
+        <SmallButton className="approve" bsStyle="success" onClick={this.onClick}>
+          { this.state.loading && <FormattedMessage id="form.processing" defaultMessage="processing" /> }
+          { !this.state.loading && <FormattedMessage id="SendMoneyToCollective.btn" defaultMessage="Send {amount} to {collective}" values={{ amount: formatCurrency(amount, currency), collective: toCollective.name}} /> }
+        </SmallButton>
+        { this.state.error &&
+          <div className="error">{this.state.error}</div>
+        }
       </div>
     );
   }
@@ -52,7 +78,7 @@ const addPaymentMethodsQuery = gql`
 query Collective($slug: String!) {
   Collective(slug: $slug) {
     id
-    paymentMethods {
+    paymentMethods(service: "opencollective") {
       id
       service
       name
@@ -76,6 +102,13 @@ const createOrderQuery = gql`
 mutation createOrder($order: OrderInputType!) {
   createOrder(order: $order) {
     id
+    fromCollective {
+      id
+      stats {
+        id
+        balance
+      }
+    }
     collective {
       id
       stats {

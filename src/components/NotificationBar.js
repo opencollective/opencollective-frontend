@@ -17,7 +17,7 @@ class NotificationBar extends React.Component {
 
     return (
       <div className={`${status} NotificationBar`}>
-        <style>{`
+        <style jsx>{`
         .oc-message {
           position: fixed;
           top: -70px;
