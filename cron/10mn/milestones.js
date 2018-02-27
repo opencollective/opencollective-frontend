@@ -164,19 +164,24 @@ const sendTweet = async (tweet, twitterAccount, template) => {
   console.log(">>> sending tweet:", tweet.length, tweet);
   if (process.env.NODE_ENV === 'production') {
 
-    // We thread the tweet with the previous milestone
-    const in_reply_to_tweet_id = get(twitterAccount, `settings.milestones.lastTweetId`);
-    const res = await twitter.tweetStatus(twitterAccount, tweet, null, { in_reply_to_tweet_id });
+    try {
+      // We thread the tweet with the previous milestone
+      const in_reply_to_status_id = get(twitterAccount, `settings.milestones.lastTweetId`);
+      const res = await twitter.tweetStatus(twitterAccount, tweet, null, { in_reply_to_status_id });
 
-    set(twitterAccount, `settings.milestones.tweetId`, res.id_str);
-    set(twitterAccount, `settings.milestones.tweetSentAt`, new Date); // TODO: check the value from res.
-    set(twitterAccount, `settings.${template}.tweetId`, res.id_str);
-    set(twitterAccount, `settings.${template}.tweetSentAt`, new Date); // TODO: check the value from res.
-    await twitterAccount.save();
-    if (process.env.DEBUG) {
-      console.log(">>> twitter response: ", JSON.stringify(res));
+      set(twitterAccount, `settings.milestones.tweetId`, res.id_str);
+      set(twitterAccount, `settings.milestones.tweetSentAt`, new Date(res.created_at));
+      set(twitterAccount, `settings.${template}.tweetId`, res.id_str);
+      set(twitterAccount, `settings.${template}.tweetSentAt`, new Date(res.created_at));
+      await twitterAccount.save();
+      if (process.env.DEBUG) {
+        console.log(">>> twitter response: ", JSON.stringify(res));
+      }
+      res.url = `https://twitter.com/${res.user.screen_name}/status/${res.id_str}`;
+      return res;
+    } catch (e) {
+      console.error("Unable to tweet", tweet, e);
     }
-    return res;
   }
 }
 
