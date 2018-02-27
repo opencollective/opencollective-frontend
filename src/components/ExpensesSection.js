@@ -7,6 +7,7 @@ import TransactionsWithData from './TransactionsWithData';
 import Currency from './Currency';
 import { Button } from 'react-bootstrap';
 import { Router } from '../server/pages';
+import { get } from 'lodash';
 
 class ExpensesSection extends React.Component {
 
@@ -18,6 +19,8 @@ class ExpensesSection extends React.Component {
 
   constructor(props) {
     super(props);
+    this.totalExpenses = get(props.collective, 'stats.expenses.all');
+    this.totalTransactions = get(props.collective, 'stats.transactions.all');
   }
 
   render() {
@@ -53,7 +56,7 @@ class ExpensesSection extends React.Component {
             <h2>
               <FormattedMessage
                 id="collective.expenses.title"
-                values={{ n: collective.stats.expenses.all }}
+                values={{ n: this.totalExpenses }}
                 defaultMessage={`{n, plural, one {Latest expense} other {Latest expenses}}`}
                 />
             </h2>
@@ -63,16 +66,18 @@ class ExpensesSection extends React.Component {
               compact={true}
               limit={5}
               />
-            <div className="actions">
-              <a className="ViewAllExpensesBtn" onClick={() =>Router.pushRoute(`/${collective.slug}/expenses`)}><FormattedMessage id="expenses.viewAll" defaultMessage="View All Expenses" /></a>
-            </div>
+            { this.totalExpenses > 0 &&
+              <div className="actions">
+                <a className="ViewAllExpensesBtn" onClick={() =>Router.pushRoute(`${collective.path}/expenses`)}><FormattedMessage id="expenses.viewAll" defaultMessage="View All Expenses" /></a>
+              </div>
+            }
           </div>
 
           <div id="transactions" className="col">
             <h2>
               <FormattedMessage
                 id="collective.transactions.title"
-                values={{ n: collective.stats.transactions }}
+                values={{ n: this.totalTransactions }}
                 defaultMessage={`{n, plural, one {Latest transaction} other {Latest transactions}}`}
                 />
             </h2>
@@ -82,9 +87,11 @@ class ExpensesSection extends React.Component {
               limit={5}
               showCSVlink={false}
               />
-            <div className="actions">
-              <a className="ViewAllTransactionsBtn" onClick={() => Router.pushRoute(`/${collective.slug}/transactions`)}><FormattedMessage id="transactions.viewAll" defaultMessage="View All Transactions" /></a>
-            </div>
+            { this.totalTransactions > 0 &&
+              <div className="actions">
+                <a className="ViewAllTransactionsBtn" onClick={() => Router.pushRoute(`${collective.path}/transactions`)}><FormattedMessage id="transactions.viewAll" defaultMessage="View All Transactions" /></a>
+              </div>
+            }
           </div>
         </div>
       </div>

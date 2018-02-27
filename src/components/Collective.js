@@ -14,13 +14,13 @@ import { get } from 'lodash';
 import { Router } from '../server/pages';
 import { FormattedMessage, defineMessages } from 'react-intl';
 import CollectivesWithData from './CollectivesWithData';
+import SectionTitle from './SectionTitle';
 import ExpensesSection from './ExpensesSection';
 import UpdatesSection from './UpdatesSection';
 import EventsSection from './EventsSection';
 import TransactionsWithData from './TransactionsWithData';
 import { Button } from 'react-bootstrap';
 import { Link } from '../server/pages';
-import SectionTitle from './SectionTitle';
 import { formatCurrency } from '../lib/utils';
 
 const defaultBackgroundImage = '/static/images/defaultBackgroundImage.png';
@@ -276,13 +276,11 @@ class Collective extends React.Component {
               <section id="budget" className="clear">
                 <div className="content" >
                   <SectionTitle section="budget" values={{ balance: formatCurrency(get(this.collective, 'stats.balance'), this.collective.currency) }}/>
-
                   <ExpensesSection
                     collective={this.collective}
                     LoggedInUser={LoggedInUser}
                     limit={10}
                     />
-
                 </div>
               </section>
 

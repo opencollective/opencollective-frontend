@@ -41,8 +41,10 @@ class UpdatePage extends React.Component {
     const { intl, data, updateSlug } = this.props;
     const { LoggedInUser } = this.state;
 
-    if (data.loading && !data.Collective) return (<Loading />);
-    if (!data.Collective) return (<NotFound />);
+    if (data.loading) return (<Loading />);
+    if (!data.Collective) {
+      return (<NotFound />)
+    }
 
     if (data.error) {
       console.error("graphql error>>>", data.error.message);

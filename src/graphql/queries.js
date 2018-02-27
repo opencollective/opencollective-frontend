@@ -230,7 +230,10 @@ const getCollectiveQuery = gql`
           hosted
           memberOf
         }
-        transactions
+        transactions {
+          id
+          all
+        }
         expenses {
           id
           all
@@ -362,6 +365,18 @@ const getEventCollectiveQuery = gql`
         image
         settings
       }
+      stats {
+        id
+        balance
+        expenses {
+          id
+          all
+        }
+        transactions {
+          id
+          all
+        }
+      }
       members {
         id
         createdAt
@@ -407,6 +422,7 @@ const getCollectiveCoverQuery = gql`
       id
       type
       slug
+      path
       name
       currency
       backgroundImage
@@ -429,6 +445,11 @@ const getCollectiveCoverQuery = gql`
         slug
         name
         image
+      }
+      parentCollective {
+        id
+        slug
+        name
       }
       members {
         id

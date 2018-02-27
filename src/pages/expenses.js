@@ -38,7 +38,7 @@ class ExpensesPage extends React.Component {
     const { data } = this.props;
     const { LoggedInUser } = this.state;
     
-    if (!data.loading && !data.Collective) return (<Loading />);
+    if (data.loading) return (<Loading />);
     if (!data.Collective) return (<NotFound />);
     
     if (data.error) {
@@ -110,7 +110,6 @@ class ExpensesPage extends React.Component {
 
           <CollectiveCover
             collective={collective}
-            href={`/${collective.slug}`}
             cta={{ href: `/${collective.slug}#contribute`, label: 'contribute' }}
             LoggedInUser={LoggedInUser}
             />

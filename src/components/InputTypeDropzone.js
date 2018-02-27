@@ -34,7 +34,7 @@ class InputTypeDropzone extends React.Component {
     // for e2e testing purposes
     if (window.location.hostname === 'localhost') {
       const fileUrl = "https://d.pr/free/i/OlQVIb+";
-      setTimeout(() => {
+      return setTimeout(() => {
         this.setState({ value: fileUrl, url: fileUrl, loading: false });
         return this.props.onChange(fileUrl);
       }, 2500);

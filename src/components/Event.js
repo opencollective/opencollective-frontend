@@ -12,7 +12,7 @@ import OrderForm from '../components/OrderForm';
 import InterestedForm from '../components/InterestedForm';
 import Sponsors from '../components/Sponsors';
 import Responses from '../components/Responses';
-import { filterCollection } from '../lib/utils';
+import { filterCollection, formatCurrency } from '../lib/utils';
 import Markdown from 'react-markdown';
 import TicketsConfirmed from '../components/TicketsConfirmed';
 import { FormattedMessage, FormattedDate, FormattedTime } from 'react-intl';
@@ -22,6 +22,8 @@ import { Router } from '../server/pages';
 import { addEventMutations } from '../graphql/mutations';
 import { exportRSVPs } from '../lib/export_file';
 import { Link } from '../server/pages';
+import SectionTitle from './SectionTitle';
+import ExpensesSection from './ExpensesSection';
 
 const defaultBackgroundImage = '/static/images/defaultBackgroundImage.png';
 
@@ -240,7 +242,6 @@ class Event extends React.Component {
                 title={event.name}
                 description={info}
                 LoggedInUser={LoggedInUser}
-                href={`/${event.parentCollective.slug}`}
                 style={get(event, 'settings.style.hero.cover') || get(event.parentCollective, 'settings.style.hero.cover')}
                 />
 
@@ -292,6 +293,7 @@ class Event extends React.Component {
                     <Responses responses={responses.guests} />
                   </section>
                 }
+
                 { responses.sponsors.length > 0 &&
                   <section id="sponsors">
                     <h1>
@@ -305,6 +307,17 @@ class Event extends React.Component {
                     })} />
                   </section>
                 }
+
+              <section id="budget" className="clear">
+                <div className="content" >
+                  <SectionTitle section="budget" values={{ balance: formatCurrency(get(event, 'stats.balance'), event.currency) }}/>
+                  <ExpensesSection
+                    collective={event}
+                    LoggedInUser={LoggedInUser}
+                    limit={10}
+                    />
+                </div>
+              </section>
 
               </div>
             </div>
