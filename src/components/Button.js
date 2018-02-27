@@ -144,6 +144,9 @@ class Button extends React.Component {
         .Button :global(span) {
           white-space: nowrap;
         }
+        .darkBackground {
+          color: #E3E4E6;
+        }
         .ticket, :global(.EventPage .tier .Button) {
           width: 100%;
           border-radius: 0;

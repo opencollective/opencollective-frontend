@@ -585,7 +585,6 @@ const refreshLoggedInUser = async (data) => {
 
   if (data.LoggedInUser) {
     const user = new LoggedInUser(data.LoggedInUser);
-    console.info(`>>> LoggedInUser was already in data`);
     storage.set("LoggedInUser", user, 1000 * 60 * 60);
     return user;
   }

@@ -15,7 +15,7 @@ import Responses from '../components/Responses';
 import { filterCollection, formatCurrency } from '../lib/utils';
 import Markdown from 'react-markdown';
 import TicketsConfirmed from '../components/TicketsConfirmed';
-import { FormattedMessage, FormattedDate, FormattedTime } from 'react-intl';
+import { defineMessages, FormattedMessage, FormattedDate, FormattedTime } from 'react-intl';
 import { uniqBy, get, union } from 'lodash';
 import { capitalize, trimObject } from '../lib/utils';
 import { Router } from '../server/pages';
@@ -24,6 +24,9 @@ import { exportRSVPs } from '../lib/export_file';
 import { Link } from '../server/pages';
 import SectionTitle from './SectionTitle';
 import ExpensesSection from './ExpensesSection';
+import withIntl from '../lib/withIntl';
+import Button from './Button';
+import SendMoneyToCollectiveBtn from './SendMoneyToCollectiveBtn';
 
 const defaultBackgroundImage = '/static/images/defaultBackgroundImage.png';
 
@@ -36,6 +39,7 @@ class Event extends React.Component {
 
   constructor(props) {
     super(props);
+    const { intl, LoggedInUser } = props;
     this.event = this.props.event; // pre-loaded by SSR
     this.setInterested = this.setInterested.bind(this);
     this.removeInterested = this.removeInterested.bind(this);
@@ -49,6 +53,28 @@ class Event extends React.Component {
       tierInfo: {},
       api: { status: 'idle' },
       event: this.props.event
+    }
+
+    this.messages = defineMessages({
+      'event.over.sendMoneyToParent.title': { id: 'event.over.sendMoneyToParent.title', defaultMessage: 'Event is over and still has a positive balance'},
+      'event.over.sendMoneyToParent.description': { id: 'event.over.sendMoneyToParent.description', defaultMessage: 'If you still have expenses related to this event, please file them. Otherwise consider moving the money to your collective {collective}'}
+    });
+
+    this.notification = {};
+    // If event is over and has a positive balance, we ask the admins if they want to move the money to the parent collective
+    if ((new Date(this.event.endsAt)).getTime() < (new Date).getTime() && this.event.stats.balance >= 0 && LoggedInUser && LoggedInUser.canEditEvent(this.event)) {
+      this.notification.title = intl.formatMessage(this.messages['event.over.sendMoneyToParent.title']);
+      this.notification.description = intl.formatMessage(this.messages['event.over.sendMoneyToParent.description'], { collective: this.event.parentCollective.name });
+      this.notification.actions = [
+        <Button className="submitExpense gray" href={`${this.event.path}/expenses/new`}><FormattedMessage id="menu.submitExpense" defaultMessage="Submit Expense" /></Button>,
+        <SendMoneyToCollectiveBtn
+          fromCollective={this.event}
+          toCollective={this.event.parentCollective}
+          LoggedInUser={LoggedInUser}
+          amount={this.event.stats.balance}
+          currency={this.event.currency}
+          />
+      ]
     }
 
   }
@@ -188,9 +214,7 @@ class Event extends React.Component {
       </HashLink>
     );
 
-    const backgroundImage = event.backgroundImage || event.parentCollective.backgroundImage || defaultBackgroundImage;
-
-    console.log("event", event);
+    const backgroundImage = event.backgroundImage || get(event, 'parentCollective.backgroundImage') || defaultBackgroundImage;
 
     return (
       <div>
@@ -235,7 +259,13 @@ class Event extends React.Component {
 
             <div className={`EventPage ${this.state.modal && 'showModal'}`}>
 
-              <NotificationBar status={this.state.status} error={this.state.error} />
+              <NotificationBar
+                status={this.state.status}
+                title={this.notification.title}
+                description={this.notification.description}
+                actions={this.notification.actions}
+                error={this.state.error}
+                />
 
               <CollectiveCover
                 collective={event}
@@ -329,4 +359,4 @@ class Event extends React.Component {
   }
 }
 
-export default addEventMutations(Event);
+export default withIntl(addEventMutations(Event));

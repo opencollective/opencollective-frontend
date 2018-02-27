@@ -133,10 +133,6 @@ class MenuBar extends React.Component {
           border-color: ${colors.blue}
         }
 
-        .MenuBar :global(button.darkbackground) {
-          color: #E3E4E6;
-        }
-
         `}</style>
         { this.state.sticky && cta &&
           <Link route={cta.href} animate={{offset}}>
@@ -144,7 +140,7 @@ class MenuBar extends React.Component {
           </Link>
         }
         { ["COLLECTIVE", "EVENT"].indexOf(collective.type) !== -1  &&
-          <Button className="submitExpense darkbackground" href={`${collective.path}/expenses/new`}><FormattedMessage id="menu.submitExpense" defaultMessage="Submit Expense" /></Button>
+          <Button className="submitExpense darkBackground" href={`${collective.path}/expenses/new`}><FormattedMessage id="menu.submitExpense" defaultMessage="Submit Expense" /></Button>
         }
       </div>
     )

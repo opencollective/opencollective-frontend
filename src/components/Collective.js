@@ -65,6 +65,7 @@ class Collective extends React.Component {
 
   componentDidMount() {
     window.oc = { collective: this.collective }; // for easy debugging
+    const { LoggedInUser } = this.props;
   }
 
   async createOrder(order) {
