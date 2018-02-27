@@ -75,7 +75,7 @@ export function createOrder(_, args, req) {
   .then(() => {
     if (paymentRequired) {
       if (!order.paymentMethod || !(order.paymentMethod.uuid || order.paymentMethod.token)) {
-        throw new Error(`This tier requires a payment method`);
+        throw new Error(`This order requires a payment method`);
       }
     }
   })
@@ -154,6 +154,9 @@ export function createOrder(_, args, req) {
         order.referral = { id: matchingFund.CollectiveId }; // if there is a matching fund, we force the referral to be the owner of the fund
       }
       const currency = tier && tier.currency || collective.currency;
+      if (order.currency && order.currency !== currency) {
+        throw new Error(`Invalid currency. Expected ${currency}.`);
+      }
       const quantity = order.quantity || 1;
       let totalAmount;
       if (tier && tier.amount && !tier.presets) { // if the tier has presets, we can't enforce tier.amount

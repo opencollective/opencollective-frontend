@@ -200,6 +200,42 @@ export const ExpensesStatsType = new GraphQLObjectType({
   }
 });
 
+export const TransactionsStatsType = new GraphQLObjectType({
+  name: "TransactionsStatsType",
+  description: "Breakdown of transactions per type (ALL/CREDIT/DEBIT)",
+  fields: () => {
+    return {
+      // We always have to return an id for apollo's caching
+      id: {
+        type: GraphQLInt,
+        resolve(collective) {
+          return collective.id;
+        }
+      },
+      all: {
+        type: GraphQLInt,
+        resolve(collective) {
+          return models.Transaction.count({ where: { CollectiveId: collective.id } });
+        }
+      },
+      credit: {
+        type: GraphQLInt,
+        description: "Returns the number of CREDIT transactions",
+        resolve(collective) {
+          return models.Transaction.count({ where: { CollectiveId: collective.id, type: 'CREDIT' } });
+        }
+      },
+      debit: {
+        type: GraphQLInt,
+        description: "Returns the number of DEBIT transactions",
+        async resolve(collective) {
+          return models.Transaction.count({ where: { CollectiveId: collective.id, type: 'DEBIT' } });
+        }
+      }
+    }
+  }
+});
+
 export const CollectiveStatsType = new GraphQLObjectType({
   name: "CollectiveStatsType",
   description: "Stats for the collective",
@@ -256,9 +292,9 @@ export const CollectiveStatsType = new GraphQLObjectType({
       },
       transactions: {
         description: "Number of transactions",
-        type: GraphQLInt,
+        type: TransactionsStatsType,
         resolve(collective) {
-          return models.Transaction.count({ where: { CollectiveId: collective.id } });
+          return collective;
         }
       },
       totalAmountReceived: {

@@ -340,15 +340,15 @@ export default function(Sequelize, DataTypes) {
 
       },
       afterCreate: (instance) => {
-        // We only create an "opencollective" paymentMethod for collectives
-        if (instance.type !== 'COLLECTIVE') {
+        // We only create an "opencollective" paymentMethod for collectives and events
+        if (instance.type !== 'COLLECTIVE' && instance.type !== 'EVENT') {
           return null;
         }
         models.PaymentMethod.create({
           CollectiveId: instance.id,
           service: 'opencollective',
           type: 'collective',
-          name: `${capitalize(instance.name)} Collective`,
+          name: `${capitalize(instance.name)} ${capitalize(instance.type.toLowerCase())}`,
           primary: true,
           currency: instance.currency
         });
