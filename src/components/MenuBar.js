@@ -24,7 +24,7 @@ class MenuBar extends React.Component {
     this.height = 60;
 
     const menuItems = [
-      { anchor: 'about', link: `/${props.collective.slug}#about`, position: 0 },
+      { anchor: 'about', link: `${props.collective.path}#about`, position: 0 },
     ];
 
     if (props.collective.type === 'COLLECTIVE') {
@@ -133,18 +133,14 @@ class MenuBar extends React.Component {
           border-color: ${colors.blue}
         }
 
-        .MenuBar :global(button.darkbackground) {
-          color: #E3E4E6;
-        }
-
         `}</style>
         { this.state.sticky && cta &&
           <Link route={cta.href} animate={{offset}}>
             <Button className="blue">{cta.label}</Button>
           </Link>
         }
-        { collective.type === "COLLECTIVE" &&
-          <Button className="submitExpense darkbackground" href={`/${collective.slug}/expenses/new`}><FormattedMessage id="menu.submitExpense" defaultMessage="Submit Expense" /></Button>
+        { ["COLLECTIVE", "EVENT"].indexOf(collective.type) !== -1  &&
+          <Button className="submitExpense darkBackground" href={`${collective.path}/expenses/new`}><FormattedMessage id="menu.submitExpense" defaultMessage="Submit Expense" /></Button>
         }
       </div>
     )

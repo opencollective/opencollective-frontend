@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import withIntl from '../lib/withIntl';
 import { defineMessages, FormattedMessage } from 'react-intl';
-import { Link } from '../server/pages';
 import { union, get, uniqBy } from 'lodash';
 import { prettyUrl, formatCurrency, imagePreview } from '../lib/utils';
 import { Router } from '../server/pages';
@@ -10,6 +9,7 @@ import Currency from './Currency';
 import Avatar from './Avatar';
 import Logo from './Logo';
 import { defaultBackgroundImage } from '../constants/collectives';
+import Link from './Link';
 import Button from './Button';
 import MenuBar from './MenuBar';
 
@@ -69,7 +69,7 @@ ${description}`
       stats
     } = collective;
 
-    const href = this.props.href || `/${collective.slug}`;
+    const href = this.props.href || collective.path || `/${collective.slug}`;
     const title = this.props.title || collective.name;
     const description = this.props.description || collective.description;
     const formattedYearlyIncome = stats && stats.yearlyBudget > 0 && formatCurrency(stats.yearlyBudget, collective.currency, { precision: 0 });
@@ -256,20 +256,29 @@ ${description}`
         <div className="cover">
           <div className="backgroundCover" style={style} />
           <div className="content">
-            <Link route={href}><a className="goBack">
+            <Link route={href} className="goBack">
               { collective.type === 'USER' && <Avatar src={logo} className="logo" radius="10rem" /> }
               { collective.type !== 'USER' && <Logo src={logo} className="logo" type={collective.type} website={collective.website} height="10rem" /> }
-            </a></Link>
+            </Link>
             <h1>{title}</h1>
-            { company && company.substr(0,1) === '@' && <p className="company"><Link route={`/${company.substr(1)}`}><a>{company.substr(1)}</a></Link></p> }
+            { company && company.substr(0,1) === '@' && <p className="company"><Link route={`/${company.substr(1)}`}>{company.substr(1)}</Link></p> }
             { company && company.substr(0,1) !== '@' && <p className="company">{company}</p> }
             { description && <p className="description">{description}</p> }
-            <div className="contact">
-              { collective.host && collective.isActive && <div className="host"><label><FormattedMessage id="collective.cover.hostedBy" defaultMessage="Hosted by" /></label><Link route={`/${collective.host.slug}`}><a>{collective.host.name} </a></Link></div> }
-              { collective.host && !collective.isActive && <div className="host"><label><FormattedMessage id="collective.cover.pendingApprovalFrom" defaultMessage="Pending approval from" /></label><Link route={`/${collective.host.slug}`}><a>{collective.host.name} </a></Link></div> }
-              { twitterHandle && <div className="twitterHandle"><a href={`https://twitter.com/${twitterHandle}`} target="_blank">@{twitterHandle}</a></div> }
-              { website && <div className="website"><a href={website} target="_blank">{prettyUrl(website) }</a></div> }
-            </div>
+            { collective.type !== 'EVENT' &&
+              <div className="contact">
+                { collective.host && collective.isActive && <div className="host"><label><FormattedMessage id="collective.cover.hostedBy" defaultMessage="Hosted by" /></label><Link route={`/${collective.host.slug}`}>{collective.host.name} </Link></div> }
+                { collective.host && !collective.isActive && <div className="host"><label><FormattedMessage id="collective.cover.pendingApprovalFrom" defaultMessage="Pending approval from" /></label><Link route={`/${collective.host.slug}`}>{collective.host.name} </Link></div> }
+                { twitterHandle && <div className="twitterHandle"><a href={`https://twitter.com/${twitterHandle}`} target="_blank">@{twitterHandle}</a></div> }
+                { website && <div className="website"><a href={website} target="_blank">{prettyUrl(website) }</a></div> }
+              </div>
+            }
+            { collective.type === 'EVENT' &&
+              <div className="contact">
+                <div className="parentCollective">
+                  <Link route={`/${collective.parentCollective.slug}`}>{collective.parentCollective.name}</Link>
+                </div>
+              </div>
+            }
             { membersPreview.length > 0 &&
               <div className="members">
                 { membersPreview.map(member => (

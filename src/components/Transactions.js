@@ -99,7 +99,7 @@ class Transactions extends React.Component {
           }
         `}</style>
 
-        {showCSVlink && <TransactionsExportPopoverAndButton collective={collective} />}
+        {showCSVlink && transactions.length > 0 && <TransactionsExportPopoverAndButton collective={collective} />}
 
         { filters &&
           <div className="filter">
