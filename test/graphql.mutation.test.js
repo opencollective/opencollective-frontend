@@ -471,7 +471,7 @@ describe('Mutation Tests', () => {
             quantity: 2
           };
           const result = await utils.graphqlQuery(query, { order });
-          expect(result.errors[0].message).to.equal('This tier requires a payment method');
+          expect(result.errors[0].message).to.equal('This order requires a payment method');
         });
       });
     });
