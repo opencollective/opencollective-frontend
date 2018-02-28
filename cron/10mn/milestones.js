@@ -51,12 +51,12 @@ const notifyCollective = async (CollectiveId, milestone, collective) => {
 
   if (!twitterAccount) {
     debug(`${collective.slug}: the collective id ${CollectiveId} doesn't have a twitter account connected, skipping`);
-    postToSlack(tweet, slackAccount);
+    await postToSlack(tweet, slackAccount);
     return;
   }
   if (!get(twitterAccount, `settings.${milestone}.active`)) {
     debug(`${collective.slug}: the collective id ${CollectiveId} hasn't activated the ${milestone} milestone notification, skipping`);
-    postToSlack(tweet, slackAccount);
+    await postToSlack(tweet, slackAccount);
     return;
   }
   if (process.env.TWITTER_CONSUMER_SECRET) {
@@ -138,7 +138,7 @@ const compileTweet = async (collective, template, twitterAccount) => {
 
 const postSlackMessage = async (message, webhookUrl, options = {}) => {
   if (!webhookUrl) {
-    return console.warn(`slack> no webhookUrl`);
+    return console.warn(`slack> no webhookUrl to post ${message}`);
   }
   try {
     console.log(`slack> posting ${message} to ${webhookUrl}`);
@@ -150,13 +150,13 @@ const postSlackMessage = async (message, webhookUrl, options = {}) => {
 
 const postToSlack = async (message, slackAccount) => {
   // post to slack.opencollective.com (bug: we send it twice if both `collective` and `host` have set up a Slack webhook)
-  await postSlackMessage(message, config.slack.webhookUrl, { channel: config.slack.publicActivityChannel });
+  await postSlackMessage(message, config.slack.webhookUrl, { channel: config.slack.publicActivityChannel, linkTwitterMentions: true });
 
   if (!slackAccount) {
-    return console.warn(`No slack account`);
+    return console.warn(`No slack account to post ${message}`);
   }
 
-  await postSlackMessage(message, slackAccount.webhookUrl);
+  await postSlackMessage(message, slackAccount.webhookUrl, { linkTwitterMentions: true });
 }
 
 const sendTweet = async (tweet, twitterAccount, template) => {

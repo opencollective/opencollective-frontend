@@ -40,6 +40,11 @@ export default {
     if (!options) {
       options = {};
     }
+
+    if (options.linkTwitterMentions) {
+      msg = msg.replace(/@([a-z\d_]+)/ig, '<http://twitter.com/$1|@$1>');
+    }
+
     const slackOptions = {
       text: msg,
       username: 'OpenCollective Activity Bot',
@@ -54,7 +59,7 @@ export default {
 
     return new Promise((resolve, reject) => {
       // production check
-      if (process.env.NODE_ENV !== 'production') {
+      if (process.env.NODE_ENV !== 'production' && !process.env.TEST_SLACK) {
         return resolve();
       }
 
