@@ -101,7 +101,7 @@ export async function fetchMembersStats(params) {
 }
 
 export async function fetchMembers({ collectiveSlug, tierSlug, backerType }, options = {}) {
-  let query, processResult, type;
+  let query, processResult, type, role;
   if (backerType === 'contributors') {
     query = `
     query Collective($collectiveSlug: String!) {
@@ -126,9 +126,12 @@ export async function fetchMembers({ collectiveSlug, tierSlug, backerType }, opt
     }
   } else if (backerType) {
     type = backerType.match(/sponsor/i) ? 'ORGANIZATION' : 'USER';
+    if (backerType.match(/(backer|sponsor)/)) {
+      role = 'BACKER';
+    }
     query = `
-    query allMembers($collectiveSlug: String!, $type: String!) {
-      allMembers(collectiveSlug: $collectiveSlug, type: $type, orderBy: "totalDonations") {
+    query allMembers($collectiveSlug: String!, $type: String!, $role: String!) {
+      allMembers(collectiveSlug: $collectiveSlug, type: $type, role: $role, orderBy: "totalDonations") {
         id
         createdAt
         member {
@@ -167,7 +170,7 @@ export async function fetchMembers({ collectiveSlug, tierSlug, backerType }, opt
     processResult = (res) => uniqBy(res.Collective.tiers[0].orders.map(o => o.fromCollective), m => m.id);
   }
 
-  const result = await (options.client || client).request(query, { collectiveSlug, tierSlug, type });
+  const result = await (options.client || client).request(query, { collectiveSlug, tierSlug, type, role });
   const members = processResult(result);
   return members;
 }
