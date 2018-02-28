@@ -100,6 +100,7 @@ const getCollectiveToEditQuery = gql`
       currency
       settings
       createdAt
+      isHost
       stats {
         id
         yearlyBudget

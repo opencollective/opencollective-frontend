@@ -27,10 +27,27 @@ class EditTwitterAccount extends React.Component {
       'monthlyStats.toggle.label': { id: 'connectedAccounts.twitter.monthlyStats.toggle.label', defaultMessage: 'Monthly stats' },
       'monthlyStats.toggle.description': { id: 'connectedAccounts.twitter.monthlyStats.toggle.description', defaultMessage: 'Every first of the month, automatically send a public tweet with the latest stats, the new backers and the all time top backers' },
       'updatePublished.toggle.label': { id: 'connectedAccounts.twitter.updatePublished.toggle.label', defaultMessage: 'Update published' },
-      'updatePublished.toggle.description': { id: 'connectedAccounts.twitter.updatePublished.toggle.description', defaultMessage: 'Send a tweet whenever you publish an update' }
+      'updatePublished.toggle.description': { id: 'connectedAccounts.twitter.updatePublished.toggle.description', defaultMessage: 'Send a tweet whenever you publish an update' },
+      'tenBackers.toggle.label': { id: 'connectedAccounts.twitter.tenBackers.toggle.label', defaultMessage: '10 backers' },
+      'tenBackers.toggle.description': { id: 'connectedAccounts.twitter.tenBackers.toggle.description', defaultMessage: 'Whenever one of the collectives that you are hosting reaches 10 backers' },
+      'tenBackers.tweet': { id: 'connectedAccounts.twitter.tenBackers.tweet', defaultMessage: '🎉 {collective} just reached 10 backers! Thank you {topBackersTwitterHandles} 🙌  Support them too!' },
+      'oneHundredBackers.toggle.label': { id: 'connectedAccounts.twitter.oneHundredBackers.toggle.label', defaultMessage: '100 backers' },
+      'oneHundredBackers.toggle.description': { id: 'connectedAccounts.twitter.oneHundredBackers.toggle.description', defaultMessage: 'Whenever one of the collectives that you are hosting reaches 100 backers' },
+      'oneHundredBackers.tweet': { id: 'connectedAccounts.twitter.oneHundredBackers.tweet', defaultMessage: '🎉 {collective} just reached 100 backers!! 🙌  Support them too!' },
+      'oneThousandBackers.toggle.label': { id: 'connectedAccounts.twitter.oneThousandBackers.toggle.label', defaultMessage: '1,000 backers' },
+      'oneThousandBackers.toggle.description': { id: 'connectedAccounts.twitter.oneThousandBackers.toggle.description', defaultMessage: 'Whenever one of the collectives that you are hosting reaches 1,000 backers' },
+      'oneThousandBackers.tweet': { id: 'connectedAccounts.twitter.oneThousandBackers.tweet', defaultMessage: '🎉 {collective} just reached 1,000 backers!! 🙌  Support them too!' },
     });
 
-    this.notificationTypes = ['newBacker', 'monthlyStats', 'updatePublished'];
+    this.notificationTypes = [];
+    if (props.collective.type === 'COLLECTIVE') {
+      this.notificationTypes = ['newBacker', 'monthlyStats', 'updatePublished'];
+    }
+
+    if (props.collective.isHost) {
+      this.notificationTypes = ['tenBackers', 'oneHundredBackers', 'oneThousandBackers'];
+    }
+
     this.state = { connectedAccount: cloneDeep(props.connectedAccount) };
     this.state.connectedAccount.settings = this.state.connectedAccount.settings || {};
     this.notificationTypes.forEach(notificationType => {
