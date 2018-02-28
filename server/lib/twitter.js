@@ -100,10 +100,16 @@ const tweetStatus = (twitterAccount, status, url, options = {}) => {
   }
 }
 
-const compileTweet = (template, data) => {
+const compileTweet = (template, data, message) => {
 
   const messages = {
     'en-US': {
+      tenBackers: `🎉 {collective} just reached 10 backers! Thank you {topBackersTwitterHandles} 🙌
+Support them too!`,
+      oneHundred: `🎉 {collective} just reached 100 backers!! 🙌
+Support them too!`,
+      oneThousandBackers: `🎉 {collective} just reached 1,0000 backers!!! 🙌
+Support them too!`,
       updatePublished: `Latest update from the collective: {title}`,
       monthlyStats: `In {month}, {totalNewBackers, select, 
   0 {no new backer joined. 😑} 
@@ -123,6 +129,10 @@ Our current balance is {balance}.
 
 Become a backer! 😃`
     }
+  }
+
+  if (message) {
+    messages['en-US'][template] = message;
   }
 
   if (!messages['en-US'][template]) {
