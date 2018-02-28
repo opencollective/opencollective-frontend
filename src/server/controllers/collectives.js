@@ -258,8 +258,8 @@ export async function avatar(req, res, next) {
   if (position==0) {
     req.ga.pageview();
   }
-
-  let imageUrl = "/static/images/user.svg";
+  const collectiveType = (user.type === 'USER') ? 'user' : 'organization';
+  let imageUrl = `/static/images/${collectiveType}.svg`;
   if (user.image && user.image.substr(0,1) !== '/') {
     if (user.type === 'USER') {
       imageUrl = getCloudinaryUrl(user.image, { query: `/c_thumb,g_face,h_${maxHeight},r_max,w_${maxHeight},bo_3px_solid_white/c_thumb,h_${maxHeight},r_max,w_${maxHeight},bo_2px_solid_rgb:66C71A/e_trim/f_auto/` });
