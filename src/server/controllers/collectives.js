@@ -229,7 +229,6 @@ export async function website(req, res) {
 export async function avatar(req, res, next) {
   const { collectiveSlug, tierSlug, backerType } = req.params;
   
-  console.log('>>> cache.itemCount', cache.itemCount);
   let users = cache.get(queryString.stringify({ collectiveSlug, tierSlug, backerType }));
   if (!users) {
     try {
