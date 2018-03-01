@@ -2,14 +2,14 @@ import fs from 'fs';
 import json2csv from 'json2csv';
 import { ArgumentParser } from 'argparse';
 
-import emailLib from '../server/lib/email';
-import { promiseSeq } from '../server/lib/utils';
-import { sequelize } from '../server/models';
+import emailLib from '../../server/lib/email';
+import { promiseSeq } from '../../server/lib/utils';
+import { sequelize } from '../../server/models';
 import {
   ordersWithPendingCharges,
   processOrderWithSubscription,
   groupProcessedOrders,
-} from '../server/lib/subscriptions';
+} from '../../server/lib/subscriptions';
 
 const REPORT_EMAIL = 'ops@opencollective.com';
 
@@ -78,8 +78,8 @@ async function emailReport(start, orders, data, attachments) {
   // Add entries of each group to the result list
   const printGroup = ([ name, { total, entries } ]) => {
     result.push(`>>> ${entries.length} orders ${name} (sum of amounts: ${total})`);
-    result = result.concat(entries.map((i) => ` ${i.status !== 'unattempted' ? icon(i.error) : ''} ` + [
-      `order: ${i.orderId}`,
+    result = result.concat(entries.map((i) => [
+      ` ${i.status !== 'unattempted' ? icon(i.error) : ''} order: ${i.orderId}`,
       `subscription: ${i.subscriptionId}`,
       `amount: ${i.amount}`,
       `from: ${i.from}`,
@@ -92,7 +92,7 @@ async function emailReport(start, orders, data, attachments) {
 
   // Iterate over grouped orders to populate the result list with
   // details of each group
-  for (let group of data) printGroup(group);
+  for (const group of data) printGroup(group);
 
   // Time we spent running the whole script
   const now = new Date, end = now - start;
