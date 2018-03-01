@@ -769,7 +769,15 @@ const CollectiveFields = () => {
         if (roles && roles.length > 0) {
           where.role = { $in: roles };
         }
-        return models.Member.findAll({ where, limit: args.limit, offset: args.offset });
+        return models.Member.findAll({
+          where,
+          limit: args.limit,
+          offset: args.offset,
+          include: [{
+            model: models.Collective, as: 'collective',
+            where: { deletedAt: null },
+          }]
+        });
       }
     },
     collectives: {
