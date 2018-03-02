@@ -1202,7 +1202,7 @@ export default function(Sequelize, DataTypes) {
   };
 
   Collective.prototype.getTopBackers = function(since, until, limit) {
-    return queries.getMembersWithTotalDonations({ CollectiveId: this.id }, { since, until, limit })
+    return queries.getMembersWithTotalDonations({ CollectiveId: this.id, role: 'BACKER' }, { since, until, limit })
       .tap(backers => debug("getTopBackers", backers.map(b => b.dataValues)));
   };
   
