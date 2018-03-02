@@ -123,14 +123,14 @@ function parseCommandLineArguments() {
     addHelp: true,
     description: 'Charge due subscriptions',
   });
-  parser.addArgument(['-v', '--verbose'], {
-    help: 'Verbose output',
+  parser.addArgument(['-q', '--quiet'], {
+    help: 'Silence output',
     defaultValue: false,
     action: 'storeConst',
     constant: true,
   });
-  parser.addArgument(['--notdryrun'], {
-    help: "Pass this flag when you're ready to run the script for real",
+  parser.addArgument(['--dryrun'], {
+    help: "Pass this flag if you just want to look at what the script would do",
     defaultValue: false,
     action: 'storeConst',
     constant: true,
@@ -144,10 +144,10 @@ function parseCommandLineArguments() {
   });
   const args = parser.parseArgs();
   return {
-    dryRun: !args.notdryrun,
-    verbose: args.verbose,
+    dryRun: args.dryrun,
+    verbose: !args.quiet,
     limit: args.limit,
-    batchSize: args.batch_size || 100
+    batchSize: args.batch_size
   };
 }
 
