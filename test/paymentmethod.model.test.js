@@ -53,7 +53,7 @@ describe("paymentmethod.model.test.js", () => {
     it(`computes the balance in the currency of the payment method's collective`, async () => {
       const balance = await paymentMethod.getBalanceForUser(user);
       expect(balance.currency).to.equal(organization.currency);
-      expect(balance.amount).to.equal(7967); // $100 - (€5 + €2 + €10)
+      expect(balance.amount).to.equal(7974); // $100 - (€5 + €2 + €10)
     });
 
   });
