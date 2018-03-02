@@ -79,8 +79,13 @@ export async function processOrderWithSubscription(options, order) {
   csvEntry.nextPeriodStartAfter = dateFormat(order.Subscription.nextPeriodStart);
 
   if (!options.dryRun) {
-    await handleRetryStatus(order, transaction);
-    await order.Subscription.save();
+    try {
+      await handleRetryStatus(order, transaction);
+    } catch (error) {
+      console.log(`Error notifying order #${order.id} ${error}`);
+    } finally {
+      await order.Subscription.save();
+    }
   }
 
   return csvEntry;

@@ -2,14 +2,14 @@ import fs from 'fs';
 import json2csv from 'json2csv';
 import { ArgumentParser } from 'argparse';
 
-import emailLib from '../../server/lib/email';
-import { promiseSeq } from '../../server/lib/utils';
-import { sequelize } from '../../server/models';
+import emailLib from '../server/lib/email';
+import { promiseSeq } from '../server/lib/utils';
+import { sequelize } from '../server/models';
 import {
   ordersWithPendingCharges,
   processOrderWithSubscription,
   groupProcessedOrders,
-} from '../../server/lib/subscriptions';
+} from '../server/lib/subscriptions';
 
 const REPORT_EMAIL = 'ops@opencollective.com';
 
@@ -129,8 +129,8 @@ function parseCommandLineArguments() {
     action: 'storeConst',
     constant: true,
   });
-  parser.addArgument(['--dryrun'], {
-    help: "Pass this flag if you just want to look at what the script would do",
+  parser.addArgument(['--notdryrun'], {
+    help: "Pass this flag when you're ready to run the script for real",
     defaultValue: false,
     action: 'storeConst',
     constant: true,
@@ -144,7 +144,7 @@ function parseCommandLineArguments() {
   });
   const args = parser.parseArgs();
   return {
-    dryRun: args.dryrun,
+    dryRun: !args.notdryrun,
     verbose: !args.quiet,
     limit: args.limit,
     batchSize: args.batch_size

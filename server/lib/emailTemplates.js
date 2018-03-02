@@ -47,7 +47,7 @@ const templateNames = [
   'ticket.confirmed.sustainoss',
   'thankyou',
   'thankyou.chsf',
-  'thankyou.sustain',
+  'thankyou.sustainoss',
   'thankyou.wwcode',
   'thankyou.kendraio',
   'thankyou.brusselstogether',
