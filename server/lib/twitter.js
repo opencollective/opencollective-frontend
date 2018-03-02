@@ -93,7 +93,7 @@ const tweetStatus = (twitterAccount, status, url, options = {}) => {
   debug("tweeting status: ", status, "with options:", options);
   if (config.twitter.consumerSecret) {
     const tweet = Promise.promisify(client.post, { context: client });
-    return tweet("statuses/update", { status, attachment_url: url, ...options });
+    return tweet("statuses/update", { status, ...options });
   } else {
     console.log('Tweet not sent: no twitter key/secret provided in env');
     return Promise.resolve();
