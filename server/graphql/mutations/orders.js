@@ -79,7 +79,7 @@ export function createOrder(_, args, req) {
       }
     }
   })
-  
+
   // check for available quantity of the tier if any
   .then(() => {
     if (!tier) return;
@@ -90,21 +90,21 @@ export function createOrder(_, args, req) {
     .then(enoughQuantityAvailable => enoughQuantityAvailable ? 
       Promise.resolve() : Promise.reject(new Error(`No more tickets left for ${tier.name}`)))
     })
-    
+
     // find or create user, check permissions to set `fromCollective`
     .then(() => {
-      if (order.user && order.user.email) return models.User.findOrCreateByEmail(order.user.email, { ...order.user, CreatedByUserId: req.remoteUser ? req.remoteUser.id : null });
+      if (order.user && order.user.email) return models.User.findOrCreateByEmail(order.user.email, { ...order.user, currency: order.currency, CreatedByUserId: req.remoteUser ? req.remoteUser.id : null });
       if (req.remoteUser) return req.remoteUser;
     })
-    
+
     // returns the fromCollective
     .then(u => {
       user = u;
-      
+
       if (!order.fromCollective || (!order.fromCollective.id && !order.fromCollective.name)) {
         return models.Collective.findById(user.CollectiveId);
       }
-      
+
       // If a `fromCollective` is provided, we check its existence and if the user can create an order on its behalf
       if (order.fromCollective.id) {
         if (!req.remoteUser) throw new Error(`You need to be logged in to create an order for an existing open collective`);
@@ -224,7 +224,7 @@ export function createOrder(_, args, req) {
     .then(() => models.Order.findById(orderCreated.id))
     .then(order => {
       // If there was a referral for this order, we add it as a FUNDRAISER role
-      if (order.ReferralCollectiveId) {
+      if (order.ReferralCollectiveId && order.ReferralCollectiveId !== user.CollectiveId) {
         collective.addUserWithRole({ id: user.id, CollectiveId: order.ReferralCollectiveId }, roles.FUNDRAISER);
       }
       return order;
