@@ -52,6 +52,8 @@ class Transaction extends React.Component {
     meta.push(transaction.category);
     meta.push(intl.formatMessage(this.messages[`${type}.meta`], { name: transaction.fromCollective.name, createdAt: new Date(transaction.createdAt) }));
 
+    const amount = (["USER", "ORGANIZATION"].indexOf(collective.type) !== -1) ? transaction.netAmountInCollectiveCurrency : transaction.amount;
+
     return (
       <div className={`transaction ${type} ${this.state.view}View`}>
         <style jsx>{`
@@ -143,7 +145,7 @@ class Transaction extends React.Component {
         </div>
         <div className="amount">
           <FormattedNumber
-            value={transaction.amount / 100}
+            value={amount / 100}
             currency={transaction.currency}
             {...this.currencyStyle}
             />

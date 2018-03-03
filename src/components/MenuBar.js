@@ -208,6 +208,13 @@ class MenuBar extends React.Component {
         )}
         { LoggedInUser && LoggedInUser.canEditCollective(collective) &&
           <div className="admin">
+            { ["USER", "ORGANIZATION"].indexOf(collective.type) !== -1 &&
+              <div className="item transactions">
+                <Link route={`${collective.path}/transactions`}>
+                  <FormattedMessage id="menu.transactions" defaultMessage="transactions" />
+                </Link>
+              </div>
+            }
             <div className="separator" />
             <div className="item editCollective">
               <Link route={`${collective.path}/edit`}>
