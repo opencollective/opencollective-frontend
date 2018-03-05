@@ -3,10 +3,13 @@
  */
 
 import Promise from 'bluebird';
+import json2csv from 'json2csv';
 import models, { sequelize } from '../../server/models';
 import emailLib from '../../server/lib/email';
+import * as transactionsLib from '../../server/lib/transactions';
 
 const VERBOSE = true;
+const attachments = [];
 let result = '';
 let start;
 let issuesFound = false;
@@ -22,7 +25,8 @@ const done = (err) => {
     subject, 
     '', {
       bcc: ' ',
-      text: result
+      text: result,
+      attachments
     })
     .then(process.exit)
     .catch(console.error)
@@ -350,8 +354,21 @@ const checkTransactions = () => {
   })
 
   // Check that various fees and amounts add up
-  // TODO
-}
+  .then(async () => {
+    const allTransactions = await models.Transaction.findAll({ where: { deletedAt: null } });
+    const funkyTransactions = allTransactions
+          .filter((tr) => !transactionsLib.verify(tr))
+          .map((tr) => ({...tr.dataValues, offBy: transactionsLib.difference(tr)}));
+    const fields = ['id', 'amount', 'currency', 'hostCurrency', 'offBy'];
+    if (funkyTransactions.length > 0) {
+      attachments.push({
+        filename: `tr-dont-add-up-${(new Date).toLocaleDateString()}.csv`,
+        content: await Promise.promisify(json2csv)({ data: funkyTransactions, fields })
+      });
+    }
+    subHeader("Transactions that don't add up", funkyTransactions.length);
+  });
+};
 
 const checkCollectiveBalance = () => {
 
