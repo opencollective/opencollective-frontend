@@ -230,7 +230,7 @@ describe('graphql.paymentMethods.test.js', () => {
       expect(transaction.CreatedByUserId).to.equal(admin.id);
       expect(org.CreatedByUserId).to.equal(admin.id);
       expect(transaction.FromCollectiveId).to.equal(org.id);
-      expect(transaction.hostFeeInHostCurrency).to.equal(Math.round(hostFeePercent/100*order.totalAmount*fxrate));
+      expect(transaction.hostFeeInHostCurrency).to.equal(-Math.round(hostFeePercent/100*order.totalAmount*fxrate));
       expect(transaction.platformFeeInHostCurrency).to.equal(0);
       expect(transaction.paymentProcessorFeeInHostCurrency).to.equal(0);
       expect(transaction.hostCurrency).to.equal(host.currency);

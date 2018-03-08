@@ -544,3 +544,8 @@ export const promiseSeq = (arr, predicate, consecutive) => {
     });
   }, Promise.resolve([]));
 };
+
+/** Sleeps for MS milliseconds */
+export function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}

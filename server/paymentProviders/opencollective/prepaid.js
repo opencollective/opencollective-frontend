@@ -3,6 +3,10 @@ import Promise from 'bluebird';
 import models from '../../models';
 import { type as TransactionTypes } from '../../constants/transactions';
 import roles from '../../constants/roles';
+import * as paymentsLib from '../../lib/payments';
+
+/** How much the platform charges per transaction: 5% */
+export const PLATFORM_FEE = 0.05
 
 export default {
   features: {
@@ -78,8 +82,11 @@ export default {
           .then(pm => newPM = pm)
           .then(() => {
 
-            const hostFeePercent = order.collective.hostFeePercent;
-
+            const hostFeeInHostCurrency = paymentsLib.calcFee(
+              order.totalAmount,
+              order.collective.hostFeePercent);
+            const platformFeeInHostCurrency = paymentsLib.calcFee(
+              order.totalAmount, PLATFORM_FEE);
             const payload = {
               CreatedByUserId: user.id,
               FromCollectiveId: order.FromCollectiveId,
@@ -93,8 +100,8 @@ export default {
                 currency: order.currency,
                 hostCurrency: order.currency,
                 hostCurrencyFxRate: 1,
-                hostFeeInHostCurrency: parseInt(order.totalAmount*hostFeePercent/100, 10),
-                platformFeeInHostCurrency: parseInt(order.totalAmount*.05, 10), // 5%
+                hostFeeInHostCurrency,
+                platformFeeInHostCurrency,
                 paymentProcessorFeeInHostCurrency: 0,
                 description: order.description
               }

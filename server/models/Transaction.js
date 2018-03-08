@@ -289,9 +289,9 @@ export default (Sequelize, DataTypes) => {
       amount: -transaction.netAmountInCollectiveCurrency,
       netAmountInCollectiveCurrency: -transaction.amount,
       amountInHostCurrency: -transaction.netAmountInCollectiveCurrency / transaction.hostCurrencyFxRate,
-      hostFeeInHostCurrency: null,
-      platformFeeInHostCurrency: null,
-      paymentProcessorFeeInHostCurrency: null
+      hostFeeInHostCurrency: transaction.hostFeeInHostCurrency,
+      platformFeeInHostCurrency: transaction.platformFeeInHostCurrency,
+      paymentProcessorFeeInHostCurrency: transaction.paymentProcessorFeeInHostCurrency
     };
 
     debug("createDoubleEntry", transaction, "opposite", oppositeTransaction);
@@ -332,14 +332,23 @@ export default (Sequelize, DataTypes) => {
         transaction.PaymentMethodId = transaction.PaymentMethodId || PaymentMethodId;
         transaction.type = (transaction.amount > 0) ? type.CREDIT : type.DEBIT;
 
+        const toNegative = (value) => value > 0 ? -value : value;
+
+        transaction.platformFeeInHostCurrency =
+          toNegative(transaction.platformFeeInHostCurrency);
+        transaction.hostFeeInHostCurrency =
+          toNegative(transaction.hostFeeInHostCurrency);
+        transaction.paymentProcessorFeeInHostCurrency =
+          toNegative(transaction.paymentProcessorFeeInHostCurrency);
+
         if (transaction.amount > 0 && transaction.hostCurrencyFxRate) {
           // populate netAmountInCollectiveCurrency for donations
           // @aseem: why the condition on && transaction.hostCurrencyFxRate ?
             transaction.netAmountInCollectiveCurrency =
               Math.round((transaction.amountInHostCurrency
-                - transaction.platformFeeInHostCurrency
-                - transaction.hostFeeInHostCurrency
-                - transaction.paymentProcessorFeeInHostCurrency)
+                        + transaction.platformFeeInHostCurrency
+                        + transaction.hostFeeInHostCurrency
+                        + transaction.paymentProcessorFeeInHostCurrency)
               * transaction.hostCurrencyFxRate);
         }
         return Transaction.createDoubleEntry(transaction);

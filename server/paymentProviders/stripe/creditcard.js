@@ -5,6 +5,7 @@ import models from '../../models';
 import * as constants from '../../constants/transactions';
 import roles from '../../constants/roles';
 import * as stripeGateway from './gateway';
+import * as paymentsLib from '../../lib/payments';
 import { planId } from '../../lib/utils';
 import errors from '../../lib/errors';
 
@@ -107,7 +108,9 @@ export default {
         .then(balanceTransaction => {
           // create a transaction
           const fees = stripeGateway.extractFees(balanceTransaction);
-          const hostFeePercent = collective.hostFeePercent;
+          const hostFeeInHostCurrency = paymentsLib.calcFee(
+            balanceTransaction.amount,
+            collective.hostFeePercent);
           const payload = {
             CreatedByUserId: user.id,
             FromCollectiveId: order.FromCollectiveId,
@@ -122,7 +125,7 @@ export default {
             hostCurrency: balanceTransaction.currency,
             amountInHostCurrency: balanceTransaction.amount,
             hostCurrencyFxRate: order.totalAmount / balanceTransaction.amount,
-            hostFeeInHostCurrency: parseInt(balanceTransaction.amount * hostFeePercent / 100, 10),
+            hostFeeInHostCurrency,
             platformFeeInHostCurrency: fees.applicationFee,
             paymentProcessorFeeInHostCurrency: fees.stripeFee,
             description: order.description,

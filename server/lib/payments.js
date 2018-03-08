@@ -7,11 +7,17 @@ import { types } from '../constants/collectives';
 import paymentProviders from '../paymentProviders';
 import * as libsubscription from './subscriptions';
 
+/** Unpack actual method from Payment Method attached to the order */
 export async function processOrder(order, options) {
   const provider = order.paymentMethod ? order.paymentMethod.service : 'manual';
   const methodType = order.paymentMethod.type || 'default';
   const method = paymentProviders[provider].types[methodType]; // eslint-disable-line import/namespace
   return await method.processOrder(order, options);
+}
+
+/** Calculates how much an amount's fee is worth */
+export function calcFee(amount, fee) {
+  return Math.round(amount * fee / 100);
 }
 
 /**

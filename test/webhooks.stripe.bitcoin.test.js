@@ -150,7 +150,7 @@ describe('webhooks.stripe.bitcoin.test.js', () => {
           .then(transactions => {
             expect(transactions.length).to.equal(2);
             expect(transactions[0].OrderId).to.equal(order.id)
-            expect(transactions[1].paymentProcessorFeeInHostCurrency).to.equal(order.totalAmount*0.008)
+            expect(transactions[1].paymentProcessorFeeInHostCurrency).to.equal(-(order.totalAmount*0.008))
             // TODO: write test case for $5 cap on stripe fees
           })
 

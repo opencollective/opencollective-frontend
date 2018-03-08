@@ -4,6 +4,7 @@ import models from '../../models';
 import * as constants from '../../constants/transactions';
 import roles from '../../constants/roles';
 import * as stripeGateway from './gateway';
+import * as paymentsLib from '../../lib/payments';
 import activities from '../../constants/activities';
 import errors from '../../lib/errors';
 import emailLib from '../../lib/email';
@@ -69,7 +70,9 @@ export default {
         .then(balanceTransaction => {
           // create a transaction
           const fees = stripeGateway.extractFees(balanceTransaction);
-          const hostFeePercent = collective.hostFeePercent;
+          const hostFeeInHostCurrency = paymentsLib.calcFee(
+            balanceTransaction.amount,
+            collective.hostFeePercent);
           const payload = {
             CreatedByUserId: user.id,
             FromCollectiveId: order.FromCollectiveId,
@@ -84,8 +87,8 @@ export default {
             hostCurrency: balanceTransaction.currency,
             amountInHostCurrency: balanceTransaction.amount,
             hostCurrencyFxRate: order.totalAmount / balanceTransaction.amount,
-            hostFeeInHostCurrency: parseInt(balanceTransaction.amount * hostFeePercent / 100, 10),
-            platformFeeInHostCurrency: order.totalAmount*0.05,
+            hostFeeInHostCurrency,
+            platformFeeInHostCurrency: Math.round(order.totalAmount * 0.05),  /* Why not dividing by 100? Is it in a different unit? */
             paymentProcessorFeeInHostCurrency: fees.stripeFee,
             description: order.description,
             data: { charge, balanceTransaction },

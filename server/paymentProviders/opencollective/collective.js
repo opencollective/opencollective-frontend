@@ -2,6 +2,7 @@ import models, { sequelize } from '../../models';
 import { type as TransactionTypes } from '../../constants/transactions';
 import Promise from 'bluebird';
 import { getFxRate } from '../../lib/currency';
+import * as paymentsLib from '../../lib/payments';
 
 export default {
   features: {
@@ -85,8 +86,12 @@ export default {
       return getFxRate(order.currency, order.paymentMethod.currency)
       .then(fxrate => {
         const totalAmountInPaymentMethodCurrency = order.totalAmount * fxrate;
-        const hostFeeInHostCurrency = hostFeePercent / 100 * order.totalAmount * fxrate;
-        const platformFeeInHostCurrency = platformFeePercent / 100 * order.totalAmount * fxrate;
+        const hostFeeInHostCurrency = paymentsLib.calcFee(
+          order.totalAmount * fxrate,
+          hostFeePercent);
+        const platformFeeInHostCurrency = paymentsLib.calcFee(
+          order.totalAmount * fxrate,
+          platformFeePercent);
         payload.transaction = {
           type: TransactionTypes.CREDIT,
           OrderId: order.id,
