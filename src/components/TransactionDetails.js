@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { defineMessages, FormattedNumber, FormattedMessage } from 'react-intl';
 import { imagePreview, capitalize } from '../lib/utils';
 import withIntl from '../lib/withIntl';
+import RefundTransactionBtn from './RefundTransactionBtn';
 
 class TransactionDetails extends React.Component {
 
@@ -79,6 +80,9 @@ class TransactionDetails extends React.Component {
           .netAmountInCollectiveCurrency {
             font-weight: bold;
           }
+          .TransactionDetails .actions {
+             clear: both;
+          }
 
           @media(max-width: 600px) {
             .TransactionDetails {
@@ -135,6 +139,14 @@ class TransactionDetails extends React.Component {
             </div>
           </div>
         }
+        <div className="actions">
+          { (LoggedInUser && LoggedInUser.isRoot() && !transaction.refundId) &&
+            <div className="transactionActions">
+              <RefundTransactionBtn transaction={transaction} />
+            </div>
+          }
+        </div>
+
       </div>
     );
   }
