@@ -36,7 +36,7 @@ describe("event.create.test.js", () => {
     cy.wait(100);
     cy.get(".geosuggest__suggests > :nth-child(1)").click();
     cy.wait(100);
-    cy.get("#location .address").contains("Rue Lesbroussart 22, 1050 Bruxelles, Belgium");
+    cy.get("#location .address").contains("Rue Lesbroussart 22, 1050"); // TODO: removed "Bruxelles, Belgium" because Google is returning a different spelling for Brussells.
     cy.get(".EditTiers .tier .inputField.name input").type("Free ticket");
     cy.get(".EditTiers .tier .inputField.description textarea").type("Free ticket for students");
     cy.get(".EditTiers .tier .inputField.maxQuantity input").type("10");
