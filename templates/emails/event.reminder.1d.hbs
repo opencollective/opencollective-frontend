@@ -1,0 +1,55 @@
+Subject: ⏰ Reminder: {{ collective.name }} tomorrow {{ moment collective.startsAt timezone=collective.timezone format="h:mma" }} at {{ collective.locationName }}
+
+{{> header}}
+
+{{> toplogo}}
+
+{{#if recipient.name}}
+<p>Dear {{recipient.name}},</p>
+{{else}}
+<p>Hi!</p>
+{{/if}}
+
+<p>We are excited that you'll be joining us tomorrow ({{ moment collective.startsAt timezone=collective.timezone format="MMMM Do" }}) at <a href="https://opencollective.com{{collective.path}}">{{ collective.name }}</a> at {{ collective.locationName }} ({{collective.address}}). The event starts at {{ moment collective.startsAt timezone=collective.timezone format="h:mma" }}.</p>
+
+<p>You have {{ order.quantity }} {{{pluralize "ticket" n=order.quantity}}}{{#if donation}} for a total of {{{currency order.totalAmount currency=order.currency}}}{{/if}}. </p>
+
+<p>Warmly,</p>
+
+<p>
+  – The {{collective.name}} organizers
+</p>
+
+<script type="application/ld+json">
+    {
+      "@context":              "http://schema.org",
+      "@type":                 "EventReservation",
+      "reservationNumber":     "{{order.id}}",
+      "reservationStatus":     "http://schema.org/Confirmed",
+      "numSeats":              "{{order.quantity}}",
+      "underName": {
+        "@type":               "Person",
+        "name":                "{{recipient.name}}"
+      },
+      "reservationFor": {
+        "@type":               "Event",
+        "name":                "{{collective.name}}",
+        "startDate":           "{{collective.startsAt}}",
+        "endDate":             "{{collective.endsAt}}",
+        "location": {
+          "@type":             "Place",
+          "name":              "{{collective.locationName}}",
+          "address": {
+            "@type":           "PostalAddress",
+            "streetAddress":   "{{collective.address}}",
+            "addressLocality": "",
+            "addressRegion":   "",
+            "postalCode":      "",
+            "addressCountry":  ""
+          }
+        }
+      }
+    }
+</script>
+
+{{> footer}}

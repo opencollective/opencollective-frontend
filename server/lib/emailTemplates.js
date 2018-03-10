@@ -28,6 +28,8 @@ const templateNames = [
   'collective.newmember',
   'collective.update.published',
   'event.newmember',
+  'event.reminder.1d',
+  'event.reminder.7d',
   'host.report',
   'host.report.text',
   'host.report.summary',
