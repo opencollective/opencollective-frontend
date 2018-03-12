@@ -1,0 +1,74 @@
+Subject: ⏰ Reminder: {{ collective.name }} next week {{ moment collective.startsAt timezone=collective.timezone format="MMMM Do" }} {{ moment collective.startsAt timezone=collective.timezone format="h:mma" }} at {{ collective.locationName }}
+
+{{> header}}
+
+{{> toplogo}}
+
+<style>
+  .description {
+    text-align: center;
+    line-height: 1.5;
+  }
+</style>
+
+{{> toplogo}}
+
+<h1>⏰</h1>
+<h2>{{collective.name}}</h2>
+<div class="description">
+  {{ moment collective.startsAt timezone=collective.timezone format="MMMM Do" }} at {{ moment collective.startsAt timezone=collective.timezone format="h:mma" }}
+  <br />
+  {{ collective.locationName }}<br />
+  ({{collective.address}})
+</div>
+
+<p>
+  <center>
+    <a class="btn blue" href="https://opencollective.com{{collective.path}}"><div>more info</div></a>
+  </center>
+</p>
+
+<p>We are excited that you'll be joining us next week.</p>
+
+<p>You have {{ order.quantity }} {{{pluralize "ticket" n=order.quantity}}}{{#if donation}} for a total of {{{currency order.totalAmount currency=order.currency}}}{{/if}}. </p>
+
+<p>Warmly,</p>
+
+<p>
+  – The {{collective.name}} organizers
+</p>
+
+
+<script type="application/ld+json">
+    {
+      "@context":              "http://schema.org",
+      "@type":                 "EventReservation",
+      "reservationNumber":     "{{order.id}}",
+      "reservationStatus":     "http://schema.org/Confirmed",
+      "numSeats":              "{{order.quantity}}",
+      "underName": {
+        "@type":               "Person",
+        "name":                "{{recipient.name}}"
+      },
+      "reservationFor": {
+        "@type":               "Event",
+        "name":                "{{collective.name}}",
+        "startDate":           "{{collective.startsAt}}",
+        "endDate":             "{{collective.endsAt}}",
+        "location": {
+          "@type":             "Place",
+          "name":              "{{collective.locationName}}",
+          "address": {
+            "@type":           "PostalAddress",
+            "streetAddress":   "{{collective.address}}",
+            "addressLocality": "",
+            "addressRegion":   "",
+            "postalCode":      "",
+            "addressCountry":  ""
+          }
+        }
+      }
+    }
+</script>
+
+{{> footer}}
