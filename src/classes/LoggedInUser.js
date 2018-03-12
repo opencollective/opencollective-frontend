@@ -106,7 +106,7 @@ LoggedInUser.prototype.canPayExpense = function(expense) {
  */
 LoggedInUser.prototype.canEditSubscription = function(order) {
   if (!order) return false;
-  if ((this.roles[order.fromCollective.slug] === 'ADMIN') || (order.fromCollective.createdByUser && order.fromCollective.createdByUser.id === this.id)) {
+  if ((this.roles[order.fromCollective.slug] && this.roles[order.fromCollective.slug].includes('ADMIN')) || (order.fromCollective.createdByUser && order.fromCollective.createdByUser.id === this.id)) {
     return true;
   }
   return false;

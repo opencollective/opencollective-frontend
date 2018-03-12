@@ -15,7 +15,7 @@ import colors from '../constants/colors';
 
 const SUBSCRIPTIONS_PER_PAGE = 25;
 
-class SubscriptionsWithData extends React.Component {
+class Subscriptions extends React.Component {
 
   static propTypes = {
     LoggedInUser: PropTypes.object,
@@ -164,4 +164,4 @@ class SubscriptionsWithData extends React.Component {
 }
 
 
-export default withIntl(SubscriptionsWithData);
+export default withIntl(Subscriptions);
