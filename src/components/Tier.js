@@ -220,7 +220,7 @@ class Tier extends React.Component {
           }
           .tier :global(.inputAmount) {
             width: 12rem;
-            margin: 0.5rem 0;
+            margin: 0.2rem 0;
           }
           .tier :global(input[name=amount]) {
             max-width: 8rem;
