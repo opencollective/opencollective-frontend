@@ -277,6 +277,7 @@ class Expense extends React.Component {
                   { expense.status === 'APPROVED' && LoggedInUser.canPayExpense(expense) &&
                     <PayExpenseBtn
                       expense={expense}
+                      collective={collective}
                       disabled={!this.props.allowPayAction}
                       lock={this.props.lockPayAction}
                       unlock={this.props.unlockPayAction}
