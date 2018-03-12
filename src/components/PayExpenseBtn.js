@@ -12,6 +12,7 @@ class PayExpenseBtn extends React.Component {
 
   static propTypes = {
     expense: PropTypes.object.isRequired,
+    collective: PropTypes.object.isRequired,
     disabled: PropTypes.bool,
     lock: PropTypes.func,
     unlock: PropTypes.func
@@ -46,13 +47,16 @@ class PayExpenseBtn extends React.Component {
   }
 
   render() {
-    const { expense, intl } = this.props;
-    let disabled = this.state.loading, title = '';
+    const { collective, expense, intl } = this.props;
+    let disabled = this.state.loading, title = '', error = this.state.error;
     if (expense.payoutMethod === 'paypal' && !isValidEmail(get(expense, 'user.paypalEmail')) && !isValidEmail(get(expense, 'user.email'))) {
       disabled = true;
       title = intl.formatMessage(this.messages['paypal.missing']);
     }
-
+    if (get(collective, 'stats.balance') < expense.amount ) {
+      disabled = true;
+      error = <FormattedMessage id="expense.pay.errror.insufficientBalance" defaultMessage="Insufficient balance" />
+    }
     return (
       <div className="PayExpenseBtn">
         <style jsx>{`
@@ -60,6 +64,8 @@ class PayExpenseBtn extends React.Component {
             display: flex;
           }
           .error {
+            display: flex;
+            align-items: center;
             color: red;
             font-size: 1.3rem;
             padding-left: 1rem;
@@ -69,7 +75,7 @@ class PayExpenseBtn extends React.Component {
           { expense.payoutMethod === 'other' && <FormattedMessage id="expense.pay.manual.btn" defaultMessage="record as paid" />}
           { expense.payoutMethod !== 'other' && <FormattedMessage id="expense.pay.btn" defaultMessage="pay with {paymentMethod}" values={{ paymentMethod: expense.payoutMethod }} />}
         </SmallButton>
-        <div className="error">{this.state.error}</div>
+        <div className="error">{error}</div>
       </div>
     );
   }
