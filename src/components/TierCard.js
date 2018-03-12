@@ -68,7 +68,9 @@ class TierCard extends React.Component {
   render() {
 
     const { collective, tier, intl } = this.props;
-    const disabled = tier.amount > 0 && !collective.isActive;
+    const amount = tier.presets ? Math.min(tier.presets[0], tier.amount) : tier.amount;
+    console.log(">>> amount: ", tier.presets, tier.amount, amount);
+    const disabled = amount > 0 && !collective.isActive;
     const totalOrders = tier.stats.totalOrders;
     let errorMsg;
     if (!collective.host) {
@@ -212,9 +214,9 @@ class TierCard extends React.Component {
         <div className="name">
           {tier.name}
         </div>
-        { tier.amount > 0 &&
+        { amount > 0 &&
           <div className="amount">
-            <Currency value={tier.amount} currency={tier.currency || collective.currency} precision={0} />
+            <Currency value={amount} currency={tier.currency || collective.currency} precision={0} />
             { tier.presets &&
             <span>+</span>
             }
@@ -240,7 +242,7 @@ class TierCard extends React.Component {
         }
         <div className="description">
           { tier.description && <Markdown source={tier.description} /> }
-          { !tier.description && <p><FormattedMessage id="tier.defaultDescription" defaultMessage="Become a {name} for {amount} per {interval} and help us sustain our activities!" values={{ name: tier.name, amount: formatCurrency(tier.amount, tier.currency || collective.currency), interval: tier.interval}}/></p> }
+          { !tier.description && <p><FormattedMessage id="tier.defaultDescription" defaultMessage="Become a {name} for {amount} per {interval} and help us sustain our activities!" values={{ name: tier.name, amount: formatCurrency(amount, tier.currency || collective.currency), interval: tier.interval}}/></p> }
         </div>
         { tier.stats.totalOrders > 0 &&
           <div>
