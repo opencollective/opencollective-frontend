@@ -43,6 +43,7 @@ class TransactionsPage extends React.Component {
     }
 
     const collective = data.Collective;
+    const cta = ["USER", "ORGANIZATION"].indexOf(collective.type) === -1 && { href: `/${collective.slug}#contribute`, label: 'contribute' };
 
     return (
       <div className="TransactionsPage">
@@ -61,7 +62,7 @@ class TransactionsPage extends React.Component {
           <CollectiveCover
             collective={collective}
             href={`/${collective.slug}`}
-            cta={{ href: `/${collective.slug}#contribute`, label: 'contribute' }}
+            cta={cta}
             LoggedInUser={LoggedInUser}
             />
 

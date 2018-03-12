@@ -36,7 +36,7 @@ describe("event.create.test.js", () => {
     cy.wait(100);
     cy.get(".geosuggest__suggests > :nth-child(1)").click();
     cy.wait(100);
-    cy.get("#location .address").contains("Rue Lesbroussart 22, 1050 Bruxelles, Belgium");
+    cy.get("#location .address").contains("Rue Lesbroussart 22, 1050");
     cy.get(".EditTiers .tier .inputField.name input").type("Free ticket");
     cy.get(".EditTiers .tier .inputField.description textarea").type("Free ticket for students");
     cy.get(".EditTiers .tier .inputField.maxQuantity input").type("10");
@@ -47,7 +47,7 @@ describe("event.create.test.js", () => {
     cy.wait(300);
     cy.get('.actions button').click();
     cy.wait(1000);
-    cy.get("#location .address").contains("Rue Lesbroussart 22, 1050 Bruxelles, Belgium");
+    cy.get("#location .address").contains("Rue Lesbroussart 22, 1050");
     cy.get('#tickets .tier').should("have.length", 2);
     cy.get('#tickets .tier:nth-child(1) .amount').contains(15);
     cy.wait(300);
