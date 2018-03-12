@@ -87,7 +87,7 @@ class ExpensesPage extends React.Component {
             margin-top: 5rem;
           }
           .largeColumn {
-            width: 900px;
+            width: 100%;
           }
           .actions {
             text-align: center;
