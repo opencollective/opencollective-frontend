@@ -24,7 +24,7 @@ const donation = {
       $not: null
     },
     platformFeeInHostCurrency: {
-      $gt: 0
+      $lt: 0
     }
   }
 };
