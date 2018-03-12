@@ -7,10 +7,10 @@ import { graphql } from 'react-apollo'
 import gql from 'graphql-tag'
 import InputField from './InputField';
 import SignInForm from './SignInForm';
-import { Button } from 'react-bootstrap';
 import { getCurrencySymbol } from '../lib/utils';
 import categories from '../constants/categories';
 import { get } from 'lodash';
+import Button from './Button';
 
 class CreateExpenseForm extends React.Component {
 
@@ -192,7 +192,10 @@ class CreateExpenseForm extends React.Component {
             font-weight: bold;
           }
           .error {
+            display: flex;
+            align-items: center;
             color: red;
+            margin-left: 1rem;
           }
           @media(max-width: 600px) {
             .leftColumn {
@@ -278,6 +281,7 @@ class CreateExpenseForm extends React.Component {
                       name="description"
                       defaultValue={expense.description}
                       className="descriptionField"
+                      maxLength={255}
                       onChange={description => this.handleChange('description', description)}
                       />
                   </span>
@@ -370,22 +374,18 @@ class CreateExpenseForm extends React.Component {
             </div>
 
             <div className="row">
-              <div className="col large">
-                <Button bsStyle="primary" type="submit" ref="submit" disabled= {this.state.loading || !this.state.isExpenseValid} >
+              <div>
+                <Button className="blue" type="submit" ref="submit" disabled= {this.state.loading || !this.state.isExpenseValid} >
                   { this.state.loading && <FormattedMessage id="form.processing" defaultMessage="processing" /> }
                   { !this.state.loading && <FormattedMessage id="expense.new.submit" defaultMessage="Submit Expense" /> }
                 </Button>
               </div>
-            </div>
 
-            <div className="row">
-              <div className="col large">
-                { this.state.error &&
-                  <div className="error">
-                    {this.state.error}
-                  </div>
-                }
-              </div>
+              { this.state.error &&
+                <div className="error">
+                  {this.state.error}
+                </div>
+              }
             </div>
 
           </div>
