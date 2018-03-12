@@ -74,11 +74,13 @@ function processEvent(event, template) {
   })
   .map(async (order) => {
     const user = await models.User.findOne({ where: { CollectiveId: get(order, 'fromCollective.id') } });
+    const fromCollective = await models.Collective.findById(get(order, 'fromCollective.id'));
     event.path = await event.getUrlPath();
     const recipient = user.email;
     const data = {
-      collective: event,
-      order
+      collective: { ... event.info, path: event.path },
+      recipient: { name: fromCollective.name },
+      order: order.info
     }
     return emailLib.send(template, recipient, data).catch(e => {
       console.warn("Unable to send email to ", event.slug, recipient, "error:", e);

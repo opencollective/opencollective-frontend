@@ -4,13 +4,31 @@ Subject: ⏰ Reminder: {{ collective.name }} next week {{ moment collective.star
 
 {{> toplogo}}
 
-{{#if recipient.name}}
-<p>Dear {{recipient.name}},</p>
-{{else}}
-<p>Hi!</p>
-{{/if}}
+<style>
+  .description {
+    text-align: center;
+    line-height: 1.5;
+  }
+</style>
 
-<p>We are excited that you'll be joining us next week ({{ moment collective.startsAt timezone=collective.timezone format="MMMM Do" }}) at <a href="https://opencollective.com{{collective.path}}">{{ collective.name }}</a> at {{ collective.locationName }} ({{collective.address}}). The event starts at {{ moment collective.startsAt timezone=collective.timezone format="h:mma" }}.</p>
+{{> toplogo}}
+
+<h1>⏰</h1>
+<h2>{{collective.name}}</h2>
+<div class="description">
+  {{ moment collective.startsAt timezone=collective.timezone format="MMMM Do" }} at {{ moment collective.startsAt timezone=collective.timezone format="h:mma" }}
+  <br />
+  {{ collective.locationName }}<br />
+  ({{collective.address}})
+</div>
+
+<p>
+  <center>
+    <a class="btn blue" href="https://opencollective.com{{collective.path}}"><div>more info</div></a>
+  </center>
+</p>
+
+<p>We are excited that you'll be joining us next week.</p>
 
 <p>You have {{ order.quantity }} {{{pluralize "ticket" n=order.quantity}}}{{#if donation}} for a total of {{{currency order.totalAmount currency=order.currency}}}{{/if}}. </p>
 
@@ -19,6 +37,7 @@ Subject: ⏰ Reminder: {{ collective.name }} next week {{ moment collective.star
 <p>
   – The {{collective.name}} organizers
 </p>
+
 
 <script type="application/ld+json">
     {
