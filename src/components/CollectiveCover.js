@@ -146,7 +146,7 @@ ${description}`
         .small .content {
           margin-top: 0px;
         }
-        .content a, .content :global(p a) {
+        .content, .content a {
           color: white;
         }
         .content a:hover {
@@ -157,9 +157,6 @@ ${description}`
         }
         .COLLECTIVE .content {
           margin-top: 0px;
-        }
-        .content, .content a {
-          color: white;
         }
         .logo {
           max-width: 20rem;
@@ -251,6 +248,11 @@ ${description}`
           h1 {
             font-size: 2.5rem;
           }
+        }
+        `}</style>
+        <style jsx global>{`
+        .CollectiveCover .content a, .content p a {
+          color: white;
         }
         `}</style>
         <div className="cover">
