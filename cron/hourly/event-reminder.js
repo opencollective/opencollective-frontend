@@ -1,14 +1,8 @@
-import Promise from 'bluebird';
 import models from '../../server/models';
 import emailLib from '../../server/lib/email';
 import { get } from 'lodash';
 
 let totalEvents = 0;
-
-const XDaysAgo = (days) => {
-  const d = new Date;
-  return new Date(d.getFullYear(), d.getMonth(), d.getDate() - days);
-}
 
 Date.prototype.toString = function() {
   const mm = this.getMonth() + 1; // getMonth() is zero-based
@@ -57,7 +51,7 @@ models.Collective.findAll({ where: {
 })
 .map(event => processEvent(event, "event.reminder.7d"))
 .then(() => {
-  console.log("All done");
+  console.log(`${totalEvents} events processed. All done.`);
   process.exit(0);
 });
 
