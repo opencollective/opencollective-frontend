@@ -34,13 +34,15 @@ const approvedExpense = { where: { status: expenseStatus.APPROVED } };
 const rejectedExpense = { where: { status: expenseStatus.REJECTED } };
 const paidExpense = { where : { status: expenseStatus.PAID } };
 
+const credit = { where: {type: 'CREDIT'}};
+
 const excludeOcTeam = { where: {
   CollectiveId: {
     $not: 1 // OpenCollective collective
   }
 } };
 
-const lastWeekDonations = _.merge({}, createdLastWeek, donation, excludeOcTeam);
+const lastWeekDonations = _.merge({}, createdLastWeek, donation, excludeOcTeam, credit);
 const lastWeekExpenses = _.merge({}, updatedLastWeek, excludeOcTeam);
 
 const pendingLastWeekExpenses = _.merge({}, lastWeekExpenses, pendingExpense);
@@ -53,6 +55,16 @@ const collectiveByCurrency = {
   group: ['currency'],
   attributes: ['currency'],
   order: ['currency']
+};
+
+const onlyIncludeCollectiveType = {
+  include: [{
+    model: models.Collective, 
+    as: 'collective',
+    where: {
+      type: 'COLLECTIVE'
+    }
+  }]
 };
 
 const stripeReceived = { where: { type: activities.WEBHOOK_STRIPE_RECEIVED } };
@@ -106,7 +118,7 @@ Promise.props({
   // Collective statistics
 
   activeCollectivesWithTransactions: Transaction
-    .findAll(_.merge({attributes: ['CollectiveId'] }, updatedLastWeek, distinct, excludeOcTeam))
+    .findAll(_.merge({attributes: ['CollectiveId'] }, createdLastWeek, distinct, excludeOcTeam, onlyIncludeCollectiveType))
     .map(row => row.CollectiveId),
 
   activeCollectivesWithExpenses: Expense
@@ -166,8 +178,7 @@ function reportString(results) {
 \`\`\`
 * Donations:
   - ${results.donationCount} donations received${displayTotals(results.donationAmount)}
-  - ${results.stripeReceivedCount} donations received via Stripe Webhook (only recurring)
-  - ${results.paypalReceivedCount} donations received via PayPal
+  - ${results.stripeReceivedCount} donations received via Bitcoin (count via Stripe Webhook)
 * Expenses:
   - ${results.pendingExpenseCount} pending expenses${displayTotals(results.pendingExpenseAmount)}
   - ${results.approvedExpenseCount} approved expenses${displayTotals(results.approvedExpenseAmount)}
