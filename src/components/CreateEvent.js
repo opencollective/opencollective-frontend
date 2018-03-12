@@ -111,6 +111,7 @@ class CreateEvent extends React.Component {
 
           <CollectiveCover
             href={`/${collective.slug}`}
+            className="small"
             title={title}
             collective={collective}
             style={get(collective, 'settings.style.hero.cover')}

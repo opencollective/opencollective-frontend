@@ -100,6 +100,7 @@ const getCollectiveToEditQuery = gql`
       currency
       settings
       createdAt
+      isHost
       stats {
         id
         yearlyBudget
@@ -230,7 +231,10 @@ const getCollectiveQuery = gql`
           hosted
           memberOf
         }
-        transactions
+        transactions {
+          id
+          all
+        }
         expenses {
           id
           all
@@ -362,6 +366,18 @@ const getEventCollectiveQuery = gql`
         image
         settings
       }
+      stats {
+        id
+        balance
+        expenses {
+          id
+          all
+        }
+        transactions {
+          id
+          all
+        }
+      }
       members {
         id
         createdAt
@@ -407,6 +423,7 @@ const getCollectiveCoverQuery = gql`
       id
       type
       slug
+      path
       name
       currency
       backgroundImage
@@ -429,6 +446,11 @@ const getCollectiveCoverQuery = gql`
         slug
         name
         image
+      }
+      parentCollective {
+        id
+        slug
+        name
       }
       members {
         id
@@ -564,7 +586,6 @@ const refreshLoggedInUser = async (data) => {
 
   if (data.LoggedInUser) {
     const user = new LoggedInUser(data.LoggedInUser);
-    console.info(`>>> LoggedInUser was already in data`);
     storage.set("LoggedInUser", user, 1000 * 60 * 60);
     return user;
   }

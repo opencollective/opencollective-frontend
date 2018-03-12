@@ -124,24 +124,30 @@ class OrderForm extends React.Component {
 
     this.fields = [
       {
-        name: 'firstName'
+        name: 'firstName',
+        maxLength: 127
       },
       {
-        name: 'lastName'
+        name: 'lastName',
+        maxLength: 128
       },
       {
-        name: 'company'
+        name: 'company',
+        maxLength: 255
       },
       {
-        name: 'website'
+        name: 'website',
+        maxLength: 255
       },
       {
         name: 'twitterHandle',
         pre: '@',
+        maxLength: 255,
         validate: (val) => val.match(/^[A-Za-z0-9_]{1,15}$/)
       },
       {
-        name: 'description'
+        name: 'description',
+        maxLength: 255
       }
     ]
 
@@ -563,7 +569,6 @@ class OrderForm extends React.Component {
       type: 'email',
       name: 'email',
       required: true,
-      focus: true,
       label: `${intl.formatMessage(this.messages['email.label'])}*`,
       description: intl.formatMessage(this.messages['email.description']),
       defaultValue: order['email'],
@@ -924,8 +929,8 @@ class OrderForm extends React.Component {
                 { (collective.host || order.totalAmount === 0) &&
                   <div className="actions">
                     <div className="submit">
-                      <ActionButton className="blue" ref="submit" onClick={this.handleSubmit} disabled={this.state.loading}>
-                        {this.state.loading ? <FormattedMessage id='loading' defaultMessage='loading' /> : order.tier.button || capitalize(intl.formatMessage(this.messages['order.button']))}
+                      <ActionButton className="blue" ref="submit" onClick={this.handleSubmit} disabled={ this.state.loading}>
+                        {this.state.loading ? <FormattedMessage id='form.processing' defaultMessage='processing' /> : order.tier.button || capitalize(intl.formatMessage(this.messages['order.button']))}
                       </ActionButton>
                     </div>
                     { order.totalAmount > 0 &&
@@ -949,7 +954,7 @@ class OrderForm extends React.Component {
                       </div>
                     }
                     <div className="result">
-                      { this.state.loading && <div className="loading">Processing...</div> }
+                      { this.state.loading && <div className="loading"><FormattedMessage id='form.processing' defaultMessage='processing' />...</div> }
                       { this.state.result.success &&
                         <div className="success">
                           {this.state.result.success}

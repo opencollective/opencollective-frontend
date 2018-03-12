@@ -81,6 +81,16 @@ class Header extends React.Component {
         font-style: normal;
       }
 
+      html {
+        --charcoal-grey-two: #373a3d;
+        --charcoal-grey-three: #45484c;
+        --main-custom-color: #8f47b3;
+        --silver-four: #e1e4e6;
+        --cool-grey: #9ea2a6;
+        --attention: #e69900;
+        --gunmetal: #505559;
+      }
+
       body.showModal {
         overflow: hidden;
       }

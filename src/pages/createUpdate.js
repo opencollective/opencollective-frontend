@@ -62,8 +62,10 @@ class CreateUpdatePage extends React.Component {
     const { data, action } = this.props;
     const { LoggedInUser } = this.state;
 
-    if (data.loading && !data.Collective) return (<Loading />);
-    if (!data.Collective) return (<NotFound />);
+    if (data.loading) return (<Loading />);
+    if (!data.loading && !data.Collective) {
+      return (<NotFound />)
+    }
 
     if (data.error) {
       console.error("graphql error>>>", data.error.message);

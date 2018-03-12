@@ -9,7 +9,8 @@ describe("collective.createOrder page", () => {
   it ("loads custom donate page", () => {
     cy.visit(`${WEBSITE_URL}/apex/donate/50/month/custom%20description`)
     cy.get('.tier .description').contains("custom description");
-    cy.get('.tier .amount').contains("$50/monthly");
+    cy.get('.tier .amount').contains("$50");
+    cy.get('.tier .amount').contains("per month");
   });
 
   it ("makes an order as a new organization", () => {

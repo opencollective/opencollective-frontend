@@ -14,13 +14,13 @@ import { get } from 'lodash';
 import { Router } from '../server/pages';
 import { FormattedMessage, defineMessages } from 'react-intl';
 import CollectivesWithData from './CollectivesWithData';
+import SectionTitle from './SectionTitle';
 import ExpensesSection from './ExpensesSection';
 import UpdatesSection from './UpdatesSection';
-import EventsWithData from './EventsWithData';
+import EventsSection from './EventsSection';
 import TransactionsWithData from './TransactionsWithData';
 import { Button } from 'react-bootstrap';
 import { Link } from '../server/pages';
-import SectionTitle from './SectionTitle';
 import { formatCurrency } from '../lib/utils';
 
 const defaultBackgroundImage = '/static/images/defaultBackgroundImage.png';
@@ -65,6 +65,7 @@ class Collective extends React.Component {
 
   componentDidMount() {
     window.oc = { collective: this.collective }; // for easy debugging
+    const { LoggedInUser } = this.props;
   }
 
   async createOrder(order) {
@@ -229,12 +230,10 @@ class Collective extends React.Component {
                   }
 
                   { (get(this.collective, 'stats.events') > 0 || canEditCollective) &&
-                    <section id="events">
-                      <SectionTitle section="events" />
-                      <div className="eventsList">
-                        <EventsWithData collectiveSlug={this.collective.slug} />
-                      </div>
-                    </section>
+                    <EventsSection
+                      LoggedInUser={LoggedInUser}
+                      collective={this.collective}
+                      />
                   }
                   <section id="about" className="longDescription" >
                     <SectionTitle
@@ -278,13 +277,11 @@ class Collective extends React.Component {
               <section id="budget" className="clear">
                 <div className="content" >
                   <SectionTitle section="budget" values={{ balance: formatCurrency(get(this.collective, 'stats.balance'), this.collective.currency) }}/>
-
                   <ExpensesSection
                     collective={this.collective}
                     LoggedInUser={LoggedInUser}
                     limit={10}
                     />
-
                 </div>
               </section>
 

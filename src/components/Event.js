@@ -12,16 +12,21 @@ import OrderForm from '../components/OrderForm';
 import InterestedForm from '../components/InterestedForm';
 import Sponsors from '../components/Sponsors';
 import Responses from '../components/Responses';
-import { filterCollection } from '../lib/utils';
+import { filterCollection, formatCurrency } from '../lib/utils';
 import Markdown from 'react-markdown';
 import TicketsConfirmed from '../components/TicketsConfirmed';
-import { FormattedMessage, FormattedDate, FormattedTime } from 'react-intl';
+import { defineMessages, FormattedMessage, FormattedDate, FormattedTime } from 'react-intl';
 import { uniqBy, get, union } from 'lodash';
 import { capitalize, trimObject } from '../lib/utils';
 import { Router } from '../server/pages';
 import { addEventMutations } from '../graphql/mutations';
 import { exportRSVPs } from '../lib/export_file';
 import { Link } from '../server/pages';
+import SectionTitle from './SectionTitle';
+import ExpensesSection from './ExpensesSection';
+import withIntl from '../lib/withIntl';
+import Button from './Button';
+import SendMoneyToCollectiveBtn from './SendMoneyToCollectiveBtn';
 
 const defaultBackgroundImage = '/static/images/defaultBackgroundImage.png';
 
@@ -49,6 +54,13 @@ class Event extends React.Component {
       event: this.props.event
     }
 
+    this.messages = defineMessages({
+      'event.over.sendMoneyToParent.title': { id: 'event.over.sendMoneyToParent.title', defaultMessage: 'Event is over and still has a positive balance'},
+      'event.over.sendMoneyToParent.description': { id: 'event.over.sendMoneyToParent.description', defaultMessage: 'If you still have expenses related to this event, please file them. Otherwise consider moving the money to your collective {collective}'},
+      'event.over.sendMoneyToParent.transaction.description': { id: 'event.over.sendMoneyToParent.transaction.description', defaultMessage: 'Balance of {event}'}
+    });
+
+    this.isEventOver = (new Date(this.event.endsAt)).getTime() < (new Date).getTime();
   }
 
   componentDidMount() {
@@ -141,8 +153,8 @@ class Event extends React.Component {
   }
 
   render() {
+    const { LoggedInUser, intl } = this.props;
     const { event } = this.state;
-    const { LoggedInUser } = this.props;
 
     const canEditEvent = LoggedInUser && LoggedInUser.canEditEvent(event);
     const responses = {};
@@ -178,6 +190,26 @@ class Event extends React.Component {
     responses.going = filterCollection(responses.guests, { status: 'YES' });
     responses.interested = filterCollection(responses.guests, { status: 'INTERESTED' });
 
+    let notification = {};
+    // If event is over and has a positive balance, we ask the admins if they want to move the money to the parent collective
+    if (this.isEventOver && get(this.props.event, 'stats.balance') > 0 && canEditEvent) {
+      notification = {
+        title: intl.formatMessage(this.messages['event.over.sendMoneyToParent.title']),
+        description: intl.formatMessage(this.messages['event.over.sendMoneyToParent.description'], { collective: event.parentCollective.name }),
+        actions: [
+          <Button className="submitExpense gray" href={`${event.path}/expenses/new`}><FormattedMessage id="menu.submitExpense" defaultMessage="Submit Expense" /></Button>,
+          <SendMoneyToCollectiveBtn
+            fromCollective={event}
+            toCollective={event.parentCollective}
+            LoggedInUser={LoggedInUser}
+            description={intl.formatMessage(this.messages['event.over.sendMoneyToParent.transaction.description'], { event: event.name })}
+            amount={event.stats.balance}
+            currency={event.currency}
+            />
+        ]
+      }
+    }
+
     const info = (
       <HashLink to="#location">
         <FormattedDate value={event.startsAt} weekday='short' day='numeric' month='long' />, &nbsp;
@@ -186,9 +218,7 @@ class Event extends React.Component {
       </HashLink>
     );
 
-    const backgroundImage = event.backgroundImage || event.parentCollective.backgroundImage || defaultBackgroundImage;
-
-    console.log("event", event);
+    const backgroundImage = event.backgroundImage || get(event, 'parentCollective.backgroundImage') || defaultBackgroundImage;
 
     return (
       <div>
@@ -233,14 +263,19 @@ class Event extends React.Component {
 
             <div className={`EventPage ${this.state.modal && 'showModal'}`}>
 
-              <NotificationBar status={this.state.status} error={this.state.error} />
+              <NotificationBar
+                status={this.state.status}
+                title={notification.title}
+                description={notification.description}
+                actions={notification.actions}
+                error={this.state.error}
+                />
 
               <CollectiveCover
                 collective={event}
                 title={event.name}
                 description={info}
                 LoggedInUser={LoggedInUser}
-                href={`/${event.parentCollective.slug}`}
                 style={get(event, 'settings.style.hero.cover') || get(event.parentCollective, 'settings.style.hero.cover')}
                 />
 
@@ -292,6 +327,7 @@ class Event extends React.Component {
                     <Responses responses={responses.guests} />
                   </section>
                 }
+
                 { responses.sponsors.length > 0 &&
                   <section id="sponsors">
                     <h1>
@@ -306,6 +342,17 @@ class Event extends React.Component {
                   </section>
                 }
 
+              <section id="budget" className="clear">
+                <div className="content" >
+                  <SectionTitle section="budget" values={{ balance: formatCurrency(get(event, 'stats.balance'), event.currency) }}/>
+                  <ExpensesSection
+                    collective={event}
+                    LoggedInUser={LoggedInUser}
+                    limit={10}
+                    />
+                </div>
+              </section>
+
               </div>
             </div>
           </Body>
@@ -316,4 +363,4 @@ class Event extends React.Component {
   }
 }
 
-export default addEventMutations(Event);
+export default withIntl(addEventMutations(Event));

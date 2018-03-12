@@ -48,21 +48,26 @@ class LoginForm extends React.Component {
     this.fields = [
       {
         name: 'firstName',
-        focus: true
+        focus: true,
+        maxLength: 127
       },
       {
-        name: 'lastName'
+        name: 'lastName',
+        maxLength: 128
       },
       {
-        name: 'website'
+        name: 'website',
+        maxLength: 255
       },
       {
         name: 'twitterHandle',
         pre: '@',
+        maxLength: 255,
         validate: (val) => val.match(/^[A-Za-z0-9_]{1,15}$/)
       },
       {
-        name: 'description'
+        name: 'description',
+        maxLength: 255
       }
     ]
 

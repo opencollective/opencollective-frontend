@@ -54,7 +54,7 @@ class EditConnectedAccount extends React.Component {
   }
 
   render() {
-    const { intl, service, connectedAccount } = this.props;
+    const { intl, service, connectedAccount, collective } = this.props;
     let vars = {};
     if (connectedAccount) {
       vars = {
@@ -78,7 +78,7 @@ class EditConnectedAccount extends React.Component {
         </div>
       }
       { connectedAccount && connectedAccount.service === 'twitter' &&
-        <EditTwitterAccount connectedAccount={connectedAccount} />
+        <EditTwitterAccount collective={collective} connectedAccount={connectedAccount} />
       }
       </div>
     );

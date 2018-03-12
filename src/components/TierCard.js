@@ -10,6 +10,7 @@ import { Link } from '../server/pages';
 import Currency from './Currency';
 import colors from '../constants/colors';
 import { formatCurrency } from '../lib/utils';
+import Markdown from 'react-markdown';
 
 class TierCard extends React.Component {
 
@@ -90,15 +91,6 @@ class TierCard extends React.Component {
     return (
       <div className={`TierCard ${this.props.className} ${this.anchor}`}>
         <style jsx global>{`
-          html {
-            --charcoal-grey-two: #373a3d;
-            --charcoal-grey-three: #45484c;
-            --main-custom-color: #8f47b3;
-            --silver-four: #e1e4e6;
-            --cool-grey: #9ea2a6;
-            --attention: #e69900;
-            --gunmetal: #505559;
-          }
           .image img {
             border: 2px solid white;            
           }
@@ -165,7 +157,7 @@ class TierCard extends React.Component {
             color: var(--attention);
           }
           .description {
-            margin: 1rem 3rem;
+            margin: 0rem 3rem;
             overflow: hidden;
             text-overflow: ellipsis;
             font-size: 1.4rem;
@@ -247,7 +239,8 @@ class TierCard extends React.Component {
           </div>
         }
         <div className="description">
-          {tier.description || <FormattedMessage id="tier.defaultDescription" defaultMessage="Become a {name} for {amount} per {interval} and help us sustain our activities!" values={{ name: tier.name, amount: formatCurrency(tier.amount, tier.currency || collective.currency), interval: tier.interval}}/>}
+          { tier.description && <Markdown source={tier.description} /> }
+          { !tier.description && <p><FormattedMessage id="tier.defaultDescription" defaultMessage="Become a {name} for {amount} per {interval} and help us sustain our activities!" values={{ name: tier.name, amount: formatCurrency(tier.amount, tier.currency || collective.currency), interval: tier.interval}}/></p> }
         </div>
         { tier.stats.totalOrders > 0 &&
           <div>

@@ -8,15 +8,16 @@ class NotificationBar extends React.Component {
     status: PropTypes.string,
     title: PropTypes.string,
     description: PropTypes.string,
-    error: PropTypes.string
+    error: PropTypes.string,
+    actions: PropTypes.arrayOf(PropTypes.node)
   }
 
   render() {
-    const { status, error, title, description } = this.props;
+    const { status, error, title, description, actions } = this.props;
 
     return (
       <div className={`${status} NotificationBar`}>
-        <style>{`
+        <style jsx>{`
         .oc-message {
           position: fixed;
           top: -70px;
@@ -91,6 +92,12 @@ class NotificationBar extends React.Component {
           max-width: 60rem;
           text-align: center;
         }
+        .actions {
+          display: flex;
+        }
+        .actions > div {
+          margin: 0.5rem;
+        }
         `}</style>
         <div className="oc-message">
           <img src={logo} width="40" height="40" className="logo" alt="Open Collective logo" />
@@ -100,6 +107,11 @@ class NotificationBar extends React.Component {
           <div className="NotificationLine">
             <h1>{title}</h1>
             <p className="description">{description}</p>
+            { actions &&
+              <div className="actions">
+                { actions.map(action => <div>{action}</div>) }
+              </div>
+            }
           </div>
         }
         <div className="oc-progress-bar">
