@@ -80,7 +80,7 @@ class Expenses extends React.Component {
             justify-content: center;
           }
           :global(.filterBtn) {
-            width: 33%;
+            width: 25%;
           }
           .empty {
             text-align: center;
