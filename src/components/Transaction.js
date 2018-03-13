@@ -25,6 +25,7 @@ class Transaction extends React.Component {
       'credit': { id: 'transaction.credit', defaultMessage: 'credit' },
       'credit.title': { id: 'transaction.credit.title', defaultMessage: '{interval, select, month {monthly} year {yearly} other {}} donation to {collective}' },
       'debit.meta': { id: 'transaction.debit.meta', defaultMessage: 'Expense submitted by {name}, paid on {createdAt, date, medium}' },
+      'refund.meta': { id: 'transaction.refund.meta', defaultMessage: 'Refunded to {name}, paid on {createdAt, date, medium}' },
       'credit.meta': { id: 'transaction.credit.meta', defaultMessage: 'Donation made by {name} on {createdAt, date, medium}' },
       'closeDetails': { id: 'transaction.closeDetails', defaultMessage: 'Close Details' },
       'viewDetails': { id: 'transaction.viewDetails', defaultMessage: 'View Details' }
@@ -42,15 +43,16 @@ class Transaction extends React.Component {
     if (!transaction.fromCollective) return (<div />); // This only occurs for host collectives when they add funds
 
     const type = transaction.type.toLowerCase();
+    const messageType = (transaction.RefundTransactionId) ? 'refund' : type;
 
     let title = transaction.description;
-    if (type === 'credit' && (!title || !title.match(/Matching/) && title.match(/donation to /i))) {
+    if (type === 'credit' && (!title || !title.match(/Matching/) && title.match(/donation to /i) && !title.match(/Refund/))) {
       title = intl.formatMessage(this.messages['credit.title'], {collective: collective.name, interval: get(transaction, 'subscription.interval')})
     }
 
     const meta = [];
     meta.push(transaction.category);
-    meta.push(intl.formatMessage(this.messages[`${type}.meta`], { name: transaction.fromCollective.name, createdAt: new Date(transaction.createdAt) }));
+    meta.push(intl.formatMessage(this.messages[`${messageType}.meta`], { name: transaction.fromCollective.name, createdAt: new Date(transaction.createdAt) }));
 
     const amount = (["USER", "ORGANIZATION"].indexOf(collective.type) !== -1) ? transaction.netAmountInCollectiveCurrency : transaction.amount;
 
