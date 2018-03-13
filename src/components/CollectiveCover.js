@@ -251,7 +251,7 @@ ${description}`
         }
         `}</style>
         <style jsx global>{`
-        .CollectiveCover .content a, .content p a {
+        .CollectiveCover .content a {
           color: white;
         }
         `}</style>
