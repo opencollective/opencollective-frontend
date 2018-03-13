@@ -3,8 +3,8 @@ import PropTypes from 'prop-types';
 import Error from '../components/Error';
 import withIntl from '../lib/withIntl';
 import Transactions from '../components/Transactions';
+import { getTransactionsQuery } from '../graphql/queries';
 import { graphql } from 'react-apollo'
-import gql from 'graphql-tag'
 
 class TransactionsWithData extends React.Component {
 
@@ -53,50 +53,6 @@ class TransactionsWithData extends React.Component {
   }
 
 }
-
-
-export const getTransactionsQuery = gql`
-query Transactions($CollectiveId: Int!, $type: String, $limit: Int, $offset: Int, $dateFrom: String, $dateTo: String) {
-  allTransactions(CollectiveId: $CollectiveId, type: $type, limit: $limit, offset: $offset, dateFrom: $dateFrom, dateTo: $dateTo) {
-    id
-    RefundTransactionId
-    uuid
-    description
-    createdAt
-    type
-    amount
-    currency
-    netAmountInCollectiveCurrency
-    hostFeeInHostCurrency
-    platformFeeInHostCurrency
-    paymentProcessorFeeInHostCurrency
-    paymentMethod {
-      service
-    }
-    fromCollective {
-      id
-      name
-      slug
-      image
-    }
-    host {
-      id
-      name
-      currency
-    }
-    ... on Expense {
-      category
-      attachment
-    }
-    ... on Order {
-      subscription {
-        interval
-      }
-    }
-  }
-}
-`;
-
 
 const TRANSACTIONS_PER_PAGE = 10;
 export const addTransactionsData = graphql(getTransactionsQuery, {

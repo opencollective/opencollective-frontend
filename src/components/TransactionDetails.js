@@ -142,7 +142,9 @@ class TransactionDetails extends React.Component {
         <div className="actions">
           { (LoggedInUser && LoggedInUser.isRoot() && !transaction.RefundTransactionId) &&
             <div className="transactionActions">
-              <RefundTransactionBtn transaction={transaction} />
+              <RefundTransactionBtn
+                transaction={transaction}
+                collective={collective} />
             </div>
           }
         </div>
