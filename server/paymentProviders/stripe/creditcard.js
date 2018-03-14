@@ -162,7 +162,8 @@ export default {
       .then(() => transactions); // make sure we return the transactions created
   },
 
-  refundTransaction: async (transaction) => {
+  /** Refund a given transaction */
+  refundTransaction: async (transaction, user) => {
     /* What's going to be refunded */
     const chargeId = _.result(transaction.data, 'charge.id');
 
@@ -181,7 +182,7 @@ export default {
 
     /* Create negative transactions for the received transaction */
     const refundTransaction = await paymentsLib.createRefundTransaction(
-      transaction, fees.stripeFee, { refund, balance });
+      transaction, fees.stripeFee, { refund, balance }, user);
 
     /* Associate RefundTransactionId to all the transactions created */
     return paymentsLib.associateTransactionRefundId(

@@ -39,10 +39,12 @@ export async function processOrder(order, options) {
  * @param {Object} transaction must contain a valid `PaymentMethod`
  *  field. Which means that the query to select it from the DB must
  *  include the `PaymentMethods` table.
+ * @param {Object} user is an instance of the User model that will be
+ *  associated to the refund transaction as who performed the refund.
  */
-export async function refundTransaction(transaction) {
+export async function refundTransaction(transaction, user) {
   const paymentMethod = findPaymentMethod(transaction.PaymentMethod);
-  return await paymentMethod.refundTransaction(transaction);
+  return await paymentMethod.refundTransaction(transaction, user);
 }
 
 /** Calculates how much an amount's fee is worth */
@@ -74,7 +76,7 @@ export function calcFee(amount, fee) {
  *  method that should be saved within the *data* field of the
  *  transactions being created.
  */
-export async function createRefundTransaction(transaction, refundedPaymentProcessorFee, data) {
+export async function createRefundTransaction(transaction, refundedPaymentProcessorFee, data, user) {
   /* If the transaction passed isn't the one from the collective
    * perspective, the opposite transaction is retrieved. */
   const collectiveLedger = (transaction.type === 'CREDIT') ? transaction :
@@ -84,10 +86,11 @@ export async function createRefundTransaction(transaction, refundedPaymentProces
         } });
   const userLedgerRefund = pick(collectiveLedger, [
     'FromCollectiveId', 'CollectiveId', 'HostCollectiveId', 'PaymentMethodId',
-    'CreatedByUserId', 'OrderId', 'hostCurrencyFxRate', 'hostCurrency',
+    'OrderId', 'hostCurrencyFxRate', 'hostCurrency',
     'hostFeeInHostCurrency', 'platformFeeInHostCurrency',
     'paymentProcessorFeeInHostCurrency',
   ]);
+  userLedgerRefund.CreatedByUserId = user.id;
   userLedgerRefund.amount = -collectiveLedger.amount;
   userLedgerRefund.amountInHostCurrency = -collectiveLedger.amountInHostCurrency;
   userLedgerRefund.netAmountInCollectiveCurrency = -libtransactions.netAmount(collectiveLedger);

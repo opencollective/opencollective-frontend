@@ -299,7 +299,7 @@ describe('lib.payments.test.js', () => {
       });
 
       // When the refund transaction is created
-      await payments.createRefundTransaction(transaction, 0, { dataField: 'foo' });
+      await payments.createRefundTransaction(transaction, 0, { dataField: 'foo' }, user);
 
       // And when transactions for that order are retrieved
       const allTransactions = await models.Transaction.findAll({ where: {

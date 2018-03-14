@@ -95,6 +95,15 @@ async function setupTestObjects() {
   return { user, host, collective, tier, paymentMethod, order, transaction };
 }
 
+function initStripeNock({ amount, fee, fee_details, net }) {
+  nock('https://api.stripe.com:443')
+    .post('/v1/refunds')
+    .reply(200, { id: 're_1Bvu79LzdXg9xKNSFNBqv7Jn', amount: 5000, balance_transaction: 'txn_1Bvu79LzdXg9xKNSWEVCLSUu' });
+  nock('https://api.stripe.com:443')
+    .get('/v1/balance/history/txn_1Bvu79LzdXg9xKNSWEVCLSUu')
+    .reply(200, { id: 'txn_1Bvu79LzdXg9xKNSWEVCLSUu', amount, fee, fee_details, net });
+}
+
 describe("Refund Transaction", () => {
   /* All the tests will touch the database, so resetting it is the
    * first thing we do. */
@@ -130,26 +139,61 @@ describe("Refund Transaction", () => {
     expect(message).to.equal('Not a site admin');
   });
 
+  describe("Save CreatedByUserId", () => {
+    let userStub;
+    beforeEach(() => {
+      userStub = sinon.stub(models.User.prototype, 'isRoot', () => true);
+    });
+    afterEach(() => userStub.restore());
+
+    beforeEach(() => initStripeNock({ amount: -5000, fee: 0, fee_details: [], net: -5000 }));
+
+    afterEach(nock.cleanAll);
+
+    it("should save the ID of the user that refunded the transaction in CreatedByUserId", async () => {
+      // Given that we create a user, host, collective, tier,
+      // paymentMethod, an order and a transaction
+      const { user, transaction } = await setupTestObjects();
+
+      // And a newly created user that's also a site admin
+      const anotherUser = await models.User.createUserWithCollective(utils.data('user3'));
+
+      // When a refunded attempt happens from the above user
+      const result = await utils.graphqlQuery(refundQuery, { id: transaction.id }, anotherUser);
+
+      // Then there should be no errors
+      if (result.errors) throw result.errors;
+
+      // And then all the transactions with that same order id are
+      // retrieved.
+      const [tr1, tr2, tr3, tr4] = await models.Transaction.findAll({ where: { OrderId: transaction.OrderId } });
+
+      // And then the first two transactions (related to the order)
+      // should be owned by the user created in setupTestObjects()
+      expect(tr1.CreatedByUserId).to.equal(user.id);
+      expect(tr2.CreatedByUserId).to.equal(user.id);
+
+      // And then the two refund transactions should be owned by the
+      // user that refunded the first transactions
+      expect(tr3.CreatedByUserId).to.equal(anotherUser.id);
+      expect(tr4.CreatedByUserId).to.equal(anotherUser.id);
+    });
+  });  /* describe("Save CreatedByUserId") */
+
   /* Stripe will fully refund the processing fee for accounts created
    * prior to 09/17/17. The refunded fee can be seen in the balance
    * transaction call right after a refund.  The nock output isn't
    * complete but we really don't use the other fields retrieved from
    * Stripe. */
   describe("Stripe Transaction - for hosts created before September 17th 2017", () => {
-    let userStub
+    let userStub;
     beforeEach(() => {
       userStub = sinon.stub(models.User.prototype, 'isRoot', () => true);
     });
     afterEach(() => userStub.restore());
 
-    beforeEach(() => {
-      nock('https://api.stripe.com:443')
-        .post('/v1/refunds')
-        .reply(200, { id: 're_1Bvu79LzdXg9xKNSFNBqv7Jn', amount: 5000, balance_transaction: 'txn_1Bvu79LzdXg9xKNSWEVCLSUu' });
-      nock('https://api.stripe.com:443')
-        .get('/v1/balance/history/txn_1Bvu79LzdXg9xKNSWEVCLSUu')
-        .reply(200, { id: 'txn_1Bvu79LzdXg9xKNSWEVCLSUu', amount: -5000, fee: -175, fee_details: [{ amount: -175, type: 'stripe_fee' }], net: -4825 });
-    });
+    beforeEach(() => initStripeNock({ amount: -5000, fee: -175, fee_details: [{ amount: -175, type: 'stripe_fee' }], net: -4825 }));
+
     afterEach(nock.cleanAll);
 
     it('should create negative transactions with all the fees refunded', async () => {
@@ -234,20 +278,14 @@ describe("Refund Transaction", () => {
    * complete but we really don't use the other fields retrieved from
    * Stripe. */
   describe("Stripe Transaction - for hosts created after September 17th 2017", () => {
-    let userStub
+    let userStub;
     beforeEach(() => {
       userStub = sinon.stub(models.User.prototype, 'isRoot', () => true);
     });
     afterEach(() => userStub.restore());
 
-    beforeEach(() => {
-      nock('https://api.stripe.com:443')
-        .post('/v1/refunds')
-        .reply(200, { id: 're_1Bvu79LzdXg9xKNSFNBqv7Jn', amount: 5000, balance_transaction: 'txn_1Bvu79LzdXg9xKNSWEVCLSUu' });
-      nock('https://api.stripe.com:443')
-        .get('/v1/balance/history/txn_1Bvu79LzdXg9xKNSWEVCLSUu')
-        .reply(200, { id: 'txn_1Bvu79LzdXg9xKNSWEVCLSUu', amount: -5000, fee: 0, fee_details: [], net: -5000 });
-    });
+    beforeEach(() => initStripeNock({ amount: -5000, fee: 0, fee_details: [], net: -5000 }));
+
     afterEach(nock.cleanAll);
 
     it('should create negative transactions without the stripe fee being refunded', async () => {
