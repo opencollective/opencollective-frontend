@@ -1,5 +1,5 @@
 import { createCollective, editCollective, deleteCollective, approveCollective } from './mutations/collectives';
-import { createOrder, cancelSubscription, updateSubscription } from './mutations/orders';
+import { createOrder, cancelSubscription, updateSubscription, refundTransaction } from './mutations/orders';
 import { createMember, removeMember } from './mutations/members';
 import { editTiers } from './mutations/tiers';
 import { editConnectedAccount } from './mutations/connectedAccounts';
@@ -27,6 +27,10 @@ import {
 import {
   CollectiveInterfaceType
 } from './CollectiveInterface';
+
+import {
+  TransactionInterfaceType,
+} from './TransactionInterface';
 
 import {
   CollectiveInputType,
@@ -258,7 +262,19 @@ const mutations = {
     resolve(_, args, req) {
       return updateSubscription(req.remoteUser, args)
     }
+  },
+
+  refundTransaction: {
+    type: TransactionInterfaceType,
+    args: {
+      id: {
+        type: new GraphQLNonNull(GraphQLInt)
+      }
+    },
+    async resolve(_, args, req) {
+      return await refundTransaction(_, args, req);
+    }
   }
-}
+};
 
 export default mutations;

@@ -129,6 +129,14 @@ export const retrieveCharge = (stripeAccount, chargeId) => {
   return appStripe.charges.retrieve(chargeId, { stripe_account: stripeAccount.username});
 };
 
+/** Refund a charge & the application fee */
+export const refundCharge = (stripeAccount, chargeId) => {
+  return appStripe.refunds.create(
+    { charge: chargeId, refund_application_fee: true },
+    { stripe_account: stripeAccount.username}
+  );
+};
+
 /**
  * Retrieve a balance transaction (for fees)
  */

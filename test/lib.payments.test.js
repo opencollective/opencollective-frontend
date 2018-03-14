@@ -273,4 +273,60 @@ describe('lib.payments.test.js', () => {
       });
     });
   });
+
+  describe('createRefundTransaction', () => {
+    it('should allow collective to start a refund', async () => {
+      // Given the following pair of transactions created
+      const transaction = await models.Transaction.createFromPayload({
+        CreatedByUserId: user.id,
+        FromCollectiveId: order.FromCollectiveId,
+        CollectiveId: collective.id,
+        PaymentMethodId: order.PaymentMethodId,
+        transaction: {
+          type: 'CREDIT',
+          OrderId: order.id,
+          amount: 5000,
+          currency: 'USD',
+          hostCurrency: 'USD',
+          amountInHostCurrency: 5000,
+          hostCurrencyFxRate: 1,
+          hostFeeInHostCurrency: 250,
+          platformFeeInHostCurrency: 250,
+          paymentProcessorFeeInHostCurrency: 175,
+          description: 'Monthly subscription to Webpack',
+          data: { charge: { id: 'ch_1AzPXHD8MNtzsDcgXpUhv4pm' } }
+        }
+      });
+
+      // When the refund transaction is created
+      await payments.createRefundTransaction(transaction, 0, { dataField: 'foo' });
+
+      // And when transactions for that order are retrieved
+      const allTransactions = await models.Transaction.findAll({ where: {
+        OrderId: order.id
+      } });
+
+      // Then there should be 4 transactions in total under that order id
+      expect(allTransactions.length).to.equal(4);
+
+      // And Then two transactions should be refund
+      const refundTransactions = allTransactions.filter((t) => t.description === 'Refund of "Monthly subscription to Webpack"');
+      expect (refundTransactions).to.have.lengthOf(2);
+
+      // And then the values for the transaction from the collective
+      // to the donor are correct
+      const [creditRefundTransaction] = refundTransactions.filter((t) => t.type === 'CREDIT');
+      expect(creditRefundTransaction.FromCollectiveId).to.equal(collective.id);
+      expect(creditRefundTransaction.CollectiveId).to.equal(order.FromCollectiveId);
+      expect(creditRefundTransaction.data).to.deep.equal({ dataField: 'foo' });
+
+      // And then the values for the transaction from the donor to the
+      // collective also look correct
+      const [debitRefundTransaction] = refundTransactions.filter((t) => t.type === 'DEBIT');
+      expect(debitRefundTransaction.FromCollectiveId).to.equal(order.FromCollectiveId);
+      expect(debitRefundTransaction.CollectiveId).to.equal(collective.id);
+      expect(debitRefundTransaction.data).to.deep.equal({ dataField: 'foo' });
+    });
+  }); /* createRefundTransaction */
+
 });

@@ -128,6 +128,11 @@ export default (Sequelize, DataTypes) => {
       type: DataTypes.UUID,
     },
 
+    RefundTransactionId: {
+      type: DataTypes.INTEGER,
+      references: { model: 'Transactions',  key: 'id' }
+    },
+
     createdAt: {
       type: DataTypes.DATE,
       defaultValue: Sequelize.NOW
@@ -219,6 +224,11 @@ export default (Sequelize, DataTypes) => {
         }
       })
   }
+
+  Transaction.prototype.getRefundTransaction = function() {
+    if (!this.RefundTransactionId) return null;
+    return Transaction.findById(this.RefundTransactionId);
+  };
 
   /**
    * Class Methods
