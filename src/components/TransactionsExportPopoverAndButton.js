@@ -12,7 +12,7 @@ import {
 import { json2csv, exportFile } from '../lib/export_file';
 import withIntl from '../lib/withIntl';
 import InputField from './InputField';
-import { getTransactionsQuery } from './TransactionsWithData';
+import { getTransactionsQuery } from '../graphql/queries';
 
 /* Convert the output of the allTransactions query into a CSV payload
    that can be downloaded directly by the user */
