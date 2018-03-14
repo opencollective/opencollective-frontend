@@ -43,7 +43,7 @@ class Transaction extends React.Component {
     if (!transaction.fromCollective) return (<div />); // This only occurs for host collectives when they add funds
 
     const type = transaction.type.toLowerCase();
-    const messageType = (transaction.RefundTransactionId) ? 'refund' : type;
+    const messageType = (transaction.refundTransaction) ? 'refund' : type;
 
     let title = transaction.description;
     if (type === 'credit' && (!title || !title.match(/Matching/) && title.match(/donation to /i) && !title.match(/Refund/))) {
