@@ -127,6 +127,9 @@ const refundTransactionQuery = gql`
       id
       refundTransaction {
         ${transactionFields}
+        refundTransaction {
+          ${transactionFields}
+        }
       }
     }
   }
@@ -137,21 +140,20 @@ const addMutation = graphql(refundTransactionQuery, {
     refundTransaction: async (id) => await mutate({
       variables: { id },
       update: (proxy, { data: { refundTransaction }}) => {
+        const variables = {
+          CollectiveId: ownProps.collective.id,
+          limit: 20,
+          offset: 0
+        };
+
         // Retrieve the query from the cache
-        const data = proxy.readQuery({
-          query: getTransactionsQuery,
-          variables: {
-            CollectiveId: ownProps.collective.id,
-            limit: 20,
-            offset: 0
-          }
-        });
+        const data = proxy.readQuery({ query: getTransactionsQuery, variables });
 
         // Insert new transaction at the beginning
         data.allTransactions.unshift(refundTransaction.refundTransaction);
 
         // write data back for the query
-        proxy.writeQuery({ query: getTransactionsQuery, data});
+        proxy.writeQuery({ query: getTransactionsQuery, variables, data });
       }
     })
   })
