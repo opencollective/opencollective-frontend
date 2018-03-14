@@ -4,6 +4,53 @@ import { intersection, get } from 'lodash';
 import LoggedInUser from '../classes/LoggedInUser';
 import storage from '../lib/storage';
 
+export const transactionFields = `
+  id
+  RefundTransactionId
+  uuid
+  description
+  createdAt
+  type
+  amount
+  currency
+  netAmountInCollectiveCurrency
+  hostFeeInHostCurrency
+  platformFeeInHostCurrency
+  paymentProcessorFeeInHostCurrency
+  paymentMethod {
+    service
+  }
+  fromCollective {
+    id
+    name
+    slug
+    image
+  }
+  host {
+    id
+    name
+    currency
+  }
+  ... on Expense {
+    category
+    attachment
+  }
+  ... on Order {
+    subscription {
+      interval
+    }
+  }
+`;
+
+export const getTransactionsQuery = gql`
+query Transactions($CollectiveId: Int!, $type: String, $limit: Int, $offset: Int, $dateFrom: String, $dateTo: String) {
+  allTransactions(CollectiveId: $CollectiveId, type: $type, limit: $limit, offset: $offset, dateFrom: $dateFrom, dateTo: $dateTo) {
+    ${transactionFields}
+  }
+}
+`;
+
+
 export const getLoggedInUserQuery = gql`
   query LoggedInUser {
     LoggedInUser {
