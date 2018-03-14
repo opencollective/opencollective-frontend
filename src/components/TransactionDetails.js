@@ -39,7 +39,7 @@ class TransactionDetails extends React.Component {
 
     addFees(['hostFeeInHostCurrency', 'platformFeeInHostCurrency', 'paymentProcessorFeeInHostCurrency']);
 
-    const amountDetailsStr = amountDetails.length > 1 ? amountDetails.join(' - ') : null;
+    const amountDetailsStr = amountDetails.length > 1 ? amountDetails.join(' ') : null;
 
     return (
         <div className={`TransactionDetails ${this.props.mode}`}>
