@@ -472,7 +472,7 @@ class OrderForm extends React.Component {
             funding: res.card.funding,
             zip: res.card.address_zip
           },
-          save: creditcard.save
+          save: true
         };
         newState.paymentMethod = paymentMethod;
         this.setState(newState);
