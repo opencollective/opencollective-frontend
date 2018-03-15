@@ -5,6 +5,7 @@ import _, { get } from 'lodash';
 import Temporal from 'sequelize-temporal';
 import config from 'config';
 import deepmerge from 'deepmerge';
+import prependHttp from 'prepend-http';
 import queries from '../lib/queries';
 import { difference, uniq, pick } from 'lodash';
 import { types } from '../constants/collectives';
@@ -190,10 +191,7 @@ export default function(Sequelize, DataTypes) {
       get() {
         let website = this.getDataValue('website');
         if (website) {
-          if (!website.match(/^http/i)) {
-            website = `http://${website}`;
-          }
-          return website;
+          return prependHttp(website);
         }
         return (this.getDataValue('twitterHandle')) ? `https://twitter.com/${this.getDataValue('twitterHandle')}` : null;
       }
