@@ -189,7 +189,7 @@ export default function(Sequelize, DataTypes) {
     website: {
       type: DataTypes.STRING,
       get() {
-        let website = this.getDataValue('website');
+        const website = this.getDataValue('website');
         if (website) {
           return prependHttp(website);
         }
