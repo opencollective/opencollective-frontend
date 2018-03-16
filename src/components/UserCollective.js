@@ -286,12 +286,12 @@ class UserCollective extends React.Component {
                 </section>
               }
 
-              { get(this.collective, 'stats.collectives.parent') > 0 &&
+              { get(this.collective, 'stats.collectives.memberOf') > 0 &&
                 <section id="parenting">
                   <h1>
                     <FormattedMessage
                       id="organization.collective.memberOf.collective.parent.title"
-                      values={{ n: this.collective.stats.collectives.parent }}
+                      values={{ n: this.collective.stats.collectives.memberOf }}
                       defaultMessage={`{n, plural, one {this collective is} other {{n} collectives are}} part of our organization`}
                       />
                   </h1>
