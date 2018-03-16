@@ -29,7 +29,6 @@ pages
   .add('host.expenses', '/:hostCollectiveSlug/collectives/expenses')
   .add('host.expenses.approve', '/:collectiveSlug/:table(expenses)/:id/:action(approve|reject)', 'action')
   .add('host.collectives.approve', '/:hostCollectiveSlug/:table(collectives)/:id/:action(approve)', 'action')
-  .add('nametags', '/:parentCollectiveSlug/events/:eventSlug/nametags')
   .add('transactions', '/:parentCollectiveSlug?/:collectiveType(events)?/:collectiveSlug/transactions')
   .add('createUpdate', '/:collectiveSlug/updates/new')
   .add('updates', '/:collectiveSlug/updates')

@@ -15,7 +15,7 @@ class Nametags extends React.Component {
 
   constructor(props) {
     super(props);
-    const { format, nametagWidth, nametagHeight } = this.props;
+    const { pageFormat, nametagWidth, nametagHeight } = this.props;
 
     this.renderPage = this.renderPage.bind(this);
     this.renderNametag = this.renderNametag.bind(this);
@@ -47,7 +47,7 @@ class Nametags extends React.Component {
       }
     };
 
-    this.dimensions = this.dimensions[format || 'US'];
+    this.dimensions = this.dimensions[pageFormat || 'US'];
     this.page = this.dimensions.page;
     this.cols = Math.floor(this.page.width / this.dimensions.nametag.width);
     this.rows = Math.floor(this.page.height / this.dimensions.nametag.height);

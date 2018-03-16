@@ -232,3 +232,55 @@ export async function fetchEvent(eventSlug) {
   const result = await client.request(query, { slug: eventSlug });
   return result.Collective;
 }
+
+export async function fetchInvoice(invoiceSlug, accessToken) {
+  const query = `
+  query Invoice($invoiceSlug: String!) {
+    Invoice(invoiceSlug:$invoiceSlug) {
+      slug
+      totalAmount
+      currency
+      year
+      month
+      host {
+        id
+        slug
+        name
+        image
+        website
+        settings
+        type
+        location {
+          name
+          address
+        }
+      }
+      fromCollective {
+        id
+        slug
+        name
+        currency
+        location {
+          name
+          address
+        }
+      }
+      transactions {
+        id
+        createdAt
+        description
+        amount
+        currency
+        collective {
+          id
+          slug
+          name
+        }
+      }
+    }
+  }
+  `;
+  const client = new GraphQLClient(graphqlServerUrl, { headers: { authorization: `Bearer ${accessToken}`} })
+  const result = await client.request(query, { invoiceSlug });
+  return result.Invoice;
+}

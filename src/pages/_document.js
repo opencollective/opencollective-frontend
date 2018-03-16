@@ -24,7 +24,12 @@ export default class IntlDocument extends Document {
     };
 
     const scripts = [];
-    const page = this.props.__NEXT_DATA__.pathname.substr(1);
+    const pathname = this.props.__NEXT_DATA__.pathname;
+
+    const page = pathname.indexOf('/') !== -1
+      ? pathname.substr(pathname.lastIndexOf('/') + 1)
+      : pathname;
+
     const noScriptPages = ['nametags', 'events', 'events-iframe', 'collectives-iframe'];
     if (noScriptPages.indexOf(page) === -1) {
       const requiredScripts = Object.keys(scriptsUrls);

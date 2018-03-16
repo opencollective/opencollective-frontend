@@ -8,6 +8,7 @@ import withIntl from '../lib/withIntl';
 import colors from '../constants/colors';
 import Transaction from './Transaction';
 import TransactionsExportPopoverAndButton from './TransactionsExportPopoverAndButton';
+import DownloadInvoicesPopOver from './DownloadInvoicesPopOver';
 
 class Transactions extends React.Component {
 
@@ -99,7 +100,12 @@ class Transactions extends React.Component {
           }
         `}</style>
 
-        {showCSVlink && transactions.length > 0 && <TransactionsExportPopoverAndButton collective={collective} />}
+        {showCSVlink && transactions.length > 0 &&
+          <div>
+            <TransactionsExportPopoverAndButton collective={collective} />
+            <DownloadInvoicesPopOver fromCollectiveSlug={collective.slug} />
+          </div>
+        }
 
         { filters &&
           <div className="filter">
