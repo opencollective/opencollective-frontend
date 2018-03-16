@@ -266,6 +266,82 @@ export const LocationType = new GraphQLObjectType({
   })
 });
 
+export const InvoiceType = new GraphQLObjectType({
+  name: 'InvoiceType',
+  description: 'This represents an Invoice',
+  fields: () => {
+    return {
+      slug: {
+        type: GraphQLString,
+        resolve(invoice) {
+          return invoice.slug;
+        }
+      },
+      title: {
+        type: GraphQLString,
+        description: "Title for the invoice. Depending on the type of legal entity, a host should issue an Invoice or a Receipt.",
+        resolve(invoice) {
+          return invoice.title || "Donation Receipt";
+        }
+      },
+      year: {
+        type: GraphQLInt,
+        resolve(invoice) {
+          return invoice.year;
+        }
+      },
+      month: {
+        type: GraphQLInt,
+        resolve(invoice) {
+          return invoice.month;
+        }
+      },
+      totalAmount: {
+        type: GraphQLInt,
+        resolve(invoice) {
+          return invoice.totalAmount;
+        }
+      },
+      currency: {
+        type: GraphQLString,
+        resolve(invoice) {
+          return invoice.currency;
+        }
+      },
+      host: {
+        type: CollectiveInterfaceType,
+        resolve(invoice, args, req) {
+          return req.loaders.collective.findById.load(invoice.HostCollectiveId);
+        }
+      },
+      fromCollective: {
+        type: CollectiveInterfaceType,
+        resolve(invoice, args, req) {
+          return req.loaders.collective.findById.load(invoice.FromCollectiveId);
+        }
+      },
+      transactions: {
+        type: new GraphQLList(TransactionInterfaceType),
+        async resolve(invoice) {
+          const startsAt = new Date(`${invoice.year}-${invoice.month}-01`);
+          const endsAt = new Date(startsAt);
+          endsAt.setMonth(startsAt.getMonth() + 1);
+          const where = {
+            FromCollectiveId: invoice.FromCollectiveId,
+            type: 'CREDIT',
+            createdAt: { $gte: startsAt, $lt: endsAt }
+          };
+          if (invoice.HostCollectiveId) {
+            where.HostCollectiveId = invoice.HostCollectiveId;
+          }
+          const transactions = await models.Transaction.findAll({ where });
+          return transactions;
+        }
+      },
+    }
+  }
+});
+
 export const ExpenseType = new GraphQLObjectType({
   name: 'ExpenseType',
   description: 'This represents an Expense',

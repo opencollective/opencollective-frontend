@@ -1,4 +1,5 @@
 import Promise from 'bluebird';
+import errors from '../lib/errors';
 
 import {
   GraphQLList,
@@ -20,11 +21,13 @@ import {
   UserType,
   TierType,
   ExpenseType,
+  InvoiceType,
   UpdateType,
   MemberType,
   PaymentMethodType
 } from './types';
 
+import { get } from 'lodash';
 import models, { sequelize } from '../models';
 import rawQueries from '../lib/queries';
 import { fetchCollectiveId } from '../lib/cache';
@@ -66,6 +69,121 @@ const queries = {
     type: UserType,
     resolve(_, args, req) {
       return req.remoteUser;
+    }
+  },
+
+  allInvoices: {
+    type: new GraphQLList(InvoiceType),
+    args: {
+      fromCollectiveSlug: { type: new GraphQLNonNull(GraphQLString) }
+    },
+    async resolve(_, args, req) {
+      const fromCollective = await models.Collective.findOne({ where: { slug: args.fromCollectiveSlug }});
+      if (!fromCollective) {
+        throw new errors.NotFound("User or organization not found");
+      }
+      if (!req.remoteUser || req.remoteUser.CollectiveId !== fromCollective.id) {
+        throw new errors.Unauthorized("You don't have permission to access invoices for this user");
+      }
+
+      const transactions = await models.Transaction.findAll({
+        attributes: [ 'createdAt', 'HostCollectiveId', 'amountInHostCurrency', 'hostCurrency'],
+        where: {
+          type: 'CREDIT',
+          FromCollectiveId: fromCollective.id,
+        }
+      });
+      const hostsById = {};
+      const invoicesByKey = {};
+      await Promise.map(transactions, async (transaction) => {
+        const HostCollectiveId = transaction.HostCollectiveId;
+        hostsById[HostCollectiveId] = hostsById[HostCollectiveId] || await models.Collective.findById(HostCollectiveId, { attributes: ['slug'] }); 
+        const createdAt = new Date(transaction.createdAt);
+        const year = createdAt.getFullYear();
+        const month = createdAt.getMonth() + 1;
+        const month2digit = month < 10 ? `0${month}`: `${month}`;
+        const slug = `${year}${month2digit}-${hostsById[HostCollectiveId].slug}-${fromCollective.slug}`;
+        const totalAmount = invoicesByKey[slug] ? invoicesByKey[slug].totalAmount + transaction.amountInHostCurrency : transaction.amountInHostCurrency;
+        invoicesByKey[slug] = {
+          HostCollectiveId,
+          FromCollectiveId: fromCollective.id,
+          slug,
+          year,
+          month,
+          totalAmount,
+          currency: transaction.hostCurrency
+        }
+      });
+      const invoices = [];
+      Object.keys(invoicesByKey).forEach(key => invoices.push(invoicesByKey[key]));
+      invoices.sort((a, b) => {
+        return (a.slug > b.slug)
+          ? -1
+          : 1;
+      })
+      return invoices;
+    }
+  },
+
+  Invoice: {
+    type: InvoiceType,
+    args: {
+      invoiceSlug: {
+        type: new GraphQLNonNull(GraphQLString),
+        description: `Slug of the invoice. Format: :year:2digitMonth-:hostSlug-:fromCollectiveSlug`
+      }
+    },
+    async resolve(_, args, req) {
+      const year = args.invoiceSlug.substr(0, 4);
+      const month = args.invoiceSlug.substr(4, 2);
+      const hostSlug = args.invoiceSlug.substring(7, args.invoiceSlug.lastIndexOf('-'));
+      const fromCollectiveSlug = args.invoiceSlug.substr(args.invoiceSlug.lastIndexOf('-') + 1);
+      if (!hostSlug || year < 2015 || (month < 1 || month > 12)) {
+        throw new errors.ValidationFailed(`Invalid invoiceSlug format. Should be :year:2digitMonth-:hostSlug-:fromCollectiveSlug`);
+      }
+      const fromCollective = await models.Collective.findOne({ where: { slug: fromCollectiveSlug }});
+      if (!fromCollective) {
+        throw new errors.NotFound("User or organization not found");
+      }
+      const host = await models.Collective.findBySlug(hostSlug);
+        if (!host) {
+          throw new errors.NotFound("Host not found");
+        }
+      if (!req.remoteUser || req.remoteUser.CollectiveId !== fromCollective.id) {
+        throw new errors.Unauthorized("You don't have permission to access invoices for this user");
+      }
+
+      const startsAt = new Date(`${year}-${month}-01`);
+      const endsAt = new Date(startsAt);
+      endsAt.setMonth(startsAt.getMonth() + 1);
+
+      const where = {
+        FromCollectiveId: fromCollective.id,
+        HostCollectiveId: host.id,
+        createdAt: { $gte: startsAt, $lt: endsAt },
+        type: 'CREDIT'
+      };
+
+      const transactions = await models.Transaction.findAll({ where });
+      if (transactions.length === 0) {
+        throw new errors.NotFound("No transactions found");
+      }
+      const invoice = {
+        title: get(host, 'settings.invoiceTitle') || "Donation Receipt",
+        HostCollectiveId: host.id,
+        slug: args.invoiceSlug,
+        year,
+        month
+      };
+      let totalAmount = 0
+      transactions.map(transaction => {
+        totalAmount += transaction.amountInHostCurrency;
+        invoice.currency = transaction.hostCurrency;
+      })
+      invoice.FromCollectiveId = fromCollective.id;
+      invoice.totalAmount = totalAmount;
+      invoice.transactions = transactions;
+      return invoice;
     }
   },
 
