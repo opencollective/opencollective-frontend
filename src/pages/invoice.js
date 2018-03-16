@@ -71,8 +71,8 @@ class InvoicePage extends React.Component {
       amount: formatCurrency(invoice.totalAmount, invoice.currency)
     });
 
-    this.hostBillingAddress = { __html : `${invoice.host.location.name}\n${invoice.host.location.address}`.replace(/\n/g,'<br />') };
-    this.fromCollectiveBillingAddress = { __html : `${invoice.fromCollective.location.name}\n${invoice.fromCollective.location.address}`.replace(/\n/g,'<br />') };
+    this.hostBillingAddress = { __html : `${invoice.host.location.name || ''}\n${invoice.host.location.address || ''}`.replace(/\n/g,'<br />') };
+    this.fromCollectiveBillingAddress = { __html : `${invoice.fromCollective.location.name || ''}\n${invoice.fromCollective.location.address || ''}`.replace(/\n/g,'<br />') };
 
   }
 
