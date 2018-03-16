@@ -96,7 +96,7 @@ class Overlay extends React.Component {
     if (data.loading) {
       return (
         <Popover id="downloadInvoicesPopover" title="Download invoices" {...this.props}>
-          <div><FormattedMessage id="loading" defaultMessage="loading" />...</div>;
+          <div><FormattedMessage id="loading" defaultMessage="loading" />...</div>
         </Popover>
       )
     }
