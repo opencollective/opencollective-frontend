@@ -118,13 +118,12 @@ class LoginForm extends React.Component {
   }
 
   componentDidMount() {
-    const interval = setInterval(() => {
-      if (this.state.user.email && this.state.user.email.length > 0) {
-        return clearInterval(interval);
+    this.interval = setInterval(() => {
+      const email = document.querySelector('input[name="email"]').value;
+      if (isValidEmail(email)) {
+        this.handleChange("user", "email", email);
       }
-      const user = { email: document.querySelector('input[name="email"]').value };
-      this.setState({ user });
-    }, 700);
+    }, 500);
   }
 
   error(msg) {
@@ -165,6 +164,7 @@ class LoginForm extends React.Component {
 
   handleSubmit(e) {
     e && e.preventDefault();
+    clearInterval(this.interval);
     if (this.state.isNewUser) {
       this.setState({ signup: true });
     } else {
