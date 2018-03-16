@@ -306,6 +306,26 @@ class UserCollective extends React.Component {
                 </section>
               }
 
+              { get(this.collective, 'settings.superCollectiveTags') &&
+                <section id="parenting">
+                  <h1>
+                    <FormattedMessage
+                      id="organization.supercollective.title"
+                      values={{ tags: get(this.collective, 'settings.superCollectiveTags').join(', '), n: this.collective.stats.collectives.memberOf }}
+                      defaultMessage={`{tags} collectives`}
+                      />
+                  </h1>
+                  <div className="cardsList">
+                    <CollectivesWithData
+                      tags={get(this.collective, 'settings.superCollectiveTags')}
+                      orderBy="balance"
+                      orderDirection="DESC"
+                      limit={20}
+                      />
+                  </div>
+                </section>
+              }
+
               { Object.keys(this.memberOfByRole).map(role => role !== 'HOST' && this.renderRole(role)) }
 
             </div>
