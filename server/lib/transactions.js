@@ -4,6 +4,7 @@ import errors from '../lib/errors';
 import { type } from '../constants/transactions';
 import { getFxRate } from '../lib/currency';
 import { exportToCSV } from '../lib/utils';
+import { toNegative } from '../lib/math';
 
 /**
  * Export transactions as CSV
@@ -85,7 +86,7 @@ export function createFromPaidExpense(host, paymentMethod, expense, paymentRespo
   const transaction = {
     netAmountInCollectiveCurrency: -1 * (expense.amount + paymentProcessorFeeInCollectiveCurrency),
     hostCurrency,
-    paymentProcessorFeeInHostCurrency,
+    paymentProcessorFeeInHostCurrency: toNegative(paymentProcessorFeeInHostCurrency),
     ExpenseId: expense.id,
     type: type.DEBIT,
     amount: -expense.amount,
