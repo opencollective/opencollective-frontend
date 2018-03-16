@@ -94,7 +94,7 @@ class TopBarProfileMenu extends React.Component {
           position: absolute;
           top: 40px;
           right: 0;
-          z-index: 999;
+          z-index: 2999;
           min-width: 170px;
           max-width: 300px;
           border-radius: 0.5rem;

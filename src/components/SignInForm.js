@@ -117,6 +117,16 @@ class LoginForm extends React.Component {
     }
   }
 
+  componentDidMount() {
+    const interval = setInterval(() => {
+      if (this.state.user.email) {
+        return clearInterval(interval);
+      }
+      const user = { email: document.querySelector('input[name="email"]').value };
+      this.setState({ user });
+    }, 700);
+  }
+
   error(msg) {
     this.setState({ result: { error: msg }});
   }

@@ -103,7 +103,9 @@ class Transactions extends React.Component {
         {showCSVlink && transactions.length > 0 &&
           <div>
             <TransactionsExportPopoverAndButton collective={collective} />
-            <DownloadInvoicesPopOver fromCollectiveSlug={collective.slug} />
+            { (collective.type === 'ORGANIZATION' || collective.type === 'USER') && LoggedInUser && LoggedInUser.canEditCollective(collective) &&
+              <DownloadInvoicesPopOver fromCollectiveSlug={collective.slug} />
+            }
           </div>
         }
 
