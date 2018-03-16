@@ -41,10 +41,12 @@ export const transformResultInCSV = (json) => {
     `OpenCollective Fee (${hostCurrency})`,
     `Payment Processor Fee (${hostCurrency})`,
     `Net Amount (${collectiveCurrency})`,
+    "Subscription Interval",
   ].join(',');
 
   const lines = json.map((i) => {
     const profile = `http://opencollective.com/${i.fromCollective.slug}`;
+    const subscriptionInterval = i.subscription ? i.subscription.interval : 'one time';
     return [
       q(i.description),                       /* Transaction Description */
       q(i.fromCollective.name),               /* User Name  */
@@ -57,6 +59,7 @@ export const transformResultInCSV = (json) => {
       f(i.platformFeeInHostCurrency),         /* Platform Fee */
       f(i.paymentProcessorFeeInHostCurrency), /* Payment Processor Fee */
       f(i.netAmountInCollectiveCurrency),     /* Net Amount */
+      q(subscriptionInterval),                /* Interval of subscription */
     ].join(',');
   });
 
