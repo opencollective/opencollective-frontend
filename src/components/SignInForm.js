@@ -117,6 +117,18 @@ class LoginForm extends React.Component {
     }
   }
 
+  componentDidMount() {
+    // This is required because with 1Password or browser autocomplete, the onChange doesn't get triggered :-/
+    this.interval = setInterval(() => {
+      const node = document.querySelector('input[name="email"]');
+      if (!node) return;
+      const email = node.value;
+      if (isValidEmail(email)) {
+        this.handleChange("user", "email", email);
+      }
+    }, 500);
+  }
+
   error(msg) {
     this.setState({ result: { error: msg }});
   }
@@ -155,6 +167,7 @@ class LoginForm extends React.Component {
 
   handleSubmit(e) {
     e && e.preventDefault();
+    clearInterval(this.interval);
     if (this.state.isNewUser) {
       this.setState({ signup: true });
     } else {

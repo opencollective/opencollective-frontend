@@ -286,7 +286,7 @@ class MenuBar extends React.Component {
           width: 100%;
         }
         .sticky-inner-wrapper {
-          z-index: 10;
+          z-index: 2000;
           overflow: hidden;
           background-color: #17181A;
         }

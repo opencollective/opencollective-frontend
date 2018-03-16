@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Link } from '../server/pages';
 import { FormattedMessage, defineMessages } from 'react-intl';
 import withIntl from '../lib/withIntl';
-import { formatCurrency } from '../lib/utils';
+import { formatCurrency, capitalize } from '../lib/utils';
 import { Badge } from 'react-bootstrap';
 import { get, uniqBy } from 'lodash';
 
@@ -21,6 +21,7 @@ class TopBarProfileMenu extends React.Component {
     this.messages = defineMessages({
       'tooltip.balance': { id: 'profilemenu.memberships.tooltip.balance', defaultMessage: 'Balance {balance}' },
       'tooltip.pendingExpenses': { id: 'profilemenu.memberships.tooltip.pendingExpenses', defaultMessage: '{n} pending expenses' },
+      'menu.transactions': { id: 'menu.transactions', defaultMessage: 'transactions' }
     });
   }
 
@@ -94,7 +95,7 @@ class TopBarProfileMenu extends React.Component {
           position: absolute;
           top: 40px;
           right: 0;
-          z-index: 999;
+          z-index: 2999;
           min-width: 170px;
           max-width: 300px;
           border-radius: 0.5rem;
@@ -212,7 +213,8 @@ class TopBarProfileMenu extends React.Component {
           </div>
           <ul>
             <li><a href={`/${LoggedInUser.username}`}><FormattedMessage id="menu.profile" defaultMessage="profile" /></a></li>
-            <li><a href='/subscriptions'><FormattedMessage id="menu.subscriptions" defaultMessage="Subscriptions" /></a></li>
+            <li><a href={`/${LoggedInUser.username}/subscriptions`}><FormattedMessage id="menu.subscriptions" defaultMessage="Subscriptions" /></a></li>
+            <li><a href={`/${LoggedInUser.username}/transactions`}>{ capitalize(intl.formatMessage(this.messages['menu.transactions'])) }</a></li>
             <li>
               <Link route="/organizations/new">
                 <a><FormattedMessage id="menu.createOrganization" defaultMessage="Create an Organization" /></a>

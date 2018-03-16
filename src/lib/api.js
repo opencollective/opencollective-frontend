@@ -122,7 +122,7 @@ export async function refreshToken(currentToken) {
   }
 }
 
-export function get(path, options) {
+export function get(path, options = {}) {
   if (path.substr(0,1) !== '/') throw new Error("Can only get resources with a relative path");
 
   return fetch(path, {
@@ -131,6 +131,7 @@ export function get(path, options) {
   })
   .then(response => {
     if (options.format === 'csv') return response.text();
+    if (options.format === 'blob') return response.blob();
     return checkResponseStatus(response);
   })
 }

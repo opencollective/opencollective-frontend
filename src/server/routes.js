@@ -17,6 +17,7 @@ module.exports = (server, app) => {
     // By default, we cache all GET calls for 30s at the CDN level (cloudflare) => we should increase this over time
     // note: only for production/staging (NextJS overrides this in development env)
     res.setHeader('cache-control', 'max-age=30');
+    req.app = app;
     return next();
   });
 
@@ -77,6 +78,7 @@ module.exports = (server, app) => {
   server.get('/:collectiveSlug/tiers/:tierSlug/badge.svg', controllers.collectives.badge);
   server.get('/:collectiveSlug/tiers/:tierSlug/:position/avatar(.:format(png|jpg|svg))?', mw.maxAge(300), mw.ga, controllers.collectives.avatar);
   server.get('/:collectiveSlug/tiers/:tierSlug/:position/website(.:format(png|jpg|svg))?', mw.ga, controllers.collectives.website);
+  server.get('/:collectiveSlug/invoices/:invoiceSlug.:format(html|pdf|json)', mw.ga, controllers.transactions.invoice);
 
   server.get('/:collectiveSlug/:verb(contribute|donate)/button:size(|@2x).png', (req, res) => {
     const color = (req.query.color === 'blue') ? 'blue' : 'white';
@@ -86,13 +88,17 @@ module.exports = (server, app) => {
   server.get('/:collectiveSlug/events.:format(json)', controllers.events.list);
   server.get('/:collectiveSlug/events/:eventSlug.:format(json)', controllers.events.info);
   server.get('/:collectiveSlug/events/:eventSlug/:role(attendees|followers|organizers|all).:format(json|csv)', controllers.members.list);
-  server.get('/:collectiveSlug/events/:eventSlug/nametags.pdf', (req, res, next) => {
-    const { collectiveSlug, eventSlug, format } = req.params;
+  server.get('/:collectiveSlug/events/:eventSlug/nametags.:format(pdf|html)', (req, res, next) => {
+    const { collectiveSlug, eventSlug, pageFormat, format } = req.params;
     const params = {...req.params, ...req.query};
-    app.renderToHTML(req, res, 'nametags', params)
+    app.renderToHTML(req, res, `/nametags`, params)
       .then((html) => {
+        if (format === 'html') {
+          return res.send(html);
+        }
+
         const options = {
-          format: (format === 'A4') ? 'A4' : 'Letter',
+          pageFormat: (pageFormat === 'A4') ? 'A4' : 'Letter',
           renderDelay: 3000
         };
         // html = html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,'');

@@ -57,7 +57,7 @@ export function getCurrencySymbol(currency) {
  return r.replace(/0$/,'');
 }
 
-export function resizeImage(imageUrl, { width, height, query }) {
+export function resizeImage(imageUrl, { width, height, query, baseUrl }) {
   if (!imageUrl) return null;
   if (!query && imageUrl.match(/\.svg$/)) return imageUrl; // if we don't need to transform the image, no need to proxy it.
   let queryurl = '';
@@ -67,7 +67,7 @@ export function resizeImage(imageUrl, { width, height, query }) {
     if (width) queryurl += `&width=${width}`;
     if (height) queryurl += `&height=${height}`;
   }
-  return `/proxy/images/?src=${encodeURIComponent(imageUrl)}${queryurl}`;
+  return `${baseUrl || ''}/proxy/images/?src=${encodeURIComponent(imageUrl)}${queryurl}`;
 }
 
 export function imagePreview(src, defaultImage, options = { width: 640 }) {
