@@ -201,7 +201,7 @@ const generateEmailFromTemplate = (template, recipient, data = {}, options = {})
   // If we are sending the same email to multiple recipients, it doesn't make sense to allow them to unsubscribe
   if (!isArray(recipient)) {
     data.notificationTypeLabel = getNotificationLabel(options.type || template, recipient);
-    data.unsubscribeUrl = `${config.host.website}/api/services/email/unsubscribe/${encodeURIComponent(options.bcc || recipient)}/${slug}/${options.type || template}/${generateUnsubscribeToken(options.bcc || recipient, slug, options.type || template)}`;
+    data.unsubscribeUrl = `${config.host.website}/api/services/email/unsubscribe/${encodeURIComponent(recipient || options.bcc)}/${slug}/${options.type || template}/${generateUnsubscribeToken(recipient || options.bcc, slug, options.type || template)}`;
   }
 
   if (template === 'ticket.confirmed') {
