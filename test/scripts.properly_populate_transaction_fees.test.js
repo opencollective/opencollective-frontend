@@ -39,14 +39,6 @@ describe('Migration', () => {
       expect(transaction.data.migration.platformFeeInHostCurrency).to.deep.equal({ oldValue: 1082, newValue: 1083 });
     });
   });
-  describe('#toNegative', () => {
-    it('should convert positive numbers to negative', () => {
-      expect((new Migration).toNegative(10)).to.equal(-10);
-    });
-    it('should not do anything with negative numbers', () => {
-      expect((new Migration).toNegative(-10)).to.equal(-10);
-    });
-  });
   describe('#ensureHostCurrencyFxRate', () => {
     it('should not touch transactions that contain a hostCurrencyFxRate value', () => {
       // Given a transaction *with a value* for hostCurrencyFxRate

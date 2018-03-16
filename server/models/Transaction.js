@@ -4,6 +4,8 @@ import { type } from '../constants/transactions';
 import CustomDataTypes from './DataTypes';
 import uuid from 'node-uuid';
 import debugLib from 'debug';
+import { toNegative } from '../lib/math';
+
 const debug = debugLib("transaction");
 
 /*
@@ -341,9 +343,6 @@ export default (Sequelize, DataTypes) => {
         transaction.CollectiveId = CollectiveId;
         transaction.PaymentMethodId = transaction.PaymentMethodId || PaymentMethodId;
         transaction.type = (transaction.amount > 0) ? type.CREDIT : type.DEBIT;
-
-        const toNegative = (value) => value > 0 ? -value : value;
-
         transaction.platformFeeInHostCurrency =
           toNegative(transaction.platformFeeInHostCurrency);
         transaction.hostFeeInHostCurrency =

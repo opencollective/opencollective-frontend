@@ -24,6 +24,7 @@ import * as transactionsLib from '../server/lib/transactions';
 import * as paymentsLib from '../server/lib/payments';
 import { OC_FEE_PERCENT } from '../server/constants/transactions';
 import { sleep } from '../server/lib/utils';
+import { toNegative } from '../server/lib/math';
 
 export class Migration {
   constructor(options) {
@@ -49,9 +50,6 @@ export class Migration {
     this.offset += transactions.length;
     return transactions;
   }
-
-  /** Convert `value` to negative if it's possitive */
-  toNegative = (value) => value > 0 ? -value : value;
 
   /** Saves what type of change was made to a given field in a transaction */
   saveTransactionChange = (tr, field, oldValue, newValue) => {
@@ -81,7 +79,7 @@ export class Migration {
    * the then the transaction is left untouched. */
   rewriteFees = (credit, debit) => {
     // Update hostFeeInHostCurrency
-    const newHostFeeInHostCurrency = this.toNegative(credit.hostFeeInHostCurrency || debit.hostFeeInHostCurrency);
+    const newHostFeeInHostCurrency = toNegative(credit.hostFeeInHostCurrency || debit.hostFeeInHostCurrency);
     if (newHostFeeInHostCurrency || newHostFeeInHostCurrency === 0) {
       this.saveTransactionChange(credit, 'hostFeeInHostCurrency', credit.hostFeeInHostCurrency, newHostFeeInHostCurrency);
       credit.hostFeeInHostCurrency = newHostFeeInHostCurrency;
@@ -89,7 +87,7 @@ export class Migration {
       debit.hostFeeInHostCurrency = newHostFeeInHostCurrency;
     }
     // Update platformFeeInHostCurrency
-    const newPlatformFeeInHostCurrency = this.toNegative(credit.platformFeeInHostCurrency || debit.platformFeeInHostCurrency);
+    const newPlatformFeeInHostCurrency = toNegative(credit.platformFeeInHostCurrency || debit.platformFeeInHostCurrency);
     if (newPlatformFeeInHostCurrency || newPlatformFeeInHostCurrency === 0) {
       this.saveTransactionChange(credit, 'platformFeeInHostCurrency', credit.platformFeeInHostCurrency, newPlatformFeeInHostCurrency);
       credit.platformFeeInHostCurrency = newPlatformFeeInHostCurrency;
@@ -97,7 +95,7 @@ export class Migration {
       debit.platformFeeInHostCurrency = newPlatformFeeInHostCurrency;
     }
     // Update paymentProcessorFeeInHostCurrency
-    const newPaymentProcessorFeeInHostCurrency = this.toNegative(credit.paymentProcessorFeeInHostCurrency || debit.paymentProcessorFeeInHostCurrency);
+    const newPaymentProcessorFeeInHostCurrency = toNegative(credit.paymentProcessorFeeInHostCurrency || debit.paymentProcessorFeeInHostCurrency);
     if (newPaymentProcessorFeeInHostCurrency || newPaymentProcessorFeeInHostCurrency === 0) {
       this.saveTransactionChange(credit, 'paymentProcessorFeeInHostCurrency', credit.paymentProcessorFeeInHostCurrency, newPaymentProcessorFeeInHostCurrency);
       credit.paymentProcessorFeeInHostCurrency = newPaymentProcessorFeeInHostCurrency;
@@ -109,9 +107,9 @@ export class Migration {
   /** Recalculate host fee if it doesn't round up properly  */
   recalculateHostFee = (credit, debit) => {
     const fee = (credit.hostFeeInHostCurrency || debit.hostFeeInHostCurrency);
-    const hostFeePercent = -this.toNegative(fee * 100 / credit.amountInHostCurrency);
+    const hostFeePercent = -toNegative(fee * 100 / credit.amountInHostCurrency);
     if (!!hostFeePercent && hostFeePercent !== credit.collective.hostFeePercent) {
-      const newHostFeeInHostCurrency = this.toNegative(
+      const newHostFeeInHostCurrency = toNegative(
         paymentsLib.calcFee(credit.amountInHostCurrency, credit.collective.hostFeePercent));
       console.log('Correcting Suspicious hostFee', credit.id,
                   debit.id,
@@ -135,7 +133,7 @@ export class Migration {
     //       || debit.netAmountInCollectiveCurrency * debit.hostCurrencyFxRate;
     // if (!hostFee || !amount) return;
     //
-    // const hostFeePercent = -this.toNegative(hostFee * 100 / amount);
+    // const hostFeePercent = -toNegative(hostFee * 100 / amount);
     // if (!hostFeePercent) return;
     //
     // if (hostFeePercent != 5 && hostFeePercent != 10) {
@@ -154,7 +152,7 @@ export class Migration {
     //   else roundHostFeePercent = Math.round(hostFeePercent);
     //
     //   const newHostFeeInHostCurrency =
-    //         this.toNegative(paymentsLib.calcFee(
+    //         toNegative(paymentsLib.calcFee(
     //           credit.amountInHostCurrency, roundHostFeePercent));
     //   if (newHostFeeInHostCurrency || newHostFeeInHostCurrency === 0) {
     //     this.saveTransactionChange(credit, 'hostFeeInHostCurrency', credit.hostFeeInHostCurrency, newHostFeeInHostCurrency);
@@ -168,13 +166,13 @@ export class Migration {
   /** Recalculate platform fee if it doesn't match OC_FEE_PERCENT  */
   recalculatePlatformFee = (credit, debit) => {
     const fee = (credit.platformFeeInHostCurrency || debit.platformFeeInHostCurrency);
-    const platformFeePercent = -this.toNegative(fee * 100 / credit.amountInHostCurrency);
+    const platformFeePercent = -toNegative(fee * 100 / credit.amountInHostCurrency);
     if (!!platformFeePercent && platformFeePercent !== OC_FEE_PERCENT) {
       console.log('Correcting Suspicious platformFee', credit.id,
                   credit.amountInHostCurrency,
                   credit.amountInHostCurrency * OC_FEE_PERCENT / 100,
                   platformFeePercent);
-      const newPlatformFeeInHostCurrency = this.toNegative(
+      const newPlatformFeeInHostCurrency = toNegative(
         paymentsLib.calcFee(credit.amountInHostCurrency, OC_FEE_PERCENT));
       this.saveTransactionChange(credit, 'platformFeeInHostCurrency', credit.platformFeeInHostCurrency, newPlatformFeeInHostCurrency);
       credit.platformFeeInHostCurrency = newPlatformFeeInHostCurrency;
