@@ -40,7 +40,7 @@ amountPlusFees = (
 
 ## Use case example
 
-Given a transaction that represents moving $5 dollars from User to
+Given a transaction that represents moving $50 dollars from User to
 Collective
 
 ### How it was stored

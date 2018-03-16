@@ -22,7 +22,7 @@ the basic operations related to the ledger.
 ## Goals
 
 1. Increase accuracy of the ledger
-   1. [ ] Create collective type "Payment Method"
+   1. [ ] Create collective type "Payment Provider"
    2. [ ] Create separate transactions for fees
 2. Make it easier to build new features that depend on data from the
    ledger
@@ -31,7 +31,7 @@ the basic operations related to the ledger.
            places that interact with the ledger and decrease
            duplicated code in the repository.
 
-### Create collective type "Payment Method"
+### Create collective type "Payment Provider"
 
 As mentioned before, the amount of the payment processor fee is stored
 in the field `paymentProcessorFeeInHostCurrency` in the `Transactions`
@@ -39,14 +39,14 @@ table. To find out to which specific payment method the fee went to,
 the `Transactions` table also records the `PaymentMethodId`.
 
 This is different from how transactions are tracked between User &
-Collective. To address this difference, the Payment Method needs to
+Collective. To address this difference, the Payment Provider needs to
 have a ledger as well.
 
 ### Create separate transactions for fees
 
 #### Use case example
 
-Given a transaction that represents moving $5 dollars from User to
+Given a transaction that represents moving $50 dollars from User to
 Collective with 5% of platform fee, 10% of host fee and 2.9%+30c of
 payment processor fee.
 
@@ -62,9 +62,9 @@ payment processor fee.
 
 ##### How it should look like after this change
 
-|        |  User | Collective | Collective | Platform | Collective | Host | Collective | Payment Method |
-|--------|------:|-----------:|-----------:|---------:|-----------:|-----:|-----------:|---------------:|
-| Amount | -5000 |       5000 |       -250 |      250 |       -500 |  500 |       -175 |            175 |
+|        |  User | Collective | Collective | Platform | Collective | Host | Collective | Payment Provider |
+|--------|------:|-----------:|-----------:|---------:|-----------:|-----:|-----------:|-----------------:|
+| Amount | -5000 |       5000 |       -250 |      250 |       -500 |  500 |       -175 |              175 |
 
 ##### Where did the net amount go
 
@@ -117,6 +117,6 @@ The Ledger API will now provide the following tools:
      { fromCollective: 10165, collective: 58, amount: -5000 }, // from User to Collective
      { fromCollective: 58, collective: 1, amount: -250 },      // from Collective to Platform
      { fromCollective: 58, collective: 11004, amount: -250 },  // from Collective to Host
-     { fromCollective: 58, collective: 90000, amount: -175 },  // from Collective to Payment Processor
+     { fromCollective: 58, collective: 90000, amount: -175 },  // from Collective to Payment Provider
    ]
    ```

@@ -14,5 +14,5 @@ manage the transactions.
       2. [ ] Expenses
       3. [ ] Neither
    2. [ ] Double Entry Ledger [rfc-003]
-      1. [ ] Create collective type "Payment Method"
+      1. [ ] Create collective type "Payment Provider"
       2. [ ] Create separate transactions for fees
