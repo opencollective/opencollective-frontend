@@ -252,11 +252,29 @@ export class Migration {
         console.log('Expense.: true, true');
         return false;
       }
+      // Don't do anything for now since these are not in the same currency
+      if (credit.currency !== credit.hostCurrency || debit.currency !== debit.hostCurrency) {
+        console.log('Expense.: ', transactionsLib.verify(credit), transactionsLib.verify(debit), ' # not touched because currency is different');
+        return false;
+      }
 
-      // this.rewriteFees(credit, debit);
+      // Try to set up hostCurrencyFxRate if it's null
+      this.ensureHostCurrencyFxRate(credit);
+      this.ensureHostCurrencyFxRate(debit);
+      if (transactionsLib.verify(credit) && transactionsLib.verify(debit)) {
+        console.log('Expense.: true, true # after updating hostCurrencyFxRate');
+        return true;
+      }
 
-      console.log('  Expense.:', transactionsLib.verify(tr1), transactionsLib.verify(tr2));
+      // Try to just setup fees
+      this.rewriteFees(credit, debit);
+      if (transactionsLib.verify(credit) && transactionsLib.verify(debit)) {
+        console.log('Expense.: true, true # after updating fees');
+        return true;
+      }
 
+      // Something is still off
+      console.log('Expense.:', transactionsLib.verify(tr1), transactionsLib.verify(tr2));
       if (!transactionsLib.verify(credit)) {
         console.log(`EDAU, CREDIT, ${credit.id}, ${credit.TransactionGroup}, ${transactionsLib.difference(credit)}`);
       }
@@ -264,11 +282,12 @@ export class Migration {
         console.log(`EDAU, DEBIT, ${debit.id}, ${debit.TransactionGroup}, ${transactionsLib.difference(debit)}`);
       }
     } else if (tr1.OrderId !== null) {
+      // Both CREDIT & DEBIT transactions add up
       if (transactionsLib.verify(credit) && transactionsLib.verify(debit)) {
         console.log('Order...: true, true');
         return false;
       }
-
+      // Don't do anything for now since these are not in the same currency
       if (credit.currency !== credit.hostCurrency || debit.currency !== debit.hostCurrency) {
         console.log('Order...:', transactionsLib.verify(credit), transactionsLib.verify(debit), ' # not touched because currency is different');
         return false;
