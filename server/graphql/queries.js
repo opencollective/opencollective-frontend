@@ -431,14 +431,14 @@ const queries = {
       if (args.HostCollectiveId) query.where.HostCollectiveId = args.HostCollectiveId;
       if (args.ParentCollectiveId) query.where.ParentCollectiveId = args.ParentCollectiveId;
       if (args.type) query.where.type = args.type;
+      if (args.tags) query.where.tags = { $overlap: args.tags };
 
-      if (args.orderBy === 'balance' && (args.ParentCollectiveId || args.HostCollectiveId)) {
+      if (args.orderBy === 'balance' && (args.ParentCollectiveId || args.HostCollectiveId || args.tags)) {
         return rawQueries.getCollectivesWithBalance(query.where, args);
       } else {
         query.order = [['name', 'ASC']];
       }
 
-      if (args.tags) query.where.tags = { $overlap: args.tags };
       if (args.offset) query.offset = args.offset;
       return models.Collective.findAll(query);
     }

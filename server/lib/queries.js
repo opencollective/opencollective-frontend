@@ -251,7 +251,12 @@ const getCollectivesWithBalance = (where = {}, options) => {
 
   let whereCondition = '';
   Object.keys(where).forEach(key => {
-    whereCondition += `AND c."${key}"=:${key} `;
+    if (key === 'tags') {
+      whereCondition += 'AND c.tags && $tags '; // && operator means "overlaps", e.g. ARRAY[1,4,3] && ARRAY[2,1] == true
+      where.tags = where.tags.$overlap;
+    } else {
+      whereCondition += `AND c."${key}"=$${key} `;
+    }
   });
 
   return sequelize.query(`
@@ -275,7 +280,7 @@ const getCollectivesWithBalance = (where = {}, options) => {
     ORDER BY ${orderBy} ${orderDirection} NULLS LAST LIMIT ${limit} OFFSET ${offset}
   `.replace(/\s\s+/g, ' '), // this is to remove the new lines and save log space.
   {
-    replacements: where,
+    bind: where,
     model: models.Collective
   });
 };
