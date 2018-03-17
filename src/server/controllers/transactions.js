@@ -29,8 +29,8 @@ export async function list(req, res, next) {
 }
 
 export async function info(req, res, next) {
-  // Keeping the resulting info for 48h in the CDN cache
-  res.setHeader('Cache-Control', `public, max-age=${60*60*48}`);
+  // Keeping the resulting info for 10mn in the CDN cache
+  res.setHeader('Cache-Control', `public, max-age=${60*10}`);
   let transaction, path = '';
   if (req.params.collectiveSlug) {
     path += `/${req.params.collectiveSlug}/`;

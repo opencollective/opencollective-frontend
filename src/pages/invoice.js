@@ -210,7 +210,7 @@ class InvoicePage extends React.Component {
             margin: 0;
             font-family: Lato,Helvetica,sans-serif;
             font-weight: 300;
-            font-size: 1.6rem;
+            font-size: 1.4rem;
             line-height: 1.5;
           }
 
@@ -223,7 +223,7 @@ class InvoicePage extends React.Component {
 
           .InvoicePage {
             margin: 0 auto;
-            padding: 2rem;
+            padding: 2rem 3rem;
             width: 100%;
           }
 
@@ -320,9 +320,10 @@ class InvoicePage extends React.Component {
             width: 95%;
           }
         
-          td {
+          td, th {
             padding: 5px;
             vertical-align: top;
+            font-size: 1.2rem;
           }
       
           .date {
@@ -339,11 +340,10 @@ class InvoicePage extends React.Component {
             border-top: 1px solid grey;
             font-weight: bold;
             text-align: left;
-            font-size: 12px;
           }
 
           tr.footer td {
-            font-size: 1.6rem;
+            font-size: 1.4rem;
           }
 
           tr.footer img {
