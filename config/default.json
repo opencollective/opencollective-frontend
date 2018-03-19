@@ -1,6 +1,6 @@
 {
   "database": {
-    "database": "opencollective_localhost",
+    "database": "opencollective_dvl",
     "username": "opencollective",
     "password": "",
     "options": {
