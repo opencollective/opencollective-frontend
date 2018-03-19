@@ -28,7 +28,7 @@ class CollectiveCover extends React.Component {
     super(props);
     this.messages = defineMessages({
       'contribute': { id: 'collective.contribute', defaultMessage: 'contribute' },
-      'apply': { id: 'host.apply', defaultMessage: "Apply to create a collective" },
+      'apply': { id: 'host.apply.btn', defaultMessage: "Apply to create a collective" },
       'ADMIN': { id: 'roles.admin.label', defaultMessage: 'Core Contributor' },
       'MEMBER': { id: 'roles.member.label', defaultMessage: 'Contributor' }
     });
