@@ -5,6 +5,57 @@ import { types } from '../../constants/collectives';
 import roles from '../../constants/roles';
 import activities from '../../constants/activities';
 
+const defaultTiers = (collectiveData) => {
+  const tiers = collectiveData.tiers || [];
+
+  if (collectiveData.HostCollectiveId === 858) {
+    tiers.push({
+      type: 'TIER',
+      name: '1 month',
+      description: "Sponsor our meetup and get: a shout-out on social media, presence on the merch table and your logo on our meetup page.",
+      slug: '1month-sponsor',
+      amount: 25000,
+      button: "become a sponsor"
+    });
+    tiers.push({
+      type: 'TIER',
+      name: '3 months',
+      description: "**10% off!** - Sponsor our meetup and get: a shout-out on social media, presence on the merch table and your logo on our meetup page.",
+      slug: '3month-sponsor',
+      amount: 67500,
+      button: "become a sponsor"
+    });
+    tiers.push({
+      type: 'TIER',
+      name: '6 months',
+      description: "**20% off!** - Sponsor our meetup and get: a shout-out on social media, presence on the merch table and your logo on our meetup page.",
+      slug: '6month-sponsor',
+      amount: 120000,
+      button: "become a sponsor"
+    });
+    return tiers;
+  }
+  if (collectiveData.tiers.length === 0) {
+    tiers.push({
+      type: 'TIER',
+      name: 'backer',
+      slug: 'backers',
+      amount: 500,
+      presets: [500, 1000, 2500, 5000],
+      interval: 'month'
+    });
+    tiers.push({
+      type: 'TIER',
+      name: 'sponsor',
+      slug: 'sponsors',
+      amount: 10000,
+      presets: [10000, 25000, 50000],
+      interval: 'month'
+    });
+  }
+  return tiers;
+}
+
 export function createCollective(_, args, req) {
   if (!req.remoteUser) {
     return Promise.reject(new errors.Unauthorized({ message: "You need to be logged in to create a collective"}));
@@ -23,22 +74,7 @@ export function createCollective(_, args, req) {
 
   collectiveData.tiers = collectiveData.tiers || [];
   if (collectiveData.tiers.length === 0) {
-    collectiveData.tiers.push({
-      type: 'TIER',
-      name: 'backer',
-      slug: 'backers',
-      amount: 500,
-      presets: [500, 1000, 2500, 5000],
-      interval: 'month'
-    });
-    collectiveData.tiers.push({
-      type: 'TIER',
-      name: 'sponsor',
-      slug: 'sponsors',
-      amount: 10000,
-      presets: [10000, 25000, 50000],
-      interval: 'month'
-    });
+    collectiveData.tiers = defaultTiers(collectiveData);
   }
 
   const location = args.collective.location;
@@ -52,6 +88,10 @@ export function createCollective(_, args, req) {
 
   const promises = [];
   if (args.collective.HostCollectiveId) {
+    if (args.collective.HostCollectiveId === 858) { // opencollective.com/meetups
+      args.collective.HostCollectiveId = 8674; // Open Collective Inc. Host
+      collectiveData.tags = ["Tech meetups"];
+    }
     promises.push(
       req.loaders
         .collective.findById.load(args.collective.HostCollectiveId)
