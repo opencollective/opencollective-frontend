@@ -126,8 +126,14 @@ Promise.props({
     .map(row => row.CollectiveId),
 
   newCollectives: Collective
-    .findAll(_.merge({}, { attributes: ['slug'], where: { type: 'COLLECTIVE' } }, createdLastWeek))
-    .map(collective => collective.dataValues.slug)
+    .findAll(_.merge({}, { attributes: ['slug', 'tags'], where: { type: 'COLLECTIVE' } }, createdLastWeek))
+    .map(collective => {
+      let openSource = false;
+      if (collective.dataValues.tags.indexOf('open source') != -1) {
+        openSource = true;
+      }
+      return `${collective.dataValues.slug} (${openSource ? 'open source' : collective.dataValues.tags})`
+    })
 
 }).then(results => {
   results.activeCollectiveCount = _.union(results.activeCollectivesWithTransactions, results.activeCollectivesWithExpenses).length
