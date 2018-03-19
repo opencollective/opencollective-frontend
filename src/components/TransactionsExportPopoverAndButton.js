@@ -42,6 +42,7 @@ export const transformResultInCSV = (json) => {
     `Payment Processor Fee (${hostCurrency})`,
     `Net Amount (${collectiveCurrency})`,
     "Subscription Interval",
+    "Order Date",
   ].join(',');
 
   const lines = json.map((i) => {
@@ -60,6 +61,7 @@ export const transformResultInCSV = (json) => {
       f(i.paymentProcessorFeeInHostCurrency), /* Payment Processor Fee */
       f(i.netAmountInCollectiveCurrency),     /* Net Amount */
       q(subscriptionInterval),                /* Interval of subscription */
+      q(new Date(i.createdAt).toISOString()), /* Order Date */
     ].join(',');
   });
 

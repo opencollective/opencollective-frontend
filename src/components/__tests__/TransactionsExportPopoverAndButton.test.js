@@ -21,8 +21,8 @@ describe("TransactionsExportPopoverAndButton component", () => {
 
     // Then it should output the following CSV
     expect(csv).toEqual([
-      "Transaction Description,User Name,User Profile,Transaction Date,Collective Currency,Host Currency,Transaction Amount,Host Fee (USD),OpenCollective Fee (USD),Payment Processor Fee (USD),Net Amount (BRL),Subscription Interval",
-      '"monthly recurring subscription","Brad Pinter","http://opencollective.com/bradpinter",2017-12-04 15:43:04,"BRL","USD",2.00,0.10,0.10,0.36,1.44,"month"'
+      "Transaction Description,User Name,User Profile,Transaction Date,Collective Currency,Host Currency,Transaction Amount,Host Fee (USD),OpenCollective Fee (USD),Payment Processor Fee (USD),Net Amount (BRL),Subscription Interval,Order Date",
+      '"monthly recurring subscription","Brad Pinter","http://opencollective.com/bradpinter",2017-12-04 15:43:04,"BRL","USD",2.00,0.10,0.10,0.36,1.44,"month","2017-12-04T15:43:04.000Z"'
     ].join("\n"))
   });
 });
