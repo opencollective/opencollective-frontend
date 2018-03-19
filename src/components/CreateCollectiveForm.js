@@ -102,13 +102,16 @@ class CreateCollectiveForm extends React.Component {
       ]
     }
 
-    this.categories = get(props.host, 'settings.categories');
-
     this.state = {
       modified: false,
       section: 'info',
       collective
     };
+
+    this.categories = get(props.host, 'settings.categories') || [];
+    if (this.categories.length === 1) {
+      this.state.collective.category = this.categories[0];
+    }
     this.fields.info.map(field => {
     });
 
@@ -165,7 +168,7 @@ class CreateCollectiveForm extends React.Component {
 
     const { host, collective, loading, intl } = this.props;
 
-    const showForm = Boolean(!this.categories || this.state.collective.category);
+    const showForm = Boolean(this.categories.length === 0 || this.state.collective.category);
     const isNew = !(collective && collective.id);
     const defaultStartsAt = new Date;
     const type = collective.type.toLowerCase();
@@ -237,7 +240,7 @@ class CreateCollectiveForm extends React.Component {
         }
         `}</style>
  
-        { this.categories && <CollectiveCategoryPicker categories={this.categories} onChange={(value) => this.handleChange("category", value)} /> }
+        { this.categories.length > 1 && <CollectiveCategoryPicker categories={this.categories} onChange={(value) => this.handleChange("category", value)} /> }
 
         { showForm &&
           <div className="FormInputs">
@@ -281,7 +284,7 @@ class CreateCollectiveForm extends React.Component {
             <div className="actions">
               <Button bsStyle="primary" type="submit" ref="submit" onClick={this.handleSubmit} disabled={loading || !this.state.modified} >
                 { loading && <FormattedMessage id="loading" defaultMessage="loading" /> }
-                { !loading && collective.type === 'COLLECTIVE' && <FormattedMessage id="host.apply" defaultMessage="Apply to create a collective" /> }
+                { !loading && collective.type === 'COLLECTIVE' && <FormattedMessage id="host.apply.btn" defaultMessage="Apply to create a collective" /> }
                 { !loading && collective.type === 'ORGANIZATION' && <FormattedMessage id="organization.create" defaultMessage="Create organization" /> }
               </Button>
             </div>

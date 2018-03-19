@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import withIntl from '../lib/withIntl';
 import Header from '../components/Header';
 import Body from '../components/Body';
 import Footer from '../components/Footer';
@@ -11,7 +12,7 @@ import Loading from '../components/Loading';
 import SignInForm from '../components/SignInForm';
 import { Button } from 'react-bootstrap';
 import { get } from 'lodash';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, defineMessages } from 'react-intl';
 
 class CreateCollective extends React.Component {
 
@@ -26,6 +27,9 @@ class CreateCollective extends React.Component {
     this.createCollective = this.createCollective.bind(this);
     this.error = this.error.bind(this);
     this.resetError = this.resetError.bind(this);
+    this.messages = defineMessages({
+      "host.apply.title": { id: "host.apply.title", defaultMessage: "Apply to create a new {hostname} collective" }
+    });
   }
 
   error(msg) {
@@ -45,7 +49,7 @@ class CreateCollective extends React.Component {
     this.setState( { status: 'loading' });
     CollectiveInputType.type = 'COLLECTIVE';
     CollectiveInputType.HostCollectiveId = host.id;
-    CollectiveInputType.tags = [...host.tags] || [];
+    CollectiveInputType.tags = [...host.tags || []] || [];
     if (CollectiveInputType.category) {
       CollectiveInputType.tags.push(CollectiveInputType.category);
     }
@@ -68,13 +72,13 @@ class CreateCollective extends React.Component {
   }
 
   render() {
-    const { LoggedInUser, host } = this.props;
+    const { LoggedInUser, host, intl } = this.props;
     const canApply = get(host, 'settings.apply');
 
     if (!host) {
       return (<Loading />);
     }
-    const title = `Apply to create a new collective hosted by ${host.name}`;
+    const title = intl.formatMessage(this.messages["host.apply.title"], { hostname: host.name });
 
     return (
       <div className="CreateCollective">
@@ -89,12 +93,8 @@ class CreateCollective extends React.Component {
           .error {
             color: red;
           }
-          .CollectiveTemplatePicker {
-            max-width: 700px;
-            margin: 0 auto;
-          }
-          .CollectiveTemplatePicker .field {
-            margin: 0;
+          .signin {
+            text-align: center;
           }
           .login {
             margin: 0 auto;
@@ -129,7 +129,7 @@ class CreateCollective extends React.Component {
             }
 
             { canApply && !LoggedInUser &&
-              <div>
+              <div className="signin">
                 <h2><FormattedMessage id="collectives.create.signin" defaultMessage="Sign in or create an Open Collective account" /></h2>
                 <SignInForm next={`/${host.slug}/apply`} />
               </div>
@@ -161,4 +161,4 @@ class CreateCollective extends React.Component {
 
 }
 
-export default addCreateCollectiveMutation(CreateCollective);
+export default withIntl(addCreateCollectiveMutation(CreateCollective));

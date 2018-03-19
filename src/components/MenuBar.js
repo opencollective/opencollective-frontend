@@ -51,6 +51,7 @@ class MenuBar extends React.Component {
       'backer': { id: 'menu.backer', defaultMessage: "backer" },
       'attendee': { id: 'menu.attendee', defaultMessage: "attendee" },
       'fundraiser': { id: 'menu.fundraiser', defaultMessage: "fundraiser" },
+      'parenting': { id: 'menu.parenting', defaultMessage: "member collectives" },
       'about': { id: 'menu.about', defaultMessage: "about" },
       'events': { id: 'menu.events', defaultMessage: "events" },
       'updates': { id: 'menu.updates', defaultMessage: "updates" },
