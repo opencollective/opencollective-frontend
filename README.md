@@ -13,7 +13,9 @@ Note: If you see a step below that could be improved (or is outdated), please up
 
 ### Database
 
-Install Postgres 9.x. Start the database server, if necessary. If you face any issue with this step, see [troubleshooting postgres](docs/postgres.md)
+Install Postgres 9.x and Postgis. Start the database server.
+
+If necessary, check our [Postgres documentation](docs/postgres.md) for details and troubleshooting.
 
 ### Node and npm
 
@@ -90,7 +92,7 @@ See [Wiki](https://github.com/OpenCollective/OpenCollective/wiki/Software-testin
 
 ## Start server
 
-In development environment: 
+In development environment:
 
 ```
 npm run dev
