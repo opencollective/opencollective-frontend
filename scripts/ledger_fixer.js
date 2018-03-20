@@ -249,7 +249,13 @@ export class Migration {
       if (!this.options.dryRun) {
         await this.createOrder(credit, debit);
       }
-      return this.migratePair('Neither', credit, debit);
+      this.migratePair('Neither', credit, debit);
+
+      // Even if the migrate pair doesn't do anything, the call to
+      // createOrder should change the instance thus we need to return
+      // true here otherwise the method `run()` won't know this pair
+      // needs to be updated.
+      return true;
     }
 
     // console.log('    * C:amount......: ', credit.amountInHostCurrency);
