@@ -25,12 +25,18 @@ import * as paymentsLib from '../server/lib/payments';
 import { OC_FEE_PERCENT } from '../server/constants/transactions';
 import { sleep } from '../server/lib/utils';
 import { toNegative } from '../server/lib/math';
+import libemail from '../server/lib/email';
+
+const REPORT_EMAIL = 'ops@opencollective.com';
 
 export class Migration {
   constructor(options) {
     this.options = options;
     this.offset = 0;
     this.migrated = 0;
+    this.ordersCreated = 0;
+    this.counters = {};
+    this.logFiles = {};
   }
 
   /** Retrieve the total number of valid transactions */
@@ -45,7 +51,6 @@ export class Migration {
       order: ['TransactionGroup'],
       limit: this.options.batchSize,
       offset: this.offset
-      // , include: [{ model: models.Collective, as: 'collective' }]
     });
     this.offset += transactions.length;
     return transactions;
@@ -104,93 +109,8 @@ export class Migration {
     }
   }
 
-  /** Recalculate host fee if it doesn't round up properly  */
-  recalculateHostFee = (credit, debit) => {
-    const fee = (credit.hostFeeInHostCurrency || debit.hostFeeInHostCurrency);
-    const hostFeePercent = -toNegative(fee * 100 / credit.amountInHostCurrency);
-    if (!!hostFeePercent && hostFeePercent !== credit.collective.hostFeePercent) {
-      const newHostFeeInHostCurrency = toNegative(
-        paymentsLib.calcFee(credit.amountInHostCurrency, credit.collective.hostFeePercent));
-      console.log('Correcting Suspicious hostFee', credit.id,
-                  debit.id,
-                  credit.amountInHostCurrency,
-                  credit.amountInHostCurrency * credit.collective.hostFeePercent / 100,
-                  hostFeePercent,
-                  newHostFeeInHostCurrency);
-      this.saveTransactionChange(credit, 'hostFeeInHostCurrency', credit.hostFeeInHostCurrency, newHostFeeInHostCurrency);
-      credit.hostFeeInHostCurrency = newHostFeeInHostCurrency;
-      this.saveTransactionChange(debit, 'hostFeeInHostCurrency', debit.hostFeeInHostCurrency, newHostFeeInHostCurrency);
-      debit.hostFeeInHostCurrency = newHostFeeInHostCurrency;
-    }
-
-    // I wanted to make sure that it was safe to use the field
-    // credit.collective.hostFeePercent like I did above so I wrote
-    // the following code to find the approximate value from the data.
-
-    // const hostFee = credit.hostFeeInHostCurrency
-    //       || debit.hostFeeInHostCurrency;
-    // const amount = credit.amountInHostCurrency
-    //       || debit.netAmountInCollectiveCurrency * debit.hostCurrencyFxRate;
-    // if (!hostFee || !amount) return;
-    //
-    // const hostFeePercent = -toNegative(hostFee * 100 / amount);
-    // if (!hostFeePercent) return;
-    //
-    // if (hostFeePercent != 5 && hostFeePercent != 10) {
-    //   console.log('Correcting Suspicious hostFee',
-    //               credit.id,
-    //               credit.amountInHostCurrency,
-    //               credit.amountInHostCurrency * hostFeePercent / 100,
-    //               hostFeePercent);
-    //
-    //   /* Since the current values are not properly rounded */
-    //   let roundHostFeePercent;
-    //   if (hostFeePercent > 4 && hostFeePercent < 6)
-    //     roundHostFeePercent = 5;
-    //   else if (hostFeePercent > 9 && hostFeePercent < 11)
-    //     roundHostFeePercent = 10;
-    //   else roundHostFeePercent = Math.round(hostFeePercent);
-    //
-    //   const newHostFeeInHostCurrency =
-    //         toNegative(paymentsLib.calcFee(
-    //           credit.amountInHostCurrency, roundHostFeePercent));
-    //   if (newHostFeeInHostCurrency || newHostFeeInHostCurrency === 0) {
-    //     this.saveTransactionChange(credit, 'hostFeeInHostCurrency', credit.hostFeeInHostCurrency, newHostFeeInHostCurrency);
-    //     credit.hostFeeInHostCurrency = newHostFeeInHostCurrency;
-    //     this.saveTransactionChange(debit, 'hostFeeInHostCurrency', debit.hostFeeInHostCurrency, newHostFeeInHostCurrency);
-    //     debit.hostFeeInHostCurrency = newHostFeeInHostCurrency;
-    //   }
-    // }
-  }
-
-  /** Recalculate platform fee if it doesn't match OC_FEE_PERCENT  */
-  recalculatePlatformFee = (credit, debit) => {
-    const fee = (credit.platformFeeInHostCurrency || debit.platformFeeInHostCurrency);
-    const platformFeePercent = -toNegative(fee * 100 / credit.amountInHostCurrency);
-    if (!!platformFeePercent && platformFeePercent !== OC_FEE_PERCENT) {
-      console.log('Correcting Suspicious platformFee', credit.id,
-                  credit.amountInHostCurrency,
-                  credit.amountInHostCurrency * OC_FEE_PERCENT / 100,
-                  platformFeePercent);
-      const newPlatformFeeInHostCurrency = toNegative(
-        paymentsLib.calcFee(credit.amountInHostCurrency, OC_FEE_PERCENT));
-      this.saveTransactionChange(credit, 'platformFeeInHostCurrency', credit.platformFeeInHostCurrency, newPlatformFeeInHostCurrency);
-      credit.platformFeeInHostCurrency = newPlatformFeeInHostCurrency;
-      this.saveTransactionChange(debit, 'platformFeeInHostCurrency', debit.platformFeeInHostCurrency, newPlatformFeeInHostCurrency);
-      debit.platformFeeInHostCurrency = newPlatformFeeInHostCurrency;
-    }
-  }
-
-  /** Fix rounding errors in fees and rewrite netAmount */
-  rewriteFeesAndNetAmount = (credit, debit) => {
-    if (!credit.collective || !debit.collective) {
-      if (!credit.collective) console.log('credit with no collective!!!!', credit.id);
-      if (!debit.collective) console.log('debit with no collective!!!!', credit.id);
-      return;
-    }
-    this.recalculateHostFee(credit, debit);
-    this.recalculatePlatformFee(credit, debit);
-
+  /** Fix rounding errors in netAmount (credit) & amountInHostCurrency and netAmount (debit) */
+  rewriteNetAmount = (credit, debit) => {
     /* Rewrite netAmountInCollectiveCurrency for credit */
     const newNetAmountInCollectiveCurrency = transactionsLib.netAmount(credit);
     this.saveTransactionChange(
@@ -213,6 +133,27 @@ export class Migration {
     debit.amount = newAmountInHostCurrency;
   }
 
+  /** Create an order for orphan transactions */
+  createOrder = async (credit, debit) => {
+    const order = await models.Order.create({
+      CreatedByUserId: credit.CreatedByUserId,
+      FromCollectiveId: credit.FromCollectiveId,
+      CollectiveId: credit.CollectiveId,
+      description: credit.description,
+      totalAmount: credit.amount,
+      currency: credit.currency,
+      processedAt: credit.createdAt,
+      PaymentMethodId: credit.PaymentMethodId,
+      quantity: 1
+    });
+
+    this.saveTransactionChange(credit, 'OrderId', credit.OrderId, order.id);
+    credit.OrderId = order.id;
+
+    this.saveTransactionChange(debit, 'OrderId', debit.OrderId, order.id);
+    debit.OrderId = order.id;
+  }
+
   /** Make sure two transactions are pairs of each other */
   validatePair = (tr1, tr2) => {
     if (tr1.TransactionGroup !== tr2.TransactionGroup) {
@@ -232,98 +173,83 @@ export class Migration {
     }
   }
 
+  /** Migrate a pair of transactions */
+  migratePair = (type, credit, debit) => {
+    const fileName = `broken.${type.toLowerCase()}.csv`;
+    const icon = (good) => good ? '✅' : '❌';
+
+    // Both CREDIT & DEBIT transactions add up
+    if (transactionsLib.verify(credit) && transactionsLib.verify(debit)) {
+      vprint(`${type}.: true, true`);;
+      return false;
+    }
+
+    // Don't do anything for now since these are not in the same currency
+    if (credit.currency !== credit.hostCurrency || debit.currency !== debit.hostCurrency) {
+      const [vc, vd] = [transactionsLib.verify(credit), transactionsLib.verify(debit)];
+      this.incr('not touched due to different currency');
+      this.log('report.txt', ` ${icon(vc && vd)} ${type}:${credit.TransactionGroup} ${vc}, ${vd} # not touched because currency is different`);
+      return false;
+    }
+
+    // Try to set up hostCurrencyFxRate if it's null
+    this.ensureHostCurrencyFxRate(credit);
+    this.ensureHostCurrencyFxRate(debit);
+    if (transactionsLib.verify(credit) && transactionsLib.verify(debit)) {
+      this.incr('fix hostFeeInHostCurrency');
+      this.log('report.txt', ` ${icon(true)} ${type}:${credit.TransactionGroup} true, true # after updating hostCurrencyFxRate'`);
+      return true;
+    }
+
+    // Try to just setup fees
+    this.rewriteFees(credit, debit);
+    if (transactionsLib.verify(credit) && transactionsLib.verify(debit)) {
+      this.incr('rewrite fees');
+      this.log('report.txt', ` ${icon(true)} ${type}:${credit.TransactionGroup} true, true # after updating fees`);
+      return true;
+    }
+
+    // Fix off by one errors
+    if (transactionsLib.difference(credit) === transactionsLib.difference(debit)
+        && transactionsLib.difference(credit) === 1) {
+      this.rewriteNetAmount(credit, debit);
+      if (transactionsLib.verify(credit) && transactionsLib.verify(debit)) {
+        this.incr('recalculate net amount');
+        this.log('report.txt', ` ${icon(true)} ${type}:${credit.TransactionGroup} true, true # after recalculating netAmount`);
+        return true;
+      }
+    }
+
+    // Something is still off
+    vprint(`${type}.:`, transactionsLib.verify(credit), transactionsLib.verify(debit));
+    if (!transactionsLib.verify(credit)) {
+      this.log(fileName, `${credit.id}, CREDIT, ${credit.TransactionGroup}, ${transactionsLib.difference(credit)}`);
+    }
+    if (!transactionsLib.verify(debit)) {
+      this.log(fileName, `${debit.id}, DEBIT, ${debit.TransactionGroup}, ${transactionsLib.difference(debit)}`);
+    }
+    return false;
+  }
+
   /** Migrate one pair of transactions.
    *
    * Return true if the row was changed and false if it was left
    * untouched. */
-  migrate = (tr1, tr2) => {
-    console.log(tr1.TransactionGroup);
-    console.log(tr2.TransactionGroup);
+  migrate = async (tr1, tr2) => {
     this.validatePair(tr1, tr2);
-
     const credit = tr1.type === 'CREDIT' ? tr1 : tr2;
     const debit =  tr1.type === 'DEBIT' ? tr1 : tr2;
 
     if (tr1.ExpenseId !== null) {
-      // Both CREDIT & DEBIT transactions add up
-      if (transactionsLib.verify(credit) && transactionsLib.verify(debit)) {
-        console.log('Expense.: true, true');
-        return false;
-      }
-      // Don't do anything for now since these are not in the same currency
-      if (credit.currency !== credit.hostCurrency || debit.currency !== debit.hostCurrency) {
-        console.log('Expense.: ', transactionsLib.verify(credit), transactionsLib.verify(debit), ' # not touched because currency is different');
-        return false;
-      }
-
-      // Try to set up hostCurrencyFxRate if it's null
-      this.ensureHostCurrencyFxRate(credit);
-      this.ensureHostCurrencyFxRate(debit);
-      if (transactionsLib.verify(credit) && transactionsLib.verify(debit)) {
-        console.log('Expense.: true, true # after updating hostCurrencyFxRate');
-        return true;
-      }
-
-      // Try to just setup fees
-      this.rewriteFees(credit, debit);
-      if (transactionsLib.verify(credit) && transactionsLib.verify(debit)) {
-        console.log('Expense.: true, true # after updating fees');
-        return true;
-      }
-
-      // Something is still off
-      console.log('Expense.:', transactionsLib.verify(tr1), transactionsLib.verify(tr2));
-      if (!transactionsLib.verify(credit)) {
-        console.log(`EDAU, CREDIT, ${credit.id}, ${credit.TransactionGroup}, ${transactionsLib.difference(credit)}`);
-      }
-      if (!transactionsLib.verify(debit)) {
-        console.log(`EDAU, DEBIT, ${debit.id}, ${debit.TransactionGroup}, ${transactionsLib.difference(debit)}`);
-      }
+      return this.migratePair('Expense', credit, debit);
     } else if (tr1.OrderId !== null) {
-      // Both CREDIT & DEBIT transactions add up
-      if (transactionsLib.verify(credit) && transactionsLib.verify(debit)) {
-        console.log('Order...: true, true');
-        return false;
-      }
-      // Don't do anything for now since these are not in the same currency
-      if (credit.currency !== credit.hostCurrency || debit.currency !== debit.hostCurrency) {
-        console.log('Order...:', transactionsLib.verify(credit), transactionsLib.verify(debit), ' # not touched because currency is different');
-        return false;
-      }
-
-      // Try to set up hostCurrencyFxRate if it's null
-      this.ensureHostCurrencyFxRate(credit);
-      this.ensureHostCurrencyFxRate(debit);
-      if (transactionsLib.verify(credit) && transactionsLib.verify(debit)) {
-        console.log('Order...: true, true # after updating hostCurrencyFxRate');
-        return true;
-      }
-
-      // Try to just setup fees
-      this.rewriteFees(credit, debit);
-      if (transactionsLib.verify(credit) && transactionsLib.verify(debit)) {
-        console.log('Order...: true, true # after updating fees');
-        return true;
-      }
-
-      // -*- Temporarily disabled -*-
-      // // Try to recalculate the fees & net amount
-      // this.rewriteFeesAndNetAmount(credit, debit);
-      // if (transactionsLib.verify(credit) && transactionsLib.verify(debit)) {
-      //   console.log('Order...: true, true # after recalculating fees & net amount');
-      //   return true;
-      // }
-
-      // Something is still off
-      console.log('Order...:', transactionsLib.verify(credit), transactionsLib.verify(debit));
-      if (!transactionsLib.verify(credit)) {
-        console.log(`ODAU, CREDIT, ${credit.id}, ${credit.TransactionGroup}, ${transactionsLib.netAmount(credit)}, ${transactionsLib.difference(credit)}`);
-      }
-      if (!transactionsLib.verify(debit)) {
-        console.log(`ODAU, DEBIT, ${debit.id}, ${debit.TransactionGroup}, ${transactionsLib.netAmount(debit)}, ${transactionsLib.difference(debit)}`);
-      }
+      return this.migratePair('Order', credit, debit);
     } else {
-      console.log('  WAT.....:', transactionsLib.verify(tr1), transactionsLib.verify(tr2));
+      this.ordersCreated++;
+      if (!this.options.dryRun) {
+        await this.createOrder(credit, debit);
+      }
+      return this.migratePair('Neither', credit, debit);
     }
 
     // console.log('    * C:amount......: ', credit.amountInHostCurrency);
@@ -340,22 +266,18 @@ export class Migration {
     return false;
   }
 
-  /** Print out a CSV line */
-  logChange = (tr) => {
-    const fields = ((tr.data || {}).migration || {});
-    for (const k of Object.keys(fields)) {
-      console.log(`CSV:${tr.id},${tr.type},${tr.TransactionGroup},${k},${fields[k].oldValue},${fields[k].newValue}`);
-    }
-  }
-
   /** Run the whole migration */
   run = async () => {
-    console.log('CSV:id,type,group,field,oldval,newval');
+    this.log('changes.csv', 'id,type,group,field,oldval,newval');
     let rowsChanged = 0;
     const allTransactions = await this.countValidTransactions();
     const count = this.options.limit
           ? Math.min(this.options.limit, allTransactions)
           : allTransactions;
+
+    this.log('report.txt', `Ledger Fixer Report (dryRun: ${this.options.dryRun})`);
+    this.log('report.txt', `Analyzing ${count} of ${allTransactions}\n`);
+
     while (this.offset < count) {
       /* Transactions are sorted by their TransactionGroup, which
        * means that the first transaction is followed by its negative
@@ -365,8 +287,8 @@ export class Migration {
 
       let dbTransaction;
       try {
+        this.log('report.txt', `\nBatch ${this.offset}/${count}: start`);
         dbTransaction = await sequelize.transaction();
-
         for (let i = 0; i < transactions.length; i += 2) {
           /* Sanity check */
           if (transactions[i].TransactionGroup !== transactions[i + 1].TransactionGroup) {
@@ -375,7 +297,7 @@ export class Migration {
 
           /* Migrate the pair that we just found & log if migration fixed the row */
           const [tr1, tr2] = [transactions[i], transactions[i + 1]];
-          if (this.migrate(tr1, tr2)) {
+          if (await this.migrate(tr1, tr2)) {
             this.logChange(tr1);
             this.logChange(tr2);
             rowsChanged += 2;
@@ -391,11 +313,66 @@ export class Migration {
         await dbTransaction.commit();
         await sleep(60);
       } catch (error) {
-        console.log('Error saving transactions', error);
         await dbTransaction.rollback();
+        this.log('report.txt', `\nBatch ${this.offset}/${count}: FAILED!\n`);
+        this.log('report.txt', `Error ${error}`);
       }
     }
-    console.log(`${rowsChanged} pairs changed`);
+
+    this.log('report.txt', '\nSummary:');
+    this.log('report.txt', `${rowsChanged} pairs changed`);
+    this.log('report.txt', `${this.ordersCreated} orders created`);
+
+    this.log('report.txt', `\nTransactions fixed:`);
+    for (const counter of Object.keys(this.counters)) {
+        this.log('report.txt', ` * ${counter} ${this.counters[counter]}`);
+    }
+
+    this.log('report.txt', `\nTransactions with problems:`);
+    for (const filename of Object.keys(this.logFiles)) {
+      if (filename.startsWith('broken.')) {
+        this.log('report.txt', ` * ${filename} ${this.logFiles[filename].length}`);
+      }
+    }
+  }
+
+  incr = (counter) => {
+    if (!this.counters[counter]) this.counters[counter] = 0;
+    this.counters[counter]++;
+  }
+
+  log = (name, msg) => {
+    if (!this.logFiles[name]) {
+      this.logFiles[name] = [];
+    }
+
+    this.logFiles[name].push(msg);
+
+    if (this.options.verbose) {
+      console.log(name, msg);
+    }
+  }
+
+  /** Print out a CSV line */
+  logChange = (tr) => {
+    const fields = ((tr.data || {}).migration || {});
+    for (const k of Object.keys(fields)) {
+      this.log('changes.csv', `${tr.id},${tr.type},${tr.TransactionGroup},${k},${fields[k].oldValue},${fields[k].newValue}`);
+    }
+  }
+
+  report = async () => {
+    const body = this.logFiles['report.txt'].join('\n');
+    const attachments = [];
+    for (const filename of Object.keys(this.logFiles)) {
+      if (filename !== 'report.txt') {
+        const content = this.logFiles[filename].join('\n');
+        attachments.push({ filename, content });
+      }
+    }
+
+    const icon = Object.keys(this.logFiles).length !== 2 ? '❌' : '✅';
+    return emailReport(`${icon} Ledger Fixer Report`, body, attachments);
   }
 }
 
@@ -442,12 +419,22 @@ function vprint(options, message) {
   }
 }
 
+/** Sends the report to REPORT_EMAIL address */
+async function emailReport(subject, text, attachments) {
+  return libemail.sendMessage(REPORT_EMAIL, subject, '', {
+    text, attachments
+  });
+}
+
 /** Kick off the script with all the user selected options */
 async function entryPoint(options) {
   vprint(options, 'Starting to migrate fees');
+  const migration = new Migration(options);
   try {
-    await (new Migration(options)).run();
+    await migration.run();
   } finally {
+    vprint(options, 'Running report');
+    await migration.report();
     await sequelize.close();
   }
   vprint(options, 'Finished migrating fees');

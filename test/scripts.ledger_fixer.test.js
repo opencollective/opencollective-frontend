@@ -1,6 +1,6 @@
 import sinon from 'sinon';
 import { expect } from 'chai';
-import { Migration } from '../scripts/properly_populate_transaction_fees';
+import { Migration } from '../scripts/ledger_fixer';
 
 describe('Migration', () => {
   describe('#saveTransactionChange', () => {
@@ -159,67 +159,6 @@ describe('Migration', () => {
       expect(debit2.paymentProcessorFeeInHostCurrency).to.equal(-250);
       expect(credit2.data.migration).to.deep.equal({ paymentProcessorFeeInHostCurrency: { oldValue: null, newValue: -250 } });
       expect(debit2.data.migration).to.deep.equal({ paymentProcessorFeeInHostCurrency: { oldValue: 250, newValue: -250 } });
-    });
-  });
-  describe('#recalculatePlatformFee', () => {
-    it('should recalculate the platform fee making sure it is properly round up', () => {
-      // Given a transaction that has the platformFeeInHostCurrency
-      // off because of a rounding error (one case for credit & one
-      // for debit)
-      const [credit1, debit1] = [
-        { platformFeeInHostCurrency: 1082, amountInHostCurrency: 21650, changed: sinon.spy() },
-        { platformFeeInHostCurrency: 0, changed: sinon.spy() },
-      ];
-      const [credit2, debit2] = [
-        { platformFeeInHostCurrency: 0, amountInHostCurrency: 21650, changed: sinon.spy() },
-        { platformFeeInHostCurrency: 1082, changed: sinon.spy() },
-      ];
-
-      // When the fee is recalculated
-      (new Migration).recalculatePlatformFee(credit1, debit1);
-      (new Migration).recalculatePlatformFee(credit2, debit2);
-
-      // Then we see that both platformFeeInHostCurrency values were
-      // fixed
-      expect(credit1.platformFeeInHostCurrency).to.equal(-1083);
-      expect(debit1.platformFeeInHostCurrency).to.equal(-1083);
-      expect(credit1.data.migration).to.deep.equal({ platformFeeInHostCurrency: { oldValue: 1082, newValue: -1083 } });
-      expect(debit1.data.migration).to.deep.equal({ platformFeeInHostCurrency: { oldValue: 0, newValue: -1083 } });
-
-      expect(credit2.platformFeeInHostCurrency).to.equal(-1083);
-      expect(debit2.platformFeeInHostCurrency).to.equal(-1083);
-      expect(credit2.data.migration).to.deep.equal({ platformFeeInHostCurrency: { oldValue: 0, newValue: -1083 } });
-      expect(debit2.data.migration).to.deep.equal({ platformFeeInHostCurrency: { oldValue: 1082, newValue: -1083 } });
-    });
-  });
-  describe('#recalculateHostFee', () => {
-    it('should recalculate the host fee from credit', () => {
-      // Given a transaction that has the hostFeeInHostCurrency off
-      // because of a rounding error
-      const [credit1, debit1] = [
-        { hostFeeInHostCurrency: 1082, amountInHostCurrency: 21650, collective: { hostFeePercent: 5 }, changed: sinon.spy() },
-        { hostFeeInHostCurrency: 0, changed: sinon.spy() },
-      ];
-      const [credit2, debit2] = [
-        { hostFeeInHostCurrency: 0, amountInHostCurrency: 21650, collective: { hostFeePercent: 5 }, changed: sinon.spy() },
-        { hostFeeInHostCurrency: 1082, changed: sinon.spy() },
-      ];
-
-      // When the fee is recalculated
-      (new Migration).recalculateHostFee(credit1, debit1);
-      (new Migration).recalculateHostFee(credit2, debit2);
-
-      // Then we see that both hostFeeInHostCurrency values were
-      // fixed
-      expect(credit1.hostFeeInHostCurrency).to.equal(-1083);
-      expect(debit1.hostFeeInHostCurrency).to.equal(-1083);
-      expect(credit1.data.migration).to.deep.equal({ hostFeeInHostCurrency: { oldValue: 1082, newValue: -1083 } });
-      expect(debit1.data.migration).to.deep.equal({ hostFeeInHostCurrency: { oldValue: 0, newValue: -1083 } });
-
-      expect(credit2.hostFeeInHostCurrency).to.equal(-1083);
-      expect(debit2.hostFeeInHostCurrency).to.equal(-1083);
-      expect(credit2.data.migration).to.deep.equal({ hostFeeInHostCurrency: { oldValue: 0, newValue: -1083 } });
-      expect(debit2.data.migration).to.deep.equal({ hostFeeInHostCurrency: { oldValue: 1082, newValue: -1083 } });
     });
   });
 });
