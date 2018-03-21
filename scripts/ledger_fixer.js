@@ -18,7 +18,10 @@
  * just a little bit slower than running it all in one batch and we
  * don't block the database for other transactions.
  */
+import fs from 'fs';
 import { ArgumentParser } from 'argparse';
+import { promisify } from 'util';
+
 import models, { sequelize } from '../server/models';
 import * as transactionsLib from '../server/lib/transactions';
 import * as paymentsLib from '../server/lib/payments';
@@ -378,8 +381,30 @@ export class Migration {
     }
 
     const icon = Object.keys(this.logFiles).length !== 2 ? '❌' : '✅';
-    return emailReport(`${icon} Ledger Fixer Report`, body, attachments);
+    if (this.options.dryRun) {
+      return saveReport(body, attachments);
+    } else {
+      return emailReport(`${icon} Ledger Fixer Report`, body, attachments);
+    }
   }
+}
+
+/* -- Report functions -- */
+
+/** Sends the report to REPORT_EMAIL address */
+async function saveReport(text, attachments) {
+  const write = promisify(fs.writeFile);
+  await write('report.txt', text);
+  for (const attachment of attachments) {
+    await write(attachment.filename, attachment.content);
+  }
+}
+
+/** Sends the report to REPORT_EMAIL address */
+async function emailReport(subject, text, attachments) {
+  return libemail.sendMessage(REPORT_EMAIL, subject, '', {
+    text, attachments
+  });
 }
 
 /* -- Utilities & Script Entry Point -- */
@@ -423,13 +448,6 @@ function vprint(options, message) {
   if (options.verbose) {
     console.log(message);
   }
-}
-
-/** Sends the report to REPORT_EMAIL address */
-async function emailReport(subject, text, attachments) {
-  return libemail.sendMessage(REPORT_EMAIL, subject, '', {
-    text, attachments
-  });
 }
 
 /** Kick off the script with all the user selected options */
