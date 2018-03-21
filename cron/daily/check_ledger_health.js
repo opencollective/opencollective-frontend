@@ -347,8 +347,7 @@ const checkTransactions = () => {
     }
   }))
   .then(txnsWithoutOrderOrExpenses => {
-    // 600 very old txns. Not worth fixing right now. 
-    subHeader('Transactions without OrderId or ExpenseId', txnsWithoutOrderOrExpenses.length-600);
+    subHeader('Transactions without OrderId or ExpenseId', txnsWithoutOrderOrExpenses.length);
     // if (VERBOSE)
       // txnsWithoutOrderOrExpenses.map(t => Object.assign({id: t.id}));
   })
