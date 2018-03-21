@@ -123,17 +123,31 @@ export class Migration {
     credit.netAmountInCollectiveCurrency = newNetAmountInCollectiveCurrency;
 
     /* Rewrite amountInHostCurrency & amount for debit */
-    const newAmountInHostCurrency = -credit.netAmountInHostCurrency;
-    this.saveTransactionChange(
-      debit, 'amountInHostCurrency',
-      debit.amountInHostCurrency,
-      newAmountInHostCurrency);
-    debit.amountInHostCurrency = newAmountInHostCurrency;
-    this.saveTransactionChange(
-      debit, 'amount',
-      debit.amount,
-      newAmountInHostCurrency);
-    debit.amount = newAmountInHostCurrency;
+    const newAmountInHostCurrency = -credit.amountInHostCurrency;
+    if (debit.amountInHostCurrency !== newAmountInHostCurrency) {
+      this.saveTransactionChange(
+        debit, 'amountInHostCurrency',
+        debit.amountInHostCurrency,
+        newAmountInHostCurrency);
+      debit.amountInHostCurrency = newAmountInHostCurrency;
+    }
+    if (debit.amount !== newAmountInHostCurrency) {
+      this.saveTransactionChange(
+        debit, 'amount',
+        debit.amount,
+        newAmountInHostCurrency);
+      debit.amount = newAmountInHostCurrency;
+    }
+
+    /* Rewrite netAmountInHostCurrency for debit */
+    const newNetAmountInCollectiveCurrencyDebit = -credit.netAmountInCollectiveCurrency;
+    if (debit.newNetAmountInCollectiveCurrency !== newNetAmountInCollectiveCurrencyDebit) {
+      this.saveTransactionChange(
+        debit, 'netAmountInHostCurrency',
+        debit.netAmountInCollectiveCurrency,
+        newNetAmountInCollectiveCurrencyDebit);
+      debit.netAmountInCollectiveCurrency = newNetAmountInCollectiveCurrencyDebit;
+    }
   }
 
   /** Create an order for orphan transactions */
@@ -188,12 +202,12 @@ export class Migration {
     }
 
     // Don't do anything for now since these are not in the same currency
-    if (credit.currency !== credit.hostCurrency || debit.currency !== debit.hostCurrency) {
-      const [vc, vd] = [transactionsLib.verify(credit), transactionsLib.verify(debit)];
-      this.incr('not touched due to different currency');
-      this.log('report.txt', ` ${icon(vc && vd)} ${type}:${credit.TransactionGroup} ${vc}, ${vd} # not touched because currency is different`);
-      return false;
-    }
+    // if (credit.currency !== credit.hostCurrency || debit.currency !== debit.hostCurrency) {
+    //   const [vc, vd] = [transactionsLib.verify(credit), transactionsLib.verify(debit)];
+    //   this.incr('not touched due to different currency');
+    //   this.log('report.txt', ` ${icon(vc && vd)} ${type}:${credit.TransactionGroup} ${vc}, ${vd} # not touched because currency is different`);
+    //   return false;
+    // }
 
     // Try to set up hostCurrencyFxRate if it's null
     this.ensureHostCurrencyFxRate(credit);
@@ -213,23 +227,23 @@ export class Migration {
     }
 
     // Fix off by one errors
-    if (transactionsLib.difference(credit) === transactionsLib.difference(debit)
-        && transactionsLib.difference(credit) === 1) {
+    // if (transactionsLib.difference(credit) === transactionsLib.difference(debit)
+    //     && transactionsLib.difference(credit) === 1) {
       this.rewriteNetAmount(credit, debit);
       if (transactionsLib.verify(credit) && transactionsLib.verify(debit)) {
         this.incr('recalculate net amount');
         this.log('report.txt', ` ${icon(true)} ${type}:${credit.TransactionGroup} true, true # after recalculating netAmount`);
         return true;
       }
-    }
+    // }
 
     // Something is still off
     vprint(`${type}.:`, transactionsLib.verify(credit), transactionsLib.verify(debit));
     if (!transactionsLib.verify(credit)) {
-      this.log(fileName, `${credit.id}, CREDIT, ${credit.TransactionGroup}, ${transactionsLib.difference(credit)}`);
+      this.log(fileName, `${credit.id}, CREDIT, ${credit.PaymentMethodId}, ${credit.currency}, ${credit.hostCurrency}, ${credit.TransactionGroup}, ${transactionsLib.difference(credit)}`);
     }
     if (!transactionsLib.verify(debit)) {
-      this.log(fileName, `${debit.id}, DEBIT, ${debit.TransactionGroup}, ${transactionsLib.difference(debit)}`);
+      this.log(fileName, `${debit.id}, DEBIT, ${debit.PaymentMethodId}, ${debit.currency}, ${debit.hostCurrency}, ${debit.TransactionGroup}, ${transactionsLib.difference(debit)}`);
     }
     return false;
   }
