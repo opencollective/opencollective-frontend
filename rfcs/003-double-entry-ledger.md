@@ -1,6 +1,5 @@
 # REQUEST FOR COMMENTS 003 - Double Entry Ledger
 
-
 ## Overview
 
 Transferring funds from User to Collective is currently represented as
@@ -19,17 +18,19 @@ store the transactions. It will also decrease duplicated code (likely
 reducing bugs) because it will provide a library that implements all
 the basic operations related to the ledger.
 
+*Fig 1.0 - Payment Flow*
+![Payment Flow](./imgs/payment-flow.svg "Payment Flow")
+
 ## Goals
 
 1. Increase accuracy of the ledger
-   1. [ ] Create collective type "Payment Provider"
-   2. [ ] Create separate transactions for fees
-2. Make it easier to build new features that depend on data from the
-   ledger
-   1. [ ] `libocledger`: wrap the most common operations related to
-           the ledger under a library that can be used across all the
-           places that interact with the ledger and decrease
-           duplicated code in the repository.
+   1. Create collective type "Payment Provider"
+   2. Create separate transactions for fees
+2. Make it easier to build new features that depend on the ledger
+   1. `libocledger`: wrap the most common operations related to the
+      ledger under a library that can be used across all the places
+      that interact with the ledger and decrease duplicated code in
+      the repository.
 
 ### Create collective type "Payment Provider"
 
@@ -44,29 +45,55 @@ have a ledger as well.
 
 ### Create separate transactions for fees
 
-#### Use case example
+#### Use case example (Order)
 
 Given a transaction that represents moving $50 dollars from User to
 Collective with 5% of platform fee, 10% of host fee and 2.9%+30c of
 payment processor fee.
 
 ##### How it is currently stored
-|            | User Ledger | Collective Ledger |
-|------------|------------:|------------------:|
-| Type       |       DEBIT |            CREDIT |
-| Amount     |       -4075 |              5000 |
-| Host Fee   |        -500 |              -500 |
-| Plat Fee   |        -250 |              -250 |
-| PP Fee     |        -175 |              -175 |
-| Net Amount |       -5000 |              4075 |
+
+|            |  User | Collective |
+|------------|------:|-----------:|
+| Type       | DEBIT |     CREDIT |
+| Amount     | -4075 |       5000 |
+| Host Fee   |  -500 |       -500 |
+| Plat Fee   |  -250 |       -250 |
+| PP Fee     |  -175 |       -175 |
+| Net Amount | -5000 |       4075 |
 
 ##### How it should look like after this change
 
-|        |  User | Collective | Collective | Platform | Collective | Host | Collective | Payment Provider |
-|--------|------:|-----------:|-----------:|---------:|-----------:|-----:|-----------:|-----------------:|
-| Amount | -5000 |       5000 |       -250 |      250 |       -500 |  500 |       -175 |              175 |
+|  User | Payment Provider | Platform |  Host | Collective |
+|------:|-----------------:|---------:|------:|-----------:|
+| -5000 |             5000 |          |       |            |
+|       |             -250 |      250 |       |            |
+|       |            -4575 |          |  4575 |            |
+|       |                  |          | -4325 |       4325 |
 
-##### Where did the net amount go
+#### Use case example (Expense)
+
+Given a transaction that represents moving $50 dollars from Collective
+to User with 2.9%+30c of payment processor fee.
+
+##### How it is currently stored
+
+|            | Collective |   User |
+|------------|-----------:|-------:|
+| Type       |      DEBIT | CREDIT |
+| Amount     |      -5000 |   5000 |
+| PP Fee     |       -175 |   -175 |
+| Net Amount |      -5175 |   5000 |
+
+##### How it should look like after this change
+
+| Collective |  Host | Payment Provider | User |
+|-----------:|------:|-----------------:|-----:|
+|      -5000 |  5000 |                  |      |
+|            | -5175 |             5175 |      |
+|            |       |            -5000 | 5000 |
+
+#### Where did the net amount go
 
 The net amount won't be a static value in the database anymore. The
 next section introduces an API that provides core operations to the
@@ -114,9 +141,9 @@ The Ledger API will now provide the following tools:
    ```javascript
    > libledger.rows('d3e36baa-69a2-4f6e-ac44-f93981e51c97')
    [
-     { fromCollective: 10165, collective: 58, amount: -5000 }, // from User to Collective
-     { fromCollective: 58, collective: 1, amount: -250 },      // from Collective to Platform
-     { fromCollective: 58, collective: 11004, amount: -250 },  // from Collective to Host
-     { fromCollective: 58, collective: 90000, amount: -175 },  // from Collective to Payment Provider
+     { fromCollective: 10165, collective: 90000, amount: -5000 }, // from User to Payment Provider
+     { fromCollective: 90000, collective: 1, amount: 250 },       // from Payment Provider to Platform
+     { fromCollective: 90000, collective: 11004, amount: 4575 },  // from Payment Provider to Host
+     { fromCollective: 11004, collective: 58, amount: 4325 },     // from Host to Collective
    ]
    ```
