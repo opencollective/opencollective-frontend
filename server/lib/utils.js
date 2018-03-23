@@ -15,13 +15,12 @@ const debug = debugLib('utils');
 
 // source: https://stackoverflow.com/questions/8498592/extract-hostname-name-from-string
 function extractHostname(url) {
-  var hostname;
+  let hostname;
   //find & remove protocol (http, ftp, etc.) and get hostname
 
   if (url.indexOf("://") > -1) {
       hostname = url.split('/')[2];
-  }
-  else {
+  } else {
       hostname = url.split('/')[0];
   }
 
