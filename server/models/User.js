@@ -492,6 +492,7 @@ export default (Sequelize, DataTypes) => {
         return models.Collective.create(userCollective);
       })
       .tap(collective => {
+        collective.findImage(user);
         user.CollectiveId = collective.id;
         return user.save();
       })

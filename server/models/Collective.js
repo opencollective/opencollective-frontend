@@ -11,7 +11,7 @@ import { difference, uniq, pick } from 'lodash';
 import { types } from '../constants/collectives';
 import roles from '../constants/roles';
 import { HOST_FEE_PERCENT } from '../constants/transactions';
-import { capitalize, flattenArray } from '../lib/utils';
+import { capitalize, flattenArray, getDomain } from '../lib/utils';
 import slugify from 'slug';
 import activities from '../constants/activities';
 import Promise from 'bluebird';
@@ -20,6 +20,8 @@ import CustomDataTypes from './DataTypes';
 import { convertToCurrency } from '../lib/currency';
 import emailLib from '../lib/email';
 import debugLib from 'debug';
+import fetch from 'isomorphic-fetch';
+import crypto from 'crypto';
 
 const debug = debugLib('collective');
 
@@ -116,7 +118,17 @@ export default function(Sequelize, DataTypes) {
 
     currency: CustomDataTypes(DataTypes).currency,
 
-    image: DataTypes.STRING,
+    image: {
+      type: DataTypes.STRING,
+      get() {
+        const image = this.getDataValue("image");
+        if (image) return image;
+        if (this.type === 'ORGANIZATION' && this.website) {
+          const image = `https://logo.clearbit.com/${getDomain(this.website)}`;
+          return image;
+        }
+      }
+    },
 
     backgroundImage: {
       type: DataTypes.STRING,
@@ -338,6 +350,9 @@ export default function(Sequelize, DataTypes) {
 
       },
       afterCreate: (instance) => {
+
+        instance.findImage();
+
         // We only create an "opencollective" paymentMethod for collectives and events
         if (instance.type !== 'COLLECTIVE' && instance.type !== 'EVENT') {
           return null;
@@ -358,6 +373,34 @@ export default function(Sequelize, DataTypes) {
   /**
    * Instance Methods
    */
+
+
+  // If no image has been provided, try to find a good image using clearbit/gravatar and save it if it returns 200
+  Collective.prototype.findImage = function(user) {
+    if (this.getDataValue("image")) return this.image;
+
+    const checkAndUpdateImage = (image) => {
+      return fetch(image).then(response => {
+        if (response.status === 200) {
+          return this.update({ image });
+        }
+      })
+    }
+
+    if (this.type === 'ORGANIZATION' && this.website) {
+      const image = `https://logo.clearbit.com/${getDomain(this.website)}`;
+      checkAndUpdateImage(image);
+      return image;
+    }
+    if (this.type === 'USER' && user) {
+      if (user.email) {
+        const md5 = crypto.createHash('md5').update(user.email.toLowerCase().trim()).digest("hex");
+        const avatar = `https://www.gravatar.com/avatar/${md5}?default=404`;
+        checkAndUpdateImage(avatar);
+        return avatar;
+      }
+    }
+  }
 
   // run when attaching a Stripe Account to this user/organization collective
   Collective.prototype.becomeHost = function() {
