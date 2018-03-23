@@ -189,9 +189,7 @@ class Update extends React.Component {
           </div>
 
           { mode === "summary" &&
-            <div className="summary">
-              {update.summary}
-            </div>
+            <div className="summary" dangerouslySetInnerHTML={{ __html: update.summary }} />
           }
 
           { mode === "details" && !this.props.compact &&
