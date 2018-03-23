@@ -180,13 +180,14 @@ export async function banner(req, res) {
 }
 
 export async function website(req, res) {
-  const { collectiveSlug, tierSlug, backerType } = req.params;
+  req.params.isActive = true;
+  const { collectiveSlug, tierSlug, backerType, isActive } = req.params;
 
-  let users = cache.get(queryString.stringify({ collectiveSlug, tierSlug, backerType }));
+  let users = cache.get(queryString.stringify({ collectiveSlug, tierSlug, backerType, isActive }));
   if (!users) {
     try {
       users = await fetchMembers(req.params);
-      cache.set(queryString.stringify({ collectiveSlug, tierSlug, backerType }), users);
+      cache.set(queryString.stringify({ collectiveSlug, tierSlug, backerType, isActive }), users);
     } catch (e) {
       return res.status(404).send('Not found');
     }
@@ -227,13 +228,13 @@ export async function website(req, res) {
 }
 
 export async function avatar(req, res, next) {
-  const { collectiveSlug, tierSlug, backerType } = req.params;
-  
-  let users = cache.get(queryString.stringify({ collectiveSlug, tierSlug, backerType }));
+  req.params.isActive = true;
+  const { collectiveSlug, tierSlug, backerType, isActive } = req.params;
+  let users = cache.get(queryString.stringify({ collectiveSlug, tierSlug, backerType, isActive }));
   if (!users) {
     try {
       users = await fetchMembers(req.params);
-      cache.set(queryString.stringify({ collectiveSlug, tierSlug, backerType }), users);
+      cache.set(queryString.stringify({ collectiveSlug, tierSlug, backerType, isActive }), users);
     } catch (e) {
       return res.status(404).send('Not found');
     }
