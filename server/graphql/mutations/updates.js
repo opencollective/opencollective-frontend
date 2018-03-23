@@ -15,8 +15,8 @@ export async function createUpdate(_, args, req) {
 
   const update = await models.Update.create({
     title: args.update.title,
-    markdown: strip_tags(args.update.markdown || "", '<a><b><i><strong><img><blockquote><iframe><p><ol><ul><li><br>'),
-    html: strip_tags(args.update.html || "", '<a><b><i><strong><img><blockquote><iframe><p><ol><ul><li><br>'),
+    markdown: strip_tags(args.update.markdown),
+    html: strip_tags(args.update.html),
     CollectiveId,
     TierId: get(args, 'update.tier.id'),
     CreatedByUserId: req.remoteUser.id,

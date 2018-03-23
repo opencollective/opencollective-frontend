@@ -9,6 +9,7 @@ import fs from 'fs';
 import path from 'path';
 import handlebars from './handlebars';
 import { get } from 'lodash';
+import sanitizeHtml from 'sanitize-html';
 
 const debug = debugLib('utils');
 
@@ -32,39 +33,33 @@ export const decrypt = (text) => {
   return dec;
 };
 
-export function strip_tags(str, allowed) {
-
-  // making sure the allowed arg is a string containing only tags in lowercase (<a><b><c>)
-  allowed = ((`${(allowed || '')}`).toLowerCase().match(/<[a-z][a-z0-9]*>/g) || []).join('')
-
-  const tags = /<\/?([a-z][a-z0-9]*)\b[^>]*>/gi
-  const commentsAndPhpTags = /<!--[\s\S]*?-->|<\?(?:php)?[\s\S]*?\?>/gi
-
-  let after = str;
-  // recursively remove tags to ensure that the returned string doesn't contain forbidden tags after previous passes (e.g. '<<bait/>switch/>')
-  while (true) { // eslint-disable-line
-    const before = after
-    after = before.replace(commentsAndPhpTags, '').replace(tags, ($0, $1) => {
-      return allowed.indexOf(`<${$1.toLowerCase()}>`) > -1 ? $0 : ''
-    })
-
-    // return once no more tags are removed
-    if (before === after) {
-      return after
+export function strip_tags(str, allowedTags) {
+  return sanitizeHtml(str, {
+    allowedTags: allowedTags || sanitizeHtml.defaults.allowedTags.concat([ 'img' ]),
+    allowedAttributes: {
+      a: [ 'href', 'name', 'target' ],
+      img: [ 'src' ]
     }
-  }  
+  });
 }
 
 export const sanitizeObject = (obj, attributes) => {
   attributes.forEach(attr => {
     if (!obj[attr]) return;
-    obj[attr] = strip_tags(obj[attr] || "", '<a><b><i><strong><img><blockquote><iframe><p><ol><ul><li><br>')
+    obj[attr] = strip_tags(obj[attr] || "");
   });
   return obj;
 }
 
+String.prototype.trunc = function(n, useWordBoundary ) {
+  if (this.length <= n) return this;
+  const subString = this.substr(0, n-1);
+  return `${(useWordBoundary 
+    ? subString.substr(0, subString.lastIndexOf(' ')) 
+    : subString)}&hellip;`;
+};
 
-/**
+      /**
  * Generate a secured token that works inside URLs
  * http://stackoverflow.com/a/25690754
  */

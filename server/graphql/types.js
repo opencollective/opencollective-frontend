@@ -533,19 +533,19 @@ export const UpdateType = new GraphQLObjectType({
       summary: {
         type: GraphQLString,
         resolve(update) {
-          return he.decode(strip_tags(update.html || "")).substr(0,255);
+          return he.decode(strip_tags(update.html || "", ["a"]).trunc(255, true));
         }
       },
       html: {
         type: GraphQLString,
         resolve(update) {
-          return update.html;
+          return strip_tags(update.html || "");
         }
       },
       markdown: {
         type: GraphQLString,
         resolve(update) {
-          return update.markdown;
+          return strip_tags(update.markdown || "");
         }
       },
       tags: {
