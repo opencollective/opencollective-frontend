@@ -138,6 +138,36 @@ describe('Collective model', () => {
       })
   })
 
+  it('creates an organization and populates logo image', (done) => {
+    models.Collective.create({
+      name: "Open Collective",
+      type: "ORGANIZATION",
+      website: "https://opencollective.com"
+    }).then(collective => {
+      expect(collective.image).to.equal("https://logo.clearbit.com/opencollective.com");
+      models.Collective.findById(collective.id).then(c => {
+        expect(c.image).to.equal("https://logo.clearbit.com/opencollective.com");
+        done();
+      })
+    })
+  });
+
+  it('creates a user and populates avatar image', (done) => {
+    models.User.createUserWithCollective({
+      name: "Xavier Damman",
+      type: "USER",
+      email: "xavier@tribal.be"
+    }).then(user => {
+      expect(user.collective.image).to.equal(undefined);
+      setTimeout(() => {
+        models.Collective.findById(user.collective.id).then(c => {
+          expect(c.image).to.equal("https://www.gravatar.com/avatar/a97d0fcd96579015da610aa284f8d8df?default=404");
+          done();
+        })
+      }, 700);
+    })
+  });
+
   it('computes the balance ', () =>
     collective.getBalance().then(balance => {
       let sum = 0;
