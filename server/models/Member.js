@@ -1,4 +1,5 @@
 import roles from '../constants/roles';
+import { days } from '../lib/utils';
 
 export default function(Sequelize, DataTypes) {
 
@@ -99,6 +100,18 @@ export default function(Sequelize, DataTypes) {
       }
     }
   });
+  
+  /**
+   * Returns false if member is part of a tier with an interval and last donation is out of interval
+   * @param {*} member { tier: { interval }, lastDonation}
+   */
+  Member.isActive = (member) => {
+    if (!member.tier || !member.tier.interval) return true;
+    if (!member.lastDonation) return false;
+    if (member.tier.interval === 'month' && days(new Date(member.lastDonation)) <= 31) return true;
+    if (member.tier.interval === 'year' && days(new Date(member.lastDonation)) <= 365) return true;
+    return false;
+  }
 
   return Member
 }

@@ -269,8 +269,8 @@ describe('graphql.collective.test.js', () => {
   describe("allMembers query", () => {
 
     const allMembersQuery = `
-    query allMembers($collectiveSlug: String, $memberCollectiveSlug: String, $orderBy: String, $role: String, $type: String) {
-      allMembers(collectiveSlug: $collectiveSlug, memberCollectiveSlug: $memberCollectiveSlug, role: $role, type: $type, limit: 10, offset: 1, orderBy: $orderBy) {
+    query allMembers($collectiveSlug: String, $memberCollectiveSlug: String, $orderBy: String, $role: String, $type: String, $isActive: Boolean) {
+      allMembers(collectiveSlug: $collectiveSlug, memberCollectiveSlug: $memberCollectiveSlug, role: $role, type: $type, limit: 10, offset: 1, orderBy: $orderBy, isActive: $isActive) {
         id
         role
         stats {
@@ -287,9 +287,27 @@ describe('graphql.collective.test.js', () => {
             email
           }
         }
+        tier {
+          id
+          slug
+          interval
+        }
       }
     }
     `;
+
+    it('gets the active members ', async () => {
+      const result = await utils.graphqlQuery(allMembersQuery, { collectiveSlug: "brusselstogether-collective", isActive: true, orderBy: "totalDonations" });
+      result.errors && console.error(result.errors);
+      expect(result.errors).to.not.exist;
+      const members = result.data.allMembers;
+      expect(members).to.have.length(6);
+      expect(members[0].collective.slug).to.equal('brusselstogether-collective');
+      expect(members[0].member.slug).to.equal('xdamman');
+      members.map(m => {
+        m.tier && expect(m.tier.interval).to.be.null;
+      });
+    });
 
     it('gets the members by collectiveSlug without email', async () => {
       const result = await utils.graphqlQuery(allMembersQuery, { collectiveSlug: "brusselstogether-collective" });

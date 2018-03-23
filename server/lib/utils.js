@@ -214,7 +214,7 @@ export const paginateOffset = (page, perPage) => {
 /**
  * Gives the number of days between two dates
  */
-export const days = (d1, d2) => {
+export const days = (d1, d2 = new Date) => {
   const oneDay = 24*60*60*1000; // hours*minutes*seconds*milliseconds
   return Math.round(Math.abs((d1.getTime() - d2.getTime())/(oneDay)));
 }

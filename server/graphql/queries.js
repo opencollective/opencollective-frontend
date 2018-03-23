@@ -27,7 +27,7 @@ import {
   PaymentMethodType
 } from './types';
 
-import { get } from 'lodash';
+import { get, uniq } from 'lodash';
 import models, { sequelize } from '../models';
 import rawQueries from '../lib/queries';
 import { fetchCollectiveId } from '../lib/cache';
@@ -460,6 +460,7 @@ const queries = {
       TierId: { type: GraphQLInt },
       role: { type: GraphQLString },
       type: { type: GraphQLString },
+      isActive: { type: GraphQLBoolean },
       orderBy: { type: GraphQLString },
       orderDirection: { type: GraphQLString },
       limit: { type: GraphQLInt },
@@ -502,7 +503,28 @@ const queries = {
 
       if (["totalDonations", "balance"].indexOf(args.orderBy) !== -1) {
         const queryName = (args.orderBy === 'totalDonations') ? "getMembersWithTotalDonations" : "getMembersWithBalance";
-        return rawQueries[queryName](where, args)
+        const tiersById = {};
+
+        const options = args.isActive
+          ? { ...args, limit: args.limit * 2}
+          : args;
+
+        return rawQueries[queryName](where, options)
+          .then(results => {
+            if (args.isActive) {
+              const TierIds = uniq(results.map(r => r.dataValues.TierId));
+              return models.Tier.findAll({where: { id: { $in: TierIds }}}).then(tiers => {
+                tiers.map(t => tiersById[t.id] = t.dataValues);
+                return results.filter(r => {
+                  return models.Member.isActive({
+                    tier: tiersById[r.dataValues.TierId],
+                    lastDonation: r.dataValues.lastDonation
+                  })
+                }).slice(0, args.limit)
+              })
+            }
+            return results;
+          })
           .map(collective => {
             const res = {
               id: collective.dataValues.MemberId,
@@ -510,7 +532,8 @@ const queries = {
               createdAt: collective.dataValues.createdAt,
               CollectiveId: collective.dataValues.CollectiveId,
               MemberCollectiveId: collective.dataValues.MemberCollectiveId,
-              totalDonations: collective.dataValues.totalDonations
+              totalDonations: collective.dataValues.totalDonations,
+              TierId: collective.dataValues.TierId
             }
             res[memberTable] = collective;
             return res;
