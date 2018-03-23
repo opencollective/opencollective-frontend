@@ -504,7 +504,12 @@ const queries = {
       if (["totalDonations", "balance"].indexOf(args.orderBy) !== -1) {
         const queryName = (args.orderBy === 'totalDonations') ? "getMembersWithTotalDonations" : "getMembersWithBalance";
         const tiersById = {};
-        return rawQueries[queryName](where, args)
+
+        const options = args.isActive
+          ? { ...args, limit: args.limit * 2}
+          : args;
+
+        return rawQueries[queryName](where, options)
           .then(results => {
             if (args.isActive) {
               const TierIds = uniq(results.map(r => r.dataValues.TierId));
@@ -515,7 +520,7 @@ const queries = {
                     tier: tiersById[r.dataValues.TierId],
                     lastDonation: r.dataValues.lastDonation
                   })
-                })
+                }).slice(0, args.limit)
               })
             }
             return results;
