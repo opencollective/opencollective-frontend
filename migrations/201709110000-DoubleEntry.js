@@ -2,7 +2,7 @@
 
 const DRY_RUN = false;
 
-const uuid = require('node-uuid');
+const uuid = require('uuid');
 const Promise = require('bluebird');
 
 const pick = (obj, attributes) => {

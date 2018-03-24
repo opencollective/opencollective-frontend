@@ -2,7 +2,7 @@ import Promise from 'bluebird';
 import activities from '../constants/activities';
 import { type } from '../constants/transactions';
 import CustomDataTypes from './DataTypes';
-import uuid from 'node-uuid';
+import uuid from 'uuid';
 import debugLib from 'debug';
 import { toNegative } from '../lib/math';
 

@@ -1,5 +1,5 @@
 'use strict';
-const uuid = require('node-uuid');
+const uuid = require('uuid');
 
 // Update all expenses payoutMethod from "manual" to "other"
 // Make sure each organization has an "opencollective" paymentMethod

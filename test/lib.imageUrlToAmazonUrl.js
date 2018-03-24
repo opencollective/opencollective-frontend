@@ -3,7 +3,7 @@ import { expect } from 'chai';
 import sinon from 'sinon';
 import nock from 'nock';
 import knox from 'knox';
-import uuid from 'node-uuid';
+import uuid from 'uuid';
 import stream from 'stream';
 
 import amazonMockData from './mocks/amazon';

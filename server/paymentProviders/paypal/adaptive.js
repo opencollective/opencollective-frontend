@@ -1,7 +1,7 @@
 import models from '../../models';
 import paypalAdaptive from './adaptiveGateway';
 import config from 'config';
-import uuid from 'node-uuid';
+import uuid from 'uuid';
 import { formatCurrency } from '../../lib/utils';
 import debugLib from 'debug';
 const debug = debugLib('paypal');

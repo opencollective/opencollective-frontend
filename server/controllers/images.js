@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import uuid from 'node-uuid';
+import uuid from 'uuid';
 import errors from '../lib/errors';
 import knox from '../gateways/knox';
 

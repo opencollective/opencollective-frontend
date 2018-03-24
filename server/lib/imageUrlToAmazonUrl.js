@@ -1,5 +1,5 @@
 import path from 'path';
-import uuid from 'node-uuid';
+import uuid from 'uuid';
 import mime from 'mime';
 import request from 'request';
 import MultiPartUpload from 'knox-mpu-alt';

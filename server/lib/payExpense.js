@@ -1,5 +1,5 @@
 import config from 'config';
-import uuid from 'node-uuid';
+import uuid from 'uuid';
 import errors from './errors';
 import paypalAdaptive from '../paymentProviders/paypal/adaptiveGateway';
 
