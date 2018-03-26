@@ -170,7 +170,8 @@ export const addEditCollectiveMutation = graphql(editCollectiveQuery, {
         'quantity',
         'ParentCollectiveId',
         'image',
-        'backgroundImage'
+        'backgroundImage',
+        'settings'
       ]);
       if (collective.paymentMethods && collective.paymentMethods.length > 0) {
         CollectiveInputType.paymentMethods = collective.paymentMethods.map(pm => pick(pm, ['id', 'name', 'token', 'data', 'monthlyLimitPerMember', 'currency']));

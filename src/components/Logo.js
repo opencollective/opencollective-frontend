@@ -2,15 +2,15 @@ import { defaultImage } from '../constants/collectives';
 import { imagePreview, getDomain } from '../lib/utils';
 
 export default ({ src, style = {}, height, type = 'ORGANIZATION', website }) => {
-  style.height = style.height || height;
+  style.maxHeight = style.height || height;
   if (!src && website && type==='ORGANIZATION') {
     src = `https://logo.clearbit.com/${getDomain(website)}`;
   }
-  const backgroundStyle = { height, minWidth: height };
+  const backgroundStyle = { height, minWidth: Math.max(0, height/2) };
   if (!src) {
     backgroundStyle.backgroundImage = `url(${defaultImage[type]})`
   }
-  const image = imagePreview(src, defaultImage[type], { height: style.height });
+  const image = imagePreview(src, defaultImage[type], { height: style.maxHeight });
   return (
     <div className="Logo" style={backgroundStyle}>
       <style jsx>{`
@@ -19,6 +19,8 @@ export default ({ src, style = {}, height, type = 'ORGANIZATION', website }) => 
           background-position: center center;
           background-size: cover;
           overflow: hidden;
+          display: flex;
+          align-items: center;
         }
         .image {
           background-repeat: no-repeat;

@@ -307,7 +307,7 @@ class Collective extends React.Component {
                       role='BACKER'
                       limit={100}
                       />
-                
+
                     <MembersWithData
                       collective={this.collective}
                       LoggedInUser={LoggedInUser}
