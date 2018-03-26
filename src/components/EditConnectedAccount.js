@@ -28,9 +28,9 @@ class EditConnectedAccount extends React.Component {
       'collective.connectedAccounts.twitter.button': { id: 'collective.connectedAccounts.twitter.button', defaultMessage: 'Connect Twitter' },
       'collective.connectedAccounts.twitter.description': { id: 'collective.connectedAccounts.twitter.description', defaultMessage: 'Connect a Twitter account to automatically thank new backers' },
       'collective.connectedAccounts.twitter.connected': { id: 'collective.connectedAccounts.twitter.connected', defaultMessage: 'Twitter account @{username} connected on {createdAt, date, short}' },
-      'collective.connectedAccounts.github.button': { id: 'collective.connectedAccounts.github.button', defaultMessage: 'Connect Github' },
-      'collective.connectedAccounts.github.description': { id: 'collective.connectedAccounts.github.description', defaultMessage: 'Connect a Github account to verify your identity and add it to your profile' },
-      'collective.connectedAccounts.github.connected': { id: 'collective.connectedAccounts.github.connected', defaultMessage: 'Github account {username} connected on {createdAt, date, short}' }
+      'collective.connectedAccounts.github.button': { id: 'collective.connectedAccounts.github.button', defaultMessage: 'Connect GitHub' },
+      'collective.connectedAccounts.github.description': { id: 'collective.connectedAccounts.github.description', defaultMessage: 'Connect a GitHub account to verify your identity and add it to your profile' },
+      'collective.connectedAccounts.github.connected': { id: 'collective.connectedAccounts.github.connected', defaultMessage: 'GitHub account {username} connected on {createdAt, date, short}' }
     });
     this.services = ['stripe', 'paypal', 'twitter', 'github'];
   }
