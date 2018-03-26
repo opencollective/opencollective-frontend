@@ -3,6 +3,13 @@ import { expect } from 'chai';
 import { Migration } from '../scripts/ledger_fixer';
 
 describe('Migration', () => {
+  // The changes performed by the migration code are stored within a
+  // JSON key that contains the date the change happened. So to test
+  // it properly here time has to be frozen.
+  let clock;
+  beforeEach(() => clock = sinon.useFakeTimers((new Date("2018-03-20 0:0")).getTime()));
+  afterEach(() => clock.restore());
+
   describe('#saveTransactionChange', () => {
     it('should create a new change within the data field', () => {
       // Given a transaction with an empty data field
@@ -13,8 +20,9 @@ describe('Migration', () => {
 
       // Then the data field should reflect that update
       expect(transaction.data).to.have.property('migration');
-      expect(transaction.data.migration).to.have.property('hostCurrencyFxRate');
-      expect(transaction.data.migration.hostCurrencyFxRate).to.deep.equal({ oldValue: null, newValue: 1 });
+      expect(transaction.data.migration).to.have.property('20180320');
+      expect(transaction.data.migration['20180320']).to.have.property('hostCurrencyFxRate');
+      expect(transaction.data.migration['20180320'].hostCurrencyFxRate).to.deep.equal({ oldValue: null, newValue: 1 });
 
       // And then the spy was properly called
       expect(transaction.changed.called).to.be.true;
@@ -24,7 +32,7 @@ describe('Migration', () => {
       // Given a transaction with a data field that contains a
       // migration field
       const transaction = {
-        data: { migration: { hostCurrencyFxRate: { oldValue: null, newValue: 1 } } },
+        data: { migration: { '20180320': { hostCurrencyFxRate: { oldValue: null, newValue: 1 } } } },
         changed: sinon.spy()
       };
 
@@ -33,10 +41,11 @@ describe('Migration', () => {
 
       // Then both fields should be saved in the data.migration property
       expect(transaction.data).to.have.property('migration');
-      expect(transaction.data.migration).to.have.property('hostCurrencyFxRate');
-      expect(transaction.data.migration.hostCurrencyFxRate).to.deep.equal({ oldValue: null, newValue: 1 });
-      expect(transaction.data.migration).to.have.property('platformFeeInHostCurrency');
-      expect(transaction.data.migration.platformFeeInHostCurrency).to.deep.equal({ oldValue: 1082, newValue: 1083 });
+      expect(transaction.data.migration).to.have.property('20180320');
+      expect(transaction.data.migration['20180320']).to.have.property('hostCurrencyFxRate');
+      expect(transaction.data.migration['20180320'].hostCurrencyFxRate).to.deep.equal({ oldValue: null, newValue: 1 });
+      expect(transaction.data.migration['20180320']).to.have.property('platformFeeInHostCurrency');
+      expect(transaction.data.migration['20180320'].platformFeeInHostCurrency).to.deep.equal({ oldValue: 1082, newValue: 1083 });
     });
   });
   describe('#ensureHostCurrencyFxRate', () => {
@@ -98,13 +107,13 @@ describe('Migration', () => {
       // negative
       expect(credit1.hostFeeInHostCurrency).to.equal(-250);
       expect(debit1.hostFeeInHostCurrency).to.equal(-250);
-      expect(credit1.data.migration).to.deep.equal({ hostFeeInHostCurrency: { oldValue: 250, newValue: -250 } });
-      expect(debit1.data.migration).to.deep.equal({ hostFeeInHostCurrency: { oldValue: 0, newValue: -250 } });
+      expect(credit1.data.migration['20180320']).to.deep.equal({ hostFeeInHostCurrency: { oldValue: 250, newValue: -250 } });
+      expect(debit1.data.migration['20180320']).to.deep.equal({ hostFeeInHostCurrency: { oldValue: 0, newValue: -250 } });
 
       expect(credit2.hostFeeInHostCurrency).to.equal(-250);
       expect(debit2.hostFeeInHostCurrency).to.equal(-250);
-      expect(credit2.data.migration).to.deep.equal({ hostFeeInHostCurrency: { oldValue: null, newValue: -250 } });
-      expect(debit2.data.migration).to.deep.equal({ hostFeeInHostCurrency: { oldValue: 250, newValue: -250 } });
+      expect(credit2.data.migration['20180320']).to.deep.equal({ hostFeeInHostCurrency: { oldValue: null, newValue: -250 } });
+      expect(debit2.data.migration['20180320']).to.deep.equal({ hostFeeInHostCurrency: { oldValue: 250, newValue: -250 } });
     });
     it('should find platformFeeInHostCurrency in the credit transaction & ensure it is negative in both credit & debit', () => {
       // Given a credit and a debit transactions
@@ -125,13 +134,13 @@ describe('Migration', () => {
       // negative
       expect(credit1.platformFeeInHostCurrency).to.equal(-250);
       expect(debit1.platformFeeInHostCurrency).to.equal(-250);
-      expect(credit1.data.migration).to.deep.equal({ platformFeeInHostCurrency: { oldValue: 250, newValue: -250 } });
-      expect(debit1.data.migration).to.deep.equal({ platformFeeInHostCurrency: { oldValue: 0, newValue: -250 } });
+      expect(credit1.data.migration['20180320']).to.deep.equal({ platformFeeInHostCurrency: { oldValue: 250, newValue: -250 } });
+      expect(debit1.data.migration['20180320']).to.deep.equal({ platformFeeInHostCurrency: { oldValue: 0, newValue: -250 } });
 
       expect(credit2.platformFeeInHostCurrency).to.equal(-250);
       expect(debit2.platformFeeInHostCurrency).to.equal(-250);
-      expect(credit2.data.migration).to.deep.equal({ platformFeeInHostCurrency: { oldValue: null, newValue: -250 } });
-      expect(debit2.data.migration).to.deep.equal({ platformFeeInHostCurrency: { oldValue: 250, newValue: -250 } });
+      expect(credit2.data.migration['20180320']).to.deep.equal({ platformFeeInHostCurrency: { oldValue: null, newValue: -250 } });
+      expect(debit2.data.migration['20180320']).to.deep.equal({ platformFeeInHostCurrency: { oldValue: 250, newValue: -250 } });
     });
     it('should find paymentProcessorFeeInHostCurrency in the credit transaction & ensure it is negative in both credit & debit', () => {
       // Given a credit and a debit transactions
@@ -152,13 +161,13 @@ describe('Migration', () => {
       // values are negative
       expect(credit1.paymentProcessorFeeInHostCurrency).to.equal(-250);
       expect(debit1.paymentProcessorFeeInHostCurrency).to.equal(-250);
-      expect(credit1.data.migration).to.deep.equal({ paymentProcessorFeeInHostCurrency: { oldValue: 250, newValue: -250 } });
-      expect(debit1.data.migration).to.deep.equal({ paymentProcessorFeeInHostCurrency: { oldValue: 0, newValue: -250 } });
+      expect(credit1.data.migration['20180320']).to.deep.equal({ paymentProcessorFeeInHostCurrency: { oldValue: 250, newValue: -250 } });
+      expect(debit1.data.migration['20180320']).to.deep.equal({ paymentProcessorFeeInHostCurrency: { oldValue: 0, newValue: -250 } });
 
       expect(credit2.paymentProcessorFeeInHostCurrency).to.equal(-250);
       expect(debit2.paymentProcessorFeeInHostCurrency).to.equal(-250);
-      expect(credit2.data.migration).to.deep.equal({ paymentProcessorFeeInHostCurrency: { oldValue: null, newValue: -250 } });
-      expect(debit2.data.migration).to.deep.equal({ paymentProcessorFeeInHostCurrency: { oldValue: 250, newValue: -250 } });
+      expect(credit2.data.migration['20180320']).to.deep.equal({ paymentProcessorFeeInHostCurrency: { oldValue: null, newValue: -250 } });
+      expect(debit2.data.migration['20180320']).to.deep.equal({ paymentProcessorFeeInHostCurrency: { oldValue: 250, newValue: -250 } });
     });
   });
 });

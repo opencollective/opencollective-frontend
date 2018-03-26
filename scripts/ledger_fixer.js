@@ -19,8 +19,10 @@
  * don't block the database for other transactions.
  */
 import fs from 'fs';
+import moment from 'moment';
 import { ArgumentParser } from 'argparse';
 import { promisify } from 'util';
+import { result } from 'lodash';
 
 import models, { sequelize } from '../server/models';
 import * as transactionsLib from '../server/lib/transactions';
@@ -40,6 +42,7 @@ export class Migration {
     this.ordersCreated = 0;
     this.counters = {};
     this.logFiles = {};
+    this.date = moment().format('YYYYMMDD');
   }
 
   /** Retrieve the total number of valid transactions */
@@ -63,7 +66,8 @@ export class Migration {
   saveTransactionChange = (tr, field, oldValue, newValue) => {
     if (!tr.data) tr.data = {};
     if (!tr.data.migration) tr.data.migration = {};
-    tr.data.migration[field] = { oldValue, newValue };
+    if (!tr.data.migration[this.date]) tr.data.migration[this.date] = {};
+    tr.data.migration[this.date][field] = { oldValue, newValue };
 
     // Sequelize isn't really that great detecting changes in JSON
     // fields. So we're explicitly signaling the change.
@@ -431,7 +435,8 @@ export class Migration {
 
   /** Print out a CSV line */
   logChange = (tr) => {
-    const fields = ((tr.data || {}).migration || {});
+    const fields = result(tr.data, `migration['${this.date}']`);
+    if (!fields) return;
     for (const k of Object.keys(fields)) {
       this.log('changes.csv', `${tr.id},${tr.type},${tr.TransactionGroup},${k},${fields[k].oldValue},${fields[k].newValue}`);
     }
