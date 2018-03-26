@@ -33,7 +33,7 @@ class TopBackersCoverWithData extends React.Component {
     };
   }
 
-  renderOrganization(member) {
+  renderOrganization(member, index) {
     const org = member.member;
     const percentage = Math.round((member.stats.totalDonations / this.props.collective.stats.totalAmountReceived) * 100);
     let title = `${org.name}`;
@@ -44,31 +44,33 @@ ${org.description}
     }
     title += `
 Financial contribution: ${percentage}% (${formatCurrency(member.stats.totalDonations, this.props.collective.currency, { precision: 0 })})`;
-
+    const className = index >= 5 ? 'desktopOnly' : '';
     return (
-      <div className="org backer">
-        <style jsx>{`
-        .org {
-          border-radius: 16px;
-          background: rgba(255, 255, 255, 0.5);
-          padding: 5px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-        .org :global(img) {
-          height: auto;
-          max-width: 96px;
-        }
-        `}</style>      
-        <Link route={`/${org.slug}`} title={title}>
-          <Logo src={org.image} height={36} />
-        </Link>
+      <div key={`topBacker-${index}`} className={className} >
+        <div className="org backer">
+          <style jsx>{`
+          .org {
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.5);
+            padding: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          }
+          .org :global(img) {
+            height: auto;
+            max-width: 96px;
+          }
+          `}</style>      
+          <Link route={`/${org.slug}`} title={title}>
+            <Logo src={org.image} height={36} />
+          </Link>
+        </div>
       </div>
     )
   }
   
-  renderUser(member) {
+  renderUser(member, index) {
     const user = member.member;
 
     const percentage = Math.round((member.stats.totalDonations / this.props.collective.stats.totalAmountReceived) * 100);
@@ -80,9 +82,9 @@ ${user.description}
     }
     title += `
 Financial contribution: ${percentage}% (${formatCurrency(member.stats.totalDonations, this.props.collective.currency, { precision: 0 })})`;
-
+    const className = index >= 5 ? 'desktopOnly' : '';
     return (
-      <div className="user backer">
+      <div key={`topBacker-${index}`} className={`user backer ${className}`}>
         <Link route={`/${user.slug}`} title={title}>
           <Avatar src={user.image} radius={48} className="noFrame" />
         </Link>
@@ -90,9 +92,9 @@ Financial contribution: ${percentage}% (${formatCurrency(member.stats.totalDonat
     )
   }
 
-  renderMember(member) {
-    if (member.member.type === 'ORGANIZATION') return this.renderOrganization(member);
-    if (member.member.type === 'USER') return this.renderUser(member);
+  renderMember(member, index) {
+    if (member.member.type === 'ORGANIZATION') return this.renderOrganization(member, index);
+    if (member.member.type === 'USER') return this.renderUser(member, index);
   }
 
   render() {
@@ -155,7 +157,7 @@ Financial contribution: ${percentage}% (${formatCurrency(member.stats.totalDonat
             padding: 3px !important;
             border-radius: 8px;
           }
-          .TopBackersCover .backer .Logo {
+          .TopBackersCover .backer .Logo, .TopBackersCover .Logo img {
             height: 24px !important;
           }
           .TopBackersCover .backer .Avatar, .TopBackersCover .backer .Avatar > div {
