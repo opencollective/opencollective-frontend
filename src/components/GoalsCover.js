@@ -59,7 +59,7 @@ class GoalsCover extends React.Component {
       {
         slug: 'yearlyBudget',
         title: intl.formatMessage(this.messages['bar.yearlyBudget']),
-        amount: get(collective, 'stats.yearlyBudget'),
+        amount: get(collective, 'stats.yearlyBudget') + get(collective, 'stats.balance'),
         precision: 0
       },
       ... get(collective, 'settings.goals') || []
@@ -86,9 +86,9 @@ class GoalsCover extends React.Component {
     const slug = goal.slug || "goal";
     const title = goal.title || intl.formatMessage(this.messages[goal.slug]);
     const amount = formatCurrency(goal.animate ? (get(this.state, `goals.${goal.slug}.amount`) || 0) : goal.amount, collective.currency, { precision: goal.precision || 0 });
-
+    const className = parseInt(width) < 50 && slug === 'yearlyBudget' ? 'subLevel2' : '';
     return (
-      <div className={`bar ${slug}`} style={{width: get(this.state, `goals.${goal.slug}.width`) || width}}>
+      <div className={`bar ${slug} ${className}`} style={{width: get(this.state, `goals.${goal.slug}.width`) || width}}>
         <style jsx>{`
         .bar {
           height: 20px;
@@ -128,12 +128,15 @@ class GoalsCover extends React.Component {
           text-align: right;
           transition: all 2s;
         }
-
+        .subLevel2 {
+          padding-top: 4rem;
+        }
         .bar.goal .caption {
           margin-top: -4.5rem;
         }
 
         .label {
+          background: #252729;
           color: #AAAEB3;
           padding: 0;
           line-height: 1.5;
@@ -142,6 +145,7 @@ class GoalsCover extends React.Component {
         }
 
         .amount {
+          background: #252729;
           color: white;
           font-weight: bold;
         }
@@ -197,7 +201,7 @@ class GoalsCover extends React.Component {
           position: relative;
           width: 80%;
           margin: 6rem auto 1rem;
-          min-height: 70px;
+          min-height: 80px;
         }
 
         @media(max-width: 420px) {
