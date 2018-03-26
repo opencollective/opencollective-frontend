@@ -55,6 +55,12 @@ class EditGoals extends React.Component {
         label: intl.formatMessage(this.messages['type.label'])
       },
       {
+        name: 'amount',
+        pre: getCurrencySymbol(props.currency),
+        type: 'currency',
+        label: intl.formatMessage(this.messages['amount.label'])
+      },
+      {
         name: 'title',
         label: intl.formatMessage(this.messages['title.label']),
         maxLength: 64
@@ -63,12 +69,6 @@ class EditGoals extends React.Component {
         name: 'description',
         type: 'textarea',
         label: intl.formatMessage(this.messages['description.label'])
-      },
-      {
-        name: 'amount',
-        pre: getCurrencySymbol(props.currency),
-        type: 'currency',
-        label: intl.formatMessage(this.messages['amount.label'])
       }
     ];
   }
