@@ -114,7 +114,8 @@ class EditCollective extends React.Component {
     if (!CollectiveInputType) {
       return false;
     }
-    CollectiveInputType.settings = { goals: CollectiveInputType.goals };
+    const { collective } = this.props;
+    CollectiveInputType.settings = { ...collective.settings, goals: CollectiveInputType.goals };
     delete CollectiveInputType.goals;
     this.setState( { status: 'loading' });
     try {
