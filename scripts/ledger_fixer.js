@@ -177,11 +177,11 @@ export class Migration {
       changed = true;
     }
 
-    /* Rewrite netAmountInHostCurrency for debit */
+    /* Rewrite netAmountInCollectiveCurrency for debit */
     const newNetAmountInCollectiveCurrencyDebit = -credit.amountInHostCurrency;
     if (debit.netAmountInCollectiveCurrency !== newNetAmountInCollectiveCurrencyDebit) {
       this.saveTransactionChange(
-        debit, 'netAmountInHostCurrency',
+        debit, 'netAmountInCollectiveCurrency',
         debit.netAmountInCollectiveCurrency,
         newNetAmountInCollectiveCurrencyDebit);
       debit.netAmountInCollectiveCurrency = newNetAmountInCollectiveCurrencyDebit;
