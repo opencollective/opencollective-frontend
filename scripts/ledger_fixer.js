@@ -391,13 +391,14 @@ export class Migration {
 
           /* Migrate the pair that we just found & log if migration fixed the row */
           const [tr1, tr2] = [transactions[i], transactions[i + 1]];
-          (await this.migrate(tr1, tr2)).forEach(async (tr) => {
+          const changes = await this.migrate(tr1, tr2);
+          for (const tr of changes) {
             rowsChanged++;
             this.logChange(tr);
             if (!this.options.dryRun) {
               await tr.save({ transaction: dbTransaction });
             }
-          });
+          }
         }
 
         /* We're done with that batch, let's commit the transaction
@@ -405,9 +406,9 @@ export class Migration {
         await dbTransaction.commit();
         await sleep(60);
       } catch (error) {
-        await dbTransaction.rollback();
         this.log('report.txt', `\nBatch ${this.offset}/${count}: FAILED!\n`);
         this.log('report.txt', `Error ${error}`);
+        await dbTransaction.rollback();
       }
     }
 
@@ -471,11 +472,11 @@ export class Migration {
       }
     }
 
-    const icon = Object.keys(this.logFiles).length !== 2 ? '❌' : '✅';
     if (this.options.dryRun) {
       return saveReport(body, attachments);
     } else {
-      return emailReport(`${icon} Ledger Fixer Report`, body, attachments);
+      const subject = `${icon(Object.keys(this.logFiles).length === 2)} Ledger Fixer Report`;
+      return emailReport(subject, body, attachments);
     }
   }
 }
