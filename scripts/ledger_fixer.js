@@ -22,7 +22,7 @@ import fs from 'fs';
 import moment from 'moment';
 import { ArgumentParser } from 'argparse';
 import { promisify } from 'util';
-import { result } from 'lodash';
+import { result, includes } from 'lodash';
 
 import models, { sequelize } from '../server/models';
 import * as transactionsLib from '../server/lib/transactions';
@@ -33,6 +33,14 @@ import { toNegative } from '../server/lib/math';
 import libemail from '../server/lib/email';
 
 const REPORT_EMAIL = 'ops@opencollective.com';
+
+/** The script won't ever touch transaction groups in this list */
+const DONT_TOUCH_THESE_TRANSACTION_GROUPS = [
+  '4747823b-9924-4109-bb64-bed45f1ae151',
+];
+
+/** Helper that shows an icon transaction status */
+const icon = (good) => good ? '✅' : '❌';
 
 export class Migration {
   constructor(options) {
@@ -227,7 +235,6 @@ export class Migration {
     const fileName = `broken.${type.toLowerCase()}.csv`;
     const fixed = [];
     const isFixed = (tr) => fixed.includes(tr);
-    const icon = (good) => good ? '✅' : '❌';
 
     // Both CREDIT & DEBIT transactions add up
     if (transactionsLib.verify(credit) && transactionsLib.verify(debit)) {
@@ -308,6 +315,18 @@ export class Migration {
     this.validatePair(tr1, tr2);
     const credit = tr1.type === 'CREDIT' ? tr1 : tr2;
     const debit =  tr1.type === 'DEBIT' ? tr1 : tr2;
+
+    if (includes(DONT_TOUCH_THESE_TRANSACTION_GROUPS, tr1.TransactionGroup)) {
+      const [vc, vd] = [transactionsLib.verify(credit), transactionsLib.verify(debit)];
+      if (!vc) {
+        this.incr('blacklisted');
+        this.log('report.txt', ` ${icon(vc)} CREDIT ${credit.id} ${vc} # not touched because it's blacklisted`);
+      }
+      if (!vd) {
+        this.incr('blacklisted');
+        this.log('report.txt', ` ${icon(vd)} DEBIT ${debit.id} ${vd} # not touched because it's blacklisted`);
+      }
+    }
 
     if (tr1.ExpenseId !== null) {
       return this.migratePair('Expense', credit, debit);
