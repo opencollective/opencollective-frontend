@@ -112,7 +112,6 @@ Financial contribution: ${percentage}% (${formatCurrency(member.stats.totalDonat
     if (members.length === 0) {
       return (<div />)
     }
-
     
     return (
       <div className="TopBackersCover" ref={(node) => this.node = node}>

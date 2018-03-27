@@ -59,7 +59,7 @@ class GoalsCover extends React.Component {
       {
         slug: 'yearlyBudget',
         title: intl.formatMessage(this.messages['bar.yearlyBudget']),
-        amount: get(collective, 'stats.yearlyBudget') + get(collective, 'stats.balance'),
+        amount: get(collective, 'stats.yearlyBudget'),
         precision: 0
       },
       ... get(collective, 'settings.goals') || []
@@ -81,10 +81,11 @@ class GoalsCover extends React.Component {
   }
 
   renderGoal(goal) {
+    if (!goal.title) return;
     const { collective, intl } = this.props;
     const width = goal.animate ? 0 : `${Math.round(goal.amount / this.maxAmount * 100)}%`;
     const slug = goal.slug || "goal";
-    const title = goal.title || intl.formatMessage(this.messages[goal.slug]);
+    const title = goal.title || (this.messages[goal.slug] && intl.formatMessage(this.messages[goal.slug]));
     const amount = formatCurrency(goal.animate ? (get(this.state, `goals.${goal.slug}.amount`) || 0) : goal.amount, collective.currency, { precision: goal.precision || 0 });
     const className = parseInt(width) < 50 && slug === 'yearlyBudget' ? 'subLevel2' : '';
     return (
@@ -212,9 +213,11 @@ class GoalsCover extends React.Component {
         `}
         </style>
         <div className="">
-          <div className="budgetText">
-            <FormattedMessage id="cover.budget.text" defaultMessage="Thanks to their financial contributions, we’re operating on an estimated annual budget of  {yearlyBudget}." values={{ yearlyBudget: formatCurrency(get(collective, 'stats.yearlyBudget'), collective.currency, { precision: 0 })}} />
-          </div>
+          { get(collective, 'stats.backers.all') > 0 &&
+            <div className="budgetText">
+              <FormattedMessage id="cover.budget.text" defaultMessage="Thanks to their financial contributions, we’re operating on an estimated annual budget of  {yearlyBudget}." values={{ yearlyBudget: formatCurrency(get(collective, 'stats.yearlyBudget'), collective.currency, { precision: 0 })}} />
+            </div>
+          }
           <div className="barContainer">
             <div className="bars">
               { this.goals.map(this.renderGoal) }

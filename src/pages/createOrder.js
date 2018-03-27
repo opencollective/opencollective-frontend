@@ -239,6 +239,10 @@ query Collective($slug: String!) {
     stats {
       id
       yearlyBudget
+      balance
+      backers {
+        all
+      }
     }
     members {
       id
