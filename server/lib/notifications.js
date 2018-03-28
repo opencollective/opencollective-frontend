@@ -178,8 +178,17 @@ async function notifyByEmail(activity) {
       notifyAdminsOfCollective(activity.data.host.id, activity, { template: 'collective.expense.paid.for.host' })
       break;
 
+    case activityType.COLLECTIVE_APPROVED:
+      notifyAdminsOfCollective(activity.data.collective.id, activity);
+      break;
+
     case activityType.COLLECTIVE_CREATED:
-      notifyAdminsOfCollective(activity.data.host.id, activity);
+      notifyAdminsOfCollective(activity.data.host.id, activity, { template: 'collective.created.for.host' });
+      if (activity.data.collective.tags && activity.data.collective.tags.indexOf("meetup") !== -1) {
+        notifyAdminsOfCollective(activity.data.collective.id, activity, { template: 'collective.created.meetup' });
+      } else {
+        notifyAdminsOfCollective(activity.data.collective.id, activity);
+      }
       break;
 
   }
