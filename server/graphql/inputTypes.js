@@ -109,6 +109,8 @@ export const CollectiveInputType = new GraphQLInputObjectType({
     backgroundImage: { type: GraphQLString },
     tags: { type: new GraphQLList(GraphQLString) },
     tiers: { type: new GraphQLList(TierInputType) },
+    settings: { type: GraphQLJSON },
+    data: { type: GraphQLJSON },
     members: { type: new GraphQLList(MemberInputType) },
     paymentMethods: { type: new GraphQLList(PaymentMethodInputType) },
     HostCollectiveId: { type: GraphQLInt },
@@ -150,7 +152,8 @@ export const CollectiveAttributesInputType = new GraphQLInputObjectType({
     endsAt: { type: GraphQLString },
     timezone: { type: GraphQLString },
     maxAmount: { type: GraphQLInt },
-    currency: { type: GraphQLString}
+    currency: { type: GraphQLString},
+    settings: { type: GraphQLJSON }
   })
 });
 
