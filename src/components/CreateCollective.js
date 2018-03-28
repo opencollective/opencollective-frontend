@@ -58,6 +58,7 @@ class CreateCollective extends React.Component {
     }
     CollectiveInputType.data = CollectiveInputType.data || {};
     CollectiveInputType.data.members = CollectiveInputType.members;
+    CollectiveInputType.data.meetupSlug = CollectiveInputType.meetup;
     delete CollectiveInputType.category;
     delete CollectiveInputType.tos;
     delete CollectiveInputType.hostTos;
