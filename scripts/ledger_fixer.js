@@ -100,6 +100,7 @@ export class Migration {
    * transaction, then in the debit transaction. If no fee is found,
    * the then the transaction is left untouched. */
   rewriteFees = (credit, debit) => {
+    let changed = false;
     // Update hostFeeInHostCurrency
     const newHostFeeInHostCurrency = toNegative(credit.hostFeeInHostCurrency || debit.hostFeeInHostCurrency);
     if ((newHostFeeInHostCurrency || newHostFeeInHostCurrency === 0) && newHostFeeInHostCurrency !== credit.hostFeeInHostCurrency) {
@@ -107,6 +108,7 @@ export class Migration {
       credit.hostFeeInHostCurrency = newHostFeeInHostCurrency;
       this.saveTransactionChange(debit, 'hostFeeInHostCurrency', debit.hostFeeInHostCurrency, newHostFeeInHostCurrency);
       debit.hostFeeInHostCurrency = newHostFeeInHostCurrency;
+      changed = true;
     }
     // Update platformFeeInHostCurrency
     const newPlatformFeeInHostCurrency = toNegative(credit.platformFeeInHostCurrency || debit.platformFeeInHostCurrency);
@@ -115,6 +117,7 @@ export class Migration {
       credit.platformFeeInHostCurrency = newPlatformFeeInHostCurrency;
       this.saveTransactionChange(debit, 'platformFeeInHostCurrency', debit.platformFeeInHostCurrency, newPlatformFeeInHostCurrency);
       debit.platformFeeInHostCurrency = newPlatformFeeInHostCurrency;
+      changed = true;
     }
     // Update paymentProcessorFeeInHostCurrency
     const newPaymentProcessorFeeInHostCurrency = toNegative(credit.paymentProcessorFeeInHostCurrency || debit.paymentProcessorFeeInHostCurrency);
@@ -123,7 +126,9 @@ export class Migration {
       credit.paymentProcessorFeeInHostCurrency = newPaymentProcessorFeeInHostCurrency;
       this.saveTransactionChange(debit, 'paymentProcessorFeeInHostCurrency', debit.paymentProcessorFeeInHostCurrency, newPaymentProcessorFeeInHostCurrency);
       debit.paymentProcessorFeeInHostCurrency = newPaymentProcessorFeeInHostCurrency;
+      changed = true;
     }
+    return changed;
   }
 
   /** Recalculate amountInHostCurrency & netAmountInCollectiveCurrency */
@@ -230,6 +235,9 @@ export class Migration {
     }
   }
 
+  /** transactionsLib.verify as a boolean function */
+  verify = (tr) => transactionsLib.verify(tr) === true;
+
   /** Migrate a pair of transactions */
   migratePair = (type, credit, debit) => {
     const fileName = `broken.${type.toLowerCase()}.csv`;
@@ -237,14 +245,14 @@ export class Migration {
     const isFixed = (tr) => fixed.includes(tr);
 
     // Both CREDIT & DEBIT transactions add up
-    if (transactionsLib.verify(credit) && transactionsLib.verify(debit)) {
+    if (this.verify(credit) && this.verify(debit)) {
       vprint(`${type}.: true, true`);;
       return [];
     }
 
     // Don't do anything for now since these are not in the same currency
     if (credit.currency !== credit.hostCurrency || debit.currency !== debit.hostCurrency) {
-      const [vc, vd] = [transactionsLib.verify(credit), transactionsLib.verify(debit)];
+      const [vc, vd] = [this.verify(credit), this.verify(debit)];
       if (!vc) {
         this.incr('not touched due to different currency');
         this.log('report.txt', ` ${icon(vc)} CREDIT ${credit.id} ${vc} # not touched because currency is different`);
@@ -257,26 +265,25 @@ export class Migration {
     }
 
     // Try to set up hostCurrencyFxRate if it's null
-    if (this.ensureHostCurrencyFxRate(credit) && transactionsLib.verify(credit)) {
+    if (this.ensureHostCurrencyFxRate(credit) && this.verify(credit)) {
       this.incr('fix hostFeeInHostCurrency');
       this.log('report.txt', ` ${icon(true)} CREDIT ${type} ${credit.id} true # after updating hostCurrencyFxRate`);
       fixed.push(credit);
     }
-    if (this.ensureHostCurrencyFxRate(debit) && transactionsLib.verify(debit)) {
+    if (this.ensureHostCurrencyFxRate(debit) && this.verify(debit)) {
       this.incr('fix hostFeeInHostCurrency');
       this.log('report.txt', ` ${icon(true)} DEBIT ${type} ${debit.id} true # after updating hostCurrencyFxRate'`);
       fixed.push(debit);
     }
 
     // Try to just setup fees
-    if (!isFixed(credit) && !isFixed(debit)) {
-      this.rewriteFees(credit, debit);
-      if (!isFixed(credit) && transactionsLib.verify(credit)) {
+    if (!isFixed(credit) && !isFixed(debit) && this.rewriteFees(credit, debit)) {
+      if (this.verify(credit)) {
         this.incr('rewrite fees');
         this.log('report.txt', ` ${icon(true)} CREDIT ${type} ${credit.id} true # after updating fees`);
         fixed.push(credit);
       }
-      if (!isFixed(debit) && transactionsLib.verify(debit)) {
+      if (this.verify(debit)) {
         this.incr('rewrite fees');
         this.log('report.txt', ` ${icon(true)} DEBIT ${type} ${debit.id} true # after updating fees`);
         fixed.push(debit);
@@ -284,25 +291,49 @@ export class Migration {
     }
 
     // Try to rewrite amounts on the credit
-    if (!isFixed(credit) && this.rewriteCreditAmounts(credit) && transactionsLib.verify(credit)) {
+    if (!isFixed(credit) && this.rewriteCreditAmounts(credit) && this.verify(credit)) {
       this.incr('recalculate net amount');
       this.log('report.txt', ` ${icon(true)} CREDIT ${type} ${credit.id} true # after recalculating amounts`);
       fixed.push(credit);
     }
 
     // Try to rewrite amounts on the debit
-    if (!isFixed(debit) && this.rewriteDebitAmounts(credit, debit) && transactionsLib.verify(debit)) {
+    if (!isFixed(debit) && this.rewriteDebitAmounts(credit, debit) && this.verify(debit)) {
       this.incr('recalculate net amount');
       this.log('report.txt', ` ${icon(true)} DEBIT ${type} ${debit.id} true # after recalculating amounts`);
       fixed.push(debit);
     }
 
     // Something is still off
-    if (!isFixed(credit) && !transactionsLib.verify(credit)) {
-      this.log(fileName, `${credit.id}, CREDIT, ${credit.PaymentMethodId}, ${credit.currency}, ${credit.hostCurrency}, ${credit.TransactionGroup}, ${transactionsLib.difference(credit)}`);
+    if (!isFixed(credit) && !this.verify(credit)) {
+      this.log(fileName, [
+        credit.id,
+        'CREDIT',
+        credit.TransactionGroup,
+        credit.PaymentMethodId,
+        credit.currency,
+        credit.hostCurrency,
+        credit.hostCurrencyFxRate,
+        transactionsLib.verify(credit),
+        transactionsLib.difference(credit),
+        credit.amount,
+        credit.netAmountInCollectiveCurrency,
+      ].join(', '));
     }
-    if (!isFixed(debit) && !transactionsLib.verify(debit)) {
-      this.log(fileName, `${debit.id}, DEBIT, ${debit.PaymentMethodId}, ${debit.currency}, ${debit.hostCurrency}, ${debit.TransactionGroup}, ${transactionsLib.difference(debit)}`);
+    if (!isFixed(debit) && !this.verify(debit)) {
+      this.log(fileName, [
+        debit.id,
+        'DEBIT',
+        debit.TransactionGroup,
+        debit.PaymentMethodId,
+        debit.currency,
+        debit.hostCurrency,
+        debit.hostCurrencyFxRate,
+        transactionsLib.verify(debit),
+        transactionsLib.difference(debit),
+        debit.amount,
+        debit.netAmountInCollectiveCurrency,
+      ].join(', '));
     }
     return fixed;
   }
@@ -317,7 +348,7 @@ export class Migration {
     const debit =  tr1.type === 'DEBIT' ? tr1 : tr2;
 
     if (includes(DONT_TOUCH_THESE_TRANSACTION_GROUPS, tr1.TransactionGroup)) {
-      const [vc, vd] = [transactionsLib.verify(credit), transactionsLib.verify(debit)];
+      const [vc, vd] = [this.verify(credit), this.verify(debit)];
       if (!vc) {
         this.incr('blacklisted');
         this.log('report.txt', ` ${icon(vc)} CREDIT ${credit.id} ${vc} # not touched because it's blacklisted`);
@@ -362,7 +393,7 @@ export class Migration {
 
   /** Run the whole migration */
   run = async () => {
-    this.log('changes.csv', 'id,type,group,field,oldval,newval');
+    this.writeFileHeaders();
     let rowsChanged = 0;
     const allTransactions = await this.countValidTransactions();
     const count = this.options.limit
@@ -424,21 +455,28 @@ export class Migration {
     const total = await this.stillBroken();
     this.log('report.txt', `\nTransactions with problems: ${total}`);
     for (const filename of Object.keys(this.logFiles)) {
-      if (filename.startsWith('broken.')) {
-        this.log('report.txt', ` * ${filename} ${this.logFiles[filename].length}`);
+      const length = this.logFiles[filename].length;
+      if (filename.startsWith('broken.') && length > 1) {
+        this.log('report.txt', ` * ${filename} ${length}`);
       }
     }
   }
 
   stillBroken = async () => {
     const allTransactions = await models.Transaction.findAll({ where: { deletedAt: null } });
-    const funkyTransactions = allTransactions.filter((tr) => !transactionsLib.verify(tr));
+    const funkyTransactions = allTransactions.filter((tr) => !this.verify(tr));
     return funkyTransactions.length;
   }
 
   incr = (counter) => {
     if (!this.counters[counter]) this.counters[counter] = 0;
     this.counters[counter]++;
+  }
+
+  writeFileHeaders = () => {
+    this.log('changes.csv', 'id,type,group,field,oldval,newval');
+    this.log('broken.order.csv', 'id,type,group,paymentMethodId,currency,hostCurrency,fx,reason,netAmount diff,amount,netAmount');
+    this.log('broken.expense.csv', 'id,type,group,paymentMethodId,currency,hostCurrency,fx,reason,netAmount diff,amount,netAmount');
   }
 
   log = (name, msg) => {
@@ -466,7 +504,8 @@ export class Migration {
     const body = this.logFiles['report.txt'].join('\n');
     const attachments = [];
     for (const filename of Object.keys(this.logFiles)) {
-      if (filename !== 'report.txt') {
+      // Skip report.txt & files with a single line (CSV header)
+      if (filename !== 'report.txt' && this.logFiles[filename].length > 1) {
         const content = this.logFiles[filename].join('\n');
         attachments.push({ filename, content });
       }
@@ -475,8 +514,7 @@ export class Migration {
     if (this.options.dryRun) {
       return saveReport(body, attachments);
     } else {
-      const subject = `${icon(Object.keys(this.logFiles).length === 2)} Ledger Fixer Report`;
-      return emailReport(subject, body, attachments);
+      return emailReport('Ledger Fixer Report', body, attachments);
     }
   }
 }

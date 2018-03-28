@@ -125,7 +125,12 @@ export function netAmount(tr) {
 
 /** Verify net amount of a transaction */
 export function verify(tr) {
-  return netAmount(tr) === tr.netAmountInCollectiveCurrency;
+  if (tr.type === 'CREDIT' && tr.amount <= 0) return 'amount <= 0';
+  if (tr.type === 'DEBIT' && tr.amount >= 0) return 'amount >= 0';
+  if (tr.type === 'CREDIT' && tr.netAmountInCollectiveCurrency <= 0) return 'netAmount <= 0';
+  if (tr.type === 'DEBIT' && tr.netAmountInCollectiveCurrency >= 0) return 'netAmount >= 0';
+  if (netAmount(tr) !== tr.netAmountInCollectiveCurrency) return 'netAmount diff';
+  return true;
 }
 
 /** Calculate how off a transaction is
