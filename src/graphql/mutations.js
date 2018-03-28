@@ -126,6 +126,7 @@ export const addCreateCollectiveMutation = graphql(createCollectiveQuery, {
         'slug',
         'type',
         'name',
+        'image',
         'description',
         'longDescription',
         'location',
