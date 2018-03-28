@@ -100,33 +100,48 @@ export class Migration {
    * transaction, then in the debit transaction. If no fee is found,
    * the then the transaction is left untouched. */
   rewriteFees = (credit, debit) => {
-    let changed = false;
+    const changed = [];
     // Update hostFeeInHostCurrency
     const newHostFeeInHostCurrency = toNegative(credit.hostFeeInHostCurrency || debit.hostFeeInHostCurrency);
-    if ((newHostFeeInHostCurrency || newHostFeeInHostCurrency === 0) && newHostFeeInHostCurrency !== credit.hostFeeInHostCurrency) {
-      this.saveTransactionChange(credit, 'hostFeeInHostCurrency', credit.hostFeeInHostCurrency, newHostFeeInHostCurrency);
-      credit.hostFeeInHostCurrency = newHostFeeInHostCurrency;
-      this.saveTransactionChange(debit, 'hostFeeInHostCurrency', debit.hostFeeInHostCurrency, newHostFeeInHostCurrency);
-      debit.hostFeeInHostCurrency = newHostFeeInHostCurrency;
-      changed = true;
+    if (newHostFeeInHostCurrency || newHostFeeInHostCurrency === 0) {
+      if (newHostFeeInHostCurrency !== credit.hostFeeInHostCurrency) {
+        this.saveTransactionChange(credit, 'hostFeeInHostCurrency', credit.hostFeeInHostCurrency, newHostFeeInHostCurrency);
+        credit.hostFeeInHostCurrency = newHostFeeInHostCurrency;
+        if (!changed.includes(credit)) changed.push(credit);
+      }
+      if (newHostFeeInHostCurrency !== debit.hostFeeInHostCurrency) {
+        this.saveTransactionChange(debit, 'hostFeeInHostCurrency', debit.hostFeeInHostCurrency, newHostFeeInHostCurrency);
+        debit.hostFeeInHostCurrency = newHostFeeInHostCurrency;
+        if (!changed.includes(debit)) changed.push(debit);
+      }
     }
     // Update platformFeeInHostCurrency
     const newPlatformFeeInHostCurrency = toNegative(credit.platformFeeInHostCurrency || debit.platformFeeInHostCurrency);
-    if ((newPlatformFeeInHostCurrency || newPlatformFeeInHostCurrency === 0) && newPlatformFeeInHostCurrency !== credit.platformFeeInHostCurrency) {
-      this.saveTransactionChange(credit, 'platformFeeInHostCurrency', credit.platformFeeInHostCurrency, newPlatformFeeInHostCurrency);
-      credit.platformFeeInHostCurrency = newPlatformFeeInHostCurrency;
-      this.saveTransactionChange(debit, 'platformFeeInHostCurrency', debit.platformFeeInHostCurrency, newPlatformFeeInHostCurrency);
-      debit.platformFeeInHostCurrency = newPlatformFeeInHostCurrency;
-      changed = true;
+    if (newPlatformFeeInHostCurrency || newPlatformFeeInHostCurrency === 0) {
+      if (newPlatformFeeInHostCurrency !== credit.platformFeeInHostCurrency) {
+        this.saveTransactionChange(credit, 'platformFeeInHostCurrency', credit.platformFeeInHostCurrency, newPlatformFeeInHostCurrency);
+        credit.platformFeeInHostCurrency = newPlatformFeeInHostCurrency;
+        if (!changed.includes(credit)) changed.push(credit);
+      }
+      if (newPlatformFeeInHostCurrency !== debit.platformFeeInHostCurrency) {
+        this.saveTransactionChange(debit, 'platformFeeInHostCurrency', debit.platformFeeInHostCurrency, newPlatformFeeInHostCurrency);
+        debit.platformFeeInHostCurrency = newPlatformFeeInHostCurrency;
+        if (!changed.includes(debit)) changed.push(debit);
+      }
     }
     // Update paymentProcessorFeeInHostCurrency
     const newPaymentProcessorFeeInHostCurrency = toNegative(credit.paymentProcessorFeeInHostCurrency || debit.paymentProcessorFeeInHostCurrency);
-    if ((newPaymentProcessorFeeInHostCurrency || newPaymentProcessorFeeInHostCurrency === 0) && newPaymentProcessorFeeInHostCurrency !== credit.paymentProcessorFeeInHostCurrency) {
-      this.saveTransactionChange(credit, 'paymentProcessorFeeInHostCurrency', credit.paymentProcessorFeeInHostCurrency, newPaymentProcessorFeeInHostCurrency);
-      credit.paymentProcessorFeeInHostCurrency = newPaymentProcessorFeeInHostCurrency;
-      this.saveTransactionChange(debit, 'paymentProcessorFeeInHostCurrency', debit.paymentProcessorFeeInHostCurrency, newPaymentProcessorFeeInHostCurrency);
-      debit.paymentProcessorFeeInHostCurrency = newPaymentProcessorFeeInHostCurrency;
-      changed = true;
+    if (newPaymentProcessorFeeInHostCurrency || newPaymentProcessorFeeInHostCurrency === 0) {
+      if (newPaymentProcessorFeeInHostCurrency !== credit.paymentProcessorFeeInHostCurrency) {
+        this.saveTransactionChange(credit, 'paymentProcessorFeeInHostCurrency', credit.paymentProcessorFeeInHostCurrency, newPaymentProcessorFeeInHostCurrency);
+        credit.paymentProcessorFeeInHostCurrency = newPaymentProcessorFeeInHostCurrency;
+        if (!changed.includes(credit)) changed.push(credit);
+      }
+      if (newPaymentProcessorFeeInHostCurrency !== debit.paymentProcessorFeeInHostCurrency) {
+        this.saveTransactionChange(debit, 'paymentProcessorFeeInHostCurrency', debit.paymentProcessorFeeInHostCurrency, newPaymentProcessorFeeInHostCurrency);
+        debit.paymentProcessorFeeInHostCurrency = newPaymentProcessorFeeInHostCurrency;
+        if (!changed.includes(debit)) changed.push(debit);
+      }
     }
     return changed;
   }
@@ -263,13 +278,14 @@ export class Migration {
     }
 
     // Try to just setup fees
-    if (!isFixed(credit) && !isFixed(debit) && this.rewriteFees(credit, debit)) {
-      if (this.verify(credit)) {
+    if (!isFixed(credit) || !isFixed(debit)) {
+      const changed = this.rewriteFees(credit, debit);
+      if (changed.includes(credit) && this.verify(credit)) {
         this.incr('rewrite fees');
         this.log('report.txt', ` ${icon(true)} CREDIT ${type} ${credit.id} true # after updating fees`);
         fixed.push(credit);
       }
-      if (this.verify(debit)) {
+      if (changed.includes(debit) && this.verify(debit)) {
         this.incr('rewrite fees');
         this.log('report.txt', ` ${icon(true)} DEBIT ${type} ${debit.id} true # after updating fees`);
         fixed.push(debit);
