@@ -299,10 +299,24 @@ export async function approveCollective(remoteUser, CollectiveId) {
     throw new errors.NotFound({ message: `Collective with id ${CollectiveId} not found` });
   }
 
-  const HostCollectiveId = await collective.getHostCollectiveId();
-  if (!remoteUser.isAdmin(HostCollectiveId)) {
-    throw new errors.Unauthorized({ message: "You need to be logged in as an admin of the host of this collective to approve it", data: { HostCollectiveId } });
+  const hostCollective = await collective.getHostCollective();
+
+  if (!remoteUser.isAdmin(hostCollective.id)) {
+    throw new errors.Unauthorized({ message: "You need to be logged in as an admin of the host of this collective to approve it", data: { HostCollectiveId: hostCollective.id } });
   }
+
+  models.Activity.create({
+    type: activities.COLLECTIVE_APPROVED,
+    UserId: remoteUser.id,
+    CollectiveId: hostCollective.id,
+    data: {
+      collective: collective.info,
+      host: hostCollective.info,
+      user: {
+        email: remoteUser.email
+      }
+    }
+  })
 
   return collective.update({ isActive: true });
 }

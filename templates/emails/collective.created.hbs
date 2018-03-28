@@ -1,39 +1,27 @@
-Subject: New collective pending {{collective.name}}
+Subject: Welcome to Open Collective!
 
 {{> header}}
 
-<div class="hidden">{{collective.name}} ({{collective.website}}) would love to be hosted by you.</div>
+<h1>Hey {{collective.name}} 👋</h1>
 
-<h1>🎉 New collective pending</h1>
+<p>I’m Pía, one of the founders of Open Collective. I’d love to help you set up and get your collective up and running. Feel free to reach out to me directly by replying to this email. I'm here to help you!</p>
 
-<style>
-  th { text-align: left; }
-</style>
+<p>Your collective is pending approval from your host (<a href="https://opencollective.com/{{host.slug}}">{{host.name}}</a>). Your host is the legal entity that will hold the money on behalf of your collective. Once they approve you, you will be able to collect money for your collective without having to worry about accounting, invoicing, etc. If you already have a legal entity that could act as your host, please reach out!</p>
 
+<p>In the meantime, you can already customize your collective page, submit expenses, organize events (with free tickets), post updates and add members.</p>
 
-<h2>Collective</h2>
-<table>
-  <tr><th>Name</th><td>{{collective.name}}</td></tr>
-  <tr><th>Url</th><td><a href="https://opencollective.com/{{collective.slug}}">https://opencollective.com/{{collective.slug}}</a></td></tr>
-  <tr><th>Website</th><td>{{collective.website}}</td></tr>
-  <tr><th>Twitter</th><td>{{collective.twitterHandle}}</td></tr>
-  <tr><th>Description</th><td>{{collective.description}}</td></tr>
-  <tr><th>Tags</th><td>{{{json collective.tags}}}</td></tr>
-</table>
+<p>Let us know if you need any help setting things up, we are here to help your collective succeed.</p>
 
-<h2>Creator</h2>
-https://opencollective.com/{{user.collective.slug}}
-<br /><br />
-<table>
-  <tr><th>Name</th><td>{{user.collective.name}}</td></tr>
-  <tr><th>Email</th><td>{{user.email}}</td></tr>
-  <tr><th>Website</th><td>{{user.collective.website}}</td></tr>
-  <tr><th>Twitter</th><td>{{user.collective.twitterHandle}}</td></tr>
-</table>
+<p>
+  <center>
+    <a href="https://opencollective.com/{{collective.slug}}" class="btn blue"><div>Get Started!</div></a>
+  </center>
+</p>
 
-<br /><br />
-<center>
-  <a href="{{actions.approve}}" class="btn blue"><div>APPROVE</div></a>
-</center>
+<p>Feel free to schedule a call (<a href="http://calendly.com/piamancini/call">calendly.com/piamancini/call</a>), email me or <a href="https://slack.opencollective.com">join us on our Slack</a>. We would love to know your story.</p>
+
+<p>Best,</p>
+
+<p>Pía, and the Open Collective Team</p>
 
 {{> footer}}

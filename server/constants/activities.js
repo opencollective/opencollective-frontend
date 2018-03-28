@@ -5,6 +5,7 @@
 export default {
   ACTIVITY_ALL: 'all',
   CONNECTED_ACCOUNT_CREATED: 'connected_account.created',
+  COLLECTIVE_APPROVED: 'collective.approved',
   COLLECTIVE_CREATED: 'collective.created',
   COLLECTIVE_EXPENSE_CREATED: 'collective.expense.created',
   COLLECTIVE_EXPENSE_DELETED: 'collective.expense.deleted',

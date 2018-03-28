@@ -1,0 +1,45 @@
+Subject: New collective pending {{collective.name}}
+
+{{> header}}
+
+<div class="hidden">{{collective.name}} ({{collective.website}}) would love to be hosted by you.</div>
+
+<h1>🎉 New collective pending</h1>
+
+<style>
+  th { text-align: left; }
+</style>
+
+
+<h2>Collective</h2>
+<table>
+  <tr><th>Name</th><td>{{collective.name}}</td></tr>
+  <tr><th>Url</th><td><a href="https://opencollective.com/{{collective.slug}}">https://opencollective.com/{{collective.slug}}</a></td></tr>
+  <tr><th>Website</th><td>{{collective.website}}</td></tr>
+  {{#if collective.data.meetupSlug}}
+    <tr><th>Meetup</th><td>https://meetup.com/{{collective.data.meetupSlug}}</td></tr>
+  {{/if}}
+  {{#if collective.data.members}}
+    <tr><th>Members</th><td>{{collective.data.members}}</td></tr>
+  {{/if}}
+  <tr><th>Twitter</th><td>{{collective.twitterHandle}}</td></tr>
+  <tr><th>Description</th><td>{{collective.description}}</td></tr>
+  <tr><th>Tags</th><td>{{{json collective.tags}}}</td></tr>
+</table>
+
+<h2>Creator</h2>
+https://opencollective.com/{{user.collective.slug}}
+<br /><br />
+<table>
+  <tr><th>Name</th><td>{{user.collective.name}}</td></tr>
+  <tr><th>Email</th><td>{{user.email}}</td></tr>
+  <tr><th>Website</th><td>{{user.collective.website}}</td></tr>
+  <tr><th>Twitter</th><td>{{user.collective.twitterHandle}}</td></tr>
+</table>
+
+<br /><br />
+<center>
+  <a href="{{actions.approve}}" class="btn blue"><div>APPROVE</div></a>
+</center>
+
+{{> footer}}
