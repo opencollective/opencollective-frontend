@@ -94,10 +94,10 @@ export const createOrUpdate = (req, res, next, accessToken, data, emails) => {
 
       return models.Collective.findById(req.query.CollectiveId)
         .then(c => {
-          collective = c; 
-          collective.image = collective.image || profile.profile_image_url_https ? profile.profile_image_url_https.replace(/_normal/, '') : null;
+          collective = c;
+          collective.image = collective.image || (profile.profile_image_url_https ? profile.profile_image_url_https.replace(/_normal/, '') : null);
           collective.description = collective.description || profile.description;
-          collective.backgroundImage = collective.backgroundImage || profile.profile_banner_url ? `${profile.profile_banner_url}/1500x500` : null;
+          collective.backgroundImage = collective.backgroundImage || (profile.profile_banner_url ? `${profile.profile_banner_url}/1500x500` : null);
           collective.website = collective.website || profile.url;
           collective.locationName = collective.locationName || profile.location;
           collective.twitterHandle = profile.screen_name;

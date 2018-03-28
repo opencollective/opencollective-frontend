@@ -152,7 +152,8 @@ export const CollectiveAttributesInputType = new GraphQLInputObjectType({
     endsAt: { type: GraphQLString },
     timezone: { type: GraphQLString },
     maxAmount: { type: GraphQLInt },
-    currency: { type: GraphQLString}
+    currency: { type: GraphQLString},
+    settings: { type: GraphQLJSON }
   })
 });
 
