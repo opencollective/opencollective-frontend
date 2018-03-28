@@ -8,7 +8,7 @@ import activities from '../../constants/activities';
 const defaultTiers = (collectiveData) => {
   const tiers = collectiveData.tiers || [];
 
-  if (collectiveData.HostCollectiveId === 858) {
+  if (collectiveData.tags.indexOf("meetup") !== -1) {
     tiers.push({
       type: 'TIER',
       name: '1 month',
@@ -89,8 +89,27 @@ export function createCollective(_, args, req) {
   const promises = [];
   if (args.collective.HostCollectiveId) {
     if (args.collective.HostCollectiveId === 858) { // opencollective.com/meetups
-      args.collective.HostCollectiveId = 8674; // Open Collective Inc. Host
-      collectiveData.tags = ["Tech meetups"];
+      if (collectiveData.timezone) {
+        if (collectiveData.timezone.match(/Europe/)) {
+          collectiveData.currency = 'EUR';
+          args.collective.HostCollectiveId = 9807; // Open Collective Europe ASBL Host
+        }
+        if (collectiveData.timezone.match(/Paris/)) {
+          collectiveData.currency = 'EUR';
+          args.collective.HostCollectiveId = 11284; // Open Collective Paris Host
+        }
+        if (collectiveData.timezone.match(/Brussels/)) {
+          collectiveData.currency = 'EUR';
+          args.collective.HostCollectiveId = 9802; // BrusselsTogether ASBL Host
+        }
+        if (collectiveData.timezone.match(/London/)) {
+          collectiveData.currency = 'GBP';
+          args.collective.HostCollectiveId = 9806; // Open Collective UK Host
+        }
+      } else {
+        args.collective.HostCollectiveId = 8674; // Open Collective Inc. Host
+      }
+      collectiveData.tags.push("Tech meetups");
     }
     promises.push(
       req.loaders
