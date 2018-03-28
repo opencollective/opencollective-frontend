@@ -250,20 +250,6 @@ export class Migration {
       return [];
     }
 
-    // Don't do anything for now since these are not in the same currency
-    if (credit.currency !== credit.hostCurrency || debit.currency !== debit.hostCurrency) {
-      const [vc, vd] = [this.verify(credit), this.verify(debit)];
-      if (!vc) {
-        this.incr('not touched due to different currency');
-        this.log('report.txt', ` ${icon(vc)} CREDIT ${credit.id} ${vc} # not touched because currency is different`);
-      }
-      if (!vd) {
-        this.incr('not touched due to different currency');
-        this.log('report.txt', ` ${icon(vd)} DEBIT ${debit.id} ${vd} # not touched because currency is different`);
-      }
-      return [];
-    }
-
     // Try to set up hostCurrencyFxRate if it's null
     if (this.ensureHostCurrencyFxRate(credit) && this.verify(credit)) {
       this.incr('fix hostFeeInHostCurrency');
@@ -288,6 +274,20 @@ export class Migration {
         this.log('report.txt', ` ${icon(true)} DEBIT ${type} ${debit.id} true # after updating fees`);
         fixed.push(debit);
       }
+    }
+
+    // Don't do anything for now since these are not in the same currency
+    if (credit.currency !== credit.hostCurrency || debit.currency !== debit.hostCurrency) {
+      const [vc, vd] = [this.verify(credit), this.verify(debit)];
+      if (!vc) {
+        this.incr('not touched due to different currency');
+        this.log('report.txt', ` ${icon(vc)} CREDIT ${credit.id} ${vc} # not touched because currency is different`);
+      }
+      if (!vd) {
+        this.incr('not touched due to different currency');
+        this.log('report.txt', ` ${icon(vd)} DEBIT ${debit.id} ${vd} # not touched because currency is different`);
+      }
+      return fixed;
     }
 
     // Try to rewrite amounts on the credit
