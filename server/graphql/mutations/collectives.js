@@ -8,7 +8,7 @@ import activities from '../../constants/activities';
 const defaultTiers = (collectiveData) => {
   const tiers = collectiveData.tiers || [];
 
-  if (collectiveData.tags.indexOf("meetup") !== -1) {
+  if (collectiveData.HostCollectiveId === 858) { // if request coming from opencollective.com/meetups
     tiers.push({
       type: 'TIER',
       name: '1 month',
