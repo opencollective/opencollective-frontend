@@ -23,6 +23,7 @@ class GoalsCover extends React.Component {
     this.renderGoal = this.renderGoal.bind(this);
     this.nodes = {};
     this.state = {
+      goals: {},
       styles: {
         balance: { textAlign: 'left', left: 0 },
         yearlyBudget: { textAlign: 'right', right: 0 }
@@ -54,42 +55,105 @@ class GoalsCover extends React.Component {
         animate: true,
         title: intl.formatMessage(this.messages['bar.balance']),
         amount: get(collective, 'stats.balance'),
-        precision: 2
+        precision: 2,
+        position: 'below'
       },
       {
         slug: 'yearlyBudget',
         title: intl.formatMessage(this.messages['bar.yearlyBudget']),
         amount: get(collective, 'stats.yearlyBudget'),
-        precision: 0
+        precision: 0,
+        position: 'below'
       },
       ... get(collective, 'settings.goals') || []
-    ];
+    ].sort((a, b) => a.amount > b.amount);
+
+    const lastGoalAtPosition = {};
+    for (let i=0; i<this.goals.length; i++) {
+      const goal = { ...this.goals[i] };
+      goal.slug = goal.slug || `goal${i}`;
+      goal.position = goal.position || "above";
+      lastGoalAtPosition[goal.position] = goal;
+      goal.style = {
+        textAlign: lastGoalAtPosition[goal.position] ? 'right' : 'left'
+      }
+      this.goals[i] = goal;
+    }
 
     this.maxAmount = maxBy(this.goals, g => g.amount).amount;
   }
 
   componentDidMount() {
     const { collective } = this.props;
-    const state = { goals: {} };
-    this.goals.forEach(goal => {
-      if (goal.animate) {
-        const width = `${Math.round(goal.amount / this.maxAmount * 100)}%`;
-        state.goals[goal.slug] = { width, amount: goal.amount };
+    const state = this.state;
+    const previous = {};
+    const barLength = this.nodes.barContainer.offsetWidth;
+    this.goals.forEach((goal, index) => {
+      const pos = { level: 0, amount: goal.amount };
+      const { slug, position } = goal;
+      if (this.nodes[slug]) {
+        pos.posX = this.nodes[slug].offsetWidth;
+        pos.width = this.nodes[slug].querySelector('.label').offsetWidth;
+        pos.height = '20px';
       }
+      // if the previous item's position is overlapping, we change the level
+      if (previous[position] && pos.posX < previous[position].posX + previous[position].width) {
+        pos.level = previous[position].level === 1 ? 0 : 1;
+
+        // Make sure we don't overlap with previous goal on the same level (previous' previous)
+        if (previous[position].previous) {
+          const overlap = previous[position].previous.posX - pos.posX + pos.width;
+          if (overlap > 0) {
+            pos.opacity = 0.2;
+            pos.posX = pos.posX + overlap;
+          }
+        }
+
+        if (position === 'above' && pos.level === 1) {
+          pos.height = '60px';
+          state.styles.barContainer = { marginTop: '10rem' };
+        }
+      }
+      if (goal.animate) {
+        const width =  Math.ceil(goal.amount / this.maxAmount * barLength);
+        pos.posX = width;
+      }
+      pos.slug = slug;
+      pos.previous = previous[position];
+      state.goals[slug] = pos;
+      previous[position] = pos;
     });
     this.setState(state);
   }
 
-  renderGoal(goal) {
+  renderGoal(goal, index) {
     if (!goal.title) return;
     const { collective, intl } = this.props;
-    const width = goal.animate ? 0 : `${Math.round(goal.amount / this.maxAmount * 100)}%`;
-    const slug = goal.slug || "goal";
     const title = goal.title || (this.messages[goal.slug] && intl.formatMessage(this.messages[goal.slug]));
-    const amount = formatCurrency(goal.animate ? (get(this.state, `goals.${goal.slug}.amount`) || 0) : goal.amount, collective.currency, { precision: goal.precision || 0 });
-    const className = parseInt(width) < 50 && slug === 'yearlyBudget' ? 'subLevel2' : '';
+    const isLast = index === this.goals.length - 1;
+    const posX = goal.animate ? 0 : `${Math.round(goal.amount / this.maxAmount * 100)}%`;
+    const slug = goal.slug || `goal${index}`;
+    const zIndex = (20 - index) * 10;
+    const amount = formatCurrency(goal.animate ? (get(this.state, `goals.${slug}.amount`) || 0) : goal.amount, collective.currency, { precision: goal.precision || 0 });
+    const position = goal.position || "above";
+    const level = get(this.state, `goals.${slug}.level`) || 0;
+    const style = {
+      width: get(this.state, `goals.${slug}.posX`) || posX,
+      opacity: get(this.state, `goals.${slug}.opacity`) || 1,
+      zIndex
+    };
+    if (position === 'below' && level === 1) {
+      style.paddingTop = '4rem';
+      style.height = '60px';
+    }
+
+    // We animate the goals except last one
+    if (position === 'above' && !isLast) {
+      style.height = get(this.state, `goals.${slug}.height`) || '0px';
+    }
+
     return (
-      <div className={`bar ${slug} ${className}`} style={{width: get(this.state, `goals.${goal.slug}.width`) || width}}>
+      <div className={`goal bar ${slug} ${position}`} style={style} ref={node => this.nodes[slug] = node}>
         <style jsx>{`
         .bar {
           height: 20px;
@@ -97,7 +161,7 @@ class GoalsCover extends React.Component {
           position: absolute;
           top: 0;
           left: 0;
-          z-index: 0;
+          text-align: right;
           transition: width 3s;
         }
 
@@ -106,7 +170,6 @@ class GoalsCover extends React.Component {
           width: 150px;
           border-top: 4px solid #64C800;
           border-right: 1px solid #64C800;
-          z-index: 10;
         }
 
         .bar.yearlyBudget {
@@ -114,25 +177,23 @@ class GoalsCover extends React.Component {
           border-right: 1px solid #3399FF;
         }
 
-        .bar.goal {
+        .bar.goal.above {
           border-bottom: 4px solid #3399FF;
           border-right: 1px solid #3399FF;
-          top: -16px;
+          top: auto;
+          bottom: 76px;
+          transition: height 3s;
         }
 
         .caption {
-          padding: 1rem;
+          padding: 1rem 0.5rem 1rem 0.5rem;
           color: #AAAEB3;
           font-family: Rubik;
           font-size: 13px;
           line-height: 15px;
-          text-align: right;
           transition: all 2s;
         }
-        .subLevel2 {
-          padding-top: 4rem;
-        }
-        .bar.goal .caption {
+        .bar.goal.above .caption {
           margin-top: -4.5rem;
         }
 
@@ -150,6 +211,7 @@ class GoalsCover extends React.Component {
           color: white;
           font-weight: bold;
         }
+
         .interval {
           color: #AAAEB3;
           font-size: 10px;
@@ -218,7 +280,7 @@ class GoalsCover extends React.Component {
               <FormattedMessage id="cover.budget.text" defaultMessage="Thanks to their financial contributions, we’re operating on an estimated annual budget of  {yearlyBudget}." values={{ yearlyBudget: formatCurrency(get(collective, 'stats.yearlyBudget'), collective.currency, { precision: 0 })}} />
             </div>
           }
-          <div className="barContainer">
+          <div className="barContainer" style={get(this.state, 'styles.barContainer')} ref={node => this.nodes.barContainer = node}>
             <div className="bars">
               { this.goals.map(this.renderGoal) }
             </div>
