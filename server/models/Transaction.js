@@ -149,11 +149,11 @@ export default (Sequelize, DataTypes) => {
     getterMethods: {
 
       netAmountInHostCurrency() {
-        return this.amountInHostCurrency - this.paymentProcessorFeeInHostCurrency - this.platformFeeInHostCurrency - this.hostFeeInHostCurrency;
+        return this.amountInHostCurrency + this.paymentProcessorFeeInHostCurrency + this.platformFeeInHostCurrency + this.hostFeeInHostCurrency;
       },
 
       amountSentToHostInHostCurrency() {
-        return this.amountInHostCurrency - this.paymentProcessorFeeInHostCurrency - this.platformFeeInHostCurrency;
+        return this.amountInHostCurrency + this.paymentProcessorFeeInHostCurrency + this.platformFeeInHostCurrency;
       },
 
       // Info.

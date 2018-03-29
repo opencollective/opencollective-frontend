@@ -73,7 +73,7 @@ describe('graphql.paymentMethods.test.js', () => {
     hostCurrency: 'USD',
     hostCurrencyFxRate: 1.15,
     amountInHostCurrency: -1150,
-    paymentProcessorFeeInHostCurrency: 100,
+    paymentProcessorFeeInHostCurrency: -100,
     netAmountInCollectiveCurrency: -1250,
     PaymentMethodId: paypalPaymentMethod.id
   }));
