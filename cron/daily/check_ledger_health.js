@@ -356,7 +356,7 @@ const checkTransactions = () => {
   .then(async () => {
     const allTransactions = await models.Transaction.findAll({ where: { deletedAt: null } });
     const funkyTransactions = allTransactions
-          .filter((tr) => !transactionsLib.verify(tr))
+          .filter((tr) => transactionsLib.verify(tr) !== true)
           .map((tr) => ({...tr.dataValues, offBy: transactionsLib.difference(tr)}));
     const fields = ['id', 'amount', 'currency', 'hostCurrency', 'offBy'];
     if (funkyTransactions.length > 0) {
