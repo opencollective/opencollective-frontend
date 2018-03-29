@@ -49,13 +49,21 @@ class CreateCollective extends React.Component {
     this.setState( { status: 'loading' });
     CollectiveInputType.type = 'COLLECTIVE';
     CollectiveInputType.HostCollectiveId = host.id;
-    CollectiveInputType.tags = [...host.tags || []] || [];
+    if (CollectiveInputType.tags) {
+      CollectiveInputType.tags = CollectiveInputType.tags.split(',').map(t => t.trim());
+    }
+    CollectiveInputType.tags = [...CollectiveInputType.tags || [], ...host.tags || []] || [];
     if (CollectiveInputType.category) {
       CollectiveInputType.tags.push(CollectiveInputType.category);
     }
+    CollectiveInputType.data = CollectiveInputType.data || {};
+    CollectiveInputType.data.members = CollectiveInputType.members;
+    CollectiveInputType.data.meetupSlug = CollectiveInputType.meetup;
     delete CollectiveInputType.category;
     delete CollectiveInputType.tos;
     delete CollectiveInputType.hostTos;
+
+    console.log(">>> CollectiveInputType", CollectiveInputType);
 
     try {
       const res = await this.props.createCollective(CollectiveInputType);

@@ -13,6 +13,8 @@ import { ButtonGroup, Button } from 'react-bootstrap';
 import { Link } from '../server/pages';
 import { get } from 'lodash';
 import CollectiveCategoryPicker from './CollectiveCategoryPicker';
+import fetch from 'fetch-jsonp';
+import { firstSentence } from '../lib/utils';
 
 class CreateCollectiveForm extends React.Component {
 
@@ -47,6 +49,10 @@ class CreateCollectiveForm extends React.Component {
       'twitterHandle.label': { id: 'collective.twitterHandle.label', defaultMessage: 'Twitter' },
       'website.label': { id: 'collective.website.label', defaultMessage: 'Website' },
       'location.label': { id: 'collective.location.label', defaultMessage: 'City' },
+      'meetup.label': { id: 'collective.meetup.label', defaultMessage: 'Meetup URL' },
+      'members.label': { id: 'collective.members.label', defaultMessage: 'Number of members' },
+      'tags.label': { id: 'collective.tags.label', defaultMessage: 'Tags' },
+      'tags.description': { id: 'collective.tags.description', defaultMessage: 'Tags helps people discover your collective. Separate them with a comma.' },
       'tos.label': { id: 'collective.tos.label', defaultMessage: 'Terms of Service' }
     });
 
@@ -102,6 +108,7 @@ class CreateCollectiveForm extends React.Component {
       ]
     }
 
+    this.masterKey = '';
     this.state = {
       modified: false,
       section: 'info',
@@ -112,8 +119,26 @@ class CreateCollectiveForm extends React.Component {
     if (this.categories.length === 1) {
       this.state.collective.category = this.categories[0];
     }
-    this.fields.info.map(field => {
-    });
+
+    if (get(this.state, 'collective.category') === 'meetup') {
+      this.fields.info.splice(2, 0, {
+        name: 'members',
+        type: 'number'
+      });
+      this.fields.info.unshift({
+        name: 'meetup',
+        type: 'text',
+        pre: 'https://meetup.com/',
+        maxLength: 255,
+        placeholder: ''
+      });
+      this.fields.info.push({
+        name: 'tags',
+        type: 'text',
+        maxLength: 255,
+        placeholder: 'meetup, nyc, bitcoin'
+      });
+    }
 
     Object.keys(this.fields).map(key => {
       this.fields[key] = this.fields[key].map(field => {
@@ -150,8 +175,36 @@ class CreateCollectiveForm extends React.Component {
       return window.location = '/opensource/apply';
     }
     const collective = {};
+
+    if (fieldname === 'meetup') {
+      fetch(`https://api.meetup.com/${value}?fields=plain_text_description,topics`)
+        .then(response => {
+          if (response.ok) {
+            return response.json();
+          }
+        })
+        .then(json => {
+          if (!json) return;
+          const { city, localized_location, lat, lon, members, plain_text_description, name, timezone, key_photo, category, link, created, topics } = json.data;
+          Object.assign(collective, { name, timezone })
+          collective.description = firstSentence(plain_text_description, 255);
+          collective.longDescription = plain_text_description;
+          collective.location = { name: city, address: localized_location, lat, long: lon };
+          collective.image = get(key_photo, 'highres_link');
+          collective.tags = topics && topics.map(t => t.urlkey).join(', ');
+          collective.website = link;
+          collective.members = members;
+          collective.data = {
+            created: new Date(created)
+          }
+          this.masterKey = value; // making sure we recreate the form with new prefilled values
+          this.setState( { modified: true, collective: Object.assign({}, this.state.collective, collective) });
+          window.state = this.state;
+        })
+    }
     collective[fieldname] = value;
     this.setState( { modified: true, collective: Object.assign({}, this.state.collective, collective) });
+    window.state = this.state;
   }
 
   handleObjectChange(obj) {
@@ -247,10 +300,10 @@ class CreateCollectiveForm extends React.Component {
             { Object.keys(this.fields).map(key =>
               <div className="inputs" key={key}>
                 {this.fields[key].map((field) => (!field.when || field.when()) && <InputField
-                  key={field.name}
+                  key={`${this.masterKey}-${field.name}`}
                   value={this.state.collective[field.name]}
                   className={field.className}
-                  defaultValue={field.defaultValue}
+                  defaultValue={this.state.collective[field.name] || field.defaultValue}
                   validate={field.validate}
                   ref={field.name}
                   name={field.name}

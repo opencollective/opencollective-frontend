@@ -126,6 +126,7 @@ export const addCreateCollectiveMutation = graphql(createCollectiveQuery, {
         'slug',
         'type',
         'name',
+        'image',
         'description',
         'longDescription',
         'location',
@@ -139,7 +140,8 @@ export const addCreateCollectiveMutation = graphql(createCollectiveQuery, {
         'currency',
         'quantity',
         'HostCollectiveId',
-        'ParentCollectiveId'
+        'ParentCollectiveId',
+        'data'
       ]);
       CollectiveInputType.tiers = (collective.tiers || []).map(tier => pick(tier, ['type', 'name', 'description', 'amount', 'maxQuantity', 'maxQuantityPerUser']));
       CollectiveInputType.location = pick(collective.location, ['name','address','lat','long']);
