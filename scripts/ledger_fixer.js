@@ -207,7 +207,7 @@ export class Migration {
       debit.netAmountInCollectiveCurrency = newNetAmountInCollectiveCurrencyDebit;
       changed = true;
     }
-    return true;
+    return changed;
   }
 
   /** Create an order for orphan transactions */
