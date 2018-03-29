@@ -1,10 +1,5 @@
 {
   "presets": ["es2015", "stage-0"],
-  "env": {
-    "test": {
-      "plugins": ["istanbul"]
-    }
-  },
   "plugins": [
     "add-module-exports",
     "lodash"
