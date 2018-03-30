@@ -142,6 +142,9 @@ class GoalsCover extends React.Component {
       opacity: get(this.state, `goals.${slug}.opacity`) || 1,
       zIndex
     };
+    if (isLast) {
+      style.width = posX;
+    }
     if (position === 'below' && level === 1) {
       style.paddingTop = '4rem';
       style.height = '60px';
