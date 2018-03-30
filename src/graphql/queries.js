@@ -293,6 +293,7 @@ const getCollectiveQuery = gql`
         events
         totalAmountSent
         totalAmountRaised
+        totalAmountReceived
       }
       tiers {
         id
@@ -487,6 +488,9 @@ const getCollectiveCoverQuery = gql`
         updates
         events
         yearlyBudget
+        backers {
+          all
+        }
       }
       createdByUser {
         id

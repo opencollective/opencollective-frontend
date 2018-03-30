@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import InputField from '../components/InputField';
 import EditTiers from '../components/EditTiers';
+import EditGoals from '../components/EditGoals';
 import EditMembers from '../components/EditMembers';
 import EditPaymentMethods from '../components/EditPaymentMethods';
 import EditConnectedAccounts from '../components/EditConnectedAccounts';
@@ -36,10 +37,12 @@ class EditCollectiveForm extends React.Component {
       collective,
       members: collective.members || [{}],
       tiers: collective.tiers || [{}],
+      goals: collective.settings.goals || [{}],
       paymentMethods: collective.paymentMethods || [{}]
     };
 
     this.showEditTiers = ['COLLECTIVE', 'EVENT'].includes(collective.type);
+    this.showEditGoals = collective.type === 'COLLECTIVE';
     this.defaultTierType = collective.type === 'EVENT' ? 'TICKET' : 'TIER';
     this.showEditMembers = ['COLLECTIVE', 'ORGANIZATION'].includes(collective.type);
     this.showPaymentMethods = ['USER', 'ORGANIZATION'].includes(collective.type);
@@ -100,6 +103,7 @@ class EditCollectiveForm extends React.Component {
     const collective = {
       ...this.state.collective,
       tiers: this.state.tiers,
+      goals: this.state.goals,
       members: this.state.members,
       paymentMethods: this.state.paymentMethods
     };
@@ -280,6 +284,11 @@ class EditCollectiveForm extends React.Component {
                 <FormattedMessage id='editCollective.menu.members' defaultMessage='members' />
               </Button>
             }
+            { this.showEditGoals &&
+              <Button className="menuBtn goals" bsStyle={this.state.section === 'goals' ? 'primary' : 'default'} onClick={() => this.showSection('goals')}>
+                <FormattedMessage id='editCollective.menu.goals' defaultMessage='goals' />
+              </Button>
+            }
             { this.showEditTiers &&
               <Button className="menuBtn tiers" bsStyle={this.state.section === 'tiers' ? 'primary' : 'default'} onClick={() => this.showSection('tiers')}>
                 <FormattedMessage id='editCollective.menu.tiers' defaultMessage='tiers' />
@@ -336,6 +345,15 @@ class EditCollectiveForm extends React.Component {
               currency={collective.currency}
               onChange={this.handleObjectChange}
               defaultType={this.defaultTierType}
+              />
+          }
+          { this.state.section === 'goals' &&
+            <EditGoals
+              title="goals"
+              goals={this.state.goals}
+              collective={collective}
+              currency={collective.currency}
+              onChange={this.handleObjectChange}
               />
           }
           { this.state.section === 'paymentMethods' &&

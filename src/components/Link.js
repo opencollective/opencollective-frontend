@@ -37,7 +37,7 @@ class Link extends React.Component {
       const path = routeFromRouter.getAs(params);
       return (<a href={path} title={title} className={className} {...otherProps}>{children}</a>);
     } else {
-      return (<router.Link {...pick(this.props, ['route', 'params', 'href'])}><a className={className}>{children}</a></router.Link>);
+      return (<router.Link {...pick(this.props, ['route', 'params', 'href'])}><a className={className} title={title}>{children}</a></router.Link>);
     }
   }
 }

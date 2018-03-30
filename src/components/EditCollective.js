@@ -114,6 +114,9 @@ class EditCollective extends React.Component {
     if (!CollectiveInputType) {
       return false;
     }
+    const { collective } = this.props;
+    CollectiveInputType.settings = { ...collective.settings, goals: CollectiveInputType.goals };
+    delete CollectiveInputType.goals;
     this.setState( { status: 'loading' });
     try {
       if (CollectiveInputType.backgroundImage === defaultBackgroundImage[CollectiveInputType.type]) {
