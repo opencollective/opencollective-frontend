@@ -67,7 +67,7 @@ class GoalsCover extends React.Component {
       },
       ... get(collective, 'settings.goals') || []
     ].sort((a, b) => a.amount > b.amount);
-    console.log(">>> this.goals", this.goals);
+
     const lastGoalAtPosition = {};
     for (let i=0; i<this.goals.length; i++) {
       const goal = { ...this.goals[i] };
@@ -79,8 +79,6 @@ class GoalsCover extends React.Component {
       }
       this.goals[i] = goal;
     }
-    console.log(">>> this.goals processed", this.goals);
-
     this.maxAmount = maxBy(this.goals, g => g.amount).amount;
   }
 
@@ -143,9 +141,7 @@ class GoalsCover extends React.Component {
       opacity: get(this.state, `goals.${slug}.opacity`) || 1,
       zIndex
     };
-    if (isLast) {
-      style.width = posX;
-    }
+
     if (position === 'below' && level === 1) {
       style.paddingTop = '4rem';
       style.height = '60px';
@@ -155,7 +151,6 @@ class GoalsCover extends React.Component {
     if (position === 'above' && !isLast) {
       style.height = get(this.state, `goals.${slug}.height`) || '0px';
     }
-    console.log(">>> rendering goal", goal, "isLast", isLast, "style", style, "goals", this.goals);
 
     return (
       <div className={`goal bar ${slug} ${position}`} style={style} ref={node => this.nodes[slug] = node}>
