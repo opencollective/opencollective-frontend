@@ -93,6 +93,7 @@ class MenuBar extends React.Component {
       if (!el.id) return;
       const menuItem = {
         anchor: el.id,
+        title: el.querySelector('.title').innerText,
         link: `#${el.id}`,
         position: el.offsetTop
       };
@@ -203,7 +204,7 @@ class MenuBar extends React.Component {
         { this.state.menuItems.map((item, index) =>
           <div className={`item ${item.anchor} ${this.state.selectedAnchor === item.anchor && 'selected'}`} key={`item-${index}-${item.link}`}>
             <Link route={item.link} animate={{offset}}>
-              { this.messages[item.anchor] ? intl.formatMessage(this.messages[item.anchor]): item.anchor }
+              { this.messages[item.anchor] ? intl.formatMessage(this.messages[item.anchor]): (item.title || item.anchor) }
             </Link>
           </div>
         )}

@@ -91,6 +91,7 @@
     "sass-loader": "6.0.3",
     "serve": "3.3.1",
     "showdown": "^1.8.6",
+    "slug": "^0.9.1",
     "styled-jsx": "2.2.1",
     "styled-jsx-plugin-postcss": "0.1.2",
     "svg-to-png": "3.1.2",
