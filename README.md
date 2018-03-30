@@ -23,7 +23,7 @@ cd api;
 npm install;
 ```
 
-See the [API Github Repo](https://github.com/opencollective/opencollective-api) for more details.
+See the [API GitHub Repo](https://github.com/opencollective/opencollective-api) for more details.
 
 2. Install the Frontend
 
