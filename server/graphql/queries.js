@@ -241,7 +241,29 @@ const queries = {
   },
 
   /*
-   * Given a collective slug, returns all expenses
+   * Given an ExpenseId or an UpdateId, returns all comments
+   */
+  allComments: {
+    type: new GraphQLList(UpdateType),
+    args: {
+      ExpenseId: { type: GraphQLInt },
+      UpdateId: { type: GraphQLInt },
+      limit: { type: GraphQLInt },
+      offset: { type: GraphQLInt }
+    },
+    resolve(_, args) {
+      const query = { where: {} };
+      if (args.ExpenseId) query.where.ExpenseId = args.ExpenseId;
+      if (args.UpdateId) query.where.UpdateId = args.UpdateId;
+      if (args.limit) query.limit = args.limit;
+      if (args.offset) query.offset = args.offset;
+      query.order = [['createdAt', 'DESC']];
+      return models.Comment.findAll(query);
+    }
+  },
+
+  /*
+   * Given a collective slug, returns all updates
    */
   allUpdates: {
     type: new GraphQLList(UpdateType),
@@ -265,7 +287,7 @@ const queries = {
             throw new Error('Collective not found');
           }
           const getCollectiveIds = () => {
-            // if is host, we get all the expenses across all the hosted collectives
+            // if is host, we get all the updates across all the hosted collectives
             if (args.includeHostedCollectives) {
               return models.Member.findAll({
                 where: {

@@ -5,6 +5,7 @@ import { editTiers } from './mutations/tiers';
 import { editConnectedAccount } from './mutations/connectedAccounts';
 import { createExpense, editExpense, updateExpenseStatus, payExpense, deleteExpense } from './mutations/expenses';
 import * as updateMutations from './mutations/updates';
+import * as commentMutations from './mutations/comments';
 
 import statuses from '../constants/expense_status';
 
@@ -21,6 +22,7 @@ import {
   MemberType,
   ExpenseType,
   UpdateType,
+  CommentType,
   ConnectedAccountType
 } from './types';
 
@@ -40,6 +42,8 @@ import {
   ExpenseInputType,
   UpdateInputType,
   UpdateAttributesInputType,
+  CommentInputType,
+  CommentAttributesInputType,
   ConnectedAccountInputType,
   PaymentMethodInputType
 } from './inputTypes';
@@ -241,6 +245,39 @@ const mutations = {
     },
     resolve(_, args, req) {
       return updateMutations.deleteUpdate(_, args, req);
+    }
+  },
+  createComment: {
+    type: CommentType,
+    args: {
+      update: {
+        type: new GraphQLNonNull(CommentInputType)
+      }
+    },
+    resolve(_, args, req) {
+      return commentMutations.createComment(_, args, req);
+    }
+  },
+  editComment: {
+    type: CommentType,
+    args: {
+      update: {
+        type: new GraphQLNonNull(CommentAttributesInputType)
+      }
+    },
+    resolve(_, args, req) {
+      return commentMutations.editComment(_, args, req);
+    }
+  },
+  deleteComment: {
+    type: CommentType,
+    args: {
+      id: {
+        type: new GraphQLNonNull(GraphQLInt)
+      }
+    },
+    resolve(_, args, req) {
+      return commentMutations.deleteComment(_, args, req);
     }
   },
   cancelSubscription: {

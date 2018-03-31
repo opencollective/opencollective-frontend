@@ -57,6 +57,7 @@ export function setupModels(client) {
     'Order',
     'Expense',
     'Collective',
+    'Comment',
     'Notification',
     'PaymentMethod',
     'Member',

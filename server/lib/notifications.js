@@ -159,6 +159,22 @@ async function notifyByEmail(activity) {
       notifyAdminsOfCollective(activity.data.collective.id, activity);
       break;
 
+    case activityType.COLLECTIVE_COMMENT_CREATED:
+      activity.data.collective = await models.Collective.findById(activity.CollectiveId);
+      if (activity.data.ExpenseId) {
+        activity.data.target = await models.Expense.findById(activity.data.ExpenseId);
+        activity.data.path = `/${activity.data.collective.slug}/expenses/${activity.data.target.id}`;
+      } else {
+        activity.data.target = await models.Update.findById(activity.data.UpdateId);
+        activity.data.path = `/${activity.data.collective.slug}/updates/${activity.data.target.slug}`;
+      }
+
+      notifyAdminsOfCollective(activity.CollectiveId, activity);
+      if (activity.UserId !== activity.data.target.UserId) {
+        notifyUserId(activity.data.target.UserId, activity);
+      }
+      break;
+
     case activityType.COLLECTIVE_EXPENSE_APPROVED:
       activity.data.actions = {
         viewLatestExpenses: `${config.host.website}/${activity.data.collective.slug}/expenses#expense${activity.data.expense.id}`
