@@ -91,9 +91,10 @@ class MenuBar extends React.Component {
     const menuItemsFoundOnPage = [];
     uniqBy(document.querySelectorAll('section'), el => el.id).forEach((el, index) => {
       if (!el.id) return;
+      const titleEl = el.querySelector('.title');
       const menuItem = {
         anchor: el.id,
-        title: el.querySelector('.title').innerText,
+        title: titleEl && titleEl.innerText,
         link: `#${el.id}`,
         position: el.offsetTop
       };

@@ -9,7 +9,6 @@ import TierCard from '../components/TierCard';
 import NotificationBar from '../components/NotificationBar';
 import MembersWithData from '../components/MembersWithData';
 import { addCreateOrderMutation } from '../graphql/mutations';
-import Markdown from 'react-markdown';
 import { get } from 'lodash';
 import { Router } from '../server/pages';
 import { FormattedMessage, defineMessages } from 'react-intl';
@@ -22,7 +21,8 @@ import TransactionsWithData from './TransactionsWithData';
 import { Button } from 'react-bootstrap';
 import { Link } from '../server/pages';
 import { formatCurrency } from '../lib/utils';
-import { processMarkdown } from '../lib/markdown.lib';
+import LongDescription from './LongDescription';
+
 const defaultBackgroundImage = '/static/images/defaultBackgroundImage.png';
 
 class Collective extends React.Component {
@@ -35,7 +35,6 @@ class Collective extends React.Component {
   constructor(props) {
     super(props);
     this.collective = this.props.collective; // pre-loaded by SSR
-    this.renderCustomSection = this.renderCustomSection.bind(this);
     this.updateOrder = this.updateOrder.bind(this);
     this.resetOrder = this.resetOrder.bind(this);
 
@@ -111,23 +110,6 @@ class Collective extends React.Component {
     this.setState({ order: {} });
   }
 
-  renderCustomSection(section) {
-    const subtitle = section.title
-      ? ''
-      : this.collective.description || '';
-
-    return (
-      <section id={section.id || "about"} className="longDescription" >
-        <SectionTitle
-          title={section.title || <FormattedMessage id="collective.about.title" defaultMessage="About" />}
-          subtitle={subtitle}
-          />
-
-        <Markdown source={section.markdown} />
-      </section>
-    )
-  }
-
   render() {
     const { intl, LoggedInUser, query } = this.props;
 
@@ -143,8 +125,6 @@ class Collective extends React.Component {
       notification.title = intl.formatMessage(this.messages['collective.created']);
       notification.description = intl.formatMessage(this.messages['collective.created.description'], { host: this.collective.host.name });
     }
-
-    const customSections = processMarkdown(this.collective.longDescription || "").sections;
 
     return (
       <div className={`CollectivePage ${this.collective.type}`}>
@@ -255,7 +235,7 @@ class Collective extends React.Component {
                       collective={this.collective}
                       />
                   }
-                  { customSections.map(this.renderCustomSection) }
+                  <LongDescription longDescription={this.collective.longDescription} defaultSubtitle={this.collective.description} />
                 </div>
               </div>
 

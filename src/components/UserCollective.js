@@ -10,7 +10,7 @@ import Link from './Link';
 import NotificationBar from './NotificationBar';
 import Memberships from './Memberships';
 import CollectivesWithData from './CollectivesWithData';
-import Markdown from 'react-markdown';
+import LongDescription from './LongDescription';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import { pick, get, groupBy } from 'lodash';
 import HashLink from 'react-scrollchor';
@@ -252,9 +252,7 @@ class UserCollective extends React.Component {
                     </div>
                   }
                   { this.collective.longDescription &&
-                    <section id="about" className="longDescription" >
-                      <Markdown source={this.collective.longDescription} />
-                    </section>
+                    <LongDescription longDescription={this.collective.longDescription} defaultSubtitle={this.collective.description} />
                   }
                 </div>
               }
