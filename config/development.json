@@ -10,6 +10,14 @@
       "benchmark": true
     }
   },
+  "maintenancedb": {
+    "database": "postgres",
+    "username": "postgres",
+    "password": "",
+    "options": {
+      "host": "127.0.0.1"
+    }
+  },
   "keys": {
     "opencollective": {
       "api_key": "dvl-1510egmf4a23d80342403fb599qd",
