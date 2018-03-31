@@ -34,9 +34,12 @@ describe('graphql.comments.test', () => {
   before(() => models.Collective.create(utils.data('collective1')).tap(g => collective1 = g));
   before(() => models.Expense.create({
     CollectiveId: collective1.id,
-    CreatedByUserId: user1.id,
-    FromCollectiveId: user1.CollectiveId,
-    markdown: "This is a first **comment**"
+    lastEditedById: user1.id,
+    UserId: user1.id,
+    description: "Plane ticket",
+    incurredAt: new Date,
+    amount: 100000,
+    currency: "USD"
   }).tap(e => expense1 = e));
   before(() => collective1.addUserWithRole(host, roles.HOST));
   before(() => collective1.addUserWithRole(user1, roles.ADMIN));
@@ -46,8 +49,8 @@ describe('graphql.comments.test', () => {
       CollectiveId: collective1.id,
       FromCollectiveId: user1.CollectiveId,
       CreatedByUserId: user1.id,
-      title: `first comment & "love"`,
-      html: `long text for the comment #1 <a href="https://google.com">here is a link</a>`,
+      markdown: `first comment & "love"`,
+      ExpenseId: expense1.id
     }).then(u => comment1 = u)
   });
 
@@ -60,11 +63,10 @@ describe('graphql.comments.test', () => {
   let comment;
   before(() => {
     comment = {
-      title: `Monthly comment 2`,
-      html: "This is the comment",
-      collective: {
-        id: collective1.id
-      }
+      markdown: "This is the **comment**",
+      ExpenseId: expense1.id,
+      FromCollectiveId: user1.CollectiveId,
+      CollectiveId: collective1.id
     };
   })
 
@@ -74,29 +76,27 @@ describe('graphql.comments.test', () => {
     mutation createComment($comment: CommentInputType!) {
       createComment(comment: $comment) {
         id
-        slug
-        publishedAt
+        markdown
+        html
+        expense {
+          id
+        }
       }
     }
     `;
 
     it("fails if not authenticated", async () => {
       const result = await utils.graphqlQuery(createCommentQuery, { comment });
+      result.errors && console.error(result.errors[0]);
       expect(result.errors).to.have.length(1);
       expect(result.errors[0].message).to.equal("You must be logged in to create a comment");
-    });
-
-    it("fails if authenticated but cannot edit collective", async () => {
-      const result = await utils.graphqlQuery(createCommentQuery, { comment }, user2);
-      expect(result.errors).to.have.length(1);
-      expect(result.errors[0].message).to.equal("You don't have sufficient permissions to create a comment");
     });
 
     it("creates a comment", async () => {
       const result = await utils.graphqlQuery(createCommentQuery, { comment }, user1);
       result.errors && console.error(result.errors[0]);
       const createdComment = result.data.createComment;
-      expect(createdComment.slug).to.equal(`monthly-comment-2`);
+      expect(createdComment.html).to.equal(`<p>This is the <strong>comment</strong></p>`);
     })
   })
 
@@ -107,6 +107,7 @@ describe('graphql.comments.test', () => {
       editComment(comment: $comment) {
         id
         markdown
+        html
       }
     }
     `;
@@ -126,7 +127,7 @@ describe('graphql.comments.test', () => {
     it('edits a comment successfully', async () => {
       const result = await utils.graphqlQuery(editCommentQuery, { comment: { id: comment1.id, markdown: 'new *comment* text' } }, user1);
       expect(result.errors).to.not.exist;
-      expect(result.data.editComment.html).to.equal('new <i>comment</i> text');
+      expect(result.data.editComment.html).to.equal('<p>new <em>comment</em> text</p>');
     });
 
   })
@@ -136,8 +137,7 @@ describe('graphql.comments.test', () => {
     const deleteCommentQuery = `
       mutation deleteComment($id: Int!) {
         deleteComment(id: $id) {
-          id,
-          slug
+          id
         }
       }`;
 
@@ -177,41 +177,33 @@ describe('graphql.comments.test', () => {
       allComments(ExpenseId: $ExpenseId, limit: $limit, offset: $offset) {
         id
         markdown
-        html
       }
     }
     `;
 
     before(() => {
       return models.Comment.destroy({ where: {}, truncate: true }).then(() => models.Comment.createMany([
-        { markdown: 'draft comment 1', createdAt: new Date('2018-01-11'), publishedAt: null },
-        { markdown: 'comment 1', publishedAt: new Date('2018-01-01') },
-        { markdown: 'comment 2', publishedAt: new Date('2018-01-02') },
-        { markdown: 'comment 3', publishedAt: new Date('2018-01-03') },
-        { markdown: 'comment 4', publishedAt: new Date('2018-01-04') },
-        { markdown: 'comment 5', publishedAt: new Date('2018-01-05') },
-        { markdown: 'comment 6', publishedAt: new Date('2018-01-06') },
-        { markdown: 'comment 7', publishedAt: new Date('2018-01-07') },
-        { markdown: 'comment 8', publishedAt: new Date('2018-01-08') },
-        { markdown: 'comment 9', publishedAt: new Date('2018-01-09') },
-        { markdown: 'comment 10', publishedAt: new Date('2018-01-10') },
-      ], { CreatedByUserId: user1.id, ExpenseId: expense1.id }));
+        { markdown: 'draft comment 1', createdAt: new Date('2018-01-11') },
+        { markdown: 'comment 1', createdAt: new Date('2018-01-01') },
+        { markdown: 'comment 2', createdAt: new Date('2018-01-02') },
+        { markdown: 'comment 3', createdAt: new Date('2018-01-03') },
+        { markdown: 'comment 4', createdAt: new Date('2018-01-04') },
+        { markdown: 'comment 5', createdAt: new Date('2018-01-05') },
+        { markdown: 'comment 6', createdAt: new Date('2018-01-06') },
+        { markdown: 'comment 7', createdAt: new Date('2018-01-07') },
+        { markdown: 'comment 8', createdAt: new Date('2018-01-08') },
+        { markdown: 'comment 9', createdAt: new Date('2018-01-09') },
+        { markdown: 'comment 10', createdAt: new Date('2018-01-10') },
+      ], { CreatedByUserId: user1.id, CollectiveId: collective1.id, ExpenseId: expense1.id }));
     });
 
-    it('get all the comments that are published', async () => {
+    it('get all the comments', async () => {
       const result = await utils.graphqlQuery(allCommentsQuery, { ExpenseId: expense1.id, limit: 5, offset: 2 });
       const comments = result.data.allComments;
       expect(result.errors).to.not.exist;
       expect(comments).to.have.length(5);
-      expect(comments[0].slug).to.equal('comment-8');
+      expect(comments[0].markdown).to.equal("comment 9");
     });
 
-    it('get all the comments that are published and unpublished if admin', async () => {
-      const result = await utils.graphqlQuery(allCommentsQuery, { ExpenseId: expense1.id, limit: 5, offset: 0 }, user1);
-      const comments = result.data.allComments;
-      expect(result.errors).to.not.exist;
-      expect(comments).to.have.length(5);
-      expect(comments[0].slug).to.equal('draft-comment-1');
-    });
   });  
 });

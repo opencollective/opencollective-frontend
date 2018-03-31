@@ -226,7 +226,7 @@ export const CommentInputType = new GraphQLInputObjectType({
 });
 
 export const CommentAttributesInputType = new GraphQLInputObjectType({
-  name: 'CommentInputType',
+  name: 'CommentAttributesInputType',
   description: 'Input type for CommentType',
   fields: () => ({
     id: { type: GraphQLInt },

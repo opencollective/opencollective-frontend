@@ -26,17 +26,6 @@ export default function(Sequelize, DataTypes) {
       autoIncrement: true
     },
 
-    slug: {
-      type: DataTypes.STRING,
-      unique: true,
-      allowNull: false,
-      set(slug) {
-        if (slug && slug.toLowerCase) {
-          this.setDataValue('slug', slug.toLowerCase().replace(/ /g, '-').replace(/\./g, ''));
-        }
-      }
-    },
-
     CollectiveId: {
       type: DataTypes.INTEGER,
       references: {
@@ -46,17 +35,6 @@ export default function(Sequelize, DataTypes) {
       onDelete: 'SET NULL',
       onUpdate: 'CASCADE',
       allowNull: false
-    },
-
-    TierId: {
-      type: DataTypes.INTEGER,
-      references: {
-        model: 'Tiers',
-        key: 'id'
-      },
-      onDelete: 'SET NULL',
-      onUpdate: 'CASCADE',
-      allowNull: true
     },
 
     FromCollectiveId: {
@@ -103,7 +81,7 @@ export default function(Sequelize, DataTypes) {
       allowNull: true
     },
 
-    markdown: DataTypes.STRING,
+    markdown: DataTypes.TEXT,
 
     createdAt: {
       type: DataTypes.DATE,
@@ -153,6 +131,11 @@ export default function(Sequelize, DataTypes) {
     },
 
     hooks: {
+      beforeCreate: (instance) => {
+        if (!instance.ExpenseId && !instance.UpdateId) {
+          throw new Error("Missing target expense or update");
+        }
+      },
       afterCreate: (instance) => {
         models.Activity.create({
           type: activities.COLLECTIVE_COMMENT_CREATED,
@@ -172,7 +155,7 @@ export default function(Sequelize, DataTypes) {
    * Instance Methods
    */
 
-  // Edit an update
+  // Edit a comment
   Comment.prototype.edit = async function(remoteUser, newCommentData) {
     mustBeLoggedInTo(remoteUser, 'edit this comment');
     if (remoteUser.id !== this.CreatedByUserId || !remoteUser.isAdmin(this.CollectiveId)) {
@@ -186,9 +169,9 @@ export default function(Sequelize, DataTypes) {
   }
 
   Comment.prototype.delete = async function(remoteUser) {
-    mustBeLoggedInTo(remoteUser, "delete this update");
+    mustBeLoggedInTo(remoteUser, "delete this comment");
     if (remoteUser.id !== this.CreatedByUserId || !remoteUser.isAdmin(this.CollectiveId)) {
-      throw new errors.Unauthorized({ message: "You need to be logged in as a core contributor or as a host to delete this update" });
+      throw new errors.Unauthorized({ message: "You need to be logged in as a core contributor or as a host to delete this comment" });
     }
     return this.destroy();
   }

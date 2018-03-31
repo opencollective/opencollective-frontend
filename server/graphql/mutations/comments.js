@@ -9,24 +9,25 @@ function require(args, path) {
 }
 
 export async function createComment(_, args, req) {
-  require(args, 'markdown');
+  require(args, 'comment.markdown');
   mustBeLoggedInTo(req.remoteUser, "create a comment");
   const {
-    update: {
+    comment: {
       CollectiveId,
       ExpenseId,
       UpdateId
     }
   } = args;
-
-  const comment = await models.Comment.create({
+  const commentData = {
     markdown: strip_tags(args.comment.markdown),
     CollectiveId,
     ExpenseId,
     UpdateId,
     CreatedByUserId: req.remoteUser.id,
     FromCollectiveId: req.remoteUser.CollectiveId
-  });
+  };
+  console.log(">>> create comment: ", commentData);
+  const comment = await models.Comment.create(commentData);
 
   return comment;
 }

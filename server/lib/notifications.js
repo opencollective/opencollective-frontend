@@ -168,7 +168,6 @@ async function notifyByEmail(activity) {
         activity.data.target = await models.Update.findById(activity.data.UpdateId);
         activity.data.path = `/${activity.data.collective.slug}/updates/${activity.data.target.slug}`;
       }
-
       notifyAdminsOfCollective(activity.CollectiveId, activity);
       if (activity.UserId !== activity.data.target.UserId) {
         notifyUserId(activity.data.target.UserId, activity);

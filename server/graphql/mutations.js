@@ -250,7 +250,7 @@ const mutations = {
   createComment: {
     type: CommentType,
     args: {
-      update: {
+      comment: {
         type: new GraphQLNonNull(CommentInputType)
       }
     },
@@ -261,7 +261,7 @@ const mutations = {
   editComment: {
     type: CommentType,
     args: {
-      update: {
+      comment: {
         type: new GraphQLNonNull(CommentAttributesInputType)
       }
     },
