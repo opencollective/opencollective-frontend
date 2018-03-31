@@ -1,0 +1,26 @@
+{
+  "database": {
+    "database": "opencollective_dvl",
+    "username": "opencollective",
+    "password": "",
+    "options": {
+      "host": "postgres",
+      "dialect": "postgres",
+      "logging": false,
+      "benchmark": true
+    }
+  },
+  "maintenancedb": {
+    "database": "postgres",
+    "username": "postgres",
+    "password": "",
+    "options": { "host": "postgres" }
+  },
+  "keys": {
+    "opencollective": {
+      "api_key": "dvl-1510egmf4a23d80342403fb599qd",
+      "secret": "dvl-7749ba6ad8e62b53b18b4c30295f45d849c1",
+      "session_secret": "()x}xU<e6)91+Nh$A$m*z/Jb4sI9LV"
+    }
+  }
+}

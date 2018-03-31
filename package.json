@@ -128,6 +128,7 @@
   },
   "scripts": {
     "start": "node ./dist/index.js",
+    "predev": "npm install && npm run db:setup",
     "dev": "nodemon server/index.js -x babel-node . -e js,hbs",
     "clean": "rm -rf dist && mkdir dist",
     "build-server": "babel server -d ./dist",
