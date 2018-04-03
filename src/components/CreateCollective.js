@@ -63,8 +63,6 @@ class CreateCollective extends React.Component {
     delete CollectiveInputType.tos;
     delete CollectiveInputType.hostTos;
 
-    console.log(">>> CollectiveInputType", CollectiveInputType);
-
     try {
       const res = await this.props.createCollective(CollectiveInputType);
       const collective = res.data.createCollective;

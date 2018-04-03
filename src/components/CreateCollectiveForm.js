@@ -27,6 +27,8 @@ class CreateCollectiveForm extends React.Component {
 
   constructor(props) {
     super(props);
+    this.defineFields = this.defineFields.bind(this);
+    this.addLabels = this.addLabels.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.handleObjectChange = this.handleObjectChange.bind(this);
@@ -58,6 +60,40 @@ class CreateCollectiveForm extends React.Component {
 
     collective.backgroundImage = collective.backgroundImage || defaultBackgroundImage[collective.type];
 
+    this.masterKey = '';
+    this.state = {
+      modified: false,
+      section: 'info',
+      collective
+    };
+
+    this.categories = get(props.host, 'settings.categories') || [];
+    if (this.categories.length === 1) {
+      this.state.collective.category = this.categories[0];
+    }
+
+    this.defineFields();
+    this.addLabels();
+
+    window.OC = { collective, state: this.state };
+
+  }
+
+  componentDidMount() {
+    const hash = window.location.hash;
+    if (hash) {
+      this.setState({ section: hash.substr(1) });
+    }
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.collective && (!this.props.collective || get(nextProps, 'collective.name') != get(this.props, 'collective.name'))) {
+      this.setState({ collective: nextProps.collective, tiers: nextProps.collective.tiers });
+    }
+  }
+
+  defineFields(category) {
+
     this.fields = {
       info: [
         {
@@ -69,7 +105,7 @@ class CreateCollectiveForm extends React.Component {
           name: 'company',
           placeholder: '',
           maxLength: 255,
-          when: () => collective.type === 'USER'
+          when: () => get(this.state, 'collective.type') === 'USER'
         },
         {
           name: 'description',
@@ -108,19 +144,7 @@ class CreateCollectiveForm extends React.Component {
       ]
     }
 
-    this.masterKey = '';
-    this.state = {
-      modified: false,
-      section: 'info',
-      collective
-    };
-
-    this.categories = get(props.host, 'settings.categories') || [];
-    if (this.categories.length === 1) {
-      this.state.collective.category = this.categories[0];
-    }
-
-    if (get(this.state, 'collective.category') === 'meetup') {
+    if (category === 'meetup') {
       this.fields.info.splice(2, 0, {
         name: 'members',
         type: 'number'
@@ -140,42 +164,35 @@ class CreateCollectiveForm extends React.Component {
       });
     }
 
+    this.addLabels();
+  }
+
+  addLabels() {
+    const { intl } = this.props;
     Object.keys(this.fields).map(key => {
       this.fields[key] = this.fields[key].map(field => {
       if (this.messages[`${field.name}.label`]) {
-        field.label = props.intl.formatMessage(this.messages[`${field.name}.label`]);
+        field.label = intl.formatMessage(this.messages[`${field.name}.label`]);
       }
       if (this.messages[`${field.name}.description`]) {
-        field.description = props.intl.formatMessage(this.messages[`${field.name}.description`]);
+        field.description = intl.formatMessage(this.messages[`${field.name}.description`]);
       }
       this.state.collective[field.name] = this.state.collective[field.name] || field.defaultValue;
       return field;
       });
     });
-
-    window.OC = { collective, state: this.state };
-
   }
-
-  componentDidMount() {
-    const hash = window.location.hash;
-    if (hash) {
-      this.setState({ section: hash.substr(1) });
-    }
-  }
-
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.collective && (!this.props.collective || get(nextProps, 'collective.name') != get(this.props, 'collective.name'))) {
-      this.setState({ collective: nextProps.collective, tiers: nextProps.collective.tiers });
-    }
-  }
-
+  
   handleChange(fieldname, value) {
     if (fieldname === 'category' && value === 'opensource') {
       return window.location = '/opensource/apply';
     }
-    const collective = {};
 
+    if (fieldname === 'category') {
+      this.defineFields(value);
+    }
+
+    const collective = {};
     if (fieldname === 'meetup') {
       fetch(`https://api.meetup.com/${value}?fields=plain_text_description,topics`)
         .then(response => {
