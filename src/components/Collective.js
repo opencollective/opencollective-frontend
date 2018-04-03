@@ -9,7 +9,6 @@ import TierCard from '../components/TierCard';
 import NotificationBar from '../components/NotificationBar';
 import MembersWithData from '../components/MembersWithData';
 import { addCreateOrderMutation } from '../graphql/mutations';
-import Markdown from 'react-markdown';
 import { get } from 'lodash';
 import { Router } from '../server/pages';
 import { FormattedMessage, defineMessages } from 'react-intl';
@@ -22,6 +21,7 @@ import TransactionsWithData from './TransactionsWithData';
 import { Button } from 'react-bootstrap';
 import { Link } from '../server/pages';
 import { formatCurrency } from '../lib/utils';
+import LongDescription from './LongDescription';
 
 const defaultBackgroundImage = '/static/images/defaultBackgroundImage.png';
 
@@ -235,14 +235,7 @@ class Collective extends React.Component {
                       collective={this.collective}
                       />
                   }
-                  <section id="about" className="longDescription" >
-                    <SectionTitle
-                      title={<FormattedMessage id="collective.about.title" defaultMessage="About" />}
-                      subtitle={`${this.collective.description || ''}`}
-                      />
-
-                    <Markdown source={this.collective.longDescription || ''} />
-                  </section>
+                  <LongDescription longDescription={this.collective.longDescription} defaultSubtitle={this.collective.description} />
                 </div>
               </div>
 
