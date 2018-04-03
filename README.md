@@ -48,7 +48,7 @@ $ docker-compose -f docker/docker-compose.yml up --build
 ```
 
 Then you'll be able to access the UI from http://localhost:13000 and
-the API from the address http://localhost:23060.
+the API from the address http://localhost:13060.
 
 ### Once it's running
 
