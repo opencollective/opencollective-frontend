@@ -19,7 +19,9 @@ if (process.env.NODE_ENV === 'production') {
 
 winstonPapertrail.on('error', () => {
   // Handle, report, or silently ignore connection errors and failures
-  console.error("Coulnd't connect to papertrail");
+  if (process.env.NODE_ENV === 'production') {
+    console.error("Coulnd't connect to papertrail");
+  }
 });
 
 winston.handleExceptions(transports);
