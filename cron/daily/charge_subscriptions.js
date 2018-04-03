@@ -2,14 +2,14 @@ import fs from 'fs';
 import json2csv from 'json2csv';
 import { ArgumentParser } from 'argparse';
 
-import emailLib from '../server/lib/email';
-import { promiseSeq } from '../server/lib/utils';
-import { sequelize } from '../server/models';
+import emailLib from '../../server/lib/email';
+import { promiseSeq } from '../../server/lib/utils';
+import { sequelize } from '../../server/models';
 import {
   ordersWithPendingCharges,
   processOrderWithSubscription,
   groupProcessedOrders,
-} from '../server/lib/subscriptions';
+} from '../../server/lib/subscriptions';
 
 const REPORT_EMAIL = 'ops@opencollective.com';
 
@@ -129,8 +129,8 @@ function parseCommandLineArguments() {
     action: 'storeConst',
     constant: true,
   });
-  parser.addArgument(['--notdryrun'], {
-    help: "Pass this flag when you're ready to run the script for real",
+  parser.addArgument(['--dryrun'], {
+    help: "Don't perform any changes to the database",
     defaultValue: false,
     action: 'storeConst',
     constant: true,
@@ -138,13 +138,13 @@ function parseCommandLineArguments() {
   parser.addArgument(['-l', '--limit'], {
     help: 'total subscriptions to process'
   });
-  parser.addArgument(['-b', '--batch_size'], {
+  parser.addArgument(['-b', '--batch-size'], {
     help: 'batch size to fetch at a time',
     defaultValue: 10
   });
   const args = parser.parseArgs();
   return {
-    dryRun: !args.notdryrun,
+    dryRun: args.dryrun,
     verbose: !args.quiet,
     limit: args.limit,
     batchSize: args.batch_size
