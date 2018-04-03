@@ -36,6 +36,17 @@ LoggedInUser.prototype.canEditCollective = function(collective) {
 }
 
 /**
+ * CanEditComment if LoggedInUser is
+ * - creator of the comment
+ * - is admin or host of the collective
+ */
+LoggedInUser.prototype.canEditComment = function(comment) {
+  if (!comment) return false;
+  return (get(comment, 'createdByUser.id') === this.id) 
+  || intersection(this.roles[get(comment, 'collective.slug')], ['HOST','ADMIN']).length > 0;
+}
+
+/**
  * CanEditEventif LoggedInUser is
  * - creator of the event
  * - is admin of the event

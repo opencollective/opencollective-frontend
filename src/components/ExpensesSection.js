@@ -63,7 +63,7 @@ class ExpensesSection extends React.Component {
             <ExpensesWithData
               collective={collective}
               LoggedInUser={LoggedInUser}
-              compact={true}
+              view="compact"
               limit={5}
               />
             { this.totalExpenses > 0 &&
