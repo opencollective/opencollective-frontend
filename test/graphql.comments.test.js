@@ -65,7 +65,7 @@ describe('graphql.comments.test', () => {
     comment = {
       markdown: "This is the **comment**",
       ExpenseId: expense1.id,
-      FromCollectiveId: user1.CollectiveId,
+      FromCollectiveId: user2.CollectiveId,
       CollectiveId: collective1.id
     };
   })
@@ -93,10 +93,17 @@ describe('graphql.comments.test', () => {
     });
 
     it("creates a comment", async () => {
-      const result = await utils.graphqlQuery(createCommentQuery, { comment }, user1);
+      const result = await utils.graphqlQuery(createCommentQuery, { comment }, user2);
       result.errors && console.error(result.errors[0]);
       const createdComment = result.data.createComment;
       expect(createdComment.html).to.equal(`<p>This is the <strong>comment</strong></p>`);
+      await utils.waitForCondition(() => sendEmailSpy.callCount > 0);
+      // utils.inspectSpy(sendEmailSpy, 2);
+      expect(sendEmailSpy.callCount).to.equal(2);
+      expect(sendEmailSpy.firstCall.args[0]).to.equal(user2.email);
+      expect(sendEmailSpy.secondCall.args[0]).to.equal(user1.email);
+      expect(sendEmailSpy.firstCall.args[1]).to.contain(`New comment on your expense ${expense1.description} by ${user2.firstName}`);
+      expect(sendEmailSpy.secondCall.args[1]).to.contain(`New comment on your expense ${expense1.description} by ${user2.firstName}`);
     })
   })
 

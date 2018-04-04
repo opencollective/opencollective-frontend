@@ -116,10 +116,13 @@ async function notifyUserId(UserId, activity, options) {
   return emailLib.send(activity.type, user.email, activity.data, options);
 }
 
-async function notifyAdminsOfCollective(CollectiveId, activity, options) {
+async function notifyAdminsOfCollective(CollectiveId, activity, options = {}) {
   debug("notify admins of CollectiveId", CollectiveId);
   const collective = await models.Collective.findById(CollectiveId)
-  const adminUsers = await collective.getAdminUsers();
+  let adminUsers = await collective.getAdminUsers();
+  if (options.exclude) {
+    adminUsers = adminUsers.filter(u => options.exclude.indexOf(u.id) === -1);
+  }
   debug("Total users to notify:", adminUsers.length);
   activity.CollectiveId = collective.id;
   return notifySubscribers(adminUsers, activity, options);
@@ -161,17 +164,30 @@ async function notifyByEmail(activity) {
 
     case activityType.COLLECTIVE_COMMENT_CREATED:
       activity.data.collective = await models.Collective.findById(activity.CollectiveId);
+      activity.data.fromCollective = await models.Collective.findById(activity.data.FromCollectiveId);
       if (activity.data.ExpenseId) {
-        activity.data.target = await models.Expense.findById(activity.data.ExpenseId);
-        activity.data.path = `/${activity.data.collective.slug}/expenses/${activity.data.target.id}`;
+        activity.data.expense = await models.Expense.findById(activity.data.ExpenseId);
+        activity.data.UserId = activity.data.expense.UserId;
+        activity.data.path = `/${activity.data.collective.slug}/expenses/${activity.data.expense.id}`;
       } else {
-        activity.data.target = await models.Update.findById(activity.data.UpdateId);
-        activity.data.path = `/${activity.data.collective.slug}/updates/${activity.data.target.slug}`;
+        activity.data.update = await models.Update.findById(activity.data.UpdateId);
+        activity.data.UserId = activity.data.update.CreatedByUserId;
+        activity.data.path = `/${activity.data.collective.slug}/updates/${activity.data.update.slug}`;
       }
-      notifyAdminsOfCollective(activity.CollectiveId, activity);
-      if (activity.UserId !== activity.data.target.UserId) {
-        notifyUserId(activity.data.target.UserId, activity);
+      // if the author of the comment is the one who submitted the expense
+      if (activity.UserId === activity.data.UserId) {
+        // then, if the expense was already approved, we notify the admins of the host
+        if (get(activity, 'data.expense.status') === 'APPROVED') {
+          notifyAdminsOfCollective(get(activity, 'data.collective.HostCollectiveId'), activity, { exclude: [activity.UserId] });          
+        } else {
+          // or, if the expense hans't been approved yet, we notifiy the admins of the host
+          notifyAdminsOfCollective(activity.CollectiveId, activity, { exclude: [activity.UserId] });
+        }
+      } else {
+        // if the comment was sent by one of the admins of the collective or the host, we notify the author of the expense
+        notifyUserId(activity.UserId, activity);
       }
+      // notify the author of the expense (unless it's their own comment)
       break;
 
     case activityType.COLLECTIVE_EXPENSE_APPROVED:

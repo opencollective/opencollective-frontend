@@ -3,7 +3,7 @@
 module.exports = {
   up: function (queryInterface, DataTypes) {
 
-    const updateAttributes = {
+    const commentAttributes = {
       id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
@@ -82,16 +82,35 @@ module.exports = {
       }  
     };
 
-    return queryInterface.createTable('Comments', updateAttributes, { paranoid: true })
-      .then(() => queryInterface.addIndex('Comments', ['ExpenseId', 'publishedAt'], {
-        indexName: `Comments_ExpenseId_publishedAt`
+    const commentHistoriesAttributes = {
+      id: DataTypes.INTEGER,
+      hid: {
+        type: DataTypes.BIGINT,
+        primaryKey: true,
+        autoIncrement: true,
+        unique: true
+      },
+      archivedAt: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: DataTypes.NOW
+      }  
+    };
+    return queryInterface.createTable('Comments', commentAttributes, { paranoid: true })
+      .then(() => queryInterface.addIndex('Comments', ['ExpenseId', 'createdAt'], {
+        indexName: `Comments_ExpenseId_createdAt`
       }))
-      .then(() => queryInterface.addIndex('Comments', ['UpdateId', 'publishedAt'], {
-        indexName: `Comments_UpdateId_publishedAt`
+      .then(() => queryInterface.addIndex('Comments', ['UpdateId', 'createdAt'], {
+        indexName: `Comments_UpdateId_createdAt`
+      }))
+      .then(() => queryInterface.createTable('CommentHistories', {
+        ...commentAttributes,
+        ...commentHistoriesAttributes
       }))
   },
 
   down: function (queryInterface) {
-    return queryInterface.dropTable('Comments');
+    return queryInterface.dropTable('Comments')
+      .then(() => queryInterface.dropTable('CommmentHistories'));
   }
 };
