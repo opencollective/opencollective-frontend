@@ -219,18 +219,16 @@ ${description}`
           margin-top: 3rem;
           padding: 3rem 1rem;
           z-index: 1;
+          font-size: 1.3rem;
+          display: flex;
+          justify-content: center;
+          color: white;
           background-color: #252729;
         }
         .topContributors {
           margin-top: -6rem;
         }
-        .stats {
-          font-size: 1.3rem;
-          display: flex;
-          justify-content: center;
-          color: white;
-        }
-        .stats .value {
+        .statsContainer .value {
           font-size: 3rem;
         }
         .stat {
