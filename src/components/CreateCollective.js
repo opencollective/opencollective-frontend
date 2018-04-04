@@ -84,7 +84,7 @@ class CreateCollective extends React.Component {
     if (!host) {
       return (<Loading />);
     }
-    const title = intl.formatMessage(this.messages["host.apply.title"], { hostname: host.name });
+    const title = get(host, 'settings.apply.title') || intl.formatMessage(this.messages["host.apply.title"], { hostname: host.name });
 
     return (
       <div className="CreateCollective">
