@@ -72,7 +72,7 @@ class CreateCollectiveForm extends React.Component {
       this.state.collective.category = this.categories[0];
     }
 
-    this.defineFields();
+    this.defineFields(this.state.collective.category);
     this.addLabels();
 
     window.OC = { collective, state: this.state };

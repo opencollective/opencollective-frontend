@@ -219,18 +219,16 @@ ${description}`
           margin-top: 3rem;
           padding: 3rem 1rem;
           z-index: 1;
+          font-size: 1.3rem;
+          display: flex;
+          justify-content: center;
+          color: white;
           background-color: #252729;
         }
         .topContributors {
           margin-top: -6rem;
         }
-        .stats {
-          font-size: 1.3rem;
-          display: flex;
-          justify-content: center;
-          color: white;
-        }
-        .stats .value {
+        .statsContainer .value {
           font-size: 3rem;
         }
         .stat {
@@ -258,6 +256,9 @@ ${description}`
           font-weight: bold;
           line-height: 1.25;
           margin: 1px;
+        }
+        .cta {
+          margin: 4rem 0;
         }
         @media(max-width: 600px) {
           h1 {
@@ -298,11 +299,34 @@ ${description}`
               </div>
             }
 
+            { collective.type !== 'COLLECTIVE' && this.props.cta &&
+              <div className="cta">
+                <Button className="blue" href={this.cta.href}>{this.cta.label}</Button>
+              </div>
+            }
           </div>
 
-          { collective.type !== 'EVENT' &&
+          { ['USER','ORGANIZATION'].indexOf(collective.type) !== -1 && stats && stats.totalAmountSent > 0 && !collective.isHost &&
             <div className="statsContainer">
+              <div className="stat">
+                <div className="totalAmountSent value">
+                  <Currency value={stats.totalAmountSent} currency={collective.currency} />
+                </div>
+                <FormattedMessage id="collective.stats.totalAmountSent.label" defaultMessage="Total amount donated" />
+              </div>
+              { stats.totalAmountRaised > 0 &&
+                <div className="stat">
+                  <div className="totalAmountRaised value">
+                    <Currency value={stats.totalAmountRaised} currency={collective.currency} />
+                  </div>
+                  <FormattedMessage id="collective.stats.totalAmountRaised.label" defaultMessage="Total amount raised" />
+                </div>
+              }
+            </div>
+          }
 
+          { collective.type === 'COLLECTIVE' &&
+            <div className="statsContainer">
               { className !== "small" && collective.type === "COLLECTIVE" &&
                 <div className="topContributors">
                   <TopBackersCoverWithData
@@ -310,25 +334,6 @@ ${description}`
                     LoggedInUser={LoggedInUser}
                     limit={10}
                     />
-                </div>
-              }
-
-              { ['USER','ORGANIZATION'].indexOf(collective.type) !== -1 && stats && stats.totalAmountSent > 0 && !collective.isHost &&
-                <div className="stats">
-                  <div className="stat">
-                    <div className="totalAmountSent value">
-                      <Currency value={stats.totalAmountSent} currency={collective.currency} />
-                    </div>
-                    <FormattedMessage id="collective.stats.totalAmountSent.label" defaultMessage="Total amount donated" />
-                  </div>
-                  { stats.totalAmountRaised > 0 &&
-                    <div className="stat">
-                      <div className="totalAmountRaised value">
-                        <Currency value={stats.totalAmountRaised} currency={collective.currency} />
-                      </div>
-                      <FormattedMessage id="collective.stats.totalAmountRaised.label" defaultMessage="Total amount raised" />
-                    </div>
-                  }
                 </div>
               }
 
@@ -342,8 +347,10 @@ ${description}`
               { this.props.cta &&
                 <Button className="blue" href={this.cta.href}>{this.cta.label}</Button>
               }
+
             </div>
           }
+
         </div>
 
         { className !== "small" &&
