@@ -30,12 +30,8 @@ class Link extends React.Component {
       return (<HashLink animate={this.props.animate} to={route.substr(1)} className={className}>{children}</HashLink>);
     } else if (this.isIframe) {
       const routeFromRouter = router.findByName(route);
-      if (!routeFromRouter) {
-        console.error(">>> cannot find route ", route);
-        return (<div>Cannot find route {route}</div>);
-      }
-      const path = routeFromRouter.getAs(params);
-      return (<a href={path} title={title} className={className} {...otherProps}>{children}</a>);
+      const path = routeFromRouter ? routeFromRouter.getAs(params) : `https://opencollective.com${route}`;
+      return (<a href={path} title={title} target="_top" className={className} {...otherProps}>{children}</a>);
     } else {
       return (<router.Link {...pick(this.props, ['route', 'params', 'href'])}><a className={className} title={title}>{children}</a></router.Link>);
     }
