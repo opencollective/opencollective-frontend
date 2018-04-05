@@ -182,7 +182,6 @@ class GoalsCover extends React.Component {
           border-right: 1px solid #3399FF;
           top: auto;
           bottom: 76px;
-          transition: height 3s;
         }
 
         .caption {
