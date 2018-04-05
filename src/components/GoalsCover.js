@@ -146,11 +146,6 @@ class GoalsCover extends React.Component {
       style.paddingTop = '4rem';
       style.height = '60px';
     }
-    
-    // We animate the goals except last one
-    if (position === 'above' && !isLast) {
-      style.height = get(this.state, `goals.${slug}.height`) || '0px';
-    }
 
     return (
       <div className={`goal bar ${slug} ${position}`} style={style} ref={node => this.nodes[slug] = node}>
