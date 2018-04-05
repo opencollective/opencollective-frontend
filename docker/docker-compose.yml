@@ -2,7 +2,7 @@ version: '3'
 services:
   api:
     build: ./api
-    command: /usr/src/api/docker/wait-for-db.sh npm run dev
+    command: /usr/src/api/docker/wait-for-db.sh npm run docker:dev
     environment:
       NODE_ENV: "docker"
       SEQUELIZE_ENV: "docker"

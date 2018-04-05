@@ -128,7 +128,8 @@
   },
   "scripts": {
     "start": "node ./dist/index.js",
-    "predev": "npm install && npm run db:setup && babel-node ./scripts/db_restore.js opencollective_dvl",
+    "predevdocker:dev": "npm install && npm run db:setup && babel-node ./scripts/db_restore.js opencollective_dvl",
+    "docker:dev": "npm run dev",
     "dev": "nodemon server/index.js -x babel-node . -e js,hbs",
     "clean": "rm -rf dist && mkdir dist",
     "build-server": "babel server -d ./dist",
