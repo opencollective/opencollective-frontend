@@ -1,3 +1,5 @@
+/** @module lib/payments */
+
 import Promise from 'bluebird';
 import { includes, pick, get, find } from 'lodash';
 import { Op } from 'sequelize';
@@ -11,7 +13,7 @@ import * as libtransactions from './transactions';
 
 /** Find payment method handler
  *
- * @param {Object} paymentMethod: This must point to a row in the
+ * @param {models.PaymentMethod} paymentMethod This must point to a row in the
  *  `PaymentMethods` table. That information is retrieved and the
  *  fields `service' & `type' are used to figure out which payment
  *  {service: 'stripe', type: 'bitcoin'}.
@@ -47,7 +49,14 @@ export async function refundTransaction(transaction, user) {
   return await paymentMethod.refundTransaction(transaction, user);
 }
 
-/** Calculates how much an amount's fee is worth */
+/** Calculates how much an amount's fee is worth.
+ *
+ * @param {Number} amount is the amount of the transaction.
+ * @param {Number} fee is the percentage of the transaction.
+ * @example
+ * calcFee(100, 3.5); // 4.0
+ * @return {Number} fee-percent of the amount rounded
+ */
 export function calcFee(amount, fee) {
   return Math.round(amount * fee / 100);
 }
@@ -63,11 +72,11 @@ export function calcFee(amount, fee) {
  *   1. CREDIT from collective B to collective A
  *   2. DEBIT from collective A to collective B
  *
- * @param {Object<models.Transaction>} transaction Can be either a
+ * @param {models.Transaction} transaction Can be either a
  *  DEBIT or a CREDIT transaction and it will generate a pair of
  *  transactions that debit the collective that was credited and
  *  credit the user that was debited.
- * @param {Integer} refundedPaymentProcessorFee is the amount refunded
+ * @param {number} refundedPaymentProcessorFee is the amount refunded
  *  by the payment processor. If it's 0 (zero) it means that the
  *  payment processor didn't refund its fee at all. In that case, the
  *  equivalent value will be moved from the host so the user can get
@@ -131,8 +140,9 @@ export async function associateTransactionRefundId(transaction, refund) {
 /**
  * Execute an order as user using paymentMethod
  * It validates the paymentMethod and makes sure the user can use it
- * @param {*} order { tier, description, totalAmount, currency, interval (null|month|year), paymentMethod }
- * @param options { hostFeePercent, platformFeePercent} (only for add funds and if remoteUser is admin of host or root)
+ * @param {Object} order { tier, description, totalAmount, currency, interval (null|month|year), paymentMethod }
+ * @param {Object} options { hostFeePercent, platformFeePercent} (only
+ *  for add funds and if remoteUser is admin of host or root)
  */
 export const executeOrder = (user, order, options) => {
 

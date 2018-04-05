@@ -1,3 +1,5 @@
+/** @module lib/subscriptions */
+
 import config from 'config';
 import moment from 'moment';
 import { Op } from 'sequelize';
