@@ -146,11 +146,6 @@ class GoalsCover extends React.Component {
       style.paddingTop = '4rem';
       style.height = '60px';
     }
-    
-    // We animate the goals except last one
-    if (position === 'above' && !isLast) {
-      style.height = get(this.state, `goals.${slug}.height`) || '0px';
-    }
 
     return (
       <div className={`goal bar ${slug} ${position}`} style={style} ref={node => this.nodes[slug] = node}>
@@ -182,7 +177,6 @@ class GoalsCover extends React.Component {
           border-right: 1px solid #3399FF;
           top: auto;
           bottom: 76px;
-          transition: height 3s;
         }
 
         .caption {
@@ -191,7 +185,6 @@ class GoalsCover extends React.Component {
           font-family: Rubik;
           font-size: 13px;
           line-height: 15px;
-          transition: all 2s;
         }
         .bar.goal.above .caption {
           margin-top: -4.5rem;
@@ -267,6 +260,12 @@ class GoalsCover extends React.Component {
           min-height: 80px;
         }
 
+        .annualBudget {
+          font-weight: bold;
+          color: white;
+          margin-left: 5px;
+        }
+
         @media(max-width: 420px) {
           .barContainer {
             width: 95%;
@@ -277,7 +276,8 @@ class GoalsCover extends React.Component {
         <div className="">
           { get(collective, 'stats.backers.all') > 0 &&
             <div className="budgetText">
-              <FormattedMessage id="cover.budget.text" defaultMessage="Thanks to your financial contributions, we are operating on an estimated annual budget of  {yearlyBudget}." values={{ yearlyBudget: formatCurrency(get(collective, 'stats.yearlyBudget'), collective.currency, { precision: 0 })}} />
+              <FormattedMessage id="cover.budget.text" defaultMessage="Thanks to your financial contributions, we are operating on an estimated annual budget of" />
+              <span className="annualBudget">{formatCurrency(get(collective, 'stats.yearlyBudget'), collective.currency, { precision: 0 })}</span>
             </div>
           }
           <div className="barContainer" style={get(this.state, 'styles.barContainer')} ref={node => this.nodes.barContainer = node}>

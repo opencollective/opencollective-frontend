@@ -221,12 +221,14 @@ ${description}`
           z-index: 1;
           font-size: 1.3rem;
           display: flex;
+          flex-direction: column;
           justify-content: center;
           color: white;
           background-color: #252729;
         }
         .topContributors {
           margin-top: -6rem;
+          min-height: 30px;
         }
         .statsContainer .value {
           font-size: 3rem;
@@ -345,7 +347,9 @@ ${description}`
               }
 
               { this.props.cta &&
-                <Button className="blue" href={this.cta.href}>{this.cta.label}</Button>
+                <div>
+                  <Button className="blue" href={this.cta.href}>{this.cta.label}</Button>
+                </div>
               }
 
             </div>

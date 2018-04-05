@@ -298,7 +298,7 @@
   "cover.bar.balance": "Today's Balance",
   "cover.bar.yearlyBudget": "Estimated Annual Budget",
   "tier.interval": "per {interval, select, month {month} year {year} other {}}",
-  "cover.budget.text": "Thanks to your financial contributions, we are operating on an estimated annual budget of  {yearlyBudget}.",
+  "cover.budget.text": "Thanks to your financial contributions, we are operating on an estimated annual budget of",
   "uploadImage.placeholder": "Drop an image or click to upload",
   "uploadImage.isDragActive": "Drop it like it's hot 🔥",
   "uploadImage.isDragReject": "🚫 This file type is not accepted",
