@@ -152,6 +152,9 @@ Financial contribution: ${percentage}% (${formatCurrency(member.stats.totalDonat
         `}</style>
         <style jsx global>{`
         @media(max-width: 420px) {
+          .TopBackersCover {
+            margin-top: 5px;
+          }
           .TopBackersCover .backer {
             padding: 3px !important;
             border-radius: 8px;

@@ -190,7 +190,6 @@ class GoalsCover extends React.Component {
           font-family: Rubik;
           font-size: 13px;
           line-height: 15px;
-          transition: all 2s;
         }
         .bar.goal.above .caption {
           margin-top: -4.5rem;
