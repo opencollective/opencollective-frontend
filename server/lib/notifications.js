@@ -14,12 +14,13 @@ const debug = debugLib("notification");
 
 export default async (Sequelize, activity) => {
   // publish everything to our private channel
-  publishToSlackPrivateChannel(activity)
+  publishToSlackPrivateChannel(activity).catch(console.log);
 
   // publish a filtered version to our public channel
-  publishToSlack(activity, config.slack.webhookUrl, { channel: config.slack.publicActivityChannel });
-  
-  notifyByEmail(activity);
+  publishToSlack(activity, config.slack.webhookUrl, { channel: config.slack.publicActivityChannel })
+    .catch(console.log);
+
+  notifyByEmail(activity).catch(console.log);
 
   // process notification entries for slack, twitter, gitter
   if (!activity.CollectiveId || !activity.type) {

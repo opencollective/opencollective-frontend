@@ -5,115 +5,84 @@
 [![Dependency Status](https://david-dm.org/opencollective/opencollective-api.svg)](https://david-dm.org/opencollective/opencollective-api)
 [![Coverage Status](https://coveralls.io/repos/github/opencollective/opencollective-api/badge.svg)](https://coveralls.io/github/opencollective/opencollective-api)
 
-![](http://d.pr/i/Vxm1rw+)
 
 ## How to get started
 
-Note: If you see a step below that could be improved (or is outdated), please update instructions. We rarely go through this process ourselves, so your fresh pair of eyes and your recent experience with it, makes you the best candidate to improve them for other users.
+Note: If you see a step below that could be improved (or is outdated),
+please update instructions. We rarely go through this process
+ourselves, so your fresh pair of eyes and your recent experience with
+it, makes you the best candidate to improve them for other users.
 
-### Database
+### Download the source code
 
-Install Postgres 9.x and Postgis. Start the database server.
+Although this repository only contains the code for the API and the
+code for the UI is in a [separate
+repository](https://github.com/opencollective/frontend), these
+instructions will get *both* running on developer mode. That's why you
+need to download *both* codebases under the same directory. Here's an
+example of how it can be done if you have a
+[git](https://git-scm.com/) client setup and ready to work:
 
-If necessary, check our [Postgres documentation](docs/postgres.md) for details and troubleshooting.
-
-### Node and npm
-
-```
-$> npm install
-```
-
-This will create the `opencollective_dvl` database if it doesn't exist yet (in which case it will just attempts to run the latest migration if any).
-This sanitized version of the database includes the data for a very small subset of collectives:
-- /opensource
-- /apex
-- /railsgirlsatl
-- /tipbox
-- /brusselstogether
-- /veganizerbxl
-
-You can test that the API is working by opening:
-http://localhost:3060/status
-
-And you can play with GraphQL by opening:
-http://localhost:3060/graphql
-
-For example, try this query:
-
-```
-query {
-  Collective(slug:"apex") {
-      id,
-      slug,
-      name,
-      description,
-      tiers {
-        id,
-        name,
-        description,
-        amount,
-        currency,
-        maxQuantity
-      }
-      members{
-        id
-        role
-        member {
-          id
-          slug
-          name
-        }
-        stats {
-          totalDonations
-        }
-      }
-    }
-}
+```bash
+$ mkdir -p ~/src/github.com/opencollective
+$ cd ~/src/github.com/opencollective
+$ git clone https://github.com/opencollective/opencollective-api
+$ git clone https://github.com/opencollective/frontend
 ```
 
-## Tests
+### Run the application
 
-```
-$> npm test
-```
+#### Vagrant setup
 
-The tests delete all the `opencollective_test` database's tables and re-create them with the latest models.
+If you by any chance is a [Vagrant](https://www.vagrantup.com/) user,
+just run the usual `vagrant up` within the `opencollective-api`
+directory and go to http://localhost:23000/ in your browser.
 
-All the calls to 3rd party services are stubbed using either `sinon` or `nock`.
+#### Docker setup
 
-If you get an error at the first test, you might have forgotten to run postgres. Use e.g. the following aliases to start/stop postgres:
-```
-export PGDATA='/usr/local/var/postgres'
-alias pgstart='pg_ctl -l $PGDATA/server.log start'
-alias pgstop='pg_ctl stop -m fast'
-```
+If you prefer using `docker-compose` make sure it's installed and
+working and then execute the following command:
 
-See [Wiki](https://github.com/OpenCollective/OpenCollective/wiki/Software-testing) for more info about the tests.
-
-## Start server
-
-In development environment:
-
-```
-npm run dev
+```bash
+$ docker-compose -f docker/docker-compose.yml up --build
 ```
 
-This will watch for file changes and automatically restart the server
+Then you'll be able to access the UI from http://localhost:13000 and
+the API from the address http://localhost:13060.
 
-On production:
+### Once it's running
 
-```
-npm run start
-```
+This new environment is created with the `opencollective_dvl`
+database. And it comes with enough data to play with most of the
+system.
 
-## Documentation
-WIP. Help welcome!
+However, trying to access the home page will lead you to a 404
+page. That's because we're porting our old UI over to the new one. The
+repository
+[opencollective-website](http://github.com/opencollective/opencollective-website/)
+is deprecated but it still powers our home page and the `/discover`
+page.
 
-## Questions
+To see something interesting, please access one of the collectives
+that are present in this sanitized version of the database. Here are
+some examples:
 
-If you have any questions, ping us on Slack (https://slack.opencollective.org) or on Twitter ([@opencollect](https://twitter.com/opencollect)).
+- http://localhost:13000/opensource
+- http://localhost:13000/apex
+- http://localhost:13000/railsgirlsatl
+- http://localhost:13000/tipbox
+- http://localhost:13000/brusselstogether
+- http://localhost:13000/veganizerbxl
+  
+## Participate on the discussion
+
+If you have any questions, ping us on Slack
+(https://slack.opencollective.org) or on Twitter
+([@opencollect](https://twitter.com/opencollect)).
 
 ## TODO
 
-- The User model is confusing with the concept of User Collective, we should merge the "User" model with the "ConnectedAccount" model so that we could have multiple emails per User.
+- The User model is confusing with the concept of User Collective, we
+  should merge the "User" model with the "ConnectedAccount" model so
+  that we could have multiple emails per User.
 - CreatedByUserId is confusing, it should be "CreatedByCollectiveId"

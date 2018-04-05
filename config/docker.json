@@ -4,7 +4,7 @@
     "username": "opencollective",
     "password": "",
     "options": {
-      "host": "127.0.0.1",
+      "host": "postgres",
       "dialect": "postgres",
       "logging": false,
       "benchmark": true
@@ -14,18 +14,13 @@
     "database": "postgres",
     "username": "postgres",
     "password": "",
-    "options": {
-      "host": "127.0.0.1"
-    }
+    "options": { "host": "postgres" }
   },
   "keys": {
     "opencollective": {
       "api_key": "dvl-1510egmf4a23d80342403fb599qd",
       "secret": "dvl-7749ba6ad8e62b53b18b4c30295f45d849c1",
-      "session_secret": "i&j@/V6Wx.`g>Aq?qQQF(>u)/Erm;3A="
+      "session_secret": "()x}xU<e6)91+Nh$A$m*z/Jb4sI9LV"
     }
-  },
-  "stripe": {
-    "platformPublishableKey": "pk_test_VgSB4VSg2wb5LdAkz7p38Gw8"
   }
 }
