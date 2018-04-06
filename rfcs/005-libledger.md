@@ -4,17 +4,17 @@
 
 The Ledger API will now provide the following tools:
 
-* `Promise<Number> balance(Number CollectiveId)`
+* `Promise<Object> balance(number CollectiveId)`
 
-  Return the amount of funds in a ledger after summing up all the
-  transactions.
+  Return the amount of funds for each currency ledger of a given
+  collective.
 
   ```javascript
   > await libledger.balance(665)
   { usd: 4325 }
   ```
 
-* `Promise<Object> summary(String TransactionGroup)`
+* `Promise<Object> summary(string TransactionGroup)`
 
   Return an object describing all the rows related to a single
   transaction.

@@ -103,16 +103,16 @@ ledger including calculate (& cache) the balance, getting fees etc.
 The example shown in the section "Create separate transactions for
 fees" would be represented in the database by the following rows:
 
-|             from |               to |   type | amount |
-|-----------------:|-----------------:|-------:|-------:|
-|             User |       Collective |  DEBIT |  -5000 |
-|       Collective |             User | CREDIT |  +5000 |
-|       Collective |             Host |  DEBIT |   -500 |
-|             Host |       Collective | CREDIT |   +500 |
-|       Collective |         Platform |  DEBIT |   -250 |
-|         Platform |       Collective | CREDIT |   +250 |
-|       Collective | Payment Provider |  DEBIT |   -175 |
-| Payment Provider |       Collective | CREDIT |   +175 |
+|             from |               to |   type | amount | currency |
+|-----------------:|-----------------:|-------:|-------:|---------:|
+|             User |       Collective |  DEBIT |  -5000 |      USD |
+|       Collective |             User | CREDIT |  +5000 |      USD |
+|       Collective |             Host |  DEBIT |   -500 |      USD |
+|             Host |       Collective | CREDIT |   +500 |      USD |
+|       Collective |         Platform |  DEBIT |   -250 |      USD |
+|         Platform |       Collective | CREDIT |   +250 |      USD |
+|       Collective | Payment Provider |  DEBIT |   -175 |      USD |
+| Payment Provider |       Collective | CREDIT |   +175 |      USD |
 
 After this operation, if there are no other transactions for the
 entities involved, the output of the `balance()` call for each ledger
