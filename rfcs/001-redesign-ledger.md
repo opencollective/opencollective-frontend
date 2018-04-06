@@ -20,3 +20,4 @@ manage the transactions.
       1. [ ] Store amounts in Host Currency
       2. [ ] Where currency conversion happens
       3. [ ] Multi Wallets
+   4. `libledger` API [rfc-005]
