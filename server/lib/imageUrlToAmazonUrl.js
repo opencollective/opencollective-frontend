@@ -26,7 +26,7 @@ function imageUrlToAmazonUrl(knox_client, src, callback) {
     const contentType = response.headers['content-type'];
     if (response.statusCode === 200) {
       const name = path.basename(src).replace(/\W/g, ''); // remove non alphanumeric
-      const ext = mime.extension(contentType) || path.extname(src).substr(1);
+      const ext = mime.getExtension(contentType) || path.extname(src).substr(1);
       const filename = `/${name}_${uuidv1()}.${ext}`;
 
     this.multiPartUpload({

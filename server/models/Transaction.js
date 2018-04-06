@@ -1,3 +1,5 @@
+/** @module models/Transaction */
+
 import Promise from 'bluebird';
 import activities from '../constants/activities';
 import { type } from '../constants/transactions';

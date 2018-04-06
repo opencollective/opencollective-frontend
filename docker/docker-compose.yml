@@ -2,7 +2,7 @@ version: '3'
 services:
   api:
     build: ./api
-    command: /usr/src/api/docker/wait-for-db.sh npm run dev
+    command: /usr/src/api/docker/wait-for-db.sh npm run docker:dev
     environment:
       NODE_ENV: "docker"
       SEQUELIZE_ENV: "docker"
@@ -29,7 +29,7 @@ services:
       NODE_ENV: "docker"
       API_KEY: "dvl-1510egmf4a23d80342403fb599qd"
       WEBSITE_URL: "http://localhost:13000"
-      API_URL: "http://api:3060"
+      API_URL: "http://localhost:13060"
     volumes:
       - ../../frontend:/usr/src/frontend
     ports:

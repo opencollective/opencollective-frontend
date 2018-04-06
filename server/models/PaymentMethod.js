@@ -1,3 +1,5 @@
+/** @module models/PaymentMethod */
+
 import * as stripe from '../paymentProviders/stripe/gateway';
 import { types as CollectiveTypes } from '../constants/collectives';
 import { type as TransactionTypes } from '../constants/transactions';
@@ -188,8 +190,8 @@ export default function(Sequelize, DataTypes) {
   /**
    * Returns true if this payment method can be used for the given order
    * based on available balance and user
-   * @param order: { totalAmount, currency }
-   * @param user: instanceof models.User
+   * @param {Object} order { totalAmount, currency }
+   * @param {Object} user instanceof models.User
    */
   PaymentMethod.prototype.canBeUsedForOrder = async function(order, user) {
     const name = (this.matching) ? 'matching fund' : 'payment method';
