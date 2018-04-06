@@ -64,12 +64,12 @@ payment processor fee.
 
 ##### How it should look like after this change
 
-|  User | Payment Provider | Platform |  Host | Collective |
-|------:|-----------------:|---------:|------:|-----------:|
-| -5000 |             5000 |          |       |            |
-|       |             -250 |      250 |       |            |
-|       |            -4575 |          |  4575 |            |
-|       |                  |          | -4325 |       4325 |
+|      User | Collective |     Host | Platform | Payment Provider |
+|----------:|-----------:|---------:|---------:|-----------------:|
+| -5000 USD |  +5000 USD |          |          |                  |
+|           |   -500 USD | +500 USD |          |                  |
+|           |   -250 USD |          | +250 USD |                  |
+|           |   -175 USD |          |          |         +175 USD |
 
 #### Use case example (Expense)
 
@@ -87,11 +87,10 @@ to User with 2.9%+30c of payment processor fee.
 
 ##### How it should look like after this change
 
-| Collective |  Host | Payment Provider | User |
-|-----------:|------:|-----------------:|-----:|
-|      -5000 |  5000 |                  |      |
-|            | -5175 |             5175 |      |
-|            |       |            -5000 | 5000 |
+| Collective |      User | Payment Provider |
+|-----------:|----------:|-----------------:|
+|  -5000 USD | +5000 USD |                  |
+|   -175 USD |           |         +175 USD |
 
 #### Where did the net amount go
 
@@ -99,51 +98,35 @@ The net amount won't be a static value in the database anymore. The
 next section introduces an API that provides core operations to the
 ledger including calculate (& cache) the balance, getting fees etc.
 
-## Ledger API (`libocledger`)
+#### Table Format
 
-The Ledger API will now provide the following tools:
+The example shown in the section "Create separate transactions for
+fees" would be represented in the database by the following rows:
 
- * `Number balance(Number CollectiveId)`
+|             from |               to |   type | amount |
+|-----------------:|-----------------:|-------:|-------:|
+|             User |       Collective |  DEBIT |  -5000 |
+|       Collective |             User | CREDIT |  +5000 |
+|       Collective |             Host |  DEBIT |   -500 |
+|             Host |       Collective | CREDIT |   +500 |
+|       Collective |         Platform |  DEBIT |   -250 |
+|         Platform |       Collective | CREDIT |   +250 |
+|       Collective | Payment Provider |  DEBIT |   -175 |
+| Payment Provider |       Collective | CREDIT |   +175 |
 
-   Return the amount of funds in a ledger after summing up all the
-   transactions.
+After this operation, if there are no other transactions for the
+entities involved, the output of the `balance()` call for each ledger
+should be:
 
-   ```javascript
-   > libledger.balance(665)
-   4325
-   ```
-
- * `Object<String,Number> summary(String TransactionGroup)`
-
-   Return an object describing all the rows related to a single
-   transaction.
-
-   ```javascript
-   > libledger.summary('d3e36baa-69a2-4f6e-ac44-f93981e51c97')
-   { amount: 500, sumfees: 95, netAmount: 405 }
-   ```
-
- * `Object<String,Number> fees(String TransactionGroup)`
- 
-   Return an `Object` with keys containing the names of the fees and
-   their respective values.
-
-   ```javascript
-   > libledger.fees('d3e36baa-69a2-4f6e-ac44-f93981e51c97')
-   { platformFeeInHostCurrency: -25, hostFeeInHostCurrency: -25, paymentProcessorFeeInHostCurrency: -45 }
-   ```
-
- * `Object<String,Number> rows(String TransactionGroup)`
-
-   Return an `Object` describing all the rows related to a single
-   transaction.
-
-   ```javascript
-   > libledger.rows('d3e36baa-69a2-4f6e-ac44-f93981e51c97')
-   [
-     { fromCollective: 10165, collective: 90000, amount: -5000 }, // from User to Payment Provider
-     { fromCollective: 90000, collective: 1, amount: 250 },       // from Payment Provider to Platform
-     { fromCollective: 90000, collective: 11004, amount: 4575 },  // from Payment Provider to Host
-     { fromCollective: 11004, collective: 58, amount: 4325 },     // from Host to Collective
-   ]
-   ```
+```javascript
+> (await libledger.balance(userCollective.id))['usd']
+-5000
+> (await libledger.balance(collective.id)))['usd']
++4075
+> (await libledger.balance(hostCollective.id)))['usd']
++500
+> (await libledger.balance(platformCollective.id)))['usd']
++250
+> (await libledger.balance(paymentProviderCollective.id)))['usd']
++175
+```
