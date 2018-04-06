@@ -2,7 +2,7 @@ import Promise from 'bluebird';
 import activities from '../constants/activities';
 import { type } from '../constants/transactions';
 import CustomDataTypes from './DataTypes';
-import uuid from 'uuid';
+import uuidv4 from 'uuid/v4';
 import debugLib from 'debug';
 import { toNegative } from '../lib/math';
 
@@ -290,7 +290,7 @@ export default (Sequelize, DataTypes) => {
 
     transaction.type = (transaction.amount > 0) ? type.CREDIT : type.DEBIT;
     transaction.netAmountInCollectiveCurrency = transaction.netAmountInCollectiveCurrency || transaction.amount;
-    transaction.TransactionGroup = uuid.v4();
+    transaction.TransactionGroup = uuidv4();
     transaction.hostCurrencyFxRate = transaction.hostCurrencyFxRate || 1;
 
     const oppositeTransaction = {

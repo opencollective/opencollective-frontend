@@ -2,7 +2,7 @@
 
 const DRY_RUN = false;
 
-const uuid = require('uuid');
+const uuidv4 = require('uuid/v4');
 const Promise = require('bluebird');
 
 const pick = (obj, attributes) => {
@@ -33,7 +33,7 @@ const updateTransactions = (sequelize) => {
     totalTransactions++;
 
     transaction.txnCurrencyFxRate = transaction.txnCurrencyFxRate || 1;
-    transaction.TransactionGroup = uuid.v4();
+    transaction.TransactionGroup = uuidv4();
 
     const updateOriginalTransaction = () => sequelize.query(`UPDATE "Transactions" SET "TransactionGroup"=:TransactionGroup WHERE id=:id`, { replacements: { id: transaction.id, TransactionGroup: transaction.TransactionGroup }});
 
@@ -46,7 +46,7 @@ const updateTransactions = (sequelize) => {
       netAmountInCollectiveCurrency: -transaction.amount,
       amountInTxnCurrency: -transaction.netAmountInCollectiveCurrency / transaction.txnCurrencyFxRate,
       hostFeeInTxnCurrency: null,
-      uuid: uuid.v4()
+      uuid: uuidv4()
     }
     if (DRY_RUN) {
       console.log("------------------------------------")
@@ -63,7 +63,7 @@ const updateTransactions = (sequelize) => {
         FromCollectiveId: null, // money doesn't come from a collective but from an external source (Host's bank account)
         currency: transaction.currency,
         netAmountInCollectiveCurrency: transaction.amount,
-        uuid: uuid.v4(),
+        uuid: uuidv4(),
         hostFeeInTxnCurrency: null,
         platformFeeInTxnCurrency: null,
         paymentProcessorFeeInTxnCurrency: null

@@ -1,5 +1,5 @@
 import config from 'config';
-import uuid from 'uuid';
+import uuidv1 from 'uuid/v1';
 import errors from './errors';
 import paypalAdaptive from '../paymentProviders/paypal/adaptiveGateway';
 
@@ -18,7 +18,7 @@ const services = {
       currencyCode: expense.currency,
       feesPayer: 'SENDER',
       memo: `Reimbursement from ${collective.name}: ${expense.description}`,
-      trackingId: [uuid.v1().substr(0, 8), expense.id].join(':'),
+      trackingId: [uuidv1().substr(0, 8), expense.id].join(':'),
       preapprovalKey,
       returnUrl: `${baseUrl}/success`,
       cancelUrl: `${baseUrl}/cancel`,

@@ -1,7 +1,7 @@
 import models from '../../models';
 import paypalAdaptive from './adaptiveGateway';
 import config from 'config';
-import uuid from 'uuid';
+import uuidv1 from 'uuid/v1';
 import { formatCurrency } from '../../lib/utils';
 import debugLib from 'debug';
 const debug = debugLib('paypal');
@@ -45,7 +45,7 @@ export default {
       currencyCode: expense.currency,
       feesPayer: 'SENDER',
       memo: `Reimbursement from ${collective.name}: ${expense.description}`,
-      trackingId: [uuid.v1().substr(0, 8), expense.id].join(':'),
+      trackingId: [uuidv1().substr(0, 8), expense.id].join(':'),
       preapprovalKey,
       returnUrl: `${baseUrl}/success`,
       cancelUrl: `${baseUrl}/cancel`,

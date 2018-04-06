@@ -1,7 +1,7 @@
 'use strict';
 
 const Promise = require('bluebird');
-const uuid = require('uuid');
+const uuidv4 = require('uuid/v4');
 
 const DRY_RUN = false;
 
@@ -407,7 +407,7 @@ const addTransactionGroupsForOrders = (sequelize) => {
             AND "TransactionGroup" IS NULL
           `, {
             replacements: {
-              uuid: uuid.v4(),
+              uuid: uuidv4(),
               orderId: orderId.OrderId
             }
           })
