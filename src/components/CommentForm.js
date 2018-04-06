@@ -1,13 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import withIntl from '../lib/withIntl';
-import { defineMessages, FormattedNumber, FormattedMessage } from 'react-intl';
+import { defineMessages, FormattedNumber, FormattedMessage, FormattedDate } from 'react-intl';
 import { imagePreview, capitalize } from '../lib/utils';
 import { graphql } from 'react-apollo'
 import gql from 'graphql-tag'
 import InputField from './InputField';
 import SmallButton from './SmallButton';
 import MarkdownEditor from './MarkdownEditor';
+import Avatar from './Avatar';
+import Link from './Link';
 
 class CommentForm extends React.Component {
 
@@ -48,7 +50,18 @@ class CommentForm extends React.Component {
 
   render() {
     const { LoggedInUser } = this.props;
+    if (!LoggedInUser) return <div />;
 
+    const comment = {
+      createdAt: new Date,
+      fromCollective: {
+        id: LoggedInUser.collective.id,
+        slug: LoggedInUser.collective.slug,
+        name: LoggedInUser.collective.name,
+        image: LoggedInUser.image
+      }
+    };
+    console.log(">>> LoggedInUser", LoggedInUser);
     return (
         <div className={`CommentForm`}>
         <style jsx>{`
@@ -58,11 +71,27 @@ class CommentForm extends React.Component {
             transition: max-height 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
           }
         `}</style>
-        <div className="comment">
-          <MarkdownEditor onChange={markdown => this.handleChange('markdown', markdown)} />
+
+        <div className="fromCollective">
+          <a href={`/${comment.fromCollective.slug}`} title={comment.fromCollective.name}>
+            <Avatar src={comment.fromCollective.image} key={comment.fromCollective.id} radius={40} />
+          </a>
         </div>
-        <div className="actions">
-          <SmallButton className="primary save" onClick={this.onSubmit}><FormattedMessage id="comment.btn" defaultMessage="Comment" /></SmallButton>        
+        <div className="body">
+          <div className="header">
+            <div className="meta">
+              <span className="createdAt"><FormattedDate value={comment.createdAt} day="numeric" month="numeric" /></span> |&nbsp;
+              <span className="metaItem"><Link route={`/${comment.fromCollective.slug}`}>{comment.fromCollective.name}</Link></span>
+            </div>
+            <div className="description">
+              <div className="comment">
+                <MarkdownEditor preview={false} onChange={markdown => this.handleChange('markdown', markdown)} />
+              </div>
+              <div className="actions">
+                <SmallButton className="primary save" onClick={this.onSubmit}><FormattedMessage id="comment.btn" defaultMessage="Comment" /></SmallButton>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     );

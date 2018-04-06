@@ -73,7 +73,7 @@ class Comment extends React.Component {
     } = this.props;
 
     return (
-      <div className={`comment ${status} ${this.state.mode}View`}>
+      <div className={`comment ${this.state.mode}View`}>
         <style jsx>{`
           .comment {
             width: 100%;
@@ -138,6 +138,9 @@ class Comment extends React.Component {
           .comment .actions > div > div {
             margin-right: 0.5rem;
           }
+          .comment p {
+            margin: 0rem;
+          }
         `}</style>
         <div className="fromCollective">
           <a href={`/${comment.fromCollective.slug}`} title={comment.fromCollective.name}>
@@ -148,7 +151,7 @@ class Comment extends React.Component {
           <div className="header">
             <div className="meta">
               <span className="createdAt"><FormattedDate value={comment.createdAt} day="numeric" month="numeric" /></span> |&nbsp;
-              <span className="metaItem"><Link route={`/${comment.collective.slug}/comments/${comment.category}`}>{capitalize(comment.category)}</Link></span>
+              <span className="metaItem"><Link route={`/${comment.fromCollective.slug}`}>{comment.fromCollective.name}</Link></span>
               { editable && LoggedInUser && LoggedInUser.canEditComment(comment) &&
                 <span> | <a className="toggleEditComment" onClick={this.toggleEdit}>{intl.formatMessage(this.messages[`${this.state.mode === 'edit' ? 'cancelEdit' : 'edit'}`])}</a></span>
               }

@@ -11,7 +11,8 @@ class MarkdownEditor extends React.Component {
   static propTypes = {
     placeholder: PropTypes.string,
     defaultValue: PropTypes.string,
-    onChange: PropTypes.func
+    onChange: PropTypes.func,
+    preview: PropTypes.bool
   };
 
   constructor (props) {
@@ -29,11 +30,14 @@ class MarkdownEditor extends React.Component {
 
   render () {
     return (
-      <div className="MarkdownEditor">
+      <div className={`${this.props.preview === false ? 'noPreview' : ''} MarkdownEditor`}>
         <style dangerouslySetInnerHTML={{ __html: stylesheet }} />
         <style jsx global>{`
           .MarkdownEditor .react-mde-editor {
             width: 50%;
+          }
+          .MarkdownEditor.noPreview .react-mde-preview {
+            display: none;
           }
           .MarkdownEditor .react-mde-preview {
             width: 50%;

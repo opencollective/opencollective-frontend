@@ -69,7 +69,7 @@ class CommentsWithData extends React.Component {
           LoggedInUser={LoggedInUser}
           />
 
-        <CommentForm onSubmit={this.createComment} />
+        <CommentForm onSubmit={this.createComment} LoggedInUser={LoggedInUser} />
 
       </div>
     );
