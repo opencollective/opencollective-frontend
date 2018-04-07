@@ -349,8 +349,8 @@ describe('graphql.collective.test.js', () => {
       result.errors && console.error(result.errors);
       expect(result.errors).to.not.exist;
       const members = result.data.allMembers;
-      expect(members[0].role).to.equal('ADMIN');
-      expect(members[0].collective.slug).to.equal('brusselstogether');
+      expect(members[0].role).to.equal('BACKER');
+      expect(members[0].collective.slug).to.equal('brusselstogether-collective');
       expect(members[0].member.slug).to.equal('xdamman');
       expect(members).to.have.length(10);
     });

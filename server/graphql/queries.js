@@ -544,8 +544,8 @@ const queries = {
 
         // If we request the data of the member, we do a JOIN query
         // that allows us to sort by Member.member.name
+        const memberCond = {};
         if (req.body.query.match(/ member ?\{/) || args.type) {
-          const memberCond = {};
           if (args.type) {
             const types = args.type.split(',');
             memberCond.type = { $in: types };
@@ -562,10 +562,30 @@ const queries = {
         }
         if (args.limit) query.limit = args.limit;
         if (args.offset) query.offset = args.offset;
-        
+
         return getCollectiveIds().then(collectiveIds => {
           query.where[attr] = { $in: collectiveIds };
+          query.where.role = { $ne: 'HOST' };
           return models.Member.findAll(query);
+        }).then(members => {
+          // also fetch the list of collectives that are members of the host
+          if (args.includeHostedCollectives) {
+            query.where = { MemberCollectiveId: args.CollectiveId, role: 'HOST' };
+            query.order = [[sequelize.literal(`collective.name`), 'ASC']];
+            query.include = [{
+              model: models.Collective,
+              as: 'collective',
+              required: true
+            }]
+
+            return models.Member.findAll(query).map(m => {
+              m.memberCollective = m.collective;
+              delete m.collective;
+              members.push(m);
+            }).then(() => members)
+          } else {
+            return members;
+          }
         })
       }
     }
