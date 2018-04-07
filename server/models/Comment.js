@@ -143,6 +143,10 @@ export default function(Sequelize, DataTypes) {
           CollectiveId: instance.CollectiveId,
           data: {
             CommentId: instance.id,
+            comment: {
+              id: instance.id,
+              html: instance.html
+            },
             FromCollectiveId: instance.FromCollectiveId,
             ExpenseId: instance.ExpenseId,
             UpdateId: instance.UpdateId

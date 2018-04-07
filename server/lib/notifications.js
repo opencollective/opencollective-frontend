@@ -179,9 +179,10 @@ async function notifyByEmail(activity) {
       if (activity.UserId === activity.data.UserId) {
         // then, if the expense was already approved, we notify the admins of the host
         if (get(activity, 'data.expense.status') === 'APPROVED') {
-          notifyAdminsOfCollective(get(activity, 'data.collective.HostCollectiveId'), activity, { exclude: [activity.UserId] });          
+          notifyAdminsOfCollective(get(activity, 'data.collective.HostCollectiveId'), activity, { exclude: [activity.UserId] });
         } else {
-          // or, if the expense hans't been approved yet, we notifiy the admins of the host
+          // or, if the expense hans't been approved yet, we notifiy the admins of the collective and the admins of the host
+          notifyAdminsOfCollective(get(activity, 'data.collective.HostCollectiveId'), activity, { exclude: [activity.UserId] });
           notifyAdminsOfCollective(activity.CollectiveId, activity, { exclude: [activity.UserId] });
         }
       } else {
