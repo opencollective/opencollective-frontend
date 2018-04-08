@@ -4,6 +4,7 @@
 import pg from 'pg';
 import Sequelize from 'sequelize';
 import { database as config } from 'config';
+import debug from 'debug';
 
 // this is needed to prevent sequelize from converting integers to strings, when model definition isn't clear
 // like in case of the key totalOrders and raw query (like User.getTopBackers())
@@ -23,12 +24,12 @@ if (config.options.logging) {
   if (process.env.NODE_ENV === 'production') {
     config.options.logging = (query, executionTime) => {
       if (executionTime > 50) {
-        console.log(query.replace(/(\n|\t| +)/g,' ').slice(0, 100), '|', executionTime, 'ms');
+        debug("psql")(query.replace(/(\n|\t| +)/g,' ').slice(0, 100), '|', executionTime, 'ms');
       }
     }
   } else {
     config.options.logging = (query, executionTime) => {
-      console.log(`\n-------------------- <query> --------------------\n`,query,`\n-------------------- </query executionTime="${executionTime}"> --------------------\n`);
+      debug("psql")(`\n-------------------- <query> --------------------\n`,query,`\n-------------------- </query executionTime="${executionTime}"> --------------------\n`);
     }
   }
 }

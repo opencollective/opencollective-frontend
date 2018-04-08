@@ -16,6 +16,7 @@ import { sequelize as db } from '../models';
 import { middleware } from '../graphql/loaders';
 import debug from 'debug';
 import lruCache from '../middleware/lru_cache';
+import { sanitizeForLogs } from '../lib/utils';
 
 const SequelizeStore = connectSessionSequelize(session.Store);
 
@@ -59,7 +60,7 @@ export default function(app) {
       if (timeElapsed > (process.env.SLOW_REQUEST_THRESHOLD || 1000)) {
         if (req.body && req.body.query) {
           console.log(">>> slow request", req.body.operationName, "query:", req.body.query.substr(0, req.body.query.indexOf(")")+1));
-          console.log(">>> variables: ", req.body.variables);
+          console.log(">>> variables: ", sanitizeForLogs(req.body.variables));
         }
       }
       temp.apply(this,arguments);
