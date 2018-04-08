@@ -317,7 +317,7 @@ const getCollectivesByTag = (tag, limit, excludeList, minTotalDonationInCents, r
   }
 
   return sequelize.query(`
-    with "totalDonations" AS (
+    WITH "totalDonations" AS (
       SELECT t."CollectiveId", SUM("netAmountInCollectiveCurrency") as "totalDonations"
       FROM "Collectives" c
       LEFT JOIN "Transactions" t ON t."CollectiveId" = c.id

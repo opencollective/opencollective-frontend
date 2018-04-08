@@ -30,7 +30,7 @@ import errors from './lib/errors';
 import { formatError } from 'apollo-errors';
 
 import sanitizer from './middleware/sanitizer';
-
+import { sanitizeForLogs } from './lib/utils';
 import debug from 'debug';
 
 /**
@@ -50,7 +50,8 @@ export default (app) => {
 
   if (process.env.DEBUG) {
     app.use('*', (req, res, next) => {
-      const body = Object.assign({}, req.body);
+      const body = sanitizeForLogs(req.body || {});
+      debug('operation')(body.operationName, JSON.stringify(body.variables, null));
       if (body.query) {
         const query = body.query;
         debug('params')(query);

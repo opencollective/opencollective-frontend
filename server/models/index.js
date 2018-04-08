@@ -22,7 +22,9 @@ if (process.env.DEBUG && process.env.DEBUG.match(/psql/)) {
 if (config.options.logging) {
   if (process.env.NODE_ENV === 'production') {
     config.options.logging = (query, executionTime) => {
-      console.log(query.slice(0, 100), '|', executionTime, 'ms');
+      if (executionTime > 50) {
+        console.log(query.replace(/(\n|\t| +)/g,' ').slice(0, 100), '|', executionTime, 'ms');
+      }
     }
   } else {
     config.options.logging = (query, executionTime) => {
