@@ -103,30 +103,45 @@ ledger including calculate (& cache) the balance, getting fees etc.
 The example shown in the section "Create separate transactions for
 fees" would be represented in the database by the following rows:
 
-|             from |               to |   type | amount | currency |
-|-----------------:|-----------------:|-------:|-------:|---------:|
-|             User |       Collective |  DEBIT |  -5000 |      USD |
-|       Collective |             User | CREDIT |  +5000 |      USD |
-|       Collective |             Host |  DEBIT |   -500 |      USD |
-|             Host |       Collective | CREDIT |   +500 |      USD |
-|       Collective |         Platform |  DEBIT |   -250 |      USD |
-|         Platform |       Collective | CREDIT |   +250 |      USD |
-|       Collective | Payment Provider |  DEBIT |   -175 |      USD |
-| Payment Provider |       Collective | CREDIT |   +175 |      USD |
+|             from |               to |   type |   hostId | currency | amount |
+|-----------------:|-----------------:|-------:|---------:|---------:|-------:|
+|             User |       Collective |  DEBIT | USD-HOST |      USD |  -5000 |
+|       Collective |             User | CREDIT | USD-HOST |      USD |  +5000 |
+|       Collective |             Host |  DEBIT | USD-HOST |      USD |   -500 |
+|             Host |       Collective | CREDIT | USD-HOST |      USD |   +500 |
+|       Collective |         Platform |  DEBIT | USD-HOST |      USD |   -250 |
+|         Platform |       Collective | CREDIT | USD-HOST |      USD |   +250 |
+|       Collective | Payment Provider |  DEBIT | USD-HOST |      USD |   -175 |
+| Payment Provider |       Collective | CREDIT | USD-HOST |      USD |   +175 |
 
-After this operation, if there are no other transactions for the
-entities involved, the output of the `balance()` call for each ledger
-should be:
+#### Balance and Host Balance
+
+After the operation above, if there are no other transactions for the
+entities involved, the output of the `accumulatedBalance()` call for
+each ledger should be:
 
 ```javascript
-> (await libledger.balance(userCollective.id))['usd']
+> await libledger.accumulatedBalance(userCollective.id)
 -5000
-> (await libledger.balance(collective.id)))['usd']
+> await libledger.accumulatedBalance(collective.id)
 +4075
-> (await libledger.balance(hostCollective.id)))['usd']
+> await libledger.accumulatedBalance(hostCollective.id)
 +500
-> (await libledger.balance(platformCollective.id)))['usd']
+> await libledger.accumulatedBalance(platformCollective.id)
 +250
-> (await libledger.balance(paymentProviderCollective.id)))['usd']
+> await libledger.accumulatedBalance(paymentProviderCollective.id)
 +175
 ```
+
+Notice that the balance on the `hostCollective` only sums up the fees
+received by the host. Another API call is needed to sum up all the
+host fees and assets of all collectives hosted:
+`accumulatedHostBalance`.
+
+```javascript
+> await libledger.accumulatedHostBalance(hostCollective.id)
+4575
+```
+
+This balance gets decreased when the collective pays expenses or when
+there are funds transferred to other collectives.
