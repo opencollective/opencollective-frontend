@@ -118,6 +118,7 @@ export function createCollective(_, args, req) {
           if (!hc) return Promise.reject(new Error(`Host collective with id ${args.collective.HostCollectiveId} not found`));
           hostCollective = hc;
           collectiveData.currency = collectiveData.currency || hc.currency;
+          collectiveData.hostFeePercent = hc.hostFeePercent;
           if (req.remoteUser.hasRole([roles.ADMIN, roles.HOST], hostCollective.id)) {
             collectiveData.isActive = true;
           }
