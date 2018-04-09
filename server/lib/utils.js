@@ -8,7 +8,7 @@ import pdf from 'html-pdf';
 import fs from 'fs';
 import path from 'path';
 import handlebars from './handlebars';
-import { get } from 'lodash';
+import { get, cloneDeep } from 'lodash';
 import sanitizeHtml from 'sanitize-html';
 
 const debug = debugLib('utils');
@@ -80,12 +80,38 @@ export function strip_tags(str, allowedTags) {
   });
 }
 
-export const sanitizeObject = (obj, attributes) => {
+export const sanitizeObject = (obj, attributes, sanitizerFn) => {
+  const sanitizer = typeof sanitizerFn === 'function'
+    ? sanitizerFn
+    : strip_tags;
+
   attributes.forEach(attr => {
     if (!obj[attr]) return;
-    obj[attr] = strip_tags(obj[attr] || "");
+    if (typeof obj[attr] === 'object') return sanitizeObject(obj[attr], Object.keys(obj[attr]), sanitizerFn);
+    obj[attr] = sanitizer(obj[attr] || "");
   });
   return obj;
+}
+
+/**
+ * recursively reads all values of an object and hide emails and tokens
+ * @param {*} obj 
+ */
+export const sanitizeForLogs = (obj) => {
+  const sanitizer = (value) => {
+    if (!value) return;
+    if (typeof value === 'string') {
+      if (value.indexOf('@') !== -1) {
+        return "(email obfuscated)";
+      }
+      if (value.substr(0,4) === 'tok_') {
+        return "(token obfuscated)";
+      }
+    }
+    return value;
+  }
+
+  return sanitizeObject(cloneDeep(obj), Object.keys(obj), sanitizer);
 }
 
 String.prototype.trunc = function(n, useWordBoundary ) {
@@ -96,7 +122,7 @@ String.prototype.trunc = function(n, useWordBoundary ) {
     : subString)}&hellip;`;
 };
 
-      /**
+/**
  * Generate a secured token that works inside URLs
  * http://stackoverflow.com/a/25690754
  */
