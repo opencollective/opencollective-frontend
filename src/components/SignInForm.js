@@ -119,11 +119,13 @@ class LoginForm extends React.Component {
 
   componentDidMount() {
     // This is required because with 1Password or browser autocomplete, the onChange doesn't get triggered :-/
+    let prevEmail;
     this.interval = setInterval(() => {
       const node = document.querySelector('input[name="email"]');
       if (!node) return;
       const email = node.value;
-      if (isValidEmail(email)) {
+      if (prevEmail !== email && isValidEmail(email)) {
+        prevEmail = email;
         this.handleChange("user", "email", email);
       }
     }, 500);
