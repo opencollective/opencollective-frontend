@@ -112,6 +112,7 @@ Financial contribution: ${percentage}% (${formatCurrency(member.stats.totalDonat
     if (members.length === 0) {
       return (<div />)
     }
+    const additionalBackers = get(collective, 'stats.backers.all') - members.length;
     
     return (
       <div className="TopBackersCover" ref={(node) => this.node = node}>
@@ -170,9 +171,11 @@ Financial contribution: ${percentage}% (${formatCurrency(member.stats.totalDonat
         `}</style>
         <div className="list">
           {members.map(this.renderMember)}
-          <div className="backer stats">
-            <Link route="#contributors"><div className="totalBackersStat">+{get(collective, 'stats.backers.all') - members.length}</div></Link>
-          </div>
+          { additionalBackers > 0 &&
+            <div className="backer stats">
+              <Link route="#contributors"><div className="totalBackersStat">+{additionalBackers}</div></Link>
+            </div>
+          }
         </div>
       </div>
     );
