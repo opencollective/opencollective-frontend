@@ -120,7 +120,6 @@ class Tier extends React.Component {
     const intervals = [ null, 'month', 'year'];
     const currentValues = this.calcCurrentValues();
     const { quantity, amount, interval, presets } = currentValues;
-
     const anchor = (get(tier, 'name') || "").toLowerCase().replace(/ /g,'-');
 
     return (
@@ -298,7 +297,7 @@ class Tier extends React.Component {
                       min={tier.presets && tier.presets[0]}
                       pre={getCurrencySymbol(currency)}
                       type='currency'
-                      defaultValue={amount}
+                      value={amount}
                       onChange={(amount) => this.handleChange('amount', amount)} />
                     </div>
                 </div>

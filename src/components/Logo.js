@@ -6,7 +6,7 @@ export default ({ src, style = {}, height, type = 'ORGANIZATION', website }) => 
   if (!src && website && type==='ORGANIZATION') {
     src = `https://logo.clearbit.com/${getDomain(website)}`;
   }
-  const backgroundStyle = { height, minWidth: Math.max(0, height/2) };
+  const backgroundStyle = { height, minWidth: Math.max(0, parseInt(height)/2) };
   if (!src) {
     backgroundStyle.backgroundImage = `url(${defaultImage[type]})`
   }

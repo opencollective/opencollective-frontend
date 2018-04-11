@@ -138,7 +138,7 @@ class Expenses extends React.Component {
           {expenses.map((expense) =>
             <Expense
               key={expense.id}
-              collective={collective}
+              collective={expense.collective || collective}
               expense={expense}
               editable={editable}
               includeHostedCollectives={includeHostedCollectives}
