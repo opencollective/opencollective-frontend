@@ -292,14 +292,12 @@ export function cancelSubscription(remoteUser, orderId) {
   .then(() => models.Order.findOne(query)) // need to fetch it second time to get updated data.
 }
 
-export function updateSubscription(remoteUser, args) {
-
+export async function updateSubscription(remoteUser, args) {
   if (!remoteUser) {
     throw new errors.Unauthorized({ message: "You need to be logged in to update a subscription"});
   }
 
-  const { id, paymentMethod } = args;
-
+  const { id, paymentMethod, amount } = args;
 
   const query = {
     where: {
@@ -311,63 +309,71 @@ export function updateSubscription(remoteUser, args) {
     ]
   };
 
-  return models.Order.findOne(query)
-  .tap(order => {
-    if (!order) {
-      throw new Error("Subscription not found")
-    }
-    return Promise.resolve();
-  })
-  .tap(order => {
-    if (!remoteUser.isAdmin(order.FromCollectiveId)) {
-      throw new errors.Unauthorized({
-        message: "You don't have permission to update this subscription"
-      })
-    }
-    return Promise.resolve();
-  })
-  .tap(order => {
-    if (!order.Subscription.isActive) {
-      throw new Error('Subscription must be active to be updated');
-    }
-    return Promise.resolve();
-  })
-  .tap(order => {
+  let order = await models.Order.findOne(query);
 
-    let updatePromise;
-    let newPm;
+  if (!order) {
+    throw new Error("Subscription not found")
+  }
+  if (!remoteUser.isAdmin(order.FromCollectiveId)) {
+    throw new errors.Unauthorized({
+      message: "You don't have permission to update this subscription"
+    })
+  }
+  if (!order.Subscription.isActive) {
+    throw new Error('Subscription must be active to be updated');
+  }
 
-    // TODO: Would be even better if we could charge you here directly
-    // before letting you proceed
+  if (amount) {
+    order.Subscription.deactivate();
 
-    // means it's an existing paymentMethod
-    if (paymentMethod.uuid && paymentMethod.uuid.length === 36) {
-      updatePromise = models.PaymentMethod.findOne({where: { uuid: paymentMethod.uuid}})
-        .then(pm => {
-          if (!pm){
-            throw new Error('Payment method not found with this uuid', paymentMethod.uuid);
-          }
-          newPm = pm;
-        })
-    } else {
-      // means it's a new paymentMethod
-      const newPMData = Object.assign(paymentMethod, { CollectiveId: order.FromCollectiveId })
-      updatePromise = models.PaymentMethod.createFromStripeSourceToken(newPMData)
-        .then(pm => newPm = pm)
-    }
+    const newSubscriptionDataValues = Object.assign(pick(order.Subscription.dataValues, [
+      'interval',
+      'nextChargeDate',
+      'nextPeriodStart',
+      'stripeSubscriptionId',
+      'createdAt'
+    ]), {
+      amount: amount,
+      isActive: true,
+      updatedAt: new Date,
+      activatedAt: new Date,
+    });
 
-    // determine if this order was pastdue
-    if (order.Subscription.chargeRetryCount > 0) {
-      const updatedDates = getNextChargeAndPeriodStartDates('updated', order);
-      const chargeRetryCount = getChargeRetryCount('updated', order);
+    const newSubscription = await models.Subscription.create(newSubscriptionDataValues);
 
-      updatePromise = updatePromise
-        .then(() => order.Subscription.update({ nextChargeDate: updatedDates.nextChargeDate, chargeRetryCount }))
-    }
+    order = await order.update({ totalAmount: amount, SubscriptionId: newSubscription.id });
+  }
 
-    return updatePromise
-        .then(() => order.update({ PaymentMethodId: newPm.id}))
-  })
+  if (paymentMethod) {
+      let newPm;
+
+      // TODO: Would be even better if we could charge you here directly
+      // before letting you proceed
+
+      // means it's an existing paymentMethod
+      if (paymentMethod.uuid && paymentMethod.uuid.length === 36) {
+        newPm = await models.PaymentMethod.findOne({ where: { uuid: paymentMethod.uuid }});
+        if (!newPm){
+          throw new Error('Payment method not found with this uuid', paymentMethod.uuid);
+        }
+      } else {
+        // means it's a new paymentMethod
+        const newPMData = Object.assign(paymentMethod, { CollectiveId: order.FromCollectiveId });
+        newPm = await models.PaymentMethod.createFromStripeSourceToken(newPMData);
+      }
+
+      // determine if this order was pastdue
+      if (order.Subscription.chargeRetryCount > 0) {
+        const updatedDates = getNextChargeAndPeriodStartDates('updated', order);
+        const chargeRetryCount = getChargeRetryCount('updated', order);
+
+        await order.Subscription.update({ nextChargeDate: updatedDates.nextChargeDate, chargeRetryCount });
+      }
+
+      order = await order.update({ PaymentMethodId: newPm.id});
+  }
+
+  return order;
 }
 
 export async function refundTransaction(_, args, req) {

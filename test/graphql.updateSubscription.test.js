@@ -10,8 +10,8 @@ import initNock from './graphql.updateSubscription.nock';
 const ordersData = utils.data('orders');
 
 const updateSubscriptionQuery = `
-mutation updateSubscription($id: Int!, $paymentMethod: PaymentMethodInputType) {
-  updateSubscription(id: $id, paymentMethod: $paymentMethod) {
+mutation updateSubscription($id: Int!, $paymentMethod: PaymentMethodInputType, $amount: Int) {
+  updateSubscription(id: $id, paymentMethod: $paymentMethod, amount: $amount) {
     id
     currency
     totalAmount
@@ -120,7 +120,8 @@ describe('graphql.updateSubscriptions.test.js', () => {
           FromCollectiveId: user.CollectiveId,
           CollectiveId: collective.id,
           PaymentMethodId: paymentMethod.id,
-          SubscriptionId: sub.id
+          SubscriptionId: sub.id,
+          totalAmount: sub.amount,
         }))
         .then(order => models.Order.findOne({ where: { id: order.id }, include: [{ model: models.Subscription }]}))
         .tap(o => order = o)
@@ -297,7 +298,6 @@ describe('graphql.updateSubscriptions.test.js', () => {
             }
           }, user);
 
-          console.log(res);
           expect(res.errors).to.not.exist;
 
           const newPM = await models.PaymentMethod.findOne({
@@ -323,6 +323,24 @@ describe('graphql.updateSubscriptions.test.js', () => {
       })
     })
 
+    describe('updating payment amount', async () => {
+
+      it('succeeds when the payment amount is valid', async () => {
+
+        const res = await utils.graphqlQuery(updateSubscriptionQuery, { id: order.id, amount: 4000}, user);
+
+        expect(res.errors).to.not.exist;
+
+        // fetch updated order
+        const updatedOrder = await models.Order.findOne({
+          where: { id: order.id },
+          include: [{ model: models.Subscription }]
+        });
+
+        expect(updatedOrder.totalAmount).to.equal(4000);
+        expect(updatedOrder.Subscription.amount).to.equal(4000);
+      })
+    })
 
   });
 });
