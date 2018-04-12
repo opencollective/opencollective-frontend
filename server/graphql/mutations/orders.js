@@ -353,6 +353,11 @@ export async function updateSubscription(remoteUser, args) {
   }
 
   if (amount) {
+
+    if (amount < 100) {
+      throw new Error('Invalid amount');
+    }
+
     order.Subscription.deactivate();
     order = await order.destroy();
 

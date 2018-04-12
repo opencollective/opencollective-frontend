@@ -325,6 +325,14 @@ describe('graphql.updateSubscriptions.test.js', () => {
 
     describe('updating payment amount', async () => {
 
+      it('fails when the payment amount is invalid', async () => {
+
+        const res = await utils.graphqlQuery(updateSubscriptionQuery, { id: order.id, amount: 1}, user);
+
+        expect(res.errors).to.exist;
+        expect(res.errors[0].message).to.equal('Invalid amount');
+      })
+
       it('succeeds when the payment amount is valid', async () => {
 
         const res = await utils.graphqlQuery(updateSubscriptionQuery, { id: order.id, amount: 4000}, user);
