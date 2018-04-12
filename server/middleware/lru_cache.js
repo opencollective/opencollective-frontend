@@ -38,10 +38,10 @@ export default () => {
           case 'finished':
             debug("sending response", cached.contentType, cached.response);
             res.setHeader("content-type", cached.contentType);
-            return res.send(new Buffer(cached.response, "base64"));
+            return res.send(Buffer.from(cached.response, "base64"));
           case 'running':
             return cached.once('finished', () => {
-              return res.send(new Buffer(cached.response, "base64"));
+              return res.send(Buffer.from(cached.response, "base64"));
             })
         }
       } else {

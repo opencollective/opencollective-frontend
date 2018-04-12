@@ -5,7 +5,6 @@ import emailLib from '../server/lib/email';
 import sinon from 'sinon';
 
 import * as utils from './utils';
-import { waitForCondition } from './utils';
 
 describe('graphql.collective.test.js', () => {
   let host, collective;
@@ -166,7 +165,7 @@ describe('graphql.collective.test.js', () => {
       expect(membership).to.exist;
       expect(membership.MemberCollectiveId).to.equal(user.CollectiveId);
 
-      await waitForCondition(() => emailSendMessageSpy.callCount > 0);
+      await utils.waitForCondition(() => emailSendMessageSpy.callCount > 0);
       expect(emailSendMessageSpy.callCount).to.equal(1);
       expect(emailSendMessageSpy.firstCall.args[0]).to.equal("testuser@opencollective.com");
       expect(emailSendMessageSpy.firstCall.args[1]).to.equal("New expense on Test Collective: $10 for Test expense for pizza");

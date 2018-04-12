@@ -1,13 +1,12 @@
 /**
  * Dependencies.
  */
-import _, { get } from 'lodash';
+import _, { get, difference, uniq, pick } from 'lodash';
 import Temporal from 'sequelize-temporal';
 import config from 'config';
 import deepmerge from 'deepmerge';
 import prependHttp from 'prepend-http';
 import queries from '../lib/queries';
-import { difference, uniq, pick } from 'lodash';
 import { types } from '../constants/collectives';
 import roles from '../constants/roles';
 import { HOST_FEE_PERCENT } from '../constants/transactions';
