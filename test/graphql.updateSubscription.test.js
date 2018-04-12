@@ -339,18 +339,18 @@ describe('graphql.updateSubscriptions.test.js', () => {
 
         expect(res.errors).to.not.exist;
 
-        // fetch updated order
-        const updatedOrder = await models.Order.findOne({
+        const matchingOrders = await models.Order.findAll({
           where: {
             CreatedByUserId: order.CreatedByUserId,
-            CollectiveId: order.CollectiveId,
-            deletedAt: null,
+            CollectiveId: order.CollectiveId
           },
           include: [{ model: models.Subscription }]
         });
 
-        expect(updatedOrder.totalAmount).to.equal(4000);
-        expect(updatedOrder.Subscription.amount).to.equal(4000);
+        const activeOrder = matchingOrders.find(order => order.Subscription.isActive);
+
+        expect(activeOrder.totalAmount).to.equal(4000);
+        expect(activeOrder.Subscription.amount).to.equal(4000);
       })
     })
 

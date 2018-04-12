@@ -359,7 +359,6 @@ export async function updateSubscription(remoteUser, args) {
     }
 
     order.Subscription.deactivate();
-    order = await order.destroy();
 
     const newSubscriptionDataValues = Object.assign(omit(order.Subscription.dataValues, [
       'id',
@@ -375,7 +374,6 @@ export async function updateSubscription(remoteUser, args) {
 
     const newOrderDataValues = Object.assign(omit(order.dataValues, [
       'id',
-      'deletedAt',
     ]), {
       totalAmount: amount,
       SubscriptionId: newSubscription.id,
