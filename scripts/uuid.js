@@ -1,3 +1,3 @@
-import uuid from 'uuid';
+import uuidv4 from 'uuid/v4'
 
-console.log(uuid.v4());
+console.log(uuidv4());

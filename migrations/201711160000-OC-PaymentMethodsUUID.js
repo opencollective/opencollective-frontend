@@ -1,5 +1,5 @@
 'use strict';
-const uuid = require('node-uuid');
+const uuidv4 = require('uuid/v4');
 
 // Update all expenses payoutMethod from "manual" to "other"
 // Make sure each organization has an "opencollective" paymentMethod
@@ -23,7 +23,7 @@ const updatePaymentMethods = (sequelize) => {
     if (DRY_RUN) {
       console.log("> Updating ", pm.id, pm.service, pm.name);
     } else {
-      return sequelize.query(`UPDATE "PaymentMethods" SET uuid=:uuid WHERE id=:id`, { replacements: { id: pm.id, uuid: uuid.v4() }});
+      return sequelize.query(`UPDATE "PaymentMethods" SET uuid=:uuid WHERE id=:id`, { replacements: { id: pm.id, uuid: uuidv4() }});
     }
   }
 
