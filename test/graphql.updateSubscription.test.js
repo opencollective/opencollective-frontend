@@ -333,7 +333,11 @@ describe('graphql.updateSubscriptions.test.js', () => {
 
         // fetch updated order
         const updatedOrder = await models.Order.findOne({
-          where: { id: order.id },
+          where: {
+            CreatedByUserId: order.CreatedByUserId,
+            CollectiveId: order.CollectiveId,
+            deletedAt: null,
+          },
           include: [{ model: models.Subscription }]
         });
 

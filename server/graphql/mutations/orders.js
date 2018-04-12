@@ -1,4 +1,4 @@
-import { pick } from 'lodash';
+import { pick, omit } from 'lodash';
 import Promise from 'bluebird';
 
 import models from '../../models';
@@ -323,27 +323,6 @@ export async function updateSubscription(remoteUser, args) {
     throw new Error('Subscription must be active to be updated');
   }
 
-  if (amount) {
-    order.Subscription.deactivate();
-
-    const newSubscriptionDataValues = Object.assign(pick(order.Subscription.dataValues, [
-      'interval',
-      'nextChargeDate',
-      'nextPeriodStart',
-      'stripeSubscriptionId',
-      'createdAt'
-    ]), {
-      amount: amount,
-      isActive: true,
-      updatedAt: new Date,
-      activatedAt: new Date,
-    });
-
-    const newSubscription = await models.Subscription.create(newSubscriptionDataValues);
-
-    order = await order.update({ totalAmount: amount, SubscriptionId: newSubscription.id });
-  }
-
   if (paymentMethod) {
       let newPm;
 
@@ -371,6 +350,34 @@ export async function updateSubscription(remoteUser, args) {
       }
 
       order = await order.update({ PaymentMethodId: newPm.id});
+  }
+
+  if (amount) {
+    order.Subscription.deactivate();
+    order = await order.destroy();
+
+    const newSubscriptionDataValues = Object.assign(omit(order.Subscription.dataValues, [
+      'id',
+      'deactivatedAt',
+    ]), {
+      amount: amount,
+      updatedAt: new Date,
+      activatedAt: new Date,
+      isActive: true,
+    });
+
+    const newSubscription = await models.Subscription.create(newSubscriptionDataValues);
+
+    const newOrderDataValues = Object.assign(omit(order.dataValues, [
+      'id',
+      'deletedAt',
+    ]), {
+      totalAmount: amount,
+      SubscriptionId: newSubscription.id,
+      updatedAt: new Date,
+    });
+
+    order = await models.Order.create(newOrderDataValues);
   }
 
   return order;
