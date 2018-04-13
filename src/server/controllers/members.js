@@ -83,7 +83,7 @@ export async function list(req, res, next) {
       }
     }
   }
-  `; 
+  `;
   const vars = { collectiveSlug: eventSlug || collectiveSlug };
   if (role === 'attendees') vars.role = 'ATTENDEE';
   if (role === 'followers') vars.role = 'FOLLOWER';
@@ -151,7 +151,7 @@ export async function list(req, res, next) {
     });
     return res;
   }
-  
+
   const data = members.map(applyMapping);
 
   switch (req.params.format) {
@@ -160,7 +160,7 @@ export async function list(req, res, next) {
       res.setHeader('content-type', 'text/csv');
       res.send(csv);
       break;
-    
+
     default:
       res.send(data);
       break;

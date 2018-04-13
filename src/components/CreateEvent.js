@@ -21,7 +21,7 @@ class CreateEvent extends React.Component {
   constructor(props) {
     super(props);
     const timezone = moment.tz.guess();
-    this.state = { event: { 
+    this.state = { event: {
       parentCollective: props.parentCollective,
       timezone, // "Europe/Brussels", // "America/New_York"
     }, result: {} };

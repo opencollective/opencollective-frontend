@@ -28,7 +28,7 @@ export default ({src, radius, id, title, className}) => {
           background-repeat: no-repeat;
           background-position: center center;
           border-radius: 50%;
-          background-size: cover;          
+          background-size: cover;
         }
       `}</style>
       {image &&

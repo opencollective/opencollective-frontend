@@ -182,7 +182,7 @@ class CreateCollectiveForm extends React.Component {
       });
     });
   }
-  
+
   handleChange(fieldname, value) {
     if (fieldname === 'category' && value === 'opensource') {
       return window.location = '/opensource/apply';
@@ -309,13 +309,13 @@ class CreateCollectiveForm extends React.Component {
           margin: 1rem 0 3rem 0;
         }
         `}</style>
- 
+
         { this.categories.length > 1 && <CollectiveCategoryPicker categories={this.categories} onChange={(value) => this.handleChange("category", value)} /> }
 
         { showForm &&
           <div className="FormInputs">
             { Object.keys(this.fields).map(key =>
-              <div className="inputs" key={key}>
+              (<div className="inputs" key={key}>
                 {this.fields[key].map((field) => (!field.when || field.when()) && <InputField
                   key={`${this.masterKey}-${field.name}`}
                   value={this.state.collective[field.name]}
@@ -334,7 +334,7 @@ class CreateCollectiveForm extends React.Component {
                   context={this.state.collective}
                   onChange={(value) => this.handleChange(field.name, value)}
                   />)}
-              </div>
+              </div>)
             )}
 
             <div className="tos">

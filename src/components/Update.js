@@ -171,14 +171,14 @@ class Update extends React.Component {
           }
 
           <div className="meta">
-            <div className="author"><Link route={`/${update.fromCollective.slug}`}><a>{update.fromCollective.name}</a></Link></div> 
+            <div className="author"><Link route={`/${update.fromCollective.slug}`}><a>{update.fromCollective.name}</a></Link></div>
             <Role role='ADMIN' />
-            { update.publishedAt && 
+            { update.publishedAt &&
               <div className="publishedAt">
                 <FormattedMessage id="update.publishedAt" defaultMessage={"published on {date}"} values={{date: formatDate(update.publishedAt, { day: 'numeric', month: 'long', year: 'numeric' })}} />
               </div>
             }
-            { !update.publishedAt && 
+            { !update.publishedAt &&
               <div className="createdAt">
                 <FormattedMessage id="update.createdAt" defaultMessage={"created on {date} (draft)"} values={{date: formatDate(update.createdAt)}} />
               </div>

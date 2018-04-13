@@ -85,7 +85,7 @@ class UpdatesWithData extends React.Component {
         <Updates
           collective={collective}
           updates={updates}
-          editable={!Boolean(compact)}
+          editable={!compact}
           fetchMore={this.props.fetchMore}
           LoggedInUser={LoggedInUser}
           includeHostedCollectives={includeHostedCollectives}
@@ -160,7 +160,7 @@ export const addUpdatesData = graphql(getUpdatesQuery, {
         }
       })
     }
-  })  
+  })
 });
 
 export default addUpdatesData(withIntl(UpdatesWithData));

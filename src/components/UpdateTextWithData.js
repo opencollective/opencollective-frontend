@@ -14,7 +14,7 @@ class UpdateText extends React.Component {
   }
 
   constructor(props) {
-    super(props); 
+    super(props);
   }
 
   render() {
@@ -27,7 +27,7 @@ class UpdateText extends React.Component {
 
     return (
       <div className={`UpdateText ${this.props.mode}`}>
-        <div 
+        <div
           dangerouslySetInnerHTML={{
             __html: html
           }}

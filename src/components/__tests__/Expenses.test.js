@@ -25,12 +25,12 @@ describe("Expenses component", () => {
 
   }
 
-  const expenseConsts = { 
-    currency: 'USD', 
-    status: 'APPROVED', 
-    payoutMethod: 'paypal', 
+  const expenseConsts = {
+    currency: 'USD',
+    status: 'APPROVED',
+    payoutMethod: 'paypal',
     incurredAt: '2017-11-05',
-    collective, 
+    collective,
     fromCollective};
 
   const expenses = [
@@ -38,8 +38,8 @@ describe("Expenses component", () => {
     Object.assign({}, {...expenseConsts}, {id: 2, amount: 1000})
   ];
 
-  const loggedInUser = { 
-    canPayExpense: () => true, 
+  const loggedInUser = {
+    canPayExpense: () => true,
     canApproveExpense: () => true,
     canEditExpense: () => true,
     collective: {
@@ -69,7 +69,7 @@ describe("Expenses component", () => {
 
       // click on the first one
       component.find('.PayExpenseBtn button').first().simulate('click');
-      
+
       // expect two disabled buttons again
       expect(component.find('.PayExpenseBtn button[disabled]').length).toEqual(2);
 

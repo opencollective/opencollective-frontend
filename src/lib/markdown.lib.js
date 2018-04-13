@@ -5,9 +5,9 @@ import slugify from 'slug';
  * @PRE:
  *   param1: value1
  *   param2: value2
- * 
+ *
  *   intro text
- * 
+ *
  *   # title1
  *   Hello
  *   # title2

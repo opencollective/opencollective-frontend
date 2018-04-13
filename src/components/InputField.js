@@ -139,14 +139,14 @@ class InputField extends React.Component {
                               {capitalize(field.label)}
                             </Col>
                             <Col sm={10}>
-                              <InputTypeCreditCard options={field.options} onChange={this.handleChange} style={this.props.style}/>                   
+                              <InputTypeCreditCard options={field.options} onChange={this.handleChange} style={this.props.style}/>
                             </Col>
                           </div>
                         }
                         {!horizontal &&
                           <div>
                             <ControlLabel>{capitalize(field.label)}</ControlLabel>
-                            <InputTypeCreditCard onChange={this.handleChange} style={this.props.style}/>                   
+                            <InputTypeCreditCard onChange={this.handleChange} style={this.props.style}/>
                           </div>
                         }
                       </FormGroup>)

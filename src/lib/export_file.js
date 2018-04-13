@@ -17,7 +17,7 @@ export function json2csv(json) {
         if (typeof td === 'string')
           return td.replace(/"/g,'""').replace(/\n/g,'  ');
         else
-          return (td || '') + '';
+          return `${td || ''  }`;
       }).join('","')}"`);
   })
   return lines.join('\n');
@@ -64,5 +64,5 @@ export async function exportMembers(collectiveSlug, tierSlug, options = { type: 
   const csv = await get(path, options);
   const date = formatDate(new Date);
   return exportFile('text/plain;charset=utf-8', `${date.replace(/\-/g,'')}${path.replace(/\//g,'-')}`, csv);
-  
+
 }

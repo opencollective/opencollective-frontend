@@ -32,8 +32,8 @@ class MembershipsWithData extends React.Component {
   }
 
   onChange() {
-    const { onChange } = this.props; 
-    onChange && this.node && onChange({ height: this.node.offsetHeight });    
+    const { onChange } = this.props;
+    onChange && this.node && onChange({ height: this.node.offsetHeight });
   }
 
   componentDidMount() {
@@ -89,11 +89,11 @@ class MembershipsWithData extends React.Component {
 
         <div className="Collectives cardsList">
           {memberships.map((membership) =>
-            <Membership
+            (<Membership
               key={membership.id}
               membership={membership}
               LoggedInUser={LoggedInUser}
-              />
+              />)
           )}
         </div>
         { memberships.length % 10 === 0 && memberships.length >= limit &&
@@ -175,7 +175,7 @@ export const addMembershipsData = graphql(getMembershipsQuery, {
         }
       })
     }
-  })  
+  })
 });
 
 

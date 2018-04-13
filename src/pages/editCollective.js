@@ -38,7 +38,7 @@ class EditCollectivePage extends React.Component {
     const collective = data.Collective;
 
     window.OC = { collective };
-    
+
     return (
       <div>
         <EditCollective collective={collective} LoggedInUser={LoggedInUser} />

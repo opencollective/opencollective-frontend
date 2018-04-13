@@ -132,12 +132,12 @@ class Transactions extends React.Component {
             </div>
           }
           {transactions.map((transaction) =>
-            <Transaction
+            (<Transaction
               key={transaction.id}
               collective={collective}
               transaction={transaction}
               LoggedInUser={LoggedInUser}
-            />
+            />)
           )}
           { transactions.length === 0 &&
             <div className="empty">

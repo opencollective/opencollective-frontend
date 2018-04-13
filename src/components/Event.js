@@ -78,7 +78,7 @@ class Event extends React.Component {
   }
 
   /**
-   * If user is logged in, we directly create a response 
+   * If user is logged in, we directly create a response
    * Otherwise, we show the form to enter an email address
    */
   async setInterested(member) {
@@ -291,13 +291,13 @@ class Event extends React.Component {
 
                   <section id="tickets">
                     { event.tiers.map((tier) =>
-                      <Tier
+                      (<Tier
                         key={tier.id}
                         tier={tier}
                         values={this.state.tierInfo[tier.id] || {}}
                         onChange={(response) => this.updateOrder(response)}
                         onClick={(response) => this.handleOrderTier(response)}
-                        />
+                        />)
                     )}
                   </section>
                 </div>

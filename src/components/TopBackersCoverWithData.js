@@ -61,7 +61,7 @@ Financial contribution: ${percentage}% (${formatCurrency(member.stats.totalDonat
             height: auto;
             max-width: 96px;
           }
-          `}</style>      
+          `}</style>
           <Link route={`/${org.slug}`} title={title}>
             <Logo src={org.image} height={36} />
           </Link>
@@ -69,7 +69,7 @@ Financial contribution: ${percentage}% (${formatCurrency(member.stats.totalDonat
       </div>
     )
   }
-  
+
   renderUser(member, index) {
     const user = member.member;
 
@@ -113,7 +113,7 @@ Financial contribution: ${percentage}% (${formatCurrency(member.stats.totalDonat
       return (<div />)
     }
     const additionalBackers = get(collective, 'stats.backers.all') - members.length;
-    
+
     return (
       <div className="TopBackersCover" ref={(node) => this.node = node}>
         <style jsx>{`

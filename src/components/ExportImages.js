@@ -135,9 +135,9 @@ class ExportImages extends React.Component {
         { tier &&
           <div>
             { tier.images.map(image =>
-              <div>
+              (<div>
                 <label>{image.name}</label>
-                <div 
+                <div
                   dangerouslySetInnerHTML={{
                     __html: image.code
                   }}
@@ -149,13 +149,13 @@ class ExportImages extends React.Component {
                   <table><tbody>
                     <tr><th>parameter</th><th>description</th><th>default value</th></tr>
                     { image.options.map(option =>
-                      <tr>
+                      (<tr>
                         <th valign="top">{option.name}</th><td valign="top">{option.description}</td><td valign="top">{option.defaultValue}</td>
-                      </tr>
+                      </tr>)
                     )}
                   </tbody></table>
                 </div>
-              </div>
+              </div>)
             )}
           </div>
         }

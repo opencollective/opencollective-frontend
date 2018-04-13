@@ -87,11 +87,11 @@ class CollectivesForRedeemPageWithData extends React.Component {
 
         <div className="Collectives cardsList">
           { collectives.map((collective) =>
-            <CollectiveCardWithRedeem
+            (<CollectiveCardWithRedeem
               key={collective.id}
               collective={collective}
               showRedeemPrompt={true}
-            />
+            />)
           )}
         </div>
         <div className="loadMoreBtn">
@@ -163,7 +163,7 @@ export const addCollectivesData = graphql(getCollectivesQuery, {
         }
       })
     }
-  })  
+  })
 });
 
 

@@ -230,7 +230,7 @@ class TopBarProfileMenu extends React.Component {
   renderLoggedInUser() {
     const { showProfileMenu } = this.state;
     const { LoggedInUser } = this.props;
-    
+
     return (
       <div className={`TopBarProfileMenu ${showProfileMenu ? '-active' : ''}`} onClick={this.toggleProfileMenu}>
         <style jsx>{`

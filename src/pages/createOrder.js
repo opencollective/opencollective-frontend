@@ -34,7 +34,7 @@ class CreateOrderPage extends React.Component {
       totalAmount: parseInt(props.totalAmount, 10) || null
     };
 
-    switch(props.verb) {
+    switch (props.verb) {
       case 'pay':
         this.defaultType = 'PAYMENT';
         break;
@@ -105,7 +105,7 @@ class CreateOrderPage extends React.Component {
       const res = await this.props.createOrder(order);
       const orderCreated = res.data.createOrder;
       this.setState({ loading: false, order, result: { success: intl.formatMessage(this.messages['order.success']) } });
-      Router.pushRoute('collective', { 
+      Router.pushRoute('collective', {
         slug: orderCreated.fromCollective.slug,
         status: order.paymentMethod.type === 'bitcoin' ? 'orderProcessing' : 'orderCreated',
         CollectiveId: order.collective.id,
@@ -132,7 +132,7 @@ class CreateOrderPage extends React.Component {
     if (TierId) {
       tier = collective.tiers.find(t => t.id === TierId);
     }
-    
+
     tier = tier || {
       name: intl.formatMessage(this.messages[`${this.defaultType.toLowerCase()}.title`]),
       presets: !this.order.totalAmount && [1000, 5000, 10000], // we only offer to customize the contribution if it hasn't been specified in the URL

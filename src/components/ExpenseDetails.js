@@ -34,7 +34,7 @@ class ExpenseDetails extends React.Component {
     });
 
     this.state = { modified: false, expense: {} };
- 
+
   }
 
   getOptions(arr, intlVars) {

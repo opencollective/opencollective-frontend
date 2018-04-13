@@ -16,7 +16,7 @@ class UpdateWithData extends React.Component {
   }
 
   constructor(props) {
-    super(props); 
+    super(props);
   }
 
   render() {

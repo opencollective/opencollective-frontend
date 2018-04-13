@@ -17,13 +17,13 @@ export default function(slug = '') {
         'Fees',
         'Fireside Chat',
         'Global Development',
-        'Hack Night', 
+        'Hack Night',
         'Hackathon',
         'Leadership Development',
         'Leadership Supplies',
         'Lightning Talks',
         'Scholarship',
-        'Speaker Series', 
+        'Speaker Series',
         'Sponsorship',
         'Tech Panel',
         'Transaction Fees',
@@ -114,7 +114,7 @@ export default function(slug = '') {
         'Other'
        ];
       break;
-      
+
     default:
       categories = [
         'Communications',

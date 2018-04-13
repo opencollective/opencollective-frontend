@@ -113,7 +113,7 @@ ${totalDonationsStr}`
           font-size: 1.4rem;
         }
 
-        `}</style>          
+        `}</style>
         <div>
           { viewMode === 'USER' &&
             <Link route={'collective'} params={{ slug: this.props.member.member.slug}} target="_top" title={title}>

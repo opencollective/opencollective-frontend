@@ -130,7 +130,7 @@ class AddFundsForm extends React.Component {
         newState[obj].hostFeePercent = 0;
       }
     }
-    
+
     this.setState(newState);
     if (typeof window !== "undefined") {
       window.state = newState;
@@ -227,7 +227,7 @@ class AddFundsForm extends React.Component {
                 <Row>
                   <Col sm={12}>
                     <div className="form-group">
-                      <label className="col-sm-3 control-label"><FormattedMessage id="addfunds.details" defaultMessage="Details" /></label>  
+                      <label className="col-sm-3 control-label"><FormattedMessage id="addfunds.details" defaultMessage="Details" /></label>
                       <Col sm={9}>
                         <table className="details">
                           <tbody>

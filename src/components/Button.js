@@ -43,7 +43,7 @@ class Button extends React.Component {
 
   renderButton() {
     return (
-      <button 
+      <button
         type={this.props.type}
         disabled={this.props.disabled}
         style={this.props.style}

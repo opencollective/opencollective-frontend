@@ -23,7 +23,7 @@ class Expense extends React.Component {
     LoggedInUser: PropTypes.object,
     allowPayAction: PropTypes.bool,
     lockPayAction: PropTypes.func,
-    unlockPayAction: PropTypes.func 
+    unlockPayAction: PropTypes.func
   }
 
   constructor(props) {
@@ -243,7 +243,7 @@ class Expense extends React.Component {
               { includeHostedCollectives &&
                 <span className="collective"><Link route={`/${expense.collective.slug}`}>{expense.collective.slug}</Link> (balance: {formatCurrency(expense.collective.stats.balance, expense.collective.currency)}) | </span>
               }
-              <span className="status">{intl.formatMessage(this.messages[status])}</span> | 
+              <span className="status">{intl.formatMessage(this.messages[status])}</span> |
               <span className="metaItem"><Link route={`/${expense.collective.slug}/expenses/${expense.category}`}>{capitalize(expense.category)}</Link></span>
               { editable && LoggedInUser && LoggedInUser.canEditExpense(expense) &&
                 <span> | <a className="toggleEditExpense" onClick={this.toggleEdit}>{intl.formatMessage(this.messages[`${mode === 'edit' ? 'cancelEdit' : 'edit'}`])}</a></span>

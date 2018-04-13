@@ -98,10 +98,10 @@ class SubscriptionsRedirectPage extends React.Component {
             <div className='content'>
               <div className='Subscriptions-header'>
                 <div className='Subscriptions-title'>
-                  {this.state.LoggedInUser && 
-                    <div> 
-                      This page has moved. Your subscriptions are now at 
-                      <Link route={'subscriptions'} params={{collectiveSlug: LoggedInUser.collective.slug }}> 
+                  {this.state.LoggedInUser &&
+                    <div>
+                      This page has moved. Your subscriptions are now at
+                      <Link route={'subscriptions'} params={{collectiveSlug: LoggedInUser.collective.slug }}>
                         <span className='link'> /{LoggedInUser.collective.slug}/subscriptions</span>
                       </Link>. Redirecting...
                     </div>}

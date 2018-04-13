@@ -31,7 +31,7 @@ class ExpenseForm extends React.Component {
     });
 
     this.state = { expense: {} };
- 
+
   }
 
   getOptions(arr, intlVars) {

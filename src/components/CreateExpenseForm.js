@@ -51,7 +51,7 @@ class CreateExpenseForm extends React.Component {
       isExpenseValid: false,
       loading: false
     };
- 
+
   }
 
   getOptions(arr, intlVars) {

@@ -203,11 +203,11 @@ class MenuBar extends React.Component {
         }
         `}</style>
         { this.state.menuItems.map((item, index) =>
-          <div className={`item ${item.anchor} ${this.state.selectedAnchor === item.anchor && 'selected'}`} key={`item-${index}-${item.link}`}>
+          (<div className={`item ${item.anchor} ${this.state.selectedAnchor === item.anchor && 'selected'}`} key={`item-${index}-${item.link}`}>
             <Link route={item.link} animate={{offset}}>
               { this.messages[item.anchor] ? intl.formatMessage(this.messages[item.anchor]): (item.title || item.anchor) }
             </Link>
-          </div>
+          </div>)
         )}
         { LoggedInUser && LoggedInUser.canEditCollective(collective) &&
           <div className="admin">

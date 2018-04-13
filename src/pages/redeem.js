@@ -155,7 +155,7 @@ class RedeemPage extends React.Component {
                   Redeem Gift Card
                 </div>
                 <div className='Redeem-hero-line2'>
-                  Open Collective helps communities - like open source projects, meetups, etc - raise money and operate transparently. 
+                  Open Collective helps communities - like open source projects, meetups, etc - raise money and operate transparently.
 
                   It's easy. Enter your gift code at the bottom of a project and we'll credit them with your gift card amount.
                 </div>

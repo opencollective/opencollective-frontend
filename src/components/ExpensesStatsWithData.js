@@ -15,7 +15,7 @@ class ExpensesStatsWithData extends React.Component {
   }
 
   constructor(props) {
-    super(props); 
+    super(props);
   }
 
   render() {

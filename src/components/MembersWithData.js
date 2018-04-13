@@ -35,8 +35,8 @@ class MembersWithData extends React.Component {
   }
 
   onChange() {
-    const { onChange } = this.props; 
-    onChange && this.node && onChange({ height: this.node.offsetHeight });    
+    const { onChange } = this.props;
+    onChange && this.node && onChange({ height: this.node.offsetHeight });
   }
 
   componentDidMount() {
@@ -88,7 +88,7 @@ class MembersWithData extends React.Component {
         return aDate - bDate;
       }
     });
-    
+
     const size = members.length > 50 ? "small" : "large";
     let viewMode = (type && type.split(',')[0]) || "USER";
     if (tier && tier.name.match(/sponsor/i)) {
@@ -152,14 +152,14 @@ class MembersWithData extends React.Component {
 
         <div className="Members cardsList">
           {members.map((member) =>
-            <Member
+            (<Member
               key={member.id}
               member={member}
               className={classNames(this.props.className, size)}
               collective={collective}
               viewMode={viewMode}
               LoggedInUser={LoggedInUser}
-              />
+              />)
           )}
         </div>
         { members.length % 10 === 0 && members.length >= limit &&
@@ -237,7 +237,7 @@ export const addMembersData = graphql(getMembersQuery, {
         }
       })
     }
-  })  
+  })
 });
 
 

@@ -45,7 +45,7 @@ class InputTypeCreditCard extends React.Component {
         this.setState({ loading: false });
       })
       card.addEventListener('change', (event) => {
-        var displayError = document.getElementById('card-errors');
+        const displayError = document.getElementById('card-errors');
         if (event.error) {
           this.setState({ error: event.error.message })
         } else {
@@ -53,7 +53,7 @@ class InputTypeCreditCard extends React.Component {
           this.setState({ error: '' })
         }
       });
-      
+
     }
   }
 

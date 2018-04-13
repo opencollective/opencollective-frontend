@@ -36,7 +36,7 @@ const getStripeToken = (type = 'cc', data) => {
           email: data.email,
           name: data.name
         }
-      }).then(function(res) {
+      }).then((res) => {
         if (res.error) {
           throw new Error(res.error.message);
         }

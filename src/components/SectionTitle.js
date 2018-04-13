@@ -100,7 +100,7 @@ class SectionTitle extends React.Component {
           { subtitle && <div className="subtitle">{subtitle}</div> }
         </div>
       </div>
-    );    
+    );
   }
 }
 

@@ -93,7 +93,7 @@ class CollectivePickerWithData extends React.Component {
     const { intl } = this.props;
     const badgeCount = collective.stats.expenses.pending + collective.stats.expenses.approved;
 
-    let tooltipArray = [];
+    const tooltipArray = [];
     if (collective.stats.expenses.pending > 0) {
       tooltipArray.push(intl.formatMessage(this.messages['badge.tooltip.pending'], collective.stats.expenses));
     }
@@ -379,7 +379,7 @@ export const addCollectivesData = graphql(getCollectivesQuery, {
         }
       })
     }
-  })  
+  })
 });
 
 

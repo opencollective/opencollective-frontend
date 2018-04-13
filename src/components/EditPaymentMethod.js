@@ -38,7 +38,7 @@ class EditPaymentMethod extends React.Component {
   removePaymentMethod() {
     this.onChange(null);
   }
-  
+
   handleChange(obj) {
     const updatedPaymentMethod = { ...this.state.paymentMethod, ...obj }
     this.setState({ paymentMethod: updatedPaymentMethod });
@@ -76,7 +76,7 @@ class EditPaymentMethod extends React.Component {
                     <div className="name col">{label}</div>
                       { paymentMethod.orders.length > 0 &&
                         <div className="actions">
-                          <FormattedMessage id="paymentMethod.activeSubscriptions" defaultMessage="{n} active {n, plural, one {subscription} other {subscriptions}}" values={{ n: paymentMethod.orders.length }} />&nbsp; 
+                          <FormattedMessage id="paymentMethod.activeSubscriptions" defaultMessage="{n} active {n, plural, one {subscription} other {subscriptions}}" values={{ n: paymentMethod.orders.length }} />&nbsp;
                           <Button bsStyle="default" bsSize="xsmall" onClick={() => Router.push(`/subscriptions?collectiveSlug=${this.props.slug}`, `/subscriptions/${this.props.slug}`)}>{intl.formatMessage(this.messages[`paymentMethod.editSubscriptions`])}</Button>
                         </div>
                       }

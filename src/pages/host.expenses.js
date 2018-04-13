@@ -41,12 +41,12 @@ class HostExpensesPage extends React.Component {
   render() {
     const { data } = this.props;
     const { LoggedInUser } = this.state;
-    
+
     if (data.error) {
       console.error("graphql error>>>", data.error.message);
       return (<ErrorPage message="GraphQL error" />)
     }
-    
+
     if (!data.Collective) return (<Loading />);
 
     const collective = data.Collective;

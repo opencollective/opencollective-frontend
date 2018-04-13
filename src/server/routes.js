@@ -77,7 +77,7 @@ module.exports = (server, app) => {
    * Ideally we should consolidate those routes under:
    * `/:collectiveSlug/members/:backerType(all|users|organizations)`
    */
-  server.use('/public', express.static(path.join(__dirname, `../public`), { maxAge: '1d' }));  
+  server.use('/public', express.static(path.join(__dirname, `../public`), { maxAge: '1d' }));
 
   server.get('/:collectiveSlug/:image(avatar|logo).:format(txt|png|jpg|gif|svg)', mw.maxAge(7200), controllers.collectives.logo);
   server.get('/:collectiveSlug/:backerType.svg', controllers.collectives.banner);

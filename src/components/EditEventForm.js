@@ -18,7 +18,7 @@ class EditEventForm extends React.Component {
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.handleTiersChange = this.handleTiersChange.bind(this);
-    
+
     const event = { ... props.event || {} };
     event.slug = event.slug ? event.slug.replace(/.*\//, '') : '';
     this.state = { event, tiers: event.tiers || [{}] };
@@ -166,7 +166,7 @@ class EditEventForm extends React.Component {
 
         <div className="FormInputs">
           <div className="inputs">
-            {this.fields.map((field) => <InputField
+            {this.fields.map((field) => (<InputField
               key={field.name}
               defaultValue={this.state.event[field.name] || field.defaultValue}
               validate={field.validate}
@@ -179,7 +179,7 @@ class EditEventForm extends React.Component {
               pre={field.pre}
               context={this.state.event}
               onChange={(value) => this.handleChange(field.name, value)}
-              />)}
+              />))}
           </div>
           <EditTiers
             title="Tickets"

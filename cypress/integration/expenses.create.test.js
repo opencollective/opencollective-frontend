@@ -19,14 +19,14 @@ const uploadReceipt = (dropzoneElement = '.InputTypeDropzone') => {
         files: [],
     },
   };
-  
+
   cy.fixture('./images/receipt.jpg').then((picture) => {
       return Cypress.Blob.base64StringToBlob(picture, 'image/jpeg').then((blob) => {
           dropEvent.dataTransfer.files.push(blob);
       });
   });
-  
-  cy.get(dropzoneElement).trigger('drop', dropEvent);    
+
+  cy.get(dropzoneElement).trigger('drop', dropEvent);
   cy.wait(900);
 }
 
@@ -103,7 +103,7 @@ describe("new expense", () => {
     cy.screenshot("expenseSaved");
     cy.get('.Expenses .expense:first .ApproveExpenseBtn button').click();
     cy.wait(300);
-    cy.get('.Expenses .expense:first .status').contains("approved")    
+    cy.get('.Expenses .expense:first .status').contains("approved")
   })
 
 })

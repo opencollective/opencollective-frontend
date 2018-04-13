@@ -48,9 +48,9 @@ export const addSubscriptionsData = graphql(getSubscriptionsQuery, {
       variables: {
         slug: props.slug,
       }
-    } 
+    }
   },
-  
+
   props: ({ data, ownProps }) => {
 
     let subscriptions = [];
@@ -63,7 +63,8 @@ export const addSubscriptionsData = graphql(getSubscriptionsQuery, {
         const memberInfo = data.Collective.memberOf.filter(member => member.collective.id === s.collective.id)[0];
         if (memberInfo) {
           s.stats = memberInfo.stats || {};
-        }});
+        }
+});
 
     }
 
@@ -71,7 +72,7 @@ export const addSubscriptionsData = graphql(getSubscriptionsQuery, {
       data,
       subscriptions
     })
-  } 
+  }
 
 });
 

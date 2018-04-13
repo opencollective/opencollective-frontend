@@ -74,7 +74,7 @@ export async function info(req, res, next) {
   }
 
   res.send(response);
-};
+}
 
 export async function logo(req, res, next) {
 
@@ -132,7 +132,7 @@ export async function logo(req, res, next) {
         .pipe(res);
       break;
   }
-};
+}
 
 export async function banner(req, res) {
   const { collectiveSlug, tierSlug, backerType } = req.params;
@@ -143,7 +143,7 @@ export async function banner(req, res) {
   const height = Number(req.query.height) || 0;
   const { avatarHeight, margin } = req.query;
   const showBtn = (req.query.button === 'false') ? false : true;
-  
+
   let users = cache.get(queryString.stringify(req.params));
   if (!users) {
     try {
@@ -224,7 +224,7 @@ export async function website(req, res) {
   req.ga.event(`GithubWidget-${selector}`, `Click`, user.slug, position);
 
   res.redirect(301, redirectUrl);
-     
+
 }
 
 export async function avatar(req, res, next) {
@@ -318,5 +318,5 @@ export async function avatar(req, res, next) {
         res.headers['Cache-Control'] = 'public, max-age=300';
       })
       .pipe(res);
-  }  
+  }
 }

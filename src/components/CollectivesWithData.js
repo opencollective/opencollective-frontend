@@ -35,12 +35,12 @@ class CollectivesWithData extends React.Component {
   }
 
   componentDidMount() {
-    const { onChange } = this.props; 
+    const { onChange } = this.props;
     onChange && this.node && onChange({ height: this.node.offsetHeight });
   }
 
   fetchMore(e) {
-    const { onChange } = this.props; 
+    const { onChange } = this.props;
     e.target.blur();
     this.setState({ loading: true });
     this.props.fetchMore().then(() => {
@@ -103,10 +103,10 @@ class CollectivesWithData extends React.Component {
 
         <div className="Collectives cardsList">
           { collectives.map((collective) =>
-            <CollectiveCard
+            (<CollectiveCard
               key={collective.id}
               collective={collective}
-            />
+            />)
           )}
         </div>
         { collectives.length % 10 === 0 && collectives.length >= limit &&
@@ -184,7 +184,7 @@ export const addCollectivesData = graphql(getCollectivesQuery, {
         }
       })
     }
-  })  
+  })
 });
 
 

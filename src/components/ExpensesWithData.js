@@ -50,7 +50,7 @@ class ExpensesWithData extends React.Component {
           collective={collective}
           expenses={expenses}
           refetch={data.refetch}
-          editable={!Boolean(compact)}
+          editable={!compact}
           fetchMore={this.props.fetchMore}
           filters={filters}
           LoggedInUser={LoggedInUser}
@@ -151,7 +151,7 @@ export const addExpensesData = graphql(getExpensesQuery, {
         }
       })
     }
-  })  
+  })
 });
 
 export default addExpensesData(withIntl(ExpensesWithData));

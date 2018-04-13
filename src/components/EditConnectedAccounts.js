@@ -48,10 +48,10 @@ class EditConnectedAccounts extends React.Component {
       <div className="EditConnectedAccounts">
 
       { this.state.services.map(service =>
-        <div key={`connect-${service}`}>
+        (<div key={`connect-${service}`}>
           <h2>{capitalize(service)}</h2>
           <EditConnectedAccount collective={collective} service={service} connectedAccount={this.connectedAccounts[service] && this.connectedAccounts[service][0]} />
-        </div>
+        </div>)
         ) }
 
       </div>

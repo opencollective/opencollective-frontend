@@ -175,10 +175,10 @@ class CollectiveCardWithRedeem extends React.Component {
             padding: 10px 0px;
           }
           `}</style>
-        
-        <Link 
+
+        <Link
           route={'donate'}
-          params={{ 
+          params={{
             collectiveSlug: this.props.collective.slug,
             verb: 'donate',
             description: 'Gift card',

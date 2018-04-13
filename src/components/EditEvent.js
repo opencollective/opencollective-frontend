@@ -88,7 +88,7 @@ class EditEvent extends React.Component {
             margin-bottom: 5rem;
           }
         `}</style>
-        
+
         <Header
           title={parentCollective.name}
           description={parentCollective.description}
@@ -113,7 +113,7 @@ class EditEvent extends React.Component {
                 <p>You need to be logged in as the creator of this event<br />or as a core contributor of the {event.parentCollective.name} collective.</p>
                 <p><Button bsStyle="primary" href={`/signin?next=/${event.slug}/edit`}>Login</Button></p>
               </div>
-            }   
+            }
             { canEditEvent &&
               <div>
                 <EditEventForm event={event} onSubmit={this.editEvent} loading={this.state.status === 'loading'} />

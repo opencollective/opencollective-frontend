@@ -68,7 +68,7 @@ class ExpensesSection extends React.Component {
               />
             { this.totalExpenses > 0 &&
               <div className="actions">
-                <a className="ViewAllExpensesBtn" onClick={() =>Router.pushRoute(`${collective.path}/expenses`)}><FormattedMessage id="expenses.viewAll" defaultMessage="View All Expenses" /></a>
+                <a className="ViewAllExpensesBtn" onClick={() => Router.pushRoute(`${collective.path}/expenses`)}><FormattedMessage id="expenses.viewAll" defaultMessage="View All Expenses" /></a>
               </div>
             }
           </div>

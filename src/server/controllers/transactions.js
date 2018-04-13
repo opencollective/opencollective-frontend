@@ -75,7 +75,7 @@ export async function invoice(req, res, next) {
     console.log(">>> error message", e.message);
     return next(e);
   }
-  
+
   const pageFormat = (req.query.pageFormat === 'A4' || invoice.fromCollective.currency === 'EUR')
     ? 'A4'
     : 'Letter';

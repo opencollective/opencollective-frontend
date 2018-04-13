@@ -20,7 +20,7 @@ class EventsWithData extends React.Component {
   }
 
   componentDidMount() {
-    const { onChange } = this.props; 
+    const { onChange } = this.props;
     this.isIframe = window.self !== window.top && window.location.hostname !== "localhost"; // cypress is using an iframe for e2e testing;
     onChange && this.node && onChange({ height: this.node.offsetHeight });
   }

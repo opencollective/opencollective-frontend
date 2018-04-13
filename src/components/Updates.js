@@ -33,7 +33,7 @@ class Updates extends React.Component {
   setPayActionLock(val) {
     this.setState({ isPayActionLocked: val})
   }
-  
+
   render() {
     const {
       collective,
@@ -94,7 +94,7 @@ class Updates extends React.Component {
             </div>
           }
           { updates.map((update) =>
-            <div key={update.id} className="update">
+            (<div key={update.id} className="update">
               <Update
                 compact={true}
                 collective={collective}
@@ -103,7 +103,7 @@ class Updates extends React.Component {
                 includeHostedCollectives={includeHostedCollectives}
                 LoggedInUser={LoggedInUser}
                 />
-            </div>
+            </div>)
           )}
           { updates.length === 0 &&
             <div className="empty">

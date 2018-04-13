@@ -130,20 +130,20 @@ class Subscriptions extends React.Component {
 
         <div className='active'>
           { activeSubs.map((subscription) =>
-            <SubscriptionCard
+            (<SubscriptionCard
               subscription={subscription}
               key={'active-' + subscription.collective.id}
               LoggedInUser={LoggedInUser}
               paymentMethods={collective.paymentMethods}
               slug={collective.slug}
-            />
+            />)
           )}
         </div>
-        {activeSubs.length === 0 && 
+        {activeSubs.length === 0 &&
           <div className='subscriptions-noactive'>
             <img className='subscriptions-noactive-image' src='/static/images/no-subscription-placeholder.svg' />
             <div className='subscriptions-noactive-text'> Looks like {userString} contributing right now.</div>
-            <div className='subscriptions-noactive-link'> 
+            <div className='subscriptions-noactive-link'>
               <a href='/discover'>Discover more collectives</a>
             </div>
           </div>}
@@ -154,13 +154,13 @@ class Subscriptions extends React.Component {
         { canceledSubs.length > 0 && <div className="subscriptions-cancelled-label"> <span>{intl.formatMessage(this.messages['subscription.canceled.label'])} </span></div>}
         <div className='canceled'>
           { canceledSubs.map((subscription) =>
-            <SubscriptionCard
+            (<SubscriptionCard
               subscription={subscription}
               key={'canceled-' + subscription.id}
               LoggedInUser={LoggedInUser}
               paymentMethods={collective.paymentMethods}
               slug={collective.slug}
-            />
+            />)
           )}
         </div>
       </div>

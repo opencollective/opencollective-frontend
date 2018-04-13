@@ -49,7 +49,7 @@ class MatchingFundWithData extends React.Component {
       this.props.onChange(uuid);
     }
   }
-  
+
   computeAmounts(orderTotalAmount, matchingFund) {
     const totalAmount = orderTotalAmount * matchingFund.matching;
     return {

@@ -182,7 +182,7 @@ class EditCollective extends React.Component {
             margin-bottom: 5rem;
           }
         `}</style>
-        
+
         <Header
           title={collective.name}
           description={collective.description}
@@ -207,7 +207,7 @@ class EditCollective extends React.Component {
                 <p>You need to be logged in as the creator of this collective<br />or as a core contributor of the {collective.name} collective.</p>
                 <SignInForm next={`/${collective.slug}/edit`} />
               </div>
-            }   
+            }
             { canEditCollective &&
               <div>
                 <EditCollectiveForm collective={collective} onSubmit={this.editCollective} loading={this.state.status === 'loading'} />
