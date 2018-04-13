@@ -193,6 +193,20 @@ export default {
     const invoice = event.data.object;
     const invoiceLineItems = invoice.lines.data;
     const stripeSubscription = _.find(invoiceLineItems, { type: 'subscription' });
+
+    /*  
+      If it's an ACH payment (which we don't accept but a host might have others 
+      sending it), we need to send back a 200 or Stripe will keep trying
+
+      This assumes that any 'invoice.payment_succeeded' that is not a subscription
+      will be ignored. 
+
+      TODO: when we start accepting other payment types, need to update this.
+    */
+    if (!stripeSubscription) {
+      return Promise.resolve();
+    }
+
     /* Stripe might send pings for lots of reasons, but we're logging
        this one because it could flag a subscription that wasn't
        migrated to the new system.  */
