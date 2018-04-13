@@ -17,7 +17,7 @@ import CancelSubscriptionBtn from './CancelSubscriptionBtn';
 import PaymentMethodChooser from './PaymentMethodChooser';
 import { getSubscriptionsQuery } from '../graphql/queries';
 import Logo from './Logo';
-import withIntl from '../lib/withIntl'; 
+import withIntl from '../lib/withIntl';
 
 import { Dropdown, MenuItem, Popover, OverlayTrigger } from 'react-bootstrap';
 import { CustomToggle } from './CustomMenu';
@@ -37,10 +37,13 @@ class SubscriptionCard extends React.Component {
     this.update = this.update.bind(this);
     this.onError = this.onError.bind(this);
     this.resetState = this.resetState.bind(this);
+    this.handleAmountChange = this.handleAmountChange.bind(this);
+    this.updateAmount = this.updateAmount.bind(this);
 
     this.stateConstants = {
       normal: 'normal',
-      editPM: 'editPM',
+      editPaymentMethod: 'editPaymentMethod',
+      editAmount: 'editAmount',
       cancelConf: 'cancelConf'
     }
 
@@ -60,20 +63,35 @@ class SubscriptionCard extends React.Component {
     });
   }
 
-  async update(paymentMethod) {
+  async update({ paymentMethod, amount }) {
     const { intl } = this.props;
     this.setState({ loading: true });
-    let res;
     try {
-      res = await this.props.updateSubscription(this.props.subscription.id, paymentMethod);
+      await this.props.updateSubscription(this.props.subscription.id, paymentMethod, amount);
+      if (amount) {
+        // the card is gonna be unmounted, calling setState would result in a React warning
+        return;
+      }
       this.setState({ loading: false, visibleState: this.stateConstants.normal, result: {success: intl.formatMessage(this.messages['subscription.updated'])}})
     } catch (e) {
       this.setState({ loading: false, result: { error: e.graphQLErrors[0].message}});
     }
   }
 
+  async updatePaymentMethod(paymentMethod) {
+    this.update({ paymentMethod });
+  }
+
+  async updateAmount() {
+    this.update({ amount: parseInt(this.state.amountValue, 10) * 100 });
+  }
+
   resetState() {
     this.setState({ visibleState: this.stateConstants.normal, result: {}});
+  }
+
+  handleAmountChange(event) {
+    this.setState({ amountValue: event.target.value });
   }
 
   onError(error) {
@@ -202,7 +220,7 @@ class SubscriptionCard extends React.Component {
           .name {
             cursor: pointer;
           }
-        
+
           .name, .description {
             overflow: hidden;
             text-overflow: ellipsis;
@@ -235,7 +253,7 @@ class SubscriptionCard extends React.Component {
             padding-bottom: 20px;
             border-top: 2px solid #f2f2f2
           }
-          
+
           .amount-frequency {
             margin: auto;
             height: 32px;
@@ -255,14 +273,14 @@ class SubscriptionCard extends React.Component {
           .border-red {
             border-color: #F2F2F2;
           }
-          
+
           .amount {
             font-weight: 700;
             color: #303233;
             font-size: 14px;
             padding-right: 2px;
           }
-          
+
           .frequency {
           }
 
@@ -275,6 +293,42 @@ class SubscriptionCard extends React.Component {
             font-weight: 700;
           }
 
+          .editAmount {
+            position: relative;
+            top: -18px;
+            padding: 0 1rem;
+          }
+
+          .inputAmount {
+            padding-bottom: 1em;
+          }
+
+          .inputAmount .currency, .inputAmount .frequency, .inputAmount input {
+            font-size: 14px;
+            line-height:14px;
+
+            border: 1px solid #d4dae1;
+            padding: 0.5em;
+            background: white;
+          }
+
+          .inputAmount span.currency {
+            color: #d4dae1;
+            border-radius: 9px 0 0 9px;
+            border-right: 0;
+          }
+
+          .inputAmount span.frequency {
+            border-radius: 9px;
+            margin-left: 1em;
+            padding: 0.5em 1em;
+          }
+
+          .inputAmount input {
+            width: 6em;
+            border-radius: 0 9px 9px 0;
+          }
+
           .paymentMethod {
             padding-top: 0.5rem;
           }
@@ -285,10 +339,9 @@ class SubscriptionCard extends React.Component {
             margin-top: 1rem;
           }
 
-          .cancel-buttons {
+          .cancel-buttons, .update-buttons {
             display: flex;
             flex-direction: row;
-            width: 150px;
             justify-content: space-evenly;
             margin: auto;
             margin-top: 4px;
@@ -332,24 +385,25 @@ class SubscriptionCard extends React.Component {
           `}</style>
           <div className='head'>
             <div className='background' style={coverStyle} />
-            {subscription.isPastDue && <div className='polygon'> 
+            {subscription.isPastDue && <div className='polygon'>
               <img title={intl.formatMessage(this.messages['subscription.pastDue'])} src='/static/images/attention-badge.svg' />
             </div>}
             {canEditSubscription && subscription.isSubscriptionActive &&
               <div className={`actions ${this.state.showMenu ? 'selected' : ''}`} onClick={() => this.setState({showMenu: !this.state.showMenu})}>
-              <Dropdown 
+              <Dropdown
                 id='dropdown-custom'
                 className='dropdown-toggle'
                 style={{width: '100%'}}
                 open={this.state.showMenu}
-                onToggle={() => this.setState({showMenu: !this.state.showMenu})} 
+                onToggle={() => this.setState({showMenu: !this.state.showMenu})}
                 onSelect={(eventKey) => this.setState({visibleState: eventKey })}
                 pullRight>
-                <CustomToggle bsRole='toggle'> 
+                <CustomToggle bsRole='toggle'>
                   <img className='actions-image' src={`/static/images/glyph-more.svg`} />
                 </CustomToggle>
                 <Dropdown.Menu className='menu-item'>
-                  <MenuItem style={menuItemStyle} eventKey={this.stateConstants.editPM}>Update payment method</MenuItem>
+                  <MenuItem style={menuItemStyle} eventKey={this.stateConstants.editPaymentMethod}>Update payment method</MenuItem>
+                  <MenuItem style={menuItemStyle} eventKey={this.stateConstants.editAmount}>Update payment amount</MenuItem>
                   <MenuItem style={{ margin: '2px' }} divider />
                   <MenuItem style={menuItemStyle} eventKey={this.stateConstants.cancelConf}>Cancel contribution</MenuItem>
                 </Dropdown.Menu>
@@ -366,38 +420,53 @@ class SubscriptionCard extends React.Component {
             <div className='description'>{description}</div>
           </div>
           <div className='footer'>
+
             <div className='subscription'>
-              <div className={`amount-frequency ${subscription.isPastDue ? 'past-due' : ''}`}>
-                <span className='amount'><Currency value={subscription.totalAmount} currency={subscription.currency} /></span>
-                <span className='currency-frequency'> {subscription.currency.toLowerCase()}/{frequency} </span> 
-              </div>
+              {this.state.visibleState === this.stateConstants.editAmount &&
+                <div className="editAmount">
+                  <div className="inputAmount">
+                    <span className="currency">$</span>
+                    <input type="number" step="0.01" min="1" name="amount" value={this.state.amountValue || subscription.totalAmount / 100} onChange={this.handleAmountChange}/>
+                    <span className="frequency">{subscription.interval === 'year' ? 'Yearly' : 'Monthly'}</span>
+                  </div>
+                  <div className="update-buttons">
+                    <SmallButton className="no" bsStyle="primary" onClick={this.resetState}><FormattedMessage id="subscription.updateAmount.cancel.btn" defaultMessage="cancel" /></SmallButton>
+                    <SmallButton className="yes" bsStyle="primary" onClick={this.updateAmount}><FormattedMessage id="subscription.updateAmount.update.btn" defaultMessage="update" /></SmallButton>
+                  </div>
+                </div>
+              }
+              {this.state.visibleState !== this.stateConstants.editAmount &&
+                <div className={`amount-frequency ${subscription.isPastDue ? 'past-due' : ''}`}>
+                  <span className='amount'><Currency value={subscription.totalAmount} currency={subscription.currency} /></span>
+                  <span className='currency-frequency'> {subscription.currency.toLowerCase()}/{frequency} </span>
+                </div>
+              }
             </div>
 
-            {this.state.visibleState === 'normal' && subscription.stats && Object.keys(subscription.stats).length > 0 && 
-                  <div className='contribution'>
-                    <span className="totalAmount">
-                      <Currency value={get(subscription, 'stats.totalDonations')} currency={subscription.currency} />&nbsp;
-                    </span>
-                    <span className="total-amount-text">{intl.formatMessage(this.messages['subscription.amountToDate'])}</span>
-                  </div>}
+            {this.state.visibleState === 'normal' && subscription.stats && Object.keys(subscription.stats).length > 0 &&
+              <div className='contribution'>
+                <span className="totalAmount">
+                  <Currency value={get(subscription, 'stats.totalDonations')} currency={subscription.currency} />&nbsp;
+                </span>
+                <span className="total-amount-text">{intl.formatMessage(this.messages['subscription.amountToDate'])}</span>
+              </div>}
 
-
-            {this.state.visibleState !== this.stateConstants.cancelConf && subscription.paymentMethod && canEditSubscription && 
+            {this.state.visibleState !== this.stateConstants.cancelConf && subscription.paymentMethod && canEditSubscription &&
               <div className='paymentMethod'>
-                  <PaymentMethodChooser 
-                    paymentMethodInUse={subscription.paymentMethod} 
+                  <PaymentMethodChooser
+                    paymentMethodInUse={subscription.paymentMethod}
                     paymentMethodsList={this.props.paymentMethods}
-                    editMode={this.state.visibleState === this.stateConstants.editPM }
+                    editMode={this.state.visibleState === this.stateConstants.editPaymentMethod }
                     onCancel={this.resetState}
-                    onSubmit={this.update}/>
+                    onSubmit={this.updatePaymentMethod}/>
               </div>}
 
             {this.state.visibleState === 'normal' && subscription.isPastDue &&
             <div className='past-due-msg'>
-              <span onClick={() => this.setState({visibleState: this.stateConstants.editPM})}> {intl.formatMessage(this.messages['subscription.pastDue.msg'])}&nbsp;&nbsp;</span>
+              <span onClick={() => this.setState({visibleState: this.stateConstants.editPaymentMethod})}> {intl.formatMessage(this.messages['subscription.pastDue.msg'])}&nbsp;&nbsp;</span>
               <OverlayTrigger trigger="click" placement={'bottom'} overlay={popover} rootClose>
                 <img className='help-image' src='/static/images/help-icon.svg' />
-              </OverlayTrigger> 
+              </OverlayTrigger>
             </div>}
 
             {this.state.visibleState === this.stateConstants.cancelConf && <div className='cancel'>
@@ -419,7 +488,8 @@ class SubscriptionCard extends React.Component {
                   {this.state.result.error}
                 </div>
               }
-            </div>                   
+            </div>
+
         </div>
       </div>
       );
@@ -427,8 +497,8 @@ class SubscriptionCard extends React.Component {
 }
 
 const updateSubscriptionQuery = gql`
-mutation updateSubscription($id: Int!, $paymentMethod: PaymentMethodInputType) {
-  updateSubscription(id: $id, paymentMethod: $paymentMethod) {
+mutation updateSubscription($id: Int!, $paymentMethod: PaymentMethodInputType, $amount: Int) {
+  updateSubscription(id: $id, paymentMethod: $paymentMethod, amount: $amount) {
     id
     currency
     totalAmount
@@ -436,6 +506,24 @@ mutation updateSubscription($id: Int!, $paymentMethod: PaymentMethodInputType) {
     createdAt
     isSubscriptionActive
     isPastDue
+    collective {
+      id
+      name
+      currency
+      slug
+      type
+      image
+      description
+      longDescription
+      backgroundImage
+    }
+    fromCollective {
+      id
+      slug
+      createdByUser {
+        id
+      }
+    }
     paymentMethod {
       id
       uuid
@@ -478,33 +566,39 @@ query Collective($slug: String!) {
 
 const addMutation = graphql(updateSubscriptionQuery, {
   props: ( { ownProps, mutate }) => ({
-    updateSubscription: async (id, paymentMethod) => {
-      return await mutate({ 
-        variables: { id, paymentMethod },
+    updateSubscription: async (id, paymentMethod, amount) => {
+      return await mutate({
+        variables: { id, paymentMethod, amount },
 
         // this inserts a newly added credit card in one subscription to the list
         // of all subscriptions, so it can be immediately selected.
         update: (proxy, { data: { updateSubscription }}) => {
 
-          // this means an existing card was picked, so nothing to do
-          if (paymentMethod.uuid && paymentMethod.uuid.length === 36) {
-            return Promise.resolve();
-          }
-
-          // Otherwise, a new card was added and we need to add that back in our cache
           const data = proxy.readQuery({
             query: getSubscriptionsQuery,
             variables: { slug: ownProps.slug }
           });
 
-          // find the original list of payment methods fetched
-          const origPaymentMethodList = data.Collective.paymentMethods;
+          if (paymentMethod) {
+            // a new card was added and we need to add that back in our cache
+            if (!paymentMethod.uuid || paymentMethod.uuid.length !== 36) {
+              // find the original list of payment methods fetched
+              const origPaymentMethodList = data.Collective.paymentMethods;
+              // insert it to the end
+              origPaymentMethodList.push(updateSubscription.paymentMethod);
+            }
+          }
 
-          // insert it to the end
-          origPaymentMethodList.push(updateSubscription.paymentMethod);
+          if (amount) {
+            // update the old order/subscription and mark it as unactive
+            const originalOrder = data.Collective.ordersFromCollective.find(order => order.id === id);
+            originalOrder.isSubscriptionActive = false;
+            // insert the new order/subscription
+            data.Collective.ordersFromCollective.push(updateSubscription);
+          }
 
           // write data back for the query
-          proxy.writeQuery({ query: getSubscriptionsQuery, data}); 
+          proxy.writeQuery({ query: getSubscriptionsQuery, data});
         }
       })
     }

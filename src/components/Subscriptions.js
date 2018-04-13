@@ -48,8 +48,8 @@ class Subscriptions extends React.Component {
       return (<div />);
     }
 
-    const activeSubs = subscriptions.filter(s => s.isSubscriptionActive).sort((s1, s2) => s1.id < s2.id);
-    const canceledSubs = subscriptions.filter(s => !s.isSubscriptionActive).sort((s1, s2) => s1.id < s2.id)
+    const activeSubs = subscriptions.filter(s => s.isSubscriptionActive).sort((s1, s2) => s2.id - s1.id);
+    const canceledSubs = subscriptions.filter(s => !s.isSubscriptionActive).sort((s1, s2) => s2.id - s1.id)
 
     let userString = `${collective.name || collective.slug} isn't`;
     if (LoggedInUser && LoggedInUser.canEditCollective(collective)) {
