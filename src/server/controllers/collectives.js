@@ -120,7 +120,7 @@ export async function logo(req, res, next) {
         res.setHeader('content-type', 'text/plain; charset=us-ascii');
         res.send(`${ascii}\n`);
       })
-      .catch(e => {
+      .catch(() => {
         return next(new Error(`Unable to create an ASCII art for ${imagesrc}`));
       });
       break;
@@ -227,7 +227,7 @@ export async function website(req, res) {
 
 }
 
-export async function avatar(req, res, next) {
+export async function avatar(req, res) {
   req.params.isActive = true;
   const { collectiveSlug, tierSlug, backerType, isActive } = req.params;
   let users = cache.get(queryString.stringify({ collectiveSlug, tierSlug, backerType, isActive }));

@@ -1,10 +1,10 @@
-import { fetchMembers } from '../lib/graphql';
 import { GraphQLClient } from 'graphql-request';
-const graphqlServerUrl = `${process.env.API_URL}/graphql?api_key=${process.env.API_KEY}`;
 import { json2csv } from '../../lib/export_file';
 import moment from 'moment';
 import { get } from 'lodash';
 import { days } from '../../lib/utils';
+
+const graphqlServerUrl = `${process.env.API_URL}/graphql?api_key=${process.env.API_KEY}`;
 
 export async function list(req, res, next) {
 
@@ -38,8 +38,8 @@ export async function list(req, res, next) {
     }
     res.setHeader('cache-control','max-age=6000');
   }
-  const client = new GraphQLClient(graphqlServerUrl, { headers });
 
+  const client = new GraphQLClient(graphqlServerUrl, { headers });
 
   const query = `
   query Collective($collectiveSlug: String!, $backerType: String, $tierSlug: String, $TierId: Int, $limit: Int, $offset: Int, $role: String) {
@@ -155,11 +155,12 @@ export async function list(req, res, next) {
   const data = members.map(applyMapping);
 
   switch (req.params.format) {
-    case 'csv':
+    case 'csv': {
       const csv = json2csv(data);
       res.setHeader('content-type', 'text/csv');
       res.send(csv);
       break;
+    }
 
     default:
       res.send(data);
