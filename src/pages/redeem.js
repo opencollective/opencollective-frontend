@@ -3,12 +3,9 @@ import React from 'react'
 import Header from '../components/Header';
 import Body from '../components/Body';
 import Footer from '../components/Footer';
-import Loading from '../components/Loading';
 import CollectivesForRedeemPageWithData from '../components/CollectivesForRedeemPageWithData';
-import OrderForm from '../components/OrderForm';
 import withIntl from '../lib/withIntl';
 import withData from '../lib/withData'
-import { isValidUrl } from '../lib/utils';
 import colors from '../constants/colors';
 import { addGetLoggedInUserFunction } from '../graphql/queries';
 
@@ -93,7 +90,7 @@ class RedeemPage extends React.Component {
         }
         .Redeem-hero-line2 {
           margin: auto;
-          margin-top: 40px;      
+          margin-top: 40px;
           height: 78px;
           font-family: Rubik;
           font-size: 16px;

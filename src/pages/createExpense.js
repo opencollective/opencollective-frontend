@@ -9,9 +9,8 @@ import NotFound from '../components/NotFoundPage';
 import ErrorPage from '../components/ErrorPage';
 import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
-import ExpensesWithData from '../components/ExpensesWithData';
 import ExpensesStatsWithData from '../components/ExpensesStatsWithData';
-import { get, pick } from 'lodash';
+import { pick } from 'lodash';
 import { FormattedMessage } from 'react-intl'
 import { graphql } from 'react-apollo'
 import gql from 'graphql-tag'
@@ -60,7 +59,7 @@ class ExpensesPage extends React.Component {
   }
 
   render() {
-    const { data, action } = this.props;
+    const { data } = this.props;
     const { LoggedInUser, expenseCreated } = this.state;
     if (data.loading) return (<Loading />);
     if (!data.Collective) return (<NotFound />);

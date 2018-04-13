@@ -9,8 +9,7 @@ import ErrorPage from '../components/ErrorPage';
 import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
 import ExpensesWithData from '../components/ExpensesWithData';
-import { get, pick } from 'lodash';
-import { FormattedMessage } from 'react-intl'
+import { get } from 'lodash';
 import CollectivePicker from '../components/CollectivePickerWithData';
 import ExpensesStatsWithData from '../components/ExpensesStatsWithData';
 import { graphql } from 'react-apollo'

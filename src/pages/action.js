@@ -2,16 +2,10 @@ import React from 'react';
 import Header from '../components/Header';
 import Body from '../components/Body';
 import Footer from '../components/Footer';
-import CollectiveCover from '../components/CollectiveCover';
 import { addGetLoggedInUserFunction } from '../graphql/queries';
-import Loading from '../components/Loading';
-import ErrorPage from '../components/ErrorPage';
 import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
-import ExpensesWithData from '../components/ExpensesWithData';
-import { get, pick } from 'lodash';
-import { FormattedMessage, FormattedDate } from 'react-intl'
-import CollectivePicker from '../components/CollectivePickerWithData';
+import { FormattedMessage } from 'react-intl'
 import { graphql, compose } from 'react-apollo';
 import gql from 'graphql-tag'
 import { capitalize } from '../lib/utils';
@@ -22,7 +16,7 @@ import { capitalize } from '../lib/utils';
 class ActionPage extends React.Component {
 
   static getInitialProps (props) {
-    const { query: { table, id, action }, data } = props;
+    const { query: { table, id, action } } = props;
     return { action, table, id, ssr: false };
   }
 
@@ -47,7 +41,7 @@ class ActionPage extends React.Component {
   }
 
   render() {
-    const { action, table, id } = this.props;
+    const { action } = this.props;
     const { LoggedInUser, loading } = this.state;
 
     return (

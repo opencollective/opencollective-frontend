@@ -120,7 +120,7 @@ class CreateOrderPage extends React.Component {
   }
 
   render() {
-    const { intl, data, interval, verb } = this.props;
+    const { intl, data } = this.props;
     const { loading, LoggedInUser } = this.state;
     const description = decodeURIComponent(this.props.description || "");
     const collective = data.Collective;
@@ -145,11 +145,9 @@ class CreateOrderPage extends React.Component {
 
     this.order.tier = tier;
     this.order.description = description;
-    const href = (collective.type === 'EVENT') ? `/${collective.parentCollective.slug}/events/${collective.slug}` : `/${collective.slug}`;
 
     // Tier names are inconsistent - singular or plural
     // To avoid header like "Become a backers", this hack removes the last character if it's an 's'
-    const headerName = tier.name.charAt(tier.name.length-1) === 's' ? tier.name.slice(0, -1) : tier.name;
     const coverClassName = collective.type === 'EVENT' ? 'small' : '';
 
     return (

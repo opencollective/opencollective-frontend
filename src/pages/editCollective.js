@@ -5,7 +5,6 @@ import { addCollectiveToEditData, addGetLoggedInUserFunction } from '../graphql/
 import NotFound from '../components/NotFoundPage';
 import Loading from '../components/Loading';
 import EditCollective from '../components/EditCollective';
-import { intersection } from 'lodash';
 
 class EditCollectivePage extends React.Component {
 
@@ -25,7 +24,7 @@ class EditCollectivePage extends React.Component {
   }
 
   render() {
-    const { data, slug } = this.props;
+    const { data } = this.props;
     const { loading, LoggedInUser } = this.state;
     if (loading || data.loading) {
       return <Loading />;

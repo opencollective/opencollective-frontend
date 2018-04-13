@@ -3,9 +3,7 @@ import withIntl from '../lib/withIntl';
 import React from 'react';
 import CreateOrganization from '../components/CreateOrganization';
 import { addGetLoggedInUserFunction } from '../graphql/queries';
-import NotFound from '../components/NotFoundPage';
 import Loading from '../components/Loading';
-import { intersection } from 'lodash';
 
 class CreateOrganizationPage extends React.Component {
 
@@ -19,15 +17,12 @@ class CreateOrganizationPage extends React.Component {
   }
 
   async componentDidMount() {
-    const { getLoggedInUser, slug } = this.props;
+    const { getLoggedInUser } = this.props;
     const LoggedInUser = getLoggedInUser && await getLoggedInUser();
     this.setState({LoggedInUser, loading: false});
   }
 
   render() {
-
-    const { data } = this.props;
-
     if (this.state.loading) {
       return (<Loading />)
     }
