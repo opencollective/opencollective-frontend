@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormGroup, FormControl } from 'react-bootstrap';
-import Payment from 'payment';
+import { FormControl } from 'react-bootstrap';
 import withIntl from '../lib/withIntl';
 import { FormattedMessage } from 'react-intl';
 
@@ -27,7 +26,7 @@ class InputTypeCreditCard extends React.Component {
   }
 
   componentDidMount() {
-    if (typeof stripe !== "undefined") {
+    if (typeof window.stripe !== "undefined") {
 
       const style = Object.assign({}, {
         base: {
@@ -36,7 +35,7 @@ class InputTypeCreditCard extends React.Component {
         }
       }, this.props.style);
 
-      const elements = stripe.elements();
+      const elements = window.stripe.elements();
       const card = elements.create('card', {style: style});
 
       // Add an instance of the card Element into the `card-element` <div>
@@ -45,7 +44,6 @@ class InputTypeCreditCard extends React.Component {
         this.setState({ loading: false });
       })
       card.addEventListener('change', (event) => {
-        const displayError = document.getElementById('card-errors');
         if (event.error) {
           this.setState({ error: event.error.message })
         } else {
@@ -66,7 +64,6 @@ class InputTypeCreditCard extends React.Component {
   }
 
   render() {
-    const { intl } = this.props;
     const options = this.props.options || [];
     const showNewCreditCardForm = !(this.state.uuid && this.state.uuid.length === 36);
 

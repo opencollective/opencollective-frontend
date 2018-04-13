@@ -1,11 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormGroup, ControlLabel, FormControl } from 'react-bootstrap';
+import { FormControl } from 'react-bootstrap';
 import { graphql } from 'react-apollo'
 import gql from 'graphql-tag'
 import { defineMessages, FormattedMessage } from 'react-intl';
 import withIntl from '../lib/withIntl';
-import { capitalize } from '../lib/utils';
 import { get, uniqBy, groupBy } from 'lodash';
 
 class AddFundsSourcePicker extends React.Component {

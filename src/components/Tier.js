@@ -114,7 +114,7 @@ class Tier extends React.Component {
   }
 
   render() {
-    const { intl, values, tier } = this.props;
+    const { intl, tier } = this.props;
     const { type, name, description, currency } = this.props.tier;
 
     const intervals = [ null, 'month', 'year'];

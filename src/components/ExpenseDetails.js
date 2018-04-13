@@ -2,12 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import withIntl from '../lib/withIntl';
 import { defineMessages, FormattedNumber, FormattedMessage } from 'react-intl';
-import { imagePreview, capitalize } from '../lib/utils';
+import { capitalize, getCurrencySymbol, imagePreview } from '../lib/utils';
 import { graphql } from 'react-apollo'
 import gql from 'graphql-tag'
 import InputField from './InputField';
-import SmallButton from './SmallButton';
-import { getCurrencySymbol } from '../lib/utils';
 import categories from '../constants/categories';
 import { get } from 'lodash';
 

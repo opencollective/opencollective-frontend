@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Update from './Update';
-import { ButtonGroup, Button } from 'react-bootstrap';
+import { Button } from 'react-bootstrap';
 import { FormattedMessage } from 'react-intl';
 import colors from '../constants/colors';
 

@@ -1,19 +1,10 @@
 import React from 'react';
-import { withApollo } from 'react-apollo';
-
 import PropTypes from 'prop-types';
-import Error from '../components/Error';
 import withIntl from '../lib/withIntl';
-import { graphql } from 'react-apollo'
-import gql from 'graphql-tag'
-import { Button } from 'react-bootstrap';
-import { FormattedMessage, defineMessages } from 'react-intl';
+import { defineMessages } from 'react-intl';
 
-import { getSubscriptionsQuery } from '../graphql/queries';
 import SubscriptionCard from './SubscriptionCard';
 import colors from '../constants/colors';
-
-const SUBSCRIPTIONS_PER_PAGE = 25;
 
 class Subscriptions extends React.Component {
 

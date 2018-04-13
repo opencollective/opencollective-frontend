@@ -8,8 +8,6 @@ import gql from 'graphql-tag'
 import Member from './Member';
 import { ButtonGroup, Button } from 'react-bootstrap';
 import { FormattedMessage } from 'react-intl';
-import { exportMembers } from '../lib/export_file';
-import { pluralize } from '../lib/utils';
 
 const MEMBERS_PER_PAGE = 10;
 
@@ -59,11 +57,6 @@ class MembersWithData extends React.Component {
 
   render() {
     const { data, LoggedInUser, collective, tier, role, type } = this.props;
-
-    let emailGroup = (tier) ? tier.slug : 'all';
-    if (type) {
-      emailGroup = pluralize(type, 2).toLowerCase();
-    }
 
     if (data.error) {
       console.error("graphql error>>>", data.error.message);
@@ -117,7 +110,7 @@ class MembersWithData extends React.Component {
             display: flex;
             flex-wrap: wrap;
             flex-direction: row;
-            justify-content: center;   
+            justify-content: center;
             overflow: hidden;
             margin: 1rem 0;
           }

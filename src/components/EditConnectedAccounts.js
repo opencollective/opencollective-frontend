@@ -1,8 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-
-import { Row, Col, Checkbox, Button, Form } from 'react-bootstrap';
-import { defineMessages, FormattedMessage } from 'react-intl';
+import { defineMessages } from 'react-intl';
 import withIntl from '../lib/withIntl';
 import EditConnectedAccount from '../components/EditConnectedAccount';
 import { groupBy } from 'lodash';
@@ -17,7 +15,7 @@ class EditConnectedAccounts extends React.Component {
 
   constructor(props) {
     super(props);
-    const { intl, collective } = props;
+    const { collective } = props;
 
     this.state = { services: ['twitter'], editMode: props.editMode || false };
 
@@ -42,7 +40,7 @@ class EditConnectedAccounts extends React.Component {
   }
 
   render() {
-    const { intl, collective } = this.props;
+    const { collective } = this.props;
 
     return (
       <div className="EditConnectedAccounts">

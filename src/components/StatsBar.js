@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import colors from '../constants/colors';
 
 class StatsBar extends React.Component {
 

@@ -6,7 +6,7 @@ import TwitterLogo from './TwitterLogo';
 import FacebookLogo from './FacebookLogo';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import { formatCurrency } from '../lib/utils';
-import { Button, Glyphicon } from 'react-bootstrap';
+import { Button } from 'react-bootstrap';
 
 class OrderCreated extends React.Component {
 

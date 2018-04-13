@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Router from 'next/router';
 
-import { Row, Col, Checkbox, Button, Form } from 'react-bootstrap';
+import Router from 'next/router';
+import { Row, Col, Button } from 'react-bootstrap';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import withIntl from '../lib/withIntl';
 import InputField from '../components/InputField';
@@ -19,7 +19,7 @@ class EditPaymentMethod extends React.Component {
 
   constructor(props) {
     super(props);
-    const { intl, paymentMethod } = props;
+    const { paymentMethod } = props;
 
     this.state = { paymentMethod, editMode: props.editMode || false };
     this.removePaymentMethod = this.removePaymentMethod.bind(this);

@@ -1,15 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage, FormattedDate } from 'react-intl';
-import Currency from './Currency';
+import { FormattedMessage } from 'react-intl';
 import { pickLogo } from '../lib/collective.lib';
 import { get } from 'lodash';
-import { Router, Link } from '../server/pages';
+import { Link } from '../server/pages';
 import { firstSentence, imagePreview } from '../lib/utils';
 import { defaultBackgroundImage } from '../constants/collectives';
-import colors from '../constants/colors';
 import Button from './Button';
-import InputField from './InputField';
 
 class CollectiveCardWithRedeem extends React.Component {
 
@@ -23,8 +20,7 @@ class CollectiveCardWithRedeem extends React.Component {
 
 
   render() {
-    const { collective, onClick } = this.props;
-    const currency = collective.currency;
+    const { collective } = this.props;
     const logo = imagePreview(collective.image, pickLogo(collective.id), { height: 128 });
 
     const coverStyle = { ...get(collective, 'settings.style.hero.cover')};
@@ -93,7 +89,7 @@ class CollectiveCardWithRedeem extends React.Component {
             padding: 1rem;
             min-height: 10rem;
           }
-        
+
           .name, .description {
             overflow: hidden;
             text-overflow: ellipsis;

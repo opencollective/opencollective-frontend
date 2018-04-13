@@ -79,7 +79,7 @@ class Expense extends React.Component {
       id: this.props.expense.id,
       ...this.state.expense
     }
-    const res = await this.props.editExpense(expense);
+    await this.props.editExpense(expense);
     this.setState({ modified: false, mode: 'details' });
   }
 
@@ -186,7 +186,7 @@ class Expense extends React.Component {
           .status {
             text-transform: uppercase;
           }
-          
+
           .actions > div {
             display: flex;
             margin: 0.5rem 0;

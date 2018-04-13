@@ -3,15 +3,10 @@ import PropTypes from 'prop-types';
 import Error from '../components/Error';
 import withIntl from '../lib/withIntl';
 import Updates from '../components/Updates';
-import Currency from '../components/Currency';
-import EditUpdateForm from '../components/EditUpdateForm';
 import { graphql } from 'react-apollo'
 import gql from 'graphql-tag'
 import { FormattedMessage } from 'react-intl'
-import { pick, get } from 'lodash';
-import HTMLEditor from './HTMLEditor';
 import SectionTitle from './SectionTitle';
-import { Link } from '../server/pages';
 
 class UpdatesWithData extends React.Component {
 

@@ -36,7 +36,7 @@ class TopBarProfileMenu extends React.Component {
     this.onClickOutsideRef = this.onClickOutside.bind(this);
     document.addEventListener('click', this.onClickOutsideRef);
     if (typeof window !== 'undefined') {
-      this.redirectAfterSignin = window.location.href.replace(/^https?:\/\/[^\/]+/,'');
+      this.redirectAfterSignin = window.location.href.replace(/^https?:\/\/[^/]+/,'');
       if (!window.localStorage.accessToken) {
         this.setState({ loading: false })
       }
@@ -236,7 +236,7 @@ class TopBarProfileMenu extends React.Component {
         <style jsx>{`
         .TopBarProfileMenu {
           display: flex;
-          align-items: center;          
+          align-items: center;
         }
         .LoginTopBarProfileMenu {
           line-height: 3.1rem;

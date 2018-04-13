@@ -6,8 +6,7 @@ import { defineMessages, FormattedMessage } from 'react-intl';
 import { get, uniqBy } from 'lodash';
 import Avatar from './Avatar';
 import Logo from './Logo';
-import { Router } from '../server/pages';
-import { Link } from '../server/pages';
+import { Link, Router } from '../server/pages';
 import Currency from './Currency';
 import colors from '../constants/colors';
 import { formatCurrency } from '../lib/utils';
@@ -94,7 +93,7 @@ class TierCard extends React.Component {
       <div className={classNames('TierCard', this.props.className, this.anchor)}>
         <style jsx global>{`
           .image img {
-            border: 2px solid white;            
+            border: 2px solid white;
           }
           .TierCard .fromCollectives {
             margin: 1rem 0;

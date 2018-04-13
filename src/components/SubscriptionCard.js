@@ -2,17 +2,13 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import gql from 'graphql-tag'
 import { graphql } from 'react-apollo'
-import { FormattedMessage, FormattedDate, defineMessages } from 'react-intl';
+import { FormattedMessage, defineMessages } from 'react-intl';
 import Currency from './Currency';
-import { pickLogo } from '../lib/collective.lib';
 import { get, cloneDeep } from 'lodash';
 import router from '../server/pages';
 import { firstSentence, getCurrencySymbol, imagePreview } from '../lib/utils';
 import { defaultBackgroundImage } from '../constants/collectives';
 import colors from '../constants/colors';
-import Button from './Button';
-import InputField from './InputField';
-import CollectiveCard from './CollectiveCard';
 import CancelSubscriptionBtn from './CancelSubscriptionBtn';
 import PaymentMethodChooser from './PaymentMethodChooser';
 import { getSubscriptionsQuery } from '../graphql/queries';
@@ -96,8 +92,8 @@ class SubscriptionCard extends React.Component {
   }
 
   render() {
-    const { intl, LoggedInUser, subscription, paymentMethods} = this.props;
-    const { transactions, paymentMethod, collective } = subscription;
+    const { intl, LoggedInUser, subscription} = this.props;
+    const { collective } = subscription;
 
     const coverStyle = { ...get(collective, 'settings.style.hero.cover')};
     const backgroundImage = imagePreview(collective.backgroundImage, collective.type === 'COLLECTIVE' && defaultBackgroundImage[collective.type], { width: 400 });
@@ -532,34 +528,6 @@ mutation updateSubscription($id: Int!, $paymentMethod: PaymentMethodInputType, $
     }
   }
 }
-`;
-
-const getPaymentMethodsQuery = gql`
-query Collective($slug: String!) {
-    Collective(slug: $slug) {
-      id
-      type
-      slug
-      name
-      company
-      image
-      backgroundImage
-      description
-      twitterHandle
-      website
-      currency
-      settings
-      createdAt
-      paymentMethods {
-        id
-        uuid
-        service
-        type
-        data
-        name
-      }
-    }
-  }
 `;
 
 const addMutation = graphql(updateSubscriptionQuery, {

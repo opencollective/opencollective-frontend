@@ -4,8 +4,7 @@ import withIntl from '../lib/withIntl';
 import { FormattedMessage } from 'react-intl'
 import ExpensesWithData from './ExpensesWithData';
 import TransactionsWithData from './TransactionsWithData';
-import Currency from './Currency';
-import { Button } from 'react-bootstrap';
+import NotFound from './NotFound';
 import { Router } from '../server/pages';
 import { get } from 'lodash';
 
@@ -24,7 +23,7 @@ class ExpensesSection extends React.Component {
   }
 
   render() {
-    const { collective, LoggedInUser, limit } = this.props;
+    const { collective, LoggedInUser } = this.props;
 
     if (!collective) return (<NotFound />);
 

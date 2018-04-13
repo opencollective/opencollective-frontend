@@ -1,10 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import withIntl from '../lib/withIntl';
-import { defineMessages, FormattedNumber, FormattedMessage } from 'react-intl';
-import { capitalize } from '../lib/utils';
-import { graphql } from 'react-apollo'
-import gql from 'graphql-tag'
+import { defineMessages, FormattedMessage } from 'react-intl';
 import InputField from './InputField';
 import HTMLEditor from './HTMLEditor';
 import MarkdownEditor from './MarkdownEditor';
@@ -77,7 +74,7 @@ class EditUpdateForm extends React.Component {
   }
 
   render() {
-    const { LoggedInUser, intl, collective } = this.props;
+    const { intl, collective } = this.props;
     const { update } = this.state;
     if (!this._isMounted) return (<div />);
     const editor = get(collective, 'settings.editor') === 'markdown' ? 'markdown' : 'html';

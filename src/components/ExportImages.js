@@ -1,10 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { Row, Col, Checkbox, Button, Form } from 'react-bootstrap';
-import { defineMessages, FormattedMessage } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
 import withIntl from '../lib/withIntl';
-import { exportMembers } from '../lib/export_file';
 import InputField from './InputField';
 
 class ExportImages extends React.Component {
@@ -15,12 +13,11 @@ class ExportImages extends React.Component {
 
   constructor(props) {
     super(props);
-    const { intl } = props;
     this.state = { tierIndex: 0 };
   }
 
   render() {
-    const { intl, collective } = this.props;
+    const { collective } = this.props;
 
     if (collective.tiers.length === 0) {
       return <div />

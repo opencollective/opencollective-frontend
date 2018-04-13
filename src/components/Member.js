@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import colors from '../constants/colors';
-import { Router } from '../server/pages';
 
 import { defineMessages, injectIntl } from 'react-intl';
 import { formatCurrency, formatDate, firstSentence, singular, capitalize } from '../lib/utils';

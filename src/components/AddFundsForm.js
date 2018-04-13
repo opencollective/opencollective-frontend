@@ -4,9 +4,7 @@ import InputField from '../components/InputField';
 import AddFundsSourcePicker from '../components/AddFundsSourcePicker';
 import { Button, Row, Col, Form } from 'react-bootstrap';
 import { defineMessages, FormattedMessage } from 'react-intl';
-import { isValidEmail } from '../lib/utils';
 import withIntl from '../lib/withIntl';
-import * as api from '../lib/api';
 import { getCurrencySymbol, formatCurrency } from '../lib/utils';
 import { get } from 'lodash';
 
@@ -44,14 +42,6 @@ class AddFundsForm extends React.Component {
       'organization.label': { id: 'addfunds.organization.label', defaultMessage: 'organization' },
       'website.label': { id: 'user.website.label', defaultMessage: 'website' }
     });
-
-    const getOptions = (arr, vars) => {
-      return arr.map(key => {
-        const obj = {};
-        obj[key] = intl.formatMessage(this.messages[key], vars);
-        return obj;
-      })
-    }
 
     this.fields = [
       {
@@ -114,7 +104,7 @@ class AddFundsForm extends React.Component {
   }
 
   handleChange(obj, attr, value) {
-    const { intl, host } = this.props;
+    const { host } = this.props;
 
     const newState = { ... this.state };
     if (value !== undefined) {
@@ -144,7 +134,7 @@ class AddFundsForm extends React.Component {
   }
 
   render() {
-    const { intl, loading } = this.props;
+    const { loading } = this.props;
     const hostFeePercent = this.state.form.hostFeePercent || 0;
     const platformFeePercent = this.state.form.platformFeePercent || 0;
     return (

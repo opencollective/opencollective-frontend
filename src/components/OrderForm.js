@@ -7,7 +7,7 @@ import MatchingFundWithData from './MatchingFundWithData';
 import RequestBitcoin from './RequestBitcoin';
 import ActionButton from './Button';
 import SectionTitle from './SectionTitle';
-import { Button, Row, Col, Form, InputGroup, FormControl } from 'react-bootstrap';
+import { Button, Row, Col, Form } from 'react-bootstrap';
 import { defineMessages, FormattedMessage, FormattedDate, FormattedTime } from 'react-intl';
 import { capitalize, formatCurrency, isValidEmail } from '../lib/utils';
 import { getStripeToken } from '../lib/stripe';

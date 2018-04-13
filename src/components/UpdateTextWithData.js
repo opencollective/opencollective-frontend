@@ -1,11 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import withIntl from '../lib/withIntl';
-import { defineMessages, FormattedNumber, FormattedMessage } from 'react-intl';
 import { graphql } from 'react-apollo'
 import gql from 'graphql-tag'
 import { get } from 'lodash';
-import Markdown from 'react-markdown';
 
 class UpdateText extends React.Component {
 
@@ -18,7 +16,7 @@ class UpdateText extends React.Component {
   }
 
   render() {
-    const { data: { loading, Update }, intl } = this.props;
+    const { data: { Update } } = this.props;
     const html = get(Update, 'html');
 
     if (!html) {

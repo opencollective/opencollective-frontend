@@ -56,7 +56,6 @@ class CollectivesForRedeemPageWithData extends React.Component {
       return (<div />)
     }
 
-    const limit = this.props.limit || COLLECTIVE_CARDS_PER_PAGE * 2;
     return (
       <div className="CollectivesContainer">
         <style jsx>{`
@@ -79,7 +78,7 @@ class CollectivesForRedeemPageWithData extends React.Component {
             display: flex;
             flex-wrap: wrap;
             flex-direction: row;
-            justify-content: center;   
+            justify-content: center;
             overflow: hidden;
             margin: 1rem 0;
           }

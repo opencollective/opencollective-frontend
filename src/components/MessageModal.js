@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { intl, defineMessages } from 'react-intl';
+import { defineMessages } from 'react-intl';
 import withIntl from '../lib/withIntl';
 
 class MessageModal extends React.Component {
