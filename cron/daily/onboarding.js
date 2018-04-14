@@ -58,7 +58,7 @@ async function processOnBoardingTemplate(template, startsAt, filter = () => true
 
   const endsAt = new Date(startsAt.getFullYear(), startsAt.getMonth(), startsAt.getDate() + 1);
   console.log(`\n>>> ${template} (from ${startsAt.toString()} to ${endsAt.toString()})`);
-  
+
   return models.Collective.findAll({
     where: {
       type: "COLLECTIVE",

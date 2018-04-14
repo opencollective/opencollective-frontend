@@ -7,7 +7,7 @@ import twitter from '../server/lib/twitter';
  * We use sanitized data from wwcode for this
  */
 describe('lib.twitter.test.js', () => {
-  
+
   describe("compile the tweet", () => {
 
     const data = {
@@ -24,26 +24,26 @@ describe('lib.twitter.test.js', () => {
       "topExpenseCategories": "none"
     };
 
-    
+
     it("with no amount spent", () => {
       const tweet = twitter.compileTweet('monthlyStats', data);
       expect(tweet).to.contain("we spent $0.");
     });
-    
+
     it("with amount spent", () => {
       data.totalAmountSpent = "$542";
       data.topExpenseCategories = "engineering and travel";
       const tweet = twitter.compileTweet('monthlyStats', data);
       expect(tweet).to.contain("we spent $542 on engineering and travel.");
     });
-    
+
     it("with no new backer", () => {
       data.totalNewBackers = 0;
       data.newBackersTwitterHandles = "";
       const tweet = twitter.compileTweet('monthlyStats', data);
       expect(tweet).to.contain("no new backer joined");
     });
-    
+
     it("with 1 new backer", () => {
       data.totalNewBackers = 1;
       data.newBackersTwitterHandles = "";

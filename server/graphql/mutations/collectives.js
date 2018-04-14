@@ -268,17 +268,17 @@ export function editCollective(_, args, req) {
   .then(canEditCollective => {
     if (!canEditCollective) {
       let errorMsg;
-      switch (updatedCollectiveData.type) { 
+      switch (updatedCollectiveData.type) {
         case types.EVENT:
           errorMsg = `You must be logged in as the creator of this Event or as an admin of the ${parentCollective.slug} collective to edit this Event Collective`;
           break;
-        
+
         case types.USER:
-          errorMsg = `You must be logged in as ${updatedCollectiveData.name} to edit this User Collective`;            
+          errorMsg = `You must be logged in as ${updatedCollectiveData.name} to edit this User Collective`;
           break;
 
         default:
-          errorMsg = `You must be logged in as an admin or as the host of this ${updatedCollectiveData.type.toLowerCase()} collective to edit it`;            
+          errorMsg = `You must be logged in as an admin or as the host of this ${updatedCollectiveData.type.toLowerCase()} collective to edit it`;
       }
       return Promise.reject(new errors.Unauthorized({ message: errorMsg }));
     }

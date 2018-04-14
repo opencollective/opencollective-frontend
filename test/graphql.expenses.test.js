@@ -11,10 +11,10 @@ describe('graphql.collective.test.js', () => {
 
   describe("read", () => {
 
-    before(() => utils.loadDB('opencollective_dvl'));  
+    before(() => utils.loadDB('opencollective_dvl'));
     before(() => models.Collective.findOne({ where: { slug: 'opensourceorg' }}).then(c => host = c));
     before(() => models.Collective.findOne({ where: { slug: 'railsgirlsatl' }}).then(c => collective = c));
-    
+
     const query = `
     query allExpenses($CollectiveId: Int!, $category: String, $fromCollectiveSlug: String, $limit: Int, $includeHostedCollectives: Boolean) {
       allExpenses(CollectiveId: $CollectiveId, category: $category, fromCollectiveSlug: $fromCollectiveSlug, limit: $limit, includeHostedCollectives: $includeHostedCollectives) {
@@ -37,14 +37,14 @@ describe('graphql.collective.test.js', () => {
         }
       }
     }`;
-    
+
     it('fails if collective not found', async () => {
       const result = await utils.graphqlQuery(query, { CollectiveId: 999999 });
       result.errors && console.error(result.errors);
       expect(result.errors).to.exist;
       expect(result.errors[0].message).to.equal('Collective not found');
     })
-    
+
     it('gets the latest expenses from one collective', async () => {
       const result = await utils.graphqlQuery(query, { CollectiveId: collective.id, limit: 5 });
       result.errors && console.error(result.errors);
@@ -53,7 +53,7 @@ describe('graphql.collective.test.js', () => {
       expect(expenses).to.have.length(5);
       expect(expenses.map(e => e.collective.slug)).to.deep.equal([ 'railsgirlsatl', 'railsgirlsatl', 'railsgirlsatl', 'railsgirlsatl', 'railsgirlsatl' ]);
     });
-    
+
     it('gets the latest expenses from all the hosted collectives', async () => {
       const result = await utils.graphqlQuery(query, { CollectiveId: host.id, limit: 5, includeHostedCollectives: true });
       result.errors && console.error(result.errors);
@@ -91,7 +91,7 @@ describe('graphql.collective.test.js', () => {
       emailSendMessageSpy = sandbox.spy(emailLib, 'sendMessage');
     })
     afterEach(() => sandbox.restore());
-    
+
     beforeEach(() => utils.resetTestDB());
     beforeEach('create test user', () => models.User.createUserWithCollective({ name: "Test User", email: "testuser@opencollective.com", paypalEmail: "testuser@paypal.com" }).then(u => user = u));
     beforeEach('create test host admin user', () => models.User.createUserWithCollective({ name: "Test Host Admin User", email: "host.admin@opencollective.com" }).then(u => hostAdmin = u));
@@ -112,7 +112,7 @@ describe('graphql.collective.test.js', () => {
       lastEditedById: user.id,
       status: 'PENDING'
     }).then(e => expense = e))
-    
+
     const createExpenseQuery = `mutation createExpense($expense: ExpenseInputType!) {
       createExpense(expense: $expense) {
         id
@@ -145,7 +145,7 @@ describe('graphql.collective.test.js', () => {
     };
 
     it("fails to create an expense if not logged in", async () => {
-      newExpenseData.collective = { id: collective.id };      
+      newExpenseData.collective = { id: collective.id };
       const res = await utils.graphqlQuery(createExpenseQuery, { expense: newExpenseData });
       expect(res.errors).to.exist;
       expect(res.errors[0].message).to.equal('You need to be logged in to create an expense');
@@ -190,7 +190,7 @@ describe('graphql.collective.test.js', () => {
         expect(res.errors).to.exist;
         expect(res.errors[0].message).to.equal("You don't have permission to delete this expense");
       });
-      
+
       it("fails if logged in as backer of collective", async () => {
         const backer = await models.User.createUserWithCollective({ name: "test backer user"});
         await models.Member.create({
@@ -296,7 +296,7 @@ describe('graphql.collective.test.js', () => {
           HostCollectiveId: hostCollective.id,
           type: 'CREDIT',
           netAmountInCollectiveCurrency: amount,
-          currency: 'USD',  
+          currency: 'USD',
           CollectiveId: collective.id
         });
       }

@@ -259,7 +259,7 @@ export default (Sequelize, DataTypes) => {
    * Create the opposite transaction from the perspective of the FromCollective
    * There is no fees
    * @POST Two transactions are created. Returns the initial transaction FromCollectiveId -> CollectiveId
-   * 
+   *
    * Examples (simplified with rounded numbers):
    * - Expense1 from User1 paid by Collective1
    *   - amount: $10
@@ -270,7 +270,7 @@ export default (Sequelize, DataTypes) => {
    *      amount: -$10, netAmountInCollectiveCurrency: -$11, paymentProcessorFeeInHostCurrency: $1, platformFeeInHostCurrency: 0, hostFeeInHostCurrency: 0
    *   => CREDIT: Collective: U1, FromCollective: C1
    *      amount: $11, netAmountInCollectiveCurrency: $10, paymentProcessorFeeInHostCurrency: $1, platformFeeInHostCurrency: 0, hostFeeInHostCurrency: 0
-   * 
+   *
    * - Donation1 from User1 to Collective1
    *   - amount: $10
    *   - Stripe Fees: $1
@@ -280,12 +280,12 @@ export default (Sequelize, DataTypes) => {
    *      amount: -$7, netAmountInCollectiveCurrency: -$10, paymentProcessorFeeInHostCurrency: $1, platformFeeInHostCurrency: $1, hostFeeInHostCurrency: $1
    *   => CREDIT: Collective: C1, FromCollective: U1
    *      amount: $10, netAmountInCollectiveCurrency: $7, paymentProcessorFeeInHostCurrency: $1, platformFeeInHostCurrency: $1, hostFeeInHostCurrency: $1
-   * 
+   *
    * Note:
    * We should simplify a Transaction to:
    * CollectiveId, DEBIT/CREDIT, amount, currency, OrderId where amount is always the net amount in the currency of CollectiveId
    * and we should move paymentProcessorFee, platformFee, hostFee to the Order model
-   * 
+   *
    */
 
   Transaction.createDoubleEntry = (transaction) => {
@@ -310,7 +310,7 @@ export default (Sequelize, DataTypes) => {
 
     debug("createDoubleEntry", transaction, "opposite", oppositeTransaction);
 
-    // We first record the negative transaction 
+    // We first record the negative transaction
     // and only then we can create the transaction to add money somewhere else
     const transactions = [];
     let index = 0;

@@ -193,7 +193,7 @@ describe('user.models.test.js', () => {
         })
         .then(user2 => {
           expect(user2.collective.slug).to.equal('xavier-damman1');
-          expect(user2.collective.name).to.equal('Xavier Damman');        
+          expect(user2.collective.name).to.equal('Xavier Damman');
           expect(user2.firstName).to.equal('Xavier');
           expect(user2.lastName).to.equal('Damman');
         })

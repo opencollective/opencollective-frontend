@@ -7,7 +7,7 @@ const debug = debugLib("cache");
 
 const cache = LRUCache({
   max: 1000,
-  maxAge: 1000 * 5 // in ms 
+  maxAge: 1000 * 5 // in ms
 });
 
 export default () => {
@@ -15,7 +15,7 @@ export default () => {
     use query and variables to identify a unique cache key
     Track active requests in process
     if incoming request matches an active request,
-      wait for the active to finish and send the same response back to all 
+      wait for the active to finish and send the same response back to all
       waiting requests that match cache key
   */
 

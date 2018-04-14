@@ -89,7 +89,7 @@ export function setupModels(client) {
   m.User.hasMany(m.Member, { foreignKey: 'CreatedByUserId' });
   m.User.hasMany(m.ConnectedAccount, { foreignKey: 'CreatedByUserId' });
   m.User.belongsTo(m.Collective, { as: 'collective', foreignKey: 'CollectiveId', constraints: false });
-  
+
   // Members
   m.Member.belongsTo(m.User, { foreignKey: 'CreatedByUserId', as: 'createdByUser' });
   m.Member.belongsTo(m.Collective, { foreignKey: 'MemberCollectiveId', as: 'memberCollective' });

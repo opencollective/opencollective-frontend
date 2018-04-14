@@ -63,7 +63,7 @@ export function collectiveid(req, res, next, collectiveIdOrSlug) {
 export function transactionuuid(req, res, next, transactionuuid) {
   if (!isUUID(transactionuuid)) {
     next(new errors.BadRequest("Must provide transaction uuid"));
-    return null;    
+    return null;
   }
 
   Transaction.findOne({ where: { uuid: transactionuuid } })

@@ -65,7 +65,7 @@ export function createOrder(_, args, req) {
     paymentRequired = order.totalAmount > 0 || tier && tier.amount > 0;
 
     // interval of the tier can only be overridden if it is null (e.g. for custom donations)
-    // TODO: using order.interval over Tiers will likely include donations that shouldn't be in tiers. 
+    // TODO: using order.interval over Tiers will likely include donations that shouldn't be in tiers.
     // Need to reevalute with always respecting user choice.
 
     interval = order.interval;
@@ -87,7 +87,7 @@ export function createOrder(_, args, req) {
       Promise.reject(new Error(`You can buy up to ${tier.maxQuantityPerUser} ${pluralize('ticket', tier.maxQuantityPerUser)} per person`));
     }
     return tier.checkAvailableQuantity(order.quantity)
-    .then(enoughQuantityAvailable => enoughQuantityAvailable ? 
+    .then(enoughQuantityAvailable => enoughQuantityAvailable ?
       Promise.resolve() : Promise.reject(new Error(`No more tickets left for ${tier.name}`)))
     })
 
@@ -137,7 +137,7 @@ export function createOrder(_, args, req) {
       }
     })
     .then(c => fromCollective = c)
-    
+
     // check if the MatchingFund is valid and has enough funds
     .then(async () => {
       if (order.matchingFund) {
@@ -258,7 +258,7 @@ export function cancelSubscription(remoteUser, orderId) {
   .tap(order => {
     if (!order) {
       throw new Error("Subscription not found")
-    } 
+    }
     return Promise.resolve()
   })
   .tap(order => {
@@ -277,7 +277,7 @@ export function cancelSubscription(remoteUser, orderId) {
   })
   .then(order => order.Subscription.deactivate())
 
-  // createActivity - that sends out the email 
+  // createActivity - that sends out the email
   .then(() => models.Activity.create({
         type: activities.SUBSCRIPTION_CANCELED,
         CollectiveId: order.CollectiveId,
@@ -301,7 +301,7 @@ export function updateSubscription(remoteUser, args) {
   const { id, paymentMethod } = args;
 
 
-  const query = { 
+  const query = {
     where: {
       id,
     },
@@ -336,7 +336,7 @@ export function updateSubscription(remoteUser, args) {
 
     let updatePromise;
     let newPm;
-    
+
     // TODO: Would be even better if we could charge you here directly
     // before letting you proceed
 

@@ -144,7 +144,7 @@ describe('lib/email', () => {
           minimumFractionDigits : 0,
           maximumFractionDigits : 0
         });
-        
+
         expect(nm.sendMail.lastCall.args[0].from).to.equal(from);
         expect(nm.sendMail.lastCall.args[0].to).to.equal('emailbcc+user1-at-opencollective.com@opencollective.com');
         expect(nm.sendMail.lastCall.args[0].subject).to.contain(`Thank you for your ${amountStr}/month donation to #BrusselsTogether`);

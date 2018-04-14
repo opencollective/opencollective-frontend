@@ -33,7 +33,7 @@ async function fetchUpdate(id) {
 }
 
 export async function editUpdate(_, args, req) {
-  require(args, 'update.id');  
+  require(args, 'update.id');
   const update = await fetchUpdate(args.update.id);
   return await update.edit(req.remoteUser, args.update);
 }

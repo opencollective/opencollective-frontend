@@ -24,12 +24,12 @@ const getPreapprovalDetailsAndUpdatePaymentMethod = function(paymentMethod) {
   }
 
   let preapprovalDetailsResponse;
-  
+
   return paypalAdaptive.preapprovalDetails(paymentMethod.token)
     .tap(response => preapprovalDetailsResponse = response)
     .then(response => {
       if (response.approved === 'false') {
-        throw new errors.BadRequest('This preapprovalkey is not approved yet.') 
+        throw new errors.BadRequest('This preapprovalkey is not approved yet.')
       }
     })
     .then(() => paymentMethod.update({
@@ -55,7 +55,7 @@ export default {
 
   oauth: {
     redirectUrl: (remoteUser, CollectiveId, options = {}) => {
-  
+
       // TODO: The cancel URL doesn't work - no routes right now.
       const { redirect } = options;
       if (!redirect) {
@@ -155,7 +155,7 @@ export default {
 
           // TODO: Call paypal to cancel preapproval keys before marking as deleted.
           .then(oldPMs => oldPMs && oldPMs.map(pm => pm.destroy()))
-        
+
           .then(() => {
             const redirect = `${paymentMethod.data.redirect}?status=success&service=paypal`;
             return res.redirect(redirect)

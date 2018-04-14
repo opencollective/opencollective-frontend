@@ -14,7 +14,7 @@ import {
 } from './CollectiveInterface';
 
 import {
-  TransactionInterfaceType  
+  TransactionInterfaceType
 } from './TransactionInterface';
 
 import {
@@ -97,7 +97,7 @@ const queries = {
       const invoicesByKey = {};
       await Promise.map(transactions, async (transaction) => {
         const HostCollectiveId = transaction.HostCollectiveId;
-        hostsById[HostCollectiveId] = hostsById[HostCollectiveId] || await models.Collective.findById(HostCollectiveId, { attributes: ['slug'] }); 
+        hostsById[HostCollectiveId] = hostsById[HostCollectiveId] || await models.Collective.findById(HostCollectiveId, { attributes: ['slug'] });
         const createdAt = new Date(transaction.createdAt);
         const year = createdAt.getFullYear();
         const month = createdAt.getMonth() + 1;
@@ -487,7 +487,7 @@ const queries = {
       if (where.role === 'HOST') {
         where.HostCollectiveId = args.MemberCollectiveId;
       }
-      
+
       const getCollectiveIds = () => {
         if (args.includeHostedCollectives) {
           return models.Member.findAll({
@@ -631,7 +631,7 @@ const queries = {
     },
     resolve(_, args) {
       return models.PaymentMethod.findOne({
-        where: { 
+        where: {
           token: args.token,
           expiryDate: {
             $gt: new Date()

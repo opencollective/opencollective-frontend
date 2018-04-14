@@ -87,7 +87,7 @@ const getTopBackers = (startDate, endDate, tags) => {
   else {
     return Collective.getTopBackers(startDate, endDate, tags, 5)
       .then(backers => {
-        if (!backers) return []; 
+        if (!backers) return [];
         return Promise.map(backers, backer => processBacker(backer, startDate, endDate, tags))
       })
       .then(backers => {
@@ -153,7 +153,7 @@ const processCollective = (collective) => {
     collective.getTotalTransactions(startDate, endDate, 'expense'),
     collective.getExpenses(null, startDate, endDate),
     collective.getRelatedCollectives(3, 0, 'c."createdAt"', 'DESC'),
-    collective.getBackersStats(startDate, endDate)    
+    collective.getBackersStats(startDate, endDate)
   ];
 
   let emailData = {};

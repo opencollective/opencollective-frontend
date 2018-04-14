@@ -63,6 +63,6 @@ describe("graphql.connectedAccounts.test.js", () => {
       expect(res.errors).to.not.exist;
       expect(res.data.editConnectedAccount.service).to.equal("twitter");
       expect(res.data.editConnectedAccount.settings).to.deep.equal(connectedAccountData.settings);
-    });    
+    });
   })
 })

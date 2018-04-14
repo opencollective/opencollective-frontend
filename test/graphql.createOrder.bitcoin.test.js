@@ -90,7 +90,7 @@ describe('graphql.createOrder.bitcoin.test', () => {
       res.errors && console.error(res.errors);
       expect(res.errors).to.not.exist;
       const collective = res.data.createOrder.collective;
-      
+
       const paymentMethod = res.data.createOrder.paymentMethod;
 
       // paymentMethod shouldn't be sent back without a token;
@@ -99,10 +99,10 @@ describe('graphql.createOrder.bitcoin.test', () => {
       const orderRow = await models.Order.findOne({
         where: {
           id: res.data.createOrder.id
-        }, 
+        },
         include: [{ model: models.PaymentMethod, as: 'paymentMethod' }]
       });
-      
+
       expect(orderRow.paymentMethod.customerId).to.equal('cus_BykOG8ivma78f2');
 
       const transaction = await models.Transaction.findOne({
@@ -173,10 +173,10 @@ describe('graphql.createOrder.bitcoin.test', () => {
       const orderRow = await models.Order.findOne({
         where: {
           id: res.data.createOrder.id
-        }, 
+        },
         include: [{ model: models.PaymentMethod, as: 'paymentMethod' }]
       });
-      
+
       expect(orderRow.paymentMethod.customerId).to.equal('cus_BykOG8ivma78f2');
 
       const transaction = await models.Transaction.findOne({ where: { OrderId: orderCreated.id }});

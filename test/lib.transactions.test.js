@@ -5,7 +5,7 @@ import * as utils from '../test/utils';
 import * as tlib from '../server/lib/transactions';
 
 describe('lib.transactions.test.js', () => {
-  
+
   const startDate = new Date("2017-02-01");
   const endDate = new Date("2017-03-01");
   let transactions;

@@ -108,7 +108,7 @@ export default (app) => {
   app.post('/webhooks/stripe', stripeWebhook); // when it gets a new subscription invoice
   app.post('/webhooks/mailgun', email.webhook); // when receiving an email
   app.get('/connected-accounts/:service/callback', aN.authenticateServiceCallback); // oauth callback
-  
+
   app.use(sanitizer()); // note: this break /webhooks/mailgun /graphiql
 
   /**
@@ -129,14 +129,14 @@ export default (app) => {
    */
   app.post('/users', required('user'), users.create); // Create a user.
   app.get('/users/exists', required('email'), users.exists); // Checks the existence of a user based on email.
-  app.get('/users/:userid', users.show); // Get a user.  
+  app.get('/users/:userid', users.show); // Get a user.
   app.put('/users/:userid/paypalemail', auth.mustBeLoggedInAsUser, required('paypalEmail'), users.updatePaypalEmail); // Update a user paypal email.
   app.get('/users/:userid/email', NotImplemented); // Confirm a user's email.
 
   // TODO: Why is this a PUT and not a GET?
   app.put('/users/:userid/images', required('userData'), users.getSocialMediaAvatars); // Return possible images for a user.
-  
-  
+
+
   /**
    * Credit paymentMethod.
    *

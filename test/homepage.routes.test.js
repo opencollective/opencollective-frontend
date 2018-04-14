@@ -19,7 +19,7 @@ describe('homepage.routes.test.js', () => {
   beforeEach((done) => {
     setTimeout(done, 1000);
   });
-  
+
   beforeEach(() => models.User.createUserWithCollective(userData).tap(u => user = u));
   beforeEach(() =>
     models.Collective
