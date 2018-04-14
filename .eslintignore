@@ -1,4 +1,3 @@
 build/**/*.js
 node_modules/
 .next
-src/components/HTMLEditor.js
