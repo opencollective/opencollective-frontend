@@ -354,7 +354,7 @@ export async function updateSubscription(remoteUser, args) {
 
   if (amount) {
 
-    if (amount < 100) {
+    if (amount < 100 || amount % 100 !== 0) {
       throw new Error('Invalid amount');
     }
 
