@@ -49,7 +49,7 @@ export const isValidUrl = (url) => {
 
 export const isValidEmail = (email) => {
   if (typeof email !== 'string') return false;
-  return email.match(/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/);
+  return email.match(/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/);
 };
 
 export function getCurrencySymbol(currency) {
@@ -113,6 +113,7 @@ export function getQueryParams() {
 },
         query  = window.location.search.substring(1);
 
+  // eslint-disable-next-line no-cond-assign
   while (match = search.exec(query)) {
     urlParams[decode(match[1])] = decode(match[2]);
   }
@@ -140,9 +141,8 @@ function extractHostname(url) {
 }
 
 export function getDomain(url = '') {
-  let domain = extractHostname(url),
-      splitArr = domain.split('.'),
-      arrLen = splitArr.length;
+  let domain = extractHostname(url);
+  const splitArr = domain.split('.'), arrLen = splitArr.length;
 
   //extracting the root domain here
   //if there is a subdomain
@@ -233,7 +233,7 @@ export const firstSentence = (str, length) => {
   str = str.replace(/&amp;/g, '&');
 
   if (str.length <= length) return str;
-  const tokens = str.match(/\.|\?|\!/);
+  const tokens = str.match(/\.|\?|!/);
   if (tokens) {
     str = str.substr(0, tokens.index + 1);
   }

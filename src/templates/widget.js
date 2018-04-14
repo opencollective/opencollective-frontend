@@ -120,8 +120,8 @@
     scriptsNodesArray.map(s => {
       const src = s.getAttribute('src');
       Object.keys(window.OC.widgets).forEach(widget => {
-        if (src && src.match(regex) && src.match(new RegExp(`${widget}\.js`))) {
-          const tokens = src.match(new RegExp(`\/([^\/]+)\/${widget}\.js`));
+        if (src && src.match(regex) && src.match(new RegExp(`${widget}.js`))) {
+          const tokens = src.match(new RegExp(`/([^/]+)/${widget}.js`));
           const collectiveSlug = tokens[1];
           return window.OC.widgets[widget].push(new OpenCollectiveWidget(widget, collectiveSlug, s));
         }

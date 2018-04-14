@@ -63,6 +63,6 @@ export async function exportMembers(collectiveSlug, tierSlug, options = { type: 
 
   const csv = await get(path, options);
   const date = formatDate(new Date);
-  return exportFile('text/plain;charset=utf-8', `${date.replace(/\-/g,'')}${path.replace(/\//g,'-')}`, csv);
+  return exportFile('text/plain;charset=utf-8', `${date.replace(/-/g,'')}${path.replace(/\//g,'-')}`, csv);
 
 }
