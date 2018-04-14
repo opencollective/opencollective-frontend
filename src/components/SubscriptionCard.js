@@ -403,7 +403,7 @@ class SubscriptionCard extends React.Component {
                 </CustomToggle>
                 <Dropdown.Menu className='menu-item'>
                   <MenuItem style={menuItemStyle} eventKey={this.stateConstants.editPaymentMethod}>Update payment method</MenuItem>
-                  <MenuItem style={menuItemStyle} eventKey={this.stateConstants.editAmount}>Update payment amount</MenuItem>
+                  <MenuItem style={menuItemStyle} eventKey={this.stateConstants.editAmount}>Edit amount</MenuItem>
                   <MenuItem style={{ margin: '2px' }} divider />
                   <MenuItem style={menuItemStyle} eventKey={this.stateConstants.cancelConf}>Cancel contribution</MenuItem>
                 </Dropdown.Menu>
