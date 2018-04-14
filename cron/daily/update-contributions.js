@@ -11,7 +11,7 @@ const { Collective } = models;
 
 // TODO: As number of collectives grow, we need to consider fetching 100 at a time,
 // otherwise, we end up fetching a lot of data.
-// Note: Picking attributes doesn't work with Histories table because Histories 
+// Note: Picking attributes doesn't work with Histories table because Histories
 // ends up recording on the attributes that were pulled out
 
 Collective.findAll({

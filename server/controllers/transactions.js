@@ -2,7 +2,7 @@ import models, { sequelize } from '../models';
 import { getFxRate } from '../lib/currency';
 
 export const getFxRateController = (req, res, next) => {
-  const { 
+  const {
     fromCurrency,
     toCurrency,
     date
@@ -24,7 +24,7 @@ export const getOne = (req, res, next) => {
     req.transaction.getCollective(),
     req.transaction.getFromCollective(),
     req.transaction.getCreatedByUser(),
-    
+
     // TODO: we shouldn't need two paths to fetch a host
     // User->Collective relationship needs to be stored in the Members table
 
@@ -33,7 +33,7 @@ export const getOne = (req, res, next) => {
       where: { CollectiveId: req.transaction.HostCollectiveId }
     }),
 
-    // case 2: in case Host is an ORG, look up an admin with a billing address 
+    // case 2: in case Host is an ORG, look up an admin with a billing address
     // in the Members table
     sequelize.query(`
     WITH admins AS 

@@ -176,7 +176,7 @@ const TransactionFields = () => {
         // TODO: put behind a login check
         return req.loaders.paymentMethods.findById.load(transaction.PaymentMethodId);
       }
-    }    
+    }
   }
 }
 export const TransactionExpenseType = new GraphQLObjectType({

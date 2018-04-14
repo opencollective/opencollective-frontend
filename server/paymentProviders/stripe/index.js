@@ -60,19 +60,19 @@ export default {
     // callback called by Stripe after the user approves the connection
     callback: (req, res, next) => {
       let state, collective;
-    
+
       try {
         state = jwt.verify(req.query.state, config.keys.opencollective.secret);
       } catch (e) {
         return next(new errors.BadRequest(`Invalid JWT: ${e.message}`));
       }
-    
+
       const { CollectiveId, CreatedByUserId } = state;
-    
+
       if (!CollectiveId) {
         return next(new errors.BadRequest('No state in the callback'));
       }
-    
+
       const createStripeAccount = data => models.ConnectedAccount.create({
         service: 'stripe',
         CollectiveId,
@@ -86,7 +86,7 @@ export default {
           scope: data.scope
         }
       });
-    
+
       models.Collective.findById(CollectiveId)
         .then(c => {
           collective = c;

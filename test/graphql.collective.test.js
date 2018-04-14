@@ -437,7 +437,7 @@ describe('graphql.collective.test.js', () => {
     expect(members[1].role).to.equal('MEMBER');
     expect(members[1].member.name).to.equal('member1');
     expect(members[1].member.email).to.equal('member1@hail.com');
-    
+
     const member = await models.User.findById(members[1].member.createdByUser.id);
     const res2 = await utils.graphqlQuery(query, { collective }, member);
     expect(res2.errors).to.exist;

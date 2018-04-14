@@ -21,8 +21,8 @@ const done = (err) => {
   console.log('\ndone!\n');``
   const subject = `${issuesFound ? '❌' : '✅'} Daily ledger health report - ${(new Date()).toLocaleDateString()}`;
   return emailLib.sendMessage(
-    'ops@opencollective.com', 
-    subject, 
+    'ops@opencollective.com',
+    subject,
     '', {
       bcc: ' ',
       text: result,
@@ -86,7 +86,7 @@ const fetchAll = (func, options) => {
       return fetchAll(func, options)
         .then(result2 => results.data.concat(result2))
     })
-} 
+}
 
 /* **** functions that check for various things **** */
 
@@ -116,7 +116,7 @@ const checkHostsUserOrOrg = () => {
       subHeader('Hosts found with incorrect type', hostErrors.length);
       verboseData(hostErrors, h => Object.assign({slug: h.slug, type: h.type}));
     });
-} 
+}
 
 // Ensure all Collectives are setup properly
 const checkHostCollectives = () => {
@@ -404,7 +404,7 @@ const checkCollectiveBalance = () => {
 const run = () => {
   console.log('\nStarting check_ledger_health script...')
   start = new Date();
-  
+
   return checkHostsUserOrOrg()
   .then(() => checkHostCollectives())
   .then(() => checkUsersAndOrgs())

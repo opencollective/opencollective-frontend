@@ -17,7 +17,7 @@ export default function(Sequelize, DataTypes) {
   const { models } = Sequelize;
 
   const payoutMethods = ['paypal', 'stripe', 'opencollective', 'prepaid'];
-  
+
   const PaymentMethod = Sequelize.define('PaymentMethod', {
     id: {
       type: DataTypes.INTEGER,
@@ -51,7 +51,7 @@ export default function(Sequelize, DataTypes) {
       onUpdate: 'CASCADE'
     },
 
-    name: DataTypes.STRING, // custom human readable identifier for the payment method 
+    name: DataTypes.STRING, // custom human readable identifier for the payment method
     description: DataTypes.STRING, // custom human readable description (useful for matching fund)
     customerId: DataTypes.STRING, // stores the id of the customer from the payment processor at the platform level
     token: DataTypes.STRING,
@@ -180,7 +180,7 @@ export default function(Sequelize, DataTypes) {
       }
     },
   });
-  
+
   PaymentMethod.payoutMethods = payoutMethods;
 
   /**
@@ -326,9 +326,9 @@ export default function(Sequelize, DataTypes) {
       return models.PaymentMethod.create(paymentMethodData);
     } else if (paymentMethod.uuid && paymentMethod.service === 'prepaid') {
 
-      return PaymentMethod.findOne({ 
-        where: { 
-          uuid: paymentMethod.uuid, 
+      return PaymentMethod.findOne({
+        where: {
+          uuid: paymentMethod.uuid,
           token: paymentMethod.token.toUpperCase(),
           archivedAt: null
         }
@@ -357,11 +357,11 @@ export default function(Sequelize, DataTypes) {
               // If this PaymentMethod is associated to an organization, members can use it within limit
               if (PaymentMethodCollective.type === CollectiveTypes.ORGANIZATION) {
                 if (!user.isMember(PaymentMethodCollective.id)) {
-                  throw new Error("You don't have sufficient permissions to access this payment method");                      
+                  throw new Error("You don't have sufficient permissions to access this payment method");
                 }
               } else {
                 if (!user.isAdmin(PaymentMethodCollective.id)) {
-                  throw new Error("You don't have sufficient permissions to access this payment method");                      
+                  throw new Error("You don't have sufficient permissions to access this payment method");
                 }
               }
               return pm;

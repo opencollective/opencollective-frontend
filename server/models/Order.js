@@ -49,7 +49,7 @@ export default function(Sequelize, DataTypes) {
       onUpdate: 'CASCADE',
       allowNull: false
     },
-    
+
     TierId: {
       type: DataTypes.INTEGER,
       references: {
@@ -144,7 +144,7 @@ export default function(Sequelize, DataTypes) {
           }
         })
       },
-      
+
       // does this payment method support recurring payments?
       recurring() {
         return (this.service === 'stripe');
@@ -223,7 +223,7 @@ export default function(Sequelize, DataTypes) {
   /**
    * Populate all the foreign keys if necessary
    * (order.fromCollective, order.collective, order.createdByUser, order.tier)
-   * @param {*} order 
+   * @param {*} order
    */
   Order.prototype.populate = function(foreignKeys = ['FromCollectiveId', 'CollectiveId', 'CreatedByUserId', 'TierId', 'PaymentMethodId']) {
     return Promise.map(foreignKeys, fk => {
@@ -267,7 +267,7 @@ export default function(Sequelize, DataTypes) {
         }
       })
   }
-  
+
   Temporal(Order, Sequelize);
   return Order;
 }

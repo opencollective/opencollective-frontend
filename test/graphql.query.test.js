@@ -124,7 +124,7 @@ describe('Query Tests', () => {
       });
 
       describe('returns multiple events', () => {
-        
+
         it('when given only a collective slug', async () => {
           const query = `
             query getMultipleEvents {
@@ -143,7 +143,7 @@ describe('Query Tests', () => {
                 {
                   description: "February monthly meetup",
                   id: 8,
-                  name: "Feb meetup"               
+                  name: "Feb meetup"
                 },
                 {
                   description: "January monthly meetup",
@@ -170,7 +170,7 @@ describe('Query Tests', () => {
           Object.assign(utils.data('ticket1'), { CollectiveId: event2.id })));
 
         beforeEach(() => models.Order.create(
-          Object.assign(utils.data('order1'), { 
+          Object.assign(utils.data('order1'), {
             CollectiveId: event1.id,
             FromCollectiveId: user2.CollectiveId,
             TierId: ticket1.id,
@@ -179,10 +179,10 @@ describe('Query Tests', () => {
           })));
 
         beforeEach(() => models.Order.create(
-          Object.assign(utils.data('order2'), { 
+          Object.assign(utils.data('order2'), {
             CollectiveId: event1.id,
             FromCollectiveId: user3.CollectiveId,
-            TierId: ticket1.id, 
+            TierId: ticket1.id,
             CreatedByUserId: user3.id,
             processedAt: new Date()
           })));
@@ -190,23 +190,23 @@ describe('Query Tests', () => {
         // this order shouldn't show up in the query
         // because it's not confirmed
         beforeEach(() => models.Order.create(
-          Object.assign(utils.data('order2'), { 
+          Object.assign(utils.data('order2'), {
             CollectiveId: event1.id,
             FromCollectiveId: user1.CollectiveId,
-            TierId: ticket1.id, 
+            TierId: ticket1.id,
             CreatedByUserId: user1.id,
             processedAt: null
           })));
 
         beforeEach(() => models.Order.create(
-          Object.assign(utils.data('order3'), { 
+          Object.assign(utils.data('order3'), {
             CollectiveId: event1.id,
             FromCollectiveId: user3.CollectiveId,
-            TierId: ticket2.id, 
+            TierId: ticket2.id,
             CreatedByUserId: user3.id,
             processedAt: new Date()
           })));
-        
+
         it('sends order data', async () => {
           const query = `
             query getOneCollective {

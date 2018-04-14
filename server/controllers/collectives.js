@@ -166,7 +166,7 @@ export const create = (req, res, next) => {
 
   if (!collectiveData.hostId) {
     collectiveData.hostId = defaultHostCollective().CollectiveId; // set it to our non-open-source host as default
-  } 
+  }
 
   const sendConfirmationEmail = (user, collective) => {
     const data = {
@@ -269,7 +269,7 @@ export const createFromGithub = (req, res, next) => {
   const collectiveData = payload.group;
   const githubUser = payload.user;
   let createdCollective;
-  
+
   collectiveData.tiers = [
     {
       type: 'TIER',

@@ -62,12 +62,12 @@ export function sumTransactionsByCurrency(attribute = 'netAmountInCollectiveCurr
 
 /**
  * Sum an attribute of the Transactions table and return the result by currency with the total in host currency
- * 
+ *
  * @param {*} attribute column to sum, e.g. 'netAmountInCollectiveCurrency' or 'hostFeeInHostCurrency'
  * @param {*} where where clause to reduce the scope
  * @param {*} hostCurrency currency of the host
  *
- * @post { 
+ * @post {
  *   byCurrency: [ { amount: Float!, currency: 'USD' }]
  *   totalInHostCurrency: Float!
  * }
@@ -95,7 +95,7 @@ export function getTotalHostFees(collectiveids, type, startDate = new Date('2015
   const where = {
     CollectiveId: { $in: collectiveids },
     createdAt: { $gte: startDate, $lt: endDate }
-  }; 
+  };
   if (type) {
     where.type = type;
   }

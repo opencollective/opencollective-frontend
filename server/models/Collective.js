@@ -1,13 +1,12 @@
 /**
  * Dependencies.
  */
-import _, { get } from 'lodash';
+import _, { get, difference, uniq, pick } from 'lodash';
 import Temporal from 'sequelize-temporal';
 import config from 'config';
 import deepmerge from 'deepmerge';
 import prependHttp from 'prepend-http';
 import queries from '../lib/queries';
-import { difference, uniq, pick } from 'lodash';
 import { types } from '../constants/collectives';
 import roles from '../constants/roles';
 import { HOST_FEE_PERCENT } from '../constants/transactions';
@@ -27,7 +26,7 @@ const debug = debugLib('collective');
 
 /**
  * Collective Model.
- * 
+ *
  * There 3 types of collective at the moment
  * - Collective
  * - User: Collective with only one ADMIN
@@ -637,7 +636,7 @@ export default function(Sequelize, DataTypes) {
 
   /**
    * Get the Tier object of a user
-   * @param {*} user 
+   * @param {*} user
    */
   Collective.prototype.getBackerTier = function(backerCollective) {
     if (backerCollective.role && backerCollective.role !== 'BACKER') return backerCollective;
@@ -654,8 +653,8 @@ export default function(Sequelize, DataTypes) {
    * Add User to the Collective
    * @post Member( { CreatedByUserId: user.id, MemberCollectiveId: user.CollectiveId, CollectiveId: this.id })
    * @param {*} user { id, CollectiveId }
-   * @param {*} role 
-   * @param {*} defaultAttributes 
+   * @param {*} role
+   * @param {*} defaultAttributes
    */
   Collective.prototype.addUserWithRole = function(user, role, defaultAttributes) {
 
@@ -846,7 +845,7 @@ export default function(Sequelize, DataTypes) {
           if (!tier.name) return;
           tier.CollectiveId = this.id;
           tier.currency = tier.currency || this.currency;
-          return models.Tier.create(tier);  
+          return models.Tier.create(tier);
         }
       });
     })
@@ -854,7 +853,7 @@ export default function(Sequelize, DataTypes) {
   };
 
   /*
-   * Assumes: 
+   * Assumes:
    * - only credit cards on stripe can be updated
    */
 
@@ -862,11 +861,11 @@ export default function(Sequelize, DataTypes) {
     if (!paymentMethods) return Promise.resolve();
     // We only allow editing of Stripe Payment Methods for the moment
     // (to avoid marking other types as archived see issue #698)
-    return models.PaymentMethod.findAll({ where: { 
-      CollectiveId: this.id, 
-      archivedAt: { $eq: null }, 
+    return models.PaymentMethod.findAll({ where: {
+      CollectiveId: this.id,
+      archivedAt: { $eq: null },
       service: 'stripe',
-      type: 'creditcard' 
+      type: 'creditcard'
     }})
     .then(oldPaymentMethods => {
       // remove the paymentMethods that are not present anymore in the updated collective
@@ -926,7 +925,7 @@ export default function(Sequelize, DataTypes) {
       } else if (paymentMethod.endDate && (paymentMethod.endDate < new Date())) {
         throw new Error('Payment method expired');
       }
-    });    
+    });
   }
 
   Collective.prototype.getBalance = function(until) {
@@ -1246,7 +1245,7 @@ export default function(Sequelize, DataTypes) {
     return queries.getMembersWithTotalDonations({ CollectiveId: this.id, role: 'BACKER' }, { since, until, limit })
       .tap(backers => debug("getTopBackers", backers.map(b => b.dataValues)));
   };
-  
+
 
   /**
    * Class Methods
@@ -1367,7 +1366,7 @@ export default function(Sequelize, DataTypes) {
     Collective.hasMany(m.Activity);
     Collective.hasMany(m.Notification);
     Collective.hasMany(m.Transaction, { foreignKey: 'CollectiveId', as: 'transactions' }); // collective.getTransactions()
-    Collective.hasMany(m.Tier, { as: 'tiers' });    
+    Collective.hasMany(m.Tier, { as: 'tiers' });
   }
 
   Temporal(Collective, Sequelize);

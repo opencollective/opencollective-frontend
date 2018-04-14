@@ -1,7 +1,7 @@
 import sanitize from 'sanitize-html';
 import lodashEach from 'lodash/collection/forEach';
 
- 
+
 export default () => {
   return (req, res, next) => {
     if (req.body) {

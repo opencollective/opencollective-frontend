@@ -9,7 +9,7 @@ function getDate(date = 'latest') {
   if (date.getFullYear) {
     date.setTime( date.getTime() + date.getTimezoneOffset()*60*1000 );
     const mm = date.getMonth() + 1; // getMonth() is zero-based
-    const dd = date.getDate();    
+    const dd = date.getDate();
     date = [date.getFullYear(),
           (mm>9 ? '' : '0') + mm,
           (dd>9 ? '' : '0') + dd

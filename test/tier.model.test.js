@@ -17,12 +17,12 @@ describe('Collective model', () => {
     currency: 'USD',
     tags: ['#brusselstogether'],
     tiers: [
-      { 
+      {
         name: 'backer',
         range: [2, 100],
         interval: 'monthly'
       },
-      { 
+      {
         name: 'sponsor',
         range: [100, 100000],
         interval: 'yearly'
@@ -56,7 +56,7 @@ describe('Collective model', () => {
       TierId: tiers[0].id,
       processedAt: new Date,
       FromCollectiveId: 1,
-      CollectiveId: collective.id 
+      CollectiveId: collective.id
     }))
   )
 
@@ -68,5 +68,5 @@ describe('Collective model', () => {
     .then(available => {
       expect(available).to.be.false;
     }));
-    
+
 });

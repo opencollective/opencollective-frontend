@@ -23,7 +23,7 @@ const render = (template, data) => {
   if (data.user) {
     data.user.paypalEmail = data.user.paypalEmail || data.user.email;
   }
-  
+
   if (templates[`${template}.text`]) {
     text = templates[`${template}.text`](data);
   }
@@ -165,7 +165,7 @@ const sendMessage = (recipients, subject, html, options = {}) => {
  * Shown in the footer of the email following "To unsubscribe from "
  */
 const getNotificationLabel = (template, recipients) => {
-  
+
   if (!isArray(recipients)) recipients = [recipients];
 
   template = template.replace('.text', '');

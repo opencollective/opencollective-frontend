@@ -157,7 +157,7 @@ describe('Query Tests', () => {
         expect(paymentMethods).to.have.length(1);
         expect(paymentMethods[0].CollectiveId).to.be.null;
       });
-      
+
       it("doesn't get the payment method of the user if not logged in as that user", async () => {
         const createOrderQuery = `
         mutation createOrder($order: OrderInputType!) {

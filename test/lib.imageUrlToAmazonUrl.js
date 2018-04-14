@@ -12,7 +12,7 @@ const imageUrl = 'https://d1ts43dypk8bqh.cloudfront.net/v1/images/1dca3d82-9c91-
 const returnUrl = 'https://opencollective-test.s3-us-west-1.amazonaws.com/31654v3_2ba16cc0-124d-11e6-b36a-2d79eed36137.png';
 
 describe('lib.imageUrlToAmazonUrl.js', () => {
-  
+
   /* Need to jump through some hoops to stub updated uuid library */
   describe('#Convert an external image url to a Amazon url', () => {
 
@@ -21,7 +21,7 @@ describe('lib.imageUrlToAmazonUrl.js', () => {
 
     before(() => {
       sinon.stub(uuid, 'v1', () => 'testuuid');
-    
+
       multiPartStub = sinon.stub(imageUrlLib, 'multiPartUpload')
       multiPartStub.yields(null, {Location: returnUrl});
     });

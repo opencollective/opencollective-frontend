@@ -34,7 +34,7 @@ export const unsubscribe = (req, res, next) => {
 // TODO: move to emailLib.js
 const sendEmailToList = (to, email) => {
   debug("email")("sendEmailToList", to, "email data: ", email);
-  const { mailinglist, collectiveSlug, type } = getNotificationType(to);  
+  const { mailinglist, collectiveSlug, type } = getNotificationType(to);
   email.from = email.from || `${collectiveSlug} collective <hello@${collectiveSlug}.opencollective.com>`;
   email.collective = email.collective || { slug: collectiveSlug }; // used for the unsubscribe url
 
@@ -164,7 +164,7 @@ export const webhook = (req, res, next) => {
       console.error("Error: ", e);
       next(e);
     });
-  }  
+  }
 
   // If the email is sent to :tierSlug or :eventSlug@:collectiveSlug.opencollective.com
   // We leave the original message on the mailgun server

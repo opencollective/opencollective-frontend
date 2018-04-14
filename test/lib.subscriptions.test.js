@@ -181,7 +181,7 @@ describe('LibSubscription', () => {
         try {
           // Then only nextChargeDate should be set to today;
           expect(updatedDates.nextChargeDate.getTime())
-            .to.equal((new Date()).getTime());          
+            .to.equal((new Date()).getTime());
         } finally {
           clock.restore();
         }
@@ -493,7 +493,7 @@ describe('LibSubscription', () => {
 
   describe('#groupProcessedOrders', () => {
     it('should group orders by their status charged, past due, and canceled', () => {
-      // Given three types of 
+      // Given three types of
       const data = [
         { orderId: 1, status: 'success', amount: 1000, retriesAfter: 0 },
         { orderId: 2, status: 'success', amount: 1000, retriesAfter: 0 },

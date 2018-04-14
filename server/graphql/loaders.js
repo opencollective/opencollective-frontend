@@ -234,7 +234,7 @@ export const loaders = (req) => {
             },
             order: [['createdAt', 'DESC']]
           })
-          .then(results => sortResults(combinedKeys, results, 'CollectiveId:FromCollectiveId', []))          
+          .then(results => sortResults(combinedKeys, results, 'CollectiveId:FromCollectiveId', []))
         ),
       totalAmountRaised: new DataLoader(keys => models.Order.findAll({
         attributes: ['ReferralCollectiveId', 'CollectiveId', [sequelize.fn('SUM', sequelize.col('totalAmount')), 'totalAmount'] ],

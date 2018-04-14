@@ -25,7 +25,7 @@ export default {
     } = order;
 
     // we create a customer on platform account only
-    // since this type of source on stripe is easier to use directly from 
+    // since this type of source on stripe is easier to use directly from
     // platform account
     return stripeGateway.appStripe.customers.create({
       email: user.email
@@ -39,9 +39,9 @@ export default {
   webhook: (requestBody, event) => {
 
     const createChargeAndTransactions = (order, { hostStripeAccount, source }) => {
-  
+
       const { collective, createdByUser: user, paymentMethod } = order;
-      let charge, stripeFees = 500;      
+      let charge, stripeFees = 500;
 
       // We need to specify exactly the amount of money to send to host account
       // bitcoin transactions have a standard 0.8% fee charged by Stripe or $5 max
@@ -140,7 +140,7 @@ export default {
        * if it doesn't get a 2XX status code.
        * For non-production environments, we will simply return 200 to avoid
        * the retry on Stripe side (and the email from Stripe support).
-       */ 
+       */
         return Promise.resolve();
       }
 
@@ -151,15 +151,15 @@ export default {
       return order.collective.getHostStripeAccount()
         .then(stripeAccount => hostStripeAccount = stripeAccount)
         .then(() => createChargeAndTransactions(order, {
-          hostStripeAccount: hostStripeAccount.username, 
+          hostStripeAccount: hostStripeAccount.username,
           source: sourceId,
         }))
         // let's add that user as a member
-        .tap(() => order.collective.findOrAddUserWithRole({ 
-          id: order.createdByUser.id, 
-          CollectiveId: order.fromCollective.id}, 
-          roles.BACKER, 
-          { CreatedByUserId: order.createdByUser.id, 
+        .tap(() => order.collective.findOrAddUserWithRole({
+          id: order.createdByUser.id,
+          CollectiveId: order.fromCollective.id},
+          roles.BACKER,
+          { CreatedByUserId: order.createdByUser.id,
             TierId: order.TierId })
         )
         // now we send an email to confirm transaction

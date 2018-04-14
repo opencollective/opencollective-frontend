@@ -185,7 +185,7 @@ describe('graphql.updateSubscriptions.test.js', () => {
 
           expect(res.errors).to.not.exist;
 
-          const updatedOrder = await models.Order.findOne({ 
+          const updatedOrder = await models.Order.findOne({
             where: {
               id: order.id
             },
@@ -200,20 +200,20 @@ describe('graphql.updateSubscriptions.test.js', () => {
 
         it('succeeds when it\'s a new payment method', async () => {
           const res = await utils.graphqlQuery(updateSubscriptionQuery, {
-            id:order.id, 
+            id:order.id,
             paymentMethod: {
                name: '8431',
                token: 'tok_1BvCA5DjPFcHOcTmg1234567',
                service: 'stripe',
                type: 'creditcard',
-               data: { 
+               data: {
                 expMonth: 1,
                 expYear: 2019,
                 brand: 'American Express',
                 country: 'US',
                 funding: 'credit',
-                zip: '10012' 
-              } 
+                zip: '10012'
+              }
             }
           }, user);
 
@@ -237,14 +237,14 @@ describe('graphql.updateSubscriptions.test.js', () => {
           pastDueSubscription = await models.Subscription.findById(1);
           const nextChargeDate = new Date('2018-01-29');
 
-          pastDueSubscription = await pastDueSubscription.update({ chargeRetryCount: 1, nextChargeDate }) 
+          pastDueSubscription = await pastDueSubscription.update({ chargeRetryCount: 1, nextChargeDate })
         })
 
         before(() => clock = sinon.useFakeTimers((new Date("2018-01-28 0:0")).getTime()));
 
         after(() => clock.restore());
 
-        it('succeeds when the payment method uuid is valid', async () => {          
+        it('succeeds when the payment method uuid is valid', async () => {
 
           // add a new payment method
           const pm2 = await models.PaymentMethod.create(Object.assign({}, utils.data('paymentMethod2'), {token: 'tok_123456781234567812345612', customerId: 'cus_new', name: '3434'}));
@@ -259,7 +259,7 @@ describe('graphql.updateSubscriptions.test.js', () => {
           expect(res.errors).to.not.exist;
 
           // fetch updated order
-          const updatedOrder = await models.Order.findOne({ 
+          const updatedOrder = await models.Order.findOne({
             where: {
               id: order.id
             },
@@ -280,20 +280,20 @@ describe('graphql.updateSubscriptions.test.js', () => {
 
           // run query
           const res = await utils.graphqlQuery(updateSubscriptionQuery, {
-            id:order.id, 
+            id:order.id,
             paymentMethod: {
                name: '8431',
                token: 'tok_1BvCA5DjPFcHOcTmg1234567',
                service: 'stripe',
                type: 'creditcard',
-               data: { 
+               data: {
                 expMonth: 1,
                 expYear: 2019,
                 brand: 'American Express',
                 country: 'US',
                 funding: 'credit',
-                zip: '10012' 
-              } 
+                zip: '10012'
+              }
             }
           }, user);
 
@@ -308,7 +308,7 @@ describe('graphql.updateSubscriptions.test.js', () => {
           });
 
           // fetch updated order
-          const updatedOrder = await models.Order.findOne({ 
+          const updatedOrder = await models.Order.findOne({
             where: {
               id: order.id
             },
@@ -320,7 +320,7 @@ describe('graphql.updateSubscriptions.test.js', () => {
           expect(updatedOrder.Subscription.nextChargeDate.getTime()).to.equal((new Date("2018-01-28 0:0")).getTime());
           expect(updatedOrder.Subscription.nextPeriodStart.getTime()).to.equal(originalNextPeriodStart.getTime());
         });
-      })      
+      })
     })
 
 
