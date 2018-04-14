@@ -1,5 +1,4 @@
 import r2 from 'r2';
-import fetch from 'node-fetch';
 
 const WEBSITE_URL = process.env.WEBSITE_URL || "https://staging.opencollective.com";
 
@@ -109,6 +108,5 @@ describe("api.json.test.js", () => {
     });
 
   });
-
 
 });

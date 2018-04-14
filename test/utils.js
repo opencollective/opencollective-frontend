@@ -24,6 +24,7 @@ export const chromeless = {
   },
 
   close: function(chrome) {
+  // eslint-disable-next-line no-unused-vars
   return new Promise((resolve, reject) => {
     chrome.end()
       .then(() => {
