@@ -1,5 +1,5 @@
 import path from 'path';
-import uuidv1 from 'uuid/v1';
+import uuid from 'uuid';
 import mime from 'mime';
 import request from 'request';
 import MultiPartUpload from 'knox-mpu-alt';
@@ -27,7 +27,7 @@ function imageUrlToAmazonUrl(knox_client, src, callback) {
     if (response.statusCode === 200) {
       const name = path.basename(src).replace(/\W/g, ''); // remove non alphanumeric
       const ext = mime.getExtension(contentType) || path.extname(src).substr(1);
-      const filename = `/${name}_${uuidv1()}.${ext}`;
+      const filename = `/${name}_${uuid.v1()}.${ext}`;
 
     this.multiPartUpload({
         client: knox_client,
