@@ -28,7 +28,7 @@ describe('paypal.preapproval.routes.test.js', () => {
   });
 
   beforeEach(() => {
-    sinon.stub(paypalAdaptive, 'preapproval', 
+    sinon.stub(paypalAdaptive, 'preapproval',
       () => Promise.resolve(paypalMock.adaptive.preapproval));
   });
 
@@ -167,7 +167,7 @@ describe('paypal.preapproval.routes.test.js', () => {
     describe('Details from Paypal CREATED', () => {
 
       beforeEach(() => {
-        sinon.stub(paypalAdaptive, 'preapprovalDetails', 
+        sinon.stub(paypalAdaptive, 'preapprovalDetails',
           () => Promise.resolve(paypalMock.adaptive.preapprovalDetails.created));
       });
 
@@ -190,7 +190,7 @@ describe('paypal.preapproval.routes.test.js', () => {
     describe('Details from Paypal ERROR', () => {
 
       beforeEach(() => {
-        sinon.stub(paypalAdaptive, 'preapprovalDetails', 
+        sinon.stub(paypalAdaptive, 'preapprovalDetails',
           () => Promise.reject(paypalMock.adaptive.preapprovalDetails.error));
       });
 

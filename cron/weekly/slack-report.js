@@ -59,7 +59,7 @@ const collectiveByCurrency = {
 
 const onlyIncludeCollectiveType = {
   include: [{
-    model: models.Collective, 
+    model: models.Collective,
     as: 'collective',
     where: {
       type: 'COLLECTIVE'

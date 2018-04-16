@@ -307,13 +307,13 @@ const sendOrderConfirmedEmail = async (order) => {
 const sendSupportEmailForManualIntervention = (order) => {
   const user = order.createdByUser;
   return emailLib.sendMessage(
-    'support@opencollective.com', 
-    'Gift card order needs manual attention', 
-    null, 
+    'support@opencollective.com',
+    'Gift card order needs manual attention',
+    null,
     { text: `Order Id: ${order.id} by userId: ${user.id}`});
 }
 
-// Assumes one-time payments, 
+// Assumes one-time payments,
 const sendOrderProcessingEmail = (order) => {
     const { collective, fromCollective } = order;
   const user = order.createdByUser;

@@ -38,7 +38,7 @@ export function getDomain(url = '') {
       arrLen = splitArr.length;
 
   //extracting the root domain here
-  //if there is a subdomain 
+  //if there is a subdomain
   if (arrLen > 2) {
       domain = `${splitArr[arrLen - 2]}.${splitArr[arrLen - 1]}`;
       //check to see if it's using a Country Code Top Level Domain (ccTLD) (i.e. ".me.uk")
@@ -95,7 +95,7 @@ export const sanitizeObject = (obj, attributes, sanitizerFn) => {
 
 /**
  * recursively reads all values of an object and hide emails and tokens
- * @param {*} obj 
+ * @param {*} obj
  */
 export const sanitizeForLogs = (obj) => {
   const sanitizer = (value) => {
@@ -117,8 +117,8 @@ export const sanitizeForLogs = (obj) => {
 String.prototype.trunc = function(n, useWordBoundary ) {
   if (this.length <= n) return this;
   const subString = this.substr(0, n-1);
-  return `${(useWordBoundary 
-    ? subString.substr(0, subString.lastIndexOf(' ')) 
+  return `${(useWordBoundary
+    ? subString.substr(0, subString.lastIndexOf(' '))
     : subString)}&hellip;`;
 };
 
@@ -253,11 +253,11 @@ export const flattenArray = (arr) => {
 
 /**
  * Returns stats for each tier compared to previousMonth
- * 
+ *
  * @PRE:
  *  - tiers: array of Tier: [ { name, interval, users: [ { id, totalDonations, firstDonation, lastDonation } ] } ]
  *  - startDate, endDate: boundaries for lastMonth
- * 
+ *
  * @POST: { stats, tiers }
  *  - stats.backers.lastMonth: number of backers who were active by endDate
  *  - stats.backers.previousMonth: number of backers who were active by startDate
@@ -351,7 +351,7 @@ export const getTiersStats = (tiers, startDate, endDate) => {
       });
 
       tier.users = backers;
-      
+
       return tier;
     });
   })
@@ -363,9 +363,9 @@ export const getTiersStats = (tiers, startDate, endDate) => {
 /**
  * export data to CSV
  * @param {*} data
- * @param {*} attributes 
- * @param {*} getColumnName 
- * @param {*} processValue 
+ * @param {*} attributes
+ * @param {*} getColumnName
+ * @param {*} processValue
  */
 export function exportToCSV(data, attributes, getColumnName = (attr) => attr, processValue = (attr, val) => val) {
   const lines = [];
@@ -545,7 +545,7 @@ export function formatCurrency(amount, currency, precision = 0) {
     currency,
     minimumFractionDigits : precision,
     maximumFractionDigits : precision
-  });  
+  });
 }
 
 /**

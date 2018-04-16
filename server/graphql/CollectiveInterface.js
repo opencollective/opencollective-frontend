@@ -465,7 +465,7 @@ export const CollectiveInterfaceType = new GraphQLInterfaceType({
         }
       },
       orders: { type: new GraphQLList(OrderType) },
-      ordersFromCollective: { 
+      ordersFromCollective: {
         type: new GraphQLList(OrderType),
         args: {
           subscriptionsOnly: { type: GraphQLBoolean }
@@ -728,7 +728,7 @@ const CollectiveFields = () => {
         if (roles && roles.length > 0) {
           query.where.role = { $in: roles };
         }
-        
+
         let conditionOnMemberCollective;
         if (args.type) {
           const types = args.type.split(',');
@@ -848,9 +848,9 @@ const CollectiveFields = () => {
         };
 
         if (args.subscriptionsOnly) {
-          query.include = [{ 
-            model: models.Subscription, 
-            required: true 
+          query.include = [{
+            model: models.Subscription,
+            required: true
           }]
         }
         return collective.getOutgoingOrders(query)

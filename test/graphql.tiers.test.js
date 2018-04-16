@@ -23,7 +23,7 @@ describe('graphql.tiers.test', () => {
   beforeEach(() => models.User.createUserWithCollective(utils.data('user2')).tap(u => user2 = u));
   beforeEach(() => models.User.createUserWithCollective(utils.data('host1')).tap(u => host = u));
   beforeEach(() => models.PaymentMethod.create({
-    ...utils.data('paymentMethod2'), 
+    ...utils.data('paymentMethod2'),
     CreatedByUserId: user1.id,
     CollectiveId: user1.CollectiveId
   }).tap(c => paymentMethod1 = c));
@@ -99,7 +99,7 @@ describe('graphql.tiers.test', () => {
       return Promise.resolve({ id: 'stripeSubscriptionId-123' });
     });
 
-    
+
   });
 
   describe('graphql.tiers.test.js', () => {
@@ -160,7 +160,7 @@ describe('graphql.tiers.test', () => {
           }
         }
       }`;
-      
+
 
       const generateOrder = (user) => {
         return {
@@ -193,7 +193,7 @@ describe('graphql.tiers.test', () => {
         expect(result.errors).to.exist;
         expect(result.errors[0].message).to.equal("You need to be logged in to be able to use a payment method on file");
       });
-    
+
       it("fails to use a payment method on file if not logged in as the owner", async () => {
         const order = generateOrder(user1);
         order.paymentMethod = { uuid: paymentMethod1.uuid };
@@ -202,7 +202,7 @@ describe('graphql.tiers.test', () => {
         expect(result.errors).to.exist;
         expect(result.errors[0].message).to.equal("You don't have sufficient permissions to access this payment method");
       });
-          
+
       it("user1 becomes a backer of collective1 using a payment method on file", async () => {
         const orderInput = generateOrder(user1);
         orderInput.paymentMethod = { uuid: paymentMethod1.uuid };
@@ -225,7 +225,7 @@ describe('graphql.tiers.test', () => {
         expect(transactions).to.have.length(1);
         expect(transactions[0].amount).to.equal(tier1.amount);
       });
-      
+
       it("user1 becomes a backer of collective1 using a new payment method", async () => {
         const result = await utils.graphqlQuery(createOrderQuery, { order: generateOrder(user1) });
         result.errors && console.error(result.errors[0]);

@@ -18,7 +18,7 @@ const {
 
 /**
  * Authorize api_key
- * 
+ *
  * All calls should provide a valid api_key
  */
 export function authorizeApiKey(req, res, next) {
@@ -49,7 +49,7 @@ export function authorizeApiKey(req, res, next) {
 
 /**
  * Makes sure that the user the is logged in and req.remoteUser is populated.
- * if we cannot authenticate the user, we directly return an Unauthorized error. 
+ * if we cannot authenticate the user, we directly return an Unauthorized error.
  */
 export function mustBeLoggedIn(req, res, next) {
   authenticateUser(req, res, (e) => {

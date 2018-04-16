@@ -47,7 +47,7 @@ describe('lib.activities.test.js', () => {
     it (`${constants.SUBSCRIPTION_CANCELLED}`, () => {
       const actual = activitiesLib.formatMessageForPrivateChannel(activitiesData[18], 'slack');
       expect(actual).to.equal('Subscription 4 canceled: EUR 12.34/month from <https://twitter.com/xdamman|xdamman> (jussi@kuohujoki.fi) to <https://opencollective.com/yeoman|Yeoman>');
-    });    
+    });
 
     it (constants.COLLECTIVE_CREATED, () => {
       const actual = activitiesLib.formatMessageForPrivateChannel(activitiesData[19], 'slack');

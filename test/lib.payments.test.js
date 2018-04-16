@@ -34,7 +34,7 @@ describe('lib.payments.test.js', () => {
   });
 
   beforeEach(() => utils.resetTestDB());
-  
+
   beforeEach(() => {
     sandbox = sinon.sandbox.create();
     sandbox.stub(stripe, "createCustomer", () => Promise.resolve({ id: "cus_BM7mGwp1Ea8RtL"}));
@@ -103,7 +103,7 @@ describe('lib.payments.test.js', () => {
 
       it('payment amount is less than 50', () => {
         order.totalAmount = 49;
-        return payments.executeOrder(user, order)       
+        return payments.executeOrder(user, order)
         .catch(err => expect(err.message).to.equal('payment.amount must be at least $0.50'));
       });
 
@@ -137,7 +137,7 @@ describe('lib.payments.test.js', () => {
         describe('one-time', () => {
 
           describe('1st payment', () => {
-            
+
             beforeEach('add transaction for collective 2', () => models.Transaction.createDoubleEntry({
               CollectiveId: collective2.id,
               CreatedByUserId: user2.id,
@@ -188,11 +188,11 @@ describe('lib.payments.test.js', () => {
                 done();
               }, 150);
             });
-  
+
           });
 
           describe('2nd payment with same stripeToken', () => {
-            
+
             beforeEach('create first payment', () => payments.executeOrder(user, order));
 
             beforeEach('create 2nd payment', () => {

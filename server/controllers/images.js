@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import uuid from 'node-uuid';
+import uuidv1 from 'uuid/v1';
 import errors from '../lib/errors';
 import knox from '../gateways/knox';
 
@@ -33,7 +33,7 @@ export default function uploadImage(req, res, next) {
    * We will replace the name to avoid collisions
    */
   const ext = path.extname(file.originalname);
-  const filename = ['/', uuid.v1(), ext].join('');
+  const filename = ['/', uuidv1(), ext].join('');
 
   const put = knox.put(filename, {
     'Content-Length': file.size,

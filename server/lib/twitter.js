@@ -153,7 +153,7 @@ Become a backer! 😃`
   }
   return tweet;
 }
-  
+
 const twitterLib = {
   tweetActivity,
   tweetStatus,

@@ -248,7 +248,7 @@ describe('graphql.transaction.test.js', () => {
       const transactions2 = result2.data.allTransactions;
       expect(result.errors).to.not.exist;
       const expense2 = transactions2.find(t => t.type === 'DEBIT');
-      expect(expense2.attachment).to.equal('******');      
+      expect(expense2.attachment).to.equal('******');
     });
   });
 });

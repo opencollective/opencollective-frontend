@@ -7,7 +7,7 @@ const debug = debugLib("cache");
 
 const cache = LRUCache({
   max: 1000,
-  maxAge: 1000 * 5 // in ms 
+  maxAge: 1000 * 5 // in ms
 });
 
 export default () => {
@@ -15,7 +15,7 @@ export default () => {
     use query and variables to identify a unique cache key
     Track active requests in process
     if incoming request matches an active request,
-      wait for the active to finish and send the same response back to all 
+      wait for the active to finish and send the same response back to all
       waiting requests that match cache key
   */
 
@@ -38,10 +38,10 @@ export default () => {
           case 'finished':
             debug("sending response", cached.contentType, cached.response);
             res.setHeader("content-type", cached.contentType);
-            return res.send(new Buffer(cached.response, "base64"));
+            return res.send(Buffer.from(cached.response, "base64"));
           case 'running':
             return cached.once('finished', () => {
-              return res.send(new Buffer(cached.response, "base64"));
+              return res.send(Buffer.from(cached.response, "base64"));
             })
         }
       } else {
