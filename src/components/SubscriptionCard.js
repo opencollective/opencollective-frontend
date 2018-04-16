@@ -294,8 +294,7 @@ class SubscriptionCard extends React.Component {
           }
 
           .editAmount {
-            position: relative;
-            top: -18px;
+            margin-top: -16px;
             padding: 0 1rem;
           }
 
@@ -426,7 +425,7 @@ class SubscriptionCard extends React.Component {
                 <div className="editAmount">
                   <div className="inputAmount">
                     <span className="currency">$</span>
-                    <input type="number" step="0.01" min="1" name="amount" value={this.state.amountValue || subscription.totalAmount / 100} onChange={this.handleAmountChange}/>
+                    <input type="number" step="1" min="1" name="amount" value={this.state.amountValue || subscription.totalAmount / 100} onChange={this.handleAmountChange}/>
                     <span className="frequency">{subscription.interval === 'year' ? 'Yearly' : 'Monthly'}</span>
                   </div>
                   <div className="update-buttons">
@@ -443,7 +442,7 @@ class SubscriptionCard extends React.Component {
               }
             </div>
 
-            {this.state.visibleState === 'normal' && subscription.stats && Object.keys(subscription.stats).length > 0 &&
+            {this.state.visibleState === this.stateConstants.normal && subscription.stats && Object.keys(subscription.stats).length > 0 &&
               <div className='contribution'>
                 <span className="totalAmount">
                   <Currency value={get(subscription, 'stats.totalDonations')} currency={subscription.currency} />&nbsp;
@@ -451,7 +450,7 @@ class SubscriptionCard extends React.Component {
                 <span className="total-amount-text">{intl.formatMessage(this.messages['subscription.amountToDate'])}</span>
               </div>}
 
-            {this.state.visibleState !== this.stateConstants.cancelConf && subscription.paymentMethod && canEditSubscription &&
+            {(this.state.visibleState === this.stateConstants.normal || this.state.visibleState === this.stateConstants.editPaymentMethod) && subscription.paymentMethod && canEditSubscription &&
               <div className='paymentMethod'>
                   <PaymentMethodChooser
                     paymentMethodInUse={subscription.paymentMethod}
@@ -461,7 +460,7 @@ class SubscriptionCard extends React.Component {
                     onSubmit={this.updatePaymentMethod}/>
               </div>}
 
-            {this.state.visibleState === 'normal' && subscription.isPastDue &&
+            {this.state.visibleState === this.stateConstants.normal && subscription.isPastDue &&
             <div className='past-due-msg'>
               <span onClick={() => this.setState({visibleState: this.stateConstants.editPaymentMethod})}> {intl.formatMessage(this.messages['subscription.pastDue.msg'])}&nbsp;&nbsp;</span>
               <OverlayTrigger trigger="click" placement={'bottom'} overlay={popover} rootClose>
@@ -476,6 +475,7 @@ class SubscriptionCard extends React.Component {
                   <SmallButton className="no" bsStyle="primary" onClick={this.resetState}><FormattedMessage id="subscription.cancel.no.btn" defaultMessage="no" /></SmallButton>
                 </div>
             </div>}
+
             <div className="result">
               { this.state.loading && <div className="loading">Processing...</div> }
               { this.state.result.success &&
