@@ -13,6 +13,7 @@ import models from '../models';
 import errors from '../lib/errors';
 import debugLib from 'debug';
 import config from 'config';
+import prependHttp from 'prepend-http';
 
 const {
   Activity,
@@ -109,6 +110,9 @@ export const getUsers = (req, res, next) => {
       }
       if (!req.collective || !req.remoteUser || !req.remoteUser.isAdmin(req.collective.id)) {
         delete u.email;
+      }
+      if (u.website) {
+        u.website = prependHttp(u.website);
       }
       return u;
     })
