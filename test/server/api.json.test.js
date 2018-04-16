@@ -49,6 +49,18 @@ describe("api.json.test.js", () => {
     });
   });
 
+  describe("old api", () => {
+    describe("webpack", () => {
+      test("return list of backers with proper website url", async () => {
+        const backers = await r2(`${WEBSITE_URL}/api/groups/railsgirlsatl/backers${cacheBurst}`).json;
+        backers.forEach(backer => {
+          if (!backer.website) return;
+          expect(backer.website).toMatch(/^https?:\/\//);
+        })
+      })
+    })
+  });
+
   describe("event", () => {
 
     test("return /:collectiveSlug/events.json", async () => {
