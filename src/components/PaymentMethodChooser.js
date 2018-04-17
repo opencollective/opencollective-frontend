@@ -79,7 +79,7 @@ class PaymentMethodChooser extends React.Component {
   }
 
   resetForm() {
-    this.setState({ 
+    this.setState({
       modified: false,
       showSelector: false,
       showNewCreditCardForm: false,
@@ -234,7 +234,7 @@ class PaymentMethodChooser extends React.Component {
         .PaymentMethodChooser .horizontal.creditcard {
           overflow: hidden;
         }
-          
+
         .PaymentMethodChooser .CreditCardForm {
           padding-top: 0.5rem;
         }
@@ -258,13 +258,12 @@ class PaymentMethodChooser extends React.Component {
         }
       `}</style>
 
-
       {!this.props.editMode &&
         <div className="paymentmethod-info">
           {paymentMethodString} {this.state.showUnknownPaymentMethodHelp &&
             <OverlayTrigger trigger="click" placement={"top"} overlay={popover} rootClose>
               <img className='help-image' src='/static/images/help-icon.svg' />
-            </OverlayTrigger> 
+            </OverlayTrigger>
             }
         </div>}
 
@@ -279,7 +278,7 @@ class PaymentMethodChooser extends React.Component {
             />}
 
 
-      { this.props.editMode && this.state.showNewCreditCardForm && 
+      { this.props.editMode && this.state.showNewCreditCardForm &&
          <div>
           <InputField
               type="creditcard"
@@ -289,16 +288,16 @@ class PaymentMethodChooser extends React.Component {
               style={ {base: { fontSize }}}
               />
           </div>}
-      { this.props.editMode && 
+
+      { this.props.editMode &&
         <div className='actions'>
-          <SmallButton className="yes" bsStyle="primary" onClick={this.onSubmit} disabled={this.state.loading || !this.state.modified} style={{minWidth: '80px'}}>
-            {intl.formatMessage(this.messages[`paymentMethod.save`])} 
-          </SmallButton>
-
           <SmallButton className="no" bsStyle="primary" onClick={this.resetForm}>
-            {intl.formatMessage(this.messages[`paymentMethod.cancel`])} 
+            {intl.formatMessage(this.messages[`paymentMethod.cancel`])}
           </SmallButton>
 
+          <SmallButton className="yes" bsStyle="primary" onClick={this.onSubmit} disabled={this.state.loading || !this.state.modified} style={{minWidth: '80px'}}>
+            {intl.formatMessage(this.messages[`paymentMethod.save`])}
+          </SmallButton>
         </div>}
 
       <div className="result">

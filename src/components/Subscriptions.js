@@ -38,8 +38,14 @@ class Subscriptions extends React.Component {
     if (!this.props.LoggedInUser && nextProps.LoggedInUser) {
       return this.props.refetch();
     }
-  } 
+  }
 
+  sortBycreatedAt(a, b) {
+    const aTimestamp = new Date(a.createdAt).getTime();
+    const bTimestamp = new Date(b.createdAt).getTime();
+
+    return bTimestamp - aTimestamp;
+  }
 
   render() {
     const { intl, subscriptions, LoggedInUser, collective, loading } = this.props;
@@ -48,8 +54,8 @@ class Subscriptions extends React.Component {
       return (<div />);
     }
 
-    const activeSubs = subscriptions.filter(s => s.isSubscriptionActive).sort((s1, s2) => s1.id < s2.id);
-    const canceledSubs = subscriptions.filter(s => !s.isSubscriptionActive).sort((s1, s2) => s1.id < s2.id)
+    const activeSubs = subscriptions.filter(s => s.isSubscriptionActive).sort(this.sortBycreatedAt);
+    const canceledSubs = subscriptions.filter(s => !s.isSubscriptionActive).sort(this.sortBycreatedAt)
 
     let userString = `${collective.name || collective.slug} isn't`;
     if (LoggedInUser && LoggedInUser.canEditCollective(collective)) {
@@ -126,7 +132,7 @@ class Subscriptions extends React.Component {
           { activeSubs.map((subscription) =>
             <SubscriptionCard
               subscription={subscription}
-              key={subscription.id}
+              key={'active-' + subscription.collective.id}
               LoggedInUser={LoggedInUser}
               paymentMethods={collective.paymentMethods}
               slug={collective.slug}
@@ -150,7 +156,7 @@ class Subscriptions extends React.Component {
           { canceledSubs.map((subscription) =>
             <SubscriptionCard
               subscription={subscription}
-              key={subscription.id}
+              key={'canceled-' + subscription.id}
               LoggedInUser={LoggedInUser}
               paymentMethods={collective.paymentMethods}
               slug={collective.slug}
@@ -162,6 +168,5 @@ class Subscriptions extends React.Component {
   }
 
 }
-
 
 export default withIntl(Subscriptions);
