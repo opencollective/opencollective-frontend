@@ -427,8 +427,8 @@ class SubscriptionCard extends React.Component {
                     <span className="frequency">{subscription.interval === 'year' ? 'Yearly' : 'Monthly'}</span>
                   </div>
                   <div className="update-buttons">
-                    <SmallButton className="yes" bsStyle="primary" disabled={!this.state.amountValue || this.state.amountValue === subscription.totalAmount / 100} onClick={this.updateAmount}><FormattedMessage id="subscription.updateAmount.update.btn" defaultMessage="Update" /></SmallButton>
                     <SmallButton className="no" bsStyle="primary" onClick={this.resetState}><FormattedMessage id="subscription.updateAmount.cancel.btn" defaultMessage="Cancel" /></SmallButton>
+                    <SmallButton className="yes" bsStyle="primary" disabled={!this.state.amountValue || this.state.amountValue === subscription.totalAmount / 100} onClick={this.updateAmount}><FormattedMessage id="subscription.updateAmount.update.btn" defaultMessage="Update" /></SmallButton>
                   </div>
                 </div>
               }
@@ -469,8 +469,8 @@ class SubscriptionCard extends React.Component {
             {this.state.visibleState === this.stateConstants.cancelConf && <div className='cancel'>
               Cancel this subscription?
                 <div className='cancel-buttons'>
-                  <CancelSubscriptionBtn id={subscription.id} onError={this.onError}/>
                   <SmallButton className="no" bsStyle="primary" onClick={this.resetState}><FormattedMessage id="subscription.cancel.no.btn" defaultMessage="no" /></SmallButton>
+                  <CancelSubscriptionBtn id={subscription.id} onError={this.onError}/>
                 </div>
             </div>}
 
