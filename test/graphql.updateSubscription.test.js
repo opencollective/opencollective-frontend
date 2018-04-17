@@ -323,9 +323,17 @@ describe('graphql.updateSubscriptions.test.js', () => {
       })
     })
 
-    describe('updating payment amount', async () => {
+    describe('updating amount', async () => {
 
-      it('fails when the payment amount is invalid (too small)', async () => {
+      it('fails when the amount is the same', async () => {
+
+        const res = await utils.graphqlQuery(updateSubscriptionQuery, { id: order.id, amount: 2000}, user);
+
+        expect(res.errors).to.exist;
+        expect(res.errors[0].message).to.equal('Same amount');
+      })
+
+      it('fails when the amount is invalid (too small)', async () => {
 
         const res = await utils.graphqlQuery(updateSubscriptionQuery, { id: order.id, amount: 75}, user);
 
@@ -333,7 +341,7 @@ describe('graphql.updateSubscriptions.test.js', () => {
         expect(res.errors[0].message).to.equal('Invalid amount');
       })
 
-      it('fails when the payment amount is invalid (divisible by 100)', async () => {
+      it('fails when the amount is invalid (divisible by 100)', async () => {
 
         const res = await utils.graphqlQuery(updateSubscriptionQuery, { id: order.id, amount: 125}, user);
 
@@ -341,7 +349,7 @@ describe('graphql.updateSubscriptions.test.js', () => {
         expect(res.errors[0].message).to.equal('Invalid amount');
       })
 
-      it('succeeds when the payment amount is valid', async () => {
+      it('succeeds when the amount is valid', async () => {
 
         const res = await utils.graphqlQuery(updateSubscriptionQuery, { id: order.id, amount: 4000}, user);
 

@@ -323,7 +323,7 @@ export async function updateSubscription(remoteUser, args) {
     throw new Error('Subscription must be active to be updated');
   }
 
-  if (paymentMethod) {
+  if (paymentMethod !== undefined) {
       let newPm;
 
       // TODO: Would be even better if we could charge you here directly
@@ -352,7 +352,11 @@ export async function updateSubscription(remoteUser, args) {
       order = await order.update({ PaymentMethodId: newPm.id});
   }
 
-  if (amount) {
+  if (amount !== undefined) {
+
+    if (amount == order.Subscription.amount) {
+      throw new Error('Same amount');
+    }
 
     if (amount < 100 || amount % 100 !== 0) {
       throw new Error('Invalid amount');
