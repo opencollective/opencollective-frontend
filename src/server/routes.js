@@ -14,15 +14,17 @@ import express from 'express';
 module.exports = (server, app) => {
 
   server.get('*', mw.ga, (req, res, next) => {
-    // By default, we cache all GET calls for 30s at the CDN level (cloudflare) => we should increase this over time
-    // note: only for production/staging (NextJS overrides this in development env)
-    res.setHeader('cache-control', 'max-age=30');
     req.app = app;
     return next();
   });
 
-  server.get('/favicon.*', (req, res) => {
-    res.setHeader('cache-control', 'max-age=300000');
+  // By default, we cache all GET calls for 30s at the CDN level (cloudflare) => we should increase this over time
+  // note: only for production/staging (NextJS overrides this in development env)
+  server.get('*', mw.maxAge(30));
+
+  server.get('/static/*', mw.maxAge(7200));
+
+  server.get('/favicon.*', mw.maxAge(300000), (req, res) => {
     return res.sendFile(path.join(__dirname, '../public/images/favicon.ico.png'));
   });
 
@@ -42,7 +44,7 @@ module.exports = (server, app) => {
    * and we can cache them at cloudflare level (to reduce bandwidth at cloudinary level)
    * Format: /proxy/images?src=:encoded_url&width=:width
    */
-  server.get('/proxy/images', (req, res) => {
+  server.get('/proxy/images', mw.maxAge(7200), (req, res) => {
     const { src, width, height, query } = req.query;
 
     const url = getCloudinaryUrl(src, { width, height, query });
@@ -64,10 +66,10 @@ module.exports = (server, app) => {
    */
   server.use('/public', express.static(path.join(__dirname, `../public`), { maxAge: '1d' }));  
 
-  server.get('/:collectiveSlug/:image(avatar|logo).:format(txt|png|jpg|gif|svg)', mw.maxAge(300), controllers.collectives.logo);
+  server.get('/:collectiveSlug/:image(avatar|logo).:format(txt|png|jpg|gif|svg)', mw.maxAge(7200), controllers.collectives.logo);
   server.get('/:collectiveSlug/:backerType.svg', controllers.collectives.banner);
   server.get('/:collectiveSlug/:backerType/badge.svg', controllers.collectives.badge);
-  server.get('/:collectiveSlug/:backerType/:position/avatar(.:format(png|jpg|svg))?', mw.maxAge(300), mw.ga, controllers.collectives.avatar);
+  server.get('/:collectiveSlug/:backerType/:position/avatar(.:format(png|jpg|svg))?', mw.maxAge(7200), mw.ga, controllers.collectives.avatar);
   server.get('/:collectiveSlug/:backerType/:position/website(.:format(png|jpg|svg))?', mw.ga, controllers.collectives.website);
 
   server.get('/:collectiveSlug/tiers/:tierSlug.:format(png|jpg|svg)', controllers.collectives.banner);
@@ -76,7 +78,7 @@ module.exports = (server, app) => {
   server.get('/:collectiveSlug/members/:backerType(all|users|organizations).:format(json|csv)', controllers.members.list);
   server.get('/:collectiveSlug/tiers/:tierSlug/:backerType(all|users|organizations).:format(json|csv)', controllers.members.list);
   server.get('/:collectiveSlug/tiers/:tierSlug/badge.svg', controllers.collectives.badge);
-  server.get('/:collectiveSlug/tiers/:tierSlug/:position/avatar(.:format(png|jpg|svg))?', mw.maxAge(300), mw.ga, controllers.collectives.avatar);
+  server.get('/:collectiveSlug/tiers/:tierSlug/:position/avatar(.:format(png|jpg|svg))?', mw.maxAge(7200), mw.ga, controllers.collectives.avatar);
   server.get('/:collectiveSlug/tiers/:tierSlug/:position/website(.:format(png|jpg|svg))?', mw.ga, controllers.collectives.website);
   server.get('/:collectiveSlug/invoices/:invoiceSlug.:format(html|pdf|json)', mw.ga, controllers.transactions.invoice);
 
