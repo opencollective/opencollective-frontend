@@ -14,8 +14,9 @@ class MessageModal extends React.Component {
     this.state = { show: true };
     this.close = this.close.bind(this);
     this.messages = defineMessages({
-      'StripeAccountConnected': { id: 'collective.messages.StripeAccountConnected', defaultMessage: 'Stripe account connected successfully' }
-    })
+      'StripeAccountConnected': { id: 'collective.messages.StripeAccountConnected', defaultMessage: 'Stripe account connected successfully' },
+      'PayPalBtAccountConnected': { id: 'collective.messages.PayPalBtAccountConnected', defaultMessage: 'PayPal/Braintree account connected successfully' }
+    });
   }
 
   close() {
