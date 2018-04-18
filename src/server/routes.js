@@ -66,10 +66,10 @@ module.exports = (server, app) => {
    */
   server.use('/public', express.static(path.join(__dirname, `../public`), { maxAge: '1d' }));  
 
-  server.get('/:collectiveSlug/:image(avatar|logo).:format(txt|png|jpg|gif|svg)', mw.maxAge(300), controllers.collectives.logo);
+  server.get('/:collectiveSlug/:image(avatar|logo).:format(txt|png|jpg|gif|svg)', mw.maxAge(7200), controllers.collectives.logo);
   server.get('/:collectiveSlug/:backerType.svg', controllers.collectives.banner);
   server.get('/:collectiveSlug/:backerType/badge.svg', controllers.collectives.badge);
-  server.get('/:collectiveSlug/:backerType/:position/avatar(.:format(png|jpg|svg))?', mw.maxAge(300), mw.ga, controllers.collectives.avatar);
+  server.get('/:collectiveSlug/:backerType/:position/avatar(.:format(png|jpg|svg))?', mw.maxAge(7200), mw.ga, controllers.collectives.avatar);
   server.get('/:collectiveSlug/:backerType/:position/website(.:format(png|jpg|svg))?', mw.ga, controllers.collectives.website);
 
   server.get('/:collectiveSlug/tiers/:tierSlug.:format(png|jpg|svg)', controllers.collectives.banner);
@@ -78,7 +78,7 @@ module.exports = (server, app) => {
   server.get('/:collectiveSlug/members/:backerType(all|users|organizations).:format(json|csv)', controllers.members.list);
   server.get('/:collectiveSlug/tiers/:tierSlug/:backerType(all|users|organizations).:format(json|csv)', controllers.members.list);
   server.get('/:collectiveSlug/tiers/:tierSlug/badge.svg', controllers.collectives.badge);
-  server.get('/:collectiveSlug/tiers/:tierSlug/:position/avatar(.:format(png|jpg|svg))?', mw.maxAge(300), mw.ga, controllers.collectives.avatar);
+  server.get('/:collectiveSlug/tiers/:tierSlug/:position/avatar(.:format(png|jpg|svg))?', mw.maxAge(7200), mw.ga, controllers.collectives.avatar);
   server.get('/:collectiveSlug/tiers/:tierSlug/:position/website(.:format(png|jpg|svg))?', mw.ga, controllers.collectives.website);
   server.get('/:collectiveSlug/invoices/:invoiceSlug.:format(html|pdf|json)', mw.ga, controllers.transactions.invoice);
 
