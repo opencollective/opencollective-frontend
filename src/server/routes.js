@@ -14,15 +14,17 @@ import express from 'express';
 module.exports = (server, app) => {
 
   server.get('*', mw.ga, (req, res, next) => {
-    // By default, we cache all GET calls for 30s at the CDN level (cloudflare) => we should increase this over time
-    // note: only for production/staging (NextJS overrides this in development env)
-    res.setHeader('cache-control', 'max-age=30');
     req.app = app;
     return next();
   });
 
-  server.get('/favicon.*', (req, res) => {
-    res.setHeader('cache-control', 'max-age=300000');
+  // By default, we cache all GET calls for 30s at the CDN level (cloudflare) => we should increase this over time
+  // note: only for production/staging (NextJS overrides this in development env)
+  server.get('*', mw.maxAge(30));
+
+  server.get('/static/*', mw.maxAge(7200));
+
+  server.get('/favicon.*', mw.maxAge(300000), (req, res) => {
     return res.sendFile(path.join(__dirname, '../public/images/favicon.ico.png'));
   });
 
