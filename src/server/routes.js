@@ -44,7 +44,7 @@ module.exports = (server, app) => {
    * and we can cache them at cloudflare level (to reduce bandwidth at cloudinary level)
    * Format: /proxy/images?src=:encoded_url&width=:width
    */
-  server.get('/proxy/images', (req, res) => {
+  server.get('/proxy/images', mw.maxAge(7200), (req, res) => {
     const { src, width, height, query } = req.query;
 
     const url = getCloudinaryUrl(src, { width, height, query });
