@@ -89,7 +89,6 @@ class OrderForm extends React.Component {
       'creditcard.error': { id: 'creditcard.error', defaultMessage: 'Invalid credit card' },
       'paymentMethod.type': { id: 'paymentMethod.type', defaultMessage: 'Payment method' },
       'paymentMethod.creditcard': { id: 'paymentMethod.creditcard', defaultMessage: 'credit card' },
-      'paymentMethod.bitcoin': { id: 'paymentMethod.bitcoin', defaultMessage: 'bitcoin' },
       'prepaidcard.label': {id: 'prepaidcard.label', defaultMessage: 'Gift Card'},
       'prepaidcard.apply': {id: 'prepaidcard.apply', defaultMessage: 'Apply'},
       'prepaidcard.invalid': {id: 'prepaidcard.invalid', defaultMessage: 'Invalid code'},
@@ -173,9 +172,6 @@ class OrderForm extends React.Component {
     const { intl, collective } = this.props;
     const paymentMethodTypeOptions = [];
     paymentMethodTypeOptions.push({'creditcard': intl.formatMessage(this.messages['paymentMethod.creditcard'])});
-    if (collective.currency === 'USD' && !get(this.state, 'order.interval') && !get(this.state, 'order.tier.interval')) {
-      paymentMethodTypeOptions.push({'bitcoin': intl.formatMessage(this.messages['paymentMethod.bitcoin'])});
-    }
     this.paymentMethodTypeOptions = paymentMethodTypeOptions;
     return paymentMethodTypeOptions;
   }
@@ -346,14 +342,6 @@ class OrderForm extends React.Component {
       });
     }
 
-    if (newState.paymentMethod.type === 'bitcoin') {
-      // We regenerate a new BTC address if we don't have one yet
-      // or if we change the details of the user (email, fromCollective) or of the order (tier)
-      if (!this.state.paymentMethod.uri || (attr === 'tier' || attr === 'fromCollective' || attr === 'email')) {
-        this.getBTCPaymentAddress(newState);
-      }
-    }
-
     this.setState(newState);
     if (typeof window !== "undefined") {
       window.state = newState;
@@ -427,9 +415,6 @@ class OrderForm extends React.Component {
 
     // validate payment method
     if (order.totalAmount > 0) {
-      if (paymentMethod.type === 'bitcoin') {
-        return true;
-      }
       // favors prepaidcard over credit card
       if (prepaidcard.valid) {
         if (prepaidcard.balance < order.totalAmount) {
@@ -523,38 +508,6 @@ class OrderForm extends React.Component {
         order: Object.assign(order, {interval: null, totalAmount: result.data.prepaidPaymentMethod.balance, tier})
       });
     }
-  }
-
-  getBTCPaymentAddress(state) {
-    const { order } = state;
-    if (!get(order, 'totalAmount')) return;
-    const { LoggedInUser, collective } = this.props;
-    console.log(">>> getBTCPaymentAddress", state, "LoggedInUser", LoggedInUser);
-    const email = LoggedInUser ? LoggedInUser.email : get(state, 'user.email');
-    const name = LoggedInUser ? LoggedInUser.name : get(state, 'user.name');
-
-    if (!email) {
-      return console.error("Impossible to create a bitcoin address without an email address");
-    }
-
-    const metadata = {
-      CollectiveId: collective.id,
-      UserId: get(LoggedInUser, 'id'),
-      FromCollectiveId: get(state, 'fromCollective.id'),
-      TierId: get(state, 'tier.id'),
-    };
-
-    return getStripeToken('btc', { email, name, metadata, amount: order.totalAmount }).then(res => {
-      const paymentMethod = {
-        service: "stripe",
-        type: "bitcoin",
-        currency: "BTC",
-        amount: res.card.amount,
-        uri: res.card.uri,
-        token: res.token
-      };
-      this.setState({ paymentMethod });
-    });
   }
 
   render() {
@@ -659,9 +612,6 @@ class OrderForm extends React.Component {
         .disclaimer {
           margin: 0.5rem;
           font-size: 1.2rem;
-        }
-        .bitcoin.disclaimer {
-          margin: -1rem 0 2rem;
         }
         p {
           margin-top: -2.5rem;
@@ -835,7 +785,8 @@ class OrderForm extends React.Component {
             { order.totalAmount > 0 &&
               <section className="paymentDetails">
                 <SectionTitle section="paymentDetails" />
-                { this.paymentMethodTypeOptions.length > 0 &&
+
+                { this.paymentMethodTypeOptions.length > 1 &&
                   <Row>
                     <Col sm={12}>
                       <InputField
@@ -846,27 +797,6 @@ class OrderForm extends React.Component {
                       label={intl.formatMessage(this.messages['paymentMethod.type'])}
                       onChange={(value) => this.handleChange("paymentMethod", "type", value)}
                       />
-                    </Col>
-                  </Row>
-                }
-                { this.state.paymentMethod.type === 'bitcoin' &&
-                  <Row>
-                    <Col sm={12}>
-                    <div className="form-group">
-                      <label className="col-sm-2 control-label">
-                      </label>
-                      <Col sm={10}>
-                        <div className="bitcoin disclaimer">
-                          <FormattedMessage id="paymentMethod.bitcoin.disclaimer" defaultMessage="Note: Bitcoin donations are automatically converted to US dollars (USD). Only one time donations are supported. The bitcoin address (and QR code) is different for each donation (so please don't share this address)." />
-                        </div>
-                        <RequestBitcoin
-                          USDamount={order.totalAmount}
-                          satoshis={this.state.paymentMethod.amount}
-                          uri={this.state.paymentMethod.uri}
-                          email={LoggedInUser ? LoggedInUser.email : get(this.state, 'user.email')}
-                          />
-                      </Col>
-                    </div>
                     </Col>
                   </Row>
                 }
