@@ -33,15 +33,4 @@ describe("collective.createOrder page", () => {
     cy.get('.result .error').contains("Credit card missing");
   });
 
-  it ("shows the bitcoin payment method type", () => {
-    cy.visit(`${WEBSITE_URL}/apex/donate`)
-    cy.get('.paymentMethodTypeSelector select option').should('have.length', 2);
-    cy.get('.paymentMethodTypeSelector select').select('bitcoin');
-    cy.get('.paymentDetails .error').contains("We can't generate a bitcoin address without a valid email address.");
-    fill('email', 'test@test.com');
-    cy.get('.btcAddress').contains("to this BTC address");
-    cy.get('.intervalBtn.month').click();
-    cy.get('.paymentMethodTypeSelector select option').should('have.length', 1);
-  });
-
 })

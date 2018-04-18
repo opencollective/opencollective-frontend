@@ -4,7 +4,6 @@ import PropTypes from 'prop-types';
 import TierComponent from './Tier';
 import InputField from './InputField';
 import MatchingFundWithData from './MatchingFundWithData';
-import RequestBitcoin from './RequestBitcoin';
 import ActionButton from './Button';
 import SectionTitle from './SectionTitle';
 import { Button, Row, Col, Form, InputGroup, FormControl } from 'react-bootstrap';
