@@ -308,7 +308,7 @@ class InputField extends React.Component {
             pre={field.pre}
             post={field.post}
             name={field.name}
-            step={get(field, 'options.step') || "1"}
+            step={get(field, 'options.step') || "0.01"}
             min={(field.min || 0) / 100}
             label={field.label && `${capitalize(field.label)}`}
             help={field.description}
