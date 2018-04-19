@@ -50,6 +50,8 @@ class SubscriptionCard extends React.Component {
     this.state = {
       showMenu: false,
       visibleState: this.stateConstants.normal,
+      amountValue: this.props.subscription.totalAmount / 100,
+      amountValueInteger: this.props.subscription.totalAmount,
       result: {}
     }
 
@@ -79,8 +81,7 @@ class SubscriptionCard extends React.Component {
   }
 
   async updateAmount() {
-    const amount = this.state.amountValue ? this.state.amountValue * 100 : this.props.subscription.totalAmount;
-    this.update({ amount });
+    this.update({ amount: this.state.amountValueInteger });
   }
 
   resetState() {
@@ -88,7 +89,10 @@ class SubscriptionCard extends React.Component {
   }
 
   handleAmountChange(event) {
-    this.setState({ amountValue: parseInt(event.target.value, 10) });
+    this.setState({
+      amountValue: event.target.value,
+      amountValueInteger: parseInt(event.target.value, 10) * 100
+    });
   }
 
   onError(error) {
@@ -423,12 +427,12 @@ class SubscriptionCard extends React.Component {
                 <div className="editAmount">
                   <div className="inputAmount">
                     <span className="currency">{getCurrencySymbol(subscription.currency)}</span>
-                    <input type="number" step="1" min="1" name="amount" value={this.state.amountValue || subscription.totalAmount / 100} onChange={this.handleAmountChange}/>
+                    <input type="number" step="1" min="1" name="amount" value={this.state.amountValue} onChange={this.handleAmountChange}/>
                     <span className="frequency">{subscription.interval === 'year' ? 'Yearly' : 'Monthly'}</span>
                   </div>
                   <div className="update-buttons">
                     <SmallButton className="no" bsStyle="primary" onClick={this.resetState}><FormattedMessage id="subscription.updateAmount.cancel.btn" defaultMessage="Cancel" /></SmallButton>
-                    <SmallButton className="yes" bsStyle="primary" disabled={!this.state.amountValue || this.state.amountValue === subscription.totalAmount / 100} onClick={this.updateAmount}><FormattedMessage id="subscription.updateAmount.update.btn" defaultMessage="Update" /></SmallButton>
+                    <SmallButton className="yes" bsStyle="primary" disabled={!this.state.amountValueInteger || this.state.amountValueInteger == subscription.totalAmount} onClick={this.updateAmount}><FormattedMessage id="subscription.updateAmount.update.btn" defaultMessage="Update" /></SmallButton>
                   </div>
                 </div>
               }
