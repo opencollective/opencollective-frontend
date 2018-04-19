@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import classNames from 'classnames';
 import TopBarProfileMenu from './TopBarProfileMenu';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import withIntl from '../lib/withIntl';
@@ -60,7 +61,7 @@ class TopBar extends React.Component {
     const { className, LoggedInUser, intl } = this.props;
 
     return (
-      <div className={`${className} TopBar`}>
+      <div className={classNames(className, 'TopBar')}>
         <style jsx>{`
         .TopBar {
           height: 6rem;
