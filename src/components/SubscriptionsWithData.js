@@ -2,8 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Error from '../components/Error';
 import withIntl from '../lib/withIntl';
-import { graphql } from 'react-apollo'
-import gql from 'graphql-tag'
+import { graphql } from 'react-apollo';
 import { getSubscriptionsQuery } from '../graphql/queries';
 import Subscriptions from '../components/Subscriptions';
 import { cloneDeep } from 'lodash';
@@ -48,10 +47,10 @@ export const addSubscriptionsData = graphql(getSubscriptionsQuery, {
       variables: {
         slug: props.slug,
       }
-    } 
+    }
   },
-  
-  props: ({ data, ownProps }) => {
+
+  props: ({ data }) => {
 
     let subscriptions = [];
 
@@ -63,7 +62,8 @@ export const addSubscriptionsData = graphql(getSubscriptionsQuery, {
         const memberInfo = data.Collective.memberOf.filter(member => member.collective.id === s.collective.id)[0];
         if (memberInfo) {
           s.stats = memberInfo.stats || {};
-        }});
+        }
+      });
 
     }
 
@@ -71,7 +71,7 @@ export const addSubscriptionsData = graphql(getSubscriptionsQuery, {
       data,
       subscriptions
     })
-  } 
+  }
 
 });
 

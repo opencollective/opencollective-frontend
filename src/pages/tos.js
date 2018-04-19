@@ -4,10 +4,10 @@ import Footer from '../components/Footer';
 import markdown from '../markdown/tos.md';
 
 export default () =>
-  <div className="root">
+  (<div className="root">
     <Header title="Terms of Service" />
     <Body>
       <div className="content" dangerouslySetInnerHTML={{__html: markdown}} />
     </Body>
     <Footer />
-  </div>
+  </div>)

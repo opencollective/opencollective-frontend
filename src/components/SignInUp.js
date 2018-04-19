@@ -134,7 +134,7 @@ class SignInUp extends React.Component {
             description
           })
           }
-          {!this.props.emailOnly && 
+          {!this.props.emailOnly &&
             <div className="signup">
               {this.fields.map(this.renderInputField)}
             </div>

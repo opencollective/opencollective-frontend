@@ -4,7 +4,6 @@ import withIntl from '../lib/withIntl';
 import { FormattedMessage } from 'react-intl';
 import SmallButton from './SmallButton';
 import QRCode from 'qrcode.react';
-import { getStripeToken } from '../lib/stripe';
 import { isValidEmail } from '../lib/utils';
 
 class RequestBitcoin extends React.Component {
@@ -21,7 +20,7 @@ class RequestBitcoin extends React.Component {
   }
 
   render() {
-    const { USDamount, satoshis, email } = this.props;
+    const { satoshis, email } = this.props;
 
     if (!isValidEmail(email)) {
       return (

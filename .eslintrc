@@ -1,17 +1,13 @@
-// You can also omit the eslint-config- and it will be automatically assumed by ESLint:
 {
-    "extends": "opencollective",
-    "env": {
-        "mocha": true
-    },
-    "plugins": [
-        "mocha"
-    ],
-    "rules": {
-        // we still use console even on frontend
-        "no-console": 0,
-        "mocha/no-exclusive-tests": "error",
-        // use es6 module imports and exports
-//        "import/no-commonjs": "error"
-    }
+  "extends": "opencollective",
+  "env": {
+    "jest": true
+  },
+  "plugins": [
+    "jest"
+  ],
+  "rules": {
+    // we still use console even on frontend
+    "no-console": 0
+  }
 }

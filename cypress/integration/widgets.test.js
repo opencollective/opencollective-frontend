@@ -16,10 +16,10 @@ describe("widgets", () => {
     cy.visit(`${WEBSITE_URL}/veganizerbxl/events.html`);
     cy.get('.pastEvents li').should('have.length', 6);
   })
-  
+
   /**
-   * For some reason, this test fails on CircleCI: 
-   * 
+   * For some reason, this test fails on CircleCI:
+   *
    * Timed out after waiting '60000ms' for your remote page to load. Your page did not fire its 'load' event within '60000ms'
    * CypressError: Timed out after waiting '60000ms' for your remote page to load.
    * Your page did not fire its 'load' event within '60000ms'.

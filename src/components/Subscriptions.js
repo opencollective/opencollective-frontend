@@ -1,19 +1,10 @@
 import React from 'react';
-import { withApollo } from 'react-apollo';
-
 import PropTypes from 'prop-types';
-import Error from '../components/Error';
 import withIntl from '../lib/withIntl';
-import { graphql } from 'react-apollo'
-import gql from 'graphql-tag'
-import { Button } from 'react-bootstrap';
-import { FormattedMessage, defineMessages } from 'react-intl';
+import { defineMessages } from 'react-intl';
 
-import { getSubscriptionsQuery } from '../graphql/queries';
 import SubscriptionCard from './SubscriptionCard';
 import colors from '../constants/colors';
-
-const SUBSCRIPTIONS_PER_PAGE = 25;
 
 class Subscriptions extends React.Component {
 
@@ -130,20 +121,20 @@ class Subscriptions extends React.Component {
 
         <div className='active'>
           { activeSubs.map((subscription) =>
-            <SubscriptionCard
+            (<SubscriptionCard
               subscription={subscription}
-              key={'active-' + subscription.collective.id}
+              key={`active-${subscription.collective.id}`}
               LoggedInUser={LoggedInUser}
               paymentMethods={collective.paymentMethods}
               slug={collective.slug}
-            />
+            />)
           )}
         </div>
-        {activeSubs.length === 0 && 
+        {activeSubs.length === 0 &&
           <div className='subscriptions-noactive'>
             <img className='subscriptions-noactive-image' src='/static/images/no-subscription-placeholder.svg' />
             <div className='subscriptions-noactive-text'> Looks like {userString} contributing right now.</div>
-            <div className='subscriptions-noactive-link'> 
+            <div className='subscriptions-noactive-link'>
               <a href='/discover'>Discover more collectives</a>
             </div>
           </div>}
@@ -154,13 +145,13 @@ class Subscriptions extends React.Component {
         { canceledSubs.length > 0 && <div className="subscriptions-cancelled-label"> <span>{intl.formatMessage(this.messages['subscription.canceled.label'])} </span></div>}
         <div className='canceled'>
           { canceledSubs.map((subscription) =>
-            <SubscriptionCard
+            (<SubscriptionCard
               subscription={subscription}
-              key={'canceled-' + subscription.id}
+              key={`canceled-${subscription.id}`}
               LoggedInUser={LoggedInUser}
               paymentMethods={collective.paymentMethods}
               slug={collective.slug}
-            />
+            />)
           )}
         </div>
       </div>

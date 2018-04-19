@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import colors from '../constants/colors';
-import { Router } from '../server/pages';
 
 import { defineMessages, injectIntl } from 'react-intl';
 import { formatCurrency, formatDate, firstSentence, singular, capitalize } from '../lib/utils';
@@ -113,7 +112,7 @@ ${totalDonationsStr}`
           font-size: 1.4rem;
         }
 
-        `}</style>          
+        `}</style>
         <div>
           { viewMode === 'USER' &&
             <Link route={'collective'} params={{ slug: this.props.member.member.slug}} target="_top" title={title}>

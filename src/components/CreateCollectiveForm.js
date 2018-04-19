@@ -1,16 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import InputField from './InputField';
-import EditTiers from './EditTiers';
-import EditMembers from './EditMembers';
-import EditPaymentMethods from './EditPaymentMethods';
-import EditConnectedAccounts from './EditConnectedAccounts';
-import ExportData from './ExportData';
 import { FormattedMessage, defineMessages } from 'react-intl';
 import { defaultBackgroundImage } from '../constants/collectives';
 import withIntl from '../lib/withIntl';
-import { ButtonGroup, Button } from 'react-bootstrap';
-import { Link } from '../server/pages';
+import { Button } from 'react-bootstrap';
 import { get } from 'lodash';
 import CollectiveCategoryPicker from './CollectiveCategoryPicker';
 import fetch from 'fetch-jsonp';
@@ -182,7 +176,7 @@ class CreateCollectiveForm extends React.Component {
       });
     });
   }
-  
+
   handleChange(fieldname, value) {
     if (fieldname === 'category' && value === 'opensource') {
       return window.location = '/opensource/apply';
@@ -202,7 +196,7 @@ class CreateCollectiveForm extends React.Component {
         })
         .then(json => {
           if (!json) return;
-          const { city, localized_location, lat, lon, members, plain_text_description, name, timezone, key_photo, category, link, created, topics } = json.data;
+          const { city, localized_location, lat, lon, members, plain_text_description, name, timezone, key_photo, link, created, topics } = json.data;
           Object.assign(collective, { name, timezone })
           collective.description = firstSentence(plain_text_description, 255);
           collective.longDescription = plain_text_description;
@@ -239,9 +233,7 @@ class CreateCollectiveForm extends React.Component {
     const { host, collective, loading, intl } = this.props;
 
     const showForm = Boolean(this.categories.length === 0 || this.state.collective.category);
-    const isNew = !(collective && collective.id);
     const defaultStartsAt = new Date;
-    const type = collective.type.toLowerCase();
     defaultStartsAt.setHours(19);
     defaultStartsAt.setMinutes(0);
 
@@ -309,13 +301,13 @@ class CreateCollectiveForm extends React.Component {
           margin: 1rem 0 3rem 0;
         }
         `}</style>
- 
+
         { this.categories.length > 1 && <CollectiveCategoryPicker categories={this.categories} onChange={(value) => this.handleChange("category", value)} /> }
 
         { showForm &&
           <div className="FormInputs">
             { Object.keys(this.fields).map(key =>
-              <div className="inputs" key={key}>
+              (<div className="inputs" key={key}>
                 {this.fields[key].map((field) => (!field.when || field.when()) && <InputField
                   key={`${this.masterKey}-${field.name}`}
                   value={this.state.collective[field.name]}
@@ -334,7 +326,7 @@ class CreateCollectiveForm extends React.Component {
                   context={this.state.collective}
                   onChange={(value) => this.handleChange(field.name, value)}
                   />)}
-              </div>
+              </div>)
             )}
 
             <div className="tos">

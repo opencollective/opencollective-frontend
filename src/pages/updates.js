@@ -9,10 +9,7 @@ import NotFound from '../components/NotFoundPage';
 import ErrorPage from '../components/ErrorPage';
 import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
-import MenuBar from '../components/MenuBar';
 import UpdatesWithData from '../components/UpdatesWithData';
-import { get } from 'lodash';
-import { FormattedMessage } from 'react-intl'
 
 class UpdatesPage extends React.Component {
 

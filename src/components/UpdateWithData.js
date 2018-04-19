@@ -1,10 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import withIntl from '../lib/withIntl';
-import { defineMessages, FormattedNumber, FormattedMessage } from 'react-intl';
 import { graphql } from 'react-apollo'
 import gql from 'graphql-tag'
-import { get } from 'lodash';
 import Update from './Update';
 import NotFound from './NotFound';
 
@@ -16,11 +14,11 @@ class UpdateWithData extends React.Component {
   }
 
   constructor(props) {
-    super(props); 
+    super(props);
   }
 
   render() {
-    const { data, intl, editable, LoggedInUser } = this.props;
+    const { data, editable, LoggedInUser } = this.props;
     if (data.loading) return (<div />);
     const update = data.Update;
     if (!update) return (<NotFound />);

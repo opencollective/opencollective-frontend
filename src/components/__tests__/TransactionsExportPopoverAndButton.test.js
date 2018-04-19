@@ -1,4 +1,3 @@
-import React from 'react';
 import { transformResultInCSV } from '../TransactionsExportPopoverAndButton';
 
 describe("TransactionsExportPopoverAndButton component", () => {

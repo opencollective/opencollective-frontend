@@ -8,8 +8,6 @@ import gql from 'graphql-tag'
 import Member from './Member';
 import { ButtonGroup, Button } from 'react-bootstrap';
 import { FormattedMessage } from 'react-intl';
-import { exportMembers } from '../lib/export_file';
-import { pluralize } from '../lib/utils';
 
 const MEMBERS_PER_PAGE = 10;
 
@@ -35,8 +33,8 @@ class MembersWithData extends React.Component {
   }
 
   onChange() {
-    const { onChange } = this.props; 
-    onChange && this.node && onChange({ height: this.node.offsetHeight });    
+    const { onChange } = this.props;
+    onChange && this.node && onChange({ height: this.node.offsetHeight });
   }
 
   componentDidMount() {
@@ -59,11 +57,6 @@ class MembersWithData extends React.Component {
 
   render() {
     const { data, LoggedInUser, collective, tier, role, type } = this.props;
-
-    let emailGroup = (tier) ? tier.slug : 'all';
-    if (type) {
-      emailGroup = pluralize(type, 2).toLowerCase();
-    }
 
     if (data.error) {
       console.error("graphql error>>>", data.error.message);
@@ -88,7 +81,7 @@ class MembersWithData extends React.Component {
         return aDate - bDate;
       }
     });
-    
+
     const size = members.length > 50 ? "small" : "large";
     let viewMode = (type && type.split(',')[0]) || "USER";
     if (tier && tier.name.match(/sponsor/i)) {
@@ -117,7 +110,7 @@ class MembersWithData extends React.Component {
             display: flex;
             flex-wrap: wrap;
             flex-direction: row;
-            justify-content: center;   
+            justify-content: center;
             overflow: hidden;
             margin: 1rem 0;
           }
@@ -152,14 +145,14 @@ class MembersWithData extends React.Component {
 
         <div className="Members cardsList">
           {members.map((member) =>
-            <Member
+            (<Member
               key={member.id}
               member={member}
               className={classNames(this.props.className, size)}
               collective={collective}
               viewMode={viewMode}
               LoggedInUser={LoggedInUser}
-              />
+              />)
           )}
         </div>
         { members.length % 10 === 0 && members.length >= limit &&
@@ -237,7 +230,7 @@ export const addMembersData = graphql(getMembersQuery, {
         }
       })
     }
-  })  
+  })
 });
 
 

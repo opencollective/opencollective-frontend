@@ -1,6 +1,5 @@
 import { graphql } from 'react-apollo'
 import gql from 'graphql-tag'
-import { intersection, get } from 'lodash';
 import LoggedInUser from '../classes/LoggedInUser';
 import storage from '../lib/storage';
 
@@ -52,7 +51,6 @@ query Transactions($CollectiveId: Int!, $type: String, $limit: Int, $offset: Int
   }
 }
 `;
-
 
 export const getLoggedInUserQuery = gql`
   query LoggedInUser {
@@ -637,7 +635,6 @@ export const addSubscriptionsData = graphql(getSubscriptionsQuery);
 
 const refreshLoggedInUser = async (data) => {
   let res;
-  const startTime = new Date;
 
   if (data.LoggedInUser) {
     const user = new LoggedInUser(data.LoggedInUser);
@@ -652,8 +649,6 @@ const refreshLoggedInUser = async (data) => {
       return null;
     }
     const user = new LoggedInUser(res.data.LoggedInUser);
-    const endTime = new Date;
-    const elapsedTime = Math.round((endTime.getTime() - startTime.getTime()) / 1000);
     storage.set("LoggedInUser", user, 1000 * 60 * 60);
     return user;
   } catch (e) {

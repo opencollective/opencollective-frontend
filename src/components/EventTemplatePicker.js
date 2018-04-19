@@ -19,7 +19,7 @@ class EventTemplatePicker extends React.Component {
     super(props);
     this.state = { event: {}, result: {} };
     this.handleTemplateChange = this.handleTemplateChange.bind(this);
-    
+
   }
 
   handleTemplateChange(e) {

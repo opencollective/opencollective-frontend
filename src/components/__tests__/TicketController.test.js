@@ -5,7 +5,6 @@ import TicketController from '../TicketController';
 let ticketCtlr;
 
 
-
 describe("TicketController", () => {
 
   const div = document.createElement('div');

@@ -5,7 +5,7 @@ import withIntl from '../lib/withIntl';
 import { graphql } from 'react-apollo'
 import gql from 'graphql-tag'
 import Membership from './Membership';
-import { ButtonGroup, Button } from 'react-bootstrap';
+import { Button } from 'react-bootstrap';
 import { FormattedMessage } from 'react-intl';
 
 const MEMBERSHIPS_PER_PAGE = 10;
@@ -32,8 +32,8 @@ class MembershipsWithData extends React.Component {
   }
 
   onChange() {
-    const { onChange } = this.props; 
-    onChange && this.node && onChange({ height: this.node.offsetHeight });    
+    const { onChange } = this.props;
+    onChange && this.node && onChange({ height: this.node.offsetHeight });
   }
 
   componentDidMount() {
@@ -55,7 +55,7 @@ class MembershipsWithData extends React.Component {
   }
 
   render() {
-    const { data, LoggedInUser, role } = this.props;
+    const { data, LoggedInUser } = this.props;
 
     if (data.error) {
       console.error("graphql error>>>", data.error.message);
@@ -81,7 +81,7 @@ class MembershipsWithData extends React.Component {
             display: flex;
             flex-wrap: wrap;
             flex-direction: row;
-            justify-content: center;   
+            justify-content: center;
             overflow: hidden;
             margin: 1rem 0;
           }
@@ -89,11 +89,11 @@ class MembershipsWithData extends React.Component {
 
         <div className="Collectives cardsList">
           {memberships.map((membership) =>
-            <Membership
+            (<Membership
               key={membership.id}
               membership={membership}
               LoggedInUser={LoggedInUser}
-              />
+              />)
           )}
         </div>
         { memberships.length % 10 === 0 && memberships.length >= limit &&
@@ -175,7 +175,7 @@ export const addMembershipsData = graphql(getMembershipsQuery, {
         }
       })
     }
-  })  
+  })
 });
 
 

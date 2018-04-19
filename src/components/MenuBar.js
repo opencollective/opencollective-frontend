@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import colors from '../constants/colors';
-import HashLink from 'react-scrollchor';
 import Logo from './Logo';
 import Sticky from 'react-stickynode';
 import { FormattedMessage, defineMessages } from 'react-intl';
@@ -82,14 +81,13 @@ class MenuBar extends React.Component {
   componentDidMount() {
     window.onscroll = throttle(this.onscroll, 300);
     const { collective } = this.props;
-    const { menuItems } = this.state;
     if (!collective) {
       console.error(">>> this is a weird error, collective should always be set", this.props);
       return;
     }
 
     const menuItemsFoundOnPage = [];
-    uniqBy(document.querySelectorAll('section'), el => el.id).forEach((el, index) => {
+    uniqBy(document.querySelectorAll('section'), el => el.id).forEach(el => {
       if (!el.id) return;
       const titleEl = el.querySelector('.title');
       const menuItem = {
@@ -203,11 +201,11 @@ class MenuBar extends React.Component {
         }
         `}</style>
         { this.state.menuItems.map((item, index) =>
-          <div className={`item ${item.anchor} ${this.state.selectedAnchor === item.anchor && 'selected'}`} key={`item-${index}-${item.link}`}>
+          (<div className={`item ${item.anchor} ${this.state.selectedAnchor === item.anchor && 'selected'}`} key={`item-${index}-${item.link}`}>
             <Link route={item.link} animate={{offset}}>
               { this.messages[item.anchor] ? intl.formatMessage(this.messages[item.anchor]): (item.title || item.anchor) }
             </Link>
-          </div>
+          </div>)
         )}
         { LoggedInUser && LoggedInUser.canEditCollective(collective) &&
           <div className="admin">
@@ -232,7 +230,7 @@ class MenuBar extends React.Component {
   }
 
   render() {
-    const { collective, cta } = this.props;
+    const { collective } = this.props;
     const { logoLink } = this.state;
 
     if (!collective) {

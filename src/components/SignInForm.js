@@ -164,7 +164,7 @@ class LoginForm extends React.Component {
       if (result.redirect) {
         window.location.replace(result.redirect);
       }
-    })    
+    })
   }
 
   handleSubmit(e) {

@@ -2,7 +2,7 @@ export function getCloudinaryUrl(src, { width, height, query }) {
   const cloudinaryBaseUrl = 'https://res.cloudinary.com/opencollective/image/fetch';
 
   // We don't try to resize animated gif, svg or images already processed by cloudinary
-  if (src.substr(0, cloudinaryBaseUrl.length) === cloudinaryBaseUrl || src.match(/\.gif$/) || (src.match(/\.svg/) && !query) || src.match(/localhost\:3000/)) {
+  if (src.substr(0, cloudinaryBaseUrl.length) === cloudinaryBaseUrl || src.match(/\.gif$/) || (src.match(/\.svg/) && !query) || src.match(/localhost:3000/)) {
     return src;
   }
 

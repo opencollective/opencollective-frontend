@@ -4,12 +4,9 @@ import Router from 'next/router';
 import Header from '../components/Header';
 import Body from '../components/Body';
 import Footer from '../components/Footer';
-import Loading from '../components/Loading';
 import Link from '../components/Link';
-import SubscriptionsWithData from '../components/SubscriptionsWithData';
 import withIntl from '../lib/withIntl';
 import withData from '../lib/withData'
-import { isValidUrl } from '../lib/utils';
 import colors from '../constants/colors';
 import { addGetLoggedInUserFunction } from '../graphql/queries';
 
@@ -22,7 +19,6 @@ class SubscriptionsRedirectPage extends React.Component {
   constructor(props) {
     super(props);
     this.state = {}
-
   }
 
   async componentDidMount() {
@@ -38,7 +34,6 @@ class SubscriptionsRedirectPage extends React.Component {
   }
 
   render() {
-    const { slug } = this.props;
     const { LoggedInUser } = this.state;
     return (
       <div className="SubscriptionsPage">
@@ -98,10 +93,10 @@ class SubscriptionsRedirectPage extends React.Component {
             <div className='content'>
               <div className='Subscriptions-header'>
                 <div className='Subscriptions-title'>
-                  {this.state.LoggedInUser && 
-                    <div> 
-                      This page has moved. Your subscriptions are now at 
-                      <Link route={'subscriptions'} params={{collectiveSlug: LoggedInUser.collective.slug }}> 
+                  {this.state.LoggedInUser &&
+                    <div>
+                      This page has moved. Your subscriptions are now at
+                      <Link route={'subscriptions'} params={{collectiveSlug: LoggedInUser.collective.slug }}>
                         <span className='link'> /{LoggedInUser.collective.slug}/subscriptions</span>
                       </Link>. Redirecting...
                     </div>}

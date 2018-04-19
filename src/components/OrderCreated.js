@@ -6,7 +6,7 @@ import TwitterLogo from './TwitterLogo';
 import FacebookLogo from './FacebookLogo';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import { formatCurrency } from '../lib/utils';
-import { Button, Glyphicon } from 'react-bootstrap';
+import { Button } from 'react-bootstrap';
 
 class OrderCreated extends React.Component {
 
@@ -49,12 +49,12 @@ class OrderCreated extends React.Component {
 
     const left = ((width / 2) - (w / 2)) + dualScreenLeft;
     const top = ((height / 2) - (h / 2)) + dualScreenTop;
-    const newWindow = window.open(url, "share", 'scrollbars=yes, width=' + w + ', height=' + h + ', top=' + top + ', left=' + left);
+    const newWindow = window.open(url, "share", `scrollbars=yes, width=${  w  }, height=${  h  }, top=${  top  }, left=${  left}`);
 
     // Puts focus on the newWindow
     if (window.focus) {
         newWindow.focus();
-    }    
+    }
   }
 
   render() {

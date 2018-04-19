@@ -105,7 +105,7 @@ class InputField extends React.Component {
     }
     switch (this.props.type) {
       case 'email':
-        return value.match(/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/);
+        return value.match(/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/);
     }
     return true;
   }
@@ -139,20 +139,20 @@ class InputField extends React.Component {
                               {capitalize(field.label)}
                             </Col>
                             <Col sm={10}>
-                              <InputTypeCreditCard options={field.options} onChange={this.handleChange} style={this.props.style}/>                   
+                              <InputTypeCreditCard options={field.options} onChange={this.handleChange} style={this.props.style}/>
                             </Col>
                           </div>
                         }
                         {!horizontal &&
                           <div>
                             <ControlLabel>{capitalize(field.label)}</ControlLabel>
-                            <InputTypeCreditCard onChange={this.handleChange} style={this.props.style}/>                   
+                            <InputTypeCreditCard onChange={this.handleChange} style={this.props.style}/>
                           </div>
                         }
                       </FormGroup>)
         break;
 
-      case 'textarea':
+      case 'textarea': {
         value = value || this.props.defaultValue || '';
         let after;
         if (field.charCount) {
@@ -176,9 +176,10 @@ class InputField extends React.Component {
                         />
                       )
         break;
+      }
 
       case 'date':
-      case 'datetime':
+      case 'datetime': {
         const timeFormat = field.type === 'date' ? false : true;
         const { closeOnSelect } = this.props;
 
@@ -218,6 +219,7 @@ class InputField extends React.Component {
         </FormGroup>
         )
         break;
+      }
 
       case 'component':
         this.input = (
@@ -320,7 +322,7 @@ class InputField extends React.Component {
           )
         break;
 
-      case 'select':
+      case 'select': {
         const firstOptionValue = Object.keys(field.options[0])[0];
         this.input = (
           <FieldGroup
@@ -345,6 +347,7 @@ class InputField extends React.Component {
             }
           </FieldGroup>)
         break;
+      }
 
       case 'checkbox':
         this.input =  (<FormGroup controlId={field.name}>

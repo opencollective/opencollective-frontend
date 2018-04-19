@@ -84,7 +84,7 @@ export const addTransactionsData = graphql(getTransactionsQuery, {
         }
       })
     }
-  })  
+  })
 });
 
 

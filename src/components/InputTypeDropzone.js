@@ -1,11 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Dropzone from 'react-dropzone'
-import fetch from 'isomorphic-fetch';
 import { imagePreview } from '../lib/utils';
 import { upload } from '../lib/api';
 import withIntl from '../lib/withIntl';
-import { defineMessages, FormattedMessage } from 'react-intl';
+import { defineMessages } from 'react-intl';
 
 class InputTypeDropzone extends React.Component {
 
@@ -52,7 +51,7 @@ class InputTypeDropzone extends React.Component {
       });
   }
 
-  renderContainer({ isDragActive, isDragReject, acceptedFiles, rejectedFiles }) {
+  renderContainer({ isDragActive, isDragReject }) {
     const { intl } = this.props;
 
     let messageId = "placeholder";
@@ -111,7 +110,6 @@ class InputTypeDropzone extends React.Component {
   }
 
   render() {
-    const { intl } = this.props;
     const options = this.props.options || {};
     options.accept = options.accept || 'image/png, image/jpeg';
 

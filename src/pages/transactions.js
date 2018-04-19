@@ -10,8 +10,6 @@ import ErrorPage from '../components/ErrorPage';
 import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
 import TransactionsWithData from '../components/TransactionsWithData';
-import { get } from 'lodash';
-import { FormattedMessage } from 'react-intl'
 
 class TransactionsPage extends React.Component {
 

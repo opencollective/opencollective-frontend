@@ -24,7 +24,7 @@ class TopBar extends React.Component {
     this.props.pushState(null, '/subscriptions')
     this.toggleProfileMenu(e);
   }
-  
+
   renderProfileMenu() {
     const { LoggedInUser } = this.props;
 

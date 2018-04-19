@@ -34,7 +34,7 @@ export function filterCollection(array, cond, inverse) {
       return Boolean(obj.match(cond));
     if (typeof cond === 'string')
       return obj === cond;
-    
+
     const nextKey = Object.keys(cond)[0];
     return test(obj[nextKey], cond[nextKey], ++depth);
   }
@@ -49,7 +49,7 @@ export const isValidUrl = (url) => {
 
 export const isValidEmail = (email) => {
   if (typeof email !== 'string') return false;
-  return email.match(/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/);
+  return email.match(/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/);
 };
 
 export function getCurrencySymbol(currency) {
@@ -108,9 +108,12 @@ export function getQueryParams() {
   let match;
   const pl     = /\+/g,  // Regex for replacing addition symbol with a space
         search = /([^&=]+)=?([^&]*)/g,
-        decode = function (s) { return decodeURIComponent(s.replace(pl, " ")); },
+        decode = function (s) {
+ return decodeURIComponent(s.replace(pl, " "));
+},
         query  = window.location.search.substring(1);
 
+  // eslint-disable-next-line no-cond-assign
   while (match = search.exec(query)) {
     urlParams[decode(match[1])] = decode(match[2]);
   }
@@ -120,13 +123,12 @@ export function getQueryParams() {
 
 // source: https://stackoverflow.com/questions/8498592/extract-hostname-name-from-string
 function extractHostname(url) {
-  var hostname;
+  let hostname;
   //find & remove protocol (http, ftp, etc.) and get hostname
 
   if (url.indexOf("://") > -1) {
       hostname = url.split('/')[2];
-  }
-  else {
+  } else {
       hostname = url.split('/')[0];
   }
 
@@ -139,18 +141,17 @@ function extractHostname(url) {
 }
 
 export function getDomain(url = '') {
-  var domain = extractHostname(url),
-      splitArr = domain.split('.'),
-      arrLen = splitArr.length;
+  let domain = extractHostname(url);
+  const splitArr = domain.split('.'), arrLen = splitArr.length;
 
   //extracting the root domain here
-  //if there is a subdomain 
+  //if there is a subdomain
   if (arrLen > 2) {
-      domain = splitArr[arrLen - 2] + '.' + splitArr[arrLen - 1];
+      domain = `${splitArr[arrLen - 2]  }.${  splitArr[arrLen - 1]}`;
       //check to see if it's using a Country Code Top Level Domain (ccTLD) (i.e. ".me.uk")
       if (splitArr[arrLen - 1].length == 2 && splitArr[arrLen - 1].length == 2) {
           //this is using a ccTLD
-          domain = splitArr[arrLen - 3] + '.' + domain;
+          domain = `${splitArr[arrLen - 3]  }.${  domain}`;
       }
   }
   return domain;
@@ -181,7 +182,7 @@ export function formatCurrency(amount, currency = 'USD', options = {}) {
     minimumFractionDigits : minimumFractionDigits,
     maximumFractionDigits : maximumFractionDigits
   })
-};
+}
 
 export const singular = (str) => {
   if (!str) return '';
@@ -194,7 +195,7 @@ export const pluralize = (str, n) => {
 
 export const translateApiUrl = (url) => {
   const withoutParams = process.env.API_URL + (url.replace('/api/', '/'));
-  const hasParams = `${url}`.match(/\?/) 
+  const hasParams = `${url}`.match(/\?/)
   if (process.env.API_KEY) {
     return `${withoutParams}${hasParams ? '&' : '?'}api_key=${process.env.API_KEY}`;
   } else {
@@ -232,7 +233,7 @@ export const firstSentence = (str, length) => {
   str = str.replace(/&amp;/g, '&');
 
   if (str.length <= length) return str;
-  const tokens = str.match(/\.|\?|\!/);
+  const tokens = str.match(/\.|\?|!/);
   if (tokens) {
     str = str.substr(0, tokens.index + 1);
   }

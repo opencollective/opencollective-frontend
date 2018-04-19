@@ -7,8 +7,6 @@ import gql from 'graphql-tag'
 import Avatar from './Avatar';
 import Logo from './Logo';
 import Link from './Link';
-import { ButtonGroup, Button } from 'react-bootstrap';
-import { FormattedMessage } from 'react-intl';
 import { formatCurrency } from '../lib/utils';
 import { get } from 'lodash';
 
@@ -61,7 +59,7 @@ Financial contribution: ${percentage}% (${formatCurrency(member.stats.totalDonat
             height: auto;
             max-width: 96px;
           }
-          `}</style>      
+          `}</style>
           <Link route={`/${org.slug}`} title={title}>
             <Logo src={org.image} height={36} />
           </Link>
@@ -69,7 +67,7 @@ Financial contribution: ${percentage}% (${formatCurrency(member.stats.totalDonat
       </div>
     )
   }
-  
+
   renderUser(member, index) {
     const user = member.member;
 
@@ -98,7 +96,7 @@ Financial contribution: ${percentage}% (${formatCurrency(member.stats.totalDonat
   }
 
   render() {
-    const { data, LoggedInUser, collective, tier, role, type } = this.props;
+    const { data, collective } = this.props;
 
     if (data.error) {
       console.error("graphql error>>>", data.error.message);
@@ -113,7 +111,7 @@ Financial contribution: ${percentage}% (${formatCurrency(member.stats.totalDonat
       return (<div />)
     }
     const additionalBackers = get(collective, 'stats.backers.all') - members.length;
-    
+
     return (
       <div className="TopBackersCover" ref={(node) => this.node = node}>
         <style jsx>{`

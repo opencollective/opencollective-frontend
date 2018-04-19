@@ -1,10 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { Button, Form } from 'react-bootstrap';
+import { Button } from 'react-bootstrap';
 import { defineMessages } from 'react-intl';
 import withIntl from '../lib/withIntl';
-import { get } from 'lodash';
 import EditPaymentMethod from '../components/EditPaymentMethod';
 
 class EditPaymentMethods extends React.Component {
@@ -17,7 +16,6 @@ class EditPaymentMethods extends React.Component {
 
   constructor(props) {
     super(props);
-    const { intl } = props;
 
     this.state = {};
     this.state.paymentMethods = (props.paymentMethods.length === 0) ? [{}] : props.paymentMethods;
@@ -59,7 +57,7 @@ class EditPaymentMethods extends React.Component {
   }
 
   renderPaymentMethod(paymentMethod, index) {
-    const { intl, collective } = this.props;
+    const { collective } = this.props;
     return (
       <div className="paymentMethod" key={`paymentMethod-${index}`}>
         <EditPaymentMethod

@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { HelpBlock, Button } from 'react-bootstrap';
-import { defineMessages, FormattedMessage } from 'react-intl';
+import { defineMessages } from 'react-intl';
 import withIntl from '../lib/withIntl';
 import { connectAccount } from '../lib/api';
 import EditTwitterAccount from './EditTwitterAccount';

@@ -2,7 +2,7 @@
 
   // Make sure we only load the script once.
   if (window.OC && window.OC.widgets) {
-    window.OC.widgets["{{widget}}"] = window.OC.widgets["{{widget}}"] || [];    
+    window.OC.widgets["{{widget}}"] = window.OC.widgets["{{widget}}"] || [];
     return;
   }
 
@@ -81,7 +81,7 @@
     this.iframe.height = height;
     this.iframe.frameBorder = 0;
     this.iframe.scrolling = 'no';
-    
+
     this.el = document.createElement('div');
     this.el.className = `opencollective-${widget}`;
     this.el.appendChild(this.loading);
@@ -120,11 +120,11 @@
     scriptsNodesArray.map(s => {
       const src = s.getAttribute('src');
       Object.keys(window.OC.widgets).forEach(widget => {
-        if (src && src.match(regex) && src.match(new RegExp(`${widget}\.js`))) {
-          const tokens = src.match(new RegExp(`\/([^\/]+)\/${widget}\.js`));
+        if (src && src.match(regex) && src.match(new RegExp(`${widget}.js`))) {
+          const tokens = src.match(new RegExp(`/([^/]+)/${widget}.js`));
           const collectiveSlug = tokens[1];
           return window.OC.widgets[widget].push(new OpenCollectiveWidget(widget, collectiveSlug, s));
-        }        
+        }
       })
     });
   };

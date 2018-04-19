@@ -26,7 +26,7 @@ class ErrorPage extends React.Component {
     } else {
       this.error = message || intl.formatMessage(this.messages['default']);
     }
-    
+
   }
 
   render() {

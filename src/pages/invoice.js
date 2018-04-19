@@ -1,7 +1,6 @@
 import React from 'react'
 import withIntl from '../lib/withIntl';
-import { capitalize, formatCurrency, imagePreview } from '../lib/utils';
-import colors from '../constants/colors';
+import { formatCurrency, imagePreview } from '../lib/utils';
 import { FormattedDate } from 'react-intl';
 import moment from 'moment';
 import { defaultBackgroundImage } from '../constants/collectives';
@@ -76,7 +75,7 @@ class InvoicePage extends React.Component {
 
   }
 
-  renderPage(pageNumber, transactions) {
+  renderPage() {
     const { invoice } = this.props;
 
     const coverStyle = { ...get(invoice.host, 'settings.style.hero.cover')};
@@ -102,7 +101,7 @@ class InvoicePage extends React.Component {
             text-align: center;
             font-size: 10px;
           }
-          
+
           .footer img {
             max-height: 100px;
             max-width: 200px;
@@ -252,7 +251,7 @@ class InvoicePage extends React.Component {
             line-height: 20px;
             font-size: 2rem;
           }
-        
+
           h2 {
             margin-bottom: 0;
             font-size: 1.6rem;
@@ -261,7 +260,7 @@ class InvoicePage extends React.Component {
           .row {
             overflow: hidden;
           }
-          
+
           .hero {
             border-radius: 3px;
             float: left;
@@ -298,44 +297,44 @@ class InvoicePage extends React.Component {
           .invoiceDetails {
             float: left;
           }
-        
+
           .fromCollectiveBillingAddress {
             float: right;
             padding-right: 15rem;
           }
-        
+
           label {
             display: inline-block;
             width: 8rem;
           }
-        
+
           .rc-table {
             clear: both;
             margin: 100px 0px;
           }
-        
+
           table {
             margin: 8rem 0rem;
             overflow: hidden;
             width: 95%;
           }
-        
+
           td, th {
             padding: 5px;
             vertical-align: top;
             font-size: 1.2rem;
           }
-      
+
           .date {
             width: 2rem;
           }
-      
+
           .amount {
             width: 3rem;
             text-align: right;
             padding-right: 2rem;
           }
-      
+
           tr.footer {
             border-top: 1px solid grey;
             font-weight: bold;

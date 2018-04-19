@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormGroup, ControlLabel, FormControl } from 'react-bootstrap';
 import InputField from './InputField';
 
 class InputFieldPresets extends React.Component {

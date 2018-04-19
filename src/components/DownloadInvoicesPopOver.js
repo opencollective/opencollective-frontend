@@ -1,12 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
-import { withApollo } from 'react-apollo';
 import { FormattedMessage } from 'react-intl';
 import { graphql } from 'react-apollo'
 import gql from 'graphql-tag'
 import {
-  Button,
   Popover,
   OverlayTrigger,
 } from 'react-bootstrap';

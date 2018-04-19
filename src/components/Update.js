@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import withIntl from '../lib/withIntl';
-import { defineMessages, FormattedMessage, FormattedNumber, FormattedDate } from 'react-intl';
-import { capitalize, formatCurrency, formatDate } from '../lib/utils';
+import { defineMessages, FormattedMessage } from 'react-intl';
+import { capitalize, formatDate } from '../lib/utils';
 import { graphql } from 'react-apollo'
 import gql from 'graphql-tag'
 import Avatar from './Avatar';
@@ -77,7 +77,6 @@ class Update extends React.Component {
       intl,
       collective,
       update,
-      includeHostedCollectives,
       LoggedInUser
     } = this.props;
 
@@ -129,7 +128,7 @@ class Update extends React.Component {
           .meta .collective {
             margin-right: 0.2rem;
           }
-          
+
           .actions {
             margin-top: 5rem;
           }
@@ -171,14 +170,14 @@ class Update extends React.Component {
           }
 
           <div className="meta">
-            <div className="author"><Link route={`/${update.fromCollective.slug}`}><a>{update.fromCollective.name}</a></Link></div> 
+            <div className="author"><Link route={`/${update.fromCollective.slug}`}><a>{update.fromCollective.name}</a></Link></div>
             <Role role='ADMIN' />
-            { update.publishedAt && 
+            { update.publishedAt &&
               <div className="publishedAt">
                 <FormattedMessage id="update.publishedAt" defaultMessage={"published on {date}"} values={{date: formatDate(update.publishedAt, { day: 'numeric', month: 'long', year: 'numeric' })}} />
               </div>
             }
-            { !update.publishedAt && 
+            { !update.publishedAt &&
               <div className="createdAt">
                 <FormattedMessage id="update.createdAt" defaultMessage={"created on {date} (draft)"} values={{date: formatDate(update.createdAt)}} />
               </div>

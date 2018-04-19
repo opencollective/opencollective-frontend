@@ -2,7 +2,6 @@ import React from 'react';
 import { addTiersData } from '../graphql/queries';
 import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
-import { FormattedDate, FormattedMessage } from 'react-intl';
 import EditTiersComponent from '../components/EditTiers';
 import Header from '../components/Header';
 import Body from '../components/Body';

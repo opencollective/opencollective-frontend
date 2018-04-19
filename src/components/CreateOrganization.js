@@ -4,12 +4,9 @@ import Header from '../components/Header';
 import Body from '../components/Body';
 import Footer from '../components/Footer';
 import { addCreateCollectiveMutation } from '../graphql/mutations';
-import moment from 'moment-timezone';
 import CreateCollectiveForm from '../components/CreateCollectiveForm';
 import CollectiveCover from '../components/CollectiveCover';
 import SignInForm from '../components/SignInForm';
-import { Button } from 'react-bootstrap';
-import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
 class CreateOrganization extends React.Component {
@@ -20,7 +17,6 @@ class CreateOrganization extends React.Component {
 
   constructor(props) {
     super(props);
-    const timezone = moment.tz.guess();
     this.state = { collective: { type: 'ORGANIZATION' }, result: {} };
     this.createCollective = this.createCollective.bind(this);
     this.error = this.error.bind(this);
@@ -36,7 +32,6 @@ class CreateOrganization extends React.Component {
   }
 
   async createCollective(CollectiveInputType) {
-    const { host, LoggedInUser } = this.props;
     this.setState( { status: 'loading' });
     CollectiveInputType.type = 'ORGANIZATION';
     console.log(">>> createOrganization", CollectiveInputType);
@@ -55,7 +50,7 @@ class CreateOrganization extends React.Component {
   }
 
   render() {
-    const { LoggedInUser, host } = this.props;
+    const { LoggedInUser } = this.props;
 
     const title = `Create a new organization`;
 

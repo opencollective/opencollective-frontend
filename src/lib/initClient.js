@@ -1,4 +1,4 @@
-import { ApolloClient, createNetworkInterface } from 'react-apollo'
+import { ApolloClient, createNetworkInterface, IntrospectionFragmentMatcher } from 'react-apollo'
 import fetch from 'isomorphic-fetch'
 
 let apolloClient = null
@@ -8,7 +8,6 @@ if (!process.browser) {
   global.fetch = fetch
 }
 
-import { IntrospectionFragmentMatcher } from 'react-apollo';
 const fragmentMatcher = new IntrospectionFragmentMatcher({
   introspectionQueryResultData: {
     __schema: {

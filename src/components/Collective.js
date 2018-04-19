@@ -10,16 +10,13 @@ import NotificationBar from '../components/NotificationBar';
 import MembersWithData from '../components/MembersWithData';
 import { addCreateOrderMutation } from '../graphql/mutations';
 import { get } from 'lodash';
-import { Router } from '../server/pages';
+import { Link } from '../server/pages';
 import { FormattedMessage, defineMessages } from 'react-intl';
 import CollectivesWithData from './CollectivesWithData';
 import SectionTitle from './SectionTitle';
 import ExpensesSection from './ExpensesSection';
 import UpdatesSection from './UpdatesSection';
 import EventsSection from './EventsSection';
-import TransactionsWithData from './TransactionsWithData';
-import { Button } from 'react-bootstrap';
-import { Link } from '../server/pages';
 import { formatCurrency } from '../lib/utils';
 import LongDescription from './LongDescription';
 
@@ -65,7 +62,6 @@ class Collective extends React.Component {
 
   componentDidMount() {
     window.oc = { collective: this.collective }; // for easy debugging
-    const { LoggedInUser } = this.props;
   }
 
   async createOrder(order) {
@@ -117,7 +113,6 @@ class Collective extends React.Component {
     if (query.referral) {
       donateParams.referral = query.referral;
     }
-    const backersHash = this.collective.stats.backers.organizations > 0 ? '#organizations' : '#backers';
     const backgroundImage = this.collective.backgroundImage || get(this.collective,'parentCollective.backgroundImage') || defaultBackgroundImage;
     const canEditCollective = LoggedInUser && LoggedInUser.canEditCollective(this.collective);
     const notification = {};

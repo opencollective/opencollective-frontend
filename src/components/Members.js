@@ -34,13 +34,13 @@ class Members extends React.Component {
         }
         `}</style>
         {members.map((member, index) =>
-          <Member
+          (<Member
             key={`member${index}`}
             className={classNames(this.props.className, size)}
             member={member}
             collective={collective}
             viewMode={viewMode}
-            />
+            />)
         )}
       </div>
     )

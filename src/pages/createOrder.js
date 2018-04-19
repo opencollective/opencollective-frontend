@@ -34,7 +34,7 @@ class CreateOrderPage extends React.Component {
       totalAmount: parseInt(props.totalAmount, 10) || null
     };
 
-    switch(props.verb) {
+    switch (props.verb) {
       case 'pay':
         this.defaultType = 'PAYMENT';
         break;
@@ -105,7 +105,7 @@ class CreateOrderPage extends React.Component {
       const res = await this.props.createOrder(order);
       const orderCreated = res.data.createOrder;
       this.setState({ loading: false, order, result: { success: intl.formatMessage(this.messages['order.success']) } });
-      Router.pushRoute('collective', { 
+      Router.pushRoute('collective', {
         slug: orderCreated.fromCollective.slug,
         status: order.paymentMethod.type === 'bitcoin' ? 'orderProcessing' : 'orderCreated',
         CollectiveId: order.collective.id,
@@ -120,7 +120,7 @@ class CreateOrderPage extends React.Component {
   }
 
   render() {
-    const { intl, data, interval, verb } = this.props;
+    const { intl, data } = this.props;
     const { loading, LoggedInUser } = this.state;
     const description = decodeURIComponent(this.props.description || "");
     const collective = data.Collective;
@@ -132,7 +132,7 @@ class CreateOrderPage extends React.Component {
     if (TierId) {
       tier = collective.tiers.find(t => t.id === TierId);
     }
-    
+
     tier = tier || {
       name: intl.formatMessage(this.messages[`${this.defaultType.toLowerCase()}.title`]),
       presets: !this.order.totalAmount && [1000, 5000, 10000], // we only offer to customize the contribution if it hasn't been specified in the URL
@@ -145,11 +145,9 @@ class CreateOrderPage extends React.Component {
 
     this.order.tier = tier;
     this.order.description = description;
-    const href = (collective.type === 'EVENT') ? `/${collective.parentCollective.slug}/events/${collective.slug}` : `/${collective.slug}`;
 
     // Tier names are inconsistent - singular or plural
     // To avoid header like "Become a backers", this hack removes the last character if it's an 's'
-    const headerName = tier.name.charAt(tier.name.length-1) === 's' ? tier.name.slice(0, -1) : tier.name;
     const coverClassName = collective.type === 'EVENT' ? 'small' : '';
 
     return (

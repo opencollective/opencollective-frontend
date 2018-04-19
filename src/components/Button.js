@@ -34,7 +34,6 @@ class Button extends React.Component {
     if (type === "submit") return;
     e.preventDefault();
     if (href && href.substr(0,1) !== '#') {
-      const routeFromRouter = router.findByName(href);
       return router.Router.pushRoute(href);
     }
     if (!onClick) return;
@@ -43,7 +42,7 @@ class Button extends React.Component {
 
   renderButton() {
     return (
-      <button 
+      <button
         type={this.props.type}
         disabled={this.props.disabled}
         style={this.props.style}
@@ -119,7 +118,7 @@ class Button extends React.Component {
         }
         .blue:active {
           background-color: ${colors.blueActive};
-          border-color: ${colors.blueActive};          
+          border-color: ${colors.blueActive};
         }
         .gray {
           color: ${colors.darkgray};
@@ -163,7 +162,7 @@ class Button extends React.Component {
         <style jsx global>{`
         .mobileOnly .Button {
           padding: 0 16px;
-        }        
+        }
         `}</style>
         {this.props.icon && <img src={icons[this.props.icon]} />}
         {this.props.label && <span>{this.props.label}</span>}

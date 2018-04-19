@@ -22,14 +22,14 @@ class LongDescription extends React.Component {
     return (
       <div className="longDescription">
         { this.sections.map(section =>
-          <section id={section.id || "about"} className="longDescription" >
+          (<section id={section.id || "about"} className="longDescription" >
             <SectionTitle
               title={section.title || <FormattedMessage id="collective.about.title" defaultMessage="About" />}
               subtitle={section.title ? '' : this.props.defaultSubtitle}
               />
 
             <Markdown source={section.markdown} />
-          </section>
+          </section>)
         )}
       </div>
     )

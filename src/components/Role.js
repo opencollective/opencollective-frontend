@@ -27,7 +27,7 @@ class Role extends React.Component {
     if (!this.messages[role]) {
       return (<div />);
     }
-    
+
     return (
       <div className="Role">
         <style jsx>{`
