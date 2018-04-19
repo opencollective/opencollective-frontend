@@ -463,6 +463,44 @@ describe('createOrder', () => {
 
     });
 
+    describe(`host moves funds between collectives`, async () => {
+      let hostAdmin;
+
+      before(async () => {
+        hostAdmin = await models.User.findById(2);
+        const fromCollective = await models.Collective.findOne({ where: { slug: 'opensource' }})
+        const collective = await models.Collective.findOne({ where: { slug: 'apex' }})
+
+        await models.Member.create({
+          CreatedByUserId: hostAdmin.id,
+          CollectiveId: 9805, // open source collective host
+          MemberCollectiveId: hostAdmin.CollectiveId,
+          role: 'ADMIN'
+        });
+
+        const paymentMethod = await models.PaymentMethod.findOne({ where: { CollectiveId: 9805 }});
+
+        order.fromCollective = { id: fromCollective.id };
+        order.collective = { id: collective.id };
+        order.paymentMethod = { uuid: paymentMethod.uuid };
+        order.interval = null;
+        order.totalAmount = 10000000;
+        delete order.tier;
+      })
+
+      it("Should fail if not enough funds in the fromCollective", async () => {
+        const res = await utils.graphqlQuery(createOrderQuery, { order }, hostAdmin);
+        expect(res.errors).to.exist;
+        expect(res.errors[0].message).to.equal("You don't have enough funds available ($7,461 left) to execute this order ($100,000)");
+      });
+
+      it("succeeds", async () => {
+        order.totalAmount = 20000;
+        const res = await utils.graphqlQuery(createOrderQuery, { order }, hostAdmin);
+        expect(res.errors).to.not.exist;
+      })
+    });
+
     it(`creates an order as a logged in user for an existing collective using the collective's balance`, async () => {
 
       const xdamman = await models.User.findById(2);
