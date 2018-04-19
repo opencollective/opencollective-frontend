@@ -31,7 +31,9 @@ export default ({src, radius, id, title, className}) => {
           background-size: cover;          
         }
       `}</style>
-      <div className="image" style={{ backgroundImage: `url(${image})`, width: radius, height: radius }} />
+      {image &&
+        <div className="image" style={{ backgroundImage: `url(${image})`, width: radius, height: radius }} />
+      }
     </div>
   )
 }
