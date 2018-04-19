@@ -62,13 +62,15 @@ module.exports = (server, app) => {
    * Prevent indexation from search engines
    * (out of 'production' environment)
    */
-  if (process.env.NODE_ENV !== 'production') {
-    server.get('/robots.txt', (req, res, next) => {
-      res.setHeader('Content-Type', 'text/plain');
+  server.get('/robots.txt', (req, res, next) => {
+    res.setHeader('Content-Type', 'text/plain');
+    if (process.env.NODE_ENV === 'production') {
+      res.send("User-agent: *\Allow: /");
+    } else {
       res.send("User-agent: *\nDisallow: /");
-      next();
-    });
-  }
+    }
+    next();
+  });
 
   /**
    * For backward compatibility.
