@@ -58,7 +58,18 @@ module.exports = (server, app) => {
       .pipe(res);
   });
 
-  
+  /**
+   * Prevent indexation from search engines
+   * (out of 'production' environment)
+   */
+  if (process.env.NODE_ENV !== 'production') {
+    server.get('/robots.txt', (req, res, next) => {
+      res.setHeader('Content-Type', 'text/plain');
+      res.send("User-agent: *\nDisallow: /");
+      next();
+    });
+  }
+
   /**
    * For backward compatibility.
    * Ideally we should consolidate those routes under:
