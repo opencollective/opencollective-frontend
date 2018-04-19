@@ -67,7 +67,7 @@ export function resizeImage(imageUrl, { width, height, query, baseUrl }) {
     if (width) queryurl += `&width=${width}`;
     if (height) queryurl += `&height=${height}`;
   }
-  return `${baseUrl || process.env.IMAGES_URL || ''}/proxy/images/?src=${encodeURIComponent(imageUrl)}${queryurl}`;
+  return `${process.env.IMAGES_URL || baseUrl || ''}/proxy/images/?src=${encodeURIComponent(imageUrl)}${queryurl}`;
 }
 
 export function imagePreview(src, defaultImage, options = { width: 640 }) {
