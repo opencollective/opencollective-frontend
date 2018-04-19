@@ -65,7 +65,7 @@ module.exports = (server, app) => {
   server.get('/robots.txt', (req, res, next) => {
     res.setHeader('Content-Type', 'text/plain');
     if (process.env.NODE_ENV === 'production') {
-      res.send("User-agent: *\Allow: /");
+      res.send("User-agent: *\nAllow: /");
     } else {
       res.send("User-agent: *\nDisallow: /");
     }
