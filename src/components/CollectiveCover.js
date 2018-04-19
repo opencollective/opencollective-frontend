@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import classNames from 'classnames';
 import withIntl from '../lib/withIntl';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import { union, get, uniqBy } from 'lodash';
@@ -98,7 +99,7 @@ ${description}`
     const additionalBackers = (get(stats, 'backers.all') || (get(collective, 'members') || []).length) - membersPreview.length;
 
     return (
-      <div className={`CollectiveCover ${className} ${type}`}>
+      <div className={classNames('CollectiveCover', className, type)}>
         <style jsx>{`
         .cover {
           align-items: center;

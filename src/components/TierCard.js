@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import classNames from 'classnames';
 import withIntl from '../lib/withIntl';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import { get, uniqBy } from 'lodash';
@@ -90,7 +91,7 @@ class TierCard extends React.Component {
     }
 
     return (
-      <div className={`TierCard ${this.props.className} ${this.anchor}`}>
+      <div className={classNames('TierCard', this.props.className, this.anchor)}>
         <style jsx global>{`
           .image img {
             border: 2px solid white;            

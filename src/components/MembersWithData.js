@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import classNames from 'classnames';
 import Error from '../components/Error';
 import withIntl from '../lib/withIntl';
 import { graphql } from 'react-apollo'
@@ -154,7 +155,7 @@ class MembersWithData extends React.Component {
             <Member
               key={member.id}
               member={member}
-              className={`${this.props.className} ${size}`}
+              className={classNames(this.props.className, size)}
               collective={collective}
               viewMode={viewMode}
               LoggedInUser={LoggedInUser}
