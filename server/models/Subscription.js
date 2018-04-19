@@ -33,6 +33,10 @@ export default (Sequelize, DataTypes) => {
 
     chargeRetryCount: DataTypes.INTEGER,
 
+    quantity: DataTypes.INTEGER,
+
+    chargeNumber: DataTypes.INTEGER,
+
     data: DataTypes.JSON,
 
     stripeSubscriptionId: DataTypes.STRING,

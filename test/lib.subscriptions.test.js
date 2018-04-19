@@ -19,7 +19,7 @@ import {
   groupProcessedOrders,
 } from '../server/lib/subscriptions';
 
-async function createOrderWithSubscription(interval, date) {
+async function createOrderWithSubscription(interval, date, quantity=1) {
   const payment = { amount: 1000, currency: 'USD', interval };
   const user = await models.User.createUserWithCollective({ name: "Test McTesterson" });
   const fromCollective = await models.Collective.create({ name: "Donor Collective" });
@@ -30,7 +30,9 @@ async function createOrderWithSubscription(interval, date) {
     isActive: true,
     activatedAt: new Date("2018-01-27 0:0"),
     nextChargeDate: new Date(`${date} 0:0`),
-    nextPeriodStart: new Date(`${date} 0:0`)
+    nextPeriodStart: new Date(`${date} 0:0`),
+    chargeNumber: 0,
+    quantity,
   });
   const order = await models.Order.create({
     CreatedByUserId: user.id,
@@ -421,6 +423,71 @@ describe('LibSubscription', () => {
         // processing
         expect(order.Subscription.nextPeriodStart.getTime())
           .to.equal(new Date("2018-01-27 0:0").getTime());
+      });
+
+      it('should increment chargeNumber after successfuly processing the order', async () => {
+        // Given an order with a subscription
+        const { order } = await createOrderWithSubscription('month', '2018-04-17');
+
+        // When the order is processed
+        const entry = await processOrderWithSubscription({ dryRun: false }, order);
+
+        // Then expect the stub of the payment lib to be called
+        expect(paymentsStub.called).to.be.true;
+
+        // And then the status of the processing is successful
+        expect(entry.status).to.equal('success');
+
+        // Then charge number (that started with 0) should be 1
+        expect(order.Subscription.chargeNumber).to.equal(1);
+      });
+
+      it('should NOT increment chargeNumber after failure processing order', async () => {
+        // Given an order with a subscription
+        const { order } = await createOrderWithSubscription('month', '2018-04-17');
+
+        // And that the payments library will throw an error
+        paymentsStub.throws("TypeError -- Whatever");
+
+        // When the order is processed
+        const entry = await processOrderWithSubscription({ dryRun: false }, order);
+
+        // Then expect the stub of the payment lib to be called
+        expect(paymentsStub.called).to.be.true;
+
+        // And then the status of the processing fails
+        expect(entry.status).to.equal('failure');
+
+        // And then charge number continues to be 0
+        expect(order.Subscription.chargeNumber).to.equal(0);
+
+        // And the subscription shoult not be canceled
+        expect(order.Subscription.deactivatedAt).to.be.null;
+      });
+
+      it('should cancel the subscription if chargeNumber === quantity', async () => {
+        // Given an order with a subscription valid for two months
+        const { order, subscription } = await createOrderWithSubscription('month', '2018-04-17', 2);
+        // And given that we'll tweak its chargeNumber field to the
+        // quantity of intervals
+        await subscription.update({ chargeNumber: 2 });
+
+        // When the order is processed
+        const entry = await processOrderWithSubscription({ dryRun: false }, order);
+
+        // Then expect the stub of the payment lib to NOT be called!
+        // No charge should happen!!!
+        expect(paymentsStub.called).to.be.false;
+
+        // And then the status of the processing fails
+        expect(entry.status).to.equal('failure');
+
+        // And then charge number continues to be unchanged
+        expect(order.Subscription.chargeNumber).to.equal(2);
+
+        // And the subscription should be marked as deactivated
+        expect(order.Subscription.isActive).to.be.false;
+        expect(order.Subscription.deactivatedAt.getTime()).to.be.at.most((new Date).getTime());
       });
     });
   });
