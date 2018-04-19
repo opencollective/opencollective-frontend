@@ -105,14 +105,12 @@ export const loaders = (req) => {
           return models.Transaction.findAll(query)
           .then(results => sortResults(ids, results, 'CollectiveId', []))
           .map(result => {
-            const stats = {};
-            let all = 0;
+            const stats = { all: 0 };
             result.forEach(r => {
               stats.id = r.CollectiveId;
               stats[r.type] = r.count;
-              all += r.count;
+              stats.all += r.count;
             })
-            stats.all = all;
             return stats;
           })
         }

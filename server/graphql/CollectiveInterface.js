@@ -53,21 +53,21 @@ export const BackersStatsType = new GraphQLObjectType({
         description: "Number of individuals that have given money to this collective",
         type: GraphQLInt,
         resolve(stats) {
-          return stats.USER;
+          return stats.USER || 0;
         }
       },
       organizations: {
         description: "Number of organizations that have given money to this collective",
         type: GraphQLInt,
         resolve(stats) {
-          return stats.ORGANIZATION;
+          return stats.ORGANIZATION || 0;
         }
       },
       collectives: {
         description: "Number of collectives that have given money to this collective",
         type: GraphQLInt,
         resolve(stats) {
-          return stats.COLLECTIVE;
+          return stats.COLLECTIVE || 0;
         }
       }
     }
