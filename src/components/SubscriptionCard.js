@@ -30,11 +30,6 @@ class SubscriptionCard extends React.Component {
 
   constructor(props) {
     super(props);
-    this.update = this.update.bind(this);
-    this.onError = this.onError.bind(this);
-    this.resetState = this.resetState.bind(this);
-    this.handleAmountChange = this.handleAmountChange.bind(this);
-    this.updateAmount = this.updateAmount.bind(this);
 
     this.stateConstants = {
       normal: 'normal',
@@ -61,7 +56,7 @@ class SubscriptionCard extends React.Component {
     });
   }
 
-  async update({ paymentMethod, amount }) {
+  update = async ({ paymentMethod, amount }) => {
     const { intl } = this.props;
     this.setState({ loading: true, result: {} });
     try {
@@ -72,26 +67,26 @@ class SubscriptionCard extends React.Component {
     }
   }
 
-  async updatePaymentMethod(paymentMethod) {
+  updatePaymentMethod = async (paymentMethod) => {
     this.update({ paymentMethod });
   }
 
-  async updateAmount() {
+  updateAmount = async () => {
     this.update({ amount: this.state.amountValueInteger });
   }
 
-  resetState() {
+  resetState = () => {
     this.setState({ visibleState: this.stateConstants.normal, result: {}});
   }
 
-  handleAmountChange(event) {
+  handleAmountChange = (event) => {
     this.setState({
       amountValue: event.target.value,
       amountValueInteger: parseInt(event.target.value, 10) * 100
     });
   }
 
-  onError(error) {
+  onError = (error) => {
     this.setState({result: {error }});
   }
 
