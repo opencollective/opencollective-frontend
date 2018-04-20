@@ -1161,6 +1161,7 @@ export default function(Sequelize, DataTypes) {
   };
 
   Collective.prototype.isHost = function() {
+    if (this.type !== 'ORGANIZATION' && this.type !== 'USER') return Promise.resolve(false);
     return models.Member.findOne({ where: { MemberCollectiveId: this.id, role: 'HOST' }}).then(r => Boolean(r));
   }
 
@@ -1181,7 +1182,10 @@ export default function(Sequelize, DataTypes) {
       attributes: ['MemberCollectiveId'],
       where: { role: roles.HOST, CollectiveId: this.ParentCollectiveId },
       include: [ { model: models.Collective, as: 'memberCollective' } ]
-    }).then(m => m && m.memberCollective);
+    }).then(m => {
+      if (m && m.memberCollective) return m.memberCollective;
+      return this.isHost().then(isHost => isHost ? this : null);
+    });
   };
 
   Collective.prototype.getHostCollectiveId = function() {

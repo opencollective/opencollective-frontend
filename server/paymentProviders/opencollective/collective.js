@@ -64,7 +64,7 @@ paymentMethodProvider.processOrder = async (order, options = {}) => {
 
   // If the paymentMethod is the one of the host to make a payment on behalf of another of its collective,
   // we need to use the payment method of the fromCollective (to make sure it has enough funds)
-  if (order.paymentMethod.CollectiveId === fromCollectiveHost.id && fromCollectiveHost.id === collectiveHost.id) {
+  if (fromCollectiveHost && order.paymentMethod.CollectiveId === fromCollectiveHost.id && fromCollectiveHost.id === collectiveHost.id) {
     order.paymentMethod = await models.PaymentMethod.findOne({ where: { CollectiveId: order.fromCollective.id }});
     // We need to recheck the balance
     const balance = await paymentMethodProvider.getBalance(order.paymentMethod);
@@ -73,7 +73,7 @@ paymentMethodProvider.processOrder = async (order, options = {}) => {
     }
   }
 
-  if (order.paymentMethod.CollectiveId !== order.fromCollective.id && order.collective.type === 'COLLECTIVE') {
+  if (order.paymentMethod.CollectiveId !== order.fromCollective.id && order.fromCollective.type === 'COLLECTIVE') {
     throw new Error(`Cannot use an opencollective payment method to make a payment on behalf of another collective`);
   }
 
