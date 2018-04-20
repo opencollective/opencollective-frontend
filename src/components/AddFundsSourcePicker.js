@@ -55,8 +55,12 @@ class AddFundsSourcePicker extends React.Component {
     const { host, data: { loading, allMembers } } = this.props;
     if (loading) return (<div />);
     const uniqueMembers = uniqBy(allMembers, m => get(m, 'member.id'));
-    this.membersByType = groupBy(uniqueMembers, m => get(m, 'member.type'));
-
+    this.membersByType = {
+      ORGANIZATION: [],
+      COLLECTIVE: [],
+      USER: [],
+      ...groupBy(uniqueMembers, m => get(m, 'member.type')),
+    };
     return (
       <FormControl id="sourcePicker" name="template" componentClass="select" placeholder="select" onChange={this.onChange}>
         <option value={host.id}><FormattedMessage id="addfunds.fromCollective.host" values={{ host: host.name}} defaultMessage="Host ({host})"/></option>
