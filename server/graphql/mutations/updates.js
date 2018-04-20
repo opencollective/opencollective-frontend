@@ -13,9 +13,12 @@ export async function createUpdate(_, args, req) {
   mustHaveRole(req.remoteUser, 'ADMIN', CollectiveId, "create an update");
   require(args, 'update.title');
 
+  const markdown = args.update.markdown
+        ? strip_tags(args.update.markdown)
+        : '';
   const update = await models.Update.create({
     title: args.update.title,
-    markdown: strip_tags(args.update.markdown),
+    markdown,
     html: strip_tags(args.update.html),
     CollectiveId,
     TierId: get(args, 'update.tier.id'),
