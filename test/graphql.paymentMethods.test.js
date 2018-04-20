@@ -183,7 +183,7 @@ describe('graphql.paymentMethods.test.js', () => {
 
       const result = await utils.graphqlQuery(createOrderQuery, { order }, admin);
       expect(result.errors).to.exist;
-      expect(result.errors[0].message).to.equal(`You need to use the payment method of the host (${user.CollectiveId}) to add funds to this collective`);
+      expect(result.errors[0].message).to.equal(`Cannot transfer money between different hosts (open source collective -> Xavier)`);
     });
 
     it('adds funds from the host (USD) to the collective (EUR)', async () => {

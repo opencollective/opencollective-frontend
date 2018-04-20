@@ -19,7 +19,7 @@ import * as libtransactions from './transactions';
  *  {service: 'stripe', type: 'bitcoin'}.
  * @return the payment method's JS module.
  */
-export function findPaymentMethod(paymentMethod) {
+export function findPaymentMethodProvider(paymentMethod) {
   const provider = paymentMethod ? paymentMethod.service : 'manual';
   const methodType = paymentMethod.type || 'default';
   return paymentProviders[provider].types[methodType]; // eslint-disable-line import/namespace
@@ -32,7 +32,7 @@ export function findPaymentMethod(paymentMethod) {
  *  the `PaymentMethods` table.
  */
 export async function processOrder(order, options) {
-  const paymentMethod = findPaymentMethod(order.paymentMethod);
+  const paymentMethod = findPaymentMethodProvider(order.paymentMethod);
   return await paymentMethod.processOrder(order, options);
 }
 
@@ -45,7 +45,7 @@ export async function processOrder(order, options) {
  *  associated to the refund transaction as who performed the refund.
  */
 export async function refundTransaction(transaction, user) {
-  const paymentMethod = findPaymentMethod(transaction.PaymentMethod);
+  const paymentMethod = findPaymentMethodProvider(transaction.PaymentMethod);
   return await paymentMethod.refundTransaction(transaction, user);
 }
 
@@ -139,7 +139,7 @@ export async function associateTransactionRefundId(transaction, refund) {
 
 /**
  * Execute an order as user using paymentMethod
- * It validates the paymentMethod and makes sure the user can use it
+ * Note: validation of the paymentMethod happens in `models.Order.setPaymentMethod`. Not here anymore.
  * @param {Object} order { tier, description, totalAmount, currency, interval (null|month|year), paymentMethod }
  * @param {Object} options { hostFeePercent, platformFeePercent} (only
  *  for add funds and if remoteUser is admin of host or root)
@@ -171,6 +171,7 @@ export const executeOrder = (user, order, options) => {
   return order.populate()
     .then(() => {
       if (payment.interval) {
+        // @lincoln: shouldn't this section be executed after we successfully charge the user for the first payment? (ie. after `processOrder`)
         return models.Subscription.create(payment).then(subscription => {
           // The order instance doesn't have the Subscription field
           // here because it was just created and no models were
