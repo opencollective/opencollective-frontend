@@ -1,6 +1,6 @@
 {
   "name": "opencollective-api",
-  "version": "2.0.116",
+  "version": "2.0.121",
   "description": "OpenCollective API",
   "author": "@philmod @arnaudbenard @xdamman @asood123",
   "main": "server/index.js",
@@ -127,7 +127,7 @@
   "scripts": {
     "start": "node ./dist/index.js",
     "doc:gen": "jsdoc --configure .jsdoc.json --verbose",
-    "predevdocker:dev": "npm install && npm run db:setup && babel-node ./scripts/db_restore.js opencollective_dvl",
+    "predocker:dev": "npm install && npm run db:setup && babel-node ./scripts/db_restore.js opencollective_dvl",
     "docker:dev": "npm run dev",
     "dev": "nodemon server/index.js -x babel-node . -e js,hbs",
     "clean": "rm -rf dist && mkdir dist",

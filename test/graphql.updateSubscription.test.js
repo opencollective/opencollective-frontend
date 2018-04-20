@@ -10,8 +10,8 @@ import initNock from './graphql.updateSubscription.nock';
 const ordersData = utils.data('orders');
 
 const updateSubscriptionQuery = `
-mutation updateSubscription($id: Int!, $paymentMethod: PaymentMethodInputType) {
-  updateSubscription(id: $id, paymentMethod: $paymentMethod) {
+mutation updateSubscription($id: Int!, $paymentMethod: PaymentMethodInputType, $amount: Int) {
+  updateSubscription(id: $id, paymentMethod: $paymentMethod, amount: $amount) {
     id
     currency
     totalAmount
@@ -120,7 +120,8 @@ describe('graphql.updateSubscriptions.test.js', () => {
           FromCollectiveId: user.CollectiveId,
           CollectiveId: collective.id,
           PaymentMethodId: paymentMethod.id,
-          SubscriptionId: sub.id
+          SubscriptionId: sub.id,
+          totalAmount: sub.amount,
         }))
         .then(order => models.Order.findOne({ where: { id: order.id }, include: [{ model: models.Subscription }]}))
         .tap(o => order = o)
@@ -297,7 +298,6 @@ describe('graphql.updateSubscriptions.test.js', () => {
             }
           }, user);
 
-          console.log(res);
           expect(res.errors).to.not.exist;
 
           const newPM = await models.PaymentMethod.findOne({
@@ -323,6 +323,52 @@ describe('graphql.updateSubscriptions.test.js', () => {
       })
     })
 
+    describe('updating amount', async () => {
+
+      it('fails when the amount is the same', async () => {
+
+        const res = await utils.graphqlQuery(updateSubscriptionQuery, { id: order.id, amount: 2000}, user);
+
+        expect(res.errors).to.exist;
+        expect(res.errors[0].message).to.equal('Same amount');
+      })
+
+      it('fails when the amount is invalid (too small)', async () => {
+
+        const res = await utils.graphqlQuery(updateSubscriptionQuery, { id: order.id, amount: 75}, user);
+
+        expect(res.errors).to.exist;
+        expect(res.errors[0].message).to.equal('Invalid amount');
+      })
+
+      it('fails when the amount is invalid (divisible by 100)', async () => {
+
+        const res = await utils.graphqlQuery(updateSubscriptionQuery, { id: order.id, amount: 125}, user);
+
+        expect(res.errors).to.exist;
+        expect(res.errors[0].message).to.equal('Invalid amount');
+      })
+
+      it('succeeds when the amount is valid', async () => {
+
+        const res = await utils.graphqlQuery(updateSubscriptionQuery, { id: order.id, amount: 4000}, user);
+
+        expect(res.errors).to.not.exist;
+
+        const matchingOrders = await models.Order.findAll({
+          where: {
+            CreatedByUserId: order.CreatedByUserId,
+            CollectiveId: order.CollectiveId
+          },
+          include: [{ model: models.Subscription }]
+        });
+
+        const activeOrder = matchingOrders.find(order => order.Subscription.isActive);
+
+        expect(activeOrder.totalAmount).to.equal(4000);
+        expect(activeOrder.Subscription.amount).to.equal(4000);
+      })
+    })
 
   });
 });

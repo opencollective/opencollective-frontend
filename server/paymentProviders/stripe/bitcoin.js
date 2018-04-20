@@ -94,7 +94,7 @@ export default {
             data: { charge, balanceTransaction },
           };
           return models.Transaction.createFromPayload(payload);
-        });
+        })
     };
 
     // based on the source, fetch order
@@ -186,6 +186,17 @@ export default {
 
         // Mark paymentMethod as confirmed
         .tap(() => order.paymentMethod.update({ archivedAt: new Date }))
+
+        .catch(err => {
+          // Stripe will keep pinging us even if the source is no longer chargeable (and it gets canceled after 6 hours)
+          // Need to detect and respond with a 200 anyway.
+
+          // Very hacky, can hide other types of errors. Cutting corners, since this code
+          // is deprecating in 6 days and we only have one failing request we need to handle
+          if (err.type === 'StripeInvalidRequestError' || err.type === 'invalid_request_error') {
+            return Promise.resolve();
+          }
+        })
     })
   }
 }

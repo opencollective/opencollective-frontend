@@ -252,18 +252,17 @@ const mutations = {
       return cancelSubscription(req.remoteUser, args.id);
     }
   },
-
   updateSubscription: {
     type: OrderType,
     args: {
       id: { type: new GraphQLNonNull(GraphQLInt)},
-      paymentMethod: { type: PaymentMethodInputType}
+      paymentMethod: { type: PaymentMethodInputType},
+      amount: { type: GraphQLInt }
     },
-    resolve(_, args, req) {
-      return updateSubscription(req.remoteUser, args)
+    async resolve(_, args, req) {
+      return await updateSubscription(req.remoteUser, args)
     }
   },
-
   refundTransaction: {
     type: TransactionInterfaceType,
     args: {

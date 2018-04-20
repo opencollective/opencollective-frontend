@@ -10,8 +10,7 @@ function usage() {
 /** Return true if there's any data within the Collectives table */
 async function hasData(client) {
   try {
-    const exists = await client.query('SELECT 1 FROM "Collectives"');
-    return Boolean(exists.rowCount);
+    return (await client.query('SELECT 1 FROM "Collectives"')).rowCount > 0;
   } catch (error) {
     return false;
   }
@@ -20,12 +19,15 @@ async function hasData(client) {
 /** Launcher that recreates a database & load a dump into it. */
 async function main(args) {
   if (!args.file) {
-    return usage();
+    usage();
+    return;
   }
 
   const [client, clientApp] = await libdb.recreateDatabase(args.force);
 
-  if (await hasData(clientApp) && args.force) {
+  const data = await hasData(clientApp);
+
+  if (!data || data && args.force) {
     await libdb.loadDB(args.file);
   }
 
