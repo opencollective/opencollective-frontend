@@ -25,7 +25,9 @@ class SubscriptionCard extends React.Component {
     subscription: PropTypes.object.isRequired,
     slug: PropTypes.string.isRequired,
     LoggedInUser: PropTypes.object,
-    paymentMethods: PropTypes.arrayOf(PropTypes.object)
+    paymentMethods: PropTypes.arrayOf(PropTypes.object),
+    intl: PropTypes.object.isRequired,
+    updateSubscription: PropTypes.func.isRequired
   }
 
   constructor(props) {
