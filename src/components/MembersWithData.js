@@ -19,30 +19,33 @@ class MembersWithData extends React.Component {
     tier: PropTypes.object,
     limit: PropTypes.number,
     onChange: PropTypes.func,
-    LoggedInUser: PropTypes.object
+    LoggedInUser: PropTypes.object,
+    fetchMore: PropTypes.func.isRequired,
+    refetch: PropTypes.func.isRequired,
+    className: PropTypes.string,
+    data: PropTypes.object,
+    role: PropTypes.string,
+    type: PropTypes.string,
   }
 
   constructor(props) {
     super(props);
-    this.fetchMore = this.fetchMore.bind(this);
-    this.refetch = this.refetch.bind(this);
-    this.onChange = this.onChange.bind(this);
     this.state = {
       role: null,
       loading: false
     };
   }
 
-  onChange() {
-    const { onChange } = this.props;
-    onChange && this.node && onChange({ height: this.node.offsetHeight });
-  }
-
   componentDidMount() {
     this.onChange();
   }
 
-  fetchMore(e) {
+  onChange = () => {
+    const { onChange } = this.props;
+    onChange && this.node && onChange({ height: this.node.offsetHeight });
+  }
+
+  fetchMore = (e) => {
     e.target.blur();
     this.setState({ loading: true });
     this.props.fetchMore().then(() => {
@@ -51,7 +54,7 @@ class MembersWithData extends React.Component {
     });
   }
 
-  refetch(role) {
+  refetch = (role) => {
     this.setState({role});
     this.props.refetch({role});
   }
@@ -157,7 +160,7 @@ class MembersWithData extends React.Component {
               collective={collective}
               viewMode={viewMode}
               LoggedInUser={LoggedInUser}
-              />)
+             />)
           )}
         </div>
         { members.length % 10 === 0 && members.length >= limit &&
@@ -237,6 +240,5 @@ export const addMembersData = graphql(getMembersQuery, {
     }
   })
 });
-
 
 export default addMembersData(withIntl(MembersWithData));
