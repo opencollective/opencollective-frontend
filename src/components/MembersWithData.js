@@ -8,6 +8,7 @@ import gql from 'graphql-tag'
 import Member from './Member';
 import { ButtonGroup, Button } from 'react-bootstrap';
 import { FormattedMessage } from 'react-intl';
+import { uniqBy } from 'lodash';
 
 const MEMBERS_PER_PAGE = 10;
 
@@ -65,7 +66,7 @@ class MembersWithData extends React.Component {
     if (!data.allMembers) {
       return (<div />);
     }
-    const members = [...data.allMembers];
+    let members = [...data.allMembers];
     if (members.length === 0) {
       return (<div />)
     }
@@ -78,9 +79,13 @@ class MembersWithData extends React.Component {
       } else {
         const aDate = new Date(a.createdAt);
         const bDate = new Date(b.createdAt);
-        return aDate - bDate;
+        return bDate - aDate;
       }
     });
+
+    // Make sure we display unique members
+    // that should ultimately be addressed on the API side
+    members = uniqBy(members, member => member.member.id);
 
     const size = members.length > 50 ? "small" : "large";
     let viewMode = (type && type.split(',')[0]) || "USER";
