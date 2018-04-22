@@ -6,10 +6,13 @@ import { imagePreview, getDomain } from '../lib/utils';
 
 const Logo = ({ src, style = {}, height, type = 'ORGANIZATION', website }) => {
   style.maxHeight = style.height || height;
-  if (!src && website && type==='ORGANIZATION') {
+  if (!src && website && type === 'ORGANIZATION') {
     src = `https://logo.clearbit.com/${getDomain(website)}`;
   }
-  const backgroundStyle = { height, minWidth: Math.max(0, parseInt(height)/2) };
+  const backgroundStyle = { height };
+  if (height && parseInt(height, 10) == height) {
+    backgroundStyle.minWidth = parseInt(height, 10) / 2;
+  }
   if (!src) {
     backgroundStyle.backgroundImage = `url(${defaultImage[type]})`;
   }
