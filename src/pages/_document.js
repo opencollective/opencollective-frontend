@@ -20,7 +20,8 @@ export default class IntlDocument extends Document {
     const scriptsUrls = {
       intl: `https://cdn.polyfill.io/v2/polyfill.min.js?features=Intl.~locale.${this.props.locale}`,
       stripe: "https://js.stripe.com/v3/",
-      google: "https://maps.googleapis.com/maps/api/js?key=AIzaSyCRLIexl7EkMQk_0_yNsjO4Vqb_MccD-RI&libraries=places"
+      google: "https://maps.googleapis.com/maps/api/js?key=AIzaSyCRLIexl7EkMQk_0_yNsjO4Vqb_MccD-RI&libraries=places",
+      paypalCheckout: "https://www.paypalobjects.com/api/checkout.js",
     };
 
     const scripts = [];

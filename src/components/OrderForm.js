@@ -1,18 +1,23 @@
+/* global paypal */
+/* The `paypal` global comes from a script included in _document.js */
+
 import React from 'react';
 import { withApollo } from 'react-apollo';
 import PropTypes from 'prop-types';
+import btClient from 'braintree-web/client';
+import btPaypalCheckout from 'braintree-web/paypal-checkout';
 import TierComponent from './Tier';
 import InputField from './InputField';
 import MatchingFundWithData from './MatchingFundWithData';
 import ActionButton from './Button';
 import SectionTitle from './SectionTitle';
-import { Button, Row, Col, Form } from 'react-bootstrap';
+import { Button, Row, Col, Form, FormGroup } from 'react-bootstrap';
 import { defineMessages, FormattedMessage, FormattedDate, FormattedTime } from 'react-intl';
 import { capitalize, formatCurrency, isValidEmail } from '../lib/utils';
 import { getStripeToken } from '../lib/stripe';
 import { pick, get } from 'lodash';
 import withIntl from '../lib/withIntl';
-import { checkUserExistence, signin } from '../lib/api';
+import { checkUserExistence, signin, getAccountClientToken } from '../lib/api';
 import { getPrepaidCardBalanceQuery } from '../graphql/queries';
 import colors from '../constants/colors';
 
@@ -88,6 +93,8 @@ class OrderForm extends React.Component {
       'creditcard.error': { id: 'creditcard.error', defaultMessage: 'Invalid credit card' },
       'paymentMethod.type': { id: 'paymentMethod.type', defaultMessage: 'Payment method' },
       'paymentMethod.creditcard': { id: 'paymentMethod.creditcard', defaultMessage: 'credit card' },
+      'paymentMethod.bitcoin': { id: 'paymentMethod.bitcoin', defaultMessage: 'bitcoin' },
+      'paymentMethod.paypal': { id: 'paymentMethod.paypal', defaultMessage: 'paypal' },
       'prepaidcard.label': {id: 'prepaidcard.label', defaultMessage: 'Gift Card'},
       'prepaidcard.apply': {id: 'prepaidcard.apply', defaultMessage: 'Apply'},
       'prepaidcard.invalid': {id: 'prepaidcard.invalid', defaultMessage: 'Invalid code'},
@@ -169,8 +176,11 @@ class OrderForm extends React.Component {
 
   populatePaymentMethodTypes() {
     const { intl } = this.props;
-    const paymentMethodTypeOptions = [];
-    paymentMethodTypeOptions.push({'creditcard': intl.formatMessage(this.messages['paymentMethod.creditcard'])});
+    const paymentMethodTypeOptions = [
+      { creditcard: intl.formatMessage(this.messages['paymentMethod.creditcard']) },
+      { paypal: intl.formatMessage(this.messages['paymentMethod.paypal']) },
+    ];
+
     this.paymentMethodTypeOptions = paymentMethodTypeOptions;
     return paymentMethodTypeOptions;
   }
@@ -191,13 +201,16 @@ class OrderForm extends React.Component {
       });
     }
 
+    const allowedPaymentMethods = (toFilter) => toFilter
+      .filter((pm) => ['stripe', 'paypalbt'].includes(pm.service));
+
     if (collective) {
-      paymentMethods = (collective.paymentMethods || []).filter(pm => pm.service === 'stripe');
+      paymentMethods = allowedPaymentMethods(collective.paymentMethods || []);
       paymentMethodsOptions = generateOptionsForCollective(collective);
     }
 
     if (LoggedInUser && CollectiveId !== LoggedInUser.CollectiveId) {
-      paymentMethods = [... paymentMethods, ...LoggedInUser.collective.paymentMethods].filter(pm => pm.service === 'stripe');
+      paymentMethods = allowedPaymentMethods([... paymentMethods, ...LoggedInUser.collective.paymentMethods]);
       paymentMethodsOptions = [...paymentMethodsOptions, ... generateOptionsForCollective(this.collectivesById[LoggedInUser.CollectiveId])];
     }
 
@@ -345,33 +358,83 @@ class OrderForm extends React.Component {
     if (typeof window !== "undefined") {
       window.state = newState;
     }
+
+    if (this.state.paymentMethod.type === 'paypal') {
+      this.loadPayPalButton();
+    }
   }
 
-  async handleSubmit() {
-    if (! await this.validate()) return false;
-    this.setState({ loading: true });
-    const { paymentMethod, order, fromCollective, user } = this.state;
-    const tier = order.tier;
+  async loadPayPalButton() {
+    const collectiveId = this.props.collective.id;
+    const button = document.getElementById('paypal-checkout');
+    try {
+      const { clientToken } = await getAccountClientToken(collectiveId, 'paypalbt');
+      const client = await btClient.create({ authorization: clientToken });
+      const paypalCheckout = await btPaypalCheckout.create({ client });
+      const paymentOptions = {
+        flow: 'checkout',
+        amount: this.getTotalAmount(),
+        currency: 'USD',
+        intent: 'sale',
+      };
+      const renderOptions = {
+        env: 'sandbox',
+        payment: () => paypalCheckout.createPayment(paymentOptions),
+        onAuthorize: (data) => paypalCheckout
+          .tokenizePayment(data)
+          .then((payload) => {
+            this.setState({
+              ...this.state,
+              paymentMethod: {
+                token: payload.nonce,
+                service: 'paypalbt',
+                type: 'default',
+              },
+            });
+            return this.submitOrder();
+          })
+      };
+      paypal.Button.render(renderOptions, '#paypal-checkout');
+    } catch (error) {
+      button.removeAttribute('disabled');
+    }
+  }
 
-    const quantity = tier.quantity || 1;
-    const OrderInputType = {
+  getTotalAmount() {
+    const { order } = this.state;
+    const quantity = (order.tier.quantity || 1);
+    const total = (quantity * order.tier.amount) || order.totalAmount;
+    return total / 100.0;
+  }
+
+  async submitOrder() {
+    const { paymentMethod, order, fromCollective, user } = this.state;
+    const quantity = order.tier.quantity || 1;
+    const orderInput = {
       user,
       collective: { id: this.props.collective.id},
       fromCollective,
       publicMessage: order.publicMessage,
       quantity,
-      interval: order.interval || tier.interval,
-      totalAmount: (quantity * tier.amount) || order.totalAmount,
+      interval: order.interval || order.tier.interval,
+      totalAmount: this.getTotalAmount(),
       matchingFund: order.matchingFund,
       paymentMethod
     };
-
-    if (tier && tier.id) {
-      OrderInputType.tier = { id: tier.id, amount: tier.amount };
+    if (order.tier && order.tier.id) {
+      orderInput.tier = { id: order.tier.id, amount: order.tier.amount };
     }
-    console.log(">>> OrderForm onSubmit", OrderInputType);
-    await this.props.onSubmit(OrderInputType);
-    this.setState({ loading: false });
+    await this.props.onSubmit(orderInput);
+  }
+
+  async handleSubmit() {
+    if (! await this.validate()) return false;
+    this.setState({ loading: true });
+    try {
+      await this.submitOrder();
+    } finally {
+      this.setState({ loading: false });
+    }
   }
 
   error(msg) {
@@ -511,11 +574,10 @@ class OrderForm extends React.Component {
 
   render() {
     const { intl, collective, LoggedInUser } = this.props;
-    const { order, prepaidcard, creditcard, fromCollective } = this.state;
+    const { order, fromCollective } = this.state;
     const currency = order.tier.currency || collective.currency;
 
     this.populatePaymentMethodTypes();
-    const showNewCreditCardForm = !prepaidcard.show && creditcard.show && (!creditcard.uuid || creditcard.uuid === 'other');
     const requireLogin = !this.state.isNewUser && !LoggedInUser;
     const inputEmail = {
       type: 'email',
@@ -533,31 +595,6 @@ class OrderForm extends React.Component {
       } else {
         inputEmail.button = <Button disabled={true}>Login</Button>;
         inputEmail.description = intl.formatMessage(this.messages['email.description.signup']);
-      }
-    }
-
-    const inputPrepaidcard = {
-      type: 'text',
-      name: 'prepaidcard',
-      button: <Button
-        className='prepaidapply'
-        disabled={prepaidcard.loading}
-        onClick={() => this.applyPrepaidCardBalance()}>
-        {intl.formatMessage(this.messages['prepaidcard.apply'])}
-        </Button>,
-      required: true,
-      label: intl.formatMessage(this.messages['prepaidcard.label']),
-      defaultValue: prepaidcard['token'],
-      onChange: (value) => this.handleChange("prepaidcard", "token", value)
-    };
-
-    if (prepaidcard.applySent) {
-      if (prepaidcard.loading) {
-        inputPrepaidcard.description = intl.formatMessage(this.messages['prepaidcard.loading']);
-      } else if (prepaidcard.valid) {
-        inputPrepaidcard.description = `${intl.formatMessage(this.messages['prepaidcard.amountremaining'])} ${formatCurrency(prepaidcard.balance, prepaidcard.currency)}`;
-      } else {
-        inputPrepaidcard.description = intl.formatMessage(this.messages['prepaidcard.invalid'])
       }
     }
 
@@ -620,6 +657,8 @@ class OrderForm extends React.Component {
           color: ${colors.blue};
           margin-left: 205px;
         }
+        #paypal-checkout { padding-top: 30px; }
+        .form-group#paypalFG { margin-bottom: 0px !important; }
         `}</style>
         <Form horizontal>
 
@@ -800,50 +839,9 @@ class OrderForm extends React.Component {
                   </Row>
                 }
 
-                { this.state.paymentMethod.type === 'creditcard' &&
-                  <Row>
-                    <Col sm={12}>
-                      { this.paymentMethodsOptions && this.paymentMethodsOptions.length > 1 &&
-                        <InputField
-                          type="select"
-                          className="horizontal"
-                          label={intl.formatMessage(this.messages['creditcard.label'])}
-                          name="creditcardSelector"
-                          onChange={uuid => this.handleChange("creditcard", { uuid })}
-                          options={this.paymentMethodsOptions}
-                          />
-                      }
-                      { showNewCreditCardForm &&
-                        <div>
-                          <InputField
-                            label={intl.formatMessage(this.messages['creditcard.label'])}
-                            type="creditcard"
-                            name="creditcard"
-                            className="horizontal"
-                            onChange={(creditcardObject) => this.handleChange("creditcard", creditcardObject)}
-                            />
-                        </div>
-                      }
-                      <div>
-                        { !prepaidcard.expanded &&
-                          <a className='gift-card-expander' onClick={() => this.setState({
-                            prepaidcard: Object.assign({}, this.state.prepaidcard, {expanded: true})
-                          })}><FormattedMessage id="paymentMethod.useGiftCard" defaultMessage="Use a Gift Card" /></a>
-                        }
-                        { prepaidcard.expanded &&
-                          <Row key={`prepaidcard.input`}>
-                            <Col sm={12}>
-                              <InputField
-                                className="horizontal"
-                                {...inputPrepaidcard}
-                                />
-                            </Col>
-                          </Row>
-                        }
-                      </div>
-                    </Col>
-                  </Row>
-                }
+                { this.state.paymentMethod.type === 'creditcard' && this.renderCreditCard() }
+
+                { this.state.paymentMethod.type === 'paypal' && this.renderPaypal() }
               </section>
             }
 
@@ -857,11 +855,12 @@ class OrderForm extends React.Component {
                 }
                 { (collective.host || order.totalAmount === 0) &&
                   <div className="actions">
-                    <div className="submit">
-                      <ActionButton className="blue" ref="submit" onClick={this.handleSubmit} disabled={ this.state.loading}>
-                        {this.state.loading ? <FormattedMessage id='form.processing' defaultMessage='processing' /> : order.tier.button || capitalize(intl.formatMessage(this.messages['order.button']))}
-                      </ActionButton>
-                    </div>
+                    { this.state.paymentMethod.type !== 'paypal' &&
+                      <div className="submit">
+                        <ActionButton className="blue" ref="submit" onClick={this.handleSubmit} disabled={ this.state.loading}>
+                          {this.state.loading ? <FormattedMessage id='form.processing' defaultMessage='processing' /> : order.tier.button || capitalize(intl.formatMessage(this.messages['order.button']))}
+                        </ActionButton>
+                      </div> }
                     { order.totalAmount > 0 &&
                       <div className="disclaimer">
                         <FormattedMessage
@@ -905,6 +904,94 @@ class OrderForm extends React.Component {
 
       </div>
     )
+  }
+
+  renderPaypal() {
+    return (
+      <FormGroup controlId="paypalFG" id="paypalFG">
+        <div>
+          <Col sm={2}></Col>
+          <Col sm={10}>
+            <div id="paypal-checkout"></div>
+          </Col>
+        </div>
+      </FormGroup>
+    );
+  }
+
+  renderCreditCard() {
+    const { intl } = this.props;
+    const { prepaidcard, creditcard } = this.state;
+    const showNewCreditCardForm = !prepaidcard.show && creditcard.show && (!creditcard.uuid || creditcard.uuid === 'other');
+    const inputPrepaidcard = {
+      type: 'text',
+      name: 'prepaidcard',
+      button: <Button
+        className='prepaidapply'
+        disabled={prepaidcard.loading}
+        onClick={() => this.applyPrepaidCardBalance()}>
+        {intl.formatMessage(this.messages['prepaidcard.apply'])}
+        </Button>,
+      required: true,
+      label: intl.formatMessage(this.messages['prepaidcard.label']),
+      defaultValue: prepaidcard['token'],
+      onChange: (value) => this.handleChange("prepaidcard", "token", value)
+    };
+
+    if (prepaidcard.applySent) {
+      if (prepaidcard.loading) {
+        inputPrepaidcard.description = intl.formatMessage(this.messages['prepaidcard.loading']);
+      } else if (prepaidcard.valid) {
+        inputPrepaidcard.description = `${intl.formatMessage(this.messages['prepaidcard.amountremaining'])} ${formatCurrency(prepaidcard.balance, prepaidcard.currency)}`;
+      } else {
+        inputPrepaidcard.description = intl.formatMessage(this.messages['prepaidcard.invalid'])
+      }
+    }
+
+    return (
+      <Row>
+        <Col sm={12}>
+          { this.paymentMethodsOptions && this.paymentMethodsOptions.length > 1 &&
+            <InputField
+              type="select"
+              className="horizontal"
+              label={intl.formatMessage(this.messages['creditcard.label'])}
+              name="creditcardSelector"
+              onChange={uuid => this.handleChange("creditcard", { uuid })}
+              options={this.paymentMethodsOptions}
+            />
+          }
+          { showNewCreditCardForm &&
+            <div>
+              <InputField
+                label={intl.formatMessage(this.messages['creditcard.label'])}
+                type="creditcard"
+                name="creditcard"
+                className="horizontal"
+                onChange={(creditcardObject) => this.handleChange("creditcard", creditcardObject)}
+              />
+            </div>
+          }
+          <div>
+            { !prepaidcard.expanded &&
+              <a className='gift-card-expander' onClick={() => this.setState({
+                  prepaidcard: Object.assign({}, this.state.prepaidcard, {expanded: true})
+              })}><FormattedMessage id="paymentMethod.useGiftCard" defaultMessage="Use a Gift Card" /></a>
+            }
+            { prepaidcard.expanded &&
+              <Row key={`prepaidcard.input`}>
+                <Col sm={12}>
+                  <InputField
+                    className="horizontal"
+                    {...inputPrepaidcard}
+                  />
+                </Col>
+              </Row>
+            }
+          </div>
+        </Col>
+      </Row>
+    );
   }
 }
 
