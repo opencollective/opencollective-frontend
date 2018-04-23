@@ -140,7 +140,7 @@ class GoalsCover extends React.Component {
     }
 
     return (
-      <div className={`goal bar ${slug} ${position}`} style={style} ref={node => this.nodes[slug] = node}>
+      <div key={slug} className={`goal bar ${slug} ${position}`} style={style} ref={node => this.nodes[slug] = node}>
         <style jsx>{`
         .bar {
           height: 20px;
