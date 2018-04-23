@@ -168,7 +168,7 @@ class OrderForm extends React.Component {
   }
 
   populatePaymentMethodTypes() {
-    const { intl, collective } = this.props;
+    const { intl } = this.props;
     const paymentMethodTypeOptions = [];
     paymentMethodTypeOptions.push({'creditcard': intl.formatMessage(this.messages['paymentMethod.creditcard'])});
     this.paymentMethodTypeOptions = paymentMethodTypeOptions;
@@ -387,7 +387,7 @@ class OrderForm extends React.Component {
     const TEST_ENVIRONMENT = (typeof window !== 'undefined' && window.location.search.match(/test=e2e/) && (window.location.hostname === 'staging.opencollective.com' || window.location.hostname === 'localhost'));
 
     const { intl } = this.props;
-    const { order, user, creditcard, prepaidcard, paymentMethod } = this.state;
+    const { order, user, creditcard, prepaidcard } = this.state;
     const newState = {...this.state};
     // validate email
     if (this.state.isNewUser && !isValidEmail(user.email)) {

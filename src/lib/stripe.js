@@ -24,7 +24,6 @@ const getStripeToken = (type = 'cc', data) => {
         }
         return { token: res.token.id, card: res.token.card };
       });
-      break;
   }
 }
 

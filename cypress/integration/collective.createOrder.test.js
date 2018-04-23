@@ -1,9 +1,5 @@
 const WEBSITE_URL = process.env.WEBSITE_URL || "http://localhost:3000" || "https://staging.opencollective.com";
 
-const fill = (fieldname, value) => {
-  cy.get(`.inputField.${fieldname} input`).type(value);
-}
-
 describe("collective.createOrder page", () => {
 
   it ("loads custom donate page", () => {
