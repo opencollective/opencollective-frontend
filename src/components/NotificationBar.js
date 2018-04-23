@@ -1,5 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import classNames from 'classnames';
+
 const logo = '/static/images/opencollective-icon.svg';
 
 class NotificationBar extends React.Component {
@@ -16,7 +18,7 @@ class NotificationBar extends React.Component {
     const { status, error, title, description, actions } = this.props;
 
     return (
-      <div className={`${status} NotificationBar`}>
+      <div className={classNames(status, 'NotificationBar')}>
         <style jsx>{`
         .oc-message {
           position: fixed;

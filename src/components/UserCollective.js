@@ -5,7 +5,6 @@ import Header from './Header';
 import Body from './Body';
 import Footer from './Footer';
 import CollectiveCover from './CollectiveCover';
-import Tier from './Tier';
 import Link from './Link';
 import NotificationBar from './NotificationBar';
 import Memberships from './Memberships';
@@ -13,7 +12,6 @@ import CollectivesWithData from './CollectivesWithData';
 import LongDescription from './LongDescription';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import { pick, get, groupBy } from 'lodash';
-import HashLink from 'react-scrollchor';
 import MessageModal from './MessageModal';
 import SectionTitle from './SectionTitle';
 import OrderCreated from './OrderCreated';
@@ -64,7 +62,6 @@ class UserCollective extends React.Component {
       'organization.collective.memberOf.collective.fundraiser.title': { id: 'organization.collective.memberOf.collective.fundraiser.title', defaultMessage: `We've helped raise money for {n, plural, one {this collective} other {these {n} collectives}}`},
       'section.host': { id: 'section.host', defaultMessage: `Hosting`},
       'section.admin': { id: 'section.admin', defaultMessage: `Administrating`},
-      'section.host': { id: 'section.host', defaultMessage: `Hosting`},
       'section.member': { id: 'section.member', defaultMessage: `Memberships`},
       'section.backer': { id: 'section.backer', defaultMessage: `Backing`},
       'section.attendee': { id: 'section.attendee', defaultMessage: `Events`},
@@ -88,11 +85,11 @@ class UserCollective extends React.Component {
       const memberships = this.memberOfByRole[role].filter(m => get(m, 'collective.type') === memberOfCollectiveType);
       if (memberships.length === 0) return;
 
-      let title, subtitle;
+      let subtitle;
       const collectiveType = memberOfCollectiveType.toLowerCase();
       const titleMessageId = `section.${role.toLowerCase()}`;
       const values = { n: memberships.length };
-      title = this.messages[titleMessageId] && intl.formatMessage(this.messages[titleMessageId], values);
+      const title = this.messages[titleMessageId] && intl.formatMessage(this.messages[titleMessageId], values);
       if (!title) return;
       const subtitleMessageId = `${type}.collective.memberOf.${collectiveType}.${role.toLowerCase()}.title`;
       const loggedInSubtitleMessageId = `${type}.collective.memberOf.${collectiveType}.${role.toLowerCase()}.LoggedInDescription`;

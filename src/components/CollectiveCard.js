@@ -4,9 +4,7 @@ import { FormattedMessage, FormattedDate } from 'react-intl';
 import Currency from './Currency';
 import Link from './Link';
 import Logo from './Logo';
-import { pickLogo } from '../lib/collective.lib';
 import { get } from 'lodash';
-import { Router } from '../server/pages';
 import { firstSentence, imagePreview } from '../lib/utils';
 import { defaultBackgroundImage } from '../constants/collectives';
 
@@ -113,7 +111,7 @@ class CollectiveCard extends React.Component {
             padding: 1rem;
             min-height: 11rem;
           }
-        
+
           .name, .description {
             overflow: hidden;
             text-overflow: ellipsis;

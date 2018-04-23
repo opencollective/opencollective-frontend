@@ -9,8 +9,7 @@ import Currency from '../components/Currency';
 import { FormattedMessage, defineMessages } from 'react-intl';
 import ConnectPaypal from '../components/ConnectPaypal';
 import AddFundsForm from '../components/AddFundsForm';
-import SmallButton from '../components/SmallButton';
-import { pick, cloneDeep } from 'lodash';
+import { pick } from 'lodash';
 
 class CollectivePickerWithData extends React.Component {
 
@@ -70,7 +69,7 @@ class CollectivePickerWithData extends React.Component {
     }
     console.log(">>> add funds order: ", order);
     try {
-      const res = await this.props.createOrder(order)
+      await this.props.createOrder(order);
       this.setState({ showAddFunds: false, loading: false });
     } catch (e) {
       const error = e.message && e.message.replace(/GraphQL error:/, "");
@@ -93,7 +92,7 @@ class CollectivePickerWithData extends React.Component {
     const { intl } = this.props;
     const badgeCount = collective.stats.expenses.pending + collective.stats.expenses.approved;
 
-    let tooltipArray = [];
+    const tooltipArray = [];
     if (collective.stats.expenses.pending > 0) {
       tooltipArray.push(intl.formatMessage(this.messages['badge.tooltip.pending'], collective.stats.expenses));
     }
@@ -113,7 +112,7 @@ class CollectivePickerWithData extends React.Component {
 
         .MenuItem-Collective.selected {
           float: left;
-          margin-right: 1rem;          
+          margin-right: 1rem;
         }
 
         label {
@@ -218,7 +217,7 @@ class CollectivePickerWithData extends React.Component {
             font-size: 2.4rem;
             margin: 0;
             font-weight: 300;
-            color: #18191a;            
+            color: #18191a;
           }
 
           .collectivesFilter {
@@ -379,7 +378,7 @@ export const addCollectivesData = graphql(getCollectivesQuery, {
         }
       })
     }
-  })  
+  })
 });
 
 

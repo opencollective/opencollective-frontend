@@ -31,12 +31,12 @@ const logger = new winston.Logger( { transports } );
 const loggerMiddleware = {
   logger: expressWinston.logger({
       transports,
-      meta: false, // optional: control whether you want to log the meta data about the request (default to true) 
-      msg: "HTTP {{req.method}} {{req.url}}", // optional: customize the default logging message. E.g. "{{res.statusCode}} {{req.method}} {{res.responseTime}}ms {{req.url}}" 
-      expressFormat: true, // Use the default Express/morgan request formatting, with the same colors. Enabling this will override any msg and colorStatus if true. Will only output colors on transports with colorize set to true 
-      colorStatus: true, // Color the status code, using the Express/morgan color palette (default green, 3XX cyan, 4XX yellow, 5XX red). Will not be recognized if expressFormat is true 
+      meta: false, // optional: control whether you want to log the meta data about the request (default to true)
+      msg: "HTTP {{req.method}} {{req.url}}", // optional: customize the default logging message. E.g. "{{res.statusCode}} {{req.method}} {{res.responseTime}}ms {{req.url}}"
+      expressFormat: true, // Use the default Express/morgan request formatting, with the same colors. Enabling this will override any msg and colorStatus if true. Will only output colors on transports with colorize set to true
+      colorStatus: true, // Color the status code, using the Express/morgan color palette (default green, 3XX cyan, 4XX yellow, 5XX red). Will not be recognized if expressFormat is true
       ignoreRoute: (req) => {
-         // optional: allows to skip some log messages based on request and/or response 
+         // optional: allows to skip some log messages based on request and/or response
         if (req.url.match(/^\/_/)) return true;
         if (req.url.match(/^\/log\//)) return true;
         return false;

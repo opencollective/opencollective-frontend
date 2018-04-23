@@ -1,11 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import colors from '../constants/colors';
-import HashLink from 'react-scrollchor';
-import Logo from './Logo';
 import { FormattedMessage, defineMessages } from 'react-intl';
-import Link from './Link';
-import Button from './Button';
 import { get, maxBy } from 'lodash';
 import withIntl from '../lib/withIntl';
 import { formatCurrency } from '../lib/utils';
@@ -83,11 +78,10 @@ class GoalsCover extends React.Component {
   }
 
   componentDidMount() {
-    const { collective } = this.props;
     const state = this.state;
     const previous = {};
     const barLength = this.nodes.barContainer.offsetWidth;
-    this.goals.forEach((goal, index) => {
+    this.goals.forEach(goal => {
       const pos = { level: 0, amount: goal.amount };
       const { slug, position } = goal;
       if (this.nodes[slug]) {
@@ -127,9 +121,7 @@ class GoalsCover extends React.Component {
 
   renderGoal(goal, index) {
     if (!goal.title) return;
-    const { collective, intl } = this.props;
-    const title = goal.title || (this.messages[goal.slug] && intl.formatMessage(this.messages[goal.slug]));
-    const isLast = index === this.goals.length - 1;
+    const { collective } = this.props;
     const posX = goal.animate ? 0 : `${Math.round(goal.amount / this.maxAmount * 100)}%`;
     const slug = goal.slug || `goal${index}`;
     const zIndex = (20 - index) * 10;
@@ -148,7 +140,7 @@ class GoalsCover extends React.Component {
     }
 
     return (
-      <div className={`goal bar ${slug} ${position}`} style={style} ref={node => this.nodes[slug] = node}>
+      <div key={slug} className={`goal bar ${slug} ${position}`} style={style} ref={node => this.nodes[slug] = node}>
         <style jsx>{`
         .bar {
           height: 20px;
@@ -231,7 +223,7 @@ class GoalsCover extends React.Component {
   }
 
   render() {
-    const { collective, intl } = this.props;
+    const { collective } = this.props;
 
     if (!collective) {
       return (<div />);

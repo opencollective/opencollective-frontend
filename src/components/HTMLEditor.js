@@ -3,8 +3,8 @@ import PropTypes from 'prop-types';
 import { upload } from '../lib/api';
 import stylesheet from '../../node_modules/react-quill/dist/quill.snow.css';
 
-/* 
- * Simple editor component that takes placeholder text as a prop 
+/*
+ * Simple editor component that takes placeholder text as a prop
  */
 class HTMLEditor extends React.Component {
 
@@ -24,7 +24,7 @@ class HTMLEditor extends React.Component {
       this.ReactQuill = require('react-quill');
     }
 
-    /* 
+    /*
     * Quill modules to attach to editor
     * See https://quilljs.com/docs/modules/ for complete options
     */
@@ -34,7 +34,7 @@ class HTMLEditor extends React.Component {
           [{ 'header': '1'}, {'header': '2'}],
           [{size: []}],
           ['bold', 'italic', 'underline', 'blockquote'],
-          [{'list': 'ordered'}, {'list': 'bullet'}, 
+          [{'list': 'ordered'}, {'list': 'bullet'},
           ],
           ['link', 'image', 'video']
         ],
@@ -49,7 +49,7 @@ class HTMLEditor extends React.Component {
         matchVisual: false,
       }
     }
-    /* 
+    /*
     * Quill editor formats
     * See https://quilljs.com/docs/formats/
     */
@@ -61,7 +61,7 @@ class HTMLEditor extends React.Component {
     ]
 
   }
-  
+
   handleChange (html) {
     this.setState({ editorHtml: html });
     console.log(html);
@@ -91,7 +91,7 @@ class HTMLEditor extends React.Component {
    *
    * @param {File} file
    */
-  saveToServer(file: File) {
+  saveToServer(file) {
     upload(file)
       .then(fileUrl => {
         return this.insertToEditor(fileUrl);
@@ -106,7 +106,7 @@ class HTMLEditor extends React.Component {
    *
    * @param {string} url
    */
-  insertToEditor(url: string) {
+  insertToEditor(url) {
     const editor = this.reactQuillRef.getEditor();
     // push image url to rich editor.
     const range = editor.getSelection();
@@ -128,8 +128,8 @@ class HTMLEditor extends React.Component {
             min-height: 40rem;
           }
         `}</style>
-        <this.ReactQuill 
-          ref={(el) => { this.reactQuillRef = el }}
+        <this.ReactQuill
+          ref={el => this.reactQuillRef = el}
           theme="snow"
           onChange={this.handleChange}
           // value={this.state.editorHtml}
@@ -143,8 +143,6 @@ class HTMLEditor extends React.Component {
      )
   }
 }
-
-
 
 // // quill editor add image handler
 // HTMLEditor.getModule('toolbar').addHandler('image', () => {

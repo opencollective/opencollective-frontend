@@ -1,11 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormGroup, ControlLabel, FormControl } from 'react-bootstrap';
+import { FormControl } from 'react-bootstrap';
 import { graphql } from 'react-apollo'
 import gql from 'graphql-tag'
 import { defineMessages, FormattedMessage } from 'react-intl';
 import withIntl from '../lib/withIntl';
-import { capitalize } from '../lib/utils';
 import { get, uniqBy, groupBy } from 'lodash';
 
 class AddFundsSourcePicker extends React.Component {
@@ -56,8 +55,12 @@ class AddFundsSourcePicker extends React.Component {
     const { host, data: { loading, allMembers } } = this.props;
     if (loading) return (<div />);
     const uniqueMembers = uniqBy(allMembers, m => get(m, 'member.id'));
-    this.membersByType = groupBy(uniqueMembers, m => get(m, 'member.type'));
-
+    this.membersByType = {
+      ORGANIZATION: [],
+      COLLECTIVE: [],
+      USER: [],
+      ...groupBy(uniqueMembers, m => get(m, 'member.type')),
+    };
     return (
       <FormControl id="sourcePicker" name="template" componentClass="select" placeholder="select" onChange={this.onChange}>
         <option value={host.id}><FormattedMessage id="addfunds.fromCollective.host" values={{ host: host.name}} defaultMessage="Host ({host})"/></option>

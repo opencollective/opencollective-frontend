@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import classNames from 'classnames';
 import Member from './Member';
 
 class Members extends React.Component {
@@ -33,13 +34,13 @@ class Members extends React.Component {
         }
         `}</style>
         {members.map((member, index) =>
-          <Member
+          (<Member
             key={`member${index}`}
-            className={`${this.props.className} ${size}`}
+            className={classNames(this.props.className, size)}
             member={member}
             collective={collective}
             viewMode={viewMode}
-            />
+            />)
         )}
       </div>
     )

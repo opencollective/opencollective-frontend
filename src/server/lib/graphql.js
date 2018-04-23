@@ -38,9 +38,9 @@ export async function fetchCollectiveImage(collectiveSlug) {
       image
     }
   }
-  `;  
+  `;
 
-  const result = await client.request(query, { collectiveSlug });    
+  const result = await client.request(query, { collectiveSlug });
   return result.Collective;
 }
 

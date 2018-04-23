@@ -17,7 +17,7 @@ describe("badge.routes.test.js", () => {
       const res = await r2(`${WEBSITE_URL}/apex/backers/badge.svg${cacheBurst}`).text;
       expect(res).toMatch(/backers<\/text>/);
     });
-    
+
     test("loads the sponsors badge", async () => {
       const res = await r2(`${WEBSITE_URL}/apex/sponsors/badge.svg${cacheBurst}`).text;
       expect(res).toMatch(/sponsors<\/text>/);
@@ -27,17 +27,17 @@ describe("badge.routes.test.js", () => {
       const res = await r2(`${WEBSITE_URL}/apex222/backers/0/avatar.svg${cacheBurst}`).response;
       expect(res.status).toEqual(404);
     });
-    
+
     test("loads the first backer avatar.svg", async () => {
       const res = await r2(`${WEBSITE_URL}/apex/backers/0/avatar.svg${cacheBurst}`).text;
       expect(res).toMatch(/<image width="64" height="64"/);
     });
-    
+
     test("loads the first sponsor avatar.svg", async () => {
       const res = await r2(`${WEBSITE_URL}/apex/sponsors/0/avatar.svg${cacheBurst}`).text;
       expect(res).toMatch(/height="64"/);
     });
-    
+
     test("redirects to the website of the second backer", async () => {
       const res = await r2(`${WEBSITE_URL}/apex/backers/1/website${cacheBurst}`).response;
       expect(res.status).toEqual(200);

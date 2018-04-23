@@ -23,7 +23,7 @@ class Expense extends React.Component {
     LoggedInUser: PropTypes.object,
     allowPayAction: PropTypes.bool,
     lockPayAction: PropTypes.func,
-    unlockPayAction: PropTypes.func 
+    unlockPayAction: PropTypes.func
   }
 
   constructor(props) {
@@ -79,7 +79,7 @@ class Expense extends React.Component {
       id: this.props.expense.id,
       ...this.state.expense
     }
-    const res = await this.props.editExpense(expense);
+    await this.props.editExpense(expense);
     this.setState({ modified: false, mode: 'details' });
   }
 
@@ -186,7 +186,7 @@ class Expense extends React.Component {
           .status {
             text-transform: uppercase;
           }
-          
+
           .actions > div {
             display: flex;
             margin: 0.5rem 0;
@@ -243,7 +243,7 @@ class Expense extends React.Component {
               { includeHostedCollectives &&
                 <span className="collective"><Link route={`/${expense.collective.slug}`}>{expense.collective.slug}</Link> (balance: {formatCurrency(expense.collective.stats.balance, expense.collective.currency)}) | </span>
               }
-              <span className="status">{intl.formatMessage(this.messages[status])}</span> | 
+              <span className="status">{intl.formatMessage(this.messages[status])}</span> |
               <span className="metaItem"><Link route={`/${expense.collective.slug}/expenses/${expense.category}`}>{capitalize(expense.category)}</Link></span>
               { editable && LoggedInUser && LoggedInUser.canEditExpense(expense) &&
                 <span> | <a className="toggleEditExpense" onClick={this.toggleEdit}>{intl.formatMessage(this.messages[`${mode === 'edit' ? 'cancelEdit' : 'edit'}`])}</a></span>

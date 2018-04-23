@@ -4,7 +4,7 @@ import Body from '../components/Body';
 import Footer from '../components/Footer';
 
 export default () =>
-  <div className="root">
+  (<div className="root">
     <style jsx global>{`
       th {
         min-width: 200px;
@@ -27,4 +27,4 @@ export default () =>
       <div className="content" dangerouslySetInnerHTML={{__html: markdown}} />
     </Body>
     <Footer />
-  </div>
+  </div>)

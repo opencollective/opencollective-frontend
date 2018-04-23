@@ -1,7 +1,4 @@
 const WEBSITE_URL = process.env.WEBSITE_URL || "http://localhost:3000" || "https://staging.opencollective.com";
-const random = Math.round(Math.random() * 100000);
-const expenseDescription = `New expense ${random}`;
-
 
 const signin = (redirect) => {
   cy.visit(`${WEBSITE_URL}/signin?next=${redirect}`)

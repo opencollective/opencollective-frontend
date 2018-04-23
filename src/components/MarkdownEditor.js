@@ -3,8 +3,8 @@ import PropTypes from 'prop-types';
 import ReactMde, { ReactMdeCommands } from 'react-mde';
 import stylesheet from '../../node_modules/react-mde/lib/styles/css/react-mde-all.css';
 
-/* 
- * Simple editor component that takes placeholder text as a prop 
+/*
+ * Simple editor component that takes placeholder text as a prop
  */
 class MarkdownEditor extends React.Component {
 
@@ -21,7 +21,7 @@ class MarkdownEditor extends React.Component {
       reactMdeValue: { text: props.defaultValue, selection: null }
     };
   }
-  
+
   handleChange(value) {
     this.setState({ reactMdeValue: value });
     this.props.onChange(value.text);

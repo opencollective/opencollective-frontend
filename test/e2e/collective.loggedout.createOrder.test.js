@@ -7,9 +7,9 @@ describe("collective.loggedout.createOrder", () => {
 
   beforeAll(() => browser = chromeless.init());
   afterAll(() => chromeless.close(browser));
-  
+
   test("makes a one time donation", async () => {
-    
+
     jest.setTimeout(25000);
 
     const run = async () => {
@@ -34,7 +34,7 @@ describe("collective.loggedout.createOrder", () => {
       download("createOrder", screenshot);
       const screenshot2 = await browser.wait('.UserCollectivePage', 15000).screenshot();
       download("orderCreated", screenshot2);
-      
+
       const url = await browser.evaluate(() => window.location.href)
       console.log(">>> url", url);
       expect(url).toEqual(expect.stringContaining(`${WEBSITE_URL}/xdamman`));

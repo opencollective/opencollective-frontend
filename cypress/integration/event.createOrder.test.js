@@ -20,7 +20,7 @@ describe("event.createOrder page", () => {
     fill("firstName", 'New');
     fill("lastName", 'User');
     fill("website", "http://mywebsite.com");
-    fill("twitterHandle", "twhandle")    
+    fill("twitterHandle", "twhandle")
     cy.get('.inputField.publicMessage textarea').type("excited to meet the community!");
     cy.wait(400)
     cy.get('.actions .submit button').click();

@@ -23,7 +23,7 @@ const getStripeToken = sinon.stub(stripe, 'getStripeToken', () => {
   }
 })
 
-const checkUserExistenceStub = sinon.stub(api, 'checkUserExistence', () => Promise.resolve(false));
+sinon.stub(api, 'checkUserExistence', () => Promise.resolve(false));
 
 describe("OrderForm component", () => {
 
@@ -100,17 +100,6 @@ describe("OrderForm component", () => {
     it.skip('show the user details form and credit card form', (done) => {
 
       const onSubmit = (order) => {
-        const sanitizedCard = {
-          identifier: '4242',
-          brand: 'VISA',
-          funding: 'credit',
-          country: 'US',
-          save: true,
-          token: 'xxx',
-          fullName: 'Xavier Damman',
-          expYear: 2022,
-          expMonth: 11
-        };
         expect(getStripeToken.callCount).toEqual(1);
         expect(order.user).toEqual({...LoggedInUser });
         expect(order.totalAmount).toEqual(tiers.donor.presets[2]);

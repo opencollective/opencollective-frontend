@@ -5,7 +5,6 @@ import { addEventCollectiveData, addGetLoggedInUserFunction } from '../graphql/q
 import NotFound from '../components/NotFoundPage';
 import Loading from '../components/Loading';
 import EditEvent from '../components/EditEvent';
-import { intersection } from 'lodash';
 
 class EditEventPage extends React.Component {
 
@@ -25,7 +24,7 @@ class EditEventPage extends React.Component {
   }
 
   render() {
-    const { data, slug, parentCollectiveSlug } = this.props;
+    const { data } = this.props;
 
     if (this.state.loading) {
       return <Loading />;

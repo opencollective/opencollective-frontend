@@ -4,10 +4,10 @@ import Footer from '../components/Footer';
 import markdown from '../markdown/widgets.md';
 
 export default () =>
-  <div className="root">
+  (<div className="root">
     <Header title="Widgets" />
     <Body>
       <div className="content" dangerouslySetInnerHTML={{__html: markdown}} />
     </Body>
     <Footer />
-  </div>
+  </div>)

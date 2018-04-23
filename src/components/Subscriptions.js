@@ -1,19 +1,10 @@
 import React from 'react';
-import { withApollo } from 'react-apollo';
-
 import PropTypes from 'prop-types';
-import Error from '../components/Error';
 import withIntl from '../lib/withIntl';
-import { graphql } from 'react-apollo'
-import gql from 'graphql-tag'
-import { Button } from 'react-bootstrap';
-import { FormattedMessage, defineMessages } from 'react-intl';
+import { defineMessages } from 'react-intl';
 
-import { getSubscriptionsQuery } from '../graphql/queries';
 import SubscriptionCard from './SubscriptionCard';
 import colors from '../constants/colors';
-
-const SUBSCRIPTIONS_PER_PAGE = 25;
 
 class Subscriptions extends React.Component {
 
@@ -38,8 +29,14 @@ class Subscriptions extends React.Component {
     if (!this.props.LoggedInUser && nextProps.LoggedInUser) {
       return this.props.refetch();
     }
-  } 
+  }
 
+  sortBycreatedAt(a, b) {
+    const aTimestamp = new Date(a.createdAt).getTime();
+    const bTimestamp = new Date(b.createdAt).getTime();
+
+    return bTimestamp - aTimestamp;
+  }
 
   render() {
     const { intl, subscriptions, LoggedInUser, collective, loading } = this.props;
@@ -48,8 +45,8 @@ class Subscriptions extends React.Component {
       return (<div />);
     }
 
-    const activeSubs = subscriptions.filter(s => s.isSubscriptionActive).sort((s1, s2) => s1.id < s2.id);
-    const canceledSubs = subscriptions.filter(s => !s.isSubscriptionActive).sort((s1, s2) => s1.id < s2.id)
+    const activeSubs = subscriptions.filter(s => s.isSubscriptionActive).sort(this.sortBycreatedAt);
+    const canceledSubs = subscriptions.filter(s => !s.isSubscriptionActive).sort(this.sortBycreatedAt)
 
     let userString = `${collective.name || collective.slug} isn't`;
     if (LoggedInUser && LoggedInUser.canEditCollective(collective)) {
@@ -124,20 +121,20 @@ class Subscriptions extends React.Component {
 
         <div className='active'>
           { activeSubs.map((subscription) =>
-            <SubscriptionCard
+            (<SubscriptionCard
               subscription={subscription}
-              key={subscription.id}
+              key={`active-${subscription.collective.id}`}
               LoggedInUser={LoggedInUser}
               paymentMethods={collective.paymentMethods}
               slug={collective.slug}
-            />
+            />)
           )}
         </div>
-        {activeSubs.length === 0 && 
+        {activeSubs.length === 0 &&
           <div className='subscriptions-noactive'>
             <img className='subscriptions-noactive-image' src='/static/images/no-subscription-placeholder.svg' />
             <div className='subscriptions-noactive-text'> Looks like {userString} contributing right now.</div>
-            <div className='subscriptions-noactive-link'> 
+            <div className='subscriptions-noactive-link'>
               <a href='/discover'>Discover more collectives</a>
             </div>
           </div>}
@@ -148,13 +145,13 @@ class Subscriptions extends React.Component {
         { canceledSubs.length > 0 && <div className="subscriptions-cancelled-label"> <span>{intl.formatMessage(this.messages['subscription.canceled.label'])} </span></div>}
         <div className='canceled'>
           { canceledSubs.map((subscription) =>
-            <SubscriptionCard
+            (<SubscriptionCard
               subscription={subscription}
-              key={subscription.id}
+              key={`canceled-${subscription.id}`}
               LoggedInUser={LoggedInUser}
               paymentMethods={collective.paymentMethods}
               slug={collective.slug}
-            />
+            />)
           )}
         </div>
       </div>
@@ -162,6 +159,5 @@ class Subscriptions extends React.Component {
   }
 
 }
-
 
 export default withIntl(Subscriptions);

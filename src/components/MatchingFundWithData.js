@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormGroup, ControlLabel, FormControl, Col } from 'react-bootstrap';
+import { FormGroup, ControlLabel, Col } from 'react-bootstrap';
 import { graphql } from 'react-apollo'
 import gql from 'graphql-tag'
 import { FormattedMessage } from 'react-intl';
@@ -49,7 +49,7 @@ class MatchingFundWithData extends React.Component {
       this.props.onChange(uuid);
     }
   }
-  
+
   computeAmounts(orderTotalAmount, matchingFund) {
     const totalAmount = orderTotalAmount * matchingFund.matching;
     return {

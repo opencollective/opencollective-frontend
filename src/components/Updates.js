@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Update from './Update';
-import { ButtonGroup, Button } from 'react-bootstrap';
+import { Button } from 'react-bootstrap';
 import { FormattedMessage } from 'react-intl';
 import colors from '../constants/colors';
 
@@ -33,7 +33,7 @@ class Updates extends React.Component {
   setPayActionLock(val) {
     this.setState({ isPayActionLocked: val})
   }
-  
+
   render() {
     const {
       collective,
@@ -94,7 +94,7 @@ class Updates extends React.Component {
             </div>
           }
           { updates.map((update) =>
-            <div key={update.id} className="update">
+            (<div key={update.id} className="update">
               <Update
                 compact={true}
                 collective={collective}
@@ -103,7 +103,7 @@ class Updates extends React.Component {
                 includeHostedCollectives={includeHostedCollectives}
                 LoggedInUser={LoggedInUser}
                 />
-            </div>
+            </div>)
           )}
           { updates.length === 0 &&
             <div className="empty">

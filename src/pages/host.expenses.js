@@ -9,8 +9,7 @@ import ErrorPage from '../components/ErrorPage';
 import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
 import ExpensesWithData from '../components/ExpensesWithData';
-import { get, pick } from 'lodash';
-import { FormattedMessage } from 'react-intl'
+import { get } from 'lodash';
 import CollectivePicker from '../components/CollectivePickerWithData';
 import ExpensesStatsWithData from '../components/ExpensesStatsWithData';
 import { graphql } from 'react-apollo'
@@ -41,12 +40,12 @@ class HostExpensesPage extends React.Component {
   render() {
     const { data } = this.props;
     const { LoggedInUser } = this.state;
-    
+
     if (data.error) {
       console.error("graphql error>>>", data.error.message);
       return (<ErrorPage message="GraphQL error" />)
     }
-    
+
     if (!data.Collective) return (<Loading />);
 
     const collective = data.Collective;

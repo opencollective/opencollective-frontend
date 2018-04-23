@@ -2,22 +2,18 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import gql from 'graphql-tag'
 import { graphql } from 'react-apollo'
-import { FormattedMessage, FormattedDate, defineMessages } from 'react-intl';
+import { FormattedMessage, defineMessages } from 'react-intl';
 import Currency from './Currency';
-import { pickLogo } from '../lib/collective.lib';
-import { get } from 'lodash';
+import { get, cloneDeep } from 'lodash';
 import router from '../server/pages';
-import { firstSentence, imagePreview } from '../lib/utils';
+import { firstSentence, getCurrencySymbol, imagePreview } from '../lib/utils';
 import { defaultBackgroundImage } from '../constants/collectives';
 import colors from '../constants/colors';
-import Button from './Button';
-import InputField from './InputField';
-import CollectiveCard from './CollectiveCard';
 import CancelSubscriptionBtn from './CancelSubscriptionBtn';
 import PaymentMethodChooser from './PaymentMethodChooser';
 import { getSubscriptionsQuery } from '../graphql/queries';
 import Logo from './Logo';
-import withIntl from '../lib/withIntl'; 
+import withIntl from '../lib/withIntl';
 
 import { Dropdown, MenuItem, Popover, OverlayTrigger } from 'react-bootstrap';
 import { CustomToggle } from './CustomMenu';
@@ -29,24 +25,26 @@ class SubscriptionCard extends React.Component {
     subscription: PropTypes.object.isRequired,
     slug: PropTypes.string.isRequired,
     LoggedInUser: PropTypes.object,
-    paymentMethods: PropTypes.arrayOf(PropTypes.object)
+    paymentMethods: PropTypes.arrayOf(PropTypes.object),
+    intl: PropTypes.object.isRequired,
+    updateSubscription: PropTypes.func.isRequired
   }
 
   constructor(props) {
     super(props);
-    this.update = this.update.bind(this);
-    this.onError = this.onError.bind(this);
-    this.resetState = this.resetState.bind(this);
 
     this.stateConstants = {
       normal: 'normal',
-      editPM: 'editPM',
+      editPaymentMethod: 'editPaymentMethod',
+      editAmount: 'editAmount',
       cancelConf: 'cancelConf'
     }
 
     this.state = {
       showMenu: false,
       visibleState: this.stateConstants.normal,
+      amountValue: this.props.subscription.totalAmount / 100,
+      amountValueInteger: this.props.subscription.totalAmount,
       result: {}
     }
 
@@ -60,29 +58,43 @@ class SubscriptionCard extends React.Component {
     });
   }
 
-  async update(paymentMethod) {
+  update = async ({ paymentMethod, amount }) => {
     const { intl } = this.props;
-    this.setState({ loading: true });
-    let res;
+    this.setState({ loading: true, result: {} });
     try {
-      res = await this.props.updateSubscription(this.props.subscription.id, paymentMethod);
+      await this.props.updateSubscription(this.props.subscription.id, paymentMethod, amount);
       this.setState({ loading: false, visibleState: this.stateConstants.normal, result: {success: intl.formatMessage(this.messages['subscription.updated'])}})
     } catch (e) {
       this.setState({ loading: false, result: { error: e.graphQLErrors[0].message}});
     }
   }
 
-  resetState() {
+  updatePaymentMethod = async (paymentMethod) => {
+    this.update({ paymentMethod });
+  }
+
+  updateAmount = async () => {
+    this.update({ amount: this.state.amountValueInteger });
+  }
+
+  resetState = () => {
     this.setState({ visibleState: this.stateConstants.normal, result: {}});
   }
 
-  onError(error) {
+  handleAmountChange = (event) => {
+    this.setState({
+      amountValue: event.target.value,
+      amountValueInteger: parseInt(event.target.value, 10) * 100
+    });
+  }
+
+  onError = (error) => {
     this.setState({result: {error }});
   }
 
   render() {
-    const { intl, LoggedInUser, subscription, paymentMethods} = this.props;
-    const { transactions, paymentMethod, collective } = subscription;
+    const { intl, LoggedInUser, subscription} = this.props;
+    const { collective } = subscription;
 
     const coverStyle = { ...get(collective, 'settings.style.hero.cover')};
     const backgroundImage = imagePreview(collective.backgroundImage, collective.type === 'COLLECTIVE' && defaultBackgroundImage[collective.type], { width: 400 });
@@ -103,13 +115,15 @@ class SubscriptionCard extends React.Component {
 
     const menuItemStyle = { margin: '0rem', fontSize: '12px' };
 
-    const popover = (<Popover id="popover-positioned-bottom" title={intl.formatMessage(this.messages['subscription.whyPastDueTitle'])} >
-            {intl.formatMessage(this.messages['subscription.whyPastDueText'])}
-            </Popover>);
+    const popover = (
+      <Popover id="popover-positioned-bottom" title={intl.formatMessage(this.messages['subscription.whyPastDueTitle'])} >
+        {intl.formatMessage(this.messages['subscription.whyPastDueText'])}
+      </Popover>
+    );
 
     return (
-        <div className={`SubscriptionCard ${ subscription.isPastDue ? 'past-due' : ''}`}>
-          <style jsx>{`
+      <div className={`SubscriptionCard ${ subscription.isPastDue ? 'past-due' : ''}`}>
+        <style jsx>{`
           .SubscriptionCard {
             display: flex;
             flex-direction: column;
@@ -202,7 +216,7 @@ class SubscriptionCard extends React.Component {
           .name {
             cursor: pointer;
           }
-        
+
           .name, .description {
             overflow: hidden;
             text-overflow: ellipsis;
@@ -235,7 +249,7 @@ class SubscriptionCard extends React.Component {
             padding-bottom: 20px;
             border-top: 2px solid #f2f2f2
           }
-          
+
           .amount-frequency {
             margin: auto;
             height: 32px;
@@ -255,14 +269,14 @@ class SubscriptionCard extends React.Component {
           .border-red {
             border-color: #F2F2F2;
           }
-          
+
           .amount {
             font-weight: 700;
             color: #303233;
             font-size: 14px;
             padding-right: 2px;
           }
-          
+
           .frequency {
           }
 
@@ -275,6 +289,41 @@ class SubscriptionCard extends React.Component {
             font-weight: 700;
           }
 
+          .editAmount {
+            margin-top: -16px;
+            padding: 0 1rem;
+          }
+
+          .inputAmount {
+            padding-bottom: 1em;
+          }
+
+          .inputAmount .currency, .inputAmount .frequency, .inputAmount input {
+            font-size: 14px;
+            line-height:14px;
+
+            border: 1px solid #d4dae1;
+            padding: 0.5em;
+            background: white;
+          }
+
+          .inputAmount span.currency {
+            color: #d4dae1;
+            border-radius: 9px 0 0 9px;
+            border-right: 0;
+          }
+
+          .inputAmount span.frequency {
+            border-radius: 9px;
+            margin-left: 1em;
+            padding: 0.5em 1em;
+          }
+
+          .inputAmount input {
+            width: 6em;
+            border-radius: 0 9px 9px 0;
+          }
+
           .paymentMethod {
             padding-top: 0.5rem;
           }
@@ -285,10 +334,9 @@ class SubscriptionCard extends React.Component {
             margin-top: 1rem;
           }
 
-          .cancel-buttons {
+          .cancel-buttons, .update-buttons {
             display: flex;
             flex-direction: row;
-            width: 150px;
             justify-content: space-evenly;
             margin: auto;
             margin-top: 4px;
@@ -312,114 +360,140 @@ class SubscriptionCard extends React.Component {
             color: red;
             font-weight: bold;
           }
-          `}</style>
-          <style jsx global>{`
-            .StripeElement {
-              background-color: white;
-              height: 20px;
-              padding: 0px 0px;
-              border-radius: 9px;
-              border: 1px solid transparent;
-              box-shadow: 0 1px 3px 0 #e6ebf1;
-              -webkit-transition: box-shadow 150ms ease;
-              transition: box-shadow 150ms ease;
-              font-size: 10px;
-            }
+        `}</style>
+        <style jsx global>{`
+          .StripeElement {
+            background-color: white;
+            height: 20px;
+            padding: 0px 0px;
+            border-radius: 9px;
+            border: 1px solid transparent;
+            box-shadow: 0 1px 3px 0 #e6ebf1;
+            -webkit-transition: box-shadow 150ms ease;
+            transition: box-shadow 150ms ease;
+            font-size: 10px;
+          }
 
           .menu-item li a {
             padding: 5px 10px;
           }
-          `}</style>
-          <div className='head'>
-            <div className='background' style={coverStyle} />
-            {subscription.isPastDue && <div className='polygon'> 
+        `}</style>
+
+        <div className='head'>
+
+          <div className='background' style={coverStyle} />
+
+          {subscription.isPastDue &&
+            <div className='polygon'>
               <img title={intl.formatMessage(this.messages['subscription.pastDue'])} src='/static/images/attention-badge.svg' />
             </div>}
-            {canEditSubscription && subscription.isSubscriptionActive &&
-              <div className={`actions ${this.state.showMenu ? 'selected' : ''}`} onClick={() => this.setState({showMenu: !this.state.showMenu})}>
-              <Dropdown 
+
+          {canEditSubscription && subscription.isSubscriptionActive &&
+            <div className={`actions ${this.state.showMenu ? 'selected' : ''}`} onClick={() => this.setState({showMenu: !this.state.showMenu})}>
+              <Dropdown
                 id='dropdown-custom'
                 className='dropdown-toggle'
                 style={{width: '100%'}}
                 open={this.state.showMenu}
-                onToggle={() => this.setState({showMenu: !this.state.showMenu})} 
-                onSelect={(eventKey) => this.setState({visibleState: eventKey })}
-                pullRight>
-                <CustomToggle bsRole='toggle'> 
+                onToggle={() => this.setState({showMenu: !this.state.showMenu})}
+                onSelect={(eventKey) => this.setState({visibleState: eventKey, 'result': {} })}
+                pullRight
+              >
+                <CustomToggle bsRole='toggle'>
                   <img className='actions-image' src={`/static/images/glyph-more.svg`} />
                 </CustomToggle>
                 <Dropdown.Menu className='menu-item'>
-                  <MenuItem style={menuItemStyle} eventKey={this.stateConstants.editPM}>Update payment method</MenuItem>
+                  <MenuItem style={menuItemStyle} eventKey={this.stateConstants.editPaymentMethod}><FormattedMessage id="subscription.menu.editPaymentMethod" defaultMessage="Update payment method" /></MenuItem>
+                  <MenuItem style={menuItemStyle} eventKey={this.stateConstants.editAmount}><FormattedMessage id="subscription.menu.editAmount" defaultMessage="Update amount" /></MenuItem>
                   <MenuItem style={{ margin: '2px' }} divider />
-                  <MenuItem style={menuItemStyle} eventKey={this.stateConstants.cancelConf}>Cancel contribution</MenuItem>
+                  <MenuItem style={menuItemStyle} eventKey={this.stateConstants.cancelConf}><FormattedMessage id="subscription.menu.cancel" defaultMessage="Cancel contribution" /></MenuItem>
                 </Dropdown.Menu>
               </Dropdown>
             </div>}
-            <div className='logo'>
-                <Logo src={collective.image} type={collective.type} website={collective.website} height={65} />
-            </div>
+          <div className='logo'>
+            <Logo src={collective.image} type={collective.type} website={collective.website} height={65} />
           </div>
-          <div className='body'>
-            <router.Link route={'collective'} params={{slug: collective.slug}}>
-              <div className='name'>{collective.name}</div>
-            </router.Link>
-            <div className='description'>{description}</div>
-          </div>
-          <div className='footer'>
-            <div className='subscription'>
+        </div>
+
+        <div className='body'>
+          <router.Link route={'collective'} params={{slug: collective.slug}}>
+            <div className='name'>{collective.name}</div>
+          </router.Link>
+          <div className='description'>{description}</div>
+        </div>
+
+        <div className='footer'>
+
+          <div className='subscription'>
+            {this.state.visibleState === this.stateConstants.editAmount &&
+              <div className="editAmount">
+                <div className="inputAmount">
+                  <span className="currency">{getCurrencySymbol(subscription.currency)}</span>
+                  <input type="number" step="1" min="1" name="amount" value={this.state.amountValue} onChange={this.handleAmountChange} />
+                  <span className="frequency">{subscription.interval === 'year' ? 'Yearly' : 'Monthly'}</span>
+                </div>
+                <div className="update-buttons">
+                  <SmallButton className="no" bsStyle="primary" onClick={this.resetState}><FormattedMessage id="subscription.updateAmount.cancel.btn" defaultMessage="Cancel" /></SmallButton>
+                  <SmallButton className="yes" bsStyle="primary" disabled={!this.state.amountValueInteger || this.state.amountValueInteger == subscription.totalAmount} onClick={this.updateAmount}><FormattedMessage id="subscription.updateAmount.update.btn" defaultMessage="Update" /></SmallButton>
+                </div>
+              </div>}
+            {this.state.visibleState !== this.stateConstants.editAmount &&
               <div className={`amount-frequency ${subscription.isPastDue ? 'past-due' : ''}`}>
                 <span className='amount'><Currency value={subscription.totalAmount} currency={subscription.currency} /></span>
-                <span className='currency-frequency'> {subscription.currency.toLowerCase()}/{frequency} </span> 
-              </div>
-            </div>
-
-            {this.state.visibleState === 'normal' && subscription.stats && Object.keys(subscription.stats).length > 0 && 
-                  <div className='contribution'>
-                    <span className="totalAmount">
-                      <Currency value={get(subscription, 'stats.totalDonations')} currency={subscription.currency} />&nbsp;
-                    </span>
-                    <span className="total-amount-text">{intl.formatMessage(this.messages['subscription.amountToDate'])}</span>
-                  </div>}
-
-
-            {this.state.visibleState !== this.stateConstants.cancelConf && subscription.paymentMethod && canEditSubscription && 
-              <div className='paymentMethod'>
-                  <PaymentMethodChooser 
-                    paymentMethodInUse={subscription.paymentMethod} 
-                    paymentMethodsList={this.props.paymentMethods}
-                    editMode={this.state.visibleState === this.stateConstants.editPM }
-                    onCancel={this.resetState}
-                    onSubmit={this.update}/>
+                <span className='currency-frequency'> {subscription.currency.toLowerCase()}/{frequency} </span>
               </div>}
+          </div>
 
-            {this.state.visibleState === 'normal' && subscription.isPastDue &&
+          {this.state.visibleState === this.stateConstants.normal && subscription.stats && Object.keys(subscription.stats).length > 0 &&
+            <div className='contribution'>
+              <span className="totalAmount">
+                <Currency value={get(subscription, 'stats.totalDonations')} currency={subscription.currency} />&nbsp;
+              </span>
+              <span className="total-amount-text">{intl.formatMessage(this.messages['subscription.amountToDate'])}</span>
+            </div>}
+
+          {(this.state.visibleState === this.stateConstants.normal || this.state.visibleState === this.stateConstants.editPaymentMethod) && subscription.paymentMethod && canEditSubscription &&
+            <div className='paymentMethod'>
+              <PaymentMethodChooser
+                paymentMethodInUse={subscription.paymentMethod}
+                paymentMethodsList={this.props.paymentMethods}
+                editMode={this.state.visibleState === this.stateConstants.editPaymentMethod}
+                onCancel={this.resetState}
+                onSubmit={this.updatePaymentMethod}
+              />
+            </div>}
+
+          {this.state.visibleState === this.stateConstants.normal && subscription.isPastDue &&
             <div className='past-due-msg'>
-              <span onClick={() => this.setState({visibleState: this.stateConstants.editPM})}> {intl.formatMessage(this.messages['subscription.pastDue.msg'])}&nbsp;&nbsp;</span>
+              <span onClick={() => this.setState({visibleState: this.stateConstants.editPaymentMethod})}> {intl.formatMessage(this.messages['subscription.pastDue.msg'])}&nbsp;&nbsp;</span>
               <OverlayTrigger trigger="click" placement={'bottom'} overlay={popover} rootClose>
                 <img className='help-image' src='/static/images/help-icon.svg' />
-              </OverlayTrigger> 
+              </OverlayTrigger>
             </div>}
 
-            {this.state.visibleState === this.stateConstants.cancelConf && <div className='cancel'>
-              Cancel this subscription?
-                <div className='cancel-buttons'>
-                  <CancelSubscriptionBtn id={subscription.id} onError={this.onError}/>
-                  <SmallButton className="no" bsStyle="primary" onClick={this.resetState}><FormattedMessage id="subscription.cancel.no.btn" defaultMessage="no" /></SmallButton>
-                </div>
+          {this.state.visibleState === this.stateConstants.cancelConf &&
+            <div className='cancel'>
+                Cancel this subscription?
+              <div className='cancel-buttons'>
+                <SmallButton className="no" bsStyle="primary" onClick={this.resetState}><FormattedMessage id="subscription.cancel.no.btn" defaultMessage="no" /></SmallButton>
+                <CancelSubscriptionBtn id={subscription.id} onError={this.onError} />
+              </div>
             </div>}
-            <div className="result">
-              { this.state.loading && <div className="loading">Processing...</div> }
-              { this.state.result.success &&
-                <div className="success">
-                  {this.state.result.success}
-                </div>
-              }
-              { this.state.result.error &&
-                <div className="error">
-                  {this.state.result.error}
-                </div>
-              }
-            </div>                   
+
+          <div className="result">
+            {this.state.loading &&
+              <div className="loading">Processing...</div>
+            }
+            {this.state.result.success &&
+              <div className="success">
+                {this.state.result.success}
+              </div>}
+            {this.state.result.error &&
+              <div className="error">
+                {this.state.result.error}
+              </div>}
+          </div>
+
         </div>
       </div>
       );
@@ -427,8 +501,8 @@ class SubscriptionCard extends React.Component {
 }
 
 const updateSubscriptionQuery = gql`
-mutation updateSubscription($id: Int!, $paymentMethod: PaymentMethodInputType) {
-  updateSubscription(id: $id, paymentMethod: $paymentMethod) {
+mutation updateSubscription($id: Int!, $paymentMethod: PaymentMethodInputType, $amount: Int) {
+  updateSubscription(id: $id, paymentMethod: $paymentMethod, amount: $amount) {
     id
     currency
     totalAmount
@@ -436,6 +510,24 @@ mutation updateSubscription($id: Int!, $paymentMethod: PaymentMethodInputType) {
     createdAt
     isSubscriptionActive
     isPastDue
+    collective {
+      id
+      name
+      currency
+      slug
+      type
+      image
+      description
+      longDescription
+      backgroundImage
+    }
+    fromCollective {
+      id
+      slug
+      createdByUser {
+        id
+      }
+    }
     paymentMethod {
       id
       uuid
@@ -448,63 +540,44 @@ mutation updateSubscription($id: Int!, $paymentMethod: PaymentMethodInputType) {
 }
 `;
 
-const getPaymentMethodsQuery = gql`
-query Collective($slug: String!) {
-    Collective(slug: $slug) {
-      id
-      type
-      slug
-      name
-      company
-      image
-      backgroundImage
-      description
-      twitterHandle
-      website
-      currency
-      settings
-      createdAt
-      paymentMethods {
-        id
-        uuid
-        service
-        type
-        data
-        name
-      }
-    }
-  }
-`;
-
 const addMutation = graphql(updateSubscriptionQuery, {
   props: ( { ownProps, mutate }) => ({
-    updateSubscription: async (id, paymentMethod) => {
-      return await mutate({ 
-        variables: { id, paymentMethod },
+    updateSubscription: async (id, paymentMethod, amount) => {
+      return await mutate({
+        variables: { id, paymentMethod, amount },
 
         // this inserts a newly added credit card in one subscription to the list
         // of all subscriptions, so it can be immediately selected.
         update: (proxy, { data: { updateSubscription }}) => {
 
-          // this means an existing card was picked, so nothing to do
-          if (paymentMethod.uuid && paymentMethod.uuid.length === 36) {
-            return Promise.resolve();
-          }
-
-          // Otherwise, a new card was added and we need to add that back in our cache
           const data = proxy.readQuery({
             query: getSubscriptionsQuery,
             variables: { slug: ownProps.slug }
           });
 
-          // find the original list of payment methods fetched
-          const origPaymentMethodList = data.Collective.paymentMethods;
+          if (paymentMethod !== undefined) {
+            // a new card was added and we need to add that back in our cache
+            if (!paymentMethod.uuid || paymentMethod.uuid.length !== 36) {
+              // find the original list of payment methods fetched
+              const origPaymentMethodList = data.Collective.paymentMethods;
+              // insert it to the end
+              origPaymentMethodList.push(updateSubscription.paymentMethod);
+            }
+          }
 
-          // insert it to the end
-          origPaymentMethodList.push(updateSubscription.paymentMethod);
+          if (amount !== undefined) {
+            const originalOrder = data.Collective.ordersFromCollective.find(order => order.id === id);
+            // copy it and mark it as unactive (will be in the canceled list)
+            const canceledOrder = cloneDeep(originalOrder);
+            canceledOrder.isSubscriptionActive = false;
+            data.Collective.ordersFromCollective.push(canceledOrder);
+            // now, update the originalOrder (edit in place)
+            originalOrder.id = updateSubscription.id;
+            originalOrder.totalAmount = amount;
+          }
 
           // write data back for the query
-          proxy.writeQuery({ query: getSubscriptionsQuery, data}); 
+          proxy.writeQuery({ query: getSubscriptionsQuery, data});
         }
       })
     }

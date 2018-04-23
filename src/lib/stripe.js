@@ -18,7 +18,7 @@ const getStripeToken = (type = 'cc', data) => {
   // eslint-disable-next-line
   switch (type) {
     case 'cc': // credit card
-      return stripe.createToken(data).then(res => {
+      return window.stripe.createToken(data).then(res => {
         if (res.error) {
           throw new Error(res.error.message);
         }

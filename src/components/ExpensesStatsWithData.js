@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import withIntl from '../lib/withIntl';
-import { defineMessages, FormattedNumber, FormattedMessage } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
 import { graphql } from 'react-apollo'
 import gql from 'graphql-tag'
 import { get } from 'lodash';
@@ -15,11 +15,11 @@ class ExpensesStatsWithData extends React.Component {
   }
 
   constructor(props) {
-    super(props); 
+    super(props);
   }
 
   render() {
-    const { slug, data: { loading, Collective }, intl } = this.props;
+    const { slug, data: { Collective } } = this.props;
     const topExpenses = get(Collective, 'stats.topExpenses');
     if (!topExpenses) {
       return (<div />);

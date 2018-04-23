@@ -6,7 +6,7 @@ import InputField from './InputField';
 import MatchingFundWithData from './MatchingFundWithData';
 import ActionButton from './Button';
 import SectionTitle from './SectionTitle';
-import { Button, Row, Col, Form, InputGroup, FormControl } from 'react-bootstrap';
+import { Button, Row, Col, Form } from 'react-bootstrap';
 import { defineMessages, FormattedMessage, FormattedDate, FormattedTime } from 'react-intl';
 import { capitalize, formatCurrency, isValidEmail } from '../lib/utils';
 import { getStripeToken } from '../lib/stripe';
@@ -31,7 +31,7 @@ class OrderForm extends React.Component {
     super(props);
     const { intl, order } = props;
     const tier = { ...order.tier };
-    
+
     this.state = {
       isNewUser: true,
       loginSent: false,
@@ -40,7 +40,7 @@ class OrderForm extends React.Component {
       paymentMethod: {
         type: 'creditcard'
       },
-      creditcard: { 
+      creditcard: {
         show: !this.props.redeemFlow,
         save: true,
       },
@@ -55,7 +55,7 @@ class OrderForm extends React.Component {
       order: order || {},
       result: {}
     };
-    
+
     this.state.order.totalAmount = this.state.order.totalAmount || tier.amount * (tier.quantity || 1);
 
     this.paymentMethodsOptions = [];
@@ -213,7 +213,7 @@ class OrderForm extends React.Component {
    * Populate the profiles available based on the current logged in user
    * If the tier is a ticket, you can only order the ticket as an individual
    * Otherwise, you can order a tier as an individual or as any organization that you are an admin of
-   * @param {*} LoggedInUser 
+   * @param {*} LoggedInUser
    */
   populateProfiles(LoggedInUser) {
     const { intl } = this.props;
@@ -251,7 +251,7 @@ class OrderForm extends React.Component {
     const { LoggedInUser } = props;
     if (!LoggedInUser) return;
     if (!this._isMounted) return; // Fixes error: Can only update a mounted or mounting component
-    this.setState({ LoggedInUser, isNewUser: !Boolean(LoggedInUser) });
+    this.setState({ LoggedInUser, isNewUser: !LoggedInUser });
     this.populateProfiles(LoggedInUser);
     setTimeout(() => this.selectProfile(LoggedInUser.CollectiveId), 0); // need to pass a cycle to let setState take effect
   }
@@ -352,7 +352,7 @@ class OrderForm extends React.Component {
     this.setState({ loading: true });
     const { paymentMethod, order, fromCollective, user } = this.state;
     const tier = order.tier;
-    
+
     const quantity = tier.quantity || 1;
     const OrderInputType = {
       user,
@@ -462,7 +462,7 @@ class OrderForm extends React.Component {
         this.setState(newState);
         return true;
       }
-    } 
+    }
     return true;
   }
 
@@ -498,9 +498,9 @@ class OrderForm extends React.Component {
         description: "Thank you 🙏",
         name: "Gift Card"
       }
-      
-      this.setState({ 
-        prepaidcard: Object.assign(prepaidcard, 
+
+      this.setState({
+        prepaidcard: Object.assign(prepaidcard,
           {...result.data.prepaidPaymentMethod, valid: true }),
         creditcard: Object.assign(creditcard,
           { show: false }),
@@ -539,7 +539,7 @@ class OrderForm extends React.Component {
     const inputPrepaidcard = {
       type: 'text',
       name: 'prepaidcard',
-      button: <Button 
+      button: <Button
         className='prepaidapply'
         disabled={prepaidcard.loading}
         onClick={() => this.applyPrepaidCardBalance()}>
@@ -552,7 +552,7 @@ class OrderForm extends React.Component {
     };
 
     if (prepaidcard.applySent) {
-      if (prepaidcard.loading) {   
+      if (prepaidcard.loading) {
         inputPrepaidcard.description = intl.formatMessage(this.messages['prepaidcard.loading']);
       } else if (prepaidcard.valid) {
         inputPrepaidcard.description = `${intl.formatMessage(this.messages['prepaidcard.amountremaining'])} ${formatCurrency(prepaidcard.balance, prepaidcard.currency)}`;
@@ -626,7 +626,7 @@ class OrderForm extends React.Component {
           { !requireLogin &&
             <section className="order">
               { order.tier.type !== 'TICKET' && <SectionTitle section="contributionDetails" /> }
-              { order.tier.type === 'TICKET' && 
+              { order.tier.type === 'TICKET' &&
                 <div>
                   <SectionTitle section="ticketDetails" />
                   <Row>
@@ -902,7 +902,7 @@ class OrderForm extends React.Component {
           </div>
         }
       </Form>
-        
+
       </div>
     )
   }

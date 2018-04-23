@@ -5,12 +5,10 @@ import Header from '../components/Header';
 import Body from '../components/Body';
 import Footer from '../components/Footer';
 import { addCreateCollectiveMutation } from '../graphql/mutations';
-import moment from 'moment-timezone';
 import CreateCollectiveForm from '../components/CreateCollectiveForm';
 import CollectiveCover from '../components/CollectiveCover';
 import Loading from '../components/Loading';
 import SignInForm from '../components/SignInForm';
-import { Button } from 'react-bootstrap';
 import { get } from 'lodash';
 import { FormattedMessage, defineMessages } from 'react-intl';
 
@@ -22,7 +20,6 @@ class CreateCollective extends React.Component {
 
   constructor(props) {
     super(props);
-    const timezone = moment.tz.guess();
     this.state = { collective: { type: 'COLLECTIVE' }, result: {} };
     this.createCollective = this.createCollective.bind(this);
     this.error = this.error.bind(this);
@@ -41,7 +38,7 @@ class CreateCollective extends React.Component {
   }
 
   async createCollective(CollectiveInputType) {
-    const { host, LoggedInUser } = this.props;
+    const { host } = this.props;
     if (!CollectiveInputType.tos || (get(host, 'settings.tos') && !CollectiveInputType.hostTos)) {
       this.setState( { result: { error: "Please accept the terms of service" }})
       return;

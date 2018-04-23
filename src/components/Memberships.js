@@ -28,11 +28,11 @@ class Collectives extends React.Component {
         }
         `}</style>
         {memberships.map((membership, index) =>
-          <Membership
+          (<Membership
             key={`membership${index}`}
             membership={membership}
             LoggedInUser={this.props.LoggedInUser}
-            />
+            />)
         )}
       </div>
     )
