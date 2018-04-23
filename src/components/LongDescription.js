@@ -1,5 +1,5 @@
-import React from 'react'
-import PropTypes from 'prop-types'
+import React from 'react';
+import PropTypes from 'prop-types';
 import { processMarkdown } from '../lib/markdown.lib';
 import Markdown from 'react-markdown';
 import SectionTitle from './SectionTitle';
@@ -18,21 +18,20 @@ class LongDescription extends React.Component {
   }
 
   render() {
-
     return (
       <div className="longDescription">
-        { this.sections.map(section =>
-          (<section id={section.id || "about"} className="longDescription" >
+        {this.sections.map(section => (
+          <section key={section.id || 'about'} id={section.id || 'about'} className="longDescription">
             <SectionTitle
               title={section.title || <FormattedMessage id="collective.about.title" defaultMessage="About" />}
               subtitle={section.title ? '' : this.props.defaultSubtitle}
-              />
+            />
 
             <Markdown source={section.markdown} />
-          </section>)
-        )}
+          </section>
+        ))}
       </div>
-    )
+    );
   }
 }
 
