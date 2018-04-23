@@ -13,6 +13,7 @@
     "@material-ui/core": "1.1.0",
     "accepts": "1.3.5",
     "bluebird": "3.5.1",
+    "braintree-web": "3.32.1",
     "cached-request": "1.1.3",
     "classnames": "2.2.5",
     "dotenv": "5.0.1",
