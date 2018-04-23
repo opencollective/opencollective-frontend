@@ -328,7 +328,7 @@ class MenuBar extends React.Component {
                       { this.renderButtons() }
                     </div>
                     <div className="logo">
-                      <Link route={logoLink} key={logoLink}><Logo src={collective.image} type='COLLECTIVE' /></Link>
+                      <Link route={logoLink} key={logoLink}><Logo src={collective.image} type='COLLECTIVE' height={48} /></Link>
                     </div>
                   </div>
                 </div>
@@ -347,7 +347,7 @@ class MenuBar extends React.Component {
                   { this.renderButtons() }
                 </div>
                 <div className="logo">
-                  <Link route={logoLink} key={logoLink}><Logo src={collective.image} type='COLLECTIVE' /></Link>
+                  <Link route={logoLink} key={logoLink}><Logo src={collective.image} type='COLLECTIVE' height={64} /></Link>
                 </div>
                 <div className="pullLeft menu">
                   { this.renderMenu() }
