@@ -24,23 +24,6 @@ const getStripeToken = (type = 'cc', data) => {
         }
         return { token: res.token.id, card: res.token.card };
       });
-
-    case 'btc': // bitcoin
-      return window.stripe.createSource({
-        type: 'bitcoin',
-        amount: data.amount,
-        currency: 'usd',
-        metadata: data.metadata,
-        owner: {
-          email: data.email,
-          name: data.name
-        }
-      }).then((res) => {
-        if (res.error) {
-          throw new Error(res.error.message);
-        }
-        return { token: res.source.id, card: res.source.bitcoin };
-      });
   }
 }
 
