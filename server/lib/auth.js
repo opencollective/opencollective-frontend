@@ -26,9 +26,9 @@ export function verifyJwt(token) {
 }
 
 /**
- * Returns the subset of UserCollectiveIds that the remoteUser has access to
+ * Returns the subset of [User|Organization]CollectiveIds that the remoteUser has access to
  */
-export function getListOfAccessibleUsers(remoteUser, UserCollectiveIds) {
+export function getListOfAccessibleMembers(remoteUser, CollectiveIds) {
   if (!remoteUser) return Promise.resolve([]);
   if (!remoteUser.rolesByCollectiveId) return Promise.resolve([]);
   // all the CollectiveIds that the remoteUser is admin of.
@@ -36,7 +36,7 @@ export function getListOfAccessibleUsers(remoteUser, UserCollectiveIds) {
   return models.Member.findAll({
     attributes: ['MemberCollectiveId'],
     where: {
-      MemberCollectiveId: { $in: UserCollectiveIds },
+      MemberCollectiveId: { $in: CollectiveIds },
       CollectiveId: { $in: adminOfCollectives }
     },
     group: ['MemberCollectiveId']
