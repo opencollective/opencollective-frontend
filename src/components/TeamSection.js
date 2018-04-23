@@ -32,7 +32,7 @@ class TeamSection extends React.Component {
     return (
       <section id="team">
         <div className="content" >
-          <SectionTitle section="team" />
+          <SectionTitle section="team" action={action} />
           <div className="Members cardsList">
             {members.map((member) =>
               (<Member
