@@ -108,11 +108,6 @@ class Comments extends React.Component {
               LoggedInUser={LoggedInUser}
               />
           )}
-          { comments.length === 0 &&
-            <div className="empty">
-              <FormattedMessage id="comments.empty" defaultMessage="No comments" />
-            </div>
-          }
           { comments.length >= 10 && comments.length % 10 === 0 &&
             <div className="loadMoreBtn">
               <Button bsStyle='default' onClick={this.fetchMore}>

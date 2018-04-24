@@ -34,12 +34,13 @@ class CommentsWithData extends React.Component {
       ExpenseId: parseInt(ExpenseId, 10)
     }
     console.log(">>> createComment", CommentInputType);
+    let res;
     try {
-      const res = await this.props.createComment(CommentInputType);
-      console.log(">>> res", res);
+      res = await this.props.createComment(CommentInputType);
     } catch(e) {
       console.error(">>> error while trying to create the comment", CommentInputType, e);
     }
+    return res;
   }
 
   render() {
@@ -82,7 +83,7 @@ const getCommentsQuery = gql`
 query Comments($ExpenseId: Int) {
   allComments(ExpenseId: $ExpenseId) {
     id
-    markdown
+    html
     createdAt
     collective {
       id
@@ -152,7 +153,7 @@ const createCommentQuery = gql`
 mutation createComment($comment: CommentInputType!) {
   createComment(comment: $comment) {
     id
-    markdown
+    html
     createdAt
     updatedAt
     collective {
@@ -190,7 +191,7 @@ const addMutation = graphql(createCommentQuery, {
             query: getCommentsQuery,
             variables: getCommentsVariables(ownProps)
           });
-          data.allComments.unshift(createComment);
+          data.allComments.push(createComment);
           proxy.writeQuery({
             query: getCommentsQuery,
             variables: getCommentsVariables(ownProps),

@@ -8,7 +8,8 @@ import gql from 'graphql-tag'
 import Avatar from './Avatar';
 import Link from './Link';
 import SmallButton from './SmallButton';
-import Markdown from 'react-markdown';
+import { get, pick } from 'lodash';
+import InputField from './InputField';
 
 class Comment extends React.Component {
 
@@ -23,7 +24,7 @@ class Comment extends React.Component {
 
     this.state = {
       modified: false,
-      comment: {},
+      comment: props.comment,
       mode: undefined
     };
 
@@ -49,15 +50,19 @@ class Comment extends React.Component {
     this.state.mode === 'edit' ? this.cancelEdit() : this.edit();
   }
 
-  handleChange(comment) {
-    this.setState({ modified: true, comment });
+  handleChange(attr, value) {
+    this.setState({
+      modified: true,
+      comment: {
+        ...this.state.comment,
+        [attr]: value
+      }
+    });
+    window.state = { modified: true, comment: { ...this.state.comment, [attr]: value } };
   }
 
   async save() {
-    const comment = {
-      id: this.props.comment.id,
-      ...this.state.comment
-    }
+    const comment = pick(this.state.comment, ['id', 'markdown', 'html']);
     const res = await this.props.editComment(comment);
     this.setState({ modified: false, mode: 'details' });
   }
@@ -66,11 +71,14 @@ class Comment extends React.Component {
     const {
       intl,
       collective,
-      comment,
       LoggedInUser,
       editable,
       view
     } = this.props;
+
+    const { comment } = this.state;
+    if (!comment) return (<div />);
+    const editor = (get(LoggedInUser, 'collective.settings.editor') === 'markdown' || get(collective, 'settings.editor') === 'markdown') ? 'markdown' : 'html';
 
     return (
       <div className={`comment ${this.state.mode}View`}>
@@ -157,18 +165,16 @@ class Comment extends React.Component {
               }
             </div>
             <div className="description">
-              <Markdown source={comment.markdown} />
+              { this.state.mode !== 'edit' && <div dangerouslySetInnerHTML={{ __html: comment.html }} /> }
+              { this.state.mode === 'edit' && <InputField type={editor} defaultValue={comment[editor]} onChange={(value) => this.handleChange(editor, value)} />}
             </div>
           </div>
 
           { editable &&
             <div className="actions">
-              { this.state.mode === 'edit' && this.state.modified &&
+              { this.state.mode === 'edit' &&
                 <div>
-                  <div className="leftColumn"></div>
-                  <div className="rightColumn">
-                    <SmallButton className="primary save" onClick={this.save}><FormattedMessage id="comment.save" defaultMessage="save" /></SmallButton>
-                  </div>
+                  <SmallButton className="primary save" onClick={this.save} disabled={!this.state.modified}><FormattedMessage id="comment.save" defaultMessage="save" /></SmallButton>
                 </div>
               }
             </div>
@@ -180,10 +186,32 @@ class Comment extends React.Component {
 }
 
 const editCommentQuery = gql`
-mutation editComment($comment: CommentInputType!) {
+mutation editComment($comment: CommentAttributesInputType!) {
   editComment(comment: $comment) {
     id
-    markdown
+    html
+    createdAt
+    collective {
+      id
+      slug
+      currency
+      name
+      host {
+        id
+        slug
+      }
+      stats {
+        id
+        balance
+      }
+    }
+    fromCollective {
+      id
+      type
+      name
+      slug
+      image
+    }
   }
 }
 `;

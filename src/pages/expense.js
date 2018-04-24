@@ -15,12 +15,12 @@ import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl'
 import Button from '../components/Button';
 import SectionTitle from '../components/SectionTitle';
+import Link from '../components/Link';
 
 class ExpensePage extends React.Component {
 
   static getInitialProps (props) {
     const { query: { collectiveSlug, ExpenseId }, data } = props;
-    console.log(">>> getInitialProps", props);
     return { slug: collectiveSlug, data, ExpenseId }
   }
 
@@ -38,7 +38,7 @@ class ExpensePage extends React.Component {
   render() {
     const { data, ExpenseId } = this.props;
     const { LoggedInUser } = this.state;
-    console.log(">>> render props", this.props);
+
     if (data.loading) return (<Loading />);
     if (!data.Collective) return (<NotFound />);
     
@@ -84,6 +84,10 @@ class ExpensePage extends React.Component {
               }
             }
           }
+
+          .viewAllExpenses {
+            font-size: 1.2rem;
+          }
         `}</style>
 
         <Header
@@ -108,6 +112,9 @@ class ExpensePage extends React.Component {
             <div className=" columns" >
 
               <div className="col large">
+                <div className="viewAllExpenses">
+                  <Link route={`/${collective.slug}/expenses`}><FormattedMessage id="expenses.viewAll" defaultMessage="View All Expenses" /></Link>
+                </div>
                 <ExpenseWithData
                   id={ExpenseId}
                   collective={collective}

@@ -41,6 +41,10 @@ class ExpenseWithData extends React.Component {
       return (<Error message="GraphQL error" />)
     }
 
+    if (data.loading) {
+      return <div><FormattedMessage id="loading" defaultMessage="loading" /></div>;
+    }
+
     const expense = data.Expense;
 
     return (

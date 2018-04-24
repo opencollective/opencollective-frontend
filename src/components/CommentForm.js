@@ -7,9 +7,9 @@ import { graphql } from 'react-apollo'
 import gql from 'graphql-tag'
 import InputField from './InputField';
 import SmallButton from './SmallButton';
-import MarkdownEditor from './MarkdownEditor';
 import Avatar from './Avatar';
 import Link from './Link';
+import { get } from 'lodash';
 
 class CommentForm extends React.Component {
 
@@ -35,8 +35,12 @@ class CommentForm extends React.Component {
  
   }
 
-  onSubmit() {
-    this.props.onSubmit(this.state.comment);
+  async onSubmit() {
+    const res = await this.props.onSubmit(this.state.comment);
+    if (res.data && res.data.createComment) {
+      const comment = res.data.createComment;
+      this.setState({ comment });
+    }
   }
 
   handleChange(attr, value) {
@@ -49,7 +53,7 @@ class CommentForm extends React.Component {
   }
 
   render() {
-    const { LoggedInUser } = this.props;
+    const { LoggedInUser, collective } = this.props;
     if (!LoggedInUser) return <div />;
 
     const comment = {
@@ -61,14 +65,27 @@ class CommentForm extends React.Component {
         image: LoggedInUser.image
       }
     };
-    console.log(">>> LoggedInUser", LoggedInUser);
+    const editor = (get(LoggedInUser, 'collective.settings.editor') === 'markdown' || get(collective, 'settings.editor') === 'markdown') ? 'markdown' : 'html';
+
     return (
         <div className={`CommentForm`}>
         <style jsx>{`
           .CommentForm {
             font-size: 1.2rem;
             overflow: hidden;
-            transition: max-height 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            margin: 0.5rem;
+            padding: 0.5rem;
+          }
+          .fromCollective {
+            float: left;
+            margin-right: 1rem;
+          }
+          .meta {
+            color: #919599;
+            font-size: 1.2rem;
+          }
+          .body {
+            overflow: hidden;
           }
         `}</style>
 
@@ -85,7 +102,12 @@ class CommentForm extends React.Component {
             </div>
             <div className="description">
               <div className="comment">
-                <MarkdownEditor preview={false} onChange={markdown => this.handleChange('markdown', markdown)} />
+              <InputField
+                key={`comment-${this.state.comment.id}`}
+                type={editor}
+                defaultValue={this.state.comment[editor]}
+                onChange={(value) => this.handleChange(editor, value)}
+                />
               </div>
               <div className="actions">
                 <SmallButton className="primary save" onClick={this.onSubmit}><FormattedMessage id="comment.btn" defaultMessage="Comment" /></SmallButton>

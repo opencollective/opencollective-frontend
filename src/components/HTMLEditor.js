@@ -64,7 +64,6 @@ class HTMLEditor extends React.Component {
 
   handleChange (html) {
     this.setState({ editorHtml: html });
-    console.log(html);
     this.props.onChange(html);
   }
 
@@ -126,6 +125,9 @@ class HTMLEditor extends React.Component {
           .HTMLEditor :global(.quill) {
             height: 1rem;
             min-height: 40rem;
+          }
+          .HTMLEditor :global(.ql-container) {
+            height: 35rem;
           }
         `}</style>
         <this.ReactQuill

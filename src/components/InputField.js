@@ -10,6 +10,8 @@ import InputTypeLocation from './InputTypeLocation';
 import InputTypeCreditCard from './InputTypeCreditCard';
 import { Col, HelpBlock, FormGroup, InputGroup, FormControl, ControlLabel, Checkbox } from 'react-bootstrap';
 import Switch from "material-ui/Switch";
+import MarkdownEditor from './MarkdownEditor';
+import HTMLEditor from './HTMLEditor';
 
 function FieldGroup({ controlId, label, help, pre, post, after, button, className, ...props }) {
 
@@ -386,11 +388,31 @@ class InputField extends React.Component {
                         {!horizontal &&
                           <div>
                             <ControlLabel>{capitalize(field.label)}</ControlLabel>
-                            <Switch defaultChecked={field.defaultValue} onChange={event => this.handleChange(event.target.checked)}></Switch>
-                            {field.description && <HelpBlock>{field.description}</HelpBlock>}
+                            <div className="switch">
+                              <Switch defaultChecked={field.defaultValue} onChange={event => this.handleChange(event.target.checked)}></Switch>
+                              {field.description && <HelpBlock>{field.description}</HelpBlock>}
+                            </div>
                           </div>
                         }
                       </FormGroup>)
+        break;
+
+      case 'html':
+        this.input = (
+          <div>
+            { field.label && <ControlLabel>{capitalize(field.label)}</ControlLabel> }
+            <HTMLEditor defaultValue={field.defaultValue} onChange={this.handleChange} />
+          </div>
+        )
+        break;
+
+      case 'markdown':
+        this.input = (
+          <div>
+            { field.label && <ControlLabel>{capitalize(field.label)}</ControlLabel> }
+            <MarkdownEditor defaultValue={field.defaultValue} onChange={this.handleChange} />
+          </div>
+        )
         break;
 
       default:
@@ -438,6 +460,10 @@ class InputField extends React.Component {
           }
           .inputField .currency input[type="number"] {
             text-align: left;
+          }
+          .inputField .switch {
+            display: flex;
+            align-items: center;            
           }
         `}</style>
         <style dangerouslySetInnerHTML={{ __html: stylesheet }} />
