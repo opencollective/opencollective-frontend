@@ -53,6 +53,7 @@ class MenuBar extends React.Component {
       'parenting': { id: 'menu.parenting', defaultMessage: "member collectives" },
       'about': { id: 'menu.about', defaultMessage: "about" },
       'events': { id: 'menu.events', defaultMessage: "events" },
+      'team': { id: 'menu.team', defaultMessage: "team" },
       'updates': { id: 'menu.updates', defaultMessage: "updates" },
       'budget': { id: 'menu.budget', defaultMessage: "budget" },
       'contributors': { id: 'menu.contributors', defaultMessage: "contributors" },

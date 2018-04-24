@@ -232,14 +232,15 @@ class Collective extends React.Component {
                       />
                   }
                   <LongDescription longDescription={this.collective.longDescription} defaultSubtitle={this.collective.description} />
+
+                  <TeamSection
+                    collective={this.collective}
+                    LoggedInUser={LoggedInUser}
+                    limit={10}
+                    />
                 </div>
               </div>
 
-              <TeamSection
-                collective={this.collective}
-                LoggedInUser={LoggedInUser}
-                limit={10}
-                />
 
               { get(this.collective, 'stats.collectives.memberOf') > 0 &&
                 <section id="members" className="clear">

@@ -316,6 +316,7 @@
   "members.admin": "管理者",
   "members.members": "メンバー",
   "members.paid": "支援者",
+  "menu.team": "team",
   "menu.transactions": "transactions",
   "collective.messages.StripeAccountConnected": "Stripeアカウントの連携に成功しました",
   "order.created.tweet": "I've just donated {amount} to {collective}. Consider donating too, every little helps!",
