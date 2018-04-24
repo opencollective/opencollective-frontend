@@ -46,6 +46,12 @@ LoggedInUser.prototype.canEditComment = function(comment) {
   || intersection(this.roles[get(comment, 'collective.slug')], ['HOST','ADMIN']).length > 0;
 }
 
+LoggedInUser.prototype.canCreateCommentOnExpense = function(expense) {
+  // if author
+  if (LoggedInUser.id === expense.user.id) return true;
+  return this.canApproveExpense(expense);
+}
+
 /**
  * CanEditEventif LoggedInUser is
  * - creator of the event

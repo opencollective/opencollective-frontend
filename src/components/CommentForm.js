@@ -9,7 +9,7 @@ import InputField from './InputField';
 import SmallButton from './SmallButton';
 import Avatar from './Avatar';
 import Link from './Link';
-import { get } from 'lodash';
+import { get, pick } from 'lodash';
 
 class CommentForm extends React.Component {
 
@@ -36,10 +36,11 @@ class CommentForm extends React.Component {
   }
 
   async onSubmit() {
-    const res = await this.props.onSubmit(this.state.comment);
-    if (res.data && res.data.createComment) {
-      const comment = res.data.createComment;
-      this.setState({ comment });
+    const res = await this.props.onSubmit(pick(this.state.comment, ['html', 'markdown']));
+    const comment = res.data && res.data.createComment;
+    if (comment) {
+      const newEmptyComment = { id: comment.id++ };
+      this.setState({ comment: newEmptyComment });
     }
   }
 

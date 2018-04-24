@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import Error from '../components/Error';
 import withIntl from '../lib/withIntl';
 import Expense from '../components/Expense';
+import CommentsWithData from '../components/CommentsWithData';
 import Currency from '../components/Currency';
 import { graphql } from 'react-apollo'
 import gql from 'graphql-tag'
@@ -58,6 +59,14 @@ class ExpenseWithData extends React.Component {
           editable={true}
           LoggedInUser={LoggedInUser}
           />
+
+        { view === 'details' &&
+          <CommentsWithData
+            expense={expense}
+            collective={collective}
+            LoggedInUser={LoggedInUser}
+            />
+        }
 
       </div>
     );

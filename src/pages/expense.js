@@ -10,7 +10,6 @@ import ErrorPage from '../components/ErrorPage';
 import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
 import ExpenseWithData from '../components/ExpenseWithData';
-import CommentsWithData from '../components/CommentsWithData';
 import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl'
 import Button from '../components/Button';
@@ -118,14 +117,10 @@ class ExpensePage extends React.Component {
                 <ExpenseWithData
                   id={ExpenseId}
                   collective={collective}
+                  view="details"
                   LoggedInUser={this.state.LoggedInUser}
                   />
 
-                <CommentsWithData
-                  ExpenseId={ExpenseId}
-                  collective={collective}
-                  LoggedInUser={this.state.LoggedInUser}
-                  />
               </div>
 
               <div className="col side">

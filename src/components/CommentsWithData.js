@@ -13,7 +13,7 @@ class CommentsWithData extends React.Component {
 
   static propTypes = {
     collective: PropTypes.object,
-    ExpenseId: PropTypes.number,
+    expense: PropTypes.object,
     UpdateId: PropTypes.number,
     limit: PropTypes.number,
     LoggedInUser: PropTypes.object
@@ -25,13 +25,13 @@ class CommentsWithData extends React.Component {
   }
 
   async createComment(comment) {
-    const { LoggedInUser, ExpenseId, collective } = this.props;
+    const { LoggedInUser, expense, collective } = this.props;
 
     const CommentInputType = {
       ...comment,
       CollectiveId: collective.id,
       FromCollectiveId: LoggedInUser.collective.id,
-      ExpenseId: parseInt(ExpenseId, 10)
+      ExpenseId: expense.id
     }
     console.log(">>> createComment", CommentInputType);
     let res;
@@ -48,6 +48,7 @@ class CommentsWithData extends React.Component {
       data,
       LoggedInUser,
       collective,
+      expense,
       view
     } = this.props;
 
@@ -70,8 +71,9 @@ class CommentsWithData extends React.Component {
           LoggedInUser={LoggedInUser}
           />
 
-        <CommentForm onSubmit={this.createComment} LoggedInUser={LoggedInUser} />
-
+        { LoggedInUser && LoggedInUser.canCreateCommentOnExpense(expense) &&
+          <CommentForm onSubmit={this.createComment} LoggedInUser={LoggedInUser} />
+        }
       </div>
     );
   }
@@ -112,7 +114,7 @@ query Comments($ExpenseId: Int) {
 
 const getCommentsVariables = (props) => {
   const vars = {
-    ExpenseId: props.ExpenseId,
+    ExpenseId: props.expense.id,
     UpdateId: props.UpdateId,
     offset: 0,
     limit: props.limit || EXPENSES_PER_PAGE * 2
