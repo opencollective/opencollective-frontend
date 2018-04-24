@@ -11,7 +11,7 @@ import Memberships from './Memberships';
 import CollectivesWithData from './CollectivesWithData';
 import LongDescription from './LongDescription';
 import { defineMessages, FormattedMessage } from 'react-intl';
-import { pick, get, groupBy } from 'lodash';
+import { pick, get, groupBy, uniqBy } from 'lodash';
 import MessageModal from './MessageModal';
 import SectionTitle from './SectionTitle';
 import OrderCreated from './OrderCreated';
@@ -82,7 +82,8 @@ class UserCollective extends React.Component {
     const renderRoleForType = (memberOfCollectiveType) => {
       if (role === 'ADMIN' && memberOfCollectiveType === 'EVENT') return;
 
-      const memberships = this.memberOfByRole[role].filter(m => get(m, 'collective.type') === memberOfCollectiveType);
+      let memberships = this.memberOfByRole[role].filter(m => get(m, 'collective.type') === memberOfCollectiveType);
+      memberships = uniqBy(memberships, member => member.collective.id);
       if (memberships.length === 0) return;
 
       let subtitle;
