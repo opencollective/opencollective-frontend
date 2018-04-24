@@ -6,10 +6,9 @@ import Footer from '../components/Footer';
 import SignInForm from '../components/SignInForm';
 import EditCollectiveForm from '../components/EditCollectiveForm';
 import CollectiveCover from '../components/CollectiveCover';
-import { Button } from 'react-bootstrap';
 import { addEditCollectiveMutation, addDeleteCollectiveMutation } from '../graphql/mutations';
 import { defaultBackgroundImage } from '../constants/collectives';
-import { getStripeToken, isValidCard } from '../lib/stripe';
+import { getStripeToken } from '../lib/stripe';
 import { defineMessages } from 'react-intl';
 import withIntl from '../lib/withIntl';
 import { capitalize } from '../lib/utils';
@@ -182,7 +181,7 @@ class EditCollective extends React.Component {
             margin-bottom: 5rem;
           }
         `}</style>
-        
+
         <Header
           title={collective.name}
           description={collective.description}
@@ -207,7 +206,7 @@ class EditCollective extends React.Component {
                 <p>You need to be logged in as the creator of this collective<br />or as a core contributor of the {collective.name} collective.</p>
                 <SignInForm next={`/${collective.slug}/edit`} />
               </div>
-            }   
+            }
             { canEditCollective &&
               <div>
                 <EditCollectiveForm collective={collective} onSubmit={this.editCollective} loading={this.state.status === 'loading'} />

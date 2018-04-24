@@ -18,29 +18,11 @@ const getStripeToken = (type = 'cc', data) => {
   // eslint-disable-next-line
   switch (type) {
     case 'cc': // credit card
-      return stripe.createToken(data).then(res => {
+      return window.stripe.createToken(data).then(res => {
         if (res.error) {
           throw new Error(res.error.message);
         }
         return { token: res.token.id, card: res.token.card };
-      });
-      break;
-
-    case 'btc': // bitcoin
-      return stripe.createSource({
-        type: 'bitcoin',
-        amount: data.amount,
-        currency: 'usd',
-        metadata: data.metadata,
-        owner: {
-          email: data.email,
-          name: data.name
-        }
-      }).then(function(res) {
-        if (res.error) {
-          throw new Error(res.error.message);
-        }
-        return { token: res.source.id, card: res.source.bitcoin };
       });
   }
 }

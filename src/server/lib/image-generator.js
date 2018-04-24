@@ -77,7 +77,7 @@ export function generateSVGBannerForUsers(users, options) {
   console.log(">>> generateSVGBannerForUsers", users.length, "users, options: ", options);
 
   const {
-    format, style, limit, buttonImage, collectiveSlug
+    style, limit, collectiveSlug
   } = options;
 
   const imageWidth = options.width;

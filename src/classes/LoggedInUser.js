@@ -31,7 +31,7 @@ LoggedInUser.prototype.hasRole = function(roles, collective) {
 LoggedInUser.prototype.canEditCollective = function(collective) {
   if (!collective) return false;
   if (collective.type === 'EVENT') return this.canEditEvent(collective);
-  return (get(collective, 'createdByUser.id') === this.id) 
+  return (get(collective, 'createdByUser.id') === this.id)
   || intersection(this.roles[collective.slug], ['HOST','ADMIN']).length > 0;
 }
 
@@ -74,7 +74,7 @@ LoggedInUser.prototype.canApproveExpense = function(expense) {
     if (intersection(this.roles[expense.collective.slug], ['HOST', 'ADMIN']).length > 0) return true;
     const hostSlug = get(expense, 'collective.host.slug');
     if (intersection(this.roles[hostSlug], ['HOST', 'ADMIN']).length > 0) return true;
-  } 
+  }
   return false;
 }
 
@@ -109,7 +109,7 @@ LoggedInUser.prototype.canPayExpense = function(expense) {
     || (this.collective.slug === hostSlug)) {
     return true;
   }
-  return false;                  
+  return false;
 }
 
 /**

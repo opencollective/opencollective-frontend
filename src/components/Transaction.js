@@ -137,7 +137,7 @@ class Transaction extends React.Component {
             {capitalize(meta.join(' '))}
             <span> | <a onClick={this.toggleDetails}>{intl.formatMessage(this.messages[`${this.state.view === 'details' ? 'closeDetails' : 'viewDetails'}`])}</a></span>
           </div>
-          {this.state.loadDetails && 
+          {this.state.loadDetails &&
             <TransactionDetails
               LoggedInUser={LoggedInUser}
               transaction={transaction}

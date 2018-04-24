@@ -25,7 +25,7 @@ class Tier extends React.Component {
   constructor(props) {
     super(props);
 
-    this.onChange = this.props.onChange || function() {}; 
+    this.onChange = this.props.onChange || function() {};
     this.handleChange = this.handleChange.bind(this);
 
     this.currencyStyle = { style: 'currency', currencyDisplay: 'symbol', minimumFractionDigits: 0, maximumFractionDigits: 2};
@@ -51,7 +51,7 @@ class Tier extends React.Component {
   }
 
   // since this is a pure component, we don't want to store state
-  // But, we still need a way to construct the current values of 
+  // But, we still need a way to construct the current values of
   // quantity, amount and interval
   calcCurrentValues() {
 
@@ -71,7 +71,7 @@ class Tier extends React.Component {
       amount = tier.amount * quantity;
     } else if (tier.amount || values.amount) {
       // Case 3: nothing is changeable, comes with amount (and interval optional)
-      interval = tier.interval || values.interval; 
+      interval = tier.interval || values.interval;
       amount = tier.amount || values.amount;
       quantity = 1;
     }
@@ -98,7 +98,7 @@ class Tier extends React.Component {
 
     const currentValues = this.calcCurrentValues();
 
-    const response = Object.assign({}, tier, { 
+    const response = Object.assign({}, tier, {
       amount: currentValues.amount,
       interval: currentValues.interval,
       quantity: currentValues.quantity
@@ -114,13 +114,12 @@ class Tier extends React.Component {
   }
 
   render() {
-    const { intl, values, tier } = this.props;
+    const { intl, tier } = this.props;
     const { type, name, description, currency } = this.props.tier;
 
     const intervals = [ null, 'month', 'year'];
     const currentValues = this.calcCurrentValues();
     const { quantity, amount, interval, presets } = currentValues;
-
     const anchor = (get(tier, 'name') || "").toLowerCase().replace(/ /g,'-');
 
     return (
@@ -298,7 +297,7 @@ class Tier extends React.Component {
                       min={tier.presets && tier.presets[0]}
                       pre={getCurrencySymbol(currency)}
                       type='currency'
-                      defaultValue={amount}
+                      value={amount}
                       onChange={(amount) => this.handleChange('amount', amount)} />
                     </div>
                 </div>
@@ -323,7 +322,7 @@ class Tier extends React.Component {
               {this.props.onClick && <CTAButton className="ctabtn blue ticket" label={(<FormattedMessage id='tier.GetTicket' values={{ quantity }} defaultMessage={`{quantity, plural, one {get ticket} other {get tickets}}`} />)} onClick={() => this.props.onClick({id: tier.id, amount, quantity, interval})} />}
             </div>
           }
-          { type !== 'TICKET' && this.props.onClick && 
+          { type !== 'TICKET' && this.props.onClick &&
             <div id="actions" className="actions">
               <CTAButton className="ctabtn blue" label={tier.button || (<FormattedMessage id='tier.GetTier' values={{name}} defaultMessage={`become a {name}`} />)} onClick={() => this.props.onClick({id: tier.id, amount, quantity, interval})} />
             </div>

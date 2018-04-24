@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import classNames from 'classnames';
 import Error from '../components/Error';
 import withIntl from '../lib/withIntl';
 import { graphql } from 'react-apollo'
@@ -7,8 +8,7 @@ import gql from 'graphql-tag'
 import Member from './Member';
 import { ButtonGroup, Button } from 'react-bootstrap';
 import { FormattedMessage } from 'react-intl';
-import { exportMembers } from '../lib/export_file';
-import { pluralize } from '../lib/utils';
+import { uniqBy } from 'lodash';
 
 const MEMBERS_PER_PAGE = 10;
 
@@ -19,30 +19,33 @@ class MembersWithData extends React.Component {
     tier: PropTypes.object,
     limit: PropTypes.number,
     onChange: PropTypes.func,
-    LoggedInUser: PropTypes.object
+    LoggedInUser: PropTypes.object,
+    fetchMore: PropTypes.func.isRequired,
+    refetch: PropTypes.func.isRequired,
+    className: PropTypes.string,
+    data: PropTypes.object,
+    role: PropTypes.string,
+    type: PropTypes.string,
   }
 
   constructor(props) {
     super(props);
-    this.fetchMore = this.fetchMore.bind(this);
-    this.refetch = this.refetch.bind(this);
-    this.onChange = this.onChange.bind(this);
     this.state = {
       role: null,
       loading: false
     };
   }
 
-  onChange() {
-    const { onChange } = this.props; 
-    onChange && this.node && onChange({ height: this.node.offsetHeight });    
-  }
-
   componentDidMount() {
     this.onChange();
   }
 
-  fetchMore(e) {
+  onChange = () => {
+    const { onChange } = this.props;
+    onChange && this.node && onChange({ height: this.node.offsetHeight });
+  }
+
+  fetchMore = (e) => {
     e.target.blur();
     this.setState({ loading: true });
     this.props.fetchMore().then(() => {
@@ -51,18 +54,13 @@ class MembersWithData extends React.Component {
     });
   }
 
-  refetch(role) {
+  refetch = (role) => {
     this.setState({role});
     this.props.refetch({role});
   }
 
   render() {
     const { data, LoggedInUser, collective, tier, role, type } = this.props;
-
-    let emailGroup = (tier) ? tier.slug : 'all';
-    if (type) {
-      emailGroup = pluralize(type, 2).toLowerCase();
-    }
 
     if (data.error) {
       console.error("graphql error>>>", data.error.message);
@@ -71,7 +69,7 @@ class MembersWithData extends React.Component {
     if (!data.allMembers) {
       return (<div />);
     }
-    const members = [...data.allMembers];
+    let members = [...data.allMembers];
     if (members.length === 0) {
       return (<div />)
     }
@@ -84,10 +82,14 @@ class MembersWithData extends React.Component {
       } else {
         const aDate = new Date(a.createdAt);
         const bDate = new Date(b.createdAt);
-        return aDate - bDate;
+        return bDate - aDate;
       }
     });
-    
+
+    // Make sure we display unique members
+    // that should ultimately be addressed on the API side
+    members = uniqBy(members, member => member.member.id);
+
     const size = members.length > 50 ? "small" : "large";
     let viewMode = (type && type.split(',')[0]) || "USER";
     if (tier && tier.name.match(/sponsor/i)) {
@@ -116,7 +118,7 @@ class MembersWithData extends React.Component {
             display: flex;
             flex-wrap: wrap;
             flex-direction: row;
-            justify-content: center;   
+            justify-content: center;
             overflow: hidden;
             margin: 1rem 0;
           }
@@ -151,14 +153,14 @@ class MembersWithData extends React.Component {
 
         <div className="Members cardsList">
           {members.map((member) =>
-            <Member
+            (<Member
               key={member.id}
               member={member}
-              className={`${this.props.className} ${size}`}
+              className={classNames(this.props.className, size)}
               collective={collective}
               viewMode={viewMode}
               LoggedInUser={LoggedInUser}
-              />
+             />)
           )}
         </div>
         { members.length % 10 === 0 && members.length >= limit &&
@@ -236,8 +238,7 @@ export const addMembersData = graphql(getMembersQuery, {
         }
       })
     }
-  })  
+  })
 });
-
 
 export default addMembersData(withIntl(MembersWithData));

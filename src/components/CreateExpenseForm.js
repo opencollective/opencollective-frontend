@@ -1,13 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import withIntl from '../lib/withIntl';
-import { defineMessages, FormattedNumber, FormattedMessage } from 'react-intl';
-import { imagePreview, capitalize } from '../lib/utils';
-import { graphql } from 'react-apollo'
-import gql from 'graphql-tag'
+import { defineMessages, FormattedMessage } from 'react-intl';
+import { getCurrencySymbol } from '../lib/utils';
 import InputField from './InputField';
 import SignInForm from './SignInForm';
-import { getCurrencySymbol } from '../lib/utils';
 import categories from '../constants/categories';
 import { get } from 'lodash';
 import Button from './Button';
@@ -51,7 +48,7 @@ class CreateExpenseForm extends React.Component {
       isExpenseValid: false,
       loading: false
     };
- 
+
   }
 
   getOptions(arr, intlVars) {
@@ -63,7 +60,7 @@ class CreateExpenseForm extends React.Component {
   }
 
   validate(expense) {
-    const { intl, LoggedInUser } = this.props;
+    const { intl } = this.props;
     if (!expense.description) {
       this.setState({ error: intl.formatMessage(this.messages['error.descriptionMissing'])});
       return false;
@@ -122,8 +119,6 @@ class CreateExpenseForm extends React.Component {
     const { LoggedInUser, intl, collective } = this.props;
     const { expense } = this.state;
 
-    const previewAttachmentImage = expense.attachment ? imagePreview(expense.attachment) : '/static/images/receipt.svg';
-    const payoutMethod = this.state.expense.payoutMethod || expense.payoutMethod;
     const payoutMethods = this.getOptions(['paypal', 'other'], { paypalEmail: get(expense, 'user.paypalEmail') || intl.formatMessage(this.messages['newExpense.paypal.label']) });
 
     return (

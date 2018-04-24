@@ -9,29 +9,6 @@ import { capitalize } from '../../lib/utils';
 
 describe("Tier component", () => {
 
-  const tiers = {
-    donor: {
-      name: 'donor',
-      slug: 'donors',
-      presets: [1000, 5000, 25000],
-      currency: 'USD',
-      button: 'donate'
-    },
-    backer: {
-      name: 'backer',
-      amount: 1000,
-      interval: 'month'
-    }
-  }
-
-  const expectValue = (component, className, value) => {
-    expect(component.find(`.${className} .value`).text()).toEqual(value);
-  }
-
-  const fillValue = (component, field, value) => {
-    component.find({ name: field }).simulate('change', { target: { value } });
-  }
-
   const mountComponent = (props) => mount(
     <IntlProvider locale="en">
       <Tier {...props} />

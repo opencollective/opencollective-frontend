@@ -1,4 +1,4 @@
-import { ApolloClient, createNetworkInterface } from 'react-apollo'
+import { ApolloClient, createNetworkInterface, IntrospectionFragmentMatcher } from 'react-apollo'
 import fetch from 'isomorphic-fetch'
 
 let apolloClient = null
@@ -8,7 +8,6 @@ if (!process.browser) {
   global.fetch = fetch
 }
 
-import { IntrospectionFragmentMatcher } from 'react-apollo';
 const fragmentMatcher = new IntrospectionFragmentMatcher({
   introspectionQueryResultData: {
     __schema: {
@@ -35,7 +34,7 @@ function createClient (initialState, options = {}) {
 
   return new ApolloClient({
     ssrMode: !process.browser,
-    dataIdFromObject: result => `${result.__typename}:${result.id || result.name || Math.floor(Math.random()*1000000)}`,
+    dataIdFromObject: result => `${result.__typename}:${result.id || result.name || result.slug || Math.floor(Math.random()*1000000)}`,
     fragmentMatcher,
     initialState,
     shouldBatch: true, // should speed up performance

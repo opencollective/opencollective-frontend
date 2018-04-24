@@ -1,12 +1,8 @@
 import React from 'react';
-import Enzyme, { mount } from 'enzyme';
-import { IntlProvider, addLocaleData } from 'react-intl';
+import { mount } from 'enzyme';
+import { IntlProvider } from 'react-intl';
 
 import PaymentMethodChooser from '../PaymentMethodChooser';
-
-const onSubmit = (value) => {
-  return value;
-}
 
 describe("PaymentMethodChooser.test.js", () => {
 

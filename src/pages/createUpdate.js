@@ -9,7 +9,6 @@ import NotFound from '../components/NotFoundPage';
 import ErrorPage from '../components/ErrorPage';
 import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
-import UpdatesWithData from '../components/UpdatesWithData';
 import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl'
 import EditUpdateForm from '../components/EditUpdateForm';
@@ -45,7 +44,7 @@ class CreateUpdatePage extends React.Component {
   }
 
   async createUpdate(update) {
-    const { LoggedInUser, data: { Collective } } = this.props;
+    const { data: { Collective } } = this.props;
     try {
       update.collective = { id: Collective.id };
       console.log(">>> createUpdate", update);
@@ -59,7 +58,7 @@ class CreateUpdatePage extends React.Component {
   }
 
   render() {
-    const { data, action } = this.props;
+    const { data } = this.props;
     const { LoggedInUser } = this.state;
 
     if (data.loading) return (<Loading />);

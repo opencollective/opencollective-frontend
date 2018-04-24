@@ -46,7 +46,7 @@ class SendMoneyToCollectiveBtn extends React.Component {
       const res = await this.props.createOrder(order);
       console.log(">>> createOrder result:", res);
       this.setState({ loading: false });
-    } catch(e) {
+    } catch (e) {
       const error = e.message && e.message.replace(/GraphQL error:/, "");
       this.setState({ error, loading: false });
     }

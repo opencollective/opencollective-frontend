@@ -3,11 +3,8 @@ import PropTypes from 'prop-types';
 import Error from '../components/Error';
 import withIntl from '../lib/withIntl';
 import Expenses from '../components/Expenses';
-import Currency from '../components/Currency';
 import { graphql } from 'react-apollo'
 import gql from 'graphql-tag'
-import { FormattedMessage } from 'react-intl'
-import { pick, get } from 'lodash';
 
 class ExpensesWithData extends React.Component {
 
@@ -62,7 +59,6 @@ class ExpensesWithData extends React.Component {
   }
 
 }
-
 
 const getExpensesQuery = gql`
 query Expenses($CollectiveId: Int!, $status: String, $category: String, $fromCollectiveSlug: String, $limit: Int, $offset: Int, $includeHostedCollectives: Boolean) {
@@ -151,7 +147,7 @@ export const addExpensesData = graphql(getExpensesQuery, {
         }
       })
     }
-  })  
+  })
 });
 
 export default addExpensesData(withIntl(ExpensesWithData));

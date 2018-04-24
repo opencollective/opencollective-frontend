@@ -8,5 +8,5 @@ export default ({value, currency, precision=0}) => (
     currencyDisplay='symbol'
     minimumFractionDigits={precision}
     maximumFractionDigits={precision}
-    />    
-);  
+    />
+);

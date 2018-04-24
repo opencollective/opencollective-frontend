@@ -75,7 +75,7 @@ class ActionBar extends React.Component {
           </div>
           <div className="buttons">
           {this.props.actions.map((action, index) =>
-            <Button
+            (<Button
               key={`actionItem${index}`}
               style={{borderColor: colors.lightgray}}
               className={action.className}
@@ -83,7 +83,7 @@ class ActionBar extends React.Component {
               label={action.label}
               icon={action.icon}
               onClick={() => action.onClick && action.onClick()}
-              >{action.component}</Button> 
+              >{action.component}</Button>)
           )}
           </div>
         </div>

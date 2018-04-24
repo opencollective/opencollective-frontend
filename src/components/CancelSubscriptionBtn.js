@@ -25,9 +25,8 @@ class CancelSubscriptionBtn extends React.Component {
   async onClick() {
     const { id, onError } = this.props;
     this.setState({loading: true});
-    let result;
     try {
-      result = await this.props.cancelSubscription(id);
+      await this.props.cancelSubscription(id);
     } catch (err) {
       onError(err.graphQLErrors[0].message);
     }

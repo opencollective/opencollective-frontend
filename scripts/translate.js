@@ -9,7 +9,7 @@ const LANG_DIR         = './src/lang/';
 // React components via the React Intl Babel plugin. An error will be thrown if
 // there are messages in different components that use the same `id`. The result
 // is a flat collection of `id: message` pairs for the app's default locale.
-let defaultMessages = globSync(MESSAGES_PATTERN)
+const defaultMessages = globSync(MESSAGES_PATTERN)
     .map((filename) => fs.readFileSync(filename, 'utf8'))
     .map((file) => JSON.parse(file))
     .reduce((collection, descriptors) => {
@@ -41,7 +41,7 @@ const translatedMessages = (locale) => {
 }
 
 mkdirpSync(LANG_DIR);
-fs.writeFileSync(LANG_DIR + 'en.json', JSON.stringify(defaultMessages, null, 2));
-fs.writeFileSync(LANG_DIR + 'fr.json', JSON.stringify(translatedMessages('fr'), null, 2));
-fs.writeFileSync(LANG_DIR + 'es.json', JSON.stringify(translatedMessages('es'), null, 2));
-fs.writeFileSync(LANG_DIR + 'ja.json', JSON.stringify(translatedMessages('ja'), null, 2));
+fs.writeFileSync(`${LANG_DIR  }en.json`, JSON.stringify(defaultMessages, null, 2));
+fs.writeFileSync(`${LANG_DIR  }fr.json`, JSON.stringify(translatedMessages('fr'), null, 2));
+fs.writeFileSync(`${LANG_DIR  }es.json`, JSON.stringify(translatedMessages('es'), null, 2));
+fs.writeFileSync(`${LANG_DIR  }ja.json`, JSON.stringify(translatedMessages('ja'), null, 2));

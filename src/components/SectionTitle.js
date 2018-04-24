@@ -23,6 +23,8 @@ class SectionTitle extends React.Component {
       'updates.subtitle': { id: 'section.updates.subtitle', defaultMessage: 'Stay up to dates with our latest activities and progress.' },
       'events.title': { id: 'section.events.title', defaultMessage: 'Events' },
       'events.subtitle': { id: 'section.events.subtitle', defaultMessage: 'Meet the community!' },
+      'team.title': { id: 'section.team.title', defaultMessage: 'Team' },
+      'team.subtitle': { id: 'section.team.subtitle', defaultMessage: 'Meet the awesome people that are bringing the community together! 🙌' },
       'budget.title': { id: 'section.budget.title', defaultMessage: 'Budget' },
       'budget.subtitle': { id: 'section.budget.subtitle', defaultMessage: 'Current balance: {balance}' },
       'expenses.title': { id: 'section.expenses.title', defaultMessage: 'Expenses' },
@@ -100,7 +102,7 @@ class SectionTitle extends React.Component {
           { subtitle && <div className="subtitle">{subtitle}</div> }
         </div>
       </div>
-    );    
+    );
   }
 }
 

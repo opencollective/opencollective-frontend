@@ -1,7 +1,7 @@
 import React from 'react'
 import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
-import { capitalize, firstSentence } from '../lib/utils';
+import { firstSentence } from '../lib/utils';
 import colors from '../constants/colors';
 import { FormattedDate } from 'react-intl';
 import { graphql } from 'react-apollo'
@@ -158,7 +158,7 @@ class Nametags extends React.Component {
             -webkit-justify-content: space-around;
             align-items: center;
             -webkit-align-items: center;
-          
+
           }
 
           .nametag span {

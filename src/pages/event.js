@@ -2,7 +2,6 @@ import withData from '../lib/withData'
 import withIntl from '../lib/withIntl';
 import React from 'react'
 import { addEventCollectiveData, addGetLoggedInUserFunction } from '../graphql/queries';
-import { intersection } from 'lodash';
 
 import NotFound from '../components/NotFoundPage';
 import Loading from '../components/Loading';
@@ -27,7 +26,7 @@ class EventPage extends React.Component {
   }
 
   render() {
-    const { data, slug, parentCollectiveSlug } = this.props;
+    const { data } = this.props;
     const { LoggedInUser } = this.state;
 
     if (data.loading) return (<Loading />);

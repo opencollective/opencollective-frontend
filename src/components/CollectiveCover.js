@@ -1,10 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import classNames from 'classnames';
 import withIntl from '../lib/withIntl';
 import { defineMessages, FormattedMessage } from 'react-intl';
-import { union, get, uniqBy } from 'lodash';
-import { prettyUrl, formatCurrency, imagePreview } from '../lib/utils';
-import { Router } from '../server/pages';
+import { get } from 'lodash';
+import { prettyUrl, imagePreview } from '../lib/utils';
 import Currency from './Currency';
 import Avatar from './Avatar';
 import Logo from './Logo';
@@ -74,7 +74,6 @@ ${description}`
     const href = this.props.href || collective.path || `/${collective.slug}`;
     const title = this.props.title || collective.name;
     const description = this.props.description || collective.description;
-    const formattedYearlyIncome = stats && stats.yearlyBudget > 0 && formatCurrency(stats.yearlyBudget, collective.currency, { precision: 0 });
     const backgroundImage = imagePreview(collective.backgroundImage || get(collective,'parentCollective.backgroundImage'), defaultBackgroundImage[collective.type], { height: 500 });
     const customStyles = get(collective, 'settings.style.hero.cover') || get(collective.parentCollective, 'settings.style.hero.cover');
     const style = {
@@ -87,18 +86,8 @@ ${description}`
 
     const logo = collective.image || get(collective.parentCollective, 'image');
 
-    let membersPreview = [];
-    if (collective.members) {
-      const admins = collective.members.filter(m => m.role === 'ADMIN');
-      const members = collective.members.filter(m => m.role === 'MEMBER');
-      const backers = collective.members.filter(m => m.role === 'BACKER');
-      backers.sort((a, b) => b.stats && b.stats.totalDonations - a.stats && a.stats.totalDonations);
-      membersPreview = uniqBy(union(admins, members, backers).filter(m => m.member), m => m.member.id).slice(0, 5);
-    }
-    const additionalBackers = (get(stats, 'backers.all') || (get(collective, 'members') || []).length) - membersPreview.length;
-
     return (
-      <div className={`CollectiveCover ${className} ${type}`}>
+      <div className={classNames('CollectiveCover', className, type)}>
         <style jsx>{`
         .cover {
           align-items: center;

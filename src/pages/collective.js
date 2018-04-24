@@ -8,7 +8,6 @@ import Loading from '../components/Loading';
 import ErrorPage from '../components/ErrorPage';
 import Collective from '../components/Collective';
 import UserCollective from '../components/UserCollective';
-import { intersection } from 'lodash';
 
 class CollectivePage extends React.Component {
 
@@ -28,7 +27,7 @@ class CollectivePage extends React.Component {
   }
 
   render() {
-    const { data, slug, query, intl } = this.props;
+    const { data, query } = this.props;
     const { LoggedInUser } = this.state;
 
     if (data.loading) return (<Loading />);

@@ -43,7 +43,7 @@ class Expenses extends React.Component {
   setPayActionLock(val) {
     this.setState({ isPayActionLocked: val})
   }
-  
+
   render() {
     const {
       collective,
@@ -136,9 +136,9 @@ class Expenses extends React.Component {
             </div>
           }
           {expenses.map((expense) =>
-            <Expense
+            (<Expense
               key={expense.id}
-              collective={collective}
+              collective={expense.collective || collective}
               expense={expense}
               editable={editable}
               includeHostedCollectives={includeHostedCollectives}
@@ -146,7 +146,7 @@ class Expenses extends React.Component {
               allowPayAction={!this.state.isPayActionLocked}
               lockPayAction={this.setPayActionLock.bind(this, true)}
               unlockPayAction={this.setPayActionLock.bind(this, false)}
-              />
+              />)
           )}
           { expenses.length === 0 &&
             <div className="empty">

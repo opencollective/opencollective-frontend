@@ -64,7 +64,7 @@ export async function invoice(req, res, next) {
     return next(new Error('Invalid authorization header. Format should be: Authorization: Bearer [token]'));
   }
 
-  const { collectiveSlug, invoiceSlug, format } = req.params;
+  const { invoiceSlug, format } = req.params;
 
   try {
     invoice = await fetchInvoice(invoiceSlug, accessToken);
@@ -75,7 +75,7 @@ export async function invoice(req, res, next) {
     console.log(">>> error message", e.message);
     return next(e);
   }
-  
+
   const pageFormat = (req.query.pageFormat === 'A4' || invoice.fromCollective.currency === 'EUR')
     ? 'A4'
     : 'Letter';
@@ -93,7 +93,7 @@ export async function invoice(req, res, next) {
       html = await req.app.renderToHTML(req, res, `/invoice`, params);
       res.send(html);
       break;
-    case 'pdf':
+    case 'pdf': {
       html = await req.app.renderToHTML(req, res, `/invoice`, params);
       const options = {
         format: pageFormat,
@@ -112,6 +112,7 @@ export async function invoice(req, res, next) {
         stream.pipe(res);
       });
       break;
+    }
   }
 
 }

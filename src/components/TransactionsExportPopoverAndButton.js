@@ -9,7 +9,7 @@ import {
   OverlayTrigger,
 } from 'react-bootstrap';
 
-import { json2csv, exportFile } from '../lib/export_file';
+import { exportFile } from '../lib/export_file';
 import withIntl from '../lib/withIntl';
 import InputField from './InputField';
 import { getTransactionsQuery } from '../graphql/queries';

@@ -10,7 +10,7 @@ describe("collective page", () => {
     cy.get('#contribute .TierCard').should('have.length', 2);
     cy.get("#contributors .CollectiveCard").first().find('.totalDonations').contains("$1,700");
     cy.get("#budget .subtitle").contains("Current balance: $4.71");
-    cy.get(".Members.cardsList .Member").should('have.length', 26);
+    cy.get("#contributors .Members.cardsList .Member").should('have.length', 26);
   });
 
   it ("loads the latest expenses", () => {
@@ -25,19 +25,19 @@ describe("collective page", () => {
     cy.get(".ExpensesPage .itemsList .expense").should("have.length", 6);
     cy.get(".ExpensesPage .desktopOnly .menu .item.budget").click();
   });
-  
+
   it("opens new expense page", () => {
     cy.get(".desktopOnly button.submitExpense").click();
     cy.wait(500);
     cy.get(".ExpensesPage .CreateExpenseForm").contains("Sign up or login to submit an expense");
     cy.get(".ExpensesPage .desktopOnly .menu .item.budget").click();
   });
-  
+
   it ("loads the latest transactions", () => {
     cy.get("#transactions .itemsList .transaction").should("have.length", 5);
     cy.get("#transactions .itemsList .transaction:first .amount").contains("$2");
   });
-  
+
   it ("opens all transactions page", () => {
     cy.get("#transactions .ViewAllTransactionsBtn").click();
     cy.wait(500);

@@ -1,12 +1,13 @@
+import classNames from 'classnames';
 import { pickAvatar } from '../lib/collective.lib';
 import { imagePreview } from '../lib/utils';
 
 export default ({src, radius, id, title, className}) => {
   const image = imagePreview(src, null, { width: radius });
   return (
-    <div className={`Avatar ${className}`} style={{ 
-      width: radius, 
-      height: radius, 
+    <div className={classNames('Avatar', className)} style={{
+      width: radius,
+      height: radius,
       backgroundImage: `url(${pickAvatar(id || title || src)})` }}>
       <style jsx>{`
         .Avatar {
@@ -27,10 +28,12 @@ export default ({src, radius, id, title, className}) => {
           background-repeat: no-repeat;
           background-position: center center;
           border-radius: 50%;
-          background-size: cover;          
+          background-size: cover;
         }
       `}</style>
-      <div className="image" style={{ backgroundImage: `url(${image})`, width: radius, height: radius }} />
+      {image &&
+        <div className="image" style={{ backgroundImage: `url(${image})`, width: radius, height: radius }} />
+      }
     </div>
   )
 }

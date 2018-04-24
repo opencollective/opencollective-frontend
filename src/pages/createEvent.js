@@ -5,7 +5,6 @@ import CreateEvent from '../components/CreateEvent';
 import { addGetLoggedInUserFunction, addCollectiveData } from '../graphql/queries';
 import NotFound from '../components/NotFoundPage';
 import Loading from '../components/Loading';
-import { intersection } from 'lodash';
 
 class CreateEventPage extends React.Component {
 
@@ -19,7 +18,7 @@ class CreateEventPage extends React.Component {
   }
 
   async componentDidMount() {
-    const { getLoggedInUser, slug } = this.props;
+    const { getLoggedInUser } = this.props;
     const LoggedInUser = getLoggedInUser && await getLoggedInUser();
     this.setState({ LoggedInUser, loading: false });
   }

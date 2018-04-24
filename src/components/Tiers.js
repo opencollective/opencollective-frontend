@@ -20,14 +20,14 @@ class Tiers extends React.Component {
     return (
       <div id="tickets" className="tiers">
         {tiers.map((tier) =>
-          <Tier
+          (<Tier
             key={tier.id}
             name={tier.name}
             description={tier.description}
             amount={tier.amount}
             currency={tier.currency}
             onClick={(tier) => this.getTicket(tier)}
-            />
+            />)
         )}
       </div>
     );

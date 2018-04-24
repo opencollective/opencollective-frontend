@@ -1,4 +1,5 @@
-import { FormControl } from 'react-bootstrap';
+import React from 'react';
+import ReactDOM from 'react-dom';
 
 export class CustomToggle extends React.Component {
   constructor(props, context) {
