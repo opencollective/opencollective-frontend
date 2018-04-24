@@ -29,7 +29,6 @@ import { types } from '../constants/collectives';
 import models from '../models';
 import roles from '../constants/roles';
 
-
 export const BackersStatsType = new GraphQLObjectType({
   name: "BackersStatsType",
   description: "Breakdown of backers per type (ANY/USER/ORGANIZATION/COLLECTIVE)",
@@ -371,8 +370,10 @@ export const CollectiveInterfaceType = new GraphQLInterfaceType({
         return CollectiveType;
 
       case types.USER:
-      case types.ORGANIZATION:
         return UserCollectiveType;
+
+      case types.ORGANIZATION:
+        return OrganizationCollectiveType;
 
       case types.EVENT:
         return EventCollectiveType;
@@ -1025,6 +1026,24 @@ export const UserCollectiveType = new GraphQLObjectType({
         resolve(userCollective, args, req) {
           if (!req.remoteUser) return null;
           return userCollective && req.loaders.getUserDetailsByCollectiveId.load(userCollective.id).then(user => user.email);
+        }
+      }
+    }
+  }
+});
+
+export const OrganizationCollectiveType = new GraphQLObjectType({
+  name: 'Organization',
+  description: 'This represents a Organization Collective',
+  interfaces: [ CollectiveInterfaceType ],
+  fields: () => {
+    return {
+      ...CollectiveFields(),
+      email: {
+        type: GraphQLString,
+        async resolve(orgCollective, args, req) {
+          if (!req.remoteUser) return null;
+          return orgCollective && req.loaders.getOrgDetailsByCollectiveId.load(orgCollective.id).then(user => user.email);
         }
       }
     }

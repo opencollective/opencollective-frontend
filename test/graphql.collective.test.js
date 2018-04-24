@@ -286,6 +286,9 @@ describe('graphql.collective.test.js', () => {
           ... on User {
             email
           }
+          ... on Organization {
+            email
+          }
         }
         tier {
           id

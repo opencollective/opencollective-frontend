@@ -122,7 +122,7 @@ export default function(Sequelize, DataTypes) {
       get() {
         const image = this.getDataValue("image");
         if (image) return image;
-        if (this.type === 'ORGANIZATION' && this.website) {
+        if (this.type === 'ORGANIZATION' && this.website && !this.website.match(/^https:\/\/twitter\.com\//)) {
           const image = `https://logo.clearbit.com/${getDomain(this.website)}`;
           return image;
         }
