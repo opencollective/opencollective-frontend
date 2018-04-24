@@ -100,11 +100,16 @@ export async function createRefundTransaction(transaction, refundedPaymentProces
     'paymentProcessorFeeInHostCurrency',
   ]);
   userLedgerRefund.CreatedByUserId = user.id;
-  userLedgerRefund.amount = -collectiveLedger.amount;
-  userLedgerRefund.amountInHostCurrency = -collectiveLedger.amountInHostCurrency;
-  userLedgerRefund.netAmountInCollectiveCurrency = -libtransactions.netAmount(collectiveLedger);
   userLedgerRefund.description = `Refund of "${transaction.description}"`;
   userLedgerRefund.data = data;
+
+  /* The refund operation moves back fees to the user's ledger so the
+   * fees there should be positive. Since they're usually in negative,
+   * we're just setting them to positive by adding a - sign in front
+   * of it. */
+  userLedgerRefund.hostFeeInHostCurrency = -userLedgerRefund.hostFeeInHostCurrency;
+  userLedgerRefund.platformFeeInHostCurrency = -userLedgerRefund.platformFeeInHostCurrency;
+  userLedgerRefund.paymentProcessorFeeInHostCurrency = -userLedgerRefund.paymentProcessorFeeInHostCurrency;
 
   /* If the payment processor doesn't refund the fee, the equivalent
    * of the fee will be transferred from the host to the user so the
@@ -114,6 +119,12 @@ export async function createRefundTransaction(transaction, refundedPaymentProces
       userLedgerRefund.paymentProcessorFeeInHostCurrency;
     userLedgerRefund.paymentProcessorFeeInHostCurrency = 0;
   }
+
+  /* Amount fields. Must be calculated after tweaking all the fees */
+  userLedgerRefund.amount = -collectiveLedger.amount;
+  userLedgerRefund.amountInHostCurrency = -collectiveLedger.amountInHostCurrency;
+  userLedgerRefund.netAmountInCollectiveCurrency = -libtransactions.netAmount(collectiveLedger);
+
   return models.Transaction.createDoubleEntry(userLedgerRefund);
 }
 

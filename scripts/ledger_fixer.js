@@ -278,17 +278,19 @@ export class Migration {
     }
 
     // Try to just setup fees
-    if (!isFixed(credit) || !isFixed(debit)) {
-      const changed = this.rewriteFees(credit, debit);
-      if (changed.includes(credit) && this.verify(credit)) {
-        this.incr('rewrite fees');
-        this.log('report.txt', ` ${icon(true)} CREDIT ${type} ${credit.id} true # after updating fees`);
-        fixed.push(credit);
-      }
-      if (changed.includes(debit) && this.verify(debit)) {
-        this.incr('rewrite fees');
-        this.log('report.txt', ` ${icon(true)} DEBIT ${type} ${debit.id} true # after updating fees`);
-        fixed.push(debit);
+    if (!credit.RefundTransactionId && !debit.RefundTransactionId) {
+      if (!isFixed(credit) || !isFixed(debit)) {
+        const changed = this.rewriteFees(credit, debit);
+        if (changed.includes(credit) && this.verify(credit)) {
+          this.incr('rewrite fees');
+          this.log('report.txt', ` ${icon(true)} CREDIT ${type} ${credit.id} true # after updating fees`);
+          fixed.push(credit);
+        }
+        if (changed.includes(debit) && this.verify(debit)) {
+          this.incr('rewrite fees');
+          this.log('report.txt', ` ${icon(true)} DEBIT ${type} ${debit.id} true # after updating fees`);
+          fixed.push(debit);
+        }
       }
     }
 
