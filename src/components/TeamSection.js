@@ -31,18 +31,22 @@ class TeamSection extends React.Component {
 
     return (
       <section id="team">
-        <div className="content" >
-          <SectionTitle section="team" action={action} />
-          <div className="Members cardsList">
-            {members.map((member) =>
-              (<Member
-                key={member.id}
-                member={member}
-                collective={collective}
-                LoggedInUser={LoggedInUser}
-              />)
-            )}
-          </div>
+        <style jsx>{`
+          .Members.cardsList {
+            display: flex;
+            flex-wrap: wrap;
+          }
+        `}</style>
+        <SectionTitle section="team" action={action} />
+        <div className="Members cardsList">
+          {members.map((member) =>
+            (<Member
+              key={member.id}
+              member={member}
+              collective={collective}
+              LoggedInUser={LoggedInUser}
+            />)
+          )}
         </div>
       </section>
     );

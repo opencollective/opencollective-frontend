@@ -316,6 +316,7 @@
   "members.admin": "administrators",
   "members.members": "members",
   "members.paid": "backers",
+  "menu.team": "team",
   "menu.transactions": "transactions",
   "collective.messages.StripeAccountConnected": "Stripe account connected successfully",
   "order.created.tweet": "I've just donated {amount} to {collective}. Consider donating too, every little helps!",
