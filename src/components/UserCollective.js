@@ -23,7 +23,9 @@ class UserCollective extends React.Component {
   static propTypes = {
     collective: PropTypes.object.isRequired,
     LoggedInUser: PropTypes.object,
-    query: PropTypes.object
+    query: PropTypes.object,
+    intl: PropTypes.object.isRequired,
+    message: PropTypes.string,
   }
 
   constructor(props) {
