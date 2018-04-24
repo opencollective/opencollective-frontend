@@ -16,6 +16,7 @@ export async function createUpdate(_, args, req) {
   const markdown = args.update.markdown
         ? strip_tags(args.update.markdown)
         : '';
+
   const update = await models.Update.create({
     title: args.update.title,
     markdown,

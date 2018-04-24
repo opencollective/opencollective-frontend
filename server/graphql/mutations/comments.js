@@ -9,7 +9,9 @@ function require(args, path) {
 }
 
 export async function createComment(_, args, req) {
-  require(args, 'comment.markdown');
+  if (!args.comment.markdown && !args.comment.html) {
+    throw new errors.ValidationFailed({ message: `comment.markdown or comment.html required` });
+  }
   mustBeLoggedInTo(req.remoteUser, "create a comment");
   const {
     comment: {
@@ -18,15 +20,20 @@ export async function createComment(_, args, req) {
       UpdateId
     }
   } = args;
+
+  const markdown = args.comment.markdown
+        ? strip_tags(args.comment.markdown)
+        : '';
+
   const commentData = {
-    markdown: strip_tags(args.comment.markdown),
+    markdown,
+    html: strip_tags(args.comment.html),
     CollectiveId,
     ExpenseId,
     UpdateId,
     CreatedByUserId: req.remoteUser.id,
     FromCollectiveId: req.remoteUser.CollectiveId
   };
-  console.log(">>> create comment: ", commentData);
   const comment = await models.Comment.create(commentData);
 
   return comment;

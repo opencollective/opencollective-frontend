@@ -635,16 +635,16 @@ export const CommentType = new GraphQLObjectType({
           return comment.updatedAt;
         }
       },
+      html: {
+        type: GraphQLString,
+        resolve(comment) {
+          return strip_tags(comment.html || "");
+        }
+      },
       markdown: {
         type: GraphQLString,
         resolve(comment) {
           return strip_tags(comment.markdown || "");
-        }
-      },
-      html: {
-        type: GraphQLString,
-        resolve(comment) {
-          return comment.html;
         }
       },
       createdByUser: {

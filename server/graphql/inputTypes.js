@@ -218,6 +218,7 @@ export const CommentInputType = new GraphQLInputObjectType({
   fields: () => ({
     id: { type: GraphQLInt },
     markdown: { type: GraphQLString },
+    html: { type: GraphQLString },
     FromCollectiveId: { type: new GraphQLNonNull(GraphQLInt) },
     CollectiveId: { type: new GraphQLNonNull(GraphQLInt) },
     ExpenseId: { type: GraphQLInt },
@@ -231,6 +232,7 @@ export const CommentAttributesInputType = new GraphQLInputObjectType({
   fields: () => ({
     id: { type: GraphQLInt },
     markdown: { type: GraphQLString },
+    html: { type: GraphQLString },
     FromCollectiveId: { type: GraphQLInt },
     CollectiveId: { type: GraphQLInt },
     ExpenseId: { type: GraphQLInt },

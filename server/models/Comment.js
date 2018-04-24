@@ -82,6 +82,12 @@ export default function(Sequelize, DataTypes) {
     },
 
     markdown: DataTypes.TEXT,
+    html: {
+      type: DataTypes.TEXT,
+      get() {
+        return this.getDataValue('html') ? this.getDataValue('html') : markdownConverter.makeHtml(this.getDataValue('markdown'));
+      }
+    },
 
     createdAt: {
       type: DataTypes.DATE,
@@ -102,16 +108,13 @@ export default function(Sequelize, DataTypes) {
 
     getterMethods: {
 
-      html() {
-        return this.getDataValue('markdown') ? markdownConverter.makeHtml(this.getDataValue('markdown')) : '';
-      },
-
       // Info.
       info() {
         return {
           id: this.id,
           title: this.title,
           markdown: this.markdown,
+          html: this.html,
           createdAt: this.createdAt,
           updatedAt: this.updatedAt
         };
@@ -166,8 +169,8 @@ export default function(Sequelize, DataTypes) {
     if (remoteUser.id !== this.CreatedByUserId || !remoteUser.isAdmin(this.CollectiveId)) {
       throw new errors.Unauthorized({ message: "You must be the author or an admin of this collective to edit this comment" });
     }
-    const editableAttributes = ['FromCollectiveId', 'markdown'];
-    sanitizeObject(newCommentData, ['markdown']);
+    const editableAttributes = ['FromCollectiveId', 'markdown', 'html'];
+    sanitizeObject(newCommentData, ['markdown', 'html']);
     return await this.update({
       ...pick(newCommentData, editableAttributes)
     });

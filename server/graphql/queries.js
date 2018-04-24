@@ -257,7 +257,7 @@ const queries = {
       if (args.UpdateId) query.where.UpdateId = args.UpdateId;
       if (args.limit) query.limit = args.limit;
       if (args.offset) query.offset = args.offset;
-      query.order = [['createdAt', 'DESC']];
+      query.order = [['createdAt', 'ASC']];
       return models.Comment.findAll(query);
     }
   },

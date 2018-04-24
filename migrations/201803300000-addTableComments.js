@@ -66,6 +66,7 @@ module.exports = {
       },
   
       markdown: DataTypes.TEXT,
+      html: DataTypes.TEXT,
   
       createdAt: {
         type: DataTypes.DATE,
