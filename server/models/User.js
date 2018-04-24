@@ -244,7 +244,7 @@ export default (Sequelize, DataTypes) => {
   };
 
   User.prototype.getMemberships = function(options = {}) {
-    const query = {          
+    const query = {
       where: {
         MemberCollectiveId: this.CollectiveId
       },
@@ -273,7 +273,7 @@ export default (Sequelize, DataTypes) => {
   // should be deprecated
   User.prototype.updateWhiteListedAttributes = function(attributes) {
 
-    const allowedFields = 
+    const allowedFields =
       [ 'slug',
         'firstName',
         'lastName',
@@ -376,7 +376,7 @@ export default (Sequelize, DataTypes) => {
       roles = [roles];
     }
     const result = intersection(this.rolesByCollectiveId[Number(CollectiveId)], roles).length > 0;
-    debug("hasRole", "userid:", this.id, "has role", roles," in CollectiveId", CollectiveId, "?", result);    
+    debug("hasRole", "userid:", this.id, "has role", roles," in CollectiveId", CollectiveId, "?", result);
     return result;
   }
 

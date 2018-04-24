@@ -55,6 +55,35 @@ data['github.signup'] = {
     slug: "webpack"
   }
 };
+data['collective.update.published'] = {
+  collective: {
+    id: 207,
+    type: 'COLLECTIVE',
+    slug: 'brusselstogether',
+    name: 'BrusselsTogether',
+    previewImage: 'https://res.cloudinary.com/opencollective/image/fetch/h_96,c_fill/f_jpg/https%3A%2F%2Fpbs.twimg.com%2Fprofile_images%2F793098287364579328%2FlfBaSTtH.jpg'
+  },
+  update: {
+    id: 44,
+    slug: 'testing-update-html',
+    CollectiveId: 207,
+    TierId: null,
+    FromCollectiveId: 1729,
+    CreatedByUserId: 2,
+    LastEditedByUserId: null,
+    title: 'Testing update html',
+    markdown: '',
+    html: '<p>Hello world</p><ol><li>one</li><li>two</li><li>three</li></ol><p>is this good?</p>',
+    image: null,
+    tags: null,
+    deletedAt: null,
+    fromCollective: {
+      slug: "xdamman",
+      name: "Xavier Damman",
+      image: ""
+    }
+  }
+};
 data['user.monthlyreport'] = {
   recipient: { firstName: 'Xavier' },
   month: 'march', year: '2017',

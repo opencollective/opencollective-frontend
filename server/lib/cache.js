@@ -16,7 +16,7 @@ export async function fetchCollectiveId(collectiveSlug) {
     attributes: ['id'],
     where: { slug: collectiveSlug }
   });
-  
+
   debug("cache")("setting collective id for ", collectiveSlug, "to", collective.id);
   cache.set(collectiveSlug, collective.id);
   return collective.id;

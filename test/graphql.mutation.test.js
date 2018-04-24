@@ -68,7 +68,7 @@ describe('Mutation Tests', () => {
     Object.assign(utils.data('event1'), { CreatedByUserId: user1.id, ParentCollectiveId: collective1.id }))
     .tap(e => event1 = e));
   beforeEach("add user1 as admin of event1", () => event1.addUserWithRole(user1, roles.ADMIN));
-    
+
   describe('createCollective tests', () => {
 
     const createCollectiveQuery = `
@@ -383,7 +383,7 @@ describe('Mutation Tests', () => {
             user: { email: user1.email },
             collective: { id: 12324 },
             tier: { id: 1 },
-            quantity:1 
+            quantity:1
           };
           const result = await utils.graphqlQuery(query, { order });
           expect(result.errors.length).to.equal(1);
@@ -541,7 +541,7 @@ describe('Mutation Tests', () => {
 
         const error3 = await utils.graphqlQuery(removeMemberQuery, { member: { id: user1.id }, collective: { id: event1.id }, role: "FOLLOWER" }, user2);
         expect(error3.errors[0].message).to.equal(`You need to be logged in as this user or as a core contributor or as a host of the collective id ${event1.id}`);
-        
+
         const membersBefore = await models.Member.count();
         const res = await utils.graphqlQuery(removeMemberQuery, { member: { id: user1.id }, collective: { id: event1.id }, role: "FOLLOWER" }, user1);
         res.errors && console.error(res.errors);
@@ -846,7 +846,7 @@ describe('Mutation Tests', () => {
                 "id": 1,
                 "maxQuantity": 10,
                 "name": "Free ticket",
-                "stats": {                  
+                "stats": {
                   "availableQuantity": 8,
                 }
               },
@@ -1009,7 +1009,7 @@ describe('Mutation Tests', () => {
                   "maxQuantity": 100,
                   "name": "paid ticket",
                   "stats": {
-                    "availableQuantity": 98,                    
+                    "availableQuantity": 98,
                   }
                 },
                 "createdByUser": {

@@ -39,6 +39,11 @@ export async function ordersWithPendingCharges() {
   });
 }
 
+function hasReachedQuantity(order) {
+  return order.Subscription.chargeNumber !== null &&
+    order.Subscription.chargeNumber === order.Subscription.quantity;
+}
+
 /** Process order and trigger result handlers.
  *
  * Uses `lib.payments.processOrder()` to charge subscription and
@@ -63,17 +68,24 @@ export async function processOrderWithSubscription(options, order) {
 
   let status = 'unattempted', transaction;
   if (!options.dryRun) {
-    try {
-      transaction = await paymentsLib.processOrder(order);
-      status = 'success';
-    } catch (error) {
+    if (hasReachedQuantity(order)) {
       status = 'failure';
-      csvEntry.error = error.message;
+      csvEntry.error = 'Your subscription is over';
+      cancelSubscription(order);
+    } else {
+      try {
+        transaction = await paymentsLib.processOrder(order);
+        status = 'success';
+      } catch (error) {
+        status = 'failure';
+        csvEntry.error = error.message;
+      }
+      order.Subscription = Object.assign(order.Subscription, getNextChargeAndPeriodStartDates(status, order));
+      order.Subscription.chargeRetryCount = getChargeRetryCount(status, order);
+      if (status === 'success' && order.Subscription.chargeNumber !== null)
+        order.Subscription.chargeNumber += 1;
     }
   }
-
-  order.Subscription = Object.assign(order.Subscription, getNextChargeAndPeriodStartDates(status, order));
-  order.Subscription.chargeRetryCount = getChargeRetryCount(status, order);
 
   csvEntry.status = status;
   csvEntry.retriesAfter = order.Subscription.chargeRetryCount;

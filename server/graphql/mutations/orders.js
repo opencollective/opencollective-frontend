@@ -1,4 +1,4 @@
-import { pick } from 'lodash';
+import { pick, omit } from 'lodash';
 import Promise from 'bluebird';
 
 import models from '../../models';
@@ -65,7 +65,7 @@ export function createOrder(_, args, req) {
     paymentRequired = order.totalAmount > 0 || tier && tier.amount > 0;
 
     // interval of the tier can only be overridden if it is null (e.g. for custom donations)
-    // TODO: using order.interval over Tiers will likely include donations that shouldn't be in tiers. 
+    // TODO: using order.interval over Tiers will likely include donations that shouldn't be in tiers.
     // Need to reevalute with always respecting user choice.
 
     interval = order.interval;
@@ -87,7 +87,7 @@ export function createOrder(_, args, req) {
       Promise.reject(new Error(`You can buy up to ${tier.maxQuantityPerUser} ${pluralize('ticket', tier.maxQuantityPerUser)} per person`));
     }
     return tier.checkAvailableQuantity(order.quantity)
-    .then(enoughQuantityAvailable => enoughQuantityAvailable ? 
+    .then(enoughQuantityAvailable => enoughQuantityAvailable ?
       Promise.resolve() : Promise.reject(new Error(`No more tickets left for ${tier.name}`)))
     })
 
@@ -137,7 +137,7 @@ export function createOrder(_, args, req) {
       }
     })
     .then(c => fromCollective = c)
-    
+
     // check if the MatchingFund is valid and has enough funds
     .then(async () => {
       if (order.matchingFund) {
@@ -258,7 +258,7 @@ export function cancelSubscription(remoteUser, orderId) {
   .tap(order => {
     if (!order) {
       throw new Error("Subscription not found")
-    } 
+    }
     return Promise.resolve()
   })
   .tap(order => {
@@ -277,7 +277,7 @@ export function cancelSubscription(remoteUser, orderId) {
   })
   .then(order => order.Subscription.deactivate())
 
-  // createActivity - that sends out the email 
+  // createActivity - that sends out the email
   .then(() => models.Activity.create({
         type: activities.SUBSCRIPTION_CANCELED,
         CollectiveId: order.CollectiveId,
@@ -292,16 +292,14 @@ export function cancelSubscription(remoteUser, orderId) {
   .then(() => models.Order.findOne(query)) // need to fetch it second time to get updated data.
 }
 
-export function updateSubscription(remoteUser, args) {
-
+export async function updateSubscription(remoteUser, args) {
   if (!remoteUser) {
     throw new errors.Unauthorized({ message: "You need to be logged in to update a subscription"});
   }
 
-  const { id, paymentMethod } = args;
+  const { id, paymentMethod, amount } = args;
 
-
-  const query = { 
+  const query = {
     where: {
       id,
     },
@@ -311,63 +309,85 @@ export function updateSubscription(remoteUser, args) {
     ]
   };
 
-  return models.Order.findOne(query)
-  .tap(order => {
-    if (!order) {
-      throw new Error("Subscription not found")
-    }
-    return Promise.resolve();
-  })
-  .tap(order => {
-    if (!remoteUser.isAdmin(order.FromCollectiveId)) {
-      throw new errors.Unauthorized({
-        message: "You don't have permission to update this subscription"
-      })
-    }
-    return Promise.resolve();
-  })
-  .tap(order => {
-    if (!order.Subscription.isActive) {
-      throw new Error('Subscription must be active to be updated');
-    }
-    return Promise.resolve();
-  })
-  .tap(order => {
+  let order = await models.Order.findOne(query);
 
-    let updatePromise;
-    let newPm;
-    
-    // TODO: Would be even better if we could charge you here directly
-    // before letting you proceed
+  if (!order) {
+    throw new Error("Subscription not found")
+  }
+  if (!remoteUser.isAdmin(order.FromCollectiveId)) {
+    throw new errors.Unauthorized({
+      message: "You don't have permission to update this subscription"
+    })
+  }
+  if (!order.Subscription.isActive) {
+    throw new Error('Subscription must be active to be updated');
+  }
 
-    // means it's an existing paymentMethod
-    if (paymentMethod.uuid && paymentMethod.uuid.length === 36) {
-      updatePromise = models.PaymentMethod.findOne({where: { uuid: paymentMethod.uuid}})
-        .then(pm => {
-          if (!pm){
-            throw new Error('Payment method not found with this uuid', paymentMethod.uuid);
-          }
-          newPm = pm;
-        })
-    } else {
-      // means it's a new paymentMethod
-      const newPMData = Object.assign(paymentMethod, { CollectiveId: order.FromCollectiveId })
-      updatePromise = models.PaymentMethod.createFromStripeSourceToken(newPMData)
-        .then(pm => newPm = pm)
-    }
+  if (paymentMethod !== undefined) {
+      let newPm;
 
-    // determine if this order was pastdue
-    if (order.Subscription.chargeRetryCount > 0) {
-      const updatedDates = getNextChargeAndPeriodStartDates('updated', order);
-      const chargeRetryCount = getChargeRetryCount('updated', order);
+      // TODO: Would be even better if we could charge you here directly
+      // before letting you proceed
 
-      updatePromise = updatePromise
-        .then(() => order.Subscription.update({ nextChargeDate: updatedDates.nextChargeDate, chargeRetryCount }))
+      // means it's an existing paymentMethod
+      if (paymentMethod.uuid && paymentMethod.uuid.length === 36) {
+        newPm = await models.PaymentMethod.findOne({ where: { uuid: paymentMethod.uuid }});
+        if (!newPm){
+          throw new Error('Payment method not found with this uuid', paymentMethod.uuid);
+        }
+      } else {
+        // means it's a new paymentMethod
+        const newPMData = Object.assign(paymentMethod, { CollectiveId: order.FromCollectiveId });
+        newPm = await models.PaymentMethod.createFromStripeSourceToken(newPMData);
+      }
+
+      // determine if this order was pastdue
+      if (order.Subscription.chargeRetryCount > 0) {
+        const updatedDates = getNextChargeAndPeriodStartDates('updated', order);
+        const chargeRetryCount = getChargeRetryCount('updated', order);
+
+        await order.Subscription.update({ nextChargeDate: updatedDates.nextChargeDate, chargeRetryCount });
+      }
+
+      order = await order.update({ PaymentMethodId: newPm.id});
+  }
+
+  if (amount !== undefined) {
+
+    if (amount == order.Subscription.amount) {
+      throw new Error('Same amount');
     }
 
-    return updatePromise
-        .then(() => order.update({ PaymentMethodId: newPm.id}))
-  })
+    if (amount < 100 || amount % 100 !== 0) {
+      throw new Error('Invalid amount');
+    }
+
+    order.Subscription.deactivate();
+
+    const newSubscriptionDataValues = Object.assign(omit(order.Subscription.dataValues, [
+      'id',
+      'deactivatedAt',
+    ]), {
+      amount: amount,
+      updatedAt: new Date,
+      activatedAt: new Date,
+      isActive: true,
+    });
+
+    const newSubscription = await models.Subscription.create(newSubscriptionDataValues);
+
+    const newOrderDataValues = Object.assign(omit(order.dataValues, [
+      'id',
+    ]), {
+      totalAmount: amount,
+      SubscriptionId: newSubscription.id,
+      updatedAt: new Date,
+    });
+
+    order = await models.Order.create(newOrderDataValues);
+  }
+
+  return order;
 }
 
 export async function refundTransaction(_, args, req) {

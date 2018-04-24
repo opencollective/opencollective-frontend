@@ -1,7 +1,7 @@
 import models from '../../models';
 import paypalAdaptive from './adaptiveGateway';
 import config from 'config';
-import uuid from 'node-uuid';
+import uuidv1 from 'uuid/v1';
 import { formatCurrency } from '../../lib/utils';
 import debugLib from 'debug';
 const debug = debugLib('paypal');
@@ -21,8 +21,8 @@ export default {
     if (host.currency === currency)
       /*
         Paypal fees can vary from 2.9% + $0.30 to as much as 5% (maybe higher)
-        with 2.9%, we saw a collective go in negative. Changing minimum to 3.9% to 
-        reduce risk of negative balance (and taking on some risk of an expense not 
+        with 2.9%, we saw a collective go in negative. Changing minimum to 3.9% to
+        reduce risk of negative balance (and taking on some risk of an expense not
         able to be paid out)
        */
       return (0.039 * amount + 30);
@@ -45,7 +45,7 @@ export default {
       currencyCode: expense.currency,
       feesPayer: 'SENDER',
       memo: `Reimbursement from ${collective.name}: ${expense.description}`,
-      trackingId: [uuid.v1().substr(0, 8), expense.id].join(':'),
+      trackingId: [uuidv1().substr(0, 8), expense.id].join(':'),
       preapprovalKey,
       returnUrl: `${baseUrl}/success`,
       cancelUrl: `${baseUrl}/cancel`,

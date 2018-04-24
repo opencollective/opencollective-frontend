@@ -16,7 +16,7 @@ describe("order.model.test.js", () => {
     totalAmount: 1000,
     currency: 'USD'
   }).then(o => order = o));
-  
+
   it('populates the foreign keys', (done) => {
     order.populate().then(order => {
       expect(order.createdByUser.id).to.equal(user.id);

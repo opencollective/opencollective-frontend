@@ -1,7 +1,26 @@
 import {expect} from 'chai';
-import { exportToPDF } from '../server/lib/utils';
+import { exportToPDF, sanitizeForLogs } from '../server/lib/utils';
 
 describe("utils", () => {
+
+  it("sanitize for logs", () => {
+    const obj = {
+      user: {
+        name: "Xavier",
+        email: "xavier@gmail.com"
+      },
+      card: {
+        expYear: 2022,
+        token: "tok_32112123"
+      }
+    };
+
+    const res = sanitizeForLogs(obj);
+    expect(res.user.name).to.equal(obj.user.name);
+    expect(res.user.email).to.equal("(email obfuscated)");
+    expect(res.card.token).to.equal("(token obfuscated)");
+    expect(res.card.expYear).to.equal(obj.card.expYear);
+  });
 
   it("exports PDF", function(done) {
     this.timeout(10000);

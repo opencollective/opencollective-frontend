@@ -40,7 +40,7 @@ async function HostReport(year, month, hostId) {
   let previousStartDate, startDate, endDate;
 
   const d = new Date;
-  
+
   if (!month) {
     // yearly report
     d.setFullYear(year);
@@ -57,11 +57,11 @@ async function HostReport(year, month, hostId) {
   const dateRange = {
     createdAt: { $gte: startDate, $lt: endDate }
   };
-  
+
   const previousDateRange = {
     createdAt: { $gte: previousStartDate, $lt: startDate }
   }
-  
+
   const emailTemplate = (!month) ? 'host.yearlyreport' : 'host.monthlyreport';
   const reportName = (!month) ? `${year} Yearly Host Report` : `${year}/${month+1} Monthly Host Report`;
   const dateFormat = (!month) ? 'YYYY' : 'YYYYMM';
@@ -86,7 +86,7 @@ async function HostReport(year, month, hostId) {
   }
 
   const getPlatformStats = () => {
-  
+
     return models.Collective.findAll({ where: { type: { $in: ['COLLECTIVE', 'EVENT'] } } })
       .then((collectives) => {
         const where = {
@@ -117,13 +117,13 @@ async function HostReport(year, month, hostId) {
         ])
       });
   }
-  
+
   const getHostStats = (host, collectiveids) => {
-  
+
     const where = {
       CollectiveId: { $in: collectiveids }
     };
-  
+
     return Promise.all([
       sumTransactions('netAmountInCollectiveCurrency', where, host.currency),                      // total host balance
       sumTransactions('netAmountInCollectiveCurrency', { ...where, ...dateRange}, host.currency),   // delta host balance last month
@@ -136,19 +136,19 @@ async function HostReport(year, month, hostId) {
       getBackersStats(startDate, endDate, collectiveids)
     ]);
   }
-  
+
   const processHost = (host) => {
-  
+
     summary.totalHosts++;
     console.log(">>> Processing host", host.slug);
     const data = {}, attachments = [];
     const note = `using fxrate of the day of the transaction as provided by the ECB. Your effective fxrate may vary.`;
     const expensesPerPage = 30; // number of expenses per page of the Table Of Content (for PDF export)
-  
+
     let collectivesById = {};
     let page = 1;
     let currentPage = 0;
-  
+
     data.host = host;
     data.collective = host;
     data.reportDate = endDate;
@@ -161,7 +161,7 @@ async function HostReport(year, month, hostId) {
     data.stats = {
       numberPaidExpenses: 0
     };
-  
+
     const getHostAdminsEmails = (host) => {
       if (host.type === 'USER') {
         return models.User.findAll({ where: { CollectiveId: host.id }}).map(u => u.email);
@@ -178,7 +178,7 @@ async function HostReport(year, month, hostId) {
         }).then(user => user.email)
       }, { concurrency: 1 })
     };
-  
+
     const processTransaction = (transaction) => {
       const t = transaction;
       t.collective = collectivesById[t.CollectiveId].dataValues;
@@ -188,7 +188,7 @@ async function HostReport(year, month, hostId) {
         t.notes = (t.notes) ? `${t.notes} (${note})` : note;
         data.notes = note;
       }
-  
+
       // We prepare expenses for the PDF export
       if (t.type === 'DEBIT' && t.ExpenseId) {
         t.page = page++;
@@ -199,7 +199,7 @@ async function HostReport(year, month, hostId) {
         }
         data.expensesPerPage[currentPage].push(t);
       }
-  
+
       data.maxSlugSize = Math.max(data.maxSlugSize, t.collective.shortSlug.length + 1);
       if (!t.description) {
         return transaction.getSource().then(source => {
@@ -211,10 +211,10 @@ async function HostReport(year, month, hostId) {
             return t;
           });
       } else {
-        return Promise.resolve(t);      
+        return Promise.resolve(t);
       }
     }
-  
+
     return getHostedCollectives(host.id, endDate)
       .tap(collectives => {
         collectivesById = _.indexBy(collectives, "id")
@@ -234,21 +234,21 @@ async function HostReport(year, month, hostId) {
       })
       .map(processTransaction)
       .tap(transactions => {
-  
+
         const getColumnName = (attr) => {
           if (attr === 'CollectiveId') return "collective";
           if (attr === 'Expense.privateMessage') return "private note";
           else return attr;
         }
-  
+
         const processValue = (attr, value) => {
           if (attr === "CollectiveId") return collectivesById[value].slug;
           if (['amount', 'netAmountInCollectiveCurrency', 'paymentProcessorFeeInHostCurrency', 'hostFeeInHostCurrency', 'platformFeeInHostCurrency', 'netAmountInHostCurrency'].indexOf(attr) !== -1) {
-            return value / 100; // converts cents          
+            return value / 100; // converts cents
           }
           return value;
         }
-  
+
         const csv = exportToCSV(transactions,
           [
             'id', 'createdAt', 'CollectiveId', 'amount', 'currency', 'description', 'netAmountInCollectiveCurrency', 'hostCurrency', 'hostCurrencyFxRate',
@@ -256,7 +256,7 @@ async function HostReport(year, month, hostId) {
           ],
           getColumnName,
           processValue);
-    
+
         attachments.push({
           filename: csv_filename,
           content: csv
@@ -281,7 +281,7 @@ async function HostReport(year, month, hostId) {
           balance: stats[0],
           delta: stats[1],
           numberDonations: data.transactions.length - data.stats.numberPaidExpenses,
-          totalAmountDonations: stats[2],        
+          totalAmountDonations: stats[2],
           totalNetAmountReceivedForCollectives: stats[3],
           totalAmountPaidExpenses: stats[4],
           totalHostFees: stats[5],
@@ -310,7 +310,7 @@ async function HostReport(year, month, hostId) {
         debug(e);
       });
   };
-  
+
   const sendEmail = (recipients, data, attachments) => {
       debug("Sending email to ", recipients);
       if (!recipients || recipients.length === 0){

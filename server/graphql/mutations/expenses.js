@@ -220,7 +220,7 @@ export async function payExpense(remoteUser, expenseId) {
   if (expense.status === statuses.PAID) {
     throw new errors.Unauthorized("Expense has already been paid");
   }
-  
+
   if (expense.status !== statuses.APPROVED) {
     throw new errors.Unauthorized(`Expense needs to be approved. Current status of the expense: ${expense.status}.`);
   }

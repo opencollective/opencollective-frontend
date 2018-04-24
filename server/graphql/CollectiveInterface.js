@@ -29,7 +29,6 @@ import { types } from '../constants/collectives';
 import models from '../models';
 import roles from '../constants/roles';
 
-
 export const BackersStatsType = new GraphQLObjectType({
   name: "BackersStatsType",
   description: "Breakdown of backers per type (ANY/USER/ORGANIZATION/COLLECTIVE)",
@@ -53,21 +52,21 @@ export const BackersStatsType = new GraphQLObjectType({
         description: "Number of individuals that have given money to this collective",
         type: GraphQLInt,
         resolve(stats) {
-          return stats.USER;
+          return stats.USER || 0;
         }
       },
       organizations: {
         description: "Number of organizations that have given money to this collective",
         type: GraphQLInt,
         resolve(stats) {
-          return stats.ORGANIZATION;
+          return stats.ORGANIZATION || 0;
         }
       },
       collectives: {
         description: "Number of collectives that have given money to this collective",
         type: GraphQLInt,
         resolve(stats) {
-          return stats.COLLECTIVE;
+          return stats.COLLECTIVE || 0;
         }
       }
     }
@@ -371,8 +370,10 @@ export const CollectiveInterfaceType = new GraphQLInterfaceType({
         return CollectiveType;
 
       case types.USER:
-      case types.ORGANIZATION:
         return UserCollectiveType;
+
+      case types.ORGANIZATION:
+        return OrganizationCollectiveType;
 
       case types.EVENT:
         return EventCollectiveType;
@@ -465,7 +466,7 @@ export const CollectiveInterfaceType = new GraphQLInterfaceType({
         }
       },
       orders: { type: new GraphQLList(OrderType) },
-      ordersFromCollective: { 
+      ordersFromCollective: {
         type: new GraphQLList(OrderType),
         args: {
           subscriptionsOnly: { type: GraphQLBoolean }
@@ -728,7 +729,7 @@ const CollectiveFields = () => {
         if (roles && roles.length > 0) {
           query.where.role = { $in: roles };
         }
-        
+
         let conditionOnMemberCollective;
         if (args.type) {
           const types = args.type.split(',');
@@ -848,9 +849,9 @@ const CollectiveFields = () => {
         };
 
         if (args.subscriptionsOnly) {
-          query.include = [{ 
-            model: models.Subscription, 
-            required: true 
+          query.include = [{
+            model: models.Subscription,
+            required: true
           }]
         }
         return collective.getOutgoingOrders(query)
@@ -1025,6 +1026,24 @@ export const UserCollectiveType = new GraphQLObjectType({
         resolve(userCollective, args, req) {
           if (!req.remoteUser) return null;
           return userCollective && req.loaders.getUserDetailsByCollectiveId.load(userCollective.id).then(user => user.email);
+        }
+      }
+    }
+  }
+});
+
+export const OrganizationCollectiveType = new GraphQLObjectType({
+  name: 'Organization',
+  description: 'This represents a Organization Collective',
+  interfaces: [ CollectiveInterfaceType ],
+  fields: () => {
+    return {
+      ...CollectiveFields(),
+      email: {
+        type: GraphQLString,
+        async resolve(orgCollective, args, req) {
+          if (!req.remoteUser) return null;
+          return orgCollective && req.loaders.getOrgDetailsByCollectiveId.load(orgCollective.id).then(user => user.email);
         }
       }
     }

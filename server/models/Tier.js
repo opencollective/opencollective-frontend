@@ -63,7 +63,7 @@ export default function(Sequelize, DataTypes) {
     presets: {
       type: DataTypes.ARRAY(DataTypes.INTEGER)
     },
-  
+
     currency: CustomDataTypes(DataTypes).currency,
 
     interval: {
@@ -194,7 +194,7 @@ export default function(Sequelize, DataTypes) {
             return false;
           }
           if (this.interval === 'month' && days(transaction.createdAt, until) <= 31) return true;
-          if (this.interval === 'year' && days(transaction.createdAt, until) <= 365) return true;    
+          if (this.interval === 'year' && days(transaction.createdAt, until) <= 365) return true;
           return false;
         })
       })
@@ -203,7 +203,7 @@ export default function(Sequelize, DataTypes) {
 
    // TODO: Check for maxQuantityPerUser
   Tier.prototype.availableQuantity = function() {
-    return models.Order.sum('quantity', { 
+    return models.Order.sum('quantity', {
         where: {
           TierId: this.id,
           processedAt: { $ne: null }

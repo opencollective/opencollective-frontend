@@ -10,7 +10,7 @@ import * as currencyLib from '../server/lib/currency';
  * We use sanitized data from wwcode for this
  */
 describe('hostlib', () => {
-  
+
   const hostid = 9804; // WWCode collective host
   const startDate = new Date("2017-02-01");
   const endDate = new Date("2017-03-01");

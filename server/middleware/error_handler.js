@@ -57,7 +57,7 @@ export default (err, req, res, next) => {
   }
 
   // only send email for important errors. When someone gets wrong jwt token or api key, it shouldn't spam us.
-  if (req.app.set('env') === 'production' && 
+  if (req.app.set('env') === 'production' &&
     !(err.code === 400 && req.method === 'GET') &&
     !(err.code === 404 && req.method === 'GET')) {
     sendErrorByEmail(req, err);

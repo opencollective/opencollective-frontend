@@ -133,7 +133,7 @@ const getTotalDonations = () => {
 
 /**
  * Returns the total amount of donations made by collective type (USER/ORGANIZATION/COLLECTIVE) (in cents in the currency of the CollectiveId)
- * @param {*} CollectiveId 
+ * @param {*} CollectiveId
  */
 const getTotalDonationsByCollectiveType = (CollectiveId) => {
   return sequelize.query(`
@@ -146,8 +146,8 @@ const getTotalDonationsByCollectiveType = (CollectiveId) => {
 
 /**
  * Returns an array with the top (default 3) donors for a given CollectiveId (where the money comes from)
- * @param {*} CollectiveId 
- * @param {*} options 
+ * @param {*} CollectiveId
+ * @param {*} options
  */
 const getTopDonorsForCollective = (CollectiveId, options = {}) => {
   options.limit = options.limit || 3;
@@ -161,8 +161,8 @@ const getTopDonorsForCollective = (CollectiveId, options = {}) => {
 
 /**
  * Returns an array with the top (default 3) vendors for a given CollectiveId (where the money goes)
- * @param {*} CollectiveId 
- * @param {*} options 
+ * @param {*} CollectiveId
+ * @param {*} options
  */
 const getTopVendorsForCollective = (CollectiveId, options = {}) => {
   options.limit = options.limit || 3;
@@ -183,8 +183,8 @@ const getTopVendorsForCollective = (CollectiveId, options = {}) => {
 
 /**
  * Get the top expense categories for a given collective with total amount and total number of expenses
- * @param {*} CollectiveId 
- * @param {*} options 
+ * @param {*} CollectiveId
+ * @param {*} options
  */
 const getTopExpenseCategories = (CollectiveId, options = {}) => {
   options.limit = options.limit || 3;
@@ -200,7 +200,7 @@ const getTopExpenseCategories = (CollectiveId, options = {}) => {
   `, {
     replacements: { CollectiveId, limit: options.limit },
     type: sequelize.QueryTypes.SELECT
-  });  
+  });
 }
 
 /**
@@ -317,7 +317,7 @@ const getCollectivesByTag = (tag, limit, excludeList, minTotalDonationInCents, r
   }
 
   return sequelize.query(`
-    with "totalDonations" AS (
+    WITH "totalDonations" AS (
       SELECT t."CollectiveId", SUM("netAmountInCollectiveCurrency") as "totalDonations"
       FROM "Collectives" c
       LEFT JOIN "Transactions" t ON t."CollectiveId" = c.id

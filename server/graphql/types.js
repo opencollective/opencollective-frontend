@@ -783,7 +783,7 @@ export const TierType = new GraphQLObjectType({
         resolve(tier) {
           return tier.presets;
         }
-      },      
+      },
       maxQuantity: {
         type: GraphQLInt,
         resolve(tier) {
@@ -989,7 +989,7 @@ export const OrderType = new GraphQLObjectType({
         resolve(order, args, req) {
           if (!req.remoteUser) {
             return null;
-          } 
+          }
           return order.getPaymentMethodForUser(req.remoteUser);
         }
       },
@@ -1122,13 +1122,13 @@ export const PaymentMethodType = new GraphQLObjectType({
       uuid: {
         type: GraphQLString,
         resolve(paymentMethod) {
-          return paymentMethod.uuid; 
+          return paymentMethod.uuid;
         }
       },
       createdAt: {
         type: GraphQLString,
         resolve(paymentMethod) {
-          return paymentMethod.createdAt; 
+          return paymentMethod.createdAt;
         }
       },
       expiryDate: {
@@ -1260,7 +1260,7 @@ export const PaymentMethodType = new GraphQLObjectType({
 });
 
 
-// TODO: Do we even need this type? It's 1:1 mapping with Order. 
+// TODO: Do we even need this type? It's 1:1 mapping with Order.
 // Already linked interval and isActive directly in Order table
 export const SubscriptionType = new GraphQLObjectType({
   name: "Subscription",

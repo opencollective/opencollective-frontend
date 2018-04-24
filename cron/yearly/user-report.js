@@ -71,7 +71,7 @@ const buildTweet = (fromCollective, collectives, totalDonations) => {
   } else {
     tweet = `🎁 In ${year}, ${pronoun} have contributed ${formatArrayToString(collectivesDonationsNames)}'s collective`;
   }
-  
+
   return tweet;
 }
 
@@ -100,7 +100,7 @@ const processCollective = (collective) => {
     const collectivesBySlug = {};
     transactions.forEach(row => {
       if (!row.hostName) {
-        return console.log(">>> no hostname for", row); 
+        return console.log(">>> no hostname for", row);
       }
       if (typeof hosts[row.hostSlug] === 'undefined') {
         hosts[row.hostSlug] = {
@@ -201,7 +201,7 @@ const getCollectives = () => {
   if (process.env.DEBUG && process.env.DEBUG.match(/preview/)) {
     where.slug = { $in : ['xdamman', 'digitalocean', 'fbopensource', 'piamancini', 'brusselstogether','wwcode'] };
   }
-  
+
   return models.Collective.findAll({
     where: { ...where, type: { $in: ['ORGANIZATION', 'USER'] }}
   });

@@ -94,7 +94,7 @@ export default function(Sequelize, DataTypes) {
       allowNull: true // needs to be true because of old rows
     },
 
-    title: DataTypes.STRING, 
+    title: DataTypes.STRING,
     markdown: DataTypes.STRING,
     html: {
       type: DataTypes.STRING,
@@ -112,17 +112,17 @@ export default function(Sequelize, DataTypes) {
     publishedAt: {
       type: DataTypes.DATE
     },
-    
+
     createdAt: {
       type: DataTypes.DATE,
       defaultValue: Sequelize.NOW
     },
-    
+
     updatedAt: {
       type: DataTypes.DATE,
       defaultValue: Sequelize.NOW
     },
-    
+
     deletedAt: {
       type: DataTypes.DATE
     }

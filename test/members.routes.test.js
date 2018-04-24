@@ -294,6 +294,6 @@ describe('members.routes.test.js', () => {
           expect(getValue(0,"email")).to.contain('@');
         })
         .end(done);
-    });    
+    });
   });
 });

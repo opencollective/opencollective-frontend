@@ -13,6 +13,7 @@ import models from '../models';
 import errors from '../lib/errors';
 import debugLib from 'debug';
 import config from 'config';
+import prependHttp from 'prepend-http';
 
 const {
   Activity,
@@ -110,6 +111,9 @@ export const getUsers = (req, res, next) => {
       if (!req.collective || !req.remoteUser || !req.remoteUser.isAdmin(req.collective.id)) {
         delete u.email;
       }
+      if (u.website) {
+        u.website = prependHttp(u.website);
+      }
       return u;
     })
     .then(users => res.send(users))
@@ -166,7 +170,7 @@ export const create = (req, res, next) => {
 
   if (!collectiveData.hostId) {
     collectiveData.hostId = defaultHostCollective().CollectiveId; // set it to our non-open-source host as default
-  } 
+  }
 
   const sendConfirmationEmail = (user, collective) => {
     const data = {
@@ -269,7 +273,7 @@ export const createFromGithub = (req, res, next) => {
   const collectiveData = payload.group;
   const githubUser = payload.user;
   let createdCollective;
-  
+
   collectiveData.tiers = [
     {
       type: 'TIER',

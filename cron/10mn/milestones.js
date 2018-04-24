@@ -70,8 +70,8 @@ const notifyCollective = async (CollectiveId, milestone, collective) => {
  * - slack.opencollective.com
  * - slack of the host (if any)
  * - slack of the collective (if any)
- * @param {*} milestone 
- * @param {*} collective 
+ * @param {*} milestone
+ * @param {*} collective
  */
 const processMilestone = async (milestone, collective) => {
   set(collective, `data.milestones.${milestone}`, startTime);
@@ -127,7 +127,7 @@ const compileTweet = async (collective, template, twitterAccount) => {
 
   if (template === 'tenBackers') {
     const topBackers = await collective.getTopBackers(null, null, 10);
-    const backers = topBackers.map(b => pick(b.dataValues, ['twitterHandle']));  
+    const backers = topBackers.map(b => pick(b.dataValues, ['twitterHandle']));
     replacements.topBackersTwitterHandles = compileTwitterHandles(backers, 10, 10)
   }
 

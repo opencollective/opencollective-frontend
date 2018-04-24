@@ -127,8 +127,8 @@ export const sendNewTokenByEmail = (req, res, next) => {
     // If you don't find a user, proceed without error
     // Otherwise, we can leak email addresses
     if (user) {
-      return emailLib.send('user.new.token', req.body.email, 
-        { loginLink: user.generateLoginLink(redirect)}, 
+      return emailLib.send('user.new.token', req.body.email,
+        { loginLink: user.generateLoginLink(redirect)},
         { bcc: 'ops@opencollective.com'}); // allows us to log in as users to debug issue
     }
     return null;
@@ -148,8 +148,8 @@ export const signin = (req, res, next) => {
     .then(u => {
       cache.set(u.email, true);
       loginLink = u.generateLoginLink(redirect || '/');
-      return emailLib.send('user.new.token', u.email, 
-        { loginLink }, 
+      return emailLib.send('user.new.token', u.email,
+        { loginLink },
         { bcc: 'ops@opencollective.com'}); // allows us to log in as users to debug issue
     })
     .then(() => {

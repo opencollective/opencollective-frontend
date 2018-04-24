@@ -286,6 +286,9 @@ describe('graphql.collective.test.js', () => {
           ... on User {
             email
           }
+          ... on Organization {
+            email
+          }
         }
         tier {
           id
@@ -349,8 +352,8 @@ describe('graphql.collective.test.js', () => {
       result.errors && console.error(result.errors);
       expect(result.errors).to.not.exist;
       const members = result.data.allMembers;
-      expect(members[0].role).to.equal('ADMIN');
-      expect(members[0].collective.slug).to.equal('brusselstogether');
+      expect(members[0].role).to.equal('BACKER');
+      expect(members[0].collective.slug).to.equal('brusselstogether-collective');
       expect(members[0].member.slug).to.equal('xdamman');
       expect(members).to.have.length(10);
     });
@@ -437,7 +440,7 @@ describe('graphql.collective.test.js', () => {
     expect(members[1].role).to.equal('MEMBER');
     expect(members[1].member.name).to.equal('member1');
     expect(members[1].member.email).to.equal('member1@hail.com');
-    
+
     const member = await models.User.findById(members[1].member.createdByUser.id);
     const res2 = await utils.graphqlQuery(query, { collective }, member);
     expect(res2.errors).to.exist;

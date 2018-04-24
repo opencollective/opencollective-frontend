@@ -6,7 +6,7 @@ general:
       - production
 machine:
   node:
-    version: 6.10.3
+    version: 8.4.0
   environment:
     NODE_ENV: circleci
   services:

@@ -18,12 +18,12 @@ describe('Collective model', () => {
     currency: 'USD',
     tags: ['#brusselstogether'],
     tiers: [
-      { 
+      {
         name: 'backer',
         range: [2, 100],
         interval: 'monthly'
       },
-      { 
+      {
         name: 'sponsor',
         range: [100, 100000],
         interval: 'yearly'
@@ -340,7 +340,7 @@ describe('Collective model', () => {
           done();
         })
         .catch(e => {
-          console.error(">>> error", e); done() 
+          console.error(">>> error", e); done()
         });
     });
 

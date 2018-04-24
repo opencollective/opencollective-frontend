@@ -305,5 +305,5 @@ describe('graphql.updates.test', () => {
       expect(updates).to.have.length(5);
       expect(updates[0].slug).to.equal('draft-update-1');
     });
-  });  
+  });
 });

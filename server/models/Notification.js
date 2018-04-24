@@ -93,7 +93,7 @@ export default function(Sequelize, DataTypes) {
 
   /**
    * Get an array of all the UserId that have unsubscribed from the `notificationType` notification for (optional) CollectiveId
-   * @param {*} notificationType 
+   * @param {*} notificationType
    * @param {*} CollectiveId (optional)
    */
   Notification.getUnsubscribersUserIds = (notificationType, CollectiveId) => {

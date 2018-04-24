@@ -8,7 +8,7 @@ import pdf from 'html-pdf';
 import fs from 'fs';
 import path from 'path';
 import handlebars from './handlebars';
-import { get } from 'lodash';
+import { get, cloneDeep } from 'lodash';
 import sanitizeHtml from 'sanitize-html';
 
 const debug = debugLib('utils');
@@ -38,7 +38,7 @@ export function getDomain(url = '') {
       arrLen = splitArr.length;
 
   //extracting the root domain here
-  //if there is a subdomain 
+  //if there is a subdomain
   if (arrLen > 2) {
       domain = `${splitArr[arrLen - 2]}.${splitArr[arrLen - 1]}`;
       //check to see if it's using a Country Code Top Level Domain (ccTLD) (i.e. ".me.uk")
@@ -80,23 +80,49 @@ export function strip_tags(str, allowedTags) {
   });
 }
 
-export const sanitizeObject = (obj, attributes) => {
+export const sanitizeObject = (obj, attributes, sanitizerFn) => {
+  const sanitizer = typeof sanitizerFn === 'function'
+    ? sanitizerFn
+    : strip_tags;
+
   attributes.forEach(attr => {
     if (!obj[attr]) return;
-    obj[attr] = strip_tags(obj[attr] || "");
+    if (typeof obj[attr] === 'object') return sanitizeObject(obj[attr], Object.keys(obj[attr]), sanitizerFn);
+    obj[attr] = sanitizer(obj[attr] || "");
   });
   return obj;
+}
+
+/**
+ * recursively reads all values of an object and hide emails and tokens
+ * @param {*} obj
+ */
+export const sanitizeForLogs = (obj) => {
+  const sanitizer = (value) => {
+    if (!value) return;
+    if (typeof value === 'string') {
+      if (value.indexOf('@') !== -1) {
+        return "(email obfuscated)";
+      }
+      if (value.substr(0,4) === 'tok_') {
+        return "(token obfuscated)";
+      }
+    }
+    return value;
+  }
+
+  return sanitizeObject(cloneDeep(obj), Object.keys(obj), sanitizer);
 }
 
 String.prototype.trunc = function(n, useWordBoundary ) {
   if (this.length <= n) return this;
   const subString = this.substr(0, n-1);
-  return `${(useWordBoundary 
-    ? subString.substr(0, subString.lastIndexOf(' ')) 
+  return `${(useWordBoundary
+    ? subString.substr(0, subString.lastIndexOf(' '))
     : subString)}&hellip;`;
 };
 
-      /**
+/**
  * Generate a secured token that works inside URLs
  * http://stackoverflow.com/a/25690754
  */
@@ -227,11 +253,11 @@ export const flattenArray = (arr) => {
 
 /**
  * Returns stats for each tier compared to previousMonth
- * 
+ *
  * @PRE:
  *  - tiers: array of Tier: [ { name, interval, users: [ { id, totalDonations, firstDonation, lastDonation } ] } ]
  *  - startDate, endDate: boundaries for lastMonth
- * 
+ *
  * @POST: { stats, tiers }
  *  - stats.backers.lastMonth: number of backers who were active by endDate
  *  - stats.backers.previousMonth: number of backers who were active by startDate
@@ -325,7 +351,7 @@ export const getTiersStats = (tiers, startDate, endDate) => {
       });
 
       tier.users = backers;
-      
+
       return tier;
     });
   })
@@ -337,9 +363,9 @@ export const getTiersStats = (tiers, startDate, endDate) => {
 /**
  * export data to CSV
  * @param {*} data
- * @param {*} attributes 
- * @param {*} getColumnName 
- * @param {*} processValue 
+ * @param {*} attributes
+ * @param {*} getColumnName
+ * @param {*} processValue
  */
 export function exportToCSV(data, attributes, getColumnName = (attr) => attr, processValue = (attr, val) => val) {
   const lines = [];
@@ -519,7 +545,7 @@ export function formatCurrency(amount, currency, precision = 0) {
     currency,
     minimumFractionDigits : precision,
     maximumFractionDigits : precision
-  });  
+  });
 }
 
 /**

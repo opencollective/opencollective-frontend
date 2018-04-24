@@ -1,5 +1,5 @@
 import models, { sequelize } from '../models';
-import { getListOfAccessibleUsers } from '../lib/auth';
+import { getListOfAccessibleMembers } from '../lib/auth';
 import { type } from '../constants/transactions';
 import DataLoader from 'dataloader';
 import { get, groupBy } from 'lodash';
@@ -105,14 +105,12 @@ export const loaders = (req) => {
           return models.Transaction.findAll(query)
           .then(results => sortResults(ids, results, 'CollectiveId', []))
           .map(result => {
-            const stats = {};
-            let all = 0;
+            const stats = { all: 0 };
             result.forEach(r => {
               stats.id = r.CollectiveId;
               stats[r.type] = r.count;
-              all += r.count;
+              stats.all += r.count;
             })
-            stats.all = all;
             return stats;
           })
         }
@@ -145,9 +143,26 @@ export const loaders = (req) => {
       }
     },
     // This one is tricky. We need to make sure that the remoteUser can view the personal details of the user.
-    getUserDetailsByCollectiveId: new DataLoader(UserCollectiveIds => getListOfAccessibleUsers(req.remoteUser, UserCollectiveIds)
+    getUserDetailsByCollectiveId: new DataLoader(UserCollectiveIds => getListOfAccessibleMembers(req.remoteUser, UserCollectiveIds)
       .then(accessibleUserCollectiveIds => models.User.findAll({ where: { CollectiveId: { $in: accessibleUserCollectiveIds } }}))
       .then(results => sortResults(UserCollectiveIds, results, 'CollectiveId', {}))
+    ),
+    getOrgDetailsByCollectiveId: new DataLoader(OrgCollectiveIds => getListOfAccessibleMembers(req.remoteUser, OrgCollectiveIds)
+      .then(accessibleOrgCollectiveIds => models.Collective.findAll({ attributes: ['id', 'CreatedByUserId'], where: { id: { $in: accessibleOrgCollectiveIds } }})).then(accessibleOrgCollectives => {
+        const accessibleOrgCreators = {};
+        accessibleOrgCollectives.map(c => {
+          accessibleOrgCreators[c.CreatedByUserId] = c.id;
+        })
+        return accessibleOrgCreators;
+      })
+      .then(accessibleOrgCreators => {
+        return models.User.findAll({ attributes: ['id', 'CollectiveId', 'email'], where: { id: { $in: Object.keys(accessibleOrgCreators) } }})
+          .map(u => {
+            u.dataValues.OrgCollectiveId = accessibleOrgCreators[u.id];
+            return u;
+          })
+          .then(results => sortResults(OrgCollectiveIds, results, 'OrgCollectiveId', {}))
+      })
     ),
     tiers: {
       findById: new DataLoader(ids => models.Tier
@@ -234,7 +249,7 @@ export const loaders = (req) => {
             },
             order: [['createdAt', 'DESC']]
           })
-          .then(results => sortResults(combinedKeys, results, 'CollectiveId:FromCollectiveId', []))          
+          .then(results => sortResults(combinedKeys, results, 'CollectiveId:FromCollectiveId', []))
         ),
       totalAmountRaised: new DataLoader(keys => models.Order.findAll({
         attributes: ['ReferralCollectiveId', 'CollectiveId', [sequelize.fn('SUM', sequelize.col('totalAmount')), 'totalAmount'] ],

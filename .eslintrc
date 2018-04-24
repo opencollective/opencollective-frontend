@@ -1,17 +1,26 @@
-// You can also omit the eslint-config- and it will be automatically assumed by ESLint:
 {
-  "extends": "opencollective",
+  "extends": [
+    "opencollective",
+    "plugin:node/recommended"
+  ],
   "env": {
     "mocha": true
   },
   "plugins": [
-    "mocha"
+    "mocha",
+    "node"
   ],
   "rules": {
     // console logs are OK in Node
-    "no-console": 0,
+    "no-console": "off",
     "mocha/no-exclusive-tests": "error",
     // use es6 module imports and exports
-    "import/no-commonjs": "error"
+    "import/no-commonjs": "error",
+    // common warnings in the codebase
+    "no-process-exit": "off",
+    "node/shebang": "off",
+    "no-useless-escape": "off",
+    // don't complain about es6 imports and exports
+    "node/no-unsupported-features": ["error", {"ignores": ["modules"]}]
   }
 }

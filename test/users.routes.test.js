@@ -79,7 +79,7 @@ describe('users.routes.test.js', () => {
 
 
   describe("existence", () => {
-    it("returns true", (done) => { 
+    it("returns true", (done) => {
       models.User.create({ email: 'john@smith.com' })
         .then(() => {
           request(app)

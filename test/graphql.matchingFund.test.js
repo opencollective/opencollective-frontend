@@ -55,7 +55,7 @@ const createOrderQuery = `
 `;
 
 describe('graphql.matchingFund.test.js', () => {
-  
+
   let collective, host, admin, user1, user2, sandbox, emailSendSpy;
   before(initNock);
 
@@ -78,7 +78,7 @@ describe('graphql.matchingFund.test.js', () => {
     host = await models.Collective.create({ type: "ORGANIZATION", name: "host", isActive: true});
     collective = await models.Collective.create({ name: "tipbox", slug: "tipbox", currency: "USD", hostFeePercent: 5, isActive: true, HostCollectiveId: host.id });
     await models.ConnectedAccount.create({
-      CreatedByUserId: admin.id,    
+      CreatedByUserId: admin.id,
       service: 'stripe',
       username: 'acct_18KWlTLzdXg9xKNS', // using opensource host test stripe account
       token: 'sk_test_iDWQubtz4ixk0FQg1csgCi6p',

@@ -8,7 +8,7 @@ import { toNegative } from '../lib/math';
 
 /**
  * Export transactions as CSV
- * @param {*} transactions 
+ * @param {*} transactions
  */
 export function exportTransactions(transactions, attributes) {
   attributes = attributes || ['id', 'createdAt', 'amount', 'currency', 'description', 'netAmountInCollectiveCurrency', 'hostCurrency', 'hostCurrencyFxRate', 'paymentProcessorFeeInHostCurrency', 'hostFeeInHostCurrency', 'platformFeeInHostCurrency', 'netAmountInHostCurrency' ];
@@ -18,10 +18,10 @@ export function exportTransactions(transactions, attributes) {
 
 /**
  * Get transactions between startDate and endDate for collectiveids
- * @param {*} collectiveids 
- * @param {*} startDate 
- * @param {*} endDate 
- * @param {*} limit 
+ * @param {*} collectiveids
+ * @param {*} startDate
+ * @param {*} endDate
+ * @param {*} limit
  */
 export function getTransactions(collectiveids, startDate = new Date("2015-01-01"), endDate = new Date, options) {
   const where = options.where || {};

@@ -14,7 +14,7 @@ import {
 } from './CollectiveInterface';
 
 import {
-  TransactionInterfaceType  
+  TransactionInterfaceType
 } from './TransactionInterface';
 
 import {
@@ -97,7 +97,7 @@ const queries = {
       const invoicesByKey = {};
       await Promise.map(transactions, async (transaction) => {
         const HostCollectiveId = transaction.HostCollectiveId;
-        hostsById[HostCollectiveId] = hostsById[HostCollectiveId] || await models.Collective.findById(HostCollectiveId, { attributes: ['slug'] }); 
+        hostsById[HostCollectiveId] = hostsById[HostCollectiveId] || await models.Collective.findById(HostCollectiveId, { attributes: ['slug'] });
         const createdAt = new Date(transaction.createdAt);
         const year = createdAt.getFullYear();
         const month = createdAt.getMonth() + 1;
@@ -509,7 +509,7 @@ const queries = {
       if (where.role === 'HOST') {
         where.HostCollectiveId = args.MemberCollectiveId;
       }
-      
+
       const getCollectiveIds = () => {
         if (args.includeHostedCollectives) {
           return models.Member.findAll({
@@ -566,8 +566,8 @@ const queries = {
 
         // If we request the data of the member, we do a JOIN query
         // that allows us to sort by Member.member.name
+        const memberCond = {};
         if (req.body.query.match(/ member ?\{/) || args.type) {
-          const memberCond = {};
           if (args.type) {
             const types = args.type.split(',');
             memberCond.type = { $in: types };
@@ -584,10 +584,30 @@ const queries = {
         }
         if (args.limit) query.limit = args.limit;
         if (args.offset) query.offset = args.offset;
-        
+
         return getCollectiveIds().then(collectiveIds => {
           query.where[attr] = { $in: collectiveIds };
+          query.where.role = { $ne: 'HOST' };
           return models.Member.findAll(query);
+        }).then(members => {
+          // also fetch the list of collectives that are members of the host
+          if (args.includeHostedCollectives) {
+            query.where = { MemberCollectiveId: args.CollectiveId, role: 'HOST' };
+            query.order = [[sequelize.literal(`collective.name`), 'ASC']];
+            query.include = [{
+              model: models.Collective,
+              as: 'collective',
+              required: true
+            }]
+
+            return models.Member.findAll(query).map(m => {
+              m.memberCollective = m.collective;
+              delete m.collective;
+              members.push(m);
+            }).then(() => members)
+          } else {
+            return members;
+          }
         })
       }
     }
@@ -633,7 +653,7 @@ const queries = {
     },
     resolve(_, args) {
       return models.PaymentMethod.findOne({
-        where: { 
+        where: {
           token: args.token,
           expiryDate: {
             $gt: new Date()

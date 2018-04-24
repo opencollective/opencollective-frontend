@@ -243,7 +243,7 @@ export const exportPDF = function(req, res, next) {
     });
     exportToPDF("expenses", data, { format, paper }).then(html => {
       if (format === 'pdf') {
-        res.setHeader('content-type','application/pdf');      
+        res.setHeader('content-type','application/pdf');
       }
       res.send(html);
     });

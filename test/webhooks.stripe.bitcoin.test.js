@@ -50,7 +50,7 @@ describe('webhooks.stripe.bitcoin.test.js', () => {
         .catch(err => {
           process.env.NODE_ENV = env;
           expect(err.message).to.equal('Source not found');
-        }); 
+        });
 
     })
   })
@@ -110,7 +110,7 @@ describe('webhooks.stripe.bitcoin.test.js', () => {
         })
         .then((order) => {
           order.currency
-          return order.setPaymentMethod({ 
+          return order.setPaymentMethod({
             token: 'src_1BaqqSDjPFcHOcTm4RAZ6yTY',
             type: 'bitcoin',
             service: 'stripe',
@@ -170,7 +170,7 @@ describe('webhooks.stripe.bitcoin.test.js', () => {
           .then(() => {
             expect(emailSendSpy.callCount).to.equal(1);
             expect(emailSendSpy.firstCall.args[0]).to.equal('thankyou')
-            expect(emailSendSpy.firstCall.args[1]).to.equal(order.createdByUser.email);            
+            expect(emailSendSpy.firstCall.args[1]).to.equal(order.createdByUser.email);
           })
 
           // paymentMethod is updated

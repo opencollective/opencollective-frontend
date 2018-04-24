@@ -13,7 +13,7 @@ export default {
     recurring: false,
     waitToCharge: false
   },
-  
+
   getBalance: (paymentMethod) => {
     return Promise.resolve({ amount: paymentMethod.monthlyLimitPerMember, currency: paymentMethod.currency});
   },
@@ -60,7 +60,7 @@ export default {
             }
           };
           return models.Transaction.createFromPayload(payload)
-          
+
           // mark gift card as used, so no one can use it again
           .then(() => order.paymentMethod.update({archivedAt: new Date()}))
 
@@ -68,7 +68,7 @@ export default {
           // create new payment method to allow User to use the money
           .then(() => models.PaymentMethod.create({
             name: originalPM.name,
-            service: 'opencollective', 
+            service: 'opencollective',
             type: 'collective', // changes to type collective
             confirmedAt: new Date(),
             CollectiveId: user.CollectiveId,
