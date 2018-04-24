@@ -147,7 +147,7 @@ class UserCollective extends React.Component {
       Object.assign(order, {
         ...order,
         ...pick(query || {}, 'totalAmount', 'CollectiveId', 'TierId'),
-        collective: (this.collective.memberOf.find(m => m.collective.id === parseInt(query.CollectiveId)) || {}).collective
+        collective: ((this.collective.memberOf || []).find(m => get(m, 'collective.id') === parseInt(query.CollectiveId)) || {}).collective
       });
     }
 
