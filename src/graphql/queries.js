@@ -366,6 +366,29 @@ const getCollectiveQuery = gql`
           }
         }
       }
+      ... on Organization {
+        memberOf(limit: 60) {
+          id
+          role
+          createdAt
+          stats {
+            totalDonations
+            totalRaised
+          }
+          collective {
+            id
+            name
+            currency
+            slug
+            path
+            type
+            image
+            description
+            longDescription
+            backgroundImage
+          }
+        }
+      }
     }
   }
 `;
