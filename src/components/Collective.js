@@ -15,6 +15,7 @@ import { FormattedMessage, defineMessages } from 'react-intl';
 import CollectivesWithData from './CollectivesWithData';
 import SectionTitle from './SectionTitle';
 import ExpensesSection from './ExpensesSection';
+import TeamSection from './TeamSection';
 import UpdatesSection from './UpdatesSection';
 import EventsSection from './EventsSection';
 import { formatCurrency } from '../lib/utils';
@@ -233,6 +234,12 @@ class Collective extends React.Component {
                   <LongDescription longDescription={this.collective.longDescription} defaultSubtitle={this.collective.description} />
                 </div>
               </div>
+
+              <TeamSection
+                collective={this.collective}
+                LoggedInUser={LoggedInUser}
+                limit={10}
+                />
 
               { get(this.collective, 'stats.collectives.memberOf') > 0 &&
                 <section id="members" className="clear">
