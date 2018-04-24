@@ -54,14 +54,12 @@ const tweetNewMember = async (activity) => {
   const template = settings.tweet;
 
   // todo: we should use the handlebar templating system to support {{#if}}{{/if}}
-  let status = template
+  const status = template
     .replace('{backerTwitterHandle}', `@${get(activity, 'data.member.memberCollective.twitterHandle')}`)
     .replace('{referralTwitterHandle}', `@${get(activity, 'data.order.referral.twitterHandle')}`)
     .replace('{amount}', formatCurrency(get(activity, 'data.order.totalAmount'), get(activity, 'data.order.currency')));
 
-  status += `\nhttps://opencollective.com/${get(activity, 'data.collective.slug')}`
-
-  return await twitterLib.tweetStatus(twitterAccount, status);
+  return await twitterLib.tweetStatus(twitterAccount, status, `https://opencollective.com/${get(activity, 'data.collective.slug')}`);
 }
 
 const tweetActivity = async (activity) => {
@@ -89,6 +87,10 @@ const tweetStatus = (twitterAccount, status, url, options = {}) => {
     access_token_key: twitterAccount.clientId,
     access_token_secret: twitterAccount.token
   });
+
+  if (url) {
+    status += `\n${url}`;
+  }
 
   debug("tweeting status: ", status, "with options:", options);
   if (config.twitter.consumerSecret) {

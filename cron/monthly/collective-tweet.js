@@ -164,13 +164,12 @@ const sendTweet = async (twitterAccount, data) => {
   }
 
   const template = stats.totalReceived === 0 ? 'monthlyStatsNoNewDonation' : 'monthlyStats';
-  let tweet = await twitter.compileTweet(template, replacements);
-  tweet += `\nhttps://opencollective.com/${data.collective.slug}`;
+  const tweet = await twitter.compileTweet(template, replacements);
 
   // We thread the tweet with the previos monthly stats
   const in_reply_to_status_id = get(twitterAccount, `settings.monthlyStats.lastTweetId`);
   try {
-    const res = await twitter.tweetStatus(twitterAccount, tweet, null, { in_reply_to_status_id });
+    const res = await twitter.tweetStatus(twitterAccount, tweet, `https://opencollective.com/${data.collective.slug}`, { in_reply_to_status_id });
     const tweetUrl = `https://twitter.com/${res.user.screen_name}/status/${res.id_str}`;
     // publish to slack.opencollective.com
     await publishToSlack(tweetUrl, config.slack.webhookUrl, { channel: config.slack.publicActivityChannel });
