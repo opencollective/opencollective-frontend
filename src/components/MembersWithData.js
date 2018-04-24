@@ -21,7 +21,7 @@ class MembersWithData extends React.Component {
     onChange: PropTypes.func,
     LoggedInUser: PropTypes.object,
     fetchMore: PropTypes.func.isRequired,
-    refetch: PropTypes.func.isRequired,
+    refetch: PropTypes.func,
     className: PropTypes.string,
     data: PropTypes.object,
     role: PropTypes.string,
@@ -88,6 +88,7 @@ class MembersWithData extends React.Component {
 
     // Make sure we display unique members
     // that should ultimately be addressed on the API side
+    members = members.filter(member => member.role !== 'FUNDRAISER');
     members = uniqBy(members, member => member.member.id);
 
     const size = members.length > 50 ? "small" : "large";
