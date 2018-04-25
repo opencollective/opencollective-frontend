@@ -102,11 +102,13 @@ describe('graphql.comments.test', () => {
       // utils.inspectSpy(sendEmailSpy, 2);
       expect(sendEmailSpy.callCount).to.equal(3);
       expect(sendEmailSpy.firstCall.args[0]).to.equal(user1.email);
-      expect(sendEmailSpy.secondCall.args[0]).to.equal(hostAdmin.email);
-      expect(sendEmailSpy.thirdCall.args[0]).to.equal(collectiveAdmin.email);
       expect(sendEmailSpy.firstCall.args[1]).to.contain(`webpack: New comment on your expense ${expense1.description} by ${collectiveAdmin.firstName}`);
       expect(sendEmailSpy.secondCall.args[1]).to.contain(`webpack: New comment on expense ${expense1.description} by ${user1.firstName}`);
       expect(sendEmailSpy.thirdCall.args[1]).to.contain(`webpack: New comment on expense ${expense1.description} by ${user1.firstName}`);
+      const firstRecipient = (sendEmailSpy.args[1][0] === hostAdmin.email) ? hostAdmin : collectiveAdmin;
+      const secondRecipient = (sendEmailSpy.args[1][0] === hostAdmin.email) ? collectiveAdmin : hostAdmin;
+      expect(sendEmailSpy.args[1][0]).to.equal(firstRecipient.email);
+      expect(sendEmailSpy.args[2][0]).to.equal(secondRecipient.email);
     })
   })
 
