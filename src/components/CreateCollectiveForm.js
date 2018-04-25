@@ -344,7 +344,7 @@ class CreateCollectiveForm extends React.Component {
             </div>
 
             <div className="actions">
-              <Button bsStyle="primary" type="submit" ref="submit" onClick={this.handleSubmit} disabled={loading || !this.state.modified} >
+              <Button bsStyle="primary" type="submit" onClick={this.handleSubmit} disabled={loading || !this.state.modified} >
                 { loading && <FormattedMessage id="loading" defaultMessage="loading" /> }
                 { !loading && collective.type === 'COLLECTIVE' && <FormattedMessage id="host.apply.btn" defaultMessage="Apply to create a collective" /> }
                 { !loading && collective.type === 'ORGANIZATION' && <FormattedMessage id="organization.create" defaultMessage="Create organization" /> }

@@ -163,7 +163,7 @@ class EditUpdateForm extends React.Component {
           </div>
 
           <div className="row actions">
-            <Button className="bluewhite" type="submit" ref="submit" disabled={this.state.loading} >
+            <Button className="bluewhite" type="submit" disabled={this.state.loading} >
               { this.state.loading && <FormattedMessage id="form.processing" defaultMessage="processing" /> }
               { !this.state.loading && <FormattedMessage id="update.new.save" defaultMessage="Save Update" /> }
             </Button>

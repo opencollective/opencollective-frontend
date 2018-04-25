@@ -190,7 +190,7 @@ class EditEventForm extends React.Component {
             onChange={this.handleTiersChange} />
         </div>
         <div className="actions">
-          <Button className="blue" ref="submit" label={submitBtnLabel} onClick={this.handleSubmit} disabled={loading} />
+          <Button className="blue" label={submitBtnLabel} onClick={this.handleSubmit} disabled={loading} />
         </div>
       </div>
     );

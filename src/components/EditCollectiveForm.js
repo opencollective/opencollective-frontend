@@ -386,7 +386,7 @@ class EditCollectiveForm extends React.Component {
         </div>
         { ['export', 'connectedAccounts'].indexOf(this.state.section) === -1 &&
           <div className="actions">
-            <Button bsStyle="primary" type="submit" ref="submit" onClick={this.handleSubmit} disabled={loading || !this.state.modified} >{submitBtnLabel}</Button>
+            <Button bsStyle="primary" type="submit" onClick={this.handleSubmit} disabled={loading || !this.state.modified} >{submitBtnLabel}</Button>
             <div className="backToProfile">
               <Link route={`/${collective.slug}`}><a><FormattedMessage id="collective.edit.backToProfile" defaultMessage="or go back to the {type} page" values={{ type }} /></a></Link>
             </div>

@@ -858,7 +858,7 @@ class OrderForm extends React.Component {
                 { (collective.host || order.totalAmount === 0) &&
                   <div className="actions">
                     <div className="submit">
-                      <ActionButton className="blue" ref="submit" onClick={this.handleSubmit} disabled={ this.state.loading}>
+                      <ActionButton className="blue" onClick={this.handleSubmit} disabled={ this.state.loading}>
                         {this.state.loading ? <FormattedMessage id='form.processing' defaultMessage='processing' /> : order.tier.button || capitalize(intl.formatMessage(this.messages['order.button']))}
                       </ActionButton>
                     </div>

@@ -88,7 +88,7 @@ class EditTiers extends React.Component {
               onChange={this.handleTiersChange}
               />
             <div className="actions">
-              <Button type="submit" className="green" ref="submit" label="save" onClick={this.handleSubmit} disabled={this.state.status === 'loading'} />
+              <Button type="submit" className="green" label="save" onClick={this.handleSubmit} disabled={this.state.status === 'loading'} />
               <div className="result">
                 <div className="success">{this.state.result.success}</div>
                 <div className="error">{this.state.result.error}</div>

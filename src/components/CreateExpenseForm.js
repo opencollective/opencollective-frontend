@@ -370,7 +370,7 @@ class CreateExpenseForm extends React.Component {
 
             <div className="row">
               <div>
-                <Button className="blue" type="submit" ref="submit" disabled= {this.state.loading || !this.state.isExpenseValid} >
+                <Button className="blue" type="submit" disabled= {this.state.loading || !this.state.isExpenseValid} >
                   { this.state.loading && <FormattedMessage id="form.processing" defaultMessage="processing" /> }
                   { !this.state.loading && <FormattedMessage id="expense.new.submit" defaultMessage="Submit Expense" /> }
                 </Button>
