@@ -120,6 +120,9 @@ async function notifyUserId(UserId, activity, options) {
 async function notifyAdminsOfCollective(CollectiveId, activity, options = {}) {
   debug("notify admins of CollectiveId", CollectiveId);
   const collective = await models.Collective.findById(CollectiveId)
+  if (!collective) {
+    throw new Error(`notifyAdminsOfCollective> can't notify ${activity.type}: no collective found with id ${CollectiveId}`)
+  }
   let adminUsers = await collective.getAdminUsers();
   if (options.exclude) {
     adminUsers = adminUsers.filter(u => options.exclude.indexOf(u.id) === -1);
@@ -177,17 +180,19 @@ async function notifyByEmail(activity) {
       }
       // if the author of the comment is the one who submitted the expense
       if (activity.UserId === activity.data.UserId) {
+        const HostCollectiveId = await activity.data.collective.getHostCollectiveId();
         // then, if the expense was already approved, we notify the admins of the host
         if (get(activity, 'data.expense.status') === 'APPROVED') {
-          notifyAdminsOfCollective(get(activity, 'data.collective.HostCollectiveId'), activity, { exclude: [activity.UserId] });
+          notifyAdminsOfCollective(HostCollectiveId, activity, { exclude: [activity.UserId] });
         } else {
           // or, if the expense hans't been approved yet, we notifiy the admins of the collective and the admins of the host
-          notifyAdminsOfCollective(get(activity, 'data.collective.HostCollectiveId'), activity, { exclude: [activity.UserId] });
+          notifyAdminsOfCollective(HostCollectiveId, activity, { exclude: [activity.UserId] });
           notifyAdminsOfCollective(activity.CollectiveId, activity, { exclude: [activity.UserId] });
         }
       } else {
         // if the comment was sent by one of the admins of the collective or the host, we notify the author of the expense
-        notifyUserId(activity.UserId, activity);
+        activity.data.isAuthor = true;
+        notifyUserId(activity.data.UserId, activity);
       }
       // notify the author of the expense (unless it's their own comment)
       break;

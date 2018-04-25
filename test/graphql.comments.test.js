@@ -7,15 +7,15 @@ import models from '../server/models';
 import roles from '../server/constants/roles';
 import emailLib from '../server/lib/email';
 
-let host, user1, user2, collective1, event1, expense1, comment1;
+let host, collectiveAdmin, user1, hostAdmin, collective1, event1, expense1, comment1;
 let sandbox, sendEmailSpy;
 
 describe('graphql.comments.test', () => {
 
   /* SETUP
-     - collective1: host, user1 as admin
-       - event1: user1 as admin
-     - user2
+     - collective1: host, collectiveAdmin as admin
+       - event1: collectiveAdmin as admin
+     - user1
   */
 
   before(() => {
@@ -27,11 +27,11 @@ describe('graphql.comments.test', () => {
 
   before(() => utils.resetTestDB());
 
-  before(() => models.User.createUserWithCollective(utils.data('user1')).tap(u => user1 = u));
-  before(() => models.User.createUserWithCollective(utils.data('host1')).tap(u => host = u));
-
-  before(() => models.User.createUserWithCollective(utils.data('user2')).tap(u => user2 = u));
-  before(() => models.Collective.create(utils.data('collective1')).tap(g => collective1 = g));
+  before(() => models.User.createUserWithCollective({ firstName: "Sean", email: "sean@webpack.opencollective.com" }).tap(u => collectiveAdmin = u));
+  before(() => models.User.createUserWithCollective({ firstName: "Tobias", email: "tobias@webpack.opencollective.com"}).tap(u => user1 = u));
+  before(() => models.User.createUserWithCollective({ firstName: "host admin", email: "hostadmin@opencollective.com"}).tap(u => hostAdmin = u));
+  before(() => models.Collective.create({ name: "webpack", slug: "webpack"}).tap(g => collective1 = g));
+  before(() => models.Collective.create(utils.data('host1')).tap(g => host = g));
   before(() => models.Expense.create({
     CollectiveId: collective1.id,
     lastEditedById: user1.id,
@@ -41,23 +41,24 @@ describe('graphql.comments.test', () => {
     amount: 100000,
     currency: "USD"
   }).tap(e => expense1 = e));
-  before(() => collective1.addUserWithRole(host, roles.HOST));
-  before(() => collective1.addUserWithRole(user1, roles.ADMIN));
+  before(() => collective1.addUserWithRole(collectiveAdmin, roles.ADMIN));
+  before(() => host.addUserWithRole(hostAdmin, roles.ADMIN));
+  before(() => collective1.addHost(host, collectiveAdmin));
 
   before(() => {
     return models.Comment.create({
       CollectiveId: collective1.id,
-      FromCollectiveId: user1.CollectiveId,
-      CreatedByUserId: user1.id,
+      FromCollectiveId: collectiveAdmin.CollectiveId,
+      CreatedByUserId: collectiveAdmin.id,
       markdown: `first comment & "love"`,
       ExpenseId: expense1.id
     }).then(u => comment1 = u)
   });
 
   before('create an event collective', () => models.Collective.create(
-    Object.assign(utils.data('event1'), { CreatedByUserId: user1.id, ParentCollectiveId: collective1.id }))
+    Object.assign(utils.data('event1'), { CreatedByUserId: collectiveAdmin.id, ParentCollectiveId: collective1.id }))
     .tap(e => event1 = e));
-  before(() => event1.addUserWithRole(user1, roles.ADMIN));
+  before(() => event1.addUserWithRole(collectiveAdmin, roles.ADMIN));
 
 
   let comment;
@@ -65,7 +66,7 @@ describe('graphql.comments.test', () => {
     comment = {
       markdown: "This is the **comment**",
       ExpenseId: expense1.id,
-      FromCollectiveId: user2.CollectiveId,
+      FromCollectiveId: user1.CollectiveId,
       CollectiveId: collective1.id
     };
   })
@@ -93,17 +94,19 @@ describe('graphql.comments.test', () => {
     });
 
     it("creates a comment", async () => {
-      const result = await utils.graphqlQuery(createCommentQuery, { comment }, user2);
+      const result = await utils.graphqlQuery(createCommentQuery, { comment }, user1);
       result.errors && console.error(result.errors[0]);
       const createdComment = result.data.createComment;
       expect(createdComment.html).to.equal(`<p>This is the <strong>comment</strong></p>`);
-      await utils.waitForCondition(() => sendEmailSpy.callCount > 0);
+      await utils.waitForCondition(() => sendEmailSpy.callCount === 3);
       // utils.inspectSpy(sendEmailSpy, 2);
-      expect(sendEmailSpy.callCount).to.equal(2);
-      expect(sendEmailSpy.firstCall.args[0]).to.equal(user2.email);
-      expect(sendEmailSpy.secondCall.args[0]).to.equal(user1.email);
-      expect(sendEmailSpy.firstCall.args[1]).to.contain(`New comment on your expense ${expense1.description} by ${user2.firstName}`);
-      expect(sendEmailSpy.secondCall.args[1]).to.contain(`New comment on your expense ${expense1.description} by ${user2.firstName}`);
+      expect(sendEmailSpy.callCount).to.equal(3);
+      expect(sendEmailSpy.firstCall.args[0]).to.equal(user1.email);
+      expect(sendEmailSpy.secondCall.args[0]).to.equal(hostAdmin.email);
+      expect(sendEmailSpy.thirdCall.args[0]).to.equal(collectiveAdmin.email);
+      expect(sendEmailSpy.firstCall.args[1]).to.contain(`webpack: New comment on your expense ${expense1.description} by ${collectiveAdmin.firstName}`);
+      expect(sendEmailSpy.secondCall.args[1]).to.contain(`webpack: New comment on expense ${expense1.description} by ${user1.firstName}`);
+      expect(sendEmailSpy.thirdCall.args[1]).to.contain(`webpack: New comment on expense ${expense1.description} by ${user1.firstName}`);
     })
   })
 
@@ -126,13 +129,13 @@ describe('graphql.comments.test', () => {
     });
 
     it('fails if not authenticated as author or admin of collective', async () => {
-      const result = await utils.graphqlQuery(editCommentQuery, { comment: { id: comment1.id } }, user2);
+      const result = await utils.graphqlQuery(editCommentQuery, { comment: { id: comment1.id } }, user1);
       expect(result.errors).to.exist;
       expect(result.errors[0].message).to.equal("You must be the author or an admin of this collective to edit this comment");
     });
 
     it('edits a comment successfully', async () => {
-      const result = await utils.graphqlQuery(editCommentQuery, { comment: { id: comment1.id, markdown: 'new *comment* text' } }, user1);
+      const result = await utils.graphqlQuery(editCommentQuery, { comment: { id: comment1.id, markdown: 'new *comment* text' } }, collectiveAdmin);
       expect(result.errors).to.not.exist;
       expect(result.data.editComment.html).to.equal('<p>new <em>comment</em> text</p>');
     });
@@ -158,7 +161,7 @@ describe('graphql.comments.test', () => {
     });
 
     it('fails to delete a comment if logged in as another user', async () => {
-      const result = await utils.graphqlQuery(deleteCommentQuery, { id: comment1.id }, user2);
+      const result = await utils.graphqlQuery(deleteCommentQuery, { id: comment1.id }, user1);
       expect(result.errors).to.exist;
       expect(result.errors[0].message).to.equal("You need to be logged in as a core contributor or as a host to delete this comment");
       return models.Comment.findById(comment1.id).then(commentFound => {
@@ -167,7 +170,7 @@ describe('graphql.comments.test', () => {
     });
 
     it('deletes a comment', async () => {
-      const res = await utils.graphqlQuery(deleteCommentQuery, { id: comment1.id }, user1);
+      const res = await utils.graphqlQuery(deleteCommentQuery, { id: comment1.id }, collectiveAdmin);
       res.errors && console.error(res.errors[0]);
       expect(res.errors).to.not.exist;
       return models.Comment.findById(comment1.id).then(commentFound => {
@@ -201,7 +204,7 @@ describe('graphql.comments.test', () => {
         { markdown: 'comment 8', createdAt: new Date('2018-01-08') },
         { markdown: 'comment 9', createdAt: new Date('2018-01-09') },
         { markdown: 'comment 10', createdAt: new Date('2018-01-10') },
-      ], { CreatedByUserId: user1.id, CollectiveId: collective1.id, ExpenseId: expense1.id }));
+      ], { CreatedByUserId: collectiveAdmin.id, CollectiveId: collective1.id, ExpenseId: expense1.id }));
     });
 
     it('get all the comments', async () => {
@@ -209,7 +212,7 @@ describe('graphql.comments.test', () => {
       const comments = result.data.allComments;
       expect(result.errors).to.not.exist;
       expect(comments).to.have.length(5);
-      expect(comments[0].markdown).to.equal("comment 9");
+      expect(comments[0].markdown).to.equal("comment 3");
     });
 
   });  

@@ -21,19 +21,22 @@ export async function createComment(_, args, req) {
     }
   } = args;
 
-  const markdown = args.comment.markdown
-        ? strip_tags(args.comment.markdown)
-        : '';
-
   const commentData = {
-    markdown,
-    html: strip_tags(args.comment.html),
     CollectiveId,
     ExpenseId,
     UpdateId,
     CreatedByUserId: req.remoteUser.id,
     FromCollectiveId: req.remoteUser.CollectiveId
   };
+
+  if (args.comment.markdown) {
+    commentData.markdown = strip_tags(args.comment.markdown);
+  }
+
+  if (args.comment.html) {
+    commentData.html = strip_tags(args.comment.html);
+  }
+
   const comment = await models.Comment.create(commentData);
 
   return comment;
