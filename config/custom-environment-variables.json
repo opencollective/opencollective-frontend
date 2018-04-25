@@ -74,6 +74,7 @@
   },
   "algolia": {
     "appId": "ALGOLIA_APP_ID",
-    "appKey": "ALGOLIA_KEY"
+    "appKey": "ALGOLIA_KEY",
+    "index": "ALGOLIA_INDEX"
   }
 }
