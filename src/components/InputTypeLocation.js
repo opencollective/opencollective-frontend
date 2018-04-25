@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Geosuggest from 'react-geosuggest';
+import classNames from 'classnames';
 import Location from './Location';
 
 class InputTypeLocation extends React.Component {
@@ -41,7 +42,7 @@ class InputTypeLocation extends React.Component {
     const options = this.props.options || {};
 
     return (
-      <div className="InputTypeLocation" className={this.props.className}>
+      <div className={classNames('InputTypeLocation', this.props.className)}>
         <style jsx global>{`
         .geosuggest {
           font-size: 18px;
