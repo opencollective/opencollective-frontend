@@ -7,6 +7,7 @@ export default {
   CONNECTED_ACCOUNT_CREATED: 'connected_account.created',
   COLLECTIVE_APPROVED: 'collective.approved',
   COLLECTIVE_CREATED: 'collective.created',
+  COLLECTIVE_COMMENT_CREATED: 'collective.comment.created',
   COLLECTIVE_EXPENSE_CREATED: 'collective.expense.created',
   COLLECTIVE_EXPENSE_DELETED: 'collective.expense.deleted',
   COLLECTIVE_EXPENSE_UPDATED: 'collective.expense.updated',

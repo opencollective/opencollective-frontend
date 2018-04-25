@@ -95,9 +95,9 @@ export default function(Sequelize, DataTypes) {
     },
 
     title: DataTypes.STRING,
-    markdown: DataTypes.STRING,
+    markdown: DataTypes.TEXT,
     html: {
-      type: DataTypes.STRING,
+      type: DataTypes.TEXT,
       get() {
         return this.getDataValue('markdown') ? markdownConverter.makeHtml(this.getDataValue('markdown')) : this.getDataValue('html');
       }

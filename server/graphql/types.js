@@ -456,6 +456,21 @@ export const ExpenseType = new GraphQLObjectType({
           });
         }
       },
+      comments: {
+        type: new GraphQLList(CommentType),
+        args: {
+          limit: { type: GraphQLInt },
+          offset: { type: GraphQLInt }
+        },
+        resolve(expense, args) {
+          const query = {
+            where: { ExpenseId: expense.id},
+            limit: args.limit || 10,
+            offset: args.offset || 0
+          };
+          return models.Comment.findAll(query);
+        }
+      },
       collective: {
         type: CollectiveInterfaceType,
         resolve(expense, args, req) {
@@ -576,6 +591,90 @@ export const UpdateType = new GraphQLObjectType({
         type: TierType,
         resolve(update, args, req) {
           return req.loaders.tiers.findById.load(update.TierId);
+        }
+      },
+      comments: {
+        type: new GraphQLList(CommentType),
+        args: {
+          limit: { type: GraphQLInt },
+          offset: { type: GraphQLInt }
+        },
+        resolve(update, args) {
+          const query = {
+            where: { ExpenseId: update.id},
+            limit: args.limit || 10,
+            offset: args.offset || 0
+          };
+          return models.Comment.findAll(query);
+        }
+      }
+    }
+  }
+});
+
+export const CommentType = new GraphQLObjectType({
+  name: 'CommentType',
+  description: 'This represents a Comment',
+  fields: () => {
+    return {
+      id: {
+        type: GraphQLInt,
+        resolve(expense) {
+          return expense.id;
+        }
+      },
+      createdAt: {
+        type: GraphQLString,
+        resolve(comment) {
+          return comment.createdAt;
+        }
+      },
+      updatedAt: {
+        type: GraphQLString,
+        resolve(comment) {
+          return comment.updatedAt;
+        }
+      },
+      html: {
+        type: GraphQLString,
+        resolve(comment) {
+          return strip_tags(comment.html || "");
+        }
+      },
+      markdown: {
+        type: GraphQLString,
+        resolve(comment) {
+          return strip_tags(comment.markdown || "");
+        }
+      },
+      createdByUser: {
+        type: UserType,
+        resolve(comment) {
+          return comment.getUser();
+        }
+      },
+      fromCollective: {
+        type: CollectiveInterfaceType,
+        resolve(comment, args, req) {
+          return req.loaders.collective.findById.load(comment.FromCollectiveId);
+        }
+      },
+      collective: {
+        type: CollectiveInterfaceType,
+        resolve(comment, args, req) {
+          return req.loaders.collective.findById.load(comment.CollectiveId);
+        }
+      },
+      expense: {
+        type: ExpenseType,
+        resolve(comment) {
+          return models.Expense.findById(comment.ExpenseId);
+        }
+      },
+      update: {
+        type: UpdateType,
+        resolve(comment) {
+          return models.Update.findById(comment.UpdateId);
         }
       }
     }

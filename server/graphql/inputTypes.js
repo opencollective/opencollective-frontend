@@ -212,6 +212,34 @@ export const OrderInputType = new GraphQLInputObjectType({
   })
 });
 
+export const CommentInputType = new GraphQLInputObjectType({
+  name: 'CommentInputType',
+  description: 'Input type for CommentType',
+  fields: () => ({
+    id: { type: GraphQLInt },
+    markdown: { type: GraphQLString },
+    html: { type: GraphQLString },
+    FromCollectiveId: { type: new GraphQLNonNull(GraphQLInt) },
+    CollectiveId: { type: new GraphQLNonNull(GraphQLInt) },
+    ExpenseId: { type: GraphQLInt },
+    UpdateId: { type: GraphQLInt }
+  })
+});
+
+export const CommentAttributesInputType = new GraphQLInputObjectType({
+  name: 'CommentAttributesInputType',
+  description: 'Input type for CommentType',
+  fields: () => ({
+    id: { type: GraphQLInt },
+    markdown: { type: GraphQLString },
+    html: { type: GraphQLString },
+    FromCollectiveId: { type: GraphQLInt },
+    CollectiveId: { type: GraphQLInt },
+    ExpenseId: { type: GraphQLInt },
+    UpdateId: { type: GraphQLInt }
+  })
+});
+
 export const UpdateInputType = new GraphQLInputObjectType({
   name: 'UpdateInputType',
   description: 'Input type for UpdateType',
