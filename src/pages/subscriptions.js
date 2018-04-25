@@ -76,7 +76,7 @@ class SubscriptionsPage extends React.Component {
             <div className='content'>
               <div className='Subscriptions-header'>
                 <div className='Subscriptions-title'>
-                    {slug}'s subscriptions
+                    {slug}&apos;s subscriptions
                 </div>
               </div>
 
