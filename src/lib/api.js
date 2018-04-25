@@ -67,6 +67,15 @@ export function connectAccount(CollectiveId, service) {
     .then(checkResponseStatus);
 }
 
+export async function getAccountClientToken(CollectiveId, service) {
+  const params = { CollectiveId };
+  const url = `/api/connected-accounts/${service}/clientToken?${queryString(params)}`;
+  return checkResponseStatus(await fetch(url, {
+    method: 'get',
+    headers: addAuthTokenToHeader(),
+  }));
+}
+
 export function checkUserExistence(email) {
   if (!isValidEmail(email)) return Promise.resolve(false);
   return fetch(`/api/users/exists?email=${encodeURIComponent(email)}`)

@@ -30,9 +30,12 @@ class EditConnectedAccount extends React.Component {
       'collective.connectedAccounts.twitter.connected': { id: 'collective.connectedAccounts.twitter.connected', defaultMessage: 'Twitter account @{username} connected on {createdAt, date, short}' },
       'collective.connectedAccounts.github.button': { id: 'collective.connectedAccounts.github.button', defaultMessage: 'Connect GitHub' },
       'collective.connectedAccounts.github.description': { id: 'collective.connectedAccounts.github.description', defaultMessage: 'Connect a GitHub account to verify your identity and add it to your profile' },
-      'collective.connectedAccounts.github.connected': { id: 'collective.connectedAccounts.github.connected', defaultMessage: 'GitHub account {username} connected on {createdAt, date, short}' }
+      'collective.connectedAccounts.github.connected': { id: 'collective.connectedAccounts.github.connected', defaultMessage: 'GitHub account {username} connected on {createdAt, date, short}' },
+      'collective.connectedAccounts.paypalbt.button': { id: 'collective.connectedAccounts.paypalbt.button', defaultMessage: 'Connect PayPal' },
+      'collective.connectedAccounts.paypalbt.description': { id: 'collective.connectedAccounts.paypalbt.description', defaultMessage: 'Connect a PayPal (Braintree) account to create collectives and start accepting donations on their behalf.' },
+      'collective.connectedAccounts.paypalbt.connected': { id: 'collective.connectedAccounts.paypalbt.connected', defaultMessage: 'PayPal account connected on {createdAt, date, short}' },
     });
-    this.services = ['stripe', 'paypal', 'twitter', 'github'];
+    this.services = ['stripe', 'paypal', 'paypalbt', 'twitter', 'github'];
   }
 
   connect(service) {
@@ -54,36 +57,63 @@ class EditConnectedAccount extends React.Component {
   }
 
   render() {
-    const { intl, service, connectedAccount, collective } = this.props;
-    let vars = {};
-    if (connectedAccount) {
-      vars = {
-        username: connectedAccount.username,
-        createdAt: new Date(connectedAccount.createdAt)
-      };
+    const { connectedAccount } = this.props;
+    if (!connectedAccount) {
+      return this.renderNotConnectedAccount();
+    } else if (connectedAccount && connectedAccount.service === 'twitter') {
+      return this.renderTwitterConnectedAccount();
+    } else {
+      return this.renderConnectedAccount();
     }
+  }
+
+  renderNotConnectedAccount() {
+    return <div className="EditConnectedAccount">{this.renderDisconnectedButton()}</div>;
+  }
+
+  renderPaypalBtNotConnectedAccount() {
+    return <div className="EditConnectedAccount"><div id="paypalbt-dropin-container"></div></div>;
+  }
+
+  renderTwitterConnectedAccount() {
+    const { connectedAccount, collective } = this.props;
     return (
       <div className="EditConnectedAccount">
-
-      { !connectedAccount &&
-        <div>
-          <HelpBlock>{intl.formatMessage(this.messages[`collective.connectedAccounts.${service}.description`])}</HelpBlock>
-          <Button onClick={() => this.connect(service)}>{intl.formatMessage(this.messages[`collective.connectedAccounts.${service}.button`])}</Button>
-        </div>
-      }
-      { connectedAccount &&
-        <div>
-          <div>{intl.formatMessage(this.messages[`collective.connectedAccounts.${service}.connected`], vars)}</div>
-          <Button onClick={() => this.connect(service)}>{intl.formatMessage(this.messages[`collective.connectedAccounts.reconnect.button`])}</Button>
-        </div>
-      }
-      { connectedAccount && connectedAccount.service === 'twitter' &&
-        <EditTwitterAccount collective={collective} connectedAccount={connectedAccount} />
-      }
+        {this.renderConnectedAccount()}
+        <EditTwitterAccount
+          collective={collective}
+          connectedAccount={connectedAccount} />
       </div>
     );
   }
 
+  renderConnectedAccount() {
+    return <div className="EditConnectedAccount">{this.renderConnectedButton()}</div>;
+  }
+
+  renderDisconnectedButton() {
+    const { intl, service } = this.props;
+    return (
+      <div>
+        <HelpBlock>{intl.formatMessage(this.messages[`collective.connectedAccounts.${service}.description`])}</HelpBlock>
+        <Button onClick={() => this.connect(service)}>{intl.formatMessage(this.messages[`collective.connectedAccounts.${service}.button`])}</Button>
+      </div>
+    );
+  }
+
+  renderConnectedButton() {
+    const { intl, connectedAccount, service } = this.props;
+    const vars = {
+      username: connectedAccount.username,
+      createdAt: new Date(connectedAccount.createdAt)
+    };
+    return (
+      <div>
+        <div>{intl.formatMessage(this.messages[`collective.connectedAccounts.${service}.connected`], vars)}</div>
+        <Button onClick={() => this.connect(service)}>{intl.formatMessage(this.messages[`collective.connectedAccounts.reconnect.button`])}</Button>
+      </div>
+    );
+  }
 }
 
 export default withIntl(EditConnectedAccount);

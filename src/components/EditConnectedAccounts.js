@@ -32,11 +32,17 @@ class EditConnectedAccounts extends React.Component {
 
   componentDidMount() {
     const { collective } = this.props;
-    if (window.location.href.match(/service=stripe/) && (collective.type === 'USER' || collective.type === 'ORGANIZATION')) {
-      const { services } = this.state;
+    const { services } = this.state;
+
+    if (window.location.href.match(/service=stripe/) &&
+        (collective.type === 'USER' || collective.type === 'ORGANIZATION')) {
       services.push('stripe');
-      this.setState({ services });
     }
+    if (window.location.href.match(/service=paypalbt/) &&
+        (collective.type === 'USER' || collective.type === 'ORGANIZATION')) {
+      services.push('paypalbt');
+    }
+    this.setState({ services });
   }
 
   render() {
