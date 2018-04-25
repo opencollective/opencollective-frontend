@@ -1,4 +1,6 @@
-export default ({message}) => {
+import React from 'react';
+
+const ErrorComponent = ({message}) => {
   return (
     <div className="Error">
       <style jsx>{`
@@ -11,4 +13,6 @@ export default ({message}) => {
       <h1>{message || "unknown error"}</h1>
     </div>
   )
-}
+};
+
+export default ErrorComponent;

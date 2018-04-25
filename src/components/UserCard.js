@@ -1,6 +1,7 @@
+import React from 'react';
 import { FormattedMessage, FormattedDate } from 'react-intl';
 
-export default ({ user, type }) => (
+const UserCard = ({ user, type }) => (
   <a href={`/${user.username}`}>
     <div className={`UserCard ${type}`}>
       <style jsx>{`
@@ -44,7 +45,7 @@ export default ({ user, type }) => (
           font-size: 0.6875rem;
           letter-spacing: 1.47px;
           margin-bottom: 0.3rem;
-        }        
+        }
         .tier .since {
           font-size: .6875rem;
           letter-spacing: 0.05rem;
@@ -64,3 +65,5 @@ export default ({ user, type }) => (
     </div>
   </a>
 );
+
+export default UserCard;
