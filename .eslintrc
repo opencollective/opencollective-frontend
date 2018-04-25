@@ -4,7 +4,7 @@
     "jest": true
   },
   "plugins": [
-    "jest"
+    "jest", "mocha"
   ],
   "rules": {
     // we still use console even on frontend

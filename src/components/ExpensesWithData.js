@@ -11,7 +11,7 @@ class ExpensesWithData extends React.Component {
   static propTypes = {
     collective: PropTypes.object,
     limit: PropTypes.number,
-    compact: PropTypes.bool, // compact view for homepage (can't edit expense, don't show header)
+    view: PropTypes.string, // "compact" for homepage (can't edit expense, don't show header), "list" for list view, "details" for details view
     filter: PropTypes.object, // { category, recipient }
     defaultAction: PropTypes.string, // "new" to open the new expense form by default
     includeHostedCollectives: PropTypes.bool,
@@ -28,7 +28,7 @@ class ExpensesWithData extends React.Component {
       data,
       LoggedInUser,
       collective,
-      compact,
+      view,
       includeHostedCollectives,
       filters
     } = this.props;
@@ -47,7 +47,7 @@ class ExpensesWithData extends React.Component {
           collective={collective}
           expenses={expenses}
           refetch={data.refetch}
-          editable={!compact}
+          editable={view !== 'compact'}
           fetchMore={this.props.fetchMore}
           filters={filters}
           LoggedInUser={LoggedInUser}

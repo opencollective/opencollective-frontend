@@ -12,6 +12,7 @@ import { defaultBackgroundImage } from '../constants/collectives';
 import withIntl from '../lib/withIntl';
 import { ButtonGroup, Button } from 'react-bootstrap';
 import { Link } from '../server/pages';
+import { get } from 'lodash';
 
 class EditCollectiveForm extends React.Component {
 
@@ -62,6 +63,8 @@ class EditCollectiveForm extends React.Component {
       'backgroundImage.label': { id: 'collective.backgroundImage.label', defaultMessage: 'Cover image' },
       'twitterHandle.label': { id: 'collective.twitterHandle.label', defaultMessage: 'Twitter' },
       'website.label': { id: 'collective.website.label', defaultMessage: 'Website' },
+      'markdown.label': { id: 'collective.markdown.label', defaultMessage: 'Default editor' },
+      'markdown.description': { id: 'collective.markdown.description', defaultMessage: 'Use markdown editor' },
       'location.label': { id: 'collective.location.label', defaultMessage: 'City' }
     });
 
@@ -192,6 +195,12 @@ class EditCollectiveForm extends React.Component {
           pre: `https://opencollective.com/`,
           placeholder: '',
           when: () => this.state.section === 'advanced'
+        },
+        {
+          name: 'markdown',
+          type: 'switch',
+          defaultValue: get(this.state.collective, 'settings.editor') === 'markdown',
+          when: () => this.state.section === 'advanced' && (collective.type === 'USER' || collective.type === 'COLLECTIVE')
         }
       ]
     }

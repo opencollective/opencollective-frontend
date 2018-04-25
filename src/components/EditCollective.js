@@ -114,8 +114,13 @@ class EditCollective extends React.Component {
       return false;
     }
     const { collective } = this.props;
-    CollectiveInputType.settings = { ...collective.settings, goals: CollectiveInputType.goals };
+    CollectiveInputType.settings = {
+      ...collective.settings,
+      goals: CollectiveInputType.goals,
+      editor: CollectiveInputType.markdown ? 'markdown' : 'html'
+    };
     delete CollectiveInputType.goals;
+    delete CollectiveInputType.markdown;
     this.setState( { status: 'loading' });
     try {
       if (CollectiveInputType.backgroundImage === defaultBackgroundImage[CollectiveInputType.type]) {

@@ -18,6 +18,7 @@ class Expense extends React.Component {
   static propTypes = {
     collective: PropTypes.object,
     expense: PropTypes.object,
+    view: PropTypes.string, // "compact" for homepage (can't edit expense, don't show header), "list" for list view, "details" for details view
     editable: PropTypes.bool,
     includeHostedCollectives: PropTypes.bool,
     LoggedInUser: PropTypes.object,
@@ -54,7 +55,7 @@ class Expense extends React.Component {
 
   toggleDetails() {
     this.setState({
-      mode: this.state.mode === 'details' ? 'summary': 'details',
+      mode: this.state.mode === 'details' ? 'list': 'details',
     });
   }
 
@@ -90,7 +91,8 @@ class Expense extends React.Component {
       expense,
       includeHostedCollectives,
       LoggedInUser,
-      editable
+      editable,
+      view
     } = this.props;
 
     const title = expense.description;
@@ -105,7 +107,7 @@ class Expense extends React.Component {
         mode = 'details';
       }
     }
-    mode = mode || 'summary';
+    mode = mode || view;
 
     const canReject = LoggedInUser
       && LoggedInUser.canApproveExpense(expense)
@@ -234,9 +236,9 @@ class Expense extends React.Component {
                 />
             </div>
             <div className="description">
-              <a onClick={this.toggleDetails} title={capitalize(title)}>{/* should link to `/${collective.slug}/expenses/${expense.uuid}` once we have a page for it */}
+              <Link route={`/${collective.slug}/expenses/${expense.id}`} title={capitalize(title)}>
                 {capitalize(title)}
-              </a>
+              </Link>
             </div>
             <div className="meta">
               <span className="incurredAt"><FormattedDate value={expense.incurredAt} day="numeric" month="numeric" /></span> |&nbsp;
@@ -248,7 +250,7 @@ class Expense extends React.Component {
               { editable && LoggedInUser && LoggedInUser.canEditExpense(expense) &&
                 <span> | <a className="toggleEditExpense" onClick={this.toggleEdit}>{intl.formatMessage(this.messages[`${mode === 'edit' ? 'cancelEdit' : 'edit'}`])}</a></span>
               }
-              { mode !== 'edit' &&
+              { mode !== 'edit' && view === 'list' &&
                 <span> | <a className="toggleDetails" onClick={this.toggleDetails}>{intl.formatMessage(this.messages[`${mode === 'details' ? 'closeDetails' : 'viewDetails'}`])}</a></span>
               }
             </div>
