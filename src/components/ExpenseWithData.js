@@ -4,11 +4,9 @@ import Error from '../components/Error';
 import withIntl from '../lib/withIntl';
 import Expense from '../components/Expense';
 import CommentsWithData from '../components/CommentsWithData';
-import Currency from '../components/Currency';
 import { graphql } from 'react-apollo'
 import gql from 'graphql-tag'
 import { FormattedMessage } from 'react-intl'
-import { pick, get } from 'lodash';
 
 class ExpenseWithData extends React.Component {
 
@@ -18,8 +16,6 @@ class ExpenseWithData extends React.Component {
     view: PropTypes.string, // "compact" for homepage (can't edit expense, don't show header), "list" for list view, "details" for details view
     filter: PropTypes.object, // { category, recipient }
     defaultAction: PropTypes.string, // "new" to open the new expense form by default
-    includeHostedCollectives: PropTypes.bool,
-    filters: PropTypes.bool,
     LoggedInUser: PropTypes.object
   }
 
@@ -32,9 +28,7 @@ class ExpenseWithData extends React.Component {
       data,
       LoggedInUser,
       collective,
-      view,
-      includeHostedCollectives,
-      filters
+      view
     } = this.props;
 
     if (data.error) {

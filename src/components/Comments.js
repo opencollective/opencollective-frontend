@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Comment from './Comment';
-import { ButtonGroup, Button } from 'react-bootstrap';
+import { Button } from 'react-bootstrap';
 import { FormattedMessage } from 'react-intl';
 import colors from '../constants/colors';
 
@@ -99,7 +99,7 @@ class Comments extends React.Component {
               <FormattedMessage id="loading" defaultMessage="loading" />
             </div>
           }
-          {comments.map((comment) =>
+          {comments.map((comment) => (
             <Comment
               key={comment.id}
               collective={collective}
@@ -107,6 +107,7 @@ class Comments extends React.Component {
               editable={editable}
               LoggedInUser={LoggedInUser}
               />
+            )
           )}
           { comments.length >= 10 && comments.length % 10 === 0 &&
             <div className="loadMoreBtn">

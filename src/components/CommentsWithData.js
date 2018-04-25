@@ -6,8 +6,6 @@ import Comments from '../components/Comments';
 import CommentForm from '../components/CommentForm';
 import { graphql, compose } from 'react-apollo'
 import gql from 'graphql-tag'
-import { FormattedMessage } from 'react-intl'
-import { pick, get } from 'lodash';
 
 class CommentsWithData extends React.Component {
 
@@ -37,7 +35,7 @@ class CommentsWithData extends React.Component {
     let res;
     try {
       res = await this.props.createComment(CommentInputType);
-    } catch(e) {
+    } catch (e) {
       console.error(">>> error while trying to create the comment", CommentInputType, e);
     }
     return res;

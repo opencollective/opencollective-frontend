@@ -1,8 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import withIntl from '../lib/withIntl';
-import { defineMessages, FormattedMessage, FormattedNumber, FormattedDate } from 'react-intl';
-import { capitalize, formatCurrency } from '../lib/utils';
+import { defineMessages, FormattedMessage, FormattedDate } from 'react-intl';
 import { graphql } from 'react-apollo'
 import gql from 'graphql-tag'
 import Avatar from './Avatar';
@@ -63,7 +62,7 @@ class Comment extends React.Component {
 
   async save() {
     const comment = pick(this.state.comment, ['id', 'markdown', 'html']);
-    const res = await this.props.editComment(comment);
+    await this.props.editComment(comment);
     this.setState({ modified: false, mode: 'details' });
   }
 
@@ -72,8 +71,7 @@ class Comment extends React.Component {
       intl,
       collective,
       LoggedInUser,
-      editable,
-      view
+      editable
     } = this.props;
 
     const { comment } = this.state;

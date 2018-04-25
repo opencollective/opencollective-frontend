@@ -2,11 +2,11 @@ const WEBSITE_URL = process.env.WEBSITE_URL || "http://localhost:3000" || "https
 const random = Math.round(Math.random() * 100000);
 const expenseDescription = `New expense ${random}`;
 
-const init = (skip_signin = false) => {
+const init = (skip_signin = false, next = '/testcollective/expenses/new') => {
   if (skip_signin) {
     cy.visit(`http://localhost:3000/signin/eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzY29wZSI6ImxvZ2luIiwiaWQiOjk0NzQsImVtYWlsIjoidGVzdHVzZXIrYWRtaW5Ab3BlbmNvbGxlY3RpdmUuY29tIiwiaWF0IjoxNTE3OTM2Njg5LCJleHAiOjE1MTgwMjMwODksImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6MzA2MCIsInN1YiI6OTQ3NH0.uw7RGXELcv7pmr80VCApQbyra03SPvm49lHyq4kZA28?next=/testcollective/expenses/new`);
   } else {
-    cy.visit(`${WEBSITE_URL}/signin?next=/testcollective/expenses/new`)
+    cy.visit(`${WEBSITE_URL}/signin?next=${next}`)
     cy.get('.email.inputField input').type('testuser+admin@opencollective.com');
     cy.wait(500)
     cy.get('.LoginForm button').click();
@@ -41,6 +41,7 @@ describe("new expense", () => {
   });
 
   it ("submits new expense paypal", () => {
+    // init(false, '/testcollective/expenses');
     init();
     cy.get('.descriptionField input').type(expenseDescription);
     cy.get('.error').should('have.text', 'Amount must be greater than 0');
@@ -61,6 +62,15 @@ describe("new expense", () => {
     cy.get('.Expenses .expense:first .description').contains(expenseDescription)
     cy.get('.Expenses .expense:first .status').contains("pending")
     cy.get('.Expenses .expense:first .meta').contains("Team")
+    cy.get('.Expenses .expense:first .description a').click();
+    cy.get('.CommentForm');
+    cy.get('.ql-editor').type("This is a first comment");
+    cy.get('.ql-editor').blur();
+    cy.wait(500);
+    cy.get('.CommentForm .actions .Button.save').click();
+    cy.wait(500);
+    cy.get('.Comments .itemsList .comment').should('have.length', 1);
+    cy.get('.Comments .itemsList .comment:first .description').contains("This is a first comment");
     cy.get('.desktopOnly .submitExpense').click();
     cy.get('.descriptionField input').should('have.value', '');
     cy.get('.amountField input').should('have.value', '');

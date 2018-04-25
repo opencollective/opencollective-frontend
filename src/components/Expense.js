@@ -236,7 +236,7 @@ class Expense extends React.Component {
                 />
             </div>
             <div className="description">
-              <Link route={`/${collective.slug}/expenses/${expense.id}`} title={capitalize(title)}>{/* should link to `/${collective.slug}/expenses/${expense.uuid}` once we have a page for it */}
+              <Link route={`/${collective.slug}/expenses/${expense.id}`} title={capitalize(title)}>
                 {capitalize(title)}
               </Link>
             </div>

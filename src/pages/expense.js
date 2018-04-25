@@ -10,10 +10,7 @@ import ErrorPage from '../components/ErrorPage';
 import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
 import ExpenseWithData from '../components/ExpenseWithData';
-import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl'
-import Button from '../components/Button';
-import SectionTitle from '../components/SectionTitle';
 import Link from '../components/Link';
 
 class ExpensePage extends React.Component {
@@ -47,13 +44,6 @@ class ExpensePage extends React.Component {
     }
 
     const collective = data.Collective;
-
-    const action = {
-      label: <FormattedMessage id="expenses.viewAll" defaultMessage="View All Expenses" />,
-      href: `/${collective.slug}/expenses`
-    }
-
-    const subtitle = <FormattedMessage id="expense.subtitle" defaultMessage="Expense" values={{ }} />
 
     return (
       <div className="ExpensePage">

@@ -1,10 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import withIntl from '../lib/withIntl';
-import { defineMessages, FormattedNumber, FormattedMessage, FormattedDate } from 'react-intl';
-import { imagePreview, capitalize } from '../lib/utils';
-import { graphql } from 'react-apollo'
-import gql from 'graphql-tag'
+import { defineMessages, FormattedMessage, FormattedDate } from 'react-intl';
 import InputField from './InputField';
 import SmallButton from './SmallButton';
 import Avatar from './Avatar';
