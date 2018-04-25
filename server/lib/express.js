@@ -77,13 +77,15 @@ export default function(app) {
 
   app.use(multer());
 
-  app.use(Liana.init({
-    modelsDir: path.resolve(__dirname, '../models'),
-    configDir: path.resolve(__dirname, '../forest'),
-    envSecret: process.env.FOREST_ENV_SECRET,
-    authSecret: process.env.FOREST_AUTH_SECRET,
-    sequelize: db,
-  }));
+  if (process.env.FOREST_ENV_SECRET && process.env.FOREST_AUTH_SECRET) {
+    app.use(Liana.init({
+      modelsDir: path.resolve(__dirname, '../models'),
+      configDir: path.resolve(__dirname, '../forest'),
+      envSecret: process.env.FOREST_ENV_SECRET,
+      authSecret: process.env.FOREST_AUTH_SECRET,
+      sequelize: db,
+    }));
+  }
 
   // Error handling.
   if (process.env.NODE_ENV !== 'production' && process.env.NODE_ENV !== 'staging') {
