@@ -104,6 +104,7 @@ class ExpensePage extends React.Component {
                 <div className="viewAllExpenses">
                   <Link route={`/${collective.slug}/expenses`}><FormattedMessage id="expenses.viewAll" defaultMessage="View All Expenses" /></Link>
                 </div>
+
                 <ExpenseWithData
                   id={ExpenseId}
                   collective={collective}
