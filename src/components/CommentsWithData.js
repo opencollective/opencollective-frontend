@@ -6,6 +6,8 @@ import Comments from '../components/Comments';
 import CommentForm from '../components/CommentForm';
 import { graphql, compose } from 'react-apollo'
 import gql from 'graphql-tag'
+import { FormattedMessage } from 'react-intl';
+import { get } from 'lodash';
 
 class CommentsWithData extends React.Component {
 
@@ -56,6 +58,16 @@ class CommentsWithData extends React.Component {
     }
 
     const comments = data.allComments;
+    let notice;
+    if (LoggedInUser && LoggedInUser.id !== get(expense, 'user.id')) {
+      notice = <FormattedMessage id="comment.post.to.author" defaultMessage={`Note: Your comment will be public and we will notify the person who submitted the expense`} />
+    }
+    if (LoggedInUser && LoggedInUser.id === get(expense, 'user.id') && expense.status === 'APPROVED') {
+      notice = <FormattedMessage id="comment.post.to.host" defaultMessage={`Note: Your comment will be public and we will notify the administrators of the host of this collective`} />
+    }
+    if (LoggedInUser && LoggedInUser.id === get(expense, 'user.id') && expense.status !== 'APPROVED') {
+      notice = <FormattedMessage id="comment.post.to.collective" defaultMessage={`Note: Your comment will be public and we will notify the administrators of this collective`} />
+    }
 
     return (
       <div className="CommentsWithData">
@@ -70,7 +82,11 @@ class CommentsWithData extends React.Component {
           />
 
         { LoggedInUser && LoggedInUser.canCreateCommentOnExpense(expense) &&
-          <CommentForm onSubmit={this.createComment} LoggedInUser={LoggedInUser} />
+          <CommentForm
+            onSubmit={this.createComment}
+            LoggedInUser={LoggedInUser}
+            notice={notice}
+            />
         }
       </div>
     );

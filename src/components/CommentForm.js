@@ -13,6 +13,7 @@ class CommentForm extends React.Component {
   static propTypes = {
     collective: PropTypes.object,
     LoggedInUser: PropTypes.object,
+    notice: PropTypes.oneOf(PropTypes.string, PropTypes.node),
     onChange: PropTypes.func,
     onSubmit: PropTypes.func
   }
@@ -51,7 +52,7 @@ class CommentForm extends React.Component {
   }
 
   render() {
-    const { LoggedInUser, collective } = this.props;
+    const { LoggedInUser, collective, notice } = this.props;
     if (!LoggedInUser) return <div />;
 
     const comment = {
@@ -85,6 +86,17 @@ class CommentForm extends React.Component {
           .body {
             overflow: hidden;
           }
+          .actions {
+            display: flex;
+            align-items: center;
+          }
+          .notice {
+            color: #525866;
+            font-family: Rubik;
+            font-size: 12px;
+            margin-left: 1rem;
+          }
+
         `}</style>
 
         <div className="fromCollective">
@@ -105,10 +117,12 @@ class CommentForm extends React.Component {
                 type={editor}
                 defaultValue={this.state.comment[editor]}
                 onChange={(value) => this.handleChange(editor, value)}
+                className="small"
                 />
               </div>
               <div className="actions">
                 <SmallButton className="primary save" onClick={this.onSubmit}><FormattedMessage id="comment.btn" defaultMessage="Comment" /></SmallButton>
+                { notice && <div className="notice">{notice}</div> }
               </div>
             </div>
           </div>
