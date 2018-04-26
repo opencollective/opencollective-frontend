@@ -91,7 +91,7 @@ class EditGoals extends React.Component {
   }
 
   removeGoal(index) {
-    let goals = this.state.goals;
+    const goals = this.state.goals;
     if (index < 0 || index > goals.length) return;
     goals.splice(index, 1);
     this.setState({goals});

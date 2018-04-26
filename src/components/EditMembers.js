@@ -101,7 +101,7 @@ class EditMembers extends React.Component {
   }
 
   removeMember(index) {
-    let members = this.state.members;
+    const members = this.state.members;
     if (index < 0 || index > members.length) return;
     members.splice(index, 1);
     this.setState({members});
