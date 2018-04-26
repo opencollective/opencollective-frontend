@@ -579,7 +579,7 @@ describe('Mutation Tests', () => {
           }
         `;
 
-        it('as a new organization', async () => {
+        it.only('as a new organization', async () => {
 
           const order = {
             user: { email: user2.email },
@@ -628,15 +628,18 @@ describe('Mutation Tests', () => {
               role: roles.BACKER
             }
           });
-          await utils.waitForCondition(() => emailSendMessageSpy.callCount > 0);
+          await utils.waitForCondition(() => emailSendMessageSpy.callCount > 1);
           expect(members).to.have.length(1);
 
           // Make sure we send the collective.member.created email notification to core contributor of collective1
-          expect(emailSendMessageSpy.callCount).to.equal(1);
-          expect(emailSendMessageSpy.firstCall.args[0]).to.equal("user1@opencollective.com");
-          expect(emailSendMessageSpy.firstCall.args[1]).to.equal("Google joined Scouts d'Arlon as backer");
-          expect(emailSendMessageSpy.firstCall.args[2]).to.contain("Looking forward!"); // publicMessage
-          expect(emailSendMessageSpy.firstCall.args[2]).to.contain("@google thanks for your donation to @scouts");
+          expect(emailSendMessageSpy.callCount).to.equal(2);
+          // utils.inspectSpy(emailSendMessageSpy, 2);
+          expect(emailSendMessageSpy.firstCall.args[0]).to.equal("user2@opencollective.com");
+          expect(emailSendMessageSpy.firstCall.args[1]).to.equal("Welcome to Open Collective 🙌");
+          expect(emailSendMessageSpy.secondCall.args[0]).to.equal("user1@opencollective.com");
+          expect(emailSendMessageSpy.secondCall.args[1]).to.equal("Google joined Scouts d'Arlon as backer");
+          expect(emailSendMessageSpy.secondCall.args[2]).to.contain("Looking forward!"); // publicMessage
+          expect(emailSendMessageSpy.secondCall.args[2]).to.contain("@google thanks for your donation to @scouts");
         });
 
         it('as an existing organization', async () => {
