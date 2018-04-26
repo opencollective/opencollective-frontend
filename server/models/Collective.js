@@ -1269,6 +1269,16 @@ export default function(Sequelize, DataTypes) {
           MemberCollectiveId: adminUser.CollectiveId,
           role: roles.ADMIN
         });
+      })
+      .tap(collective => {
+        models.Activity.create({
+          type: activities.ORGANIZATION_COLLECTIVE_CREATED,
+          UserId: adminUser.id,
+          CollectiveId: collective.id,
+          data: {
+            collective: pick(collective, ['name', 'slug'])
+          }
+        })
       });
   };
 

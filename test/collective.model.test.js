@@ -1,6 +1,8 @@
 import {expect} from 'chai';
 import models from '../server/models';
 import * as utils from '../test/utils';
+import sinon from 'sinon';
+import emailLib from '../server/lib/email';
 
 const {
   Transaction,
@@ -11,6 +13,7 @@ const {
 describe('Collective model', () => {
 
   let collective = {}, opensourceCollective, user1, user2, host;
+  let sandbox, sendEmailSpy;
 
   const collectiveData = {
     slug: 'tipbox',
@@ -90,6 +93,13 @@ describe('Collective model', () => {
   }];
 
 
+  before(() => {
+    sandbox = sinon.sandbox.create();
+    sendEmailSpy = sandbox.spy(emailLib, 'sendMessage');
+  });
+
+  after(() => sandbox.restore());
+
   before(() => utils.resetTestDB());
 
   before(() => User.createUserWithCollective(users[0])
@@ -150,6 +160,17 @@ describe('Collective model', () => {
         done();
       })
     })
+  });
+
+  it("creates an organization with an admin user", async () => {
+    models.Collective.createOrganization({
+      name: "Coinbase"
+    }, user1)
+    await utils.waitForCondition(() => sendEmailSpy.callCount > 0);
+    // utils.inspectSpy(sendEmailSpy, 3);
+    expect(sendEmailSpy.firstCall.args[0]).to.equal(user1.email);
+    expect(sendEmailSpy.firstCall.args[1]).to.equal("Welcome to Open Collective 🙌");
+    expect(sendEmailSpy.firstCall.args[2]).to.contain("Discover");
   });
 
   it('creates a user and populates avatar image', (done) => {

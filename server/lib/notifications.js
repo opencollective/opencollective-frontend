@@ -146,6 +146,10 @@ async function notifyByEmail(activity) {
   debugLib("activity.data")("activity.data", activity.data);
   switch (activity.type) {
 
+    case activityType.ORGANIZATION_COLLECTIVE_CREATED:
+      notifyUserId(activity.UserId, activity);
+      break;
+
     case activityType.COLLECTIVE_UPDATE_PUBLISHED:
       twitter.tweetActivity(activity);
       activity.data.update = await models.Update.findById(activity.data.update.id, {
@@ -190,8 +194,8 @@ async function notifyByEmail(activity) {
           notifyAdminsOfCollective(activity.CollectiveId, activity, { exclude: [activity.UserId] });
         }
       } else {
-        // if the comment was sent by one of the admins of the collective or the host, we notify the author of the expense
-        activity.data.isAuthor = true;
+        // if the comment was sent by one of the admins of the collective or the host, we just notify the author of the expense
+        activity.data.recipientIsAuthor = true;
         notifyUserId(activity.data.UserId, activity);
       }
       // notify the author of the expense (unless it's their own comment)
