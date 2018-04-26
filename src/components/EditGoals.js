@@ -21,7 +21,9 @@ class EditGoals extends React.Component {
     const { intl } = props;
 
     this.defaultType = 'yearlyBudget';
-    this.state = { goals: [...props.goals || {}] };
+    this.state = { goals: [...(props.goals || []).map(g => {
+      return { ...g };
+    }) ] };
     this.renderGoal = this.renderGoal.bind(this);
     this.addGoal = this.addGoal.bind(this);
     this.removeGoal = this.removeGoal.bind(this);
@@ -83,9 +85,9 @@ class EditGoals extends React.Component {
     this.onChange({ goals });
   }
 
-  addGoal(goal) {
+  addGoal() {
     const goals = this.state.goals;
-    goals.push(goal || {});
+    goals.push({});
     this.setState({goals});
   }
 
@@ -105,8 +107,11 @@ class EditGoals extends React.Component {
       type: goal.type || this.defaultType
     }
 
+    // We need to assing a key to the goal otherwise we can't properly remove one, same issue as #996
+    goal.key = goal.key || Math.round(Math.random() * 100000);
+
     return (
-      <div className={`goal ${goal.slug}`} key={`goal-${index}`}>
+      <div className={`goal ${goal.slug}`} key={`goal-${index}-${goal.key}`}>
         <div className="goalActions">
           <a className="removeGoal" href="#" onClick={() => this.removeGoal(index)}>{intl.formatMessage(this.messages[`goal.remove`])}</a>
         </div>
@@ -161,7 +166,7 @@ class EditGoals extends React.Component {
           {this.state.goals.map(this.renderGoal)}
         </div>
         <div className="editGoalsActions">
-          <Button className="addGoal" bsStyle="primary" onClick={() => this.addGoal({})}>{intl.formatMessage(this.messages[`goal.add`])}</Button>
+          <Button className="addGoal" bsStyle="primary" onClick={() => this.addGoal()}>{intl.formatMessage(this.messages[`goal.add`])}</Button>
         </div>
 
       </div>

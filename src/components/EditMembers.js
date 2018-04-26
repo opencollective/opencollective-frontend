@@ -112,7 +112,7 @@ class EditMembers extends React.Component {
     const { intl } = this.props;
 
     return (
-      <div className="member" key={`member-${index}`}>
+      <div className="member" key={`member-${index}-${member.id}`}>
         <div className="memberActions">
           <a className="removeMember" href="#" onClick={() => this.removeMember(index)}>{intl.formatMessage(this.messages[`members.remove`])}</a>
         </div>
