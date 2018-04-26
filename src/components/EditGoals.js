@@ -6,6 +6,7 @@ import { defineMessages, injectIntl } from 'react-intl';
 
 import InputField from '../components/InputField';
 import { getCurrencySymbol } from '../lib/utils';
+import { cloneDeep } from 'lodash';
 
 class EditGoals extends React.Component {
 
@@ -21,9 +22,7 @@ class EditGoals extends React.Component {
     const { intl } = props;
 
     this.defaultType = 'yearlyBudget';
-    this.state = { goals: [...(props.goals || []).map(g => {
-      return { ...g };
-    }) ] };
+    this.state = { goals: cloneDeep(props.goals) };
     this.renderGoal = this.renderGoal.bind(this);
     this.addGoal = this.addGoal.bind(this);
     this.removeGoal = this.removeGoal.bind(this);
@@ -94,7 +93,7 @@ class EditGoals extends React.Component {
   removeGoal(index) {
     let goals = this.state.goals;
     if (index < 0 || index > goals.length) return;
-    goals = [...goals.slice(0, index), ...goals.slice(index+1)];
+    goals.splice(index, 1);
     this.setState({goals});
     this.onChange({goals});
   }
@@ -107,7 +106,7 @@ class EditGoals extends React.Component {
       type: goal.type || this.defaultType
     }
 
-    // We need to assing a key to the goal otherwise we can't properly remove one, same issue as #996
+    // We need to assign a key to the goal otherwise we can't properly remove one, same issue as #996
     goal.key = goal.key || Math.round(Math.random() * 100000);
 
     return (
