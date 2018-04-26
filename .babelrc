@@ -4,7 +4,6 @@
     "stage-0",
     ["next/babel", {
       "styled-jsx": {
-        "optimizeForSpeed": true,
         "plugins": [
           "styled-jsx-plugin-postcss"
         ]
@@ -12,22 +11,6 @@
     }]
   ],
   "plugins": [
-    "transform-css-import-to-string",
-    ["module-resolver", {
-      "root": ["."],
-      "alias": {
-        "styles": "./src/styles",
-        "markdown": "./src/markdown"
-      },
-      "cwd": "babelrc"
-    }],
-    "markdown-in-js/babel",
-    [
-      "wrap-in-js",
-      {
-        "extensions": ["css$", "scss$", "md$"]
-      }
-    ],
     ["react-intl", {
       "messagesDir": "./build/messages/"
     }]
