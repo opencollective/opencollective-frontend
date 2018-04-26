@@ -55,6 +55,12 @@ data['github.signup'] = {
     slug: "webpack"
   }
 };
+data['organization.collective.created'] = {
+  collective: {
+    slug: "coinbase",
+    name: "Coinbase"
+  }
+}
 data['collective.update.published'] = {
   collective: {
     id: 207,

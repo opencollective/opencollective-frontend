@@ -19,6 +19,7 @@ export default {
   COLLECTIVE_UPDATE_CREATED: 'collective.update.created',
   COLLECTIVE_UPDATE_PUBLISHED: 'collective.update.published',
   COLLECTIVE_USER_ADDED: 'collective.user.added',
+  ORGANIZATION_COLLECTIVE_CREATED: 'organization.collective.created',
   SUBSCRIPTION_CONFIRMED: 'subscription.confirmed',
   SUBSCRIPTION_CANCELED: 'subscription.canceled',
   USER_CREATED: 'user.created',
