@@ -598,7 +598,6 @@ export function promiseSeq(arr, predicate, consecutive =100) {
   return chunkArray(arr, consecutive).reduce(( prom, items, ix ) => {
     // wait for the previous Promise.all() to resolve
     return prom.then(() => {
-      console.log("processing batch", ix);
       return Promise.all(
         // then we build up the next set of simultaneous promises
         items.map((item) => predicate(item, ix))
