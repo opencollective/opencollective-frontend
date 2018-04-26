@@ -76,5 +76,10 @@
   },
   "expressperf": {
     "api_key": ""
+  },
+  "algolia": {
+    "appId": "xxxxx",
+    "appKey": "xxxxx",
+    "index": "dvl_collectives"
   }
 }

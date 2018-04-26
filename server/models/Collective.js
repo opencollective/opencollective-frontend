@@ -325,7 +325,22 @@ export default function(Sequelize, DataTypes) {
           description: this.description,
           previewImage: this.previewImage
         }
-      }
+      },
+      searchIndex() {
+        return {
+          id: this.id,
+          name: this.name,
+          description: this.description,
+          currency: this.currency,
+          slug: this.slug,
+          mission: this.mission,
+          tags: this.tags,
+          locationName: this.locationName,
+          balance: this.balance, // useful in ranking
+          yearlyBudget: this.yearlyBudget,
+          backersCount: this.backersCount
+        }
+      },
     },
 
     hooks: {

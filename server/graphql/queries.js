@@ -1,4 +1,8 @@
+import algoliasearch from 'algoliasearch';
+import config from 'config';
 import Promise from 'bluebird';
+import { Op } from 'sequelize';
+
 import errors from '../lib/errors';
 
 import {
@@ -31,6 +35,12 @@ import { get, uniq } from 'lodash';
 import models, { sequelize } from '../models';
 import rawQueries from '../lib/queries';
 import { fetchCollectiveId } from '../lib/cache';
+
+const {
+  appId: ALGOLIA_APP_ID,
+  appKey: ALGOLIA_KEY,
+  index: ALGOLIA_INDEX,
+} = config.algolia;
 
 const queries = {
   Collective: {
@@ -660,6 +670,50 @@ const queries = {
           },
           archivedAt: null // archived PMs are assumed to be used or inactive
         }
+      });
+    }
+  },
+
+  /*
+   * Given a search term, return a list of related Collectives
+   */
+  search: {
+    type: new GraphQLList(CollectiveInterfaceType),
+    args: {
+      term: {
+        type: GraphQLString,
+        description: "Fetch collectives related to this term based on name, description, tags, slug, mission, and location",
+      },
+      limit: {
+        type: GraphQLInt,
+        description: "Limit the amount of results. Defaults to 10",
+        defaultValue: 10,
+      },
+      offset: {
+        type: GraphQLInt,
+        defaultValue: 0,
+      },
+    },
+    async resolve(_, args) {
+      const {
+        limit,
+        offset,
+        term,
+      } = args;
+      const client = algoliasearch(ALGOLIA_APP_ID, ALGOLIA_KEY);
+      const index = client.initIndex(ALGOLIA_INDEX);
+
+      const { hits } = await index.search({
+        query: term,
+        length: limit,
+        offset,
+      });
+      return models.Collective.findAll({
+        where: {
+          id: {
+            [Op.in]: hits.map(({ id }) => id),
+          }
+        },
       });
     }
   }
