@@ -101,9 +101,9 @@ class EditMembers extends React.Component {
   }
 
   removeMember(index) {
-    let members = this.state.members;
+    const members = this.state.members;
     if (index < 0 || index > members.length) return;
-    members = [...members.slice(0, index), ...members.slice(index+1)];
+    members.splice(index, 1);
     this.setState({members});
     this.onChange({members});
   }
@@ -112,7 +112,7 @@ class EditMembers extends React.Component {
     const { intl } = this.props;
 
     return (
-      <div className="member" key={`member-${index}`}>
+      <div className="member" key={`member-${index}-${member.id}`}>
         <div className="memberActions">
           <a className="removeMember" href="#" onClick={() => this.removeMember(index)}>{intl.formatMessage(this.messages[`members.remove`])}</a>
         </div>
