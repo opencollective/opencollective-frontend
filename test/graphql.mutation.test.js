@@ -579,7 +579,7 @@ describe('Mutation Tests', () => {
           }
         `;
 
-        it.only('as a new organization', async () => {
+        it('as a new organization', async () => {
 
           const order = {
             user: { email: user2.email },
