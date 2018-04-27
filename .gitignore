@@ -8,3 +8,4 @@ yarn.lock
 .vscode/*
 build
 cypress/screenshots
+*.swp
