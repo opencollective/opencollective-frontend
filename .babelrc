@@ -1,34 +1,18 @@
 {
   "presets": [
-    "es2015",
+    "env",
     "stage-0",
     ["next/babel", {
-      "styled-jsx": { "optimizeForSpeed": true }
-    }],
-    "react"
+      "styled-jsx": {
+        "plugins": [
+          "styled-jsx-plugin-postcss"
+        ]
+      }
+    }]
   ],
   "plugins": [
-    "transform-css-import-to-string",
-    [
-      "styled-jsx/babel", { "plugins": ["styled-jsx-plugin-postcss"] }
-    ],
-    ["module-resolver", {
-      "root": ["."],
-      "alias": {
-        "styles": "./src/styles",
-        "markdown": "./src/markdown"
-      },
-      "cwd": "babelrc"
-    }],
-    "markdown-in-js/babel",
-    [
-      "wrap-in-js",
-      {
-        "extensions": ["css$", "scss$", "md$"]
-      }
-    ],
     ["react-intl", {
-        "messagesDir": "./build/messages/"
+      "messagesDir": "./build/messages/"
     }]
   ]
 }
