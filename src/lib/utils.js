@@ -194,7 +194,7 @@ export const pluralize = (str, n) => {
 }
 
 export const translateApiUrl = (url) => {
-  const withoutParams = process.env.API_URL + (url.replace('/api/', '/'));
+  const withoutParams = (process.env.INTERNAL_API_URL || process.env.API_URL) + (url.replace('/api/', '/'));
   const hasParams = `${url}`.match(/\?/)
   if (process.env.API_KEY) {
     return `${withoutParams}${hasParams ? '&' : '?'}api_key=${process.env.API_KEY}`;
