@@ -4,13 +4,11 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import morgan from 'morgan';
 import multer from 'multer';
-import path from 'path';
 import errorHandler from 'errorhandler';
 import passport from 'passport';
 import connectSessionSequelize from 'connect-session-sequelize';
 import session from 'express-session';
 import helmet from 'helmet';
-import Liana from 'forest-express-sequelize';
 import { Strategy as GitHubStrategy } from 'passport-github';
 import { Strategy as TwitterStrategy } from 'passport-twitter';
 import { Strategy as MeetupStrategy } from 'passport-meetup-oauth2';
@@ -19,6 +17,7 @@ import { middleware } from '../graphql/loaders';
 import debug from 'debug';
 import lruCache from '../middleware/lru_cache';
 import { sanitizeForLogs } from '../lib/utils';
+import forest from './forest';
 
 const SequelizeStore = connectSessionSequelize(session.Store);
 
@@ -77,20 +76,13 @@ export default function(app) {
 
   app.use(multer());
 
-  if (process.env.FOREST_ENV_SECRET && process.env.FOREST_AUTH_SECRET) {
-    app.use(Liana.init({
-      modelsDir: path.resolve(__dirname, '../models'),
-      configDir: path.resolve(__dirname, '../forest'),
-      envSecret: process.env.FOREST_ENV_SECRET,
-      authSecret: process.env.FOREST_AUTH_SECRET,
-      sequelize: db,
-    }));
-  }
-
   // Error handling.
   if (process.env.NODE_ENV !== 'production' && process.env.NODE_ENV !== 'staging') {
     app.use(errorHandler());
   }
+
+  // Forest
+  forest(app);
 
   // Authentication
 
