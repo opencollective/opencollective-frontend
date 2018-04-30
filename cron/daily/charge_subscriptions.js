@@ -67,7 +67,20 @@ async function run(options) {
     });
   } else {
     vprint(options, 'Not generating CSV file');
+    if (!options.dryRun) await emailReportNoCharges(start);
   }
+}
+
+/** Send an email with a message just notifying that there were no
+    subscriptions to charge. */
+
+async function emailReportNoCharges(start) {
+  // Time we spent running the whole script
+  const now = new Date, end = now - start;
+  // Build & send message
+  const text = `No subscriptions pending charges found\n\nTotal time taken: ${end}ms`;
+  const subject = `Ø Daily Subscription Report - ${now.toLocaleDateString()}`;
+  return emailLib.sendMessage(REPORT_EMAIL, subject, '', { text });
 }
 
 /** Send an email with details of the subscriptions processed */
