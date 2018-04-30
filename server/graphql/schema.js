@@ -5,6 +5,7 @@ import {
 
 import {
   CollectiveInterfaceType,
+  CollectiveSearchResultsType,
   CollectiveType,
   CollectiveStatsType,
   UserCollectiveType,
@@ -40,6 +41,7 @@ const Mutation = new GraphQLObjectType({
 const Schema = new GraphQLSchema({
   types: [
     CollectiveInterfaceType,
+    CollectiveSearchResultsType,
     CollectiveType,
     CollectiveStatsType,
     UserCollectiveType,

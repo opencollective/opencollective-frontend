@@ -14,7 +14,8 @@ import {
 } from 'graphql';
 
 import {
-  CollectiveInterfaceType
+  CollectiveInterfaceType,
+  CollectiveSearchResultsType,
 } from './CollectiveInterface';
 
 import {
@@ -678,7 +679,7 @@ const queries = {
    * Given a search term, return a list of related Collectives
    */
   search: {
-    type: new GraphQLList(CollectiveInterfaceType),
+    type: CollectiveSearchResultsType,
     args: {
       term: {
         type: GraphQLString,
@@ -686,8 +687,8 @@ const queries = {
       },
       limit: {
         type: GraphQLInt,
-        description: "Limit the amount of results. Defaults to 10",
-        defaultValue: 10,
+        description: "Limit the amount of results. Defaults to 20",
+        defaultValue: 20,
       },
       offset: {
         type: GraphQLInt,
@@ -703,18 +704,24 @@ const queries = {
       const client = algoliasearch(ALGOLIA_APP_ID, ALGOLIA_KEY);
       const index = client.initIndex(ALGOLIA_INDEX);
 
-      const { hits } = await index.search({
+      const { hits, nbHits: total } = await index.search({
         query: term,
         length: limit,
         offset,
       });
-      return models.Collective.findAll({
+      const collectives = await models.Collective.findAll({
         where: {
           id: {
             [Op.in]: hits.map(({ id }) => id),
           }
         },
       });
+      return {
+        collectives,
+        limit,
+        offset,
+        total,
+      };
     }
   }
 }
