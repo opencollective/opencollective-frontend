@@ -161,14 +161,39 @@ with conversions as (select
     CASE
         WHEN (fc.type ilike 'organization') THEN 1
         ELSE 0
-    END as "isOrg"
+    END as "isOrg",
+
+    /** isNotRefund: The transaction isn't either a refund or
+        refunded. */
+    CASE
+        WHEN (t."RefundTransactionId" IS NULL) THEN 1
+        ELSE 0
+    END as isNotRefund,
+    /** hasBeenRefunded: A refunded transaction represents the
+        original donation from User to Collective */
+    CASE
+        WHEN (t."RefundTransactionId" IS NOT NULL AND
+              t."data"->'refund' IS NULL AND
+              t.type = 'CREDIT')
+        THEN 1
+        ELSE 0
+    END as hasBeenRefunded,
+    /** isRefund: A refund is true when the transaction represents
+        moving funds from Collective to User after a refund. */
+    CASE
+        WHEN (t."RefundTransactionId" IS NOT NULL AND
+              t."data"->'refund' IS NOT NULL AND
+              t."type" = 'DEBIT')
+        THEN 1
+        ELSE 0
+    END as isRefund
 
     FROM "Transactions" t
     LEFT JOIN "Orders" d on t."OrderId" = d.id
     LEFT JOIN "Subscriptions" s on d."SubscriptionId" = s.id
     LEFT JOIN "Collectives" fc on t."FromCollectiveId" = fc.id
     WHERE
-        t."deletedAt" IS NULL AND t."RefundTransactionId" IS NULL AND
+        t."deletedAt" IS NULL AND
         t."createdAt" BETWEEN '2016/01/01' AND '2020/01/01' AND
         d."deletedAt" IS NULL AND
         s."deletedAt" IS NULL)
@@ -179,65 +204,68 @@ SELECT
     to_char("givenMonth", 'YYYY-mm') as "month",
 
     /* donations */
-    (SUM("amountInUSD" * recurringMonthlyTotal +
-        "amountInUSD" * recurringAnnuallyTotal +
-        "amountInUSD" * oneTimeDonations +
-        "amountInUSD" * addedFunds)/100)::DECIMAL(10,0)::money
+    (SUM("amountInUSD" * recurringMonthlyTotal * (isNotRefund + isRefund) +
+         "amountInUSD" * recurringAnnuallyTotal * (isNotRefund + isRefund) +
+         "amountInUSD" * oneTimeDonations * (isNotRefund + isRefund) +
+         "amountInUSD" * addedFunds) / 100)::DECIMAL(10, 0)::money
         AS "totalMoneyBroughtIntoPlatformInUSD",
 
-    (SUM("amountInUSD" * recurringMonthlyTotal +
-        "amountInUSD" * recurringAnnuallyTotal +
-        "amountInUSD" * oneTimeDonations)/100)::DECIMAL(10,0)::money
+    (SUM("amountInUSD" * recurringMonthlyTotal * (isNotRefund + isRefund) +
+         "amountInUSD" * recurringAnnuallyTotal * (isNotRefund + isRefund) +
+         "amountInUSD" * oneTimeDonations * (isNotRefund + isRefund)) / 100)::DECIMAL(10, 0)::money
         AS "totalDonationsMadeOnPlatformInUSD",
+
+    (SUM("amountInUSD" * isRefund / 100))::DECIMAL(10, 0)::money
+        AS "refundTransactions",
 
     (SUM("platformFeeInUSD")/-100)::DECIMAL(10,0)::money AS "OCFeeInUSD",
 
     /* monthly donations */
 
       /* total donations */
-      (SUM("amountInUSD" * recurringMonthlyTotal)/100)::DECIMAL(10,0)::money AS "recurringMonthlyTotalDonationsInUSD",
-      (SUM("amountInUSD" * recurringMonthlyTotal * "isUser")/100)::DECIMAL(10,0)::money AS "recurringMonthlyTotalDonationsFromUsersInUSD",
-      (SUM("amountInUSD" * recurringMonthlyTotal * "isOrg")/100)::DECIMAL(10,0)::money AS "recurringMonthlyTotalDonationsFromOrgsInUSD",
+      (SUM("amountInUSD" * recurringMonthlyTotal * (isNotRefund + isRefund))/100)::DECIMAL(10,0)::money AS "recurringMonthlyTotalDonationsInUSD",
+      (SUM("amountInUSD" * recurringMonthlyTotal * (isNotRefund + isRefund) * "isUser")/100)::DECIMAL(10,0)::money AS "recurringMonthlyTotalDonationsFromUsersInUSD",
+      (SUM("amountInUSD" * recurringMonthlyTotal * (isNotRefund + isRefund) * "isOrg")/100)::DECIMAL(10,0)::money AS "recurringMonthlyTotalDonationsFromOrgsInUSD",
 
       /* old donations */
-      (SUM("amountInUSD" * recurringMonthlyOld)/100)::DECIMAL(10,0)::money AS "recurringMonthlyOldDonationsInUSD",
-      (SUM("amountInUSD" * recurringMonthlyOld * "isUser")/100)::DECIMAL(10,0)::money AS "recurringMonthlyOldDonationsFromUsersInUSD",
-      (SUM("amountInUSD" * recurringMonthlyOld * "isOrg")/100)::DECIMAL(10,0)::money AS "recurringMonthlyOldDonationsFromOrgsInUSD",
+      (SUM("amountInUSD" * recurringMonthlyOld * (isNotRefund + isRefund))/100)::DECIMAL(10,0)::money AS "recurringMonthlyOldDonationsInUSD",
+      (SUM("amountInUSD" * recurringMonthlyOld * (isNotRefund + isRefund) * "isUser")/100)::DECIMAL(10,0)::money AS "recurringMonthlyOldDonationsFromUsersInUSD",
+      (SUM("amountInUSD" * recurringMonthlyOld * (isNotRefund + isRefund) * "isOrg")/100)::DECIMAL(10,0)::money AS "recurringMonthlyOldDonationsFromOrgsInUSD",
 
       /* new donations */
-      (SUM("amountInUSD" * recurringMonthlyNew)/100)::DECIMAL(10,0)::money AS "recurringMonthlyNewDonationsInUSD",
-      (SUM("amountInUSD" * recurringMonthlyNew * "isUser")/100)::DECIMAL(10,0)::money AS "recurringMonthlyNewDonationsFromUsersInUSD",
-      (SUM("amountInUSD" * recurringMonthlyNew * "isOrg")/100)::DECIMAL(10,0)::money AS "recurringMonthlyNewDonationsFromOrgsInUSD",
+      (SUM("amountInUSD" * recurringMonthlyNew * (isNotRefund + isRefund))/100)::DECIMAL(10,0)::money AS "recurringMonthlyNewDonationsInUSD",
+      (SUM("amountInUSD" * recurringMonthlyNew * (isNotRefund + isRefund) * "isUser")/100)::DECIMAL(10,0)::money AS "recurringMonthlyNewDonationsFromUsersInUSD",
+      (SUM("amountInUSD" * recurringMonthlyNew * (isNotRefund + isRefund) * "isOrg")/100)::DECIMAL(10,0)::money AS "recurringMonthlyNewDonationsFromOrgsInUSD",
 
     /* annual donations */
 
       /* total donations */
-      (SUM("amountInUSD" * recurringAnnuallyTotal)/100)::DECIMAL(10,0)::money AS "recurringAnnualDonationsInUSD",
-      (SUM("amountInUSD" * recurringAnnuallyTotal * "isUser")/100)::DECIMAL(10,0)::money AS "recurringAnnuallyTotalDonationsFromUsersInUSD",
-      (SUM("amountInUSD" * recurringAnnuallyTotal * "isOrg")/100)::DECIMAL(10,0)::money AS "recurringAnnuallyTotalDonationsFromOrgsInUSD",
+      (SUM("amountInUSD" * recurringAnnuallyTotal * (isNotRefund + isRefund))/100)::DECIMAL(10,0)::money AS "recurringAnnualDonationsInUSD",
+      (SUM("amountInUSD" * recurringAnnuallyTotal * (isNotRefund + isRefund) * "isUser")/100)::DECIMAL(10,0)::money AS "recurringAnnuallyTotalDonationsFromUsersInUSD",
+      (SUM("amountInUSD" * recurringAnnuallyTotal * (isNotRefund + isRefund) * "isOrg")/100)::DECIMAL(10,0)::money AS "recurringAnnuallyTotalDonationsFromOrgsInUSD",
 
       /* old donations */
-      (SUM("amountInUSD" * recurringAnnuallyOld)/100)::DECIMAL(10,0)::money AS "recurringAnnuallyOldDonationsInUSD",
-      (SUM("amountInUSD" * recurringAnnuallyOld * "isUser")/100)::DECIMAL(10,0)::money AS "recurringAnnuallyOldDonationsFromUsersInUSD",
-      (SUM("amountInUSD" * recurringAnnuallyOld * "isOrg")/100)::DECIMAL(10,0)::money AS "recurringAnnuallyOldDonationsFromOrgsInUSD",
+      (SUM("amountInUSD" * recurringAnnuallyOld * (isNotRefund + isRefund))/100)::DECIMAL(10,0)::money AS "recurringAnnuallyOldDonationsInUSD",
+      (SUM("amountInUSD" * recurringAnnuallyOld * (isNotRefund + isRefund) * "isUser")/100)::DECIMAL(10,0)::money AS "recurringAnnuallyOldDonationsFromUsersInUSD",
+      (SUM("amountInUSD" * recurringAnnuallyOld * (isNotRefund + isRefund) * "isOrg")/100)::DECIMAL(10,0)::money AS "recurringAnnuallyOldDonationsFromOrgsInUSD",
 
       /* new donations */
-      (SUM("amountInUSD" * recurringAnnuallyNew)/100)::DECIMAL(10,0)::money AS "recurringAnnuallyNewDonationsInUSD",
-      (SUM("amountInUSD" * recurringAnnuallyNew * "isUser")/100)::DECIMAL(10,0)::money AS "recurringAnnuallyNewDonationsFromUsersInUSD",
-      (SUM("amountInUSD" * recurringAnnuallyNew * "isOrg")/100)::DECIMAL(10,0)::money AS "recurringAnnuallyNewDonationsFromOrgsInUSD",
+      (SUM("amountInUSD" * recurringAnnuallyNew * (isNotRefund + isRefund))/100)::DECIMAL(10,0)::money AS "recurringAnnuallyNewDonationsInUSD",
+      (SUM("amountInUSD" * recurringAnnuallyNew * (isNotRefund + isRefund) * "isUser")/100)::DECIMAL(10,0)::money AS "recurringAnnuallyNewDonationsFromUsersInUSD",
+      (SUM("amountInUSD" * recurringAnnuallyNew * (isNotRefund + isRefund) * "isOrg")/100)::DECIMAL(10,0)::money AS "recurringAnnuallyNewDonationsFromOrgsInUSD",
 
     /* one-time donations */
-    (SUM("amountInUSD" * oneTimeDonations)/100)::DECIMAL(10,0)::money AS "oneTimeDonationsInUSD",
-    (SUM("amountInUSD" * oneTimeDonations * "isUser")/100)::DECIMAL(10,0)::money AS "oneTimeDonationsFromUsersInUSD",
-    (SUM("amountInUSD" * oneTimeDonations * "isOrg")/100)::DECIMAL(10,0)::money AS "oneTimeDonationsFromOrgsInUSD",
+    (SUM("amountInUSD" * oneTimeDonations * (isNotRefund + isRefund))/100)::DECIMAL(10,0)::money AS "oneTimeDonationsInUSD",
+    (SUM("amountInUSD" * oneTimeDonations * (isNotRefund + isRefund) * "isUser")/100)::DECIMAL(10,0)::money AS "oneTimeDonationsFromUsersInUSD",
+    (SUM("amountInUSD" * oneTimeDonations * (isNotRefund + isRefund) * "isOrg")/100)::DECIMAL(10,0)::money AS "oneTimeDonationsFromOrgsInUSD",
 
     /* added funds */
-    (SUM("amountInUSD" * addedFunds)/100):: DECIMAL(10,0)::money AS "addedFundsInUSD",
+    (SUM("amountInUSD" * addedFunds * (isNotRefund + isRefund))/100):: DECIMAL(10,0)::money AS "addedFundsInUSD",
 
     /* expenses */
-    (SUM("amountInUSD" * totalExpensesRecorded)/100)::DECIMAL(10,0)::money AS "expensesPaidInUSD",
-    (SUM("amountInUSD" * manualExpenses)/100)::DECIMAL(10,0)::money AS "manualExpensesInUSD",
-    (SUM("amountInUSD" * paypalExpenses)/100)::DECIMAL(10,0)::money AS "paypalExpensesInUSD",
+    (SUM("amountInUSD" * totalExpensesRecorded * (isNotRefund + isRefund))/100)::DECIMAL(10,0)::money AS "expensesPaidInUSD",
+    (SUM("amountInUSD" * manualExpenses * (isNotRefund + isRefund))/100)::DECIMAL(10,0)::money AS "manualExpensesInUSD",
+    (SUM("amountInUSD" * paypalExpenses * (isNotRefund + isRefund))/100)::DECIMAL(10,0)::money AS "paypalExpensesInUSD",
 
     /* counts of transactions */
     COUNT(*)/2 AS "numTransactions",
@@ -245,35 +273,35 @@ SELECT
     SUM(recurringMonthlyTotal + recurringAnnuallyTotal + oneTimeDonations) AS "numDonationMadeOnPlatformEntries",
 
     /* monthly */
-    SUM(recurringMonthlyTotal) as "numRecurringMonthlyTotalDonations",
-    SUM(recurringMonthlyTotal * "isUser") as "numRecurringMonthlyTotalDonationsFromUsers",
-    SUM(recurringMonthlyTotal * "isOrg") as "numRecurringMonthlyTotalDonationsFromOrgs",
+    SUM(recurringMonthlyTotal * (isNotRefund + isRefund)) as "numRecurringMonthlyTotalDonations",
+    SUM(recurringMonthlyTotal * (isNotRefund + isRefund) * "isUser") as "numRecurringMonthlyTotalDonationsFromUsers",
+    SUM(recurringMonthlyTotal * (isNotRefund + isRefund) * "isOrg") as "numRecurringMonthlyTotalDonationsFromOrgs",
 
-    SUM(recurringMonthlyOld) as "numRecurringMonthlyOldDonations",
-    SUM(recurringMonthlyOld * "isUser") as "numRecurringMonthlyOldDonationsFromUsers",
-    SUM(recurringMonthlyOld * "isOrg") as "numRecurringMonthlyOldDonationsFromOrgs",
+    SUM(recurringMonthlyOld * (isNotRefund + isRefund)) as "numRecurringMonthlyOldDonations",
+    SUM(recurringMonthlyOld * (isNotRefund + isRefund) * "isUser") as "numRecurringMonthlyOldDonationsFromUsers",
+    SUM(recurringMonthlyOld * (isNotRefund + isRefund) * "isOrg") as "numRecurringMonthlyOldDonationsFromOrgs",
 
-    SUM(recurringMonthlyNew) as "numRecurringMonthlyNewDonations",
-    SUM(recurringMonthlyNew * "isUser") as "numRecurringMonthlyNewDonationsFromUsers",
-    SUM(recurringMonthlyNew * "isOrg") as "numRecurringMonthlyNewDonationsFromOrgs",
+    SUM(recurringMonthlyNew * (isNotRefund + isRefund)) as "numRecurringMonthlyNewDonations",
+    SUM(recurringMonthlyNew * (isNotRefund + isRefund) * "isUser") as "numRecurringMonthlyNewDonationsFromUsers",
+    SUM(recurringMonthlyNew * (isNotRefund + isRefund) * "isOrg") as "numRecurringMonthlyNewDonationsFromOrgs",
 
     /* annually */
-    SUM(recurringAnnuallyTotal) as "numRecurringAnnualDonations",
-    SUM(recurringAnnuallyTotal * "isUser") as "numRecurringAnnuallyTotalDonationsFromUsers",
-    SUM(recurringAnnuallyTotal * "isOrg") as "numRecurringAnnuallyTotalDonationsFromOrgs",
+    SUM(recurringAnnuallyTotal * (isNotRefund + isRefund)) as "numRecurringAnnualDonations",
+    SUM(recurringAnnuallyTotal * (isNotRefund + isRefund) * "isUser") as "numRecurringAnnuallyTotalDonationsFromUsers",
+    SUM(recurringAnnuallyTotal * (isNotRefund + isRefund) * "isOrg") as "numRecurringAnnuallyTotalDonationsFromOrgs",
 
-    SUM(recurringAnnuallyOld) as "numRecurringAnnuallyOldDonations",
-    SUM(recurringAnnuallyOld * "isUser") as "numRecurringAnnuallyOldDonationsFromUsers",
-    SUM(recurringAnnuallyOld * "isOrg") as "numRecurringAnnuallyOldDonationsFromOrgs",
+    SUM(recurringAnnuallyOld * isNotRefund) as "numRecurringAnnuallyOldDonations",
+    SUM(recurringAnnuallyOld * isNotRefund * "isUser") as "numRecurringAnnuallyOldDonationsFromUsers",
+    SUM(recurringAnnuallyOld * isNotRefund * "isOrg") as "numRecurringAnnuallyOldDonationsFromOrgs",
 
-    SUM(recurringAnnuallyNew) as "numRecurringAnnuallyNewDonations",
-    SUM(recurringAnnuallyNew * "isUser") as "numRecurringAnnuallyNewDonationsFromUsers",
-    SUM(recurringAnnuallyNew * "isOrg") as "numRecurringAnnuallyNewDonationsFromOrgs",
+    SUM(recurringAnnuallyNew * (isNotRefund + isRefund)) as "numRecurringAnnuallyNewDonations",
+    SUM(recurringAnnuallyNew * (isNotRefund + isRefund) * "isUser") as "numRecurringAnnuallyNewDonationsFromUsers",
+    SUM(recurringAnnuallyNew * (isNotRefund + isRefund) * "isOrg") as "numRecurringAnnuallyNewDonationsFromOrgs",
 
         /* one-time */
-        SUM(oneTimeDonations) as "numOneTimeDonations",
-        SUM(oneTimeDonations * "isUser") as "numOneTimeDonationsFromUsers",
-        SUM(oneTimeDonations * "isOrg") as "numOneTimeDonationsFromOrgs",
+        SUM(oneTimeDonations * (isNotRefund + isRefund)) as "numOneTimeDonations",
+        SUM(oneTimeDonations * (isNotRefund + isRefund) * "isUser") as "numOneTimeDonationsFromUsers",
+        SUM(oneTimeDonations * (isNotRefund + isRefund) * "isOrg") as "numOneTimeDonationsFromOrgs",
 
     SUM(addedFunds) as "numAddedFunds",
     SUM(totalExpensesRecorded) as "numExpensesPaid"

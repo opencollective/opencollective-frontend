@@ -17,6 +17,9 @@ where
 	((t."OrderId" IS NOT NULL AND t.type LIKE 'CREDIT')
 	OR (t."ExpenseId" IS NOT NULL AND t.type LIKE 'DEBIT'))
 	AND c.type ilike 'organization'
+    AND ((t."RefundTransactionId" IS NOT NULL AND
+          t."data"->'refund' IS NULL AND
+          t.type = 'CREDIT') OR t."RefundTransactionId" IS NULL)
 
 group by c.slug, "month"
 order by c.slug
