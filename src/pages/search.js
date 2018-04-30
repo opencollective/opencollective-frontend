@@ -8,6 +8,7 @@ import {
   Row,
 } from 'react-bootstrap';
 import Router from 'next/router';
+import classNames from 'classnames';
 
 import withData from '../lib/withData'
 import withIntl from '../lib/withIntl';
@@ -20,12 +21,17 @@ import ErrorPage from '../components/ErrorPage';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
 import LoadingGrid from '../components/LoadingGrid';
+import { Link } from '../server/pages';
 
 import colors from '../constants/colors';
 
 class SearchPage extends React.Component {
   static getInitialProps({ query = {} }) {
-    return { term: query.q };
+    return {
+      limit: query.limit || 20,
+      offset: query.offset || 0,
+      term: query.q,
+    };
   }
 
   refetch = (event) => {
@@ -40,6 +46,13 @@ class SearchPage extends React.Component {
 
   render() {
     const { data: { error, loading, search }, term } = this.props;
+
+    const {
+      collectives,
+      limit,
+      offset,
+      total,
+    } = search || {};
 
     if (error) {
       return <ErrorPage {...error} />;
@@ -89,6 +102,10 @@ class SearchPage extends React.Component {
             text-align: center;
             width: 100%;
           }
+
+          .pagination {
+            margin: 2rem auto;
+          }
         `}</style>
         <Header />
         <Body>
@@ -113,12 +130,31 @@ class SearchPage extends React.Component {
                 </div>
               )}
               { /* TODO: add suggested collectives when the result is empty */ } 
-              {!!search && !loading && search.map(collective => (
-                <Col className="col">
+              {!!collectives && !loading && collectives.map(collective => (
+                <Col className="col" key={collective.slug}>
                   <CollectiveCard collective={collective} />
                 </Col>
               ))}
-              { /* TODO: add "See More" button to paginate results */ }
+            </Row>
+            <Row>
+              <ul className="pagination">
+                { Array(Math.ceil(total / limit)).fill(1).map((n, i) => (
+                  <li className={classNames({ active: (i * limit) === offset })}>
+                    <Link
+                      href={{
+                        query: {
+                          limit,
+                          offset: i * limit,
+                          q: term,
+                        }
+                      }}
+                      key={i * limit}
+                    >
+                      {`${n + i}`}
+                    </Link>
+                  </li>
+                )) }
+              </ul>
             </Row>
           </Grid>
         </Body>
