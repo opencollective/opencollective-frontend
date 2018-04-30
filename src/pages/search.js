@@ -97,7 +97,7 @@ class SearchPage extends React.Component {
             padding: 0;
           }
 
-          .loading {
+          .center {
             padding: 2rem 0;
             text-align: center;
             width: 100%;
@@ -125,16 +125,21 @@ class SearchPage extends React.Component {
             </Row>
             <Row className="results-row">
               { loading && (
-                <div className="loading">
+                <div className="center">
                   <LoadingGrid /> 
                 </div>
               )}
-              { /* TODO: add suggested collectives when the result is empty */ } 
+
               {!!collectives && !loading && collectives.map(collective => (
                 <Col className="col" key={collective.slug}>
                   <CollectiveCard collective={collective} />
                 </Col>
               ))}
+
+              { /* TODO: add suggested collectives when the result is empty */ } 
+              {!!collectives && collectives.length === 0 && (
+                <p className="center"><em>No collectives found matching your query: "{term}"</em></p>
+              )}
             </Row>
             <Row>
               <ul className="pagination">
