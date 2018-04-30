@@ -19,7 +19,7 @@ import CollectiveCard from '../components/CollectiveCard';
 import ErrorPage from '../components/ErrorPage';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
-import Loading from '../components/Loading';
+import LoadingGrid from '../components/LoadingGrid';
 
 import colors from '../constants/colors';
 
@@ -83,6 +83,12 @@ class SearchPage extends React.Component {
             font-family: lato;
             padding: 0;
           }
+
+          .loading {
+            padding: 2rem 0;
+            text-align: center;
+            width: 100%;
+          }
         `}</style>
         <Header />
         <Body>
@@ -101,8 +107,11 @@ class SearchPage extends React.Component {
               </Col>
             </Row>
             <Row className="results-row">
-              { /* TODO: add loading indicator for just this row */ }
-              { loading && <p>Loading...</p> }
+              { loading && (
+                <div className="loading">
+                  <LoadingGrid /> 
+                </div>
+              )}
               { /* TODO: add suggested collectives when the result is empty */ } 
               {!!search && !loading && search.map(collective => (
                 <Col className="col">
@@ -117,6 +126,6 @@ class SearchPage extends React.Component {
       </div>
     )
   }
-};
+}
 
 export default withData(addSearchQueryData(withIntl(SearchPage)));
