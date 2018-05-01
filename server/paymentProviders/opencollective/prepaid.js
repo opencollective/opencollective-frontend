@@ -4,9 +4,7 @@ import models from '../../models';
 import { type as TransactionTypes } from '../../constants/transactions';
 import roles from '../../constants/roles';
 import * as paymentsLib from '../../lib/payments';
-
-/** How much the platform charges per transaction: 5% */
-export const PLATFORM_FEE = 0.05
+import * as constants from '../../constants/transactions';
 
 export default {
   features: {
@@ -86,7 +84,7 @@ export default {
               order.totalAmount,
               order.collective.hostFeePercent);
             const platformFeeInHostCurrency = paymentsLib.calcFee(
-              order.totalAmount, PLATFORM_FEE);
+              order.totalAmount, constants.OC_FEE_PERCENT);
             const payload = {
               CreatedByUserId: user.id,
               FromCollectiveId: order.FromCollectiveId,
