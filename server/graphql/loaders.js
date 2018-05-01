@@ -151,7 +151,9 @@ export const loaders = (req) => {
       .then(accessibleOrgCollectiveIds => models.Collective.findAll({ attributes: ['id', 'CreatedByUserId'], where: { id: { $in: accessibleOrgCollectiveIds } }})).then(accessibleOrgCollectives => {
         const accessibleOrgCreators = {};
         accessibleOrgCollectives.map(c => {
-          accessibleOrgCreators[c.CreatedByUserId] = c.id;
+          if (c.CreatedByUserId) {
+            accessibleOrgCreators[c.CreatedByUserId] = c.id;
+          }
         })
         return accessibleOrgCreators;
       })
@@ -161,8 +163,12 @@ export const loaders = (req) => {
             u.dataValues.OrgCollectiveId = accessibleOrgCreators[u.id];
             return u;
           })
-          .then(results => sortResults(OrgCollectiveIds, results, 'OrgCollectiveId', {}))
       })
+      .catch(e => {
+        console.error(e);
+        return [];
+      })
+      .then(results => sortResults(OrgCollectiveIds, results, 'OrgCollectiveId', {}))
     ),
     tiers: {
       findById: new DataLoader(ids => models.Tier
