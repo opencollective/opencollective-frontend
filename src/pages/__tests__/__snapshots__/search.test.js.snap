@@ -1,0 +1,1293 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Search Page renders empty results message 1`] = `
+<div
+  className="jsx-3680710510"
+>
+  <header
+    className="jsx-963368174"
+  >
+    <div
+      className="jsx-963368174"
+      id="top"
+    />
+    <div
+      className="jsx-2106991174 loading TopBar"
+    >
+      <a
+        className="jsx-2106991174"
+        href="/"
+        title="Go to Open Collective Homepage"
+      >
+        <img
+          alt="Open Collective logo"
+          className="jsx-2106991174 logo"
+          height="40"
+          src="/static/images/opencollective-icon.svg"
+          width="40"
+        />
+      </a>
+      <div
+        className="jsx-2106991174 nav"
+      >
+        <ul
+          className="jsx-2106991174 mediumScreenOnly"
+        >
+          <li
+            className="jsx-2106991174"
+          >
+            <a
+              className="jsx-2106991174 menuItem"
+              href="/learn-more"
+            >
+              <span>
+                How it works
+              </span>
+            </a>
+          </li>
+          <li
+            className="jsx-2106991174"
+          >
+            <a
+              className="jsx-2106991174 menuItem"
+              href="/discover"
+            >
+              <span>
+                discover
+              </span>
+            </a>
+          </li>
+          <li
+            className="jsx-2106991174"
+          >
+            <a
+              className="jsx-2106991174 menuItem"
+              href="https://medium.com/open-collective"
+            >
+              <span>
+                Blog
+              </span>
+            </a>
+          </li>
+        </ul>
+        <div
+          className="jsx-2106991174 separator"
+        />
+        <div
+          className="jsx-2783800609 LoginTopBarProfileButton"
+        >
+          <div
+            className="jsx-2904874222 TopBarProfileMenu "
+            onClick={[Function]}
+          >
+            <div
+              className="jsx-2904874222 LoginTopBarProfileButton-name desktopOnly"
+            />
+            <div
+              className="jsx-2904874222 LoginTopBarProfileButton-caret"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+  <main
+    className="jsx-4138488456"
+  >
+    <div
+      className="container"
+    >
+      <div
+        className="row"
+      >
+        <div
+          className="col-xs-12"
+        >
+          <form
+            className="jsx-3680710510"
+            method="GET"
+            onSubmit={[Function]}
+          >
+            <div
+              className="form-group form-group-lg"
+            >
+              <label
+                className="h1 control-label"
+                htmlFor="search"
+              >
+                Search Open Collective
+              </label>
+              <div
+                className="jsx-3680710510 search-row"
+              >
+                <input
+                  className="search-input form-control"
+                  defaultValue="test"
+                  id="search"
+                  name="q"
+                  placeholder="Hoodie"
+                  type="search"
+                />
+                <button
+                  className="jsx-2820878800 jsx-219750138 Button blue"
+                  disabled={undefined}
+                  onClick={[Function]}
+                  style={
+                    Object {
+                      "padding": "0 2rem",
+                    }
+                  }
+                  type="submit"
+                >
+                  <span
+                    className="jsx-3680710510 fa fa-search"
+                  />
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+      <div
+        className="results-row row"
+      >
+        <p
+          className="jsx-3680710510 center"
+        >
+          <em
+            className="jsx-3680710510"
+          >
+            No collectives found matching your query: "
+            test
+            "
+          </em>
+        </p>
+      </div>
+    </div>
+  </main>
+  <div
+    className="jsx-568600484 Footer"
+  >
+    <div
+      className="jsx-568600484 content"
+    >
+      <div
+        className="jsx-568600484"
+      >
+        <object
+          className="jsx-568600484 logo"
+          data="/static/images/opencollectivelogo-footer.svg"
+          height="20"
+          type="image/svg+xml"
+        />
+      </div>
+      <div
+        className="jsx-568600484"
+      >
+        <nav
+          className="jsx-568600484"
+        >
+          <ul
+            className="jsx-568600484"
+          >
+            <li
+              className="jsx-568600484"
+            >
+              <a
+                className="jsx-568600484"
+                href="/learn-more"
+              >
+                How It Works
+              </a>
+            </li>
+            <li
+              className="jsx-568600484"
+            >
+              <a
+                className="jsx-568600484"
+                href="https://opencollective.com/#opensource"
+              >
+                Use Cases
+              </a>
+            </li>
+            <li
+              className="jsx-568600484"
+            >
+              <a
+                className="jsx-568600484"
+                href="https://opencollective.com/faq"
+              >
+                FAQ
+              </a>
+            </li>
+            <li
+              className="jsx-568600484"
+            >
+              <a
+                className="jsx-568600484"
+                href="https://forum.opencollective.com"
+              >
+                Forum
+              </a>
+            </li>
+            <li
+              className="jsx-568600484"
+            >
+              <a
+                className="jsx-568600484"
+                href="https://medium.com/open-collective"
+              >
+                Blog
+              </a>
+            </li>
+            <li
+              className="jsx-568600484"
+            >
+              <a
+                className={undefined}
+                href="/tos"
+                onClick={[Function]}
+                title={undefined}
+              >
+                Terms Of Service
+              </a>
+            </li>
+            <li
+              className="jsx-568600484"
+            >
+              <a
+                className="jsx-568600484"
+                href="https://opencollective.com/about"
+              >
+                About
+              </a>
+            </li>
+            <li
+              className="jsx-568600484"
+            >
+              <a
+                className="jsx-568600484"
+                href="mailto:info@opencollective.com"
+              >
+                Contact
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`Search Page renders error message 1`] = `
+<div
+  className="jsx-3855972673 Error"
+>
+  <header
+    className="jsx-963368174"
+  >
+    <div
+      className="jsx-963368174"
+      id="top"
+    />
+    <div
+      className="jsx-2106991174 TopBar"
+    >
+      <a
+        className="jsx-2106991174"
+        href="/"
+        title="Go to Open Collective Homepage"
+      >
+        <img
+          alt="Open Collective logo"
+          className="jsx-2106991174 logo"
+          height="40"
+          src="/static/images/opencollective-icon.svg"
+          width="40"
+        />
+      </a>
+      <div
+        className="jsx-2106991174 nav"
+      >
+        <ul
+          className="jsx-2106991174 mediumScreenOnly"
+        >
+          <li
+            className="jsx-2106991174"
+          >
+            <a
+              className="jsx-2106991174 menuItem"
+              href="/learn-more"
+            >
+              <span>
+                How it works
+              </span>
+            </a>
+          </li>
+          <li
+            className="jsx-2106991174"
+          >
+            <a
+              className="jsx-2106991174 menuItem"
+              href="/discover"
+            >
+              <span>
+                discover
+              </span>
+            </a>
+          </li>
+          <li
+            className="jsx-2106991174"
+          >
+            <a
+              className="jsx-2106991174 menuItem"
+              href="https://medium.com/open-collective"
+            >
+              <span>
+                Blog
+              </span>
+            </a>
+          </li>
+        </ul>
+        <div
+          className="jsx-2106991174 separator"
+        />
+        <div
+          className="jsx-2783800609 LoginTopBarProfileButton"
+        >
+          <div
+            className="jsx-2783800609 LoginTopBarProfileButton"
+          >
+            <a
+              className="jsx-2783800609"
+              href="/signin?next=about%3Ablank"
+              onClick={[Function]}
+            >
+              <span>
+                login
+              </span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+  <main
+    className="jsx-4138488456"
+  >
+    <h1
+      className="jsx-3855972673"
+    >
+      Test error
+    </h1>
+  </main>
+  <div
+    className="jsx-568600484 Footer"
+  >
+    <div
+      className="jsx-568600484 content"
+    >
+      <div
+        className="jsx-568600484"
+      >
+        <object
+          className="jsx-568600484 logo"
+          data="/static/images/opencollectivelogo-footer.svg"
+          height="20"
+          type="image/svg+xml"
+        />
+      </div>
+      <div
+        className="jsx-568600484"
+      >
+        <nav
+          className="jsx-568600484"
+        >
+          <ul
+            className="jsx-568600484"
+          >
+            <li
+              className="jsx-568600484"
+            >
+              <a
+                className="jsx-568600484"
+                href="/learn-more"
+              >
+                How It Works
+              </a>
+            </li>
+            <li
+              className="jsx-568600484"
+            >
+              <a
+                className="jsx-568600484"
+                href="https://opencollective.com/#opensource"
+              >
+                Use Cases
+              </a>
+            </li>
+            <li
+              className="jsx-568600484"
+            >
+              <a
+                className="jsx-568600484"
+                href="https://opencollective.com/faq"
+              >
+                FAQ
+              </a>
+            </li>
+            <li
+              className="jsx-568600484"
+            >
+              <a
+                className="jsx-568600484"
+                href="https://forum.opencollective.com"
+              >
+                Forum
+              </a>
+            </li>
+            <li
+              className="jsx-568600484"
+            >
+              <a
+                className="jsx-568600484"
+                href="https://medium.com/open-collective"
+              >
+                Blog
+              </a>
+            </li>
+            <li
+              className="jsx-568600484"
+            >
+              <a
+                className={undefined}
+                href="/tos"
+                onClick={[Function]}
+                title={undefined}
+              >
+                Terms Of Service
+              </a>
+            </li>
+            <li
+              className="jsx-568600484"
+            >
+              <a
+                className="jsx-568600484"
+                href="https://opencollective.com/about"
+              >
+                About
+              </a>
+            </li>
+            <li
+              className="jsx-568600484"
+            >
+              <a
+                className="jsx-568600484"
+                href="mailto:info@opencollective.com"
+              >
+                Contact
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`Search Page renders loading grid SVG 1`] = `
+<div
+  className="jsx-3680710510"
+>
+  <header
+    className="jsx-963368174"
+  >
+    <div
+      className="jsx-963368174"
+      id="top"
+    />
+    <div
+      className="jsx-2106991174 loading TopBar"
+    >
+      <a
+        className="jsx-2106991174"
+        href="/"
+        title="Go to Open Collective Homepage"
+      >
+        <img
+          alt="Open Collective logo"
+          className="jsx-2106991174 logo"
+          height="40"
+          src="/static/images/opencollective-icon.svg"
+          width="40"
+        />
+      </a>
+      <div
+        className="jsx-2106991174 nav"
+      >
+        <ul
+          className="jsx-2106991174 mediumScreenOnly"
+        >
+          <li
+            className="jsx-2106991174"
+          >
+            <a
+              className="jsx-2106991174 menuItem"
+              href="/learn-more"
+            >
+              <span>
+                How it works
+              </span>
+            </a>
+          </li>
+          <li
+            className="jsx-2106991174"
+          >
+            <a
+              className="jsx-2106991174 menuItem"
+              href="/discover"
+            >
+              <span>
+                discover
+              </span>
+            </a>
+          </li>
+          <li
+            className="jsx-2106991174"
+          >
+            <a
+              className="jsx-2106991174 menuItem"
+              href="https://medium.com/open-collective"
+            >
+              <span>
+                Blog
+              </span>
+            </a>
+          </li>
+        </ul>
+        <div
+          className="jsx-2106991174 separator"
+        />
+        <div
+          className="jsx-2783800609 LoginTopBarProfileButton"
+        >
+          <div
+            className="jsx-2904874222 TopBarProfileMenu "
+            onClick={[Function]}
+          >
+            <div
+              className="jsx-2904874222 LoginTopBarProfileButton-name desktopOnly"
+            />
+            <div
+              className="jsx-2904874222 LoginTopBarProfileButton-caret"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+  <main
+    className="jsx-4138488456"
+  >
+    <div
+      className="container"
+    >
+      <div
+        className="row"
+      >
+        <div
+          className="col-xs-12"
+        >
+          <form
+            className="jsx-3680710510"
+            method="GET"
+            onSubmit={[Function]}
+          >
+            <div
+              className="form-group form-group-lg"
+            >
+              <label
+                className="h1 control-label"
+                htmlFor="search"
+              >
+                Search Open Collective
+              </label>
+              <div
+                className="jsx-3680710510 search-row"
+              >
+                <input
+                  className="search-input form-control"
+                  defaultValue={undefined}
+                  id="search"
+                  name="q"
+                  placeholder="Hoodie"
+                  type="search"
+                />
+                <button
+                  className="jsx-2820878800 jsx-219750138 Button blue"
+                  disabled={undefined}
+                  onClick={[Function]}
+                  style={
+                    Object {
+                      "padding": "0 2rem",
+                    }
+                  }
+                  type="submit"
+                >
+                  <span
+                    className="jsx-3680710510 fa fa-search"
+                  />
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+      <div
+        className="results-row row"
+      >
+        <div
+          className="jsx-3680710510 center"
+        >
+          <svg
+            fill="#46B0ED"
+            height={100}
+            viewBox="0 0 105 105"
+            width={100}
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <circle
+              cx="12.5"
+              cy="12.5"
+              r="12.5"
+            >
+              <animate
+                attributeName="fill-opacity"
+                begin="0s"
+                calcMode="linear"
+                dur="1s"
+                repeatCount="indefinite"
+                values="1;.2;1"
+              />
+            </circle>
+            <circle
+              cx="12.5"
+              cy="52.5"
+              fill-opacity=".5"
+              r="12.5"
+            >
+              <animate
+                attributeName="fill-opacity"
+                begin="100ms"
+                calcMode="linear"
+                dur="1s"
+                repeatCount="indefinite"
+                values="1;.2;1"
+              />
+            </circle>
+            <circle
+              cx="52.5"
+              cy="12.5"
+              r="12.5"
+            >
+              <animate
+                attributeName="fill-opacity"
+                begin="300ms"
+                calcMode="linear"
+                dur="1s"
+                repeatCount="indefinite"
+                values="1;.2;1"
+              />
+            </circle>
+            <circle
+              cx="52.5"
+              cy="52.5"
+              r="12.5"
+            >
+              <animate
+                attributeName="fill-opacity"
+                begin="600ms"
+                calcMode="linear"
+                dur="1s"
+                repeatCount="indefinite"
+                values="1;.2;1"
+              />
+            </circle>
+            <circle
+              cx="92.5"
+              cy="12.5"
+              r="12.5"
+            >
+              <animate
+                attributeName="fill-opacity"
+                begin="800ms"
+                calcMode="linear"
+                dur="1s"
+                repeatCount="indefinite"
+                values="1;.2;1"
+              />
+            </circle>
+            <circle
+              cx="92.5"
+              cy="52.5"
+              r="12.5"
+            >
+              <animate
+                attributeName="fill-opacity"
+                begin="400ms"
+                calcMode="linear"
+                dur="1s"
+                repeatCount="indefinite"
+                values="1;.2;1"
+              />
+            </circle>
+            <circle
+              cx="12.5"
+              cy="92.5"
+              r="12.5"
+            >
+              <animate
+                attributeName="fill-opacity"
+                begin="700ms"
+                calcMode="linear"
+                dur="1s"
+                repeatCount="indefinite"
+                values="1;.2;1"
+              />
+            </circle>
+            <circle
+              cx="52.5"
+              cy="92.5"
+              r="12.5"
+            >
+              <animate
+                attributeName="fill-opacity"
+                begin="500ms"
+                calcMode="linear"
+                dur="1s"
+                repeatCount="indefinite"
+                values="1;.2;1"
+              />
+            </circle>
+            <circle
+              cx="92.5"
+              cy="92.5"
+              r="12.5"
+            >
+              <animate
+                attributeName="fill-opacity"
+                begin="200ms"
+                calcMode="linear"
+                dur="1s"
+                repeatCount="indefinite"
+                values="1;.2;1"
+              />
+            </circle>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </main>
+  <div
+    className="jsx-568600484 Footer"
+  >
+    <div
+      className="jsx-568600484 content"
+    >
+      <div
+        className="jsx-568600484"
+      >
+        <object
+          className="jsx-568600484 logo"
+          data="/static/images/opencollectivelogo-footer.svg"
+          height="20"
+          type="image/svg+xml"
+        />
+      </div>
+      <div
+        className="jsx-568600484"
+      >
+        <nav
+          className="jsx-568600484"
+        >
+          <ul
+            className="jsx-568600484"
+          >
+            <li
+              className="jsx-568600484"
+            >
+              <a
+                className="jsx-568600484"
+                href="/learn-more"
+              >
+                How It Works
+              </a>
+            </li>
+            <li
+              className="jsx-568600484"
+            >
+              <a
+                className="jsx-568600484"
+                href="https://opencollective.com/#opensource"
+              >
+                Use Cases
+              </a>
+            </li>
+            <li
+              className="jsx-568600484"
+            >
+              <a
+                className="jsx-568600484"
+                href="https://opencollective.com/faq"
+              >
+                FAQ
+              </a>
+            </li>
+            <li
+              className="jsx-568600484"
+            >
+              <a
+                className="jsx-568600484"
+                href="https://forum.opencollective.com"
+              >
+                Forum
+              </a>
+            </li>
+            <li
+              className="jsx-568600484"
+            >
+              <a
+                className="jsx-568600484"
+                href="https://medium.com/open-collective"
+              >
+                Blog
+              </a>
+            </li>
+            <li
+              className="jsx-568600484"
+            >
+              <a
+                className={undefined}
+                href="/tos"
+                onClick={[Function]}
+                title={undefined}
+              >
+                Terms Of Service
+              </a>
+            </li>
+            <li
+              className="jsx-568600484"
+            >
+              <a
+                className="jsx-568600484"
+                href="https://opencollective.com/about"
+              >
+                About
+              </a>
+            </li>
+            <li
+              className="jsx-568600484"
+            >
+              <a
+                className="jsx-568600484"
+                href="mailto:info@opencollective.com"
+              >
+                Contact
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`Search Page renders search results with pagination 1`] = `
+<div
+  className="jsx-3680710510"
+>
+  <header
+    className="jsx-963368174"
+  >
+    <div
+      className="jsx-963368174"
+      id="top"
+    />
+    <div
+      className="jsx-2106991174 loading TopBar"
+    >
+      <a
+        className="jsx-2106991174"
+        href="/"
+        title="Go to Open Collective Homepage"
+      >
+        <img
+          alt="Open Collective logo"
+          className="jsx-2106991174 logo"
+          height="40"
+          src="/static/images/opencollective-icon.svg"
+          width="40"
+        />
+      </a>
+      <div
+        className="jsx-2106991174 nav"
+      >
+        <ul
+          className="jsx-2106991174 mediumScreenOnly"
+        >
+          <li
+            className="jsx-2106991174"
+          >
+            <a
+              className="jsx-2106991174 menuItem"
+              href="/learn-more"
+            >
+              <span>
+                How it works
+              </span>
+            </a>
+          </li>
+          <li
+            className="jsx-2106991174"
+          >
+            <a
+              className="jsx-2106991174 menuItem"
+              href="/discover"
+            >
+              <span>
+                discover
+              </span>
+            </a>
+          </li>
+          <li
+            className="jsx-2106991174"
+          >
+            <a
+              className="jsx-2106991174 menuItem"
+              href="https://medium.com/open-collective"
+            >
+              <span>
+                Blog
+              </span>
+            </a>
+          </li>
+        </ul>
+        <div
+          className="jsx-2106991174 separator"
+        />
+        <div
+          className="jsx-2783800609 LoginTopBarProfileButton"
+        >
+          <div
+            className="jsx-2904874222 TopBarProfileMenu "
+            onClick={[Function]}
+          >
+            <div
+              className="jsx-2904874222 LoginTopBarProfileButton-name desktopOnly"
+            />
+            <div
+              className="jsx-2904874222 LoginTopBarProfileButton-caret"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+  <main
+    className="jsx-4138488456"
+  >
+    <div
+      className="container"
+    >
+      <div
+        className="row"
+      >
+        <div
+          className="col-xs-12"
+        >
+          <form
+            className="jsx-3680710510"
+            method="GET"
+            onSubmit={[Function]}
+          >
+            <div
+              className="form-group form-group-lg"
+            >
+              <label
+                className="h1 control-label"
+                htmlFor="search"
+              >
+                Search Open Collective
+              </label>
+              <div
+                className="jsx-3680710510 search-row"
+              >
+                <input
+                  className="search-input form-control"
+                  defaultValue="Test"
+                  id="search"
+                  name="q"
+                  placeholder="Hoodie"
+                  type="search"
+                />
+                <button
+                  className="jsx-2820878800 jsx-219750138 Button blue"
+                  disabled={undefined}
+                  onClick={[Function]}
+                  style={
+                    Object {
+                      "padding": "0 2rem",
+                    }
+                  }
+                  type="submit"
+                >
+                  <span
+                    className="jsx-3680710510 fa fa-search"
+                  />
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+      <div
+        className="results-row row"
+      >
+        <div
+          className="col "
+        >
+          <a
+            className={undefined}
+            href="/test-collective"
+            onClick={[Function]}
+            title={undefined}
+          >
+            <div
+              className="jsx-3446301333 CollectiveCard undefined"
+            >
+              <div
+                className="jsx-3446301333 head"
+              >
+                <div
+                  className="jsx-3446301333 background"
+                  style={Object {}}
+                />
+                <div
+                  className="jsx-3446301333 logo"
+                >
+                  <div
+                    className="jsx-1454345377 Logo"
+                    style={
+                      Object {
+                        "backgroundImage": "url(/static/images/default-organization-logo.png)",
+                        "height": 65,
+                        "minWidth": 32.5,
+                      }
+                    }
+                  >
+                    <img
+                      className="jsx-1454345377 logo"
+                      src="/static/images/default-organization-logo.png"
+                      style={
+                        Object {
+                          "maxHeight": 65,
+                        }
+                      }
+                    />
+                  </div>
+                </div>
+              </div>
+              <div
+                className="jsx-3446301333 body"
+              >
+                <div
+                  className="jsx-3446301333 name"
+                />
+                <div
+                  className="jsx-3446301333 description"
+                />
+              </div>
+              <div
+                className="jsx-3446301333 footer"
+              />
+            </div>
+          </a>
+        </div>
+      </div>
+      <div
+        className="row"
+      >
+        <ul
+          className="jsx-3680710510 pagination"
+        >
+          <li
+            className="jsx-3680710510 active"
+          >
+            <a
+              href="?limit=20&offset=0&q=Test"
+              onClick={[Function]}
+            >
+              1
+            </a>
+          </li>
+          <li
+            className="jsx-3680710510 "
+          >
+            <a
+              href="?limit=20&offset=20&q=Test"
+              onClick={[Function]}
+            >
+              2
+            </a>
+          </li>
+          <li
+            className="jsx-3680710510 "
+          >
+            <a
+              href="?limit=20&offset=40&q=Test"
+              onClick={[Function]}
+            >
+              3
+            </a>
+          </li>
+          <li
+            className="jsx-3680710510 "
+          >
+            <a
+              href="?limit=20&offset=60&q=Test"
+              onClick={[Function]}
+            >
+              4
+            </a>
+          </li>
+          <li
+            className="jsx-3680710510 "
+          >
+            <a
+              href="?limit=20&offset=80&q=Test"
+              onClick={[Function]}
+            >
+              5
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </main>
+  <div
+    className="jsx-568600484 Footer"
+  >
+    <div
+      className="jsx-568600484 content"
+    >
+      <div
+        className="jsx-568600484"
+      >
+        <object
+          className="jsx-568600484 logo"
+          data="/static/images/opencollectivelogo-footer.svg"
+          height="20"
+          type="image/svg+xml"
+        />
+      </div>
+      <div
+        className="jsx-568600484"
+      >
+        <nav
+          className="jsx-568600484"
+        >
+          <ul
+            className="jsx-568600484"
+          >
+            <li
+              className="jsx-568600484"
+            >
+              <a
+                className="jsx-568600484"
+                href="/learn-more"
+              >
+                How It Works
+              </a>
+            </li>
+            <li
+              className="jsx-568600484"
+            >
+              <a
+                className="jsx-568600484"
+                href="https://opencollective.com/#opensource"
+              >
+                Use Cases
+              </a>
+            </li>
+            <li
+              className="jsx-568600484"
+            >
+              <a
+                className="jsx-568600484"
+                href="https://opencollective.com/faq"
+              >
+                FAQ
+              </a>
+            </li>
+            <li
+              className="jsx-568600484"
+            >
+              <a
+                className="jsx-568600484"
+                href="https://forum.opencollective.com"
+              >
+                Forum
+              </a>
+            </li>
+            <li
+              className="jsx-568600484"
+            >
+              <a
+                className="jsx-568600484"
+                href="https://medium.com/open-collective"
+              >
+                Blog
+              </a>
+            </li>
+            <li
+              className="jsx-568600484"
+            >
+              <a
+                className={undefined}
+                href="/tos"
+                onClick={[Function]}
+                title={undefined}
+              >
+                Terms Of Service
+              </a>
+            </li>
+            <li
+              className="jsx-568600484"
+            >
+              <a
+                className="jsx-568600484"
+                href="https://opencollective.com/about"
+              >
+                About
+              </a>
+            </li>
+            <li
+              className="jsx-568600484"
+            >
+              <a
+                className="jsx-568600484"
+                href="mailto:info@opencollective.com"
+              >
+                Contact
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </div>
+</div>
+`;
