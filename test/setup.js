@@ -7,6 +7,11 @@ const { jsdom } = require('jsdom');
 
 global.document = jsdom('');
 global.window = document.defaultView;
+global.window.localStorage = {
+  getItem: jest.fn(),
+  setItem: jest.fn(),
+  removeItem: jest.fn(),
+}
 global.navigator = {
   userAgent: 'node.js',
 };
