@@ -1056,3 +1056,22 @@ export const EventCollectiveType = new GraphQLObjectType({
   interfaces: [ CollectiveInterfaceType ],
   fields: CollectiveFields
 });
+
+export const CollectiveSearchResultsType = new GraphQLObjectType({
+  name: 'CollectiveSearchResults',
+  description: 'The results from searching for collectives with pagination info',
+  fields: () => ({
+    collectives: {
+      type: new GraphQLList(CollectiveType),
+    },
+    limit: {
+      type: GraphQLInt,
+    },
+    offset: {
+      type: GraphQLInt,
+    },
+    total: {
+      type: GraphQLInt,
+    },
+  }),
+});

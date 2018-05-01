@@ -23,6 +23,7 @@ describe('graphql.search.test.js', () => {
     yearlyBudget: 3600,
     backersCount: 130
   }];
+  const nbHits = 10;
 
   before(async () => {
     await utils.loadDB('opencollective_dvl');
@@ -31,7 +32,7 @@ describe('graphql.search.test.js', () => {
 
   beforeEach(() => {
     sandbox.stub(Index.prototype, 'search');
-    Index.prototype.search.returns(Promise.resolve({ hits }));
+    Index.prototype.search.returns(Promise.resolve({ hits, nbHits }));
   });
 
   afterEach(() => sandbox.restore());
@@ -40,7 +41,9 @@ describe('graphql.search.test.js', () => {
     const query = `
     query CollectiveSearch($term: String!) {
       search(term: $term) {
-        id
+        collectives {
+          id
+        }
       }
     }
     `;
@@ -49,19 +52,24 @@ describe('graphql.search.test.js', () => {
 
     expect(Index.prototype.search.firstCall.calledWith({
       query: 'open',
-      length: 10,
+      length: 20,
       offset: 0,
     })).to.be.true;
-    expect(result.data.search).to.deep.equal([{ id: hits[0].id }]);
+    expect(result.data.search).to.deep.equal({ collectives: [{ id: hits[0].id }]});
   });
 
   it('accepts limit and offset arguments', async () => {
     const query = `
     query CollectiveSearch($term: String!, $limit: Int!, $offset: Int!) {
       search(term: $term, limit: $limit, offset: $offset) {
-        id
-        name
-        description
+        collectives {
+          id
+          name
+          description
+        }
+        total
+        limit
+        offset
       }
     }
     `;
@@ -74,10 +82,15 @@ describe('graphql.search.test.js', () => {
       offset: 10,
     })).to.be.true;
     expect(result.data.search)
-    .to.deep.equal([{
-      id: hits[0].id,
-      name: hits[0].name,
-      description: hits[0].description,
-    }]);
+    .to.deep.equal({
+      collectives: [{
+        id: hits[0].id,
+        name: hits[0].name,
+        description: hits[0].description,
+      }],
+      total: nbHits,
+      limit: 20,
+      offset: 10,
+    });
   });
 });
