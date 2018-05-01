@@ -1,10 +1,9 @@
 import config from 'config';
 import debug from 'debug';
 import nock from 'nock';
-import path from 'path';
+
 import Promise from 'bluebird';
 import Stripe from 'stripe';
-import { exec } from 'child_process';
 import { graphql } from 'graphql';
 import { isArray, values } from 'lodash';
 
@@ -19,6 +18,8 @@ import { sequelize } from '../server/models';
 import * as libcache from '../server/lib/cache';
 import * as libpayments from '../server/lib/payments';
 import * as stripeGateway from '../server/paymentProviders/stripe/gateway';
+import * as db_restore from '../scripts/db_restore';
+
 
 const appStripe = Stripe(config.stripe.secret);
 
@@ -31,7 +32,7 @@ jsonData.application = { name: 'client', api_key: config.keys.opencollective.api
 export const data = (item) => {
   const copy = Object.assign({}, jsonData[item]); // to avoid changing these data
   return (isArray(jsonData[item])) ? values(copy) : copy;
-}
+};
 
 export const clearbitStubBeforeEach = sandbox => {
   sandbox.stub(userlib.clearbit.Enrichment, 'find').callsFake(() => {
@@ -49,32 +50,8 @@ export const resetTestDB = () => sequelize.sync({force: true})
     process.exit(1);
   });
 
-export function loadDB(dbname) {
-
-  const importDB = (cb) => {
-    const cmd = `${path.join(__dirname, '../scripts/db_restore.sh')} -d ${config.database.database} -U ${config.database.username} -f ${path.join(__dirname,"dbdumps", `${dbname}.pgsql`)}`;
-    exec(cmd, cb);
-  };
-
-  return new Promise((resolve, reject) => {
-    importDB((err, stdout) => {
-      if (!err) {
-        debug("utils")(`${dbname} imported successfully`, stdout);
-        return resolve(stdout);
-      }
-      if (err) { // First try may fail due to foreign keys restrictions
-        debug("utils")(`error importing ${dbname}`, err);
-        importDB((err, stdout) => {
-          if (err) {
-            debug("utils")(`2nd attempt: error importing ${dbname}`, err);
-            return reject(err);
-          } else {
-            return resolve(stdout);
-          }
-        });
-      }
-    })
-  });
+export async function loadDB(dbname) {
+  await db_restore.main({ force: true, file: dbname });
 }
 
 export const stringify = (json) => {

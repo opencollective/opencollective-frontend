@@ -1294,8 +1294,8 @@ export default function(Sequelize, DataTypes) {
 
   /**
    * Get the latest transactions made by this collective
-   * @param {*} since 
-   * @param {*} until 
+   * @param {*} since
+   * @param {*} until
    * @param {*} tags if not null, only takes into account donations made to collectives that contains one of those tags
    */
   Collective.prototype.getLatestTransactions = function(since, until, tags) {

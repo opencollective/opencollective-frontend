@@ -18,14 +18,18 @@ else
       cp .env.default .env
   fi
 
-  if psql -lqt | cut -d \| -f 1 | grep -qw opencollective_dvl; then
-    echo "✓ opencollective_dvl exists, running migration if any"
-    PG_DATABASE=opencollective_dvl npm run db:migrate:dev
-  else
-    if [ ! "$NODE_ENV" = "circleci" ]; then
+  if [ ! "$NODE_ENV" = "circleci" ]; then
+    if psql -lqt | cut -d \| -f 1 | grep -qw opencollective_dvl; then
+      echo "✓ opencollective_dvl exists, running migration if any"
+      PG_DATABASE=opencollective_dvl npm run db:migrate:dev
+    else
       echo "> Restoring opencollective_dvl";
       ./scripts/db_restore.sh -d opencollective_dvl -f test/dbdumps/opencollective_dvl.pgsql
     fi
+  else
+    echo "✓ opencollective_dvl exists, running migration if any"
+    npm run db:setup
+    npm run db:migrate
   fi
 
   echo ""

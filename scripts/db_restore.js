@@ -17,7 +17,7 @@ async function hasData(client) {
 }
 
 /** Launcher that recreates a database & load a dump into it. */
-async function main(args) {
+export async function main(args) {
   if (!args.file) {
     usage();
     return;

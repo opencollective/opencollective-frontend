@@ -319,7 +319,7 @@ async function HostReport(year, month, hostId) {
   .then(() => !process.env.SKIP_PLATFORM_STATS && getPlatformStats())
   .then(platformStats => {
     const timeLapsed = Math.round((new Date - startTime)/1000); // in seconds
-    console.log(`Total run time: ${timeLapsed}s`);    
+    console.log(`Total run time: ${timeLapsed}s`);
     if (!platformStats) return;
 
     summary.timeLapsed = timeLapsed;

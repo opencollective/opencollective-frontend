@@ -1,0 +1,48 @@
+version: 2
+jobs:
+  build:
+    docker:
+    - image: circleci/node:10.3.0
+      command: /sbin/init
+    - image: circleci/postgres:9.6.8-alpine-postgis-ram
+    environment:
+      TZ: "UTC"
+      NODE_ENV: "circleci"
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: ""
+      CIRCLE_ARTIFACTS: /tmp/circleci-artifacts
+      CIRCLE_TEST_REPORTS: /tmp/circleci-test-results
+    steps:
+    - checkout
+    - setup_remote_docker
+    - restore_cache:
+        keys:
+        - v1-dep-{{ .Branch }}-
+        - v1-dep-master-
+        - v1-dep-
+
+    - run: mkdir -p $CIRCLE_ARTIFACTS $CIRCLE_TEST_REPORTS
+
+    - run: npm install
+
+    - save_cache:
+        key: v1-dep-{{ .Branch }}-{{ epoch }}
+        paths:
+        - ./node_modules
+
+    - run: npm run test
+    - store_test_results:
+        path: /tmp/circleci-test-results
+
+    branches:
+      ignore:
+        - test-server
+        - staging
+        - production
+
+# XXX Should I keep this?
+# deployment:
+#   staging:
+#     branch: staging
+#     heroku:
+#       appname: opencollective-staging-api
