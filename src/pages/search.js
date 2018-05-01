@@ -12,7 +12,7 @@ import classNames from 'classnames';
 
 import withData from '../lib/withData'
 import withIntl from '../lib/withIntl';
-import { addSearchQueryData } from '../graphql/queries';
+import { addGetLoggedInUserFunction, addSearchQueryData } from '../graphql/queries';
 
 import Body from '../components/Body';
 import Button from '../components/Button';
@@ -34,6 +34,24 @@ class SearchPage extends React.Component {
     };
   }
 
+  state = {
+    loadingUserLogin: true,
+    LoggedInUser: {},
+  }
+
+  async componentDidMount() {
+    const { getLoggedInUser } = this.props;
+    try {
+      const LoggedInUser = getLoggedInUser && await getLoggedInUser();
+      this.setState({
+        loadingUserLogin: false,
+        LoggedInUser,
+      });
+    } catch (error) {
+      this.setState({ loadingUserLogin: false });
+    }
+  }
+
   refetch = (event) => {
     event.preventDefault();
 
@@ -46,12 +64,13 @@ class SearchPage extends React.Component {
 
   render() {
     const { data: { error, loading, search }, term } = this.props;
+    const { loadingUserLogin, LoggedInUser } = this.state;
 
     const {
       collectives,
-      limit,
+      limit = 20,
       offset,
-      total,
+      total = 0,
     } = search || {};
 
     if (error) {
@@ -107,7 +126,11 @@ class SearchPage extends React.Component {
             margin: 2rem auto;
           }
         `}</style>
-        <Header />
+        <Header
+          title="Search"
+          className={loadingUserLogin ? 'loading' : ''}
+          LoggedInUser={LoggedInUser}
+        />
         <Body>
           <Grid>
             <Row>
@@ -141,10 +164,10 @@ class SearchPage extends React.Component {
                 <p className="center"><em>No collectives found matching your query: "{term}"</em></p>
               )}
             </Row>
-            <Row>
+            {!!collectives && collectives.length !== 0 && <Row>
               <ul className="pagination">
                 { Array(Math.ceil(total / limit)).fill(1).map((n, i) => (
-                  <li className={classNames({ active: (i * limit) === offset })}>
+                  <li key={i * limit} className={classNames({ active: (i * limit) === offset })}>
                     <Link
                       href={{
                         query: {
@@ -153,14 +176,13 @@ class SearchPage extends React.Component {
                           q: term,
                         }
                       }}
-                      key={i * limit}
                     >
                       {`${n + i}`}
                     </Link>
                   </li>
                 )) }
               </ul>
-            </Row>
+            </Row>}
           </Grid>
         </Body>
         <Footer />
@@ -169,4 +191,6 @@ class SearchPage extends React.Component {
   }
 }
 
-export default withData(addSearchQueryData(withIntl(SearchPage)));
+export { SearchPage as MockSearchPage };
+
+export default withData(addGetLoggedInUserFunction(addSearchQueryData(withIntl(SearchPage))));
