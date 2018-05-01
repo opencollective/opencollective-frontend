@@ -657,6 +657,39 @@ export const getSubscriptionsQuery = gql`
   }
 `;
 
+export const searchCollectivesQuery = gql`
+  query search($term: String!, $limit: Int, $offset: Int) {
+    search(term: $term, limit: $limit, offset: $offset) {
+      collectives {
+        id
+        isActive
+        type
+        slug
+        path
+        name
+        company
+        image
+        backgroundImage
+        description
+        longDescription
+        website
+        currency
+        stats {
+          id
+          balance
+          yearlyBudget
+          backers {
+            all
+          }
+        }
+      }
+      limit
+      offset
+      total
+    }
+  }
+`;
+
 export const addCollectiveData = graphql(getCollectiveQuery);
 export const addCollectiveCoverData = graphql(getCollectiveCoverQuery, {
   options(props) {
@@ -671,6 +704,7 @@ export const addCollectiveToEditData = graphql(getCollectiveToEditQuery);
 export const addEventCollectiveData = graphql(getEventCollectiveQuery);
 export const addTiersData = graphql(getTiersQuery);
 export const addSubscriptionsData = graphql(getSubscriptionsQuery);
+export const addSearchQueryData = graphql(searchCollectivesQuery);
 
 const refreshLoggedInUser = async (data) => {
   let res;

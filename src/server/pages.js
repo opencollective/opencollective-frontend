@@ -9,6 +9,7 @@ pages
   .add('redeem', '/redeem')
   .add('signin', '/signin/:token?')
   .add('subscriptions_redirect', '/subscriptions', 'subscriptions-redirect')
+  .add('search', '/search')
   .add('button', '/:collectiveSlug/:verb(contribute|donate)/button')
   .add('createEvent', '/:parentCollectiveSlug/events/(new|create)')
   .add('createCollective', '/:hostCollectiveSlug?/(apply|create)')
