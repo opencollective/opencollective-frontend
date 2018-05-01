@@ -1,16 +1,21 @@
+import sinon from 'sinon';
 import { expect } from 'chai';
 import * as utils from '../test/utils';
 import models from '../server/models';
 import nock from 'nock';
 
-nock('http://api.fixer.io:80')
+nock('https://api.fixer.io:80')
   .get(/.*/)
   .query({"base":"EUR","symbols":"USD"})
   .reply(200, {"base":"EUR","date":"2017-09-01","rates":{"USD":1.192}});
 
 describe("paymentmethod.model.test.js", () => {
-  let user, collective, organization, paymentMethod;
-  before(() => utils.resetTestDB());
+  let timer, user, collective, organization, paymentMethod;
+  before(async () => {
+    await utils.resetTestDB();
+    timer = sinon.useFakeTimers((new Date("2017-09-01 00:00:00")).getTime());
+  });
+  after(() => timer.restore());
 
   describe("validation", () => {
     it('validates the token for Stripe', (done) => {
