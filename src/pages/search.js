@@ -133,6 +133,7 @@ class SearchPage extends React.Component {
           title="Search"
           className={loadingUserLogin ? 'loading' : ''}
           LoggedInUser={LoggedInUser}
+          showSearch={false}
         />
         <Body>
           <Grid>
