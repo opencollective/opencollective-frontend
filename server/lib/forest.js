@@ -1,7 +1,8 @@
 import path from 'path';
+import { cloneDeep } from 'lodash';
 import Liana from 'forest-express-sequelize';
 
-import models, {sequelize} from '../models';
+import models, { sequelize } from '../models';
 
 export default (app) => {
 
@@ -14,7 +15,8 @@ export default (app) => {
     configDir: path.resolve(__dirname, '../forest'),
     envSecret: process.env.FOREST_ENV_SECRET,
     authSecret: process.env.FOREST_AUTH_SECRET,
-    sequelize: sequelize,
+    connections: [{ models: getForestModels(), options: sequelize.options }],
+    sequelize: sequelize.Sequelize,
   }));
 
   app.post('/forest/actions/activate-subscription', Liana.ensureAuthenticated, (req, res) => {
@@ -46,3 +48,42 @@ export default (app) => {
   });
 
 };
+
+function getForestModels () {
+  const m = cloneDeep(models);
+
+  // Customize Collective
+  // --------------------
+
+  // Hidden in Forest
+  delete m.Collective.associations.Activities;
+  delete m.Collective.associations.Notifications;
+  delete m.Collective.associations.ConnectedAccounts;
+  // Duplicates
+  delete m.Collective.associations.members;
+  delete m.Collective.associations.transactions;
+  // Not working as expected
+  delete m.Collective.associations.memberCollectives;
+  delete m.Collective.associations.memberOfCollectives;
+  // Missing relations
+  m.Collective.hasMany(m.PaymentMethod);
+  m.Collective.hasMany(m.Expense);
+  m.Collective.hasMany(m.Member, { foreignKey: 'MemberCollectiveId', as: 'Membership' });
+  delete m.Collective.associations.orders;
+  m.Collective.hasMany(m.Order, { foreignKey: "CollectiveId", as: 'ReceivedOrders'});
+  m.Collective.hasMany(m.Order, { foreignKey: "FromCollectiveId", as: 'IssuedOrders'});
+
+  // Customize User
+  // --------------
+
+  // Hidden in Forest
+  delete m.User.associations.Activities;
+  delete m.User.associations.Notifications;
+  delete m.User.associations.ConnectedAccounts;
+  // Unclear (created by user)
+  delete m.User.associations.Members;
+  delete m.User.associations.PaymentMethods;
+  delete m.User.associations.orders;
+
+  return m;
+}
