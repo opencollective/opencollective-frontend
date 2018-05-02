@@ -30,7 +30,7 @@ class SearchPage extends React.Component {
     return {
       limit: query.limit || 20,
       offset: query.offset || 0,
-      term: query.q,
+      term: query.q || '',
     };
   }
 
