@@ -6,7 +6,7 @@ import { days } from '../../lib/utils';
 
 const graphqlServerUrl = `${process.env.API_URL}/graphql?api_key=${process.env.API_KEY}`;
 
-export async function list(req, res, next) {
+export async function list(req, res) {
 
   const {
     collectiveSlug,
@@ -34,7 +34,7 @@ export async function list(req, res, next) {
     headers.authorization = req.headers.authorization;
   } else {
     if (req.params.format === 'csv') {
-      return next(new Error("Need to be logged in to export members in CSV"));
+      return res.status(401).send('Need to be authenticated to export members in CSV');
     }
     res.setHeader('cache-control','max-age=6000');
   }
