@@ -63,7 +63,7 @@ class SearchPage extends React.Component {
   }
 
   render() {
-    const { data: { error, loading, search }, term } = this.props;
+    const { data: { error, loading, search }, term = '' } = this.props;
     const { loadingUserLogin, LoggedInUser } = this.state;
 
     const {
@@ -76,6 +76,8 @@ class SearchPage extends React.Component {
     if (error) {
       return <ErrorPage {...error} />;
     }
+
+    const showCollectives = !loading && term.trim() !== "" && !!collectives;
 
     return (
       <div>
@@ -92,10 +94,10 @@ class SearchPage extends React.Component {
             }
           }
 
-          div :global(.search-row) {
-            align-items: end;
+          .search-row {
+            align-items: flex-end;
             display: flex;
-            margin: 0;
+            margin: 2rem 0;
           }
 
           div :global(.col) {
@@ -113,6 +115,7 @@ class SearchPage extends React.Component {
             box-shadow: none;
             display: block;
             font-family: lato;
+            height: 3.4rem;
             padding: 0;
           }
 
@@ -139,7 +142,7 @@ class SearchPage extends React.Component {
                   <FormGroup controlId="search" bsSize="large">
                     <ControlLabel className="h1">Search Open Collective</ControlLabel>
                     <div className="search-row">
-                      <FormControl type="search" name="q" placeholder="Hoodie" className="search-input" defaultValue={term} />
+                      <FormControl type="search" name="q" placeholder="open source" className="search-input" defaultValue={term} />
                       <Button type="submit" className="blue" style={{ padding: '0 2rem' }}><span className="fa fa-search"/></Button>
                     </div>
                   </FormGroup>
@@ -147,24 +150,24 @@ class SearchPage extends React.Component {
               </Col>
             </Row>
             <Row className="results-row">
-              { loading && (
+              {loading && (
                 <div className="center">
                   <LoadingGrid /> 
                 </div>
               )}
 
-              {!!collectives && !loading && collectives.map(collective => (
+              {showCollectives && collectives.map(collective => (
                 <Col className="col" key={collective.slug}>
                   <CollectiveCard collective={collective} />
                 </Col>
               ))}
 
               { /* TODO: add suggested collectives when the result is empty */ } 
-              {!!collectives && collectives.length === 0 && (
+              {showCollectives && collectives.length === 0 && (
                 <p className="center"><em>No collectives found matching your query: "{term}"</em></p>
               )}
             </Row>
-            {!!collectives && collectives.length !== 0 && <Row>
+            {showCollectives && collectives.length !== 0 && <Row>
               <ul className="pagination">
                 { Array(Math.ceil(total / limit)).fill(1).map((n, i) => (
                   <li key={i * limit} className={classNames({ active: (i * limit) === offset })}>
@@ -177,7 +180,7 @@ class SearchPage extends React.Component {
                         }
                       }}
                     >
-                      {`${n + i}`}
+                      <a>{`${n + i}`}</a>
                     </Link>
                   </li>
                 )) }
