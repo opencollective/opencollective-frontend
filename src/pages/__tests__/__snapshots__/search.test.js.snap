@@ -2,7 +2,7 @@
 
 exports[`Search Page renders empty results message 1`] = `
 <div
-  className="jsx-3680710510"
+  className="jsx-3957010919"
 >
   <header
     className="jsx-963368174"
@@ -104,7 +104,7 @@ exports[`Search Page renders empty results message 1`] = `
           className="col-xs-12"
         >
           <form
-            className="jsx-3680710510"
+            className="jsx-3957010919"
             method="GET"
             onSubmit={[Function]}
           >
@@ -118,14 +118,14 @@ exports[`Search Page renders empty results message 1`] = `
                 Search Open Collective
               </label>
               <div
-                className="jsx-3680710510 search-row"
+                className="jsx-3957010919 search-row"
               >
                 <input
                   className="search-input form-control"
                   defaultValue="test"
                   id="search"
                   name="q"
-                  placeholder="Hoodie"
+                  placeholder="open source"
                   type="search"
                 />
                 <button
@@ -140,7 +140,7 @@ exports[`Search Page renders empty results message 1`] = `
                   type="submit"
                 >
                   <span
-                    className="jsx-3680710510 fa fa-search"
+                    className="jsx-3957010919 fa fa-search"
                   />
                 </button>
               </div>
@@ -152,10 +152,10 @@ exports[`Search Page renders empty results message 1`] = `
         className="results-row row"
       >
         <p
-          className="jsx-3680710510 center"
+          className="jsx-3957010919 center"
         >
           <em
-            className="jsx-3680710510"
+            className="jsx-3957010919"
           >
             No collectives found matching your query: "
             test
@@ -499,7 +499,7 @@ exports[`Search Page renders error message 1`] = `
 
 exports[`Search Page renders loading grid SVG 1`] = `
 <div
-  className="jsx-3680710510"
+  className="jsx-3957010919"
 >
   <header
     className="jsx-963368174"
@@ -601,7 +601,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
           className="col-xs-12"
         >
           <form
-            className="jsx-3680710510"
+            className="jsx-3957010919"
             method="GET"
             onSubmit={[Function]}
           >
@@ -615,14 +615,14 @@ exports[`Search Page renders loading grid SVG 1`] = `
                 Search Open Collective
               </label>
               <div
-                className="jsx-3680710510 search-row"
+                className="jsx-3957010919 search-row"
               >
                 <input
                   className="search-input form-control"
-                  defaultValue={undefined}
+                  defaultValue=""
                   id="search"
                   name="q"
-                  placeholder="Hoodie"
+                  placeholder="open source"
                   type="search"
                 />
                 <button
@@ -637,7 +637,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
                   type="submit"
                 >
                   <span
-                    className="jsx-3680710510 fa fa-search"
+                    className="jsx-3957010919 fa fa-search"
                   />
                 </button>
               </div>
@@ -649,7 +649,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
         className="results-row row"
       >
         <div
-          className="jsx-3680710510 center"
+          className="jsx-3957010919 center"
         >
           <svg
             fill="#46B0ED"
@@ -907,7 +907,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
 
 exports[`Search Page renders search results with pagination 1`] = `
 <div
-  className="jsx-3680710510"
+  className="jsx-3957010919"
 >
   <header
     className="jsx-963368174"
@@ -1009,7 +1009,7 @@ exports[`Search Page renders search results with pagination 1`] = `
           className="col-xs-12"
         >
           <form
-            className="jsx-3680710510"
+            className="jsx-3957010919"
             method="GET"
             onSubmit={[Function]}
           >
@@ -1023,14 +1023,14 @@ exports[`Search Page renders search results with pagination 1`] = `
                 Search Open Collective
               </label>
               <div
-                className="jsx-3680710510 search-row"
+                className="jsx-3957010919 search-row"
               >
                 <input
                   className="search-input form-control"
                   defaultValue="Test"
                   id="search"
                   name="q"
-                  placeholder="Hoodie"
+                  placeholder="open source"
                   type="search"
                 />
                 <button
@@ -1045,7 +1045,7 @@ exports[`Search Page renders search results with pagination 1`] = `
                   type="submit"
                 >
                   <span
-                    className="jsx-3680710510 fa fa-search"
+                    className="jsx-3957010919 fa fa-search"
                   />
                 </button>
               </div>
@@ -1121,12 +1121,13 @@ exports[`Search Page renders search results with pagination 1`] = `
         className="row"
       >
         <ul
-          className="jsx-3680710510 pagination"
+          className="jsx-3957010919 pagination"
         >
           <li
-            className="jsx-3680710510 active"
+            className="jsx-3957010919 active"
           >
             <a
+              className="jsx-3957010919"
               href="?limit=20&offset=0&q=Test"
               onClick={[Function]}
             >
@@ -1134,9 +1135,10 @@ exports[`Search Page renders search results with pagination 1`] = `
             </a>
           </li>
           <li
-            className="jsx-3680710510 "
+            className="jsx-3957010919 "
           >
             <a
+              className="jsx-3957010919"
               href="?limit=20&offset=20&q=Test"
               onClick={[Function]}
             >
@@ -1144,9 +1146,10 @@ exports[`Search Page renders search results with pagination 1`] = `
             </a>
           </li>
           <li
-            className="jsx-3680710510 "
+            className="jsx-3957010919 "
           >
             <a
+              className="jsx-3957010919"
               href="?limit=20&offset=40&q=Test"
               onClick={[Function]}
             >
@@ -1154,9 +1157,10 @@ exports[`Search Page renders search results with pagination 1`] = `
             </a>
           </li>
           <li
-            className="jsx-3680710510 "
+            className="jsx-3957010919 "
           >
             <a
+              className="jsx-3957010919"
               href="?limit=20&offset=60&q=Test"
               onClick={[Function]}
             >
@@ -1164,9 +1168,10 @@ exports[`Search Page renders search results with pagination 1`] = `
             </a>
           </li>
           <li
-            className="jsx-3680710510 "
+            className="jsx-3957010919 "
           >
             <a
+              className="jsx-3957010919"
               href="?limit=20&offset=80&q=Test"
               onClick={[Function]}
             >
