@@ -32,7 +32,7 @@ import {
   PaymentMethodType
 } from './types';
 
-import { get, uniq } from 'lodash';
+import { find, get, uniq } from 'lodash';
 import models, { sequelize } from '../models';
 import rawQueries from '../lib/queries';
 import { fetchCollectiveId } from '../lib/cache';
@@ -701,6 +701,16 @@ const queries = {
         offset,
         term,
       } = args;
+
+      if (term.trim() === '') {
+        return {
+          collectives: [],
+          limit,
+          offset,
+          total: 0,
+        };
+      }
+
       const client = algoliasearch(ALGOLIA_APP_ID, ALGOLIA_KEY);
       const index = client.initIndex(ALGOLIA_INDEX);
 
@@ -709,15 +719,19 @@ const queries = {
         length: limit,
         offset,
       });
+      const collectiveIds = hits.map(({ id }) => id);
       const collectives = await models.Collective.findAll({
         where: {
           id: {
-            [Op.in]: hits.map(({ id }) => id),
+            [Op.in]: collectiveIds,
           }
         },
       });
+
+      // map over the collectiveIds with the database results to keep the original order from Algolia
+      // filter out null results
       return {
-        collectives,
+        collectives: collectiveIds.map(id => find(collectives, { id })).filter(Boolean),
         limit,
         offset,
         total,
