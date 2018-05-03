@@ -27,7 +27,7 @@ import {
 } from './TransactionInterface';
 
 import { types } from '../constants/collectives';
-import models from '../models';
+import models, { Op } from '../models';
 import roles from '../constants/roles';
 
 export const TypeOfCollectiveType = new GraphQLEnumType({
@@ -302,7 +302,7 @@ export const CollectiveStatsType = new GraphQLObjectType({
         description: "Number of updates published by this collective",
         type: GraphQLInt,
         resolve(collective) {
-          return models.Update.count({ where: { CollectiveId: collective.id, publishedAt: { $ne: null } } });
+          return models.Update.count({ where: { CollectiveId: collective.id, publishedAt: { [Op.ne]: null } } });
         }
       },
       events: {
@@ -869,7 +869,7 @@ const CollectiveFields = () => {
       type: new GraphQLList(OrderType),
       resolve(collective) {
         return collective.getIncomingOrders({
-          where: { processedAt: { $ne: null } },
+          where: { processedAt: { [Op.ne]: null } },
           order: [ ['createdAt', 'DESC'] ]
         });
       }
@@ -978,7 +978,7 @@ const CollectiveFields = () => {
         offset: { type: GraphQLInt }
       },
       resolve(collective, args) {
-        const query = { CollectiveId: collective.id, publishedAt: { $ne: null } };
+        const query = { CollectiveId: collective.id, publishedAt: { [Op.ne]: null } };
         if (args.limit) query.limit = args.limit;
         if (args.offset) query.offset = args.offset;
         return models.Update.findAll(query);

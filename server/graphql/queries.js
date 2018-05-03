@@ -1,7 +1,6 @@
 import algoliasearch from 'algoliasearch';
 import config from 'config';
 import Promise from 'bluebird';
-import { Op } from 'sequelize';
 
 import errors from '../lib/errors';
 
@@ -39,7 +38,7 @@ import {
 } from './types';
 
 import { find, get, uniq } from 'lodash';
-import models, { sequelize } from '../models';
+import models, { sequelize, Op } from '../models';
 import rawQueries from '../lib/queries';
 import { fetchCollectiveId } from '../lib/cache';
 
@@ -355,7 +354,7 @@ const queries = {
       if (args.offset) query.offset = args.offset;
       query.order = [['publishedAt', 'DESC'], ['createdAt', 'DESC']];
       if (!req.remoteUser || !req.remoteUser.isAdmin(args.CollectiveId)) {
-        query.where.publishedAt = { $ne: null };
+        query.where.publishedAt = { [Op.ne]: null };
       }
       return req.loaders.collective.findById.load(args.CollectiveId)
         .then(collective => {
@@ -673,7 +672,7 @@ const queries = {
 
         return getCollectiveIds().then(collectiveIds => {
           query.where[attr] = { $in: collectiveIds };
-          query.where.role = { $ne: 'HOST' };
+          query.where.role = { [Op.ne]: 'HOST' };
           return models.Member.findAll(query);
         }).then(members => {
           // also fetch the list of collectives that are members of the host

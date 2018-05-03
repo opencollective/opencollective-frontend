@@ -1,4 +1,4 @@
-import models, { sequelize } from '../models';
+import models, { sequelize, Op } from '../models';
 import { getListOfAccessibleMembers } from '../lib/auth';
 import { type } from '../constants/transactions';
 import DataLoader from 'dataloader';
@@ -191,7 +191,7 @@ export const loaders = (req) => {
             'TierId',
             [ sequelize.fn('COALESCE', sequelize.fn('COUNT', sequelize.col('id')), 0), 'count' ]
           ],
-          where: { TierId: { $in: ids }, processedAt: { $ne: null } },
+          where: { TierId: { $in: ids }, processedAt: { [Op.ne]: null } },
           group: ['TierId']
         })
         .then(results => sortResults(ids, results, 'TierId'))
@@ -206,7 +206,7 @@ export const loaders = (req) => {
       findByCollectiveId: new DataLoader(CollectiveIds => models.PaymentMethod
         .findAll({ where: {
           CollectiveId: { $in: CollectiveIds },
-          name: { $ne: null },
+          name: { [Op.ne]: null },
           expiryDate: { $or: [ null, { $gte: new Date } ] },
           archivedAt: null
         }})

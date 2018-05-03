@@ -2,7 +2,6 @@
  * Dependencies.
  */
 import _, { get, difference, uniq, pick } from 'lodash';
-import Sequelize from 'sequelize';
 import Temporal from 'sequelize-temporal';
 import config from 'config';
 import deepmerge from 'deepmerge';
@@ -670,7 +669,7 @@ export default function(Sequelize, DataTypes) {
         const include = options.active ? [ { model: models.Subscription, attributes: ['isActive'] } ] : [];
         return models.Order.findOne({
           attributes: [ 'TierId' ],
-          where: { FromCollectiveId: backerCollective.id, CollectiveId: this.id, TierId: { $ne: null } },
+          where: { FromCollectiveId: backerCollective.id, CollectiveId: this.id, TierId: { [Op.ne]: null } },
           include
         }).then(order => {
           if (!order) {
@@ -982,7 +981,7 @@ export default function(Sequelize, DataTypes) {
       where: {
         ...where,
         CollectiveId: this.id,
-        confirmedAt: { $ne: null }
+        confirmedAt: { [Op.ne]: null }
       },
       order: [['confirmedAt', 'DESC']]
     })
@@ -1160,7 +1159,7 @@ export default function(Sequelize, DataTypes) {
       ],
       where: {
         CollectiveId: this.id,
-        FromCollectiveId: { $ne: this.HostCollectiveId },
+        FromCollectiveId: { [Op.ne]: this.HostCollectiveId },
         type: 'CREDIT'
       }
     };

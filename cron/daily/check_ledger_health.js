@@ -149,7 +149,7 @@ const checkUsersAndOrgs = () => {
         $or: ['USER', 'ORGANIZATION']
       },
       HostCollectiveId: {
-        $ne: null
+        [Op.ne]: null
       }
     }
   })
@@ -167,7 +167,7 @@ const checkUsersAndOrgs = () => {
         $in: userCollectives.map(u => u.CollectiveId)
       },
       type: {
-        $ne: 'USER'
+        [Op.ne]: 'USER'
       }
     }
   }))
@@ -244,7 +244,7 @@ const checkExpenses = () => {
 
   // Check that there are no expenses marked as "PAID" and without transaction entries
   return sequelize.query(`
-    SELECT 
+    SELECT
       e.id AS id
     FROM "Expenses" e
     LEFT JOIN "Transactions" t ON t."ExpenseId" = e.id
@@ -305,7 +305,7 @@ const checkTransactions = () => {
     SELECT "OrderId" FROM "Transactions"
         WHERE "OrderId" IS NOT NULL and "deletedAt" is null
           GROUP BY "OrderId"
-          HAVING COUNT(*) % 2 != 0 
+          HAVING COUNT(*) % 2 != 0
     `, {type: sequelize.QueryTypes.SELECT}))
   .then(oddOrderIds => {
     subHeader('Orders with odd (not multiple of 2) number of transactions', oddOrderIds.length)
@@ -316,7 +316,7 @@ const checkTransactions = () => {
     SELECT "ExpenseId" FROM "Transactions"
         WHERE "ExpenseId" IS NOT NULL and "deletedAt" is null
           GROUP BY "ExpenseId"
-          HAVING COUNT(*) != 2 
+          HAVING COUNT(*) != 2
     `, {type: sequelize.QueryTypes.SELECT}))
   .then(oddExpenseIds => {
     subHeader('Expenses with less than or more than 2 transactions', oddExpenseIds.length)
@@ -328,7 +328,7 @@ const checkTransactions = () => {
     SELECT "TransactionGroup" FROM "Transactions"
         WHERE "TransactionGroup" IS NOT NULL and "deletedAt" is null
           GROUP BY "TransactionGroup"
-          HAVING COUNT(*) != 2 
+          HAVING COUNT(*) != 2
     `, {type: sequelize.QueryTypes.SELECT}))
   .then(oddTxnGroups => {
     subHeader('Transaction groups that are not pairs', oddTxnGroups.length)

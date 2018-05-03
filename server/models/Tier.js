@@ -7,7 +7,7 @@ import CustomDataTypes from './DataTypes';
 
 export default function(Sequelize, DataTypes) {
 
-  const { models } = Sequelize;
+  const { models, Op } = Sequelize;
 
   const Tier = Sequelize.define('Tier', {
     id: {
@@ -206,7 +206,7 @@ export default function(Sequelize, DataTypes) {
     return models.Order.sum('quantity', {
         where: {
           TierId: this.id,
-          processedAt: { $ne: null }
+          processedAt: { [Op.ne]: null }
         }
       })
       .then(usedQuantity => {

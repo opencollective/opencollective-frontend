@@ -18,7 +18,7 @@ import {
   TransactionInterfaceType
 } from './TransactionInterface';
 
-import models from '../models';
+import models, { Op } from '../models';
 import dataloaderSequelize from 'dataloader-sequelize';
 import { strip_tags } from '../lib/utils';
 
@@ -840,7 +840,7 @@ export const TierType = new GraphQLObjectType({
         },
         resolve(tier, args) {
           const query = {
-            where: { processedAt: { $ne: null } },
+            where: { processedAt: { [Op.ne]: null } },
             limit: args.limit
           };
           if (args.isActive) {

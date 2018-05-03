@@ -41,7 +41,7 @@ const findUserCollectives = (userId) => {
 const checkAndFixExpenses = () => {
   /*
   For each expense,
-    find the collective associated with the User 
+    find the collective associated with the User
       OR
     If the user is an admin of a host, use that host collective
 
@@ -62,7 +62,7 @@ const checkAndFixExpenses = () => {
         $notIn: [1, 114, 248] // opencollective, partidodigital, wordpress sfo
       },
       payoutMethod: {
-        $ne: 'paypal'
+        [Op.ne]: 'paypal'
       }
     },
     order: ['id']
@@ -96,9 +96,9 @@ const checkAndFixExpenses = () => {
         const credit = transactions.find(t => t.type === 'CREDIT');
         const debit = transactions.find(t => t.type === 'DEBIT');
 
-        if (!(validUserCollectives.find(c => c === debit.FromCollectiveId) && 
+        if (!(validUserCollectives.find(c => c === debit.FromCollectiveId) &&
             validUserCollectives.find(c => c === credit.CollectiveId))) {
-          
+
           console.log('\t>>> FromCollectiveId mismatch for Expense Id', expense.id)
           console.log('\t\t>>> debit.FromCollectiveId', debit.FromCollectiveId, 'credit.CollectiveId', credit.CollectiveId);
           console.log('\t\t>>> Should be: ', validUserCollectives)
@@ -108,7 +108,7 @@ const checkAndFixExpenses = () => {
           return debit.update({FromCollectiveId: validUserCollectives[0]})
            .then(() => credit.update({CollectiveId: validUserCollectives[0]}))
 
-         
+
         }
         return Promise.resolve();
       })
@@ -128,7 +128,7 @@ const checkAndFixOrders = () => {
   return models.Order.findAll({
     where: {
       processedAt: {
-        $ne: null
+        [Op.ne]: null
       },
       PaymentMethodId: null,
       CollectiveId: {
@@ -174,7 +174,7 @@ const checkAndFixOrders = () => {
               if (transactions.length !== 2) {
                 throw new Error('transaction.length !== 2 check failed');
               }
-              // should only be one of each 
+              // should only be one of each
               const credit = transactions.find(t => t.type === 'CREDIT');
               const debit = transactions.find(t => t.type === 'DEBIT');
 

@@ -378,7 +378,7 @@ export default function(Sequelize, DataTypes) {
     return PaymentMethod.findOne({
       where: Sequelize.and(
         Sequelize.where(Sequelize.cast(Sequelize.col('uuid'), 'text'), { $like: `${shortUUID}%` }),
-        { matching: { $ne: null } }
+        { matching: { [Op.ne]: null } }
       )
     }).then(async (pm) => {
       if (pm.expiryDate) {

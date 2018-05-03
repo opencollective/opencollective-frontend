@@ -5,18 +5,15 @@ import _ from 'lodash';
 import async from 'async';
 import { defaultHostCollective, getLinkHeader, getRequestedUrl, resizeImage } from '../lib/utils';
 import Promise from 'bluebird';
-import Sequelize from 'sequelize';
 import roles from '../constants/roles';
 import activities from '../constants/activities';
 import emailLib from '../lib/email';
 import queries from '../lib/queries';
-import models from '../models';
+import models, { Op } from '../models';
 import errors from '../lib/errors';
 import debugLib from 'debug';
 import config from 'config';
 import prependHttp from 'prepend-http';
-
-const Op = Sequelize.Op;
 
 const {
   Activity,
@@ -550,7 +547,7 @@ export const getTransactions = (req, res, next) => {
   }
 
   if (req.query.exclude) {
-    where.$or = [ { type: { $ne: req.query.exclude } }, { type: { [Op.eq]: null } } ];
+    where.$or = [ { type: { [Op.ne]: req.query.exclude } }, { type: { [Op.eq]: null } } ];
   }
 
   const query = _.merge({

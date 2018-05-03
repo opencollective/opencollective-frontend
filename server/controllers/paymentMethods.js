@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import models from '../models';
+import models, { Op } from '../models';
 
 const { PaymentMethod } = models;
 
@@ -11,7 +11,7 @@ const { PaymentMethod } = models;
  */
 export default function getPaymentMethods(req, res, next) {
   const { filter } = req.query;
-  const query = _.extend({}, filter, { CollectiveId: req.user.CollectiveId, confirmedAt: {$ne: null} });
+  const query = _.extend({}, filter, { CollectiveId: req.user.CollectiveId, confirmedAt: {[Op.ne]: null} });
 
   return PaymentMethod.findAll({ where: query })
   .then((response) => {
