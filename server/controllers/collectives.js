@@ -538,7 +538,7 @@ export const getTransactions = (req, res, next) => {
 
   if (req.query.donation || req.query.type === 'donations') {
     where.amount = {
-      $gt: 0
+      [Op.gt]: 0
     };
   } else if (req.query.expense || req.query.type === 'expenses') {
     where.amount = {

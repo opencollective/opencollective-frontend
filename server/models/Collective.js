@@ -1061,7 +1061,7 @@ export default function(Sequelize, DataTypes) {
   Collective.prototype.getTotalAmountReceived = function(startDate, endDate) {
     endDate = endDate || new Date;
     const where = {
-      amount: { $gt: 0 },
+      amount: { [Op.gt]: 0 },
       createdAt: { $lt: endDate },
       CollectiveId: this.id
     };
@@ -1079,7 +1079,7 @@ export default function(Sequelize, DataTypes) {
   Collective.prototype.getTotalAmountSent = function(startDate, endDate) {
     endDate = endDate || new Date;
     const where = {
-      amount: { $gt: 0 },
+      amount: { [Op.gt]: 0 },
       createdAt: { $lt: endDate },
       FromCollectiveId: this.id
     };
@@ -1122,7 +1122,7 @@ export default function(Sequelize, DataTypes) {
       CollectiveId: this.id
     };
     if (startDate) where.createdAt[Op.gte] = startDate;
-    if (type === 'donation') where.amount = { $gt: 0 };
+    if (type === 'donation') where.amount = { [Op.gt]: 0 };
     if (type === 'expense') where.amount = { $lt: 0 };
     return models.Transaction.find({
       attributes: [

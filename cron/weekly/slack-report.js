@@ -2,7 +2,7 @@ import config from 'config';
 import Promise from 'bluebird';
 import moment from 'moment-timezone';
 import _ from 'lodash';
-import models from '../../server/models';
+import models, { Op } from '../../server/models';
 import activities from '../../server/constants/activities';
 import slackLib from '../../server/lib/slack';
 import expenseStatus from '../../server/constants/expense_status';
@@ -169,7 +169,7 @@ function getTimeFrame(propName) {
   return {
     where: {
       [propName]: {
-        $gt: lastWeekStart,
+        [Op.gt]: lastWeekStart,
         $lt: thisWeekStart
       }
     }

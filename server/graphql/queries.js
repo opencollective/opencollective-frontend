@@ -741,7 +741,7 @@ const queries = {
         where: {
           token: args.token,
           expiryDate: {
-            $gt: new Date()
+            [Op.gt]: new Date()
           },
           archivedAt: null // archived PMs are assumed to be used or inactive
         }
