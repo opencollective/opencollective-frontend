@@ -19,7 +19,7 @@ describe('hostlib', () => {
 
   const where = {
     CollectiveId: { $in: collectiveids },
-    createdAt: { [Op.gte]: startDate, $lt: endDate}
+    createdAt: { [Op.gte]: startDate, [Op.lt]: endDate}
   };
 
   let sandbox;

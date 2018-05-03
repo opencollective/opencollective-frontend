@@ -176,7 +176,7 @@ const queries = {
       const where = {
         FromCollectiveId: fromCollective.id,
         HostCollectiveId: host.id,
-        createdAt: { [Op.gte]: startsAt, $lt: endsAt },
+        createdAt: { [Op.gte]: startsAt, [Op.lt]: endsAt },
         type: 'CREDIT'
       };
 

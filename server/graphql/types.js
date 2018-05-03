@@ -329,7 +329,7 @@ export const InvoiceType = new GraphQLObjectType({
           const where = {
             FromCollectiveId: invoice.FromCollectiveId,
             type: 'CREDIT',
-            createdAt: { [Op.gte]: startsAt, $lt: endsAt }
+            createdAt: { [Op.gte]: startsAt, [Op.lt]: endsAt }
           };
           if (invoice.HostCollectiveId) {
             where.HostCollectiveId = invoice.HostCollectiveId;

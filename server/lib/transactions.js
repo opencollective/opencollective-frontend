@@ -29,7 +29,7 @@ export function getTransactions(collectiveids, startDate = new Date("2015-01-01"
     where: {
       ...where,
       CollectiveId: { $in: collectiveids },
-      createdAt: { [Op.gte]: startDate, $lt: endDate }
+      createdAt: { [Op.gte]: startDate, [Op.lt]: endDate }
     },
     order: [ ['createdAt', 'DESC' ]]
   };

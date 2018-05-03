@@ -542,7 +542,7 @@ export const getTransactions = (req, res, next) => {
     };
   } else if (req.query.expense || req.query.type === 'expenses') {
     where.amount = {
-      $lt: 0
+      [Op.lt]: 0
     };
   }
 

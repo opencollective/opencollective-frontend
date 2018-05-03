@@ -19,7 +19,7 @@ export function getBackersStats(startDate = new Date('2015-01-01'), endDate = ne
   const getBackersIds = (startDate, endDate) => {
     const where = {
         type: 'CREDIT',
-        createdAt: { [Op.gte]: startDate, $lt: endDate }
+        createdAt: { [Op.gte]: startDate, [Op.lt]: endDate }
       };
 
     if (collectiveids) {
@@ -74,7 +74,7 @@ export function sumTransactionsByCurrency(attribute = 'netAmountInCollectiveCurr
  */
 export function sumTransactions(attribute, where = {}, hostCurrency, date) {
   if (where.createdAt) {
-    date = date || where.createdAt.$lt || where.createdAt[Op.gte];
+    date = date || where.createdAt[Op.lt] || where.createdAt[Op.gte];
   }
   const res = {};
   return sumTransactionsByCurrency(attribute, where)
@@ -94,7 +94,7 @@ export function sumTransactions(attribute, where = {}, hostCurrency, date) {
 export function getTotalHostFees(collectiveids, type, startDate = new Date('2015-01-01'), endDate = new Date, hostCurrency = 'USD') {
   const where = {
     CollectiveId: { $in: collectiveids },
-    createdAt: { [Op.gte]: startDate, $lt: endDate }
+    createdAt: { [Op.gte]: startDate, [Op.lt]: endDate }
   };
   if (type) {
     where.type = type;
@@ -105,7 +105,7 @@ export function getTotalHostFees(collectiveids, type, startDate = new Date('2015
 export function getTotalNetAmount(collectiveids, type, startDate = new Date('2015-01-01'), endDate = new Date, hostCurrency = 'USD') {
   const where = {
     CollectiveId: { $in: collectiveids },
-    createdAt: { [Op.gte]: startDate, $lt: endDate }
+    createdAt: { [Op.gte]: startDate, [Op.lt]: endDate }
   };
   if (type) {
     where.type = type;

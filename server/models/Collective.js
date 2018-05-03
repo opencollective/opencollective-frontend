@@ -591,7 +591,7 @@ export default function(Sequelize, DataTypes) {
       where: {
         CollectiveId: this.id,
         role: roles.BACKER,
-        createdAt: { $lt: until }
+        createdAt: { [Op.lt]: until }
       }
     });
 
@@ -955,7 +955,7 @@ export default function(Sequelize, DataTypes) {
 
   Collective.prototype.getExpenses = function(status, startDate, endDate = new Date) {
     const where = {
-      createdAt: { $lt: endDate },
+      createdAt: { [Op.lt]: endDate },
       CollectiveId: this.id
     };
     if (status) where.status = status;
@@ -1002,7 +1002,7 @@ export default function(Sequelize, DataTypes) {
       ],
       where: {
         CollectiveId: this.id,
-        createdAt: { $lt: until }
+        createdAt: { [Op.lt]: until }
       }
     })
     .then(result => Promise.resolve(parseInt(result.toJSON().total, 10)));
@@ -1062,7 +1062,7 @@ export default function(Sequelize, DataTypes) {
     endDate = endDate || new Date;
     const where = {
       amount: { [Op.gt]: 0 },
-      createdAt: { $lt: endDate },
+      createdAt: { [Op.lt]: endDate },
       CollectiveId: this.id
     };
     if (startDate) where.createdAt[Op.gte] = startDate;
@@ -1080,7 +1080,7 @@ export default function(Sequelize, DataTypes) {
     endDate = endDate || new Date;
     const where = {
       amount: { [Op.gt]: 0 },
-      createdAt: { $lt: endDate },
+      createdAt: { [Op.lt]: endDate },
       FromCollectiveId: this.id
     };
     if (startDate) where.createdAt[Op.gte] = startDate;
@@ -1118,12 +1118,12 @@ export default function(Sequelize, DataTypes) {
   Collective.prototype.getTotalTransactions = function(startDate, endDate, type, attribute = 'netAmountInCollectiveCurrency') {
     endDate = endDate || new Date;
     const where = {
-      createdAt: { $lt: endDate },
+      createdAt: { [Op.lt]: endDate },
       CollectiveId: this.id
     };
     if (startDate) where.createdAt[Op.gte] = startDate;
     if (type === 'donation') where.amount = { [Op.gt]: 0 };
-    if (type === 'expense') where.amount = { $lt: 0 };
+    if (type === 'expense') where.amount = { [Op.lt]: 0 };
     return models.Transaction.find({
       attributes: [
         [Sequelize.fn('COALESCE', Sequelize.fn('SUM', Sequelize.col(attribute)), 0), 'total']
@@ -1138,7 +1138,7 @@ export default function(Sequelize, DataTypes) {
     return models.Transaction.findAll({
       where: {
         FromCollectiveId: this.id,
-        createdAt: { [Op.gte]: since || 0, $lt: until || new Date}
+        createdAt: { [Op.gte]: since || 0, [Op.lt]: until || new Date}
       },
       order: [ ['amount','DESC'] ],
       include: [ { model: models.Collective, as: 'collective', where: { tags: { $contains: tags } } } ]
@@ -1170,7 +1170,7 @@ export default function(Sequelize, DataTypes) {
     }
     if (options.until) {
       query.where.createdAt = query.where.createdAt || {};
-      query.where.createdAt.$lt = options.until;
+      query.where.createdAt[Op.lt] = options.until;
     }
 
     if (options.type) {

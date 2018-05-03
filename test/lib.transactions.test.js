@@ -11,7 +11,7 @@ describe('lib.transactions.test.js', () => {
   let transactions;
 
   const where = {
-    createdAt: { [Op.gte]: startDate, $lt: endDate}
+    createdAt: { [Op.gte]: startDate, [Op.lt]: endDate}
   };
 
   before(() => utils.loadDB("wwcode_test"));

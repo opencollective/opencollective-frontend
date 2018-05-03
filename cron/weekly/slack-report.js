@@ -24,7 +24,7 @@ const donation = {
       $not: null
     },
     platformFeeInHostCurrency: {
-      $lt: 0
+      [Op.lt]: 0
     }
   }
 };
@@ -170,7 +170,7 @@ function getTimeFrame(propName) {
     where: {
       [propName]: {
         [Op.gt]: lastWeekStart,
-        $lt: thisWeekStart
+        [Op.lt]: thisWeekStart
       }
     }
   };

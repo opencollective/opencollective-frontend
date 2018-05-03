@@ -244,7 +244,7 @@ const processCollective =  async (CollectiveId) => {
     collective.getExpenses(null, startDate, endDate),
     collective.getYearlyIncome(),
     models.Expense.findAll({
-      where: { CollectiveId: collective.id, createdAt: { [Op.gte]: startDate, $lt: endDate } },
+      where: { CollectiveId: collective.id, createdAt: { [Op.gte]: startDate, [Op.lt]: endDate } },
       limit: 3,
       order: [['id', 'DESC']],
       include: [ models.User ]

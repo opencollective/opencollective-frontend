@@ -53,11 +53,11 @@ async function HostReport(year, month, hostId) {
   }
 
   const dateRange = {
-    createdAt: { [Op.gte]: startDate, $lt: endDate }
+    createdAt: { [Op.gte]: startDate, [Op.lt]: endDate }
   };
 
   const previousDateRange = {
-    createdAt: { [Op.gte]: previousStartDate, $lt: startDate }
+    createdAt: { [Op.gte]: previousStartDate, [Op.lt]: startDate }
   }
 
   const emailTemplate = (!month) ? 'host.yearlyreport' : 'host.monthlyreport';

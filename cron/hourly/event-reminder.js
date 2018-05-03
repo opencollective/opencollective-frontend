@@ -34,7 +34,7 @@ console.log(">>> Fetching all events that start within time range", tomorrowStar
 
 models.Collective.findAll({ where: {
   type: "EVENT",
-  startsAt: { [Op.gte]: tomorrowStartsAt, $lt: tomorrowEndsAt }
+  startsAt: { [Op.gte]: tomorrowStartsAt, [Op.lt]: tomorrowEndsAt }
 }})
 .tap(events => {
   console.log(`>>> Processing ${events.length} events`);
@@ -45,7 +45,7 @@ models.Collective.findAll({ where: {
   return models.Collective.findAll({
     where: {
       type: "EVENT",
-      startsAt: { [Op.gte]: nextWeekStartsAt, $lt: nextWeekEndsAt }
+      startsAt: { [Op.gte]: nextWeekStartsAt, [Op.lt]: nextWeekEndsAt }
     }
   })
 })
