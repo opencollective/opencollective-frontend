@@ -637,7 +637,7 @@ export default function(Sequelize, DataTypes) {
     return models.Collective.findAll({
       attributes: ['id'],
       where: {
-        tags: { $contains: [this.settings.superCollectiveTag] }
+        tags: { [Op.contains]: [this.settings.superCollectiveTag] }
       }
     })
     .then(rows => rows.map(r => r.id))
@@ -1141,7 +1141,7 @@ export default function(Sequelize, DataTypes) {
         createdAt: { [Op.gte]: since || 0, [Op.lt]: until || new Date}
       },
       order: [ ['amount','DESC'] ],
-      include: [ { model: models.Collective, as: 'collective', where: { tags: { $contains: tags } } } ]
+      include: [ { model: models.Collective, as: 'collective', where: { tags: { [Op.contains]: tags } } } ]
     });
   };
 
