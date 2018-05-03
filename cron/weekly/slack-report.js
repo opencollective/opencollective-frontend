@@ -21,7 +21,7 @@ const updatedLastWeek = getTimeFrame('updatedAt');
 const donation = {
   where: {
     OrderId: {
-      $not: null
+      [Op.not]: null
     },
     platformFeeInHostCurrency: {
       [Op.lt]: 0
@@ -38,7 +38,7 @@ const credit = { where: {type: 'CREDIT'}};
 
 const excludeOcTeam = { where: {
   CollectiveId: {
-    $not: 1 // OpenCollective collective
+    [Op.not]: 1 // OpenCollective collective
   }
 } };
 
