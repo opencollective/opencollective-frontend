@@ -410,7 +410,7 @@ const queries = {
         query.where.UserId = user.id;
       }
       if (args.status) query.where.status = args.status;
-      if (args.category) query.where.category = { $iLike: args.category };
+      if (args.category) query.where.category = { [Op.iLike]: args.category };
       if (args.limit) query.limit = args.limit;
       if (args.offset) query.offset = args.offset;
       query.order = [["incurredAt", "DESC"]];
