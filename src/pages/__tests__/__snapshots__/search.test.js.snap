@@ -5,39 +5,39 @@ exports[`Search Page renders empty results message 1`] = `
   className="jsx-4119556752"
 >
   <header
-    className="jsx-963368174"
+    className="jsx-3598562734"
   >
     <div
-      className="jsx-963368174"
+      className="jsx-3598562734"
       id="top"
     />
     <div
-      className="jsx-960116486 loading TopBar"
+      className="jsx-3593811691 loading TopBar"
     >
       <a
-        className="jsx-960116486"
+        className="jsx-3593811691"
         href="/"
         title="Go to Open Collective Homepage"
       >
         <img
           alt="Open Collective logo"
-          className="jsx-960116486 logo"
+          className="jsx-3593811691 logo"
           height="40"
           src="/static/images/opencollective-icon.svg"
           width="40"
         />
       </a>
       <div
-        className="jsx-960116486 nav"
+        className="jsx-3593811691 nav"
       >
         <ul
-          className="jsx-960116486 mediumScreenOnly"
+          className="jsx-3593811691 mediumScreenOnly"
         >
           <li
-            className="jsx-960116486"
+            className="jsx-3593811691"
           >
             <a
-              className="jsx-960116486 menuItem"
+              className="jsx-3593811691 menuItem"
               href="/learn-more"
             >
               <span>
@@ -46,10 +46,10 @@ exports[`Search Page renders empty results message 1`] = `
             </a>
           </li>
           <li
-            className="jsx-960116486"
+            className="jsx-3593811691"
           >
             <a
-              className="jsx-960116486 menuItem"
+              className="jsx-3593811691 menuItem"
               href="/discover"
             >
               <span>
@@ -58,10 +58,10 @@ exports[`Search Page renders empty results message 1`] = `
             </a>
           </li>
           <li
-            className="jsx-960116486"
+            className="jsx-3593811691"
           >
             <a
-              className="jsx-960116486 menuItem"
+              className="jsx-3593811691 menuItem"
               href="https://medium.com/open-collective"
             >
               <span>
@@ -71,7 +71,7 @@ exports[`Search Page renders empty results message 1`] = `
           </li>
         </ul>
         <div
-          className="jsx-960116486 separator"
+          className="jsx-3593811691 separator"
         />
         <div
           className="jsx-2783800609 LoginTopBarProfileButton"
@@ -285,23 +285,23 @@ exports[`Search Page renders error message 1`] = `
   className="jsx-3855972673 Error"
 >
   <header
-    className="jsx-963368174"
+    className="jsx-3598562734"
   >
     <div
-      className="jsx-963368174"
+      className="jsx-3598562734"
       id="top"
     />
     <div
-      className="jsx-960116486 TopBar"
+      className="jsx-3593811691 TopBar"
     >
       <a
-        className="jsx-960116486"
+        className="jsx-3593811691"
         href="/"
         title="Go to Open Collective Homepage"
       >
         <img
           alt="Open Collective logo"
-          className="jsx-960116486 logo"
+          className="jsx-3593811691 logo"
           height="40"
           src="/static/images/opencollective-icon.svg"
           width="40"
@@ -309,27 +309,52 @@ exports[`Search Page renders error message 1`] = `
       </a>
       <form
         action="/search"
-        className="jsx-960116486 topbar-search-form"
+        className="jsx-3593811691 topbar-search-form"
         method="GET"
       >
-        <input
-          className="jsx-960116486 topbar-search-input"
-          name="q"
-          placeholder="Search Open Collective"
-          type="search"
-        />
+        <div
+          className="jsx-3593811691 topbar-search-container"
+        >
+          <input
+            className="jsx-3593811691 topbar-search-input"
+            name="q"
+            placeholder="Search Open Collective"
+            type="search"
+          />
+          <button
+            className="jsx-3593811691 topbar-search-button"
+          >
+            <svg
+              height={16}
+              version="1.1"
+              viewBox="10 10 30 30"
+              width={16}
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <title>
+                magnifying glass icon
+              </title>
+              <path
+                d="M28.5404814,30.1903972 C26.7995948,31.5736628 24.5962981,32.4 22.2,32.4 C16.5666956,32.4 12,27.8333044 12,22.2 C12,16.5666956 16.5666956,12 22.2,12 C27.8333044,12 32.4,16.5666956 32.4,22.2 C32.4,24.5962981 31.5736628,26.7995948 30.1903972,28.5404814 L35.6582912,34.0083754 C36.1139029,34.4639871 36.1139029,35.2026796 35.6582912,35.6582912 C35.2026796,36.1139029 34.4639871,36.1139029 34.0083754,35.6582912 L28.5404814,30.1903972 Z M22.2,30 C26.507821,30 30,26.507821 30,22.2 C30,17.892179 26.507821,14.4 22.2,14.4 C17.892179,14.4 14.4,17.892179 14.4,22.2 C14.4,26.507821 17.892179,30 22.2,30 Z"
+                fill="#FFFFFF"
+                fillRule="nonzero"
+                id="magnifying-glass"
+              />
+            </svg>
+          </button>
+        </div>
       </form>
       <div
-        className="jsx-960116486 nav"
+        className="jsx-3593811691 nav"
       >
         <ul
-          className="jsx-960116486 mediumScreenOnly"
+          className="jsx-3593811691 mediumScreenOnly"
         >
           <li
-            className="jsx-960116486"
+            className="jsx-3593811691"
           >
             <a
-              className="jsx-960116486 menuItem"
+              className="jsx-3593811691 menuItem"
               href="/learn-more"
             >
               <span>
@@ -338,10 +363,10 @@ exports[`Search Page renders error message 1`] = `
             </a>
           </li>
           <li
-            className="jsx-960116486"
+            className="jsx-3593811691"
           >
             <a
-              className="jsx-960116486 menuItem"
+              className="jsx-3593811691 menuItem"
               href="/discover"
             >
               <span>
@@ -350,10 +375,10 @@ exports[`Search Page renders error message 1`] = `
             </a>
           </li>
           <li
-            className="jsx-960116486"
+            className="jsx-3593811691"
           >
             <a
-              className="jsx-960116486 menuItem"
+              className="jsx-3593811691 menuItem"
               href="https://medium.com/open-collective"
             >
               <span>
@@ -363,7 +388,7 @@ exports[`Search Page renders error message 1`] = `
           </li>
         </ul>
         <div
-          className="jsx-960116486 separator"
+          className="jsx-3593811691 separator"
         />
         <div
           className="jsx-2783800609 LoginTopBarProfileButton"
@@ -514,39 +539,39 @@ exports[`Search Page renders loading grid SVG 1`] = `
   className="jsx-4119556752"
 >
   <header
-    className="jsx-963368174"
+    className="jsx-3598562734"
   >
     <div
-      className="jsx-963368174"
+      className="jsx-3598562734"
       id="top"
     />
     <div
-      className="jsx-960116486 loading TopBar"
+      className="jsx-3593811691 loading TopBar"
     >
       <a
-        className="jsx-960116486"
+        className="jsx-3593811691"
         href="/"
         title="Go to Open Collective Homepage"
       >
         <img
           alt="Open Collective logo"
-          className="jsx-960116486 logo"
+          className="jsx-3593811691 logo"
           height="40"
           src="/static/images/opencollective-icon.svg"
           width="40"
         />
       </a>
       <div
-        className="jsx-960116486 nav"
+        className="jsx-3593811691 nav"
       >
         <ul
-          className="jsx-960116486 mediumScreenOnly"
+          className="jsx-3593811691 mediumScreenOnly"
         >
           <li
-            className="jsx-960116486"
+            className="jsx-3593811691"
           >
             <a
-              className="jsx-960116486 menuItem"
+              className="jsx-3593811691 menuItem"
               href="/learn-more"
             >
               <span>
@@ -555,10 +580,10 @@ exports[`Search Page renders loading grid SVG 1`] = `
             </a>
           </li>
           <li
-            className="jsx-960116486"
+            className="jsx-3593811691"
           >
             <a
-              className="jsx-960116486 menuItem"
+              className="jsx-3593811691 menuItem"
               href="/discover"
             >
               <span>
@@ -567,10 +592,10 @@ exports[`Search Page renders loading grid SVG 1`] = `
             </a>
           </li>
           <li
-            className="jsx-960116486"
+            className="jsx-3593811691"
           >
             <a
-              className="jsx-960116486 menuItem"
+              className="jsx-3593811691 menuItem"
               href="https://medium.com/open-collective"
             >
               <span>
@@ -580,7 +605,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
           </li>
         </ul>
         <div
-          className="jsx-960116486 separator"
+          className="jsx-3593811691 separator"
         />
         <div
           className="jsx-2783800609 LoginTopBarProfileButton"
@@ -922,39 +947,39 @@ exports[`Search Page renders search results with pagination 1`] = `
   className="jsx-4119556752"
 >
   <header
-    className="jsx-963368174"
+    className="jsx-3598562734"
   >
     <div
-      className="jsx-963368174"
+      className="jsx-3598562734"
       id="top"
     />
     <div
-      className="jsx-960116486 loading TopBar"
+      className="jsx-3593811691 loading TopBar"
     >
       <a
-        className="jsx-960116486"
+        className="jsx-3593811691"
         href="/"
         title="Go to Open Collective Homepage"
       >
         <img
           alt="Open Collective logo"
-          className="jsx-960116486 logo"
+          className="jsx-3593811691 logo"
           height="40"
           src="/static/images/opencollective-icon.svg"
           width="40"
         />
       </a>
       <div
-        className="jsx-960116486 nav"
+        className="jsx-3593811691 nav"
       >
         <ul
-          className="jsx-960116486 mediumScreenOnly"
+          className="jsx-3593811691 mediumScreenOnly"
         >
           <li
-            className="jsx-960116486"
+            className="jsx-3593811691"
           >
             <a
-              className="jsx-960116486 menuItem"
+              className="jsx-3593811691 menuItem"
               href="/learn-more"
             >
               <span>
@@ -963,10 +988,10 @@ exports[`Search Page renders search results with pagination 1`] = `
             </a>
           </li>
           <li
-            className="jsx-960116486"
+            className="jsx-3593811691"
           >
             <a
-              className="jsx-960116486 menuItem"
+              className="jsx-3593811691 menuItem"
               href="/discover"
             >
               <span>
@@ -975,10 +1000,10 @@ exports[`Search Page renders search results with pagination 1`] = `
             </a>
           </li>
           <li
-            className="jsx-960116486"
+            className="jsx-3593811691"
           >
             <a
-              className="jsx-960116486 menuItem"
+              className="jsx-3593811691 menuItem"
               href="https://medium.com/open-collective"
             >
               <span>
@@ -988,7 +1013,7 @@ exports[`Search Page renders search results with pagination 1`] = `
           </li>
         </ul>
         <div
-          className="jsx-960116486 separator"
+          className="jsx-3593811691 separator"
         />
         <div
           className="jsx-2783800609 LoginTopBarProfileButton"
