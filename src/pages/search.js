@@ -153,7 +153,7 @@ class SearchPage extends React.Component {
             <Row className="results-row">
               {loading && (
                 <div className="center">
-                  <LoadingGrid /> 
+                  <LoadingGrid />
                 </div>
               )}
 
@@ -163,9 +163,9 @@ class SearchPage extends React.Component {
                 </Col>
               ))}
 
-              { /* TODO: add suggested collectives when the result is empty */ } 
+              { /* TODO: add suggested collectives when the result is empty */ }
               {showCollectives && collectives.length === 0 && (
-                <p className="center"><em>No collectives found matching your query: "{term}"</em></p>
+                <p className="center"><em>No collectives found matching your query: &quot;{term}&quot;</em></p>
               )}
             </Row>
             {showCollectives && collectives.length !== 0 && <Row>

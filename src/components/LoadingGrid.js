@@ -1,3 +1,4 @@
+import React from 'react';
 import PropTypes from 'prop-types';
 
 const LoadingGrid = ({ color, size }) => (
@@ -5,7 +6,7 @@ const LoadingGrid = ({ color, size }) => (
     <circle cx="12.5" cy="12.5" r="12.5">
       <animate attributeName="fill-opacity" begin="0s" dur="1s" values="1;.2;1" calcMode="linear" repeatCount="indefinite"/>
     </circle>
-    <circle cx="12.5" cy="52.5" r="12.5" fill-opacity=".5">
+    <circle cx="12.5" cy="52.5" r="12.5" fillOpacity=".5">
       <animate attributeName="fill-opacity" begin="100ms" dur="1s" values="1;.2;1" calcMode="linear" repeatCount="indefinite"/>
     </circle>
     <circle cx="52.5" cy="12.5" r="12.5">
