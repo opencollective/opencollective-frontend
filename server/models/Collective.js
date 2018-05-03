@@ -823,17 +823,22 @@ export default function(Sequelize, DataTypes) {
             return models.Member.update(editableAttributes, { where: { id: member.id }});
           } else {
             // Create new membership
+            const memberAttrs = {
+              ...defaultAttributes,
+              description: member.description,
+            };
+
             member.CollectiveId = this.id;
             if (member.CreatedByUserId) {
               const user = {
                 id: member.CreatedByUserId,
                 CollectiveId: member.MemberCollectiveId
               };
-              return this.addUserWithRole(user, member.role, { TierId: member.TierId, ...defaultAttributes });
+              return this.addUserWithRole(user, member.role, { TierId: member.TierId, ...memberAttrs });
             } else {
               return models.User.findOrCreateByEmail(member.member.email, member.member)
                 .then(user => {
-                  return this.addUserWithRole(user, member.role, { TierId: member.TierId, ...defaultAttributes });
+                  return this.addUserWithRole(user, member.role, { TierId: member.TierId, ...memberAttrs });
                 })
             }
           }
