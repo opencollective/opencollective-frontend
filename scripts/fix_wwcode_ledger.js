@@ -26,7 +26,7 @@ const findUserCollectives = (userId) => {
       return models.Member.findAll({
         where: {
           MemberCollectiveId: user.CollectiveId,
-          $and: {
+          [Op.and]: {
             [Op.or]: [{ role: 'ADMIN'}, { role: 'HOST'}]
           }
         }
