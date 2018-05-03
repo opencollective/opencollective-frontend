@@ -118,7 +118,7 @@ export const getOrCreateUser = (req, res, next) => {
 
   User.findOne({
     where: {
-      $or: {
+      [Op.or]: {
         email: userData.email,
         paypalEmail: userData.paypalEmail
       }

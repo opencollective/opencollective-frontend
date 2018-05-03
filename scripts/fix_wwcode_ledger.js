@@ -27,7 +27,7 @@ const findUserCollectives = (userId) => {
         where: {
           MemberCollectiveId: user.CollectiveId,
           $and: {
-            $or: [{ role: 'ADMIN'}, { role: 'HOST'}]
+            [Op.or]: [{ role: 'ADMIN'}, { role: 'HOST'}]
           }
         }
       })

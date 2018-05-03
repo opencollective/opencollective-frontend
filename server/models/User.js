@@ -462,7 +462,7 @@ export default (Sequelize, DataTypes) => {
     debug("findOrCreateByEmail", email, "other attributes: ", otherAttributes);
     return User.findOne({
       where: {
-        $or: {
+        [Op.or]: {
           email,
           paypalEmail: email
         }

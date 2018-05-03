@@ -120,7 +120,7 @@ export const CollectivesStatsType = new GraphQLObjectType({
         async resolve(collective) {
           return models.Collective.count({
             where: {
-              $or: {
+              [Op.or]: {
                 ParentCollectiveId: collective.id,
                 HostCollectiveId: collective.id
               },

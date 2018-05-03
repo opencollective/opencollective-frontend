@@ -146,7 +146,7 @@ const checkUsersAndOrgs = () => {
   return models.Collective.findAll({
     where: {
       type: {
-        $or: ['USER', 'ORGANIZATION']
+        [Op.or]: ['USER', 'ORGANIZATION']
       },
       HostCollectiveId: {
         [Op.ne]: null
@@ -376,7 +376,7 @@ const checkCollectiveBalance = () => {
   return models.Collective.findAll({
     attributes: [ 'id' ],
     where: {
-      $or: [{type: 'COLLECTIVE'}, {type: 'EVENT'}],
+      [Op.or]: [{type: 'COLLECTIVE'}, {type: 'EVENT'}],
       id: {
         $notIn: [7, 34]
       }

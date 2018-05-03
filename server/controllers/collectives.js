@@ -547,7 +547,7 @@ export const getTransactions = (req, res, next) => {
   }
 
   if (req.query.exclude) {
-    where.$or = [ { type: { [Op.ne]: req.query.exclude } }, { type: { [Op.eq]: null } } ];
+    where[Op.or] = [ { type: { [Op.ne]: req.query.exclude } }, { type: { [Op.eq]: null } } ];
   }
 
   const query = _.merge({

@@ -207,7 +207,7 @@ export const loaders = (req) => {
         .findAll({ where: {
           CollectiveId: { [Op.in]: CollectiveIds },
           name: { [Op.ne]: null },
-          expiryDate: { $or: [ null, { [Op.gte]: new Date } ] },
+          expiryDate: { [Op.or]: [ null, { [Op.gte]: new Date } ] },
           archivedAt: null
         }})
         .then(results => sortResults(CollectiveIds, results, 'CollectiveId', []))
