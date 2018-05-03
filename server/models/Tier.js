@@ -170,7 +170,7 @@ export default function(Sequelize, DataTypes) {
         CollectiveId: this.CollectiveId,
         MemberCollectiveId: backerCollective.id,
         TierId: this.id,
-        createdAt: { $lte: until }
+        createdAt: { [Op.lte]: until }
       }
     }).then(membership => {
       if (!membership) return false;

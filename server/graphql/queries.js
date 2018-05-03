@@ -234,7 +234,7 @@ const queries = {
       if (args.dateFrom || args.dateTo) {
         query.where.createdAt = {};
         if (args.dateFrom) query.where.createdAt[Op.gte] = args.dateFrom;
-        if (args.dateTo) query.where.createdAt['$lte'] = args.dateTo;
+        if (args.dateTo) query.where.createdAt[Op.lte] = args.dateTo;
       }
       return models.Transaction.findAll(query);
     }
