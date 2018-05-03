@@ -34,6 +34,8 @@ if (config.options.logging) {
   }
 }
 
+config.options.operatorsAliases = false;
+
 export const sequelize = new Sequelize(
   config.database,
   config.username,
@@ -152,5 +154,6 @@ export function setupModels(client) {
   m.Tier.belongsTo(m.Collective);
 
   Object.keys(m).forEach((modelName) => m[modelName].associate && m[modelName].associate(m));
+
   return m;
 }
