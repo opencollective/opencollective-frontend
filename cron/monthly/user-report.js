@@ -16,7 +16,7 @@ import config from 'config';
 import Promise from 'bluebird';
 import fetch from 'node-fetch';
 import debugLib from 'debug';
-import models, { sequelize, Op } from '../../server/models';
+import models, { Op } from '../../server/models';
 import emailLib from '../../server/lib/email';
 import roles from '../../server/constants/roles';
 import { formatCurrencyObject, formatArrayToString } from '../../server/lib/utils';

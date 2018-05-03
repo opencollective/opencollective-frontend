@@ -34,7 +34,7 @@ const calculateNewBackersPerMonth = () => {
         [Op.not]: null
       }*/
       CollectiveId: {
-        [sequelize.Op.notIn]: [ 1 ]
+        [Op.notIn]: [ 1 ]
       }
     },
     include: [

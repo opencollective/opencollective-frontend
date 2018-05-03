@@ -2,9 +2,7 @@ import path from 'path';
 import { cloneDeep } from 'lodash';
 import Liana from 'forest-express-sequelize';
 
-import models, { sequelize } from '../models';
-
-const Op = sequelize.Sequelize.Op;
+import models, { sequelize, Op } from '../models';
 
 export default (app) => {
 
