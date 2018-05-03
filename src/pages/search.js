@@ -108,7 +108,7 @@ class SearchPage extends React.Component {
             max-width: 200px;
           }
 
-          div :global(input[type=search]) {
+          div :global(.search-input) {
             border: none;
             border-bottom: 2px solid ${colors.blue};
             border-radius: 0;
@@ -133,6 +133,7 @@ class SearchPage extends React.Component {
           title="Search"
           className={loadingUserLogin ? 'loading' : ''}
           LoggedInUser={LoggedInUser}
+          showSearch={false}
         />
         <Body>
           <Grid>

@@ -10,7 +10,12 @@ const logo = '/static/images/opencollective-icon.svg';
 class TopBar extends React.Component {
 
   static propTypes = {
-    LoggedInUser: PropTypes.object
+    LoggedInUser: PropTypes.object.isRequired,
+    showSearch: PropTypes.bool,
+  }
+
+  static defaultProps = {
+    showSearch: true,
   }
 
   constructor(props) {
@@ -58,13 +63,12 @@ class TopBar extends React.Component {
   }
 
   render() {
-    const { className, LoggedInUser, intl } = this.props;
+    const { className, LoggedInUser, intl, showSearch } = this.props;
 
     return (
       <div className={classNames(className, 'TopBar')}>
         <style jsx>{`
         .TopBar {
-          height: 6rem;
           width: 100%;
           position: relative;
         }
@@ -126,8 +130,44 @@ class TopBar extends React.Component {
           margin-right: 0;
           padding-right: 0;
         }
+
+        .topbar-search-form {
+          padding: 1rem;
+          width: 100%;
+        }
+
+        .topbar-search-input {
+          background-color: var(--silver-four);
+          border: none;
+          border-radius: 2px;
+          font-size: 1.5rem;
+          letter-spacing: 0.1rem;
+          padding: 1rem;
+          width: 100%;
+        }
+
+        @media(min-width: 500px) {
+          .topbar-search-form {
+            display: inline-block;
+            max-width: 30rem;
+            min-width: 10rem;
+            width: 40%;
+          }
+
+          .topbar-search-input {
+            font-size: 1.2rem;
+            padding: 0.5rem;
+          }
+        }
         `}</style>
         <a href="/" title={intl.formatMessage(this.messages['menu.homepage'])}><img src={logo} width="40" height="40" className="logo" alt="Open Collective logo" /></a>
+        
+        {showSearch && (
+          <form action="/search" method="GET" className="topbar-search-form">
+            <input type="search" name="q" placeholder="Search Open Collective" className="topbar-search-input" />
+          </form>
+        )}
+
         <div className="nav">
           <ul className="mediumScreenOnly">
             <li><a className="menuItem" href="/learn-more"><FormattedMessage id="menu.howItWorks" defaultMessage="How it works" /></a></li>

@@ -214,7 +214,7 @@ class Header extends React.Component {
       `}
       </style>
       <div id="top" />
-      <TopBar className={className} LoggedInUser={this.props.LoggedInUser} />
+      <TopBar className={className} LoggedInUser={this.props.LoggedInUser} showSearch={this.props.showSearch} />
     </header>
     );
   }
