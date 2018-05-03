@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
+import SearchIcon from './SearchIcon';
 import TopBarProfileMenu from './TopBarProfileMenu';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import withIntl from '../lib/withIntl';
@@ -136,14 +137,35 @@ class TopBar extends React.Component {
           width: 100%;
         }
 
+        .topbar-search-container {
+          align-items: center;
+          border: solid 1px var(--silver-four);
+          border-radius: 2px;
+          display: flex;
+          justify-content: space-between;
+        }
+
         .topbar-search-input {
+          background-color: white;
+          border: none;
+          font-size: 1.2rem;
+          letter-spacing: 0.1rem;
+          padding: 1rem;
+          width: 80%;
+        }
+
+        .topbar-search-input:focus ~ .topbar-search-button {
+          background-color: var(--fade-blue);
+        }
+
+        .topbar-search-button {
+          appearance: none;
           background-color: var(--silver-four);
           border: none;
           border-radius: 2px;
-          font-size: 1.5rem;
-          letter-spacing: 0.1rem;
-          padding: 1rem;
-          width: 100%;
+          display: flex;
+          margin-right: 5px;
+          padding: 5px;
         }
 
         @media(min-width: 500px) {
@@ -153,18 +175,18 @@ class TopBar extends React.Component {
             min-width: 10rem;
             width: 40%;
           }
-
-          .topbar-search-input {
-            font-size: 1.2rem;
-            padding: 0.5rem;
-          }
         }
         `}</style>
         <a href="/" title={intl.formatMessage(this.messages['menu.homepage'])}><img src={logo} width="40" height="40" className="logo" alt="Open Collective logo" /></a>
         
         {showSearch && (
           <form action="/search" method="GET" className="topbar-search-form">
-            <input type="search" name="q" placeholder="Search Open Collective" className="topbar-search-input" />
+            <div className="topbar-search-container">
+              <input type="search" name="q" placeholder="Search Open Collective" className="topbar-search-input" />
+              <button className="topbar-search-button">
+                <SearchIcon size={16} />
+              </button>
+            </div>
           </form>
         )}
 
