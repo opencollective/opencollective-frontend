@@ -4,6 +4,8 @@ import Liana from 'forest-express-sequelize';
 
 import models, { sequelize } from '../models';
 
+const Op = sequelize.Sequelize.Op;
+
 export default (app) => {
 
   if (!process.env.FOREST_ENV_SECRET || !process.env.FOREST_AUTH_SECRET) {
@@ -47,6 +49,59 @@ export default (app) => {
       })
   });
 
+  app.post('/forest/actions/delete-collective-and-dependencies', Liana.ensureAuthenticated, async (req, res) => {
+    const data = req.body.data;
+    const id = data.attributes.ids[0];
+    models.Collective
+      .findOne({ where: { id } })
+      .then(async collective => {
+        // Check if we can delete the collective
+        await models.Order
+          .count({ where: { [Op.or]: [ { CollectiveId: collective.id }, { FromCollectiveId: collective.id } ] } })
+          .then(count => {
+            if (count > 0) throw Error('Can not delete collective with existing orders.');
+          });
+        await models.Expense
+          .count({ where: { CollectiveId: collective.id, 'status': 'PAID' } })
+          .then(count => {
+            if (count > 0) throw Error('Can not delete collective with paid expenses.');
+          });
+        // Delete Expenses
+        await models.Expense
+          .findAll({ where: { CollectiveId: collective.id }})
+          .then(expenses => {
+            expenses.forEach(async expense => {
+              await expense.destroy();
+            });
+          });
+        // Delete Members
+        await models.Member
+          .findAll({ where: { CollectiveId: collective.id }})
+          .then(members => {
+            members.forEach(async member => {
+              await member.destroy();
+            });
+          });
+        // Delete Collective
+        await collective.destroy();
+      })
+      .then(() => {
+        const msg = 'The collective and its dependencies were successfully deleted.';
+        res.status(200).send({
+          html: `<p>${msg}</p>
+                 <p><a href="../../../">Click here to continue</a>.</p>`
+        });
+      })
+      .catch(e => {
+        const msg = e.message;
+        res.status(400).send({
+          error: `There was an error while processing your request.\n
+            "${msg}"\n
+            Maybe you want to proceed manually?`
+        });
+      })
+  });
+
 };
 
 function getForestModels () {
@@ -67,7 +122,7 @@ function getForestModels () {
   delete m.Collective.associations.memberOfCollectives;
   // Missing relations
   m.Collective.hasMany(m.PaymentMethod);
-  m.Collective.hasMany(m.Expense);
+  m.Collective.hasMany(m.Expense, { foreignKey: "CollectiveId", as: 'Expense'});
   m.Collective.hasMany(m.Member, { foreignKey: 'MemberCollectiveId', as: 'Membership' });
   delete m.Collective.associations.orders;
   m.Collective.hasMany(m.Order, { foreignKey: "CollectiveId", as: 'ReceivedOrders'});
