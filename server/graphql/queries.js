@@ -375,7 +375,7 @@ const queries = {
             }
           }
           return getCollectiveIds().then(collectiveIds => {
-            query.where.CollectiveId = { $in: collectiveIds };
+            query.where.CollectiveId = { [Op.in]: collectiveIds };
             return models.Update.findAll(query);
           })
         })
@@ -433,7 +433,7 @@ const queries = {
             }
           }
           return getCollectiveIds().then(collectiveIds => {
-            query.where.CollectiveId = { $in: collectiveIds };
+            query.where.CollectiveId = { [Op.in]: collectiveIds };
             return models.Expense.findAll(query);
           })
         })
@@ -620,7 +620,7 @@ const queries = {
           .then(results => {
             if (args.isActive) {
               const TierIds = uniq(results.map(r => r.dataValues.TierId));
-              return models.Tier.findAll({where: { id: { $in: TierIds }}}).then(tiers => {
+              return models.Tier.findAll({where: { id: { [Op.in]: TierIds }}}).then(tiers => {
                 tiers.map(t => tiersById[t.id] = t.dataValues);
                 return results.filter(r => {
                   return models.Member.isActive({
@@ -655,7 +655,7 @@ const queries = {
         if (req.body.query.match(/ member ?\{/) || args.type) {
           if (args.type) {
             const types = args.type.split(',');
-            memberCond.type = { $in: types };
+            memberCond.type = { [Op.in]: types };
           }
           query.include.push(
             {
@@ -671,7 +671,7 @@ const queries = {
         if (args.offset) query.offset = args.offset;
 
         return getCollectiveIds().then(collectiveIds => {
-          query.where[attr] = { $in: collectiveIds };
+          query.where[attr] = { [Op.in]: collectiveIds };
           query.where.role = { [Op.ne]: 'HOST' };
           return models.Member.findAll(query);
         }).then(members => {

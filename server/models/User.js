@@ -27,7 +27,7 @@ const SALT_WORK_FACTOR = 10;
  */
 export default (Sequelize, DataTypes) => {
 
-  const models = Sequelize.models;
+  const { models, Op } = Sequelize;
 
   const User = Sequelize.define('User', {
 
@@ -359,7 +359,7 @@ export default (Sequelize, DataTypes) => {
     if (adminOf.length > 0) {
       const hostedMemberships = await models.Member.findAll({
         where: {
-          MemberCollectiveId: { $in: adminOf },
+          MemberCollectiveId: { [Op.in]: adminOf },
           role: roles.HOST
         }
       });

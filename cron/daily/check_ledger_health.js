@@ -164,7 +164,7 @@ const checkUsersAndOrgs = () => {
   .then(userCollectives => models.Collective.findAll({
     where: {
       id: {
-        $in: userCollectives.map(u => u.CollectiveId)
+        [Op.in]: userCollectives.map(u => u.CollectiveId)
       },
       type: {
         [Op.ne]: 'USER'

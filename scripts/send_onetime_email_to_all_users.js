@@ -2,7 +2,7 @@
 
 /*
  * This script is useful for sending a one-time email to all users.
- */ 
+ */
 
 process.env.PORT = 3066;
 
@@ -11,7 +11,7 @@ import moment from 'moment';
 import config from 'config';
 import Promise from 'bluebird';
 import debugLib from 'debug';
-import models, { sequelize } from '../server/models';
+import models, { sequelize, Op } from '../server/models';
 import emailLib from '../server/lib/email';
 import roles from '../server/constants/roles';
 
@@ -36,7 +36,7 @@ const init = () => {
 
   // for debugging, handpick a few users
   if (process.env.DEBUG && process.env.DEBUG.match(/preview/))
-    usersQuery.where = { username: {$in: ['xdamman','piamancini','aseem']} };
+    usersQuery.where = { username: {[Op.in]: ['xdamman','piamancini','aseem']} };
 
   return User.findAll(usersQuery)
   .then(sendEmail)

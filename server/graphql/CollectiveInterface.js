@@ -764,13 +764,13 @@ const CollectiveFields = () => {
         const roles = args.roles || (args.role && [ args.role ]);
 
         if (roles && roles.length > 0) {
-          query.where.role = { $in: roles };
+          query.where.role = { [Op.in]: roles };
         }
 
         let conditionOnMemberCollective;
         if (args.type) {
           const types = args.type.split(',');
-          conditionOnMemberCollective = { type: { $in: types } };
+          conditionOnMemberCollective = { type: { [Op.in]: types } };
         }
 
         query.include = [
@@ -805,7 +805,7 @@ const CollectiveFields = () => {
         const where = { MemberCollectiveId: collective.id };
         const roles = args.roles || (args.role && [ args.role ]);
         if (roles && roles.length > 0) {
-          where.role = { $in: roles };
+          where.role = { [Op.in]: roles };
         }
         return models.Member.findAll({
           where,
@@ -947,7 +947,7 @@ const CollectiveFields = () => {
               }
             }
             return getCollectiveIds().then(collectiveIds => {
-              query.where.CollectiveId = { $in: collectiveIds };
+              query.where.CollectiveId = { [Op.in]: collectiveIds };
               return models.Expense.findAll(query);
             })
           })

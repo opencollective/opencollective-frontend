@@ -23,7 +23,7 @@ export function getBackersStats(startDate = new Date('2015-01-01'), endDate = ne
       };
 
     if (collectiveids) {
-      where.CollectiveId = { $in: collectiveids };
+      where.CollectiveId = { [Op.in]: collectiveids };
     }
 
     return models.Transaction.findAll({
@@ -93,7 +93,7 @@ export function sumTransactions(attribute, where = {}, hostCurrency, date) {
 
 export function getTotalHostFees(collectiveids, type, startDate = new Date('2015-01-01'), endDate = new Date, hostCurrency = 'USD') {
   const where = {
-    CollectiveId: { $in: collectiveids },
+    CollectiveId: { [Op.in]: collectiveids },
     createdAt: { [Op.gte]: startDate, [Op.lt]: endDate }
   };
   if (type) {
@@ -104,7 +104,7 @@ export function getTotalHostFees(collectiveids, type, startDate = new Date('2015
 
 export function getTotalNetAmount(collectiveids, type, startDate = new Date('2015-01-01'), endDate = new Date, hostCurrency = 'USD') {
   const where = {
-    CollectiveId: { $in: collectiveids },
+    CollectiveId: { [Op.in]: collectiveids },
     createdAt: { [Op.gte]: startDate, [Op.lt]: endDate }
   };
   if (type) {

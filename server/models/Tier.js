@@ -241,7 +241,7 @@ export default function(Sequelize, DataTypes) {
     debug("appendTier", collective.name, "backers: ", backerCollectives.length);
     return models.Member.findAll({
       where: {
-        MemberCollectiveId: { $in: backerCollectivesIds },
+        MemberCollectiveId: { [Op.in]: backerCollectivesIds },
         CollectiveId: collective.id
       },
       include: [ { model: models.Tier }]

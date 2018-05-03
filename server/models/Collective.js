@@ -849,7 +849,7 @@ export default function(Sequelize, DataTypes) {
   // creates a User and a UserCollective if needed
   Collective.prototype.editMembers = function(members, defaultAttributes = {}) {
     if (!members) return Promise.resolve();
-    return this.getMembers({ where: { role: { $in: [ roles.ADMIN, roles.MEMBER ] } } } )
+    return this.getMembers({ where: { role: { [Op.in]: [ roles.ADMIN, roles.MEMBER ] } } } )
       .then(oldMembers => {
         // remove the members that are not present anymore
         const diff = difference(oldMembers.map(t => t.id), members.map(t => t.id));
@@ -857,7 +857,7 @@ export default function(Sequelize, DataTypes) {
           return null;
         } else {
           debug("editMembers", "delete", diff);
-          return models.Member.update({ deletedAt: new Date }, { where: { id: { $in: diff }}})
+          return models.Member.update({ deletedAt: new Date }, { where: { id: { [Op.in]: diff }}})
         }
       })
       .then(() => {
@@ -890,7 +890,7 @@ export default function(Sequelize, DataTypes) {
           }
         });
       })
-      .then(() => this.getMembers({ where: { role: { $in: [ roles.ADMIN, roles.MEMBER ] } } } ))
+      .then(() => this.getMembers({ where: { role: { [Op.in]: [ roles.ADMIN, roles.MEMBER ] } } } ))
   };
 
   // edit the tiers of this collective (create/update/remove)
@@ -901,7 +901,7 @@ export default function(Sequelize, DataTypes) {
     .then(oldTiers => {
       // remove the tiers that are not present anymore in the updated collective
       const diff = difference(oldTiers.map(t => t.id), tiers.map(t => t.id));
-      return models.Tier.update({ deletedAt: new Date }, { where: { id: { $in: diff }}})
+      return models.Tier.update({ deletedAt: new Date }, { where: { id: { [Op.in]: diff }}})
     })
     .then(() => {
       return Promise.map(tiers, (tier) => {
@@ -936,7 +936,7 @@ export default function(Sequelize, DataTypes) {
     .then(oldPaymentMethods => {
       // remove the paymentMethods that are not present anymore in the updated collective
       const diff = difference(oldPaymentMethods.map(t => t.id), paymentMethods.map(t => t.id));
-      return models.PaymentMethod.update({ archivedAt: new Date }, { where: { id: { $in: diff }}})
+      return models.PaymentMethod.update({ archivedAt: new Date }, { where: { id: { [Op.in]: diff }}})
     })
     .then(() => {
       return Promise.map(paymentMethods, (pm) => {
@@ -1181,7 +1181,7 @@ export default function(Sequelize, DataTypes) {
           as: 'fromCollective',
           attributes: [],
           required: true,
-          where: { type: { $in: types }}
+          where: { type: { [Op.in]: types }}
         }
       ];
       query.raw = true; // need this otherwise it automatically also fetches Transaction.id which messes up everything

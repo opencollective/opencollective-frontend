@@ -1,7 +1,7 @@
 import config from 'config';
 import request from 'request-promise';
 import Promise from 'bluebird';
-import models from '../models';
+import models, { Op } from '../models';
 import errors from '../lib/errors';
 import paymentProviders from '../paymentProviders';
 import { get } from 'lodash';
@@ -41,7 +41,7 @@ export const createOrUpdate = (req, res, next, accessToken, data, emails) => {
       if (req.remoteUser) {
         fetchUserPromise = Promise.resolve(req.remoteUser);
       } else {
-        fetchUserPromise = User.findOne({ where: { email: { $in: emails.map(email => email.toLowerCase()) } } })
+        fetchUserPromise = User.findOne({ where: { email: { [Op.in]: emails.map(email => email.toLowerCase()) } } })
         .then(u => u || User.createUserWithCollective({
           name: profile.name || profile.login,
           image,

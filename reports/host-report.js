@@ -85,10 +85,10 @@ async function HostReport(year, month, hostId) {
 
   const getPlatformStats = () => {
 
-    return models.Collective.findAll({ where: { type: { $in: ['COLLECTIVE', 'EVENT'] } } })
+    return models.Collective.findAll({ where: { type: { [Op.in]: ['COLLECTIVE', 'EVENT'] } } })
       .then((collectives) => {
         const where = {
-          CollectiveId: { $in: collectives.map(c => c.id) }
+          CollectiveId: { [Op.in]: collectives.map(c => c.id) }
         };
         const now = new Date;
         const catchError = (e) => {
@@ -119,7 +119,7 @@ async function HostReport(year, month, hostId) {
   const getHostStats = (host, collectiveids) => {
 
     const where = {
-      CollectiveId: { $in: collectiveids }
+      CollectiveId: { [Op.in]: collectiveids }
     };
 
     return Promise.all([

@@ -18,7 +18,7 @@ describe('hostlib', () => {
   let collectiveids;
 
   const where = {
-    CollectiveId: { $in: collectiveids },
+    CollectiveId: { [Op.in]: collectiveids },
     createdAt: { [Op.gte]: startDate, [Op.lt]: endDate}
   };
 
@@ -38,7 +38,7 @@ describe('hostlib', () => {
 
   beforeEach('get hosted collectives', () => hostlib.getHostedCollectives(hostid).then(collectives => {
     collectiveids = collectives.map(g => g.id).filter(id => id !== hostid); // We remove the host collective
-    where.CollectiveId = { $in: collectiveids };
+    where.CollectiveId = { [Op.in]: collectiveids };
     expect(collectives.length).to.equal(73);
   }));
 

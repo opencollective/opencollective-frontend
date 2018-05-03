@@ -9,7 +9,7 @@ if (process.env.NODE_ENV === 'production' && today.getDate() !== 1 && today.getM
 
 process.env.PORT = 3066;
 
-import models, { sequelize } from '../../server/models';
+import models, { sequelize, Op } from '../../server/models';
 import _ from 'lodash';
 import Promise from 'bluebird';
 import { formatCurrency, formatArrayToString, formatCurrencyObject } from '../../server/lib/utils';
@@ -46,7 +46,7 @@ SELECT
   host.name as "hostName",
   host.image as "hostLogo", host."twitterHandle" as "hostTwitterHandle", host.description as "hostDescription", host.mission as "hostMission",
   g.slug, g.name, g.mission, g.image, g."backgroundImage", g."twitterHandle", g.settings, g.data
-FROM "CollectiveTransactions" ut 
+FROM "CollectiveTransactions" ut
 LEFT JOIN "Collectives" g ON ut."CollectiveId" = g.id
 LEFT JOIN "Collectives" host ON ut."HostCollectiveId" = host.id`;
 
@@ -199,11 +199,11 @@ const getHosts = () => {
 const getCollectives = () => {
   const where = {};
   if (process.env.DEBUG && process.env.DEBUG.match(/preview/)) {
-    where.slug = { $in : ['xdamman', 'digitalocean', 'fbopensource', 'piamancini', 'brusselstogether','wwcode'] };
+    where.slug = { [Op.in] : ['xdamman', 'digitalocean', 'fbopensource', 'piamancini', 'brusselstogether','wwcode'] };
   }
 
   return models.Collective.findAll({
-    where: { ...where, type: { $in: ['ORGANIZATION', 'USER'] }}
+    where: { ...where, type: { [Op.in]: ['ORGANIZATION', 'USER'] }}
   });
 }
 
@@ -234,7 +234,7 @@ const getUsers = (collective) => {
       return models.Member.findAll({
         where: { CollectiveId: collective.id, role: 'ADMIN' }
       }).then(memberships => models.User.findAll({
-        where: { CollectiveId: { $in: memberships.map(m => m.MemberCollectiveId) }, ...excludeUnsubscribed },
+        where: { CollectiveId: { [Op.in]: memberships.map(m => m.MemberCollectiveId) }, ...excludeUnsubscribed },
         include: [ { model: models.Collective, as: 'collective', attributes: ['slug', 'name'] } ]
       }));
     }

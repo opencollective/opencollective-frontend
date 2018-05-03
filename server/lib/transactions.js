@@ -28,7 +28,7 @@ export function getTransactions(collectiveids, startDate = new Date("2015-01-01"
   const query = {
     where: {
       ...where,
-      CollectiveId: { $in: collectiveids },
+      CollectiveId: { [Op.in]: collectiveids },
       createdAt: { [Op.gte]: startDate, [Op.lt]: endDate }
     },
     order: [ ['createdAt', 'DESC' ]]

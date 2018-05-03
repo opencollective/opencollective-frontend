@@ -48,7 +48,7 @@ export const loaders = (req) => {
   return {
     collective: {
       findById: new DataLoader(ids => models.Collective
-        .findAll({ where: { id: { $in: ids }}})
+        .findAll({ where: { id: { [Op.in]: ids }}})
         .then(collectives => sortResults(ids, collectives))
       ),
       balance: new DataLoader(ids => models.Transaction.findAll({
@@ -56,14 +56,14 @@ export const loaders = (req) => {
             'CollectiveId',
             [ sequelize.fn('COALESCE', sequelize.fn('SUM', sequelize.col('netAmountInCollectiveCurrency')), 0), 'balance' ]
           ],
-          where: { CollectiveId: { $in: ids } },
+          where: { CollectiveId: { [Op.in]: ids } },
           group: ['CollectiveId']
         })
         .then(results => sortResults(ids, results, 'CollectiveId'))
         .map(result => get(result, 'dataValues.balance') || 0)
       ),
       connectedAccounts: new DataLoader(ids => models.ConnectedAccount.findAll({
-          where: { CollectiveId: { $in: ids } }
+          where: { CollectiveId: { [Op.in]: ids } }
         })
         .then(results => sortResults(ids, results, 'CollectiveId', []))
       ),
@@ -73,7 +73,7 @@ export const loaders = (req) => {
               'HostCollectiveId',
               [ sequelize.fn('COALESCE', sequelize.fn('COUNT', sequelize.col('id')), 0), 'count' ]
             ],
-            where: { HostCollectiveId: { $in: ids } },
+            where: { HostCollectiveId: { [Op.in]: ids } },
             group: ['HostCollectiveId']
           })
           .then(results => sortResults(ids, results, 'TierId'))
@@ -86,7 +86,7 @@ export const loaders = (req) => {
               [sequelize.fn('COUNT', sequelize.fn('DISTINCT', sequelize.col('FromCollectiveId'))), 'count']
             ],
             where: {
-              CollectiveId: { $in: ids },
+              CollectiveId: { [Op.in]: ids },
               type: 'CREDIT'
             }
           };
@@ -122,7 +122,7 @@ export const loaders = (req) => {
             'status',
             [ sequelize.fn('COALESCE', sequelize.fn('COUNT', sequelize.col('id')), 0), 'count' ]
           ],
-          where: { CollectiveId: { $in: ids } },
+          where: { CollectiveId: { [Op.in]: ids } },
           group: ['CollectiveId', 'status']
         })
         .then(rows => {
@@ -144,11 +144,11 @@ export const loaders = (req) => {
     },
     // This one is tricky. We need to make sure that the remoteUser can view the personal details of the user.
     getUserDetailsByCollectiveId: new DataLoader(UserCollectiveIds => getListOfAccessibleMembers(req.remoteUser, UserCollectiveIds)
-      .then(accessibleUserCollectiveIds => models.User.findAll({ where: { CollectiveId: { $in: accessibleUserCollectiveIds } }}))
+      .then(accessibleUserCollectiveIds => models.User.findAll({ where: { CollectiveId: { [Op.in]: accessibleUserCollectiveIds } }}))
       .then(results => sortResults(UserCollectiveIds, results, 'CollectiveId', {}))
     ),
     getOrgDetailsByCollectiveId: new DataLoader(OrgCollectiveIds => getListOfAccessibleMembers(req.remoteUser, OrgCollectiveIds)
-      .then(accessibleOrgCollectiveIds => models.Collective.findAll({ attributes: ['id', 'CreatedByUserId'], where: { id: { $in: accessibleOrgCollectiveIds } }})).then(accessibleOrgCollectives => {
+      .then(accessibleOrgCollectiveIds => models.Collective.findAll({ attributes: ['id', 'CreatedByUserId'], where: { id: { [Op.in]: accessibleOrgCollectiveIds } }})).then(accessibleOrgCollectives => {
         const accessibleOrgCreators = {};
         accessibleOrgCollectives.map(c => {
           if (c.CreatedByUserId) {
@@ -158,7 +158,7 @@ export const loaders = (req) => {
         return accessibleOrgCreators;
       })
       .then(accessibleOrgCreators => {
-        return models.User.findAll({ attributes: ['id', 'CollectiveId', 'email'], where: { id: { $in: Object.keys(accessibleOrgCreators) } }})
+        return models.User.findAll({ attributes: ['id', 'CollectiveId', 'email'], where: { id: { [Op.in]: Object.keys(accessibleOrgCreators) } }})
           .map(u => {
             u.dataValues.OrgCollectiveId = accessibleOrgCreators[u.id];
             return u;
@@ -172,7 +172,7 @@ export const loaders = (req) => {
     ),
     tiers: {
       findById: new DataLoader(ids => models.Tier
-        .findAll({ where: { id: { $in: ids }}})
+        .findAll({ where: { id: { [Op.in]: ids }}})
         .then(results => sortResults(ids, results, 'id'))
       ),
       totalDistinctOrders: new DataLoader(ids => models.Order.findAll({
@@ -180,7 +180,7 @@ export const loaders = (req) => {
             'TierId',
             [ sequelize.fn('COALESCE', sequelize.fn('COUNT', sequelize.fn('DISTINCT', sequelize.col('FromCollectiveId'))), 0), 'count' ]
           ],
-          where: { TierId: { $in: ids } },
+          where: { TierId: { [Op.in]: ids } },
           group: ['TierId']
         })
         .then(results => sortResults(ids, results, 'TierId'))
@@ -191,7 +191,7 @@ export const loaders = (req) => {
             'TierId',
             [ sequelize.fn('COALESCE', sequelize.fn('COUNT', sequelize.col('id')), 0), 'count' ]
           ],
-          where: { TierId: { $in: ids }, processedAt: { [Op.ne]: null } },
+          where: { TierId: { [Op.in]: ids }, processedAt: { [Op.ne]: null } },
           group: ['TierId']
         })
         .then(results => sortResults(ids, results, 'TierId'))
@@ -200,12 +200,12 @@ export const loaders = (req) => {
     },
     paymentMethods: {
       findById: new DataLoader(ids => models.PaymentMethod
-        .findAll({ where: { id: { $in: ids }}})
+        .findAll({ where: { id: { [Op.in]: ids }}})
         .then(results => sortResults(ids, results, 'id'))
       ),
       findByCollectiveId: new DataLoader(CollectiveIds => models.PaymentMethod
         .findAll({ where: {
-          CollectiveId: { $in: CollectiveIds },
+          CollectiveId: { [Op.in]: CollectiveIds },
           name: { [Op.ne]: null },
           expiryDate: { $or: [ null, { [Op.gte]: new Date } ] },
           archivedAt: null
@@ -217,8 +217,8 @@ export const loaders = (req) => {
       findByMembership: new DataLoader(combinedKeys => models.Order
           .findAll({
             where: {
-              CollectiveId: { $in: combinedKeys.map(k => k.split(':')[0]) },
-              FromCollectiveId: { $in: combinedKeys.map(k => k.split(':')[1] )}
+              CollectiveId: { [Op.in]: combinedKeys.map(k => k.split(':')[0]) },
+              FromCollectiveId: { [Op.in]: combinedKeys.map(k => k.split(':')[1] )}
             },
             order: [['createdAt', 'DESC']]
           })
@@ -230,7 +230,7 @@ export const loaders = (req) => {
               'OrderId',
               [ sequelize.fn('COALESCE', sequelize.fn('COUNT', sequelize.col('id')), 0), 'count' ]
             ],
-            where: { OrderId: { $in: ids } },
+            where: { OrderId: { [Op.in]: ids } },
             group: ['OrderId']
           })
           .then(results => sortResults(ids, results, 'OrderId'))
@@ -238,7 +238,7 @@ export const loaders = (req) => {
         ),
         totalTransactions: new DataLoader(keys => models.Transaction.findAll({
             attributes: ['OrderId', [sequelize.fn('SUM', sequelize.col('amount')), 'totalAmount'] ],
-            where: { OrderId: { $in: keys } },
+            where: { OrderId: { [Op.in]: keys } },
             group: ['OrderId']
           })
           .then(results => sortResults(keys, results, 'OrderId'))
@@ -250,8 +250,8 @@ export const loaders = (req) => {
       transactions: new DataLoader(combinedKeys => models.Transaction
           .findAll({
             where: {
-              CollectiveId: { $in: combinedKeys.map(k => k.split(':')[0]) },
-              FromCollectiveId: { $in: combinedKeys.map(k => k.split(':')[1] )}
+              CollectiveId: { [Op.in]: combinedKeys.map(k => k.split(':')[0]) },
+              FromCollectiveId: { [Op.in]: combinedKeys.map(k => k.split(':')[1] )}
             },
             order: [['createdAt', 'DESC']]
           })
@@ -260,8 +260,8 @@ export const loaders = (req) => {
       totalAmountRaised: new DataLoader(keys => models.Order.findAll({
         attributes: ['ReferralCollectiveId', 'CollectiveId', [sequelize.fn('SUM', sequelize.col('totalAmount')), 'totalAmount'] ],
         where: {
-          ReferralCollectiveId: { $in: keys.map(k => k.ReferralCollectiveId) },
-          CollectiveId: { $in: keys.map(k => k.CollectiveId) }
+          ReferralCollectiveId: { [Op.in]: keys.map(k => k.ReferralCollectiveId) },
+          CollectiveId: { [Op.in]: keys.map(k => k.CollectiveId) }
         },
         group: ['ReferralCollectiveId', 'CollectiveId']
       })
@@ -280,7 +280,7 @@ export const loaders = (req) => {
         return models.Transaction
           .findAll({
             where: {
-              OrderId: { $in: OrderIds },
+              OrderId: { [Op.in]: OrderIds },
               ... options.where
             },
             order: [['createdAt', 'DESC']]
@@ -290,8 +290,8 @@ export const loaders = (req) => {
       totalAmountDonatedFromTo: new DataLoader(keys => models.Transaction.findAll({
         attributes: ['FromCollectiveId', 'CollectiveId', [sequelize.fn('SUM', sequelize.col('amount')), 'totalAmount'] ],
         where: {
-          FromCollectiveId: { $in: keys.map(k => k.FromCollectiveId) },
-          CollectiveId: { $in: keys.map(k => k.CollectiveId) },
+          FromCollectiveId: { [Op.in]: keys.map(k => k.FromCollectiveId) },
+          CollectiveId: { [Op.in]: keys.map(k => k.CollectiveId) },
           type: type.CREDIT
         },
         group: ['FromCollectiveId', 'CollectiveId']

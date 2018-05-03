@@ -80,7 +80,7 @@ export const getUsers = (req, res, next) => {
     promise = promise.then(userCollectives => {
       const UserCollectiveIds = userCollectives.map(u => u.id);
       return models.Order.findAll({
-        where: { FromCollectiveId: { $in: UserCollectiveIds}},
+        where: { FromCollectiveId: { [Op.in]: UserCollectiveIds}},
         include: [
           { model: models.Subscription, where: { isActive: true } }
         ]

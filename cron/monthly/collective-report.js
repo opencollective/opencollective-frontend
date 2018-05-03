@@ -15,7 +15,7 @@ import config from 'config';
 import Promise from 'bluebird';
 import debugLib from 'debug';
 import { getTiersStats } from '../../server/lib/utils';
-import models from '../../server/models';
+import models, { Op } from '../../server/models';
 import emailLib from '../../server/lib/email';
 
 const d = new Date;
@@ -64,7 +64,7 @@ const init = () => {
     slugs = process.env.SLUGS.split(',');
   }
   if (slugs) {
-    query.where.slug = { $in: slugs };
+    query.where.slug = { [Op.in]: slugs };
   }
 
   Collective.findAll(query)
