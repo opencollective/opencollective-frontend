@@ -4,7 +4,7 @@
 
 import Promise from 'bluebird';
 import json2csv from 'json2csv';
-import models, { sequelize } from '../../server/models';
+import models, { sequelize, Op } from '../../server/models';
 import emailLib from '../../server/lib/email';
 import * as transactionsLib from '../../server/lib/transactions';
 
@@ -267,7 +267,7 @@ const checkTransactions = () => {
   return models.Transaction.count({
     where: {
       FromCollectiveId: {
-        $eq: null
+        [Op.eq]: null
       }
     }
   })
@@ -292,7 +292,7 @@ const checkTransactions = () => {
   .then(() => models.Transaction.count({
     where: {
       TransactionGroup: {
-        $eq: null
+        [Op.eq]: null
       }
     }
   }))
@@ -339,10 +339,10 @@ const checkTransactions = () => {
   .then(() => models.Transaction.findAll({
     where: {
       OrderId: {
-        $eq: null
+        [Op.eq]: null
       },
       ExpenseId: {
-        $eq: null
+        [Op.eq]: null
       }
     }
   }))

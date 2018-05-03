@@ -14,7 +14,7 @@ import { getFxRate } from '../lib/currency';
 
 export default function(Sequelize, DataTypes) {
 
-  const { models } = Sequelize;
+  const { models, Op } = Sequelize;
 
   const payoutMethods = ['paypal', 'stripe', 'opencollective', 'prepaid'];
 
@@ -373,7 +373,7 @@ export default function(Sequelize, DataTypes) {
   PaymentMethod.getMatchingFund = (shortUUID, options = {}) => {
     const where = {};
     if (options.ForCollectiveId) {
-      where.limitedToCollectiveIds = Sequelize.or({ limitedToCollectiveIds: {$eq: null } }, { limitedToCollectiveIds: options.ForCollectiveId });
+      where.limitedToCollectiveIds = Sequelize.or({ limitedToCollectiveIds: {[Op.eq]: null } }, { limitedToCollectiveIds: options.ForCollectiveId });
     }
     return PaymentMethod.findOne({
       where: Sequelize.and(

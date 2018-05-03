@@ -2,6 +2,7 @@
  * Dependencies.
  */
 import _, { get, difference, uniq, pick } from 'lodash';
+import Sequelize from 'sequelize';
 import Temporal from 'sequelize-temporal';
 import config from 'config';
 import deepmerge from 'deepmerge';
@@ -34,7 +35,7 @@ const debug = debugLib('collective');
  */
 export default function(Sequelize, DataTypes) {
 
-  const { models } = Sequelize;
+  const { models, Op } = Sequelize;
 
   const Collective = Sequelize.define('Collective', {
 
@@ -929,7 +930,7 @@ export default function(Sequelize, DataTypes) {
     // (to avoid marking other types as archived see issue #698)
     return models.PaymentMethod.findAll({ where: {
       CollectiveId: this.id,
-      archivedAt: { $eq: null },
+      archivedAt: { [Op.eq]: null },
       service: 'stripe',
       type: 'creditcard'
     }})
@@ -945,7 +946,7 @@ export default function(Sequelize, DataTypes) {
         } else {
           pm.CollectiveId = this.id;
           pm.currency = pm.currency || this.currency;
-          models.PaymentMethod.update({ primary: false }, { where: { CollectiveId: this.id, archivedAt: { $eq: null } }});
+          models.PaymentMethod.update({ primary: false }, { where: { CollectiveId: this.id, archivedAt: { [Op.eq]: null } }});
           return models.PaymentMethod.createFromStripeSourceToken({ ...defaultAttributes, ...pm, type: 'creditcard' }); // TODO: nicer to not have to hard code 'creditcard'
         }
       });

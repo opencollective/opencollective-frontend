@@ -157,3 +157,5 @@ export function setupModels(client) {
 
   return m;
 }
+
+export const Op = Sequelize.Op;

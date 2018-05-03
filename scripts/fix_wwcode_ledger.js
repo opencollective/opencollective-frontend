@@ -2,7 +2,7 @@
  * This is a one-time use script to fix wwcode ledger
  */
 
-import models, { sequelize } from '../server/models';
+import models, { sequelize, Op } from '../server/models';
 
 const done = (err) => {
   if (err) console.log('err', err);
@@ -56,7 +56,7 @@ const checkAndFixExpenses = () => {
     where: {
       status: 'PAID',
       deletedAt: {
-        $eq: null
+        [Op.eq]: null
       },
       CollectiveId: {
         $notIn: [1, 114, 248] // opencollective, partidodigital, wordpress sfo
