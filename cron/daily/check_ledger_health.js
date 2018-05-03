@@ -127,7 +127,7 @@ const checkHostCollectives = () => {
   return models.Collective.findAll({
     where: {
       HostCollectiveId: {
-        $col: 'id'
+        [Op.col]: 'id'
       }
     }
   })
@@ -183,7 +183,7 @@ const checkMembers = () => {
   return models.Member.findAll({
     where: {
       MemberCollectiveId: {
-        $col: 'CollectiveId'
+        [Op.col]: 'CollectiveId'
       }
     }
   })
@@ -279,7 +279,7 @@ const checkTransactions = () => {
   .then(() => models.Transaction.findAll({
     where: {
       CollectiveId: {
-        $col: 'FromCollectiveId'
+        [Op.col]: 'FromCollectiveId'
       }
     }
   }))
