@@ -1,10 +1,8 @@
-
-
 import _ from 'lodash';
 import moment from 'moment';
 import Promise from 'bluebird';
 import debugLib from 'debug';
-import models, { sequelize } from '../server/models';
+import models, { sequelize, Op } from '../server/models';
 import emailLib from '../server/lib/email';
 import config from 'config';
 import { exportToCSV, exportToPDF } from '../server/lib/utils';
@@ -55,11 +53,11 @@ async function HostReport(year, month, hostId) {
   }
 
   const dateRange = {
-    createdAt: { $gte: startDate, $lt: endDate }
+    createdAt: { [Op.gte]: startDate, $lt: endDate }
   };
 
   const previousDateRange = {
-    createdAt: { $gte: previousStartDate, $lt: startDate }
+    createdAt: { [Op.gte]: previousStartDate, $lt: startDate }
   }
 
   const emailTemplate = (!month) ? 'host.yearlyreport' : 'host.monthlyreport';

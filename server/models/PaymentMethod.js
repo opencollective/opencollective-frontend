@@ -280,7 +280,7 @@ export default function(Sequelize, DataTypes) {
       limit = this.monthlyLimitPerMember;
       const d = new Date;
       const firstOfTheMonth = new Date(d.getFullYear(), d.getMonth(), 1);
-      where.createdAt = { $gte: firstOfTheMonth };
+      where.createdAt = { [Op.gte]: firstOfTheMonth };
       where.CreatedByUserId = user.id;
     }
 

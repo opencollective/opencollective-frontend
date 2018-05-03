@@ -1,5 +1,6 @@
 import sinon from 'sinon';
 import { expect } from 'chai';
+import { Op } from '../server/models';
 import * as utils from '../test/utils';
 
 import * as hostlib from '../server/lib/hostlib';
@@ -18,7 +19,7 @@ describe('hostlib', () => {
 
   const where = {
     CollectiveId: { $in: collectiveids },
-    createdAt: { $gte: startDate, $lt: endDate}
+    createdAt: { [Op.gte]: startDate, $lt: endDate}
   };
 
   let sandbox;

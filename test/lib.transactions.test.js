@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import models from '../server/models';
+import models, { Op } from '../server/models';
 import * as utils from '../test/utils';
 
 import * as tlib from '../server/lib/transactions';
@@ -11,7 +11,7 @@ describe('lib.transactions.test.js', () => {
   let transactions;
 
   const where = {
-    createdAt: { $gte: startDate, $lt: endDate}
+    createdAt: { [Op.gte]: startDate, $lt: endDate}
   };
 
   before(() => utils.loadDB("wwcode_test"));

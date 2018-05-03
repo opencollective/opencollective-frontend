@@ -176,7 +176,7 @@ const queries = {
       const where = {
         FromCollectiveId: fromCollective.id,
         HostCollectiveId: host.id,
-        createdAt: { $gte: startsAt, $lt: endsAt },
+        createdAt: { [Op.gte]: startsAt, $lt: endsAt },
         type: 'CREDIT'
       };
 
@@ -233,7 +233,7 @@ const queries = {
       // Add date ranges to the query
       if (args.dateFrom || args.dateTo) {
         query.where.createdAt = {};
-        if (args.dateFrom) query.where.createdAt['$gte'] = args.dateFrom;
+        if (args.dateFrom) query.where.createdAt[Op.gte] = args.dateFrom;
         if (args.dateTo) query.where.createdAt['$lte'] = args.dateTo;
       }
       return models.Transaction.findAll(query);

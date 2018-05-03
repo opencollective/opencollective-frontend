@@ -1,5 +1,5 @@
 import Promise from 'bluebird';
-import models, { sequelize } from '../models';
+import models, { Op, sequelize } from '../models';
 import errors from '../lib/errors';
 import { type } from '../constants/transactions';
 import { getFxRate } from '../lib/currency';
@@ -29,7 +29,7 @@ export function getTransactions(collectiveids, startDate = new Date("2015-01-01"
     where: {
       ...where,
       CollectiveId: { $in: collectiveids },
-      createdAt: { $gte: startDate, $lt: endDate }
+      createdAt: { [Op.gte]: startDate, $lt: endDate }
     },
     order: [ ['createdAt', 'DESC' ]]
   };

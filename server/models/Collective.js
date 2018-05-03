@@ -959,7 +959,7 @@ export default function(Sequelize, DataTypes) {
       CollectiveId: this.id
     };
     if (status) where.status = status;
-    if (startDate) where.createdAt.$gte = startDate;
+    if (startDate) where.createdAt[Op.gte] = startDate;
 
     return models.Expense.findAll({
       where,
@@ -1065,7 +1065,7 @@ export default function(Sequelize, DataTypes) {
       createdAt: { $lt: endDate },
       CollectiveId: this.id
     };
-    if (startDate) where.createdAt.$gte = startDate;
+    if (startDate) where.createdAt[Op.gte] = startDate;
     return models.Transaction.find({
       attributes: [
         [Sequelize.fn('COALESCE', Sequelize.fn('SUM', Sequelize.col('amount')), 0), 'total']
@@ -1083,7 +1083,7 @@ export default function(Sequelize, DataTypes) {
       createdAt: { $lt: endDate },
       FromCollectiveId: this.id
     };
-    if (startDate) where.createdAt.$gte = startDate;
+    if (startDate) where.createdAt[Op.gte] = startDate;
     return models.Transaction.find({
       attributes: [
         [Sequelize.fn('COALESCE', Sequelize.fn('SUM', Sequelize.col('amount')), 0), 'total']
@@ -1121,7 +1121,7 @@ export default function(Sequelize, DataTypes) {
       createdAt: { $lt: endDate },
       CollectiveId: this.id
     };
-    if (startDate) where.createdAt.$gte = startDate;
+    if (startDate) where.createdAt[Op.gte] = startDate;
     if (type === 'donation') where.amount = { $gt: 0 };
     if (type === 'expense') where.amount = { $lt: 0 };
     return models.Transaction.find({
@@ -1138,7 +1138,7 @@ export default function(Sequelize, DataTypes) {
     return models.Transaction.findAll({
       where: {
         FromCollectiveId: this.id,
-        createdAt: { $gte: since || 0, $lt: until || new Date}
+        createdAt: { [Op.gte]: since || 0, $lt: until || new Date}
       },
       order: [ ['amount','DESC'] ],
       include: [ { model: models.Collective, as: 'collective', where: { tags: { $contains: tags } } } ]
@@ -1166,7 +1166,7 @@ export default function(Sequelize, DataTypes) {
 
     if (options.since) {
       query.where.createdAt = query.where.createdAt || {};
-      query.where.createdAt.$gte = options.since;
+      query.where.createdAt[Op.gte] = options.since;
     }
     if (options.until) {
       query.where.createdAt = query.where.createdAt || {};

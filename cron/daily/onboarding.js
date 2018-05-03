@@ -1,5 +1,5 @@
 import Promise from 'bluebird';
-import models from '../../server/models';
+import models, { Op } from '../../server/models';
 import emailLib from '../../server/lib/email';
 import { get } from 'lodash';
 
@@ -69,7 +69,7 @@ async function processOnBoardingTemplate(template, startsAt, filter = () => true
     where: {
       type: "COLLECTIVE",
       isActive: true,
-      createdAt: { $gte: startsAt, $lt: endsAt }
+      createdAt: { [Op.gte]: startsAt, $lt: endsAt }
     }
   })
   .tap(collectives => console.log(`${template}> processing ${collectives.length} collectives`))

@@ -16,7 +16,7 @@ import config from 'config';
 import Promise from 'bluebird';
 import fetch from 'node-fetch';
 import debugLib from 'debug';
-import models, { sequelize } from '../../server/models';
+import models, { sequelize, Op } from '../../server/models';
 import emailLib from '../../server/lib/email';
 import roles from '../../server/constants/roles';
 import { formatCurrencyObject, formatArrayToString } from '../../server/lib/utils';
@@ -244,13 +244,13 @@ const processCollective =  async (CollectiveId) => {
     collective.getExpenses(null, startDate, endDate),
     collective.getYearlyIncome(),
     models.Expense.findAll({
-      where: { CollectiveId: collective.id, createdAt: { $gte: startDate, $lt: endDate } },
+      where: { CollectiveId: collective.id, createdAt: { [Op.gte]: startDate, $lt: endDate } },
       limit: 3,
       order: [['id', 'DESC']],
       include: [ models.User ]
     }),
     collective.getEvents({
-      where: { startsAt: { $gte: startDate } },
+      where: { startsAt: { [Op.gte]: startDate } },
       order: [['startsAt', 'DESC']],
       include: [
         { model: models.Member, as: 'members' },
