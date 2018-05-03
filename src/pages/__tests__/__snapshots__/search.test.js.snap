@@ -2,7 +2,7 @@
 
 exports[`Search Page renders empty results message 1`] = `
 <div
-  className="jsx-3957010919"
+  className="jsx-4119556752"
 >
   <header
     className="jsx-963368174"
@@ -12,32 +12,32 @@ exports[`Search Page renders empty results message 1`] = `
       id="top"
     />
     <div
-      className="jsx-2106991174 loading TopBar"
+      className="jsx-960116486 loading TopBar"
     >
       <a
-        className="jsx-2106991174"
+        className="jsx-960116486"
         href="/"
         title="Go to Open Collective Homepage"
       >
         <img
           alt="Open Collective logo"
-          className="jsx-2106991174 logo"
+          className="jsx-960116486 logo"
           height="40"
           src="/static/images/opencollective-icon.svg"
           width="40"
         />
       </a>
       <div
-        className="jsx-2106991174 nav"
+        className="jsx-960116486 nav"
       >
         <ul
-          className="jsx-2106991174 mediumScreenOnly"
+          className="jsx-960116486 mediumScreenOnly"
         >
           <li
-            className="jsx-2106991174"
+            className="jsx-960116486"
           >
             <a
-              className="jsx-2106991174 menuItem"
+              className="jsx-960116486 menuItem"
               href="/learn-more"
             >
               <span>
@@ -46,10 +46,10 @@ exports[`Search Page renders empty results message 1`] = `
             </a>
           </li>
           <li
-            className="jsx-2106991174"
+            className="jsx-960116486"
           >
             <a
-              className="jsx-2106991174 menuItem"
+              className="jsx-960116486 menuItem"
               href="/discover"
             >
               <span>
@@ -58,10 +58,10 @@ exports[`Search Page renders empty results message 1`] = `
             </a>
           </li>
           <li
-            className="jsx-2106991174"
+            className="jsx-960116486"
           >
             <a
-              className="jsx-2106991174 menuItem"
+              className="jsx-960116486 menuItem"
               href="https://medium.com/open-collective"
             >
               <span>
@@ -71,7 +71,7 @@ exports[`Search Page renders empty results message 1`] = `
           </li>
         </ul>
         <div
-          className="jsx-2106991174 separator"
+          className="jsx-960116486 separator"
         />
         <div
           className="jsx-2783800609 LoginTopBarProfileButton"
@@ -104,7 +104,7 @@ exports[`Search Page renders empty results message 1`] = `
           className="col-xs-12"
         >
           <form
-            className="jsx-3957010919"
+            className="jsx-4119556752"
             method="GET"
             onSubmit={[Function]}
           >
@@ -118,7 +118,7 @@ exports[`Search Page renders empty results message 1`] = `
                 Search Open Collective
               </label>
               <div
-                className="jsx-3957010919 search-row"
+                className="jsx-4119556752 search-row"
               >
                 <input
                   className="search-input form-control"
@@ -140,7 +140,7 @@ exports[`Search Page renders empty results message 1`] = `
                   type="submit"
                 >
                   <span
-                    className="jsx-3957010919 fa fa-search"
+                    className="jsx-4119556752 fa fa-search"
                   />
                 </button>
               </div>
@@ -152,10 +152,10 @@ exports[`Search Page renders empty results message 1`] = `
         className="results-row row"
       >
         <p
-          className="jsx-3957010919 center"
+          className="jsx-4119556752 center"
         >
           <em
-            className="jsx-3957010919"
+            className="jsx-4119556752"
           >
             No collectives found matching your query: "
             test
@@ -292,32 +292,44 @@ exports[`Search Page renders error message 1`] = `
       id="top"
     />
     <div
-      className="jsx-2106991174 TopBar"
+      className="jsx-960116486 TopBar"
     >
       <a
-        className="jsx-2106991174"
+        className="jsx-960116486"
         href="/"
         title="Go to Open Collective Homepage"
       >
         <img
           alt="Open Collective logo"
-          className="jsx-2106991174 logo"
+          className="jsx-960116486 logo"
           height="40"
           src="/static/images/opencollective-icon.svg"
           width="40"
         />
       </a>
+      <form
+        action="/search"
+        className="jsx-960116486 topbar-search-form"
+        method="GET"
+      >
+        <input
+          className="jsx-960116486 topbar-search-input"
+          name="q"
+          placeholder="Search Open Collective"
+          type="search"
+        />
+      </form>
       <div
-        className="jsx-2106991174 nav"
+        className="jsx-960116486 nav"
       >
         <ul
-          className="jsx-2106991174 mediumScreenOnly"
+          className="jsx-960116486 mediumScreenOnly"
         >
           <li
-            className="jsx-2106991174"
+            className="jsx-960116486"
           >
             <a
-              className="jsx-2106991174 menuItem"
+              className="jsx-960116486 menuItem"
               href="/learn-more"
             >
               <span>
@@ -326,10 +338,10 @@ exports[`Search Page renders error message 1`] = `
             </a>
           </li>
           <li
-            className="jsx-2106991174"
+            className="jsx-960116486"
           >
             <a
-              className="jsx-2106991174 menuItem"
+              className="jsx-960116486 menuItem"
               href="/discover"
             >
               <span>
@@ -338,10 +350,10 @@ exports[`Search Page renders error message 1`] = `
             </a>
           </li>
           <li
-            className="jsx-2106991174"
+            className="jsx-960116486"
           >
             <a
-              className="jsx-2106991174 menuItem"
+              className="jsx-960116486 menuItem"
               href="https://medium.com/open-collective"
             >
               <span>
@@ -351,7 +363,7 @@ exports[`Search Page renders error message 1`] = `
           </li>
         </ul>
         <div
-          className="jsx-2106991174 separator"
+          className="jsx-960116486 separator"
         />
         <div
           className="jsx-2783800609 LoginTopBarProfileButton"
@@ -499,7 +511,7 @@ exports[`Search Page renders error message 1`] = `
 
 exports[`Search Page renders loading grid SVG 1`] = `
 <div
-  className="jsx-3957010919"
+  className="jsx-4119556752"
 >
   <header
     className="jsx-963368174"
@@ -509,32 +521,32 @@ exports[`Search Page renders loading grid SVG 1`] = `
       id="top"
     />
     <div
-      className="jsx-2106991174 loading TopBar"
+      className="jsx-960116486 loading TopBar"
     >
       <a
-        className="jsx-2106991174"
+        className="jsx-960116486"
         href="/"
         title="Go to Open Collective Homepage"
       >
         <img
           alt="Open Collective logo"
-          className="jsx-2106991174 logo"
+          className="jsx-960116486 logo"
           height="40"
           src="/static/images/opencollective-icon.svg"
           width="40"
         />
       </a>
       <div
-        className="jsx-2106991174 nav"
+        className="jsx-960116486 nav"
       >
         <ul
-          className="jsx-2106991174 mediumScreenOnly"
+          className="jsx-960116486 mediumScreenOnly"
         >
           <li
-            className="jsx-2106991174"
+            className="jsx-960116486"
           >
             <a
-              className="jsx-2106991174 menuItem"
+              className="jsx-960116486 menuItem"
               href="/learn-more"
             >
               <span>
@@ -543,10 +555,10 @@ exports[`Search Page renders loading grid SVG 1`] = `
             </a>
           </li>
           <li
-            className="jsx-2106991174"
+            className="jsx-960116486"
           >
             <a
-              className="jsx-2106991174 menuItem"
+              className="jsx-960116486 menuItem"
               href="/discover"
             >
               <span>
@@ -555,10 +567,10 @@ exports[`Search Page renders loading grid SVG 1`] = `
             </a>
           </li>
           <li
-            className="jsx-2106991174"
+            className="jsx-960116486"
           >
             <a
-              className="jsx-2106991174 menuItem"
+              className="jsx-960116486 menuItem"
               href="https://medium.com/open-collective"
             >
               <span>
@@ -568,7 +580,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
           </li>
         </ul>
         <div
-          className="jsx-2106991174 separator"
+          className="jsx-960116486 separator"
         />
         <div
           className="jsx-2783800609 LoginTopBarProfileButton"
@@ -601,7 +613,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
           className="col-xs-12"
         >
           <form
-            className="jsx-3957010919"
+            className="jsx-4119556752"
             method="GET"
             onSubmit={[Function]}
           >
@@ -615,7 +627,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
                 Search Open Collective
               </label>
               <div
-                className="jsx-3957010919 search-row"
+                className="jsx-4119556752 search-row"
               >
                 <input
                   className="search-input form-control"
@@ -637,7 +649,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
                   type="submit"
                 >
                   <span
-                    className="jsx-3957010919 fa fa-search"
+                    className="jsx-4119556752 fa fa-search"
                   />
                 </button>
               </div>
@@ -649,7 +661,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
         className="results-row row"
       >
         <div
-          className="jsx-3957010919 center"
+          className="jsx-4119556752 center"
         >
           <svg
             fill="#46B0ED"
@@ -907,7 +919,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
 
 exports[`Search Page renders search results with pagination 1`] = `
 <div
-  className="jsx-3957010919"
+  className="jsx-4119556752"
 >
   <header
     className="jsx-963368174"
@@ -917,32 +929,32 @@ exports[`Search Page renders search results with pagination 1`] = `
       id="top"
     />
     <div
-      className="jsx-2106991174 loading TopBar"
+      className="jsx-960116486 loading TopBar"
     >
       <a
-        className="jsx-2106991174"
+        className="jsx-960116486"
         href="/"
         title="Go to Open Collective Homepage"
       >
         <img
           alt="Open Collective logo"
-          className="jsx-2106991174 logo"
+          className="jsx-960116486 logo"
           height="40"
           src="/static/images/opencollective-icon.svg"
           width="40"
         />
       </a>
       <div
-        className="jsx-2106991174 nav"
+        className="jsx-960116486 nav"
       >
         <ul
-          className="jsx-2106991174 mediumScreenOnly"
+          className="jsx-960116486 mediumScreenOnly"
         >
           <li
-            className="jsx-2106991174"
+            className="jsx-960116486"
           >
             <a
-              className="jsx-2106991174 menuItem"
+              className="jsx-960116486 menuItem"
               href="/learn-more"
             >
               <span>
@@ -951,10 +963,10 @@ exports[`Search Page renders search results with pagination 1`] = `
             </a>
           </li>
           <li
-            className="jsx-2106991174"
+            className="jsx-960116486"
           >
             <a
-              className="jsx-2106991174 menuItem"
+              className="jsx-960116486 menuItem"
               href="/discover"
             >
               <span>
@@ -963,10 +975,10 @@ exports[`Search Page renders search results with pagination 1`] = `
             </a>
           </li>
           <li
-            className="jsx-2106991174"
+            className="jsx-960116486"
           >
             <a
-              className="jsx-2106991174 menuItem"
+              className="jsx-960116486 menuItem"
               href="https://medium.com/open-collective"
             >
               <span>
@@ -976,7 +988,7 @@ exports[`Search Page renders search results with pagination 1`] = `
           </li>
         </ul>
         <div
-          className="jsx-2106991174 separator"
+          className="jsx-960116486 separator"
         />
         <div
           className="jsx-2783800609 LoginTopBarProfileButton"
@@ -1009,7 +1021,7 @@ exports[`Search Page renders search results with pagination 1`] = `
           className="col-xs-12"
         >
           <form
-            className="jsx-3957010919"
+            className="jsx-4119556752"
             method="GET"
             onSubmit={[Function]}
           >
@@ -1023,7 +1035,7 @@ exports[`Search Page renders search results with pagination 1`] = `
                 Search Open Collective
               </label>
               <div
-                className="jsx-3957010919 search-row"
+                className="jsx-4119556752 search-row"
               >
                 <input
                   className="search-input form-control"
@@ -1045,7 +1057,7 @@ exports[`Search Page renders search results with pagination 1`] = `
                   type="submit"
                 >
                   <span
-                    className="jsx-3957010919 fa fa-search"
+                    className="jsx-4119556752 fa fa-search"
                   />
                 </button>
               </div>
@@ -1121,13 +1133,13 @@ exports[`Search Page renders search results with pagination 1`] = `
         className="row"
       >
         <ul
-          className="jsx-3957010919 pagination"
+          className="jsx-4119556752 pagination"
         >
           <li
-            className="jsx-3957010919 active"
+            className="jsx-4119556752 active"
           >
             <a
-              className="jsx-3957010919"
+              className="jsx-4119556752"
               href="?limit=20&offset=0&q=Test"
               onClick={[Function]}
             >
@@ -1135,10 +1147,10 @@ exports[`Search Page renders search results with pagination 1`] = `
             </a>
           </li>
           <li
-            className="jsx-3957010919 "
+            className="jsx-4119556752 "
           >
             <a
-              className="jsx-3957010919"
+              className="jsx-4119556752"
               href="?limit=20&offset=20&q=Test"
               onClick={[Function]}
             >
@@ -1146,10 +1158,10 @@ exports[`Search Page renders search results with pagination 1`] = `
             </a>
           </li>
           <li
-            className="jsx-3957010919 "
+            className="jsx-4119556752 "
           >
             <a
-              className="jsx-3957010919"
+              className="jsx-4119556752"
               href="?limit=20&offset=40&q=Test"
               onClick={[Function]}
             >
@@ -1157,10 +1169,10 @@ exports[`Search Page renders search results with pagination 1`] = `
             </a>
           </li>
           <li
-            className="jsx-3957010919 "
+            className="jsx-4119556752 "
           >
             <a
-              className="jsx-3957010919"
+              className="jsx-4119556752"
               href="?limit=20&offset=60&q=Test"
               onClick={[Function]}
             >
@@ -1168,10 +1180,10 @@ exports[`Search Page renders search results with pagination 1`] = `
             </a>
           </li>
           <li
-            className="jsx-3957010919 "
+            className="jsx-4119556752 "
           >
             <a
-              className="jsx-3957010919"
+              className="jsx-4119556752"
               href="?limit=20&offset=80&q=Test"
               onClick={[Function]}
             >
