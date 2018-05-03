@@ -378,7 +378,7 @@ const checkCollectiveBalance = () => {
     where: {
       [Op.or]: [{type: 'COLLECTIVE'}, {type: 'EVENT'}],
       id: {
-        $notIn: [7, 34]
+        [Op.notIn]: [7, 34]
       }
     }
   })

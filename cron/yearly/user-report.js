@@ -223,7 +223,7 @@ const getUsers = (collective) => {
     }
 
     if (unsubscribedUserIds.length > 0) {
-      excludeUnsubscribed.id = { $notIn: unsubscribedUserIds };
+      excludeUnsubscribed.id = { [Op.notIn]: unsubscribedUserIds };
     }
     if (collective.type === 'USER') {
       return models.User.findAll({

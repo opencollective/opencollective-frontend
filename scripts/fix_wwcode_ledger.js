@@ -59,7 +59,7 @@ const checkAndFixExpenses = () => {
         [Op.eq]: null
       },
       CollectiveId: {
-        $notIn: [1, 114, 248] // opencollective, partidodigital, wordpress sfo
+        [Op.notIn]: [1, 114, 248] // opencollective, partidodigital, wordpress sfo
       },
       payoutMethod: {
         [Op.ne]: 'paypal'
@@ -132,13 +132,13 @@ const checkAndFixOrders = () => {
       },
       PaymentMethodId: null,
       CollectiveId: {
-        $notIn: [114, 92, 234, 304] // ignore collectives that have unrelated weirdness
+        [Op.notIn]: [114, 92, 234, 304] // ignore collectives that have unrelated weirdness
       },
       CreatedByUserId: {
-        $notIn: [772] // ignores threadless type of transactions that are legit and will get screwed up below
+        [Op.notIn]: [772] // ignores threadless type of transactions that are legit and will get screwed up below
       },
       id: {
-        $notIn: [2031, 2534, 5752] // one off orders to ignore for various reasons
+        [Op.notIn]: [2031, 2534, 5752] // one off orders to ignore for various reasons
       }
     },
     include: [
