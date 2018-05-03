@@ -89,6 +89,7 @@ class Header extends React.Component {
         --cool-grey: #9ea2a6;
         --attention: #e69900;
         --gunmetal: #505559;
+        --fade-blue: #97B7F3;
       }
 
       body.showModal {
