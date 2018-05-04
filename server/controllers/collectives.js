@@ -532,29 +532,28 @@ export const getCollectiveTags = (req, res, next) => {
 };
 
 export const getTransactions = (req, res, next) => {
-  const where = {
-    CollectiveId: req.collective.id
-  };
+  const query = req.pagination ? req.pagination : {};
+
+  query.where = query.where || {};
+  query.where.CollectiveId = req.collective.id;
 
   if (req.query.donation || req.query.type === 'donations') {
-    where.amount = {
+    query.where.amount = {
       [Op.gt]: 0
     };
   } else if (req.query.expense || req.query.type === 'expenses') {
-    where.amount = {
+     query.where.amount = {
       [Op.lt]: 0
     };
   }
 
   if (req.query.exclude) {
-    where[Op.or] = [ { type: { [Op.ne]: req.query.exclude } }, { type: { [Op.eq]: null } } ];
+    query.where[Op.or] = [ { type: { [Op.ne]: req.query.exclude } }, { type: { [Op.eq]: null } } ];
   }
 
-  const query = _.merge({
-    where,
-    include: { model: models.Order },
-    order: [[req.sorting.key, req.sorting.dir]]
-  }, req.pagination);
+  query.include = { model: models.Order };
+
+  query.order = [[req.sorting.key, req.sorting.dir]];
 
   models.Transaction
     .findAndCountAll(query)
