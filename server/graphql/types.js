@@ -431,7 +431,7 @@ export const ExpenseType = new GraphQLObjectType({
             return expense.attachment;
           }
           return req.loaders.collective.findById.load(expense.CollectiveId).then(collective => {
-            if (req.remoteUser.isAdmin(collective.HostCollectiveId)) {
+            if (req.remoteUser.isAdmin(collective.HostCollectiveId) || req.remoteUser.isAdmin(collective.ParentCollectiveId)) {
               return expense.attachment;
             } else {
               return null;
