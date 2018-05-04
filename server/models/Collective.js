@@ -483,7 +483,7 @@ export default function(Sequelize, DataTypes) {
   // I'd argue that we should store the event slug as `${parentCollectiveSlug}/events/${eventSlug}`
   Collective.prototype.getUrlPath = function() {
     if (this.type === types.EVENT) {
-      return models.Collective.findById(this.ParentCollectiveId, { attributes: ['slug'] })
+      return models.Collective.findById(this.ParentCollectiveId, { attributes: ['id', 'slug'] })
         .then(parent => {
           return `/${parent.slug}/events/${this.slug}`;
         })
