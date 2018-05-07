@@ -190,7 +190,9 @@ class Expense extends React.Component {
           }
 
           .actions > div {
+            align-items: flex-end;
             display: flex;
+            flex-wrap: wrap;
             margin: 0.5rem 0;
           }
 
@@ -206,7 +208,8 @@ class Expense extends React.Component {
 
           @media(max-width: 600px) {
             .expense {
-              max-height: 23rem;
+              max-height: 50rem;
+              padding: 2rem 0.5rem;
             }
             .expense.detailsView {
               max-height: 45rem;
@@ -219,6 +222,19 @@ class Expense extends React.Component {
         <style jsx global>{`
           .expense .actions > div > div {
             margin-right: 0.5rem;
+          }
+
+          @media screen and (max-width: 700px) {
+            .expense .PayExpenseBtn ~ .RejectExpenseBtn {
+              flex-grow: 1;
+            }
+            .expense .SmallButton {
+              flex-grow: 1;
+              margin-top: 1rem;
+            }
+            .expense .SmallButton button {
+              width: 100%;
+            }
           }
         `}</style>
         <div className="fromCollective">
