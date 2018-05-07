@@ -349,19 +349,20 @@ describe('Collective model', () => {
     }));
 
     it('get the tiers with users', (done) => {
-
       collective.getTiersWithUsers()
         .then(tiers => {
           expect(tiers).to.have.length(2);
-          expect(tiers[0].users).to.have.length(1);
-          const backer = tiers[0].users[0];
+          const users = tiers[0].getDataValue('users');
+          expect(users).to.not.be.undefined;
+          expect(users).to.have.length(1);
+          const backer = users[0];
           expect(parseInt(backer.totalDonations, 10)).to.equal(transactions[2].amountInHostCurrency + transactions[3].amountInHostCurrency);
           expect(new Date(backer.firstDonation).getTime()).to.equal(new Date(transactions[2].createdAt).getTime());
           expect(new Date(backer.lastDonation).getTime()).to.equal(new Date(transactions[3].createdAt).getTime());
           done();
         })
         .catch(e => {
-          console.error(">>> error", e); done()
+          done(e);
         });
     });
 
