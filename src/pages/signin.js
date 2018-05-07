@@ -44,7 +44,7 @@ class LoginPage extends React.Component {
         <Header
           title="Sign Up"
           description="Create your profile on Open Collective and show the world the open collectives that you are contributing to."
-        />
+          />
         <style jsx>{`
         .signin {
           max-width: 60rem;
@@ -60,7 +60,7 @@ class LoginPage extends React.Component {
         <Body>
           <div className="signin">
             {this.state.error &&
-             <h1>Authentication Failed. Please try to generate a new token.</h1>}
+            <h1>Authentication Failed. Please try to generate a new token.</h1>}
 
             <h2><FormattedMessage id="loginform.title" defaultMessage="Sign in or Create an Account" /></h2>
             <SignInForm next={this.props.next} />

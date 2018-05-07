@@ -187,7 +187,8 @@ class EditEventForm extends React.Component {
             tiers={this.state.tiers}
             collective={{...event, type: 'EVENT' }}
             currency={event.parentCollective.currency}
-            onChange={this.handleTiersChange} />
+            onChange={this.handleTiersChange}
+            />
         </div>
         <div className="actions">
           <Button className="blue" label={submitBtnLabel} onClick={this.handleSubmit} disabled={loading} />

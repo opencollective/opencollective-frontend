@@ -98,16 +98,16 @@ class CreateEvent extends React.Component {
           }
         `}</style>
 
-          <Header
-            title={title}
-            description={collective.description}
-            twitterHandle={collective.twitterHandle}
-            image={collective.image || collective.backgroundImage}
-            className={this.state.status}
-            LoggedInUser={this.props.LoggedInUser}
-            />
+        <Header
+          title={title}
+          description={collective.description}
+          twitterHandle={collective.twitterHandle}
+          image={collective.image || collective.backgroundImage}
+          className={this.state.status}
+          LoggedInUser={this.props.LoggedInUser}
+          />
 
-          <Body>
+        <Body>
 
           <CollectiveCover
             href={`/${collective.slug}`}
@@ -141,9 +141,9 @@ class CreateEvent extends React.Component {
               </div>
             }
           </div>
-          </Body>
+        </Body>
 
-          <Footer />
+        <Footer />
       </div>
     );
   }

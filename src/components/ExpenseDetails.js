@@ -68,7 +68,7 @@ class ExpenseDetails extends React.Component {
     });
 
     return (
-        <div className={`ExpenseDetails ${this.props.mode}`}>
+      <div className={`ExpenseDetails ${this.props.mode}`}>
         <style jsx>{`
           .ExpenseDetails {
             font-size: 1.2rem;
@@ -182,7 +182,7 @@ class ExpenseDetails extends React.Component {
           { editMode &&
             <div className="row">
               <div className="col large">
-                <label><FormattedMessage id='expense.description' defaultMessage='description' /></label>
+                <label><FormattedMessage id="expense.description" defaultMessage="description" /></label>
                 <div className="description">
                   <span className="description">
                     <InputField
@@ -200,7 +200,7 @@ class ExpenseDetails extends React.Component {
 
           { editMode &&
             <div className="col">
-              <label><FormattedMessage id='expense.category' defaultMessage='category' /></label>
+              <label><FormattedMessage id="expense.category" defaultMessage="category" /></label>
               <div className="category">
                 <span className="category">
                   <InputField
@@ -217,7 +217,7 @@ class ExpenseDetails extends React.Component {
           }
 
           <div className="col">
-            <label><FormattedMessage id='expense.amount' defaultMessage='amount' /></label>
+            <label><FormattedMessage id="expense.amount" defaultMessage="amount" /></label>
             <div className="amountDetails">
               <span className="amount">
                 { editMode && canEditAmount &&
@@ -225,7 +225,7 @@ class ExpenseDetails extends React.Component {
                     name="amount"
                     defaultValue={expense.amount}
                     pre={getCurrencySymbol(expense.currency)}
-                    type='currency'
+                    type="currency"
                     className="amountField"
                     onChange={amount => this.handleChange('amount', amount)}
                     />
@@ -242,7 +242,7 @@ class ExpenseDetails extends React.Component {
           </div>
 
           <div className="col">
-            <label><FormattedMessage id='expense.payoutMethod' defaultMessage='payout method' /></label>
+            <label><FormattedMessage id="expense.payoutMethod" defaultMessage="payout method" /></label>
             { !editMode && capitalize(intl.formatMessage(this.messages[expense.payoutMethod], { paypalEmail: paypalEmail || (canEditExpense ? "missing" : "hidden")}))}
             { editMode &&
               <InputField
@@ -257,7 +257,7 @@ class ExpenseDetails extends React.Component {
 
           { (expense.privateMessage || ((isAuthor || canEditExpense) && payoutMethod === 'other')) &&
             <div className="col privateMessage">
-              <label><FormattedMessage id='expense.privateMessage' defaultMessage='private note' /></label>
+              <label><FormattedMessage id="expense.privateMessage" defaultMessage="private note" /></label>
               { (!editMode || !isAuthor) && capitalize(expense.privateMessage)}
               { editMode && (isAuthor || canEditExpense) &&
                 <InputField

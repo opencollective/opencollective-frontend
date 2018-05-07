@@ -283,41 +283,41 @@ class EditCollectiveForm extends React.Component {
         <div className="menu">
           <ButtonGroup className="menuBtnGroup">
             <Button className="menuBtn info" bsStyle={this.state.section === 'info' ? 'primary' : 'default'} onClick={() => this.showSection('info')}>
-              <FormattedMessage id='editCollective.menu.info' defaultMessage='info' />
+              <FormattedMessage id="editCollective.menu.info" defaultMessage="info" />
             </Button>
             <Button className="menuBtn images" bsStyle={this.state.section === 'images' ? 'primary' : 'default'} onClick={() => this.showSection('images')}>
-              <FormattedMessage id='editCollective.menu.' defaultMessage='images' />
+              <FormattedMessage id="editCollective.menu." defaultMessage="images" />
             </Button>
             { this.showEditMembers &&
               <Button className="menuBtn members" bsStyle={this.state.section === 'members' ? 'primary' : 'default'} onClick={() => this.showSection('members')}>
-                <FormattedMessage id='editCollective.menu.members' defaultMessage='members' />
+                <FormattedMessage id="editCollective.menu.members" defaultMessage="members" />
               </Button>
             }
             { this.showEditGoals &&
               <Button className="menuBtn goals" bsStyle={this.state.section === 'goals' ? 'primary' : 'default'} onClick={() => this.showSection('goals')}>
-                <FormattedMessage id='editCollective.menu.goals' defaultMessage='goals' />
+                <FormattedMessage id="editCollective.menu.goals" defaultMessage="goals" />
               </Button>
             }
             { this.showEditTiers &&
               <Button className="menuBtn tiers" bsStyle={this.state.section === 'tiers' ? 'primary' : 'default'} onClick={() => this.showSection('tiers')}>
-                <FormattedMessage id='editCollective.menu.tiers' defaultMessage='tiers' />
+                <FormattedMessage id="editCollective.menu.tiers" defaultMessage="tiers" />
               </Button>
             }
             { this.showPaymentMethods &&
               <Button className="menuBtn paymentMethods" bsStyle={this.state.section === 'paymentMethods' ? 'primary' : 'default'} onClick={() => this.showSection('paymentMethods')}>
-                <FormattedMessage id='editCollective.menu.paymentMethods' defaultMessage='Payment Methods' />
+                <FormattedMessage id="editCollective.menu.paymentMethods" defaultMessage="Payment Methods" />
               </Button>
             }
             <Button className="menuBtn connectedAccounts" bsStyle={this.state.section === 'connectedAccounts' ? 'primary' : 'default'} onClick={() => this.showSection('connectedAccounts')}>
-              <FormattedMessage id='editCollective.menu.connectedAccounts' defaultMessage='Connected Accounts' />
+              <FormattedMessage id="editCollective.menu.connectedAccounts" defaultMessage="Connected Accounts" />
             </Button>
             { collective.type === 'COLLECTIVE' &&
             <Button className="menuBtn export" bsStyle={this.state.section === 'export' ? 'primary' : 'default'} onClick={() => this.showSection('export')}>
-              <FormattedMessage id='editCollective.menu.export' defaultMessage='export' />
+              <FormattedMessage id="editCollective.menu.export" defaultMessage="export" />
             </Button>
             }
             <Button className="menuBtn advanced" bsStyle={this.state.section === 'advanced' ? 'primary' : 'default'} onClick={() => this.showSection('advanced')}>
-              <FormattedMessage id='editCollective.menu.advanced' defaultMessage='advanced' />
+              <FormattedMessage id="editCollective.menu.advanced" defaultMessage="advanced" />
             </Button>
           </ButtonGroup>
         </div>

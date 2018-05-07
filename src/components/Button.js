@@ -47,7 +47,8 @@ class Button extends React.Component {
         disabled={this.props.disabled}
         style={this.props.style}
         className={`Button ${this.props.className}`}
-        onClick={this.onClick} >
+        onClick={this.onClick}
+        >
         <style jsx>{`
         .Button {
           --webkit-appearance: none;

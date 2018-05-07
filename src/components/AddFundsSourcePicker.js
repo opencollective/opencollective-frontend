@@ -63,7 +63,7 @@ class AddFundsSourcePicker extends React.Component {
     };
     return (
       <FormControl id="sourcePicker" name="template" componentClass="select" placeholder="select" onChange={this.onChange}>
-        <option value={host.id}><FormattedMessage id="addfunds.fromCollective.host" values={{ host: host.name}} defaultMessage="Host ({host})"/></option>
+        <option value={host.id}><FormattedMessage id="addfunds.fromCollective.host" values={{ host: host.name}} defaultMessage="Host ({host})" /></option>
         { this.membersByType['COLLECTIVE'].length > 0 && this.renderSeparator("COLLECTIVE") }
         { this.membersByType['COLLECTIVE'].map(this.renderSourceEntry) }
 
@@ -74,7 +74,7 @@ class AddFundsSourcePicker extends React.Component {
         { this.membersByType['USER'].map(this.renderSourceEntry) }
 
         <option value="">---------------</option>
-        <option value="other"><FormattedMessage id="addfunds.fromCollective.other" defaultMessage="other (please specify)"/></option>
+        <option value="other"><FormattedMessage id="addfunds.fromCollective.other" defaultMessage="other (please specify)" /></option>
       </FormControl>
     );
   }

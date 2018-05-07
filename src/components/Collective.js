@@ -249,12 +249,12 @@ class Collective extends React.Component {
                       title={<FormattedMessage
                         id="collective.collective.memberOf.collective.parent.title"
                         defaultMessage={`Member collectives`}
-                      />}
+                        />}
                       subtitle={(<FormattedMessage
                         id="collective.collective.memberOf.collective.parent.subtitle"
                         values={{ n: this.collective.stats.collectives.memberOf }}
                         defaultMessage={`{n, plural, one {this collective is} other {{n} collectives are}} part of our collective`}
-                      />)}
+                        />)}
                       />
 
                     <div className="cardsList">
@@ -272,7 +272,7 @@ class Collective extends React.Component {
 
               <section id="budget" className="clear">
                 <div className="content" >
-                  <SectionTitle section="budget" values={{ balance: formatCurrency(get(this.collective, 'stats.balance'), this.collective.currency) }}/>
+                  <SectionTitle section="budget" values={{ balance: formatCurrency(get(this.collective, 'stats.balance'), this.collective.currency) }} />
                   <ExpensesSection
                     collective={this.collective}
                     LoggedInUser={LoggedInUser}
@@ -283,24 +283,24 @@ class Collective extends React.Component {
 
               <section id="contributors" className="tier">
                 <div className="content" >
-                { get(this.collective, 'stats.backers.all') === 0 &&
+                  { get(this.collective, 'stats.backers.all') === 0 &&
                   <SectionTitle
                     section="contributors"
                     subtitle={<FormattedMessage id="collective.section.contributors.empty" defaultMessage="You don't have any contributors yet." />}
                     />
                 }
-                { get(this.collective, 'stats.backers.all') > 0 &&
+                  { get(this.collective, 'stats.backers.all') > 0 &&
                   <div>
                     <SectionTitle
                       section="contributors"
-                      values={ get(this.collective, 'stats.backers') }
+                      values={get(this.collective, 'stats.backers')}
                       />
 
                     <MembersWithData
                       collective={this.collective}
                       type="ORGANIZATION"
                       LoggedInUser={LoggedInUser}
-                      role='BACKER'
+                      role="BACKER"
                       limit={100}
                       />
 
@@ -308,7 +308,7 @@ class Collective extends React.Component {
                       collective={this.collective}
                       LoggedInUser={LoggedInUser}
                       type="USER"
-                      role='BACKER'
+                      role="BACKER"
                       limit={100}
                       orderBy="totalDonations"
                       />

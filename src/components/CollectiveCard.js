@@ -205,17 +205,17 @@ class CollectiveCard extends React.Component {
             text-transform: capitalize;
           }
           `}</style>
-          <div className='head'>
-            <div className='background' style={coverStyle} />
-            <div className='logo'>
+          <div className="head">
+            <div className="background" style={coverStyle} />
+            <div className="logo">
               <Logo src={collective.image} type={collective.type} website={collective.website} height={65} />
             </div>
           </div>
-          <div className='body'>
-            <div className='name'>{collective.name}</div>
-            <div className='description'>{description}</div>
+          <div className="body">
+            <div className="name">{collective.name}</div>
+            <div className="description">{description}</div>
           </div>
-          <div className='footer'>
+          <div className="footer">
             { collective.stats &&
               <div className="stats">
                 <div className="backers">
@@ -233,18 +233,18 @@ class CollectiveCard extends React.Component {
                     <Currency value={collective.stats.yearlyBudget} currency={collective.currency} />
                   </div>
                   <div className="label">
-                    <FormattedMessage id='collective.card.stats.yearlyBudget' defaultMessage={`yearly budget`} />
+                    <FormattedMessage id="collective.card.stats.yearlyBudget" defaultMessage={`yearly budget`} />
                   </div>
                 </div>
               </div>
             }
             { membership &&
               <div className="membership">
-                <div className='role'>{tierName}</div>
+                <div className="role">{tierName}</div>
                 { membership.createdAt &&
-                  <div className='since'>
-                    <FormattedMessage id='membership.since' defaultMessage={`since`} />&nbsp;
-                    <FormattedDate value={membership.createdAt} month='long' year='numeric' />
+                  <div className="since">
+                    <FormattedMessage id="membership.since" defaultMessage={`since`} />&nbsp;
+                    <FormattedDate value={membership.createdAt} month="long" year="numeric" />
                   </div>
                 }
               </div>
@@ -254,7 +254,7 @@ class CollectiveCard extends React.Component {
                 <div className="totalDonationsAmount">
                   <Currency value={get(membership, 'stats.totalDonations')} currency={get(membership, 'collective.currency')} />
                 </div>
-                <FormattedMessage id='membership.totalDonations.title' defaultMessage={`amount contributed`} />
+                <FormattedMessage id="membership.totalDonations.title" defaultMessage={`amount contributed`} />
               </div>
             }
             { role === 'FUNDRAISER' && get(membership, 'stats.totalRaised') > 0 &&
@@ -262,7 +262,7 @@ class CollectiveCard extends React.Component {
                 <div className="totalRaisedAmount">
                   <Currency value={get(membership, 'stats.totalRaised')} currency={get(membership, 'collective.currency')} />
                 </div>
-                <FormattedMessage id='membership.totalRaised.title' defaultMessage={`amount raised`} />
+                <FormattedMessage id="membership.totalRaised.title" defaultMessage={`amount raised`} />
               </div>
             }
           </div>

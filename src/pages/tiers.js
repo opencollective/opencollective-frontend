@@ -62,14 +62,14 @@ class Tiers extends React.Component {
             style={get(Collective, 'settings.style.hero.cover')}
             />
           <div className="tiers">
-          {Collective.tiers.map(tier => (
-            <Tier
-              key={tier.id}
-              className="tier"
-              tier={tier}
-              onChange={(response) => this.updateResponse(response)}
-              onClick={(response) => this.handleGetTierClick(response)}
-              />
+            {Collective.tiers.map(tier => (
+              <Tier
+                key={tier.id}
+                className="tier"
+                tier={tier}
+                onChange={(response) => this.updateResponse(response)}
+                onClick={(response) => this.handleGetTierClick(response)}
+                />
           ))}
           </div>
         </Body>

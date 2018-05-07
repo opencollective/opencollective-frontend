@@ -25,7 +25,7 @@ class LongDescription extends React.Component {
             <SectionTitle
               title={section.title || <FormattedMessage id="collective.about.title" defaultMessage="About" />}
               subtitle={section.title ? '' : this.props.defaultSubtitle}
-            />
+              />
 
             <Markdown source={section.markdown} />
           </section>

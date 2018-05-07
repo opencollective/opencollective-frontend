@@ -113,13 +113,13 @@ class Transactions extends React.Component {
           <div className="filter">
             <ButtonGroup className="filterBtnGroup">
               <Button className="filterBtn all" bsSize="small" bsStyle={!this.state.type ? 'primary' : 'default'} onClick={() => this.refetch()}>
-                <FormattedMessage id='transactions.all' defaultMessage='all' />
+                <FormattedMessage id="transactions.all" defaultMessage="all" />
               </Button>
               <Button className="filterBtn credit" bsSize="small" bsStyle={this.state.type === 'CREDIT' ? 'primary' : 'default'} onClick={() => this.refetch('CREDIT')}>
-                <FormattedMessage id='transactions.credits' defaultMessage='credits' />
+                <FormattedMessage id="transactions.credits" defaultMessage="credits" />
               </Button>
               <Button className="filterBtn debit" bsSize="small" bsStyle={this.state.type === 'DEBIT' ? 'primary' : 'default'} onClick={() => this.refetch('DEBIT')}>
-                <FormattedMessage id='transactions.debits' defaultMessage='debits' />
+                <FormattedMessage id="transactions.debits" defaultMessage="debits" />
               </Button>
             </ButtonGroup>
           </div>
@@ -137,7 +137,7 @@ class Transactions extends React.Component {
               collective={collective}
               transaction={transaction}
               LoggedInUser={LoggedInUser}
-            />)
+              />)
           )}
           { transactions.length === 0 &&
             <div className="empty">
@@ -146,9 +146,9 @@ class Transactions extends React.Component {
           }
           { transactions.length >= 10 && transactions.length % 10 === 0 &&
             <div className="loadMoreBtn">
-              <Button bsStyle='default' onClick={this.fetchMore}>
-                {this.state.fetchingMore && <FormattedMessage id='loading' defaultMessage='loading' />}
-                {!this.state.fetchingMore && <FormattedMessage id='loadMore' defaultMessage='load more' />}
+              <Button bsStyle="default" onClick={this.fetchMore}>
+                {this.state.fetchingMore && <FormattedMessage id="loading" defaultMessage="loading" />}
+                {!this.state.fetchingMore && <FormattedMessage id="loadMore" defaultMessage="load more" />}
               </Button>
             </div>
           }

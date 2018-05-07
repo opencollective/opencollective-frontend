@@ -193,7 +193,7 @@ class Banner extends React.Component {
               collective={collective}
               onChange={this.onChange}
               type="ORGANIZATION"
-              role='BACKER'
+              role="BACKER"
               limit={100}
               />
           </section>
@@ -216,7 +216,7 @@ class Banner extends React.Component {
               collective={collective}
               onChange={this.onChange}
               type="USER"
-              role='BACKER'
+              role="BACKER"
               limit={100}
               orderBy="totalDonations"
               />

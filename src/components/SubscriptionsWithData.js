@@ -34,7 +34,7 @@ class SubscriptionsWithData extends React.Component {
           LoggedInUser={LoggedInUser}
           collective={data.Collective}
           loading={data.loading}
-        />
+          />
       </div>
     );
   }

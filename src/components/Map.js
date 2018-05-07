@@ -29,11 +29,13 @@ class Map extends React.Component {
           zoom={16}
           loadingMessage={'Loading map'}
           params={{v: '3.exp', key: 'AIzaSyCRLIexl7EkMQk_0_yNsjO4Vqb_MccD-RI'}}
-          onMapCreated={this.onMapCreated}>
+          onMapCreated={this.onMapCreated}
+          >
           <Marker
             lat={lat}
             lng={long}
-            draggable={false} />
+            draggable={false}
+            />
         </Gmaps>
         <a className="map-overlay" href={`http://maps.apple.com/?q=${lat},${long}`} target="_blank"></a>
       </div>

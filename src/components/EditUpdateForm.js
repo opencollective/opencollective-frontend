@@ -81,7 +81,7 @@ class EditUpdateForm extends React.Component {
     const editor = (get(LoggedInUser, 'collective.settings.editor') === 'markdown' || get(collective, 'settings.editor') === 'markdown') ? 'markdown' : 'html';
 
     return (
-        <div className={`EditUpdateForm ${this.props.mode}`}>
+      <div className={`EditUpdateForm ${this.props.mode}`}>
         <style jsx>{`
           .EditUpdateForm {
             font-size: 1.2rem;

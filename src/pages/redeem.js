@@ -34,7 +34,7 @@ class RedeemPage extends React.Component {
           title="Redeem gift card"
           description="Use your gift card to support open source projects that you are contributing to."
           LoggedInUser={this.state.LoggedInUser}
-        />
+          />
         <style jsx global>{`
           .Redeem-hero .ctabtn a {
             color: white !important;
@@ -143,26 +143,26 @@ class RedeemPage extends React.Component {
         `}
         </style>
         <Body>
-          <div className='Redeem-container'>
+          <div className="Redeem-container">
 
-            <div className='Redeem-hero'>
-              <div className='backgroundCover' />
-              <div className='content'>
-                <div className='Redeem-hero-line1'>
+            <div className="Redeem-hero">
+              <div className="backgroundCover" />
+              <div className="content">
+                <div className="Redeem-hero-line1">
                   Redeem Gift Card
                 </div>
-                <div className='Redeem-hero-line2'>
+                <div className="Redeem-hero-line2">
                   Open Collective helps communities - like open source projects, meetups, etc - raise money and operate transparently.
 
                   It&apos;s easy. Enter your gift code at the bottom of a project and we&apos;ll credit them with your gift card amount.
                 </div>
-                <div className='Redeem-hero-line3'>
+                <div className="Redeem-hero-line3">
                   Check out some of our popular collectives below!
                 </div>
               </div>
             </div>
 
-            <div className='Redeem-listing'>
+            <div className="Redeem-listing">
               <div className="cardsList">
                 <CollectivesForRedeemPageWithData
                   HostCollectiveId={11004} // hard-coded to only show open source projects

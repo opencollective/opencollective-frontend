@@ -105,7 +105,7 @@ class InputTypeDropzone extends React.Component {
           </div>
         }
         <img src={imagePreview(this.state.url, this.props.placeholder, { width: 128 })} />
-        </div>
+      </div>
     )
   }
 

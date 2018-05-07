@@ -34,7 +34,7 @@ class SubscriptionsPage extends React.Component {
           title={`Subscriptions`}
           description="All the collectives that you are giving money to"
           LoggedInUser={this.state.LoggedInUser}
-        />
+          />
         <style jsx>{`
         .Subscriptions-container {
           background-color: ${colors.offwhite};
@@ -72,15 +72,15 @@ class SubscriptionsPage extends React.Component {
         `}
         </style>
         <Body>
-          <div className='Subscriptions-container'>
-            <div className='content'>
-              <div className='Subscriptions-header'>
-                <div className='Subscriptions-title'>
-                    {slug}&apos;s subscriptions
+          <div className="Subscriptions-container">
+            <div className="content">
+              <div className="Subscriptions-header">
+                <div className="Subscriptions-title">
+                  {slug}&apos;s subscriptions
                 </div>
               </div>
 
-              <div className='Subscriptions-listing'>
+              <div className="Subscriptions-listing">
                 <SubscriptionsWithData
                   slug={this.props.slug}
                   LoggedInUser={this.state.LoggedInUser}

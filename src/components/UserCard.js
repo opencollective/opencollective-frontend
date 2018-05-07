@@ -54,12 +54,12 @@ const UserCard = ({ user, type }) => (
         }
       `}</style>
       <img src={user.image} />
-      <p className='name'>{user.name}</p>
-      <div className='tier border-top border-gray px3 py2'>
-        <p className='name'>{user.tier.name}</p>
-        <p className='since'>
-          <FormattedMessage id='UserCard.since' defaultMessage={`since`} />&nbsp;
-          <FormattedDate value={user.createdAt} month='long' year='numeric' />
+      <p className="name">{user.name}</p>
+      <div className="tier border-top border-gray px3 py2">
+        <p className="name">{user.tier.name}</p>
+        <p className="since">
+          <FormattedMessage id="UserCard.since" defaultMessage={`since`} />&nbsp;
+          <FormattedDate value={user.createdAt} month="long" year="numeric" />
         </p>
       </div>
     </div>

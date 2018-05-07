@@ -12,7 +12,7 @@ describe("Tier component", () => {
   const mountComponent = (props) => mount(
     <IntlProvider locale="en">
       <Tier {...props} />
-      </IntlProvider>
+    </IntlProvider>
   );
 
   describe('Donate Tier', () => {

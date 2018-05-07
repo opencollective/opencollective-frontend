@@ -55,7 +55,7 @@ describe("Expenses component", () => {
         LoggedInUser={loggedInUser}
         payExpense={() => setTimeout(() => Promise.resolve(), 2000)}
         />
-      </IntlProvider>
+    </IntlProvider>
   );
 
   describe('Paying expenses', () => {

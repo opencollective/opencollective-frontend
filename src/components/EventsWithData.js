@@ -44,10 +44,10 @@ class EventsWithData extends React.Component {
 
   renderEventEntry(event) {
     return (<li key={event.id}>
-              <a href={`/${event.parentCollective.slug}/events/${event.slug}`} onClick={() => this.openEvent(event.slug)} target="_top">{event.name}</a>, &nbsp;
-              <FormattedDate value={event.startsAt} day='numeric' month='long' />, &nbsp;
-              {event.location.name}
-            </li>);
+      <a href={`/${event.parentCollective.slug}/events/${event.slug}`} onClick={() => this.openEvent(event.slug)} target="_top">{event.name}</a>, &nbsp;
+      <FormattedDate value={event.startsAt} day="numeric" month="long" />, &nbsp;
+      {event.location.name}
+    </li>);
   }
 
   render() {
@@ -100,31 +100,31 @@ class EventsWithData extends React.Component {
         <div className="events">
           {futureEvents.length === 0 && pastEvents.length === 0 && this.isIframe &&
             <div className="createEvent">
-              <p><FormattedMessage id='events.widget.noEventScheduled' defaultMessage={`No event has been scheduled yet.`} /></p>
-              <a href={`/${this.props.collectiveSlug}/events/new`} onClick={this.createEvent} className="btn btn-default" target="_top"><FormattedMessage id='events.widget.createEvent' defaultMessage={`Create an Event`} /></a>
+              <p><FormattedMessage id="events.widget.noEventScheduled" defaultMessage={`No event has been scheduled yet.`} /></p>
+              <a href={`/${this.props.collectiveSlug}/events/new`} onClick={this.createEvent} className="btn btn-default" target="_top"><FormattedMessage id="events.widget.createEvent" defaultMessage={`Create an Event`} /></a>
             </div>
           }
           { (futureEvents.length > 0 || pastEvents.length > 0) &&
             <div>
               <div className="title">
-                <h2><FormattedMessage id='events.title.futureEvents' values={{n: futureEvents.length}} defaultMessage={`Next {n, plural, one {event} other {events}}`} /></h2>
+                <h2><FormattedMessage id="events.title.futureEvents" values={{n: futureEvents.length}} defaultMessage={`Next {n, plural, one {event} other {events}}`} /></h2>
                 { this.isIframe &&
-                  <div className="action"><a href={`/${this.props.collectiveSlug}/events/new`} onClick={this.createEvent} target="_blank"><FormattedMessage id='events.widget.createEvent' defaultMessage={`Create an Event`} /></a></div>
+                  <div className="action"><a href={`/${this.props.collectiveSlug}/events/new`} onClick={this.createEvent} target="_blank"><FormattedMessage id="events.widget.createEvent" defaultMessage={`Create an Event`} /></a></div>
                 }
               </div>
               <ul>
-              { futureEvents.length === 0 &&
-              <div>No event planned.</div>
+                { futureEvents.length === 0 &&
+                <div>No event planned.</div>
               }
-              { futureEvents.map(this.renderEventEntry) }
+                { futureEvents.map(this.renderEventEntry) }
               </ul>
               { pastEvents.length > 0 &&
                 <div className="pastEvents">
                   <div className="title">
-                    <h2><FormattedMessage id='events.title.pastEvents' values={{n: pastEvents.length}} defaultMessage={`Past {n, plural, one {event} other {events}}`} /></h2>
+                    <h2><FormattedMessage id="events.title.pastEvents" values={{n: pastEvents.length}} defaultMessage={`Past {n, plural, one {event} other {events}}`} /></h2>
                   </div>
                   <ul>
-                  {pastEvents.map(this.renderEventEntry)}
+                    {pastEvents.map(this.renderEventEntry)}
                   </ul>
                 </div>
               }

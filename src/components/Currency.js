@@ -5,8 +5,8 @@ const Currency = ({value, currency, precision=0}) => (
   <FormattedNumber
     value={value / 100}
     currency={currency}
-    style='currency'
-    currencyDisplay='symbol'
+    style="currency"
+    currencyDisplay="symbol"
     minimumFractionDigits={precision}
     maximumFractionDigits={precision}
     />

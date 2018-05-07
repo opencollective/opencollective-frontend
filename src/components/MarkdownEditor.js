@@ -47,16 +47,16 @@ class MarkdownEditor extends React.Component {
           }
         `}</style>
         <ReactMde
-            textAreaProps={{
+          textAreaProps={{
                 id: 'ta1',
                 name: 'ta1',
             }}
-            value={this.state.reactMdeValue}
-            className="column"
-            onChange={this.handleChange}
-            commands={ReactMdeCommands.getDefaultCommands()}
-            />
-       </div>
+          value={this.state.reactMdeValue}
+          className="column"
+          onChange={this.handleChange}
+          commands={ReactMdeCommands.getDefaultCommands()}
+          />
+      </div>
      )
   }
 }

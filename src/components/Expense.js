@@ -124,8 +124,8 @@ class Expense extends React.Component {
       );
 
       return (
-      <div className={`expense ${status} ${this.state.mode}View`}>
-        <style jsx>{`
+        <div className={`expense ${status} ${this.state.mode}View`}>
+          <style jsx>{`
           .expense {
             width: 100%;
             margin: 0.5em 0;
@@ -219,7 +219,7 @@ class Expense extends React.Component {
             }
           }
         `}</style>
-        <style jsx global>{`
+          <style jsx global>{`
           .expense .actions > div > div {
             margin-right: 0.5rem;
           }
@@ -237,50 +237,50 @@ class Expense extends React.Component {
             }
           }
         `}</style>
-        <div className="fromCollective">
-          <a href={`/${expense.fromCollective.slug}`} title={expense.fromCollective.name}>
-            <Avatar src={expense.fromCollective.image} key={expense.fromCollective.id} radius={40} />
-          </a>
-        </div>
-        <div className="body">
-          <div className="header">
-            <div className="amount pullRight">
-              <FormattedNumber
-                value={expense.amount / 100}
-                currency={expense.currency}
-                {...this.currencyStyle}
-                />
-            </div>
-            <div className="description">
-              <Link route={`/${collective.slug}/expenses/${expense.id}`} title={capitalize(title)}>
-                {capitalize(title)}
-              </Link>
-            </div>
-            <div className="meta">
-              <span className="incurredAt"><FormattedDate value={expense.incurredAt} day="numeric" month="numeric" /></span> |&nbsp;
-              { includeHostedCollectives &&
+          <div className="fromCollective">
+            <a href={`/${expense.fromCollective.slug}`} title={expense.fromCollective.name}>
+              <Avatar src={expense.fromCollective.image} key={expense.fromCollective.id} radius={40} />
+            </a>
+          </div>
+          <div className="body">
+            <div className="header">
+              <div className="amount pullRight">
+                <FormattedNumber
+                  value={expense.amount / 100}
+                  currency={expense.currency}
+                  {...this.currencyStyle}
+                  />
+              </div>
+              <div className="description">
+                <Link route={`/${collective.slug}/expenses/${expense.id}`} title={capitalize(title)}>
+                  {capitalize(title)}
+                </Link>
+              </div>
+              <div className="meta">
+                <span className="incurredAt"><FormattedDate value={expense.incurredAt} day="numeric" month="numeric" /></span> |&nbsp;
+                { includeHostedCollectives &&
                 <span className="collective"><Link route={`/${expense.collective.slug}`}>{expense.collective.slug}</Link> (balance: {formatCurrency(expense.collective.stats.balance, expense.collective.currency)}) | </span>
               }
-              <span className="status">{intl.formatMessage(this.messages[status])}</span> |
-              <span className="metaItem"><Link route={`/${expense.collective.slug}/expenses/${expense.category}`}>{capitalize(expense.category)}</Link></span>
-              { editable && LoggedInUser && LoggedInUser.canEditExpense(expense) &&
+                <span className="status">{intl.formatMessage(this.messages[status])}</span> |
+                <span className="metaItem"><Link route={`/${expense.collective.slug}/expenses/${expense.category}`}>{capitalize(expense.category)}</Link></span>
+                { editable && LoggedInUser && LoggedInUser.canEditExpense(expense) &&
                 <span> | <a className="toggleEditExpense" onClick={this.toggleEdit}>{intl.formatMessage(this.messages[`${mode === 'edit' ? 'cancelEdit' : 'edit'}`])}</a></span>
               }
-              { mode !== 'edit' && view === 'list' &&
+                { mode !== 'edit' && view === 'list' &&
                 <span> | <a className="toggleDetails" onClick={this.toggleDetails}>{intl.formatMessage(this.messages[`${mode === 'details' ? 'closeDetails' : 'viewDetails'}`])}</a></span>
               }
+              </div>
             </div>
-          </div>
 
-          <ExpenseDetails
-            LoggedInUser={LoggedInUser}
-            expense={expense}
-            collective={collective}
-            onChange={this.handleChange}
-            mode={mode}
-            />
+            <ExpenseDetails
+              LoggedInUser={LoggedInUser}
+              expense={expense}
+              collective={collective}
+              onChange={this.handleChange}
+              mode={mode}
+              />
 
-          { editable &&
+            { editable &&
             <div className="actions">
               { mode === 'edit' && this.state.modified &&
                 <div>
@@ -307,8 +307,8 @@ class Expense extends React.Component {
               }
             </div>
           }
+          </div>
         </div>
-      </div>
     );
   }
 }

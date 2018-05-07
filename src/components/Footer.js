@@ -61,7 +61,7 @@ class Footer extends React.Component {
         `}</style>
         <div className="content">
           <div>
-            <object type="image/svg+xml" data="/static/images/opencollectivelogo-footer.svg" height='20' className="logo"></object>
+            <object type="image/svg+xml" data="/static/images/opencollectivelogo-footer.svg" height="20" className="logo"></object>
           </div>
           <div>
             <nav>

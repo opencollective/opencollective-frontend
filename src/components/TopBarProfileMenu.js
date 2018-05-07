@@ -89,7 +89,7 @@ class TopBarProfileMenu extends React.Component {
     }); // order by role then az
 
     return (
-      <div className='LoginTopBarProfileMenu' onClick={(e) => e.nativeEvent.stopImmediatePropagation()}>
+      <div className="LoginTopBarProfileMenu" onClick={(e) => e.nativeEvent.stopImmediatePropagation()}>
         <style jsx>{`
         .LoginTopBarProfileMenu {
           position: absolute;
@@ -189,27 +189,27 @@ class TopBarProfileMenu extends React.Component {
 
         `}</style>
         <div>
-          <div className='LoginTopBarProfileMenuHeading'>
+          <div className="LoginTopBarProfileMenuHeading">
             <span><FormattedMessage id="collective" defaultMessage="{n, plural, one {collective} other {collectives}}" values={{ n: collectives.length }} /></span>
-            <div className='-dash'></div>
+            <div className="-dash"></div>
           </div>
           <ul>
-          {this.showCreateBtn && <li><a href='/create'><FormattedMessage id="menu.createCollective" defaultMessage="Create a Collective" /></a></li>}
-          <li><a href='/discover'><FormattedMessage id="menu.discover" defaultMessage="discover" /></a></li>
-          { collectives.map(membership => (
-            <li key={`LoggedInMenu-Collective-${get(membership, 'collective.slug')}`}>
-              <Link route={`/${get(membership, 'collective.slug')}`}>
-                <a title={this.tooltip(membership)} className={membership.role.toLowerCase()}>{get(membership, 'collective.slug')}</a>
-              </Link>
-              { get(membership, 'collective.stats.expenses.pending') > 0 && <Badge>{get(membership, 'collective.stats.expenses.pending')}</Badge> }
-            </li>
+            {this.showCreateBtn && <li><a href="/create"><FormattedMessage id="menu.createCollective" defaultMessage="Create a Collective" /></a></li>}
+            <li><a href="/discover"><FormattedMessage id="menu.discover" defaultMessage="discover" /></a></li>
+            { collectives.map(membership => (
+              <li key={`LoggedInMenu-Collective-${get(membership, 'collective.slug')}`}>
+                <Link route={`/${get(membership, 'collective.slug')}`}>
+                  <a title={this.tooltip(membership)} className={membership.role.toLowerCase()}>{get(membership, 'collective.slug')}</a>
+                </Link>
+                { get(membership, 'collective.stats.expenses.pending') > 0 && <Badge>{get(membership, 'collective.stats.expenses.pending')}</Badge> }
+              </li>
           ))}
           </ul>
         </div>
         <div>
-          <div className='LoginTopBarProfileMenuHeading'>
+          <div className="LoginTopBarProfileMenuHeading">
             <span><FormattedMessage id="menu.myAccount" defaultMessage="My account" /></span>
-            <div className='-dash'></div>
+            <div className="-dash"></div>
           </div>
           <ul>
             <li><a href={`/${LoggedInUser.username}`}><FormattedMessage id="menu.profile" defaultMessage="profile" /></a></li>
@@ -220,7 +220,7 @@ class TopBarProfileMenu extends React.Component {
                 <a><FormattedMessage id="menu.createOrganization" defaultMessage="Create an Organization" /></a>
               </Link>
             </li>
-            <li><a className='-blue' href='#' onClick={this.logout}><FormattedMessage id="menu.logout" defaultMessage="logout" /></a></li>
+            <li><a className="-blue" href="#" onClick={this.logout}><FormattedMessage id="menu.logout" defaultMessage="logout" /></a></li>
           </ul>
         </div>
       </div>
@@ -300,9 +300,9 @@ class TopBarProfileMenu extends React.Component {
           border-right: 0.5rem solid transparent;
         }
         `}</style>
-        {LoggedInUser.image && <div className='LoginTopBarProfileButton-image' style={{backgroundImage: `url(${LoggedInUser.image})`}}></div>}
-        <div className='LoginTopBarProfileButton-name desktopOnly'>{LoggedInUser.username}</div>
-        <div className='LoginTopBarProfileButton-caret'></div>
+        {LoggedInUser.image && <div className="LoginTopBarProfileButton-image" style={{backgroundImage: `url(${LoggedInUser.image})`}}></div>}
+        <div className="LoginTopBarProfileButton-name desktopOnly">{LoggedInUser.username}</div>
+        <div className="LoginTopBarProfileButton-caret"></div>
         {showProfileMenu && this.renderProfileMenu()}
       </div>
     )
@@ -355,7 +355,7 @@ class TopBarProfileMenu extends React.Component {
 
         { status === 'loggedout' &&
           <div className="LoginTopBarProfileButton">
-            <Link route="signin" params={ { next: this.redirectAfterSignin } }><a>
+            <Link route="signin" params={{ next: this.redirectAfterSignin }}><a>
               <FormattedMessage id="login.button" defaultMessage="login" />
             </a></Link>
           </div>

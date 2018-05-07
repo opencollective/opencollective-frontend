@@ -90,13 +90,13 @@ class CollectivesForRedeemPageWithData extends React.Component {
               key={collective.id}
               collective={collective}
               showRedeemPrompt={true}
-            />)
+              />)
           )}
         </div>
         <div className="loadMoreBtn">
           <Button onClick={this.fetchMore}>
-            {this.state.loading && <FormattedMessage id='loading' defaultMessage='loading' />}
-            {!this.state.loading && <FormattedMessage id='loadMore' defaultMessage='load more' />}
+            {this.state.loading && <FormattedMessage id="loading" defaultMessage="loading" />}
+            {!this.state.loading && <FormattedMessage id="loadMore" defaultMessage="load more" />}
           </Button>
         </div>
       </div>

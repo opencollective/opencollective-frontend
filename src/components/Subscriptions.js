@@ -119,7 +119,7 @@ class Subscriptions extends React.Component {
           }
         `}</style>
 
-        <div className='active'>
+        <div className="active">
           { activeSubs.map((subscription) =>
             (<SubscriptionCard
               subscription={subscription}
@@ -127,23 +127,23 @@ class Subscriptions extends React.Component {
               LoggedInUser={LoggedInUser}
               paymentMethods={collective.paymentMethods}
               slug={collective.slug}
-            />)
+              />)
           )}
         </div>
         {activeSubs.length === 0 &&
-          <div className='subscriptions-noactive'>
-            <img className='subscriptions-noactive-image' src='/static/images/no-subscription-placeholder.svg' />
-            <div className='subscriptions-noactive-text'> Looks like {userString} contributing right now.</div>
-            <div className='subscriptions-noactive-link'>
-              <a href='/discover'>Discover more collectives</a>
+          <div className="subscriptions-noactive">
+            <img className="subscriptions-noactive-image" src="/static/images/no-subscription-placeholder.svg" />
+            <div className="subscriptions-noactive-text"> Looks like {userString} contributing right now.</div>
+            <div className="subscriptions-noactive-link">
+              <a href="/discover">Discover more collectives</a>
             </div>
           </div>}
         {activeSubs.length > 1 && !LoggedInUser &&
-          <div className='subscriptions-login-message'>
+          <div className="subscriptions-login-message">
             {intl.formatMessage(this.messages['subscription.login.message'])}
           </div>}
         { canceledSubs.length > 0 && <div className="subscriptions-cancelled-label"> <span>{intl.formatMessage(this.messages['subscription.canceled.label'])} </span></div>}
-        <div className='canceled'>
+        <div className="canceled">
           { canceledSubs.map((subscription) =>
             (<SubscriptionCard
               subscription={subscription}
@@ -151,7 +151,7 @@ class Subscriptions extends React.Component {
               LoggedInUser={LoggedInUser}
               paymentMethods={collective.paymentMethods}
               slug={collective.slug}
-            />)
+              />)
           )}
         </div>
       </div>
