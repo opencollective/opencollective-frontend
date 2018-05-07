@@ -116,10 +116,11 @@ const mutations = {
   payExpense: {
     type: ExpenseType,
     args: {
-      id: { type: new GraphQLNonNull(GraphQLInt) }
+      id: { type: new GraphQLNonNull(GraphQLInt) },
+      fee: { type: new GraphQLNonNull(GraphQLInt) },
     },
     resolve(_, args, req) {
-      return payExpense(req.remoteUser, args.id);
+      return payExpense(req.remoteUser, args.id, args.fee);
     }
   },
   createExpense: {

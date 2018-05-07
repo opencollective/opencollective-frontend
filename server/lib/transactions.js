@@ -38,12 +38,11 @@ export function getTransactions(collectiveids, startDate = new Date("2015-01-01"
   return models.Transaction.findAll(query);
 }
 
-export function createFromPaidExpense(host, paymentMethod, expense, paymentResponses, preapprovalDetails, UserId) {
+export function createFromPaidExpense(host, paymentMethod, expense, paymentResponses, preapprovalDetails, UserId, paymentProcessorFeeInHostCurrency = 0) {
   const hostCurrency = host.currency;
   let createPaymentResponse, executePaymentResponse;
   let fxrate;
   let paymentProcessorFeeInCollectiveCurrency = 0;
-  let paymentProcessorFeeInHostCurrency = 0;
   let getFxRatePromise;
 
   // If PayPal
