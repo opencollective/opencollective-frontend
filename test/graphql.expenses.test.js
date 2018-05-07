@@ -282,8 +282,8 @@ describe('graphql.collective.test.js', () => {
     describe("pay an expense", () => {
 
       const payExpenseQuery = `
-        mutation payExpense($id: Int!) {
-          payExpense(id: $id) {
+        mutation payExpense($id: Int!, $fee: Int!) {
+          payExpense(id: $id, fee: $fee) {
             id
             status
           }
@@ -305,13 +305,13 @@ describe('graphql.collective.test.js', () => {
         let res;
         expense.status = 'PENDING';
         await expense.save();
-        res = await utils.graphqlQuery(payExpenseQuery, { id: expense.id }, hostAdmin);
+        res = await utils.graphqlQuery(payExpenseQuery, { id: expense.id, fee: 0 }, hostAdmin);
         expect(res.errors).to.exist;
         expect(res.errors[0].message).to.equal("Expense needs to be approved. Current status of the expense: PENDING.");
 
         expense.status = 'REJECTED';
         await expense.save();
-        res = await utils.graphqlQuery(payExpenseQuery, { id: expense.id }, hostAdmin);
+        res = await utils.graphqlQuery(payExpenseQuery, { id: expense.id, fee: 0 }, hostAdmin);
         expect(res.errors).to.exist;
         expect(res.errors[0].message).to.equal("Expense needs to be approved. Current status of the expense: REJECTED.");
       });
@@ -324,7 +324,7 @@ describe('graphql.collective.test.js', () => {
 
         // add funds to the collective
         await addFunds(500);
-        const res = await utils.graphqlQuery(payExpenseQuery, { id: expense.id }, hostAdmin);
+        const res = await utils.graphqlQuery(payExpenseQuery, { id: expense.id, fee: 0 }, hostAdmin);
         expect(res.errors).to.exist;
         expect(res.errors[0].message).to.equal("You don't have enough funds to pay this expense. Current balance: $5, Expense amount: $10");
       });
@@ -337,7 +337,7 @@ describe('graphql.collective.test.js', () => {
 
         // add funds to the collective
         await addFunds(1000);
-        const res = await utils.graphqlQuery(payExpenseQuery, { id: expense.id }, hostAdmin);
+        const res = await utils.graphqlQuery(payExpenseQuery, { id: expense.id, fee: 0 }, hostAdmin);
         expect(res.errors).to.exist;
         expect(res.errors[0].message).to.equal("You don't have enough funds to cover for the fees of this payment method. Current balance: $10, Expense amount: $10, Estimated paypal fees: $1");
       });
@@ -353,7 +353,7 @@ describe('graphql.collective.test.js', () => {
         await addFunds(1500);
         balance = await collective.getBalance();
         expect(balance).to.equal(1500);
-        const res = await utils.graphqlQuery(payExpenseQuery, { id: expense.id }, hostAdmin);
+        const res = await utils.graphqlQuery(payExpenseQuery, { id: expense.id, fee: 100 }, hostAdmin);
         expect(res.errors).to.not.exist;
         expect(res.data.payExpense.status).to.equal('PAID');
         balance = await collective.getBalance();
