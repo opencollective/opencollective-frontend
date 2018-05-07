@@ -29,11 +29,6 @@ describe('transactions.routes.test.js', () => {
   before('add host to publicCollective', () => publicCollective.addHost(host.collective));
   before('add user to publicCollective as a member', () => publicCollective.addUserWithRole(user, roles.ADMIN));
 
-  /**
-   * Get collective's transactions.
-   */
-  describe('#get', () => {
-
     let transaction, defaultAttributes;
 
     before(() => {
@@ -54,6 +49,11 @@ describe('transactions.routes.test.js', () => {
     before('create multiple transactions for collective2', () => models.Transaction
       .createMany(transactionsData, { CollectiveId: collective2.id, ...defaultAttributes })
     );
+
+  /**
+   * Get collective's transactions.
+   */
+  describe('#get', () => {
 
     it('cannot get the transaction details by id', (done) => {
       request(app)
