@@ -6,7 +6,8 @@ import { defineMessages, FormattedMessage } from 'react-intl';
 import gql from 'graphql-tag'
 import SmallButton from './SmallButton';
 import { get } from 'lodash';
-import { isValidEmail } from '../lib/utils';
+import { getCurrencySymbol, isValidEmail } from '../lib/utils';
+import InputField from './InputField';
 
 class PayExpenseBtn extends React.Component {
 
@@ -20,7 +21,10 @@ class PayExpenseBtn extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = { loading: false };
+    this.state = {
+      loading: false,
+      paymentProcessorFeeInHostCurrency: 0,
+    };
     this.onClick = this.onClick.bind(this);
     this.messages = defineMessages({
       'paypal.missing': { id: 'expense.payoutMethod.paypal.missing', defaultMessage: "Please provide a valid paypal email address"}
@@ -35,7 +39,7 @@ class PayExpenseBtn extends React.Component {
     lock();
     this.setState({ loading: true });
     try {
-      await this.props.payExpense(expense.id);
+      await this.props.payExpense(expense.id, this.state.paymentProcessorFeeInHostCurrency);
       this.setState({ loading: false });
       unlock();
     } catch (e) {
@@ -61,7 +65,9 @@ class PayExpenseBtn extends React.Component {
       <div className="PayExpenseBtn">
         <style jsx>{`
           .PayExpenseBtn {
+            align-items: flex-end;
             display: flex;
+            flex-wrap: wrap;
           }
           .error {
             display: flex;
@@ -70,7 +76,40 @@ class PayExpenseBtn extends React.Component {
             font-size: 1.3rem;
             padding-left: 1rem;
           }
+
+          .processorFee {
+            margin-right: 1rem;
+            max-width: 16rem;
+          }
+
+          .processorFee label {
+            margin: 0;
+          }
         `}</style>
+        <style global jsx>{`
+          .processorFee .inputField, .processorFee .form-group {
+            margin: 0;
+          }
+
+          .processorFee .inputField {
+            margin-top: 0.5rem;
+          }
+        `}</style>
+        {expense.payoutMethod === 'other' && (
+          <div className="processorFee">
+            <label htmlFor="processorFee">
+              <FormattedMessage id="expense.paymentProcessorFeeInHostCurrency" defaultMessage="payment processor fee" />
+            </label>
+            <InputField
+              defaultValue={0}
+              id="paymentProcessorFeeInHostCurrency"
+              name="paymentProcessorFeeInHostCurrency"
+              onChange={fee => this.setState({ paymentProcessorFeeInHostCurrency: fee })}
+              pre={getCurrencySymbol(expense.currency)}
+              type="currency"
+            />
+          </div>
+        )}
         <SmallButton className="pay" onClick={this.onClick} disabled={this.props.disabled || disabled} title={title}>
           { expense.payoutMethod === 'other' && <FormattedMessage id="expense.pay.manual.btn" defaultMessage="record as paid" />}
           { expense.payoutMethod !== 'other' && <FormattedMessage id="expense.pay.btn" defaultMessage="pay with {paymentMethod}" values={{ paymentMethod: expense.payoutMethod }} />}
@@ -83,8 +122,8 @@ class PayExpenseBtn extends React.Component {
 }
 
 const payExpenseQuery = gql`
-mutation payExpense($id: Int!) {
-  payExpense(id: $id) {
+mutation payExpense($id: Int!, $fee: Int!) {
+  payExpense(id: $id, fee: $fee) {
     id
     status
     collective {
@@ -100,8 +139,8 @@ mutation payExpense($id: Int!) {
 
 const addMutation = graphql(payExpenseQuery, {
   props: ( { mutate }) => ({
-    payExpense: async (id) => {
-      return await mutate({ variables: { id } })
+    payExpense: async (id, fee) => {
+      return await mutate({ variables: { id, fee } })
     }
   })
 });
