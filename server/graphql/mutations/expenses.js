@@ -206,7 +206,7 @@ export async function deleteExpense(remoteUser, expenseId) {
   return res;
 }
 
-export async function payExpense(remoteUser, expenseId) {
+export async function payExpense(remoteUser, expenseId, paymentProcessFees) {
   if (!remoteUser) {
     throw new errors.Unauthorized("You need to be logged in to pay an expense");
   }
@@ -237,11 +237,14 @@ export async function payExpense(remoteUser, expenseId) {
 
   const host = await expense.collective.getHostCollective();
 
-  const paymentProcessFees = paymentProviders[expense.payoutMethod] ? await paymentProviders[expense.payoutMethod].types['adaptive'].fees({
-    amount: expense.amount,
-    currency: expense.collective.currency,
-    host
-  }) : 0;
+  if (paymentProviders[expense.payoutMethod]) {
+    paymentProcessFees = await paymentProviders[expense.payoutMethod].types['adaptive'].fees({
+      amount: expense.amount,
+      currency: expense.collective.currency,
+      host,
+    });
+  }
+
   if ((expense.amount + paymentProcessFees) > balance) {
     throw new Error(`You don't have enough funds to cover for the fees of this payment method. Current balance: ${formatCurrency(balance, expense.collective.currency)}, Expense amount: ${formatCurrency(expense.amount, expense.collective.currency)}, Estimated ${expense.payoutMethod} fees: ${formatCurrency(paymentProcessFees, expense.collective.currency)}`);
   }
@@ -266,7 +269,7 @@ export async function payExpense(remoteUser, expenseId) {
 
   // note: we need to check for manual and other for legacy reasons
   if (expense.payoutMethod === 'manual' || expense.payoutMethod === 'other') {
-    await createTransactionFromPaidExpense(host, null, expense, null, null, expense.UserId);
+    await createTransactionFromPaidExpense(host, null, expense, null, null, expense.UserId, paymentProcessFees);
   }
 
   const updatedExpense = await expense.update({ status: statuses.PAID });
