@@ -33,6 +33,10 @@ const onlyCollectivesWithoutExpenses = (collective) => {
   return models.Expense.count({ where: { CollectiveId: collective.id }}).then(count => count === 0);
 }
 
+const onlyCollectivesWithoutUpdates = (collective) => {
+  return models.Update.count({ where: { CollectiveId: collective.id, publishedAt: { $ne: null } }}).then(count => count === 0);
+}
+
 const onlyCollectivesWithoutTwitterActivated = (collective) => {
   return models.ConnectedAccount.findOne({ where: { CollectiveId: collective.id, service: 'twitter' }})
     .then(twitterAccount => {
@@ -46,7 +50,9 @@ Promise.all([
   processOnBoardingTemplate("onboarding.day35.inactive", XDaysAgo(35), onlyInactiveCollectives),
   processOnBoardingTemplate("onboarding.day28", XDaysAgo(28)),
   processOnBoardingTemplate("onboarding.day21.noTwitter", XDaysAgo(21), onlyCollectivesWithoutTwitterActivated),
-  processOnBoardingTemplate("onboarding.day14.noExpenses", XDaysAgo(14), onlyCollectivesWithoutExpenses),
+  processOnBoardingTemplate("onboarding.noExpenses", XDaysAgo(14), onlyCollectivesWithoutExpenses),
+  processOnBoardingTemplate("onboarding.noExpenses", XDaysAgo(35), onlyCollectivesWithoutExpenses), // another reminder after 35 days if no expenses filed yet
+  processOnBoardingTemplate("onboarding.noUpdates", XDaysAgo(42), onlyCollectivesWithoutUpdates),
   processOnBoardingTemplate("onboarding.day7.widgets", XDaysAgo(7)),
   processOnBoardingTemplate("onboarding.day2", XDaysAgo(2))
 ]).then(() => {
