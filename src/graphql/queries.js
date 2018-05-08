@@ -708,7 +708,8 @@ export const addSubscriptionsData = graphql(getSubscriptionsQuery);
 export const addSearchQueryData = graphql(searchCollectivesQuery);
 
 export const addGetLoggedInUserFunction = component => {
-  const err = new Error('addGetLoggedInUserFunction is deprecated, use withLoggedInUser instead');
-  console.warn(err.message);
+  if (process.env.NODE_ENV == 'development') {
+    console.warn('addGetLoggedInUserFunction is deprecated, use withLoggedInUser instead');
+  }
   return withLoggedInUser(component);
 }
