@@ -42,7 +42,7 @@ LoggedInUser.prototype.canEditCollective = function(collective) {
  */
 LoggedInUser.prototype.canEditComment = function(comment) {
   if (!comment) return false;
-  return (get(comment, 'createdByUser.id') === this.id) 
+  return (get(comment, 'createdByUser.id') === this.id)
   || intersection(this.roles[get(comment, 'collective.slug')], ['HOST','ADMIN']).length > 0;
 }
 

@@ -142,25 +142,29 @@ class ExportForm extends React.Component {
           type="date"
           closeOnSelect
           defaultValue={this.state.dateFrom}
-          onChange={(dateFrom) => this.updateSearchProps({ dateFrom })} />
+          onChange={(dateFrom) => this.updateSearchProps({ dateFrom })}
+          />
         <InputField
           name="dateTo"
           label="End date"
           type="date"
           defaultValue={this.state.dateTo}
           closeOnSelect
-          onChange={(dateTo) => this.updateSearchProps({ dateTo })} />
+          onChange={(dateTo) => this.updateSearchProps({ dateTo })}
+          />
         <Button
           disabled={this.state.disabled}
           bsSize="small"
           bsStyle="primary"
-          onClick={this.download.bind(this)}>Download</Button>
+          onClick={this.download.bind(this)}
+          >Download</Button>
         {this.state.searchReturnedEmpty &&
-         <div className="empty-search-error">
-           <FormattedMessage
-             id='transactions.emptysearch'
-             defaultMessage='There are no transactions in this date range.' />
-         </div>}
+        <div className="empty-search-error">
+          <FormattedMessage
+            id="transactions.emptysearch"
+            defaultMessage="There are no transactions in this date range."
+            />
+        </div>}
       </Popover>
     )
   }
@@ -175,7 +179,7 @@ class PopoverButton extends React.Component {
       <OverlayTrigger trigger="click" placement="bottom" overlay={form} rootClose>
         <a className="download-csv" role="button" style={{ float: 'right', fontSize: '12px', padding: 7 }}>
           <img src="/static/images/icons/download.svg" style={{ paddingRight: 5 }} />
-          <FormattedMessage id='transactions.downloadcsvbutton' defaultMessage='Download CSV' />
+          <FormattedMessage id="transactions.downloadcsvbutton" defaultMessage="Download CSV" />
         </a>
       </OverlayTrigger>
     )

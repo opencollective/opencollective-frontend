@@ -7,9 +7,9 @@ import SubscriptionCard from '../SubscriptionCard';
 describe("SubscriptionCard.test.js", () => {
 
  const mountComponent = (props) => mount(
-        <IntlProvider locale="en">
-          <SubscriptionCard {...props} />
-        </IntlProvider>
+   <IntlProvider locale="en">
+     <SubscriptionCard {...props} />
+   </IntlProvider>
     );
 
   const defaultValues = {

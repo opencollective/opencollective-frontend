@@ -4,7 +4,7 @@ import Body from './Body';
 import Footer from './Footer';
 import NotFound from './NotFound';
 
-export default () => {
+const NotFoundPage = () => {
   return (
     <div className="NotFoundPage">
       <Header />
@@ -14,4 +14,6 @@ export default () => {
       <Footer />
     </div>
   )
-}
+};
+
+export default NotFoundPage;

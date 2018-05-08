@@ -208,14 +208,14 @@ class PaymentMethodChooser extends React.Component {
     const paymentMethodsOptions = this.populatePaymentMethods();
 
     const popover = (<Popover id="popover-positioned-top" title={intl.formatMessage(this.messages['paymentMethod.whyUnknownTitle'])} >
-            {intl.formatMessage(this.messages['paymentMethod.whyUnknown'])}
-            </Popover>);
+      {intl.formatMessage(this.messages['paymentMethod.whyUnknown'])}
+    </Popover>);
 
     const fontSize = '12px';
 
     return (
       <div className="PaymentMethodChooser">
-      <style jsx global>{`
+        <style jsx global>{`
         .PaymentMethodChooser .form-group .control-label {
           display: none;
         }
@@ -243,7 +243,7 @@ class PaymentMethodChooser extends React.Component {
           width: 100%;
         }
       `}</style>
-      <style jsx>{`
+        <style jsx>{`
         .actions {
           display: flex;
           flex-direction: row;
@@ -254,39 +254,39 @@ class PaymentMethodChooser extends React.Component {
         }
       `}</style>
 
-      {!this.props.editMode &&
+        {!this.props.editMode &&
         <div className="paymentmethod-info">
           {paymentMethodString} {this.state.showUnknownPaymentMethodHelp &&
             <OverlayTrigger trigger="click" placement={"top"} overlay={popover} rootClose>
-              <img className='help-image' src='/static/images/help-icon.svg' />
+              <img className="help-image" src="/static/images/help-icon.svg" />
             </OverlayTrigger>
             }
         </div>}
 
-      { this.props.editMode && !this.state.showNewCreditCardForm &&
+        { this.props.editMode && !this.state.showNewCreditCardForm &&
+        <InputField
+          type="select"
+          className="horizontal"
+          name="creditcardSelector"
+          onChange={uuid => this.handleChange({ uuid })}
+          options={paymentMethodsOptions}
+          defaultValue={this.props.paymentMethodInUse.uuid}
+          />}
+
+
+        { this.props.editMode && this.state.showNewCreditCardForm &&
+        <div>
           <InputField
-            type="select"
+            type="creditcard"
+            name="creditcard"
             className="horizontal"
-            name="creditcardSelector"
-            onChange={uuid => this.handleChange({ uuid })}
-            options={paymentMethodsOptions}
-            defaultValue={this.props.paymentMethodInUse.uuid}
-            />}
+            onChange={(creditcardObject) => this.handleChange(creditcardObject)}
+            style={{base: { fontSize }}}
+            />
+        </div>}
 
-
-      { this.props.editMode && this.state.showNewCreditCardForm &&
-         <div>
-          <InputField
-              type="creditcard"
-              name="creditcard"
-              className="horizontal"
-              onChange={(creditcardObject) => this.handleChange(creditcardObject)}
-              style={ {base: { fontSize }}}
-              />
-          </div>}
-
-      { this.props.editMode &&
-        <div className='actions'>
+        { this.props.editMode &&
+        <div className="actions">
           <SmallButton className="no" bsStyle="primary" onClick={this.resetForm}>
             {intl.formatMessage(this.messages[`paymentMethod.cancel`])}
           </SmallButton>

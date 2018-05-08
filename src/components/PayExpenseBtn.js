@@ -107,7 +107,7 @@ class PayExpenseBtn extends React.Component {
               onChange={fee => this.setState({ paymentProcessorFeeInHostCurrency: fee })}
               pre={getCurrencySymbol(expense.currency)}
               type="currency"
-            />
+              />
           </div>
         )}
         <SmallButton className="pay" onClick={this.onClick} disabled={this.props.disabled || disabled} title={title}>

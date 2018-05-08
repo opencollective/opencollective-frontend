@@ -3,9 +3,6 @@
   "env": {
     "jest": true
   },
-  "plugins": [
-    "jest", "mocha"
-  ],
   "rules": {
     // we still use console even on frontend
     "no-console": 0

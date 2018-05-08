@@ -30,7 +30,7 @@ class UpdateText extends React.Component {
             __html: html
           }}
           />
-    </div>
+      </div>
     );
   }
 }

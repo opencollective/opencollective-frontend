@@ -90,14 +90,14 @@ class EditTwitterAccount extends React.Component {
         <Row>
           <Col sm={12}>
             <InputField
-                type="switch"
-                name={`${notificationType}.active`}
-                className="horizontal"
-                defaultValue={connectedAccount.settings[notificationType].active}
-                label={intl.formatMessage(this.messages[`${notificationType}.toggle.label`])}
-                description={this.messages[`${notificationType}.toggle.description`] && intl.formatMessage(this.messages[`${notificationType}.toggle.description`])}
-                onChange={(activateNewBacker) => this.handleChange(notificationType, "active", activateNewBacker)}
-                />
+              type="switch"
+              name={`${notificationType}.active`}
+              className="horizontal"
+              defaultValue={connectedAccount.settings[notificationType].active}
+              label={intl.formatMessage(this.messages[`${notificationType}.toggle.label`])}
+              description={this.messages[`${notificationType}.toggle.description`] && intl.formatMessage(this.messages[`${notificationType}.toggle.description`])}
+              onChange={(activateNewBacker) => this.handleChange(notificationType, "active", activateNewBacker)}
+              />
             { this.messages[`${notificationType}.tweet`] &&
               <InputField
                 type="textarea"

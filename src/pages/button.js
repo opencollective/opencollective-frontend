@@ -9,8 +9,8 @@ class ButtonPage extends React.Component {
     const { color = 'white', collectiveSlug, verb = 'donate' } = this.props;
 
     return (
-        <div>
-          <style jsx>{`
+      <div>
+        <style jsx>{`
             :global(body) {
               margin: 0;
             }
@@ -62,8 +62,8 @@ class ButtonPage extends React.Component {
               background-position: 0 -100px;
             }
           `}</style>
-          <a type="button" className={`btn ${color} ${verb}`} target="_blank" href={`https://opencollective.com/${collectiveSlug}/${verb}`} />
-        </div>
+        <a type="button" className={`btn ${color} ${verb}`} target="_blank" href={`https://opencollective.com/${collectiveSlug}/${verb}`} />
+      </div>
     );
   }
 }

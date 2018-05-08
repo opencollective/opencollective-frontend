@@ -277,14 +277,14 @@ class LoginForm extends React.Component {
           { showForm &&
             <Form horizontal onSubmit={this.handleSubmit}>
               <div className="userDetailsForm">
-                  <Row key={`email.input`}>
-                    <Col sm={12}>
-                      <InputField
-                        className="horizontal"
-                        {...inputEmail}
-                        />
-                    </Col>
-                  </Row>
+                <Row key={`email.input`}>
+                  <Col sm={12}>
+                    <InputField
+                      className="horizontal"
+                      {...inputEmail}
+                      />
+                  </Col>
+                </Row>
                 {this.state.isNewUser && this.state.signup &&
                   <div>
                     { this.fields.map(field => (
@@ -309,20 +309,20 @@ class LoginForm extends React.Component {
                     </Row>
                   </div>
                 }
-            </div>
-            <div className="result">
-              {this.state.result.success &&
+              </div>
+              <div className="result">
+                {this.state.result.success &&
                 <div className="success">
                   {this.state.result.success}
                 </div>
               }
-              { this.state.result.error &&
+                { this.state.result.error &&
                 <div className="error">
                   {this.state.result.error}
                 </div>
               }
-            </div>
-          </Form>
+              </div>
+            </Form>
         }
         </div>
       </div>

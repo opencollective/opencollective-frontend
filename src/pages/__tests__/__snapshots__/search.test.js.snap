@@ -712,7 +712,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
             <circle
               cx="12.5"
               cy="52.5"
-              fill-opacity=".5"
+              fillOpacity=".5"
               r="12.5"
             >
               <animate

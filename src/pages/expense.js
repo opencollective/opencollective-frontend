@@ -37,7 +37,7 @@ class ExpensePage extends React.Component {
 
     if (data.loading) return (<Loading />);
     if (!data.Collective) return (<NotFound />);
-    
+
     if (data.error) {
       console.error("graphql error>>>", data.error.message);
       return (<ErrorPage message="GraphQL error" />)

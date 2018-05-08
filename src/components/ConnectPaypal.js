@@ -83,7 +83,7 @@ class ConnectPaypal extends React.Component {
           }
         `}</style>
         <div className="connectPaypal">
-        { paypalPaymentMethod &&
+          { paypalPaymentMethod &&
           <div>
             <div className="balance">
               <label>
@@ -104,7 +104,7 @@ class ConnectPaypal extends React.Component {
             </div>
           </div>
         }
-        { !paypalPaymentMethod &&
+          { !paypalPaymentMethod &&
           <div>
             <SmallButton className="primary" bsStyle="primary" onClick={this.connectPaypal} disabled={this.state.connectingPaypal}>
               { this.state.connectingPaypal && "Connecting..."}

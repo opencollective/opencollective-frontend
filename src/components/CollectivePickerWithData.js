@@ -254,57 +254,57 @@ class CollectivePickerWithData extends React.Component {
             text-align: right;
           }
         `}</style>
-         <div className="submenu">
-            <div className="">
-              <div className="title">
-                <h1><FormattedMessage id="expenses.collectivePicker.title" defaultMessage="Finances" /></h1>
-                <h2><FormattedMessage id="expenses.collectivePicker.subtitle" defaultMessage="for {n} {n, plural, one {collective} other {collectives}}" values={{n: collectives.length}} /></h2>
-              </div>
+        <div className="submenu">
+          <div className="">
+            <div className="title">
+              <h1><FormattedMessage id="expenses.collectivePicker.title" defaultMessage="Finances" /></h1>
+              <h2><FormattedMessage id="expenses.collectivePicker.subtitle" defaultMessage="for {n} {n, plural, one {collective} other {collectives}}" values={{n: collectives.length}} /></h2>
+            </div>
             { collectives.length > 0 &&
-              <div className="collectivesFilter">
-                <DropdownButton id="collectivePicker" bsStyle="default" title={selectedTitle} onSelect={this.onChange}>
-                  { this.state.CollectiveId &&
-                    <MenuItem key={null} eventKey={null}>
-                      <FormattedMessage id="expenses.allCollectives" defaultMessage="All Collectives" />
-                    </MenuItem>
+            <div className="collectivesFilter">
+              <DropdownButton id="collectivePicker" bsStyle="default" title={selectedTitle} onSelect={this.onChange}>
+                { this.state.CollectiveId &&
+                <MenuItem key={null} eventKey={null}>
+                  <FormattedMessage id="expenses.allCollectives" defaultMessage="All Collectives" />
+                </MenuItem>
                   }
-                  { collectives.map(collective => (
-                    <MenuItem key={collective.id} eventKey={collective.id} title={collective.name}>
+                { collectives.map(collective => (
+                  <MenuItem key={collective.id} eventKey={collective.id} title={collective.name}>
                     { this.renderCollectiveMenuItem(collective) }
-                    </MenuItem>
+                  </MenuItem>
                   ))}
-                </DropdownButton>
-                { selectedCollective && !this.state.showAddFunds && canAddFunds &&
-                  <a className="addFundsLink" onClick={this.toggleAddFunds}><FormattedMessage id="addfunds.submit" defaultMessage="Add Funds" /></a>
+              </DropdownButton>
+              { selectedCollective && !this.state.showAddFunds && canAddFunds &&
+              <a className="addFundsLink" onClick={this.toggleAddFunds}><FormattedMessage id="addfunds.submit" defaultMessage="Add Funds" /></a>
                 }
-              </div>
-            }
             </div>
-            <div className="right">
-              { LoggedInUser && LoggedInUser.canEditCollective(this.hostCollective) &&
-                <ConnectPaypal
-                  collective={this.hostCollective}
-                  />
+            }
+          </div>
+          <div className="right">
+            { LoggedInUser && LoggedInUser.canEditCollective(this.hostCollective) &&
+            <ConnectPaypal
+              collective={this.hostCollective}
+              />
               }
+          </div>
+        </div>
+        <div>
+          { selectedCollective && this.state.showAddFunds &&
+          <div>
+            <AddFundsForm
+              collective={selectedCollective}
+              host={this.hostCollective}
+              onSubmit={this.addFunds}
+              onCancel={this.toggleAddFunds}
+              loading={this.state.loading}
+              LoggedInUser={LoggedInUser}
+              />
+            <div className="results">
+              <div className="error">{this.state.error}</div>
             </div>
           </div>
-          <div>
-            { selectedCollective && this.state.showAddFunds &&
-              <div>
-                <AddFundsForm
-                  collective={selectedCollective}
-                  host={this.hostCollective}
-                  onSubmit={this.addFunds}
-                  onCancel={this.toggleAddFunds}
-                  loading={this.state.loading}
-                  LoggedInUser={LoggedInUser}
-                  />
-                <div className="results">
-                  <div className="error">{this.state.error}</div>
-                </div>
-              </div>
             }
-          </div>
+        </div>
       </div>
     );
   }

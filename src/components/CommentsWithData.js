@@ -162,7 +162,7 @@ export const addCommentsData = graphql(getCommentsQuery, {
         }
       })
     }
-  })  
+  })
 });
 
 const createCommentQuery = gql`

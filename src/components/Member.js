@@ -37,7 +37,7 @@ class Member extends React.Component {
     const viewMode = this.props.viewMode || (get(member, 'type') === 'USER' ? 'USER' : 'ORGANIZATION');
     const user = member.user || {};
     const name = ((member.name && member.name.match(/^null/)) ? null : member.name) || member.slug || user.email && user.email.substr(0, user.email.indexOf('@'));
-    if (!name) return (<div/>);
+    if (!name) return (<div />);
 
     const tierName = membership.tier ? singular(membership.tier.name) : this.messages[membership.role] ? intl.formatMessage(this.messages[membership.role]) : membership.role;
     const className = this.props.className || '';

@@ -83,13 +83,13 @@ class CreateOrganization extends React.Component {
           }
         `}</style>
 
-          <Header
-            title={title}
-            className={this.state.status}
-            LoggedInUser={LoggedInUser}
-            />
+        <Header
+          title={title}
+          className={this.state.status}
+          LoggedInUser={LoggedInUser}
+          />
 
-          <Body>
+        <Body>
 
           <CollectiveCover
             title={title}
@@ -121,9 +121,9 @@ class CreateOrganization extends React.Component {
               </div>
             }
           </div>
-          </Body>
+        </Body>
 
-          <Footer />
+        <Footer />
       </div>
     );
   }

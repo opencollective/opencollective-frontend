@@ -34,8 +34,8 @@ class CollectiveCardWithRedeem extends React.Component {
     const description = (collective.description && firstSentence(collective.description, 64)) ||(collective.longDescription && firstSentence(collective.longDescription, 64))
 
     return (
-        <div className={`CollectiveCard ${collective.type}`} >
-          <style jsx>{`
+      <div className={`CollectiveCard ${collective.type}`} >
+        <style jsx>{`
           .CollectiveCard {
             display: flex;
             flex-direction: column;
@@ -184,15 +184,15 @@ class CollectiveCardWithRedeem extends React.Component {
           >
           <div>
 
-            <div className='head'>
-              <div className='background' style={coverStyle}></div>
-              <div className='image' style={{backgroundImage: `url(${logo})`}}></div>
+            <div className="head">
+              <div className="background" style={coverStyle}></div>
+              <div className="image" style={{backgroundImage: `url(${logo})`}}></div>
             </div>
-            <div className='body'>
-              <div className='name'>{collective.name}</div>
-              <div className='description'>{description}</div>
+            <div className="body">
+              <div className="name">{collective.name}</div>
+              <div className="description">{description}</div>
             </div>
-            <div className='footer'>
+            <div className="footer">
               { collective.stats &&
                 <div className="stats">
                   <div className="backers">
@@ -216,8 +216,8 @@ class CollectiveCardWithRedeem extends React.Component {
                 </div>
               }
             </div>
-            <div className='redeem'>
-              <Button className='redeem-button blue' style={{width: '150px', height: '3rem', textAlign: 'center', letterSpacing: '0px', textTransform: 'none', borderRadius: '16px'}} >Support us!</Button>
+            <div className="redeem">
+              <Button className="redeem-button blue" style={{width: '150px', height: '3rem', textAlign: 'center', letterSpacing: '0px', textTransform: 'none', borderRadius: '16px'}} >Support us!</Button>
             </div>
           </div>
         </Link>

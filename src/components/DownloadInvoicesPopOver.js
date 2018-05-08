@@ -144,7 +144,7 @@ class PopoverButton extends React.Component {
       <OverlayTrigger trigger="click" placement="bottom" overlay={overlay} rootClose>
         <a className="download-invoices" role="button" style={{ float: 'right', fontSize: '12px', padding: 7 }}>
           <img src="/static/images/icons/download.svg" style={{ paddingRight: 5 }} />
-          <FormattedMessage id='transactions.downloadinvoicesbutton' defaultMessage='Download Receipts' />
+          <FormattedMessage id="transactions.downloadinvoicesbutton" defaultMessage="Download Receipts" />
         </a>
       </OverlayTrigger>
     )

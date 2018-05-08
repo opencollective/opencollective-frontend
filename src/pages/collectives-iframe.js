@@ -133,7 +133,7 @@ class Events extends React.Component {
           orderBy={orderBy}
           orderDirection="DESC"
           limit={limit || 20}
-        />
+          />
       </div>
     );
   }

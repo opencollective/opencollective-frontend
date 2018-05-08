@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default () => {
+const NotFound = () => {
   return (
     <div className="NotFound">
       <style jsx>{`
@@ -18,4 +18,6 @@ export default () => {
       <div className="shrug">¯\_(ツ)_/¯ </div>
     </div>
   )
-}
+};
+
+export default NotFound;

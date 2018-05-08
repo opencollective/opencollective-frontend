@@ -271,7 +271,7 @@ class Tier extends React.Component {
           </div>
           <div className="description">
             { description && <Markdown source={description} /> }
-            { !description && <p><FormattedMessage id="tier.defaultDescription" defaultMessage="Become a {name} for {amount} per {interval} and help us sustain our activities!" values={{ name: tier.name, amount: formatCurrency(tier.amount, tier.currency), interval: tier.interval}}/></p> }
+            { !description && <p><FormattedMessage id="tier.defaultDescription" defaultMessage="Become a {name} for {amount} per {interval} and help us sustain our activities!" values={{ name: tier.name, amount: formatCurrency(tier.amount, tier.currency), interval: tier.interval}} /></p> }
 
             { presets &&
               <div>
@@ -292,14 +292,15 @@ class Tier extends React.Component {
                       ))}
                     </ButtonGroup>
                     <InputField
-                      name='amount'
+                      name="amount"
                       className="inputAmount"
                       min={tier.presets && tier.presets[0]}
                       pre={getCurrencySymbol(currency)}
-                      type='currency'
+                      type="currency"
                       value={amount}
-                      onChange={(amount) => this.handleChange('amount', amount)} />
-                    </div>
+                      onChange={(amount) => this.handleChange('amount', amount)}
+                      />
+                  </div>
                 </div>
                 { type === 'DONATION' &&
                   <div className="selectInterval inputRow">
@@ -319,12 +320,12 @@ class Tier extends React.Component {
           { type === 'TICKET' &&
             <div id="actions" className="actions">
               <TicketController value={quantity} onChange={(value) => this.handleTicketsChange(value)} />
-              {this.props.onClick && <CTAButton className="ctabtn blue ticket" label={(<FormattedMessage id='tier.GetTicket' values={{ quantity }} defaultMessage={`{quantity, plural, one {get ticket} other {get tickets}}`} />)} onClick={() => this.props.onClick({id: tier.id, amount, quantity, interval})} />}
+              {this.props.onClick && <CTAButton className="ctabtn blue ticket" label={(<FormattedMessage id="tier.GetTicket" values={{ quantity }} defaultMessage={`{quantity, plural, one {get ticket} other {get tickets}}`} />)} onClick={() => this.props.onClick({id: tier.id, amount, quantity, interval})} />}
             </div>
           }
           { type !== 'TICKET' && this.props.onClick &&
             <div id="actions" className="actions">
-              <CTAButton className="ctabtn blue" label={tier.button || (<FormattedMessage id='tier.GetTier' values={{name}} defaultMessage={`become a {name}`} />)} onClick={() => this.props.onClick({id: tier.id, amount, quantity, interval})} />
+              <CTAButton className="ctabtn blue" label={tier.button || (<FormattedMessage id="tier.GetTier" values={{name}} defaultMessage={`become a {name}`} />)} onClick={() => this.props.onClick({id: tier.id, amount, quantity, interval})} />
             </div>
           }
         </div>

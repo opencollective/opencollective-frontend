@@ -29,7 +29,7 @@ class Response extends React.Component {
 
     const name = ((user.name && user.name.match(/^null/)) ? null : user.name) || user.email && user.email.substr(0, user.email.indexOf('@'));
 
-    if (!name) return (<div/>);
+    if (!name) return (<div />);
 
     const image = user.image || pickAvatar(name);
     const linkTo = `/${user.slug}`;

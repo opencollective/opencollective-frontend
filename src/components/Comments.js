@@ -41,7 +41,7 @@ class Comments extends React.Component {
   setPayActionLock(val) {
     this.setState({ isPayActionLocked: val})
   }
-  
+
   render() {
     const {
       collective,
@@ -111,9 +111,9 @@ class Comments extends React.Component {
           )}
           { comments.length >= 10 && comments.length % 10 === 0 &&
             <div className="loadMoreBtn">
-              <Button bsStyle='default' onClick={this.fetchMore}>
-                {this.state.loading && <FormattedMessage id='loading' defaultMessage='loading' />}
-                {!this.state.loading && <FormattedMessage id='loadMore' defaultMessage='load more' />}
+              <Button bsStyle="default" onClick={this.fetchMore}>
+                {this.state.loading && <FormattedMessage id="loading" defaultMessage="loading" />}
+                {!this.state.loading && <FormattedMessage id="loadMore" defaultMessage="load more" />}
               </Button>
             </div>
           }

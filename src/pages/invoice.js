@@ -108,46 +108,46 @@ class InvoicePage extends React.Component {
           }
         `}</style>
         <div className="InvoicePage">
-        <div className="header">
-          <a href={`https://opencollective.com/${invoice.host.slug}`}>
-            <div className="hero">
-              <div className="cover" style={coverStyle} />
-              <div className="logo" style={{backgroundImage:`url('${imagePreview(invoice.host.image, null, { height: 200, baseUrl })}')`}} />
-            </div>
-          </a>
+          <div className="header">
+            <a href={`https://opencollective.com/${invoice.host.slug}`}>
+              <div className="hero">
+                <div className="cover" style={coverStyle} />
+                <div className="logo" style={{backgroundImage:`url('${imagePreview(invoice.host.image, null, { height: 200, baseUrl })}')`}} />
+              </div>
+            </a>
 
-          <div className="collectiveInfo">
-            <h1>{invoice.host.name}</h1>
-            <a href={`https://opencollective.com/${invoice.host.slug}`} className="website">https://opencollective.com/{invoice.host.slug}</a>
-          </div>
-        </div>
-
-        <div className="body">
-          <div className="row">
-            <div className="invoiceDetails">
-              <h2>{ invoice.title || "Donation Receipt"}</h2>
-              <div className="detail"><label>Date:</label>{invoice.year}/{invoice.month}</div>
-              <div className="detail reference"><label>Reference:</label> {invoice.slug}</div>
-            </div>
-            <div className="fromCollectiveBillingAddress">
-              <h2>Bill to:</h2>
-              {invoice.fromCollective.name}<br />
-              <div dangerouslySetInnerHTML={this.fromCollectiveBillingAddress} />
+            <div className="collectiveInfo">
+              <h1>{invoice.host.name}</h1>
+              <a href={`https://opencollective.com/${invoice.host.slug}`} className="website">https://opencollective.com/{invoice.host.slug}</a>
             </div>
           </div>
 
-          <Table columns={this.columns} data={this.data} rowClassName={(row, index) => (index === this.data.length - 1) ? `footer` : ''} />
-        </div>
+          <div className="body">
+            <div className="row">
+              <div className="invoiceDetails">
+                <h2>{ invoice.title || "Donation Receipt"}</h2>
+                <div className="detail"><label>Date:</label>{invoice.year}/{invoice.month}</div>
+                <div className="detail reference"><label>Reference:</label> {invoice.slug}</div>
+              </div>
+              <div className="fromCollectiveBillingAddress">
+                <h2>Bill to:</h2>
+                {invoice.fromCollective.name}<br />
+                <div dangerouslySetInnerHTML={this.fromCollectiveBillingAddress} />
+              </div>
+            </div>
 
-        <div className="footer">
-          <a href={invoice.host.website}>
+            <Table columns={this.columns} data={this.data} rowClassName={(row, index) => (index === this.data.length - 1) ? `footer` : ''} />
+          </div>
+
+          <div className="footer">
+            <a href={invoice.host.website}>
               <img src={imagePreview(invoice.host.image, null, { height: 200, baseUrl })} />
-          </a><br />
-          <div className="hostBillingAddress">
-            {invoice.host.name}<br />
-            <div dangerouslySetInnerHTML={this.hostBillingAddress} />
+            </a><br />
+            <div className="hostBillingAddress">
+              {invoice.host.name}<br />
+              <div dangerouslySetInnerHTML={this.hostBillingAddress} />
+            </div>
           </div>
-        </div>
         </div>
       </div>
     )
@@ -160,7 +160,7 @@ class InvoicePage extends React.Component {
     }
     return (
       <div className="transaction" key={index}>
-        <div className="createdAt"><FormattedDate value={new Date(transaction.createdAt)} day='numeric' month='long' year='numeric' /></div>
+        <div className="createdAt"><FormattedDate value={new Date(transaction.createdAt)} day="numeric" month="long" year="numeric" /></div>
         <div className="description">{transaction.description}</div>
         <div className="amount">{ formatCurrency(transaction.amount, transaction.currency) }</div>
       </div>

@@ -208,7 +208,7 @@ class Event extends React.Component {
 
     const info = (
       <HashLink to="#location">
-        <FormattedDate value={event.startsAt} weekday='short' day='numeric' month='long' />, &nbsp;
+        <FormattedDate value={event.startsAt} weekday="short" day="numeric" month="long" />, &nbsp;
         <FormattedTime value={event.startsAt} timeZone={event.timezone} />&nbsp; - &nbsp;
         {event.location.name}
       </HashLink>
@@ -303,11 +303,11 @@ class Event extends React.Component {
                 { responses.guests.length > 0 &&
                   <section id="responses">
                     <h1>
-                      <FormattedMessage id='event.responses.title.going' values={{n: responses.going.length}} defaultMessage={`{n} {n, plural, one {person going} other {people going}}`} />
+                      <FormattedMessage id="event.responses.title.going" values={{n: responses.going.length}} defaultMessage={`{n} {n, plural, one {person going} other {people going}}`} />
                       { responses.interested.length > 0 &&
                         <span>
                           <span> - </span>
-                          <FormattedMessage id='event.responses.title.interested' values={{n: responses.interested.length}} defaultMessage={`{n} interested`} />
+                          <FormattedMessage id="event.responses.title.interested" values={{n: responses.interested.length}} defaultMessage={`{n} interested`} />
                         </span>
                       }
                     </h1>
@@ -316,7 +316,7 @@ class Event extends React.Component {
                       <ul>
                         <li><a href={`/${event.parentCollective.slug}/events/${event.slug}/nametags.pdf`}>Print name tags</a></li>
                         <li><a href={`mailto:${event.slug}@${event.parentCollective.slug}.opencollective.com`}>Send email</a></li>
-                        <li><a onClick={ () => exportRSVPs(event) }>Export CSV</a></li>
+                        <li><a onClick={() => exportRSVPs(event)}>Export CSV</a></li>
                       </ul>
                     </div>
                     }
@@ -327,33 +327,34 @@ class Event extends React.Component {
                 { responses.sponsors.length > 0 &&
                   <section id="sponsors">
                     <h1>
-                      <FormattedMessage id='event.sponsors.title' defaultMessage={`Sponsors`} />
+                      <FormattedMessage id="event.sponsors.title" defaultMessage={`Sponsors`} />
                     </h1>
                     <Sponsors sponsors={responses.sponsors.map(r => {
                       const user = Object.assign({}, r.user);
                       user.tier = r.tier;
                       user.createdAt = new Date(r.createdAt);
                       return user;
-                    })} />
+                    })}
+                              />
                   </section>
                 }
 
-              <section id="budget" className="clear">
-                <div className="content" >
-                  <SectionTitle section="budget" values={{ balance: formatCurrency(get(event, 'stats.balance'), event.currency) }}/>
-                  <ExpensesSection
-                    collective={event}
-                    LoggedInUser={LoggedInUser}
-                    limit={10}
-                    />
-                </div>
-              </section>
+                <section id="budget" className="clear">
+                  <div className="content" >
+                    <SectionTitle section="budget" values={{ balance: formatCurrency(get(event, 'stats.balance'), event.currency) }} />
+                    <ExpensesSection
+                      collective={event}
+                      LoggedInUser={LoggedInUser}
+                      limit={10}
+                      />
+                  </div>
+                </section>
 
               </div>
             </div>
           </Body>
           <Footer />
-          </div>
+        </div>
       </div>
     )
   }
