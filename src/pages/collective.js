@@ -1,8 +1,9 @@
-import withData from '../lib/withData'
-import withIntl from '../lib/withIntl';
 import React from 'react'
-import { addCollectiveData, addGetLoggedInUserFunction } from '../graphql/queries';
-
+import PropTypes from 'prop-types';
+import { addCollectiveData } from '../graphql/queries';
+import withData from '../lib/withData';
+import withLoggedInUser from '../lib/withLoggedInUser';
+import withIntl from '../lib/withIntl';
 import NotFound from '../components/NotFoundPage';
 import Loading from '../components/Loading';
 import ErrorPage from '../components/ErrorPage';
@@ -11,13 +12,19 @@ import UserCollective from '../components/UserCollective';
 
 class CollectivePage extends React.Component {
 
-  constructor(props) {
-    super(props);
-    this.state = {};
+  static propTypes = {
+    getLoggedInUser: PropTypes.func.isRequired,
+    data: PropTypes.object,
+    query: PropTypes.object,
   }
 
   static getInitialProps ({ query }) {
     return { slug: query && query.slug, query }
+  }
+
+  constructor(props) {
+    super(props);
+    this.state = {};
   }
 
   async componentDidMount() {
@@ -61,4 +68,4 @@ class CollectivePage extends React.Component {
   }
 }
 
-export default withData(addGetLoggedInUserFunction(addCollectiveData(withIntl(CollectivePage))));
+export default withData(withLoggedInUser(addCollectiveData(withIntl(CollectivePage))));
