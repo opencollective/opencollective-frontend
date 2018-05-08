@@ -16,7 +16,10 @@ class ExpenseWithData extends React.Component {
     view: PropTypes.string, // "compact" for homepage (can't edit expense, don't show header), "list" for list view, "details" for details view
     filter: PropTypes.object, // { category, recipient }
     defaultAction: PropTypes.string, // "new" to open the new expense form by default
-    LoggedInUser: PropTypes.object
+    LoggedInUser: PropTypes.object,
+    allowPayAction: PropTypes.bool,
+    lockPayAction: PropTypes.func,
+    unlockPayAction: PropTypes.func,
   }
 
   constructor(props) {
@@ -28,7 +31,10 @@ class ExpenseWithData extends React.Component {
       data,
       LoggedInUser,
       collective,
-      view
+      view,
+      allowPayAction,
+      lockPayAction,
+      unlockPayAction,
     } = this.props;
 
     if (data.error) {
@@ -52,7 +58,10 @@ class ExpenseWithData extends React.Component {
           view={view}
           editable={true}
           LoggedInUser={LoggedInUser}
-          />
+          allowPayAction={allowPayAction}
+          lockPayAction={lockPayAction}
+          unlockPayAction={unlockPayAction}
+        />
 
         { view === 'details' &&
           <CommentsWithData
