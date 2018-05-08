@@ -1,3 +1,4 @@
+import { get } from 'lodash';
 import errors from '../../lib/errors';
 import roles from '../../constants/roles';
 import statuses from '../../constants/expense_status';
@@ -6,8 +7,10 @@ import models from '../../models';
 import paymentProviders from '../../paymentProviders';
 import { formatCurrency } from '../../lib/utils';
 import paypalAdaptive from '../../paymentProviders/paypal/adaptiveGateway';
-import { createFromPaidExpense as createTransactionFromPaidExpense } from '../../lib/transactions';
-import { get } from 'lodash';
+import {
+  createFromPaidExpense as createTransactionFromPaidExpense,
+  createTransactionFromInKindDonation
+} from '../../lib/transactions';
 
 
 async function _createActivity(expense, type) {
@@ -206,6 +209,13 @@ export async function deleteExpense(remoteUser, expenseId) {
   return res;
 }
 
+/** Helper that finishes the process of paying an expense */
+async function payExpenseUpdate(expense) {
+  const updatedExpense = await expense.update({ status: statuses.PAID });
+  await _createActivity(expense, activities.COLLECTIVE_EXPENSE_PAID);
+  return updatedExpense;
+}
+
 export async function payExpense(remoteUser, expenseId, paymentProcessFees) {
   if (!remoteUser) {
     throw new errors.Unauthorized("You need to be logged in to pay an expense");
@@ -229,13 +239,24 @@ export async function payExpense(remoteUser, expenseId, paymentProcessFees) {
     throw new errors.Unauthorized("You don't have permission to pay this expense");
   }
 
+  const host = await expense.collective.getHostCollective();
+
+  // Expenses in kind can be maid for collectives without any
+  // funds. That's why we skip earlier here.
+  if (expense.payoutMethod === 'donation') {
+    const transaction = await createTransactionFromPaidExpense(
+      host, null, expense, null, null, expense.UserId);
+    await createTransactionFromInKindDonation(transaction);
+    const user = await models.User.findById(expense.UserId);
+    await expense.collective.addUserWithRole(user, 'BACKER');
+    return payExpenseUpdate(expense);
+  }
+
   const balance = await expense.collective.getBalance();
 
   if (expense.amount > balance) {
     throw new errors.Unauthorized(`You don't have enough funds to pay this expense. Current balance: ${formatCurrency(balance, expense.collective.currency)}, Expense amount: ${formatCurrency(expense.amount, expense.collective.currency)}`);
   }
-
-  const host = await expense.collective.getHostCollective();
 
   if (paymentProviders[expense.payoutMethod]) {
     paymentProcessFees = await paymentProviders[expense.payoutMethod].types['adaptive'].fees({
@@ -272,7 +293,5 @@ export async function payExpense(remoteUser, expenseId, paymentProcessFees) {
     await createTransactionFromPaidExpense(host, null, expense, null, null, expense.UserId, paymentProcessFees);
   }
 
-  const updatedExpense = await expense.update({ status: statuses.PAID });
-  _createActivity(expense, activities.COLLECTIVE_EXPENSE_PAID);
-  return updatedExpense;
+  return payExpenseUpdate(expense);
 }

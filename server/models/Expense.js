@@ -53,8 +53,8 @@ export default function (Sequelize, DataTypes) {
       type: DataTypes.STRING,
       validate: {
         isIn: {
-          args: [['paypal', 'manual', 'other']],
-          msg: 'Must be paypal, manual or other'
+          args: [['paypal', 'manual', 'donation', 'other']],
+          msg: 'Must be paypal, manual, donation or other'
         }
       },
       allowNull: false,

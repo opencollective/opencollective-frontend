@@ -14,6 +14,7 @@ import * as store from './features/support/stores';
 /* Support code */
 import models from '../server/models';
 import emailLib from '../server/lib/email';
+import * as libtransactions from '../server/lib/transactions';
 
 /* Queries used throughout these tests */
 const allExpensesQuery = `
@@ -511,6 +512,44 @@ describe('GraphQL Expenses API', () => {
       expect(emailSendMessageSpy.secondCall.args[0]).to.equal(hostAdmin.email);
       expect(emailSendMessageSpy.secondCall.args[1]).to.contain("Expense paid on Test Collective");
     }); /* End of "pays the expense manually and reduces the balance of the collective" */
+
+    it('Pay expense in kind', async () => {
+      // Given that we have a host and a collective
+      const { hostAdmin, collective } = await store.hostAndCollective('Test Collective', 'USD', 10);
+      // And given a user to file expenses
+      const { user, userCollective } = await store.newUser('someone cool');
+      // And given the above collective has one expense (in PENDING
+      // state)
+      const expense = await store.createExpense(user, {
+        amount: 7000,
+        description: "Pizza",
+        currency: 'USD',
+        payoutMethod: 'manual',
+        collective: { id: collective.id }
+      });
+      // And given the expense is approved
+      expense.status = 'APPROVED';
+      // And the expense will be paid in kind
+      expense.payoutMethod = 'donation';
+      await expense.save();
+      // When the expense is paid by the host admin
+      const parameters = { id: expense.id, fee: 0 };
+      const result = await utils.graphqlQuery(payExpenseQuery, parameters, hostAdmin);
+      result.errors && console.log(result.errors);
+      // Then the collective's balance should stay 0
+      expect(await collective.getBalance()).to.equal(0);
+      // And then it should create a transaction for the user
+      expect(await libtransactions.sum({
+        FromCollectiveId: userCollective.id,
+        CollectiveId: collective.id,
+        currency: 'USD',
+        type: 'CREDIT',
+      })).to.equal(7000);
+      // And then the user should become a backer of the project
+      const membership = await models.Member.findOne({ where: { CollectiveId: collective.id, role: 'BACKER' }});
+      expect(membership).to.exist;
+      expect(membership.MemberCollectiveId).to.equal(user.CollectiveId);
+    });
 
   }); /* End of #payExpense */
 

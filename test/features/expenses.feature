@@ -11,6 +11,6 @@ Feature: Pay expenses in kind
     And a User "Chen"
     When "Chen" expenses "50 USD" for "Pizza" to "Buttercup" via "Donation"
     And expense for "Pizza" is approved by "Buttercup"
-    And expense for "Pizza" is paid by "Buttercup"
-    #Then "Chen" should have contributed "50 USD" to "Buttercup"
-    #And "Buttercup" should have "0 USD" in their balance
+    And expense for "Pizza" is paid by "Buttercup" with "0%" fee
+    Then "Chen" should have contributed "50 USD" to "Buttercup"
+    And "Buttercup" should have "0 USD" in their balance
