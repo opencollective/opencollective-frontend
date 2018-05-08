@@ -113,7 +113,8 @@ export default function(Sequelize, DataTypes) {
     mission: DataTypes.STRING, // max 95 characters
     description: DataTypes.STRING, // max 95 characters
 
-    longDescription: DataTypes.TEXT,
+    longDescription: DataTypes.TEXT, // markdown
+    expensePolicy: DataTypes.TEXT, // markdown
 
     currency: CustomDataTypes(DataTypes).currency,
 

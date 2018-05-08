@@ -99,6 +99,7 @@ export const CollectiveInputType = new GraphQLInputObjectType({
     twitterHandle: { type: GraphQLString },
     description: { type: GraphQLString },
     longDescription: { type: GraphQLString },
+    expensePolicy: { type: GraphQLString },
     location: { type: LocationInputType},
     startsAt: { type: GraphQLString },
     endsAt: { type: GraphQLString },
@@ -145,6 +146,7 @@ export const CollectiveAttributesInputType = new GraphQLInputObjectType({
     email: { type: GraphQLString }, // for Collective type USER
     description: { type: GraphQLString },
     longDescription: { type: GraphQLString },
+    expensePolicy: { type: GraphQLString },
     website: { type: GraphQLString },
     twitterHandle: { type: GraphQLString },
     location: { type: LocationInputType },
