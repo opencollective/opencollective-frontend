@@ -149,8 +149,8 @@ class HTMLEditor extends React.Component {
           formats={this.formats}
           bounds={'.app'}
           placeholder={this.props.placeholder}
-         />
-       </div>
+          />
+      </div>
      )
   }
 }

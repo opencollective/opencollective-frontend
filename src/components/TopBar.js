@@ -35,28 +35,28 @@ class TopBar extends React.Component {
     const { LoggedInUser } = this.props;
 
     return (
-      <div className='LoginTopBarProfileMenu' onClick={(e) => e.nativeEvent.stopImmediatePropagation()}>
+      <div className="LoginTopBarProfileMenu" onClick={(e) => e.nativeEvent.stopImmediatePropagation()}>
         <div>
-          <div className='LoginTopBarProfileMenuHeading'>
+          <div className="LoginTopBarProfileMenuHeading">
             <span>collectives</span>
-            <div className='-dash'></div>
+            <div className="-dash"></div>
           </div>
           <ul>
-          {this.showCreateBtn && <li><a href='/create'>create a collective</a></li>}
-          <li><a href='/discover'><FormattedMessage id="menu.discover" defaultMessage="discover" /></a></li>
-            <li><a href='#' onClick={this.onClickSubscriptions.bind(this)}>Subscriptions</a></li>
+            {this.showCreateBtn && <li><a href="/create">create a collective</a></li>}
+            <li><a href="/discover"><FormattedMessage id="menu.discover" defaultMessage="discover" /></a></li>
+            <li><a href="#" onClick={this.onClickSubscriptions.bind(this)}>Subscriptions</a></li>
           </ul>
         </div>
         <div>
-          <div className='LoginTopBarProfileMenuHeading'>
+          <div className="LoginTopBarProfileMenuHeading">
             <span><FormattedMessage id="menu.myAccount" defaultMessage="My account" /></span>
-            <div className='-dash'></div>
+            <div className="-dash"></div>
           </div>
           <ul>
             <li><a href={`/${LoggedInUser.username}`}><FormattedMessage id="menu.profile" defaultMessage="Profile" /></a></li>
           </ul>
           <ul>
-            <li><a className='-blue' href='#' onClick={this.onClickLogout.bind(this)}><FormattedMessage id="menu.logout" defaultMessage="Logout" /></a></li>
+            <li><a className="-blue" href="#" onClick={this.onClickLogout.bind(this)}><FormattedMessage id="menu.logout" defaultMessage="Logout" /></a></li>
           </ul>
         </div>
       </div>
@@ -178,7 +178,7 @@ class TopBar extends React.Component {
         }
         `}</style>
         <a href="/" title={intl.formatMessage(this.messages['menu.homepage'])}><img src={logo} width="40" height="40" className="logo" alt="Open Collective logo" /></a>
-        
+
         {showSearch && (
           <form action="/search" method="GET" className="topbar-search-form">
             <div className="topbar-search-container">

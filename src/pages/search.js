@@ -134,7 +134,7 @@ class SearchPage extends React.Component {
           className={loadingUserLogin ? 'loading' : ''}
           LoggedInUser={LoggedInUser}
           showSearch={false}
-        />
+          />
         <Body>
           <Grid>
             <Row>
@@ -144,7 +144,7 @@ class SearchPage extends React.Component {
                     <ControlLabel className="h1">Search Open Collective</ControlLabel>
                     <div className="search-row">
                       <FormControl type="search" name="q" placeholder="open source" className="search-input" defaultValue={term} />
-                      <Button type="submit" className="blue" style={{ padding: '0 2rem' }}><span className="fa fa-search"/></Button>
+                      <Button type="submit" className="blue" style={{ padding: '0 2rem' }}><span className="fa fa-search" /></Button>
                     </div>
                   </FormGroup>
                 </form>
@@ -153,7 +153,7 @@ class SearchPage extends React.Component {
             <Row className="results-row">
               {loading && (
                 <div className="center">
-                  <LoadingGrid /> 
+                  <LoadingGrid />
                 </div>
               )}
 
@@ -163,9 +163,9 @@ class SearchPage extends React.Component {
                 </Col>
               ))}
 
-              { /* TODO: add suggested collectives when the result is empty */ } 
+              { /* TODO: add suggested collectives when the result is empty */ }
               {showCollectives && collectives.length === 0 && (
-                <p className="center"><em>No collectives found matching your query: "{term}"</em></p>
+                <p className="center"><em>No collectives found matching your query: &quot;{term}&quot;</em></p>
               )}
             </Row>
             {showCollectives && collectives.length !== 0 && <Row>
@@ -180,7 +180,7 @@ class SearchPage extends React.Component {
                           q: term,
                         }
                       }}
-                    >
+                      >
                       <a>{`${n + i}`}</a>
                     </Link>
                   </li>

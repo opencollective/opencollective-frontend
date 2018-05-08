@@ -41,7 +41,7 @@ class InterestedForm extends React.Component {
           }
         `}</style>
         <div className="InterestedForm">
-          <SignInUp label={(<FormattedMessage id='InterestedForm.RemindMe' defaultMessage='remind me' />)} emailOnly={true} showLabels={false} onSubmit={this.handleSubmit} />
+          <SignInUp label={(<FormattedMessage id="InterestedForm.RemindMe" defaultMessage="remind me" />)} emailOnly={true} showLabels={false} onSubmit={this.handleSubmit} />
         </div>
       </div>
     );

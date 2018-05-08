@@ -31,7 +31,7 @@ class TicketsConfirmed extends React.Component {
     const { event, response } = this.props;
 
     return (
-      <Modal onClose={this.props.onClose} show={this.props.show} className="TicketsConfirmedModal" title={(<FormattedMessage id="TicketsConfirmed.ticketsAcquired" values={{quantity: response.quantity}} defaultMessage='{quantity, plural, one {ticket} other {tickets}} acquired!' />)} >
+      <Modal onClose={this.props.onClose} show={this.props.show} className="TicketsConfirmedModal" title={(<FormattedMessage id="TicketsConfirmed.ticketsAcquired" values={{quantity: response.quantity}} defaultMessage="{quantity, plural, one {ticket} other {tickets}} acquired!" />)} >
         <div className="TicketsConfirmed">
           <style jsx>{`
           .TicketsConfirmed {
@@ -147,7 +147,7 @@ class TicketsConfirmed extends React.Component {
           <div id="ticket">
             <div className="topbar">
               <div className="numberTickets">
-                <FormattedMessage id="TicketsConfirmed.tickets" values={{quantity: response.quantity}} defaultMessage='{quantity} {quantity, plural, one {ticket} other {tickets}}' />
+                <FormattedMessage id="TicketsConfirmed.tickets" values={{quantity: response.quantity}} defaultMessage="{quantity} {quantity, plural, one {ticket} other {tickets}}" />
               </div>
               <div className="amount">
                 { response.tier.amount > 0 &&
@@ -163,11 +163,11 @@ class TicketsConfirmed extends React.Component {
                 <div className="date">
                   <FormattedDate
                     value={event.startsAt}
-                    year='numeric'
-                    month='long'
-                    day='numeric'
-                    weekday='long'
-                  />
+                    year="numeric"
+                    month="long"
+                    day="numeric"
+                    weekday="long"
+                    />
                 </div>
                 <div className="time">
                   <FormattedTime value={event.startsAt} />
@@ -179,9 +179,9 @@ class TicketsConfirmed extends React.Component {
               </div>
             </div>
           </div>
-          <div className='text'>
+          <div className="text">
             <p>{ response.user && <FormattedMessage id="TicketsConfirmed.ConfirmationSent" values={{email:response.user.email}} defaultMessage={`A confirmation email has been sent to your address {email}`} />}</p>
-            <p><FormattedMessage id="TicketsConfirmed.SeeYouSoon" defaultMessage='See you soon!' /></p>
+            <p><FormattedMessage id="TicketsConfirmed.SeeYouSoon" defaultMessage="See you soon!" /></p>
             <div className="AddToCalendarBtn">
               <AddToCalendar event={this.addToCalendarEvent} />
             </div>

@@ -53,20 +53,20 @@ class ExpensesStatsWithData extends React.Component {
         <div className="section categories">
           <h2><FormattedMessage id="expenses.stats.byCategory.title" defaultMessage="By category" /></h2>
           <ol>
-          { topExpenses.byCategory.map(category => (
-            <li key={category.category}>
-              <Link route={`/${slug}/expenses/categories/${category.category}`}>{category.category}</Link> (<Currency value={category.totalExpenses} currency={Collective.currency} />)
-            </li>
+            { topExpenses.byCategory.map(category => (
+              <li key={category.category}>
+                <Link route={`/${slug}/expenses/categories/${category.category}`}>{category.category}</Link> (<Currency value={category.totalExpenses} currency={Collective.currency} />)
+              </li>
           ))}
           </ol>
         </div>
         <div className="section recipients">
           <h2><FormattedMessage id="expenses.stats.byRecipient.title" defaultMessage="By recipient" /></h2>
           <ol>
-          { topExpenses.byCollective.map(recipientCollective => (
-            <li key={recipientCollective.slug}>
-              <Link route={`/${slug}/expenses/recipients/${recipientCollective.slug}`}>{recipientCollective.name}</Link> (<Currency value={-recipientCollective.totalExpenses} currency={Collective.currency} />)
-            </li>
+            { topExpenses.byCollective.map(recipientCollective => (
+              <li key={recipientCollective.slug}>
+                <Link route={`/${slug}/expenses/recipients/${recipientCollective.slug}`}>{recipientCollective.name}</Link> (<Currency value={-recipientCollective.totalExpenses} currency={Collective.currency} />)
+              </li>
           ))}
           </ol>
         </div>

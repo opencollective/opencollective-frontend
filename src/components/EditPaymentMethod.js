@@ -74,16 +74,16 @@ class EditPaymentMethod extends React.Component {
                   <label className="col-sm-3 control-label">Credit Card</label>
                   <Col sm={9}>
                     <div className="name col">{label}</div>
-                      { paymentMethod.orders.length > 0 &&
-                        <div className="actions">
-                          <FormattedMessage id="paymentMethod.activeSubscriptions" defaultMessage="{n} active {n, plural, one {subscription} other {subscriptions}}" values={{ n: paymentMethod.orders.length }} />&nbsp;
-                          <Button bsStyle="default" bsSize="xsmall" onClick={() => Router.push(`/subscriptions?collectiveSlug=${this.props.slug}`, `/subscriptions/${this.props.slug}`)}>{intl.formatMessage(this.messages[`paymentMethod.editSubscriptions`])}</Button>
-                        </div>
+                    { paymentMethod.orders.length > 0 &&
+                    <div className="actions">
+                      <FormattedMessage id="paymentMethod.activeSubscriptions" defaultMessage="{n} active {n, plural, one {subscription} other {subscriptions}}" values={{ n: paymentMethod.orders.length }} />&nbsp;
+                      <Button bsStyle="default" bsSize="xsmall" onClick={() => Router.push(`/subscriptions?collectiveSlug=${this.props.slug}`, `/subscriptions/${this.props.slug}`)}>{intl.formatMessage(this.messages[`paymentMethod.editSubscriptions`])}</Button>
+                    </div>
                       }
-                      { paymentMethod.orders.length === 0 &&
-                          <div className="actions">
-                            <Button bsStyle="default" bsSize="xsmall" onClick={() => this.removePaymentMethod({})}>{intl.formatMessage(this.messages[`paymentMethod.remove`])}</Button>
-                          </div>
+                    { paymentMethod.orders.length === 0 &&
+                      <div className="actions">
+                        <Button bsStyle="default" bsSize="xsmall" onClick={() => this.removePaymentMethod({})}>{intl.formatMessage(this.messages[`paymentMethod.remove`])}</Button>
+                      </div>
                       }
                   </Col>
                 </div>

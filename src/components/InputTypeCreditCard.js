@@ -88,25 +88,25 @@ class InputTypeCreditCard extends React.Component {
         }
       `}</style>
 
-      { options.length > 0 &&
-          <FormControl
-            componentClass="select"
-            className="creditcardSelector"
-            type="select"
-            name="creditcardSelector"
-            onChange={event => this.handleChange("uuid", event.target.value)}
-            >
-            { options.map(option => {
+        { options.length > 0 &&
+        <FormControl
+          componentClass="select"
+          className="creditcardSelector"
+          type="select"
+          name="creditcardSelector"
+          onChange={event => this.handleChange("uuid", event.target.value)}
+          >
+          { options.map(option => {
               const value = option.uuid
               const label = `${option.data.brand} ${option.data.funding} ${option.data.identifier} ${option.data.expMonth}/${option.data.expYear}`;
               return (<option value={value}>{`💳 ${label}`}</option>)
               })
             }
-            <option value="">other</option>
-          </FormControl>
+          <option value="">other</option>
+        </FormControl>
       }
 
-      { showNewCreditCardForm &&
+        { showNewCreditCardForm &&
         <div>
           { this.state.loading &&
             <div className="loading">
@@ -117,7 +117,7 @@ class InputTypeCreditCard extends React.Component {
           <div id="card-errors" role="alert">{this.state.error}</div>
         </div>
         }
-    </div>
+      </div>
     );
   }
 }

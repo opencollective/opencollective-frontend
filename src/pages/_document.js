@@ -86,12 +86,12 @@ export default class IntlDocument extends Document {
               }
               `
             }}
-          />
+            />
           <script
             dangerouslySetInnerHTML={{
               __html: this.props.localeDataScript
             }}
-          />
+            />
           <NextScript />
         </body>
       </html>

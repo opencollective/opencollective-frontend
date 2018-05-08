@@ -65,19 +65,19 @@ class EditConnectedAccount extends React.Component {
     return (
       <div className="EditConnectedAccount">
 
-      { !connectedAccount &&
+        { !connectedAccount &&
         <div>
           <HelpBlock>{intl.formatMessage(this.messages[`collective.connectedAccounts.${service}.description`])}</HelpBlock>
           <Button onClick={() => this.connect(service)}>{intl.formatMessage(this.messages[`collective.connectedAccounts.${service}.button`])}</Button>
         </div>
       }
-      { connectedAccount &&
+        { connectedAccount &&
         <div>
           <div>{intl.formatMessage(this.messages[`collective.connectedAccounts.${service}.connected`], vars)}</div>
           <Button onClick={() => this.connect(service)}>{intl.formatMessage(this.messages[`collective.connectedAccounts.reconnect.button`])}</Button>
         </div>
       }
-      { connectedAccount && connectedAccount.service === 'twitter' &&
+        { connectedAccount && connectedAccount.service === 'twitter' &&
         <EditTwitterAccount collective={collective} connectedAccount={connectedAccount} />
       }
       </div>

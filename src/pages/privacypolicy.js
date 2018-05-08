@@ -1,9 +1,10 @@
+import React from 'react';
 import markdown from '../markdown/privacypolicy.md';
 import Header from '../components/Header';
 import Body from '../components/Body';
 import Footer from '../components/Footer';
 
-export default () =>
+const PrivacyPolicyPage = () =>
   (<div className="root">
     <style jsx global>{`
       th {
@@ -27,4 +28,6 @@ export default () =>
       <div className="content" dangerouslySetInnerHTML={{__html: markdown}} />
     </Body>
     <Footer />
-  </div>)
+  </div>);
+
+export default PrivacyPolicyPage;

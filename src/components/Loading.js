@@ -1,8 +1,9 @@
+import React from 'react';
 import Header from './Header';
 import Body from './Body';
 import Footer from './Footer';
 
-export default () => {
+const Loading = () => {
   return (
     <div className="loading">
       <Header />
@@ -19,4 +20,6 @@ export default () => {
       <Footer />
     </div>
   )
-}
+};
+
+export default Loading;

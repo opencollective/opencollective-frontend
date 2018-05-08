@@ -123,7 +123,7 @@ class CreateExpenseForm extends React.Component {
     const payoutMethods = this.getOptions(['paypal', 'other'], { paypalEmail: get(expense, 'user.paypalEmail') || intl.formatMessage(this.messages['newExpense.paypal.label']) });
 
     return (
-        <div className={`CreateExpenseForm ${this.props.mode}`}>
+      <div className={`CreateExpenseForm ${this.props.mode}`}>
         <style jsx>{`
           .CreateExpenseForm {
             font-size: 1.2rem;
@@ -280,7 +280,7 @@ class CreateExpenseForm extends React.Component {
           <div className="rightColumn">
             <div className="row">
               <div className="col large">
-                <label><FormattedMessage id='expense.description' defaultMessage='description' /></label>
+                <label><FormattedMessage id="expense.description" defaultMessage="description" /></label>
                 <div className="description">
                   <span className="description">
                     <InputField
@@ -297,13 +297,13 @@ class CreateExpenseForm extends React.Component {
             </div>
 
             <div className="col">
-              <label><FormattedMessage id='expense.amount' defaultMessage='amount' /></label>
+              <label><FormattedMessage id="expense.amount" defaultMessage="amount" /></label>
               <div className="amountDetails">
                 <span className="amount">
                   <InputField
                     defaultValue={expense.amount}
                     pre={getCurrencySymbol(collective.currency)}
-                    type='currency'
+                    type="currency"
                     name="amount"
                     className="amountField"
                     onChange={amount => this.handleChange('amount', amount)}
@@ -313,12 +313,12 @@ class CreateExpenseForm extends React.Component {
             </div>
 
             <div className="col incurredAt">
-              <label><FormattedMessage id='expense.incurredAt' defaultMessage='Date' /></label>
+              <label><FormattedMessage id="expense.incurredAt" defaultMessage="Date" /></label>
               <div className="incurredAt">
                 <span className="incurredAt">
                   <InputField
                     defaultValue={new Date}
-                    type='date'
+                    type="date"
                     name="incurredAt"
                     className="incurredAtField"
                     onChange={incurredAt => this.handleChange('incurredAt', incurredAt)}
@@ -328,7 +328,7 @@ class CreateExpenseForm extends React.Component {
             </div>
 
             <div className="col">
-              <label><FormattedMessage id='expense.category' defaultMessage='category' /></label>
+              <label><FormattedMessage id="expense.category" defaultMessage="category" /></label>
               <div className="category">
                 <span className="category">
                   <InputField
@@ -344,7 +344,7 @@ class CreateExpenseForm extends React.Component {
             </div>
 
             <div className="col">
-              <label><FormattedMessage id='expense.payoutMethod' defaultMessage='payout method' /></label>
+              <label><FormattedMessage id="expense.payoutMethod" defaultMessage="payout method" /></label>
               <InputField
                 type="select"
                 name="payoutMethod"
@@ -356,7 +356,7 @@ class CreateExpenseForm extends React.Component {
 
             { this.state.expense.payoutMethod === 'paypal' &&
               <div className="col emailInput">
-                <label><FormattedMessage id='expense.payoutMethod.paypal.label' defaultMessage='PayPal address' /></label>
+                <label><FormattedMessage id="expense.payoutMethod.paypal.label" defaultMessage="PayPal address" /></label>
                 <InputField
                   type="email"
                   name="paypalEmail"
@@ -369,7 +369,7 @@ class CreateExpenseForm extends React.Component {
 
             <div className="col privateMessage">
               <label>
-                <FormattedMessage id='expense.privateMessage' defaultMessage='Private instructions' />
+                <FormattedMessage id="expense.privateMessage" defaultMessage="Private instructions" />
               </label>
               <InputField
                 type="textarea"
@@ -382,7 +382,7 @@ class CreateExpenseForm extends React.Component {
 
             <div className="row">
               <div>
-                <Button className="blue" type="submit" ref="submit" disabled= {this.state.loading || !this.state.isExpenseValid} >
+                <Button className="blue" type="submit" disabled={this.state.loading || !this.state.isExpenseValid} >
                   { this.state.loading && <FormattedMessage id="form.processing" defaultMessage="processing" /> }
                   { !this.state.loading && <FormattedMessage id="expense.new.submit" defaultMessage="Submit Expense" /> }
                 </Button>

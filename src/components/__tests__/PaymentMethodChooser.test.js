@@ -7,9 +7,9 @@ import PaymentMethodChooser from '../PaymentMethodChooser';
 describe("PaymentMethodChooser.test.js", () => {
 
   const mountComponent = (props) => mount(
-        <IntlProvider locale="en">
-          <PaymentMethodChooser {...props} />
-        </IntlProvider>
+    <IntlProvider locale="en">
+      <PaymentMethodChooser {...props} />
+    </IntlProvider>
     );
 
   const defaultPaymentMethod = {name: '4242', data: { brand: 'VISA', expMonth: '01', expYear: '2020'}};

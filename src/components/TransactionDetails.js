@@ -42,7 +42,7 @@ class TransactionDetails extends React.Component {
     const amountDetailsStr = amountDetails.length > 1 ? amountDetails.join(' ') : null;
 
     return (
-        <div className={`TransactionDetails ${this.props.mode}`}>
+      <div className={`TransactionDetails ${this.props.mode}`}>
         <style jsx>{`
           .TransactionDetails {
             font-size: 1.2rem;
@@ -104,15 +104,15 @@ class TransactionDetails extends React.Component {
           </div>
         }
         <div className="col">
-          <label><FormattedMessage id='transaction.host' defaultMessage='host' /></label>
+          <label><FormattedMessage id="transaction.host" defaultMessage="host" /></label>
           {transaction.host.name}
         </div>
         <div className="col">
-          <label><FormattedMessage id='transaction.paymentMethod' defaultMessage='payment method' /></label>
+          <label><FormattedMessage id="transaction.paymentMethod" defaultMessage="payment method" /></label>
           {transaction.paymentMethod && capitalize(transaction.paymentMethod.service)}
         </div>
         <div className="col">
-          <label><FormattedMessage id='transaction.amount' defaultMessage='amount' /></label>
+          <label><FormattedMessage id="transaction.amount" defaultMessage="amount" /></label>
           <div className="amountDetails">
             { amountDetailsStr &&
               <span>
@@ -131,10 +131,10 @@ class TransactionDetails extends React.Component {
         </div>
         { type === 'debit' && LoggedInUser && LoggedInUser.canEditCollective(collective) && !transaction.refundTransaction &&
           <div className="col invoice">
-            <label><FormattedMessage id='transaction.invoice' defaultMessage='invoice' /></label>
+            <label><FormattedMessage id="transaction.invoice" defaultMessage="invoice" /></label>
             <div>
               <a href={`/${collective.slug}/transactions/${transaction.uuid}/invoice.pdf`}>
-                <FormattedMessage id='transaction.downloadPDF' defaultMessage='Download (pdf)' />
+                <FormattedMessage id="transaction.downloadPDF" defaultMessage="Download (pdf)" />
               </a>
             </div>
           </div>
@@ -144,7 +144,8 @@ class TransactionDetails extends React.Component {
             <div className="transactionActions">
               <RefundTransactionBtn
                 transaction={transaction}
-                collective={collective} />
+                collective={collective}
+                />
             </div> }
         </div>
 

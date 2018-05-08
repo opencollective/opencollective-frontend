@@ -45,7 +45,7 @@ class TeamSection extends React.Component {
               member={member}
               collective={collective}
               LoggedInUser={LoggedInUser}
-            />)
+              />)
           )}
         </div>
       </section>

@@ -171,7 +171,7 @@ class Update extends React.Component {
 
           <div className="meta">
             <div className="author"><Link route={`/${update.fromCollective.slug}`}><a>{update.fromCollective.name}</a></Link></div>
-            <Role role='ADMIN' />
+            <Role role="ADMIN" />
             { update.publishedAt &&
               <div className="publishedAt">
                 <FormattedMessage id="update.publishedAt" defaultMessage={"published on {date}"} values={{date: formatDate(update.publishedAt, { day: 'numeric', month: 'long', year: 'numeric' })}} />

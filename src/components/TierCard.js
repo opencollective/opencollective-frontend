@@ -241,20 +241,20 @@ class TierCard extends React.Component {
         }
         <div className="description">
           { tier.description && <Markdown source={tier.description} /> }
-          { !tier.description && <p><FormattedMessage id="tier.defaultDescription" defaultMessage="Become a {name} for {amount} per {interval} and help us sustain our activities!" values={{ name: tier.name, amount: formatCurrency(amount, tier.currency || collective.currency), interval: tier.interval}}/></p> }
+          { !tier.description && <p><FormattedMessage id="tier.defaultDescription" defaultMessage="Become a {name} for {amount} per {interval} and help us sustain our activities!" values={{ name: tier.name, amount: formatCurrency(amount, tier.currency || collective.currency), interval: tier.interval}} /></p> }
         </div>
         { tier.stats.totalOrders > 0 &&
           <div>
             <div className="divider" />
             <div className="footer">
               <div className="lastOrders">
-              { totalOrders > 0 &&
+                { totalOrders > 0 &&
                 <div className="totalOrders">
                   {totalOrders} {intl.formatMessage(this.messages[`contribution`], { n: totalOrders })}
                 </div>
               }
-              {this.showLastOrders(['USER'], 10)}
-              {this.showLastOrders(['ORGANIZATION', 'COLLECTIVE'], 10)}
+                {this.showLastOrders(['USER'], 10)}
+                {this.showLastOrders(['ORGANIZATION', 'COLLECTIVE'], 10)}
               </div>
             </div>
           </div>

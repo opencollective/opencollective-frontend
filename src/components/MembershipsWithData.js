@@ -98,9 +98,9 @@ class MembershipsWithData extends React.Component {
         </div>
         { memberships.length % 10 === 0 && memberships.length >= limit &&
           <div className="loadMoreBtn">
-            <Button bsStyle='default' onClick={this.fetchMore}>
-              {this.state.loading && <FormattedMessage id='loading' defaultMessage='loading' />}
-              {!this.state.loading && <FormattedMessage id='loadMore' defaultMessage='load more' />}
+            <Button bsStyle="default" onClick={this.fetchMore}>
+              {this.state.loading && <FormattedMessage id="loading" defaultMessage="loading" />}
+              {!this.state.loading && <FormattedMessage id="loadMore" defaultMessage="load more" />}
             </Button>
           </div>
         }

@@ -141,7 +141,7 @@ class SignInUp extends React.Component {
           }
 
           <div id="actions" className="actions">
-            <Button type="submit" disabled={!isFormValid || isLoading} className="green" label={submitBtnLabel} onClick={this.handleSubmit}/>
+            <Button type="submit" disabled={!isFormValid || isLoading} className="green" label={submitBtnLabel} onClick={this.handleSubmit} />
           </div>
         </form>
       </div>

@@ -7,7 +7,7 @@ import App from '../button.js'
 describe('Donate Button', () => {
   it('Button links to /:collectiveSlug/donate"', () => {
     const app = shallow(
-      <App collectiveSlug='webpack' />
+      <App collectiveSlug="webpack" />
     )
     expect(app.find({href: 'https://opencollective.com/webpack/donate' }).length).toEqual(1);
   })

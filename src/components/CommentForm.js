@@ -30,7 +30,7 @@ class CommentForm extends React.Component {
     });
 
     this.state = { comment: {} };
- 
+
   }
 
   async onSubmit() {
@@ -67,7 +67,7 @@ class CommentForm extends React.Component {
     const editor = (get(LoggedInUser, 'collective.settings.editor') === 'markdown' || get(collective, 'settings.editor') === 'markdown') ? 'markdown' : 'html';
 
     return (
-        <div className={`CommentForm`}>
+      <div className={`CommentForm`}>
         <style jsx>{`
           .CommentForm {
             font-size: 1.2rem;
@@ -112,13 +112,13 @@ class CommentForm extends React.Component {
             </div>
             <div className="description">
               <div className="comment">
-              <InputField
-                key={`comment-${this.state.comment.id}`}
-                type={editor}
-                defaultValue={this.state.comment[editor]}
-                onChange={(value) => this.handleChange(editor, value)}
-                className="small"
-                />
+                <InputField
+                  key={`comment-${this.state.comment.id}`}
+                  type={editor}
+                  defaultValue={this.state.comment[editor]}
+                  onChange={(value) => this.handleChange(editor, value)}
+                  className="small"
+                  />
               </div>
               <div className="actions">
                 <SmallButton className="primary save" onClick={this.onSubmit}><FormattedMessage id="comment.btn" defaultMessage="Comment" /></SmallButton>

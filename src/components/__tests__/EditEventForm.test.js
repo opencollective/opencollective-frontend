@@ -20,10 +20,10 @@ describe("EditEventForm component", () => {
   const component = mount(
     <IntlProvider locale="en">
       <EditEventForm
-          event={event}
-          onSubmit={onSubmit}
+        event={event}
+        onSubmit={onSubmit}
         />
-      </IntlProvider>
+    </IntlProvider>
   );
 
   // @TODO: update: no need for slug anymore

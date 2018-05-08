@@ -41,7 +41,7 @@ class SubscriptionsRedirectPage extends React.Component {
           title={`Subscriptions`}
           description="All the collectives that you are giving money to"
           LoggedInUser={this.state.LoggedInUser}
-        />
+          />
         <style jsx>{`
         .Subscriptions-container {
           background-color: ${colors.offwhite};
@@ -89,15 +89,15 @@ class SubscriptionsRedirectPage extends React.Component {
         `}
         </style>
         <Body>
-          <div className='SubscriptionsRedirect-container'>
-            <div className='content'>
-              <div className='Subscriptions-header'>
-                <div className='Subscriptions-title'>
+          <div className="SubscriptionsRedirect-container">
+            <div className="content">
+              <div className="Subscriptions-header">
+                <div className="Subscriptions-title">
                   {this.state.LoggedInUser &&
                     <div>
                       This page has moved. Your subscriptions are now at
                       <Link route={'subscriptions'} params={{collectiveSlug: LoggedInUser.collective.slug }}>
-                        <span className='link'> /{LoggedInUser.collective.slug}/subscriptions</span>
+                        <span className="link"> /{LoggedInUser.collective.slug}/subscriptions</span>
                       </Link>. Redirecting...
                     </div>}
                 </div>

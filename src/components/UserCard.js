@@ -1,6 +1,7 @@
+import React from 'react';
 import { FormattedMessage, FormattedDate } from 'react-intl';
 
-export default ({ user, type }) => (
+const UserCard = ({ user, type }) => (
   <a href={`/${user.username}`}>
     <div className={`UserCard ${type}`}>
       <style jsx>{`
@@ -44,7 +45,7 @@ export default ({ user, type }) => (
           font-size: 0.6875rem;
           letter-spacing: 1.47px;
           margin-bottom: 0.3rem;
-        }        
+        }
         .tier .since {
           font-size: .6875rem;
           letter-spacing: 0.05rem;
@@ -53,14 +54,16 @@ export default ({ user, type }) => (
         }
       `}</style>
       <img src={user.image} />
-      <p className='name'>{user.name}</p>
-      <div className='tier border-top border-gray px3 py2'>
-        <p className='name'>{user.tier.name}</p>
-        <p className='since'>
-          <FormattedMessage id='UserCard.since' defaultMessage={`since`} />&nbsp;
-          <FormattedDate value={user.createdAt} month='long' year='numeric' />
+      <p className="name">{user.name}</p>
+      <div className="tier border-top border-gray px3 py2">
+        <p className="name">{user.tier.name}</p>
+        <p className="since">
+          <FormattedMessage id="UserCard.since" defaultMessage={`since`} />&nbsp;
+          <FormattedDate value={user.createdAt} month="long" year="numeric" />
         </p>
       </div>
     </div>
   </a>
 );
+
+export default UserCard;

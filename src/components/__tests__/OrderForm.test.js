@@ -63,9 +63,11 @@ describe("OrderForm component", () => {
   }
 
   const mountComponent = (props, queryStub) => mount(
-    <ApolloProvider client={{
-      query: queryStub || Promise.resolve
-    }} >
+    <ApolloProvider
+      client={{
+        query: queryStub || Promise.resolve
+      }}
+      >
       <IntlProvider locale="en">
         <OrderForm {...props} />
       </IntlProvider>

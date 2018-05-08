@@ -31,12 +31,12 @@ function FieldGroup({ controlId, label, help, pre, post, after, button, classNam
         </Col>
         <Col sm={10}>
           <InputGroup>
-          { pre && <InputGroup.Addon>{pre}</InputGroup.Addon>}
-          <FormControl {...inputProps} />
-          { post && <InputGroup.Addon>{post}</InputGroup.Addon>}
-          { after && <div className="after">{after}</div>}
-          { validationState && <FormControl.Feedback /> }
-          { button && <InputGroup.Button>{button}</InputGroup.Button>}
+            { pre && <InputGroup.Addon>{pre}</InputGroup.Addon>}
+            <FormControl {...inputProps} />
+            { post && <InputGroup.Addon>{post}</InputGroup.Addon>}
+            { after && <div className="after">{after}</div>}
+            { validationState && <FormControl.Feedback /> }
+            { button && <InputGroup.Button>{button}</InputGroup.Button>}
           </InputGroup>
           { help && <HelpBlock>{help}</HelpBlock>}
         </Col>
@@ -48,11 +48,11 @@ function FieldGroup({ controlId, label, help, pre, post, after, button, classNam
         {label && <ControlLabel>{label}</ControlLabel>}
         { (pre || button) &&
           <InputGroup>
-          { pre && <InputGroup.Addon>{pre}</InputGroup.Addon>}
-          <FormControl {...inputProps} ref={inputRef => inputRef && props.focus && inputRef.focus()} />
-          { post && <InputGroup.Addon>{post}</InputGroup.Addon>}
-          { validationState && <FormControl.Feedback /> }
-          { button && <InputGroup.Button>{button}</InputGroup.Button>}
+            { pre && <InputGroup.Addon>{pre}</InputGroup.Addon>}
+            <FormControl {...inputProps} ref={inputRef => inputRef && props.focus && inputRef.focus()} />
+            { post && <InputGroup.Addon>{post}</InputGroup.Addon>}
+            { validationState && <FormControl.Feedback /> }
+            { button && <InputGroup.Button>{button}</InputGroup.Button>}
           </InputGroup>
         }
         { !pre && !post && !button &&
@@ -135,23 +135,23 @@ class InputField extends React.Component {
 
       case 'creditcard':
         this.input =  (<FormGroup controlId={field.name}>
-                        {horizontal &&
-                          <div>
-                            <Col componentClass={ControlLabel} sm={2}>
-                              {capitalize(field.label)}
-                            </Col>
-                            <Col sm={10}>
-                              <InputTypeCreditCard options={field.options} onChange={this.handleChange} style={this.props.style}/>
-                            </Col>
-                          </div>
+          {horizontal &&
+          <div>
+            <Col componentClass={ControlLabel} sm={2}>
+              {capitalize(field.label)}
+            </Col>
+            <Col sm={10}>
+              <InputTypeCreditCard options={field.options} onChange={this.handleChange} style={this.props.style} />
+            </Col>
+          </div>
                         }
-                        {!horizontal &&
-                          <div>
-                            <ControlLabel>{capitalize(field.label)}</ControlLabel>
-                            <InputTypeCreditCard onChange={this.handleChange} style={this.props.style}/>
-                          </div>
+          {!horizontal &&
+          <div>
+            <ControlLabel>{capitalize(field.label)}</ControlLabel>
+            <InputTypeCreditCard onChange={this.handleChange} style={this.props.style} />
+          </div>
                         }
-                      </FormGroup>)
+        </FormGroup>)
         break;
 
       case 'textarea': {
@@ -165,17 +165,17 @@ class InputField extends React.Component {
           }
         }
         this.input =  (<FieldGroup
-                          label={capitalize(field.label)}
-                          componentClass="textarea"
-                          className={field.className}
-                          placeholder={this.props.placeholder}
-                          name={field.name}
-                          help={field.description}
-                          after={after}
-                          maxLength={field.maxLength}
-                          value={this.state.value || this.props.defaultValue}
-                          onChange={event => this.handleChange(event.target.value)}
-                        />
+          label={capitalize(field.label)}
+          componentClass="textarea"
+          className={field.className}
+          placeholder={this.props.placeholder}
+          name={field.name}
+          help={field.description}
+          after={after}
+          maxLength={field.maxLength}
+          value={this.state.value || this.props.defaultValue}
+          onChange={event => this.handleChange(event.target.value)}
+          />
                       )
         break;
       }
@@ -186,8 +186,8 @@ class InputField extends React.Component {
         const { closeOnSelect } = this.props;
 
         this.input = (
-        <FormGroup>
-          {horizontal &&
+          <FormGroup>
+            {horizontal &&
             <div>
               <Col componentClass={ControlLabel} sm={2}>
                 {capitalize(field.label)}
@@ -200,11 +200,11 @@ class InputField extends React.Component {
                   isValidDate={field.validate}
                   onChange={date => date.toISOString ? this.handleChange(date.toISOString()) : false}
                   closeOnSelect={closeOnSelect}
-                />
+                  />
               </Col>
             </div>
           }
-          {!horizontal &&
+            {!horizontal &&
             <div>
               {field.label && <ControlLabel>{`${capitalize(field.label)}`}</ControlLabel>}
               <DateTime
@@ -214,19 +214,19 @@ class InputField extends React.Component {
                 isValidDate={field.validate}
                 onChange={date => date.toISOString ? this.handleChange(date.toISOString()) : false}
                 closeOnSelect={closeOnSelect}
-              />
+                />
               {field.description && <HelpBlock>{field.description}</HelpBlock>}
             </div>
           }
-        </FormGroup>
+          </FormGroup>
         )
         break;
       }
 
       case 'component':
         this.input = (
-        <FormGroup>
-          {horizontal &&
+          <FormGroup>
+            {horizontal &&
             <div>
               <Col componentClass={ControlLabel} sm={2}>
                 {capitalize(field.label)}
@@ -236,36 +236,36 @@ class InputField extends React.Component {
               </Col>
             </div>
           }
-          {!horizontal &&
+            {!horizontal &&
             <div>
               {field.label && <ControlLabel>{`${capitalize(field.label)}`}</ControlLabel>}
               <field.component onChange={this.handleChange} {...field} {...field.options} />
               {field.description && <HelpBlock>{field.description}</HelpBlock>}
             </div>
           }
-        </FormGroup>
+          </FormGroup>
         )
         break;
 
       case 'location':
         this.input = (
-        <FormGroup>
-          {field.label && <ControlLabel>{`${capitalize(field.label)}`}</ControlLabel>}
-          <InputTypeLocation
-            value={this.state.value || field.defaultValue}
-            onChange={event => this.handleChange(event)}
-            placeholder={field.placeholder}
-            options={field.options}
-            />
-          {field.description && <HelpBlock>{field.description}</HelpBlock>}
-        </FormGroup>
+          <FormGroup>
+            {field.label && <ControlLabel>{`${capitalize(field.label)}`}</ControlLabel>}
+            <InputTypeLocation
+              value={this.state.value || field.defaultValue}
+              onChange={event => this.handleChange(event)}
+              placeholder={field.placeholder}
+              options={field.options}
+              />
+            {field.description && <HelpBlock>{field.description}</HelpBlock>}
+          </FormGroup>
         )
         break;
 
       case 'dropzone':
         this.input = (
           <FormGroup>
-          {horizontal &&
+            {horizontal &&
             <div>
               <Col componentClass={ControlLabel} sm={2}>
                 {capitalize(field.label)}
@@ -282,7 +282,7 @@ class InputField extends React.Component {
               </Col>
             </div>
           }
-          {!horizontal &&
+            {!horizontal &&
             <div>
               {field.label && <ControlLabel>{`${capitalize(field.label)}`}</ControlLabel>}
               <InputTypeDropzone
@@ -295,7 +295,7 @@ class InputField extends React.Component {
               { field.description && <HelpBlock>{field.description}</HelpBlock> }
             </div>
           }
-        </FormGroup>
+          </FormGroup>
         )
         break;
 
@@ -353,48 +353,48 @@ class InputField extends React.Component {
 
       case 'checkbox':
         this.input =  (<FormGroup controlId={field.name}>
-                        {horizontal &&
-                          <div>
-                            <Col componentClass={ControlLabel} sm={2}>
-                              {capitalize(field.label)}
-                            </Col>
-                            <Col sm={10}>
-                              <Checkbox defaultChecked={field.defaultValue} onChange={event => this.handleChange(event.target.checked)}>{field.description}</Checkbox>
-                            </Col>
-                          </div>
+          {horizontal &&
+          <div>
+            <Col componentClass={ControlLabel} sm={2}>
+              {capitalize(field.label)}
+            </Col>
+            <Col sm={10}>
+              <Checkbox defaultChecked={field.defaultValue} onChange={event => this.handleChange(event.target.checked)}>{field.description}</Checkbox>
+            </Col>
+          </div>
                         }
-                        {!horizontal &&
-                          <div>
-                            { field.label && <ControlLabel>{capitalize(field.label)}</ControlLabel> }
-                            <Checkbox defaultChecked={field.defaultValue} onChange={event => this.handleChange(event.target.checked)}>{field.description}</Checkbox>
-                          </div>
+          {!horizontal &&
+          <div>
+            { field.label && <ControlLabel>{capitalize(field.label)}</ControlLabel> }
+            <Checkbox defaultChecked={field.defaultValue} onChange={event => this.handleChange(event.target.checked)}>{field.description}</Checkbox>
+          </div>
                         }
-                      </FormGroup>)
+        </FormGroup>)
         break;
 
       case 'switch':
         this.input =  (<FormGroup controlId={field.name} help={field.description}>
-                        {horizontal &&
-                          <div>
-                            <Col componentClass={ControlLabel} sm={2}>
-                              {capitalize(field.label)}
-                            </Col>
-                            <Col sm={10}>
-                              <Switch defaultChecked={field.defaultValue} onChange={event => this.handleChange(event.target.checked)}></Switch>
-                              {field.description && <HelpBlock>{field.description}</HelpBlock>}
-                            </Col>
-                          </div>
+          {horizontal &&
+          <div>
+            <Col componentClass={ControlLabel} sm={2}>
+              {capitalize(field.label)}
+            </Col>
+            <Col sm={10}>
+              <Switch defaultChecked={field.defaultValue} onChange={event => this.handleChange(event.target.checked)}></Switch>
+              {field.description && <HelpBlock>{field.description}</HelpBlock>}
+            </Col>
+          </div>
                         }
-                        {!horizontal &&
-                          <div>
-                            <ControlLabel>{capitalize(field.label)}</ControlLabel>
-                            <div className="switch">
-                              <Switch defaultChecked={field.defaultValue} onChange={event => this.handleChange(event.target.checked)}></Switch>
-                              {field.description && <HelpBlock>{field.description}</HelpBlock>}
-                            </div>
-                          </div>
+          {!horizontal &&
+          <div>
+            <ControlLabel>{capitalize(field.label)}</ControlLabel>
+            <div className="switch">
+              <Switch defaultChecked={field.defaultValue} onChange={event => this.handleChange(event.target.checked)}></Switch>
+              {field.description && <HelpBlock>{field.description}</HelpBlock>}
+            </div>
+          </div>
                         }
-                      </FormGroup>)
+        </FormGroup>)
         break;
 
       case 'html':
@@ -421,21 +421,21 @@ class InputField extends React.Component {
 
       default:
       this.input = (<FieldGroup
-          onChange={event => this.handleChange(event.target.value)}
-          type={field.type}
-          pre={field.pre}
-          post={field.post}
-          button={field.button}
-          name={field.name}
-          maxLength={field.maxLength}
-          disabled={field.disabled}
-          label={field.label && `${capitalize(field.label)}`}
-          help={field.description}
-          autoFocus={field.focus}
-          placeholder={field.placeholder}
-          className={field.className}
-          defaultValue={field.defaultValue}
-          validationState={this.state.validationState}
+        onChange={event => this.handleChange(event.target.value)}
+        type={field.type}
+        pre={field.pre}
+        post={field.post}
+        button={field.button}
+        name={field.name}
+        maxLength={field.maxLength}
+        disabled={field.disabled}
+        label={field.label && `${capitalize(field.label)}`}
+        help={field.description}
+        autoFocus={field.focus}
+        placeholder={field.placeholder}
+        className={field.className}
+        defaultValue={field.defaultValue}
+        validationState={this.state.validationState}
         />)
 
         break;

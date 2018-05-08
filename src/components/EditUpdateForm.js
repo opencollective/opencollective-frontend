@@ -81,7 +81,7 @@ class EditUpdateForm extends React.Component {
     const editor = (get(LoggedInUser, 'collective.settings.editor') === 'markdown' || get(collective, 'settings.editor') === 'markdown') ? 'markdown' : 'html';
 
     return (
-        <div className={`EditUpdateForm ${this.props.mode}`}>
+      <div className={`EditUpdateForm ${this.props.mode}`}>
         <style jsx>{`
           .EditUpdateForm {
             font-size: 1.2rem;
@@ -163,7 +163,7 @@ class EditUpdateForm extends React.Component {
           </div>
 
           <div className="row actions">
-            <Button className="bluewhite" type="submit" ref="submit" disabled={this.state.loading} >
+            <Button className="bluewhite" type="submit" disabled={this.state.loading} >
               { this.state.loading && <FormattedMessage id="form.processing" defaultMessage="processing" /> }
               { !this.state.loading && <FormattedMessage id="update.new.save" defaultMessage="Save Update" /> }
             </Button>
