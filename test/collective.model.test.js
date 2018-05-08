@@ -455,4 +455,52 @@ describe('Collective model', () => {
     });
   });
 
+  describe("goals", () => {
+
+    it("returns the next goal based on balance", async () => {
+      const goals = [
+        {
+          type: 'yearlyBudget',
+          amount: 500000,
+          title: "hire fte"
+        },
+        {
+          type: 'balance',
+          amount: 200000,
+          title: "buy laptop"
+        }
+      ];
+      await collective.update({ settings: { goals }});
+      const nextGoal = await collective.getNextGoal();
+      expect(nextGoal.type).to.equal('balance');
+      expect(nextGoal.amount).to.equal(200000);
+      expect(nextGoal.progress).to.equal(0.48);
+      expect(nextGoal.percentage).to.equal("48%");
+      expect(nextGoal.missing.amount).to.equal(103500)
+    });
+    
+    it("returns the next goal based on yearlBudget", async () => {
+      const goals = [
+        {
+          type: 'yearlyBudget',
+          amount: 500000,
+          title: "hire fte"
+        },
+        {
+          type: 'balance',
+          amount: 5000,
+          title: "buy stickers"
+        }
+      ];
+      await collective.update({ settings: { goals }});
+      const nextGoal = await collective.getNextGoal();
+      expect(nextGoal.type).to.equal('yearlyBudget');
+      expect(nextGoal.amount).to.equal(500000);
+      expect(nextGoal.interval).to.equal("year");
+      expect(nextGoal.missing.amount).to.equal(41667);
+      expect(nextGoal.missing.interval).to.equal("month");
+    });
+
+  });
+
 });

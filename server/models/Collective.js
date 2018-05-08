@@ -388,6 +388,50 @@ export default function(Sequelize, DataTypes) {
    * Instance Methods
    */
 
+  /**
+  * Returns the next goal with the progress and how much is missing (as one-time or monthly donation)
+  * Used for the monthly reports to backers
+  */
+  Collective.prototype.getNextGoal = async function(until) {
+    const goals = get(this, 'settings.goals');
+    if (!goals) return null;
+    const stats = {};
+    goals.sort((a, b) => {
+      if (a.amount < b.amount) return -1;
+      else return 1
+    });
+
+    let nextGoal;
+    await Promise.each(goals, async (goal) => {
+      if (nextGoal) return;
+      if (goal.type === 'balance') {
+        if (!stats.balance) {
+          stats.balance = await this.getBalance(until);
+        }
+        if (stats.balance < goal.amount) {
+          nextGoal = goal;
+          nextGoal.progress = Math.round(stats.balance/goal.amount*100) / 100;
+          nextGoal.percentage = `${nextGoal.progress * 100}%`;
+          nextGoal.missing = { amount: goal.amount - stats.balance };
+          return;
+        }
+      }
+      if (goal.type === 'yearlyBudget') {
+        if (!stats.yearlyBudget) {
+          stats.yearlyBudget = await this.getYearlyIncome(until);
+        }
+        if (stats.yearlyBudget < goal.amount) {
+          nextGoal = goal;
+          nextGoal.progress = Math.round(stats.yearlyBudget/goal.amount*100) / 100;
+          nextGoal.percentage = `${nextGoal.progress * 100}%`;
+          nextGoal.missing = { amount: Math.round((goal.amount - stats.yearlyBudget )/ 12), interval: 'month' }
+          nextGoal.interval = 'year';
+          return;
+        }
+      }
+    })
+    return nextGoal;
+  }
 
   // If no image has been provided, try to find a good image using clearbit/gravatar and save it if it returns 200
   Collective.prototype.findImage = function(user) {

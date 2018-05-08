@@ -53,13 +53,15 @@ describe('lib/email', () => {
   it('sends the thankyou.fr email template', () => {
 
     const template = 'thankyou';
-    const collective = { name: "La Primaire", slug: "laprimaire" };
+    const collective = { name: "En Marche", slug: "enmarchebe" };
     const data = {
       order: { totalAmount: 5000, currency: 'EUR'},
       transaction: { uuid: '17811b3e-0ac4-4101-81d4-86e9e0aefd7b' },
       config: { host: config.host },
       interval: 'month',
+      firstPayment: false,
       user: emailData.user,
+      fromCollective: { id: 1, slug: "xdamman", name: "Xavier" },
       collective
     };
     const options = {
@@ -76,7 +78,9 @@ describe('lib/email', () => {
         });
         expect(nm.sendMail.lastCall.args[0].from).to.equal(options.from);
         expect(nm.sendMail.lastCall.args[0].to).to.equal('emailbcc+user1-at-opencollective.com@opencollective.com');
-        expect(nm.sendMail.lastCall.args[0].subject).to.contain(`Merci pour votre donation de ${amountStr}/mois à La Primaire`);
+        expect(nm.sendMail.lastCall.args[0].subject).to.contain(`Merci pour votre donation de ${amountStr}/mois à En Marche`);
+        expect(nm.sendMail.lastCall.args[0].html).to.contain(`Merci pour continuer à nous soutenir`);
+        expect(nm.sendMail.lastCall.args[0].html).to.contain(`donate?referral=1`);
         expect(nm.sendMail.lastCall.args[0].headers['X-Mailgun-Tag']).to.equal('internal');
       });
   });

@@ -11,22 +11,35 @@ Subject: Merci pour votre donation de {{{currency order.totalAmount currency=ord
 {{#if fromCollective.name}}
 <p>{{fromCollective.name}},</p>
 {{else}}
-<p>Hi!</p>
+<p>Hep!</p>
 {{/if}}
 
 {{#if interval}}
-<p>Merci pour votre donation de {{{currency order.totalAmount currency=order.currency}}} par {{interval}}. Votre premier paiement vient d'être reçu. Votre don nous aidera à continuer nos activités.</p>
 
-<p>Veuillez noter que vos futurs paiements seront effectués au premier du mois. <a href='https://opencollective.com/faq#charge-date-notice'>Pourquoi?</a></p>
+  {{#if firstPayment }}
+    <p>Merci pour votre donation de {{{currency order.totalAmount currency=order.currency}}} par {{interval}}. Votre premier paiement vient d'être reçu. Votre don nous aidera à continuer nos activités.</p>
+    <p>Veuillez noter que vos futurs paiements seront effectués au premier du mois (<a href='https://opencollective.com/faq#charge-date-notice'>plus d'info</a>).</p>
+  {{else}}
+    <p>Votre dernière donation de {{{currency order.totalAmount currency=order.currency}}} vient d'être reçue. Merci pour continuer à nous soutenir!</p>
+  {{/if}}
 
 {{else}}
 <p>Merci pour votre donation de {{{currency order.totalAmount currency=order.currency}}}.
-  Votre don nous aidera à continuer nos activités.</p>
+  Votre don nous aide à continuer nos activités.</p>
 {{/if}}
 
-<p>Vous pouvez suivre nos prochaines activités et comment on va utiliser l'argent recolté sur notre page OpenCollective:
+{{#if matchingFund}}
+<p>🎉 Votre donation a été multipliée {{matchingFund.matching}}x par <a href="https://opencollective.com/{{matchingFund.collective.slug}}">{{matchingFund.collective.name}}</a>!</p>
+{{/if}}
+
+<p>Vous pouvez suivre nos prochaines activités et comment on va utiliser l'argent recolté sur la page de notre collectif ouvert:
   <a href="https://opencollective.com/{{collective.slug}}">https://opencollective.com/{{collective.slug}}</a>.
 </p>
+
+<h2>Aidez-nous à récolter plus d'argent!</h2>
+<p>Partagez cette URL: <a href="https://opencollective.com/{{collective.slug}}/donate?referral={{fromCollective.id}}">https://opencollective.com/{{collective.slug}}/donate?referral={{fromCollective.id}}</a><br />
+Cela nous permettra de savoir combien de dons vous aurez réussi à récolter (cette info sera affichée sur votre profil: <a href="https://opencollective.com/{{fromCollective.slug}}">https://opencollective.com/{{fromCollective.slug}}</a>).
+
 
 {{#if subscriptionsLink}}
   <p>
@@ -34,7 +47,7 @@ Subject: Merci pour votre donation de {{{currency order.totalAmount currency=ord
   </p>
 {{/if}}
 
-<p>Encore merci et gros bisous de nous tous! 😘,</p>
+<p>Encore merci! 🙏</p>
 
 <p>
   – Le collectif {{collective.name}}
