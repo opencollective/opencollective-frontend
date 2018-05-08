@@ -12,6 +12,14 @@ Backers: {{collective.stats.backers.lastMonth}} (+{{collective.stats.backers.new
 Current balance: {{{currency collective.stats.balance currency=currency}}} (+{{{currency collective.stats.totalDonations currency=currency}}}{{#if collective.stats.totalPaidExpenses}}, {{{currency collective.stats.totalPaidExpenses currency=currency}}}{{/if}}) 
 Your contribution: {{currency amount currency=currency}} per {{interval}}
 Member since: {{{moment createdAt}}}
+{{#if collective.updates}}
+
+Latest {{{pluralize "update" n=collective.updates.length}}}:
+{{#each collective.updates}}
+  - {{{moment publishedAt timezone=timezone format="MM/DD"}}} {{title}}
+  https://opencollective.com/{{../collective.slug}}/updates/{{slug}}
+{{/each}}
+{{/if}}
 {{#if collective.events.upcoming}}
 
 Upcoming {{{pluralize "event" n=collective.events.upcoming.length}}}:

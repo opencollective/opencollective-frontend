@@ -126,6 +126,10 @@ const processCollective = (collective) => {
         { model: models.Member, as: 'members' },
         { model: models.Order, as: 'orders' }
       ]
+    }),
+    models.Update.findAll({
+      where: { CollectiveId: collective.id, publishedAt: { $gte: startDate, $lt: endDate } },
+      order: [['createdAt', 'DESC']]
     })
   ];
 
@@ -142,6 +146,8 @@ const processCollective = (collective) => {
             data.collective.yearlyIncome = results[5];
             data.collective.expenses = results[6];
             data.collective.events = processEvents(results[7]);
+            data.collective.updates = results[8];
+            data.collective.stats.updates = results[8].length;
             console.log(data.collective.stats);
             collectivesData[collective.slug] = data.collective;
             return collective;

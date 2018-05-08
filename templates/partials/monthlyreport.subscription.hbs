@@ -136,6 +136,22 @@
           <td><p>You’re contributing <b>{{{currency amount currency=currency}}}</b> per {{interval}} since {{{moment createdAt}}}</p></td>
         </tr>
         <tr><td height="10"></td></tr>
+        {{#if collective.updates}}
+          <tr>
+            <td>
+              <label>Latest {{{pluralize "update" n=collective.updates.length}}}:</label>
+              <ul>
+              {{#each collective.updates}}
+                <li>{{{moment publishedAt timezone=timezone format="MM/DD"}}}
+                  <a href="https://opencollective.com/{{../collective.slug}}/updates/{{slug}}">{{title}}</a><br />
+                </li>
+              {{/each}}
+              </ul>
+            </td>
+          </tr>
+          <tr><td height="5"></td></tr>
+        {{/if}}
+
         {{#if collective.events.upcoming}}
           <tr>
             <td>
