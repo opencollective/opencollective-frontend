@@ -3,7 +3,7 @@ import Header from '../components/Header';
 import Body from '../components/Body';
 import Footer from '../components/Footer';
 import CollectiveCover from '../components/CollectiveCover';
-import { addCollectiveCoverData, addGetLoggedInUserFunction } from '../graphql/queries';
+import { addGetLoggedInUserFunction } from '../graphql/queries';
 import Loading from '../components/Loading';
 import NotFound from '../components/NotFoundPage';
 import ErrorPage from '../components/ErrorPage';
@@ -12,7 +12,7 @@ import withIntl from '../lib/withIntl';
 import ExpensesStatsWithData from '../components/ExpensesStatsWithData';
 import { pick } from 'lodash';
 import { FormattedMessage } from 'react-intl'
-import { graphql } from 'react-apollo'
+import { graphql, compose } from 'react-apollo'
 import gql from 'graphql-tag'
 import CreateExpenseForm from '../components/CreateExpenseForm';
 import Button from '../components/Button';
@@ -213,6 +213,65 @@ mutation createExpense($expense: ExpenseInputType!) {
 }
 `;
 
+const getCollectiveQuery = gql`
+  query Collective($slug: String!) {
+    Collective(slug: $slug) {
+      id
+      type
+      slug
+      path
+      name
+      currency
+      backgroundImage
+      expensePolicy
+      settings
+      image
+      isHost
+      tags
+      stats {
+        id
+        balance
+        updates
+        events
+        yearlyBudget
+        totalAmountReceived
+        backers {
+          all
+        }
+      }
+      createdByUser {
+        id
+      }
+      host {
+        id
+        slug
+        name
+        image
+        expensePolicy
+      }
+      parentCollective {
+        id
+        slug
+        name
+      }
+      members {
+        id
+        role
+        createdAt
+        description
+        member {
+          id
+          description
+          name
+          slug
+          type
+          image
+        }
+      }
+    }
+  }
+`;
+
 const addMutation = graphql(createExpenseQuery, {
   props: ( { mutate }) => ({
     createExpense: async (expense) => {
@@ -221,4 +280,8 @@ const addMutation = graphql(createExpenseQuery, {
   })
 });
 
-export default withData(addGetLoggedInUserFunction(addCollectiveCoverData(addMutation(withIntl(ExpensesPage)))));
+const addCollectiveData = graphql(getCollectiveQuery);
+
+const addData = compose(addCollectiveData, addMutation);
+
+export default withData(addGetLoggedInUserFunction(addData(withIntl(ExpensesPage))));

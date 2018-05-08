@@ -43,6 +43,7 @@ class EditCollectiveForm extends React.Component {
     };
 
     this.showEditTiers = ['COLLECTIVE', 'EVENT'].includes(collective.type);
+    this.showExpenses = collective.type === 'COLLECTIVE';
     this.showEditGoals = collective.type === 'COLLECTIVE';
     this.defaultTierType = collective.type === 'EVENT' ? 'TICKET' : 'TIER';
     this.showEditMembers = ['COLLECTIVE', 'ORGANIZATION'].includes(collective.type);
@@ -58,6 +59,9 @@ class EditCollectiveForm extends React.Component {
       'amount.label': { id: 'collective.amount.label', defaultMessage: 'amount' },
       'description.label': { id: 'collective.description.label', defaultMessage: 'Short description' },
       'longDescription.label': { id: 'collective.longDescription.label', defaultMessage: 'Long description' },
+      'expensePolicy.label': { id: 'collective.expensePolicy.label', defaultMessage: 'Expense policy' },
+      'expensePolicy.description': { id: 'collective.expensePolicy.description', defaultMessage: 'Submitting an expense can be daunting if the people in your community don\'t know what can or cannot be expensed. Help them by defining a simple expense policy.'  },
+      'expensePolicy.placeholder': { id: 'collective.expensePolicy.placeholder', defaultMessage: 'E.g. Feel free to expense your public transport or Uber/Lyft drive for up to XX. You can also expense drinks and food for meetups for up to XX. For other types of expenses, feel free to ask us.' },
       'startsAt.label': { id: 'collective.startsAt.label', defaultMessage: 'start date and time' },
       'image.label': { id: 'collective.image.label', defaultMessage: 'Avatar' },
       'backgroundImage.label': { id: 'collective.backgroundImage.label', defaultMessage: 'Cover image' },
@@ -189,6 +193,13 @@ class EditCollectiveForm extends React.Component {
           when: () => this.state.section === 'images'
         }
       ],
+      expenses: [
+        {
+          name: 'expensePolicy',
+          type: 'textarea',
+          description: 'Protip: you can use markdown'
+        }
+      ],
       advanced: [
         {
           name: 'slug',
@@ -213,6 +224,9 @@ class EditCollectiveForm extends React.Component {
       }
       if (this.messages[`${field.name}.description`]) {
         field.description = intl.formatMessage(this.messages[`${field.name}.description`]);
+      }
+      if (this.messages[`${field.name}.placeholder`]) {
+        field.placeholder = intl.formatMessage(this.messages[`${field.name}.placeholder`]);
       }
       return field;
       });
@@ -240,7 +254,11 @@ class EditCollectiveForm extends React.Component {
           overflow: hidden;
         }
 
-        :global(textarea[name=longDescription]) {
+        .EditCollectiveForm :global(textarea[name=longDescription]) {
+          height: 30rem;
+        }
+
+        .EditCollectiveForm :global(textarea[name=expensePolicy]) {
           height: 30rem;
         }
 
@@ -301,6 +319,11 @@ class EditCollectiveForm extends React.Component {
             { this.showEditTiers &&
               <Button className="menuBtn tiers" bsStyle={this.state.section === 'tiers' ? 'primary' : 'default'} onClick={() => this.showSection('tiers')}>
                 <FormattedMessage id='editCollective.menu.tiers' defaultMessage='tiers' />
+              </Button>
+            }
+            { this.showExpenses &&
+              <Button className="menuBtn expenses" bsStyle={this.state.section === 'expenses' ? 'primary' : 'default'} onClick={() => this.showSection('expenses')}>
+                <FormattedMessage id='editCollective.menu.expenses' defaultMessage='expenses' />
               </Button>
             }
             { this.showPaymentMethods &&

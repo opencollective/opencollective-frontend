@@ -8,6 +8,7 @@ import SignInForm from './SignInForm';
 import categories from '../constants/categories';
 import { get } from 'lodash';
 import Button from './Button';
+import Markdown from 'react-markdown';
 
 class CreateExpenseForm extends React.Component {
 
@@ -129,7 +130,7 @@ class CreateExpenseForm extends React.Component {
             overflow: hidden;
             margin: 0 1rem 5rem 1rem;
           }
-          .disclaimer {
+          .disclaimer, .expensePolicy {
             font-size: 1.4rem;
             margin: 2rem 0;
           }
@@ -246,6 +247,17 @@ class CreateExpenseForm extends React.Component {
         `}</style>
 
         <form onSubmit={this.onSubmit}>
+          { (collective.expensePolicy || get(collective, 'host.expensePolicy') ) &&
+            <div className="expensePolicy">
+            <h2><FormattedMessage id="expense.expensePolicy" defaultMessage="Expense policy" /></h2>
+              { collective.expensePolicy &&
+                <Markdown source={collective.expensePolicy} />
+              }
+              { get(collective, 'host.expensePolicy') &&
+                <Markdown source={get(collective, 'host.expensePolicy')} />
+              }
+            </div>
+          }
           <div className="disclaimer">
             <FormattedMessage id="expense.disclaimer" defaultMessage="Please make sure to upload a valid receipt or invoice. We should be able to see clearly on the picture (or PDF) the total amount paid, the date, the items purchased and the legal address." />
           </div>
