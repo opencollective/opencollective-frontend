@@ -15,7 +15,8 @@ const defaultTiers = (collectiveData) => {
       description: "Sponsor our meetup and get: a shout-out on social media, presence on the merch table and your logo on our meetup page.",
       slug: '1month-sponsor',
       amount: 25000,
-      button: "become a sponsor"
+      button: "become a sponsor",
+      currency: collectiveData.currency
     });
     tiers.push({
       type: 'TIER',
@@ -23,7 +24,8 @@ const defaultTiers = (collectiveData) => {
       description: "**10% off!** - Sponsor our meetup and get: a shout-out on social media, presence on the merch table and your logo on our meetup page.",
       slug: '3month-sponsor',
       amount: 67500,
-      button: "become a sponsor"
+      button: "become a sponsor",
+      currency: collectiveData.currency
     });
     tiers.push({
       type: 'TIER',
@@ -31,7 +33,8 @@ const defaultTiers = (collectiveData) => {
       description: "**20% off!** - Sponsor our meetup and get: a shout-out on social media, presence on the merch table and your logo on our meetup page.",
       slug: '6month-sponsor',
       amount: 120000,
-      button: "become a sponsor"
+      button: "become a sponsor",
+      currency: collectiveData.currency
     });
     return tiers;
   }
@@ -42,7 +45,8 @@ const defaultTiers = (collectiveData) => {
       slug: 'backers',
       amount: 500,
       presets: [500, 1000, 2500, 5000],
-      interval: 'month'
+      interval: 'month',
+      currency: collectiveData.currency
     });
     tiers.push({
       type: 'TIER',
@@ -50,7 +54,8 @@ const defaultTiers = (collectiveData) => {
       slug: 'sponsors',
       amount: 10000,
       presets: [10000, 25000, 50000],
-      interval: 'month'
+      interval: 'month',
+      currency: collectiveData.currency
     });
   }
   return tiers;
