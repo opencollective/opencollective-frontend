@@ -10,6 +10,9 @@ This is your monthly report for all the collectives that you are supporting on o
 {{collective.publicUrl}}
 Backers: {{collective.stats.backers.lastMonth}} (+{{collective.stats.backers.new}}{{#if collective.stats.backers.lost}}, -{{collective.stats.backers.lost}}{{/if}})
 Current balance: {{{currency collective.stats.balance currency=currency}}} (+{{{currency collective.stats.totalDonations currency=currency}}}{{#if collective.stats.totalPaidExpenses}}, {{{currency collective.stats.totalPaidExpenses currency=currency}}}{{/if}}) 
+{{#if collective.nextGoal}}
+Next goal: {{{currency collective.nextGoal.amount currency=currency}}}{{#if collective.nextGoal.interval}}/{{collective.nextGoal.interval}}{{/if}} to {{collective.nextGoal.title}} ({{collective.nextGoal.percentage}} - missing {{{currency collective.nextGoal.missing.amount currency=currency}}}{{#if collective.nextGoal.missing.interval}}/{{collective.nextGoal.missing.interval}}{{/if}})
+{{/if}}
 Your contribution: {{currency amount currency=currency}} per {{interval}}
 Member since: {{{moment createdAt}}}
 {{#if collective.updates}}

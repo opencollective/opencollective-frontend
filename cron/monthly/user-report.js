@@ -130,7 +130,8 @@ const processCollective = (collective) => {
     models.Update.findAll({
       where: { CollectiveId: collective.id, publishedAt: { $gte: startDate, $lt: endDate } },
       order: [['createdAt', 'DESC']]
-    })
+    }),
+    collective.getNextGoal(endDate)
   ];
 
   return Promise.all(promises)
@@ -148,6 +149,7 @@ const processCollective = (collective) => {
             data.collective.events = processEvents(results[7]);
             data.collective.updates = results[8];
             data.collective.stats.updates = results[8].length;
+            data.collective.nextGoal = results[9];
             console.log(data.collective.stats);
             collectivesData[collective.slug] = data.collective;
             return collective;

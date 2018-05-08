@@ -202,6 +202,20 @@
           </td>
         </tr>
         <tr><td height="10"></td></tr>
+
+        {{#if collective.nextGoal}}
+          <tr>
+            <td>
+              <label>Next goal: {{{currency collective.nextGoal.amount currency=currency}}}{{#if collective.nextGoal.interval}}/{{collective.nextGoal.interval}}{{/if}}</label>
+                <p>
+                  {{collective.nextGoal.title}}<br />
+                  ({{collective.nextGoal.percentage}} - missing {{{currency collective.nextGoal.missing.amount currency=currency}}}{{#if collective.nextGoal.missing.interval}}/{{collective.nextGoal.missing.interval}}{{/if}})
+                </p>
+            </td>
+          </tr>
+          <tr><td height="5"></td></tr>
+        {{/if}}
+
         <tr>
           <td>
             <div class="latestExpenses">
