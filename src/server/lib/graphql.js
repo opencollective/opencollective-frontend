@@ -1,10 +1,9 @@
-import dotenv from 'dotenv';
-dotenv.config();
 import { GraphQLClient } from 'graphql-request';
 import { uniqBy } from 'lodash';
-const graphqlServerUrl = `${process.env.API_URL}/graphql?api_key=${process.env.API_KEY}`;
-console.log(">>> connecting to ", graphqlServerUrl);
-const client = new GraphQLClient(graphqlServerUrl, { headers: {} })
+
+import { getGraphqlUrl } from '../../lib/utils'
+
+const client = new GraphQLClient(getGraphqlUrl(), { headers: {} })
 
 export async function fetchCollective(collectiveSlug) {
   const query = `
@@ -280,7 +279,7 @@ export async function fetchInvoice(invoiceSlug, accessToken) {
     }
   }
   `;
-  const client = new GraphQLClient(graphqlServerUrl, { headers: { authorization: `Bearer ${accessToken}`} })
+  const client = new GraphQLClient(getGraphqlUrl(), { headers: { authorization: `Bearer ${accessToken}`} })
   const result = await client.request(query, { invoiceSlug });
   return result.Invoice;
 }

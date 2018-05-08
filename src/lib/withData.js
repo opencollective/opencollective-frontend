@@ -1,42 +1,26 @@
 import { ApolloProvider, getDataFromTree } from 'react-apollo'
 import React from 'react'
 import PropTypes from 'prop-types';
-import 'isomorphic-fetch'
 import { initClient } from './initClient'
 import Head from 'next/head'
 
-const env = process.env.NODE_ENV || "development";
-
-let { API_URL, API_KEY } = process.env;
-switch (env) {
-  case 'development':
-    API_KEY = (API_URL || (API_KEY && API_KEY.length > 24)) ? API_KEY : 'dvl-1510egmf4a23d80342403fb599qd';
-    API_URL = API_URL || 'http://localhost:3060';
-    break;
-  case 'production':
-    API_URL = API_URL || 'https://opencollective.com/api';
-    break;
-  case 'staging':
-    API_URL = API_URL || 'https://staging.opencollective.com/api';
-    break;
-}
-
-const api_key_param = (API_KEY) ? `?api_key=${API_KEY}` : '';
-const graphqlUri = `${API_URL}/graphql${api_key_param}`;
-
 export default ComposedComponent => {
+
   return class WithData extends React.Component {
+
     static displayName = `WithData(${ComposedComponent.displayName})`
+
     static propTypes = {
-      serverState: PropTypes.object.isRequired
+      serverState: PropTypes.object.isRequired,
+      options: PropTypes.object
     }
 
     static async getInitialProps (ctx) {
       let serverState = {}
 
       const headers = ctx.req ? ctx.req.headers : {}
+
       const options = {
-        uri: graphqlUri,
         headers
       }
 
