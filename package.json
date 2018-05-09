@@ -1,6 +1,10 @@
 {
   "name": "opencollective-frontend",
   "version": "2.0.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/opencollective/frontend.git"
+  },
   "private": true,
   "engines": {
     "node": "8.4.0"
@@ -105,7 +109,9 @@
     "hint": "npm run lint",
     "lint": "eslint '**/*.js' --quiet",
     "lint:fix": "eslint '**/*.js' --fix",
-    "pretest": "npm run lint"
+    "pretest": "npm run lint",
+    "commit": "git-cz",
+    "semantic-release": "semantic-release"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
@@ -114,7 +120,9 @@
     "babel-preset-stage-0": "^6.24.1",
     "chai": "4.1.2",
     "chromeless": "1.4.0",
+    "commitizen": "^2.9.6",
     "cypress": "1.4.1",
+    "cz-conventional-changelog": "^2.1.0",
     "eslint": "^4.19.1",
     "eslint-config-opencollective": "^1.2.0",
     "eslint-plugin-cypress": "^2.0.1",
@@ -126,6 +134,7 @@
     "raf": "^3.4.0",
     "react-test-renderer": "16.2.0",
     "regenerator-runtime": "0.11.0",
+    "semantic-release": "^15.3.1",
     "sinon": "2.4.1"
   },
   "postcss": {
@@ -142,5 +151,10 @@
       "raf/polyfill",
       "<rootDir>/test/setup.js"
     ]
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
   }
 }
