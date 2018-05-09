@@ -61,19 +61,15 @@ describe("notification.model.test.js", () => {
     let users;
     beforeEach(() => Promise.map([utils.data('user3'), utils.data('user4')], user => models.User.createUserWithCollective(user)).then(result => users = result))
 
-    it('getSubscribers to the backers mailinglist', () => Promise.map(users, user => collective.addUserWithRole(user, 'BACKER').catch(e => console.error(e)))
-      .then(() => Notification.getSubscribersUsers(collective.slug, 'backers').catch(e => console.error(e)))
-      .tap(subscribers => {
-        expect(subscribers.length).to.equal(2);
-      })
-      .tap(subscribers => {
-        return subscribers[0].unsubscribe(collective.id, 'mailinglist.backers')
-      })
-      .then(() => Notification.getSubscribers(collective.slug, 'backers'))
-      .tap(subscribers => {
-        expect(subscribers.length).to.equal(1);
-      })
-      .catch(e => console.error(e)));
+    it('getSubscribers to the backers mailinglist', async () => {
+      await Promise.map(users, user => collective.addUserWithRole(user, 'BACKER'));
+      const subscribers = await Notification.getSubscribersUsers(collective.slug, 'backers');
+      expect(subscribers.length).to.equal(2);
+
+      await subscribers[0].unsubscribe(collective.id, 'mailinglist.backers')
+      const subscribers2 = await Notification.getSubscribers(collective.slug, 'backers');
+      expect(subscribers2.length).to.equal(1);
+    });
 
     it('getSubscribers to an event', () => {
       const eventData = utils.data('event1');
@@ -117,8 +113,7 @@ describe("notification.model.test.js", () => {
       .then(() => Notification.getSubscribers(eventData.slug))
       .then(subscribers => {
         expect(subscribers.length).to.equal(1);
-      })
-      .catch(console.error)
+      });
     })
   });
 });
