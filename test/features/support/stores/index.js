@@ -24,11 +24,15 @@ export function randEmail(email) {
  *
  * @param {String} name is the name of the new user. The email created
  *  for the user will be `{name}@oc.com`.
+ * @param {Object} data is whatever other data that needs to be passed
+ *  to the user's creation. The fields "name", "email", "username" and
+ *  "description" can't be overrided.
  * @return {Object} with references for `user` and `userCollective`.
  */
-export async function newUser(name) {
+export async function newUser(name, data={}) {
   const email = randEmail(`${name}@oc.com`);
   const user = await models.User.createUserWithCollective({
+    ...data,
     email,
     name,
     username: name,
@@ -37,7 +41,7 @@ export async function newUser(name) {
   return { user, userCollective: user.collective };
 }
 
-/** Create a new collective with host
+/** Create new a host, a collective and add collective to the host
  *
  * @param {String} name Name of the collective.
  * @param {String} currency is the currency of the host
