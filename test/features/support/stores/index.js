@@ -1,7 +1,9 @@
-/** @module test.stores
+/** @module test/features/support/stores
  *
- * Helpers for interacting with the database models. */
+ * Helpers for interacting with the database models.
+ */
 import models from '../../../../server/models';
+import * as expenses from '../../../../server/graphql/mutations/expenses';
 
 /** Randomize email since it's a unique key in the database
  *
@@ -49,18 +51,53 @@ export async function newUser(name, data={}) {
  * @returns {Object} with references for `hostCollective`,
  *  `hostOwner`, and `collective`.
  */
-export async function collectiveWithHost(name, currency, fee) {
-  const email = randEmail(`${name}-host-${currency}@oc.com`);
-  const hostOwner = await models.User.create({ email });
+export async function hostAndCollective(name, currency, fee) {
+  const hostAdmin = (await newUser(`${name}-${currency}-admin`)).user;
   const hostCollective = await models.Collective.create({
-    CreatedByUserId: hostOwner.id,
+    CreatedByUserId: hostAdmin.id,
     name: `${name} Host`,
     slug: `${name}-host`,
     hostFeePercent: fee ? parseInt(fee) : 0,
     currency,
   });
+  await hostCollective.addUserWithRole(hostAdmin, 'ADMIN');
+
   const collective = await models.Collective.create({ name });
   await collective.addHost(hostCollective);
-  await hostOwner.update({ CollectiveId: hostCollective.id });
-  return { hostCollective, hostOwner, collective };
+  return { hostCollective, hostAdmin, collective };
+}
+
+/** Create a collective and associate to a given host.
+ *
+ * @param {String} name is the name of the collective being created.
+ * @param {models.Collective} hostCollective is an already collective
+ *  meant to be the host of the collective being created here.
+ * @return {models.Collective} a newly created collective hosted by
+ *  `hostCollective`.
+ */
+export async function collectiveWithHost(name, hostCollective) {
+  const collective = await models.Collective.create({ name });
+  await collective.addHost(hostCollective);
+  return { collective };
+}
+
+/** Create a new expense in a collective
+ *
+ * This is just adds an existing utility to this namespace for
+ * consistency.
+ * @see {graphql.mutations.expenses.createExpense}.
+ *
+ * This function uses the `createExpense` mutation to do its
+ * job. Which guarantees that expenses created in tests will go
+ * through all the same validations as if they were created by users.
+ *
+ * @param {models.User} user an instance of the User model that will
+ *  be used to perform the action of creating the expense.
+ * @param {Object} expenseData contains values for the brand new
+ *  expense. It especifically waits for the fields `amount`,
+ *  `currency`, `description` and `paymentMethod`.
+ * @return {models.Expense} newly created expense instance.
+ */
+export async function createExpense(user, expenseData) {
+  return expenses.createExpense(user, expenseData);
 }

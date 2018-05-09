@@ -12,9 +12,9 @@ Given('a User {string}', async function (name) {
 });
 
 Given(/^a Collective "([^\"]+)" with a host in "([^\"]+)"(\, "([^\"]+)%" fee)?$/, async function (name, currency, fee) {
-  const { hostCollective, hostOwner, collective } = await store.collectiveWithHost(name, currency, fee);
+  const { hostCollective, hostAdmin, collective } = await store.hostAndCollective(name, currency, fee);
   this.addValue(name, collective);
-  this.addValue(`${name}-hostOwner`, hostOwner);
+  this.addValue(`${name}-hostAdmin`, hostAdmin);
   this.addValue(`${name}-host`, hostCollective);
 });
 
@@ -39,18 +39,18 @@ When('{string} expenses {string} for {string} to {string} via {string}', async f
 });
 
 When('expense for {string} is approved by {string}', async function(description, collectiveName) {
-  const hostOwner = this.getValue(`${collectiveName}-hostOwner`);
+  const hostAdmin = this.getValue(`${collectiveName}-hostAdmin`);
   const expense = this.getValue(`expense-${description}`);
   const query = `mutation approveExpense($id: Int!) { approveExpense(id: $id) { id } }`;
-  const result = await utils.graphqlQuery(query, expense, hostOwner);
+  const result = await utils.graphqlQuery(query, expense, hostAdmin);
   expect(result.errors).to.not.exist;
 });
 
 When('expense for {string} is paid by {string}', async function(description, collectiveName) {
-  const hostOwner = this.getValue(`${collectiveName}-hostOwner`);
+  const hostAdmin = this.getValue(`${collectiveName}-hostAdmin`);
   const query = `mutation payExpense($id: Int!) { approveExpense(id: $id) { id } }`;
   const expense = this.getValue(`expense-${description}`);
-  const result = await utils.graphqlQuery(query, expense, hostOwner);
+  const result = await utils.graphqlQuery(query, expense, hostAdmin);
   expect(result.errors).to.not.exist;
 });
 
