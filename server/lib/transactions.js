@@ -64,7 +64,7 @@ export function createFromPaidExpense(host, paymentMethod, expense, paymentRespo
         throw new errors.BadRequest(`Please approve this payment manually on ${createPaymentResponse.paymentApprovalUrl}`);
 
       default:
-        throw new errors.ServerError(`controllers.expenses.pay: Unknown error while trying to create transaction for expense ${expense.id}`);
+        throw new errors.ServerError(`controllers.expenses.pay: Unknown error while trying to create transaction for expense ${expense.id}. The full response was: ${JSON.stringify(executePaymentResponse)}`);
     }
 
     const senderFees = createPaymentResponse.defaultFundingPlan.senderFees;
