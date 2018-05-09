@@ -7,6 +7,11 @@ const cache = LRU({
   maxAge: 1000 * 60 * 60 * 24 // we keep it max 1d
 });
 
+/** Reset cache mostly for tests */
+export function clearCache() {
+  cache.reset();
+}
+
 export async function fetchCollectiveId(collectiveSlug) {
 
   const collectiveId = cache.get(collectiveSlug);

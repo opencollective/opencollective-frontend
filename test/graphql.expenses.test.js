@@ -48,6 +48,8 @@ describe('GraphQL Expenses API', () => {
 
   beforeEach(utils.resetTestDB);
 
+  beforeEach(utils.resetCaches);
+
   describe('#allExpenses', () => {
 
     it('fails if collective not found', async () => {

@@ -1,4 +1,5 @@
 import Promise from 'bluebird';
+import nock from 'nock';
 import {sequelize} from '../server/models';
 import jsonData from './mocks/data';
 import userlib from '../server/lib/userlib';
@@ -10,9 +11,10 @@ import debug from 'debug';
 import { loaders } from '../server/graphql/loaders';
 import { graphql } from 'graphql';
 import schema from '../server/graphql/schema';
+import * as libcache from '../server/lib/cache';
 import Stripe from 'stripe';
 const appStripe = Stripe(config.stripe.secret);
-import nock from 'nock';
+
 if (process.env.RECORD) {
   nock.recorder.rec();
 }
@@ -31,6 +33,8 @@ export const clearbitStubBeforeEach = sandbox => {
 };
 
 export const clearbitStubAfterEach = (sandbox) => sandbox.restore();
+
+export const resetCaches = () => libcache.clearCache();
 
 export const resetTestDB = () => sequelize.sync({force: true})
   .catch(e => {
