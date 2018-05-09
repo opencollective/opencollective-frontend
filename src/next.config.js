@@ -11,7 +11,8 @@ module.exports = {
     config.plugins.push(
       new webpack.IgnorePlugin(/react\/addons/),
       new webpack.IgnorePlugin(/react\/lib\/ExecutionEnvironment/),
-      new webpack.IgnorePlugin(/react\/lib\/ReactContext/)
+      new webpack.IgnorePlugin(/react\/lib\/ReactContext/),
+      new webpack.ContextReplacementPlugin(/moment[/\\]locale$/, /en|fr|es|ja/),
     );
     config.module.rules.push(
       {
