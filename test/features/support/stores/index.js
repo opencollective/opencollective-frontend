@@ -15,7 +15,7 @@ import models from '../../../../server/models';
  * 'foo-lwfi9uaq9ua@bar.com'
  */
 export function randEmail(email) {
-  const [user, domain] = email.split('@');
+  const [user, domain] = email.replace(/\s/g, '-').split('@');
   const rand = Math.random().toString(36).substring(2, 15);
   return `${user}-${rand}@${domain}`;
 }
