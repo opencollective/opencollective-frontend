@@ -1,12 +1,9 @@
+import 'isomorphic-fetch'
 import { ApolloClient, createNetworkInterface, IntrospectionFragmentMatcher } from 'react-apollo'
-import fetch from 'isomorphic-fetch'
+
+import { getGraphqlUrl } from './utils'
 
 let apolloClient = null
-
-// Polyfill fetch() on the server (used by apollo-client)
-if (!process.browser) {
-  global.fetch = fetch
-}
 
 const fragmentMatcher = new IntrospectionFragmentMatcher({
   introspectionQueryResultData: {
@@ -39,7 +36,7 @@ function createClient (initialState, options = {}) {
     initialState,
     shouldBatch: true, // should speed up performance
     networkInterface: createNetworkInterface({
-      uri: options.uri,
+      uri: getGraphqlUrl(),
       opts: {
         credentials: 'same-origin',
         headers

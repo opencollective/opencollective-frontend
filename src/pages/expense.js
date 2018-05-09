@@ -22,7 +22,9 @@ class ExpensePage extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {
+      isPayActionLocked: false,
+    };
   }
 
   async componentDidMount() {
@@ -110,7 +112,10 @@ class ExpensePage extends React.Component {
                   collective={collective}
                   view="details"
                   LoggedInUser={this.state.LoggedInUser}
-                  />
+                  allowPayAction={!this.state.isPayActionLocked}
+                  lockPayAction={() => this.setState({ isPayActionLocked: true })}
+                  unlockPayAction={() => this.setState({ isPayActionLocked: false })}
+                />
 
               </div>
 

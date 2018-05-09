@@ -690,7 +690,6 @@ class OrderForm extends React.Component {
                   className="horizontal"
                   type="text"
                   name="organization_website"
-                  pre="http://"
                   label={intl.formatMessage(this.messages['order.organization.website'])}
                   onChange={(value) => this.handleChange("fromCollective", "website", value)}
                   />

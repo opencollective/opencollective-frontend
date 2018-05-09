@@ -83,3 +83,12 @@ and replace `ja` with your 2-4 letter locale code.
 
 Then you can submit a pull request, like this one :-)
 https://github.com/opencollective/frontend/pull/119
+
+## Contributing
+
+1. Your commits conform to the conventions established [here](https://github.com/conventional-changelog/conventional-changelog-angular/blob/master/convention.md)
+2. This project used [commitizen](https://github.com/commitizen/cz-cli) and [semantic-release](https://github.com/semantic-release/semantic-release) to handle npm version from CI
+  + run git add first to add your changes to staging
+  + use `npm run commit` to commit, and CI will do the rest.
+  + if changes contain breaking change, use `BREAKING CHANGE` keyword in the comment to trigger major release
+  + before push to git and trigger CI, you can dry run `npm run semantic-release` locally to make sure the version number is push as expected.
