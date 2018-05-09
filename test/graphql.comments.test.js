@@ -88,7 +88,6 @@ describe('graphql.comments.test', () => {
 
     it("fails if not authenticated", async () => {
       const result = await utils.graphqlQuery(createCommentQuery, { comment });
-      result.errors && console.error(result.errors[0]);
       expect(result.errors).to.have.length(1);
       expect(result.errors[0].message).to.equal("You must be logged in to create a comment");
     });

@@ -52,8 +52,6 @@ describe("graphql.connectedAccounts.test.js", () => {
       res = await utils.graphqlQuery(editConnectedAccountQuery, { connectedAccount: connectedAccountData }, backer);
       expect(res.errors).to.exist;
       expect(res.errors[0].message).to.contain("You don't have permission to edit this connected account");
-      res.errors && console.error(res.errors[0]);
-      console.log(">>> ", res.data);
     })
   });
 

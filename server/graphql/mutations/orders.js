@@ -1,4 +1,5 @@
 import { pick, omit } from 'lodash';
+import debug from 'debug';
 import Promise from 'bluebird';
 
 import models from '../../models';
@@ -10,6 +11,8 @@ import roles from '../../constants/roles';
 import * as errors from '../errors';
 import activities from '../../constants/activities';
 import { getNextChargeAndPeriodStartDates, getChargeRetryCount} from '../../lib/subscriptions';
+
+const debugOrder = debug('order');
 
 export function createOrder(_, args, req) {
   let tier, collective, fromCollective, paymentRequired, interval, orderCreated, user;
@@ -230,10 +233,9 @@ export function createOrder(_, args, req) {
       return order;
     })
     .catch(e => {
-      // helps debugging
-      console.error(">>> createOrder mutation error: ", e)
+      debugOrder("createOrder mutation error: ", e);
       throw e;
-    })
+    });
 }
 
 export function cancelSubscription(remoteUser, orderId) {

@@ -29,7 +29,6 @@ describe('graphql.invoices.test.js', () => {
         }
       `;
       const result = await utils.graphqlQuery(query, { fromCollectiveSlug: "xdamman" });
-      result.errors && console.error(result.errors[0]);
       expect(result.errors).to.exist;
       expect(result.errors[0].message).to.contain("You don't have permission to access invoices for this user");
     });
