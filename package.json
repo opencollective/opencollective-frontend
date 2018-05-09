@@ -95,7 +95,7 @@
     "test": "TZ=utc jest src/* && npm run test:e2e",
     "test:server": "jest test/server/*",
     "test:e2e": "./scripts/run_e2e_tests.sh",
-    "build:server": "babel -D ./src -d ./build --ignore widget.js && cp src/templates/widget.js build/templates/",
+    "build:server": "babel -D ./src -d ./build --ignore src/templates/widget.js,__tests__/* && cp src/templates/widget.js build/templates/",
     "build:langs": "rm -rf build/messages && babel src > /dev/null && babel-node scripts/translate.js",
     "deploy:production": "git push production master",
     "deploy:staging": "git push -f staging master && heroku ps:scale web=1 -a opencollective-staging-api && heroku ps:scale web=1 -a oc-staging-frontend && heroku ps:scale web=1 -a opencollective-staging-website",
