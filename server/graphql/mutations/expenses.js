@@ -15,7 +15,7 @@ async function _createActivity(expense, type) {
   const userCollective = await models.Collective.findById(user.CollectiveId);
   const host = await expense.collective.getHostCollective();
   const transaction = expense.status === statuses.PAID && await models.Transaction.findOne({ where: { type: 'DEBIT', ExpenseId: expense.id }});
-  models.Activity.create({
+  await models.Activity.create({
     type,
     UserId: expense.UserId,
     CollectiveId: expense.collective.id,
@@ -93,7 +93,7 @@ export async function updateExpenseStatus(remoteUser, expenseId, status) {
 
   const res = await expense.update({ status, lastEditedById: remoteUser.id });
   if (status === statuses.APPROVED) {
-    _createActivity(expense, activities.COLLECTIVE_EXPENSE_APPROVED);
+    await _createActivity(expense, activities.COLLECTIVE_EXPENSE_APPROVED);
   }
 
   return res;
@@ -146,7 +146,7 @@ export async function createExpense(remoteUser, expenseData) {
 
   expense.user = remoteUser;
   expense.collective = collective;
-  _createActivity(expense, activities.COLLECTIVE_EXPENSE_CREATED);
+  await _createActivity(expense, activities.COLLECTIVE_EXPENSE_CREATED);
 
   return expense;
 }

@@ -840,8 +840,8 @@ export default function(Sequelize, DataTypes) {
       MemberCollectiveId: hostCollective.id,
       CollectiveId: this.id,
     };
-    this.update({ HostCollectiveId: hostCollective.id });
-    return models.Member.create(member);
+    return this.update({ HostCollectiveId: hostCollective.id })
+      .then(() => models.Member.create(member));
   };
 
   // edit the list of members and admins of this collective (create/update/remove)
