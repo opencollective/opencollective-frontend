@@ -1,8 +1,10 @@
 import _ from 'lodash';
 import curlify from 'request-as-curl';
+import libdebug from 'debug';
 import errors from '../lib/errors';
 import emailLib from '../lib/email';
 
+const debug = libdebug('express');
 
 const sendErrorByEmail = (req, err) => {
   let errorHTML = 'To reproduce this error, run this CURL command:<br />\n<br />\n';
@@ -63,8 +65,8 @@ export default (err, req, res, next) => {
     sendErrorByEmail(req, err);
   }
 
-  console.error('Error Express : ', err);
-  if (err.stack) console.log(err.stack);
+  debug('Error Express : ', err);
+  if (err.stack) debug(err.stack);
 
   res.status(err.code).send({error: err});
 };

@@ -44,8 +44,9 @@ export default function(app) {
     });
   }
 
-  // Logs.
-  app.use(morgan('dev'));
+  // Log requests if it's not the test environment
+  if (!['test', 'circleci'].includes(process.env.NODE_ENV))
+    app.use(morgan('dev'));
 
   // Body parser.
   app.use(bodyParser.json({limit: '50mb'}));

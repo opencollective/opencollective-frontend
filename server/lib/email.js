@@ -36,11 +36,9 @@ const render = (template, data) => {
     filepath = `/tmp/${template}.${slug}.html`;
     const script = `<script>data=${JSON.stringify(data)};</script>`;
     fs.writeFileSync(filepath, `${html}\n\n${script}`);
-    console.log(`Preview email template: file://${filepath}`);
     if (text) {
       filepath = `/tmp/${template}.${slug}.txt`;
       fs.writeFileSync(filepath, text);
-      console.log(`Preview email template: file://${filepath}`);
     }
   }
 
@@ -155,7 +153,7 @@ const sendMessage = (recipients, subject, html, options = {}) => {
       })
     });
   } else {
-    console.warn("Warning: No email sent - Mailgun is not configured");
+    debug(">>> mailgun not configured");
     return Promise.resolve();
   }
 };
