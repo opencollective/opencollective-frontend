@@ -44,11 +44,18 @@ most likely broken.
    expense that was previously created with the same `<description>`
    is approved by the `<collective>`.
 
- * `When expense for {description} is paid by {collective}`: The
-   expense that was previously created with the same `<description>`
-   is marked as paid by the `<collective>`.
+ * `When expense for {description} is paid by {collective} with {fee} fee`:
+   The expense that was previously created with the same
+   `<description>` is marked as paid by the `<collective>`. The
+   `<fee>` can be expressed as a percentage of the total of the
+   expense (when the sign [%] is present in the end of the
+   string. Otherwise it will just use the input as the absolute value.
 
  * `Then {name} should have contributed {value} to {collective}`: This
    **assertion** checks if a user `<name>` contributed a certain
    amount to a collective. The `<value>` field is a string that
    contains amount and currency. e.g.: `10 USD`.
+
+ * `Then {collective} should have {value} in their balance`: This
+   asserts that a given collective has a certain value in their
+   balance.

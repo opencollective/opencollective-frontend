@@ -1,9 +1,35 @@
 import { expect } from 'chai';
 import { Given, When, Then } from 'cucumber';
 
+import * as libpayments from '../../../../server/lib/payments';
 import * as libtransactions from '../../../../server/lib/transactions';
 import * as store from '../stores';
 import * as utils from '../../../utils';
+
+/** Helper for interpreting fee description
+ *
+ * The fee can be expressed as an absolute value, like "50" which
+ * means $50.00 (the value will be multiplied by 100 to account for
+ * the cents).
+ *
+ * The fee can also be expressed as a percentage of the value. In that
+ * case it looks like "5%". That's why this helper takes the amount
+ * parameter so the absolute value of the fee can be calculated.
+ *
+ * @param {Number} amount is the total amount of the expense. Used to
+ *  calculate the absolute value of fees expressed as percentages.
+ * @param {String} feeStr is the data read from the `.features` test
+ *  file. That can be expressed as an absolute value or as a
+ *  percentage.
+ */
+const readFee = (amount, feeStr) => {
+  if (feeStr.endsWith('%')) {
+    const asFloat = parseFloat(feeStr.replace('%', ''));
+    return asFloat > 0 ? libpayments.calcFee(amount, asFloat) : asFloat;
+  } else {
+    return parseFloat(feeStr) * 100;
+  }
+};
 
 Given('a User {string}', async function (name) {
   const { user, userCollective } = await store.newUser(name);
@@ -46,11 +72,13 @@ When('expense for {string} is approved by {string}', async function(description,
   expect(result.errors).to.not.exist;
 });
 
-When('expense for {string} is paid by {string}', async function(description, collectiveName) {
+When('expense for {string} is paid by {string} with {string} fee', async function(description, collectiveName, fee) {
   const hostAdmin = this.getValue(`${collectiveName}-hostAdmin`);
-  const query = `mutation payExpense($id: Int!) { approveExpense(id: $id) { id } }`;
+  const query = `mutation payExpense($id: Int!, $fee: Int!) { payExpense(id: $id, fee: $fee) { id } }`;
   const expense = this.getValue(`expense-${description}`);
-  const result = await utils.graphqlQuery(query, expense, hostAdmin);
+  const parameters = { id: expense.id, fee: readFee(expense.totalAmount, fee) };
+  const result = await utils.graphqlQuery(query, parameters, hostAdmin);
+  result.errors && console.log(result.errors);
   expect(result.errors).to.not.exist;
 });
 
@@ -61,6 +89,19 @@ Then('{string} should have contributed {string} to {string}', async function(use
   /* Doesn't ever sum up different currencies */
   const userToCollectiveAmount = await libtransactions.sum({
     FromCollectiveId: userCollective.id,
+    CollectiveId: collective.id,
+    currency,
+    type: 'CREDIT',
+  });
+  expect(userToCollectiveAmount).to.equal(parseInt(amount));
+});
+
+Then('{string} should have {string} in their balance', async function(collectiveName, value) {
+  const [ amount, currency ] = value.split(' ');
+  const collective = this.getValue(collectiveName);
+  /* Doesn't ever sum up different currencies */
+  const userToCollectiveAmount = await libtransactions.sum({
+    FromCollectiveId: collective.id,
     CollectiveId: collective.id,
     currency,
   });
