@@ -117,7 +117,6 @@ class CreateCollectiveForm extends React.Component {
         {
           name: 'website',
           type: 'text',
-          pre: 'http://',
           maxLength: 255,
           placeholder: ''
         },
