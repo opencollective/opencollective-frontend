@@ -340,6 +340,9 @@ const queries = {
       }
       if (args.FromCollectiveId) {
         const user = await models.User.findOne({ attributes: ['id'], where: { CollectiveId: args.FromCollectiveId }});
+        if (!user) {
+          throw new Error('FromCollectiveId not found');
+        }
         query.where.UserId = user.id;
       }
       if (args.status) query.where.status = args.status;
