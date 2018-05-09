@@ -8,6 +8,9 @@ import debug from 'debug';
 import models, {sequelize} from '../../models';
 import errors from '../../lib/errors';
 
+const debugEmail = debug('email');
+const debugWebhook = debug('webhook');
+
 export const unsubscribe = (req, res, next) => {
 
   const { type, email, slug, token } = req.params;
@@ -33,7 +36,7 @@ export const unsubscribe = (req, res, next) => {
 
 // TODO: move to emailLib.js
 const sendEmailToList = (to, email) => {
-  debug("email")("sendEmailToList", to, "email data: ", email);
+  debugEmail("sendEmailToList", to, "email data: ", email);
   const { mailinglist, collectiveSlug, type } = getNotificationType(to);
   email.from = email.from || `${collectiveSlug} collective <hello@${collectiveSlug}.opencollective.com>`;
   email.collective = email.collective || { slug: collectiveSlug }; // used for the unsubscribe url
@@ -44,7 +47,7 @@ const sendEmailToList = (to, email) => {
   })
   .then(results => results.map(r => r.email))
   .then(recipients => {
-    console.log(`Sending email from ${email.from} to ${to} (${recipients.length} recipient(s))`);
+    debugEmail(`Sending email from ${email.from} to ${to} (${recipients.length} recipient(s))`);
     return Promise.map(recipients, (recipient) => {
       if (email.template) {
         return emailLib.send(email.template, to, email, { from: email.from, bcc: recipient, type });
@@ -132,14 +135,14 @@ export const getNotificationType = (email) => {
 export const webhook = (req, res, next) => {
   const email = req.body;
   const { recipient } = email;
-  debug('webhook')(">>> webhook received", JSON.stringify(email));
+  debugWebhook(">>> webhook received", JSON.stringify(email));
   const { mailinglist, collectiveSlug } = getNotificationType(recipient);
 
   if (!collectiveSlug) {
     return res.send(`Invalid recipient (${recipient}), skipping`);
   }
 
-  debug("webhook")(`email received for ${mailinglist} mailinglist of ${collectiveSlug}`);
+  debugWebhook(`email received for ${mailinglist} mailinglist of ${collectiveSlug}`);
   const body = email['body-html'] || email['body-plain'];
 
   let collective;
@@ -147,7 +150,7 @@ export const webhook = (req, res, next) => {
   // If receive an email that has already been processed, we skip it
   // (it happens since we send the approved email to the mailing list and add the recipients in /bcc)
   if (body.indexOf('<!-- OpenCollective.com -->') !== -1 ) {
-    console.log(`Email from ${email.from} with subject ${email.subject} already processed, skipping`);
+    debugWebhook(`Email from ${email.from} with subject ${email.subject} already processed, skipping`);
     return res.send('Email already processed, skipping');
   }
 
@@ -161,7 +164,7 @@ export const webhook = (req, res, next) => {
     })
     .then(() => res.send('ok'))
     .catch(e => {
-      console.error("Error: ", e);
+      debugWebhook("Error: ", e);
       next(e);
     });
   }

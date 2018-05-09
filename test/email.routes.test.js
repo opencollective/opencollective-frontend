@@ -128,7 +128,6 @@ describe("email.routes.test", () => {
       .then((res) => {
         expect(res.statusCode).to.equal(200);
         if (spy.args[0][1] !== 'admins@testcollective.opencollective.com') {
-          console.log(">>> emailLib.send spy.callCount", spy.callCount);
           utils.inspectSpy(spy, 4);
         }
         expect(spy.args[0][1]).to.equal('admins@testcollective.opencollective.com');

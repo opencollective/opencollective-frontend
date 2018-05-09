@@ -1,7 +1,10 @@
+import debug from 'debug';
+import config from 'config';
 import url from 'url';
 import Promise from 'bluebird';
 import clearbit from '../gateways/clearbit';
-import config from 'config';
+
+const debugClearbit = debug('clearbit');
 
 export default {
 
@@ -11,7 +14,7 @@ export default {
 
   fetchAvatar(email) {
     return this.getUserData(email)
-      .then(userData => userData && userData.avatar ? userData.avatar : null)
+      .then(userData => userData && userData.avatar ? userData.avatar : null);
   },
 
   getUserData(email) {
@@ -29,7 +32,7 @@ export default {
       .tap(res => this.memory[email] = res.person)
       .then(res => res.person)
       .catch(clearbit.Enrichment.NotFoundError, () => this.memory[email] = null)
-      .catch(err => console.error('Clearbit error', err));
+      .catch(err => debugClearbit('Clearbit error', err));
   },
 
   resolveUserAvatars(userData, cb) {
@@ -99,7 +102,7 @@ export default {
       return cb(new clearbit.Enrichment.NotFoundError());
     })
     .catch((err) => {
-      console.error('Clearbit error', err);
+      debugClearbit('Clearbit error', err);
       return cb(err);
     });
   },
