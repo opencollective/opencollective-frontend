@@ -28,6 +28,7 @@ class CreateExpenseForm extends React.Component {
       'paypal': { id: 'expense.payoutMethod.paypal', defaultMessage: 'PayPal ({paypalEmail, select, missing {missing} other {{paypalEmail}}})' },
       'newExpense.paypal.label': { id: 'newExpense.paypal.label', defaultMessage: 'Please provide address' },
       'other': { id: 'expense.payoutMethod.manual', defaultMessage: 'Other (see instructions)' },
+      'donation': { id: 'expense.payoutMethod.donation', defaultMessage: 'Donation' },
       'error.descriptionMissing': { id: 'expense.error.descriptionMissing', defaultMessage: 'Missing description' },
       'error.amountMissing': { id: 'expense.error.amountMissing', defaultMessage: 'Amount must be greater than 0' },
       'error.privateMessageMissing': { id: 'expense.error.privateMessageMissing', defaultMessage: `Please provide instructions on how you'd like to be reimbursed as a private note` },
@@ -119,7 +120,9 @@ class CreateExpenseForm extends React.Component {
     const { LoggedInUser, intl, collective } = this.props;
     const { expense } = this.state;
 
-    const payoutMethods = this.getOptions(['paypal', 'other'], { paypalEmail: get(expense, 'user.paypalEmail') || intl.formatMessage(this.messages['newExpense.paypal.label']) });
+    const payoutMethods = this.getOptions(['paypal', 'other', 'donation'], {
+      paypalEmail: get(expense, 'user.paypalEmail') || intl.formatMessage(this.messages['newExpense.paypal.label'])
+    });
 
     return (
       <div className={`CreateExpenseForm ${this.props.mode}`}>
