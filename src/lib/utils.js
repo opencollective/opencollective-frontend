@@ -193,8 +193,23 @@ export const pluralize = (str, n) => {
   return (n > 1) ? `${str}s` : str;
 }
 
+export const getBaseApiUrl = ({ internal } = {}) => {
+  if (process.browser) {
+    return '/api';
+  } else if (internal && process.env.INTERNAL_API_URL) {
+    return process.env.INTERNAL_API_URL;
+  } else {
+    return process.env.API_URL || 'https://api.opencollective.com';
+  }
+};
+
+export const getGraphqlUrl = () => {
+  const apiKey = !process.browser ? process.env.API_KEY : null;
+  return `${getBaseApiUrl()}/graphql${apiKey ? `?api_key=${apiKey}` : ''}`;
+};
+
 export const translateApiUrl = (url) => {
-  const withoutParams = (process.env.INTERNAL_API_URL || process.env.API_URL) + (url.replace('/api/', '/'));
+  const withoutParams = getBaseApiUrl({ internal : true }) + (url.replace('/api/', '/'));
   const hasParams = `${url}`.match(/\?/)
   if (process.env.API_KEY) {
     return `${withoutParams}${hasParams ? '&' : '?'}api_key=${process.env.API_KEY}`;

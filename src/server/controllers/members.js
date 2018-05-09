@@ -1,10 +1,8 @@
 import { GraphQLClient } from 'graphql-request';
-import { json2csv } from '../../lib/export_file';
 import moment from 'moment';
 import { get } from 'lodash';
-import { days } from '../../lib/utils';
-
-const graphqlServerUrl = `${process.env.API_URL}/graphql?api_key=${process.env.API_KEY}`;
+import { days, getGraphqlUrl } from '../../lib/utils';
+import { json2csv } from '../../lib/export_file';
 
 export async function list(req, res) {
 
@@ -33,13 +31,10 @@ export async function list(req, res) {
     res.setHeader('cache-control','no-cache'); // don't cache at CDN level as the result contains private information
     headers.authorization = req.headers.authorization;
   } else {
-    if (req.params.format === 'csv') {
-      return res.status(401).send('Need to be authenticated to export members in CSV');
-    }
     res.setHeader('cache-control','max-age=6000');
   }
 
-  const client = new GraphQLClient(graphqlServerUrl, { headers });
+  const client = new GraphQLClient(getGraphqlUrl(), { headers });
 
   const query = `
   query Collective($collectiveSlug: String!, $backerType: String, $tierSlug: String, $TierId: Int, $limit: Int, $offset: Int, $role: String) {
