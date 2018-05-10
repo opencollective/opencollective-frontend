@@ -7,7 +7,6 @@ import models from '../../models';
 import errors from '../../lib/errors';
 import { retrieveEvent } from './gateway';
 import creditcard from './creditcard';
-import bitcoin from './bitcoin';
 
 
 const AUTHORIZE_URI = 'https://connect.stripe.com/oauth/authorize';
@@ -30,7 +29,6 @@ export default {
   types: {
     default: creditcard,
     creditcard,
-    bitcoin
   },
 
   oauth: {
@@ -111,11 +109,10 @@ export default {
   processOrder: (order) => {
     switch (order.paymentMethod.type) {
       case 'bitcoin':
-        return bitcoin.processOrder(order);
-      case 'creditcard':
+        throw new errors.BadRequest('Stripe-Bitcoin not supported anymore :(');
+      case 'creditcard':        /* Fallthrough */
       default:
         return creditcard.processOrder(order);
-
     }
   },
 
@@ -138,7 +135,10 @@ export default {
         if (event.type === 'invoice.payment_succeeded') {
           return creditcard.webhook(requestBody, event)
         } else if (event.type === 'source.chargeable') {
-          return bitcoin.webhook(requestBody, event)
+          /* This will cause stripe to send us email alerts, saying
+           * that our stuff is broken. But that should never happen
+           * since they discontinued the support. */
+          throw new errors.BadRequest('Stripe-Bitcoin not supported anymore :(');
         } else {
           throw new errors.BadRequest('Wrong event type received')
         }

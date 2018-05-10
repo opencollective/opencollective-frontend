@@ -6,9 +6,6 @@ import app from '../server/index';
 import originalStripeMock from './mocks/stripe';
 import { appStripe } from '../server/paymentProviders/stripe/gateway';
 
-import bitcoin from '../server/paymentProviders/stripe/bitcoin';
-
-
 describe('webhooks.stripe.test.js', () => {
   let sandbox;
 
@@ -38,10 +35,6 @@ describe('webhooks.stripe.test.js', () => {
 
     beforeEach(() => {
       sandbox = sinon.sandbox.create();
-      sandbox.stub(bitcoin, 'webhook', () => {
-        return Promise.resolve();
-      })
-
     });
 
     afterEach(() => {
@@ -77,14 +70,14 @@ describe('webhooks.stripe.test.js', () => {
       .end(done);
   });
 
-  it('lets `source.chargeable through`', (done) => {
+  it('error out on `source.chargeable`', (done) => {
       const stripeMock = _.cloneDeep(originalStripeMock);
 
       sandbox.stub(appStripe.events, "retrieve", () => Promise.resolve(stripeMock.event_source_chargeable));
       request(app)
         .post('/webhooks/stripe')
         .send(stripeMock.webhook_source_chargeable)
-        .expect(200)
+        .expect(400)
         .end(done);
     });
 
