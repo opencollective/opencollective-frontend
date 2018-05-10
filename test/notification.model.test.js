@@ -71,49 +71,39 @@ describe("notification.model.test.js", () => {
       expect(subscribers2.length).to.equal(1);
     });
 
-    it('getSubscribers to an event', () => {
+    it('getSubscribers to an event', async () => {
       const eventData = utils.data('event1');
       const tierData = utils.data('tier1');
-      let event;
-      return Collective.create({
+      const event = await Collective.create({
         ...eventData,
-        ParentCollectiveId: collective.id
-      })
-      .then(res => {
-        event = res;
-        return Tier.create({
-          ...tierData,
-          CollectiveId: event.id
+        ParentCollectiveId: collective.id,
+      });
+      const tier = Tier.create({
+        ...tierData,
+        CollectiveId: event.id
+      });
+      await Promise.map(users, (user) => {
+        return Order.create({
+          CreatedByUserId: user.id,
+          FromCollectiveId: user.CollectiveId,
+          CollectiveId: collective.id,
+          TierId: tier.id
         })
-      })
-      .tap((tier) => {
-        return Promise.map(users, (user) => {
-          return Order.create({
-            CreatedByUserId: user.id,
-            FromCollectiveId: user.CollectiveId,
-            CollectiveId: collective.id,
-            TierId: tier.id
-          })
-        });
-      })
-      .then((tier) => Promise.map(users, user => models.Member.create({
+      });
+      await Promise.map(users, user => models.Member.create({
         CreatedByUserId: user.id,
         MemberCollectiveId: user.CollectiveId,
         CollectiveId: event.id,
         TierId: tier.id,
         role: roles.FOLLOWER
-      })))
-      .then(() => Notification.getSubscribers(eventData.slug))
-      .then(subscribers => {
-        expect(subscribers.length).to.equal(2);
-      })
-      .then(() => {
-        return users[0].unsubscribe(event.id, `mailinglist`)
-      })
-      .then(() => Notification.getSubscribers(eventData.slug))
-      .then(subscribers => {
-        expect(subscribers.length).to.equal(1);
-      });
+      }))
+
+      const subscribers = await Notification.getSubscribers(event.slug, event.slug);
+      expect(subscribers.length).to.equal(2);
+
+      await users[0].unsubscribe(event.id, `mailinglist.${event.slug}`)
+      const subscribers2 = await Notification.getSubscribers(event.slug, event.slug);
+      expect(subscribers2.length).to.equal(1);
     })
   });
 });
