@@ -60,7 +60,7 @@ class EditCollectiveForm extends React.Component {
       'description.label': { id: 'collective.description.label', defaultMessage: 'Short description' },
       'longDescription.label': { id: 'collective.longDescription.label', defaultMessage: 'Long description' },
       'expensePolicy.label': { id: 'collective.expensePolicy.label', defaultMessage: 'Expense policy' },
-      'expensePolicy.description': { id: 'collective.expensePolicy.description', defaultMessage: 'Submitting an expense can be daunting if the people in your community don\'t know what can or cannot be expensed. Help them by defining a simple expense policy.'  },
+      'expensePolicy.description': { id: 'collective.expensePolicy.description', defaultMessage: 'It can be daunting for the community to file an expense. Help them by providing a clear expense policy to explain what they can expense.'  },
       'expensePolicy.placeholder': { id: 'collective.expensePolicy.placeholder', defaultMessage: 'E.g. Feel free to expense your public transport or Uber/Lyft drive for up to XX. You can also expense drinks and food for meetups for up to XX. For other types of expenses, feel free to ask us.' },
       'startsAt.label': { id: 'collective.startsAt.label', defaultMessage: 'start date and time' },
       'image.label': { id: 'collective.image.label', defaultMessage: 'Avatar' },

@@ -250,6 +250,15 @@ class CreateExpenseForm extends React.Component {
         `}</style>
 
         <form onSubmit={this.onSubmit}>
+          { !collective.expensePolicy && LoggedInUser && LoggedInUser.canEditCollective(collective) &&
+            <div className="expensePolicy">
+              <h2><FormattedMessage id="collective.expensePolicy.label" defaultMessage="Expense policy" /></h2>
+              <p><FormattedMessage id="collective.expensePolicy.description" defaultMessage="It can be daunting for the community to file an expense. Help them by providing a clear expense policy to explain what they can expense." /></p>
+              <Button className="blue" href={`/${collective.slug}/edit#expenses`}>
+                <FormattedMessage id="expense.expensePolicy.add" defaultMessage="add an expense policy" />
+              </Button>
+            </div>
+          }
           { (collective.expensePolicy || get(collective, 'host.expensePolicy') ) &&
             <div className="expensePolicy">
             <h2><FormattedMessage id="expense.expensePolicy" defaultMessage="Expense policy" /></h2>
