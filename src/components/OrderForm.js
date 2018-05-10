@@ -624,77 +624,6 @@ class OrderForm extends React.Component {
         `}</style>
         <Form horizontal>
 
-          { !requireLogin &&
-            <section className="order">
-              { order.tier.type !== 'TICKET' && <SectionTitle section="contributionDetails" /> }
-              { order.tier.type === 'TICKET' &&
-                <div>
-                  <SectionTitle section="ticketDetails" />
-                  <Row>
-                    <Col sm={12}>
-                      <div className="form-group">
-                        <label className="col-sm-2 control-label">
-                          <FormattedMessage id="tier.order.ticket.info" defaultMessage="Event info" />
-                        </label>
-                        <Col sm={10}>
-                          <FormattedDate value={collective.startsAt} weekday="short" day="numeric" month="long" />, &nbsp;
-                          <FormattedTime value={collective.startsAt} timeZone={collective.timezone} />&nbsp; - &nbsp;
-                          { get(collective, 'location.name') }
-                        </Col>
-                      </div>
-                    </Col>
-                  </Row>
-                </div>
-              }
-              <Row>
-                <Col sm={12}>
-                  <div className="form-group">
-                    <label className="col-sm-2 control-label">
-                      { order.tier.type !== 'TICKET' && <FormattedMessage id="tier.order.contribution" defaultMessage="Contribution" /> }
-                      { order.tier.type === 'TICKET' && <FormattedMessage id="tier.order.ticket" defaultMessage="Ticket" /> }
-                    </label>
-                    <Col sm={10}>
-                      <TierComponent
-                        tier={order.tier}
-                        values={{
-                          quantity: order.tier.quantity || order.quantity, // TODO: confusing, need to fix
-                          interval: order.interval || order.tier.interval,
-                          amount: order.totalAmount,
-                        }}
-                        onChange={(tier) => this.handleChange('order', 'tier', tier)}
-                        />
-                    </Col>
-                  </div>
-                </Col>
-              </Row>
-              { this.props.matchingFund &&
-                <Row>
-                  <Col sm={12}>
-                    <MatchingFundWithData
-                      collective={collective}
-                      order={order}
-                      uuid={this.props.matchingFund}
-                      onChange={(matchingFund) => this.handleChange('order', 'matchingFund', matchingFund)}
-                      />
-                  </Col>
-                </Row>
-              }
-              <Row>
-                <Col sm={12}>
-                  <InputField
-                    label="Message (public)"
-                    type="textarea"
-                    name="publicMessage"
-                    className="horizontal"
-                    placeholder={intl.formatMessage(this.messages['order.publicMessage.placeholder'])}
-                    defaultValue={order.publicMessage}
-                    maxLength={255}
-                    onChange={(value) => this.handleChange("order", "publicMessage", value)}
-                    />
-                </Col>
-              </Row>
-            </section>
-          }
           <section className="userDetailsForm">
             <SectionTitle
               section="userDetails" subtitle={
@@ -702,8 +631,8 @@ class OrderForm extends React.Component {
                   { !LoggedInUser && <FormattedMessage id="tier.order.userdetails.description" defaultMessage="If you wish to remain anonymous, only provide an email address without any other personal details." /> }
                   { LoggedInUser && <FormattedMessage id="tier.order.userdetails.description.loggedin" defaultMessage="If you wish to remain anonymous, logout and use another email address without providing any other personal details." /> }
                 </div>
-            }
-                                    />
+                }
+              />
 
             { !LoggedInUser &&
               <Row key={`email.input`}>
@@ -781,8 +710,79 @@ class OrderForm extends React.Component {
           </section>
         }
 
-          { !requireLogin &&
+        { !requireLogin &&
           <div>
+
+            <section className="order">
+              { order.tier.type !== 'TICKET' && <SectionTitle section="contributionDetails" /> }
+              { order.tier.type === 'TICKET' &&
+                <div>
+                  <SectionTitle section="ticketDetails" />
+                  <Row>
+                    <Col sm={12}>
+                      <div className="form-group">
+                        <label className="col-sm-2 control-label">
+                          <FormattedMessage id="tier.order.ticket.info" defaultMessage="Event info" />
+                        </label>
+                        <Col sm={10}>
+                        <FormattedDate value={collective.startsAt} weekday='short' day='numeric' month='long' />, &nbsp;
+                        <FormattedTime value={collective.startsAt} timeZone={collective.timezone} />&nbsp; - &nbsp;
+                        { get(collective, 'location.name') }
+                        </Col>
+                      </div>
+                    </Col>
+                  </Row>
+                </div>
+              }
+              <Row>
+                <Col sm={12}>
+                  <div className="form-group">
+                    <label className="col-sm-2 control-label">
+                      { order.tier.type !== 'TICKET' && <FormattedMessage id="tier.order.contribution" defaultMessage="Contribution" /> }
+                      { order.tier.type === 'TICKET' && <FormattedMessage id="tier.order.ticket" defaultMessage="Ticket" /> }
+                    </label>
+                    <Col sm={10}>
+                      <TierComponent
+                        tier={order.tier}
+                        values={{
+                          quantity: order.tier.quantity || order.quantity, // TODO: confusing, need to fix
+                          interval: order.interval || order.tier.interval,
+                          amount: order.totalAmount,
+                        }}
+                        onChange={(tier) => this.handleChange('order', 'tier', tier)}
+                        />
+                    </Col>
+                  </div>
+                </Col>
+              </Row>
+              { this.props.matchingFund &&
+                <Row>
+                  <Col sm={12}>
+                    <MatchingFundWithData
+                      collective={collective}
+                      order={order}
+                      uuid={this.props.matchingFund}
+                      onChange={(matchingFund) => this.handleChange('order', 'matchingFund', matchingFund)}
+                      />
+                  </Col>
+                </Row>
+              }
+              <Row>
+                <Col sm={12}>
+                <InputField
+                  label="Message (public)"
+                  type="textarea"
+                  name="publicMessage"
+                  className="horizontal"
+                  placeholder={intl.formatMessage(this.messages['order.publicMessage.placeholder'])}
+                  defaultValue={order.publicMessage}
+                  maxLength={255}
+                  onChange={(value) => this.handleChange("order", "publicMessage", value)}
+                  />
+                </Col>
+              </Row>
+            </section>
+
             { order.totalAmount > 0 &&
               <section className="paymentDetails">
                 <SectionTitle section="paymentDetails" />

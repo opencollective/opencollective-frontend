@@ -159,6 +159,8 @@
     }
   },
   "release": {
-    "publish": ["@semantic-release/github"]
+    "publish": [
+      "@semantic-release/github"
+    ]
   }
 }
