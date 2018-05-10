@@ -1,4 +1,4 @@
-import slugify from 'slug';
+import slugify from 'slugify';
 
 /**
  * This breaks down a markdown text into multiple pages
