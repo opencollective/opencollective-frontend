@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import colors from '../constants/colors';
 import Button from './Button';
-import _ from 'lodash';
+import { debounce } from 'lodash';
 import { isValidEmail, capitalize } from '../lib/utils';
 import { defineMessages, injectIntl } from 'react-intl';
 
@@ -63,7 +63,7 @@ class SignInUp extends React.Component {
 
   renderInputField(field) {
 
-    const debouncedHandleEvent = _.debounce(this.handleChange, 500);
+    const debouncedHandleEvent = debounce(this.handleChange, 500);
     const { intl } = this.props;
 
     return (

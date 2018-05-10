@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import _, { get } from 'lodash';
+import { get, debounce } from 'lodash';
 import { capitalize } from '../lib/utils';
 import DateTime from 'react-datetime';
 import stylesheet from '../styles/react-datetime.css';
@@ -89,7 +89,7 @@ class InputField extends React.Component {
 
     this.state = { value: props.value, validationState: null };
     this.handleChange = this.handleChange.bind(this);
-    this.debouncedHandleChange = _.debounce(props.onChange, 500);
+    this.debouncedHandleChange = debounce(props.onChange, 500);
 
   }
 
