@@ -3,5 +3,5 @@
 --reporter mocha-circleci-reporter
 --require babel-core/register
 --require babel-polyfill
---require=./test/setup.js
-
+--file ./test/setup.js
+--exit
