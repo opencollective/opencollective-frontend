@@ -4,8 +4,11 @@
 
 import Slack from 'node-slack';
 import config from 'config';
+import debug from 'debug';
 import activitiesLib from '../lib/activities';
 import constants from '../constants/activities';
+
+const debugSlack = debug('slack');
 
 export default {
 
@@ -70,7 +73,7 @@ export default {
       return new Slack(webhookUrl, {})
         .send(slackOptions, (err) => {
           if (err) {
-            console.error(err);
+            debugSlack(err);
             return reject(err);
           }
           return resolve();
