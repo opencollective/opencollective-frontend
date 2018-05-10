@@ -1,12 +1,15 @@
+import debug from 'debug';
+import config from 'config';
+import moment from 'moment';
+
 import models from '../../models';
 import errors from '../../lib/errors';
 import paypalAdaptive from './adaptiveGateway';
-import moment from 'moment';
-import config from 'config';
 import { convertToCurrency } from '../../lib/currency';
 import { formatCurrency } from '../../lib/utils';
 import adaptive from './adaptive';
 
+const debugPaypal = debug('paypal');
 
 /**
  * PayPal paymentProvider
@@ -42,7 +45,7 @@ const getPreapprovalDetailsAndUpdatePaymentMethod = function(paymentMethod) {
       })
     )
     .catch(e => {
-      console.log(">>> getPreapprovalDetailsAndUpdatePaymentMethod error ", e);
+      debugPaypal(">>> getPreapprovalDetailsAndUpdatePaymentMethod error ", e);
       throw e;
     })
 }
@@ -72,7 +75,7 @@ export default {
           .then(limit => {
             // We can request a paykey for up to $2,000 equivalent (minus 5%)
             const lowerLimit = collective.currency === 'USD' ? 2000 : Math.floor(0.95 * limit);
-            console.log(">>> requesting a paykey for ", formatCurrency(lowerLimit*100, collective.currency));
+            debugPaypal(">>> requesting a paykey for ", formatCurrency(lowerLimit*100, collective.currency));
             return {
               currencyCode: 'USD', // collective.currency, // we should use the currency of the host collective but still waiting on PayPal to resolve that issue.
               startingDate: new Date().toISOString(),
@@ -127,9 +130,9 @@ export default {
 
         return getPreapprovalDetailsAndUpdatePaymentMethod(pm)
           .catch(e => {
-            console.error(">>> paypal callback error:", e);
+            debugPaypal(">>> paypal callback error:", e);
             const redirect = `${paymentMethod.data.redirect}?status=error&service=paypal&error=Error%20while%20contacting%20PayPal&errorMessage=${encodeURIComponent(e.message)}`;
-            console.log(">>> redirect", redirect);
+            debugPaypal(">>> redirect", redirect);
             res.redirect(redirect);
             throw e; // make sure we skip what follows until next catch()
           })

@@ -58,7 +58,6 @@ describe('homepage.routes.test.js', () => {
       .expect(200)
       .then((res) => {
         const { body } = res;
-        console.log(">>> body: ", body);
         expect(body.stats).to.have.property('totalCollectives');
         expect(body.collectives).to.have.property('opensource');
         expect(body.collectives).to.have.property('meetup');

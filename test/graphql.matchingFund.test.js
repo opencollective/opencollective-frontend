@@ -237,7 +237,6 @@ describe('graphql.matchingFund.test.js', () => {
     };
 
     const res = await utils.graphqlQuery(createOrderQuery, { order }, user2);
-    res.errors && console.error(res.errors);
     expect(res.errors).to.exist;
     expect(res.errors[0].message).to.equal(`There is not enough funds left on this matching fund to match your order (balance: €1,500`);
   })

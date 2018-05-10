@@ -137,7 +137,6 @@ describe('graphql.paymentMethods.test.js', () => {
         id: host.id
       };
       const result = await utils.graphqlQuery(createOrderQuery, { order }, user);
-      result.errors && console.error(result.errors[0]);
       expect(result.errors).to.exist;
       expect(result.errors[0].message).to.equal(`You don't have sufficient permissions to create an order on behalf of the open source collective organization`);
 
@@ -150,7 +149,6 @@ describe('graphql.paymentMethods.test.js', () => {
         website: "http://neworg.com"
       };
       const result2 = await utils.graphqlQuery(createOrderQuery, { order }, user);
-      result2.errors && console.error(result2.errors[0]);
       expect(result2.errors).to.exist;
       expect(result2.errors[0].message).to.equal(`You don't have sufficient permissions to access this payment method`);
     });
@@ -161,7 +159,6 @@ describe('graphql.paymentMethods.test.js', () => {
       };
       order.platformFeePercent = 5;
       const result = await utils.graphqlQuery(createOrderQuery, { order }, user);
-      result.errors && console.error(result.errors[0]);
       expect(result.errors).to.exist;
       expect(result.errors[0].message).to.equal(`Only a root can change the platformFeePercent`);
     });
