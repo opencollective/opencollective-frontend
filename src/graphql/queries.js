@@ -152,6 +152,7 @@ const getCollectiveToEditQuery = gql`
       settings
       createdAt
       isHost
+      expensePolicy
       stats {
         id
         yearlyBudget
