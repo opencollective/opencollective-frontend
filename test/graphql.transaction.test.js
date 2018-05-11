@@ -1,15 +1,7 @@
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
-import models from '../server/models';
 
 import * as utils from './utils';
-
-const showErrors = (graphqlResult) => {
-  if (!graphqlResult || !graphqlResult.errors) return;
-  const { message, path } = graphqlResult.errors[0];
-  console.log("GraphQL error in path", path);
-  console.error(message.split('\n').filter(line => !line.match(/node_modules/)).join('\n'));
-}
 
 describe('graphql.transaction.test.js', () => {
   /* SETUP
@@ -64,20 +56,7 @@ describe('graphql.transaction.test.js', () => {
         }
       `;
       const result = await utils.graphqlQuery(query, { slug: "WWCodeAustin", limit });
-      showErrors(result);
-      result.errors && console.error(result.errors[0]);
-      expect(result.errors).to.not.exist;
-      const transactions = result.data.Collective.transactions;
-      expect(transactions.length).to.equal(limit);
-      const expense = transactions.find(t => t.type === 'DEBIT');
-      const order = transactions.find(t => t.type === 'CREDIT');
-      expect(expense).to.have.property('attachment');
-      expect(expense.attachment).to.equal(null); // can't see attachment if not logged in
-      expect(order).to.have.property('paymentMethod');
-      expect(order.createdByUser.id).to.equal(4348); // Nicole user
-      expect(order.host.id).to.equal(9804); // wwcode host collective
-      expect(order.createdByUser.email).to.equal(null); // can't see email if not logged in
-      expect(order.host.slug).to.equal("wwcode");
+      expect(result).to.matchSnapshot();
     });
   });
 
@@ -115,11 +94,7 @@ describe('graphql.transaction.test.js', () => {
         }
       `;
       const result = await utils.graphqlQuery(query, { id: 7071 });
-      result.errors && console.error(result.errors[0]);
-      expect(result.errors).to.not.exist;
-      const transaction = result.data.Transaction;
-      expect(transaction.id).to.equal(7071);
-      expect(transaction.attachment).to.equal(null);
+      expect(result).to.matchSnapshot();
     });
 
     it('with filter on type', async () => {
@@ -134,13 +109,7 @@ describe('graphql.transaction.test.js', () => {
         }
       `;
       const result = await utils.graphqlQuery(query, { CollectiveId: 2, limit, offset, type: 'CREDIT' });
-      result.errors && console.error(result.errors);
-      expect(result.errors).to.not.exist;
-      const transactions = result.data.allTransactions;
-      expect(transactions.length).to.equal(limit);
-      transactions.map(t => {
-        expect(t.type).to.equal('CREDIT');
-      });
+      expect(result).to.matchSnapshot();
     });
 
     it('with dateFrom', async () => {
@@ -158,14 +127,7 @@ describe('graphql.transaction.test.js', () => {
         CollectiveId: 2,
         dateFrom: '2017-10-01',
       });
-
-      // Then the result should contain no errors
-      expect(result.errors).to.not.exist;
-
-      // TODO: If the database rows change, this test will likely fail
-      // And then the results should only include the rows with
-      // `createdAt` after `dateFrom`.
-      expect(result.data.allTransactions.length).to.equal(5);
+      expect(result).to.matchSnapshot();
     });
 
     it('with dateTo', async () => {
@@ -183,13 +145,7 @@ describe('graphql.transaction.test.js', () => {
         CollectiveId: 2,
         dateTo: '2017-10-01',
       });
-
-      // Then the result should contain no errors
-      expect(result.errors).to.not.exist;
-
-      // TODO: If the database rows change, this test will likely fail
-      // And then there should bring all the rows created before `2017-10-01`
-      expect(result.data.allTransactions.length).to.equal(78);
+      expect(result).to.matchSnapshot();
     });
 
     it('with pagination', async () => {
@@ -235,20 +191,212 @@ describe('graphql.transaction.test.js', () => {
         }
       `;
       const result = await utils.graphqlQuery(query, { CollectiveId: 2, limit, offset });
-      result.errors && console.error(result.errors[0]);
-      expect(result.errors).to.not.exist;
-      const transactions = result.data.allTransactions;
-      expect(transactions.length).to.equal(limit);
-      expect(transactions[0].id).to.equal(9595);
-      const expense = transactions.find(t => t.type === 'DEBIT');
-      expect(expense.attachment).to.equal(null);
-      const user = await models.User.findOne({ where: { id: expense.createdByUser.id } });
-      const result2 = await utils.graphqlQuery(query, { CollectiveId: 2 }, user);
-      result2.errors && console.error(result2.errors[0]);
-      const transactions2 = result2.data.allTransactions;
-      expect(result.errors).to.not.exist;
-      const expense2 = transactions2.find(t => t.type === 'DEBIT');
-      expect(expense2.attachment).to.equal('******');
+      expect(result).to.matchSnapshot();
+    });
+
+    describe('`transactions` query', () => {
+      const limit = 5;
+      const offset = 10;
+
+      it('default returns list of transactions with pagination data', async () => {
+        const query = `
+          query transactions {
+            transactions {
+              limit
+              offset
+              total
+              transactions {
+                id
+                type
+                createdByUser {
+                  id
+                  firstName
+                  lastName
+                  email
+                },
+                fromCollective {
+                  id
+                  slug
+                }
+                collective {
+                  id
+                  slug
+                }
+                host {
+                  id
+                  slug
+                },
+                ... on Expense {
+                  attachment
+                }
+                ... on Order {
+                  paymentMethod {
+                    id
+                    name
+                  },
+                  subscription {
+                    id
+                    interval
+                  }
+                }
+              }
+            }
+          }
+        `;
+
+        const result = await utils.graphqlQuery(query);
+        expect(result).to.matchSnapshot();
+      });
+
+      it('accepts pagination arguments: limit & offset', async () => {
+        const query = `
+          query transactions($limit: Int!, $offset: Int!) {
+            transactions(limit: $limit, offset: $offset) {
+              limit
+              offset
+              total
+              transactions {
+                id
+                type
+                createdByUser {
+                  id
+                  firstName
+                  lastName
+                  email
+                },
+                fromCollective {
+                  id
+                  slug
+                }
+                collective {
+                  id
+                  slug
+                }
+                host {
+                  id
+                  slug
+                },
+                ... on Expense {
+                  attachment
+                }
+                ... on Order {
+                  paymentMethod {
+                    id
+                    name
+                  },
+                  subscription {
+                    id
+                    interval
+                  }
+                }
+              }
+            }
+          }
+        `;
+
+        const result = await utils.graphqlQuery(query, { limit, offset });
+        expect(result).to.matchSnapshot();
+      });
+
+      it('accepts type argument to filter transactions by type', async () => {
+        const query = `
+          query transactions($limit: Int!) {
+            transactions(limit: $limit, type: CREDIT) {
+              limit
+              offset
+              total
+              transactions {
+                id
+                type
+                createdByUser {
+                  id
+                  firstName
+                  lastName
+                  email
+                },
+                fromCollective {
+                  id
+                  slug
+                }
+                collective {
+                  id
+                  slug
+                }
+                host {
+                  id
+                  slug
+                },
+                ... on Expense {
+                  attachment
+                }
+                ... on Order {
+                  paymentMethod {
+                    id
+                    name
+                  },
+                  subscription {
+                    id
+                    interval
+                  }
+                }
+              }
+            }
+          }
+        `;
+
+        const result = await utils.graphqlQuery(query, { limit });
+        expect(result).to.matchSnapshot();
+      });
+
+      it('accepts orderBy argument to order transactions', async () => {
+        const query = `
+          query transactions($limit: Int!) {
+            transactions(limit: $limit, orderBy: { field: CREATED_AT, direction: ASC }) {
+              limit
+              offset
+              total
+              transactions {
+                id
+                type
+                createdByUser {
+                  id
+                  firstName
+                  lastName
+                  email
+                },
+                fromCollective {
+                  id
+                  slug
+                }
+                collective {
+                  id
+                  slug
+                }
+                host {
+                  id
+                  slug
+                },
+                ... on Expense {
+                  attachment
+                }
+                ... on Order {
+                  paymentMethod {
+                    id
+                    name
+                  },
+                  subscription {
+                    id
+                    interval
+                  }
+                }
+              }
+            }
+          }
+        `;
+
+        const result = await utils.graphqlQuery(query, { limit });
+        expect(result).to.matchSnapshot();
+      });
     });
   });
 });

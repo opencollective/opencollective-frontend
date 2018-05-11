@@ -3,7 +3,10 @@ import {
   GraphQLFloat,
   GraphQLString,
   GraphQLInterfaceType,
-  GraphQLObjectType
+  GraphQLObjectType,
+  GraphQLList,
+  GraphQLEnumType,
+  GraphQLInputObjectType,
 } from 'graphql';
 
 import {
@@ -255,4 +258,62 @@ export const TransactionOrderType = new GraphQLObjectType({
       }
     }
   }
+});
+
+export const TransactionType = new GraphQLEnumType({
+  name: 'TransactionType',
+  description: 'Type of transaction in the ledger',
+  values: {
+    CREDIT: {},
+    DEBIT: {},
+  },
+});
+
+export const TransactionOrder = new GraphQLInputObjectType({
+  name: 'TransactionOrder',
+  description: 'Ordering options for transactions',
+  fields: {
+    field: {
+      description: 'The field to order transactions by.',
+      defaultValue: 'createdAt',
+      type: new GraphQLEnumType({
+        name: 'TransactionOrderField',
+        description: 'Properties by which transactions can be ordered.',
+        values: {
+          CREATED_AT: {
+            value: 'createdAt',
+            description: 'Order transactions by creation time.',
+          },
+        },
+      }),
+    },
+    direction: {
+      description: 'The ordering direction.',
+      defaultValue: 'DESC',
+      type: new GraphQLEnumType({
+        name: 'OrderDirection',
+        description: 'Possible directions in which to order a list of items when provided an orderBy argument.',
+        values: {
+          ASC: {},
+          DESC: {},
+        },
+      }),
+    },
+  },
+});
+
+TransactionOrder.defaultValue = Object.entries(TransactionOrder.getFields()).reduce((values, [key, value]) => ({
+  ...values,
+  [key]: value.defaultValue,
+}), {});
+
+export const PaginatedTransactionsType = new GraphQLObjectType({
+  name: 'PaginatedTransactions',
+  description: 'List of transactions with pagination data', 
+  fields: () => ({
+    transactions: { type: new GraphQLList(TransactionInterfaceType) },
+    limit: { type: GraphQLInt },
+    offset: { type: GraphQLInt },
+    total: { type: GraphQLInt },
+  }),
 });

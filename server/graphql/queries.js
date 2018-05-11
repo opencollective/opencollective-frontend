@@ -10,7 +10,7 @@ import {
   GraphQLNonNull,
   GraphQLString,
   GraphQLInt,
-  GraphQLBoolean
+  GraphQLBoolean,
 } from 'graphql';
 
 import {
@@ -19,7 +19,10 @@ import {
 } from './CollectiveInterface';
 
 import {
-  TransactionInterfaceType
+  PaginatedTransactionsType,
+  TransactionInterfaceType,
+  TransactionType,
+  TransactionOrder,
 } from './TransactionInterface';
 
 import {
@@ -233,6 +236,65 @@ const queries = {
       }
       return models.Transaction.findAll(query);
     }
+  },
+
+  /*
+   * Returns all transactions
+   */
+  transactions: {
+    type: PaginatedTransactionsType,
+    args: {
+      limit: {
+        defaultValue: 100,
+        description: 'Defaults to 100',
+        type: GraphQLInt,
+      },
+      offset: {
+        defaultValue: 0,
+        type: GraphQLInt,
+      },
+      orderBy: {
+        defaultValue: TransactionOrder.defaultValue,
+        type: TransactionOrder,
+      },
+      type: {
+        description: 'CREDIT or DEBIT are accepted values',
+        type: TransactionType,
+      },
+    },
+    async resolve(_, args) {
+      const {
+        limit,
+        offset,
+        orderBy,
+        type,
+      } = args;
+      const query = {
+        limit,
+        offset,
+        order: [Object.values(orderBy)],
+        where: {},
+      };
+      
+      if (type) {
+        query.where = { type };
+      }
+
+      const [
+        total,
+        transactions,
+      ] = await Promise.all([
+        models.Transaction.count({ where: query.where }),
+        models.Transaction.findAll(query),
+      ]);
+
+      return {
+        limit,
+        offset,
+        total,
+        transactions,
+      };
+    },
   },
 
   Update: {

@@ -28,6 +28,7 @@ describe('lib.imageUrlToAmazonUrl.js', () => {
 
     beforeEach(() => {
       const s = stream.Readable();
+      s.read = () => null;
       s.write = function(){};
       s.end = function(){
         s.emit('response', {statusCode: 200, statusMessage: 'OK'});
@@ -41,7 +42,7 @@ describe('lib.imageUrlToAmazonUrl.js', () => {
       uuid.v1.restore();
     })
 
-    it('returns an error if the image url is not found', () => {
+    it('returns an error if the image url is not found', (done) => {
       nocks['cloudfront.head'] = nock(imageUrl)
         .head('')
         .reply(404);
@@ -50,7 +51,8 @@ describe('lib.imageUrlToAmazonUrl.js', () => {
         knox,
         imageUrl,
         (e) => {
-          expect(e).to.equal('Image not found');
+          expect(e.toString()).to.include('Image not found');
+          done();
         })
     });
 
