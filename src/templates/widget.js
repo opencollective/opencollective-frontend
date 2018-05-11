@@ -99,7 +99,7 @@
     // Add the <style> element to the page
     document.head.appendChild(style);
     style.sheet.insertRule(`
-      .oc-leading-container {
+      .oc-loading-container {
         display: flex;
         justify-content: center;
         text-align: center;
