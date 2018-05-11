@@ -70,8 +70,9 @@
     const width = attributes.width || this.getContainerWidth();
     const height = attributes.height || 0;
     this.loading = document.createElement('div');
-    this.loading.className = 'oc-loading';
+    this.loading.className = 'oc-loading-container';
     this.logo = document.createElement('img');
+    this.logo.className = 'oc-loading';
     this.logo.src = `{{host}}/static/images/opencollective-icon.svg`;
     this.loading.appendChild(this.logo);
     this.iframe = document.createElement('iframe');
@@ -98,11 +99,15 @@
     // Add the <style> element to the page
     document.head.appendChild(style);
     style.sheet.insertRule(`
-      .oc-loading {
-        text-align: center;
-        animation: oc-rotate 0.8s infinite linear;
+      .oc-leading-container {
         display: flex;
         justify-content: center;
+        text-align: center;
+      }
+    `)
+    style.sheet.insertRule(`
+      .oc-loading {
+        animation: oc-rotate 0.8s infinite linear;
       }
     `);
     style.sheet.insertRule(`
