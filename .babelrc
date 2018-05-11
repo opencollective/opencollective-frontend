@@ -1,7 +1,7 @@
 {
   "presets": [
-    "env",
-    "stage-0",
+    "@babel/preset-env",
+    "@babel/preset-stage-0",
     ["next/babel", {
       "styled-jsx": {
         "plugins": [
@@ -15,5 +15,10 @@
     ["react-intl", {
       "messagesDir": "./build/messages/"
     }]
-  ]
+  ],
+  "env": {
+    "development" : {
+      "compact": false
+    }
+  }
 }
