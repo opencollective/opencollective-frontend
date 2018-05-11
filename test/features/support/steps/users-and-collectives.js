@@ -37,11 +37,19 @@ Given('a User {string}', async function (name) {
   this.addValue(`${name}-user`, user);
 });
 
-Given(/^a Collective "([^\"]+)" with a host in "([^\"]+)"(\, "([^\"]+)%" fee)?$/, async function (name, currency, fee) {
-  const { hostCollective, hostAdmin, collective } = await store.hostAndCollective(name, currency, fee);
+Given('a Host {string} in {string} and charges {string} of fee', async function (name, currency, fee) {
+  const { hostCollective, hostAdmin } = await store.newHost(name, currency, fee);
+  this.addValue(name, hostCollective);
+  this.addValue(`${name}-admin`, hostAdmin);
+});
+
+Given('a Collective {string} in {string} hosted by {string}', async function (name, currency, hostName) {
+  const hostCollective = this.getValue(hostName);
+  const hostAdmin = this.getValue(`${hostName}-admin`);
+  const { collective } = await store.newCollectiveInHost(name, currency, hostCollective);
   this.addValue(name, collective);
-  this.addValue(`${name}-hostAdmin`, hostAdmin);
-  this.addValue(`${name}-host`, hostCollective);
+  this.addValue(`${name}-host-collective`, hostCollective);
+  this.addValue(`${name}-host-admin`, hostAdmin);
 });
 
 When('{string} expenses {string} for {string} to {string} via {string}', async function (userName, value, description, collectiveName, payoutMethod) {
@@ -65,7 +73,7 @@ When('{string} expenses {string} for {string} to {string} via {string}', async f
 });
 
 When('expense for {string} is approved by {string}', async function(description, collectiveName) {
-  const hostAdmin = this.getValue(`${collectiveName}-hostAdmin`);
+  const hostAdmin = this.getValue(`${collectiveName}-host-admin`);
   const expense = this.getValue(`expense-${description}`);
   const query = `mutation approveExpense($id: Int!) { approveExpense(id: $id) { id } }`;
   const result = await utils.graphqlQuery(query, expense, hostAdmin);
@@ -73,7 +81,7 @@ When('expense for {string} is approved by {string}', async function(description,
 });
 
 When('expense for {string} is paid by {string} with {string} fee', async function(description, collectiveName, fee) {
-  const hostAdmin = this.getValue(`${collectiveName}-hostAdmin`);
+  const hostAdmin = this.getValue(`${collectiveName}-host-admin`);
   const query = `mutation payExpense($id: Int!, $fee: Int!) { payExpense(id: $id, fee: $fee) { id } }`;
   const expense = this.getValue(`expense-${description}`);
   const parameters = { id: expense.id, fee: readFee(expense.totalAmount, fee) };

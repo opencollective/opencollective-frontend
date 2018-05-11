@@ -2,6 +2,8 @@
  *
  * Helpers for interacting with the database models.
  */
+
+/* Libraries that create the objects */
 import models from '../../../../server/models';
 import * as expenses from '../../../../server/graphql/mutations/expenses';
 
@@ -43,31 +45,44 @@ export async function newUser(name, data={}) {
   return { user, userCollective: user.collective };
 }
 
+/**
+ * Create a new host and its admin user
+ *
+ * @param {String} name Name of the host collective
+ * @param {String} currency is the currency of the host
+ * @param {String} hostFee is the per transaction Host fee
+ * @returns {Object} with references for `hostCollective`,
+ *  `hostAdmin`.
+ */
+export async function newHost(name, currency, hostFee) {
+  // Host Admin
+  const hostAdmin = (await newUser(`${name}-${currency}-admin`)).user;
+  const hostFeePercent = hostFee ? parseInt(hostFee) : 0;
+  const hostCollective = await models.Collective.create({
+    name, currency, hostFeePercent, CreatedByUserId: hostAdmin.id,
+  });
+  await hostCollective.addUserWithRole(hostAdmin, 'ADMIN');
+  return { hostAdmin, hostCollective };
+}
+
 /** Create new a host, a collective and add collective to the host
  *
  * @param {String} name Name of the collective.
- * @param {String} currency is the currency of the host
- * @param {String} fee is the per transaction Host fee
+ * @param {String} currency is the currency of the collective
+ * @param {String} hostCurrency is the currency of the host
+ * @param {String} hostFee is the per transaction Host fee
  * @returns {Object} with references for `hostCollective`,
- *  `hostOwner`, and `collective`.
+ *  `hostAdmin`, and `collective`.
  */
-export async function hostAndCollective(name, currency, fee) {
-  const hostAdmin = (await newUser(`${name}-${currency}-admin`)).user;
-  const hostCollective = await models.Collective.create({
-    CreatedByUserId: hostAdmin.id,
-    name: `${name} Host`,
-    slug: `${name}-host`,
-    hostFeePercent: fee ? parseInt(fee) : 0,
-    currency,
-  });
-  await hostCollective.addUserWithRole(hostAdmin, 'ADMIN');
-
-  const collective = await models.Collective.create({ name });
+export async function newCollectiveWithHost(name, currency, hostCurrency, hostFee) {
+  const hostName = `${name}-Host`;
+  const { hostAdmin, hostCollective } = await newHost(hostName, hostCurrency, hostFee);
+  const collective = await models.Collective.create({ name, currency });
   await collective.addHost(hostCollective);
   return { hostCollective, hostAdmin, collective };
 }
 
-/** Create a collective and associate to a given host.
+/** Create a collective and associate to an existing host.
  *
  * @param {String} name is the name of the collective being created.
  * @param {models.Collective} hostCollective is an already collective
@@ -75,8 +90,8 @@ export async function hostAndCollective(name, currency, fee) {
  * @return {models.Collective} a newly created collective hosted by
  *  `hostCollective`.
  */
-export async function collectiveWithHost(name, hostCollective) {
-  const collective = await models.Collective.create({ name });
+export async function newCollectiveInHost(name, currency, hostCollective) {
+  const collective = await models.Collective.create({ name, currency });
   await collective.addHost(hostCollective);
   return { collective };
 }

@@ -65,7 +65,7 @@ describe('GraphQL Expenses API', () => {
 
     it('gets no expenses if collective has no expenses', async () => {
       // Given that we have a collective with no expenses
-      const { collective } = await store.hostAndCollective('railsgirlsatl', 'USD', 10);
+      const { collective } = await store.newCollectiveWithHost('railsgirlsatl', 'USD', 'USD', 10);
       // When we retrieve all its expenses
       const result = await utils.graphqlQuery(allExpensesQuery, { CollectiveId: collective.id });
       result.errors && console.log(result.errors);
@@ -77,7 +77,7 @@ describe('GraphQL Expenses API', () => {
 
     it('gets the latest expenses from one collective', async () => {
       // Given that we have a collective
-      const { hostAdmin, collective } = await store.hostAndCollective('railsgirlsatl', 'USD', 10);
+      const { hostAdmin, collective } = await store.newCollectiveWithHost('railsgirlsatl', 'USD', 'USD', 10);
       // And given the above collective has some expenses
       const data = { currency: 'USD', payoutMethod: 'manual', collective: { id: collective.id } };
       await store.createExpense(hostAdmin, { amount: 1000, description: "Pizza", ...data });
@@ -101,8 +101,8 @@ describe('GraphQL Expenses API', () => {
 
     it('gets the latest expenses from all the hosted collectives', async () => {
       // Given that we have two collectives within a host
-      const { hostAdmin, hostCollective, collective } = await store.hostAndCollective('apex', 'USD', 10);
-      const anotherCollective = (await store.collectiveWithHost('brusselstogether', hostCollective)).collective;
+      const { hostAdmin, hostCollective, collective } = await store.newCollectiveWithHost('apex', 'USD', 'USD', 10);
+      const anotherCollective = (await store.newCollectiveInHost('brusselstogether', 'USD', hostCollective)).collective;
       // And given that the first collective created above have two expenses
       const data = { currency: 'USD', payoutMethod: 'manual', collective: { id: collective.id } };
       await store.createExpense(hostAdmin, { amount: 1000, description: "Pizza", ...data });
@@ -126,8 +126,8 @@ describe('GraphQL Expenses API', () => {
 
     it('gets the latest expenses from all the hosted collectives for one category', async () => {
       // Given that we have two collectives within a host
-      const { hostAdmin, hostCollective, collective } = await store.hostAndCollective('apex', 'USD', 10);
-      const anotherCollective = (await store.collectiveWithHost('babel', hostCollective)).collective;
+      const { hostAdmin, hostCollective, collective } = await store.newCollectiveWithHost('apex', 'USD', 'USD', 10);
+      const anotherCollective = (await store.newCollectiveInHost('babel', 'USD', hostCollective)).collective;
       // And given that the first collective created above have two
       // expenses but just one categorized as `legal`.
       const data = { currency: 'USD', payoutMethod: 'manual', collective: { id: collective.id } };
@@ -159,8 +159,8 @@ describe('GraphQL Expenses API', () => {
       // Given a user that will file expenses
       const xdamman = (await store.newUser('xdamman')).user;
       // And given that we have two collectives within a host
-      const { hostAdmin, hostCollective, collective } = await store.hostAndCollective('apex', 'USD', 10);
-      const anotherCollective = (await store.collectiveWithHost('babel', hostCollective)).collective;
+      const { hostAdmin, hostCollective, collective } = await store.newCollectiveWithHost('apex', 'USD', 'USD', 10);
+      const anotherCollective = (await store.newCollectiveInHost('babel', 'USD', hostCollective)).collective;
       // And given that the first collective created above have two
       // expenses but just one filed by our user
       const data = { currency: 'USD', payoutMethod: 'manual', collective: { id: collective.id } };
@@ -204,7 +204,7 @@ describe('GraphQL Expenses API', () => {
 
     it('fails to create an expense if not logged in', async () => {
       // Given a collective
-      const { collective } = await store.hostAndCollective('railsgirlsatl', 'USD', 10);
+      const { collective } = await store.newCollectiveWithHost('railsgirlsatl', 'USD', 'USD', 10);
       // When it's attempted to create an expense with no user
       const data = { currency: 'USD', payoutMethod: 'manual', collective: { id: collective.id } };
       const result = await utils.graphqlQuery(createExpenseQuery, { expense: data });
@@ -216,7 +216,7 @@ describe('GraphQL Expenses API', () => {
 
     it('creates a new expense logged in and send email to collective admin for approval', async () => {
       // Given a collective
-      const { collective } = await store.hostAndCollective('Test Collective', 'USD', 10);
+      const { collective } = await store.newCollectiveWithHost('Test Collective', 'USD', 'USD', 10);
       // And given an admin for the above collective
       const admin = (await store.newUser('collectives-admin')).user;
       await collective.addUserWithRole(admin, 'ADMIN');
@@ -279,7 +279,7 @@ describe('GraphQL Expenses API', () => {
 
     it("fails to approve expense if expense.status is PAID", async () => {
       // Given that we have a collective
-      const { hostAdmin, collective } = await store.hostAndCollective('parcel', 'USD', 10);
+      const { hostAdmin, collective } = await store.newCollectiveWithHost('parcel', 'USD', 'USD', 10);
       // And given the above collective has some expenses
       const data = { currency: 'USD', payoutMethod: 'manual', collective: { id: collective.id } };
       const expense = await store.createExpense(hostAdmin, { amount: 1000, description: "Pizza", ...data });
@@ -295,7 +295,7 @@ describe('GraphQL Expenses API', () => {
 
     it("successfully approve expense if expense.status is PENDING and send notification email to author of expense and host admin (unless unsubscribed)", async () => {
       // Given that we have a collective
-      const { hostAdmin, collective } = await store.hostAndCollective('rollup', 'USD', 10);
+      const { hostAdmin, collective } = await store.newCollectiveWithHost('rollup', 'USD', 'USD', 10);
       // And given a user that will file an expense
       const { user } = await store.newUser('an internet user', { paypalEmail: 'testuser@paypal.com' });
       // And given the above collective has one expense (created by
@@ -346,7 +346,7 @@ describe('GraphQL Expenses API', () => {
 
     it('fails if expense is not approved (PENDING)', async () => {
       // Given that we have a collective
-      const { hostAdmin, collective } = await store.hostAndCollective('railsgirlsatl', 'USD', 10);
+      const { hostAdmin, collective } = await store.newCollectiveWithHost('railsgirlsatl', 'USD', 'USD', 10);
       // And given a user to file expenses
       const { user } = await store.newUser('someone cool');
       // And given the above collective has one expense (in PENDING
@@ -370,7 +370,7 @@ describe('GraphQL Expenses API', () => {
 
     it('fails if expense is not approved (REJECTED)', async () => {
       // Given that we have a collective
-      const { hostAdmin, collective } = await store.hostAndCollective('railsgirlsatl', 'USD', 10);
+      const { hostAdmin, collective } = await store.newCollectiveWithHost('railsgirlsatl', 'USD', 'USD', 10);
       // And given a user to file expenses
       const { user } = await store.newUser('someone cool');
       // And given the above collective has one expense (in PENDING
@@ -410,8 +410,8 @@ describe('GraphQL Expenses API', () => {
       const {
         hostAdmin,
         hostCollective,
-        collective
-      } = await store.hostAndCollective('railsgirlsatl', 'USD', 10);
+        collective,
+      } = await store.newCollectiveWithHost('railsgirlsatl', 'USD', 'USD', 10);
       // And given a user to file expenses
       const { user } = await store.newUser('someone cool');
       // And given the above collective has one expense (in PENDING
@@ -441,10 +441,10 @@ describe('GraphQL Expenses API', () => {
     it("fails if not enough funds to cover the fees", async () => {
       // Given that we have a host and a collective
       const {
-        hostCollective,
         hostAdmin,
-        collective
-      } = await store.hostAndCollective('railsgirlsatl', 'USD', 10);
+        hostCollective,
+        collective,
+      } = await store.newCollectiveWithHost('railsgirlsatl', 'USD', 'USD', 10);
       // And given a user to file expenses
       const { user } = await store.newUser('someone cool');
       // And given the above collective has one expense (in PENDING
@@ -475,10 +475,10 @@ describe('GraphQL Expenses API', () => {
     it("pays the expense manually and reduces the balance of the collective", async () => {
       // Given that we have a host and a collective
       const {
-        hostCollective,
         hostAdmin,
-        collective
-      } = await store.hostAndCollective('Test Collective', 'USD', 10);
+        hostCollective,
+        collective,
+      } = await store.newCollectiveWithHost('Test Collective', 'USD', 'USD', 10);
       // And given a user to file expenses
       const { user } = await store.newUser('someone cool');
       // And given the above collective has one expense (in PENDING
@@ -515,7 +515,7 @@ describe('GraphQL Expenses API', () => {
 
     it('Pay expense in kind', async () => {
       // Given that we have a host and a collective
-      const { hostAdmin, collective } = await store.hostAndCollective('Test Collective', 'USD', 10);
+      const { hostAdmin, collective } = await store.newCollectiveWithHost('Test Collective', 'USD', 'USD', 10);
       // And given a user to file expenses
       const { user, userCollective } = await store.newUser('someone cool');
       // And given the above collective has one expense (in PENDING
@@ -559,7 +559,7 @@ describe('GraphQL Expenses API', () => {
   describe('#deleteExpense', () => {
     it("fails if not logged in", async () => {
       // Given that we have a collective
-      const { hostAdmin, collective } = await store.hostAndCollective('railsgirlsatl', 'USD', 10);
+      const { hostAdmin, collective } = await store.newCollectiveWithHost('railsgirlsatl', 'USD', 'USD', 10);
       // And given the above collective has one expense
       const data = { currency: 'USD', payoutMethod: 'manual', collective: { id: collective.id } };
       const expense = await store.createExpense(hostAdmin, { amount: 1000, description: "Pizza", ...data });
@@ -573,7 +573,7 @@ describe('GraphQL Expenses API', () => {
 
     it("fails if not logged in as author, admin or host", async () => {
       // Given that we have a collective
-      const { hostAdmin, collective } = await store.hostAndCollective('railsgirlsatl', 'USD', 10);
+      const { hostAdmin, collective } = await store.newCollectiveWithHost('railsgirlsatl', 'USD', 'USD', 10);
       // And given the above collective has one expense
       const data = { currency: 'USD', payoutMethod: 'manual', collective: { id: collective.id } };
       const expense = await store.createExpense(hostAdmin, { amount: 1000, description: "Pizza", ...data });
@@ -590,7 +590,7 @@ describe('GraphQL Expenses API', () => {
 
     it("fails if logged in as backer of collective", async () => {
       // Given that we have a collective
-      const { collective } = await store.hostAndCollective('railsgirlsatl', 'USD', 10);
+      const { collective } = await store.newCollectiveWithHost('railsgirlsatl', 'USD', 'USD', 10);
       // And given a user to file an expense
       const { user } = await store.newUser('some random internet user');
       // And given the above collective has one expense (created by the host admin)
@@ -609,7 +609,7 @@ describe('GraphQL Expenses API', () => {
 
     it("works if logged in as author", async () => {
       // Given that we have a collective
-      const { collective } = await store.hostAndCollective('railsgirlsatl', 'USD', 10);
+      const { collective } = await store.newCollectiveWithHost('railsgirlsatl', 'USD', 'USD', 10);
       // And given a user that will file an expense
       const { user } = await store.newUser('an internet user');
       // And given the above collective has one expense (created by the above user)
@@ -626,7 +626,7 @@ describe('GraphQL Expenses API', () => {
 
     it("works if logged in as admin of collective", async () => {
       // Given a collective
-      const { collective } = await store.hostAndCollective('Test Collective', 'USD', 10);
+      const { collective } = await store.newCollectiveWithHost('Test Collective', 'USD', 'USD', 10);
       // And given an admin for the above collective
       const admin = (await store.newUser('collectives-admin')).user;
       await collective.addUserWithRole(admin, 'ADMIN');
@@ -647,7 +647,7 @@ describe('GraphQL Expenses API', () => {
 
     it("works if logged in as admin of host collective", async () => {
       // Given a collective
-      const { hostAdmin, collective } = await store.hostAndCollective('Test Collective', 'USD', 10);
+      const { hostAdmin, collective } = await store.newCollectiveWithHost('Test Collective', 'USD', 'USD', 10);
       // And given a user to file expenses
       const { user } = await store.newUser('someone cool');
       // And given the above collective has one expense (created by
