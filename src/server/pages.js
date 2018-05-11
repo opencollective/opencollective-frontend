@@ -3,6 +3,7 @@ import nextRoutes from 'next-routes';
 const pages = nextRoutes();
 
 pages
+  .add('home', '/')
   .add('widgets', '/widgets')
   .add('tos', '/tos')
   .add('privacypolicy', '/privacypolicy')
