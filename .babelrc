@@ -11,6 +11,7 @@
     }]
   ],
   "plugins": [
+    "lodash",
     ["react-intl", {
       "messagesDir": "./build/messages/"
     }]
