@@ -9,7 +9,7 @@ import InputTypeDropzone from './InputTypeDropzone';
 import InputTypeLocation from './InputTypeLocation';
 import InputTypeCreditCard from './InputTypeCreditCard';
 import { Col, HelpBlock, FormGroup, InputGroup, FormControl, ControlLabel, Checkbox } from 'react-bootstrap';
-import Switch from "material-ui/Switch";
+import Switch from "@material-ui/core/Switch";
 import MarkdownEditor from './MarkdownEditor';
 import HTMLEditor from './HTMLEditor';
 
