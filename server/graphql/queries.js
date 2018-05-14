@@ -23,6 +23,7 @@ import {
   TransactionInterfaceType,
   TransactionType,
   TransactionOrder,
+  OrderDirectionType,
 } from './TransactionInterface';
 
 import {
@@ -495,7 +496,10 @@ const queries = {
         description: "Fetch all collectives that are a child of `ParentCollectiveId`. Used for \"SuperCollectives\""
       },
       orderBy: { type: GraphQLString },
-      orderDirection: { type: GraphQLString },
+      orderDirection: {
+        defaultValue: 'ASC',
+        type: OrderDirectionType,
+      },
       limit: { type: GraphQLInt },
       offset: { type: GraphQLInt }
     },
