@@ -269,6 +269,15 @@ export const TransactionType = new GraphQLEnumType({
   },
 });
 
+export const OrderDirectionType = new GraphQLEnumType({
+  name: 'OrderDirection',
+  description: 'Possible directions in which to order a list of items when provided an orderBy argument.',
+  values: {
+    ASC: {},
+    DESC: {},
+  },
+});
+
 export const TransactionOrder = new GraphQLInputObjectType({
   name: 'TransactionOrder',
   description: 'Ordering options for transactions',
@@ -290,14 +299,7 @@ export const TransactionOrder = new GraphQLInputObjectType({
     direction: {
       description: 'The ordering direction.',
       defaultValue: 'DESC',
-      type: new GraphQLEnumType({
-        name: 'OrderDirection',
-        description: 'Possible directions in which to order a list of items when provided an orderBy argument.',
-        values: {
-          ASC: {},
-          DESC: {},
-        },
-      }),
+      type: OrderDirectionType,
     },
   },
 });

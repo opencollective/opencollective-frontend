@@ -4,7 +4,8 @@ import {
   GraphQLString,
   GraphQLBoolean,
   GraphQLInterfaceType,
-  GraphQLObjectType
+  GraphQLObjectType,
+  GraphQLEnumType,
 } from 'graphql';
 
 import GraphQLJSON from 'graphql-type-json';
@@ -28,6 +29,35 @@ import {
 import { types } from '../constants/collectives';
 import models from '../models';
 import roles from '../constants/roles';
+
+export const TypeOfCollectiveType = new GraphQLEnumType({
+  name: 'TypeOfCollective',
+  values: {
+    COLLECTIVE: {},
+    EVENT: {},
+    ORGANIZATION: {},
+    USER: {},
+  },
+});
+
+export const CollectiveOrderFieldType = new GraphQLEnumType({
+  name: 'CollectiveOrderField',
+  description: 'Properties by which collectives can be ordered.',
+  values: {
+    balance: {
+      description: 'Order collectives by total balance.',
+    },
+    createdAt: {
+      description: 'Order collectives by creation time.',
+    },
+    name: {
+      description: 'Order collectives by name.',
+    },
+    updatedAt: {
+      description: 'Order collectives by updated time.',
+    },
+  },
+});
 
 export const BackersStatsType = new GraphQLObjectType({
   name: "BackersStatsType",
