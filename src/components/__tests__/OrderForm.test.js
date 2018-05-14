@@ -12,7 +12,7 @@ import Enzyme, { mount } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
 Enzyme.configure({ adapter: new Adapter() });
 
-const getStripeToken = sinon.stub(stripe, 'getStripeToken', () => {
+const getStripeToken = sinon.stub(stripe, 'getStripeToken').callsFake(() => {
   return {
     token: 'xxx',
     card: {
@@ -23,7 +23,7 @@ const getStripeToken = sinon.stub(stripe, 'getStripeToken', () => {
   }
 })
 
-sinon.stub(api, 'checkUserExistence', () => Promise.resolve(false));
+sinon.stub(api, 'checkUserExistence').callsFake(() => Promise.resolve(false));
 
 describe("OrderForm component", () => {
 
