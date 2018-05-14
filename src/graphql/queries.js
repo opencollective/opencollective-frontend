@@ -1,9 +1,7 @@
 import { graphql } from 'react-apollo'
 import gql from 'graphql-tag'
-import moment from 'moment';
-import LoggedInUser from '../classes/LoggedInUser';
-import storage from '../lib/storage';
-import * as api from '../lib/api';
+
+import withLoggedInUser from '../lib/withLoggedInUser';
 
 export const transactionFields = `
   id
@@ -709,63 +707,9 @@ export const addTiersData = graphql(getTiersQuery);
 export const addSubscriptionsData = graphql(getSubscriptionsQuery);
 export const addSearchQueryData = graphql(searchCollectivesQuery);
 
-const refreshLoggedInUser = async (data) => {
-  let res;
-
-  if (data.LoggedInUser) {
-    const user = new LoggedInUser(data.LoggedInUser);
-    storage.set("LoggedInUser", user, 1000 * 60 * 60);
-    return user;
+export const addGetLoggedInUserFunction = component => {
+  if (process.env.NODE_ENV == 'development') {
+    console.warn('addGetLoggedInUserFunction is deprecated, use withLoggedInUser instead');
   }
-
-  try {
-    res = await data.refetch();
-    if (!res.data || !res.data.LoggedInUser) {
-      storage.set("LoggedInUser", null);
-      return null;
-    }
-    const user = new LoggedInUser(res.data.LoggedInUser);
-    storage.set("LoggedInUser", user, 1000 * 60 * 60);
-    return user;
-  } catch (e) {
-    console.error(">>> getLoggedInUser error:", e);
-    storage.set("LoggedInUser", null);
-    return null;
-  }
-};
-
-const maybeRefreshAccessToken = async (currentToken) => {
-  const { exp } = JSON.parse(atob(currentToken.split('.')[1]));
-  const shouldUpdate = moment(exp * 1000).subtract(1, 'month').isBefore(new Date);
-  if (shouldUpdate) {
-    const { token } = await api.refreshToken(currentToken);
-    window.localStorage.getItem('accessToken', token);
-  }
-};
-
-export const addGetLoggedInUserFunction = (component) => {
-  const accessToken = typeof window !== 'undefined' && window.localStorage.getItem('accessToken');
-  if (!accessToken) return component;
-  return graphql(getLoggedInUserQuery, {
-    props: ({ data }) => ({
-      data,
-      getLoggedInUser: async () => {
-        const token = window.localStorage.getItem('accessToken');
-        if (!token) {
-          storage.set("LoggedInUser", null);
-          return null;
-        }
-
-        // Just issue the request, don't wait for this call
-        maybeRefreshAccessToken(token);
-
-        const cache = storage.get("LoggedInUser");
-        if (cache) {
-          refreshLoggedInUser(data); // we don't wait.
-          return new LoggedInUser(cache);
-        }
-        return await refreshLoggedInUser(data);
-      }
-    })
-  })(component);
+  return withLoggedInUser(component);
 }
