@@ -1,16 +1,51 @@
-import { expect } from 'chai';
-import { describe, it } from 'mocha';
-import models from '../server/models';
+/** @module test/graphql.invoices.test
+ *
+ * This tests all the GraphQL API methods that interact with user
+ * invoices. */
 
+import sinon from 'sinon';
+import { expect } from 'chai';
+
+/* Test utilities */
 import * as utils from './utils';
+import * as store from './features/support/stores';
+
+/** Create host, collective, payment method and make a donation
+ *
+ * As a bonus feature, this helper freezes time at `createdAt' so all
+ * the objects created will have that date as their creation date.
+ *
+ * The payment method is always stripe for now.
+ */
+async function donate(userCollective, currency, amount, createdAt, collective) {
+  const timer = sinon.useFakeTimers((new Date(createdAt)).getTime());
+  try {
+    await store.stripeConnectedAccount(collective.HostCollectiveId);
+    await store.stripeOneTimeDonation({ userCollective, collective, currency, amount });
+  } finally {
+    timer.restore();
+  }
+}
 
 describe('graphql.invoices.test.js', () => {
 
   let xdamman;
 
-  before(() => utils.loadDB("opencollective_dvl"));
   before(async () => {
-    xdamman = await models.User.findById(2);
+    // First reset the test database
+    await utils.resetTestDB();
+    // Given a user and its collective
+    const { userCollective, user } = await store.newUser('xdamman');
+    xdamman = user;
+    // And given the collective (with their host)
+    const { collective } = await store.newCollectiveWithHost(
+      'brusselstogether', 'EUR', 'EUR', 10);
+    // And given some donations to that collective
+    await donate(userCollective, 'EUR', 1000, '2017-09-03 00:00', collective);
+    await donate(userCollective, 'EUR', 1000, '2017-10-05 00:00', collective);
+    await donate(userCollective, 'EUR',  500, '2017-10-25 00:00', collective);
+    await donate(userCollective, 'EUR',  500, '2017-11-05 00:00', collective);
+    await donate(userCollective, 'EUR',  500, '2017-11-25 00:00', collective);
   });
 
   describe('return transactions', () => {
@@ -56,12 +91,12 @@ describe('graphql.invoices.test.js', () => {
       result.errors && console.error(result.errors[0]);
       expect(result.errors).to.not.exist;
       const invoices = result.data.allInvoices;
-      expect(invoices).to.have.length(23);
+      expect(invoices).to.have.length(3);
       expect(invoices[0].year).to.equal(2017);
       expect(invoices[0].month).to.equal(11);
       expect(invoices[0].totalAmount).to.equal(1000);
       expect(invoices[0].currency).to.equal("EUR");
-      expect(invoices[0].host.slug).to.equal("brusselstogether");
+      expect(invoices[0].host.slug).to.equal("brusselstogether-host");
       expect(invoices[0].fromCollective.slug).to.equal("xdamman");
     });
 
@@ -97,11 +132,11 @@ describe('graphql.invoices.test.js', () => {
           }
         }
       `;
-      const result = await utils.graphqlQuery(query, { invoiceSlug: "201710-brusselstogether-xdamman" }, xdamman);
+      const result = await utils.graphqlQuery(query, { invoiceSlug: "201710-brusselstogether-host-xdamman" }, xdamman);
       result.errors && console.error(result.errors[0]);
       expect(result.errors).to.not.exist;
       const invoice = result.data.Invoice;
-      expect(invoice.host.slug).to.equal("brusselstogether");
+      expect(invoice.host.slug).to.equal("brusselstogether-host");
       expect(invoice.fromCollective.slug).to.equal("xdamman");
       expect(invoice.totalAmount).to.equal(1500);
       expect(invoice.currency).to.equal("EUR");
