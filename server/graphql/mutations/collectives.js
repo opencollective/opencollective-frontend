@@ -170,7 +170,7 @@ export function createCollective(_, args, req) {
   .then(() => collective.addUserWithRole(req.remoteUser, roles.ADMIN, { CreatedByUserId: req.remoteUser.id }))
   .then(() => {
     if (collective.HostCollectiveId) {
-      collective.addHost(hostCollective, req.remoteUser);
+      return collective.addHost(hostCollective, req.remoteUser);
     }
   })
   .then(() => collective.editPaymentMethods(args.collective.paymentMethods, { CreatedByUserId: req.remoteUser.id }))
