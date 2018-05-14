@@ -11,7 +11,7 @@ const logo = '/static/images/opencollective-icon.svg';
 class TopBar extends React.Component {
 
   static propTypes = {
-    LoggedInUser: PropTypes.object.isRequired,
+    LoggedInUser: PropTypes.object,
     showSearch: PropTypes.bool,
   }
 
