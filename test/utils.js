@@ -1,18 +1,24 @@
-import Promise from 'bluebird';
-import nock from 'nock';
-import {sequelize} from '../server/models';
-import jsonData from './mocks/data';
-import userlib from '../server/lib/userlib';
 import config from 'config';
-import { isArray, values } from 'lodash';
-import path from 'path';
-import { exec } from 'child_process';
 import debug from 'debug';
-import { loaders } from '../server/graphql/loaders';
-import { graphql } from 'graphql';
-import schema from '../server/graphql/schema';
-import * as libcache from '../server/lib/cache';
+import nock from 'nock';
+import path from 'path';
+import Promise from 'bluebird';
 import Stripe from 'stripe';
+import { exec } from 'child_process';
+import { graphql } from 'graphql';
+import { isArray, values } from 'lodash';
+
+/* Test data */
+import jsonData from './mocks/data';
+
+/* Server code being used */
+import userlib from '../server/lib/userlib';
+import schema from '../server/graphql/schema';
+import { loaders } from '../server/graphql/loaders';
+import { sequelize } from '../server/models';
+import * as libcache from '../server/lib/cache';
+import * as stripeGateway from '../server/paymentProviders/stripe/gateway';
+
 const appStripe = Stripe(config.stripe.secret);
 
 if (process.env.RECORD) {
@@ -143,6 +149,8 @@ export const graphqlQuery = async (query, variables, remoteUser) => {
     ));
 }
 
+/* ---- Stripe Helpers ---- */
+
 export const createStripeToken = async () => {
     return appStripe.tokens.create({
       card: {
@@ -153,4 +161,38 @@ export const createStripeToken = async () => {
       }
     })
     .then(st => st.id);
+}
+
+/** Stub Stripe methods used while creating transactions
+ *
+ * @param {sinon.sandbox} sandbox is the sandbox that the test created
+ *  and the one that *must* be reset after the test is done.
+ */
+export function stubStripeCreate(sandbox, overloadDefaults) {
+  const values = {
+    customer: 'cus_BM7mGwp1Ea8RtL',
+    token: 'tok_1AzPXGD8MNtzsDcgwaltZuvp',
+    charge: 'ch_1AzPXHD8MNtzsDcgXpUhv4pm',
+    ...overloadDefaults,
+  };
+  /* Little helper function that returns the stub with a given
+   * value. */
+  const factory = (name) => async () => Promise.resolve({ id: values[name] })
+  sandbox.stub(stripeGateway, "createCustomer", factory('customer'));
+  sandbox.stub(stripeGateway, "createToken", factory('token'));
+  sandbox.stub(stripeGateway, "createCharge", factory('charge'));
+}
+
+export function stubStripeBalance(sandbox, amount, currency) {
+  return sandbox.stub(stripeGateway, "retrieveBalanceTransaction", async () => ({
+    id: "txn_1Bs9EEBYycQg1OMfTR33Y5Xr",
+    object: "balance_transaction",
+    amount,
+    currency,
+    fee: 0,
+    fee_details: [],
+    net: amount, // - fees
+    status: "pending",
+    type: "charge",
+  }));
 }

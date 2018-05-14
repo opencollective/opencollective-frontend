@@ -3,9 +3,14 @@
  * Helpers for interacting with the database models.
  */
 
+/* Test libraries */
+import sinon from 'sinon';
+import * as utils from '../../../utils';
+
 /* Libraries that create the objects */
 import models from '../../../../server/models';
 import * as expenses from '../../../../server/graphql/mutations/expenses';
+import * as libpayments from '../../../../server/lib/payments';
 
 /** Randomize email since it's a unique key in the database
  *
@@ -124,4 +129,83 @@ export async function newCollectiveInHost(name, currency, hostCollective) {
  */
 export async function createExpense(user, expenseData) {
   return expenses.createExpense(user, expenseData);
+}
+
+/* -- STRIPE METHODS -- */
+
+/** Create a stripe account for a host collective
+ *
+ * @param {Number} hostId is the id of the host collective that the
+ *  newly created connected account object will be associated to.
+ * @return {models.ConnectedAccount} the newly created connected
+ *  account instance.
+ */
+export async function stripeConnectedAccount(hostId) {
+  return models.ConnectedAccount.create({
+    service: 'stripe',
+    token: 'sk_test_XOFJ9lGbErcK5akcfdYM1D7j',
+    username: 'acct_198T7jD8MNtzsDcg',
+    CollectiveId: hostId,
+  });
+}
+
+/** Create an order and Stripe payment method
+ *
+ * @param {models.Collective} opt.from is the collective the order is
+ *  initiated by.
+ * @param {models.Collective} opt.to is the collective receiving the
+ *  donation.
+ * @param {Number} opt.amount is the amount of the order.
+ * @param {String} opt.currency is the currency of the collective
+ *  initiating the order.
+ */
+export async function stripeOrderAndPaymentMethod(opt) {
+  const { from, to, amount, currency } = opt;
+  const order = await models.Order.create({
+    ...opt,
+    description: `Donation to ${to.slug}`,
+    totalAmount: amount,
+    currency,
+    CreatedByUserId: from.CreatedByUserId,
+    FromCollectiveId: from.id,
+    CollectiveId: to.id,
+  });
+  await order.setPaymentMethod({
+    token: "tok_123456781234567812345678",
+  });
+  return { order };
+}
+
+/** Create a one time donation.
+ *
+ * This function creates an order for a one time donation.
+ *
+ * @param {models.Order} opt.order is the order to be executed
+ * @param {models.Collective} opt.userCollective is the collective
+ *  making the donation.
+ * @param {models.Collective} opt.collective is the collective
+ *  receiving the donation.
+ * @param {Number} opt.amount is the amount of the order in cents.
+ * @param {String} opt.currency is the currency of the user making the
+ *  order.
+ */
+export async function stripeOneTimeDonation(opt) {
+  const { userCollective, collective, amount, currency } = opt;
+  const params = { from: userCollective, to: collective, amount, currency };
+  const { order } = await stripeOrderAndPaymentMethod(params)
+  const user = await models.User.findById(userCollective.CreatedByUserId);
+  // Every transaction made can use different values, so we stub the
+  // stripe call, create the order, and restore the stripe call so it
+  // can be stubbed again by the next call to this helper.
+  const sandbox = sinon.sandbox.create();
+  try {
+    utils.stubStripeCreate(sandbox);
+    utils.stubStripeBalance(sandbox, order.totalAmount, order.currency)
+    // Although it's supposed to be OK to omit `await' when returning
+    // a promise, it's causing this next call to fail so I'm keeping
+    // it here.
+    return await libpayments.executeOrder(user, order);
+  } finally {
+    sandbox.restore();
+  }
 }
