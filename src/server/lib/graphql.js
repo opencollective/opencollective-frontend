@@ -3,7 +3,14 @@ import { uniqBy } from 'lodash';
 
 import { getGraphqlUrl } from '../../lib/utils'
 
-const client = new GraphQLClient(getGraphqlUrl(), { headers: {} })
+let client;
+
+function getClient() {
+  if (!client) {
+    client = new GraphQLClient(getGraphqlUrl(), { headers: {} })
+  }
+  return client;
+}
 
 export async function fetchCollective(collectiveSlug) {
   const query = `
@@ -25,7 +32,7 @@ export async function fetchCollective(collectiveSlug) {
   }
   `;
 
-  const result = await client.request(query, { collectiveSlug });
+  const result = await getClient().request(query, { collectiveSlug });
   return result.Collective;
 }
 
@@ -39,7 +46,7 @@ export async function fetchCollectiveImage(collectiveSlug) {
   }
   `;
 
-  const result = await client.request(query, { collectiveSlug });
+  const result = await getClient().request(query, { collectiveSlug });
   return result.Collective;
 }
 
@@ -91,7 +98,7 @@ export async function fetchMembersStats(params) {
     }
   }
   try {
-    const result = await client.request(query, params);
+    const result = await getClient().request(query, params);
     const count = processResult(result);
     return count;
   } catch (e) {
@@ -169,7 +176,7 @@ export async function fetchMembers({ collectiveSlug, tierSlug, backerType, isAct
     processResult = (res) => uniqBy(res.Collective.tiers[0].orders.map(o => o.fromCollective), m => m.id);
   }
 
-  const result = await (options.client || client).request(query, { collectiveSlug, tierSlug, type, role, isActive });
+  const result = await (options.client || getClient()).request(query, { collectiveSlug, tierSlug, type, role, isActive });
   const members = processResult(result);
   return members;
 }
@@ -195,7 +202,7 @@ export async function fetchEvents(parentCollectiveSlug, options = { limit: 10 })
   }
   `;
 
-  const result = await client.request(query, { slug: parentCollectiveSlug, limit: options.limit || 10 });
+  const result = await getClient().request(query, { slug: parentCollectiveSlug, limit: options.limit || 10 });
   return result.allEvents;
 }
 
@@ -228,7 +235,7 @@ export async function fetchEvent(eventSlug) {
   }
   `;
 
-  const result = await client.request(query, { slug: eventSlug });
+  const result = await getClient().request(query, { slug: eventSlug });
   return result.Collective;
 }
 
