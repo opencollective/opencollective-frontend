@@ -190,7 +190,7 @@ const mutations = {
       }
     },
     resolve(_, args, req) {
-      return createOrder(_, args, req);
+      return createOrder(args.order, req.loaders, req.remoteUser);
     }
   },
   createUpdate: {

@@ -14,24 +14,23 @@ import { getNextChargeAndPeriodStartDates, getChargeRetryCount} from '../../lib/
 
 const debugOrder = debug('order');
 
-export function createOrder(_, args, req) {
+export function createOrder(order, loaders, remoteUser) {
   let tier, collective, fromCollective, paymentRequired, interval, orderCreated, user;
-  const order = args.order;
 
-  if (order.paymentMethod && order.paymentMethod.service === 'stripe' && order.paymentMethod.uuid && !req.remoteUser) {
+  if (order.paymentMethod && order.paymentMethod.service === 'stripe' && order.paymentMethod.uuid && !remoteUser) {
     throw new Error("You need to be logged in to be able to use a payment method on file");
   }
 
-  if (!order.collective.id) {
+  if (!order.collective || !order.collective.id) {
     throw new Error("No collective id provided");
   }
 
-  if (order.platformFeePercent && !req.remoteUser.isRoot()) {
+  if (order.platformFeePercent && !remoteUser.isRoot()) {
     throw new Error(`Only a root can change the platformFeePercent`);
   }
 
   // Check the existence of the recipient Collective
-  return req.loaders.collective.findById.load(order.collective.id)
+  return loaders.collective.findById.load(order.collective.id)
   .then(c => {
     if (!c) {
       throw new Error(`No collective found with id: ${order.collective.id}`);
@@ -48,7 +47,7 @@ export function createOrder(_, args, req) {
 
     if (order.hostFeePercent) {
       return collective.getHostCollectiveId().then(HostCollectiveId => {
-        if (!req.remoteUser.isAdmin(HostCollectiveId)) {
+        if (!remoteUser.isAdmin(HostCollectiveId)) {
           throw new Error(`Only an admin of the host can change the hostFeePercent`);
         }
       });
@@ -96,8 +95,14 @@ export function createOrder(_, args, req) {
 
     // find or create user, check permissions to set `fromCollective`
     .then(() => {
-      if (order.user && order.user.email) return models.User.findOrCreateByEmail(order.user.email, { ...order.user, currency: order.currency, CreatedByUserId: req.remoteUser ? req.remoteUser.id : null });
-      if (req.remoteUser) return req.remoteUser;
+      if (order.user && order.user.email) {
+        return models.User.findOrCreateByEmail(order.user.email, {
+          ...order.user,
+          currency: order.currency,
+          CreatedByUserId: remoteUser ? remoteUser.id : null,
+        });
+      }
+      if (remoteUser) return remoteUser;
     })
 
     // returns the fromCollective
@@ -110,19 +115,18 @@ export function createOrder(_, args, req) {
 
       // If a `fromCollective` is provided, we check its existence and if the user can create an order on its behalf
       if (order.fromCollective.id) {
-        if (!req.remoteUser) throw new Error(`You need to be logged in to create an order for an existing open collective`);
-        return req.loaders
-        .collective.findById.load(order.fromCollective.id)
+        if (!remoteUser) throw new Error(`You need to be logged in to create an order for an existing open collective`);
+        return loaders.collective.findById.load(order.fromCollective.id)
         .then(c => {
           if (!c) throw new Error(`From collective id ${order.fromCollective.id} not found`);
           const possibleRoles = [roles.ADMIN, roles.HOST];
           if (c.type === types.ORGANIZATION) {
             possibleRoles.push(roles.MEMBER);
           }
-          if (!req.remoteUser.hasRole(possibleRoles, order.fromCollective.id)) {
+          if (!remoteUser.hasRole(possibleRoles, order.fromCollective.id)) {
             // We only allow to add funds on behalf of a collective if the user is an admin of that collective or an admin of the host of the collective that receives the money
             return collective.getHostCollectiveId().then(HostCollectiveId => {
-              if (!req.remoteUser.isAdmin(HostCollectiveId)) {
+              if (!remoteUser.isAdmin(HostCollectiveId)) {
                 throw new Error(`You don't have sufficient permissions to create an order on behalf of the ${c.name} ${c.type.toLowerCase()}`);
               } else {
                 return c;
@@ -133,8 +137,8 @@ export function createOrder(_, args, req) {
         });
       } else {
         // Create new organization collective
-        if (req.remoteUser) {
-          order.fromCollective.CreatedByUserId = req.remoteUser.id;
+        if (remoteUser) {
+          order.fromCollective.CreatedByUserId = remoteUser.id;
         }
         return models.Collective.createOrganization(order.fromCollective, user)
       }
@@ -177,7 +181,7 @@ export function createOrder(_, args, req) {
       }
 
       const orderData = {
-        CreatedByUserId: req.remoteUser ? req.remoteUser.id : user.id,
+        CreatedByUserId: remoteUser ? remoteUser.id : user.id,
         FromCollectiveId: fromCollective.id,
         CollectiveId: collective.id,
         TierId: tier && tier.id,
@@ -210,10 +214,10 @@ export function createOrder(_, args, req) {
       if (paymentRequired) {
         return orderCreated
           .setPaymentMethod(order.paymentMethod)
-          .then(() => libPayments.executeOrder(req.remoteUser || user, orderCreated, pick(order, ['hostFeePercent', 'platformFeePercent']))) // also adds the user as a BACKER of collective
+          .then(() => libPayments.executeOrder(remoteUser || user, orderCreated, pick(order, ['hostFeePercent', 'platformFeePercent']))) // also adds the user as a BACKER of collective
       } else {
         // Free ticket, add user as an ATTENDEE
-        const email = (req.remoteUser) ? req.remoteUser.email : args.order.user.email;
+        const email = (remoteUser) ? remoteUser.email : order.user.email;
         return collective.addUserWithRole(user, roles.ATTENDEE)
           .then(() => emailLib.send('ticket.confirmed', email, {
           recipient: { name: fromCollective.name },
