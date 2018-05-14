@@ -24,6 +24,11 @@ export function randEmail(email) {
   return `${user}-${rand}@${domain}`;
 }
 
+/** Convert string to lower case and swap spaces with dashes */
+function slugify(value) {
+  return value.toLowerCase().replace(/\s/g, '-');
+}
+
 /** Create a new user with a collective
  *
  * @param {String} name is the name of the new user. The email created
@@ -34,10 +39,12 @@ export function randEmail(email) {
  * @return {Object} with references for `user` and `userCollective`.
  */
 export async function newUser(name, data={}) {
-  const email = randEmail(`${name}@oc.com`);
+  const slug = slugify(name);
+  const email = randEmail(`${slug}@oc.com`);
   const user = await models.User.createUserWithCollective({
     ...data,
     email,
+    slug,
     name,
     username: name,
     description: `A user called ${name}`,
@@ -56,10 +63,11 @@ export async function newUser(name, data={}) {
  */
 export async function newHost(name, currency, hostFee) {
   // Host Admin
-  const hostAdmin = (await newUser(`${name}-${currency}-admin`)).user;
+  const slug = slugify(name);
+  const hostAdmin = (await newUser(`${name} Admin`)).user;
   const hostFeePercent = hostFee ? parseInt(hostFee) : 0;
   const hostCollective = await models.Collective.create({
-    name, currency, hostFeePercent, CreatedByUserId: hostAdmin.id,
+    name, slug, currency, hostFeePercent, CreatedByUserId: hostAdmin.id,
   });
   await hostCollective.addUserWithRole(hostAdmin, 'ADMIN');
   return { hostAdmin, hostCollective };
@@ -75,9 +83,9 @@ export async function newHost(name, currency, hostFee) {
  *  `hostAdmin`, and `collective`.
  */
 export async function newCollectiveWithHost(name, currency, hostCurrency, hostFee) {
-  const hostName = `${name}-Host`;
-  const { hostAdmin, hostCollective } = await newHost(hostName, hostCurrency, hostFee);
-  const collective = await models.Collective.create({ name, currency });
+  const { hostAdmin, hostCollective } = await newHost(`${name} Host`, hostCurrency, hostFee);
+  const slug = slugify(name);
+  const collective = await models.Collective.create({ name, slug, currency });
   await collective.addHost(hostCollective);
   return { hostCollective, hostAdmin, collective };
 }
@@ -91,7 +99,8 @@ export async function newCollectiveWithHost(name, currency, hostCurrency, hostFe
  *  `hostCollective`.
  */
 export async function newCollectiveInHost(name, currency, hostCollective) {
-  const collective = await models.Collective.create({ name, currency });
+  const slug = slugify(name);
+  const collective = await models.Collective.create({ name, slug, currency });
   await collective.addHost(hostCollective);
   return { collective };
 }
