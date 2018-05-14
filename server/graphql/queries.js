@@ -16,6 +16,8 @@ import {
 import {
   CollectiveInterfaceType,
   CollectiveSearchResultsType,
+  TypeOfCollectiveType,
+  CollectiveOrderFieldType,
 } from './CollectiveInterface';
 
 import {
@@ -475,7 +477,7 @@ const queries = {
     args: {
       tags: { type: new GraphQLList(GraphQLString) },
       type: {
-        type: GraphQLString,
+        type: TypeOfCollectiveType,
         description: "COLLECTIVE, USER, ORGANIZATION, EVENT"
       },
       HostCollectiveId: { type: GraphQLInt },
@@ -495,7 +497,10 @@ const queries = {
         type: GraphQLInt,
         description: "Fetch all collectives that are a child of `ParentCollectiveId`. Used for \"SuperCollectives\""
       },
-      orderBy: { type: GraphQLString },
+      orderBy: {
+        defaultValue: 'name',
+        type: CollectiveOrderFieldType
+      },
       orderDirection: {
         defaultValue: 'ASC',
         type: OrderDirectionType,
@@ -537,11 +542,12 @@ const queries = {
 
       if (args.orderBy === 'balance' && (args.ParentCollectiveId || args.HostCollectiveId || args.tags)) {
         return rawQueries.getCollectivesWithBalance(query.where, args);
-      } else {
-        query.order = [['name', 'ASC']];
       }
 
+      query.order = [[args.orderBy, args.orderDirection]];
+
       if (args.offset) query.offset = args.offset;
+
       return models.Collective.findAll(query);
     }
   },
