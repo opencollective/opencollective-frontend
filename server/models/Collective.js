@@ -1336,7 +1336,7 @@ export default function(Sequelize, DataTypes) {
         });
       })
       .tap(collective => {
-        models.Activity.create({
+        return models.Activity.create({
           type: activities.ORGANIZATION_COLLECTIVE_CREATED,
           UserId: adminUser.id,
           CollectiveId: collective.id,
