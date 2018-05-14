@@ -104,7 +104,6 @@ class Comment extends React.Component {
           }
           .description {
             text-overflow: ellipsis;
-            white-space: nowrap;
             overflow: hidden;
             display: block;
           }
