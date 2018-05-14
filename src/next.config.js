@@ -1,6 +1,5 @@
-import path from 'path';
-import glob from 'glob';
 import webpack from 'webpack';
+import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
 
 module.exports = {
   onDemandEntries: {
@@ -14,6 +13,15 @@ module.exports = {
       // Only include our supported locales
       new webpack.ContextReplacementPlugin(/moment[/\\]locale$/, /en|fr|es|ja/),
     );
+    if (process.env.WEBPACK_BUNDLE_ANALYZER) {
+      config.plugins.push(
+        new BundleAnalyzerPlugin({
+          analyzerMode: 'static',
+          generateStatsFile: true,
+          openAnalyzer: false
+        }),
+      )
+    }
     config.module.rules.push(
       {
         test: /\.css$/,

@@ -128,7 +128,8 @@
     "react-test-renderer": "^16.3.2",
     "regenerator-runtime": "^0.11.1",
     "semantic-release": "^15.3.1",
-    "sinon": "2.4.1"
+    "sinon": "2.4.1",
+    "webpack-bundle-analyzer": "^2.11.3"
   },
   "postcss": {
     "plugins": {
