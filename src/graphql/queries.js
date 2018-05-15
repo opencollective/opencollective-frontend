@@ -144,6 +144,7 @@ const getCollectiveToEditQuery = gql`
       backgroundImage
       description
       longDescription
+      tags
       twitterHandle
       website
       currency

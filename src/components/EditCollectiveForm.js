@@ -54,6 +54,8 @@ class EditCollectiveForm extends React.Component {
       'slug.label': { id: 'collective.slug.label', defaultMessage: 'url' },
       'type.label': { id: 'collective.type.label', defaultMessage: 'type' },
       'name.label': { id: 'collective.name.label', defaultMessage: 'name' },
+      'tags.label': { id: 'collective.tags.label', defaultMessage: 'tags' },
+      'tags.description': { id: 'collective.tags.description', defaultMessage: 'Make your collective discoverable in search and related collectives (comma separated)' },
       'company.label': { id: 'collective.company.label', defaultMessage: 'company' },
       'company.description': { id: 'collective.company.description', defaultMessage: 'Start with a @ to reference an organization (e.g. @airbnb)' },
       'amount.label': { id: 'collective.amount.label', defaultMessage: 'amount' },
@@ -174,6 +176,12 @@ class EditCollectiveForm extends React.Component {
           type: 'textarea',
           placeholder: '',
           description: 'Protip: you can use markdown'
+        },
+        {
+          name: 'tags',
+          maxLength: 128,
+          type: 'text',
+          placeholder: 'meetup, javascript'
         }
       ],
       images: [
@@ -222,7 +230,7 @@ class EditCollectiveForm extends React.Component {
         field.label = intl.formatMessage(this.messages[`${field.name}.label`]);
       }
       if (this.messages[`${field.name}.description`]) {
-        field.description = intl.formatMessage(this.messages[`${field.name}.description`]);
+        field.description = intl.formatMessage(this.messages[`${field.name}.description`], collective);
       }
       if (this.messages[`${field.name}.placeholder`]) {
         field.placeholder = intl.formatMessage(this.messages[`${field.name}.placeholder`]);
