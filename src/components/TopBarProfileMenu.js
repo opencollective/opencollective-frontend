@@ -10,7 +10,8 @@ import { get, uniqBy } from 'lodash';
 class TopBarProfileMenu extends React.Component {
 
   static propTypes = {
-    LoggedInUser: PropTypes.object
+    LoggedInUser: PropTypes.object,
+    intl: PropTypes.object.isRequired,
   }
 
   constructor(props) {
