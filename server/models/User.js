@@ -114,11 +114,19 @@ export default (Sequelize, DataTypes) => {
       type: DataTypes.DATE,
       defaultValue: Sequelize.NOW
     },
+
     updatedAt: {
       type: DataTypes.DATE,
       defaultValue: Sequelize.NOW
     },
-    seenAt: DataTypes.DATE
+
+    seenAt: DataTypes.DATE,
+
+    newsletterOptIn: {
+      allowNull: false,
+      defaultValue: false,
+      type: DataTypes.BOOLEAN,
+    },
 
   }, {
     paranoid: true,
