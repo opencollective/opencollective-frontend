@@ -1,3 +1,5 @@
+import { get } from 'lodash';
+
 export function truncate(str, length) {
   if (!str || typeof str !== 'string' || str.length <= length) {
     return str;
@@ -57,6 +59,14 @@ export function getCurrencySymbol(currency) {
  return r.replace(/0$/,'');
 }
 
+export function getBaseImagesUrl() {
+  if (process.browser) {
+    return get(window, ['__NEXT_DATA__', 'env', 'IMAGES_URL']);
+  } else {
+    return get(process, ['env', 'IMAGES_URL']);
+  }
+}
+
 export function resizeImage(imageUrl, { width, height, query, baseUrl }) {
   if (!imageUrl) return null;
   if (!query && imageUrl.match(/\.svg$/)) return imageUrl; // if we don't need to transform the image, no need to proxy it.
@@ -67,7 +77,8 @@ export function resizeImage(imageUrl, { width, height, query, baseUrl }) {
     if (width) queryurl += `&width=${width}`;
     if (height) queryurl += `&height=${height}`;
   }
-  return `${process.env.IMAGES_URL || baseUrl || ''}/proxy/images/?src=${encodeURIComponent(imageUrl)}${queryurl}`;
+
+  return `${getBaseImagesUrl() || baseUrl || ''}/proxy/images/?src=${encodeURIComponent(imageUrl)}${queryurl}`;
 }
 
 export function imagePreview(src, defaultImage, options = { width: 640 }) {

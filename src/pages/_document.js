@@ -1,18 +1,26 @@
-
-import Document, {Head, Main, NextScript} from 'next/document'
+import React from 'react';
+import Document, { Head, Main, NextScript } from 'next/document'
 
 // The document (which is SSR-only) needs to be customized to expose the locale
 // data for the user's locale for React Intl to work in the browser.
 export default class IntlDocument extends Document {
+
   static async getInitialProps (context) {
     const props = await super.getInitialProps(context);
-    const {req: {locale, localeDataScript}} = context;
+    const { req: { locale, localeDataScript } } = context;
 
     return {
       ...props,
       locale,
       localeDataScript
     }
+  }
+
+  constructor (props) {
+    super(props);
+    props.__NEXT_DATA__.env = {
+      IMAGES_URL: process.env.IMAGES_URL || '',
+    };
   }
 
   render () {
