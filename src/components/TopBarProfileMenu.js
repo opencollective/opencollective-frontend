@@ -17,7 +17,6 @@ class TopBarProfileMenu extends React.Component {
     super(props);
     this.state = { showProfileMenu: false, loading: true };
     this.toggleProfileMenu = this.toggleProfileMenu.bind(this);
-    this.logout = this.logout.bind(this);
     this.messages = defineMessages({
       'tooltip.balance': { id: 'profilemenu.memberships.tooltip.balance', defaultMessage: 'Balance {balance}' },
       'tooltip.pendingExpenses': { id: 'profilemenu.memberships.tooltip.pendingExpenses', defaultMessage: '{n} pending expenses' },
@@ -25,16 +24,8 @@ class TopBarProfileMenu extends React.Component {
     });
   }
 
-  logout() {
-    this.setState({ showProfileMenu: false, status: 'loggingout' })
-    window.localStorage.removeItem('accessToken');
-    window.localStorage.removeItem('LoggedInUser');
-    window.location.replace(window.location.href);
-  }
-
   componentDidMount() {
-    this.onClickOutsideRef = this.onClickOutside.bind(this);
-    document.addEventListener('click', this.onClickOutsideRef);
+    document.addEventListener('click', this.onClickOutside);
     if (typeof window !== 'undefined') {
       this.redirectAfterSignin = window.location.href.replace(/^https?:\/\/[^/]+/,'');
       if (!window.localStorage.accessToken) {
@@ -44,10 +35,17 @@ class TopBarProfileMenu extends React.Component {
   }
 
   componentWillUnmount() {
-    document.removeEventListener('click', this.onClickOutsideRef);
+    document.removeEventListener('click', this.onClickOutside);
   }
 
-  onClickOutside() {
+  logout = () => {
+    this.setState({ showProfileMenu: false, status: 'loggingout' })
+    window.localStorage.removeItem('accessToken');
+    window.localStorage.removeItem('LoggedInUser');
+    window.location.reload();
+  }
+
+  onClickOutside = () => {
     this.setState({ showProfileMenu: false });
   }
 
