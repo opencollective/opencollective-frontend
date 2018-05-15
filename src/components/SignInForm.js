@@ -166,16 +166,24 @@ class LoginForm extends React.Component {
 
   signup() {
     this.state.user.email = this.state.user.email && this.state.user.email.trim();
+
     if (!isValidEmail(this.state.user.email)) {
       return;
     }
+
     this.setState({ loading: true });
-    api.signin(this.state.user, this.props.next).then((result) => {
+
+    api.signin(this.state.user, this.props.next)
+    .then((result) => {
       this.setState({ loginSent: true, signup: true, isNewUser: true, loading: false });
+
       if (result.redirect) {
         window.location.replace(result.redirect);
       }
     })
+    .catch((error) => {
+      this.error(error.message);
+    });
   }
 
   handleSubmit(e) {
