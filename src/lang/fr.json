@@ -113,7 +113,7 @@
   "collective.meetup.label": "Meetup URL",
   "collective.members.label": "Nombre de membres",
   "collective.tags.label": "Tags",
-  "collective.tags.description": "Les tags aident la communauté à découvrir votre collectif. Séparez les avec une virgule.",
+  "collective.tags.description": "Les tags aident la communauté à {type, select, COLLECTIVE {découvrir votre collectif} USER {vous découvrir} ORGANIZATION {découvrir votre organisation}}. Séparez les avec une virgule.",
   "collective.tos.label": "Conditions d'utilisation",
   "organization.create": "Créer une organisation",
   "events.create.login": "Vous devez vous identifier en tant qu'administrateur de ce collectif pour pouvoir créer un événement.",

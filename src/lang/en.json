@@ -113,7 +113,7 @@
   "collective.meetup.label": "Meetup URL",
   "collective.members.label": "Number of members",
   "collective.tags.label": "Tags",
-  "collective.tags.description": "Tags helps people discover your collective. Separate them with a comma.",
+  "collective.tags.description": "Tags helps people discover {type, select, COLLECTIVE {your collective} USER {you} ORGANIZATION {your organization}}. Separate them with a comma.",
   "collective.tos.label": "Terms of Service",
   "organization.create": "Create organization",
   "events.create.login": "You need to be logged in as a core contributor of this collective to be able to create an event.",
