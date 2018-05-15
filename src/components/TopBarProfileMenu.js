@@ -16,7 +16,6 @@ class TopBarProfileMenu extends React.Component {
   constructor(props) {
     super(props);
     this.state = { showProfileMenu: false, loading: true };
-    this.toggleProfileMenu = this.toggleProfileMenu.bind(this);
     this.messages = defineMessages({
       'tooltip.balance': { id: 'profilemenu.memberships.tooltip.balance', defaultMessage: 'Balance {balance}' },
       'tooltip.pendingExpenses': { id: 'profilemenu.memberships.tooltip.pendingExpenses', defaultMessage: '{n} pending expenses' },
@@ -49,11 +48,10 @@ class TopBarProfileMenu extends React.Component {
     this.setState({ showProfileMenu: false });
   }
 
-  toggleProfileMenu(e) {
-    if (e.target.className.indexOf('LoginTopBarProfileButton') !== -1) {
-      this.setState({showProfileMenu: !this.state.showProfileMenu});
-      e.nativeEvent.stopImmediatePropagation();
-    }
+  toggleProfileMenu = (e) => {
+    this.setState({ showProfileMenu: !this.state.showProfileMenu });
+    // don't propagate to onClickOutside
+    e.nativeEvent.stopImmediatePropagation();
   }
 
   tooltip(membership) {
@@ -87,7 +85,7 @@ class TopBarProfileMenu extends React.Component {
     }); // order by role then az
 
     return (
-      <div className="LoginTopBarProfileMenu" onClick={(e) => e.nativeEvent.stopImmediatePropagation()}>
+      <div className="LoginTopBarProfileMenu">
         <style jsx>{`
         .LoginTopBarProfileMenu {
           position: absolute;
