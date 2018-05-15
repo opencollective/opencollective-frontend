@@ -170,28 +170,34 @@ export const createStripeToken = async () => {
  */
 export function stubStripeCreate(sandbox, overloadDefaults) {
   const values = {
-    customer: 'cus_BM7mGwp1Ea8RtL',
-    token: 'tok_1AzPXGD8MNtzsDcgwaltZuvp',
-    charge: 'ch_1AzPXHD8MNtzsDcgXpUhv4pm',
+    customer: { id: 'cus_BM7mGwp1Ea8RtL' },
+    token: { id: 'tok_1AzPXGD8MNtzsDcgwaltZuvp' },
+    charge: { id: 'ch_1AzPXHD8MNtzsDcgXpUhv4pm' },
     ...overloadDefaults,
   };
   /* Little helper function that returns the stub with a given
    * value. */
-  const factory = (name) => async () => Promise.resolve({ id: values[name] })
+  const factory = (name) => async () => values[name];
   sandbox.stub(stripeGateway, "createCustomer", factory('customer'));
   sandbox.stub(stripeGateway, "createToken", factory('token'));
   sandbox.stub(stripeGateway, "createCharge", factory('charge'));
 }
 
-export function stubStripeBalance(sandbox, amount, currency) {
+export function stubStripeBalance(sandbox, amount, currency, applicationFee=0, stripeFee=0) {
+  const fee_details = [];
+  const fee = applicationFee + stripeFee;
+  if (applicationFee > 0)
+    fee_details.push({ type: 'application_fee', amount: applicationFee });
+  if (stripeFee > 0)
+    fee_details.push({ type: 'stripe_fee', amount: stripeFee });
   return sandbox.stub(stripeGateway, "retrieveBalanceTransaction", async () => ({
     id: "txn_1Bs9EEBYycQg1OMfTR33Y5Xr",
     object: "balance_transaction",
     amount,
-    currency,
-    fee: 0,
-    fee_details: [],
-    net: amount, // - fees
+    currency: currency.toLowerCase(),
+    fee,
+    fee_details,
+    net: amount - fee,
     status: "pending",
     type: "charge",
   }));
