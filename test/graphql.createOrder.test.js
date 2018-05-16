@@ -151,13 +151,13 @@ describe('createOrder', () => {
         firstName: "John",
         lastName: "Smith",
         email: "jsmith@email.com",
-        twitterHandle: "johnsmith"
+        twitterHandle: "johnsmith",
+        newsletterOptIn: true,
       };
       // When the query is executed
       const res = await utils.graphqlQuery(createOrderQuery, { order });
 
       // Then there should be no errors
-      res.errors && console.error(res.errors);
       expect(res.errors).to.not.exist;
 
       const fromCollective = res.data.createOrder.fromCollective;
@@ -176,6 +176,10 @@ describe('createOrder', () => {
         .to.equal(transaction.netAmountInCollectiveCurrency);
       // we create a customer on the host stripe account even for one time charges
       expect(transaction.data.charge.customer).to.not.be.null;
+
+      const { createdByUser: { id } } = res.data.createOrder;
+      const user = await models.User.findById(id);
+      expect(user.newsletterOptIn).to.be.true;
 
       // make sure the payment has been recorded in the connected Stripe Account of the host
       expect(transaction.data.charge.currency).to.equal('eur');
