@@ -154,10 +154,10 @@ export async function fetchMembers({ collectiveSlug, tierSlug, backerType, isAct
     processResult = (res) => uniqBy(res.allMembers.map(m => m.member), m => m.id);
   } else if (tierSlug) {
     query = `
-    query Collective($collectiveSlug: String!, $tierSlug: String!) {
+    query Collective($collectiveSlug: String!, $tierSlug: String!, $isActive: Boolean) {
       Collective(slug:$collectiveSlug) {
         tiers(slug: $tierSlug) {
-          orders {
+          orders(isActive: $isActive) {
             id
             createdAt
             fromCollective {
