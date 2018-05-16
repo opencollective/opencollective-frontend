@@ -34,6 +34,23 @@ most likely broken.
  * `Given a Collective {name} with a host in {currency}, {fee%} fee`:
    Same as above but also sets the host fee percentage.
 
+ * `Given {hostCollective} connects a {paymentProcessor} account`:
+   Create a connected account for a host collective with the payment
+   provider name informed in `<paymentProcessor>`.
+
+ * `Given {payemntProcessor} payment processor fee is {fee%}`: Set the
+   fee of a payment processor.
+
+ * `Given platform fee is {fee}`: Set the platform fee (how much Open
+   Collective) charges per transaction.
+
+ * `When {name} donates {value} to {collective} via {paymentMethod}`:
+   This **action** creates and executes a one time order from the user
+   `<name>` to the `<collective>`. The value of the transactions is
+   specified in `<value>` and uses the format `AMOUNT CURRENCY`. E.g.:
+   `10 USD`. The `<paymentMethod>` is a string containing `stripe` for
+   now.
+
  * `When {name} expenses {value} for {description} to {collective} via {method}`:
    This **action** creates an expense from the user `<name>` to the
    collective. The `<value>` is how much the expense is worth. It
