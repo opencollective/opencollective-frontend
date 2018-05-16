@@ -10,14 +10,13 @@ import { get, uniqBy } from 'lodash';
 class TopBarProfileMenu extends React.Component {
 
   static propTypes = {
-    LoggedInUser: PropTypes.object
+    LoggedInUser: PropTypes.object,
+    intl: PropTypes.object.isRequired,
   }
 
   constructor(props) {
     super(props);
     this.state = { showProfileMenu: false, loading: true };
-    this.toggleProfileMenu = this.toggleProfileMenu.bind(this);
-    this.logout = this.logout.bind(this);
     this.messages = defineMessages({
       'tooltip.balance': { id: 'profilemenu.memberships.tooltip.balance', defaultMessage: 'Balance {balance}' },
       'tooltip.pendingExpenses': { id: 'profilemenu.memberships.tooltip.pendingExpenses', defaultMessage: '{n} pending expenses' },
@@ -25,16 +24,8 @@ class TopBarProfileMenu extends React.Component {
     });
   }
 
-  logout() {
-    this.setState({ showProfileMenu: false, status: 'loggingout' })
-    window.localStorage.removeItem('accessToken');
-    window.localStorage.removeItem('LoggedInUser');
-    window.location.replace(window.location.href);
-  }
-
   componentDidMount() {
-    this.onClickOutsideRef = this.onClickOutside.bind(this);
-    document.addEventListener('click', this.onClickOutsideRef);
+    document.addEventListener('click', this.onClickOutside);
     if (typeof window !== 'undefined') {
       this.redirectAfterSignin = window.location.href.replace(/^https?:\/\/[^/]+/,'');
       if (!window.localStorage.accessToken) {
@@ -44,18 +35,24 @@ class TopBarProfileMenu extends React.Component {
   }
 
   componentWillUnmount() {
-    document.removeEventListener('click', this.onClickOutsideRef);
+    document.removeEventListener('click', this.onClickOutside);
   }
 
-  onClickOutside() {
+  logout = () => {
+    this.setState({ showProfileMenu: false, status: 'loggingout' })
+    window.localStorage.removeItem('accessToken');
+    window.localStorage.removeItem('LoggedInUser');
+    window.location.reload();
+  }
+
+  onClickOutside = () => {
     this.setState({ showProfileMenu: false });
   }
 
-  toggleProfileMenu(e) {
-    if (e.target.className.indexOf('LoginTopBarProfileButton') !== -1) {
-      this.setState({showProfileMenu: !this.state.showProfileMenu});
-      e.nativeEvent.stopImmediatePropagation();
-    }
+  toggleProfileMenu = (e) => {
+    this.setState({ showProfileMenu: !this.state.showProfileMenu });
+    // don't propagate to onClickOutside
+    e.nativeEvent.stopImmediatePropagation();
   }
 
   tooltip(membership) {
@@ -89,7 +86,7 @@ class TopBarProfileMenu extends React.Component {
     }); // order by role then az
 
     return (
-      <div className="LoginTopBarProfileMenu" onClick={(e) => e.nativeEvent.stopImmediatePropagation()}>
+      <div className="LoginTopBarProfileMenu">
         <style jsx>{`
         .LoginTopBarProfileMenu {
           position: absolute;
@@ -212,9 +209,21 @@ class TopBarProfileMenu extends React.Component {
             <div className="-dash"></div>
           </div>
           <ul>
-            <li><a href={`/${LoggedInUser.username}`}><FormattedMessage id="menu.profile" defaultMessage="profile" /></a></li>
-            <li><a href={`/${LoggedInUser.username}/subscriptions`}><FormattedMessage id="menu.subscriptions" defaultMessage="Subscriptions" /></a></li>
-            <li><a href={`/${LoggedInUser.username}/transactions`}>{ capitalize(intl.formatMessage(this.messages['menu.transactions'])) }</a></li>
+            <li>
+              <Link route="collective" params={{slug: LoggedInUser.username}}>
+                <a><FormattedMessage id="menu.profile" defaultMessage="Profile" /></a>
+              </Link>
+            </li>
+            <li>
+              <Link route="subscriptions" params={{collectiveSlug: LoggedInUser.username}}>
+                <a><FormattedMessage id="menu.subscriptions" defaultMessage="Subscriptions" /></a>
+              </Link>
+            </li>
+            <li>
+              <Link route="transactions" params={{collectiveSlug: LoggedInUser.username}}>
+                <a>{ capitalize(intl.formatMessage(this.messages['menu.transactions'])) }</a>
+              </Link>
+            </li>
             <li>
               <Link route="/organizations/new">
                 <a><FormattedMessage id="menu.createOrganization" defaultMessage="Create an Organization" /></a>
@@ -355,9 +364,9 @@ class TopBarProfileMenu extends React.Component {
 
         { status === 'loggedout' &&
           <div className="LoginTopBarProfileButton">
-            <Link route="signin" params={{ next: this.redirectAfterSignin }}><a>
-              <FormattedMessage id="login.button" defaultMessage="login" />
-            </a></Link>
+            <Link route="signin" params={{ next: this.redirectAfterSignin }}>
+              <a><FormattedMessage id="login.button" defaultMessage="login" /></a>
+            </Link>
           </div>
         }
 
