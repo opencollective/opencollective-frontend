@@ -54,7 +54,7 @@ describe("badge.routes.test.js", () => {
     });
 
     test("loads the first member avatar.svg", async () => {
-      const res = await r2(`${WEBSITE_URL}/apex/tiers/sponsors/0/avatar.svg${cacheBurst}`).text;
+      const res = await r2(`${WEBSITE_URL}/apex/tiers/sponsors/0/avatar.svg${cacheBurst}&isActive=false`).text;
       expect(res).toMatch(/<image width="140" height="64"/);
     });
 
