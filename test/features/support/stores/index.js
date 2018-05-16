@@ -90,7 +90,8 @@ export async function newHost(name, currency, hostFee) {
 export async function newCollectiveWithHost(name, currency, hostCurrency, hostFee) {
   const { hostAdmin, hostCollective } = await newHost(`${name} Host`, hostCurrency, hostFee);
   const slug = slugify(name);
-  const collective = await models.Collective.create({ name, slug, currency });
+  const { hostFeePercent } = hostCollective;
+  const collective = await models.Collective.create({ name, slug, currency, hostFeePercent });
   await collective.addHost(hostCollective);
   return { hostCollective, hostAdmin, collective };
 }
@@ -105,7 +106,8 @@ export async function newCollectiveWithHost(name, currency, hostCurrency, hostFe
  */
 export async function newCollectiveInHost(name, currency, hostCollective) {
   const slug = slugify(name);
-  const collective = await models.Collective.create({ name, slug, currency });
+  const { hostFeePercent } = hostCollective;
+  const collective = await models.Collective.create({ name, slug, currency, hostFeePercent });
   await collective.addHost(hostCollective);
   return { collective };
 }
