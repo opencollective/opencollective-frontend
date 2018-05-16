@@ -182,7 +182,7 @@ export function difference(tr) {
  * @return the sum of the column `amount`.
  */
 export async function sum(where) {
-  const totalAttr = sequelize.fn('COALESCE', sequelize.fn('SUM', sequelize.col('amount')), 0);
+  const totalAttr = sequelize.fn('COALESCE', sequelize.fn('SUM', sequelize.col('netAmountInCollectiveCurrency')), 0);
   const attributes = [[ totalAttr, 'total' ]];
   const result = await models.Transaction.find({ attributes, where });
   return result.dataValues.total;
