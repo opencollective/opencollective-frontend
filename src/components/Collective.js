@@ -32,7 +32,6 @@ class Collective extends React.Component {
 
   constructor(props) {
     super(props);
-    this.collective = this.props.collective; // pre-loaded by SSR
     this.updateOrder = this.updateOrder.bind(this);
     this.resetOrder = this.resetOrder.bind(this);
 
@@ -62,7 +61,7 @@ class Collective extends React.Component {
   }
 
   componentDidMount() {
-    window.oc = { collective: this.collective }; // for easy debugging
+    window.oc = { collective: this.props.collective }; // for easy debugging
   }
 
   async createOrder(order) {
@@ -108,22 +107,22 @@ class Collective extends React.Component {
   }
 
   render() {
-    const { intl, LoggedInUser, query } = this.props;
+    const { intl, LoggedInUser, query, collective } = this.props;
 
-    const donateParams = { collectiveSlug: this.collective.slug, verb: 'donate' };
+    const donateParams = { collectiveSlug: collective.slug, verb: 'donate' };
     if (query.referral) {
       donateParams.referral = query.referral;
     }
-    const backgroundImage = this.collective.backgroundImage || get(this.collective,'parentCollective.backgroundImage') || defaultBackgroundImage;
-    const canEditCollective = LoggedInUser && LoggedInUser.canEditCollective(this.collective);
+    const backgroundImage = collective.backgroundImage || get(collective,'parentCollective.backgroundImage') || defaultBackgroundImage;
+    const canEditCollective = LoggedInUser && LoggedInUser.canEditCollective(collective);
     const notification = {};
     if (get(query, 'status') === 'collectiveCreated') {
       notification.title = intl.formatMessage(this.messages['collective.created']);
-      notification.description = intl.formatMessage(this.messages['collective.created.description'], { host: this.collective.host.name });
+      notification.description = intl.formatMessage(this.messages['collective.created.description'], { host: collective.host.name });
     }
 
     return (
-      <div className={`CollectivePage ${this.collective.type}`}>
+      <div className={`CollectivePage ${collective.type}`}>
         <style jsx>{`
           .sidebar {
             display: flex;
@@ -172,13 +171,13 @@ class Collective extends React.Component {
         `}</style>
 
         <Header
-          title={this.collective.name}
-          description={this.collective.description || this.collective.longDescription}
-          twitterHandle={this.collective.twitterHandle || get(this.collective.parentCollective, 'twitterHandle')}
-          image={this.collective.image || get(this.collective.parentCollective, 'image') || backgroundImage}
+          title={collective.name}
+          description={collective.description || collective.longDescription}
+          twitterHandle={collective.twitterHandle || get(collective.parentCollective, 'twitterHandle')}
+          image={collective.image || get(collective.parentCollective, 'image') || backgroundImage}
           className={this.state.status}
-          LoggedInUser={this.props.LoggedInUser}
-          href={`/${this.collective.slug}`}
+          LoggedInUser={LoggedInUser}
+          href={`/${collective.slug}`}
           />
 
         <Body>
@@ -193,7 +192,7 @@ class Collective extends React.Component {
               />
 
             <CollectiveCover
-              collective={this.collective}
+              collective={collective}
               cta={{ href: `#contribute`, label: 'contribute' }}
               LoggedInUser={LoggedInUser}
               />
@@ -203,46 +202,45 @@ class Collective extends React.Component {
                 <div className="content" >
 
                   <div className="sidebar tiers" id="contribute">
-                    { this.collective.tiers.map(tier => (
+                    { collective.tiers.map(tier => (
                       <TierCard
                         key={`TierCard-${tier.slug}`}
-                        collective={this.collective}
+                        collective={collective}
                         tier={tier}
                         referral={query.referral}
                         />
                     ))}
                     <div className="CustomDonationTierCard">
-                      <Link route={`/${this.collective.slug}/donate`}>
+                      <Link route={`/${collective.slug}/donate`}>
                         <a><FormattedMessage id="collective.tiers.donate" defaultMessage="Or make a one time donation" /></a>
                       </Link>
                     </div>
                   </div>
 
-                  { (get(this.collective, 'stats.updates') > 0 || canEditCollective) &&
+                  { (get(collective, 'stats.updates') > 0 || canEditCollective) &&
                     <UpdatesSection
                       LoggedInUser={LoggedInUser}
-                      collective={this.collective}
+                      collective={collective}
                       />
                   }
 
-                  { (get(this.collective, 'stats.events') > 0 || canEditCollective) &&
+                  { (get(collective, 'stats.events') > 0 || canEditCollective) &&
                     <EventsSection
                       LoggedInUser={LoggedInUser}
-                      collective={this.collective}
+                      collective={collective}
                       />
                   }
-                  <LongDescription longDescription={this.collective.longDescription} defaultSubtitle={this.collective.description} />
+                  <LongDescription longDescription={collective.longDescription} defaultSubtitle={collective.description} />
 
                   <TeamSection
-                    collective={this.collective}
+                    collective={collective}
                     LoggedInUser={LoggedInUser}
                     limit={10}
                     />
                 </div>
               </div>
 
-
-              { get(this.collective, 'stats.collectives.memberOf') > 0 &&
+              { get(collective, 'stats.collectives.memberOf') > 0 &&
                 <section id="members" className="clear">
                   <div className="content" >
                     <SectionTitle
@@ -252,14 +250,14 @@ class Collective extends React.Component {
                         />}
                       subtitle={(<FormattedMessage
                         id="collective.collective.memberOf.collective.parent.subtitle"
-                        values={{ n: this.collective.stats.collectives.memberOf }}
+                        values={{ n: collective.stats.collectives.memberOf }}
                         defaultMessage={`{n, plural, one {this collective is} other {{n} collectives are}} part of our collective`}
                         />)}
                       />
 
                     <div className="cardsList">
                       <CollectivesWithData
-                        ParentCollectiveId={this.collective.id}
+                        ParentCollectiveId={collective.id}
                         orderBy="balance"
                         type="COLLECTIVE"
                         orderDirection="DESC"
@@ -272,9 +270,9 @@ class Collective extends React.Component {
 
               <section id="budget" className="clear">
                 <div className="content" >
-                  <SectionTitle section="budget" values={{ balance: formatCurrency(get(this.collective, 'stats.balance'), this.collective.currency) }} />
+                  <SectionTitle section="budget" values={{ balance: formatCurrency(get(collective, 'stats.balance'), collective.currency) }} />
                   <ExpensesSection
-                    collective={this.collective}
+                    collective={collective}
                     LoggedInUser={LoggedInUser}
                     limit={10}
                     />
@@ -283,21 +281,21 @@ class Collective extends React.Component {
 
               <section id="contributors" className="tier">
                 <div className="content" >
-                  { get(this.collective, 'stats.backers.all') === 0 &&
+                  { get(collective, 'stats.backers.all') === 0 &&
                   <SectionTitle
                     section="contributors"
                     subtitle={<FormattedMessage id="collective.section.contributors.empty" defaultMessage="You don't have any contributors yet." />}
                     />
                 }
-                  { get(this.collective, 'stats.backers.all') > 0 &&
+                  { get(collective, 'stats.backers.all') > 0 &&
                   <div>
                     <SectionTitle
                       section="contributors"
-                      values={get(this.collective, 'stats.backers')}
+                      values={get(collective, 'stats.backers')}
                       />
 
                     <MembersWithData
-                      collective={this.collective}
+                      collective={collective}
                       type="ORGANIZATION"
                       LoggedInUser={LoggedInUser}
                       role="BACKER"
@@ -305,7 +303,7 @@ class Collective extends React.Component {
                       />
 
                     <MembersWithData
-                      collective={this.collective}
+                      collective={collective}
                       LoggedInUser={LoggedInUser}
                       type="USER"
                       role="BACKER"
