@@ -835,13 +835,18 @@ export const TierType = new GraphQLObjectType({
       orders: {
         type: new GraphQLList(OrderType),
         args: {
+          isActive: { type: GraphQLBoolean },
           limit: { type: GraphQLInt }
         },
         resolve(tier, args) {
-          return tier.getOrders({
+          const query = {
             where: { processedAt: { $ne: null } },
             limit: args.limit
-          });
+          };
+          if (args.isActive) {
+            query.include = [ { model: models.Subscription, where: { isActive: true } } ];
+          }
+          return tier.getOrders(query);
         }
       },
       stats: {
