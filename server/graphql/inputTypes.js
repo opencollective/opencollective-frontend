@@ -1,3 +1,4 @@
+
 import {
   GraphQLInt,
   GraphQLFloat,
@@ -70,7 +71,8 @@ export const UserInputType = new GraphQLInputObjectType({
       description: { type: GraphQLString },
       twitterHandle: { type: GraphQLString },
       website: { type: GraphQLString },
-      paypalEmail: { type: GraphQLString }
+      paypalEmail: { type: GraphQLString },
+      newsletterOptIn: { type: GraphQLBoolean },
   })
 });
 
