@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 
-import roles from '../../server/constants/roles';
 
 // Only run on the first of the month
 const today = new Date();
@@ -11,13 +10,17 @@ if (process.env.NODE_ENV === 'production' && today.getDate() !== 1) {
 
 process.env.PORT = 3066;
 
-import _ from 'lodash';
+import { get, pick } from 'lodash';
 import moment from 'moment';
 import config from 'config';
 import Promise from 'bluebird';
 import debugLib from 'debug';
 import models, { sequelize } from '../../server/models';
 import emailLib from '../../server/lib/email';
+import roles from '../../server/constants/roles';
+import { formatCurrencyObject, formatArrayToString } from '../../server/lib/utils';
+
+const Op = sequelize.Sequelize.Op;
 
 const d = new Date;
 d.setMonth(d.getMonth() - 1);
@@ -30,47 +33,122 @@ console.log("startDate", startDate,"endDate", endDate);
 
 const debug = debugLib('monthlyreport');
 
-const {
-  Collective,
-  Expense,
-  Notification,
-  Subscription,
-  User
-} = models;
+/**
+ * Returns the list of Users that are subscribed to the user.monthlyreport
+ * for the current backer collective (User/Org/Collective)
+ * @param {*} backerCollective
+ */
+const fetchUserSubscribers = async (notificationType, backerCollective) => {
 
+  const unsubscriptions = await models.Notification.findAll({
+    attributes: ['UserId'],
+    where: {
+      CollectiveId: backerCollective.id,
+      type: notificationType,
+      active: false
+    }
+  });
+  const unsubscribedUserIds = unsubscriptions.map(n => n.UserId);
+  console.log(`${unsubscribedUserIds.length} users have unsubscribed from the ${notificationType} report for ${backerCollective.type} ${backerCollective.slug}`);
 
-const init = () => {
+  const admins = await backerCollective.getAdminUsers();
+  const subscribers = admins.filter(a => unsubscribedUserIds.indexOf(a.id) === -1);
+
+  return subscribers;
+}
+
+const init = async () => {
 
   const startTime = new Date;
 
-  const where = {};
-  if (process.env.DEBUG && process.env.DEBUG.match(/preview/))
-    where.id = {$in: [2, 30, 1391, 2031, 8, 41]}; // xdamman, pia, aseem, aseem, aseem, aseem
-  // where.id = {$in: [2]}; // xdamman
+  let FromCollectiveIds;
+  if (process.env.DEBUG && process.env.DEBUG.match(/preview/)) {
+    FromCollectiveIds = [1729, 12671]; // xdamman, coinbase
+  } else {
+    const distinctTransactions = await models.Transaction.findAll({
+      attributes: [ [sequelize.fn('DISTINCT', sequelize.col('FromCollectiveId')), 'FromCollectiveId'] ],
+      where: {
+        type: 'CREDIT',
+        OrderId: { [Op.ne]: null }, // make sure we don't consider collectives paying out expenses as backers of user collectives
+        createdAt: { [Op.gte]: startDate, [Op.lt]: endDate }
+      }
+    });
+    FromCollectiveIds = distinctTransactions.map(t => t.FromCollectiveId);
+  }
 
-  Notification.findAll({
-    attributes: ['UserId'],
+  console.log(`Preparing the ${month} report for ${FromCollectiveIds.length} backers`);
+
+  await Promise.each(FromCollectiveIds, processBacker);
+
+  const timeLapsed = Math.round((new Date - startTime)/1000);
+  console.log(`Total run time: ${timeLapsed}s`);
+  process.exit(0)
+}
+
+const processBacker = async (FromCollectiveId) => {
+  console.log(">>> Processing backer", FromCollectiveId);
+  const distinctTransactions = await models.Transaction.findAll({
+    attributes: [ [sequelize.fn('DISTINCT', sequelize.col('CollectiveId')), 'CollectiveId'] ],
     where: {
-      type: 'user.monthlyreport',
-      active: false
+      FromCollectiveId,
+      type: 'CREDIT',
+      createdAt: { [Op.gte]: startDate, [Op.lt]: endDate }
     }
-  })
-  .then(notifications => notifications.map(n => n.UserId))
-  .then(unsubscribedUserIds => {
-    console.log(`${unsubscribedUserIds.length} users have unsubscribed from this report`);
-    return models.User.findAll({
-      where: { id: { [sequelize.Op.notIn]: unsubscribedUserIds }, ...where }
-    })
-  })
-  .tap(users => {
-      console.log(`Preparing the ${month} report for ${users.length} users`);
-  })
-  .then(users => Promise.map(users, processUser, { concurrency: 1 }))
-  .then(() => {
-    const timeLapsed = Math.round((new Date - startTime)/1000);
-    console.log(`Total run time: ${timeLapsed}s`);
-    process.exit(0)
   });
+
+  console.log(`>>> Collective ${FromCollectiveId} has backed ${distinctTransactions.length} collectives`);
+  const collectives = await Promise.map(distinctTransactions, (transaction) => processCollective(transaction.CollectiveId));
+
+  const backerCollective = await models.Collective.findById(FromCollectiveId);
+  const subscribers = await fetchUserSubscribers('user.monthlyreport', backerCollective);
+  console.log(`>>> Collective ${FromCollectiveId} has ${subscribers.length} subscribers`);
+
+  const orders = await models.Order.findAll({
+    attributes: ['id', 'CollectiveId', 'totalAmount', 'currency'],
+    where: {
+      FromCollectiveId,
+      [Op.or]: {
+        createdAt: { [Op.gte]: startDate, [Op.lt]: endDate },
+        SubscriptionId: { [Op.ne]: null }
+      }
+    },
+    include: [ { model: models.Subscription } ]
+  })
+  const ordersByCollectiveId = {};
+  orders.map(o => {
+    ordersByCollectiveId[o.CollectiveId] = o;
+  });
+  const collectivesWithOrders = [];
+  collectives.map(collective => {
+    collectivesWithOrders.push({
+      ...collective,
+      order: ordersByCollectiveId[collective.id]
+    });
+  });
+  collectivesWithOrders.sort((a, b) => {
+    if (get(a, 'order.totalAmount') > get(b, 'order.totalAmount')) return -1;
+    else return 1;
+  })
+
+  const stats = await computeStats(collectivesWithOrders);
+  const relatedCollectives = await models.Collective.getCollectivesSummaryByTag(stats.topTags, 3, null, 0, false, 'c."createdAt"', 'DESC');
+
+  try {
+    await Promise.each(subscribers, (user) => {
+      const data = {
+        config: { host: config.host },
+        month,
+        fromCollective: backerCollective,
+        collectives: collectivesWithOrders,
+        manageSubscriptionsUrl: user.generateLoginLink('/subscriptions'),
+        relatedCollectives,
+        stats
+      };
+      return sendEmail(user, data);
+    });
+  } catch (e) {
+    console.error(e);
+  }
 }
 
 const now = new Date;
@@ -102,10 +180,25 @@ const processEvents = (events) => {
   return res;
 };
 
+/**
+ * Processes the stats of a given collective and keeps the result in memory cache
+ * Returns collective data object with
+ * {
+ *   ...{'id', 'name', 'slug', 'website', 'image', 'mission', 'currency','publicUrl', 'tags', 'backgroundImage', 'settings', 'totalDonations', 'contributorsCount'},
+ *   stats: { balance, totalDonations, totalPaidExpenses, updates },
+ *   contributorsCounts,
+ *   yearlyIncome,
+ *   expenses
+ *   events
+ *   updates
+ *   nextGoal
+ * }
+ */
 const collectivesData = {};
-const processCollective = (collective) => {
-  if ( collectivesData[collective.slug]) return collectivesData[collective.slug];
+const processCollective =  async (CollectiveId) => {
+  if (collectivesData[CollectiveId]) return collectivesData[CollectiveId];
 
+  const collective = await models.Collective.findById(CollectiveId);
   const promises = [
     collective.getBackersStats(startDate, endDate),
     collective.getBalance(endDate),
@@ -113,11 +206,11 @@ const processCollective = (collective) => {
     collective.getTotalTransactions(startDate, endDate, 'expense'),
     collective.getExpenses(null, startDate, endDate),
     collective.getYearlyIncome(),
-    Expense.findAll({
+    models.Expense.findAll({
       where: { CollectiveId: collective.id, createdAt: { $gte: startDate, $lt: endDate } },
       limit: 3,
       order: [['id', 'DESC']],
-      include: [ User ]
+      include: [ models.User ]
     }),
     collective.getEvents({
       where: { startsAt: { $gte: startDate } },
@@ -134,63 +227,92 @@ const processCollective = (collective) => {
     collective.getNextGoal(endDate)
   ];
 
-  return Promise.all(promises)
-          .then(results => {
-            console.log('***', collective.name, '***');
-            const data = {};
-            data.collective = _.pick(collective, ['id', 'name', 'slug', 'website', 'image', 'mission', 'currency','publicUrl', 'tags', 'backgroundImage', 'settings', 'totalDonations', 'contributorsCount']);
-            data.collective.stats = results[0];
-            data.collective.stats.balance = results[1];
-            data.collective.stats.totalDonations = results[2];
-            data.collective.stats.totalPaidExpenses = -results[3];
-            data.collective.contributorsCount = (collective.data && collective.data.githubContributors) ? Object.keys(collective.data.githubContributors).length : data.collective.stats.backers.lastMonth;
-            data.collective.yearlyIncome = results[5];
-            data.collective.expenses = results[6];
-            data.collective.events = processEvents(results[7]);
-            data.collective.updates = results[8];
-            data.collective.stats.updates = results[8].length;
-            data.collective.nextGoal = results[9];
-            console.log(data.collective.stats);
-            collectivesData[collective.slug] = data.collective;
-            return collective;
-          })
-          .catch(e => {
-            console.error("Error in processing collective", collective.slug, e);
-          });
+  const results = await Promise.all(promises);
+  console.log('***', collective.name, '***');
+  const data = {};
+  data.collective = pick(collective, ['id', 'name', 'slug', 'website', 'image', 'mission', 'currency','publicUrl', 'tags', 'backgroundImage', 'settings', 'totalDonations', 'contributorsCount']);
+  data.collective.stats = results[0];
+  data.collective.stats.balance = results[1];
+  data.collective.stats.totalDonations = results[2];
+  data.collective.stats.totalPaidExpenses = -results[3];
+  data.collective.contributorsCount = (collective.data && collective.data.githubContributors) ? Object.keys(collective.data.githubContributors).length : data.collective.stats.backers.lastMonth;
+  data.collective.yearlyIncome = results[5];
+  data.collective.expenses = results[6];
+  data.collective.events = processEvents(results[7]);
+  data.collective.updates = results[8];
+  data.collective.stats.updates = results[8].length;
+  const nextGoal = results[9]
+  if (nextGoal) {
+    nextGoal.tweet = `🚀 ${collective.twitterHandle ? `@${collective.twitterHandle}` : collective.name} is at ${nextGoal.percentage} of their next goal: ${nextGoal.title}.\nJoin me in helping them get there! 🙌\nhttps://opencollective.com/${collective.slug}`;
+    data.collective.nextGoal = nextGoal;
+  }
+  console.log(data.collective.stats);
+  collectivesData[CollectiveId] = data.collective;
+  return data.collective;
 };
 
-
-const processUser = (user) => {
-
-let subscriptions, tags;
- return user.getOrders({
-   include: [
-     { model: Collective, as: 'collective' },
-     { model: Subscription, where: { isActive: true } }
-   ]
+const getTopKeysFromObject = (obj, valueAttr, limit = 3) => {
+  const values = [];
+  Object.keys(obj).map(t => {
+    values.push({ value: t, occurences: valueAttr ? obj[t][valueAttr] : obj[t]});
   })
-  .tap(orders => Promise.map(orders, s => processCollective(s.collective)))
-  .then(orders => orders.map(s => {
-    const subscription = _.pick(s.Subscription, ['amount', 'interval', 'currency', 'createdAt']);
-    subscription.collective = collectivesData[s.collective.slug];
-    tags = _.union(tags, s.collective.tags);
-    return subscription;
-    })
-  )
-  .tap(s => subscriptions = s)
-  .then(() => Collective.getCollectivesSummaryByTag(tags, 3, null, 0, false, 'c."createdAt"', 'DESC'))
-  .then(relatedCollectives => {
-    return {
-      config: { host: config.host },
-      month,
-      subscriptions,
-      manageSubscriptionsUrl: user.generateLoginLink('/subscriptions'),
-      relatedCollectives
+  values.sort((a, b) => {
+    if (a.occurences > b.occurences) return -1;
+    else return 1;
+  });
+  const topValues = [];
+  for (let i=0; i < Math.min(values.length, limit); i++) {
+    topValues.push(values[i].value);
+  }
+  return topValues;
+}
+
+const computeStats = (collectives) => {
+  const categories = {};
+  const tagsIndex = {};
+  const stats = {
+    collectives: collectives.length,
+    expenses: 0,
+    totalSpentPerCurrency: {},
+    totalDonatedPerCurrency: {}
+  };
+  collectives.map(collective => {
+    const expenses = collective.expenses;
+    if (collective.tags) {
+      collective.tags.map(t => {
+        tagsIndex[t] = tagsIndex[t] || 0;
+        tagsIndex[t]++;
+      })
+    }
+    if (collective.order) {
+      stats.totalDonatedPerCurrency[collective.order.currency] = stats.totalDonatedPerCurrency[collective.order.currency] || 0;
+      stats.totalDonatedPerCurrency[collective.order.currency] += collective.order.totalAmount;
+    }
+    if (expenses && expenses.length > 0) {
+      stats.expenses += expenses.length;
+      expenses.map(expense => {
+        categories[expense.category] = categories[expense.category] || { occurences: 0, totalAmountPerCurrency: {} };
+        categories[expense.category].occurences++;
+        categories[expense.category].totalAmountPerCurrency[expense.currency] = categories[expense.category].totalAmountPerCurrency[expense.currency] || 0;
+        categories[expense.category].totalAmountPerCurrency[expense.currency] += expense.amount;
+        stats.totalSpentPerCurrency[expense.currency] = stats.totalSpentPerCurrency[expense.currency] || 0;
+        stats.totalSpentPerCurrency[expense.currency] += expense.amount;
+      })
     }
   })
-  .then(data => sendEmail(user, data))
-};
-
+  stats.topTags = getTopKeysFromObject(tagsIndex);
+  stats.topCategories = getTopKeysFromObject(categories, 'occurences');
+  stats.categories = categories;
+  stats.totalSpentString = formatCurrencyObject(stats.totalSpentPerCurrency);
+  stats.totalDonatedString = formatCurrencyObject(stats.totalDonatedPerCurrency);
+  const ar = [];
+  stats.topCategories.map(category => {
+    ar.push(`${category} (${formatCurrencyObject(categories[category].totalAmountPerCurrency)})`)
+  })
+  stats.expensesBreakdownString = `${(Object.keys(categories).length > 3) ? `, mostly in` : ` in`} ${formatArrayToString(ar)}`;
+  console.log(">>> stats", JSON.stringify(stats, null, '  '));
+  return stats;
+}
 
 const sendEmail = (recipient, data) => {
   if (recipient.length === 0) return;
@@ -199,9 +321,6 @@ const sendEmail = (recipient, data) => {
     debug("Skipping ", recipient.email);
     return Promise.resolve();
   }
-
-  // We don't send the monthly email if there is no active subscription
-  if (!data.subscriptions || data.subscriptions.length === 0) return;
 
   if (process.env.SEND_EMAIL_TO) {
     recipient.email = process.env.SEND_EMAIL_TO;

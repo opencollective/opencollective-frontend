@@ -1,58 +1,76 @@
-Hi {{recipient.firstName}}!
+Hi {{fromCollective.name}} 👋
 
-This is your monthly report for all the collectives that you are supporting on opencollective.com. Let us know how you like this and do not hesitate if you have any feedback or ideas. Just reply to this email!
+In {{month}}, you have backed {{stats.collectives}} {{{pluralize "collective" n=stats.collectives}}} for a total of {{stats.totalDonatedString}}. Thank you for your {{{pluralize "contribution" n=stats.collectives}}}! 🙌
+{{#if stats.expenses}}They've spent a total of {{stats.totalSpentString}}{{stats.expensesBreakdownString}}.{{/if}}
+{{#each collectives}}
+{{#if nextGoal}}
 
-
-# Active subscriptions
-{{#each subscriptions}}
-
-{{collective.name}}:
-{{collective.publicUrl}}
-Backers: {{collective.stats.backers.lastMonth}} (+{{collective.stats.backers.new}}{{#if collective.stats.backers.lost}}, -{{collective.stats.backers.lost}}{{/if}})
-Current balance: {{{currency collective.stats.balance currency=currency}}} (+{{{currency collective.stats.totalDonations currency=currency}}}{{#if collective.stats.totalPaidExpenses}}, {{{currency collective.stats.totalPaidExpenses currency=currency}}}{{/if}}) 
-{{#if collective.nextGoal}}
-Next goal: {{{currency collective.nextGoal.amount currency=currency}}}{{#if collective.nextGoal.interval}}/{{collective.nextGoal.interval}}{{/if}} to {{collective.nextGoal.title}} ({{collective.nextGoal.percentage}} - missing {{{currency collective.nextGoal.missing.amount currency=currency}}}{{#if collective.nextGoal.missing.interval}}/{{collective.nextGoal.missing.interval}}{{/if}})
+{{name}} needs {{{currency nextGoal.missing.amount currency=currency}}} more {{#if nextGoal.missing.interval}}per {{nextGoal.missing.interval}}{{/if}} to reach their next goal of {{nextGoal.title}} ({{nextGoal.percentage}} there). 
+{{#if order.Subscription}}
+You are currently contributing {{{currency order.Subscription.amount currency=order.Subscription.currency}}} per {{order.Subscription.interval}}.
+[increase your contribution]({{../config.host.website}}/{{../fromCollective.slug}}/subscriptions)
+[share their goal](https://twitter.com/intent/tweet?text={{{encodeURIComponent nextGoal.tweet}}})
+{{else}}
+You have contributed {{{currency order.totalAmount currency=order.currency}}}.
+[increase your contribution]({{../config.host.website}}/{{slug}}/donate)
+[share their goal](https://twitter.com/intent/tweet?text={{{encodeURIComponent nextGoal.tweet}}})
 {{/if}}
-Your contribution: {{currency amount currency=currency}} per {{interval}}
-Member since: {{{moment createdAt}}}
-{{#if collective.updates}}
+{{/if}}
+{{/each}}
 
-Latest {{{pluralize "update" n=collective.updates.length}}}:
-{{#each collective.updates}}
+
+# Collectives backed in {{month}}
+{{#each collectives}}
+
+{{name}}:
+{{publicUrl}}
+Backers: {{stats.backers.lastMonth}} (+{{stats.backers.new}}{{#if stats.backers.lost}}, -{{stats.backers.lost}}{{/if}})
+Current balance: {{{currency stats.balance currency=currency}}} (+{{{currency stats.totalDonations currency=currency}}}{{#if stats.totalPaidExpenses}}, {{{currency stats.totalPaidExpenses currency=currency}}}{{/if}}) 
+{{#if nextGoal}}
+Next goal: {{{currency nextGoal.amount currency=currency}}}{{#if nextGoal.interval}}/{{nextGoal.interval}}{{/if}} to {{nextGoal.title}} ({{nextGoal.percentage}} - missing {{{currency nextGoal.missing.amount currency=currency}}}{{#if nextGoal.missing.interval}}/{{nextGoal.missing.interval}}{{/if}})
+{{/if}}
+{{#if order.Subscription}}
+Your contribution: {{currency order.Subscription.amount currency=order.Subscription.currency}} per {{order.Subscription.interval}}
+Member since: {{{moment order.subscription.createdAt format="MMMM YYYY"}}}
+{{else}}
+Your contribution: {{currency order.totalAmount currency=order.currency}}
+{{/if}}
+{{#if updates}}
+
+Latest {{{pluralize "update" n=updates.length}}}:
+{{#each updates}}
   - {{{moment publishedAt timezone=timezone format="MM/DD"}}} {{title}}
-  https://opencollective.com/{{../collective.slug}}/updates/{{slug}}
+  {{../config.host.website}}/{{../slug}}/updates/{{slug}}
 {{/each}}
 {{/if}}
-{{#if collective.events.upcoming}}
+{{#if events.upcoming}}
 
-Upcoming {{{pluralize "event" n=collective.events.upcoming.length}}}:
-{{#each collective.events.upcoming}}
+Upcoming {{{pluralize "event" n=events.upcoming.length}}}:
+{{#each events.upcoming}}
   - {{{moment startsAt timezone=timezone format="MMMM Do HH:mm"}}} {{name}} @ {{locationName}}
-    https://opencollective.com/{{../collective.slug}}/events/{{slug}}
+    {{../config.host.website}}/{{../slug}}/events/{{slug}}
     RSVPs: {{stats.confirmed}} {{#if stats.interested}}(+{{stats.interested}} interested){{/if}}
 {{/each}}
 {{/if}}
-{{#if collective.events.past}}
+{{#if events.past}}
 
-Past {{{pluralize "event" n=collective.events.past.length}}}:
-{{#each collective.events.past}}
+Past {{{pluralize "event" n=events.past.length}}}:
+{{#each events.past}}
   - {{{moment startsAt timezone=timezone format="MMMM Do HH:mm"}}} {{name}} @ {{locationName}}
-    https://opencollective.com/{{../collective.slug}}/events/{{slug}}
+    {{../config.host.website}}/{{../slug}}/events/{{slug}}
     RSVPs: {{stats.confirmed}} {{#if stats.interested}}(+{{stats.interested}} interested){{/if}}
 {{/each}}
 {{/if}}
 
-Latest {{{pluralize "expense" n=collective.expenses.length}}}:
-  {{#each collective.expenses}}
+Latest {{{pluralize "expense" n=expenses.length}}}:
+  {{#each expenses}}
   - {{{moment createdAt format="MM/DD"}}} {{{currency amount currency=../currency}}} {{description}} {{status}}
   {{else}}
   (no expense filed)
-  Submit an expense on https://opencollective.com/{{collective.slug}}/expenses/new
+  Submit an expense on {{../config.host.website}}/{{slug}}/expenses/new
   {{/each}}
 
 {{/each}}
-
-If you'd like to cancel any of your subscriptions, you can do so on https://opencollective.com/subscriptions
 
 
 # New Related Collectives

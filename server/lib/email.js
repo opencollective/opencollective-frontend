@@ -36,15 +36,17 @@ const render = (template, data) => {
     filepath = `/tmp/${template}.${slug}.html`;
     const script = `<script>data=${JSON.stringify(data)};</script>`;
     fs.writeFileSync(filepath, `${html}\n\n${script}`);
+    console.log(">>> preview email", filepath);
     if (text) {
       filepath = `/tmp/${template}.${slug}.txt`;
       fs.writeFileSync(filepath, text);
+      console.log(">>> preview email", filepath);
     }
   }
 
   // When in development mode, we log the data used to compile the template
   // (useful to get login token without sending an email)
-  debug(`Rendering ${template} with data`, data);
+  debugLib('data')(`Rendering ${template} with data`, data);
 
   return {text, html};
 };
