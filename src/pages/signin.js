@@ -47,7 +47,7 @@ class LoginPage extends React.Component {
           />
         <style jsx>{`
         .signin {
-          max-width: 60rem;
+          max-width: 70rem;
           margin: 15rem auto;
           text-align:center;
         }

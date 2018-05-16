@@ -22,7 +22,9 @@ class LoginForm extends React.Component {
       isNewUser: null,
       loginSent: false,
       loading: false,
-      user: {},
+      user: {
+        newsletterOptIn: false,
+      },
       result: {}
     };
 
@@ -43,6 +45,10 @@ class LoginForm extends React.Component {
       'email.label': { id: 'user.email.label', defaultMessage: 'email' },
       'description.label': { id: 'user.description.label', defaultMessage: 'Short bio' },
       'description.description': { id: 'user.description.description', defaultMessage: 'Present yourself in 60 characters or less, if you can!' },
+      'newsletterOptIn.description': {
+        id: 'user.newsletterOptIn.description',
+        defaultMessage: 'Subscribe to the Open Collective newsletter.',
+      },
     });
 
     this.fields = [
@@ -68,7 +74,12 @@ class LoginForm extends React.Component {
       {
         name: 'description',
         maxLength: 255
-      }
+      },
+      {
+        name: 'newsletterOptIn',
+        type: 'checkbox',
+        help: 'Receive our monthly newsletter with updates about new collectives and features. Stay in the know with the latest sponsor and backer funding leaderboard, open source inspiration, and upcoming events.'
+      },
     ]
 
     this.fields = this.fields.map(field => {
@@ -155,16 +166,24 @@ class LoginForm extends React.Component {
 
   signup() {
     this.state.user.email = this.state.user.email && this.state.user.email.trim();
+
     if (!isValidEmail(this.state.user.email)) {
       return;
     }
+
     this.setState({ loading: true });
-    api.signin(this.state.user, this.props.next).then((result) => {
+
+    api.signin(this.state.user, this.props.next)
+    .then((result) => {
       this.setState({ loginSent: true, signup: true, isNewUser: true, loading: false });
+
       if (result.redirect) {
         window.location.replace(result.redirect);
       }
     })
+    .catch((error) => {
+      this.error(error.message);
+    });
   }
 
   handleSubmit(e) {
@@ -300,8 +319,7 @@ class LoginForm extends React.Component {
                       </Row>
                     ))}
                     <Row>
-                      <Col sm={3}></Col>
-                      <Col sm={9}>
+                      <Col sm={8} smOffset={2}>
                         <Button className="signup" bsStyle="primary" onClick={() => this.signup()}>
                           <FormattedMessage id="signin.createAccount" defaultMessage="Sign Up" />
                         </Button>

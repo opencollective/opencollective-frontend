@@ -361,6 +361,11 @@ class InputField extends React.Component {
             <Col sm={10}>
               <Checkbox defaultChecked={field.defaultValue} onChange={event => this.handleChange(event.target.checked)}>{field.description}</Checkbox>
             </Col>
+            {field.help && (
+              <Col sm={10} smOffset={2}>
+                <HelpBlock>{field.help}</HelpBlock>
+              </Col>
+            )}
           </div>
                         }
           {!horizontal &&
