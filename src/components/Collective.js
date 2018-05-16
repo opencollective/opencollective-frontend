@@ -8,7 +8,6 @@ import CollectiveCover from '../components/CollectiveCover';
 import TierCard from '../components/TierCard';
 import NotificationBar from '../components/NotificationBar';
 import MembersWithData from '../components/MembersWithData';
-import { addCreateOrderMutation } from '../graphql/mutations';
 import { get } from 'lodash';
 import { Link } from '../server/pages';
 import { FormattedMessage, defineMessages } from 'react-intl';
@@ -32,8 +31,6 @@ class Collective extends React.Component {
 
   constructor(props) {
     super(props);
-    this.updateOrder = this.updateOrder.bind(this);
-    this.resetOrder = this.resetOrder.bind(this);
 
     this.state = {
       view: 'default',
@@ -62,48 +59,6 @@ class Collective extends React.Component {
 
   componentDidMount() {
     window.oc = { collective: this.props.collective }; // for easy debugging
-  }
-
-  async createOrder(order) {
-    order.tier = order.tier || {};
-    const OrderInputType = {
-      ... order,
-      collective: { slug: this.collective.slug },
-      tier: { id: order.tier.id }
-    };
-
-    this.setState( { status: 'loading' });
-    try {
-      await this.props.createOrder(OrderInputType);
-      this.setState( { status: 'idle' });
-    } catch (err) {
-      console.error(">>> createOrder error: ", err);
-      throw new Error(err.graphQLErrors[0].message);
-    }
-  }
-
-  error(msg) {
-    this.setState( {status: 'error', error: msg });
-    setTimeout(() => {
-      this.setState( { status: 'idle', error: null });
-    }, 5000);
-  }
-
-  updateOrder(tier) {
-    const order = {
-      tier: { id: tier.id },
-      quantity: tier.quantity,
-      totalAmount: (tier.quantity || 1) * tier.amount,
-      interval: tier.interval
-    }
-    this.setState({ order });
-    // if (typeof window !== "undefined") {
-    //   window.state = this.state;
-    // }
-  }
-
-  resetOrder() {
-    this.setState({ order: {} });
   }
 
   render() {
@@ -323,4 +278,4 @@ class Collective extends React.Component {
   }
 }
 
-export default addCreateOrderMutation(withIntl(Collective));
+export default withIntl(Collective);
