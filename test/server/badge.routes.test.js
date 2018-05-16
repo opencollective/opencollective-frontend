@@ -67,7 +67,7 @@ describe("badge.routes.test.js", () => {
       expect(res.headers.get('content-type')).toEqual('image/svg+xml; charset=utf-8');
       expect(res.headers.get('cache-control')).toMatch(/public, max-age=[1-9][0-9]{2,5}/);
       const text = await res.text();
-      expect(text.length).toBeGreaterThan(890000);
+      expect(text.length).toBeGreaterThan(800000);
     });
   })
 
