@@ -117,7 +117,11 @@ class OrderForm extends React.Component {
       'endsAt.label': { id: 'tier.endsAt.label', defaultMessage: 'end date and time' },
       'order.error.organization.name.required': { id: 'order.error.organization.name.required', defaultMessage: 'Please provide a name for the new organization' },
       'order.error.organization.website.required': { id: 'order.error.organization.website.required', defaultMessage: 'Please provide a website for the new organization' },
-      'order.publicMessage.placeholder': { id: 'order.publicMessage.placeholder', defaultMessage: 'Use this space to add a personal message (public)' }
+      'order.publicMessage.placeholder': { id: 'order.publicMessage.placeholder', defaultMessage: 'Use this space to add a personal message (public)' },
+      'newsletterOptIn.description': {
+        id: 'user.newsletterOptIn.description',
+        defaultMessage: 'Subscribe to the Open Collective newsletter.',
+      },
     });
 
     this.fields = [
@@ -146,7 +150,12 @@ class OrderForm extends React.Component {
       {
         name: 'description',
         maxLength: 255
-      }
+      },
+      {
+        name: 'newsletterOptIn',
+        type: 'checkbox',
+        help: 'Receive our monthly newsletter with updates about new collectives and features. Stay in the know with the latest sponsor and backer funding leaderboard, open source inspiration, and upcoming events.',
+      },
     ]
 
     this.fields = this.fields.map(field => {
@@ -568,7 +577,7 @@ class OrderForm extends React.Component {
           .prepaidcard span {
             max-width: 350px;
           }
-          .OrderForm span.input-group {
+          .OrderForm span.input-group, .OrderForm .help-block {
             max-width: 500px;
           }
           .OrderForm textarea[name="publicMessage"] {
