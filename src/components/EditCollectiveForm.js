@@ -43,7 +43,7 @@ class EditCollectiveForm extends React.Component {
     };
 
     this.showEditTiers = ['COLLECTIVE', 'EVENT'].includes(collective.type);
-    this.showExpenses = collective.type === 'COLLECTIVE';
+    this.showExpenses = collective.type === 'COLLECTIVE' || collective.isHost;
     this.showEditGoals = collective.type === 'COLLECTIVE';
     this.defaultTierType = collective.type === 'EVENT' ? 'TICKET' : 'TIER';
     this.showEditMembers = ['COLLECTIVE', 'ORGANIZATION'].includes(collective.type);
