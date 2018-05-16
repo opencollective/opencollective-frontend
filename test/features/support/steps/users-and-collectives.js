@@ -55,6 +55,39 @@ Given('a Collective {string} in {string} hosted by {string}', async function (na
   this.addValue(`${name}-host-admin`, hostAdmin);
 });
 
+Given('{string} connects a {string} account', async function (hostName, connectedAccountName) {
+  const host = this.getValue(hostName);
+  const hostAdmin = this.getValue(`${hostName}-admin`);
+  const method = {
+    stripe: store.stripeConnectedAccount,
+  }[connectedAccountName.toLowerCase()];
+  await method(host.id, hostAdmin.id);
+});
+
+Given('{string} payment processor fee is {string}', async function (ppName, feeStr) {
+  this.addValue(`${ppName.toLowerCase()}-payment-provider-fee`, feeStr);
+});
+
+Given('platform fee is {string}', async function (feeStr) {
+  this.addValue(`platform-fee`, feeStr);
+});
+
+When('{string} donates {string} to {string} via {string}', async function (fromName, value, toName, paymentMethod) {
+  const [ amountStr, currency ] = value.split(' ');
+  const amount = parseInt(amountStr);
+  const userCollective = this.getValue(fromName);
+  const collective = this.getValue(toName);
+  /* Retrieve fees that may or may not have been set */
+  const paymentMethodName = paymentMethod.toLowerCase();
+  const ppFee = readFee(amount, this.getValue(`${paymentMethodName}-payment-provider-fee`));
+  const appFee = readFee(amount, this.getValue('platform-fee'));
+  /* We currently only have these available payment methods */
+  const method = {
+    stripe: store.stripeOneTimeDonation,
+  }[paymentMethodName]
+  await method({ userCollective, collective, currency, amount, appFee, ppFee });
+});
+
 When('{string} expenses {string} for {string} to {string} via {string}', async function (userName, value, description, collectiveName, payoutMethod) {
   const [ amount, currency ] = value.split(' ');
   const user = this.getValue(`${userName}-user`);
@@ -112,7 +145,6 @@ Then('{string} should have {string} in their balance', async function(collective
   const collective = this.getValue(collectiveName);
   /* Doesn't ever sum up different currencies */
   const userToCollectiveAmount = await libtransactions.sum({
-    FromCollectiveId: collective.id,
     CollectiveId: collective.id,
     currency,
   });
