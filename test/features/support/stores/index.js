@@ -131,6 +131,33 @@ export async function createExpense(user, expenseData) {
   return expenses.createExpense(user, expenseData);
 }
 
+/** Create order and set payment method information
+ *
+ * @param {models.Collective} opt.from is the collective the order is
+ *  initiated by.
+ * @param {models.Collective} opt.to is the collective receiving the
+ *  donation.
+ * @param {Number} opt.amount is the amount of the order.
+ * @param {String} opt.currency is the currency of the collective
+ *  initiating the order.
+ */
+export async function newOrder(opt) {
+  const { from, to, amount, currency } = opt;
+  const order = await models.Order.create({
+    ...opt,
+    description: `Donation to ${to.slug}`,
+    totalAmount: amount,
+    currency,
+    CreatedByUserId: from.CreatedByUserId,
+    FromCollectiveId: from.id,
+    CollectiveId: to.id,
+  });
+  await order.setPaymentMethod({
+    token: 'tok_123456781234567812345678',
+  });
+  return { order };
+}
+
 /* -- STRIPE METHODS -- */
 
 /** Create a stripe account for a host collective
@@ -149,33 +176,6 @@ export async function stripeConnectedAccount(hostId) {
   });
 }
 
-/** Create an order and Stripe payment method
- *
- * @param {models.Collective} opt.from is the collective the order is
- *  initiated by.
- * @param {models.Collective} opt.to is the collective receiving the
- *  donation.
- * @param {Number} opt.amount is the amount of the order.
- * @param {String} opt.currency is the currency of the collective
- *  initiating the order.
- */
-export async function stripeOrderAndPaymentMethod(opt) {
-  const { from, to, amount, currency } = opt;
-  const order = await models.Order.create({
-    ...opt,
-    description: `Donation to ${to.slug}`,
-    totalAmount: amount,
-    currency,
-    CreatedByUserId: from.CreatedByUserId,
-    FromCollectiveId: from.id,
-    CollectiveId: to.id,
-  });
-  await order.setPaymentMethod({
-    token: "tok_123456781234567812345678",
-  });
-  return { order };
-}
-
 /** Create a one time donation.
  *
  * This function creates an order for a one time donation.
@@ -192,7 +192,7 @@ export async function stripeOrderAndPaymentMethod(opt) {
 export async function stripeOneTimeDonation(opt) {
   const { userCollective, collective, amount, currency } = opt;
   const params = { from: userCollective, to: collective, amount, currency };
-  const { order } = await stripeOrderAndPaymentMethod(params)
+  const { order } = await newOrder(params)
   const user = await models.User.findById(userCollective.CreatedByUserId);
   // Every transaction made can use different values, so we stub the
   // stripe call, create the order, and restore the stripe call so it
