@@ -23,10 +23,13 @@ import * as utils from '../../../utils';
  *  percentage.
  */
 const readFee = (amount, feeStr) => {
-  if (feeStr.endsWith('%')) {
+  if (!feeStr) {
+    return 0;
+  } else if (feeStr.endsWith('%')) {
     const asFloat = parseFloat(feeStr.replace('%', ''));
     return asFloat > 0 ? libpayments.calcFee(amount, asFloat) : asFloat;
   } else {
+    /* The `* 100` is for converting from cents */
     return parseFloat(feeStr) * 100;
   }
 };

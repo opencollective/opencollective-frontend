@@ -188,9 +188,15 @@ export async function stripeConnectedAccount(hostId) {
  * @param {Number} opt.amount is the amount of the order in cents.
  * @param {String} opt.currency is the currency of the user making the
  *  order.
+ * @param {Number} opt.appFee is the application fee to be subtracted
+ *  from the order's total amount. It must be the absolute
+ *  value. Not a percentage.
+ * @param {Number} opt.ppFee is the payment processor fee to be
+ *  subtracted from the order's total amount. It must be the absolute
+ *  value. Not a percentage.
  */
 export async function stripeOneTimeDonation(opt) {
-  const { userCollective, collective, amount, currency } = opt;
+  const { userCollective, collective, amount, currency, appFee, ppFee } = opt;
   const params = { from: userCollective, to: collective, amount, currency };
   const { order } = await newOrder(params)
   const user = await models.User.findById(userCollective.CreatedByUserId);
@@ -200,7 +206,7 @@ export async function stripeOneTimeDonation(opt) {
   const sandbox = sinon.sandbox.create();
   try {
     utils.stubStripeCreate(sandbox);
-    utils.stubStripeBalance(sandbox, order.totalAmount, order.currency)
+    utils.stubStripeBalance(sandbox, amount, currency, appFee, ppFee);
     // Although it's supposed to be OK to omit `await' when returning
     // a promise, it's causing this next call to fail so I'm keeping
     // it here.

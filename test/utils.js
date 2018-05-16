@@ -186,9 +186,9 @@ export function stubStripeCreate(sandbox, overloadDefaults) {
 export function stubStripeBalance(sandbox, amount, currency, applicationFee=0, stripeFee=0) {
   const fee_details = [];
   const fee = applicationFee + stripeFee;
-  if (applicationFee > 0)
+  if (applicationFee && applicationFee > 0)
     fee_details.push({ type: 'application_fee', amount: applicationFee });
-  if (stripeFee > 0)
+  if (stripeFee && stripeFee > 0)
     fee_details.push({ type: 'stripe_fee', amount: stripeFee });
   return sandbox.stub(stripeGateway, "retrieveBalanceTransaction", async () => ({
     id: "txn_1Bs9EEBYycQg1OMfTR33Y5Xr",
