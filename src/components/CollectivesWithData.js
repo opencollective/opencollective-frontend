@@ -124,7 +124,7 @@ class CollectivesWithData extends React.Component {
 }
 
 const getCollectivesQuery = gql`
-query allCollectives($HostCollectiveId: Int, $hostCollectiveSlug: String, $ParentCollectiveId: Int, $tags: [String], $memberOfCollectiveSlug: String, $role: String, $type: String, $limit: Int, $offset: Int, $orderBy: String, $orderDirection: String) {
+query allCollectives($HostCollectiveId: Int, $hostCollectiveSlug: String, $ParentCollectiveId: Int, $tags: [String], $memberOfCollectiveSlug: String, $role: String, $type: TypeOfCollective, $limit: Int, $offset: Int, $orderBy: CollectiveOrderField, $orderDirection: OrderDirection) {
   allCollectives(HostCollectiveId: $HostCollectiveId, hostCollectiveSlug: $hostCollectiveSlug, memberOfCollectiveSlug: $memberOfCollectiveSlug, role: $role, type: $type, ParentCollectiveId: $ParentCollectiveId, tags: $tags, limit: $limit, offset: $offset, orderBy: $orderBy, orderDirection: $orderDirection) {
     id
     type
