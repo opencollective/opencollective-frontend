@@ -151,11 +151,6 @@ class OrderForm extends React.Component {
         name: 'description',
         maxLength: 255
       },
-      {
-        name: 'newsletterOptIn',
-        type: 'checkbox',
-        help: 'Receive our monthly newsletter with updates about new collectives and features. Stay in the know with the latest sponsor and backer funding leaderboard, open source inspiration, and upcoming events.',
-      },
     ]
 
     this.fields = this.fields.map(field => {
@@ -661,7 +656,7 @@ class OrderForm extends React.Component {
                     {...field}
                     defaultValue={this.state.user[field.name]}
                     onChange={(value) => this.handleChange("user", field.name, value)}
-                    />
+                  />
                 </Col>
               </Row>
             ))}
@@ -674,8 +669,24 @@ class OrderForm extends React.Component {
                 name="fromCollectiveSelector"
                 onChange={CollectiveId => this.selectProfile(CollectiveId)}
                 options={this.fromCollectiveOptions}
-                />
+              />
             }
+
+            { !LoggedInUser && this.state.isNewUser && (
+              <Row key="newsletterOptIn.input">
+                <Col sm={12}>
+                  <InputField
+                    className="horizontal"
+                    name="newsletterOptIn"
+                    type="checkbox"
+                    help="Receive our monthly newsletter with updates about new collectives and features. Stay in the know with the latest sponsor and backer funding leaderboard, open source inspiration, and upcoming events."
+                    description={intl.formatMessage(this.messages['newsletterOptIn.description'])}
+                    defaultValue={this.state.user['newsletterOptIn']}
+                    onChange={(value) => this.handleChange('user', 'newsletterOptIn', value)}
+                  />
+                </Col>
+              </Row>
+            )}
 
           </section>
 
