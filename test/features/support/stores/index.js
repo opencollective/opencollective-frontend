@@ -78,6 +78,25 @@ export async function newHost(name, currency, hostFee) {
   return { hostAdmin, hostCollective };
 }
 
+/** Create an organization
+ *
+ * This is mostly a proxy to an already existing method within the
+ * `Collective` model.
+ *
+ * @see models.Collective.createOrganization
+ *
+ * @param {Object} orgData fields to be passed to the new
+ *  organization. E.g.: name, slug, etc. These are forwarded to the
+ *  model's `.create` method.
+ * @param {models.User} adminUser the user that will be set as the
+ *  organization's first administrator.
+ * @return {models.Collective} the newly created Organization
+ *  collective instance.
+ */
+export async function newOrganization(orgData, adminUser) {
+  return models.Collective.createOrganization(orgData, adminUser);
+}
+
 /** Create new a host, a collective and add collective to the host
  *
  * @param {String} name Name of the collective.
@@ -183,6 +202,7 @@ export async function stripeConnectedAccount(hostId) {
  * This function creates an order for a one time donation.
  *
  * @param {models.Order} opt.order is the order to be executed
+ * @param {models.User} opt.user is the user making the donation
  * @param {models.Collective} opt.userCollective is the collective
  *  making the donation.
  * @param {models.Collective} opt.collective is the collective
@@ -198,10 +218,9 @@ export async function stripeConnectedAccount(hostId) {
  *  value. Not a percentage.
  */
 export async function stripeOneTimeDonation(opt) {
-  const { userCollective, collective, amount, currency, appFee, ppFee } = opt;
+  const { user, userCollective, collective, amount, currency, appFee, ppFee } = opt;
   const params = { from: userCollective, to: collective, amount, currency };
   const { order } = await newOrder(params)
-  const user = await models.User.findById(userCollective.CreatedByUserId);
   // Every transaction made can use different values, so we stub the
   // stripe call, create the order, and restore the stripe call so it
   // can be stubbed again by the next call to this helper.

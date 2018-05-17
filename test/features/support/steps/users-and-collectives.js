@@ -12,10 +12,24 @@ Given('a User {string}', async function (name) {
   this.addValue(`${name}-user`, user);
 });
 
+Given('a User {string} as an {string} to {string}', async function (userName, role, collectiveName) {
+  const { user, userCollective } = await store.newUser(userName);
+  this.addValue(userName, userCollective);
+  this.addValue(`${userName}-user`, user);
+  const collective = this.getValue(collectiveName);
+  collective.addUserWithRole(user, role);
+});
+
 Given('a Host {string} in {string} and charges {string} of fee', async function (name, currency, fee) {
   const { hostCollective, hostAdmin } = await store.newHost(name, currency, fee);
   this.addValue(name, hostCollective);
   this.addValue(`${name}-admin`, hostAdmin);
+});
+
+Given('an Organization {string} in {string} administered by {string}', async function (orgName, currency, userName) {
+  const orgAdmin = this.getValue(`${userName}-user`);
+  const organization = await store.newOrganization({ name: orgName, currency }, orgAdmin);
+  this.addValue(orgName, organization);
 });
 
 Given('a Collective {string} in {string} hosted by {string}', async function (name, currency, hostName) {
@@ -25,6 +39,12 @@ Given('a Collective {string} in {string} hosted by {string}', async function (na
   this.addValue(name, collective);
   this.addValue(`${name}-host-collective`, hostCollective);
   this.addValue(`${name}-host-admin`, hostAdmin);
+});
+
+Given('{string} is hosted by {string}', async function (collectiveName, hostName) {
+  const hostCollective = this.getValue(hostName);
+  const collective = this.getValue(collectiveName);
+  collective.addHost(hostCollective);
 });
 
 Given('{string} connects a {string} account', async function (hostName, connectedAccountName) {
@@ -44,21 +64,35 @@ Given('platform fee is {string}', async function (feeStr) {
   this.addValue(`platform-fee`, feeStr);
 });
 
-When('{string} donates {string} to {string} via {string}', async function (fromName, value, toName, paymentMethod) {
+async function handleDonation (fromName, value, toName, paymentMethod, userName) {
   const [ amountStr, currency ] = value.split(' ');
   const amount = parseInt(amountStr);
+  const user = this.getValue(`${userName ? userName : fromName}-user`);
   const userCollective = this.getValue(fromName);
   const collective = this.getValue(toName);
   /* Retrieve fees that may or may not have been set */
   const paymentMethodName = paymentMethod.toLowerCase();
   const ppFee = utils.readFee(amount, this.getValue(`${paymentMethodName}-payment-provider-fee`));
   const appFee = utils.readFee(amount, this.getValue('platform-fee'));
-  /* We currently only have these available payment methods */
+  /* Use the appropriate stub to execute the order */
   const method = {
     stripe: store.stripeOneTimeDonation,
-  }[paymentMethodName]
-  await method({ userCollective, collective, currency, amount, appFee, ppFee });
-});
+  }[paymentMethodName];
+  if (!method) throw new Error(`Payment Method ${paymentMethod} doesn't exist`);
+  return method({
+    user,
+    userCollective,
+    collective,
+    currency,
+    amount,
+    appFee,
+    ppFee,
+  });
+}
+
+When('{string} donates {string} to {string} via {string}', handleDonation);
+
+When('{string} donates {string} to {string} via {string} as {string}', handleDonation);
 
 Then('{string} should have contributed {string} to {string}', async function(userName, value, collectiveName) {
   const [ amount, currency ] = value.split(' ');
