@@ -10,22 +10,27 @@ if (process.env.NODE_ENV === 'production' && today.getDate() !== 1) {
 
 process.env.PORT = 3066;
 
-import { get, pick } from 'lodash';
+import { get, pick, uniq } from 'lodash';
 import moment from 'moment';
 import config from 'config';
 import Promise from 'bluebird';
+import fetch from 'node-fetch';
 import debugLib from 'debug';
 import models, { sequelize } from '../../server/models';
 import emailLib from '../../server/lib/email';
 import roles from '../../server/constants/roles';
 import { formatCurrencyObject, formatArrayToString } from '../../server/lib/utils';
 import { convertToCurrency } from '../../server/lib/currency';
+import path from 'path';
+import fs from 'fs';
 
 const Op = sequelize.Sequelize.Op;
 
 const d = new Date;
 d.setMonth(d.getMonth() - 1);
+const year = d.getFullYear();
 const month = moment(d).format('MMMM');
+const month2digit = moment(d).format('MM');
 
 const startDate = new Date(d.getFullYear(), d.getMonth(), 1);
 const endDate = new Date(d.getFullYear(), d.getMonth()+1, 1);
@@ -87,9 +92,10 @@ const init = async () => {
 }
 
 const processBacker = async (FromCollectiveId) => {
-  console.log(">>> Processing backer", FromCollectiveId);
+  const backerCollective = await models.Collective.findById(FromCollectiveId);
+  console.log(">>> Processing backer", backerCollective.slug);
   const distinctTransactions = await models.Transaction.findAll({
-    attributes: [ [sequelize.fn('DISTINCT', sequelize.col('CollectiveId')), 'CollectiveId'] ],
+    attributes: [ [sequelize.fn('DISTINCT', sequelize.col('CollectiveId')), 'CollectiveId'], 'HostCollectiveId' ],
     where: {
       FromCollectiveId,
       type: 'CREDIT',
@@ -99,10 +105,37 @@ const processBacker = async (FromCollectiveId) => {
 
   console.log(`>>> Collective ${FromCollectiveId} has backed ${distinctTransactions.length} collectives`);
   const collectives = await Promise.map(distinctTransactions, (transaction) => processCollective(transaction.CollectiveId));
-
-  const backerCollective = await models.Collective.findById(FromCollectiveId);
   const subscribers = await fetchUserSubscribers('user.monthlyreport', backerCollective);
   console.log(`>>> Collective ${FromCollectiveId} has ${subscribers.length} subscribers`);
+
+  const attachments = [];
+  if (get(backerCollective, 'settings.sendInvoiceByEmail')) {
+    const distinctHostCollectiveIds = uniq(distinctTransactions.map(t => t.dataValues.HostCollectiveId));
+    const hosts = await Promise.map(distinctHostCollectiveIds, (HostCollectiveId) => models.Collective.findById(HostCollectiveId, { attributes: ['id', 'slug'] }));
+
+    const token = subscribers[0].jwt();
+    const headers = { 'Authorization': `Bearer ${token}` };
+    await Promise.map(hosts, async (host) => {
+      const filename = `${year}${month2digit}-${host.slug}-${backerCollective.slug}.pdf`;
+      const invoiceUrl = `${config.host.website}/${backerCollective.slug}/invoices/${filename}`;
+      console.log(">>> downloading", invoiceUrl);
+      await fetch(invoiceUrl, { headers })
+        .then(response => {
+          if (response.status === 200) {
+            return response.buffer();
+          } else {
+            console.error(`Unable to download the invoice ${invoiceUrl}`);
+          }
+        })
+        .then(blob => {
+          if (!blob) return;
+          attachments.push({
+            filename,
+            content: blob
+          })
+        })
+    }, { concurrency: 4 })
+  }
 
   const orders = await models.Order.findAll({
     attributes: ['id', 'CollectiveId', 'totalAmount', 'currency'],
@@ -145,7 +178,10 @@ const processBacker = async (FromCollectiveId) => {
         relatedCollectives,
         stats
       };
-      return sendEmail(user, data);
+      const options = {
+        attachments
+      };
+      return sendEmail(user, data, options);
     });
   } catch (e) {
     console.error(e);
@@ -313,11 +349,10 @@ const computeStats = async (collectives, currency = 'USD') => {
     ar.push(`${category} (${formatCurrencyObject(categories[category].totalAmountPerCurrency)})`)
   })
   stats.expensesBreakdownString = `${(Object.keys(categories).length > 3) ? `, mostly in` : ` in`} ${formatArrayToString(ar)}`;
-  console.log(">>> stats", JSON.stringify(stats, null, '  '));
   return stats;
 }
 
-const sendEmail = (recipient, data) => {
+const sendEmail = (recipient, data, options = {}) => {
   if (recipient.length === 0) return;
   data.recipient = recipient;
   if (process.env.ONLY && recipient.email !== process.env.ONLY) {
@@ -329,7 +364,15 @@ const sendEmail = (recipient, data) => {
     recipient.email = process.env.SEND_EMAIL_TO;
   }
 
-  return emailLib.send('user.monthlyreport', recipient.email, data);
+  if (process.env.DEBUG && process.env.DEBUG.match(/preview/) && options.attachments) {
+    options.attachments.map(attachment => {
+      const filepath = path.resolve(`/tmp/${attachment.filename}`);
+      fs.writeFileSync(filepath, attachment.content);
+      console.log(">>> preview attachment", filepath);
+    })
+  }
+
+  return emailLib.send('user.monthlyreport', recipient.email, data, options);
 }
 
 init();

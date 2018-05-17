@@ -38,7 +38,7 @@ import {
   PaymentMethodType
 } from './types';
 
-import { find, get, uniq } from 'lodash';
+import { find, get, uniq, pick } from 'lodash';
 import models, { sequelize } from '../models';
 import rawQueries from '../lib/queries';
 import { fetchCollectiveId } from '../lib/cache';
@@ -99,7 +99,7 @@ const queries = {
       if (!fromCollective) {
         throw new errors.NotFound("User or organization not found");
       }
-      if (!req.remoteUser || req.remoteUser.CollectiveId !== fromCollective.id) {
+      if (!req.remoteUser || !req.remoteUser.isAdmin(fromCollective.id)) {
         throw new errors.Unauthorized("You don't have permission to access invoices for this user");
       }
 
@@ -163,10 +163,10 @@ const queries = {
         throw new errors.NotFound("User or organization not found");
       }
       const host = await models.Collective.findBySlug(hostSlug);
-        if (!host) {
-          throw new errors.NotFound("Host not found");
-        }
-      if (!req.remoteUser || req.remoteUser.CollectiveId !== fromCollective.id) {
+      if (!host) {
+        throw new errors.NotFound("Host not found");
+      }
+      if (!req.remoteUser || !req.remoteUser.isAdmin(fromCollective.id)) {
         throw new errors.Unauthorized("You don't have permission to access invoices for this user");
       }
 
