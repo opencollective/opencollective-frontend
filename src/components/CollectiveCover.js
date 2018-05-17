@@ -271,28 +271,32 @@ ${description}`
               { collective.type !== 'USER' && <Logo src={logo} className="logo" type={collective.type} website={collective.website} height="10rem" /> }
             </Link>
             <h1>{title}</h1>
-            { company && company.substr(0,1) === '@' && <p className="company"><Link route={`/${company.substr(1)}`}>{company.substr(1)}</Link></p> }
-            { company && company.substr(0,1) !== '@' && <p className="company">{company}</p> }
-            { description && <p className="description">{description}</p> }
-            { collective.type !== 'EVENT' &&
-              <div className="contact">
-                { collective.host && collective.isActive && <div className="host"><label><FormattedMessage id="collective.cover.hostedBy" defaultMessage="Hosted by" /></label><Link route={`/${collective.host.slug}`}>{collective.host.name} </Link></div> }
-                { collective.host && !collective.isActive && <div className="host"><label><FormattedMessage id="collective.cover.pendingApprovalFrom" defaultMessage="Pending approval from" /></label><Link route={`/${collective.host.slug}`}>{collective.host.name} </Link></div> }
-                { twitterHandle && <div className="twitterHandle"><a href={`https://twitter.com/${twitterHandle}`} target="_blank">@{twitterHandle}</a></div> }
-                { website && <div className="website"><a href={website} target="_blank">{prettyUrl(website) }</a></div> }
-              </div>
-            }
-            { collective.type === 'EVENT' &&
-              <div className="contact">
-                <div className="parentCollective">
-                  <Link route={`/${collective.parentCollective.slug}`}>{collective.parentCollective.name}</Link>
-                </div>
-              </div>
-            }
+            { className !== 'small' &&
+              <div>
+                { company && company.substr(0,1) === '@' && <p className="company"><Link route={`/${company.substr(1)}`}>{company.substr(1)}</Link></p> }
+                { company && company.substr(0,1) !== '@' && <p className="company">{company}</p> }
+                { description && <p className="description">{description}</p> }
+                { collective.type !== 'EVENT' &&
+                  <div className="contact">
+                    { collective.host && collective.isActive && <div className="host"><label><FormattedMessage id="collective.cover.hostedBy" defaultMessage="Hosted by" /></label><Link route={`/${collective.host.slug}`}>{collective.host.name} </Link></div> }
+                    { collective.host && !collective.isActive && <div className="host"><label><FormattedMessage id="collective.cover.pendingApprovalFrom" defaultMessage="Pending approval from" /></label><Link route={`/${collective.host.slug}`}>{collective.host.name} </Link></div> }
+                    { twitterHandle && <div className="twitterHandle"><a href={`https://twitter.com/${twitterHandle}`} target="_blank">@{twitterHandle}</a></div> }
+                    { website && <div className="website"><a href={website} target="_blank">{prettyUrl(website) }</a></div> }
+                  </div>
+                }
+                { collective.type === 'EVENT' &&
+                  <div className="contact">
+                    <div className="parentCollective">
+                      <Link route={`/${collective.parentCollective.slug}`}>{collective.parentCollective.name}</Link>
+                    </div>
+                  </div>
+                }
 
-            { collective.type !== 'COLLECTIVE' && this.props.cta &&
-              <div className="cta">
-                <Button className="blue" href={this.cta.href}>{this.cta.label}</Button>
+                { collective.type !== 'COLLECTIVE' && this.props.cta &&
+                  <div className="cta">
+                    <Button className="blue" href={this.cta.href}>{this.cta.label}</Button>
+                  </div>
+                }
               </div>
             }
           </div>

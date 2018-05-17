@@ -51,7 +51,7 @@ class EditCollectiveForm extends React.Component {
     this.members = collective.members && collective.members.filter(m => ['ADMIN','MEMBER'].includes(m.role));
 
     this.messages = defineMessages({
-      'slug.label': { id: 'collective.slug.label', defaultMessage: 'url' },
+      'slug.label': { id: 'collective.slug.label', defaultMessage: 'Change your URL' },
       'type.label': { id: 'collective.type.label', defaultMessage: 'type' },
       'name.label': { id: 'collective.name.label', defaultMessage: 'name' },
       'tags.label': { id: 'collective.tags.label', defaultMessage: 'tags' },
@@ -71,6 +71,8 @@ class EditCollectiveForm extends React.Component {
       'website.label': { id: 'collective.website.label', defaultMessage: 'Website' },
       'markdown.label': { id: 'collective.markdown.label', defaultMessage: 'Default editor' },
       'markdown.description': { id: 'collective.markdown.description', defaultMessage: 'Use markdown editor' },
+      'sendInvoiceByEmail.label': { id: 'collective.sendInvoiceByEmail.label', defaultMessage: 'Invoices' },
+      'sendInvoiceByEmail.description': { id: 'collective.sendInvoiceByEmail.description', defaultMessage: 'Automatically attach the PDF of your receipts to the monthly report email' },
       'location.label': { id: 'collective.location.label', defaultMessage: 'City' }
     });
 
@@ -213,6 +215,12 @@ class EditCollectiveForm extends React.Component {
           pre: `https://opencollective.com/`,
           placeholder: '',
           when: () => this.state.section === 'advanced'
+        },
+        {
+          name: 'sendInvoiceByEmail',
+          type: 'switch',
+          defaultValue: get(this.state.collective, 'settings.sendInvoiceByEmail'),
+          when: () => this.state.section === 'advanced' && (collective.type === 'USER' || collective.type === 'ORGANIZATION')
         },
         {
           name: 'markdown',
