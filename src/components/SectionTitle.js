@@ -92,11 +92,12 @@ class SectionTitle extends React.Component {
             }
           }
         `}</style>
+
         <div className="content">
           <div className="title">
             <h1>{title}</h1>
             { action &&
-              <Link route={action.href} className="action">{action.label}</Link>
+              <Link route={action.href} className="action" scroll={false}>{action.label}</Link>
             }
           </div>
           { subtitle && <div className="subtitle">{subtitle}</div> }

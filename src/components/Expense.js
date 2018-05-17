@@ -262,7 +262,11 @@ class Expense extends React.Component {
                 <span className="collective"><Link route={`/${expense.collective.slug}`}>{expense.collective.slug}</Link> (balance: {formatCurrency(expense.collective.stats.balance, expense.collective.currency)}) | </span>
               }
                 <span className="status">{intl.formatMessage(this.messages[status])}</span> |
-                <span className="metaItem"><Link route={`/${expense.collective.slug}/expenses/${expense.category}`}>{capitalize(expense.category)}</Link></span>
+                <span className="metaItem">
+                  <Link route="expenses" params={{collectiveSlug: expense.collective.slug, filter: 'categories', value: expense.category }} scroll={false}>
+                    {capitalize(expense.category)}
+                  </Link>
+                </span>
                 { editable && LoggedInUser && LoggedInUser.canEditExpense(expense) &&
                 <span> | <a className="toggleEditExpense" onClick={this.toggleEdit}>{intl.formatMessage(this.messages[`${mode === 'edit' ? 'cancelEdit' : 'edit'}`])}</a></span>
               }
