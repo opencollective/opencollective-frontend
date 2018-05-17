@@ -54,7 +54,7 @@ export async function newUser(name, data={}) {
     username: name,
     description: `A user called ${name}`,
   });
-  return { user, userCollective: user.collective };
+  return { user, userCollective: user.collective, [slug]: user };
 }
 
 /**
@@ -75,7 +75,7 @@ export async function newHost(name, currency, hostFee) {
     name, slug, currency, hostFeePercent, CreatedByUserId: hostAdmin.id,
   });
   await hostCollective.addUserWithRole(hostAdmin, 'ADMIN');
-  return { hostAdmin, hostCollective };
+  return { hostAdmin, hostCollective, [slug]: hostCollective };
 }
 
 /** Create an organization
@@ -112,7 +112,7 @@ export async function newCollectiveWithHost(name, currency, hostCurrency, hostFe
   const { hostFeePercent } = hostCollective;
   const collective = await models.Collective.create({ name, slug, currency, hostFeePercent });
   await collective.addHost(hostCollective);
-  return { hostCollective, hostAdmin, collective };
+  return { hostCollective, hostAdmin, collective, [slug]: hostCollective };
 }
 
 /** Create a collective and associate to an existing host.
@@ -128,7 +128,7 @@ export async function newCollectiveInHost(name, currency, hostCollective) {
   const { hostFeePercent } = hostCollective;
   const collective = await models.Collective.create({ name, slug, currency, hostFeePercent });
   await collective.addHost(hostCollective);
-  return { collective };
+  return { collective, [slug]: collective };
 }
 
 /** Create a new expense in a collective
