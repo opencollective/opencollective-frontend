@@ -228,7 +228,7 @@ export async function website(req, res) {
 }
 
 export async function avatar(req, res) {
-  req.params.isActive = true;
+  req.params.isActive = (req.query.isActive === 'false') ? false : true;
   const { collectiveSlug, tierSlug, backerType, isActive } = req.params;
   let users = cache.get(queryString.stringify({ collectiveSlug, tierSlug, backerType, isActive }));
   if (!users) {
