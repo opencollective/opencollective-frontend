@@ -113,7 +113,7 @@ class EditCollective extends React.Component {
     if (!CollectiveInputType) {
       return false;
     }
-    if (CollectiveInputType.tags) {
+    if (typeof CollectiveInputType.tags === 'string') {
       CollectiveInputType.tags = CollectiveInputType.tags.split(',').map(t => t.trim());
     }
 
