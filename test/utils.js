@@ -17,6 +17,7 @@ import schema from '../server/graphql/schema';
 import { loaders } from '../server/graphql/loaders';
 import { sequelize } from '../server/models';
 import * as libcache from '../server/lib/cache';
+import * as libpayments from '../server/lib/payments';
 import * as stripeGateway from '../server/paymentProviders/stripe/gateway';
 
 const appStripe = Stripe(config.stripe.secret);
@@ -148,6 +149,34 @@ export const graphqlQuery = async (query, variables, remoteUser) => {
       variables
     ));
 }
+
+/** Helper for interpreting fee description in BDD tests
+ *
+ * The fee can be expressed as an absolute value, like "50" which
+ * means $50.00 (the value will be multiplied by 100 to account for
+ * the cents).
+ *
+ * The fee can also be expressed as a percentage of the value. In that
+ * case it looks like "5%". That's why this helper takes the amount
+ * parameter so the absolute value of the fee can be calculated.
+ *
+ * @param {Number} amount is the total amount of the expense. Used to
+ *  calculate the absolute value of fees expressed as percentages.
+ * @param {String} feeStr is the data read from the `.features` test
+ *  file. That can be expressed as an absolute value or as a
+ *  percentage.
+ */
+export const readFee = (amount, feeStr) => {
+  if (!feeStr) {
+    return 0;
+  } else if (feeStr.endsWith('%')) {
+    const asFloat = parseFloat(feeStr.replace('%', ''));
+    return asFloat > 0 ? libpayments.calcFee(amount, asFloat) : asFloat;
+  } else {
+    /* The `* 100` is for converting from cents */
+    return parseFloat(feeStr) * 100;
+  }
+};
 
 /* ---- Stripe Helpers ---- */
 

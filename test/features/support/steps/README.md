@@ -51,6 +51,17 @@ most likely broken.
    `10 USD`. The `<paymentMethod>` is a string containing `stripe` for
    now.
 
+ * `Then {name} should have contributed {value} to {collective}`: This
+   **assertion** checks if a user `<name>` contributed a certain
+   amount to a collective. The `<value>` field is a string that
+   contains amount and currency. e.g.: `10 USD`.
+
+ * `Then {collective} should have {value} in their balance`: This
+   asserts that a given collective has a certain value in their
+   balance.
+
+# expenses
+
  * `When {name} expenses {value} for {description} to {collective} via {method}`:
    This **action** creates an expense from the user `<name>` to the
    collective. The `<value>` is how much the expense is worth. It
@@ -67,12 +78,3 @@ most likely broken.
    `<fee>` can be expressed as a percentage of the total of the
    expense (when the sign [%] is present in the end of the
    string. Otherwise it will just use the input as the absolute value.
-
- * `Then {name} should have contributed {value} to {collective}`: This
-   **assertion** checks if a user `<name>` contributed a certain
-   amount to a collective. The `<value>` field is a string that
-   contains amount and currency. e.g.: `10 USD`.
-
- * `Then {collective} should have {value} in their balance`: This
-   asserts that a given collective has a certain value in their
-   balance.
