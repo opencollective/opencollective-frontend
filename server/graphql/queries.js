@@ -38,7 +38,7 @@ import {
   PaymentMethodType
 } from './types';
 
-import { find, get, uniq, pick } from 'lodash';
+import { find, get, uniq } from 'lodash';
 import models, { sequelize } from '../models';
 import rawQueries from '../lib/queries';
 import { fetchCollectiveId } from '../lib/cache';
