@@ -19,6 +19,7 @@ import models, { sequelize } from '../../server/models';
 import emailLib from '../../server/lib/email';
 import roles from '../../server/constants/roles';
 import { formatCurrencyObject, formatArrayToString } from '../../server/lib/utils';
+import { convertToCurrency } from '../../server/lib/currency';
 
 const Op = sequelize.Sequelize.Op;
 
@@ -130,7 +131,7 @@ const processBacker = async (FromCollectiveId) => {
     else return 1;
   })
 
-  const stats = await computeStats(collectivesWithOrders);
+  const stats = await computeStats(collectivesWithOrders, backerCollective.currency);
   const relatedCollectives = await models.Collective.getCollectivesSummaryByTag(stats.topTags, 3, null, 0, false, 'c."createdAt"', 'DESC');
 
   try {
@@ -267,7 +268,7 @@ const getTopKeysFromObject = (obj, valueAttr, limit = 3) => {
   return topValues;
 }
 
-const computeStats = (collectives) => {
+const computeStats = async (collectives, currency = 'USD') => {
   const categories = {};
   const tagsIndex = {};
   const stats = {
@@ -276,7 +277,7 @@ const computeStats = (collectives) => {
     totalSpentPerCurrency: {},
     totalDonatedPerCurrency: {}
   };
-  collectives.map(collective => {
+  await Promise.map(collectives, async (collective) => {
     const expenses = collective.expenses;
     if (collective.tags) {
       collective.tags.map(t => {
@@ -290,18 +291,20 @@ const computeStats = (collectives) => {
     }
     if (expenses && expenses.length > 0) {
       stats.expenses += expenses.length;
-      expenses.map(expense => {
-        categories[expense.category] = categories[expense.category] || { occurences: 0, totalAmountPerCurrency: {} };
+      await Promise.map(expenses, async (expense) => {
+        const amountInBackerCurrency = await convertToCurrency(expense.amount, expense.currency, currency);
+        categories[expense.category] = categories[expense.category] || { occurences: 0, totalAmountPerCurrency: {}, totalAmountInBackerCurrency: 0 };
         categories[expense.category].occurences++;
         categories[expense.category].totalAmountPerCurrency[expense.currency] = categories[expense.category].totalAmountPerCurrency[expense.currency] || 0;
         categories[expense.category].totalAmountPerCurrency[expense.currency] += expense.amount;
+        categories[expense.category].totalAmountInBackerCurrency += amountInBackerCurrency;
         stats.totalSpentPerCurrency[expense.currency] = stats.totalSpentPerCurrency[expense.currency] || 0;
         stats.totalSpentPerCurrency[expense.currency] += expense.amount;
       })
     }
   })
   stats.topTags = getTopKeysFromObject(tagsIndex);
-  stats.topCategories = getTopKeysFromObject(categories, 'occurences');
+  stats.topCategories = getTopKeysFromObject(categories, 'totalAmountInBackerCurrency');
   stats.categories = categories;
   stats.totalSpentString = formatCurrencyObject(stats.totalSpentPerCurrency);
   stats.totalDonatedString = formatCurrencyObject(stats.totalDonatedPerCurrency);
