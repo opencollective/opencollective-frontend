@@ -33,7 +33,7 @@ class Link extends React.Component {
       const path = routeFromRouter ? routeFromRouter.getAs(params) : `https://opencollective.com${route}`;
       return (<a href={path} title={title} target="_top" className={className} {...otherProps}>{children}</a>);
     } else {
-      return (<router.Link {...pick(this.props, ['route', 'params', 'href'])}><a className={className} title={title}>{children}</a></router.Link>);
+      return (<router.Link {...pick(this.props, ['route', 'params', 'href', 'scroll'])}><a className={className} title={title}>{children}</a></router.Link>);
     }
   }
 }

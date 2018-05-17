@@ -47,6 +47,7 @@ class ExpensesStatsWithData extends React.Component {
             font-size: 1.2rem;
           }
         `}</style>
+
         <h1><FormattedMessage id="collective.stats.balance.title" defaultMessage="Available balance" /></h1>
         <Currency value={Collective.stats.balance} currency={Collective.currency} precision={2} />
         <h1><FormattedMessage id="expenses.stats.distribution.title" defaultMessage="Distribution" /></h1>
@@ -55,7 +56,7 @@ class ExpensesStatsWithData extends React.Component {
           <ol>
             { topExpenses.byCategory.map(category => (
               <li key={category.category}>
-                <Link route={`/${slug}/expenses/categories/${category.category}`}>{category.category}</Link> (<Currency value={category.totalExpenses} currency={Collective.currency} />)
+                <Link route={`/${slug}/expenses/categories/${category.category}`} scroll={false}>{category.category}</Link> (<Currency value={category.totalExpenses} currency={Collective.currency} />)
               </li>
           ))}
           </ol>
@@ -65,7 +66,7 @@ class ExpensesStatsWithData extends React.Component {
           <ol>
             { topExpenses.byCollective.map(recipientCollective => (
               <li key={recipientCollective.slug}>
-                <Link route={`/${slug}/expenses/recipients/${recipientCollective.slug}`}>{recipientCollective.name}</Link> (<Currency value={-recipientCollective.totalExpenses} currency={Collective.currency} />)
+                <Link route={`/${slug}/expenses/recipients/${recipientCollective.slug}`} scroll={false}>{recipientCollective.name}</Link> (<Currency value={-recipientCollective.totalExpenses} currency={Collective.currency} />)
               </li>
           ))}
           </ol>
