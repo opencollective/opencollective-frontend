@@ -80,9 +80,10 @@
     "dev": "babel-node src/server",
     "build": "npm run build:server && next build build",
     "start": "node build/server",
-    "test": "TZ=utc jest src/* && npm run test:e2e",
-    "test:server": "jest test/server/*",
-    "test:e2e": "./scripts/run_e2e_tests.sh",
+    "test": "npm run test:src && npm run test:e2e",
+    "test:src": "TZ=UTC jest src/*",
+    "test:server": "TZ=UTC jest test/server/*",
+    "test:e2e": "TZ=UTC ./scripts/run_e2e_tests.sh",
     "build:server": "babel -D ./src -d ./build --ignore src/templates/widget.js,src/**/__tests__/* && cp src/templates/widget.js build/templates/",
     "build:langs": "rm -rf build/messages && babel src/**/*.js > /dev/null && babel-node scripts/translate.js",
     "deploy:production": "git push production master",
@@ -134,7 +135,6 @@
       "\\.(css|less)$": "<rootDir>/test/mocks/styleMock.js"
     },
     "setupFiles": [
-      "raf/polyfill",
       "<rootDir>/test/setup.js"
     ]
   },

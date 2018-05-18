@@ -1,5 +1,7 @@
-import React, { Component } from 'react'
-import { IntlProvider, addLocaleData, injectIntl } from 'react-intl'
+import React from 'react';
+import { IntlProvider, addLocaleData, injectIntl } from 'react-intl';
+import PropTypes from 'prop-types';
+
 import 'intl';
 import 'intl/locale-data/jsonp/en.js'; // for old browsers without window.Intl
 
@@ -15,7 +17,17 @@ if (typeof window !== 'undefined' && window.ReactIntlLocaleData) {
 export default (Page) => {
   const IntlPage = injectIntl(Page)
 
-  return class PageWithIntl extends Component {
+  return class PageWithIntl extends React.Component {
+
+    static propTypes = {
+      locale: PropTypes.string,
+      messages: PropTypes.object,
+      now: PropTypes.number,
+    }
+
+    static defaultProps = {
+      locale: 'en'
+    }
 
     // Note: when adding withIntl to a child component, getInitialProps doesn't get called
     // and it doesn't populate the messages in the props

@@ -4,6 +4,7 @@ import TicketController from '../TicketController';
 
 let ticketCtlr;
 
+const DEBUG = process.env.DEBUG || false;
 
 describe("TicketController", () => {
 
@@ -11,7 +12,7 @@ describe("TicketController", () => {
 
   it('decreases the value by 1', () => {
     const onChange = (value) => {
-      console.log("> onChange", value);
+      if (DEBUG) console.log("> onChange", value);
       expect(value).toEqual(1);
     }
     ticketCtlr = ReactDOM.render(<TicketController value={2} onChange={onChange} />, div);
@@ -20,7 +21,7 @@ describe("TicketController", () => {
 
   it('increases the value by 1', () => {
     const onChange = (value) => {
-      console.log("> onChange", value);
+      if (DEBUG) console.log("> onChange", value);
       expect(value).toEqual(3);
     }
     ticketCtlr = ReactDOM.render(<TicketController value={2} onChange={onChange} />, div);
@@ -29,7 +30,7 @@ describe("TicketController", () => {
 
   it('doesn\'t go below 1', () => {
     const onChange = (value) => {
-      console.log("> onChange", value);
+      if (DEBUG) console.log("> onChange", value);
       expect(value).toEqual(1);
     }
     ticketCtlr = ReactDOM.render(<TicketController value={1} onChange={onChange} />, div);
