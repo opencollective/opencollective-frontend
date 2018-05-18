@@ -30,8 +30,6 @@ class UserCollective extends React.Component {
 
   constructor(props) {
     super(props);
-    this.collective = this.props.collective; // pre-loaded by SSR
-    this.memberOfByRole = groupBy(this.collective.memberOf, 'role');
 
     this.state = {
       view: 'default',
@@ -80,11 +78,12 @@ class UserCollective extends React.Component {
   renderRole(role) {
     const { intl, collective, LoggedInUser } = this.props;
     const type = collective.type.toLowerCase();
+    const memberOfByRole = groupBy(collective.memberOf, 'role');
 
     const renderRoleForType = (memberOfCollectiveType) => {
       if (role === 'ADMIN' && memberOfCollectiveType === 'EVENT') return;
 
-      let memberships = this.memberOfByRole[role].filter(m => get(m, 'collective.type') === memberOfCollectiveType);
+      let memberships = memberOfByRole[role].filter(m => get(m, 'collective.type') === memberOfCollectiveType);
       memberships = uniqBy(memberships, member => member.collective.id);
       if (memberships.length === 0) return;
 
@@ -131,26 +130,29 @@ class UserCollective extends React.Component {
   }
 
   render() {
-    const order = { fromCollective: this.collective };
+    const collective = this.props.collective;
+    const memberOfByRole = groupBy(collective.memberOf, 'role');
+
+    const order = { fromCollective: collective };
     const { intl, LoggedInUser, query } = this.props;
-    const isProfileEmpty = !(this.collective.description || this.collective.longDescription);
-    const canEditCollective = LoggedInUser && LoggedInUser.canEditCollective(this.collective);
-    const type = this.collective.type.toLowerCase();
+    const isProfileEmpty = !(collective.description || collective.longDescription);
+    const canEditCollective = LoggedInUser && LoggedInUser.canEditCollective(collective);
+    const type = collective.type.toLowerCase();
     let cta;
-    if (this.collective.canApply) {
-      cta = { href: `/${this.collective.slug}/apply`, label: 'apply' }
+    if (collective.canApply) {
+      cta = { href: `/${collective.slug}/apply`, label: 'apply' }
     }
 
     const notification = {};
     if (query && query.CollectiveId) {
-      if (query.status === 'collectiveCreated' && this.collective.type === 'ORGANIZATION') {
+      if (query.status === 'collectiveCreated' && collective.type === 'ORGANIZATION') {
         notification.title = intl.formatMessage(this.messages['organization.created']);
         notification.description = intl.formatMessage(this.messages['organization.created.description']);
       }
       Object.assign(order, {
         ...order,
         ...pick(query || {}, 'totalAmount', 'CollectiveId', 'TierId'),
-        collective: ((this.collective.memberOf || []).find(m => get(m, 'collective.id') === parseInt(query.CollectiveId)) || {}).collective
+        collective: ((collective.memberOf || []).find(m => get(m, 'collective.id') === parseInt(query.CollectiveId)) || {}).collective
       });
     }
 
@@ -209,13 +211,13 @@ class UserCollective extends React.Component {
         `}</style>
 
         <Header
-          title={this.collective.name}
-          description={this.collective.description || this.collective.longDescription}
-          twitterHandle={this.collective.twitterHandle || get(this.collective.parentCollective, 'twitterHandle')}
-          image={get(this.collective.parentCollective, 'image')}
+          title={collective.name}
+          description={collective.description || collective.longDescription}
+          twitterHandle={collective.twitterHandle || get(collective.parentCollective, 'twitterHandle')}
+          image={get(collective.parentCollective, 'image')}
           className={this.state.status}
           LoggedInUser={LoggedInUser}
-          href={`/${this.collective.slug}`}
+          href={`/${collective.slug}`}
           />
 
         <Body>
@@ -232,7 +234,7 @@ class UserCollective extends React.Component {
             { this.props.message && <MessageModal message={this.props.message} /> }
 
             <CollectiveCover
-              collective={this.collective}
+              collective={collective}
               cta={cta}
               LoggedInUser={LoggedInUser}
               />
@@ -242,40 +244,40 @@ class UserCollective extends React.Component {
               { (get(query, 'status') === 'orderCreated' || get(query, 'status') === 'orderProcessing') &&  <OrderCreated order={order} type={query.type} status={query.status} /> }
 
               { /* Make sure we don't show an empty div.content if no description unless canEditCollective */ }
-              { (this.collective.longDescription || canEditCollective) &&
+              { (collective.longDescription || canEditCollective) &&
                 <div className="content" >
                   { isProfileEmpty && canEditCollective &&
                     <div className="message">
                       <div className="editBtn">
-                        <Button onClick={() => Router.pushRoute(`/${this.collective.slug}/edit`)}>{intl.formatMessage(this.messages[`${type}.collective.edit`])}</Button>
+                        <Button onClick={() => Router.pushRoute(`/${collective.slug}/edit`)}>{intl.formatMessage(this.messages[`${type}.collective.edit`])}</Button>
                       </div>
                     </div>
                   }
-                  { this.collective.longDescription &&
-                    <LongDescription longDescription={this.collective.longDescription} defaultSubtitle={this.collective.description} />
+                  { collective.longDescription &&
+                    <LongDescription longDescription={collective.longDescription} defaultSubtitle={collective.description} />
                   }
                 </div>
               }
 
-              { get(this.collective, 'stats.collectives.hosted') > 0 &&
+              { get(collective, 'stats.collectives.hosted') > 0 &&
                 <section id="hosting">
                   <h1>
                     <FormattedMessage
                       id="organization.collective.memberOf.collective.host.title"
-                      values={{ n: this.collective.stats.collectives.hosted }}
+                      values={{ n: collective.stats.collectives.hosted }}
                       defaultMessage={`We are hosting {n, plural, one {this collective} other {{n} collectives}}`}
                       />
                   </h1>
-                  { LoggedInUser && LoggedInUser.canEditCollective(this.collective) &&
+                  { LoggedInUser && LoggedInUser.canEditCollective(collective) &&
                     <div className="adminActions" id="adminActions">
                       <ul>
-                        <li><Link route={`/${this.collective.slug}/collectives/expenses`}><FormattedMessage id="host.collectives.manageExpenses" defaultMessage="manage expenses" /></Link></li>
+                        <li><Link route={`/${collective.slug}/collectives/expenses`}><FormattedMessage id="host.collectives.manageExpenses" defaultMessage="manage expenses" /></Link></li>
                       </ul>
                     </div>
                   }
                   <div className="cardsList">
                     <CollectivesWithData
-                      HostCollectiveId={this.collective.id}
+                      HostCollectiveId={collective.id}
                       orderBy="balance"
                       orderDirection="DESC"
                       limit={20}
@@ -284,18 +286,18 @@ class UserCollective extends React.Component {
                 </section>
               }
 
-              { get(this.collective, 'stats.collectives.memberOf') > 0 &&
+              { get(collective, 'stats.collectives.memberOf') > 0 &&
                 <section id="parenting">
                   <h1>
                     <FormattedMessage
                       id="organization.collective.memberOf.collective.parent.title"
-                      values={{ n: this.collective.stats.collectives.memberOf }}
+                      values={{ n: collective.stats.collectives.memberOf }}
                       defaultMessage={`{n, plural, one {this collective is} other {{n} collectives are}} part of our organization`}
                       />
                   </h1>
                   <div className="cardsList">
                     <CollectivesWithData
-                      ParentCollectiveId={this.collective.id}
+                      ParentCollectiveId={collective.id}
                       orderBy="balance"
                       orderDirection="DESC"
                       limit={20}
@@ -304,18 +306,18 @@ class UserCollective extends React.Component {
                 </section>
               }
 
-              { get(this.collective, 'settings.superCollectiveTags') &&
+              { get(collective, 'settings.superCollectiveTags') &&
                 <section id="parenting">
                   <h1>
                     <FormattedMessage
                       id="organization.supercollective.title"
-                      values={{ tags: get(this.collective, 'settings.superCollectiveTags').join(', '), n: this.collective.stats.collectives.memberOf }}
+                      values={{ tags: get(collective, 'settings.superCollectiveTags').join(', '), n: collective.stats.collectives.memberOf }}
                       defaultMessage={`{tags} collectives`}
                       />
                   </h1>
                   <div className="cardsList">
                     <CollectivesWithData
-                      tags={get(this.collective, 'settings.superCollectiveTags')}
+                      tags={get(collective, 'settings.superCollectiveTags')}
                       orderBy="balance"
                       orderDirection="DESC"
                       limit={20}
@@ -324,7 +326,7 @@ class UserCollective extends React.Component {
                 </section>
               }
 
-              { Object.keys(this.memberOfByRole).map(role => role !== 'HOST' && this.renderRole(role)) }
+              { Object.keys(memberOfByRole).map(role => role !== 'HOST' && this.renderRole(role)) }
 
             </div>
           </div>
