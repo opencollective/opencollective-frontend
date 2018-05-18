@@ -45,10 +45,12 @@ const done = (error) => {
 const populateIndex = async () => {
   const collectives = await models.Collective.findAll({
     where: {
-      type: collectiveTypes.COLLECTIVE,
+      type: {
+        [Op.or]: [collectiveTypes.COLLECTIVE, collectiveTypes.ORGANIZATION],
+      },
       id: {
         [Op.notIn]: [1, 7]
-      }
+      },
     },
 
     attributes: { 
