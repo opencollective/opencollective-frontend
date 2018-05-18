@@ -168,7 +168,7 @@ class SearchPage extends React.Component {
                 <p className="center"><em>No collectives found matching your query: &quot;{term}&quot;</em></p>
               )}
             </Row>
-            {showCollectives && collectives.length !== 0 && <Row>
+            {showCollectives && collectives.length !== 0 && total > limit && <Row>
               <ul className="pagination">
                 { Array(Math.ceil(total / limit)).fill(1).map((n, i) => (
                   <li key={i * limit} className={classNames({ active: (i * limit) === offset })}>
