@@ -236,9 +236,8 @@ class CollectivePickerWithData extends React.Component {
             text-align: center;
             padding-bottom: 3rem;
           }
-
         `}</style>
-        <style global>{`
+        <style jsx global>{`
           .CollectivesContainer .defaultTitle {
             width: 40rem;
             float: left;
@@ -256,7 +255,7 @@ class CollectivePickerWithData extends React.Component {
           }
         `}</style>
         <div className="submenu">
-          <div className="">
+          <div>
             <div className="title">
               <h1><FormattedMessage id="expenses.collectivePicker.title" defaultMessage="Finances" /></h1>
               <h2><FormattedMessage id="expenses.collectivePicker.subtitle" defaultMessage="for {n} {n, plural, one {collective} other {collectives}}" values={{n: collectives.length}} /></h2>
