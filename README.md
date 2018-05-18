@@ -1,9 +1,8 @@
 # Open Collective Frontend
 
-[![Greenkeeper badge](https://badges.greenkeeper.io/opencollective/frontend.svg)](https://greenkeeper.io/)
-
 [![Circle CI](https://circleci.com/gh/opencollective/frontend/tree/master.svg?style=shield)](https://circleci.com/gh/opencollective/frontend/tree/master)
 [![Slack Status](https://slack.opencollective.org/badge.svg)](https://slack.opencollective.org)
+[![Greenkeeper badge](https://badges.greenkeeper.io/opencollective/frontend.svg)](https://greenkeeper.io/)
 
 ![](https://d.pr/i/MOS677+)
 

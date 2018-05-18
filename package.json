@@ -25,9 +25,9 @@
     "font-awesome": "^4.7.0",
     "glob": "7.1.2",
     "gm": "1.23.1",
-    "graphql": "0.13.2",
+    "graphql": "0.12.3",
     "graphql-request": "1.6.0",
-    "graphql-tag": "2.9.2",
+    "graphql-tag": "2.6.1",
     "html-pdf": "2.2.0",
     "image-size": "0.6.2",
     "image-to-ascii": "3.0.11",
@@ -51,7 +51,7 @@
     "rc-table": "6.2.1",
     "react": "16.3.2",
     "react-add-to-calendar": "0.1.5",
-    "react-apollo": "2.1.4",
+    "react-apollo": "1.4.16",
     "react-bootstrap": "0.32.1",
     "react-datetime": "2.14.0",
     "react-dom": "16.3.2",
@@ -71,7 +71,7 @@
     "styled-jsx-plugin-postcss": "0.1.3",
     "svg-to-png": "3.1.2",
     "universal-analytics": "0.4.16",
-    "webpack": "4.8.3",
+    "webpack": "3.10.0",
     "winston": "2.4.2",
     "winston-express-middleware": "0.1.0",
     "winston-papertrail": "1.0.5"
@@ -98,12 +98,12 @@
     "semantic-release": "semantic-release"
   },
   "devDependencies": {
-    "@babel/cli": "7.0.0-beta.47",
-    "@babel/core": "7.0.0-beta.47",
-    "@babel/node": "7.0.0-beta.47",
-    "@babel/preset-env": "7.0.0-beta.47",
-    "@babel/preset-stage-0": "7.0.0-beta.47",
-    "@babel/runtime": "7.0.0-beta.47",
+    "@babel/cli": "7.0.0-beta.42",
+    "@babel/core": "7.0.0-beta.42",
+    "@babel/node": "7.0.0-beta.42",
+    "@babel/preset-env": "7.0.0-beta.42",
+    "@babel/preset-stage-0": "7.0.0-beta.42",
+    "@babel/runtime": "7.0.0-beta.42",
     "babel-core": "7.0.0-bridge.0",
     "babel-eslint": "8.2.3",
     "babel-jest": "22.4.3",
@@ -146,6 +146,21 @@
   "release": {
     "publish": [
       "@semantic-release/github"
+    ]
+  },
+  "greenkeeper": {
+    "ignore": [
+      "@babel/cli",
+      "@babel/core",
+      "@babel/node",
+      "@babel/preset-env",
+      "@babel/preset-stage-0",
+      "@babel/runtime",
+      "graphql",
+      "graphql-tag",
+      "react-apollo",
+      "react-mde",
+      "webpack"
     ]
   }
 }
