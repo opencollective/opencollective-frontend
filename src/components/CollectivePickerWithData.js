@@ -34,6 +34,11 @@ class CollectivePickerWithData extends React.Component {
     });
   }
 
+  canEdit = () => {
+    const { LoggedInUser } = this.props;
+    return LoggedInUser && LoggedInUser.canEditCollective(this.hostCollective);
+  }
+
   async addFunds(form) {
     if (form.totalAmount === 0) {
       return console.error("Total amount must be > 0");
@@ -158,7 +163,7 @@ class CollectivePickerWithData extends React.Component {
   }
 
   render() {
-    const { LoggedInUser, data: { loading, error, Collective } } = this.props;
+    const { data: { loading, error, Collective } } = this.props;
 
     if (error) {
       console.error("graphql error>>>", error.message);
@@ -166,8 +171,6 @@ class CollectivePickerWithData extends React.Component {
     }
 
     this.hostCollective = Collective || this.hostCollective;
-    const canAddFunds = LoggedInUser && LoggedInUser.canEditCollective(this.hostCollective);
-
     if (loading || !this.hostCollective) {
       return (<div />);
     }
@@ -272,18 +275,14 @@ class CollectivePickerWithData extends React.Component {
                   </MenuItem>
                   ))}
               </DropdownButton>
-              { selectedCollective && !this.state.showAddFunds && canAddFunds &&
+              { selectedCollective && !this.state.showAddFunds && ::this.canEdit() &&
               <a className="addFundsLink" onClick={this.toggleAddFunds}><FormattedMessage id="addfunds.submit" defaultMessage="Add Funds" /></a>
                 }
             </div>
             }
           </div>
           <div className="right">
-            { LoggedInUser && LoggedInUser.canEditCollective(this.hostCollective) &&
-            <ConnectPaypal
-              collective={this.hostCollective}
-              />
-              }
+            { ::this.canEdit() && <ConnectPaypal collective={this.hostCollective} /> }
           </div>
         </div>
         <div>
@@ -295,7 +294,7 @@ class CollectivePickerWithData extends React.Component {
               onSubmit={this.addFunds}
               onCancel={this.toggleAddFunds}
               loading={this.state.loading}
-              LoggedInUser={LoggedInUser}
+              LoggedInUser={this.props.LoggedInUser}
               />
             <div className="results">
               <div className="error">{this.state.error}</div>
