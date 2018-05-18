@@ -216,7 +216,7 @@ class CollectiveCard extends React.Component {
             <div className="description">{description}</div>
           </div>
           <div className="footer">
-            { collective.stats &&
+            { collective.stats && collective.type === 'COLLECTIVE' &&
               <div className="stats">
                 <div className="backers">
                   <div className="value">{collective.stats.backers.all}</div>
@@ -238,6 +238,28 @@ class CollectiveCard extends React.Component {
                 </div>
               </div>
             }
+            { collective.stats && collective.memberOf && collective.type === 'ORGANIZATION' && (
+              <div className="stats">
+                <div className="backers">
+                  <div className="value">{collective.memberOf.length}</div>
+                  <div className="label">
+                    <FormattedMessage
+                      id="collective.card.memberOf.count"
+                      defaultMessage="{n, plural, one {collective} other {collectives}} backed"
+                      values={{ n: collective.memberOf.length }}
+                      />
+                  </div>
+                </div>
+                <div className="yearlyBudget">
+                  <div className="value">
+                    <Currency value={collective.stats.totalAmountSent} currency={collective.currency} />
+                  </div>
+                  <div className="label">
+                    <FormattedMessage id="collective.card.stats.totalAmountSent" defaultMessage="contributed" />
+                  </div>
+                </div>
+              </div>
+            ) }
             { membership &&
               <div className="membership">
                 <div className="role">{tierName}</div>
