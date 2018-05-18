@@ -13,13 +13,14 @@ class MenuBar extends React.Component {
 
   static propTypes = {
     collective: PropTypes.object.isRequired,
-    LoggedInUser: PropTypes.object
+    LoggedInUser: PropTypes.object,
+    cta: PropTypes.object,
+    intl: PropTypes.object,
   }
 
   constructor(props) {
     super(props);
-    this.onscroll = this.onscroll.bind(this);
-    this.handleChange = this.handleChange.bind(this);
+
     this.height = 60;
 
     const menuItems = [
@@ -64,21 +65,6 @@ class MenuBar extends React.Component {
     })
   }
 
-  onscroll(e) {
-    const top = e.target.scrollingElement.scrollTop;
-    const selectedMenuItem = this.state.menuItems.find(menuItem => {
-      return menuItem.position && menuItem.position > (top);
-    })
-    if (selectedMenuItem) {
-      history.replaceState(undefined, undefined, (selectedMenuItem.anchor === this.state.menuItems[0].anchor) ? '#' : `#${selectedMenuItem.anchor}`);
-      this.setState({ selectedAnchor: selectedMenuItem.anchor });
-    }
-  }
-
-  handleChange(status) {
-    this.setState({ sticky: status.status === Sticky.STATUS_FIXED });
-  }
-
   componentDidMount() {
     window.onscroll = throttle(this.onscroll, 300);
     const { collective } = this.props;
@@ -110,6 +96,24 @@ class MenuBar extends React.Component {
       });
       this.setState({ menuItems: menuItemsFoundOnPage, logoLink });
     }
+  }
+
+  onscroll = (e) => {
+    const top = e.target.scrollingElement.scrollTop;
+    const selectedMenuItem = this.state.menuItems.find(menuItem => {
+      return menuItem.position && menuItem.position > (top);
+    });
+    if (selectedMenuItem) {
+      const anchor = (
+        selectedMenuItem.anchor === this.state.menuItems[0].anchor ? '#' : `#${selectedMenuItem.anchor}`
+      );
+      history.replaceState(history.state, undefined, anchor);
+      this.setState({ selectedAnchor: selectedMenuItem.anchor });
+    }
+  }
+
+  handleChange = (status) => {
+    this.setState({ sticky: status.status === Sticky.STATUS_FIXED });
   }
 
   // Render Contribute and Submit Expense buttons
