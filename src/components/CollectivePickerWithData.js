@@ -172,9 +172,7 @@ class CollectivePickerWithData extends React.Component {
       return (<div />);
     }
 
-    const collectives = [...this.hostCollective.collectives].sort((a, b) => {
-      return (b.name.toUpperCase() < a.name.toUpperCase()) ? 1 : -1;
-    });
+    const collectives = [...this.hostCollective.collectives];
 
     const selectedCollective = collectives.find(c => c.id === this.state.CollectiveId);
     const selectedTitle = selectedCollective ? this.renderCollectiveMenuItem(selectedCollective, 'selected') : <div className="defaultTitle"><FormattedMessage id="expenses.allCollectives" defaultMessage="All Collectives" /></div>;
@@ -311,7 +309,7 @@ class CollectivePickerWithData extends React.Component {
 }
 
 const getCollectivesQuery = gql`
-query Collective($hostCollectiveSlug: String!) {
+query Collective($hostCollectiveSlug: String!, $orderBy: CollectiveOrderField, $orderDirection: OrderDirection) {
   Collective(slug: $hostCollectiveSlug) {
     id
     slug
@@ -324,7 +322,7 @@ query Collective($hostCollectiveSlug: String!) {
       balance
       currency
     }
-    collectives {
+    collectives(orderBy: $orderBy, orderDirection: $orderDirection) {
       id
       slug
       name
@@ -355,7 +353,9 @@ export const addCollectivesData = graphql(getCollectivesQuery, {
         hostCollectiveSlug: props.hostCollectiveSlug,
         offset: 0,
         limit: props.limit || COLLECTIVES_PER_PAGE * 2,
-        includeHostedCollectives: true
+        includeHostedCollectives: true,
+        orderBy: 'name',
+        orderDirection: 'ASC',
       }
     }
   },
