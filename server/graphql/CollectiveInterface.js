@@ -23,6 +23,7 @@ import {
 } from './types';
 
 import {
+  OrderDirectionType,
   TransactionInterfaceType
 } from './TransactionInterface';
 
@@ -473,9 +474,11 @@ export const CollectiveInterfaceType = new GraphQLInterfaceType({
         }
       },
       collectives: {
-        type: new GraphQLList(CollectiveType),
+        type: new GraphQLList(CollectiveInterfaceType),
         description: "List of all collectives hosted by this collective",
         args: {
+          orderBy: { defaultValue: 'name', type: CollectiveOrderFieldType },
+          orderDirection: { defaultValue: 'ASC', type: OrderDirectionType },
           limit: { type: GraphQLInt },
           offset: { type: GraphQLInt }
         }
@@ -819,14 +822,17 @@ const CollectiveFields = () => {
       }
     },
     collectives: {
-      type: new GraphQLList(CollectiveType),
+      type: new GraphQLList(CollectiveInterfaceType),
       args: {
+        orderBy: { defaultValue: 'name', type: CollectiveOrderFieldType },
+        orderDirection: { defaultValue: 'ASC', type: OrderDirectionType },
         limit: { type: GraphQLInt },
         offset: { type: GraphQLInt }
       },
       resolve(collective, args) {
         return models.Collective.findAll({
           where: { HostCollectiveId: collective.id, type: types.COLLECTIVE },
+          order: [ [ args.orderBy, args.orderDirection ] ],
           limit: args.limit, offset: args.offset
         })
       }
