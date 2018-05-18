@@ -193,6 +193,85 @@ export default (app) => {
     }
   });
 
+  app.post('/forest/actions/delete-user-and-merge', Liana.ensureAuthenticated, async (req, res) => {
+    const data = req.body.data;
+    console.log(data);
+    const id = data.attributes.ids[0];
+    const mergeIntoUserId = data.attributes.values['User ID'];
+    try {
+      const user = await models.User.findOne({ where: { id } });
+      const userCollective = await models.Collective.findOne({ where: { id: user.CollectiveId } });
+      if (!user || !userCollective) {
+        throw Error('Can not fetch origin user.');
+      }
+      const mergeIntoUser = await models.User.findOne({ where: { id: mergeIntoUserId } });
+      const mergeIntoUserCollective = await models.Collective.findOne({ where: { id: mergeIntoUser.CollectiveId } });
+      if (!mergeIntoUser || !mergeIntoUserCollective) {
+        throw Error('Can not fetch destination user.');
+      }
+      // Check if we can delete the user
+      await models.Transaction
+        .count({ where: { FromCollectiveId: userCollective.id } })
+        .then(count => {
+          if (count > 0) throw Error('Can not delete user with existing orders.');
+        });
+      await models.Order
+        .count({ where: { FromCollectiveId: userCollective.id } })
+        .then(count => {
+          if (count > 0) throw Error('Can not delete user with existing orders.');
+        });
+      await models.Expense
+        .count({ where: { UserId: user.id, 'status': 'PAID' } })
+        .then(count => {
+          if (count > 0) throw Error('Can not delete user with paid expenses.');
+        });
+      // Merge Memberships
+      await models.Member
+        .findAll({ where: { MemberCollectiveId: userCollective.id }})
+        .then(members => {
+          members.forEach(async member => {
+            await member.update({ MemberCollectiveId: mergeIntoUserCollective.id });
+          });
+        });
+      // Merge Expenses
+      await models.Expense
+        .findAll({ where: { UserId: user.id }})
+        .then(expenses => {
+          expenses.forEach(async expense => {
+            await expense.update({ UserId: mergeIntoUser.id });
+          });
+        });
+      // Merge Payment Methods
+      await models.PaymentMethod
+        .findAll({ where: { CollectiveId: userCollective.id }})
+        .then(paymentMethods => {
+          paymentMethods.forEach(async paymentMethod => {
+            await paymentMethod.update({ CollectiveId: mergeIntoUserCollective.id });
+          });
+        });
+      // // Delete User
+      await user.destroy();
+      // // Delete User Collective
+      await userCollective.destroy();
+
+      const msg = 'The user was successfully deleted and its dependencies merged.';
+      res.status(200).send({
+        html: `<p>${msg}</p>
+               <p><a href="../../../">Click here to continue</a>.</p>`
+      });
+
+    } catch (e) {
+
+      const msg = e.message;
+      res.status(400).send({
+        error: `There was an error while processing your request.\n
+          "${msg}"\n
+          Maybe you want to proceed manually?`
+      });
+
+    }
+  });
+
 };
 
 function getForestModels () {
