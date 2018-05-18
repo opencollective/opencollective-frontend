@@ -1,7 +1,6 @@
 import { expect } from 'chai';
 import { Given, When, Then } from 'cucumber';
 
-import * as libpayments from '../../../../server/lib/payments';
 import * as libtransactions from '../../../../server/lib/transactions';
 import * as store from '../stores';
 import * as utils from '../../../utils';

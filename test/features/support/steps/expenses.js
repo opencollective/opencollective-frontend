@@ -1,8 +1,6 @@
 import { expect } from 'chai';
-import { Given, When, Then } from 'cucumber';
+import { When } from 'cucumber';
 
-import * as libpayments from '../../../../server/lib/payments';
-import * as store from '../stores';
 import * as utils from '../../../utils';
 
 When('{string} expenses {string} for {string} to {string} via {string}', async function (userName, value, description, collectiveName, payoutMethod) {
