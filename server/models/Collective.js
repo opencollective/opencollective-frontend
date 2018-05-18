@@ -412,7 +412,7 @@ export default function(Sequelize, DataTypes) {
         if (stats.balance < goal.amount) {
           nextGoal = goal;
           nextGoal.progress = Math.round(stats.balance/goal.amount*100) / 100;
-          nextGoal.percentage = `${nextGoal.progress * 100}%`;
+          nextGoal.percentage = `${Math.round(nextGoal.progress * 100)}%`;
           nextGoal.missing = { amount: goal.amount - stats.balance };
           return;
         }
@@ -424,7 +424,7 @@ export default function(Sequelize, DataTypes) {
         if (stats.yearlyBudget < goal.amount) {
           nextGoal = goal;
           nextGoal.progress = Math.round(stats.yearlyBudget/goal.amount*100) / 100;
-          nextGoal.percentage = `${nextGoal.progress * 100}%`;
+          nextGoal.percentage = `${Math.round(nextGoal.progress * 100)}%`;
           nextGoal.missing = { amount: Math.round((goal.amount - stats.yearlyBudget )/ 12), interval: 'month' }
           nextGoal.interval = 'year';
           return;

@@ -522,8 +522,9 @@ export function resizeImage(imageUrl, { width, height, query, defaultImage }) {
   return `${config.host.website}/proxy/images/?src=${encodeURIComponent(imageUrl)}${queryurl}`;
 }
 
-export function formatArrayToString(arr) {
-  return `${arr.slice(0, arr.length -1).join(', ')} and ${arr.slice(-1)}`;
+export function formatArrayToString(arr, conjonction = 'and') {
+  if (arr.length === 1) return arr[0];
+  return `${arr.slice(0, arr.length -1).join(', ')} ${conjonction} ${arr.slice(-1)}`;
 }
 
 export function formatCurrency(amount, currency, precision = 0) {
@@ -552,7 +553,7 @@ export function formatCurrency(amount, currency, precision = 0) {
  * @PRE: { USD: 1000, EUR: 6000 }
  * @POST: "€60 and $10"
  */
-export function formatCurrencyObject(currencyObj, options = { precision: 0 }) {
+export function formatCurrencyObject(currencyObj, options = { precision: 0, conjonction: 'and' }) {
   const array = [];
   for (const currency in currencyObj) {
     if (currencyObj[currency] > 0) {
@@ -561,7 +562,7 @@ export function formatCurrencyObject(currencyObj, options = { precision: 0 }) {
   }
   if (array.length === 1) return array[0].str;
   array.sort((a, b) => b.value - a.value)
-  return formatArrayToString(array.map(r => r.str));
+  return formatArrayToString(array.map(r => r.str), options.conjonction);
 }
 
 export function isUUID(str) {

@@ -115,35 +115,39 @@
     <td valign="top" width="100%">
       <table>
         <tr>
-          <td><h1>{{collective.name}}</h1></td>
+          <td><h1>{{name}}</h1></td>
         </tr>
         <tr>
           <td>
             <div class="Links">
-              {{#if collective.website}}
-              <a href="{{collective.website}}">Website</a>
+              {{#if website}}
+              <a href="{{website}}">Website</a>
               <span> | </span>
               {{/if}}
-              <a href="https://opencollective.com/{{collective.slug}}?{{@root.utm}}">Open Collective Page</a>
+              <a href="{{config.host.website}}/{{slug}}?{{@root.utm}}">Open Collective Page</a>
             </div>
           </td>
         </tr>
         <tr><td height="10"></td></tr>
         <tr>
-          <td><p class="CollectiveMission">{{collective.mission}}</p></td>
+          <td><p class="CollectiveMission">{{mission}}</p></td>
         </tr>
         <tr>
-          <td><p>You’re contributing <b>{{{currency amount currency=currency}}}</b> per {{interval}} since {{{moment createdAt}}}</p></td>
+          {{#if order.Subscription}}
+            <td><p>You’re contributing <b>{{{currency order.Subscription.amount currency=order.Subscription.currency}}}</b> per {{order.Subscription.interval}} since {{{moment order.Subscription.createdAt format="MMMM YYYY"}}}</p></td>
+          {{else}}
+            <td><p>You've contributed <b>{{{currency order.totalAmount currency=order.currency}}}</b></p></td>
+          {{/if}}
         </tr>
         <tr><td height="10"></td></tr>
-        {{#if collective.updates}}
+        {{#if updates}}
           <tr>
             <td>
-              <label>Latest {{{pluralize "update" n=collective.updates.length}}}:</label>
+              <label>Latest {{{pluralize "update" n=updates.length}}}:</label>
               <ul>
-              {{#each collective.updates}}
+              {{#each updates}}
                 <li>{{{moment publishedAt timezone=timezone format="MM/DD"}}}
-                  <a href="https://opencollective.com/{{../collective.slug}}/updates/{{slug}}">{{title}}</a><br />
+                  <a href="{{config.host.website}}/{{../slug}}/updates/{{slug}}">{{title}}</a><br />
                 </li>
               {{/each}}
               </ul>
@@ -152,14 +156,14 @@
           <tr><td height="5"></td></tr>
         {{/if}}
 
-        {{#if collective.events.upcoming}}
+        {{#if events.upcoming}}
           <tr>
             <td>
-              <label>Upcoming {{{pluralize "event" n=collective.events.upcoming.length}}}:</label>
+              <label>Upcoming {{{pluralize "event" n=events.upcoming.length}}}:</label>
               <ul>
-              {{#each collective.events.upcoming}}
+              {{#each events.upcoming}}
                 <li>{{{moment startsAt timezone=timezone format="MMMM Do HH:mm"}}} @ {{locationName}}<br />
-                <a href="https://opencollective.com/{{../collective.slug}}/events/{{slug}}">{{name}}</a><br />
+                <a href="{{config.host.website}}/{{../slug}}/events/{{slug}}">{{name}}</a><br />
                 RSVPs: {{stats.confirmed}} {{#if stats.interested}}(+{{stats.interested}} interested){{/if}}</li>
               {{/each}}
               </ul>
@@ -168,14 +172,14 @@
           <tr><td height="5"></td></tr>
         {{/if}}
 
-        {{#if collective.events.past}}
+        {{#if events.past}}
           <tr>
             <td>
-              <label>Past {{{pluralize "event" n=collective.events.past.length}}}:</label>
+              <label>Past {{{pluralize "event" n=events.past.length}}}:</label>
               <ul>
-              {{#each collective.events.past}}
+              {{#each events.past}}
                 <li>{{{moment startsAt timezone=timezone format="MMMM Do HH:mm"}}} @ {{locationName}}<br />
-                <a href="https://opencollective.com/{{../collective.slug}}/events/{{slug}}">{{name}}</a><br />
+                <a href="{{config.host.website}}/{{../slug}}/events/{{slug}}">{{name}}</a><br />
                 RSVPs: {{stats.confirmed}} {{#if stats.interested}}(+{{stats.interested}} interested){{/if}}</li>
               {{/each}}
               </ul>
@@ -188,13 +192,13 @@
             <div class="currentBalance">
               <label>Current balance:</label> 
               <div class="Statistic">
-                <div class="Amount">{{{currency collective.stats.balance currency=currency}}}</div>
+                <div class="Amount">{{{currency stats.balance currency=currency}}}</div>
                 <div class="Change">
-                  {{#if collective.stats.totalDonations}}
-                  <div class="PositiveChange">+&nbsp;{{{currency collective.stats.totalDonations currency=currency}}}</div>
+                  {{#if stats.totalDonations}}
+                  <div class="PositiveChange">+&nbsp;{{{currency stats.totalDonations currency=currency}}}</div>
                   {{/if}}
-                  {{#if collective.stats.totalPaidExpenses}}
-                  <div class="NegativeChange">-&nbsp;{{{currency collective.stats.totalPaidExpenses currency=currency}}}</div>
+                  {{#if stats.totalPaidExpenses}}
+                  <div class="NegativeChange">-&nbsp;{{{currency stats.totalPaidExpenses currency=currency}}}</div>
                   {{/if}}
                 </div>
               </div>
@@ -203,13 +207,14 @@
         </tr>
         <tr><td height="10"></td></tr>
 
-        {{#if collective.nextGoal}}
+        {{#if nextGoal}}
           <tr>
             <td>
-              <label>Next goal: {{{currency collective.nextGoal.amount currency=currency}}}{{#if collective.nextGoal.interval}}/{{collective.nextGoal.interval}}{{/if}}</label>
+              <label>Next goal: {{{currency nextGoal.amount currency=currency}}}{{#if nextGoal.interval}}/{{nextGoal.interval}}{{/if}}</label>
                 <p>
-                  {{collective.nextGoal.title}}<br />
-                  ({{collective.nextGoal.percentage}} - missing {{{currency collective.nextGoal.missing.amount currency=currency}}}{{#if collective.nextGoal.missing.interval}}/{{collective.nextGoal.missing.interval}}{{/if}})
+                  {{nextGoal.title}}<br />
+                  ({{nextGoal.percentage}} - missing {{{currency nextGoal.missing.amount currency=currency}}}{{#if nextGoal.missing.interval}}/{{nextGoal.missing.interval}}{{/if}})
+                  (<a href="https://twitter.com/intent/tweet?text={{{encodeURIComponent nextGoal.tweet}}}">share their goal</a>)
                 </p>
             </td>
           </tr>
@@ -219,17 +224,17 @@
         <tr>
           <td>
             <div class="latestExpenses">
-              <label>Latest {{{pluralize "expense" n=collective.expenses.length}}}:</label>
-              {{#if collective.expenses.length}}
+              <label>Latest {{{pluralize "expense" n=expenses.length}}}:</label>
+              {{#if expenses.length}}
                 <ul>
-                {{#each collective.expenses}}
+                {{#each expenses}}
                 <li>{{{moment createdAt format="MM/DD"}}} {{{currency amount currency=../currency}}} {{description}} {{status}}</li>
                 {{/each}}
                 </ul>
               {{else}}
-              <p class="noExpense">No expense filed this month. <a href="https://opencollective.com/{{collective.slug}}/expenses/new">Submit an expense</a>.</p>
+              <p class="noExpense">No expense filed this month. <a href="{{config.host.website}}/{{slug}}/expenses/new">Submit an expense</a>.</p>
               {{/if}}
-              <p><a href="https://opencollective.com/{{collective.slug}}/transactions">View all past transactions</a></p>
+              <p><a href="{{config.host.website}}/{{slug}}/expenses">View all past expenses</a></p>
             </div>
           </td>
         </tr>
@@ -237,7 +242,7 @@
 
     </td>
     <td valign="top">
-      {{> collectivecard collective}}
+      {{> collectivecard .}}
     </td>
   </tr>
 </table>
