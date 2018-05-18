@@ -396,11 +396,11 @@ mutation createOrder($order: OrderInputType!) {
 `;
 
 const addMutation = graphql(createOrderQuery, {
-props: ( { mutate }) => ({
-  createOrder: async (order) => {
-    return await mutate({ variables: { order } })
-  }
-})
+  props: ({ mutate }) => ({
+    createOrder: async (order) => {
+      return await mutate({ variables: { order } })
+    }
+  })
 });
 
 const addGraphQL = compose(addMutation, addCollectivesData);
