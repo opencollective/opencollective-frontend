@@ -60,7 +60,7 @@ then
   if [ -d "opencollective-api" ]; then
     rm -rf opencollective-api
   fi
-  mv "opencollective-api-${BRANCH}" opencollective-api
+  mv "opencollective-api-${BRANCH//\//-}" opencollective-api
   cd "opencollective-api"
   echo "> Running npm install for api"
   npm install
