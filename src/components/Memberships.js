@@ -11,12 +11,19 @@ class Collectives extends React.Component {
 
   render() {
     const memberships = [...this.props.memberships];
-    memberships.sort((a, b) => b.stats.totalDonations - a.stats.totalDonations);
+
+    memberships.sort((a, b) => {
+      if (b.stats.totalDonations !== a.stats.totalDonations) {
+        return b.stats.totalDonations - a.stats.totalDonations;
+      } else {
+        return new Date(a.createdAt) - new Date(b.createdAt);
+      }
+    });
 
     if (!memberships || memberships.length === 0) return (<div />);
 
     return (
-      <div className="Collectives" >
+      <div className="Collectives">
         <style jsx>{`
         .Collectives {
           margin: 3rem auto 3rem;
@@ -26,13 +33,16 @@ class Collectives extends React.Component {
           flex-wrap: wrap;
           justify-content: center;
         }
-        `}</style>
-        {memberships.map((membership, index) =>
-          (<Membership
-            key={`membership${index}`}
+        `}
+        </style>
+
+        {memberships.map(membership => (
+          <Membership
+            key={membership.id}
             membership={membership}
             LoggedInUser={this.props.LoggedInUser}
-            />)
+            />
+          )
         )}
       </div>
     )
