@@ -11,7 +11,14 @@ class Collectives extends React.Component {
 
   render() {
     const memberships = [...this.props.memberships];
-    memberships.sort((a, b) => b.stats.totalDonations - a.stats.totalDonations);
+
+    memberships.sort((a, b) => {
+      if (b.stats.totalDonations !== a.stats.totalDonations) {
+        return b.stats.totalDonations - a.stats.totalDonations;
+      } else {
+        return new Date(a.createdAt) - new Date(b.createdAt);
+      }
+    });
 
     if (!memberships || memberships.length === 0) return (<div />);
 
