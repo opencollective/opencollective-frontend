@@ -38,7 +38,6 @@ class Membership extends React.Component {
 
         <div className="Membership">
           <CollectiveCard
-            key={membership.id}
             membership={membership}
             collective={collective}
             LoggedInUser={LoggedInUser}

@@ -15,8 +15,10 @@ class Collectives extends React.Component {
     memberships.sort((a, b) => {
       if (b.stats.totalDonations !== a.stats.totalDonations) {
         return b.stats.totalDonations - a.stats.totalDonations;
-      } else {
+      } else if (a.createdAt !== b.createdAt) {
         return new Date(a.createdAt) - new Date(b.createdAt);
+      } else {
+        return a.collective.name.localeCompare(b.collective.name);
       }
     });
 
