@@ -34,12 +34,14 @@ class Collectives extends React.Component {
           justify-content: center;
         }
         `}</style>
-        {memberships.map((membership, index) =>
-          (<Membership
-            key={`membership${index}`}
+
+        {memberships.map(membership => (
+          <Membership
+            key={membership.id}
             membership={membership}
             LoggedInUser={this.props.LoggedInUser}
-            />)
+            />
+          )
         )}
       </div>
     )
