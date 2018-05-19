@@ -80,7 +80,7 @@ class CreateCollectiveForm extends React.Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (nextProps.collective && (!this.props.collective || get(nextProps, 'collective.name') != get(this.props, 'collective.name'))) {
       this.setState({ collective: nextProps.collective, tiers: nextProps.collective.tiers });
     }

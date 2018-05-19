@@ -25,7 +25,7 @@ class MatchingFundWithData extends React.Component {
   }
 
   // Whenever this.props.order.totalAmount changes, we update the status
-  async componentWillReceiveProps(newProps) {
+  async UNSAFE_componentWillReceiveProps(newProps) {
     const { data: { loading, MatchingFund }, collective, order, uuid } = newProps;
     if (loading) return;
 

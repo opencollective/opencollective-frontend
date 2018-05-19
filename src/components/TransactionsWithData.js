@@ -19,7 +19,7 @@ class TransactionsWithData extends React.Component {
     super(props);
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (!this.props.LoggedInUser && nextProps.LoggedInUser) {
       return this.props.data.refetch();
     }

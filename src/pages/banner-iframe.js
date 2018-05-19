@@ -31,7 +31,7 @@ class Banner extends React.Component {
     this.sendMessageToParentWindow();
   }
 
-  componentWillReceiveProps() {
+  UNSAFE_componentWillReceiveProps() {
     this.onChange();
   }
 

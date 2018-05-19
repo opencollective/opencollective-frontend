@@ -81,7 +81,7 @@ class CreateOrderPage extends React.Component {
     this.setState(newState);
   }
 
-  componentWillReceiveProps(newProps) {
+  UNSAFE_componentWillReceiveProps(newProps) {
     if (this.state.matchingFund) return;
     const matchingFund = get(newProps, 'data.Collective.settings.matchingFund');
     if (matchingFund) {

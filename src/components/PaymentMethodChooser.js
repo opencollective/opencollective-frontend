@@ -48,7 +48,7 @@ class PaymentMethodChooser extends React.Component {
     });
   }
 
-  componentWillReceiveProps(newProps) {
+  UNSAFE_componentWillReceiveProps(newProps) {
     // TODO: Remove these hacky fixes
     // Most likely means need to rework the logic split between this and SubscriptionCard component
 

@@ -55,7 +55,7 @@ class InputTypeCreditCard extends React.Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (nextProps.options && nextProps.options.length > 0) {
       if (typeof this.state.uuid !== 'string') {
         this.handleChange("uuid", nextProps.options[0].uuid);

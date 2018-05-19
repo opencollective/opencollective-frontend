@@ -97,7 +97,7 @@ class CreateExpenseForm extends React.Component {
     this.props.onChange && this.props.onChange(expense);
   }
 
-  componentWillReceiveProps(newProps) {
+  UNSAFE_componentWillReceiveProps(newProps) {
     if (!this.props.LoggedInUser && newProps.LoggedInUser && !this.state.expense.paypalEmail) {
       this.handleChange('paypalEmail', newProps.LoggedInUser.paypalEmail);
     }
