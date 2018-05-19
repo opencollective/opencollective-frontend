@@ -25,7 +25,7 @@ class Subscriptions extends React.Component {
     })
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (!this.props.LoggedInUser && nextProps.LoggedInUser) {
       return this.props.refetch();
     }

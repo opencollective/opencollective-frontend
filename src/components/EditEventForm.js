@@ -36,7 +36,7 @@ class EditEventForm extends React.Component {
 
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (nextProps.event && (!this.props.event || nextProps.event.name != this.props.event.name)) {
       this.setState({ event: nextProps.event, tiers: nextProps.event.tiers });
     }

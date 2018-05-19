@@ -93,7 +93,7 @@ class EditCollectiveForm extends React.Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (nextProps.collective && (!this.props.collective || nextProps.collective.name != this.props.collective.name)) {
       this.setState({ collective: nextProps.collective, tiers: nextProps.collective.tiers });
     }

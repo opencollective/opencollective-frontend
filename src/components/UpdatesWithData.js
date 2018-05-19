@@ -26,7 +26,7 @@ class UpdatesWithData extends React.Component {
     }
   }
 
-  componentWillReceiveProps(newProps) {
+  UNSAFE_componentWillReceiveProps(newProps) {
     const { data, collective } = this.props;
     const { LoggedInUser } = newProps;
     if (LoggedInUser && LoggedInUser.canEditCollective(collective)) {
