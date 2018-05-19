@@ -23,7 +23,7 @@ class Collectives extends React.Component {
     if (!memberships || memberships.length === 0) return (<div />);
 
     return (
-      <div className="Collectives" >
+      <div className="Collectives">
         <style jsx>{`
         .Collectives {
           margin: 3rem auto 3rem;
@@ -33,7 +33,8 @@ class Collectives extends React.Component {
           flex-wrap: wrap;
           justify-content: center;
         }
-        `}</style>
+        `}
+        </style>
 
         {memberships.map(membership => (
           <Membership

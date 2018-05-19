@@ -11,7 +11,6 @@ class Membership extends React.Component {
 
   constructor(props) {
     super(props);
-
   }
 
   render() {
@@ -28,13 +27,15 @@ class Membership extends React.Component {
     if (!name) return (<div />);
 
     return (
-      <div>
+      <React.Fragment>
         <style jsx>{`
         .Membership {
           float: left;
           margin: 1rem;
         }
-        `}</style>
+        `}
+        </style>
+
         <div className="Membership">
           <CollectiveCard
             key={membership.id}
@@ -43,7 +44,7 @@ class Membership extends React.Component {
             LoggedInUser={LoggedInUser}
             />
         </div>
-      </div>
+      </React.Fragment>
     )
   }
 
