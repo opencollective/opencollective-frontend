@@ -101,14 +101,14 @@ class HostExpensesPage extends React.Component {
             style={get(collective, 'settings.style.hero.cover')}
             />
 
-          <CollectivePicker
-            hostCollectiveSlug={this.props.collectiveSlug}
-            LoggedInUser={LoggedInUser}
-            onChange={(selectedCollective => this.pickCollective(selectedCollective))}
-            />
-
           <div className="content">
-
+            <div className="col side pullLeft">
+              <CollectivePicker
+                query={this.props.query}
+                hostCollectiveSlug={this.props.collectiveSlug}
+                LoggedInUser={LoggedInUser}
+                onChange={(selectedCollective => this.pickCollective(selectedCollective))} />
+            </div>
             <div className="col large pullLeft">
               <ExpensesWithData
                 collective={selectedCollective}
@@ -116,15 +116,8 @@ class HostExpensesPage extends React.Component {
                 LoggedInUser={this.state.LoggedInUser}
                 filters={true}
                 editable={true}
-                />
+              />
             </div>
-
-            { this.state.selectedCollective &&
-              <div className="col side pullLeft">
-                <ExpensesStatsWithData slug={selectedCollective.slug} />
-              </div>
-            }
-
           </div>
 
         </Body>
