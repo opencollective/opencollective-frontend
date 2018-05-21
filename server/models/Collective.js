@@ -334,6 +334,7 @@ export default function(Sequelize, DataTypes) {
           description: this.description,
           currency: this.currency,
           slug: this.slug,
+          type: this.type,
           mission: this.mission,
           tags: this.tags,
           locationName: this.locationName,
