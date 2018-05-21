@@ -128,10 +128,7 @@ Promise.props({
   newCollectives: Collective
     .findAll(_.merge({}, { attributes: ['slug', 'tags'], where: { type: 'COLLECTIVE' } }, createdLastWeek))
     .map(collective => {
-      let openSource = false;
-      if (collective.dataValues.tags.indexOf('open source') != -1) {
-        openSource = true;
-      }
+      const openSource = collective.dataValues.tags && collective.dataValues.tags.indexOf('open source') !== -1;
       return `${collective.dataValues.slug} (${openSource ? 'open source' : collective.dataValues.tags})`
     })
 
