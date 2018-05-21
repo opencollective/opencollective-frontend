@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import gql from 'graphql-tag';
+import Scrollchor from 'react-scrollchor';
 
 import { pick } from 'lodash';
 import { graphql, compose } from 'react-apollo';
@@ -18,6 +19,7 @@ import AddFundsForm from '../components/AddFundsForm';
 import Currency from '../components/Currency';
 import ConnectPaypal from '../components/ConnectPaypal';
 import Error from '../components/Error';
+import ExpensesStatsWithData from '../components/ExpensesStatsWithData';
 
 
 class AddFundsFormContainer extends React.Component {
@@ -90,6 +92,7 @@ class DropDown extends React.Component {
     onChange: PropTypes.func,
     hostCollectiveSlug: PropTypes.string.isRequired,
     collectiveFilter: PropTypes.string.isRequired,
+    LoggedInUser: PropTypes.object.isRequired,
   }
 
   constructor(props) {
@@ -100,9 +103,15 @@ class DropDown extends React.Component {
       CollectiveId: -1,
       /* Filled in by onChange */
       selectedCollective: null,
-      /* Filled in by filterCollectives() */
-      hostCollective: null,
+      /* We don't show it up until the user selects a collective */
+      showAddFundsForm: false,
     };
+
+    /* Filled in by filterCollectives(). It's not in state because it
+       reads information that was processed by Apollo so we may access
+       that in a render method. That doesn't feel quite right, but it
+       might take another round of refactoring to be changed. */
+    this.hostCollective = null;
 
     this.messages = defineMessages({
       'badge.tooltip.pending': { id: 'expenses.badge.tooltip.pending', defaultMessage: "{pending} {pending, plural, one {expense} other {expenses}} pending approval" },
@@ -123,16 +132,23 @@ class DropDown extends React.Component {
        organizations */
     switch (collectiveFilter) {
       case 'COLLECTIVES':
-        const state = { hostCollective: Collective || this.hostCollective };
+        /* Other placess need this this value and since this function
+           can be called from render(), the value is being shovelled
+           within an instance slot instead of the state.
+
+           It's only safe to do this here because `collectiveFilter'
+           defaults to 'COLLECTIVES' so we know that this happens
+           before anything else depending on `this.hostCollective`. */
+        this.hostCollective = Collective;
+        const state = { hostCollective: Collective };
         if (state.hostCollective) {
-          this.hostCollective = state.hostCollective;
-          state.collectives = [...state.hostCollective.collectives];
+          state.result = state.hostCollective.collectives;
         }
         return state;
       case 'ORGANIZATIONS':
         return {
-          hostCollective: this.props.hostCollective,
-          collectives: this.props.organizations.allCollectives,
+          hostCollective: this.hostCollective,
+          result: organizations.allCollectives.collectives,
         };
       default:
         console.error(`Wrong state received by filterCollectives(${collectiveFilter})`);
@@ -141,132 +157,159 @@ class DropDown extends React.Component {
   }
 
   onChange = (CollectiveId) => {
-    const { collectives } = this.filterCollectives();
-    const selectedCollective = CollectiveId > 0 && collectives.find(c => c.id === CollectiveId);
-    this.state.CollectiveId = CollectiveId;
-    this.state.selectedCollective = selectedCollective;
-    this.props.onChange(selectedCollective);
+    const { result } = this.filterCollectives();
+    if (CollectiveId > 0) {
+      const selectedCollective = result.collectives.find(c => c.id === CollectiveId);
+      this.setState({ CollectiveId, selectedCollective });
+      this.props.onChange(selectedCollective);
+    }
   }
 
-  renderCollectiveMenuItem = (collective, className) => {
-    const { intl } = this.props;
-    const tooltipArray = [];
-    let badgeCount = 0;
+  canEdit = () => {
+    const user = this.props.LoggedInUser;
+    /* console.log('CANEDIT', user, this.hostCollective);*/
+    return user && user.canEditCollective(this.hostCollective);
+  }
 
-    if (collective.stats.expenses) {
-      collective.stats.expenses.pending + collective.stats.expenses.approved;
-      if (collective.stats.expenses.pending > 0) {
-        tooltipArray.push(intl.formatMessage(this.messages['badge.tooltip.pending'], collective.stats.expenses));
-      }
-      if (collective.stats.expenses.approved > 0) {
-        tooltipArray.push(intl.formatMessage(this.messages['badge.tooltip.approved'], collective.stats.expenses));
-      }
-    }
-    const tooltip = tooltipArray.join(', ') || '';
+  renderSelectedCollective = () => {
+    const { name, slug, image, backgroundImage, stats: { expenses } } =
+      this.state.selectedCollective;
+    return (
+      <div style={{ width: '100%' }}>
+        <style jsx>{`
+        .selectedCollective { margin: -10px -10px 10px; padding: 10px; font-size: 12px; background: #fff; border: 1px solid #f1f3f4; }
+        .selectedCollective h1 { font-size: 30px; text-align: left; margin: 0 0 5px 0; color: #000; }
+        .selectedCollective h3 { font-size: 16px; }
+        .selectedCollective ul { list-style: none; padding: 0; }
+        .selectedCollective li { margin: 0; padding: 0 10px; }
+        .selectedCollective li label { margin: 0; padding: 0; }
+        `}</style>
+        <div className="selectedCollective" >
+          <h1>{ name || slug }</h1>
 
-    return (<div className={`MenuItem-Collective ${className}`} title={tooltip}>
-      <style jsx>{`
-        .MenuItem-Collective {
-          display: flex;
-          width: 40rem;
-          justify-content: space-between;
-          align-items: center;
-        }
+          { !this.state.showAddFundsForm && ::this.canEdit() &&
+            <a className="addFundsLink" onClick={this.toggleAddFunds}>
+              <FormattedMessage id="addfunds.submit" defaultMessage="Add Funds" /></a> }
 
-        .MenuItem-Collective.selected {
-          float: left;
-          margin-right: 1rem;
-        }
-
-        label {
-          margin: 0;
-        }
-
-        .collectiveName {
-          float: left;
-          margin-right: 0.2rem;
-          max-width: 25rem;
-          text-overflow: ellipsis;
-          overflow: hidden;
-        }
-
-        .NameBalance {
-          display: flex;
-          align-items: baseline;
-        }
-
-        .balance {
-          margin-left: 0.5rem;
-          color: #919599;
-          font-size: 1.2rem;
-        }
-
-        .balance label {
-          font-weight: 300;
-        }
-
-        .MenuItem-Collective label {
-          margin-right: 0.2rem;
-        }
-      `}</style>
-      <div className="NameBalance">
-        <div className="collectiveName">{collective.name}</div>
-        <div className="balance">
-          <label><FormattedMessage id="expenses.balance.label" defaultMessage="balance:" /></label>
-          <Currency value={collective.stats.balance} currency={collective.currency} />
+          <ExpensesStatsWithData slug={slug} />
         </div>
       </div>
-      { badgeCount > 0 && <Badge pullRight={true}>{badgeCount}</Badge> }
-    </div>);
+    );
   }
 
   render() {
     const { intl, collectiveFilter } = this.props;
-    const { loading, error, hostCollective, collectives, selectedCollective } = this.filterCollectives();
+    const { loading, error, hostCollective, result } = this.filterCollectives();
+    const collectives = result && result.collectives;
 
     if (error) {
       console.error("graphql error>>>", error.message);
       return (<Error message="GraphQL error" />)
     }
 
-    let selectedTitle;
-
-    if (loading) {
-      selectedTitle = (
-        <div className="defaultTitle">
-          <FormattedMessage id="loading" defaultMessage="loading" />
-        </div>
-      );
-    } else if (selectedCollective) {
-      selectedTitle = this.renderCollectiveMenuItem(selectedCollective, 'selected')
-    } else {
-      selectedTitle = (
-        <div className="defaultTitle">
-          {intl.formatMessage(this.messages[collectiveFilter.toLowerCase()])}
-        </div>
-      );
-    }
+    if (loading) return <div><h1>Loading...</h1><br/><br/></div>;
 
     return (
       <div>
-        <div className="collectivesFilter">
-          <DropdownButton id="collectivePicker" bsStyle="default" title={selectedTitle} onSelect={this.onChange}>
-            { this.props.CollectiveId &&
-              <MenuItem key={null} eventKey={null}>
+        <style jsx>{`
+        /* Container */
+        .collectivesColumn { background: #f1f3f4; padding: 10px; }
+
+        /* Title */
+        .collectivesColumn h1 { margin: 0 0 20px 0; text-align: left; }
+
+        /* Filters */
+        .collectivesColumn ul.filters { list-style: none; margin: -5px 0 0 0; padding: 0; }
+        .collectivesColumn ul.filters li { margin: 0; padding-left: 10px; }
+        .collectivesColumn ul.filters li label { margin: 0; font-weight: normal; }
+        .collectivesColumn ul.filters li input { margin-right: 4px; }
+
+        /* List of collective */
+        .collectivesColumn ul.colectives { list-style: none; margin: 0; padding: 0; }
+        .collectivesColumn ul.colectives li { border-bottom: 1px solid #46b0ed; background: #fff; padding: 4px 10px 0 10px; }
+        .collectivesColumn ul.colectives li a:link { color: #333; }
+        .collectivesColumn .balance { font-size: 12px; color: gray; }
+        .collectivesColumn .balance label { margin-right: 4px; }
+        `}</style>
+        <div className="collectivesColumn">
+
+          <div id="selectedCollectiveContainer">
+            { this.state.selectedCollective && ::this.renderSelectedCollective() }
+          </div>
+
+          <div>
+            <h1 className="title">
+              <FormattedMessage
+                id="expenses.collectivePicker.listCollectivesTitle"
+                defaultMessage="You host {n} {n, plural, one {collective} other {collectives}}"
+                values={{n: result.total || 0}} />
+            </h1>
+
+            <ul className="filters">
+              <li>
+                <label>
+                  <input type="radio" name="filterCollectives" />
+                  List all
+                </label>
+              </li>
+              <li>
+                <label>
+                  <input type="radio" name="filterCollectives" />
+                  With pending expenses
+                </label>
+              </li>
+            </ul>
+          </div>
+
+          <ul className="colectives">
+            { collectives.map(collective => {
+                const tooltipArray = [];
+                let badgeCount = 0;
+
+                if (collective.stats.expenses) {
+                  const { pending, approved } = collective.stats.expenses;
+                  badgeCount = pending + approved;
+                  if (pending > 0) {
+                    tooltipArray.push(intl.formatMessage(this.messages['badge.tooltip.pending'], collective.stats.expenses));
+                  }
+                  if (approved > 0) {
+                    tooltipArray.push(intl.formatMessage(this.messages['badge.tooltip.approved'], collective.stats.expenses));
+                  }
+                }
+                const tooltip = tooltipArray.join(', ') || '';
+
+                return (
+                  <li key={ `collective-${collective.id}` } onClick={(e) => this.onChange (collective.id)}>
+                    <Scrollchor to="collective" animate={{ duration: 200 }} className="nav-link">
+                      { badgeCount > 0 && <Badge pullRight={true}>{badgeCount}</Badge> }
+                      <div className="NameBalance">
+                        <div className="collectiveName">{ collective.name || collective.slug }</div>
+                        <div className="balance">
+                          <label><FormattedMessage id="expenses.balance.label" defaultMessage="balance:" /></label>
+                          <Currency value={collective.stats.balance} currency={collective.currency} />
+                        </div>
+                      </div>
+                    </Scrollchor>
+                  </li>
+                );
+            }) }
+
+
+            {/* <DropdownButton id="collectivePicker" bsStyle="default" title={selectedTitle} onSelect={this.onChange}> */}
+            {/* { this.props.CollectiveId &&
+                <MenuItem key={null} eventKey={null}>
                 <FormattedMessage id="expenses.allCollectives" defaultMessage="All Collectives" />
-              </MenuItem> }
+                </MenuItem> }
 
-            { collectives && collectives.map(collective => (
-              <MenuItem key={ `collective-${collective.id}` }
-                        eventKey={collective.id}
-                        title={collective.name}>
+                { collectives && collectives.map(collective => (
+                <MenuItem key={ `collective-${collective.id}` }
+                eventKey={collective.id}
+                title={collective.name}>
                 { this.renderCollectiveMenuItem(collective) }
-              </MenuItem> )) }
+                </MenuItem> )) } */}
+            {/* </DropdownButton> */}
 
-          </DropdownButton>
-          { selectedCollective && !this.state.showAddFunds && ::this.canEdit() &&
-            <a className="addFundsLink" onClick={this.toggleAddFunds}>
-              <FormattedMessage id="addfunds.submit" defaultMessage="Add Funds" /></a> }
+          </ul>
         </div>
       </div>);
   }
@@ -277,14 +320,15 @@ class CollectivePickerWithData extends React.Component {
   static propTypes = {
     onChange: PropTypes.func,
     hostCollectiveSlug: PropTypes.string.isRequired,
+    query: PropTypes.object.isRequired,
   }
 
   constructor(props) {
     super(props);
+    console.log('query', props.query);
     this.state = {
       connectingPaypal: false,
       loading: false,
-      showAddFunds: false,
       /* Filter between 'COLLECTIVES' and 'ORGANIZATIONS'. The graphql
        * client uses this to define which query will be loaded in the
        * component */
@@ -309,107 +353,38 @@ class CollectivePickerWithData extends React.Component {
 
   render() {
     return (
-      <div className="CollectivesContainer">
+      <div id="collective" className="CollectivesContainer">
         <style jsx>{`
-          .CollectivesContainer {
-            background: #f2f4f5;
-          }
-
-          .submenu {
-            width: 100%;
-            min-height: 16rem;
-            font-family: Rubik;
-            padding: 2rem 2rem 2rem 6rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: baseline;
-          }
-
-          .submenu .title {
-            margin: 2rem 0;
-            overflow: hidden;
-            display: flex;
-            align-items: baseline;
-          }
-
-          .submenu .title h1 {
-            font-family: Rubik;
-            font-size: 3.6rem;
-            margin: 0 2rem 0 0;
-            font-weight: 500;
-            color: #18191a;
-            float: left;
-          }
-
-          .submenu .title h2 {
-            font-family: Rubik;
-            font-size: 2.4rem;
-            margin: 0;
-            font-weight: 300;
-            color: #18191a;
-          }
-
-          .collectivesFilter {
-            display: flex;
-          }
-
-          .addFundsLink {
-            display: block;
-            font-size: 1.2rem;
-            padding: 0.8rem;
-          }
-
-          .error {
-            color: red;
-            text-align: center;
-            padding-bottom: 3rem;
-          }
-
-        .menu {
-          text-align:center;
-          margin: 1rem 0 3rem 0;
-        }
-
-        `}</style>
-        <style jsx global>{`
-          .CollectivesContainer .defaultTitle {
-            width: 40rem;
-            float: left;
-            text-align: left;
-          }
-
-          .CollectivesContainer .caret {
-            float: right;
-            margin-top: 7px;
-          }
-
-          .right {
-            float: right;
-            text-align: right;
-          }
+          .CollectivesContainer { background: #ccc; padding: 0; }
+          .CollectivesContainer .filter { text-align: center; padding: 10px; }
+          .CollectivesContainer .filterBtnGroup { width: 100%; }
+          .CollectivesContainer .filterButton { width: auto; }
         `}</style>
         <div className="submenu">
           <div>
-            <div className="title">
-              <h1><FormattedMessage id="expenses.collectivePicker.title" defaultMessage="Finances" /></h1>
-              <h2><FormattedMessage id="expenses.collectivePicker.subtitle" defaultMessage="for {n} {n, plural, one {collective} other {collectives}}" values={{n: 1}} /></h2>
-            </div>
-
-            <div>
-              <label>
-                <input type="checkbox" id="showOrganizations"
-                       checked={ this.state.collectiveFilter === 'ORGANIZATIONS' }
-                       onClick={ () => ::this.toggleOrgFilter() } /> &nbsp; List Organizations
-              </label>
+            <div className="filter">
+              <ButtonGroup className="filterBtnGroup">
+                <Button className="filterButton collectives" bsSize="small"
+                        bsStyle={ this.state.collectiveFilter === 'COLLECTIVES' ? 'primary' : 'default'}
+                        onClick={ () => ::this.toggleOrgFilter() } >
+                  <FormattedMessage id="host.expenses.collectivePicker.collectives" defaultMessage="Collectives" />
+                </Button>
+                <Button className="filterButton organizations" bsSize="small"
+                        bsStyle={ this.state.collectiveFilter === 'ORGANIZATIONS' ? 'primary' : 'default'}
+                        onClick={ () => ::this.toggleOrgFilter() } >
+                  <FormattedMessage id="host.expenses.collectivePicker.organizations" defaultMessage="Organizations" />
+                </Button>
+              </ButtonGroup>
             </div>
 
             <DropDownWithData hostCollectiveSlug={this.props.hostCollectiveSlug}
                               collectiveFilter={this.state.collectiveFilter}
-                              onChange={this.props.onChange} />
+                              onChange={this.props.onChange}
+                              LoggedInUser={this.props.LoggedInUser} />
           </div>
-          <div className="right">
-            { ::this.canEdit() && <ConnectPaypal collective={this.hostCollective} /> }
-          </div>
+          {/* <div className="right">
+              { ::this.canEdit() && <ConnectPaypal collective={this.hostCollective} /> }
+              </div> */}
         </div>
       </div>
     );
@@ -417,7 +392,7 @@ class CollectivePickerWithData extends React.Component {
 }
 
 const getCollectivesQuery = gql`
-query Collective($hostCollectiveSlug: String!, $orderBy: CollectiveOrderField, $orderDirection: OrderDirection) {
+query Collective($hostCollectiveSlug: String!, $orderBy: CollectiveOrderField, $orderDirection: OrderDirection, $limit: Int, $offset: Int) {
   Collective(slug: $hostCollectiveSlug) {
     id
     slug
@@ -430,22 +405,27 @@ query Collective($hostCollectiveSlug: String!, $orderBy: CollectiveOrderField, $
       balance
       currency
     }
-    collectives(orderBy: $orderBy, orderDirection: $orderDirection) {
-      id
-      slug
-      name
-      currency
-      hostFeePercent
-      stats {
+    collectives(orderBy: $orderBy, orderDirection: $orderDirection, limit: $limit, offset: $offset) {
+      total
+      collectives {
         id
-        balance
-        expenses {
+        slug
+        name
+        image
+        backgroundImage
+        currency
+        hostFeePercent
+        stats {
           id
-          all
-          pending
-          paid
-          rejected
-          approved
+          balance
+          expenses {
+            id
+            all
+            pending
+            paid
+            rejected
+            approved
+          }
         }
       }
     }
@@ -454,6 +434,7 @@ query Collective($hostCollectiveSlug: String!, $orderBy: CollectiveOrderField, $
 `;
 
 const COLLECTIVES_PER_PAGE = 20;
+
 export const addCollectivesData = graphql(getCollectivesQuery, {
   skip: props => props.collectiveFilter !== 'COLLECTIVES',
   options(props) {
@@ -461,7 +442,7 @@ export const addCollectivesData = graphql(getCollectivesQuery, {
       variables: {
         hostCollectiveSlug: props.hostCollectiveSlug,
         offset: 0,
-        limit: props.limit || COLLECTIVES_PER_PAGE * 2,
+        limit: props.limit || COLLECTIVES_PER_PAGE,
         includeHostedCollectives: true,
         orderBy: 'name',
         orderDirection: 'ASC',
@@ -482,7 +463,7 @@ export const addCollectivesData = graphql(getCollectivesQuery, {
           }
           return Object.assign({}, previousResult, {
             // Append the new posts results to the old one
-            allCollectives: [...previousResult.allCollectives, ...fetchMoreResult.allCollectives]
+            /* allCollectives: [...previousResult.allCollectives, ...fetchMoreResult.allCollectives]*/
           })
         }
       })
@@ -496,6 +477,8 @@ query allCollectives($type: TypeOfCollective, $limit: Int, $offset: Int, $orderB
   allCollectives(type: $type, limit: $limit, offset: $offset, orderBy: $orderBy, orderDirection: $orderDirection) {
     id
     type
+    image
+    backgroundImage
     createdAt
     slug
     name
@@ -538,7 +521,7 @@ const addOrganizations = graphql(allCollectivesQuery, {
           if (!fetchMoreResult) return previousResult;
           return Object.assign({}, previousResult, {
             // Append the new posts results to the old one
-            allCollectives: [...previousResult.allCollectives, ...fetchMoreResult.allCollectives]
+            /* allCollectives: [...previousResult.allCollectives, ...fetchMoreResult.allCollectives]*/
           })
         }
       })
