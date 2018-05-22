@@ -38,12 +38,11 @@ class CreateCollectiveForm extends React.Component {
       'company.description': { id: 'collective.company.description', defaultMessage: 'Start with a @ to reference an organization (e.g. @airbnb)' },
       'amount.label': { id: 'collective.amount.label', defaultMessage: 'amount' },
       'description.label': { id: 'collective.description.label', defaultMessage: 'Short description' },
-      'longDescription.label': { id: 'collective.longDescription.label', defaultMessage: 'Long description' },
       'startsAt.label': { id: 'collective.startsAt.label', defaultMessage: 'start date and time' },
       'image.label': { id: 'collective.image.label', defaultMessage: 'Avatar' },
       'backgroundImage.label': { id: 'collective.backgroundImage.label', defaultMessage: 'Cover image' },
-      'twitterHandle.label': { id: 'collective.twitterHandle.label', defaultMessage: 'Twitter' },
       'website.label': { id: 'collective.website.label', defaultMessage: 'Website' },
+      'website.description': { id: 'collective.website.description', defaultMessage: 'Enter the URL of your website or Facebook Page' },
       'location.label': { id: 'collective.location.label', defaultMessage: 'City' },
       'meetup.label': { id: 'collective.meetup.label', defaultMessage: 'Meetup URL' },
       'members.label': { id: 'collective.members.label', defaultMessage: 'Number of members' },
@@ -61,9 +60,16 @@ class CreateCollectiveForm extends React.Component {
       collective
     };
 
-    this.categories = get(props.host, 'settings.categories') || [];
+    this.categories = get(props.host, 'settings.apply.categories') || [];
     if (this.categories.length === 1) {
       this.state.collective.category = this.categories[0];
+    }
+
+    if (get(props.host, 'settings.apply.defaultValues')) {
+      this.state.collective = {
+        ...this.state.collective,
+        ... props.host.settings.apply.defaultValues
+      };
     }
 
     this.defineFields(this.state.collective.category);
@@ -108,13 +114,6 @@ class CreateCollectiveForm extends React.Component {
           placeholder: ''
         },
         {
-          name: 'twitterHandle',
-          type: 'text',
-          pre: 'https://twitter.com/',
-          maxLength: 255,
-          placeholder: ''
-        },
-        {
           name: 'website',
           type: 'text',
           maxLength: 255,
@@ -127,12 +126,6 @@ class CreateCollectiveForm extends React.Component {
           options: {
             types: ['(cities)']
           }
-        },
-        {
-          name: 'longDescription',
-          type: 'textarea',
-          placeholder: '',
-          help: 'Protip: you can use markdown'
         }
       ]
     }
@@ -256,10 +249,6 @@ class CreateCollectiveForm extends React.Component {
           max-width: 700px;
           margin: 0 auto;
           overflow: hidden;
-        }
-
-        :global(textarea[name=longDescription]) {
-          height: 30rem;
         }
 
         .actions {
