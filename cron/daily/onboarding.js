@@ -34,7 +34,7 @@ const onlyCollectivesWithoutExpenses = (collective) => {
 }
 
 const onlyCollectivesWithoutUpdates = (collective) => {
-  return models.Update.count({ where: { CollectiveId: collective.id, publishedAt: { $ne: null } }}).then(count => count === 0);
+  return models.Update.count({ where: { CollectiveId: collective.id, publishedAt: { [Op.ne]: null } }}).then(count => count === 0);
 }
 
 const onlyCollectivesWithoutTwitterActivated = (collective) => {

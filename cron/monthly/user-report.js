@@ -16,15 +16,13 @@ import config from 'config';
 import Promise from 'bluebird';
 import fetch from 'node-fetch';
 import debugLib from 'debug';
-import models, { Op } from '../../server/models';
+import models, { Op, sequelize } from '../../server/models';
 import emailLib from '../../server/lib/email';
 import roles from '../../server/constants/roles';
 import { formatCurrencyObject, formatArrayToString } from '../../server/lib/utils';
 import { convertToCurrency } from '../../server/lib/currency';
 import path from 'path';
 import fs from 'fs';
-
-const Op = sequelize.Sequelize.Op;
 
 const d = new Date;
 d.setMonth(d.getMonth() - 1);
@@ -258,7 +256,7 @@ const processCollective =  async (CollectiveId) => {
       ]
     }),
     models.Update.findAll({
-      where: { CollectiveId: collective.id, publishedAt: { $gte: startDate, $lt: endDate } },
+      where: { CollectiveId: collective.id, publishedAt: { [Op.gte]: startDate, [Op.lt]: endDate } },
       order: [['createdAt', 'DESC']]
     }),
     collective.getNextGoal(endDate)
