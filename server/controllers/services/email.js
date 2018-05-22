@@ -5,7 +5,7 @@ import request from 'request-promise';
 import _ from 'lodash';
 import crypto from 'crypto';
 import debug from 'debug';
-import models, {sequelize} from '../../models';
+import models, { sequelize, Op } from '../../models';
 import errors from '../../lib/errors';
 
 const debugEmail = debug('email');
@@ -71,7 +71,7 @@ export const approve = (req, res, next) => {
     let email = {};
 
     const fetchSenderAndApprover = (email) => {
-      const where = { '$or': [ {email: approverEmail}, { email: email.sender } ] };
+      const where = { [Op.or]: [ {email: approverEmail}, { email: email.sender } ] };
       sender = { name: email.From, email: email.sender }; // default value
       return models.User.findAll({ where })
               .then(users => {

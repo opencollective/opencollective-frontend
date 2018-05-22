@@ -2,7 +2,7 @@ import config from 'config';
 import Promise from 'bluebird';
 import moment from 'moment-timezone';
 import _ from 'lodash';
-import models from '../../server/models';
+import models, { Op } from '../../server/models';
 import activities from '../../server/constants/activities';
 import slackLib from '../../server/lib/slack';
 import expenseStatus from '../../server/constants/expense_status';
@@ -21,10 +21,10 @@ const updatedLastWeek = getTimeFrame('updatedAt');
 const donation = {
   where: {
     OrderId: {
-      $not: null
+      [Op.not]: null
     },
     platformFeeInHostCurrency: {
-      $lt: 0
+      [Op.lt]: 0
     }
   }
 };
@@ -38,7 +38,7 @@ const credit = { where: {type: 'CREDIT'}};
 
 const excludeOcTeam = { where: {
   CollectiveId: {
-    $not: 1 // OpenCollective collective
+    [Op.not]: 1 // OpenCollective collective
   }
 } };
 
@@ -169,8 +169,8 @@ function getTimeFrame(propName) {
   return {
     where: {
       [propName]: {
-        $gt: lastWeekStart,
-        $lt: thisWeekStart
+        [Op.gt]: lastWeekStart,
+        [Op.lt]: thisWeekStart
       }
     }
   };

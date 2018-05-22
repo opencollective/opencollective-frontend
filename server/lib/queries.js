@@ -1,4 +1,4 @@
-import models, {sequelize} from '../models';
+import models, { sequelize, Op } from '../models';
 import currencies from '../constants/currencies'
 import config from 'config';
 import { pick } from 'lodash';
@@ -29,7 +29,7 @@ const generateFXConversionSQL = (aggregate) => {
 
 const getTotalAnnualBudgetForHost = (HostCollectiveId) => {
   return sequelize.query(`
-  WITH 
+  WITH
     "collectiveids" AS (
       SELECT id FROM "Collectives" WHERE "HostCollectiveId"=:HostCollectiveId AND "isActive"=true
     ),
@@ -51,10 +51,10 @@ const getTotalAnnualBudgetForHost = (HostCollectiveId) => {
       WHERE ((s.interval = 'year' AND s."isActive" = true) OR s.interval IS NULL)
         AND o."CollectiveId" IN (SELECT id FROM collectiveids)
         AND s."deletedAt" IS NULL
-        AND t."createdAt" > (current_date - INTERVAL '12 months') 
+        AND t."createdAt" > (current_date - INTERVAL '12 months')
       GROUP BY o.id
     )
- 
+
   SELECT
     ( SELECT COALESCE(SUM("amountInHostCurrency") * 12, 0) FROM "monthlyOrdersWithAmountInHostCurrency" t )
     +
@@ -98,7 +98,7 @@ const getTotalAnnualBudget = () => {
       LEFT JOIN "Subscriptions" s ON d."SubscriptionId" = s.id
       WHERE t.type='CREDIT' AND t."CollectiveId" != 1
         AND t."deletedAt" IS NULL
-        AND t."createdAt" > (current_date - INTERVAL '12 months') 
+        AND t."createdAt" > (current_date - INTERVAL '12 months')
         AND ((s.interval = 'year' AND s."isActive" IS TRUE AND s."deletedAt" IS NULL) OR s.interval IS NULL))
     +
     (SELECT
@@ -225,12 +225,12 @@ const getTopBackers = (since, until, tags, limit) => {
     FROM "Transactions" t
     LEFT JOIN "Collectives" fromCollective ON fromCollective.id = t."FromCollectiveId"
     LEFT JOIN "Collectives" collective ON collective.id = t."CollectiveId"
-    WHERE 
+    WHERE
       t.type='CREDIT'
       ${sinceClause}
       ${untilClause}
-      ${tagsClause}      
-    GROUP BY "FromCollectiveId" 
+      ${tagsClause}
+    GROUP BY "FromCollectiveId"
     ORDER BY "totalDonations" DESC
     LIMIT ${limit}
     `.replace(/\s\s+/g, ' '), // this is to remove the new lines and save log space.
@@ -253,7 +253,7 @@ const getCollectivesWithBalance = (where = {}, options) => {
   Object.keys(where).forEach(key => {
     if (key === 'tags') {
       whereCondition += 'AND c.tags && $tags '; // && operator means "overlaps", e.g. ARRAY[1,4,3] && ARRAY[2,1] == true
-      where.tags = where.tags.$overlap;
+      where.tags = where.tags[Op.overlap];
     } else {
       whereCondition += `AND c."${key}"=$${key} `;
     }

@@ -5,7 +5,7 @@ process.env.PORT = 3066;
 import config from 'config';
 import Promise from 'bluebird';
 import debugLib from 'debug';
-import models, { sequelize } from '../../server/models';
+import models, { sequelize, Op } from '../../server/models';
 import twitter from '../../server/lib/twitter';
 import slackLib from '../../server/lib/slack';
 import { pluralize } from '../../server/lib/utils';
@@ -25,7 +25,7 @@ const init = () => {
 models.Member.findAll({
     attributes: [ [sequelize.fn('COUNT', sequelize.col('Member.id')), 'count'], 'CollectiveId' ],
     where: {
-      createdAt: { $gte: TenMinutesAgo },
+      createdAt: { [Op.gte]: TenMinutesAgo },
       role: 'BACKER'
     },
     limit: 30,

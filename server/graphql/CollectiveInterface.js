@@ -27,7 +27,7 @@ import {
 } from './TransactionInterface';
 
 import { types } from '../constants/collectives';
-import models from '../models';
+import models, { Op } from '../models';
 import roles from '../constants/roles';
 
 export const TypeOfCollectiveType = new GraphQLEnumType({
@@ -120,7 +120,7 @@ export const CollectivesStatsType = new GraphQLObjectType({
         async resolve(collective) {
           return models.Collective.count({
             where: {
-              $or: {
+              [Op.or]: {
                 ParentCollectiveId: collective.id,
                 HostCollectiveId: collective.id
               },
@@ -302,7 +302,7 @@ export const CollectiveStatsType = new GraphQLObjectType({
         description: "Number of updates published by this collective",
         type: GraphQLInt,
         resolve(collective) {
-          return models.Update.count({ where: { CollectiveId: collective.id, publishedAt: { $ne: null } } });
+          return models.Update.count({ where: { CollectiveId: collective.id, publishedAt: { [Op.ne]: null } } });
         }
       },
       events: {
@@ -764,13 +764,13 @@ const CollectiveFields = () => {
         const roles = args.roles || (args.role && [ args.role ]);
 
         if (roles && roles.length > 0) {
-          query.where.role = { $in: roles };
+          query.where.role = { [Op.in]: roles };
         }
 
         let conditionOnMemberCollective;
         if (args.type) {
           const types = args.type.split(',');
-          conditionOnMemberCollective = { type: { $in: types } };
+          conditionOnMemberCollective = { type: { [Op.in]: types } };
         }
 
         query.include = [
@@ -805,7 +805,7 @@ const CollectiveFields = () => {
         const where = { MemberCollectiveId: collective.id };
         const roles = args.roles || (args.role && [ args.role ]);
         if (roles && roles.length > 0) {
-          where.role = { $in: roles };
+          where.role = { [Op.in]: roles };
         }
         return models.Member.findAll({
           where,
@@ -869,7 +869,7 @@ const CollectiveFields = () => {
       type: new GraphQLList(OrderType),
       resolve(collective) {
         return collective.getIncomingOrders({
-          where: { processedAt: { $ne: null } },
+          where: { processedAt: { [Op.ne]: null } },
           order: [ ['createdAt', 'DESC'] ]
         });
       }
@@ -947,7 +947,7 @@ const CollectiveFields = () => {
               }
             }
             return getCollectiveIds().then(collectiveIds => {
-              query.where.CollectiveId = { $in: collectiveIds };
+              query.where.CollectiveId = { [Op.in]: collectiveIds };
               return models.Expense.findAll(query);
             })
           })
@@ -978,7 +978,7 @@ const CollectiveFields = () => {
         offset: { type: GraphQLInt }
       },
       resolve(collective, args) {
-        const query = { CollectiveId: collective.id, publishedAt: { $ne: null } };
+        const query = { CollectiveId: collective.id, publishedAt: { [Op.ne]: null } };
         if (args.limit) query.limit = args.limit;
         if (args.offset) query.offset = args.offset;
         return models.Update.findAll(query);

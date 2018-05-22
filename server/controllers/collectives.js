@@ -9,7 +9,7 @@ import roles from '../constants/roles';
 import activities from '../constants/activities';
 import emailLib from '../lib/email';
 import queries from '../lib/queries';
-import models from '../models';
+import models, { Op } from '../models';
 import errors from '../lib/errors';
 import debugLib from 'debug';
 import config from 'config';
@@ -80,7 +80,7 @@ export const getUsers = (req, res, next) => {
     promise = promise.then(userCollectives => {
       const UserCollectiveIds = userCollectives.map(u => u.id);
       return models.Order.findAll({
-        where: { FromCollectiveId: { $in: UserCollectiveIds}},
+        where: { FromCollectiveId: { [Op.in]: UserCollectiveIds}},
         include: [
           { model: models.Subscription, where: { isActive: true } }
         ]
@@ -532,29 +532,28 @@ export const getCollectiveTags = (req, res, next) => {
 };
 
 export const getTransactions = (req, res, next) => {
-  const where = {
-    CollectiveId: req.collective.id
-  };
+  const query = req.pagination ? req.pagination : {};
+
+  query.where = query.where || {};
+  query.where.CollectiveId = req.collective.id;
 
   if (req.query.donation || req.query.type === 'donations') {
-    where.amount = {
-      $gt: 0
+    query.where.amount = {
+      [Op.gt]: 0
     };
   } else if (req.query.expense || req.query.type === 'expenses') {
-    where.amount = {
-      $lt: 0
+     query.where.amount = {
+      [Op.lt]: 0
     };
   }
 
   if (req.query.exclude) {
-    where.$or = [ { type: { $ne: req.query.exclude } }, { type: { $eq: null } } ];
+    query.where[Op.or] = [ { type: { [Op.ne]: req.query.exclude } }, { type: { [Op.eq]: null } } ];
   }
 
-  const query = _.merge({
-    where,
-    include: { model: models.Order },
-    order: [[req.sorting.key, req.sorting.dir]]
-  }, req.pagination);
+  query.include = { model: models.Order };
+
+  query.order = [[req.sorting.key, req.sorting.dir]];
 
   models.Transaction
     .findAndCountAll(query)

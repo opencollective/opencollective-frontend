@@ -1,5 +1,5 @@
 import Promise from 'bluebird';
-import models from '../../server/models';
+import models, { Op } from '../../server/models';
 import emailLib from '../../server/lib/email';
 import { get } from 'lodash';
 
@@ -34,7 +34,7 @@ const onlyCollectivesWithoutExpenses = (collective) => {
 }
 
 const onlyCollectivesWithoutUpdates = (collective) => {
-  return models.Update.count({ where: { CollectiveId: collective.id, publishedAt: { $ne: null } }}).then(count => count === 0);
+  return models.Update.count({ where: { CollectiveId: collective.id, publishedAt: { [Op.ne]: null } }}).then(count => count === 0);
 }
 
 const onlyCollectivesWithoutTwitterActivated = (collective) => {
@@ -69,7 +69,7 @@ async function processOnBoardingTemplate(template, startsAt, filter = () => true
     where: {
       type: "COLLECTIVE",
       isActive: true,
-      createdAt: { $gte: startsAt, $lt: endsAt }
+      createdAt: { [Op.gte]: startsAt, [Op.lt]: endsAt }
     }
   })
   .tap(collectives => console.log(`${template}> processing ${collectives.length} collectives`))

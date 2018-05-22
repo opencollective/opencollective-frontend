@@ -7,7 +7,7 @@ import CustomDataTypes from './DataTypes';
 
 export default function(Sequelize, DataTypes) {
 
-  const { models } = Sequelize;
+  const { models, Op } = Sequelize;
 
   const Tier = Sequelize.define('Tier', {
     id: {
@@ -170,7 +170,7 @@ export default function(Sequelize, DataTypes) {
         CollectiveId: this.CollectiveId,
         MemberCollectiveId: backerCollective.id,
         TierId: this.id,
-        createdAt: { $lte: until }
+        createdAt: { [Op.lte]: until }
       }
     }).then(membership => {
       if (!membership) return false;
@@ -206,7 +206,7 @@ export default function(Sequelize, DataTypes) {
     return models.Order.sum('quantity', {
         where: {
           TierId: this.id,
-          processedAt: { $ne: null }
+          processedAt: { [Op.ne]: null }
         }
       })
       .then(usedQuantity => {
@@ -241,7 +241,7 @@ export default function(Sequelize, DataTypes) {
     debug("appendTier", collective.name, "backers: ", backerCollectives.length);
     return models.Member.findAll({
       where: {
-        MemberCollectiveId: { $in: backerCollectivesIds },
+        MemberCollectiveId: { [Op.in]: backerCollectivesIds },
         CollectiveId: collective.id
       },
       include: [ { model: models.Tier }]

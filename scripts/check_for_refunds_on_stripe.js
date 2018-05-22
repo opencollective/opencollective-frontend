@@ -3,7 +3,7 @@
  */
 
 const app = require('../server/index');
-import models from '../server/models';
+import models, { Op } from '../server/models';
 import { retrieveCharge } from '../server/gateways/stripe';
 
 const done = (err) => {
@@ -12,7 +12,7 @@ const done = (err) => {
   process.exit();
 }
 
-function promiseSeq(arr, predicate, consecutive=100) {  
+function promiseSeq(arr, predicate, consecutive=100) {
   return chunkArray(arr, consecutive).reduce(( prom, items, ix ) => {
     // wait for the previous Promise.all() to resolve
     return prom.then(( allResults ) => {
@@ -68,7 +68,7 @@ function run() {
     where: {
       type: 'DONATION',
       data: {
-        $ne: null 
+        [Op.ne]: null
       }
     },
     include: [

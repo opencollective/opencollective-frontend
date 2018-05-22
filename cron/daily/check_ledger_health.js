@@ -4,7 +4,7 @@
 
 import Promise from 'bluebird';
 import json2csv from 'json2csv';
-import models, { sequelize } from '../../server/models';
+import models, { sequelize, Op } from '../../server/models';
 import emailLib from '../../server/lib/email';
 import * as transactionsLib from '../../server/lib/transactions';
 
@@ -127,7 +127,7 @@ const checkHostCollectives = () => {
   return models.Collective.findAll({
     where: {
       HostCollectiveId: {
-        $col: 'id'
+        [Op.col]: 'id'
       }
     }
   })
@@ -146,10 +146,10 @@ const checkUsersAndOrgs = () => {
   return models.Collective.findAll({
     where: {
       type: {
-        $or: ['USER', 'ORGANIZATION']
+        [Op.or]: ['USER', 'ORGANIZATION']
       },
       HostCollectiveId: {
-        $ne: null
+        [Op.ne]: null
       }
     }
   })
@@ -164,10 +164,10 @@ const checkUsersAndOrgs = () => {
   .then(userCollectives => models.Collective.findAll({
     where: {
       id: {
-        $in: userCollectives.map(u => u.CollectiveId)
+        [Op.in]: userCollectives.map(u => u.CollectiveId)
       },
       type: {
-        $ne: 'USER'
+        [Op.ne]: 'USER'
       }
     }
   }))
@@ -183,7 +183,7 @@ const checkMembers = () => {
   return models.Member.findAll({
     where: {
       MemberCollectiveId: {
-        $col: 'CollectiveId'
+        [Op.col]: 'CollectiveId'
       }
     }
   })
@@ -244,7 +244,7 @@ const checkExpenses = () => {
 
   // Check that there are no expenses marked as "PAID" and without transaction entries
   return sequelize.query(`
-    SELECT 
+    SELECT
       e.id AS id
     FROM "Expenses" e
     LEFT JOIN "Transactions" t ON t."ExpenseId" = e.id
@@ -267,7 +267,7 @@ const checkTransactions = () => {
   return models.Transaction.count({
     where: {
       FromCollectiveId: {
-        $eq: null
+        [Op.eq]: null
       }
     }
   })
@@ -279,7 +279,7 @@ const checkTransactions = () => {
   .then(() => models.Transaction.findAll({
     where: {
       CollectiveId: {
-        $col: 'FromCollectiveId'
+        [Op.col]: 'FromCollectiveId'
       }
     }
   }))
@@ -292,7 +292,7 @@ const checkTransactions = () => {
   .then(() => models.Transaction.count({
     where: {
       TransactionGroup: {
-        $eq: null
+        [Op.eq]: null
       }
     }
   }))
@@ -305,7 +305,7 @@ const checkTransactions = () => {
     SELECT "OrderId" FROM "Transactions"
         WHERE "OrderId" IS NOT NULL and "deletedAt" is null
           GROUP BY "OrderId"
-          HAVING COUNT(*) % 2 != 0 
+          HAVING COUNT(*) % 2 != 0
     `, {type: sequelize.QueryTypes.SELECT}))
   .then(oddOrderIds => {
     subHeader('Orders with odd (not multiple of 2) number of transactions', oddOrderIds.length)
@@ -316,7 +316,7 @@ const checkTransactions = () => {
     SELECT "ExpenseId" FROM "Transactions"
         WHERE "ExpenseId" IS NOT NULL and "deletedAt" is null
           GROUP BY "ExpenseId"
-          HAVING COUNT(*) != 2 
+          HAVING COUNT(*) != 2
     `, {type: sequelize.QueryTypes.SELECT}))
   .then(oddExpenseIds => {
     subHeader('Expenses with less than or more than 2 transactions', oddExpenseIds.length)
@@ -328,7 +328,7 @@ const checkTransactions = () => {
     SELECT "TransactionGroup" FROM "Transactions"
         WHERE "TransactionGroup" IS NOT NULL and "deletedAt" is null
           GROUP BY "TransactionGroup"
-          HAVING COUNT(*) != 2 
+          HAVING COUNT(*) != 2
     `, {type: sequelize.QueryTypes.SELECT}))
   .then(oddTxnGroups => {
     subHeader('Transaction groups that are not pairs', oddTxnGroups.length)
@@ -339,10 +339,10 @@ const checkTransactions = () => {
   .then(() => models.Transaction.findAll({
     where: {
       OrderId: {
-        $eq: null
+        [Op.eq]: null
       },
       ExpenseId: {
-        $eq: null
+        [Op.eq]: null
       }
     }
   }))
@@ -376,9 +376,9 @@ const checkCollectiveBalance = () => {
   return models.Collective.findAll({
     attributes: [ 'id' ],
     where: {
-      $or: [{type: 'COLLECTIVE'}, {type: 'EVENT'}],
+      [Op.or]: [{type: 'COLLECTIVE'}, {type: 'EVENT'}],
       id: {
-        $notIn: [7, 34]
+        [Op.notIn]: [7, 34]
       }
     }
   })
