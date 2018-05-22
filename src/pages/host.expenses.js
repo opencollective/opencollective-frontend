@@ -110,6 +110,12 @@ class HostExpensesPage extends React.Component {
                 onChange={(selectedCollective => this.pickCollective(selectedCollective))} />
             </div>
             <div className="col large pullLeft">
+              <h1 style={{ margin: '0 0 20px 0' }}>
+                { this.state.selectedCollective && (selectedCollective.name || selectedCollective.slug) }
+                { !this.state.selectedCollective && 'All' }
+                {' '} expenses
+              </h1>
+
               <ExpensesWithData
                 collective={selectedCollective}
                 includeHostedCollectives={includeHostedCollectives}
