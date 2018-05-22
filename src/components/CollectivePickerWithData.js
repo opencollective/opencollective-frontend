@@ -124,7 +124,7 @@ class AddFundsFormContainer extends React.Component {
 class CollectiveSelector extends React.Component {
   static propTypes = {
     onChange: PropTypes.func,
-    hostCollectiveSlug: PropTypes.string.isRequired,
+    hostCollective: PropTypes.object.isRequired,
     collectiveFilter: PropTypes.string.isRequired,
     LoggedInUser: PropTypes.object.isRequired,
     toggleAddFunds: PropTypes.func.isRequired,
@@ -132,20 +132,12 @@ class CollectiveSelector extends React.Component {
 
   constructor(props) {
     super(props);
-
     this.state = {
       /* -1 Means that no collective is selected */
       CollectiveId: -1,
       /* Filled in by onChange */
       selectedCollective: null,
     };
-
-    /* Filled in by filterCollectives(). It's not in state because it
-       reads information that was processed by Apollo so we may access
-       that in a render method. That doesn't feel quite right, but it
-       might take another round of refactoring to be changed. */
-    this.hostCollective = null;
-
     this.messages = defineMessages({
       'badge.tooltip.pending': { id: 'expenses.badge.tooltip.pending', defaultMessage: "{pending} {pending, plural, one {expense} other {expenses}} pending approval" },
       'badge.tooltip.approved': { id: 'expenses.badge.tooltip.approved', defaultMessage: "{approved} {approved, plural, one {expense} other {expenses}} ready to be paid" },
@@ -164,29 +156,12 @@ class CollectiveSelector extends React.Component {
     /* Unpacking the values is different for collectives and
        organizations */
     switch (collectiveFilter) {
-      case 'COLLECTIVES': {
-        /* Other placess need this this value and since this function
-           can be called from render(), the value is being shovelled
-           within an instance slot instead of the state.
-
-           It's only safe to do this here because `collectiveFilter'
-           defaults to 'COLLECTIVES' so we know that this happens
-           before anything else depending on `this.hostCollective`. */
-        this.hostCollective = Collective;
-        const state = { hostCollective: Collective };
-        if (state.hostCollective) {
-          state.result = state.hostCollective.collectives;
-        }
-        return state;
-      }
+      case 'COLLECTIVES':
+        return { result: Collective.collectives };
       case 'ORGANIZATIONS':
-        return {
-          hostCollective: this.hostCollective,
-          result: organizations.allCollectives.collectives,
-        };
+        return { result: organizations.allCollectives.collectives };
       default:
-        console.error(`Wrong state received by filterCollectives(${collectiveFilter})`);
-        break;
+        return { error: `Wrong state received by filterCollectives(${collectiveFilter})` };
     }
   }
 
@@ -256,14 +231,16 @@ class CollectiveSelector extends React.Component {
   render() {
     const { intl } = this.props;
     const { loading, error, result } = this.filterCollectives();
-    const collectives = result && result.collectives;
 
     if (error) {
       console.error("graphql error>>>", error.message);
       return (<Error message="GraphQL error" />)
     }
+    if (loading) {
+      return (<div><h1>Loading...</h1><br /><br /></div>);
+    }
 
-    if (loading) return <div><h1>Loading...</h1><br /><br /></div>;
+    const { total, collectives } = result;
 
     return (
       <div>
@@ -299,7 +276,7 @@ class CollectiveSelector extends React.Component {
               <FormattedMessage
                 id="expenses.collectivePicker.listCollectivesTitle"
                 defaultMessage="{n} {n, plural, one {collective} other {collectives}} listed"
-                values={{n: result.total || 0}}
+                values={{ n: total }}
                 />
             </h1>
 
@@ -377,7 +354,7 @@ class CollectiveSelector extends React.Component {
                 );
             }) }
 
-            { ::this.renderPagination(result.total) }
+            { ::this.renderPagination(total) }
           </ul>
         </div>
       </div>
@@ -388,9 +365,8 @@ class CollectiveSelector extends React.Component {
 class CollectivePickerWithData extends React.Component {
 
   static propTypes = {
-    onChange: PropTypes.func,
-    toggleAddFunds: PropTypes.func,
-    hostCollectiveSlug: PropTypes.string.isRequired,
+    onChange: PropTypes.func.isRequired,
+    toggleAddFunds: PropTypes.func.isRequired,
     hostCollective: PropTypes.object.isRequired,
     query: PropTypes.object.isRequired,
   }
@@ -451,7 +427,7 @@ class CollectivePickerWithData extends React.Component {
 
           <CollectiveSelectorWithData
             query={this.props.query}
-            hostCollectiveSlug={this.props.hostCollectiveSlug}
+            hostCollective={this.props.hostCollective}
             collectiveFilter={this.state.collectiveFilter}
             onChange={this.props.onChange}
             toggleAddFunds={this.props.toggleAddFunds}
@@ -510,7 +486,7 @@ export const addCollectivesData = graphql(getCollectivesQuery, {
   options(props) {
     return {
       variables: {
-        hostCollectiveSlug: props.hostCollectiveSlug,
+        hostCollectiveSlug: props.hostCollective.slug,
         offset: props.query.collectivesOffset,
         limit: props.query.collectivesLimit || MAX_COLLECTIVES_IN_SIDEBAR,
         expenseStatus: props.query.collectivesQuery,
