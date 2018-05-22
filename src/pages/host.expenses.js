@@ -40,21 +40,21 @@ class HostExpensesPage extends React.Component {
   toggleAddFunds = () => {
     const showAddFunds = !this.state.showAddFunds;
     this.setState({ showAddFunds });
-    console.log(showAddFunds);
   }
 
   render() {
-    const { data } = this.props;
+    const { data: { error, loading, Collective } } = this.props;
     const { LoggedInUser } = this.state;
 
-    if (data.error) {
-      console.error("graphql error>>>", data.error.message);
+    if (error) {
+      console.error("graphql error>>>", error.message);
       return (<ErrorPage message="GraphQL error" />)
     }
+    if (loading) {
+      return (<Loading />);
+    }
 
-    if (!data.Collective) return (<Loading />);
-
-    const collective = data.Collective;
+    const collective = Collective;
     const selectedCollective = this.state.selectedCollective || collective;
     const includeHostedCollectives = (selectedCollective.id === collective.id);
 
@@ -112,7 +112,6 @@ class HostExpensesPage extends React.Component {
             <div className="col side pullLeft">
               <CollectivePicker
                 query={this.props.query}
-                hostCollectiveSlug={this.props.collectiveSlug}
                 hostCollective={collective}
                 LoggedInUser={LoggedInUser}
                 onChange={this.pickCollective}
