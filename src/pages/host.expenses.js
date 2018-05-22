@@ -10,7 +10,7 @@ import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
 import ExpensesWithData from '../components/ExpensesWithData';
 import { get } from 'lodash';
-import CollectivePicker from '../components/CollectivePickerWithData';
+import CollectivePicker, { AddFundsFormWithData } from '../components/CollectivePickerWithData';
 import ExpensesStatsWithData from '../components/ExpensesStatsWithData';
 import { graphql } from 'react-apollo'
 import gql from 'graphql-tag'
@@ -24,7 +24,7 @@ class HostExpensesPage extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = { selectedCollective: null };
+    this.state = { selectedCollective: null, showAddFunds: false };
   }
 
   async componentDidMount() {
@@ -35,6 +35,12 @@ class HostExpensesPage extends React.Component {
 
   pickCollective = (selectedCollective) => {
     this.setState({ selectedCollective });
+  }
+
+  toggleAddFunds = () => {
+    const showAddFunds = !this.state.showAddFunds;
+    this.setState({ showAddFunds });
+    console.log(showAddFunds);
   }
 
   render() {
@@ -107,22 +113,32 @@ class HostExpensesPage extends React.Component {
                 query={this.props.query}
                 hostCollectiveSlug={this.props.collectiveSlug}
                 LoggedInUser={LoggedInUser}
-                onChange={this.pickCollective} />
+                onChange={this.pickCollective}
+                toggleAddFunds={this.toggleAddFunds} />
             </div>
             <div className="col large pullLeft">
-              <h1 style={{ margin: '0 0 20px 0' }}>
-                { this.state.selectedCollective && (selectedCollective.name || selectedCollective.slug) }
-                { !this.state.selectedCollective && 'All' }
-                {' '} expenses
-              </h1>
+              { this.state.showAddFunds &&
+                <AddFundsFormWithData
+                  hostCollective={collective}
+                  selectedCollective={selectedCollective}
+                  toggleAddFunds={this.toggleAddFunds}
+                  LoggedInUser={LoggedInUser} /> }
 
-              <ExpensesWithData
-                collective={selectedCollective}
-                includeHostedCollectives={includeHostedCollectives}
-                LoggedInUser={this.state.LoggedInUser}
-                filters={true}
-                editable={true}
-              />
+              { !this.state.showAddFunds &&
+                <div>
+                  <h1 style={{ margin: '0 0 20px 0' }}>
+                    { this.state.selectedCollective && (selectedCollective.name || selectedCollective.slug) }
+                    { !this.state.selectedCollective && 'All' }
+                    {' '} expenses
+                  </h1>
+                  <ExpensesWithData
+                    collective={selectedCollective}
+                    includeHostedCollectives={includeHostedCollectives}
+                    LoggedInUser={this.state.LoggedInUser}
+                    filters={true}
+                    editable={true}
+                  />
+                </div> }
             </div>
           </div>
 
@@ -147,6 +163,14 @@ query Collective($collectiveSlug: String!) {
     settings
     image
     isHost
+    paymentMethods {
+      id
+      uuid
+      service
+      createdAt
+      balance
+      currency
+    }
   }
 }
 `;
