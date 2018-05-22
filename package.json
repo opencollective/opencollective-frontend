@@ -96,7 +96,8 @@
     "lint:fix": "eslint '**/*.js' --fix",
     "pretest": "npm run lint",
     "commit": "git-cz",
-    "semantic-release": "semantic-release"
+    "semantic-release": "semantic-release",
+    "cypress": "TZ=UTC cypress run"
   },
   "devDependencies": {
     "@babel/cli": "7.0.0-beta.42",
