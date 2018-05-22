@@ -31,6 +31,12 @@ const canEdit = (props) => {
   return LoggedInUser && LoggedInUser.canEditCollective(hostCollective);
 };
 
+/* Helper that tests if the currently logged in user is a site admin */
+const isRoot = (props) => {
+  const { LoggedInUser } = props;
+  return LoggedInUser && LoggedInUser.isRoot();
+};
+
 /* Class that adds the createOrder mutation to AddFundsForm */
 class AddFundsFormContainer extends React.Component {
 
@@ -423,24 +429,25 @@ class CollectivePickerWithData extends React.Component {
             { canEdit(this.props) && <ConnectPaypal collective={this.props.hostCollective} /> }
           </div>
 
-          <div className="filter">
-            <ButtonGroup className="filterBtnGroup">
-              <Button
-                className="filterButton collectives" bsSize="small"
-                bsStyle={this.state.collectiveFilter === 'COLLECTIVES' ? 'primary' : 'default'}
-                onClick={() => ::this.toggleOrgFilter()}
-                >
-                <FormattedMessage id="host.expenses.collectivePicker.collectives" defaultMessage="Collectives" />
-              </Button>
-              <Button
-                className="filterButton organizations" bsSize="small"
-                bsStyle={this.state.collectiveFilter === 'ORGANIZATIONS' ? 'primary' : 'default'}
-                onClick={() => ::this.toggleOrgFilter()}
-                >
-                <FormattedMessage id="host.expenses.collectivePicker.organizations" defaultMessage="Organizations" />
-              </Button>
-            </ButtonGroup>
-          </div>
+          { isRoot(this.props) &&
+            <div className="filter">
+              <ButtonGroup className="filterBtnGroup">
+                <Button
+                  className="filterButton collectives" bsSize="small"
+                  bsStyle={this.state.collectiveFilter === 'COLLECTIVES' ? 'primary' : 'default'}
+                  onClick={() => ::this.toggleOrgFilter()}
+                  >
+                  <FormattedMessage id="host.expenses.collectivePicker.collectives" defaultMessage="Collectives" />
+                </Button>
+                <Button
+                  className="filterButton organizations" bsSize="small"
+                  bsStyle={this.state.collectiveFilter === 'ORGANIZATIONS' ? 'primary' : 'default'}
+                  onClick={() => ::this.toggleOrgFilter()}
+                  >
+                  <FormattedMessage id="host.expenses.collectivePicker.organizations" defaultMessage="Organizations" />
+                </Button>
+              </ButtonGroup>
+            </div> }
 
           <CollectiveSelectorWithData
             query={this.props.query}
