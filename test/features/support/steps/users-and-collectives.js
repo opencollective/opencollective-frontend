@@ -63,10 +63,12 @@ Given('platform fee is {string}', async function (feeStr) {
   this.addValue(`platform-fee`, feeStr);
 });
 
-async function handleDonation (fromName, value, toName, paymentMethod, userName) {
+async function handleDonation (fromName, value, toName, paymentMethod, userName=null) {
   const [ amountStr, currency ] = value.split(' ');
   const amount = parseInt(amountStr);
-  const user = this.getValue(`${userName ? userName : fromName}-user`);
+  const user = !userName
+    ? this.getValue(`${userName ? userName : fromName}-user`)
+    : this.getValue(`${fromName}-user`);
   const userCollective = this.getValue(fromName);
   const collective = this.getValue(toName);
   /* Retrieve fees that may or may not have been set */
