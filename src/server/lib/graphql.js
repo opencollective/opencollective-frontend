@@ -97,13 +97,9 @@ export async function fetchMembersStats(params) {
       }
     }
   }
-  try {
-    const result = await getClient().request(query, params);
-    const count = processResult(result);
-    return count;
-  } catch (e) {
-    console.error(e);
-  }
+  const result = await getClient().request(query, params);
+  const count = processResult(result);
+  return count;
 }
 
 export async function fetchMembers({ collectiveSlug, tierSlug, backerType, isActive }, options = {}) {

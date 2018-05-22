@@ -43,11 +43,20 @@ class EventsWithData extends React.Component {
   }
 
   renderEventEntry(event) {
-    return (<li key={event.id}>
-      <a href={`/${event.parentCollective.slug}/events/${event.slug}`} onClick={() => this.openEvent(event.slug)} target="_top">{event.name}</a>, &nbsp;
-      <FormattedDate value={event.startsAt} day="numeric" month="long" />, &nbsp;
-      {event.location.name}
-    </li>);
+    if (!event.startsAt && process.env.NODE_ENV !== 'production') {
+      console.warn(`Event startsAt should not be empty. Event ID: ${event.id}`);
+    }
+    return (
+      <li key={event.id}>
+        <a href={`/${event.parentCollective.slug}/events/${event.slug}`} onClick={() => this.openEvent(event.slug)} target="_top">{event.name}</a>, &nbsp;
+        {event.startsAt &&
+          <React.Fragment>
+            <FormattedDate value={event.startsAt} day="numeric" month="long" />, &nbsp;
+          </React.Fragment>
+        }
+        {event.location.name}
+      </li>
+    );
   }
 
   render() {

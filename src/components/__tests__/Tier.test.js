@@ -7,6 +7,8 @@ import en from 'react-intl/locale-data/en';
 addLocaleData([...en]);
 import { capitalize } from '../../lib/utils';
 
+const DEBUG = process.env.DEBUG || false;
+
 describe("Tier component", () => {
 
   const mountComponent = (props) => mount(
@@ -103,7 +105,7 @@ describe("Tier component", () => {
       expect(component.find('.title').first().text()).toEqual(capitalize(ticket.name));
       expect(component.find('.ctabtn').hostNodes().text()).toEqual('get tickets');
       component.find('.ctabtn').hostNodes().simulate('click');
-      console.log(">>> state", component.state());
+      if (DEBUG) console.log(">>> state", component.state());
     });
   })
 

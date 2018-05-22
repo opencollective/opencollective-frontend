@@ -82,7 +82,7 @@ export default class IntlDocument extends Document {
         <Head />
         <body>
           <Main />
-          {scripts.map((script) => <script type="text/javascript" src={script} />)}
+          {scripts.map((script) => <script key={script} type="text/javascript" src={script} />)}
           {/* TODO: use the official react-stripe-elements; this is ugly */}
           <script
             dangerouslySetInnerHTML={{
