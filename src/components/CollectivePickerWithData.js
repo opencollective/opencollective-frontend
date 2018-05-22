@@ -1,9 +1,11 @@
 import React from 'react';
+import Router from 'next/router';
 import PropTypes from 'prop-types';
 import gql from 'graphql-tag';
+import classNames from 'classnames';
 import Scrollchor from 'react-scrollchor';
 
-import { pick } from 'lodash';
+import { pick, omit } from 'lodash';
 import { graphql, compose } from 'react-apollo';
 import { FormattedMessage, defineMessages } from 'react-intl';
 import {
@@ -20,6 +22,11 @@ import Currency from '../components/Currency';
 import ConnectPaypal from '../components/ConnectPaypal';
 import Error from '../components/Error';
 import ExpensesStatsWithData from '../components/ExpensesStatsWithData';
+import { Link } from '../server/pages';
+
+
+/* Used to limit query and for building pagination links */
+const MAX_COLLECTIVES_IN_SIDEBAR = 50;
 
 
 class AddFundsFormContainer extends React.Component {
@@ -87,7 +94,7 @@ class AddFundsFormContainer extends React.Component {
 }
 
 
-class DropDown extends React.Component {
+class CollectiveSelector extends React.Component {
   static propTypes = {
     onChange: PropTypes.func,
     hostCollectiveSlug: PropTypes.string.isRequired,
@@ -123,10 +130,10 @@ class DropDown extends React.Component {
 
   filterCollectives = () => {
     /* Read both queries from Apollo */
-    const { collectiveFilter, data, organizations } = this.props;
-    if (!data && !organizations) return { error: 'No data returned by graphql' };
+    const { collectiveFilter, collectives, organizations } = this.props;
+    if (!collectives && !organizations) return { error: 'No data returned by graphql' };
     /* Read data from the query enabled in `collectiveFilter' */
-    const { loading, error, Collective } = (data || organizations);
+    const { loading, error, Collective } = (collectives || organizations);
     if (error || loading) return { error, loading };
     /* Unpacking the values is different for collectives and
        organizations */
@@ -167,13 +174,11 @@ class DropDown extends React.Component {
 
   canEdit = () => {
     const user = this.props.LoggedInUser;
-    /* console.log('CANEDIT', user, this.hostCollective);*/
     return user && user.canEditCollective(this.hostCollective);
   }
 
   renderSelectedCollective = () => {
-    const { name, slug, image, backgroundImage, stats: { expenses } } =
-      this.state.selectedCollective;
+    const { name, slug, type } = this.state.selectedCollective;
     return (
       <div style={{ width: '100%' }}>
         <style jsx>{`
@@ -191,9 +196,34 @@ class DropDown extends React.Component {
             <a className="addFundsLink" onClick={this.toggleAddFunds}>
               <FormattedMessage id="addfunds.submit" defaultMessage="Add Funds" /></a> }
 
-          <ExpensesStatsWithData slug={slug} />
+          { type === 'COLLECTIVE' && <ExpensesStatsWithData slug={slug} /> }
         </div>
       </div>
+    );
+  }
+
+  renderPagination = (total) => {
+    if (total === 0) return <div></div>;
+    const limit = MAX_COLLECTIVES_IN_SIDEBAR;
+    const offset = this.props.query.collectivesOffset || 0;
+    const collectiveQuery = this.props.query.collectivesQuery || null;
+    return (
+      <ul className="pagination">
+        { Array(Math.ceil(total / limit)).fill(1).map((n, i) => (
+          <li key={`pagination-link-${i * limit}`}
+              className={classNames({ active: (i * limit) === offset })}>
+            <Link href={{
+              query: {
+                ...this.props.query,
+                collectiveQuery,
+                collectivesOffset: i * limit,
+              }
+            }}>
+              <a>{`${n + i}`}</a>
+            </Link>
+          </li>
+        )) }
+      </ul>
     );
   }
 
@@ -241,21 +271,39 @@ class DropDown extends React.Component {
             <h1 className="title">
               <FormattedMessage
                 id="expenses.collectivePicker.listCollectivesTitle"
-                defaultMessage="You host {n} {n, plural, one {collective} other {collectives}}"
+                defaultMessage="{n} {n, plural, one {collective} other {collectives}} listed"
                 values={{n: result.total || 0}} />
             </h1>
 
             <ul className="filters">
               <li>
                 <label>
-                  <input type="radio" name="filterCollectives" />
-                  List all
+                  <input
+                    type="radio" name="filterCollectives" readOnly
+                    checked={ !this.props.query.collectivesQuery } />
+                  <Link href={{ query: omit(this.props.query, 'collectivesQuery', 'collectivesOffset') }}>
+                    <a>List all</a>
+                  </Link>
                 </label>
               </li>
               <li>
                 <label>
-                  <input type="radio" name="filterCollectives" />
-                  With pending expenses
+                  <input
+                    type="radio" name="filterCollectives" readOnly
+                    checked={ this.props.query.collectivesQuery === 'approved' } />
+                  <Link href={{ query: { ...omit(this.props.query, 'collectivesOffset'), collectivesQuery: 'approved' } }}>
+                    <a>With approved expenses</a>
+                  </Link>
+                </label>
+              </li>
+              <li>
+                <label>
+                  <input
+                    type="radio" name="filterCollectives" readOnly
+                    checked={ this.props.query.collectivesQuery === 'pending' } />
+                  <Link href={{ query: { ...omit(this.props.query, 'collectivesOffset'), collectivesQuery: 'pending' } }}>
+                    <a>With pending expenses</a>
+                  </Link>
                 </label>
               </li>
             </ul>
@@ -294,21 +342,7 @@ class DropDown extends React.Component {
                 );
             }) }
 
-
-            {/* <DropdownButton id="collectivePicker" bsStyle="default" title={selectedTitle} onSelect={this.onChange}> */}
-            {/* { this.props.CollectiveId &&
-                <MenuItem key={null} eventKey={null}>
-                <FormattedMessage id="expenses.allCollectives" defaultMessage="All Collectives" />
-                </MenuItem> }
-
-                { collectives && collectives.map(collective => (
-                <MenuItem key={ `collective-${collective.id}` }
-                eventKey={collective.id}
-                title={collective.name}>
-                { this.renderCollectiveMenuItem(collective) }
-                </MenuItem> )) } */}
-            {/* </DropdownButton> */}
-
+            { ::this.renderPagination(result.total) }
           </ul>
         </div>
       </div>);
@@ -325,7 +359,6 @@ class CollectivePickerWithData extends React.Component {
 
   constructor(props) {
     super(props);
-    console.log('query', props.query);
     this.state = {
       connectingPaypal: false,
       loading: false,
@@ -376,11 +409,12 @@ class CollectivePickerWithData extends React.Component {
                 </Button>
               </ButtonGroup>
             </div>
-
-            <DropDownWithData hostCollectiveSlug={this.props.hostCollectiveSlug}
-                              collectiveFilter={this.state.collectiveFilter}
-                              onChange={this.props.onChange}
-                              LoggedInUser={this.props.LoggedInUser} />
+            <CollectiveSelectorWithData
+              query={this.props.query}
+              hostCollectiveSlug={this.props.hostCollectiveSlug}
+              collectiveFilter={this.state.collectiveFilter}
+              onChange={this.props.onChange}
+              LoggedInUser={this.props.LoggedInUser} />
           </div>
           {/* <div className="right">
               { ::this.canEdit() && <ConnectPaypal collective={this.hostCollective} /> }
@@ -392,7 +426,7 @@ class CollectivePickerWithData extends React.Component {
 }
 
 const getCollectivesQuery = gql`
-query Collective($hostCollectiveSlug: String!, $orderBy: CollectiveOrderField, $orderDirection: OrderDirection, $limit: Int, $offset: Int) {
+query Collective($hostCollectiveSlug: String!, $orderBy: CollectiveOrderField, $orderDirection: OrderDirection, $limit: Int, $offset: Int, $expenseStatus: String) {
   Collective(slug: $hostCollectiveSlug) {
     id
     slug
@@ -405,14 +439,13 @@ query Collective($hostCollectiveSlug: String!, $orderBy: CollectiveOrderField, $
       balance
       currency
     }
-    collectives(orderBy: $orderBy, orderDirection: $orderDirection, limit: $limit, offset: $offset) {
+    collectives(orderBy: $orderBy, orderDirection: $orderDirection, limit: $limit, offset: $offset, expenseStatus: $expenseStatus) {
       total
       collectives {
         id
         slug
         name
-        image
-        backgroundImage
+        type
         currency
         hostFeePercent
         stats {
@@ -433,42 +466,22 @@ query Collective($hostCollectiveSlug: String!, $orderBy: CollectiveOrderField, $
 }
 `;
 
-const COLLECTIVES_PER_PAGE = 20;
-
 export const addCollectivesData = graphql(getCollectivesQuery, {
+  name: 'collectives',
   skip: props => props.collectiveFilter !== 'COLLECTIVES',
   options(props) {
     return {
       variables: {
         hostCollectiveSlug: props.hostCollectiveSlug,
-        offset: 0,
-        limit: props.limit || COLLECTIVES_PER_PAGE,
+        offset: props.query.collectivesOffset,
+        limit: props.query.collectivesLimit || MAX_COLLECTIVES_IN_SIDEBAR,
+        expenseStatus: props.query.collectivesQuery,
         includeHostedCollectives: true,
-        orderBy: 'name',
+        orderBy: 'slug',
         orderDirection: 'ASC',
       }
     }
   },
-  props: ({ data }) => ({
-    data,
-    fetchMore: () => {
-      return data.fetchMore({
-        variables: {
-          offset: data.allCollectives.length,
-          limit: COLLECTIVES_PER_PAGE
-        },
-        updateQuery: (previousResult, { fetchMoreResult }) => {
-          if (!fetchMoreResult) {
-            return previousResult
-          }
-          return Object.assign({}, previousResult, {
-            // Append the new posts results to the old one
-            /* allCollectives: [...previousResult.allCollectives, ...fetchMoreResult.allCollectives]*/
-          })
-        }
-      })
-    }
-  })
 });
 
 /* For listing all the Organizations */
@@ -477,8 +490,6 @@ query allCollectives($type: TypeOfCollective, $limit: Int, $offset: Int, $orderB
   allCollectives(type: $type, limit: $limit, offset: $offset, orderBy: $orderBy, orderDirection: $orderDirection) {
     id
     type
-    image
-    backgroundImage
     createdAt
     slug
     name
@@ -506,27 +517,9 @@ const addOrganizations = graphql(allCollectivesQuery, {
       orderBy: 'name',
       orderDirection: 'ASC',
       offset: 0,
-      limit: props.limit || COLLECTIVES_PER_PAGE * 2,
+      limit: null,
     }
   }),
-  props: ({ organizations }) => ({
-    organizations,
-    fetchMore: () => {
-      return organizations.fetchMore({
-        variables: {
-          offset: organizations.allCollectives.length,
-          limit: COLLECTIVES_PER_PAGE
-        },
-        updateQuery: (previousResult, { fetchMoreResult }) => {
-          if (!fetchMoreResult) return previousResult;
-          return Object.assign({}, previousResult, {
-            // Append the new posts results to the old one
-            /* allCollectives: [...previousResult.allCollectives, ...fetchMoreResult.allCollectives]*/
-          })
-        }
-      })
-    }
-  })
 });
 
 const createOrderQuery = gql`
@@ -554,6 +547,6 @@ const addMutation = graphql(createOrderQuery, {
 
 const queryCollectives = compose(addCollectivesData, addOrganizations);
 
-const DropDownWithData = queryCollectives(withIntl(DropDown));
+const CollectiveSelectorWithData = queryCollectives(withIntl(CollectiveSelector));
 
 export default addMutation(withIntl(CollectivePickerWithData));
