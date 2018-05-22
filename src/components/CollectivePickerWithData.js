@@ -11,7 +11,6 @@ import { FormattedMessage, defineMessages } from 'react-intl';
 import {
   Button,
   ButtonGroup,
-  DropdownButton,
   MenuItem,
   Badge,
 } from 'react-bootstrap';
@@ -27,6 +26,12 @@ import { Link } from '../server/pages';
 
 /* Used to limit query and for building pagination links */
 const MAX_COLLECTIVES_IN_SIDEBAR = 50;
+
+/* Helper for validating if logged in user can edit a collective */
+const canEdit = (props) => {
+  const { LoggedInUser, hostCollective } = props;
+  return LoggedInUser && LoggedInUser.canEditCollective(hostCollective);
+};
 
 
 class AddFundsFormContainer extends React.Component {
@@ -189,11 +194,6 @@ class CollectiveSelector extends React.Component {
     }
   }
 
-  canEdit = () => {
-    const user = this.props.LoggedInUser;
-    return user && user.canEditCollective(this.hostCollective);
-  }
-
   renderSelectedCollective = () => {
     const { name, slug, type } = this.state.selectedCollective;
     return (
@@ -209,7 +209,7 @@ class CollectiveSelector extends React.Component {
         <div className="selectedCollective" >
           <h1>{ name || slug }</h1>
 
-          { ::this.canEdit() &&
+          { canEdit(this.props) &&
             <a className="addFundsLink" onClick={this.props.toggleAddFunds}>
               <FormattedMessage id="addfunds.submit" defaultMessage="Add Funds" /></a> }
 
@@ -372,6 +372,7 @@ class CollectivePickerWithData extends React.Component {
     onChange: PropTypes.func,
     toggleAddFunds: PropTypes.func,
     hostCollectiveSlug: PropTypes.string.isRequired,
+    hostCollective: PropTypes.object.isRequired,
     query: PropTypes.object.isRequired,
   }
 
@@ -387,11 +388,6 @@ class CollectivePickerWithData extends React.Component {
     };
   }
 
-  canEdit = () => {
-    const { LoggedInUser } = this.props;
-    return LoggedInUser && LoggedInUser.canEditCollective(this.hostCollective);
-  }
-
   toggleOrgFilter = () => {
     const collectiveFilter = this.state.collectiveFilter === 'COLLECTIVES'
       ? 'ORGANIZATIONS' : 'COLLECTIVES';
@@ -402,38 +398,38 @@ class CollectivePickerWithData extends React.Component {
     return (
       <div id="collective" className="CollectivesContainer">
         <style jsx>{`
-          .CollectivesContainer { background: #ccc; padding: 0; }
-          .CollectivesContainer .filter { text-align: center; padding: 10px; }
+          .CollectivesContainer { padding: 0; }
+          .CollectivesContainer .filter { background: #ccc; text-align: center; padding: 10px; }
           .CollectivesContainer .filterBtnGroup { width: 100%; }
           .CollectivesContainer .filterButton { width: auto; }
+          .CollectivesContainer .paypalContainer { padding: 10px; }
         `}</style>
         <div className="submenu">
-          <div>
-            <div className="filter">
-              <ButtonGroup className="filterBtnGroup">
-                <Button className="filterButton collectives" bsSize="small"
-                        bsStyle={ this.state.collectiveFilter === 'COLLECTIVES' ? 'primary' : 'default'}
-                        onClick={ () => ::this.toggleOrgFilter() } >
-                  <FormattedMessage id="host.expenses.collectivePicker.collectives" defaultMessage="Collectives" />
-                </Button>
-                <Button className="filterButton organizations" bsSize="small"
-                        bsStyle={ this.state.collectiveFilter === 'ORGANIZATIONS' ? 'primary' : 'default'}
-                        onClick={ () => ::this.toggleOrgFilter() } >
-                  <FormattedMessage id="host.expenses.collectivePicker.organizations" defaultMessage="Organizations" />
-                </Button>
-              </ButtonGroup>
-            </div>
-            <CollectiveSelectorWithData
-              query={this.props.query}
-              hostCollectiveSlug={this.props.hostCollectiveSlug}
-              collectiveFilter={this.state.collectiveFilter}
-              onChange={this.props.onChange}
-              toggleAddFunds={this.props.toggleAddFunds}
-              LoggedInUser={this.props.LoggedInUser} />
+          <div className="paypalContainer">
+            { canEdit(this.props) && <ConnectPaypal collective={this.props.hostCollective} /> }
           </div>
-          {/* <div className="right">
-              { ::this.canEdit() && <ConnectPaypal collective={this.hostCollective} /> }
-              </div> */}
+
+          <div className="filter">
+            <ButtonGroup className="filterBtnGroup">
+              <Button className="filterButton collectives" bsSize="small"
+                      bsStyle={ this.state.collectiveFilter === 'COLLECTIVES' ? 'primary' : 'default'}
+                      onClick={ () => ::this.toggleOrgFilter() } >
+                <FormattedMessage id="host.expenses.collectivePicker.collectives" defaultMessage="Collectives" />
+              </Button>
+              <Button className="filterButton organizations" bsSize="small"
+                      bsStyle={ this.state.collectiveFilter === 'ORGANIZATIONS' ? 'primary' : 'default'}
+                      onClick={ () => ::this.toggleOrgFilter() } >
+                <FormattedMessage id="host.expenses.collectivePicker.organizations" defaultMessage="Organizations" />
+              </Button>
+            </ButtonGroup>
+          </div>
+          <CollectiveSelectorWithData
+            query={this.props.query}
+            hostCollectiveSlug={this.props.hostCollectiveSlug}
+            collectiveFilter={this.state.collectiveFilter}
+            onChange={this.props.onChange}
+            toggleAddFunds={this.props.toggleAddFunds}
+            LoggedInUser={this.props.LoggedInUser} />
         </div>
       </div>
     );
