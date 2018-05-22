@@ -33,7 +33,7 @@ class HostExpensesPage extends React.Component {
     this.setState({ LoggedInUser });
   }
 
-  pickCollective(selectedCollective) {
+  pickCollective = (selectedCollective) => {
     this.setState({ selectedCollective });
   }
 
@@ -107,7 +107,7 @@ class HostExpensesPage extends React.Component {
                 query={this.props.query}
                 hostCollectiveSlug={this.props.collectiveSlug}
                 LoggedInUser={LoggedInUser}
-                onChange={(selectedCollective => this.pickCollective(selectedCollective))} />
+                onChange={this.pickCollective} />
             </div>
             <div className="col large pullLeft">
               <h1 style={{ margin: '0 0 20px 0' }}>
