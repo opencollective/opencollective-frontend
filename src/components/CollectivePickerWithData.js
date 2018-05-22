@@ -31,16 +31,26 @@ const MAX_COLLECTIVES_IN_SIDEBAR = 50;
 
 class AddFundsFormContainer extends React.Component {
 
+  static propTypes = {
+    hostCollective: PropTypes.object.isRequired,
+    selectedCollective: PropTypes.object.isRequired,
+    LoggedInUser: PropTypes.object.isRequired,
+    toggleAddFunds: PropTypes.func.isRequired,
+  }
+
+  constructor (props) {
+    super(props);
+    this.state = { loading: false };
+  }
+
   addFunds = async form => {
     if (form.totalAmount === 0) {
       return console.error("Total amount must be > 0");
     }
     this.setState({ loading: true });
-    const hostCollective = this.hostCollective;
+    const { selectedCollective, hostCollective } = this.props;
     const order = pick(form, ['totalAmount', 'description', 'hostFeePercent', 'platformFeePercent']);
-    order.collective = {
-      id: this.props.CollectiveId
-    };
+    order.collective = { id: selectedCollective.id };
     if (form.email) {
       order.user = {
         email: form.email,
@@ -56,6 +66,12 @@ class AddFundsFormContainer extends React.Component {
         id: form.FromCollectiveId || hostCollective.id
       }
     }
+
+    if (!hostCollective.paymentMethods) {
+      this.setState({ error: "This host doesn't have a payment method", loading: false });
+      return console.error(">>> no payment methods: ", hostCollective.paymentMethods);
+    }
+
     const pm = hostCollective.paymentMethods.find(pm => pm.service === 'opencollective');
     if (!pm) {
       this.setState({ error: "This host doesn't have an opencollective payment method", loading: false });
@@ -67,10 +83,12 @@ class AddFundsFormContainer extends React.Component {
     console.log(">>> add funds order: ", order);
     try {
       await this.props.createOrder(order);
-      this.setState({ showAddFunds: false, loading: false });
+      this.props.toggleAddFunds();
     } catch (e) {
       const error = e.message && e.message.replace(/GraphQL error:/, "");
-      this.setState({ error, loading: false });
+      this.setState({ error });
+    } finally {
+      this.setState({ loading: false });
     }
   }
 
@@ -78,10 +96,10 @@ class AddFundsFormContainer extends React.Component {
     return (
       <div>
         <AddFundsForm
-          collective={selectedCollective}
-          host={this.hostCollective}
+          collective={this.props.selectedCollective}
+          host={this.props.hostCollective}
           onSubmit={this.addFunds}
-          onCancel={this.toggleAddFunds}
+          onCancel={this.props.toggleAddFunds}
           loading={this.state.loading}
           LoggedInUser={this.props.LoggedInUser}
         />
@@ -100,6 +118,7 @@ class CollectiveSelector extends React.Component {
     hostCollectiveSlug: PropTypes.string.isRequired,
     collectiveFilter: PropTypes.string.isRequired,
     LoggedInUser: PropTypes.object.isRequired,
+    toggleAddFunds: PropTypes.func.isRequired,
   }
 
   constructor(props) {
@@ -110,8 +129,6 @@ class CollectiveSelector extends React.Component {
       CollectiveId: -1,
       /* Filled in by onChange */
       selectedCollective: null,
-      /* We don't show it up until the user selects a collective */
-      showAddFundsForm: false,
     };
 
     /* Filled in by filterCollectives(). It's not in state because it
@@ -192,8 +209,8 @@ class CollectiveSelector extends React.Component {
         <div className="selectedCollective" >
           <h1>{ name || slug }</h1>
 
-          { !this.state.showAddFundsForm && ::this.canEdit() &&
-            <a className="addFundsLink" onClick={this.toggleAddFunds}>
+          { ::this.canEdit() &&
+            <a className="addFundsLink" onClick={this.props.toggleAddFunds}>
               <FormattedMessage id="addfunds.submit" defaultMessage="Add Funds" /></a> }
 
           { type === 'COLLECTIVE' && <ExpensesStatsWithData slug={slug} /> }
@@ -353,6 +370,7 @@ class CollectivePickerWithData extends React.Component {
 
   static propTypes = {
     onChange: PropTypes.func,
+    toggleAddFunds: PropTypes.func,
     hostCollectiveSlug: PropTypes.string.isRequired,
     query: PropTypes.object.isRequired,
   }
@@ -372,10 +390,6 @@ class CollectivePickerWithData extends React.Component {
   canEdit = () => {
     const { LoggedInUser } = this.props;
     return LoggedInUser && LoggedInUser.canEditCollective(this.hostCollective);
-  }
-
-  toggleAddFunds() {
-    this.setState({ showAddFunds: !this.state.showAddFunds });
   }
 
   toggleOrgFilter = () => {
@@ -414,6 +428,7 @@ class CollectivePickerWithData extends React.Component {
               hostCollectiveSlug={this.props.hostCollectiveSlug}
               collectiveFilter={this.state.collectiveFilter}
               onChange={this.props.onChange}
+              toggleAddFunds={this.props.toggleAddFunds}
               LoggedInUser={this.props.LoggedInUser} />
           </div>
           {/* <div className="right">
@@ -540,13 +555,15 @@ mutation createOrder($order: OrderInputType!) {
 const addMutation = graphql(createOrderQuery, {
   props: ({ mutate }) => ({
     createOrder: async (order) => {
-      return await mutate({ variables: { order } })
+      return await mutate({ variables: { order } });
     }
   })
 });
+
+export const AddFundsFormWithData = addMutation(withIntl(AddFundsFormContainer));
 
 const queryCollectives = compose(addCollectivesData, addOrganizations);
 
 const CollectiveSelectorWithData = queryCollectives(withIntl(CollectiveSelector));
 
-export default addMutation(withIntl(CollectivePickerWithData));
+export default withIntl(CollectivePickerWithData);
