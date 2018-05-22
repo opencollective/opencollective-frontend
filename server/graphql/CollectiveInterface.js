@@ -56,6 +56,9 @@ export const CollectiveOrderFieldType = new GraphQLEnumType({
     name: {
       description: 'Order collectives by name.',
     },
+    slug: {
+      description: 'Order collectives by slug.',
+    },
     updatedAt: {
       description: 'Order collectives by updated time.',
     },
