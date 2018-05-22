@@ -111,24 +111,22 @@ export function createCollective(_, args, req) {
           collectiveData.currency = 'GBP';
           args.collective.HostCollectiveId = 9806; // Open Collective UK Host
         }
-      } else {
-        args.collective.HostCollectiveId = 8674; // Open Collective Inc. Host
       }
       collectiveData.tags.push("Tech meetups");
+      promises.push(
+        req.loaders
+          .collective.findById.load(args.collective.HostCollectiveId)
+          .then(hc => {
+            if (!hc) return Promise.reject(new Error(`Host collective with id ${args.collective.HostCollectiveId} not found`));
+            hostCollective = hc;
+            collectiveData.currency = collectiveData.currency || hc.currency;
+            collectiveData.hostFeePercent = hc.hostFeePercent;
+            if (req.remoteUser.hasRole([roles.ADMIN, roles.HOST], hostCollective.id)) {
+              collectiveData.isActive = true;
+            }
+          })
+      );
     }
-    promises.push(
-      req.loaders
-        .collective.findById.load(args.collective.HostCollectiveId)
-        .then(hc => {
-          if (!hc) return Promise.reject(new Error(`Host collective with id ${args.collective.HostCollectiveId} not found`));
-          hostCollective = hc;
-          collectiveData.currency = collectiveData.currency || hc.currency;
-          collectiveData.hostFeePercent = hc.hostFeePercent;
-          if (req.remoteUser.hasRole([roles.ADMIN, roles.HOST], hostCollective.id)) {
-            collectiveData.isActive = true;
-          }
-        })
-    );
   }
   if (args.collective.ParentCollectiveId) {
     promises.push(
