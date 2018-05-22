@@ -112,6 +112,7 @@ class HostExpensesPage extends React.Component {
               <CollectivePicker
                 query={this.props.query}
                 hostCollectiveSlug={this.props.collectiveSlug}
+                hostCollective={collective}
                 LoggedInUser={LoggedInUser}
                 onChange={this.pickCollective}
                 toggleAddFunds={this.toggleAddFunds} />
