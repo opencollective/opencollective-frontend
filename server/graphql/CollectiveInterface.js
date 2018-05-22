@@ -474,7 +474,7 @@ export const CollectiveInterfaceType = new GraphQLInterfaceType({
         }
       },
       collectives: {
-        type: new GraphQLList(CollectiveInterfaceType),
+        type: CollectiveSearchResultsType,
         description: "List of all collectives hosted by this collective",
         args: {
           orderBy: { defaultValue: 'name', type: CollectiveOrderFieldType },
@@ -822,19 +822,27 @@ const CollectiveFields = () => {
       }
     },
     collectives: {
-      type: new GraphQLList(CollectiveInterfaceType),
+      type: CollectiveSearchResultsType,
       args: {
         orderBy: { defaultValue: 'name', type: CollectiveOrderFieldType },
         orderDirection: { defaultValue: 'ASC', type: OrderDirectionType },
         limit: { type: GraphQLInt },
         offset: { type: GraphQLInt }
       },
-      resolve(collective, args) {
-        return models.Collective.findAll({
+      async resolve(collective, args) {
+        const query = {
           where: { HostCollectiveId: collective.id, type: types.COLLECTIVE },
           order: [ [ args.orderBy, args.orderDirection ] ],
-          limit: args.limit, offset: args.offset
-        })
+          limit: args.limit, offset: args.offset,
+        };
+        const result = await models.Collective.findAndCountAll(query);
+        const { count, rows } = result;
+        return {
+          total: count,
+          collectives: rows,
+          limit: args.limitg,
+          offset: args.offset,
+        };
       }
     },
     followers: {
