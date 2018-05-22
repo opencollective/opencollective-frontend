@@ -8,9 +8,7 @@ import { IntlProvider, addLocaleData } from 'react-intl';
 import en from 'react-intl/locale-data/en';
 addLocaleData([...en]);
 
-import Enzyme, { mount } from 'enzyme';
-import Adapter from 'enzyme-adapter-react-16';
-Enzyme.configure({ adapter: new Adapter() });
+import { mount } from 'enzyme';
 
 const getStripeToken = sinon.stub(stripe, 'getStripeToken').callsFake(() => {
   return {

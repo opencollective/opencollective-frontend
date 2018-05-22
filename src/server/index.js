@@ -1,6 +1,7 @@
 import dotenv from 'dotenv';
 dotenv.config();
 import 'newrelic';
+import http from 'http';
 import express from 'express';
 import next from 'next';
 import routes from './routes';
@@ -8,7 +9,6 @@ import { loggerMiddleware, logger } from './logger';
 import accepts from 'accepts';
 import { getLocaleDataScript, getMessages, languages } from './intl';
 
-const DEBUG = process.env.DEBUG || false;
 const env = process.env.NODE_ENV || "development";
 const dev = (env === 'development');
 const server = express();
@@ -22,16 +22,10 @@ app.prepare()
 
   server.use(loggerMiddleware.logger);
 
-  // allow the frontend to log errors to papertrail
-  server.get('/log/:type', (req, res) => {
-    logger[req.params.type](req.query.message);
-    res.send('ok');
-  });
-
   server.use((req, res, next) => {
     const accept = accepts(req)
     const locale = accept.language(languages)  || 'en';
-    if (DEBUG) console.log(">>> url", req.url, "locale", locale);
+    logger.debug("url %s locale %s", req.url, locale);
     req.locale = locale;
     req.localeDataScript = getLocaleDataScript(locale)
     req.messages = getMessages(locale)
@@ -41,11 +35,15 @@ app.prepare()
 
   server.use(routes(server, app));
   server.use(loggerMiddleware.errorLogger);
-  server.listen(port, (err) => {
-    if (err) {
-      logger.error(">> Error when starting server", err);
-      throw err
-    }
-    logger.info(`>> Ready on http://localhost:${port} in ${env} environment`);
+
+  const httpServer = http.createServer(server);
+
+  httpServer.on('error', err => {
+    logger.error(`Can't start server on http://localhost:${port} in ${env} environment. %s`, err);
   })
-})
+
+  httpServer.listen(port, () => {
+    logger.info(`Ready on http://localhost:${port} in ${env} environment`);
+  });
+
+});

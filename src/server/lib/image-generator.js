@@ -5,10 +5,11 @@ import crypto from 'crypto';
 import svg_to_png from 'svg-to-png';
 import cachedRequestLib from 'cached-request';
 import request from 'request';
-import { getCloudinaryUrl } from '../lib/utils';
 import imageToAscii from 'image-to-ascii';
 
-const DEBUG = process.env.DEBUG || false;
+import { getCloudinaryUrl } from './utils';
+import { logger } from '../logger';
+
 const WEBSITE_URL = process.env.WEBSITE_URL || "https://opencollective.com";
 
 const cachedRequest = cachedRequestLib(request);
@@ -75,7 +76,7 @@ export function svg2png(svg) {
 
 
 export function generateSVGBannerForUsers(users, options) {
-  if (DEBUG) console.log(">>> generateSVGBannerForUsers", users.length, "users, options: ", options);
+  logger.debug(">>> generateSVGBannerForUsers %d users, options: %j", users.length, options);
 
   const {
     style, limit, collectiveSlug
@@ -153,7 +154,7 @@ export function generateSVGBannerForUsers(users, options) {
           avatarWidth = Math.round(dimensions.width / dimensions.height * avatarHeight);
         } catch (e) {
           // Otherwise, we skip it
-          console.error(`Cannot get the dimensions of the avatar of ${user.slug}`, user.image);
+          logger.warn(`Cannot get the dimensions of the avatar of %s.`, user.slug, { image: user.image });
           continue;
         }
 
@@ -173,6 +174,6 @@ export function generateSVGBannerForUsers(users, options) {
       </svg>`;
     })
     .catch(e => {
-      console.error(">>> error in image-generator:generateSVGBannerForUsers:", e);
+      logger.error(">>> Error in image-generator:generateSVGBannerForUsers", e);
     })
   }

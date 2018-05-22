@@ -749,8 +749,15 @@ class OrderForm extends React.Component {
                           <FormattedMessage id="tier.order.ticket.info" defaultMessage="Event info" />
                         </label>
                         <Col sm={10}>
-                          <FormattedDate value={collective.startsAt} weekday="short" day="numeric" month="long" />, &nbsp;
-                          <FormattedTime value={collective.startsAt} timeZone={collective.timezone} />&nbsp; - &nbsp;
+                          {!collective.startsAt &&
+                            console.warn(`OrderForm: collective.startsAt should not be empty. collective.id: ${collective.id}`)
+                          }
+                          {collective.startsAt &&
+                            <React.Fragment>
+                              <FormattedDate value={collective.startsAt} weekday="short" day="numeric" month="long" />, &nbsp;
+                              <FormattedTime value={collective.startsAt} timeZone={collective.timezone} />&nbsp; - &nbsp;
+                            </React.Fragment>
+                          }
                           { get(collective, 'location.name') }
                         </Col>
                       </div>

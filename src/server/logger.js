@@ -1,48 +1,41 @@
 import winston from 'winston';
-import expressWinston from 'winston-express-middleware';
-require('winston-papertrail').Papertrail;
+import expressWinston from 'express-winston';
 
-const winstonConsole = new winston.transports.Console({
-  json: false,
-  colorize: true
-});
-
-const winstonPapertrail = new winston.transports.Papertrail({
-	host: 'logs5.papertrailapp.com',
-	port: 35586
-});
-
-const transports = [winstonConsole];
-if (process.env.NODE_ENV === 'production') {
-  transports.push(winstonPapertrail);
+function getLogLevel() {
+  if (process.env.DEBUG) {
+    return 'debug';
+  } else if (process.env.NODE_ENV === 'test' || process.env.NODE_ENV === 'circleci') {
+    return 'warn';
+  } else {
+    return 'info';
+  }
 }
 
-winstonPapertrail.on('error', () => {
-  // Handle, report, or silently ignore connection errors and failures
-  if (process.env.NODE_ENV === 'production') {
-    console.error("Coulnd't connect to papertrail");
-  }
+const logger = new winston.createLogger();
+
+const winstonConsole = new winston.transports.Console({
+  level: getLogLevel(),
+  format: winston.format.combine(
+    winston.format.colorize(),
+    winston.format.splat(),
+    winston.format.simple()
+  )
 });
 
-winston.handleExceptions(transports);
-
-const logger = new winston.Logger( { transports } );
+logger.add(winstonConsole)
+logger.exceptions.handle(winstonConsole);
 
 const loggerMiddleware = {
   logger: expressWinston.logger({
-      transports,
-      meta: false, // optional: control whether you want to log the meta data about the request (default to true)
-      msg: "HTTP {{req.method}} {{req.url}}", // optional: customize the default logging message. E.g. "{{res.statusCode}} {{req.method}} {{res.responseTime}}ms {{req.url}}"
-      expressFormat: true, // Use the default Express/morgan request formatting, with the same colors. Enabling this will override any msg and colorStatus if true. Will only output colors on transports with colorize set to true
-      colorStatus: true, // Color the status code, using the Express/morgan color palette (default green, 3XX cyan, 4XX yellow, 5XX red). Will not be recognized if expressFormat is true
-      ignoreRoute: (req) => {
-         // optional: allows to skip some log messages based on request and/or response
-        if (req.url.match(/^\/_/)) return true;
-        if (req.url.match(/^\/log\//)) return true;
-        return false;
-      }
-    }),
-    errorLogger: expressWinston.errorLogger( { transports } )
+    winstonInstance: logger,
+    meta: false,
+    colorize: true,
+    expressFormat: true,
+    ignoreRoute: req => req.url.match(/^\/_/)
+  }),
+  errorLogger: expressWinston.errorLogger({
+    winstonInstance: logger
+  })
 }
 
 module.exports = { logger, loggerMiddleware };
