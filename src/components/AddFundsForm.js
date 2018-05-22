@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import InputField from '../components/InputField';
-import AddFundsSourcePicker from '../components/AddFundsSourcePicker';
+import InputField from './InputField';
+import AddFundsSourcePicker from './AddFundsSourcePicker';
 import { Button, Row, Col, Form } from 'react-bootstrap';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import withIntl from '../lib/withIntl';

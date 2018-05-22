@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import withIntl from '../lib/withIntl';
-import Currency from '../components/Currency';
-import SmallButton from '../components/SmallButton';
+import Currency from './Currency';
+import SmallButton from './SmallButton';
 import { FormattedMessage } from 'react-intl';
 import { connectAccount } from '../lib/api';
 

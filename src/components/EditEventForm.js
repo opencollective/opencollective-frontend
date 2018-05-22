@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Button from '../components/Button';
-import InputField from '../components/InputField';
-import EditTiers from '../components/EditTiers';
+import Button from './Button';
+import InputField from './InputField';
+import EditTiers from './EditTiers';
 import { defineMessages, injectIntl } from 'react-intl';
 
 class EditEventForm extends React.Component {

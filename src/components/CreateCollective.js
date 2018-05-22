@@ -1,14 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import withIntl from '../lib/withIntl';
-import Header from '../components/Header';
-import Body from '../components/Body';
-import Footer from '../components/Footer';
+import Header from './Header';
+import Body from './Body';
+import Footer from './Footer';
 import { addCreateCollectiveMutation } from '../graphql/mutations';
-import CreateCollectiveForm from '../components/CreateCollectiveForm';
-import CollectiveCover from '../components/CollectiveCover';
-import Loading from '../components/Loading';
-import SignInForm from '../components/SignInForm';
+import CreateCollectiveForm from './CreateCollectiveForm';
+import CollectiveCover from './CollectiveCover';
+import Loading from './Loading';
+import SignInForm from './SignInForm';
 import { get } from 'lodash';
 import { FormattedMessage, defineMessages } from 'react-intl';
 

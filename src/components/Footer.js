@@ -1,5 +1,5 @@
 import React from 'react';
-import Link from '../components/Link';
+import Link from './Link';
 
 class Footer extends React.Component {
 

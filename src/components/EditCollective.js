@@ -1,11 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Header from '../components/Header';
-import Body from '../components/Body';
-import Footer from '../components/Footer';
-import SignInForm from '../components/SignInForm';
-import EditCollectiveForm from '../components/EditCollectiveForm';
-import CollectiveCover from '../components/CollectiveCover';
+import Header from './Header';
+import Body from './Body';
+import Footer from './Footer';
+import SignInForm from './SignInForm';
+import EditCollectiveForm from './EditCollectiveForm';
+import CollectiveCover from './CollectiveCover';
 import { addEditCollectiveMutation, addDeleteCollectiveMutation } from '../graphql/mutations';
 import { defaultBackgroundImage } from '../constants/collectives';
 import { getStripeToken } from '../lib/stripe';
