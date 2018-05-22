@@ -74,15 +74,15 @@ class MembersWithData extends React.Component {
       return (<div />)
     }
 
-    // need to sort by totalDonations and then date
-    // browsers (chrome vs. firefox) appear to handle "0" return cases differently
+    // sort by totalDonations, then createdAt date, then alphabetically
+    // it's important to have a consistent sorting across environments and browsers
     members.sort((a, b) => {
       if (b.stats.totalDonations !== a.stats.totalDonations) {
         return b.stats.totalDonations - a.stats.totalDonations;
+      } else if (a.createdAt !== b.createdAt) {
+        return new Date(a.createdAt) - new Date(b.createdAt);
       } else {
-        const aDate = new Date(a.createdAt);
-        const bDate = new Date(b.createdAt);
-        return bDate - aDate;
+        return a.collective.name.localeCompare(b.collective.name);
       }
     });
 
