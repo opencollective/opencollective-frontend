@@ -1,5 +1,4 @@
 import React from 'react';
-import Router from 'next/router';
 import PropTypes from 'prop-types';
 import gql from 'graphql-tag';
 import classNames from 'classnames';
@@ -11,7 +10,6 @@ import { FormattedMessage, defineMessages } from 'react-intl';
 import {
   Button,
   ButtonGroup,
-  MenuItem,
   Badge,
 } from 'react-bootstrap';
 
@@ -33,7 +31,7 @@ const canEdit = (props) => {
   return LoggedInUser && LoggedInUser.canEditCollective(hostCollective);
 };
 
-
+/* Class that adds the createOrder mutation to AddFundsForm */
 class AddFundsFormContainer extends React.Component {
 
   static propTypes = {
@@ -107,7 +105,7 @@ class AddFundsFormContainer extends React.Component {
           onCancel={this.props.toggleAddFunds}
           loading={this.state.loading}
           LoggedInUser={this.props.LoggedInUser}
-        />
+          />
         <div className="results">
           <div className="error">{this.state.error}</div>
         </div>
@@ -160,7 +158,7 @@ class CollectiveSelector extends React.Component {
     /* Unpacking the values is different for collectives and
        organizations */
     switch (collectiveFilter) {
-      case 'COLLECTIVES':
+      case 'COLLECTIVES': {
         /* Other placess need this this value and since this function
            can be called from render(), the value is being shovelled
            within an instance slot instead of the state.
@@ -174,6 +172,7 @@ class CollectiveSelector extends React.Component {
           state.result = state.hostCollective.collectives;
         }
         return state;
+      }
       case 'ORGANIZATIONS':
         return {
           hostCollective: this.hostCollective,
@@ -205,13 +204,15 @@ class CollectiveSelector extends React.Component {
         .selectedCollective ul { list-style: none; padding: 0; }
         .selectedCollective li { margin: 0; padding: 0 10px; }
         .selectedCollective li label { margin: 0; padding: 0; }
-        `}</style>
+        `}
+        </style>
         <div className="selectedCollective" >
           <h1>{ name || slug }</h1>
 
           { canEdit(this.props) &&
             <a className="addFundsLink" onClick={this.props.toggleAddFunds}>
-              <FormattedMessage id="addfunds.submit" defaultMessage="Add Funds" /></a> }
+              <FormattedMessage id="addfunds.submit" defaultMessage="Add Funds" />
+            </a> }
 
           { type === 'COLLECTIVE' && <ExpensesStatsWithData slug={slug} /> }
         </div>
@@ -227,15 +228,17 @@ class CollectiveSelector extends React.Component {
     return (
       <ul className="pagination">
         { Array(Math.ceil(total / limit)).fill(1).map((n, i) => (
-          <li key={`pagination-link-${i * limit}`}
-              className={classNames({ active: (i * limit) === offset })}>
-            <Link href={{
-              query: {
+          <li
+            key={`pagination-link-${i * limit}`}
+            className={classNames({ active: (i * limit) === offset })}
+            >
+            <Link
+              href={{ query: {
                 ...this.props.query,
                 collectiveQuery,
-                collectivesOffset: i * limit,
-              }
-            }}>
+                collectivesOffset: i * limit
+              }}}
+              >
               <a>{`${n + i}`}</a>
             </Link>
           </li>
@@ -245,8 +248,8 @@ class CollectiveSelector extends React.Component {
   }
 
   render() {
-    const { intl, collectiveFilter } = this.props;
-    const { loading, error, hostCollective, result } = this.filterCollectives();
+    const { intl } = this.props;
+    const { loading, error, result } = this.filterCollectives();
     const collectives = result && result.collectives;
 
     if (error) {
@@ -254,13 +257,13 @@ class CollectiveSelector extends React.Component {
       return (<Error message="GraphQL error" />)
     }
 
-    if (loading) return <div><h1>Loading...</h1><br/><br/></div>;
+    if (loading) return <div><h1>Loading...</h1><br /><br /></div>;
 
     return (
       <div>
         <style jsx>{`
         /* Container */
-        .collectivesColumn { background: #f1f3f4; padding: 10px; }
+        .collectivesColumn { background: #f1f3f4; padding: 10px; border-top: solid 2px #999 }
 
         /* Title */
         .collectivesColumn h1 { margin: 0 0 20px 0; text-align: left; }
@@ -277,7 +280,8 @@ class CollectiveSelector extends React.Component {
         .collectivesColumn ul.colectives li a:link { color: #333; }
         .collectivesColumn .balance { font-size: 12px; color: gray; }
         .collectivesColumn .balance label { margin-right: 4px; }
-        `}</style>
+        `}
+        </style>
         <div className="collectivesColumn">
 
           <div id="selectedCollectiveContainer">
@@ -289,7 +293,8 @@ class CollectiveSelector extends React.Component {
               <FormattedMessage
                 id="expenses.collectivePicker.listCollectivesTitle"
                 defaultMessage="{n} {n, plural, one {collective} other {collectives}} listed"
-                values={{n: result.total || 0}} />
+                values={{n: result.total || 0}}
+                />
             </h1>
 
             <ul className="filters">
@@ -297,7 +302,8 @@ class CollectiveSelector extends React.Component {
                 <label>
                   <input
                     type="radio" name="filterCollectives" readOnly
-                    checked={ !this.props.query.collectivesQuery } />
+                    checked={!this.props.query.collectivesQuery}
+                    />
                   <Link href={{ query: omit(this.props.query, 'collectivesQuery', 'collectivesOffset') }}>
                     <a>List all</a>
                   </Link>
@@ -307,7 +313,8 @@ class CollectiveSelector extends React.Component {
                 <label>
                   <input
                     type="radio" name="filterCollectives" readOnly
-                    checked={ this.props.query.collectivesQuery === 'approved' } />
+                    checked={this.props.query.collectivesQuery === 'approved'}
+                    />
                   <Link href={{ query: { ...omit(this.props.query, 'collectivesOffset'), collectivesQuery: 'approved' } }}>
                     <a>With approved expenses</a>
                   </Link>
@@ -317,7 +324,8 @@ class CollectiveSelector extends React.Component {
                 <label>
                   <input
                     type="radio" name="filterCollectives" readOnly
-                    checked={ this.props.query.collectivesQuery === 'pending' } />
+                    checked={this.props.query.collectivesQuery === 'pending'}
+                    />
                   <Link href={{ query: { ...omit(this.props.query, 'collectivesOffset'), collectivesQuery: 'pending' } }}>
                     <a>With pending expenses</a>
                   </Link>
@@ -344,11 +352,15 @@ class CollectiveSelector extends React.Component {
                 const tooltip = tooltipArray.join(', ') || '';
 
                 return (
-                  <li key={ `collective-${collective.id}` } onClick={(e) => this.onChange (collective.id)}>
+                  <li
+                    title={tooltip}
+                    key={`collective-${collective.id}`}
+                    onClick={() => this.onChange(collective.id)}
+                    >
                     <Scrollchor to="collective" animate={{ duration: 200 }} className="nav-link">
                       { badgeCount > 0 && <Badge pullRight={true}>{badgeCount}</Badge> }
                       <div className="NameBalance">
-                        <div className="collectiveName">{ collective.name || collective.slug }</div>
+                        <div className="collectiveName">{collective.name || collective.slug}</div>
                         <div className="balance">
                           <label><FormattedMessage id="expenses.balance.label" defaultMessage="balance:" /></label>
                           <Currency value={collective.stats.balance} currency={collective.currency} />
@@ -362,7 +374,8 @@ class CollectiveSelector extends React.Component {
             { ::this.renderPagination(result.total) }
           </ul>
         </div>
-      </div>);
+      </div>
+    );
   }
 }
 
@@ -403,7 +416,8 @@ class CollectivePickerWithData extends React.Component {
           .CollectivesContainer .filterBtnGroup { width: 100%; }
           .CollectivesContainer .filterButton { width: auto; }
           .CollectivesContainer .paypalContainer { padding: 10px; }
-        `}</style>
+        `}
+        </style>
         <div className="submenu">
           <div className="paypalContainer">
             { canEdit(this.props) && <ConnectPaypal collective={this.props.hostCollective} /> }
@@ -411,25 +425,31 @@ class CollectivePickerWithData extends React.Component {
 
           <div className="filter">
             <ButtonGroup className="filterBtnGroup">
-              <Button className="filterButton collectives" bsSize="small"
-                      bsStyle={ this.state.collectiveFilter === 'COLLECTIVES' ? 'primary' : 'default'}
-                      onClick={ () => ::this.toggleOrgFilter() } >
+              <Button
+                className="filterButton collectives" bsSize="small"
+                bsStyle={this.state.collectiveFilter === 'COLLECTIVES' ? 'primary' : 'default'}
+                onClick={() => ::this.toggleOrgFilter()}
+                >
                 <FormattedMessage id="host.expenses.collectivePicker.collectives" defaultMessage="Collectives" />
               </Button>
-              <Button className="filterButton organizations" bsSize="small"
-                      bsStyle={ this.state.collectiveFilter === 'ORGANIZATIONS' ? 'primary' : 'default'}
-                      onClick={ () => ::this.toggleOrgFilter() } >
+              <Button
+                className="filterButton organizations" bsSize="small"
+                bsStyle={this.state.collectiveFilter === 'ORGANIZATIONS' ? 'primary' : 'default'}
+                onClick={() => ::this.toggleOrgFilter()}
+                >
                 <FormattedMessage id="host.expenses.collectivePicker.organizations" defaultMessage="Organizations" />
               </Button>
             </ButtonGroup>
           </div>
+
           <CollectiveSelectorWithData
             query={this.props.query}
             hostCollectiveSlug={this.props.hostCollectiveSlug}
             collectiveFilter={this.state.collectiveFilter}
             onChange={this.props.onChange}
             toggleAddFunds={this.props.toggleAddFunds}
-            LoggedInUser={this.props.LoggedInUser} />
+            LoggedInUser={this.props.LoggedInUser}
+            />
         </div>
       </div>
     );
@@ -525,10 +545,10 @@ const addOrganizations = graphql(allCollectivesQuery, {
   options: props => ({
     variables: {
       type: 'ORGANIZATION',
-      orderBy: 'name',
+      orderBy: 'slug',
       orderDirection: 'ASC',
-      offset: 0,
-      limit: null,
+      offset: props.query.collectivesOffset,
+      limit: props.query.collectivesLimit || MAX_COLLECTIVES_IN_SIDEBAR,
     }
   }),
 });
