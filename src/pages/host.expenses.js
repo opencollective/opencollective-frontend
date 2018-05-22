@@ -1,19 +1,19 @@
 import React from 'react';
+import gql from 'graphql-tag'
+import { graphql } from 'react-apollo'
+import { get } from 'lodash';
+
+import { addGetLoggedInUserFunction } from '../graphql/queries';
 import Header from '../components/Header';
 import Body from '../components/Body';
 import Footer from '../components/Footer';
 import CollectiveCover from '../components/CollectiveCover';
-import { addGetLoggedInUserFunction } from '../graphql/queries';
 import Loading from '../components/Loading';
 import ErrorPage from '../components/ErrorPage';
 import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
 import ExpensesWithData from '../components/ExpensesWithData';
-import { get } from 'lodash';
 import CollectivePicker, { AddFundsFormWithData } from '../components/CollectivePickerWithData';
-import ExpensesStatsWithData from '../components/ExpensesStatsWithData';
-import { graphql } from 'react-apollo'
-import gql from 'graphql-tag'
 
 class HostExpensesPage extends React.Component {
 
@@ -87,7 +87,8 @@ class HostExpensesPage extends React.Component {
             }
           }
         }
-        `}</style>
+        `}
+        </style>
 
         <Header
           title={collective.name}
@@ -115,7 +116,8 @@ class HostExpensesPage extends React.Component {
                 hostCollective={collective}
                 LoggedInUser={LoggedInUser}
                 onChange={this.pickCollective}
-                toggleAddFunds={this.toggleAddFunds} />
+                toggleAddFunds={this.toggleAddFunds}
+                />
             </div>
             <div className="col large pullLeft">
               { this.state.showAddFunds &&
@@ -123,7 +125,8 @@ class HostExpensesPage extends React.Component {
                   hostCollective={collective}
                   selectedCollective={selectedCollective}
                   toggleAddFunds={this.toggleAddFunds}
-                  LoggedInUser={LoggedInUser} /> }
+                  LoggedInUser={LoggedInUser}
+                  /> }
 
               { !this.state.showAddFunds &&
                 <div>
@@ -138,7 +141,7 @@ class HostExpensesPage extends React.Component {
                     LoggedInUser={this.state.LoggedInUser}
                     filters={true}
                     editable={true}
-                  />
+                    />
                 </div> }
             </div>
           </div>
