@@ -1,3 +1,5 @@
+import sequelize from 'sequelize';
+import SqlString from 'sequelize/lib/sql-string';
 import {
   GraphQLInt,
   GraphQLList,
@@ -479,6 +481,7 @@ export const CollectiveInterfaceType = new GraphQLInterfaceType({
         args: {
           orderBy: { defaultValue: 'name', type: CollectiveOrderFieldType },
           orderDirection: { defaultValue: 'ASC', type: OrderDirectionType },
+          expenseStatus: { defaultValue: null, type: GraphQLString },
           limit: { type: GraphQLInt },
           offset: { type: GraphQLInt }
         }
@@ -826,6 +829,7 @@ const CollectiveFields = () => {
       args: {
         orderBy: { defaultValue: 'name', type: CollectiveOrderFieldType },
         orderDirection: { defaultValue: 'ASC', type: OrderDirectionType },
+        expenseStatus: { defaultValue: null, type: GraphQLString },
         limit: { type: GraphQLInt },
         offset: { type: GraphQLInt }
       },
@@ -834,7 +838,23 @@ const CollectiveFields = () => {
           where: { HostCollectiveId: collective.id, type: types.COLLECTIVE },
           order: [ [ args.orderBy, args.orderDirection ] ],
           limit: args.limit, offset: args.offset,
-        };
+        }
+        /* if any specific Expense status was passed */
+        if (args.expenseStatus) {
+          /* The escape trick came from here:
+             https://github.com/sequelize/sequelize/issues/1132
+
+             Didin't really find a better way to do it. */
+          const status = SqlString.escape(args.expenseStatus.toUpperCase());
+          query.where.expenseCount = sequelize.where(
+            /* This tests if collective has any expenses in the given
+             * status. */
+            sequelize.literal(
+              '(SELECT COUNT("id") FROM "Expenses" WHERE "Expenses"."CollectiveId" =' +
+              ` "Collective"."id" AND "status" = ${status})`,
+              args.expenseStatus),
+            '>', 0);
+        }
         const result = await models.Collective.findAndCountAll(query);
         const { count, rows } = result;
         return {
