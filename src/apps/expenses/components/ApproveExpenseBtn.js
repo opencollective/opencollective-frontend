@@ -1,10 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import withIntl from '../lib/withIntl';
 import { graphql } from 'react-apollo'
 import { FormattedMessage } from 'react-intl';
 import gql from 'graphql-tag'
-import SmallButton from './SmallButton';
+
+import withIntl from '../../../lib/withIntl';
+import SmallButton from '../../../components/SmallButton';
+
 
 class ApproveExpenseBtn extends React.Component {
 

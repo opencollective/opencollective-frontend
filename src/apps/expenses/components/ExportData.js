@@ -5,7 +5,7 @@ import { Button } from 'react-bootstrap';
 import { FormattedMessage } from 'react-intl';
 import withIntl from '../lib/withIntl';
 import { exportMembers } from '../lib/export_file';
-import ExportImages from './ExportImages';
+import ExportImages from '../../../components/ExportImages';
 
 class ExportData extends React.Component {
 

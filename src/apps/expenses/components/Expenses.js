@@ -1,9 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Expense from './Expense';
 import { ButtonGroup, Button } from 'react-bootstrap';
 import { FormattedMessage } from 'react-intl';
-import colors from '../constants/colors';
+import colors from '../../../constants/colors';
+
+import Expense from './Expense';
+
 
 class Expenses extends React.Component {
 

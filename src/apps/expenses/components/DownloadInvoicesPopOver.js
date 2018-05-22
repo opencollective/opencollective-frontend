@@ -4,18 +4,16 @@ import moment from 'moment';
 import { FormattedMessage } from 'react-intl';
 import { graphql } from 'react-apollo'
 import gql from 'graphql-tag'
-import {
-  Popover,
-  OverlayTrigger,
-} from 'react-bootstrap';
-
-import withIntl from '../lib/withIntl';
-import InputField from './InputField';
-import { uniq } from 'lodash';
-import * as api from '../lib/api';
+import { Popover, OverlayTrigger } from 'react-bootstrap';
 import { saveAs } from 'file-saver'
-import { formatCurrency, imagePreview } from '../lib/utils';
-import { defaultImage } from '../constants/collectives';
+import { uniq } from 'lodash';
+
+import withIntl from '../../../lib/withIntl';
+import * as api from '../../../lib/api';
+import { formatCurrency, imagePreview } from '../../../lib/utils';
+import { defaultImage } from '../../../constants/collectives';
+import InputField from '../../../components/InputField';
+
 
 class Overlay extends React.Component {
 

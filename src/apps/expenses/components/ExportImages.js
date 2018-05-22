@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 import { FormattedMessage } from 'react-intl';
 import withIntl from '../lib/withIntl';
-import InputField from './InputField';
+import InputField from '../../../components/InputField';
 
 class ExportImages extends React.Component {
 

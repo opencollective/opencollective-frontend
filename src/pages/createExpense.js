@@ -1,21 +1,25 @@
 import React from 'react';
-import Header from '../components/Header';
-import Body from '../components/Body';
-import Footer from '../components/Footer';
-import CollectiveCover from '../components/CollectiveCover';
-import { addGetLoggedInUserFunction } from '../graphql/queries';
-import Loading from '../components/Loading';
-import NotFound from '../components/NotFoundPage';
-import ErrorPage from '../components/ErrorPage';
-import withData from '../lib/withData';
-import withIntl from '../lib/withIntl';
-import ExpensesStatsWithData from '../components/ExpensesStatsWithData';
 import { pick } from 'lodash';
 import { FormattedMessage } from 'react-intl'
 import { graphql, compose } from 'react-apollo'
 import gql from 'graphql-tag'
-import CreateExpenseForm from '../components/CreateExpenseForm';
+
+import { addGetLoggedInUserFunction } from '../graphql/queries';
+import withData from '../lib/withData';
+import withIntl from '../lib/withIntl';
+
+import Loading from '../components/Loading';
+import NotFound from '../components/NotFoundPage';
+import ErrorPage from '../components/ErrorPage';
 import Button from '../components/Button';
+import CollectiveCover from '../components/CollectiveCover';
+import Header from '../components/Header';
+import Body from '../components/Body';
+import Footer from '../components/Footer';
+
+import ExpensesStatsWithData from '../apps/expenses/components/ExpensesStatsWithData';
+import CreateExpenseForm from '../apps/expenses/components/CreateExpenseForm';
+
 
 class ExpensesPage extends React.Component {
 

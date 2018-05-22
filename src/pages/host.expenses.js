@@ -1,19 +1,22 @@
 import React from 'react';
+import withData from '../lib/withData';
+import withIntl from '../lib/withIntl';
+import { get } from 'lodash';
+import { graphql } from 'react-apollo'
+import gql from 'graphql-tag'
+
+import ExpensesWithData from '../apps/expenses/components/ExpensesWithData';
+import ExpensesStatsWithData from '../apps/expenses/components/ExpensesStatsWithData';
+
+import { addGetLoggedInUserFunction } from '../graphql/queries';
 import Header from '../components/Header';
 import Body from '../components/Body';
 import Footer from '../components/Footer';
 import CollectiveCover from '../components/CollectiveCover';
-import { addGetLoggedInUserFunction } from '../graphql/queries';
 import Loading from '../components/Loading';
 import ErrorPage from '../components/ErrorPage';
-import withData from '../lib/withData';
-import withIntl from '../lib/withIntl';
-import ExpensesWithData from '../components/ExpensesWithData';
-import { get } from 'lodash';
 import CollectivePicker from '../components/CollectivePickerWithData';
-import ExpensesStatsWithData from '../components/ExpensesStatsWithData';
-import { graphql } from 'react-apollo'
-import gql from 'graphql-tag'
+
 
 class HostExpensesPage extends React.Component {
 

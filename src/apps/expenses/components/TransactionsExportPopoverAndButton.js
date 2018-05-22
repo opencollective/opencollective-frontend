@@ -3,16 +3,13 @@ import PropTypes from 'prop-types';
 import moment from 'moment';
 import { withApollo } from 'react-apollo';
 import { FormattedMessage } from 'react-intl';
-import {
-  Button,
-  Popover,
-  OverlayTrigger,
-} from 'react-bootstrap';
+import { Button, Popover, OverlayTrigger } from 'react-bootstrap';
 
-import { exportFile } from '../lib/export_file';
-import withIntl from '../lib/withIntl';
-import InputField from './InputField';
-import { getTransactionsQuery } from '../graphql/queries';
+import { getTransactionsQuery } from '../../../graphql/queries';
+import { exportFile } from '../../../lib/export_file';
+import withIntl from '../../../lib/withIntl';
+import InputField from '../../../components/InputField';
+
 
 /* Convert the output of the allTransactions query into a CSV payload
    that can be downloaded directly by the user */
