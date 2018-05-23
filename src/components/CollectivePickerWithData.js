@@ -289,7 +289,7 @@ class CollectiveSelector extends React.Component {
                 />
             </h1>
 
-            { collectives.length > MAX_COLLECTIVES_IN_SIDEBAR &&
+            { total > MAX_COLLECTIVES_IN_SIDEBAR &&
               <ul className="filters">
                 <li>
                   <label>
