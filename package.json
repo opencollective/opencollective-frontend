@@ -28,6 +28,7 @@
     "graphql": "0.12.3",
     "graphql-request": "1.6.0",
     "graphql-tag": "2.6.1",
+    "grid-styled": "^4.1.0",
     "html-pdf": "2.2.0",
     "image-size": "0.6.2",
     "image-to-ascii": "3.0.11",
