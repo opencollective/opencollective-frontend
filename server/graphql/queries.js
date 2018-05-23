@@ -540,14 +540,8 @@ const queries = {
       if (args.tags) query.where.tags = { [Op.overlap]: args.tags };
 
       if (args.orderBy === 'balance' && (args.ParentCollectiveId || args.HostCollectiveId || args.tags)) {
-        const queryResult = await rawQueries.getCollectivesWithBalance(query.where, args);
-        console.log(queryResult);
-        return {
-          total: queryResult.total,
-          collectives: queryResult,
-          limit: args.limit,
-          offset: args.offset,
-        };
+        const { total, collectives } = await rawQueries.getCollectivesWithBalance(query.where, args);
+        return { total, collectives, limit: args.limit, offset: args.offset };
       }
 
       query.order = [[args.orderBy, args.orderDirection]];

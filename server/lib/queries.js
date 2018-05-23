@@ -243,7 +243,7 @@ const getTopBackers = (since, until, tags, limit) => {
 /**
  * Get top collectives ordered by available balance
  */
-const getCollectivesWithBalance = (where = {}, options) => {
+const getCollectivesWithBalance = async (where = {}, options) => {
   const orderDirection = options.orderDirection || "DESC";
   const orderBy = options.orderBy || "balance";
   const limit = options.limit || 20;
@@ -259,7 +259,15 @@ const getCollectivesWithBalance = (where = {}, options) => {
     }
   });
 
-  return sequelize.query(`
+  const params = {
+    bind: where,
+    model: models.Collective
+  };
+
+  const allFields = 'c.*, td.*';
+
+  /* This version doesn't include limit/offset */
+  const sql = (fields) => `
     with "balance" AS (
       SELECT t."CollectiveId", SUM("netAmountInCollectiveCurrency") as "balance"
       FROM "Collectives" c
@@ -272,18 +280,21 @@ const getCollectivesWithBalance = (where = {}, options) => {
         AND c."deletedAt" IS NULL
         GROUP BY t."CollectiveId"
     )
-    SELECT COUNT(c.id) as "total", c.*, td.* FROM "Collectives" c
+    SELECT ${fields} FROM "Collectives" c
     LEFT JOIN "balance" td ON td."CollectiveId" = c.id
     WHERE c."isActive" IS TRUE
     ${whereCondition}
     AND c."deletedAt" IS NULL
     GROUP BY c.id, td."CollectiveId", td.balance
-    ORDER BY ${orderBy} ${orderDirection} NULLS LAST LIMIT ${limit} OFFSET ${offset}
-  `.replace(/\s\s+/g, ' '), // this is to remove the new lines and save log space.
-  {
-    bind: where,
-    model: models.Collective
-  });
+    ORDER BY ${orderBy} ${orderDirection} NULLS LAST
+  `.replace(/\s\s+/g, ' '); // remove the new lines and save log space
+
+  const [ [ { dataValues: { total } } ], collectives ] = await Promise.all([
+    sequelize.query(`${sql('COUNT(c.*) OVER() as "total"')} LIMIT 1`, params),
+    sequelize.query(`${sql(allFields)} LIMIT ${limit} OFFSET ${offset}`, params),
+  ]);
+
+  return { total, collectives };
 };
 
 /**
