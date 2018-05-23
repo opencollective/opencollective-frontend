@@ -165,6 +165,14 @@ class CollectiveSelector extends React.Component {
     }
   }
 
+  componentDidUpdate = (prevProps) => {
+    const c = (p) => (p.collectives || p.organizations);
+    if (c(prevProps).loading && !c(this.props).loading) {
+      const { result: { total, collectives } } = this.filterCollectives();
+      if (total === 1) this.setState({ selectedCollective: collectives[0] });
+    }
+  }
+
   onChange = (CollectiveId) => {
     const { result } = this.filterCollectives();
     if (CollectiveId > 0) {
