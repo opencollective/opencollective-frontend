@@ -202,13 +202,14 @@ class CollectiveSelector extends React.Component {
   }
 
   renderPagination = (total) => {
-    if (total === 0) return <div></div>;
     const limit = MAX_COLLECTIVES_IN_SIDEBAR;
+    const range = total > 0 ? Math.ceil(total / limit) : 0;
+    if (range < 2) return <div></div>;
     const offset = this.props.query.collectivesOffset || 0;
     const collectiveQuery = this.props.query.collectivesQuery || null;
     return (
       <ul className="pagination">
-        { Array(Math.ceil(total / limit)).fill(1).map((n, i) => (
+        { Array(range).fill(1).map((n, i) => (
           <li
             key={`pagination-link-${i * limit}`}
             className={classNames({ active: (i * limit) === offset })}
@@ -280,41 +281,42 @@ class CollectiveSelector extends React.Component {
                 />
             </h1>
 
-            <ul className="filters">
-              <li>
-                <label>
-                  <input
-                    type="radio" name="filterCollectives" readOnly
-                    checked={!this.props.query.collectivesQuery}
+            { collectives.length > MAX_COLLECTIVES_IN_SIDEBAR &&
+              <ul className="filters">
+                <li>
+                  <label>
+                    <input
+                      type="radio" name="filterCollectives" readOnly
+                      checked={!this.props.query.collectivesQuery}
                     />
-                  <Link href={{ query: omit(this.props.query, 'collectivesQuery', 'collectivesOffset') }}>
-                    <a>List all</a>
-                  </Link>
-                </label>
-              </li>
-              <li>
-                <label>
-                  <input
-                    type="radio" name="filterCollectives" readOnly
-                    checked={this.props.query.collectivesQuery === 'approved'}
+                    <Link href={{ query: omit(this.props.query, 'collectivesQuery', 'collectivesOffset') }}>
+                      <a>List all</a>
+                    </Link>
+                  </label>
+                </li>
+                <li>
+                  <label>
+                    <input
+                      type="radio" name="filterCollectives" readOnly
+                      checked={this.props.query.collectivesQuery === 'approved'}
                     />
-                  <Link href={{ query: { ...omit(this.props.query, 'collectivesOffset'), collectivesQuery: 'approved' } }}>
-                    <a>With approved expenses</a>
-                  </Link>
-                </label>
-              </li>
-              <li>
-                <label>
-                  <input
-                    type="radio" name="filterCollectives" readOnly
-                    checked={this.props.query.collectivesQuery === 'pending'}
+                    <Link href={{ query: { ...omit(this.props.query, 'collectivesOffset'), collectivesQuery: 'approved' } }}>
+                      <a>With approved expenses</a>
+                    </Link>
+                  </label>
+                </li>
+                <li>
+                  <label>
+                    <input
+                      type="radio" name="filterCollectives" readOnly
+                      checked={this.props.query.collectivesQuery === 'pending'}
                     />
-                  <Link href={{ query: { ...omit(this.props.query, 'collectivesOffset'), collectivesQuery: 'pending' } }}>
-                    <a>With pending expenses</a>
-                  </Link>
-                </label>
-              </li>
-            </ul>
+                    <Link href={{ query: { ...omit(this.props.query, 'collectivesOffset'), collectivesQuery: 'pending' } }}>
+                      <a>With pending expenses</a>
+                    </Link>
+                  </label>
+                </li>
+              </ul> }
           </div>
 
           <ul className="colectives">
