@@ -38,12 +38,13 @@ class CollectivePage extends React.Component {
     const { LoggedInUser } = this.state;
 
     if (data.loading) return (<Loading />);
-    if (!data.Collective) return (<NotFound />);
 
     if (data.error) {
       console.error("graphql error>>>", data.error.message);
       return (<ErrorPage message="GraphQL error" />)
     }
+
+    if (!data.Collective) return (<NotFound />);
 
     const collective = data.Collective;
 
