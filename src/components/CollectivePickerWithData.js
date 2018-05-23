@@ -220,7 +220,7 @@ class CollectiveSelector extends React.Component {
         { Array(range).fill(1).map((n, i) => (
           <li
             key={`pagination-link-${i * limit}`}
-            className={classNames({ active: (i * limit) === offset })}
+            className={classNames({ active: (i * limit) === parseInt(offset) })}
             >
             <Link
               href={{ query: {
