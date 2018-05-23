@@ -106,7 +106,7 @@ class CollectivesForRedeemPageWithData extends React.Component {
 }
 
 const getCollectivesQuery = gql`
-query allCollectives($HostCollectiveId: Int, $ParentCollectiveId: Int, $limit: Int, $offset: Int, $orderBy: String, $orderDirection: String) {
+query allCollectives($HostCollectiveId: Int, $ParentCollectiveId: Int, $limit: Int, $offset: Int, $orderBy: CollectiveOrderField, $orderDirection: OrderDirection) {
   allCollectives(HostCollectiveId: $HostCollectiveId, ParentCollectiveId: $ParentCollectiveId, limit: $limit, offset: $offset, orderBy: $orderBy, orderDirection: $orderDirection) {
     id
     type
