@@ -1,6 +1,7 @@
+import slugify from 'slug';
+import { get } from 'lodash';
 import models from '../../models';
 import * as errors from '../errors';
-import slugify from 'slug';
 import { types } from '../../constants/collectives';
 import roles from '../../constants/roles';
 import activities from '../../constants/activities';
@@ -113,20 +114,22 @@ export function createCollective(_, args, req) {
         }
       }
       collectiveData.tags.push("Tech meetups");
-      promises.push(
-        req.loaders
-          .collective.findById.load(args.collective.HostCollectiveId)
-          .then(hc => {
-            if (!hc) return Promise.reject(new Error(`Host collective with id ${args.collective.HostCollectiveId} not found`));
-            hostCollective = hc;
-            collectiveData.currency = collectiveData.currency || hc.currency;
-            collectiveData.hostFeePercent = hc.hostFeePercent;
-            if (req.remoteUser.hasRole([roles.ADMIN, roles.HOST], hostCollective.id)) {
-              collectiveData.isActive = true;
-            }
-          })
-      );
     }
+  }
+  if (args.collective.HostCollectiveId) {
+    promises.push(
+      req.loaders
+        .collective.findById.load(args.collective.HostCollectiveId)
+        .then(hc => {
+          if (!hc) return Promise.reject(new Error(`Host collective with id ${args.collective.HostCollectiveId} not found`));
+          hostCollective = hc;
+          collectiveData.currency = collectiveData.currency || hc.currency;
+          collectiveData.hostFeePercent = hc.hostFeePercent;
+          if (req.remoteUser.hasRole([roles.ADMIN, roles.HOST], hostCollective.id)) {
+            collectiveData.isActive = true;
+          }
+        })
+    );
   }
   if (args.collective.ParentCollectiveId) {
     promises.push(
@@ -181,10 +184,10 @@ export function createCollective(_, args, req) {
     models.Activity.create({
       type: activities.COLLECTIVE_CREATED,
       UserId: req.remoteUser.id,
-      CollectiveId: hostCollective.id,
+      CollectiveId: get(hostCollective, 'id'),
       data: {
         collective: collective.info,
-        host: hostCollective.info,
+        host: get(hostCollective, 'info'),
         user: {
           email: req.remoteUser.email,
           collective: remoteUserCollective.info

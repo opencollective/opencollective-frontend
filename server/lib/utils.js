@@ -450,7 +450,7 @@ export const defaultHostCollective = (tag) => {
     if (tag === 'opensource') {
       return { id: 772, CollectiveId: 11004, ParentCollectiveId: 83 }; // Open Source Host Collective
     } else {
-      return { id: 7944, CollectiveId: 8674, ParentCollectiveId: 83 }; // Non-open source Host Collective ('host-other')
+      return {}; // Don't automatically assign a host anymore
     }
   }
   return { id: 1, CollectiveId: 1 };
