@@ -472,7 +472,7 @@ const queries = {
    * Returns all collectives
    */
   allCollectives: {
-    type: new GraphQLList(CollectiveInterfaceType),
+    type: CollectiveSearchResultsType,
     args: {
       tags: { type: new GraphQLList(GraphQLString) },
       type: {
@@ -540,14 +540,28 @@ const queries = {
       if (args.tags) query.where.tags = { [Op.overlap]: args.tags };
 
       if (args.orderBy === 'balance' && (args.ParentCollectiveId || args.HostCollectiveId || args.tags)) {
-        return rawQueries.getCollectivesWithBalance(query.where, args);
+        const queryResult = await rawQueries.getCollectivesWithBalance(query.where, args);
+        console.log(queryResult);
+        return {
+          total: queryResult.total,
+          collectives: queryResult,
+          limit: args.limit,
+          offset: args.offset,
+        };
       }
 
       query.order = [[args.orderBy, args.orderDirection]];
 
       if (args.offset) query.offset = args.offset;
 
-      return models.Collective.findAll(query);
+      const result = await models.Collective.findAndCountAll(query);
+
+      return {
+        total: result.count,
+        collectives: result.rows,
+        limit: args.limit,
+        offset: args.offset,
+      };
     }
   },
 

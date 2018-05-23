@@ -272,11 +272,12 @@ const getCollectivesWithBalance = (where = {}, options) => {
         AND c."deletedAt" IS NULL
         GROUP BY t."CollectiveId"
     )
-    SELECT c.*, td.* FROM "Collectives" c
+    SELECT COUNT(c.id) as "total", c.*, td.* FROM "Collectives" c
     LEFT JOIN "balance" td ON td."CollectiveId" = c.id
     WHERE c."isActive" IS TRUE
     ${whereCondition}
     AND c."deletedAt" IS NULL
+    GROUP BY c.id, td."CollectiveId", td.balance
     ORDER BY ${orderBy} ${orderDirection} NULLS LAST LIMIT ${limit} OFFSET ${offset}
   `.replace(/\s\s+/g, ' '), // this is to remove the new lines and save log space.
   {
