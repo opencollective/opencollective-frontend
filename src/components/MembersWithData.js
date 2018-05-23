@@ -184,6 +184,9 @@ query Members($CollectiveId: Int!, $TierId: Int, $role: String, $type: String, $
     id
     role
     createdAt
+    collective {
+      name
+    }
     stats {
       totalDonations
     }
