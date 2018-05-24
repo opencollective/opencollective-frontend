@@ -1,65 +1,54 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import gql from 'graphql-tag';
-import classNames from 'classnames';
-import Scrollchor from 'react-scrollchor';
-
-import { pick, omit } from 'lodash';
-import { graphql, compose } from 'react-apollo';
-import { FormattedMessage, defineMessages } from 'react-intl';
-import {
-  Button,
-  ButtonGroup,
-  Badge,
-} from 'react-bootstrap';
-
-import withIntl from '../lib/withIntl';
-import AddFundsForm from '../components/AddFundsForm';
-import Currency from '../components/Currency';
-import ConnectPaypal from '../components/ConnectPaypal';
 import Error from '../components/Error';
-import ExpensesStatsWithData from '../components/ExpensesStatsWithData';
-import { Link } from '../server/pages';
+import withIntl from '../lib/withIntl';
+import { graphql, compose } from 'react-apollo';
+import gql from 'graphql-tag'
+import { DropdownButton, MenuItem, Badge } from 'react-bootstrap';
+import Currency from '../components/Currency';
+import { FormattedMessage, defineMessages } from 'react-intl';
+import ConnectPaypal from '../components/ConnectPaypal';
+import AddFundsForm from '../components/AddFundsForm';
+import { pick } from 'lodash';
 
-
-/* Used to limit query and for building pagination links */
-const MAX_COLLECTIVES_IN_SIDEBAR = 50;
-
-/* Helper for validating if logged in user can edit a collective */
-const canEdit = (props) => {
-  const { LoggedInUser, hostCollective } = props;
-  return LoggedInUser && LoggedInUser.canEditCollective(hostCollective);
-};
-
-/* Helper that tests if the currently logged in user is a site admin */
-const isRoot = (props) => {
-  const { LoggedInUser } = props;
-  return LoggedInUser && LoggedInUser.isRoot();
-};
-
-/* Class that adds the createOrder mutation to AddFundsForm */
-class AddFundsFormContainer extends React.Component {
+class CollectivePickerWithData extends React.Component {
 
   static propTypes = {
-    hostCollective: PropTypes.object.isRequired,
-    selectedCollective: PropTypes.object.isRequired,
-    LoggedInUser: PropTypes.object.isRequired,
-    toggleAddFunds: PropTypes.func.isRequired,
+    hostCollectiveSlug: PropTypes.string.isRequired,
+    onChange: PropTypes.func
   }
 
-  constructor (props) {
+  constructor(props) {
     super(props);
-    this.state = { loading: false };
+    this.state = {
+      connectingPaypal: false,
+      loading: false,
+      showAddFunds: false
+    };
+    this.addFunds = this.addFunds.bind(this);
+    this.toggleAddFunds = this.toggleAddFunds.bind(this);
+    this.onChange = this.onChange.bind(this);
+    this.messages = defineMessages({
+      'badge.tooltip.pending': { id: 'expenses.badge.tooltip.pending', defaultMessage: "{pending} {pending, plural, one {expense} other {expenses}} pending approval" },
+      'badge.tooltip.approved': { id: 'expenses.badge.tooltip.approved', defaultMessage: "{approved} {approved, plural, one {expense} other {expenses}} ready to be paid" }
+    });
   }
 
-  addFunds = async form => {
+  canEdit = () => {
+    const { LoggedInUser } = this.props;
+    return LoggedInUser && LoggedInUser.canEditCollective(this.hostCollective);
+  }
+
+  async addFunds(form) {
     if (form.totalAmount === 0) {
       return console.error("Total amount must be > 0");
     }
     this.setState({ loading: true });
-    const { selectedCollective, hostCollective } = this.props;
+    const hostCollective = this.hostCollective;
     const order = pick(form, ['totalAmount', 'description', 'hostFeePercent', 'platformFeePercent']);
-    order.collective = { id: selectedCollective.id };
+    order.collective = {
+      id: this.state.CollectiveId
+    };
     if (form.email) {
       order.user = {
         email: form.email,
@@ -75,12 +64,6 @@ class AddFundsFormContainer extends React.Component {
         id: form.FromCollectiveId || hostCollective.id
       }
     }
-
-    if (!hostCollective.paymentMethods) {
-      this.setState({ error: "This host doesn't have a payment method", loading: false });
-      return console.error(">>> no payment methods: ", hostCollective.paymentMethods);
-    }
-
     const pm = hostCollective.paymentMethods.find(pm => pm.service === 'opencollective');
     if (!pm) {
       this.setState({ error: "This host doesn't have an opencollective payment method", loading: false });
@@ -92,357 +75,231 @@ class AddFundsFormContainer extends React.Component {
     console.log(">>> add funds order: ", order);
     try {
       await this.props.createOrder(order);
-      this.props.toggleAddFunds();
+      this.setState({ showAddFunds: false, loading: false });
     } catch (e) {
       const error = e.message && e.message.replace(/GraphQL error:/, "");
-      this.setState({ error });
-    } finally {
-      this.setState({ loading: false });
+      this.setState({ error, loading: false });
     }
   }
 
-  render() {
-    return (
-      <div>
-        <AddFundsForm
-          collective={this.props.selectedCollective}
-          host={this.props.hostCollective}
-          onSubmit={this.addFunds}
-          onCancel={this.props.toggleAddFunds}
-          loading={this.state.loading}
-          LoggedInUser={this.props.LoggedInUser}
-          />
-        <div className="results">
-          <div className="error">{this.state.error}</div>
-        </div>
-      </div>
-    );
-  }
-}
-
-
-class CollectiveSelector extends React.Component {
-  static propTypes = {
-    onChange: PropTypes.func,
-    hostCollective: PropTypes.object.isRequired,
-    collectiveFilter: PropTypes.string.isRequired,
-    LoggedInUser: PropTypes.object.isRequired,
-    toggleAddFunds: PropTypes.func.isRequired,
+  toggleAddFunds() {
+    this.setState({ showAddFunds: !this.state.showAddFunds });
   }
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      /* -1 Means that no collective is selected */
-      CollectiveId: -1,
-      /* Filled in by onChange */
-      selectedCollective: null,
-    };
-    this.messages = defineMessages({
-      'badge.tooltip.pending': { id: 'expenses.badge.tooltip.pending', defaultMessage: "{pending} {pending, plural, one {expense} other {expenses}} pending approval" },
-      'badge.tooltip.approved': { id: 'expenses.badge.tooltip.approved', defaultMessage: "{approved} {approved, plural, one {expense} other {expenses}} ready to be paid" },
-      'collectives': { id: 'expenses.allCollectives', defaultMessage: "All Collectives" },
-      'organizations': { id: 'expenses.allOrganizations', defaultMessage: "All Organizations" },
-    });
+  onChange(CollectiveId) {
+    const collectives = this.hostCollective.collectives;
+    const selectedCollective = CollectiveId > 0 && collectives.find(c => c.id === CollectiveId);
+    this.setState({ CollectiveId });
+    this.props.onChange(selectedCollective);
   }
 
-  filterCollectives = () => {
-    /* Read both queries from Apollo */
-    const { collectiveFilter, collectives, organizations } = this.props;
-    if (!collectives && !organizations) return { error: 'No data returned by graphql' };
-    /* Read data from the query enabled in `collectiveFilter' */
-    const { loading, error, Collective } = (collectives || organizations);
-    if (error || loading) return { error, loading };
-    /* Unpacking the values is different for collectives and
-       organizations */
-    switch (collectiveFilter) {
-      case 'COLLECTIVES':
-        return { result: Collective.collectives };
-      case 'ORGANIZATIONS':
-        return { result: organizations.allCollectives.collectives };
-      default:
-        return { error: `Wrong state received by filterCollectives(${collectiveFilter})` };
-    }
-  }
-
-  componentDidUpdate = (prevProps) => {
-    const c = (p) => (p.collectives || p.organizations);
-    if (c(prevProps).loading && !c(this.props).loading) {
-      const { result: { total, collectives } } = this.filterCollectives();
-      if (total === 1) this.setState({ selectedCollective: collectives[0] });
-    }
-  }
-
-  onChange = (CollectiveId) => {
-    const { result } = this.filterCollectives();
-    if (CollectiveId > 0) {
-      const selectedCollective = result.collectives.find(c => c.id === CollectiveId);
-      this.setState({ CollectiveId, selectedCollective });
-      this.props.onChange(selectedCollective);
-    }
-  }
-
-  renderSelectedCollective = () => {
-    const { name, slug, type } = this.state.selectedCollective;
-    return (
-      <div style={{ width: '100%' }}>
-        <style jsx>{`
-        .selectedCollective { margin: -10px -10px 10px; padding: 10px; font-size: 12px; background: #fff; border: 1px solid #f1f3f4; }
-        .selectedCollective h1 { font-size: 30px; text-align: left; margin: 0 0 5px 0; color: #000; }
-        .selectedCollective h3 { font-size: 16px; }
-        .selectedCollective ul { list-style: none; padding: 0; }
-        .selectedCollective li { margin: 0; padding: 0 10px; }
-        .selectedCollective li label { margin: 0; padding: 0; }
-        `}
-        </style>
-        <div className="selectedCollective" >
-          <h1>{ name || slug }</h1>
-
-          { canEdit(this.props) &&
-            <a className="addFundsLink" onClick={this.props.toggleAddFunds}>
-              <FormattedMessage id="addfunds.submit" defaultMessage="Add Funds" />
-            </a> }
-
-          { type === 'COLLECTIVE' && <ExpensesStatsWithData slug={slug} /> }
-        </div>
-      </div>
-    );
-  }
-
-  renderPagination = (total) => {
-    const limit = MAX_COLLECTIVES_IN_SIDEBAR;
-    const range = total > 0 ? Math.ceil(total / limit) : 0;
-    if (range < 2) return <div></div>;
-    const offset = this.props.query.collectivesOffset || 0;
-    const collectiveQuery = this.props.query.collectivesQuery || null;
-    return (
-      <ul className="pagination">
-        { Array(range).fill(1).map((n, i) => (
-          <li
-            key={`pagination-link-${i * limit}`}
-            className={classNames({ active: (i * limit) === parseInt(offset) })}
-            >
-            <Link
-              href={{ query: {
-                ...this.props.query,
-                collectiveQuery,
-                collectivesOffset: i * limit
-              }}}
-              >
-              <a>{`${n + i}`}</a>
-            </Link>
-          </li>
-        )) }
-      </ul>
-    );
-  }
-
-  render() {
+  renderCollectiveMenuItem(collective, className) {
     const { intl } = this.props;
-    const { loading, error, result } = this.filterCollectives();
+    const badgeCount = collective.stats.expenses.pending + collective.stats.expenses.approved;
+
+    const tooltipArray = [];
+    if (collective.stats.expenses.pending > 0) {
+      tooltipArray.push(intl.formatMessage(this.messages['badge.tooltip.pending'], collective.stats.expenses));
+    }
+    if (collective.stats.expenses.approved > 0) {
+      tooltipArray.push(intl.formatMessage(this.messages['badge.tooltip.approved'], collective.stats.expenses));
+    }
+    const tooltip = tooltipArray.join(', ') || '';
+
+    return (<div className={`MenuItem-Collective ${className}`} title={tooltip}>
+      <style jsx>{`
+        .MenuItem-Collective {
+          display: flex;
+          width: 40rem;
+          justify-content: space-between;
+          align-items: center;
+        }
+
+        .MenuItem-Collective.selected {
+          float: left;
+          margin-right: 1rem;
+        }
+
+        label {
+          margin: 0;
+        }
+
+        .collectiveName {
+          float: left;
+          margin-right: 0.2rem;
+          max-width: 25rem;
+          text-overflow: ellipsis;
+          overflow: hidden;
+        }
+
+        .NameBalance {
+          display: flex;
+          align-items: baseline;
+        }
+
+        .balance {
+          margin-left: 0.5rem;
+          color: #919599;
+          font-size: 1.2rem;
+        }
+
+        .balance label {
+          font-weight: 300;
+        }
+
+        .MenuItem-Collective label {
+          margin-right: 0.2rem;
+        }
+      `}</style>
+      <div className="NameBalance">
+        <div className="collectiveName">{collective.name}</div>
+        <div className="balance">
+          <label><FormattedMessage id="expenses.balance.label" defaultMessage="balance:" /></label>
+          <Currency value={collective.stats.balance} currency={collective.currency} />
+        </div>
+      </div>
+      { badgeCount > 0 && <Badge pullRight={true}>{badgeCount}</Badge> }
+    </div>);
+  }
+
+  render() {
+    const { data: { loading, error, Collective } } = this.props;
 
     if (error) {
       console.error("graphql error>>>", error.message);
       return (<Error message="GraphQL error" />)
     }
-    if (loading) {
-      return (<div><h1>Loading...</h1><br /><br /></div>);
+
+    this.hostCollective = Collective || this.hostCollective;
+    if (loading || !this.hostCollective) {
+      return (<div />);
     }
 
-    const { total, collectives } = result;
+    const collectives = [...this.hostCollective.collectives];
+
+    const selectedCollective = collectives.find(c => c.id === this.state.CollectiveId);
+    const selectedTitle = selectedCollective ? this.renderCollectiveMenuItem(selectedCollective, 'selected') : <div className="defaultTitle"><FormattedMessage id="expenses.allCollectives" defaultMessage="All Collectives" /></div>;
 
     return (
-      <div>
+      <div className="CollectivesContainer">
         <style jsx>{`
-        /* Container */
-        .collectivesColumn { background: #f1f3f4; padding: 10px; border-top: solid 2px #999 }
+          .CollectivesContainer {
+            background: #f2f4f5;
+          }
 
-        /* Title */
-        .collectivesColumn h1 { margin: 0 0 20px 0; text-align: left; }
+          .submenu {
+            width: 100%;
+            min-height: 16rem;
+            font-family: Rubik;
+            padding: 2rem 2rem 2rem 6rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+          }
 
-        /* Filters */
-        .collectivesColumn ul.filters { list-style: none; margin: -5px 0 0 0; padding: 0; }
-        .collectivesColumn ul.filters li { margin: 0; padding-left: 10px; }
-        .collectivesColumn ul.filters li label { margin: 0; font-weight: normal; }
-        .collectivesColumn ul.filters li input { margin-right: 4px; }
+          .submenu .title {
+            margin: 2rem 0;
+            overflow: hidden;
+            display: flex;
+            align-items: baseline;
+          }
 
-        /* List of collective */
-        .collectivesColumn ul.colectives { list-style: none; margin: 0; padding: 0; }
-        .collectivesColumn ul.colectives li { border-bottom: 1px solid #46b0ed; background: #fff; padding: 4px 10px 0 10px; }
-        .collectivesColumn ul.colectives li a:link { color: #333; }
-        .collectivesColumn .balance { font-size: 12px; color: gray; }
-        .collectivesColumn .balance label { margin-right: 4px; }
-        `}
-        </style>
-        <div className="collectivesColumn">
+          .submenu .title h1 {
+            font-family: Rubik;
+            font-size: 3.6rem;
+            margin: 0 2rem 0 0;
+            font-weight: 500;
+            color: #18191a;
+            float: left;
+          }
 
-          <div id="selectedCollectiveContainer">
-            { this.state.selectedCollective && ::this.renderSelectedCollective() }
-          </div>
+          .submenu .title h2 {
+            font-family: Rubik;
+            font-size: 2.4rem;
+            margin: 0;
+            font-weight: 300;
+            color: #18191a;
+          }
 
-          <div>
-            <h1 className="title">
-              <FormattedMessage
-                id="expenses.collectivePicker.listCollectivesTitle"
-                defaultMessage="{n} {n, plural, one {collective} other {collectives}} listed"
-                values={{ n: total }}
-                />
-            </h1>
+          .collectivesFilter {
+            display: flex;
+          }
 
-            { total > MAX_COLLECTIVES_IN_SIDEBAR &&
-              <ul className="filters">
-                <li>
-                  <label>
-                    <input
-                      type="radio" name="filterCollectives" readOnly
-                      checked={!this.props.query.collectivesQuery}
-                    />
-                    <Link href={{ query: omit(this.props.query, 'collectivesQuery', 'collectivesOffset') }}>
-                      <a>List all</a>
-                    </Link>
-                  </label>
-                </li>
-                <li>
-                  <label>
-                    <input
-                      type="radio" name="filterCollectives" readOnly
-                      checked={this.props.query.collectivesQuery === 'approved'}
-                    />
-                    <Link href={{ query: { ...omit(this.props.query, 'collectivesOffset'), collectivesQuery: 'approved' } }}>
-                      <a>With approved expenses</a>
-                    </Link>
-                  </label>
-                </li>
-                <li>
-                  <label>
-                    <input
-                      type="radio" name="filterCollectives" readOnly
-                      checked={this.props.query.collectivesQuery === 'pending'}
-                    />
-                    <Link href={{ query: { ...omit(this.props.query, 'collectivesOffset'), collectivesQuery: 'pending' } }}>
-                      <a>With pending expenses</a>
-                    </Link>
-                  </label>
-                </li>
-              </ul> }
-          </div>
+          .addFundsLink {
+            display: block;
+            font-size: 1.2rem;
+            padding: 0.8rem;
+          }
 
-          <ul className="colectives">
-            { collectives.map(collective => {
-                const tooltipArray = [];
-                let badgeCount = 0;
+          .error {
+            color: red;
+            text-align: center;
+            padding-bottom: 3rem;
+          }
+        `}</style>
+        <style jsx global>{`
+          .CollectivesContainer .defaultTitle {
+            width: 40rem;
+            float: left;
+            text-align: left;
+          }
 
-                if (collective.stats.expenses) {
-                  const { pending, approved } = collective.stats.expenses;
-                  badgeCount = pending + approved;
-                  if (pending > 0) {
-                    tooltipArray.push(intl.formatMessage(this.messages['badge.tooltip.pending'], collective.stats.expenses));
-                  }
-                  if (approved > 0) {
-                    tooltipArray.push(intl.formatMessage(this.messages['badge.tooltip.approved'], collective.stats.expenses));
-                  }
-                }
-                const tooltip = tooltipArray.join(', ') || '';
+          .CollectivesContainer .caret {
+            float: right;
+            margin-top: 7px;
+          }
 
-                return (
-                  <li
-                    title={tooltip}
-                    key={`collective-${collective.id}`}
-                    onClick={() => this.onChange(collective.id)}
-                    >
-                    <Scrollchor to="collective" animate={{ duration: 200 }} className="nav-link">
-                      { badgeCount > 0 && <Badge pullRight={true}>{badgeCount}</Badge> }
-                      <div className="NameBalance">
-                        <div className="collectiveName">{collective.name || collective.slug}</div>
-                        <div className="balance">
-                          <label><FormattedMessage id="expenses.balance.label" defaultMessage="balance:" /></label>
-                          <Currency value={collective.stats.balance} currency={collective.currency} />
-                        </div>
-                      </div>
-                    </Scrollchor>
-                  </li>
-                );
-            }) }
-
-            { ::this.renderPagination(total) }
-          </ul>
-        </div>
-      </div>
-    );
-  }
-}
-
-class CollectivePickerWithData extends React.Component {
-
-  static propTypes = {
-    onChange: PropTypes.func.isRequired,
-    toggleAddFunds: PropTypes.func.isRequired,
-    hostCollective: PropTypes.object.isRequired,
-    query: PropTypes.object.isRequired,
-  }
-
-  constructor(props) {
-    super(props);
-    this.state = {
-      connectingPaypal: false,
-      loading: false,
-      /* Filter between 'COLLECTIVES' and 'ORGANIZATIONS'. The graphql
-       * client uses this to define which query will be loaded in the
-       * component */
-      collectiveFilter: 'COLLECTIVES',
-    };
-  }
-
-  toggleOrgFilter = () => {
-    const collectiveFilter = this.state.collectiveFilter === 'COLLECTIVES'
-      ? 'ORGANIZATIONS' : 'COLLECTIVES';
-    this.setState({ collectiveFilter });
-  }
-
-  render() {
-    return (
-      <div id="collective" className="CollectivesContainer">
-        <style jsx>{`
-          .CollectivesContainer { padding: 0; }
-          .CollectivesContainer .filter { background: #ccc; text-align: center; padding: 10px; }
-          .CollectivesContainer .filterBtnGroup { width: 100%; }
-          .CollectivesContainer .filterButton { width: auto; }
-          .CollectivesContainer .paypalContainer { padding: 10px; }
-        `}
-        </style>
+          .right {
+            float: right;
+            text-align: right;
+          }
+        `}</style>
         <div className="submenu">
-          <div className="paypalContainer">
-            { canEdit(this.props) && <ConnectPaypal collective={this.props.hostCollective} /> }
+          <div>
+            <div className="title">
+              <h1><FormattedMessage id="expenses.collectivePicker.title" defaultMessage="Finances" /></h1>
+              <h2><FormattedMessage id="expenses.collectivePicker.subtitle" defaultMessage="for {n} {n, plural, one {collective} other {collectives}}" values={{n: collectives.length}} /></h2>
+            </div>
+            { collectives.length > 0 &&
+            <div className="collectivesFilter">
+              <DropdownButton id="collectivePicker" bsStyle="default" title={selectedTitle} onSelect={this.onChange}>
+                { this.state.CollectiveId &&
+                <MenuItem key={null} eventKey={null}>
+                  <FormattedMessage id="expenses.allCollectives" defaultMessage="All Collectives" />
+                </MenuItem>
+                  }
+                { collectives.map(collective => (
+                  <MenuItem key={collective.id} eventKey={collective.id} title={collective.name}>
+                    { this.renderCollectiveMenuItem(collective) }
+                  </MenuItem>
+                  ))}
+              </DropdownButton>
+              { selectedCollective && !this.state.showAddFunds && ::this.canEdit() &&
+              <a className="addFundsLink" onClick={this.toggleAddFunds}><FormattedMessage id="addfunds.submit" defaultMessage="Add Funds" /></a>
+                }
+            </div>
+            }
           </div>
-
-          { isRoot(this.props) &&
-            <div className="filter">
-              <ButtonGroup className="filterBtnGroup">
-                <Button
-                  className="filterButton collectives" bsSize="small"
-                  bsStyle={this.state.collectiveFilter === 'COLLECTIVES' ? 'primary' : 'default'}
-                  onClick={() => ::this.toggleOrgFilter()}
-                  >
-                  <FormattedMessage id="host.expenses.collectivePicker.collectives" defaultMessage="Collectives" />
-                </Button>
-                <Button
-                  className="filterButton organizations" bsSize="small"
-                  bsStyle={this.state.collectiveFilter === 'ORGANIZATIONS' ? 'primary' : 'default'}
-                  onClick={() => ::this.toggleOrgFilter()}
-                  >
-                  <FormattedMessage id="host.expenses.collectivePicker.organizations" defaultMessage="Organizations" />
-                </Button>
-              </ButtonGroup>
-            </div> }
-
-          <CollectiveSelectorWithData
-            query={this.props.query}
-            hostCollective={this.props.hostCollective}
-            collectiveFilter={this.state.collectiveFilter}
-            onChange={this.props.onChange}
-            toggleAddFunds={this.props.toggleAddFunds}
-            LoggedInUser={this.props.LoggedInUser}
-            />
+          <div className="right">
+            { ::this.canEdit() && <ConnectPaypal collective={this.hostCollective} /> }
+          </div>
+        </div>
+        <div>
+          { selectedCollective && this.state.showAddFunds &&
+          <div>
+            <AddFundsForm
+              collective={selectedCollective}
+              host={this.hostCollective}
+              onSubmit={this.addFunds}
+              onCancel={this.toggleAddFunds}
+              loading={this.state.loading}
+              LoggedInUser={this.props.LoggedInUser}
+              />
+            <div className="results">
+              <div className="error">{this.state.error}</div>
+            </div>
+          </div>
+            }
         </div>
       </div>
     );
@@ -450,7 +307,7 @@ class CollectivePickerWithData extends React.Component {
 }
 
 const getCollectivesQuery = gql`
-query Collective($hostCollectiveSlug: String!, $orderBy: CollectiveOrderField, $orderDirection: OrderDirection, $limit: Int, $offset: Int, $expenseStatus: String) {
+query Collective($hostCollectiveSlug: String!, $orderBy: CollectiveOrderField, $orderDirection: OrderDirection) {
   Collective(slug: $hostCollectiveSlug) {
     id
     slug
@@ -463,26 +320,22 @@ query Collective($hostCollectiveSlug: String!, $orderBy: CollectiveOrderField, $
       balance
       currency
     }
-    collectives(orderBy: $orderBy, orderDirection: $orderDirection, limit: $limit, offset: $offset, expenseStatus: $expenseStatus) {
-      total
-      collectives {
+    collectives(orderBy: $orderBy, orderDirection: $orderDirection) {
+      id
+      slug
+      name
+      currency
+      hostFeePercent
+      stats {
         id
-        slug
-        name
-        type
-        currency
-        hostFeePercent
-        stats {
+        balance
+        expenses {
           id
-          balance
-          expenses {
-            id
-            all
-            pending
-            paid
-            rejected
-            approved
-          }
+          all
+          pending
+          paid
+          rejected
+          approved
         }
       }
     }
@@ -490,61 +343,42 @@ query Collective($hostCollectiveSlug: String!, $orderBy: CollectiveOrderField, $
 }
 `;
 
+const COLLECTIVES_PER_PAGE = 20;
 export const addCollectivesData = graphql(getCollectivesQuery, {
-  name: 'collectives',
-  skip: props => props.collectiveFilter !== 'COLLECTIVES',
   options(props) {
     return {
       variables: {
-        hostCollectiveSlug: props.hostCollective.slug,
-        offset: props.query.collectivesOffset,
-        limit: props.query.collectivesLimit || MAX_COLLECTIVES_IN_SIDEBAR,
-        expenseStatus: props.query.collectivesQuery,
+        hostCollectiveSlug: props.hostCollectiveSlug,
+        offset: 0,
+        limit: props.limit || COLLECTIVES_PER_PAGE * 2,
         includeHostedCollectives: true,
-        orderBy: 'slug',
+        orderBy: 'name',
         orderDirection: 'ASC',
       }
     }
   },
+  props: ({ data }) => ({
+    data,
+    fetchMore: () => {
+      return data.fetchMore({
+        variables: {
+          offset: data.allCollectives.length,
+          limit: COLLECTIVES_PER_PAGE
+        },
+        updateQuery: (previousResult, { fetchMoreResult }) => {
+          if (!fetchMoreResult) {
+            return previousResult
+          }
+          return Object.assign({}, previousResult, {
+            // Append the new posts results to the old one
+            allCollectives: [...previousResult.allCollectives, ...fetchMoreResult.allCollectives]
+          })
+        }
+      })
+    }
+  })
 });
 
-/* For listing all the Organizations */
-const allCollectivesQuery = gql`
-query allCollectives($type: TypeOfCollective, $limit: Int, $offset: Int, $orderBy: CollectiveOrderField, $orderDirection: OrderDirection) {
-  allCollectives(type: $type, limit: $limit, offset: $offset, orderBy: $orderBy, orderDirection: $orderDirection) {
-    id
-    type
-    createdAt
-    slug
-    name
-    description
-    longDescription
-    currency
-    stats {
-      id
-      balance
-      yearlyBudget
-      backers {
-        all
-      }
-    }
-  }
-}
-`;
-
-const addOrganizations = graphql(allCollectivesQuery, {
-  name: 'organizations',
-  skip: props => props.collectiveFilter !== 'ORGANIZATIONS',
-  options: props => ({
-    variables: {
-      type: 'ORGANIZATION',
-      orderBy: 'slug',
-      orderDirection: 'ASC',
-      offset: props.query.collectivesOffset,
-      limit: props.query.collectivesLimit || MAX_COLLECTIVES_IN_SIDEBAR,
-    }
-  }),
-});
 
 const createOrderQuery = gql`
 mutation createOrder($order: OrderInputType!) {
@@ -564,15 +398,11 @@ mutation createOrder($order: OrderInputType!) {
 const addMutation = graphql(createOrderQuery, {
   props: ({ mutate }) => ({
     createOrder: async (order) => {
-      return await mutate({ variables: { order } });
+      return await mutate({ variables: { order } })
     }
   })
 });
 
-export const AddFundsFormWithData = addMutation(withIntl(AddFundsFormContainer));
+const addGraphQL = compose(addMutation, addCollectivesData);
 
-const queryCollectives = compose(addCollectivesData, addOrganizations);
-
-const CollectiveSelectorWithData = queryCollectives(withIntl(CollectiveSelector));
-
-export default withIntl(CollectivePickerWithData);
+export default addGraphQL(withIntl(CollectivePickerWithData));
