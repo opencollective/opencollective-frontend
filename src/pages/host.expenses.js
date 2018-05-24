@@ -1,19 +1,19 @@
 import React from 'react';
-import gql from 'graphql-tag'
-import { graphql } from 'react-apollo'
-import { get } from 'lodash';
-
-import { addGetLoggedInUserFunction } from '../graphql/queries';
 import Header from '../components/Header';
 import Body from '../components/Body';
 import Footer from '../components/Footer';
 import CollectiveCover from '../components/CollectiveCover';
+import { addGetLoggedInUserFunction } from '../graphql/queries';
 import Loading from '../components/Loading';
 import ErrorPage from '../components/ErrorPage';
 import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
 import ExpensesWithData from '../components/ExpensesWithData';
-import CollectivePicker, { AddFundsFormWithData } from '../components/CollectivePickerWithData';
+import { get } from 'lodash';
+import CollectivePicker from '../components/CollectivePickerWithData';
+import ExpensesStatsWithData from '../components/ExpensesStatsWithData';
+import { graphql } from 'react-apollo'
+import gql from 'graphql-tag'
 
 class HostExpensesPage extends React.Component {
 
@@ -24,7 +24,7 @@ class HostExpensesPage extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = { selectedCollective: null, showAddFunds: false };
+    this.state = { selectedCollective: null };
   }
 
   async componentDidMount() {
@@ -33,28 +33,22 @@ class HostExpensesPage extends React.Component {
     this.setState({ LoggedInUser });
   }
 
-  pickCollective = (selectedCollective) => {
+  pickCollective(selectedCollective) {
     this.setState({ selectedCollective });
   }
 
-  toggleAddFunds = () => {
-    const showAddFunds = !this.state.showAddFunds;
-    this.setState({ showAddFunds });
-  }
-
   render() {
-    const { data: { error, loading, Collective } } = this.props;
+    const { data } = this.props;
     const { LoggedInUser } = this.state;
 
-    if (error) {
-      console.error("graphql error>>>", error.message);
+    if (data.error) {
+      console.error("graphql error>>>", data.error.message);
       return (<ErrorPage message="GraphQL error" />)
     }
-    if (loading) {
-      return (<Loading />);
-    }
 
-    const collective = Collective;
+    if (!data.Collective) return (<Loading />);
+
+    const collective = data.Collective;
     const selectedCollective = this.state.selectedCollective || collective;
     const includeHostedCollectives = (selectedCollective.id === collective.id);
 
@@ -87,8 +81,7 @@ class HostExpensesPage extends React.Component {
             }
           }
         }
-        `}
-        </style>
+        `}</style>
 
         <Header
           title={collective.name}
@@ -108,41 +101,30 @@ class HostExpensesPage extends React.Component {
             style={get(collective, 'settings.style.hero.cover')}
             />
 
+          <CollectivePicker
+            hostCollectiveSlug={this.props.collectiveSlug}
+            LoggedInUser={LoggedInUser}
+            onChange={(selectedCollective => this.pickCollective(selectedCollective))}
+            />
+
           <div className="content">
-            <div className="col side pullLeft">
-              <CollectivePicker
-                query={this.props.query}
-                hostCollective={collective}
-                LoggedInUser={LoggedInUser}
-                onChange={this.pickCollective}
-                toggleAddFunds={this.toggleAddFunds}
+
+            <div className="col large pullLeft">
+              <ExpensesWithData
+                collective={selectedCollective}
+                includeHostedCollectives={includeHostedCollectives}
+                LoggedInUser={this.state.LoggedInUser}
+                filters={true}
+                editable={true}
                 />
             </div>
-            <div className="col large pullLeft">
-              { this.state.showAddFunds &&
-                <AddFundsFormWithData
-                  hostCollective={collective}
-                  selectedCollective={selectedCollective}
-                  toggleAddFunds={this.toggleAddFunds}
-                  LoggedInUser={LoggedInUser}
-                  /> }
 
-              { !this.state.showAddFunds &&
-                <div>
-                  <h1 style={{ margin: '0 0 20px 0' }}>
-                    { this.state.selectedCollective && (selectedCollective.name || selectedCollective.slug) }
-                    { !this.state.selectedCollective && 'All' }
-                    {' '} expenses
-                  </h1>
-                  <ExpensesWithData
-                    collective={selectedCollective}
-                    includeHostedCollectives={includeHostedCollectives}
-                    LoggedInUser={this.state.LoggedInUser}
-                    filters={true}
-                    editable={true}
-                    />
-                </div> }
-            </div>
+            { this.state.selectedCollective &&
+              <div className="col side pullLeft">
+                <ExpensesStatsWithData slug={selectedCollective.slug} />
+              </div>
+            }
+
           </div>
 
         </Body>
@@ -166,14 +148,6 @@ query Collective($collectiveSlug: String!) {
     settings
     image
     isHost
-    paymentMethods {
-      id
-      uuid
-      service
-      createdAt
-      balance
-      currency
-    }
   }
 }
 `;
