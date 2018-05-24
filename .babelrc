@@ -14,6 +14,11 @@
     "lodash",
     ["react-intl", {
       "messagesDir": "./build/messages/"
+    }],
+    ["styled-components", {
+      "ssr": true,
+      "displayName": true,
+      "preprocess": false
     }]
   ],
   "env": {
