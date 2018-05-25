@@ -3,6 +3,8 @@ import fetch from 'node-fetch';
 
 const WEBSITE_URL = process.env.WEBSITE_URL || "https://staging.opencollective.com";
 
+const timeout = 30000;
+
 const cacheBurst = `?cacheBurst=${Math.round(Math.random()*100000)}`;
 
 describe("badge.routes.test.js", () => {
@@ -11,32 +13,32 @@ describe("badge.routes.test.js", () => {
     test("returns a 404 if slug doesn't exist", async () => {
       const res = await r2(`${WEBSITE_URL}/webpack222/backers/badge.svg${cacheBurst}`).response;
       expect(res.status).toEqual(404);
-    });
+    }, timeout);
 
     test("loads the backers badge", async () => {
       const res = await r2(`${WEBSITE_URL}/apex/backers/badge.svg${cacheBurst}`).text;
       expect(res).toMatch(/backers<\/text>/);
-    });
+    }, timeout);
 
     test("loads the sponsors badge", async () => {
       const res = await r2(`${WEBSITE_URL}/apex/sponsors/badge.svg${cacheBurst}`).text;
       expect(res).toMatch(/sponsors<\/text>/);
-    });
+    }, timeout);
 
     test("returns a 404 if slug doesn't exist", async () => {
       const res = await r2(`${WEBSITE_URL}/apex222/backers/0/avatar.svg${cacheBurst}`).response;
       expect(res.status).toEqual(404);
-    });
+    }, timeout);
 
     test("loads the first backer avatar.svg", async () => {
       const res = await r2(`${WEBSITE_URL}/apex/backers/0/avatar.svg${cacheBurst}`).text;
       expect(res).toMatch(/<image width="64" height="64"/);
-    });
+    }, timeout);
 
     test("loads the first sponsor avatar.svg", async () => {
       const res = await r2(`${WEBSITE_URL}/apex/sponsors/0/avatar.svg${cacheBurst}`).text;
       expect(res).toMatch(/height="64"/);
-    });
+    }, timeout);
 
     test("redirects to the website of the second backer", async () => {
       const res = await r2(`${WEBSITE_URL}/apex/backers/1/website${cacheBurst}`).response;
@@ -44,19 +46,19 @@ describe("badge.routes.test.js", () => {
       expect(res.url).toMatch(/utm_campaign=apex/);
       expect(res.url).toMatch(/utm_medium=github/);
       expect(res.url).toMatch(/utm_source=opencollective/);
-    });
+    }, timeout);
   });
 
   describe("custom tiers", () => {
     test("loads the badge", async () => {
       const res = await r2(`${WEBSITE_URL}/apex/tiers/sponsors/badge.svg${cacheBurst}`).text;
       expect(res).toMatch(/Sponsors<\/text>/);
-    });
+    }, timeout);
 
     test("loads the first member avatar.svg", async () => {
       const res = await r2(`${WEBSITE_URL}/apex/tiers/sponsors/0/avatar.svg${cacheBurst}&isActive=false`).text;
       expect(res).toMatch(/<image width="140" height="64"/);
-    });
+    }, timeout);
 
   });
 
@@ -69,12 +71,11 @@ describe("badge.routes.test.js", () => {
       expect(res.headers.get('cache-control')).toMatch(/public, max-age=[1-9][0-9]{2,5}/);
       const text = await res.text();
       expect(text.length).toBeGreaterThan(800000);
-    });
+    }, timeout);
   })
 
   describe("collective logo", () => {
     test("loads the logo in ascii", async () => {
-      jest.setTimeout(10000);
       const res = await fetch(`${WEBSITE_URL}/railsgirlsatl/logo.txt${cacheBurst}`);
       expect(res.status).toEqual(200);
       expect(res.headers.get('content-type')).toEqual('text/plain; charset=utf-8');
@@ -82,7 +83,7 @@ describe("badge.routes.test.js", () => {
       const text = await res.text();
       expect(text.length).toBeGreaterThan(600);
       expect(text.length).toBeLessThan(1000);
-    });
+    }, timeout);
   })
 
 });

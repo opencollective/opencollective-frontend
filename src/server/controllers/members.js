@@ -110,14 +110,16 @@ export async function list(req, res) {
 
   const mapping = {
     'MemberId': 'id',
-    'createdAt': r => moment(r.createdAt).format("YYYY-MM-DD HH:mm"),
+    'createdAt': r => moment(new Date(r.createdAt)).format("YYYY-MM-DD HH:mm"),
     'type': 'member.type',
     'role': 'role',
     'tier': 'tier.name',
     'isActive': isActive,
     'totalAmountDonated': (r) => (get(r, 'stats.totalDonations') || 0) / 100,
     'currency': 'transactions[0].currency',
-    'lastTransactionAt': r => moment(r.transactions[0] && r.transactions[0].createdAt).format("YYYY-MM-DD HH:mm"),
+    'lastTransactionAt': r => {
+      return moment(r.transactions[0] && new Date(r.transactions[0].createdAt)).format("YYYY-MM-DD HH:mm");
+    },
     'lastTransactionAmount': (r) => (get(r, 'transactions[0].amount') || 0) / 100,
     'profile': (r) => `${process.env.WEBSITE_URL}/${r.member.slug}`,
     'name': 'member.name',

@@ -1,5 +1,6 @@
 import React from 'react';
-import Document, { Head, Main, NextScript } from 'next/document'
+import Document, { Head, Main, NextScript } from 'next/document';
+import { ServerStyleSheet } from 'styled-components';
 
 // The document (which is SSR-only) needs to be customized to expose the locale
 // data for the user's locale for React Intl to work in the browser.
@@ -7,13 +8,19 @@ export default class IntlDocument extends Document {
 
   static async getInitialProps (context) {
     const props = await super.getInitialProps(context);
-    const { req: { locale, localeDataScript } } = context;
+    const { req: { locale, localeDataScript }, renderPage } = context;
+
+    const sheet = new ServerStyleSheet();
+    const page = renderPage(App => props => sheet.collectStyles(<App {...props} />));
+    const styleTags = sheet.getStyleElement();
 
     return {
       ...props,
+      ...page,
       locale,
-      localeDataScript
-    }
+      localeDataScript,
+      styleTags,
+    };
   }
 
   constructor (props) {
@@ -79,10 +86,11 @@ export default class IntlDocument extends Document {
             text-decoration: none;
           }
         `}</style>
+          {this.props.styleTags}
         <Head />
         <body>
           <Main />
-          {scripts.map((script) => <script type="text/javascript" src={script} />)}
+          {scripts.map((script) => <script key={script} type="text/javascript" src={script} />)}
           {/* TODO: use the official react-stripe-elements; this is ugly */}
           <script
             dangerouslySetInnerHTML={{

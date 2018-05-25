@@ -1,14 +1,13 @@
 import React from 'react';
 import {
-  Col,
   ControlLabel,
   FormControl,
   FormGroup,
-  Grid,
-  Row,
 } from 'react-bootstrap';
+import { Box, Flex } from 'grid-styled';
 import Router from 'next/router';
 import classNames from 'classnames';
+import styled from 'styled-components';
 
 import withData from '../lib/withData'
 import withIntl from '../lib/withIntl';
@@ -24,6 +23,31 @@ import LoadingGrid from '../components/LoadingGrid';
 import { Link } from '../server/pages';
 
 import colors from '../constants/colors';
+
+const SearchInput = styled(FormControl)`
+  &&& {
+    border: none;
+    border-bottom: 2px solid ${colors.blue};
+    border-radius: 0;
+    box-shadow: none;
+    display: block;
+    font-family: lato;
+    height: 3.4rem;
+    padding: 0;
+  }
+`;
+
+const SearchButton = styled(Button).attrs({
+  className: 'blue',
+})`
+  && {
+    padding: 0 2rem;
+  }
+`;
+
+const Container = Box.extend`
+  max-width: 1200px;
+`;
 
 class SearchPage extends React.Component {
   static getInitialProps({ query = {} }) {
@@ -81,94 +105,46 @@ class SearchPage extends React.Component {
 
     return (
       <div>
-        <style jsx>{`
-          div :global(.results-row) {
-            flex-wrap: wrap;
-            justify-content: flex-start;
-            margin: 0;
-          }
-
-          @media(max-width: 500px) {
-            div :global(.results-row) {
-              justify-content: center;
-            }
-          }
-
-          .search-row {
-            align-items: flex-end;
-            display: flex;
-            margin: 2rem 0;
-          }
-
-          div :global(.col) {
-            display: flex;
-            flex-grow: 1;
-            justify-content: flex-start;
-            margin: 2rem 1rem;
-            max-width: 200px;
-          }
-
-          div :global(.search-input) {
-            border: none;
-            border-bottom: 2px solid ${colors.blue};
-            border-radius: 0;
-            box-shadow: none;
-            display: block;
-            font-family: lato;
-            height: 3.4rem;
-            padding: 0;
-          }
-
-          .center {
-            padding: 2rem 0;
-            text-align: center;
-            width: 100%;
-          }
-
-          .pagination {
-            margin: 2rem auto;
-          }
-        `}</style>
         <Header
           title="Search"
           className={loadingUserLogin ? 'loading' : ''}
           LoggedInUser={LoggedInUser}
           showSearch={false}
-          />
+        />
         <Body>
-          <Grid>
-            <Row>
-              <Col xs={12}>
-                <form method="GET" onSubmit={this.refetch}>
-                  <FormGroup controlId="search" bsSize="large">
-                    <ControlLabel className="h1">Search Open Collective</ControlLabel>
-                    <div className="search-row">
-                      <FormControl type="search" name="q" placeholder="open source" className="search-input" defaultValue={term} />
-                      <Button type="submit" className="blue" style={{ padding: '0 2rem' }}><span className="fa fa-search" /></Button>
-                    </div>
-                  </FormGroup>
-                </form>
-              </Col>
-            </Row>
-            <Row className="results-row">
+          <Container mx="auto" px={3} w={[1, 0.85]}>
+            <Box w={1}>
+              <form method="GET" onSubmit={this.refetch}>
+                <FormGroup controlId="search" bsSize="large">
+                  <ControlLabel className="h1">Search Open Collective</ControlLabel>
+                  <Flex alignItems="flex-end" my={3}>
+                    <SearchInput type="search" name="q" placeholder="open source" defaultValue={term} />
+                    <SearchButton type="submit"><span className="fa fa-search" /></SearchButton>
+                  </Flex>
+                </FormGroup>
+              </form>
+            </Box>
+            <Flex justifyContent={['center', 'center', 'flex-start']} flexWrap="wrap">
               {loading && (
-                <div className="center">
+                <Flex py={3} w={1} justifyContent="center">
                   <LoadingGrid />
-                </div>
+                </Flex>
               )}
 
               {showCollectives && collectives.map(collective => (
-                <Col className="col" key={collective.slug}>
+                <Flex key={collective.slug} my={3} mx={2}>
                   <CollectiveCard collective={collective} />
-                </Col>
+                </Flex>
               ))}
 
               { /* TODO: add suggested collectives when the result is empty */ }
               {showCollectives && collectives.length === 0 && (
-                <p className="center"><em>No collectives found matching your query: &quot;{term}&quot;</em></p>
+                <Flex py={3} w={1} justifyContent="center">
+                  <p><em>No collectives found matching your query: &quot;{term}&quot;</em></p>
+                </Flex>
               )}
-            </Row>
-            {showCollectives && collectives.length !== 0 && total > limit && <Row>
+            </Flex>
+            {showCollectives && collectives.length !== 0 && total > limit && <Flex justifyContent="center">
               <ul className="pagination">
                 { Array(Math.ceil(total / limit)).fill(1).map((n, i) => (
                   <li key={i * limit} className={classNames({ active: (i * limit) === offset })}>
@@ -186,8 +162,8 @@ class SearchPage extends React.Component {
                   </li>
                 )) }
               </ul>
-            </Row>}
-          </Grid>
+            </Flex>}
+          </Container>
         </Body>
         <Footer />
       </div>

@@ -8,6 +8,7 @@ import request from 'request';
 import { getCloudinaryUrl } from '../lib/utils';
 import imageToAscii from 'image-to-ascii';
 
+const DEBUG = process.env.DEBUG || false;
 const WEBSITE_URL = process.env.WEBSITE_URL || "https://opencollective.com";
 
 const cachedRequest = cachedRequestLib(request);
@@ -74,7 +75,7 @@ export function svg2png(svg) {
 
 
 export function generateSVGBannerForUsers(users, options) {
-  console.log(">>> generateSVGBannerForUsers", users.length, "users, options: ", options);
+  if (DEBUG) console.log(">>> generateSVGBannerForUsers", users.length, "users, options: ", options);
 
   const {
     style, limit, collectiveSlug

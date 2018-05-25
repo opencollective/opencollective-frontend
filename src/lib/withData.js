@@ -46,7 +46,7 @@ export default ComposedComponent => {
           try {
             await getDataFromTree(app)
           } catch (e) {
-            console.error(">>> apollo error: ", e);
+            if (process.env.DEBUG) console.error(">>> apollo error: ", e);
           }
           // getDataFromTree does not call componentWillUnmount
           // head side effect therefore need to be cleared manually

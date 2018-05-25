@@ -12,6 +12,8 @@ class Collectives extends React.Component {
   render() {
     const memberships = [...this.props.memberships];
 
+    // sort by totalDonations, then createdAt date, then alphabetically
+    // it's important to have a consistent sorting across environments and browsers
     memberships.sort((a, b) => {
       if (b.stats.totalDonations !== a.stats.totalDonations) {
         return b.stats.totalDonations - a.stats.totalDonations;
