@@ -1,4 +1,4 @@
-import { pick, omit } from 'lodash';
+import { pick, omit, get } from 'lodash';
 import debug from 'debug';
 import Promise from 'bluebird';
 
@@ -196,7 +196,7 @@ export function createOrder(order, loaders, remoteUser) {
         MatchingPaymentMethodId: order.MatchingPaymentMethodId
       };
 
-      if (order.referral && order.referral.id && order.referral.id !== order.FromCollectiveId) {
+      if (order.referral && get(order, 'referral.id') !== orderData.FromCollectiveId) {
         orderData.ReferralCollectiveId = order.referral.id;
       }
 
