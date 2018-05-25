@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Error from '../components/Error';
+import Error from './Error';
 import withIntl from '../lib/withIntl';
 import { graphql } from 'react-apollo'
 import gql from 'graphql-tag'
@@ -48,10 +48,10 @@ class CollectivesForRedeemPageWithData extends React.Component {
       console.error("graphql error>>>", data.error.message);
       return (<Error message="GraphQL error" />)
     }
-    if (!data.allCollectives) {
+    if (!data.allCollectives || !data.allCollectives.collectives) {
       return (<div />);
     }
-    const collectives = [...data.allCollectives];
+    const collectives = [...data.allCollectives.collectives];
     if (collectives.length === 0) {
       return (<div />)
     }
@@ -106,24 +106,27 @@ class CollectivesForRedeemPageWithData extends React.Component {
 }
 
 const getCollectivesQuery = gql`
-query allCollectives($HostCollectiveId: Int, $ParentCollectiveId: Int, $limit: Int, $offset: Int, $orderBy: String, $orderDirection: String) {
+query allCollectives($HostCollectiveId: Int, $ParentCollectiveId: Int, $limit: Int, $offset: Int, $orderBy: CollectiveOrderField, $orderDirection: OrderDirection) {
   allCollectives(HostCollectiveId: $HostCollectiveId, ParentCollectiveId: $ParentCollectiveId, limit: $limit, offset: $offset, orderBy: $orderBy, orderDirection: $orderDirection) {
-    id
-    type
-    createdAt
-    slug
-    name
-    description
-    longDescription
-    image
-    currency
-    backgroundImage
-    stats {
+    total
+    collectives {
       id
-      yearlyBudget
-      backers {
-        users
-        organizations
+      type
+      createdAt
+      slug
+      name
+      description
+      longDescription
+      image
+      currency
+      backgroundImage
+      stats {
+        id
+        yearlyBudget
+        backers {
+          users
+          organizations
+        }
       }
     }
   }
@@ -145,24 +148,21 @@ export const addCollectivesData = graphql(getCollectivesQuery, {
   },
   props: ({ data, ownProps }) => ({
     data,
-    fetchMore: () => {
-      return data.fetchMore({
-        variables: {
-          offset: data.allCollectives.length,
-          limit: ownProps.limit || COLLECTIVE_CARDS_PER_PAGE
-        },
-        updateQuery: (previousResult, { fetchMoreResult }) => {
-          if (!fetchMoreResult) {
-            return previousResult
-          }
-          return Object.assign({}, previousResult, {
-            // Append the new posts results to the old one
-            allCollectives: [...previousResult.allCollectives, ...fetchMoreResult.allCollectives]
-          })
-        }
-      })
-    }
-  })
+    fetchMore: () => data.fetchMore({
+      variables: {
+        offset: data.allCollectives.collectives.length,
+        limit: ownProps.limit || COLLECTIVE_CARDS_PER_PAGE
+      },
+      updateQuery: (previousResult, { fetchMoreResult }) => {
+        if (!fetchMoreResult) return previousResult;
+        // Update the results object with new entries
+        const { __typename, total, collectives } = previousResult.allCollectives;
+        const all = collectives.concat(fetchMoreResult.allCollectives.collectives);
+        return Object.assign({}, previousResult, {
+          allCollectives: { __typename, total, collectives: all } });
+      },
+    }),
+  }),
 });
 
 

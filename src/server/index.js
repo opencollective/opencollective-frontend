@@ -8,6 +8,7 @@ import { loggerMiddleware, logger } from './logger';
 import accepts from 'accepts';
 import { getLocaleDataScript, getMessages, languages } from './intl';
 
+const DEBUG = process.env.DEBUG || false;
 const env = process.env.NODE_ENV || "development";
 const dev = (env === 'development');
 const server = express();
@@ -30,7 +31,7 @@ app.prepare()
   server.use((req, res, next) => {
     const accept = accepts(req)
     const locale = accept.language(languages)  || 'en';
-    console.log(">>> url", req.url, "locale", locale);
+    if (DEBUG) console.log(">>> url", req.url, "locale", locale);
     req.locale = locale;
     req.localeDataScript = getLocaleDataScript(locale)
     req.messages = getMessages(locale)

@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import withIntl from '../lib/withIntl';
-import Currency from '../components/Currency';
-import SmallButton from '../components/SmallButton';
+import Currency from './Currency';
+import SmallButton from './SmallButton';
 import { FormattedMessage } from 'react-intl';
 import { connectAccount } from '../lib/api';
 
@@ -62,7 +62,6 @@ class ConnectPaypal extends React.Component {
             font-size: 3.6rem;
             font-weight: 500;
             line-height: 1.11;
-            text-align: right;
             color: #252729;
             margin: 0.5rem 0;
           }
@@ -84,18 +83,16 @@ class ConnectPaypal extends React.Component {
         `}</style>
         <div className="connectPaypal">
           { paypalPaymentMethod &&
-          <div>
+          <div style={{ textAlign: 'center' }}>
             <div className="balance">
-              <label>
-                <FormattedMessage id="collective.stats.balance.title" defaultMessage="Available balance:" />
-              </label>
+              <FormattedMessage id="collective.stats.balance.title" defaultMessage="Available balance:" />
               <div className="amount">
                 <Currency value={paypalPaymentMethod.balance} currency={paypalPaymentMethod.currency} />
               </div>
               <div>
                 <SmallButton bsStyle="primary" bsSize="xsmall" onClick={this.connectPaypal} disabled={this.state.connectingPaypal}>
                   { this.state.connectingPaypal && "Processing..."}
-                  { !this.state.connectingPaypal && "refill the payment balance"}
+                  { !this.state.connectingPaypal && "refill balance"}
                 </SmallButton>
               </div>
             </div>

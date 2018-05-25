@@ -1,12 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Error from '../components/Error';
-import withIntl from '../lib/withIntl';
-import Expense from '../components/Expense';
-import CommentsWithData from '../components/CommentsWithData';
-import { graphql } from 'react-apollo'
 import gql from 'graphql-tag'
+import { graphql } from 'react-apollo'
 import { FormattedMessage } from 'react-intl'
+
+import Error from '../../../components/Error';
+import withIntl from '../../../lib/withIntl';
+import Expense from './Expense';
+
+import CommentsWithData from '../../../components/CommentsWithData';
+
 
 class ExpenseWithData extends React.Component {
 

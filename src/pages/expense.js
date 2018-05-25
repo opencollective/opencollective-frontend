@@ -1,17 +1,20 @@
 import React from 'react';
+import withData from '../lib/withData';
+import withIntl from '../lib/withIntl';
+import { FormattedMessage } from 'react-intl'
+
+import { addCollectiveCoverData, addGetLoggedInUserFunction } from '../graphql/queries';
 import Header from '../components/Header';
 import Body from '../components/Body';
 import Footer from '../components/Footer';
 import CollectiveCover from '../components/CollectiveCover';
-import { addCollectiveCoverData, addGetLoggedInUserFunction } from '../graphql/queries';
 import Loading from '../components/Loading';
 import NotFound from '../components/NotFoundPage';
 import ErrorPage from '../components/ErrorPage';
-import withData from '../lib/withData';
-import withIntl from '../lib/withIntl';
-import ExpenseWithData from '../components/ExpenseWithData';
-import { FormattedMessage } from 'react-intl'
 import Link from '../components/Link';
+
+import ExpenseWithData from '../apps/expenses/components/ExpenseWithData';
+
 
 class ExpensePage extends React.Component {
 

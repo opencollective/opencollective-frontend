@@ -22,9 +22,10 @@ class OrderForm extends React.Component {
     order: PropTypes.object.isRequired, // { tier: {}, quantity: Int, interval: String, totalAmount: Int }
     collective: PropTypes.object.isRequired,
     LoggedInUser: PropTypes.object,
-    onSubmit: PropTypes.func.isRequired,
+    onSubmit: PropTypes.func,
     matchingFund: PropTypes.string,
-    redeemFlow: PropTypes.bool
+    redeemFlow: PropTypes.bool,
+    intl: PropTypes.object
   }
 
   constructor(props) {

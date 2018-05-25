@@ -1,17 +1,19 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import withIntl from '../lib/withIntl';
 import { defineMessages, FormattedMessage, FormattedNumber, FormattedDate } from 'react-intl';
-import { capitalize, formatCurrency } from '../lib/utils';
 import { graphql } from 'react-apollo'
 import gql from 'graphql-tag'
-import Avatar from './Avatar';
+
+import withIntl from '../../../lib/withIntl';
+import Avatar from '../../../components/Avatar';
+import { capitalize, formatCurrency } from '../../../lib/utils';
+import Link from '../../../components/Link';
+import SmallButton from '../../../components/SmallButton';
+
 import ExpenseDetails from './ExpenseDetails';
 import ApproveExpenseBtn from './ApproveExpenseBtn';
 import RejectExpenseBtn from './RejectExpenseBtn';
 import PayExpenseBtn from './PayExpenseBtn';
-import Link from './Link';
-import SmallButton from './SmallButton';
 
 class Expense extends React.Component {
 

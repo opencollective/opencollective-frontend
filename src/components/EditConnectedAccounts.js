@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { defineMessages } from 'react-intl';
 import withIntl from '../lib/withIntl';
-import EditConnectedAccount from '../components/EditConnectedAccount';
+import EditConnectedAccount from './EditConnectedAccount';
 import { groupBy } from 'lodash';
 import { capitalize } from '../lib/utils';
 

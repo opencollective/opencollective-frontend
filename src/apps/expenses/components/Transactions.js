@@ -3,12 +3,13 @@ import PropTypes from 'prop-types';
 import { ButtonGroup, Button } from 'react-bootstrap';
 import { FormattedMessage } from 'react-intl';
 
-import withIntl from '../lib/withIntl';
+import withIntl from '../../../lib/withIntl';
+import colors from '../../../constants/colors';
 
-import colors from '../constants/colors';
 import Transaction from './Transaction';
 import TransactionsExportPopoverAndButton from './TransactionsExportPopoverAndButton';
 import DownloadInvoicesPopOver from './DownloadInvoicesPopOver';
+
 
 class Transactions extends React.Component {
 

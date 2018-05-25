@@ -13,6 +13,8 @@ import express from 'express';
 
 module.exports = (server, app) => {
 
+  const DEBUG = process.env.DEBUG || false;
+
   server.get('*', mw.ga, (req, res, next) => {
     req.app = app;
     return next();
@@ -29,7 +31,7 @@ module.exports = (server, app) => {
   });
 
   server.all('/api/*', (req, res) => {
-    console.log(">>> api request", translateApiUrl(req.url));
+    if (DEBUG) console.log(">>> api request", translateApiUrl(req.url));
     req
       .pipe(request(translateApiUrl(req.url), { followRedirect: false }))
       .on('error', (e) => {

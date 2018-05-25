@@ -1,14 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Error from '../components/Error';
+import Error from './Error';
 import withIntl from '../lib/withIntl';
 import { graphql, compose } from 'react-apollo';
 import gql from 'graphql-tag'
 import { DropdownButton, MenuItem, Badge } from 'react-bootstrap';
-import Currency from '../components/Currency';
+import Currency from './Currency';
 import { FormattedMessage, defineMessages } from 'react-intl';
-import ConnectPaypal from '../components/ConnectPaypal';
-import AddFundsForm from '../components/AddFundsForm';
+import ConnectPaypal from './ConnectPaypal';
+import AddFundsForm from './AddFundsForm';
 import { pick } from 'lodash';
 
 class CollectivePickerWithData extends React.Component {
@@ -32,6 +32,11 @@ class CollectivePickerWithData extends React.Component {
       'badge.tooltip.pending': { id: 'expenses.badge.tooltip.pending', defaultMessage: "{pending} {pending, plural, one {expense} other {expenses}} pending approval" },
       'badge.tooltip.approved': { id: 'expenses.badge.tooltip.approved', defaultMessage: "{approved} {approved, plural, one {expense} other {expenses}} ready to be paid" }
     });
+  }
+
+  canEdit = () => {
+    const { LoggedInUser } = this.props;
+    return LoggedInUser && LoggedInUser.canEditCollective(this.hostCollective);
   }
 
   async addFunds(form) {
@@ -82,7 +87,7 @@ class CollectivePickerWithData extends React.Component {
   }
 
   onChange(CollectiveId) {
-    const collectives = this.hostCollective.collectives;
+    const collectives = this.hostCollective.collectives.collectives;
     const selectedCollective = CollectiveId > 0 && collectives.find(c => c.id === CollectiveId);
     this.setState({ CollectiveId });
     this.props.onChange(selectedCollective);
@@ -158,7 +163,7 @@ class CollectivePickerWithData extends React.Component {
   }
 
   render() {
-    const { LoggedInUser, data: { loading, error, Collective } } = this.props;
+    const { data: { loading, error, Collective } } = this.props;
 
     if (error) {
       console.error("graphql error>>>", error.message);
@@ -166,15 +171,11 @@ class CollectivePickerWithData extends React.Component {
     }
 
     this.hostCollective = Collective || this.hostCollective;
-    const canAddFunds = LoggedInUser && LoggedInUser.canEditCollective(this.hostCollective);
-
     if (loading || !this.hostCollective) {
       return (<div />);
     }
 
-    const collectives = [...this.hostCollective.collectives].sort((a, b) => {
-      return (b.name.toUpperCase() < a.name.toUpperCase()) ? 1 : -1;
-    });
+    const collectives = [...this.hostCollective.collectives.collectives];
 
     const selectedCollective = collectives.find(c => c.id === this.state.CollectiveId);
     const selectedTitle = selectedCollective ? this.renderCollectiveMenuItem(selectedCollective, 'selected') : <div className="defaultTitle"><FormattedMessage id="expenses.allCollectives" defaultMessage="All Collectives" /></div>;
@@ -235,9 +236,8 @@ class CollectivePickerWithData extends React.Component {
             text-align: center;
             padding-bottom: 3rem;
           }
-
         `}</style>
-        <style global>{`
+        <style jsx global>{`
           .CollectivesContainer .defaultTitle {
             width: 40rem;
             float: left;
@@ -255,7 +255,7 @@ class CollectivePickerWithData extends React.Component {
           }
         `}</style>
         <div className="submenu">
-          <div className="">
+          <div>
             <div className="title">
               <h1><FormattedMessage id="expenses.collectivePicker.title" defaultMessage="Finances" /></h1>
               <h2><FormattedMessage id="expenses.collectivePicker.subtitle" defaultMessage="for {n} {n, plural, one {collective} other {collectives}}" values={{n: collectives.length}} /></h2>
@@ -274,18 +274,14 @@ class CollectivePickerWithData extends React.Component {
                   </MenuItem>
                   ))}
               </DropdownButton>
-              { selectedCollective && !this.state.showAddFunds && canAddFunds &&
+              { selectedCollective && !this.state.showAddFunds && ::this.canEdit() &&
               <a className="addFundsLink" onClick={this.toggleAddFunds}><FormattedMessage id="addfunds.submit" defaultMessage="Add Funds" /></a>
                 }
             </div>
             }
           </div>
           <div className="right">
-            { LoggedInUser && LoggedInUser.canEditCollective(this.hostCollective) &&
-            <ConnectPaypal
-              collective={this.hostCollective}
-              />
-              }
+            { ::this.canEdit() && <ConnectPaypal collective={this.hostCollective} /> }
           </div>
         </div>
         <div>
@@ -297,7 +293,7 @@ class CollectivePickerWithData extends React.Component {
               onSubmit={this.addFunds}
               onCancel={this.toggleAddFunds}
               loading={this.state.loading}
-              LoggedInUser={LoggedInUser}
+              LoggedInUser={this.props.LoggedInUser}
               />
             <div className="results">
               <div className="error">{this.state.error}</div>
@@ -311,7 +307,7 @@ class CollectivePickerWithData extends React.Component {
 }
 
 const getCollectivesQuery = gql`
-query Collective($hostCollectiveSlug: String!) {
+query Collective($hostCollectiveSlug: String!, $orderBy: CollectiveOrderField, $orderDirection: OrderDirection) {
   Collective(slug: $hostCollectiveSlug) {
     id
     slug
@@ -324,22 +320,25 @@ query Collective($hostCollectiveSlug: String!) {
       balance
       currency
     }
-    collectives {
-      id
-      slug
-      name
-      currency
-      hostFeePercent
-      stats {
+    collectives(orderBy: $orderBy, orderDirection: $orderDirection) {
+      total
+      collectives {
         id
-        balance
-        expenses {
+        slug
+        name
+        currency
+        hostFeePercent
+        stats {
           id
-          all
-          pending
-          paid
-          rejected
-          approved
+          balance
+          expenses {
+            id
+            all
+            pending
+            paid
+            rejected
+            approved
+          }
         }
       }
     }
@@ -355,7 +354,9 @@ export const addCollectivesData = graphql(getCollectivesQuery, {
         hostCollectiveSlug: props.hostCollectiveSlug,
         offset: 0,
         limit: props.limit || COLLECTIVES_PER_PAGE * 2,
-        includeHostedCollectives: true
+        includeHostedCollectives: true,
+        orderBy: 'name',
+        orderDirection: 'ASC',
       }
     }
   },
@@ -398,11 +399,11 @@ mutation createOrder($order: OrderInputType!) {
 `;
 
 const addMutation = graphql(createOrderQuery, {
-props: ( { mutate }) => ({
-  createOrder: async (order) => {
-    return await mutate({ variables: { order } })
-  }
-})
+  props: ({ mutate }) => ({
+    createOrder: async (order) => {
+      return await mutate({ variables: { order } })
+    }
+  })
 });
 
 const addGraphQL = compose(addMutation, addCollectivesData);

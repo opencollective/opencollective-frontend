@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { Button } from 'react-bootstrap';
 import { defineMessages } from 'react-intl';
 import withIntl from '../lib/withIntl';
-import EditPaymentMethod from '../components/EditPaymentMethod';
+import EditPaymentMethod from './EditPaymentMethod';
 
 class EditPaymentMethods extends React.Component {
 

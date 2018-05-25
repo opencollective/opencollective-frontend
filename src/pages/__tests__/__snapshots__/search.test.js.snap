@@ -1,9 +1,105 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Search Page renders empty results message 1`] = `
-<div
-  className="jsx-4119556752"
->
+.c1 {
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.c2 {
+  box-sizing: border-box;
+  margin-top: 16px;
+  margin-bottom: 16px;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: flex-end;
+  -webkit-box-align: flex-end;
+  -ms-flex-align: flex-end;
+  align-items: flex-end;
+}
+
+.c5 {
+  box-sizing: border-box;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-wrap: wrap;
+  -ms-flex-wrap: wrap;
+  flex-wrap: wrap;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+}
+
+.c6 {
+  box-sizing: border-box;
+  width: 100%;
+  padding-top: 16px;
+  padding-bottom: 16px;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+}
+
+.c3.c3.c3 {
+  border: none;
+  border-bottom: 2px solid #46B0ED;
+  border-radius: 0;
+  box-shadow: none;
+  display: block;
+  font-family: lato;
+  height: 3.4rem;
+  padding: 0;
+}
+
+.c4.c4 {
+  padding: 0 2rem;
+}
+
+.c0 {
+  box-sizing: border-box;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 16px;
+  padding-right: 16px;
+  max-width: 1200px;
+}
+
+@media screen and (min-width:40em) {
+  .c5 {
+    -webkit-box-pack: center;
+    -webkit-justify-content: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+  }
+}
+
+@media screen and (min-width:52em) {
+  .c5 {
+    -webkit-box-pack: start;
+    -webkit-justify-content: flex-start;
+    -ms-flex-pack: start;
+    justify-content: flex-start;
+  }
+}
+
+@media screen and (min-width:40em) {
+  .c0 {
+    width: 85%;
+  }
+}
+
+<div>
   <header
     className="jsx-3598562734"
   >
@@ -95,73 +191,62 @@ exports[`Search Page renders empty results message 1`] = `
     className="jsx-4138488456"
   >
     <div
-      className="container"
+      className="c0"
     >
       <div
-        className="row"
+        className="c1"
       >
-        <div
-          className="col-xs-12"
+        <form
+          method="GET"
+          onSubmit={[Function]}
         >
-          <form
-            className="jsx-4119556752"
-            method="GET"
-            onSubmit={[Function]}
+          <div
+            className="form-group form-group-lg"
           >
-            <div
-              className="form-group form-group-lg"
+            <label
+              className="h1 control-label"
+              htmlFor="search"
             >
-              <label
-                className="h1 control-label"
-                htmlFor="search"
+              Search Open Collective
+            </label>
+            <div
+              className="c2"
+            >
+              <input
+                className="c3 form-control"
+                defaultValue="test"
+                id="search"
+                name="q"
+                placeholder="open source"
+                type="search"
+              />
+              <button
+                className="jsx-2820878800 jsx-219750138 Button blue c4"
+                onClick={[Function]}
+                type="submit"
               >
-                Search Open Collective
-              </label>
-              <div
-                className="jsx-4119556752 search-row"
-              >
-                <input
-                  className="search-input form-control"
-                  defaultValue="test"
-                  id="search"
-                  name="q"
-                  placeholder="open source"
-                  type="search"
+                <span
+                  className="fa fa-search"
                 />
-                <button
-                  className="jsx-2820878800 jsx-219750138 Button blue"
-                  disabled={undefined}
-                  onClick={[Function]}
-                  style={
-                    Object {
-                      "padding": "0 2rem",
-                    }
-                  }
-                  type="submit"
-                >
-                  <span
-                    className="jsx-4119556752 fa fa-search"
-                  />
-                </button>
-              </div>
+              </button>
             </div>
-          </form>
-        </div>
+          </div>
+        </form>
       </div>
       <div
-        className="results-row row"
+        className="c5"
       >
-        <p
-          className="jsx-4119556752 center"
+        <div
+          className="c6"
         >
-          <em
-            className="jsx-4119556752"
-          >
-            No collectives found matching your query: "
-            test
-            "
-          </em>
-        </p>
+          <p>
+            <em>
+              No collectives found matching your query: "
+              test
+              "
+            </em>
+          </p>
+        </div>
       </div>
     </div>
   </main>
@@ -244,10 +329,8 @@ exports[`Search Page renders empty results message 1`] = `
               className="jsx-568600484"
             >
               <a
-                className={undefined}
                 href="/tos"
                 onClick={[Function]}
-                title={undefined}
               >
                 Terms Of Service
               </a>
@@ -498,10 +581,8 @@ exports[`Search Page renders error message 1`] = `
               className="jsx-568600484"
             >
               <a
-                className={undefined}
                 href="/tos"
                 onClick={[Function]}
-                title={undefined}
               >
                 Terms Of Service
               </a>
@@ -535,9 +616,105 @@ exports[`Search Page renders error message 1`] = `
 `;
 
 exports[`Search Page renders loading grid SVG 1`] = `
-<div
-  className="jsx-4119556752"
->
+.c1 {
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.c2 {
+  box-sizing: border-box;
+  margin-top: 16px;
+  margin-bottom: 16px;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: flex-end;
+  -webkit-box-align: flex-end;
+  -ms-flex-align: flex-end;
+  align-items: flex-end;
+}
+
+.c5 {
+  box-sizing: border-box;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-wrap: wrap;
+  -ms-flex-wrap: wrap;
+  flex-wrap: wrap;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+}
+
+.c6 {
+  box-sizing: border-box;
+  width: 100%;
+  padding-top: 16px;
+  padding-bottom: 16px;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+}
+
+.c3.c3.c3 {
+  border: none;
+  border-bottom: 2px solid #46B0ED;
+  border-radius: 0;
+  box-shadow: none;
+  display: block;
+  font-family: lato;
+  height: 3.4rem;
+  padding: 0;
+}
+
+.c4.c4 {
+  padding: 0 2rem;
+}
+
+.c0 {
+  box-sizing: border-box;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 16px;
+  padding-right: 16px;
+  max-width: 1200px;
+}
+
+@media screen and (min-width:40em) {
+  .c5 {
+    -webkit-box-pack: center;
+    -webkit-justify-content: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+  }
+}
+
+@media screen and (min-width:52em) {
+  .c5 {
+    -webkit-box-pack: start;
+    -webkit-justify-content: flex-start;
+    -ms-flex-pack: start;
+    justify-content: flex-start;
+  }
+}
+
+@media screen and (min-width:40em) {
+  .c0 {
+    width: 85%;
+  }
+}
+
+<div>
   <header
     className="jsx-3598562734"
   >
@@ -629,64 +806,53 @@ exports[`Search Page renders loading grid SVG 1`] = `
     className="jsx-4138488456"
   >
     <div
-      className="container"
+      className="c0"
     >
       <div
-        className="row"
+        className="c1"
       >
-        <div
-          className="col-xs-12"
+        <form
+          method="GET"
+          onSubmit={[Function]}
         >
-          <form
-            className="jsx-4119556752"
-            method="GET"
-            onSubmit={[Function]}
+          <div
+            className="form-group form-group-lg"
           >
-            <div
-              className="form-group form-group-lg"
+            <label
+              className="h1 control-label"
+              htmlFor="search"
             >
-              <label
-                className="h1 control-label"
-                htmlFor="search"
+              Search Open Collective
+            </label>
+            <div
+              className="c2"
+            >
+              <input
+                className="c3 form-control"
+                defaultValue=""
+                id="search"
+                name="q"
+                placeholder="open source"
+                type="search"
+              />
+              <button
+                className="jsx-2820878800 jsx-219750138 Button blue c4"
+                onClick={[Function]}
+                type="submit"
               >
-                Search Open Collective
-              </label>
-              <div
-                className="jsx-4119556752 search-row"
-              >
-                <input
-                  className="search-input form-control"
-                  defaultValue=""
-                  id="search"
-                  name="q"
-                  placeholder="open source"
-                  type="search"
+                <span
+                  className="fa fa-search"
                 />
-                <button
-                  className="jsx-2820878800 jsx-219750138 Button blue"
-                  disabled={undefined}
-                  onClick={[Function]}
-                  style={
-                    Object {
-                      "padding": "0 2rem",
-                    }
-                  }
-                  type="submit"
-                >
-                  <span
-                    className="jsx-4119556752 fa fa-search"
-                  />
-                </button>
-              </div>
+              </button>
             </div>
-          </form>
-        </div>
+          </div>
+        </form>
       </div>
       <div
-        className="results-row row"
+        className="c5"
       >
         <div
-          className="jsx-4119556752 center"
+          className="c6"
         >
           <svg
             fill="#46B0ED"
@@ -906,10 +1072,8 @@ exports[`Search Page renders loading grid SVG 1`] = `
               className="jsx-568600484"
             >
               <a
-                className={undefined}
                 href="/tos"
                 onClick={[Function]}
-                title={undefined}
               >
                 Terms Of Service
               </a>
@@ -943,9 +1107,114 @@ exports[`Search Page renders loading grid SVG 1`] = `
 `;
 
 exports[`Search Page renders search results with pagination 1`] = `
-<div
-  className="jsx-4119556752"
->
+.c1 {
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.c2 {
+  box-sizing: border-box;
+  margin-top: 16px;
+  margin-bottom: 16px;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: flex-end;
+  -webkit-box-align: flex-end;
+  -ms-flex-align: flex-end;
+  align-items: flex-end;
+}
+
+.c5 {
+  box-sizing: border-box;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-wrap: wrap;
+  -ms-flex-wrap: wrap;
+  flex-wrap: wrap;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+}
+
+.c6 {
+  box-sizing: border-box;
+  margin-left: 8px;
+  margin-right: 8px;
+  margin-top: 16px;
+  margin-bottom: 16px;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+}
+
+.c7 {
+  box-sizing: border-box;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+}
+
+.c3.c3.c3 {
+  border: none;
+  border-bottom: 2px solid #46B0ED;
+  border-radius: 0;
+  box-shadow: none;
+  display: block;
+  font-family: lato;
+  height: 3.4rem;
+  padding: 0;
+}
+
+.c4.c4 {
+  padding: 0 2rem;
+}
+
+.c0 {
+  box-sizing: border-box;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 16px;
+  padding-right: 16px;
+  max-width: 1200px;
+}
+
+@media screen and (min-width:40em) {
+  .c5 {
+    -webkit-box-pack: center;
+    -webkit-justify-content: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+  }
+}
+
+@media screen and (min-width:52em) {
+  .c5 {
+    -webkit-box-pack: start;
+    -webkit-justify-content: flex-start;
+    -ms-flex-pack: start;
+    justify-content: flex-start;
+  }
+}
+
+@media screen and (min-width:40em) {
+  .c0 {
+    width: 85%;
+  }
+}
+
+<div>
   <header
     className="jsx-3598562734"
   >
@@ -1037,70 +1306,57 @@ exports[`Search Page renders search results with pagination 1`] = `
     className="jsx-4138488456"
   >
     <div
-      className="container"
+      className="c0"
     >
       <div
-        className="row"
+        className="c1"
       >
-        <div
-          className="col-xs-12"
+        <form
+          method="GET"
+          onSubmit={[Function]}
         >
-          <form
-            className="jsx-4119556752"
-            method="GET"
-            onSubmit={[Function]}
+          <div
+            className="form-group form-group-lg"
           >
-            <div
-              className="form-group form-group-lg"
+            <label
+              className="h1 control-label"
+              htmlFor="search"
             >
-              <label
-                className="h1 control-label"
-                htmlFor="search"
+              Search Open Collective
+            </label>
+            <div
+              className="c2"
+            >
+              <input
+                className="c3 form-control"
+                defaultValue="Test"
+                id="search"
+                name="q"
+                placeholder="open source"
+                type="search"
+              />
+              <button
+                className="jsx-2820878800 jsx-219750138 Button blue c4"
+                onClick={[Function]}
+                type="submit"
               >
-                Search Open Collective
-              </label>
-              <div
-                className="jsx-4119556752 search-row"
-              >
-                <input
-                  className="search-input form-control"
-                  defaultValue="Test"
-                  id="search"
-                  name="q"
-                  placeholder="open source"
-                  type="search"
+                <span
+                  className="fa fa-search"
                 />
-                <button
-                  className="jsx-2820878800 jsx-219750138 Button blue"
-                  disabled={undefined}
-                  onClick={[Function]}
-                  style={
-                    Object {
-                      "padding": "0 2rem",
-                    }
-                  }
-                  type="submit"
-                >
-                  <span
-                    className="jsx-4119556752 fa fa-search"
-                  />
-                </button>
-              </div>
+              </button>
             </div>
-          </form>
-        </div>
+          </div>
+        </form>
       </div>
       <div
-        className="results-row row"
+        className="c5"
       >
         <div
-          className="col "
+          className="c6"
         >
           <a
-            className={undefined}
             href="/test-collective"
             onClick={[Function]}
-            title={undefined}
           >
             <div
               className="jsx-3446301333 CollectiveCard undefined"
@@ -1155,16 +1411,15 @@ exports[`Search Page renders search results with pagination 1`] = `
         </div>
       </div>
       <div
-        className="row"
+        className="c7"
       >
         <ul
-          className="jsx-4119556752 pagination"
+          className="pagination"
         >
           <li
-            className="jsx-4119556752 active"
+            className="active"
           >
             <a
-              className="jsx-4119556752"
               href="?limit=20&offset=0&q=Test"
               onClick={[Function]}
             >
@@ -1172,10 +1427,9 @@ exports[`Search Page renders search results with pagination 1`] = `
             </a>
           </li>
           <li
-            className="jsx-4119556752 "
+            className=""
           >
             <a
-              className="jsx-4119556752"
               href="?limit=20&offset=20&q=Test"
               onClick={[Function]}
             >
@@ -1183,10 +1437,9 @@ exports[`Search Page renders search results with pagination 1`] = `
             </a>
           </li>
           <li
-            className="jsx-4119556752 "
+            className=""
           >
             <a
-              className="jsx-4119556752"
               href="?limit=20&offset=40&q=Test"
               onClick={[Function]}
             >
@@ -1194,10 +1447,9 @@ exports[`Search Page renders search results with pagination 1`] = `
             </a>
           </li>
           <li
-            className="jsx-4119556752 "
+            className=""
           >
             <a
-              className="jsx-4119556752"
               href="?limit=20&offset=60&q=Test"
               onClick={[Function]}
             >
@@ -1205,10 +1457,9 @@ exports[`Search Page renders search results with pagination 1`] = `
             </a>
           </li>
           <li
-            className="jsx-4119556752 "
+            className=""
           >
             <a
-              className="jsx-4119556752"
               href="?limit=20&offset=80&q=Test"
               onClick={[Function]}
             >
@@ -1298,10 +1549,8 @@ exports[`Search Page renders search results with pagination 1`] = `
               className="jsx-568600484"
             >
               <a
-                className={undefined}
                 href="/tos"
                 onClick={[Function]}
-                title={undefined}
               >
                 Terms Of Service
               </a>
