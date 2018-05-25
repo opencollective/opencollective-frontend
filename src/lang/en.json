@@ -498,7 +498,7 @@
   "tier.limited": "LIMITED: {availableQuantity} LEFT OUT OF {maxQuantity}",
   "tier.contribute": "contribute",
   "menu.homepage": "Go to Open Collective Homepage",
-  "menu.discover": "discover",
+  "menu.discover": "Discover",
   "menu.myAccount": "My account",
   "menu.profile": "Profile",
   "menu.logout": "Logout",
