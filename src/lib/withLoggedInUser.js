@@ -1,6 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types';
 import moment from 'moment';
+import jwt from 'jsonwebtoken';
 
 import * as api from '../lib/api';
 import storage from '../lib/storage';
@@ -8,7 +9,7 @@ import LoggedInUser from '../classes/LoggedInUser';
 import { getLoggedInUserQuery } from '../graphql/queries';
 
 const maybeRefreshAccessToken = async (currentToken) => {
-  const { exp } = JSON.parse(currentToken.split('.')[1]);
+  const { exp } = jwt.decode(currentToken);
   const shouldUpdate = moment(exp * 1000).subtract(1, 'month').isBefore(new Date);
   if (shouldUpdate) {
     const { token } = await api.refreshToken(currentToken);
@@ -27,6 +28,17 @@ export default WrappedComponent => {
     static getInitialProps (props) {
       return WrappedComponent.getInitialProps(props);
     }
+
+    getLoggedInUserFromServer = () =>
+      this.props.client.query({ query: getLoggedInUserQuery }).then(result => {
+        if (result.data && result.data.LoggedInUser) {
+          storage.set("LoggedInUser", result.data.LoggedInUser, 1000 * 60 * 60);
+          return result.data.LoggedInUser;
+        } else {
+          storage.set("LoggedInUser", null);
+          return null;
+        }
+      })
 
     getLoggedInUser = async () => {
       // only Client Side for now
@@ -47,25 +59,17 @@ export default WrappedComponent => {
       // From cache
       const cache = storage.get("LoggedInUser");
       if (cache) {
+        // This is asynchronous and will take care of updating the cache
+        this.getLoggedInUserFromServer();
+        // Return from cache immediately
         return new LoggedInUser(cache);
       }
 
-      // From GraphQL with Apollo
-      const result = await this.props.client.query({
-        query: getLoggedInUserQuery,
-      });
-
-      // No result
-      if (!result.data || !result.data.LoggedInUser) {
-        storage.set("LoggedInUser", null);
-        return null;
+      // Synchronously
+      const loggedInUser = await this.getLoggedInUserFromServer();
+      if (loggedInUser) {
+        return new LoggedInUser(loggedInUser);
       }
-
-      // Store in cache
-      storage.set("LoggedInUser", result.data.LoggedInUser, 1000 * 60 * 60);
-
-      // Fresh data from Apollo
-      return new LoggedInUser(result.data.LoggedInUser);
     }
 
     render() {
