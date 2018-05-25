@@ -222,9 +222,7 @@ exports[`Search Page renders empty results message 1`] = `
               />
               <button
                 className="jsx-2820878800 jsx-219750138 Button blue c4"
-                disabled={undefined}
                 onClick={[Function]}
-                style={undefined}
                 type="submit"
               >
                 <span
@@ -331,10 +329,8 @@ exports[`Search Page renders empty results message 1`] = `
               className="jsx-568600484"
             >
               <a
-                className={undefined}
                 href="/tos"
                 onClick={[Function]}
-                title={undefined}
               >
                 Terms Of Service
               </a>
@@ -585,10 +581,8 @@ exports[`Search Page renders error message 1`] = `
               className="jsx-568600484"
             >
               <a
-                className={undefined}
                 href="/tos"
                 onClick={[Function]}
-                title={undefined}
               >
                 Terms Of Service
               </a>
@@ -843,9 +837,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
               />
               <button
                 className="jsx-2820878800 jsx-219750138 Button blue c4"
-                disabled={undefined}
                 onClick={[Function]}
-                style={undefined}
                 type="submit"
               >
                 <span
@@ -1080,10 +1072,8 @@ exports[`Search Page renders loading grid SVG 1`] = `
               className="jsx-568600484"
             >
               <a
-                className={undefined}
                 href="/tos"
                 onClick={[Function]}
-                title={undefined}
               >
                 Terms Of Service
               </a>
@@ -1347,9 +1337,7 @@ exports[`Search Page renders search results with pagination 1`] = `
               />
               <button
                 className="jsx-2820878800 jsx-219750138 Button blue c4"
-                disabled={undefined}
                 onClick={[Function]}
-                style={undefined}
                 type="submit"
               >
                 <span
@@ -1367,10 +1355,8 @@ exports[`Search Page renders search results with pagination 1`] = `
           className="c6"
         >
           <a
-            className={undefined}
             href="/test-collective"
             onClick={[Function]}
-            title={undefined}
           >
             <div
               className="jsx-3446301333 CollectiveCard undefined"
@@ -1563,10 +1549,8 @@ exports[`Search Page renders search results with pagination 1`] = `
               className="jsx-568600484"
             >
               <a
-                className={undefined}
                 href="/tos"
                 onClick={[Function]}
-                title={undefined}
               >
                 Terms Of Service
               </a>
