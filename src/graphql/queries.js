@@ -95,8 +95,10 @@ export const getLoggedInUserQuery = gql`
             uuid
             name
             service
+            type
             data
             balance
+            expiryDate
           }
         }
       }
