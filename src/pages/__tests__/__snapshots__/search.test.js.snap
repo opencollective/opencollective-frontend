@@ -100,11 +100,8 @@ exports[`Search Page renders empty results message 1`] = `
 }
 
 <div>
-  <header
-    className="jsx-3598562734"
-  >
+  <header>
     <div
-      className="jsx-3598562734"
       id="top"
     />
     <div
@@ -371,11 +368,8 @@ exports[`Search Page renders error message 1`] = `
 <div
   className="jsx-3855972673 Error"
 >
-  <header
-    className="jsx-3598562734"
-  >
+  <header>
     <div
-      className="jsx-3598562734"
       id="top"
     />
     <div
@@ -721,11 +715,8 @@ exports[`Search Page renders loading grid SVG 1`] = `
 }
 
 <div>
-  <header
-    className="jsx-3598562734"
-  >
+  <header>
     <div
-      className="jsx-3598562734"
       id="top"
     />
     <div
@@ -1225,11 +1216,8 @@ exports[`Search Page renders search results with pagination 1`] = `
 }
 
 <div>
-  <header
-    className="jsx-3598562734"
-  >
+  <header>
     <div
-      className="jsx-3598562734"
       id="top"
     />
     <div
