@@ -60,9 +60,9 @@ The API comes with a sanitized version of the database that includes the followi
 ## Tests
 
 We are using [Jest](https://facebook.github.io/jest/) for testing.
-You can run the tests using `npm test` or more specifically `npm run test:server`, `npm run test:e2e`.
+You can run the tests using `npm test` or more specifically `npm run test:src`, `npm run test:server`, `npm run test:e2e`.
 
-End-to-end tests are using [Chromeless](https://github.com/graphcool/chromeless). If you are using Ubuntu, make sure you have Google Chrome installed (`sudo apt-get install google-chrome`).
+End-to-end tests are using [Cypress](https://www.cypress.io/). 
 
 ## Stack
 
