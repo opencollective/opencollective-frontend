@@ -19,7 +19,7 @@ import { Router } from '../server/pages';
 import { addEventMutations } from '../graphql/mutations';
 import { exportRSVPs } from '../lib/export_file';
 import SectionTitle from './SectionTitle';
-import ExpensesSection from './ExpensesSection';
+import ExpensesSection from '../apps/expenses/components/ExpensesSection';
 import withIntl from '../lib/withIntl';
 import Button from './Button';
 import SendMoneyToCollectiveBtn from './SendMoneyToCollectiveBtn';
