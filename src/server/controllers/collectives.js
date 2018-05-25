@@ -303,7 +303,7 @@ export async function avatar(req, res) {
         }
       }
 
-      const base64data = new Buffer(data).toString('base64');
+      const base64data = Buffer.from(data).toString('base64');
       const svg = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${imageWidth}" height="${imageHeight}">
         <image width="${imageWidth}" height="${imageHeight}" xlink:href="data:${contentType};base64,${base64data}"/>
       </svg>`;

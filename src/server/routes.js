@@ -13,7 +13,7 @@ import { logger } from './logger';
 import { getCloudinaryUrl } from './lib/utils';
 import { translateApiUrl } from '../lib/utils';
 
-module.exports = (server, app) => {
+export default (server, app) => {
 
   server.get('*', mw.ga, (req, res, next) => {
     req.app = app;

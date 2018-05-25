@@ -1,10 +1,12 @@
 {
-  "extends": "opencollective",
+  "extends": [
+    "opencollective",
+  ],
   "env": {
-    "jest": true
+    "jest": true,
   },
   "rules": {
-    // we still use console even on frontend
-    "no-console": 0
+    "no-console": 1,
+    "node/no-unsupported-features": 0,
   }
 }
