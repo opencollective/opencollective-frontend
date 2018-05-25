@@ -8,7 +8,7 @@ import LoggedInUser from '../classes/LoggedInUser';
 import { getLoggedInUserQuery } from '../graphql/queries';
 
 const maybeRefreshAccessToken = async (currentToken) => {
-  const { exp } = JSON.parse(atob(currentToken.split('.')[1]));
+  const { exp } = JSON.parse(currentToken.split('.')[1]);
   const shouldUpdate = moment(exp * 1000).subtract(1, 'month').isBefore(new Date);
   if (shouldUpdate) {
     const { token } = await api.refreshToken(currentToken);
