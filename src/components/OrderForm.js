@@ -172,46 +172,46 @@ class OrderForm extends React.Component {
     this.UNSAFE_componentWillReceiveProps(this.props);
   }
 
-  populatePaymentMethodTypes() {
+  // All the following methods are arrow functions and auto-bind
+
+  populatePaymentMethodTypes = () => {
     const { intl } = this.props;
     const paymentMethodTypeOptions = [];
     paymentMethodTypeOptions.push({'creditcard': intl.formatMessage(this.messages['paymentMethod.creditcard'])});
     this.paymentMethodTypeOptions = paymentMethodTypeOptions;
-    return paymentMethodTypeOptions;
   }
 
-  populatePaymentMethods(CollectiveId) {
+  paymentMethodsOptionsForCollective = (paymentMethods, collective) => {
+    return paymentMethods.map(pm => {
+      const value = pm.uuid
+      const label = `💳  \xA0\xA0${collective.name} - ${get(pm, 'data.brand')} ${pm.name} - exp ${get(pm, 'data.expMonth')}/${get(pm, 'data.expYear')}`;
+      const option = {};
+      option[value] = label;
+      return option;
+    });
+  }
+
+  populatePaymentMethods = (CollectiveId) => {
     const { LoggedInUser } = this.props;
-    let paymentMethods = [], paymentMethodsOptions = [];
+
+    let paymentMethodsOptions = [];
 
     const collective = this.collectivesById[CollectiveId];
 
-    const generateOptionsForCollective = (collective) => {
-      return paymentMethods.map(pm => {
-        const value = pm.uuid
-        const label = `💳  \xA0\xA0${collective.name} - ${get(pm, 'data.brand')} ${pm.name} - exp ${get(pm, 'data.expMonth')}/${get(pm, 'data.expYear')}`;
-        const option = {};
-        option[value] = label;
-        return option;
-      });
-    }
-
     if (collective) {
-      paymentMethods = (collective.paymentMethods || []).filter(pm => pm.service === 'stripe');
-      paymentMethodsOptions = generateOptionsForCollective(collective);
+      const paymentMethods = (collective.paymentMethods || []).filter(pm => pm.service === 'stripe');
+      paymentMethodsOptions = this.paymentMethodsOptionsForCollective(paymentMethods, collective);
     }
 
     if (LoggedInUser && CollectiveId !== LoggedInUser.CollectiveId) {
-      paymentMethods = [... paymentMethods, ...LoggedInUser.collective.paymentMethods].filter(pm => pm.service === 'stripe');
-      paymentMethodsOptions = [...paymentMethodsOptions, ... generateOptionsForCollective(this.collectivesById[LoggedInUser.CollectiveId])];
+      const userCollective = this.collectivesById[LoggedInUser.CollectiveId];
+      const paymentMethods = (LoggedInUser.collective.paymentMethods || []).filter(pm => pm.service === 'stripe');
+      paymentMethodsOptions = [...paymentMethodsOptions, ... this.paymentMethodsOptionsForCollective(paymentMethods, userCollective)];
     }
 
-    paymentMethodsOptions.push({'other': 'other'});
+    paymentMethodsOptions.push({ other: 'other' });
 
-    this.paymentMethods = paymentMethods;
     this.paymentMethodsOptions = paymentMethodsOptions;
-
-    return paymentMethodsOptions;
   }
 
   /**
@@ -294,8 +294,8 @@ class OrderForm extends React.Component {
 
     if (collective) {
       this.populatePaymentMethods(CollectiveId);
-      if (this.paymentMethods.length > 0) {
-        newState.creditcard = { uuid: this.paymentMethods[0].uuid };
+      if (this.paymentMethodsOptions.length > 0) {
+        newState.creditcard = { uuid: this.paymentMethodsOptions[0].value };
       } else {
         newState.creditcard = { show: true, save: true }; // reset to default value
       }
