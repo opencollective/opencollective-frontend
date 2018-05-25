@@ -24,6 +24,7 @@ class Tier extends React.Component {
 
   constructor(props) {
     super(props);
+    this.state = { customAmountError: null };
 
     this.onChange = this.props.onChange || function() {};
     this.handleChange = this.handleChange.bind(this);
@@ -32,11 +33,13 @@ class Tier extends React.Component {
 
     this.messages = defineMessages({
       'amount.label': { id: 'tier.amount.label', defaultMessage: 'amount' },
+      'customAmount.error.minimumAmount': { id: 'tier.customAmount.error.minimumAmount', defaultMessage: 'Minimum amount should be {minimumAmount}' },
       'interval.label': { id: 'tier.interval.label', defaultMessage: 'interval' },
       'interval.onetime': { id: 'tier.interval.onetime', defaultMessage: 'one time' },
       'interval.month': { id: 'tier.interval.month', defaultMessage: 'month' },
       'interval.year': { id: 'tier.interval.year', defaultMessage: 'year' }
     });
+
 
   }
 
@@ -94,7 +97,7 @@ class Tier extends React.Component {
 
 
   handleChange(field, value) {
-    const { tier } = this.props;
+    const { tier, intl } = this.props;
 
     const currentValues = this.calcCurrentValues();
 
@@ -105,8 +108,13 @@ class Tier extends React.Component {
     });
 
     // Make sure that the custom amount entered by the user is never under the minimum preset amount
-    if (field === 'amount' && tier.presets && tier.presets[0] >= value) {
-      value = tier.presets[0];
+    if (field === 'amount') {
+      if (tier.presets && tier.presets[0] > value) {
+        value = tier.presets[0];
+        this.setState({ customAmountError: intl.formatMessage(this.messages['customAmount.error.minimumAmount'], { minimumAmount: formatCurrency(value, tier.currency) }) });
+      } else {
+        this.setState({ customAmountError: null });
+      }
     }
 
     response[field] = value;
@@ -162,6 +170,13 @@ class Tier extends React.Component {
             text-align: right;
             color: #45484c;
             color: var(--charcoal-grey-three);
+          }
+          .customAmount {
+            width: 12rem;
+          }
+          .customAmount .error {
+            font-size: 11px;
+            color: red;
           }
           .interval {
             font-size: 1.2rem;
@@ -291,15 +306,20 @@ class Tier extends React.Component {
                         </Button>
                       ))}
                     </ButtonGroup>
-                    <InputField
-                      name="amount"
-                      className="inputAmount"
-                      min={tier.presets && tier.presets[0]}
-                      pre={getCurrencySymbol(currency)}
-                      type="currency"
-                      value={amount}
-                      onChange={(amount) => this.handleChange('amount', amount)}
-                      />
+                    <div className="customAmount">
+                      <InputField
+                        name="amount"
+                        className="inputAmount"
+                        min={tier.presets && tier.presets[0]}
+                        pre={getCurrencySymbol(currency)}
+                        type="currency"
+                        value={amount}
+                        onChange={(amount) => this.handleChange('amount', amount)}
+                        />
+                      { this.state.customAmountError &&
+                        <div className="error">{this.state.customAmountError}</div>
+                      }
+                    </div>
                   </div>
                 </div>
                 { type === 'DONATION' &&
