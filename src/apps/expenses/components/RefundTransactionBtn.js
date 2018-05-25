@@ -4,9 +4,11 @@ import gql from 'graphql-tag';
 import { graphql } from 'react-apollo';
 import { FormattedMessage } from 'react-intl';
 
-import withIntl from '../lib/withIntl';
-import SmallButton from './SmallButton';
-import { getTransactionsQuery, transactionFields } from '../graphql/queries';
+import withIntl from '../../../lib/withIntl';
+import { getTransactionsQuery, transactionFields } from '../../../graphql/queries';
+
+import SmallButton from '../../../components/SmallButton';
+
 
 class RefundTransactionBtn extends React.Component {
 

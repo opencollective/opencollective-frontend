@@ -1,23 +1,23 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import withIntl from '../lib/withIntl';
-import Header from '../components/Header';
-import Body from '../components/Body';
-import Footer from '../components/Footer';
-import CollectiveCover from '../components/CollectiveCover';
-import TierCard from '../components/TierCard';
-import NotificationBar from '../components/NotificationBar';
-import MembersWithData from '../components/MembersWithData';
-import { get } from 'lodash';
-import { Link } from '../server/pages';
 import { FormattedMessage, defineMessages } from 'react-intl';
+import { get } from 'lodash';
+import withIntl from '../lib/withIntl';
+import { Link } from '../server/pages';
+
+import Header from './Header';
+import Body from './Body';
+import Footer from './Footer';
+import CollectiveCover from './CollectiveCover';
+import TierCard from './TierCard';
+import NotificationBar from './NotificationBar';
+import MembersWithData from './MembersWithData';
 import CollectivesWithData from './CollectivesWithData';
 import SectionTitle from './SectionTitle';
-import ExpensesSection from './ExpensesSection';
 import TeamSection from './TeamSection';
 import UpdatesSection from './UpdatesSection';
+import ExpensesSection from '../apps/expenses/components/ExpensesSection';
 import EventsSection from './EventsSection';
-import { formatCurrency } from '../lib/utils';
 import LongDescription from './LongDescription';
 
 const defaultBackgroundImage = '/static/images/defaultBackgroundImage.png';
@@ -225,16 +225,11 @@ class Collective extends React.Component {
                 </section>
               }
 
-              <section id="budget" className="clear">
-                <div className="content" >
-                  <SectionTitle section="budget" values={{ balance: formatCurrency(get(collective, 'stats.balance'), collective.currency) }} />
-                  <ExpensesSection
-                    collective={collective}
-                    LoggedInUser={LoggedInUser}
-                    limit={10}
-                    />
-                </div>
-              </section>
+              <ExpensesSection
+                collective={collective}
+                LoggedInUser={LoggedInUser}
+                limit={10}
+                />
 
               <section id="contributors" className="tier">
                 <div className="content" >

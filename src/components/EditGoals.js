@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { Button, Form } from 'react-bootstrap';
 import { defineMessages, injectIntl } from 'react-intl';
 
-import InputField from '../components/InputField';
+import InputField from './InputField';
 import { getCurrencySymbol } from '../lib/utils';
 import { cloneDeep } from 'lodash';
 

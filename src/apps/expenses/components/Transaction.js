@@ -1,11 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { defineMessages, FormattedNumber } from 'react-intl';
-import { capitalize } from '../lib/utils';
 import { get } from 'lodash';
+
+import withIntl from '../../../lib/withIntl';
+import { capitalize } from '../../../lib/utils';
+import Avatar from '../../../components/Avatar';
+
 import TransactionDetails from './TransactionDetails';
-import Avatar from './Avatar';
-import withIntl from '../lib/withIntl';
 
 
 class Transaction extends React.Component {

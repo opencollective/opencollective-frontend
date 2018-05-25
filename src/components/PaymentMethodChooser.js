@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Popover, OverlayTrigger } from 'react-bootstrap';
 import { defineMessages } from 'react-intl';
 import withIntl from '../lib/withIntl';
-import InputField from '../components/InputField';
+import InputField from './InputField';
 import { getStripeToken } from '../lib/stripe';
 
 import SmallButton from './SmallButton';

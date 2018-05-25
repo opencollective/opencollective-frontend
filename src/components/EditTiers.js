@@ -4,8 +4,8 @@ import PropTypes from 'prop-types';
 import { Button, Form } from 'react-bootstrap';
 import { defineMessages, injectIntl } from 'react-intl';
 
-import InputField from '../components/InputField';
-import InputFieldPresets from '../components/InputFieldPresets';
+import InputField from './InputField';
+import InputFieldPresets from './InputFieldPresets';
 import { getCurrencySymbol } from '../lib/utils';
 
 class EditTiers extends React.Component {

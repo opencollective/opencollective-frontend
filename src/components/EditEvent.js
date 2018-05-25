@@ -1,10 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Header from '../components/Header';
-import Body from '../components/Body';
-import Footer from '../components/Footer';
-import EditEventForm from '../components/EditEventForm';
-import CollectiveCover from '../components/CollectiveCover';
+import Header from './Header';
+import Body from './Body';
+import Footer from './Footer';
+import EditEventForm from './EditEventForm';
+import CollectiveCover from './CollectiveCover';
 import { Button } from 'react-bootstrap';
 import { get } from 'lodash';
 import { addEditCollectiveMutation, addDeleteCollectiveMutation } from '../graphql/mutations';

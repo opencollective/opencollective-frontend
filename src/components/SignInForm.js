@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import InputField from '../components/InputField';
+import InputField from './InputField';
 import { Button, Row, Col, Form } from 'react-bootstrap';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import { isValidEmail } from '../lib/utils';

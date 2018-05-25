@@ -9,8 +9,8 @@ import NotFound from '../components/NotFoundPage';
 import ErrorPage from '../components/ErrorPage';
 import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
-import ExpensesWithData from '../components/ExpensesWithData';
-import ExpensesStatsWithData from '../components/ExpensesStatsWithData';
+import ExpensesWithData from '../apps/expenses/components/ExpensesWithData';
+import ExpensesStatsWithData from '../apps/expenses/components/ExpensesStatsWithData';
 import { FormattedMessage } from 'react-intl'
 import SectionTitle from '../components/SectionTitle';
 

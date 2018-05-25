@@ -1,14 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Error from '../components/Error';
+import Error from './Error';
 import withIntl from '../lib/withIntl';
 import { graphql, compose } from 'react-apollo';
 import gql from 'graphql-tag'
 import { DropdownButton, MenuItem, Badge } from 'react-bootstrap';
-import Currency from '../components/Currency';
+import Currency from './Currency';
 import { FormattedMessage, defineMessages } from 'react-intl';
-import ConnectPaypal from '../components/ConnectPaypal';
-import AddFundsForm from '../components/AddFundsForm';
+import ConnectPaypal from './ConnectPaypal';
+import AddFundsForm from './AddFundsForm';
 import { pick } from 'lodash';
 
 class CollectivePickerWithData extends React.Component {

@@ -5,7 +5,7 @@ import { Button, Form } from 'react-bootstrap';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import withIntl from '../lib/withIntl';
 import { get } from 'lodash';
-import InputField from '../components/InputField';
+import InputField from './InputField';
 
 class EditMembers extends React.Component {
 

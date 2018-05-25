@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Error from '../components/Error';
+import Error from './Error';
 import withIntl from '../lib/withIntl';
-import Comments from '../components/Comments';
-import CommentForm from '../components/CommentForm';
+import Comments from './Comments';
+import CommentForm from './CommentForm';
 import { graphql, compose } from 'react-apollo'
 import gql from 'graphql-tag'
 import { FormattedMessage } from 'react-intl';

@@ -1,10 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Error from '../components/Error';
+import Error from './Error';
 import withIntl from '../lib/withIntl';
 import { graphql } from 'react-apollo';
 import { getSubscriptionsQuery } from '../graphql/queries';
-import Subscriptions from '../components/Subscriptions';
+import Subscriptions from './Subscriptions';
 import { cloneDeep } from 'lodash';
 
 class SubscriptionsWithData extends React.Component {

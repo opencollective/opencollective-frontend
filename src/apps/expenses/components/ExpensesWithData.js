@@ -1,10 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Error from '../components/Error';
-import withIntl from '../lib/withIntl';
-import Expenses from '../components/Expenses';
 import { graphql } from 'react-apollo'
 import gql from 'graphql-tag'
+
+import withIntl from '../../../lib/withIntl';
+import Error from '../../../components/Error';
+import Expenses from './Expenses';
+
 
 class ExpensesWithData extends React.Component {
 
