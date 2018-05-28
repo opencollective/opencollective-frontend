@@ -1,7 +1,6 @@
 import algoliasearch from 'algoliasearch';
 import config from 'config';
 import Promise from 'bluebird';
-import { Op } from 'sequelize';
 
 import errors from '../lib/errors';
 
@@ -39,7 +38,7 @@ import {
 } from './types';
 
 import { find, get, uniq } from 'lodash';
-import models, { sequelize } from '../models';
+import models, { sequelize, Op } from '../models';
 import rawQueries from '../lib/queries';
 import { fetchCollectiveId } from '../lib/cache';
 
@@ -114,7 +113,7 @@ const queries = {
       const invoicesByKey = {};
       await Promise.map(transactions, async (transaction) => {
         const HostCollectiveId = transaction.HostCollectiveId;
-        hostsById[HostCollectiveId] = hostsById[HostCollectiveId] || await models.Collective.findById(HostCollectiveId, { attributes: ['slug'] });
+        hostsById[HostCollectiveId] = hostsById[HostCollectiveId] || await models.Collective.findById(HostCollectiveId, { attributes: ['id', 'slug'] });
         const createdAt = new Date(transaction.createdAt);
         const year = createdAt.getFullYear();
         const month = createdAt.getMonth() + 1;
@@ -177,7 +176,7 @@ const queries = {
       const where = {
         FromCollectiveId: fromCollective.id,
         HostCollectiveId: host.id,
-        createdAt: { $gte: startsAt, $lt: endsAt },
+        createdAt: { [Op.gte]: startsAt, [Op.lt]: endsAt },
         type: 'CREDIT'
       };
 
@@ -234,8 +233,8 @@ const queries = {
       // Add date ranges to the query
       if (args.dateFrom || args.dateTo) {
         query.where.createdAt = {};
-        if (args.dateFrom) query.where.createdAt['$gte'] = args.dateFrom;
-        if (args.dateTo) query.where.createdAt['$lte'] = args.dateTo;
+        if (args.dateFrom) query.where.createdAt[Op.gte] = args.dateFrom;
+        if (args.dateTo) query.where.createdAt[Op.lte] = args.dateTo;
       }
       return models.Transaction.findAll(query);
     }
@@ -355,7 +354,7 @@ const queries = {
       if (args.offset) query.offset = args.offset;
       query.order = [['publishedAt', 'DESC'], ['createdAt', 'DESC']];
       if (!req.remoteUser || !req.remoteUser.isAdmin(args.CollectiveId)) {
-        query.where.publishedAt = { $ne: null };
+        query.where.publishedAt = { [Op.ne]: null };
       }
       return req.loaders.collective.findById.load(args.CollectiveId)
         .then(collective => {
@@ -376,7 +375,7 @@ const queries = {
             }
           }
           return getCollectiveIds().then(collectiveIds => {
-            query.where.CollectiveId = { $in: collectiveIds };
+            query.where.CollectiveId = { [Op.in]: collectiveIds };
             return models.Update.findAll(query);
           })
         })
@@ -411,7 +410,7 @@ const queries = {
         query.where.UserId = user.id;
       }
       if (args.status) query.where.status = args.status;
-      if (args.category) query.where.category = { $iLike: args.category };
+      if (args.category) query.where.category = { [Op.iLike]: args.category };
       if (args.limit) query.limit = args.limit;
       if (args.offset) query.offset = args.offset;
       query.order = [["incurredAt", "DESC"]];
@@ -434,7 +433,7 @@ const queries = {
             }
           }
           return getCollectiveIds().then(collectiveIds => {
-            query.where.CollectiveId = { $in: collectiveIds };
+            query.where.CollectiveId = { [Op.in]: collectiveIds };
             return models.Expense.findAll(query);
           })
         })
@@ -473,7 +472,7 @@ const queries = {
    * Returns all collectives
    */
   allCollectives: {
-    type: new GraphQLList(CollectiveInterfaceType),
+    type: CollectiveSearchResultsType,
     args: {
       tags: { type: new GraphQLList(GraphQLString) },
       type: {
@@ -538,17 +537,25 @@ const queries = {
       if (args.HostCollectiveId) query.where.HostCollectiveId = args.HostCollectiveId;
       if (args.ParentCollectiveId) query.where.ParentCollectiveId = args.ParentCollectiveId;
       if (args.type) query.where.type = args.type;
-      if (args.tags) query.where.tags = { $overlap: args.tags };
+      if (args.tags) query.where.tags = { [Op.overlap]: args.tags };
 
       if (args.orderBy === 'balance' && (args.ParentCollectiveId || args.HostCollectiveId || args.tags)) {
-        return rawQueries.getCollectivesWithBalance(query.where, args);
+        const { total, collectives } = await rawQueries.getCollectivesWithBalance(query.where, args);
+        return { total, collectives, limit: args.limit, offset: args.offset };
       }
 
       query.order = [[args.orderBy, args.orderDirection]];
 
       if (args.offset) query.offset = args.offset;
 
-      return models.Collective.findAll(query);
+      const result = await models.Collective.findAndCountAll(query);
+
+      return {
+        total: result.count,
+        collectives: result.rows,
+        limit: args.limit,
+        offset: args.offset,
+      };
     }
   },
 
@@ -621,7 +628,7 @@ const queries = {
           .then(results => {
             if (args.isActive) {
               const TierIds = uniq(results.map(r => r.dataValues.TierId));
-              return models.Tier.findAll({where: { id: { $in: TierIds }}}).then(tiers => {
+              return models.Tier.findAll({where: { id: { [Op.in]: TierIds }}}).then(tiers => {
                 tiers.map(t => tiersById[t.id] = t.dataValues);
                 return results.filter(r => {
                   return models.Member.isActive({
@@ -656,7 +663,7 @@ const queries = {
         if (req.body.query.match(/ member ?\{/) || args.type) {
           if (args.type) {
             const types = args.type.split(',');
-            memberCond.type = { $in: types };
+            memberCond.type = { [Op.in]: types };
           }
           query.include.push(
             {
@@ -672,8 +679,8 @@ const queries = {
         if (args.offset) query.offset = args.offset;
 
         return getCollectiveIds().then(collectiveIds => {
-          query.where[attr] = { $in: collectiveIds };
-          query.where.role = { $ne: 'HOST' };
+          query.where[attr] = { [Op.in]: collectiveIds };
+          query.where.role = { [Op.ne]: 'HOST' };
           return models.Member.findAll(query);
         }).then(members => {
           // also fetch the list of collectives that are members of the host
@@ -742,7 +749,7 @@ const queries = {
         where: {
           token: args.token,
           expiryDate: {
-            $gt: new Date()
+            [Op.gt]: new Date()
           },
           archivedAt: null // archived PMs are assumed to be used or inactive
         }

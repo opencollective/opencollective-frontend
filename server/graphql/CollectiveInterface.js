@@ -1,3 +1,5 @@
+import sequelize from 'sequelize';
+import SqlString from 'sequelize/lib/sql-string';
 import {
   GraphQLInt,
   GraphQLList,
@@ -23,11 +25,12 @@ import {
 } from './types';
 
 import {
+  OrderDirectionType,
   TransactionInterfaceType
 } from './TransactionInterface';
 
 import { types } from '../constants/collectives';
-import models from '../models';
+import models, { Op } from '../models';
 import roles from '../constants/roles';
 
 export const TypeOfCollectiveType = new GraphQLEnumType({
@@ -52,6 +55,9 @@ export const CollectiveOrderFieldType = new GraphQLEnumType({
     },
     name: {
       description: 'Order collectives by name.',
+    },
+    slug: {
+      description: 'Order collectives by slug.',
     },
     updatedAt: {
       description: 'Order collectives by updated time.',
@@ -120,7 +126,7 @@ export const CollectivesStatsType = new GraphQLObjectType({
         async resolve(collective) {
           return models.Collective.count({
             where: {
-              $or: {
+              [Op.or]: {
                 ParentCollectiveId: collective.id,
                 HostCollectiveId: collective.id
               },
@@ -302,7 +308,7 @@ export const CollectiveStatsType = new GraphQLObjectType({
         description: "Number of updates published by this collective",
         type: GraphQLInt,
         resolve(collective) {
-          return models.Update.count({ where: { CollectiveId: collective.id, publishedAt: { $ne: null } } });
+          return models.Update.count({ where: { CollectiveId: collective.id, publishedAt: { [Op.ne]: null } } });
         }
       },
       events: {
@@ -473,9 +479,12 @@ export const CollectiveInterfaceType = new GraphQLInterfaceType({
         }
       },
       collectives: {
-        type: new GraphQLList(CollectiveType),
+        type: CollectiveSearchResultsType,
         description: "List of all collectives hosted by this collective",
         args: {
+          orderBy: { defaultValue: 'name', type: CollectiveOrderFieldType },
+          orderDirection: { defaultValue: 'ASC', type: OrderDirectionType },
+          expenseStatus: { defaultValue: null, type: GraphQLString },
           limit: { type: GraphQLInt },
           offset: { type: GraphQLInt }
         }
@@ -764,13 +773,13 @@ const CollectiveFields = () => {
         const roles = args.roles || (args.role && [ args.role ]);
 
         if (roles && roles.length > 0) {
-          query.where.role = { $in: roles };
+          query.where.role = { [Op.in]: roles };
         }
 
         let conditionOnMemberCollective;
         if (args.type) {
           const types = args.type.split(',');
-          conditionOnMemberCollective = { type: { $in: types } };
+          conditionOnMemberCollective = { type: { [Op.in]: types } };
         }
 
         query.include = [
@@ -805,7 +814,7 @@ const CollectiveFields = () => {
         const where = { MemberCollectiveId: collective.id };
         const roles = args.roles || (args.role && [ args.role ]);
         if (roles && roles.length > 0) {
-          where.role = { $in: roles };
+          where.role = { [Op.in]: roles };
         }
         return models.Member.findAll({
           where,
@@ -819,16 +828,44 @@ const CollectiveFields = () => {
       }
     },
     collectives: {
-      type: new GraphQLList(CollectiveType),
+      type: CollectiveSearchResultsType,
       args: {
+        orderBy: { defaultValue: 'name', type: CollectiveOrderFieldType },
+        orderDirection: { defaultValue: 'ASC', type: OrderDirectionType },
+        expenseStatus: { defaultValue: null, type: GraphQLString },
         limit: { type: GraphQLInt },
         offset: { type: GraphQLInt }
       },
-      resolve(collective, args) {
-        return models.Collective.findAll({
+      async resolve(collective, args) {
+        const query = {
           where: { HostCollectiveId: collective.id, type: types.COLLECTIVE },
-          limit: args.limit, offset: args.offset
-        })
+          order: [ [ args.orderBy, args.orderDirection ] ],
+          limit: args.limit, offset: args.offset,
+        }
+        /* if any specific Expense status was passed */
+        if (args.expenseStatus) {
+          /* The escape trick came from here:
+             https://github.com/sequelize/sequelize/issues/1132
+
+             Didin't really find a better way to do it. */
+          const status = SqlString.escape(args.expenseStatus.toUpperCase());
+          query.where.expenseCount = sequelize.where(
+            /* This tests if collective has any expenses in the given
+             * status. */
+            sequelize.literal(
+              '(SELECT COUNT("id") FROM "Expenses" WHERE "Expenses"."CollectiveId" =' +
+              ` "Collective"."id" AND "status" = ${status})`,
+              args.expenseStatus),
+            '>', 0);
+        }
+        const result = await models.Collective.findAndCountAll(query);
+        const { count, rows } = result;
+        return {
+          total: count,
+          collectives: rows,
+          limit: args.limitg,
+          offset: args.offset,
+        };
       }
     },
     followers: {
@@ -869,7 +906,7 @@ const CollectiveFields = () => {
       type: new GraphQLList(OrderType),
       resolve(collective) {
         return collective.getIncomingOrders({
-          where: { processedAt: { $ne: null } },
+          where: { processedAt: { [Op.ne]: null } },
           order: [ ['createdAt', 'DESC'] ]
         });
       }
@@ -947,7 +984,7 @@ const CollectiveFields = () => {
               }
             }
             return getCollectiveIds().then(collectiveIds => {
-              query.where.CollectiveId = { $in: collectiveIds };
+              query.where.CollectiveId = { [Op.in]: collectiveIds };
               return models.Expense.findAll(query);
             })
           })
@@ -978,7 +1015,7 @@ const CollectiveFields = () => {
         offset: { type: GraphQLInt }
       },
       resolve(collective, args) {
-        const query = { CollectiveId: collective.id, publishedAt: { $ne: null } };
+        const query = { CollectiveId: collective.id, publishedAt: { [Op.ne]: null } };
         if (args.limit) query.limit = args.limit;
         if (args.offset) query.offset = args.offset;
         return models.Update.findAll(query);

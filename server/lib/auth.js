@@ -1,7 +1,7 @@
 import config from 'config';
 import jwt from 'jsonwebtoken';
 import moment from 'moment';
-import models from '../models';
+import models, { Op } from '../models';
 import Promise from 'bluebird';
 import * as errors from '../graphql/errors';
 
@@ -36,8 +36,8 @@ export function getListOfAccessibleMembers(remoteUser, CollectiveIds) {
   return models.Member.findAll({
     attributes: ['MemberCollectiveId'],
     where: {
-      MemberCollectiveId: { $in: CollectiveIds },
-      CollectiveId: { $in: adminOfCollectives }
+      MemberCollectiveId: { [Op.in]: CollectiveIds },
+      CollectiveId: { [Op.in]: adminOfCollectives }
     },
     group: ['MemberCollectiveId']
   })

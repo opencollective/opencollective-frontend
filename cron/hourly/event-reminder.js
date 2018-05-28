@@ -1,4 +1,4 @@
-import models from '../../server/models';
+import models, { Op } from '../../server/models';
 import emailLib from '../../server/lib/email';
 import { get } from 'lodash';
 
@@ -34,7 +34,7 @@ console.log(">>> Fetching all events that start within time range", tomorrowStar
 
 models.Collective.findAll({ where: {
   type: "EVENT",
-  startsAt: { $gte: tomorrowStartsAt, $lt: tomorrowEndsAt }
+  startsAt: { [Op.gte]: tomorrowStartsAt, [Op.lt]: tomorrowEndsAt }
 }})
 .tap(events => {
   console.log(`>>> Processing ${events.length} events`);
@@ -45,7 +45,7 @@ models.Collective.findAll({ where: {
   return models.Collective.findAll({
     where: {
       type: "EVENT",
-      startsAt: { $gte: nextWeekStartsAt, $lt: nextWeekEndsAt }
+      startsAt: { [Op.gte]: nextWeekStartsAt, [Op.lt]: nextWeekEndsAt }
     }
   })
 })

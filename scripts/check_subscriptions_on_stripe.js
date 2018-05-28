@@ -3,7 +3,7 @@
  */
 import argparse from 'argparse'
 
-import models from '../server/models';
+import models, { Op } from '../server/models';
 import { retrieveSubscription } from '../server/paymentProviders/stripe/gateway';
 
 let inactiveSubscriptionCount = 0;
@@ -19,9 +19,9 @@ const done = (err) => {
   process.exit();
 }
 
-// This generates promises of n-length at a time 
+// This generates promises of n-length at a time
 // Useful so we don't go over api quota limit on Stripe
-const promiseSeq = (arr, predicate, consecutive) => {  
+const promiseSeq = (arr, predicate, consecutive) => {
   return chunkArray(arr, consecutive).reduce(( prom, items, ix ) => {
     // wait for the previous Promise.all() to resolve
     return prom.then(() => {
@@ -95,21 +95,21 @@ const getSubscriptionFromStripe = (order, options) => {
 const checkSubscriptions = (options) => {
 
   return models.Order.findAll({
-    where: { 
+    where: {
       SubscriptionId: {
-        $ne: null
+        [Op.ne]: null
       },
       PaymentMethodId: {
-        $ne: null
+        [Op.ne]: null
       }
     },
     include: [
       { model: models.Subscription,
-        where: { 
+        where: {
           isActive: true,
           stripeSubscriptionId: {
-            $ne: null
-          } 
+            [Op.ne]: null
+          }
         }
       },
       { model: models.Collective, as: 'collective'},

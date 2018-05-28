@@ -1,4 +1,4 @@
-import models, { sequelize } from '../models';
+import models, { sequelize, Op } from '../models';
 import _ from 'lodash';
 import { convertToCurrency } from '../lib/currency';
 import Promise from 'bluebird';
@@ -19,11 +19,11 @@ export function getBackersStats(startDate = new Date('2015-01-01'), endDate = ne
   const getBackersIds = (startDate, endDate) => {
     const where = {
         type: 'CREDIT',
-        createdAt: { $gte: startDate, $lt: endDate }
+        createdAt: { [Op.gte]: startDate, [Op.lt]: endDate }
       };
 
     if (collectiveids) {
-      where.CollectiveId = { $in: collectiveids };
+      where.CollectiveId = { [Op.in]: collectiveids };
     }
 
     return models.Transaction.findAll({
@@ -74,7 +74,7 @@ export function sumTransactionsByCurrency(attribute = 'netAmountInCollectiveCurr
  */
 export function sumTransactions(attribute, where = {}, hostCurrency, date) {
   if (where.createdAt) {
-    date = date || where.createdAt.$lt || where.createdAt.$gte;
+    date = date || where.createdAt[Op.lt] || where.createdAt[Op.gte];
   }
   const res = {};
   return sumTransactionsByCurrency(attribute, where)
@@ -93,8 +93,8 @@ export function sumTransactions(attribute, where = {}, hostCurrency, date) {
 
 export function getTotalHostFees(collectiveids, type, startDate = new Date('2015-01-01'), endDate = new Date, hostCurrency = 'USD') {
   const where = {
-    CollectiveId: { $in: collectiveids },
-    createdAt: { $gte: startDate, $lt: endDate }
+    CollectiveId: { [Op.in]: collectiveids },
+    createdAt: { [Op.gte]: startDate, [Op.lt]: endDate }
   };
   if (type) {
     where.type = type;
@@ -104,8 +104,8 @@ export function getTotalHostFees(collectiveids, type, startDate = new Date('2015
 
 export function getTotalNetAmount(collectiveids, type, startDate = new Date('2015-01-01'), endDate = new Date, hostCurrency = 'USD') {
   const where = {
-    CollectiveId: { $in: collectiveids },
-    createdAt: { $gte: startDate, $lt: endDate }
+    CollectiveId: { [Op.in]: collectiveids },
+    createdAt: { [Op.gte]: startDate, [Op.lt]: endDate }
   };
   if (type) {
     where.type = type;

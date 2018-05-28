@@ -1,4 +1,4 @@
-import models, {sequelize} from '../models';
+import models, { sequelize, Op } from '../models';
 import currencies from '../constants/currencies'
 import config from 'config';
 import { pick } from 'lodash';
@@ -29,7 +29,7 @@ const generateFXConversionSQL = (aggregate) => {
 
 const getTotalAnnualBudgetForHost = (HostCollectiveId) => {
   return sequelize.query(`
-  WITH 
+  WITH
     "collectiveids" AS (
       SELECT id FROM "Collectives" WHERE "HostCollectiveId"=:HostCollectiveId AND "isActive"=true
     ),
@@ -51,10 +51,10 @@ const getTotalAnnualBudgetForHost = (HostCollectiveId) => {
       WHERE ((s.interval = 'year' AND s."isActive" = true) OR s.interval IS NULL)
         AND o."CollectiveId" IN (SELECT id FROM collectiveids)
         AND s."deletedAt" IS NULL
-        AND t."createdAt" > (current_date - INTERVAL '12 months') 
+        AND t."createdAt" > (current_date - INTERVAL '12 months')
       GROUP BY o.id
     )
- 
+
   SELECT
     ( SELECT COALESCE(SUM("amountInHostCurrency") * 12, 0) FROM "monthlyOrdersWithAmountInHostCurrency" t )
     +
@@ -98,7 +98,7 @@ const getTotalAnnualBudget = () => {
       LEFT JOIN "Subscriptions" s ON d."SubscriptionId" = s.id
       WHERE t.type='CREDIT' AND t."CollectiveId" != 1
         AND t."deletedAt" IS NULL
-        AND t."createdAt" > (current_date - INTERVAL '12 months') 
+        AND t."createdAt" > (current_date - INTERVAL '12 months')
         AND ((s.interval = 'year' AND s."isActive" IS TRUE AND s."deletedAt" IS NULL) OR s.interval IS NULL))
     +
     (SELECT
@@ -225,12 +225,12 @@ const getTopBackers = (since, until, tags, limit) => {
     FROM "Transactions" t
     LEFT JOIN "Collectives" fromCollective ON fromCollective.id = t."FromCollectiveId"
     LEFT JOIN "Collectives" collective ON collective.id = t."CollectiveId"
-    WHERE 
+    WHERE
       t.type='CREDIT'
       ${sinceClause}
       ${untilClause}
-      ${tagsClause}      
-    GROUP BY "FromCollectiveId" 
+      ${tagsClause}
+    GROUP BY "FromCollectiveId"
     ORDER BY "totalDonations" DESC
     LIMIT ${limit}
     `.replace(/\s\s+/g, ' '), // this is to remove the new lines and save log space.
@@ -243,7 +243,7 @@ const getTopBackers = (since, until, tags, limit) => {
 /**
  * Get top collectives ordered by available balance
  */
-const getCollectivesWithBalance = (where = {}, options) => {
+const getCollectivesWithBalance = async (where = {}, options) => {
   const orderDirection = options.orderDirection || "DESC";
   const orderBy = options.orderBy || "balance";
   const limit = options.limit || 20;
@@ -253,13 +253,21 @@ const getCollectivesWithBalance = (where = {}, options) => {
   Object.keys(where).forEach(key => {
     if (key === 'tags') {
       whereCondition += 'AND c.tags && $tags '; // && operator means "overlaps", e.g. ARRAY[1,4,3] && ARRAY[2,1] == true
-      where.tags = where.tags.$overlap;
+      where.tags = where.tags[Op.overlap];
     } else {
       whereCondition += `AND c."${key}"=$${key} `;
     }
   });
 
-  return sequelize.query(`
+  const params = {
+    bind: where,
+    model: models.Collective
+  };
+
+  const allFields = 'c.*, td.*';
+
+  /* This version doesn't include limit/offset */
+  const sql = (fields) => `
     with "balance" AS (
       SELECT t."CollectiveId", SUM("netAmountInCollectiveCurrency") as "balance"
       FROM "Collectives" c
@@ -272,17 +280,21 @@ const getCollectivesWithBalance = (where = {}, options) => {
         AND c."deletedAt" IS NULL
         GROUP BY t."CollectiveId"
     )
-    SELECT c.*, td.* FROM "Collectives" c
+    SELECT ${fields} FROM "Collectives" c
     LEFT JOIN "balance" td ON td."CollectiveId" = c.id
     WHERE c."isActive" IS TRUE
     ${whereCondition}
     AND c."deletedAt" IS NULL
-    ORDER BY ${orderBy} ${orderDirection} NULLS LAST LIMIT ${limit} OFFSET ${offset}
-  `.replace(/\s\s+/g, ' '), // this is to remove the new lines and save log space.
-  {
-    bind: where,
-    model: models.Collective
-  });
+    GROUP BY c.id, td."CollectiveId", td.balance
+    ORDER BY ${orderBy} ${orderDirection} NULLS LAST
+  `.replace(/\s\s+/g, ' '); // remove the new lines and save log space
+
+  const [ [ { dataValues: { total } } ], collectives ] = await Promise.all([
+    sequelize.query(`${sql('COUNT(c.*) OVER() as "total"')} LIMIT 1`, params),
+    sequelize.query(`${sql(allFields)} LIMIT ${limit} OFFSET ${offset}`, params),
+  ]);
+
+  return { total, collectives };
 };
 
 /**

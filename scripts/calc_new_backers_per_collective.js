@@ -6,7 +6,7 @@ import Promise from 'bluebird';
 import fs from 'fs';
 import moment from 'moment';
 import json2csv from 'json2csv';
-import models, { sequelize } from '../server/models';
+import models, { sequelize, Op } from '../server/models';
 
 
 const done = (err) => {
@@ -47,7 +47,7 @@ const initiateNewCollectiveStats = (firstOrder, isNewBacker) => {
   }
   const newCollectiveStats = generateMonths(collectiveStats);
   console.log("newCollectiveStats", newCollectiveStats);
-  return newCollectiveStats;  
+  return newCollectiveStats;
 };
 
 const countOrderInStats = (order, isNewBacker) => {
@@ -81,14 +81,14 @@ const calculateBackersPerCollective = () => {
   return models.Order.findAll({
     where: {
       /*PaymentMethodId: {
-        $not: null
+        [Op.not]: null
       }*/
       CollectiveId: {
-        [sequelize.Op.notIn]: [ 1 ]
-      }, 
+        [Op.notIn]: [ 1 ]
+      },
     },
     include: [
-      { model: models.Collective, as: 'fromCollective', paranoid: false }, 
+      { model: models.Collective, as: 'fromCollective', paranoid: false },
       { model: models.Collective, as: 'collective', paranoid: false }
     ],
     order: ['id']
@@ -151,7 +151,7 @@ const calculateBackersPerCollective = () => {
 
 const run = () => {
   console.log('\nStarting calc_new_backers_per_collective...')
-  
+
   return calculateBackersPerCollective()
   .then(() => done())
   .catch(done)

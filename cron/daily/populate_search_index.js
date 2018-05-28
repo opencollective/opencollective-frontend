@@ -41,7 +41,6 @@ const done = (error) => {
 }
 
 
-// TODO: clean index once a week
 const populateIndex = async () => {
   const collectives = await models.Collective.findAll({
     where: {

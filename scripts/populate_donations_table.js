@@ -1,7 +1,7 @@
 const _ = require('lodash');
 const app = require('../server/index');
 const config = require('config');
-import models from '../server/models';
+import models, { Op } from '../server/models';
 const constants = require('../server/constants/transactions');
 
 const done = (err) => {
@@ -36,7 +36,7 @@ const createDonation = (transaction) => {
 models.Transaction.findAll({
   where: {
     amount: {
-      $gt: 0
+      [Op.gt]: 0
     },
     OrderId: null // this ensures that we don't reprocess a transaction
   },

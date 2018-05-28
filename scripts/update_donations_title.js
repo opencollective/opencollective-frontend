@@ -1,5 +1,5 @@
 import config from 'config';
-import models from '../server/models';
+import models, { Op } from '../server/models';
 import { capitalize } from '../server/lib/utils';
 
 const done = (err) => {
@@ -9,9 +9,9 @@ const done = (err) => {
 };
 
 // Get all donations that have a subscription
-models.Order.findAll({ 
-  where: { 
-    SubscriptionId: { $ne: null }
+models.Order.findAll({
+  where: {
+    SubscriptionId: { [Op.ne]: null }
   },
   include: [ { model: models.Subscription }]
 })

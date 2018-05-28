@@ -14,7 +14,7 @@ import { getFxRate } from '../lib/currency';
 
 export default function(Sequelize, DataTypes) {
 
-  const { models } = Sequelize;
+  const { models, Op } = Sequelize;
 
   const payoutMethods = ['paypal', 'stripe', 'opencollective', 'prepaid'];
 
@@ -280,7 +280,7 @@ export default function(Sequelize, DataTypes) {
       limit = this.monthlyLimitPerMember;
       const d = new Date;
       const firstOfTheMonth = new Date(d.getFullYear(), d.getMonth(), 1);
-      where.createdAt = { $gte: firstOfTheMonth };
+      where.createdAt = { [Op.gte]: firstOfTheMonth };
       where.CreatedByUserId = user.id;
     }
 
@@ -373,12 +373,12 @@ export default function(Sequelize, DataTypes) {
   PaymentMethod.getMatchingFund = (shortUUID, options = {}) => {
     const where = {};
     if (options.ForCollectiveId) {
-      where.limitedToCollectiveIds = Sequelize.or({ limitedToCollectiveIds: {$eq: null } }, { limitedToCollectiveIds: options.ForCollectiveId });
+      where.limitedToCollectiveIds = Sequelize.or({ limitedToCollectiveIds: {[Op.eq]: null } }, { limitedToCollectiveIds: options.ForCollectiveId });
     }
     return PaymentMethod.findOne({
       where: Sequelize.and(
-        Sequelize.where(Sequelize.cast(Sequelize.col('uuid'), 'text'), { $like: `${shortUUID}%` }),
-        { matching: { $ne: null } }
+        Sequelize.where(Sequelize.cast(Sequelize.col('uuid'), 'text'), {[Op.like]: `${shortUUID}%` }),
+        { matching: { [Op.ne]: null } }
       )
     }).then(async (pm) => {
       if (pm.expiryDate) {

@@ -4,7 +4,7 @@
  * to the `collective.monthlyreport` notification (for all collectives)
  */
 import Promise from 'bluebird';
-import models from '../server/models';
+import models, { Op } from '../server/models';
 
 const debug = require('debug')('subscribe');
 
@@ -22,7 +22,7 @@ const init = () => {
   const query = {
       where: {
         role: 'ADMIN',
-        createdAt: { $gt: '2016-08-11 00:22:42.277+00' } // only subscribe users who became members of a collective after August 11th 2016
+        createdAt: { [Op.gt]: '2016-08-11 00:22:42.277+00' } // only subscribe users who became members of a collective after August 11th 2016
       }
   };
 

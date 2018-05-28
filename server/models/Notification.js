@@ -13,7 +13,7 @@ const debug = debugLib("notification");
 
 export default function(Sequelize, DataTypes) {
 
-  const models = Sequelize.models;
+  const { models, Op } = Sequelize;
 
   const Notification = Sequelize.define('Notification', {
 
@@ -85,7 +85,7 @@ export default function(Sequelize, DataTypes) {
   Notification.getSubscribersUsers = async (collectiveSlug, mailinglist) => {
     const getUsers = (memberships) => {
       if (!memberships || memberships.length === 0) return [];
-      return models.User.findAll({ where: { CollectiveId: { $in: memberships.map(m => m.MemberCollectiveId )}}});
+      return models.User.findAll({ where: { CollectiveId: { [Op.in]: memberships.map(m => m.MemberCollectiveId )}}});
     }
 
     return await Notification.getSubscribers(collectiveSlug, mailinglist).then(getUsers);

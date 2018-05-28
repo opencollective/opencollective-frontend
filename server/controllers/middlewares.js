@@ -4,7 +4,7 @@ import moment from 'moment';
 import _ from 'lodash';
 import * as users from '../controllers/users';
 import queries from '../lib/queries';
-import models from '../models';
+import models, { Op } from '../models';
 import errors from '../lib/errors';
 
 const {
@@ -118,7 +118,7 @@ export const getOrCreateUser = (req, res, next) => {
 
   User.findOne({
     where: {
-      $or: {
+      [Op.or]: {
         email: userData.email,
         paypalEmail: userData.paypalEmail
       }
@@ -187,7 +187,7 @@ export const paginate = (options) => {
     if (sinceId) {
       req.pagination = {
         where: {
-          id: {$gt: sinceId}
+          id: {[Op.gt]: sinceId}
         }
       };
       return next();

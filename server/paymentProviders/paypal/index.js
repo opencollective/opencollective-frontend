@@ -2,7 +2,7 @@ import debug from 'debug';
 import config from 'config';
 import moment from 'moment';
 
-import models from '../../models';
+import models, { Op } from '../../models';
 import errors from '../../lib/errors';
 import paypalAdaptive from './adaptiveGateway';
 import { convertToCurrency } from '../../lib/currency';
@@ -152,7 +152,7 @@ export default {
             where: {
               service: 'paypal',
               CollectiveId: paymentMethod.CollectiveId,
-              token: { $ne: req.query.preapprovalkey }
+              token: { [Op.ne]: req.query.preapprovalkey }
             }
           }))
 

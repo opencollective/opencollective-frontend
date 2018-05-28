@@ -1,10 +1,8 @@
-
-
 import _ from 'lodash';
 import moment from 'moment';
 import Promise from 'bluebird';
 import debugLib from 'debug';
-import models, { sequelize } from '../server/models';
+import models, { sequelize, Op } from '../server/models';
 import emailLib from '../server/lib/email';
 import config from 'config';
 import { exportToCSV, exportToPDF } from '../server/lib/utils';
@@ -55,11 +53,11 @@ async function HostReport(year, month, hostId) {
   }
 
   const dateRange = {
-    createdAt: { $gte: startDate, $lt: endDate }
+    createdAt: { [Op.gte]: startDate, [Op.lt]: endDate }
   };
 
   const previousDateRange = {
-    createdAt: { $gte: previousStartDate, $lt: startDate }
+    createdAt: { [Op.gte]: previousStartDate, [Op.lt]: startDate }
   }
 
   const emailTemplate = (!month) ? 'host.yearlyreport' : 'host.monthlyreport';
@@ -87,10 +85,10 @@ async function HostReport(year, month, hostId) {
 
   const getPlatformStats = () => {
 
-    return models.Collective.findAll({ where: { type: { $in: ['COLLECTIVE', 'EVENT'] } } })
+    return models.Collective.findAll({ where: { type: { [Op.in]: ['COLLECTIVE', 'EVENT'] } } })
       .then((collectives) => {
         const where = {
-          CollectiveId: { $in: collectives.map(c => c.id) }
+          CollectiveId: { [Op.in]: collectives.map(c => c.id) }
         };
         const now = new Date;
         const catchError = (e) => {
@@ -100,10 +98,10 @@ async function HostReport(year, month, hostId) {
         return Promise.all([
           sumTransactions('netAmountInCollectiveCurrency', where, 'USD', now).catch(catchError),                      // total host balance
           sumTransactions('netAmountInCollectiveCurrency', { ...where, ...dateRange}, 'USD', now).catch(catchError),   // delta host balance last month
-          sumTransactions('amount', { ...where, type: 'CREDIT', ...dateRange, platformFeeInHostCurrency: { $gt: 0 }}, 'USD', now).catch(catchError), // total donations last month excluding  "add funds"
-          sumTransactions('amount', { ...where, type: 'CREDIT', ...previousDateRange, platformFeeInHostCurrency: { $gt: 0 }}, 'USD', now).catch(catchError), // total donations last month excluding  "add funds" previous month
-          sumTransactions('amount', { ...where, type: 'CREDIT', ...dateRange, platformFeeInHostCurrency: { $or: [null, 0 ] } }, 'USD', now).catch(catchError), // total "add funds" last month
-          sumTransactions('amount', { ...where, type: 'CREDIT', ...previousDateRange, platformFeeInHostCurrency: { $or: [null, 0 ] } }, 'USD', now).catch(catchError), // total "add funds" previous month
+          sumTransactions('amount', { ...where, type: 'CREDIT', ...dateRange, platformFeeInHostCurrency: { [Op.gt]: 0 }}, 'USD', now).catch(catchError), // total donations last month excluding  "add funds"
+          sumTransactions('amount', { ...where, type: 'CREDIT', ...previousDateRange, platformFeeInHostCurrency: { [Op.gt]: 0 }}, 'USD', now).catch(catchError), // total donations last month excluding  "add funds" previous month
+          sumTransactions('amount', { ...where, type: 'CREDIT', ...dateRange, platformFeeInHostCurrency: { [Op.or]: [null, 0 ] } }, 'USD', now).catch(catchError), // total "add funds" last month
+          sumTransactions('amount', { ...where, type: 'CREDIT', ...previousDateRange, platformFeeInHostCurrency: { [Op.or]: [null, 0 ] } }, 'USD', now).catch(catchError), // total "add funds" previous month
           sumTransactions('netAmountInCollectiveCurrency', { ...where, type: 'CREDIT', ...dateRange}, 'USD', now).catch(catchError), // total net amount received last month (after processing fee and host fees)
           sumTransactions('netAmountInCollectiveCurrency', { ...where, type: 'DEBIT', ...dateRange}, 'USD', now).catch(catchError),  // total net amount paid out last month
           sumTransactions('netAmountInCollectiveCurrency', { ...where, type: 'DEBIT', ...previousDateRange}, 'USD', now).catch(catchError),  // total net amount paid out previous month
@@ -121,7 +119,7 @@ async function HostReport(year, month, hostId) {
   const getHostStats = (host, collectiveids) => {
 
     const where = {
-      CollectiveId: { $in: collectiveids }
+      CollectiveId: { [Op.in]: collectiveids }
     };
 
     return Promise.all([

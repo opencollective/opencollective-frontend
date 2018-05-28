@@ -167,15 +167,18 @@ describe('graphql.collective.test.js', () => {
           }
         }
         collectives {
-          id
-          slug
-          stats {
-            expenses {
-              all
-              paid
-              pending
-              rejected
-              approved
+          total
+          collectives {
+            id
+            slug
+            stats {
+              expenses {
+                all
+                paid
+                pending
+                rejected
+                approved
+              }
             }
           }
         }
@@ -185,7 +188,7 @@ describe('graphql.collective.test.js', () => {
     const result = await utils.graphqlQuery(query, { slug: "brusselstogether" });
     result.errors && console.error(result.errors);
     expect(result.errors).to.not.exist;
-    const collectives = result.data.Collective.collectives;
+    const collectives = result.data.Collective.collectives.collectives;
     expect(result.data.Collective.stats.collectives.all).to.equal(2);
     expect(result.data.Collective.stats.collectives.hosted).to.equal(2);
     expect(result.data.Collective.stats.collectives.memberOf).to.equal(0);

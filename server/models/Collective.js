@@ -34,7 +34,7 @@ const debug = debugLib('collective');
  */
 export default function(Sequelize, DataTypes) {
 
-  const { models } = Sequelize;
+  const { models, Op } = Sequelize;
 
   const Collective = Sequelize.define('Collective', {
 
@@ -483,7 +483,7 @@ export default function(Sequelize, DataTypes) {
   // I'd argue that we should store the event slug as `${parentCollectiveSlug}/events/${eventSlug}`
   Collective.prototype.getUrlPath = function() {
     if (this.type === types.EVENT) {
-      return models.Collective.findById(this.ParentCollectiveId, { attributes: ['slug'] })
+      return models.Collective.findById(this.ParentCollectiveId, { attributes: ['id', 'slug'] })
         .then(parent => {
           return `/${parent.slug}/events/${this.slug}`;
         })
@@ -591,7 +591,7 @@ export default function(Sequelize, DataTypes) {
       where: {
         CollectiveId: this.id,
         role: roles.BACKER,
-        createdAt: { $lt: until }
+        createdAt: { [Op.lt]: until }
       }
     });
 
@@ -637,7 +637,7 @@ export default function(Sequelize, DataTypes) {
     return models.Collective.findAll({
       attributes: ['id'],
       where: {
-        tags: { $contains: [this.settings.superCollectiveTag] }
+        tags: { [Op.contains]: [this.settings.superCollectiveTag] }
       }
     })
     .then(rows => rows.map(r => r.id))
@@ -669,7 +669,7 @@ export default function(Sequelize, DataTypes) {
         const include = options.active ? [ { model: models.Subscription, attributes: ['isActive'] } ] : [];
         return models.Order.findOne({
           attributes: [ 'TierId' ],
-          where: { FromCollectiveId: backerCollective.id, CollectiveId: this.id, TierId: { $ne: null } },
+          where: { FromCollectiveId: backerCollective.id, CollectiveId: this.id, TierId: { [Op.ne]: null } },
           include
         }).then(order => {
           if (!order) {
@@ -849,7 +849,7 @@ export default function(Sequelize, DataTypes) {
   // creates a User and a UserCollective if needed
   Collective.prototype.editMembers = function(members, defaultAttributes = {}) {
     if (!members) return Promise.resolve();
-    return this.getMembers({ where: { role: { $in: [ roles.ADMIN, roles.MEMBER ] } } } )
+    return this.getMembers({ where: { role: { [Op.in]: [ roles.ADMIN, roles.MEMBER ] } } } )
       .then(oldMembers => {
         // remove the members that are not present anymore
         const diff = difference(oldMembers.map(t => t.id), members.map(t => t.id));
@@ -857,7 +857,7 @@ export default function(Sequelize, DataTypes) {
           return null;
         } else {
           debug("editMembers", "delete", diff);
-          return models.Member.update({ deletedAt: new Date }, { where: { id: { $in: diff }}})
+          return models.Member.update({ deletedAt: new Date }, { where: { id: { [Op.in]: diff }}})
         }
       })
       .then(() => {
@@ -890,7 +890,7 @@ export default function(Sequelize, DataTypes) {
           }
         });
       })
-      .then(() => this.getMembers({ where: { role: { $in: [ roles.ADMIN, roles.MEMBER ] } } } ))
+      .then(() => this.getMembers({ where: { role: { [Op.in]: [ roles.ADMIN, roles.MEMBER ] } } } ))
   };
 
   // edit the tiers of this collective (create/update/remove)
@@ -901,7 +901,7 @@ export default function(Sequelize, DataTypes) {
     .then(oldTiers => {
       // remove the tiers that are not present anymore in the updated collective
       const diff = difference(oldTiers.map(t => t.id), tiers.map(t => t.id));
-      return models.Tier.update({ deletedAt: new Date }, { where: { id: { $in: diff }}})
+      return models.Tier.update({ deletedAt: new Date }, { where: { id: { [Op.in]: diff }}})
     })
     .then(() => {
       return Promise.map(tiers, (tier) => {
@@ -929,14 +929,14 @@ export default function(Sequelize, DataTypes) {
     // (to avoid marking other types as archived see issue #698)
     return models.PaymentMethod.findAll({ where: {
       CollectiveId: this.id,
-      archivedAt: { $eq: null },
+      archivedAt: { [Op.eq]: null },
       service: 'stripe',
       type: 'creditcard'
     }})
     .then(oldPaymentMethods => {
       // remove the paymentMethods that are not present anymore in the updated collective
       const diff = difference(oldPaymentMethods.map(t => t.id), paymentMethods.map(t => t.id));
-      return models.PaymentMethod.update({ archivedAt: new Date }, { where: { id: { $in: diff }}})
+      return models.PaymentMethod.update({ archivedAt: new Date }, { where: { id: { [Op.in]: diff }}})
     })
     .then(() => {
       return Promise.map(paymentMethods, (pm) => {
@@ -945,7 +945,7 @@ export default function(Sequelize, DataTypes) {
         } else {
           pm.CollectiveId = this.id;
           pm.currency = pm.currency || this.currency;
-          models.PaymentMethod.update({ primary: false }, { where: { CollectiveId: this.id, archivedAt: { $eq: null } }});
+          models.PaymentMethod.update({ primary: false }, { where: { CollectiveId: this.id, archivedAt: { [Op.eq]: null } }});
           return models.PaymentMethod.createFromStripeSourceToken({ ...defaultAttributes, ...pm, type: 'creditcard' }); // TODO: nicer to not have to hard code 'creditcard'
         }
       });
@@ -955,11 +955,11 @@ export default function(Sequelize, DataTypes) {
 
   Collective.prototype.getExpenses = function(status, startDate, endDate = new Date) {
     const where = {
-      createdAt: { $lt: endDate },
+      createdAt: { [Op.lt]: endDate },
       CollectiveId: this.id
     };
     if (status) where.status = status;
-    if (startDate) where.createdAt.$gte = startDate;
+    if (startDate) where.createdAt[Op.gte] = startDate;
 
     return models.Expense.findAll({
       where,
@@ -981,7 +981,7 @@ export default function(Sequelize, DataTypes) {
       where: {
         ...where,
         CollectiveId: this.id,
-        confirmedAt: { $ne: null }
+        confirmedAt: { [Op.ne]: null }
       },
       order: [['confirmedAt', 'DESC']]
     })
@@ -1002,7 +1002,7 @@ export default function(Sequelize, DataTypes) {
       ],
       where: {
         CollectiveId: this.id,
-        createdAt: { $lt: until }
+        createdAt: { [Op.lt]: until }
       }
     })
     .then(result => Promise.resolve(parseInt(result.toJSON().total, 10)));
@@ -1061,11 +1061,11 @@ export default function(Sequelize, DataTypes) {
   Collective.prototype.getTotalAmountReceived = function(startDate, endDate) {
     endDate = endDate || new Date;
     const where = {
-      amount: { $gt: 0 },
-      createdAt: { $lt: endDate },
+      amount: { [Op.gt]: 0 },
+      createdAt: { [Op.lt]: endDate },
       CollectiveId: this.id
     };
-    if (startDate) where.createdAt.$gte = startDate;
+    if (startDate) where.createdAt[Op.gte] = startDate;
     return models.Transaction.find({
       attributes: [
         [Sequelize.fn('COALESCE', Sequelize.fn('SUM', Sequelize.col('amount')), 0), 'total']
@@ -1079,11 +1079,11 @@ export default function(Sequelize, DataTypes) {
   Collective.prototype.getTotalAmountSent = function(startDate, endDate) {
     endDate = endDate || new Date;
     const where = {
-      amount: { $gt: 0 },
-      createdAt: { $lt: endDate },
+      amount: { [Op.gt]: 0 },
+      createdAt: { [Op.lt]: endDate },
       FromCollectiveId: this.id
     };
-    if (startDate) where.createdAt.$gte = startDate;
+    if (startDate) where.createdAt[Op.gte] = startDate;
     return models.Transaction.find({
       attributes: [
         [Sequelize.fn('COALESCE', Sequelize.fn('SUM', Sequelize.col('amount')), 0), 'total']
@@ -1118,12 +1118,12 @@ export default function(Sequelize, DataTypes) {
   Collective.prototype.getTotalTransactions = function(startDate, endDate, type, attribute = 'netAmountInCollectiveCurrency') {
     endDate = endDate || new Date;
     const where = {
-      createdAt: { $lt: endDate },
+      createdAt: { [Op.lt]: endDate },
       CollectiveId: this.id
     };
-    if (startDate) where.createdAt.$gte = startDate;
-    if (type === 'donation') where.amount = { $gt: 0 };
-    if (type === 'expense') where.amount = { $lt: 0 };
+    if (startDate) where.createdAt[Op.gte] = startDate;
+    if (type === 'donation') where.amount = { [Op.gt]: 0 };
+    if (type === 'expense') where.amount = { [Op.lt]: 0 };
     return models.Transaction.find({
       attributes: [
         [Sequelize.fn('COALESCE', Sequelize.fn('SUM', Sequelize.col(attribute)), 0), 'total']
@@ -1138,10 +1138,10 @@ export default function(Sequelize, DataTypes) {
     return models.Transaction.findAll({
       where: {
         FromCollectiveId: this.id,
-        createdAt: { $gte: since || 0, $lt: until || new Date}
+        createdAt: { [Op.gte]: since || 0, [Op.lt]: until || new Date}
       },
       order: [ ['amount','DESC'] ],
-      include: [ { model: models.Collective, as: 'collective', where: { tags: { $contains: tags } } } ]
+      include: [ { model: models.Collective, as: 'collective', where: { tags: { [Op.contains]: tags } } } ]
     });
   };
 
@@ -1159,18 +1159,18 @@ export default function(Sequelize, DataTypes) {
       ],
       where: {
         CollectiveId: this.id,
-        FromCollectiveId: { $ne: this.HostCollectiveId },
+        FromCollectiveId: { [Op.ne]: this.HostCollectiveId },
         type: 'CREDIT'
       }
     };
 
     if (options.since) {
       query.where.createdAt = query.where.createdAt || {};
-      query.where.createdAt.$gte = options.since;
+      query.where.createdAt[Op.gte] = options.since;
     }
     if (options.until) {
       query.where.createdAt = query.where.createdAt || {};
-      query.where.createdAt.$lt = options.until;
+      query.where.createdAt[Op.lt] = options.until;
     }
 
     if (options.type) {
@@ -1181,7 +1181,7 @@ export default function(Sequelize, DataTypes) {
           as: 'fromCollective',
           attributes: [],
           required: true,
-          where: { type: { $in: types }}
+          where: { type: { [Op.in]: types }}
         }
       ];
       query.raw = true; // need this otherwise it automatically also fetches Transaction.id which messes up everything

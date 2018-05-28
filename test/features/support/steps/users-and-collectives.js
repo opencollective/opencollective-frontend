@@ -1,38 +1,9 @@
 import { expect } from 'chai';
 import { Given, When, Then } from 'cucumber';
 
-import * as libpayments from '../../../../server/lib/payments';
 import * as libtransactions from '../../../../server/lib/transactions';
 import * as store from '../stores';
 import * as utils from '../../../utils';
-
-/** Helper for interpreting fee description
- *
- * The fee can be expressed as an absolute value, like "50" which
- * means $50.00 (the value will be multiplied by 100 to account for
- * the cents).
- *
- * The fee can also be expressed as a percentage of the value. In that
- * case it looks like "5%". That's why this helper takes the amount
- * parameter so the absolute value of the fee can be calculated.
- *
- * @param {Number} amount is the total amount of the expense. Used to
- *  calculate the absolute value of fees expressed as percentages.
- * @param {String} feeStr is the data read from the `.features` test
- *  file. That can be expressed as an absolute value or as a
- *  percentage.
- */
-const readFee = (amount, feeStr) => {
-  if (!feeStr) {
-    return 0;
-  } else if (feeStr.endsWith('%')) {
-    const asFloat = parseFloat(feeStr.replace('%', ''));
-    return asFloat > 0 ? libpayments.calcFee(amount, asFloat) : asFloat;
-  } else {
-    /* The `* 100` is for converting from cents */
-    return parseFloat(feeStr) * 100;
-  }
-};
 
 Given('a User {string}', async function (name) {
   const { user, userCollective } = await store.newUser(name);
@@ -40,10 +11,24 @@ Given('a User {string}', async function (name) {
   this.addValue(`${name}-user`, user);
 });
 
+Given('a User {string} as an {string} to {string}', async function (userName, role, collectiveName) {
+  const { user, userCollective } = await store.newUser(userName);
+  this.addValue(userName, userCollective);
+  this.addValue(`${userName}-user`, user);
+  const collective = this.getValue(collectiveName);
+  collective.addUserWithRole(user, role);
+});
+
 Given('a Host {string} in {string} and charges {string} of fee', async function (name, currency, fee) {
   const { hostCollective, hostAdmin } = await store.newHost(name, currency, fee);
   this.addValue(name, hostCollective);
   this.addValue(`${name}-admin`, hostAdmin);
+});
+
+Given('an Organization {string} in {string} administered by {string}', async function (orgName, currency, userName) {
+  const orgAdmin = this.getValue(`${userName}-user`);
+  const organization = await store.newOrganization({ name: orgName, currency }, orgAdmin);
+  this.addValue(orgName, organization);
 });
 
 Given('a Collective {string} in {string} hosted by {string}', async function (name, currency, hostName) {
@@ -53,6 +38,12 @@ Given('a Collective {string} in {string} hosted by {string}', async function (na
   this.addValue(name, collective);
   this.addValue(`${name}-host-collective`, hostCollective);
   this.addValue(`${name}-host-admin`, hostAdmin);
+});
+
+Given('{string} is hosted by {string}', async function (collectiveName, hostName) {
+  const hostCollective = this.getValue(hostName);
+  const collective = this.getValue(collectiveName);
+  collective.addHost(hostCollective);
 });
 
 Given('{string} connects a {string} account', async function (hostName, connectedAccountName) {
@@ -72,59 +63,37 @@ Given('platform fee is {string}', async function (feeStr) {
   this.addValue(`platform-fee`, feeStr);
 });
 
-When('{string} donates {string} to {string} via {string}', async function (fromName, value, toName, paymentMethod) {
+async function handleDonation (fromName, value, toName, paymentMethod, userName=null) {
   const [ amountStr, currency ] = value.split(' ');
   const amount = parseInt(amountStr);
+  const user = !userName
+    ? this.getValue(`${userName ? userName : fromName}-user`)
+    : this.getValue(`${fromName}-user`);
   const userCollective = this.getValue(fromName);
   const collective = this.getValue(toName);
   /* Retrieve fees that may or may not have been set */
   const paymentMethodName = paymentMethod.toLowerCase();
-  const ppFee = readFee(amount, this.getValue(`${paymentMethodName}-payment-provider-fee`));
-  const appFee = readFee(amount, this.getValue('platform-fee'));
-  /* We currently only have these available payment methods */
+  const ppFee = utils.readFee(amount, this.getValue(`${paymentMethodName}-payment-provider-fee`));
+  const appFee = utils.readFee(amount, this.getValue('platform-fee'));
+  /* Use the appropriate stub to execute the order */
   const method = {
     stripe: store.stripeOneTimeDonation,
-  }[paymentMethodName]
-  await method({ userCollective, collective, currency, amount, appFee, ppFee });
-});
-
-When('{string} expenses {string} for {string} to {string} via {string}', async function (userName, value, description, collectiveName, payoutMethod) {
-  const [ amount, currency ] = value.split(' ');
-  const user = this.getValue(`${userName}-user`);
-  const collective = this.getValue(collectiveName);
-  const expense = {
-    amount,
+  }[paymentMethodName];
+  if (!method) throw new Error(`Payment Method ${paymentMethod} doesn't exist`);
+  return method({
+    user,
+    userCollective,
+    collective,
     currency,
-    description,
-    payoutMethod: payoutMethod.toLowerCase(),
-    collective: { id: collective.id },
-  };
-  const query =
-    `mutation createExpense($expense: ExpenseInputType!) {
-      createExpense(expense: $expense) { id, status } }`;
-  const result = await utils.graphqlQuery(
-    query, { expense }, user);
-  expect(result.errors).to.not.exist;
-  this.addValue(`expense-${description}`, result.data.createExpense);
-});
+    amount,
+    appFee,
+    ppFee,
+  });
+}
 
-When('expense for {string} is approved by {string}', async function(description, collectiveName) {
-  const hostAdmin = this.getValue(`${collectiveName}-host-admin`);
-  const expense = this.getValue(`expense-${description}`);
-  const query = `mutation approveExpense($id: Int!) { approveExpense(id: $id) { id } }`;
-  const result = await utils.graphqlQuery(query, expense, hostAdmin);
-  expect(result.errors).to.not.exist;
-});
+When('{string} donates {string} to {string} via {string}', handleDonation);
 
-When('expense for {string} is paid by {string} with {string} fee', async function(description, collectiveName, fee) {
-  const hostAdmin = this.getValue(`${collectiveName}-host-admin`);
-  const query = `mutation payExpense($id: Int!, $fee: Int!) { payExpense(id: $id, fee: $fee) { id } }`;
-  const expense = this.getValue(`expense-${description}`);
-  const parameters = { id: expense.id, fee: readFee(expense.totalAmount, fee) };
-  const result = await utils.graphqlQuery(query, parameters, hostAdmin);
-  result.errors && console.log(result.errors);
-  expect(result.errors).to.not.exist;
-});
+When('{string} donates {string} to {string} via {string} as {string}', handleDonation);
 
 Then('{string} should have contributed {string} to {string}', async function(userName, value, collectiveName) {
   const [ amount, currency ] = value.split(' ');
