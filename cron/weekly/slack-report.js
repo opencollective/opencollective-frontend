@@ -2,6 +2,7 @@ import config from 'config';
 import Promise from 'bluebird';
 import moment from 'moment-timezone';
 import _ from 'lodash';
+import merge from 'merge-options';
 import models, { Op } from '../../server/models';
 import activities from '../../server/constants/activities';
 import slackLib from '../../server/lib/slack';
@@ -45,13 +46,13 @@ const excludeOcTeam = { where: {
   }
 } };
 
-const lastWeekDonations = _.merge({}, createdLastWeek, donation, excludeOcTeam, credit);
-const lastWeekExpenses = _.merge({}, updatedLastWeek, excludeOcTeam);
+const lastWeekDonations = merge({}, createdLastWeek, donation, excludeOcTeam, credit);
+const lastWeekExpenses = merge({}, updatedLastWeek, excludeOcTeam);
 
-const pendingLastWeekExpenses = _.merge({}, lastWeekExpenses, pendingExpense);
-const approvedLastWeekExpenses = _.merge({}, lastWeekExpenses, approvedExpense);
-const rejectedLastWeekExpenses = _.merge({}, lastWeekExpenses, rejectedExpense);
-const paidLastWeekExpenses = _.merge({}, lastWeekExpenses, paidExpense);
+const pendingLastWeekExpenses = merge({}, lastWeekExpenses, pendingExpense);
+const approvedLastWeekExpenses = merge({}, lastWeekExpenses, approvedExpense);
+const rejectedLastWeekExpenses = merge({}, lastWeekExpenses, rejectedExpense);
+const paidLastWeekExpenses = merge({}, lastWeekExpenses, paidExpense);
 
 const collectiveByCurrency = {
   plain: false,
@@ -85,12 +86,12 @@ Promise.props({
   donationCount: Transaction.count(lastWeekDonations),
 
   donationAmount: Transaction
-    .aggregate('amount', 'SUM', _.merge({}, lastWeekDonations, collectiveByCurrency))
+    .aggregate('amount', 'SUM', merge({}, lastWeekDonations, collectiveByCurrency))
     .map(row => `${row.SUM/100} ${row.currency}`),
 
-  stripeReceivedCount: Activity.count(_.merge({}, createdLastWeek, stripeReceived)),
+  stripeReceivedCount: Activity.count(merge({}, createdLastWeek, stripeReceived)),
 
-  paypalReceivedCount: Activity.count(_.merge({}, createdLastWeek, paypalReceived)),
+  paypalReceivedCount: Activity.count(merge({}, createdLastWeek, paypalReceived)),
 
   // Expense statistics
 
@@ -103,33 +104,33 @@ Promise.props({
   paidExpenseCount: Expense.count(paidLastWeekExpenses),
 
   pendingExpenseAmount: Expense
-    .aggregate('amount', 'SUM', _.merge({}, pendingLastWeekExpenses, collectiveByCurrency))
+    .aggregate('amount', 'SUM', merge({}, pendingLastWeekExpenses, collectiveByCurrency))
     .map(row => `${-row.SUM/100} ${row.currency}`),
 
   approvedExpenseAmount: Expense
-    .aggregate('amount', 'SUM', _.merge({}, approvedLastWeekExpenses, collectiveByCurrency))
+    .aggregate('amount', 'SUM', merge({}, approvedLastWeekExpenses, collectiveByCurrency))
     .map(row => `${-row.SUM/100} ${row.currency}`),
 
   rejectedExpenseAmount: Expense
-    .aggregate('amount', 'SUM', _.merge({}, rejectedLastWeekExpenses, collectiveByCurrency))
+    .aggregate('amount', 'SUM', merge({}, rejectedLastWeekExpenses, collectiveByCurrency))
     .map(row => `${-row.SUM/100} ${row.currency}`),
 
   paidExpenseAmount: Expense
-    .aggregate('amount', 'SUM', _.merge({}, paidLastWeekExpenses, collectiveByCurrency))
+    .aggregate('amount', 'SUM', merge({}, paidLastWeekExpenses, collectiveByCurrency))
     .map(row => `${-row.SUM/100} ${row.currency}`),
 
   // Collective statistics
 
   activeCollectivesWithTransactions: Transaction
-    .findAll(_.merge({attributes: ['CollectiveId'] }, createdLastWeek, distinct, excludeOcTeam, onlyIncludeCollectiveType))
+    .findAll(merge({attributes: ['CollectiveId'] }, createdLastWeek, distinct, excludeOcTeam, onlyIncludeCollectiveType))
     .map(row => row.CollectiveId),
 
   activeCollectivesWithExpenses: Expense
-    .findAll(_.merge({attributes: ['CollectiveId'] }, updatedLastWeek, distinct, excludeOcTeam))
+    .findAll(merge({attributes: ['CollectiveId'] }, updatedLastWeek, distinct, excludeOcTeam))
     .map(row => row.CollectiveId),
 
   newCollectives: Collective
-    .findAll(_.merge({}, { attributes: ['slug', 'tags'], where: { type: 'COLLECTIVE' } }, createdLastWeek))
+    .findAll(merge({}, { attributes: ['slug', 'tags'], where: { type: 'COLLECTIVE' } }, createdLastWeek))
     .map(collective => {
       const openSource = collective.dataValues.tags && collective.dataValues.tags.indexOf('open source') !== -1;
       return `${collective.dataValues.slug} (${openSource ? 'open source' : collective.dataValues.tags})`
