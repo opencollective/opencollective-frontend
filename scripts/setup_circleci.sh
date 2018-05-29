@@ -54,9 +54,9 @@ fi
 if [ ! -e "${BRANCH}.tgz" ];
 then
   echo "> Downloading tarball ${API_TARBALL_URL}${BRANCH}"
-  curl  "${API_TARBALL_URL}${BRANCH}" -o "${BRANCH}.tgz"
-  echo "> Extracting ${BRANCH}.tgz"
-  tar -xzf "${BRANCH}.tgz"
+  curl  "${API_TARBALL_URL}${BRANCH}" -o "${BRANCH//\//-}.tgz"
+  echo "> Extracting ${BRANCH//\//-}.tgz"
+  tar -xzf "${BRANCH//\//-}.tgz"
   if [ -d "opencollective-api" ]; then
     rm -rf opencollective-api
   fi
