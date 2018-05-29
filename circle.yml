@@ -10,6 +10,6 @@ dependencies:
     - "~/cache"
 machine:
   node:
-    version: 8.4.0
+    version: 10.2.1
   environment:
     NODE_ENV: circleci
