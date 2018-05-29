@@ -59,6 +59,7 @@ const sendEmailToList = (to, email) => {
   })
   .catch(e => {
     console.error("error in sendEmailToList", e);
+    throw e;
   });
 };
 
@@ -121,7 +122,13 @@ export const approve = (req, res, next) => {
 };
 
 export const getNotificationType = (email) => {
-  const tokens = email.match(/(.+)@(.+)\.opencollective\.com/i);
+  debugEmail("getNotificationType", email);
+  let tokens;
+  if (email.match(/<.+@.+\..+>/)) {
+    tokens = email.match(/<(.+)@(.+)\.opencollective\.com>/i);
+  } else {
+    tokens = email.match(/(.+)@(.+)\.opencollective\.com/i);
+  }
   if (!tokens) return {};
   const collectiveSlug = tokens[2];
   let mailinglist = tokens[1];
@@ -129,7 +136,9 @@ export const getNotificationType = (email) => {
     mailinglist = 'admins';
   }
   const type = `mailinglist.${mailinglist}`;
-  return { collectiveSlug, mailinglist, type };
+  const res = { collectiveSlug, mailinglist, type };
+  debugEmail("getNotificationType", res);
+  return res;
 }
 
 export const webhook = (req, res, next) => {
