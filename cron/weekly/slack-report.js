@@ -6,7 +6,10 @@ import models, { Op } from '../../server/models';
 import activities from '../../server/constants/activities';
 import slackLib from '../../server/lib/slack';
 import expenseStatus from '../../server/constants/expense_status';
-onlyExecuteInProdOnMondays();
+
+if (!process.env.MANUAL) {
+  onlyExecuteInProdOnMondays();
+}
 
 const {
   Activity,
@@ -159,7 +162,7 @@ function onlyExecuteInProdOnMondays() {
 }
 
 function getTimeFrame(propName) {
-  const thisWeekStartRaw = moment()
+  const thisWeekStartRaw = moment(process.env.START_DATE) // will default to now if START_DATE is not set
     .tz('America/New_York')
     .startOf('isoWeek')
     .add(9, 'hours');
