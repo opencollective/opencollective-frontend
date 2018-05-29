@@ -56,11 +56,14 @@ export default function(Sequelize, DataTypes) {
     const getMembersForEvent = (mailinglist) => models.Collective
     .findOne({ where: { slug: mailinglist, type: 'EVENT' } })
     .then(event => {
-      if (event) return event.getMembers();
+      if (!event) throw new Error(`mailinglist_not_found`);
+      debug("getMembersForEvent", event.slug);
+      return event.getMembers();
     });
-    debug("getSubscribers", findByAttribute, collectiveSlug, "found:", collective.slug);
+
+    debug("getSubscribers", findByAttribute, collectiveSlug, "found:", collective.slug, "mailinglist:", mailinglist);
     const excludeUnsubscribed = (members) => {
-      debug("excludeUnsubscribed: need to filter", members.length, "members");
+      debug("excludeUnsubscribed: need to filter", members && members.length, "members");
       if (!members || members.length === 0) return [];
 
       return Notification.getUnsubscribersUserIds(`mailinglist.${mailinglist}`, collective.id)
