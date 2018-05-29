@@ -70,7 +70,7 @@
     "moment-timezone": "0.5.14",
     "morgan": "1.7.0",
     "multer": "0.1.8",
-    "newrelic": "2.4.2",
+    "newrelic": "4.1.2",
     "node-fetch": "2.1.2",
     "node-slack": "0.0.7",
     "node-slug": "0.0.2",
