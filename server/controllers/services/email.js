@@ -59,6 +59,7 @@ const sendEmailToList = (to, email) => {
   })
   .catch(e => {
     console.error("error in sendEmailToList", e);
+    throw e;
   });
 };
 
@@ -121,7 +122,13 @@ export const approve = (req, res, next) => {
 };
 
 export const getNotificationType = (email) => {
-  const tokens = email.match(/(.+)@(.+)\.opencollective\.com/i);
+  debugEmail("getNotificationType", email);
+  let tokens;
+  if (email.match(/<.+@.+\..+>/)) {
+    tokens = email.match(/<(.+)@(.+)\.opencollective\.com>/i);
+  } else {
+    tokens = email.match(/(.+)@(.+)\.opencollective\.com/i);
+  }
   if (!tokens) return {};
   const collectiveSlug = tokens[2];
   let mailinglist = tokens[1];
@@ -129,7 +136,9 @@ export const getNotificationType = (email) => {
     mailinglist = 'admins';
   }
   const type = `mailinglist.${mailinglist}`;
-  return { collectiveSlug, mailinglist, type };
+  const res = { collectiveSlug, mailinglist, type };
+  debugEmail("getNotificationType", res);
+  return res;
 }
 
 export const webhook = (req, res, next) => {
@@ -174,7 +183,6 @@ export const webhook = (req, res, next) => {
   // and we send the email to the admins of the collective for approval
   // once approved, we will fetch the original email from the server and send it to all recipients
   let subscribers;
-
   models.Collective.find({ where: { slug: collectiveSlug } })
     .tap(g => {
       if (!g) throw new Error('collective_not_found');
@@ -183,6 +191,7 @@ export const webhook = (req, res, next) => {
     // We fetch all the recipients of that mailing list to give a preview in the approval email
     .then(collective => models.Notification.getSubscribers(collective.slug, mailinglist))
     .tap(results => {
+      debugWebhook("getSubscribers", mailinglist, results);
       if (results.length === 0) throw new Error('no_subscribers');
       subscribers = results.map(s => {
         s.roundedAvatar = `https://res.cloudinary.com/opencollective/image/fetch/c_thumb,g_face,h_48,r_max,w_48,bo_3px_solid_white/c_thumb,h_48,r_max,w_48,bo_2px_solid_rgb:66C71A/e_trim/f_auto/${encodeURIComponent(s.image)}`;
@@ -226,6 +235,7 @@ export const webhook = (req, res, next) => {
     .catch(e => {
       switch (e.message) {
         case 'no_subscribers':
+          debugWebhook("No subscribers");
           /**
            * TODO
            * If there is no such mailing list,
@@ -234,16 +244,25 @@ export const webhook = (req, res, next) => {
            * - if the sender is unknown, we return an email suggesting to contact info@:collectiveSlug.opencollective.com
            */
           return res.send({error: { message: `There is no user subscribed to ${recipient}` }});
+
+        case 'mailinglist_not_found':
+          debugWebhook("Mailing list not found");
+          return res.send({error: { message: `Invalid mailing list address ${mailinglist}@${collectiveSlug}.opencollective.com` }});
+
         case 'collective_not_found':
-          /**
+          debugWebhook("Collective not found");
+        /**
            * TODO
            * If there is no such collective, we send an email to confirm to create the collective
            * with the people in /cc as initial admins
            */
           return res.send({error: { message: `There is no collective with slug ${collectiveSlug}` }});
+
         case 'no_admins':
           return res.send({error: { message: `There is no admins to approve emails sent to ${email.recipient}` }});
+
         default:
+          debugWebhook("Unknown error:", e);
           return next(e);
       }
     });
