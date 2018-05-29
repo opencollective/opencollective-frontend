@@ -55,7 +55,11 @@ const queries = {
       slug: { type: new GraphQLNonNull(GraphQLString) }
     },
     resolve(_, args) {
-      return models.Collective.findBySlug(args.slug.toLowerCase());
+      const collective = models.Collective.findBySlug(args.slug.toLowerCase());
+      if (!collective) {
+        throw new errors.NotFound("Collective not found");
+      }
+      return collective;
     }
   },
 

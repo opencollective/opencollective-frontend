@@ -474,6 +474,7 @@ export const CollectiveInterfaceType = new GraphQLInterfaceType({
         args: {
           limit: { type: GraphQLInt },
           offset: { type: GraphQLInt },
+          type: { type: GraphQLString, description: "Type of collective (COLLECTIVE, EVENT, ORGANIZATION)" },
           role: { type: GraphQLString },
           roles: { type: new GraphQLList(GraphQLString) }
         }
@@ -807,6 +808,7 @@ const CollectiveFields = () => {
       args: {
         limit: { type: GraphQLInt },
         offset: { type: GraphQLInt },
+        type: { type: GraphQLString },
         role: { type: GraphQLString },
         roles: { type: new GraphQLList(GraphQLString) }
       },
@@ -816,13 +818,17 @@ const CollectiveFields = () => {
         if (roles && roles.length > 0) {
           where.role = { [Op.in]: roles };
         }
+        const collectiveConditions = { deletedAt: null };
+        if (args.type) {
+          collectiveConditions.type = args.type;
+        }
         return models.Member.findAll({
           where,
           limit: args.limit,
           offset: args.offset,
           include: [{
             model: models.Collective, as: 'collective',
-            where: { deletedAt: null },
+            where: collectiveConditions
           }]
         });
       }
