@@ -47,7 +47,8 @@ class CreateExpenseForm extends React.Component {
       modified: false,
       expense: {
         category: Object.keys(this.categoriesOptions[0])[0],
-        payoutMethod: 'paypal'
+        payoutMethod: 'paypal',
+        paypalEmail: (props.LoggedInUser && props.LoggedInUser.paypalEmail) || null,
       },
       isExpenseValid: false,
       loading: false
