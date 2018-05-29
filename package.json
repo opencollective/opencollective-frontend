@@ -64,6 +64,7 @@
     "knox-mpu-alt": "0.2.2",
     "lodash": "3.10.1",
     "lru-cache": "4.1.1",
+    "merge-options": "^1.0.1",
     "mime": "2.2.2",
     "moment": "2.19.3",
     "moment-timezone": "0.5.14",
