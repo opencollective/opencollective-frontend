@@ -5,8 +5,8 @@
   "author": "@philmod @arnaudbenard @xdamman @asood123",
   "main": "server/index.js",
   "engines": {
-    "node": "8.4.0",
-    "npm": "5.4.1"
+    "node": "10.2.1",
+    "npm": "6.1.0"
   },
   "dependencies": {
     "algoliasearch": "3.24.9",
@@ -25,7 +25,7 @@
     "babel-preset-stage-0": "6.24.1",
     "babel-register": "6.26.0",
     "base64url": "1.0.6",
-    "bcrypt": "1.0.2",
+    "bcrypt": "2.0.1",
     "bluebird": "3.4.0",
     "body-parser": "1.17.2",
     "child-process-promise": "1.1.0",
