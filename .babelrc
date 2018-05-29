@@ -1,6 +1,10 @@
 {
   "presets": [
-    "@babel/preset-env",
+    ["@babel/preset-env", {
+      "targets": {
+        "node": "current"
+      }
+    }],
     "@babel/preset-stage-0",
     ["next/babel", {
       "styled-jsx": {
