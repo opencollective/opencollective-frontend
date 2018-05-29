@@ -156,6 +156,7 @@ const sendMessage = (recipients, subject, html, options = {}) => {
     });
   } else {
     debug(">>> mailgun not configured");
+    debug(options.text);
     return Promise.resolve();
   }
 };
