@@ -10,11 +10,12 @@ function require(args, path) {
 
 export async function createUpdate(_, args, req) {
   const CollectiveId = get(args, 'update.collective.id');
+  const allowedExtensions = ['a', 'h1', 'h2', 'strong', 'img', 'ul', 'li'];
   mustHaveRole(req.remoteUser, 'ADMIN', CollectiveId, "create an update");
   require(args, 'update.title');
 
   const markdown = args.update.markdown
-        ? strip_tags(args.update.markdown)
+        ? strip_tags(args.update.markdown, allowedExtensions)
         : '';
 
   const update = await models.Update.create({
