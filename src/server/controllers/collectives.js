@@ -1,12 +1,14 @@
 import r2 from 'r2';
 import sizeOf from 'image-size';
 import request from 'request';
-import { queryString, getCloudinaryUrl } from '../lib/utils';
-import { fetchCollective, fetchCollectiveImage, fetchMembersStats, fetchMembers } from '../lib/graphql';
 import url from 'url';
-import { svg2png, generateSVGBannerForUsers, generateAsciiFromImage } from '../lib/image-generator';
 import gm from 'gm';
 import { get, pick } from 'lodash';
+
+import { logger } from '../logger';
+import { queryString, getCloudinaryUrl } from '../lib/utils';
+import { fetchCollective, fetchCollectiveImage, fetchMembersStats, fetchMembers } from '../lib/graphql';
+import { svg2png, generateSVGBannerForUsers, generateAsciiFromImage } from '../lib/image-generator';
 
 // Cache the list of members of a collective to avoid requesting it for every single /:collectiveSlug/backers/:position/avatar
 const cache = require('lru-cache')({
@@ -39,12 +41,12 @@ export async function badge(req, res) {
       res.setHeader('cache-control','max-age=600');
       return res.send(imageRequest);
     } catch (e) {
-      console.error(">>> error while fetching", imageUrl, e);
+      logger.error(">>> collectives.badge: Error while fetching %s", imageUrl, e);
       res.setHeader('cache-control','max-age=30');
       return res.status(500).send(`Unable to fetch ${imageUrl}`);
     }
   } catch (e) {
-    console.error("Catching an error in controllers.collectives.badge", e);
+    logger.debug('>>> collectives.badge error', e);
     return res.status(500).send(`Unable to generate badge for ${req.params.collectiveSlug}/${req.params.backerType}`);
   }
 }
@@ -61,7 +63,7 @@ export async function info(req, res, next) {
     if (e.message.match(/No collective found/)) {
       return res.status(404).send("Not found");
     }
-    console.log(">>> error message", e.message);
+    logger.debug('>>> collectives.info error', e);
     return next(e);
   }
 
@@ -88,7 +90,7 @@ export async function logo(req, res, next) {
     if (e.message.match(/No collective found/)) {
       return res.status(404).send("Not found");
     }
-    console.log(">>> error message", e.message);
+    logger.debug('>>> collectives.logo error', e);
     return next(e);
   }
   const imagesrc = collective.image;
@@ -150,7 +152,7 @@ export async function banner(req, res) {
       users = await fetchMembers(req.params);
       cache.set(queryString.stringify(req.params), users);
     } catch (e) {
-      console.error(">>> server.controllers.collective.banner: error while fetching members", e);
+      logger.error(">>> collectives.banner: Error while fetching members", e);
       return res.status(404).send('Not found');
     }
   }
@@ -175,7 +177,7 @@ export async function banner(req, res) {
       res.send(svg);
     })
     .catch(e => {
-      console.log("Error in generating banner: ", e);
+      logger.error('>>> collectives.banner error', e);
     });
 }
 
@@ -294,7 +296,7 @@ export async function avatar(req, res) {
           const dimensions = sizeOf(data);
           imageWidth = Math.round(dimensions.width / dimensions.height * imageHeight);
         } catch (e) {
-          console.error("Unable to get image dimensions for ", imageUrl);
+          logger.error('>>> collectives.avatar: Unable to get image dimensions for %s', imageUrl, e);
           return res.status(500).send(`Unable to fetch ${imageUrl}`);
         }
       }
@@ -311,7 +313,7 @@ export async function avatar(req, res) {
     req
       .pipe(request(imageUrl))
       .on('error', (e) => {
-        console.error("error proxying ", imageUrl, e);
+        logger.error(">>> collectives.avatar: Error proxying %s", imageUrl, e);
         res.status(500).send(e);
       })
       .on('response', (res) => {

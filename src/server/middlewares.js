@@ -1,7 +1,9 @@
 import expressSession from 'express-session';
 import ua from 'universal-analytics';
 
-const { GOOGLE_ANALYTICS_ACCOUNT, DEBUG } = process.env;
+import { logger } from './logger';
+
+const { GOOGLE_ANALYTICS_ACCOUNT } = process.env;
 
 /**
  * Google Analytics middleware
@@ -14,10 +16,10 @@ export const ga = (req, res, next) => {
   if (!GOOGLE_ANALYTICS_ACCOUNT) {
     req.ga = {
       pageview: () => {
-        if (DEBUG) console.log(">>> ga: recording page view event for ", req.url);
+        logger.debug(">>> ga: recording page view event for %s", req.url);
       },
       event: (EventCategory, EventName, EventLabel, EventValue) => {
-        if (DEBUG) console.log(">>> ga: recording event", { EventCategory, EventName, EventLabel, EventValue });
+        logger.debug(">>> ga: recording event %j", { EventCategory, EventName, EventLabel, EventValue });
       }
     }
     return next();

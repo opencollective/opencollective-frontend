@@ -1,5 +1,6 @@
-import { fetchTransaction, fetchTransactions, fetchInvoice } from '../lib/graphql';
 import pdf from 'html-pdf';
+import { logger } from '../logger';
+import { fetchTransaction, fetchTransactions, fetchInvoice } from '../lib/graphql';
 
 export async function list(req, res, next) {
   // Keeping the resulting info for 10m in the CDN cache
@@ -23,7 +24,7 @@ export async function list(req, res, next) {
     if (e.message.match(/No collective found/)) {
       return res.status(404).send("Not found");
     }
-    console.log(">>> error message", e.message);
+    logger.debug('>>> transactions.list error', e);
     return next(e);
   }
 }
@@ -44,7 +45,7 @@ export async function info(req, res, next) {
     if (e.message.match(/No collective found/)) {
       return res.status(404).send("Not found");
     }
-    console.log(">>> error message", e.message);
+    logger.debug('>>> transactions.info error', e);
     return next(e);
   }
 
@@ -72,7 +73,7 @@ export async function invoice(req, res, next) {
     if (e.message.match(/No collective found/)) {
       return res.status(404).send("Not found");
     }
-    console.log(">>> error message", e.message);
+    logger.debug('>>> transactions.invoice error', e);
     return next(e);
   }
 
@@ -106,7 +107,7 @@ export async function invoice(req, res, next) {
       res.setHeader('content-disposition', `inline; filename="${filename}"`); // or attachment?
       pdf.create(html, options).toStream((err, stream) => {
         if (err) {
-          console.log(">>> error while generating pdf", req.url, err);
+          logger.error('>>> Error while generating pdf at %s', req.url, err);
           return next(err);
         }
         stream.pipe(res);
