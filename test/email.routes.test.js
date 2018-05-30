@@ -159,7 +159,7 @@ describe("email.routes.test", () => {
       .send(unknownMailingListWebhook)
       .then((res) => {
         expect(res.statusCode).to.equal(200);
-        expect(res.body.error.message).to.equal('There is no user subscribed to unknown@testcollective.opencollective.com');
+        expect(res.body.error.message).to.equal('Invalid mailing list address unknown@testcollective.opencollective.com');
       });
   });
 

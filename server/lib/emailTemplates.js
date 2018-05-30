@@ -66,6 +66,7 @@ const templateNames = [
   'user.monthlyreport',
   'user.monthlyreport.text',
   'user.new.token',
+  'user.new.token.text',
   'user.yearlyreport',
   'user.yearlyreport.text'
 ];
