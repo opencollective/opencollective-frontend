@@ -33,7 +33,7 @@ export default WrappedComponent => {
       this.props.client.query({ query: getLoggedInUserQuery }).then(result => {
         if (result.data && result.data.LoggedInUser) {
           storage.set("LoggedInUser", result.data.LoggedInUser, 1000 * 60 * 60);
-          return result.data.LoggedInUser;
+          return new LoggedInUser(result.data.LoggedInUser);
         } else {
           storage.set("LoggedInUser", null);
           return null;
@@ -66,10 +66,7 @@ export default WrappedComponent => {
       }
 
       // Synchronously
-      const loggedInUser = await this.getLoggedInUserFromServer();
-      if (loggedInUser) {
-        return new LoggedInUser(loggedInUser);
-      }
+      return await this.getLoggedInUserFromServer();
     }
 
     render() {
