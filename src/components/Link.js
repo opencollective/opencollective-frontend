@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import router from '../server/pages';
 import { pick } from 'lodash';
-import HashLink from 'react-scrollchor';
+import Scrollchor from 'react-scrollchor';
 
 class Link extends React.Component {
 
@@ -12,7 +12,8 @@ class Link extends React.Component {
     target: PropTypes.string,
     animate: PropTypes.object,
     className: PropTypes.string,
-    title: PropTypes.string
+    title: PropTypes.string,
+    children: PropTypes.node.isRequired,
   }
 
   constructor(props) {
@@ -27,13 +28,38 @@ class Link extends React.Component {
   render() {
     const { route, params, children, className, title, ...otherProps } = this.props;
     if (this.isHash) {
-      return (<HashLink animate={this.props.animate} to={route.substr(1)} className={className}>{children}</HashLink>);
+      const afterAnimate = () => {
+        if (window.history) {
+           history.pushState({ ...history.state, as: location.pathname + route }, undefined, route);
+        }
+      }
+      return (
+        <Scrollchor
+          animate={this.props.animate}
+          to={route.substr(1)}
+          className={className}
+          disableHistory={true}
+          afterAnimate={afterAnimate}
+          >
+          {children}
+        </Scrollchor>
+      );
     } else if (this.isIframe) {
       const routeFromRouter = router.findByName(route);
       const path = routeFromRouter ? routeFromRouter.getAs(params) : `https://opencollective.com${route}`;
-      return (<a href={path} title={title} target="_top" className={className} {...otherProps}>{children}</a>);
+      return (
+        <a href={path} title={title} target="_top" className={className} {...otherProps}>
+          {children}
+        </a>
+      );
     } else {
-      return (<router.Link {...pick(this.props, ['route', 'params', 'href', 'scroll'])}><a className={className} title={title}>{children}</a></router.Link>);
+      return (
+        <router.Link {...pick(this.props, ['route', 'params', 'href', 'scroll'])}>
+          <a className={className} title={title}>
+            {children}
+          </a>
+        </router.Link>
+      );
     }
   }
 }
