@@ -11,7 +11,7 @@ function getLogLevel() {
   }
 }
 
-const logger = new winston.createLogger();
+const logger = winston.createLogger();
 
 const winstonConsole = new winston.transports.Console({
   level: getLogLevel(),
