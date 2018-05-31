@@ -287,7 +287,10 @@ class OrderForm extends React.Component {
     if (collective) {
       this.populatePaymentMethods(CollectiveId);
       if (this.paymentMethodsOptions.length > 0) {
-        newState.creditcard = { uuid: this.paymentMethodsOptions[0].value };
+        // The data structure looks like that:
+        // [ { "uuid" => "Label" }, { "uuid2" => "Label 2" } ]
+        const uuid = Object.keys(this.paymentMethodsOptions[0])[0];
+        newState.creditcard = { uuid: uuid };
       } else {
         newState.creditcard = { show: true, save: true }; // reset to default value
       }
