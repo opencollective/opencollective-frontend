@@ -10,7 +10,7 @@ import queries from '../lib/queries';
 import { types } from '../constants/collectives';
 import roles from '../constants/roles';
 import { HOST_FEE_PERCENT } from '../constants/transactions';
-import { capitalize, flattenArray, getDomain } from '../lib/utils';
+import { capitalize, flattenArray, getDomain, formatCurrency } from '../lib/utils';
 import slugify from 'slug';
 import activities from '../constants/activities';
 import Promise from 'bluebird';
@@ -835,6 +835,9 @@ export default function(Sequelize, DataTypes) {
    * @param {*} creatorUser { id } (optional, falls back to hostCollective.CreatedByUserId)
    */
   Collective.prototype.addHost = function(hostCollective, creatorUser) {
+    if (this.HostCollectiveId) {
+      throw new Error(`This collective already has a host (${this.HostCollectiveId})`);
+    }
     const member = {
       role: roles.HOST,
       CreatedByUserId: creatorUser ? creatorUser.id : hostCollective.CreatedByUserId,
@@ -844,6 +847,24 @@ export default function(Sequelize, DataTypes) {
     return this.update({ HostCollectiveId: hostCollective.id })
       .then(() => models.Member.create(member));
   };
+
+  /**
+   * Change host of the collective (only if balance === 0)
+   * @param {*} newHostCollective: { id }
+   * @param {*} creatorUser { id }
+   */
+  Collective.prototype.changeHost = async function(newHostCollective, creatorUser) {
+    const balance = await this.getBalance();
+    if (balance > 0) {
+      throw new Error(`Unable to change host: you still have a balance of ${formatCurrency(balance, this.currency)}`);
+    }
+    const membership = await models.Member.findOne({
+      where: { CollectiveId: this.id, MemberCollectiveId: this.HostCollectiveId, role: roles.HOST }
+    });
+    membership.destroy();
+    this.HostCollectiveId = null;
+    return this.addHost(newHostCollective, creatorUser);
+  }
 
   // edit the list of members and admins of this collective (create/update/remove)
   // creates a User and a UserCollective if needed

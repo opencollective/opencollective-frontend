@@ -148,6 +148,54 @@ describe('Collective model', () => {
       })
   })
 
+  describe("hosts", () => {
+    let newHost;
+
+    before(async () => {
+      expect(collective.HostCollectiveId).to.be.null;
+      await collective.addHost(host.collective, host);
+      expect(collective.HostCollectiveId).to.equal(host.CollectiveId);
+      newHost = await models.Collective.create({
+        name: "BrusselsTogether",
+        slug: "brusselstogether",
+        type: "ORGANIZATION",
+        CreatedByUserId: user1.id
+      });
+    });
+
+    it("fails to add another host", async () => {
+      try {
+        await collective.addHost(newHost, user1);
+      } catch (e) {
+        expect(e.message).to.contain(`This collective already has a host`);
+      }
+    });
+    
+    it("fails to change host if there is a pending balance", async () => {
+      try {
+        await collective.changeHost();
+      } catch (e) {
+        expect(e.message).to.contain("Unable to change host: you still have a balance of $965");
+      }
+    });
+
+    it("changes host successfully", async () => {
+      const newCollective = await models.Collective.create({
+        name: "New collective",
+        slug: "new-collective",
+        type: "COLLECTIVE",
+        CreatedByUserId: user1.id
+      });
+      await newCollective.addHost(host, user1);
+      await newCollective.changeHost(newHost, user1);
+      expect(newCollective.HostCollectiveId).to.equal(newHost.id);
+      const membership = await models.Member.findOne({ where: { role: 'HOST', CollectiveId: newCollective.id }});
+      expect(membership).to.exist;
+      expect(membership.MemberCollectiveId).to.equal(newHost.id);
+      expect(newCollective.HostCollectiveId).to.equal(newHost.id);
+    });
+  });
+
   it('creates an organization and populates logo image', (done) => {
     models.Collective.create({
       name: "Open Collective",

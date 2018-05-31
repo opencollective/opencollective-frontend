@@ -289,6 +289,12 @@ export function editCollective(_, args, req) {
       return Promise.reject(new errors.Unauthorized({ message: errorMsg }));
     }
   })
+  .then(() => {
+    // If we try to change the host
+    if (updatedCollectiveData.HostCollectiveId && updatedCollectiveData.HostCollectiveId !== collective.HostCollectiveId) {
+      return collective.changeHost({ id: updatedCollectiveData.HostCollectiveId }, req.remoteUser);
+    }
+  })
   .then(() => collective.update(updatedCollectiveData))
   .then(() => collective.editTiers(args.collective.tiers))
   .then(() => collective.editMembers(args.collective.members, { CreatedByUserId: req.remoteUser.id }))
