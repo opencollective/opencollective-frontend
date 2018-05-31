@@ -219,18 +219,30 @@ export async function stripeConnectedAccount(hostId) {
  */
 export async function stripeOneTimeDonation(opt) {
   const { user, userCollective, collective, amount, currency, appFee, ppFee } = opt;
+  const { createdAt } = opt;    // Optional
+
+  // Create a new order
   const params = { from: userCollective, to: collective, amount, currency };
-  const { order } = await newOrder(params)
+  const { order } = await newOrder(params);
+
   // Every transaction made can use different values, so we stub the
   // stripe call, create the order, and restore the stripe call so it
   // can be stubbed again by the next call to this helper.
   const sandbox = sinon.sandbox.create();
+
+  // Freeze the time to guarantee that all the objects have the
+  // requested creation date. It will be reset right after the
+  // execution of the order.
+  if (createdAt) sandbox.useFakeTimers((new Date(createdAt)).getTime());
+
+  // Stub the stripe calls before executing the order.
   try {
     utils.stubStripeCreate(sandbox);
     utils.stubStripeBalance(sandbox, amount, currency, appFee, ppFee);
+
     // Although it's supposed to be OK to omit `await' when returning
-    // a promise, it's causing this next call to fail so I'm keeping
-    // it here.
+    // a promise, it's causing this call to fail probably because of
+    // the try/catch so I'm keeping it here.
     return await libpayments.executeOrder(user, order);
   } finally {
     sandbox.restore();
