@@ -181,13 +181,17 @@ class OrderForm extends React.Component {
 
   // All the following methods are arrow functions and auto-bind
 
-  populatePaymentMethodTypes = () => {
-    const { intl } = this.props;
+  populatePaymentMethodTypes = (hostId) => {
+    const { intl, LoggedInUser } = this.props;
     const paymentMethodTypeOptions = [
       { creditcard: intl.formatMessage(this.messages['paymentMethod.creditcard']) },
-      { paypal: intl.formatMessage(this.messages['paymentMethod.paypal']) },
     ];
-
+    /* We only support paypal for the open source collective for now */
+    if (hostId === 11004 && LoggedInUser && LoggedInUser.isRoot()) {
+      paymentMethodTypeOptions.push({
+        paypal: intl.formatMessage(this.messages['paymentMethod.paypal'])
+      });
+    }
     this.paymentMethodTypeOptions = paymentMethodTypeOptions;
   }
 
@@ -697,7 +701,7 @@ class OrderForm extends React.Component {
     const { order, fromCollective } = this.state;
     const currency = (order.tier && order.tier.currency) || collective.currency;
 
-    this.populatePaymentMethodTypes();
+    this.populatePaymentMethodTypes(collective.host.id);
 
     const requireLogin = !this.state.isNewUser && !LoggedInUser;
     const inputEmail = {
