@@ -34,13 +34,15 @@ export default {
   oauth: {
 
     // Returns the redirectUrl to connect the Stripe Account to the Host Collective Id
-    redirectUrl: (remoteUser, CollectiveId) => {
+    redirectUrl: (remoteUser, CollectiveId, query) => {
       // Since we pass the redirectUrl in clear to the frontend, we cannot pass the CollectiveId in the state query variable
       // It would be trivial to change that value and attach a Stripe Account to someone else's collective
       // That's why we encode the state in a JWT
       const state = jwt.sign({
         CollectiveId,
-        CreatedByUserId: remoteUser.id
+        CreatedByUserId: remoteUser.id,
+        redirect: query.redirect,
+        postAction: query.postAction
       }, config.keys.opencollective.secret, {
         expiresIn: '45m' // People may need some time to set up their Stripe Account if they don't have one already
       });
@@ -65,7 +67,7 @@ export default {
         return next(new errors.BadRequest(`Invalid JWT: ${e.message}`));
       }
 
-      const { CollectiveId, CreatedByUserId } = state;
+      const { CollectiveId, CreatedByUserId, redirect, postAction } = state;
 
       if (!CollectiveId) {
         return next(new errors.BadRequest('No state in the callback'));
@@ -101,7 +103,14 @@ export default {
         })
         .then(getToken(req.query.code))
         .then(createStripeAccount)
-        .then(() => res.redirect(`${config.host.website}/${collective.slug}?message=StripeAccountConnected`))
+        .then(() => {
+          if (typeof postAction === 'string' && postAction.match(/hostCollective/)) {
+            const collectiveIdToHost = Number(postAction.substr(postAction.indexOf(':')+1));
+            models.Collective.findById(collectiveIdToHost)
+              .then(collectiveToHost => collectiveToHost.addHost(collective, { id: CreatedByUserId }))
+          }
+        })
+        .then(() => res.redirect(redirect || `${config.host.website}/${collective.slug}?message=StripeAccountConnected`))
         .catch(next);
     }
   },
