@@ -8,6 +8,7 @@ import Link from './Link';
 import Button from './Button';
 import { get, throttle, uniqBy } from 'lodash';
 import withIntl from '../lib/withIntl';
+import { animateScroll } from 'react-scrollchor/lib/helpers';
 
 class MenuBar extends React.Component {
 
@@ -20,8 +21,6 @@ class MenuBar extends React.Component {
 
   constructor(props) {
     super(props);
-
-    this.height = 60;
 
     const menuItems = [
       { anchor: 'about', link: `${props.collective.path}#about`, position: 0 },
@@ -63,10 +62,21 @@ class MenuBar extends React.Component {
       'menu.edit.organization': { id: 'menu.edit.organization', defaultMessage: "edit organization" },
       'menu.edit.event': { id: 'menu.edit.event', defaultMessage: "edit event" }
     })
+
+    this.domElement = React.createRef();
+
+    this.throttledOnResize = throttle(this.onResize, 400);
+    this.throttledOnScroll = throttle(this.onScroll, 400);
   }
 
   componentDidMount() {
-    window.onscroll = throttle(this.onscroll, 300);
+    this.height = this.domElement.current.clientHeight;
+
+    window.addEventListener('load', this.onLoad);
+    window.addEventListener('hashchange', this.onHashChange);
+    window.addEventListener('resize', this.throttledOnResize);
+    window.addEventListener('scroll', this.throttledOnScroll);
+
     const { collective } = this.props;
     if (!collective) {
       console.error(">>> this is a weird error, collective should always be set", this.props);
@@ -74,41 +84,68 @@ class MenuBar extends React.Component {
     }
 
     const menuItemsFoundOnPage = [];
-    uniqBy(document.querySelectorAll('section'), el => el.id).forEach(el => {
-      if (!el.id) return;
-      const titleEl = el.querySelector('.title');
-      const menuItem = {
-        anchor: el.id,
-        title: titleEl && titleEl.innerText,
-        link: `#${el.id}`,
-        position: el.offsetTop
-      };
-      menuItemsFoundOnPage.push(menuItem);
-    })
+    uniqBy(document.querySelectorAll('section'), el => el.id)
+      .filter(el => !!el.id)
+      .forEach(el => {
+        const titleEl = el.querySelector('.title');
+        const menuItem = {
+          anchor: el.id,
+          title: titleEl && titleEl.innerText,
+          link: `#${el.id}`,
+          position: el.offsetTop
+        };
+        menuItemsFoundOnPage.push(menuItem);
+      })
 
     // If we don't find the sections on the page, we link the logo to the homepage instead of #top
-    let logoLink;
-
     if (menuItemsFoundOnPage.length > 0) {
-      logoLink = '#top';
-      menuItemsFoundOnPage.sort((a, b) => {
-        return a.position > b.position;
-      });
-      this.setState({ menuItems: menuItemsFoundOnPage, logoLink });
+      menuItemsFoundOnPage.sort((a, b) => a.position - b.position);
+      this.setState({ menuItems: menuItemsFoundOnPage, logoLink: '#top' });
     }
   }
 
-  onscroll = (e) => {
+  componentWillUnmount() {
+    window.removeEventListener('load', this.onLoad);
+    window.removeEventListener('hashchange', this.onHashChange);
+    window.removeEventListener('resize', this.throttledOnResize);
+    window.removeEventListener('scroll', this.throttledOnScroll);
+  }
+
+  onLoad = () => {
+    this.adjustScrollPosition();
+  }
+
+  onHashChange = () => {
+    this.adjustScrollPosition();
+  }
+
+  onResize = () => {
+    this.height = this.domElement.current.clientHeight;
+  }
+
+  onScroll = (e) => {
     const top = e.target.scrollingElement.scrollTop;
-    const selectedMenuItem = this.state.menuItems.find(menuItem => {
-      return menuItem.position && menuItem.position > (top);
-    });
+    const selectedMenuItem = this.state.menuItems
+      .filter(menuItem => !!menuItem.position)
+      .sort((a, b) => b.position - a.position)
+      .find(menuItem => menuItem.position < top + this.height + 50);
     if (selectedMenuItem) {
-      const anchor = (
-        selectedMenuItem.anchor === this.state.menuItems[0].anchor ? '#' : `#${selectedMenuItem.anchor}`
-      );
-      history.replaceState(history.state, undefined, anchor);
       this.setState({ selectedAnchor: selectedMenuItem.anchor });
+    }
+    const anchor = selectedMenuItem ? `#${selectedMenuItem.anchor}` : '#';
+    history.replaceState({ ...history.state, as: location.pathname + anchor }, undefined, anchor);
+  }
+
+  adjustScrollPosition = () => {
+    if (window.location.hash) {
+      const animate = {
+        duration: 400,
+        offset: -this.height,
+        easing: (x, t, b, c, d) => -c * (t /= d) * (t - 2) + b
+      }
+      animateScroll(window.location.hash.substr(1), animate)
+        .then(id => this.setState({ selectedAnchor: id }))
+        .catch(() => {})
     }
   }
 
@@ -139,9 +176,10 @@ class MenuBar extends React.Component {
           border-color: ${colors.blue}
         }
 
-        `}</style>
+        `}
+        </style>
         { this.state.sticky && cta &&
-          <Link route={cta.href} animate={{offset}}>
+          <Link route={cta.href} animate={{ offset }}>
             <Button className="blue">{cta.label}</Button>
           </Link>
         }
@@ -204,10 +242,11 @@ class MenuBar extends React.Component {
           height: 28px;
           float: left;
         }
-        `}</style>
-        { this.state.menuItems.map((item, index) =>
-          (<div className={`item ${item.anchor} ${this.state.selectedAnchor === item.anchor && 'selected'}`} key={`item-${index}-${item.link}`}>
-            <Link route={item.link} animate={{offset}}>
+        `}
+        </style>
+        { this.state.menuItems.map((item, index) => (
+          <div className={`item ${item.anchor} ${this.state.selectedAnchor === item.anchor && 'selected'}`} key={`item-${index}-${item.link}`}>
+            <Link route={item.link} animate={{ offset }}>
               { this.messages[item.anchor] ? intl.formatMessage(this.messages[item.anchor]): (item.title || item.anchor) }
             </Link>
           </div>)
@@ -243,7 +282,7 @@ class MenuBar extends React.Component {
     }
 
     return (
-      <div className="MenuBar">
+      <div className="MenuBar" ref={this.domElement}>
         <style jsx>{`
         .MenuBar {
           background-color: #17181A;
@@ -322,7 +361,8 @@ class MenuBar extends React.Component {
         .MenuBar .mobileOnly .logo img {
           height: 48px;
         }
-        `}</style>
+        `}
+        </style>
         <div className="mobileOnly">
           <div className="innerMenu">
             <div className="actionBar">

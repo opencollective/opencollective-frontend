@@ -1,6 +1,7 @@
 import React from 'react';
 import Document, { Head, Main, NextScript } from 'next/document';
 import { ServerStyleSheet } from 'styled-components';
+import './global-styles';
 
 // The document (which is SSR-only) needs to be customized to expose the locale
 // data for the user's locale for React Intl to work in the browser.
@@ -53,41 +54,9 @@ export default class IntlDocument extends Document {
 
     return (
       <html>
-        <style jsx global>{`
-          @font-face {
-            font-family: 'lato','montserratlight';
-            src: url('/static/fonts/montserrat/montserrat-light-webfont.eot');
-            src: url('/static/fonts/montserrat/montserrat-light-webfont.eot?#iefix') format('embedded-opentype'),
-              url('/static/fonts/montserrat/montserrat-light-webfont.woff2') format('woff2'),
-              url('/static/fonts/montserrat/montserrat-light-webfont.woff') format('woff'),
-              url('/static/fonts/montserrat/montserrat-light-webfont.ttf') format('truetype'),
-              url('/static/fonts/montserrat/montserrat-light-webfont.svg#montserratlight') format('svg');
-            font-weight: normal;
-            font-style: normal;
-          }
-          @font-face {
-            font-family: 'lato';
-            src: url('/static/fonts/montserrat/lato-regular.ttf') format('truetype');
-            font-weight: normal;
-            font-style: normal;
-          }
-          html {
-            width: 100%;
-            height: 100%;
-            font-size: 62.5%;
-          }
-          body {
-            height: 100%;
-            margin: 0;
-            padding: 0;
-          }
-          a:hover {
-            color: #797d80;
-            text-decoration: none;
-          }
-        `}</style>
+        <Head>
           {this.props.styleTags}
-        <Head />
+        </Head>
         <body>
           <Main />
           {scripts.map((script) => <script key={script} type="text/javascript" src={script} />)}

@@ -208,8 +208,15 @@ class Event extends React.Component {
 
     const info = (
       <HashLink to="#location">
-        <FormattedDate value={event.startsAt} weekday="short" day="numeric" month="long" />, &nbsp;
-        <FormattedTime value={event.startsAt} timeZone={event.timezone} />&nbsp; - &nbsp;
+        {!event.startsAt &&
+          console.warn(`Event: event.startsAt should not be empty. event.id: ${event.id}`)
+        }
+        {event.startsAt &&
+          <React.Fragment>
+            <FormattedDate value={event.startsAt} weekday="short" day="numeric" month="long" />, &nbsp;
+            <FormattedTime value={event.startsAt} timeZone={event.timezone} />&nbsp; - &nbsp;
+          </React.Fragment>
+        }
         {event.location.name}
       </HashLink>
     );

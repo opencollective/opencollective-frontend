@@ -98,8 +98,10 @@ class TopBarProfileMenu extends React.Component {
           border-radius: 0.5rem;
           background-color: #ffffff;
           box-shadow: 0 -1px 2px 0 rgba(0, 0, 0, 0.1);
+          box-sizing: border-box;
           border: solid 1px #f2f2f2;
           padding: 20px 0;
+          width: max-content;
         }
         .LoginTopBarProfileMenuHeading {
           position: relative;
@@ -124,10 +126,8 @@ class TopBarProfileMenu extends React.Component {
         }
         li {
           box-sizing: border-box;
-          float: left;
           width: 100%;
           padding: 0.1rem 0.5rem;
-          display: flex;
         }
         a {
           box-sizing: border-box;
@@ -191,8 +191,12 @@ class TopBarProfileMenu extends React.Component {
             <div className="-dash"></div>
           </div>
           <ul>
-            {this.showCreateBtn && <li><a href="/create"><FormattedMessage id="menu.createCollective" defaultMessage="Create a Collective" /></a></li>}
-            <li><a href="/discover"><FormattedMessage id="menu.discover" defaultMessage="discover" /></a></li>
+            <li>
+              <Link route="/create">
+                <a><FormattedMessage id="menu.createCollective" defaultMessage="Create a Collective" /></a>
+              </Link>
+            </li>
+            <li><a href="/discover"><FormattedMessage id="menu.discover" defaultMessage="Discover" /></a></li>
             { collectives.map(membership => (
               <li key={`LoggedInMenu-Collective-${get(membership, 'collective.slug')}`}>
                 <Link route={`/${get(membership, 'collective.slug')}`}>

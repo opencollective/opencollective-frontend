@@ -8,9 +8,11 @@ import {readFileSync} from 'fs';
 import path from 'path';
 import glob from 'glob';
 
+import { logger } from './logger';
+
 // Get the supported languages by looking for translations in the `lang/` dir.
 export const languages = glob.sync(path.join(__dirname, '../lang/*.json')).map((f) => path.basename(f, '.json'))
-console.log("> loading languages", languages);
+logger.info("loading languages %j", languages);
 
 // We need to expose React Intl's locale data on the request for the user's
 // locale. This function will also cache the scripts by lang in memory.
