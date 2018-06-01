@@ -85,6 +85,7 @@ describe('createOrder', () => {
       .reply(200, {"base":"EUR","date":"2017-09-01","rates":{"USD":1.192}});
     nock('http://api.fixer.io:80')
       .get('/latest')
+      .times(5)
       .query({"base":"EUR","symbols":"USD"})
       .reply(200, {"base":"EUR","date":"2017-09-22","rates":{"USD":1.1961} }, ['Server', 'nosniff'])
   });
@@ -439,6 +440,7 @@ describe('createOrder', () => {
       expect(res.errors).to.exist;
       expect(res.errors[0].message).to.equal("The total amount of this order (€200 ~= $239) is higher than your monthly spending limit on this payment method ($100)");
 
+      sandbox.useFakeTimers((new Date('2017-09-22')).getTime());
       await paymentMethod.update({ monthlyLimitPerMember: 25000 }); // $250 limit
       res = await utils.graphqlQuery(createOrderQuery, { order }, duc);
       res.errors && console.error(res.errors);

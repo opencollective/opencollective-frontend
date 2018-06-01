@@ -54,7 +54,7 @@ export async function newUser(name, data={}) {
     username: name,
     description: `A user called ${name}`,
   });
-  return { user, userCollective: user.collective };
+  return { user, userCollective: user.collective, [slug]: user };
 }
 
 /**
@@ -75,7 +75,7 @@ export async function newHost(name, currency, hostFee) {
     name, slug, currency, hostFeePercent, CreatedByUserId: hostAdmin.id,
   });
   await hostCollective.addUserWithRole(hostAdmin, 'ADMIN');
-  return { hostAdmin, hostCollective };
+  return { hostAdmin, hostCollective, [slug]: hostCollective };
 }
 
 /** Create an organization
@@ -112,7 +112,7 @@ export async function newCollectiveWithHost(name, currency, hostCurrency, hostFe
   const { hostFeePercent } = hostCollective;
   const collective = await models.Collective.create({ name, slug, currency, hostFeePercent });
   await collective.addHost(hostCollective);
-  return { hostCollective, hostAdmin, collective };
+  return { hostCollective, hostAdmin, collective, [slug]: hostCollective };
 }
 
 /** Create a collective and associate to an existing host.
@@ -128,7 +128,7 @@ export async function newCollectiveInHost(name, currency, hostCollective) {
   const { hostFeePercent } = hostCollective;
   const collective = await models.Collective.create({ name, slug, currency, hostFeePercent });
   await collective.addHost(hostCollective);
-  return { collective };
+  return { collective, [slug]: collective };
 }
 
 /** Create a new expense in a collective
@@ -219,18 +219,30 @@ export async function stripeConnectedAccount(hostId) {
  */
 export async function stripeOneTimeDonation(opt) {
   const { user, userCollective, collective, amount, currency, appFee, ppFee } = opt;
+  const { createdAt } = opt;    // Optional
+
+  // Create a new order
   const params = { from: userCollective, to: collective, amount, currency };
-  const { order } = await newOrder(params)
+  const { order } = await newOrder(params);
+
   // Every transaction made can use different values, so we stub the
   // stripe call, create the order, and restore the stripe call so it
   // can be stubbed again by the next call to this helper.
   const sandbox = sinon.sandbox.create();
+
+  // Freeze the time to guarantee that all the objects have the
+  // requested creation date. It will be reset right after the
+  // execution of the order.
+  if (createdAt) sandbox.useFakeTimers((new Date(createdAt)).getTime());
+
+  // Stub the stripe calls before executing the order.
   try {
     utils.stubStripeCreate(sandbox);
     utils.stubStripeBalance(sandbox, amount, currency, appFee, ppFee);
+
     // Although it's supposed to be OK to omit `await' when returning
-    // a promise, it's causing this next call to fail so I'm keeping
-    // it here.
+    // a promise, it's causing this call to fail probably because of
+    // the try/catch so I'm keeping it here.
     return await libpayments.executeOrder(user, order);
   } finally {
     sandbox.restore();
