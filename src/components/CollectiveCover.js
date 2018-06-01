@@ -98,11 +98,8 @@ ${description}`
           overflow: hidden;
         }
         .small .cover {
-          height: 22rem;
+          height: auto;
           min-height: 22rem;
-        }
-        .small .description, .small .contact, .small .stats, .small .members {
-          display: none;
         }
         .backgroundCover {
           position: absolute;
@@ -256,6 +253,9 @@ ${description}`
             font-size: 2.5rem;
           }
         }
+        .small .contact, .small .stats, .small .statsContainer, .small .members {
+          display: none;
+        }
         `}</style>
         <style jsx global>{`
         .CollectiveCover .content a {
@@ -271,11 +271,11 @@ ${description}`
               { collective.type !== 'USER' && <Logo src={logo} className="logo" type={collective.type} website={collective.website} height="10rem" /> }
             </Link>
             <h1>{title}</h1>
+            { description && <p className="description">{description}</p> }
             { className !== 'small' &&
               <div>
                 { company && company.substr(0,1) === '@' && <p className="company"><Link route={`/${company.substr(1)}`}>{company.substr(1)}</Link></p> }
                 { company && company.substr(0,1) !== '@' && <p className="company">{company}</p> }
-                { description && <p className="description">{description}</p> }
                 { collective.type !== 'EVENT' &&
                   <div className="contact">
                     { collective.host && collective.isActive && <div className="host"><label><FormattedMessage id="collective.cover.hostedBy" defaultMessage="Hosted by" /></label><Link route={`/${collective.host.slug}`}>{collective.host.name} </Link></div> }

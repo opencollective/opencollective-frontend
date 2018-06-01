@@ -342,8 +342,8 @@ class InputField extends React.Component {
             onChange={event => this.handleChange(event.target.value)}
             >
             { field.options && field.options.map(option => {
-              const value = Object.keys(option)[0];
-              const label = option[value];
+              const value = option.value || Object.keys(option)[0];
+              const label = option.label || option[value];
               return (<option key={value} value={value}>{label}</option>)
               })
             }

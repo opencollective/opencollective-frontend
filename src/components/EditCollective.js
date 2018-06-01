@@ -220,7 +220,12 @@ class EditCollective extends React.Component {
             }
             { canEditCollective &&
               <div>
-                <EditCollectiveForm collective={collective} onSubmit={this.editCollective} loading={this.state.status === 'loading'} />
+                <EditCollectiveForm
+                  collective={collective}
+                  LoggedInUser={LoggedInUser}
+                  onSubmit={this.editCollective}
+                  loading={this.state.status === 'loading'}
+                  />
                 <div className="actions">
                   { collective.type === 'EVENT' && (<a onClick={this.deleteCollective}>delete event</a>)}
                   <div className="result">

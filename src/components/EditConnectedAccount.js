@@ -11,7 +11,8 @@ class EditConnectedAccount extends React.Component {
 
   static propTypes = {
     collective: PropTypes.object.isRequired,
-    connectedAccounts: PropTypes.arrayOf(PropTypes.object)
+    connectedAccounts: PropTypes.arrayOf(PropTypes.object),
+    options: PropTypes.object
   };
 
   constructor(props) {
@@ -36,14 +37,14 @@ class EditConnectedAccount extends React.Component {
   }
 
   connect(service) {
-    const { collective } = this.props;
+    const { collective, options } = this.props;
 
     if (service === 'github' || service === 'twitter') {
       const redirect = `${window.location.protocol}//${window.location.host}/${collective.slug}/edit#connectedAccounts`;
       return window.location.replace(`/api/connected-accounts/${service}/oauthUrl?CollectiveId=${collective.id}&redirect=${encodeURIComponent(redirect)}&access_token=${localStorage.accessToken}`);
     }
 
-    connectAccount(collective.id, service)
+    connectAccount(collective.id, service, options)
     .then(json => {
       console.log(`>>> /api/connected-accounts/${service} response`, json);
       return window.location.replace(json.redirectUrl);

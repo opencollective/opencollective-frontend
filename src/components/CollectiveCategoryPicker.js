@@ -50,10 +50,10 @@ class CollectiveCategoryPicker extends React.Component {
             width: 180px;
             height: 90px;
             text-align: center;
+            margin: 2rem;
             padding: 0.5rem;
             background: ${colors.blue};
             color: white;
-            margin: 2rem;
             display: flex;
             justify-content: center;
             align-items: center;

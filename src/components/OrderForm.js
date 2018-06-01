@@ -6,6 +6,7 @@ import InputField from './InputField';
 import MatchingFundWithData from './MatchingFundWithData';
 import ActionButton from './Button';
 import SectionTitle from './SectionTitle';
+import CreateOrganizationForm from './CreateOrganizationForm';
 import { Button, Row, Col, Form } from 'react-bootstrap';
 import { defineMessages, FormattedMessage, FormattedDate, FormattedTime } from 'react-intl';
 import { capitalize, formatCurrency, isValidEmail } from '../lib/utils';
@@ -79,9 +80,6 @@ class OrderForm extends React.Component {
       'order.button': { id: 'tier.order.button', defaultMessage: 'place order' },
       'order.organization.create': { id: 'tier.order.organization.create', defaultMessage: `create an organization` },
       'order.profile.logout': { id: 'tier.order.profile.logout', defaultMessage: `logout to create a new profile` },
-      'order.organization.name': { id: 'tier.order.organization.name', defaultMessage: `name` },
-      'order.organization.website': { id: 'tier.order.organization.website', defaultMessage: `website` },
-      'order.organization.twitterHandle': { id: 'tier.order.organization.twitterHandle', defaultMessage: `Twitter` },
       'error.email.invalid': { id: 'error.email.invalid', defaultMessage: 'Invalid email address' },
       'creditcard.label': { id: 'creditcard.label', defaultMessage: 'Credit Card' },
       'creditcard.save': { id: 'creditcard.save', defaultMessage: 'Save credit card to {type, select, user {my account} other {{type} account}}' },
@@ -692,44 +690,8 @@ class OrderForm extends React.Component {
           </section>
 
           { !fromCollective.id && this.state.orgDetails.show &&
-          <section className="organizationDetailsForm">
-            <SectionTitle section="organizationDetails" />
-            <Row key={`organization.name.input`}>
-              <Col sm={12}>
-                <InputField
-                  className="horizontal"
-                  type="text"
-                  name="organization_name"
-                  label={intl.formatMessage(this.messages['order.organization.name'])}
-                  onChange={(value) => this.handleChange("fromCollective", "name", value)}
-                  />
-              </Col>
-            </Row>
-            <Row key={`organization.website.input`}>
-              <Col sm={12}>
-                <InputField
-                  className="horizontal"
-                  type="text"
-                  name="organization_website"
-                  label={intl.formatMessage(this.messages['order.organization.website'])}
-                  onChange={(value) => this.handleChange("fromCollective", "website", value)}
-                  />
-              </Col>
-            </Row>
-            <Row key={`organization.twitterHandle.input`}>
-              <Col sm={12}>
-                <InputField
-                  className="horizontal"
-                  type="text"
-                  name="organization_twitterHandle"
-                  pre="@"
-                  label={intl.formatMessage(this.messages['order.organization.twitterHandle'])}
-                  onChange={(value) => this.handleChange("fromCollective", "twitterHandle", value)}
-                  />
-              </Col>
-            </Row>
-          </section>
-        }
+            <CreateOrganizationForm onChange={org => this.handleChange("fromCollective", org))} />
+          }
 
         { !requireLogin &&
           <div>

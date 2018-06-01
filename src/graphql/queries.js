@@ -138,6 +138,22 @@ const getCollectiveToEditQuery = gql`
       createdByUser {
         id
       }
+      host {
+        id
+        createdAt
+        slug
+        name
+        image
+        description
+        website
+        twitterHandle
+        stats {
+          id
+          collectives {
+            hosted
+          }
+        }
+      }
       name
       company
       image

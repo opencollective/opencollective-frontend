@@ -8,11 +8,15 @@ import LoggedInUser from '../classes/LoggedInUser';
 import { getLoggedInUserQuery } from '../graphql/queries';
 
 const maybeRefreshAccessToken = async (currentToken) => {
-  const { exp } = JSON.parse(currentToken.split('.')[1]);
-  const shouldUpdate = moment(exp * 1000).subtract(1, 'month').isBefore(new Date);
-  if (shouldUpdate) {
-    const { token } = await api.refreshToken(currentToken);
-    window.localStorage.setItem('accessToken', token);
+  try {
+    const { exp } = JSON.parse(currentToken.split('.')[1]);
+    const shouldUpdate = moment(exp * 1000).subtract(1, 'month').isBefore(new Date);
+    if (shouldUpdate) {
+      const { token } = await api.refreshToken(currentToken);
+      window.localStorage.setItem('accessToken', token);
+    }
+  } catch (e) {
+    console.log(">>> invalid token", currentToken);
   }
 };
 
