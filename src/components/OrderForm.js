@@ -211,7 +211,9 @@ class OrderForm extends React.Component {
       paymentMethodsOptions = [...paymentMethodsOptions, ... this.paymentMethodsOptionsForCollective(paymentMethods, userCollective)];
     }
 
-    paymentMethodsOptions.push({ other: 'other' });
+    if (paymentMethodsOptions.length > 0) {
+      paymentMethodsOptions.push({ other: 'other' });
+    }
 
     this.paymentMethodsOptions = paymentMethodsOptions;
   }
@@ -288,8 +290,12 @@ class OrderForm extends React.Component {
       this.populatePaymentMethods(CollectiveId);
       if (this.paymentMethodsOptions.length > 0) {
         // The data structure looks like that:
-        // [ { "uuid" => "Label" }, { "uuid2" => "Label 2" } ]
+        // [
+        // { "8222e069-e4b0-4409-9563-167fa078fdaa" => "John Doe - Visa 4242 - exp 10/2018" },
+        // { "3944a1fe-0878-4832-ab33-c493f536152e" => "John Doe - Visa 4343 - exp 11/2019" }
+        // ]
         const uuid = Object.keys(this.paymentMethodsOptions[0])[0];
+        // NOTE: might be fragile to have { show: undefined } as a result
         newState.creditcard = { uuid: uuid };
       } else {
         newState.creditcard = { show: true, save: true }; // reset to default value
