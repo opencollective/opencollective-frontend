@@ -172,7 +172,7 @@ Subject: {{{capitalize month}}} Report
   .Section.Notice > p:last-child {
     margin-bottom: 0;
   }
-  ul.goals li {
+  ul.intro li {
     font-size: 14px;
     line-height: 2;
     color: #494b4d;
@@ -220,11 +220,11 @@ Subject: {{{capitalize month}}} Report
       <div class="ContainerLogoName"></div>
       <div class="Section Intro">
         <h2>Hi {{fromCollective.name}} 👋</h2>
-        <p>In {{month}}, you have backed {{stats.collectives}} {{{pluralize "collective" n=stats.collectives}}} for a total of {{stats.totalDonatedString}}. Thank you for your {{{pluralize "contribution" n=stats.collectives}}}! 🙌
-        {{#if stats.expenses}}<br />They've spent a total of {{stats.totalSpentString}}{{stats.expensesBreakdownString}}.{{/if}}</p>
-        <ul class="goals">
-        {{#each collectives}}
-          {{#if nextGoal}}
+        <ul class="intro">
+          <li>In {{month}}, you have backed {{stats.collectives}} {{{pluralize "collective" n=stats.collectives}}} for a total of {{stats.totalDonatedString}}. Thank you for your {{{pluralize "contribution" n=stats.collectives}}}! 🙌
+          {{#if stats.expenses}}<br />They've spent a total of {{stats.totalSpentString}}{{stats.expensesBreakdownString}}.{{/if}}</li>
+          {{#each collectives}}
+            {{#if nextGoal}}
               <li><a href="{{config.host.website}}/{{slug}}">{{name}}</a> needs {{{currency nextGoal.missing.amount currency=currency}}} more {{#if nextGoal.missing.interval}}per {{nextGoal.missing.interval}}{{/if}} to reach their next goal of {{nextGoal.title}} ({{nextGoal.percentage}} there). 
               {{#if order.Subscription}}
               You are currently contributing {{{currency order.Subscription.amount currency=order.Subscription.currency}}} per {{order.Subscription.interval}}.
@@ -236,18 +236,19 @@ Subject: {{{capitalize month}}} Report
               (<a href="https://twitter.com/intent/tweet?text={{{encodeURIComponent nextGoal.tweet}}}">share their goal</a>)
               {{/if}}
               </li>
-          {{/if}}
-        {{/each}}
+            {{/if}}
+          {{/each}}
         </ul>
       </div>
       <div class="Section Subscriptions">
         <h1>Collectives backed in {{month}}</h1>
         <span class="Date">{{month}} {{year}}</span>
-        <div>
+        <table>
           {{#each collectives}}
-            {{> mr-subscription}}
+          <tr><td>{{> mr-subscription}}</td></tr>
+          <tr><td height="20"></td></tr>
           {{/each}}
-        </div>
+        </table>
       </div>
       {{#if relatedCollectives.length}}
       <table class="Section Interest"><tr><td>

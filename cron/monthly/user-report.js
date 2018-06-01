@@ -74,6 +74,7 @@ const init = async () => {
       where: {
         type: 'CREDIT',
         OrderId: { [Op.ne]: null }, // make sure we don't consider collectives paying out expenses as backers of user collectives
+        RefundTransactionId: null, // make sure we don't consider refunds
         createdAt: { [Op.gte]: startDate, [Op.lt]: endDate }
       }
     });
