@@ -1,38 +1,47 @@
 import React from 'react';
-import { addTiersData } from '../graphql/queries';
-import withData from '../lib/withData';
-import withIntl from '../lib/withIntl';
+import PropTypes from 'prop-types';
 import { defineMessages } from 'react-intl';
+import { get } from 'lodash';
+
+import { Router } from '../server/pages';
+
 import Tier from '../components/Tier';
 import Header from '../components/Header';
 import CollectiveCover from '../components/CollectiveCover';
 import Body from '../components/Body';
-import { Router } from '../server/pages';
-import { get } from 'lodash';
 
-class Tiers extends React.Component {
+import { addTiersData } from '../graphql/queries';
+
+import withData from '../lib/withData';
+import withIntl from '../lib/withIntl';
+
+class TiersPage extends React.Component {
 
   static getInitialProps ({ query: { collectiveSlug } }) {
-    return { collectiveSlug }
+    return { slug: collectiveSlug };
   }
+
+  static propTypes = {
+    slug: PropTypes.string, // for addTiersData
+    data: PropTypes.object.isRequired, // from withData
+    intl: PropTypes.object.isRequired, // from withIntl
+  };
 
   constructor(props) {
     super(props);
-    this.updateResponse = this.updateResponse.bind(this);
-    this.handleGetTierClick = this.handleGetTierClick.bind(this);
     this.messages = defineMessages({
-      'tiers.title': { id: 'tiers.title', defaultMessage: 'Join the collective'}
+      'tiers.title': { id: 'tiers.title', defaultMessage: 'Join the collective' },
     });
   }
 
-  updateResponse() {
-
-  }
-
-  handleGetTierClick(response) {
+  handleGetTierClick = response => {
     const { Collective } = this.props.data;
-    Router.pushRoute(`/${Collective.slug}/tiers/${response.tier.id}`)
-  }
+    Router.pushRoute(`/${Collective.slug}/tiers/${response.tier.id}`);
+  };
+
+  updateResponse = () => {
+
+  };
 
   render() {
     const { intl } = this.props;
@@ -50,13 +59,14 @@ class Tiers extends React.Component {
           .tiers :global(.tier) {
             margin: 3rem 0;
           }
-        `}</style>
+        `}
+        </style>
         <Header />
         <Body>
           <CollectiveCover
             href={`/${Collective.slug}`}
             logo={Collective.image}
-            title={intl.formatMessage(this.messages[`tiers.title`])}
+            title={intl.formatMessage(this.messages['tiers.title'])}
             className="small"
             backgroundImage={Collective.backgroundImage}
             style={get(Collective, 'settings.style.hero.cover')}
@@ -76,7 +86,6 @@ class Tiers extends React.Component {
       </div>
     );
   }
-
 }
 
-export default withData(withIntl(addTiersData(Tiers)));
+export default withData(withIntl(addTiersData(TiersPage)));

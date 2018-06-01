@@ -1,20 +1,31 @@
 import React from 'react';
+import PropTypes from 'prop-types';
+
 import Header from '../components/Header';
 import Body from '../components/Body';
 import Footer from '../components/Footer';
 import CollectiveCover from '../components/CollectiveCover';
-import { addCollectiveCoverData, addGetLoggedInUserFunction } from '../graphql/queries';
 import ErrorPage from '../components/ErrorPage';
+import UpdatesWithData from '../components/UpdatesWithData';
+
+import { addCollectiveCoverData } from '../graphql/queries';
+
 import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
-import UpdatesWithData from '../components/UpdatesWithData';
+import withLoggedInUser from '../lib/withLoggedInUser';
 
 class UpdatesPage extends React.Component {
 
-  static getInitialProps (props) {
-    const { query: { collectiveSlug, action }, data } = props;
-    return { slug: collectiveSlug, data, action }
+  static getInitialProps ({ query: { collectiveSlug, action } }) {
+    return { slug: collectiveSlug, action };
   }
+
+  static propTypes = {
+    slug: PropTypes.string, // for addCollectiveCoverData
+    action: PropTypes.string, // not clear whre it's coming from, not in the route
+    data: PropTypes.object.isRequired, // from withData
+    getLoggedInUser: PropTypes.func.isRequired, // from withLoggedInUser
+  };
 
   constructor(props) {
     super(props);
@@ -23,8 +34,8 @@ class UpdatesPage extends React.Component {
 
   async componentDidMount() {
     const { getLoggedInUser } = this.props;
-    const LoggedInUser = getLoggedInUser && await getLoggedInUser(this.props.collectiveSlug);
-    this.setState({LoggedInUser});
+    const LoggedInUser = await getLoggedInUser();
+    this.setState({ LoggedInUser });
   }
 
   render() {
@@ -75,4 +86,4 @@ class UpdatesPage extends React.Component {
 
 }
 
-export default withData(addGetLoggedInUserFunction(addCollectiveCoverData(withIntl(UpdatesPage))));
+export default withData(withIntl(withLoggedInUser(addCollectiveCoverData(UpdatesPage))));

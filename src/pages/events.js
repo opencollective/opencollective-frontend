@@ -1,20 +1,28 @@
 import React from 'react';
-import withData from '../lib/withData';
-import withIntl from '../lib/withIntl';
+import PropTypes from 'prop-types';
+
 import EventsWithData from '../components/EventsWithData';
 
-class Events extends React.Component {
+import withData from '../lib/withData';
+import withIntl from '../lib/withIntl';
+
+class EventsPage extends React.Component {
 
   static getInitialProps ({ query: { collectiveSlug } }) {
-    return { collectiveSlug }
+    return { collectiveSlug };
   }
 
+  static propTypes = {
+    collectiveSlug: PropTypes.string,
+  };
+
   render() {
+    const { collectiveSlug } = this.props;
     return (
-      <EventsWithData collectiveSlug={this.props.collectiveSlug} />
+      <EventsWithData collectiveSlug={collectiveSlug} />
     );
   }
 
 }
 
-export default withData(withIntl(Events));
+export default withData(withIntl(EventsPage));

@@ -1,13 +1,18 @@
-import withData from '../lib/withData'
-import withIntl from '../lib/withIntl';
-import React from 'react'
+import React from 'react';
 import PropTypes from 'prop-types';
-import { addCollectiveToEditData, addGetLoggedInUserFunction } from '../graphql/queries';
-import { addEditCollectiveMutation, addDeleteCollectiveMutation } from '../graphql/mutations';
-import { compose } from '../../node_modules/react-apollo';
-import ErrorPage from '../components/ErrorPage';
+import { compose } from 'react-apollo';
+
 import EditCollective from '../components/EditCollective';
+import ErrorPage from '../components/ErrorPage';
+
+import { addCollectiveToEditData } from '../graphql/queries';
+import { addEditCollectiveMutation, addDeleteCollectiveMutation } from '../graphql/mutations';
+
 import { getQueryParams } from '../lib/utils';
+
+import withData from '../lib/withData';
+import withIntl from '../lib/withIntl';
+import withLoggedInUser from '../lib/withLoggedInUser';
 
 class EditCollectivePage extends React.Component {
 
@@ -17,13 +22,16 @@ class EditCollectivePage extends React.Component {
       res.setHeader('Cache-Control','no-cache');
     }
 
-    return { slug: query && query.slug, query, ssr: false }
+    return { slug: query && query.slug, query, ssr: false };
   }
 
   static propTypes = {
-    data: PropTypes.object.isRequired,
-    editCollective: PropTypes.func.isRequired,
-    deleteCollective: PropTypes.func.isRequired,
+    slug: PropTypes.string, // for addCollectiveToEditData
+    ssr: PropTypes.bool,
+    data: PropTypes.object.isRequired, // from withData
+    getLoggedInUser: PropTypes.func.isRequired, // from withLoggedInUser
+    editCollective: PropTypes.func.isRequired, // from addEditCollectiveMutation
+    deleteCollective: PropTypes.func.isRequired, // from addDeleteCollectiveMutation
   };
 
   constructor(props) {
@@ -33,7 +41,7 @@ class EditCollectivePage extends React.Component {
 
   async componentDidMount() {
     const { getLoggedInUser } = this.props;
-    const LoggedInUser = getLoggedInUser && await getLoggedInUser();
+    const LoggedInUser = await getLoggedInUser();
     this.setState({ LoggedInUser, loading: false });
     const queryParams = getQueryParams();
     if (queryParams.HostedCollectiveId) {
@@ -46,7 +54,7 @@ class EditCollectivePage extends React.Component {
     const { loading, LoggedInUser } = this.state;
 
     if (loading || !data.Collective) {
-      return (<ErrorPage loading={loading} data={data} />)
+      return (<ErrorPage loading={loading} data={data} />);
     }
 
     const collective = data.Collective;
@@ -67,10 +75,9 @@ class EditCollectivePage extends React.Component {
 }
 
 const addGraphQL = compose(
-  addGetLoggedInUserFunction,
   addCollectiveToEditData,
   addEditCollectiveMutation,
   addDeleteCollectiveMutation
 );
 
-export default withData(addGraphQL(withIntl(EditCollectivePage)));
+export default withData(withIntl(withLoggedInUser(addGraphQL(EditCollectivePage))));

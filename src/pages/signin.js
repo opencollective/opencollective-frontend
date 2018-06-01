@@ -1,16 +1,29 @@
-import React from 'react'
+import React from 'react';
+import PropTypes from 'prop-types';
+import { FormattedMessage } from 'react-intl';
 
 import Header from '../components/Header';
 import Body from '../components/Body';
 import Footer from '../components/Footer';
 import ErrorPage from '../components/ErrorPage';
 import SignInForm from '../components/SignInForm';
-import withIntl from '../lib/withIntl';
-import { isValidUrl } from '../lib/utils';
-import { FormattedMessage } from 'react-intl';
-import * as api from '../lib/api';
 
-class LoginPage extends React.Component {
+import * as api from '../lib/api';
+import { isValidUrl } from '../lib/utils';
+
+import withIntl from '../lib/withIntl';
+
+class SigninPage extends React.Component {
+
+  static getInitialProps ({ query: { token, next } }) {
+    next = isValidUrl(next) && next.substr(0,1) === '/' ? next : null;
+    return { token, next };
+  }
+
+  static propTypes = {
+    token: PropTypes.string,
+    next: PropTypes.string,
+  };
 
   constructor(props) {
     super(props);
@@ -29,10 +42,6 @@ class LoginPage extends React.Component {
         window.location.replace(this.props.next || '/');
       }
     }
-  }
-
-  static getInitialProps ({ query: { token, next } }) {
-    return { token, next: isValidUrl(next) && next.substr(0,1) === '/'  && next }
   }
 
   render() {
@@ -69,8 +78,8 @@ class LoginPage extends React.Component {
         <Footer />
 
       </div>
-    )
+    );
   }
 }
 
-export default withIntl(LoginPage);
+export default withIntl(SigninPage);

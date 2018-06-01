@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 const CollectButton = styled.a`
@@ -28,15 +29,29 @@ const CollectButton = styled.a`
 `;
 
 class ButtonPage extends React.Component {
+
   static getInitialProps ({ query: { color, collectiveSlug, verb } }) {
-    return { color, collectiveSlug, verb }
+    return { color, collectiveSlug, verb };
   }
+
+  static propTypes = {
+    color: PropTypes.string,
+    collectiveSlug: PropTypes.string,
+    verb: PropTypes.string,
+  };
 
   render() {
     const { color = 'white', collectiveSlug, verb = 'donate' } = this.props;
 
     return (
-      <CollectButton type="button" target="_blank" rel="noopener noreferrer" href={`https://opencollective.com/${collectiveSlug}/${verb}`} color={color} verb={verb} />
+      <CollectButton
+        type="button"
+        target="_blank"
+        rel="noopener noreferrer"
+        href={`https://opencollective.com/${collectiveSlug}/${verb}`}
+        color={color}
+        verb={verb}
+        />
     );
   }
 }

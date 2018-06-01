@@ -1,33 +1,36 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import Router from 'next/router';
 
 import Header from '../components/Header';
 import Body from '../components/Body';
 import Footer from '../components/Footer';
 import Link from '../components/Link';
-import withIntl from '../lib/withIntl';
-import withData from '../lib/withData'
+
 import colors from '../constants/colors';
-import { addGetLoggedInUserFunction } from '../graphql/queries';
+
+import withIntl from '../lib/withIntl';
+import withData from '../lib/withData';
+import withLoggedInUser from '../lib/withLoggedInUser';
 
 class SubscriptionsRedirectPage extends React.Component {
 
-  static getInitialProps({ query: { collectiveSlug }}) {
-    return { slug: collectiveSlug }
-  }
+  static propTypes = {
+    getLoggedInUser: PropTypes.func.isRequired, // from withLoggedInUser
+  };
 
   constructor(props) {
     super(props);
-    this.state = {}
+    this.state = {};
   }
 
   async componentDidMount() {
     const { getLoggedInUser } = this.props;
-    const LoggedInUser = getLoggedInUser && await getLoggedInUser();
+    const LoggedInUser = await getLoggedInUser();
     this.setState({ LoggedInUser });
 
     if (!LoggedInUser) {
-      Router.push('/signin', `/signin?next=/subscriptions`);
+      Router.push('/signin', '/signin?next=/subscriptions');
     } else {
       setTimeout(() => Router.push(`/subscriptions?collectiveSlug=${LoggedInUser.collective.slug}`, `/${LoggedInUser.collective.slug}/subscriptions`), 4000);
     }
@@ -38,7 +41,7 @@ class SubscriptionsRedirectPage extends React.Component {
     return (
       <div className="SubscriptionsPage">
         <Header
-          title={`Subscriptions`}
+          title={'Subscriptions'}
           description="All the collectives that you are giving money to"
           LoggedInUser={this.state.LoggedInUser}
           />
@@ -96,7 +99,7 @@ class SubscriptionsRedirectPage extends React.Component {
                   {this.state.LoggedInUser &&
                     <div>
                       This page has moved. Your subscriptions are now at
-                      <Link route={'subscriptions'} params={{collectiveSlug: LoggedInUser.collective.slug }}>
+                      <Link route={'subscriptions'} params={{ collectiveSlug: LoggedInUser.collective.slug }}>
                         <span className="link"> /{LoggedInUser.collective.slug}/subscriptions</span>
                       </Link>. Redirecting...
                     </div>}
@@ -109,8 +112,8 @@ class SubscriptionsRedirectPage extends React.Component {
         <Footer />
 
       </div>
-    )
+    );
   }
 }
 
-export default withData(addGetLoggedInUserFunction(withIntl(SubscriptionsRedirectPage)));
+export default withData(withIntl(withLoggedInUser(SubscriptionsRedirectPage)));

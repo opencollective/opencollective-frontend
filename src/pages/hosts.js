@@ -1,9 +1,11 @@
-import React from 'react'
+import React from 'react';
 import PropTypes from 'prop-types';
-import withData from '../lib/withData'
+
+import Hosts from '../components/Hosts';
+
+import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
 import withLoggedInUser from '../lib/withLoggedInUser';
-import Hosts from '../components/Hosts';
 
 class HostsPage extends React.Component {
 
@@ -33,4 +35,4 @@ class HostsPage extends React.Component {
   }
 }
 
-export default withData(withLoggedInUser(withIntl(HostsPage)));
+export default withData(withIntl(withLoggedInUser(HostsPage)));

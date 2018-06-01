@@ -1,28 +1,26 @@
 import React from 'react';
+import PropTypes from 'prop-types';
+import gql from 'graphql-tag';
+import styled from 'styled-components';
+import { graphql } from 'react-apollo';
+import { backgroundSize, fontSize, minHeight, maxWidth } from 'styled-system';
+import { Flex, Box } from 'grid-styled';
+import { FormattedMessage, defineMessages } from 'react-intl';
+import { get } from 'lodash';
 
 import Header from '../components/Header';
 import Body from '../components/Body';
 import Footer from '../components/Footer';
-import withLoggedInUser from '../lib/withLoggedInUser';
-import withIntl from '../lib/withIntl';
-import withData from '../lib/withData';
-import { graphql } from 'react-apollo';
-import gql from 'graphql-tag';
-
 import Container from '../components/Container';
-// import Button from '../components/Button';
-import { Flex, Box } from 'grid-styled';
-import { FormattedMessage, defineMessages } from 'react-intl';
-
 import RedeemForm from '../components/RedeemForm';
 import RedeemSuccess from '../components/RedeemSuccess';
-
 import { P, H1, H5 } from '../components/Text';
 
-import styled from 'styled-components';
-import { backgroundSize, fontSize, minHeight, maxWidth } from 'styled-system';
 import { isValidEmail } from '../lib/utils';
-import { get } from 'lodash';
+
+import withData from '../lib/withData';
+import withIntl from '../lib/withIntl';
+import withLoggedInUser from '../lib/withLoggedInUser';
 
 const Error = styled(P)`
   color: red;
@@ -77,10 +75,17 @@ const Hero = styled(Box)`
 `;
 
 class RedeemPage extends React.Component {
-
   static getInitialProps ({ query: { code, email } }) {
     return { code, email };
   }
+
+  static propTypes = {
+    getLoggedInUser: PropTypes.func.isRequired, // from withLoggedInUser
+    intl: PropTypes.object.isRequired, // from withIntl
+    claimVirtualCard: PropTypes.func.isRequired, // from redeemMutation
+    code: PropTypes.string,
+    email: PropTypes.string,
+  };
 
   constructor(props) {
     super(props);
@@ -110,14 +115,18 @@ class RedeemPage extends React.Component {
     const { code, email } = this.state.form;
     try {
       const res = await this.props.claimVirtualCard(code, email);
-      console.log(">>> res graphql: ", JSON.stringify(res, null, '  '));
+      console.log('>>> res graphql: ', JSON.stringify(res, null, '  '));
       this.setState({ loading: false, view: 'success' });
     } catch (e) {
       const error = e.graphQLErrors && e.graphQLErrors[0].message;
       this.setState({ loading: false, error });
       // console.log(">>> error graphql: ", JSON.stringify(error, null, '  '));
-      console.log(">>> error graphql: ", error);
+      console.log('>>> error graphql: ', error);
     }
+  }
+
+  handleChange(form) {
+    this.setState({ form, error: null });
   }
 
   handleSubmit() {
@@ -129,10 +138,6 @@ class RedeemPage extends React.Component {
       return this.setState({ error: intl.formatMessage(this.messages['error.code.invalid']) });
     }
     this.claimVirtualCard();
-  }
-
-  handleChange(form) {
-    this.setState({ form, error: null });
   }
 
   render() {
@@ -220,4 +225,5 @@ const addMutation = graphql(redeemMutation, {
   }),
 });
 
-export default withData(withLoggedInUser(withIntl(addMutation(RedeemPage))));
+export default withData(withIntl(withLoggedInUser(addMutation(RedeemPage))));
+

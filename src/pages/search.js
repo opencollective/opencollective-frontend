@@ -1,17 +1,12 @@
 import React from 'react';
-import {
-  ControlLabel,
-  FormControl,
-  FormGroup,
-} from 'react-bootstrap';
+import PropTypes from 'prop-types';
+import { ControlLabel, FormControl, FormGroup } from 'react-bootstrap';
 import { Box, Flex } from 'grid-styled';
 import Router from 'next/router';
 import classNames from 'classnames';
 import styled from 'styled-components';
 
-import withData from '../lib/withData'
-import withIntl from '../lib/withIntl';
-import { addGetLoggedInUserFunction, addSearchQueryData } from '../graphql/queries';
+import { Link } from '../server/pages';
 
 import Body from '../components/Body';
 import Button from '../components/Button';
@@ -19,9 +14,15 @@ import CollectiveCard from '../components/CollectiveCard';
 import ErrorPage from '../components/ErrorPage';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
-import { Link } from '../server/pages';
 import LoadingGrid from '../components/LoadingGrid';
+
 import colors from '../constants/colors';
+
+import { addSearchQueryData } from '../graphql/queries';
+
+import withData from '../lib/withData';
+import withIntl from '../lib/withIntl';
+import withLoggedInUser from '../lib/withLoggedInUser';
 
 const SearchInput = styled(FormControl)`
   &&& {
@@ -49,23 +50,33 @@ const Container = Box.extend`
 `;
 
 class SearchPage extends React.Component {
-  static getInitialProps({ query = {} }) {
+
+  static getInitialProps({ query }) {
     return {
+      term: query.q || '',
       limit: query.limit || 20,
       offset: query.offset || 0,
-      term: query.q || '',
     };
   }
+
+  static propTypes = {
+    term: PropTypes.string, // for addSearchQueryData
+    limit: PropTypes.number, // for addSearchQueryData
+    offset: PropTypes.number, // for addSearchQueryData
+    url: PropTypes.object,
+    data: PropTypes.object.isRequired, // from withData
+    getLoggedInUser: PropTypes.func.isRequired, // from withLoggedInUser
+  };
 
   state = {
     loadingUserLogin: true,
     LoggedInUser: {},
-  }
+  };
 
   async componentDidMount() {
     const { getLoggedInUser } = this.props;
     try {
-      const LoggedInUser = getLoggedInUser && await getLoggedInUser();
+      const LoggedInUser = await getLoggedInUser();
       this.setState({
         loadingUserLogin: false,
         LoggedInUser,
@@ -83,7 +94,7 @@ class SearchPage extends React.Component {
     const { q } = form;
 
     Router.push({ pathname: url.pathname, query: { q: q.value } });
-  }
+  };
 
   render() {
     const { data: { error, loading, search }, term = '' } = this.props;
@@ -98,9 +109,9 @@ class SearchPage extends React.Component {
       limit = 20,
       offset,
       total = 0,
-    } = search || {};  
+    } = search || {};
 
-    const showCollectives = !loading && term.trim() !== "" && !!collectives;
+    const showCollectives = !loading && term.trim() !== '' && !!collectives;
 
     return (
       <div>
@@ -109,7 +120,7 @@ class SearchPage extends React.Component {
           className={loadingUserLogin ? 'loading' : ''}
           LoggedInUser={LoggedInUser}
           showSearch={false}
-        />
+          />
         <Body>
           <Container mx="auto" px={3} width={[1, 0.85]}>
             <Box width={1}>
@@ -124,7 +135,7 @@ class SearchPage extends React.Component {
               </form>
             </Box>
             <Flex justifyContent={['center', 'center', 'flex-start']} flexWrap="wrap">
-              { loading && (		
+              { loading && (
                 <Flex py={3} width={1} justifyContent="center">
                   <LoadingGrid />
                 </Flex>
@@ -142,33 +153,35 @@ class SearchPage extends React.Component {
                 </Flex>
               )}
             </Flex>
-            {showCollectives && collectives.length !== 0 && total > limit && <Flex justifyContent="center">
-              <ul className="pagination">
-                { Array(Math.ceil(total / limit)).fill(1).map((n, i) => (
-                  <li key={i * limit} className={classNames({ active: (i * limit) === offset })}>
-                    <Link
-                      href={{
-                        query: {
-                          limit,
-                          offset: i * limit,
-                          q: term,
-                        }
-                      }}
-                      >
-                      <a>{`${n + i}`}</a>
-                    </Link>
-                  </li>
-                )) }
-              </ul>
-            </Flex>}
+            {showCollectives && collectives.length !== 0 && total > limit && (
+              <Flex justifyContent="center">
+                <ul className="pagination">
+                  { Array(Math.ceil(total / limit)).fill(1).map((n, i) => (
+                    <li key={i * limit} className={classNames({ active: (i * limit) === offset })}>
+                      <Link
+                        href={{
+                          query: {
+                            limit,
+                            offset: i * limit,
+                            q: term,
+                          },
+                        }}
+                        >
+                        <a>{`${n + i}`}</a>
+                      </Link>
+                    </li>
+                  )) }
+                </ul>
+              </Flex>
+            )}
           </Container>
         </Body>
         <Footer />
       </div>
-    )
+    );
   }
 }
 
 export { SearchPage as MockSearchPage };
 
-export default withData(addGetLoggedInUserFunction(addSearchQueryData(withIntl(SearchPage))));
+export default withData(withIntl(withLoggedInUser(addSearchQueryData(SearchPage))));

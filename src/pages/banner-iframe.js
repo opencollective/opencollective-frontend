@@ -1,21 +1,30 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import Head from 'next/head';
+
+import { FormattedMessage } from 'react-intl';
+import { graphql } from 'react-apollo';
+import gql from 'graphql-tag';
+
 import MembersWithData from '../components/MembersWithData';
+
 import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
-import { FormattedMessage } from 'react-intl';
-import { graphql } from 'react-apollo'
-import gql from 'graphql-tag'
 
-class Banner extends React.Component {
-
+class BannerIframe extends React.Component {
   static getInitialProps ({ query: { collectiveSlug, id, style } }) {
-    return { collectiveSlug, id, style }
+    return { collectiveSlug, id, style };
   }
+
+  static propTypes = {
+    collectiveSlug: PropTypes.string, // from getInitialProps, for addCollectiveData
+    id: PropTypes.string, // from getInitialProps
+    style: PropTypes.object, // from getInitialProps
+    data: PropTypes.object.isRequired, // from withData
+  };
 
   constructor(props) {
     super(props);
-    this.sendMessageToParentWindow = this.sendMessageToParentWindow.bind(this);
     this.onChange = this.onChange.bind(this);
   }
 
@@ -25,23 +34,30 @@ class Banner extends React.Component {
 
   UNSAFE_componentWillReceiveProps() {
     this.onChange();
-  }  
+  }
 
   componentDidUpdate() {
     this.onChange();
   }
 
-  onChange() {
+  onChange = () => {
     this.height = this.node && this.node.offsetHeight;
     this.sendMessageToParentWindow();
-  }
+  };
 
-  sendMessageToParentWindow() {
+  sendMessageToParentWindow = () => {
     if (!window.parent) return;
     if (!this.height) return;
     const message = `oc-${JSON.stringify({ id: this.props.id, height: this.height })}`;
     window.parent.postMessage(message, '*');
-  }
+  };
+
+  sendMessageToParentWindow = () => {
+    if (!window.parent) return;
+    if (!this.height) return;
+    const message = `oc-${JSON.stringify({ id: this.props.id, height: this.height })}`;
+    window.parent.postMessage(message, '*');
+  };
 
   render() {
     const { collectiveSlug, data } = this.props;
@@ -69,7 +85,7 @@ class Banner extends React.Component {
         <Head>
           <meta name="viewport" content="width=device-width, initial-scale=1" />
           <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,900" />
-          <title>{`${this.props.collectiveSlug} collectives`}</title>
+          <title>{`${collectiveSlug} collectives`}</title>
         </Head>
 
         <style jsx global>{`
@@ -109,7 +125,7 @@ class Banner extends React.Component {
 
         a {
           text-decoration: none;
-          color: ${style.a && style.a.color || "#46b0ed"};
+          color: ${style.a && style.a.color || '#46b0ed'};
           cursor: pointer;
           font-size: 14px;
         }
@@ -188,7 +204,7 @@ class Banner extends React.Component {
               <FormattedMessage
                 id="collective.section.backers.organizations.title"
                 values={{ n: backers.organizations, collective: collective.name }}
-                defaultMessage={`{n} {n, plural, one {organization is} other {organizations are}} supporting {collective}`}
+                defaultMessage={'{n} {n, plural, one {organization is} other {organizations are}} supporting {collective}'}
                 />
             </h2>
             <div className="actions">
@@ -210,7 +226,7 @@ class Banner extends React.Component {
               <FormattedMessage
                 id="collective.section.backers.users.title"
                 values={{ n: backers.users, collective: collective.name }}
-                defaultMessage={`{n} {n, plural, one {person is} other {people are}} supporting {collective}`}
+                defaultMessage={'{n} {n, plural, one {person is} other {people are}} supporting {collective}'}
                 />
             </h2>
 
@@ -231,7 +247,6 @@ class Banner extends React.Component {
       </div>
     );
   }
-
 }
 
 const getMembersQuery = gql`
@@ -253,4 +268,5 @@ query Collective($collectiveSlug: String) {
 `;
 
 export const addCollectiveData = graphql(getMembersQuery);
-export default withData(withIntl(addCollectiveData(Banner)));
+
+export default withData(withIntl(addCollectiveData(BannerIframe)));

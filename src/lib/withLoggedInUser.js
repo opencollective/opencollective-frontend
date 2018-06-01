@@ -1,4 +1,4 @@
-import React from 'react'
+import React from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
 import jwt from 'jsonwebtoken';
@@ -21,8 +21,10 @@ export default WrappedComponent => {
 
   return class withLoggedInUser extends React.Component {
 
-    static getInitialProps (props) {
-      return WrappedComponent.getInitialProps(props);
+    static displayName = `withLoggedInUser(${WrappedComponent.displayName})`;
+
+    static async getInitialProps (context) {
+      return typeof WrappedComponent.getInitialProps === 'function' ? await WrappedComponent.getInitialProps(context) : {};
     }
 
     static propTypes = {
@@ -38,7 +40,7 @@ export default WrappedComponent => {
           storage.set('LoggedInUser', null);
           return null;
         }
-      })
+      });
 
     getLoggedInUser = async () => {
       // only Client Side for now
@@ -66,8 +68,8 @@ export default WrappedComponent => {
       }
 
       // Synchronously
-      return await this.getLoggedInUserFromServer();
-    }
+      return this.getLoggedInUserFromServer();
+    };
 
     render() {
       return (
@@ -78,6 +80,6 @@ export default WrappedComponent => {
       );
     }
 
-  }
+  };
 
-}
+};
