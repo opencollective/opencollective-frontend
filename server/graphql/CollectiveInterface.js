@@ -139,11 +139,10 @@ export const CollectivesStatsType = new GraphQLObjectType({
         type: GraphQLInt,
         description: "Returns the collectives hosted by this collective",
         async resolve(collective) {
-          return models.Collective.count({
+          return models.Member.count({
             where: {
-              HostCollectiveId: collective.id,
-              type: types.COLLECTIVE,
-              isActive: true
+              MemberCollectiveId: collective.id,
+              role: roles.HOST
             }
           });
         }
