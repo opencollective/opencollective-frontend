@@ -131,7 +131,7 @@ class TransactionDetails extends React.Component {
             </span>
           </div>
         </div>
-        { type === 'debit' && LoggedInUser && LoggedInUser.canEditCollective(collective) && !transaction.refundTransaction &&
+        { type === 'debit' && LoggedInUser && (LoggedInUser.canEditCollective(collective) || LoggedInUser.isRoot()) && !transaction.refundTransaction &&
           <div className="col invoice">
             <label><FormattedMessage id="transaction.invoice" defaultMessage="invoice" /></label>
             <div>
