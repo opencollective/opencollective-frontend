@@ -29,6 +29,11 @@ class InputTypeDropzone extends React.Component {
   }
 
   handleChange(files) {
+    if (!files) {
+      this.setState({ value: null, url: null, loading: false });
+      return this.props.onChange(null);
+    }
+
     this.setState({ loading: true });
     // for e2e testing purposes
     if (window.location.hostname === 'localhost') {
@@ -130,6 +135,9 @@ class InputTypeDropzone extends React.Component {
           .dropzone:hover .placeholder, .dropzone.empty .placeholder {
             display: flex;
           }
+          .removeImage {
+            font-size: 11px;
+          }
         `}</style>
         <Dropzone
           multiple={false}
@@ -140,6 +148,9 @@ class InputTypeDropzone extends React.Component {
           >
           { this.renderContainer }
         </Dropzone>
+        { this.state.value &&
+          <a className="removeImage" onClick={() => this.handleChange(null)}>❌ remove image</a>
+        }
       </div>
     );
   }

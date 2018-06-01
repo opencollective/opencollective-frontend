@@ -69,6 +69,8 @@ export function getBaseImagesUrl() {
 
 export function resizeImage(imageUrl, { width, height, query, baseUrl }) {
   if (!imageUrl) return null;
+  if (imageUrl.substr(0, 1) === '/') return imageUrl; // if image is a local image, we don't resize it with the proxy.
+  if (imageUrl.substr(0,4).toLowerCase() !== 'http') return null; // Invalid imageUrl;
   if (!query && imageUrl.match(/\.svg$/)) return imageUrl; // if we don't need to transform the image, no need to proxy it.
   let queryurl = '';
   if (query) {
@@ -81,6 +83,10 @@ export function resizeImage(imageUrl, { width, height, query, baseUrl }) {
   return `${getBaseImagesUrl() || baseUrl || ''}/proxy/images/?src=${encodeURIComponent(imageUrl)}${queryurl}`;
 }
 
+export function isValidImageUrl(src) {
+  return src && (src.substr(0,1) === '/' || src.substr(0,4).toLowerCase() === 'http');
+}
+
 export function imagePreview(src, defaultImage, options = { width: 640 }) {
 
   if (typeof options.width === 'string') {
@@ -91,7 +97,8 @@ export function imagePreview(src, defaultImage, options = { width: 640 }) {
   }
 
   if (src) return resizeImage(src, options);
-  return defaultImage;
+  if (isValidImageUrl(defaultImage)) return defaultImage;
+  return null;
 }
 
 export function prettyUrl(url) {
