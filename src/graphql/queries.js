@@ -86,6 +86,7 @@ export const getLoggedInUserQuery = gql`
           type
           name
           currency
+          isHost
           stats {
             id
             balance

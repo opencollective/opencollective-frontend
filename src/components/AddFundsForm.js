@@ -1,18 +1,23 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import InputField from './InputField';
-import AddFundsSourcePicker from './AddFundsSourcePicker';
 import { Button, Row, Col, Form } from 'react-bootstrap';
 import { defineMessages, FormattedMessage } from 'react-intl';
-import withIntl from '../lib/withIntl';
-import { getCurrencySymbol, formatCurrency } from '../lib/utils';
 import { get } from 'lodash';
+
+import { getCurrencySymbol, formatCurrency } from '../lib/utils';
+import withIntl from '../lib/withIntl';
+import InputField from './InputField';
+import {
+  AddFundsSourcePicker,
+  AddFundsSourcePickerForUserWithData,
+} from './AddFundsSourcePicker';
+
 
 class AddFundsForm extends React.Component {
 
   static propTypes = {
     collective: PropTypes.object.isRequired,
-    host: PropTypes.object.isRequired,
+    host: PropTypes.object,
     onSubmit: PropTypes.func.isRequired,
     onCancel: PropTypes.func.isRequired,
     loading: PropTypes.bool
@@ -56,10 +61,20 @@ class AddFundsForm extends React.Component {
       {
         name: "FromCollectiveId",
         type: "component",
+        when: () => this.props.host,
         component: AddFundsSourcePicker,
         options: {
           collective: this.props.collective,
           host: this.props.host
+        }
+      },
+      {
+        name: "FromCollectiveId",
+        type: "component",
+        when: () => !this.props.host,
+        component: AddFundsSourcePickerForUserWithData,
+        options: {
+          LoggedInUser: this.props.LoggedInUser,
         }
       },
       {
@@ -114,7 +129,8 @@ class AddFundsForm extends React.Component {
     }
 
     if (attr === 'FromCollectiveId') {
-      if (value !== host.id) {
+      /* We don't have the host object if we're adding funds to orgs */
+      if (host && value !== host.id) {
         newState[obj].hostFeePercent = this.props.collective.hostFeePercent;
       } else {
         newState[obj].hostFeePercent = 0;
@@ -217,8 +233,8 @@ class AddFundsForm extends React.Component {
               <Row>
                 <Col sm={12}>
                   <div className="form-group">
-                    <label className="col-sm-3 control-label"><FormattedMessage id="addfunds.details" defaultMessage="Details" /></label>
-                    <Col sm={9}>
+                    <label className="col-sm-2 control-label inputField"><FormattedMessage id="addfunds.details" defaultMessage="Details" /></label>
+                    <Col sm={10}>
                       <table className="details">
                         <tbody>
                           <tr>
@@ -245,7 +261,17 @@ class AddFundsForm extends React.Component {
                         </tbody>
                       </table>
                       <div className="disclaimer">
-                        <FormattedMessage id="addfunds.disclaimer" defaultMessage="By clicking below, you agree to set aside {amount} in your bank account on behalf of the collective" values={{amount: formatCurrency(this.state.form.totalAmount, this.props.collective.currency)}} />
+                        { this.props.host &&
+                          <FormattedMessage id="addfunds.disclaimer" defaultMessage="By clicking below, you agree to set aside {amount} in your bank account on behalf of the collective" values={{amount: formatCurrency(this.state.form.totalAmount, this.props.collective.currency)}} />
+                        }
+
+                        { !this.props.host &&
+                          <FormattedMessage
+                            id="addfunds.disclaimerOrganization"
+                            defaultMessage="By clicking below, you agree to create a pre-paid credit card with the amount of {amount} for this organization"
+                            values={{ amount: formatCurrency(this.state.form.totalAmount, this.props.collective.currency) }}
+                            />
+                        }
                       </div>
                     </Col>
                   </div>
