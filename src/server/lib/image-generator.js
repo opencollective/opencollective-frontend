@@ -1,8 +1,8 @@
-import fs from 'fs';
+import fs from 'fs-extra';
 import sizeOf from 'image-size';
 import Promise from 'bluebird';
 import crypto from 'crypto';
-import svg_to_png from 'svg-to-png';
+import convertSvgToPng from 'convert-svg-to-png';
 import cachedRequestLib from 'cached-request';
 import request from 'request';
 import imageToAscii from 'image-to-ascii';
@@ -16,7 +16,8 @@ const cachedRequest = cachedRequestLib(request);
 cachedRequest.setCacheDirectory('/tmp');
 
 const requestPromise = Promise.promisify(cachedRequest, { multiArgs: true });
-const readFile = Promise.promisify(fs.readFile);
+
+const md5 = string => crypto.createHash('md5').update(string).digest('hex');
 
 export function generateAsciiFromImage(imgsrc, options) {
 
@@ -53,25 +54,20 @@ export function generateAsciiFromImage(imgsrc, options) {
  * (returns a promise)
  */
 export function svg2png(svg) {
-  const md5 = crypto.createHash('md5').update(svg).digest("hex");
-  const svgFilePath = `/tmp/${md5}.svg`;
   const outputDir = `/tmp`;
-  const outputFile = `${outputDir}/${md5}.png`;
+  const outputFile = `${outputDir}/${md5(svg)}.png`;
 
-  try {
+  return fs
     // If file exists, return it
     // Note: because we generate a md5 fingerprint based on the content of the svg,
     //       any change in the svg (margin, size, number of backers, etc.) will force
     //       the creation of a new png :-)
-    fs.statSync(outputFile);
-    return readFile(outputFile);
-  } catch (e) {
-    // Otherwise, generate a new png (slow)
-    fs.writeFileSync(svgFilePath, svg);
-
-    return svg_to_png.convert(svgFilePath, outputDir)
-            .then(() => readFile(outputFile));
-  }
+    .readFile(outputFile)
+    .catch(() =>
+      // Otherwise, generate a new png (slow)
+      convertSvgToPng.convert(svg)
+        .then(png => fs.writeFile(outputFile, png).then(() => png))
+    );
 }
 
 
