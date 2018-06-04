@@ -1,5 +1,4 @@
 import webpack from 'webpack';
-import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
 
 module.exports = {
   onDemandEntries: {
@@ -14,6 +13,7 @@ module.exports = {
       new webpack.ContextReplacementPlugin(/moment[/\\]locale$/, /en|fr|es|ja/),
     );
     if (process.env.WEBPACK_BUNDLE_ANALYZER) {
+      const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
       config.plugins.push(
         new BundleAnalyzerPlugin({
           analyzerMode: 'static',
