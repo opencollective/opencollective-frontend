@@ -139,7 +139,7 @@ class ExportImages extends React.Component {
                     __html: image.code
                   }}
                   />
-                <div className="url"><a href={image.url} target="_blank">{image.url}</a></div>
+                <div className="url"><a href={image.url} target="_blank" rel="noopener noreferrer">{image.url}</a></div>
                 <div className="code">{image.code}</div>
                 <div>
                   <label>Options:</label>

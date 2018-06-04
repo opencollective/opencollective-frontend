@@ -170,10 +170,11 @@ class Banner extends React.Component {
         .btn.hover {
           background-position: 0 -100px;
         }
-        `}</style>
+        `}
+        </style>
 
         { backers.organizations + backers.users === 0 &&
-          <a type="button" className="btn blue contribute" target="_blank" href={`https://opencollective.com/${collectiveSlug}`} />
+          <a type="button" className="btn blue contribute" target="_blank" rel="noopener noreferrer" href={`https://opencollective.com/${collectiveSlug}`} />
         }
 
 
@@ -187,7 +188,7 @@ class Banner extends React.Component {
                 />
             </h2>
             <div className="actions">
-              <a href={`https://opencollective.com/${collectiveSlug}`} target="_blank" style={style.a}><FormattedMessage id="widget.becomeSponsor" defaultMessage="Become a sponsor" /></a>
+              <a href={`https://opencollective.com/${collectiveSlug}`} target="_blank" rel="noopener noreferrer" style={style.a}><FormattedMessage id="widget.becomeSponsor" defaultMessage="Become a sponsor" /></a>
             </div>
             <MembersWithData
               collective={collective}
@@ -210,7 +211,7 @@ class Banner extends React.Component {
             </h2>
 
             <div className="actions">
-              <a href={`https://opencollective.com/${collectiveSlug}`} target="_blank" style={style.a}><FormattedMessage id="widget.becomeBacker" defaultMessage="Become a backer" /></a>
+              <a href={`https://opencollective.com/${collectiveSlug}`} target="_blank" rel="noopener noreferrer" style={style.a}><FormattedMessage id="widget.becomeBacker" defaultMessage="Become a backer" /></a>
             </div>
             <MembersWithData
               collective={collective}
