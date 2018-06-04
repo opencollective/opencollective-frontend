@@ -5,7 +5,7 @@
   "author": "@philmod @arnaudbenard @xdamman @asood123",
   "main": "server/index.js",
   "engines": {
-    "node": "10.2.1",
+    "node": "10.3.0",
     "npm": "6.1.0"
   },
   "dependencies": {
