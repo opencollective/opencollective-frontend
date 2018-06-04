@@ -80,9 +80,9 @@
     "winston": "^3.0.0-rc6"
   },
   "scripts": {
+    "start": "node build/server",
     "dev": "babel-node src/server",
     "build": "npm run build:server && next build build",
-    "start": "node build/server",
     "test": "npm run test:src && npm run test:e2e",
     "test:src": "TZ=UTC jest src/*",
     "test:server": "TZ=UTC jest test/server/*",
@@ -93,7 +93,7 @@
     "deploy:staging": "git push -f staging master && heroku ps:scale web=1 -a opencollective-staging-api && heroku ps:scale web=1 -a oc-staging-frontend && heroku ps:scale web=1 -a opencollective-staging-website",
     "stop:staging": "heroku ps:scale web=0 -a oc-staging-frontend && heroku ps:scale web=0 -a opencollective-staging-website && heroku ps:scale web=0 -a opencollective-staging-api",
     "git:clean": "./scripts/git_clean.sh",
-    "postinstall": "npm run build",
+    "postinstall": "if test \"$NODE_ENV\" = \"\" || test \"$NODE_ENV\" = \"development\" ; then echo \"Skipping postinstall build because NODE_ENV is '${NODE_ENV}'\" ; else npm run build ; fi",
     "hint": "npm run lint",
     "lint": "eslint '**/*.js' --quiet",
     "lint:fix": "eslint '**/*.js' --fix",
