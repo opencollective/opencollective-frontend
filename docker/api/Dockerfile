@@ -1,4 +1,4 @@
-FROM node:8.4.0
+FROM node:10.3.0
 
 RUN echo 'deb http://ftp.debian.org/debian jessie-backports main' > \
     /etc/apt/sources.list.d/jessie-backports.list
