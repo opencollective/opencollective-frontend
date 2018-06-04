@@ -78,7 +78,7 @@ class CreateCollective extends React.Component {
       if (CollectiveInputType.HostCollectiveId) {
         successUrl = `${window.location.protocol}//${window.location.host}/${collective.slug}?status=collectiveCreated&CollectiveId=${collective.id}&collectiveSlug=${collective.slug}`;
       } else {
-        successUrl = `${window.location.protocol}//${window.location.host}/${collective.slug}/connect/stripe`;
+        successUrl = `${window.location.protocol}//${window.location.host}/${collective.slug}/edit#host`;
       }
       this.setState({ status: 'idle', result: { success: `Collective created successfully` }});
       window.location.replace(successUrl);
