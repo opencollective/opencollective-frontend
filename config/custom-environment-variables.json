@@ -76,5 +76,8 @@
     "appId": "ALGOLIA_APP_ID",
     "appKey": "ALGOLIA_KEY",
     "index": "ALGOLIA_INDEX"
+  },
+  "fixer": {
+    "accessKey": "FIXER_ACCESS_KEY"
   }
 }
