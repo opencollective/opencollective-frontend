@@ -15,7 +15,7 @@
     "bluebird": "3.5.1",
     "cached-request": "1.1.4",
     "classnames": "2.2.5",
-    "dotenv": "5.0.1",
+    "dotenv": "6.0.0",
     "enzyme": "3.3.0",
     "enzyme-adapter-react-16": "1.1.1",
     "express": "4.16.3",
