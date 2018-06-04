@@ -280,8 +280,8 @@ ${description}`
                   <div className="contact">
                     { collective.host && collective.isActive && <div className="host"><label><FormattedMessage id="collective.cover.hostedBy" defaultMessage="Hosted by" /></label><Link route={`/${collective.host.slug}`}>{collective.host.name} </Link></div> }
                     { collective.host && !collective.isActive && <div className="host"><label><FormattedMessage id="collective.cover.pendingApprovalFrom" defaultMessage="Pending approval from" /></label><Link route={`/${collective.host.slug}`}>{collective.host.name} </Link></div> }
-                    { twitterHandle && <div className="twitterHandle"><a href={`https://twitter.com/${twitterHandle}`} target="_blank">@{twitterHandle}</a></div> }
-                    { website && <div className="website"><a href={website} target="_blank">{prettyUrl(website) }</a></div> }
+                    { twitterHandle && <div className="twitterHandle"><a href={`https://twitter.com/${twitterHandle}`} target="_blank" rel="noopener noreferrer">@{twitterHandle}</a></div> }
+                    { website && <div className="website"><a href={website} target="_blank" rel="noopener noreferrer">{prettyUrl(website) }</a></div> }
                   </div>
                 }
                 { collective.type === 'EVENT' &&

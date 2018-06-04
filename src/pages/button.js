@@ -62,7 +62,7 @@ class ButtonPage extends React.Component {
               background-position: 0 -100px;
             }
           `}</style>
-        <a type="button" className={`btn ${color} ${verb}`} target="_blank" href={`https://opencollective.com/${collectiveSlug}/${verb}`} />
+        <a type="button" className={`btn ${color} ${verb}`} target="_blank" rel="noopener noreferrer" href={`https://opencollective.com/${collectiveSlug}/${verb}`} />
       </div>
     );
   }

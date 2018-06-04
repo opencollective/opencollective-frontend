@@ -118,7 +118,7 @@ class EventsWithData extends React.Component {
               <div className="title">
                 <h2><FormattedMessage id="events.title.futureEvents" values={{n: futureEvents.length}} defaultMessage={`Next {n, plural, one {event} other {events}}`} /></h2>
                 { this.isIframe &&
-                  <div className="action"><a href={`/${this.props.collectiveSlug}/events/new`} onClick={this.createEvent} target="_blank"><FormattedMessage id="events.widget.createEvent" defaultMessage={`Create an Event`} /></a></div>
+                  <div className="action"><a href={`/${this.props.collectiveSlug}/events/new`} onClick={this.createEvent} target="_blank" rel="noopener noreferrer"><FormattedMessage id="events.widget.createEvent" defaultMessage={`Create an Event`} /></a></div>
                 }
               </div>
               <ul>
