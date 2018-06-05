@@ -167,10 +167,13 @@ class MenuBar extends React.Component {
   }
 
   addFundsToOrg = async (form) => {
+    const err = (error) => this.setState({ error, loading: false });
+
     if (form.totalAmount === 0) {
-      const error = "Total amount must be > 0";
-      this.setState({ error, loading: false });
-      return;
+      return err("Total amount must be > 0");
+    }
+    if (!form.FromCollectiveId) {
+      return err("No host selected");
     }
 
     const { collective } = this.props;
@@ -186,13 +189,13 @@ class MenuBar extends React.Component {
       await this.props.addFundsToOrg(params);
       this.setState({ showAddFunds: false, loading: false });
     } catch (e) {
-      const error = e.message && e.message.replace(/GraphQL error:/, "");
-      this.setState({ error, loading: false });
+      console.error(e);
+      return err(e.message && e.message.replace(/GraphQL error:/, ""));
     }
   };
 
   // Render Contribute and Submit Expense buttons
-  renderButtons() {
+  renderButtons = () => {
     const { collective, cta, LoggedInUser } = this.props;
     const offset = -this.height;
 
@@ -209,6 +212,7 @@ class MenuBar extends React.Component {
             onSubmit={this.addFundsToOrg}
             onCancel={this.hideAddFunds}
             />
+          { this.state.error && <div>{this.state.error}</div> }
         </Modal.Body>
       </Modal>
     );
@@ -266,7 +270,7 @@ class MenuBar extends React.Component {
 
   hideAddFunds = () => this.setState({ showAddFunds: false });
 
-  renderMenu() {
+  renderMenu = () => {
     const { intl, LoggedInUser, collective } = this.props;
     const offset = -this.height; // offset for hashlink to leave room for the menu bar
     return (

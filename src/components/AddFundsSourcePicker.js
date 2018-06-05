@@ -103,6 +103,7 @@ class AddFundsSourcePickerForUser extends React.Component {
           id="sourcePicker" name="template" componentClass="select"
           placeholder="select" onChange={this.onChange}
           >
+          <option value="" key="addfsph-00"></option>
           { hosts.map(h => <option value={h.id} key={`addfsph-${h.id}`}>{h.name}</option>) }
         </FormControl>
       </div>
