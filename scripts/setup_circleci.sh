@@ -2,27 +2,17 @@
 # This script only runs on circleci, just before the e2e tests
 # first version cfr. https://discuss.circleci.com/t/add-ability-to-cache-apt-get-programs/598/6
 
-
 if [ "$NODE_ENV" = "circleci" ]; then
-  echo "Installing Google Chrome for E2E tests";
+  echo "Performing circleci e2e setup because NODE_ENV is '${NODE_ENV}'";
 else
+  echo "Skipping circleci e2e setup because NODE_ENV is '${NODE_ENV}'";
   exit;
 fi
 
-# Install Google Chrome
-if [ ! -d "~/cache" ]; then
-  mkdir ~/cache
-fi
-cd ~/cache
-
-if [ ! -e "google-chrome-stable_current_amd64.deb" ]; then
-  wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-fi;
-
-sudo dpkg -i ./google-chrome*.deb
-sudo apt-get install -f
-
 sudo apt-get install GraphicsMagick
+
+mkdir -p ~/cache
+cd ~/cache
 
 API_TARBALL_URL="https://codeload.github.com/opencollective/opencollective-api/tar.gz/";
 if curl -s --head  --request GET "${API_TARBALL_URL}${CIRCLE_BRANCH}" | grep "200" > /dev/null
@@ -31,7 +21,6 @@ then
 else
   BRANCH="master";
 fi
-
 
 # If we already have an archive of the branch locally (in ~/cache)
 # Then we check to see if the size matches the online version

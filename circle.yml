@@ -7,7 +7,9 @@ dependencies:
   pre:
     - ./scripts/setup_circleci.sh
   cache_directories:
-    - "~/cache"
+    - ~/.cache
+    - ~/.npm
+    - ~/cache
 machine:
   node:
     version: 10.3.0
