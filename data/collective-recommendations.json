@@ -1,0 +1,7464 @@
+{
+  "7": {
+    "id": 7,
+    "slug": "tipbox",
+    "recommendations": [
+      {
+        "id": 85,
+        "name": "GulpJS",
+        "slug": "gulpjs",
+        "description": "The streaming build system.",
+        "score": 6
+      },
+      {
+        "id": 12010,
+        "name": "Nodemailer",
+        "slug": "nodemailer",
+        "description": "Module for Node.js applications to allow easy as cake email sending",
+        "score": 3
+      },
+      {
+        "id": 125,
+        "name": "chaijs",
+        "slug": "chaijs",
+        "description": "Chai is a BDD / TDD assertion library for node and the browser that can be delightfully paired with any javascript testing framework.",
+        "score": 1
+      },
+      {
+        "id": 58,
+        "name": "MochaJS",
+        "slug": "mochajs",
+        "description": "simple, flexible, fun javascript test framework for node.js & the browser.",
+        "score": 1
+      }
+    ]
+  },
+  "55": {
+    "id": 55,
+    "slug": "democracyearth",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 4
+      },
+      {
+        "id": 125,
+        "name": "chaijs",
+        "slug": "chaijs",
+        "description": "Chai is a BDD / TDD assertion library for node and the browser that can be delightfully paired with any javascript testing framework.",
+        "score": 1
+      }
+    ]
+  },
+  "56": {
+    "id": 56,
+    "slug": "angular-fullstack",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 18
+      },
+      {
+        "id": 85,
+        "name": "GulpJS",
+        "slug": "gulpjs",
+        "description": "The streaming build system.",
+        "score": 2
+      },
+      {
+        "id": 125,
+        "name": "chaijs",
+        "slug": "chaijs",
+        "description": "Chai is a BDD / TDD assertion library for node and the browser that can be delightfully paired with any javascript testing framework.",
+        "score": 1
+      },
+      {
+        "id": 58,
+        "name": "MochaJS",
+        "slug": "mochajs",
+        "description": "simple, flexible, fun javascript test framework for node.js & the browser.",
+        "score": 1
+      }
+    ]
+  },
+  "58": {
+    "id": 58,
+    "slug": "mochajs",
+    "recommendations": [
+      {
+        "id": 498,
+        "name": "debug",
+        "slug": "debug",
+        "description": null,
+        "score": 3
+      },
+      {
+        "id": 125,
+        "name": "chaijs",
+        "slug": "chaijs",
+        "description": "Chai is a BDD / TDD assertion library for node and the browser that can be delightfully paired with any javascript testing framework.",
+        "score": 1
+      }
+    ]
+  },
+  "62": {
+    "id": 62,
+    "slug": "easystatic",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 6
+      },
+      {
+        "id": 498,
+        "name": "debug",
+        "slug": "debug",
+        "description": null,
+        "score": 3
+      }
+    ]
+  },
+  "63": {
+    "id": 63,
+    "slug": "react-firebase-starter",
+    "recommendations": [
+      {
+        "id": 12353,
+        "name": "styled-components",
+        "slug": "styled-components",
+        "description": "Visual primitives for the component age. Use the best bits of ES6 and CSS to style your apps without stress 💅",
+        "score": 3
+      },
+      {
+        "id": 755,
+        "name": "stylelint",
+        "slug": "stylelint",
+        "description": "A mighty, modern CSS linter",
+        "score": 2
+      },
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 1
+      },
+      {
+        "id": 125,
+        "name": "chaijs",
+        "slug": "chaijs",
+        "description": "Chai is a BDD / TDD assertion library for node and the browser that can be delightfully paired with any javascript testing framework.",
+        "score": 1
+      }
+    ]
+  },
+  "85": {
+    "id": 85,
+    "slug": "gulpjs",
+    "recommendations": [
+      {
+        "id": 58,
+        "name": "MochaJS",
+        "slug": "mochajs",
+        "description": "simple, flexible, fun javascript test framework for node.js & the browser.",
+        "score": 1
+      }
+    ]
+  },
+  "86": {
+    "id": 86,
+    "slug": "koajs",
+    "recommendations": [
+      {
+        "id": 498,
+        "name": "debug",
+        "slug": "debug",
+        "description": null,
+        "score": 3
+      },
+      {
+        "id": 16401,
+        "name": "Jest",
+        "slug": "jest",
+        "description": "Delightful JavaScript Testing",
+        "score": 1
+      }
+    ]
+  },
+  "116": {
+    "id": 116,
+    "slug": "react-boilerplate",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 11
+      },
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 7
+      },
+      {
+        "id": 12353,
+        "name": "styled-components",
+        "slug": "styled-components",
+        "description": "Visual primitives for the component age. Use the best bits of ES6 and CSS to style your apps without stress 💅",
+        "score": 3
+      },
+      {
+        "id": 14082,
+        "name": "html-webpack-plugin",
+        "slug": "html-webpack-plugin",
+        "description": null,
+        "score": 1
+      }
+    ]
+  },
+  "117": {
+    "id": 117,
+    "slug": "streetmix",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 19
+      },
+      {
+        "id": 11885,
+        "name": "Mongoose.js",
+        "slug": "mongoose",
+        "description": "The leading ODM for Node.js and MongoDB",
+        "score": 3
+      },
+      {
+        "id": 16401,
+        "name": "Jest",
+        "slug": "jest",
+        "description": "Delightful JavaScript Testing",
+        "score": 2
+      },
+      {
+        "id": 755,
+        "name": "stylelint",
+        "slug": "stylelint",
+        "description": "A mighty, modern CSS linter",
+        "score": 2
+      }
+    ]
+  },
+  "125": {
+    "id": 125,
+    "slug": "chaijs",
+    "recommendations": [
+      {
+        "id": 58,
+        "name": "MochaJS",
+        "slug": "mochajs",
+        "description": "simple, flexible, fun javascript test framework for node.js & the browser.",
+        "score": 1
+      }
+    ]
+  },
+  "151": {
+    "id": 151,
+    "slug": "cheerio",
+    "recommendations": [
+      {
+        "id": 58,
+        "name": "MochaJS",
+        "slug": "mochajs",
+        "description": "simple, flexible, fun javascript test framework for node.js & the browser.",
+        "score": 1
+      }
+    ]
+  },
+  "180": {
+    "id": 180,
+    "slug": "ava",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 3
+      },
+      {
+        "id": 498,
+        "name": "debug",
+        "slug": "debug",
+        "description": null,
+        "score": 3
+      },
+      {
+        "id": 470,
+        "name": "sinon",
+        "slug": "sinon",
+        "description": "",
+        "score": 1
+      }
+    ]
+  },
+  "183": {
+    "id": 183,
+    "slug": "satellizer",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 5
+      },
+      {
+        "id": 11743,
+        "name": "Rollup",
+        "slug": "rollup",
+        "description": "The JavaScript module bundler",
+        "score": 4
+      },
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 2
+      }
+    ]
+  },
+  "184": {
+    "id": 184,
+    "slug": "hackathon-starter",
+    "recommendations": [
+      {
+        "id": 151,
+        "name": "cheerio",
+        "slug": "cheerio",
+        "description": "Fast, flexible, and lean implementation of core jQuery designed specifically for the server",
+        "score": 3
+      },
+      {
+        "id": 11885,
+        "name": "Mongoose.js",
+        "slug": "mongoose",
+        "description": "The leading ODM for Node.js and MongoDB",
+        "score": 3
+      },
+      {
+        "id": 12010,
+        "name": "Nodemailer",
+        "slug": "nodemailer",
+        "description": "Module for Node.js applications to allow easy as cake email sending",
+        "score": 3
+      },
+      {
+        "id": 454,
+        "name": "pug",
+        "slug": "pug",
+        "description": "A powerful templating engine for node.js and the browser",
+        "score": 3
+      },
+      {
+        "id": 125,
+        "name": "chaijs",
+        "slug": "chaijs",
+        "description": "Chai is a BDD / TDD assertion library for node and the browser that can be delightfully paired with any javascript testing framework.",
+        "score": 1
+      },
+      {
+        "id": 58,
+        "name": "MochaJS",
+        "slug": "mochajs",
+        "description": "simple, flexible, fun javascript test framework for node.js & the browser.",
+        "score": 1
+      },
+      {
+        "id": 470,
+        "name": "sinon",
+        "slug": "sinon",
+        "description": "",
+        "score": 1
+      }
+    ]
+  },
+  "185": {
+    "id": 185,
+    "slug": "hospitalrun",
+    "recommendations": [
+      {
+        "id": 755,
+        "name": "stylelint",
+        "slug": "stylelint",
+        "description": "A mighty, modern CSS linter",
+        "score": 1
+      }
+    ]
+  },
+  "186": {
+    "id": 186,
+    "slug": "typographyjs",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 12
+      },
+      {
+        "id": 16401,
+        "name": "Jest",
+        "slug": "jest",
+        "description": "Delightful JavaScript Testing",
+        "score": 2
+      }
+    ]
+  },
+  "187": {
+    "id": 187,
+    "slug": "gatsby",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 9
+      },
+      {
+        "id": 16401,
+        "name": "Jest",
+        "slug": "jest",
+        "description": "Delightful JavaScript Testing",
+        "score": 2
+      }
+    ]
+  },
+  "192": {
+    "id": 192,
+    "slug": "jsbin",
+    "recommendations": [
+      {
+        "id": 498,
+        "name": "debug",
+        "slug": "debug",
+        "description": null,
+        "score": 3
+      },
+      {
+        "id": 12010,
+        "name": "Nodemailer",
+        "slug": "nodemailer",
+        "description": "Module for Node.js applications to allow easy as cake email sending",
+        "score": 3
+      },
+      {
+        "id": 454,
+        "name": "pug",
+        "slug": "pug",
+        "description": "A powerful templating engine for node.js and the browser",
+        "score": 3
+      },
+      {
+        "id": 58,
+        "name": "MochaJS",
+        "slug": "mochajs",
+        "description": "simple, flexible, fun javascript test framework for node.js & the browser.",
+        "score": 1
+      },
+      {
+        "id": 470,
+        "name": "sinon",
+        "slug": "sinon",
+        "description": "",
+        "score": 1
+      }
+    ]
+  },
+  "205": {
+    "id": 205,
+    "slug": "nightwatch",
+    "recommendations": [
+      {
+        "id": 125,
+        "name": "chaijs",
+        "slug": "chaijs",
+        "description": "Chai is a BDD / TDD assertion library for node and the browser that can be delightfully paired with any javascript testing framework.",
+        "score": 1
+      },
+      {
+        "id": 58,
+        "name": "MochaJS",
+        "slug": "mochajs",
+        "description": "simple, flexible, fun javascript test framework for node.js & the browser.",
+        "score": 1
+      }
+    ]
+  },
+  "211": {
+    "id": 211,
+    "slug": "octolinker",
+    "recommendations": [
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 6
+      },
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 4
+      },
+      {
+        "id": 16401,
+        "name": "Jest",
+        "slug": "jest",
+        "description": "Delightful JavaScript Testing",
+        "score": 1
+      },
+      {
+        "id": 470,
+        "name": "sinon",
+        "slug": "sinon",
+        "description": "",
+        "score": 1
+      }
+    ]
+  },
+  "242": {
+    "id": 242,
+    "slug": "cyclejs",
+    "recommendations": [
+      {
+        "id": 58,
+        "name": "MochaJS",
+        "slug": "mochajs",
+        "description": "simple, flexible, fun javascript test framework for node.js & the browser.",
+        "score": 1
+      },
+      {
+        "id": 470,
+        "name": "sinon",
+        "slug": "sinon",
+        "description": "",
+        "score": 1
+      }
+    ]
+  },
+  "243": {
+    "id": 243,
+    "slug": "noble",
+    "recommendations": [
+      {
+        "id": 498,
+        "name": "debug",
+        "slug": "debug",
+        "description": null,
+        "score": 3
+      },
+      {
+        "id": 58,
+        "name": "MochaJS",
+        "slug": "mochajs",
+        "description": "simple, flexible, fun javascript test framework for node.js & the browser.",
+        "score": 1
+      },
+      {
+        "id": 470,
+        "name": "sinon",
+        "slug": "sinon",
+        "description": "",
+        "score": 1
+      }
+    ]
+  },
+  "244": {
+    "id": 244,
+    "slug": "wpgulp",
+    "recommendations": [
+      {
+        "id": 85,
+        "name": "GulpJS",
+        "slug": "gulpjs",
+        "description": "The streaming build system.",
+        "score": 1
+      }
+    ]
+  },
+  "250": {
+    "id": 250,
+    "slug": "esnextbin",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 7
+      },
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 4
+      },
+      {
+        "id": 10352,
+        "name": "nodemon",
+        "slug": "nodemon",
+        "description": "Nodemon is a utility that will monitor for any changes in your source and automatically restart your server. Perfect for rapid development. ",
+        "score": 1
+      }
+    ]
+  },
+  "255": {
+    "id": 255,
+    "slug": "npms-www",
+    "recommendations": [
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 7
+      },
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 5
+      },
+      {
+        "id": 755,
+        "name": "stylelint",
+        "slug": "stylelint",
+        "description": "A mighty, modern CSS linter",
+        "score": 1
+      }
+    ]
+  },
+  "257": {
+    "id": 257,
+    "slug": "relax",
+    "recommendations": [
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 10
+      },
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 9
+      },
+      {
+        "id": 11885,
+        "name": "Mongoose.js",
+        "slug": "mongoose",
+        "description": "The leading ODM for Node.js and MongoDB",
+        "score": 3
+      },
+      {
+        "id": 12010,
+        "name": "Nodemailer",
+        "slug": "nodemailer",
+        "description": "Module for Node.js applications to allow easy as cake email sending",
+        "score": 3
+      },
+      {
+        "id": 16401,
+        "name": "Jest",
+        "slug": "jest",
+        "description": "Delightful JavaScript Testing",
+        "score": 1
+      },
+      {
+        "id": 10352,
+        "name": "nodemon",
+        "slug": "nodemon",
+        "description": "Nodemon is a utility that will monitor for any changes in your source and automatically restart your server. Perfect for rapid development. ",
+        "score": 1
+      }
+    ]
+  },
+  "302": {
+    "id": 302,
+    "slug": "webpack",
+    "recommendations": [
+      {
+        "id": 16401,
+        "name": "Jest",
+        "slug": "jest",
+        "description": "Delightful JavaScript Testing",
+        "score": 1
+      },
+      {
+        "id": 454,
+        "name": "pug",
+        "slug": "pug",
+        "description": "A powerful templating engine for node.js and the browser",
+        "score": 1
+      }
+    ]
+  },
+  "305": {
+    "id": 305,
+    "slug": "codebuddies",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 3
+      }
+    ]
+  },
+  "306": {
+    "id": 306,
+    "slug": "boostnote",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 6
+      },
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 5
+      },
+      {
+        "id": 16401,
+        "name": "Jest",
+        "slug": "jest",
+        "description": "Delightful JavaScript Testing",
+        "score": 2
+      },
+      {
+        "id": 180,
+        "name": "AVA",
+        "slug": "ava",
+        "description": null,
+        "score": 1
+      },
+      {
+        "id": 13486,
+        "name": "electron",
+        "slug": "electron",
+        "description": "Build cross platform desktop apps with JavaScript, HTML, and CSS",
+        "score": 1
+      }
+    ]
+  },
+  "327": {
+    "id": 327,
+    "slug": "tellform",
+    "recommendations": [
+      {
+        "id": 11885,
+        "name": "Mongoose.js",
+        "slug": "mongoose",
+        "description": "The leading ODM for Node.js and MongoDB",
+        "score": 3
+      },
+      {
+        "id": 12010,
+        "name": "Nodemailer",
+        "slug": "nodemailer",
+        "description": "Module for Node.js applications to allow easy as cake email sending",
+        "score": 3
+      },
+      {
+        "id": 454,
+        "name": "pug",
+        "slug": "pug",
+        "description": "A powerful templating engine for node.js and the browser",
+        "score": 3
+      },
+      {
+        "id": 659,
+        "name": "socket.io",
+        "slug": "socketio",
+        "description": null,
+        "score": 3
+      },
+      {
+        "id": 58,
+        "name": "MochaJS",
+        "slug": "mochajs",
+        "description": "simple, flexible, fun javascript test framework for node.js & the browser.",
+        "score": 1
+      }
+    ]
+  },
+  "331": {
+    "id": 331,
+    "slug": "nexe",
+    "recommendations": [
+      {
+        "id": 125,
+        "name": "chaijs",
+        "slug": "chaijs",
+        "description": "Chai is a BDD / TDD assertion library for node and the browser that can be delightfully paired with any javascript testing framework.",
+        "score": 1
+      },
+      {
+        "id": 58,
+        "name": "MochaJS",
+        "slug": "mochajs",
+        "description": "simple, flexible, fun javascript test framework for node.js & the browser.",
+        "score": 1
+      }
+    ]
+  },
+  "338": {
+    "id": 338,
+    "slug": "redux-devtools-extension",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 9
+      },
+      {
+        "id": 85,
+        "name": "GulpJS",
+        "slug": "gulpjs",
+        "description": "The streaming build system.",
+        "score": 2
+      },
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 2
+      },
+      {
+        "id": 13486,
+        "name": "electron",
+        "slug": "electron",
+        "description": "Build cross platform desktop apps with JavaScript, HTML, and CSS",
+        "score": 1
+      },
+      {
+        "id": 58,
+        "name": "MochaJS",
+        "slug": "mochajs",
+        "description": "simple, flexible, fun javascript test framework for node.js & the browser.",
+        "score": 1
+      }
+    ]
+  },
+  "373": {
+    "id": 373,
+    "slug": "mobx",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 4
+      },
+      {
+        "id": 16401,
+        "name": "Jest",
+        "slug": "jest",
+        "description": "Delightful JavaScript Testing",
+        "score": 2
+      },
+      {
+        "id": 11743,
+        "name": "Rollup",
+        "slug": "rollup",
+        "description": "The JavaScript module bundler",
+        "score": 2
+      }
+    ]
+  },
+  "374": {
+    "id": 374,
+    "slug": "cloudcmd",
+    "recommendations": [
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 7
+      },
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 4
+      },
+      {
+        "id": 659,
+        "name": "socket.io",
+        "slug": "socketio",
+        "description": null,
+        "score": 3
+      },
+      {
+        "id": 755,
+        "name": "stylelint",
+        "slug": "stylelint",
+        "description": "A mighty, modern CSS linter",
+        "score": 2
+      },
+      {
+        "id": 14082,
+        "name": "html-webpack-plugin",
+        "slug": "html-webpack-plugin",
+        "description": null,
+        "score": 1
+      },
+      {
+        "id": 10352,
+        "name": "nodemon",
+        "slug": "nodemon",
+        "description": "Nodemon is a utility that will monitor for any changes in your source and automatically restart your server. Perfect for rapid development. ",
+        "score": 1
+      },
+      {
+        "id": 470,
+        "name": "sinon",
+        "slug": "sinon",
+        "description": "",
+        "score": 1
+      }
+    ]
+  },
+  "386": {
+    "id": 386,
+    "slug": "preact",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 6
+      },
+      {
+        "id": 11743,
+        "name": "Rollup",
+        "slug": "rollup",
+        "description": "The JavaScript module bundler",
+        "score": 3
+      },
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 2
+      },
+      {
+        "id": 125,
+        "name": "chaijs",
+        "slug": "chaijs",
+        "description": "Chai is a BDD / TDD assertion library for node and the browser that can be delightfully paired with any javascript testing framework.",
+        "score": 1
+      },
+      {
+        "id": 58,
+        "name": "MochaJS",
+        "slug": "mochajs",
+        "description": "simple, flexible, fun javascript test framework for node.js & the browser.",
+        "score": 1
+      },
+      {
+        "id": 470,
+        "name": "sinon",
+        "slug": "sinon",
+        "description": "",
+        "score": 1
+      }
+    ]
+  },
+  "398": {
+    "id": 398,
+    "slug": "phenomic",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 6
+      },
+      {
+        "id": 16401,
+        "name": "Jest",
+        "slug": "jest",
+        "description": "Delightful JavaScript Testing",
+        "score": 1
+      }
+    ]
+  },
+  "399": {
+    "id": 399,
+    "slug": "ant-design",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 10
+      },
+      {
+        "id": 755,
+        "name": "stylelint",
+        "slug": "stylelint",
+        "description": "A mighty, modern CSS linter",
+        "score": 2
+      },
+      {
+        "id": 16401,
+        "name": "Jest",
+        "slug": "jest",
+        "description": "Delightful JavaScript Testing",
+        "score": 1
+      }
+    ]
+  },
+  "408": {
+    "id": 408,
+    "slug": "eme",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 10
+      },
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 9
+      },
+      {
+        "id": 903,
+        "name": "vue",
+        "slug": "vuejs",
+        "description": null,
+        "score": 8
+      },
+      {
+        "id": 13486,
+        "name": "electron",
+        "slug": "electron",
+        "description": "Build cross platform desktop apps with JavaScript, HTML, and CSS",
+        "score": 1
+      }
+    ]
+  },
+  "412": {
+    "id": 412,
+    "slug": "element",
+    "recommendations": [
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 12
+      },
+      {
+        "id": 903,
+        "name": "vue",
+        "slug": "vuejs",
+        "description": null,
+        "score": 5
+      },
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 4
+      },
+      {
+        "id": 125,
+        "name": "chaijs",
+        "slug": "chaijs",
+        "description": "Chai is a BDD / TDD assertion library for node and the browser that can be delightfully paired with any javascript testing framework.",
+        "score": 1
+      },
+      {
+        "id": 151,
+        "name": "cheerio",
+        "slug": "cheerio",
+        "description": "Fast, flexible, and lean implementation of core jQuery designed specifically for the server",
+        "score": 1
+      },
+      {
+        "id": 85,
+        "name": "GulpJS",
+        "slug": "gulpjs",
+        "description": "The streaming build system.",
+        "score": 1
+      },
+      {
+        "id": 14082,
+        "name": "html-webpack-plugin",
+        "slug": "html-webpack-plugin",
+        "description": null,
+        "score": 1
+      },
+      {
+        "id": 58,
+        "name": "MochaJS",
+        "slug": "mochajs",
+        "description": "simple, flexible, fun javascript test framework for node.js & the browser.",
+        "score": 1
+      },
+      {
+        "id": 470,
+        "name": "sinon",
+        "slug": "sinon",
+        "description": "",
+        "score": 1
+      }
+    ]
+  },
+  "414": {
+    "id": 414,
+    "slug": "go-plus",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 13
+      }
+    ]
+  },
+  "415": {
+    "id": 415,
+    "slug": "riot",
+    "recommendations": [
+      {
+        "id": 11743,
+        "name": "Rollup",
+        "slug": "rollup",
+        "description": "The JavaScript module bundler",
+        "score": 3
+      },
+      {
+        "id": 125,
+        "name": "chaijs",
+        "slug": "chaijs",
+        "description": "Chai is a BDD / TDD assertion library for node and the browser that can be delightfully paired with any javascript testing framework.",
+        "score": 1
+      },
+      {
+        "id": 151,
+        "name": "cheerio",
+        "slug": "cheerio",
+        "description": "Fast, flexible, and lean implementation of core jQuery designed specifically for the server",
+        "score": 1
+      },
+      {
+        "id": 58,
+        "name": "MochaJS",
+        "slug": "mochajs",
+        "description": "simple, flexible, fun javascript test framework for node.js & the browser.",
+        "score": 1
+      },
+      {
+        "id": 470,
+        "name": "sinon",
+        "slug": "sinon",
+        "description": "",
+        "score": 1
+      }
+    ]
+  },
+  "419": {
+    "id": 419,
+    "slug": "angular-socialshare",
+    "recommendations": [
+      {
+        "id": 85,
+        "name": "GulpJS",
+        "slug": "gulpjs",
+        "description": "The streaming build system.",
+        "score": 1
+      }
+    ]
+  },
+  "420": {
+    "id": 420,
+    "slug": "telegraf",
+    "recommendations": [
+      {
+        "id": 498,
+        "name": "debug",
+        "slug": "debug",
+        "description": null,
+        "score": 3
+      },
+      {
+        "id": 180,
+        "name": "AVA",
+        "slug": "ava",
+        "description": null,
+        "score": 1
+      }
+    ]
+  },
+  "421": {
+    "id": 421,
+    "slug": "ndm",
+    "recommendations": [
+      {
+        "id": 11743,
+        "name": "Rollup",
+        "slug": "rollup",
+        "description": "The JavaScript module bundler",
+        "score": 3
+      },
+      {
+        "id": 13486,
+        "name": "electron",
+        "slug": "electron",
+        "description": "Build cross platform desktop apps with JavaScript, HTML, and CSS",
+        "score": 2
+      },
+      {
+        "id": 85,
+        "name": "GulpJS",
+        "slug": "gulpjs",
+        "description": "The streaming build system.",
+        "score": 1
+      },
+      {
+        "id": 454,
+        "name": "pug",
+        "slug": "pug",
+        "description": "A powerful templating engine for node.js and the browser",
+        "score": 1
+      }
+    ]
+  },
+  "424": {
+    "id": 424,
+    "slug": "redux-saga",
+    "recommendations": [
+      {
+        "id": 11743,
+        "name": "Rollup",
+        "slug": "rollup",
+        "description": "The JavaScript module bundler",
+        "score": 5
+      },
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 3
+      },
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 3
+      }
+    ]
+  },
+  "425": {
+    "id": 425,
+    "slug": "grapesjs",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 4
+      },
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 2
+      },
+      {
+        "id": 125,
+        "name": "chaijs",
+        "slug": "chaijs",
+        "description": "Chai is a BDD / TDD assertion library for node and the browser that can be delightfully paired with any javascript testing framework.",
+        "score": 1
+      },
+      {
+        "id": 14082,
+        "name": "html-webpack-plugin",
+        "slug": "html-webpack-plugin",
+        "description": null,
+        "score": 1
+      },
+      {
+        "id": 58,
+        "name": "MochaJS",
+        "slug": "mochajs",
+        "description": "simple, flexible, fun javascript test framework for node.js & the browser.",
+        "score": 1
+      },
+      {
+        "id": 470,
+        "name": "sinon",
+        "slug": "sinon",
+        "description": "",
+        "score": 1
+      }
+    ]
+  },
+  "426": {
+    "id": 426,
+    "slug": "react-on-rails",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 10
+      },
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 1
+      }
+    ]
+  },
+  "433": {
+    "id": 433,
+    "slug": "telescope",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 16
+      },
+      {
+        "id": 16401,
+        "name": "Jest",
+        "slug": "jest",
+        "description": "Delightful JavaScript Testing",
+        "score": 1
+      },
+      {
+        "id": 10352,
+        "name": "nodemon",
+        "slug": "nodemon",
+        "description": "Nodemon is a utility that will monitor for any changes in your source and automatically restart your server. Perfect for rapid development. ",
+        "score": 1
+      }
+    ]
+  },
+  "434": {
+    "id": 434,
+    "slug": "react-toolbox",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 9
+      },
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 8
+      },
+      {
+        "id": 58,
+        "name": "MochaJS",
+        "slug": "mochajs",
+        "description": "simple, flexible, fun javascript test framework for node.js & the browser.",
+        "score": 1
+      },
+      {
+        "id": 470,
+        "name": "sinon",
+        "slug": "sinon",
+        "description": "",
+        "score": 1
+      }
+    ]
+  },
+  "436": {
+    "id": 436,
+    "slug": "material-ui",
+    "recommendations": [
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 6
+      },
+      {
+        "id": 11743,
+        "name": "Rollup",
+        "slug": "rollup",
+        "description": "The JavaScript module bundler",
+        "score": 5
+      },
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 4
+      },
+      {
+        "id": 125,
+        "name": "chaijs",
+        "slug": "chaijs",
+        "description": "Chai is a BDD / TDD assertion library for node and the browser that can be delightfully paired with any javascript testing framework.",
+        "score": 1
+      },
+      {
+        "id": 58,
+        "name": "MochaJS",
+        "slug": "mochajs",
+        "description": "simple, flexible, fun javascript test framework for node.js & the browser.",
+        "score": 1
+      },
+      {
+        "id": 470,
+        "name": "sinon",
+        "slug": "sinon",
+        "description": "",
+        "score": 1
+      }
+    ]
+  },
+  "440": {
+    "id": 440,
+    "slug": "date-fns",
+    "recommendations": [
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 3
+      },
+      {
+        "id": 58,
+        "name": "MochaJS",
+        "slug": "mochajs",
+        "description": "simple, flexible, fun javascript test framework for node.js & the browser.",
+        "score": 1
+      },
+      {
+        "id": 470,
+        "name": "sinon",
+        "slug": "sinon",
+        "description": "",
+        "score": 1
+      }
+    ]
+  },
+  "443": {
+    "id": 443,
+    "slug": "matterwiki",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 5
+      },
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 4
+      }
+    ]
+  },
+  "444": {
+    "id": 444,
+    "slug": "webslides",
+    "recommendations": [
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 7
+      },
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 5
+      },
+      {
+        "id": 16401,
+        "name": "Jest",
+        "slug": "jest",
+        "description": "Delightful JavaScript Testing",
+        "score": 2
+      }
+    ]
+  },
+  "445": {
+    "id": 445,
+    "slug": "feathers",
+    "recommendations": [
+      {
+        "id": 498,
+        "name": "debug",
+        "slug": "debug",
+        "description": null,
+        "score": 3
+      },
+      {
+        "id": 58,
+        "name": "MochaJS",
+        "slug": "mochajs",
+        "description": "simple, flexible, fun javascript test framework for node.js & the browser.",
+        "score": 1
+      }
+    ]
+  },
+  "454": {
+    "id": 454,
+    "slug": "pug",
+    "recommendations": [
+      {
+        "id": 16401,
+        "name": "Jest",
+        "slug": "jest",
+        "description": "Delightful JavaScript Testing",
+        "score": 1
+      }
+    ]
+  },
+  "456": {
+    "id": 456,
+    "slug": "openlayers",
+    "recommendations": [
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 3
+      },
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 1
+      },
+      {
+        "id": 14082,
+        "name": "html-webpack-plugin",
+        "slug": "html-webpack-plugin",
+        "description": null,
+        "score": 1
+      },
+      {
+        "id": 58,
+        "name": "MochaJS",
+        "slug": "mochajs",
+        "description": "simple, flexible, fun javascript test framework for node.js & the browser.",
+        "score": 1
+      },
+      {
+        "id": 470,
+        "name": "sinon",
+        "slug": "sinon",
+        "description": "",
+        "score": 1
+      }
+    ]
+  },
+  "460": {
+    "id": 460,
+    "slug": "react-dropzone",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 8
+      },
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 3
+      },
+      {
+        "id": 16401,
+        "name": "Jest",
+        "slug": "jest",
+        "description": "Delightful JavaScript Testing",
+        "score": 2
+      },
+      {
+        "id": 470,
+        "name": "sinon",
+        "slug": "sinon",
+        "description": "",
+        "score": 1
+      }
+    ]
+  },
+  "462": {
+    "id": 462,
+    "slug": "cerebro",
+    "recommendations": [
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 10
+      },
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 6
+      },
+      {
+        "id": 13486,
+        "name": "electron",
+        "slug": "electron",
+        "description": "Build cross platform desktop apps with JavaScript, HTML, and CSS",
+        "score": 2
+      },
+      {
+        "id": 125,
+        "name": "chaijs",
+        "slug": "chaijs",
+        "description": "Chai is a BDD / TDD assertion library for node and the browser that can be delightfully paired with any javascript testing framework.",
+        "score": 1
+      },
+      {
+        "id": 58,
+        "name": "MochaJS",
+        "slug": "mochajs",
+        "description": "simple, flexible, fun javascript test framework for node.js & the browser.",
+        "score": 1
+      },
+      {
+        "id": 470,
+        "name": "sinon",
+        "slug": "sinon",
+        "description": "",
+        "score": 1
+      }
+    ]
+  },
+  "463": {
+    "id": 463,
+    "slug": "skatejs",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 9
+      },
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 3
+      },
+      {
+        "id": 16401,
+        "name": "Jest",
+        "slug": "jest",
+        "description": "Delightful JavaScript Testing",
+        "score": 1
+      }
+    ]
+  },
+  "470": {
+    "id": 470,
+    "slug": "sinon",
+    "recommendations": [
+      {
+        "id": 58,
+        "name": "MochaJS",
+        "slug": "mochajs",
+        "description": "simple, flexible, fun javascript test framework for node.js & the browser.",
+        "score": 1
+      }
+    ]
+  },
+  "471": {
+    "id": 471,
+    "slug": "google-play-music-desktop-player-unofficial-",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 6
+      },
+      {
+        "id": 13486,
+        "name": "electron",
+        "slug": "electron",
+        "description": "Build cross platform desktop apps with JavaScript, HTML, and CSS",
+        "score": 3
+      },
+      {
+        "id": 125,
+        "name": "chaijs",
+        "slug": "chaijs",
+        "description": "Chai is a BDD / TDD assertion library for node and the browser that can be delightfully paired with any javascript testing framework.",
+        "score": 1
+      },
+      {
+        "id": 85,
+        "name": "GulpJS",
+        "slug": "gulpjs",
+        "description": "The streaming build system.",
+        "score": 1
+      },
+      {
+        "id": 58,
+        "name": "MochaJS",
+        "slug": "mochajs",
+        "description": "simple, flexible, fun javascript test framework for node.js & the browser.",
+        "score": 1
+      },
+      {
+        "id": 470,
+        "name": "sinon",
+        "slug": "sinon",
+        "description": "",
+        "score": 1
+      }
+    ]
+  },
+  "473": {
+    "id": 473,
+    "slug": "whitestormjs",
+    "recommendations": [
+      {
+        "id": 11743,
+        "name": "Rollup",
+        "slug": "rollup",
+        "description": "The JavaScript module bundler",
+        "score": 7
+      },
+      {
+        "id": 16401,
+        "name": "Jest",
+        "slug": "jest",
+        "description": "Delightful JavaScript Testing",
+        "score": 2
+      },
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 2
+      },
+      {
+        "id": 85,
+        "name": "GulpJS",
+        "slug": "gulpjs",
+        "description": "The streaming build system.",
+        "score": 1
+      },
+      {
+        "id": 58,
+        "name": "MochaJS",
+        "slug": "mochajs",
+        "description": "simple, flexible, fun javascript test framework for node.js & the browser.",
+        "score": 1
+      },
+      {
+        "id": 454,
+        "name": "pug",
+        "slug": "pug",
+        "description": "A powerful templating engine for node.js and the browser",
+        "score": 1
+      }
+    ]
+  },
+  "482": {
+    "id": 482,
+    "slug": "reactabular",
+    "recommendations": [
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 8
+      },
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 7
+      },
+      {
+        "id": 16401,
+        "name": "Jest",
+        "slug": "jest",
+        "description": "Delightful JavaScript Testing",
+        "score": 2
+      },
+      {
+        "id": 125,
+        "name": "chaijs",
+        "slug": "chaijs",
+        "description": "Chai is a BDD / TDD assertion library for node and the browser that can be delightfully paired with any javascript testing framework.",
+        "score": 1
+      },
+      {
+        "id": 14082,
+        "name": "html-webpack-plugin",
+        "slug": "html-webpack-plugin",
+        "description": null,
+        "score": 1
+      },
+      {
+        "id": 12353,
+        "name": "styled-components",
+        "slug": "styled-components",
+        "description": "Visual primitives for the component age. Use the best bits of ES6 and CSS to style your apps without stress 💅",
+        "score": 1
+      }
+    ]
+  },
+  "484": {
+    "id": 484,
+    "slug": "dim",
+    "recommendations": [
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 10
+      },
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 7
+      },
+      {
+        "id": 14082,
+        "name": "html-webpack-plugin",
+        "slug": "html-webpack-plugin",
+        "description": null,
+        "score": 1
+      }
+    ]
+  },
+  "492": {
+    "id": 492,
+    "slug": "colyseus",
+    "recommendations": [
+      {
+        "id": 498,
+        "name": "debug",
+        "slug": "debug",
+        "description": null,
+        "score": 3
+      },
+      {
+        "id": 58,
+        "name": "MochaJS",
+        "slug": "mochajs",
+        "description": "simple, flexible, fun javascript test framework for node.js & the browser.",
+        "score": 1
+      },
+      {
+        "id": 10352,
+        "name": "nodemon",
+        "slug": "nodemon",
+        "description": "Nodemon is a utility that will monitor for any changes in your source and automatically restart your server. Perfect for rapid development. ",
+        "score": 1
+      },
+      {
+        "id": 470,
+        "name": "sinon",
+        "slug": "sinon",
+        "description": "",
+        "score": 1
+      }
+    ]
+  },
+  "493": {
+    "id": 493,
+    "slug": "matterwiki2",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 5
+      },
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 4
+      }
+    ]
+  },
+  "498": {
+    "id": 498,
+    "slug": "debug",
+    "recommendations": [
+      {
+        "id": 125,
+        "name": "chaijs",
+        "slug": "chaijs",
+        "description": "Chai is a BDD / TDD assertion library for node and the browser that can be delightfully paired with any javascript testing framework.",
+        "score": 1
+      },
+      {
+        "id": 58,
+        "name": "MochaJS",
+        "slug": "mochajs",
+        "description": "simple, flexible, fun javascript test framework for node.js & the browser.",
+        "score": 1
+      },
+      {
+        "id": 470,
+        "name": "sinon",
+        "slug": "sinon",
+        "description": "",
+        "score": 1
+      }
+    ]
+  },
+  "503": {
+    "id": 503,
+    "slug": "cloudboost",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 3
+      },
+      {
+        "id": 11885,
+        "name": "Mongoose.js",
+        "slug": "mongoose",
+        "description": "The leading ODM for Node.js and MongoDB",
+        "score": 3
+      },
+      {
+        "id": 12010,
+        "name": "Nodemailer",
+        "slug": "nodemailer",
+        "description": "Module for Node.js applications to allow easy as cake email sending",
+        "score": 3
+      },
+      {
+        "id": 659,
+        "name": "socket.io",
+        "slug": "socketio",
+        "description": null,
+        "score": 3
+      },
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 3
+      },
+      {
+        "id": 125,
+        "name": "chaijs",
+        "slug": "chaijs",
+        "description": "Chai is a BDD / TDD assertion library for node and the browser that can be delightfully paired with any javascript testing framework.",
+        "score": 1
+      },
+      {
+        "id": 58,
+        "name": "MochaJS",
+        "slug": "mochajs",
+        "description": "simple, flexible, fun javascript test framework for node.js & the browser.",
+        "score": 1
+      }
+    ]
+  },
+  "505": {
+    "id": 505,
+    "slug": "colmena",
+    "recommendations": [
+      {
+        "id": 10352,
+        "name": "nodemon",
+        "slug": "nodemon",
+        "description": "Nodemon is a utility that will monitor for any changes in your source and automatically restart your server. Perfect for rapid development. ",
+        "score": 1
+      }
+    ]
+  },
+  "508": {
+    "id": 508,
+    "slug": "fakerjs",
+    "recommendations": [
+      {
+        "id": 85,
+        "name": "GulpJS",
+        "slug": "gulpjs",
+        "description": "The streaming build system.",
+        "score": 1
+      },
+      {
+        "id": 58,
+        "name": "MochaJS",
+        "slug": "mochajs",
+        "description": "simple, flexible, fun javascript test framework for node.js & the browser.",
+        "score": 1
+      },
+      {
+        "id": 470,
+        "name": "sinon",
+        "slug": "sinon",
+        "description": "",
+        "score": 1
+      }
+    ]
+  },
+  "529": {
+    "id": 529,
+    "slug": "firekylin",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 10
+      },
+      {
+        "id": 12010,
+        "name": "Nodemailer",
+        "slug": "nodemailer",
+        "description": "Module for Node.js applications to allow easy as cake email sending",
+        "score": 3
+      },
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 3
+      },
+      {
+        "id": 180,
+        "name": "AVA",
+        "slug": "ava",
+        "description": null,
+        "score": 1
+      }
+    ]
+  },
+  "531": {
+    "id": 531,
+    "slug": "trails",
+    "recommendations": [
+      {
+        "id": 58,
+        "name": "MochaJS",
+        "slug": "mochajs",
+        "description": "simple, flexible, fun javascript test framework for node.js & the browser.",
+        "score": 1
+      }
+    ]
+  },
+  "534": {
+    "id": 534,
+    "slug": "vue-admin",
+    "recommendations": [
+      {
+        "id": 903,
+        "name": "vue",
+        "slug": "vuejs",
+        "description": null,
+        "score": 11
+      },
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 10
+      },
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 5
+      },
+      {
+        "id": 14082,
+        "name": "html-webpack-plugin",
+        "slug": "html-webpack-plugin",
+        "description": null,
+        "score": 1
+      }
+    ]
+  },
+  "539": {
+    "id": 539,
+    "slug": "dockerio",
+    "recommendations": [
+      {
+        "id": 125,
+        "name": "chaijs",
+        "slug": "chaijs",
+        "description": "Chai is a BDD / TDD assertion library for node and the browser that can be delightfully paired with any javascript testing framework.",
+        "score": 1
+      },
+      {
+        "id": 58,
+        "name": "MochaJS",
+        "slug": "mochajs",
+        "description": "simple, flexible, fun javascript test framework for node.js & the browser.",
+        "score": 1
+      }
+    ]
+  },
+  "543": {
+    "id": 543,
+    "slug": "fine-uploader",
+    "recommendations": [
+      {
+        "id": 58,
+        "name": "MochaJS",
+        "slug": "mochajs",
+        "description": "simple, flexible, fun javascript test framework for node.js & the browser.",
+        "score": 1
+      }
+    ]
+  },
+  "545": {
+    "id": 545,
+    "slug": "vux",
+    "recommendations": [
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 11
+      },
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 6
+      },
+      {
+        "id": 903,
+        "name": "vue",
+        "slug": "vuejs",
+        "description": null,
+        "score": 4
+      },
+      {
+        "id": 14082,
+        "name": "html-webpack-plugin",
+        "slug": "html-webpack-plugin",
+        "description": null,
+        "score": 1
+      }
+    ]
+  },
+  "551": {
+    "id": 551,
+    "slug": "octotree",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 3
+      },
+      {
+        "id": 85,
+        "name": "GulpJS",
+        "slug": "gulpjs",
+        "description": "The streaming build system.",
+        "score": 2
+      },
+      {
+        "id": 58,
+        "name": "MochaJS",
+        "slug": "mochajs",
+        "description": "simple, flexible, fun javascript test framework for node.js & the browser.",
+        "score": 1
+      }
+    ]
+  },
+  "552": {
+    "id": 552,
+    "slug": "weather-10kb",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 1
+      },
+      {
+        "id": 125,
+        "name": "chaijs",
+        "slug": "chaijs",
+        "description": "Chai is a BDD / TDD assertion library for node and the browser that can be delightfully paired with any javascript testing framework.",
+        "score": 1
+      },
+      {
+        "id": 58,
+        "name": "MochaJS",
+        "slug": "mochajs",
+        "description": "simple, flexible, fun javascript test framework for node.js & the browser.",
+        "score": 1
+      },
+      {
+        "id": 10352,
+        "name": "nodemon",
+        "slug": "nodemon",
+        "description": "Nodemon is a utility that will monitor for any changes in your source and automatically restart your server. Perfect for rapid development. ",
+        "score": 1
+      },
+      {
+        "id": 470,
+        "name": "sinon",
+        "slug": "sinon",
+        "description": "",
+        "score": 1
+      }
+    ]
+  },
+  "555": {
+    "id": 555,
+    "slug": "electron-react-boilerplate",
+    "recommendations": [
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 11
+      },
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 8
+      },
+      {
+        "id": 13486,
+        "name": "electron",
+        "slug": "electron",
+        "description": "Build cross platform desktop apps with JavaScript, HTML, and CSS",
+        "score": 2
+      },
+      {
+        "id": 16401,
+        "name": "Jest",
+        "slug": "jest",
+        "description": "Delightful JavaScript Testing",
+        "score": 2
+      },
+      {
+        "id": 755,
+        "name": "stylelint",
+        "slug": "stylelint",
+        "description": "A mighty, modern CSS linter",
+        "score": 2
+      },
+      {
+        "id": 470,
+        "name": "sinon",
+        "slug": "sinon",
+        "description": "",
+        "score": 1
+      }
+    ]
+  },
+  "559": {
+    "id": 559,
+    "slug": "offline-plugin",
+    "recommendations": [
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 2
+      },
+      {
+        "id": 58,
+        "name": "MochaJS",
+        "slug": "mochajs",
+        "description": "simple, flexible, fun javascript test framework for node.js & the browser.",
+        "score": 1
+      }
+    ]
+  },
+  "562": {
+    "id": 562,
+    "slug": "voca",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 5
+      },
+      {
+        "id": 11743,
+        "name": "Rollup",
+        "slug": "rollup",
+        "description": "The JavaScript module bundler",
+        "score": 3
+      },
+      {
+        "id": 125,
+        "name": "chaijs",
+        "slug": "chaijs",
+        "description": "Chai is a BDD / TDD assertion library for node and the browser that can be delightfully paired with any javascript testing framework.",
+        "score": 1
+      },
+      {
+        "id": 58,
+        "name": "MochaJS",
+        "slug": "mochajs",
+        "description": "simple, flexible, fun javascript test framework for node.js & the browser.",
+        "score": 1
+      }
+    ]
+  },
+  "569": {
+    "id": 569,
+    "slug": "ream",
+    "recommendations": [
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 18
+      },
+      {
+        "id": 903,
+        "name": "vue",
+        "slug": "vuejs",
+        "description": null,
+        "score": 13
+      },
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 6
+      }
+    ]
+  },
+  "570": {
+    "id": 570,
+    "slug": "docute",
+    "recommendations": [
+      {
+        "id": 903,
+        "name": "vue",
+        "slug": "vuejs",
+        "description": null,
+        "score": 9
+      },
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 2
+      },
+      {
+        "id": 16401,
+        "name": "Jest",
+        "slug": "jest",
+        "description": "Delightful JavaScript Testing",
+        "score": 2
+      },
+      {
+        "id": 11743,
+        "name": "Rollup",
+        "slug": "rollup",
+        "description": "The JavaScript module bundler",
+        "score": 2
+      }
+    ]
+  },
+  "576": {
+    "id": 576,
+    "slug": "laravel-gitscrum",
+    "recommendations": [
+      {
+        "id": 85,
+        "name": "GulpJS",
+        "slug": "gulpjs",
+        "description": "The streaming build system.",
+        "score": 1
+      }
+    ]
+  },
+  "580": {
+    "id": 580,
+    "slug": "babel",
+    "recommendations": [
+      {
+        "id": 85,
+        "name": "GulpJS",
+        "slug": "gulpjs",
+        "description": "The streaming build system.",
+        "score": 2
+      },
+      {
+        "id": 16401,
+        "name": "Jest",
+        "slug": "jest",
+        "description": "Delightful JavaScript Testing",
+        "score": 2
+      },
+      {
+        "id": 11743,
+        "name": "Rollup",
+        "slug": "rollup",
+        "description": "The JavaScript module bundler",
+        "score": 2
+      },
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 1
+      }
+    ]
+  },
+  "586": {
+    "id": 586,
+    "slug": "ax5ui-kernel",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 3
+      },
+      {
+        "id": 85,
+        "name": "GulpJS",
+        "slug": "gulpjs",
+        "description": "The streaming build system.",
+        "score": 2
+      },
+      {
+        "id": 58,
+        "name": "MochaJS",
+        "slug": "mochajs",
+        "description": "simple, flexible, fun javascript test framework for node.js & the browser.",
+        "score": 1
+      }
+    ]
+  },
+  "587": {
+    "id": 587,
+    "slug": "ax-boot-framework",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 3
+      },
+      {
+        "id": 85,
+        "name": "GulpJS",
+        "slug": "gulpjs",
+        "description": "The streaming build system.",
+        "score": 2
+      }
+    ]
+  },
+  "588": {
+    "id": 588,
+    "slug": "hexo",
+    "recommendations": [
+      {
+        "id": 151,
+        "name": "cheerio",
+        "slug": "cheerio",
+        "description": "Fast, flexible, and lean implementation of core jQuery designed specifically for the server",
+        "score": 3
+      },
+      {
+        "id": 125,
+        "name": "chaijs",
+        "slug": "chaijs",
+        "description": "Chai is a BDD / TDD assertion library for node and the browser that can be delightfully paired with any javascript testing framework.",
+        "score": 1
+      },
+      {
+        "id": 58,
+        "name": "MochaJS",
+        "slug": "mochajs",
+        "description": "simple, flexible, fun javascript test framework for node.js & the browser.",
+        "score": 1
+      },
+      {
+        "id": 470,
+        "name": "sinon",
+        "slug": "sinon",
+        "description": "",
+        "score": 1
+      }
+    ]
+  },
+  "592": {
+    "id": 592,
+    "slug": "bower",
+    "recommendations": [
+      {
+        "id": 125,
+        "name": "chaijs",
+        "slug": "chaijs",
+        "description": "Chai is a BDD / TDD assertion library for node and the browser that can be delightfully paired with any javascript testing framework.",
+        "score": 1
+      },
+      {
+        "id": 58,
+        "name": "MochaJS",
+        "slug": "mochajs",
+        "description": "simple, flexible, fun javascript test framework for node.js & the browser.",
+        "score": 1
+      }
+    ]
+  },
+  "595": {
+    "id": 595,
+    "slug": "react-native-elements",
+    "recommendations": [
+      {
+        "id": 16401,
+        "name": "Jest",
+        "slug": "jest",
+        "description": "Delightful JavaScript Testing",
+        "score": 2
+      },
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 2
+      }
+    ]
+  },
+  "613": {
+    "id": 613,
+    "slug": "karma-typescript",
+    "recommendations": [
+      {
+        "id": 85,
+        "name": "GulpJS",
+        "slug": "gulpjs",
+        "description": "The streaming build system.",
+        "score": 1
+      },
+      {
+        "id": 470,
+        "name": "sinon",
+        "slug": "sinon",
+        "description": "",
+        "score": 1
+      }
+    ]
+  },
+  "620": {
+    "id": 620,
+    "slug": "mastodon-me-uk",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 25
+      },
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 22
+      },
+      {
+        "id": 16401,
+        "name": "Jest",
+        "slug": "jest",
+        "description": "Delightful JavaScript Testing",
+        "score": 1
+      }
+    ]
+  },
+  "623": {
+    "id": 623,
+    "slug": "strider",
+    "recommendations": [
+      {
+        "id": 498,
+        "name": "debug",
+        "slug": "debug",
+        "description": null,
+        "score": 3
+      },
+      {
+        "id": 11885,
+        "name": "Mongoose.js",
+        "slug": "mongoose",
+        "description": "The leading ODM for Node.js and MongoDB",
+        "score": 3
+      },
+      {
+        "id": 454,
+        "name": "pug",
+        "slug": "pug",
+        "description": "A powerful templating engine for node.js and the browser",
+        "score": 3
+      },
+      {
+        "id": 659,
+        "name": "socket.io",
+        "slug": "socketio",
+        "description": null,
+        "score": 3
+      },
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 1
+      },
+      {
+        "id": 125,
+        "name": "chaijs",
+        "slug": "chaijs",
+        "description": "Chai is a BDD / TDD assertion library for node and the browser that can be delightfully paired with any javascript testing framework.",
+        "score": 1
+      },
+      {
+        "id": 58,
+        "name": "MochaJS",
+        "slug": "mochajs",
+        "description": "simple, flexible, fun javascript test framework for node.js & the browser.",
+        "score": 1
+      },
+      {
+        "id": 470,
+        "name": "sinon",
+        "slug": "sinon",
+        "description": "",
+        "score": 1
+      }
+    ]
+  },
+  "642": {
+    "id": 642,
+    "slug": "sizzy",
+    "recommendations": [
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 8
+      },
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 7
+      },
+      {
+        "id": 12353,
+        "name": "styled-components",
+        "slug": "styled-components",
+        "description": "Visual primitives for the component age. Use the best bits of ES6 and CSS to style your apps without stress 💅",
+        "score": 3
+      },
+      {
+        "id": 13486,
+        "name": "electron",
+        "slug": "electron",
+        "description": "Build cross platform desktop apps with JavaScript, HTML, and CSS",
+        "score": 2
+      },
+      {
+        "id": 16401,
+        "name": "Jest",
+        "slug": "jest",
+        "description": "Delightful JavaScript Testing",
+        "score": 2
+      },
+      {
+        "id": 14082,
+        "name": "html-webpack-plugin",
+        "slug": "html-webpack-plugin",
+        "description": null,
+        "score": 1
+      }
+    ]
+  },
+  "644": {
+    "id": 644,
+    "slug": "color-space",
+    "recommendations": [
+      {
+        "id": 58,
+        "name": "MochaJS",
+        "slug": "mochajs",
+        "description": "simple, flexible, fun javascript test framework for node.js & the browser.",
+        "score": 1
+      }
+    ]
+  },
+  "645": {
+    "id": 645,
+    "slug": "lumo",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 6
+      },
+      {
+        "id": 11743,
+        "name": "Rollup",
+        "slug": "rollup",
+        "description": "The JavaScript module bundler",
+        "score": 5
+      },
+      {
+        "id": 16401,
+        "name": "Jest",
+        "slug": "jest",
+        "description": "Delightful JavaScript Testing",
+        "score": 1
+      }
+    ]
+  },
+  "646": {
+    "id": 646,
+    "slug": "jss",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 10
+      },
+      {
+        "id": 11743,
+        "name": "Rollup",
+        "slug": "rollup",
+        "description": "The JavaScript module bundler",
+        "score": 6
+      },
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 3
+      },
+      {
+        "id": 58,
+        "name": "MochaJS",
+        "slug": "mochajs",
+        "description": "simple, flexible, fun javascript test framework for node.js & the browser.",
+        "score": 1
+      }
+    ]
+  },
+  "652": {
+    "id": 652,
+    "slug": "selection-sharer",
+    "recommendations": [
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 3
+      }
+    ]
+  },
+  "653": {
+    "id": 653,
+    "slug": "nuxtjs",
+    "recommendations": [
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 29
+      },
+      {
+        "id": 903,
+        "name": "vue",
+        "slug": "vuejs",
+        "description": null,
+        "score": 15
+      },
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 8
+      },
+      {
+        "id": 498,
+        "name": "debug",
+        "slug": "debug",
+        "description": null,
+        "score": 3
+      },
+      {
+        "id": 14082,
+        "name": "html-webpack-plugin",
+        "slug": "html-webpack-plugin",
+        "description": null,
+        "score": 3
+      },
+      {
+        "id": 180,
+        "name": "AVA",
+        "slug": "ava",
+        "description": null,
+        "score": 1
+      },
+      {
+        "id": 470,
+        "name": "sinon",
+        "slug": "sinon",
+        "description": "",
+        "score": 1
+      }
+    ]
+  },
+  "657": {
+    "id": 657,
+    "slug": "universalviewer",
+    "recommendations": [
+      {
+        "id": 125,
+        "name": "chaijs",
+        "slug": "chaijs",
+        "description": "Chai is a BDD / TDD assertion library for node and the browser that can be delightfully paired with any javascript testing framework.",
+        "score": 1
+      },
+      {
+        "id": 16401,
+        "name": "Jest",
+        "slug": "jest",
+        "description": "Delightful JavaScript Testing",
+        "score": 1
+      }
+    ]
+  },
+  "659": {
+    "id": 659,
+    "slug": "socketio",
+    "recommendations": [
+      {
+        "id": 498,
+        "name": "debug",
+        "slug": "debug",
+        "description": null,
+        "score": 3
+      },
+      {
+        "id": 58,
+        "name": "MochaJS",
+        "slug": "mochajs",
+        "description": "simple, flexible, fun javascript test framework for node.js & the browser.",
+        "score": 1
+      }
+    ]
+  },
+  "663": {
+    "id": 663,
+    "slug": "sierra",
+    "recommendations": [
+      {
+        "id": 85,
+        "name": "GulpJS",
+        "slug": "gulpjs",
+        "description": "The streaming build system.",
+        "score": 2
+      }
+    ]
+  },
+  "664": {
+    "id": 664,
+    "slug": "parse-server",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 6
+      },
+      {
+        "id": 10352,
+        "name": "nodemon",
+        "slug": "nodemon",
+        "description": "Nodemon is a utility that will monitor for any changes in your source and automatically restart your server. Perfect for rapid development. ",
+        "score": 1
+      }
+    ]
+  },
+  "666": {
+    "id": 666,
+    "slug": "mimic",
+    "recommendations": [
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 8
+      },
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 6
+      },
+      {
+        "id": 12353,
+        "name": "styled-components",
+        "slug": "styled-components",
+        "description": "Visual primitives for the component age. Use the best bits of ES6 and CSS to style your apps without stress 💅",
+        "score": 1
+      }
+    ]
+  },
+  "667": {
+    "id": 667,
+    "slug": "kaku",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 4
+      },
+      {
+        "id": 13486,
+        "name": "electron",
+        "slug": "electron",
+        "description": "Build cross platform desktop apps with JavaScript, HTML, and CSS",
+        "score": 4
+      },
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 2
+      },
+      {
+        "id": 125,
+        "name": "chaijs",
+        "slug": "chaijs",
+        "description": "Chai is a BDD / TDD assertion library for node and the browser that can be delightfully paired with any javascript testing framework.",
+        "score": 1
+      },
+      {
+        "id": 58,
+        "name": "MochaJS",
+        "slug": "mochajs",
+        "description": "simple, flexible, fun javascript test framework for node.js & the browser.",
+        "score": 1
+      },
+      {
+        "id": 470,
+        "name": "sinon",
+        "slug": "sinon",
+        "description": "",
+        "score": 1
+      }
+    ]
+  },
+  "676": {
+    "id": 676,
+    "slug": "storybook",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 7
+      },
+      {
+        "id": 16401,
+        "name": "Jest",
+        "slug": "jest",
+        "description": "Delightful JavaScript Testing",
+        "score": 1
+      }
+    ]
+  },
+  "681": {
+    "id": 681,
+    "slug": "research-engine",
+    "recommendations": [
+      {
+        "id": 151,
+        "name": "cheerio",
+        "slug": "cheerio",
+        "description": "Fast, flexible, and lean implementation of core jQuery designed specifically for the server",
+        "score": 3
+      }
+    ]
+  },
+  "683": {
+    "id": 683,
+    "slug": "nest",
+    "recommendations": [
+      {
+        "id": 659,
+        "name": "socket.io",
+        "slug": "socketio",
+        "description": null,
+        "score": 3
+      },
+      {
+        "id": 125,
+        "name": "chaijs",
+        "slug": "chaijs",
+        "description": "Chai is a BDD / TDD assertion library for node and the browser that can be delightfully paired with any javascript testing framework.",
+        "score": 1
+      },
+      {
+        "id": 85,
+        "name": "GulpJS",
+        "slug": "gulpjs",
+        "description": "The streaming build system.",
+        "score": 1
+      },
+      {
+        "id": 58,
+        "name": "MochaJS",
+        "slug": "mochajs",
+        "description": "simple, flexible, fun javascript test framework for node.js & the browser.",
+        "score": 1
+      },
+      {
+        "id": 10352,
+        "name": "nodemon",
+        "slug": "nodemon",
+        "description": "Nodemon is a utility that will monitor for any changes in your source and automatically restart your server. Perfect for rapid development. ",
+        "score": 1
+      },
+      {
+        "id": 470,
+        "name": "sinon",
+        "slug": "sinon",
+        "description": "",
+        "score": 1
+      },
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 1
+      }
+    ]
+  },
+  "684": {
+    "id": 684,
+    "slug": "fuse-box",
+    "recommendations": [
+      {
+        "id": 151,
+        "name": "cheerio",
+        "slug": "cheerio",
+        "description": "Fast, flexible, and lean implementation of core jQuery designed specifically for the server",
+        "score": 1
+      },
+      {
+        "id": 85,
+        "name": "GulpJS",
+        "slug": "gulpjs",
+        "description": "The streaming build system.",
+        "score": 1
+      },
+      {
+        "id": 58,
+        "name": "MochaJS",
+        "slug": "mochajs",
+        "description": "simple, flexible, fun javascript test framework for node.js & the browser.",
+        "score": 1
+      },
+      {
+        "id": 470,
+        "name": "sinon",
+        "slug": "sinon",
+        "description": "",
+        "score": 1
+      }
+    ]
+  },
+  "686": {
+    "id": 686,
+    "slug": "react-native-camera",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 1
+      }
+    ]
+  },
+  "687": {
+    "id": 687,
+    "slug": "react-ace",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 8
+      },
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 3
+      },
+      {
+        "id": 125,
+        "name": "chaijs",
+        "slug": "chaijs",
+        "description": "Chai is a BDD / TDD assertion library for node and the browser that can be delightfully paired with any javascript testing framework.",
+        "score": 1
+      },
+      {
+        "id": 58,
+        "name": "MochaJS",
+        "slug": "mochajs",
+        "description": "simple, flexible, fun javascript test framework for node.js & the browser.",
+        "score": 1
+      },
+      {
+        "id": 470,
+        "name": "sinon",
+        "slug": "sinon",
+        "description": "",
+        "score": 1
+      }
+    ]
+  },
+  "688": {
+    "id": 688,
+    "slug": "librenms",
+    "recommendations": [
+      {
+        "id": 903,
+        "name": "vue",
+        "slug": "vuejs",
+        "description": null,
+        "score": 1
+      }
+    ]
+  },
+  "689": {
+    "id": 689,
+    "slug": "javascript-obfuscator",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 2
+      },
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 2
+      },
+      {
+        "id": 125,
+        "name": "chaijs",
+        "slug": "chaijs",
+        "description": "Chai is a BDD / TDD assertion library for node and the browser that can be delightfully paired with any javascript testing framework.",
+        "score": 1
+      },
+      {
+        "id": 58,
+        "name": "MochaJS",
+        "slug": "mochajs",
+        "description": "simple, flexible, fun javascript test framework for node.js & the browser.",
+        "score": 1
+      },
+      {
+        "id": 470,
+        "name": "sinon",
+        "slug": "sinon",
+        "description": "",
+        "score": 1
+      }
+    ]
+  },
+  "695": {
+    "id": 695,
+    "slug": "modular-admin",
+    "recommendations": [
+      {
+        "id": 85,
+        "name": "GulpJS",
+        "slug": "gulpjs",
+        "description": "The streaming build system.",
+        "score": 2
+      }
+    ]
+  },
+  "698": {
+    "id": 698,
+    "slug": "distributed",
+    "recommendations": [
+      {
+        "id": 125,
+        "name": "chaijs",
+        "slug": "chaijs",
+        "description": "Chai is a BDD / TDD assertion library for node and the browser that can be delightfully paired with any javascript testing framework.",
+        "score": 1
+      },
+      {
+        "id": 85,
+        "name": "GulpJS",
+        "slug": "gulpjs",
+        "description": "The streaming build system.",
+        "score": 1
+      },
+      {
+        "id": 58,
+        "name": "MochaJS",
+        "slug": "mochajs",
+        "description": "simple, flexible, fun javascript test framework for node.js & the browser.",
+        "score": 1
+      },
+      {
+        "id": 470,
+        "name": "sinon",
+        "slug": "sinon",
+        "description": "",
+        "score": 1
+      },
+      {
+        "id": 755,
+        "name": "stylelint",
+        "slug": "stylelint",
+        "description": "A mighty, modern CSS linter",
+        "score": 1
+      }
+    ]
+  },
+  "700": {
+    "id": 700,
+    "slug": "hedron",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 8
+      },
+      {
+        "id": 11743,
+        "name": "Rollup",
+        "slug": "rollup",
+        "description": "The JavaScript module bundler",
+        "score": 7
+      },
+      {
+        "id": 16401,
+        "name": "Jest",
+        "slug": "jest",
+        "description": "Delightful JavaScript Testing",
+        "score": 2
+      },
+      {
+        "id": 12353,
+        "name": "styled-components",
+        "slug": "styled-components",
+        "description": "Visual primitives for the component age. Use the best bits of ES6 and CSS to style your apps without stress 💅",
+        "score": 2
+      }
+    ]
+  },
+  "702": {
+    "id": 702,
+    "slug": "react-pdf",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 6
+      },
+      {
+        "id": 16401,
+        "name": "Jest",
+        "slug": "jest",
+        "description": "Delightful JavaScript Testing",
+        "score": 4
+      }
+    ]
+  },
+  "736": {
+    "id": 736,
+    "slug": "pokeapi",
+    "recommendations": [
+      {
+        "id": 85,
+        "name": "GulpJS",
+        "slug": "gulpjs",
+        "description": "The streaming build system.",
+        "score": 3
+      }
+    ]
+  },
+  "738": {
+    "id": 738,
+    "slug": "t-scroll",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 2
+      },
+      {
+        "id": 85,
+        "name": "GulpJS",
+        "slug": "gulpjs",
+        "description": "The streaming build system.",
+        "score": 1
+      }
+    ]
+  },
+  "740": {
+    "id": 740,
+    "slug": "speedtracker",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 6
+      },
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 2
+      }
+    ]
+  },
+  "745": {
+    "id": 745,
+    "slug": "react-redux-firebase",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 11
+      },
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 2
+      },
+      {
+        "id": 125,
+        "name": "chaijs",
+        "slug": "chaijs",
+        "description": "Chai is a BDD / TDD assertion library for node and the browser that can be delightfully paired with any javascript testing framework.",
+        "score": 1
+      },
+      {
+        "id": 58,
+        "name": "MochaJS",
+        "slug": "mochajs",
+        "description": "simple, flexible, fun javascript test framework for node.js & the browser.",
+        "score": 1
+      },
+      {
+        "id": 470,
+        "name": "sinon",
+        "slug": "sinon",
+        "description": "",
+        "score": 1
+      }
+    ]
+  },
+  "755": {
+    "id": 755,
+    "slug": "stylelint",
+    "recommendations": [
+      {
+        "id": 498,
+        "name": "debug",
+        "slug": "debug",
+        "description": null,
+        "score": 3
+      },
+      {
+        "id": 16401,
+        "name": "Jest",
+        "slug": "jest",
+        "description": "Delightful JavaScript Testing",
+        "score": 1
+      }
+    ]
+  },
+  "761": {
+    "id": 761,
+    "slug": "react-native-router-flux",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 2
+      },
+      {
+        "id": 16401,
+        "name": "Jest",
+        "slug": "jest",
+        "description": "Delightful JavaScript Testing",
+        "score": 2
+      }
+    ]
+  },
+  "763": {
+    "id": 763,
+    "slug": "yakkee",
+    "recommendations": [
+      {
+        "id": 58,
+        "name": "MochaJS",
+        "slug": "mochajs",
+        "description": "simple, flexible, fun javascript test framework for node.js & the browser.",
+        "score": 3
+      },
+      {
+        "id": 11885,
+        "name": "Mongoose.js",
+        "slug": "mongoose",
+        "description": "The leading ODM for Node.js and MongoDB",
+        "score": 3
+      },
+      {
+        "id": 12010,
+        "name": "Nodemailer",
+        "slug": "nodemailer",
+        "description": "Module for Node.js applications to allow easy as cake email sending",
+        "score": 3
+      },
+      {
+        "id": 659,
+        "name": "socket.io",
+        "slug": "socketio",
+        "description": null,
+        "score": 3
+      },
+      {
+        "id": 85,
+        "name": "GulpJS",
+        "slug": "gulpjs",
+        "description": "The streaming build system.",
+        "score": 2
+      }
+    ]
+  },
+  "780": {
+    "id": 780,
+    "slug": "ngrx",
+    "recommendations": [
+      {
+        "id": 16401,
+        "name": "Jest",
+        "slug": "jest",
+        "description": "Delightful JavaScript Testing",
+        "score": 1
+      },
+      {
+        "id": 11743,
+        "name": "Rollup",
+        "slug": "rollup",
+        "description": "The JavaScript module bundler",
+        "score": 1
+      }
+    ]
+  },
+  "788": {
+    "id": 788,
+    "slug": "beaker",
+    "recommendations": [
+      {
+        "id": 13486,
+        "name": "electron",
+        "slug": "electron",
+        "description": "Build cross platform desktop apps with JavaScript, HTML, and CSS",
+        "score": 2
+      },
+      {
+        "id": 85,
+        "name": "GulpJS",
+        "slug": "gulpjs",
+        "description": "The streaming build system.",
+        "score": 2
+      },
+      {
+        "id": 11743,
+        "name": "Rollup",
+        "slug": "rollup",
+        "description": "The JavaScript module bundler",
+        "score": 1
+      }
+    ]
+  },
+  "795": {
+    "id": 795,
+    "slug": "ava-ia",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 7
+      },
+      {
+        "id": 125,
+        "name": "chaijs",
+        "slug": "chaijs",
+        "description": "Chai is a BDD / TDD assertion library for node and the browser that can be delightfully paired with any javascript testing framework.",
+        "score": 1
+      },
+      {
+        "id": 58,
+        "name": "MochaJS",
+        "slug": "mochajs",
+        "description": "simple, flexible, fun javascript test framework for node.js & the browser.",
+        "score": 1
+      }
+    ]
+  },
+  "807": {
+    "id": 807,
+    "slug": "lolashare",
+    "recommendations": [
+      {
+        "id": 13486,
+        "name": "electron",
+        "slug": "electron",
+        "description": "Build cross platform desktop apps with JavaScript, HTML, and CSS",
+        "score": 3
+      }
+    ]
+  },
+  "833": {
+    "id": 833,
+    "slug": "jsonmvc",
+    "recommendations": [
+      {
+        "id": 11743,
+        "name": "Rollup",
+        "slug": "rollup",
+        "description": "The JavaScript module bundler",
+        "score": 7
+      },
+      {
+        "id": 903,
+        "name": "vue",
+        "slug": "vuejs",
+        "description": null,
+        "score": 3
+      },
+      {
+        "id": 16401,
+        "name": "Jest",
+        "slug": "jest",
+        "description": "Delightful JavaScript Testing",
+        "score": 2
+      },
+      {
+        "id": 85,
+        "name": "GulpJS",
+        "slug": "gulpjs",
+        "description": "The streaming build system.",
+        "score": 1
+      }
+    ]
+  },
+  "847": {
+    "id": 847,
+    "slug": "poi",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 4
+      },
+      {
+        "id": 13486,
+        "name": "electron",
+        "slug": "electron",
+        "description": "Build cross platform desktop apps with JavaScript, HTML, and CSS",
+        "score": 2
+      },
+      {
+        "id": 755,
+        "name": "stylelint",
+        "slug": "stylelint",
+        "description": "A mighty, modern CSS linter",
+        "score": 2
+      },
+      {
+        "id": 85,
+        "name": "GulpJS",
+        "slug": "gulpjs",
+        "description": "The streaming build system.",
+        "score": 1
+      },
+      {
+        "id": 58,
+        "name": "MochaJS",
+        "slug": "mochajs",
+        "description": "simple, flexible, fun javascript test framework for node.js & the browser.",
+        "score": 1
+      }
+    ]
+  },
+  "860": {
+    "id": 860,
+    "slug": "grow-iot",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 4
+      },
+      {
+        "id": 125,
+        "name": "chaijs",
+        "slug": "chaijs",
+        "description": "Chai is a BDD / TDD assertion library for node and the browser that can be delightfully paired with any javascript testing framework.",
+        "score": 3
+      }
+    ]
+  },
+  "863": {
+    "id": 863,
+    "slug": "meteor-up",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 9
+      },
+      {
+        "id": 498,
+        "name": "debug",
+        "slug": "debug",
+        "description": null,
+        "score": 3
+      },
+      {
+        "id": 755,
+        "name": "stylelint",
+        "slug": "stylelint",
+        "description": "A mighty, modern CSS linter",
+        "score": 2
+      },
+      {
+        "id": 125,
+        "name": "chaijs",
+        "slug": "chaijs",
+        "description": "Chai is a BDD / TDD assertion library for node and the browser that can be delightfully paired with any javascript testing framework.",
+        "score": 1
+      },
+      {
+        "id": 58,
+        "name": "MochaJS",
+        "slug": "mochajs",
+        "description": "simple, flexible, fun javascript test framework for node.js & the browser.",
+        "score": 1
+      },
+      {
+        "id": 470,
+        "name": "sinon",
+        "slug": "sinon",
+        "description": "",
+        "score": 1
+      }
+    ]
+  },
+  "866": {
+    "id": 866,
+    "slug": "moro",
+    "recommendations": [
+      {
+        "id": 180,
+        "name": "AVA",
+        "slug": "ava",
+        "description": null,
+        "score": 1
+      }
+    ]
+  },
+  "867": {
+    "id": 867,
+    "slug": "esdiscuss",
+    "recommendations": [
+      {
+        "id": 454,
+        "name": "pug",
+        "slug": "pug",
+        "description": "A powerful templating engine for node.js and the browser",
+        "score": 3
+      }
+    ]
+  },
+  "870": {
+    "id": 870,
+    "slug": "hyperline",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 5
+      },
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 5
+      },
+      {
+        "id": 16401,
+        "name": "Jest",
+        "slug": "jest",
+        "description": "Delightful JavaScript Testing",
+        "score": 2
+      }
+    ]
+  },
+  "886": {
+    "id": 886,
+    "slug": "fela",
+    "recommendations": [
+      {
+        "id": 16401,
+        "name": "Jest",
+        "slug": "jest",
+        "description": "Delightful JavaScript Testing",
+        "score": 2
+      }
+    ]
+  },
+  "894": {
+    "id": 894,
+    "slug": "orchid",
+    "recommendations": [
+      {
+        "id": 903,
+        "name": "vue",
+        "slug": "vuejs",
+        "description": null,
+        "score": 3
+      }
+    ]
+  },
+  "897": {
+    "id": 897,
+    "slug": "lad",
+    "recommendations": [
+      {
+        "id": 180,
+        "name": "AVA",
+        "slug": "ava",
+        "description": null,
+        "score": 1
+      }
+    ]
+  },
+  "899": {
+    "id": 899,
+    "slug": "tldjs",
+    "recommendations": [
+      {
+        "id": 58,
+        "name": "MochaJS",
+        "slug": "mochajs",
+        "description": "simple, flexible, fun javascript test framework for node.js & the browser.",
+        "score": 1
+      }
+    ]
+  },
+  "901": {
+    "id": 901,
+    "slug": "openjscad",
+    "recommendations": [
+      {
+        "id": 180,
+        "name": "AVA",
+        "slug": "ava",
+        "description": null,
+        "score": 1
+      }
+    ]
+  },
+  "903": {
+    "id": 903,
+    "slug": "vuejs",
+    "recommendations": [
+      {
+        "id": 11743,
+        "name": "Rollup",
+        "slug": "rollup",
+        "description": "The JavaScript module bundler",
+        "score": 5
+      },
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 4
+      },
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 4
+      }
+    ]
+  },
+  "908": {
+    "id": 908,
+    "slug": "jquery-jsonview",
+    "recommendations": [
+      {
+        "id": 85,
+        "name": "GulpJS",
+        "slug": "gulpjs",
+        "description": "The streaming build system.",
+        "score": 2
+      },
+      {
+        "id": 58,
+        "name": "MochaJS",
+        "slug": "mochajs",
+        "description": "simple, flexible, fun javascript test framework for node.js & the browser.",
+        "score": 1
+      }
+    ]
+  },
+  "916": {
+    "id": 916,
+    "slug": "bundlesize",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 4
+      }
+    ]
+  },
+  "927": {
+    "id": 927,
+    "slug": "vue-js-modal",
+    "recommendations": [
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 9
+      },
+      {
+        "id": 903,
+        "name": "vue",
+        "slug": "vuejs",
+        "description": null,
+        "score": 4
+      },
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 3
+      },
+      {
+        "id": 125,
+        "name": "chaijs",
+        "slug": "chaijs",
+        "description": "Chai is a BDD / TDD assertion library for node and the browser that can be delightfully paired with any javascript testing framework.",
+        "score": 1
+      },
+      {
+        "id": 58,
+        "name": "MochaJS",
+        "slug": "mochajs",
+        "description": "simple, flexible, fun javascript test framework for node.js & the browser.",
+        "score": 1
+      },
+      {
+        "id": 470,
+        "name": "sinon",
+        "slug": "sinon",
+        "description": "",
+        "score": 1
+      }
+    ]
+  },
+  "928": {
+    "id": 928,
+    "slug": "acgn-stock",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 8
+      },
+      {
+        "id": 151,
+        "name": "cheerio",
+        "slug": "cheerio",
+        "description": "Fast, flexible, and lean implementation of core jQuery designed specifically for the server",
+        "score": 3
+      },
+      {
+        "id": 470,
+        "name": "sinon",
+        "slug": "sinon",
+        "description": "",
+        "score": 1
+      }
+    ]
+  },
+  "938": {
+    "id": 938,
+    "slug": "typeorm",
+    "recommendations": [
+      {
+        "id": 498,
+        "name": "debug",
+        "slug": "debug",
+        "description": null,
+        "score": 3
+      },
+      {
+        "id": 125,
+        "name": "chaijs",
+        "slug": "chaijs",
+        "description": "Chai is a BDD / TDD assertion library for node and the browser that can be delightfully paired with any javascript testing framework.",
+        "score": 1
+      },
+      {
+        "id": 85,
+        "name": "GulpJS",
+        "slug": "gulpjs",
+        "description": "The streaming build system.",
+        "score": 1
+      },
+      {
+        "id": 58,
+        "name": "MochaJS",
+        "slug": "mochajs",
+        "description": "simple, flexible, fun javascript test framework for node.js & the browser.",
+        "score": 1
+      },
+      {
+        "id": 470,
+        "name": "sinon",
+        "slug": "sinon",
+        "description": "",
+        "score": 1
+      }
+    ]
+  },
+  "939": {
+    "id": 939,
+    "slug": "cmv-app",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 3
+      }
+    ]
+  },
+  "950": {
+    "id": 950,
+    "slug": "wikijs",
+    "recommendations": [
+      {
+        "id": 151,
+        "name": "cheerio",
+        "slug": "cheerio",
+        "description": "Fast, flexible, and lean implementation of core jQuery designed specifically for the server",
+        "score": 3
+      },
+      {
+        "id": 11885,
+        "name": "Mongoose.js",
+        "slug": "mongoose",
+        "description": "The leading ODM for Node.js and MongoDB",
+        "score": 3
+      },
+      {
+        "id": 454,
+        "name": "pug",
+        "slug": "pug",
+        "description": "A powerful templating engine for node.js and the browser",
+        "score": 3
+      },
+      {
+        "id": 659,
+        "name": "socket.io",
+        "slug": "socketio",
+        "description": null,
+        "score": 3
+      },
+      {
+        "id": 903,
+        "name": "vue",
+        "slug": "vuejs",
+        "description": null,
+        "score": 3
+      },
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 2
+      },
+      {
+        "id": 16401,
+        "name": "Jest",
+        "slug": "jest",
+        "description": "Delightful JavaScript Testing",
+        "score": 2
+      },
+      {
+        "id": 10352,
+        "name": "nodemon",
+        "slug": "nodemon",
+        "description": "Nodemon is a utility that will monitor for any changes in your source and automatically restart your server. Perfect for rapid development. ",
+        "score": 1
+      }
+    ]
+  },
+  "951": {
+    "id": 951,
+    "slug": "react-native-masonry",
+    "recommendations": [
+      {
+        "id": 16401,
+        "name": "Jest",
+        "slug": "jest",
+        "description": "Delightful JavaScript Testing",
+        "score": 2
+      }
+    ]
+  },
+  "958": {
+    "id": 958,
+    "slug": "git-point",
+    "recommendations": [
+      {
+        "id": 12353,
+        "name": "styled-components",
+        "slug": "styled-components",
+        "description": "Visual primitives for the component age. Use the best bits of ES6 and CSS to style your apps without stress 💅",
+        "score": 3
+      },
+      {
+        "id": 16401,
+        "name": "Jest",
+        "slug": "jest",
+        "description": "Delightful JavaScript Testing",
+        "score": 2
+      },
+      {
+        "id": 755,
+        "name": "stylelint",
+        "slug": "stylelint",
+        "description": "A mighty, modern CSS linter",
+        "score": 2
+      },
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 1
+      }
+    ]
+  },
+  "962": {
+    "id": 962,
+    "slug": "url-shortener",
+    "recommendations": [
+      {
+        "id": 11885,
+        "name": "Mongoose.js",
+        "slug": "mongoose",
+        "description": "The leading ODM for Node.js and MongoDB",
+        "score": 3
+      },
+      {
+        "id": 659,
+        "name": "socket.io",
+        "slug": "socketio",
+        "description": null,
+        "score": 3
+      }
+    ]
+  },
+  "8850": {
+    "id": 8850,
+    "slug": "testing",
+    "recommendations": [
+      {
+        "id": 12353,
+        "name": "styled-components",
+        "slug": "styled-components",
+        "description": "Visual primitives for the component age. Use the best bits of ES6 and CSS to style your apps without stress 💅",
+        "score": 3
+      }
+    ]
+  },
+  "8993": {
+    "id": 8993,
+    "slug": "kea",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 5
+      },
+      {
+        "id": 16401,
+        "name": "Jest",
+        "slug": "jest",
+        "description": "Delightful JavaScript Testing",
+        "score": 2
+      }
+    ]
+  },
+  "9144": {
+    "id": 9144,
+    "slug": "lem",
+    "recommendations": [
+      {
+        "id": 13486,
+        "name": "electron",
+        "slug": "electron",
+        "description": "Build cross platform desktop apps with JavaScript, HTML, and CSS",
+        "score": 3
+      }
+    ]
+  },
+  "9173": {
+    "id": 9173,
+    "slug": "buttercup",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 10
+      },
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 10
+      },
+      {
+        "id": 13486,
+        "name": "electron",
+        "slug": "electron",
+        "description": "Build cross platform desktop apps with JavaScript, HTML, and CSS",
+        "score": 2
+      },
+      {
+        "id": 180,
+        "name": "AVA",
+        "slug": "ava",
+        "description": null,
+        "score": 1
+      },
+      {
+        "id": 12353,
+        "name": "styled-components",
+        "slug": "styled-components",
+        "description": "Visual primitives for the component age. Use the best bits of ES6 and CSS to style your apps without stress 💅",
+        "score": 1
+      }
+    ]
+  },
+  "9428": {
+    "id": 9428,
+    "slug": "openfl",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 3
+      },
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 2
+      },
+      {
+        "id": 125,
+        "name": "chaijs",
+        "slug": "chaijs",
+        "description": "Chai is a BDD / TDD assertion library for node and the browser that can be delightfully paired with any javascript testing framework.",
+        "score": 1
+      },
+      {
+        "id": 58,
+        "name": "MochaJS",
+        "slug": "mochajs",
+        "description": "simple, flexible, fun javascript test framework for node.js & the browser.",
+        "score": 1
+      }
+    ]
+  },
+  "9449": {
+    "id": 9449,
+    "slug": "boostnoteio",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 6
+      },
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 5
+      },
+      {
+        "id": 16401,
+        "name": "Jest",
+        "slug": "jest",
+        "description": "Delightful JavaScript Testing",
+        "score": 2
+      },
+      {
+        "id": 180,
+        "name": "AVA",
+        "slug": "ava",
+        "description": null,
+        "score": 1
+      },
+      {
+        "id": 13486,
+        "name": "electron",
+        "slug": "electron",
+        "description": "Build cross platform desktop apps with JavaScript, HTML, and CSS",
+        "score": 1
+      }
+    ]
+  },
+  "9507": {
+    "id": 9507,
+    "slug": "vis",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 6
+      },
+      {
+        "id": 85,
+        "name": "GulpJS",
+        "slug": "gulpjs",
+        "description": "The streaming build system.",
+        "score": 2
+      },
+      {
+        "id": 58,
+        "name": "MochaJS",
+        "slug": "mochajs",
+        "description": "simple, flexible, fun javascript test framework for node.js & the browser.",
+        "score": 1
+      },
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 1
+      }
+    ]
+  },
+  "9543": {
+    "id": 9543,
+    "slug": "wallabag",
+    "recommendations": [
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 9
+      },
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 4
+      },
+      {
+        "id": 755,
+        "name": "stylelint",
+        "slug": "stylelint",
+        "description": "A mighty, modern CSS linter",
+        "score": 2
+      }
+    ]
+  },
+  "9830": {
+    "id": 9830,
+    "slug": "ghost",
+    "recommendations": [
+      {
+        "id": 151,
+        "name": "cheerio",
+        "slug": "cheerio",
+        "description": "Fast, flexible, and lean implementation of core jQuery designed specifically for the server",
+        "score": 3
+      },
+      {
+        "id": 12010,
+        "name": "Nodemailer",
+        "slug": "nodemailer",
+        "description": "Module for Node.js applications to allow easy as cake email sending",
+        "score": 3
+      },
+      {
+        "id": 58,
+        "name": "MochaJS",
+        "slug": "mochajs",
+        "description": "simple, flexible, fun javascript test framework for node.js & the browser.",
+        "score": 1
+      },
+      {
+        "id": 470,
+        "name": "sinon",
+        "slug": "sinon",
+        "description": "",
+        "score": 1
+      }
+    ]
+  },
+  "9866": {
+    "id": 9866,
+    "slug": "oni",
+    "recommendations": [
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 6
+      },
+      {
+        "id": 12353,
+        "name": "styled-components",
+        "slug": "styled-components",
+        "description": "Visual primitives for the component age. Use the best bits of ES6 and CSS to style your apps without stress 💅",
+        "score": 3
+      },
+      {
+        "id": 13486,
+        "name": "electron",
+        "slug": "electron",
+        "description": "Build cross platform desktop apps with JavaScript, HTML, and CSS",
+        "score": 2
+      },
+      {
+        "id": 16401,
+        "name": "Jest",
+        "slug": "jest",
+        "description": "Delightful JavaScript Testing",
+        "score": 1
+      },
+      {
+        "id": 58,
+        "name": "MochaJS",
+        "slug": "mochajs",
+        "description": "simple, flexible, fun javascript test framework for node.js & the browser.",
+        "score": 1
+      },
+      {
+        "id": 470,
+        "name": "sinon",
+        "slug": "sinon",
+        "description": "",
+        "score": 1
+      }
+    ]
+  },
+  "9883": {
+    "id": 9883,
+    "slug": "shields",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 3
+      },
+      {
+        "id": 125,
+        "name": "chaijs",
+        "slug": "chaijs",
+        "description": "Chai is a BDD / TDD assertion library for node and the browser that can be delightfully paired with any javascript testing framework.",
+        "score": 1
+      },
+      {
+        "id": 58,
+        "name": "MochaJS",
+        "slug": "mochajs",
+        "description": "simple, flexible, fun javascript test framework for node.js & the browser.",
+        "score": 1
+      },
+      {
+        "id": 470,
+        "name": "sinon",
+        "slug": "sinon",
+        "description": "",
+        "score": 1
+      }
+    ]
+  },
+  "9897": {
+    "id": 9897,
+    "slug": "front-end-checklist",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 6
+      },
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 3
+      },
+      {
+        "id": 85,
+        "name": "GulpJS",
+        "slug": "gulpjs",
+        "description": "The streaming build system.",
+        "score": 2
+      },
+      {
+        "id": 755,
+        "name": "stylelint",
+        "slug": "stylelint",
+        "description": "A mighty, modern CSS linter",
+        "score": 2
+      },
+      {
+        "id": 125,
+        "name": "chaijs",
+        "slug": "chaijs",
+        "description": "Chai is a BDD / TDD assertion library for node and the browser that can be delightfully paired with any javascript testing framework.",
+        "score": 1
+      },
+      {
+        "id": 14082,
+        "name": "html-webpack-plugin",
+        "slug": "html-webpack-plugin",
+        "description": null,
+        "score": 1
+      },
+      {
+        "id": 470,
+        "name": "sinon",
+        "slug": "sinon",
+        "description": "",
+        "score": 1
+      }
+    ]
+  },
+  "9910": {
+    "id": 9910,
+    "slug": "react-native-firebase",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 2
+      },
+      {
+        "id": 498,
+        "name": "debug",
+        "slug": "debug",
+        "description": null,
+        "score": 1
+      },
+      {
+        "id": 16401,
+        "name": "Jest",
+        "slug": "jest",
+        "description": "Delightful JavaScript Testing",
+        "score": 1
+      }
+    ]
+  },
+  "9995": {
+    "id": 9995,
+    "slug": "apiato",
+    "recommendations": [
+      {
+        "id": 903,
+        "name": "vue",
+        "slug": "vuejs",
+        "description": null,
+        "score": 1
+      }
+    ]
+  },
+  "10056": {
+    "id": 10056,
+    "slug": "bootstrap-vue",
+    "recommendations": [
+      {
+        "id": 11743,
+        "name": "Rollup",
+        "slug": "rollup",
+        "description": "The JavaScript module bundler",
+        "score": 4
+      },
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 3
+      },
+      {
+        "id": 16401,
+        "name": "Jest",
+        "slug": "jest",
+        "description": "Delightful JavaScript Testing",
+        "score": 1
+      }
+    ]
+  },
+  "10112": {
+    "id": 10112,
+    "slug": "vsc-material-theme",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 2
+      },
+      {
+        "id": 85,
+        "name": "GulpJS",
+        "slug": "gulpjs",
+        "description": "The streaming build system.",
+        "score": 2
+      }
+    ]
+  },
+  "10257": {
+    "id": 10257,
+    "slug": "slimjs",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 3
+      }
+    ]
+  },
+  "10288": {
+    "id": 10288,
+    "slug": "caption",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 2
+      },
+      {
+        "id": 13486,
+        "name": "electron",
+        "slug": "electron",
+        "description": "Build cross platform desktop apps with JavaScript, HTML, and CSS",
+        "score": 2
+      },
+      {
+        "id": 16401,
+        "name": "Jest",
+        "slug": "jest",
+        "description": "Delightful JavaScript Testing",
+        "score": 1
+      },
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 1
+      }
+    ]
+  },
+  "10350": {
+    "id": 10350,
+    "slug": "generator-jhipster",
+    "recommendations": [
+      {
+        "id": 125,
+        "name": "chaijs",
+        "slug": "chaijs",
+        "description": "Chai is a BDD / TDD assertion library for node and the browser that can be delightfully paired with any javascript testing framework.",
+        "score": 1
+      },
+      {
+        "id": 58,
+        "name": "MochaJS",
+        "slug": "mochajs",
+        "description": "simple, flexible, fun javascript test framework for node.js & the browser.",
+        "score": 1
+      },
+      {
+        "id": 470,
+        "name": "sinon",
+        "slug": "sinon",
+        "description": "",
+        "score": 1
+      }
+    ]
+  },
+  "10352": {
+    "id": 10352,
+    "slug": "nodemon",
+    "recommendations": [
+      {
+        "id": 498,
+        "name": "debug",
+        "slug": "debug",
+        "description": null,
+        "score": 3
+      },
+      {
+        "id": 58,
+        "name": "MochaJS",
+        "slug": "mochajs",
+        "description": "simple, flexible, fun javascript test framework for node.js & the browser.",
+        "score": 1
+      }
+    ]
+  },
+  "10407": {
+    "id": 10407,
+    "slug": "ramme",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 2
+      },
+      {
+        "id": 13486,
+        "name": "electron",
+        "slug": "electron",
+        "description": "Build cross platform desktop apps with JavaScript, HTML, and CSS",
+        "score": 2
+      },
+      {
+        "id": 85,
+        "name": "GulpJS",
+        "slug": "gulpjs",
+        "description": "The streaming build system.",
+        "score": 1
+      }
+    ]
+  },
+  "10552": {
+    "id": 10552,
+    "slug": "surfbird",
+    "recommendations": [
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 11
+      },
+      {
+        "id": 903,
+        "name": "vue",
+        "slug": "vuejs",
+        "description": null,
+        "score": 8
+      },
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 7
+      },
+      {
+        "id": 13486,
+        "name": "electron",
+        "slug": "electron",
+        "description": "Build cross platform desktop apps with JavaScript, HTML, and CSS",
+        "score": 2
+      },
+      {
+        "id": 14082,
+        "name": "html-webpack-plugin",
+        "slug": "html-webpack-plugin",
+        "description": null,
+        "score": 1
+      }
+    ]
+  },
+  "10620": {
+    "id": 10620,
+    "slug": "sage",
+    "recommendations": [
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 10
+      },
+      {
+        "id": 755,
+        "name": "stylelint",
+        "slug": "stylelint",
+        "description": "A mighty, modern CSS linter",
+        "score": 2
+      }
+    ]
+  },
+  "10668": {
+    "id": 10668,
+    "slug": "splitjs",
+    "recommendations": [
+      {
+        "id": 11743,
+        "name": "Rollup",
+        "slug": "rollup",
+        "description": "The JavaScript module bundler",
+        "score": 2
+      }
+    ]
+  },
+  "10679": {
+    "id": 10679,
+    "slug": "fontplop",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 2
+      },
+      {
+        "id": 16401,
+        "name": "Jest",
+        "slug": "jest",
+        "description": "Delightful JavaScript Testing",
+        "score": 1
+      }
+    ]
+  },
+  "10685": {
+    "id": 10685,
+    "slug": "wireflow",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 1
+      }
+    ]
+  },
+  "10739": {
+    "id": 10739,
+    "slug": "sketchpad",
+    "recommendations": [
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 1
+      }
+    ]
+  },
+  "10798": {
+    "id": 10798,
+    "slug": "turf",
+    "recommendations": [
+      {
+        "id": 11743,
+        "name": "Rollup",
+        "slug": "rollup",
+        "description": "The JavaScript module bundler",
+        "score": 1
+      }
+    ]
+  },
+  "10809": {
+    "id": 10809,
+    "slug": "openscope",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 9
+      },
+      {
+        "id": 85,
+        "name": "GulpJS",
+        "slug": "gulpjs",
+        "description": "The streaming build system.",
+        "score": 4
+      },
+      {
+        "id": 180,
+        "name": "AVA",
+        "slug": "ava",
+        "description": null,
+        "score": 1
+      },
+      {
+        "id": 10352,
+        "name": "nodemon",
+        "slug": "nodemon",
+        "description": "Nodemon is a utility that will monitor for any changes in your source and automatically restart your server. Perfect for rapid development. ",
+        "score": 1
+      },
+      {
+        "id": 470,
+        "name": "sinon",
+        "slug": "sinon",
+        "description": "",
+        "score": 1
+      }
+    ]
+  },
+  "10905": {
+    "id": 10905,
+    "slug": "cypressio",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 1
+      },
+      {
+        "id": 125,
+        "name": "chaijs",
+        "slug": "chaijs",
+        "description": "Chai is a BDD / TDD assertion library for node and the browser that can be delightfully paired with any javascript testing framework.",
+        "score": 1
+      },
+      {
+        "id": 498,
+        "name": "debug",
+        "slug": "debug",
+        "description": null,
+        "score": 1
+      },
+      {
+        "id": 85,
+        "name": "GulpJS",
+        "slug": "gulpjs",
+        "description": "The streaming build system.",
+        "score": 1
+      },
+      {
+        "id": 58,
+        "name": "MochaJS",
+        "slug": "mochajs",
+        "description": "simple, flexible, fun javascript test framework for node.js & the browser.",
+        "score": 1
+      }
+    ]
+  },
+  "10914": {
+    "id": 10914,
+    "slug": "create-react-native-app",
+    "recommendations": [
+      {
+        "id": 16401,
+        "name": "Jest",
+        "slug": "jest",
+        "description": "Delightful JavaScript Testing",
+        "score": 1
+      }
+    ]
+  },
+  "10947": {
+    "id": 10947,
+    "slug": "verdaccio",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 14
+      },
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 9
+      },
+      {
+        "id": 16401,
+        "name": "Jest",
+        "slug": "jest",
+        "description": "Delightful JavaScript Testing",
+        "score": 2
+      },
+      {
+        "id": 14082,
+        "name": "html-webpack-plugin",
+        "slug": "html-webpack-plugin",
+        "description": null,
+        "score": 1
+      },
+      {
+        "id": 755,
+        "name": "stylelint",
+        "slug": "stylelint",
+        "description": "A mighty, modern CSS linter",
+        "score": 1
+      }
+    ]
+  },
+  "10985": {
+    "id": 10985,
+    "slug": "aurelia",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 6
+      },
+      {
+        "id": 85,
+        "name": "GulpJS",
+        "slug": "gulpjs",
+        "description": "The streaming build system.",
+        "score": 2
+      }
+    ]
+  },
+  "11020": {
+    "id": 11020,
+    "slug": "parcel",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 12
+      },
+      {
+        "id": 903,
+        "name": "vue",
+        "slug": "vuejs",
+        "description": null,
+        "score": 2
+      },
+      {
+        "id": 58,
+        "name": "MochaJS",
+        "slug": "mochajs",
+        "description": "simple, flexible, fun javascript test framework for node.js & the browser.",
+        "score": 1
+      },
+      {
+        "id": 454,
+        "name": "pug",
+        "slug": "pug",
+        "description": "A powerful templating engine for node.js and the browser",
+        "score": 1
+      },
+      {
+        "id": 470,
+        "name": "sinon",
+        "slug": "sinon",
+        "description": "",
+        "score": 1
+      }
+    ]
+  },
+  "11057": {
+    "id": 11057,
+    "slug": "final-form",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 7
+      },
+      {
+        "id": 11743,
+        "name": "Rollup",
+        "slug": "rollup",
+        "description": "The JavaScript module bundler",
+        "score": 6
+      },
+      {
+        "id": 16401,
+        "name": "Jest",
+        "slug": "jest",
+        "description": "Delightful JavaScript Testing",
+        "score": 2
+      }
+    ]
+  },
+  "11083": {
+    "id": 11083,
+    "slug": "node-data",
+    "recommendations": [
+      {
+        "id": 85,
+        "name": "GulpJS",
+        "slug": "gulpjs",
+        "description": "The streaming build system.",
+        "score": 3
+      },
+      {
+        "id": 11885,
+        "name": "Mongoose.js",
+        "slug": "mongoose",
+        "description": "The leading ODM for Node.js and MongoDB",
+        "score": 3
+      },
+      {
+        "id": 659,
+        "name": "socket.io",
+        "slug": "socketio",
+        "description": null,
+        "score": 3
+      }
+    ]
+  },
+  "11114": {
+    "id": 11114,
+    "slug": "strapi",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 2
+      },
+      {
+        "id": 58,
+        "name": "MochaJS",
+        "slug": "mochajs",
+        "description": "simple, flexible, fun javascript test framework for node.js & the browser.",
+        "score": 1
+      }
+    ]
+  },
+  "11198": {
+    "id": 11198,
+    "slug": "aplayer",
+    "recommendations": [
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 8
+      },
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 3
+      }
+    ]
+  },
+  "11199": {
+    "id": 11199,
+    "slug": "dplayer",
+    "recommendations": [
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 9
+      },
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 3
+      }
+    ]
+  },
+  "11200": {
+    "id": 11200,
+    "slug": "resume",
+    "recommendations": [
+      {
+        "id": 85,
+        "name": "GulpJS",
+        "slug": "gulpjs",
+        "description": "The streaming build system.",
+        "score": 1
+      }
+    ]
+  },
+  "11203": {
+    "id": 11203,
+    "slug": "cnodern",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 2
+      },
+      {
+        "id": 16401,
+        "name": "Jest",
+        "slug": "jest",
+        "description": "Delightful JavaScript Testing",
+        "score": 2
+      }
+    ]
+  },
+  "11281": {
+    "id": 11281,
+    "slug": "ramda-adjunct",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 5
+      },
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 3
+      },
+      {
+        "id": 125,
+        "name": "chaijs",
+        "slug": "chaijs",
+        "description": "Chai is a BDD / TDD assertion library for node and the browser that can be delightfully paired with any javascript testing framework.",
+        "score": 1
+      },
+      {
+        "id": 58,
+        "name": "MochaJS",
+        "slug": "mochajs",
+        "description": "simple, flexible, fun javascript test framework for node.js & the browser.",
+        "score": 1
+      },
+      {
+        "id": 470,
+        "name": "sinon",
+        "slug": "sinon",
+        "description": "",
+        "score": 1
+      }
+    ]
+  },
+  "11338": {
+    "id": 11338,
+    "slug": "parle",
+    "recommendations": [
+      {
+        "id": 85,
+        "name": "GulpJS",
+        "slug": "gulpjs",
+        "description": "The streaming build system.",
+        "score": 1
+      }
+    ]
+  },
+  "11355": {
+    "id": 11355,
+    "slug": "ccxt",
+    "recommendations": [
+      {
+        "id": 125,
+        "name": "chaijs",
+        "slug": "chaijs",
+        "description": "Chai is a BDD / TDD assertion library for node and the browser that can be delightfully paired with any javascript testing framework.",
+        "score": 1
+      },
+      {
+        "id": 58,
+        "name": "MochaJS",
+        "slug": "mochajs",
+        "description": "simple, flexible, fun javascript test framework for node.js & the browser.",
+        "score": 1
+      }
+    ]
+  },
+  "11368": {
+    "id": 11368,
+    "slug": "d3-node-editor",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 6
+      },
+      {
+        "id": 11743,
+        "name": "Rollup",
+        "slug": "rollup",
+        "description": "The JavaScript module bundler",
+        "score": 2
+      },
+      {
+        "id": 58,
+        "name": "MochaJS",
+        "slug": "mochajs",
+        "description": "simple, flexible, fun javascript test framework for node.js & the browser.",
+        "score": 1
+      }
+    ]
+  },
+  "11406": {
+    "id": 11406,
+    "slug": "cezerin",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 21
+      },
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 15
+      },
+      {
+        "id": 14082,
+        "name": "html-webpack-plugin",
+        "slug": "html-webpack-plugin",
+        "description": null,
+        "score": 3
+      },
+      {
+        "id": 12010,
+        "name": "Nodemailer",
+        "slug": "nodemailer",
+        "description": "Module for Node.js applications to allow easy as cake email sending",
+        "score": 3
+      }
+    ]
+  },
+  "11411": {
+    "id": 11411,
+    "slug": "echoes-player",
+    "recommendations": [
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 3
+      }
+    ]
+  },
+  "11414": {
+    "id": 11414,
+    "slug": "ngx-infinite-scroll",
+    "recommendations": [
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 2
+      },
+      {
+        "id": 11743,
+        "name": "Rollup",
+        "slug": "rollup",
+        "description": "The JavaScript module bundler",
+        "score": 1
+      }
+    ]
+  },
+  "11428": {
+    "id": 11428,
+    "slug": "inferno",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 7
+      },
+      {
+        "id": 11743,
+        "name": "Rollup",
+        "slug": "rollup",
+        "description": "The JavaScript module bundler",
+        "score": 5
+      },
+      {
+        "id": 16401,
+        "name": "Jest",
+        "slug": "jest",
+        "description": "Delightful JavaScript Testing",
+        "score": 2
+      },
+      {
+        "id": 470,
+        "name": "sinon",
+        "slug": "sinon",
+        "description": "",
+        "score": 1
+      }
+    ]
+  },
+  "11436": {
+    "id": 11436,
+    "slug": "erxes",
+    "recommendations": [
+      {
+        "id": 12353,
+        "name": "styled-components",
+        "slug": "styled-components",
+        "description": "Visual primitives for the component age. Use the best bits of ES6 and CSS to style your apps without stress 💅",
+        "score": 3
+      }
+    ]
+  },
+  "11532": {
+    "id": 11532,
+    "slug": "dat",
+    "recommendations": [
+      {
+        "id": 498,
+        "name": "debug",
+        "slug": "debug",
+        "description": null,
+        "score": 3
+      }
+    ]
+  },
+  "11593": {
+    "id": 11593,
+    "slug": "hamstersjs",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 5
+      },
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 2
+      }
+    ]
+  },
+  "11598": {
+    "id": 11598,
+    "slug": "ran",
+    "recommendations": [
+      {
+        "id": 12353,
+        "name": "styled-components",
+        "slug": "styled-components",
+        "description": "Visual primitives for the component age. Use the best bits of ES6 and CSS to style your apps without stress 💅",
+        "score": 3
+      },
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 2
+      },
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 1
+      }
+    ]
+  },
+  "11731": {
+    "id": 11731,
+    "slug": "30-seconds-of-code",
+    "recommendations": [
+      {
+        "id": 11743,
+        "name": "Rollup",
+        "slug": "rollup",
+        "description": "The JavaScript module bundler",
+        "score": 2
+      },
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 1
+      }
+    ]
+  },
+  "11743": {
+    "id": 11743,
+    "slug": "rollup",
+    "recommendations": [
+      {
+        "id": 58,
+        "name": "MochaJS",
+        "slug": "mochajs",
+        "description": "simple, flexible, fun javascript test framework for node.js & the browser.",
+        "score": 1
+      }
+    ]
+  },
+  "11787": {
+    "id": 11787,
+    "slug": "hyperhtml",
+    "recommendations": [
+      {
+        "id": 11743,
+        "name": "Rollup",
+        "slug": "rollup",
+        "description": "The JavaScript module bundler",
+        "score": 2
+      },
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 1
+      }
+    ]
+  },
+  "11810": {
+    "id": 11810,
+    "slug": "node-twitter",
+    "recommendations": [
+      {
+        "id": 11885,
+        "name": "Mongoose.js",
+        "slug": "mongoose",
+        "description": "The leading ODM for Node.js and MongoDB",
+        "score": 3
+      },
+      {
+        "id": 454,
+        "name": "pug",
+        "slug": "pug",
+        "description": "A powerful templating engine for node.js and the browser",
+        "score": 3
+      },
+      {
+        "id": 180,
+        "name": "AVA",
+        "slug": "ava",
+        "description": null,
+        "score": 1
+      },
+      {
+        "id": 58,
+        "name": "MochaJS",
+        "slug": "mochajs",
+        "description": "simple, flexible, fun javascript test framework for node.js & the browser.",
+        "score": 1
+      },
+      {
+        "id": 10352,
+        "name": "nodemon",
+        "slug": "nodemon",
+        "description": "Nodemon is a utility that will monitor for any changes in your source and automatically restart your server. Perfect for rapid development. ",
+        "score": 1
+      }
+    ]
+  },
+  "11829": {
+    "id": 11829,
+    "slug": "hoverboard",
+    "recommendations": [
+      {
+        "id": 85,
+        "name": "GulpJS",
+        "slug": "gulpjs",
+        "description": "The streaming build system.",
+        "score": 1
+      }
+    ]
+  },
+  "11832": {
+    "id": 11832,
+    "slug": "altair",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 2
+      },
+      {
+        "id": 13486,
+        "name": "electron",
+        "slug": "electron",
+        "description": "Build cross platform desktop apps with JavaScript, HTML, and CSS",
+        "score": 1
+      }
+    ]
+  },
+  "11860": {
+    "id": 11860,
+    "slug": "thinksns-plus",
+    "recommendations": [
+      {
+        "id": 903,
+        "name": "vue",
+        "slug": "vuejs",
+        "description": null,
+        "score": 10
+      },
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 2
+      }
+    ]
+  },
+  "11885": {
+    "id": 11885,
+    "slug": "mongoose",
+    "recommendations": [
+      {
+        "id": 58,
+        "name": "MochaJS",
+        "slug": "mochajs",
+        "description": "simple, flexible, fun javascript test framework for node.js & the browser.",
+        "score": 1
+      }
+    ]
+  },
+  "11918": {
+    "id": 11918,
+    "slug": "react-slick",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 8
+      },
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 6
+      },
+      {
+        "id": 16401,
+        "name": "Jest",
+        "slug": "jest",
+        "description": "Delightful JavaScript Testing",
+        "score": 2
+      },
+      {
+        "id": 85,
+        "name": "GulpJS",
+        "slug": "gulpjs",
+        "description": "The streaming build system.",
+        "score": 1
+      },
+      {
+        "id": 470,
+        "name": "sinon",
+        "slug": "sinon",
+        "description": "",
+        "score": 1
+      }
+    ]
+  },
+  "12010": {
+    "id": 12010,
+    "slug": "nodemailer",
+    "recommendations": [
+      {
+        "id": 125,
+        "name": "chaijs",
+        "slug": "chaijs",
+        "description": "Chai is a BDD / TDD assertion library for node and the browser that can be delightfully paired with any javascript testing framework.",
+        "score": 1
+      },
+      {
+        "id": 58,
+        "name": "MochaJS",
+        "slug": "mochajs",
+        "description": "simple, flexible, fun javascript test framework for node.js & the browser.",
+        "score": 1
+      },
+      {
+        "id": 470,
+        "name": "sinon",
+        "slug": "sinon",
+        "description": "",
+        "score": 1
+      }
+    ]
+  },
+  "12022": {
+    "id": 12022,
+    "slug": "styleguidist",
+    "recommendations": [
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 19
+      },
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 7
+      },
+      {
+        "id": 16401,
+        "name": "Jest",
+        "slug": "jest",
+        "description": "Delightful JavaScript Testing",
+        "score": 2
+      },
+      {
+        "id": 151,
+        "name": "cheerio",
+        "slug": "cheerio",
+        "description": "Fast, flexible, and lean implementation of core jQuery designed specifically for the server",
+        "score": 1
+      }
+    ]
+  },
+  "12178": {
+    "id": 12178,
+    "slug": "react-native-debugger",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 7
+      },
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 5
+      },
+      {
+        "id": 13486,
+        "name": "electron",
+        "slug": "electron",
+        "description": "Build cross platform desktop apps with JavaScript, HTML, and CSS",
+        "score": 1
+      },
+      {
+        "id": 16401,
+        "name": "Jest",
+        "slug": "jest",
+        "description": "Delightful JavaScript Testing",
+        "score": 1
+      }
+    ]
+  },
+  "12221": {
+    "id": 12221,
+    "slug": "docsify",
+    "recommendations": [
+      {
+        "id": 11743,
+        "name": "Rollup",
+        "slug": "rollup",
+        "description": "The JavaScript module bundler",
+        "score": 5
+      }
+    ]
+  },
+  "12353": {
+    "id": 12353,
+    "slug": "styled-components",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 8
+      },
+      {
+        "id": 11743,
+        "name": "Rollup",
+        "slug": "rollup",
+        "description": "The JavaScript module bundler",
+        "score": 7
+      },
+      {
+        "id": 16401,
+        "name": "Jest",
+        "slug": "jest",
+        "description": "Delightful JavaScript Testing",
+        "score": 1
+      }
+    ]
+  },
+  "12505": {
+    "id": 12505,
+    "slug": "compodoc",
+    "recommendations": [
+      {
+        "id": 151,
+        "name": "cheerio",
+        "slug": "cheerio",
+        "description": "Fast, flexible, and lean implementation of core jQuery designed specifically for the server",
+        "score": 3
+      },
+      {
+        "id": 125,
+        "name": "chaijs",
+        "slug": "chaijs",
+        "description": "Chai is a BDD / TDD assertion library for node and the browser that can be delightfully paired with any javascript testing framework.",
+        "score": 1
+      },
+      {
+        "id": 58,
+        "name": "MochaJS",
+        "slug": "mochajs",
+        "description": "simple, flexible, fun javascript test framework for node.js & the browser.",
+        "score": 1
+      },
+      {
+        "id": 10352,
+        "name": "nodemon",
+        "slug": "nodemon",
+        "description": "Nodemon is a utility that will monitor for any changes in your source and automatically restart your server. Perfect for rapid development. ",
+        "score": 1
+      },
+      {
+        "id": 11743,
+        "name": "Rollup",
+        "slug": "rollup",
+        "description": "The JavaScript module bundler",
+        "score": 1
+      }
+    ]
+  },
+  "12626": {
+    "id": 12626,
+    "slug": "sweetalert",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 7
+      },
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 6
+      },
+      {
+        "id": 16401,
+        "name": "Jest",
+        "slug": "jest",
+        "description": "Delightful JavaScript Testing",
+        "score": 1
+      }
+    ]
+  },
+  "12695": {
+    "id": 12695,
+    "slug": "commitizen",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 4
+      },
+      {
+        "id": 125,
+        "name": "chaijs",
+        "slug": "chaijs",
+        "description": "Chai is a BDD / TDD assertion library for node and the browser that can be delightfully paired with any javascript testing framework.",
+        "score": 1
+      },
+      {
+        "id": 58,
+        "name": "MochaJS",
+        "slug": "mochajs",
+        "description": "simple, flexible, fun javascript test framework for node.js & the browser.",
+        "score": 1
+      },
+      {
+        "id": 10352,
+        "name": "nodemon",
+        "slug": "nodemon",
+        "description": "Nodemon is a utility that will monitor for any changes in your source and automatically restart your server. Perfect for rapid development. ",
+        "score": 1
+      },
+      {
+        "id": 470,
+        "name": "sinon",
+        "slug": "sinon",
+        "description": "",
+        "score": 1
+      }
+    ]
+  },
+  "12703": {
+    "id": 12703,
+    "slug": "redom",
+    "recommendations": [
+      {
+        "id": 11743,
+        "name": "Rollup",
+        "slug": "rollup",
+        "description": "The JavaScript module bundler",
+        "score": 2
+      }
+    ]
+  },
+  "12753": {
+    "id": 12753,
+    "slug": "sweetalert2",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 4
+      },
+      {
+        "id": 11743,
+        "name": "Rollup",
+        "slug": "rollup",
+        "description": "The JavaScript module bundler",
+        "score": 3
+      },
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 2
+      },
+      {
+        "id": 85,
+        "name": "GulpJS",
+        "slug": "gulpjs",
+        "description": "The streaming build system.",
+        "score": 1
+      },
+      {
+        "id": 470,
+        "name": "sinon",
+        "slug": "sinon",
+        "description": "",
+        "score": 1
+      }
+    ]
+  },
+  "12812": {
+    "id": 12812,
+    "slug": "chamilo",
+    "recommendations": [
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 3
+      },
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 1
+      }
+    ]
+  },
+  "12936": {
+    "id": 12936,
+    "slug": "gun",
+    "recommendations": [
+      {
+        "id": 58,
+        "name": "MochaJS",
+        "slug": "mochajs",
+        "description": "simple, flexible, fun javascript test framework for node.js & the browser.",
+        "score": 1
+      }
+    ]
+  },
+  "13011": {
+    "id": 13011,
+    "slug": "dv-php-core",
+    "recommendations": [
+      {
+        "id": 85,
+        "name": "GulpJS",
+        "slug": "gulpjs",
+        "description": "The streaming build system.",
+        "score": 1
+      }
+    ]
+  },
+  "13013": {
+    "id": 13013,
+    "slug": "dot",
+    "recommendations": [
+      {
+        "id": 13486,
+        "name": "electron",
+        "slug": "electron",
+        "description": "Build cross platform desktop apps with JavaScript, HTML, and CSS",
+        "score": 3
+      }
+    ]
+  },
+  "13032": {
+    "id": 13032,
+    "slug": "openapi-directory",
+    "recommendations": [
+      {
+        "id": 85,
+        "name": "GulpJS",
+        "slug": "gulpjs",
+        "description": "The streaming build system.",
+        "score": 3
+      }
+    ]
+  },
+  "13122": {
+    "id": 13122,
+    "slug": "wildfire-473",
+    "recommendations": [
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 11
+      },
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 7
+      },
+      {
+        "id": 903,
+        "name": "vue",
+        "slug": "vuejs",
+        "description": null,
+        "score": 5
+      },
+      {
+        "id": 14082,
+        "name": "html-webpack-plugin",
+        "slug": "html-webpack-plugin",
+        "description": null,
+        "score": 1
+      }
+    ]
+  },
+  "13140": {
+    "id": 13140,
+    "slug": "holyjs",
+    "recommendations": [
+      {
+        "id": 11885,
+        "name": "Mongoose.js",
+        "slug": "mongoose",
+        "description": "The leading ODM for Node.js and MongoDB",
+        "score": 3
+      },
+      {
+        "id": 12010,
+        "name": "Nodemailer",
+        "slug": "nodemailer",
+        "description": "Module for Node.js applications to allow easy as cake email sending",
+        "score": 3
+      },
+      {
+        "id": 659,
+        "name": "socket.io",
+        "slug": "socketio",
+        "description": null,
+        "score": 3
+      },
+      {
+        "id": 125,
+        "name": "chaijs",
+        "slug": "chaijs",
+        "description": "Chai is a BDD / TDD assertion library for node and the browser that can be delightfully paired with any javascript testing framework.",
+        "score": 1
+      },
+      {
+        "id": 58,
+        "name": "MochaJS",
+        "slug": "mochajs",
+        "description": "simple, flexible, fun javascript test framework for node.js & the browser.",
+        "score": 1
+      }
+    ]
+  },
+  "13418": {
+    "id": 13418,
+    "slug": "vuesax",
+    "recommendations": [
+      {
+        "id": 903,
+        "name": "vue",
+        "slug": "vuejs",
+        "description": null,
+        "score": 4
+      },
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 1
+      }
+    ]
+  },
+  "13451": {
+    "id": 13451,
+    "slug": "visifile-55",
+    "recommendations": [
+      {
+        "id": 903,
+        "name": "vue",
+        "slug": "vuejs",
+        "description": null,
+        "score": 6
+      },
+      {
+        "id": 13486,
+        "name": "electron",
+        "slug": "electron",
+        "description": "Build cross platform desktop apps with JavaScript, HTML, and CSS",
+        "score": 4
+      },
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 3
+      },
+      {
+        "id": 498,
+        "name": "debug",
+        "slug": "debug",
+        "description": null,
+        "score": 3
+      },
+      {
+        "id": 659,
+        "name": "socket.io",
+        "slug": "socketio",
+        "description": null,
+        "score": 3
+      }
+    ]
+  },
+  "13468": {
+    "id": 13468,
+    "slug": "react-hot-loader",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 8
+      },
+      {
+        "id": 11743,
+        "name": "Rollup",
+        "slug": "rollup",
+        "description": "The JavaScript module bundler",
+        "score": 7
+      },
+      {
+        "id": 16401,
+        "name": "Jest",
+        "slug": "jest",
+        "description": "Delightful JavaScript Testing",
+        "score": 2
+      }
+    ]
+  },
+  "13487": {
+    "id": 13487,
+    "slug": "tsed",
+    "recommendations": [
+      {
+        "id": 125,
+        "name": "chaijs",
+        "slug": "chaijs",
+        "description": "Chai is a BDD / TDD assertion library for node and the browser that can be delightfully paired with any javascript testing framework.",
+        "score": 1
+      },
+      {
+        "id": 85,
+        "name": "GulpJS",
+        "slug": "gulpjs",
+        "description": "The streaming build system.",
+        "score": 1
+      },
+      {
+        "id": 58,
+        "name": "MochaJS",
+        "slug": "mochajs",
+        "description": "simple, flexible, fun javascript test framework for node.js & the browser.",
+        "score": 1
+      },
+      {
+        "id": 11885,
+        "name": "Mongoose.js",
+        "slug": "mongoose",
+        "description": "The leading ODM for Node.js and MongoDB",
+        "score": 1
+      },
+      {
+        "id": 470,
+        "name": "sinon",
+        "slug": "sinon",
+        "description": "",
+        "score": 1
+      },
+      {
+        "id": 659,
+        "name": "socket.io",
+        "slug": "socketio",
+        "description": null,
+        "score": 1
+      }
+    ]
+  },
+  "13497": {
+    "id": 13497,
+    "slug": "weex-ui",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 6
+      },
+      {
+        "id": 903,
+        "name": "vue",
+        "slug": "vuejs",
+        "description": null,
+        "score": 3
+      },
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 3
+      }
+    ]
+  },
+  "13643": {
+    "id": 13643,
+    "slug": "polished",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 9
+      },
+      {
+        "id": 11743,
+        "name": "Rollup",
+        "slug": "rollup",
+        "description": "The JavaScript module bundler",
+        "score": 7
+      },
+      {
+        "id": 16401,
+        "name": "Jest",
+        "slug": "jest",
+        "description": "Delightful JavaScript Testing",
+        "score": 2
+      }
+    ]
+  },
+  "13649": {
+    "id": 13649,
+    "slug": "flow-for-vscode",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 4
+      }
+    ]
+  },
+  "13652": {
+    "id": 13652,
+    "slug": "anchor-cms",
+    "recommendations": [
+      {
+        "id": 85,
+        "name": "GulpJS",
+        "slug": "gulpjs",
+        "description": "The streaming build system.",
+        "score": 3
+      },
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 2
+      },
+      {
+        "id": 16401,
+        "name": "Jest",
+        "slug": "jest",
+        "description": "Delightful JavaScript Testing",
+        "score": 1
+      }
+    ]
+  },
+  "13673": {
+    "id": 13673,
+    "slug": "thelounge",
+    "recommendations": [
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 5
+      },
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 3
+      },
+      {
+        "id": 151,
+        "name": "cheerio",
+        "slug": "cheerio",
+        "description": "Fast, flexible, and lean implementation of core jQuery designed specifically for the server",
+        "score": 3
+      },
+      {
+        "id": 659,
+        "name": "socket.io",
+        "slug": "socketio",
+        "description": null,
+        "score": 3
+      },
+      {
+        "id": 755,
+        "name": "stylelint",
+        "slug": "stylelint",
+        "description": "A mighty, modern CSS linter",
+        "score": 2
+      },
+      {
+        "id": 125,
+        "name": "chaijs",
+        "slug": "chaijs",
+        "description": "Chai is a BDD / TDD assertion library for node and the browser that can be delightfully paired with any javascript testing framework.",
+        "score": 1
+      },
+      {
+        "id": 58,
+        "name": "MochaJS",
+        "slug": "mochajs",
+        "description": "simple, flexible, fun javascript test framework for node.js & the browser.",
+        "score": 1
+      },
+      {
+        "id": 470,
+        "name": "sinon",
+        "slug": "sinon",
+        "description": "",
+        "score": 1
+      }
+    ]
+  },
+  "13726": {
+    "id": 13726,
+    "slug": "codesandbox",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 1
+      },
+      {
+        "id": 85,
+        "name": "GulpJS",
+        "slug": "gulpjs",
+        "description": "The streaming build system.",
+        "score": 1
+      },
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 1
+      }
+    ]
+  },
+  "13775": {
+    "id": 13775,
+    "slug": "darkreader",
+    "recommendations": [
+      {
+        "id": 11743,
+        "name": "Rollup",
+        "slug": "rollup",
+        "description": "The JavaScript module bundler",
+        "score": 4
+      },
+      {
+        "id": 85,
+        "name": "GulpJS",
+        "slug": "gulpjs",
+        "description": "The streaming build system.",
+        "score": 1
+      },
+      {
+        "id": 16401,
+        "name": "Jest",
+        "slug": "jest",
+        "description": "Delightful JavaScript Testing",
+        "score": 1
+      }
+    ]
+  },
+  "13868": {
+    "id": 13868,
+    "slug": "framework7",
+    "recommendations": [
+      {
+        "id": 11743,
+        "name": "Rollup",
+        "slug": "rollup",
+        "description": "The JavaScript module bundler",
+        "score": 4
+      },
+      {
+        "id": 85,
+        "name": "GulpJS",
+        "slug": "gulpjs",
+        "description": "The streaming build system.",
+        "score": 1
+      }
+    ]
+  },
+  "14019": {
+    "id": 14019,
+    "slug": "musicplayer",
+    "recommendations": [
+      {
+        "id": 659,
+        "name": "socket.io",
+        "slug": "socketio",
+        "description": null,
+        "score": 3
+      }
+    ]
+  },
+  "14039": {
+    "id": 14039,
+    "slug": "cms",
+    "recommendations": [
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 12
+      },
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 3
+      },
+      {
+        "id": 903,
+        "name": "vue",
+        "slug": "vuejs",
+        "description": null,
+        "score": 3
+      }
+    ]
+  },
+  "14044": {
+    "id": 14044,
+    "slug": "radarr",
+    "recommendations": [
+      {
+        "id": 85,
+        "name": "GulpJS",
+        "slug": "gulpjs",
+        "description": "The streaming build system.",
+        "score": 3
+      },
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 3
+      }
+    ]
+  },
+  "14082": {
+    "id": 14082,
+    "slug": "html-webpack-plugin",
+    "recommendations": [
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 7
+      }
+    ]
+  },
+  "14226": {
+    "id": 14226,
+    "slug": "marktext",
+    "recommendations": [
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 11
+      },
+      {
+        "id": 903,
+        "name": "vue",
+        "slug": "vuejs",
+        "description": null,
+        "score": 8
+      },
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 7
+      },
+      {
+        "id": 151,
+        "name": "cheerio",
+        "slug": "cheerio",
+        "description": "Fast, flexible, and lean implementation of core jQuery designed specifically for the server",
+        "score": 3
+      },
+      {
+        "id": 13486,
+        "name": "electron",
+        "slug": "electron",
+        "description": "Build cross platform desktop apps with JavaScript, HTML, and CSS",
+        "score": 2
+      },
+      {
+        "id": 125,
+        "name": "chaijs",
+        "slug": "chaijs",
+        "description": "Chai is a BDD / TDD assertion library for node and the browser that can be delightfully paired with any javascript testing framework.",
+        "score": 1
+      },
+      {
+        "id": 14082,
+        "name": "html-webpack-plugin",
+        "slug": "html-webpack-plugin",
+        "description": null,
+        "score": 1
+      },
+      {
+        "id": 58,
+        "name": "MochaJS",
+        "slug": "mochajs",
+        "description": "simple, flexible, fun javascript test framework for node.js & the browser.",
+        "score": 1
+      }
+    ]
+  },
+  "14375": {
+    "id": 14375,
+    "slug": "lidarr",
+    "recommendations": [
+      {
+        "id": 85,
+        "name": "GulpJS",
+        "slug": "gulpjs",
+        "description": "The streaming build system.",
+        "score": 3
+      },
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 3
+      }
+    ]
+  },
+  "14390": {
+    "id": 14390,
+    "slug": "we-vue",
+    "recommendations": [
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 12
+      },
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 7
+      },
+      {
+        "id": 903,
+        "name": "vue",
+        "slug": "vuejs",
+        "description": null,
+        "score": 5
+      },
+      {
+        "id": 16401,
+        "name": "Jest",
+        "slug": "jest",
+        "description": "Delightful JavaScript Testing",
+        "score": 2
+      },
+      {
+        "id": 14082,
+        "name": "html-webpack-plugin",
+        "slug": "html-webpack-plugin",
+        "description": null,
+        "score": 1
+      }
+    ]
+  },
+  "14406": {
+    "id": 14406,
+    "slug": "metamask",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 11
+      },
+      {
+        "id": 85,
+        "name": "GulpJS",
+        "slug": "gulpjs",
+        "description": "The streaming build system.",
+        "score": 5
+      },
+      {
+        "id": 125,
+        "name": "chaijs",
+        "slug": "chaijs",
+        "description": "Chai is a BDD / TDD assertion library for node and the browser that can be delightfully paired with any javascript testing framework.",
+        "score": 1
+      },
+      {
+        "id": 58,
+        "name": "MochaJS",
+        "slug": "mochajs",
+        "description": "simple, flexible, fun javascript test framework for node.js & the browser.",
+        "score": 1
+      },
+      {
+        "id": 470,
+        "name": "sinon",
+        "slug": "sinon",
+        "description": "",
+        "score": 1
+      },
+      {
+        "id": 755,
+        "name": "stylelint",
+        "slug": "stylelint",
+        "description": "A mighty, modern CSS linter",
+        "score": 1
+      }
+    ]
+  },
+  "14581": {
+    "id": 14581,
+    "slug": "better-xlsx",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 8
+      },
+      {
+        "id": 11743,
+        "name": "Rollup",
+        "slug": "rollup",
+        "description": "The JavaScript module bundler",
+        "score": 4
+      },
+      {
+        "id": 125,
+        "name": "chaijs",
+        "slug": "chaijs",
+        "description": "Chai is a BDD / TDD assertion library for node and the browser that can be delightfully paired with any javascript testing framework.",
+        "score": 1
+      },
+      {
+        "id": 58,
+        "name": "MochaJS",
+        "slug": "mochajs",
+        "description": "simple, flexible, fun javascript test framework for node.js & the browser.",
+        "score": 1
+      }
+    ]
+  },
+  "14856": {
+    "id": 14856,
+    "slug": "cezerin-693",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 21
+      },
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 15
+      },
+      {
+        "id": 14082,
+        "name": "html-webpack-plugin",
+        "slug": "html-webpack-plugin",
+        "description": null,
+        "score": 3
+      },
+      {
+        "id": 12010,
+        "name": "Nodemailer",
+        "slug": "nodemailer",
+        "description": "Module for Node.js applications to allow easy as cake email sending",
+        "score": 3
+      }
+    ]
+  },
+  "14924": {
+    "id": 14924,
+    "slug": "misskey",
+    "recommendations": [
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 21
+      },
+      {
+        "id": 903,
+        "name": "vue",
+        "slug": "vuejs",
+        "description": null,
+        "score": 15
+      },
+      {
+        "id": 85,
+        "name": "GulpJS",
+        "slug": "gulpjs",
+        "description": "The streaming build system.",
+        "score": 6
+      },
+      {
+        "id": 498,
+        "name": "debug",
+        "slug": "debug",
+        "description": null,
+        "score": 3
+      },
+      {
+        "id": 58,
+        "name": "MochaJS",
+        "slug": "mochajs",
+        "description": "simple, flexible, fun javascript test framework for node.js & the browser.",
+        "score": 3
+      },
+      {
+        "id": 454,
+        "name": "pug",
+        "slug": "pug",
+        "description": "A powerful templating engine for node.js and the browser",
+        "score": 3
+      }
+    ]
+  },
+  "14983": {
+    "id": 14983,
+    "slug": "fider",
+    "recommendations": [
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 5
+      },
+      {
+        "id": 16401,
+        "name": "Jest",
+        "slug": "jest",
+        "description": "Delightful JavaScript Testing",
+        "score": 1
+      }
+    ]
+  },
+  "15021": {
+    "id": 15021,
+    "slug": "rsshub",
+    "recommendations": [
+      {
+        "id": 151,
+        "name": "cheerio",
+        "slug": "cheerio",
+        "description": "Fast, flexible, and lean implementation of core jQuery designed specifically for the server",
+        "score": 3
+      }
+    ]
+  },
+  "15104": {
+    "id": 15104,
+    "slug": "rsuite",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 10
+      },
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 5
+      },
+      {
+        "id": 755,
+        "name": "stylelint",
+        "slug": "stylelint",
+        "description": "A mighty, modern CSS linter",
+        "score": 2
+      },
+      {
+        "id": 125,
+        "name": "chaijs",
+        "slug": "chaijs",
+        "description": "Chai is a BDD / TDD assertion library for node and the browser that can be delightfully paired with any javascript testing framework.",
+        "score": 1
+      },
+      {
+        "id": 85,
+        "name": "GulpJS",
+        "slug": "gulpjs",
+        "description": "The streaming build system.",
+        "score": 1
+      },
+      {
+        "id": 58,
+        "name": "MochaJS",
+        "slug": "mochajs",
+        "description": "simple, flexible, fun javascript test framework for node.js & the browser.",
+        "score": 1
+      },
+      {
+        "id": 470,
+        "name": "sinon",
+        "slug": "sinon",
+        "description": "",
+        "score": 1
+      }
+    ]
+  },
+  "15447": {
+    "id": 15447,
+    "slug": "mobx-react-form",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 8
+      },
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 2
+      },
+      {
+        "id": 125,
+        "name": "chaijs",
+        "slug": "chaijs",
+        "description": "Chai is a BDD / TDD assertion library for node and the browser that can be delightfully paired with any javascript testing framework.",
+        "score": 1
+      },
+      {
+        "id": 58,
+        "name": "MochaJS",
+        "slug": "mochajs",
+        "description": "simple, flexible, fun javascript test framework for node.js & the browser.",
+        "score": 1
+      }
+    ]
+  },
+  "15488": {
+    "id": 15488,
+    "slug": "p3x-onenote",
+    "recommendations": [
+      {
+        "id": 13486,
+        "name": "electron",
+        "slug": "electron",
+        "description": "Build cross platform desktop apps with JavaScript, HTML, and CSS",
+        "score": 4
+      }
+    ]
+  },
+  "15501": {
+    "id": 15501,
+    "slug": "nock",
+    "recommendations": [
+      {
+        "id": 125,
+        "name": "chaijs",
+        "slug": "chaijs",
+        "description": "Chai is a BDD / TDD assertion library for node and the browser that can be delightfully paired with any javascript testing framework.",
+        "score": 3
+      },
+      {
+        "id": 498,
+        "name": "debug",
+        "slug": "debug",
+        "description": null,
+        "score": 3
+      }
+    ]
+  },
+  "15509": {
+    "id": 15509,
+    "slug": "warriorjs",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 3
+      },
+      {
+        "id": 16401,
+        "name": "Jest",
+        "slug": "jest",
+        "description": "Delightful JavaScript Testing",
+        "score": 1
+      }
+    ]
+  },
+  "15558": {
+    "id": 15558,
+    "slug": "putsreq",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 3
+      },
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 1
+      }
+    ]
+  },
+  "15586": {
+    "id": 15586,
+    "slug": "searchkit",
+    "recommendations": [
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 9
+      },
+      {
+        "id": 14082,
+        "name": "html-webpack-plugin",
+        "slug": "html-webpack-plugin",
+        "description": null,
+        "score": 1
+      },
+      {
+        "id": 470,
+        "name": "sinon",
+        "slug": "sinon",
+        "description": "",
+        "score": 1
+      }
+    ]
+  },
+  "15731": {
+    "id": 15731,
+    "slug": "emma-cli",
+    "recommendations": [
+      {
+        "id": 180,
+        "name": "AVA",
+        "slug": "ava",
+        "description": null,
+        "score": 1
+      },
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 1
+      }
+    ]
+  },
+  "15732": {
+    "id": 15732,
+    "slug": "graphql-shield",
+    "recommendations": [
+      {
+        "id": 180,
+        "name": "AVA",
+        "slug": "ava",
+        "description": null,
+        "score": 1
+      }
+    ]
+  },
+  "15978": {
+    "id": 15978,
+    "slug": "graphql-compose",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 10
+      },
+      {
+        "id": 16401,
+        "name": "Jest",
+        "slug": "jest",
+        "description": "Delightful JavaScript Testing",
+        "score": 2
+      }
+    ]
+  },
+  "15990": {
+    "id": 15990,
+    "slug": "isomorphic-git",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 6
+      },
+      {
+        "id": 498,
+        "name": "debug",
+        "slug": "debug",
+        "description": null,
+        "score": 3
+      },
+      {
+        "id": 302,
+        "name": "webpack",
+        "slug": "webpack",
+        "description": "webpack is THE build solution for modern web applications.",
+        "score": 3
+      },
+      {
+        "id": 16401,
+        "name": "Jest",
+        "slug": "jest",
+        "description": "Delightful JavaScript Testing",
+        "score": 1
+      },
+      {
+        "id": 11743,
+        "name": "Rollup",
+        "slug": "rollup",
+        "description": "The JavaScript module bundler",
+        "score": 1
+      }
+    ]
+  },
+  "16104": {
+    "id": 16104,
+    "slug": "ant-design-pro",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 5
+      },
+      {
+        "id": 755,
+        "name": "stylelint",
+        "slug": "stylelint",
+        "description": "A mighty, modern CSS linter",
+        "score": 2
+      }
+    ]
+  },
+  "16195": {
+    "id": 16195,
+    "slug": "dayjs",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 3
+      },
+      {
+        "id": 11743,
+        "name": "Rollup",
+        "slug": "rollup",
+        "description": "The JavaScript module bundler",
+        "score": 3
+      },
+      {
+        "id": 16401,
+        "name": "Jest",
+        "slug": "jest",
+        "description": "Delightful JavaScript Testing",
+        "score": 2
+      }
+    ]
+  },
+  "16212": {
+    "id": 16212,
+    "slug": "neteasecloudmusicapi",
+    "recommendations": [
+      {
+        "id": 58,
+        "name": "MochaJS",
+        "slug": "mochajs",
+        "description": "simple, flexible, fun javascript test framework for node.js & the browser.",
+        "score": 1
+      }
+    ]
+  },
+  "16401": {
+    "id": 16401,
+    "slug": "jest",
+    "recommendations": [
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 10
+      },
+      {
+        "id": 11743,
+        "name": "Rollup",
+        "slug": "rollup",
+        "description": "The JavaScript module bundler",
+        "score": 5
+      },
+      {
+        "id": 498,
+        "name": "debug",
+        "slug": "debug",
+        "description": null,
+        "score": 1
+      },
+      {
+        "id": 58,
+        "name": "MochaJS",
+        "slug": "mochajs",
+        "description": "simple, flexible, fun javascript test framework for node.js & the browser.",
+        "score": 1
+      }
+    ]
+  },
+  "16453": {
+    "id": 16453,
+    "slug": "material",
+    "recommendations": [
+      {
+        "id": 11743,
+        "name": "Rollup",
+        "slug": "rollup",
+        "description": "The JavaScript module bundler",
+        "score": 4
+      },
+      {
+        "id": 580,
+        "name": "Babel",
+        "slug": "babel",
+        "description": "Babel is a compiler for writing next generation JavaScript",
+        "score": 2
+      },
+      {
+        "id": 755,
+        "name": "stylelint",
+        "slug": "stylelint",
+        "description": "A mighty, modern CSS linter",
+        "score": 2
+      }
+    ]
+  },
+  "16540": {
+    "id": 16540,
+    "slug": "moleculer",
+    "recommendations": [
+      {
+        "id": 16401,
+        "name": "Jest",
+        "slug": "jest",
+        "description": "Delightful JavaScript Testing",
+        "score": 1
+      },
+      {
+        "id": 10352,
+        "name": "nodemon",
+        "slug": "nodemon",
+        "description": "Nodemon is a utility that will monitor for any changes in your source and automatically restart your server. Perfect for rapid development. ",
+        "score": 1
+      }
+    ]
+  }
+}

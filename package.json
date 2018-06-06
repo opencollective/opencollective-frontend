@@ -48,6 +48,7 @@
     "flat": "2.0.0",
     "forest-express-sequelize": "2.8.1",
     "form-data": "0.2.0",
+    "fs-extra": "^6.0.1",
     "graphql": "0.11.7",
     "graphql-type-json": "0.1.4",
     "handlebars": "4.0.5",
