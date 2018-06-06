@@ -4,6 +4,7 @@ import gql from 'graphql-tag'
 
 import withData from '../lib/withData'
 import withIntl from '../lib/withIntl';
+import withLoggedInUser from '../lib/withLoggedInUser';
 import { transactionFields } from '../graphql/queries';
 
 import Body from '../components/Body';
@@ -14,6 +15,15 @@ import TransactionSimple from '../components/TransactionSimple';
 import { Link } from '../server/pages';
 
 class HomePage extends React.Component {
+  state = {
+    LoggedInUser: {},
+  }
+
+  async componentDidMount() {
+    const LoggedInUser = this.props.getLoggedInUser && await this.props.getLoggedInUser();
+    this.setState({ LoggedInUser });
+  }
+
   render() {
     const {
       transactions: {
@@ -21,6 +31,9 @@ class HomePage extends React.Component {
       },
       loading,
     } = this.props.data;
+    const {
+      LoggedInUser,
+    } = this.state;
 
     if (loading) {
       return <p>loading...</p>;
@@ -46,6 +59,7 @@ class HomePage extends React.Component {
         `}</style>
         <Header
           title="Home"
+          LoggedInUser={LoggedInUser}
         />
         <Body>
           <div className="flex pa3">
@@ -113,4 +127,4 @@ const query = gql`
 const addHomeData = graphql(query)
 
 export { HomePage as MockHomePage };
-export default withData(addHomeData(withIntl(HomePage)));
+export default withData(withLoggedInUser(addHomeData(withIntl(HomePage))));
