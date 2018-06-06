@@ -6,6 +6,67 @@ import withIntl from '../lib/withIntl';
 import { formatCurrency, capitalize } from '../lib/utils';
 import { Badge } from 'react-bootstrap';
 import { get, uniqBy } from 'lodash';
+import styled from 'styled-components';
+import {
+  backgroundImage,
+  bgColor,
+  border,
+  borderRadius,
+  bottom,
+  boxShadow,
+  display,
+  height,
+  left,
+  maxWidth,
+  minWidth,
+  position,
+  right,
+  size,
+  space,
+  top,
+  width,
+  zIndex,
+} from 'styled-system';
+import { Box, Flex } from 'grid-styled';
+import Hide from './Hide';
+import { P } from './Text';
+import Caret from './Caret';
+import StyledLink from './StyledLink';
+import ListItem from './ListItem';
+
+const Avatar = styled.div`
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  overflow: hidden;
+
+  ${bgColor}
+  ${backgroundImage}
+  ${border}
+  ${borderRadius}
+  ${display}
+  ${size}
+  ${space}
+`;
+
+const Container = styled.div`
+  ${bgColor}
+  ${border}
+  ${borderRadius}
+  ${bottom}
+  ${boxShadow}
+  ${display}
+  ${height}
+  ${left}
+  ${maxWidth}
+  ${minWidth}
+  ${position}
+  ${right}
+  ${space}
+  ${top}
+  ${width}
+  ${zIndex}
+`;
 
 class TopBarProfileMenu extends React.Component {
 
@@ -81,162 +142,144 @@ class TopBarProfileMenu extends React.Component {
           return 3;
       }
     }
-    const collectives = uniqBy([ ...LoggedInUser.memberOf.filter(m => m.collective.type !== 'EVENT') ], m => m.collective.id).sort((a, b) => {
+    const collectives = uniqBy([ ...LoggedInUser.memberOf.filter(m => m.collective.type === 'COLLECTIVE') ], m => m.collective.id).sort((a, b) => {
+      return (`${score(a)}-${a.collective.slug}` > `${score(b)}-${b.collective.slug}`) ? 1 : -1
+    }); // order by role then az
+
+    const orgs = uniqBy([ ...LoggedInUser.memberOf.filter(m => m.collective.type === 'ORGANIZATION') ], m => m.collective.id).sort((a, b) => {
       return (`${score(a)}-${a.collective.slug}` > `${score(b)}-${b.collective.slug}`) ? 1 : -1
     }); // order by role then az
 
     return (
-      <div className="LoginTopBarProfileMenu">
-        <style jsx>{`
-        .LoginTopBarProfileMenu {
-          position: absolute;
-          top: 40px;
-          right: 0;
-          z-index: 2999;
-          min-width: 170px;
-          max-width: 300px;
-          border-radius: 0.5rem;
-          background-color: #ffffff;
-          box-shadow: 0 -1px 2px 0 rgba(0, 0, 0, 0.1);
-          box-sizing: border-box;
-          border: solid 1px #f2f2f2;
-          padding: 20px 0;
-          width: max-content;
-        }
-        .LoginTopBarProfileMenuHeading {
-          position: relative;
-          font-family: montserratlight, arial;
-          font-size: 10px;
-          font-weight: 500;
-          text-align: left;
-          color: #b4bbbf;
-          padding: 0 20px;
-          text-transform: uppercase;
-          cursor: default;
-          height: 13px;
-        }
-
-        ul {
-          width: 100%;
-          list-style-type: none;
-          margin-top: 1rem;
-          margin-bottom: 2rem;
-          padding: 0;
-          overflow: hidden;
-        }
-        li {
-          box-sizing: border-box;
-          width: 100%;
-          padding: 0.1rem 0.5rem;
-        }
-        a {
-          box-sizing: border-box;
-          display: inline-block;
-          width: 100%;
-          text-decoration: none;
-          font-family: montserratlight, arial;
-          font-size: 1.4rem;
-          font-weight: 300;
-          text-align: left;
-          color: #84898c;
-          padding: 1px 2rem;
-          border-radius: 4px;
-        }
-        a:active,
-        a:hover {
-          background-color: #f0f0f0;
-        }
-        a.-blue {
-          color: #46b0ed;
-        }
-        .LoginTopBarProfileMenu div:last-child ul {
-          margin-bottom: 0;
-        }
-
-        span {
-          display: inline-block;
-          position: absolute;
-          height: 1.3rem;
-          background-color: white;
-          z-index: 1;
-          padding-right: 0.5rem;
-        }
-        .-dash {
-          position: absolute;
-          top: 0.7rem;
-          left: 2rem;
-          right: 2rem;
-          height: 0.1rem;
-          background-color: #e6e6e6;
-          z-index: 0;
-        }
-
-        .LoginTopBar-nav .LoginTopBarLink:last-child {
-          margin-right: 0;
-          padding-right: 0;
-        }
-
-        a.admin {
-          font-weight: bold;
-        }
-
-        a.member {
-          color: green;
-        }
-
-        `}</style>
-        <div>
-          <div className="LoginTopBarProfileMenuHeading">
-            <span><FormattedMessage id="collective" defaultMessage="{n, plural, one {collective} other {collectives}}" values={{ n: collectives.length }} /></span>
-            <div className="-dash"></div>
-          </div>
-          <ul>
-            <li>
-              <Link route="/create">
-                <a><FormattedMessage id="menu.createCollective" defaultMessage="Create a Collective" /></a>
-              </Link>
-            </li>
-            <li><a href="/discover"><FormattedMessage id="menu.discover" defaultMessage="Discover" /></a></li>
-            { collectives.map(membership => (
-              <li key={`LoggedInMenu-Collective-${get(membership, 'collective.slug')}`}>
+      <Container
+        bg="white"
+        border="1px solid rgba(18,19,20,0.12)"
+        borderRadius="12px"
+        boxShadow="0 4px 8px 0 rgba(61,82,102,0.08)"
+        minWidth="170px"
+        maxWidth="300px"
+        position="absolute"
+        right={16}
+        top={40}
+        width="max-content"
+        zIndex={3000}
+      >
+        <Container p={3}>
+          <Flex alignItems="center" >
+            <P
+              color="#B4BBBF"
+              fontFamily="montserratlight, arial"
+              fontSize="1rem"
+              fontWeight="400"
+              letterSpacing="1px"
+              pr={2}
+              textTransform="uppercase"
+              whiteSpace="nowrap"
+            >
+              <FormattedMessage id="collective" defaultMessage="my collectives" />
+            </P>
+            <Container height="0.1rem" bg="#E6E6E6" w={1} minWidth={50} />
+            <Link route="/create">
+              <StyledLink border="1px solid #D5DAE0" borderRadius="20px" px={2} py={1} color="#6E747A" display="inline-block" ml={2} fontSize="1rem" whiteSpace="nowrap">+ New</StyledLink>
+            </Link>
+          </Flex>
+          <Box is="ul" p={0} my={2}>
+            {collectives.map(membership => (
+              <ListItem py={1} key={`LoggedInMenu-Collective-${get(membership, 'collective.slug')}`}>
                 <Link route={`/${get(membership, 'collective.slug')}`}>
-                  <a title={this.tooltip(membership)} className={membership.role.toLowerCase()}>{get(membership, 'collective.slug')}</a>
+                  <StyledLink title={this.tooltip(membership)} color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial" fontWeight="400">
+                    <Flex alignItems="center">
+                      <Avatar backgroundImage={get(membership, 'collective.image')} size="2.8rem" borderRadius="3px" border="1px solid rgba(18,19,20,0.12)" mr={2} />
+                      {get(membership, 'collective.slug')}
+                    </Flex>
+                  </StyledLink>
                 </Link>
                 { get(membership, 'collective.stats.expenses.pending') > 0 && <Badge>{get(membership, 'collective.stats.expenses.pending')}</Badge> }
-              </li>
-          ))}
-          </ul>
-        </div>
-        <div>
-          <div className="LoginTopBarProfileMenuHeading">
-            <span><FormattedMessage id="menu.myAccount" defaultMessage="My account" /></span>
-            <div className="-dash"></div>
-          </div>
-          <ul>
-            <li>
+              </ListItem>
+            ))}
+          </Box>
+
+          <Flex alignItems="center" mt={3} >
+            <P
+              color="#B4BBBF"
+              fontFamily="montserratlight, arial"
+              fontSize="1rem"
+              fontWeight="400"
+              letterSpacing="1px"
+              pr={2}
+              textTransform="uppercase"
+              whiteSpace="nowrap"
+            >
+              <FormattedMessage id="organization" defaultMessage="my organizations" />
+            </P>
+            <Container height="0.1rem" bg="#E6E6E6" w={1} minWidth={50} />
+            <Link route="/organizations/new">
+              <StyledLink border="1px solid #D5DAE0" borderRadius="20px" px={2} py={1} color="#6E747A" display="inline-block" ml={2} fontSize="1rem" whiteSpace="nowrap">+ New</StyledLink>
+            </Link>
+          </Flex>
+          <Box is="ul" p={0} my={2}>
+            {orgs.map(membership => (
+              <ListItem py={1} key={`LoggedInMenu-Collective-${get(membership, 'collective.slug')}`}>
+                <Link route={`/${get(membership, 'collective.slug')}`}>
+                  <StyledLink title={this.tooltip(membership)} color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial" fontWeight="400">
+                    <Flex alignItems="center">
+                      <Avatar backgroundImage={get(membership, 'collective.image')} size="2.8rem" borderRadius="3px" border="1px solid rgba(18,19,20,0.12)" mr={2} />
+                      {get(membership, 'collective.slug')}
+                    </Flex>
+                  </StyledLink>
+                </Link>
+                { get(membership, 'collective.stats.expenses.pending') > 0 && <Badge>{get(membership, 'collective.stats.expenses.pending')}</Badge> }
+              </ListItem>
+            ))}
+          </Box>
+          {orgs.length === 0 && (
+            <Box my={2}>
+              <P color="#9399A3" fontSize="1rem" letterSpacing="0.5px"><em>No organizations yet</em></P>
+            </Box>
+          )}
+        </Container>
+        <Container height="0.1rem" bg="#E6E6E6" w={1} />
+        <Container p={[3]}>
+            <P
+              color="#B4BBBF"
+              fontFamily="montserratlight, arial"
+              fontSize="1rem"
+              fontWeight="400"
+              letterSpacing="1px"
+              textTransform="uppercase"
+            >
+              <FormattedMessage id="menu.myAccount" defaultMessage="My account" />
+            </P>
+          <Box is="ul" p={0} my={2}>
+            <ListItem py={1}>
               <Link route="collective" params={{slug: LoggedInUser.username}}>
-                <a><FormattedMessage id="menu.profile" defaultMessage="Profile" /></a>
+                <StyledLink color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial">
+                  <FormattedMessage id="menu.profile" defaultMessage="Profile" />
+                </StyledLink>
               </Link>
-            </li>
-            <li>
+            </ListItem>
+            <ListItem py={1}>
               <Link route="subscriptions" params={{collectiveSlug: LoggedInUser.username}}>
-                <a><FormattedMessage id="menu.subscriptions" defaultMessage="Subscriptions" /></a>
+                <StyledLink color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial">
+                  <FormattedMessage id="menu.subscriptions" defaultMessage="Subscriptions" />
+                </StyledLink>
               </Link>
-            </li>
-            <li>
+            </ListItem>
+            <ListItem py={1}>
               <Link route="transactions" params={{collectiveSlug: LoggedInUser.username}}>
-                <a>{ capitalize(intl.formatMessage(this.messages['menu.transactions'])) }</a>
+                <StyledLink color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial">
+                  { capitalize(intl.formatMessage(this.messages['menu.transactions'])) }
+                </StyledLink>
               </Link>
-            </li>
-            <li>
-              <Link route="/organizations/new">
-                <a><FormattedMessage id="menu.createOrganization" defaultMessage="Create an Organization" /></a>
-              </Link>
-            </li>
-            <li><a className="-blue" href="#" onClick={this.logout}><FormattedMessage id="menu.logout" defaultMessage="logout" /></a></li>
-          </ul>
-        </div>
-      </div>
+            </ListItem>
+            <ListItem py={1}>
+              <StyledLink color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial" onClick={this.logout}>
+                <FormattedMessage id="menu.logout" defaultMessage="logout" />
+              </StyledLink>
+            </ListItem>
+          </Box>
+        </Container>
+      </Container>
     )
   }
 
@@ -245,79 +288,32 @@ class TopBarProfileMenu extends React.Component {
     const { LoggedInUser } = this.props;
 
     return (
-      <div className={`TopBarProfileMenu ${showProfileMenu ? '-active' : ''}`} onClick={this.toggleProfileMenu}>
-        <style jsx>{`
-        .TopBarProfileMenu {
-          display: flex;
-          align-items: center;
-        }
-        .LoginTopBarProfileMenu {
-          line-height: 3.1rem;
-        }
-        .LoginTopBarProfileButton:hover {
-          background-color: #fbfbfb;
-          cursor: pointer;
-        }
-        .LoginTopBarProfileButton-caret:after {
-          border-top: 0.5rem solid #fbfbfb;
-        }
-        LoginTopBarProfileButton .-active {
-          background-color: #f7f7f7;
-        }
-        .LoginTopBarProfileButton-caret:after {
-          border-top: 0.5rem solid #f7f7f7;
-        }
-        .LoginTopBarProfileButton-image {
-          display: inline-block;
-          width: 2.6rem;
-          height: 2.6rem;
-          background-color: #fdfdfd;
-          vertical-align: middle;
-          border-radius: 100%;
-          overflow: hidden;
-          background-size: contain;
-          margin-right: 0.5rem;
-          background-repeat: no-repeat;
-          background-position: center;
-        }
-        .LoginTopBarProfileButton-name {
-          display: inline-block;
-          height: 1.8rem;
-          font-size: 1.2rem;
-          font-weight: bold;
-          color: #46b0ed;
-          margin: 0 0.5rem;
-        }
-        .LoginTopBarProfileButton-caret {
-          position: relative;
-          display: inline-block;
-          width: 1.4rem;
-          height: 0.6rem;
-        }
-        .LoginTopBarProfileButton-caret:before {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: 0;
-          border-top: 0.6rem solid #46b0ed;
-          border-left: 0.6rem solid transparent;
-          border-right: 0.6rem solid transparent;
-        }
-        .LoginTopBarProfileButton-caret:after {
-          content: '';
-          position: absolute;
-          left: 0.1rem;
-          top: 0;
-          border-top: 0.5rem solid white;
-          border-left: 0.5rem solid transparent;
-          border-right: 0.5rem solid transparent;
-        }
-        `}</style>
-        {LoggedInUser.image && <div className="LoginTopBarProfileButton-image" style={{backgroundImage: `url(${LoggedInUser.image})`}}></div>}
-        <div className="LoginTopBarProfileButton-name desktopOnly">{LoggedInUser.username}</div>
-        <div className="LoginTopBarProfileButton-caret"></div>
+      <Flex alignItems="center" onClick={this.toggleProfileMenu}>
+        {LoggedInUser.image && (
+          <Avatar
+            backgroundColor="#FDFDFD"
+            backgroundImage={LoggedInUser.image}
+            borderRadius="100%"
+            display="inline-block"
+            size="2.6rem"
+            mr={2}
+          />
+        )}
+        <Hide xs sm>
+          <P
+            color="#46b0ed"
+            display="inline-block"
+            fontSize="1.2rem"
+            fontWeight="bold"
+            letterSpacing="1px"
+            mx={2}
+          >
+            {LoggedInUser.username}
+          </P>
+        </Hide>
+        <Caret color="#46b0ed" display="inline-block" height="0.6rem" strokeWidth="0.2rem" width="1.4rem" />
         {showProfileMenu && this.renderProfileMenu()}
-      </div>
+      </Flex>
     )
   }
 
@@ -338,40 +334,30 @@ class TopBarProfileMenu extends React.Component {
     }
 
     return (
-      <div className="LoginTopBarProfileButton">
-        <style jsx>{`
-        .LoginTopBarProfileButton {
-          position: relative;
-          box-sizing: border-box;
-          display: inline-block;
-          border-radius: 0.5rem;
-          vertical-align: middle;
-          margin-right: 0;
-          padding: 0.6rem 0.1rem;
-          font-size: 1.2rem;
-          letter-spacing: 0.1rem;
-          color: #b4bbbf;
-          cursor: pointer;
-        }
-        .LoginTopBarProfileButton a {
-          color: #b4bbbf;
-        }
-        `}</style>
-
+      <div>
         { status === 'loading' &&
-          <div className="LoginTopBarProfileButton"><FormattedMessage id="loading" defaultMessage="loading" />&hellip;</div>
+          <P color="#D5DAE0" fontSize="1.4rem" px={3} py={2} display="inline-block"><FormattedMessage id="loading" defaultMessage="loading" />&hellip;</P>
         }
 
         { status === 'loggingout' &&
-          <div className="LoginTopBarProfileButton"><FormattedMessage id="loggingout" defaultMessage="logging out" />&hellip;</div>
+          <P color="#D5DAE0" fontSize="1.4rem" px={3} py={2} display="inline-block"><FormattedMessage id="loggingout" defaultMessage="logging out" />&hellip;</P>
         }
 
         { status === 'loggedout' &&
-          <div className="LoginTopBarProfileButton">
-            <Link route="signin" params={{ next: this.redirectAfterSignin }}>
-              <a><FormattedMessage id="login.button" defaultMessage="login" /></a>
-            </Link>
-          </div>
+          <Link route="signin" params={{ next: this.redirectAfterSignin }}>
+            <StyledLink
+              border="1px solid #D5DAE0"
+              borderRadius="20px"
+              color="#3385FF"
+              display="inline-block"
+              fontSize="1.4rem"
+              hover={{ cursor: 'pointer' }}
+              px={3}
+              py={2}
+            >
+              <FormattedMessage id="login.button" defaultMessage="Login" />
+            </StyledLink>
+          </Link>
         }
 
         { status === 'loggedin' && this.renderLoggedInUser() }
