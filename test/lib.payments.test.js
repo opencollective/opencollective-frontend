@@ -1,3 +1,4 @@
+import config from 'config';
 import { expect } from 'chai';
 import sinon from 'sinon';
 
@@ -22,10 +23,10 @@ describe('lib.payments.test.js', () => {
   let host, user, user2, collective, order, collective2, sandbox, emailSendSpy;
 
   before(() => {
-    nock('http://api.fixer.io:80', {"encodedQueryParams":true})
+    nock('http://data.fixer.io', {"encodedQueryParams":true})
     .get('/latest')
     .times(19)
-    .query({"base":"EUR","symbols":"USD"})
+    .query({ access_key: config.fixer.accessKey, base: 'EUR', symbols: 'USD'})
     .reply(200, {"base":"EUR","date":"2017-10-05","rates":{"USD":1.1742}});
   });
 

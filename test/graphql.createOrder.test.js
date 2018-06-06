@@ -1,3 +1,4 @@
+import config from 'config';
 import nock from 'nock';
 import sinon from 'sinon';
 import { expect } from 'chai';
@@ -78,15 +79,16 @@ describe('createOrder', () => {
   let sandbox, tweetStatusSpy, brusselstogether;
 
   before(() => {
-    nock('http://api.fixer.io:80')
+    nock('http://data.fixer.io')
       .get(/20[0-9]{2}\-[0-9]{2}\-[0-9]{2}/)
       .times(5)
-      .query({"base":"EUR","symbols":"USD"})
+      .query({ access_key: config.fixer.accessKey, base: 'EUR', symbols: 'USD'})
       .reply(200, {"base":"EUR","date":"2017-09-01","rates":{"USD":1.192}});
-    nock('http://api.fixer.io:80')
+
+    nock('http://data.fixer.io')
       .get('/latest')
       .times(5)
-      .query({"base":"EUR","symbols":"USD"})
+      .query({ access_key: config.fixer.accessKey, base: 'EUR', symbols: 'USD'})
       .reply(200, {"base":"EUR","date":"2017-09-22","rates":{"USD":1.1961} }, ['Server', 'nosniff'])
   });
 
@@ -438,7 +440,7 @@ describe('createOrder', () => {
       // Should fail if order.totalAmount > PaymentMethod.monthlyLimitPerMember
       res = await utils.graphqlQuery(createOrderQuery, { order }, duc);
       expect(res.errors).to.exist;
-      expect(res.errors[0].message).to.equal("The total amount of this order (€200 ~= $234) is higher than your monthly spending limit on this payment method ($100)");
+      expect(res.errors[0].message).to.equal("The total amount of this order (€200 ~= $239) is higher than your monthly spending limit on this payment method ($100)");
 
       sandbox.useFakeTimers((new Date('2017-09-22')).getTime());
       await paymentMethod.update({ monthlyLimitPerMember: 25000 }); // $250 limit
@@ -447,7 +449,7 @@ describe('createOrder', () => {
       expect(res.errors).to.not.exist;
 
       const availableBalance = await paymentMethod.getBalanceForUser(duc);
-      expect(availableBalance.amount).to.equal(1276);
+      expect(availableBalance.amount).to.equal(1160);
 
       const orderCreated = res.data.createOrder;
       const fromCollective = orderCreated.fromCollective;
@@ -465,7 +467,7 @@ describe('createOrder', () => {
       // Should fail if order.totalAmount > PaymentMethod.getBalanceForUser
       res = await utils.graphqlQuery(createOrderQuery, { order }, duc);
       expect(res.errors).to.exist;
-      expect(res.errors[0].message).to.equal("You don't have enough funds available ($13 left) to execute this order (€200 ~= $234)");
+      expect(res.errors[0].message).to.equal("You don't have enough funds available ($12 left) to execute this order (€200 ~= $239)");
 
     });
 
