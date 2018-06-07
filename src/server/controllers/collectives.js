@@ -1,4 +1,4 @@
-import r2 from 'r2';
+import fetch from 'node-fetch';
 import sizeOf from 'image-size';
 import request from 'request';
 import url from 'url';
@@ -18,6 +18,8 @@ const cache = require('lru-cache')({
 
 const WEBSITE_URL = process.env.WEBSITE_URL || "https://opencollective.com";
 
+const fetchText = path => fetch(path).then(response => response.text());
+
 /**
  * Generates a github badge for a backerType (backers|sponsors) or for a tierSlug
  */
@@ -36,7 +38,7 @@ export async function badge(req, res) {
     }
 
     try {
-      const imageRequest = await r2(imageUrl).text;
+      const imageRequest = await fetchText(imageUrl);
       res.setHeader('content-type','image/svg+xml;charset=utf-8');
       res.setHeader('cache-control','max-age=600');
       return res.send(imageRequest);
