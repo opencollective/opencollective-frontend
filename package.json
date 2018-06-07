@@ -167,5 +167,9 @@
       "react-mde",
       "webpack"
     ]
-  }
+  },
+  "cacheDirectories": [
+    ".cache",
+    "node_modules"
+  ]
 }
