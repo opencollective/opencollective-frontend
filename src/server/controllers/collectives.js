@@ -172,9 +172,9 @@ export async function banner(req, res) {
           return svg2png(svg);
       }
     })
-    .then(svg => {
+    .then(content => {
       res.setHeader('Cache-Control', 'public, max-age=300');
-      res.send(svg);
+      res.send(content);
     })
     .catch(e => {
       logger.error('>>> collectives.banner error', e);
