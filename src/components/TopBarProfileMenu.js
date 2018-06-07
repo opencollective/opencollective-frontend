@@ -33,6 +33,7 @@ import { P } from './Text';
 import Caret from './Caret';
 import StyledLink from './StyledLink';
 import ListItem from './ListItem';
+import Container from './Container';
 
 const Avatar = styled.div`
   background-position: center;
@@ -47,25 +48,6 @@ const Avatar = styled.div`
   ${display}
   ${size}
   ${space}
-`;
-
-const Container = styled.div`
-  ${bgColor}
-  ${border}
-  ${borderRadius}
-  ${bottom}
-  ${boxShadow}
-  ${display}
-  ${height}
-  ${left}
-  ${maxWidth}
-  ${minWidth}
-  ${position}
-  ${right}
-  ${space}
-  ${top}
-  ${width}
-  ${zIndex}
 `;
 
 class TopBarProfileMenu extends React.Component {
