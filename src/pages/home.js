@@ -2,6 +2,9 @@ import React, { Fragment } from 'react';
 import { graphql } from 'react-apollo'
 import gql from 'graphql-tag'
 
+import styled from 'styled-components';
+import { Box, Flex } from 'grid-styled';
+
 import withData from '../lib/withData'
 import withIntl from '../lib/withIntl';
 import withLoggedInUser from '../lib/withLoggedInUser';
@@ -13,6 +16,11 @@ import Footer from '../components/Footer';
 import Header from '../components/Header';
 import TransactionSimple from '../components/TransactionSimple';
 import { Link } from '../server/pages';
+import { P, H1 } from '../components/Text';
+import ListItem from '../components/ListItem';
+import Hide from '../components/Hide';
+import Container from '../components/Container';
+import StyledLink from '../components/StyledLink';
 
 class HomePage extends React.Component {
   state = {
@@ -41,53 +49,71 @@ class HomePage extends React.Component {
 
     return (
       <Fragment>
-        <style jsx>{`
-          .ai-center { align-items: center; }
-          .f-subheadline { font-size: 5rem; }
-          .flex { display: flex; }
-          .pa3 { padding: 1rem; }
-          .text-center { text-align: center; }
-          .text-left { text-align: left; }
-          .w-50 { width: 50%; }
-          .list { list-style: none; }
-          .item {
-            border: 1px solid rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
-            box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.2);
-            margin-bottom: 0.3625rem;
-          }
-        `}</style>
         <Header
           title="Home"
           LoggedInUser={LoggedInUser}
         />
         <Body>
-          <div className="flex pa3">
-            <div className="w-50">
-              <h1 className="f-subheadline text-left">A new form of association, <br /> <strong>transparent by design.</strong></h1>
+          <Container
+            alignItems="center"
+            backgroundImage="/static/images/hero-bg.svg"
+            backgroundPosition="center top"
+            backgroundSize="cover"
+            backgroundRepeat="no-repeat"
+            boxShadown="inset 0px -60px 100px 0 rgba(78,121,187,0.1), 0px 40px 80px 0 rgba(78, 121,187, 0.12)"
+            display="flex"
+            justifyContent="space-between"
+            px={3}
+            py="5rem"
+          >
+            <Container w={[1, null, 0.5]} pr={[null, null, 4]} maxWidth={450}>
+              <H1 fontWeight="normal" textAlign="left">A new form of association, <br /> <strong>transparent by design.</strong></H1>
 
-              <p>
+              <P my={3} color="#6E747A">
                 It's time to break the mold. 21st century citizens need organizations where all members share the mission;
                  where anybody can contribute; where leaders can change; and where money works in full transparency.
                 Open Collective provides the digitals tools you need to take your group a step closer in that direction.
-              </p>
+              </P>
 
-              <p className="f4 bold">The movement has begun. Are you ready?</p>
+              <P fontWeight="bold" fontSize="2rem">The movement has begun. Are you ready?</P>
 
-              <div className="flex ai-center">
-                <Button>Join the movement</Button>
-                <Link href="/learn-more">How it works ></Link>
-              </div>
-            </div>
+              <Flex alignItems="center" flexDirection={['column', null, 'row']} my={4}>
+                <StyledLink
+                  href="#movement"
+                  bg="#3385FF"
+                  borderRadius="50px"
+                  color="white"
+                  fontSize="1.6rem"
+                  fontWeight="bold"
+                  maxWidth="220px"
+                  hover={{ color: 'white' }}
+                  py={3}
+                  textAlign="center"
+                  w={1}
+                >
+                  Join the movement
+                </StyledLink>
+                <Link href="/learn-more">
+                  <StyledLink mt={[3, null, 0]} ml={[null, null, 3]}>How it works ></StyledLink>
+                </Link>
+              </Flex>
+            </Container>
 
-            <div className="w-50">
-              <p className="text-center">Latest Transactions</p>
-              <ul className="list" style={{ maxHeight: '50rem', overflow: 'scroll' }}>
-                {transactions.map((transaction) => <li key={transaction.id} className="pa3 item"><TransactionSimple {...transaction} /></li>)}
-              </ul>
-            </div>
-          </div>
-
+            <Hide xs sm w={0.5}>
+              <P textAlign="center" color="#C2C6CC" textTransform="uppercase" fontSize="1.2rem" letterSpacing="0.8px" mb={3}>Latest Transactions</P>
+              <Container maxHeight="50rem" overflow="scroll">
+                <Box is="ul" p={0}>
+                  {transactions.map((transaction) => (
+                    <ListItem key={transaction.id} mb={1}>
+                      <Container bg="white" border="1px solid rgba(0, 0, 0, 0.1)" borderRadius="8px" boxShadow="0 2px 4px 0 rgba(46,48,51,0.08);" p={3}>
+                        <TransactionSimple {...transaction} />
+                      </Container>
+                    </ListItem>
+                  ))}
+                </Box>
+              </Container>
+            </Hide>
+          </Container>
         </Body>
         <Footer />
       </Fragment>
