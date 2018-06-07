@@ -41,17 +41,17 @@ describe("api.json.test.js", () => {
     });
 
     test("return /:collectiveSlug/members.json", async () => {
-      const res = await fetchJson('/railsgirlsatl/members.json');
-      expect(res.length).toBeGreaterThan(5);
-      validateMember(res[0]);
+      const members = await fetchJson('/railsgirlsatl/members.json');
+      expect(members.length).toBeGreaterThan(5);
+      validateMember(members[0]);
     });
 
     test("return /:collectiveSlug/members/organizations.json", async () => {
-      const res = await fetchJson('/railsgirlsatl/members/organizations.json');
-      expect(res.length).toBeGreaterThan(2);
-      validateMember(res[0]);
-      expect(res[0].type).toEqual('ORGANIZATION');
-      expect(res[1].type).toEqual('ORGANIZATION');
+      const organizations = await fetchJson('/railsgirlsatl/members/organizations.json');
+      expect(organizations.length).toBeGreaterThan(2);
+      validateMember(organizations[0]);
+      expect(organizations[0].type).toEqual('ORGANIZATION');
+      expect(organizations[1].type).toEqual('ORGANIZATION');
     });
   });
 
@@ -70,9 +70,9 @@ describe("api.json.test.js", () => {
   describe("event", () => {
 
     test("return /:collectiveSlug/events.json", async () => {
-      const res = await fetchJson('/veganizerbxl/events.json');
-      expect(res).toHaveLength(6);
-      expect(res[0]).toEqual({ id: 8722,
+      const events = await fetchJson('/veganizerbxl/events.json');
+      expect(events).toHaveLength(6);
+      expect(events[0]).toEqual({ id: 8722,
         name: 'Vegan Dining Week',
         description: null,
         slug: 'vegandiningweek-407ev',
@@ -89,29 +89,29 @@ describe("api.json.test.js", () => {
     });
 
     test("return /:collectiveSlug/events/:eventSlug.json", async () => {
-      const res = await fetchJson('/veganizerbxl/events/superfilles.json');
-      expect(res).toEqual({"id":8716,"name":"Les Super Filles du Tram: Officially Veganized","description":null,"longDescription":"It is finally happening: Veganizer BXL is launching an incredibly tasty vegan burger, 100% plant-based and, in true Brussels style, infused with the bold flavor of Brussels Beer Project's Babylone beer! The seitan base is provided by a basis of Bertyn seitan. The hamburger bun prepared by Agribio's Laurent Pedrotti. For now, it will be exclusively available at the famous burger place Les Super Filles du Tram at Flagey. \n\n<center><img src=\"https://cl.ly/1M2f0N2K1W1I/veganizerbxl.jpg\" style=\"max-width:100%\" /></center>\n\nThe night of the event, orders can also be made through Deliveroo to have your burgers delivered at home in the Brussels area. ","slug":"superfilles","image":null,"startsAt":"Mon Apr 24 2017 17:00:00 GMT+0000 (UTC)","endsAt":"Mon Apr 24 2017 19:00:00 GMT+0000 (UTC)","location":{"name":"Les Super Filles du Tram","address":"Rue Lesbroussart 22, 1050 Bruxelles","lat":50.827697,"long":4.370636},"currency":"EUR","tiers":[{"id":13,"name":"free ticket","description":"note: this is not an official reservation! First come, first serve. It is however a great way for us to get an idea of how many people will be attending. Plus, we will send you a little reminder before the event!","amount":0},{"id":19,"name":"supporter ticket","description":"Support the VeganizerBXL collective. Your donations matter.","amount":500}],"url":"https://opencollective.com/veganizerbxl/events/superfilles","attendees":"https://opencollective.com/veganizerbxl/events/superfilles/attendees.json"});
+      const event = await fetchJson('/veganizerbxl/events/superfilles.json');
+      expect(event).toEqual({"id":8716,"name":"Les Super Filles du Tram: Officially Veganized","description":null,"longDescription":"It is finally happening: Veganizer BXL is launching an incredibly tasty vegan burger, 100% plant-based and, in true Brussels style, infused with the bold flavor of Brussels Beer Project's Babylone beer! The seitan base is provided by a basis of Bertyn seitan. The hamburger bun prepared by Agribio's Laurent Pedrotti. For now, it will be exclusively available at the famous burger place Les Super Filles du Tram at Flagey. \n\n<center><img src=\"https://cl.ly/1M2f0N2K1W1I/veganizerbxl.jpg\" style=\"max-width:100%\" /></center>\n\nThe night of the event, orders can also be made through Deliveroo to have your burgers delivered at home in the Brussels area. ","slug":"superfilles","image":null,"startsAt":"Mon Apr 24 2017 17:00:00 GMT+0000 (UTC)","endsAt":"Mon Apr 24 2017 19:00:00 GMT+0000 (UTC)","location":{"name":"Les Super Filles du Tram","address":"Rue Lesbroussart 22, 1050 Bruxelles","lat":50.827697,"long":4.370636},"currency":"EUR","tiers":[{"id":13,"name":"free ticket","description":"note: this is not an official reservation! First come, first serve. It is however a great way for us to get an idea of how many people will be attending. Plus, we will send you a little reminder before the event!","amount":0},{"id":19,"name":"supporter ticket","description":"Support the VeganizerBXL collective. Your donations matter.","amount":500}],"url":"https://opencollective.com/veganizerbxl/events/superfilles","attendees":"https://opencollective.com/veganizerbxl/events/superfilles/attendees.json"});
     });
 
     test("return /:collectiveSlug/events/:eventSlug/attendees.json", async () => {
-      const res = await fetchJson('/veganizerbxl/events/superfilles/attendees.json');
-      validateMember(res[0]);
-      expect(res[0].role).toEqual('ATTENDEE');
-      expect(res[1].role).toEqual('ATTENDEE');
+      const attendees = await fetchJson('/veganizerbxl/events/superfilles/attendees.json');
+      validateMember(attendees[0]);
+      expect(attendees[0].role).toEqual('ATTENDEE');
+      expect(attendees[1].role).toEqual('ATTENDEE');
     });
 
     test("return /:collectiveSlug/events/:eventSlug/followers.json", async () => {
-      const res = await fetchJson('/veganizerbxl/events/superfilles/followers.json');
-      validateMember(res[0]);
-      expect(res[0].role).toEqual('FOLLOWER');
-      expect(res[1].role).toEqual('FOLLOWER');
+      const followers = await fetchJson('/veganizerbxl/events/superfilles/followers.json');
+      validateMember(followers[0]);
+      expect(followers[0].role).toEqual('FOLLOWER');
+      expect(followers[1].role).toEqual('FOLLOWER');
     });
 
     test("return /:collectiveSlug/events/:eventSlug/organizers.json", async () => {
-      const res = await fetchJson('/veganizerbxl/events/superfilles/organizers.json');
-      validateMember(res[0]);
-      expect(res[0].role).toEqual('ADMIN');
-      expect(res[1].role).toEqual('ADMIN');
+      const organizers = await fetchJson('/veganizerbxl/events/superfilles/organizers.json');
+      validateMember(organizers[0]);
+      expect(organizers[0].role).toEqual('ADMIN');
+      expect(organizers[1].role).toEqual('ADMIN');
     });
 
   });
