@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import {
   active,
-  backgroundColor,
+  bgColor,
   border,
   borderRadius,
   color,
@@ -10,6 +10,7 @@ import {
   fontSize,
   fontWeight,
   hover,
+  maxWidth,
   space,
   textAlign,
   width,
@@ -18,7 +19,7 @@ import { whiteSpace } from './Text';
 
 const StyledLink = styled.a`
   ${active}
-  ${backgroundColor}
+  ${bgColor}
   ${border}
   ${borderRadius}
   ${color}
@@ -27,6 +28,7 @@ const StyledLink = styled.a`
   ${fontSize}
   ${fontWeight}
   ${hover}
+  ${maxWidth}
   ${space}
   ${textAlign}
   ${whiteSpace}
