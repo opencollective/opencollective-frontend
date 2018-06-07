@@ -87,8 +87,8 @@ describe('graphql.paymentMethods.test.js', () => {
     const fxrate = 1.1654; // 1 EUR = 1.1654 USD
 
     beforeEach(() => {
-      sandbox = sinon.sandbox.create();
-      sandbox.stub(libcurrency, 'getFxRate', () => Promise.resolve(fxrate));
+      sandbox = sinon.createSandbox();
+      sandbox.stub(libcurrency, 'getFxRate').callsFake(() => Promise.resolve(fxrate));
       return models.PaymentMethod.findOne({
         where: {
           service: 'opencollective',

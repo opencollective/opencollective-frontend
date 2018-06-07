@@ -20,7 +20,7 @@ describe('graphql.updates.test', () => {
   */
 
   before(() => {
-    sandbox = sinon.sandbox.create();
+    sandbox = sinon.createSandbox();
     sendEmailSpy = sandbox.spy(emailLib, 'sendMessage');
     sendTweetSpy = sandbox.spy(twitterLib, 'tweetStatus');
   });
@@ -144,7 +144,7 @@ describe('graphql.updates.test', () => {
       });
 
       beforeEach(() => {
-        sendEmailSpy.reset();
+        sendEmailSpy.resetHistory();
       })
 
       it("published the update successfully", async () => {

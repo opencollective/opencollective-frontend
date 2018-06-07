@@ -60,7 +60,7 @@ describe('graphql.matchingFund.test.js', () => {
   before(initNock);
 
   before(() => {
-    sandbox = sinon.sandbox.create();
+    sandbox = sinon.createSandbox();
     emailSendSpy = sandbox.spy(emailLib, 'send');
   });
 
@@ -71,7 +71,7 @@ describe('graphql.matchingFund.test.js', () => {
 
   beforeEach(() => utils.resetTestDB());
   beforeEach(async () => {
-    emailSendSpy.reset();
+    emailSendSpy.resetHistory();
     admin = await models.User.createUserWithCollective({ name: "admin" });
     user1 = await models.User.createUserWithCollective({ name: "user1", email: "user1@opencollective.com" });
     user2 = await models.User.createUserWithCollective({ name: "user2", email: "user2@opencollective.com" });

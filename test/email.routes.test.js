@@ -67,7 +67,7 @@ describe("email.routes.test", () => {
   before(initNock);
 
   beforeEach(() => {
-    sandbox = sinon.sandbox.create();
+    sandbox = sinon.createSandbox();
   });
 
   afterEach(() => {

@@ -94,7 +94,7 @@ describe('Collective model', () => {
 
 
   before(() => {
-    sandbox = sinon.sandbox.create();
+    sandbox = sinon.createSandbox();
     sendEmailSpy = sandbox.spy(emailLib, 'sendMessage');
   });
 

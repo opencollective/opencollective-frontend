@@ -96,7 +96,7 @@ describe('createOrder', () => {
 
   beforeEach(async () => {
     await utils.resetTestDB();
-    sandbox = sinon.sandbox.create();
+    sandbox = sinon.createSandbox();
     tweetStatusSpy = sandbox.spy(twitter, 'tweetStatus');
 
     // Given a collective (with a host)

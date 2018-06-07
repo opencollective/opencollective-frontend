@@ -20,7 +20,7 @@ describe('lib.imageUrlToAmazonUrl.js', () => {
     let multiPartStub
 
     before(() => {
-      sinon.stub(uuid, 'v1', () => 'testuuid');
+      sinon.stub(uuid, 'v1').callsFake(() => 'testuuid');
 
       multiPartStub = sinon.stub(imageUrlLib, 'multiPartUpload')
       multiPartStub.yields(null, {Location: returnUrl});

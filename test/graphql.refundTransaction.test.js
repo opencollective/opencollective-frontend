@@ -142,7 +142,7 @@ describe("Refund Transaction", () => {
   describe("Save CreatedByUserId", () => {
     let userStub;
     beforeEach(() => {
-      userStub = sinon.stub(models.User.prototype, 'isRoot', () => true);
+      userStub = sinon.stub(models.User.prototype, 'isRoot').callsFake(() => true);
     });
     afterEach(() => userStub.restore());
 
@@ -188,7 +188,7 @@ describe("Refund Transaction", () => {
   describe("Stripe Transaction - for hosts created before September 17th 2017", () => {
     let userStub;
     beforeEach(() => {
-      userStub = sinon.stub(models.User.prototype, 'isRoot', () => true);
+      userStub = sinon.stub(models.User.prototype, 'isRoot').callsFake(() => true);
     });
     afterEach(() => userStub.restore());
 
@@ -280,7 +280,7 @@ describe("Refund Transaction", () => {
   describe("Stripe Transaction - for hosts created after September 17th 2017", () => {
     let userStub;
     beforeEach(() => {
-      userStub = sinon.stub(models.User.prototype, 'isRoot', () => true);
+      userStub = sinon.stub(models.User.prototype, 'isRoot').callsFake(() => true);
     });
     afterEach(() => userStub.restore());
 
