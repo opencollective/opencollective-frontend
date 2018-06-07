@@ -6,6 +6,8 @@ import { defineMessages, FormattedNumber, injectIntl } from 'react-intl';
 import withIntl from '../lib/withIntl';
 
 import Avatar from './Avatar';
+import Container from './Container';
+import { P, Span } from './Text';
 
 const TransactionSimple = ({
   amount,
@@ -18,34 +20,34 @@ const TransactionSimple = ({
 }) => {
 
   return (
-    <div className="flex">
-      <style jsx>{`
-        .flex { display: flex; }
-        .ml3 { margin-left: 1rem; }
-        .m0 { margin: 0; }
-      `}</style>
+    <Container display="flex" alignItems="center">
       <a href={`/${fromCollective.slug}`} title={fromCollective.name}>
         <Avatar src={fromCollective.image} id={fromCollective.id} radius={40} className="noFrame" />
       </a>
-      <div className="ml3">
-        <p className="m0">
+      <Container ml={3}>
+        <P fontSize="1.2rem" color="#9399A3" display="inline">
           <a href={`/${fromCollective.slug}`} title={fromCollective.name}>{fromCollective.name}</a>
           {type === 'DEBIT' ? ' submitted a ' : ' contributed '}
-          <FormattedNumber
-            currency={currency}
-            currencyDisplay="symbol"
-            maximumFractionDigits={2}
-            minimumFractionDigits={2}
-            style="currency"
-            value={Math.abs(amount) / 100}
-          />
+          <Span color="#2E3033">
+            <FormattedNumber
+              currency={currency}
+              currencyDisplay="symbol"
+              maximumFractionDigits={2}
+              minimumFractionDigits={2}
+              style="currency"
+              value={Math.abs(amount) / 100}
+            />
+          </Span>
           {subscription && ` a ${subscription.interval} `}
           {type === 'DEBIT' && ' expense '}
           to <a href={`/${host.slug}`} title={host.name}>{host.name}</a>.
-        </p>
-        <small>{moment(createdAt).fromNow()}</small>
-      </div>
-    </div>
+        </P>
+        <Container position="relative" top={4} left={4} display="inline-block">
+          <P fontSize="1.6rem">{type === 'DEBIT' && ' 🎉'}</P>
+        </Container>
+        <P fontSize="1rem" color="#AEB2B8">{moment(createdAt).fromNow()}</P>
+      </Container>
+    </Container>
   );
 };
 
