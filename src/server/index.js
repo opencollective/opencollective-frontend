@@ -1,6 +1,13 @@
+// Load environment variables
 import dotenv from 'dotenv';
 dotenv.config();
-import 'newrelic';
+
+// Only load newrelic when we explicitly want it
+if (process.env.NEW_RELIC_ENABLED) {
+  require('newrelic');
+}
+
+import path from 'path';
 import http from 'http';
 import express from 'express';
 import next from 'next';
@@ -12,7 +19,7 @@ import { getLocaleDataScript, getMessages, languages } from './intl';
 const env = process.env.NODE_ENV || "development";
 const dev = (env === 'development');
 const server = express();
-const app = next({ dev, dir: dev ? 'src' : 'build' });
+const app = next({ dev, dir: path.dirname(__dirname) });
 server.next = app;
 
 const port = process.env.PORT || 3000;
