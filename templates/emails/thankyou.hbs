@@ -52,7 +52,11 @@ The total amount that you will help us raise will be shown on your profile! <a h
   – The {{collective.name}} open collective
 </p>
 
-{{> relatedcollectives}}
+{{#if recommendedCollectives.length}}
+  {{> recommendedcollectives}}
+{{else if relatedCollectives.length}}
+  {{> relatedcollectives}}
+{{/if}}
 
 {{> footer}}
 

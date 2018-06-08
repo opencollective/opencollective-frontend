@@ -6,7 +6,7 @@ import userlib from '../server/lib/userlib';
 
 describe("clearbit", () => {
 
-  const sandbox = sinon.sandbox.create();
+  const sandbox = sinon.createSandbox();
 
   beforeEach(() => utils.clearbitStubBeforeEach(sandbox));
 

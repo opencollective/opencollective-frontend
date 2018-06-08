@@ -34,7 +34,7 @@ export const data = (item) => {
 }
 
 export const clearbitStubBeforeEach = sandbox => {
-  sandbox.stub(userlib.clearbit.Enrichment, 'find', () => {
+  sandbox.stub(userlib.clearbit.Enrichment, 'find').callsFake(() => {
     return Promise.reject(new userlib.clearbit.Enrichment.NotFoundError());
   });
 };
@@ -207,9 +207,9 @@ export function stubStripeCreate(sandbox, overloadDefaults) {
   /* Little helper function that returns the stub with a given
    * value. */
   const factory = (name) => async () => values[name];
-  sandbox.stub(stripeGateway, "createCustomer", factory('customer'));
-  sandbox.stub(stripeGateway, "createToken", factory('token'));
-  sandbox.stub(stripeGateway, "createCharge", factory('charge'));
+  sandbox.stub(stripeGateway, "createCustomer").callsFake(factory('customer'));
+  sandbox.stub(stripeGateway, "createToken").callsFake(factory('token'));
+  sandbox.stub(stripeGateway, "createCharge").callsFake(factory('charge'));
 }
 
 export function stubStripeBalance(sandbox, amount, currency, applicationFee=0, stripeFee=0) {
@@ -219,7 +219,7 @@ export function stubStripeBalance(sandbox, amount, currency, applicationFee=0, s
     fee_details.push({ type: 'application_fee', amount: applicationFee });
   if (stripeFee && stripeFee > 0)
     fee_details.push({ type: 'stripe_fee', amount: stripeFee });
-  return sandbox.stub(stripeGateway, "retrieveBalanceTransaction", async () => ({
+  return sandbox.stub(stripeGateway, "retrieveBalanceTransaction").callsFake(async () => ({
     id: "txn_1Bs9EEBYycQg1OMfTR33Y5Xr",
     object: "balance_transaction",
     amount,

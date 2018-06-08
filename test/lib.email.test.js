@@ -24,7 +24,7 @@ describe('lib/email', () => {
           },
           logger: false
         });
-    sinon.stub(nodemailer, 'createTransport', () => {
+    sinon.stub(nodemailer, 'createTransport').callsFake(() => {
       return nm;
     });
     done();
@@ -32,7 +32,7 @@ describe('lib/email', () => {
 
   // stub the transport
   beforeEach(done => {
-    sinon.stub(nm, 'sendMail', (object, cb) => {
+    sinon.stub(nm, 'sendMail').callsFake((object, cb) => {
       cb(null, object);
     });
     done();

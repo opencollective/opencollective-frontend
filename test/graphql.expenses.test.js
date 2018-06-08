@@ -196,7 +196,7 @@ describe('GraphQL Expenses API', () => {
     let sandbox, emailSendMessageSpy;
 
     beforeEach(() => {
-      sandbox = sinon.sandbox.create();
+      sandbox = sinon.createSandbox();
       emailSendMessageSpy = sandbox.spy(emailLib, 'sendMessage');
     });
 
@@ -271,7 +271,7 @@ describe('GraphQL Expenses API', () => {
     let sandbox, emailSendMessageSpy;
 
     beforeEach(() => {
-      sandbox = sinon.sandbox.create();
+      sandbox = sinon.createSandbox();
       emailSendMessageSpy = sandbox.spy(emailLib, 'sendMessage');
     });
 
@@ -338,7 +338,7 @@ describe('GraphQL Expenses API', () => {
     let sandbox, emailSendMessageSpy;
 
     beforeEach(() => {
-      sandbox = sinon.sandbox.create();
+      sandbox = sinon.createSandbox();
       emailSendMessageSpy = sandbox.spy(emailLib, 'sendMessage');
     });
 

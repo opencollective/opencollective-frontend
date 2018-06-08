@@ -49,25 +49,25 @@ describe('graphql.tiers.test', () => {
   });
 
   before(() => {
-    sandbox = sinon.sandbox.create();
+    sandbox = sinon.createSandbox();
   });
 
   after(() => sandbox.restore());
 
   before(() => {
-    sandbox.stub(stripe, 'createToken', () => {
+    sandbox.stub(stripe, 'createToken').callsFake(() => {
       return Promise.resolve({ id: 'tok_B5s4wkqxtUtNyM'});
     });
-    sandbox.stub(stripe, 'createCustomer', () => {
+    sandbox.stub(stripe, 'createCustomer').callsFake(() => {
       return Promise.resolve({ id: 'cus_B5s4wkqxtUtNyM'});
     });
-    sandbox.stub(stripe, 'createCharge', (hostStripeAccount, data) => {
+    sandbox.stub(stripe, 'createCharge').callsFake((hostStripeAccount, data) => {
       return Promise.resolve({
         "amount": data.amount,
         "balance_transaction": "txn_19XJJ02eZvKYlo2ClwuJ1rbA",
       });
     });
-    sandbox.stub(stripe, 'retrieveBalanceTransaction', () => {
+    sandbox.stub(stripe, 'retrieveBalanceTransaction').callsFake(() => {
       return Promise.resolve({
         "id": "txn_19XJJ02eZvKYlo2ClwuJ1rbA",
         "object": "balance_transaction",
@@ -92,10 +92,10 @@ describe('graphql.tiers.test', () => {
         "type": "charge"
       });
     });
-    sandbox.stub(stripe, 'getOrCreatePlan', () => {
+    sandbox.stub(stripe, 'getOrCreatePlan').callsFake(() => {
       return Promise.resolve({ id: 'stripePlanId-111' });
     });
-    sandbox.stub(stripe, 'createSubscription', () => {
+    sandbox.stub(stripe, 'createSubscription').callsFake(() => {
       return Promise.resolve({ id: 'stripeSubscriptionId-123' });
     });
 

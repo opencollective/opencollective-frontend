@@ -15,7 +15,7 @@ describe('user.models.test.js', () => {
   let sandbox;
 
   before(() => {
-    sandbox = sinon.sandbox.create();
+    sandbox = sinon.createSandbox();
   });
 
   after(() => sandbox.restore());
@@ -144,7 +144,7 @@ describe('user.models.test.js', () => {
     it('contains the right base URL from config and the right query parameter', async () => {
       // Given a user instance with a mocked `jwt` method
       const user = await User.create({ email: 'foo@oc.com', password: '123456' });
-      const mockUser = sinon.stub(user, 'jwt', () => 'foo');
+      const mockUser = sinon.stub(user, 'jwt').callsFake(() => 'foo');
 
       // When a login link is created
       const link = user.generateLoginLink('/path/to/redirect');
@@ -164,7 +164,7 @@ describe('user.models.test.js', () => {
     it('generates a valid token with right expiration time', async () => {
       // Given a user instance with a mocked `jwt` method
       const user = await User.create({ email: 'foo@oc.com', password: '123456' });
-      const mockUser = sinon.stub(user, 'jwt', (payload, expiration) => ({ payload, expiration }));
+      const mockUser = sinon.stub(user, 'jwt').callsFake((payload, expiration) => ({ payload, expiration }));
 
       // When an account verification link is created
       const output = user.generateConnectedAccountVerifiedToken(1, 'user');

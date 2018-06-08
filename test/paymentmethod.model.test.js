@@ -1,12 +1,13 @@
+import config from 'config';
 import sinon from 'sinon';
 import { expect } from 'chai';
 import * as utils from '../test/utils';
 import models from '../server/models';
 import nock from 'nock';
 
-nock('https://api.fixer.io:80')
+nock('http://data.fixer.io')
   .get(/.*/)
-  .query({"base":"EUR","symbols":"USD"})
+  .query({ access_key: config.fixer.accessKey, base: 'EUR', symbols: 'USD'})
   .reply(200, {"base":"EUR","date":"2017-09-01","rates":{"USD":1.192}});
 
 describe("paymentmethod.model.test.js", () => {

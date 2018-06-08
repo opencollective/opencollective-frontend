@@ -34,7 +34,7 @@ describe('webhooks.stripe.test.js', () => {
   describe('Webhook events: ', () => {
 
     beforeEach(() => {
-      sandbox = sinon.sandbox.create();
+      sandbox = sinon.createSandbox();
     });
 
     afterEach(() => {
@@ -53,7 +53,8 @@ describe('webhooks.stripe.test.js', () => {
         }
       };
 
-      sandbox.stub(appStripe.events, "retrieve", () => Promise.resolve(stripeMock.event_payment_succeeded));
+      sandbox.stub(appStripe.events, "retrieve")
+        .callsFake(() => Promise.resolve(stripeMock.event_payment_succeeded));
 
     request(app)
       .post('/webhooks/stripe')
@@ -73,7 +74,8 @@ describe('webhooks.stripe.test.js', () => {
   it('error out on `source.chargeable`', (done) => {
       const stripeMock = _.cloneDeep(originalStripeMock);
 
-      sandbox.stub(appStripe.events, "retrieve", () => Promise.resolve(stripeMock.event_source_chargeable));
+      sandbox.stub(appStripe.events, "retrieve")
+        .callsFake(() => Promise.resolve(stripeMock.event_source_chargeable));
       request(app)
         .post('/webhooks/stripe')
         .send(stripeMock.webhook_source_chargeable)
@@ -85,7 +87,8 @@ describe('webhooks.stripe.test.js', () => {
       const stripeMock = _.cloneDeep(originalStripeMock);
       stripeMock.event_source_chargeable.type = 'application_fee.created';
 
-      sandbox.stub(appStripe.events, "retrieve", () => Promise.resolve(stripeMock.event_source_chargeable));
+      sandbox.stub(appStripe.events, "retrieve")
+        .callsFake(() => Promise.resolve(stripeMock.event_source_chargeable));
 
       request(app)
         .post('/webhooks/stripe')

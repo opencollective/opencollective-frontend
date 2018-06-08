@@ -19,7 +19,7 @@ describe('graphql.comments.test', () => {
   */
 
   before(() => {
-    sandbox = sinon.sandbox.create();
+    sandbox = sinon.createSandbox();
     sendEmailSpy = sandbox.spy(emailLib, 'sendMessage');
   });
 

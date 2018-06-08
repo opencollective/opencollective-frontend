@@ -10,6 +10,7 @@ import { types } from '../constants/collectives';
 import paymentProviders from '../paymentProviders';
 import * as libsubscription from './subscriptions';
 import * as libtransactions from './transactions';
+import { getRecommendedCollectives } from './data';
 
 /** Find payment method handler
  *
@@ -287,7 +288,8 @@ const sendOrderConfirmedEmail = async (order) => {
       });
   } else {
     // normal order
-    const relatedCollectives = await collective.getRelatedCollectives(2, 0);
+    const relatedCollectives = await order.collective.getRelatedCollectives(3, 0);
+    const recommendedCollectives = await getRecommendedCollectives(order.collective, 3);
     const emailOptions = { from: `${collective.name} <hello@${collective.slug}.opencollective.com>` };
     const data = {
       order: pick(order, ['totalAmount', 'currency', 'createdAt']),
@@ -297,6 +299,7 @@ const sendOrderConfirmedEmail = async (order) => {
       fromCollective: fromCollective.minimal,
       interval,
       relatedCollectives,
+      recommendedCollectives,
       monthlyInterval: (interval === 'month'),
       firstPayment: true,
       subscriptionsLink: interval && user.generateLoginLink(`/${fromCollective.slug}/subscriptions`)

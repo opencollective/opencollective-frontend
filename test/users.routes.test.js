@@ -33,9 +33,9 @@ describe('users.routes.test.js', () => {
 
   let sandbox;
   beforeEach(() => {
-    sandbox = sinon.sandbox.create();
+    sandbox = sinon.createSandbox();
     userlib.memory = {};
-    sandbox.stub(userlib, 'getUserData', (email) => {
+    sandbox.stub(userlib, 'getUserData').callsFake((email) => {
       return new Bluebird((resolve) => {
         if (email === "xd@noreply.com") {
           return resolve(mock.person);
@@ -63,11 +63,11 @@ describe('users.routes.test.js', () => {
           },
           logger: false
         });
-    sinon.stub(nodemailer, 'createTransport', () => nm);
+    sinon.stub(nodemailer, 'createTransport').callsFake(() => nm);
   });
 
   // stub the transport
-  beforeEach(() => sinon.stub(nm, 'sendMail', (object, cb) => cb(null, object)));
+  beforeEach(() => sinon.stub(nm, 'sendMail').callsFake((object, cb) => cb(null, object)));
 
   afterEach(() => nm.sendMail.restore());
 

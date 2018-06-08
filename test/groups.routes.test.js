@@ -26,7 +26,7 @@ describe('groups.routes.test.js', () => {
   let hostCollective, hostAdmin1, hostAdmin2, user, sandbox;
 
   before(() => {
-    sandbox = sinon.sandbox.create();
+    sandbox = sinon.createSandbox();
     utils.clearbitStubBeforeEach(sandbox);
   });
 

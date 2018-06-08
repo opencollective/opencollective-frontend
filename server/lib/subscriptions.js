@@ -7,6 +7,7 @@ import { Op } from 'sequelize';
 import models from '../models';
 import emailLib from './email';
 import * as paymentsLib from './payments';
+import { getRecommendedCollectives } from './data';
 
 /** Maximum number of attempts before an order gets cancelled. */
 export const MAX_RETRIES = 3;
@@ -253,7 +254,8 @@ export async function sendFailedEmail(order, lastAttempt) {
 
 /** Send `thankyou` email */
 export async function sendThankYouEmail(order, transaction) {
-  const relatedCollectives = await order.collective.getRelatedCollectives(2, 0);
+  const relatedCollectives = await order.collective.getRelatedCollectives(3, 0);
+  const recommendedCollectives = await getRecommendedCollectives(order.collective, 3);
   const user = order.createdByUser;
   await emailLib.send('thankyou', user.email, {
     order: order.info,
@@ -263,6 +265,7 @@ export async function sendThankYouEmail(order, transaction) {
     collective: order.collective.info,
     fromCollective: order.fromCollective.minimal,
     relatedCollectives,
+    recommendedCollectives,
     config: { host: config.host },
     interval: order.Subscription.interval,
     subscriptionsLink: user.generateLoginLink(`/${order.fromCollective.slug}/subscriptions`)

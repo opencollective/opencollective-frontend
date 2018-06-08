@@ -10,10 +10,10 @@ describe('Query Tests', () => {
   let user1, user2, host, collective1, collective2, tier1, ticket1, sandbox;
 
 
-  before(() => sandbox = sinon.sandbox.create());
+  before(() => sandbox = sinon.createSandbox());
 
   before(() => {
-    sandbox.stub(payments, 'executeOrder', (user, order) => {
+    sandbox.stub(payments, 'executeOrder').callsFake((user, order) => {
       return models.Order.update({ processedAt: new Date }, { where: { id: order.id }});
     });
   });

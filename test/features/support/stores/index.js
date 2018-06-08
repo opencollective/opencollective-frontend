@@ -228,7 +228,7 @@ export async function stripeOneTimeDonation(opt) {
   // Every transaction made can use different values, so we stub the
   // stripe call, create the order, and restore the stripe call so it
   // can be stubbed again by the next call to this helper.
-  const sandbox = sinon.sandbox.create();
+  const sandbox = sinon.createSandbox();
 
   // Freeze the time to guarantee that all the objects have the
   // requested creation date. It will be reset right after the

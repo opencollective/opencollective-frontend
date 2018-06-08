@@ -27,7 +27,7 @@ describe('graphql.search.test.js', () => {
 
   before(async () => {
     await utils.loadDB('opencollective_dvl');
-    sandbox = sinon.sandbox.create();
+    sandbox = sinon.createSandbox();
   });
 
   beforeEach(() => {

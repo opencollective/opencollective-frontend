@@ -81,5 +81,8 @@
     "appId": "xxxxx",
     "appKey": "xxxxx",
     "index": "dvl_collectives"
+  },
+  "fixer": {
+    "accessKey": "xxxxx"
   }
 }

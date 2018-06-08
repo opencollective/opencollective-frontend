@@ -67,8 +67,8 @@ Latest {{{pluralize "expense" n=expenses.length}}}:
   - {{{moment createdAt format="MM/DD"}}} {{{currency amount currency=../currency}}} {{description}} {{status}}
   {{else}}
   (no expense filed)
-  Submit an expense on {{../config.host.website}}/{{slug}}/expenses/new
   {{/each}}
+  View all expenses on {{../config.host.website}}/{{slug}}/expenses
 
 {{/each}}
 

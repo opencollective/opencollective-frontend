@@ -1,0 +1,35 @@
+<style>
+.CollectiveCards {
+  overflow: hidden;
+  display: inline-block;
+  height: 255px;
+}
+th {
+  padding: 10px;
+  font-weight: normal;
+  font-size: 14px;
+  color: #7A7B82;
+  vertical-align: top;
+}
+</style>
+
+{{#if recommendedCollectives.length}}
+<table width="100%" height=30>
+  <tr><td colspan="3" height="10">&nbsp;</td></tr>
+  <tr>
+    <td class="tdline"></td><th rowspan=2 nowrap>Recommended Collectives</th><td class="tdline"></td>
+  </tr>
+  <tr><td colspan="3">&nbsp;</td></tr>
+  <tr><td colspan="3">
+    <p>{{collective.name}} couldn't exist without these other open source projects. Consider supporting them too!</p>
+  </td></tr>
+  <tr><td colspan="3">&nbsp;</td></tr>
+</table>
+
+<div class="CollectiveCards">
+{{#each recommendedCollectives}}
+  {{> collectivecard}}
+{{/each}}
+</div>
+
+{{/if}}

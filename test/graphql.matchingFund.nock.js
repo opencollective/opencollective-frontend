@@ -1,3 +1,4 @@
+import config from 'config';
 import nock from 'nock';
 
 export default function() {
@@ -64,9 +65,9 @@ nock('https://api.stripe.com:443', {"encodedQueryParams":true})
   'Strict-Transport-Security',
   'max-age=31556926; includeSubDomains; preload' ]);
 
-nock('http://api.fixer.io:80', {"encodedQueryParams":true})
+nock('http://data.fixer.io', {"encodedQueryParams":true})
   .get('/latest')
-  .query({"base":"USD","symbols":"EUR"})
+  .query({ access_key: config.fixer.accessKey, base: 'USD', symbols: 'EUR'})
   .reply(200, {"base":"USD","date":"2017-12-28","rates":{"EUR":0.83794}}, [ 'Server',
   'nginx/1.13.6',
   'Date',

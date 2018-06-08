@@ -453,7 +453,7 @@ describe('graphql.collective.test.js', () => {
   it('edit payment methods', async () => {
     let query, res, paymentMethods;
 
-    sinon.stub(appStripe.customers, 'create', () => Promise.resolve(stripeMock.customers.create));
+    sinon.stub(appStripe.customers, 'create').callsFake(() => Promise.resolve(stripeMock.customers.create));
 
     const collective = {
       id: pubnubCollective.id,

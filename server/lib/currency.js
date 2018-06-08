@@ -1,4 +1,5 @@
 import fetch from 'isomorphic-fetch';
+import config from 'config';
 import debugLib from 'debug';
 import Promise from 'bluebird';
 
@@ -33,7 +34,9 @@ export function getFxRate(fromCurrency, toCurrency, date = 'latest') {
   const key = `${dateKey}-${fromCurrency}-${toCurrency}`;
   if (cache[key]) return Promise.resolve(cache[key]);
   return new Promise((resolve, reject) => {
-    fetch(`http://api.fixer.io/${date}?base=${fromCurrency}&symbols=${toCurrency}`)
+    const params = { access_key: config.fixer.accessKey, base: fromCurrency, symbols: toCurrency }
+    const searchParams = Object.keys(params).map(key => `${key}=${params[key]}`).join('&');
+    fetch(`http://data.fixer.io/${date}?${searchParams}`)
       .then(res => res.json())
       .then(json => {
         try {
@@ -43,7 +46,7 @@ export function getFxRate(fromCurrency, toCurrency, date = 'latest') {
         } catch (e) {
           const msg = `>>> lib/currency: can't fetch fxrate from ${fromCurrency} to ${toCurrency} for date ${date}`;
           console.error(msg, "json:", json, "error:", e);
-          return reject(new Error(msg));
+          throw new Error(msg);
         }
       })
       .catch(e => {

@@ -21,8 +21,8 @@ describe("userlib", () => {
   let sandbox, stub;
   beforeEach(() => {
     userlib.memory = {};
-    sandbox = sinon.sandbox.create();
-    stub = sandbox.stub(userlib.clearbit.Enrichment, 'find', (opts) => {
+    sandbox = sinon.createSandbox();
+    stub = sandbox.stub(userlib.clearbit.Enrichment, 'find').callsFake((opts) => {
       return new Bluebird((resolve, reject) => {
         switch (opts.email) {
           case userData1.email: {
