@@ -849,7 +849,7 @@ export default function(Sequelize, DataTypes) {
   };
 
   /**
-   * Change host of the collective (only if balance === 0)
+   * Change or remove host of the collective (only if balance === 0)
    * @param {*} newHostCollective: { id }
    * @param {*} creatorUser { id }
    */
@@ -861,9 +861,15 @@ export default function(Sequelize, DataTypes) {
     const membership = await models.Member.findOne({
       where: { CollectiveId: this.id, MemberCollectiveId: this.HostCollectiveId, role: roles.HOST }
     });
-    membership.destroy();
+    if (membership) {
+      membership.destroy();
+    }
     this.HostCollectiveId = null;
-    return this.addHost(newHostCollective, creatorUser);
+    if (newHostCollective.id) {
+      return this.addHost(newHostCollective, creatorUser);
+    } else {
+      return this.save();
+    }
   }
 
   // edit the list of members and admins of this collective (create/update/remove)

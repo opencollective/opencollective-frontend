@@ -291,7 +291,7 @@ export function editCollective(_, args, req) {
   })
   .then(() => {
     // If we try to change the host
-    if (updatedCollectiveData.HostCollectiveId && updatedCollectiveData.HostCollectiveId !== collective.HostCollectiveId) {
+    if (updatedCollectiveData.HostCollectiveId !== undefined && updatedCollectiveData.HostCollectiveId !== collective.HostCollectiveId) {
       return collective.changeHost({ id: updatedCollectiveData.HostCollectiveId }, req.remoteUser);
     }
   })
