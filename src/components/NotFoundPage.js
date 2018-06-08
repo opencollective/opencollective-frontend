@@ -3,6 +3,7 @@ import Header from './Header';
 import Body from './Body';
 import Footer from './Footer';
 import NotFound from './NotFound';
+import { FormattedMessage } from 'react-intl';
 
 const NotFoundPage = ({ slug }) => {
   return (
@@ -16,7 +17,7 @@ const NotFoundPage = ({ slug }) => {
       <Body>
         <NotFound />
         { slug &&
-        <p align="center">Let me try to find {slug} for you...</p>
+        <p align="center"><FormattedMessage id="notFound.search" defaultMessage="Let me try to find {term} for you..." values={{ term: slug }} /></p>
         }
       </Body>
       <Footer />
