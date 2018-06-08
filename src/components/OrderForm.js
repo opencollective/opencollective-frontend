@@ -11,7 +11,7 @@ import ActionButton from './Button';
 import SectionTitle from './SectionTitle';
 import { Button, Row, Col, Form, FormGroup } from 'react-bootstrap';
 import { defineMessages, FormattedMessage, FormattedDate, FormattedTime } from 'react-intl';
-import { capitalize, formatCurrency, isValidEmail } from '../lib/utils';
+import { capitalize, formatCurrency, isValidEmail, getEnvVar } from '../lib/utils';
 import { getStripeToken } from '../lib/stripe';
 import { pick, get } from 'lodash';
 import withIntl from '../lib/withIntl';
@@ -385,7 +385,7 @@ class OrderForm extends React.Component {
       this.props.collective.currency;
     /* Parameters for the paypal button */
     const renderOptions = {
-      env: 'sandbox',
+      env: getEnvVar('PAYPAL_ENVIRONMENT'),
       payment: async (data, actions) => {
         const paymentURL = '/api/services/paypal/create-payment';
         const { id } = await actions.request.post(paymentURL, {
