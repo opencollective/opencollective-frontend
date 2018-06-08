@@ -37,7 +37,7 @@ class Map extends React.Component {
             draggable={false}
             />
         </Gmaps>
-        <a className="map-overlay" href={`http://maps.apple.com/?q=${lat},${long}`} target="_blank"></a>
+        <a className="map-overlay" href={`http://maps.apple.com/?q=${lat},${long}`} target="_blank" rel="noopener noreferrer"></a>
       </div>
     );
   }

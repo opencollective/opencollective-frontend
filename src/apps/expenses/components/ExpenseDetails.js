@@ -171,7 +171,7 @@ class ExpenseDetails extends React.Component {
                 />
             }
             { !editMode && expense.attachment &&
-              <a href={expense.attachment} target="_blank" title="Open receipt in a new window">
+              <a href={expense.attachment} target="_blank" rel="noopener noreferrer" title="Open receipt in a new window">
                 <img src={previewAttachmentImage} />
               </a>
             }

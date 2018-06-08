@@ -37,7 +37,29 @@ class EditCollective extends React.Component {
 
   async validate(CollectiveInputType) {
     const { intl } = this.props;
-    CollectiveInputType.tiers = this.cleanTiers(CollectiveInputType.tiers);
+    const tiers = this.cleanTiers(CollectiveInputType.tiers);
+    if (tiers) {
+      CollectiveInputType.tiers = tiers;
+    }
+
+    if (typeof CollectiveInputType.tags === 'string') {
+      CollectiveInputType.tags = CollectiveInputType.tags.split(',').map(t => t.trim());
+    }
+    if (CollectiveInputType.backgroundImage === defaultBackgroundImage[CollectiveInputType.type]) {
+      delete CollectiveInputType.backgroundImage;
+    }
+
+    const { collective } = this.props;
+    CollectiveInputType.settings = {
+      ...collective.settings,
+      goals: CollectiveInputType.goals,
+      editor: CollectiveInputType.markdown ? 'markdown' : 'html',
+      sendInvoiceByEmail: CollectiveInputType.sendInvoiceByEmail
+    };
+    delete CollectiveInputType.goals;
+    delete CollectiveInputType.markdown;
+    delete CollectiveInputType.sendInvoiceByEmail;
+
     if (!CollectiveInputType.paymentMethods) return CollectiveInputType;
 
     let newPaymentMethod, index;
@@ -113,26 +135,9 @@ class EditCollective extends React.Component {
     if (!CollectiveInputType) {
       return false;
     }
-    if (typeof CollectiveInputType.tags === 'string') {
-      CollectiveInputType.tags = CollectiveInputType.tags.split(',').map(t => t.trim());
-    }
-
-    const { collective } = this.props;
-    CollectiveInputType.settings = {
-      ...collective.settings,
-      goals: CollectiveInputType.goals,
-      editor: CollectiveInputType.markdown ? 'markdown' : 'html',
-      sendInvoiceByEmail: CollectiveInputType.sendInvoiceByEmail
-    };
-    delete CollectiveInputType.goals;
-    delete CollectiveInputType.markdown;
-    delete CollectiveInputType.sendInvoiceByEmail;
+    console.log(">>> editCollective", CollectiveInputType);
     this.setState( { status: 'loading' });
     try {
-      if (CollectiveInputType.backgroundImage === defaultBackgroundImage[CollectiveInputType.type]) {
-        delete CollectiveInputType.backgroundImage;
-      }
-
       const res = await this.props.editCollective(CollectiveInputType);
       const type = res.data.editCollective.type.toLowerCase();
       this.setState({ status: 'idle', result: { success: `${capitalize(type)} saved` }});

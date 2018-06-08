@@ -487,7 +487,7 @@
   "TicketsConfirmed.ConfirmationSent": "Un email de confirmation a été envoyé à votre adresse email {email}",
   "TicketsConfirmed.SeeYouSoon": "A bientôt!",
   "tier.customAmount.error.minimumAmount": "Le montant doit être au minimum {minimumAmount}",
-  "tier.defaultDescription": "Deviens un {name} pour {amount} par {interval} et aide nous à continuer nos activités!",
+  "tier.defaultDescription": "Deviens un {name} pour {amount} par {interval, select, month {mois} year {an} other {}} et aide nous à continuer nos activités!",
   "tier.amount.select": "Choisissez le montant {interval, select, month {mensuel} year {annuel} other {}}",
   "tier.interval.select": "Choisir la fréquence de votre contribution",
   "tier.GetTicket": "{quantity, plural, one {réserver ticket} other {réserver tickets}}",

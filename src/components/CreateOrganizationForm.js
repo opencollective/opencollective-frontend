@@ -11,7 +11,8 @@ class CreateOrganizationForm extends React.Component {
   static propTypes = {
     onChange: PropTypes.func.isRequired,
     LoggedInUser: PropTypes.object.isRequired,
-    intl: PropTypes.object.isRequired
+    intl: PropTypes.object.isRequired,
+    header: PropTypes.bool
   };
 
   constructor(props) {
@@ -22,7 +23,8 @@ class CreateOrganizationForm extends React.Component {
     this.messages = defineMessages({
       'order.organization.name': { id: 'tier.order.organization.name', defaultMessage: `name` },
       'order.organization.website': { id: 'tier.order.organization.website', defaultMessage: `website` },
-      'order.organization.twitterHandle': { id: 'tier.order.organization.twitterHandle', defaultMessage: `Twitter` }
+      'order.organization.twitterHandle': { id: 'tier.order.organization.twitterHandle', defaultMessage: `Twitter` },
+      'order.organization.twitterHandle.description': { id: 'tier.order.organization.twitterHandle.description', defaultMessage: `optional` }
     });
   }
 
@@ -35,11 +37,13 @@ class CreateOrganizationForm extends React.Component {
 
   render() {
 
-    const { intl } = this.props;
+    const { intl, header } = this.props;
 
     return (
       <section className="organizationDetailsForm">
-        <SectionTitle section="organizationDetails" />
+        { header !== false &&
+          <SectionTitle section="organizationDetails" />
+        }
         <Row key={`organization.name.input`}>
           <Col sm={12}>
             <InputField
@@ -70,6 +74,7 @@ class CreateOrganizationForm extends React.Component {
               name="organization_twitterHandle"
               pre="@"
               label={intl.formatMessage(this.messages['order.organization.twitterHandle'])}
+              help={intl.formatMessage(this.messages['order.organization.twitterHandle.description'])}
               onChange={(value) => this.handleChange("twitterHandle", value)}
               />
           </Col>

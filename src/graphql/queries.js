@@ -171,6 +171,7 @@ const getCollectiveToEditQuery = gql`
       stats {
         id
         yearlyBudget
+        balance
         backers {
           all
         }

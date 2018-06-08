@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import withIntl from '../lib/withIntl';
 import { get } from 'lodash';
-import { graphql } from 'react-apollo'
+import { graphql, compose } from 'react-apollo'
 import gql from 'graphql-tag'
 import LoadingGrid from './LoadingGrid';
 import CreateHostForm from './CreateHostForm';
@@ -13,8 +13,30 @@ class CreateHostFormWithData extends React.Component {
   static propTypes = {
     LoggedInUser: PropTypes.object.isRequired,
     collective: PropTypes.object.isRequired,
-    data: PropTypes.object.isRequired
+    data: PropTypes.object.isRequired,
+    onSubmit: PropTypes.func.isRequired
   };
+
+  constructor(props) {
+    super(props);
+    this.createOrganization = this.createOrganization.bind(this);
+  }
+
+  async createOrganization(CollectiveInputType) {
+    this.setState( { status: 'loading' });
+    CollectiveInputType.type = 'ORGANIZATION';
+    console.log(">>> createOrganization", CollectiveInputType);
+    try {
+      const res = await this.props.createCollective(CollectiveInputType);
+      const collective = res.data.createCollective;
+      return collective;
+    } catch (err) {
+      console.error(">>> createOrganization error: ", JSON.stringify(err));
+      const errorMsg = (err.graphQLErrors && err.graphQLErrors[0]) ? err.graphQLErrors[0].message : err.message;
+      this.setState( { result: { error: errorMsg }})
+      throw new Error(errorMsg);
+    }
+  }
 
   render() {
     const { data, collective } = this.props;
@@ -38,6 +60,8 @@ class CreateHostFormWithData extends React.Component {
         organizations={organizations}
         collective={collective}
         userCollective={userCollective}
+        createOrganization={this.createOrganization}
+        onSubmit={this.props.onSubmit}
         />
     );
   }
@@ -49,10 +73,6 @@ query Collective($slug: String!) {
   Collective(slug: $slug) {
     id
     isHost
-    location {
-      name
-      address
-    }
     slug
     memberOf(role: "ADMIN", type: "ORGANIZATION") {
       id
@@ -61,10 +81,8 @@ query Collective($slug: String!) {
         slug
         name
         isHost
-        location {
-          name
-          address
-        }
+        createdAt
+        image
         connectedAccounts {
           id
           service
@@ -92,4 +110,52 @@ export const addConnectedAccountsQuery = graphql(getConnectedAccountsQuery, {
     }
   }
 });
-export default withIntl(addConnectedAccountsQuery(CreateHostFormWithData));
+
+
+const createCollectiveQuery = gql`
+  mutation createCollective($collective: CollectiveInputType!) {
+    createCollective(collective: $collective) {
+      id
+      slug
+      name
+      image
+      createdAt
+    }
+  }
+`;
+
+const addMutation = graphql(createCollectiveQuery, {
+  props: ({ ownProps, mutate }) => ({
+    createCollective: async (CollectiveInputType) => await mutate({
+      variables: { collective: CollectiveInputType },
+      update: (proxy, { data: { createCollective }}) => {
+        const variables = {
+          slug: get(ownProps, 'LoggedInUser.collective.slug')
+        };
+
+        // Retrieve the query from the cache
+        const data = proxy.readQuery({ query: getConnectedAccountsQuery, variables });
+
+        // Insert new Collective at the beginning
+        const membership = {
+          createdAt: createCollective.createdAt,
+          id: Math.round(Math.random() * 10000000),
+          __typename: "MemberType",
+          collective: {
+            ...createCollective,
+            isHost: false,
+            connectedAccounts: []
+          }
+        }
+        data.Collective.memberOf.push(membership);
+
+        // write data back for the query
+        proxy.writeQuery({ query: getConnectedAccountsQuery, variables, data });
+      }
+    })
+  })
+});
+
+const addGraphQL = compose(addConnectedAccountsQuery, addMutation);
+
+export default withIntl(addGraphQL(CreateHostFormWithData));

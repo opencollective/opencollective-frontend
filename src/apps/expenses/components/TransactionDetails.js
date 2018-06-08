@@ -96,7 +96,7 @@ class TransactionDetails extends React.Component {
         {type === 'debit' &&
           <div className="frame">
             {transaction.attachment &&
-              <a href={transaction.attachment} target="_blank" title="Open receipt in a new window">
+              <a href={transaction.attachment} target="_blank" rel="noopener noreferrer" title="Open receipt in a new window">
                 <img src={imagePreview(transaction.attachment)} />
               </a>
             }

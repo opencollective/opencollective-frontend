@@ -173,6 +173,7 @@ export const addEditCollectiveMutation = graphql(editCollectiveQuery, {
         'currency',
         'quantity',
         'ParentCollectiveId',
+        'HostCollectiveId',
         'image',
         'backgroundImage',
         'settings'

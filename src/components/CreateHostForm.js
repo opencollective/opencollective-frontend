@@ -12,24 +12,30 @@ import InputField from './InputField';
 import Link from './Link';
 import colors from '../constants/colors';
 import { Flex, Box } from 'grid-styled';
+import CreateOrganizationForm from './CreateOrganizationForm';
+import { Button } from 'react-bootstrap';
 
 class CreateHostForm extends React.Component {
 
   static propTypes = {
     organizations: PropTypes.arrayOf(PropTypes.object).isRequired,
     collective: PropTypes.object.isRequired,
-    userCollective: PropTypes.object.isRequired
+    userCollective: PropTypes.object.isRequired,
+    createOrganization: PropTypes.func.isRequired,
+    onSubmit: PropTypes.func.isRequired // when selecting the host to use
   };
 
   constructor(props) {
     super(props);
     const { organizations, intl, userCollective } = props;
     this.handleChange = this.handleChange.bind(this);
+    this.createOrganization = this.createOrganization.bind(this);
+    this.generateInputFields = this.generateInputFields.bind(this);
 
     this.state = {
       form: { hostType: "user", HostCollectiveId: userCollective.id },
       services: ['stripe'],
-      editMode: props.editMode || false
+      organizationsOptions: []
     };
 
     this.messages = defineMessages({
@@ -40,7 +46,8 @@ class CreateHostForm extends React.Component {
       'host.types.user.label': { id: 'host.types.user.label', defaultMessage: "an individual" },
       'host.types.user.description': { id: 'host.types.user.description', defaultMessage: "ou will receive the funds on behalf of the collective under your own name. Please check with your local fiscal authorities the allowance below which you don't have to report the donations as taxable income." },
       'host.types.organization.label': { id: 'host.types.organization.label', defaultMessage: "an organization" },
-      'host.types.organization.description': { id: 'host.types.organization.description', defaultMessage: "Legal entity (ideally a non profit organization) that will receive the funds and issue invoices on behalf of the collective. Recommended if you plan to host more than one collective or if your collective expects to collect more than $10,000/year." }
+      'host.types.organization.description': { id: 'host.types.organization.description', defaultMessage: "Legal entity (ideally a non profit organization) that will receive the funds and issue invoices on behalf of the collective. Recommended if you plan to host more than one collective or if your collective expects to collect more than $10,000/year." },
+      'organization.create': { id: 'tier.order.organization.create', defaultMessage: 'create an organization' }
     });
 
     this.hostTypesOptions = [
@@ -56,13 +63,49 @@ class CreateHostForm extends React.Component {
       }
     ]
 
-    this.organizationsOptions = [];
-    organizations.map(collective => {
-      this.organizationsOptions.push({ label: collective.name, value: collective.id })
-    })
-    this.connectedAccounts = groupBy(userCollective.connectedAccounts, 'service');
+  }
 
-    console.log(">>> this.organizationsOptions", this.organizationsOptions);
+  static getDerivedStateFromProps(newProps) {
+    console.log(">>> getDerivedStateFromProps", newProps);
+    const { intl } = newProps;
+    const organizationsOptions = [];
+    newProps.organizations.map(collective => {
+      organizationsOptions.push({ label: collective.name, value: collective.id })
+    })
+    organizationsOptions.push({ label: intl.formatMessage({id: 'organization.create', defaultMessage: 'create an organization' }), value: 0 })
+    return { organizationsOptions };
+  }
+
+  async createOrganization(org) {
+    const collective = await this.props.createOrganization(org);
+    this.setState({
+      hostCollective: collective,
+      form: {
+        ...this.state.form,
+        HostCollectiveId: collective.id
+      },
+      status: 'idle',
+      result: { success: `Organization created successfully` }
+    });
+
+  }
+
+  handleChange(attr, value) {
+    const { form } = this.state;
+    form[attr] = value;
+    if (attr === 'hostType') {
+      const defaultHostCollectiveId = {
+        user: this.props.userCollective.id,
+        organization: this.state.organizationsOptions[0].value
+      }
+      console.log(">>> defaultHostCollectiveId", defaultHostCollectiveId);
+      form['HostCollectiveId'] = defaultHostCollectiveId[value];
+    }
+    this.setState({ form });
+  }
+
+  generateInputFields() {
+    const { intl } = this.props;
 
     this.fields = [
       {
@@ -74,12 +117,13 @@ class CreateHostForm extends React.Component {
       {
         name: "HostCollectiveId",
         type: "select",
-        options: this.organizationsOptions,
-        defaultValue: this.organizationsOptions[0].value,
+        options: this.state.organizationsOptions,
+        value: this.state.form.HostCollectiveId,
+        defaultValue: this.state.organizationsOptions[0] && this.state.organizationsOptions[0].value,
         when: (form) => form.hostType === 'organization'
       }
     ];
-
+    console.log(">>> generateInputFields", this.state, this.fields);
     this.fields = this.fields.map(field => {
       if (this.messages[`${field.name}.label`]) {
         field.label = intl.formatMessage(this.messages[`${field.name}.label`]);
@@ -87,27 +131,23 @@ class CreateHostForm extends React.Component {
       if (this.messages[`${field.name}.description`]) {
         field.description = intl.formatMessage(this.messages[`${field.name}.description`]);
       }
-      if (field.defaultValue) {
-        this.state.form[field.name] = field.defaultValue;
+      if (field.defaultValue && !this.state.form[field.name]) {
+        this.setState({ form: { ...this.state.form, [field.name]: field.defaultValue }});
       }
       return field;
     })
-
-  }
-
-  handleChange(attr, value) {
-    const { form } = this.state;
-    form[attr] = value;
-    this.setState({ form });
+    
   }
 
   render() {
     const { collective, userCollective, organizations, intl } = this.props;
 
-    const hostCollective = this.state.form.hostType === 'user' ? userCollective : organizations.find(c => c.id === Number(this.state.form.HostCollectiveId));
+    this.generateInputFields();
+    const hostCollective = this.state.hostCollective || (this.state.form.hostType === 'user' ? userCollective : organizations.find(c => c.id === Number(this.state.form.HostCollectiveId)));
     console.log(">>> this.state.form", this.state.form, "hostCollective", hostCollective);
 
     const connectedAccounts = hostCollective && groupBy(hostCollective.connectedAccounts, 'service');
+    const stripeAccount = connectedAccounts && connectedAccounts["stripe"] && connectedAccounts["stripe"][0];
 
     return (
       <div className="CreateHostForm">
@@ -142,62 +182,36 @@ class CreateHostForm extends React.Component {
           </Flex>
         ))}
 
-        { this.state.services.map(service =>
-          ( <div key={`connect-${service}`}>
-            <h2>{capitalize(service)}</h2>
+        { this.state.form.hostType === 'organization' && !hostCollective &&
+          <div>
+            <CreateOrganizationForm header={false} onChange={org => this.handleChange("organization", org)} />
+            <Button bsStyle="primary" type="submit" onClick={() => this.createOrganization(this.state.form.organization)} >
+              <FormattedMessage id="organization.create" defaultMessage="Create organization" />
+            </Button>
+          </div>
+        }
+
+        { hostCollective && !stripeAccount &&
+          ( <div key={`connect-${"stripe"}`}>
+            <h2>{capitalize("stripe")}</h2>
             <EditConnectedAccount
               collective={hostCollective}
-              service={service}
+              service={"stripe"}
               options={ { postAction: `hostCollective:${collective.id}` }}
-              connectedAccount={connectedAccounts[service] && connectedAccounts[service][0]}
               />
             </div>
           )
-        ) }
+        }
+
+        { hostCollective && stripeAccount &&
+          <Button bsStyle="primary" type="submit" onClick={() => this.props.onSubmit(hostCollective)} >
+            <FormattedMessage id="host.link" defaultMessage="Use this host" />
+          </Button>
+        }
       </div>
     );
   }
 
 }
 
-const getConnectedAccountsQuery = gql`
-query Collective($slug: String!) {
-  Collective(slug: $slug) {
-    id
-    isHost
-    slug
-    memberOf(role: "ADMIN", type: "ORGANIZATION") {
-      id
-      collective {
-        id
-        slug
-        name
-        isHost
-        connectedAccounts {
-          id
-          service
-          createdAt
-          updatedAt
-        }
-      }
-    }
-    connectedAccounts {
-      id
-      service
-      createdAt
-      updatedAt
-    }
-  }
-}
-`;
-
-export const addConnectedAccountsQuery = graphql(getConnectedAccountsQuery, {
-  options(props) {
-    return {
-      variables: {
-        slug: get(props, 'LoggedInUser.collective.slug')
-      }
-    }
-  }
-});
-export default withIntl(addConnectedAccountsQuery(CreateHostForm));
+export default withIntl(CreateHostForm);

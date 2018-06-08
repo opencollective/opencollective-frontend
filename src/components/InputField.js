@@ -325,7 +325,8 @@ class InputField extends React.Component {
         break;
 
       case 'select': {
-        const firstOptionValue = Object.keys(field.options[0])[0];
+        const firstOptionValue = field.options[0].value || Object.keys(field.options[0])[0];
+        if (field.options.length <= 1) return;
         this.input = (
           <FieldGroup
             key={`${field.name}-${firstOptionValue}`} // make sure we instantiate a new component if first value changes
@@ -342,7 +343,7 @@ class InputField extends React.Component {
             onChange={event => this.handleChange(event.target.value)}
             >
             { field.options && field.options.map(option => {
-              const value = option.value || Object.keys(option)[0];
+              const value = option.value !== undefined ? option.value : Object.keys(option)[0];
               const label = option.label || option[value];
               return (<option key={value} value={value}>{label}</option>)
               })

@@ -431,7 +431,7 @@ class EditCollectiveForm extends React.Component {
                 <EditHost
                   collective={collective}
                   LoggedInUser={LoggedInUser}
-                  onChange={this.handleObjectChange}
+                  editCollectiveMutation={this.props.onSubmit}
                   />
               }
               { this.state.section === 'paymentMethods' &&

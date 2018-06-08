@@ -10,7 +10,8 @@ import { Flex, Box } from 'grid-styled';
 import { Radio } from '@material-ui/core';
 import CreateHostFormWithData from './CreateHostFormWithData';
 import CollectiveCard from './CollectiveCard';
-import { formatDate } from '../lib/utils';
+import { formatDate, formatCurrency } from '../lib/utils';
+import { Button } from 'react-bootstrap';
 
 const Option = styled.div`
   h2 {
@@ -25,14 +26,20 @@ class EditHost extends React.Component {
     goals: PropTypes.arrayOf(PropTypes.object),
     collective: PropTypes.object.isRequired,
     LoggedInUser: PropTypes.object.isRequired,
-    onChange: PropTypes.func.isRequired
+    editCollectiveMutation: PropTypes.func.isRequired
   };
 
   constructor(props) {
     super(props);
-    const { intl } = props;
+    this.changeHost = this.changeHost.bind(this);
     this.handleChange = this.handleChange.bind(this);
-    this.state = { selectedOption: "noHost" };
+    this.state = { selectedOption: "noHost", collective: props.collective };
+  }
+
+  async changeHost(newHost = { id: null }) {
+    const { collective } = this.state;
+    await this.props.editCollectiveMutation({ id: collective.id, HostCollectiveId: newHost.id });
+    this.setState({ selectedOption: "noHost", collective: { ...collective, host: newHost } });
   }
 
   handleChange(attr, value) {
@@ -40,16 +47,37 @@ class EditHost extends React.Component {
   }
 
   render() {
-    const { LoggedInUser, collective } = this.props;
-    console.log(">>> collective", collective);
-    if (collective.host) {
+    const { LoggedInUser } = this.props;
+    const { collective } = this.state;
+
+    if (get(collective, 'host.id')) {
       return (
         <Flex>
           <Box p={1} mr={3}>
             <CollectiveCard collective={collective.host} />
           </Box>
           <Box>
-            <FormattedMessage id="host.label" defaultMessage="Hosting {collectives} collectives since {since}" values={{collectives: get(collective, 'host.stats.collectives.hosted'), since: formatDate(get(collective, 'host.createdAt'), { month: 'long', year: 'numeric' })}} />
+            <p>
+              <FormattedMessage id="host.label" defaultMessage="Hosting {collectives} {collectives, plural, one {collective} other {collectives}} since {since}" values={{collectives: get(collective, 'host.stats.collectives.hosted'), since: formatDate(get(collective, 'host.createdAt'), { month: 'long', year: 'numeric' })}} />
+            </p>
+            { collective.stats.balance > 0 &&
+              <p>
+                <FormattedMessage id="host.balance" defaultMessage="Your host currently holds {balance} on behalf of your collective." values={{balance: formatCurrency(collective.stats.balance, collective.currency)}} /><br />
+                <FormattedMessage id="host.change.balanceNotEmpty" defaultMessage="If you would like to change host, you first need to empty your balance by filing expenses or transfering funds to another collective." />
+              </p>
+            }
+            { collective.stats.balance === 0 &&
+              <div>
+                <p>
+                  <Button bsStyle="primary" type="submit" onClick={() => this.changeHost()} >
+                    <FormattedMessage id="host.removeBtn" defaultMessage="Remove Host" />
+                  </Button>
+                </p>
+                <p>
+                  <FormattedMessage id="host.change.removeFirst" defaultMessage="Once removed, you won't be able to accept donations anymore. But you will be able to select another host for your collective." />
+                </p>
+              </div>
+            }
           </Box>
         </Flex>
       );
@@ -81,12 +109,13 @@ class EditHost extends React.Component {
                 />
             </Box>
             <Box mb={4}>
-              <h2><FormattedMessage id="collective.edit.host.createHost.title" defaultMessage="Create your own host" /></h2>
+              <h2><FormattedMessage id="collective.edit.host.createHost.title" defaultMessage="Use your own host" /></h2>
               <FormattedMessage id="collective.edit.host.createHost.description" defaultMessage="You can create your own host as an individual or as a legal entity. You will be responsible for keeping custody of the funds raised by this collective and for paying out the expenses that have been approved." />
               { this.state.selectedOption === "createHost" && LoggedInUser &&
                 <CreateHostFormWithData
                   collective={collective}
                   LoggedInUser={LoggedInUser}
+                  onSubmit={hostCollective => this.changeHost(hostCollective)}
                   />
               }
             </Box>
