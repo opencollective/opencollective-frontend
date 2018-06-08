@@ -318,7 +318,7 @@ export default function(Sequelize, DataTypes) {
       // If no UUID provided, we create a new paymentMethod
       const paymentMethodData = {
         ...paymentMethod,
-        service: "stripe",
+        service: paymentMethod.service || "stripe",
         CreatedByUserId: user.id,
         CollectiveId: paymentMethod.CollectiveId // might be null if the user decided not to save the credit card on file
       };

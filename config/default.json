@@ -50,7 +50,12 @@
     "rest": {
       "mode": "sandbox"
     },
-    "feeOC": 5
+    "feeOC": 5,
+    "payment": {
+      "environment": "sandbox",
+      "clientId": "xxx",
+      "clientSecret": "xxx"
+    }
   },
   "stripe": {
     "redirectUri": "http://localhost:3060/connected-accounts/stripe/callback",

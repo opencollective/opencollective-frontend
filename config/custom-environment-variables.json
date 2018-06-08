@@ -38,6 +38,11 @@
       "userId": "PAYPAL_USER_ID",
       "password": "PAYPAL_PASSWORD",
       "signature": "PAYPAL_SIGNATURE"
+    },
+    "payment": {
+      "environment": "PAYPAL_ENVIRONMENT",
+      "clientId": "PAYPAL_CLIENT_ID",
+      "clientSecret": "PAYPAL_CLIENT_SECRET"
     }
   },
   "mailgun": {

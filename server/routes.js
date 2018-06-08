@@ -28,6 +28,7 @@ import cache from './middleware/cache';
 import * as params from './middleware/params';
 import errors from './lib/errors';
 import { formatError } from 'apollo-errors';
+import * as paypal from './paymentProviders/paypal/payment';
 
 import sanitizer from './middleware/sanitizer';
 import { sanitizeForLogs } from './lib/utils';
@@ -207,6 +208,9 @@ export default (app) => {
   // app.post('/users/:userid/paypal/preapproval/:preapprovalkey', auth.mustBeLoggedInAsUser, paypal.confirmPreapproval); // Confirm a preapproval key.
   // app.get('/users/:userid/paypal/preapproval/:preapprovalkey', auth.mustBeLoggedInAsUser, paypal.getDetails); // Get a preapproval key details.
 
+
+  /* PayPal Payment Method Helpers */
+  app.post('/services/paypal/create-payment', paypal.createPayment);
 
   /**
    * External services
