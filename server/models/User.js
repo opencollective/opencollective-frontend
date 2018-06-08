@@ -411,6 +411,7 @@ export default (Sequelize, DataTypes) => {
     if (!remoteUser) return Promise.resolve(this.public);
     return this.populateRoles()
       .then(() => {
+        if (this.id === remoteUser.id) return true;
         // all the CollectiveIds that the remoteUser is admin of.
         const adminOfCollectives = Object.keys(remoteUser.rolesByCollectiveId).filter(CollectiveId => remoteUser.isAdmin(CollectiveId));
         const memberOfCollectives = Object.keys(this.rolesByCollectiveId);
