@@ -28,6 +28,7 @@ export default class IntlDocument extends Document {
     super(props);
     props.__NEXT_DATA__.env = {
       IMAGES_URL: process.env.IMAGES_URL || '',
+      PAYPAL_ENVIRONMENT: process.env.PAYPAL_ENVIRONMENT || 'sandbox',
     };
   }
 
