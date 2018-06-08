@@ -9,17 +9,18 @@ import Loading from '../components/Loading';
 import ErrorPage from '../components/ErrorPage';
 import Collective from '../components/Collective';
 import UserCollective from '../components/UserCollective';
+import { get } from 'lodash';
 
 class CollectivePage extends React.Component {
+
+  static getInitialProps ({ query }) {
+    return { slug: query && query.slug, query }
+  }
 
   static propTypes = {
     getLoggedInUser: PropTypes.func.isRequired,
     data: PropTypes.object,
     query: PropTypes.object,
-  }
-
-  static getInitialProps ({ query }) {
-    return { slug: query && query.slug, query }
   }
 
   constructor(props) {
@@ -38,13 +39,15 @@ class CollectivePage extends React.Component {
     const { LoggedInUser } = this.state;
 
     if (data.loading) return (<Loading />);
+    if (!data.Collective) {
+      window.location.replace(`/search?q=${get(data, 'variables.slug')}`);
+      return (<NotFound slug={get(data, 'variables.slug')} />);
+    }
 
     if (data.error) {
       console.error("graphql error>>>", data.error.message);
       return (<ErrorPage message="GraphQL error" />)
     }
-
-    if (!data.Collective) return (<NotFound />);
 
     const collective = data.Collective;
 
