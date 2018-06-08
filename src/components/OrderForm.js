@@ -1,13 +1,12 @@
 import React from 'react';
 import { withApollo } from 'react-apollo';
 import PropTypes from 'prop-types';
-import TierComponent from './Tier';
 import InputField from './InputField';
-import MatchingFundWithData from './MatchingFundWithData';
+import OrderFormContributionDetails from './OrderFormContributionDetails';
 import ActionButton from './Button';
 import SectionTitle from './SectionTitle';
 import { Button, Row, Col, Form } from 'react-bootstrap';
-import { defineMessages, FormattedMessage, FormattedDate, FormattedTime } from 'react-intl';
+import { defineMessages, FormattedMessage } from 'react-intl';
 import { capitalize, formatCurrency, isValidEmail } from '../lib/utils';
 import { getStripeToken } from '../lib/stripe';
 import { pick, get } from 'lodash';
@@ -31,6 +30,15 @@ class OrderForm extends React.Component {
 
   constructor(props) {
     super(props);
+    this.populatePaymentMethodTypes = this.populatePaymentMethodTypes.bind(this);
+    this.populateProfiles = this.populateProfiles.bind(this);
+    this.handleChange = this.handleChange.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+    this.error = this.error.bind(this);
+    this.resetError = this.resetError.bind(this);
+    this.resetOrder = this.resetOrder.bind(this);
+    this.signin = this.signin.bind(this);
+
     const { intl, order } = props;
     const tier = { ...order.tier };
 
@@ -111,7 +119,6 @@ class OrderForm extends React.Component {
       'endsAt.label': { id: 'tier.endsAt.label', defaultMessage: 'end date and time' },
       'order.error.organization.name.required': { id: 'order.error.organization.name.required', defaultMessage: 'Please provide a name for the new organization' },
       'order.error.organization.website.required': { id: 'order.error.organization.website.required', defaultMessage: 'Please provide a website for the new organization' },
-      'order.publicMessage.placeholder': { id: 'order.publicMessage.placeholder', defaultMessage: 'Use this space to add a personal message (public)' },
       'newsletterOptIn.description': {
         id: 'user.newsletterOptIn.description',
         defaultMessage: 'Subscribe to the Open Collective newsletter.',
@@ -176,7 +183,7 @@ class OrderForm extends React.Component {
 
   // All the following methods are arrow functions and auto-bind
 
-  populatePaymentMethodTypes = () => {
+  populatePaymentMethodTypes() {
     const { intl } = this.props;
     const paymentMethodTypeOptions = [];
     paymentMethodTypeOptions.push({'creditcard': intl.formatMessage(this.messages['paymentMethod.creditcard'])});
@@ -224,7 +231,7 @@ class OrderForm extends React.Component {
    * Otherwise, you can order a tier as an individual or as any organization that you are an admin of
    * @param {*} LoggedInUser
    */
-  populateProfiles = (LoggedInUser) => {
+  populateProfiles(LoggedInUser) {
     const { intl } = this.props;
     const fromCollectiveOptions = [], collectivesById = {};
 
@@ -309,7 +316,7 @@ class OrderForm extends React.Component {
     }
   }
 
-  handleChange = (obj, attr, value) => {
+  handleChange(obj, attr, value) {
     this.resetError();
     const newTier = { ...this.state.order.tier }
     const newOrder = { ...this.state.order };
@@ -354,10 +361,10 @@ class OrderForm extends React.Component {
     }
   }
 
-  handleSubmit = async () => {
+  async handleSubmit() {
     if (! await this.validate()) return false;
     this.setState({ loading: true });
-    const { paymentMethod, order, fromCollective, user } = this.state;
+    const { paymentMethod, order, fromCollective, user, contributionDetails } = this.state;
     const tier = order.tier;
 
     const quantity = tier.quantity || 1;
@@ -370,27 +377,28 @@ class OrderForm extends React.Component {
       interval: order.interval || tier.interval,
       totalAmount: (quantity * tier.amount) || order.totalAmount,
       matchingFund: order.matchingFund,
-      paymentMethod
+      paymentMethod,
+      ...contributionDetails
     };
-
     if (tier && tier.id) {
       OrderInputType.tier = { id: tier.id, amount: tier.amount };
     }
     console.log(">>> OrderForm onSubmit", OrderInputType);
+    return;
     await this.props.onSubmit(OrderInputType);
     this.setState({ loading: false });
   }
 
-  error = (msg) => {
+  error(msg) {
     const error = `${msg}`;
     this.setState({ result: { error }});
   }
 
-  resetError = () => {
+  resetError() {
     this.setState({ result: { error: null }});
   }
 
-  validate = async () => {
+  async validate() {
     const TEST_ENVIRONMENT = (typeof window !== 'undefined' && window.location.search.match(/test=e2e/) && (window.location.hostname === 'staging.opencollective.com' || window.location.hostname === 'localhost'));
 
     const { intl } = this.props;
@@ -473,11 +481,11 @@ class OrderForm extends React.Component {
     return true;
   }
 
-  resetOrder = () => {
+  resetOrder() {
     this.setState({ order: {} });
   }
 
-  signin = () => {
+  signin() {
     signin(this.state.user, `${window.location.pathname}${window.location.search}`).then(() => {
       this.setState({ loginSent: true })
     })
@@ -745,83 +753,12 @@ class OrderForm extends React.Component {
 
           { !requireLogin &&
           <div>
-
-            <section className="order">
-              { order.tier.type !== 'TICKET' && <SectionTitle section="contributionDetails" /> }
-              { order.tier.type === 'TICKET' &&
-                <div>
-                  <SectionTitle section="ticketDetails" />
-                  <Row>
-                    <Col sm={12}>
-                      <div className="form-group">
-                        <label className="col-sm-2 control-label">
-                          <FormattedMessage id="tier.order.ticket.info" defaultMessage="Event info" />
-                        </label>
-                        <Col sm={10}>
-                          {!collective.startsAt &&
-                            console.warn(`OrderForm: collective.startsAt should not be empty. collective.id: ${collective.id}`)
-                          }
-                          {collective.startsAt &&
-                            <React.Fragment>
-                              <FormattedDate value={collective.startsAt} weekday="short" day="numeric" month="long" />, &nbsp;
-                              <FormattedTime value={collective.startsAt} timeZone={collective.timezone} />&nbsp; - &nbsp;
-                            </React.Fragment>
-                          }
-                          { get(collective, 'location.name') }
-                        </Col>
-                      </div>
-                    </Col>
-                  </Row>
-                </div>
-              }
-              <Row>
-                <Col sm={12}>
-                  <div className="form-group">
-                    <label className="col-sm-2 control-label">
-                      { order.tier.type !== 'TICKET' && <FormattedMessage id="tier.order.contribution" defaultMessage="Contribution" /> }
-                      { order.tier.type === 'TICKET' && <FormattedMessage id="tier.order.ticket" defaultMessage="Ticket" /> }
-                    </label>
-                    <Col sm={10}>
-                      <TierComponent
-                        tier={order.tier}
-                        values={{
-                          quantity: order.tier.quantity || order.quantity, // TODO: confusing, need to fix
-                          interval: order.interval || order.tier.interval,
-                          amount: order.totalAmount,
-                        }}
-                        onChange={(tier) => this.handleChange('order', 'tier', tier)}
-                        />
-                    </Col>
-                  </div>
-                </Col>
-              </Row>
-              { this.props.matchingFund &&
-                <Row>
-                  <Col sm={12}>
-                    <MatchingFundWithData
-                      collective={collective}
-                      order={order}
-                      uuid={this.props.matchingFund}
-                      onChange={(matchingFund) => this.handleChange('order', 'matchingFund', matchingFund)}
-                      />
-                  </Col>
-                </Row>
-              }
-              <Row>
-                <Col sm={12}>
-                  <InputField
-                    label="Message (public)"
-                    type="textarea"
-                    name="publicMessage"
-                    className="horizontal"
-                    placeholder={intl.formatMessage(this.messages['order.publicMessage.placeholder'])}
-                    defaultValue={order.publicMessage}
-                    maxLength={255}
-                    onChange={(value) => this.handleChange("order", "publicMessage", value)}
-                    />
-                </Col>
-              </Row>
-            </section>
+            <OrderFormContributionDetails
+              order={order}
+              collective={collective}
+              matchingFund={this.props.matchingFund}
+              onChange={(contributionDetails => this.handleChange("contributionDetails", contributionDetails))}
+              />
 
             { order.totalAmount > 0 &&
               <section className="paymentDetails">
