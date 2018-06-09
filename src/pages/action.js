@@ -59,7 +59,19 @@ class ActionPage extends React.Component {
             { loading && this.mutation === 'approveCollective' && <FormattedMessage id="actions.approveCollective.processing" defaultMessage="Approving collective" /> }
             { loading && this.mutation === 'approveExpense' && <FormattedMessage id="actions.approveExpense.processing" defaultMessage="Approving expense" /> }
             { loading && this.mutation === 'rejectExpense' && <FormattedMessage id="actions.rejectExpense.processing" defaultMessage="Rejecting expense" /> }
-            { !loading && !this.state.error && <FormattedMessage id="actions.done" defaultMessage="done " /> }
+            { !loading && !this.state.error && this.mutation !== 'approveExpense' && <FormattedMessage id="actions.done" defaultMessage="done" /> }
+            { !loading && !this.state.error && this.mutation === 'approveExpense' && <FormattedMessage
+              id="actions.expenseApproved" defaultMessage="{message}" values={{
+                message:
+                  <div>Expense approved<br />
+                    <a
+                      href={
+                        `/${this.props.url.query.collectiveSlug}`
+                      } className="-blue">Go back to your collective
+                    </a>
+                  </div>
+              }}
+            />}
             { this.state.error &&
               <div className="error">
                 <h2><FormattedMessage id="error.label" defaultMessage="Error" /></h2>

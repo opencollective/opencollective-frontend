@@ -581,6 +581,7 @@
   "actions.approveCollective.processing": "Approbation du collectif en cours",
   "actions.approveExpense.processing": "Approbation de la dépense en cours",
   "actions.rejectExpense.processing": "Rejet de la dépense en cours",
+  "actions.expenseApproved": "Expense Approved",
   "actions.done": "terminé",
   "error.label": "Erreur",
   "notFound": "pas trouvé",
