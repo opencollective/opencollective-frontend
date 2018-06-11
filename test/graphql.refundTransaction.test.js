@@ -77,7 +77,7 @@ async function setupTestObjects() {
     CollectiveId: collective.id,
     PaymentMethodId: paymentMethod.id,
     transaction: {
-      type: constants.type.CREDIT,
+      type: constants.TransactionTypes.CREDIT,
       OrderId: order.id,
       amount: order.totalAmount,
       currency: order.currency,

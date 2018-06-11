@@ -1,6 +1,6 @@
 import models, { sequelize, Op } from '../models';
 import { getListOfAccessibleMembers } from '../lib/auth';
-import { type } from '../constants/transactions';
+import { TransactionTypes } from '../constants/transactions';
 import DataLoader from 'dataloader';
 import { get, groupBy } from 'lodash';
 import debugLib from 'debug';
@@ -292,7 +292,7 @@ export const loaders = (req) => {
         where: {
           FromCollectiveId: { [Op.in]: keys.map(k => k.FromCollectiveId) },
           CollectiveId: { [Op.in]: keys.map(k => k.CollectiveId) },
-          type: type.CREDIT
+          type: TransactionTypes.CREDIT
         },
         group: ['FromCollectiveId', 'CollectiveId']
       })

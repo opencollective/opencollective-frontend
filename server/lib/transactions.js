@@ -1,7 +1,7 @@
 import Promise from 'bluebird';
 import models, { Op, sequelize } from '../models';
 import errors from '../lib/errors';
-import { type } from '../constants/transactions';
+import { TransactionTypes } from '../constants/transactions';
 import { getFxRate } from '../lib/currency';
 import { exportToCSV } from '../lib/utils';
 import { toNegative } from '../lib/math';
@@ -87,7 +87,7 @@ export function createFromPaidExpense(host, paymentMethod, expense, paymentRespo
     hostCurrency,
     paymentProcessorFeeInHostCurrency: toNegative(paymentProcessorFeeInHostCurrency),
     ExpenseId: expense.id,
-    type: type.DEBIT,
+    type: TransactionTypes.DEBIT,
     amount: -expense.amount,
     currency: expense.currency,
     description: expense.description,
@@ -130,7 +130,7 @@ export async function createTransactionFromInKindDonation(expenseTransaction) {
     amount: -expenseTransaction.amount,
     amountInHostCurrency: -expenseTransaction.amount,
     hostCurrency: expenseTransaction.hostCurrency,
-    type: type.DEBIT,
+    type: TransactionTypes.DEBIT,
     currency: expenseTransaction.currency,
     description: expenseTransaction.description,
     CreatedByUserId: expenseTransaction.CreatedByUserId,

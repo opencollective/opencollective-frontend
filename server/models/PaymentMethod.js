@@ -2,7 +2,7 @@
 
 import * as stripe from '../paymentProviders/stripe/gateway';
 import { types as CollectiveTypes } from '../constants/collectives';
-import { type as TransactionTypes } from '../constants/transactions';
+import { TransactionTypes } from '../constants/transactions';
 import * as paymentProviders from '../paymentProviders';
 import debugLib from 'debug';
 const debug = debugLib('PaymentMethod');

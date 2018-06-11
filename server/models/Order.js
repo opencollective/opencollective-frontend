@@ -1,4 +1,4 @@
-import { type } from '../constants/transactions';
+import { TransactionTypes } from '../constants/transactions';
 import Promise from 'bluebird';
 import CustomDataTypes from './DataTypes';
 import Temporal from 'sequelize-temporal';
@@ -140,7 +140,7 @@ export default function(Sequelize, DataTypes) {
         return models.Transaction.sum('amount', {
           where: {
             OrderId: this.id,
-            type: type.CREDIT
+            type: TransactionTypes.CREDIT
           }
         })
       },
@@ -152,7 +152,7 @@ export default function(Sequelize, DataTypes) {
 
       info() {
         return {
-          type: type.CREDIT,
+          type: TransactionTypes.CREDIT,
           id: this.id,
           CreatedByUserId: this.CreatedByUserId,
           TierId: this.TierId,

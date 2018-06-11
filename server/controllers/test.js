@@ -1,7 +1,7 @@
 import config from 'config';
 import Sequelize from 'sequelize';
 import models, { setupModels } from '../models';
-import { type } from '../constants/transactions';
+import { TransactionTypes } from '../constants/transactions';
 import roles from '../constants/roles';
 import errors from '../lib/errors';
 import { exportToPDF } from '../lib/utils';
@@ -131,7 +131,7 @@ export const resetTestDatabase = function(req, res, next) {
       amount: 100,
       description: "Donation 1",
       CollectiveId: testGroup.id,
-      type: type.CREDIT,
+      type: TransactionTypes.CREDIT,
       currency: "EUR",
       CreatedByUserId: testBacker.id,
       OrderId: order.id,
@@ -148,7 +148,7 @@ export const resetTestDatabase = function(req, res, next) {
     .then(order => models.Transaction.create({
       amount: 200,
       description: "Donation 2",
-      type: type.CREDIT,
+      type: TransactionTypes.CREDIT,
       currency: "EUR",
       CreatedByUserId: testBacker2.id,
       OrderId: order.id,

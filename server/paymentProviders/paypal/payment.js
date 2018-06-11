@@ -99,7 +99,7 @@ export async function createTransaction(order, paymentInfo) {
     PaymentMethodId: order.paymentMethod.id
   };
   payload.transaction = {
-    type: constants.type.CREDIT,
+    type: constants.TransactionTypes.CREDIT,
     OrderId: order.id,
     amount: order.totalAmount,
     currency: order.currency,
