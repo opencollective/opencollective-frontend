@@ -72,7 +72,11 @@ export const decrypt = (text) => {
 
 export function strip_tags(str, allowedTags) {
   return sanitizeHtml(str, {
-    allowedTags: allowedTags || sanitizeHtml.defaults.allowedTags.concat([ 'img' ]),
+    allowedTags: allowedTags || sanitizeHtml.defaults.allowedTags.concat([
+      'img',
+      'h1',
+      'h2'
+    ]),
     allowedAttributes: {
       a: [ 'href', 'name', 'target' ],
       img: [ 'src' ]
