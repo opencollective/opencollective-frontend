@@ -85,7 +85,7 @@ export default {
         }
       });
 
-      models.Collective.findById(CollectiveId)
+      return models.Collective.findById(CollectiveId)
         .then(c => {
           collective = c;
           if (collective.type === 'COLLECTIVE') {
