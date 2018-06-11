@@ -93,12 +93,12 @@ export default function(Sequelize, DataTypes) {
       type: DataTypes.DATE,
       defaultValue: Sequelize.NOW
     },
-    
+
     updatedAt: {
       type: DataTypes.DATE,
       defaultValue: Sequelize.NOW
     },
-    
+
     deletedAt: {
       type: DataTypes.DATE
     }

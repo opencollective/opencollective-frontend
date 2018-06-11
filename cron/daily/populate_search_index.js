@@ -24,8 +24,8 @@ const done = (error) => {
     debug('Error in updating index', error)
 
     return emailLib.sendMessage(
-      'ops@opencollective.com', 
-      'Error in updating index', 
+      'ops@opencollective.com',
+      'Error in updating index',
       '',
       {
         bcc: ' ',
@@ -52,8 +52,8 @@ const populateIndex = async () => {
       },
     },
 
-    attributes: { 
-      exclude: ['settings', 'data', 'longDescription'] 
+    attributes: {
+      exclude: ['settings', 'data', 'longDescription']
     }, // exclude json fields to not fetch a lot of data
     order: ['id']
   });
@@ -88,7 +88,7 @@ const populateIndex = async () => {
   debug('initializing search index');
   const index = initializeClientandIndex(ALGOLIA_INDEX);
 
-  // we need to send these in batches, there is a limit of 18kb per request 
+  // we need to send these in batches, there is a limit of 18kb per request
   const chunkedData = chunkArray(searchData, chunkSize);
 
   const indexedCount = await Promise.reduce(chunkedData, async (total, chunk) => {

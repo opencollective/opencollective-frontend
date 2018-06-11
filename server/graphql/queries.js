@@ -277,7 +277,7 @@ const queries = {
         order: [Object.values(orderBy)],
         where: {},
       };
-      
+
       if (type) {
         query.where = { type };
       }

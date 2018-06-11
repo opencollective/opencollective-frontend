@@ -597,9 +597,9 @@ export function chunkArray( startArray, chunkSize ) {
     }, []);
   }
 
-// This generates promises of n-length at a time 
+// This generates promises of n-length at a time
 // Useful so we don't go over api quota limit on Stripe
-export function promiseSeq(arr, predicate, consecutive =100) {  
+export function promiseSeq(arr, predicate, consecutive =100) {
   return chunkArray(arr, consecutive).reduce(( prom, items, ix ) => {
     // wait for the previous Promise.all() to resolve
     return prom.then(() => {

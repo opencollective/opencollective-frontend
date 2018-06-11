@@ -1,7 +1,6 @@
 import Promise from 'bluebird';
 
 import models from '../../models';
-import { type as TransactionTypes } from '../../constants/transactions';
 import roles from '../../constants/roles';
 import * as paymentsLib from '../../lib/payments';
 import * as constants from '../../constants/transactions';
@@ -43,7 +42,7 @@ export default {
             CollectiveId: user.CollectiveId,
             PaymentMethodId: order.PaymentMethodId,
             transaction: {
-              type: TransactionTypes.CREDIT,
+              type: constants.TransactionTypes.CREDIT,
               OrderId: order.id,
               amount: order.paymentMethod.monthlyLimitPerMember, // treating this field as one-time limit
               amountInHostCurrency: order.paymentMethod.monthlyLimitPerMember,
@@ -91,7 +90,7 @@ export default {
               CollectiveId: order.CollectiveId,
               PaymentMethodId: newPM.id,
               transaction: {
-                type: TransactionTypes.CREDIT,
+                type: constants.TransactionTypes.CREDIT,
                 OrderId: order.id,
                 amount: order.totalAmount,
                 amountInHostCurrency: order.totalAmount,
@@ -103,7 +102,7 @@ export default {
                 paymentProcessorFeeInHostCurrency: 0,
                 description: order.description
               }
-            }
+            };
 
             return models.Transaction.createFromPayload(payload)
               .then(t => transactions = t)
@@ -119,8 +118,8 @@ export default {
               .then(() => newPM.update({ confirmedAt: new Date() }))
 
               .then(() => transactions); // make sure we return the transactions created
-          })
+          });
         }
       });
   }
-}
+};

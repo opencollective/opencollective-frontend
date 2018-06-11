@@ -478,7 +478,7 @@ describe('Collective model', () => {
       expect(nextGoal.percentage).to.equal("48%");
       expect(nextGoal.missing.amount).to.equal(103500)
     });
-    
+
     it("returns the next goal based on yearlBudget", async () => {
       const goals = [
         {

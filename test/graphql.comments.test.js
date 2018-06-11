@@ -216,5 +216,5 @@ describe('graphql.comments.test', () => {
       expect(comments[0].markdown).to.equal("comment 3");
     });
 
-  });  
+  });
 });
