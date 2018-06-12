@@ -274,7 +274,8 @@ class CreateExpenseForm extends React.Component {
             </div>
           }
           <div className="disclaimer">
-            <FormattedMessage id="expense.disclaimer" defaultMessage="Please make sure to upload a valid receipt or invoice. We should be able to see clearly on the picture (or PDF) the total amount paid, the date, the items purchased and the legal address." />
+            <FormattedMessage id="expense.disclaimer" defaultMessage="You must upload a valid receipt or invoice. We should be able to see clearly on the picture (or PDF) the total amount paid, the date, the items purchased and the legal address." />
+            <a href="https://opencollective.com/faq#expense"><FormattedMessage id="needHelp" defaultMessage="Need help?" /></a>
           </div>
 
           <div className="leftColumn">
@@ -287,7 +288,7 @@ class CreateExpenseForm extends React.Component {
                 onChange={attachment => this.handleChange('attachment', attachment)}
                 defaultValue={expense.attachment}
                 placeholder={'/static/images/receipt.svg'}
-                description={<FormattedMessage id="expense.attachment.description" defaultMessage="Upload receipt (photo or PDF)" />}
+                description={<FormattedMessage id="expense.attachment.description" defaultMessage="Upload receipt or invoice (photo or PDF)" />}
                 />
             </div>
           </div>
