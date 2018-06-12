@@ -10,7 +10,7 @@ import MatchingFundWithData from './MatchingFundWithData';
 import ActionButton from './Button';
 import SectionTitle from './SectionTitle';
 import { Button, Row, Col, Form, FormGroup } from 'react-bootstrap';
-import { defineMessages, FormattedMessage, FormattedDate, FormattedTime } from 'react-intl';
+import { defineMessages, FormattedMessage } from 'react-intl';
 import { capitalize, formatCurrency, isValidEmail, getEnvVar } from '../lib/utils';
 import { getStripeToken } from '../lib/stripe';
 import { pick, get } from 'lodash';
@@ -427,7 +427,7 @@ class OrderForm extends React.Component {
   }
 
   prepareOrderRequest = () => {
-    const { paymentMethod, order, fromCollective, user } = this.state;
+    const { paymentMethod, order, fromCollective, user, contributionDetails } = this.state;
     const quantity = order.tier.quantity || 1;
     const orderRequest = {
       user,
