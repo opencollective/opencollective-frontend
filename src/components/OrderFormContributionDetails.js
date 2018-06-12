@@ -4,7 +4,6 @@ import SectionTitle from './SectionTitle';
 import TierComponent from './Tier';
 import MatchingFundWithData from './MatchingFundWithData';
 import { defineMessages, FormattedMessage, FormattedDate, FormattedTime } from 'react-intl';
-import styled from 'styled-components';
 import { Box, Flex } from 'grid-styled';
 import { get } from 'lodash';
 import InputField from './InputField';
