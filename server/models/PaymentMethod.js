@@ -1,16 +1,21 @@
 /** @module models/PaymentMethod */
 
-import * as stripe from '../paymentProviders/stripe/gateway';
-import { types as CollectiveTypes } from '../constants/collectives';
-import { TransactionTypes } from '../constants/transactions';
-import * as paymentProviders from '../paymentProviders';
-import debugLib from 'debug';
-const debug = debugLib('PaymentMethod');
-import { sumTransactions } from '../lib/hostlib';
-import CustomDataTypes from './DataTypes';
+import libdebug from 'debug';
 import { get, intersection } from 'lodash';
+
+import { TransactionTypes } from '../constants/transactions';
+import { types as CollectiveTypes } from '../constants/collectives';
+
+import { sumTransactions } from '../lib/hostlib';
 import { formatCurrency } from '../lib/utils';
 import { getFxRate } from '../lib/currency';
+
+import CustomDataTypes from './DataTypes';
+import * as stripe from '../paymentProviders/stripe/gateway';
+import * as libpayments from '../lib/payments';
+
+const debug = libdebug('PaymentMethod');
+
 
 export default function(Sequelize, DataTypes) {
 
@@ -162,8 +167,7 @@ export default function(Sequelize, DataTypes) {
       },
 
       features() {
-        const paymentProvider = paymentProviders[this.service]; // eslint-disable-line import/namespace
-        return paymentProvider.types[this.type || 'default'].features || {};
+        return libpayments.findPaymentMethodProvider(this).features;
       },
 
       minimal() {
@@ -240,17 +244,14 @@ export default function(Sequelize, DataTypes) {
       throw new Error(`Internal error at PaymentMethod.getBalanceForUser(user): user is not an instance of User`);
     }
 
-    const paymentProvider = paymentProviders[this.service]; // eslint-disable-line import/namespace
-    let getBalance;
-    if (paymentProvider && paymentProvider.types[this.type || 'default'].getBalance) {
-      getBalance = paymentProvider.types[this.type || 'default'].getBalance;
-    } else {
-      getBalance = () => Promise.resolve(10000000); // GraphQL doesn't like Infinity
-    }
+    const paymentProvider = libpayments.findPaymentMethodProvider(this);
+    const getBalance = (paymentProvider && paymentProvider.getBalance)
+      ? paymentProvider.getBalance
+      : () => Promise.resolve(10000000); // GraphQL doesn't like Infinity
 
-    // needed because prepaid payment method can be accessed without logged in
-    if (this.service === 'opencollective' && this.type === 'prepaid') {
-      return paymentProvider.types.prepaid.getBalance(this);
+    // needed because giftcard payment method can be accessed without logged in
+    if (libpayments.isProvider('opencollective.prepaid', this)) {
+      return getBalance(this);
     }
 
     if (this.monthlyLimitPerMember && !user) {
@@ -339,7 +340,7 @@ export default function(Sequelize, DataTypes) {
         } else {
           return pm;
         }
-      })
+      });
     } else if (paymentMethod.uuid && paymentMethod.uuid.length === 8) {
       return PaymentMethod.getMatchingFund(paymentMethod.uuid);
     } else {

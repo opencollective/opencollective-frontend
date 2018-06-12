@@ -12,6 +12,30 @@ import * as libsubscription from './subscriptions';
 import * as libtransactions from './transactions';
 import { getRecommendedCollectives } from './data';
 
+/** Check if paymentMethod has a given fully qualified name
+ *
+ * Payment Provider names are composed by service and type joined with
+ * a dot. E.g.: `opencollective.giftcard`, `stripe.creditcard`,
+ * etc. This function returns true if a *paymentMethod* instance has a
+ * given *fqn*.
+ *
+ * @param {String} fqn is the fully qualified name to be matched.
+ * @param {models.PaymentMethod} paymentMethod is the instance that
+ *  will have the fully qualified name compared to the parameter
+ *  *fqn*.
+ * @returns {Boolean} true if *paymentMethod* has a fully qualified
+ *  name that equals *fqn*.
+ * @example
+ * > isProvider('opencollective.giftcard', { service: 'foo', type: 'bar' })
+ * false
+ * > isProvider('stripe.creditcard', { service: 'stripe', type: 'creditcard' })
+ * true
+ */
+export function isProvider(fqn, paymentMethod) {
+  const pmFqn = `${paymentMethod.service}.${paymentMethod.type || 'default'}`;
+  return fqn === pmFqn;
+}
+
 /** Find payment method handler
  *
  * @param {models.PaymentMethod} paymentMethod This must point to a row in the
@@ -238,7 +262,7 @@ export const executeOrder = (user, order, options) => {
     })
     .then(transaction => {
       // for gift cards
-      if (!transaction && order.paymentMethod.service === 'opencollective' && order.paymentMethod.type === 'prepaid') {
+      if (!transaction && isProvider('opencollective.prepaid', order.paymentMethod)) {
         sendOrderProcessingEmail(order)
         .then(() => sendSupportEmailForManualIntervention(order)); // async
       } else if (!transaction && order.paymentMethod.service === 'stripe' && order.paymentMethod.type === 'bitcoin') {
