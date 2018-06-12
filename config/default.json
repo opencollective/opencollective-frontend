@@ -25,7 +25,7 @@
     "website": "http://localhost:3000"
   },
   "email": {
-    "from": "OpenCollective <info@opencollective.com>"
+    "from": "Open Collective <info@opencollective.com>"
   },
   "mailgun": {
     "user": "",
