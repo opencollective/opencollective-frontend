@@ -35,7 +35,7 @@ export const transformResultInCSV = (json) => {
     "Host Currency",
     "Transaction Amount",
     `Host Fee (${hostCurrency})`,
-    `OpenCollective Fee (${hostCurrency})`,
+    `Open Collective Fee (${hostCurrency})`,
     `Payment Processor Fee (${hostCurrency})`,
     `Net Amount (${collectiveCurrency})`,
     "Subscription Interval",
