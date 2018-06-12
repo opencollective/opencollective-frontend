@@ -154,15 +154,13 @@ class Tier extends React.Component {
             margin: 1rem;
             display: flex;
             justify-content: space-between;
+            align-items: center;
           }
           .title {
             font-size: 2.2rem;
             color: var(--charcoal-grey-two);
           }
           .amount {
-            position: absolute;
-            top: 3rem;
-            right: 3rem;
             font-family: Rubik;
             font-size: 1.6rem;
             font-weight: 500;

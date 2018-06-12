@@ -8,12 +8,22 @@ import styled from 'styled-components';
 import { Box, Flex } from 'grid-styled';
 import { get } from 'lodash';
 import InputField from './InputField';
-import Text from './Text';
+import { Label } from './Text';
 import withIntl from '../lib/withIntl';
 
+const LabelBox = Box.extend.attrs({
+  w: [1, null, 1/6],
+  mb: ['10px', null, 0],
+  mt: '10px'
+})`
+  margin-right: 10px;
+  padding-right: 20px;
+`;
 
-const LabelBox = Box.extend`
-  max-width: 150px;
+const Row = Flex.extend.attrs({
+  flexDirection: ['column', null, 'row']
+})`
+  margin-bottom: 10px;
 `;
 
 class OrderFormContributionDetails extends React.Component {
@@ -50,13 +60,13 @@ class OrderFormContributionDetails extends React.Component {
         { order.tier.type === 'TICKET' &&
           <div>
             <SectionTitle section="ticketDetails" />
-            <Flex flexDirection={['column', null, 'row']}>
-              <LabelBox w={[1, null, 1/4]} mr={30}>
+            <Row>
+              <LabelBox w={[1, null, 1/6]} mr={30}>
                 <label className="control-label">
                   <FormattedMessage id="tier.order.ticket.info" defaultMessage="Event info" />
                 </label>
               </LabelBox>
-              <Box w={[1, null, 3/4]}>
+              <Box w={[1, null, 5/6]}>
                 {!collective.startsAt &&
                   console.warn(`OrderForm: collective.startsAt should not be empty. collective.id: ${collective.id}`)
                 }
@@ -68,17 +78,17 @@ class OrderFormContributionDetails extends React.Component {
                 }
                 { get(collective, 'location.name') }
               </Box>
-            </Flex>
+            </Row>
           </div>
         }
-        <Flex flexDirection={['column', null, 'row']}>
-          <LabelBox w={[1, null, 1/4]} mr={30}>
-            <Text className="control-label" textAlign={['left', null, 'right']}>
+        <Row>
+          <LabelBox>
+            <Label className="control-label" textAlign={['left', null, 'right']}>
               { order.tier.type !== 'TICKET' && <FormattedMessage id="tier.order.contribution" defaultMessage="Contribution" /> }
               { order.tier.type === 'TICKET' && <FormattedMessage id="tier.order.ticket" defaultMessage="Ticket" /> }
-            </Text>
+            </Label>
           </LabelBox>
-          <Box w={[1, null, 3/4]}>
+          <Box w={[1, 5/6, 5/6, 5/6]}>
             <TierComponent
               tier={order.tier}
               values={{
@@ -89,10 +99,15 @@ class OrderFormContributionDetails extends React.Component {
               onChange={(tier) => this.handleChange('tier', tier)}
               />
           </Box>
-        </Flex>
+        </Row>
         { matchingFund &&
-          <Flex>
-            <Box w={1}>
+          <Row>
+            <LabelBox>
+              <Label className="control-label" textAlign={['left', null, 'right']}>
+                <FormattedMessage id="order.matchingfund.label" defaultMessage="Matching fund" />
+              </Label>
+            </LabelBox>
+            <Box w={[1, null, 5/6]}>
               <MatchingFundWithData
                 collective={collective}
                 order={order}
@@ -100,9 +115,9 @@ class OrderFormContributionDetails extends React.Component {
                 onChange={(matchingFund) => this.handleChange('matchingFund', matchingFund)}
                 />
             </Box>
-          </Flex>
+          </Row>
         }
-        <Flex>
+        <Row>
           <Box w={1}>
             <InputField
               label="Message (public)"
@@ -115,7 +130,7 @@ class OrderFormContributionDetails extends React.Component {
               onChange={(value) => this.handleChange('publicMessage', value)}
               />
           </Box>
-        </Flex>
+        </Row>
       </section>
     )
   }

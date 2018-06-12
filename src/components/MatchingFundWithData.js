@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormGroup, ControlLabel, Col } from 'react-bootstrap';
+import { FormGroup, Col } from 'react-bootstrap';
 import { graphql } from 'react-apollo'
 import gql from 'graphql-tag'
 import { FormattedMessage } from 'react-intl';
@@ -9,64 +9,77 @@ import { get } from 'lodash';
 import { formatCurrency, days } from '../lib/utils';
 import { getFxRate } from '../lib/api';
 
+function computeAmounts(orderTotalAmount, matchingFund, fxrate) {
+  const totalAmount = orderTotalAmount * matchingFund.matching;
+  return {
+    totalAmount,
+    totalAmountInMatchingFundCurrency: totalAmount * fxrate,
+    enough: totalAmount * fxrate < matchingFund.balance
+  }
+}
+
 class MatchingFundWithData extends React.Component {
 
   static propTypes = {
     uuid: PropTypes.string.isRequired,
     order: PropTypes.object.isRequired,
     collective: PropTypes.object.isRequired,
+    data: PropTypes.object.isRequired,
+    onChange: PropTypes.func.isRequired
   }
 
   constructor(props) {
     super(props);
-    this.fxrate = 1;
-    this.uuid = this.props.uuid;
-    this.props.onChange(this.uuid);
+    props.onChange(props.uuid);
+    this.state = {
+      fxrate: 1,
+      uuid: props.uuid,
+      totalAmount: get(props, 'order.totalAmount')
+    };
+    console.log(">>> MatchingFundWithData props", props);
   }
 
-  // Whenever this.props.order.totalAmount changes, we update the status
-  async UNSAFE_componentWillReceiveProps(newProps) {
-    const { data: { loading, MatchingFund }, collective, order, uuid } = newProps;
-    if (loading) return;
+  static async getDerivedStateFromProps(props, state) {
+    const { data: { loading, MatchingFund }, collective, order } = props;
+    if (loading) {
+      return state;
+    }
 
     // if the matching fund id doesn't return any matching fund, we notify the OrderForm
-    if (!MatchingFund && this.uuid) {
-      this.uuid = null;
-      this.props.onChange(null);
-      return;
+    if (!MatchingFund && state.uuid) {
+      state.uuid = null;
+      return state;
     }
 
-    if (order.totalAmount === this.props.order.totalAmount) return;
+    // if order.totalAmount hasn't changed, we stop here
+    if (get(props, 'order.totalAmount') === state.totalAmount) return;
+
+    state.totalAmount = get(props, 'order.totalAmount');
+
     const currency = get(MatchingFund, 'currency');
     if (currency && currency !== collective.currency) {
-      this.fxrate = await getFxRate(collective.currency, currency);
+      state.fxrate = await getFxRate(collective.currency, currency);
     }
-    const amounts = this.computeAmounts(order.totalAmount, MatchingFund);
+    const amounts = computeAmounts(order.totalAmount, MatchingFund, state.fxrate);
+    console.log(">>> getDerivedStateFromProps", amounts);
+    console.log(">>> state", state);
     if (!amounts.enough) {
-      console.error("Not enough fund in matching fund, balance: ", formatCurrency(MatchingFund.balance, MatchingFund.currency), "matching: ", formatCurrency(amounts.totalAmountInMatchingFundCurrency, MatchingFund.currency));
-      this.props.onChange(null);
-    } else {
-      this.props.onChange(uuid);
+      const error = `Not enough fund in matching fund, balance: ${formatCurrency(MatchingFund.balance, MatchingFund.currency)} matching: ${formatCurrency(amounts.totalAmountInMatchingFundCurrency, MatchingFund.currency)}`;
+      state.error = error;
+      console.error(error);
     }
-  }
+    return state;
 
-  computeAmounts(orderTotalAmount, matchingFund) {
-    const totalAmount = orderTotalAmount * matchingFund.matching;
-    return {
-      totalAmount,
-      totalAmountInMatchingFundCurrency: totalAmount * this.fxrate,
-      enough: totalAmount * this.fxrate < matchingFund.balance
-    }
   }
 
   render() {
     const { collective, order, data: { loading, MatchingFund } } = this.props;
-
     if (loading) return (<div />);
     if (!MatchingFund) return (<div />);
 
     const currency = collective.currency;
-    const amounts = this.computeAmounts(order.totalAmount, MatchingFund);
+    const amounts = computeAmounts(order.totalAmount, MatchingFund, this.state.fxrate);
+
     const member = {
       createdAt: MatchingFund.collective.createdAt,
       member: MatchingFund.collective,
@@ -108,9 +121,6 @@ class MatchingFundWithData extends React.Component {
           }
         `}</style>
         <div>
-          <Col componentClass={ControlLabel} sm={2}>
-            <ControlLabel><FormattedMessage id="order.matchingfund.label" defaultMessage="Matching fund" /></ControlLabel>
-          </Col>
           <Col sm={10}>
             <div className="main">
               <div className="MatcherCard">
