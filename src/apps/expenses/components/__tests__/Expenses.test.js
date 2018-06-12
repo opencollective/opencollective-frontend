@@ -41,6 +41,7 @@ describe("Expenses component", () => {
   const loggedInUser = {
     canPayExpense: () => true,
     canApproveExpense: () => true,
+    canEditCollective: () => true,
     canEditExpense: () => true,
     collective: {
       id: 3,
