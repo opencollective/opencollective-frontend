@@ -505,6 +505,7 @@ const getCollectiveCoverQuery = gql`
       settings
       image
       isHost
+      isActive
       tags
       stats {
         id
