@@ -59,13 +59,12 @@ export function getCurrencySymbol(currency) {
  return r.replace(/0$/,'');
 }
 
-export function getBaseImagesUrl() {
-  if (process.browser) {
-    return get(window, ['__NEXT_DATA__', 'env', 'IMAGES_URL']);
-  } else {
-    return get(process, ['env', 'IMAGES_URL']);
-  }
-}
+/** Retrieve variables set in the environment */
+export const getEnvVar = (v) => (process.browser)
+  ? get(window, ['__NEXT_DATA__', 'env', v])
+  : get(process, ['env', v]);
+
+export const getBaseImagesUrl = () => getEnvVar('IMAGES_URL');
 
 export function resizeImage(imageUrl, { width, height, query, baseUrl }) {
   if (!imageUrl) return null;

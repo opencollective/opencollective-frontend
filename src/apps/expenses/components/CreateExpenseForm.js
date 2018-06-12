@@ -140,6 +140,9 @@ class CreateExpenseForm extends React.Component {
             font-size: 1.4rem;
             margin: 2rem 0;
           }
+          .needHelp {
+            margin-left: 0.5rem;
+          }
           .description {
             font-size: 1.4rem;
           }
@@ -275,7 +278,7 @@ class CreateExpenseForm extends React.Component {
           }
           <div className="disclaimer">
             <FormattedMessage id="expense.disclaimer" defaultMessage="You must upload a valid receipt or invoice. We should be able to see clearly on the picture (or PDF) the total amount paid, the date, the items purchased and the legal address." />
-            <a href="https://opencollective.com/faq#expense"><FormattedMessage id="needHelp" defaultMessage="Need help?" /></a>
+            <a href="https://opencollective.com/faq#expense" className="needHelp"><FormattedMessage id="needHelp" defaultMessage="Need help?" /></a>
           </div>
 
           <div className="leftColumn">
