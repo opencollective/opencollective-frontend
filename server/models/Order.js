@@ -197,7 +197,7 @@ export default function(Sequelize, DataTypes) {
         return this.save();
       })
       .then(() => this);
-  }
+  };
 
   /**
    * Validates the payment method for the current order
@@ -209,16 +209,16 @@ export default function(Sequelize, DataTypes) {
       if (canBeUsedForOrder) return paymentMethod;
       else return null;
     });
-  }
+  };
 
   Order.prototype.getUser = function() {
     if (this.createdByUser) return Promise.resolve(this.createdByUser);
     return models.User.findById(this.CreatedByUserId).then(user => {
-      this.createdByUser = user
+      this.createdByUser = user;
       debug("getUser", user.dataValues);
       return user.populateRoles();
     });
-  }
+  };
 
   /**
    * Populate all the foreign keys if necessary
@@ -233,13 +233,13 @@ export default function(Sequelize, DataTypes) {
         if (this[attribute]) return Promise.resolve(this[attribute]);
         if (!this[fk]) return Promise.resolve(null);
         return models[model].findById(this[fk]);
-      }
+      };
       return promise().then(obj => {
         this[attribute] = obj;
-      })
+      });
     })
     .then(() => this);
-  }
+  };
 
   Order.prototype.getPaymentMethodForUser = function(user) {
     return user.populateRoles()
@@ -248,10 +248,10 @@ export default function(Sequelize, DataTypes) {
         if (user.isAdmin(this.FromCollectiveId)) {
           return models.PaymentMethod.findById(this.PaymentMethodId);
         } else {
-          return null
+          return null;
         }
-      })
-  }
+      });
+  };
 
   Order.prototype.getSubscriptionForUser = function(user) {
     if (!this.SubscriptionId) {
@@ -261,12 +261,12 @@ export default function(Sequelize, DataTypes) {
       .then(() => {
         // this check is necessary to cover organizations as well as user collective
         if (user.isAdmin(this.FromCollectiveId)) {
-          return this.getSubscription()
+          return this.getSubscription();
         } else {
-          return null
+          return null;
         }
-      })
-  }
+      });
+  };
 
   Temporal(Order, Sequelize);
   return Order;

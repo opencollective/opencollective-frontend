@@ -10,24 +10,24 @@ import * as utils from './utils';
 import * as store from './features/support/stores';
 
 const order = {
-    "quantity": 1,
-    "interval": null,
-    "totalAmount": 154300,
-    "paymentMethod": {
-        "name": "4242",
-        "token": "tok_1B5j8xDjPFcHOcTm3ogdnq0K",
-        "data": {
-          "expMonth": 10,
-          "expYear": 2023,
-          "brand": "Visa",
-          "country": "US",
-          "funding": "credit"
-        }
-    },
-    "collective": {
-        "id": null
+  "quantity": 1,
+  "interval": null,
+  "totalAmount": 154300,
+  "paymentMethod": {
+    "name": "4242",
+    "token": "tok_1B5j8xDjPFcHOcTm3ogdnq0K",
+    "data": {
+      "expMonth": 10,
+      "expYear": 2023,
+      "brand": "Visa",
+      "country": "US",
+      "funding": "credit"
     }
+  },
+  "collective": {
+    "id": null
   }
+};
 
 const createOrderQuery = `
   mutation createOrder($order: OrderInputType!) {
@@ -62,7 +62,7 @@ const createOrderQuery = `
   }
   `;
 
-  const constants = {
+const constants = {
   paymentMethod: {
     name: 'payment method',
     service: "stripe",
@@ -89,7 +89,7 @@ describe('createOrder', () => {
       .get('/latest')
       .times(5)
       .query({ access_key: config.fixer.accessKey, base: 'EUR', symbols: 'USD'})
-      .reply(200, {"base":"EUR","date":"2017-09-22","rates":{"USD":1.1961} }, ['Server', 'nosniff'])
+      .reply(200, {"base":"EUR","date":"2017-09-22","rates":{"USD":1.1961} }, ['Server', 'nosniff']);
   });
 
   after(() => nock.cleanAll());
@@ -114,11 +114,10 @@ describe('createOrder', () => {
     // the `totalAmount' field doesn't change throught the tests.
     utils.stubStripeBalance(sandbox, order.totalAmount, 'eur',
                             Math.round(order.totalAmount * 0.05),
-                            4500) // This is the payment processor fee.
-  })
+                            4500); // This is the payment processor fee.
+  });
 
   afterEach(() => sandbox.restore());
-
 
     it("fails if collective is not active", async () => {
       const collective = await models.Collective.create({

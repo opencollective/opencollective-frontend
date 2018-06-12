@@ -203,13 +203,14 @@ export const executeOrder = (user, order, options) => {
           return subscription.save();
         }).then((subscription) => {
           return order.update({ SubscriptionId: subscription.id });
-        })
+        });
       }
+      return null;
     })
     .then(() => {
       return processOrder(order, options)
         .tap(async () => {
-          if (!order.matchingFund) return;
+          if (!order.matchingFund) return null;
           const matchingFundCollective = await models.Collective.findById(order.matchingFund.CollectiveId);
           // if there is a matching fund, we execute the order
           // also adds the owner of the matching fund as a BACKER of collective
@@ -232,7 +233,7 @@ export const executeOrder = (user, order, options) => {
                 ...order,
                 transaction
               });
-            })
+            });
         });
     })
     .then(transaction => {
@@ -254,7 +255,7 @@ export const executeOrder = (user, order, options) => {
       // safe to enable subscriptions after this.
       if (payment.interval && transaction) await order.Subscription.activate();
     });
-}
+};
 
 const validatePayment = (payment) => {
   if (payment.interval && !includes(['month', 'year'], payment.interval)) {
@@ -268,7 +269,7 @@ const validatePayment = (payment) => {
   if (payment.amount < 50) {
     throw new Error('payment.amount must be at least $0.50');
   }
-}
+};
 
 const sendOrderConfirmedEmail = async (order) => {
   const { collective, tier, interval, fromCollective } = order;
@@ -307,24 +308,23 @@ const sendOrderConfirmedEmail = async (order) => {
 
     let matchingFundCollective;
     if (order.matchingFund) {
-      matchingFundCollective = await models.Collective.findById(order.matchingFund.CollectiveId)
+      matchingFundCollective = await models.Collective.findById(order.matchingFund.CollectiveId);
       data.matchingFund = {
         collective: pick(matchingFundCollective, ['slug', 'name', 'image']),
         matching: order.matchingFund.matching,
         amount: order.matchingFund.matching * order.totalAmount
-      }
+      };
     }
 
     // sending the order confirmed email to the matching fund owner or to the donor
     if (get(order, 'transaction.FromCollectiveId') === get(order, 'matchingFund.CollectiveId')) {
-      order.matchingFund.info;
       const recipients = await matchingFundCollective.getEmails();
-      emailLib.send('donationmatched', recipients, data, emailOptions)
+      return emailLib.send('donationmatched', recipients, data, emailOptions);
     } else {
-      emailLib.send('thankyou', user.email, data, emailOptions)
+      return emailLib.send('thankyou', user.email, data, emailOptions);
     }
   }
-}
+};
 
 const sendSupportEmailForManualIntervention = (order) => {
   const user = order.createdByUser;
@@ -333,7 +333,7 @@ const sendSupportEmailForManualIntervention = (order) => {
     'Gift card order needs manual attention',
     null,
     { text: `Order Id: ${order.id} by userId: ${user.id}`});
-}
+};
 
 // Assumes one-time payments,
 const sendOrderProcessingEmail = (order) => {
@@ -350,5 +350,5 @@ const sendOrderProcessingEmail = (order) => {
         subscriptionsLink: user.generateLoginLink(`/${fromCollective.slug}/subscriptions`)
       }, {
         from: `${collective.name} <hello@${collective.slug}.opencollective.com>`
-      })
-}
+      });
+};

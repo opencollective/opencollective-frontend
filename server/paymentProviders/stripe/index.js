@@ -32,7 +32,6 @@ export default {
   },
 
   oauth: {
-
     // Returns the redirectUrl to connect the Stripe Account to the Host Collective Id
     redirectUrl: (remoteUser, CollectiveId) => {
       // Since we pass the redirectUrl in clear to the frontend, we cannot pass the CollectiveId in the state query variable
@@ -96,7 +95,7 @@ export default {
               CollectiveId: collective.id,
               MemberCollectiveId: collective.id,
               role: 'HOST'
-            })
+            });
           }
         })
         .then(getToken(req.query.code))
@@ -133,16 +132,15 @@ export default {
           throw new errors.BadRequest('Event not found');
         }
         if (event.type === 'invoice.payment_succeeded') {
-          return creditcard.webhook(requestBody, event)
+          return creditcard.webhook(requestBody, event);
         } else if (event.type === 'source.chargeable') {
           /* This will cause stripe to send us email alerts, saying
            * that our stuff is broken. But that should never happen
            * since they discontinued the support. */
           throw new errors.BadRequest('Stripe-Bitcoin not supported anymore :(');
         } else {
-          throw new errors.BadRequest('Wrong event type received')
+          throw new errors.BadRequest('Wrong event type received');
         }
-      })
+      });
   }
-
-}
+};
