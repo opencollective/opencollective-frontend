@@ -739,7 +739,7 @@ const queries = {
   /*
    * Given a prepaid code, return validity and amount
    */
-  prepaidPaymentMethod: {
+  ocPaymentMethod: {
     type: PaymentMethodType,
     args: {
       token: { type: new GraphQLNonNull(GraphQLString) }
