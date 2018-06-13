@@ -16,7 +16,7 @@ import { getStripeToken } from '../lib/stripe';
 import { pick, get } from 'lodash';
 import withIntl from '../lib/withIntl';
 import { checkUserExistence, signin } from '../lib/api';
-import { getPrepaidCardBalanceQuery } from '../graphql/queries';
+import { getOcCardBalanceQuery } from '../graphql/queries';
 import colors from '../constants/colors';
 
 class OrderForm extends React.Component {
@@ -49,7 +49,7 @@ class OrderForm extends React.Component {
         show: !this.props.redeemFlow,
         save: true,
       },
-      prepaidcard: {
+      ocCard: {
         applySent: false,
         loading: false,
         expanded: this.props.redeemFlow
@@ -87,13 +87,13 @@ class OrderForm extends React.Component {
       'paymentMethod.creditcard': { id: 'paymentMethod.creditcard', defaultMessage: 'credit card' },
       'paymentMethod.bitcoin': { id: 'paymentMethod.bitcoin', defaultMessage: 'bitcoin' },
       'paymentMethod.paypal': { id: 'paymentMethod.paypal', defaultMessage: 'paypal' },
-      'prepaidcard.label': {id: 'prepaidcard.label', defaultMessage: 'Gift Card'},
-      'prepaidcard.apply': {id: 'prepaidcard.apply', defaultMessage: 'Apply'},
-      'prepaidcard.invalid': {id: 'prepaidcard.invalid', defaultMessage: 'Invalid code'},
-      'prepaidcard.expired': {id: 'prepaidcard.expired', defaultMessage: 'Expired code'},
-      'prepaidcard.loading': {id: 'prepaidcard.loading', defaultMessage: 'Please wait...'},
-      'prepaidcard.amountremaining': {id: 'prepaidcard.amountremaining', defaultMessage: 'Valid code. Amount available: '},
-      'prepaidcard.amounterror': {id: 'prepaidcard.amounterror', defaultMessage: 'You can only contribute up to the amount available on your gift card.'},
+      'ocCard.label': {id: 'occard.label', defaultMessage: 'Gift Card'},
+      'ocCard.apply': {id: 'occard.apply', defaultMessage: 'Apply'},
+      'ocCard.invalid': {id: 'occard.invalid', defaultMessage: 'Invalid code'},
+      'ocCard.expired': {id: 'occard.expired', defaultMessage: 'Expired code'},
+      'ocCard.loading': {id: 'occard.loading', defaultMessage: 'Please wait...'},
+      'ocCard.amountremaining': {id: 'occard.amountremaining', defaultMessage: 'Valid code. Amount available: '},
+      'ocCard.amounterror': {id: 'occard.amounterror', defaultMessage: 'You can only contribute up to the amount available on your gift card.'},
 
       'ticket.title': { id: 'tier.order.ticket.title', defaultMessage: 'RSVP' },
       'backer.title': { id: 'tier.order.backer.title', defaultMessage: 'Become a {name}' },
@@ -474,7 +474,7 @@ class OrderForm extends React.Component {
     const TEST_ENVIRONMENT = (typeof window !== 'undefined' && window.location.search.match(/test=e2e/) && (window.location.hostname === 'staging.opencollective.com' || window.location.hostname === 'localhost'));
 
     const { intl } = this.props;
-    const { order, user, creditcard, prepaidcard } = this.state;
+    const { order, user, creditcard, ocCard } = this.state;
     const newState = {...this.state};
     // validate email
     if (this.state.isNewUser && !isValidEmail(user.email)) {
@@ -501,13 +501,13 @@ class OrderForm extends React.Component {
 
     // validate payment method
     if (order.totalAmount > 0) {
-      // favors prepaidcard over credit card
-      if (prepaidcard.valid) {
-        if (prepaidcard.balance < order.totalAmount) {
-          this.setState({ result: { error: intl.formatMessage(this.messages['prepaidcard.amounterror'])}});
+      // favors ocCard over credit card
+      if (ocCard.valid) {
+        if (ocCard.balance < order.totalAmount) {
+          this.setState({ result: { error: intl.formatMessage(this.messages['ocCard.amounterror'])}});
           return false;
         }
-        newState.paymentMethod = { token: prepaidcard.token,  service: 'prepaid', uuid: prepaidcard.uuid };
+        newState.paymentMethod = pick(ocCard, ['token', 'service', 'type', 'uuid']);
         this.setState(newState);
         return true;
 
@@ -563,41 +563,48 @@ class OrderForm extends React.Component {
     })
   }
 
-  applyPrepaidCardBalance = async () => {
-    const { prepaidcard, creditcard, order } = this.state;
+  applyOcCardBalance = async () => {
+    const { ocCard, creditcard, order } = this.state;
 
     this.setState({
-      prepaidcard: Object.assign(prepaidcard, { applySent: true, loading: true })});
-    const { token } = prepaidcard;
-    const result = await this.props.client.query({
-      query: getPrepaidCardBalanceQuery,
-      variables: { token }
-    })
-    this.setState({ prepaidcard: Object.assign(prepaidcard, { loading: false})})
+      ocCard: Object.assign(ocCard, { applySent: true, loading: true })});
+    const { token } = ocCard;
 
-    if (result.data && result.data.prepaidPaymentMethod) {
+    const args = { query: getOcCardBalanceQuery, variables: { token } };
+    let result = null;
+    try {
+      result = await this.props.client.query(args)
+    } catch (error) {
+      this.setState({ ocCard: { loading: false }});
+      this.error(error);
+      return;
+    }
+
+    this.setState({ ocCard: Object.assign(ocCard, { loading: false})})
+
+    if (result.data && result.data.ocPaymentMethod) {
 
       // force a tier of the whole amount with null interval
       const tier = {
         interval: null,
-        amount: result.data.prepaidPaymentMethod.balance,
-        currency: result.data.prepaidPaymentMethod.currency,
+        amount: result.data.ocPaymentMethod.balance,
+        currency: result.data.ocPaymentMethod.currency,
         description: "Thank you 🙏",
         name: "Gift Card"
       }
 
       this.setState({
-        prepaidcard: Object.assign(prepaidcard,
-          {...result.data.prepaidPaymentMethod, valid: true }),
+        ocCard: Object.assign(ocCard,
+          {...result.data.ocPaymentMethod, valid: true }),
         creditcard: Object.assign(creditcard,
           { show: false }),
-        order: Object.assign(order, {interval: null, totalAmount: result.data.prepaidPaymentMethod.balance, tier})
+        order: Object.assign(order, {interval: null, totalAmount: result.data.ocPaymentMethod.balance, tier})
       });
     }
   }
 
   expandGiftCard = () => {
-    this.setState({ prepaidcard: Object.assign({}, this.state.prepaidcard, { expanded: true }) });
+    this.setState({ ocCard: Object.assign({}, this.state.ocCard, { expanded: true }) });
   }
 
   renderPaypal() {
@@ -615,33 +622,33 @@ class OrderForm extends React.Component {
 
   renderCreditCard() {
     const { intl } = this.props;
-    const { prepaidcard, creditcard } = this.state;
-    const showNewCreditCardForm = !prepaidcard.show && creditcard.show && (!creditcard.uuid || creditcard.uuid === 'other');
-    const inputPrepaidcard = {
+    const { ocCard, creditcard } = this.state;
+    const showNewCreditCardForm = !ocCard.show && creditcard.show && (!creditcard.uuid || creditcard.uuid === 'other');
+    const inputOcCard = {
       type: 'text',
-      name: 'prepaidcard',
+      name: 'ocCard',
       button: (
         <Button
-          className='prepaidapply'
-          disabled={prepaidcard.loading}
-          onClick={this.applyPrepaidCardBalance}
+          className='ocCardApply'
+          disabled={ocCard.loading}
+          onClick={this.applyOcCardBalance}
           >
-          {intl.formatMessage(this.messages['prepaidcard.apply'])}
+          {intl.formatMessage(this.messages['ocCard.apply'])}
         </Button>
       ),
       required: true,
-      label: intl.formatMessage(this.messages['prepaidcard.label']),
-      defaultValue: prepaidcard['token'],
-      onChange: (value) => this.handleChange("prepaidcard", "token", value)
+      label: intl.formatMessage(this.messages['ocCard.label']),
+      defaultValue: ocCard['token'],
+      onChange: (value) => this.handleChange("ocCard", "token", value)
     };
 
-    if (prepaidcard.applySent) {
-      if (prepaidcard.loading) {
-        inputPrepaidcard.description = intl.formatMessage(this.messages['prepaidcard.loading']);
-      } else if (prepaidcard.valid) {
-        inputPrepaidcard.description = `${intl.formatMessage(this.messages['prepaidcard.amountremaining'])} ${formatCurrency(prepaidcard.balance, prepaidcard.currency)}`;
+    if (ocCard.applySent) {
+      if (ocCard.loading) {
+        inputOcCard.description = intl.formatMessage(this.messages['ocCard.loading']);
+      } else if (ocCard.valid) {
+        inputOcCard.description = `${intl.formatMessage(this.messages['ocCard.amountremaining'])} ${formatCurrency(ocCard.balance, ocCard.currency)}`;
       } else {
-        inputPrepaidcard.description = intl.formatMessage(this.messages['prepaidcard.invalid'])
+        inputOcCard.description = intl.formatMessage(this.messages['ocCard.invalid'])
       }
     }
 
@@ -670,7 +677,7 @@ class OrderForm extends React.Component {
             </div>
           }
           <div>
-            { !prepaidcard.expanded &&
+            { !ocCard.expanded &&
               <Row key={`giftcard.checkbox`}>
                 <Col sm={2}></Col>
                 <Col sm={10}>
@@ -680,12 +687,12 @@ class OrderForm extends React.Component {
                 </Col>
               </Row>
             }
-            { prepaidcard.expanded &&
-              <Row key={`prepaidcard.input`}>
+            { ocCard.expanded &&
+              <Row key={`ocCard.input`}>
                 <Col sm={12}>
                   <InputField
                     className="horizontal"
-                    {...inputPrepaidcard}
+                    {...inputOcCard}
                     />
                 </Col>
               </Row>
@@ -726,7 +733,7 @@ class OrderForm extends React.Component {
     return (
       <div className="OrderForm">
         <style jsx global>{`
-          .prepaidcard span {
+          .ocCard span {
             max-width: 350px;
           }
           .OrderForm span.input-group, .OrderForm .help-block {
@@ -997,7 +1004,7 @@ class OrderForm extends React.Component {
               </section>
             }
 
-            <Row key={`prepaidcard.input`}>
+            <Row key={`ocCard.input`}>
               <Col sm={2} />
               <Col sm={10}>
                 { order.totalAmount > 0 && !collective.host &&
