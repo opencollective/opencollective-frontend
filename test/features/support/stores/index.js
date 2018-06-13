@@ -161,9 +161,12 @@ export async function createExpense(user, expenseData) {
  * @param {Number} opt.amount is the amount of the order.
  * @param {String} opt.currency is the currency of the collective
  *  initiating the order.
+ * @param {Object} opt.paymentMethodData is an object that will be
+ *  forward to the method `setPaymentMethod` of the newly created
+ *  order.
  */
 export async function newOrder(opt) {
-  const { from, to, amount, currency } = opt;
+  const { from, to, amount, currency, paymentMethodData } = opt;
   const order = await models.Order.create({
     ...opt,
     description: `Donation to ${to.slug}`,
@@ -173,7 +176,7 @@ export async function newOrder(opt) {
     FromCollectiveId: from.id,
     CollectiveId: to.id,
   });
-  await order.setPaymentMethod({
+  await order.setPaymentMethod(paymentMethodData || {
     token: 'tok_123456781234567812345678',
   });
   return { order };
