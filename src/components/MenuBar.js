@@ -1,14 +1,21 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import colors from '../constants/colors';
-import Logo from './Logo';
 import Sticky from 'react-stickynode';
+import gql from 'graphql-tag';
+import { get, throttle, uniqBy, pick } from 'lodash';
+import { graphql } from 'react-apollo';
+import { Modal } from 'react-bootstrap';
 import { FormattedMessage, defineMessages } from 'react-intl';
+import { animateScroll } from 'react-scrollchor/lib/helpers';
+
+import colors from '../constants/colors';
+import withIntl from '../lib/withIntl';
+
+import Logo from './Logo';
 import Link from './Link';
 import Button from './Button';
-import { get, throttle, uniqBy } from 'lodash';
-import withIntl from '../lib/withIntl';
-import { animateScroll } from 'react-scrollchor/lib/helpers';
+import AddFundsForm from './AddFundsForm';
+
 
 class MenuBar extends React.Component {
 
@@ -43,7 +50,13 @@ class MenuBar extends React.Component {
       menuItems.push({ anchor: 'updates', link: `/${props.collective.slug}#updates`, position: 0 });
     }
 
-    this.state = { menuItems, selectedAnchor: null, sticky: false, logoLink: `/${props.collective.slug}` };
+    this.state = {
+      menuItems,
+      selectedAnchor: null,
+      sticky: false,
+      logoLink: `/${props.collective.slug}`,
+      showAddFunds: false,
+    };
 
     this.messages = defineMessages({
       'admin': { id: 'menu.admin', defaultMessage: "admin" },
@@ -60,7 +73,7 @@ class MenuBar extends React.Component {
       'menu.edit.collective': { id: 'menu.edit.collective', defaultMessage: "edit collective" },
       'menu.edit.user': { id: 'menu.edit.user', defaultMessage: "edit profile" },
       'menu.edit.organization': { id: 'menu.edit.organization', defaultMessage: "edit organization" },
-      'menu.edit.event': { id: 'menu.edit.event', defaultMessage: "edit event" }
+      'menu.edit.event': { id: 'menu.edit.event', defaultMessage: "edit event" },
     })
 
     this.domElement = React.createRef();
@@ -153,10 +166,57 @@ class MenuBar extends React.Component {
     this.setState({ sticky: status.status === Sticky.STATUS_FIXED });
   }
 
+  addFundsToOrg = async (form) => {
+    const err = (error) => this.setState({ error, loading: false });
+
+    if (form.totalAmount === 0) {
+      return err("Total amount must be > 0");
+    }
+    if (!form.FromCollectiveId) {
+      return err("No host selected");
+    }
+
+    const { collective } = this.props;
+    const collectiveId = collective.id;
+    const hostCollectiveId = form.FromCollectiveId;
+    const params = {
+      ...pick(form, ['totalAmount', 'description']),
+      collectiveId,
+      hostCollectiveId,
+    };
+    this.setState({ loading: true });
+    try {
+      await this.props.addFundsToOrg(params);
+      this.setState({ showAddFunds: false, loading: false });
+    } catch (e) {
+      console.error(e);
+      return err(e.message && e.message.replace(/GraphQL error:/, ""));
+    }
+  };
+
   // Render Contribute and Submit Expense buttons
-  renderButtons() {
-    const { collective, cta } = this.props;
+  renderButtons = () => {
+    const { collective, cta, LoggedInUser } = this.props;
     const offset = -this.height;
+
+    const AddFundsModal = () => (
+      <Modal
+        show={this.state.showAddFunds}
+        onHide={this.hideAddFunds}
+        style={{ zIndex: 999999 }}
+        >
+        <Modal.Body>
+          <AddFundsForm
+            LoggedInUser={LoggedInUser}
+            collective={collective}
+            onSubmit={this.addFundsToOrg}
+            onCancel={this.hideAddFunds}
+            />
+          { this.state.error && <div>{this.state.error}</div> }
+        </Modal.Body>
+      </Modal>
+    );
+
     return (
       <div className="buttons">
         <style jsx>{`
@@ -186,11 +246,31 @@ class MenuBar extends React.Component {
         { ["COLLECTIVE", "EVENT"].indexOf(collective.type) !== -1  &&
           <Button className="submitExpense darkBackground" href={`${collective.path}/expenses/new`}><FormattedMessage id="menu.submitExpense" defaultMessage="Submit Expense" /></Button>
         }
+
+        { LoggedInUser &&
+          LoggedInUser.isRoot() && /* Only Site admins can do that for now */
+          LoggedInUser.hostsUserIsAdminOf() && /* Don't show button if user isn't admin anywhere */
+          !collective.isHost && /* If the collective being browsed is a host, don't show either */
+          <div>
+            <div className="item editCollective">
+              <AddFundsModal />
+              <Button
+                className="addFunds darkBackground"
+                onClick={() => this.setState({ showAddFunds: true })}
+                >
+                <FormattedMessage
+                  id="menu.addFunds" defaultMessage="Add funds" />
+              </Button>
+            </div>
+          </div>
+        }
       </div>
     )
   }
 
-  renderMenu() {
+  hideAddFunds = () => this.setState({ showAddFunds: false });
+
+  renderMenu = () => {
     const { intl, LoggedInUser, collective } = this.props;
     const offset = -this.height; // offset for hashlink to leave room for the menu bar
     return (
@@ -407,4 +487,18 @@ class MenuBar extends React.Component {
 
 }
 
-export default withIntl(MenuBar);
+const addFundsToOrgQuery = gql`
+mutation addFundsToOrg($totalAmount: Int!, $collectiveId: Int!, $hostCollectiveId: Int!, $description: String) {
+  addFundsToOrg(totalAmount: $totalAmount, collectiveId: $collectiveId, hostCollectiveId: $hostCollectiveId, description: $description) {
+    id
+  }
+}
+`;
+
+const addMutationForAddFundsToOrg = graphql(addFundsToOrgQuery, {
+  props: ({ mutate }) => ({
+    addFundsToOrg: async (variables) => mutate({ variables })
+  }),
+});
+
+export default addMutationForAddFundsToOrg(withIntl(MenuBar));

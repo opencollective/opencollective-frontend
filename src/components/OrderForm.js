@@ -198,7 +198,9 @@ class OrderForm extends React.Component {
   paymentMethodsOptionsForCollective = (paymentMethods, collective) => {
     return paymentMethods.map(pm => {
       const value = pm.uuid
-      const label = `💳  \xA0\xA0${collective.name} - ${get(pm, 'data.brand')} ${pm.name} - exp ${get(pm, 'data.expMonth')}/${get(pm, 'data.expYear')}`;
+      const brand = get(pm, 'data.brand') || get(pm, 'type');
+      const expiration = get(pm, 'expiryDate') || `${get(pm, 'data.expMonth')}/${get(pm, 'data.expYear')}`;
+      const label = `💳  \xA0\xA0${collective.name} - ${brand} ${pm.name} - exp ${expiration}`;
       const option = {};
       option[value] = label;
       return option;
@@ -212,8 +214,9 @@ class OrderForm extends React.Component {
 
     const collective = this.collectivesById[CollectiveId];
 
-    const filterPMs = input => (input || [])
-      .filter((pm) => ['stripe', 'paypal'].includes(pm.service));
+    const filterPMs = (pms) => (pms || []).filter(pm =>
+      ((pm.service === 'stripe' || pm.service === 'paypal') ||
+       (pm.service === 'opencollective' && pm.type === 'prepaid')));
 
     if (collective) {
       const paymentMethods = filterPMs(collective.paymentMethods);

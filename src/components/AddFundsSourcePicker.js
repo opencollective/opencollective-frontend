@@ -78,8 +78,39 @@ class AddFundsSourcePicker extends React.Component {
       </FormControl>
     );
   }
-
 }
+
+class AddFundsSourcePickerForUser extends React.Component {
+  static propTypes = {
+    onChange: PropTypes.func,
+    LoggedInUser: PropTypes.object.isRequired,
+  }
+
+  constructor(props) {
+    super(props);
+    this.state = { loading: true };
+  }
+
+  onChange = (e) => {
+    this.props.onChange(e.target.value);
+  }
+
+  render() {
+    const hosts = this.props.LoggedInUser.hostsUserIsAdminOf();
+    return (
+      <div>
+        <FormControl
+          id="sourcePicker" name="template" componentClass="select"
+          placeholder="select" onChange={this.onChange}
+          >
+          <option value="" key="addfsph-00"></option>
+          { hosts.map(h => <option value={h.id} key={`addfsph-${h.id}`}>{h.name}</option>) }
+        </FormControl>
+      </div>
+    );
+  }
+}
+
 
 const getSourcesQuery = gql`
 query allMembers($CollectiveId: Int) {
@@ -105,3 +136,5 @@ const addOrganizationsData = graphql(getSourcesQuery, {
 
 
 export default withIntl(addOrganizationsData(AddFundsSourcePicker));
+
+export const AddFundsSourcePickerForUserWithData = withIntl(AddFundsSourcePickerForUser);

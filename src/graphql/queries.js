@@ -86,6 +86,7 @@ export const getLoggedInUserQuery = gql`
           type
           name
           currency
+          isHost
           stats {
             id
             balance
@@ -95,8 +96,10 @@ export const getLoggedInUserQuery = gql`
             uuid
             name
             service
+            type
             data
             balance
+            expiryDate
           }
         }
       }
