@@ -10,11 +10,7 @@ import MatchingFundWithData from './MatchingFundWithData';
 import ActionButton from './Button';
 import SectionTitle from './SectionTitle';
 import { Button, Row, Col, Form, FormGroup } from 'react-bootstrap';
-<<<<<<< HEAD
-import { defineMessages, FormattedMessage } from 'react-intl';
-=======
 import { defineMessages, FormattedMessage, FormattedDate, FormattedTime } from 'react-intl';
->>>>>>> bcb4e5f9486b0578337eb33c56ad64120a8f8b01
 import { capitalize, formatCurrency, isValidEmail, getEnvVar } from '../lib/utils';
 import { getStripeToken } from '../lib/stripe';
 import { pick, get } from 'lodash';
@@ -431,11 +427,7 @@ class OrderForm extends React.Component {
   }
 
   prepareOrderRequest = () => {
-<<<<<<< HEAD
-    const { paymentMethod, order, fromCollective, user, contributionDetails } = this.state;
-=======
     const { paymentMethod, order, fromCollective, user } = this.state;
->>>>>>> bcb4e5f9486b0578337eb33c56ad64120a8f8b01
     const quantity = order.tier.quantity || 1;
     const orderRequest = {
       user,
@@ -453,21 +445,12 @@ class OrderForm extends React.Component {
     }
     return orderRequest;
   }
-<<<<<<< HEAD
 
   /** Call the underlying onSubmit method with an order request  */
   submitOrder = async (orderRequest) => {
     await this.props.onSubmit(orderRequest || this.prepareOrderRequest());
   }
 
-=======
-
-  /** Call the underlying onSubmit method with an order request  */
-  submitOrder = async (orderRequest) => {
-    await this.props.onSubmit(orderRequest || this.prepareOrderRequest());
-  }
-
->>>>>>> bcb4e5f9486b0578337eb33c56ad64120a8f8b01
   handleSubmit = async () => {
     if (! await this.validate()) return false;
     this.setState({ loading: true });
