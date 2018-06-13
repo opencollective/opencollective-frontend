@@ -17,7 +17,7 @@ import accepts from 'accepts';
 import { getLocaleDataScript, getMessages, languages } from './intl';
 
 const env = process.env.NODE_ENV || "development";
-const dev = (env === 'development');
+const dev = (env === 'development' || env === 'docker');
 const server = express();
 const app = next({ dev, dir: path.dirname(__dirname) });
 server.next = app;
