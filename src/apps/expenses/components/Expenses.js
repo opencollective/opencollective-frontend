@@ -15,7 +15,6 @@ class Expenses extends React.Component {
     refetch: PropTypes.func,
     fetchMore: PropTypes.func,
     editable: PropTypes.bool,
-    view: PropTypes.string, // "compact" for homepage (can't edit expense, don't show header), "list" for list view, "details" for details view
     includeHostedCollectives: PropTypes.bool,
     filters: PropTypes.bool, // show or hide filters (all/pending/paid)
     LoggedInUser: PropTypes.object
@@ -53,7 +52,6 @@ class Expenses extends React.Component {
       expenses,
       LoggedInUser,
       editable,
-      view,
       includeHostedCollectives,
       filters
     } = this.props;
@@ -145,7 +143,6 @@ class Expenses extends React.Component {
               collective={expense.collective || collective}
               expense={expense}
               editable={editable}
-              view={view}
               includeHostedCollectives={includeHostedCollectives}
               LoggedInUser={LoggedInUser}
               allowPayAction={!this.state.isPayActionLocked}
