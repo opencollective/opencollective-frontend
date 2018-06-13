@@ -262,7 +262,7 @@ export const executeOrder = (user, order, options) => {
     })
     .then(transaction => {
       // for gift cards
-      if (!transaction && isProvider('opencollective.prepaid', order.paymentMethod)) {
+      if (!transaction && isProvider('opencollective.giftcard', order.paymentMethod)) {
         sendOrderProcessingEmail(order)
         .then(() => sendSupportEmailForManualIntervention(order)); // async
       } else if (!transaction && order.paymentMethod.service === 'stripe' && order.paymentMethod.type === 'bitcoin') {
