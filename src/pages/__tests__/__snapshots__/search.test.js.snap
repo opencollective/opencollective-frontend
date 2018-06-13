@@ -218,7 +218,7 @@ exports[`Search Page renders empty results message 1`] = `
                 type="search"
               />
               <button
-                className="jsx-2820878800 jsx-219750138 Button blue c4"
+                className="jsx-2820878800 jsx-1599314605 Button blue c4"
                 onClick={[Function]}
                 type="submit"
               >
@@ -827,7 +827,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
                 type="search"
               />
               <button
-                className="jsx-2820878800 jsx-219750138 Button blue c4"
+                className="jsx-2820878800 jsx-1599314605 Button blue c4"
                 onClick={[Function]}
                 type="submit"
               >
@@ -1324,7 +1324,7 @@ exports[`Search Page renders search results with pagination 1`] = `
                 type="search"
               />
               <button
-                className="jsx-2820878800 jsx-219750138 Button blue c4"
+                className="jsx-2820878800 jsx-1599314605 Button blue c4"
                 onClick={[Function]}
                 type="submit"
               >
