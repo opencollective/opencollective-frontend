@@ -550,14 +550,16 @@ const getCollectiveCoverQuery = gql`
   }
 `;
 
-export const getPrepaidCardBalanceQuery = gql`
-  query checkPrepaidPaymentMethod($token: String!) {
-    prepaidPaymentMethod(token: $token) {
+export const getOcCardBalanceQuery = gql`
+  query checkOcPaymentMethod($token: String!) {
+    ocPaymentMethod(token: $token) {
       id,
       name,
       currency,
       balance,
       uuid
+      service
+      type
     }
   }
 `;
