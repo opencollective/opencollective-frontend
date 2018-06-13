@@ -50,6 +50,7 @@ class ExpensesWithData extends React.Component {
           expenses={expenses}
           refetch={data.refetch}
           editable={view !== 'compact'}
+          view={view}
           fetchMore={this.props.fetchMore}
           filters={filters}
           LoggedInUser={LoggedInUser}
