@@ -27,6 +27,11 @@ class AddFundsForm extends React.Component {
     super(props);
     const { intl } = props;
 
+    /* If the component doesn't receive a host property it means that
+       the form will load the hosts from the list of collectives the
+       user is an admin of. See issue #1080 */
+    this.isAddFundsToOrg = !this.props.host;
+
     this.state = {
       form: { totalAmount: 0, hostFeePercent: get(props, 'collective.hostFeePercent') },
       result: {}
@@ -40,6 +45,7 @@ class AddFundsForm extends React.Component {
       'totalAmount.label': { id: 'addfunds.amount.label', defaultMessage: 'amount' },
       'description.label': { id: 'addfunds.description.label', defaultMessage: 'description' },
       'FromCollectiveId.label': { id: 'addfunds.FromCollectiveId.label', defaultMessage: 'source' },
+      'FromCollectiveId.addfundstoorg.label': { id: 'addfundstoorg.FromCollectiveId.label', defaultMessage: 'host' },
       'hostFeePercent.label': { id: 'addfunds.hostFeePercent.label', defaultMessage: 'Host fee' },
       'platformFeePercent.label': { id: 'addfunds.platformFeePercent.label', defaultMessage: 'Platform fee' },
       'name.label': { id: 'user.name.label', defaultMessage: 'name' },
@@ -61,7 +67,7 @@ class AddFundsForm extends React.Component {
       {
         name: "FromCollectiveId",
         type: "component",
-        when: () => this.props.host,
+        when: () => !this.isAddFundsToOrg,
         component: AddFundsSourcePicker,
         options: {
           collective: this.props.collective,
@@ -71,8 +77,9 @@ class AddFundsForm extends React.Component {
       {
         name: "FromCollectiveId",
         type: "component",
-        when: () => !this.props.host,
+        when: () => this.isAddFundsToOrg,
         component: AddFundsSourcePickerForUserWithData,
+        label: 'FromCollectiveId.addfundstoorg.label',
         options: {
           LoggedInUser: this.props.LoggedInUser,
         }
@@ -95,6 +102,7 @@ class AddFundsForm extends React.Component {
       },
       {
         name: "hostFeePercent",
+        when: () => !this.isAddFundsToOrg,
         type: 'number',
         className: 'right',
         post: '%'
@@ -103,19 +111,21 @@ class AddFundsForm extends React.Component {
         name: "platformFeePercent",
         type: 'number',
         post: '%',
-        when: () => this.props.LoggedInUser && this.props.LoggedInUser.isRoot()
+        when: () => ((this.props.LoggedInUser && this.props.LoggedInUser.isRoot())
+                     && !this.isAddFundsToOrg),
       }
-    ]
+    ];
 
     this.fields = this.fields.map(field => {
-      if (this.messages[`${field.name}.label`]) {
-        field.label = intl.formatMessage(this.messages[`${field.name}.label`]);
+      const label = this.messages[field.label || `${field.name}.label`];
+      if (label) {
+        field.label = intl.formatMessage(label);
       }
       if (this.messages[`${field.name}.description`]) {
         field.description = intl.formatMessage(this.messages[`${field.name}.description`]);
       }
       return field;
-    })
+    });
   }
 
   handleChange(obj, attr, value) {
@@ -241,11 +251,13 @@ class AddFundsForm extends React.Component {
                             <td><FormattedMessage id="addfunds.totalAmount" defaultMessage="Funding amount" /></td>
                             <td className="amount">{formatCurrency(this.state.form.totalAmount, this.props.collective.currency, { precision: 2 })}</td>
                           </tr>
+                          { !this.isAddFundsToOrg &&
                           <tr>
                             <td><FormattedMessage id="addfunds.hostFees" defaultMessage="Host fees ({hostFees})" values={{ hostFees: `${hostFeePercent}%` }} /></td>
                             <td className="amount">{formatCurrency(hostFeePercent/100 * this.state.form.totalAmount, this.props.collective.currency, { precision: 2 })}</td>
                           </tr>
-                          { platformFeePercent > 0 &&
+                          }
+                          { platformFeePercent > 0 && !this.isAddFundsToOrg &&
                           <tr>
                             <td><FormattedMessage id="addfunds.platformFees" defaultMessage="Platform fees ({platformFees})" values={{ platformFees: `${platformFeePercent}%` }} /></td>
                             <td className="amount">{formatCurrency(platformFeePercent/100 * this.state.form.totalAmount, this.props.collective.currency, { precision: 2 })}</td>
@@ -278,8 +290,8 @@ class AddFundsForm extends React.Component {
                 </Col>
               </Row>
               <Row>
-                <Col sm={3}></Col>
-                <Col sm={9} className="actions">
+                <Col xsHidden md={2}></Col>
+                <Col xs={12} md={10} className="actions">
                   <Button bsStyle="primary" onClick={() => this.handleSubmit()} disabled={loading}>
                     { loading && <FormattedMessage id="form.processing" defaultMessage="processing" /> }
                     { !loading && <FormattedMessage id="addfunds.submit" defaultMessage="Add Funds" /> }

@@ -4,7 +4,8 @@ import Sticky from 'react-stickynode';
 import gql from 'graphql-tag';
 import { get, throttle, uniqBy, pick } from 'lodash';
 import { graphql } from 'react-apollo';
-import { Modal } from 'react-bootstrap';
+import { Modal, Row, Col } from 'react-bootstrap';
+
 import { FormattedMessage, defineMessages } from 'react-intl';
 import { animateScroll } from 'react-scrollchor/lib/helpers';
 
@@ -56,6 +57,7 @@ class MenuBar extends React.Component {
       sticky: false,
       logoLink: `/${props.collective.slug}`,
       showAddFunds: false,
+      fundsAdded: false,
     };
 
     this.messages = defineMessages({
@@ -187,7 +189,8 @@ class MenuBar extends React.Component {
     this.setState({ loading: true });
     try {
       await this.props.addFundsToOrg(params);
-      this.setState({ showAddFunds: false, loading: false });
+      this.setState({ fundsAdded: true, loading: false, error: null });
+      return null;
     } catch (e) {
       console.error(e);
       return err(e.message && e.message.replace(/GraphQL error:/, ""));
@@ -206,13 +209,39 @@ class MenuBar extends React.Component {
         style={{ zIndex: 999999 }}
         >
         <Modal.Body>
-          <AddFundsForm
-            LoggedInUser={LoggedInUser}
-            collective={collective}
-            onSubmit={this.addFundsToOrg}
-            onCancel={this.hideAddFunds}
-            />
-          { this.state.error && <div>{this.state.error}</div> }
+          <Row>
+            <Col sm={12}>
+              { this.state.fundsAdded &&
+                <div>
+                  <h1>Funds added to organization successfully</h1>
+                  <center>
+                    <Button
+                      className="blue"
+                      onClick={() => this.setState({ fundsAdded: false, showAddFunds: false })}
+                    >
+                      Ok
+                  </Button>
+                  </center>
+                </div> }
+
+              { !this.state.fundsAdded &&
+                <AddFundsForm
+                  LoggedInUser={LoggedInUser}
+                  collective={collective}
+                  onSubmit={this.addFundsToOrg}
+                  onCancel={this.hideAddFunds}
+                /> }
+            </Col>
+          </Row>
+          <Row>
+            <Col sm={2}></Col>
+            <Col sm={10}>
+              { this.state.error &&
+                <div style={{ color: 'red', fontWeight: 'bold' }}>
+                  {this.state.error}
+                </div> }
+            </Col>
+          </Row>
         </Modal.Body>
       </Modal>
     );
