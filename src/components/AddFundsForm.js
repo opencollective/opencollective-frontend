@@ -102,6 +102,7 @@ class AddFundsForm extends React.Component {
       },
       {
         name: "hostFeePercent",
+        when: () => !this.isAddFundsToOrg,
         type: 'number',
         className: 'right',
         post: '%'
@@ -110,7 +111,8 @@ class AddFundsForm extends React.Component {
         name: "platformFeePercent",
         type: 'number',
         post: '%',
-        when: () => this.props.LoggedInUser && this.props.LoggedInUser.isRoot()
+        when: () => ((this.props.LoggedInUser && this.props.LoggedInUser.isRoot())
+                     && !this.isAddFundsToOrg),
       }
     ];
 
@@ -249,11 +251,13 @@ class AddFundsForm extends React.Component {
                             <td><FormattedMessage id="addfunds.totalAmount" defaultMessage="Funding amount" /></td>
                             <td className="amount">{formatCurrency(this.state.form.totalAmount, this.props.collective.currency, { precision: 2 })}</td>
                           </tr>
+                          { !this.isAddFundsToOrg &&
                           <tr>
                             <td><FormattedMessage id="addfunds.hostFees" defaultMessage="Host fees ({hostFees})" values={{ hostFees: `${hostFeePercent}%` }} /></td>
                             <td className="amount">{formatCurrency(hostFeePercent/100 * this.state.form.totalAmount, this.props.collective.currency, { precision: 2 })}</td>
                           </tr>
-                          { platformFeePercent > 0 &&
+                          }
+                          { platformFeePercent > 0 && !this.isAddFundsToOrg &&
                           <tr>
                             <td><FormattedMessage id="addfunds.platformFees" defaultMessage="Platform fees ({platformFees})" values={{ platformFees: `${platformFeePercent}%` }} /></td>
                             <td className="amount">{formatCurrency(platformFeePercent/100 * this.state.form.totalAmount, this.props.collective.currency, { precision: 2 })}</td>
