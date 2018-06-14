@@ -290,8 +290,8 @@ class AddFundsForm extends React.Component {
                 </Col>
               </Row>
               <Row>
-                <Col sm={3}></Col>
-                <Col sm={9} className="actions">
+                <Col xsHidden md={2}></Col>
+                <Col xs={12} md={10} className="actions">
                   <Button bsStyle="primary" onClick={() => this.handleSubmit()} disabled={loading}>
                     { loading && <FormattedMessage id="form.processing" defaultMessage="processing" /> }
                     { !loading && <FormattedMessage id="addfunds.submit" defaultMessage="Add Funds" /> }
