@@ -2,22 +2,26 @@
 /* The `paypal` global comes from a script included in _document.js */
 
 import React from 'react';
-import { withApollo } from 'react-apollo';
+import moment from 'moment';
 import PropTypes from 'prop-types';
+
+import { pick, get } from 'lodash';
+import { withApollo } from 'react-apollo';
+import { Button, Row, Col, Form, FormGroup } from 'react-bootstrap';
+
+import colors from '../constants/colors';
 import TierComponent from './Tier';
 import InputField from './InputField';
 import MatchingFundWithData from './MatchingFundWithData';
 import ActionButton from './Button';
 import SectionTitle from './SectionTitle';
-import { Button, Row, Col, Form, FormGroup } from 'react-bootstrap';
+import withIntl from '../lib/withIntl';
+
 import { defineMessages, FormattedMessage, FormattedDate, FormattedTime } from 'react-intl';
 import { capitalize, formatCurrency, isValidEmail, getEnvVar } from '../lib/utils';
 import { getStripeToken } from '../lib/stripe';
-import { pick, get } from 'lodash';
-import withIntl from '../lib/withIntl';
 import { checkUserExistence, signin } from '../lib/api';
 import { getOcCardBalanceQuery } from '../graphql/queries';
-import colors from '../constants/colors';
 
 class OrderForm extends React.Component {
 
@@ -199,11 +203,18 @@ class OrderForm extends React.Component {
     return paymentMethods.map(pm => {
       const value = pm.uuid
       const brand = get(pm, 'data.brand') || get(pm, 'type');
-      const expiration = get(pm, 'expiryDate') || `${get(pm, 'data.expMonth')}/${get(pm, 'data.expYear')}`;
-      const label = `💳  \xA0\xA0${collective.name} - ${brand} ${pm.name} - exp ${expiration}`;
-      const option = {};
-      option[value] = label;
-      return option;
+      /* The expiryDate field will show up for prepaid cards */
+      const expiration = pm.expiryDate
+        ? moment(pm.expiryDate).format("MM/Y")
+        : `${get(pm, 'data.expMonth')}/${get(pm, 'data.expYear')}`;
+      /* Prepaid cards have their balance available */
+      const balance = pm.balance
+        ? `(${formatCurrency(pm.balance, pm.currency)})`
+        : '';
+      /* Assemble all the pieces in one string */
+      const name = `${brand} ${pm.name}`;
+      const label = `💳  \xA0\xA0${collective.name} - ${name} - exp ${expiration} ${balance}`;
+      return { [value]: label };
     });
   }
 
