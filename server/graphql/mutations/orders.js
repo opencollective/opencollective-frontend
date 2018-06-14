@@ -450,19 +450,30 @@ export async function addFundsToOrg(args, remoteUser) {
     models.Collective.findById(args.collectiveId),
     models.Collective.findById(args.hostCollectiveId)
   ]);
-  return models.PaymentMethod.create({
-    name: args.description || 'Host funds',
-    initialBalance: args.totalAmount,
-    monthlyLimitPerMember: args.totalAmount,
-    currency: hostCollective.currency,
+  let paymentMethod = await models.PaymentMethod.findOne({ where: {
     CollectiveId: args.collectiveId,
     customerId: fromCollective.slug,
-    expiryDate: moment().add(1, 'year').format(),
-    uuid: uuidv4(),
-    data: { HostCollectiveId: args.hostCollectiveId },
-    service: 'opencollective',
-    type: 'prepaid',
-    createdAt: new Date,
-    updatedAt: new Date,
-  });
+  } });
+  if (!paymentMethod) {
+    paymentMethod = await models.PaymentMethod.create({
+      name: args.description || 'Host funds',
+      initialBalance: args.totalAmount,
+      monthlyLimitPerMember: args.totalAmount,
+      currency: hostCollective.currency,
+      CollectiveId: args.collectiveId,
+      customerId: fromCollective.slug,
+      expiryDate: moment().add(1, 'year').format(),
+      uuid: uuidv4(),
+      data: { HostCollectiveId: args.hostCollectiveId },
+      service: 'opencollective',
+      type: 'prepaid',
+      createdAt: new Date,
+      updatedAt: new Date,
+    });
+  } else {
+    await paymentMethod.update({
+      initialBalance: paymentMethod.initialBalance + args.totalAmount,
+    });
+  }
+  return paymentMethod;
 }
