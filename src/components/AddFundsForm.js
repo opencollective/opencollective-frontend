@@ -8,7 +8,7 @@ import { getCurrencySymbol, formatCurrency } from '../lib/utils';
 import withIntl from '../lib/withIntl';
 import InputField from './InputField';
 import {
-  AddFundsSourcePicker,
+  AddFundsSourcePickerWithData,
   AddFundsSourcePickerForUserWithData,
 } from './AddFundsSourcePicker';
 
@@ -68,7 +68,7 @@ class AddFundsForm extends React.Component {
         name: "FromCollectiveId",
         type: "component",
         when: () => !this.isAddFundsToOrg,
-        component: AddFundsSourcePicker,
+        component: AddFundsSourcePickerWithData,
         options: {
           collective: this.props.collective,
           host: this.props.host
@@ -79,7 +79,7 @@ class AddFundsForm extends React.Component {
         type: "component",
         when: () => this.isAddFundsToOrg,
         component: AddFundsSourcePickerForUserWithData,
-        label: 'FromCollectiveId.addfundstoorg.label',
+        labelName: 'FromCollectiveId.addfundstoorg.label',
         options: {
           LoggedInUser: this.props.LoggedInUser,
         }
@@ -117,7 +117,7 @@ class AddFundsForm extends React.Component {
     ];
 
     this.fields = this.fields.map(field => {
-      const label = this.messages[field.label || `${field.name}.label`];
+      const label = this.messages[field.labelName || `${field.name}.label`];
       if (label) {
         field.label = intl.formatMessage(label);
       }

@@ -135,6 +135,8 @@ const addOrganizationsData = graphql(getSourcesQuery, {
 });
 
 
-export default withIntl(addOrganizationsData(AddFundsSourcePicker));
+export const AddFundsSourcePickerWithData = withIntl(addOrganizationsData(AddFundsSourcePicker));
 
 export const AddFundsSourcePickerForUserWithData = withIntl(AddFundsSourcePickerForUser);
+
+export default AddFundsSourcePickerWithData;
