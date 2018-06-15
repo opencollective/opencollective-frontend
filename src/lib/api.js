@@ -1,4 +1,4 @@
-import fetch from 'isomorphic-fetch';
+import fetch from 'cross-fetch';
 import { isValidEmail } from './utils';
 // Webpack error: Cannot find module 'webpack/lib/RequestShortener'
 // import queryString from 'query-string';

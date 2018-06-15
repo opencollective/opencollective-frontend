@@ -1,9 +1,14 @@
-import 'isomorphic-fetch'
-import { ApolloClient, createNetworkInterface, IntrospectionFragmentMatcher } from 'react-apollo'
+// This file is mostly adapted from:
+// https://github.com/zeit/next.js/blob/3949c82bdfe268f841178979800aa8e71bbf412c/examples/with-apollo/lib/initApollo.js
 
-import { getGraphqlUrl } from './utils'
+import fetch from 'cross-fetch';
+import { ApolloClient } from 'apollo-client';
+import { HttpLink } from 'apollo-link-http';
+import { InMemoryCache, IntrospectionFragmentMatcher } from 'apollo-cache-inmemory';
 
-let apolloClient = null
+import { getGraphqlUrl } from './utils';
+
+let apolloClient = null;
 
 const fragmentMatcher = new IntrospectionFragmentMatcher({
   introspectionQueryResultData: {
@@ -20,43 +25,43 @@ const fragmentMatcher = new IntrospectionFragmentMatcher({
       ],
     },
   }
-})
+});
 
-function createClient (initialState, options = {}) {
-
+function createClient(initialState, options = {}) {
   const headers = {};
   if (options.accessToken) {
     headers.authorization = `Bearer ${options.accessToken}`;
   }
 
-  return new ApolloClient({
-    ssrMode: !process.browser,
+  const cache = new InMemoryCache({
     dataIdFromObject: result => `${result.__typename}:${result.id || result.name || result.slug || Math.floor(Math.random()*1000000)}`,
     fragmentMatcher,
-    initialState,
-    shouldBatch: true, // should speed up performance
-    networkInterface: createNetworkInterface({
+  });
+
+  return new ApolloClient({
+    connectToDevTools: process.browser,
+    ssrMode: !process.browser, // Disables forceFetch on the server (so queries are only run once)
+    cache: cache.restore(initialState),
+    link: new HttpLink({
       uri: getGraphqlUrl(),
-      opts: {
-        credentials: 'same-origin',
-        headers
-      }
-    })
-  })
+      fetch,
+      headers,
+    }),
+  });
 }
 
-export function initClient (initialState, options) {
+export default function initClient(initialState, options = {}) {
   // Make sure to create a new client for every server-side request so that data
   // isn't shared between connections (which would be bad)
   if (!process.browser) {
-    return createClient(initialState, options)
+    return createClient(initialState, options);
   }
 
-  // Reuse client on the client-side unless we have an access token
+  // Reuse client on the client-side
   if (!apolloClient) {
     options.accessToken = process.browser && window.localStorage.getItem('accessToken');
-    apolloClient = createClient(initialState, options)
+    apolloClient = createClient(initialState, options);
   }
 
-  return apolloClient
+  return apolloClient;
 }
