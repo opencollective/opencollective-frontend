@@ -3,7 +3,8 @@ import gql from 'graphql-tag'
 
 import withLoggedInUser from '../lib/withLoggedInUser';
 
-export const transactionFields = `
+export const transactionFields = gql`
+fragment TransactionFields on Transaction {
   id
   uuid
   description
@@ -42,17 +43,19 @@ export const transactionFields = `
       interval
     }
   }
+}
 `;
 
 export const getTransactionsQuery = gql`
 query Transactions($CollectiveId: Int!, $type: String, $limit: Int, $offset: Int, $dateFrom: String, $dateTo: String) {
   allTransactions(CollectiveId: $CollectiveId, type: $type, limit: $limit, offset: $offset, dateFrom: $dateFrom, dateTo: $dateTo) {
-    ${transactionFields}
+    ...transactionFields
     refundTransaction {
-      ${transactionFields}
+      ...transactionFields
     }
   }
 }
+${transactionFields}
 `;
 
 export const getLoggedInUserQuery = gql`

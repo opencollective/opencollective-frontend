@@ -134,13 +134,14 @@ const refundTransactionQuery = gql`
     refundTransaction(id: $id) {
       id
       refundTransaction {
-        ${transactionFields}
+        ...transactionFields
         refundTransaction {
-          ${transactionFields}
+          ...transactionFields
         }
       }
     }
   }
+  ${transactionFields}
 `;
 
 const addMutation = graphql(refundTransactionQuery, {
