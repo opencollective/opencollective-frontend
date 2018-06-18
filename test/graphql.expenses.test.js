@@ -27,6 +27,21 @@ const allExpensesQuery = `
       user { id email paypalEmail collective { id slug } }
       collective { id slug } } }`;
 
+const expensesQuery = `
+  query expenses($CollectiveId: Int, $CollectiveSlug: String, $category: String, $FromCollectiveId: Int, $FromCollectiveSlug: String, $status: ExpenseStatus, $offset: Int, $limit: Int, $orderBy: OrderByType) {
+    expenses(CollectiveId: $CollectiveId, CollectiveSlug: $CollectiveSlug, category: $category, FromCollectiveId: $FromCollectiveId, FromCollectiveSlug: $FromCollectiveSlug, status: $status, offset: $offset, limit: $limit, orderBy: $orderBy) {
+      expenses {
+        id
+        description
+        amount
+        category
+        user { id email paypalEmail collective { id slug } }
+        collective { id slug }
+      }
+    }
+  }
+`;
+
 const createExpenseQuery = `
   mutation createExpense($expense: ExpenseInputType!) {
     createExpense(expense: $expense) {
@@ -190,6 +205,55 @@ describe('GraphQL Expenses API', () => {
     }); /* End of "gets the latest expenses from all the hosted collectives for one author" */
 
   }); /* End of "#allExpenses" */
+
+  describe('#expenses', () => {
+    it('gets no expenses if collective has no expenses', async () => {
+      // Given that we have a collective with no expenses
+      const { collective } = await store.newCollectiveWithHost('railsgirlsatl', 'USD', 'USD', 10);
+      // When we retrieve all its expenses
+      const {
+        errors,
+        data: {
+          expenses: {
+            expenses
+          }
+        }
+      } = await utils.graphqlQuery(expensesQuery, { CollectiveId: collective.id });
+      // Then there should be no errors
+      expect(errors).to.not.exist;
+      // And then it should retrieve no expenses
+      expect(expenses).to.have.length(0);
+    }); /* End of "gets no expenses if collective has no expenses" */
+
+    it('gets the latest expenses', async () => {
+      // Given that we have a collective
+      const { hostAdmin, collective } = await store.newCollectiveWithHost('railsgirlsatl', 'USD', 'USD', 10);
+      // And given the above collective has some expenses
+      const data = { currency: 'USD', payoutMethod: 'manual', collective: { id: collective.id } };
+      await store.createExpense(hostAdmin, { amount: 1000, description: "Pizza", ...data });
+      await store.createExpense(hostAdmin, { amount: 2000, description: "Beer", ...data });
+      await store.createExpense(hostAdmin, { amount: 3000, description: "Banner", ...data });
+      await store.createExpense(hostAdmin, { amount: 4000, description: "Stickers", ...data });
+      await store.createExpense(hostAdmin, { amount: 5000, description: "T-shirts", ...data });
+      // When we retrieve all its expenses
+      const {
+        errors,
+        data: {
+          expenses: {
+            expenses
+          },
+        },
+      } = await utils.graphqlQuery(expensesQuery, { CollectiveId: collective.id, limit: 5 });
+      expect(errors).to.not.exist;
+      // Then it should retrieve the right amount of expenses
+      expect(expenses).to.have.length(5);
+      // And then the expenses retrieved should come from the same
+      // collective
+      expect(expenses.map(e => e.description)).to.deep.equal([
+        'T-shirts', 'Stickers', 'Banner', 'Beer', 'Pizza'
+      ]);
+    }); /* End of "gets the latest expenses from one collective" */
+  });
 
   describe('#createExpense', () => {
 

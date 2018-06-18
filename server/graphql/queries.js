@@ -30,11 +30,14 @@ import {
 import {
   UserType,
   TierType,
+  ExpenseStatusType,
   ExpenseType,
   InvoiceType,
   UpdateType,
   MemberType,
-  PaymentMethodType
+  OrderByType,
+  PaginatedExpensesType,
+  PaymentMethodType,
 } from './types';
 
 import { find, get, uniq } from 'lodash';
@@ -438,6 +441,81 @@ const queries = {
           })
         })
     }
+  },
+
+  /*
+  * Return all expenses, with optional collective slug
+  */
+  expenses: {
+    type: PaginatedExpensesType,
+    args: {
+      CollectiveId: { type: GraphQLInt },
+      CollectiveSlug: { type: GraphQLString },
+      status: { type: ExpenseStatusType },
+      category: { type: GraphQLString },
+      FromCollectiveId: { type: GraphQLInt },
+      FromCollectiveSlug: { type: GraphQLString },
+      limit: {
+        defaultValue: 100,
+        description: 'Defaults to 100',
+        type: GraphQLInt,
+      },
+      offset: {
+        defaultValue: 0,
+        type: GraphQLInt,
+      },
+      orderBy: {
+        defaultValue: OrderByType.defaultValue,
+        type: OrderByType,
+      },
+    },
+    async resolve(_, args) {
+      const {
+        category,
+        CollectiveId,
+        CollectiveSlug,
+        FromCollectiveId,
+        FromCollectiveSlug,
+        limit,
+        offset,
+        orderBy,
+        status,
+      } = args;
+      const query = {
+        limit,
+        offset,
+        order: [Object.values(orderBy)],
+        where: {},
+      };
+
+      if (FromCollectiveId || FromCollectiveSlug) {
+        const { id } = await models.User.findOne({
+          attributes: ['id'],
+          where: {
+            CollectiveId: FromCollectiveId || await fetchCollectiveId(FromCollectiveSlug),
+          },
+        });
+        query.where.UserId = id;
+      }
+
+      if (category) query.where.category = { [Op.iLike]: category };
+      if (status) query.where.status = status;
+
+      if (CollectiveId || CollectiveSlug) {
+        query.where.CollectiveId = CollectiveId || await fetchCollectiveId(CollectiveSlug);
+      }
+
+      const {
+        count: total,
+        rows: expenses,
+      } = await models.Expense.findAndCountAll(query);
+      return {
+        expenses,
+        limit,
+        offset,
+        total,
+      };
+    },
   },
 
   /*
