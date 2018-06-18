@@ -1,11 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import gql from 'graphql-tag'
 import { FormControl } from 'react-bootstrap';
 import { graphql } from 'react-apollo'
-import gql from 'graphql-tag'
 import { defineMessages, FormattedMessage } from 'react-intl';
-import withIntl from '../lib/withIntl';
 import { get, uniqBy, groupBy } from 'lodash';
+import withIntl from '../lib/withIntl';
 
 class AddFundsSourcePicker extends React.Component {
 
@@ -91,7 +91,7 @@ class AddFundsSourcePickerForUser extends React.Component {
     this.state = { loading: true };
   }
 
-  onChange = (e) => {
+  onChange = async (e) => {
     this.props.onChange(e.target.value);
   }
 
@@ -104,7 +104,7 @@ class AddFundsSourcePickerForUser extends React.Component {
           placeholder="select" onChange={this.onChange}
           >
           <option value="" key="addfsph-00"></option>
-          { hosts.map(h => <option value={h.id} key={`addfsph-${h.id}`}>{h.name}</option>) }
+          { hosts.map(h => <option value={h.slug} key={`addfsph-${h.id}`}>{h.name}</option>) }
         </FormControl>
       </div>
     );
@@ -133,7 +133,6 @@ const addOrganizationsData = graphql(getSourcesQuery, {
     }
   })
 });
-
 
 export const AddFundsSourcePickerWithData = withIntl(addOrganizationsData(AddFundsSourcePicker));
 

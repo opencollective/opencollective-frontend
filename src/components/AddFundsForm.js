@@ -1,5 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import gql from 'graphql-tag'
+import { withApollo } from 'react-apollo';
 import { Button, Row, Col, Form } from 'react-bootstrap';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import { get } from 'lodash';
@@ -128,7 +130,28 @@ class AddFundsForm extends React.Component {
     });
   }
 
-  handleChange(obj, attr, value) {
+  retrieveHostFeePercent = async (slug) => {
+    const getHostCollectiveQuery = gql`
+      query Collective($slug: String!) {
+        Collective(slug: $slug) {
+          id
+          hostFeePercent
+        }
+      }
+    `;
+    try {
+      const result = await this.props.client.query({
+        query: getHostCollectiveQuery,
+        variables: { slug },
+      })
+      const { hostFeePercent } = result.data.Collective;
+      return hostFeePercent;
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  handleChange = async (obj, attr, value) => {
     const { host } = this.props;
 
     const newState = { ... this.state };
@@ -139,11 +162,15 @@ class AddFundsForm extends React.Component {
     }
 
     if (attr === 'FromCollectiveId') {
-      /* We don't have the host object if we're adding funds to orgs */
       if (host && value !== host.id) {
         newState[obj].hostFeePercent = this.props.collective.hostFeePercent;
       } else {
-        newState[obj].hostFeePercent = 0;
+        /* We don't have the host object if we're adding funds to
+           orgs. The attr props.collective contains the organization
+           receiving funds and the right host must be pulled from
+           GraphQL when the user chooses an option in the combo. */
+        newState[obj].hostFeePercent = await this.retrieveHostFeePercent(value);
+        newState[obj].platformFeePercent = 5;
       }
     }
 
@@ -161,8 +188,21 @@ class AddFundsForm extends React.Component {
 
   render() {
     const { loading } = this.props;
+
     const hostFeePercent = this.state.form.hostFeePercent || 0;
     const platformFeePercent = this.state.form.platformFeePercent || 0;
+
+    const hostFeeAmount = formatCurrency(hostFeePercent/100 * this.state.form.totalAmount, this.props.collective.currency, { precision: 2 });
+    const platformFeeAmount = formatCurrency(platformFeePercent/100 * this.state.form.totalAmount, this.props.collective.currency, { precision: 2 });
+    const netAmount = formatCurrency(this.state.form.totalAmount * (1 - (hostFeePercent + platformFeePercent)/100), this.props.collective.currency, { precision: 2 });
+
+    /* We don't need to show these details if there are no amounts
+       present yet */
+    const showAddFundsToOrgDetails =
+      this.isAddFundsToOrg &&
+      this.state.form.totalAmount > 0 &&
+      (hostFeePercent > 0 || platformFeePercent > 0)
+
     return (
       <div className="AddFundsForm">
         <style jsx>{`
@@ -218,6 +258,9 @@ class AddFundsForm extends React.Component {
         .disclaimer {
           font-size: 1.2rem;
         }
+        .note {
+          padding: 8px 0;
+        }
         `}</style>
         <style jsx global>{`
         .AddFundsForm .actions .btn {
@@ -254,13 +297,13 @@ class AddFundsForm extends React.Component {
                           { !this.isAddFundsToOrg &&
                           <tr>
                             <td><FormattedMessage id="addfunds.hostFees" defaultMessage="Host fees ({hostFees})" values={{ hostFees: `${hostFeePercent}%` }} /></td>
-                            <td className="amount">{formatCurrency(hostFeePercent/100 * this.state.form.totalAmount, this.props.collective.currency, { precision: 2 })}</td>
+                            <td className="amount">{hostFeeAmount}</td>
                           </tr>
                           }
                           { platformFeePercent > 0 && !this.isAddFundsToOrg &&
                           <tr>
                             <td><FormattedMessage id="addfunds.platformFees" defaultMessage="Platform fees ({platformFees})" values={{ platformFees: `${platformFeePercent}%` }} /></td>
-                            <td className="amount">{formatCurrency(platformFeePercent/100 * this.state.form.totalAmount, this.props.collective.currency, { precision: 2 })}</td>
+                            <td className="amount">{platformFeeAmount}</td>
                           </tr>
                             }
                           <tr>
@@ -268,10 +311,19 @@ class AddFundsForm extends React.Component {
                           </tr>
                           <tr>
                             <td><FormattedMessage id="addfunds.netAmount" defaultMessage="Net amount" /></td>
-                            <td className="amount">{formatCurrency(this.state.form.totalAmount * (1 - (hostFeePercent + platformFeePercent)/100), this.props.collective.currency, { precision: 2 })}</td>
+                            <td className="amount">{netAmount}</td>
                           </tr>
                         </tbody>
                       </table>
+
+                      <div>
+                        { showAddFundsToOrgDetails &&
+                          <div className="note">
+                            Please put aside {hostFeePercent}% ({hostFeeAmount}) for your host fees and 5% ({platformFeeAmount}) for platform fees.
+                          </div>
+                        }
+                      </div>
+
                       <div className="disclaimer">
                         { this.props.host &&
                           <FormattedMessage id="addfunds.disclaimer" defaultMessage="By clicking below, you agree to set aside {amount} in your bank account on behalf of the collective" values={{amount: formatCurrency(this.state.form.totalAmount, this.props.collective.currency)}} />
@@ -321,4 +373,4 @@ class AddFundsForm extends React.Component {
   }
 }
 
-export default withIntl(AddFundsForm);
+export default withIntl(withApollo(AddFundsForm));
