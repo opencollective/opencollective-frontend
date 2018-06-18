@@ -169,9 +169,6 @@
       "@babel/preset-env",
       "@babel/preset-stage-0",
       "@babel/runtime",
-      "graphql",
-      "graphql-tag",
-      "react-apollo",
       "react-mde",
       "styled-jsx",
       "webpack"
