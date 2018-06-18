@@ -7,7 +7,7 @@ import PropTypes from 'prop-types';
 
 import { pick, get } from 'lodash';
 import { withApollo } from 'react-apollo';
-import { Button, Row, Col, Form, FormGroup } from 'react-bootstrap';
+import { Button, Col, Form, FormGroup, Row } from 'react-bootstrap';
 
 import colors from '../constants/colors';
 import TierComponent from './Tier';
@@ -95,7 +95,6 @@ class OrderForm extends React.Component {
       'paymentMethod.creditcard': { id: 'paymentMethod.creditcard', defaultMessage: 'credit card' },
       'paymentMethod.bitcoin': { id: 'paymentMethod.bitcoin', defaultMessage: 'bitcoin' },
       'paymentMethod.paypal': { id: 'paymentMethod.paypal', defaultMessage: 'paypal' },
-      'paymentMethod.paypal.cancel': { id: 'paymentMethod.paypal.cancel', defaultMessage: 'Cancel' },
       'ocCard.label': {id: 'occard.label', defaultMessage: 'Gift Card'},
       'ocCard.apply': {id: 'occard.apply', defaultMessage: 'Apply'},
       'ocCard.invalid': {id: 'occard.invalid', defaultMessage: 'Invalid code'},
@@ -190,13 +189,19 @@ class OrderForm extends React.Component {
 
   // All the following methods are arrow functions and auto-bind
 
+  /** Interval set either in the tier or in the order object */
+  interval = () =>
+    this.state.order.interval || (this.state.tier && this.state.tier.interval);
+
+  /** Populate the combo of payment methods */
   populatePaymentMethodTypes = (hostId) => {
     const { intl, LoggedInUser } = this.props;
     const paymentMethodTypeOptions = [
       { creditcard: intl.formatMessage(this.messages['paymentMethod.creditcard']) },
     ];
-    /* We only support paypal for the open source collective for now */
-    if (hostId === 11004 && LoggedInUser && LoggedInUser.isRoot()) {
+    /* We only support paypal for one time donations to the open
+       source collective for now. */
+    if (hostId === 11004 && this.interval() === null && LoggedInUser && LoggedInUser.isRoot()) {
       paymentMethodTypeOptions.push({
         payment: intl.formatMessage(this.messages['paymentMethod.paypal'])
       });
@@ -412,8 +417,16 @@ class OrderForm extends React.Component {
   isPayPalAuthorized = () =>
     !!this.state.paypalOrderRequest;
 
+  /** Create the PayPal Checkout button and setup payment parameters
+   *
+   * This method is called when PayPal is selected as the payment
+   * provider. It creates the PayPal button and hooks it up to the
+   * backend methods that create and execute the payment.
+   */
   loadPayPalButton = async () => {
     const button = document.getElementById('paypal-checkout');
+    /* Destroy any already created button */
+    button.innerHTML = '';
     /* Convert amount to what PayPal accepts (dollars) */
     const amount = this.getTotalAmount() / 100;
     /* We need some information about the order to create the PayPal
@@ -422,6 +435,7 @@ class OrderForm extends React.Component {
     /* Parameters for the paypal button */
     const renderOptions = {
       env: getEnvVar('PAYPAL_ENVIRONMENT'),
+      commit: true,
       payment: async (data, actions) => {
         const paymentURL = '/api/services/paypal/create-payment';
         const { id } = await actions.request.post(paymentURL, {
@@ -442,9 +456,7 @@ class OrderForm extends React.Component {
         /* Corrects the `service.type' identification info */
         orderRequest.paymentMethod.service = 'paypal';
         orderRequest.paymentMethod.type = 'payment';
-        this.setState({ paypalOrderRequest: orderRequest });
-        return orderRequest;
-        /* return this.submitOrder(orderRequest);*/
+        return this.submitOrder(orderRequest);
       }
     };
 
@@ -659,48 +671,6 @@ class OrderForm extends React.Component {
     </FormGroup>
   );
 
-  renderPayPalSummary = () => {
-    const { intl, collective, LoggedInUser } = this.props;
-
-    const { totalAmount, currency, tier, interval } = this.state.paypalOrderRequest;
-    const amount = formatCurrency(totalAmount, currency);
-    const title = (tier && tier.button) || capitalize(intl.formatMessage(this.messages['order.button']));
-
-    const disclaimerValues = {
-      amount,
-      hostname: collective.host.name,
-      interval: interval || (tier && tier.interval),
-      collective: collective.name,
-    };
-
-    return (
-      <div className="submit">
-        <h1>Thank you!</h1>
-
-        <p>
-          The payment is authorized! We'll charge your PayPal account and process
-          your donation when you click the button "{title}". You will not be charged
-          if you click Cancel or navegate away from this page.
-        </p>
-
-        <ActionButton className="blue" onClick={this.submitPayPalOrder} disabled={this.state.loading}>
-          { this.state.loading ? <FormattedMessage id='form.processing' defaultMessage='processing' /> : title }
-        </ActionButton>
-
-        <ActionButton className="default"
-                      onClick={() => window.location.reload()}
-                      disabled={this.state.loading}
-        >
-          { this.state.loading
-            ? <FormattedMessage id='form.processing' defaultMessage='processing' />
-            : intl.formatMessage(this.messages['paymentMethod.paypal.cancel']) }
-        </ActionButton>
-
-        { this.renderDisclaimer(disclaimerValues) }
-      </div>
-    );
-  }
-
   renderDisclaimer = (values) => {
     return (
       <div className="disclaimer">
@@ -827,8 +797,6 @@ class OrderForm extends React.Component {
         inputEmail.description = intl.formatMessage(this.messages['email.description.signup']);
       }
     }
-
-    if (this.isPayPalAuthorized()) return this.renderPayPalSummary();
 
     return (
       <div className="OrderForm">
