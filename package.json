@@ -64,7 +64,7 @@
     "react-geosuggest": "2.7.0",
     "react-gmaps": "1.9.0",
     "react-intl": "2.4.0",
-    "react-markdown": "3.3.2",
+    "react-markdown": "3.3.3",
     "react-mde": "git://github.com/xdamman/react-mde.git#npm",
     "react-quill": "1.2.7",
     "react-scrollchor": "5.1.0",
