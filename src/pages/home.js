@@ -1,6 +1,7 @@
 import React, { Fragment } from 'react';
-import { graphql } from 'react-apollo'
-import gql from 'graphql-tag'
+import { graphql } from 'react-apollo';
+import gql from 'graphql-tag';
+import { take, uniqBy } from 'lodash';
 
 import styled from 'styled-components';
 import { Box, Flex } from 'grid-styled';
@@ -35,7 +36,10 @@ class HomePage extends React.Component {
 
   render() {
     const {
-      allCollectives: {
+      activeSpending: {
+        expenses,
+      },
+      recent: {
         collectives,
       },
       transactions: {
@@ -50,6 +54,8 @@ class HomePage extends React.Component {
     if (loading) {
       return <p>loading...</p>;
     }
+
+    const activeCollectives = take(uniqBy(expenses.map(({ collective }) => collective), 'slug'), 4);
 
     return (
       <Fragment>
@@ -118,8 +124,19 @@ class HomePage extends React.Component {
             </Container>
           </Container>
 
-          <Container maxWidth={1200} mx="auto">
-            <H2 textAlign={["center", null, "left"]} pb={3}>Active Collectives</H2>
+          <Container maxWidth={1200} mx="auto" px={2}>
+            <H2 textAlign={["center", null, "left"]} pb={3} >Active Collectives</H2>
+
+            <Container py={3}>
+              <Flex mb={3} justifyContent="space-between" px={[1, null, 0]}>
+                <H3>Most active spending</H3>
+                <StyledLink href="/discover">See all ></StyledLink>
+              </Flex>
+              <Container display="flex" flexWrap="wrap" justifyContent="space-between">
+                {activeCollectives.map((c) => <Container w={[0.5, null, 0.25]} mb={2} px={1} maxWidth={224}><CollectiveStatsCard {...c} /></Container>)} 
+              </Container>
+            </Container>
+
             <Container py={3}>
               <Flex mb={3} justifyContent="space-between" px={[1, null, 0]}>
                 <H3>Recently created</H3>
@@ -129,6 +146,24 @@ class HomePage extends React.Component {
                 {collectives.map((c) => <Container w={[0.5, null, 0.25]} mb={2} px={1} maxWidth={224}><CollectiveStatsCard {...c} /></Container>)} 
               </Container>
             </Container>
+
+            <StyledLink
+              href="/discover"
+              bg="white"
+              border="1px solid #D5DAE0"
+              borderRadius="50px"
+              color="#3385FF"
+              display="block"
+              fontSize={["1.4rem", null, "1.6rem"]}
+              fontWeight="bold"
+              hover={{ color: '#3385FF' }}
+              mx="auto"
+              py={[2, null, 3]}
+              textAlign="center"
+              w={[250, null, 320]}
+            >
+              Discover more collectives
+            </StyledLink>
           </Container>
         </Body>
         <Footer />
@@ -163,7 +198,7 @@ const query = gql`
         }
       }
     }
-    allCollectives(type: COLLECTIVE, orderBy: createdAt, orderDirection: DESC, limit: 4) {
+    recent: allCollectives(type: COLLECTIVE, orderBy: createdAt, orderDirection: DESC, limit: 4) {
       collectives {
         id
         type
@@ -180,6 +215,29 @@ const query = gql`
           backers {
             users
             organizations
+          }
+        }
+      }
+    }
+    activeSpending: expenses(status: PAID, orderBy: { field: updatedAt }) {
+      expenses {
+        collective {
+          id
+          type
+          slug
+          name
+          image
+          backgroundImage
+          description
+          settings
+          stats {
+            id
+            balance
+            yearlyBudget
+            backers {
+              users
+              organizations
+            }
           }
         }
       }
