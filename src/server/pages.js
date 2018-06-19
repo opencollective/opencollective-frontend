@@ -10,6 +10,7 @@ pages
   .add('signin', '/signin/:token?')
   .add('subscriptions_redirect', '/subscriptions', 'subscriptions-redirect')
   .add('search', '/search')
+  .add('hosts', '/hosts')
   .add('createHost', '/:collectiveSlug/connect/stripe')
   .add('button', '/:collectiveSlug/:verb(contribute|donate)/button')
   .add('createEvent', '/:parentCollectiveSlug/events/(new|create)')

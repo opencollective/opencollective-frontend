@@ -13,13 +13,14 @@ const COLLECTIVE_CARDS_PER_PAGE = 10;
 class CollectivesWithData extends React.Component {
 
   static propTypes = {
-    HostCollectiveId: PropTypes.number,
-    hostCollectiveSlug: PropTypes.string,
-    memberOfCollectiveSlug: PropTypes.string,
-    type: PropTypes.string,
-    role: PropTypes.string,
-    ParentCollectiveId: PropTypes.number,
-    tags: PropTypes.arrayOf(PropTypes.string),
+    HostCollectiveId: PropTypes.number, // only fetch collectives that are hosted by this collective id
+    hostCollectiveSlug: PropTypes.string, // only fetch collectives that are hosted by this collective slug
+    isPublicHost: PropTypes.bool, // only fetch collectives that are hosts and that accept new applications
+    memberOfCollectiveSlug: PropTypes.string, // only fetch collectives that are a member of this collective slug
+    role: PropTypes.string, // filter collectives that have this given role (use only with memberOfCollectiveSlug)
+    type: PropTypes.string, // COLLECTIVE, EVENT, ORGANIZATION or USER
+    ParentCollectiveId: PropTypes.number, // only fetch collectives that are under this collective id
+    tags: PropTypes.arrayOf(PropTypes.string), // only fetch collectives that have those tags
     onChange: PropTypes.func,
     limit: PropTypes.number
   }
@@ -124,8 +125,34 @@ class CollectivesWithData extends React.Component {
 }
 
 const getCollectivesQuery = gql`
-query allCollectives($HostCollectiveId: Int, $hostCollectiveSlug: String, $ParentCollectiveId: Int, $tags: [String], $memberOfCollectiveSlug: String, $role: String, $type: TypeOfCollective, $limit: Int, $offset: Int, $orderBy: CollectiveOrderField, $orderDirection: OrderDirection) {
-  allCollectives(HostCollectiveId: $HostCollectiveId, hostCollectiveSlug: $hostCollectiveSlug, memberOfCollectiveSlug: $memberOfCollectiveSlug, role: $role, type: $type, ParentCollectiveId: $ParentCollectiveId, tags: $tags, limit: $limit, offset: $offset, orderBy: $orderBy, orderDirection: $orderDirection) {
+query allCollectives(
+  $isPublicHost: Boolean,
+  $HostCollectiveId: Int,
+  $hostCollectiveSlug: String,
+  $ParentCollectiveId: Int,
+  $tags: [String],
+  $memberOfCollectiveSlug: String,
+  $role: String,
+  $type: TypeOfCollective,
+  $limit: Int,
+  $offset: Int,
+  $orderBy: CollectiveOrderField,
+  $orderDirection: OrderDirection
+  ) {
+  allCollectives(
+    HostCollectiveId: $HostCollectiveId,
+    hostCollectiveSlug: $hostCollectiveSlug,
+    isPublicHost: $isPublicHost,
+    memberOfCollectiveSlug: $memberOfCollectiveSlug,
+    role: $role,
+    type: $type,
+    ParentCollectiveId: $ParentCollectiveId,
+    tags: $tags,
+    limit: $limit,
+    offset: $offset,
+    orderBy: $orderBy,
+    orderDirection: $orderDirection
+    ) {
     total
     collectives {
       id
@@ -158,6 +185,7 @@ export const addCollectivesData = graphql(getCollectivesQuery, {
         tags: props.tags,
         HostCollectiveId: props.HostCollectiveId,
         hostCollectiveSlug: props.hostCollectiveSlug,
+        isPublicHost: props.isPublicHost,
         memberOfCollectiveSlug: props.memberOfCollectiveSlug,
         role: props.role,
         type: props.type,

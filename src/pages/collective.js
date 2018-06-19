@@ -12,14 +12,14 @@ import UserCollective from '../components/UserCollective';
 
 class CollectivePage extends React.Component {
 
+  static getInitialProps ({ query }) {
+    return { slug: query && query.slug, query }
+  }
+
   static propTypes = {
     getLoggedInUser: PropTypes.func.isRequired,
     data: PropTypes.object,
     query: PropTypes.object,
-  }
-
-  static getInitialProps ({ query }) {
-    return { slug: query && query.slug, query }
   }
 
   constructor(props) {
@@ -31,6 +31,8 @@ class CollectivePage extends React.Component {
     const { getLoggedInUser } = this.props;
     const LoggedInUser = getLoggedInUser && await getLoggedInUser();
     this.setState({ LoggedInUser });
+    window.OC = window.OC || {};
+    window.OC.LoggedInUser = LoggedInUser;
   }
 
   render() {
