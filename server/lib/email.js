@@ -118,7 +118,7 @@ const sendMessage = (recipients, subject, html, options = {}) => {
     to = `emailbcc+${to.replace(/@/g, '-at-')}@opencollective.com`;
   }
 
-  debug(`sending email to ${recipients.join(', ')}`);
+  debug(`sending email to ${to}`);
   if (recipients.length === 0) {
     debug("No recipient to send to, only sending to bcc", options.bcc);
   }
