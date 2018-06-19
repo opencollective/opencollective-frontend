@@ -144,7 +144,7 @@ export async function processOrder(order) {
 /* Interface expected for a payment method */
 export default {
   features: {
-    recurring: true,
+    recurring: false,
   },
   processOrder,
 };
