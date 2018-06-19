@@ -47,7 +47,11 @@ export async function paypalRequest(urlPath, body) {
   return result.json();
 }
 
-/** Create a new payment object in the PayPal API */
+/** Create a new payment object in the PayPal API
+ *
+ * It's just a wrapper to the PayPal API method `create-payment':
+ * https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/advanced-payments-api/create-express-checkout-payments/
+ */
 export async function createPayment(req, res) {
   const { amount, currency } = req.body;
   if (!amount || !currency) throw new Error("Amount & Currency are required");
@@ -67,7 +71,11 @@ export async function createPayment(req, res) {
   return res.json({ id: payment.id });
 }
 
-/** Execute an already created payment */
+/** Execute an already created payment
+ *
+ * It's just a wrapper to the PayPal API method `execute-payment':
+ * https://developer.paypal.com/docs/integration/direct/express-checkout/execute-payments/
+ */
 export async function executePayment(order) {
   const { paymentID, payerID } = order.paymentMethod.data;
   return paypalRequest(`payments/payment/${paymentID}/execute`, { payer_id: payerID });
