@@ -281,7 +281,7 @@ function getForestModels () {
   // Hidden in Forest
   delete m.Collective.associations.Activities;
   delete m.Collective.associations.Notifications;
-  delete m.Collective.associations.ConnectedAccounts;
+  // delete m.Collective.associations.ConnectedAccounts; // xdamman: this is breaking the `allCollectives` graphql query: error: ConnectedAccount is not associated to Collective!
   // Duplicates
   delete m.Collective.associations.members;
   delete m.Collective.associations.transactions;

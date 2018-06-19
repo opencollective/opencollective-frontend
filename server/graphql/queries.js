@@ -483,10 +483,17 @@ const queries = {
         type: TypeOfCollectiveType,
         description: "COLLECTIVE, USER, ORGANIZATION, EVENT"
       },
-      HostCollectiveId: { type: GraphQLInt },
+      HostCollectiveId: {
+        type: GraphQLInt,
+        description: "Fetch all collectives hosted by HostCollectiveId"
+      },
       hostCollectiveSlug: {
         type: GraphQLString,
         description: "Fetch all collectives hosted by hostCollectiveSlug"
+      },
+      isPublicHost: {
+        type: GraphQLBoolean,
+        description: "Fetch all public hosts that accept applications for hosting new collectives"
       },
       memberOfCollectiveSlug: {
         type: GraphQLString,
@@ -536,6 +543,18 @@ const queries = {
         };
         if (args.role) memberCond.where.role = args.role.toUpperCase();
         query.include.push(memberCond);
+      }
+
+      if (args.isPublicHost) {
+        query.where.settings = { apply: { [Op.ne]: null } };
+        const hostCond = {
+          model: models.ConnectedAccount,
+          required: true,
+          where: {
+            service: "stripe"
+          }
+        }
+        query.include.push(hostCond);
       }
 
       if (args.HostCollectiveId) query.where.HostCollectiveId = args.HostCollectiveId;
