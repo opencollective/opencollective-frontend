@@ -195,13 +195,13 @@ class OrderForm extends React.Component {
 
   /** Populate the combo of payment methods */
   populatePaymentMethodTypes = (hostId) => {
-    const { intl, LoggedInUser } = this.props;
+    const { intl } = this.props;
     const paymentMethodTypeOptions = [
       { creditcard: intl.formatMessage(this.messages['paymentMethod.creditcard']) },
     ];
     /* We only support paypal for one time donations to the open
        source collective for now. */
-    if (hostId === 11004 && this.interval() === null && LoggedInUser && LoggedInUser.isRoot()) {
+    if (hostId === 11004 && this.interval() === null) {
       paymentMethodTypeOptions.push({
         payment: intl.formatMessage(this.messages['paymentMethod.paypal'])
       });
