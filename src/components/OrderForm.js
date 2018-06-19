@@ -7,7 +7,7 @@ import PropTypes from 'prop-types';
 
 import { pick, get } from 'lodash';
 import { withApollo } from 'react-apollo';
-import { Button, Row, Col, Form, FormGroup } from 'react-bootstrap';
+import { Button, Col, Form, FormGroup, Row } from 'react-bootstrap';
 
 import colors from '../constants/colors';
 import TierComponent from './Tier';
@@ -61,6 +61,10 @@ class OrderForm extends React.Component {
       orgDetails: {
         show: false
       },
+      /* Set by loadPayPalButton(). This field stores the data from
+         the authorization so we can ask the user's confirmation
+         before processing the payment. */
+      paypalOrderRequest: null,
       order: order || {},
       result: {}
     };
@@ -185,15 +189,21 @@ class OrderForm extends React.Component {
 
   // All the following methods are arrow functions and auto-bind
 
+  /** Interval set either in the tier or in the order object */
+  interval = () =>
+    this.state.order.interval || (this.state.tier && this.state.tier.interval);
+
+  /** Populate the combo of payment methods */
   populatePaymentMethodTypes = (hostId) => {
-    const { intl, LoggedInUser } = this.props;
+    const { intl } = this.props;
     const paymentMethodTypeOptions = [
       { creditcard: intl.formatMessage(this.messages['paymentMethod.creditcard']) },
     ];
-    /* We only support paypal for the open source collective for now */
-    if (hostId === 11004 && LoggedInUser && LoggedInUser.isRoot()) {
+    /* We only support paypal for one time donations to the open
+       source collective for now. */
+    if (hostId === 11004 && this.interval() === null) {
       paymentMethodTypeOptions.push({
-        paypal: intl.formatMessage(this.messages['paymentMethod.paypal'])
+        payment: intl.formatMessage(this.messages['paymentMethod.paypal'])
       });
     }
     this.paymentMethodTypeOptions = paymentMethodTypeOptions;
@@ -382,29 +392,55 @@ class OrderForm extends React.Component {
       window.state = newState;
     }
 
-    if (this.state.paymentMethod.type === 'paypal') {
+    /* This is the type of the PayPal payment method */
+    if (this.isPayPalSelected()) {
       this.loadPayPalButton();
     }
   }
 
+  /** Return true if PayPal is the selected payment method
+   *
+   * Because the way the Payment Method combo works we dont't really
+   * have a better way to find out which option is selected. At some
+   * point it'd be nice to save `service.type` instead of just `type`.
+   */
+  isPayPalSelected = () =>
+    this.state.paymentMethod.type === 'payment';
+
+  /** Return true if the user has authorized a PayPal payment
+   *
+   * After the user authenticates & authorizes the payment using the
+   * checkout button, PayPal will send us a token with the
+   * authorization. This function returns `true` if the token is
+   * available.
+   */
+  isPayPalAuthorized = () =>
+    !!this.state.paypalOrderRequest;
+
+  /** Create the PayPal Checkout button and setup payment parameters
+   *
+   * This method is called when PayPal is selected as the payment
+   * provider. It creates the PayPal button and hooks it up to the
+   * backend methods that create and execute the payment.
+   */
   loadPayPalButton = async () => {
     const button = document.getElementById('paypal-checkout');
+    /* Destroy any already created button */
+    button.innerHTML = '';
     /* Convert amount to what PayPal accepts (dollars) */
     const amount = this.getTotalAmount() / 100;
     /* We need some information about the order to create the PayPal
        payment object. */
     const orderRequest = this.prepareOrderRequest();
-    const currency =
-      (orderRequest.tier && orderRequest.tier.currency) ||
-      this.props.collective.currency;
     /* Parameters for the paypal button */
     const renderOptions = {
       env: getEnvVar('PAYPAL_ENVIRONMENT'),
+      commit: true,
       payment: async (data, actions) => {
         const paymentURL = '/api/services/paypal/create-payment';
         const { id } = await actions.request.post(paymentURL, {
           amount,
-          currency,
+          currency: orderRequest.currency,
         });
         return id;
       },
@@ -442,17 +478,19 @@ class OrderForm extends React.Component {
 
   prepareOrderRequest = () => {
     const { paymentMethod, order, fromCollective, user } = this.state;
-    const quantity = order.tier.quantity || 1;
+    const { currency }  = (order.tier || this.props.collective);
+    const quantity = (order.tier && order.tier.quantity) || 1;
     const orderRequest = {
       user,
-      collective: { id: this.props.collective.id},
-      fromCollective,
-      publicMessage: order.publicMessage,
       quantity,
+      currency,
+      paymentMethod,
+      fromCollective,
+      collective: { id: this.props.collective.id },
+      publicMessage: order.publicMessage,
       interval: order.interval || order.tier.interval,
       totalAmount: this.getTotalAmount(),
       matchingFund: order.matchingFund,
-      paymentMethod
     };
     if (order.tier && order.tier.id) {
       orderRequest.tier = { id: order.tier.id, amount: order.tier.amount };
@@ -461,9 +499,12 @@ class OrderForm extends React.Component {
   }
 
   /** Call the underlying onSubmit method with an order request  */
-  submitOrder = async (orderRequest) => {
-    await this.props.onSubmit(orderRequest || this.prepareOrderRequest());
-  }
+  submitOrder = async (orderRequest) =>
+    this.props.onSubmit(orderRequest || this.prepareOrderRequest());
+
+  /** Submit order built with PayPal payment method */
+  submitPayPalOrder = async () =>
+    this.submitOrder(this.state.paypalOrderRequest);
 
   handleSubmit = async () => {
     if (! await this.validate()) return false;
@@ -621,20 +662,33 @@ class OrderForm extends React.Component {
     this.setState({ ocCard: Object.assign({}, this.state.ocCard, { expanded: true }) });
   }
 
-  renderPaypal() {
+  renderPayPalButton = () => !this.isPayPalAuthorized() && (
+    <FormGroup controlId="paypalFG" id="paypalFG">
+      <div>
+        <Col sm={2}></Col>
+        <Col sm={10}><div id="paypal-checkout"></div></Col>
+      </div>
+    </FormGroup>
+  );
+
+  renderDisclaimer = (values) => {
     return (
-      <FormGroup controlId="paypalFG" id="paypalFG">
-        <div>
-          <Col sm={2}></Col>
-          <Col sm={10}>
-            <div id="paypal-checkout"></div>
-          </Col>
-        </div>
-      </FormGroup>
+      <div className="disclaimer">
+        <FormattedMessage
+          id="collective.host.disclaimer"
+          defaultMessage="By clicking above, you are pledging to give the host ({hostname}) {amount} {interval, select, month {per month} year {per year} other {}} for {collective}."
+          values={values}
+          />
+
+        { values.interval &&
+          <div>
+            <FormattedMessage id="collective.host.cancelanytime" defaultMessage="You can cancel anytime." />
+          </div> }
+      </div>
     );
   }
 
-  renderCreditCard() {
+  renderCreditCard = () => {
     const { intl } = this.props;
     const { ocCard, creditcard } = this.state;
     const showNewCreditCardForm = !ocCard.show && creditcard.show && (!creditcard.uuid || creditcard.uuid === 'other');
@@ -1012,61 +1066,44 @@ class OrderForm extends React.Component {
                   </Row>
                 }
 
-                { this.state.paymentMethod.type === 'creditcard' && this.renderCreditCard() }
-
-                { this.state.paymentMethod.type === 'paypal' && this.renderPaypal() }
+                { this.isPayPalSelected() || this.renderCreditCard() }
+                { this.isPayPalSelected() && this.renderPayPalButton() }
               </section>
             }
 
-            <Row key={`ocCard.input`}>
+            <Row key={`summary-info`}>
               <Col sm={2} />
               <Col sm={10}>
                 { order.totalAmount > 0 && !collective.host &&
                   <div className="error">
                     <FormattedMessage id="order.error.hostRequired" defaultMessage="This collective doesn't have a host that can receive money on their behalf" />
-                  </div>
-                }
-                { (collective.host || order.totalAmount === 0) &&
+                  </div> }
+
+                { (collective.host || order.totalAmount === 0) && !this.isPayPalSelected() &&
                   <div className="actions">
-                    { this.state.paymentMethod.type !== 'paypal' &&
-                      <div className="submit">
-                        <ActionButton className="blue" onClick={this.handleSubmit} disabled={this.state.loading}>
-                          {this.state.loading ? <FormattedMessage id='form.processing' defaultMessage='processing' /> : order.tier.button || capitalize(intl.formatMessage(this.messages['order.button']))}
-                        </ActionButton>
-                      </div> }
-                    { order.totalAmount > 0 &&
-                      <div className="disclaimer">
-                        <FormattedMessage
-                          id="collective.host.disclaimer"
-                          defaultMessage="By clicking above, you are pledging to give the host ({hostname}) {amount} {interval, select, month {per month} year {per year} other {}} for {collective}."
-                          values={
-                            {
-                              hostname: collective.host.name,
-                              amount: formatCurrency(order.totalAmount, currency),
-                              interval: order.interval || order.tier.interval,
-                              collective: collective.name
-                            }
-                          }
-                          />
-                          { (order.interval || order.tier.interval) &&
-                            <div>
-                              <FormattedMessage id="collective.host.cancelanytime" defaultMessage="You can cancel anytime." />
-                            </div>
-                          }
-                      </div>
-                    }
+
+                    <div className="submit">
+                      <ActionButton className="blue" onClick={this.handleSubmit} disabled={this.state.loading}>
+                        {this.state.loading ? <FormattedMessage id='form.processing' defaultMessage='processing' /> : order.tier.button || capitalize(intl.formatMessage(this.messages['order.button']))}
+                      </ActionButton>
+                    </div>
+
+                    { order.totalAmount > 0 && this.renderDisclaimer({
+                        hostname: collective.host.name,
+                        amount: formatCurrency(order.totalAmount, currency),
+                        interval: order.interval || order.tier.interval,
+                        collective: collective.name,
+                    }) }
+
                     <div className="result">
-                      { this.state.loading && <div className="loading"><FormattedMessage id="form.processing" defaultMessage="processing" />...</div> }
+                      { this.state.loading &&
+                        <div className="loading"><FormattedMessage id="form.processing" defaultMessage="processing" />...</div> }
+
                       { this.state.result.success &&
-                        <div className="success">
-                          {this.state.result.success}
-                        </div>
-                      }
+                        <div className="success">{this.state.result.success}</div> }
+
                       { this.state.result.error &&
-                        <div className="error">
-                          {this.state.result.error}
-                        </div>
-                      }
+                        <div className="error">{this.state.result.error}</div> }
                     </div>
                   </div>
                 }
