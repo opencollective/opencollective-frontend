@@ -67,3 +67,15 @@ alias pgstop='pg_ctl stop -m fast'
 See
 [Wiki](https://github.com/OpenCollective/OpenCollective/wiki/Software-testing)
 for more info about the tests.
+
+## Running Scripts
+
+There are many admin scripts in [`/scripts` directory](https://github.com/opencollective/opencollective-api/tree/master/scripts). To run them:
+
+```
+# Local development (without Docker)
+$ npx babel-node ./scripts/populate_usernames.js
+
+# Docker
+$ docker-compose exec api npx babel-node ./scripts/populate_usernames.js
+```

@@ -1,7 +1,9 @@
 import {
   GraphQLBoolean,
+  GraphQLEnumType,
   GraphQLFloat,
   GraphQLInt,
+  GraphQLInputObjectType,
   GraphQLList,
   GraphQLObjectType,
   GraphQLString
@@ -15,12 +17,14 @@ import {
 } from './CollectiveInterface';
 
 import {
-  TransactionInterfaceType
+  TransactionInterfaceType,
+  OrderDirectionType,
 } from './TransactionInterface';
 
 import models, { Op } from '../models';
 import dataloaderSequelize from 'dataloader-sequelize';
 import { strip_tags } from '../lib/utils';
+import status from '../constants/expense_status';
 
 dataloaderSequelize(models.Order);
 dataloaderSequelize(models.Transaction);
@@ -1310,4 +1314,54 @@ export const SubscriptionType = new GraphQLObjectType({
       }
     }
   }
+});
+
+export const ExpenseStatusType = new GraphQLEnumType({
+  name: 'ExpenseStatus',
+  description: 'Possible statuses for an Expense',
+  values: Object.keys(status).reduce((values, key) => ({ ...values, [key]: {} }), {}),
+});
+
+export const OrderByType = new GraphQLInputObjectType({
+  name: 'OrderByType',
+  description: 'Ordering options',
+  fields: {
+    field: {
+      description: '',
+      defaultValue: 'createdAt',
+      type: new GraphQLEnumType({
+        name: 'OrderByField',
+        description: 'Properties by which results can be ordered.',
+        values: {
+          createdAt: {
+            description: 'Order result by creation time.',
+          },
+          updatedAt: {
+            description: 'Order result by updated time.',
+          },
+        },
+      }),
+    },
+    direction: {
+      description: 'The ordering direction',
+      defaultValue: 'DESC',
+      type: OrderDirectionType,
+    },
+  },
+});
+
+OrderByType.defaultValue = Object.entries(OrderByType.getFields()).reduce((values, [key, value]) => ({
+  ...values,
+  [key]: value.defaultValue,
+}), {});
+
+export const PaginatedExpensesType = new GraphQLObjectType({
+  name: 'PaginatedExpenses',
+  description: 'A list of expenses with pagination info',
+  fields: {
+    expenses: { type: new GraphQLList(ExpenseType) },
+    limit: { type: GraphQLInt },
+    offset: { type: GraphQLInt },
+    total: { type: GraphQLInt },
+  },
 });

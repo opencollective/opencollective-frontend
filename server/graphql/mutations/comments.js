@@ -49,7 +49,7 @@ async function fetchComment(id) {
 }
 
 export async function editComment(_, args, req) {
-  require(args, 'comment.id');  
+  require(args, 'comment.id');
   const comment = await fetchComment(args.comment.id);
   return await comment.edit(req.remoteUser, args.comment);
 }

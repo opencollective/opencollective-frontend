@@ -802,7 +802,7 @@ describe('Mutation Tests', () => {
           expect(activityData.member.memberCollective.slug).to.equal(user2.collective.slug);
           expect(emailSendSpy.firstCall.args[0]).to.equal('ticket.confirmed');
           expect(emailSendSpy.secondCall.args[0]).to.equal('collective.member.created');
-          await utils.waitForCondition(() => emailSendMessageSpy.callCount > 0);
+          await utils.waitForCondition(() => emailSendMessageSpy.callCount > 1);
           expect(emailSendMessageSpy.callCount).to.equal(2);
           expect(emailSendMessageSpy.firstCall.args[0]).to.equal("user2@opencollective.com");
           expect(emailSendMessageSpy.firstCall.args[1]).to.equal("2 tickets confirmed for January meetup");

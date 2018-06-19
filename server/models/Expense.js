@@ -1,8 +1,7 @@
 import Temporal from 'sequelize-temporal';
-import { type } from '../constants/transactions';
+import { TransactionTypes } from '../constants/transactions';
 
 import status from '../constants/expense_status';
-const expenseType = type.DEBIT;
 import CustomDataTypes from '../models/DataTypes';
 
 export default function (Sequelize, DataTypes) {
@@ -115,7 +114,7 @@ export default function (Sequelize, DataTypes) {
     getterMethods: {
       info() {
         return {
-          type: expenseType,
+          type: TransactionTypes.DEBIT,
           id: this.id,
           UserId: this.UserId,
           CollectiveId: this.CollectiveId,
@@ -136,7 +135,7 @@ export default function (Sequelize, DataTypes) {
       },
       public() {
         return {
-          type: expenseType,
+          type: TransactionTypes.DEBIT,
           id: this.id,
           UserId: this.UserId,
           CollectiveId: this.CollectiveId,

@@ -1,5 +1,5 @@
 import models, { sequelize } from '../../models';
-import { type as TransactionTypes } from '../../constants/transactions';
+import { TransactionTypes } from '../../constants/transactions';
 import Promise from 'bluebird';
 import { getFxRate } from '../../lib/currency';
 import * as paymentsLib from '../../lib/payments';

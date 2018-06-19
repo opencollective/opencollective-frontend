@@ -1,7 +1,7 @@
 {
   "name": "opencollective-api",
-  "version": "2.0.156",
-  "description": "OpenCollective API",
+  "version": "2.0.165",
+  "description": "Open Collective API",
   "author": "@philmod @arnaudbenard @xdamman @asood123",
   "main": "server/index.js",
   "engines": {
@@ -104,6 +104,7 @@
   "devDependencies": {
     "babel-plugin-istanbul": "4.1.4",
     "chai": "3.5.0",
+    "chai-as-promised": "7.1.1",
     "chai-jest-snapshot": "2.0.0",
     "chance": "0.8.0",
     "cheerio": "0.19.0",

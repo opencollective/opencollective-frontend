@@ -8,6 +8,7 @@ import paypalAdaptive from './adaptiveGateway';
 import { convertToCurrency } from '../../lib/currency';
 import { formatCurrency } from '../../lib/utils';
 import adaptive from './adaptive';
+import payment from './payment';
 
 const debugPaypal = debug('paypal');
 
@@ -53,7 +54,8 @@ const getPreapprovalDetailsAndUpdatePaymentMethod = function(paymentMethod) {
 export default {
   types: {
     default: adaptive,
-    adaptive
+    adaptive,
+    payment,
   },
 
   oauth: {

@@ -1,5 +1,5 @@
 import { createCollective, editCollective, deleteCollective, approveCollective } from './mutations/collectives';
-import { createOrder, cancelSubscription, updateSubscription, refundTransaction } from './mutations/orders';
+import { createOrder, cancelSubscription, updateSubscription, refundTransaction, addFundsToOrg } from './mutations/orders';
 import { createMember, removeMember } from './mutations/members';
 import { editTiers } from './mutations/tiers';
 import { editConnectedAccount } from './mutations/connectedAccounts';
@@ -23,7 +23,8 @@ import {
   ExpenseType,
   UpdateType,
   CommentType,
-  ConnectedAccountType
+  ConnectedAccountType,
+  PaymentMethodType,
 } from './types';
 
 import {
@@ -311,6 +312,16 @@ const mutations = {
     async resolve(_, args, req) {
       return await refundTransaction(_, args, req);
     }
+  },
+  addFundsToOrg: {
+    type: PaymentMethodType,
+    args: {
+      totalAmount: { type: new GraphQLNonNull(GraphQLInt) },
+      collectiveId: { type: new GraphQLNonNull(GraphQLInt) },
+      hostCollectiveId: { type: new GraphQLNonNull(GraphQLInt) },
+      description: { type: GraphQLString },
+    },
+    resolve: async (_, args, req) => addFundsToOrg(args, req.remoteUser),
   }
 };
 

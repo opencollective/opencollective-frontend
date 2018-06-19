@@ -2,7 +2,7 @@
 
 import Promise from 'bluebird';
 import activities from '../constants/activities';
-import { type } from '../constants/transactions';
+import { TransactionTypes } from '../constants/transactions';
 import CustomDataTypes from './DataTypes';
 import uuidv4 from 'uuid/v4';
 import debugLib from 'debug';
@@ -290,14 +290,14 @@ export default (Sequelize, DataTypes) => {
 
   Transaction.createDoubleEntry = (transaction) => {
 
-    transaction.type = (transaction.amount > 0) ? type.CREDIT : type.DEBIT;
+    transaction.type = (transaction.amount > 0) ? TransactionTypes.CREDIT : TransactionTypes.DEBIT;
     transaction.netAmountInCollectiveCurrency = transaction.netAmountInCollectiveCurrency || transaction.amount;
     transaction.TransactionGroup = uuidv4();
     transaction.hostCurrencyFxRate = transaction.hostCurrencyFxRate || 1;
 
     const oppositeTransaction = {
       ...transaction,
-      type: (-transaction.amount > 0) ? type.CREDIT : type.DEBIT,
+      type: (-transaction.amount > 0) ? TransactionTypes.CREDIT : TransactionTypes.DEBIT,
       FromCollectiveId: transaction.CollectiveId,
       CollectiveId: transaction.FromCollectiveId,
       amount: -transaction.netAmountInCollectiveCurrency,
@@ -344,7 +344,7 @@ export default (Sequelize, DataTypes) => {
         transaction.FromCollectiveId = FromCollectiveId;
         transaction.CollectiveId = CollectiveId;
         transaction.PaymentMethodId = transaction.PaymentMethodId || PaymentMethodId;
-        transaction.type = (transaction.amount > 0) ? type.CREDIT : type.DEBIT;
+        transaction.type = (transaction.amount > 0) ? TransactionTypes.CREDIT : TransactionTypes.DEBIT;
         transaction.platformFeeInHostCurrency =
           toNegative(transaction.platformFeeInHostCurrency);
         transaction.hostFeeInHostCurrency =

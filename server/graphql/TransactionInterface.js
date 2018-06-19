@@ -311,7 +311,7 @@ TransactionOrder.defaultValue = Object.entries(TransactionOrder.getFields()).red
 
 export const PaginatedTransactionsType = new GraphQLObjectType({
   name: 'PaginatedTransactions',
-  description: 'List of transactions with pagination data', 
+  description: 'List of transactions with pagination data',
   fields: () => ({
     transactions: { type: new GraphQLList(TransactionInterfaceType) },
     limit: { type: GraphQLInt },

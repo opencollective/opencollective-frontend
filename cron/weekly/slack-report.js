@@ -19,9 +19,13 @@ const {
   Transaction
 } = models;
 
-const createdLastWeek = getTimeFrame('createdAt');
-const updatedLastWeek = getTimeFrame('updatedAt');
+const createdLastWeek = getTimeFrame('createdAt', process.env.START_DATE);
+const updatedLastWeek = getTimeFrame('updatedAt', process.env.START_DATE);
 
+const weekBefore = moment(process.env.START_DATE).tz('America/New_York').startOf('isoWeek').subtract(1, 'week');
+
+const createdWeekBefore = getTimeFrame('createdAt', weekBefore);
+const updatedWeekBefore = getTimeFrame('updatedAt', weekBefore);
 const donation = {
   where: {
     OrderId: {
@@ -54,6 +58,9 @@ const approvedLastWeekExpenses = merge({}, lastWeekExpenses, approvedExpense);
 const rejectedLastWeekExpenses = merge({}, lastWeekExpenses, rejectedExpense);
 const paidLastWeekExpenses = merge({}, lastWeekExpenses, paidExpense);
 
+const weekBeforeDonations = merge({}, createdWeekBefore, donation, excludeOcTeam, credit);
+const paidWeekBeforeExpenses = merge({}, updatedWeekBefore, excludeOcTeam, paidExpense);
+
 const collectiveByCurrency = {
   plain: false,
   group: ['currency'],
@@ -71,7 +78,6 @@ const onlyIncludeCollectiveType = {
   }]
 };
 
-const stripeReceived = { where: { type: activities.WEBHOOK_STRIPE_RECEIVED } };
 const paypalReceived = { where: { type: activities.WEBHOOK_PAYPAL_RECEIVED } };
 
 const distinct = {
@@ -79,75 +85,94 @@ const distinct = {
   distinct: true
 };
 
-Promise.props({
+export default function run() {
+  return Promise.props({
 
-  // Donation statistics
+    // Donation statistics
 
-  donationCount: Transaction.count(lastWeekDonations),
+    donationCount: Transaction.count(lastWeekDonations),
 
-  donationAmount: Transaction
-    .aggregate('amount', 'SUM', merge({}, lastWeekDonations, collectiveByCurrency))
-    .map(row => `${row.SUM/100} ${row.currency}`),
+    priorDonationCount: Transaction.count(weekBeforeDonations),
 
-  stripeReceivedCount: Activity.count(merge({}, createdLastWeek, stripeReceived)),
+    donationAmount: Transaction
+      .aggregate('amount', 'SUM', merge({}, lastWeekDonations, collectiveByCurrency)),
 
-  paypalReceivedCount: Activity.count(merge({}, createdLastWeek, paypalReceived)),
+    priorDonationAmount: Transaction
+      .aggregate('amount', 'SUM', merge({}, weekBeforeDonations, collectiveByCurrency)),
 
-  // Expense statistics
+    paypalReceivedCount: Activity.count(merge({}, createdLastWeek, paypalReceived)),
 
-  pendingExpenseCount: Expense.count(pendingLastWeekExpenses),
+    // Expense statistics
 
-  approvedExpenseCount: Expense.count(approvedLastWeekExpenses),
+    pendingExpenseCount: Expense.count(pendingLastWeekExpenses),
 
-  rejectedExpenseCount: Expense.count(rejectedLastWeekExpenses),
+    approvedExpenseCount: Expense.count(approvedLastWeekExpenses),
 
-  paidExpenseCount: Expense.count(paidLastWeekExpenses),
+    rejectedExpenseCount: Expense.count(rejectedLastWeekExpenses),
 
-  pendingExpenseAmount: Expense
-    .aggregate('amount', 'SUM', merge({}, pendingLastWeekExpenses, collectiveByCurrency))
-    .map(row => `${-row.SUM/100} ${row.currency}`),
+    paidExpenseCount: Expense.count(paidLastWeekExpenses),
 
-  approvedExpenseAmount: Expense
-    .aggregate('amount', 'SUM', merge({}, approvedLastWeekExpenses, collectiveByCurrency))
-    .map(row => `${-row.SUM/100} ${row.currency}`),
+    priorPaidExpenseCount: Expense.count(paidWeekBeforeExpenses),
 
-  rejectedExpenseAmount: Expense
-    .aggregate('amount', 'SUM', merge({}, rejectedLastWeekExpenses, collectiveByCurrency))
-    .map(row => `${-row.SUM/100} ${row.currency}`),
+    pendingExpenseAmount: Expense
+      .aggregate('amount', 'SUM', merge({}, pendingLastWeekExpenses, collectiveByCurrency))
+      .map(row => `${-row.SUM/100} ${row.currency}`),
 
-  paidExpenseAmount: Expense
-    .aggregate('amount', 'SUM', merge({}, paidLastWeekExpenses, collectiveByCurrency))
-    .map(row => `${-row.SUM/100} ${row.currency}`),
+    approvedExpenseAmount: Expense
+      .aggregate('amount', 'SUM', merge({}, approvedLastWeekExpenses, collectiveByCurrency))
+      .map(row => `${-row.SUM/100} ${row.currency}`),
 
-  // Collective statistics
+    rejectedExpenseAmount: Expense
+      .aggregate('amount', 'SUM', merge({}, rejectedLastWeekExpenses, collectiveByCurrency))
+      .map(row => `${-row.SUM/100} ${row.currency}`),
 
-  activeCollectivesWithTransactions: Transaction
-    .findAll(merge({attributes: ['CollectiveId'] }, createdLastWeek, distinct, excludeOcTeam, onlyIncludeCollectiveType))
-    .map(row => row.CollectiveId),
+    paidExpenseAmount: Expense
+      .aggregate('amount', 'SUM', merge({}, paidLastWeekExpenses, collectiveByCurrency)),
 
-  activeCollectivesWithExpenses: Expense
-    .findAll(merge({attributes: ['CollectiveId'] }, updatedLastWeek, distinct, excludeOcTeam))
-    .map(row => row.CollectiveId),
+    priorPaidExpenseAmount: Expense
+      .aggregate('amount', 'SUM', merge({}, paidWeekBeforeExpenses, collectiveByCurrency)),
 
-  newCollectives: Collective
-    .findAll(merge({}, { attributes: ['slug', 'tags'], where: { type: 'COLLECTIVE' } }, createdLastWeek))
-    .map(collective => {
-      const openSource = collective.dataValues.tags && collective.dataValues.tags.indexOf('open source') !== -1;
-      return `${collective.dataValues.slug} (${openSource ? 'open source' : collective.dataValues.tags})`
-    })
+    // Collective statistics
 
-}).then(results => {
-  results.activeCollectiveCount = _.union(results.activeCollectivesWithTransactions, results.activeCollectivesWithExpenses).length
-  const report = reportString(results);
-  console.log(report);
-  return slackLib.postMessage(report, config.slack.webhookUrl, { channel: config.slack.privateActivityChannel });
-}).then(() => {
-  console.log('Weekly reporting done!');
-  process.exit();
-}).catch(err => {
-  console.log('err', err);
-  process.exit();
-});
+    activeCollectivesWithTransactions: Transaction
+      .findAll(merge({attributes: ['CollectiveId'] }, createdLastWeek, distinct, excludeOcTeam, onlyIncludeCollectiveType))
+      .map(row => row.CollectiveId),
+
+    priorActiveCollectivesWithTransactions: Transaction
+      .findAll(merge({attributes: ['CollectiveId'] }, createdWeekBefore, distinct, excludeOcTeam, onlyIncludeCollectiveType))
+      .map(row => row.CollectiveId),
+
+    activeCollectivesWithExpenses: Expense
+      .findAll(merge({attributes: ['CollectiveId'] }, updatedLastWeek, distinct, excludeOcTeam))
+      .map(row => row.CollectiveId),
+
+    priorActiveCollectivesWithExpenses: Expense
+      .findAll(merge({attributes: ['CollectiveId'] }, updatedWeekBefore, distinct, excludeOcTeam))
+      .map(row => row.CollectiveId),
+
+    newCollectives: Collective
+      .findAll(merge({}, { attributes: ['slug', 'tags'], where: { type: 'COLLECTIVE' } }, createdLastWeek))
+      .map(collective => {
+        const openSource = collective.dataValues.tags && collective.dataValues.tags.indexOf('open source') !== -1;
+        return `${collective.dataValues.slug} (${openSource ? 'open source' : collective.dataValues.tags})`
+      }),
+
+    priorNewCollectivesCount: Collective.count(merge({}, { where: { type: 'COLLECTIVE' } }, createdWeekBefore)),
+
+  }).then(results => {
+    results.activeCollectiveCount = _.union(results.activeCollectivesWithTransactions, results.activeCollectivesWithExpenses).length;
+    results.priorActiveCollectiveCount = _.union(results.priorActiveCollectivesWithTransactions, results.priorActiveCollectivesWithExpenses).length;
+    const report = reportString(results);
+    console.log(report);
+    return slackLib.postMessage(report, config.slack.webhookUrl, { channel: config.slack.privateActivityChannel });
+  }).then(() => {
+    console.log('Weekly reporting done!');
+    process.exit();
+  }).catch(err => {
+    console.log('err', err);
+    process.exit();
+  });
+}
 
 /**
  * Heroku scheduler only has daily or hourly cron jobs, we only want to run
@@ -162,8 +187,8 @@ function onlyExecuteInProdOnMondays() {
   }
 }
 
-function getTimeFrame(propName) {
-  const thisWeekStartRaw = moment(process.env.START_DATE) // will default to now if START_DATE is not set
+function getTimeFrame(propName, startDate) {
+  const thisWeekStartRaw = moment(startDate) // will default to now if START_DATE is not set
     .tz('America/New_York')
     .startOf('isoWeek')
     .add(9, 'hours');
@@ -180,20 +205,40 @@ function getTimeFrame(propName) {
   };
 }
 
-function reportString(results) {
+function reportString({
+  activeCollectiveCount,
+  approvedExpenseAmount,
+  approvedExpenseCount,
+  donationAmount,
+  donationCount,
+  newCollectives,
+  paidExpenseAmount,
+  paidExpenseCount,
+  pendingExpenseAmount,
+  pendingExpenseCount,
+  priorActiveCollectiveCount,
+  priorDonationAmount,
+  priorDonationCount,
+  priorNewCollectivesCount,
+  priorPaidExpenseAmount,
+  priorPaidExpenseCount,
+  rejectedExpenseAmount,
+  rejectedExpenseCount,
+}) {
   return `Weekly activity summary (excluding OC team):
 \`\`\`
 * Donations:
-  - ${results.donationCount} donations received${displayTotals(results.donationAmount)}
-  - ${results.stripeReceivedCount} donations received via Bitcoin (count via Stripe Webhook)
+  - ${donationCount} (${compareNumbers(donationCount, priorDonationCount)}) donations received totaling:
+    ${donationAmount.map(({ SUM, currency }) => `* ${SUM/100} ${currency} (${compareNumbers(SUM/100, getSum(priorDonationAmount, currency)/100)})`).join('\n    ')}
 * Expenses:
-  - ${results.pendingExpenseCount} pending expenses${displayTotals(results.pendingExpenseAmount)}
-  - ${results.approvedExpenseCount} approved expenses${displayTotals(results.approvedExpenseAmount)}
-  - ${results.rejectedExpenseCount} rejected expenses${displayTotals(results.rejectedExpenseAmount)}
-  - ${results.paidExpenseCount} paid expenses${displayTotals(results.paidExpenseAmount)}
+  - ${pendingExpenseCount} pending expenses${displayTotals(pendingExpenseAmount)}
+  - ${approvedExpenseCount} approved expenses${displayTotals(approvedExpenseAmount)}
+  - ${rejectedExpenseCount} rejected expenses${displayTotals(rejectedExpenseAmount)}
+  - ${paidExpenseCount} (${compareNumbers(paidExpenseCount, priorPaidExpenseCount)}) paid expenses totaling:
+    ${paidExpenseAmount.map(({ SUM, currency }) => `* ${-SUM/100} ${currency} (${compareNumbers(SUM/100, getSum(priorPaidExpenseAmount, currency)/100)})`).join('\n    ')}
 * Collectives:
-  - ${results.activeCollectiveCount} active collectives
-  - ${results.newCollectives.length} new collectives${displayCollectives(results.newCollectives)}
+  - ${activeCollectiveCount} (${compareNumbers(activeCollectiveCount, priorActiveCollectiveCount)}) active collectives
+  - ${newCollectives.length} (${compareNumbers(newCollectives.length, priorNewCollectivesCount)}) new collectives${displayCollectives(newCollectives)}
 \`\`\``;
 }
 
@@ -210,3 +255,15 @@ function displayCollectives(collectives) {
   }
   return "";
 }
+
+function compareNumbers(recentNumber, priorNumber) {
+  const diff = Math.round(recentNumber - priorNumber);
+  return `${diff >= 0 ? 'increase' : 'decrease'} of ${diff}`;
+}
+
+function getSum(collection, currency) {
+  const record = _.find(collection, { currency });
+  return record ? record.SUM : 0;
+}
+
+run();
