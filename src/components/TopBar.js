@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import classNames from 'classnames';
 import SearchIcon from './SearchIcon';
 import MenuIcon from './icons/MenuIcon';
 import TopBarProfileMenu from './TopBarProfileMenu';

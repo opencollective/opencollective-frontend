@@ -12,20 +12,9 @@ import {
   bgColor,
   border,
   borderRadius,
-  bottom,
-  boxShadow,
   display,
-  height,
-  left,
-  maxWidth,
-  minWidth,
-  position,
-  right,
   size,
   space,
-  top,
-  width,
-  zIndex,
 } from 'styled-system';
 import { Box, Flex } from 'grid-styled';
 import Hide from './Hide';
