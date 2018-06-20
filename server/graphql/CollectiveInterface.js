@@ -47,6 +47,9 @@ export const CollectiveOrderFieldType = new GraphQLEnumType({
   name: 'CollectiveOrderField',
   description: 'Properties by which collectives can be ordered.',
   values: {
+    amountSent: {
+      description: 'Order collective organizations by total money sent to collectives',
+    },
     balance: {
       description: 'Order collectives by total balance.',
     },
@@ -154,7 +157,7 @@ export const CollectivesStatsType = new GraphQLObjectType({
           return models.Collective.count({
             where: {
               ParentCollectiveId: collective.id,
-              type: types.COLLECTIVE,
+              type: [ types.COLLECTIVE, types.ORGANIZATION ],
               isActive: true
             }
           });

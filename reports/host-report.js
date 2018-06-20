@@ -13,6 +13,10 @@ import fs from 'fs';
 
 const debug = debugLib('hostreport');
 
+if (process.env.SKIP_PLATFORM_STATS) {
+  console.log("Skipping computing platform stats");
+}
+
 const summary = {
   totalHosts: 0,
   totalActiveHosts: 0,
@@ -218,6 +222,7 @@ async function HostReport(year, month, hostId) {
         collectivesById = _.indexBy(collectives, "id")
         data.stats.totalCollectives = Object.keys(collectivesById).length;
         summary.totalCollectives += data.stats.totalCollectives;
+        console.log(`>>> processing ${data.stats.totalCollectives} collectives`);
       })
       .then(() => getTransactions(Object.keys(collectivesById), startDate, endDate, {
         include: [
@@ -229,6 +234,7 @@ async function HostReport(year, month, hostId) {
         if (!transactions || transactions.length == 0) {
           throw new Error(`No transaction found`);
         }
+        console.log(`>>> processing ${transactions.length} transactions`);
       })
       .map(processTransaction)
       .tap(transactions => {
@@ -344,10 +350,12 @@ async function HostReport(year, month, hostId) {
   console.log(`Preparing the ${reportName} for ${hosts.length} hosts`);
 
   return Promise.map(hosts, processHost, { concurrency: 1 })
-  .then(() => getPlatformStats())
+  .then(() => !process.env.SKIP_PLATFORM_STATS && getPlatformStats())
   .then(platformStats => {
     const timeLapsed = Math.round((new Date - startTime)/1000); // in seconds
-    console.log(`Total run time: ${timeLapsed}s`);
+    console.log(`Total run time: ${timeLapsed}s`);    
+    if (!platformStats) return;
+
     summary.timeLapsed = timeLapsed;
     summary.month = month && moment(startDate).format('MMMM');
     summary.year = year;
