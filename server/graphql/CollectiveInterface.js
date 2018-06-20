@@ -47,6 +47,9 @@ export const CollectiveOrderFieldType = new GraphQLEnumType({
   name: 'CollectiveOrderField',
   description: 'Properties by which collectives can be ordered.',
   values: {
+    amountSent: {
+      description: 'Order collective organizations by total money sent to collectives',
+    },
     balance: {
       description: 'Order collectives by total balance.',
     },
