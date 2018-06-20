@@ -392,6 +392,49 @@ const getTopSponsors = () => {
   }));
 };
 
+/**
+ * Returns sponsors ordered by total amount donated
+ * (excluding open source collective id 9805)
+ */
+const getSponsors = async (where = {}, { orderDirection = 'ASC', limit = 0, offset = 0 }) => {
+  const whereStatement = Object.keys(where).reduce((statement, key) => `${statement} AND c."${key}"=$${key}`, '');
+  const params = {
+    bind: where,
+    model: models.Collective,
+  };
+
+  const sql = (fields) => `
+    with "sponsors" as (
+      SELECT c.id, SUM(amount) as "amountSent"
+      FROM "Transactions" t
+      INNER JOIN "Collectives" c ON t."FromCollectiveId" = c.id
+      WHERE
+        c.type = 'ORGANIZATION'
+        AND t.type = 'CREDIT'
+        AND c.id != 9805
+        AND t."deletedAt" IS NULL
+        AND c."isActive" IS TRUE
+        ${whereStatement}
+        AND c."deletedAt" IS NULL
+        GROUP BY c.id
+    )
+    SELECT ${fields} from "Collectives" c
+    LEFT JOIN "sponsors" s on s.id = c.id
+    WHERE c."isActive" IS TRUE
+    ${whereStatement}
+    AND c."deletedAt" IS NULL
+    GROUP BY c.id, s.id, s."amountSent"
+    ORDER BY s."amountSent" ${orderDirection} NULLS LAST
+  `.replace(/\s\s+/g, ' ');
+
+  const [ [ { dataValues: { total } } ], collectives ] = await Promise.all([
+    sequelize.query(`${sql('COUNT(c.*) OVER() as "total"')} LIMIT 1`, params),
+    sequelize.query(`${sql('c.*')} LIMIT ${limit} OFFSET ${offset}`, params),
+  ]);
+
+  return { total, collectives };
+};
+
 const getMembersOfCollectiveWithRole = (CollectiveIds) => {
   const collectiveids = (typeof CollectiveIds === 'number') ? [CollectiveIds] : CollectiveIds;
   return sequelize.query(`
@@ -623,6 +666,7 @@ const getTotalNumberOfDonors = () => {
 }
 
 export default {
+  getSponsors,
   getTotalDonationsByCollectiveType,
   getTotalAnnualBudgetForHost,
   getTopDonorsForCollective,
