@@ -196,7 +196,7 @@ class InputField extends React.Component {
                 <DateTime
                   name={field.name}
                   timeFormat={field.timeFormat || timeFormat}
-                  value={moment.tz(new Date(this.state.value || field.defaultValue), context.timezone)}
+                  value={moment.tz(new Date(this.state.value || field.defaultValue), context.timezone || 'utc')}
                   isValidDate={field.validate}
                   onChange={date => date.toISOString ? this.handleChange(date.toISOString()) : false}
                   closeOnSelect={closeOnSelect}
@@ -210,7 +210,7 @@ class InputField extends React.Component {
               <DateTime
                 name={field.name}
                 timeFormat={field.timeFormat || timeFormat}
-                value={moment.tz(new Date(this.state.value || field.defaultValue), context.timezone)}
+                value={moment.tz(new Date(this.state.value || field.defaultValue), context.timezone || 'utc')}
                 isValidDate={field.validate}
                 onChange={date => date.toISOString ? this.handleChange(date.toISOString()) : false}
                 closeOnSelect={closeOnSelect}

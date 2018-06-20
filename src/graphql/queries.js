@@ -86,6 +86,7 @@ export const getLoggedInUserQuery = gql`
           type
           name
           currency
+          isHost
           stats {
             id
             balance
@@ -95,8 +96,10 @@ export const getLoggedInUserQuery = gql`
             uuid
             name
             service
+            type
             data
             balance
+            expiryDate
           }
         }
       }
@@ -522,6 +525,7 @@ const getCollectiveCoverQuery = gql`
       settings
       image
       isHost
+      isActive
       tags
       stats {
         id
@@ -566,14 +570,16 @@ const getCollectiveCoverQuery = gql`
   }
 `;
 
-export const getPrepaidCardBalanceQuery = gql`
-  query checkPrepaidPaymentMethod($token: String!) {
-    prepaidPaymentMethod(token: $token) {
+export const getOcCardBalanceQuery = gql`
+  query checkOcPaymentMethod($token: String!) {
+    ocPaymentMethod(token: $token) {
       id,
       name,
       currency,
       balance,
       uuid
+      service
+      type
     }
   }
 `;

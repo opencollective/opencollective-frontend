@@ -13,6 +13,7 @@ module.exports = {
       new webpack.ContextReplacementPlugin(/moment[/\\]locale$/, /en|fr|es|ja/),
     );
     if (process.env.WEBPACK_BUNDLE_ANALYZER) {
+      // eslint-disable-next-line node/no-unpublished-require
       const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
       config.plugins.push(
         new BundleAnalyzerPlugin({

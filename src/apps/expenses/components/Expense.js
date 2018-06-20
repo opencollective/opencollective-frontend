@@ -14,6 +14,7 @@ import ExpenseDetails from './ExpenseDetails';
 import ApproveExpenseBtn from './ApproveExpenseBtn';
 import RejectExpenseBtn from './RejectExpenseBtn';
 import PayExpenseBtn from './PayExpenseBtn';
+import colors from '../../../constants/colors';
 
 class Expense extends React.Component {
 
@@ -115,7 +116,16 @@ class Expense extends React.Component {
       && LoggedInUser.canApproveExpense(expense)
       && (
         expense.status === 'PENDING'
-        || (expense.status === 'APPROVED' && (Date.now() - (new Date(expense.updatedAt).getTime())) < 60 * 1000 * 15) // we can reject an expense for up to 10mn after approving it
+        ||
+        (
+          expense.status === 'APPROVED'
+          &&
+          (
+            ((Date.now() - (new Date(expense.updatedAt).getTime())) < 60 * 1000 * 15) // admin of collective can reject the expense for up to 10mn after approving it
+            ||
+            LoggedInUser.canEditCollective(collective.host)
+          )
+        )
       );
 
     const canApprove = LoggedInUser
@@ -136,6 +146,10 @@ class Expense extends React.Component {
             overflow: hidden;
             position: relative;
             display: flex;
+          }
+          .ExpenseId {
+            color: ${colors.gray};
+            margin-left: 0.5rem;
           }
           .expense.detailsView {
             background-color: #fafafa;
@@ -256,6 +270,7 @@ class Expense extends React.Component {
               <div className="description">
                 <Link route={`/${collective.slug}/expenses/${expense.id}`} title={capitalize(title)}>
                   {capitalize(title)}
+                  { view !== 'compact' && <span className="ExpenseId">#{expense.id}</span> }
                 </Link>
               </div>
               <div className="meta">

@@ -13,7 +13,7 @@ import { logger } from './logger';
 import { getCloudinaryUrl } from './lib/utils';
 import { translateApiUrl } from '../lib/utils';
 
-module.exports = (server, app) => {
+export default (server, app) => {
 
   server.get('*', mw.ga, (req, res, next) => {
     req.app = app;
@@ -67,10 +67,10 @@ module.exports = (server, app) => {
    */
   server.get('/robots.txt', (req, res, next) => {
     res.setHeader('Content-Type', 'text/plain');
-    if (process.env.NODE_ENV === 'production') {
-      res.send("User-agent: *\nAllow: /");
-    } else {
+    if (process.env.NODE_ENV !== 'production' || process.env.ROBOTS_DISALLOW) {
       res.send("User-agent: *\nDisallow: /");
+    } else {
+      res.send("User-agent: *\nAllow: /");
     }
     next();
   });

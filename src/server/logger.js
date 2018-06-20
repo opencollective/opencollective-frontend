@@ -38,4 +38,7 @@ const loggerMiddleware = {
   })
 }
 
-module.exports = { logger, loggerMiddleware };
+export {
+  logger,
+  loggerMiddleware
+}

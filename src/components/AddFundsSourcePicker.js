@@ -1,11 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import gql from 'graphql-tag'
 import { FormControl } from 'react-bootstrap';
 import { graphql } from 'react-apollo'
-import gql from 'graphql-tag'
 import { defineMessages, FormattedMessage } from 'react-intl';
-import withIntl from '../lib/withIntl';
 import { get, uniqBy, groupBy } from 'lodash';
+import withIntl from '../lib/withIntl';
 
 class AddFundsSourcePicker extends React.Component {
 
@@ -78,8 +78,39 @@ class AddFundsSourcePicker extends React.Component {
       </FormControl>
     );
   }
-
 }
+
+class AddFundsSourcePickerForUser extends React.Component {
+  static propTypes = {
+    onChange: PropTypes.func,
+    LoggedInUser: PropTypes.object.isRequired,
+  }
+
+  constructor(props) {
+    super(props);
+    this.state = { loading: true };
+  }
+
+  onChange = async (e) => {
+    this.props.onChange(e.target.value);
+  }
+
+  render() {
+    const hosts = this.props.LoggedInUser.hostsUserIsAdminOf();
+    return (
+      <div>
+        <FormControl
+          id="sourcePicker" name="template" componentClass="select"
+          placeholder="select" onChange={this.onChange}
+          >
+          <option value="" key="addfsph-00"></option>
+          { hosts.map(h => <option value={h.slug} key={`addfsph-${h.id}`}>{h.name}</option>) }
+        </FormControl>
+      </div>
+    );
+  }
+}
+
 
 const getSourcesQuery = gql`
 query allMembers($CollectiveId: Int) {
@@ -103,5 +134,8 @@ const addOrganizationsData = graphql(getSourcesQuery, {
   })
 });
 
+export const AddFundsSourcePickerWithData = withIntl(addOrganizationsData(AddFundsSourcePicker));
 
-export default withIntl(addOrganizationsData(AddFundsSourcePicker));
+export const AddFundsSourcePickerForUserWithData = withIntl(AddFundsSourcePickerForUser);
+
+export default AddFundsSourcePickerWithData;

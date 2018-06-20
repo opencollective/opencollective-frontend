@@ -1,4 +1,4 @@
-import { intersection, get } from 'lodash';
+import { intersection, get, uniqBy } from 'lodash';
 
 class LoggedInUser {
   constructor(data) {
@@ -130,7 +130,15 @@ LoggedInUser.prototype.canEditSubscription = function(order) {
 }
 
 LoggedInUser.prototype.isRoot = function() {
-  return intersection(this.roles['opencollectiveinc_internal'], ['ADMIN']).length > 0;
+  return intersection(this.roles['opencollective-company'], ['ADMIN']).length > 0;
 }
+
+LoggedInUser.prototype.hostsUserIsAdminOf = function () {
+  // List all the hosts this user belongs to and is admin of
+  return uniqBy(this.memberOf
+      .filter(m => m.collective.isHost)
+      .filter(m => this.hasRole(['ADMIN'], m.collective))
+      .map(m => m.collective), 'id');
+};
 
 export default LoggedInUser;

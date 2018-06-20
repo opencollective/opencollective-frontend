@@ -212,12 +212,12 @@ describe("OrderForm component", () => {
       component = mountComponent({ collective, order }, () => Promise.resolve({ data: null}));
 
       component.find('.gift-card-expander').simulate('click');
-      fillValue(component, 'prepaidcard', 'BB-FTC1900');
+      fillValue(component, 'ocCard', 'BB-FTC1900');
 
-      component.find('.prepaidapply.btn').simulate('click');
+      component.find('.ocCardApply.btn').simulate('click');
 
       setTimeout(() => {
-        expect(component.find('.inputField .prepaidcard').html()).toContain('Invalid code');
+        expect(component.find('.inputField .ocCard').html()).toContain('Invalid code');
         done();
       }, 1000);
     });
@@ -225,7 +225,7 @@ describe("OrderForm component", () => {
     it('gives correct amount on success', (done) => {
 
       component = mountComponent({ collective, order }, () => Promise.resolve({ data: {
-          prepaidPaymentMethod: {
+          ocPaymentMethod: {
             balance: 5000,
             valid: true,
             currency: 'USD'
@@ -233,12 +233,12 @@ describe("OrderForm component", () => {
       }}));
 
       component.find('.gift-card-expander').simulate('click');
-      fillValue(component, 'prepaidcard', 'BB-FTC1900');
+      fillValue(component, 'ocCard', 'BB-FTC1900');
 
-      component.find('.prepaidapply.btn').simulate('click');
+      component.find('.ocCardApply.btn').simulate('click');
 
       setTimeout(() => {
-        expect(component.find('.inputField .prepaidcard').html()).toContain('Valid code. Amount available: $50.00');
+        expect(component.find('.inputField .ocCard').html()).toContain('Valid code. Amount available: $50.00');
         done();
       }, 1000);
     })

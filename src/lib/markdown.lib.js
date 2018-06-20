@@ -53,8 +53,8 @@ export function processMarkdown(text) {
     } else {
       isHeader = false;
     }
-    if (line.length <= 30) {
-      const match = line.match(/^# *([^#]{2,30})/i);
+    if (line.length <= 60) {
+      const match = line.match(/^# *([^#]{2,60})/i);
       if (match) {
         pushSection(currentTitle, paragraph);
         currentTitle = match[1];
