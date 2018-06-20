@@ -40,7 +40,6 @@ class CollectivePage extends React.Component {
 
     if (data.loading) return (<Loading />);
     if (!data.Collective) {
-      window.location.replace(`/search?q=${get(data, 'variables.slug')}`);
       return (<NotFound slug={get(data, 'variables.slug')} />);
     }
 
