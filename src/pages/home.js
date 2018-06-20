@@ -3,16 +3,13 @@ import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import { take, uniqBy } from 'lodash';
 
-import styled from 'styled-components';
 import { Box, Flex } from 'grid-styled';
 
 import withData from '../lib/withData'
 import withIntl from '../lib/withIntl';
 import withLoggedInUser from '../lib/withLoggedInUser';
-import { transactionFields } from '../graphql/queries';
 
 import Body from '../components/Body';
-import Button from '../components/Button';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
 import TransactionSimple from '../components/TransactionSimple';
@@ -23,6 +20,7 @@ import Hide from '../components/Hide';
 import Container from '../components/Container';
 import StyledLink from '../components/StyledLink';
 import CollectiveStatsCard from '../components/CollectiveStatsCard';
+import SponsorCard from '../components/SponsorCard';
 
 const responsiveAlign = ['center', null, 'left'];
 const sectionHeadingStyles = {
@@ -35,6 +33,7 @@ const sectionSubHeadingStyles = {
   ...sectionHeadingStyles,
   color: '#2E3033',
   fontSize: [20, null, 28],
+  fontWeight: 600,
   my: 3,
 };
 const sectionDetailStyles = {
@@ -60,6 +59,9 @@ class HomePage extends React.Component {
       },
       recent: {
         collectives,
+      },
+      sponsors: {
+        collectives: sponsors,
       },
       transactions: {
         transactions,
@@ -98,7 +100,7 @@ class HomePage extends React.Component {
                 <H1 fontWeight="normal" textAlign="left">A new form of association, <br /> <strong>transparent by design.</strong></H1>
 
                 <P my={3} color="#6E747A">
-                  It's time to break the mold. 21st century citizens need organizations where all members share the mission;
+                  It&apos;s time to break the mold. 21st century citizens need organizations where all members share the mission;
                    where anybody can contribute; where leaders can change; and where money works in full transparency.
                   Open Collective provides the digitals tools you need to take your group a step closer in that direction.
                 </P>
@@ -121,7 +123,7 @@ class HomePage extends React.Component {
                     Join the movement
                   </StyledLink>
                   <Link href="/learn-more">
-                    <StyledLink mt={[3, null, 0]} ml={[null, null, 3]}>How it works ></StyledLink>
+                    <StyledLink mt={[3, null, 0]} ml={[null, null, 3]}>How it works &gt;</StyledLink>
                   </Link>
                 </Flex>
               </Container>
@@ -149,7 +151,7 @@ class HomePage extends React.Component {
             <Container py={3}>
               <Flex mb={3} justifyContent="space-between" px={[1, null, 0]}>
                 <H3>Most active spending</H3>
-                <StyledLink href="/discover">See all ></StyledLink>
+                <StyledLink href="/discover">See all &gt;</StyledLink>
               </Flex>
               <Container display="flex" flexWrap="wrap" justifyContent="space-between">
                 {activeCollectives.map((c) => <Container w={[0.5, null, 0.25]} mb={2} px={1} maxWidth={224}><CollectiveStatsCard {...c} /></Container>)} 
@@ -159,7 +161,7 @@ class HomePage extends React.Component {
             <Container py={3}>
               <Flex mb={3} justifyContent="space-between" px={[1, null, 0]}>
                 <H3>Recently created</H3>
-                <StyledLink href="/discover">See all ></StyledLink>
+                <StyledLink href="/discover">See all &gt;</StyledLink>
               </Flex>
               <Container display="flex" flexWrap="wrap" justifyContent="space-between">
                 {collectives.map((c) => <Container w={[0.5, null, 0.25]} mb={2} px={1} maxWidth={224}><CollectiveStatsCard {...c} /></Container>)} 
@@ -221,7 +223,7 @@ class HomePage extends React.Component {
 
                 <P {...sectionSubHeadingStyles}>Great companies supporting great collectives with 💙.</P>
 
-                <P {...sectionDetailStyles}>Accelerate collectives on behalf of your organization. <Span fontWeight="bold">You'll get an invoice for every financial contribution your company makes as well as monthly reporting.</Span></P>
+                <P {...sectionDetailStyles}>Accelerate collectives on behalf of your organization. <Span fontWeight="bold">You&apos;ll get an invoice for every financial contribution your company makes as well as monthly reporting.</Span></P>
 
                 <P {...sectionDetailStyles} my={3}>If you’re looking to onboard and financially support an initiative through Open Collective, <a href="mailto:info@opencollective.com">let us know</a> and we’ll gladly set them up and get them going.</P>
 
@@ -236,6 +238,7 @@ class HomePage extends React.Component {
                     maxWidth="220px"
                     mx="auto"
                     mt={4}
+                    mb={4}
                     hover={{ color: 'white' }}
                     py={3}
                     textAlign="center"
@@ -245,7 +248,8 @@ class HomePage extends React.Component {
                   </StyledLink>
                 </Link>
               </Container>
-              <Container w={[1, null, 0.5]}>
+              <Container w={[1, null, 0.5]} display="flex" flexWrap="wrap" justifySpace="space-between" px={[1, null, 4]}>
+                {sponsors.map((c) => <Container w={[0.5, null, 0.33]} mb={2} px={1} maxWidth={224} key={c.id}><SponsorCard {...c} /></Container>)}
               </Container>
             </Container>
 
@@ -410,6 +414,20 @@ const query = gql`
               organizations
             }
           }
+        }
+      }
+    }
+    sponsors: allCollectives(type: ORGANIZATION, limit: 6, orderBy: amountSent, orderDirection: DESC, offset: 0) {
+      collectives {
+        id
+        currency
+        type
+        slug
+        name
+        image
+        tags
+        stats {
+          totalAmountSent
         }
       }
     }
