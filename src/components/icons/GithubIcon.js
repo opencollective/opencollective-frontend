@@ -3,7 +3,7 @@ import React from 'react';
 const GithubIcon = ({ size = 22, fill = '#9399A3', ...props }) => (
   <svg width={size} height={size} viewBox="0 0 22 22" version="1.1" xmlns="http://www.w3.org/2000/svg" {...props}>
       <title>github icon</title>
-      <g id="Homepage" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+      <g id="Homepage" stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
           <g id="Homepage---XS-(small-handset)" transform="translate(-149.000000, -10919.000000)">
               <g id="FOOTER" transform="translate(0.000000, 10758.000000)">
                   <g id="::-social-networks" transform="translate(24.000000, 148.000000)">

@@ -3,7 +3,7 @@ import React from 'react';
 const MailIcon = ({ size = '16', fill = '#9399A3', ...props }) => (
   <svg width={size} height={size * (14/16)} viewBox="0 0 16 14" version="1.1" xmlns="http://www.w3.org/2000/svg" {...props}>
     <title>email icon</title>
-    <g id="Homepage" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+    <g id="Homepage" stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
         <g id="Homepage---XS-(small-handset)" transform="translate(-264.000000, -10923.000000)" >
             <g id="FOOTER" transform="translate(0.000000, 10758.000000)">
                 <g id="::-social-networks" transform="translate(24.000000, 148.000000)">

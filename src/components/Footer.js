@@ -1,9 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
-import { maxWidth, textAlign } from 'styled-system';
+import { maxWidth } from 'styled-system';
 import { Box, Flex } from 'grid-styled';
 import { P } from './Text';
-import Link from './Link';
 import {
   GithubIcon,
   MailIcon,

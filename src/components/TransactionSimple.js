@@ -1,9 +1,7 @@
 import moment from 'moment';
 import React from 'react';
 import PropTypes from 'prop-types';
-import { defineMessages, FormattedNumber, injectIntl } from 'react-intl';
-
-import withIntl from '../lib/withIntl';
+import { FormattedNumber } from 'react-intl';
 
 import Avatar from './Avatar';
 import Container from './Container';

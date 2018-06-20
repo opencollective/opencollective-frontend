@@ -16,7 +16,6 @@ const getGoalPercentage = ({ type, amount}, { balance, yearlyBudget }) => type =
 
 const CollectiveStatsCard = ({
   backgroundImage,
-  currency,
   description,
   image,
   name,
