@@ -622,6 +622,11 @@ const queries = {
         return { total, collectives, limit: args.limit, offset: args.offset };
       }
 
+      if (args.orderBy === 'amountSent' && args.type === 'ORGANIZATION') {
+        const { total, collectives } = await rawQueries.getSponsors(query.where, args);
+        return { total, collectives, limit: args.limit, offset: args.offset };
+      }
+
       query.order = [[args.orderBy, args.orderDirection]];
 
       if (args.offset) query.offset = args.offset;
