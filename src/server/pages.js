@@ -38,6 +38,8 @@ pages
   .add('expense', '/:parentCollectiveSlug?/:collectiveType(events)?/:collectiveSlug/expenses/:ExpenseId([0-9]+)')
   .add('expenses', '/:parentCollectiveSlug?/:collectiveType(events)?/:collectiveSlug/expenses/:filter(categories|recipients)?/:value?')
   .add('collective', '/:slug')
-  .add('editCollective', '/:slug/edit')
+  .add('editCollective', '/:slug/edit');
 
-  module.exports = pages;
+export default pages;
+
+export const { Link, Router } = pages;
