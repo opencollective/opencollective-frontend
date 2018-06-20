@@ -126,6 +126,11 @@ class CreateCollectiveForm extends React.Component {
           options: {
             types: ['(cities)']
           }
+        },
+        {
+          name: 'tags',
+          placeholder: 'civic tech, open source, vegan',
+          type: 'text'
         }
       ]
     }
