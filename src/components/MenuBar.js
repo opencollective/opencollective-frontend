@@ -109,7 +109,9 @@ class MenuBar extends React.Component {
           link: `#${el.id}`,
           position: el.offsetTop
         };
-        menuItemsFoundOnPage.push(menuItem);
+        if (menuItem.title && menuItem.title.length < 30) {
+          menuItemsFoundOnPage.push(menuItem);
+        }
       })
 
     // If we don't find the sections on the page, we link the logo to the homepage instead of #top
