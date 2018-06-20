@@ -158,7 +158,7 @@ export const CollectivesStatsType = new GraphQLObjectType({
           return models.Collective.count({
             where: {
               ParentCollectiveId: collective.id,
-              type: types.COLLECTIVE,
+              type: [ types.COLLECTIVE, types.ORGANIZATION ],
               isActive: true
             }
           });
