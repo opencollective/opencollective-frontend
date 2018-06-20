@@ -231,6 +231,7 @@ const getCollectiveQuery = gql`
       settings
       image
       isHost
+      isActive
       tags
       stats {
         id

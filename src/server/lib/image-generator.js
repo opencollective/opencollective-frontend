@@ -142,7 +142,7 @@ export function generateSVGBannerForUsers(users, options) {
 
         const contentType = headers['content-type'];
         const website = (options.linkToProfile || !user.website) ? `${WEBSITE_URL}/${user.slug}` : user.website;
-        const base64data = new Buffer(rawData).toString('base64');
+        const base64data = Buffer.from(rawData).toString('base64');
         let avatarWidth = avatarHeight;
         try {
           // We make sure the image loaded properly
