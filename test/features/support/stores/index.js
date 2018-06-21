@@ -112,7 +112,7 @@ export async function newCollectiveWithHost(name, currency, hostCurrency, hostFe
   const { hostFeePercent } = hostCollective;
   const collective = await models.Collective.create({ name, slug, currency, hostFeePercent });
   await collective.addHost(hostCollective);
-  return { hostCollective, hostAdmin, collective, [slug]: hostCollective };
+  return { hostCollective, hostAdmin, collective, [slug]: collective };
 }
 
 /** Create a collective and associate to an existing host.

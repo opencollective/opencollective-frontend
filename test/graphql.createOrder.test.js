@@ -100,8 +100,7 @@ describe('createOrder', () => {
     tweetStatusSpy = sandbox.spy(twitter, 'tweetStatus');
 
     // Given a collective (with a host)
-    brusselstogether = (await store.newCollectiveWithHost(
-      'brusselstogether', 'EUR', 'EUR', 5)).collective;
+    ({ brusselstogether } = await store.newCollectiveWithHost('brusselstogether', 'EUR', 'EUR', 5));
     // And the above collective's host has a stripe account
     await store.stripeConnectedAccount(brusselstogether.HostCollectiveId);
     // And given that the above collective is active
