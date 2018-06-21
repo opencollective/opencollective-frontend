@@ -103,15 +103,22 @@ export async function newOrganization(orgData, adminUser) {
  * @param {String} currency is the currency of the collective
  * @param {String} hostCurrency is the currency of the host
  * @param {String} hostFee is the per transaction Host fee
+ * @param {models.User} user is an istance of a user that will be the
+ *  collective's admin
+ * @param {Object} data extra fields to be set when creating the new
+ *  collective
  * @returns {Object} with references for `hostCollective`,
  *  `hostAdmin`, and `collective`.
  */
-export async function newCollectiveWithHost(name, currency, hostCurrency, hostFee) {
+export async function newCollectiveWithHost(name, currency, hostCurrency, hostFee, user=null, data={}) {
   const { hostAdmin, hostCollective } = await newHost(`${name} Host`, hostCurrency, hostFee);
   const slug = slugify(name);
   const { hostFeePercent } = hostCollective;
-  const collective = await models.Collective.create({ name, slug, currency, hostFeePercent });
+  const args = { ...data, name, slug, currency, hostFeePercent };
+  if (user) args['CreatedByUserId'] = user.id;
+  const collective = await models.Collective.create(args);
   await collective.addHost(hostCollective);
+  if (user) await collective.addUserWithRole(user, 'ADMIN');
   return { hostCollective, hostAdmin, collective, [slug]: collective };
 }
 
@@ -120,14 +127,21 @@ export async function newCollectiveWithHost(name, currency, hostCurrency, hostFe
  * @param {String} name is the name of the collective being created.
  * @param {models.Collective} hostCollective is an already collective
  *  meant to be the host of the collective being created here.
+ * @param {models.User} user is an istance of a user that will be the
+ *  collective's admin
+ * @param {Object} data extra fields to be set when creating the new
+ *  collective
  * @return {models.Collective} a newly created collective hosted by
  *  `hostCollective`.
  */
-export async function newCollectiveInHost(name, currency, hostCollective) {
+export async function newCollectiveInHost(name, currency, hostCollective, user=null, data={}) {
   const slug = slugify(name);
   const { hostFeePercent } = hostCollective;
-  const collective = await models.Collective.create({ name, slug, currency, hostFeePercent });
+  const args = { ...data, name, slug, currency, hostFeePercent };
+  if (user) args['CreatedByUserId'] = user.id;
+  const collective = await models.Collective.create(args);
   await collective.addHost(hostCollective);
+  if (user) await collective.addUserWithRole(user, 'ADMIN');
   return { collective, [slug]: collective };
 }
 
