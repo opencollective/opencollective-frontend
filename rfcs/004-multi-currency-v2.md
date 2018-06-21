@@ -17,55 +17,9 @@ the collective's currency but stores it host currency.
 
 ### Store amounts in Host Currency
 
-The host is the entity that stores the donation money in their bank
-account. The collective's 
-
-Since the collective doesn't really store any money,  only
-use the collective's currency for display purposes.  We should
-deprecate the
-
-These are all the possible cases
-
-Orders
- * User(A) -> HOST(A) -> COLLECTIVE(A)
- * User(A) -> HOST(B) -> COLLECTIVE(B)
- * User(A) -> HOST(B) -> COLLECTIVE(C)
-
-Expenses
- * Host(A) -> User(A)
- * Host(A) -> User(B)
-
-
-
-In practical terms, if a 
-
-
-And every transaction between collectives of different currency
-generate a currency conversion.
-
-
-To give some context, it's important to remember that collectives
-don't really store
-
-
-
-The goal of this RFC is to spec out a flow for the use cases we
-support that 0. Guarantee the accuracy of the ledger, 1. Minimize the
-number of conversions between exchanges to avoid fees.
-
-
-There's currently a bug in the way we store currency exchange. We 
-
-
-The ledger of Collectives without a bank account is virtual. They all
-need a host to actually store money. Each Collective under a host
-knows how much they have in their ledger and the Host knows how much
-each collective has as well as its own balance.
-
-The currency of the Host is attached to which currency their bank
-account support. The currency of the Collective under a host is mostly
-informative to their members since the funds are stored in the Host's
-currency.
+The host is the entity that stores money in their bank account. The
+collective's currency should stop being used in currency conversions
+and should be used only for display purposes.
 
 If a Collective changes to a different host, the old transactions
 won't be changed. They will still reference the old host. That's
@@ -98,9 +52,14 @@ To document the purchase of an amount of a different currency, the
 following changes are necessary:
 
 The following fields will be renamed
- * **amountInHostCurrency** to **fromAmount**
- * **hostCurrency** to **fromCurrency**
- * **hostCurrencyFxRate** to **fromCurrencyRate**
+
+ * **amountInHostCurrency** replaced by **amount**
+ * **hostCurrency** replaced by **currency**
+ * **hostCurrencyFxRate** deleted
+
+ * **fromAmount** store the amount in the original currency
+ * **fromCurrency** store the original currency
+ * **fromCurrencyRate** store the rate between **fromAmount** and **amount**
 
 And the following fields are going to be deleted:
  * **netAmountInCollectiveCurrency**
