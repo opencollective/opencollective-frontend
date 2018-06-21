@@ -122,11 +122,13 @@ class EditCollective extends React.Component {
       ...collective.settings,
       goals: CollectiveInputType.goals,
       editor: CollectiveInputType.markdown ? 'markdown' : 'html',
-      sendInvoiceByEmail: CollectiveInputType.sendInvoiceByEmail
+      sendInvoiceByEmail: CollectiveInputType.sendInvoiceByEmail,
+      tos: CollectiveInputType.tos,
     };
     delete CollectiveInputType.goals;
     delete CollectiveInputType.markdown;
     delete CollectiveInputType.sendInvoiceByEmail;
+    delete CollectiveInputType.tos;
     this.setState( { status: 'loading' });
     try {
       if (CollectiveInputType.backgroundImage === defaultBackgroundImage[CollectiveInputType.type]) {

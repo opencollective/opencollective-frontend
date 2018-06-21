@@ -39,7 +39,7 @@ class EditCollectiveForm extends React.Component {
       members: collective.members || [{}],
       tiers: collective.tiers || [{}],
       goals: collective.settings.goals || [{}],
-      paymentMethods: collective.paymentMethods || [{}]
+      paymentMethods: collective.paymentMethods || [{}],
     };
 
     this.showEditTiers = ['COLLECTIVE', 'EVENT'].includes(collective.type);
@@ -55,6 +55,8 @@ class EditCollectiveForm extends React.Component {
       'type.label': { id: 'collective.type.label', defaultMessage: 'type' },
       'name.label': { id: 'collective.name.label', defaultMessage: 'name' },
       'tags.label': { id: 'collective.tags.label', defaultMessage: 'tags' },
+      'tos.label': { id: 'collecitve.tos.label', defaultMessage: 'Terms of Service' },
+      'tos.description': { id: 'collective.tos.description', defaultMessage: 'Link to the terms by which this host will collect money on behalf of their collectives'},
       'tags.description': { id: 'collective.tags.description', defaultMessage: 'Make your collective discoverable in search and related collectives (comma separated)' },
       'company.label': { id: 'collective.company.label', defaultMessage: 'company' },
       'company.description': { id: 'collective.company.description', defaultMessage: 'Start with a @ to reference an organization (e.g. @airbnb)' },
@@ -184,7 +186,14 @@ class EditCollectiveForm extends React.Component {
           maxLength: 128,
           type: 'text',
           placeholder: 'meetup, javascript'
-        }
+        },
+        {
+          name: 'tos',
+          type: 'text',
+          placeholder: '',
+          defaultValue: get(this.state.collective, 'settings.tos'),
+          when: () => get(this.state.collective, 'isHost'),
+        },
       ],
       images: [
         {
