@@ -309,7 +309,7 @@ describe('Collective model', () => {
 
     it('gets the latest donations of a user collective', () => {
       return Collective.findOne({where: { type: 'USER' }}).then(userCollective => {
-        return userCollective.getLatestDonations(new Date('2016-06-01'), new Date('2016-08-01'))
+        return userCollective.getLatestTransactions(new Date('2016-06-01'), new Date('2016-08-01'))
           .then(donations => {
             expect(donations.length).to.equal(8);
           })
@@ -318,7 +318,7 @@ describe('Collective model', () => {
 
     it('gets the latest donations of a user collective to open source', () => {
       return Collective.findOne({where: { type: 'USER' }}).then(userCollective => {
-        return userCollective.getLatestDonations(new Date('2016-06-01'), new Date('2016-08-01'), ['open source'])
+        return userCollective.getLatestTransactions(new Date('2016-06-01'), new Date('2016-08-01'), ['open source'])
           .then(donations => {
             expect(donations.length).to.equal(1);
             expect(donations[0]).to.have.property("amount");

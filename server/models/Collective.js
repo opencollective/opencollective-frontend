@@ -610,6 +610,150 @@ export default function(Sequelize, DataTypes) {
     });
   }
 
+  /**
+   * Get new orders in last time period
+   * @param {*} startDate beginning of the time period
+   * @param {*} endDate end of the time period
+   */
+  Collective.prototype.getNewOrders = async function(startDate = 0, endDate = new Date) {
+    const orders = await models.Order.findAll({
+      where: {
+        CollectiveId: this.id,
+        createdAt: { [Op.gte]: startDate, [Op.lt]: endDate }
+      },
+      paranoid: false,
+      include: [
+        { model: models.Collective, as: "fromCollective" },
+        { model: models.Tier }
+      ]
+    });
+    orders.sort((a, b) => {
+      if (a.dataValues.totalAmount > b.dataValues.totalAmount) return -1;
+      else return 1;
+    });
+    return orders;
+  }
+
+  /**
+   * Get orders whose subscription was cancelled during last time period
+   * @param {*} startDate beginning of the time period
+   * @param {*} endDate end of the time period
+   */
+  Collective.prototype.getCancelledOrders = async function(startDate = 0, endDate = new Date) {
+    const orders = await models.Order.findAll({
+      where: {
+        CollectiveId: this.id
+      },
+      include: [
+        {
+          model: models.Subscription,
+          required: true,
+          where: {
+            deactivatedAt: { [Op.gte]: startDate, [Op.lt]: endDate }
+          }
+        },
+        {
+          model: models.Collective,
+          as: "fromCollective"
+        },
+        {
+          model: models.Tier
+        }
+      ]
+    }).map(async (order) => {
+      order.totalTransactions = await order.getTotalTransactions();
+      return order;
+    });
+
+    orders.sort((a, b) => {
+      if (a.dataValues.totalAmount > b.dataValues.totalAmount) return -1;
+      else return 1;
+    });
+
+    return orders;
+  }
+
+  /**
+   * Get the total number of backers (individuals or organizations that have given money to the collective)
+   * @params: { type, since, until }
+   * type: COLLECTIVE/USER/ORGANIZATION or an array of types
+   * until: date till when to count the number of backers
+   */
+  Collective.prototype.getBackersCount = function(options = {}) {
+
+    const query = {
+      attributes: [
+        [Sequelize.fn('COUNT', Sequelize.fn('DISTINCT', Sequelize.col('FromCollectiveId'))), 'count']
+      ],
+      where: {
+        CollectiveId: this.id,
+        FromCollectiveId: { [Op.ne]: this.HostCollectiveId },
+        type: 'CREDIT'
+      }
+    };
+
+    if (options.since) {
+      query.where.createdAt = query.where.createdAt || {};
+      query.where.createdAt[Op.gte] = options.since;
+    }
+    if (options.until) {
+      query.where.createdAt = query.where.createdAt || {};
+      query.where.createdAt[Op.lt] = options.until;
+    }
+
+    if (options.type) {
+      const types = (typeof options.type === 'string') ? [options.type] : options.type;
+      query.include = [
+        {
+          model: models.Collective,
+          as: 'fromCollective',
+          attributes: [],
+          required: true,
+          where: { type: { [Op.in]: types }}
+        }
+      ];
+      query.raw = true; // need this otherwise it automatically also fetches Transaction.id which messes up everything
+    }
+
+    let method;
+    if (options.group) {
+      query.attributes.push('fromCollective.type');
+      query.include = [
+        {
+          model: models.Collective,
+          as: 'fromCollective',
+          attributes: [],
+          required: true
+        }
+      ];
+      query.raw = true; // need this otherwise it automatically also fetches Transaction.id which messes up everything
+      query.group = options.group;
+      method = "findAll";
+    } else {
+      method = "findOne";
+    }
+
+    return models.Transaction[method](query).then(res => {
+        if (options.group) {
+          const stats = { id: this.id };
+          let all = 0;
+          // when it's a raw query, the result is not in dataValues
+          res.forEach(r => {
+            stats[r.type] = r.count;
+            all += r.count;
+          })
+          stats.all = all;
+          debug("getBackersCount", stats);
+          return stats;
+        } else {
+          const result = res.dataValues || res || {};
+          debug("getBackersCount", result);
+          if (!result.count) return 0;
+          return Promise.resolve(Number(result.count));
+        }
+      });
+  };
+
   Collective.prototype.getIncomingOrders = function(options) {
     const query = deepmerge({
       where: { CollectiveId: this.id }
@@ -655,7 +799,7 @@ export default function(Sequelize, DataTypes) {
    *  { name: 'backer', users: [ {UserObject}, {UserObject} ], range: [], ... }
    * ]
    */
-  Collective.prototype.getTiersWithUsers = function(options = { active: false, attributes: ['id', 'username', 'image', 'firstDonation', 'lastDonation', 'totalDonations', 'website'] }) {
+  Collective.prototype.getTiersWithUsers = function(options = {active: false, attributes: ['id', 'username', 'image', 'firstDonation', 'lastDonation', 'totalDonations', 'website'] }) {
     const tiersById = {};
       // Get the list of tiers for the collective (including deleted ones)
     return models.Tier
@@ -1133,7 +1277,13 @@ export default function(Sequelize, DataTypes) {
     .then(result => Promise.resolve(parseInt(result.toJSON().total, 10)));
   };
 
-  Collective.prototype.getLatestDonations = function(since, until, tags) {
+  /**
+   * Get the latest transactions made by this collective
+   * @param {*} since 
+   * @param {*} until 
+   * @param {*} tags if not null, only takes into account donations made to collectives that contains one of those tags
+   */
+  Collective.prototype.getLatestTransactions = function(since, until, tags) {
     tags = tags || [];
     return models.Transaction.findAll({
       where: {
@@ -1141,89 +1291,9 @@ export default function(Sequelize, DataTypes) {
         createdAt: { [Op.gte]: since || 0, [Op.lt]: until || new Date}
       },
       order: [ ['amount','DESC'] ],
-      include: [ { model: models.Collective, as: 'collective', where: { tags: { [Op.contains]: tags } } } ]
+      include: [ { model: models.Collective, as: 'collective', where: { tags: { [Op.overlap]: tags } } } ],
+      logging: console.log
     });
-  };
-
-  /**
-   * Get the total number of backers (individuals or organizations that have given money to the collective)
-   * @params: { type, since, until }
-   * type: COLLECTIVE/USER/ORGANIZATION or an array of types
-   * until: date till when to count the number of backers
-   */
-  Collective.prototype.getBackersCount = function(options = {}) {
-
-    const query = {
-      attributes: [
-        [Sequelize.fn('COUNT', Sequelize.fn('DISTINCT', Sequelize.col('FromCollectiveId'))), 'count']
-      ],
-      where: {
-        CollectiveId: this.id,
-        FromCollectiveId: { [Op.ne]: this.HostCollectiveId },
-        type: 'CREDIT'
-      }
-    };
-
-    if (options.since) {
-      query.where.createdAt = query.where.createdAt || {};
-      query.where.createdAt[Op.gte] = options.since;
-    }
-    if (options.until) {
-      query.where.createdAt = query.where.createdAt || {};
-      query.where.createdAt[Op.lt] = options.until;
-    }
-
-    if (options.type) {
-      const types = (typeof options.type === 'string') ? [options.type] : options.type;
-      query.include = [
-        {
-          model: models.Collective,
-          as: 'fromCollective',
-          attributes: [],
-          required: true,
-          where: { type: { [Op.in]: types }}
-        }
-      ];
-      query.raw = true; // need this otherwise it automatically also fetches Transaction.id which messes up everything
-    }
-
-    let method;
-    if (options.group) {
-      query.attributes.push('fromCollective.type');
-      query.include = [
-        {
-          model: models.Collective,
-          as: 'fromCollective',
-          attributes: [],
-          required: true
-        }
-      ];
-      query.raw = true; // need this otherwise it automatically also fetches Transaction.id which messes up everything
-      query.group = options.group;
-      method = "findAll";
-    } else {
-      method = "findOne";
-    }
-
-    return models.Transaction[method](query).then(res => {
-        if (options.group) {
-          const stats = { id: this.id };
-          let all = 0;
-          // when it's a raw query, the result is not in dataValues
-          res.forEach(r => {
-            stats[r.type] = r.count;
-            all += r.count;
-          })
-          stats.all = all;
-          debug("getBackersCount", stats);
-          return stats;
-        } else {
-          const result = res.dataValues || res || {};
-          debug("getBackersCount", result);
-          if (!result.count) return 0;
-          return Promise.resolve(Number(result.count));
-        }
-      });
   };
 
   Collective.prototype.isHost = function() {

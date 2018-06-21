@@ -100,7 +100,7 @@ const sendMessage = (recipients, subject, html, options = {}) => {
 
   if (process.env.NODE_ENV === 'staging') {
     subject = `[STAGING] ${subject}`;
-  } else if (process.env.NODE_ENV !== 'production') {
+  } else if (process.env.NODE_ENV !== 'production' && process.env.WEBSITE_URL !== "https://opencollective.com") {
     subject = `[TESTING] ${subject}`;
   }
 
@@ -142,9 +142,9 @@ const sendMessage = (recipients, subject, html, options = {}) => {
       // only attach tag in production to keep data clean
       const tag = process.env.NODE_ENV === 'production' ? options.tag : 'internal';
       const headers = { 'X-Mailgun-Tag': tag, 'X-Mailgun-Dkim': 'yes' };
-      debug("mailgun> sending email to ", to, "bcc", bcc, "text", text);
+      debug("mailgun> sending email to ", to, "bcc", bcc);
 
-      mailgun.sendMail({ from, cc, to, bcc, subject, text, html, headers, attachments }, (err, info) => {
+      return mailgun.sendMail({ from, cc, to, bcc, subject, text, html, headers, attachments }, (err, info) => {
         if (err) {
           debug(">>> mailgun.sendMail error", err);
           return reject(err);
@@ -156,8 +156,8 @@ const sendMessage = (recipients, subject, html, options = {}) => {
     });
   } else {
     debug(">>> mailgun not configured");
-    debug("text", options.text);
-    debug("html", html);
+    debugLib("text")(options.text);
+    debugLib("html")(html);
     return Promise.resolve();
   }
 };

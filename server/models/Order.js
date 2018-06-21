@@ -134,17 +134,6 @@ export default function(Sequelize, DataTypes) {
 
     getterMethods: {
 
-      // total Transactions over time for this order
-      totalTransactions() {
-        if (!this.SubscriptionId) return this.totalAmount;
-        return models.Transaction.sum('amount', {
-          where: {
-            OrderId: this.id,
-            type: TransactionTypes.CREDIT
-          }
-        })
-      },
-
       // does this payment method support recurring payments?
       recurring() {
         return (this.service === 'stripe');
@@ -185,6 +174,17 @@ export default function(Sequelize, DataTypes) {
   /**
    * Instance Methods
    */
+
+  // total Transactions over time for this order
+  Order.prototype.getTotalTransactions = function() {
+    if (!this.SubscriptionId) return this.totalAmount;
+    return models.Transaction.sum('amount', {
+      where: {
+        OrderId: this.id,
+        type: TransactionTypes.CREDIT
+      }
+    });
+  }
 
   Order.prototype.setPaymentMethod = function(paymentMethodData) {
     debug("setPaymentMethod", paymentMethodData);

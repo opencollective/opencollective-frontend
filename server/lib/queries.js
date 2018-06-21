@@ -217,6 +217,7 @@ const getTopBackers = (since, until, tags, limit) => {
     SELECT
       MAX(fromCollective.id) as id,
       MAX(fromCollective.slug) as slug,
+      MAX(fromCollective.name) as name,
       MAX(fromCollective.website) as "website",
       MAX(fromCollective."twitterHandle") as "twitterHandle",
       MAX(fromCollective.image) as "image",
