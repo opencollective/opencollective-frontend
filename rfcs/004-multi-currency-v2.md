@@ -2,22 +2,60 @@
 
 ## Overview
 
-Currently, each collective has their own currency. And every
-transaction between collectives of different currency generate a
-currency conversion.
-
-The goal of this RFC is to spec out a flow for the use cases we
-support that 0. Guarantee the accuracy of the ledger, 1. Minimize the
-number of conversions between exchanges to avoid fees.
+There's currently a bug in the way we process transactions involving
+multiple currencies. More specifically, the problem happens when the
+host currency is different from the collective currency. In that
+situation the system converts the amount from the user's currency to
+the collective's currency but stores it host currency.
 
 ## Goals
 
 1. Store amounts in Host Currency
 2. Define storage for ledger
-3. Where currency conversion happens
+3. Document where currency conversion happens
 4. Multi Wallets
 
 ### Store amounts in Host Currency
+
+The host is the entity that stores the donation money in their bank
+account. The collective's 
+
+Since the collective doesn't really store any money,  only
+use the collective's currency for display purposes.  We should
+deprecate the
+
+These are all the possible cases
+
+Orders
+ * User(A) -> HOST(A) -> COLLECTIVE(A)
+ * User(A) -> HOST(B) -> COLLECTIVE(B)
+ * User(A) -> HOST(B) -> COLLECTIVE(C)
+
+Expenses
+ * Host(A) -> User(A)
+ * Host(A) -> User(B)
+
+
+
+In practical terms, if a 
+
+
+And every transaction between collectives of different currency
+generate a currency conversion.
+
+
+To give some context, it's important to remember that collectives
+don't really store
+
+
+
+The goal of this RFC is to spec out a flow for the use cases we
+support that 0. Guarantee the accuracy of the ledger, 1. Minimize the
+number of conversions between exchanges to avoid fees.
+
+
+There's currently a bug in the way we store currency exchange. We 
+
 
 The ledger of Collectives without a bank account is virtual. They all
 need a host to actually store money. Each Collective under a host
