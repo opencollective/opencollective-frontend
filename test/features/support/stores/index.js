@@ -166,6 +166,24 @@ export async function createExpense(user, expenseData) {
   return expenses.createExpense(user, expenseData);
 }
 
+export async function createApprovedExpense(user, expenseData) {
+  const expense = await createExpense(user, expenseData);
+  await expense.update({ status: 'APPROVED' });
+  return expense;
+}
+
+export async function createPaidExpense(user, expenseData) {
+  const expense = await createExpense(user, expenseData);
+  await expense.update({ status: 'PAID' });
+  return expense;
+}
+
+export async function createRejectedExpense(user, expenseData) {
+  const expense = await createExpense(user, expenseData);
+  await expense.update({ status: 'REJECTED' });
+  return expense;
+}
+
 /** Create order and set payment method information
  *
  * @param {models.Collective} opt.from is the collective the order is
