@@ -192,6 +192,7 @@ export async function newOrder(opt) {
   });
   await order.setPaymentMethod(paymentMethodData || {
     token: 'tok_123456781234567812345678',
+    currency,
   });
   return { order };
 }
