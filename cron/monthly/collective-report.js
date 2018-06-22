@@ -56,7 +56,7 @@ const init = () => {
 
   let slugs;
   if (process.env.DEBUG && process.env.DEBUG.match(/preview/)) {
-    // slugs = ['vuejs', 'webpack', 'wwcodeaustin','railsgirlsatl','cyclejs','mochajs','chsf','freeridetovote','tipbox'];
+    slugs = ['vuejs', 'webpack', 'wwcodeaustin','railsgirlsatl','cyclejs','mochajs','chsf','freeridetovote','tipbox'];
   }
   if (process.env.SLUGS) {
     slugs = process.env.SLUGS.split(',');
