@@ -1111,6 +1111,21 @@ export default function(Sequelize, DataTypes) {
     });
   };
 
+
+  Collective.prototype.getUpdates = function(status, startDate = 0, endDate = new Date) {
+    const where = {
+      createdAt: { [Op.lt]: endDate },
+      CollectiveId: this.id
+    };
+    if (startDate) where.createdAt[Op.gte] = startDate;
+    if (status === 'published') where.publishedAt = { [Op.ne]: null };
+
+    return models.Update.findAll({
+      where,
+      order: [['createdAt','DESC']]
+    });
+  };
+
   Collective.prototype.getTopExpenseCategories = function(startDate, endDate) {
     return queries.getTopExpenseCategories(this.id, { since: startDate, until: endDate });
   };

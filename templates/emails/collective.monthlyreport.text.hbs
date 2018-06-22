@@ -6,12 +6,47 @@ Balance: {{{currency collective.stats.balance currency=collective.currency}}} (+
 {{collective.stats.backers.lastMonth}} backers (+{{collective.stats.backers.new}}{{#if collective.stats.backers.lost}}, -{{collective.stats.backers.lost}}{{/if}}) 
 
 
-🗞 Give your {{collective.stats.backers.lastMonth}} backers an update!
-Don't forget to regularly >post an update on your collective page</a> to keep your backers posted on your latest activities!
+🗞  Latest updates
+{{#if collective.updates}}
+  {{#each collective.updates}}
+- {{{moment publishedAt format="MM/DD"}}} {{title}}
+  https://opencollective.com/{{@root.collective.slug}}/updates/{{slug}}
+  {{/each}}
+{{else}}
+Your {{collective.stats.backers.lastMonth}} backers haven't heard from you last month!
+Don't forget to regularly post an update on your collective page to keep your backers posted on your latest activities!
 https://opencollective.com/{{collective.slug}}/updates
+{{/if}}
 
+{{#if collective.newOrders}}
+😏  {{collective.newOrders.length}} new {{{pluralize "backer" n=collective.newOrders.length}}}
+{{#each collective.newOrders}}
 
-🗒 Expenses
+- {{fromCollective.name}}
+{{#if fromCollective.website}}  {{fromCollective.website}}{{/if}}{{#if fromCollective.twitterHandle}} https://twitter.com/{{fromCollective.twitterHandle}}{{/if}}
+{{#if fromCollective.description}}  {{fromCollective.description}}{{/if}}
+{{#if Tier.name}}  {{Tier.name}} ({{{currency totalAmount currency=currency}}} {{#if Tier.interval}}per {{Tier.interval}}{{/if}})
+{{else}}
+  {{{currency totalAmount currency=currency}}} (one time)
+{{/if}}
+{{/each}}
+{{/if}}
+
+{{#if collective.cancelledOrders}}
+😒   {{collective.cancelledOrders.length}} new {{{pluralize "backer" n=collective.cancelledOrders.length}}}
+  {{#each collective.cancelledOrders}}
+
+- {{fromCollective.name}}
+{{#if fromCollective.website}}  {{fromCollective.website}}{{/if}} {{#if fromCollective.twitterHandle}} https://twitter.com/{{fromCollective.twitterHandle}}{{/if}}
+{{#if fromCollective.description}}  {{fromCollective.description}}{{/if}}
+{{#if Tier.name}}  {{Tier.name}} ({{{currency totalAmount currency=currency}}} {{#if Tier.interval}}per {{Tier.interval}}{{/if}})
+{{else}}
+{{{currency totalAmount currency=currency}}} (one time)
+{{/if}}
+{{/each}}
+{{/if}}
+
+🗒   Expenses
 
 {{#each collective.expenses}}
 - {{{moment createdAt format="MM/DD"}}} {{{currency amount currency=currency}}} {{description}} [{{toLowerCase status}}]
@@ -23,7 +58,7 @@ Go to {{@root.collective.publicUrl}}/expenses to submit a new expense.
 
 
 {{#if topBackers}}
-💰 Recent sponsor activity on Open Collective
+💰  Recent sponsor activity on Open Collective
 
 {{#each topBackers}}
 - {{name}} gave {{{donationsString.text}}}
@@ -31,7 +66,7 @@ Go to {{@root.collective.publicUrl}}/expenses to submit a new expense.
 {{/if}}
 
 
-🔗 New Related Collectives
+🔗  New Related Collectives
 
 {{#each relatedCollectives}}
 {{publicUrl}}

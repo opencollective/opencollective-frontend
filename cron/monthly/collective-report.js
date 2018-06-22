@@ -151,7 +151,8 @@ const processCollective = (collective) => {
     collective.getRelatedCollectives(3, 0, 'c."createdAt"', 'DESC'),
     collective.getBackersStats(startDate, endDate),
     collective.getNewOrders(startDate, endDate),
-    collective.getCancelledOrders(startDate, endDate)
+    collective.getCancelledOrders(startDate, endDate),
+    collective.getUpdates("published", startDate, endDate)
   ];
 
   let emailData = {};
@@ -174,6 +175,7 @@ const processCollective = (collective) => {
                 data.collective.stats.totalExpenses = results[4];
                 data.collective.expenses = results[5];
                 data.relatedCollectives = results[6];
+                data.collective.updates = results[10];
                 emailData = data;
                 return collective;
               });

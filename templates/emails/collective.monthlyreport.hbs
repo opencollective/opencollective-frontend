@@ -7,14 +7,22 @@ Subject: {{{capitalize collective.name}}} Collective {{month}} Report
     text-align: left;
     margin-top: 36px;
   }
+  .section h2 {
+    margin-top: 0px;
+    margin-bottom: 0px;
+  }
+  .section {
+    margin-top: 36px;
+    margin-bottom: 12px;
+  }
   .action {
     font-size: 12px;
     margin-left: 5px;    
-    margin-top: 26px;
+    margin-top: 6px;
   }
   .counter {
     font-size: 36px;
-    color: #7FADF2;
+    color: rgb(51, 153, 255);
   }
   .delta {
     color: #7A7B82;
@@ -85,6 +93,24 @@ Subject: {{{capitalize collective.name}}} Collective {{month}} Report
   </table>
   </center>
 
+
+
+  <table border=0 class="section">
+    <tr>
+      <td><h2>🗞 Latest updates</h2></td>
+      <td><div class="action"><a href="{{@root.collective.publicUrl}}/updates/new?utm_source=opencollective&utm_campaign=monthlyreport&utm_medium=email">Submit an update</a></div></td>
+    </tr>
+  </table>
+  {{#if collective.updates}}
+  <ul>
+    {{#each collective.updates}}
+    <li>{{{moment publishedAt format="MM/DD"}}} <a href="https://opencollective.com/{{@root.collective.slug}}/updates/{{slug}}">{{title}}</a></li>
+    {{/each}}
+  </ul>
+  {{else}}
+    <p>Your {{collective.stats.backers.lastMonth}} backers haven't heard from you last month! Don't forget to regularly <a href="https://opencollective.com/{{collective.slug}}/updates">post an update on your collective page</a> to keep your backers posted on your latest activities!</p>
+  {{/if}}
+
   {{#if collective.newOrders}}
     <h2>😏 {{collective.newOrders.length}} new {{{pluralize "backer" n=collective.newOrders.length}}}</h2>
     <table border=0 width="100%"><tr><td>
@@ -106,7 +132,7 @@ Subject: {{{capitalize collective.name}}} Collective {{month}} Report
           <div class="backerInfo">
             {{#if fromCollective.website}}<a href="{{fromCollective.website}}">{{fromCollective.website}}</a><br />{{/if}}
             {{#if fromCollective.description}}<div class="description">{{fromCollective.description}}</div>{{/if}}
-            {{#if Tier.name}}{{Tier.name}} ({{{currency Tier.amount currency=Tier.currency}}} {{#if Tier.interval}}per {{Tier.interval}}{{/if}})
+            {{#if Tier.name}}{{Tier.name}} ({{{currency totalAmount currency=currency}}} {{#if Tier.interval}}per {{Tier.interval}}{{/if}})
             {{else}}
             {{{currency totalAmount currency=currency}}} (one time)
             {{/if}}
@@ -142,7 +168,7 @@ Subject: {{{capitalize collective.name}}} Collective {{month}} Report
           <div class="backerInfo">
             {{#if fromCollective.website}}<a href="{{fromCollective.website}}">{{fromCollective.website}}</a><br />{{/if}}
             {{#if fromCollective.description}}<div class="description">{{fromCollective.description}}</div>{{/if}}
-            {{Tier.name}} since {{{moment createdAt format="MMMM YYYY"}}}<br />
+            {{#if Tier.name}}{{Tier.name}} ({{{currency totalAmount currency=currency}}} {{#if Tier.interval}}per {{Tier.interval}}{{/if}}) since {{{moment createdAt format="MMMM YYYY"}}}<br />{{/if}}
             Total amount donated: {{{currency totalTransactions currency=currency}}}
           </div>
         </td>
@@ -155,7 +181,7 @@ Subject: {{{capitalize collective.name}}} Collective {{month}} Report
     </td></tr></table>
   {{/if}}
 
-  <table border=0>
+  <table border=0 class="section">
     <tr>
       <td><h2>🗒 Expenses</h2></td>
       <td><div class="action"><a href="{{@root.collective.publicUrl}}/expenses/new?utm_source=opencollective&utm_campaign=monthlyreport&utm_medium=email">Submit an expense</a></div></td>
@@ -172,7 +198,7 @@ Subject: {{{capitalize collective.name}}} Collective {{month}} Report
       <td valign="top" class="{{toLowerCase status}}">{{toLowerCase status}}</td>
     </tr>
   {{else}}
-    No expense submitted. 
+    <p>No expense submitted.</p>
   {{/each}}
   </table>
 
@@ -194,18 +220,16 @@ Subject: {{{capitalize collective.name}}} Collective {{month}} Report
   </ul>
   {{/if}}
 
-  <h2>🗞 Give your {{collective.stats.backers.lastMonth}} backers an update!</h2>
-  <p>Don't forget to regularly <a href="https://opencollective.com/{{collective.slug}}/updates">post an update on your collective page</a> to keep your backers posted on your latest activities!</p>
 
-  <center>
-  {{#each collective.tiers}}
-  <table width="100%" height=30>
-    <tr><td colspan="3" height="10">&nbsp;</td></tr>
+  <table border=0 class="section">
     <tr>
-      <td class="tdline"></td><th rowspan=2 nowrap class="center">{{title}}</th><td class="tdline"></td>
+      <td><h2>🏷 Tiers</h2></td>
+      <td><div class="action"><a href="{{@root.collective.publicUrl}}/edit#tiers?utm_source=opencollective&utm_campaign=monthlyreport&utm_medium=email">Edit tiers</a></div></td>
     </tr>
-    <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
   </table>
+  <ul>
+  {{#each collective.tiers}}
+  <li>{{title}} ({{{currency amount currency=currency}}} {{#if interval}}per {{interval}}{{/if}})<br />
 
     {{#each activeBackers}}
       <a href="{{@root.config.host.website}}/{{slug}}?utm_source=opencollective&utm_campaign=monthlyreport&utm_medium=email" class="{{../name}}">
@@ -216,10 +240,9 @@ Subject: {{{capitalize collective.name}}} Collective {{month}} Report
         {{/if}}
       </a>
     {{/each}}
+    </li>
   {{/each}}
-
-  </center>
-
+  </ul>
 
   <h2>🗣 Feedback</h2>
   <p>As always, feel free to reply to this email to give us your feedback. A human will always be there on the other side!</p>
