@@ -1,6 +1,6 @@
 Hi {{recipient.firstName}}!
 
-Here are your monthly stats. We have attached a CSV of the {{collective.transactions.length}} {{{pluralize "transaction" n=collective.transactions.length}}} that you had in {{month}}. Just reply to this email if you have any questions.
+Here are your monthly stats.{{#if collective.transactions}} We have attached a CSV of the {{collective.transactions.length}} {{{pluralize "transaction" n=collective.transactions.length}}} that you had in {{month}}.{{/if}} Just reply to this email if you have any questions.
 
 Balance: {{{currency collective.stats.balance currency=collective.currency}}} (+{{{currency collective.stats.totalDonations currency=collective.currency}}}{{#if collective.stats.totalExpenses}}, {{{currency collective.stats.totalExpenses currency=collective.currency}}}{{/if}}) 
 {{collective.stats.backers.lastMonth}} backers (+{{collective.stats.backers.new}}{{#if collective.stats.backers.lost}}, -{{collective.stats.backers.lost}}{{/if}}) 
@@ -22,8 +22,8 @@ https://opencollective.com/{{collective.slug}}/edit#goals
   https://opencollective.com/{{@root.collective.slug}}/updates/{{slug}}
   {{/each}}
 {{else}}
-Your {{collective.stats.backers.lastMonth}} backers haven't heard from you last month!
-Don't forget to regularly post an update on your collective page to keep your backers posted on your latest activities!
+{{#if collective.stats.backers.lastMonth}}Your {{collective.stats.backers.lastMonth}} backers haven't heard from you last month!{{/if}}
+Don't forget to regularly post an update on your collective page to keep your community posted on your latest activities!
 https://opencollective.com/{{collective.slug}}/updates
 {{/if}}
 

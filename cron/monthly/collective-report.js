@@ -51,13 +51,12 @@ const init = () => {
           'settings',
           'tags'
       ],
-      where: { type: 'COLLECTIVE'},
-      include: [ { model: models.Transaction, required: true }]
+      where: { type: 'COLLECTIVE', isActive: true }
   };
 
   let slugs;
   if (process.env.DEBUG && process.env.DEBUG.match(/preview/)) {
-    slugs = ['vuejs', 'webpack', 'wwcodeaustin','railsgirlsatl','cyclejs','mochajs','chsf','freeridetovote','tipbox'];
+    // slugs = ['vuejs', 'webpack', 'wwcodeaustin','railsgirlsatl','cyclejs','mochajs','chsf','freeridetovote','tipbox'];
   }
   if (process.env.SLUGS) {
     slugs = process.env.SLUGS.split(',');
@@ -190,13 +189,16 @@ const processCollective = (collective) => {
                   data.collective.nextGoal = nextGoal;
                 }
 
-                const collectivesById = { [collective.id]: collective };
-                const csv = models.Transaction.exportCSV(data.collective.transactions, collectivesById);
+                if (data.collective.transactions && data.collective.transactions.length > 0) {
+                  const collectivesById = { [collective.id]: collective };
+                  const csv = models.Transaction.exportCSV(data.collective.transactions, collectivesById);
 
-                options.attachments = [{
-                  filename: csv_filename,
-                  content: csv
-                }];
+                  options.attachments = [{
+                    filename: csv_filename,
+                    content: csv
+                  }];
+                }
+
                 emailData = data;
                 return collective;
               });

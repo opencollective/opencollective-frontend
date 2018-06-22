@@ -88,7 +88,7 @@ Subject: {{{capitalize collective.name}}} Collective {{month}} Report
 </div>
 
 <div>
-  <p>Here are your monthly stats. We have attached a CSV of the {{collective.transactions.length}} {{{pluralize "transaction" n=collective.transactions.length}}} that you had in {{month}}. Just reply to this email if you have any questions.</p>
+  <p>Here are your monthly stats.{{#if collective.transactions}} We have attached a CSV of the {{collective.transactions.length}} {{{pluralize "transaction" n=collective.transactions.length}}} that you had in {{month}}.{{/if}} Just reply to this email if you have any questions.</p>
 
   <center>
   <table border=0 cellpadding=0 cellspacing=0 width=300 style="margin: 30px 0px">
@@ -150,7 +150,7 @@ Subject: {{{capitalize collective.name}}} Collective {{month}} Report
     {{/each}}
   </ul>
   {{else}}
-    <p>Your {{collective.stats.backers.lastMonth}} backers haven't heard from you last month! Don't forget to regularly <a href="https://opencollective.com/{{collective.slug}}/updates">post an update on your collective page</a> to keep your backers posted on your latest activities!</p>
+    <p>{{#if collective.stats.backers.lastMonth}}Your {{collective.stats.backers.lastMonth}} backers haven't heard from you last month! {{/if}}Don't forget to regularly <a href="https://opencollective.com/{{collective.slug}}/updates">post an update on your collective page</a> to keep your community posted on your latest activities!</p>
   {{/if}}
 
   {{#if collective.newOrders}}
@@ -244,6 +244,7 @@ Subject: {{{capitalize collective.name}}} Collective {{month}} Report
   {{/each}}
   </table>
 
+  {{#if collective.tiers}}
   <table border=0 class="section">
     <tr>
       <td><h2>🏷 Tiers</h2></td>
@@ -251,22 +252,23 @@ Subject: {{{capitalize collective.name}}} Collective {{month}} Report
     </tr>
   </table>
   <ul>
-  {{#each collective.tiers}}
-  <li>{{title}} ({{{currency amount currency=currency}}} {{#if interval}}per {{interval}}{{/if}}) - {{activeBackers.length}} active {{{pluralize "backer" n=activeBackers.length}}}
-    <div class="tierMembers">
-      {{#each activeBackers}}
-        <a href="{{@root.config.host.website}}/{{slug}}?utm_source=opencollective&utm_campaign=monthlyreport&utm_medium=email" class="{{../name}}">
-          {{#if isSponsor}}
-            <img src={{resizeImage image height=48}} height="48" alt="{{name}}" border="0" />
-          {{else}}
-            <img src={{resizeImage image height=48 query="/c_thumb,g_face,h_72,r_max,w_72,bo_2px_solid_white/c_thumb,h_72,r_max,w_72,bo_2px_solid_rgb:DDE1E4/e_improve/e_trim/f_auto/" defaultImage="/static/images/avatar-01.svg"}} height="36" width="36" alt="{{name}}" border="0" />
-          {{/if}}
-        </a>
-      {{/each}}
-    </div>
-  </li>
-  {{/each}}
+    {{#each collective.tiers}}
+    <li>{{title}} ({{amountStr}}) - {{activeBackers.length}} active {{{pluralize "backer" n=activeBackers.length}}}
+      <div class="tierMembers">
+        {{#each activeBackers}}
+          <a href="{{@root.config.host.website}}/{{slug}}?utm_source=opencollective&utm_campaign=monthlyreport&utm_medium=email" class="{{../name}}">
+            {{#if isSponsor}}
+              <img src={{resizeImage image height=48}} height="48" alt="{{name}}" border="0" />
+            {{else}}
+              <img src={{resizeImage image height=48 query="/c_thumb,g_face,h_72,r_max,w_72,bo_2px_solid_white/c_thumb,h_72,r_max,w_72,bo_2px_solid_rgb:DDE1E4/e_improve/e_trim/f_auto/" defaultImage="/static/images/avatar-01.svg"}} height="36" width="36" alt="{{name}}" border="0" />
+            {{/if}}
+          </a>
+        {{/each}}
+      </div>
+    </li>
+    {{/each}}
   </ul>
+  {{/if}}
 
   {{#if topBackers}}
   <h2>💰 Recent sponsor activity on Open Collective</h2>
