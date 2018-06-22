@@ -84,7 +84,8 @@ async function notifySubscribers(users, activity, options={}) {
     return;
   }
   debug("notifySubscribers", users.length, users.map(u => u && u.email, activity.type));
-  const unsubscribedUserIds = await models.Notification.getUnsubscribersUserIds(activity.type, activity.CollectiveId);
+  const CollectiveId = get(options, 'collective.id') || activity.CollectiveId;
+  const unsubscribedUserIds = await models.Notification.getUnsubscribersUserIds(activity.type, CollectiveId);
   debug("unsubscribedUserIds", unsubscribedUserIds);
   if (process.env.ONLY) {
     debug("ONLY set to ", process.env.ONLY, " => skipping subscribers");
@@ -213,7 +214,7 @@ async function notifyByEmail(activity) {
         activity.data.expense.payoutMethod = `PayPal (${activity.data.user.paypalEmail})`;
       }
       notifyUserId(activity.data.expense.UserId, activity);
-      notifyAdminsOfCollective(activity.data.host.id, activity, { template: 'collective.expense.approved.for.host' })
+      notifyAdminsOfCollective(activity.data.host.id, activity, { template: 'collective.expense.approved.for.host', collective: activity.data.host })
       break;
 
     case activityType.COLLECTIVE_EXPENSE_PAID:
@@ -221,7 +222,7 @@ async function notifyByEmail(activity) {
         viewLatestExpenses: `${config.host.website}/${activity.data.collective.slug}/expenses#expense${activity.data.expense.id}`
       }
       notifyUserId(activity.data.expense.UserId, activity);
-      notifyAdminsOfCollective(activity.data.host.id, activity, { template: 'collective.expense.paid.for.host' })
+      notifyAdminsOfCollective(activity.data.host.id, activity, { template: 'collective.expense.paid.for.host', collective: activity.data.host })
       break;
 
     case activityType.COLLECTIVE_APPROVED:
@@ -229,7 +230,7 @@ async function notifyByEmail(activity) {
       break;
 
     case activityType.COLLECTIVE_CREATED:
-      notifyAdminsOfCollective(activity.data.host.id, activity, { template: 'collective.created.for.host' });
+      notifyAdminsOfCollective(activity.data.host.id, activity, { template: 'collective.created.for.host', collective: activity.data.host });
       if (activity.data.collective.tags && activity.data.collective.tags.indexOf("meetup") !== -1) {
         notifyAdminsOfCollective(activity.data.collective.id, activity, { template: 'collective.created.meetup' });
       } else {
