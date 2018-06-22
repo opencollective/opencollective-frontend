@@ -11,14 +11,13 @@ import NotificationBar from './NotificationBar';
 import InterestedForm from './InterestedForm';
 import Sponsors from './Sponsors';
 import Responses from './Responses';
-import { capitalize, filterCollection, formatCurrency, trimObject } from '../lib/utils';
+import { capitalize, filterCollection, trimObject } from '../lib/utils';
 import Markdown from 'react-markdown';
 import { defineMessages, FormattedMessage, FormattedDate, FormattedTime } from 'react-intl';
 import { uniqBy, get, union } from 'lodash';
 import { Router } from '../server/pages';
 import { addEventMutations } from '../graphql/mutations';
 import { exportRSVPs } from '../lib/export_file';
-import SectionTitle from './SectionTitle';
 import ExpensesSection from '../apps/expenses/components/ExpensesSection';
 import withIntl from '../lib/withIntl';
 import Button from './Button';
@@ -346,16 +345,11 @@ class Event extends React.Component {
                   </section>
                 }
 
-                <section id="budget" className="clear">
-                  <div className="content" >
-                    <SectionTitle section="budget" values={{ balance: formatCurrency(get(event, 'stats.balance'), event.currency) }} />
-                    <ExpensesSection
-                      collective={event}
-                      LoggedInUser={LoggedInUser}
-                      limit={10}
-                      />
-                  </div>
-                </section>
+                <ExpensesSection
+                  collective={event}
+                  LoggedInUser={LoggedInUser}
+                  limit={10}
+                  />
 
               </div>
             </div>
