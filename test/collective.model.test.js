@@ -307,24 +307,24 @@ describe('Collective model', () => {
         });
     });
 
-    it('gets the latest donations of a user collective', () => {
+    it('gets the latest transactions of a user collective', () => {
       return Collective.findOne({where: { type: 'USER' }}).then(userCollective => {
         return userCollective.getLatestTransactions(new Date('2016-06-01'), new Date('2016-08-01'))
-          .then(donations => {
-            expect(donations.length).to.equal(8);
+          .then(transactions => {
+            expect(transactions.length).to.equal(8);
           })
       });
     });
 
-    it('gets the latest donations of a user collective to open source', () => {
+    it('gets the latest transactions of a user collective to open source', () => {
       return Collective.findOne({where: { type: 'USER' }}).then(userCollective => {
         return userCollective.getLatestTransactions(new Date('2016-06-01'), new Date('2016-08-01'), ['open source'])
-          .then(donations => {
-            expect(donations.length).to.equal(1);
-            expect(donations[0]).to.have.property("amount");
-            expect(donations[0]).to.have.property("currency");
-            expect(donations[0]).to.have.property("collective");
-            expect(donations[0].collective).to.have.property("name");
+          .then(transactions => {
+            expect(transactions.length).to.equal(1);
+            expect(transactions[0]).to.have.property("amount");
+            expect(transactions[0]).to.have.property("currency");
+            expect(transactions[0]).to.have.property("collective");
+            expect(transactions[0].collective).to.have.property("name");
           })
       });
     });

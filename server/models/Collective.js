@@ -1284,15 +1284,17 @@ export default function(Sequelize, DataTypes) {
    * @param {*} tags if not null, only takes into account donations made to collectives that contains one of those tags
    */
   Collective.prototype.getLatestTransactions = function(since, until, tags) {
-    tags = tags || [];
+    const conditionOnCollective = {};
+    if (tags) {
+      conditionOnCollective.tags = { [Op.overlap]: tags };
+    }
     return models.Transaction.findAll({
       where: {
         FromCollectiveId: this.id,
         createdAt: { [Op.gte]: since || 0, [Op.lt]: until || new Date}
       },
       order: [ ['amount','DESC'] ],
-      include: [ { model: models.Collective, as: 'collective', where: { tags: { [Op.overlap]: tags } } } ],
-      logging: console.log
+      include: [ { model: models.Collective, as: 'collective', where: conditionOnCollective } ]
     });
   };
 
