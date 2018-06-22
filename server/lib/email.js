@@ -8,12 +8,13 @@ import templates from './emailTemplates';
 import { isEmailInternal } from './utils';
 import crypto from 'crypto';
 import fs from 'fs';
+import path from 'path';
 import he from 'he';
 const debug = debugLib('email');
 
 const render = (template, data) => {
 
-  let text, filepath;
+  let text;
   data.imageNotSvg = data.collective && data.collective.image && !data.collective.image.endsWith('.svg');
   data = _.merge({}, data);
   delete data.config;
@@ -28,21 +29,6 @@ const render = (template, data) => {
     text = templates[`${template}.text`](data);
   }
   const html = juice(he.decode(templates[template](data)));
-  const recipient = get(data, 'recipient.dataValues') || data.recipient || {};
-  const slug = data.collective && data.collective.slug || recipient.slug || recipient.email && recipient.email.substr(0, recipient.email.indexOf('@')) || recipient.substr && recipient.substr(0, recipient.indexOf('@'));
-
-  // When in preview mode, we export an HTML version of the email in `/tmp/:template.:slug.html`
-  if (process.env.DEBUG && process.env.DEBUG.match(/preview/)) {
-    filepath = `/tmp/${template}.${slug}.html`;
-    const script = `<script>data=${JSON.stringify(data)};</script>`;
-    fs.writeFileSync(filepath, `${html}\n\n${script}`);
-    console.log(">>> preview email", filepath);
-    if (text) {
-      filepath = `/tmp/${template}.${slug}.txt`;
-      fs.writeFileSync(filepath, text);
-      console.log(">>> preview email", filepath);
-    }
-  }
 
   // When in development mode, we log the data used to compile the template
   // (useful to get login token without sending an email)
@@ -100,7 +86,7 @@ const sendMessage = (recipients, subject, html, options = {}) => {
 
   if (process.env.NODE_ENV === 'staging') {
     subject = `[STAGING] ${subject}`;
-  } else if (process.env.NODE_ENV !== 'production') {
+  } else if (process.env.NODE_ENV !== 'production' && process.env.WEBSITE_URL !== "https://opencollective.com") {
     subject = `[TESTING] ${subject}`;
   }
 
@@ -142,9 +128,9 @@ const sendMessage = (recipients, subject, html, options = {}) => {
       // only attach tag in production to keep data clean
       const tag = process.env.NODE_ENV === 'production' ? options.tag : 'internal';
       const headers = { 'X-Mailgun-Tag': tag, 'X-Mailgun-Dkim': 'yes' };
-      debug("mailgun> sending email to ", to, "bcc", bcc, "text", text);
+      debug("mailgun> sending email to ", to, "bcc", bcc);
 
-      mailgun.sendMail({ from, cc, to, bcc, subject, text, html, headers, attachments }, (err, info) => {
+      return mailgun.sendMail({ from, cc, to, bcc, subject, text, html, headers, attachments }, (err, info) => {
         if (err) {
           debug(">>> mailgun.sendMail error", err);
           return reject(err);
@@ -156,8 +142,8 @@ const sendMessage = (recipients, subject, html, options = {}) => {
     });
   } else {
     debug(">>> mailgun not configured");
-    debug("text", options.text);
-    debug("html", html);
+    debugLib("text")(options.text);
+    debugLib("html")(html);
     return Promise.resolve();
   }
 };
@@ -262,7 +248,35 @@ const generateEmailFromTemplate = (template, recipient, data = {}, options = {})
   if (!templates[template]) {
     return Promise.reject(new Error(`Invalid email template: ${template}`));
   }
-  return Promise.resolve(render(template, data));
+
+  const renderedTemplate = render(template, data);
+
+  let filepath;
+  // When in preview mode, we export an HTML version of the email in `/tmp/:template.:slug.html`
+  if (process.env.DEBUG && process.env.DEBUG.match(/preview/)) {
+    const recipient = get(data, 'recipient.dataValues') || data.recipient || {};
+    const slug = data.collective && data.collective.slug || recipient.slug || recipient.email && recipient.email.substr(0, recipient.email.indexOf('@')) || recipient.substr && recipient.substr(0, recipient.indexOf('@'));
+    filepath = path.resolve(`/tmp/${template}.${slug}.html`);
+    const script = `<script>data=${JSON.stringify(data)};</script>`;
+    fs.writeFileSync(filepath, `${renderedTemplate.html}\n\n${script}`);
+    console.log(">>> preview email", filepath);
+    if (renderedTemplate.text) {
+      filepath = `/tmp/${template}.${slug}.txt`;
+      fs.writeFileSync(filepath, renderedTemplate.text);
+      console.log(">>> preview email", filepath);
+    }
+
+    if (options.attachments) {
+      options.attachments.map(attachment => {
+        filepath = path.resolve(`/tmp/${slug}-${attachment.filename}`);
+        fs.writeFileSync(filepath, attachment.content);
+        console.log(">>> preview attachment", filepath);
+      })
+    }
+
+  }
+
+  return Promise.resolve(renderedTemplate);
 };
 
 /*

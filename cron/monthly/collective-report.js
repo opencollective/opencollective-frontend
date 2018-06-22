@@ -16,11 +16,14 @@ import Promise from 'bluebird';
 import debugLib from 'debug';
 import { getTiersStats } from '../../server/lib/utils';
 import models, { Op } from '../../server/models';
-import emailLib from '../../server/lib/email';
+import { notifyAdminsOfCollective } from '../../server/lib/notifications';
 
-const d = new Date;
-d.setMonth(d.getMonth() - 1);
+const d = process.env.DATE ? new Date(process.env.DATE) : new Date;
+if (!process.env.DATE) {
+  d.setMonth(d.getMonth() - 1);
+}
 const month = moment(d).format('MMMM');
+const dateFormat = 'YYYYMM';
 
 const startDate = new Date(d.getFullYear(), d.getMonth(), 1);
 const endDate = new Date(d.getFullYear(), d.getMonth()+1, 1);
@@ -28,12 +31,6 @@ const endDate = new Date(d.getFullYear(), d.getMonth()+1, 1);
 console.log("startDate", startDate,"endDate", endDate);
 
 const debug = debugLib('monthlyreport');
-
-const {
-  Collective,
-  Notification,
-  User
-} = models;
 
 const processCollectives = (collectives) => {
     return Promise.map(collectives, processCollective, { concurrency: 1 });
@@ -49,16 +46,17 @@ const init = () => {
           'id',
           'slug',
           'name',
+          'twitterHandle',
           'currency',
+          'settings',
           'tags'
       ],
-      where: { type: 'COLLECTIVE'},
-      include: [ { model: models.Transaction, required: true }]
+      where: { type: 'COLLECTIVE', isActive: true }
   };
 
   let slugs;
   if (process.env.DEBUG && process.env.DEBUG.match(/preview/)) {
-    slugs = ['vuejs', 'webpack', 'wwcodeaustin','railsgirlsatl','cyclejs','mochajs','chsf','freeridetovote','tipbox'];
+    // slugs = ['vuejs', 'webpack', 'wwcodeaustin','railsgirlsatl','cyclejs','mochajs','chsf','freeridetovote','tipbox'];
   }
   if (process.env.SLUGS) {
     slugs = process.env.SLUGS.split(',');
@@ -67,7 +65,7 @@ const init = () => {
     query.where.slug = { [Op.in]: slugs };
   }
 
-  Collective.findAll(query)
+  models.Collective.findAll(query)
   .tap(collectives => {
       console.log(`Preparing the ${month} report for ${collectives.length} collectives`);
   })
@@ -85,7 +83,7 @@ const getTopBackers = (startDate, endDate, tags) => {
   const cacheKey = `${startDate.getTime()}${endDate.getTime()}${tags.join(',')}`;
   if (topBackersCache[cacheKey]) return Promise.resolve(topBackersCache[cacheKey]);
   else {
-    return Collective.getTopBackers(startDate, endDate, tags, 5)
+    return models.Collective.getTopBackers(startDate, endDate, tags, 5)
       .then(backers => {
         if (!backers) return [];
         return Promise.map(backers, backer => processBacker(backer, startDate, endDate, tags))
@@ -107,21 +105,21 @@ const formatCurrency =  (amount, currency) => {
   })
 }
 
-const generateDonationsString = (backer, orders) => {
+const generateDonationsString = (backer, transactions) => {
   if (!backer.name) {
     debug(`Skipping ${backer.username} because it doesn't have a name (${backer.name})`);
     return;
   }
   const donationsTextArray = [], donationsHTMLArray = [];
-  orders = orders.filter(order => (order.totalAmount > 0));
-  if (orders.length === 0) {
+  transactions = transactions.filter(order => (order.amount > 0));
+  if (transactions.length === 0) {
     debug(`Skipping ${backer.name} because there is no donation`);
     return;
   }
-  for (let i=0; i<Math.min(3, orders.length); i++) {
-    const order = orders[i];
-    donationsHTMLArray.push(`${formatCurrency(order.totalAmount, order.currency)} to <a href="https://opencollective.com/${order.Collective.slug}">${order.Collective.name}</a>`);
-    donationsTextArray.push(`${formatCurrency(order.totalAmount, order.currency)} to https://opencollective.com/${order.Collective.slug}`);
+  for (let i=0; i<Math.min(3, transactions.length); i++) {
+    const transaction = transactions[i];
+    donationsHTMLArray.push(`${formatCurrency(transaction.amount, transaction.currency)} to <a href="https://opencollective.com/${transaction.collective.slug}">${transaction.collective.name}</a>`);
+    donationsTextArray.push(`${formatCurrency(transaction.amount, transaction.currency)} to https://opencollective.com/${transaction.collective.slug}`);
   }
   const joinStringArray = (arr) => {
     return arr.join(', ').replace(/,([^, ]*)$/,' and $1');
@@ -133,8 +131,8 @@ const generateDonationsString = (backer, orders) => {
 };
 
 const processBacker = (backer, startDate, endDate, tags) => {
-  return backer.getLatestDonations(startDate, endDate, tags)
-    .then((donations) => generateDonationsString(backer, donations))
+  return backer.getLatestTransactions(startDate, endDate, tags)
+    .then((transactions) => generateDonationsString(backer, transactions))
     .then(donationsString => {
       backer.website = (backer.slug) ? `https://opencollective.com/${backer.slug}` : backer.website || backer.twitterHandle;
       if (!donationsString || !backer.website) return null;
@@ -153,10 +151,17 @@ const processCollective = (collective) => {
     collective.getTotalTransactions(startDate, endDate, 'expense'),
     collective.getExpenses(null, startDate, endDate),
     collective.getRelatedCollectives(3, 0, 'c."createdAt"', 'DESC'),
-    collective.getBackersStats(startDate, endDate)
+    collective.getBackersStats(startDate, endDate),
+    collective.getNewOrders(startDate, endDate),
+    collective.getCancelledOrders(startDate, endDate),
+    collective.getUpdates("published", startDate, endDate),
+    collective.getNextGoal(endDate),
+    collective.getTransactions({ where: { createdAt: { [Op.gte]: startDate, [Op.lt]: endDate }}})
   ];
 
   let emailData = {};
+  const options = {};
+  const csv_filename = `${moment(d).format(dateFormat)}-${collective.slug}-transactions.csv`;
 
   return Promise.all(promises)
           .then(results => {
@@ -167,49 +172,47 @@ const processCollective = (collective) => {
               .then(res => {
                 data.collective = _.pick(collective, ['id', 'name', 'slug', 'currency','publicUrl']);
                 data.collective.tiers = res.tiers;
+                data.collective.backers = res.backers;
                 data.collective.stats = results[7];
+                data.collective.newOrders = results[8];
+                data.collective.cancelledOrders = results[9];
                 data.collective.stats.balance = results[2];
                 data.collective.stats.totalDonations = results[3];
                 data.collective.stats.totalExpenses = results[4];
                 data.collective.expenses = results[5];
                 data.relatedCollectives = results[6];
+                data.collective.updates = results[10];
+                data.collective.transactions = results[12];
+                const nextGoal = results[11];
+                if (nextGoal) {
+                  nextGoal.tweet = `🚀 ${collective.twitterHandle ? `@${collective.twitterHandle}` : collective.name} is at ${nextGoal.percentage} of their next goal: ${nextGoal.title}.\nHelp us get there! 🙌\nhttps://opencollective.com/${collective.slug}`;
+                  data.collective.nextGoal = nextGoal;
+                }
+
+                if (data.collective.transactions && data.collective.transactions.length > 0) {
+                  const collectivesById = { [collective.id]: collective };
+                  const csv = models.Transaction.exportCSV(data.collective.transactions, collectivesById);
+
+                  options.attachments = [{
+                    filename: csv_filename,
+                    content: csv
+                  }];
+                }
+
                 emailData = data;
                 return collective;
               });
           })
-          .then(getRecipients)
-          .then(recipients => sendEmail(recipients, emailData))
+          .then(collective => {
+            const activity = {
+              type: 'collective.monthlyreport',
+              data: emailData
+            };
+            return notifyAdminsOfCollective(collective.id, activity, options);
+          })
           .catch(e => {
             console.error("Error in processing collective", collective.slug, e);
           });
 };
-
-const getRecipients = (collective) => {
-  return Notification.findAll({
-    where: {
-      CollectiveId: collective.id,
-      type: 'collective.monthlyreport',
-      active: true
-    },
-    include: [{ model: User }]
-  }).then(results => {
-    return results.filter(r => Boolean(r.User)).map(r => r.User.dataValues)
-  });
-}
-
-const sendEmail = (recipients, data) => {
-  if (recipients.length === 0) return;
-  return Promise.map(recipients, recipient => {
-    if (!recipient.email) {
-      return Promise.resolve();
-    }
-    data.recipient = recipient;
-    if (process.env.ONLY && recipient.email !== process.env.ONLY) {
-      debug("Skipping ", recipient.email);
-      return Promise.resolve();
-    }
-    return emailLib.send('collective.monthlyreport', recipient.email, data);
-  });
-}
 
 init();

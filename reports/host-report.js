@@ -5,11 +5,9 @@ import debugLib from 'debug';
 import models, { sequelize, Op } from '../server/models';
 import emailLib from '../server/lib/email';
 import config from 'config';
-import { exportToCSV, exportToPDF } from '../server/lib/utils';
+import { exportToPDF } from '../server/lib/utils';
 import { getTransactions } from '../server/lib/transactions';
 import { getHostedCollectives, getBackersStats, sumTransactions } from '../server/lib/hostlib';
-import path from 'path';
-import fs from 'fs';
 
 const debug = debugLib('hostreport');
 
@@ -238,29 +236,7 @@ async function HostReport(year, month, hostId) {
       })
       .map(processTransaction)
       .tap(transactions => {
-
-        const getColumnName = (attr) => {
-          if (attr === 'CollectiveId') return "collective";
-          if (attr === 'Expense.privateMessage') return "private note";
-          else return attr;
-        }
-
-        const processValue = (attr, value) => {
-          if (attr === "CollectiveId") return collectivesById[value].slug;
-          if (['amount', 'netAmountInCollectiveCurrency', 'paymentProcessorFeeInHostCurrency', 'hostFeeInHostCurrency', 'platformFeeInHostCurrency', 'netAmountInHostCurrency'].indexOf(attr) !== -1) {
-            return value / 100; // converts cents
-          }
-          return value;
-        }
-
-        const csv = exportToCSV(transactions,
-          [
-            'id', 'createdAt', 'CollectiveId', 'amount', 'currency', 'description', 'netAmountInCollectiveCurrency', 'hostCurrency', 'hostCurrencyFxRate',
-            'paymentProcessorFeeInHostCurrency', 'hostFeeInHostCurrency', 'platformFeeInHostCurrency', 'netAmountInHostCurrency', 'Expense.privateMessage'
-          ],
-          getColumnName,
-          processValue);
-
+        const csv = models.Transaction.exportCSV(transactions, collectivesById);
         attachments.push({
           filename: csv_filename,
           content: csv
@@ -324,17 +300,7 @@ async function HostReport(year, month, hostId) {
       // debug("email data transactions", data.transactions);
       debug("email data stats", data.stats);
       debug("email data stats.backers", data.stats.backers);
-      const options = {
-        attachments
-      }
-      if (process.env.DEBUG && process.env.DEBUG.match(/preview/)) {
-        attachments.map(attachment => {
-          const filepath = path.resolve(`/tmp/${data.host.slug}-${attachment.filename}`);
-          fs.writeFileSync(filepath, attachment.content);
-          console.log(">>> preview attachment", filepath);
-        })
-        recipients.push("ops+test@opencollective.com");
-      }
+      const options = { attachments };
       return emailLib.send(emailTemplate, recipients, data, options);
   }
 

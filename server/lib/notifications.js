@@ -86,6 +86,10 @@ async function notifySubscribers(users, activity, options={}) {
   debug("notifySubscribers", users.length, users.map(u => u && u.email, activity.type));
   const unsubscribedUserIds = await models.Notification.getUnsubscribersUserIds(activity.type, activity.CollectiveId);
   debug("unsubscribedUserIds", unsubscribedUserIds);
+  if (process.env.ONLY) {
+    debug("ONLY set to ", process.env.ONLY, " => skipping subscribers");
+    return emailLib.send(options.template || activity.type, process.env.ONLY, data, options)
+  }
   return users.map(u => {
     if (!u) return;
     // skip users that have unsubscribed
@@ -117,7 +121,7 @@ async function notifyUserId(UserId, activity, options) {
   return emailLib.send(activity.type, user.email, activity.data, options);
 }
 
-async function notifyAdminsOfCollective(CollectiveId, activity, options = {}) {
+export async function notifyAdminsOfCollective(CollectiveId, activity, options = {}) {
   debug("notify admins of CollectiveId", CollectiveId);
   const collective = await models.Collective.findById(CollectiveId)
   if (!collective) {
