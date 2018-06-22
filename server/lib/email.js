@@ -185,7 +185,7 @@ const getNotificationLabel = (template, recipients) => {
  */
 const generateEmailFromTemplate = (template, recipient, data = {}, options = {}) => {
 
-  const slug = get(data, 'collective.slug') || 'undefined';
+  const slug = get(options, 'collective.slug') || get(data, 'collective.slug') || 'undefined';
 
   // If we are sending the same email to multiple recipients, it doesn't make sense to allow them to unsubscribe
   if (!isArray(recipient)) {
