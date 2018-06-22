@@ -23,6 +23,7 @@ if (!process.env.DATE) {
   d.setMonth(d.getMonth() - 1);
 }
 const month = moment(d).format('MMMM');
+const dateFormat = 'YYYYMM';
 
 const startDate = new Date(d.getFullYear(), d.getMonth(), 1);
 const endDate = new Date(d.getFullYear(), d.getMonth()+1, 1);
@@ -45,7 +46,9 @@ const init = () => {
           'id',
           'slug',
           'name',
+          'twitterHandle',
           'currency',
+          'settings',
           'tags'
       ],
       where: { type: 'COLLECTIVE'},
@@ -152,10 +155,14 @@ const processCollective = (collective) => {
     collective.getBackersStats(startDate, endDate),
     collective.getNewOrders(startDate, endDate),
     collective.getCancelledOrders(startDate, endDate),
-    collective.getUpdates("published", startDate, endDate)
+    collective.getUpdates("published", startDate, endDate),
+    collective.getNextGoal(endDate),
+    collective.getTransactions({ where: { createdAt: { [Op.gte]: startDate, [Op.lt]: endDate }}})
   ];
 
   let emailData = {};
+  const options = {};
+  const csv_filename = `${moment(d).format(dateFormat)}-${collective.slug}-transactions.csv`;
 
   return Promise.all(promises)
           .then(results => {
@@ -176,6 +183,20 @@ const processCollective = (collective) => {
                 data.collective.expenses = results[5];
                 data.relatedCollectives = results[6];
                 data.collective.updates = results[10];
+                data.collective.transactions = results[12];
+                const nextGoal = results[11];
+                if (nextGoal) {
+                  nextGoal.tweet = `🚀 ${collective.twitterHandle ? `@${collective.twitterHandle}` : collective.name} is at ${nextGoal.percentage} of their next goal: ${nextGoal.title}.\nHelp us get there! 🙌\nhttps://opencollective.com/${collective.slug}`;
+                  data.collective.nextGoal = nextGoal;
+                }
+
+                const collectivesById = { [collective.id]: collective };
+                const csv = models.Transaction.exportCSV(data.collective.transactions, collectivesById);
+
+                options.attachments = [{
+                  filename: csv_filename,
+                  content: csv
+                }];
                 emailData = data;
                 return collective;
               });
@@ -185,7 +206,7 @@ const processCollective = (collective) => {
               type: 'collective.monthlyreport',
               data: emailData
             };
-            return notifyAdminsOfCollective(collective.id, activity);
+            return notifyAdminsOfCollective(collective.id, activity, options);
           })
           .catch(e => {
             console.error("Error in processing collective", collective.slug, e);

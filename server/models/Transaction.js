@@ -7,6 +7,8 @@ import CustomDataTypes from './DataTypes';
 import uuidv4 from 'uuid/v4';
 import debugLib from 'debug';
 import { toNegative } from '../lib/math';
+import { exportToCSV } from '../lib/utils';
+import { get } from 'lodash';
 
 const debug = debugLib("transaction");
 
@@ -254,6 +256,30 @@ export default (Sequelize, DataTypes) => {
       return Transaction.createDoubleEntry(transaction);
     }).catch(console.error);
   };
+
+  Transaction.exportCSV = (transactions, collectivesById) => {
+    const getColumnName = (attr) => {
+      if (attr === 'CollectiveId') return "collective";
+      if (attr === 'Expense.privateMessage') return "private note";
+      else return attr;
+    }
+
+    const processValue = (attr, value) => {
+      if (attr === "CollectiveId") return get(collectivesById[value], 'slug');
+      if (['amount', 'netAmountInCollectiveCurrency', 'paymentProcessorFeeInHostCurrency', 'hostFeeInHostCurrency', 'platformFeeInHostCurrency', 'netAmountInHostCurrency'].indexOf(attr) !== -1) {
+        return value / 100; // converts cents
+      }
+      return value;
+    }
+
+    return exportToCSV(transactions,
+      [
+        'id', 'createdAt', 'CollectiveId', 'amount', 'currency', 'description', 'netAmountInCollectiveCurrency', 'hostCurrency', 'hostCurrencyFxRate',
+        'paymentProcessorFeeInHostCurrency', 'hostFeeInHostCurrency', 'platformFeeInHostCurrency', 'netAmountInHostCurrency', 'Expense.privateMessage'
+      ],
+      getColumnName,
+      processValue);
+  }
 
   /**
    * Create the opposite transaction from the perspective of the FromCollective

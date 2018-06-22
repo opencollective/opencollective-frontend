@@ -1,12 +1,21 @@
 Hi {{recipient.firstName}}!
 
-Here are your monthly stats:
+Here are your monthly stats. We have attached a CSV of the {{collective.transactions.length}} {{{pluralize "transaction" n=collective.transactions.length}}} that you had in {{month}}. Just reply to this email if you have any questions.
 
 Balance: {{{currency collective.stats.balance currency=collective.currency}}} (+{{{currency collective.stats.totalDonations currency=collective.currency}}}{{#if collective.stats.totalExpenses}}, {{{currency collective.stats.totalExpenses currency=collective.currency}}}{{/if}}) 
 {{collective.stats.backers.lastMonth}} backers (+{{collective.stats.backers.new}}{{#if collective.stats.backers.lost}}, -{{collective.stats.backers.lost}}{{/if}}) 
 
+📌  Next goal
+{{#if collective.nextGoal}}
+
+You still need {{{currency collective.nextGoal.missing.amount currency=collective.currency}}} {{#if collective.nextGoal.missing.interval}}per {{collective.nextGoal.missing.interval}}{{/if}} to reach your next goal of {{collective.nextGoal.title}} ({{collective.nextGoal.percentage}} there). 
+{{else}}
+You haven't defined any goal. Set up a goal to incentivize your community to chip in.
+https://opencollective.com/{{collective.slug}}/edit#goals
+{{/if}}
 
 🗞  Latest updates
+
 {{#if collective.updates}}
   {{#each collective.updates}}
 - {{{moment publishedAt format="MM/DD"}}} {{title}}
@@ -33,7 +42,7 @@ https://opencollective.com/{{collective.slug}}/updates
 {{/if}}
 
 {{#if collective.cancelledOrders}}
-😒   {{collective.cancelledOrders.length}} new {{{pluralize "backer" n=collective.cancelledOrders.length}}}
+😒   {{collective.cancelledOrders.length}} {{{pluralize "backer" n=collective.cancelledOrders.length}}} stopped backing your collective
   {{#each collective.cancelledOrders}}
 
 - {{fromCollective.name}}

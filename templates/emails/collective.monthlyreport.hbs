@@ -56,6 +56,30 @@ Subject: {{{capitalize collective.name}}} Collective {{month}} Report
   .dimmed {
     color: #666;
   }
+  .tierMembers {
+    margin: 10px 0px 20px 0px;
+  }
+  @media only screen and (max-width: 480px) {
+    .backer {
+      width: 100%;
+      float: none;
+      margin-right: 0;
+    }
+  }
+  .progress-track {
+    margin: 5px 0;
+    height: 10px;
+    width: 100%;
+    max-width: 500px;
+    border-radius: 5px;
+    background-color: #E8E9EB;
+    }
+  .progress-bar {
+    height: 10px;
+    width: 127px;
+    border-radius: 5px;
+    background-color: #00B856;
+  }
 </style>
 
 <div style="display:none;font-size:1px;color:#333333;line-height:1px;max-height:0px;max-width:0px;opacity:0;overflow:hidden;">
@@ -64,8 +88,7 @@ Subject: {{{capitalize collective.name}}} Collective {{month}} Report
 </div>
 
 <div>
-  <h1>{{{capitalize collective.name}}} {{month}} Report</h1>
-  <p>Here are your monthly stats:</p>
+  <p>Here are your monthly stats. We have attached a CSV of the {{collective.transactions.length}} {{{pluralize "transaction" n=collective.transactions.length}}} that you had in {{month}}. Just reply to this email if you have any questions.</p>
 
   <center>
   <table border=0 cellpadding=0 cellspacing=0 width=300 style="margin: 30px 0px">
@@ -97,6 +120,25 @@ Subject: {{{capitalize collective.name}}} Collective {{month}} Report
 
   <table border=0 class="section">
     <tr>
+      <td><h2>📌 Next goal</h2></td>
+      <td><div class="action"><a href="{{@root.collective.publicUrl}}/edit#goals?utm_source=opencollective&utm_campaign=monthlyreport&utm_medium=email">Edit goals</a></div></td>
+    </tr>
+  </table>
+  {{#if collective.nextGoal}}
+  {{collective.nextGoal.title}}<br />
+  <div class="progress-track">
+    <div class="progress-bar" style="width:{{collective.nextGoal.percentage}}"></div>
+  </div>
+  <div class="dimmed">
+  ({{collective.nextGoal.percentage}} - missing {{{currency collective.nextGoal.missing.amount currency=collective.currency}}}{{#if collective.nextGoal.missing.interval}}/{{collective.nextGoal.missing.interval}}{{/if}})
+  (<a href="https://twitter.com/intent/tweet?text={{{encodeURIComponent collective.nextGoal.tweet}}}">share this goal</a>)
+  </div>
+  {{else}}
+  <p>You haven't defined any goal. Set up a goal to incentivize your community to chip in.</p>
+  {{/if}}
+
+  <table border=0 class="section">
+    <tr>
       <td><h2>🗞 Latest updates</h2></td>
       <td><div class="action"><a href="{{@root.collective.publicUrl}}/updates/new?utm_source=opencollective&utm_campaign=monthlyreport&utm_medium=email">Submit an update</a></div></td>
     </tr>
@@ -115,7 +157,7 @@ Subject: {{{capitalize collective.name}}} Collective {{month}} Report
     <h2>😏 {{collective.newOrders.length}} new {{{pluralize "backer" n=collective.newOrders.length}}}</h2>
     <table border=0 width="100%"><tr><td>
     {{#each collective.newOrders}}
-    <table border=0 class="backer" width="260">
+    <table border=0 class="backer">
       <tr>
         <td valign="top" width="48">
           <a href="{{@root.config.host.website}}/{{fromCollective.slug}}?utm_source=opencollective&utm_campaign=monthlyreport&utm_medium=email">
@@ -151,7 +193,7 @@ Subject: {{{capitalize collective.name}}} Collective {{month}} Report
     <h2>😒 {{collective.cancelledOrders.length}} {{{pluralize "backer" n=collective.cancelledOrders.length}}} stopped backing your collective</h2>
     <table border=0 width="100%"><tr><td>
     {{#each collective.cancelledOrders}}
-    <table border=0 class="backer" width="260">
+    <table border=0 class="backer">
       <tr>
         <td valign="top" width="48">
           <a href="{{@root.config.host.website}}/{{fromCollective.slug}}?utm_source=opencollective&utm_campaign=monthlyreport&utm_medium=email">
@@ -202,6 +244,30 @@ Subject: {{{capitalize collective.name}}} Collective {{month}} Report
   {{/each}}
   </table>
 
+  <table border=0 class="section">
+    <tr>
+      <td><h2>🏷 Tiers</h2></td>
+      <td><div class="action"><a href="{{@root.collective.publicUrl}}/edit#tiers?utm_source=opencollective&utm_campaign=monthlyreport&utm_medium=email">Edit tiers</a></div></td>
+    </tr>
+  </table>
+  <ul>
+  {{#each collective.tiers}}
+  <li>{{title}} ({{{currency amount currency=currency}}} {{#if interval}}per {{interval}}{{/if}}) - {{activeBackers.length}} active {{{pluralize "backer" n=activeBackers.length}}}
+    <div class="tierMembers">
+      {{#each activeBackers}}
+        <a href="{{@root.config.host.website}}/{{slug}}?utm_source=opencollective&utm_campaign=monthlyreport&utm_medium=email" class="{{../name}}">
+          {{#if isSponsor}}
+            <img src={{resizeImage image height=48}} height="48" alt="{{name}}" border="0" />
+          {{else}}
+            <img src={{resizeImage image height=48 query="/c_thumb,g_face,h_72,r_max,w_72,bo_2px_solid_white/c_thumb,h_72,r_max,w_72,bo_2px_solid_rgb:DDE1E4/e_improve/e_trim/f_auto/" defaultImage="/static/images/avatar-01.svg"}} height="36" width="36" alt="{{name}}" border="0" />
+          {{/if}}
+        </a>
+      {{/each}}
+    </div>
+  </li>
+  {{/each}}
+  </ul>
+
   {{#if topBackers}}
   <h2>💰 Recent sponsor activity on Open Collective</h2>
   <ul>
@@ -212,37 +278,13 @@ Subject: {{{capitalize collective.name}}} Collective {{month}} Report
   {{/if}}
 
   {{#if relatedCollectives}}
-  <h2>👨‍👩‍👧‍👦 New related collectives</h2>
+  <h2>🔗 New related collectives</h2>
   <ul>
     {{#each relatedCollectives}}
     <li><a href="https://opencollective.com/{{slug}}?utm_source=opencollective&utm_campaign=monthlyreport&utm_medium=email">{{name}}</a> <span class="dimmed">{{mission}}</span></li>
     {{/each}}
   </ul>
   {{/if}}
-
-
-  <table border=0 class="section">
-    <tr>
-      <td><h2>🏷 Tiers</h2></td>
-      <td><div class="action"><a href="{{@root.collective.publicUrl}}/edit#tiers?utm_source=opencollective&utm_campaign=monthlyreport&utm_medium=email">Edit tiers</a></div></td>
-    </tr>
-  </table>
-  <ul>
-  {{#each collective.tiers}}
-  <li>{{title}} ({{{currency amount currency=currency}}} {{#if interval}}per {{interval}}{{/if}})<br />
-
-    {{#each activeBackers}}
-      <a href="{{@root.config.host.website}}/{{slug}}?utm_source=opencollective&utm_campaign=monthlyreport&utm_medium=email" class="{{../name}}">
-        {{#if isSponsor}}
-          <img src={{resizeImage image height=48}} height="48" alt="{{name}}" border="0" />
-        {{else}}
-          <img src={{resizeImage image height=48 query="/c_thumb,g_face,h_72,r_max,w_72,bo_2px_solid_white/c_thumb,h_72,r_max,w_72,bo_2px_solid_rgb:DDE1E4/e_improve/e_trim/f_auto/" defaultImage="/static/images/avatar-01.svg"}} height="36" width="36" alt="{{name}}" border="0" />
-        {{/if}}
-      </a>
-    {{/each}}
-    </li>
-  {{/each}}
-  </ul>
 
   <h2>🗣 Feedback</h2>
   <p>As always, feel free to reply to this email to give us your feedback. A human will always be there on the other side!</p>
