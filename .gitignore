@@ -9,3 +9,4 @@ yarn.lock
 build
 cypress/screenshots
 *.swp
+.env
