@@ -8,8 +8,6 @@ import config from 'config';
 import { exportToPDF } from '../server/lib/utils';
 import { getTransactions } from '../server/lib/transactions';
 import { getHostedCollectives, getBackersStats, sumTransactions } from '../server/lib/hostlib';
-import path from 'path';
-import fs from 'fs';
 
 const debug = debugLib('hostreport');
 
