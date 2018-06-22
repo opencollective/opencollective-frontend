@@ -747,7 +747,7 @@ const CollectiveFields = () => {
 
         if (collective.ParentCollectiveId) {
           return req.loaders.collective.findById.load(collective.ParentCollectiveId)
-            .then(parentCollective => req.loaders.collective.findById.load(parentCollective.HostCollectiveId));
+            .then(parentCollective => parentCollective.HostCollectiveId && req.loaders.collective.findById.load(parentCollective.HostCollectiveId));
         }
 
         return null;
