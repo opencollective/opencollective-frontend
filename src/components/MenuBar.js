@@ -281,6 +281,7 @@ class MenuBar extends React.Component {
         { LoggedInUser &&
           LoggedInUser.isRoot() && /* Only Site admins can do that for now */
           LoggedInUser.hostsUserIsAdminOf() && /* Don't show button if user isn't admin anywhere */
+          collective.type === 'ORGANIZATION' && /* We can only create a prepaid card for an organization */
           !collective.isHost && /* If the collective being browsed is a host, don't show either */
           <div>
             <div className="item editCollective">
