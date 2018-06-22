@@ -66,10 +66,10 @@ export async function newUser(name, data={}) {
  * @returns {Object} with references for `hostCollective`,
  *  `hostAdmin`.
  */
-export async function newHost(name, currency, hostFee) {
+export async function newHost(name, currency, hostFee, userData={}) {
   // Host Admin
   const slug = slugify(name);
-  const hostAdmin = (await newUser(`${name} Admin`)).user;
+  const hostAdmin = (await newUser(`${name} Admin`, userData)).user;
   const hostFeePercent = hostFee ? parseInt(hostFee) : 0;
   const hostCollective = await models.Collective.create({
     name, slug, currency, hostFeePercent, CreatedByUserId: hostAdmin.id,
@@ -111,7 +111,7 @@ export async function newOrganization(orgData, adminUser) {
  *  `hostAdmin`, and `collective`.
  */
 export async function newCollectiveWithHost(name, currency, hostCurrency, hostFee, user=null, data={}) {
-  const { hostAdmin, hostCollective } = await newHost(`${name} Host`, hostCurrency, hostFee);
+  const { hostAdmin, hostCollective } = await newHost(`${name} Host`, hostCurrency, hostFee, { currency });
   const slug = slugify(name);
   const { hostFeePercent } = hostCollective;
   const args = { ...data, name, slug, currency, hostFeePercent };
