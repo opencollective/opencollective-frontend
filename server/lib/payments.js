@@ -253,10 +253,8 @@ export const executeOrder = (user, order, options) => {
 
           return paymentProviders[order.paymentMethod.service].types[order.paymentMethod.type || 'default'].processOrder(matchingOrder, options) // eslint-disable-line import/namespace
             .then(transaction => {
-              sendOrderConfirmedEmail({
-                ...order,
-                transaction
-              });
+              sendOrderConfirmedEmail({ ...order, transaction }); // async
+              return null;
             });
         });
     })
