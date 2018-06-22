@@ -30,15 +30,11 @@ class CollectiveCover extends React.Component {
     super(props);
     this.messages = defineMessages({
       'contribute': { id: 'collective.contribute', defaultMessage: 'contribute' },
-      'apply': { id: 'host.apply.btn', defaultMessage: "Apply to create a collective" },
+      'apply': { id: 'host.apply.create.btn', defaultMessage: "Apply to create a collective" },
       'ADMIN': { id: 'roles.admin.label', defaultMessage: 'Core Contributor' },
       'MEMBER': { id: 'roles.member.label', defaultMessage: 'Contributor' }
     });
 
-    if (props.cta) {
-      const label = props.cta.label;
-      this.cta = { href: props.cta.href, label: this.messages[label] ? props.intl.formatMessage(this.messages[label]) : label };
-    }
   }
 
   getMemberTooltip(member) {
@@ -60,7 +56,8 @@ ${description}`
     const {
       collective,
       className,
-      LoggedInUser
+      LoggedInUser,
+      intl
     } = this.props;
 
     const {
@@ -85,6 +82,16 @@ ${description}`
     };
 
     const logo = collective.image || get(collective.parentCollective, 'image');
+
+    let cta;
+    if (this.props.cta) {
+      if (this.props.cta.href) {
+        const label = this.props.cta.label;
+        cta = <Button className="blue" href={this.props.cta.href}>{this.messages[label] ? intl.formatMessage(this.messages[label]) : label}</Button>
+      } else {
+        cta = this.props.cta;
+      }
+    }
 
     return (
       <div className={classNames('CollectiveCover', className, type)}>
@@ -292,10 +299,8 @@ ${description}`
                   </div>
                 }
 
-                { collective.type !== 'COLLECTIVE' && this.props.cta &&
-                  <div className="cta">
-                    <Button className="blue" href={this.cta.href}>{this.cta.label}</Button>
-                  </div>
+                { collective.type !== 'COLLECTIVE' && cta &&
+                  <div className="cta">{cta}</div>
                 }
               </div>
             }

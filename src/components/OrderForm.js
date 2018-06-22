@@ -925,7 +925,7 @@ class OrderForm extends React.Component {
           </section>
 
           { !fromCollective.id && this.state.orgDetails.show &&
-            <CreateOrganizationForm onChange={org => this.handleChange("fromCollective", org))} />
+            <CreateOrganizationForm onChange={org => this.handleChange("fromCollective", org)} />
           }
 
           { !requireLogin &&

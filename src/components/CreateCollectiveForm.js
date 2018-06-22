@@ -120,16 +120,9 @@ class CreateCollectiveForm extends React.Component {
           placeholder: ''
         },
         {
-          name: 'location',
-          placeholder: 'Search cities',
-          type: 'location',
-          options: {
-            types: ['(cities)']
-          }
-        },
-        {
           name: 'tags',
           placeholder: 'civic tech, open source, vegan',
+          maxLength: 255,
           type: 'text'
         }
       ]
@@ -147,11 +140,13 @@ class CreateCollectiveForm extends React.Component {
         maxLength: 255,
         placeholder: ''
       });
-      this.fields.info.push({
-        name: 'tags',
-        type: 'text',
-        maxLength: 255,
-        placeholder: 'meetup, nyc, bitcoin'
+      this.fields.info.push(        {
+        name: 'location',
+        placeholder: 'Search cities',
+        type: 'location',
+        options: {
+          types: ['(cities)']
+        }
       });
     }
 
