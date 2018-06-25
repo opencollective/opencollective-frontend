@@ -398,6 +398,7 @@ const getTopSponsors = () => {
  * (excluding open source collective id 9805)
  */
 const getSponsors = async (where = {}, { orderDirection = 'ASC', limit = 0, offset = 0 }) => {
+  where.type = where.type || 'ORGANIZATION'; // setting the default type
   const whereStatement = Object.keys(where).reduce((statement, key) => `${statement} AND c."${key}"=$${key}`, '');
   const params = {
     bind: where,
@@ -410,8 +411,7 @@ const getSponsors = async (where = {}, { orderDirection = 'ASC', limit = 0, offs
       FROM "Transactions" t
       INNER JOIN "Collectives" c ON t."FromCollectiveId" = c.id
       WHERE
-        c.type = 'ORGANIZATION'
-        AND t.type = 'CREDIT'
+        t.type = 'CREDIT'
         AND c.id != 9805
         AND t."deletedAt" IS NULL
         AND c."isActive" IS TRUE

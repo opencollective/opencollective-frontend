@@ -622,7 +622,8 @@ const queries = {
         return { total, collectives, limit: args.limit, offset: args.offset };
       }
 
-      if (args.orderBy === 'amountSent' && args.type === 'ORGANIZATION') {
+      if (args.orderBy === 'amountSent') {
+        // this will default returning ORGANIZATION collectives unless overwritten by the args.type
         const { total, collectives } = await rawQueries.getSponsors(query.where, args);
         return { total, collectives, limit: args.limit, offset: args.offset };
       }
