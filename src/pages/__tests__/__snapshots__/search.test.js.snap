@@ -6,10 +6,24 @@ exports[`Search Page renders empty results message 1`] = `
   width: 100%;
 }
 
-.c2 {
+.c3 {
   box-sizing: border-box;
   margin-top: 16px;
   margin-bottom: 16px;
+}
+
+.c7 {
+  box-sizing: border-box;
+}
+
+.c9 {
+  box-sizing: border-box;
+  width: 100%;
+  padding-top: 16px;
+  padding-bottom: 16px;
+}
+
+.c2 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -20,8 +34,7 @@ exports[`Search Page renders empty results message 1`] = `
   align-items: flex-end;
 }
 
-.c5 {
-  box-sizing: border-box;
+.c6 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -35,11 +48,7 @@ exports[`Search Page renders empty results message 1`] = `
   justify-content: center;
 }
 
-.c6 {
-  box-sizing: border-box;
-  width: 100%;
-  padding-top: 16px;
-  padding-bottom: 16px;
+.c8 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -50,7 +59,7 @@ exports[`Search Page renders empty results message 1`] = `
   justify-content: center;
 }
 
-.c3.c3.c3 {
+.c4.c4.c4 {
   border: none;
   border-bottom: 2px solid #46B0ED;
   border-radius: 0;
@@ -61,7 +70,7 @@ exports[`Search Page renders empty results message 1`] = `
   padding: 0;
 }
 
-.c4.c4 {
+.c5.c5 {
   padding: 0 2rem;
 }
 
@@ -76,7 +85,7 @@ exports[`Search Page renders empty results message 1`] = `
 }
 
 @media screen and (min-width:40em) {
-  .c5 {
+  .c6 {
     -webkit-box-pack: center;
     -webkit-justify-content: center;
     -ms-flex-pack: center;
@@ -85,7 +94,7 @@ exports[`Search Page renders empty results message 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c5 {
+  .c6 {
     -webkit-box-pack: start;
     -webkit-justify-content: flex-start;
     -ms-flex-pack: start;
@@ -207,10 +216,10 @@ exports[`Search Page renders empty results message 1`] = `
               Search Open Collective
             </label>
             <div
-              className="c2"
+              className="c2 c3"
             >
               <input
-                className="c3 form-control"
+                className="c4 form-control"
                 defaultValue="test"
                 id="search"
                 name="q"
@@ -218,7 +227,7 @@ exports[`Search Page renders empty results message 1`] = `
                 type="search"
               />
               <button
-                className="jsx-2820878800 jsx-1599314605 Button blue c4"
+                className="jsx-2820878800 jsx-1599314605 Button blue c5"
                 onClick={[Function]}
                 type="submit"
               >
@@ -231,10 +240,10 @@ exports[`Search Page renders empty results message 1`] = `
         </form>
       </div>
       <div
-        className="c5"
+        className="c6 c7"
       >
         <div
-          className="c6"
+          className="c8 c9"
         >
           <p>
             <em>
@@ -615,10 +624,24 @@ exports[`Search Page renders loading grid SVG 1`] = `
   width: 100%;
 }
 
-.c2 {
+.c3 {
   box-sizing: border-box;
   margin-top: 16px;
   margin-bottom: 16px;
+}
+
+.c7 {
+  box-sizing: border-box;
+}
+
+.c9 {
+  box-sizing: border-box;
+  width: 100%;
+  padding-top: 16px;
+  padding-bottom: 16px;
+}
+
+.c2 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -629,8 +652,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
   align-items: flex-end;
 }
 
-.c5 {
-  box-sizing: border-box;
+.c6 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -644,11 +666,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
   justify-content: center;
 }
 
-.c6 {
-  box-sizing: border-box;
-  width: 100%;
-  padding-top: 16px;
-  padding-bottom: 16px;
+.c8 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -659,7 +677,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
   justify-content: center;
 }
 
-.c3.c3.c3 {
+.c4.c4.c4 {
   border: none;
   border-bottom: 2px solid #46B0ED;
   border-radius: 0;
@@ -670,7 +688,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
   padding: 0;
 }
 
-.c4.c4 {
+.c5.c5 {
   padding: 0 2rem;
 }
 
@@ -685,7 +703,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
 }
 
 @media screen and (min-width:40em) {
-  .c5 {
+  .c6 {
     -webkit-box-pack: center;
     -webkit-justify-content: center;
     -ms-flex-pack: center;
@@ -694,7 +712,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c5 {
+  .c6 {
     -webkit-box-pack: start;
     -webkit-justify-content: flex-start;
     -ms-flex-pack: start;
@@ -816,10 +834,10 @@ exports[`Search Page renders loading grid SVG 1`] = `
               Search Open Collective
             </label>
             <div
-              className="c2"
+              className="c2 c3"
             >
               <input
-                className="c3 form-control"
+                className="c4 form-control"
                 defaultValue=""
                 id="search"
                 name="q"
@@ -827,7 +845,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
                 type="search"
               />
               <button
-                className="jsx-2820878800 jsx-1599314605 Button blue c4"
+                className="jsx-2820878800 jsx-1599314605 Button blue c5"
                 onClick={[Function]}
                 type="submit"
               >
@@ -840,10 +858,10 @@ exports[`Search Page renders loading grid SVG 1`] = `
         </form>
       </div>
       <div
-        className="c5"
+        className="c6 c7"
       >
         <div
-          className="c6"
+          className="c8 c9"
         >
           <svg
             fill="#46B0ED"
@@ -1103,10 +1121,25 @@ exports[`Search Page renders search results with pagination 1`] = `
   width: 100%;
 }
 
-.c2 {
+.c3 {
   box-sizing: border-box;
   margin-top: 16px;
   margin-bottom: 16px;
+}
+
+.c7 {
+  box-sizing: border-box;
+}
+
+.c9 {
+  box-sizing: border-box;
+  margin-left: 8px;
+  margin-right: 8px;
+  margin-top: 16px;
+  margin-bottom: 16px;
+}
+
+.c2 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -1117,8 +1150,7 @@ exports[`Search Page renders search results with pagination 1`] = `
   align-items: flex-end;
 }
 
-.c5 {
-  box-sizing: border-box;
+.c6 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -1132,20 +1164,7 @@ exports[`Search Page renders search results with pagination 1`] = `
   justify-content: center;
 }
 
-.c6 {
-  box-sizing: border-box;
-  margin-left: 8px;
-  margin-right: 8px;
-  margin-top: 16px;
-  margin-bottom: 16px;
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-}
-
-.c7 {
-  box-sizing: border-box;
+.c10 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -1156,7 +1175,14 @@ exports[`Search Page renders search results with pagination 1`] = `
   justify-content: center;
 }
 
-.c3.c3.c3 {
+.c8 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+}
+
+.c4.c4.c4 {
   border: none;
   border-bottom: 2px solid #46B0ED;
   border-radius: 0;
@@ -1167,7 +1193,7 @@ exports[`Search Page renders search results with pagination 1`] = `
   padding: 0;
 }
 
-.c4.c4 {
+.c5.c5 {
   padding: 0 2rem;
 }
 
@@ -1182,7 +1208,7 @@ exports[`Search Page renders search results with pagination 1`] = `
 }
 
 @media screen and (min-width:40em) {
-  .c5 {
+  .c6 {
     -webkit-box-pack: center;
     -webkit-justify-content: center;
     -ms-flex-pack: center;
@@ -1191,7 +1217,7 @@ exports[`Search Page renders search results with pagination 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c5 {
+  .c6 {
     -webkit-box-pack: start;
     -webkit-justify-content: flex-start;
     -ms-flex-pack: start;
@@ -1313,10 +1339,10 @@ exports[`Search Page renders search results with pagination 1`] = `
               Search Open Collective
             </label>
             <div
-              className="c2"
+              className="c2 c3"
             >
               <input
-                className="c3 form-control"
+                className="c4 form-control"
                 defaultValue="Test"
                 id="search"
                 name="q"
@@ -1324,7 +1350,7 @@ exports[`Search Page renders search results with pagination 1`] = `
                 type="search"
               />
               <button
-                className="jsx-2820878800 jsx-1599314605 Button blue c4"
+                className="jsx-2820878800 jsx-1599314605 Button blue c5"
                 onClick={[Function]}
                 type="submit"
               >
@@ -1337,10 +1363,10 @@ exports[`Search Page renders search results with pagination 1`] = `
         </form>
       </div>
       <div
-        className="c5"
+        className="c6 c7"
       >
         <div
-          className="c6"
+          className="c8 c9"
         >
           <a
             href="/test-collective"
@@ -1399,7 +1425,7 @@ exports[`Search Page renders search results with pagination 1`] = `
         </div>
       </div>
       <div
-        className="c7"
+        className="c10 c7"
       >
         <ul
           className="pagination"
