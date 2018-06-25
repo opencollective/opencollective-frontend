@@ -2,6 +2,7 @@ import styled from 'styled-components';
 import {
   alignItems,
   alignSelf,
+  background,
   backgroundImage,
   backgroundPosition,
   backgroundRepeat,
@@ -35,9 +36,12 @@ import {
 
 const overflow = style({ prop: 'overflow' });
 
+const pointerEvents = style({ prop: 'pointerEvents' });
+
 const Container = styled.div([],
   alignItems,
   alignSelf,
+  background,
   backgroundImage,
   backgroundPosition,
   backgroundRepeat,
@@ -60,6 +64,7 @@ const Container = styled.div([],
   minWidth,
   order,
   overflow,
+  pointerEvents,
   position,
   right,
   size,
