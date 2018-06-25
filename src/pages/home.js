@@ -42,6 +42,29 @@ const sectionDetailStyles = {
   textAlign: responsiveAlign,
 };
 
+const BackerAvatar = ({
+  slug,
+  image,
+  stats: {
+    totalAmountSent,
+  },
+}) => (
+  <Link route={`/${slug}`}><a>
+    <Container
+      backgroundImage={image}
+      backgroundSize="cover"
+      backgroundPosition="center center"
+      backgroundRepeat="no-repeat"
+      borderRadius="50%"
+      size={Math.floor((totalAmountSent / 100) * Math.random())}
+      maxHeight={120}
+      maxWidth={120}
+      minHeight={50}
+      minWidth={50}
+    />
+  </a></Link>
+);
+
 class HomePage extends React.Component {
   state = {
     LoggedInUser: {},
@@ -57,6 +80,9 @@ class HomePage extends React.Component {
       activeSpending: {
         expenses,
       },
+      backers: {
+        collectives: backers,
+      },
       recent: {
         collectives,
       },
@@ -67,7 +93,7 @@ class HomePage extends React.Component {
         transactions,
       },
       loading,
-    } = this.props.data;
+    } = this.props.data
     const {
       LoggedInUser,
     } = this.state;
@@ -154,7 +180,7 @@ class HomePage extends React.Component {
                 <StyledLink href="/discover">See all &gt;</StyledLink>
               </Flex>
               <Container display="flex" flexWrap="wrap" justifyContent="space-between">
-                {activeCollectives.map((c) => <Container w={[0.5, null, 0.25]} mb={2} px={1} maxWidth={224}><CollectiveStatsCard {...c} /></Container>)} 
+                {activeCollectives.map((c) => <Container w={[0.5, null, 0.25]} mb={2} px={1} maxWidth={224} key={c.id}><CollectiveStatsCard {...c} /></Container>)} 
               </Container>
             </Container>
 
@@ -189,10 +215,10 @@ class HomePage extends React.Component {
 
           <Container bg="#EBF1FA" py={3} my={5}>
             <Container maxWidth={800} mx="auto">
-              <H2 textAlign="center" fontWeight="900" px={2} lineHeight={[36, null, 58]} fontSize={[null, null, 56]}>
+              <H2 textAlign="center" fontWeight="900" px={2} lineHeight={['36px', null, '58px']} fontSize={[null, null, 56]}>
                 Join the movement for a world with more open, transparent, and fluid organizations.
               </H2>
-              <P color="#6E747A" textAlign="center" fontSize={[16, null, 20]} lineHeight={[24, null, 28]} px={3} my={[3, null, 4]}>
+              <P color="#6E747A" textAlign="center" fontSize={[16, null, 20]} lineHeight={['24px', null, '28px']} px={3} my={[3, null, 4]}>
                 There are many ways to participate; from fiscally hosting collectives to spreading the word to whomever you believe will benefit from operating as an open association. Here’s how:
               </P>
             </Container>
@@ -256,7 +282,7 @@ class HomePage extends React.Component {
             <Container bg={['#3385FF', null, 'transparent']} height={2} width={32} mx="auto" my={[5]} />
 
             <Container display="flex" flexDirection={['column', null, 'row']}>
-              <Container w={[1, null, 0.5]}>
+              <Container w={[1, null, 0.5]} mb={4}>
                 <H3 {...sectionHeadingStyles}>Become a backer</H3>
 
                 <P {...sectionSubHeadingStyles}>Those who believe that giving back in unified financial support is the way to go. 👊</P>
@@ -283,7 +309,13 @@ class HomePage extends React.Component {
                   </StyledLink>
                 </Link>
               </Container>
-              <Container w={[1, null, 0.5]}>
+              <Container w={[1, null, 0.5]} overflow="hidden" position="relative">
+                <Container width={["100%", null, "160%"]} display="flex" flexWrap="wrap" justifyContent="center" alignItems="center" position="relative" >
+                  {backers.map((c) => <Container px={1} key={c.id}><BackerAvatar {...c} /></Container>)}
+                </Container>
+                <Hide xs sm position="absolute" top={0} left={0} width="100%" height="100%">
+                  <Container background="linear-gradient(to left, #EBF1FA, transparent 50%)" width="100%" height="100%" pointerEvents="none" />
+                </Hide>
               </Container>
             </Container>
 
@@ -317,24 +349,25 @@ class HomePage extends React.Component {
 
                 <P {...sectionDetailStyles}><Span fontWeight="bold">Expand the movement</Span> by becoming a fiscal host for open collectives in your region or for those focusing on topics that matter to you. Help organize initiatives and provide a means for them to recieve financial support from the Open Collective community.</P>
 
-                <StyledLink
-                  href="https://github.com/opencollective/opencollective/wiki/Becoming-a-Host"
-                  bg="#3385FF"
-                  borderRadius="50px"
-                  color="white"
-                  display="block"
-                  fontSize="1.6rem"
-                  fontWeight="bold"
-                  maxWidth="220px"
-                  mx="auto"
-                  mt={4}
-                  hover={{ color: 'white' }}
-                  py={3}
-                  textAlign="center"
-                  w={[250, null, 320]}
-                >
-                  Create a chapter
-                </StyledLink>
+                <Link route="/chapters">
+                  <StyledLink
+                    bg="#3385FF"
+                    borderRadius="50px"
+                    color="white"
+                    display="block"
+                    fontSize="1.6rem"
+                    fontWeight="bold"
+                    maxWidth="220px"
+                    mx="auto"
+                    mt={4}
+                    hover={{ color: 'white' }}
+                    py={3}
+                    textAlign="center"
+                    w={[250, null, 320]}
+                  >
+                    Create a chapter
+                  </StyledLink>
+                </Link>
               </Container>
               <Container w={[1, null, 0.5]}>
               </Container>
@@ -425,7 +458,19 @@ const query = gql`
         slug
         name
         image
-        tags
+        stats {
+          totalAmountSent
+        }
+      }
+    }
+    backers: allCollectives(type: USER, limit: 20, orderBy: amountSent, orderDirection: DESC, offset: 0) {
+      collectives {
+        id
+        currency
+        type
+        slug
+        name
+        image
         stats {
           totalAmountSent
         }
