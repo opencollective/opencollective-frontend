@@ -167,6 +167,7 @@
       "graphql-tag",
       "react-apollo",
       "react-mde",
+      "styled-jsx",
       "webpack"
     ]
   },
