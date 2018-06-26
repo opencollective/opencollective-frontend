@@ -2,21 +2,40 @@ import { expect } from 'chai';
 import { describe, it } from 'mocha';
 
 import * as utils from './utils';
+import * as store from './features/support/stores';
 
 describe('graphql.transaction.test.js', () => {
-  /* SETUP
-    collective1: 2 events
-      event1: 2 tiers
-        tier1: 2 orders
-        tier2: 1 order
-      event2: 1 tier
-        tier3: no order
-    collective2: 1 event
-      event3: no tiers // event3 not declared above due to linting
-    collective3: no events
-  */
 
-  before(() => utils.loadDB("wwcode_test"));
+  before(async () => {
+    await utils.resetTestDB();
+    // Given a host
+    const { hostCollective } = await store.newHost('wwcode', 'USD', 5);
+    // Given a collective
+    const { collective } = await store.newCollectiveInHost(
+      'wwcodeaustin', 'USD', hostCollective, null, { isActive: true });
+    // And given the host has a stripe account
+    await store.stripeConnectedAccount(hostCollective.id);
+    // And given that we have 5 users making one purchase each
+    const userNames = ['Craft Work', 'Geoff Frey', 'Holly Day', 'Max Point', 'Praxent'];
+    // Not using Promise.all because I want the entries to be created
+    // in sequence, not in parallel since stripeOneTimeDonation can't
+    // patch the same object more than once at a time.
+    for (let i = 0; i < userNames.length; i++) {
+      const { user, userCollective } = await store.newUser(userNames[i]);
+      await store.stripeOneTimeDonation({
+        user, userCollective, collective,
+        currency: 'USD',
+        amount: 1000 * (i + 1),
+        createdAt: new Date(2018, i, i, 0, 0, i),
+      });
+      await store.stripeOneTimeDonation({
+        user, userCollective, collective,
+        currency: 'USD',
+        amount: 1000 * (i + 1),
+        createdAt: new Date(2017, i, i, 0, 0, i),
+      });
+    }
+  });
 
   describe('return collective.transactions', () => {
     it('when given a collective slug (case insensitive)', async () => {
@@ -30,7 +49,7 @@ describe('graphql.transaction.test.js', () => {
               id
               type
               createdByUser {
-                id,
+                id
                 firstName
                 email
               },
@@ -56,6 +75,8 @@ describe('graphql.transaction.test.js', () => {
         }
       `;
       const result = await utils.graphqlQuery(query, { slug: "WWCodeAustin", limit });
+      expect(result.data.Collective).to.exist;
+      expect(result.data.Collective.transactions).to.have.length(10);
       expect(result).to.matchSnapshot();
     });
   });
@@ -93,13 +114,12 @@ describe('graphql.transaction.test.js', () => {
           }
         }
       `;
-      const result = await utils.graphqlQuery(query, { id: 7071 });
+      const result = await utils.graphqlQuery(query, { id: 2 });
       expect(result).to.matchSnapshot();
     });
 
     it('with filter on type', async () => {
-      const limit = 10;
-      const offset = 5;
+      const limit = 100;
       const query = `
         query allTransactions($CollectiveId: Int!, $limit: Int, $offset: Int, $type: String) {
           allTransactions(CollectiveId: $CollectiveId, limit: $limit, offset: $offset, type: $type) {
@@ -108,7 +128,8 @@ describe('graphql.transaction.test.js', () => {
           }
         }
       `;
-      const result = await utils.graphqlQuery(query, { CollectiveId: 2, limit, offset, type: 'CREDIT' });
+      const result = await utils.graphqlQuery(query, { CollectiveId: 3, limit, type: 'CREDIT' });
+      expect(result.data.allTransactions).to.have.length(10);
       expect(result).to.matchSnapshot();
     });
 
@@ -117,16 +138,18 @@ describe('graphql.transaction.test.js', () => {
       const query = `
         query allTransactions($CollectiveId: Int!, $limit: Int, $offset: Int, $type: String, $dateFrom: String $dateTo: String) {
           allTransactions(CollectiveId: $CollectiveId, limit: $limit, offset: $offset, type: $type, dateFrom: $dateFrom, dateTo: $dateTo) {
-            id,
+            id
+            createdAt
           }
         }
       `;
 
       // When the query is executed with the parameter `dateFrom`
       const result = await utils.graphqlQuery(query, {
-        CollectiveId: 2,
+        CollectiveId: 3,
         dateFrom: '2017-10-01',
       });
+      expect(result.data.allTransactions).to.have.length(5);
       expect(result).to.matchSnapshot();
     });
 
@@ -135,22 +158,24 @@ describe('graphql.transaction.test.js', () => {
       const query = `
         query allTransactions($CollectiveId: Int!, $limit: Int, $offset: Int, $type: String, $dateFrom: String $dateTo: String) {
           allTransactions(CollectiveId: $CollectiveId, limit: $limit, offset: $offset, type: $type, dateFrom: $dateFrom, dateTo: $dateTo) {
-            id,
+            id
+            createdAt
           }
         }
       `;
 
-      // When the query is executed with the parameter `dateFrom`
+      // When the query is executed with the parameter `dateTo`
       const result = await utils.graphqlQuery(query, {
-        CollectiveId: 2,
+        CollectiveId: 3,
         dateTo: '2017-10-01',
       });
+      expect(result.data.allTransactions).to.have.length(5);
       expect(result).to.matchSnapshot();
     });
 
     it('with pagination', async () => {
       const limit = 20;
-      const offset = 20;
+      const offset = 0;
       const query = `
         query allTransactions($CollectiveId: Int!, $limit: Int, $offset: Int) {
           allTransactions(CollectiveId: $CollectiveId, limit: $limit, offset: $offset) {
@@ -190,13 +215,13 @@ describe('graphql.transaction.test.js', () => {
           }
         }
       `;
-      const result = await utils.graphqlQuery(query, { CollectiveId: 2, limit, offset });
+      const result = await utils.graphqlQuery(query, { CollectiveId: 3, limit, offset });
       expect(result).to.matchSnapshot();
     });
 
     describe('`transactions` query', () => {
       const limit = 5;
-      const offset = 10;
+      const offset = 5;
 
       it('default returns list of transactions with pagination data', async () => {
         const query = `
@@ -295,6 +320,10 @@ describe('graphql.transaction.test.js', () => {
         `;
 
         const result = await utils.graphqlQuery(query, { limit, offset });
+        expect(result.data.transactions.limit).to.equal(limit);
+        expect(result.data.transactions.offset).to.equal(offset);
+        expect(result.data.transactions.total).to.equal(20);
+        expect(result.data.transactions.transactions).to.have.length(5);
         expect(result).to.matchSnapshot();
       });
 
@@ -351,13 +380,14 @@ describe('graphql.transaction.test.js', () => {
       it('accepts orderBy argument to order transactions', async () => {
         const query = `
           query transactions($limit: Int!) {
-            transactions(limit: $limit, orderBy: { field: CREATED_AT, direction: ASC }) {
+            transactions(limit: $limit, type: CREDIT, orderBy: { field: CREATED_AT, direction: ASC }) {
               limit
               offset
               total
               transactions {
                 id
                 type
+                createdAt
                 createdByUser {
                   id
                   firstName
@@ -395,6 +425,10 @@ describe('graphql.transaction.test.js', () => {
         `;
 
         const result = await utils.graphqlQuery(query, { limit });
+        expect(result.data.transactions.limit).to.equal(5);
+        expect(result.data.transactions.offset).to.equal(0);
+        expect(result.data.transactions.total).to.equal(10);
+        expect(result.data.transactions.transactions).to.have.length(5);
         expect(result).to.matchSnapshot();
       });
     });
