@@ -335,7 +335,8 @@ class HomePage extends React.Component {
                   Check out our Github organization to find out more
                 </StyledLink>
               </Container>
-              <Container w={[1, null, 0.5]}>
+              <Container w={[1, null, 0.5]} textAlign="center" px={2}>
+                <img src="/public/images/home-contributors.png" alt="Open Collective Contribution Commits" width="100%" height="auto" />
               </Container>
             </Container>
 
