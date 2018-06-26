@@ -1,5 +1,13 @@
 import styled from 'styled-components';
 import { Box } from 'grid-styled';
+import {
+  bottom,
+  height,
+  left,
+  position,
+  right,
+  top,
+} from 'styled-system';
 
 export const breakpoints = {
   xs: '@media screen and (max-width: 40em)',
@@ -24,6 +32,13 @@ const Hide = styled(Box)`
   ${sm}
   ${md}
   ${lg}
+
+  ${bottom}
+  ${height}
+  ${left}
+  ${position}
+  ${right}
+  ${top}
 `;
 
 export default Hide;
