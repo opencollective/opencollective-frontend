@@ -1,3 +1,4 @@
+// testing libraries
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
 import sinon from 'sinon';
@@ -5,14 +6,16 @@ import sinon from 'sinon';
 // class containing 'search' method to stub
 import Index from 'algoliasearch/src/Index';
 
+// Internal testing tools
 import * as utils from './utils';
+import * as store from './features/support/stores';
 
 describe('graphql.search.test.js', () => {
   let sandbox;
   const hits = [{
-    id: 83,
+    id: 5,
     name: 'Open Source Collective',
-    description: 'This is the Open Source Collective. Consider supporting the open source projects directly or become a member of the Open Source Collective and support all projects. ',
+    description: 'This is the Open Source Collective.',
     currency: 'USD',
     slug: 'test-collective',
     mission: 'test mission',
@@ -26,8 +29,14 @@ describe('graphql.search.test.js', () => {
   const nbHits = 10;
 
   before(async () => {
-    await utils.loadDB('opencollective_dvl');
+    await utils.resetTestDB();
     sandbox = sinon.createSandbox();
+
+    // Given a random collective
+    await store.newCollectiveWithHost('A random collective', 'USD', 'USD', 5);
+    // Given the open source collective host
+    const { hostCollective } = await store.newHost('Open Source Collective', 'USD', 5);
+    await hostCollective.update({ description: 'This is the Open Source Collective.' });
   });
 
   beforeEach(() => {
@@ -74,13 +83,14 @@ describe('graphql.search.test.js', () => {
     }
     `;
 
-    const result = await utils.graphqlQuery(query, { term: 'open', limit: 20, offset: 10 });
+    const result = await utils.graphqlQuery(query, { term: 'open', limit: 20, offset: 0 });
 
     expect(Index.prototype.search.firstCall.calledWith({
       query: 'open',
       length: 20,
-      offset: 10,
+      offset: 0,
     })).to.be.true;
+
     expect(result.data.search)
     .to.deep.equal({
       collectives: [{
@@ -90,7 +100,7 @@ describe('graphql.search.test.js', () => {
       }],
       total: nbHits,
       limit: 20,
-      offset: 10,
+      offset: 0,
     });
   });
 });
