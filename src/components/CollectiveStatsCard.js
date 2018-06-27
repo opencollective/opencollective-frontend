@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { get } from 'lodash';
+import { get, isEqual } from 'lodash';
 
 import { defaultImage, defaultBackgroundImage } from '../constants/collectives';
 
@@ -10,7 +10,7 @@ import { P, Span } from './Text';
 import { Link } from '../server/pages';
 import StyledLink from './StyledLink';
 
-const hasGoals = (settings = {}) => get(settings, 'goals', []).length > 0 && get(settings, 'goals', [])[0] !== {};
+const hasGoals = (settings = {}) => get(settings, 'goals', []).length > 0 && !isEqual(get(settings, 'goals', [])[0], {});
 
 const getGoalPercentage = ({ type, amount}, { balance, yearlyBudget }) => type === 'balance' ?  (balance / amount) : (yearlyBudget / amount);
 
