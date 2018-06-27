@@ -5,6 +5,7 @@ import { take, uniqBy } from 'lodash';
 
 import { Box, Flex } from 'grid-styled';
 
+import { pickAvatar } from '../lib/collective.lib';
 import withData from '../lib/withData'
 import withIntl from '../lib/withIntl';
 import withLoggedInUser from '../lib/withLoggedInUser';
@@ -41,6 +42,21 @@ const sectionDetailStyles = {
   px: [3, null, 4],
   textAlign: responsiveAlign,
 };
+const statsContainerStyles = {
+  alignItems: 'center',
+  backgroundImage: '/public/images/oc-symbol.svg',
+  backgroundPosition: 'center center',
+  backgroundRepeat: 'no-repeat',
+  backgroundSize: 'contain',
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'center',
+  size: [148, null, 240],
+};
+const statsStyles = {
+  fontSize: [20, null, 36],
+  fontWeight: 'bold',
+};
 
 const BackerAvatar = ({
   slug,
@@ -51,12 +67,12 @@ const BackerAvatar = ({
 }) => (
   <Link route={`/${slug}`}><a>
     <Container
-      backgroundImage={image}
+      backgroundImage={image || pickAvatar()}
       backgroundSize="cover"
       backgroundPosition="center center"
       backgroundRepeat="no-repeat"
       borderRadius="50%"
-      size={Math.floor((totalAmountSent / 100) * Math.random())}
+      size={Math.floor((totalAmountSent / 5000) * Math.random())}
       maxHeight={120}
       maxWidth={120}
       minHeight={50}
@@ -82,18 +98,28 @@ class HomePage extends React.Component {
       },
       backers: {
         collectives: backers,
+        total: totalBackers,
+      },
+      chapters: {
+        stats: {
+          collectives: {
+            memberOf: totalChapters,
+          },
+        },
       },
       recent: {
         collectives,
+        total: totalCollectives,
       },
       sponsors: {
         collectives: sponsors,
+        total: totalSponsors,
       },
       transactions: {
         transactions,
       },
       loading,
-    } = this.props.data
+    } = this.props.data;
     const {
       LoggedInUser,
     } = this.state;
@@ -313,8 +339,8 @@ class HomePage extends React.Component {
                 <Container width={["100%", null, "160%"]} display="flex" flexWrap="wrap" justifyContent="center" alignItems="center" position="relative" >
                   {backers.map((c) => <Container px={1} key={c.id}><BackerAvatar {...c} /></Container>)}
                 </Container>
-                <Hide xs sm position="absolute" top={0} left={0} width="100%" height="100%">
-                  <Container background="linear-gradient(to left, #EBF1FA, transparent 50%)" width="100%" height="100%" pointerEvents="none" />
+                <Hide xs sm position="absolute" top={0} left={0} width="100%" height="100%" pointerEvents="none">
+                  <Container background="linear-gradient(to left, #EBF1FA, transparent 50%)" width="100%" height="100%" />
                 </Hide>
               </Container>
             </Container>
@@ -373,6 +399,28 @@ class HomePage extends React.Component {
               <Container w={[1, null, 0.5]}>
               </Container>
             </Container>
+
+            <Container mt={6}>
+              <P textAlign="center" fontSize={[20, null, 28]} mb={2}>Today we are:</P>
+              <Container display="flex" flexWrap="wrap" alignItems="center" justifyContent="center">
+                <Container {...statsContainerStyles}>
+                  <P {...statsStyles}>{totalCollectives}</P>
+                  <P>collectives</P>
+                </Container>
+                <Container {...statsContainerStyles}>
+                  <P {...statsStyles}>{totalSponsors}</P>
+                  <P>sponsors</P>
+                </Container>
+                <Container {...statsContainerStyles}>
+                  <P {...statsStyles}>{totalBackers}</P>
+                  <P>backers</P>
+                </Container>
+                <Container {...statsContainerStyles}>
+                  <P {...statsStyles}>{totalChapters}</P>
+                  <P>chapters</P>
+                </Container>
+              </Container>
+            </Container>
           </Container>
         </Body>
         <Footer />
@@ -383,7 +431,7 @@ class HomePage extends React.Component {
 
 const query = gql`
   query home {
-    transactions {
+    transactions(limit: 50) {
       transactions {
         amount
         createdAt
@@ -408,6 +456,7 @@ const query = gql`
       }
     }
     recent: allCollectives(type: COLLECTIVE, orderBy: createdAt, orderDirection: DESC, limit: 4) {
+      total
       collectives {
         id
         type
@@ -452,6 +501,7 @@ const query = gql`
       }
     }
     sponsors: allCollectives(type: ORGANIZATION, limit: 6, orderBy: amountSent, orderDirection: DESC, offset: 0) {
+      total
       collectives {
         id
         currency
@@ -465,6 +515,7 @@ const query = gql`
       }
     }
     backers: allCollectives(type: USER, limit: 20, orderBy: amountSent, orderDirection: DESC, offset: 0) {
+      total
       collectives {
         id
         currency
@@ -474,6 +525,13 @@ const query = gql`
         image
         stats {
           totalAmountSent
+        }
+      }
+    }
+    chapters: Collective(slug: "chapters") {
+      stats {
+        collectives {
+          memberOf
         }
       }
     }
