@@ -212,7 +212,7 @@ const generateEmailFromTemplate = (template, recipient, data = {}, options = {})
       template = `thankyou.${slug}`;
     }
 
-    if (_.contains(['laprimaire', 'lesbarbares', 'nuitdebout', 'enmarchebe'], slug)) {
+    if (_.contains(['laprimaire', 'lesbarbares', 'nuitdebout', 'enmarchebe', 'monnaie-libre'], slug)) {
       template += '.fr';
 
       if (slug === 'laprimaire') {
