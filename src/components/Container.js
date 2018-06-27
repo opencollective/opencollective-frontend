@@ -34,9 +34,9 @@ import {
   zIndex,
 } from 'styled-system';
 
-const overflow = style({ prop: 'overflow' });
+export const overflow = style({ prop: 'overflow' });
 
-const pointerEvents = style({ prop: 'pointerEvents' });
+export const pointerEvents = style({ prop: 'pointerEvents' });
 
 const Container = styled.div([],
   alignItems,
