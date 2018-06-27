@@ -9,6 +9,8 @@ import {
   top,
 } from 'styled-system';
 
+import { pointerEvents } from './Container';
+
 export const breakpoints = {
   xs: '@media screen and (max-width: 40em)',
   sm: '@media screen and (min-width: 40em) and (max-width: 52em)',
@@ -36,6 +38,7 @@ const Hide = styled(Box)`
   ${bottom}
   ${height}
   ${left}
+  ${pointerEvents}
   ${position}
   ${right}
   ${top}
