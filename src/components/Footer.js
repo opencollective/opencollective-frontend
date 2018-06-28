@@ -32,7 +32,6 @@ const Container = styled.div`
   bottom: 0;
   background-color: white;
   border-top: 1px solid #aaaaaa;
-  margin-top: 2rem;
   min-height: 7.5rem;
   padding: 1rem;
   width: 100%;
