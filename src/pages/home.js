@@ -3,6 +3,7 @@ import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import { take, uniqBy } from 'lodash';
 
+import styled from 'styled-components';
 import { Box, Flex } from 'grid-styled';
 
 import { pickAvatar } from '../lib/collective.lib';
@@ -15,13 +16,18 @@ import Footer from '../components/Footer';
 import Header from '../components/Header';
 import TransactionSimple from '../components/TransactionSimple';
 import { Link } from '../server/pages';
-import { Span, P, H1, H2, H3 } from '../components/Text';
+import { Span, P, H1, H2, H3, H4 } from '../components/Text';
 import ListItem from '../components/ListItem';
 import Hide from '../components/Hide';
 import Container from '../components/Container';
 import StyledLink from '../components/StyledLink';
 import CollectiveStatsCard from '../components/CollectiveStatsCard';
 import SponsorCard from '../components/SponsorCard';
+import {
+  FacebookIcon,
+  LinkedInIcon,
+  TwitterIcon,
+} from '../components/icons';
 
 const responsiveAlign = ['center', null, 'left'];
 const sectionHeadingStyles = {
@@ -57,6 +63,21 @@ const statsStyles = {
   fontSize: [20, null, 36],
   fontWeight: 'bold',
 };
+const socialButtonStyles = {
+  border: '1px solid #99C2FF',
+  borderRadius: 50,
+  color: '#3385FF',
+  display: 'block',
+  fontSize: 14,
+  maxWidth: 200,
+  mb: 3,
+  mx: ['auto', null, 3],
+  px: 3,
+  py: 3,
+  target: '_blank',
+  textAlign: 'center',
+  width: '100%',
+};
 
 const BackerAvatar = ({
   slug,
@@ -72,11 +93,11 @@ const BackerAvatar = ({
       backgroundPosition="center center"
       backgroundRepeat="no-repeat"
       borderRadius="50%"
-      size={Math.floor((totalAmountSent / 5000) * Math.random())}
-      maxHeight={120}
-      maxWidth={120}
-      minHeight={50}
-      minWidth={50}
+      size={[Math.floor((totalAmountSent / 7500) * Math.random()), null, Math.floor((totalAmountSent / 5000) * Math.random())]}
+      maxHeight={[80, null, 120]}
+      maxWidth={[80, null, 120]}
+      minHeight={[30, null, 50]}
+      minWidth={[30, null, 50]}
     />
   </a></Link>
 );
@@ -239,7 +260,7 @@ class HomePage extends React.Component {
             </StyledLink>
           </Container>
 
-          <Container bg="#EBF1FA" py={3} my={5}>
+          <Container bg="#EBF1FA" py={5} mt={5}>
             <Container maxWidth={800} mx="auto">
               <H2 textAlign="center" fontWeight="900" px={2} lineHeight={['36px', null, '58px']} fontSize={[null, null, 56]}>
                 Join the movement for a world with more open, transparent, and fluid organizations.
@@ -300,7 +321,7 @@ class HomePage extends React.Component {
                   </StyledLink>
                 </Link>
               </Container>
-              <Container w={[1, null, 0.5]} display="flex" flexWrap="wrap" justifySpace="space-between" px={[1, null, 4]}>
+              <Container w={[1, null, 0.5]} display="flex" flexWrap="wrap" justifyContent="space-between" px={[1, null, 4]}>
                 {sponsors.map((c) => <Container w={[0.5, null, 0.33]} mb={2} px={1} maxWidth={224} key={c.id}><SponsorCard {...c} /></Container>)}
               </Container>
             </Container>
@@ -347,7 +368,7 @@ class HomePage extends React.Component {
 
             <Container bg={['#3385FF', null, 'transparent']} height={2} width={32} mx="auto" my={[5]} />
 
-            <Container display="flex" flexDirection={['column', null, 'row']}>
+            <Container display="flex" flexDirection={['column', null, 'row']} justifyContent="space-between">
               <Container w={[1, null, 0.5]}>
                 <H3 {...sectionHeadingStyles}>Contribute to OC’s development.</H3>
 
@@ -361,7 +382,7 @@ class HomePage extends React.Component {
                   Check out our Github organization to find out more
                 </StyledLink>
               </Container>
-              <Container w={[1, null, 0.5]} textAlign="center" px={2}>
+              <Container w={[1, null, 0.5]} textAlign="center" px={2} maxWidth={600}>
                 <img src="/public/images/home-contributors.png" alt="Open Collective Contribution Commits" width="100%" height="auto" />
               </Container>
             </Container>
@@ -420,6 +441,47 @@ class HomePage extends React.Component {
                   <P>chapters</P>
                 </Container>
               </Container>
+            </Container>
+
+            <Container mt={5} px={3}>
+              <H3 textAlign="center" fontSize={[28, null, 48]} pb={4}>Spread the word!</H3>
+
+              <Container maxWidth={600} mx="auto">
+                <P textAlign="center" fontSize={[14, null, 16]} color="#494D52" mb={4}>Do you know people or organizations that will benefit from an open structure and
+a transparent operation? Let them know that Open Collective exists!</P>
+              </Container>
+
+              <Flex flexDirection={['column', null, 'row']} justifyContent="center">
+                <StyledLink
+                  {...socialButtonStyles}
+                  href="https://twitter.com/intent/tweet?text=Check%20out%20Open%20Collection%2C%20a%20platform%20for%20organizations%2C%20communities%2C%20and%20projects%20to%20operate%20transparently!&url=https%3A%2F%2Fopencollective.com"
+                >
+                  <Container display="flex" alignItems="center" justifyContent="space-evenly">
+                    <TwitterIcon size={18} fill="#3385FF" />
+                    <Span>Share on Twitter</Span>
+                  </Container>
+                </StyledLink>
+
+                <StyledLink
+                  {...socialButtonStyles}
+                  href="https://www.facebook.com/sharer/sharer.php?u=https%3A//opencollective.com"
+                >
+                  <Container display="flex" alignItems="center" justifyContent="space-evenly">
+                    <FacebookIcon size={18} fill="#3385FF" />
+                    <Span>Share on Facebook</Span>
+                  </Container>
+                </StyledLink>
+
+                <StyledLink
+                  {...socialButtonStyles}
+                  href="https://www.linkedin.com/shareArticle?mini=true&url=https%3A//opencollective.com&title=Check%20out%20Open%20Collective&summary=Open%20Collection%20is%20a%20platform%20for%20organizations,%20communities,%20and%20projects%20to%20operate%20transparently&source="
+                >
+                  <Container display="flex" alignItems="center" justifyContent="space-evenly">
+                    <LinkedInIcon size={18} fill="#3385FF" />
+                    <Span>Share on LinkedIn</Span>
+                  </Container>
+                </StyledLink>
+              </Flex>
             </Container>
           </Container>
         </Body>
