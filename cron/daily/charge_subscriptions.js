@@ -131,7 +131,7 @@ function vprint(options, message) {
 }
 
 /** Return the options passed by the user to run the script */
-function parseCommandLineArguments() {
+export function parseCommandLineArguments() {
   const parser = new ArgumentParser({
     addHelp: true,
     description: 'Charge due subscriptions',
@@ -165,7 +165,7 @@ function parseCommandLineArguments() {
 }
 
 /** Kick off the script with all the user selected options */
-async function entryPoint(options) {
+export async function entryPoint(options) {
   vprint(options, 'Starting to charge subscriptions');
   try {
     await run(options);
