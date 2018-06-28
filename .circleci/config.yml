@@ -15,20 +15,14 @@ jobs:
     steps:
     - checkout
     - setup_remote_docker
-    - restore_cache:
-        keys:
-        - v1-dep-{{ .Branch }}-
-        - v1-dep-master-
-        - v1-dep-
-
+    - restore_cache: # special step to restore the dependency cache 
+        key: dependency-cache-{{ checksum "package.json" }}
     - run: mkdir -p $CIRCLE_ARTIFACTS $CIRCLE_TEST_REPORTS
-
     - run: npm install
-
-    - save_cache:
-        key: v1-dep-{{ .Branch }}-{{ epoch }}
+    - save_cache: # special step to save the dependency cache
+        key: dependency-cache-{{ checksum "package.json" }}
         paths:
-        - ./node_modules
+          - ./node_modules
 
     - run: npm run test
     - store_test_results:
