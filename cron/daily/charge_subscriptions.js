@@ -176,4 +176,4 @@ export async function entryPoint(options) {
 }
 
 /* Entry point */
-//entryPoint(parseCommandLineArguments());
+entryPoint(parseCommandLineArguments());
