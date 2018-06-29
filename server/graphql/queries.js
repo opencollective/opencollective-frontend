@@ -632,6 +632,11 @@ const queries = {
 
       if (args.offset) query.offset = args.offset;
 
+      // this will elminate the odd test accounts and older data we need to cleanup
+      query.where.createdAt = {
+        [Op.not]: null,
+      };
+
       const result = await models.Collective.findAndCountAll(query);
 
       return {
