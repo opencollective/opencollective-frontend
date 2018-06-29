@@ -11,6 +11,8 @@ jobs:
     - setup_remote_docker
     - restore_cache: # special step to restore the dependency cache
         key: dependency-cache-{{ checksum "package.json" }}
+    - run: sudo apt -y update
+    - run: sudo apt -y install graphicsmagick
     - run: npm install
     - save_cache: # special step to save the dependency cache
         key: dependency-cache-{{ checksum "package.json" }}
