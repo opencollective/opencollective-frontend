@@ -1,0 +1,27 @@
+version: 2
+jobs:
+  build:
+    docker:
+    - image: circleci/node:10.3.0
+      command: /sbin/init
+    environment:
+      NODE_ENV: circleci
+    steps:
+    - checkout
+    - setup_remote_docker
+    - restore_cache: # special step to restore the dependency cache
+        key: dependency-cache-{{ checksum "package.json" }}
+    - run: npm install
+    - save_cache: # special step to save the dependency cache
+        key: dependency-cache-{{ checksum "package.json" }}
+        paths:
+          - ./node_modules
+    - run: ./scripts/setup_circleci.sh
+    - run: npm run test
+    - store_test_results:
+        path: /tmp/circleci-test-results
+
+    branches:
+      ignore:
+        - staging
+        - production
