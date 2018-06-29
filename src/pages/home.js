@@ -3,7 +3,6 @@ import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import { take, uniqBy } from 'lodash';
 
-import styled from 'styled-components';
 import { Box, Flex } from 'grid-styled';
 
 import { pickAvatar } from '../lib/collective.lib';
@@ -28,6 +27,7 @@ import {
   LinkedInIcon,
   TwitterIcon,
 } from '../components/icons';
+import StyledInput from '../components/StyledInput';
 
 const responsiveAlign = ['center', null, 'left'];
 const sectionHeadingStyles = {
@@ -283,6 +283,27 @@ class HomePage extends React.Component {
                 <P {...sectionDetailStyles}>
                   Want to evolve from the democracy of our voices to the democracy of our actions? Create an open collective for your group and leverage the power of the community to live up to your mission. <a href="/discover">Learn more.</a>
                 </P>
+
+                <Link route="/create">
+                  <StyledLink
+                    bg="#3385FF"
+                    borderRadius="50px"
+                    color="white"
+                    display="block"
+                    fontSize="1.6rem"
+                    fontWeight="bold"
+                    maxWidth="220px"
+                    mx={['auto', null, 4]}
+                    mt={4}
+                    mb={4}
+                    hover={{ color: 'white' }}
+                    py={3}
+                    textAlign="center"
+                    w={[250, null, 320]}
+                  >
+                    Create an open collective
+                  </StyledLink>
+                </Link>
               </Container>
               <Container w={[1, null, 0.5]}>
               </Container>
@@ -309,7 +330,7 @@ class HomePage extends React.Component {
                     fontSize="1.6rem"
                     fontWeight="bold"
                     maxWidth="220px"
-                    mx="auto"
+                    mx={['auto', null, 4]}
                     mt={4}
                     mb={4}
                     hover={{ color: 'white' }}
@@ -336,25 +357,24 @@ class HomePage extends React.Component {
 
                 <P {...sectionDetailStyles}>Join Open Collective and discover the different initiatives that are seeking your support. Embrace the mission that drives them and contribute to their group efforts. <Span fontWeight="bold">Become part of the movement.</Span></P>
 
-                <Link route="/discover">
-                  <StyledLink
-                    bg="#3385FF"
-                    borderRadius="50px"
-                    color="white"
-                    display="block"
-                    fontSize="1.6rem"
-                    fontWeight="bold"
-                    maxWidth="220px"
-                    mx="auto"
-                    mt={4}
-                    hover={{ color: 'white' }}
-                    py={3}
-                    textAlign="center"
-                    w={[250, null, 320]}
-                  >
-                    Become a backer
-                  </StyledLink>
-                </Link>
+                <StyledLink
+                  bg="#3385FF"
+                  borderRadius="50px"
+                  color="white"
+                  display="block"
+                  href="/discover"
+                  fontSize="1.6rem"
+                  fontWeight="bold"
+                  maxWidth="220px"
+                  mx={['auto', null, 4]}
+                  mt={4}
+                  hover={{ color: 'white' }}
+                  py={3}
+                  textAlign="center"
+                  w={[250, null, 320]}
+                >
+                  Become a backer
+                </StyledLink>
               </Container>
               <Container w={[1, null, 0.5]} overflow="hidden" position="relative">
                 <Container width={["100%", null, "160%"]} display="flex" flexWrap="wrap" justifyContent="center" alignItems="center" position="relative" >
@@ -406,7 +426,7 @@ class HomePage extends React.Component {
                     fontSize="1.6rem"
                     fontWeight="bold"
                     maxWidth="220px"
-                    mx="auto"
+                    mx={['auto', null, 4]}
                     mt={4}
                     hover={{ color: 'white' }}
                     py={3}
@@ -483,6 +503,53 @@ a transparent operation? Let them know that Open Collective exists!</P>
                 </StyledLink>
               </Flex>
             </Container>
+          </Container>
+
+          <Container py={5}>
+            <H4 textAlign="center" fontSize={20} mb={4} px={3}>Stay updated about our news and progress.</H4>
+
+            <Flex justifyContent="center">
+              <form
+                action="https://opencollective.us12.list-manage.com/subscribe/post?u=88fc8f0f3b646152f1cfe447a&amp;id=c44469099e"
+                method="post"
+                name="mc-embedded-subscribe-form"
+                target="_blank"
+              >
+                <Container
+                  border="1px solid rgba(18,19,20,0.12)"
+                  borderRadius={50}
+                  bg="white"
+                  display="flex"
+                  justifyContent="space-between"
+                  overflow="hidden"
+                  width={300}
+                >
+                  <StyledInput
+                    fontSize={14}
+                    name="EMAIL"
+                    px={3}
+                    py={1}
+                    placeholder="Your email address"
+                    type="email"
+                    width={1}
+                  />
+                  <StyledInput
+                    bg="#3385FF"
+                    borderRadius={50}
+                    color="white"
+                    fontSize={12}
+                    fontWeight="bold"
+                    hover={{ color: 'white' }}
+                    px={3}
+                    py={2}
+                    textAlign="center"
+                    name="subscribe"
+                    type="submit"
+                    value="Subscribe"
+                  />
+                </Container>
+              </form>
+            </Flex>
           </Container>
         </Body>
         <Footer />
