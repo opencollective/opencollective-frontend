@@ -1,7 +1,7 @@
 import React from 'react';
 
 const LinkedInIcon = ({ size = 18, fill = '#6E747A', ...props }) => (
-  <svg width={size} height={size} viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg">
+  <svg width={size} height={size} viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" {...props}>
     <title>linkedin icon</title>
     <g stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
       <g transform="translate(-1322.000000, -6039.000000)" fill={fill}>
