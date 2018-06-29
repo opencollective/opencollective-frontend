@@ -58,7 +58,8 @@ fi
 
 cd "opencollective-api"
 echo "> Restoring opencollective_dvl database for e2e testing";
-./scripts/db_restore.sh -U ubuntu -d opencollective_dvl -f test/dbdumps/opencollective_dvl.pgsql
+./node_modules/.bin/babel-node ./scripts/db_restore.js -f opencollective_dvl.pgsql
+
 if [ $? -ne 0 ]; then
   echo "Error with restoring opencollective_dvl, exiting"
   exit 1;
