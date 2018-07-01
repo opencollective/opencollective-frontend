@@ -297,6 +297,7 @@ export default function(Sequelize, DataTypes) {
           backgroundImage: this.backgroundImage,
           publicUrl: this.publicUrl,
           mission: this.mission,
+          description: this.description,
           settings: this.settings,
           currency: this.currency
         }
