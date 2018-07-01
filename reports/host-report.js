@@ -269,8 +269,11 @@ async function HostReport(year, month, hostId) {
           platformFees: stats[7],
           backers: stats[8]
         };
+        data.stats.totalAmountPaid = {
+          totalInHostCurrency: data.stats.totalAmountPaidExpenses.totalInHostCurrency + data.stats.paymentProcessorFees.totalInHostCurrency + data.stats.platformFees.totalInHostCurrency
+        };
         data.stats.totalNetAmountReceived = {
-          totalInHostCurrency: data.stats.totalNetAmountReceivedForCollectives.totalInHostCurrency + data.stats.totalHostFees.totalInHostCurrency
+          totalInHostCurrency: data.stats.totalNetAmountReceivedForCollectives.totalInHostCurrency - data.stats.totalHostFees.totalInHostCurrency // totalHostFees is negative
         };
         summary.hosts.push({
           host: { name: host.name, slug: host.slug, currency: host.currency },
