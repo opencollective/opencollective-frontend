@@ -381,7 +381,7 @@ class HomePage extends React.Component {
                   {backers.map((c) => <Container px={1} key={c.id}><BackerAvatar {...c} /></Container>)}
                 </Container>
                 <Hide xs sm position="absolute" top={0} left={0} width="100%" height="100%" pointerEvents="none">
-                  <Container background="linear-gradient(to left, #EBF1FA, transparent 50%)" width="100%" height="100%" />
+                  <Container background="linear-gradient(to left, #EBF1FA, rgba(255, 255, 255, 0) 50%)" width="100%" height="100%" />
                 </Hide>
               </Container>
             </Container>
