@@ -290,7 +290,10 @@ export const ExpenseInputType = new GraphQLInputObjectType({
       description: { type: GraphQLString },
       category: { type: GraphQLString },
       status: { type: GraphQLString },
-      payoutMethod: { type: GraphQLString },
+      payoutMethod: {
+        type: GraphQLString,
+        description: "Can be paypal, donation, manual, other"
+      },
       privateMessage: { type: GraphQLString },
       attachment: { type: GraphQLString },
       user: { type: UserInputType },

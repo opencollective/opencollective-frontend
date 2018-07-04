@@ -241,7 +241,7 @@ export async function payExpense(remoteUser, expenseId, paymentProcessFees) {
 
   const host = await expense.collective.getHostCollective();
 
-  // Expenses in kind can be maid for collectives without any
+  // Expenses in kind can be made for collectives without any
   // funds. That's why we skip earlier here.
   if (expense.payoutMethod === 'donation') {
     const transaction = await createTransactionFromPaidExpense(
