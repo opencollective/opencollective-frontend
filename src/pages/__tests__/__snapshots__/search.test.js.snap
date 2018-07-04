@@ -3,27 +3,161 @@
 exports[`Search Page renders empty results message 1`] = `
 .c1 {
   box-sizing: border-box;
-  width: 100%;
+  margin-left: 16px;
+  margin-right: 16px;
+  margin-top: 8px;
+  margin-bottom: 8px;
 }
 
 .c3 {
+  box-sizing: border-box;
+}
+
+.c6 {
+  box-sizing: border-box;
+  margin-left: 8px;
+  margin-right: 8px;
+}
+
+.c8 {
+  box-sizing: border-box;
+  -webkit-flex: 1 1 auto;
+  -ms-flex: 1 1 auto;
+  flex: 1 1 auto;
+}
+
+.c10 {
+  box-sizing: border-box;
+  margin-left: 16px;
+  margin-right: 16px;
+}
+
+.c14 {
+  margin: 0;
+  box-sizing: border-box;
+  margin: 0px;
+  padding: 0px;
+}
+
+.c15 {
+  box-sizing: border-box;
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+.c21 {
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.c23 {
   box-sizing: border-box;
   margin-top: 16px;
   margin-bottom: 16px;
 }
 
-.c7 {
-  box-sizing: border-box;
-}
-
-.c9 {
+.c28 {
   box-sizing: border-box;
   width: 100%;
   padding-top: 16px;
   padding-bottom: 16px;
 }
 
+.c31 {
+  box-sizing: border-box;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 8px;
+}
+
+.c34 {
+  box-sizing: border-box;
+  margin-top: 8px;
+}
+
+.c38 {
+  box-sizing: border-box;
+  width: 100%;
+  margin-top: 16px;
+  margin-bottom: 16px;
+}
+
+.c41 {
+  margin-top: 16px;
+  box-sizing: border-box;
+  margin-top: 16px;
+}
+
+.c42 {
+  box-sizing: border-box;
+  width: 50%;
+  margin-bottom: 16px;
+}
+
+.c0 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-direction: row;
+  -ms-flex-direction: row;
+  flex-direction: row;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: space-around;
+  -webkit-justify-content: space-around;
+  -ms-flex-pack: space-around;
+  justify-content: space-around;
+}
+
 .c2 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+}
+
+.c7 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: end;
+  -webkit-justify-content: flex-end;
+  -ms-flex-pack: end;
+  justify-content: flex-end;
+}
+
+.c11 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+}
+
+.c13 {
+  margin: 0;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: space-around;
+  -webkit-justify-content: space-around;
+  -ms-flex-pack: space-around;
+  justify-content: space-around;
+}
+
+.c22 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -34,7 +168,7 @@ exports[`Search Page renders empty results message 1`] = `
   align-items: flex-end;
 }
 
-.c6 {
+.c26 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -48,7 +182,7 @@ exports[`Search Page renders empty results message 1`] = `
   justify-content: center;
 }
 
-.c8 {
+.c27 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -59,7 +193,223 @@ exports[`Search Page renders empty results message 1`] = `
   justify-content: center;
 }
 
-.c4.c4.c4 {
+.c30 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: justify;
+  -webkit-justify-content: space-between;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
+}
+
+.c33 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
+}
+
+.c35 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+}
+
+.c37 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: space-evenly;
+  -webkit-justify-content: space-evenly;
+  -ms-flex-pack: space-evenly;
+  justify-content: space-evenly;
+}
+
+.c40 {
+  margin-top: 16px;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-wrap: wrap;
+  -ms-flex-wrap: wrap;
+  flex-wrap: wrap;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+}
+
+.c18 {
+  color: #46b0ed;
+  display: inline-block;
+  font-size: 1.2rem;
+  font-weight: bold;
+  -webkit-letter-spacing: 1px;
+  -moz-letter-spacing: 1px;
+  -ms-letter-spacing: 1px;
+  letter-spacing: 1px;
+  margin: 0px;
+  margin-left: 8px;
+  margin-right: 8px;
+}
+
+.c36 {
+  color: #6E747A;
+  font-size: 1.4rem;
+  margin: 0px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  text-align: center;
+}
+
+.c43 {
+  color: #C2C6CC;
+  font-size: 1.2rem;
+  -webkit-letter-spacing: 1px;
+  -moz-letter-spacing: 1px;
+  -ms-letter-spacing: 1px;
+  letter-spacing: 1px;
+  margin: 0px;
+  padding-bottom: 16px;
+  text-align: center;
+}
+
+.c19 {
+  position: relative;
+  display: inline-block;
+  height: 0.6rem;
+  width: 1.4rem;
+}
+
+.c19::before,
+.c19::after {
+  content: '';
+  position: absolute;
+  top: 0;
+}
+
+.c19::before {
+  border-left: 0.6rem solid transparent;
+  border-right: 0.6rem solid transparent;
+  border-top: 0.6rem solid #46b0ed;
+  left: 0;
+}
+
+.c19::after {
+  border-left: calc(0.6rem - 0.2rem) solid transparent;
+  border-right: calc(0.6rem - 0.2rem) solid transparent;
+  border-top: calc(0.6rem - 0.2rem) solid white;
+  left: 0.2rem;
+}
+
+.c46 {
+  color: #6E747A;
+  display: block;
+  font-size: 1.6rem;
+  font-weight: 400;
+  margin: 0px;
+  padding: 0px;
+}
+
+.c45 {
+  list-style: none;
+  text-align: center;
+}
+
+.c4 {
+  -webkit-animation: iECmZH 0.8s infinite linear;
+  animation: iECmZH 0.8s infinite linear;
+}
+
+.c12 {
+  list-style: none;
+  min-width: 20rem;
+  text-align: right;
+}
+
+.c16 {
+  color: #777777;
+  font-size: 1.4rem;
+}
+
+.c39 {
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  border: 1px solid #9399A3;
+  border-radius: 50%;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  height: 48px;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  opacity: 0.6;
+  width: 48px;
+}
+
+.c39:hover,
+.c39:focus {
+  opacity: 1;
+}
+
+.c29 {
+  bottom: 0;
+  background-color: white;
+  border-top: 1px solid #aaaaaa;
+  min-height: 7.5rem;
+  padding: 1rem;
+  width: 100%;
+}
+
+.c32 {
+  max-width: 300px;
+}
+
+.c44 {
+  box-sizing: border-box;
+  padding: 0px;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+}
+
+.c24.c24.c24 {
   border: none;
   border-bottom: 2px solid #46B0ED;
   border-radius: 0;
@@ -70,11 +420,11 @@ exports[`Search Page renders empty results message 1`] = `
   padding: 0;
 }
 
-.c5.c5 {
+.c25.c25 {
   padding: 0 2rem;
 }
 
-.c0 {
+.c20 {
   box-sizing: border-box;
   width: 100%;
   margin-left: auto;
@@ -84,8 +434,22 @@ exports[`Search Page renders empty results message 1`] = `
   max-width: 1200px;
 }
 
+@media screen and (min-width:52em) {
+  .c34 {
+    width: 33.33333333333333%;
+  }
+}
+
+@media screen and (min-width:52em) {
+  .c38 {
+    -webkit-order: 3;
+    -ms-flex-order: 3;
+    order: 3;
+  }
+}
+
 @media screen and (min-width:40em) {
-  .c6 {
+  .c26 {
     -webkit-box-pack: center;
     -webkit-justify-content: center;
     -ms-flex-pack: center;
@@ -94,7 +458,7 @@ exports[`Search Page renders empty results message 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c6 {
+  .c26 {
     -webkit-box-pack: start;
     -webkit-justify-content: flex-start;
     -ms-flex-pack: start;
@@ -102,8 +466,88 @@ exports[`Search Page renders empty results message 1`] = `
   }
 }
 
+@media screen and (min-width:52em) {
+  .c30 {
+    -webkit-flex-direction: row;
+    -ms-flex-direction: row;
+    flex-direction: row;
+  }
+}
+
+@media screen and (min-width:52em) {
+  .c30 {
+    -webkit-align-items: flex-start;
+    -webkit-box-align: flex-start;
+    -ms-flex-align: flex-start;
+    align-items: flex-start;
+  }
+}
+
+@media screen and (min-width:52em) {
+  .c35 {
+    -webkit-box-pack: start;
+    -webkit-justify-content: flex-start;
+    -ms-flex-pack: start;
+    justify-content: flex-start;
+  }
+}
+
+@media screen and (min-width:52em) {
+  .c36 {
+    text-align: left;
+  }
+}
+
+@media screen and (min-width:52em) {
+  .c43 {
+    text-align: left;
+  }
+}
+
+@media screen and (max-width:40em) {
+  .c5 {
+    display: none;
+  }
+}
+
+@media screen and (min-width:40em) and (max-width:52em) {
+  .c9 {
+    display: none;
+  }
+}
+
+@media screen and (min-width:52em) and (max-width:64em) {
+  .c9 {
+    display: none;
+  }
+}
+
+@media screen and (min-width:64em) {
+  .c9 {
+    display: none;
+  }
+}
+
+@media screen and (max-width:40em) {
+  .c17 {
+    display: none;
+  }
+}
+
+@media screen and (min-width:40em) and (max-width:52em) {
+  .c17 {
+    display: none;
+  }
+}
+
+@media screen and (min-width:52em) {
+  .c45 {
+    text-align: left;
+  }
+}
+
 @media screen and (min-width:40em) {
-  .c0 {
+  .c20 {
     width: 85%;
   }
 }
@@ -114,79 +558,186 @@ exports[`Search Page renders empty results message 1`] = `
       id="top"
     />
     <div
-      className="jsx-3593811691 loading TopBar"
+      className="c0 c1 sc-bdVaJa c1"
     >
       <a
-        className="jsx-3593811691"
-        href="/"
-        title="Go to Open Collective Homepage"
+        className="c2 c3"
+        onClick={[Function]}
       >
         <img
           alt="Open Collective logo"
-          className="jsx-3593811691 logo"
-          height="40"
+          className="c4"
+          height="24"
           src="/static/images/opencollective-icon.svg"
-          width="40"
-        />
-      </a>
-      <div
-        className="jsx-3593811691 nav"
-      >
-        <ul
-          className="jsx-3593811691 mediumScreenOnly"
-        >
-          <li
-            className="jsx-3593811691"
-          >
-            <a
-              className="jsx-3593811691 menuItem"
-              href="/learn-more"
-            >
-              <span>
-                How it works
-              </span>
-            </a>
-          </li>
-          <li
-            className="jsx-3593811691"
-          >
-            <a
-              className="jsx-3593811691 menuItem"
-              href="/discover"
-            >
-              <span>
-                discover
-              </span>
-            </a>
-          </li>
-          <li
-            className="jsx-3593811691"
-          >
-            <a
-              className="jsx-3593811691 menuItem"
-              href="https://medium.com/open-collective"
-            >
-              <span>
-                Blog
-              </span>
-            </a>
-          </li>
-        </ul>
-        <div
-          className="jsx-3593811691 separator"
+          width="24"
         />
         <div
-          className="jsx-2783800609 LoginTopBarProfileButton"
+          className="c5 c3"
+          xs={true}
         >
           <div
-            className="jsx-2904874222 TopBarProfileMenu "
+            className="c6"
+          >
+            <img
+              height="16px"
+              src="/static/images/logotype.svg"
+            />
+          </div>
+        </div>
+      </a>
+      <div
+        className="c7 c8 sc-bdVaJa c8"
+      >
+        <div
+          className="c9 c3"
+          lg={true}
+          md={true}
+          sm={true}
+        >
+          <div
+            className="c10"
+          >
+            <a
+              className="c11 c3"
+              onClick={[Function]}
+            >
+              <svg
+                height={24}
+                version="1.1"
+                viewBox="10 10 30 30"
+                width={24}
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <title>
+                  magnifying glass icon
+                </title>
+                <path
+                  d="M28.5404814,30.1903972 C26.7995948,31.5736628 24.5962981,32.4 22.2,32.4 C16.5666956,32.4 12,27.8333044 12,22.2 C12,16.5666956 16.5666956,12 22.2,12 C27.8333044,12 32.4,16.5666956 32.4,22.2 C32.4,24.5962981 31.5736628,26.7995948 30.1903972,28.5404814 L35.6582912,34.0083754 C36.1139029,34.4639871 36.1139029,35.2026796 35.6582912,35.6582912 C35.2026796,36.1139029 34.4639871,36.1139029 34.0083754,35.6582912 L28.5404814,30.1903972 Z M22.2,30 C26.507821,30 30,26.507821 30,22.2 C30,17.892179 26.507821,14.4 22.2,14.4 C17.892179,14.4 14.4,17.892179 14.4,22.2 C14.4,26.507821 17.892179,30 22.2,30 Z"
+                  fill="#aaaaaa"
+                  fillRule="nonzero"
+                  id="magnifying-glass"
+                />
+              </svg>
+            </a>
+          </div>
+        </div>
+        <div
+          className="c9 c3"
+          lg={true}
+          md={true}
+          sm={true}
+        >
+          <div
+            className="c10"
+          >
+            <a
+              className="c11 c3"
+              onClick={[Function]}
+            >
+              <svg
+                height={16.799999999999997}
+                version="1.1"
+                viewBox="0 0 20 14"
+                width={24}
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <title>
+                  menu icon
+                </title>
+                <path
+                  d="M19,6 L1,6 C0.4,6 0,6.4 0,7 C0,7.6 0.4,8 1,8 L19,8 C19.6,8 20,7.6 20,7 C20,6.4 19.6,6 19,6 Z"
+                  fill="#aaaaaa"
+                  fillRule="nonzero"
+                />
+                <path
+                  d="M0.85,2 L16.15,2 C16.66,2 17,1.6 17,1 C17,0.4 16.66,0 16.15,0 L0.85,0 C0.34,0 0,0.4 0,1 C0,1.6 0.34,2 0.85,2 Z"
+                  fill="#aaaaaa"
+                  fillRule="nonzero"
+                />
+                <path
+                  d="M16.15,12 L0.85,12 C0.34,12 0,12.4 0,13 C0,13.6 0.34,14 0.85,14 L16.15,14 C16.66,14 17,13.6 17,13 C17,12.4 16.66,12 16.15,12 Z"
+                  fill="#aaaaaa"
+                  fillRule="nonzero"
+                />
+              </svg>
+            </a>
+          </div>
+        </div>
+        <div
+          className="c5 c3"
+          xs={true}
+        >
+          <ul
+            className="c12 c13 c14"
+            m={0}
+            p={0}
+          >
+            <li
+              className="c15"
+            >
+              <a
+                className="c16"
+                href="/discover"
+              >
+                <span>
+                  Discover
+                </span>
+              </a>
+            </li>
+            <li
+              className="c15"
+            >
+              <a
+                className="c16"
+                href="/learn-more"
+              >
+                <span>
+                  How it Works
+                </span>
+              </a>
+            </li>
+            <li
+              className="c15"
+            >
+              <a
+                className="c16"
+                href="https://medium.com/open-collective"
+              >
+                <span>
+                  Blog
+                </span>
+              </a>
+            </li>
+          </ul>
+        </div>
+        <div
+          className="LoginTopBarProfileButton"
+        >
+          <div
+            className="c2 c3 sc-bdVaJa c3"
             onClick={[Function]}
           >
             <div
-              className="jsx-2904874222 LoginTopBarProfileButton-name desktopOnly"
-            />
+              className="c17 c3"
+              sm={true}
+              xs={true}
+            >
+              <p
+                className="c18"
+                color="#46b0ed"
+                display="inline-block"
+                fontSize="1.2rem"
+                fontWeight="bold"
+                letterSpacing="1px"
+              />
+            </div>
             <div
-              className="jsx-2904874222 LoginTopBarProfileButton-caret"
+              className="c19"
+              color="#46b0ed"
+              display="inline-block"
+              height="0.6rem"
+              strokeWidth="0.2rem"
+              width="1.4rem"
             />
           </div>
         </div>
@@ -194,13 +745,13 @@ exports[`Search Page renders empty results message 1`] = `
     </div>
   </header>
   <main
-    className="jsx-4138488456"
+    className="jsx-1964704679"
   >
     <div
-      className="c0"
+      className="c20"
     >
       <div
-        className="c1"
+        className="c21"
       >
         <form
           method="GET"
@@ -216,10 +767,10 @@ exports[`Search Page renders empty results message 1`] = `
               Search Open Collective
             </label>
             <div
-              className="c2 c3 sc-bdVaJa c3"
+              className="c22 c23 sc-bdVaJa c23"
             >
               <input
-                className="c4 form-control"
+                className="c24 form-control"
                 defaultValue="test"
                 id="search"
                 name="q"
@@ -227,7 +778,7 @@ exports[`Search Page renders empty results message 1`] = `
                 type="search"
               />
               <button
-                className="jsx-2820878800 jsx-1599314605 Button blue c5"
+                className="jsx-2820878800 jsx-1599314605 Button blue c25"
                 onClick={[Function]}
                 type="submit"
               >
@@ -240,10 +791,10 @@ exports[`Search Page renders empty results message 1`] = `
         </form>
       </div>
       <div
-        className="c6 c7 sc-bdVaJa c7"
+        className="c26 c3 sc-bdVaJa c3"
       >
         <div
-          className="c8 c9 sc-bdVaJa c9"
+          className="c27 c28 sc-bdVaJa c28"
         >
           <p>
             <em>
@@ -257,388 +808,644 @@ exports[`Search Page renders empty results message 1`] = `
     </div>
   </main>
   <div
-    className="jsx-568600484 Footer"
+    className="c29"
+    id="footer"
   >
     <div
-      className="jsx-568600484 content"
+      className="c30 c31 sc-bdVaJa c31"
     >
       <div
-        className="jsx-568600484"
+        className="c32 c33 c34 sc-bdVaJa c34"
+        maxWidth="300px"
       >
-        <object
-          className="jsx-568600484 logo"
-          data="/static/images/opencollectivelogo-footer.svg"
-          height="20"
-          type="image/svg+xml"
-        />
+        <div
+          className="c35 c3 sc-bdVaJa c3"
+        >
+          <object
+            data="/static/images/opencollectivelogo-footer.svg"
+            height="20"
+            type="image/svg+xml"
+          />
+        </div>
+        <p
+          className="c36"
+          color="#6E747A"
+          fontSize="1.4rem"
+        >
+          Providing the digital tools that drive the organizations of the 21st century.
+        </p>
       </div>
       <div
-        className="jsx-568600484"
+        className="c32 c37 c38 sc-bdVaJa c38"
+        maxWidth="300px"
       >
-        <nav
-          className="jsx-568600484"
+        <a
+          className="c39"
+          href="https://medium.com/open-collective"
         >
+          <svg
+            height={15}
+            viewBox="0 0 32 32"
+            width={15}
+          >
+            <title>
+              medium icon
+            </title>
+            <path
+              d="M3.795 8.48c0.040-0.393-0.111-0.781-0.404-1.045l-2.987-3.6v-0.537h9.276l7.171 15.727 6.304-15.727h8.845v0.537l-2.556 2.449c-0.22 0.168-0.329 0.444-0.284 0.717v18c-0.045 0.272 0.064 0.547 0.284 0.716l2.493 2.449v0.537h-12.547v-0.537l2.583-2.509c0.253-0.253 0.253-0.328 0.253-0.717v-14.548l-7.187 18.251h-0.969l-8.367-18.251v12.232c-0.069 0.515 0.101 1.032 0.463 1.404l3.36 4.080v0.536h-9.527v-0.537l3.36-4.080c0.36-0.371 0.52-0.893 0.435-1.403v-14.144z"
+              fill="#9399A3"
+            />
+          </svg>
+        </a>
+        <a
+          className="c39"
+          href="https://twitter.com/opencollect"
+        >
+          <svg
+            height={12.5}
+            version="1.1"
+            viewBox="0 0 18 15"
+            width={15}
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <title>
+              twitter icon
+            </title>
+            <g
+              fill="none"
+              fillRule="evenodd"
+              id="Homepage"
+              stroke="none"
+              strokeWidth="1"
+            >
+              <g
+                id="Homepage---XS-(small-handset)"
+                transform="translate(-97.000000, -9521.000000)"
+              >
+                <g
+                  id="JOIN-MOVEMENT"
+                  transform="translate(-69.000000, 3570.000000)"
+                >
+                  <g
+                    id="::-06---spread-the-word"
+                    transform="translate(85.000000, 5758.000000)"
+                  >
+                    <g
+                      id="::-button-(share-twitter)"
+                      transform="translate(44.000000, 176.000000)"
+                    >
+                      <path
+                        d="M55,18.7756985 C54.33775,19.0771597 53.626,19.2801846 52.879,19.3716996 C53.64175,18.9033581 54.22675,18.1612407 54.50275,17.2768521 C53.7895,17.710587 52.999,18.0258908 52.1575,18.1958472 C51.484,17.4598821 50.524,17 49.462,17 C47.42275,17 45.769,18.695719 45.769,20.7867214 C45.769,21.0835683 45.802,21.3727249 45.86425,21.649577 C42.79525,21.4919251 40.07425,19.9838503 38.2525,17.6928993 C37.93525,18.2519867 37.753,18.9025891 37.753,19.5970264 C37.753,20.9105358 38.40475,22.0694694 39.3955,22.748526 C38.79025,22.7285311 38.221,22.5585747 37.723,22.2748013 C37.723,22.290951 37.723,22.3063317 37.723,22.3224814 C37.723,24.1573955 38.99575,25.6877724 40.6855,26.0353755 C40.37575,26.1222763 40.0495,26.1684184 39.712,26.1684184 C39.47425,26.1684184 39.2425,26.1445783 39.0175,26.1007434 C39.48775,27.6049731 40.85125,28.7000769 42.4675,28.7308382 C41.20375,29.7467316 39.6115,30.351961 37.88125,30.351961 C37.5835,30.351961 37.2895,30.3342733 37,30.2988977 C38.63425,31.3732376 40.57525,32 42.661,32 C49.45375,32 53.16775,26.229941 53.16775,21.2258395 C53.16775,21.0620354 53.164,20.8982312 53.15725,20.7359651 C53.87875,20.2014868 54.505,19.5347347 55,18.7756985 Z"
+                        fill="#9399A3"
+                        fillRule="nonzero"
+                        id="twitter"
+                      />
+                    </g>
+                  </g>
+                </g>
+              </g>
+            </g>
+          </svg>
+        </a>
+        <a
+          className="c39"
+          href="https://github.com/opencollective"
+        >
+          <svg
+            height={15}
+            version="1.1"
+            viewBox="0 0 22 22"
+            width={15}
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <title>
+              github icon
+            </title>
+            <g
+              fill="none"
+              fillRule="evenodd"
+              id="Homepage"
+              stroke="none"
+              strokeWidth="1"
+            >
+              <g
+                id="Homepage---XS-(small-handset)"
+                transform="translate(-149.000000, -10919.000000)"
+              >
+                <g
+                  id="FOOTER"
+                  transform="translate(0.000000, 10758.000000)"
+                >
+                  <g
+                    id="::-social-networks"
+                    transform="translate(24.000000, 148.000000)"
+                  >
+                    <g
+                      id="::-icon-(github)"
+                      transform="translate(112.000000, 0.000000)"
+                    >
+                      <path
+                        d="M24,13 C17.9133333,13 13,17.962963 13,24.1111111 C13,29.2222222 16.4466667,33.6666667 21.36,34.9259259 C21.4333333,34.9259259 21.58,34.9259259 21.6533333,34.8518519 C21.7266667,34.7777778 21.8,34.7037037 21.8,34.5555556 L21.8,31.8888889 C21.8,31.8148148 21.7266667,31.6666667 21.7266667,31.5925926 C21.6533333,31.5185185 21.58,31.5185185 21.4333333,31.5185185 L20.7,31.5185185 C19.5266667,31.5185185 18.7933333,30.4074074 18.1333333,29.4444444 C17.9866667,29.2962963 17.9133333,29.0740741 17.7666667,28.9259259 C18.2066667,29.1481481 18.5,29.4444444 18.8666667,29.8148148 C19.38,30.3333333 19.8933333,30.8518519 20.7733333,30.8518519 C20.7733333,30.8518519 20.7733333,30.8518519 20.7733333,30.8518519 C21.14,30.8518519 21.8733333,30.4814815 21.8733333,29.3703704 L21.8733333,29 C21.8733333,28.8518519 21.8,28.7037037 21.58,28.6296296 C19.0866667,27.8888889 17.4733333,25.8888889 17.4733333,23.5925926 C17.4733333,22.4074074 17.9866667,21.2222222 18.8666667,20.3333333 C18.8666667,20.1851852 18.8666667,20.037037 18.8666667,19.8888889 C18.5,19.1481481 18.8666667,18.1111111 19.38,17.5185185 C19.8933333,17.7407407 20.4066667,18.3333333 20.8466667,18.7777778 C20.92,18.9259259 21.14,18.9259259 21.2866667,18.8518519 L21.5066667,18.7777778 C22.3133333,18.4814815 23.2666667,18.1111111 24.1466667,18.1111111 C25.0266667,18.1111111 25.98,18.4814815 26.7866667,18.7777778 L27.0066667,18.8518519 C27.1533333,18.9259259 27.3,18.8518519 27.4466667,18.7777778 C27.8866667,18.2592593 28.4,17.7407407 28.9133333,17.5185185 C29.4266667,18.1851852 29.7933333,19.1481481 29.4266667,19.8888889 C29.1333333,20.037037 29.1333333,20.1851852 29.2066667,20.3333333 C30.0866667,21.2962963 30.6,22.3333333 30.6,23.4444444 C30.6,25.8888889 28.7666667,28.037037 26.1266667,28.6296296 C25.98,28.6296296 25.9066667,28.7037037 25.9066667,28.8518519 C25.9066667,29 25.8333333,29.0740741 25.9066667,29.1481481 C26.1266667,29.5185185 26.2,30.2592593 26.2,31.2222222 C26.2,32.4814815 26.2,34.6296296 26.2,34.6296296 C26.2,34.7777778 26.2733333,34.8518519 26.3466667,34.9259259 C26.42,35 26.4933333,35 26.5666667,35 C26.5666667,35 26.64,35 26.64,35 C31.5533333,33.6666667 35,29.2222222 35,24.1111111 C35,17.962963 30.0866667,13 24,13 Z"
+                        fill="#9399A3"
+                        fillRule="nonzero"
+                        id="github"
+                      />
+                    </g>
+                  </g>
+                </g>
+              </g>
+            </g>
+          </svg>
+        </a>
+        <a
+          className="c39"
+          href="https://slack.com/opencollective"
+        >
+          <svg
+            height={15}
+            version="1.1"
+            viewBox="0 0 20 20"
+            width={15}
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <title>
+              slack icon
+            </title>
+            <g
+              fill="#9399A3"
+              id="slack"
+            >
+              <path
+                d="M19.1625,7.25 C21.225,14.125 19.62125,17.1 12.75,19.1625 C5.875,21.225 2.9,19.62125 0.8375,12.75 C-1.225,5.875 0.38,2.9 7.25,0.8375 C14.1225,-1.225 17.1,0.38 19.1625,7.25 Z M15.6875,11.7125 L15.695,11.73875 C16.2325,11.56375 16.5275,10.97625 16.345,10.42625 C16.16375,9.87625 15.57625,9.58875 15.0325,9.76375 L13.74,10.19375 L12.8775,7.6225 L14.175,7.185 C14.71625,7.005 15.01,6.4175 14.82875,5.8725 C14.64625,5.335 14.05875,5.04 13.51625,5.2225 L12.22,5.6475 L11.77,4.2975 C11.59,3.75 11.00125,3.4625 10.4575,3.6375 C9.9125,3.825 9.625,4.4125 9.8,4.95 L10.25,6.2875 L7.58875,7.1825 L7.13875,5.8425 C6.96375,5.3025 6.37625,5.00625 5.82625,5.19 C5.27625,5.37 4.98875,5.9575 5.16375,6.5025 L5.61375,7.84 L4.31375,8.2725 C3.76375,8.45625 3.47625,9.04375 3.65125,9.585 C3.78875,10.01 4.18875,10.27875 4.60125,10.29125 C4.72,10.29375 4.84,10.2775 4.9575,10.2375 L6.25,9.8 L7.07375,12.37375 L5.77375,12.81125 C5.23625,12.98625 4.93625,13.57375 5.12375,14.12375 C5.27375,14.54875 5.66125,14.82375 6.08625,14.83625 C6.21125,14.83625 6.32375,14.82375 6.44875,14.78625 L7.74875,14.34875 L8.19875,15.69875 C8.34875,16.12375 8.73625,16.39375 9.16125,16.40625 C9.28625,16.40875 9.39875,16.3925 9.52375,16.3525 C10.07375,16.17125 10.36125,15.58375 10.18625,15.04 L9.73625,13.7 L12.41125,12.805 L12.86125,14.145 C13.01125,14.57 13.39875,14.84 13.82375,14.8525 C13.94875,14.85625 14.06125,14.8375 14.18625,14.8 C14.72875,14.6175 15.0225,14.03 14.84125,13.4875 L14.39125,12.14625 L15.6875,11.7125 Z"
+              />
+              <polygon
+                points="8.2325 9.1625 9.095 11.73375 11.76625 10.83875 10.90375 8.27625 8.2325 9.17625"
+              />
+            </g>
+          </svg>
+        </a>
+        <a
+          className="c39"
+          href="mailto:info@opencollective.com"
+        >
+          <svg
+            height={13.125}
+            version="1.1"
+            viewBox="0 0 16 14"
+            width={15}
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <title>
+              email icon
+            </title>
+            <g
+              fill="none"
+              fillRule="evenodd"
+              id="Homepage"
+              stroke="none"
+              strokeWidth="1"
+            >
+              <g
+                id="Homepage---XS-(small-handset)"
+                transform="translate(-264.000000, -10923.000000)"
+              >
+                <g
+                  id="FOOTER"
+                  transform="translate(0.000000, 10758.000000)"
+                >
+                  <g
+                    id="::-social-networks"
+                    transform="translate(24.000000, 148.000000)"
+                  >
+                    <g
+                      id="::-icon-(email)"
+                      transform="translate(224.000000, 0.000000)"
+                    >
+                      <path
+                        d="M30.4,17 L17.6,17 C16.72,17 16.008,17.9 16.008,19 L16,29 C16,30.1 16.72,31 17.6,31 L30.4,31 C31.28,31 32,30.1 32,29 L32,19 C32,17.9 31.28,17 30.4,17 Z M30,21 L24,25 L18,21 L18,19 L24,23 L30,19 L30,21 Z"
+                        fill="#9399A3"
+                        fillRule="nonzero"
+                        id="email"
+                      />
+                    </g>
+                  </g>
+                </g>
+              </g>
+            </g>
+          </svg>
+        </a>
+      </div>
+      <nav
+        className="c40 c41"
+        mt={3}
+      >
+        <div
+          className="c42"
+        >
+          <p
+            className="c43"
+            color="#C2C6CC"
+            fontSize="1.2rem"
+            letterSpacing="1px"
+          >
+            PLATFORM
+          </p>
           <ul
-            className="jsx-568600484"
+            className="c44"
           >
             <li
-              className="jsx-568600484"
+              className="c45"
             >
               <a
-                className="jsx-568600484"
-                href="/learn-more"
+                className="c46"
+                color="#6E747A"
+                display="block"
+                fontSize="1.6rem"
+                fontWeight="400"
+                href="/discover"
               >
-                How It Works
+                Discover
               </a>
             </li>
             <li
-              className="jsx-568600484"
+              className="c45"
             >
               <a
-                className="jsx-568600484"
-                href="https://opencollective.com/#opensource"
+                className="c46"
+                color="#6E747A"
+                display="block"
+                fontSize="1.6rem"
+                fontWeight="400"
+                href="/learn-more"
+              >
+                How it Works
+              </a>
+            </li>
+            <li
+              className="c45"
+            >
+              <a
+                className="c46"
+                color="#6E747A"
+                display="block"
+                fontSize="1.6rem"
+                fontWeight="400"
+                href="/opensource"
               >
                 Use Cases
               </a>
             </li>
             <li
-              className="jsx-568600484"
+              className="c45"
             >
               <a
-                className="jsx-568600484"
-                href="https://opencollective.com/faq"
+                className="c46"
+                color="#6E747A"
+                display="block"
+                fontSize="1.6rem"
+                fontWeight="400"
+                href="/signin"
               >
-                FAQ
+                Sign Up
               </a>
             </li>
             <li
-              className="jsx-568600484"
+              className="c45"
             >
               <a
-                className="jsx-568600484"
+                className="c46"
+                color="#6E747A"
+                display="block"
+                fontSize="1.6rem"
+                fontWeight="400"
+                href="/signin"
+              >
+                Login
+              </a>
+            </li>
+          </ul>
+        </div>
+        <div
+          className="c42"
+        >
+          <p
+            className="c43"
+            color="#C2C6CC"
+            fontSize="1.2rem"
+            letterSpacing="1px"
+          >
+            JOIN THE MOVEMENT
+          </p>
+          <ul
+            className="c44"
+          >
+            <li
+              className="c45"
+            >
+              <a
+                className="c46"
+                color="#6E747A"
+                display="block"
+                fontSize="1.6rem"
+                fontWeight="400"
+                href="/create"
+              >
+                Create a Collective
+              </a>
+            </li>
+            <li
+              className="c45"
+            >
+              <a
+                className="c46"
+                color="#6E747A"
+                display="block"
+                fontSize="1.6rem"
+                fontWeight="400"
+                href="/organizations/new"
+              >
+                Become a Sponsor
+              </a>
+            </li>
+          </ul>
+        </div>
+        <div
+          className="c42"
+        >
+          <p
+            className="c43"
+            color="#C2C6CC"
+            fontSize="1.2rem"
+            letterSpacing="1px"
+          >
+            COMMUNITY
+          </p>
+          <ul
+            className="c44"
+          >
+            <li
+              className="c45"
+            >
+              <a
+                className="c46"
+                color="#6E747A"
+                display="block"
+                fontSize="1.6rem"
+                fontWeight="400"
+                href="/opensource"
+              >
+                Open Source
+              </a>
+            </li>
+            <li
+              className="c45"
+            >
+              <a
+                className="c46"
+                color="#6E747A"
+                display="block"
+                fontSize="1.6rem"
+                fontWeight="400"
                 href="https://forum.opencollective.com"
               >
                 Forum
               </a>
             </li>
             <li
-              className="jsx-568600484"
+              className="c45"
             >
               <a
-                className="jsx-568600484"
+                className="c46"
+                color="#6E747A"
+                display="block"
+                fontSize="1.6rem"
+                fontWeight="400"
+                href="https://opencollective.slack.com"
+              >
+                Slack
+              </a>
+            </li>
+            <li
+              className="c45"
+            >
+              <a
+                className="c46"
+                color="#6E747A"
+                display="block"
+                fontSize="1.6rem"
+                fontWeight="400"
+                href="https://github.com/OpenCollective/OpenCollective/wiki"
+              >
+                Help
+              </a>
+            </li>
+          </ul>
+        </div>
+        <div
+          className="c42"
+        >
+          <p
+            className="c43"
+            color="#C2C6CC"
+            fontSize="1.2rem"
+            letterSpacing="1px"
+          >
+            COMPANY
+          </p>
+          <ul
+            className="c44"
+          >
+            <li
+              className="c45"
+            >
+              <a
+                className="c46"
+                color="#6E747A"
+                display="block"
+                fontSize="1.6rem"
+                fontWeight="400"
+                href="/about"
+              >
+                About
+              </a>
+            </li>
+            <li
+              className="c45"
+            >
+              <a
+                className="c46"
+                color="#6E747A"
+                display="block"
+                fontSize="1.6rem"
+                fontWeight="400"
+                href="/faq"
+              >
+                FAQ
+              </a>
+            </li>
+            <li
+              className="c45"
+            >
+              <a
+                className="c46"
+                color="#6E747A"
+                display="block"
+                fontSize="1.6rem"
+                fontWeight="400"
                 href="https://medium.com/open-collective"
               >
                 Blog
               </a>
             </li>
             <li
-              className="jsx-568600484"
+              className="c45"
             >
               <a
+                className="c46"
+                color="#6E747A"
+                display="block"
+                fontSize="1.6rem"
+                fontWeight="400"
                 href="/tos"
-                onClick={[Function]}
               >
-                Terms Of Service
+                Terms of Service
               </a>
             </li>
             <li
-              className="jsx-568600484"
+              className="c45"
             >
               <a
-                className="jsx-568600484"
-                href="https://opencollective.com/about"
+                className="c46"
+                color="#6E747A"
+                display="block"
+                fontSize="1.6rem"
+                fontWeight="400"
+                href="/privacypolicy"
               >
-                About
-              </a>
-            </li>
-            <li
-              className="jsx-568600484"
-            >
-              <a
-                className="jsx-568600484"
-                href="mailto:info@opencollective.com"
-              >
-                Contact
+                Privacy Policy
               </a>
             </li>
           </ul>
-        </nav>
-      </div>
+        </div>
+      </nav>
     </div>
   </div>
 </div>
 `;
 
 exports[`Search Page renders error message 1`] = `
-<div
-  className="jsx-3855972673 Error"
->
-  <header>
-    <div
-      id="top"
-    />
-    <div
-      className="jsx-3593811691 TopBar"
-    >
-      <a
-        className="jsx-3593811691"
-        href="/"
-        title="Go to Open Collective Homepage"
-      >
-        <img
-          alt="Open Collective logo"
-          className="jsx-3593811691 logo"
-          height="40"
-          src="/static/images/opencollective-icon.svg"
-          width="40"
-        />
-      </a>
-      <form
-        action="/search"
-        className="jsx-3593811691 topbar-search-form"
-        method="GET"
-      >
-        <div
-          className="jsx-3593811691 topbar-search-container"
-        >
-          <input
-            className="jsx-3593811691 topbar-search-input"
-            name="q"
-            placeholder="Search Open Collective"
-            type="search"
-          />
-          <button
-            className="jsx-3593811691 topbar-search-button"
-          >
-            <svg
-              height={16}
-              version="1.1"
-              viewBox="10 10 30 30"
-              width={16}
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <title>
-                magnifying glass icon
-              </title>
-              <path
-                d="M28.5404814,30.1903972 C26.7995948,31.5736628 24.5962981,32.4 22.2,32.4 C16.5666956,32.4 12,27.8333044 12,22.2 C12,16.5666956 16.5666956,12 22.2,12 C27.8333044,12 32.4,16.5666956 32.4,22.2 C32.4,24.5962981 31.5736628,26.7995948 30.1903972,28.5404814 L35.6582912,34.0083754 C36.1139029,34.4639871 36.1139029,35.2026796 35.6582912,35.6582912 C35.2026796,36.1139029 34.4639871,36.1139029 34.0083754,35.6582912 L28.5404814,30.1903972 Z M22.2,30 C26.507821,30 30,26.507821 30,22.2 C30,17.892179 26.507821,14.4 22.2,14.4 C17.892179,14.4 14.4,17.892179 14.4,22.2 C14.4,26.507821 17.892179,30 22.2,30 Z"
-                fill="#FFFFFF"
-                fillRule="nonzero"
-                id="magnifying-glass"
-              />
-            </svg>
-          </button>
-        </div>
-      </form>
-      <div
-        className="jsx-3593811691 nav"
-      >
-        <ul
-          className="jsx-3593811691 mediumScreenOnly"
-        >
-          <li
-            className="jsx-3593811691"
-          >
-            <a
-              className="jsx-3593811691 menuItem"
-              href="/learn-more"
-            >
-              <span>
-                How it works
-              </span>
-            </a>
-          </li>
-          <li
-            className="jsx-3593811691"
-          >
-            <a
-              className="jsx-3593811691 menuItem"
-              href="/discover"
-            >
-              <span>
-                discover
-              </span>
-            </a>
-          </li>
-          <li
-            className="jsx-3593811691"
-          >
-            <a
-              className="jsx-3593811691 menuItem"
-              href="https://medium.com/open-collective"
-            >
-              <span>
-                Blog
-              </span>
-            </a>
-          </li>
-        </ul>
-        <div
-          className="jsx-3593811691 separator"
-        />
-        <div
-          className="jsx-2783800609 LoginTopBarProfileButton"
-        >
-          <div
-            className="jsx-2783800609 LoginTopBarProfileButton"
-          >
-            <a
-              className="jsx-2783800609"
-              href="/signin?next=about%3Ablank"
-              onClick={[Function]}
-            >
-              <span>
-                login
-              </span>
-            </a>
-          </div>
-        </div>
-      </div>
-    </div>
-  </header>
-  <main
-    className="jsx-4138488456"
-  >
-    <h1
-      className="jsx-3855972673"
-    >
-      Test error
-    </h1>
-  </main>
-  <div
-    className="jsx-568600484 Footer"
-  >
-    <div
-      className="jsx-568600484 content"
-    >
-      <div
-        className="jsx-568600484"
-      >
-        <object
-          className="jsx-568600484 logo"
-          data="/static/images/opencollectivelogo-footer.svg"
-          height="20"
-          type="image/svg+xml"
-        />
-      </div>
-      <div
-        className="jsx-568600484"
-      >
-        <nav
-          className="jsx-568600484"
-        >
-          <ul
-            className="jsx-568600484"
-          >
-            <li
-              className="jsx-568600484"
-            >
-              <a
-                className="jsx-568600484"
-                href="/learn-more"
-              >
-                How It Works
-              </a>
-            </li>
-            <li
-              className="jsx-568600484"
-            >
-              <a
-                className="jsx-568600484"
-                href="https://opencollective.com/#opensource"
-              >
-                Use Cases
-              </a>
-            </li>
-            <li
-              className="jsx-568600484"
-            >
-              <a
-                className="jsx-568600484"
-                href="https://opencollective.com/faq"
-              >
-                FAQ
-              </a>
-            </li>
-            <li
-              className="jsx-568600484"
-            >
-              <a
-                className="jsx-568600484"
-                href="https://forum.opencollective.com"
-              >
-                Forum
-              </a>
-            </li>
-            <li
-              className="jsx-568600484"
-            >
-              <a
-                className="jsx-568600484"
-                href="https://medium.com/open-collective"
-              >
-                Blog
-              </a>
-            </li>
-            <li
-              className="jsx-568600484"
-            >
-              <a
-                href="/tos"
-                onClick={[Function]}
-              >
-                Terms Of Service
-              </a>
-            </li>
-            <li
-              className="jsx-568600484"
-            >
-              <a
-                className="jsx-568600484"
-                href="https://opencollective.com/about"
-              >
-                About
-              </a>
-            </li>
-            <li
-              className="jsx-568600484"
-            >
-              <a
-                className="jsx-568600484"
-                href="mailto:info@opencollective.com"
-              >
-                Contact
-              </a>
-            </li>
-          </ul>
-        </nav>
-      </div>
-    </div>
-  </div>
-</div>
-`;
-
-exports[`Search Page renders loading grid SVG 1`] = `
 .c1 {
   box-sizing: border-box;
-  width: 100%;
+  margin-left: 16px;
+  margin-right: 16px;
+  margin-top: 8px;
+  margin-bottom: 8px;
 }
 
 .c3 {
   box-sizing: border-box;
-  margin-top: 16px;
-  margin-bottom: 16px;
+}
+
+.c5 {
+  box-sizing: border-box;
+  margin-left: 8px;
+  margin-right: 8px;
 }
 
 .c7 {
   box-sizing: border-box;
+  -webkit-flex: 1 1 auto;
+  -ms-flex: 1 1 auto;
+  flex: 1 1 auto;
 }
 
-.c9 {
+.c18 {
+  box-sizing: border-box;
+  margin-left: 16px;
+  margin-right: 16px;
+}
+
+.c22 {
+  margin: 0;
+  box-sizing: border-box;
+  margin: 0px;
+  padding: 0px;
+}
+
+.c23 {
+  box-sizing: border-box;
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+.c8 {
   box-sizing: border-box;
   width: 100%;
-  padding-top: 16px;
-  padding-bottom: 16px;
+}
+
+.c28 {
+  box-sizing: border-box;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 8px;
+}
+
+.c31 {
+  box-sizing: border-box;
+  margin-top: 8px;
+}
+
+.c35 {
+  box-sizing: border-box;
+  width: 100%;
+  margin-top: 16px;
+  margin-bottom: 16px;
+}
+
+.c38 {
+  margin-top: 16px;
+  box-sizing: border-box;
+  margin-top: 16px;
+}
+
+.c39 {
+  box-sizing: border-box;
+  width: 50%;
+  margin-bottom: 16px;
+}
+
+.c10 {
+  box-sizing: border-box;
+  padding: 8px;
+}
+
+.c12 {
+  box-sizing: border-box;
+  padding: 4px;
+}
+
+.c15 {
+  box-sizing: border-box;
+  margin-right: 4px;
+  padding: 4px;
+}
+
+.c0 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-direction: row;
+  -ms-flex-direction: row;
+  flex-direction: row;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: space-around;
+  -webkit-justify-content: space-around;
+  -ms-flex-pack: space-around;
+  justify-content: space-around;
 }
 
 .c2 {
@@ -646,13 +1453,113 @@ exports[`Search Page renders loading grid SVG 1`] = `
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
-  -webkit-align-items: flex-end;
-  -webkit-box-align: flex-end;
-  -ms-flex-align: flex-end;
-  align-items: flex-end;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+}
+
+.c16 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: end;
+  -webkit-justify-content: flex-end;
+  -ms-flex-pack: end;
+  justify-content: flex-end;
+}
+
+.c19 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+}
+
+.c21 {
+  margin: 0;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: space-around;
+  -webkit-justify-content: space-around;
+  -ms-flex-pack: space-around;
+  justify-content: space-around;
 }
 
 .c6 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+}
+
+.c27 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: justify;
+  -webkit-justify-content: space-between;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
+}
+
+.c30 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
+}
+
+.c32 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+}
+
+.c34 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: space-evenly;
+  -webkit-justify-content: space-evenly;
+  -ms-flex-pack: space-evenly;
+  justify-content: space-evenly;
+}
+
+.c37 {
+  margin-top: 16px;
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -666,7 +1573,1205 @@ exports[`Search Page renders loading grid SVG 1`] = `
   justify-content: center;
 }
 
+.c33 {
+  color: #6E747A;
+  font-size: 1.4rem;
+  margin: 0px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  text-align: center;
+}
+
+.c40 {
+  color: #C2C6CC;
+  font-size: 1.2rem;
+  -webkit-letter-spacing: 1px;
+  -moz-letter-spacing: 1px;
+  -ms-letter-spacing: 1px;
+  letter-spacing: 1px;
+  margin: 0px;
+  padding-bottom: 16px;
+  text-align: center;
+}
+
+.c43 {
+  color: #6E747A;
+  display: block;
+  font-size: 1.6rem;
+  font-weight: 400;
+  margin: 0px;
+  padding: 0px;
+}
+
+.c25 {
+  border: 1px solid #D5DAE0;
+  border-radius: 20px;
+  color: #3385FF;
+  display: inline-block;
+  font-size: 1.4rem;
+  padding-left: 16px;
+  padding-right: 16px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+.c25:hover {
+  cursor: pointer;
+}
+
+.c42 {
+  list-style: none;
+  text-align: center;
+}
+
+.c11 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: justify;
+  -webkit-justify-content: space-between;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
+  border: solid 1px var(--silver-four);
+  border-radius: 20px;
+}
+
+.c13 {
+  box-sizing: border-box;
+  padding-left: 16px;
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+.c13.c13 {
+  background-color: transparent;
+  border: none;
+  font-size: 1.2rem;
+  -webkit-letter-spacing: 0.1rem;
+  -moz-letter-spacing: 0.1rem;
+  -ms-letter-spacing: 0.1rem;
+  letter-spacing: 0.1rem;
+}
+
+.c14 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+}
+
+.c14.c14 {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-color: transparent;
+  border: none;
+}
+
+.c9 {
+  max-width: 30rem;
+  min-width: 10rem;
+}
+
+.c20 {
+  list-style: none;
+  min-width: 20rem;
+  text-align: right;
+}
+
+.c24 {
+  color: #777777;
+  font-size: 1.4rem;
+}
+
+.c36 {
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  border: 1px solid #9399A3;
+  border-radius: 50%;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  height: 48px;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  opacity: 0.6;
+  width: 48px;
+}
+
+.c36:hover,
+.c36:focus {
+  opacity: 1;
+}
+
+.c26 {
+  bottom: 0;
+  background-color: white;
+  border-top: 1px solid #aaaaaa;
+  min-height: 7.5rem;
+  padding: 1rem;
+  width: 100%;
+}
+
+.c29 {
+  max-width: 300px;
+}
+
+.c41 {
+  box-sizing: border-box;
+  padding: 0px;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+}
+
+@media screen and (min-width:52em) {
+  .c31 {
+    width: 33.33333333333333%;
+  }
+}
+
+@media screen and (min-width:52em) {
+  .c35 {
+    -webkit-order: 3;
+    -ms-flex-order: 3;
+    order: 3;
+  }
+}
+
+@media screen and (min-width:52em) {
+  .c27 {
+    -webkit-flex-direction: row;
+    -ms-flex-direction: row;
+    flex-direction: row;
+  }
+}
+
+@media screen and (min-width:52em) {
+  .c27 {
+    -webkit-align-items: flex-start;
+    -webkit-box-align: flex-start;
+    -ms-flex-align: flex-start;
+    align-items: flex-start;
+  }
+}
+
+@media screen and (min-width:52em) {
+  .c32 {
+    -webkit-box-pack: start;
+    -webkit-justify-content: flex-start;
+    -ms-flex-pack: start;
+    justify-content: flex-start;
+  }
+}
+
+@media screen and (min-width:52em) {
+  .c33 {
+    text-align: left;
+  }
+}
+
+@media screen and (min-width:52em) {
+  .c40 {
+    text-align: left;
+  }
+}
+
+@media screen and (max-width:40em) {
+  .c4 {
+    display: none;
+  }
+}
+
+@media screen and (min-width:40em) and (max-width:52em) {
+  .c17 {
+    display: none;
+  }
+}
+
+@media screen and (min-width:52em) and (max-width:64em) {
+  .c17 {
+    display: none;
+  }
+}
+
+@media screen and (min-width:64em) {
+  .c17 {
+    display: none;
+  }
+}
+
+@media screen and (min-width:52em) {
+  .c42 {
+    text-align: left;
+  }
+}
+
+<div
+  className="jsx-3855972673 Error"
+>
+  <header>
+    <div
+      id="top"
+    />
+    <div
+      className="c0 c1 sc-bdVaJa c1"
+    >
+      <a
+        className="c2 c3"
+        onClick={[Function]}
+      >
+        <img
+          alt="Open Collective logo"
+          className=""
+          height="24"
+          src="/static/images/opencollective-icon.svg"
+          width="24"
+        />
+        <div
+          className="c4 c3"
+          xs={true}
+        >
+          <div
+            className="c5"
+          >
+            <img
+              height="16px"
+              src="/static/images/logotype.svg"
+            />
+          </div>
+        </div>
+      </a>
+      <div
+        className="c6 c7 sc-bdVaJa c7"
+      >
+        <div
+          className="c4 c8"
+          xs={true}
+        >
+          <div
+            className="c9 c10"
+          >
+            <form
+              action="/search"
+              method="GET"
+            >
+              <div
+                className="c11 c12 sc-bdVaJa c12"
+              >
+                <input
+                  className="c13"
+                  name="q"
+                  placeholder="Search Open Collective"
+                  type="search"
+                />
+                <button
+                  className="c14 c15"
+                  mr={1}
+                  p={1}
+                >
+                  <svg
+                    height={16}
+                    version="1.1"
+                    viewBox="10 10 30 30"
+                    width={16}
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <title>
+                      magnifying glass icon
+                    </title>
+                    <path
+                      d="M28.5404814,30.1903972 C26.7995948,31.5736628 24.5962981,32.4 22.2,32.4 C16.5666956,32.4 12,27.8333044 12,22.2 C12,16.5666956 16.5666956,12 22.2,12 C27.8333044,12 32.4,16.5666956 32.4,22.2 C32.4,24.5962981 31.5736628,26.7995948 30.1903972,28.5404814 L35.6582912,34.0083754 C36.1139029,34.4639871 36.1139029,35.2026796 35.6582912,35.6582912 C35.2026796,36.1139029 34.4639871,36.1139029 34.0083754,35.6582912 L28.5404814,30.1903972 Z M22.2,30 C26.507821,30 30,26.507821 30,22.2 C30,17.892179 26.507821,14.4 22.2,14.4 C17.892179,14.4 14.4,17.892179 14.4,22.2 C14.4,26.507821 17.892179,30 22.2,30 Z"
+                      fill="#aaaaaa"
+                      fillRule="nonzero"
+                      id="magnifying-glass"
+                    />
+                  </svg>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+      <div
+        className="c16 c7 sc-bdVaJa c7"
+      >
+        <div
+          className="c17 c3"
+          lg={true}
+          md={true}
+          sm={true}
+        >
+          <div
+            className="c18"
+          >
+            <a
+              className="c19 c3"
+              onClick={[Function]}
+            >
+              <svg
+                height={24}
+                version="1.1"
+                viewBox="10 10 30 30"
+                width={24}
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <title>
+                  magnifying glass icon
+                </title>
+                <path
+                  d="M28.5404814,30.1903972 C26.7995948,31.5736628 24.5962981,32.4 22.2,32.4 C16.5666956,32.4 12,27.8333044 12,22.2 C12,16.5666956 16.5666956,12 22.2,12 C27.8333044,12 32.4,16.5666956 32.4,22.2 C32.4,24.5962981 31.5736628,26.7995948 30.1903972,28.5404814 L35.6582912,34.0083754 C36.1139029,34.4639871 36.1139029,35.2026796 35.6582912,35.6582912 C35.2026796,36.1139029 34.4639871,36.1139029 34.0083754,35.6582912 L28.5404814,30.1903972 Z M22.2,30 C26.507821,30 30,26.507821 30,22.2 C30,17.892179 26.507821,14.4 22.2,14.4 C17.892179,14.4 14.4,17.892179 14.4,22.2 C14.4,26.507821 17.892179,30 22.2,30 Z"
+                  fill="#aaaaaa"
+                  fillRule="nonzero"
+                  id="magnifying-glass"
+                />
+              </svg>
+            </a>
+          </div>
+        </div>
+        <div
+          className="c17 c3"
+          lg={true}
+          md={true}
+          sm={true}
+        >
+          <div
+            className="c18"
+          >
+            <a
+              className="c19 c3"
+              onClick={[Function]}
+            >
+              <svg
+                height={16.799999999999997}
+                version="1.1"
+                viewBox="0 0 20 14"
+                width={24}
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <title>
+                  menu icon
+                </title>
+                <path
+                  d="M19,6 L1,6 C0.4,6 0,6.4 0,7 C0,7.6 0.4,8 1,8 L19,8 C19.6,8 20,7.6 20,7 C20,6.4 19.6,6 19,6 Z"
+                  fill="#aaaaaa"
+                  fillRule="nonzero"
+                />
+                <path
+                  d="M0.85,2 L16.15,2 C16.66,2 17,1.6 17,1 C17,0.4 16.66,0 16.15,0 L0.85,0 C0.34,0 0,0.4 0,1 C0,1.6 0.34,2 0.85,2 Z"
+                  fill="#aaaaaa"
+                  fillRule="nonzero"
+                />
+                <path
+                  d="M16.15,12 L0.85,12 C0.34,12 0,12.4 0,13 C0,13.6 0.34,14 0.85,14 L16.15,14 C16.66,14 17,13.6 17,13 C17,12.4 16.66,12 16.15,12 Z"
+                  fill="#aaaaaa"
+                  fillRule="nonzero"
+                />
+              </svg>
+            </a>
+          </div>
+        </div>
+        <div
+          className="c4 c3"
+          xs={true}
+        >
+          <ul
+            className="c20 c21 c22"
+            m={0}
+            p={0}
+          >
+            <li
+              className="c23"
+            >
+              <a
+                className="c24"
+                href="/discover"
+              >
+                <span>
+                  Discover
+                </span>
+              </a>
+            </li>
+            <li
+              className="c23"
+            >
+              <a
+                className="c24"
+                href="/learn-more"
+              >
+                <span>
+                  How it Works
+                </span>
+              </a>
+            </li>
+            <li
+              className="c23"
+            >
+              <a
+                className="c24"
+                href="https://medium.com/open-collective"
+              >
+                <span>
+                  Blog
+                </span>
+              </a>
+            </li>
+          </ul>
+        </div>
+        <div
+          className="LoginTopBarProfileButton"
+        >
+          <a
+            className="c25"
+            color="#3385FF"
+            display="inline-block"
+            fontSize="1.4rem"
+            onClick={[Function]}
+          >
+            <span>
+              Login
+            </span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </header>
+  <main
+    className="jsx-1964704679"
+  >
+    <h1
+      className="jsx-3855972673"
+    >
+      Test error
+    </h1>
+  </main>
+  <div
+    className="c26"
+    id="footer"
+  >
+    <div
+      className="c27 c28 sc-bdVaJa c28"
+    >
+      <div
+        className="c29 c30 c31 sc-bdVaJa c31"
+        maxWidth="300px"
+      >
+        <div
+          className="c32 c3 sc-bdVaJa c3"
+        >
+          <object
+            data="/static/images/opencollectivelogo-footer.svg"
+            height="20"
+            type="image/svg+xml"
+          />
+        </div>
+        <p
+          className="c33"
+          color="#6E747A"
+          fontSize="1.4rem"
+        >
+          Providing the digital tools that drive the organizations of the 21st century.
+        </p>
+      </div>
+      <div
+        className="c29 c34 c35 sc-bdVaJa c35"
+        maxWidth="300px"
+      >
+        <a
+          className="c36"
+          href="https://medium.com/open-collective"
+        >
+          <svg
+            height={15}
+            viewBox="0 0 32 32"
+            width={15}
+          >
+            <title>
+              medium icon
+            </title>
+            <path
+              d="M3.795 8.48c0.040-0.393-0.111-0.781-0.404-1.045l-2.987-3.6v-0.537h9.276l7.171 15.727 6.304-15.727h8.845v0.537l-2.556 2.449c-0.22 0.168-0.329 0.444-0.284 0.717v18c-0.045 0.272 0.064 0.547 0.284 0.716l2.493 2.449v0.537h-12.547v-0.537l2.583-2.509c0.253-0.253 0.253-0.328 0.253-0.717v-14.548l-7.187 18.251h-0.969l-8.367-18.251v12.232c-0.069 0.515 0.101 1.032 0.463 1.404l3.36 4.080v0.536h-9.527v-0.537l3.36-4.080c0.36-0.371 0.52-0.893 0.435-1.403v-14.144z"
+              fill="#9399A3"
+            />
+          </svg>
+        </a>
+        <a
+          className="c36"
+          href="https://twitter.com/opencollect"
+        >
+          <svg
+            height={12.5}
+            version="1.1"
+            viewBox="0 0 18 15"
+            width={15}
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <title>
+              twitter icon
+            </title>
+            <g
+              fill="none"
+              fillRule="evenodd"
+              id="Homepage"
+              stroke="none"
+              strokeWidth="1"
+            >
+              <g
+                id="Homepage---XS-(small-handset)"
+                transform="translate(-97.000000, -9521.000000)"
+              >
+                <g
+                  id="JOIN-MOVEMENT"
+                  transform="translate(-69.000000, 3570.000000)"
+                >
+                  <g
+                    id="::-06---spread-the-word"
+                    transform="translate(85.000000, 5758.000000)"
+                  >
+                    <g
+                      id="::-button-(share-twitter)"
+                      transform="translate(44.000000, 176.000000)"
+                    >
+                      <path
+                        d="M55,18.7756985 C54.33775,19.0771597 53.626,19.2801846 52.879,19.3716996 C53.64175,18.9033581 54.22675,18.1612407 54.50275,17.2768521 C53.7895,17.710587 52.999,18.0258908 52.1575,18.1958472 C51.484,17.4598821 50.524,17 49.462,17 C47.42275,17 45.769,18.695719 45.769,20.7867214 C45.769,21.0835683 45.802,21.3727249 45.86425,21.649577 C42.79525,21.4919251 40.07425,19.9838503 38.2525,17.6928993 C37.93525,18.2519867 37.753,18.9025891 37.753,19.5970264 C37.753,20.9105358 38.40475,22.0694694 39.3955,22.748526 C38.79025,22.7285311 38.221,22.5585747 37.723,22.2748013 C37.723,22.290951 37.723,22.3063317 37.723,22.3224814 C37.723,24.1573955 38.99575,25.6877724 40.6855,26.0353755 C40.37575,26.1222763 40.0495,26.1684184 39.712,26.1684184 C39.47425,26.1684184 39.2425,26.1445783 39.0175,26.1007434 C39.48775,27.6049731 40.85125,28.7000769 42.4675,28.7308382 C41.20375,29.7467316 39.6115,30.351961 37.88125,30.351961 C37.5835,30.351961 37.2895,30.3342733 37,30.2988977 C38.63425,31.3732376 40.57525,32 42.661,32 C49.45375,32 53.16775,26.229941 53.16775,21.2258395 C53.16775,21.0620354 53.164,20.8982312 53.15725,20.7359651 C53.87875,20.2014868 54.505,19.5347347 55,18.7756985 Z"
+                        fill="#9399A3"
+                        fillRule="nonzero"
+                        id="twitter"
+                      />
+                    </g>
+                  </g>
+                </g>
+              </g>
+            </g>
+          </svg>
+        </a>
+        <a
+          className="c36"
+          href="https://github.com/opencollective"
+        >
+          <svg
+            height={15}
+            version="1.1"
+            viewBox="0 0 22 22"
+            width={15}
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <title>
+              github icon
+            </title>
+            <g
+              fill="none"
+              fillRule="evenodd"
+              id="Homepage"
+              stroke="none"
+              strokeWidth="1"
+            >
+              <g
+                id="Homepage---XS-(small-handset)"
+                transform="translate(-149.000000, -10919.000000)"
+              >
+                <g
+                  id="FOOTER"
+                  transform="translate(0.000000, 10758.000000)"
+                >
+                  <g
+                    id="::-social-networks"
+                    transform="translate(24.000000, 148.000000)"
+                  >
+                    <g
+                      id="::-icon-(github)"
+                      transform="translate(112.000000, 0.000000)"
+                    >
+                      <path
+                        d="M24,13 C17.9133333,13 13,17.962963 13,24.1111111 C13,29.2222222 16.4466667,33.6666667 21.36,34.9259259 C21.4333333,34.9259259 21.58,34.9259259 21.6533333,34.8518519 C21.7266667,34.7777778 21.8,34.7037037 21.8,34.5555556 L21.8,31.8888889 C21.8,31.8148148 21.7266667,31.6666667 21.7266667,31.5925926 C21.6533333,31.5185185 21.58,31.5185185 21.4333333,31.5185185 L20.7,31.5185185 C19.5266667,31.5185185 18.7933333,30.4074074 18.1333333,29.4444444 C17.9866667,29.2962963 17.9133333,29.0740741 17.7666667,28.9259259 C18.2066667,29.1481481 18.5,29.4444444 18.8666667,29.8148148 C19.38,30.3333333 19.8933333,30.8518519 20.7733333,30.8518519 C20.7733333,30.8518519 20.7733333,30.8518519 20.7733333,30.8518519 C21.14,30.8518519 21.8733333,30.4814815 21.8733333,29.3703704 L21.8733333,29 C21.8733333,28.8518519 21.8,28.7037037 21.58,28.6296296 C19.0866667,27.8888889 17.4733333,25.8888889 17.4733333,23.5925926 C17.4733333,22.4074074 17.9866667,21.2222222 18.8666667,20.3333333 C18.8666667,20.1851852 18.8666667,20.037037 18.8666667,19.8888889 C18.5,19.1481481 18.8666667,18.1111111 19.38,17.5185185 C19.8933333,17.7407407 20.4066667,18.3333333 20.8466667,18.7777778 C20.92,18.9259259 21.14,18.9259259 21.2866667,18.8518519 L21.5066667,18.7777778 C22.3133333,18.4814815 23.2666667,18.1111111 24.1466667,18.1111111 C25.0266667,18.1111111 25.98,18.4814815 26.7866667,18.7777778 L27.0066667,18.8518519 C27.1533333,18.9259259 27.3,18.8518519 27.4466667,18.7777778 C27.8866667,18.2592593 28.4,17.7407407 28.9133333,17.5185185 C29.4266667,18.1851852 29.7933333,19.1481481 29.4266667,19.8888889 C29.1333333,20.037037 29.1333333,20.1851852 29.2066667,20.3333333 C30.0866667,21.2962963 30.6,22.3333333 30.6,23.4444444 C30.6,25.8888889 28.7666667,28.037037 26.1266667,28.6296296 C25.98,28.6296296 25.9066667,28.7037037 25.9066667,28.8518519 C25.9066667,29 25.8333333,29.0740741 25.9066667,29.1481481 C26.1266667,29.5185185 26.2,30.2592593 26.2,31.2222222 C26.2,32.4814815 26.2,34.6296296 26.2,34.6296296 C26.2,34.7777778 26.2733333,34.8518519 26.3466667,34.9259259 C26.42,35 26.4933333,35 26.5666667,35 C26.5666667,35 26.64,35 26.64,35 C31.5533333,33.6666667 35,29.2222222 35,24.1111111 C35,17.962963 30.0866667,13 24,13 Z"
+                        fill="#9399A3"
+                        fillRule="nonzero"
+                        id="github"
+                      />
+                    </g>
+                  </g>
+                </g>
+              </g>
+            </g>
+          </svg>
+        </a>
+        <a
+          className="c36"
+          href="https://slack.com/opencollective"
+        >
+          <svg
+            height={15}
+            version="1.1"
+            viewBox="0 0 20 20"
+            width={15}
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <title>
+              slack icon
+            </title>
+            <g
+              fill="#9399A3"
+              id="slack"
+            >
+              <path
+                d="M19.1625,7.25 C21.225,14.125 19.62125,17.1 12.75,19.1625 C5.875,21.225 2.9,19.62125 0.8375,12.75 C-1.225,5.875 0.38,2.9 7.25,0.8375 C14.1225,-1.225 17.1,0.38 19.1625,7.25 Z M15.6875,11.7125 L15.695,11.73875 C16.2325,11.56375 16.5275,10.97625 16.345,10.42625 C16.16375,9.87625 15.57625,9.58875 15.0325,9.76375 L13.74,10.19375 L12.8775,7.6225 L14.175,7.185 C14.71625,7.005 15.01,6.4175 14.82875,5.8725 C14.64625,5.335 14.05875,5.04 13.51625,5.2225 L12.22,5.6475 L11.77,4.2975 C11.59,3.75 11.00125,3.4625 10.4575,3.6375 C9.9125,3.825 9.625,4.4125 9.8,4.95 L10.25,6.2875 L7.58875,7.1825 L7.13875,5.8425 C6.96375,5.3025 6.37625,5.00625 5.82625,5.19 C5.27625,5.37 4.98875,5.9575 5.16375,6.5025 L5.61375,7.84 L4.31375,8.2725 C3.76375,8.45625 3.47625,9.04375 3.65125,9.585 C3.78875,10.01 4.18875,10.27875 4.60125,10.29125 C4.72,10.29375 4.84,10.2775 4.9575,10.2375 L6.25,9.8 L7.07375,12.37375 L5.77375,12.81125 C5.23625,12.98625 4.93625,13.57375 5.12375,14.12375 C5.27375,14.54875 5.66125,14.82375 6.08625,14.83625 C6.21125,14.83625 6.32375,14.82375 6.44875,14.78625 L7.74875,14.34875 L8.19875,15.69875 C8.34875,16.12375 8.73625,16.39375 9.16125,16.40625 C9.28625,16.40875 9.39875,16.3925 9.52375,16.3525 C10.07375,16.17125 10.36125,15.58375 10.18625,15.04 L9.73625,13.7 L12.41125,12.805 L12.86125,14.145 C13.01125,14.57 13.39875,14.84 13.82375,14.8525 C13.94875,14.85625 14.06125,14.8375 14.18625,14.8 C14.72875,14.6175 15.0225,14.03 14.84125,13.4875 L14.39125,12.14625 L15.6875,11.7125 Z"
+              />
+              <polygon
+                points="8.2325 9.1625 9.095 11.73375 11.76625 10.83875 10.90375 8.27625 8.2325 9.17625"
+              />
+            </g>
+          </svg>
+        </a>
+        <a
+          className="c36"
+          href="mailto:info@opencollective.com"
+        >
+          <svg
+            height={13.125}
+            version="1.1"
+            viewBox="0 0 16 14"
+            width={15}
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <title>
+              email icon
+            </title>
+            <g
+              fill="none"
+              fillRule="evenodd"
+              id="Homepage"
+              stroke="none"
+              strokeWidth="1"
+            >
+              <g
+                id="Homepage---XS-(small-handset)"
+                transform="translate(-264.000000, -10923.000000)"
+              >
+                <g
+                  id="FOOTER"
+                  transform="translate(0.000000, 10758.000000)"
+                >
+                  <g
+                    id="::-social-networks"
+                    transform="translate(24.000000, 148.000000)"
+                  >
+                    <g
+                      id="::-icon-(email)"
+                      transform="translate(224.000000, 0.000000)"
+                    >
+                      <path
+                        d="M30.4,17 L17.6,17 C16.72,17 16.008,17.9 16.008,19 L16,29 C16,30.1 16.72,31 17.6,31 L30.4,31 C31.28,31 32,30.1 32,29 L32,19 C32,17.9 31.28,17 30.4,17 Z M30,21 L24,25 L18,21 L18,19 L24,23 L30,19 L30,21 Z"
+                        fill="#9399A3"
+                        fillRule="nonzero"
+                        id="email"
+                      />
+                    </g>
+                  </g>
+                </g>
+              </g>
+            </g>
+          </svg>
+        </a>
+      </div>
+      <nav
+        className="c37 c38"
+        mt={3}
+      >
+        <div
+          className="c39"
+        >
+          <p
+            className="c40"
+            color="#C2C6CC"
+            fontSize="1.2rem"
+            letterSpacing="1px"
+          >
+            PLATFORM
+          </p>
+          <ul
+            className="c41"
+          >
+            <li
+              className="c42"
+            >
+              <a
+                className="c43"
+                color="#6E747A"
+                display="block"
+                fontSize="1.6rem"
+                fontWeight="400"
+                href="/discover"
+              >
+                Discover
+              </a>
+            </li>
+            <li
+              className="c42"
+            >
+              <a
+                className="c43"
+                color="#6E747A"
+                display="block"
+                fontSize="1.6rem"
+                fontWeight="400"
+                href="/learn-more"
+              >
+                How it Works
+              </a>
+            </li>
+            <li
+              className="c42"
+            >
+              <a
+                className="c43"
+                color="#6E747A"
+                display="block"
+                fontSize="1.6rem"
+                fontWeight="400"
+                href="/opensource"
+              >
+                Use Cases
+              </a>
+            </li>
+            <li
+              className="c42"
+            >
+              <a
+                className="c43"
+                color="#6E747A"
+                display="block"
+                fontSize="1.6rem"
+                fontWeight="400"
+                href="/signin"
+              >
+                Sign Up
+              </a>
+            </li>
+            <li
+              className="c42"
+            >
+              <a
+                className="c43"
+                color="#6E747A"
+                display="block"
+                fontSize="1.6rem"
+                fontWeight="400"
+                href="/signin"
+              >
+                Login
+              </a>
+            </li>
+          </ul>
+        </div>
+        <div
+          className="c39"
+        >
+          <p
+            className="c40"
+            color="#C2C6CC"
+            fontSize="1.2rem"
+            letterSpacing="1px"
+          >
+            JOIN THE MOVEMENT
+          </p>
+          <ul
+            className="c41"
+          >
+            <li
+              className="c42"
+            >
+              <a
+                className="c43"
+                color="#6E747A"
+                display="block"
+                fontSize="1.6rem"
+                fontWeight="400"
+                href="/create"
+              >
+                Create a Collective
+              </a>
+            </li>
+            <li
+              className="c42"
+            >
+              <a
+                className="c43"
+                color="#6E747A"
+                display="block"
+                fontSize="1.6rem"
+                fontWeight="400"
+                href="/organizations/new"
+              >
+                Become a Sponsor
+              </a>
+            </li>
+          </ul>
+        </div>
+        <div
+          className="c39"
+        >
+          <p
+            className="c40"
+            color="#C2C6CC"
+            fontSize="1.2rem"
+            letterSpacing="1px"
+          >
+            COMMUNITY
+          </p>
+          <ul
+            className="c41"
+          >
+            <li
+              className="c42"
+            >
+              <a
+                className="c43"
+                color="#6E747A"
+                display="block"
+                fontSize="1.6rem"
+                fontWeight="400"
+                href="/opensource"
+              >
+                Open Source
+              </a>
+            </li>
+            <li
+              className="c42"
+            >
+              <a
+                className="c43"
+                color="#6E747A"
+                display="block"
+                fontSize="1.6rem"
+                fontWeight="400"
+                href="https://forum.opencollective.com"
+              >
+                Forum
+              </a>
+            </li>
+            <li
+              className="c42"
+            >
+              <a
+                className="c43"
+                color="#6E747A"
+                display="block"
+                fontSize="1.6rem"
+                fontWeight="400"
+                href="https://opencollective.slack.com"
+              >
+                Slack
+              </a>
+            </li>
+            <li
+              className="c42"
+            >
+              <a
+                className="c43"
+                color="#6E747A"
+                display="block"
+                fontSize="1.6rem"
+                fontWeight="400"
+                href="https://github.com/OpenCollective/OpenCollective/wiki"
+              >
+                Help
+              </a>
+            </li>
+          </ul>
+        </div>
+        <div
+          className="c39"
+        >
+          <p
+            className="c40"
+            color="#C2C6CC"
+            fontSize="1.2rem"
+            letterSpacing="1px"
+          >
+            COMPANY
+          </p>
+          <ul
+            className="c41"
+          >
+            <li
+              className="c42"
+            >
+              <a
+                className="c43"
+                color="#6E747A"
+                display="block"
+                fontSize="1.6rem"
+                fontWeight="400"
+                href="/about"
+              >
+                About
+              </a>
+            </li>
+            <li
+              className="c42"
+            >
+              <a
+                className="c43"
+                color="#6E747A"
+                display="block"
+                fontSize="1.6rem"
+                fontWeight="400"
+                href="/faq"
+              >
+                FAQ
+              </a>
+            </li>
+            <li
+              className="c42"
+            >
+              <a
+                className="c43"
+                color="#6E747A"
+                display="block"
+                fontSize="1.6rem"
+                fontWeight="400"
+                href="https://medium.com/open-collective"
+              >
+                Blog
+              </a>
+            </li>
+            <li
+              className="c42"
+            >
+              <a
+                className="c43"
+                color="#6E747A"
+                display="block"
+                fontSize="1.6rem"
+                fontWeight="400"
+                href="/tos"
+              >
+                Terms of Service
+              </a>
+            </li>
+            <li
+              className="c42"
+            >
+              <a
+                className="c43"
+                color="#6E747A"
+                display="block"
+                fontSize="1.6rem"
+                fontWeight="400"
+                href="/privacypolicy"
+              >
+                Privacy Policy
+              </a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`Search Page renders loading grid SVG 1`] = `
+.c1 {
+  box-sizing: border-box;
+  margin-left: 16px;
+  margin-right: 16px;
+  margin-top: 8px;
+  margin-bottom: 8px;
+}
+
+.c3 {
+  box-sizing: border-box;
+}
+
+.c6 {
+  box-sizing: border-box;
+  margin-left: 8px;
+  margin-right: 8px;
+}
+
 .c8 {
+  box-sizing: border-box;
+  -webkit-flex: 1 1 auto;
+  -ms-flex: 1 1 auto;
+  flex: 1 1 auto;
+}
+
+.c10 {
+  box-sizing: border-box;
+  margin-left: 16px;
+  margin-right: 16px;
+}
+
+.c14 {
+  margin: 0;
+  box-sizing: border-box;
+  margin: 0px;
+  padding: 0px;
+}
+
+.c15 {
+  box-sizing: border-box;
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+.c21 {
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.c23 {
+  box-sizing: border-box;
+  margin-top: 16px;
+  margin-bottom: 16px;
+}
+
+.c28 {
+  box-sizing: border-box;
+  width: 100%;
+  padding-top: 16px;
+  padding-bottom: 16px;
+}
+
+.c31 {
+  box-sizing: border-box;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 8px;
+}
+
+.c34 {
+  box-sizing: border-box;
+  margin-top: 8px;
+}
+
+.c38 {
+  box-sizing: border-box;
+  width: 100%;
+  margin-top: 16px;
+  margin-bottom: 16px;
+}
+
+.c41 {
+  margin-top: 16px;
+  box-sizing: border-box;
+  margin-top: 16px;
+}
+
+.c42 {
+  box-sizing: border-box;
+  width: 50%;
+  margin-bottom: 16px;
+}
+
+.c0 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-direction: row;
+  -ms-flex-direction: row;
+  flex-direction: row;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: space-around;
+  -webkit-justify-content: space-around;
+  -ms-flex-pack: space-around;
+  justify-content: space-around;
+}
+
+.c2 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+}
+
+.c7 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: end;
+  -webkit-justify-content: flex-end;
+  -ms-flex-pack: end;
+  justify-content: flex-end;
+}
+
+.c11 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+}
+
+.c13 {
+  margin: 0;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: space-around;
+  -webkit-justify-content: space-around;
+  -ms-flex-pack: space-around;
+  justify-content: space-around;
+}
+
+.c22 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: flex-end;
+  -webkit-box-align: flex-end;
+  -ms-flex-align: flex-end;
+  align-items: flex-end;
+}
+
+.c26 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-wrap: wrap;
+  -ms-flex-wrap: wrap;
+  flex-wrap: wrap;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+}
+
+.c27 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -677,7 +2782,223 @@ exports[`Search Page renders loading grid SVG 1`] = `
   justify-content: center;
 }
 
-.c4.c4.c4 {
+.c30 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: justify;
+  -webkit-justify-content: space-between;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
+}
+
+.c33 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
+}
+
+.c35 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+}
+
+.c37 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: space-evenly;
+  -webkit-justify-content: space-evenly;
+  -ms-flex-pack: space-evenly;
+  justify-content: space-evenly;
+}
+
+.c40 {
+  margin-top: 16px;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-wrap: wrap;
+  -ms-flex-wrap: wrap;
+  flex-wrap: wrap;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+}
+
+.c18 {
+  color: #46b0ed;
+  display: inline-block;
+  font-size: 1.2rem;
+  font-weight: bold;
+  -webkit-letter-spacing: 1px;
+  -moz-letter-spacing: 1px;
+  -ms-letter-spacing: 1px;
+  letter-spacing: 1px;
+  margin: 0px;
+  margin-left: 8px;
+  margin-right: 8px;
+}
+
+.c36 {
+  color: #6E747A;
+  font-size: 1.4rem;
+  margin: 0px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  text-align: center;
+}
+
+.c43 {
+  color: #C2C6CC;
+  font-size: 1.2rem;
+  -webkit-letter-spacing: 1px;
+  -moz-letter-spacing: 1px;
+  -ms-letter-spacing: 1px;
+  letter-spacing: 1px;
+  margin: 0px;
+  padding-bottom: 16px;
+  text-align: center;
+}
+
+.c19 {
+  position: relative;
+  display: inline-block;
+  height: 0.6rem;
+  width: 1.4rem;
+}
+
+.c19::before,
+.c19::after {
+  content: '';
+  position: absolute;
+  top: 0;
+}
+
+.c19::before {
+  border-left: 0.6rem solid transparent;
+  border-right: 0.6rem solid transparent;
+  border-top: 0.6rem solid #46b0ed;
+  left: 0;
+}
+
+.c19::after {
+  border-left: calc(0.6rem - 0.2rem) solid transparent;
+  border-right: calc(0.6rem - 0.2rem) solid transparent;
+  border-top: calc(0.6rem - 0.2rem) solid white;
+  left: 0.2rem;
+}
+
+.c46 {
+  color: #6E747A;
+  display: block;
+  font-size: 1.6rem;
+  font-weight: 400;
+  margin: 0px;
+  padding: 0px;
+}
+
+.c45 {
+  list-style: none;
+  text-align: center;
+}
+
+.c4 {
+  -webkit-animation: iECmZH 0.8s infinite linear;
+  animation: iECmZH 0.8s infinite linear;
+}
+
+.c12 {
+  list-style: none;
+  min-width: 20rem;
+  text-align: right;
+}
+
+.c16 {
+  color: #777777;
+  font-size: 1.4rem;
+}
+
+.c39 {
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  border: 1px solid #9399A3;
+  border-radius: 50%;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  height: 48px;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  opacity: 0.6;
+  width: 48px;
+}
+
+.c39:hover,
+.c39:focus {
+  opacity: 1;
+}
+
+.c29 {
+  bottom: 0;
+  background-color: white;
+  border-top: 1px solid #aaaaaa;
+  min-height: 7.5rem;
+  padding: 1rem;
+  width: 100%;
+}
+
+.c32 {
+  max-width: 300px;
+}
+
+.c44 {
+  box-sizing: border-box;
+  padding: 0px;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+}
+
+.c24.c24.c24 {
   border: none;
   border-bottom: 2px solid #46B0ED;
   border-radius: 0;
@@ -688,11 +3009,11 @@ exports[`Search Page renders loading grid SVG 1`] = `
   padding: 0;
 }
 
-.c5.c5 {
+.c25.c25 {
   padding: 0 2rem;
 }
 
-.c0 {
+.c20 {
   box-sizing: border-box;
   width: 100%;
   margin-left: auto;
@@ -702,8 +3023,22 @@ exports[`Search Page renders loading grid SVG 1`] = `
   max-width: 1200px;
 }
 
+@media screen and (min-width:52em) {
+  .c34 {
+    width: 33.33333333333333%;
+  }
+}
+
+@media screen and (min-width:52em) {
+  .c38 {
+    -webkit-order: 3;
+    -ms-flex-order: 3;
+    order: 3;
+  }
+}
+
 @media screen and (min-width:40em) {
-  .c6 {
+  .c26 {
     -webkit-box-pack: center;
     -webkit-justify-content: center;
     -ms-flex-pack: center;
@@ -712,7 +3047,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c6 {
+  .c26 {
     -webkit-box-pack: start;
     -webkit-justify-content: flex-start;
     -ms-flex-pack: start;
@@ -720,8 +3055,88 @@ exports[`Search Page renders loading grid SVG 1`] = `
   }
 }
 
+@media screen and (min-width:52em) {
+  .c30 {
+    -webkit-flex-direction: row;
+    -ms-flex-direction: row;
+    flex-direction: row;
+  }
+}
+
+@media screen and (min-width:52em) {
+  .c30 {
+    -webkit-align-items: flex-start;
+    -webkit-box-align: flex-start;
+    -ms-flex-align: flex-start;
+    align-items: flex-start;
+  }
+}
+
+@media screen and (min-width:52em) {
+  .c35 {
+    -webkit-box-pack: start;
+    -webkit-justify-content: flex-start;
+    -ms-flex-pack: start;
+    justify-content: flex-start;
+  }
+}
+
+@media screen and (min-width:52em) {
+  .c36 {
+    text-align: left;
+  }
+}
+
+@media screen and (min-width:52em) {
+  .c43 {
+    text-align: left;
+  }
+}
+
+@media screen and (max-width:40em) {
+  .c5 {
+    display: none;
+  }
+}
+
+@media screen and (min-width:40em) and (max-width:52em) {
+  .c9 {
+    display: none;
+  }
+}
+
+@media screen and (min-width:52em) and (max-width:64em) {
+  .c9 {
+    display: none;
+  }
+}
+
+@media screen and (min-width:64em) {
+  .c9 {
+    display: none;
+  }
+}
+
+@media screen and (max-width:40em) {
+  .c17 {
+    display: none;
+  }
+}
+
+@media screen and (min-width:40em) and (max-width:52em) {
+  .c17 {
+    display: none;
+  }
+}
+
+@media screen and (min-width:52em) {
+  .c45 {
+    text-align: left;
+  }
+}
+
 @media screen and (min-width:40em) {
-  .c0 {
+  .c20 {
     width: 85%;
   }
 }
@@ -732,79 +3147,186 @@ exports[`Search Page renders loading grid SVG 1`] = `
       id="top"
     />
     <div
-      className="jsx-3593811691 loading TopBar"
+      className="c0 c1 sc-bdVaJa c1"
     >
       <a
-        className="jsx-3593811691"
-        href="/"
-        title="Go to Open Collective Homepage"
+        className="c2 c3"
+        onClick={[Function]}
       >
         <img
           alt="Open Collective logo"
-          className="jsx-3593811691 logo"
-          height="40"
+          className="c4"
+          height="24"
           src="/static/images/opencollective-icon.svg"
-          width="40"
-        />
-      </a>
-      <div
-        className="jsx-3593811691 nav"
-      >
-        <ul
-          className="jsx-3593811691 mediumScreenOnly"
-        >
-          <li
-            className="jsx-3593811691"
-          >
-            <a
-              className="jsx-3593811691 menuItem"
-              href="/learn-more"
-            >
-              <span>
-                How it works
-              </span>
-            </a>
-          </li>
-          <li
-            className="jsx-3593811691"
-          >
-            <a
-              className="jsx-3593811691 menuItem"
-              href="/discover"
-            >
-              <span>
-                discover
-              </span>
-            </a>
-          </li>
-          <li
-            className="jsx-3593811691"
-          >
-            <a
-              className="jsx-3593811691 menuItem"
-              href="https://medium.com/open-collective"
-            >
-              <span>
-                Blog
-              </span>
-            </a>
-          </li>
-        </ul>
-        <div
-          className="jsx-3593811691 separator"
+          width="24"
         />
         <div
-          className="jsx-2783800609 LoginTopBarProfileButton"
+          className="c5 c3"
+          xs={true}
         >
           <div
-            className="jsx-2904874222 TopBarProfileMenu "
+            className="c6"
+          >
+            <img
+              height="16px"
+              src="/static/images/logotype.svg"
+            />
+          </div>
+        </div>
+      </a>
+      <div
+        className="c7 c8 sc-bdVaJa c8"
+      >
+        <div
+          className="c9 c3"
+          lg={true}
+          md={true}
+          sm={true}
+        >
+          <div
+            className="c10"
+          >
+            <a
+              className="c11 c3"
+              onClick={[Function]}
+            >
+              <svg
+                height={24}
+                version="1.1"
+                viewBox="10 10 30 30"
+                width={24}
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <title>
+                  magnifying glass icon
+                </title>
+                <path
+                  d="M28.5404814,30.1903972 C26.7995948,31.5736628 24.5962981,32.4 22.2,32.4 C16.5666956,32.4 12,27.8333044 12,22.2 C12,16.5666956 16.5666956,12 22.2,12 C27.8333044,12 32.4,16.5666956 32.4,22.2 C32.4,24.5962981 31.5736628,26.7995948 30.1903972,28.5404814 L35.6582912,34.0083754 C36.1139029,34.4639871 36.1139029,35.2026796 35.6582912,35.6582912 C35.2026796,36.1139029 34.4639871,36.1139029 34.0083754,35.6582912 L28.5404814,30.1903972 Z M22.2,30 C26.507821,30 30,26.507821 30,22.2 C30,17.892179 26.507821,14.4 22.2,14.4 C17.892179,14.4 14.4,17.892179 14.4,22.2 C14.4,26.507821 17.892179,30 22.2,30 Z"
+                  fill="#aaaaaa"
+                  fillRule="nonzero"
+                  id="magnifying-glass"
+                />
+              </svg>
+            </a>
+          </div>
+        </div>
+        <div
+          className="c9 c3"
+          lg={true}
+          md={true}
+          sm={true}
+        >
+          <div
+            className="c10"
+          >
+            <a
+              className="c11 c3"
+              onClick={[Function]}
+            >
+              <svg
+                height={16.799999999999997}
+                version="1.1"
+                viewBox="0 0 20 14"
+                width={24}
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <title>
+                  menu icon
+                </title>
+                <path
+                  d="M19,6 L1,6 C0.4,6 0,6.4 0,7 C0,7.6 0.4,8 1,8 L19,8 C19.6,8 20,7.6 20,7 C20,6.4 19.6,6 19,6 Z"
+                  fill="#aaaaaa"
+                  fillRule="nonzero"
+                />
+                <path
+                  d="M0.85,2 L16.15,2 C16.66,2 17,1.6 17,1 C17,0.4 16.66,0 16.15,0 L0.85,0 C0.34,0 0,0.4 0,1 C0,1.6 0.34,2 0.85,2 Z"
+                  fill="#aaaaaa"
+                  fillRule="nonzero"
+                />
+                <path
+                  d="M16.15,12 L0.85,12 C0.34,12 0,12.4 0,13 C0,13.6 0.34,14 0.85,14 L16.15,14 C16.66,14 17,13.6 17,13 C17,12.4 16.66,12 16.15,12 Z"
+                  fill="#aaaaaa"
+                  fillRule="nonzero"
+                />
+              </svg>
+            </a>
+          </div>
+        </div>
+        <div
+          className="c5 c3"
+          xs={true}
+        >
+          <ul
+            className="c12 c13 c14"
+            m={0}
+            p={0}
+          >
+            <li
+              className="c15"
+            >
+              <a
+                className="c16"
+                href="/discover"
+              >
+                <span>
+                  Discover
+                </span>
+              </a>
+            </li>
+            <li
+              className="c15"
+            >
+              <a
+                className="c16"
+                href="/learn-more"
+              >
+                <span>
+                  How it Works
+                </span>
+              </a>
+            </li>
+            <li
+              className="c15"
+            >
+              <a
+                className="c16"
+                href="https://medium.com/open-collective"
+              >
+                <span>
+                  Blog
+                </span>
+              </a>
+            </li>
+          </ul>
+        </div>
+        <div
+          className="LoginTopBarProfileButton"
+        >
+          <div
+            className="c2 c3 sc-bdVaJa c3"
             onClick={[Function]}
           >
             <div
-              className="jsx-2904874222 LoginTopBarProfileButton-name desktopOnly"
-            />
+              className="c17 c3"
+              sm={true}
+              xs={true}
+            >
+              <p
+                className="c18"
+                color="#46b0ed"
+                display="inline-block"
+                fontSize="1.2rem"
+                fontWeight="bold"
+                letterSpacing="1px"
+              />
+            </div>
             <div
-              className="jsx-2904874222 LoginTopBarProfileButton-caret"
+              className="c19"
+              color="#46b0ed"
+              display="inline-block"
+              height="0.6rem"
+              strokeWidth="0.2rem"
+              width="1.4rem"
             />
           </div>
         </div>
@@ -812,13 +3334,13 @@ exports[`Search Page renders loading grid SVG 1`] = `
     </div>
   </header>
   <main
-    className="jsx-4138488456"
+    className="jsx-1964704679"
   >
     <div
-      className="c0"
+      className="c20"
     >
       <div
-        className="c1"
+        className="c21"
       >
         <form
           method="GET"
@@ -834,10 +3356,10 @@ exports[`Search Page renders loading grid SVG 1`] = `
               Search Open Collective
             </label>
             <div
-              className="c2 c3 sc-bdVaJa c3"
+              className="c22 c23 sc-bdVaJa c23"
             >
               <input
-                className="c4 form-control"
+                className="c24 form-control"
                 defaultValue=""
                 id="search"
                 name="q"
@@ -845,7 +3367,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
                 type="search"
               />
               <button
-                className="jsx-2820878800 jsx-1599314605 Button blue c5"
+                className="jsx-2820878800 jsx-1599314605 Button blue c25"
                 onClick={[Function]}
                 type="submit"
               >
@@ -858,10 +3380,10 @@ exports[`Search Page renders loading grid SVG 1`] = `
         </form>
       </div>
       <div
-        className="c6 c7 sc-bdVaJa c7"
+        className="c26 c3 sc-bdVaJa c3"
       >
         <div
-          className="c8 c9 sc-bdVaJa c9"
+          className="c27 c28 sc-bdVaJa c28"
         >
           <svg
             fill="#46B0ED"
@@ -1003,113 +3525,526 @@ exports[`Search Page renders loading grid SVG 1`] = `
     </div>
   </main>
   <div
-    className="jsx-568600484 Footer"
+    className="c29"
+    id="footer"
   >
     <div
-      className="jsx-568600484 content"
+      className="c30 c31 sc-bdVaJa c31"
     >
       <div
-        className="jsx-568600484"
+        className="c32 c33 c34 sc-bdVaJa c34"
+        maxWidth="300px"
       >
-        <object
-          className="jsx-568600484 logo"
-          data="/static/images/opencollectivelogo-footer.svg"
-          height="20"
-          type="image/svg+xml"
-        />
+        <div
+          className="c35 c3 sc-bdVaJa c3"
+        >
+          <object
+            data="/static/images/opencollectivelogo-footer.svg"
+            height="20"
+            type="image/svg+xml"
+          />
+        </div>
+        <p
+          className="c36"
+          color="#6E747A"
+          fontSize="1.4rem"
+        >
+          Providing the digital tools that drive the organizations of the 21st century.
+        </p>
       </div>
       <div
-        className="jsx-568600484"
+        className="c32 c37 c38 sc-bdVaJa c38"
+        maxWidth="300px"
       >
-        <nav
-          className="jsx-568600484"
+        <a
+          className="c39"
+          href="https://medium.com/open-collective"
         >
+          <svg
+            height={15}
+            viewBox="0 0 32 32"
+            width={15}
+          >
+            <title>
+              medium icon
+            </title>
+            <path
+              d="M3.795 8.48c0.040-0.393-0.111-0.781-0.404-1.045l-2.987-3.6v-0.537h9.276l7.171 15.727 6.304-15.727h8.845v0.537l-2.556 2.449c-0.22 0.168-0.329 0.444-0.284 0.717v18c-0.045 0.272 0.064 0.547 0.284 0.716l2.493 2.449v0.537h-12.547v-0.537l2.583-2.509c0.253-0.253 0.253-0.328 0.253-0.717v-14.548l-7.187 18.251h-0.969l-8.367-18.251v12.232c-0.069 0.515 0.101 1.032 0.463 1.404l3.36 4.080v0.536h-9.527v-0.537l3.36-4.080c0.36-0.371 0.52-0.893 0.435-1.403v-14.144z"
+              fill="#9399A3"
+            />
+          </svg>
+        </a>
+        <a
+          className="c39"
+          href="https://twitter.com/opencollect"
+        >
+          <svg
+            height={12.5}
+            version="1.1"
+            viewBox="0 0 18 15"
+            width={15}
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <title>
+              twitter icon
+            </title>
+            <g
+              fill="none"
+              fillRule="evenodd"
+              id="Homepage"
+              stroke="none"
+              strokeWidth="1"
+            >
+              <g
+                id="Homepage---XS-(small-handset)"
+                transform="translate(-97.000000, -9521.000000)"
+              >
+                <g
+                  id="JOIN-MOVEMENT"
+                  transform="translate(-69.000000, 3570.000000)"
+                >
+                  <g
+                    id="::-06---spread-the-word"
+                    transform="translate(85.000000, 5758.000000)"
+                  >
+                    <g
+                      id="::-button-(share-twitter)"
+                      transform="translate(44.000000, 176.000000)"
+                    >
+                      <path
+                        d="M55,18.7756985 C54.33775,19.0771597 53.626,19.2801846 52.879,19.3716996 C53.64175,18.9033581 54.22675,18.1612407 54.50275,17.2768521 C53.7895,17.710587 52.999,18.0258908 52.1575,18.1958472 C51.484,17.4598821 50.524,17 49.462,17 C47.42275,17 45.769,18.695719 45.769,20.7867214 C45.769,21.0835683 45.802,21.3727249 45.86425,21.649577 C42.79525,21.4919251 40.07425,19.9838503 38.2525,17.6928993 C37.93525,18.2519867 37.753,18.9025891 37.753,19.5970264 C37.753,20.9105358 38.40475,22.0694694 39.3955,22.748526 C38.79025,22.7285311 38.221,22.5585747 37.723,22.2748013 C37.723,22.290951 37.723,22.3063317 37.723,22.3224814 C37.723,24.1573955 38.99575,25.6877724 40.6855,26.0353755 C40.37575,26.1222763 40.0495,26.1684184 39.712,26.1684184 C39.47425,26.1684184 39.2425,26.1445783 39.0175,26.1007434 C39.48775,27.6049731 40.85125,28.7000769 42.4675,28.7308382 C41.20375,29.7467316 39.6115,30.351961 37.88125,30.351961 C37.5835,30.351961 37.2895,30.3342733 37,30.2988977 C38.63425,31.3732376 40.57525,32 42.661,32 C49.45375,32 53.16775,26.229941 53.16775,21.2258395 C53.16775,21.0620354 53.164,20.8982312 53.15725,20.7359651 C53.87875,20.2014868 54.505,19.5347347 55,18.7756985 Z"
+                        fill="#9399A3"
+                        fillRule="nonzero"
+                        id="twitter"
+                      />
+                    </g>
+                  </g>
+                </g>
+              </g>
+            </g>
+          </svg>
+        </a>
+        <a
+          className="c39"
+          href="https://github.com/opencollective"
+        >
+          <svg
+            height={15}
+            version="1.1"
+            viewBox="0 0 22 22"
+            width={15}
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <title>
+              github icon
+            </title>
+            <g
+              fill="none"
+              fillRule="evenodd"
+              id="Homepage"
+              stroke="none"
+              strokeWidth="1"
+            >
+              <g
+                id="Homepage---XS-(small-handset)"
+                transform="translate(-149.000000, -10919.000000)"
+              >
+                <g
+                  id="FOOTER"
+                  transform="translate(0.000000, 10758.000000)"
+                >
+                  <g
+                    id="::-social-networks"
+                    transform="translate(24.000000, 148.000000)"
+                  >
+                    <g
+                      id="::-icon-(github)"
+                      transform="translate(112.000000, 0.000000)"
+                    >
+                      <path
+                        d="M24,13 C17.9133333,13 13,17.962963 13,24.1111111 C13,29.2222222 16.4466667,33.6666667 21.36,34.9259259 C21.4333333,34.9259259 21.58,34.9259259 21.6533333,34.8518519 C21.7266667,34.7777778 21.8,34.7037037 21.8,34.5555556 L21.8,31.8888889 C21.8,31.8148148 21.7266667,31.6666667 21.7266667,31.5925926 C21.6533333,31.5185185 21.58,31.5185185 21.4333333,31.5185185 L20.7,31.5185185 C19.5266667,31.5185185 18.7933333,30.4074074 18.1333333,29.4444444 C17.9866667,29.2962963 17.9133333,29.0740741 17.7666667,28.9259259 C18.2066667,29.1481481 18.5,29.4444444 18.8666667,29.8148148 C19.38,30.3333333 19.8933333,30.8518519 20.7733333,30.8518519 C20.7733333,30.8518519 20.7733333,30.8518519 20.7733333,30.8518519 C21.14,30.8518519 21.8733333,30.4814815 21.8733333,29.3703704 L21.8733333,29 C21.8733333,28.8518519 21.8,28.7037037 21.58,28.6296296 C19.0866667,27.8888889 17.4733333,25.8888889 17.4733333,23.5925926 C17.4733333,22.4074074 17.9866667,21.2222222 18.8666667,20.3333333 C18.8666667,20.1851852 18.8666667,20.037037 18.8666667,19.8888889 C18.5,19.1481481 18.8666667,18.1111111 19.38,17.5185185 C19.8933333,17.7407407 20.4066667,18.3333333 20.8466667,18.7777778 C20.92,18.9259259 21.14,18.9259259 21.2866667,18.8518519 L21.5066667,18.7777778 C22.3133333,18.4814815 23.2666667,18.1111111 24.1466667,18.1111111 C25.0266667,18.1111111 25.98,18.4814815 26.7866667,18.7777778 L27.0066667,18.8518519 C27.1533333,18.9259259 27.3,18.8518519 27.4466667,18.7777778 C27.8866667,18.2592593 28.4,17.7407407 28.9133333,17.5185185 C29.4266667,18.1851852 29.7933333,19.1481481 29.4266667,19.8888889 C29.1333333,20.037037 29.1333333,20.1851852 29.2066667,20.3333333 C30.0866667,21.2962963 30.6,22.3333333 30.6,23.4444444 C30.6,25.8888889 28.7666667,28.037037 26.1266667,28.6296296 C25.98,28.6296296 25.9066667,28.7037037 25.9066667,28.8518519 C25.9066667,29 25.8333333,29.0740741 25.9066667,29.1481481 C26.1266667,29.5185185 26.2,30.2592593 26.2,31.2222222 C26.2,32.4814815 26.2,34.6296296 26.2,34.6296296 C26.2,34.7777778 26.2733333,34.8518519 26.3466667,34.9259259 C26.42,35 26.4933333,35 26.5666667,35 C26.5666667,35 26.64,35 26.64,35 C31.5533333,33.6666667 35,29.2222222 35,24.1111111 C35,17.962963 30.0866667,13 24,13 Z"
+                        fill="#9399A3"
+                        fillRule="nonzero"
+                        id="github"
+                      />
+                    </g>
+                  </g>
+                </g>
+              </g>
+            </g>
+          </svg>
+        </a>
+        <a
+          className="c39"
+          href="https://slack.com/opencollective"
+        >
+          <svg
+            height={15}
+            version="1.1"
+            viewBox="0 0 20 20"
+            width={15}
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <title>
+              slack icon
+            </title>
+            <g
+              fill="#9399A3"
+              id="slack"
+            >
+              <path
+                d="M19.1625,7.25 C21.225,14.125 19.62125,17.1 12.75,19.1625 C5.875,21.225 2.9,19.62125 0.8375,12.75 C-1.225,5.875 0.38,2.9 7.25,0.8375 C14.1225,-1.225 17.1,0.38 19.1625,7.25 Z M15.6875,11.7125 L15.695,11.73875 C16.2325,11.56375 16.5275,10.97625 16.345,10.42625 C16.16375,9.87625 15.57625,9.58875 15.0325,9.76375 L13.74,10.19375 L12.8775,7.6225 L14.175,7.185 C14.71625,7.005 15.01,6.4175 14.82875,5.8725 C14.64625,5.335 14.05875,5.04 13.51625,5.2225 L12.22,5.6475 L11.77,4.2975 C11.59,3.75 11.00125,3.4625 10.4575,3.6375 C9.9125,3.825 9.625,4.4125 9.8,4.95 L10.25,6.2875 L7.58875,7.1825 L7.13875,5.8425 C6.96375,5.3025 6.37625,5.00625 5.82625,5.19 C5.27625,5.37 4.98875,5.9575 5.16375,6.5025 L5.61375,7.84 L4.31375,8.2725 C3.76375,8.45625 3.47625,9.04375 3.65125,9.585 C3.78875,10.01 4.18875,10.27875 4.60125,10.29125 C4.72,10.29375 4.84,10.2775 4.9575,10.2375 L6.25,9.8 L7.07375,12.37375 L5.77375,12.81125 C5.23625,12.98625 4.93625,13.57375 5.12375,14.12375 C5.27375,14.54875 5.66125,14.82375 6.08625,14.83625 C6.21125,14.83625 6.32375,14.82375 6.44875,14.78625 L7.74875,14.34875 L8.19875,15.69875 C8.34875,16.12375 8.73625,16.39375 9.16125,16.40625 C9.28625,16.40875 9.39875,16.3925 9.52375,16.3525 C10.07375,16.17125 10.36125,15.58375 10.18625,15.04 L9.73625,13.7 L12.41125,12.805 L12.86125,14.145 C13.01125,14.57 13.39875,14.84 13.82375,14.8525 C13.94875,14.85625 14.06125,14.8375 14.18625,14.8 C14.72875,14.6175 15.0225,14.03 14.84125,13.4875 L14.39125,12.14625 L15.6875,11.7125 Z"
+              />
+              <polygon
+                points="8.2325 9.1625 9.095 11.73375 11.76625 10.83875 10.90375 8.27625 8.2325 9.17625"
+              />
+            </g>
+          </svg>
+        </a>
+        <a
+          className="c39"
+          href="mailto:info@opencollective.com"
+        >
+          <svg
+            height={13.125}
+            version="1.1"
+            viewBox="0 0 16 14"
+            width={15}
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <title>
+              email icon
+            </title>
+            <g
+              fill="none"
+              fillRule="evenodd"
+              id="Homepage"
+              stroke="none"
+              strokeWidth="1"
+            >
+              <g
+                id="Homepage---XS-(small-handset)"
+                transform="translate(-264.000000, -10923.000000)"
+              >
+                <g
+                  id="FOOTER"
+                  transform="translate(0.000000, 10758.000000)"
+                >
+                  <g
+                    id="::-social-networks"
+                    transform="translate(24.000000, 148.000000)"
+                  >
+                    <g
+                      id="::-icon-(email)"
+                      transform="translate(224.000000, 0.000000)"
+                    >
+                      <path
+                        d="M30.4,17 L17.6,17 C16.72,17 16.008,17.9 16.008,19 L16,29 C16,30.1 16.72,31 17.6,31 L30.4,31 C31.28,31 32,30.1 32,29 L32,19 C32,17.9 31.28,17 30.4,17 Z M30,21 L24,25 L18,21 L18,19 L24,23 L30,19 L30,21 Z"
+                        fill="#9399A3"
+                        fillRule="nonzero"
+                        id="email"
+                      />
+                    </g>
+                  </g>
+                </g>
+              </g>
+            </g>
+          </svg>
+        </a>
+      </div>
+      <nav
+        className="c40 c41"
+        mt={3}
+      >
+        <div
+          className="c42"
+        >
+          <p
+            className="c43"
+            color="#C2C6CC"
+            fontSize="1.2rem"
+            letterSpacing="1px"
+          >
+            PLATFORM
+          </p>
           <ul
-            className="jsx-568600484"
+            className="c44"
           >
             <li
-              className="jsx-568600484"
+              className="c45"
             >
               <a
-                className="jsx-568600484"
-                href="/learn-more"
+                className="c46"
+                color="#6E747A"
+                display="block"
+                fontSize="1.6rem"
+                fontWeight="400"
+                href="/discover"
               >
-                How It Works
+                Discover
               </a>
             </li>
             <li
-              className="jsx-568600484"
+              className="c45"
             >
               <a
-                className="jsx-568600484"
-                href="https://opencollective.com/#opensource"
+                className="c46"
+                color="#6E747A"
+                display="block"
+                fontSize="1.6rem"
+                fontWeight="400"
+                href="/learn-more"
+              >
+                How it Works
+              </a>
+            </li>
+            <li
+              className="c45"
+            >
+              <a
+                className="c46"
+                color="#6E747A"
+                display="block"
+                fontSize="1.6rem"
+                fontWeight="400"
+                href="/opensource"
               >
                 Use Cases
               </a>
             </li>
             <li
-              className="jsx-568600484"
+              className="c45"
             >
               <a
-                className="jsx-568600484"
-                href="https://opencollective.com/faq"
+                className="c46"
+                color="#6E747A"
+                display="block"
+                fontSize="1.6rem"
+                fontWeight="400"
+                href="/signin"
               >
-                FAQ
+                Sign Up
               </a>
             </li>
             <li
-              className="jsx-568600484"
+              className="c45"
             >
               <a
-                className="jsx-568600484"
+                className="c46"
+                color="#6E747A"
+                display="block"
+                fontSize="1.6rem"
+                fontWeight="400"
+                href="/signin"
+              >
+                Login
+              </a>
+            </li>
+          </ul>
+        </div>
+        <div
+          className="c42"
+        >
+          <p
+            className="c43"
+            color="#C2C6CC"
+            fontSize="1.2rem"
+            letterSpacing="1px"
+          >
+            JOIN THE MOVEMENT
+          </p>
+          <ul
+            className="c44"
+          >
+            <li
+              className="c45"
+            >
+              <a
+                className="c46"
+                color="#6E747A"
+                display="block"
+                fontSize="1.6rem"
+                fontWeight="400"
+                href="/create"
+              >
+                Create a Collective
+              </a>
+            </li>
+            <li
+              className="c45"
+            >
+              <a
+                className="c46"
+                color="#6E747A"
+                display="block"
+                fontSize="1.6rem"
+                fontWeight="400"
+                href="/organizations/new"
+              >
+                Become a Sponsor
+              </a>
+            </li>
+          </ul>
+        </div>
+        <div
+          className="c42"
+        >
+          <p
+            className="c43"
+            color="#C2C6CC"
+            fontSize="1.2rem"
+            letterSpacing="1px"
+          >
+            COMMUNITY
+          </p>
+          <ul
+            className="c44"
+          >
+            <li
+              className="c45"
+            >
+              <a
+                className="c46"
+                color="#6E747A"
+                display="block"
+                fontSize="1.6rem"
+                fontWeight="400"
+                href="/opensource"
+              >
+                Open Source
+              </a>
+            </li>
+            <li
+              className="c45"
+            >
+              <a
+                className="c46"
+                color="#6E747A"
+                display="block"
+                fontSize="1.6rem"
+                fontWeight="400"
                 href="https://forum.opencollective.com"
               >
                 Forum
               </a>
             </li>
             <li
-              className="jsx-568600484"
+              className="c45"
             >
               <a
-                className="jsx-568600484"
+                className="c46"
+                color="#6E747A"
+                display="block"
+                fontSize="1.6rem"
+                fontWeight="400"
+                href="https://opencollective.slack.com"
+              >
+                Slack
+              </a>
+            </li>
+            <li
+              className="c45"
+            >
+              <a
+                className="c46"
+                color="#6E747A"
+                display="block"
+                fontSize="1.6rem"
+                fontWeight="400"
+                href="https://github.com/OpenCollective/OpenCollective/wiki"
+              >
+                Help
+              </a>
+            </li>
+          </ul>
+        </div>
+        <div
+          className="c42"
+        >
+          <p
+            className="c43"
+            color="#C2C6CC"
+            fontSize="1.2rem"
+            letterSpacing="1px"
+          >
+            COMPANY
+          </p>
+          <ul
+            className="c44"
+          >
+            <li
+              className="c45"
+            >
+              <a
+                className="c46"
+                color="#6E747A"
+                display="block"
+                fontSize="1.6rem"
+                fontWeight="400"
+                href="/about"
+              >
+                About
+              </a>
+            </li>
+            <li
+              className="c45"
+            >
+              <a
+                className="c46"
+                color="#6E747A"
+                display="block"
+                fontSize="1.6rem"
+                fontWeight="400"
+                href="/faq"
+              >
+                FAQ
+              </a>
+            </li>
+            <li
+              className="c45"
+            >
+              <a
+                className="c46"
+                color="#6E747A"
+                display="block"
+                fontSize="1.6rem"
+                fontWeight="400"
                 href="https://medium.com/open-collective"
               >
                 Blog
               </a>
             </li>
             <li
-              className="jsx-568600484"
+              className="c45"
             >
               <a
+                className="c46"
+                color="#6E747A"
+                display="block"
+                fontSize="1.6rem"
+                fontWeight="400"
                 href="/tos"
-                onClick={[Function]}
               >
-                Terms Of Service
+                Terms of Service
               </a>
             </li>
             <li
-              className="jsx-568600484"
+              className="c45"
             >
               <a
-                className="jsx-568600484"
-                href="https://opencollective.com/about"
+                className="c46"
+                color="#6E747A"
+                display="block"
+                fontSize="1.6rem"
+                fontWeight="400"
+                href="/privacypolicy"
               >
-                About
-              </a>
-            </li>
-            <li
-              className="jsx-568600484"
-            >
-              <a
-                className="jsx-568600484"
-                href="mailto:info@opencollective.com"
-              >
-                Contact
+                Privacy Policy
               </a>
             </li>
           </ul>
-        </nav>
-      </div>
+        </div>
+      </nav>
     </div>
   </div>
 </div>
@@ -1118,20 +4053,91 @@ exports[`Search Page renders loading grid SVG 1`] = `
 exports[`Search Page renders search results with pagination 1`] = `
 .c1 {
   box-sizing: border-box;
-  width: 100%;
+  margin-left: 16px;
+  margin-right: 16px;
+  margin-top: 8px;
+  margin-bottom: 8px;
 }
 
 .c3 {
+  box-sizing: border-box;
+}
+
+.c6 {
+  box-sizing: border-box;
+  margin-left: 8px;
+  margin-right: 8px;
+}
+
+.c8 {
+  box-sizing: border-box;
+  -webkit-flex: 1 1 auto;
+  -ms-flex: 1 1 auto;
+  flex: 1 1 auto;
+}
+
+.c10 {
+  box-sizing: border-box;
+  margin-left: 16px;
+  margin-right: 16px;
+}
+
+.c14 {
+  margin: 0;
+  box-sizing: border-box;
+  margin: 0px;
+  padding: 0px;
+}
+
+.c15 {
+  box-sizing: border-box;
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+.c21 {
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.c23 {
   box-sizing: border-box;
   margin-top: 16px;
   margin-bottom: 16px;
 }
 
-.c7 {
+.c31 {
   box-sizing: border-box;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 8px;
 }
 
-.c9 {
+.c34 {
+  box-sizing: border-box;
+  margin-top: 8px;
+}
+
+.c38 {
+  box-sizing: border-box;
+  width: 100%;
+  margin-top: 16px;
+  margin-bottom: 16px;
+}
+
+.c41 {
+  margin-top: 16px;
+  box-sizing: border-box;
+  margin-top: 16px;
+}
+
+.c42 {
+  box-sizing: border-box;
+  width: 50%;
+  margin-bottom: 16px;
+}
+
+.c27 {
   box-sizing: border-box;
   margin-left: 8px;
   margin-right: 8px;
@@ -1139,7 +4145,70 @@ exports[`Search Page renders search results with pagination 1`] = `
   margin-bottom: 16px;
 }
 
+.c0 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-direction: row;
+  -ms-flex-direction: row;
+  flex-direction: row;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: space-around;
+  -webkit-justify-content: space-around;
+  -ms-flex-pack: space-around;
+  justify-content: space-around;
+}
+
 .c2 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+}
+
+.c7 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: end;
+  -webkit-justify-content: flex-end;
+  -ms-flex-pack: end;
+  justify-content: flex-end;
+}
+
+.c11 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+}
+
+.c13 {
+  margin: 0;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: space-around;
+  -webkit-justify-content: space-around;
+  -ms-flex-pack: space-around;
+  justify-content: space-around;
+}
+
+.c22 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -1150,7 +4219,7 @@ exports[`Search Page renders search results with pagination 1`] = `
   align-items: flex-end;
 }
 
-.c6 {
+.c26 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -1164,7 +4233,7 @@ exports[`Search Page renders search results with pagination 1`] = `
   justify-content: center;
 }
 
-.c10 {
+.c28 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -1175,14 +4244,223 @@ exports[`Search Page renders search results with pagination 1`] = `
   justify-content: center;
 }
 
-.c8 {
+.c30 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
+  -webkit-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: justify;
+  -webkit-justify-content: space-between;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
 }
 
-.c4.c4.c4 {
+.c33 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
+}
+
+.c35 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+}
+
+.c37 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: space-evenly;
+  -webkit-justify-content: space-evenly;
+  -ms-flex-pack: space-evenly;
+  justify-content: space-evenly;
+}
+
+.c40 {
+  margin-top: 16px;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-wrap: wrap;
+  -ms-flex-wrap: wrap;
+  flex-wrap: wrap;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+}
+
+.c18 {
+  color: #46b0ed;
+  display: inline-block;
+  font-size: 1.2rem;
+  font-weight: bold;
+  -webkit-letter-spacing: 1px;
+  -moz-letter-spacing: 1px;
+  -ms-letter-spacing: 1px;
+  letter-spacing: 1px;
+  margin: 0px;
+  margin-left: 8px;
+  margin-right: 8px;
+}
+
+.c36 {
+  color: #6E747A;
+  font-size: 1.4rem;
+  margin: 0px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  text-align: center;
+}
+
+.c43 {
+  color: #C2C6CC;
+  font-size: 1.2rem;
+  -webkit-letter-spacing: 1px;
+  -moz-letter-spacing: 1px;
+  -ms-letter-spacing: 1px;
+  letter-spacing: 1px;
+  margin: 0px;
+  padding-bottom: 16px;
+  text-align: center;
+}
+
+.c19 {
+  position: relative;
+  display: inline-block;
+  height: 0.6rem;
+  width: 1.4rem;
+}
+
+.c19::before,
+.c19::after {
+  content: '';
+  position: absolute;
+  top: 0;
+}
+
+.c19::before {
+  border-left: 0.6rem solid transparent;
+  border-right: 0.6rem solid transparent;
+  border-top: 0.6rem solid #46b0ed;
+  left: 0;
+}
+
+.c19::after {
+  border-left: calc(0.6rem - 0.2rem) solid transparent;
+  border-right: calc(0.6rem - 0.2rem) solid transparent;
+  border-top: calc(0.6rem - 0.2rem) solid white;
+  left: 0.2rem;
+}
+
+.c46 {
+  color: #6E747A;
+  display: block;
+  font-size: 1.6rem;
+  font-weight: 400;
+  margin: 0px;
+  padding: 0px;
+}
+
+.c45 {
+  list-style: none;
+  text-align: center;
+}
+
+.c4 {
+  -webkit-animation: iECmZH 0.8s infinite linear;
+  animation: iECmZH 0.8s infinite linear;
+}
+
+.c12 {
+  list-style: none;
+  min-width: 20rem;
+  text-align: right;
+}
+
+.c16 {
+  color: #777777;
+  font-size: 1.4rem;
+}
+
+.c39 {
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  border: 1px solid #9399A3;
+  border-radius: 50%;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  height: 48px;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  opacity: 0.6;
+  width: 48px;
+}
+
+.c39:hover,
+.c39:focus {
+  opacity: 1;
+}
+
+.c29 {
+  bottom: 0;
+  background-color: white;
+  border-top: 1px solid #aaaaaa;
+  min-height: 7.5rem;
+  padding: 1rem;
+  width: 100%;
+}
+
+.c32 {
+  max-width: 300px;
+}
+
+.c44 {
+  box-sizing: border-box;
+  padding: 0px;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+}
+
+.c24.c24.c24 {
   border: none;
   border-bottom: 2px solid #46B0ED;
   border-radius: 0;
@@ -1193,11 +4471,11 @@ exports[`Search Page renders search results with pagination 1`] = `
   padding: 0;
 }
 
-.c5.c5 {
+.c25.c25 {
   padding: 0 2rem;
 }
 
-.c0 {
+.c20 {
   box-sizing: border-box;
   width: 100%;
   margin-left: auto;
@@ -1207,8 +4485,22 @@ exports[`Search Page renders search results with pagination 1`] = `
   max-width: 1200px;
 }
 
+@media screen and (min-width:52em) {
+  .c34 {
+    width: 33.33333333333333%;
+  }
+}
+
+@media screen and (min-width:52em) {
+  .c38 {
+    -webkit-order: 3;
+    -ms-flex-order: 3;
+    order: 3;
+  }
+}
+
 @media screen and (min-width:40em) {
-  .c6 {
+  .c26 {
     -webkit-box-pack: center;
     -webkit-justify-content: center;
     -ms-flex-pack: center;
@@ -1217,7 +4509,7 @@ exports[`Search Page renders search results with pagination 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c6 {
+  .c26 {
     -webkit-box-pack: start;
     -webkit-justify-content: flex-start;
     -ms-flex-pack: start;
@@ -1225,8 +4517,88 @@ exports[`Search Page renders search results with pagination 1`] = `
   }
 }
 
+@media screen and (min-width:52em) {
+  .c30 {
+    -webkit-flex-direction: row;
+    -ms-flex-direction: row;
+    flex-direction: row;
+  }
+}
+
+@media screen and (min-width:52em) {
+  .c30 {
+    -webkit-align-items: flex-start;
+    -webkit-box-align: flex-start;
+    -ms-flex-align: flex-start;
+    align-items: flex-start;
+  }
+}
+
+@media screen and (min-width:52em) {
+  .c35 {
+    -webkit-box-pack: start;
+    -webkit-justify-content: flex-start;
+    -ms-flex-pack: start;
+    justify-content: flex-start;
+  }
+}
+
+@media screen and (min-width:52em) {
+  .c36 {
+    text-align: left;
+  }
+}
+
+@media screen and (min-width:52em) {
+  .c43 {
+    text-align: left;
+  }
+}
+
+@media screen and (max-width:40em) {
+  .c5 {
+    display: none;
+  }
+}
+
+@media screen and (min-width:40em) and (max-width:52em) {
+  .c9 {
+    display: none;
+  }
+}
+
+@media screen and (min-width:52em) and (max-width:64em) {
+  .c9 {
+    display: none;
+  }
+}
+
+@media screen and (min-width:64em) {
+  .c9 {
+    display: none;
+  }
+}
+
+@media screen and (max-width:40em) {
+  .c17 {
+    display: none;
+  }
+}
+
+@media screen and (min-width:40em) and (max-width:52em) {
+  .c17 {
+    display: none;
+  }
+}
+
+@media screen and (min-width:52em) {
+  .c45 {
+    text-align: left;
+  }
+}
+
 @media screen and (min-width:40em) {
-  .c0 {
+  .c20 {
     width: 85%;
   }
 }
@@ -1237,79 +4609,186 @@ exports[`Search Page renders search results with pagination 1`] = `
       id="top"
     />
     <div
-      className="jsx-3593811691 loading TopBar"
+      className="c0 c1 sc-bdVaJa c1"
     >
       <a
-        className="jsx-3593811691"
-        href="/"
-        title="Go to Open Collective Homepage"
+        className="c2 c3"
+        onClick={[Function]}
       >
         <img
           alt="Open Collective logo"
-          className="jsx-3593811691 logo"
-          height="40"
+          className="c4"
+          height="24"
           src="/static/images/opencollective-icon.svg"
-          width="40"
-        />
-      </a>
-      <div
-        className="jsx-3593811691 nav"
-      >
-        <ul
-          className="jsx-3593811691 mediumScreenOnly"
-        >
-          <li
-            className="jsx-3593811691"
-          >
-            <a
-              className="jsx-3593811691 menuItem"
-              href="/learn-more"
-            >
-              <span>
-                How it works
-              </span>
-            </a>
-          </li>
-          <li
-            className="jsx-3593811691"
-          >
-            <a
-              className="jsx-3593811691 menuItem"
-              href="/discover"
-            >
-              <span>
-                discover
-              </span>
-            </a>
-          </li>
-          <li
-            className="jsx-3593811691"
-          >
-            <a
-              className="jsx-3593811691 menuItem"
-              href="https://medium.com/open-collective"
-            >
-              <span>
-                Blog
-              </span>
-            </a>
-          </li>
-        </ul>
-        <div
-          className="jsx-3593811691 separator"
+          width="24"
         />
         <div
-          className="jsx-2783800609 LoginTopBarProfileButton"
+          className="c5 c3"
+          xs={true}
         >
           <div
-            className="jsx-2904874222 TopBarProfileMenu "
+            className="c6"
+          >
+            <img
+              height="16px"
+              src="/static/images/logotype.svg"
+            />
+          </div>
+        </div>
+      </a>
+      <div
+        className="c7 c8 sc-bdVaJa c8"
+      >
+        <div
+          className="c9 c3"
+          lg={true}
+          md={true}
+          sm={true}
+        >
+          <div
+            className="c10"
+          >
+            <a
+              className="c11 c3"
+              onClick={[Function]}
+            >
+              <svg
+                height={24}
+                version="1.1"
+                viewBox="10 10 30 30"
+                width={24}
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <title>
+                  magnifying glass icon
+                </title>
+                <path
+                  d="M28.5404814,30.1903972 C26.7995948,31.5736628 24.5962981,32.4 22.2,32.4 C16.5666956,32.4 12,27.8333044 12,22.2 C12,16.5666956 16.5666956,12 22.2,12 C27.8333044,12 32.4,16.5666956 32.4,22.2 C32.4,24.5962981 31.5736628,26.7995948 30.1903972,28.5404814 L35.6582912,34.0083754 C36.1139029,34.4639871 36.1139029,35.2026796 35.6582912,35.6582912 C35.2026796,36.1139029 34.4639871,36.1139029 34.0083754,35.6582912 L28.5404814,30.1903972 Z M22.2,30 C26.507821,30 30,26.507821 30,22.2 C30,17.892179 26.507821,14.4 22.2,14.4 C17.892179,14.4 14.4,17.892179 14.4,22.2 C14.4,26.507821 17.892179,30 22.2,30 Z"
+                  fill="#aaaaaa"
+                  fillRule="nonzero"
+                  id="magnifying-glass"
+                />
+              </svg>
+            </a>
+          </div>
+        </div>
+        <div
+          className="c9 c3"
+          lg={true}
+          md={true}
+          sm={true}
+        >
+          <div
+            className="c10"
+          >
+            <a
+              className="c11 c3"
+              onClick={[Function]}
+            >
+              <svg
+                height={16.799999999999997}
+                version="1.1"
+                viewBox="0 0 20 14"
+                width={24}
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <title>
+                  menu icon
+                </title>
+                <path
+                  d="M19,6 L1,6 C0.4,6 0,6.4 0,7 C0,7.6 0.4,8 1,8 L19,8 C19.6,8 20,7.6 20,7 C20,6.4 19.6,6 19,6 Z"
+                  fill="#aaaaaa"
+                  fillRule="nonzero"
+                />
+                <path
+                  d="M0.85,2 L16.15,2 C16.66,2 17,1.6 17,1 C17,0.4 16.66,0 16.15,0 L0.85,0 C0.34,0 0,0.4 0,1 C0,1.6 0.34,2 0.85,2 Z"
+                  fill="#aaaaaa"
+                  fillRule="nonzero"
+                />
+                <path
+                  d="M16.15,12 L0.85,12 C0.34,12 0,12.4 0,13 C0,13.6 0.34,14 0.85,14 L16.15,14 C16.66,14 17,13.6 17,13 C17,12.4 16.66,12 16.15,12 Z"
+                  fill="#aaaaaa"
+                  fillRule="nonzero"
+                />
+              </svg>
+            </a>
+          </div>
+        </div>
+        <div
+          className="c5 c3"
+          xs={true}
+        >
+          <ul
+            className="c12 c13 c14"
+            m={0}
+            p={0}
+          >
+            <li
+              className="c15"
+            >
+              <a
+                className="c16"
+                href="/discover"
+              >
+                <span>
+                  Discover
+                </span>
+              </a>
+            </li>
+            <li
+              className="c15"
+            >
+              <a
+                className="c16"
+                href="/learn-more"
+              >
+                <span>
+                  How it Works
+                </span>
+              </a>
+            </li>
+            <li
+              className="c15"
+            >
+              <a
+                className="c16"
+                href="https://medium.com/open-collective"
+              >
+                <span>
+                  Blog
+                </span>
+              </a>
+            </li>
+          </ul>
+        </div>
+        <div
+          className="LoginTopBarProfileButton"
+        >
+          <div
+            className="c2 c3 sc-bdVaJa c3"
             onClick={[Function]}
           >
             <div
-              className="jsx-2904874222 LoginTopBarProfileButton-name desktopOnly"
-            />
+              className="c17 c3"
+              sm={true}
+              xs={true}
+            >
+              <p
+                className="c18"
+                color="#46b0ed"
+                display="inline-block"
+                fontSize="1.2rem"
+                fontWeight="bold"
+                letterSpacing="1px"
+              />
+            </div>
             <div
-              className="jsx-2904874222 LoginTopBarProfileButton-caret"
+              className="c19"
+              color="#46b0ed"
+              display="inline-block"
+              height="0.6rem"
+              strokeWidth="0.2rem"
+              width="1.4rem"
             />
           </div>
         </div>
@@ -1317,13 +4796,13 @@ exports[`Search Page renders search results with pagination 1`] = `
     </div>
   </header>
   <main
-    className="jsx-4138488456"
+    className="jsx-1964704679"
   >
     <div
-      className="c0"
+      className="c20"
     >
       <div
-        className="c1"
+        className="c21"
       >
         <form
           method="GET"
@@ -1339,10 +4818,10 @@ exports[`Search Page renders search results with pagination 1`] = `
               Search Open Collective
             </label>
             <div
-              className="c2 c3 sc-bdVaJa c3"
+              className="c22 c23 sc-bdVaJa c23"
             >
               <input
-                className="c4 form-control"
+                className="c24 form-control"
                 defaultValue="Test"
                 id="search"
                 name="q"
@@ -1350,7 +4829,7 @@ exports[`Search Page renders search results with pagination 1`] = `
                 type="search"
               />
               <button
-                className="jsx-2820878800 jsx-1599314605 Button blue c5"
+                className="jsx-2820878800 jsx-1599314605 Button blue c25"
                 onClick={[Function]}
                 type="submit"
               >
@@ -1363,10 +4842,10 @@ exports[`Search Page renders search results with pagination 1`] = `
         </form>
       </div>
       <div
-        className="c6 c7 sc-bdVaJa c7"
+        className="c26 c3 sc-bdVaJa c3"
       >
         <div
-          className="c8 c9 sc-bdVaJa c9"
+          className="c11 c27 sc-bdVaJa c27"
         >
           <a
             href="/test-collective"
@@ -1425,7 +4904,7 @@ exports[`Search Page renders search results with pagination 1`] = `
         </div>
       </div>
       <div
-        className="c10 c7 sc-bdVaJa c7"
+        className="c28 c3 sc-bdVaJa c3"
       >
         <ul
           className="pagination"
@@ -1485,113 +4964,526 @@ exports[`Search Page renders search results with pagination 1`] = `
     </div>
   </main>
   <div
-    className="jsx-568600484 Footer"
+    className="c29"
+    id="footer"
   >
     <div
-      className="jsx-568600484 content"
+      className="c30 c31 sc-bdVaJa c31"
     >
       <div
-        className="jsx-568600484"
+        className="c32 c33 c34 sc-bdVaJa c34"
+        maxWidth="300px"
       >
-        <object
-          className="jsx-568600484 logo"
-          data="/static/images/opencollectivelogo-footer.svg"
-          height="20"
-          type="image/svg+xml"
-        />
+        <div
+          className="c35 c3 sc-bdVaJa c3"
+        >
+          <object
+            data="/static/images/opencollectivelogo-footer.svg"
+            height="20"
+            type="image/svg+xml"
+          />
+        </div>
+        <p
+          className="c36"
+          color="#6E747A"
+          fontSize="1.4rem"
+        >
+          Providing the digital tools that drive the organizations of the 21st century.
+        </p>
       </div>
       <div
-        className="jsx-568600484"
+        className="c32 c37 c38 sc-bdVaJa c38"
+        maxWidth="300px"
       >
-        <nav
-          className="jsx-568600484"
+        <a
+          className="c39"
+          href="https://medium.com/open-collective"
         >
+          <svg
+            height={15}
+            viewBox="0 0 32 32"
+            width={15}
+          >
+            <title>
+              medium icon
+            </title>
+            <path
+              d="M3.795 8.48c0.040-0.393-0.111-0.781-0.404-1.045l-2.987-3.6v-0.537h9.276l7.171 15.727 6.304-15.727h8.845v0.537l-2.556 2.449c-0.22 0.168-0.329 0.444-0.284 0.717v18c-0.045 0.272 0.064 0.547 0.284 0.716l2.493 2.449v0.537h-12.547v-0.537l2.583-2.509c0.253-0.253 0.253-0.328 0.253-0.717v-14.548l-7.187 18.251h-0.969l-8.367-18.251v12.232c-0.069 0.515 0.101 1.032 0.463 1.404l3.36 4.080v0.536h-9.527v-0.537l3.36-4.080c0.36-0.371 0.52-0.893 0.435-1.403v-14.144z"
+              fill="#9399A3"
+            />
+          </svg>
+        </a>
+        <a
+          className="c39"
+          href="https://twitter.com/opencollect"
+        >
+          <svg
+            height={12.5}
+            version="1.1"
+            viewBox="0 0 18 15"
+            width={15}
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <title>
+              twitter icon
+            </title>
+            <g
+              fill="none"
+              fillRule="evenodd"
+              id="Homepage"
+              stroke="none"
+              strokeWidth="1"
+            >
+              <g
+                id="Homepage---XS-(small-handset)"
+                transform="translate(-97.000000, -9521.000000)"
+              >
+                <g
+                  id="JOIN-MOVEMENT"
+                  transform="translate(-69.000000, 3570.000000)"
+                >
+                  <g
+                    id="::-06---spread-the-word"
+                    transform="translate(85.000000, 5758.000000)"
+                  >
+                    <g
+                      id="::-button-(share-twitter)"
+                      transform="translate(44.000000, 176.000000)"
+                    >
+                      <path
+                        d="M55,18.7756985 C54.33775,19.0771597 53.626,19.2801846 52.879,19.3716996 C53.64175,18.9033581 54.22675,18.1612407 54.50275,17.2768521 C53.7895,17.710587 52.999,18.0258908 52.1575,18.1958472 C51.484,17.4598821 50.524,17 49.462,17 C47.42275,17 45.769,18.695719 45.769,20.7867214 C45.769,21.0835683 45.802,21.3727249 45.86425,21.649577 C42.79525,21.4919251 40.07425,19.9838503 38.2525,17.6928993 C37.93525,18.2519867 37.753,18.9025891 37.753,19.5970264 C37.753,20.9105358 38.40475,22.0694694 39.3955,22.748526 C38.79025,22.7285311 38.221,22.5585747 37.723,22.2748013 C37.723,22.290951 37.723,22.3063317 37.723,22.3224814 C37.723,24.1573955 38.99575,25.6877724 40.6855,26.0353755 C40.37575,26.1222763 40.0495,26.1684184 39.712,26.1684184 C39.47425,26.1684184 39.2425,26.1445783 39.0175,26.1007434 C39.48775,27.6049731 40.85125,28.7000769 42.4675,28.7308382 C41.20375,29.7467316 39.6115,30.351961 37.88125,30.351961 C37.5835,30.351961 37.2895,30.3342733 37,30.2988977 C38.63425,31.3732376 40.57525,32 42.661,32 C49.45375,32 53.16775,26.229941 53.16775,21.2258395 C53.16775,21.0620354 53.164,20.8982312 53.15725,20.7359651 C53.87875,20.2014868 54.505,19.5347347 55,18.7756985 Z"
+                        fill="#9399A3"
+                        fillRule="nonzero"
+                        id="twitter"
+                      />
+                    </g>
+                  </g>
+                </g>
+              </g>
+            </g>
+          </svg>
+        </a>
+        <a
+          className="c39"
+          href="https://github.com/opencollective"
+        >
+          <svg
+            height={15}
+            version="1.1"
+            viewBox="0 0 22 22"
+            width={15}
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <title>
+              github icon
+            </title>
+            <g
+              fill="none"
+              fillRule="evenodd"
+              id="Homepage"
+              stroke="none"
+              strokeWidth="1"
+            >
+              <g
+                id="Homepage---XS-(small-handset)"
+                transform="translate(-149.000000, -10919.000000)"
+              >
+                <g
+                  id="FOOTER"
+                  transform="translate(0.000000, 10758.000000)"
+                >
+                  <g
+                    id="::-social-networks"
+                    transform="translate(24.000000, 148.000000)"
+                  >
+                    <g
+                      id="::-icon-(github)"
+                      transform="translate(112.000000, 0.000000)"
+                    >
+                      <path
+                        d="M24,13 C17.9133333,13 13,17.962963 13,24.1111111 C13,29.2222222 16.4466667,33.6666667 21.36,34.9259259 C21.4333333,34.9259259 21.58,34.9259259 21.6533333,34.8518519 C21.7266667,34.7777778 21.8,34.7037037 21.8,34.5555556 L21.8,31.8888889 C21.8,31.8148148 21.7266667,31.6666667 21.7266667,31.5925926 C21.6533333,31.5185185 21.58,31.5185185 21.4333333,31.5185185 L20.7,31.5185185 C19.5266667,31.5185185 18.7933333,30.4074074 18.1333333,29.4444444 C17.9866667,29.2962963 17.9133333,29.0740741 17.7666667,28.9259259 C18.2066667,29.1481481 18.5,29.4444444 18.8666667,29.8148148 C19.38,30.3333333 19.8933333,30.8518519 20.7733333,30.8518519 C20.7733333,30.8518519 20.7733333,30.8518519 20.7733333,30.8518519 C21.14,30.8518519 21.8733333,30.4814815 21.8733333,29.3703704 L21.8733333,29 C21.8733333,28.8518519 21.8,28.7037037 21.58,28.6296296 C19.0866667,27.8888889 17.4733333,25.8888889 17.4733333,23.5925926 C17.4733333,22.4074074 17.9866667,21.2222222 18.8666667,20.3333333 C18.8666667,20.1851852 18.8666667,20.037037 18.8666667,19.8888889 C18.5,19.1481481 18.8666667,18.1111111 19.38,17.5185185 C19.8933333,17.7407407 20.4066667,18.3333333 20.8466667,18.7777778 C20.92,18.9259259 21.14,18.9259259 21.2866667,18.8518519 L21.5066667,18.7777778 C22.3133333,18.4814815 23.2666667,18.1111111 24.1466667,18.1111111 C25.0266667,18.1111111 25.98,18.4814815 26.7866667,18.7777778 L27.0066667,18.8518519 C27.1533333,18.9259259 27.3,18.8518519 27.4466667,18.7777778 C27.8866667,18.2592593 28.4,17.7407407 28.9133333,17.5185185 C29.4266667,18.1851852 29.7933333,19.1481481 29.4266667,19.8888889 C29.1333333,20.037037 29.1333333,20.1851852 29.2066667,20.3333333 C30.0866667,21.2962963 30.6,22.3333333 30.6,23.4444444 C30.6,25.8888889 28.7666667,28.037037 26.1266667,28.6296296 C25.98,28.6296296 25.9066667,28.7037037 25.9066667,28.8518519 C25.9066667,29 25.8333333,29.0740741 25.9066667,29.1481481 C26.1266667,29.5185185 26.2,30.2592593 26.2,31.2222222 C26.2,32.4814815 26.2,34.6296296 26.2,34.6296296 C26.2,34.7777778 26.2733333,34.8518519 26.3466667,34.9259259 C26.42,35 26.4933333,35 26.5666667,35 C26.5666667,35 26.64,35 26.64,35 C31.5533333,33.6666667 35,29.2222222 35,24.1111111 C35,17.962963 30.0866667,13 24,13 Z"
+                        fill="#9399A3"
+                        fillRule="nonzero"
+                        id="github"
+                      />
+                    </g>
+                  </g>
+                </g>
+              </g>
+            </g>
+          </svg>
+        </a>
+        <a
+          className="c39"
+          href="https://slack.com/opencollective"
+        >
+          <svg
+            height={15}
+            version="1.1"
+            viewBox="0 0 20 20"
+            width={15}
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <title>
+              slack icon
+            </title>
+            <g
+              fill="#9399A3"
+              id="slack"
+            >
+              <path
+                d="M19.1625,7.25 C21.225,14.125 19.62125,17.1 12.75,19.1625 C5.875,21.225 2.9,19.62125 0.8375,12.75 C-1.225,5.875 0.38,2.9 7.25,0.8375 C14.1225,-1.225 17.1,0.38 19.1625,7.25 Z M15.6875,11.7125 L15.695,11.73875 C16.2325,11.56375 16.5275,10.97625 16.345,10.42625 C16.16375,9.87625 15.57625,9.58875 15.0325,9.76375 L13.74,10.19375 L12.8775,7.6225 L14.175,7.185 C14.71625,7.005 15.01,6.4175 14.82875,5.8725 C14.64625,5.335 14.05875,5.04 13.51625,5.2225 L12.22,5.6475 L11.77,4.2975 C11.59,3.75 11.00125,3.4625 10.4575,3.6375 C9.9125,3.825 9.625,4.4125 9.8,4.95 L10.25,6.2875 L7.58875,7.1825 L7.13875,5.8425 C6.96375,5.3025 6.37625,5.00625 5.82625,5.19 C5.27625,5.37 4.98875,5.9575 5.16375,6.5025 L5.61375,7.84 L4.31375,8.2725 C3.76375,8.45625 3.47625,9.04375 3.65125,9.585 C3.78875,10.01 4.18875,10.27875 4.60125,10.29125 C4.72,10.29375 4.84,10.2775 4.9575,10.2375 L6.25,9.8 L7.07375,12.37375 L5.77375,12.81125 C5.23625,12.98625 4.93625,13.57375 5.12375,14.12375 C5.27375,14.54875 5.66125,14.82375 6.08625,14.83625 C6.21125,14.83625 6.32375,14.82375 6.44875,14.78625 L7.74875,14.34875 L8.19875,15.69875 C8.34875,16.12375 8.73625,16.39375 9.16125,16.40625 C9.28625,16.40875 9.39875,16.3925 9.52375,16.3525 C10.07375,16.17125 10.36125,15.58375 10.18625,15.04 L9.73625,13.7 L12.41125,12.805 L12.86125,14.145 C13.01125,14.57 13.39875,14.84 13.82375,14.8525 C13.94875,14.85625 14.06125,14.8375 14.18625,14.8 C14.72875,14.6175 15.0225,14.03 14.84125,13.4875 L14.39125,12.14625 L15.6875,11.7125 Z"
+              />
+              <polygon
+                points="8.2325 9.1625 9.095 11.73375 11.76625 10.83875 10.90375 8.27625 8.2325 9.17625"
+              />
+            </g>
+          </svg>
+        </a>
+        <a
+          className="c39"
+          href="mailto:info@opencollective.com"
+        >
+          <svg
+            height={13.125}
+            version="1.1"
+            viewBox="0 0 16 14"
+            width={15}
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <title>
+              email icon
+            </title>
+            <g
+              fill="none"
+              fillRule="evenodd"
+              id="Homepage"
+              stroke="none"
+              strokeWidth="1"
+            >
+              <g
+                id="Homepage---XS-(small-handset)"
+                transform="translate(-264.000000, -10923.000000)"
+              >
+                <g
+                  id="FOOTER"
+                  transform="translate(0.000000, 10758.000000)"
+                >
+                  <g
+                    id="::-social-networks"
+                    transform="translate(24.000000, 148.000000)"
+                  >
+                    <g
+                      id="::-icon-(email)"
+                      transform="translate(224.000000, 0.000000)"
+                    >
+                      <path
+                        d="M30.4,17 L17.6,17 C16.72,17 16.008,17.9 16.008,19 L16,29 C16,30.1 16.72,31 17.6,31 L30.4,31 C31.28,31 32,30.1 32,29 L32,19 C32,17.9 31.28,17 30.4,17 Z M30,21 L24,25 L18,21 L18,19 L24,23 L30,19 L30,21 Z"
+                        fill="#9399A3"
+                        fillRule="nonzero"
+                        id="email"
+                      />
+                    </g>
+                  </g>
+                </g>
+              </g>
+            </g>
+          </svg>
+        </a>
+      </div>
+      <nav
+        className="c40 c41"
+        mt={3}
+      >
+        <div
+          className="c42"
+        >
+          <p
+            className="c43"
+            color="#C2C6CC"
+            fontSize="1.2rem"
+            letterSpacing="1px"
+          >
+            PLATFORM
+          </p>
           <ul
-            className="jsx-568600484"
+            className="c44"
           >
             <li
-              className="jsx-568600484"
+              className="c45"
             >
               <a
-                className="jsx-568600484"
-                href="/learn-more"
+                className="c46"
+                color="#6E747A"
+                display="block"
+                fontSize="1.6rem"
+                fontWeight="400"
+                href="/discover"
               >
-                How It Works
+                Discover
               </a>
             </li>
             <li
-              className="jsx-568600484"
+              className="c45"
             >
               <a
-                className="jsx-568600484"
-                href="https://opencollective.com/#opensource"
+                className="c46"
+                color="#6E747A"
+                display="block"
+                fontSize="1.6rem"
+                fontWeight="400"
+                href="/learn-more"
+              >
+                How it Works
+              </a>
+            </li>
+            <li
+              className="c45"
+            >
+              <a
+                className="c46"
+                color="#6E747A"
+                display="block"
+                fontSize="1.6rem"
+                fontWeight="400"
+                href="/opensource"
               >
                 Use Cases
               </a>
             </li>
             <li
-              className="jsx-568600484"
+              className="c45"
             >
               <a
-                className="jsx-568600484"
-                href="https://opencollective.com/faq"
+                className="c46"
+                color="#6E747A"
+                display="block"
+                fontSize="1.6rem"
+                fontWeight="400"
+                href="/signin"
               >
-                FAQ
+                Sign Up
               </a>
             </li>
             <li
-              className="jsx-568600484"
+              className="c45"
             >
               <a
-                className="jsx-568600484"
+                className="c46"
+                color="#6E747A"
+                display="block"
+                fontSize="1.6rem"
+                fontWeight="400"
+                href="/signin"
+              >
+                Login
+              </a>
+            </li>
+          </ul>
+        </div>
+        <div
+          className="c42"
+        >
+          <p
+            className="c43"
+            color="#C2C6CC"
+            fontSize="1.2rem"
+            letterSpacing="1px"
+          >
+            JOIN THE MOVEMENT
+          </p>
+          <ul
+            className="c44"
+          >
+            <li
+              className="c45"
+            >
+              <a
+                className="c46"
+                color="#6E747A"
+                display="block"
+                fontSize="1.6rem"
+                fontWeight="400"
+                href="/create"
+              >
+                Create a Collective
+              </a>
+            </li>
+            <li
+              className="c45"
+            >
+              <a
+                className="c46"
+                color="#6E747A"
+                display="block"
+                fontSize="1.6rem"
+                fontWeight="400"
+                href="/organizations/new"
+              >
+                Become a Sponsor
+              </a>
+            </li>
+          </ul>
+        </div>
+        <div
+          className="c42"
+        >
+          <p
+            className="c43"
+            color="#C2C6CC"
+            fontSize="1.2rem"
+            letterSpacing="1px"
+          >
+            COMMUNITY
+          </p>
+          <ul
+            className="c44"
+          >
+            <li
+              className="c45"
+            >
+              <a
+                className="c46"
+                color="#6E747A"
+                display="block"
+                fontSize="1.6rem"
+                fontWeight="400"
+                href="/opensource"
+              >
+                Open Source
+              </a>
+            </li>
+            <li
+              className="c45"
+            >
+              <a
+                className="c46"
+                color="#6E747A"
+                display="block"
+                fontSize="1.6rem"
+                fontWeight="400"
                 href="https://forum.opencollective.com"
               >
                 Forum
               </a>
             </li>
             <li
-              className="jsx-568600484"
+              className="c45"
             >
               <a
-                className="jsx-568600484"
+                className="c46"
+                color="#6E747A"
+                display="block"
+                fontSize="1.6rem"
+                fontWeight="400"
+                href="https://opencollective.slack.com"
+              >
+                Slack
+              </a>
+            </li>
+            <li
+              className="c45"
+            >
+              <a
+                className="c46"
+                color="#6E747A"
+                display="block"
+                fontSize="1.6rem"
+                fontWeight="400"
+                href="https://github.com/OpenCollective/OpenCollective/wiki"
+              >
+                Help
+              </a>
+            </li>
+          </ul>
+        </div>
+        <div
+          className="c42"
+        >
+          <p
+            className="c43"
+            color="#C2C6CC"
+            fontSize="1.2rem"
+            letterSpacing="1px"
+          >
+            COMPANY
+          </p>
+          <ul
+            className="c44"
+          >
+            <li
+              className="c45"
+            >
+              <a
+                className="c46"
+                color="#6E747A"
+                display="block"
+                fontSize="1.6rem"
+                fontWeight="400"
+                href="/about"
+              >
+                About
+              </a>
+            </li>
+            <li
+              className="c45"
+            >
+              <a
+                className="c46"
+                color="#6E747A"
+                display="block"
+                fontSize="1.6rem"
+                fontWeight="400"
+                href="/faq"
+              >
+                FAQ
+              </a>
+            </li>
+            <li
+              className="c45"
+            >
+              <a
+                className="c46"
+                color="#6E747A"
+                display="block"
+                fontSize="1.6rem"
+                fontWeight="400"
                 href="https://medium.com/open-collective"
               >
                 Blog
               </a>
             </li>
             <li
-              className="jsx-568600484"
+              className="c45"
             >
               <a
+                className="c46"
+                color="#6E747A"
+                display="block"
+                fontSize="1.6rem"
+                fontWeight="400"
                 href="/tos"
-                onClick={[Function]}
               >
-                Terms Of Service
+                Terms of Service
               </a>
             </li>
             <li
-              className="jsx-568600484"
+              className="c45"
             >
               <a
-                className="jsx-568600484"
-                href="https://opencollective.com/about"
+                className="c46"
+                color="#6E747A"
+                display="block"
+                fontSize="1.6rem"
+                fontWeight="400"
+                href="/privacypolicy"
               >
-                About
-              </a>
-            </li>
-            <li
-              className="jsx-568600484"
-            >
-              <a
-                className="jsx-568600484"
-                href="mailto:info@opencollective.com"
-              >
-                Contact
+                Privacy Policy
               </a>
             </li>
           </ul>
-        </nav>
-      </div>
+        </div>
+      </nav>
     </div>
   </div>
 </div>
