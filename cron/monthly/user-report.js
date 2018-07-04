@@ -64,20 +64,25 @@ const fetchUserSubscribers = async (notificationType, backerCollective) => {
 const init = async () => {
 
   const startTime = new Date;
+  const query = {
+    attributes: [ [sequelize.fn('DISTINCT', sequelize.col('FromCollectiveId')), 'FromCollectiveId'] ],
+    where: {
+      type: 'CREDIT',
+      OrderId: { [Op.ne]: null }, // make sure we don't consider collectives paying out expenses as backers of user collectives
+      RefundTransactionId: null, // make sure we don't consider refunds
+      createdAt: { [Op.gte]: startDate, [Op.lt]: endDate }
+    }
+  };
 
   let FromCollectiveIds;
-  if (process.env.DEBUG && process.env.DEBUG.match(/preview/)) {
+  if (process.env.SLUGS) {
+    const slugs = process.env.SLUGS.split(',');
+    const res = await models.Collective.findAll({ attributes: ['id'], where:  { slug: { [Op.in] : slugs }}});
+    FromCollectiveIds = res.map(r => r.id);
+  } else if (process.env.DEBUG && process.env.DEBUG.match(/preview/)) {
     FromCollectiveIds = [1729, 12671]; // xdamman, coinbase
   } else {
-    const distinctTransactions = await models.Transaction.findAll({
-      attributes: [ [sequelize.fn('DISTINCT', sequelize.col('FromCollectiveId')), 'FromCollectiveId'] ],
-      where: {
-        type: 'CREDIT',
-        OrderId: { [Op.ne]: null }, // make sure we don't consider collectives paying out expenses as backers of user collectives
-        RefundTransactionId: null, // make sure we don't consider refunds
-        createdAt: { [Op.gte]: startDate, [Op.lt]: endDate }
-      }
-    });
+    const distinctTransactions = await models.Transaction.findAll(query);
     FromCollectiveIds = distinctTransactions.map(t => t.FromCollectiveId);
   }
 
