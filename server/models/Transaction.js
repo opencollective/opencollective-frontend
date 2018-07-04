@@ -326,6 +326,7 @@ export default (Sequelize, DataTypes) => {
       type: (-transaction.amount > 0) ? TransactionTypes.CREDIT : TransactionTypes.DEBIT,
       FromCollectiveId: transaction.CollectiveId,
       CollectiveId: transaction.FromCollectiveId,
+      HostCollectiveId: null, // see https://github.com/opencollective/opencollective/issues/1154
       amount: -transaction.netAmountInCollectiveCurrency,
       netAmountInCollectiveCurrency: -transaction.amount,
       amountInHostCurrency: -transaction.netAmountInCollectiveCurrency / transaction.hostCurrencyFxRate,
