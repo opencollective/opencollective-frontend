@@ -76,7 +76,7 @@ class TopBar extends React.Component {
 
           {showSearch && (
             <Flex justifyContent="center" flex="1 1 auto">
-              <Hide xs>
+              <Hide xs w={1}>
                 <SearchFormContainer p={2}>
                   <SearchForm />
                 </SearchFormContainer>
@@ -103,8 +103,8 @@ class TopBar extends React.Component {
           </Hide>
 
           <Hide xs>
-            <NavList is="ul" p={0} m={0} justifyContent="space-around">
-              <Box is="li" px={3}><NavLink href="/discover"><FormattedMessage id="menu.discover" defaultMessage="discover" /></NavLink></Box>
+            <NavList is="ul" p={0} m={0} justifyContent="space-around" css="margin: 0;">
+              <Box is="li" px={3}><NavLink href="/discover"><FormattedMessage id="menu.discover" defaultMessage="Discover" /></NavLink></Box>
               <Box is="li" px={3}><NavLink href="/learn-more"><FormattedMessage id="menu.howItWorks" defaultMessage="How it Works" /></NavLink></Box>
               <Box is="li" px={3}><NavLink href="https://medium.com/open-collective"><FormattedMessage id="menu.blog" defaultMessage="Blog" /></NavLink></Box>
             </NavList>

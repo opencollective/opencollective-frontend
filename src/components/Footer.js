@@ -41,6 +41,11 @@ const FlexContainer = styled(Flex)`
   ${maxWidth}
 `;
 
+const FlexList = styled.ul([],
+  ...Box.componentStyle.rules,
+  ...Flex.componentStyle.rules,
+);
+
 const navigation = {
   PLATFORM: {
     Discover: '/discover',
@@ -102,11 +107,11 @@ class Footer extends React.Component {
               <MailIcon size={15} fill="#9399A3" />
             </SocialLink>
           </FlexContainer>
-          <Flex is="nav" flexWrap="wrap" justifyContent="center" mt={3}>
+          <Flex is="nav" flexWrap="wrap" justifyContent="center" mt={3} css="margin-top: 16px;">
             {Object.keys(navigation).map((key) => (
               <Box key={key} w={0.5} mb={3}>
                 <P textAlign={['center', null, 'left' ]} fontSize="1.2rem" color="#C2C6CC" letterSpacing="1px" pb={3}>{key}</P>
-                <Flex is="ul" justifyContent="center" flexDirection="column" p={0}>
+                <FlexList justifyContent="center" flexDirection="column" p={0}>
                   {Object.keys(navigation[key]).map((item) => (
                     <ListItem key={item} textAlign={['center', null, 'left']}>
                       <StyledLink
@@ -122,7 +127,7 @@ class Footer extends React.Component {
                       </StyledLink>
                     </ListItem>
                   ))}
-                </Flex>
+                </FlexList>
               </Box>
             ))}
           </Flex>
