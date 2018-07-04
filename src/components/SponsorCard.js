@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { defaultImage } from '../constants/collectives';
+import { imagePreview } from '../lib/utils';
 
 import Container from './Container';
 import Currency from './Currency';
@@ -19,13 +20,13 @@ const SponsorCard = ({
   },
   type,
 }) => (
-  <Container bg="white" borderRadius="8px" border="1px solid rgba(18,19,20,0.2)" overflow="hidden">
+  <Container bg="white" borderRadius="8px" border="1px solid rgba(18,19,20,0.2)" minHeight="100%">
     <Container display="flex" justifyContent="space-between" alignItems="center" pt={3}>
       <Container bg="#E8E9EB" height="1px" w={0.25} />
 
       <Link href={`/${slug}`}><a>
         <Container
-          backgroundImage={image || defaultImage[type]}
+          backgroundImage={imagePreview(image || defaultImage[type])}
           backgroundSize="contain"
           backgroundRepeat="no-repeat"
           backgroundPosition="center center"
