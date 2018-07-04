@@ -80,7 +80,7 @@ export default (Sequelize, DataTypes) => {
       },
       onDelete: 'SET NULL',
       onUpdate: 'CASCADE',
-      allowNull: false
+      allowNull: true // the opposite transaction that records the CREDIT to the User that submitted an expense doesn't have a HostCollectiveId, see https://github.com/opencollective/opencollective/issues/1154
     },
 
     OrderId: {
@@ -314,7 +314,7 @@ export default (Sequelize, DataTypes) => {
    *
    */
 
-  Transaction.createDoubleEntry = (transaction) => {
+  Transaction.createDoubleEntry = async (transaction) => {
 
     transaction.type = (transaction.amount > 0) ? TransactionTypes.CREDIT : TransactionTypes.DEBIT;
     transaction.netAmountInCollectiveCurrency = transaction.netAmountInCollectiveCurrency || transaction.amount;
@@ -326,7 +326,7 @@ export default (Sequelize, DataTypes) => {
       type: (-transaction.amount > 0) ? TransactionTypes.CREDIT : TransactionTypes.DEBIT,
       FromCollectiveId: transaction.CollectiveId,
       CollectiveId: transaction.FromCollectiveId,
-      HostCollectiveId: null, // see https://github.com/opencollective/opencollective/issues/1154
+      HostCollectiveId: await models.Collective.getHostCollectiveId(transaction.FromCollectiveId), // see https://github.com/opencollective/opencollective/issues/1154
       amount: -transaction.netAmountInCollectiveCurrency,
       netAmountInCollectiveCurrency: -transaction.amount,
       amountInHostCurrency: -transaction.netAmountInCollectiveCurrency / transaction.hostCurrencyFxRate,
