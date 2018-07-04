@@ -261,7 +261,7 @@ describe('graphql.collective.test.js', () => {
     const { veganizerbxl } = await store.newCollectiveInHost(
       'veganizerbxl', 'EUR', hostCollective, null, { isActive: true });
 
-    // And given a hepler to create data for expenses
+    // And given a helper to create data for expenses
     const d = (amount, description, cid) => ({
       amount, description, currency: 'EUR',
       payoutMethod: 'manual', collective: { id: cid }

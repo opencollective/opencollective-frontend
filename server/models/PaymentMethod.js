@@ -289,7 +289,7 @@ export default function(Sequelize, DataTypes) {
       limit = (this.initialBalance > limit) ? limit : this.initialBalance;
     }
 
-    const result = await sumTransactions('netAmountInCollectiveCurrency', where, this.currency);
+    const result = await sumTransactions('netAmountInCollectiveCurrency', { where }, this.currency);
     const availableBalance = limit + result.totalInHostCurrency; // result.totalInHostCurrency is negative
     return { amount: availableBalance, currency: this.currency };
   };

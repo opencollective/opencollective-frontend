@@ -202,6 +202,11 @@ const getCollectives = () => {
     where.slug = { [Op.in] : ['xdamman', 'digitalocean', 'fbopensource', 'piamancini', 'brusselstogether','wwcode'] };
   }
 
+  if (process.env.SLUGS) {
+    const slugs = process.env.SLUGS.split(',');
+    where.slug = { [Op.in] : slugs };
+  }
+
   return models.Collective.findAll({
     where: { ...where, type: { [Op.in]: ['ORGANIZATION', 'USER'] }}
   });

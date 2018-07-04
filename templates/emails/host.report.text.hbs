@@ -1,12 +1,8 @@
 Hi {{recipient.firstName}}!
 
-Sorry, previous report sent yesterday was miscalculating the total amount received on your bank account in June. This numbers is the net amount received for all the collectives that you are hosting plus (and not minus) your host fees.
-This has been corrected in this report. We also took the opportunity to make the summary table a bit more clear.
-Sorry again for the inconvenience and don't hesitate to reply to this email if you have any questions or feedback to make this report better!
-
 Here is your {{#if month}}monthly{{else}}yearly{{/if}} report.
 
-Balance as of {{{moment reportDate}}}: {{{currency stats.balance.totalInHostCurrency currency=host.currency}}} (+{{{currency stats.totalAmountDonations.totalInHostCurrency currency=host.currency}}}{{#if stats.totalAmountPaid.totalInHostCurrency}}, {{{currency stats.totalAmountPaid.totalInHostCurrency currency=host.currency}}}{{/if}})
+Balance as of {{{moment reportDate}}}: {{{currency stats.balance.totalInHostCurrency currency=host.currency}}} (+{{{currency stats.totalNetAmountReceived.totalInHostCurrency currency=host.currency}}}{{#if stats.totalAmountSpent.totalInHostCurrency}}, {{{currency stats.totalAmountSpent.totalInHostCurrency currency=host.currency}}}{{/if}})
 
 {{{number stats.totalCollectives}}} {{{pluralize "collective" n=stats.totalCollectives}}} ({{{number stats.totalActiveCollectives}}} active)
 {{{number stats.backers.total}}} backers (+{{{number stats.backers.new}}}{{#if stats.backers.lost}}, -{{{number stats.backers.lost}}}{{/if}}) 
@@ -17,8 +13,8 @@ Details for the month:
 Transactions:                          {{{number stats.numberTransactions}}} ({{{number stats.numberDonations}}} {{{pluralize "donation" n=stats.numberDonations}}}, {{{number stats.numberPaidExpenses}}} {{{pluralize "expense" n=stats.numberPaidExpenses}}} paid)
 
 Donations received (before fees):      {{{currency stats.totalAmountDonations.totalInHostCurrency currency=host.currency}}}
-  Payment processors (Stripe, PayPal):  {{{currency stats.paymentProcessorFees.totalInHostCurrency currency=host.currency}}}
-  Platform fees (Open Collective):      {{{currency stats.platformFees.totalInHostCurrency 
+  Payment processor fees (Stripe):     {{{currency stats.paymentProcessorFees.totalInHostCurrency currency=host.currency}}}
+  Platform fees (Open Collective):     {{{currency stats.platformFees.totalInHostCurrency 
 currency=host.currency}}}
 ----------------------------------------------
 Total amount received:                 {{{currency stats.totalNetAmountReceived.totalInHostCurrency currency=host.currency}}}
@@ -31,6 +27,11 @@ Net amount:                            {{{currency stats.totalNetAmountReceivedF
 (Net amount received for your {{{number stats.totalCollectives}}} {{{pluralize "collective" n=stats.totalCollectives}}})
 
 Expenses paid:                         {{{currency stats.totalAmountPaidExpenses.totalInHostCurrency currency=host.currency}}}
+  Payment processor fees (PayPal):     {{{currency stats.payoutProcessorFeesPaypal.totalInHostCurrency currency=host.currency}}}
+  Payment processor fees (host):       {{{currency stats.payoutProcessorFeesManual.totalInHostCurrency currency=host.currency}}}
+----------------------------------------------
+Total amount spent:                    {{{currency stats.totalAmountSpent.totalInHostCurrency currency=host.currency}}}
+(Total amount that left your {{host.name}} bank account)
 
 
 🗒   {{transactions.length}} transactions

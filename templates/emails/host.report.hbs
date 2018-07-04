@@ -66,9 +66,6 @@ th {
 
 <div>
 <p>Hi {{recipient.firstName}}!</p>
-<p class="notice">Sorry, previous report sent yesterday was miscalculating the total amount received on your bank account in June. This numbers is the net amount received for all the collectives that you are hosting plus (and not minus) your host fees. <br /><br />
-  This has been corrected in this report. We also took the opportunity to make the summary table a bit more clear.<br /><br />
-  Sorry again for the inconvenience and don't hesitate to reply to this email if you have any questions or feedback to make this report better!</p>
 <p>Here are your {{#if month}}monthly{{else}}yearly{{/if}} stats:</p>
 <center>
 <table border=0 cellpadding=0 cellspacing=0 width=300 style="margin: 30px 0px">
@@ -84,8 +81,8 @@ th {
   </tr>
   <tr>
     <td align="center">
-      <span class="positive">(+{{{currency stats.totalAmountDonations.totalInHostCurrency currency=host.currency}}})</span><br />
-      <span class="negative">&nbsp;{{#if stats.totalAmountPaid.totalInHostCurrency}}({{{currency stats.totalAmountPaid.totalInHostCurrency currency=host.currency}}}){{/if}}&nbsp;</span>
+      <span class="positive">(+{{{currency stats.totalNetAmountReceived.totalInHostCurrency currency=host.currency}}})</span><br />
+      <span class="negative">&nbsp;{{#if stats.totalAmountSpent.totalInHostCurrency}}({{{currency stats.totalAmountSpent.totalInHostCurrency currency=host.currency}}}){{/if}}&nbsp;</span>
     </td>
     <td></td>
     <td align="center">
@@ -129,7 +126,7 @@ th {
     <td>Total donations (before fees)</td><td></td><td align="right">{{{currency stats.totalAmountDonations.totalInHostCurrency currency=host.currency}}}</td>
   </tr>
   <tr class="indent1">
-    <td>Payment processor fees (Stripe, PayPal)</td>
+    <td>Payment processor fees (Stripe)</td>
     <td></td>
     <td align="right">
       {{{currency stats.paymentProcessorFees.totalInHostCurrency currency=host.currency}}}
@@ -174,6 +171,22 @@ th {
   </tr>
   <tr>
     <td>Expenses paid</td><td></td><td align="right">{{{currency stats.totalAmountPaidExpenses.totalInHostCurrency currency=host.currency}}}</td>
+  </tr>
+  <tr class="indent1">
+    <td>Payment processor fees (PayPal)</td>
+    <td></td>
+    <td align="right">
+      {{{currency stats.paymentProcessorFees.totalInHostCurrency currency=host.currency}}}
+    </td>
+  </tr>
+  <tr>
+    <td colspan=2></td><td height=10 class="line"><hr /></td>
+  </tr>
+  <tr>
+    <td>Total amount spent</td><td></td><td align="right">{{{currency stats.totalAmountSpent.totalInHostCurrency currency=host.currency}}}</td>
+  </tr>
+  <tr>
+    <td colspan=3 class="muted">Total amount that left your {{host.name}} bank account</td>
   </tr>
 </table>
 
