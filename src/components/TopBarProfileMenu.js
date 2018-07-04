@@ -305,7 +305,7 @@ class TopBarProfileMenu extends React.Component {
     }
 
     return (
-      <div>
+      <div className="LoginTopBarProfileButton">
         { status === 'loading' &&
           <P color="#D5DAE0" fontSize="1.4rem" px={3} py={2} display="inline-block"><FormattedMessage id="loading" defaultMessage="loading" />&hellip;</P>
         }
