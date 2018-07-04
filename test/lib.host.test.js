@@ -93,20 +93,20 @@ describe('libhost', () => {
   });
 
   it('get the total amount of funds held by the host', async () => {
-    const res = await libhost.sumTransactionsByCurrency("netAmountInCollectiveCurrency", where);
+    const res = await libhost.sumTransactionsByCurrency("netAmountInCollectiveCurrency", { where });
     const usd = res.find(a => a.currency === 'USD');
     expect(usd.amount).to.equal(315000);
     expect(res.length).to.equal(2);
   });
 
   it('get the total amount of funds held by the host in host currency', async () => {
-    const res = await libhost.sumTransactions("netAmountInCollectiveCurrency", where);
+    const res = await libhost.sumTransactions("netAmountInCollectiveCurrency", { where });
     expect(res.byCurrency).to.have.length(2);
     expect(res.totalInHostCurrency).to.equal(720000);
   });
 
   it('get the total net amount of host fees', async () => {
-    const res = await libhost.sumTransactions("hostFeeInHostCurrency", where);
+    const res = await libhost.sumTransactions("hostFeeInHostCurrency", { where });
     expect(res.byCurrency).to.have.length(2);
     expect(res.totalInHostCurrency).to.equal(-80000);
     const cad = res.byCurrency.find(a => a.currency === 'CAD');
