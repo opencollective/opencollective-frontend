@@ -12,7 +12,7 @@ const TransactionSimple = ({
   createdAt,
   currency,
   fromCollective,
-  host,
+  collective,
   subscription,
   type,
 }) => {
@@ -38,7 +38,7 @@ const TransactionSimple = ({
           </Span>
           {subscription && ` a ${subscription.interval} `}
           {type === 'DEBIT' && ' expense '}
-          to <a href={`/${host.slug}`} title={host.name}>{host.name}</a>.
+          {' to '} <a href={`/${collective.slug}`} title={collective.name}>{collective.name}</a>.
         </P>
         <Container position="relative" top={4} left={4} display="inline-block">
           <P fontSize="1.6rem">{type === 'DEBIT' && ' 🎉'}</P>
@@ -59,7 +59,7 @@ TransactionSimple.propTypes = {
     name: PropTypes.string.isRequired,
     slug: PropTypes.string.isRequired,
   }),
-  host: PropTypes.shape({
+  collective: PropTypes.shape({
     name: PropTypes.string.isRequired,
     slug: PropTypes.string.isRequired,
   }),
