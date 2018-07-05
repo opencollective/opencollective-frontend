@@ -1344,15 +1344,10 @@ export default function(Sequelize, DataTypes) {
 
   Collective.prototype.getHostCollectiveId = function() {
     if (this.HostCollectiveId) return Promise.resolve(this.HostCollectiveId);
-
-    const where = { role: roles.HOST, CollectiveId: this.ParentCollectiveId || this.id };
-    return models.Member.findOne({
-        attributes: ['MemberCollectiveId'],
-        where
-      })
-      .then(member => {
-        this.HostCollectiveId = member && member.MemberCollectiveId;
-        return this.HostCollectiveId;
+    return models.Collective.getHostCollectiveId(this.ParentCollectiveId || this.id)
+      .then(HostCollectiveId => {
+        this.HostCollectiveId = HostCollectiveId;
+        return HostCollectiveId;
       });
   };
 
@@ -1443,6 +1438,14 @@ export default function(Sequelize, DataTypes) {
   Collective.getTopBackers = (since, until, tags, limit) => {
     return queries.getTopBackers(since || 0, until || new Date, tags, limit || 5)
       .tap(backers => debug("getTopBackers", backers.map(b => b.dataValues)));
+  };
+
+  Collective.getHostCollectiveId = async (CollectiveId) => {
+    const res = await models.Member.findOne({
+      attributes: ['MemberCollectiveId'],
+      where: { CollectiveId, role: roles.HOST }
+    });
+    return res && res.MemberCollectiveId;
   };
 
   /*
