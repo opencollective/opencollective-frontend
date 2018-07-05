@@ -37,6 +37,7 @@ const SearchForm = () => (
         placeholder="Search Open Collective" 
         py={1} 
         pl={3}
+        w={1}
       />
       <SearchButton is="button" mr={1} p={1}>
         <SearchIcon size={16} fill="#aaaaaa" />
