@@ -7,6 +7,8 @@ import json2csv from 'json2csv';
 import models, { sequelize, Op } from '../../server/models';
 import emailLib from '../../server/lib/email';
 import * as transactionsLib from '../../server/lib/transactions';
+import { formatCurrency } from '../../server/lib/utils';
+import moment from 'moment';
 
 const VERBOSE = true;
 const attachments = [];
@@ -49,7 +51,7 @@ const header = (str) => {
 }
 
 const subHeader = (str, value, goodFunc) => {
-  const newString = `\t${judgment(value, goodFunc)}  ${str}: ${value}\n`;
+  const newString = `  ${judgment(value, goodFunc)}  ${str}: ${value}\n`;
   result = result.concat(newString);
   console.log(newString);
 }
@@ -60,12 +62,12 @@ const verboseData = (values, mapFunction) => {
     const slice = 5;
     const output = values.slice(0, slice).map(mapFunc);
     output.forEach(v => {
-      const newString = `\t\t▫️ ${JSON.stringify(v)}\n`;
+      const newString = `    ▫️ ${JSON.stringify(v)}\n`;
       result = result.concat(newString)
       console.log(newString);
     })
     if (values.length > 10) {
-      const newString = `\t\t... and ${values.length - slice} more`;
+      const newString = `    ... and ${values.length - slice} more`;
       result = result.concat(newString);
       console.log(newString);
     }
@@ -311,16 +313,25 @@ const checkTransactions = () => {
     subHeader('Orders with odd (not multiple of 2) number of transactions', oddOrderIds.length)
   })
 
-  // Check every Expense has a double Entry
+  // Check every Expense has a double Entry, excluding  ExpenseId (1740, 1737, 1956) (cheeselab known issue)
   .then(() => sequelize.query(`
-    SELECT "ExpenseId" FROM "Transactions"
-        WHERE "ExpenseId" IS NOT NULL and "deletedAt" is null
-          GROUP BY "ExpenseId"
-          HAVING COUNT(*) != 2
+    with "invalidExpenses" AS (
+      SELECT MAX(e.id) as "ExpenseId", max(e."payoutMethod") as "payoutMethod", count(*) as "numberOfTransactions",
+        CASE
+        WHEN (MAX(e."payoutMethod") = 'donation' AND COUNT(*) = 4) THEN true
+        WHEN (MAX(e."payoutMethod") != 'donation' AND COUNT(*) != 2) THEN false
+        ELSE true
+        END as valid
+      FROM "Transactions" t LEFT JOIN "Expenses" e ON t."ExpenseId" = e.id
+              WHERE "ExpenseId" IS NOT NULL and t."deletedAt" is null AND "ExpenseId"  NOT IN (1740, 1737, 1956)
+                GROUP BY "ExpenseId"
+                HAVING COUNT(*) != 2
+      )
+      SELECT ie."ExpenseId", ie."numberOfTransactions", c.slug as collective, e.category, e.amount, e.currency, e.description, e."payoutMethod", u.email as "user email", u."paypalEmail", e.attachment, e."incurredAt", e."createdAt", e."updatedAt" FROM "invalidExpenses" ie LEFT JOIN "Expenses" e ON ie."ExpenseId" = e.id LEFT JOIN "Users" u ON u.id=e."UserId" LEFT JOIN "Collectives" c ON c.id=e."CollectiveId" WHERE e.id IN (select "ExpenseId" FROM "invalidExpenses" WHERE valid is false)
     `, {type: sequelize.QueryTypes.SELECT}))
-  .then(oddExpenseIds => {
-    subHeader('Expenses with less than or more than 2 transactions', oddExpenseIds.length)
-    verboseData(oddExpenseIds)
+  .then(invalidExpenses => {
+    subHeader('Expenses with invalid number of transactions', invalidExpenses.length)
+    verboseData(invalidExpenses)
   })
 
   // Check all TransactionGroups have two entries, one CREDIT and one DEBIT
@@ -357,11 +368,30 @@ const checkTransactions = () => {
     const allTransactions = await models.Transaction.findAll({ where: { deletedAt: null } });
     const funkyTransactions = allTransactions
           .filter((tr) => transactionsLib.verify(tr) !== true)
-          .map((tr) => ({...tr.dataValues, offBy: transactionsLib.difference(tr)}));
-    const fields = ['id', 'amount', 'currency', 'hostCurrency', 'offBy'];
+          .map((tr) => ({...tr.dataValues, validation: transactionsLib.verify(tr), offBy: transactionsLib.difference(tr)}));
+    const collectiveIds = [];
+    funkyTransactions.map(ft => {
+      collectiveIds.push(ft.CollectiveId)
+      collectiveIds.push(ft.HostCollectiveId)
+    });
+    const collectives = await models.Collective.findAll({
+      attributes: ['id', 'slug'],
+      where: { id: { [Op.in]: collectiveIds }}
+    });
+    const collectiveSlugById = {};
+    collectives.map(c => {
+      collectiveSlugById[c.id] = c.slug;
+    })
+    funkyTransactions.map(ft => {
+      if (ft.HostCollectiveId) {
+        ft.host = collectiveSlugById[ft.HostCollectiveId];
+      }
+      ft.collective = collectiveSlugById[ft.CollectiveId];
+    });
+    const fields = ['validation', 'id', 'host', 'hostCurrency', 'collective', 'currency', 'type', 'amount', 'amountInHostCurrency', 'netAmountInCollectiveCurrency', 'hostFeeInHostCurrency', 'platformFeeInHostCurrency', 'paymentProcessorFeeInHostCurrency', 'OrderId', 'ExpenseId', 'description', 'offBy'];
     if (funkyTransactions.length > 0) {
       attachments.push({
-        filename: `tr-dont-add-up-${(new Date).toLocaleDateString()}.csv`,
+        filename: `${moment(new Date).format("YYYYMMDD")}-invalid-transactions.csv`,
         content: await Promise.promisify(json2csv)({ data: funkyTransactions, fields })
       });
     }
@@ -372,9 +402,9 @@ const checkTransactions = () => {
 const checkCollectiveBalance = () => {
 
   const brokenCollectives = [];
-  header('Checking balance of each (non-USER, non-ORG) collective');
+  header('Checking balance of each collective (EVENT or COLLECTIVE)');
   return models.Collective.findAll({
-    attributes: [ 'id' ],
+    attributes: [ 'id', 'slug', 'currency' ],
     where: {
       [Op.or]: [{type: 'COLLECTIVE'}, {type: 'EVENT'}],
       id: {
@@ -390,6 +420,7 @@ const checkCollectiveBalance = () => {
     return collective.getBalance()
       .then(balance => {
         if (balance < 0) {
+          collective.balance = balance;
           brokenCollectives.push(collective)
         }
         return Promise.resolve();
@@ -397,7 +428,7 @@ const checkCollectiveBalance = () => {
   })
   .then(() => {
     subHeader('Collectives with negative balance: ', brokenCollectives.length);
-    verboseData(brokenCollectives, c => Object.assign({id: c.id, slug: c.slug}))
+    verboseData(brokenCollectives, c => Object.assign({id: c.id, slug: c.slug, balance: formatCurrency(c.balance, c.currency, 2)}))
   })
 }
 
