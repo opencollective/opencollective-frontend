@@ -723,7 +723,7 @@ exports[`Search Page renders empty results message 1`] = `
               xs={true}
             >
               <p
-                className="c18"
+                className="LoginTopBarProfileButton-name c18"
                 color="#46b0ed"
                 display="inline-block"
                 fontSize="1.2rem"
@@ -1643,6 +1643,7 @@ exports[`Search Page renders error message 1`] = `
 
 .c13 {
   box-sizing: border-box;
+  width: 100%;
   padding-left: 16px;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -3312,7 +3313,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
               xs={true}
             >
               <p
-                className="c18"
+                className="LoginTopBarProfileButton-name c18"
                 color="#46b0ed"
                 display="inline-block"
                 fontSize="1.2rem"
@@ -4774,7 +4775,7 @@ exports[`Search Page renders search results with pagination 1`] = `
               xs={true}
             >
               <p
-                className="c18"
+                className="LoginTopBarProfileButton-name c18"
                 color="#46b0ed"
                 display="inline-block"
                 fontSize="1.2rem"
