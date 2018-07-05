@@ -51,7 +51,7 @@ const sectionDetailStyles = {
 };
 const statsContainerStyles = {
   alignItems: 'center',
-  backgroundImage: '/public/images/oc-symbol.svg',
+  backgroundImage: '/static/images/oc-symbol.svg',
   backgroundPosition: 'center center',
   backgroundRepeat: 'no-repeat',
   backgroundSize: 'contain',
@@ -406,7 +406,7 @@ class HomePage extends React.Component {
                 </StyledLink>
               </Container>
               <Container w={[1, null, 0.5]} textAlign="center" px={2} maxWidth={600}>
-                <img src="/public/images/home-contributors.png" alt="Open Collective Contribution Commits" width="100%" height="auto" />
+                <img src="/static/images/home-contributors.png" alt="Open Collective Contribution Commits" width="100%" height="auto" />
               </Container>
             </Container>
 
