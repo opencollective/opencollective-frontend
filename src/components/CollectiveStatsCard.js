@@ -24,7 +24,16 @@ const CollectiveStatsCard = ({
   stats,
   type,
 }) => (
-  <Container bg="white" borderRadius="8px" border="1px solid rgba(18,19,20,0.2)" overflow="hidden">
+  <Container
+    bg="white"
+    borderRadius="8px"
+    border="1px solid rgba(18,19,20,0.2)"
+    display="flex"
+    flexDirection="column"
+    justifyContent="space-between"
+    minHeight="100%"
+    overflow="hidden"
+  >
     <Container
       backgroundImage={backgroundImage || defaultBackgroundImage[type]}
       backgroundSize="cover"
