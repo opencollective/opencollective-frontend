@@ -278,6 +278,7 @@ class TopBarProfileMenu extends React.Component {
             fontWeight="bold"
             letterSpacing="1px"
             mx={2}
+            className="LoginTopBarProfileButton-name"
           >
             {LoggedInUser.username}
           </P>
