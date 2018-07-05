@@ -104,6 +104,14 @@ const sendMessage = (recipients, subject, html, options = {}) => {
     to = `emailbcc+${to.replace(/@/g, '-at-')}@opencollective.com`;
   }
 
+  if (process.env.DEBUG && process.env.DEBUG.match(/preview/) && options.attachments) {
+    options.attachments.map(attachment => {
+      const filepath = path.resolve(`/tmp/${attachment.filename}`);
+      fs.writeFileSync(filepath, attachment.content);
+      console.log(">>> preview attachment", filepath);
+    })
+  }
+
   debug(`sending email to ${to}`);
   if (recipients.length === 0) {
     debug("No recipient to send to, only sending to bcc", options.bcc);
@@ -265,15 +273,6 @@ const generateEmailFromTemplate = (template, recipient, data = {}, options = {})
       fs.writeFileSync(filepath, renderedTemplate.text);
       console.log(">>> preview email", filepath);
     }
-
-    if (options.attachments) {
-      options.attachments.map(attachment => {
-        filepath = path.resolve(`/tmp/${slug}-${attachment.filename}`);
-        fs.writeFileSync(filepath, attachment.content);
-        console.log(">>> preview attachment", filepath);
-      })
-    }
-
   }
 
   return Promise.resolve(renderedTemplate);
