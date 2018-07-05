@@ -254,6 +254,7 @@ class HomePage extends React.Component {
               fontSize={["1.4rem", null, "1.6rem"]}
               fontWeight="bold"
               hover={{ color: '#3385FF' }}
+              mt={4}
               mx="auto"
               py={[2, null, 3]}
               textAlign="center"
@@ -381,7 +382,7 @@ class HomePage extends React.Component {
               </Container>
               <Container w={[1, null, 0.5]} overflow="hidden" position="relative">
                 <Container width={["100%", null, "160%"]} display="flex" flexWrap="wrap" justifyContent="center" alignItems="center" position="relative" >
-                  {backers.map((c) => <Container px={1} key={c.id}><BackerAvatar {...c} /></Container>)}
+                  {backers.filter(({ image }) => !!image).map((c) => <Container px={1} key={c.id}><BackerAvatar {...c} /></Container>)}
                 </Container>
                 <Hide xs sm position="absolute" top={0} left={0} width="100%" height="100%" pointerEvents="none">
                   <Container background="linear-gradient(to left, #EBF1FA, rgba(255, 255, 255, 0) 50%)" width="100%" height="100%" />
@@ -393,7 +394,7 @@ class HomePage extends React.Component {
 
             <Container display="flex" flexDirection={['column', null, 'row']} justifyContent="space-between" maxWidth={1200} mx="auto">
               <Container w={[1, null, 0.5]}>
-                <H3 {...sectionHeadingStyles}>Contribute to OC’s development.</H3>
+                <H3 {...sectionHeadingStyles}>Contribute to Open Collective’s development.</H3>
 
                 <P {...sectionSubHeadingStyles}>Building Open Collective together to get further, faster. 🚀</P>
 
@@ -414,7 +415,7 @@ class HomePage extends React.Component {
 
             <Container display="flex" flexDirection={['column', null, 'row']} maxWidth={1200} mx="auto">
               <Container w={[1, null, 0.5]}>
-                <H3 {...sectionHeadingStyles}>Create an OC Chapter</H3>
+                <H3 {...sectionHeadingStyles}>Create a local Chapter</H3>
 
                 <P {...sectionSubHeadingStyles}>Help provide the legal entities open collectives need to raise funds. ⚖️</P>
 
@@ -652,7 +653,7 @@ const query = gql`
         }
       }
     }
-    backers: allCollectives(type: USER, limit: 20, orderBy: amountSent, orderDirection: DESC, offset: 0) {
+    backers: allCollectives(type: USER, limit: 30, orderBy: amountSent, orderDirection: DESC, offset: 0) {
       total
       collectives {
         id
