@@ -42,7 +42,7 @@ export function createFromPaidExpense(host, paymentMethod, expense, paymentRespo
   const hostCurrency = host.currency;
   let createPaymentResponse, executePaymentResponse;
   let fxrate;
-  let paymentProcessorFeeInCollectiveCurrency = 0;
+  let paymentProcessorFeeInCollectiveCurrency = paymentProcessorFeeInHostCurrency;
   let getFxRatePromise;
 
   // If PayPal
