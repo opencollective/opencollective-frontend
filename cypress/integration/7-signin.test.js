@@ -11,7 +11,7 @@ describe("signin", () => {
     cy.visit(`${WEBSITE_URL}/signin?next=/testuseradmin`);
     fill("email", "testuser+admin@opencollective.com");
     cy.get('.LoginForm button').click();
-    cy.get('.LoginTopBarProfileButton').contains('testuseradmin', { timeout: 15000 });
+    cy.get('.LoginTopBarProfileButton-name').contains('testuseradmin', { timeout: 15000 });
   })
 
   it("signup", () => {
