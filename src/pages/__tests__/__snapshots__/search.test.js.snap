@@ -216,7 +216,7 @@ exports[`Search Page renders empty results message 1`] = `
               Search Open Collective
             </label>
             <div
-              className="c2 c3"
+              className="c2 c3 sc-bdVaJa c3"
             >
               <input
                 className="c4 form-control"
@@ -240,10 +240,10 @@ exports[`Search Page renders empty results message 1`] = `
         </form>
       </div>
       <div
-        className="c6 c7"
+        className="c6 c7 sc-bdVaJa c7"
       >
         <div
-          className="c8 c9"
+          className="c8 c9 sc-bdVaJa c9"
         >
           <p>
             <em>
@@ -834,7 +834,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
               Search Open Collective
             </label>
             <div
-              className="c2 c3"
+              className="c2 c3 sc-bdVaJa c3"
             >
               <input
                 className="c4 form-control"
@@ -858,10 +858,10 @@ exports[`Search Page renders loading grid SVG 1`] = `
         </form>
       </div>
       <div
-        className="c6 c7"
+        className="c6 c7 sc-bdVaJa c7"
       >
         <div
-          className="c8 c9"
+          className="c8 c9 sc-bdVaJa c9"
         >
           <svg
             fill="#46B0ED"
@@ -1339,7 +1339,7 @@ exports[`Search Page renders search results with pagination 1`] = `
               Search Open Collective
             </label>
             <div
-              className="c2 c3"
+              className="c2 c3 sc-bdVaJa c3"
             >
               <input
                 className="c4 form-control"
@@ -1363,10 +1363,10 @@ exports[`Search Page renders search results with pagination 1`] = `
         </form>
       </div>
       <div
-        className="c6 c7"
+        className="c6 c7 sc-bdVaJa c7"
       >
         <div
-          className="c8 c9"
+          className="c8 c9 sc-bdVaJa c9"
         >
           <a
             href="/test-collective"
@@ -1425,7 +1425,7 @@ exports[`Search Page renders search results with pagination 1`] = `
         </div>
       </div>
       <div
-        className="c10 c7"
+        className="c10 c7 sc-bdVaJa c7"
       >
         <ul
           className="pagination"
