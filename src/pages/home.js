@@ -226,21 +226,21 @@ class HomePage extends React.Component {
 
             <Container py={3}>
               <Flex mb={3} justifyContent="space-between" px={[1, null, 0]}>
-                <H3>Most active spending</H3>
-                <StyledLink href="/discover">See all &gt;</StyledLink>
-              </Flex>
-              <Container display="flex" flexWrap="wrap" justifyContent="space-between">
-                {activeCollectives.map((c) => <Container w={[0.5, null, 0.25]} mb={2} px={1} maxWidth={224} key={c.id}><CollectiveStatsCard {...c} /></Container>)} 
-              </Container>
-            </Container>
-
-            <Container py={3}>
-              <Flex mb={3} justifyContent="space-between" px={[1, null, 0]}>
                 <H3>Recently created</H3>
                 <StyledLink href="/discover">See all &gt;</StyledLink>
               </Flex>
               <Container display="flex" flexWrap="wrap" justifyContent="space-between">
                 {collectives.map((c) => <Container w={[0.5, null, 0.25]} mb={2} px={1} maxWidth={224}><CollectiveStatsCard {...c} /></Container>)} 
+              </Container>
+            </Container>
+
+            <Container py={3}>
+              <Flex mb={3} justifyContent="space-between" px={[1, null, 0]}>
+                <H3>Most active</H3>
+                <StyledLink href="/discover">See all &gt;</StyledLink>
+              </Flex>
+              <Container display="flex" flexWrap="wrap" justifyContent="space-between">
+                {activeCollectives.map((c) => <Container w={[0.5, null, 0.25]} mb={2} px={1} maxWidth={224} key={c.id}><CollectiveStatsCard {...c} /></Container>)} 
               </Container>
             </Container>
 
