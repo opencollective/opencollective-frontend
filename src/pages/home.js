@@ -4,6 +4,7 @@ import gql from 'graphql-tag';
 import { take, uniqBy } from 'lodash';
 
 import { Box, Flex } from 'grid-styled';
+import { FormattedNumber } from 'react-intl';
 
 import { pickAvatar } from '../lib/collective.lib';
 import withData from '../lib/withData'
@@ -449,19 +450,27 @@ class HomePage extends React.Component {
               <P textAlign="center" fontSize={[20, null, 28]} mb={2}>Today we are:</P>
               <Container display="flex" flexWrap="wrap" alignItems="center" justifyContent="center">
                 <Container {...statsContainerStyles}>
-                  <P {...statsStyles}>{totalCollectives}</P>
+                  <P {...statsStyles}>
+                    <FormattedNumber value={totalCollectives} />
+                  </P>
                   <P>collectives</P>
                 </Container>
                 <Container {...statsContainerStyles}>
-                  <P {...statsStyles}>{totalSponsors}</P>
+                  <P {...statsStyles}>
+                    <FormattedNumber value={totalSponsors} />
+                  </P>
                   <P>sponsors</P>
                 </Container>
                 <Container {...statsContainerStyles}>
-                  <P {...statsStyles}>{totalBackers}</P>
+                  <P {...statsStyles}>
+                    <FormattedNumber value={totalBackers} />
+                  </P>
                   <P>backers</P>
                 </Container>
                 <Container {...statsContainerStyles}>
-                  <P {...statsStyles}>{totalChapters}</P>
+                  <P {...statsStyles}>
+                    <FormattedNumber value={totalChapters} />
+                  </P>
                   <P>chapters</P>
                 </Container>
               </Container>
