@@ -24,7 +24,7 @@ const SponsorCard = ({
     <Container display="flex" justifyContent="space-between" alignItems="center" pt={3}>
       <Container bg="#E8E9EB" height="1px" w={0.25} />
 
-      <Link href={`/${slug}`}><a>
+      <Link route={`/${slug}`} passHref><a>
         <Container
           backgroundImage={imagePreview(image || defaultImage[type])}
           backgroundSize="contain"
@@ -41,7 +41,7 @@ const SponsorCard = ({
     </Container>
 
     <P fontSize="1.4rem" textAlign="center" fontWeight="bold" mt={3} px={2}>
-      <Link href={`/${slug}`}><StyledLink color="#2E3033">{name}</StyledLink></Link>
+      <Link route={`/${slug}`} passHref><StyledLink color="#2E3033">{name}</StyledLink></Link>
     </P>
 
     <P fontSize="1.4rem" textAlign="center" mt={2} px={2} pb={3}>

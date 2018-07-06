@@ -59,7 +59,7 @@ const CollectiveStatsCard = ({
     </Container>
 
     <P fontSize="1.4rem" textAlign="center" fontWeight="bold" mt={3}>
-      <Link href={`/${slug}`}><StyledLink color="#2E3033">{name}</StyledLink></Link>
+      <Link route={`/${slug}`} passHref><StyledLink color="#2E3033">{name}</StyledLink></Link>
     </P>
 
     <P fontSize="1.2rem" textAlign="center" p={2}>{description}</P>
@@ -92,7 +92,7 @@ const CollectiveStatsCard = ({
           <P fontSize="1.2rem">sponsors</P>
         </Flex>
       ] : (
-        <Link href={`/${slug}#contribute`}><StyledLink fontSize="1.2rem" width="100%" textAlign="center">Be the first to contribute!</StyledLink></Link>
+        <Link route={`/${slug}#contribute`} passHref><StyledLink fontSize="1.2rem" width="100%" textAlign="center">Be the first to contribute!</StyledLink></Link>
       )}
     </Container>
   </Container>

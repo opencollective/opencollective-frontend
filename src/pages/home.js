@@ -87,7 +87,7 @@ const BackerAvatar = ({
     totalAmountSent,
   },
 }) => (
-  <Link route={`/${slug}`}><a>
+  <Link route={`/${slug}`} passHref><a>
     <Container
       backgroundImage={imagePreview(image || pickAvatar())}
       backgroundSize="cover"
@@ -198,7 +198,7 @@ class HomePage extends React.Component {
                   >
                     Join the movement
                   </StyledLink>
-                  <Link href="/learn-more">
+                  <Link route="/learn-more" passHref>
                     <StyledLink mt={[3, null, 0]} ml={[null, null, 3]}>How it works &gt;</StyledLink>
                   </Link>
                 </Flex>
@@ -264,7 +264,7 @@ class HomePage extends React.Component {
             </StyledLink>
           </Container>
 
-          <Container bg="#EBF1FA" py={5} mt={5}>
+          <Container bg="#EBF1FA" py={5} mt={5} id="movement">
             <Container maxWidth={800} mx="auto">
               <H2 textAlign="center" fontWeight="900" px={2} lineHeight={['36px', null, '58px']} fontSize={[null, null, 56]}>
                 Join the movement for a world with more open, transparent, and sustainable communities.
@@ -288,7 +288,7 @@ class HomePage extends React.Component {
                   Create an open collective for your group and leverage the power of the community to live up to your mission. <a href="/discover">Learn more.</a>
                 </P>
 
-                <Link route="/create">
+                <Link route="/create" passHref>
                   <StyledLink
                     bg="#3385FF"
                     borderRadius="50px"
@@ -325,7 +325,7 @@ class HomePage extends React.Component {
 
                 <P {...sectionDetailStyles} my={3}>If you’re looking to onboard and financially support an initiative through Open Collective, <a href="mailto:info@opencollective.com">let us know</a> and we’ll gladly set them up and get them going.</P>
 
-                <Link route="/organizations/new">
+                <Link route="/organizations/new" passHref>
                   <StyledLink
                     bg="#3385FF"
                     borderRadius="50px"
@@ -421,7 +421,7 @@ class HomePage extends React.Component {
 
                 <P {...sectionDetailStyles}><Span fontWeight="bold">Grow the movement</Span> by becoming a fiscal host for open collectives in your city or your ecosystem. Help organize initiatives and provide a means for them to receive financial support from the Open Collective community.</P>
 
-                <Link route="/chapters">
+                <Link route="/chapters" passHref>
                   <StyledLink
                     bg="#3385FF"
                     borderRadius="50px"
