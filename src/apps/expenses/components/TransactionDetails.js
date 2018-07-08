@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { defineMessages, FormattedNumber, FormattedMessage } from 'react-intl';
 import { imagePreview, capitalize } from '../../../lib/utils';
 import withIntl from '../../../lib/withIntl';
+import { get } from 'lodash';
 
 import RefundTransactionBtn from './RefundTransactionBtn';
 
@@ -105,10 +106,12 @@ class TransactionDetails extends React.Component {
             }
           </div>
         }
-        <div className="col">
-          <label><FormattedMessage id="transaction.host" defaultMessage="host" /></label>
-          {transaction.host.name}
-        </div>
+        { get(transaction, 'host.name') &&
+          <div className="col">
+            <label><FormattedMessage id="transaction.host" defaultMessage="host" /></label>
+            {transaction.host.name}
+          </div>
+        }
         <div className="col">
           <label><FormattedMessage id="transaction.paymentMethod" defaultMessage="payment method" /></label>
           {transaction.paymentMethod && capitalize(transaction.paymentMethod.service)}
