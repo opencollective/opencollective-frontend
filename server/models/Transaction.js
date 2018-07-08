@@ -201,8 +201,13 @@ export default (Sequelize, DataTypes) => {
     return models.User.findById(this.CreatedByUserId);
   };
 
-  Transaction.prototype.getHostCollective = function() {
-    return models.Collective.findById(this.HostCollectiveId);
+  Transaction.prototype.getHostCollective = async function() {
+    let HostCollectiveId = this.HostCollectiveId;
+    // if the transaction is from the perspective of the fromCollective
+    if (!HostCollectiveId) {
+      HostCollectiveId = await models.Collective.getHostCollectiveId(this.FromCollectiveId);
+    }
+    return models.Collective.findById(HostCollectiveId);
   };
 
   Transaction.prototype.getExpenseForViewer = function(viewer) {
