@@ -302,6 +302,23 @@ export default function(Sequelize, DataTypes) {
           currency: this.currency
         }
       },
+      // used to generate the invoice
+      invoice() {
+        return {
+          id: this.id,
+          createdAt: this.createdAt,
+          name: this.name,
+          slug: this.slug,
+          image: this.image,
+          backgroundImage: this.backgroundImage,
+          publicUrl: this.publicUrl,
+          locationName: this.locationName,
+          address: this.address,
+          description: this.description,
+          settings: this.settings,
+          currency: this.currency
+        }
+      },
       minimal() {
         return {
           id: this.id,
