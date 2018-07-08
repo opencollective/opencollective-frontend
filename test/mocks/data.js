@@ -9,7 +9,7 @@ export default {
     "description": "engineer",
     "longDescription": "This is a long description with some *markdown* **style**",
     "twitterHandle": "wwcode",
-    "billingAddress": "Paradize street\nSan Francisco CA 94100\nUSA",
+    "address": "Paradize street\nSan Francisco CA 94100\nUSA",
     "currency": "USD"
   },
   "user1": {
@@ -22,7 +22,7 @@ export default {
     "description": "engineer",
     "longDescription": "This is a long description with some *markdown* **style**",
     "twitterHandle": "philmod",
-    "billingAddress": "Paradize street\nSan Francisco CA 94100\nUSA"
+    "address": "Paradize street\nSan Francisco CA 94100\nUSA"
   },
 
   "user2": {
@@ -42,7 +42,7 @@ export default {
     "lastName": "Damman",
     "username": "xdamman",
     "email": "user3@opencollective.com",
-    "billingAddress": "Rue du paradis\n1000 Brussels\nBelgium"
+    "address": "Rue du paradis\n1000 Brussels\nBelgium"
   },
 
   "user4": {
