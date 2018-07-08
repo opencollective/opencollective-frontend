@@ -48,6 +48,7 @@
     "next": "6.1.1",
     "next-routes": "1.4.2",
     "node-fetch": "2.1.2",
+    "nuka-carousel": "4.2.5",
     "payment": "2.3.0",
     "postcss-nested": "3.0.0",
     "prop-types": "15.6.2",
