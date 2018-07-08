@@ -1,4 +1,3 @@
-import models, { sequelize } from '../models';
 import { getFxRate } from '../lib/currency';
 import Promise from 'bluebird';
 
