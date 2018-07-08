@@ -82,7 +82,7 @@ class Updates extends React.Component {
             backdrop-filter: blur(5px);
           }
           .update {
-            padding: 3rem 0;
+            padding: 0;
           }
         `}</style>
 

@@ -39,6 +39,11 @@ class ExpensesSection extends React.Component {
 
     if (!collective) return (<NotFound />);
 
+    // We don't show the Budget section on event if there is no transaction
+    if (collective.type === 'EVENT' && this.totalTransactions === 0) {
+      return (<div />);
+    }
+
     return (
       <section id="budget" className="clear">
         <div className="content" >
