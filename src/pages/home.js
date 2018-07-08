@@ -30,6 +30,28 @@ import {
   TwitterIcon,
 } from '../components/icons';
 import StyledInput from '../components/StyledInput';
+import Carousel from '../components/Carousel';
+
+const carouselContent = [{
+  image: '/static/images/home-slide-01.svg',
+  heading: 'Raise money online with recurring subscriptions.',
+  details: 'Connect with the Open Collective community and raise the funds required to sustain your community.',
+},
+{
+  image: '/static/images/home-slide-02.svg',
+  heading: 'All are welcome to join & contribute.',
+  details: 'Everyone can contribute to your open collective. All you need is for people to believe in your mission.',
+},
+{
+  image: '/static/images/home-slide-03.svg',
+  heading: 'Show how the money is spent.',
+  details: 'Every contribution helps you support your collective. Open Collective shows everyone how these financial contributions are earned and spent.',
+},
+{
+  image: '/static/images/home-slide-04.svg',
+  heading: 'A bottom - up group where anyone can become a core contributor.',
+  details: 'The mission is what persists and unites you with your community. Leaders can change over time.',
+}];
 
 const responsiveAlign = ['center', null, 'left'];
 const sectionHeadingStyles = {
@@ -277,7 +299,7 @@ class HomePage extends React.Component {
 
             <Container bg={['#3385FF', null, 'transparent']} height={2} width={32} mx="auto" my={[5, null, 3]} />
 
-            <Container display="flex" flexDirection={['column', null, 'row']} maxWidth={1200} mx="auto">
+            <Container display="flex" flexDirection={['column', null, 'row']} maxWidth={1200} mx="auto" alignItems="center">
               <Container w={[1, null, 0.5]}>
                 <H3 {...sectionHeadingStyles}>Create an open collective</H3>
 
@@ -311,6 +333,7 @@ class HomePage extends React.Component {
                 </Link>
               </Container>
               <Container w={[1, null, 0.5]}>
+                <Carousel content={carouselContent} />
               </Container>
             </Container>
 
@@ -414,7 +437,7 @@ class HomePage extends React.Component {
 
             <Container bg={['#3385FF', null, 'transparent']} height={2} width={32} mx="auto" my={[5]} />
 
-            <Container display="flex" flexDirection={['column', null, 'row']} maxWidth={1200} mx="auto">
+            <Container display="flex" flexDirection={['column', null, 'row']} maxWidth={1200} mx="auto" alignItems="center">
               <Container w={[1, null, 0.5]}>
                 <H3 {...sectionHeadingStyles}>Create a local Chapter</H3>
 
@@ -442,7 +465,8 @@ class HomePage extends React.Component {
                   </StyledLink>
                 </Link>
               </Container>
-              <Container w={[1, null, 0.5]}>
+              <Container w={[1, null, 0.5]} textAlign="center" px={4} maxWidth={600} mt={[5, null, 0]}>
+                <img src="/static/images/home-local-chapter.svg" alt="Open Collective Local Chapter" width="100%" height="auto" />
               </Container>
             </Container>
 
