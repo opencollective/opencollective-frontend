@@ -26,16 +26,9 @@ export const getOne = (req, res) => {
   })
   .then(async (results) => {
     const { collective, fromCollective, createdByUser } = results;
-    let host;
-    if (transaction.HostCollectiveId) {
-      host = await collective.getHostCollective();
-    } else {
-      // If there is no HostCollectiveId, then the transaction is related to a user or organization
-      // - could be a DEBIT (donation made by a user to `fromCollective`); or
-      // - could be a CREDIT (received money from `fromCollective` to reimburse an ExpenseId)
-      // in both cases, the host of the transaction is the host of the `fromCollective`
-      host = await fromCollective.getHostCollective();
-    }
+    const host = await transaction.getHostCollective();
+    if (!host) throw new Error("No host attached to this transaction");
+
     return {
       ...transaction.info,
       host: host.invoice,
