@@ -2,6 +2,7 @@ import React, { Fragment } from 'react';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import { take, uniqBy } from 'lodash';
+import fetch from 'node-fetch';
 
 import { Box, Flex } from 'grid-styled';
 import { FormattedNumber } from 'react-intl';
@@ -10,7 +11,7 @@ import { pickAvatar } from '../lib/collective.lib';
 import withData from '../lib/withData'
 import withIntl from '../lib/withIntl';
 import withLoggedInUser from '../lib/withLoggedInUser';
-import { imagePreview } from '../lib/utils';
+import { getBaseApiUrl, imagePreview } from '../lib/utils';
 
 import Body from '../components/Body';
 import Footer from '../components/Footer';
@@ -31,6 +32,7 @@ import {
 } from '../components/icons';
 import StyledInput from '../components/StyledInput';
 import Carousel from '../components/Carousel';
+import Currency from '../components/Currency';
 
 const carouselContent = [{
   image: '/static/images/home-slide-01.svg',
@@ -129,11 +131,16 @@ const BackerAvatar = ({
 class HomePage extends React.Component {
   state = {
     LoggedInUser: {},
+    stats: {},
   }
 
   async componentDidMount() {
     const LoggedInUser = this.props.getLoggedInUser && await this.props.getLoggedInUser();
     this.setState({ LoggedInUser });
+
+    // separate request to not block showing LoggedInUser
+    const { stats } = await fetch(`${getBaseApiUrl()}/homepage`).then(response => response.json());
+    this.setState({ stats });
   }
 
   render() {
@@ -143,7 +150,6 @@ class HomePage extends React.Component {
       },
       backers: {
         collectives: backers,
-        total: totalBackers,
       },
       chapters: {
         stats: {
@@ -154,11 +160,9 @@ class HomePage extends React.Component {
       },
       recent: {
         collectives,
-        total: totalCollectives,
       },
       sponsors: {
         collectives: sponsors,
-        total: totalSponsors,
       },
       transactions: {
         transactions,
@@ -167,6 +171,11 @@ class HomePage extends React.Component {
     } = this.props.data;
     const {
       LoggedInUser,
+      stats: {
+        totalAnnualBudget,
+        totalCollectives,
+        totalDonors,
+      },
     } = this.state;
 
     if (loading) {
@@ -472,32 +481,34 @@ class HomePage extends React.Component {
 
             <Container mt={6}>
               <P textAlign="center" fontSize={[20, null, 28]} mb={2}>Today we are:</P>
-              <Container display="flex" flexWrap="wrap" alignItems="center" justifyContent="center">
-                <Container {...statsContainerStyles}>
-                  <P {...statsStyles}>
-                    <FormattedNumber value={totalCollectives} />
-                  </P>
-                  <P>collectives</P>
+              {totalCollectives && (
+                <Container display="flex" flexWrap="wrap" alignItems="center" justifyContent="center">
+                  <Container {...statsContainerStyles}>
+                    <P {...statsStyles}>
+                      <FormattedNumber value={totalCollectives} />
+                    </P>
+                    <P>collectives</P>
+                  </Container>
+                  <Container {...statsContainerStyles}>
+                    <P {...statsStyles}>
+                      <FormattedNumber value={totalDonors} />
+                    </P>
+                    <P>donors</P>
+                  </Container>
+                  <Container {...statsContainerStyles}>
+                    <P {...statsStyles}>
+                      <FormattedNumber value={totalChapters} />
+                    </P>
+                    <P>chapters</P>
+                  </Container>
+                  <Container {...statsContainerStyles}>
+                    <P {...statsStyles}>
+                      <Currency value={totalAnnualBudget} abbreviate currency="USD" />
+                    </P>
+                    <P>available</P>
+                  </Container>
                 </Container>
-                <Container {...statsContainerStyles}>
-                  <P {...statsStyles}>
-                    <FormattedNumber value={totalSponsors} />
-                  </P>
-                  <P>sponsors</P>
-                </Container>
-                <Container {...statsContainerStyles}>
-                  <P {...statsStyles}>
-                    <FormattedNumber value={totalBackers} />
-                  </P>
-                  <P>backers</P>
-                </Container>
-                <Container {...statsContainerStyles}>
-                  <P {...statsStyles}>
-                    <FormattedNumber value={totalChapters} />
-                  </P>
-                  <P>chapters</P>
-                </Container>
-              </Container>
+              )}
             </Container>
 
             <Container mt={5} px={3}>
@@ -628,7 +639,6 @@ const query = gql`
       }
     }
     recent: allCollectives(type: COLLECTIVE, orderBy: createdAt, orderDirection: DESC, limit: 4) {
-      total
       collectives {
         id
         type
@@ -673,7 +683,6 @@ const query = gql`
       }
     }
     sponsors: allCollectives(type: ORGANIZATION, limit: 6, orderBy: amountSent, orderDirection: DESC, offset: 0) {
-      total
       collectives {
         id
         currency
@@ -687,7 +696,6 @@ const query = gql`
       }
     }
     backers: allCollectives(type: USER, limit: 30, orderBy: amountSent, orderDirection: DESC, offset: 0) {
-      total
       collectives {
         id
         currency
