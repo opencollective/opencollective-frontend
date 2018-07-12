@@ -63,7 +63,7 @@ const Carousel = ({
       autoplay
       dragging
       framePadding="32px"
-      initialSlideHeight={320}
+      initialSlideHeight={550}
       renderBottomCenterControls={Controls}
       renderCenterLeftControls={() => {}}
       renderCenterRightControls={() => {}}
