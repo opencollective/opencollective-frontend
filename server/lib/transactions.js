@@ -71,8 +71,8 @@ export function createFromPaidExpense(host, paymentMethod, expense, paymentRespo
     paymentProcessorFeeInCollectiveCurrency = senderFees.amount * 100; // paypal sends this in float
 
     const currencyConversion = createPaymentResponse.defaultFundingPlan.currencyConversion || { exchangeRate: 1 };
-    fxrate = parseFloat(currencyConversion.exchangeRate); // paypal returns a float from host.currency to expense.currency
-    paymentProcessorFeeInHostCurrency = 1/fxrate * paymentProcessorFeeInCollectiveCurrency;
+    fxrate = 1/parseFloat(currencyConversion.exchangeRate); // paypal returns a float from host.currency to expense.currency
+    paymentProcessorFeeInHostCurrency = fxrate * paymentProcessorFeeInCollectiveCurrency;
 
     getFxRatePromise = Promise.resolve(fxrate);
   } else {
@@ -98,10 +98,10 @@ export function createFromPaidExpense(host, paymentMethod, expense, paymentRespo
   };
 
   return getFxRatePromise
-    .then(fxrate => {
-      if (!isNaN(fxrate)) {
-        transaction.hostCurrencyFxRate = fxrate;
-        transaction.amountInHostCurrency = -Math.round(fxrate * expense.amount); // amountInHostCurrency is an INTEGER (in cents)
+    .then(hostCurrencyFxRate => {
+      if (!isNaN(hostCurrencyFxRate)) {
+        transaction.hostCurrencyFxRate = hostCurrencyFxRate;
+        transaction.amountInHostCurrency = -Math.round(hostCurrencyFxRate * expense.amount); // amountInHostCurrency is an INTEGER (in cents)
       }
       return transaction;
     })
@@ -143,22 +143,31 @@ export async function createTransactionFromInKindDonation(expenseTransaction) {
   });
 }
 
-/** Calculate net amount of a transaction */
+/**
+ * Calculate net amount of a transaction in the currency of the collective
+ * Notes:
+ * - fees are negative numbers
+ * - netAmountInCollectiveCurrency * hostCurrencyFxRate = amountInHostCurrency
+ *   Therefore, amountInHostCurrency / hostCurrencyFxRate= netAmountInCollectiveCurrency
+ */
 export function netAmount(tr) {
-  return Math.round((
-      tr.amountInHostCurrency +
-      tr.hostFeeInHostCurrency +
-      tr.platformFeeInHostCurrency +
-      tr.paymentProcessorFeeInHostCurrency) * tr.hostCurrencyFxRate);
+  const fees = (tr.hostFeeInHostCurrency + tr.platformFeeInHostCurrency + tr.paymentProcessorFeeInHostCurrency) || 0;
+  return Math.round( (tr.amountInHostCurrency + fees) / tr.hostCurrencyFxRate);
 }
 
-/** Verify net amount of a transaction */
+/**
+ * Verify net amount of a transaction
+ */
 export function verify(tr) {
   if (tr.type === 'CREDIT' && tr.amount <= 0) return 'amount <= 0';
   if (tr.type === 'DEBIT' && tr.amount >= 0) return 'amount >= 0';
   if (tr.type === 'CREDIT' && tr.netAmountInCollectiveCurrency <= 0) return 'netAmount <= 0';
   if (tr.type === 'DEBIT' && tr.netAmountInCollectiveCurrency >= 0) return 'netAmount >= 0';
-  if (netAmount(tr) !== tr.netAmountInCollectiveCurrency) return 'netAmount diff';
+  const diff = Math.abs(netAmount(tr) - tr.netAmountInCollectiveCurrency);
+  // if the difference is within one cent, it's most likely a rounding error (because of the number of decimals in the hostCurrencyFxRate)
+  if (diff > 0 && diff < 10) {
+    return 'netAmount diff';
+  }
   return true;
 }
 
