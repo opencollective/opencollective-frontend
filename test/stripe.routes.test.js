@@ -73,6 +73,44 @@ describe('stripe.routes.test.js', () => {
       scope: 'read_write'
     };
 
+    const stripeResponseAccountInfo = {
+      "id": "acct_198T7jD8MNtzsDcg",
+      "object": "account",
+      "business_logo": "https://s3.amazonaws.com/stripe-uploads/acct_198T7jD8MNtzsDcgmerchant-icon-1496926780969-BrusselsTogetherHashLogo.png",
+      "business_name": "#BrusselsTogether",
+      "business_primary_color": "#fefeff",
+      "business_url": "https://brusselstogether.org",
+      "charges_enabled": true,
+      "country": "BE",
+      "currencies_supported": [
+          "usd",
+          "eur",
+          "afn",
+          "all"
+      ],
+      "default_currency": "eur",
+      "details_submitted": true,
+      "display_name": "brusselstogether.org",
+      "email": "whateveremail@gmail.com",
+      "managed": false,
+      "metadata": {},
+      "statement_descriptor": "BRUSSELSTOGETHER.ORG",
+      "support_address": {
+          "city": null,
+          "country": "BE",
+          "line1": null,
+          "line2": null,
+          "postal_code": null,
+          "state": null
+      },
+      "support_email": "info@brusselstogether.org",
+      "support_phone": "+3200000000",
+      "support_url": "",
+      "timezone": "Europe/Madrid",
+      "transfers_enabled": true,
+      "type": "standard"
+    };
+
     beforeEach(() => {
       nock('https://connect.stripe.com:443')
       .post('/oauth/token', {
@@ -82,6 +120,11 @@ describe('stripe.routes.test.js', () => {
         code: 'abc'
       })
       .reply(200, () => stripeResponse);
+
+      nock('https://api.stripe.com:443')
+      .get('/v1/accounts/acct_123')
+      .reply(200, () => stripeResponseAccountInfo);
+
     });
 
     afterEach(() => {
@@ -122,7 +165,7 @@ describe('stripe.routes.test.js', () => {
         },
 
         checkStripeAccount: ['request', (cb) => {
-          models.ConnectedAccount.findAndCountAll({})
+          return models.ConnectedAccount.findAndCountAll({})
             .then(res => {
               expect(res.count).to.be.equal(1);
               const account = res.rows[0];
@@ -132,15 +175,19 @@ describe('stripe.routes.test.js', () => {
               expect(account.data).to.have.property('tokenType', stripeResponse.token_type);
               expect(account.data).to.have.property('publishableKey', stripeResponse.stripe_publishable_key);
               expect(account.data).to.have.property('scope', stripeResponse.scope);
+              expect(account.data).to.have.property('account');
+              expect(account.data.account.default_currency).to.equal('eur');
               cb(null, account);
             })
             .catch(cb);
         }],
 
-        checkUser: ['checkStripeAccount', (cb, results) => {
-          models.Collective.findById(results.checkStripeAccount.id)
+        checkHost: ['checkStripeAccount', (cb, results) => {
+          return models.Collective.findById(results.checkStripeAccount.CollectiveId)
           .then(collective => {
-            expect(collective.id).to.be.equal(host.CollectiveId);
+            expect(collective.id).to.be.equal(collective.id);
+            expect(collective.currency).to.equal('EUR');
+            expect(collective.timezone).to.equal('Europe/Madrid');
             cb();
           })
           .catch(cb);
