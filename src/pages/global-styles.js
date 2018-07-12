@@ -3,6 +3,70 @@ import colors from '../constants/colors';
 
 injectGlobal`
   @font-face {
+    font-family: 'Inter UI';
+    font-style:  normal;
+    font-weight: 400;
+    src: url('/static/fonts/inter-ui/Inter-UI-Regular.woff2') format('woff2'),
+    url('/static/fonts/inter-ui/Inter-UI-Regular.woff') format('woff');
+  }
+
+  @font-face {
+    font-family: 'Inter UI';
+    font-style:  italic;
+    font-weight: 400;
+    src: url('/static/fonts/inter-ui/Inter-UI-Italic.woff2') format('woff2'),
+    url('/static/fonts/inter-ui/Inter-UI-Italic.woff') format('woff');
+  }
+
+  @font-face {
+    font-family: 'Inter UI';
+    font-style:  normal;
+    font-weight: 500;
+    src: url('/static/fonts/inter-ui/Inter-UI-Medium.woff2') format('woff2'),
+    url('/static/fonts/inter-ui/Inter-UI-Medium.woff') format('woff');
+  }
+
+  @font-face {
+    font-family: 'Inter UI';
+    font-style:  italic;
+    font-weight: 500;
+    src: url('/static/fonts/inter-ui/Inter-UI-MediumItalic.woff2') format('woff2'),
+    url('/static/fonts/inter-ui/Inter-UI-MediumItalic.woff') format('woff');
+  }
+
+  @font-face {
+    font-family: 'Inter UI';
+    font-style:  normal;
+    font-weight: 700;
+    src: url('/static/fonts/inter-ui/Inter-UI-Bold.woff2') format('woff2'),
+    url('/static/fonts/inter-ui/Inter-UI-Bold.woff') format('woff');
+  }
+
+  @font-face {
+    font-family: 'Inter UI';
+    font-style:  italic;
+    font-weight: 700;
+    src: url('/static/fonts/inter-ui/Inter-UI-BoldItalic.woff2') format('woff2'),
+    url('/static/fonts/inter-ui/Inter-UI-BoldItalic.woff') format('woff');
+  }
+
+  @font-face {
+    font-family: 'Inter UI';
+    font-style:  normal;
+    font-weight: 900;
+    src: url('/static/fonts/inter-ui/Inter-UI-Black.woff2') format('woff2'),
+    url('/static/fonts/inter-ui/Inter-UI-Black.woff') format('woff');
+  }
+
+  @font-face {
+    font-family: 'Inter UI';
+    font-style:  italic;
+    font-weight: 900;
+    src: url('/static/fonts/inter-ui/Inter-UI-BlackItalic.woff2') format('woff2'),
+    url('/static/fonts/inter-ui/Inter-UI-BlackItalic.woff') format('woff');
+  }
+
+  @font-face {
     font-family: 'montserratlight';
     src: url('/static/fonts/montserrat/montserrat-light-webfont.eot');
     src: url('/static/fonts/montserrat/montserrat-light-webfont.eot?#iefix') format('embedded-opentype'),
@@ -37,6 +101,7 @@ injectGlobal`
   }
 
   body {
+    font-family: 'Inter UI', 'lato', 'montserratlight', sans-serif;
     height: 100%;
     margin: 0;
     padding: 0;
@@ -87,7 +152,7 @@ injectGlobal`
   }
 
   h1, h2, h3, h4 {
-    font-family: 'lato','montserratlight';
+    font-family: 'Inter UI', 'lato','montserratlight', sans-serif;
   }
 
   h1 {
