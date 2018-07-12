@@ -8,7 +8,6 @@ export default class Body extends React.Component {
         <style jsx global>{`
         main {
           height: 100%;
-          padding-bottom: 10rem;
           width: 100%;
           font-family: lato, montserratlight, Helvetica,sans-serif;
           font-weight: 300;
@@ -16,12 +15,7 @@ export default class Body extends React.Component {
           line-height: 1.5;
           overflow-x: hidden;
           margin: 0;
-          padding: 0 0 20rem 0;
-        }
-        @media(max-width: 600px) {
-          main {
-            padding-bottom: 16rem;
-          }
+          padding: 0;
         }
 
         a {
