@@ -126,7 +126,7 @@ export default (Sequelize, DataTypes) => {
     platformFeeInHostCurrency: DataTypes.INTEGER,
     hostFeeInHostCurrency: DataTypes.INTEGER,
     paymentProcessorFeeInHostCurrency: DataTypes.INTEGER,
-    netAmountInCollectiveCurrency: DataTypes.INTEGER, // stores the net amount received by the collective
+    netAmountInCollectiveCurrency: DataTypes.INTEGER, // stores the net amount received by the collective (after fees) or removed from the collective (including fees)
 
     data: DataTypes.JSON,
 
@@ -299,9 +299,9 @@ export default (Sequelize, DataTypes) => {
    *   - Host Fees: $0
    *   - Platform Fees: $0
    *   => DEBIT: Collective: C1, FromCollective: U1
-   *      amount: -$10, netAmountInCollectiveCurrency: -$11, paymentProcessorFeeInHostCurrency: $1, platformFeeInHostCurrency: 0, hostFeeInHostCurrency: 0
+   *      amount: -$10, netAmountInCollectiveCurrency: -$11, paymentProcessorFeeInHostCurrency: -$1, platformFeeInHostCurrency: 0, hostFeeInHostCurrency: 0
    *   => CREDIT: Collective: U1, FromCollective: C1
-   *      amount: $11, netAmountInCollectiveCurrency: $10, paymentProcessorFeeInHostCurrency: $1, platformFeeInHostCurrency: 0, hostFeeInHostCurrency: 0
+   *      amount: $11, netAmountInCollectiveCurrency: $10, paymentProcessorFeeInHostCurrency: -$1, platformFeeInHostCurrency: 0, hostFeeInHostCurrency: 0
    *
    * - Donation1 from User1 to Collective1
    *   - amount: $10
@@ -309,9 +309,9 @@ export default (Sequelize, DataTypes) => {
    *   - Host Fees: $1
    *   - Platform Fees: $1
    *   => DEBIT: Collective: U1, FromCollective: C1
-   *      amount: -$7, netAmountInCollectiveCurrency: -$10, paymentProcessorFeeInHostCurrency: $1, platformFeeInHostCurrency: $1, hostFeeInHostCurrency: $1
+   *      amount: -$7, netAmountInCollectiveCurrency: -$10, paymentProcessorFeeInHostCurrency: -$1, platformFeeInHostCurrency: -$1, hostFeeInHostCurrency: -$1
    *   => CREDIT: Collective: C1, FromCollective: U1
-   *      amount: $10, netAmountInCollectiveCurrency: $7, paymentProcessorFeeInHostCurrency: $1, platformFeeInHostCurrency: $1, hostFeeInHostCurrency: $1
+   *      amount: $10, netAmountInCollectiveCurrency: $7, paymentProcessorFeeInHostCurrency: -$1, platformFeeInHostCurrency: -$1, hostFeeInHostCurrency: -$1
    *
    * Note:
    * We should simplify a Transaction to:
