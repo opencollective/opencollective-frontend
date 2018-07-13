@@ -66,7 +66,16 @@ const CollectiveStatsCard = ({
 
     <Container bg="#E8E9EB" height={4} borderRadius={2} mx={3} position="relative" mt={3}>
       {hasGoals(settings) && (
-        <Container bg="#3385FF" height={4} borderRadius={2} position="absolute" top={0} left={0} width={getGoalPercentage(settings.goals[0], stats)} />
+        <Container
+          bg="#3385FF"
+          height={4}
+          borderRadius={2}
+          position="absolute"
+          top={0}
+          left={0}
+          maxWidth="100%"
+          width={`${getGoalPercentage(settings.goals[0], stats) * 100}%`}
+        />
       )}
     </Container>
 
