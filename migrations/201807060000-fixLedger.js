@@ -108,7 +108,7 @@ const verifyTransaction = (tr, accuracy = 0) => {
   }
 }
 
-const cols = ['reason', 'host', 'host.currency', 'collective', 'type', 'transaction.amount', 'transaction.currency', 'amountInHostCurrency', 'hostCurrency', 'hostCurrencyFxRate', 'hostFeeInHostCurrency', 'platformFeeInHostCurrency', 'paymentProcessorFeeInHostcurrency', 'totalFeesInCollectiveCurrency', 'netAmountInCollectiveCurrency', 'OrderId', 'ExpenseId', 'TransactionGroup', 'fix', 'fixValid'];
+const cols = ['reason', 'host', 'host.currency', 'collective', 'type', 'transaction.amount', 'transaction.currency', 'amountInHostCurrency', 'hostCurrency', 'hostCurrencyFxRate', 'hostFeeInHostCurrency', 'platformFeeInHostCurrency', 'paymentProcessorFeeInHostcurrency', 'totalFeesInCollectiveCurrency', 'netAmountInCollectiveCurrency', 'OrderId', 'ExpenseId', 'TransactionGroup', 'fix', 'netAmountDelta', 'amountInHostCurrencyDelta', 'fixValid'];
 console.log(cols.join('||'));
 
 const relativeDiffInPercentage = (a, b) => {
@@ -180,31 +180,36 @@ const fixTransaction = async (tr) => {
       update.amountInHostCurrency = tr.amount;
     }
   } else {
-    // if hostCurrencyFxRate is inversed, we flip it (with a 10% tolerance)
-    if (tr.hostCurrencyFxRate !== 1 && relativeDiffInPercentage(tr.hostCurrencyFxRate, Math.abs(tr.amount / tr.amountInHostCurrency)) < 0.1) {
-      reasons.push("hostCurrencyFxRate flipped");
-      update.hostCurrencyFxRate = Math.abs(tr.amountInHostCurrency / tr.amount);
-    } else {
-      try {
-        newFxRate = await getFxRate(tr.currency, tr.hostCurrency, tr.createdAt);
-        // if there wasn't any fxrate before, we record it
-        if (!tr.hostCurrencyFxRate || tr.hostCurrencyFxRate === 1) {
-          reasons.push("no hostCurrencyFxRate");
-          update.hostCurrencyFxRate = newFxRate;
-        } else {
-          const diff = relativeDiffInPercentage(tr.hostCurrencyFxRate, Math.abs(tr.amountInHostCurrency / tr.amount));
-          // if diff is very small (< 10%)
-          if (diff < 0.1) {
-            reasons.push(`imprecise fx rate (diff ${diff})`);
-            update.hostCurrencyFxRate = Math.abs(tr.amountInHostCurrency / tr.amount);
-          } else {
-            update.hostCurrencyFxRate = newFxRate;
-            reasons.push(`hostCurrencyFxRate off (diff ${diff})`);
-          }
+    try {
+      newFxRate = await getFxRate(tr.currency, tr.hostCurrency, tr.createdAt);
+      // if there wasn't any fxrate before, we record it
+      if (!tr.hostCurrencyFxRate || tr.hostCurrencyFxRate === 1) {
+        reasons.push("no hostCurrencyFxRate");
+        update.hostCurrencyFxRate = newFxRate;
+      } else if (relativeDiffInPercentage(tr.hostCurrencyFxRate, newFxRate) < 0.1) {
+        // if tr.hostCurrencyFxRate is ~= newFxRate, no need to change it, but we need to verify that tr.amountInHostCurrency was correctly computed
+        const amountInHostCurrency = Math.round(tr.amount * tr.hostCurrencyFxRate);
+        if (tr.amountInHostCurrency != amountInHostCurrency) {
+          reasons.push("amountInHostCurrency off");
+          update.amountInHostCurrency = amountInHostCurrency;
         }
-      } catch (e) {
-        console.error(`Unable to fetch fxrate for transaction id ${tr.id} from ${tr.currency} to ${tr.hostCurrency}, date: ${tr.createdAt}`, e);
+      } else if (relativeDiffInPercentage(tr.hostCurrencyFxRate, 1/newFxRate) < 0.1) {
+        // if hostCurrencyFxRate ~= 1/newFxRate, then it was in the wrong direction => we flip it
+        update.hostCurrencyFxRate = 1/tr.hostCurrencyFxRate;
+        reasons.push("hostCurrencyFxRate flipped");
+      } else {
+        const diff = relativeDiffInPercentage(tr.hostCurrencyFxRate, Math.abs(tr.amountInHostCurrency / tr.amount));
+        // if diff is very small (< 10%)
+        if (diff < 0.1) {
+          reasons.push(`imprecise fx rate (diff ${diff})`);
+          update.hostCurrencyFxRate = Math.abs(tr.amountInHostCurrency / tr.amount);
+        } else {
+          update.hostCurrencyFxRate = newFxRate;
+          reasons.push(`hostCurrencyFxRate off (diff ${diff})`);
+        }
       }
+    } catch (e) {
+      console.error(`Unable to fetch fxrate for transaction id ${tr.id} from ${tr.currency} to ${tr.hostCurrency}, date: ${tr.createdAt}`, e);
     }
   }
   if (update.hostCurrencyFxRate) {
@@ -239,9 +244,10 @@ const fixTransaction = async (tr) => {
     warnings++;
     console.error(`warning: tr ${tr.id} hostCurrencyFxRate is changing from ${tr.hostCurrencyFxRate} to ${update.hostCurrencyFxRate}`);
   }
-
+  const netAmountDelta = update.netAmountInCollectiveCurrency && Math.abs(tr.netAmountInCollectiveCurrency - update.netAmountInCollectiveCurrency);
+  const amountInHostCurrencyDelta = update.amountInHostCurrency && Math.abs(tr.amountInHostCurrency - update.amountInHostCurrency);
   if (DRY_MODE) {
-    const vals = [ reasons.join(', '), tr.host, tr.hostCollectiveCurrency, tr.collective, tr.type, tr.amount, tr.currency, tr.amountInHostCurrency, tr.hostCurrency, tr.hostCurrencyFxRate, tr.hostFeeInHostCurrency, tr.platformFeeInHostCurrency, tr.paymentProcessorFeeInHostCurrency, totalFeesInCollectiveCurrency, tr.netAmountInCollectiveCurrency, tr.OrderId, tr.ExpenseId, tr.TransactionGroup, JSON.stringify(update), fixValid];
+    const vals = [ reasons.join(', '), tr.host, tr.hostCollectiveCurrency, tr.collective, tr.type, tr.amount, tr.currency, tr.amountInHostCurrency, tr.hostCurrency, tr.hostCurrencyFxRate, tr.hostFeeInHostCurrency, tr.platformFeeInHostCurrency, tr.paymentProcessorFeeInHostCurrency, totalFeesInCollectiveCurrency, tr.netAmountInCollectiveCurrency, tr.OrderId, tr.ExpenseId, tr.TransactionGroup, JSON.stringify(update), netAmountDelta, amountInHostCurrencyDelta, fixValid];
     console.log(vals.join('||'));
   } else {
     return updateLedgerEntry(tr, update);
