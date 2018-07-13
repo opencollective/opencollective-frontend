@@ -206,7 +206,7 @@ Object {
             "id": 3,
             "slug": "wwcodeaustin",
           },
-          "createdAt": "Sat Dec 31 2016 00:00:00 GMT+0000 (Coordinated Universal Time)",
+          "createdAt": "Sat Dec 31 2016 00:00:00 GMT+0000 (UTC)",
           "createdByUser": Object {
             "email": null,
             "firstName": null,
@@ -234,7 +234,7 @@ Object {
             "id": 3,
             "slug": "wwcodeaustin",
           },
-          "createdAt": "Wed Feb 01 2017 00:00:01 GMT+0000 (Coordinated Universal Time)",
+          "createdAt": "Wed Feb 01 2017 00:00:01 GMT+0000 (UTC)",
           "createdByUser": Object {
             "email": null,
             "firstName": null,
@@ -262,7 +262,7 @@ Object {
             "id": 3,
             "slug": "wwcodeaustin",
           },
-          "createdAt": "Thu Mar 02 2017 00:00:02 GMT+0000 (Coordinated Universal Time)",
+          "createdAt": "Thu Mar 02 2017 00:00:02 GMT+0000 (UTC)",
           "createdByUser": Object {
             "email": null,
             "firstName": null,
@@ -290,7 +290,7 @@ Object {
             "id": 3,
             "slug": "wwcodeaustin",
           },
-          "createdAt": "Mon Apr 03 2017 00:00:03 GMT+0000 (Coordinated Universal Time)",
+          "createdAt": "Mon Apr 03 2017 00:00:03 GMT+0000 (UTC)",
           "createdByUser": Object {
             "email": null,
             "firstName": null,
@@ -318,7 +318,7 @@ Object {
             "id": 3,
             "slug": "wwcodeaustin",
           },
-          "createdAt": "Thu May 04 2017 00:00:04 GMT+0000 (Coordinated Universal Time)",
+          "createdAt": "Thu May 04 2017 00:00:04 GMT+0000 (UTC)",
           "createdByUser": Object {
             "email": null,
             "firstName": null,
@@ -1177,23 +1177,23 @@ Object {
   "data": Object {
     "allTransactions": Array [
       Object {
-        "createdAt": "Fri May 04 2018 00:00:04 GMT+0000 (Coordinated Universal Time)",
+        "createdAt": "Fri May 04 2018 00:00:04 GMT+0000 (UTC)",
         "id": 18,
       },
       Object {
-        "createdAt": "Tue Apr 03 2018 00:00:03 GMT+0000 (Coordinated Universal Time)",
+        "createdAt": "Tue Apr 03 2018 00:00:03 GMT+0000 (UTC)",
         "id": 14,
       },
       Object {
-        "createdAt": "Fri Mar 02 2018 00:00:02 GMT+0000 (Coordinated Universal Time)",
+        "createdAt": "Fri Mar 02 2018 00:00:02 GMT+0000 (UTC)",
         "id": 10,
       },
       Object {
-        "createdAt": "Thu Feb 01 2018 00:00:01 GMT+0000 (Coordinated Universal Time)",
+        "createdAt": "Thu Feb 01 2018 00:00:01 GMT+0000 (UTC)",
         "id": 6,
       },
       Object {
-        "createdAt": "Sun Dec 31 2017 00:00:00 GMT+0000 (Coordinated Universal Time)",
+        "createdAt": "Sun Dec 31 2017 00:00:00 GMT+0000 (UTC)",
         "id": 2,
       },
     ],
@@ -1206,23 +1206,23 @@ Object {
   "data": Object {
     "allTransactions": Array [
       Object {
-        "createdAt": "Thu May 04 2017 00:00:04 GMT+0000 (Coordinated Universal Time)",
+        "createdAt": "Thu May 04 2017 00:00:04 GMT+0000 (UTC)",
         "id": 20,
       },
       Object {
-        "createdAt": "Mon Apr 03 2017 00:00:03 GMT+0000 (Coordinated Universal Time)",
+        "createdAt": "Mon Apr 03 2017 00:00:03 GMT+0000 (UTC)",
         "id": 16,
       },
       Object {
-        "createdAt": "Thu Mar 02 2017 00:00:02 GMT+0000 (Coordinated Universal Time)",
+        "createdAt": "Thu Mar 02 2017 00:00:02 GMT+0000 (UTC)",
         "id": 12,
       },
       Object {
-        "createdAt": "Wed Feb 01 2017 00:00:01 GMT+0000 (Coordinated Universal Time)",
+        "createdAt": "Wed Feb 01 2017 00:00:01 GMT+0000 (UTC)",
         "id": 8,
       },
       Object {
-        "createdAt": "Sat Dec 31 2016 00:00:00 GMT+0000 (Coordinated Universal Time)",
+        "createdAt": "Sat Dec 31 2016 00:00:00 GMT+0000 (UTC)",
         "id": 4,
       },
     ],
