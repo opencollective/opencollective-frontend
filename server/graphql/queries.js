@@ -636,6 +636,9 @@ const queries = {
       query.where.createdAt = {
         [Op.not]: null,
       };
+      query.where.name = {
+        [Op.ne]: '',
+      };
 
       const result = await models.Collective.findAndCountAll(query);
 
