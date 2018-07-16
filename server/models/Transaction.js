@@ -117,7 +117,8 @@ export default (Sequelize, DataTypes) => {
     },
 
     // stores the foreign exchange rate at the time of transaction between donation currency and transaction currency
-    // hostCurrencyFxRate = amount/amountInHostCurrency
+    // amountInCollectiveCurrency * hostCurrencyFxRate = amountInHostCurrency
+    // Expense amount * hostCurrencyFxRate = amountInHostCurrency
     hostCurrencyFxRate: DataTypes.FLOAT,
 
     // amount in currency of the host
@@ -125,7 +126,7 @@ export default (Sequelize, DataTypes) => {
     platformFeeInHostCurrency: DataTypes.INTEGER,
     hostFeeInHostCurrency: DataTypes.INTEGER,
     paymentProcessorFeeInHostCurrency: DataTypes.INTEGER,
-    netAmountInCollectiveCurrency: DataTypes.INTEGER, // stores the net amount received by the collective
+    netAmountInCollectiveCurrency: DataTypes.INTEGER, // stores the net amount received by the collective (after fees) or removed from the collective (including fees)
 
     data: DataTypes.JSON,
 
@@ -298,9 +299,9 @@ export default (Sequelize, DataTypes) => {
    *   - Host Fees: $0
    *   - Platform Fees: $0
    *   => DEBIT: Collective: C1, FromCollective: U1
-   *      amount: -$10, netAmountInCollectiveCurrency: -$11, paymentProcessorFeeInHostCurrency: $1, platformFeeInHostCurrency: 0, hostFeeInHostCurrency: 0
+   *      amount: -$10, netAmountInCollectiveCurrency: -$11, paymentProcessorFeeInHostCurrency: -$1, platformFeeInHostCurrency: 0, hostFeeInHostCurrency: 0
    *   => CREDIT: Collective: U1, FromCollective: C1
-   *      amount: $11, netAmountInCollectiveCurrency: $10, paymentProcessorFeeInHostCurrency: $1, platformFeeInHostCurrency: 0, hostFeeInHostCurrency: 0
+   *      amount: $11, netAmountInCollectiveCurrency: $10, paymentProcessorFeeInHostCurrency: -$1, platformFeeInHostCurrency: 0, hostFeeInHostCurrency: 0
    *
    * - Donation1 from User1 to Collective1
    *   - amount: $10
@@ -308,9 +309,9 @@ export default (Sequelize, DataTypes) => {
    *   - Host Fees: $1
    *   - Platform Fees: $1
    *   => DEBIT: Collective: U1, FromCollective: C1
-   *      amount: -$7, netAmountInCollectiveCurrency: -$10, paymentProcessorFeeInHostCurrency: $1, platformFeeInHostCurrency: $1, hostFeeInHostCurrency: $1
+   *      amount: -$7, netAmountInCollectiveCurrency: -$10, paymentProcessorFeeInHostCurrency: -$1, platformFeeInHostCurrency: -$1, hostFeeInHostCurrency: -$1
    *   => CREDIT: Collective: C1, FromCollective: U1
-   *      amount: $10, netAmountInCollectiveCurrency: $7, paymentProcessorFeeInHostCurrency: $1, platformFeeInHostCurrency: $1, hostFeeInHostCurrency: $1
+   *      amount: $10, netAmountInCollectiveCurrency: $7, paymentProcessorFeeInHostCurrency: -$1, platformFeeInHostCurrency: -$1, hostFeeInHostCurrency: -$1
    *
    * Note:
    * We should simplify a Transaction to:
@@ -320,7 +321,6 @@ export default (Sequelize, DataTypes) => {
    */
 
   Transaction.createDoubleEntry = async (transaction) => {
-
     transaction.type = (transaction.amount > 0) ? TransactionTypes.CREDIT : TransactionTypes.DEBIT;
     transaction.netAmountInCollectiveCurrency = transaction.netAmountInCollectiveCurrency || transaction.amount;
     transaction.TransactionGroup = uuidv4();
@@ -334,7 +334,7 @@ export default (Sequelize, DataTypes) => {
       HostCollectiveId: await models.Collective.getHostCollectiveId(transaction.FromCollectiveId), // see https://github.com/opencollective/opencollective/issues/1154
       amount: -transaction.netAmountInCollectiveCurrency,
       netAmountInCollectiveCurrency: -transaction.amount,
-      amountInHostCurrency: -transaction.netAmountInCollectiveCurrency / transaction.hostCurrencyFxRate,
+      amountInHostCurrency: -transaction.netAmountInCollectiveCurrency * transaction.hostCurrencyFxRate,
       hostFeeInHostCurrency: transaction.hostFeeInHostCurrency,
       platformFeeInHostCurrency: transaction.platformFeeInHostCurrency,
       paymentProcessorFeeInHostCurrency: transaction.paymentProcessorFeeInHostCurrency
@@ -386,13 +386,8 @@ export default (Sequelize, DataTypes) => {
 
         if (transaction.amount > 0 && transaction.hostCurrencyFxRate) {
           // populate netAmountInCollectiveCurrency for donations
-          // @aseem: why the condition on && transaction.hostCurrencyFxRate ?
-            transaction.netAmountInCollectiveCurrency =
-              Math.round((transaction.amountInHostCurrency
-                        + transaction.platformFeeInHostCurrency
-                        + transaction.hostFeeInHostCurrency
-                        + transaction.paymentProcessorFeeInHostCurrency)
-              * transaction.hostCurrencyFxRate);
+          const fees = transaction.platformFeeInHostCurrency + transaction.hostFeeInHostCurrency + transaction.paymentProcessorFeeInHostCurrency;
+          transaction.netAmountInCollectiveCurrency = Math.round((transaction.amountInHostCurrency + fees) / transaction.hostCurrencyFxRate);
         }
         return Transaction.createDoubleEntry(transaction);
     });

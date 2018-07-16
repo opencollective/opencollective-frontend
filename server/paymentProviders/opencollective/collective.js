@@ -119,7 +119,7 @@ paymentMethodProvider.processOrder = async (order, options = {}) => {
     amount: order.totalAmount,
     currency: order.currency,
     hostCurrency: collectiveHost.currency,
-    hostCurrencyFxRate: 1/fxrate,
+    hostCurrencyFxRate: fxrate,
     netAmountInCollectiveCurrency: order.totalAmount * (1 - hostFeePercent/100),
     amountInHostCurrency: totalAmountInPaymentMethodCurrency,
     hostFeeInHostCurrency,
