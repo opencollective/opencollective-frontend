@@ -1,7 +1,10 @@
 import models, { sequelize, Op } from '../models';
 import currencies from '../constants/currencies'
 import config from 'config';
-import { pick } from 'lodash';
+import { memoize, pick } from 'lodash';
+memoize.Cache = Map;
+
+const useCache = ['production', 'staging'].includes(process.env.NODE_ENV);
 
 /*
 * Hacky way to do currency conversion
@@ -397,7 +400,7 @@ const getTopSponsors = () => {
  * Returns sponsors ordered by total amount donated
  * (excluding open source collective id 9805)
  */
-const getSponsors = async (where = {}, { orderDirection = 'ASC', limit = 0, offset = 0 }) => {
+const getSponsors = memoize(async (where = {}, { orderDirection = 'ASC', limit = 0, offset = 0 }) => {
   where.type = where.type || 'ORGANIZATION'; // setting the default type
   const whereStatement = Object.keys(where).reduce((statement, key) => `${statement} AND c."${key}"=$${key}`, '');
   const params = {
@@ -435,7 +438,7 @@ const getSponsors = async (where = {}, { orderDirection = 'ASC', limit = 0, offs
   ]);
 
   return { total, collectives };
-};
+});
 
 const getMembersOfCollectiveWithRole = (CollectiveIds) => {
   const collectiveids = (typeof CollectiveIds === 'number') ? [CollectiveIds] : CollectiveIds;
@@ -667,6 +670,56 @@ const getTotalNumberOfDonors = () => {
   .then(res => parseInt(res[0].count));
 }
 
+const getCollectivesWithMinBackers = memoize(async ({ backerCount = 10, orderBy = 'createdAt', orderDirection = 'ASC', limit = 0, offset = 0, where = {} }) => {
+  if (where.type) delete where.type;
+
+  const whereStatement = Object.keys(where).reduce((statement, key) => `${statement} AND c."${key}"=$${key}`, '');
+  const params = {
+    bind: where,
+    model: models.Collective,
+  };
+
+  const sql = (fields) => `
+    with "actives" as (
+      SELECT c.id
+      FROM "Collectives" c
+      LEFT JOIN "Members" m ON m."CollectiveId" = c.id
+      WHERE
+        c.type = 'COLLECTIVE'
+        AND c."isActive" IS TRUE
+        AND c."deletedAt" IS NULL
+        AND m.role = 'BACKER'
+        ${whereStatement}
+        GROUP BY c.id
+        HAVING count(m."MemberCollectiveId") >= ${backerCount}
+    )
+    SELECT ${fields} from "Collectives" c
+    INNER JOIN "actives" a on a.id = c.id
+    ORDER BY c."${orderBy}" ${orderDirection} NULLS LAST
+  `.replace(/\s\s+/g, ' ');
+
+  const [ [ { dataValues: { total } } ], collectives ] = await Promise.all([
+    sequelize.query(`${sql('COUNT(c.*) OVER() as "total"')} LIMIT 1`, params),
+    sequelize.query(`${sql('c.*')} LIMIT ${limit} OFFSET ${offset}`, params),
+  ]);
+
+  return { total, collectives };
+});
+
+const refreshCache = () => {
+  getCollectivesWithMinBackers.cache.clear();
+  getSponsors.cache.clear();
+  getCollectivesWithMinBackers({ backerCount: 10, orderDirection: 'DESC', limit: 4 }); // homepage cache
+  getSponsors({ type: 'USER' }, { orderDirection: 'DESC', limit: 30 });
+};
+
+if (useCache) {
+  getCollectivesWithMinBackers({ backerCount: 10, orderDirection: 'DESC', limit: 4 }); // homepage cache
+  getSponsors({ type: 'USER' }, { orderDirection: 'DESC', limit: 30 });
+  // refresh every hour
+  setInterval(refreshCache, 1000 * 60 * 60);
+}
+
 export default {
   getSponsors,
   getTotalDonationsByCollectiveType,
@@ -685,6 +738,7 @@ export default {
   getTotalNumberOfActiveCollectives,
   getTotalNumberOfDonors,
   getCollectivesWithBalance,
-  getUniqueCollectiveTags
+  getUniqueCollectiveTags,
+  getCollectivesWithMinBackers,
 };
 
