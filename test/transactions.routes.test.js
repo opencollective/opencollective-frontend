@@ -75,8 +75,7 @@ describe('transactions.routes.test.js', () => {
           expect(transactionDetails).to.have.property('host');
           expect(transactionDetails.description).to.equal(transaction.description);
           expect(transactionDetails.host.id).to.equal(host.CollectiveId);
-          expect(transactionDetails.host.billingAddress).to.equal(host.billingAddress);
-          expect(transactionDetails.createdByUser.billingAddress).to.equal(user.billingAddress);
+          expect(transactionDetails.host.address).to.equal(host.collective.address);
           expect(transactionDetails.collective.slug).to.equal(publicCollective.slug);
           expect(transactionDetails.createdByUser).to.not.have.property('email');
           expect(transactionDetails.createdByUser).to.not.have.property('paypalEmail');
@@ -98,8 +97,7 @@ describe('transactions.routes.test.js', () => {
           expect(transactionDetails.type).to.equal(transaction.type);
           expect(transactionDetails.description).to.equal(transaction.description);
           expect(transactionDetails.host.id).to.equal(host.CollectiveId);
-          expect(transactionDetails.host.billingAddress).to.equal(host.billingAddress);
-          expect(transactionDetails.createdByUser.billingAddress).to.equal(user.billingAddress);
+          expect(transactionDetails.host.address).to.equal(host.collective.address);
           expect(transactionDetails.collective.slug).to.equal(publicCollective.slug);
           done();
         });
