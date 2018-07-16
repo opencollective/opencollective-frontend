@@ -559,16 +559,18 @@ describe('GraphQL Expenses API', () => {
       expense.payoutMethod = 'other';
       await expense.save();
       // And then add funds to the collective
-      await addFunds(user, hostCollective, collective, 1500);
+      const initialBalance = 1500;
+      const fee = 100;
+      await addFunds(user, hostCollective, collective, initialBalance);
       // When the expense is paid by the host admin
       let balance = await collective.getBalance();
       expect(balance).to.equal(1500);
-      const res = await utils.graphqlQuery(payExpenseQuery, { id: expense.id, fee: 100 }, hostAdmin);
+      const res = await utils.graphqlQuery(payExpenseQuery, { id: expense.id, fee }, hostAdmin);
       res.errors && console.log(res.errors);
       expect(res.errors).to.not.exist;
       expect(res.data.payExpense.status).to.equal('PAID');
       balance = await collective.getBalance();
-      expect(balance).to.equal(500);
+      expect(balance).to.equal(initialBalance - expense.amount - fee);
       await utils.waitForCondition(() => emailSendMessageSpy.callCount > 0, { delay: 500 });
       expect(emailSendMessageSpy.callCount).to.equal(2);
       expect(emailSendMessageSpy.firstCall.args[0]).to.equal(user.email);

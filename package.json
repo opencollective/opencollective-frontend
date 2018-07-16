@@ -1,6 +1,6 @@
 {
   "name": "opencollective-api",
-  "version": "2.0.173",
+  "version": "2.0.181",
   "description": "Open Collective API",
   "author": "@philmod @arnaudbenard @xdamman @asood123",
   "main": "server/index.js",
@@ -144,7 +144,7 @@
     "hint": "eslint '**/*.js' --quiet",
     "nsp": "nsp check",
     "pretest": "npm run hint",
-    "test": "nyc npm run test:dev && npm run coverage",
+    "test": "TZ=UTC nyc npm run test:dev && npm run coverage",
     "test:dev": "npm run test:unit:dev && npm run test:bdd:dev",
     "test:unit:dev": "mocha --reporter-options mochaFile=$(bash scripts/test_output_dir.sh junit)/junit.xml",
     "test:unit": "nyc mocha --reporter-options mochaFile=$(bash scripts/test_output_dir.sh junit)/junit.xml",

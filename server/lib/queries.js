@@ -409,12 +409,13 @@ const getSponsors = async (where = {}, { orderDirection = 'ASC', limit = 0, offs
     with "sponsors" as (
       SELECT c.id, SUM(amount) as "amountSent"
       FROM "Transactions" t
-      INNER JOIN "Collectives" c ON t."FromCollectiveId" = c.id
+      LEFT JOIN "Collectives" c ON t."FromCollectiveId" = c.id
       WHERE
         t.type = 'CREDIT'
         AND c.id != 9805
         AND t."deletedAt" IS NULL
         AND c."isActive" IS TRUE
+        AND t."platformFeeInHostCurrency" < 0
         ${whereStatement}
         AND c."deletedAt" IS NULL
         GROUP BY c.id
