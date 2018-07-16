@@ -33,6 +33,7 @@ import {
 import StyledInput from '../components/StyledInput';
 import Carousel from '../components/Carousel';
 import Currency from '../components/Currency';
+import Loading from '../components/Loading';
 
 const carouselContent = [{
   image: '/static/images/home-slide-01.svg',
@@ -179,7 +180,7 @@ class HomePage extends React.Component {
     } = this.state;
 
     if (loading) {
-      return <p>loading...</p>;
+      return (<Loading />);
     }
 
     const activeCollectives = take(uniqBy(expenses.map(({ collective }) => collective), 'slug'), 4);
@@ -607,7 +608,7 @@ a transparent operation? Let them know that Open Collective exists!</P>
 
 const query = gql`
   query home {
-    transactions(limit: 50) {
+    transactions(limit: 30) {
       transactions {
         amount
         createdAt
@@ -637,7 +638,7 @@ const query = gql`
         }
       }
     }
-    recent: allCollectives(type: COLLECTIVE, orderBy: createdAt, orderDirection: DESC, limit: 4) {
+    recent: allCollectives(type: COLLECTIVE, minBackerCount: 10, isActive: true, orderBy: createdAt, orderDirection: DESC, limit: 4) {
       collectives {
         id
         type
