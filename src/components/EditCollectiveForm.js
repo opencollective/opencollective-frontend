@@ -55,7 +55,7 @@ class EditCollectiveForm extends React.Component {
       'type.label': { id: 'collective.type.label', defaultMessage: 'type' },
       'name.label': { id: 'collective.name.label', defaultMessage: 'name' },
       'tags.label': { id: 'collective.tags.label', defaultMessage: 'tags' },
-      'tos.label': { id: 'collecitve.tos.label', defaultMessage: 'Terms of Service' },
+      'tos.label': { id: 'collective.tos.label', defaultMessage: 'Terms of Service' },
       'tos.description': { id: 'collective.tos.description', defaultMessage: 'Link to the terms by which this host will collect money on behalf of their collectives'},
       'tags.description': { id: 'collective.tags.description', defaultMessage: 'Make your collective discoverable in search and related collectives (comma separated)' },
       'company.label': { id: 'collective.company.label', defaultMessage: 'company' },

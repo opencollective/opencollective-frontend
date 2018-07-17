@@ -30,7 +30,9 @@ class CollectivePickerWithData extends React.Component {
     this.onChange = this.onChange.bind(this);
     this.messages = defineMessages({
       'badge.tooltip.pending': { id: 'expenses.badge.tooltip.pending', defaultMessage: "{pending} {pending, plural, one {expense} other {expenses}} pending approval" },
-      'badge.tooltip.approved': { id: 'expenses.badge.tooltip.approved', defaultMessage: "{approved} {approved, plural, one {expense} other {expenses}} ready to be paid" }
+      'badge.tooltip.approved': { id: 'expenses.badge.tooltip.approved', defaultMessage: "{approved} {approved, plural, one {expense} other {expenses}} ready to be paid" },
+      'addFunds.error.amountMustBeGreatherThanZero': { id: 'addFunds.error.amountMustBeGreatherThanZero', defaultMessage: "Total amount must be greater than 0" },
+      'addFunds.error.missingEmail': { id: 'addFunds.error.missingEmail', defaultMessage: "Please provide an email address to identify the source of the money." }
     });
   }
 
@@ -40,30 +42,45 @@ class CollectivePickerWithData extends React.Component {
   }
 
   async addFunds(form) {
+    const { intl } = this.props;
+
     if (form.totalAmount === 0) {
-      return console.error("Total amount must be > 0");
+      const error = intl.formatMessage(this.messages['addFunds.error.amountMustBeGreatherThanZero']);
+      this.setState({ error });
+      return console.error(error);
     }
+    if (form.FromCollectiveId === 'other' && !form.email) {
+      const error = intl.formatMessage(this.messages['addFunds.error.missingEmail']);
+      this.setState({ error });
+      return console.error(error);
+    }
+
     this.setState({ loading: true });
     const hostCollective = this.hostCollective;
     const order = pick(form, ['totalAmount', 'description', 'hostFeePercent', 'platformFeePercent']);
     order.collective = {
       id: this.state.CollectiveId
     };
-    if (form.email) {
-      order.user = {
-        email: form.email,
-        name: form.name
+
+    if (form.FromCollectiveId === 'other') {
+      if (form.email) {
+        order.user = {
+          email: form.email,
+          name: form.name,
+        };
       }
-    } else if (form.organization) {
-      order.fromCollective = {
-        name: form.organization,
-        website: form.website
+      if (form.organization) {
+        order.fromCollective = {
+          name: form.organization,
+          website: form.website,
+        };
       }
     } else {
       order.fromCollective = {
-        id: form.FromCollectiveId || hostCollective.id
-      }
+        id: form.FromCollectiveId || hostCollective.id,
+      };
     }
+
     const pm = hostCollective.paymentMethods.find(pm => pm.service === 'opencollective');
     if (!pm) {
       this.setState({ error: "This host doesn't have an opencollective payment method", loading: false });
@@ -72,7 +89,6 @@ class CollectivePickerWithData extends React.Component {
     order.paymentMethod = {
       uuid: pm.uuid
     }
-    console.log(">>> add funds order: ", order);
     try {
       await this.props.createOrder(order);
       this.setState({ showAddFunds: false, loading: false });
