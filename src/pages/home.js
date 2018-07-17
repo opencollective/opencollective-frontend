@@ -212,7 +212,9 @@ class HomePage extends React.Component {
                 <H1 fontWeight="normal" textAlign="left">A new form of association, <br /> <strong>transparent by design.</strong></H1>
 
                 <P my={3} color="#6E747A">
-                  It&apos;s time to break the mold. The Internet generation needs organizations that reflect who we are; where anybody can contribute to a shared mission; where leaders can easily change; and where money flows in full transparency. Open Collective provides the digitals tools your community needs to thrive.
+                  The Internet generation needs organizations that reflect who we are;
+                  where anybody can contribute to a shared mission; where leaders can easily change;
+                  and where money flows in full transparency. Create an Open Collective for your community.
                 </P>
 
                 <Flex alignItems="center" flexDirection={['column', null, 'row']} my={4}>
@@ -301,7 +303,7 @@ class HomePage extends React.Component {
                 Join the movement for a world with more open, transparent, and sustainable communities.
               </H2>
               <P color="#6E747A" textAlign="center" fontSize={[16, null, 20]} lineHeight={['24px', null, '28px']} px={3} my={[3, null, 4]}>
-                There are many ways to participate! Host an open collective, make a financial contribution, attend an event or simply share the love by showing others how they can benefit from operating as an open community. Here’s how:
+                There are many ways to participate: create an open collective, become a host, make a financial contribution, attend an event or simply share the love by showing others how they can benefit from operating as an open community. Here’s how:
               </P>
             </Container>
 
@@ -312,7 +314,7 @@ class HomePage extends React.Component {
                 <H3 {...sectionHeadingStyles}>Create an open collective</H3>
 
                 <P {...sectionSubHeadingStyles}>
-                  A group of people with a shared mission that operates in full transparency. 👀
+                  A group of people with a shared mission that operates in full transparency 👀
                 </P>
 
                 <P {...sectionDetailStyles}>
@@ -351,7 +353,7 @@ class HomePage extends React.Component {
               <Container w={[1, null, 0.5]}>
                 <H3 {...sectionHeadingStyles}>Become a sponsor</H3>
 
-                <P {...sectionSubHeadingStyles}>Great companies supporting great collectives with 💙.</P>
+                <P {...sectionSubHeadingStyles}>Great companies supporting great collectives with 💙</P>
 
                 <P {...sectionDetailStyles}>Support collectives on behalf of your organization. <Span fontWeight="bold">You&apos;ll get an invoice for every financial contribution your company makes as well as a monthly report.</Span></P>
 
@@ -389,9 +391,9 @@ class HomePage extends React.Component {
               <Container w={[1, null, 0.5]} mb={4}>
                 <H3 {...sectionHeadingStyles}>Become a backer</H3>
 
-                <P {...sectionSubHeadingStyles}>For those who believe in giving back in financial support giving back and are able to.</P>
+                <P {...sectionSubHeadingStyles}>For those who believe in giving back</P>
 
-                <P {...sectionDetailStyles}>Join Open Collective and discover the different initiatives that are seeking your support. Embrace the mission that drives them and contribute to their group efforts. <Span fontWeight="bold">Become part of the movement.</Span></P>
+                <P {...sectionDetailStyles}>Join Open Collective and discover the different initiatives that need your support. Embrace the mission that drives them and contribute to their group effort. <Span fontWeight="bold">Become part of the movement.</Span></P>
 
                 <StyledLink
                   bg="#3385FF"
@@ -426,13 +428,15 @@ class HomePage extends React.Component {
 
             <Container display="flex" flexDirection={['column', null, 'row']} justifyContent="space-between" maxWidth={1200} mx="auto">
               <Container w={[1, null, 0.5]}>
-                <H3 {...sectionHeadingStyles}>Contribute to Open Collective’s development.</H3>
+                <H3 {...sectionHeadingStyles}>Contribute code 👩🏻‍💻👨🏿‍💻</H3>
 
-                <P {...sectionSubHeadingStyles}>Building Open Collective together to get further, faster. 🚀</P>
+                <P {...sectionSubHeadingStyles}>Building Open Collective together to get further, faster 🚀</P>
 
-                <P {...sectionDetailStyles}>Are you interested in helping us improve the platform experience? Are you a developer who believes in supporting open and welcoming communities? Open Collective is open source so anyone can contribute code or report issues publicly.</P>
+                <P {...sectionDetailStyles}>Are you a developer who believes in supporting open and welcoming communities? Open Collective is open source (MIT License) so anyone can contribute code or report issues publicly.</P>
+                
+                <P {...sectionDetailStyles} my={3}>Our goal is to provide all communities around the world the software that they need to operate as open and transparent collectives. We want to enable them to thrive in the same way that Wordpress enabled millions of blogs to exist.</P>
 
-                <P {...sectionDetailStyles} my={3}>Special thanks to all of you who already contributed in some way.</P>
+                <P {...sectionDetailStyles} my={3}>Special thanks to all of you who already contributed in some way! 🙏</P>
 
                 <StyledLink {...sectionDetailStyles} color="#3385FF" display="inline-block" my={4} href="https://github.com/opencollective">
                   Check out our Github organization to find out more
@@ -447,11 +451,11 @@ class HomePage extends React.Component {
 
             <Container display="flex" flexDirection={['column', null, 'row']} maxWidth={1200} mx="auto" alignItems="center">
               <Container w={[1, null, 0.5]}>
-                <H3 {...sectionHeadingStyles}>Create a local Chapter</H3>
+                <H3 {...sectionHeadingStyles}>Become a host</H3>
 
-                <P {...sectionSubHeadingStyles}>Help provide the legal entities open collectives need to raise funds. ⚖️</P>
+                <P {...sectionSubHeadingStyles}>Help provide the umbrella legal entities open collectives need to raise funds ⚖️</P>
 
-                <P {...sectionDetailStyles}><Span fontWeight="bold">Grow the movement</Span> by becoming a fiscal host for open collectives in your city or your ecosystem. Help organize initiatives and provide a means for them to receive financial support from the Open Collective community.</P>
+                <P {...sectionDetailStyles}><Span fontWeight="bold">Grow the movement</Span> by becoming a host of open collectives in your city or your industry. Hosts are acting as fiscal sponsors. They collect the money on behalf of the collectives and enable them to issue invoices. They are mutualising the legal and accounting overhead that come with creating and maintaining a legal entity so that the open collectives that they host can focus on their mission.</P>
 
                 <Link route="/chapters" passHref>
                   <StyledLink
