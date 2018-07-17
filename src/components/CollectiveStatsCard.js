@@ -44,17 +44,19 @@ const CollectiveStatsCard = ({
     >
 
       <Container position="absolute" display="flex" alignItems="flex-end" justifyContent="center" height="100%" width="100%" top={10} left={0}>
-        <Container
-          bg="#2877ED"
-          backgroundImage={image || defaultImage[type]}
-          backgroundSize="contain"
-          backgroundRepeat="no-repeat"
-          backgroundPosition="center center"
-          borderRadius={12}
-          border="2px solid white"
-          height={[52, null, 65]}
-          width={[52, null, 65]}
-        />
+        <Link route={`/${slug}`} passHref><a>
+          <Container
+            bg="#2877ED"
+            backgroundImage={image || defaultImage[type]}
+            backgroundSize="contain"
+            backgroundRepeat="no-repeat"
+            backgroundPosition="center center"
+            borderRadius={12}
+            border="2px solid white"
+            height={[52, null, 65]}
+            width={[52, null, 65]}
+          />
+        </a></Link>
       </Container>
     </Container>
 
