@@ -562,9 +562,17 @@ const queries = {
         type: GraphQLString,
         description: "Fetch all collectives hosted by hostCollectiveSlug"
       },
+      isActive: {
+        description: 'Only return active collectives',
+        type: GraphQLBoolean,
+      },
       memberOfCollectiveSlug: {
         type: GraphQLString,
         description: "Fetch all collectives that `memberOfCollectiveSlug` is a member of"
+      },
+      minBackerCount: {
+        description: 'Filter collectives with this minimum number of backers',
+        type: GraphQLInt,
       },
       role: {
         type: GraphQLString,
@@ -582,13 +590,19 @@ const queries = {
         defaultValue: 'ASC',
         type: OrderDirectionType,
       },
-      limit: { type: GraphQLInt },
-      offset: { type: GraphQLInt }
+      limit: {
+        defaultValue: 10,
+        type: GraphQLInt,
+      },
+      offset: {
+        defaultValue: 0,
+        type: GraphQLInt
+      },
     },
     async resolve(_, args) {
       const query = {
         where: {},
-        limit: args.limit || 10,
+        limit: args.limit,
         include: []
       };
 
@@ -616,6 +630,7 @@ const queries = {
       if (args.ParentCollectiveId) query.where.ParentCollectiveId = args.ParentCollectiveId;
       if (args.type) query.where.type = args.type;
       if (args.tags) query.where.tags = { [Op.overlap]: args.tags };
+      if (args.isActive) query.where.isActive = true;
 
       if (args.orderBy === 'balance' && (args.ParentCollectiveId || args.HostCollectiveId || args.tags)) {
         const { total, collectives } = await rawQueries.getCollectivesWithBalance(query.where, args);
@@ -625,6 +640,11 @@ const queries = {
       if (args.orderBy === 'amountSent') {
         // this will default returning ORGANIZATION collectives unless overwritten by the args.type
         const { total, collectives } = await rawQueries.getSponsors(query.where, args);
+        return { total, collectives, limit: args.limit, offset: args.offset };
+      }
+
+      if (args.minBackerCount) {
+        const { total, collectives } = await rawQueries.getCollectivesWithMinBackers({ ...args, where: query.where });
         return { total, collectives, limit: args.limit, offset: args.offset };
       }
 
@@ -641,7 +661,6 @@ const queries = {
         name: {
           [Op.ne]: '',
         },
-        isActive: true,
       };
 
       const result = await models.Collective.findAndCountAll(query);
