@@ -120,7 +120,7 @@
   "collective.tos.label": "Terms of Service",
   "organization.create": "Create organization",
   "events.create.login": "You need to be logged in as a core contributor of this collective to be able to create an event.",
-  "login.button": "login",
+  "login.button": "Login",
   "collectives.create.description": "An organization allows you to make donations as a company or as a team. You can also set a monthly limit within which the members of the organization can make contributions.",
   "creditcard.error": "Invalid credit card",
   "collective.expensePolicy.label": "Expense policy",
