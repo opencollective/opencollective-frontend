@@ -120,7 +120,7 @@
   "collective.tos.label": "Conditions d'utilisation",
   "organization.create": "Créer une organisation",
   "events.create.login": "Vous devez vous identifier en tant qu'administrateur de ce collectif pour pouvoir créer un événement.",
-  "login.button": "s'identifier",
+  "login.button": "S'identifier",
   "collectives.create.description": "Une organisation vous permet de faire des donations en tant que société ou équipe (eg. un département). Vous pouvez aussi définir une limite mensuelle en deça de laquelle les membres de l'organisation peuvent faire des dons.",
   "creditcard.error": "Carte de crédit non valide",
   "collective.expensePolicy.label": "Règles pour les dépenses",

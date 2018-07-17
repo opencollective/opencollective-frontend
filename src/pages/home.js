@@ -208,7 +208,7 @@ class HomePage extends React.Component {
             py="5rem"
           >
             <Container maxWidth={1200} display="flex" justifyContent="space-between" mx="auto">
-              <Container w={[1, null, 0.5]} pr={[null, null, 4]} maxWidth={450}>
+              <Container w={[1, null, 0.5]} pr={[null, null, 4]} maxWidth={500}>
                 <H1 fontWeight="normal" textAlign="left">A new form of association, <br /> <strong>transparent by design.</strong></H1>
 
                 <P my={3} color="#6E747A">
@@ -255,7 +255,7 @@ class HomePage extends React.Component {
           </Container>
 
           <Container maxWidth={1200} mx="auto" px={2}>
-            <H2 textAlign={["center", null, "left"]} pb={3} >Active Collectives</H2>
+            <H2 textAlign={["center", null, "left"]} pb={3} >Active collectives</H2>
 
             <Container py={3}>
               <Flex mb={3} justifyContent="space-between" px={[1, null, 0]}>
