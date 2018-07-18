@@ -32,6 +32,7 @@ import {
 import { types } from '../constants/collectives';
 import models, { Op } from '../models';
 import roles from '../constants/roles';
+import { get } from 'lodash';
 
 export const TypeOfCollectiveType = new GraphQLEnumType({
   name: 'TypeOfCollective',
@@ -47,8 +48,8 @@ export const CollectiveOrderFieldType = new GraphQLEnumType({
   name: 'CollectiveOrderField',
   description: 'Properties by which collectives can be ordered.',
   values: {
-    amountSent: {
-      description: 'Order collective organizations by total money sent to collectives',
+    burnrate: {
+      description: 'Order collectives by total money spent last month',
     },
     balance: {
       description: 'Order collectives by total balance.',
@@ -335,18 +336,27 @@ export const CollectiveStatsType = new GraphQLObjectType({
           return collective;
         }
       },
+      burnrate: {
+        description: 'Total amount spent in the past 30 days',
+        type: GraphQLInt,
+        resolve(collective) {
+          // if we fetched the collective with the raw query to sort them by burn rate, we don't need to recompute it
+          if (get(collective, 'dataValues.burnrate')) return get(collective, 'dataValues.burnrate');
+          return collective.getTotalAmountSpentLastMonth();
+        }
+      },
+      totalAmountSpent: {
+        description: 'Total amount spent',
+        type: GraphQLInt,
+        resolve(collective) {
+          return collective.getTotalAmountSpent();
+        }
+      },
       totalAmountReceived: {
         description: 'Net amount received',
         type: GraphQLInt,
         resolve(collective) {
           return collective.getTotalAmountReceived();
-        }
-      },
-      totalAmountSent: {
-        description: 'Net amount donated to other collectives',
-        type: GraphQLInt,
-        resolve(collective) {
-          return collective.getTotalAmountSent();
         }
       },
       totalAmountRaised: {

@@ -1,6 +1,7 @@
 import models, { sequelize, Op } from '../models';
 import currencies from '../constants/currencies'
 import config from 'config';
+import moment from 'moment';
 import { memoize, pick } from 'lodash';
 memoize.Cache = Map;
 
@@ -398,10 +399,13 @@ const getTopSponsors = () => {
 };
 
 /**
- * Returns sponsors ordered by total amount donated
- * (excluding open source collective id 9805)
+ * Returns collectives ordered by burn rate (total amount spent last month)
+ * excluding:
+ * - id 9805 (open source collective host)
+ * - id 1 (opencollective-company)
+ * - id 9804 (wwcode host)
  */
-const getSponsorsQuery = async (query) => {
+const getCollectivesOrderedByTotalAmountSpentLastMonthQuery = async (query) => {
   const where = query.where || {};
   const orderDirection = query.orderDirection || "ASC";
   const limit = query.limit || 0;
@@ -411,31 +415,25 @@ const getSponsorsQuery = async (query) => {
   const whereStatement = Object.keys(where).reduce((statement, key) => `${statement} AND c."${key}"=$${key}`, '');
   const params = {
     bind: where,
-    model: models.Collective,
+    model: models.Collective
   };
 
+  const d = new Date;
+  d.setMonth(d.getMonth() - 1);
+  const since = moment(d).format('YYYY-MM-DD');
+
   const sql = (fields) => `
-    with "sponsors" as (
-      SELECT c.id, SUM(amount) as "amountSent"
-      FROM "Transactions" t
-      LEFT JOIN "Collectives" c ON t."FromCollectiveId" = c.id
-      WHERE
-        t.type = 'CREDIT'
-        AND c.id != 9805
-        AND t."deletedAt" IS NULL
-        AND c."isActive" IS TRUE
-        AND t."platformFeeInHostCurrency" < 0
-        ${whereStatement}
-        AND c."deletedAt" IS NULL
-        GROUP BY c.id
-    )
-    SELECT ${fields} from "Collectives" c
-    LEFT JOIN "sponsors" s on s.id = c.id
+    SELECT c.id, -SUM(amount) as "burnrate", ${fields} from "Collectives" c
+    LEFT JOIN "Transactions" t on t."CollectiveId" = c.id
     WHERE c."isActive" IS TRUE
-    ${whereStatement}
-    AND c."deletedAt" IS NULL
-    GROUP BY c.id, s.id, s."amountSent"
-    ORDER BY s."amountSent" ${orderDirection} NULLS LAST
+      AND c."deletedAt" IS NULL
+      AND c.id NOT IN (1, 51, 9804, 9805)
+      AND t."deletedAt" IS NULL
+      AND t."type" = 'DEBIT'
+      AND t."createdAt" > '${since}'
+      ${whereStatement}
+    GROUP BY c.id
+    ORDER BY "burnrate" ${orderDirection} NULLS LAST
   `.replace(/\s\s+/g, ' ');
 
   const [ [ { dataValues: { total } } ], collectives ] = await Promise.all([
@@ -445,7 +443,7 @@ const getSponsorsQuery = async (query) => {
 
   return { total, collectives };
 };
-const getSponsors = memoize(getSponsorsQuery, JSON.stringify);
+const getCollectivesOrderedByTotalAmountSpentLastMonth = memoize(getCollectivesOrderedByTotalAmountSpentLastMonthQuery, JSON.stringify);
 
 const getMembersOfCollectiveWithRole = (CollectiveIds) => {
   const collectiveids = (typeof CollectiveIds === 'number') ? [CollectiveIds] : CollectiveIds;
@@ -715,9 +713,9 @@ const getCollectivesWithMinBackersQuery = async ({ backerCount = 10, orderBy = '
 const getCollectivesWithMinBackers = memoize(getCollectivesWithMinBackersQuery, JSON.stringify);
 
 const refreshCache = async () => {
-  getSponsors.cache.forEach(async (val, key) => {
-    const res = await getSponsorsQuery(JSON.parse(key));
-    getSponsors.cache.set(key, res);
+  getCollectivesOrderedByTotalAmountSpentLastMonth.cache.forEach(async (val, key) => {
+    const res = await getCollectivesOrderedByTotalAmountSpentLastMonthQuery(JSON.parse(key));
+    getCollectivesOrderedByTotalAmountSpentLastMonth.cache.set(key, res);
   });
   getCollectivesWithMinBackers.cache.forEach(async (val, key) => {
     const res = await getCollectivesWithMinBackersQuery(JSON.parse(key));
@@ -728,13 +726,14 @@ const refreshCache = async () => {
 if (useCache) {
   setInterval(refreshCache, CACHE_REFRESH_INTERVAL);
   // warming up the cache for the homepage:
+  getCollectivesOrderedByTotalAmountSpentLastMonth({"type":"COLLECTIVE","orderBy":"burnrate","orderDirection":"DESC","limit":4,"offset":0,"where":{"type":"COLLECTIVE"}});
+  getCollectivesOrderedByTotalAmountSpentLastMonth({"type":"ORGANIZATION","orderBy":"burnrate","orderDirection":"DESC","limit":6,"offset":0,"where":{"type":"ORGANIZATION"}});
+  getCollectivesOrderedByTotalAmountSpentLastMonth({"type":"USER","orderBy":"burnrate","orderDirection":"DESC","limit":30,"offset":0,"where":{"type":"USER"}});
   getCollectivesWithMinBackers({"type":"COLLECTIVE","isActive":true,"minBackerCount":10,"orderBy":"createdAt","orderDirection":"DESC","limit":4,"offset":0,"where":{"type":"COLLECTIVE","isActive":true}});
-  getSponsors({"type":"ORGANIZATION","orderBy":"amountSent","orderDirection":"DESC","limit":6,"offset":0,"where":{"type":"ORGANIZATION"}});
-  getSponsors({"type":"USER","orderBy":"amountSent","orderDirection":"DESC","limit":30,"offset":0,"where":{"type":"USER"}});
 }
 
 export default {
-  getSponsors,
+  getCollectivesOrderedByTotalAmountSpentLastMonth,
   getTotalDonationsByCollectiveType,
   getTotalAnnualBudgetForHost,
   getTopDonorsForCollective,

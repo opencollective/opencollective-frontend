@@ -1252,13 +1252,13 @@ export default function(Sequelize, DataTypes) {
     .then(result => Promise.resolve(parseInt(result.toJSON().total, 10)));
   };
 
-  // Get the total amount donated to other collectives
-  Collective.prototype.getTotalAmountSent = function(startDate, endDate) {
+  // Get the total amount spent
+  Collective.prototype.getTotalAmountSpent = function(startDate, endDate) {
     endDate = endDate || new Date;
     const where = {
-      amount: { [Op.gt]: 0 },
+      type: 'DEBIT',
       createdAt: { [Op.lt]: endDate },
-      FromCollectiveId: this.id
+      CollectiveId: this.id
     };
     if (startDate) where.createdAt[Op.gte] = startDate;
     return models.Transaction.find({
@@ -1267,7 +1267,14 @@ export default function(Sequelize, DataTypes) {
       ],
       where
     })
-    .then(result => Promise.resolve(parseInt(result.toJSON().total, 10)));
+    .then(result => Promise.resolve(-parseInt(result.toJSON().total, 10)));
+  };
+
+  // Get the total amount spent last month (burn rate)
+  Collective.prototype.getTotalAmountSpentLastMonth = function() {
+    const lastMonth = new Date;
+    lastMonth.setMonth(lastMonth.getMonth() - 1);
+    return this.getTotalAmountSpent(lastMonth);
   };
 
   // Get the total amount raised through referral
