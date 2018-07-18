@@ -130,10 +130,10 @@ class AddFundsForm extends React.Component {
     });
   }
 
-  retrieveHostFeePercent = async (slug) => {
+  retrieveHostFeePercent = async (CollectiveId) => {
     const getHostCollectiveQuery = gql`
-      query Collective($slug: String!) {
-        Collective(slug: $slug) {
+      query Collective($CollectiveId: Int) {
+        Collective(id: $CollectiveId) {
           id
           hostFeePercent
         }
@@ -142,7 +142,7 @@ class AddFundsForm extends React.Component {
     try {
       const result = await this.props.client.query({
         query: getHostCollectiveQuery,
-        variables: { slug },
+        variables: { CollectiveId },
       })
       const { hostFeePercent } = result.data.Collective;
       return hostFeePercent;

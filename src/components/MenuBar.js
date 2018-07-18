@@ -181,12 +181,12 @@ class MenuBar extends React.Component {
     }
 
     const { collective } = this.props;
-    const collectiveId = collective.id;
-    const hostCollectiveId = form.FromCollectiveId;
+    const CollectiveId = collective.id;
+    const HostCollectiveId = form.FromCollectiveId;
     const params = {
       ...pick(form, ['totalAmount', 'description']),
-      collectiveId,
-      hostCollectiveId,
+      CollectiveId,
+      HostCollectiveId,
     };
     this.setState({ loading: true });
     try {
@@ -520,8 +520,8 @@ class MenuBar extends React.Component {
 }
 
 const addFundsToOrgQuery = gql`
-mutation addFundsToOrg($totalAmount: Int!, $collectiveId: Int!, $hostCollectiveId: Int!, $description: String) {
-  addFundsToOrg(totalAmount: $totalAmount, collectiveId: $collectiveId, hostCollectiveId: $hostCollectiveId, description: $description) {
+mutation addFundsToOrg($totalAmount: Int!, $CollectiveId: Int!, $HostCollectiveId: Int!, $description: String) {
+  addFundsToOrg(totalAmount: $totalAmount, CollectiveId: $CollectiveId, HostCollectiveId: $HostCollectiveId, description: $description) {
     id
   }
 }

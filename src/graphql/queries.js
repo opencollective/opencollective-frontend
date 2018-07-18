@@ -109,7 +109,7 @@ export const getLoggedInUserQuery = gql`
 `;
 
 const getTiersQuery = gql`
-  query Collective($slug: String!) {
+  query Collective($slug: String) {
     Collective(slug: $slug) {
       id
       slug
@@ -134,7 +134,7 @@ const getTiersQuery = gql`
 `;
 
 const getCollectiveToEditQuery = gql`
-  query Collective($slug: String!) {
+  query Collective($slug: String) {
     Collective(slug: $slug) {
       id
       type
@@ -251,7 +251,7 @@ const getCollectiveToEditQuery = gql`
 `;
 
 const getCollectiveQuery = gql`
-  query Collective($slug: String!) {
+  query Collective($slug: String) {
     Collective(slug: $slug) {
       id
       isActive
@@ -401,7 +401,7 @@ const getCollectiveQuery = gql`
 `;
 
 const getEventCollectiveQuery = gql`
-  query Collective($eventSlug: String!) {
+  query Collective($eventSlug: String) {
     Collective(slug: $eventSlug) {
       id
       type
@@ -497,7 +497,7 @@ const getEventCollectiveQuery = gql`
 `;
 
 const getCollectiveCoverQuery = gql`
-  query CollectiveCover($slug: String!) {
+  query CollectiveCover($slug: String) {
     Collective(slug: $slug) {
       id
       type
@@ -569,7 +569,7 @@ export const getOcCardBalanceQuery = gql`
 `;
 
 export const getSubscriptionsQuery = gql`
-  query Collective($slug: String!) {
+  query Collective($slug: String) {
     Collective(slug: $slug) {
       id
       type

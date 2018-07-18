@@ -140,7 +140,7 @@ class HostExpensesPage extends React.Component {
 }
 
 const getDataQuery = gql`
-query Collective($collectiveSlug: String!) {
+query Collective($collectiveSlug: String) {
   Collective(slug: $collectiveSlug) {
     id
     type
