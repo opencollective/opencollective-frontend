@@ -9,8 +9,8 @@ import * as store from './features/support/stores';
 
 
 const addFundsToOrgQuery = `
-  mutation addFundsToOrg($totalAmount: Int!, $collectiveId: Int!, $hostCollectiveId: Int!, $description: String) {
-    addFundsToOrg(totalAmount: $totalAmount, collectiveId: $collectiveId, hostCollectiveId: $hostCollectiveId, description: $description) {
+  mutation addFundsToOrg($totalAmount: Int!, $CollectiveId: Int!, $HostCollectiveId: Int!, $description: String) {
+    addFundsToOrg(totalAmount: $totalAmount, CollectiveId: $CollectiveId, HostCollectiveId: $HostCollectiveId, description: $description) {
       id
     }
   }
@@ -30,8 +30,8 @@ describe('graphql.addFunds', () => {
   it('should create a new prepaid payment method', async () => {
     const args = {
       totalAmount: 2000,
-      collectiveId: collective.id,
-      hostCollectiveId: hostCollective.id,
+      CollectiveId: collective.id,
+      HostCollectiveId: hostCollective.id,
       description: 'test funds',
     };
 
@@ -56,8 +56,8 @@ describe('graphql.addFunds', () => {
   it('should not create more than one payment method per host/organization', async () => {
     const args = {
       totalAmount: 2000,
-      collectiveId: collective.id,
-      hostCollectiveId: hostCollective.id,
+      CollectiveId: collective.id,
+      HostCollectiveId: hostCollective.id,
       description: 'test funds',
     };
 

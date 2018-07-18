@@ -264,7 +264,7 @@ describe('graphql.paymentMethods.test.js', () => {
     it("returns the balance", async () => {
 
       const query = `
-      query Collective($slug: String!) {
+      query Collective($slug: String) {
         Collective(slug: $slug) {
           id,
           paymentMethods {
