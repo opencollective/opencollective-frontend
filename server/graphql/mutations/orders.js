@@ -140,10 +140,7 @@ export function createOrder(order, loaders, remoteUser) {
         });
       } else {
         // Create new organization collective
-        if (remoteUser) {
-          order.fromCollective.CreatedByUserId = remoteUser.id;
-        }
-        return models.Collective.createOrganization(order.fromCollective, user)
+        return models.Collective.createOrganization(order.fromCollective, user, remoteUser);
       }
     })
     .then(c => fromCollective = c)
