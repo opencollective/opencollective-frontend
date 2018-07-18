@@ -27,7 +27,7 @@ describe('graphql.addFunds', () => {
       'test-collective', 'USD', 'USD', 10));
   }); /* End of "before" */
 
-  it('should create a new payment method', async () => {
+  it('should create a new prepaid payment method', async () => {
     const args = {
       totalAmount: 2000,
       collectiveId: collective.id,
