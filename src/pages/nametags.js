@@ -220,7 +220,7 @@ class Nametags extends React.Component {
 }
 
 const getAttendeesQuery = gql`
-query Collective($slug: String!) {
+query Collective($slug: String) {
   Collective(slug: $slug) {
     slug
     name
