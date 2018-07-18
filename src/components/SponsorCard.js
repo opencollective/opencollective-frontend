@@ -16,7 +16,7 @@ const SponsorCard = ({
   name,
   slug,
   stats: {
-    totalAmountSent,
+    totalAmountSpent,
   },
   type,
 }) => (
@@ -45,7 +45,7 @@ const SponsorCard = ({
     </P>
 
     <P fontSize="1.4rem" textAlign="center" mt={2} px={2} pb={3}>
-      Total donated: <Currency fontWeight="bold" value={totalAmountSent} currency={currency} abbreviate />
+      Total donated: <Currency fontWeight="bold" value={totalAmountSpent} currency={currency} abbreviate />
     </P>
   </Container>
 );
@@ -56,7 +56,7 @@ SponsorCard.propTypes = {
   name: PropTypes.string.isRequired,
   slug: PropTypes.string.isRequired,
   stats: PropTypes.shape({
-    totalAmountSent: PropTypes.number.isRequired,
+    totalAmountSpent: PropTypes.number.isRequired,
   }).isRequired,
   type: PropTypes.string.isRequired,
 };
