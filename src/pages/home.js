@@ -1,7 +1,6 @@
 import React, { Fragment } from 'react';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
-import { take, uniqBy } from 'lodash';
 import fetch from 'node-fetch';
 
 import { Box, Flex } from 'grid-styled';
