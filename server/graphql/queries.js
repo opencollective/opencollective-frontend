@@ -55,10 +55,17 @@ const queries = {
   Collective: {
     type: CollectiveInterfaceType,
     args: {
-      slug: { type: new GraphQLNonNull(GraphQLString) }
+      slug: { type: GraphQLString },
+      id: { type: GraphQLInt }
     },
     resolve(_, args) {
-      return models.Collective.findBySlug(args.slug.toLowerCase());
+      if (args.slug) {
+        return models.Collective.findBySlug(args.slug.toLowerCase());
+      } else if (args.id) {        
+        return models.Collective.findById(args.id);
+      } else {
+        return new Error("Please provide a slug or an id");
+      }
     }
   },
 

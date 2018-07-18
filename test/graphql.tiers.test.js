@@ -109,7 +109,7 @@ describe('graphql.tiers.test', () => {
       beforeEach(() => collective1.createTier({ slug: 'gold-sponsor', name: 'gold sponsor'}));
 
       const getTiersQuery = `
-      query Collective($collectiveSlug: String!, $tierSlug: String, $tierId: Int) {
+      query Collective($collectiveSlug: String, $tierSlug: String, $tierId: Int) {
         Collective(slug: $collectiveSlug) {
           tiers(slug: $tierSlug, id: $tierId) {
             id

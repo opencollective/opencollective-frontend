@@ -19,7 +19,7 @@ describe('graphql.collective.test.js', () => {
 
   it('should display a nice error message if collective is not found', async () => {
     // Given the following query
-    const query = `query Collective($slug: String!) {
+    const query = `query Collective($slug: String) {
       Collective(slug: $slug) { id slug } }`;
     // When a collective that doesn't exist is retrieved
     const result = await utils.graphqlQuery(query, { slug: "apex" });
@@ -84,7 +84,7 @@ describe('graphql.collective.test.js', () => {
 
     // When the following query is executed
     const query = `
-    query Collective($slug: String!) {
+    query Collective($slug: String) {
       Collective(slug: $slug) {
         id
         slug
@@ -226,7 +226,7 @@ describe('graphql.collective.test.js', () => {
 
     // When the following query is executed
     const query = `
-      query Collective($slug: String!) {
+      query Collective($slug: String) {
         Collective(slug: $slug) {
           slug
           path
@@ -291,7 +291,7 @@ describe('graphql.collective.test.js', () => {
 
     // When the following query is executed
     const query = `
-    query Collective($slug: String!) {
+    query Collective($slug: String) {
       Collective(slug: $slug) {
         id
         slug
@@ -395,7 +395,7 @@ describe('graphql.collective.test.js', () => {
 
     // When the query is performed
     const query = `
-    query Collective($slug: String!, $type: String) {
+    query Collective($slug: String, $type: String) {
       Collective(slug: $slug) {
         members(type: $type, limit: 10, offset: 0) {
           id
@@ -750,7 +750,7 @@ describe('graphql.collective.test.js', () => {
 
 
       query = `
-    query Collective($slug: String!) {
+    query Collective($slug: String) {
       Collective(slug: $slug) {
         paymentMethods {
           uuid,

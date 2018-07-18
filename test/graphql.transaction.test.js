@@ -46,7 +46,7 @@ describe('graphql.transaction.test.js', () => {
     it('when given a collective slug (case insensitive)', async () => {
       const limit = 40;
       const query = `
-        query Collective($slug: String!, $limit: Int) {
+        query Collective($slug: String, $limit: Int) {
           Collective(slug: $slug) {
             id,
             slug
