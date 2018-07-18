@@ -130,6 +130,13 @@ const BackerAvatar = ({
 );
 
 class HomePage extends React.Component {
+
+  static getInitialProps (context) {
+    if (context.res){
+      context.res.setHeader('Cache-Control','public, max-age=7200');
+    }
+  }
+
   state = {
     LoggedInUser: {},
     stats: {},
