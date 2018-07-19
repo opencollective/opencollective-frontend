@@ -5,6 +5,7 @@ import { memoize, pick } from 'lodash';
 memoize.Cache = Map;
 
 const useCache = ['production', 'staging'].includes(process.env.NODE_ENV);
+const CACHE_REFRESH_INTERVAL = process.env.CACHE_REFRESH_INTERVAL || 1000 * 60 * 60;
 
 /*
 * Hacky way to do currency conversion
@@ -400,7 +401,12 @@ const getTopSponsors = () => {
  * Returns sponsors ordered by total amount donated
  * (excluding open source collective id 9805)
  */
-const getSponsors = memoize(async (where = {}, { orderDirection = 'ASC', limit = 0, offset = 0 }) => {
+const getSponsorsQuery = async (query) => {
+  const where = query.where || {};
+  const orderDirection = query.orderDirection || "ASC";
+  const limit = query.limit || 0;
+  const offset = query.offset || 0;
+
   where.type = where.type || 'ORGANIZATION'; // setting the default type
   const whereStatement = Object.keys(where).reduce((statement, key) => `${statement} AND c."${key}"=$${key}`, '');
   const params = {
@@ -438,7 +444,8 @@ const getSponsors = memoize(async (where = {}, { orderDirection = 'ASC', limit =
   ]);
 
   return { total, collectives };
-});
+};
+const getSponsors = memoize(getSponsorsQuery, JSON.stringify);
 
 const getMembersOfCollectiveWithRole = (CollectiveIds) => {
   const collectiveids = (typeof CollectiveIds === 'number') ? [CollectiveIds] : CollectiveIds;
@@ -670,7 +677,7 @@ const getTotalNumberOfDonors = () => {
   .then(res => parseInt(res[0].count));
 }
 
-const getCollectivesWithMinBackers = memoize(async ({ backerCount = 10, orderBy = 'createdAt', orderDirection = 'ASC', limit = 0, offset = 0, where = {} }) => {
+const getCollectivesWithMinBackersQuery = async ({ backerCount = 10, orderBy = 'createdAt', orderDirection = 'ASC', limit = 0, offset = 0, where = {} }) => {
   if (where.type) delete where.type;
 
   const whereStatement = Object.keys(where).reduce((statement, key) => `${statement} AND c."${key}"=$${key}`, '');
@@ -704,20 +711,26 @@ const getCollectivesWithMinBackers = memoize(async ({ backerCount = 10, orderBy 
   ]);
 
   return { total, collectives };
-});
+};
+const getCollectivesWithMinBackers = memoize(getCollectivesWithMinBackersQuery, JSON.stringify);
 
-const refreshCache = () => {
-  getCollectivesWithMinBackers.cache.clear();
-  getSponsors.cache.clear();
-  getCollectivesWithMinBackers({ backerCount: 10, orderDirection: 'DESC', limit: 4 }); // homepage cache
-  getSponsors({ type: 'USER' }, { orderDirection: 'DESC', limit: 30 });
+const refreshCache = async () => {
+  getSponsors.cache.forEach(async (val, key) => {
+    const res = await getSponsorsQuery(JSON.parse(key));
+    getSponsors.cache.set(key, res);
+  });
+  getCollectivesWithMinBackers.cache.forEach(async (val, key) => {
+    const res = await getCollectivesWithMinBackersQuery(JSON.parse(key));
+    getCollectivesWithMinBackers.cache.set(key, res);
+  });
 };
 
 if (useCache) {
-  getCollectivesWithMinBackers({ backerCount: 10, orderDirection: 'DESC', limit: 4 }); // homepage cache
-  getSponsors({ type: 'USER' }, { orderDirection: 'DESC', limit: 30 });
-  // refresh every hour
-  setInterval(refreshCache, 1000 * 60 * 60);
+  setInterval(refreshCache, CACHE_REFRESH_INTERVAL);
+  // warming up the cache for the homepage:
+  getCollectivesWithMinBackers({"type":"COLLECTIVE","isActive":true,"minBackerCount":10,"orderBy":"createdAt","orderDirection":"DESC","limit":4,"offset":0,"where":{"type":"COLLECTIVE","isActive":true}});
+  getSponsors({"type":"ORGANIZATION","orderBy":"amountSent","orderDirection":"DESC","limit":6,"offset":0,"where":{"type":"ORGANIZATION"}});
+  getSponsors({"type":"USER","orderBy":"amountSent","orderDirection":"DESC","limit":30,"offset":0,"where":{"type":"USER"}});
 }
 
 export default {
