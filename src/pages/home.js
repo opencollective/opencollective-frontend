@@ -1,7 +1,6 @@
 import React, { Fragment } from 'react';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
-import { take, uniqBy } from 'lodash';
 import fetch from 'node-fetch';
 
 import { Box, Flex } from 'grid-styled';
@@ -110,7 +109,7 @@ const BackerAvatar = ({
   slug,
   image,
   stats: {
-    totalAmountSent,
+    totalAmountSpent,
   },
 }) => (
   <Link route={`/${slug}`} passHref><a>
@@ -120,7 +119,7 @@ const BackerAvatar = ({
       backgroundPosition="center center"
       backgroundRepeat="no-repeat"
       borderRadius="50%"
-      size={[Math.floor((totalAmountSent / 5000) * Math.random()), null, Math.floor((totalAmountSent / 2500) * Math.random())]}
+      size={[Math.floor((totalAmountSpent / 5000) * Math.random()), null, Math.floor((totalAmountSpent / 2500) * Math.random())]}
       maxHeight={[80, null, 120]}
       maxWidth={[80, null, 120]}
       minHeight={[30, null, 50]}
@@ -153,8 +152,8 @@ class HomePage extends React.Component {
 
   render() {
     const {
-      activeSpending: {
-        expenses,
+      topSpenders: {
+        collectives: topSpenders,
       },
       backers: {
         collectives: backers,
@@ -190,7 +189,6 @@ class HomePage extends React.Component {
       return (<Loading />);
     }
 
-    const activeCollectives = take(uniqBy(expenses.map(({ collective }) => collective), 'slug'), 4);
     const filteredTransactions = transactions.filter(({ type, order, category }) => {
       if (type === 'CREDIT') {
         return !!order;
@@ -277,11 +275,11 @@ class HomePage extends React.Component {
 
             <Container py={3}>
               <Flex mb={3} justifyContent="space-between" px={[1, null, 0]}>
-                <H3>Active spenders</H3>
+                <H3>Most active</H3>
                 <StyledLink href="/discover">See all &gt;</StyledLink>
               </Flex>
               <Container display="flex" flexWrap="wrap" justifyContent="space-between">
-                {activeCollectives.map((c) => <Container w={[0.5, null, 0.25]} mb={2} px={1} maxWidth={224} key={c.id}><CollectiveStatsCard {...c} /></Container>)} 
+                {topSpenders.map((c) => <Container w={[0.5, null, 0.25]} mb={2} px={1} maxWidth={224} key={c.id}><CollectiveStatsCard {...c} /></Container>)} 
               </Container>
             </Container>
 
@@ -654,6 +652,7 @@ const query = gql`
         id
         type
         slug
+        currency
         name
         image
         backgroundImage
@@ -661,39 +660,38 @@ const query = gql`
         settings
         stats {
           id
+          monthlySpending
           balance
           yearlyBudget
           backers {
-            users
-            organizations
+            all
           }
         }
       }
     }
-    activeSpending: expenses(status: PAID, orderBy: { field: updatedAt }) {
-      expenses {
-        collective {
+    topSpenders: allCollectives(type: COLLECTIVE, limit: 4, orderBy: monthlySpending, orderDirection: DESC, offset: 0) {
+      collectives {
+        id
+        type
+        slug
+        currency
+        name
+        image
+        backgroundImage
+        description
+        settings
+        stats {
           id
-          type
-          slug
-          name
-          image
-          backgroundImage
-          description
-          settings
-          stats {
-            id
-            balance
-            yearlyBudget
-            backers {
-              users
-              organizations
-            }
+          monthlySpending
+          balance
+          yearlyBudget
+          backers {
+            all
           }
         }
       }
     }
-    sponsors: allCollectives(type: ORGANIZATION, limit: 6, orderBy: amountSent, orderDirection: DESC, offset: 0) {
+    sponsors: allCollectives(type: ORGANIZATION, limit: 6, orderBy: monthlySpending, orderDirection: DESC, offset: 0) {
       collectives {
         id
         currency
@@ -702,11 +700,11 @@ const query = gql`
         name
         image
         stats {
-          totalAmountSent
+          totalAmountSpent
         }
       }
     }
-    backers: allCollectives(type: USER, limit: 30, orderBy: amountSent, orderDirection: DESC, offset: 0) {
+    backers: allCollectives(type: USER, limit: 30, orderBy: monthlySpending, orderDirection: DESC, offset: 0) {
       collectives {
         id
         currency
@@ -715,7 +713,7 @@ const query = gql`
         name
         image
         stats {
-          totalAmountSent
+          totalAmountSpent
         }
       }
     }

@@ -252,10 +252,10 @@ class CollectiveCard extends React.Component {
                 </div>
                 <div className="yearlyBudget">
                   <div className="value">
-                    <Currency value={collective.stats.totalAmountSent} currency={collective.currency} />
+                    <Currency value={collective.stats.totalAmountSpent} currency={collective.currency} />
                   </div>
                   <div className="label">
-                    <FormattedMessage id="collective.card.stats.totalAmountSent" defaultMessage="contributed" />
+                    <FormattedMessage id="collective.card.stats.totalAmountSpent" defaultMessage="contributed" />
                   </div>
                 </div>
               </div>
