@@ -140,10 +140,7 @@ export function createOrder(order, loaders, remoteUser) {
         });
       } else {
         // Create new organization collective
-        if (remoteUser) {
-          order.fromCollective.CreatedByUserId = remoteUser.id;
-        }
-        return models.Collective.createOrganization(order.fromCollective, user)
+        return models.Collective.createOrganization(order.fromCollective, user, remoteUser);
       }
     })
     .then(c => fromCollective = c)
@@ -432,9 +429,9 @@ export async function refundTransaction(_, args, req) {
  *  payment method.
  * @param {String} args.description The description of the new payment
  *  method.
- * @param {Number} args.collectiveId The ID of the organization
+ * @param {Number} args.CollectiveId The ID of the organization
  *  receiving the credit card.
- * @param {Number} args.hostCollectiveId The ID of the host that
+ * @param {Number} args.HostCollectiveId The ID of the host that
  *  received the money on its bank account.
  * @param {Number} args.totalAmount The total amount that will be
  *  credited to the newly created payment method.
@@ -447,11 +444,11 @@ export async function addFundsToOrg(args, remoteUser) {
     fromCollective,
     hostCollective,
   ] = await Promise.all([
-    models.Collective.findById(args.collectiveId),
-    models.Collective.findById(args.hostCollectiveId)
+    models.Collective.findById(args.CollectiveId),
+    models.Collective.findById(args.HostCollectiveId)
   ]);
   let paymentMethod = await models.PaymentMethod.findOne({ where: {
-    CollectiveId: args.collectiveId,
+    CollectiveId: args.CollectiveId,
     customerId: fromCollective.slug,
   } });
   if (!paymentMethod) {
@@ -460,11 +457,11 @@ export async function addFundsToOrg(args, remoteUser) {
       initialBalance: args.totalAmount,
       monthlyLimitPerMember: args.totalAmount,
       currency: hostCollective.currency,
-      CollectiveId: args.collectiveId,
+      CollectiveId: args.CollectiveId,
       customerId: fromCollective.slug,
       expiryDate: moment().add(1, 'year').format(),
       uuid: uuidv4(),
-      data: { HostCollectiveId: args.hostCollectiveId },
+      data: { HostCollectiveId: args.HostCollectiveId },
       service: 'opencollective',
       type: 'prepaid',
       createdAt: new Date,

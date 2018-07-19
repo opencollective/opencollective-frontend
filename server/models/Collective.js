@@ -1427,17 +1427,18 @@ export default function(Sequelize, DataTypes) {
   /**
    * Class Methods
    */
-  Collective.createOrganization = (collectiveData, adminUser) => {
+  Collective.createOrganization = (collectiveData, adminUser, creator = {}) => {
+    const CreatedByUserId = creator.id || adminUser.id
     return Collective
       .create({
-        CreatedByUserId: adminUser.id,
+        CreatedByUserId,
         ...collectiveData,
         type: types.ORGANIZATION,
         isActive: true
       })
       .tap(collective => {
         return models.Member.create({
-          CreatedByUserId: adminUser.id,
+          CreatedByUserId,
           CollectiveId: collective.id,
           MemberCollectiveId: adminUser.CollectiveId,
           role: roles.ADMIN
