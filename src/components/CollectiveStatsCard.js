@@ -100,9 +100,9 @@ const CollectiveStatsCard = ({
           <P fontSize="1.2rem" fontWeight="bold">{get(stats, 'backers.all', 0)}</P>
           <P fontSize="1.2rem">backers</P>
         </Flex>,
-        <Flex w={0.5} alignItems="center" flexDirection="column" key="burn rate">
-          <P fontSize="1.2rem" fontWeight="bold">{formatCurrency(get(stats, 'burnrate', 0), currency, { precision: 0 })}</P>
-          <P fontSize="1.2rem">burn rate</P>
+        <Flex w={0.5} alignItems="center" flexDirection="column" key="monthly spending">
+          <P fontSize="1.2rem" fontWeight="bold">{formatCurrency(get(stats, 'monthlySpending', 0), currency, { precision: 0 })}</P>
+          <P fontSize="1.2rem">monthly spending</P>
         </Flex>
       ] : (
         <Link route={`/${slug}#contribute`} passHref><StyledLink fontSize="1.2rem" width="100%" textAlign="center">Be the first to contribute!</StyledLink></Link>

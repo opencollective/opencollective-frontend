@@ -659,7 +659,7 @@ const query = gql`
         settings
         stats {
           id
-          burnrate
+          monthlySpending
           balance
           yearlyBudget
           backers {
@@ -668,7 +668,7 @@ const query = gql`
         }
       }
     }
-    topSpenders: allCollectives(type: COLLECTIVE, limit: 4, orderBy: burnrate, orderDirection: DESC, offset: 0) {
+    topSpenders: allCollectives(type: COLLECTIVE, limit: 4, orderBy: monthlySpending, orderDirection: DESC, offset: 0) {
       collectives {
         id
         type
@@ -680,7 +680,7 @@ const query = gql`
         settings
         stats {
           id
-          burnrate
+          monthlySpending
           balance
           yearlyBudget
           backers {
@@ -689,7 +689,7 @@ const query = gql`
         }
       }
     }
-    sponsors: allCollectives(type: ORGANIZATION, limit: 6, orderBy: burnrate, orderDirection: DESC, offset: 0) {
+    sponsors: allCollectives(type: ORGANIZATION, limit: 6, orderBy: monthlySpending, orderDirection: DESC, offset: 0) {
       collectives {
         id
         currency
@@ -702,7 +702,7 @@ const query = gql`
         }
       }
     }
-    backers: allCollectives(type: USER, limit: 30, orderBy: burnrate, orderDirection: DESC, offset: 0) {
+    backers: allCollectives(type: USER, limit: 30, orderBy: monthlySpending, orderDirection: DESC, offset: 0) {
       collectives {
         id
         currency
