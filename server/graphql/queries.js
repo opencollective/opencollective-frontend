@@ -645,7 +645,6 @@ const queries = {
       }
 
       if (args.orderBy === 'monthlySpending') {
-        // this will default returning ORGANIZATION collectives unless overwritten by the args.type
         const { total, collectives } = await rawQueries.getCollectivesOrderedByMonthlySpending({ ...args, where: query.where });
         return { total, collectives, limit: args.limit, offset: args.offset };
       }

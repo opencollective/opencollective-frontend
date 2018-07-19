@@ -1,5 +1,6 @@
 import models, { sequelize, Op } from '../models';
 import currencies from '../constants/currencies'
+import Promise from 'bluebird';
 import config from 'config';
 import { memoize, pick } from 'lodash';
 memoize.Cache = Map;
@@ -405,7 +406,6 @@ const getTopSponsors = () => {
  * - id 51 and 9804 (wwcode host)
  */
 const getCollectivesOrderedByMonthlySpendingQuery = async ({ where = {}, orderDirection = "ASC", limit = 0, offset = 0 }) => {
-  where.type = where.type || 'ORGANIZATION'; // setting the default type
   const whereStatement = Object.keys(where).reduce((statement, key) => `${statement} AND c."${key}"=:${key}`, '');
 
   const d = new Date;
@@ -437,8 +437,13 @@ const getCollectivesOrderedByMonthlySpendingQuery = async ({ where = {}, orderDi
     ORDER BY "monthlySpending" ${orderDirection} NULLS LAST
   `.replace(/\s\s+/g, ' ');
 
-  const [ [ { dataValues: { total } } ], collectives ] = await Promise.all([
-    sequelize.query(`${sql('COUNT(c.*) OVER() as "total"')} LIMIT 1`, params),
+  // If we use this query to get the monthlySpending of one single collective, we don't need to perform a count query
+  const countPromise = (typeof where.id === 'number')
+    ? Promise.resolve(1)
+    : sequelize.query(`${sql('COUNT(c.*) OVER() as "total"')} LIMIT 1`, params).then(res => res.length === 1 && res[0].dataValues.total);
+
+  const [ total, collectives ] = await Promise.all([
+    countPromise,
     sequelize.query(`${sql('c.*')} LIMIT ${limit} OFFSET ${offset}`, params),
   ]);
 
@@ -713,28 +718,29 @@ const getCollectivesWithMinBackersQuery = async ({ backerCount = 10, orderBy = '
 };
 const getCollectivesWithMinBackers = memoize(getCollectivesWithMinBackersQuery, JSON.stringify);
 
+// warming up the cache with the homepage queries
+const cacheEntries = [
+  { method: "getCollectivesOrderedByMonthlySpending", params: {"type":"COLLECTIVE","orderBy":"monthlySpending","orderDirection":"DESC","limit":4,"offset":0,"where":{"type":"COLLECTIVE"}} },
+  { method: "getCollectivesOrderedByMonthlySpending", params: {"type":"ORGANIZATION","orderBy":"monthlySpending","orderDirection":"DESC","limit":6,"offset":0,"where":{"type":"ORGANIZATION"}} },
+  { method: "getCollectivesOrderedByMonthlySpending", params: {"type":"USER","orderBy":"monthlySpending","orderDirection":"DESC","limit":30,"offset":0,"where":{"type":"USER"}} },
+  { method: "getCollectivesWithMinBackers", params: {"type":"COLLECTIVE","isActive":true,"minBackerCount":10,"orderBy":"createdAt","orderDirection":"DESC","limit":4,"offset":0,"where":{"type":"COLLECTIVE","isActive":true}}}
+];
+
 const refreshCache = async () => {
-  getCollectivesOrderedByMonthlySpending.cache.forEach(async (val, key) => {
-    const res = await getCollectivesOrderedByMonthlySpendingQuery(JSON.parse(key));
-    getCollectivesOrderedByMonthlySpending.cache.set(key, res);
-  });
-  getCollectivesWithMinBackers.cache.forEach(async (val, key) => {
-    const res = await getCollectivesWithMinBackersQuery(JSON.parse(key));
-    getCollectivesWithMinBackers.cache.set(key, res);
+  Promise.each(cacheEntries, async (entry) => {
+    const res = await queries[`${entry.method}Query`](entry.params);
+    queries[entry.method].cache.set(JSON.stringify(entry.params), res);
   });
 };
 
 if (useCache) {
   setInterval(refreshCache, CACHE_REFRESH_INTERVAL);
-  // warming up the cache for the homepage:
-  getCollectivesOrderedByMonthlySpending({"type":"COLLECTIVE","orderBy":"monthlySpending","orderDirection":"DESC","limit":4,"offset":0,"where":{"type":"COLLECTIVE"}});
-  getCollectivesOrderedByMonthlySpending({"type":"ORGANIZATION","orderBy":"monthlySpending","orderDirection":"DESC","limit":6,"offset":0,"where":{"type":"ORGANIZATION"}});
-  getCollectivesOrderedByMonthlySpending({"type":"USER","orderBy":"monthlySpending","orderDirection":"DESC","limit":30,"offset":0,"where":{"type":"USER"}});
-  getCollectivesWithMinBackers({"type":"COLLECTIVE","isActive":true,"minBackerCount":10,"orderBy":"createdAt","orderDirection":"DESC","limit":4,"offset":0,"where":{"type":"COLLECTIVE","isActive":true}});
+  refreshCache();
 }
 
-export default {
+const queries = {
   getCollectivesOrderedByMonthlySpending,
+  getCollectivesOrderedByMonthlySpendingQuery,
   getTotalDonationsByCollectiveType,
   getTotalAnnualBudgetForHost,
   getTopDonorsForCollective,
@@ -753,5 +759,7 @@ export default {
   getCollectivesWithBalance,
   getUniqueCollectiveTags,
   getCollectivesWithMinBackers,
+  getCollectivesWithMinBackersQuery,
 };
 
+export default queries;
