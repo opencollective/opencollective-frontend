@@ -405,12 +405,7 @@ const getTopSponsors = () => {
  * - id 1 (opencollective-company)
  * - id 9804 (wwcode host)
  */
-const getCollectivesOrderedByTotalAmountSpentLastMonthQuery = async (query) => {
-  const where = query.where || {};
-  const orderDirection = query.orderDirection || "ASC";
-  const limit = query.limit || 0;
-  const offset = query.offset || 0;
-
+const getCollectivesOrderedByTotalAmountSpentLastMonthQuery = async ({ where = {}, orderDirection = "ASC", limit = 0, offset = 0 }) => {
   where.type = where.type || 'ORGANIZATION'; // setting the default type
   const whereStatement = Object.keys(where).reduce((statement, key) => `${statement} AND c."${key}"=$${key}`, '');
   const params = {
@@ -418,9 +413,7 @@ const getCollectivesOrderedByTotalAmountSpentLastMonthQuery = async (query) => {
     model: models.Collective
   };
 
-  const d = new Date;
-  d.setMonth(d.getMonth() - 1);
-  const since = moment(d).format('YYYY-MM-DD');
+  const since = moment().subtract(1, 'months').format('YYYY-MM-DD');
 
   const sql = (fields) => `
     SELECT c.id, -SUM(amount) as "burnrate", ${fields} from "Collectives" c
