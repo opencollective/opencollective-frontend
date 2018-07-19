@@ -231,7 +231,7 @@ class Banner extends React.Component {
 }
 
 const getMembersQuery = gql`
-query Collective($collectiveSlug: String!) {
+query Collective($collectiveSlug: String) {
   Collective(slug: $collectiveSlug) {
     id
     name

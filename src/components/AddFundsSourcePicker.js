@@ -104,7 +104,7 @@ class AddFundsSourcePickerForUser extends React.Component {
           placeholder="select" onChange={this.onChange}
           >
           <option value="" key="addfsph-00"></option>
-          { hosts.map(h => <option value={h.slug} key={`addfsph-${h.id}`}>{h.name}</option>) }
+          { hosts.map(h => <option value={h.id} key={`addfsph-${h.id}`}>{h.name}</option>) }
         </FormControl>
       </div>
     );

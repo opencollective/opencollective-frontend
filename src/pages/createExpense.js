@@ -218,7 +218,7 @@ mutation createExpense($expense: ExpenseInputType!) {
 `;
 
 const getCollectiveQuery = gql`
-  query Collective($slug: String!) {
+  query Collective($slug: String) {
     Collective(slug: $slug) {
       id
       type

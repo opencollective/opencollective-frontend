@@ -323,7 +323,7 @@ class CollectivePickerWithData extends React.Component {
 }
 
 const getCollectivesQuery = gql`
-query Collective($hostCollectiveSlug: String!, $orderBy: CollectiveOrderField, $orderDirection: OrderDirection) {
+query Collective($hostCollectiveSlug: String, $orderBy: CollectiveOrderField, $orderDirection: OrderDirection) {
   Collective(slug: $hostCollectiveSlug) {
     id
     slug

@@ -75,7 +75,7 @@ class SendMoneyToCollectiveBtn extends React.Component {
 }
 
 const addPaymentMethodsQuery = gql`
-query Collective($slug: String!) {
+query Collective($slug: String) {
   Collective(slug: $slug) {
     id
     paymentMethods(service: "opencollective") {
