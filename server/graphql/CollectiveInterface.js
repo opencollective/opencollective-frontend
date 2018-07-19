@@ -48,8 +48,8 @@ export const CollectiveOrderFieldType = new GraphQLEnumType({
   name: 'CollectiveOrderField',
   description: 'Properties by which collectives can be ordered.',
   values: {
-    burnrate: {
-      description: 'Order collectives by total money spent last month',
+    monthlySpending: {
+      description: 'Order collectives by their average monthly spending (based on last 90 days)',
     },
     balance: {
       description: 'Order collectives by total balance.',
@@ -336,13 +336,13 @@ export const CollectiveStatsType = new GraphQLObjectType({
           return collective;
         }
       },
-      burnrate: {
-        description: 'Total amount spent in the past 30 days',
+      monthlySpending: {
+        description: 'Average amount spent per month based on the last 90 days',
         type: GraphQLInt,
         resolve(collective) {
-          // if we fetched the collective with the raw query to sort them by burn rate, we don't need to recompute it
-          if (get(collective, 'dataValues.burnrate')) return get(collective, 'dataValues.burnrate');
-          return collective.getTotalAmountSpentLastMonth();
+          // if we fetched the collective with the raw query to sort them by their monthly spending we don't need to recompute it
+          if (get(collective, 'dataValues.monthlySpending')) return get(collective, 'dataValues.monthlySpending');
+          return collective.getMonthlySpending();
         }
       },
       totalAmountSpent: {

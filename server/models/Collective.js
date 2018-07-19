@@ -1270,11 +1270,29 @@ export default function(Sequelize, DataTypes) {
     .then(result => Promise.resolve(-parseInt(result.toJSON().total, 10)));
   };
 
-  // Get the total amount spent last month (burn rate)
-  Collective.prototype.getTotalAmountSpentLastMonth = function() {
-    const lastMonth = new Date;
-    lastMonth.setMonth(lastMonth.getMonth() - 1);
-    return this.getTotalAmountSpent(lastMonth);
+  // Get the average monthly spending based on last 90 days
+  Collective.prototype.getMonthlySpending = function() {
+    const d = new Date;
+    const since = new Date(d.setDate(d.getDate()-90));
+    const sql = `
+      SELECT
+      (CASE
+        WHEN (DATE_PART('day', max(t."createdAt") - min(t."createdAt")) < 30) THEN -SUM(amount)
+        WHEN (DATE_PART('day', max(t."createdAt") - min(t."createdAt")) < 60) THEN -SUM(amount) / 2
+        ELSE -SUM(amount) /3
+      END) as "monthlySpending"
+      FROM "Collectives" c
+      LEFT JOIN "Transactions" t on t."CollectiveId" = c.id
+      WHERE c.id = :id
+        AND t."type" = 'DEBIT'
+        AND t."deletedAt" IS NULL
+        AND t."createdAt" >= :since
+    `;
+    const params = {
+      replacements: { since, id: this.id },
+      type: Sequelize.QueryTypes.SELECT
+    };
+    return Sequelize.query(sql, params).then(res => res && res.length === 1 && parseInt(res[0].monthlySpending, 10));
   };
 
   // Get the total amount raised through referral
