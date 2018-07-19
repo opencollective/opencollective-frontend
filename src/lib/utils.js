@@ -282,18 +282,24 @@ export const firstSentence = (str, length) => {
 
 * @example
 * // return '12.3k'
-* abbreviateNumber(12345)
+* abbreviateNumber(12345, 1)
 */
 
 const SI_PREFIXES = ["", "k", "M", "G", "T", "P", "E"];
 
-export const abbreviateNumber = (number) => {
+export const abbreviateNumber = (number, precision = 0) => {
 
     // what tier? (determines SI prefix)
     const tier = Math.log10(number) / 3 | 0;
 
+    const round = (value) => {
+      return precision === 0
+      ? Math.round(value)
+      : value.toFixed(precision);
+    };
+
     // if zero, we don't need a prefix
-    if (tier == 0) return number;
+    if (tier == 0) return round(number);
 
     // get prefix and determine scale
     const scale = Math.pow(10, tier * 3);
@@ -301,6 +307,5 @@ export const abbreviateNumber = (number) => {
     // scale the number
     const scaled = number / scale;
 
-    // format number and add prefix as suffix
-    return scaled.toFixed(1) + SI_PREFIXES[tier];
+    return round(scaled) + SI_PREFIXES[tier];
 };

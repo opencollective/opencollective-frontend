@@ -9,7 +9,7 @@ import Container from './Container';
 import { P, Span } from './Text';
 import { Link } from '../server/pages';
 import StyledLink from './StyledLink';
-import { formatCurrency } from '../lib/utils';
+import Currency from './Currency';
 
 const hasGoals = (settings = {}) => get(settings, 'goals', []).length > 0 && !isEqual(get(settings, 'goals', [])[0], {});
 
@@ -101,7 +101,9 @@ const CollectiveStatsCard = ({
           <P fontSize="1.2rem">backers</P>
         </Flex>,
         <Flex w={0.5} alignItems="center" flexDirection="column" key="monthly spending">
-          <P fontSize="1.2rem" fontWeight="bold">{formatCurrency(get(stats, 'monthlySpending', 0), currency, { precision: 0 })}</P>
+          <P fontSize="1.2rem" fontWeight="bold">
+            <Currency value={get(stats, 'monthlySpending', 0)} currency={currency} precision={0} abbreviate />
+          </P>
           <P fontSize="1.2rem">monthly spending</P>
         </Flex>
       ] : (

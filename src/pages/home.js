@@ -652,6 +652,7 @@ const query = gql`
         id
         type
         slug
+        currency
         name
         image
         backgroundImage
@@ -673,6 +674,7 @@ const query = gql`
         id
         type
         slug
+        currency
         name
         image
         backgroundImage

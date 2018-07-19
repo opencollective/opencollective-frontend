@@ -45,7 +45,7 @@ const SponsorCard = ({
     </P>
 
     <P fontSize="1.4rem" textAlign="center" mt={2} px={2} pb={3}>
-      Total donated: <Currency fontWeight="bold" value={totalAmountSpent} currency={currency} abbreviate />
+      Total donated: <Currency fontWeight="bold" value={totalAmountSpent} currency={currency} precision={0} abbreviate />
     </P>
   </Container>
 );
