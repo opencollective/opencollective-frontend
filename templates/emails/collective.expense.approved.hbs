@@ -6,7 +6,7 @@ Subject: Your expense to {{collective.name}} for {{{currency expense.amount curr
 <p>Next step: the host of the <a href="{{config.host.website}}/{{collective.slug}}">{{collective.name}} collective</a> (<a href="{{config.host.website}}/{{host.slug}}">{{host.name}}</a>) will reimburse your expense shortly (may take a couple of days depending on the host)</p>
 
 <center>
-  <h1>{{{currency expense.amount currency=expense.currency}}}</h1>
+  <h1>{{{currency expense.amount currency=expense.currency precision=2}}}</h1>
   <div>{{expense.description}}</div>
 </center>
 
