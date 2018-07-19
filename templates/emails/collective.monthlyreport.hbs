@@ -1,4 +1,4 @@
-Subject: {{{capitalize collective.name}}} Collective {{month}} Report
+Subject: {{{capitalize collective.name}}} Collective {{month}} {{year}} Report
 
 {{> header}}
 
@@ -81,6 +81,13 @@ Subject: {{{capitalize collective.name}}} Collective {{month}} Report
     border-radius: 5px;
     background-color: #00B856;
   }
+  .reportHeader h1 {
+    margin-bottom: 0;
+  }
+  .reportHeader h2 {
+    margin-top: 0px;
+    text-align: center;
+  }
 </style>
 
 <div style="display:none;font-size:1px;color:#333333;line-height:1px;max-height:0px;max-width:0px;opacity:0;overflow:hidden;">
@@ -89,6 +96,10 @@ Subject: {{{capitalize collective.name}}} Collective {{month}} Report
 </div>
 
 <div>
+  <div class="reportHeader">
+    <h1>{{{capitalize collective.name}}}</h1>
+    <h2>{{month}} {{year}} Report</h2>
+  </div>
   <p>Here are your monthly stats.{{#if collective.transactions}} We have attached a CSV of the {{collective.transactions.length}} {{{pluralize "transaction" n=collective.transactions.length}}} that you had in {{month}}.{{/if}} Just reply to this email if you have any questions.</p>
 
   <center>
