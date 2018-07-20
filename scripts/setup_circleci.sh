@@ -59,5 +59,9 @@ fi
 cd "opencollective-api"
 echo "> Restoring opencollective_dvl database for e2e testing";
 ./scripts/db_restore.sh -U ubuntu -d opencollective_dvl -f test/dbdumps/opencollective_dvl.pgsql
-
-echo "✓ API is setup";
+if [ $? -ne 0 ]; then
+  echo "Error with restoring opencollective_dvl, exiting"
+  exit 1;
+else
+  echo "✓ API is setup";
+fi
