@@ -67,7 +67,7 @@ data['collective.update.published'] = {
     type: 'COLLECTIVE',
     slug: 'brusselstogether',
     name: 'BrusselsTogether',
-    previewImage: 'https://res.cloudinary.com/opencollective/image/fetch/h_96,c_fill/f_jpg/https%3A%2F%2Fpbs.twimg.com%2Fprofile_images%2F793098287364579328%2FlfBaSTtH.jpg'
+    previewImage: 'https://opencollective-production.s3-us-west-1.amazonaws.com/a9326d00-6b75-11e8-9927-4f9505022f01.png'
   },
   update: {
     id: 44,
@@ -79,7 +79,7 @@ data['collective.update.published'] = {
     LastEditedByUserId: null,
     title: 'Testing update html',
     markdown: '',
-    html: '<p>Hello world</p><ol><li>one</li><li>two</li><li>three</li></ol><p>is this good?</p>',
+    html: "<p>The first stable release of rebar3 was a little over 2 years ago. Since that time dozens of contributors over those years it has kept a steady pace of improvement, but there is so much left to do to improve the daily development lives of Erlang developers.</p><p><br /></p><p>We've started this collective in hopes of raising funds to cover both a few minimal expenses (domain registration, S3 hosting of binaries) and more dedicated development time. The coming work will be tracked on the github project https://github.com/erlang/rebar3/projects/1, a few of the main features and fixes we have planned are:</p><p><br /></p><p>* Multi-repo support</p><p>** Host the packages you need and only hit the global hexpm when it isn't found in your internal repo</p><p>* Hex.pm organizations</p><p>** Support for hosting private packages on the official hexpm</p><p>* Performance improvements</p><p>** Parallel compilation of applications</p><p>* Streamline appup and relup creation</p><p>* Integrate changes and functionality upstream to OTP</p><p>* Regular bugfixing</p>",
     image: null,
     tags: null,
     deletedAt: null,
