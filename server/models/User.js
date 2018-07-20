@@ -15,6 +15,7 @@ import roles from '../constants/roles';
 import { extend, defaults, intersection } from 'lodash';
 
 import debugLib from 'debug';
+import { isValidEmail } from '../lib/utils';
 const debug = debugLib('user');
 
 /**
@@ -460,6 +461,9 @@ export default (Sequelize, DataTypes) => {
   };
 
   User.findOrCreateByEmail = (email, otherAttributes) => {
+    if (!isValidEmail(email)) {
+      return Promise.reject(new Error("Please provide a valid email address"));
+    }
     debug("findOrCreateByEmail", email, "other attributes: ", otherAttributes);
     return User.findOne({
       where: {
