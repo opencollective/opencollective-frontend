@@ -23,6 +23,7 @@ if (!process.env.DATE) {
   d.setMonth(d.getMonth() - 1);
 }
 const month = moment(d).format('MMMM');
+const year = d.getFullYear();
 const dateFormat = 'YYYYMM';
 
 const startDate = new Date(d.getFullYear(), d.getMonth(), 1);
@@ -166,7 +167,7 @@ const processCollective = (collective) => {
   return Promise.all(promises)
           .then(results => {
             console.log('***', collective.name, '***');
-            const data = { config: { host: config.host }, month, collective: {} };
+            const data = { config: { host: config.host }, month, year, collective: {} };
             data.topBackers = _.filter(results[0], (backer) => (backer.donationsString.text.indexOf(collective.slug) === -1)); // we omit own backers
             return getTiersStats(results[1], startDate, endDate)
               .then(res => {
