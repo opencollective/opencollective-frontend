@@ -1,7 +1,7 @@
 {
   "database": {
     "database": "opencollective_dvl",
-    "username": "opencollective",
+    "username": "ubuntu",
     "password": "",
     "options": {
       "host": "localhost",
