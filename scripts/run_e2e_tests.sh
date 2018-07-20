@@ -14,10 +14,16 @@ echo ""
 echo "> Starting server jest tests"
 jest test/server/*
 RETURN_CODE=$?
+if [ $RETURN_CODE -ne 0 ]; then
+  echo "Error with jest tests, exiting"
+  exit 1;
+fi
+
 echo ""
 echo "> Running cypress tests"
 cypress run --record
-if [ $? -ne 0 ]; then
+RETURN_CODE=$?
+if [ $RETURN_CODE -ne 0 ]; then
   echo "Error with cypress e2e tests, exiting"
   exit 1;
 fi
