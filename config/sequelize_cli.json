@@ -8,7 +8,7 @@
   },
   "circleci": {
     "database": "circle_test",
-    "username": "opencollective",
+    "username": "ubuntu",
     "password": "",
     "host": "localhost",
     "protocol": "postgres",
