@@ -72,6 +72,7 @@ export const getLoggedInUserQuery = gql`
         paymentMethods(limit: 5) {
           id
           uuid
+          type
           service
           name
           data
@@ -623,6 +624,8 @@ export const getSubscriptionsQuery = gql`
           uuid
           data
           name
+          service
+          type
         }
       }
       paymentMethods {

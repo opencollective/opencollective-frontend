@@ -24,7 +24,7 @@ describe("collective.createOrder page", () => {
     fill("twitterHandle", "xdamman");
     fill("description", "short description")
     cy.get('.submit button').click();
-    cy.wait(5500);
+    cy.wait(6500);
     cy.location().should((location) => {
       expect(location.search).to.eq(`?status=orderCreated&CollectiveId=43&type=COLLECTIVE&totalAmount=5000`);
     });

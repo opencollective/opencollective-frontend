@@ -80,7 +80,7 @@ exports[`Search Page renders empty results message 1`] = `
 
 .c35 {
   box-sizing: border-box;
-  margin-top: 8px;
+  margin-top: 16px;
 }
 
 .c39 {
@@ -338,7 +338,7 @@ exports[`Search Page renders empty results message 1`] = `
 .c47 {
   color: #6E747A;
   display: block;
-  font-size: 1.6rem;
+  font-size: 1.4rem;
   font-weight: 400;
   margin: 0px;
   padding: 0px;
@@ -850,7 +850,7 @@ exports[`Search Page renders empty results message 1`] = `
           color="#6E747A"
           fontSize="1.4rem"
         >
-          Providing the digital tools that drive the organizations of the 21st century.
+          An organization for your community, transparent by design.
         </p>
       </div>
       <div
@@ -1079,7 +1079,7 @@ exports[`Search Page renders empty results message 1`] = `
                 className="c47"
                 color="#6E747A"
                 display="block"
-                fontSize="1.6rem"
+                fontSize="1.4rem"
                 fontWeight="400"
                 href="/discover"
               >
@@ -1093,7 +1093,7 @@ exports[`Search Page renders empty results message 1`] = `
                 className="c47"
                 color="#6E747A"
                 display="block"
-                fontSize="1.6rem"
+                fontSize="1.4rem"
                 fontWeight="400"
                 href="/learn-more"
               >
@@ -1107,7 +1107,7 @@ exports[`Search Page renders empty results message 1`] = `
                 className="c47"
                 color="#6E747A"
                 display="block"
-                fontSize="1.6rem"
+                fontSize="1.4rem"
                 fontWeight="400"
                 href="/opensource"
               >
@@ -1121,7 +1121,7 @@ exports[`Search Page renders empty results message 1`] = `
                 className="c47"
                 color="#6E747A"
                 display="block"
-                fontSize="1.6rem"
+                fontSize="1.4rem"
                 fontWeight="400"
                 href="/signin"
               >
@@ -1135,7 +1135,7 @@ exports[`Search Page renders empty results message 1`] = `
                 className="c47"
                 color="#6E747A"
                 display="block"
-                fontSize="1.6rem"
+                fontSize="1.4rem"
                 fontWeight="400"
                 href="/signin"
               >
@@ -1165,7 +1165,7 @@ exports[`Search Page renders empty results message 1`] = `
                 className="c47"
                 color="#6E747A"
                 display="block"
-                fontSize="1.6rem"
+                fontSize="1.4rem"
                 fontWeight="400"
                 href="/create"
               >
@@ -1179,7 +1179,7 @@ exports[`Search Page renders empty results message 1`] = `
                 className="c47"
                 color="#6E747A"
                 display="block"
-                fontSize="1.6rem"
+                fontSize="1.4rem"
                 fontWeight="400"
                 href="/organizations/new"
               >
@@ -1209,7 +1209,7 @@ exports[`Search Page renders empty results message 1`] = `
                 className="c47"
                 color="#6E747A"
                 display="block"
-                fontSize="1.6rem"
+                fontSize="1.4rem"
                 fontWeight="400"
                 href="/opensource"
               >
@@ -1223,7 +1223,7 @@ exports[`Search Page renders empty results message 1`] = `
                 className="c47"
                 color="#6E747A"
                 display="block"
-                fontSize="1.6rem"
+                fontSize="1.4rem"
                 fontWeight="400"
                 href="https://forum.opencollective.com"
               >
@@ -1237,7 +1237,7 @@ exports[`Search Page renders empty results message 1`] = `
                 className="c47"
                 color="#6E747A"
                 display="block"
-                fontSize="1.6rem"
+                fontSize="1.4rem"
                 fontWeight="400"
                 href="https://opencollective.slack.com"
               >
@@ -1251,7 +1251,7 @@ exports[`Search Page renders empty results message 1`] = `
                 className="c47"
                 color="#6E747A"
                 display="block"
-                fontSize="1.6rem"
+                fontSize="1.4rem"
                 fontWeight="400"
                 href="https://github.com/OpenCollective/OpenCollective/wiki"
               >
@@ -1281,7 +1281,7 @@ exports[`Search Page renders empty results message 1`] = `
                 className="c47"
                 color="#6E747A"
                 display="block"
-                fontSize="1.6rem"
+                fontSize="1.4rem"
                 fontWeight="400"
                 href="/about"
               >
@@ -1295,7 +1295,7 @@ exports[`Search Page renders empty results message 1`] = `
                 className="c47"
                 color="#6E747A"
                 display="block"
-                fontSize="1.6rem"
+                fontSize="1.4rem"
                 fontWeight="400"
                 href="/faq"
               >
@@ -1309,7 +1309,7 @@ exports[`Search Page renders empty results message 1`] = `
                 className="c47"
                 color="#6E747A"
                 display="block"
-                fontSize="1.6rem"
+                fontSize="1.4rem"
                 fontWeight="400"
                 href="https://medium.com/open-collective"
               >
@@ -1323,7 +1323,7 @@ exports[`Search Page renders empty results message 1`] = `
                 className="c47"
                 color="#6E747A"
                 display="block"
-                fontSize="1.6rem"
+                fontSize="1.4rem"
                 fontWeight="400"
                 href="/tos"
               >
@@ -1337,7 +1337,7 @@ exports[`Search Page renders empty results message 1`] = `
                 className="c47"
                 color="#6E747A"
                 display="block"
-                fontSize="1.6rem"
+                fontSize="1.4rem"
                 fontWeight="400"
                 href="/privacypolicy"
               >
@@ -1419,7 +1419,7 @@ exports[`Search Page renders error message 1`] = `
 
 .c32 {
   box-sizing: border-box;
-  margin-top: 8px;
+  margin-top: 16px;
 }
 
 .c36 {
@@ -1626,7 +1626,7 @@ exports[`Search Page renders error message 1`] = `
 .c44 {
   color: #6E747A;
   display: block;
-  font-size: 1.6rem;
+  font-size: 1.4rem;
   font-weight: 400;
   margin: 0px;
   padding: 0px;
@@ -2126,7 +2126,7 @@ exports[`Search Page renders error message 1`] = `
           color="#6E747A"
           fontSize="1.4rem"
         >
-          Providing the digital tools that drive the organizations of the 21st century.
+          An organization for your community, transparent by design.
         </p>
       </div>
       <div
@@ -2355,7 +2355,7 @@ exports[`Search Page renders error message 1`] = `
                 className="c44"
                 color="#6E747A"
                 display="block"
-                fontSize="1.6rem"
+                fontSize="1.4rem"
                 fontWeight="400"
                 href="/discover"
               >
@@ -2369,7 +2369,7 @@ exports[`Search Page renders error message 1`] = `
                 className="c44"
                 color="#6E747A"
                 display="block"
-                fontSize="1.6rem"
+                fontSize="1.4rem"
                 fontWeight="400"
                 href="/learn-more"
               >
@@ -2383,7 +2383,7 @@ exports[`Search Page renders error message 1`] = `
                 className="c44"
                 color="#6E747A"
                 display="block"
-                fontSize="1.6rem"
+                fontSize="1.4rem"
                 fontWeight="400"
                 href="/opensource"
               >
@@ -2397,7 +2397,7 @@ exports[`Search Page renders error message 1`] = `
                 className="c44"
                 color="#6E747A"
                 display="block"
-                fontSize="1.6rem"
+                fontSize="1.4rem"
                 fontWeight="400"
                 href="/signin"
               >
@@ -2411,7 +2411,7 @@ exports[`Search Page renders error message 1`] = `
                 className="c44"
                 color="#6E747A"
                 display="block"
-                fontSize="1.6rem"
+                fontSize="1.4rem"
                 fontWeight="400"
                 href="/signin"
               >
@@ -2441,7 +2441,7 @@ exports[`Search Page renders error message 1`] = `
                 className="c44"
                 color="#6E747A"
                 display="block"
-                fontSize="1.6rem"
+                fontSize="1.4rem"
                 fontWeight="400"
                 href="/create"
               >
@@ -2455,7 +2455,7 @@ exports[`Search Page renders error message 1`] = `
                 className="c44"
                 color="#6E747A"
                 display="block"
-                fontSize="1.6rem"
+                fontSize="1.4rem"
                 fontWeight="400"
                 href="/organizations/new"
               >
@@ -2485,7 +2485,7 @@ exports[`Search Page renders error message 1`] = `
                 className="c44"
                 color="#6E747A"
                 display="block"
-                fontSize="1.6rem"
+                fontSize="1.4rem"
                 fontWeight="400"
                 href="/opensource"
               >
@@ -2499,7 +2499,7 @@ exports[`Search Page renders error message 1`] = `
                 className="c44"
                 color="#6E747A"
                 display="block"
-                fontSize="1.6rem"
+                fontSize="1.4rem"
                 fontWeight="400"
                 href="https://forum.opencollective.com"
               >
@@ -2513,7 +2513,7 @@ exports[`Search Page renders error message 1`] = `
                 className="c44"
                 color="#6E747A"
                 display="block"
-                fontSize="1.6rem"
+                fontSize="1.4rem"
                 fontWeight="400"
                 href="https://opencollective.slack.com"
               >
@@ -2527,7 +2527,7 @@ exports[`Search Page renders error message 1`] = `
                 className="c44"
                 color="#6E747A"
                 display="block"
-                fontSize="1.6rem"
+                fontSize="1.4rem"
                 fontWeight="400"
                 href="https://github.com/OpenCollective/OpenCollective/wiki"
               >
@@ -2557,7 +2557,7 @@ exports[`Search Page renders error message 1`] = `
                 className="c44"
                 color="#6E747A"
                 display="block"
-                fontSize="1.6rem"
+                fontSize="1.4rem"
                 fontWeight="400"
                 href="/about"
               >
@@ -2571,7 +2571,7 @@ exports[`Search Page renders error message 1`] = `
                 className="c44"
                 color="#6E747A"
                 display="block"
-                fontSize="1.6rem"
+                fontSize="1.4rem"
                 fontWeight="400"
                 href="/faq"
               >
@@ -2585,7 +2585,7 @@ exports[`Search Page renders error message 1`] = `
                 className="c44"
                 color="#6E747A"
                 display="block"
-                fontSize="1.6rem"
+                fontSize="1.4rem"
                 fontWeight="400"
                 href="https://medium.com/open-collective"
               >
@@ -2599,7 +2599,7 @@ exports[`Search Page renders error message 1`] = `
                 className="c44"
                 color="#6E747A"
                 display="block"
-                fontSize="1.6rem"
+                fontSize="1.4rem"
                 fontWeight="400"
                 href="/tos"
               >
@@ -2613,7 +2613,7 @@ exports[`Search Page renders error message 1`] = `
                 className="c44"
                 color="#6E747A"
                 display="block"
-                fontSize="1.6rem"
+                fontSize="1.4rem"
                 fontWeight="400"
                 href="/privacypolicy"
               >
@@ -2708,7 +2708,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
 
 .c35 {
   box-sizing: border-box;
-  margin-top: 8px;
+  margin-top: 16px;
 }
 
 .c39 {
@@ -2966,7 +2966,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
 .c47 {
   color: #6E747A;
   display: block;
-  font-size: 1.6rem;
+  font-size: 1.4rem;
   font-weight: 400;
   margin: 0px;
   padding: 0px;
@@ -3606,7 +3606,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
           color="#6E747A"
           fontSize="1.4rem"
         >
-          Providing the digital tools that drive the organizations of the 21st century.
+          An organization for your community, transparent by design.
         </p>
       </div>
       <div
@@ -3835,7 +3835,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
                 className="c47"
                 color="#6E747A"
                 display="block"
-                fontSize="1.6rem"
+                fontSize="1.4rem"
                 fontWeight="400"
                 href="/discover"
               >
@@ -3849,7 +3849,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
                 className="c47"
                 color="#6E747A"
                 display="block"
-                fontSize="1.6rem"
+                fontSize="1.4rem"
                 fontWeight="400"
                 href="/learn-more"
               >
@@ -3863,7 +3863,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
                 className="c47"
                 color="#6E747A"
                 display="block"
-                fontSize="1.6rem"
+                fontSize="1.4rem"
                 fontWeight="400"
                 href="/opensource"
               >
@@ -3877,7 +3877,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
                 className="c47"
                 color="#6E747A"
                 display="block"
-                fontSize="1.6rem"
+                fontSize="1.4rem"
                 fontWeight="400"
                 href="/signin"
               >
@@ -3891,7 +3891,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
                 className="c47"
                 color="#6E747A"
                 display="block"
-                fontSize="1.6rem"
+                fontSize="1.4rem"
                 fontWeight="400"
                 href="/signin"
               >
@@ -3921,7 +3921,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
                 className="c47"
                 color="#6E747A"
                 display="block"
-                fontSize="1.6rem"
+                fontSize="1.4rem"
                 fontWeight="400"
                 href="/create"
               >
@@ -3935,7 +3935,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
                 className="c47"
                 color="#6E747A"
                 display="block"
-                fontSize="1.6rem"
+                fontSize="1.4rem"
                 fontWeight="400"
                 href="/organizations/new"
               >
@@ -3965,7 +3965,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
                 className="c47"
                 color="#6E747A"
                 display="block"
-                fontSize="1.6rem"
+                fontSize="1.4rem"
                 fontWeight="400"
                 href="/opensource"
               >
@@ -3979,7 +3979,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
                 className="c47"
                 color="#6E747A"
                 display="block"
-                fontSize="1.6rem"
+                fontSize="1.4rem"
                 fontWeight="400"
                 href="https://forum.opencollective.com"
               >
@@ -3993,7 +3993,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
                 className="c47"
                 color="#6E747A"
                 display="block"
-                fontSize="1.6rem"
+                fontSize="1.4rem"
                 fontWeight="400"
                 href="https://opencollective.slack.com"
               >
@@ -4007,7 +4007,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
                 className="c47"
                 color="#6E747A"
                 display="block"
-                fontSize="1.6rem"
+                fontSize="1.4rem"
                 fontWeight="400"
                 href="https://github.com/OpenCollective/OpenCollective/wiki"
               >
@@ -4037,7 +4037,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
                 className="c47"
                 color="#6E747A"
                 display="block"
-                fontSize="1.6rem"
+                fontSize="1.4rem"
                 fontWeight="400"
                 href="/about"
               >
@@ -4051,7 +4051,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
                 className="c47"
                 color="#6E747A"
                 display="block"
-                fontSize="1.6rem"
+                fontSize="1.4rem"
                 fontWeight="400"
                 href="/faq"
               >
@@ -4065,7 +4065,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
                 className="c47"
                 color="#6E747A"
                 display="block"
-                fontSize="1.6rem"
+                fontSize="1.4rem"
                 fontWeight="400"
                 href="https://medium.com/open-collective"
               >
@@ -4079,7 +4079,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
                 className="c47"
                 color="#6E747A"
                 display="block"
-                fontSize="1.6rem"
+                fontSize="1.4rem"
                 fontWeight="400"
                 href="/tos"
               >
@@ -4093,7 +4093,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
                 className="c47"
                 color="#6E747A"
                 display="block"
-                fontSize="1.6rem"
+                fontSize="1.4rem"
                 fontWeight="400"
                 href="/privacypolicy"
               >
@@ -4181,7 +4181,7 @@ exports[`Search Page renders search results with pagination 1`] = `
 
 .c35 {
   box-sizing: border-box;
-  margin-top: 8px;
+  margin-top: 16px;
 }
 
 .c39 {
@@ -4447,7 +4447,7 @@ exports[`Search Page renders search results with pagination 1`] = `
 .c47 {
   color: #6E747A;
   display: block;
-  font-size: 1.6rem;
+  font-size: 1.4rem;
   font-weight: 400;
   margin: 0px;
   padding: 0px;
@@ -5064,7 +5064,7 @@ exports[`Search Page renders search results with pagination 1`] = `
           color="#6E747A"
           fontSize="1.4rem"
         >
-          Providing the digital tools that drive the organizations of the 21st century.
+          An organization for your community, transparent by design.
         </p>
       </div>
       <div
@@ -5293,7 +5293,7 @@ exports[`Search Page renders search results with pagination 1`] = `
                 className="c47"
                 color="#6E747A"
                 display="block"
-                fontSize="1.6rem"
+                fontSize="1.4rem"
                 fontWeight="400"
                 href="/discover"
               >
@@ -5307,7 +5307,7 @@ exports[`Search Page renders search results with pagination 1`] = `
                 className="c47"
                 color="#6E747A"
                 display="block"
-                fontSize="1.6rem"
+                fontSize="1.4rem"
                 fontWeight="400"
                 href="/learn-more"
               >
@@ -5321,7 +5321,7 @@ exports[`Search Page renders search results with pagination 1`] = `
                 className="c47"
                 color="#6E747A"
                 display="block"
-                fontSize="1.6rem"
+                fontSize="1.4rem"
                 fontWeight="400"
                 href="/opensource"
               >
@@ -5335,7 +5335,7 @@ exports[`Search Page renders search results with pagination 1`] = `
                 className="c47"
                 color="#6E747A"
                 display="block"
-                fontSize="1.6rem"
+                fontSize="1.4rem"
                 fontWeight="400"
                 href="/signin"
               >
@@ -5349,7 +5349,7 @@ exports[`Search Page renders search results with pagination 1`] = `
                 className="c47"
                 color="#6E747A"
                 display="block"
-                fontSize="1.6rem"
+                fontSize="1.4rem"
                 fontWeight="400"
                 href="/signin"
               >
@@ -5379,7 +5379,7 @@ exports[`Search Page renders search results with pagination 1`] = `
                 className="c47"
                 color="#6E747A"
                 display="block"
-                fontSize="1.6rem"
+                fontSize="1.4rem"
                 fontWeight="400"
                 href="/create"
               >
@@ -5393,7 +5393,7 @@ exports[`Search Page renders search results with pagination 1`] = `
                 className="c47"
                 color="#6E747A"
                 display="block"
-                fontSize="1.6rem"
+                fontSize="1.4rem"
                 fontWeight="400"
                 href="/organizations/new"
               >
@@ -5423,7 +5423,7 @@ exports[`Search Page renders search results with pagination 1`] = `
                 className="c47"
                 color="#6E747A"
                 display="block"
-                fontSize="1.6rem"
+                fontSize="1.4rem"
                 fontWeight="400"
                 href="/opensource"
               >
@@ -5437,7 +5437,7 @@ exports[`Search Page renders search results with pagination 1`] = `
                 className="c47"
                 color="#6E747A"
                 display="block"
-                fontSize="1.6rem"
+                fontSize="1.4rem"
                 fontWeight="400"
                 href="https://forum.opencollective.com"
               >
@@ -5451,7 +5451,7 @@ exports[`Search Page renders search results with pagination 1`] = `
                 className="c47"
                 color="#6E747A"
                 display="block"
-                fontSize="1.6rem"
+                fontSize="1.4rem"
                 fontWeight="400"
                 href="https://opencollective.slack.com"
               >
@@ -5465,7 +5465,7 @@ exports[`Search Page renders search results with pagination 1`] = `
                 className="c47"
                 color="#6E747A"
                 display="block"
-                fontSize="1.6rem"
+                fontSize="1.4rem"
                 fontWeight="400"
                 href="https://github.com/OpenCollective/OpenCollective/wiki"
               >
@@ -5495,7 +5495,7 @@ exports[`Search Page renders search results with pagination 1`] = `
                 className="c47"
                 color="#6E747A"
                 display="block"
-                fontSize="1.6rem"
+                fontSize="1.4rem"
                 fontWeight="400"
                 href="/about"
               >
@@ -5509,7 +5509,7 @@ exports[`Search Page renders search results with pagination 1`] = `
                 className="c47"
                 color="#6E747A"
                 display="block"
-                fontSize="1.6rem"
+                fontSize="1.4rem"
                 fontWeight="400"
                 href="/faq"
               >
@@ -5523,7 +5523,7 @@ exports[`Search Page renders search results with pagination 1`] = `
                 className="c47"
                 color="#6E747A"
                 display="block"
-                fontSize="1.6rem"
+                fontSize="1.4rem"
                 fontWeight="400"
                 href="https://medium.com/open-collective"
               >
@@ -5537,7 +5537,7 @@ exports[`Search Page renders search results with pagination 1`] = `
                 className="c47"
                 color="#6E747A"
                 display="block"
-                fontSize="1.6rem"
+                fontSize="1.4rem"
                 fontWeight="400"
                 href="/tos"
               >
@@ -5551,7 +5551,7 @@ exports[`Search Page renders search results with pagination 1`] = `
                 className="c47"
                 color="#6E747A"
                 display="block"
-                fontSize="1.6rem"
+                fontSize="1.4rem"
                 fontWeight="400"
                 href="/privacypolicy"
               >
