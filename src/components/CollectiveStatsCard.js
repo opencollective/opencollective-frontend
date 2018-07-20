@@ -9,10 +9,11 @@ import Container from './Container';
 import { P, Span } from './Text';
 import { Link } from '../server/pages';
 import StyledLink from './StyledLink';
+import Currency from './Currency';
 
 const hasGoals = (settings = {}) => get(settings, 'goals', []).length > 0 && !isEqual(get(settings, 'goals', [])[0], {});
 
-const getGoalPercentage = ({ type, amount}, { balance, yearlyBudget }) => type === 'balance' ?  (balance / amount) : (yearlyBudget / amount);
+const getGoalPercentage = ({ type, amount }, { balance, yearlyBudget }) => type === 'balance' ?  (balance / amount) : (yearlyBudget / amount);
 
 const CollectiveStatsCard = ({
   backgroundImage,
@@ -22,6 +23,7 @@ const CollectiveStatsCard = ({
   settings,
   slug,
   stats,
+  currency,
   type,
 }) => (
   <Container
@@ -87,20 +89,22 @@ const CollectiveStatsCard = ({
 
     {hasGoals(settings) && [
       <P key="progress" textAlign="center" fontSize="1.2rem" my={2}>
-        <Span fontWeight="bold">{(getGoalPercentage(settings.goals[0], stats) * 100).toFixed(2)}%</Span> progress to:
+        <Span fontWeight="bold">{(Math.round(getGoalPercentage(settings.goals[0], stats) * 100))}%</Span> progress to:
       </P>,
       <P key="goal" textAlign="center" fontSize="1.2rem" px={2} color="#3385FF">{settings.goals[0].title}</P>
     ]}
 
     <Container display="flex" borderTop="1px solid #E3E4E6" py={2} mt={3}>
-      {(get(stats, 'backers.users', 0) || get(stats, 'backers.users', 0)) ? [
+      {(get(stats, 'backers.all', 0) || get(stats, 'backers.all', 0)) ? [
         <Flex w={0.5} alignItems="center" flexDirection="column" key="backers">
-          <P fontSize="1.2rem" fontWeight="bold">{get(stats, 'backers.users', 0)}</P>
+          <P fontSize="1.2rem" fontWeight="bold">{get(stats, 'backers.all', 0)}</P>
           <P fontSize="1.2rem">backers</P>
         </Flex>,
-        <Flex w={0.5} alignItems="center" flexDirection="column" key="sponsors">
-          <P fontSize="1.2rem" fontWeight="bold">{get(stats, 'backers.organizations', 0)}</P>
-          <P fontSize="1.2rem">sponsors</P>
+        <Flex w={0.5} alignItems="center" flexDirection="column" key="monthly spending">
+          <P fontSize="1.2rem" fontWeight="bold">
+            <Currency value={get(stats, 'monthlySpending', 0)} currency={currency} precision={0} abbreviate />
+          </P>
+          <P fontSize="1.2rem">monthly spending</P>
         </Flex>
       ] : (
         <Link route={`/${slug}#contribute`} passHref><StyledLink fontSize="1.2rem" width="100%" textAlign="center">Be the first to contribute!</StyledLink></Link>
@@ -122,6 +126,7 @@ CollectiveStatsCard.propTypes = {
     })),
   }),
   slug: PropTypes.string.isRequired,
+  currency: PropTypes.string.isRequired,
   stats: PropTypes.shape({
     backers: PropTypes.shape({
       organizations: PropTypes.number,

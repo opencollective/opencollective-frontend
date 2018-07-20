@@ -21,7 +21,7 @@ const Currency = ({
     maximumFractionDigits={precision}
   >
     {formattedNumber => abbreviate ?
-      <Span {...styles}>{formattedNumber.slice(0, 1)}{abbreviateNumber(value/100)}</Span>
+      <Span {...styles}>{formattedNumber.slice(0, 1)}{abbreviateNumber(value/100, precision)}</Span>
       : <Span {...styles}>{formattedNumber}</Span>
     }
   </FormattedNumber>

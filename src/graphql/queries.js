@@ -163,7 +163,7 @@ const getCollectiveToEditQuery = gql`
         backers {
           all
         }
-        totalAmountSent
+        totalAmountSpent
       }
       tiers {
         id
@@ -297,7 +297,7 @@ const getCollectiveQuery = gql`
         }
         updates
         events
-        totalAmountSent
+        totalAmountSpent
         totalAmountRaised
         totalAmountReceived
       }
@@ -590,7 +590,7 @@ export const getSubscriptionsQuery = gql`
       createdAt
       stats {
         id
-        totalAmountSent
+        totalAmountSpent
         totalAmountRaised
       }
       ordersFromCollective (subscriptionsOnly: true) {
@@ -689,7 +689,7 @@ export const searchCollectivesQuery = gql`
         stats {
           id
           balance
-          totalAmountSent
+          totalAmountSpent
           yearlyBudget
           backers {
             all
