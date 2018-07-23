@@ -160,7 +160,7 @@ class PaymentMethodChooser extends React.Component {
   generatePMString(pm) {
     const { intl } = this.props;
 
-    if (!pm.service === 'opencollective') {
+    if (pm.service === 'opencollective') {
       return `${pm.name} (${pm.service} ${pm.type})`;
     }
 
