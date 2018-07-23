@@ -6,7 +6,7 @@
     "jest": true,
   },
   "rules": {
-    "no-console": 1,
-    "node/no-unsupported-features": 0,
+    "no-console": "warn",
+    "node/no-unsupported-features/es-syntax": "off",
   }
 }
