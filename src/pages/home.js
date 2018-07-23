@@ -496,25 +496,25 @@ class HomePage extends React.Component {
                     <P {...statsStyles}>
                       <FormattedNumber value={totalCollectives} />
                     </P>
-                    <P>collectives</P>
+                    <P><a href="https://opencollective.com/discover">collectives</a></P>
                   </Container>
                   <Container {...statsContainerStyles}>
                     <P {...statsStyles}>
                       <FormattedNumber value={totalDonors} />
                     </P>
-                    <P>donors</P>
+                    <P>backers</P>
                   </Container>
                   <Container {...statsContainerStyles}>
                     <P {...statsStyles}>
                       <FormattedNumber value={totalChapters} />
                     </P>
-                    <P>chapters</P>
+                    <P><Link route={"chapters"}>chapters</Link></P>
                   </Container>
                   <Container {...statsContainerStyles}>
                     <P {...statsStyles}>
                       <Currency value={totalAnnualBudget} abbreviate currency="USD" />
                     </P>
-                    <P>available</P>
+                    <P>raised</P>
                   </Container>
                 </Container>
               )}
