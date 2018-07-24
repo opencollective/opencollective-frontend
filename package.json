@@ -59,7 +59,7 @@
     "react-add-to-calendar": "0.1.5",
     "react-apollo": "1.4.16",
     "react-bootstrap": "0.32.1",
-    "react-datetime": "2.14.0",
+    "react-datetime": "2.15.0",
     "react-dom": "16.4.1",
     "react-dropzone": "4.2.12",
     "react-geosuggest": "2.8.0",
