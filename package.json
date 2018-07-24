@@ -30,7 +30,7 @@
     "glob": "7.1.2",
     "gm": "1.23.1",
     "graphql": "0.12.3",
-    "graphql-request": "1.6.0",
+    "graphql-request": "1.7.0",
     "graphql-tag": "2.6.1",
     "grid-styled": "4.3.2",
     "html-pdf": "2.2.0",
