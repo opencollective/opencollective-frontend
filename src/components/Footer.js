@@ -82,11 +82,11 @@ class Footer extends React.Component {
         bottom={0}
       >
         <Flex p={2} justifyContent="space-between" alignItems={['center', null, 'flex-start']} mx="auto" flexDirection={['column', null, 'row']} css="max-width: 1300px;">
-          <FlexContainer mt={2} w={[null, null, 1/3]} flexDirection="column" maxWidth="300px">
+          <FlexContainer mt={3} w={[null, null, 1/3]} flexDirection="column" maxWidth="300px">
             <Flex justifyContent={['center', null, 'flex-start']}>
               <object type="image/svg+xml" data="/static/images/opencollectivelogo-footer.svg" height="20"></object>
             </Flex>
-            <P textAlign={['center', null, 'left']} color="#6E747A" fontSize="1.4rem" py={2}>Providing the digital tools that drive the organizations of the 21st century.</P>
+            <P textAlign={['center', null, 'left']} color="#6E747A" fontSize="1.4rem" py={2}>An organization for your community, transparent by design.</P>
           </FlexContainer>
           <FlexContainer justifyContent="space-evenly" alignItems="center" w={1} my={3} order={[null, null, '3']} maxWidth="300px">
             <SocialLink href="https://medium.com/open-collective">
@@ -116,7 +116,7 @@ class Footer extends React.Component {
                         href={navigation[key][item]}
                         color="#6E747A"
                         display="block"
-                        fontSize="1.6rem"
+                        fontSize="1.4rem"
                         fontWeight="400"
                         m={0}
                         p={0}

@@ -10,6 +10,9 @@ const init = (skip_signin = false, next = '/testcollective/expenses/new') => {
     cy.get('.email.inputField input').type('testuser+admin@opencollective.com');
     cy.wait(500)
     cy.get('.LoginForm button').click();
+    cy.url().then(currentUrl => {
+      console.log(">>> after login url", currentUrl);
+    })
   }
 }
 
@@ -36,8 +39,8 @@ describe("new expense", () => {
     cy.get('.CreateExpenseForm').contains("Sign up or login to submit an expense");
     cy.get('.inputField.email input').type("testuser+admin@opencollective.com");
     cy.get('.login').click();
-    cy.wait(500);
-    cy.get('.inputField.description');
+    cy.wait(300)
+    cy.get('.inputField.description', { timeout: 5000 });
   });
 
   it ("submits new expense paypal", () => {
@@ -57,19 +60,24 @@ describe("new expense", () => {
     cy.screenshot("expenseCreatedPaypalLoggedOut");
     cy.get('.expenseCreated').contains('success');
     cy.get('.actions .viewAllExpenses').click();
-    cy.wait(500);
+    cy.wait(300)
     cy.get('.itemsList .expense', { timeout: 10000 })
     cy.get('.Expenses .expense:first .description').contains(expenseDescription)
     cy.get('.Expenses .expense:first .status').contains("pending")
-    cy.get('.Expenses .expense:first .meta').contains("Team")
+    cy.get('.Expenses .expense:first .meta').contains("Team");
+  });
+
+  it ("submits a comment on an expense", () => {
+    init(false, '/testcollective/expenses');
     cy.get('.Expenses .expense:first .description a').click();
-    cy.get('.CommentForm');
+    cy.wait(300)
+    cy.get('.CommentForm', { timeout: 10000 });
     cy.get('.ql-editor').type("This is a first comment");
     cy.get('.ql-editor').blur();
-    cy.wait(500);
-    cy.get('.CommentForm .actions .Button.save').click();
-    cy.wait(500);
-    cy.get('.Comments .itemsList .comment').should('have.length', 1);
+    cy.wait(300)
+    cy.get('.CommentForm .actions .Button.save', { timeout: 5000 }).click();
+    cy.wait(300)
+    cy.get('.Comments .itemsList .comment', { timeout: 5000 }).should('have.length', 1);
     cy.get('.Comments .itemsList .comment:first .description').contains("This is a first comment");
     cy.get('.desktopOnly .submitExpense').click();
     cy.get('.descriptionField input').should('have.value', '');
@@ -80,16 +88,17 @@ describe("new expense", () => {
     init();
     cy.get('.descriptionField input').type(expenseDescription);
     cy.wait(300)
-    cy.get('.amountField input').type(12);
+    cy.get('.amountField input', { timeout: 5000 }).type(12);
     cy.get('.payoutMethod.inputField select').select('other');
     uploadReceipt();
+    cy.wait(300)
     cy.get('.LoginTopBarProfileButton').contains("testuseradmin", { timeout: 15000 })
     cy.get('.inputField.privateMessage textarea').type("Some private note for the host");
     cy.get('button[type=submit]').click();
     cy.screenshot("expenseCreatedLoggedIn");
     cy.get('.expenseCreated').contains('success');
     cy.get('.actions .viewAllExpenses').click();
-    cy.wait(300);
+    cy.wait(300)
     cy.get('.itemsList .expense', { timeout: 10000 })
     cy.get('.Expenses .expense:first .description').contains(expenseDescription);
     cy.get('.Expenses .expense:first .status').contains("pending")
@@ -112,8 +121,8 @@ describe("new expense", () => {
     cy.get('.Expenses .expense:first .amount').contains("$13.00");
     cy.screenshot("expenseSaved");
     cy.get('.Expenses .expense:first .ApproveExpenseBtn button').click();
-    cy.wait(300);
-    cy.get('.Expenses .expense:first .status').contains("approved")
+    cy.wait(300)
+    cy.get('.Expenses .expense:first .status', { timeout: 5000 }).contains("approved");
   })
 
 })
