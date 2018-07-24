@@ -1263,7 +1263,7 @@ export default function(Sequelize, DataTypes) {
     if (startDate) where.createdAt[Op.gte] = startDate;
     return models.Transaction.find({
       attributes: [
-        [Sequelize.fn('COALESCE', Sequelize.fn('SUM', Sequelize.col('amount')), 0), 'total']
+        [Sequelize.fn('COALESCE', Sequelize.fn('SUM', Sequelize.col('netAmountInCollectiveCurrency')), 0), 'total']
       ],
       where
     })
