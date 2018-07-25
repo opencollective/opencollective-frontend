@@ -397,6 +397,7 @@ class EditCollectiveForm extends React.Component {
             <EditTiers
               title="Tiers"
               tiers={this.state.tiers}
+              types={['TIER', 'MEMBERSHIP', 'SERVICE', 'PRODUCT', 'DONATION']}
               collective={collective}
               currency={collective.currency}
               onChange={this.handleObjectChange}

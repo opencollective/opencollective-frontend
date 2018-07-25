@@ -1186,6 +1186,20 @@ exports[`Search Page renders empty results message 1`] = `
                 Become a Sponsor
               </a>
             </li>
+            <li
+              className="c46"
+            >
+              <a
+                className="c47"
+                color="#6E747A"
+                display="block"
+                fontSize="1.4rem"
+                fontWeight="400"
+                href="/chapters"
+              >
+                Create a chapter
+              </a>
+            </li>
           </ul>
         </div>
         <div
@@ -1225,9 +1239,9 @@ exports[`Search Page renders empty results message 1`] = `
                 display="block"
                 fontSize="1.4rem"
                 fontWeight="400"
-                href="https://forum.opencollective.com"
+                href="https://github.com/opencollective/opencollectives/issues"
               >
-                Forum
+                Report an issue
               </a>
             </li>
             <li
@@ -1239,7 +1253,7 @@ exports[`Search Page renders empty results message 1`] = `
                 display="block"
                 fontSize="1.4rem"
                 fontWeight="400"
-                href="https://opencollective.slack.com"
+                href="https://slack.opencollective.com"
               >
                 Slack
               </a>
@@ -1253,9 +1267,23 @@ exports[`Search Page renders empty results message 1`] = `
                 display="block"
                 fontSize="1.4rem"
                 fontWeight="400"
-                href="https://github.com/OpenCollective/OpenCollective/wiki"
+                href="https://github.com/opencollective/opencollective/wiki"
               >
-                Help
+                Wiki
+              </a>
+            </li>
+            <li
+              className="c46"
+            >
+              <a
+                className="c47"
+                color="#6E747A"
+                display="block"
+                fontSize="1.4rem"
+                fontWeight="400"
+                href="mailto:support@opencollective.com"
+              >
+                Email Support
               </a>
             </li>
           </ul>
@@ -2462,6 +2490,20 @@ exports[`Search Page renders error message 1`] = `
                 Become a Sponsor
               </a>
             </li>
+            <li
+              className="c43"
+            >
+              <a
+                className="c44"
+                color="#6E747A"
+                display="block"
+                fontSize="1.4rem"
+                fontWeight="400"
+                href="/chapters"
+              >
+                Create a chapter
+              </a>
+            </li>
           </ul>
         </div>
         <div
@@ -2501,9 +2543,9 @@ exports[`Search Page renders error message 1`] = `
                 display="block"
                 fontSize="1.4rem"
                 fontWeight="400"
-                href="https://forum.opencollective.com"
+                href="https://github.com/opencollective/opencollectives/issues"
               >
-                Forum
+                Report an issue
               </a>
             </li>
             <li
@@ -2515,7 +2557,7 @@ exports[`Search Page renders error message 1`] = `
                 display="block"
                 fontSize="1.4rem"
                 fontWeight="400"
-                href="https://opencollective.slack.com"
+                href="https://slack.opencollective.com"
               >
                 Slack
               </a>
@@ -2529,9 +2571,23 @@ exports[`Search Page renders error message 1`] = `
                 display="block"
                 fontSize="1.4rem"
                 fontWeight="400"
-                href="https://github.com/OpenCollective/OpenCollective/wiki"
+                href="https://github.com/opencollective/opencollective/wiki"
               >
-                Help
+                Wiki
+              </a>
+            </li>
+            <li
+              className="c43"
+            >
+              <a
+                className="c44"
+                color="#6E747A"
+                display="block"
+                fontSize="1.4rem"
+                fontWeight="400"
+                href="mailto:support@opencollective.com"
+              >
+                Email Support
               </a>
             </li>
           </ul>
@@ -3942,6 +3998,20 @@ exports[`Search Page renders loading grid SVG 1`] = `
                 Become a Sponsor
               </a>
             </li>
+            <li
+              className="c46"
+            >
+              <a
+                className="c47"
+                color="#6E747A"
+                display="block"
+                fontSize="1.4rem"
+                fontWeight="400"
+                href="/chapters"
+              >
+                Create a chapter
+              </a>
+            </li>
           </ul>
         </div>
         <div
@@ -3981,9 +4051,9 @@ exports[`Search Page renders loading grid SVG 1`] = `
                 display="block"
                 fontSize="1.4rem"
                 fontWeight="400"
-                href="https://forum.opencollective.com"
+                href="https://github.com/opencollective/opencollectives/issues"
               >
-                Forum
+                Report an issue
               </a>
             </li>
             <li
@@ -3995,7 +4065,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
                 display="block"
                 fontSize="1.4rem"
                 fontWeight="400"
-                href="https://opencollective.slack.com"
+                href="https://slack.opencollective.com"
               >
                 Slack
               </a>
@@ -4009,9 +4079,23 @@ exports[`Search Page renders loading grid SVG 1`] = `
                 display="block"
                 fontSize="1.4rem"
                 fontWeight="400"
-                href="https://github.com/OpenCollective/OpenCollective/wiki"
+                href="https://github.com/opencollective/opencollective/wiki"
               >
-                Help
+                Wiki
+              </a>
+            </li>
+            <li
+              className="c46"
+            >
+              <a
+                className="c47"
+                color="#6E747A"
+                display="block"
+                fontSize="1.4rem"
+                fontWeight="400"
+                href="mailto:support@opencollective.com"
+              >
+                Email Support
               </a>
             </li>
           </ul>
@@ -5400,6 +5484,20 @@ exports[`Search Page renders search results with pagination 1`] = `
                 Become a Sponsor
               </a>
             </li>
+            <li
+              className="c46"
+            >
+              <a
+                className="c47"
+                color="#6E747A"
+                display="block"
+                fontSize="1.4rem"
+                fontWeight="400"
+                href="/chapters"
+              >
+                Create a chapter
+              </a>
+            </li>
           </ul>
         </div>
         <div
@@ -5439,9 +5537,9 @@ exports[`Search Page renders search results with pagination 1`] = `
                 display="block"
                 fontSize="1.4rem"
                 fontWeight="400"
-                href="https://forum.opencollective.com"
+                href="https://github.com/opencollective/opencollectives/issues"
               >
-                Forum
+                Report an issue
               </a>
             </li>
             <li
@@ -5453,7 +5551,7 @@ exports[`Search Page renders search results with pagination 1`] = `
                 display="block"
                 fontSize="1.4rem"
                 fontWeight="400"
-                href="https://opencollective.slack.com"
+                href="https://slack.opencollective.com"
               >
                 Slack
               </a>
@@ -5467,9 +5565,23 @@ exports[`Search Page renders search results with pagination 1`] = `
                 display="block"
                 fontSize="1.4rem"
                 fontWeight="400"
-                href="https://github.com/OpenCollective/OpenCollective/wiki"
+                href="https://github.com/opencollective/opencollective/wiki"
               >
-                Help
+                Wiki
+              </a>
+            </li>
+            <li
+              className="c46"
+            >
+              <a
+                className="c47"
+                color="#6E747A"
+                display="block"
+                fontSize="1.4rem"
+                fontWeight="400"
+                href="mailto:support@opencollective.com"
+              >
+                Email Support
               </a>
             </li>
           </ul>
