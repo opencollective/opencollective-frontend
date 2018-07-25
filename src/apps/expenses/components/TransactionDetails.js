@@ -121,7 +121,7 @@ class TransactionDetails extends React.Component {
           <label><FormattedMessage id="transaction.paymentMethod" defaultMessage="payment method" /></label>
           {transaction.paymentMethod && capitalize(transaction.paymentMethod.service)}
         </div>
-        { transaction.hostCurrencyFxRate &&
+        { transaction.hostCurrencyFxRate && transaction.hostCurrencyFxRate !== 1 &&
           <div className="col">
             <label><FormattedMessage id="transaction.fxrate" defaultMessage="fx rate" /></label>
             {transaction.hostCurrencyFxRate}
