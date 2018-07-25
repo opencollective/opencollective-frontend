@@ -40,6 +40,8 @@ export const TransactionInterfaceType = new GraphQLInterfaceType({
       uuid: { type: GraphQLString },
       amount: { type: GraphQLInt },
       currency: { type: GraphQLString },
+      hostCurrency: { type: GraphQLString },
+      hostCurrencyFxRate: { type: GraphQLFloat },
       netAmountInCollectiveCurrency: { type: GraphQLInt },
       hostFeeInHostCurrency: { type: GraphQLInt },
       platformFeeInHostCurrency: { type: GraphQLInt },
