@@ -11,6 +11,8 @@ export const transactionFields = `
   type
   amount
   currency
+  hostCurrency
+  hostCurrencyFxRate
   netAmountInCollectiveCurrency
   hostFeeInHostCurrency
   platformFeeInHostCurrency
@@ -28,6 +30,7 @@ export const transactionFields = `
     id
     name
     currency
+    hostFeePercent
   }
   ... on Expense {
     category
