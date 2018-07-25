@@ -57,12 +57,14 @@ const navigation = {
   'JOIN THE MOVEMENT': {
     'Create a Collective': '/create',
     'Become a Sponsor': '/organizations/new',
+    'Create a chapter': '/chapters',
   },
   COMMUNITY: {
     'Open Source': '/opensource',
-    Forum: 'https://forum.opencollective.com',
-    Slack: 'https://opencollective.slack.com',
-    Help: 'https://github.com/OpenCollective/OpenCollective/wiki',
+    'Report an issue': 'https://github.com/opencollective/opencollectives/issues',
+    Slack: 'https://slack.opencollective.com',
+    Wiki: 'https://github.com/opencollective/opencollective/wiki',
+    'Email Support': 'mailto:support@opencollective.com'
   },
   COMPANY: {
     About: '/about',
