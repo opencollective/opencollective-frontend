@@ -296,6 +296,21 @@ class MenuBar extends React.Component {
             </div>
           </div>
         }
+        { collective.isHost &&
+          LoggedInUser &&
+          LoggedInUser.canEditCollective(collective) &&
+          <div>
+            <div className="item editCollective">
+              <Button
+                className="darkBackground"
+                href={`/${collective.slug}/dashboard`}
+                >
+                <FormattedMessage
+                  id="host.dashboard" defaultMessage="Dashboard" />
+              </Button>
+            </div>
+          </div>
+        }
       </div>
     )
   }

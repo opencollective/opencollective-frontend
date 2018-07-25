@@ -32,7 +32,7 @@ class EditTiers extends React.Component {
     this.defaultType = this.props.defaultType || (this.props.collective.type === 'EVENT' ? 'TICKET' : 'TIER');
 
     this.messages = defineMessages({
-      'TIER': { id: 'tier.type.tier', defaultMessage: 'tier (only one per order)' },
+      'TIER': { id: 'tier.type.tier', defaultMessage: 'generic tier' },
       'MEMBERSHIP': { id: 'tier.type.membership', defaultMessage: 'membership (recurring)' },
       'SERVICE': { id: 'tier.type.service', defaultMessage: 'service (e.g. support)' },
       'PRODUCT': { id: 'tier.type.product', defaultMessage: 'product (e.g. t-shirt)' },
