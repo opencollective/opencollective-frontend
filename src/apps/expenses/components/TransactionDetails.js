@@ -139,7 +139,7 @@ class TransactionDetails extends React.Component {
             <span className="netAmountInCollectiveCurrency">
               <FormattedNumber
                 value={transaction.netAmountInCollectiveCurrency / 100}
-                currency={collective.currency}
+                currency={transaction.currency}
                 {...this.currencyStyle}
                 />
             </span>
