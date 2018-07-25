@@ -177,8 +177,7 @@ export async function associateTransactionRefundId(transaction, refund) {
  * Execute an order as user using paymentMethod
  * Note: validation of the paymentMethod happens in `models.Order.setPaymentMethod`. Not here anymore.
  * @param {Object} order { tier, description, totalAmount, currency, interval (null|month|year), paymentMethod }
- * @param {Object} options { hostFeePercent, platformFeePercent} (only
- *  for add funds and if remoteUser is admin of host or root)
+ * @param {Object} options { hostFeePercent, platformFeePercent} (only for add funds and if remoteUser is admin of host or root)
  */
 export const executeOrder = (user, order, options) => {
 

@@ -238,11 +238,14 @@ describe('graphql.paymentMethods.test.js', () => {
       const orderCreated = result.data.createOrder;
       const transaction = await models.Transaction.findOne({ where: { OrderId: orderCreated.id, type: 'CREDIT' }});
       const org = await models.Collective.findOne({ where: { slug: 'new-org' }});
-      const membership = await models.Member.findOne({ where: { CollectiveId: org.id, role: 'ADMIN' }});
-      const orgAdmin = await models.Collective.findOne({ where: { id: membership.MemberCollectiveId }});
+      const adminMembership = await models.Member.findOne({ where: { CollectiveId: org.id, role: 'ADMIN' }});
+      const backerMembership = await models.Member.findOne({ where: { MemberCollectiveId: org.id, role: 'BACKER' }});
+      const orgAdmin = await models.Collective.findOne({ where: { id: adminMembership.MemberCollectiveId }});
       expect(transaction.CreatedByUserId).to.equal(admin.id);
       expect(org.CreatedByUserId).to.equal(admin.id);
-      expect(membership.CreatedByUserId).to.equal(admin.id);
+      expect(adminMembership.CreatedByUserId).to.equal(admin.id);
+      expect(backerMembership.CreatedByUserId).to.equal(admin.id);
+      expect(backerMembership.CollectiveId).to.equal(transaction.CollectiveId);
       expect(orgAdmin.CreatedByUserId).to.equal(admin.id);
       expect(orgAdmin.name).to.equal(order.user.name);
       expect(transaction.FromCollectiveId).to.equal(org.id);
