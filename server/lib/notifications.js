@@ -146,13 +146,12 @@ async function notifyAdminsOfCollectiveAndCheckUserExpensesAmount(activity) {
     await notifyAdminsOfCollective(activity.data.collective.id, activity);
     await notifyUserIfExpensesExceededMinimumFormAmount(activity);  
   } catch (error) {
-    console.log(error);
+    console.error(error);
   }
   
 }
       
 async function notifyUserIfExpensesExceededMinimumFormAmount(activity) {
-  try {
     const host = await models.Collective.findById(activity.data.host.id);
     if (host.currency && host.currency !== 'USD') {
       return;
@@ -190,10 +189,7 @@ async function notifyUserIfExpensesExceededMinimumFormAmount(activity) {
       };
       return models.Comment.create(commentData);
     }
-    return Promise.resolve(true);
-  } catch (error) {
-    throw error;
-  }
+    return true;
 }
 
 async function notifyMembersOfCollective(CollectiveId, activity, options) {
