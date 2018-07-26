@@ -8,7 +8,7 @@ export const types = {
   BOT: 'BOT'
 };
 
-export const OPENCOLLECTIVE_BOT_NAME = 'Open Collective bot';
+export const IRS_BOT_SLUG = 'irs-bot';
 
 export const DEFAULT_BACKGROUND_IMG = `${config.host.website}/public/images/collectives/default-header-bg.jpg`;
 
