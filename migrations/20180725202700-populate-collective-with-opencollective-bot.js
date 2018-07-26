@@ -1,9 +1,6 @@
 'use strict';
 
-const Promise = require('bluebird');
-
 const insert = (sequelize, table, entry) => {
-  console.log(sequelize);
   return sequelize.query(`
     INSERT INTO "${table}" ("${Object.keys(entry).join('","')}") VALUES (:${Object.keys(entry).join(",:")})
   `, { replacements: entry });
