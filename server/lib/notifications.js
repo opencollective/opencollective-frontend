@@ -139,7 +139,7 @@ export async function notifyAdminsOfCollective(CollectiveId, activity, options =
   activity.CollectiveId = collective.id;
   return notifySubscribers(adminUsers, activity, options);
 }
-      
+
 async function notifyUserIfExpensesExceededMinimumFormAmount(activity) {
     const host = await models.Collective.findById(activity.data.host.id);
     if (host.currency && host.currency !== 'USD') {
@@ -164,16 +164,14 @@ async function notifyUserIfExpensesExceededMinimumFormAmount(activity) {
       }
       totalAmount += expenseAmountInHostCurrency;
     }
-    const irsBot = await models.Collective.findOne({ 
-      where: { 
+    const irsBot = await models.Collective.findOne({
+      where: {
         slug: IRS_BOT_SLUG
       }
     });
-    const all = await models.Collective.findAll(); 
-    
+
     // U$ 600.00 total amount allowed without form as of July 2018
-    if (irsBot && irsBot.settings &&  
-      totalAmount > JSON.parse(irsBot.settings).thresholdW9) {
+    if (irsBot && irsBot.settings && totalAmount > JSON.parse(irsBot.settings).thresholdW9) {
       const commentData = {
         CollectiveId: activity.data.collective.id,
         ExpenseId: activity.data.expense.id,
@@ -221,7 +219,7 @@ async function notifyByEmail(activity) {
 
     case activityType.COLLECTIVE_EXPENSE_CREATED:
       notifyAdminsOfCollective(activity.data.collective.id, activity);
-      notifyUserIfExpensesExceededMinimumFormAmount(activity);  
+      notifyUserIfExpensesExceededMinimumFormAmount(activity);
       break;
 
     case activityType.COLLECTIVE_COMMENT_CREATED:

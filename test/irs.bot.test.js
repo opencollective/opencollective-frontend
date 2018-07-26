@@ -26,7 +26,7 @@ const createExpenseQuery = `
 
 describe('irs.bot.test.js', () => {
   before(initNock);
-  
+
   beforeEach(utils.resetTestDB);
 
   beforeEach(utils.resetCaches);
@@ -62,7 +62,7 @@ describe('irs.bot.test.js', () => {
   describe('#createCommentForExpenses', () => {
 
     let sandbox, emailSendMessageSpy;
-    
+
     beforeEach(() => {
       sandbox = sinon.createSandbox();
       emailSendMessageSpy = sandbox.spy(emailLib, 'sendMessage');

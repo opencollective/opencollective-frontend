@@ -61,7 +61,7 @@ const payExpenseQuery = `
     payExpense(id: $id, fee: $fee) { id status } }`;
 
 describe('GraphQL Expenses API', () => {
-  
+
   beforeEach(utils.resetTestDB);
 
   beforeEach(utils.resetCaches);
