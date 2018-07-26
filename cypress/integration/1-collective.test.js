@@ -24,7 +24,6 @@ describe("collective page", () => {
     cy.get(".ExpensesPage .ExpensesStats").contains("Engineering ($3,808)");
     cy.get(".ExpensesPage .ExpensesStats").contains("TJ Holowaychuk ($3,391)");
     cy.get(".ExpensesPage .itemsList .expense").should("have.length", 6);
-    cy.get(".ExpensesPage .desktopOnly .menu .item.budget").click();
   });
 
   it("opens new expense page", () => {
