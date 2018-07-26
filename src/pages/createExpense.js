@@ -1,8 +1,9 @@
 import React from 'react';
 import { pick } from 'lodash';
-import { FormattedMessage } from 'react-intl'
-import { graphql, compose } from 'react-apollo'
-import gql from 'graphql-tag'
+import { FormattedMessage } from 'react-intl';
+import { graphql, compose } from 'react-apollo';
+import gql from 'graphql-tag';
+import { Box, Flex } from 'grid-styled';
 
 import { addGetLoggedInUserFunction } from '../graphql/queries';
 import withData from '../lib/withData';
@@ -31,7 +32,7 @@ class ExpensesPage extends React.Component {
   constructor(props) {
     super(props);
     this.createExpense = this.createExpense.bind(this);
-    this.state = {};
+    this.state = { expenseCreated: false };
   }
 
   async componentDidMount() {
@@ -78,28 +79,6 @@ class ExpensesPage extends React.Component {
 
     return (
       <div className="ExpensesPage">
-        <style jsx>{`
-          .columns {
-            display: flex;
-          }
-          .rightColumn {
-            width: 300px;
-            margin-left: 5rem;
-          }
-          .rightColumn .viewAllExpenses {
-            margin-top: 5rem;
-          }
-          .largeColumn {
-            width: 100%;
-          }
-          .actions {
-            text-align: center;
-            margin: 2rem;
-          }
-          .actions :global(> button) {
-            margin-right: 1rem;
-          }
-        `}</style>
         <Header
           title={collective.name}
           description={collective.description}
@@ -107,7 +86,7 @@ class ExpensesPage extends React.Component {
           image={collective.image || collective.backgroundImage}
           className={this.state.status}
           LoggedInUser={LoggedInUser}
-          />
+        />
 
         <Body>
 
@@ -118,24 +97,26 @@ class ExpensesPage extends React.Component {
             LoggedInUser={LoggedInUser}
             />
 
-          <div className="content columns" >
+          <Flex flexDirection={['column', null, 'row']}>
 
-            <div className="largeColumn">
+            <Box width={[1, null, 3/4]} >
 
               { expenseCreated &&
-                <div className="expenseCreated">
-                  <p>
+                <Box m={3}>
+                  <p className="expenseCreated">
                     <FormattedMessage id="expense.created" defaultMessage="Your expense has been submitted with success. It is now pending approval from one of the core contributors of the collective. You will be notified by email once it has been approved. Then, the host ({host}) will proceed to reimburse your expense." values={{ host: collective.host.name }} />
                   </p>
-                  <div className="actions">
+                  <Flex justifyContent="center" mt={4} flexWrap="wrap">
                     <Button className="blue" onClick={() => this.setState({ expenseCreated: null, showNewExpenseForm: true })}>
                       <FormattedMessage id="expenses.sendAnotherExpense" defaultMessage="Submit Another Expense" />
                     </Button>
-                    <Button className="whiteblue viewAllExpenses" href={`/${collective.slug}/expenses`}>
-                      <FormattedMessage id="expenses.viewAll" defaultMessage="View All Expenses" />
-                    </Button>
-                  </div>
-                </div>
+                    <Box ml={[null, null, 3]}>
+                      <Button className="whiteblue viewAllExpenses" href={`/${collective.slug}/expenses`}>
+                        <FormattedMessage id="expenses.viewAll" defaultMessage="View All Expenses" />
+                      </Button>
+                    </Box>
+                  </Flex>
+                </Box>
               }
 
               { showNewExpenseForm &&
@@ -143,24 +124,24 @@ class ExpensesPage extends React.Component {
                   collective={collective}
                   LoggedInUser={LoggedInUser}
                   onSubmit={this.createExpense}
-                  />
+                />
               }
 
-            </div>
+            </Box>
 
-            <div className="rightColumn">
+            <Box width={[1, null, 1/4]} pb={4} px={3}>
 
               <ExpensesStatsWithData slug={collective.slug} />
 
-              <div className="viewAllExpenses">
+              <Flex mt="5rem" justifyContent={['center', null, 'flex-start']}>
                 <Button href={`/${collective.slug}/expenses`}>
                   <FormattedMessage id="expenses.viewAll" defaultMessage="View All Expenses" />
                 </Button>
-              </div>
+              </Flex>
 
-            </div>
+            </Box>
 
-          </div>
+          </Flex>
 
         </Body>
 
