@@ -1,13 +1,16 @@
-
-import { mount } from 'enzyme';
 import React from 'react';
-
+import { mount } from 'enzyme';
 import { IntlProvider, addLocaleData } from 'react-intl';
+import { ApolloProvider } from 'react-apollo';
+
 import en from 'react-intl/locale-data/en';
 addLocaleData([...en]);
 
 import Expenses from '../Expenses';
 
+import initClient from '../../../../lib/initClient';
+
+const apolloClient = initClient();
 
 describe("Expenses component", () => {
 
@@ -50,12 +53,14 @@ describe("Expenses component", () => {
 
   const component = mount(
     <IntlProvider locale="en">
-      <Expenses
-        expenses={expenses}
-        editable={true}
-        LoggedInUser={loggedInUser}
-        payExpense={() => setTimeout(() => Promise.resolve(), 2000)}
-        />
+      <ApolloProvider client={apolloClient}>
+        <Expenses
+          expenses={expenses}
+          editable={true}
+          LoggedInUser={loggedInUser}
+          payExpense={() => setTimeout(() => Promise.resolve(), 2000)}
+          />
+      </ApolloProvider>
     </IntlProvider>
   );
 

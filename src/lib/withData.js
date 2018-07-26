@@ -1,86 +1,106 @@
-import { ApolloProvider, getDataFromTree } from 'react-apollo'
-import React from 'react'
+// This file is mostly adapted from:
+// https://github.com/zeit/next.js/blob/3949c82bdfe268f841178979800aa8e71bbf412c/examples/with-apollo/lib/withData.js
+
+import React from 'react';
 import PropTypes from 'prop-types';
-import { initClient } from './initClient'
-import Head from 'next/head'
+import Head from 'next/head';
+import { ApolloProvider, getDataFromTree } from 'react-apollo';
+
+import initClient from './initClient';
+
+// Gets the display name of a JSX component for dev tools
+function getComponentDisplayName(Component) {
+  return Component.displayName || Component.name || 'Unknown';
+}
 
 export default ComposedComponent => {
 
   return class WithData extends React.Component {
 
-    static displayName = `WithData(${ComposedComponent.displayName})`
-
-    static propTypes = {
-      serverState: PropTypes.object.isRequired,
-      options: PropTypes.object
-    }
-
-    static async getInitialProps (ctx) {
-      let serverState = {}
-
-      const headers = ctx.req ? ctx.req.headers : {}
+    static async getInitialProps(ctx) {
+      // Initial serverState with apollo (empty)
+      let serverState = {};
 
       const options = {
-        headers
-      }
+        headers: ctx.req ? ctx.req.headers : {},
+      };
 
       // Evaluate the composed component's getInitialProps()
-      let composedInitialProps = {}
+      let composedInitialProps = {};
       if (ComposedComponent.getInitialProps) {
-        composedInitialProps = await ComposedComponent.getInitialProps(ctx)
+        composedInitialProps = await ComposedComponent.getInitialProps(ctx);
       }
-      // Run all graphql queries in the component tree
+
+      // Run all GraphQL queries in the component tree
       // and extract the resulting data
-      if (!process.browser) {
-        const apollo = initClient(undefined, options)
-        // Provide the `url` prop data in case a graphql query uses it
-        const url = {query: ctx.query, pathname: ctx.pathname}
+      const apollo = initClient(undefined, options);
+      try {
+        // create the url prop which is passed to every page
+        const url = {
+          query: ctx.query,
+          asPath: ctx.asPath,
+          pathname: ctx.pathname,
+        };
 
-        // Run all graphql queries
-        const app = (
-          <ApolloProvider client={apollo}>
-            <ComposedComponent client={apollo} url={url} {...composedInitialProps} />
-          </ApolloProvider>
-        )
-        if (composedInitialProps.ssr === undefined || composedInitialProps.ssr === true) {
-          try {
-            await getDataFromTree(app)
-          } catch (e) {
-            if (process.env.DEBUG) console.error(">>> apollo error: ", e);
+        // Run all GraphQL queries
+        await getDataFromTree(
+          <ComposedComponent ctx={ctx} url={url} {...composedInitialProps} />,
+          {
+            router: {
+              asPath: ctx.asPath,
+              pathname: ctx.pathname,
+              query: ctx.query
+            },
+            client: apollo
           }
-          // getDataFromTree does not call componentWillUnmount
-          // head side effect therefore need to be cleared manually
-          Head.rewind()
-
-          // Extract query data from the Apollo's store
-          const state = apollo.getInitialState()
-
-          serverState = {
-            apollo: { // Make sure to only include Apollo's data state
-              data: state.data
-            }
-          }
-        }
+        );
+      } catch (error) {
+        // Prevent Apollo Client GraphQL errors from crashing SSR.
+        // Handle them in components via the data.error prop:
+        // http://dev.apollodata.com/react/api-queries.html#graphql-query-data-error
+        if (process.env.DEBUG) console.error(">>> apollo error: ", error);
       }
+
+      if (!process.browser) {
+        // getDataFromTree does not call componentWillUnmount
+        // head side effect therefore need to be cleared manually
+        Head.rewind();
+      }
+
+      // Extract query data from the Apollo store
+      serverState = {
+        apollo: {
+          data: apollo.cache.extract()
+        }
+      };
 
       return {
         options,
         serverState,
         ...composedInitialProps
-      }
+      };
     }
 
-    constructor (props) {
-      super(props)
-      this.apollo = initClient(this.props.serverState, this.props.options)
+    static displayName = `WithData(${getComponentDisplayName(
+      ComposedComponent
+    )})`;
+
+    static propTypes = {
+      serverState: PropTypes.object.isRequired,
+      options: PropTypes.object
+    };
+
+    constructor(props) {
+      super(props);
+      this.apollo = initClient(this.props.serverState.apollo.data, this.props.options);
     }
 
-    render () {
+    render() {
       return (
         <ApolloProvider client={this.apollo}>
           <ComposedComponent {...this.props} client={this.apollo} />
         </ApolloProvider>
-      )
+      );
     }
-  }
-}
+  };
+};
