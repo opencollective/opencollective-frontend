@@ -4,8 +4,11 @@ export const types = {
   COLLECTIVE: 'COLLECTIVE',
   EVENT: 'EVENT',
   USER: 'USER',
-  ORGANIZATION: 'ORGANIZATION'
+  ORGANIZATION: 'ORGANIZATION',
+  BOT: 'BOT'
 };
+
+export const OPENCOLLECTIVE_BOT_NAME = 'Open Collective bot';
 
 export const DEFAULT_BACKGROUND_IMG = `${config.host.website}/public/images/collectives/default-header-bg.jpg`;
 
