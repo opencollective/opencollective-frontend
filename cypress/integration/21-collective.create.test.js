@@ -32,7 +32,6 @@ describe("create a collective on default host", () => {
     cy.get('.error').contains("Please accept the terms of service");
     cy.get('.tos input[type="checkbox"]').click()
     cy.get('.actions button').click();
-    cy.wait(100)
     cy.get('.result').contains("Collective created successfully");
     cy.wait(800);
     cy.get('.CollectivePage .NotificationLine', { timeout: 5000 }).contains("Your collective has been created with success");

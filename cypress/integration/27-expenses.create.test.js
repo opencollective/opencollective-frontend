@@ -59,7 +59,7 @@ describe("new expense", () => {
     cy.get('button[type=submit]').click();
     cy.screenshot("expenseCreatedPaypalLoggedOut");
     cy.get('.expenseCreated').contains('success');
-    cy.get('.actions .viewAllExpenses').click();
+    cy.get('.whiteblue.viewAllExpenses').click();
     cy.wait(300)
     cy.get('.itemsList .expense', { timeout: 10000 })
     cy.get('.Expenses .expense:first .description').contains(expenseDescription)
@@ -97,7 +97,7 @@ describe("new expense", () => {
     cy.get('button[type=submit]').click();
     cy.screenshot("expenseCreatedLoggedIn");
     cy.get('.expenseCreated').contains('success');
-    cy.get('.actions .viewAllExpenses').click();
+    cy.get('.whiteblue.viewAllExpenses').click();
     cy.wait(300)
     cy.get('.itemsList .expense', { timeout: 10000 })
     cy.get('.Expenses .expense:first .description').contains(expenseDescription);
