@@ -11,16 +11,23 @@ module.exports = {
     
     // Inserting OpenCollective Bot Collective
     const botData = {
-      name: 'Open Collective bot',
+      name: 'IRS Bot',
       mission: 'Support users through the platform',
-      description: 'Open Collective bot that support users through the platform',
-      longDescription: 'Open Collective bot that support users through the platform',
+      description: 'IRS bot that support users regarding IRS issues through the platform',
+      longDescription: 'IRS bot that support users regarding IRS issues  through the platform',
       currency: 'USD',
       image: 'https://cldup.com/rdmBCmH20l.png',
       isActive: true,
-      slug: 'opencollective-company',
+      slug: 'irs-bot',
       website: 'https://opencollective.com',
-      type: 'BOT'
+      type: 'BOT',
+      settings: JSON.stringify({
+        thresholdW9: 60000,
+        thresholdW9HtmlComment: '<p>You have now been paid $600 or more through Open Collective, which' +
+          ' means we need to ask you fill out a tax form. For more info,' +
+          ' <a href="https://github.com/opencollective/opencollective/wiki/Submitting-Expenses#taxes">' +
+          'click here see the help wiki.</a></p>'
+      })
     };
     return insert(queryInterface.sequelize, "Collectives", botData);
   },
