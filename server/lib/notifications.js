@@ -8,7 +8,11 @@ import slackLib from './slack';
 import twitter from './twitter';
 import emailLib from '../lib/email';
 import activityType from '../constants/activities';
-import models from '../models';
+import expenseStatuses from '../constants/expense_status';
+import {OPENCOLLECTIVE_BOT_NAME} from '../constants/collectives';
+import {MAXIMUM_AMOUNT_TO_SEND_FORM_COMMENT, expensesFormData} from '../constants/comments';
+import models, { Op } from '../models';
+import { convertToCurrency } from './currency';
 import debugLib from 'debug';
 const debug = debugLib("notification");
 
@@ -137,6 +141,61 @@ export async function notifyAdminsOfCollective(CollectiveId, activity, options =
   return notifySubscribers(adminUsers, activity, options);
 }
 
+async function notifyAdminsOfCollectiveAndCheckUserExpensesAmount(activity) {
+  try {
+    await notifyAdminsOfCollective(activity.data.collective.id, activity);
+    await notifyUserIfExpensesExceededMinimumFormAmount(activity);  
+  } catch (error) {
+    console.log(error);
+  }
+  
+}
+      
+async function notifyUserIfExpensesExceededMinimumFormAmount(activity) {
+  try {
+    const host = await models.Collective.findById(activity.data.host.id);
+    if (host.currency && host.currency !== 'USD') {
+      return;
+    }
+    // ideally change to consider the current fiscal year instead(Example: might be from
+    // march to february instead of from the beginning from january)
+    const beginningOfCurrentYear = new Date(new Date().getFullYear(), 0, 1);
+    const userExpenses = await models.Expense.findAll({
+      where: {
+        UserId: activity.data.user.id,
+        createdAt: { [Op.gte]: beginningOfCurrentYear },
+      }
+    });
+    let totalAmount = 0;
+    for (const expense of userExpenses) {
+      let expenseAmountInHostCurrency = expense.amount;
+      if (expense.currency !== host.currency) {
+        const expenseDate = (expense.status === expenseStatuses.PAID) ? expense.updatedAt : 'latest';
+        expenseAmountInHostCurrency = await convertToCurrency(expense.amount, expense.currency, host.currency, expenseDate);
+      }
+      totalAmount += expenseAmountInHostCurrency;
+    }
+    // U$ 600.00 total amount allowed without form as of July 2018
+    if (totalAmount > MAXIMUM_AMOUNT_TO_SEND_FORM_COMMENT) {
+      const fromCollectiveIdData = await models.Collective.findOne({ 
+        where: { 
+          name: OPENCOLLECTIVE_BOT_NAME
+        }
+      });
+      const commentData = {
+        CollectiveId: activity.data.collective.id,
+        ExpenseId: activity.data.expense.id,
+        html: expensesFormData.FORM_EXPENSE_COMMENT_HTML,
+        FromCollectiveId: (fromCollectiveIdData ? fromCollectiveIdData.id : null)
+      };
+      return models.Comment.create(commentData);
+    }
+    return Promise.resolve(true);
+  } catch (error) {
+    throw error;
+  }
+}
+
 async function notifyMembersOfCollective(CollectiveId, activity, options) {
   debug("notify members of CollectiveId", CollectiveId);
   const collective = await models.Collective.findById(CollectiveId)
@@ -172,7 +231,7 @@ async function notifyByEmail(activity) {
       break;
 
     case activityType.COLLECTIVE_EXPENSE_CREATED:
-      notifyAdminsOfCollective(activity.data.collective.id, activity);
+      notifyAdminsOfCollectiveAndCheckUserExpensesAmount(activity);
       break;
 
     case activityType.COLLECTIVE_COMMENT_CREATED:
