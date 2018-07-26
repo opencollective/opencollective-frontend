@@ -1,3 +1,4 @@
+/* eslint-disable node/no-unpublished-require */
 const path = require('path');
 const imagemin = require('imagemin');
 const imageminOptipng = require('imagemin-optipng');
