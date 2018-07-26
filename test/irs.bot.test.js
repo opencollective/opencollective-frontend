@@ -1,7 +1,6 @@
 /** @module test/graphql.expenses.test
  *
- * This tests all the GraphQL API methods that interact with
- * expenses. */
+ * This tests all the IRS Bot iterations over expenses. */
 
 /* Test libraries */
 import sinon from 'sinon';
@@ -60,7 +59,7 @@ describe('irs.bot.test.js', () => {
     nock.cleanAll();
   });
 
-  describe('#createExpense', () => {
+  describe('#createCommentForExpenses', () => {
 
     let sandbox, emailSendMessageSpy;
     
@@ -222,5 +221,5 @@ describe('irs.bot.test.js', () => {
 
     });/* End of "creates 2 new expenses that adds up more than 600 USD and create Comment expense forms email" */
 
-  }); /* End of "#createExpense" */
-}); /* End of "GraphQL Expenses API" */
+  }); /* End of "#createCommentForExpenses" */
+}); /* End of "irs.bot.test.js" */
