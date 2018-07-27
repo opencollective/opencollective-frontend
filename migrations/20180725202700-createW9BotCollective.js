@@ -2,6 +2,18 @@
 
 import models from '../server/models';
 
+const insert = (sequelize, table, entry) => {
+  delete entry.id;
+  for (var key in entry) {
+    if (typeof entry[key] === 'object') {
+      entry[key] = JSON.stringify(entry[key]);
+    }
+  }
+  return sequelize.query(`
+    INSERT INTO "${table}" ("${Object.keys(entry).join('","')}") VALUES (:${Object.keys(entry).join(",:")})
+  `, { replacements: entry });
+}
+
 module.exports = {
   up: (queryInterface, sequelize) => {
     
@@ -32,7 +44,7 @@ module.exports = {
         }
       }    
     };
-    return models.Collective.create(botData);
+    return insert(queryInterface.sequelize, 'Collectives', botData);
   },
 
   down: (queryInterface, Sequelize) => {
