@@ -1,7 +1,5 @@
 'use strict';
 
-import models from '../server/models';
-
 const insert = (sequelize, table, entry) => {
   delete entry.id;
   for (var key in entry) {
