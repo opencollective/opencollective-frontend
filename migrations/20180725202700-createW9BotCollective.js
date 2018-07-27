@@ -19,6 +19,8 @@ module.exports = {
   up: (queryInterface, sequelize) => {
     
     return queryInterface.changeColumn('Comments', 'CreatedByUserId', {
+      type: Sequelize.INTEGER,
+      references: { model: 'Users', key: 'id' },
       allowNull: true
     }).then(() => {
       // Inserting OpenCollective Bot Collective
