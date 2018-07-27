@@ -41,6 +41,7 @@ export const TypeOfCollectiveType = new GraphQLEnumType({
     EVENT: {},
     ORGANIZATION: {},
     USER: {},
+    BOT: {},
   },
 });
 
@@ -416,6 +417,7 @@ export const CollectiveInterfaceType = new GraphQLInterfaceType({
   resolveType: (collective) => {
     switch (collective.type) {
       case types.COLLECTIVE:
+      case types.BOT:
         return CollectiveType;
 
       case types.USER:
