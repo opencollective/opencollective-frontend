@@ -1,0 +1,39 @@
+'use strict';
+
+module.exports = {
+  up: (queryInterface, sequelize) => {
+    
+    // Inserting OpenCollective Bot Collective
+    const botData = {
+      name: "W9 bot",
+      slug: "w9bot",
+      mission: "Help hosts by automating requesting users to submit their W9 or W8-BEN form when needed",
+      description: "Help hosts by automating requesting users to submit their W9 or W8-BEN form when needed",
+      longDescription: "Whenever someone files an expense to a host that has USD as its base currency, this bot will look at the sum of all past expenses of that user made during the year. If the sum exceeds $600, it will create a comment on the expense to ask to submit the W9, W8-BEN or W8-BEN-e form to the host",
+      currency: 'USD',
+      image: 'https://cldup.com/rdmBCmH20l.png',
+      isActive: true,
+      website: 'https://opencollective.com',
+      type: 'BOT',
+      settings: {
+        W9: {
+          threshold: 60000,
+          comment: '<p>The total amount of the expenses that you have submitted ' +
+          'this year to this host exceeds $600. To comply with the IRS, we need you to send us the'+
+          ' <a href="https://www.irs.gov/pub/irs-pdf/fw9.pdf">W9 form</a> if you are a ' +
+          'US resident (if you are not a US resident, please send the '+
+          '<a href="https://www.irs.gov/pub/irs-pdf/fw8ben.pdf">W-8BEN form</a> ' +
+          'for individuals or the <a href="https://www.irs.gov/pub/irs-pdf/fw8bene.pdf">W-8BEN-E ' +
+          'form</a> for companies) before we can proceed with this payment. ' +
+          '<a href="https://github.com/opencollective/opencollective/wiki/Submitting-Expenses#taxes">' +
+          'More info on our wiki</a>.</p>'
+        }
+      }    
+    };
+    return queryInterface.bulkInsert('Collectives', [botData]);
+  },
+
+  down: (queryInterface, Sequelize) => {
+    return Promise.resolve(); 
+  }
+};

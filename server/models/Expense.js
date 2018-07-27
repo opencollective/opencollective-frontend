@@ -3,6 +3,8 @@ import { TransactionTypes } from '../constants/transactions';
 
 import status from '../constants/expense_status';
 import CustomDataTypes from '../models/DataTypes';
+import { reduceArrayToCurrency } from '../lib/currency';
+import { Op } from './';
 
 export default function (Sequelize, DataTypes) {
 
@@ -184,7 +186,40 @@ export default function (Sequelize, DataTypes) {
 
   Expense.prototype.getPaypalEmail = function() {
     return this.getUser().then(user => user.paypalEmail || user.email);
-  }
+  };
+
+  /**
+   * Get the total amount of all expenses filed by the given UserId
+   * Converts the amount to baseCurrency if needed
+   * @return amount in base currency (int)
+   * @param {*} userId
+   * @param {*} baseCurrency
+   * @param {*} since
+   * @param {*} until
+   */
+  Expense.getTotalExpensesFromUserIdInBaseCurrency = async function(userId, baseCurrency, since, until = new Date) {
+    const userExpenses = await Expense.findAll({
+      attributes: [ 'currency', 'amount', 'status', 'updatedAt' ],
+      where: {
+        UserId: userId,
+        createdAt: {
+          [Op.between]: [since, until] // between means since >= x <= until
+        }
+      }
+    });
+    const arr = [];
+    for (const expense of userExpenses) {
+      const entry = {
+        currency: expense.currency,
+        amount: expense.amount
+      };
+      if (expense.status === status.PAID) {
+        entry.date = expense.updatedAt;
+      }
+      arr.push(entry);
+    }
+    return reduceArrayToCurrency(arr, baseCurrency);
+  };
 
   Temporal(Expense, Sequelize);
   return Expense;

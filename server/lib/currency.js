@@ -72,3 +72,15 @@ export function convertToCurrency(amount, fromCurrency, toCurrency, date = 'late
     return fxrate * amount;
   })
 }
+
+/**
+ * The goal of this function is to return the sum of an array of { currency, amount, date }
+ * to one total amount in the given currency
+ * @param {*} array [ { currency, amount[, date] }]
+ */
+export function reduceArrayToCurrency(array, currency) {
+  return Promise.map(array, (entry) => convertToCurrency(entry.amount, entry.currency, currency, entry.date))
+    .then(arrayInBaseCurrency => {
+      return arrayInBaseCurrency.reduce( (accumulator, amount) => accumulator + amount, 0);
+    });
+}
