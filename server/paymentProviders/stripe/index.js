@@ -112,7 +112,7 @@ export default {
           const { address } = account.legal_entity;
           const addressLines = [address.line1];
           if (address.line2) addressLines.push(address.line2);
-          if (address.country === 'US') 
+          if (address.country === 'US')
             addressLines.push(`${address.city} ${address.state} ${address.postal_code}`);
           else if (address.country === 'UK')
             addressLines.push(`${address.city} ${address.postal_code}`);

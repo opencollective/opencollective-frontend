@@ -4,8 +4,11 @@ export const types = {
   COLLECTIVE: 'COLLECTIVE',
   EVENT: 'EVENT',
   USER: 'USER',
-  ORGANIZATION: 'ORGANIZATION'
+  ORGANIZATION: 'ORGANIZATION',
+  BOT: 'BOT'
 };
+
+export const W9_BOT_SLUG = 'w9bot';
 
 export const DEFAULT_BACKGROUND_IMG = `${config.host.website}/public/images/collectives/default-header-bg.jpg`;
 

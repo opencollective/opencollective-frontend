@@ -61,7 +61,7 @@ const queries = {
     resolve(_, args) {
       if (args.slug) {
         return models.Collective.findBySlug(args.slug.toLowerCase());
-      } else if (args.id) {        
+      } else if (args.id) {
         return models.Collective.findById(args.id);
       } else {
         return new Error("Please provide a slug or an id");
