@@ -1,5 +1,7 @@
 'use strict';
 
+import models from '../server/models';
+
 module.exports = {
   up: (queryInterface, sequelize) => {
     
@@ -30,7 +32,7 @@ module.exports = {
         }
       }    
     };
-    return queryInterface.bulkInsert('Collectives', [botData]);
+    return models.Collective.create(botData);
   },
 
   down: (queryInterface, Sequelize) => {
