@@ -19,7 +19,7 @@ module.exports = {
   up: (queryInterface, sequelize) => {
     
     return queryInterface.changeColumn('Comments', 'CreatedByUserId', {
-      type: Sequelize.INTEGER,
+      type: sequelize.INTEGER,
       references: { model: 'Users', key: 'id' },
       allowNull: true
     }).then(() => {
