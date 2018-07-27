@@ -15,6 +15,9 @@ const insert = (sequelize, table, entry) => {
 module.exports = {
   up: (queryInterface, sequelize) => {
     
+    queryInterface.changeColumn('Comments', 'CreatedByUserId', {
+      allowNull: true
+    });
     // Inserting OpenCollective Bot Collective
     const botData = {
       name: "W9 bot",
