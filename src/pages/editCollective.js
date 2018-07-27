@@ -8,13 +8,13 @@ import EditCollective from '../components/EditCollective';
 
 class EditCollectivePage extends React.Component {
 
+  static getInitialProps ({ query: { slug } }) {
+    return { slug, ssr: false };
+  }
+
   constructor(props) {
     super(props);
     this.state = { loading: true };
-  }
-
-  static getInitialProps ({ query: { slug } }) {
-    return { slug, ssr: false };
   }
 
   async componentDidMount() {
