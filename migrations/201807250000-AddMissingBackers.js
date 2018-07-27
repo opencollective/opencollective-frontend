@@ -39,15 +39,23 @@ module.exports = {
       WHERE m.id IS NULL
         AND m."deletedAt" IS NULL
       `, { type: queryInterface.sequelize.QueryTypes.SELECT })
-      .map((pair) => insert(queryInterface.sequelize, 'Members', {
-        CollectiveId: pair.CollectiveId,
-        MemberCollectiveId: pair.FromCollectiveId,
-        TierId: pair.TierId,
-        role: 'BACKER',
-        createdAt: pair.createdAt,
-        updatedAt: new Date,
-        CreatedByUserId: pair.CreatedByUserId
-      }))
+      .map((pair) => {
+        const memberData = {
+          CollectiveId: pair.CollectiveId,
+          MemberCollectiveId: pair.FromCollectiveId,
+          TierId: pair.TierId,
+          role: 'BACKER',
+          createdAt: pair.createdAt,
+          updatedAt: new Date,
+          CreatedByUserId: pair.CreatedByUserId
+        };
+
+        if (!memberData.CreatedByUserId) {
+          console.error(">>> missing CreatedByUserId (falling back to UserId 2 xdamman) for", memberData);
+          memberData.CreatedByUserId = 2;
+        }
+        return insert(queryInterface.sequelize, 'Members', memberData);
+      })
       .then(() => {
         console.log(">>> total items inserted: ", totalInserts);
         if (DRY_RUN) {
