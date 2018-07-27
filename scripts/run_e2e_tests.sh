@@ -20,6 +20,8 @@ if [ $RETURN_CODE -ne 0 ]; then
 fi
 
 echo ""
+echo "> Ensure cypress binary is installed (should normally be cached)"
+cypress install
 echo "> Running cypress tests"
 cypress run --record
 RETURN_CODE=$?
