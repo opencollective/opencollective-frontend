@@ -58,12 +58,12 @@ class TopBar extends React.Component {
   }
 
   render() {
-    const { className, LoggedInUser, intl, showSearch } = this.props;
+    const { className, LoggedInUser, showSearch } = this.props;
     const shouldAnimate = className.includes && className.includes('loading');
 
     return (
       <Flex mx={3} my={2} alignItems="center" flexDirection="row" justifyContent="space-around">
-          <Link href="/" title={intl.formatMessage(this.messages['menu.homepage'])}>
+          <Link href="/">
             <Flex is="a" alignItems="center">
               <Logo width="24" height="24" animate={shouldAnimate} />
               <Hide xs>
