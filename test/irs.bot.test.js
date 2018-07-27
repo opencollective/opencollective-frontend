@@ -24,6 +24,28 @@ const createExpenseQuery = `
       status
       user { id name collective { id name slug } } } }`;
 
+// IRS Bot Collective based on the migration file
+// 20180725202700-populate-collective-with-IRS-Bot.js
+const botCollectiveData = {
+  name: 'IRS Bot',
+  mission: 'Support users through the platform',
+  description: 'IRS bot that support users regarding IRS issues through the platform',
+  longDescription: 'IRS bot that support users regarding IRS issues  through the platform',
+  currency: 'USD',
+  image: 'https://cldup.com/rdmBCmH20l.png',
+  isActive: true,
+  slug: 'irs-bot',
+  website: 'https://opencollective.com',
+  type: 'BOT',
+  settings: JSON.stringify({
+    thresholdW9: 60000,
+    thresholdW9HtmlComment: '<p>You have now been paid $600 or more through Open Collective, which' +
+      ' means we need to ask you fill out a tax form. For more info,' +
+      ' <a href="https://github.com/opencollective/opencollective/wiki/Submitting-Expenses#taxes">' +
+      'click here see the help wiki.</a></p>'
+  })
+};
+
 describe('irs.bot.test.js', () => {
   before(initNock);
 
@@ -32,27 +54,8 @@ describe('irs.bot.test.js', () => {
   beforeEach(utils.resetCaches);
 
   beforeEach(async () => {
-    // Inserting OpenCollective Bot Collective based on the migration file
-    // 20180725202700-populate-collective-with-opencollective-bot.js
-    await models.Collective.create({
-      name: 'IRS Bot',
-      mission: 'Support users through the platform',
-      description: 'IRS bot that support users regarding IRS issues through the platform',
-      longDescription: 'IRS bot that support users regarding IRS issues  through the platform',
-      currency: 'USD',
-      image: 'https://cldup.com/rdmBCmH20l.png',
-      isActive: true,
-      slug: 'irs-bot',
-      website: 'https://opencollective.com',
-      type: 'BOT',
-      settings: JSON.stringify({
-        thresholdW9: 60000,
-        thresholdW9HtmlComment: '<p>You have now been paid $600 or more through Open Collective, which' +
-          ' means we need to ask you fill out a tax form. For more info,' +
-          ' <a href="https://github.com/opencollective/opencollective/wiki/Submitting-Expenses#taxes">' +
-          'click here see the help wiki.</a></p>'
-      })
-    });
+    // Inserting IRS Bot collective
+    await models.Collective.create(botCollectiveData);
   });
 
   after(() => {
