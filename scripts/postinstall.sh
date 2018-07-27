@@ -26,17 +26,16 @@ fi
 if [ "$NODE_ENV" = "circleci" ]; then
   echo "- setup db user and run migration if any"
   npm run db:setup
-fi
-
-if psql -lqt | cut -d \| -f 1 | grep -qw opencollective_dvl; then
-  echo "✓ opencollective_dvl exists"
 else
-  echo "> Restoring opencollective_dvl";
-  ./scripts/db_restore.sh -d opencollective_dvl -f test/dbdumps/opencollective_dvl.pgsql
+  if psql -lqt | cut -d \| -f 1 | grep -qw opencollective_dvl; then
+    echo "✓ opencollective_dvl exists"
+  else
+    echo "- restoring opencollective_dvl";
+    ./scripts/db_restore.sh -d opencollective_dvl -f test/dbdumps/opencollective_dvl.pgsql
+  fi
+  echo "- running migration if any"
+  PG_DATABASE=opencollective_dvl npm run db:migrate:dev
 fi
-
-echo "- running migration if any"
-PG_DATABASE=opencollective_dvl npm run db:migrate:dev
 
 echo ""
 echo "You can now start the open collective api server by running:"
