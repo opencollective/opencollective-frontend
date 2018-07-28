@@ -20,21 +20,27 @@ class CollectiveCover extends React.Component {
   static propTypes = {
     collective: PropTypes.object.isRequired,
     href: PropTypes.string,
+    className: PropTypes.string,
     title: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
     description: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
     style: PropTypes.object,
-    cta: PropTypes.object // { href, label }
+    LoggedInUser: PropTypes.object,
+    intl: PropTypes.object.isRequired,
+    cta: PropTypes.object, // { href, label }
   }
 
   constructor(props) {
     super(props);
     this.messages = defineMessages({
       'contribute': { id: 'collective.contribute', defaultMessage: 'contribute' },
-      'apply': { id: 'host.apply.create.btn', defaultMessage: "Apply to create a collective" },
+      'apply': { id: 'host.apply.btn', defaultMessage: "Apply to create a collective" },
       'ADMIN': { id: 'roles.admin.label', defaultMessage: 'Core Contributor' },
       'MEMBER': { id: 'roles.member.label', defaultMessage: 'Contributor' }
     });
-
+    if (props.cta) {
+      const label = props.cta.label;
+      this.cta = { href: props.cta.href, label: this.messages[label] ? props.intl.formatMessage(this.messages[label]) : label };
+    }
   }
 
   getMemberTooltip(member) {
@@ -42,7 +48,7 @@ class CollectiveCover extends React.Component {
     let tooltip = member.member.name;
     if (this.messages[member.role]) {
       tooltip += `
-${intl.formatMessage(this.messages[member.role])}`;
+${this.messages[member.role] ? intl.formatMessage(this.messages[member.role]) : member.role}`;
     }
     const description = member.description || member.member.description;
     if (description) {
@@ -57,7 +63,7 @@ ${description}`
       collective,
       className,
       LoggedInUser,
-      intl
+      intl,
     } = this.props;
 
     const {
@@ -65,7 +71,7 @@ ${description}`
       type,
       website,
       twitterHandle,
-      stats
+      stats,
     } = collective;
 
     const href = this.props.href || collective.path || `/${collective.slug}`;
@@ -82,16 +88,6 @@ ${description}`
     };
 
     const logo = collective.image || get(collective.parentCollective, 'image');
-
-    let cta;
-    if (this.props.cta) {
-      if (this.props.cta.href) {
-        const label = this.props.cta.label;
-        cta = <Button className="blue" href={this.props.cta.href}>{this.messages[label] ? intl.formatMessage(this.messages[label]) : label}</Button>
-      } else {
-        cta = this.props.cta;
-      }
-    }
 
     return (
       <div className={classNames('CollectiveCover', className, type)}>
@@ -299,9 +295,12 @@ ${description}`
                   </div>
                 }
 
-                { collective.type !== 'COLLECTIVE' && cta &&
-                  <div className="cta">{cta}</div>
+                { collective.type !== 'COLLECTIVE' && this.props.cta &&
+                  <div className="cta">
+                    <Button className="blue" href={this.cta.href}>{this.cta.label}</Button>
+                  </div>
                 }
+
               </div>
             }
           </div>

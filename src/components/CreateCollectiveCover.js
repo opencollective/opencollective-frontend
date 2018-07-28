@@ -8,23 +8,24 @@ import { defineMessages } from 'react-intl';
 class CreateCollectiveCover extends React.Component {
 
   static propTypes = {
-    host: PropTypes.object
-  }
+    host: PropTypes.object,
+    intl: PropTypes.object.isRequired,
+  };
 
   constructor(props) {
     super(props);
     this.messages = defineMessages({
-      "host.apply.title": { id: "host.apply.title", defaultMessage: "Apply to create a new {hostname} collective" },
-      "collective.create.title": { id: "collective.create.title", defaultMessage: "Create an Open Collective" },
-      "collective.create.description": { id: "collective.create.description", defaultMessage: "The place for your community to collect money and share your finance in full transparency." }
+      'host.apply.title': { id: 'host.apply.title', defaultMessage: 'Apply to create a new {hostname} collective' },
+      'collective.create.title': { id: 'collective.create.title', defaultMessage: 'Create an Open Collective' },
+      'collective.create.description': { id: 'collective.create.description', defaultMessage: 'The place for your community to collect money and share your finance in full transparency.' },
     });
 
     this.host = props.host || {
       type: 'COLLECTIVE',
       settings: {
         apply: {
-          title: this.props.intl.formatMessage(this.messages["collective.create.title"]),
-          description: this.props.intl.formatMessage(this.messages["collective.create.description"])
+          title: this.props.intl.formatMessage(this.messages['collective.create.title']),
+          description: this.props.intl.formatMessage(this.messages['collective.create.description'])
         }
       }
     };
@@ -42,8 +43,8 @@ class CreateCollectiveCover extends React.Component {
   render() {
     const { intl } = this.props;
 
-    const title = get(this.host, 'settings.apply.title') || intl.formatMessage(this.messages["host.apply.title"], { hostname: this.host.name });
-    const description = get(this.host, 'settings.apply.description') || intl.formatMessage(this.messages["host.apply.description"], { hostname: this.host.name });
+    const title = get(this.host, 'settings.apply.title') || intl.formatMessage(this.messages['host.apply.title'], { hostname: this.host.name });
+    const description = get(this.host, 'settings.apply.description') || intl.formatMessage(this.messages['collective.create.description'], { hostname: this.host.name });
 
     return (
       <CollectiveCover

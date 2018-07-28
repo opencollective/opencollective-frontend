@@ -7,9 +7,9 @@ import Loading from '../components/Loading';
 
 class CreateCollectivePage extends React.Component {
 
-    static getInitialProps ({ query: { hostCollectiveSlug } }) {
-      return { slug: hostCollectiveSlug || "none" }
-    }
+  static getInitialProps ({ query: { hostCollectiveSlug } }) {
+    return { slug: hostCollectiveSlug }
+  }
 
   constructor(props) {
     super(props);
