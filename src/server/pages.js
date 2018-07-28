@@ -3,6 +3,7 @@ import nextRoutes from 'next-routes';
 const pages = nextRoutes();
 
 pages
+  .add('home', '/')
   .add('widgets', '/widgets')
   .add('tos', '/tos')
   .add('privacypolicy', '/privacypolicy')
@@ -29,7 +30,8 @@ pages
   .add('orderEventTier', '/:collectiveSlug/events/:eventSlug/order/:TierId', 'createOrder')
   .add('donate', '/:collectiveSlug/:verb(donate|pay|contribute)/:amount?/:interval(month|monthly|year|yearly)?/:description?', 'createOrder')
   .add('tiers-iframe', '/:collectiveSlug/tiers/iframe')
-  .add('host.expenses', '/:hostCollectiveSlug/collectives/expenses')
+  .add('host.expenses', '/:hostCollectiveSlug/collectives/expenses', 'host.dashboard')
+  .add('host.dashboard', '/:hostCollectiveSlug/dashboard', 'host.dashboard')
   .add('host.expenses.approve', '/:parentCollectiveSlug?/:collectiveType(events)?/:collectiveSlug/:table(expenses)/:id/:action(approve|reject)', 'action')
   .add('host.collectives.approve', '/:hostCollectiveSlug/:table(collectives)/:id/:action(approve)', 'action')
   .add('transactions', '/:parentCollectiveSlug?/:collectiveType(events)?/:collectiveSlug/transactions')

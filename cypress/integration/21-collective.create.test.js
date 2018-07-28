@@ -33,8 +33,8 @@ describe("create a collective on default host", () => {
     cy.get('.tos input[type="checkbox"]').click()
     cy.get('.actions button').click();
     cy.get('.result').contains("Collective created successfully");
-    cy.wait(1000);
-    cy.get('.CollectivePage .NotificationLine').contains("Your collective has been created with success");
+    cy.wait(800);
+    cy.get('.CollectivePage .NotificationLine', { timeout: 5000 }).contains("Your collective has been created with success");
     cy.get('.CollectivePage .TierCard').should("have.length", 2);
   })
 

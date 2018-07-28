@@ -13,7 +13,12 @@ import { get } from 'lodash';
 
 class CollectivePage extends React.Component {
 
-  static getInitialProps ({ query }) {
+  static getInitialProps ({ query, res }) {
+
+    if (res){
+      res.setHeader('Cache-Control','public, max-age=300');
+    }
+
     return { slug: query && query.slug, query }
   }
 

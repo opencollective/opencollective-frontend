@@ -11,6 +11,8 @@ export const transactionFields = `
   type
   amount
   currency
+  hostCurrency
+  hostCurrencyFxRate
   netAmountInCollectiveCurrency
   hostFeeInHostCurrency
   platformFeeInHostCurrency
@@ -28,6 +30,7 @@ export const transactionFields = `
     id
     name
     currency
+    hostFeePercent
   }
   ... on Expense {
     category
@@ -72,6 +75,7 @@ export const getLoggedInUserQuery = gql`
         paymentMethods(limit: 5) {
           id
           uuid
+          type
           service
           name
           data
@@ -87,6 +91,7 @@ export const getLoggedInUserQuery = gql`
           name
           currency
           isHost
+          image
           stats {
             id
             balance
@@ -108,7 +113,7 @@ export const getLoggedInUserQuery = gql`
 `;
 
 const getTiersQuery = gql`
-  query Collective($slug: String!) {
+  query Collective($slug: String) {
     Collective(slug: $slug) {
       id
       slug
@@ -133,7 +138,7 @@ const getTiersQuery = gql`
 `;
 
 const getCollectiveToEditQuery = gql`
-  query Collective($slug: String!) {
+  query Collective($slug: String) {
     Collective(slug: $slug) {
       id
       type
@@ -178,7 +183,7 @@ const getCollectiveToEditQuery = gql`
         backers {
           all
         }
-        totalAmountSent
+        totalAmountSpent
       }
       tiers {
         id
@@ -267,7 +272,7 @@ const getCollectiveToEditQuery = gql`
 `;
 
 const getCollectiveQuery = gql`
-  query Collective($slug: String!) {
+  query Collective($slug: String) {
     Collective(slug: $slug) {
       id
       isActive
@@ -312,7 +317,7 @@ const getCollectiveQuery = gql`
         }
         updates
         events
-        totalAmountSent
+        totalAmountSpent
         totalAmountRaised
         totalAmountReceived
       }
@@ -417,7 +422,7 @@ const getCollectiveQuery = gql`
 `;
 
 const getEventCollectiveQuery = gql`
-  query Collective($eventSlug: String!) {
+  query Collective($eventSlug: String) {
     Collective(slug: $eventSlug) {
       id
       type
@@ -513,7 +518,7 @@ const getEventCollectiveQuery = gql`
 `;
 
 const getCollectiveCoverQuery = gql`
-  query CollectiveCover($slug: String!) {
+  query CollectiveCover($slug: String) {
     Collective(slug: $slug) {
       id
       type
@@ -585,7 +590,7 @@ export const getOcCardBalanceQuery = gql`
 `;
 
 export const getSubscriptionsQuery = gql`
-  query Collective($slug: String!) {
+  query Collective($slug: String) {
     Collective(slug: $slug) {
       id
       type
@@ -605,7 +610,7 @@ export const getSubscriptionsQuery = gql`
       createdAt
       stats {
         id
-        totalAmountSent
+        totalAmountSpent
         totalAmountRaised
       }
       ordersFromCollective (subscriptionsOnly: true) {
@@ -639,6 +644,8 @@ export const getSubscriptionsQuery = gql`
           uuid
           data
           name
+          service
+          type
         }
       }
       paymentMethods {
@@ -702,7 +709,7 @@ export const searchCollectivesQuery = gql`
         stats {
           id
           balance
-          totalAmountSent
+          totalAmountSpent
           yearlyBudget
           backers {
             all

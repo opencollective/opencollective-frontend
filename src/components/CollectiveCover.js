@@ -306,13 +306,13 @@ ${description}`
             }
           </div>
 
-          { ['USER','ORGANIZATION'].indexOf(collective.type) !== -1 && stats && stats.totalAmountSent > 0 && !collective.isHost &&
+          { ['USER','ORGANIZATION'].indexOf(collective.type) !== -1 && stats && stats.totalAmountSpent > 0 && !collective.isHost &&
             <div className="statsContainer">
               <div className="stat">
-                <div className="totalAmountSent value">
-                  <Currency value={stats.totalAmountSent} currency={collective.currency} />
+                <div className="totalAmountSpent value">
+                  <Currency value={stats.totalAmountSpent} currency={collective.currency} />
                 </div>
-                <FormattedMessage id="collective.stats.totalAmountSent.label" defaultMessage="Total amount donated" />
+                <FormattedMessage id="collective.stats.totalAmountSpent.label" defaultMessage="Total amount donated" />
               </div>
               { stats.totalAmountRaised > 0 &&
                 <div className="stat">

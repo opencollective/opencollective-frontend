@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { defineMessages, FormattedNumber, FormattedMessage } from 'react-intl';
 import { imagePreview, capitalize } from '../../../lib/utils';
 import withIntl from '../../../lib/withIntl';
+import { get } from 'lodash';
 
 import RefundTransactionBtn from './RefundTransactionBtn';
 
@@ -13,14 +14,15 @@ class TransactionDetails extends React.Component {
     collective: PropTypes.object,
     transaction: PropTypes.object,
     LoggedInUser: PropTypes.object,
-    mode: PropTypes.string // open or closed
-  }
+    intl: PropTypes.object.isRequired,
+    mode: PropTypes.string, // open or closed
+  };
 
   constructor(props) {
     super(props);
     this.messages = defineMessages({
-      'hostFeeInHostCurrency': { id: 'transaction.hostFeeInHostCurrency', defaultMessage: 'host fee' },
-      'platformFeeInHostCurrency': { id: 'transaction.platformFeeInHostCurrency', defaultMessage: 'Open Collective fee' },
+      'hostFeeInHostCurrency': { id: 'transaction.hostFeeInHostCurrency', defaultMessage: '{hostFeePercent} host fee' },
+      'platformFeeInHostCurrency': { id: 'transaction.platformFeeInHostCurrency', defaultMessage: '5% Open Collective fee' },
       'paymentProcessorFeeInHostCurrency': { id: 'transaction.paymentProcessorFeeInHostCurrency', defaultMessage: 'payment processor fee' }
     });
     this.currencyStyle = { style: 'currency', currencyDisplay: 'symbol', minimumFractionDigits: 0, maximumFractionDigits: 2};
@@ -29,12 +31,16 @@ class TransactionDetails extends React.Component {
   render() {
     const { intl, collective, LoggedInUser, transaction } = this.props;
     const type = transaction.type.toLowerCase();
-
-    const amountDetails = [intl.formatNumber(transaction.amount / 100, { currency: transaction.currency, ...this.currencyStyle})];
+    const hostFeePercent = `${transaction.host.hostFeePercent}%`;
+    const amountDetails = [intl.formatNumber(transaction.amount / 100, { currency: transaction.currency, ...this.currencyStyle })];
+    if (transaction.hostCurrencyFxRate && transaction.hostCurrencyFxRate !== 1) {
+      const amountInHostCurrency = transaction.amount * transaction.hostCurrencyFxRate;
+      amountDetails.push(` (${intl.formatNumber(amountInHostCurrency / 100, { currency: transaction.hostCurrency, ...this.currencyStyle })})`);
+    }
     const addFees = (feesArray) => {
       feesArray.forEach(feeName => {
         if (transaction[feeName]) {
-          amountDetails.push(`${intl.formatNumber(transaction[feeName] / 100, { currency: collective.currency, ...this.currencyStyle})} (${intl.formatMessage(this.messages[feeName])})`);
+          amountDetails.push(`${intl.formatNumber(transaction[feeName] / 100, { currency: transaction.hostCurrency, ...this.currencyStyle })} (${intl.formatMessage(this.messages[feeName], { hostFeePercent })})`);
         }
       })
     }
@@ -105,16 +111,24 @@ class TransactionDetails extends React.Component {
             }
           </div>
         }
-        <div className="col">
-          <label><FormattedMessage id="transaction.host" defaultMessage="host" /></label>
-          {transaction.host.name}
-        </div>
+        { get(transaction, 'host.name') &&
+          <div className="col">
+            <label><FormattedMessage id="transaction.host" defaultMessage="host" /></label>
+            {transaction.host.name} ({transaction.hostCurrency})
+          </div>
+        }
         <div className="col">
           <label><FormattedMessage id="transaction.paymentMethod" defaultMessage="payment method" /></label>
           {transaction.paymentMethod && capitalize(transaction.paymentMethod.service)}
         </div>
+        { transaction.hostCurrencyFxRate && transaction.hostCurrencyFxRate !== 1 &&
+          <div className="col">
+            <label><FormattedMessage id="transaction.fxrate" defaultMessage="fx rate" /></label>
+            {transaction.hostCurrencyFxRate}
+          </div>
+        }
         <div className="col">
-          <label><FormattedMessage id="transaction.amount" defaultMessage="amount" /></label>
+          <label><FormattedMessage id="transaction.amountDetails" defaultMessage="amount details" /></label>
           <div className="amountDetails">
             { amountDetailsStr &&
               <span>
@@ -125,9 +139,13 @@ class TransactionDetails extends React.Component {
             <span className="netAmountInCollectiveCurrency">
               <FormattedNumber
                 value={transaction.netAmountInCollectiveCurrency / 100}
-                currency={collective.currency}
+                currency={transaction.currency}
                 {...this.currencyStyle}
                 />
+            </span>
+            &nbsp;
+            <span className="netAmountInCollectiveCurrencyDescription">
+              (<FormattedMessage id="transaction.netAmountInCollectiveCurrency.description" defaultMessage="net amount added to your collective's balance" />)
             </span>
           </div>
         </div>

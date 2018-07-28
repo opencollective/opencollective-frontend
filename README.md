@@ -64,6 +64,8 @@ You can run the tests using `npm test` or more specifically `npm run test:src`, 
 
 End-to-end tests are using [Cypress](https://www.cypress.io/). 
 
+To update the Jest snapshots, run `npm run test:src -- -u`
+
 ## Stack
 
 We are using NodeJS.

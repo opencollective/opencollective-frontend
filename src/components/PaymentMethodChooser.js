@@ -160,12 +160,15 @@ class PaymentMethodChooser extends React.Component {
   generatePMString(pm) {
     const { intl } = this.props;
 
+    if (pm.service === 'opencollective') {
+      return `${pm.name} (${pm.service} ${pm.type})`;
+    }
+
     const defaultString = intl.formatMessage(this.messages['paymentMethod.cardUnavailable']);
 
     if (!pm.name || !pm.data) return defaultString;
 
-    const pmData = Object.assign({},pm.data);
-
+    const pmData = Object.assign({}, pm.data);
     // Deal with long names
     if (pmData.brand.toLowerCase() === 'american express') {
       pmData.brand = 'AMEX';
@@ -192,7 +195,7 @@ class PaymentMethodChooser extends React.Component {
       });
     }
 
-    paymentMethods = (this.props.paymentMethodsList || []).filter(pm => pm.service === 'stripe');
+    paymentMethods = (this.props.paymentMethodsList || []).filter(pm => ['stripe', 'opencollective'].includes(pm.service));
     paymentMethodsOptions = generateOptions(paymentMethods);
 
     paymentMethodsOptions.push({'add': intl.formatMessage(this.messages['paymentMethod.add'])});

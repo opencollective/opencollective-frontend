@@ -272,7 +272,7 @@ class UserCollective extends React.Component {
                   { LoggedInUser && LoggedInUser.canEditCollective(collective) &&
                     <div className="adminActions" id="adminActions">
                       <ul>
-                        <li><Link route={`/${collective.slug}/collectives/expenses`}><FormattedMessage id="host.collectives.manageExpenses" defaultMessage="manage expenses" /></Link></li>
+                        <li><Link route={`/${collective.slug}/dashboard`}><FormattedMessage id="host.dashboard" defaultMessage="Dashboard" /></Link></li>
                       </ul>
                     </div>
                   }

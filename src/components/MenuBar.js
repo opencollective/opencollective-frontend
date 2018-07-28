@@ -181,12 +181,12 @@ class MenuBar extends React.Component {
     }
 
     const { collective } = this.props;
-    const collectiveId = collective.id;
-    const hostCollectiveId = form.FromCollectiveId;
+    const CollectiveId = collective.id;
+    const HostCollectiveId = form.FromCollectiveId;
     const params = {
       ...pick(form, ['totalAmount', 'description']),
-      collectiveId,
-      hostCollectiveId,
+      CollectiveId,
+      HostCollectiveId,
     };
     this.setState({ loading: true });
     try {
@@ -281,6 +281,7 @@ class MenuBar extends React.Component {
         { LoggedInUser &&
           LoggedInUser.isRoot() && /* Only Site admins can do that for now */
           LoggedInUser.hostsUserIsAdminOf() && /* Don't show button if user isn't admin anywhere */
+          collective.type === 'ORGANIZATION' && /* We can only create a prepaid card for an organization */
           !collective.isHost && /* If the collective being browsed is a host, don't show either */
           <div>
             <div className="item editCollective">
@@ -291,6 +292,21 @@ class MenuBar extends React.Component {
                 >
                 <FormattedMessage
                   id="menu.addFunds" defaultMessage="Add funds" />
+              </Button>
+            </div>
+          </div>
+        }
+        { collective.isHost &&
+          LoggedInUser &&
+          LoggedInUser.canEditCollective(collective) &&
+          <div>
+            <div className="item editCollective">
+              <Button
+                className="darkBackground"
+                href={`/${collective.slug}/dashboard`}
+                >
+                <FormattedMessage
+                  id="host.dashboard" defaultMessage="Dashboard" />
               </Button>
             </div>
           </div>
@@ -519,8 +535,8 @@ class MenuBar extends React.Component {
 }
 
 const addFundsToOrgQuery = gql`
-mutation addFundsToOrg($totalAmount: Int!, $collectiveId: Int!, $hostCollectiveId: Int!, $description: String) {
-  addFundsToOrg(totalAmount: $totalAmount, collectiveId: $collectiveId, hostCollectiveId: $hostCollectiveId, description: $description) {
+mutation addFundsToOrg($totalAmount: Int!, $CollectiveId: Int!, $HostCollectiveId: Int!, $description: String) {
+  addFundsToOrg(totalAmount: $totalAmount, CollectiveId: $CollectiveId, HostCollectiveId: $HostCollectiveId, description: $description) {
     id
   }
 }

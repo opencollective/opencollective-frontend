@@ -85,7 +85,7 @@ class ConnectPaypal extends React.Component {
           { paypalPaymentMethod &&
           <div style={{ textAlign: 'center' }}>
             <div className="balance">
-              <FormattedMessage id="collective.stats.balance.title" defaultMessage="Available balance:" />
+              <FormattedMessage id="host.dashboard.paypal.balance" defaultMessage="PayPal card balance:" />
               <div className="amount">
                 <Currency value={paypalPaymentMethod.balance} currency={paypalPaymentMethod.currency} />
               </div>

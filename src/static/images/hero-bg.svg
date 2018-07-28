@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="2484px" height="1239px" viewBox="0 0 2484 1239" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 50.2 (55047) - http://www.bohemiancoding.com/sketch -->
+    <title>:: hero</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <linearGradient x1="33.1074648%" y1="100%" x2="107.501472%" y2="0%" id="linearGradient-1">
+            <stop stop-color="#FEFEFF" offset="0%"></stop>
+            <stop stop-color="#EBF1FA" offset="62.3532334%"></stop>
+            <stop stop-color="#EBF1FA" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="0%" y1="100%" x2="177.327664%" y2="-2.22658913%" id="linearGradient-2">
+            <stop stop-color="#FEFEFF" offset="0%"></stop>
+            <stop stop-color="#EBF1FA" offset="100%"></stop>
+        </linearGradient>
+        <path d="M2049.83745,143.88742 L1860.88115,332.981783 C1793.74368,295.846068 1716.54216,274.709072 1634.41071,274.709072 C1375.44358,274.709072 1165.49862,484.823652 1165.49862,744 C1165.49862,1003.17635 1375.44358,1213.29093 1634.41071,1213.29093 C1716.54216,1213.29093 1793.74368,1192.15393 1860.88115,1155.01822 L2049.83745,1344.11258 C1931.94214,1426.00384 1788.78458,1474 1634.41071,1474 C1231.57133,1474 905,1147.16483 905,744 C905,340.83517 1231.57133,14 1634.41071,14 C1788.78458,14 1931.94214,61.9961607 2049.83745,143.88742 Z M2235.12158,327.867011 C2317.00716,445.82901 2365,589.067538 2365,743.528728 C2365,897.989918 2317.00716,1041.24304 2235.12158,1159.19045 L2046.04031,970.141857 C2083.17346,902.966417 2104.30899,825.706635 2104.30899,743.528728 C2104.30899,661.350822 2083.17346,584.105633 2046.04031,516.930193 L2235.12158,327.867011 Z" id="path-3"></path>
+        <filter x="-6.8%" y="-6.8%" width="119.2%" height="119.2%" filterUnits="objectBoundingBox" id="filter-4">
+            <feOffset dx="40" dy="40" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
+            <feGaussianBlur stdDeviation="40" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
+            <feColorMatrix values="0 0 0 0 0.305882353   0 0 0 0 0.474509804   0 0 0 0 0.733333333  0 0 0 0.12 0" type="matrix" in="shadowBlurOuter1"></feColorMatrix>
+        </filter>
+    </defs>
+    <g id="Homepage" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Homepage---XL,-L,-M-(hd-desktop,-desktop,-hd-laptop,-laptop)">
+            <g id="BACKGROUND" transform="translate(0.000000, -353.000000)">
+                <g id="::-hero">
+                    <path d="M1643,1480 C2051.69071,1480 2383,1148.69071 2383,740 C2383,331.309285 2051.69071,0 1643,0 C1471.63682,0 923.970152,0 0,0 L0,1480 C822.872857,1480 1370.53952,1480 1643,1480 Z" id="base" fill="url(#linearGradient-1)"></path>
+                    <g id="symbol">
+                        <use fill="black" fill-opacity="1" filter="url(#filter-4)" xlink:href="#path-3"></use>
+                        <use fill="url(#linearGradient-2)" fill-rule="evenodd" xlink:href="#path-3"></use>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

@@ -79,7 +79,7 @@ class ExpensesStatsWithData extends React.Component {
 }
 
 const getExpensesStatsQuery = gql`
-  query Collective($slug: String!) {
+  query Collective($slug: String) {
     Collective(slug: $slug) {
       id
       currency

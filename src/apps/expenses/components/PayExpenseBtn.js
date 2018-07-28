@@ -62,7 +62,7 @@ class PayExpenseBtn extends React.Component {
     }
     if (get(collective, 'stats.balance') < expense.amount ) {
       disabled = true;
-      error = <FormattedMessage id="expense.pay.errror.insufficientBalance" defaultMessage="Insufficient balance" />
+      error = <FormattedMessage id="expense.pay.error.insufficientBalance" defaultMessage="Insufficient balance" />
     }
     return (
       <div className="PayExpenseBtn">

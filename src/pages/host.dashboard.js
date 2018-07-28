@@ -104,11 +104,13 @@ class HostExpensesPage extends React.Component {
             style={get(collective, 'settings.style.hero.cover')}
             />
 
-          <CollectivePicker
-            hostCollectiveSlug={this.props.collectiveSlug}
-            LoggedInUser={LoggedInUser}
-            onChange={(selectedCollective => this.pickCollective(selectedCollective))}
-            />
+          { LoggedInUser &&
+            <CollectivePicker
+              hostCollectiveSlug={this.props.collectiveSlug}
+              LoggedInUser={LoggedInUser}
+              onChange={(selectedCollective => this.pickCollective(selectedCollective))}
+              />
+          }
 
           <div className="content">
 
@@ -140,7 +142,7 @@ class HostExpensesPage extends React.Component {
 }
 
 const getDataQuery = gql`
-query Collective($collectiveSlug: String!) {
+query Collective($collectiveSlug: String) {
   Collective(slug: $collectiveSlug) {
     id
     type

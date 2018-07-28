@@ -135,7 +135,23 @@ class EditCollective extends React.Component {
     if (!CollectiveInputType) {
       return false;
     }
-    console.log(">>> editCollective", CollectiveInputType);
+
+    if (typeof CollectiveInputType.tags === 'string') {
+      CollectiveInputType.tags = CollectiveInputType.tags.split(',').map(t => t.trim());
+    }
+
+    const { collective } = this.props;
+    CollectiveInputType.settings = {
+      ...collective.settings,
+      goals: CollectiveInputType.goals,
+      editor: CollectiveInputType.markdown ? 'markdown' : 'html',
+      sendInvoiceByEmail: CollectiveInputType.sendInvoiceByEmail,
+      tos: CollectiveInputType.tos,
+    };
+    delete CollectiveInputType.goals;
+    delete CollectiveInputType.markdown;
+    delete CollectiveInputType.sendInvoiceByEmail;
+    delete CollectiveInputType.tos;
     this.setState( { status: 'loading' });
     try {
       const res = await this.props.editCollective(CollectiveInputType);

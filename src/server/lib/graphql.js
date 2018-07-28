@@ -14,7 +14,7 @@ function getClient() {
 
 export async function fetchCollective(collectiveSlug) {
   const query = `
-  query Collective($collectiveSlug: String!) {
+  query Collective($collectiveSlug: String) {
     Collective(slug:$collectiveSlug) {
       id
       slug
@@ -38,7 +38,7 @@ export async function fetchCollective(collectiveSlug) {
 
 export async function fetchCollectiveImage(collectiveSlug) {
   const query = `
-  query Collective($collectiveSlug: String!) {
+  query Collective($collectiveSlug: String) {
     Collective(slug:$collectiveSlug) {
       id
       image
@@ -56,7 +56,7 @@ export async function fetchMembersStats(params) {
 
   if (backerType) {
     query = `
-    query Collective($collectiveSlug: String!) {
+    query Collective($collectiveSlug: String) {
       Collective(slug:$collectiveSlug) {
         stats {
           backers {
@@ -77,7 +77,7 @@ export async function fetchMembersStats(params) {
     }
   } else if (tierSlug) {
     query = `
-    query Collective($collectiveSlug: String!, $tierSlug: String) {
+    query Collective($collectiveSlug: String, $tierSlug: String) {
       Collective(slug:$collectiveSlug) {
         tiers(slug: $tierSlug) {
           slug
@@ -106,7 +106,7 @@ export async function fetchMembers({ collectiveSlug, tierSlug, backerType, isAct
   let query, processResult, type, role;
   if (backerType === 'contributors') {
     query = `
-    query Collective($collectiveSlug: String!) {
+    query Collective($collectiveSlug: String) {
       Collective(slug:$collectiveSlug) {
         id
         data
@@ -150,7 +150,7 @@ export async function fetchMembers({ collectiveSlug, tierSlug, backerType, isAct
     processResult = (res) => uniqBy(res.allMembers.map(m => m.member), m => m.id);
   } else if (tierSlug) {
     query = `
-    query Collective($collectiveSlug: String!, $tierSlug: String!, $isActive: Boolean) {
+    query Collective($collectiveSlug: String, $tierSlug: String!, $isActive: Boolean) {
       Collective(slug:$collectiveSlug) {
         tiers(slug: $tierSlug) {
           orders(isActive: $isActive) {
@@ -204,7 +204,7 @@ export async function fetchEvents(parentCollectiveSlug, options = { limit: 10 })
 
 export async function fetchEvent(eventSlug) {
   const query = `
-  query Collective($slug: String!) {
+  query Collective($slug: String) {
     Collective(slug:$slug) {
       id
       name

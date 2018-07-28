@@ -251,6 +251,7 @@ class Collective extends React.Component {
                       type="ORGANIZATION"
                       LoggedInUser={LoggedInUser}
                       role="BACKER"
+                      orderBy="totalDonations"
                       limit={100}
                       />
 

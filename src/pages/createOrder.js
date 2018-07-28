@@ -205,7 +205,7 @@ class CreateOrderPage extends React.Component {
 }
 
 const addData = graphql(gql`
-query Collective($slug: String!) {
+query Collective($slug: String) {
   Collective(slug: $slug) {
     id
     slug

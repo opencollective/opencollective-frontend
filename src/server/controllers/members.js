@@ -37,7 +37,7 @@ export async function list(req, res) {
   const client = new GraphQLClient(getGraphqlUrl(), { headers });
 
   const query = `
-  query Collective($collectiveSlug: String!, $backerType: String, $tierSlug: String, $TierId: Int, $limit: Int, $offset: Int, $role: String) {
+  query Collective($collectiveSlug: String, $backerType: String, $tierSlug: String, $TierId: Int, $limit: Int, $offset: Int, $role: String) {
     Collective(slug:$collectiveSlug) {
       currency
       members(type: $backerType, role: $role, tierSlug: $tierSlug, TierId: $TierId, limit: $limit, offset: $offset) {
