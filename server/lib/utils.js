@@ -354,13 +354,13 @@ export const getTiersStats = (tiers, startDate, endDate) => {
         return a.index - b.index; // make sure we keep the original order within a tier (typically totalDonations DESC)
       });
 
-      tier.users = backers;
+      tier.activeBackers = backers.filter(b => !b.isLost);
 
       return tier;
     });
   })
   .then(tiers => {
-    return { stats, tiers};
+    return { stats, tiers };
   });
 }
 

@@ -95,6 +95,13 @@ export async function dropDatabaseQuery(client, database) {
   const exists = await client.query(
     'SELECT 1 FROM pg_database WHERE datname=$1', [database]);
   if (exists.rowCount) {
+    await client.query(
+      `UPDATE pg_database SET datallowconn = 'false'
+       WHERE datname = '${database}';
+       ALTER DATABASE ${database} CONNECTION LIMIT 1;`);
+    await client.query(
+      `SELECT pg_terminate_backend(pid) FROM pg_stat_activity
+       WHERE datname = '${database}';`);
     await client.query(format('DROP DATABASE %s;', database));
     console.log(`database ${database} droped`);
   } else {

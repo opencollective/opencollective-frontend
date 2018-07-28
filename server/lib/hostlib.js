@@ -49,22 +49,32 @@ export function getBackersStats(startDate = new Date('2015-01-01'), endDate = ne
   });
 }
 
-export function sumTransactionsByCurrency(attribute = 'netAmountInCollectiveCurrency', where) {
-  const query = {
-    attributes: [ [sequelize.fn('SUM', sequelize.col(attribute)), 'amount'], 'currency' ],
-    group: ['currency'],
-    where
+export function sumTransactionsBy(groupBy, attribute, query) {
+  const findAllQuery = {
+    attributes: [ [sequelize.fn('SUM', sequelize.col(attribute)), 'amount'], groupBy ],
+    group: [`Transaction.${groupBy}`],
+    ...query
   };
-  return models.Transaction.findAll(query)
-    .then(rows => rows.map(r => r.dataValues))
-    ;
+  return models.Transaction.findAll(findAllQuery)
+    .then(rows => {
+      // when it's a raw query, the result is not in dataValues
+      if (query.raw) {
+        return rows;
+      } else {
+        return rows.map(r => r.dataValues);
+      }
+    });
+}
+
+export function sumTransactionsByCurrency(attribute = 'netAmountInCollectiveCurrency', query) {
+  return sumTransactionsBy("currency", attribute, query);
 }
 
 /**
  * Sum an attribute of the Transactions table and return the result by currency with the total in host currency
  *
  * @param {*} attribute column to sum, e.g. 'netAmountInCollectiveCurrency' or 'hostFeeInHostCurrency'
- * @param {*} where where clause to reduce the scope
+ * @param {*} query query clause to reduce the scope
  * @param {*} hostCurrency currency of the host
  *
  * @post {
@@ -72,12 +82,13 @@ export function sumTransactionsByCurrency(attribute = 'netAmountInCollectiveCurr
  *   totalInHostCurrency: Float!
  * }
  */
-export function sumTransactions(attribute, where = {}, hostCurrency, date) {
+export function sumTransactions(attribute, query = {}, hostCurrency, date) {
+  const { where } = query;
   if (where.createdAt) {
     date = date || where.createdAt[Op.lt] || where.createdAt[Op.gte];
   }
   const res = {};
-  return sumTransactionsByCurrency(attribute, where)
+  return sumTransactionsByCurrency(attribute, query)
     .tap(amounts => {
       res.byCurrency = amounts;
     })

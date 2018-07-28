@@ -5,11 +5,9 @@ import debugLib from 'debug';
 import models, { sequelize, Op } from '../server/models';
 import emailLib from '../server/lib/email';
 import config from 'config';
-import { exportToCSV, exportToPDF } from '../server/lib/utils';
+import { exportToPDF } from '../server/lib/utils';
 import { getTransactions } from '../server/lib/transactions';
 import { getHostedCollectives, getBackersStats, sumTransactions } from '../server/lib/hostlib';
-import path from 'path';
-import fs from 'fs';
 
 const debug = debugLib('hostreport');
 
@@ -100,21 +98,21 @@ async function HostReport(year, month, hostId) {
           return 0;
         }
         return Promise.all([
-          sumTransactions('netAmountInCollectiveCurrency', where, 'USD', now).catch(catchError),                      // total host balance
-          sumTransactions('netAmountInCollectiveCurrency', { ...where, ...dateRange}, 'USD', now).catch(catchError),   // delta host balance last month
-          sumTransactions('amount', { ...where, type: 'CREDIT', ...dateRange, platformFeeInHostCurrency: { [Op.gt]: 0 }}, 'USD', now).catch(catchError), // total donations last month excluding  "add funds"
-          sumTransactions('amount', { ...where, type: 'CREDIT', ...previousDateRange, platformFeeInHostCurrency: { [Op.gt]: 0 }}, 'USD', now).catch(catchError), // total donations last month excluding  "add funds" previous month
-          sumTransactions('amount', { ...where, type: 'CREDIT', ...dateRange, platformFeeInHostCurrency: { [Op.or]: [null, 0 ] } }, 'USD', now).catch(catchError), // total "add funds" last month
-          sumTransactions('amount', { ...where, type: 'CREDIT', ...previousDateRange, platformFeeInHostCurrency: { [Op.or]: [null, 0 ] } }, 'USD', now).catch(catchError), // total "add funds" previous month
-          sumTransactions('netAmountInCollectiveCurrency', { ...where, type: 'CREDIT', ...dateRange}, 'USD', now).catch(catchError), // total net amount received last month (after processing fee and host fees)
-          sumTransactions('netAmountInCollectiveCurrency', { ...where, type: 'DEBIT', ...dateRange}, 'USD', now).catch(catchError),  // total net amount paid out last month
-          sumTransactions('netAmountInCollectiveCurrency', { ...where, type: 'DEBIT', ...previousDateRange}, 'USD', now).catch(catchError),  // total net amount paid out previous month
-          sumTransactions("hostFeeInHostCurrency", { ...where, ...dateRange }, 'USD', now).catch(catchError),
-          sumTransactions("hostFeeInHostCurrency", { ...where, ...previousDateRange }, 'USD', now).catch(catchError),
-          sumTransactions("paymentProcessorFeeInHostCurrency", { ...where, ...dateRange }, 'USD', now).catch(catchError),
-          sumTransactions("paymentProcessorFeeInHostCurrency", { ...where, ...previousDateRange }, 'USD', now).catch(catchError),
-          sumTransactions("platformFeeInHostCurrency", { ...where, ...dateRange }, 'USD', now).catch(catchError),
-          sumTransactions("platformFeeInHostCurrency", { ...where, ...previousDateRange }, 'USD', now).catch(catchError),
+          sumTransactions('netAmountInCollectiveCurrency', { where }, 'USD', now).catch(catchError),                      // total host balance
+          sumTransactions('netAmountInCollectiveCurrency', { where: { ...where, ...dateRange} }, 'USD', now).catch(catchError),   // delta host balance last month
+          sumTransactions('amount', { where, type: 'CREDIT', ...dateRange, platformFeeInHostCurrency: { [Op.gt]: 0 }}, 'USD', now).catch(catchError), // total donations last month excluding  "add funds"
+          sumTransactions('amount', { where, type: 'CREDIT', ...previousDateRange, platformFeeInHostCurrency: { [Op.gt]: 0 }}, 'USD', now).catch(catchError), // total donations last month excluding  "add funds" previous month
+          sumTransactions('amount', { where, type: 'CREDIT', ...dateRange, platformFeeInHostCurrency: { [Op.or]: [null, 0 ] } }, 'USD', now).catch(catchError), // total "add funds" last month
+          sumTransactions('amount', { where, type: 'CREDIT', ...previousDateRange, platformFeeInHostCurrency: { [Op.or]: [null, 0 ] } }, 'USD', now).catch(catchError), // total "add funds" previous month
+          sumTransactions('netAmountInCollectiveCurrency', { where, type: 'CREDIT', ...dateRange}, 'USD', now).catch(catchError), // total net amount received last month (after processing fee and host fees)
+          sumTransactions('netAmountInCollectiveCurrency', { where, type: 'DEBIT', ...dateRange}, 'USD', now).catch(catchError),  // total net amount paid out last month
+          sumTransactions('netAmountInCollectiveCurrency', { where, type: 'DEBIT', ...previousDateRange}, 'USD', now).catch(catchError),  // total net amount paid out previous month
+          sumTransactions("hostFeeInHostCurrency", { where: { ...where, ...dateRange  }}, 'USD', now).catch(catchError),
+          sumTransactions("hostFeeInHostCurrency", { where: { ...where, ...previousDateRange  }}, 'USD', now).catch(catchError),
+          sumTransactions("paymentProcessorFeeInHostCurrency", { where: { ...where, ...dateRange  }}, 'USD', now).catch(catchError),
+          sumTransactions("paymentProcessorFeeInHostCurrency", { where: { ...where, ...previousDateRange  }}, 'USD', now).catch(catchError),
+          sumTransactions("platformFeeInHostCurrency", { where: { ...where, ...dateRange  }}, 'USD', now).catch(catchError),
+          sumTransactions("platformFeeInHostCurrency", { where: { ...where, ...previousDateRange  }}, 'USD', now).catch(catchError),
           getBackersStats(startDate, endDate)
         ])
       });
@@ -122,21 +120,30 @@ async function HostReport(year, month, hostId) {
 
   const getHostStats = (host, collectiveids) => {
 
-    const where = {
-      CollectiveId: { [Op.in]: collectiveids }
-    };
+    const where = { CollectiveId: { [Op.in]: collectiveids } };
+    const whereWithDateRange = { ...where, ...dateRange};
 
-    return Promise.all([
-      sumTransactions('netAmountInCollectiveCurrency', where, host.currency),                      // total host balance
-      sumTransactions('netAmountInCollectiveCurrency', { ...where, ...dateRange}, host.currency),   // delta host balance last month
-      sumTransactions('amount', { type: 'CREDIT', ...where, ...dateRange}, host.currency), // total donations last month
-      sumTransactions('netAmountInCollectiveCurrency', { type: 'CREDIT', ...where, ...dateRange}, host.currency), // total net amount received last month
-      sumTransactions('netAmountInCollectiveCurrency', { type: 'DEBIT', ...where, ...dateRange}, host.currency),  // total net amount paid out last month
-      sumTransactions("hostFeeInHostCurrency", {...where, ...dateRange}, host.currency),
-      sumTransactions("paymentProcessorFeeInHostCurrency", {...where, ...dateRange}, host.currency),
-      sumTransactions("platformFeeInHostCurrency", {...where, ...dateRange}, host.currency),
-      getBackersStats(startDate, endDate, collectiveids)
-    ]);
+    const payoutProcessorFeesQuery = (service) => {
+      return {
+        where: { ...where, ...dateRange, type: 'DEBIT'},
+        raw: true,
+        include: [ { attributes: [ [sequelize.fn('MAX', sequelize.col('service')), 'service'] ], model: models.PaymentMethod, where: { 'service': { [Op.in]: [service, null] } } }]
+      }
+    }
+
+    return Promise.props({
+      balance:                    sumTransactions('netAmountInCollectiveCurrency', { where: { ...where, createdAt: { [Op.lt]: endDate } } }, host.currency), // total host balance
+      delta:                      sumTransactions('netAmountInCollectiveCurrency', { where: whereWithDateRange }, host.currency), // delta host balance last month
+      totalAmountDonations:       sumTransactions('amount', { where: { ...whereWithDateRange, type: 'CREDIT' } }, host.currency), // total donations last month
+      totalNetAmountReceivedForCollectives: sumTransactions('netAmountInCollectiveCurrency', { where: { ...whereWithDateRange, type: 'CREDIT' } }, host.currency), // total net amount received last month
+      totalAmountPaidExpenses:    sumTransactions('netAmountInCollectiveCurrency', { where: { ...whereWithDateRange, type: 'DEBIT' } }, host.currency), // total net amount paid out last month
+      totalHostFees:              sumTransactions("hostFeeInHostCurrency", { where: whereWithDateRange }, host.currency),
+      backers:                    getBackersStats(startDate, endDate, collectiveids),
+      platformFees:               sumTransactions("platformFeeInHostCurrency", { where: whereWithDateRange }, host.currency),
+      paymentProcessorFees:       sumTransactions("paymentProcessorFeeInHostCurrency", { where: { ...whereWithDateRange, type: 'CREDIT'} }, host.currency), // total stripe fees
+      payoutProcessorFeesPaypal:  sumTransactions("paymentProcessorFeeInHostCurrency", payoutProcessorFeesQuery("paypal"), host.currency), // total paypal fees
+      payoutProcessorFeesManual:  sumTransactions("paymentProcessorFeeInHostCurrency", payoutProcessorFeesQuery("opencollective"), host.currency) // total other payout processor fees (manual host fee)
+    });
   }
 
   const processHost = (host) => {
@@ -169,14 +176,14 @@ async function HostReport(year, month, hostId) {
         return models.User.findAll({ where: { CollectiveId: host.id }}).map(u => u.email);
       }
       return models.Member.findAll({
-        where: {
+       where: {
           CollectiveId: host.id,
           role: 'ADMIN',
         }
       }).map(admin => {
         return models.User.findOne({
           attributes: ['email'],
-          where: { CollectiveId: admin.MemberCollectiveId }
+         where: { CollectiveId: admin.MemberCollectiveId }
         }).then(user => user.email)
       }, { concurrency: 1 })
     };
@@ -238,29 +245,7 @@ async function HostReport(year, month, hostId) {
       })
       .map(processTransaction)
       .tap(transactions => {
-
-        const getColumnName = (attr) => {
-          if (attr === 'CollectiveId') return "collective";
-          if (attr === 'Expense.privateMessage') return "private note";
-          else return attr;
-        }
-
-        const processValue = (attr, value) => {
-          if (attr === "CollectiveId") return collectivesById[value].slug;
-          if (['amount', 'netAmountInCollectiveCurrency', 'paymentProcessorFeeInHostCurrency', 'hostFeeInHostCurrency', 'platformFeeInHostCurrency', 'netAmountInHostCurrency'].indexOf(attr) !== -1) {
-            return value / 100; // converts cents
-          }
-          return value;
-        }
-
-        const csv = exportToCSV(transactions,
-          [
-            'id', 'createdAt', 'CollectiveId', 'amount', 'currency', 'description', 'netAmountInCollectiveCurrency', 'hostCurrency', 'hostCurrencyFxRate',
-            'paymentProcessorFeeInHostCurrency', 'hostFeeInHostCurrency', 'platformFeeInHostCurrency', 'netAmountInHostCurrency', 'Expense.privateMessage'
-          ],
-          getColumnName,
-          processValue);
-
+        const csv = models.Transaction.exportCSV(transactions, collectivesById);
         attachments.push({
           filename: csv_filename,
           content: csv
@@ -278,23 +263,25 @@ async function HostReport(year, month, hostId) {
       })
       .then(() => getHostStats(host, Object.keys(collectivesById)))
       .then(stats => {
+        stats.totalAmountPaid = {
+          totalInHostCurrency: stats.totalAmountPaidExpenses.totalInHostCurrency + stats.paymentProcessorFees.totalInHostCurrency + stats.platformFees.totalInHostCurrency
+        };
+        stats.totalAmountSpent = {
+          totalInHostCurrency: stats.totalAmountPaidExpenses.totalInHostCurrency + stats.payoutProcessorFeesPaypal.totalInHostCurrency
+        };
+        stats.totalHostRevenue = {
+          totalInHostCurrency: stats.totalHostFees.totalInHostCurrency + stats.payoutProcessorFeesManual.totalInHostCurrency
+        };
+        stats.totalNetAmountReceived = {
+          totalInHostCurrency: stats.totalNetAmountReceivedForCollectives.totalInHostCurrency - stats.totalHostFees.totalInHostCurrency // totalHostFees is negative
+        };
+
         data.stats = {
           ... data.stats,
+          ... stats,
           totalActiveCollectives: Object.keys(_.indexBy(data.transactions, "CollectiveId")).length,
           numberTransactions: data.transactions.length,
-          balance: stats[0],
-          delta: stats[1],
-          numberDonations: data.transactions.length - data.stats.numberPaidExpenses,
-          totalAmountDonations: stats[2],
-          totalNetAmountReceivedForCollectives: stats[3],
-          totalAmountPaidExpenses: stats[4],
-          totalHostFees: stats[5],
-          paymentProcessorFees: stats[6],
-          platformFees: stats[7],
-          backers: stats[8]
-        };
-        data.stats.totalNetAmountReceived = {
-          totalInHostCurrency: data.stats.totalNetAmountReceivedForCollectives.totalInHostCurrency + data.stats.totalHostFees.totalInHostCurrency
+          numberDonations: data.transactions.length - data.stats.numberPaidExpenses
         };
         summary.hosts.push({
           host: { name: host.name, slug: host.slug, currency: host.currency },
@@ -324,17 +311,7 @@ async function HostReport(year, month, hostId) {
       // debug("email data transactions", data.transactions);
       debug("email data stats", data.stats);
       debug("email data stats.backers", data.stats.backers);
-      const options = {
-        attachments
-      }
-      if (process.env.DEBUG && process.env.DEBUG.match(/preview/)) {
-        attachments.map(attachment => {
-          const filepath = path.resolve(`/tmp/${data.host.slug}-${attachment.filename}`);
-          fs.writeFileSync(filepath, attachment.content);
-          console.log(">>> preview attachment", filepath);
-        })
-        recipients.push("ops+test@opencollective.com");
-      }
+      const options = { attachments };
       return emailLib.send(emailTemplate, recipients, data, options);
   }
 
@@ -353,7 +330,7 @@ async function HostReport(year, month, hostId) {
   .then(() => !process.env.SKIP_PLATFORM_STATS && getPlatformStats())
   .then(platformStats => {
     const timeLapsed = Math.round((new Date - startTime)/1000); // in seconds
-    console.log(`Total run time: ${timeLapsed}s`);    
+    console.log(`Total run time: ${timeLapsed}s`);
     if (!platformStats) return;
 
     summary.timeLapsed = timeLapsed;

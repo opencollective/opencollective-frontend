@@ -2,7 +2,7 @@ Hi {{recipient.firstName}}!
 
 Here is your {{#if month}}monthly{{else}}yearly{{/if}} report.
 
-Balance as of {{{moment reportDate}}}: {{{currency stats.balance.totalInHostCurrency currency=host.currency}}} ({{{currency stats.delta.totalInHostCurrency currency=host.currency sign=true}}})
+Balance as of {{{moment reportDate}}}: {{{currency stats.balance.totalInHostCurrency currency=host.currency}}} (+{{{currency stats.totalNetAmountReceived.totalInHostCurrency currency=host.currency}}}{{#if stats.totalAmountSpent.totalInHostCurrency}}, {{{currency stats.totalAmountSpent.totalInHostCurrency currency=host.currency}}}{{/if}})
 
 {{{number stats.totalCollectives}}} {{{pluralize "collective" n=stats.totalCollectives}}} ({{{number stats.totalActiveCollectives}}} active)
 {{{number stats.backers.total}}} backers (+{{{number stats.backers.new}}}{{#if stats.backers.lost}}, -{{{number stats.backers.lost}}}{{/if}}) 
@@ -10,29 +10,31 @@ Balance as of {{{moment reportDate}}}: {{{currency stats.balance.totalInHostCurr
 
 Details for the month:
 
-Transactions:                    {{{number stats.numberTransactions}}} ({{{number stats.numberDonations}}} {{{pluralize "donation" n=stats.numberDonations}}}, {{{number stats.numberPaidExpenses}}} {{{pluralize "expense" n=stats.numberPaidExpenses}}} paid)
+Transactions:                          {{{number stats.numberTransactions}}} ({{{number stats.numberDonations}}} {{{pluralize "donation" n=stats.numberDonations}}}, {{{number stats.numberPaidExpenses}}} {{{pluralize "expense" n=stats.numberPaidExpenses}}} paid)
 
-Donations received:              {{{currency stats.totalAmountDonations.totalInHostCurrency currency=host.currency}}}
-Expenses paid:                   {{{currency stats.totalAmountPaidExpenses.totalInHostCurrency currency=host.currency}}}
-
-Payment processor fees:          {{{currency stats.paymentProcessorFees.totalInHostCurrency currency=host.currency}}}
-(Stripe, PayPal)
-
-Platform fees:                   {{{currency stats.platformFees.totalInHostCurrency 
+Donations received (before fees):      {{{currency stats.totalAmountDonations.totalInHostCurrency currency=host.currency}}}
+  Payment processor fees (Stripe):     {{{currency stats.paymentProcessorFees.totalInHostCurrency currency=host.currency}}}
+  Platform fees (Open Collective):     {{{currency stats.platformFees.totalInHostCurrency 
 currency=host.currency}}}
-(Open Collective)
-
-Total amount received:           {{{currency stats.totalNetAmountReceived.totalInHostCurrency currency=host.currency}}}
+----------------------------------------------
+Total amount received:                 {{{currency stats.totalNetAmountReceived.totalInHostCurrency currency=host.currency}}}
 (Total amount transferred to your {{host.name}} bank account)
 
-Host fees:                       {{{currency stats.totalHostFees.totalInHostCurrency currency=host.currency}}}
+Host fees:                             {{{currency stats.totalHostFees.totalInHostCurrency currency=host.currency}}}
 (Commission for {{host.name}})
 
-Net amount:                      {{{currency stats.totalNetAmountReceivedForCollectives.totalInHostCurrency currency=host.currency}}}
+Net amount:                            {{{currency stats.totalNetAmountReceivedForCollectives.totalInHostCurrency currency=host.currency}}}
 (Net amount received for your {{{number stats.totalCollectives}}} {{{pluralize "collective" n=stats.totalCollectives}}})
 
+Expenses paid:                         {{{currency stats.totalAmountPaidExpenses.totalInHostCurrency currency=host.currency}}}
+  Payment processor fees (PayPal):     {{{currency stats.payoutProcessorFeesPaypal.totalInHostCurrency currency=host.currency}}}
+  Payment processor fees (host):       {{{currency stats.payoutProcessorFeesManual.totalInHostCurrency currency=host.currency}}}
+----------------------------------------------
+Total amount spent:                    {{{currency stats.totalAmountSpent.totalInHostCurrency currency=host.currency}}}
+(Total amount that left your {{host.name}} bank account)
 
-🗒 {{transactions.length}} transactions
+
+🗒   {{transactions.length}} transactions
 
 date  {{{col "collective" size=17}}} amount net amount*   description
 {{#each transactions}}
@@ -46,12 +48,12 @@ No transaction.
 
 {{/if}}
 
-📎 Attachments
+📎  Attachments
 - A CSV export of all the transactions of the {{#if month}}month{{else}}year{{/if}}
 - A PDF with all the receipts
 
 
-🗣 Feedback
+🗣  Feedback
 As always, feel free to reply to this email to give us your feedback. A human will always be there on the other side!
 
 

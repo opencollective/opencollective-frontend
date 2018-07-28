@@ -4,6 +4,7 @@ import Promise from 'bluebird';
 import { getFxRate } from '../../lib/currency';
 import * as paymentsLib from '../../lib/payments';
 import { formatCurrency } from '../../lib/utils';
+import roles from '../../constants/roles';
 
 const paymentMethodProvider = {};
 
@@ -119,7 +120,7 @@ paymentMethodProvider.processOrder = async (order, options = {}) => {
     amount: order.totalAmount,
     currency: order.currency,
     hostCurrency: collectiveHost.currency,
-    hostCurrencyFxRate: 1/fxrate,
+    hostCurrencyFxRate: fxrate,
     netAmountInCollectiveCurrency: order.totalAmount * (1 - hostFeePercent/100),
     amountInHostCurrency: totalAmountInPaymentMethodCurrency,
     hostFeeInHostCurrency,
@@ -128,7 +129,13 @@ paymentMethodProvider.processOrder = async (order, options = {}) => {
     description: order.description,
   };
 
-  return models.Transaction.createFromPayload(payload);
+  const transactions = await models.Transaction.createFromPayload(payload);
+
+  const CollectiveId = order.fromCollective.id;
+  const CreatedByUserId = order.createdByUser.id;
+  await order.collective.findOrAddUserWithRole({ id: CreatedByUserId, CollectiveId }, roles.BACKER, { CreatedByUserId, TierId: order.TierId });
+
+  return transactions;
 };
 
 export default paymentMethodProvider;

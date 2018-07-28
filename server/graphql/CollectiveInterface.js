@@ -32,6 +32,7 @@ import {
 import { types } from '../constants/collectives';
 import models, { Op } from '../models';
 import roles from '../constants/roles';
+import { get } from 'lodash';
 
 export const TypeOfCollectiveType = new GraphQLEnumType({
   name: 'TypeOfCollective',
@@ -40,6 +41,7 @@ export const TypeOfCollectiveType = new GraphQLEnumType({
     EVENT: {},
     ORGANIZATION: {},
     USER: {},
+    BOT: {},
   },
 });
 
@@ -47,8 +49,8 @@ export const CollectiveOrderFieldType = new GraphQLEnumType({
   name: 'CollectiveOrderField',
   description: 'Properties by which collectives can be ordered.',
   values: {
-    amountSent: {
-      description: 'Order collective organizations by total money sent to collectives',
+    monthlySpending: {
+      description: 'Order collectives by their average monthly spending (based on last 90 days)',
     },
     balance: {
       description: 'Order collectives by total balance.',
@@ -334,18 +336,27 @@ export const CollectiveStatsType = new GraphQLObjectType({
           return collective;
         }
       },
+      monthlySpending: {
+        description: 'Average amount spent per month based on the last 90 days',
+        type: GraphQLInt,
+        resolve(collective) {
+          // if we fetched the collective with the raw query to sort them by their monthly spending we don't need to recompute it
+          if (get(collective, 'dataValues.monthlySpending')) return get(collective, 'dataValues.monthlySpending');
+          return collective.getMonthlySpending();
+        }
+      },
+      totalAmountSpent: {
+        description: 'Total amount spent',
+        type: GraphQLInt,
+        resolve(collective) {
+          return collective.getTotalAmountSpent();
+        }
+      },
       totalAmountReceived: {
         description: 'Net amount received',
         type: GraphQLInt,
         resolve(collective) {
           return collective.getTotalAmountReceived();
-        }
-      },
-      totalAmountSent: {
-        description: 'Net amount donated to other collectives',
-        type: GraphQLInt,
-        resolve(collective) {
-          return collective.getTotalAmountSent();
         }
       },
       totalAmountRaised: {
@@ -405,6 +416,7 @@ export const CollectiveInterfaceType = new GraphQLInterfaceType({
   resolveType: (collective) => {
     switch (collective.type) {
       case types.COLLECTIVE:
+      case types.BOT:
         return CollectiveType;
 
       case types.USER:
@@ -747,7 +759,7 @@ const CollectiveFields = () => {
 
         if (collective.ParentCollectiveId) {
           return req.loaders.collective.findById.load(collective.ParentCollectiveId)
-            .then(parentCollective => req.loaders.collective.findById.load(parentCollective.HostCollectiveId));
+            .then(parentCollective => parentCollective.HostCollectiveId && req.loaders.collective.findById.load(parentCollective.HostCollectiveId));
         }
 
         return null;

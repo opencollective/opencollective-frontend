@@ -1,6 +1,6 @@
 import Promise from 'bluebird';
 import _ from 'lodash';
-import { capitalize, pluralize, days } from '../lib/utils';
+import { capitalize, pluralize, days, formatCurrency } from '../lib/utils';
 import debugLib from 'debug';
 const debug = debugLib('tier');
 import CustomDataTypes from './DataTypes';
@@ -150,6 +150,19 @@ export default function(Sequelize, DataTypes) {
 
       title() {
         return capitalize(pluralize(this.name));
+      },
+
+      amountStr() {
+        let str;
+        if (this.presets) {
+          str = `${formatCurrency(this.presets[0], this.currency)}+`;
+        } else {
+          str = formatCurrency(this.amount, this.currency);
+        }
+        if (this.interval) {
+          str += ` per ${this.interval}`;
+        }
+        return str;
       }
     }
   });

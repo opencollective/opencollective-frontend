@@ -297,6 +297,24 @@ export default function(Sequelize, DataTypes) {
           backgroundImage: this.backgroundImage,
           publicUrl: this.publicUrl,
           mission: this.mission,
+          description: this.description,
+          settings: this.settings,
+          currency: this.currency
+        }
+      },
+      // used to generate the invoice
+      invoice() {
+        return {
+          id: this.id,
+          createdAt: this.createdAt,
+          name: this.name,
+          slug: this.slug,
+          image: this.image,
+          backgroundImage: this.backgroundImage,
+          publicUrl: this.publicUrl,
+          locationName: this.locationName,
+          address: this.address,
+          description: this.description,
           settings: this.settings,
           currency: this.currency
         }
@@ -610,6 +628,150 @@ export default function(Sequelize, DataTypes) {
     });
   }
 
+  /**
+   * Get new orders in last time period
+   * @param {*} startDate beginning of the time period
+   * @param {*} endDate end of the time period
+   */
+  Collective.prototype.getNewOrders = async function(startDate = 0, endDate = new Date) {
+    const orders = await models.Order.findAll({
+      where: {
+        CollectiveId: this.id,
+        createdAt: { [Op.gte]: startDate, [Op.lt]: endDate }
+      },
+      paranoid: false,
+      include: [
+        { model: models.Collective, as: "fromCollective" },
+        { model: models.Tier }
+      ]
+    });
+    orders.sort((a, b) => {
+      if (a.dataValues.totalAmount > b.dataValues.totalAmount) return -1;
+      else return 1;
+    });
+    return orders;
+  }
+
+  /**
+   * Get orders whose subscription was cancelled during last time period
+   * @param {*} startDate beginning of the time period
+   * @param {*} endDate end of the time period
+   */
+  Collective.prototype.getCancelledOrders = async function(startDate = 0, endDate = new Date) {
+    const orders = await models.Order.findAll({
+      where: {
+        CollectiveId: this.id
+      },
+      include: [
+        {
+          model: models.Subscription,
+          required: true,
+          where: {
+            deactivatedAt: { [Op.gte]: startDate, [Op.lt]: endDate }
+          }
+        },
+        {
+          model: models.Collective,
+          as: "fromCollective"
+        },
+        {
+          model: models.Tier
+        }
+      ]
+    }).map(async (order) => {
+      order.totalTransactions = await order.getTotalTransactions();
+      return order;
+    });
+
+    orders.sort((a, b) => {
+      if (a.dataValues.totalAmount > b.dataValues.totalAmount) return -1;
+      else return 1;
+    });
+
+    return orders;
+  }
+
+  /**
+   * Get the total number of backers (individuals or organizations that have given money to the collective)
+   * @params: { type, since, until }
+   * type: COLLECTIVE/USER/ORGANIZATION or an array of types
+   * until: date till when to count the number of backers
+   */
+  Collective.prototype.getBackersCount = function(options = {}) {
+
+    const query = {
+      attributes: [
+        [Sequelize.fn('COUNT', Sequelize.fn('DISTINCT', Sequelize.col('FromCollectiveId'))), 'count']
+      ],
+      where: {
+        CollectiveId: this.id,
+        FromCollectiveId: { [Op.ne]: this.HostCollectiveId },
+        type: 'CREDIT'
+      }
+    };
+
+    if (options.since) {
+      query.where.createdAt = query.where.createdAt || {};
+      query.where.createdAt[Op.gte] = options.since;
+    }
+    if (options.until) {
+      query.where.createdAt = query.where.createdAt || {};
+      query.where.createdAt[Op.lt] = options.until;
+    }
+
+    if (options.type) {
+      const types = (typeof options.type === 'string') ? [options.type] : options.type;
+      query.include = [
+        {
+          model: models.Collective,
+          as: 'fromCollective',
+          attributes: [],
+          required: true,
+          where: { type: { [Op.in]: types }}
+        }
+      ];
+      query.raw = true; // need this otherwise it automatically also fetches Transaction.id which messes up everything
+    }
+
+    let method;
+    if (options.group) {
+      query.attributes.push('fromCollective.type');
+      query.include = [
+        {
+          model: models.Collective,
+          as: 'fromCollective',
+          attributes: [],
+          required: true
+        }
+      ];
+      query.raw = true; // need this otherwise it automatically also fetches Transaction.id which messes up everything
+      query.group = options.group;
+      method = "findAll";
+    } else {
+      method = "findOne";
+    }
+
+    return models.Transaction[method](query).then(res => {
+        if (options.group) {
+          const stats = { id: this.id };
+          let all = 0;
+          // when it's a raw query, the result is not in dataValues
+          res.forEach(r => {
+            stats[r.type] = r.count;
+            all += r.count;
+          })
+          stats.all = all;
+          debug("getBackersCount", stats);
+          return stats;
+        } else {
+          const result = res.dataValues || res || {};
+          debug("getBackersCount", result);
+          if (!result.count) return 0;
+          return Promise.resolve(Number(result.count));
+        }
+      });
+  };
+
   Collective.prototype.getIncomingOrders = function(options) {
     const query = deepmerge({
       where: { CollectiveId: this.id }
@@ -655,7 +817,7 @@ export default function(Sequelize, DataTypes) {
    *  { name: 'backer', users: [ {UserObject}, {UserObject} ], range: [], ... }
    * ]
    */
-  Collective.prototype.getTiersWithUsers = function(options = { active: false, attributes: ['id', 'username', 'image', 'firstDonation', 'lastDonation', 'totalDonations', 'website'] }) {
+  Collective.prototype.getTiersWithUsers = function(options = {active: false, attributes: ['id', 'username', 'image', 'firstDonation', 'lastDonation', 'totalDonations', 'website'] }) {
     const tiersById = {};
       // Get the list of tiers for the collective (including deleted ones)
     return models.Tier
@@ -994,6 +1156,21 @@ export default function(Sequelize, DataTypes) {
     });
   };
 
+
+  Collective.prototype.getUpdates = function(status, startDate = 0, endDate = new Date) {
+    const where = {
+      createdAt: { [Op.lt]: endDate },
+      CollectiveId: this.id
+    };
+    if (startDate) where.createdAt[Op.gte] = startDate;
+    if (status === 'published') where.publishedAt = { [Op.ne]: null };
+
+    return models.Update.findAll({
+      where,
+      order: [['createdAt','DESC']]
+    });
+  };
+
   Collective.prototype.getTopExpenseCategories = function(startDate, endDate) {
     return queries.getTopExpenseCategories(this.id, { since: startDate, until: endDate });
   };
@@ -1102,22 +1279,28 @@ export default function(Sequelize, DataTypes) {
     .then(result => Promise.resolve(parseInt(result.toJSON().total, 10)));
   };
 
-  // Get the total amount donated to other collectives
-  Collective.prototype.getTotalAmountSent = function(startDate, endDate) {
+  // Get the total amount spent
+  Collective.prototype.getTotalAmountSpent = function(startDate, endDate) {
     endDate = endDate || new Date;
     const where = {
-      amount: { [Op.gt]: 0 },
+      type: 'DEBIT',
       createdAt: { [Op.lt]: endDate },
-      FromCollectiveId: this.id
+      CollectiveId: this.id
     };
     if (startDate) where.createdAt[Op.gte] = startDate;
     return models.Transaction.find({
       attributes: [
-        [Sequelize.fn('COALESCE', Sequelize.fn('SUM', Sequelize.col('amount')), 0), 'total']
+        [Sequelize.fn('COALESCE', Sequelize.fn('SUM', Sequelize.col('netAmountInCollectiveCurrency')), 0), 'total']
       ],
       where
     })
-    .then(result => Promise.resolve(parseInt(result.toJSON().total, 10)));
+    .then(result => Promise.resolve(-parseInt(result.toJSON().total, 10)));
+  };
+
+  // Get the average monthly spending based on last 90 days
+  Collective.prototype.getMonthlySpending = function() {
+    return queries.getCollectivesOrderedByMonthlySpending({ where: { id: this.id }, limit: 1 })
+      .then(res => res.collectives[0] && res.collectives[0].dataValues.monthlySpending);
   };
 
   // Get the total amount raised through referral
@@ -1160,97 +1343,25 @@ export default function(Sequelize, DataTypes) {
     .then(result => Promise.resolve(parseInt(result.toJSON().total, 10)));
   };
 
-  Collective.prototype.getLatestDonations = function(since, until, tags) {
-    tags = tags || [];
+  /**
+   * Get the latest transactions made by this collective
+   * @param {*} since
+   * @param {*} until
+   * @param {*} tags if not null, only takes into account donations made to collectives that contains one of those tags
+   */
+  Collective.prototype.getLatestTransactions = function(since, until, tags) {
+    const conditionOnCollective = {};
+    if (tags) {
+      conditionOnCollective.tags = { [Op.overlap]: tags };
+    }
     return models.Transaction.findAll({
       where: {
         FromCollectiveId: this.id,
         createdAt: { [Op.gte]: since || 0, [Op.lt]: until || new Date}
       },
       order: [ ['amount','DESC'] ],
-      include: [ { model: models.Collective, as: 'collective', where: { tags: { [Op.contains]: tags } } } ]
+      include: [ { model: models.Collective, as: 'collective', where: conditionOnCollective } ]
     });
-  };
-
-  /**
-   * Get the total number of backers (individuals or organizations that have given money to the collective)
-   * @params: { type, since, until }
-   * type: COLLECTIVE/USER/ORGANIZATION or an array of types
-   * until: date till when to count the number of backers
-   */
-  Collective.prototype.getBackersCount = function(options = {}) {
-
-    const query = {
-      attributes: [
-        [Sequelize.fn('COUNT', Sequelize.fn('DISTINCT', Sequelize.col('FromCollectiveId'))), 'count']
-      ],
-      where: {
-        CollectiveId: this.id,
-        FromCollectiveId: { [Op.ne]: this.HostCollectiveId },
-        type: 'CREDIT'
-      }
-    };
-
-    if (options.since) {
-      query.where.createdAt = query.where.createdAt || {};
-      query.where.createdAt[Op.gte] = options.since;
-    }
-    if (options.until) {
-      query.where.createdAt = query.where.createdAt || {};
-      query.where.createdAt[Op.lt] = options.until;
-    }
-
-    if (options.type) {
-      const types = (typeof options.type === 'string') ? [options.type] : options.type;
-      query.include = [
-        {
-          model: models.Collective,
-          as: 'fromCollective',
-          attributes: [],
-          required: true,
-          where: { type: { [Op.in]: types }}
-        }
-      ];
-      query.raw = true; // need this otherwise it automatically also fetches Transaction.id which messes up everything
-    }
-
-    let method;
-    if (options.group) {
-      query.attributes.push('fromCollective.type');
-      query.include = [
-        {
-          model: models.Collective,
-          as: 'fromCollective',
-          attributes: [],
-          required: true
-        }
-      ];
-      query.raw = true; // need this otherwise it automatically also fetches Transaction.id which messes up everything
-      query.group = options.group;
-      method = "findAll";
-    } else {
-      method = "findOne";
-    }
-
-    return models.Transaction[method](query).then(res => {
-        if (options.group) {
-          const stats = { id: this.id };
-          let all = 0;
-          // when it's a raw query, the result is not in dataValues
-          res.forEach(r => {
-            stats[r.type] = r.count;
-            all += r.count;
-          })
-          stats.all = all;
-          debug("getBackersCount", stats);
-          return stats;
-        } else {
-          const result = res.dataValues || res || {};
-          debug("getBackersCount", result);
-          if (!result.count) return 0;
-          return Promise.resolve(Number(result.count));
-        }
-      });
   };
 
   Collective.prototype.isHost = function() {
@@ -1283,15 +1394,10 @@ export default function(Sequelize, DataTypes) {
 
   Collective.prototype.getHostCollectiveId = function() {
     if (this.HostCollectiveId) return Promise.resolve(this.HostCollectiveId);
-
-    const where = { role: roles.HOST, CollectiveId: this.ParentCollectiveId || this.id };
-    return models.Member.findOne({
-        attributes: ['MemberCollectiveId'],
-        where
-      })
-      .then(member => {
-        this.HostCollectiveId = member && member.MemberCollectiveId;
-        return this.HostCollectiveId;
+    return models.Collective.getHostCollectiveId(this.ParentCollectiveId || this.id)
+      .then(HostCollectiveId => {
+        this.HostCollectiveId = HostCollectiveId;
+        return HostCollectiveId;
       });
   };
 
@@ -1347,17 +1453,18 @@ export default function(Sequelize, DataTypes) {
   /**
    * Class Methods
    */
-  Collective.createOrganization = (collectiveData, adminUser) => {
+  Collective.createOrganization = (collectiveData, adminUser, creator = {}) => {
+    const CreatedByUserId = creator.id || adminUser.id
     return Collective
       .create({
-        CreatedByUserId: adminUser.id,
+        CreatedByUserId,
         ...collectiveData,
         type: types.ORGANIZATION,
         isActive: true
       })
       .tap(collective => {
         return models.Member.create({
-          CreatedByUserId: adminUser.id,
+          CreatedByUserId,
           CollectiveId: collective.id,
           MemberCollectiveId: adminUser.CollectiveId,
           role: roles.ADMIN
@@ -1382,6 +1489,14 @@ export default function(Sequelize, DataTypes) {
   Collective.getTopBackers = (since, until, tags, limit) => {
     return queries.getTopBackers(since || 0, until || new Date, tags, limit || 5)
       .tap(backers => debug("getTopBackers", backers.map(b => b.dataValues)));
+  };
+
+  Collective.getHostCollectiveId = async (CollectiveId) => {
+    const res = await models.Member.findOne({
+      attributes: ['MemberCollectiveId'],
+      where: { CollectiveId, role: roles.HOST }
+    });
+    return res && res.MemberCollectiveId;
   };
 
   /*

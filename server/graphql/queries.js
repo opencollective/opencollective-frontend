@@ -55,10 +55,18 @@ const queries = {
   Collective: {
     type: CollectiveInterfaceType,
     args: {
-      slug: { type: new GraphQLNonNull(GraphQLString) }
+      slug: { type: GraphQLString },
+      id: { type: GraphQLInt }
     },
     resolve(_, args) {
-      const collective = models.Collective.findBySlug(args.slug.toLowerCase());
+      let collective;
+      if (args.slug) {
+        collective = models.Collective.findBySlug(args.slug.toLowerCase());
+      } else if (args.id) {
+        collective = models.Collective.findById(args.id);
+      } else {
+        return new Error("Please provide a slug or an id");
+      }
       if (!collective) {
         throw new errors.NotFound("Collective not found");
       }
@@ -573,9 +581,17 @@ const queries = {
         type: GraphQLBoolean,
         description: "Fetch all public hosts that accept applications for hosting new collectives"
       },
+      isActive: {
+        description: 'Only return active collectives',
+        type: GraphQLBoolean,
+      },
       memberOfCollectiveSlug: {
         type: GraphQLString,
         description: "Fetch all collectives that `memberOfCollectiveSlug` is a member of"
+      },
+      minBackerCount: {
+        description: 'Filter collectives with this minimum number of backers',
+        type: GraphQLInt,
       },
       role: {
         type: GraphQLString,
@@ -593,13 +609,19 @@ const queries = {
         defaultValue: 'ASC',
         type: OrderDirectionType,
       },
-      limit: { type: GraphQLInt },
-      offset: { type: GraphQLInt }
+      limit: {
+        defaultValue: 10,
+        type: GraphQLInt,
+      },
+      offset: {
+        defaultValue: 0,
+        type: GraphQLInt
+      },
     },
     async resolve(_, args) {
       const query = {
         where: {},
-        limit: args.limit || 10,
+        limit: args.limit,
         include: []
       };
 
@@ -639,20 +661,37 @@ const queries = {
       if (args.ParentCollectiveId) query.where.ParentCollectiveId = args.ParentCollectiveId;
       if (args.type) query.where.type = args.type;
       if (args.tags) query.where.tags = { [Op.overlap]: args.tags };
+      if (args.isActive) query.where.isActive = true;
 
       if (args.orderBy === 'balance' && (args.ParentCollectiveId || args.HostCollectiveId || args.tags)) {
         const { total, collectives } = await rawQueries.getCollectivesWithBalance(query.where, args);
         return { total, collectives, limit: args.limit, offset: args.offset };
       }
 
-      if (args.orderBy === 'amountSent' && args.type === 'ORGANIZATION') {
-        const { total, collectives } = await rawQueries.getSponsors(query.where, args);
+      if (args.orderBy === 'monthlySpending') {
+        const { total, collectives } = await rawQueries.getCollectivesOrderedByMonthlySpending({ ...args, where: query.where });
+        return { total, collectives, limit: args.limit, offset: args.offset };
+      }
+
+      if (args.minBackerCount) {
+        const { total, collectives } = await rawQueries.getCollectivesWithMinBackers({ ...args, where: query.where });
         return { total, collectives, limit: args.limit, offset: args.offset };
       }
 
       query.order = [[args.orderBy, args.orderDirection]];
 
       if (args.offset) query.offset = args.offset;
+
+      // this will elminate the odd test accounts and older data we need to cleanup
+      query.where = {
+        ...query.where,
+        createdAt: {
+          [Op.not]: null,
+        },
+        name: {
+          [Op.ne]: '',
+        },
+      };
 
       const result = await models.Collective.findAndCountAll(query);
 

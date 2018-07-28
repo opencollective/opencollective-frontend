@@ -317,8 +317,8 @@ const mutations = {
     type: PaymentMethodType,
     args: {
       totalAmount: { type: new GraphQLNonNull(GraphQLInt) },
-      collectiveId: { type: new GraphQLNonNull(GraphQLInt) },
-      hostCollectiveId: { type: new GraphQLNonNull(GraphQLInt) },
+      CollectiveId: { type: new GraphQLNonNull(GraphQLInt) },
+      HostCollectiveId: { type: new GraphQLNonNull(GraphQLInt) },
       description: { type: GraphQLString },
     },
     resolve: async (_, args, req) => addFundsToOrg(args, req.remoteUser),

@@ -7,10 +7,14 @@ import models from '../../models';
 import errors from '../../lib/errors';
 import { retrieveEvent } from './gateway';
 import creditcard from './creditcard';
+import stripeLib from 'stripe';
+import debugLib from 'debug';
 
-
+const debug = debugLib("stripe");
 const AUTHORIZE_URI = 'https://connect.stripe.com/oauth/authorize';
 const TOKEN_URI = 'https://connect.stripe.com/oauth/token';
+
+const stripe = stripeLib(config.stripe.secret);
 
 const getToken = code => () => axios
   .post(TOKEN_URI, {
@@ -21,6 +25,15 @@ const getToken = code => () => axios
   })
   .then(res => res.data);
 
+const getAccountInformation = (data) => {
+  return new Promise((resolve, reject) => {
+    return stripe.accounts.retrieve(data.stripe_user_id, (err, account) => {
+      if (err) return reject(err);
+      data.account = account;
+      return resolve(data);
+    });
+  })
+}
 
 export default {
 
@@ -59,7 +72,7 @@ export default {
     // callback called by Stripe after the user approves the connection
     callback: (req, res, next) => {
       let state, collective;
-
+      debug("req.query", JSON.stringify(req.query, null, '  '));
       try {
         state = jwt.verify(req.query.state, config.keys.opencollective.secret);
       } catch (e) {
@@ -82,9 +95,40 @@ export default {
         data: {
           publishableKey: data.stripe_publishable_key,
           tokenType: data.token_type,
-          scope: data.scope
+          scope: data.scope,
+          account: data.account
         }
       });
+
+      /**
+       * Update the Host Collective
+       * with the default currency of the bank account connected to the stripe account and legal address
+       * @param {*} connectedAccount
+       */
+      const updateHost = (connectedAccount) => {
+        if (!connectedAccount) {
+          console.error(">>> updateHost: error: no connectedAccount");
+        }
+        const { account } = connectedAccount.data;
+        if (!collective.address && account.legal_entity) {
+          const { address } = account.legal_entity;
+          const addressLines = [address.line1];
+          if (address.line2) addressLines.push(address.line2);
+          if (address.country === 'US')
+            addressLines.push(`${address.city} ${address.state} ${address.postal_code}`);
+          else if (address.country === 'UK')
+            addressLines.push(`${address.city} ${address.postal_code}`);
+          else
+            addressLines.push(`${address.postal_code} ${address.city}`);
+
+          addressLines.push(address.country);
+          collective.address = addressLines.join(`\n`);
+        }
+        collective.currency = account.default_currency.toUpperCase();
+        collective.timezone = collective.timezone || account.timezone;
+        collective.image = collective.image || account.business_logo;
+        return collective.save();
+      }
 
       return models.Collective.findById(CollectiveId)
         .then(c => {
@@ -101,6 +145,7 @@ export default {
           }
         })
         .then(getToken(req.query.code))
+        .then(getAccountInformation)
         .then(createStripeAccount)
         .then(() => {
           if (typeof postAction === 'string' && postAction.match(/hostCollective/)) {
@@ -109,6 +154,7 @@ export default {
               .then(collectiveToHost => collectiveToHost.addHost(collective, { id: CreatedByUserId }))
           }
         })
+        .then(updateHost)
         .then(() => res.redirect(redirect || `${config.host.website}/${collective.slug}?message=StripeAccountConnected`))
         .catch(next);
     }

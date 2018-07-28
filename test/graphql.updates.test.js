@@ -157,11 +157,11 @@ describe('graphql.updates.test', () => {
         await utils.waitForCondition(() => sendEmailSpy.callCount > 1);
         expect(sendEmailSpy.callCount).to.equal(3);
         expect(sendEmailSpy.args[0][0]).to.equal(user1.email);
-        expect(sendEmailSpy.args[0][1]).to.equal(`Collective update first update & "love"`);
+        expect(sendEmailSpy.args[0][1]).to.equal(`first update & "love"`);
         expect(sendEmailSpy.args[1][0]).to.equal(user2.email);
-        expect(sendEmailSpy.args[1][1]).to.equal(`Collective update first update & "love"`);
+        expect(sendEmailSpy.args[1][1]).to.equal(`first update & "love"`);
         expect(sendEmailSpy.args[2][0]).to.equal(user3.email);
-        expect(sendEmailSpy.args[2][1]).to.equal(`Collective update first update & "love"`);
+        expect(sendEmailSpy.args[2][1]).to.equal(`first update & "love"`);
       })
 
       it("sends a tweet", async () => {

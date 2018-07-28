@@ -184,7 +184,22 @@ describe('graphql.paymentMethods.test.js', () => {
     });
 
     it('adds funds from the host (USD) to the collective (EUR)', async () => {
-
+      /**
+       * collective ledger:
+       * CREDIT
+       *  - amount: €1000
+       *  - fees: 0
+       *  - netAmountInCollectiveCurrency: €1000
+       *  - hostCurrency: USD
+       *  - amountInHostCurrency: $1165 (1000 * fxrate:1.165)
+       * fromCollective (host) ledger:
+       * DEBIT
+       *  - amount: -€1000
+       *  - fees: 0
+       *  - netAmountInCollectiveCurrency: -$1165
+       *  - hostCurrency: USD
+       *  - amountInHostCurrency: -$1165
+       */
       order.fromCollective = {
         id: host.id
       };
@@ -198,16 +213,15 @@ describe('graphql.paymentMethods.test.js', () => {
       expect(transaction.platformFeeInHostCurrency).to.equal(0);
       expect(transaction.paymentProcessorFeeInHostCurrency).to.equal(0);
       expect(transaction.hostCurrency).to.equal(host.currency);
-      expect(transaction.currency).to.equal(collective.currency);
       expect(transaction.amount).to.equal(order.totalAmount);
-      expect(transaction.netAmountInCollectiveCurrency).to.equal(order.totalAmount);
+      expect(transaction.currency).to.equal(collective.currency);
+      expect(transaction.hostCurrencyFxRate).to.equal(fxrate);
       expect(transaction.amountInHostCurrency).to.equal(Math.round(order.totalAmount * fxrate));
-      expect(transaction.hostCurrencyFxRate).to.equal(Number((1/fxrate).toFixed(15)));
+      expect(transaction.netAmountInCollectiveCurrency).to.equal(order.totalAmount);
       expect(transaction.amountInHostCurrency).to.equal(1165);
     });
 
     it('adds funds from the host (USD) to the collective (EUR) on behalf of a new organization', async () => {
-
       const hostFeePercent = 4;
       order.hostFeePercent = hostFeePercent;
       order.user = {
@@ -224,8 +238,16 @@ describe('graphql.paymentMethods.test.js', () => {
       const orderCreated = result.data.createOrder;
       const transaction = await models.Transaction.findOne({ where: { OrderId: orderCreated.id, type: 'CREDIT' }});
       const org = await models.Collective.findOne({ where: { slug: 'new-org' }});
+      const adminMembership = await models.Member.findOne({ where: { CollectiveId: org.id, role: 'ADMIN' }});
+      const backerMembership = await models.Member.findOne({ where: { MemberCollectiveId: org.id, role: 'BACKER' }});
+      const orgAdmin = await models.Collective.findOne({ where: { id: adminMembership.MemberCollectiveId }});
       expect(transaction.CreatedByUserId).to.equal(admin.id);
       expect(org.CreatedByUserId).to.equal(admin.id);
+      expect(adminMembership.CreatedByUserId).to.equal(admin.id);
+      expect(backerMembership.CreatedByUserId).to.equal(admin.id);
+      expect(backerMembership.CollectiveId).to.equal(transaction.CollectiveId);
+      expect(orgAdmin.CreatedByUserId).to.equal(admin.id);
+      expect(orgAdmin.name).to.equal(order.user.name);
       expect(transaction.FromCollectiveId).to.equal(org.id);
       expect(transaction.hostFeeInHostCurrency).to.equal(-Math.round(hostFeePercent/100*order.totalAmount*fxrate));
       expect(transaction.platformFeeInHostCurrency).to.equal(0);
@@ -235,7 +257,7 @@ describe('graphql.paymentMethods.test.js', () => {
       expect(transaction.amount).to.equal(order.totalAmount);
       expect(transaction.netAmountInCollectiveCurrency).to.equal(order.totalAmount * (1-hostFeePercent/100));
       expect(transaction.amountInHostCurrency).to.equal(Math.round(order.totalAmount * fxrate));
-      expect(transaction.hostCurrencyFxRate).to.equal(Number((1/fxrate).toFixed(15)));
+      expect(transaction.hostCurrencyFxRate).to.equal(fxrate);
       expect(transaction.amountInHostCurrency).to.equal(1165);
     });
   });
@@ -245,7 +267,7 @@ describe('graphql.paymentMethods.test.js', () => {
     it("returns the balance", async () => {
 
       const query = `
-      query Collective($slug: String!) {
+      query Collective($slug: String) {
         Collective(slug: $slug) {
           id,
           paymentMethods {

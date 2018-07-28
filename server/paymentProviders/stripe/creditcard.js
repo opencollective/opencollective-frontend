@@ -124,7 +124,7 @@ export default {
             currency: order.currency,
             hostCurrency: balanceTransaction.currency,
             amountInHostCurrency: balanceTransaction.amount,
-            hostCurrencyFxRate: order.totalAmount / balanceTransaction.amount,
+            hostCurrencyFxRate: balanceTransaction.amount / order.totalAmount,
             hostFeeInHostCurrency,
             platformFeeInHostCurrency: fees.applicationFee,
             paymentProcessorFeeInHostCurrency: fees.stripeFee,

@@ -1,7 +1,20 @@
 {
   "database": {
-    "database": "circle_test",
-    "username": "ubuntu"
+    "database": "opencollective_dvl",
+    "username": "ubuntu",
+    "password": "",
+    "options": {
+      "host": "localhost",
+      "dialect": "postgres",
+      "logging": false,
+      "benchmark": true
+    }
+  },
+  "maintenancedb": {
+    "database": "postgres",
+    "username": "postgres",
+    "password": "",
+    "options": { "host": "localhost" }
   },
   "keys": {
     "opencollective": {

@@ -40,6 +40,8 @@ export const TransactionInterfaceType = new GraphQLInterfaceType({
       uuid: { type: GraphQLString },
       amount: { type: GraphQLInt },
       currency: { type: GraphQLString },
+      hostCurrency: { type: GraphQLString },
+      hostCurrencyFxRate: { type: GraphQLFloat },
       netAmountInCollectiveCurrency: { type: GraphQLInt },
       hostFeeInHostCurrency: { type: GraphQLInt },
       platformFeeInHostCurrency: { type: GraphQLInt },
@@ -108,30 +110,35 @@ const TransactionFields = () => {
     },
     hostCurrencyFxRate: {
       type: GraphQLFloat,
+      description: "Exchange rate between the currency of the transaction and the currency of the host (transaction.amount * transaction.hostCurrencyFxRate = transaction.amountInHostCurrency)",
       resolve(transaction) {
         return transaction.hostCurrencyFxRate;
       }
     },
     hostFeeInHostCurrency: {
       type: GraphQLInt,
+      description: "Fee kept by the host in the lowest unit of the currency of the host (ie. in cents)",
       resolve(transaction) {
         return transaction.hostFeeInHostCurrency;
       }
     },
     platformFeeInHostCurrency: {
       type: GraphQLInt,
+      description: "Fee kept by the Open Collective Platform in the lowest unit of the currency of the host (ie. in cents)",
       resolve(transaction) {
         return transaction.platformFeeInHostCurrency;
       }
     },
     paymentProcessorFeeInHostCurrency: {
       type: GraphQLInt,
+      description: "Fee kept by the payment processor in the lowest unit of the currency of the host (ie. in cents)",
       resolve(transaction) {
         return transaction.paymentProcessorFeeInHostCurrency;
       }
     },
     netAmountInCollectiveCurrency: {
       type: GraphQLInt,
+      description: "Amount after fees received by the collective in the lowest unit of its own currency (typically cents)",
       resolve(transaction) {
         return transaction.netAmountInCollectiveCurrency;
       }
