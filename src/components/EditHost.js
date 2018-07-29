@@ -2,9 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { get } from 'lodash';
-import { defineMessages, FormattedMessage } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
 import withIntl from '../lib/withIntl';
-import InputField from './InputField';
 import styled from 'styled-components';
 import { Flex, Box } from 'grid-styled';
 import { Radio } from '@material-ui/core';
@@ -27,24 +26,24 @@ class EditHost extends React.Component {
     goals: PropTypes.arrayOf(PropTypes.object),
     collective: PropTypes.object.isRequired,
     LoggedInUser: PropTypes.object.isRequired,
-    editCollectiveMutation: PropTypes.func.isRequired
+    editCollectiveMutation: PropTypes.func.isRequired,
   };
 
   constructor(props) {
     super(props);
     this.changeHost = this.changeHost.bind(this);
     this.handleChange = this.handleChange.bind(this);
-    this.state = { selectedOption: "noHost", collective: props.collective };
+    this.state = { selectedOption: 'noHost', collective: props.collective };
+  }
+
+  handleChange(attr, value) {
+    this.setState({[attr]: value});
   }
 
   async changeHost(newHost = { id: null }) {
     const { collective } = this.state;
     await this.props.editCollectiveMutation({ id: collective.id, HostCollectiveId: newHost.id });
-    this.setState({ selectedOption: "noHost", collective: { ...collective, host: newHost } });
-  }
-
-  handleChange(attr, value) {
-    this.setState({[attr]: value});
+    this.setState({ selectedOption: 'noHost', collective: { ...collective, host: newHost } });
   }
 
   render() {
@@ -111,7 +110,7 @@ class EditHost extends React.Component {
             </Box>
             <Box mb={4}>
               <h2><FormattedMessage id="collective.edit.host.createHost.title" defaultMessage="Use your own host" /></h2>
-              <FormattedMessage id="collective.edit.host.createHost.description" defaultMessage="You can create your own host as an individual or as a legal entity. You will be responsible for keeping custody of the funds raised by this collective and for paying out the expenses that have been approved." />
+              <FormattedMessage id="collective.edit.host.createHost.description" defaultMessage="You can create your own host as an individual or as an organization. You will be responsible for keeping custody of the funds raised by this collective and for paying out the expenses that have been approved." />&nbsp;<a href="https://github.com/opencollective/opencollective/wiki/Becoming-an-Open-Collective-Host"><FormattedMessage id="moreInfo" defaultMessage="More info" /></a>.
               { this.state.selectedOption === "createHost" && LoggedInUser &&
                 <CreateHostFormWithData
                   collective={collective}

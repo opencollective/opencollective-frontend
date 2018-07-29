@@ -14,6 +14,7 @@ import { defineMessages, FormattedMessage } from 'react-intl';
 import { pick, get, groupBy, uniqBy } from 'lodash';
 import MessageModal from './MessageModal';
 import SectionTitle from './SectionTitle';
+import ApplyToHostBtn from './ApplyToHostBtn';
 import OrderCreated from './OrderCreated';
 import { Button } from 'react-bootstrap';
 import { Router } from '../server/pages';
@@ -140,7 +141,7 @@ class UserCollective extends React.Component {
     const type = collective.type.toLowerCase();
     let cta;
     if (collective.canApply) {
-      cta = { href: `/${collective.slug}/apply`, label: 'apply' };
+      cta = <ApplyToHostBtn LoggedInUser={LoggedInUser} host={collective} />;
     }
 
     const notification = {};
