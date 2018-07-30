@@ -552,7 +552,15 @@ export const UpdateType = new GraphQLObjectType({
       summary: {
         type: GraphQLString,
         resolve(update) {
-          return he.decode(strip_tags(update.html || "", ["a"]).trunc(255, true));
+          if (update.markdown) {
+            // we only keep the first paragraph (up to 255 chars)
+            return update.markdown.replace(/\n.*/g, '').trunc(255, true);
+          }
+          if (update.html.substr(0,3) === '<p>') {
+            // we only keep the first paragraph
+            return he.decode(update.html).replace('<p><br /></p>', '').replace(/<\/p>.*/g, '').replace('<p>','');
+          }
+          return '';
         }
       },
       html: {
