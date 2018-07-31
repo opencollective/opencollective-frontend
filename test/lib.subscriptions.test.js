@@ -7,6 +7,7 @@ import * as utils from './utils';
 import models from '../server/models';
 import emailLib from '../server/lib/email';
 import * as paymentsLib from '../server/lib/payments';
+import status from '../server/constants/order_status';
 
 // What's being tested
 import {
@@ -488,6 +489,7 @@ describe('LibSubscription', () => {
         // And the subscription should be marked as deactivated
         expect(order.Subscription.isActive).to.be.false;
         expect(order.Subscription.deactivatedAt.getTime()).to.be.at.most((new Date).getTime());
+        expect(order.status).to.eql(status.CANCELLED);
       });
     });
   });
