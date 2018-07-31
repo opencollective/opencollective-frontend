@@ -20,7 +20,7 @@ const NotFound = ({ slug }) => {
       }
      `}
       </style>
-      <h1>Not Found</h1>
+      <h1><FormattedMessage id="notFound" defaultMessage="Not found" /></h1>
       <div className="shrug">¯\_(ツ)_/¯ </div>
       { slug &&
         <p>

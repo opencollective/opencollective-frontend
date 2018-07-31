@@ -30,9 +30,8 @@ class ErrorPage extends React.Component {
       'unknown': { id: 'page.error.unknown', defaultMessage: 'Unknown error' },
     });
 
-    
   }
-  
+
   getErrorComponent() {
     const { message, data, loading } = this.props;
 
@@ -44,12 +43,12 @@ class ErrorPage extends React.Component {
     if (get(data, 'error.networkError')) {
       this.message = 'networkError';
     }
-  
+
     if (loading || get(data, 'loading')) {
       this.message = 'loading';
       return <Loading />;
     }
-  
+
     if (get(data, 'error.message', '').includes('No collective found')) {
       return <NotFound slug={get(this.props.data, 'variables.slug')} />;
     }
