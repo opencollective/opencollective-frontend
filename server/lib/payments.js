@@ -7,6 +7,7 @@ import { Op } from 'sequelize';
 import models from '../models';
 import emailLib from './email';
 import { types } from '../constants/collectives';
+import status from '../constants/order_status';
 import paymentProviders from '../paymentProviders';
 import * as libsubscription from './subscriptions';
 import * as libtransactions from './transactions';
@@ -232,6 +233,7 @@ export const executeOrder = (user, order, options) => {
     })
     .then(() => {
       return processOrder(order, options)
+        .tap(() => order.update({ status: order.SubscriptionId ? status.ACTIVE : status.PAID }))
         .tap(async () => {
           if (!order.matchingFund) return null;
           const matchingFundCollective = await models.Collective.findById(order.matchingFund.CollectiveId);
