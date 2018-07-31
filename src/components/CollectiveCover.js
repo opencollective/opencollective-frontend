@@ -80,7 +80,7 @@ ${description}`
       backgroundPosition: 'center center',
       backgroundSize: 'cover',
       backgroundRepeat: 'no-repeat',
-      ...customStyles
+      ...customStyles,
     };
 
     const logo = collective.image || get(collective.parentCollective, 'image');
@@ -93,6 +93,7 @@ ${description}`
         cta = this.props.cta;
       }
     }
+
     return (
       <div className={classNames('CollectiveCover', className, type)}>
         <style jsx>{`
@@ -252,7 +253,7 @@ ${description}`
           line-height: 1.25;
           margin: 1px;
         }
-        .cta {
+        .USER .cta, .ORGANIZATION .cta {
           margin: 4rem 0;
         }
         @media(max-width: 600px) {
@@ -269,7 +270,7 @@ ${description}`
           color: white;
         }
         `}</style>
-        <div className="cover">
+        <div className={`cover ${collective.type}`}>
           <div className="backgroundCover" style={style} />
 
           <div className="content">
@@ -327,7 +328,7 @@ ${description}`
 
           { collective.type === 'COLLECTIVE' &&
             <div className="statsContainer">
-              { className !== "small" && collective.type === "COLLECTIVE" &&
+              { className !== 'small' && collective.type === 'COLLECTIVE' &&
                 <div className="topContributors">
                   <TopBackersCoverWithData
                     collective={this.props.collective}
@@ -337,17 +338,15 @@ ${description}`
                 </div>
               }
 
-              { className !== "small" && collective.type === "COLLECTIVE" &&
+              { className !== 'small' && collective.type === 'COLLECTIVE' &&
                 <GoalsCover
                   collective={collective}
                   LoggedInUser={LoggedInUser}
                   />
               }
 
-              { this.props.cta &&
-                <div>
-                  <Button className="blue" href={this.cta.href}>{this.cta.label}</Button>
-                </div>
+              { cta &&
+                <div className="cta">{cta}</div>
               }
 
             </div>
@@ -355,11 +354,11 @@ ${description}`
 
         </div>
 
-        { className !== "small" &&
+        { className !== 'small' &&
           <MenuBar
             collective={collective}
             LoggedInUser={LoggedInUser}
-            cta={this.cta}
+            cta={cta}
             />
         }
 

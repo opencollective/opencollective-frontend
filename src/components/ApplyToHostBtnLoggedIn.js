@@ -37,7 +37,9 @@ class ApplyToHostBtnLoggedIn extends React.Component {
   render() {
     const { host, data } = this.props;
     if (data.loading) {
-      return (<div />);
+      return (
+        <Button className="blue" disabled><FormattedMessage id="host.apply.create.btn" defaultMessage="Apply to create a collective" /></Button>
+      );
     }
 
     if (data.allCollectives.total > 0) {
@@ -46,10 +48,10 @@ class ApplyToHostBtnLoggedIn extends React.Component {
 
     return (
       <div className="ApplyToHostBtnLoggedIn">
-        { (!this.inactiveCollective || get(this.inactiveCollective, 'host.id') !== host.id ) &&
+        { !this.inactiveCollective &&
           <Button className="blue" href={`/${host.slug}/apply`}><FormattedMessage id="host.apply.create.btn" defaultMessage="Apply to create a collective" /></Button>
         }
-        { this.inactiveCollective && !this.inactiveCollective.host &&
+        { this.inactiveCollective && (!this.inactiveCollective.host || get(this.inactiveCollective, 'host.id') !== host.id) &&
           <Button onClick={this.onClick} className="blue"><FormattedMessage id="host.apply.btn" defaultMessage="Apply to host your collective {collective}" values={{ collective: this.inactiveCollective.name }} /></Button>
         }
         { get(this.inactiveCollective, 'host.id') === host.id &&
