@@ -12,8 +12,7 @@ import { defineMessages } from 'react-intl';
 import { Router } from '../server/pages';
 import { graphql } from 'react-apollo'
 import gql from 'graphql-tag'
-import Loading from '../components/Loading';
-import NotFound from '../components/NotFoundPage';
+import ErrorPage from '../components/ErrorPage';
 import storage from '../lib/storage';
 import { get, pick } from 'lodash';
 
@@ -122,10 +121,11 @@ class CreateOrderPage extends React.Component {
   render() {
     const { intl, data } = this.props;
     const { loading, LoggedInUser } = this.state;
+
+    if (!data.Collective) return (<ErrorPage data={data} />);
+
     const description = decodeURIComponent(this.props.description || "");
     const collective = data.Collective;
-    if (data.loading) return (<Loading />);
-    if (!data.Collective) return (<NotFound />);
 
     const TierId = parseInt(this.props.TierId);
     let tier;

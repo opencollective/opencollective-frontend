@@ -4,8 +4,6 @@ import Body from '../components/Body';
 import Footer from '../components/Footer';
 import CollectiveCover from '../components/CollectiveCover';
 import { addCollectiveCoverData, addGetLoggedInUserFunction } from '../graphql/queries';
-import Loading from '../components/Loading';
-import NotFound from '../components/NotFoundPage';
 import ErrorPage from '../components/ErrorPage';
 import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
@@ -38,14 +36,8 @@ class UpdatePage extends React.Component {
     const { intl, data, updateSlug } = this.props;
     const { LoggedInUser } = this.state;
 
-    if (data.loading) return (<Loading />);
     if (!data.Collective) {
-      return (<NotFound />)
-    }
-
-    if (data.error) {
-      console.error("graphql error>>>", data.error.message);
-      return (<ErrorPage message="GraphQL error" />)
+      return (<ErrorPage data={data} />)
     }
 
     const collective = data.Collective;

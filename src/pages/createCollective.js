@@ -3,18 +3,17 @@ import withIntl from '../lib/withIntl';
 import React from 'react';
 import CreateCollective from '../components/CreateCollective';
 import { addGetLoggedInUserFunction, addCollectiveCoverData } from '../graphql/queries';
-import NotFound from '../components/NotFoundPage';
-import Loading from '../components/Loading';
+import ErrorPage from '../components/ErrorPage';
 
 class CreateCollectivePage extends React.Component {
+
+  static getInitialProps ({ query: { hostCollectiveSlug } }) {
+    return { slug: hostCollectiveSlug || "opencollective-host" }
+  }
 
   constructor(props) {
     super(props);
     this.state = { loading: true };
-  }
-
-  static getInitialProps ({ query: { hostCollectiveSlug } }) {
-    return { slug: hostCollectiveSlug || "opencollective-host" }
   }
 
   async componentDidMount() {
@@ -27,12 +26,8 @@ class CreateCollectivePage extends React.Component {
 
     const { data } = this.props;
 
-    if (this.state.loading) {
-      return (<Loading />)
-    }
-
-    if (!data.loading && !data.Collective) {
-      return (<NotFound />)
+    if (this.state.loading || !data.Collective) {
+      return (<ErrorPage loading={this.state.loading} data={data} />)
     }
 
     return (

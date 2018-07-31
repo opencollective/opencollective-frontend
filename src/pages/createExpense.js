@@ -9,8 +9,6 @@ import { addGetLoggedInUserFunction } from '../graphql/queries';
 import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
 
-import Loading from '../components/Loading';
-import NotFound from '../components/NotFoundPage';
 import ErrorPage from '../components/ErrorPage';
 import Button from '../components/Button';
 import CollectiveCover from '../components/CollectiveCover';
@@ -66,13 +64,7 @@ class ExpensesPage extends React.Component {
   render() {
     const { data } = this.props;
     const { LoggedInUser, expenseCreated } = this.state;
-    if (data.loading) return (<Loading />);
-    if (!data.Collective) return (<NotFound />);
-
-    if (data.error) {
-      console.error("graphql error>>>", data.error.message);
-      return (<ErrorPage message="GraphQL error" />)
-    }
+    if (!data.Collective) return (<ErrorPage data={data} />);
 
     const collective = data.Collective;
     const showNewExpenseForm = !expenseCreated;

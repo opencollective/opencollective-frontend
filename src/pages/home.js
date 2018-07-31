@@ -32,7 +32,7 @@ import {
 import StyledInput from '../components/StyledInput';
 import Carousel from '../components/Carousel';
 import Currency from '../components/Currency';
-import Loading from '../components/Loading';
+import ErrorPage from '../components/ErrorPage';
 
 const carouselContent = [{
   image: '/static/images/home-slide-01.svg',
@@ -151,6 +151,11 @@ class HomePage extends React.Component {
   }
 
   render() {
+
+    if (!this.props.data.transactions) {
+      return (<ErrorPage data={this.props.data} />);
+    }
+
     const {
       topSpenders: {
         collectives: topSpenders,
@@ -174,7 +179,6 @@ class HomePage extends React.Component {
       transactions: {
         transactions,
       },
-      loading,
     } = this.props.data;
     const {
       LoggedInUser,
@@ -184,10 +188,6 @@ class HomePage extends React.Component {
         totalDonors,
       },
     } = this.state;
-
-    if (loading) {
-      return (<Loading />);
-    }
 
     const filteredTransactions = transactions.filter(({ type, order, category }) => {
       if (type === 'CREDIT') {

@@ -13,7 +13,6 @@ import Header from '../components/Header';
 import Body from '../components/Body';
 import Footer from '../components/Footer';
 import CollectiveCover from '../components/CollectiveCover';
-import Loading from '../components/Loading';
 import ErrorPage from '../components/ErrorPage';
 import CollectivePicker from '../components/CollectivePickerWithData';
 
@@ -44,20 +43,12 @@ class HostExpensesPage extends React.Component {
     const { data } = this.props;
     const { LoggedInUser } = this.state;
 
-    if (data.error) {
-      console.error("graphql error>>>", data.error.message);
-      return (<ErrorPage message="GraphQL error" />)
-    }
-
-    if (!data.Collective) return (<Loading />);
-
+    if (!data.Collective) return (<ErrorPage data={data} />);
+    if (!data.collective.isHost) return (<ErrorPage message="collective.is.not.host" />);
+    
     const collective = data.Collective;
     const selectedCollective = this.state.selectedCollective || collective;
     const includeHostedCollectives = (selectedCollective.id === collective.id);
-
-    if (!collective.isHost) {
-      return (<ErrorPage message="collective.is.not.host" />)
-    }
 
     return (
       <div className="HostExpensesPage">
