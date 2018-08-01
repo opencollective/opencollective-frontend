@@ -6,6 +6,8 @@ import Temporal from 'sequelize-temporal';
 import debugLib from 'debug';
 const debug = debugLib('order');
 
+import status from '../constants/order_status';
+
 export default function(Sequelize, DataTypes) {
 
   const { models } = Sequelize;
@@ -115,6 +117,18 @@ export default function(Sequelize, DataTypes) {
     },
 
     processedAt: DataTypes.DATE,
+
+    status: {
+      type: DataTypes.STRING,
+      defaultValue: status.PENDING,
+      allowNull: false,
+      validate: {
+        isIn: {
+          args: [Object.keys(status)],
+          msg: `Must be in ${Object.keys(status)}`,
+        },
+      },
+    },
 
     createdAt: {
       type: DataTypes.DATE,

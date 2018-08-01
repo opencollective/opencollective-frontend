@@ -8,6 +8,7 @@ import models from '../models';
 import emailLib from './email';
 import * as paymentsLib from './payments';
 import { getRecommendedCollectives } from './data';
+import status from '../constants/order_status';
 
 /** Maximum number of attempts before an order gets cancelled. */
 export const MAX_RETRIES = 3;
@@ -100,6 +101,7 @@ export async function processOrderWithSubscription(options, order) {
       console.log(`Error notifying order #${order.id} ${error}`);
     } finally {
       await order.Subscription.save();
+      await order.save();
     }
   }
 
@@ -193,6 +195,7 @@ export function getChargeRetryCount(status, order) {
 export function cancelSubscription(order) {
   order.Subscription.isActive = false;
   order.Subscription.deactivatedAt = new Date;
+  order.status = status.CANCELLED;
 }
 
 /** Group processed orders by their state

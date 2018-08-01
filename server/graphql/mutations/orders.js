@@ -11,6 +11,7 @@ import * as libPayments from '../../lib/payments';
 import emailLib from '../../lib/email';
 import { types } from '../../constants/collectives';
 import roles from '../../constants/roles';
+import status from '../../constants/order_status';
 import * as errors from '../errors';
 import activities from '../../constants/activities';
 import { getNextChargeAndPeriodStartDates, getChargeRetryCount} from '../../lib/subscriptions';
@@ -238,6 +239,10 @@ export function createOrder(order, loaders, remoteUser) {
     })
     .catch(e => {
       debugOrder("createOrder mutation error: ", e);
+      if (orderCreated && !orderCreated.processedAt) {
+        // TODO: Order should be updated with data JSON field to store the error to review later
+        orderCreated.update({ status: status.ERROR });
+      }
       throw e;
     });
 }
@@ -281,7 +286,10 @@ export function cancelSubscription(remoteUser, orderId) {
     }
     return Promise.resolve();
   })
-  .then(order => order.Subscription.deactivate())
+  .then(order => Promise.all([
+    order.update({ status: status.CANCELLED }),
+    order.Subscription.deactivate(),
+  ]))
 
   // createActivity - that sends out the email
   .then(() => models.Activity.create({
