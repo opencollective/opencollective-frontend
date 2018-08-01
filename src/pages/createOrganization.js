@@ -3,28 +3,28 @@ import withIntl from '../lib/withIntl';
 import React from 'react';
 import CreateOrganization from '../components/CreateOrganization';
 import { addGetLoggedInUserFunction } from '../graphql/queries';
-import Loading from '../components/Loading';
+import ErrorPage from '../components/ErrorPage';
 
 class CreateOrganizationPage extends React.Component {
+
+  static getInitialProps ({ query: { hostCollectiveSlug } }) {
+    return { slug: hostCollectiveSlug }
+  }
 
   constructor(props) {
     super(props);
     this.state = { loading: true };
   }
 
-  static getInitialProps ({ query: { hostCollectiveSlug } }) {
-    return { slug: hostCollectiveSlug }
-  }
-
   async componentDidMount() {
     const { getLoggedInUser } = this.props;
     const LoggedInUser = getLoggedInUser && await getLoggedInUser();
-    this.setState({LoggedInUser, loading: false});
+    this.setState({ LoggedInUser, loading: false });
   }
 
   render() {
     if (this.state.loading) {
-      return (<Loading />)
+      return (<ErrorPage loading />)
     }
 
     return (
