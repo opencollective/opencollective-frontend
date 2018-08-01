@@ -86,7 +86,7 @@ class SearchPage extends React.Component {
   }
 
   render() {
-    const { data: { error, loading, search }, term = '' } = this.props;
+    const { data: { loading, search }, term = '' } = this.props;
     const { loadingUserLogin, LoggedInUser } = this.state;
 
     if (!search) {
