@@ -1012,10 +1012,15 @@ export default function(Sequelize, DataTypes) {
 
   /**
    * Change or remove host of the collective (only if balance === 0)
+   * Note: when changing host, we also set the collective.isActive to false
    * @param {*} newHostCollective: { id }
    * @param {*} creatorUser { id }
    */
   Collective.prototype.changeHost = async function(newHostCollective, creatorUser) {
+    if (!newHostCollective || !newHostCollective.id === this.id) {
+      // do nothing
+      return;
+    }
     const balance = await this.getBalance();
     if (balance > 0) {
       throw new Error(`Unable to change host: you still have a balance of ${formatCurrency(balance, this.currency)}`);
@@ -1027,6 +1032,7 @@ export default function(Sequelize, DataTypes) {
       membership.destroy();
     }
     this.HostCollectiveId = null;
+    this.isActive = false;
     if (newHostCollective.id) {
       return this.addHost(newHostCollective, creatorUser);
     } else {
