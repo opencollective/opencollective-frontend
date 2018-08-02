@@ -4,12 +4,9 @@ import { addCollectiveData } from '../graphql/queries';
 import withData from '../lib/withData';
 import withLoggedInUser from '../lib/withLoggedInUser';
 import withIntl from '../lib/withIntl';
-import NotFound from '../components/NotFoundPage';
-import Loading from '../components/Loading';
 import ErrorPage from '../components/ErrorPage';
 import Collective from '../components/Collective';
 import UserCollective from '../components/UserCollective';
-import { get } from 'lodash';
 
 class CollectivePage extends React.Component {
 
@@ -43,15 +40,7 @@ class CollectivePage extends React.Component {
     const { data, query } = this.props;
     const { LoggedInUser } = this.state;
 
-    if (data.loading) return (<Loading />);
-    if (!data.Collective) {
-      return (<NotFound slug={get(data, 'variables.slug')} />);
-    }
-
-    if (data.error) {
-      console.error("graphql error>>>", data.error.message);
-      return (<ErrorPage message="GraphQL error" />)
-    }
+    if (!data.Collective) return (<ErrorPage data={data} />);
 
     const collective = data.Collective;
 

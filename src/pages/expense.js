@@ -8,8 +8,6 @@ import Header from '../components/Header';
 import Body from '../components/Body';
 import Footer from '../components/Footer';
 import CollectiveCover from '../components/CollectiveCover';
-import Loading from '../components/Loading';
-import NotFound from '../components/NotFoundPage';
 import ErrorPage from '../components/ErrorPage';
 import Link from '../components/Link';
 
@@ -40,13 +38,7 @@ class ExpensePage extends React.Component {
     const { data, ExpenseId } = this.props;
     const { LoggedInUser } = this.state;
 
-    if (data.loading) return (<Loading />);
-    if (!data.Collective) return (<NotFound />);
-
-    if (data.error) {
-      console.error("graphql error>>>", data.error.message);
-      return (<ErrorPage message="GraphQL error" />)
-    }
+    if (!data.Collective) return (<ErrorPage data={data} />);
 
     const collective = data.Collective;
 

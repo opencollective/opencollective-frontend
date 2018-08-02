@@ -1,23 +1,15 @@
 import React from 'react';
-import Header from './Header';
-import Body from './Body';
-import Footer from './Footer';
+import LoadingGrid from '../components/LoadingGrid';
+import { Flex } from 'grid-styled';
 
 const Loading = () => {
   return (
-    <div className="loading">
-      <Header />
-      <style jsx>{`
-      h1 {
-        text-align:center;
-        padding: 8rem;
-      }
-      `}
-      </style>
-      <Body>
-        <h1>Loading</h1>
-      </Body>
-      <Footer />
+    <div className="Loading">
+      <Flex justifyContent={['center', 'center', 'flex-start']} flexWrap="wrap">
+        <Flex py={3} w={1} justifyContent="center">
+          <LoadingGrid />
+        </Flex>
+      </Flex>
     </div>
   )
 };

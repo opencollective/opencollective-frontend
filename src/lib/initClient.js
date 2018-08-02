@@ -4,6 +4,8 @@
 import fetch from 'cross-fetch';
 import { ApolloClient } from 'apollo-client';
 import { HttpLink } from 'apollo-link-http';
+import { ApolloLink } from 'apollo-link';
+import { onError } from 'apollo-link-error';
 import { InMemoryCache, IntrospectionFragmentMatcher } from 'apollo-cache-inmemory';
 
 import { getGraphqlUrl } from './utils';
@@ -38,15 +40,33 @@ function createClient(initialState, options = {}) {
     fragmentMatcher,
   });
 
+  const errorLink = onError(({ graphQLErrors, networkError }) => {
+    if (graphQLErrors) {
+      graphQLErrors.map(({ message, locations, path }) =>
+        console.error(
+          `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`,
+        ),
+      );
+    }
+
+    if (networkError) {
+      console.error(`[Network error]: ${networkError}`);
+    }
+  });
+
+  const httpLink = new HttpLink({
+    uri: getGraphqlUrl(),
+    fetch,
+    headers,
+  });
+
+  const link = ApolloLink.from([errorLink, httpLink]);
+
   return new ApolloClient({
     connectToDevTools: process.browser,
     ssrMode: !process.browser, // Disables forceFetch on the server (so queries are only run once)
     cache: cache.restore(initialState),
-    link: new HttpLink({
-      uri: getGraphqlUrl(),
-      fetch,
-      headers,
-    }),
+    link,
   });
 }
 

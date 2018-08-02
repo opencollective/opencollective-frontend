@@ -2,8 +2,7 @@ import withData from '../lib/withData'
 import withIntl from '../lib/withIntl';
 import React from 'react'
 import { addCollectiveToEditData, addGetLoggedInUserFunction } from '../graphql/queries';
-import NotFound from '../components/NotFoundPage';
-import Loading from '../components/Loading';
+import ErrorPage from '../components/ErrorPage';
 import EditCollective from '../components/EditCollective';
 
 class EditCollectivePage extends React.Component {
@@ -26,12 +25,9 @@ class EditCollectivePage extends React.Component {
   render() {
     const { data } = this.props;
     const { loading, LoggedInUser } = this.state;
-    if (loading || data.loading) {
-      return <Loading />;
-    }
 
-    if (!data.Collective) {
-      return (<NotFound />)
+    if (loading || !data.Collective) {
+      return (<ErrorPage loading={loading} data={data} />)
     }
 
     const collective = data.Collective;

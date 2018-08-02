@@ -7,8 +7,6 @@ import Header from '../components/Header';
 import Body from '../components/Body';
 import Footer from '../components/Footer';
 import CollectiveCover from '../components/CollectiveCover';
-import Loading from '../components/Loading';
-import NotFound from '../components/NotFoundPage';
 import ErrorPage from '../components/ErrorPage';
 
 import TransactionsWithData from '../apps/expenses/components/TransactionsWithData';
@@ -35,13 +33,7 @@ class TransactionsPage extends React.Component {
     const { data } = this.props;
     const { LoggedInUser } = this.state;
 
-    if (data.loading) return (<Loading />);
-    if (!data.Collective) return (<NotFound />);
-
-    if (data.error) {
-      console.error("graphql error>>>", data.error.message);
-      return (<ErrorPage message="GraphQL error" />)
-    }
+    if (!data.Collective) return (<ErrorPage data={data} />);
 
     const collective = data.Collective;
     const cta = ["USER", "ORGANIZATION"].indexOf(collective.type) === -1 && { href: `/${collective.slug}#contribute`, label: 'contribute' };
