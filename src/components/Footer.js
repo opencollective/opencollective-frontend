@@ -61,7 +61,7 @@ const navigation = {
   },
   COMMUNITY: {
     'Open Source': '/opensource',
-    'Report an issue': 'https://github.com/opencollective/opencollectives/issues',
+    'Report an issue': 'https://github.com/opencollective/opencollective/issues',
     Slack: 'https://slack.opencollective.com',
     Wiki: 'https://github.com/opencollective/opencollective/wiki',
     'Email Support': 'mailto:support@opencollective.com'
