@@ -129,20 +129,21 @@ class RefundTransactionBtn extends React.Component {
   }
 }
 
+/* eslint-disable graphql/template-strings, graphql/no-deprecated-fields, graphql/capitalized-type-name, graphql/named-operations */
 const refundTransactionQuery = gql`
   mutation refundTransaction($id: Int!) {
     refundTransaction(id: $id) {
       id
       refundTransaction {
-        ...transactionFields
+        ${transactionFields}
         refundTransaction {
-          ...transactionFields
+          ${transactionFields}
         }
       }
     }
   }
-  ${transactionFields}
 `;
+/* eslint-enable graphql/template-strings, graphql/no-deprecated-fields, graphql/capitalized-type-name, graphql/named-operations */
 
 const addMutation = graphql(refundTransactionQuery, {
   props: ({ ownProps, mutate }) => ({
