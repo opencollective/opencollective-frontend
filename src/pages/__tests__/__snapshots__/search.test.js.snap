@@ -1239,7 +1239,7 @@ exports[`Search Page renders empty results message 1`] = `
                 display="block"
                 fontSize="1.4rem"
                 fontWeight="400"
-                href="https://github.com/opencollective/opencollectives/issues"
+                href="https://github.com/opencollective/opencollective/issues"
               >
                 Report an issue
               </a>
@@ -2551,7 +2551,7 @@ exports[`Search Page renders error message 1`] = `
                 display="block"
                 fontSize="1.4rem"
                 fontWeight="400"
-                href="https://github.com/opencollective/opencollectives/issues"
+                href="https://github.com/opencollective/opencollective/issues"
               >
                 Report an issue
               </a>
@@ -4059,7 +4059,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
                 display="block"
                 fontSize="1.4rem"
                 fontWeight="400"
-                href="https://github.com/opencollective/opencollectives/issues"
+                href="https://github.com/opencollective/opencollective/issues"
               >
                 Report an issue
               </a>
@@ -5545,7 +5545,7 @@ exports[`Search Page renders search results with pagination 1`] = `
                 display="block"
                 fontSize="1.4rem"
                 fontWeight="400"
-                href="https://github.com/opencollective/opencollectives/issues"
+                href="https://github.com/opencollective/opencollective/issues"
               >
                 Report an issue
               </a>
