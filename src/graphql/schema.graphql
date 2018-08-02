@@ -1,5 +1,5 @@
 # source: https://opencollective.com/api/graphql
-# timestamp: Thu Jul 26 2018 14:14:32 GMT+0200 (Central European Summer Time)
+# timestamp: Thu Aug 02 2018 09:45:06 GMT+0200 (Central European Summer Time)
 
 """Breakdown of backers per type (ANY/USER/ORGANIZATION/COLLECTIVE)"""
 type BackersStatsType {
@@ -1242,6 +1242,7 @@ enum TypeOfCollective {
   EVENT
   ORGANIZATION
   USER
+  BOT
 }
 
 """Input type for UpdateType"""
