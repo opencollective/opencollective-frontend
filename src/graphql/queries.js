@@ -44,6 +44,7 @@ export const transactionFields = `
   }
 `;
 
+/* eslint-disable graphql/template-strings, graphql/no-deprecated-fields, graphql/capitalized-type-name, graphql/named-operations */
 export const getTransactionsQuery = gql`
 query Transactions($CollectiveId: Int!, $type: String, $limit: Int, $offset: Int, $dateFrom: String, $dateTo: String) {
   allTransactions(CollectiveId: $CollectiveId, type: $type, limit: $limit, offset: $offset, dateFrom: $dateFrom, dateTo: $dateTo) {
@@ -54,6 +55,7 @@ query Transactions($CollectiveId: Int!, $type: String, $limit: Int, $offset: Int
   }
 }
 `;
+/* eslint-enable graphql/template-strings, graphql/no-deprecated-fields, graphql/capitalized-type-name, graphql/named-operations */
 
 export const getLoggedInUserQuery = gql`
   query LoggedInUser {
