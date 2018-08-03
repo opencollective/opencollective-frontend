@@ -81,8 +81,8 @@ const editCollectiveQuery = gql`
 `;
 
 const editTiersQuery = gql`
-  mutation editTiers($collectiveSlug: String!, $tiers: [TierInputType]!) {
-    editTiers(collectiveSlug: $collectiveSlug, tiers: $tiers) {
+  mutation editTiers($id: Int!, $tiers: [TierInputType]!) {
+    editTiers(id: $id, tiers: $tiers) {
       id,
       type,
       name,

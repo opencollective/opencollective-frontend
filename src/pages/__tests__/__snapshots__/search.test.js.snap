@@ -1239,7 +1239,7 @@ exports[`Search Page renders empty results message 1`] = `
                 display="block"
                 fontSize="1.4rem"
                 fontWeight="400"
-                href="https://github.com/opencollective/opencollectives/issues"
+                href="https://github.com/opencollective/opencollective/issues"
               >
                 Report an issue
               </a>
@@ -1892,7 +1892,7 @@ exports[`Search Page renders error message 1`] = `
 }
 
 <div
-  className="jsx-3855972673 Error"
+  className="ErrorPage"
 >
   <header>
     <div
@@ -2123,11 +2123,19 @@ exports[`Search Page renders error message 1`] = `
   <main
     className="jsx-1964704679"
   >
-    <h1
-      className="jsx-3855972673"
+    <div
+      className="content"
     >
-      Test error
-    </h1>
+      <div
+        className="jsx-300638056"
+      >
+        <h1
+          className="jsx-300638056"
+        >
+          Unknown error
+        </h1>
+      </div>
+    </div>
   </main>
   <div
     className="c26"
@@ -2543,7 +2551,7 @@ exports[`Search Page renders error message 1`] = `
                 display="block"
                 fontSize="1.4rem"
                 fontWeight="400"
-                href="https://github.com/opencollective/opencollectives/issues"
+                href="https://github.com/opencollective/opencollective/issues"
               >
                 Report an issue
               </a>
@@ -4051,7 +4059,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
                 display="block"
                 fontSize="1.4rem"
                 fontWeight="400"
-                href="https://github.com/opencollective/opencollectives/issues"
+                href="https://github.com/opencollective/opencollective/issues"
               >
                 Report an issue
               </a>
@@ -5537,7 +5545,7 @@ exports[`Search Page renders search results with pagination 1`] = `
                 display="block"
                 fontSize="1.4rem"
                 fontWeight="400"
-                href="https://github.com/opencollective/opencollectives/issues"
+                href="https://github.com/opencollective/opencollective/issues"
               >
                 Report an issue
               </a>

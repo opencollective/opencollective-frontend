@@ -33,7 +33,7 @@ class EditTiers extends React.Component {
     this.setState( { status: 'loading' });
     const { Collective } = this.props.data;
     try {
-      await this.props.editTiers(Collective.slug, TiersInputType );
+      await this.props.editTiers(Collective.id, TiersInputType);
       const tiersUrl = `${window.location.protocol}//${window.location.host}/${Collective.slug}/tiers`;
       window.location.replace(tiersUrl);
       this.setState({ result: { success: `Tiers edited successfully. (redirecting...)` }});

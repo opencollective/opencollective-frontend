@@ -19,9 +19,8 @@ import CollectiveCard from '../components/CollectiveCard';
 import ErrorPage from '../components/ErrorPage';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
-import LoadingGrid from '../components/LoadingGrid';
 import { Link } from '../server/pages';
-
+import LoadingGrid from '../components/LoadingGrid';
 import colors from '../constants/colors';
 
 const SearchInput = styled(FormControl)`
@@ -90,16 +89,16 @@ class SearchPage extends React.Component {
     const { data: { error, loading, search }, term = '' } = this.props;
     const { loadingUserLogin, LoggedInUser } = this.state;
 
+    if (error) {
+      return <ErrorPage data={this.props.data} />;
+    }
+
     const {
       collectives,
       limit = 20,
       offset,
       total = 0,
-    } = search || {};
-
-    if (error) {
-      return <ErrorPage {...error} />;
-    }
+    } = search || {};  
 
     const showCollectives = !loading && term.trim() !== "" && !!collectives;
 
@@ -125,12 +124,11 @@ class SearchPage extends React.Component {
               </form>
             </Box>
             <Flex justifyContent={['center', 'center', 'flex-start']} flexWrap="wrap">
-              {loading && (
+              { loading && (		
                 <Flex py={3} w={1} justifyContent="center">
                   <LoadingGrid />
                 </Flex>
               )}
-
               {showCollectives && collectives.map(collective => (
                 <Flex key={collective.slug} my={3} mx={2}>
                   <CollectiveCard collective={collective} />

@@ -3,7 +3,7 @@ import React from 'react'
 import Header from '../components/Header';
 import Body from '../components/Body';
 import Footer from '../components/Footer';
-import Loading from '../components/Loading';
+import ErrorPage from '../components/ErrorPage';
 import SignInForm from '../components/SignInForm';
 import withIntl from '../lib/withIntl';
 import { isValidUrl } from '../lib/utils';
@@ -37,7 +37,7 @@ class LoginPage extends React.Component {
 
   render() {
     if (this.props.token && !this.state.error) {
-      return (<Loading />);
+      return (<ErrorPage loading />);
     }
     return (
       <div className="LoginPage">

@@ -1,0 +1,12 @@
+{
+  "projects": {
+    "opencollective": {
+      "schemaPath": "src/graphql/schema.graphql",
+      "extensions": {
+        "endpoints": {
+          "prod": "https://opencollective.com/api/graphql"
+        }
+      }
+    }
+  }
+}

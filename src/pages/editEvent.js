@@ -2,8 +2,7 @@ import withData from '../lib/withData'
 import withIntl from '../lib/withIntl';
 import React from 'react'
 import { addEventCollectiveData, addGetLoggedInUserFunction } from '../graphql/queries';
-import NotFound from '../components/NotFoundPage';
-import Loading from '../components/Loading';
+import ErrorPage from '../components/ErrorPage';
 import EditEvent from '../components/EditEvent';
 
 class EditEventPage extends React.Component {
@@ -26,12 +25,8 @@ class EditEventPage extends React.Component {
   render() {
     const { data } = this.props;
 
-    if (this.state.loading) {
-      return <Loading />;
-    }
-
-    if (!data.loading && !data.Collective) {
-      return (<NotFound />)
+    if (this.state.loading || !data.Collective) {
+      return (<ErrorPage loading={this.state.loading} data={data} />)
     }
 
     const { LoggedInUser } = this.state;

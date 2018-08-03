@@ -7,6 +7,7 @@ import Footer from './Footer';
 import { addCreateCollectiveMutation } from '../graphql/mutations';
 import CreateCollectiveForm from './CreateCollectiveForm';
 import CreateCollectiveCover from './CreateCollectiveCover';
+import ErrorPage from './ErrorPage';
 import SignInForm from './SignInForm';
 import { get } from 'lodash';
 import { FormattedMessage, defineMessages } from 'react-intl';
@@ -97,6 +98,10 @@ class CreateCollective extends React.Component {
     const canApply = get(this.host, 'settings.apply');
     const title = get(this.host, 'settings.apply.title') || intl.formatMessage(this.messages['host.apply.title'], { hostname: this.host.name });
     const description = get(this.host, 'settings.apply.description') || intl.formatMessage(this.messages['collective.create.description'], { hostname: this.host.name });
+
+    if (!host) {
+      return (<ErrorPage loading />);
+    }
 
     return (
       <div className="CreateCollective">

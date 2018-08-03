@@ -77,6 +77,7 @@ class ActionPage extends React.Component {
   }
 }
 
+/* eslint-disable graphql/template-strings, graphql/no-deprecated-fields, graphql/capitalized-type-name, graphql/named-operations */
 const getQueryForAction = (action) => gql`
 mutation ${action}($id: Int!) {
   ${action}(id: $id) {
@@ -84,6 +85,7 @@ mutation ${action}($id: Int!) {
   }
 }
 `;
+/* eslint-disable graphql/template-strings, graphql/no-deprecated-fields, graphql/capitalized-type-name, graphql/named-operations */
 
 const addMutationForAction = (action) => graphql(getQueryForAction(action), {
   props: ( { mutate }) => ({
