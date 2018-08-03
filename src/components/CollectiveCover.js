@@ -27,7 +27,7 @@ class CollectiveCover extends React.Component {
     LoggedInUser: PropTypes.object,
     intl: PropTypes.object.isRequired,
     cta: PropTypes.object, // { href, label }
-  }
+  };
 
   constructor(props) {
     super(props);
@@ -101,7 +101,7 @@ ${description}`
           align-items: center;
           position: relative;
           text-align: center;
-          min-height: 400px;
+          min-height: 30rem;
           width: 100%;
           overflow: hidden;
         }
@@ -307,7 +307,7 @@ ${description}`
             }
           </div>
 
-          { ['USER','ORGANIZATION'].indexOf(collective.type) !== -1 && stats && stats.totalAmountSpent > 0 && !collective.isHost &&
+          { ['USER','ORGANIZATION'].includes(collective.type) && stats && stats.totalAmountSpent > 0 && !collective.isHost &&
             <div className="statsContainer">
               <div className="stat">
                 <div className="totalAmountSpent value">
@@ -326,7 +326,7 @@ ${description}`
             </div>
           }
 
-          { collective.type === 'COLLECTIVE' &&
+          { collective.type === 'COLLECTIVE' && collective.isActive && collective.host &&
             <div className="statsContainer">
               { className !== 'small' && collective.type === 'COLLECTIVE' &&
                 <div className="topContributors">

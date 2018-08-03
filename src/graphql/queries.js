@@ -352,6 +352,7 @@ const getCollectiveQuery = gql`
         }
       }
       isHost
+      hostFeePercent
       canApply
       host {
         id
