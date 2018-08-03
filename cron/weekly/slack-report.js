@@ -14,9 +14,10 @@ if (!process.env.MANUAL) {
 
 const {
   Activity,
-  Expense,
   Collective,
-  Transaction
+  Expense,
+  PaymentMethod,
+  Transaction,
 } = models;
 
 const createdLastWeek = getTimeFrame('createdAt', process.env.START_DATE);
@@ -70,12 +71,22 @@ const collectiveByCurrency = {
 
 const onlyIncludeCollectiveType = {
   include: [{
-    model: models.Collective,
+    model: Collective,
     as: 'collective',
     where: {
       type: 'COLLECTIVE'
     }
   }]
+};
+
+const includePaypalPayments = {
+  include: [{
+    attributes: [],
+    model: PaymentMethod,
+    where: {
+      service: 'paypal',
+    },
+  }],
 };
 
 const paypalReceived = { where: { type: activities.WEBHOOK_PAYPAL_RECEIVED } };
@@ -94,6 +105,10 @@ export default function run() {
 
     priorDonationCount: Transaction.count(weekBeforeDonations),
 
+    paypalDonationCount: Transaction.count(merge({}, lastWeekDonations, includePaypalPayments)),
+
+    priorPaypalDonationCount: Transaction.count(merge({}, weekBeforeDonations, includePaypalPayments)),
+
     donationAmount: Transaction
       .aggregate('amount', 'SUM', merge({}, lastWeekDonations, collectiveByCurrency)),
 
@@ -101,6 +116,12 @@ export default function run() {
       .aggregate('amount', 'SUM', merge({}, weekBeforeDonations, collectiveByCurrency)),
 
     paypalReceivedCount: Activity.count(merge({}, createdLastWeek, paypalReceived)),
+
+    paypalDonationAmount: Transaction
+      .sum('amount', merge({}, lastWeekDonations, includePaypalPayments)),
+
+    priorPaypalDonationAmount: Transaction
+      .sum('amount', merge({}, weekBeforeDonations, includePaypalPayments)),
 
     // Expense statistics
 
@@ -214,6 +235,8 @@ function reportString({
   newCollectives,
   paidExpenseAmount,
   paidExpenseCount,
+  paypalDonationAmount,
+  paypalDonationCount,
   pendingExpenseAmount,
   pendingExpenseCount,
   priorActiveCollectiveCount,
@@ -221,6 +244,8 @@ function reportString({
   priorDonationCount,
   priorNewCollectivesCount,
   priorPaidExpenseAmount,
+  priorPaypalDonationAmount,
+  priorPaypalDonationCount,
   priorPaidExpenseCount,
   rejectedExpenseAmount,
   rejectedExpenseCount,
@@ -230,6 +255,8 @@ function reportString({
 * Donations:
   - ${donationCount} (${compareNumbers(donationCount, priorDonationCount)}) donations received totaling:
     ${donationAmount.map(({ SUM, currency }) => `* ${SUM/100} ${currency} (${compareNumbers(SUM/100, getSum(priorDonationAmount, currency)/100)})`).join('\n    ')}
+  - ${paypalDonationCount} (${compareNumbers(paypalDonationCount, priorPaypalDonationCount)}) paypal donations received totaling:
+    * ${paypalDonationAmount/100} USD (${compareNumbers(paypalDonationAmount/100, priorPaypalDonationAmount/100)})
 * Expenses:
   - ${pendingExpenseCount} pending expenses${displayTotals(pendingExpenseAmount)}
   - ${approvedExpenseCount} approved expenses${displayTotals(approvedExpenseAmount)}
