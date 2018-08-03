@@ -76,47 +76,51 @@ class ExpensesSection extends React.Component {
             }
             `}</style>
             <div className="columns">
-              <div id="expenses" className="col">
-                <h2>
-                  <FormattedMessage
-                    id="collective.expenses.title"
-                    values={{ n: this.totalExpenses }}
-                    defaultMessage={`{n, plural, one {Latest expense} other {Latest expenses}}`}
+              { this.totalExpenses > 0 &&
+                <div id="expenses" className="col">
+                  <h2>
+                    <FormattedMessage
+                      id="collective.expenses.title"
+                      values={{ n: this.totalExpenses }}
+                      defaultMessage={`{n, plural, one {Latest expense} other {Latest expenses}}`}
+                      />
+                  </h2>
+                  <ExpensesWithData
+                    collective={collective}
+                    LoggedInUser={LoggedInUser}
+                    view="compact"
+                    limit={5}
                     />
-                </h2>
-                <ExpensesWithData
-                  collective={collective}
-                  LoggedInUser={LoggedInUser}
-                  view="compact"
-                  limit={5}
-                  />
-                { this.totalExpenses > 0 &&
-                  <div className="actions">
-                    <a className="ViewAllExpensesBtn" onClick={() => Router.pushRoute(`${collective.path}/expenses`)}><FormattedMessage id="expenses.viewAll" defaultMessage="View All Expenses" /></a>
-                  </div>
-                }
-              </div>
+                  { this.totalExpenses > 0 &&
+                    <div className="actions">
+                      <a className="ViewAllExpensesBtn" onClick={() => Router.pushRoute(`${collective.path}/expenses`)}><FormattedMessage id="expenses.viewAll" defaultMessage="View All Expenses" /></a>
+                    </div>
+                  }
+                </div>
+              }
 
-              <div id="transactions" className="col">
-                <h2>
-                  <FormattedMessage
-                    id="collective.transactions.title"
-                    values={{ n: this.totalTransactions }}
-                    defaultMessage={`{n, plural, one {Latest transaction} other {Latest transactions}}`}
+              { this.totalTransactions > 0 &&
+                <div id="transactions" className="col">
+                  <h2>
+                    <FormattedMessage
+                      id="collective.transactions.title"
+                      values={{ n: this.totalTransactions }}
+                      defaultMessage={`{n, plural, one {Latest transaction} other {Latest transactions}}`}
+                      />
+                  </h2>
+                  <TransactionsWithData
+                    collective={collective}
+                    LoggedInUser={LoggedInUser}
+                    limit={5}
+                    showCSVlink={false}
                     />
-                </h2>
-                <TransactionsWithData
-                  collective={collective}
-                  LoggedInUser={LoggedInUser}
-                  limit={5}
-                  showCSVlink={false}
-                  />
-                { this.totalTransactions > 0 &&
-                  <div className="actions">
-                    <a className="ViewAllTransactionsBtn" onClick={() => Router.pushRoute(`${collective.path}/transactions`)}><FormattedMessage id="transactions.viewAll" defaultMessage="View All Transactions" /></a>
-                  </div>
-                }
-              </div>
+                  { this.totalTransactions > 0 &&
+                    <div className="actions">
+                      <a className="ViewAllTransactionsBtn" onClick={() => Router.pushRoute(`${collective.path}/transactions`)}><FormattedMessage id="transactions.viewAll" defaultMessage="View All Transactions" /></a>
+                    </div>
+                  }
+                </div>
+              }
             </div>
           </div>
         </div>
