@@ -81,6 +81,7 @@ class ErrorPage extends React.Component {
   }
 
   render() {
+
     const component = this.getErrorComponent();
 
     return (

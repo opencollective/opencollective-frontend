@@ -99,7 +99,7 @@ class CreateCollective extends React.Component {
     const title = get(this.host, 'settings.apply.title') || intl.formatMessage(this.messages['host.apply.title'], { hostname: this.host.name });
     const description = get(this.host, 'settings.apply.description') || intl.formatMessage(this.messages['collective.create.description'], { hostname: this.host.name });
 
-    if (!host) {
+    if (!this.host) {
       return (<ErrorPage loading />);
     }
 
