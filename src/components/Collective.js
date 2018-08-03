@@ -56,6 +56,9 @@ class Collective extends React.Component {
       'collective.menu.backer': { id: 'collective.menu.backer', defaultMessage: `backing {n} {n, plural, one {collective} other {collectives}}`},
       'collective.menu.fundraiser': { id: 'collective.menu.fundraiser', defaultMessage: `raised money for {n} {n, plural, one {collective} other {collectives}}`},
       'collective.menu.follower': { id: 'collective.menu.follower', defaultMessage: `following {n} {n, plural, one {collective} other {collectives}}`},
+      'collective.section.contributors.empty': { id: 'collective.section.contributors.empty', defaultMessage: 'You don\'t have any financial contributors yet.' },
+      'collective.section.contributors.noHost': { id: 'collective.section.contributors.noHost', defaultMessage: 'Enable people to contribute financially to your collective by adding a host' },
+      'collective.addHostBtn': { id: 'collective.addHostBtn', defaultMessage: 'Add a host' },
     });
   }
 
@@ -77,6 +80,8 @@ class Collective extends React.Component {
       notification.title = intl.formatMessage(this.messages['collective.created']);
       notification.description = intl.formatMessage(this.messages['collective.created.description'], { host: collective.host.name });
     }
+
+    const cta = collective.isActive && collective.host && { href: `#contribute`, label: 'contribute' };
 
     return (
       <div className={`CollectivePage ${collective.type}`}>
@@ -150,7 +155,7 @@ class Collective extends React.Component {
 
             <CollectiveCover
               collective={collective}
-              cta={{ href: `#contribute`, label: 'contribute' }}
+              cta={cta}
               LoggedInUser={LoggedInUser}
               />
 
@@ -158,21 +163,23 @@ class Collective extends React.Component {
               <div>
                 <div className="content" >
 
-                  <div className="sidebar tiers" id="contribute">
-                    { collective.tiers.map(tier => (
-                      <TierCard
-                        key={`TierCard-${tier.slug}`}
-                        collective={collective}
-                        tier={tier}
-                        referral={query.referral}
-                        />
-                    ))}
-                    <div className="CustomDonationTierCard">
-                      <Link route={`/${collective.slug}/donate`}>
-                        <a><FormattedMessage id="collective.tiers.donate" defaultMessage="Or make a one time donation" /></a>
-                      </Link>
+                  { collective.isActive && collective.host &&
+                    <div className="sidebar tiers" id="contribute">
+                      { collective.tiers.map(tier => (
+                        <TierCard
+                          key={`TierCard-${tier.slug}`}
+                          collective={collective}
+                          tier={tier}
+                          referral={query.referral}
+                          />
+                      ))}
+                      <div className="CustomDonationTierCard">
+                        <Link route={`/${collective.slug}/donate`}>
+                          <a><FormattedMessage id="collective.tiers.donate" defaultMessage="Or make a one time donation" /></a>
+                        </Link>
+                      </div>
                     </div>
-                  </div>
+                  }
 
                   { (get(collective, 'stats.updates') > 0 || canEditCollective) &&
                     <UpdatesSection
@@ -233,12 +240,19 @@ class Collective extends React.Component {
 
               <section id="contributors" className="tier">
                 <div className="content" >
-                  { get(collective, 'stats.backers.all') === 0 &&
-                  <SectionTitle
-                    section="contributors"
-                    subtitle={<FormattedMessage id="collective.section.contributors.empty" defaultMessage="You don't have any contributors yet." />}
-                    />
-                }
+                  { !collective.host &&
+                    <SectionTitle
+                      section="contributors"
+                      subtitle={intl.formatMessage(this.messages[`collective.section.contributors.${collective.host ? 'empty' : 'noHost'}`])}
+                      action={ { label: intl.formatMessage(this.messages['collective.addHostBtn']), href: `/${collective.slug}/edit#host` } }
+                      />
+                  }
+                  { collective.host && get(collective, 'stats.backers.all') === 0 &&
+                    <SectionTitle
+                      section="contributors"
+                      subtitle={intl.formatMessage(this.messages['collective.section.contributors.empty'])}
+                      />
+                  }
                   { get(collective, 'stats.backers.all') > 0 &&
                   <div>
                     <SectionTitle
