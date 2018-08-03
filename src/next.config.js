@@ -1,6 +1,9 @@
 import webpack from 'webpack';
 
 module.exports = {
+  publicRuntimeConfig: {
+    API_URL: process.env.API_URL
+  },
   onDemandEntries: {
     // Make sure entries are not getting disposed.
     maxInactiveAge: 1000 * 60 * 60

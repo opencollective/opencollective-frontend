@@ -323,6 +323,8 @@
   "page.error.collective.is.not.host": "Cette page est uniquement pour les hôtes de collectifs",
   "page.error.networkError": "Open Collective n'est momentanément pas joignable 🙀",
   "page.error.networkError.description": "Pas de panique! Un de nos ingénieurs est probablement déjà occupé de régler ce problème 👩🏻‍💻👨🏿‍💻. Merci de bien vouloir réessayer plus tard. Merci pour votre patience 🙏 (et désolé pour l'inconvénience!)",
+  "page.error.networkError.localhost": "The Open Collective API is not reachable",
+  "page.error.networkError.localhost.description": "Please make sure the Open Collective API is up and running on {api_url} or specify a different location with the environment variable API_URL",
   "page.error.unknown": "Erreur inconnue",
   "event.over.sendMoneyToParent.title": "L'événement est terminé et il reste de l'argent qui n'a pas été dépensé",
   "event.over.sendMoneyToParent.description": "Si vous avez encore des dépenses liées à cet événement, veuillez les soumettre. Sinon, vous pouvez transférer l'argent restant à votre collectif {collective}",

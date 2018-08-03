@@ -8,6 +8,9 @@ import withIntl from '../lib/withIntl';
 import { get } from 'lodash';
 import Loading from './Loading';
 import NotFound from './NotFound';
+import getConfig from 'next/config'
+
+const { publicRuntimeConfig } = getConfig();
 
 class ErrorPage extends React.Component {
 
@@ -27,6 +30,8 @@ class ErrorPage extends React.Component {
       'collective.is.not.host': { id: 'page.error.collective.is.not.host', defaultMessage: 'This page is only for hosts' },
       'networkError': { id: 'page.error.networkError', defaultMessage: 'The Open Collective Server is momentarily unreachable 🙀' },
       'networkError.description': { id: 'page.error.networkError.description', defaultMessage: 'Worry not! One of our engineers is probably already on it  👩🏻‍💻👨🏿‍💻. Please try again later. Thank you for your patience 🙏 (and sorry for the inconvenience!)' },
+      'networkError.localhost': { id: 'page.error.networkError.localhost', defaultMessage: 'The Open Collective API is not reachable' },
+      'networkError.localhost.description': { id: 'page.error.networkError.localhost.description', defaultMessage: 'Please make sure the Open Collective API is up and running on {api_url} or specify a different location with the environment variable API_URL' },
       'unknown': { id: 'page.error.unknown', defaultMessage: 'Unknown error' },
     });
 
@@ -42,6 +47,9 @@ class ErrorPage extends React.Component {
     this.message = this.messages[message] ? message : 'unknown';
     if (get(data, 'error.networkError')) {
       this.message = 'networkError';
+      if (get(window, 'location.hostname') === 'localhost') {
+        this.message = 'networkError.localhost';
+      }
     }
 
     if (loading || get(data, 'loading')) {
@@ -74,7 +82,7 @@ class ErrorPage extends React.Component {
         <h1>{intl.formatMessage(this.messages[this.message])}</h1>
         {this.component}
         { this.messages[`${this.message}.description`] &&
-          <p>{intl.formatMessage(this.messages[`${this.message}.description`])}</p>
+          <p>{intl.formatMessage(this.messages[`${this.message}.description`], { api_url: publicRuntimeConfig.API_URL })}</p>
         }
       </div>
     )
