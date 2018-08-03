@@ -178,6 +178,7 @@ const getTopVendorsForCollective = (CollectiveId, options = {}) => {
     FROM "Transactions" t LEFT JOIN "Collectives" c ON t."FromCollectiveId" = c.id
     WHERE t."CollectiveId"=:CollectiveId
       AND t.type='DEBIT'
+      AND t."deletedAt" IS NULL
       ${since} ${until}
     GROUP BY c.id ORDER BY "totalExpenses" ASC LIMIT :limit
   `, {
@@ -514,7 +515,9 @@ const getMembersWithTotalDonations = (where, options = {}) => {
         max("createdAt") as "lastDonation",
         min("createdAt") as "firstDonation"
       FROM "Transactions" t
-      WHERE t."CollectiveId" IN (:collectiveids) AND t.amount ${transactionType === 'CREDIT' ? '>=' : '<='} 0 ${untilCondition('t')}
+      WHERE t."CollectiveId" IN (:collectiveids)
+      AND t.amount ${transactionType === 'CREDIT' ? '>=' : '<='} 0 ${untilCondition('t')}
+      AND t."deletedAt" IS NULL
       GROUP BY t."FromCollectiveId"
     )
     SELECT

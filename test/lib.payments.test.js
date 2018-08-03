@@ -6,6 +6,7 @@ import models from '../server/models';
 import * as utils from '../test/utils';
 import * as payments from '../server/lib/payments';
 import roles from '../server/constants/roles';
+import status from '../server/constants/order_status';
 import * as stripe from '../server/paymentProviders/stripe/gateway';
 import Promise from 'bluebird';
 
@@ -168,6 +169,7 @@ describe('lib.payments.test.js', () => {
                 expect(order).to.have.property('CollectiveId', collective.id);
                 expect(order).to.have.property('currency', CURRENCY);
                 expect(order).to.have.property('totalAmount', AMOUNT);
+                expect(order).to.have.property('status', status.PAID);
               }));
 
             it('successfully adds the user as a backer', () => models.Member.findOne({
@@ -248,6 +250,7 @@ describe('lib.payments.test.js', () => {
               expect(res.rows[1]).to.have.property('currency', CURRENCY);
               expect(res.rows[1]).to.have.property('totalAmount', AMOUNT2);
               expect(res.rows[1]).to.have.property('SubscriptionId');
+              expect(res.rows[1]).to.have.property('status', status.ACTIVE);
             }));
 
           it('creates a Subscription model', () => models.Subscription
