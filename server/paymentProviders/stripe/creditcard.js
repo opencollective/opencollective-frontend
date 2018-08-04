@@ -85,7 +85,8 @@ export default {
 
       const { collective, createdByUser: user, paymentMethod } = order;
       let charge;
-
+      const platformFee = order.isPlatformFeeNonChargeable ? 0 :
+                          parseInt(order.totalAmount * constants.OC_FEE_PERCENT / 100, 10);
       return stripeGateway.createCharge(
         hostStripeAccount,
         {
@@ -93,7 +94,7 @@ export default {
           currency: order.currency,
           customer: hostStripeCustomerId,
           description: order.description,
-          application_fee: parseInt(order.totalAmount * constants.OC_FEE_PERCENT / 100, 10),
+          application_fee: platformFee,
           metadata: {
             from: `${config.host.website}/${order.fromCollective.slug}`,
             to: `${config.host.website}/${order.collective.slug}`,

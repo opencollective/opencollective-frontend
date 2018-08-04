@@ -87,15 +87,33 @@ paymentMethodProvider.processOrder = async (order, options = {}) => {
     if (order.collective.HostCollectiveId !== order.paymentMethod.CollectiveId) {
       throw new Error(`You need to use the payment method of the host (${order.collective.HostCollectiveId}) to add funds to this collective`);
     }
-  } else if (fromCollectiveHost.id !== collectiveHost.id) {
-    throw new Error(`Cannot transfer money between different hosts (${fromCollectiveHost.name} -> ${collectiveHost.name})`);
+  }
+
+  // If Hosts are not the same, then look for FromCollectitveHost Credit Card
+  // and create transaction through the paymentLib Process order
+  if (fromCollectiveHost.id !== collectiveHost.id) {
+    // try to find a credit card for the fromCollectiveHost
+    const fromCollectiveHostPaymentMethod = await models.PaymentMethod.findOne({
+      where: {
+        CollectiveId: fromCollectiveHost.id,
+        type: 'creditcard'
+      }
+    });
+    if (!fromCollectiveHostPaymentMethod) {
+      throw new Error(`Host ${fromCollectiveHost.name} needs to add a credit card to send money to different Hosts`);
+    }
+    // Change paymentMethod to use credit card instead of collective
+    order.paymentMethod = fromCollectiveHostPaymentMethod;
+    // flag created to avoid platform fees in cross-host transactions
+    order.isPlatformFeeNonChargeable = true;
+    return paymentsLib.processOrder(order);
   }
 
   const payload = {
     CreatedByUserId: order.CreatedByUserId,
     FromCollectiveId: order.FromCollectiveId,
     CollectiveId: order.CollectiveId,
-    PaymentMethodId: order.PaymentMethodId
+    PaymentMethodId: order.PaymentMethodId,
   };
 
   // Different collectives on the same host may have different currencies
