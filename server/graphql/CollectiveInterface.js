@@ -974,35 +974,29 @@ const CollectiveFields = () => {
         includeHostedCollectives: { type: GraphQLBoolean },
         status: { type: GraphQLString }
       },
-      resolve(collective, args, req) {
+      resolve(collective, args) {
         const query = { where: {} };
         if (args.status) query.where.status = args.status;
         if (args.limit) query.limit = args.limit;
         if (args.offset) query.offset = args.offset;
         query.order = [["incurredAt", "DESC"]];
-        return req.loaders.collective.findById.load(args.CollectiveId)
-          .then(collective => {
-            if (!collective) {
-              throw new Error('Collective not found');
-            }
-            const getCollectiveIds = () => {
-              // if is host, we get all the expenses across all the hosted collectives
-              if (args.includeHostedCollectives) {
-                return models.Member.findAll({
-                  where: {
-                    MemberCollectiveId: collective.id,
-                    role: 'HOST'
-                  }
-                }).map(members => members.CollectiveId)
-              } else {
-                return Promise.resolve([args.CollectiveId]);
+        const getCollectiveIds = () => {
+          // if is host, we get all the expenses across all the hosted collectives
+          if (args.includeHostedCollectives) {
+            return models.Member.findAll({
+              where: {
+                MemberCollectiveId: collective.id,
+                role: 'HOST'
               }
-            }
-            return getCollectiveIds().then(collectiveIds => {
-              query.where.CollectiveId = { [Op.in]: collectiveIds };
-              return models.Expense.findAll(query);
-            })
-          })
+            }).map(members => members.CollectiveId)
+          } else {
+            return Promise.resolve([collective.id]);
+          }
+        }
+        return getCollectiveIds().then(collectiveIds => {
+          query.where.CollectiveId = { [Op.in]: collectiveIds };
+          return models.Expense.findAll(query);
+        });
       }
     },
     role: {

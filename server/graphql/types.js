@@ -25,6 +25,7 @@ import models, { Op } from '../models';
 import dataloaderSequelize from 'dataloader-sequelize';
 import { strip_tags } from '../lib/utils';
 import status from '../constants/expense_status';
+import { pick } from 'lodash';
 
 dataloaderSequelize(models.Order);
 dataloaderSequelize(models.Transaction);
@@ -466,20 +467,12 @@ export const ExpenseType = new GraphQLObjectType({
           limit: { type: GraphQLInt },
           offset: { type: GraphQLInt }
         },
-        async resolve(expense, args) {
-          const query = {
-            where: { ExpenseId: expense.id},
-            limit: args.limit || 10,
-            offset: args.offset || 0
-          };
-          const result = await models.Comment.findAndCountAll(query);
-          const { count, rows } = result;
+        resolve(expense, args) {
           return {
-            total: count,
-            comments: rows,
-            limit: args.limitg,
-            offset: args.offset,
-          };
+            where: { ExpenseId: expense.id },
+            limit: args.limit,
+            offset: args.offset
+          }
         }
       },
       collective: {
@@ -618,20 +611,12 @@ export const UpdateType = new GraphQLObjectType({
           limit: { type: GraphQLInt },
           offset: { type: GraphQLInt }
         },
-        async resolve(update, args) {
-          const query = {
-            where: { UpdateId: update.id},
+        resolve(update, args) {
+          return {
+            where: { UpdateId: update.id },
             limit: args.limit || 10,
             offset: args.offset || 0
-          };
-          const result = await models.Comment.findAndCountAll(query);
-          const { count, rows } = result;
-          return {
-            total: count,
-            comments: rows,
-            limit: args.limitg,
-            offset: args.offset,
-          };
+          }
         }
       }
     }
@@ -645,15 +630,36 @@ export const CommentListType = new GraphQLObjectType({
   fields: () => ({
     comments: {
       type: new GraphQLList(CommentType),
+      async resolve(query, args, req) {
+        let rows;
+        if (query.where.ExpenseId) {
+          rows = await req.loaders.comments.findAllByAttribute('ExpenseId').load(query.where.ExpenseId);
+        }
+        if (query.where.UpdateId) {
+          rows = await req.loaders.comments.findAllByAttribute('UpdateId').load(query.where.UpdateId);
+        }
+        return rows.splice(query.offset, query.limit);
+      }
     },
     limit: {
       type: GraphQLInt,
+      resolve(query) {
+        return query.limit;
+      }
     },
     offset: {
       type: GraphQLInt,
+      resolve(query) {
+        return query.offset;
+      }
     },
     total: {
       type: GraphQLInt,
+      async resolve(query, args, req) {
+        if (query.where.ExpenseId) {
+          return req.loaders.comments.countByExpenseId.load(query.where.ExpenseId);
+        }
+      }
     },
   }),
 });
