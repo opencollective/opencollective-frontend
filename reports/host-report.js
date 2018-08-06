@@ -134,7 +134,6 @@ async function HostReport(year, month, hostId) {
       }
 
       return {
-        logging: console.log,
         where: { ...where, ...dateRange, type: 'DEBIT'},
         raw: true,
         include: [
