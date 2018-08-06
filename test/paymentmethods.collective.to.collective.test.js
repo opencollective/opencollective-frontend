@@ -403,7 +403,6 @@ describe("payments.collectiveToCollective.test.js", () => {
         totalAmount: 1000,
         interval: 'month',
       }
-      console.log(`order: ${JSON.stringify(order,null,2)}`);
       // Executing queries
       const res = await utils.graphqlQuery(createOrderQuery, { order }, user1);
 
@@ -414,7 +413,6 @@ describe("payments.collectiveToCollective.test.js", () => {
       // When the order is created
       // Then the created transaction should match the requested data
       const orderCreated = res.data.createOrder;
-      console.log(`orderCreated: ${JSON.stringify(orderCreated,null,2)}`);
       const orderCreatedCollective = orderCreated.collective;
       const orderCreatedFromCollective = orderCreated.fromCollective;
       const subscription = orderCreated.subscription;
@@ -429,7 +427,6 @@ describe("payments.collectiveToCollective.test.js", () => {
           amount: order.totalAmount,
         }
       });
-      console.log(`transaction: ${JSON.stringify(transaction,null,2)}`);
       // make sure the transaction has been recorded
       expect(transaction.FromCollectiveId).to.equal(collective1.id);
       expect(transaction.CollectiveId).to.equal(collective3.id);
