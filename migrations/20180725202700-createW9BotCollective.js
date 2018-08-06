@@ -39,7 +39,7 @@ module.exports = {
           W9: {
             threshold: 60000,
             comment: '<p>The total amount of the expenses that you have submitted ' +
-            'this year to this host exceeds $600. To comply with the IRS, we need you to send us the'+
+            'this year to this host exceeds $600. To comply with the IRS, we need you to <a href="mailto:w9@opencollective.com?subject=W9%20for%20{{collective}}%20(hosted%20by%20{{host}})&body=Please%20find%20attached%20the%20[W9|W8-BEN|W8-BEN-E]%20form.%0D%0A%0D%0A-%20{{fromName}}%0D%0A%0D%0A---%0D%0A{{expenseUrl}}%0D%0ATotal%20amount%20expensed%20this%20year%20so%20far:%20{{totalAmountThisYear}}%0D%0A%0D%0A">send us by email</a> the'+
             ' <a href="https://www.irs.gov/pub/irs-pdf/fw9.pdf">W9 form</a> if you are a ' +
             'US resident (if you are not a US resident, please send the '+
             '<a href="https://www.irs.gov/pub/irs-pdf/fw8ben.pdf">W-8BEN form</a> ' +
