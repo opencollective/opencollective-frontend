@@ -359,7 +359,7 @@ describe("payments.collectiveToCollective.test.js", () => {
 
     });/** END OF "Collective 1 sends money to Collective 3 through different hosts(no platform fees, but still has stripe and host fees)" */
 
-    it('creates a recurring donation as logged in user', async () => {
+    it('Collective 1 sends a recurring donation to Collective 3', async () => {
       // Add User 1 as Collective 1 Admin
       await models.Member.create({
         CreatedByUserId: user1.id,
@@ -433,6 +433,6 @@ describe("payments.collectiveToCollective.test.js", () => {
       expect(transaction.currency).to.equal(collective1.currency);
     });
 
-  }); /** END OF "Collective to Collective Transactions"*/
+  }); /** END OF "Collective 1 sends a recurring donation to Collective 3"*/
 
 }); /** END OF "payments.collectiveToCollective.test" */
