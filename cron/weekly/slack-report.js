@@ -7,6 +7,7 @@ import models, { Op } from '../../server/models';
 import activities from '../../server/constants/activities';
 import slackLib from '../../server/lib/slack';
 import expenseStatus from '../../server/constants/expense_status';
+import { formatCurrency } from '../../server/lib/utils';
 
 if (!process.env.MANUAL) {
   onlyExecuteInProdOnMondays();
@@ -31,9 +32,6 @@ const donation = {
   where: {
     OrderId: {
       [Op.not]: null
-    },
-    platformFeeInHostCurrency: {
-      [Op.lt]: 0
     }
   }
 };
@@ -62,11 +60,13 @@ const paidLastWeekExpenses = merge({}, lastWeekExpenses, paidExpense);
 const weekBeforeDonations = merge({}, createdWeekBefore, donation, excludeOcTeam, credit);
 const paidWeekBeforeExpenses = merge({}, updatedWeekBefore, excludeOcTeam, paidExpense);
 
-const collectiveByCurrency = {
-  plain: false,
-  group: ['currency'],
-  attributes: ['currency'],
-  order: ['currency']
+const collectiveByCurrency = (table) => {
+  return {
+    plain: false,
+    group: [ `${table}.currency` ],
+    attributes: ['currency'],
+    order: ['currency']
+  }
 };
 
 const onlyIncludeCollectiveType = {
@@ -79,14 +79,17 @@ const onlyIncludeCollectiveType = {
   }]
 };
 
-const includePaypalPayments = {
-  include: [{
-    attributes: [],
-    model: PaymentMethod,
-    where: {
-      service: 'paypal',
-    },
-  }],
+const service = (service) => {
+  return {
+    include: [{
+      attributes: [],
+      model: PaymentMethod,
+      required: true,
+      where: {
+        service,
+      },
+    }],
+  };
 };
 
 const paypalReceived = { where: { type: activities.WEBHOOK_PAYPAL_RECEIVED } };
@@ -101,27 +104,37 @@ export default function run() {
 
     // Donation statistics
 
-    donationCount: Transaction.count(lastWeekDonations),
+    stripeDonationCount: Transaction.count(merge({}, lastWeekDonations, service('stripe'))),
 
-    priorDonationCount: Transaction.count(weekBeforeDonations),
+    priorStripeDonationCount: Transaction.count(merge({}, weekBeforeDonations, service('stripe'))),
 
-    paypalDonationCount: Transaction.count(merge({}, lastWeekDonations, includePaypalPayments)),
+    manualDonationCount: Transaction.count(merge({}, lastWeekDonations, service('opencollective'))),
 
-    priorPaypalDonationCount: Transaction.count(merge({}, weekBeforeDonations, includePaypalPayments)),
+    priorManualDonationCount: Transaction.count(merge({}, weekBeforeDonations, service('opencollective'))),
 
-    donationAmount: Transaction
-      .aggregate('amount', 'SUM', merge({}, lastWeekDonations, collectiveByCurrency)),
+    paypalDonationCount: Transaction.count(merge({}, lastWeekDonations, service('paypal'))),
 
-    priorDonationAmount: Transaction
-      .aggregate('amount', 'SUM', merge({}, weekBeforeDonations, collectiveByCurrency)),
+    priorPaypalDonationCount: Transaction.count(merge({}, weekBeforeDonations, service('paypal'))),
+
+    stripeDonationAmount: Transaction
+      .aggregate('amount', 'SUM', merge({}, lastWeekDonations, collectiveByCurrency('Transaction'))),
+
+    priorStripeDonationAmount: Transaction
+      .aggregate('amount', 'SUM', merge({}, weekBeforeDonations, collectiveByCurrency('Transaction'))),
+
+    manualDonationAmount: Transaction
+      .aggregate('amount', 'SUM', merge({ logging: console.log }, lastWeekDonations, collectiveByCurrency('Transaction'), service('opencollective'))),
+
+    priorManualDonationAmount: Transaction
+      .sum('amount', merge({}, weekBeforeDonations, service('opencollective'))),
 
     paypalReceivedCount: Activity.count(merge({}, createdLastWeek, paypalReceived)),
 
     paypalDonationAmount: Transaction
-      .sum('amount', merge({}, lastWeekDonations, includePaypalPayments)),
+      .sum('amount', merge({}, lastWeekDonations, service('paypal'))),
 
     priorPaypalDonationAmount: Transaction
-      .sum('amount', merge({}, weekBeforeDonations, includePaypalPayments)),
+      .sum('amount', merge({}, weekBeforeDonations, service('paypal'))),
 
     // Expense statistics
 
@@ -136,22 +149,22 @@ export default function run() {
     priorPaidExpenseCount: Expense.count(paidWeekBeforeExpenses),
 
     pendingExpenseAmount: Expense
-      .aggregate('amount', 'SUM', merge({}, pendingLastWeekExpenses, collectiveByCurrency))
-      .map(row => `${-row.SUM/100} ${row.currency}`),
+      .aggregate('amount', 'SUM', merge({}, pendingLastWeekExpenses, collectiveByCurrency('Expense')))
+      .map(row => `${row.currency} ${formatCurrency(row.SUM, row.currency)}`),
 
     approvedExpenseAmount: Expense
-      .aggregate('amount', 'SUM', merge({}, approvedLastWeekExpenses, collectiveByCurrency))
-      .map(row => `${-row.SUM/100} ${row.currency}`),
+      .aggregate('amount', 'SUM', merge({}, approvedLastWeekExpenses, collectiveByCurrency('Expense')))
+      .map(row => `${row.currency} ${formatCurrency(row.SUM, row.currency)}`),
 
     rejectedExpenseAmount: Expense
-      .aggregate('amount', 'SUM', merge({}, rejectedLastWeekExpenses, collectiveByCurrency))
-      .map(row => `${-row.SUM/100} ${row.currency}`),
+      .aggregate('amount', 'SUM', merge({}, rejectedLastWeekExpenses, collectiveByCurrency('Expense')))
+      .map(row => `${row.currency} ${formatCurrency(row.SUM, row.currency)}`),
 
     paidExpenseAmount: Expense
-      .aggregate('amount', 'SUM', merge({}, paidLastWeekExpenses, collectiveByCurrency)),
+      .aggregate('amount', 'SUM', merge({}, paidLastWeekExpenses, collectiveByCurrency('Expense'))),
 
     priorPaidExpenseAmount: Expense
-      .aggregate('amount', 'SUM', merge({}, paidWeekBeforeExpenses, collectiveByCurrency)),
+      .aggregate('amount', 'SUM', merge({}, paidWeekBeforeExpenses, collectiveByCurrency('Expense'))),
 
     // Collective statistics
 
@@ -230,8 +243,10 @@ function reportString({
   activeCollectiveCount,
   approvedExpenseAmount,
   approvedExpenseCount,
-  donationAmount,
-  donationCount,
+  stripeDonationAmount,
+  stripeDonationCount,
+  manualDonationAmount,
+  manualDonationCount,
   newCollectives,
   paidExpenseAmount,
   paidExpenseCount,
@@ -240,8 +255,10 @@ function reportString({
   pendingExpenseAmount,
   pendingExpenseCount,
   priorActiveCollectiveCount,
-  priorDonationAmount,
-  priorDonationCount,
+  priorStripeDonationAmount,
+  priorStripeDonationCount,
+  priorManualDonationAmount,
+  priorManualDonationCount,
   priorNewCollectivesCount,
   priorPaidExpenseAmount,
   priorPaypalDonationAmount,
@@ -250,28 +267,33 @@ function reportString({
   rejectedExpenseAmount,
   rejectedExpenseCount,
 }) {
-  return `Weekly activity summary (excluding OC team):
-\`\`\`
-* Donations:
-  - ${donationCount} (${compareNumbers(donationCount, priorDonationCount)}) donations received totaling:
-    ${donationAmount.map(({ SUM, currency }) => `* ${SUM/100} ${currency} (${compareNumbers(SUM/100, getSum(priorDonationAmount, currency)/100)})`).join('\n    ')}
-  - ${paypalDonationCount} (${compareNumbers(paypalDonationCount, priorPaypalDonationCount)}) paypal donations received totaling:
-    * ${paypalDonationAmount/100} USD (${compareNumbers(paypalDonationAmount/100, priorPaypalDonationAmount/100)})
-* Expenses:
+  return `# Weekly activity summary
+Excluding [OC team collective](https://opencollective.com/opencollective-company)
+
+## Donations
+  - STRIPE: ${stripeDonationCount} donations received (${compareNumbers(stripeDonationCount, priorStripeDonationCount)})
+    ${stripeDonationAmount.map(({ SUM, currency }) => `* ${currency} ${formatCurrency(SUM, currency)} (${compareNumbers(SUM, getSum(priorStripeDonationAmount, currency), (n) => formatCurrency(n, currency))})`).join('\n    ')}
+  - PAYPAL: ${paypalDonationCount} paypal donations received (${compareNumbers(paypalDonationCount, priorPaypalDonationCount)})
+    * USD ${formatCurrency(paypalDonationAmount, 'USD')} (${compareNumbers(paypalDonationAmount, priorPaypalDonationAmount, (n) => formatCurrency(n, 'USD'))})
+  - MANUAL: ${manualDonationCount} donations received (${compareNumbers(manualDonationCount, priorManualDonationCount)})
+    ${manualDonationAmount.map(({ SUM, currency }) => `* ${currency} ${formatCurrency(SUM, currency)} (${compareNumbers(SUM, getSum(priorManualDonationAmount, currency), (n) => formatCurrency(n, currency))})`).join('\n    ')}
+
+## Expenses
+  - ${paidExpenseCount} paid expenses (${compareNumbers(paidExpenseCount, priorPaidExpenseCount)})
+    ${paidExpenseAmount.map(({ SUM, currency }) => `* ${currency} ${formatCurrency(SUM, currency)}  (${compareNumbers(SUM, getSum(priorPaidExpenseAmount, currency), (n) => formatCurrency(n, currency))})`).join('\n    ')}
   - ${pendingExpenseCount} pending expenses${displayTotals(pendingExpenseAmount)}
   - ${approvedExpenseCount} approved expenses${displayTotals(approvedExpenseAmount)}
   - ${rejectedExpenseCount} rejected expenses${displayTotals(rejectedExpenseAmount)}
-  - ${paidExpenseCount} (${compareNumbers(paidExpenseCount, priorPaidExpenseCount)}) paid expenses totaling:
-    ${paidExpenseAmount.map(({ SUM, currency }) => `* ${-SUM/100} ${currency} (${compareNumbers(SUM/100, getSum(priorPaidExpenseAmount, currency)/100)})`).join('\n    ')}
-* Collectives:
-  - ${activeCollectiveCount} (${compareNumbers(activeCollectiveCount, priorActiveCollectiveCount)}) active collectives
-  - ${newCollectives.length} (${compareNumbers(newCollectives.length, priorNewCollectivesCount)}) new collectives${displayCollectives(newCollectives)}
-\`\`\``;
+
+## Collectives
+  - ${activeCollectiveCount} active collectives (${compareNumbers(activeCollectiveCount, priorActiveCollectiveCount)})
+  - ${newCollectives.length} new collectives (${compareNumbers(newCollectives.length, priorNewCollectivesCount)})${displayCollectives(newCollectives)}
+`;
 }
 
 function displayTotals(totals) {
   if (totals.length > 0) {
-    return ` totaling:\n    * ${totals.join('\n    * ').trim()}`;
+    return `\n    * ${totals.join('\n    * ').trim()}`;
   }
   return "";
 }
@@ -283,9 +305,9 @@ function displayCollectives(collectives) {
   return "";
 }
 
-function compareNumbers(recentNumber, priorNumber) {
+function compareNumbers(recentNumber, priorNumber, formatter = (number) => number) {
   const diff = Math.round(recentNumber - priorNumber);
-  return `${diff >= 0 ? 'increase' : 'decrease'} of ${diff}`;
+  return `${diff >= 0 ? '+' : ''}${formatter(diff)}`;
 }
 
 function getSum(collection, currency) {
