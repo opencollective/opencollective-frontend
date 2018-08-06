@@ -124,11 +124,26 @@ async function HostReport(year, month, hostId) {
     const whereWithDateRange = { ...where, ...dateRange};
 
     const payoutProcessorFeesQuery = (service) => {
+
+      // When using Sequelize query.include[].where it performs the condition on the join and it doesn't work
+      // that's why have to do the query this this way.
+      if (service === 'paypal') {
+        where['$PaymentMethod.service$'] = 'paypal';
+      } else {
+        where['$PaymentMethod.service$'] = { [Op.or]: { [Op.ne]: 'paypal', [Op.is]: null } };
+      }
+
       return {
+        logging: console.log,
         where: { ...where, ...dateRange, type: 'DEBIT'},
         raw: true,
-        include: [ { attributes: [ [sequelize.fn('MAX', sequelize.col('service')), 'service'] ], model: models.PaymentMethod, where: { 'service': { [Op.in]: [service, null] } } }]
-      }
+        include: [
+          {
+            model: models.PaymentMethod,
+            attributes: [ [sequelize.fn('MAX', sequelize.col('service')), 'service'] ],
+          }
+        ]
+      };
     }
 
     return Promise.props({
@@ -142,7 +157,7 @@ async function HostReport(year, month, hostId) {
       platformFees:               sumTransactions("platformFeeInHostCurrency", { where: whereWithDateRange }, host.currency),
       paymentProcessorFees:       sumTransactions("paymentProcessorFeeInHostCurrency", { where: { ...whereWithDateRange, type: 'CREDIT'} }, host.currency), // total stripe fees
       payoutProcessorFeesPaypal:  sumTransactions("paymentProcessorFeeInHostCurrency", payoutProcessorFeesQuery("paypal"), host.currency), // total paypal fees
-      payoutProcessorFeesManual:  sumTransactions("paymentProcessorFeeInHostCurrency", payoutProcessorFeesQuery("opencollective"), host.currency) // total other payout processor fees (manual host fee)
+      payoutProcessorFeesOther:  sumTransactions("paymentProcessorFeeInHostCurrency", payoutProcessorFeesQuery("opencollective"), host.currency) // total other payout processor fees (manual host fee)
     });
   }
 
@@ -270,7 +285,7 @@ async function HostReport(year, month, hostId) {
           totalInHostCurrency: stats.totalAmountPaidExpenses.totalInHostCurrency + stats.payoutProcessorFeesPaypal.totalInHostCurrency
         };
         stats.totalHostRevenue = {
-          totalInHostCurrency: stats.totalHostFees.totalInHostCurrency + stats.payoutProcessorFeesManual.totalInHostCurrency
+          totalInHostCurrency: stats.totalHostFees.totalInHostCurrency + stats.payoutProcessorFeesOther.totalInHostCurrency
         };
         stats.totalNetAmountReceived = {
           totalInHostCurrency: stats.totalNetAmountReceivedForCollectives.totalInHostCurrency - stats.totalHostFees.totalInHostCurrency // totalHostFees is negative

@@ -2,7 +2,7 @@ Hi {{recipient.firstName}}!
 
 Here is your {{#if month}}monthly{{else}}yearly{{/if}} report.
 
-Balance as of {{{moment reportDate}}}: {{{currency stats.balance.totalInHostCurrency currency=host.currency}}} (+{{{currency stats.totalNetAmountReceived.totalInHostCurrency currency=host.currency}}}{{#if stats.totalAmountSpent.totalInHostCurrency}}, {{{currency stats.totalAmountSpent.totalInHostCurrency currency=host.currency}}}{{/if}})
+Balance as of {{{moment reportDate}}}: {{{currency stats.balance.totalInHostCurrency currency=host.currency precision=2}}} (+{{{currency stats.totalNetAmountReceived.totalInHostCurrency currency=host.currency precision=2}}}{{#if stats.totalAmountSpent.totalInHostCurrency}}, {{{currency stats.totalAmountSpent.totalInHostCurrency currency=host.currency precision=2}}}{{/if}})
 
 {{{number stats.totalCollectives}}} {{{pluralize "collective" n=stats.totalCollectives}}} ({{{number stats.totalActiveCollectives}}} active)
 {{{number stats.backers.total}}} backers (+{{{number stats.backers.new}}}{{#if stats.backers.lost}}, -{{{number stats.backers.lost}}}{{/if}}) 
@@ -12,23 +12,23 @@ Details for the month:
 
 Transactions:                          {{{number stats.numberTransactions}}} ({{{number stats.numberDonations}}} {{{pluralize "donation" n=stats.numberDonations}}}, {{{number stats.numberPaidExpenses}}} {{{pluralize "expense" n=stats.numberPaidExpenses}}} paid)
 
-Donations received (before fees):      {{{currency stats.totalAmountDonations.totalInHostCurrency currency=host.currency}}}
-  Payment processor fees (Stripe):     {{{currency stats.paymentProcessorFees.totalInHostCurrency currency=host.currency}}}
+Donations received (before fees):      {{{currency stats.totalAmountDonations.totalInHostCurrency currency=host.currency precision=2}}}
+  Payment processor fees (Stripe):     {{{currency stats.paymentProcessorFees.totalInHostCurrency currency=host.currency precision=2}}}
   Platform fees (Open Collective):     {{{currency stats.platformFees.totalInHostCurrency 
-currency=host.currency}}}
+currency=host.currency precision=2}}}
 ----------------------------------------------
-Total amount received:                 {{{currency stats.totalNetAmountReceived.totalInHostCurrency currency=host.currency}}}
+Total amount received:                 {{{currency stats.totalNetAmountReceived.totalInHostCurrency currency=host.currency precision=2}}}
 (Total amount transferred to your {{host.name}} bank account)
 
-Host fees:                             {{{currency stats.totalHostFees.totalInHostCurrency currency=host.currency}}}
+Host fees:                             {{{currency stats.totalHostFees.totalInHostCurrency currency=host.currency precision=2}}}
 (Commission for {{host.name}})
 
-Net amount:                            {{{currency stats.totalNetAmountReceivedForCollectives.totalInHostCurrency currency=host.currency}}}
+Net amount:                            {{{currency stats.totalNetAmountReceivedForCollectives.totalInHostCurrency currency=host.currency precision=2}}}
 (Net amount received for your {{{number stats.totalCollectives}}} {{{pluralize "collective" n=stats.totalCollectives}}})
 
-Expenses paid:                         {{{currency stats.totalAmountPaidExpenses.totalInHostCurrency currency=host.currency}}}
-  Payment processor fees (PayPal):     {{{currency stats.payoutProcessorFeesPaypal.totalInHostCurrency currency=host.currency}}}
-  Payment processor fees (host):       {{{currency stats.payoutProcessorFeesManual.totalInHostCurrency currency=host.currency}}}
+Expenses paid:                         {{{currency stats.totalAmountPaidExpenses.totalInHostCurrency currency=host.currency precision=2}}}
+  Payment processor fees (PayPal):     {{{currency stats.payoutProcessorFeesPaypal.totalInHostCurrency currency=host.currency precision=2}}}
+  Payment processor fees (other):       {{{currency stats.payoutProcessorFeesOther.totalInHostCurrency currency=host.currency precision=2}}}
 ----------------------------------------------
 Total amount spent:                    {{{currency stats.totalAmountSpent.totalInHostCurrency currency=host.currency}}}
 (Total amount that left your {{host.name}} bank account)

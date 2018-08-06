@@ -216,7 +216,7 @@ async function payExpenseUpdate(expense) {
   return updatedExpense;
 }
 
-export async function payExpense(remoteUser, expenseId, paymentProcessFees) {
+export async function payExpense(remoteUser, expenseId, paymentProcessorFee) {
   if (!remoteUser) {
     throw new errors.Unauthorized("You need to be logged in to pay an expense");
   }
@@ -258,16 +258,18 @@ export async function payExpense(remoteUser, expenseId, paymentProcessFees) {
     throw new errors.Unauthorized(`You don't have enough funds to pay this expense. Current balance: ${formatCurrency(balance, expense.collective.currency)}, Expense amount: ${formatCurrency(expense.amount, expense.collective.currency)}`);
   }
 
+  // TODO: Need to make sure that paymentProcessorFee is in the currency of the host (need to create tests for it)
+  // also need to make that clear on the frontend
   if (paymentProviders[expense.payoutMethod]) {
-    paymentProcessFees = await paymentProviders[expense.payoutMethod].types['adaptive'].fees({
+    paymentProcessorFee = await paymentProviders[expense.payoutMethod].types['adaptive'].fees({
       amount: expense.amount,
       currency: expense.collective.currency,
       host,
     });
   }
 
-  if ((expense.amount + paymentProcessFees) > balance) {
-    throw new Error(`You don't have enough funds to cover for the fees of this payment method. Current balance: ${formatCurrency(balance, expense.collective.currency)}, Expense amount: ${formatCurrency(expense.amount, expense.collective.currency)}, Estimated ${expense.payoutMethod} fees: ${formatCurrency(paymentProcessFees, expense.collective.currency)}`);
+  if ((expense.amount + paymentProcessorFee) > balance) {
+    throw new Error(`You don't have enough funds to cover for the fees of this payment method. Current balance: ${formatCurrency(balance, expense.collective.currency)}, Expense amount: ${formatCurrency(expense.amount, expense.collective.currency)}, Estimated ${expense.payoutMethod} fees: ${formatCurrency(paymentProcessorFee, expense.collective.currency)}`);
   }
 
   if (expense.payoutMethod === 'paypal') {
@@ -290,7 +292,7 @@ export async function payExpense(remoteUser, expenseId, paymentProcessFees) {
 
   // note: we need to check for manual and other for legacy reasons
   if (expense.payoutMethod === 'manual' || expense.payoutMethod === 'other') {
-    await createTransactionFromPaidExpense(host, null, expense, null, null, expense.UserId, paymentProcessFees);
+    await createTransactionFromPaidExpense(host, null, expense, null, null, expense.UserId, paymentProcessorFee);
   }
 
   return payExpenseUpdate(expense);
