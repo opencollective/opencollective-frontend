@@ -10,7 +10,7 @@ const paymentMethodProvider = {};
 
 
 paymentMethodProvider.features = {
-  recurring: false,
+  recurring: true,
   waitToCharge: false
 };
 
@@ -87,11 +87,10 @@ paymentMethodProvider.processOrder = async (order, options = {}) => {
     if (order.collective.HostCollectiveId !== order.paymentMethod.CollectiveId) {
       throw new Error(`You need to use the payment method of the host (${order.collective.HostCollectiveId}) to add funds to this collective`);
     }
-  }
 
-  // If Hosts are not the same, then look for FromCollectitveHost Credit Card
-  // and create transaction through the paymentLib Process order
-  if (fromCollectiveHost.id !== collectiveHost.id) {
+    // If Hosts are not the same, then look for FromCollectitveHost Credit Card
+    // and create transaction through the paymentLib Process order
+  } else if (fromCollectiveHost.id !== collectiveHost.id) {
     // try to find a credit card for the fromCollectiveHost
     const fromCollectiveHostPaymentMethod = await models.PaymentMethod.findOne({
       where: {
