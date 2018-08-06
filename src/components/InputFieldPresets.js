@@ -12,6 +12,7 @@ class InputFieldPresets extends React.Component {
 
   constructor(props) {
     super(props);
+    this.maxLength = 5;
     const values = props.defaultValue ? [ ...props.defaultValue] : [ 1000 ];
     this.state = { values };
     this.onChange = this.onChange.bind(this);
@@ -46,7 +47,10 @@ class InputFieldPresets extends React.Component {
   }
 
   render() {
-    const values = [ ...this.state.values, null ];
+    const values = [ ...this.state.values ];
+    if (values.length < this.maxLength) {
+      values.push(null);
+    }
     return (
       <div className="InputFieldPresets">
         <style jsx>{`
