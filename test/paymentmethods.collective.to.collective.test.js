@@ -18,12 +18,20 @@ const createOrderQuery = `
         id
         slug
       }
+      subscription {
+        id
+        amount
+        interval
+        isActive
+        stripeSubscriptionId
+      }
       totalAmount
       currency
       description
     }
   }
 `;
+
 
 describe("payments.collectiveToCollective.test.js", () => {
   const STRIPE_FEE_STUBBED_VALUE = 300;
@@ -185,6 +193,7 @@ describe("payments.collectiveToCollective.test.js", () => {
       const res = await utils.graphqlQuery(createOrderQuery, { order }, user1);
 
       // Then there should be no errors
+      res.errors && console.error(res.errors);
       expect(res.errors).to.not.exist;
 
       // Then Find Created Transaction
@@ -323,6 +332,7 @@ describe("payments.collectiveToCollective.test.js", () => {
       const res = await utils.graphqlQuery(createOrderQuery, { order }, user1);
 
       // Then there should be no errors
+      res.errors && console.error(res.errors);
       expect(res.errors).to.not.exist;
 
       // Then Find Created Transaction
@@ -348,6 +358,83 @@ describe("payments.collectiveToCollective.test.js", () => {
       expect(transaction.netAmountInCollectiveCurrency).to.equal(transaction.amount + hostFee + paymentProcessorFee);
 
     });/** END OF "Collective 1 sends money to Collective 3 through different hosts(no platform fees, but still has stripe and host fees)" */
+
+    it('creates a recurring donation as logged in user', async () => {
+      // Add User 1 as Collective 1 Admin
+      await models.Member.create({
+        CreatedByUserId: user1.id,
+        MemberCollectiveId: user1.CollectiveId,
+        CollectiveId: collective1.id,
+        role: 'ADMIN'
+      });
+
+      // Create stripe connected account to host of collective 1
+      await store.stripeConnectedAccount(collective1.HostCollectiveId);
+      // Add credit card to Collective 1
+      await models.PaymentMethod.create({
+        name: '4242',
+        service: 'stripe',
+        type: 'creditcard',
+        token: 'tok_123456781234567812345678',
+        CollectiveId: collective1.HostCollectiveId,
+        monthlyLimitPerMember: 10000
+      });
+
+      // Create stripe connected account to host of collective 3
+      await store.stripeConnectedAccount(collective3.HostCollectiveId);
+      // Add credit card to Collective 3
+      await models.PaymentMethod.create({
+        name: '4343',
+        service: 'stripe',
+        type: 'creditcard',
+        token: 'tok_123456781234567812345678',
+        CollectiveId: collective3.HostCollectiveId,
+        monthlyLimitPerMember: 10000
+      });
+
+      //finding opencollective payment method for Collective 1
+      openCollectivePaymentMethod = await models.PaymentMethod.findOne({ where: {type: 'collective', CollectiveId: collective1.id}});
+
+      // Setting up order with amount less than the credit card monthly limit
+      const order = {
+        fromCollective: { id: collective1.id },
+        collective: { id: collective3.id },
+        paymentMethod: { uuid: openCollectivePaymentMethod.uuid },
+        totalAmount: 1000,
+        interval: 'month',
+      }
+      console.log(`order: ${JSON.stringify(order,null,2)}`);
+      // Executing queries
+      const res = await utils.graphqlQuery(createOrderQuery, { order }, user1);
+
+      // Then there should be no errors
+      res.errors && console.error(res.errors);
+      expect(res.errors).to.not.exist;
+
+      // When the order is created
+      // Then the created transaction should match the requested data
+      const orderCreated = res.data.createOrder;
+      console.log(`orderCreated: ${JSON.stringify(orderCreated,null,2)}`);
+      const orderCreatedCollective = orderCreated.collective;
+      const orderCreatedFromCollective = orderCreated.fromCollective;
+      const subscription = orderCreated.subscription;
+      expect(subscription.interval).to.equal('month');
+      expect(subscription.isActive).to.be.true;
+      expect(subscription.amount).to.equal(order.totalAmount);
+
+      const transaction = await models.Transaction.findOne({
+        where: {
+          CollectiveId: orderCreatedCollective.id,
+          FromCollectiveId: orderCreatedFromCollective.id,
+          amount: order.totalAmount,
+        }
+      });
+      console.log(`transaction: ${JSON.stringify(transaction,null,2)}`);
+      // make sure the transaction has been recorded
+      expect(transaction.FromCollectiveId).to.equal(collective1.id);
+      expect(transaction.CollectiveId).to.equal(collective3.id);
+      expect(transaction.currency).to.equal(collective1.currency);
+    });
 
   }); /** END OF "Collective to Collective Transactions"*/
 
