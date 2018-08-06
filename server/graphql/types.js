@@ -25,7 +25,6 @@ import models, { Op } from '../models';
 import dataloaderSequelize from 'dataloader-sequelize';
 import { strip_tags } from '../lib/utils';
 import status from '../constants/expense_status';
-import { pick } from 'lodash';
 
 dataloaderSequelize(models.Order);
 dataloaderSequelize(models.Transaction);
