@@ -41,7 +41,7 @@ const botCollectiveData = {
     W9: {
       threshold: 60000,
       comment: '<p>The total amount of the expenses that you have submitted ' +
-      'this year to this host exceeds $600. To comply with the IRS, we need you to send us the'+
+      'this year to this host exceeds $600. To comply with the IRS, we need you to <a href="mailto:w9@opencollective.com?subject=W9%20for%20{{collective}}%20(hosted%20by%20{{host}})&body=Please%20find%20attached%20the%20[W9|W8-BEN|W8-BEN-E]%20form.%0D%0A%0D%0A-%20{{fromName}}%0D%0A%0D%0A---%0D%0A{{expenseUrl}}%0D%0ATotal%20amount%20expensed%20this%20year%20so%20far:%20{{totalAmountThisYear}}%0D%0A%0D%0A">send us by email</a> the'+
       ' <a href="https://www.irs.gov/pub/irs-pdf/fw9.pdf">W9 form</a> if you are a ' +
       'US resident (if you are not a US resident, please send the '+
       '<a href="https://www.irs.gov/pub/irs-pdf/fw8ben.pdf">W-8BEN form</a> ' +
@@ -216,6 +216,10 @@ describe('w9.bot.test.js', () => {
       expect(emailSendMessageSpy.firstCall.args[2]).to.contain("/test-collective/expenses/1/approve");
       expect(emailSendMessageSpy.secondCall.args[0]).to.equal(user.email);
       expect(emailSendMessageSpy.secondCall.args[1]).to.contain("New comment on your expense");
+
+      // Checks that the compile html worked with a proper mailto containing the name of the collective/host and permalink to expense
+      expect(emailSendMessageSpy.secondCall.args[2]).to.contain("mailto:w9@opencollective.com?subject=W9%20for%20Test Collective%20(hosted%20by%20Test Collective)&body=Please%20find%20attached%20the%20[W9|W8-BEN|W8-BEN-E]%20form.%0D%0A%0D%0A-%20someone cool%0D%0A%0D%0A---%0D%0A");
+      expect(emailSendMessageSpy.secondCall.args[2]).to.contain("/test-collective/expenses/1%0D%0ATotal%20amount%20expensed%20this%20year%20so%20far:%20$700%0D%0A%0D%0A");
 
       // And then find Updated Host Collection to check if it includes the userId in its data.w9UserIds field
       const updatedHostCollective = await models.Collective.findById(hostCollective.id);
