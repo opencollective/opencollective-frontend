@@ -37,9 +37,11 @@ class CreateCollective extends React.Component {
         apply: {
           title: this.props.intl.formatMessage(this.messages['collective.create.title']),
           description: this.props.intl.formatMessage(this.messages['collective.create.description'])
-        }
-      }
+        },
+      },
     };
+
+    this.next = props.host ? `/${props.host.slug}/apply` : '/create';
 
   }
 
@@ -53,7 +55,7 @@ class CreateCollective extends React.Component {
 
   async createCollective(CollectiveInputType) {
     if (!CollectiveInputType.tos || (get(this.host, 'settings.tos') && !CollectiveInputType.hostTos)) {
-      this.setState( { result: { error: "Please accept the terms of service" }})
+      this.setState( { result: { error: 'Please accept the terms of service' }})
       return;
     }
     this.setState( { status: 'loading' });
@@ -149,7 +151,7 @@ class CreateCollective extends React.Component {
             { canApply && !LoggedInUser &&
               <div className="signin">
                 <h2><FormattedMessage id="collectives.create.signin" defaultMessage="Sign in or create an Open Collective account" /></h2>
-                <SignInForm next={`/${this.host.slug}/apply`} />
+                <SignInForm next={this.next} />
               </div>
             }
 
