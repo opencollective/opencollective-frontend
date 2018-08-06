@@ -461,18 +461,25 @@ export const ExpenseType = new GraphQLObjectType({
         }
       },
       comments: {
-        type: new GraphQLList(CommentType),
+        type: CommentListType,
         args: {
           limit: { type: GraphQLInt },
           offset: { type: GraphQLInt }
         },
-        resolve(expense, args) {
+        async resolve(expense, args) {
           const query = {
             where: { ExpenseId: expense.id},
             limit: args.limit || 10,
             offset: args.offset || 0
           };
-          return models.Comment.findAll(query);
+          const result = await models.Comment.findAndCountAll(query);
+          const { count, rows } = result;
+          return {
+            total: count,
+            comments: rows,
+            limit: args.limitg,
+            offset: args.offset,
+          };
         }
       },
       collective: {
@@ -606,23 +613,51 @@ export const UpdateType = new GraphQLObjectType({
         }
       },
       comments: {
-        type: new GraphQLList(CommentType),
+        type: CommentListType,
         args: {
           limit: { type: GraphQLInt },
           offset: { type: GraphQLInt }
         },
-        resolve(update, args) {
+        async resolve(update, args) {
           const query = {
-            where: { ExpenseId: update.id},
+            where: { UpdateId: update.id},
             limit: args.limit || 10,
             offset: args.offset || 0
           };
-          return models.Comment.findAll(query);
+          const result = await models.Comment.findAndCountAll(query);
+          const { count, rows } = result;
+          return {
+            total: count,
+            comments: rows,
+            limit: args.limitg,
+            offset: args.offset,
+          };
         }
       }
     }
   }
 });
+
+
+export const CommentListType = new GraphQLObjectType({
+  name: 'CommentListType',
+  description: 'List of comments with pagination info',
+  fields: () => ({
+    comments: {
+      type: new GraphQLList(CommentType),
+    },
+    limit: {
+      type: GraphQLInt,
+    },
+    offset: {
+      type: GraphQLInt,
+    },
+    total: {
+      type: GraphQLInt,
+    },
+  }),
+});
+
 
 export const CommentType = new GraphQLObjectType({
   name: 'CommentType',
