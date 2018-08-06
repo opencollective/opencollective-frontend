@@ -123,7 +123,7 @@ export default function run() {
       .aggregate('amount', 'SUM', merge({}, weekBeforeDonations, collectiveByCurrency('Transaction'))),
 
     manualDonationAmount: Transaction
-      .aggregate('amount', 'SUM', merge({ logging: console.log }, lastWeekDonations, collectiveByCurrency('Transaction'), service('opencollective'))),
+      .aggregate('amount', 'SUM', merge({}, lastWeekDonations, collectiveByCurrency('Transaction'), service('opencollective'))),
 
     priorManualDonationAmount: Transaction
       .sum('amount', merge({}, weekBeforeDonations, service('opencollective'))),
@@ -185,10 +185,10 @@ export default function run() {
       .map(row => row.CollectiveId),
 
     newCollectives: Collective
-      .findAll(merge({}, { attributes: ['slug', 'tags'], where: { type: 'COLLECTIVE' } }, createdLastWeek))
+      .findAll(merge({}, { attributes: ['slug', 'name', 'tags'], where: { type: 'COLLECTIVE' } }, createdLastWeek))
       .map(collective => {
         const openSource = collective.dataValues.tags && collective.dataValues.tags.indexOf('open source') !== -1;
-        return `${collective.dataValues.slug} (${openSource ? 'open source' : collective.dataValues.tags})`
+        return `[${collective.dataValues.name || collective.dataValues.slug}](https://opencollective.com/${collective.dataValues.slug}) (${openSource ? 'open source' : collective.dataValues.tags})`
       }),
 
     priorNewCollectivesCount: Collective.count(merge({}, { where: { type: 'COLLECTIVE' } }, createdWeekBefore)),
