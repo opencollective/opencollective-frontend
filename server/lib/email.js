@@ -94,6 +94,29 @@ const sendMessage = (recipients, subject, html, options = {}) => {
   if (recipients.length > 0) {
     to = recipients.join(', ');
   }
+
+  // When in preview mode, we export an HTML version of the email in `/tmp/:template.:recipientSlug.html`
+  if (process.env.DEBUG && process.env.DEBUG.match(/preview/)) {
+    let filepath;
+    const recipientSlug = to.substr(0, to.indexOf('@'));
+    filepath = path.resolve(`/tmp/${options.tag}.${recipientSlug}.html`);
+    fs.writeFileSync(filepath, html);
+    console.log(">>> preview email", filepath);
+    if (options.text) {
+      filepath = `/tmp/${options.tag}.${recipientSlug}.txt`;
+      fs.writeFileSync(filepath, options.text);
+      console.log(">>> preview email", filepath);
+    }
+
+    if (options.attachments) {
+      options.attachments.map(attachment => {
+        const filepath = path.resolve(`/tmp/${attachment.filename}`);
+        fs.writeFileSync(filepath, attachment.content);
+        console.log(">>> preview attachment", filepath);
+      });
+    }
+  }
+
   if (process.env.ONLY) {
     debug("Only sending email to ", process.env.ONLY);
     to = process.env.ONLY;
@@ -102,14 +125,6 @@ const sendMessage = (recipients, subject, html, options = {}) => {
       return Promise.reject(new Error("No recipient defined"));
   }
     to = `emailbcc+${to.replace(/@/g, '-at-')}@opencollective.com`;
-  }
-
-  if (process.env.DEBUG && process.env.DEBUG.match(/preview/) && options.attachments) {
-    options.attachments.map(attachment => {
-      const filepath = path.resolve(`/tmp/${attachment.filename}`);
-      fs.writeFileSync(filepath, attachment.content);
-      console.log(">>> preview attachment", filepath);
-    })
   }
 
   debug(`sending email to ${to}`);
@@ -258,22 +273,6 @@ const generateEmailFromTemplate = (template, recipient, data = {}, options = {})
   }
 
   const renderedTemplate = render(template, data);
-
-  let filepath;
-  // When in preview mode, we export an HTML version of the email in `/tmp/:template.:slug.html`
-  if (process.env.DEBUG && process.env.DEBUG.match(/preview/)) {
-    const recipient = get(data, 'recipient.dataValues') || data.recipient || {};
-    const slug = data.collective && data.collective.slug || recipient.slug || recipient.email && recipient.email.substr(0, recipient.email.indexOf('@')) || recipient.substr && recipient.substr(0, recipient.indexOf('@'));
-    filepath = path.resolve(`/tmp/${template}.${slug}.html`);
-    const script = `<script>data=${JSON.stringify(data)};</script>`;
-    fs.writeFileSync(filepath, `${renderedTemplate.html}\n\n${script}`);
-    console.log(">>> preview email", filepath);
-    if (renderedTemplate.text) {
-      filepath = `/tmp/${template}.${slug}.txt`;
-      fs.writeFileSync(filepath, renderedTemplate.text);
-      console.log(">>> preview email", filepath);
-    }
-  }
 
   return Promise.resolve(renderedTemplate);
 };
