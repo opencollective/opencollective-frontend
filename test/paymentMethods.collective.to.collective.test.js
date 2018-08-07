@@ -34,7 +34,7 @@ const createOrderQuery = `
 `;
 
 
-describe("payments.collectiveToCollective.test.js", () => {
+describe("paymentMethods.collective.to.collective.test.js", () => {
   let sandbox, user1, user2, transactions,  collective1, collective2, collective3, host1, host2,
       organization, stripePaymentMethod, openCollectivePaymentMethod;
 
