@@ -7,7 +7,7 @@ import debugLib from 'debug';
 const debug = debugLib('loaders');
 
 const sortResults = (keys, results, attribute = 'id', defaultValue) => {
-  debug("sortResults", attribute, results.length);
+  debug("sortResults", attribute, "number of results:", results.length);
   const resultsById = {};
   results.forEach(r => {
     let key;
@@ -19,7 +19,7 @@ const sortResults = (keys, results, attribute = 'id', defaultValue) => {
       });
       key = keyComponents.join(':');
     } else {
-      key = dataValues[attribute];
+      key = get(dataValues, attribute);
     }
     if (!key) {
       return;
@@ -39,8 +39,8 @@ const sortResults = (keys, results, attribute = 'id', defaultValue) => {
 export const loaders = (req) => {
 
   const cache = {};
-  const createDataLoaderWithOptions = (batchFunction, options = {}) => {
-    const cacheKey = JSON.stringify(options);
+  const createDataLoaderWithOptions = (batchFunction, options = {}, cacheKeyPrefix = '') => {
+    const cacheKey = `${cacheKeyPrefix}:${JSON.stringify(options)}`;
     cache[cacheKey] = cache[cacheKey] || new DataLoader(keys => batchFunction(keys, options));
     return cache[cacheKey];
   }
@@ -170,6 +170,25 @@ export const loaders = (req) => {
       })
       .then(results => sortResults(OrgCollectiveIds, results, 'OrgCollectiveId', {}))
     ),
+    comments: {
+      findAllByAttribute: (attribute) => createDataLoaderWithOptions((values, attribute) => {
+        return models.Comment
+          .findAll({
+            where: {
+              [attribute]: { [Op.in]: values },
+            },
+            order: [['createdAt', 'DESC']]
+          })
+          .then(results => sortResults(values, results, attribute, []))
+        }, attribute, 'comments'),
+      countByExpenseId: new DataLoader(ExpenseIds => models.Comment.count({
+          attributes: [ 'ExpenseId' ],
+          where: { ExpenseId: { [Op.in]: ExpenseIds } },
+          group: ['ExpenseId']
+        })
+        .then(results => sortResults(ExpenseIds, results, 'ExpenseId'))
+        .map(result => result.count)),
+    },
     tiers: {
       findById: new DataLoader(ids => models.Tier
         .findAll({ where: { id: { [Op.in]: ids }}})
@@ -286,7 +305,7 @@ export const loaders = (req) => {
             order: [['createdAt', 'DESC']]
           })
           .then(results => sortResults(OrderIds, results, 'OrderId', []))
-        }, options),
+        }, options, 'transactions'),
       totalAmountDonatedFromTo: new DataLoader(keys => models.Transaction.findAll({
         attributes: ['FromCollectiveId', 'CollectiveId', [sequelize.fn('SUM', sequelize.col('amount')), 'totalAmount'] ],
         where: {
