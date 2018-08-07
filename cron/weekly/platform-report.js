@@ -1,13 +1,14 @@
-import config from 'config';
 import Promise from 'bluebird';
 import moment from 'moment-timezone';
 import _ from 'lodash';
 import merge from 'merge-options';
 import models, { Op } from '../../server/models';
 import activities from '../../server/constants/activities';
-import slackLib from '../../server/lib/slack';
+import emailLib from '../../server/lib/email';
 import expenseStatus from '../../server/constants/expense_status';
 import { formatCurrency } from '../../server/lib/utils';
+import showdown from 'showdown';
+const markdownConverter = new showdown.Converter();
 
 if (!process.env.MANUAL) {
   onlyExecuteInProdOnMondays();
@@ -25,7 +26,8 @@ const createdLastWeek = getTimeFrame('createdAt', process.env.START_DATE);
 const updatedLastWeek = getTimeFrame('updatedAt', process.env.START_DATE);
 
 const weekBefore = moment(process.env.START_DATE).tz('America/New_York').startOf('isoWeek').subtract(1, 'week');
-
+const title = `Weekly Platform Report`;
+const subtitle = `Week ${weekBefore.week()} from ${weekBefore.format('YYYY-MM-DD')} till ${moment(process.env.START_DATE).format('YYYY-MM-DD')}`;
 const createdWeekBefore = getTimeFrame('createdAt', weekBefore);
 const updatedWeekBefore = getTimeFrame('updatedAt', weekBefore);
 const donation = {
@@ -198,7 +200,8 @@ export default function run() {
     results.priorActiveCollectiveCount = _.union(results.priorActiveCollectivesWithTransactions, results.priorActiveCollectivesWithExpenses).length;
     const report = reportString(results);
     console.log(report);
-    return slackLib.postMessage(report, config.slack.webhookUrl, { channel: config.slack.privateActivityChannel });
+    const html = markdownConverter.makeHtml(report);
+    return emailLib.sendMessage('team@opencollective.com', title, html, { tag: 'platform-weekly-report' });
   }).then(() => {
     console.log('Weekly reporting done!');
     process.exit();
@@ -267,8 +270,8 @@ function reportString({
   rejectedExpenseAmount,
   rejectedExpenseCount,
 }) {
-  return `# Weekly activity summary
-Excluding [OC team collective](https://opencollective.com/opencollective-company)
+  return `# ${title}
+${subtitle}
 
 ## Donations
   - STRIPE: ${stripeDonationCount} donations received (${compareNumbers(stripeDonationCount, priorStripeDonationCount)})
@@ -288,6 +291,9 @@ Excluding [OC team collective](https://opencollective.com/opencollective-company
 ## Collectives
   - ${activeCollectiveCount} active collectives (${compareNumbers(activeCollectiveCount, priorActiveCollectiveCount)})
   - ${newCollectives.length} new collectives (${compareNumbers(newCollectives.length, priorNewCollectivesCount)})${displayCollectives(newCollectives)}
+
+
+Note: this reports excludes activities on the [OC team collective](https://opencollective.com/opencollective-company)
 `;
 }
 
