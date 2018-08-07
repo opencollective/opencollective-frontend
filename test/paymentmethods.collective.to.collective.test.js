@@ -134,35 +134,21 @@ describe("payments.collectiveToCollective.test.js", () => {
       }
       // Executing queries
       const res = await utils.graphqlQuery(createOrderQuery, { order });
+      const resWithUserParam = await utils.graphqlQuery(createOrderQuery, { order }, user2);
 
-      // Then there should be Errors
+      // Then there should be Errors for the Result of the query without any user defined as param
       expect(res.errors).to.exist;
+      expect(res.errors).to.not.be.empty;
+      expect(res.errors[0].message).to.contain('need to be logged in to create an order for an existing open collective');
+
+      // Then there should also be Errors for the Result of the query through user2
+      expect(resWithUserParam.errors).to.exist;
+      expect(resWithUserParam.errors).to.not.be.empty;
+      expect(resWithUserParam.errors[0].message).to.contain('don\'t have sufficient permissions to create an order on behalf of the');
 
     });/** END OF "Non admin members can\'t use the payment method of the collective" */
 
-    it('Non admin users can\'t use the payment method of a collective', async () => {
-      // finding opencollective payment method for collective1
-      openCollectivePaymentMethod = await models.PaymentMethod.findOne({ where: {type: 'collective', CollectiveId: collective1.id}});
-
-      // get Balance given the created user
-      const ocPaymentMethodBalance = await openCollectivePaymentMethod.getBalanceForUser(user1);
-
-      // Setting up order
-      const order = {
-        fromCollective: { id: collective1.id },
-        collective: { id: collective2.id },
-        paymentMethod: { uuid: openCollectivePaymentMethod.uuid },
-        totalAmount: ocPaymentMethodBalance.amount,
-      }
-      // Executing queries
-      const res = await utils.graphqlQuery(createOrderQuery, { order }, user2);
-
-      // Then there should be Errors
-      expect(res.errors).to.exist;
-
-    });/** END OF "Non admin users can\'t use the payment method of a collective" */
-
-    it('Transactions should between Collectives on the same host must have NO Fees', async () => {
+    it('Transactions between Collectives on the same host must have NO Fees', async () => {
       // Add user1 as an ADMIN of collective1
       await models.Member.create({
         CreatedByUserId: user1.id,
@@ -207,7 +193,7 @@ describe("payments.collectiveToCollective.test.js", () => {
       expect(transaction.hostFeeInHostCurrency).to.equal(0);
       expect(transaction.paymentProcessorFeeInHostCurrency).to.equal(0);
 
-    });/** END OF "Transactions should between Collectives on the same host must have NO Fees" */
+    });/** END OF "Transactions between Collectives on the same host must have NO Fees" */
 
     it('Cannot send money to a different host if the host of the collective doesn\'t have a credit card', async () => {
       // Add user1 as an ADMIN of collective1
@@ -236,9 +222,70 @@ describe("payments.collectiveToCollective.test.js", () => {
 
       // Then there should be Errors
       expect(res.errors).to.exist;
+      expect(res.errors).to.not.be.empty;
+      expect(res.errors[0].message).to.contain('needs to add a credit card to send money');
     });/** END OF "Cannot send money to a different host if the host of the collective doesn\'t have a credit card" */
 
-    it('Transactions between Collectives through different hosts have NO platform fees but still have stripe and host fees', async () => {
+    it('Cannot send money that exceeds Collective balance', async () => {
+      // Add user1 as an ADMIN of collective1
+      await models.Member.create({
+        CreatedByUserId: user1.id,
+        MemberCollectiveId: user1.CollectiveId,
+        CollectiveId: collective1.id,
+        role: 'ADMIN'
+      });
+
+      // Create stripe connected account to host of collective1
+      await store.stripeConnectedAccount(collective1.HostCollectiveId);
+      // Add credit card to collective1
+      await models.PaymentMethod.create({
+        name: '4242',
+        service: 'stripe',
+        type: 'creditcard',
+        token: 'tok_123456781234567812345678',
+        CollectiveId: collective1.HostCollectiveId,
+        monthlyLimitPerMember: 10000
+      });
+
+      // // Create stripe connected account to host of collective3
+      // await store.stripeConnectedAccount(collective3.HostCollectiveId);
+      // // Add credit card to collective3
+      // await models.PaymentMethod.create({
+      //   name: '4242',
+      //   service: 'stripe',
+      //   type: 'creditcard',
+      //   token: 'tok_123456781234567812345678',
+      //   CollectiveId: collective3.HostCollectiveId,
+      //   monthlyLimitPerMember: 10000
+      // });
+
+      // finding opencollective payment method for collective1
+      openCollectivePaymentMethod = await models.PaymentMethod.findOne({ where: {type: 'collective', CollectiveId: collective1.id}});
+
+      // get Balance given the created user
+      const ocPaymentMethodBalance = await openCollectivePaymentMethod.getBalanceForUser(user1);
+      
+      // set an amount that's higher than the collective balance
+      const amountHigherThanCollectiveBalance = ocPaymentMethodBalance.amount + 1;
+
+      // Setting up order with amount higher than collective1 balance
+      const order = {
+        fromCollective: { id: collective1.id },
+        collective: { id: collective3.id },
+        paymentMethod: { uuid: openCollectivePaymentMethod.uuid },
+        totalAmount: amountHigherThanCollectiveBalance,
+      }
+
+      // Executing queries
+      const res = await utils.graphqlQuery(createOrderQuery, { order }, user1);
+
+      // Then there should be errors
+      expect(res.errors).to.exist;
+      expect(res.errors).to.not.be.empty;
+      expect(res.errors[0].message).to.contain('don\'t have enough funds available ');
+    });/** END OF "Cannot send money that exceeds Collective balance" */
+
+    it('Transactions between Collectives through different hosts must have NO platform fees but still have stripe and host fees', async () => {
       // Add user1 as an ADMIN of collective1
       await models.Member.create({
         CreatedByUserId: user1.id,
@@ -311,7 +358,7 @@ describe("payments.collectiveToCollective.test.js", () => {
       expect(transaction.paymentProcessorFeeInHostCurrency).to.equal(paymentProcessorFee);
       expect(transaction.netAmountInCollectiveCurrency).to.equal(transaction.amount + hostFee + paymentProcessorFee);
 
-    });/** END OF "Transactions between Collectives through different hosts have NO platform fees but still have stripe and host fees" */
+    });/** END OF "Transactions between Collectives through different hosts must have NO platform fees but still have stripe and host fees" */
 
     it('Recurring donations between Collectives with the same host must be allowed', async () => {
         // Add user1 as an ADMIN of collective1
@@ -321,7 +368,7 @@ describe("payments.collectiveToCollective.test.js", () => {
           CollectiveId: collective1.id,
           role: 'ADMIN'
         });
-  
+
         // Create stripe connected account to host of collective1
         await store.stripeConnectedAccount(collective1.HostCollectiveId);
         // Add credit card to collective1
@@ -333,10 +380,10 @@ describe("payments.collectiveToCollective.test.js", () => {
           CollectiveId: collective1.HostCollectiveId,
           monthlyLimitPerMember: 10000
         });
-  
+
         // finding opencollective payment method for collective1
         openCollectivePaymentMethod = await models.PaymentMethod.findOne({ where: {type: 'collective', CollectiveId: collective1.id}});
-  
+
         // Setting up order with amount less than the credit card monthly limit
         const order = {
           fromCollective: { id: collective1.id },
@@ -347,11 +394,11 @@ describe("payments.collectiveToCollective.test.js", () => {
         }
         // Executing queries
         const res = await utils.graphqlQuery(createOrderQuery, { order }, user1);
-  
+
         // Then there should be no errors
         res.errors && console.error(res.errors);
         expect(res.errors).to.not.exist;
-  
+
         // When the order is created
         // Then the created transaction should match the requested data
         const orderCreated = res.data.createOrder;
@@ -361,7 +408,7 @@ describe("payments.collectiveToCollective.test.js", () => {
         expect(subscription.interval).to.equal('month');
         expect(subscription.isActive).to.be.true;
         expect(subscription.amount).to.equal(order.totalAmount);
-  
+
         const transaction = await models.Transaction.findOne({
           where: {
             CollectiveId: orderCreatedCollective.id,
