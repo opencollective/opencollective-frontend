@@ -85,8 +85,9 @@ export default {
 
       const { collective, createdByUser: user, paymentMethod } = order;
       let charge;
-      const platformFee = order.isPlatformFeeNonChargeable ? 0 :
-                          parseInt(order.totalAmount * constants.OC_FEE_PERCENT / 100, 10);
+      const platformFee = isNaN(order.platformFee)
+        ? parseInt(order.totalAmount * constants.OC_FEE_PERCENT / 100, 10)
+        : order.platformFee;
       return stripeGateway.createCharge(
         hostStripeAccount,
         {

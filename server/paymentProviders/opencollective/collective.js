@@ -88,7 +88,7 @@ paymentMethodProvider.processOrder = async (order, options = {}) => {
       throw new Error(`You need to use the payment method of the host (${order.collective.HostCollectiveId}) to add funds to this collective`);
     }
 
-    // If Hosts are not the same, then look for FromCollectitveHost Credit Card
+    // If Hosts are not the same, then look for fromCollectiveHost Credit Card
     // and create transaction through the paymentLib Process order
   } else if (fromCollectiveHost.id !== collectiveHost.id) {
     // try to find a credit card for the fromCollectiveHost
@@ -99,12 +99,13 @@ paymentMethodProvider.processOrder = async (order, options = {}) => {
       }
     });
     if (!fromCollectiveHostPaymentMethod) {
-      throw new Error(`Host ${fromCollectiveHost.name} needs to add a credit card to send money to different Hosts`);
+      throw new Error(`Host ${fromCollectiveHost.name} needs to add a credit
+       card to send money to a different host (${collectiveHost.name}).`);
     }
     // Change paymentMethod to use credit card instead of collective
     order.paymentMethod = fromCollectiveHostPaymentMethod;
-    // flag created to avoid platform fees in cross-host transactions
-    order.isPlatformFeeNonChargeable = true;
+    // setting order platform fee to 0 in cross-host transactions
+    order.platformFee = 0;
     return paymentsLib.processOrder(order);
   }
 
