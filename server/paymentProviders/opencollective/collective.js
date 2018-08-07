@@ -99,8 +99,8 @@ paymentMethodProvider.processOrder = async (order, options = {}) => {
       }
     });
     if (!fromCollectiveHostPaymentMethod) {
-      throw new Error(`Host ${fromCollectiveHost.name} needs to add a credit
-       card to send money to a different host (${collectiveHost.name}).`);
+      throw new Error(`Host ${fromCollectiveHost.name} needs to add a credit card to send money`,
+        ` to a different host (${collectiveHost.name}).`);
     }
     // Change paymentMethod to use credit card instead of collective
     order.paymentMethod = fromCollectiveHostPaymentMethod;
