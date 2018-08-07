@@ -44,7 +44,7 @@ class HostExpensesPage extends React.Component {
     const { LoggedInUser } = this.state;
 
     if (!data.Collective) return (<ErrorPage data={data} />);
-    if (!data.collective.isHost) return (<ErrorPage message="collective.is.not.host" />);
+    if (!data.Collective.isHost) return (<ErrorPage message="collective.is.not.host" />);
     
     const collective = data.Collective;
     const selectedCollective = this.state.selectedCollective || collective;
