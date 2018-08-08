@@ -438,7 +438,7 @@ describe('createOrder', () => {
       // Should fail if order.totalAmount > PaymentMethod.monthlyLimitPerMember
       res = await utils.graphqlQuery(createOrderQuery, { order }, duc);
       expect(res.errors).to.exist;
-      expect(res.errors[0].message).to.equal("The total amount of this order (€200 ~= $239) is higher than your monthly spending limit on this payment method ($100)");
+      expect(res.errors[0].message).to.equal("The total amount of this order (€200 ~= $239) is higher than your monthly spending limit on this payment method (stripe:creditcard) ($100)");
 
       sandbox.useFakeTimers((new Date('2017-09-22')).getTime());
       await paymentMethod.update({ monthlyLimitPerMember: 25000 }); // $250 limit
