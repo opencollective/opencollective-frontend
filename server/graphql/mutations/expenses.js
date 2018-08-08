@@ -1,4 +1,4 @@
-import { get, set } from 'lodash';
+import { get } from 'lodash';
 import errors from '../../lib/errors';
 import roles from '../../constants/roles';
 import statuses from '../../constants/expense_status';
@@ -11,45 +11,6 @@ import {
   createFromPaidExpense as createTransactionFromPaidExpense,
   createTransactionFromInKindDonation
 } from '../../lib/transactions';
-
-
-async function _createActivity(expense, type) {
-  const user = expense.user || await models.User.findById(expense.UserId);
-  const userCollective = await models.Collective.findById(user.CollectiveId);
-  const host = await expense.collective.getHostCollective();
-  const transaction = expense.status === statuses.PAID && await models.Transaction.findOne({ where: { type: 'DEBIT', ExpenseId: expense.id }});
-  await models.Activity.create({
-    type,
-    UserId: expense.UserId,
-    CollectiveId: expense.collective.id,
-    data: {
-      host: host.minimal,
-      collective: expense.collective.minimal,
-      user: user.minimal,
-      fromCollective: userCollective.minimal,
-      expense: expense.info,
-      transaction: transaction.info
-    }
-  });
-}
-
-async function _addUserIdToHostW9ReceivedList(expense) {
-  const host = await expense.collective.getHostCollective();
-  // If user is already included in Host data List, don't do anything
-  if (get(host, 'data.W9.receivedFromUserIds') && host.data.W9.receivedFromUserIds.includes(expense.UserId)) {
-    return false;
-  }
-  // Only Inserts User in W9 Received list if he is already present on
-  // the W9.requestSentToUserIds (which means this user already overstepped the W9 Threshold)
-  if (get(host, 'data.W9.requestSentToUserIds') && host.data.W9.requestSentToUserIds.includes(expense.UserId)) {
-    const receivedFromUserIds = !get(host, 'data.W9.receivedFromUserIds')
-      ? [expense.UserId]
-      : get(host, 'data.W9.receivedFromUserIds').concat([expense.UserId]);
-    set(host, 'data.W9.receivedFromUserIds', receivedFromUserIds);
-    return host.update({data:host.data});
-  }
-  return false;
-}
 
 /**
  * Only admin of expense.collective or of expense.collective.host can approve/reject expenses
@@ -93,7 +54,6 @@ export async function updateExpenseStatus(remoteUser, expenseId, status) {
   if (!canUpdateExpenseStatus(remoteUser, expense)) {
     throw new errors.Unauthorized("You don't have permission to approve this expense");
   }
-
   switch (status) {
     case statuses.APPROVED:
       if (expense.status === statuses.PAID) {
@@ -111,13 +71,7 @@ export async function updateExpenseStatus(remoteUser, expenseId, status) {
       }
       break;
   }
-
   const res = await expense.update({ status, lastEditedById: remoteUser.id });
-  if (status === statuses.APPROVED) {
-    await _createActivity(expense, activities.COLLECTIVE_EXPENSE_APPROVED);
-    await _addUserIdToHostW9ReceivedList(expense);
-  }
-
   return res;
 }
 
@@ -168,8 +122,7 @@ export async function createExpense(remoteUser, expenseData) {
 
   expense.user = remoteUser;
   expense.collective = collective;
-  await _createActivity(expense, activities.COLLECTIVE_EXPENSE_CREATED);
-
+  await expense.createActivity(activities.COLLECTIVE_EXPENSE_CREATED);
   return expense;
 }
 
@@ -205,7 +158,7 @@ export async function editExpense(remoteUser, expenseData) {
 
   expenseData.lastEditedById = remoteUser.id;
   await expense.update(expenseData);
-  _createActivity(expense, activities.COLLECTIVE_EXPENSE_UPDATED);
+  expense.createActivity(activities.COLLECTIVE_EXPENSE_UPDATED);
   return expense;
 }
 
@@ -231,7 +184,7 @@ export async function deleteExpense(remoteUser, expenseId) {
 /** Helper that finishes the process of paying an expense */
 async function payExpenseUpdate(expense) {
   const updatedExpense = await expense.update({ status: statuses.PAID });
-  await _createActivity(expense, activities.COLLECTIVE_EXPENSE_PAID);
+  await expense.createActivity(activities.COLLECTIVE_EXPENSE_PAID);
   return updatedExpense;
 }
 
@@ -239,25 +192,19 @@ export async function payExpense(remoteUser, expenseId, paymentProcessFees) {
   if (!remoteUser) {
     throw new errors.Unauthorized("You need to be logged in to pay an expense");
   }
-
   const expense = await models.Expense.findById(expenseId, { include: [ { model: models.Collective, as: 'collective' } ] });
-
   if (!expense) {
     throw new errors.Unauthorized("Expense not found");
   }
-
   if (expense.status === statuses.PAID) {
     throw new errors.Unauthorized("Expense has already been paid");
   }
-
   if (expense.status !== statuses.APPROVED) {
     throw new errors.Unauthorized(`Expense needs to be approved. Current status of the expense: ${expense.status}.`);
   }
-
   if (!canUpdateExpenseStatus(remoteUser, expense)) {
     throw new errors.Unauthorized("You don't have permission to pay this expense");
   }
-
   const host = await expense.collective.getHostCollective();
 
   // Expenses in kind can be made for collectives without any
@@ -270,13 +217,11 @@ export async function payExpense(remoteUser, expenseId, paymentProcessFees) {
     await expense.collective.addUserWithRole(user, 'BACKER');
     return payExpenseUpdate(expense);
   }
-
   const balance = await expense.collective.getBalance();
 
   if (expense.amount > balance) {
     throw new errors.Unauthorized(`You don't have enough funds to pay this expense. Current balance: ${formatCurrency(balance, expense.collective.currency)}, Expense amount: ${formatCurrency(expense.amount, expense.collective.currency)}`);
   }
-
   if (paymentProviders[expense.payoutMethod]) {
     paymentProcessFees = await paymentProviders[expense.payoutMethod].types['adaptive'].fees({
       amount: expense.amount,
@@ -284,15 +229,12 @@ export async function payExpense(remoteUser, expenseId, paymentProcessFees) {
       host,
     });
   }
-
   if ((expense.amount + paymentProcessFees) > balance) {
     throw new Error(`You don't have enough funds to cover for the fees of this payment method. Current balance: ${formatCurrency(balance, expense.collective.currency)}, Expense amount: ${formatCurrency(expense.amount, expense.collective.currency)}, Estimated ${expense.payoutMethod} fees: ${formatCurrency(paymentProcessFees, expense.collective.currency)}`);
   }
-
   if (expense.payoutMethod === 'paypal') {
     const paypalEmail = await expense.getPaypalEmail();
     const paymentMethod = await host.getPaymentMethod({ service: expense.payoutMethod });
-
     try {
       const paymentResponse = await paymentProviders[expense.payoutMethod].types['adaptive'].pay(expense.collective, expense, paypalEmail, paymentMethod.token);
       const preapprovalDetailsResponse = await paypalAdaptive.preapprovalDetails(paymentMethod.token);
@@ -306,7 +248,6 @@ export async function payExpense(remoteUser, expenseId, paymentProcessFees) {
       }
     }
   }
-
   // note: we need to check for manual and other for legacy reasons
   if (expense.payoutMethod === 'manual' || expense.payoutMethod === 'other') {
     await createTransactionFromPaidExpense(host, null, expense, null, null, expense.UserId, paymentProcessFees);
