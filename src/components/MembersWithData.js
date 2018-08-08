@@ -32,7 +32,7 @@ class MembersWithData extends React.Component {
     super(props);
     this.state = {
       role: null,
-      loading: false
+      loading: false,
     };
   }
 
@@ -55,8 +55,8 @@ class MembersWithData extends React.Component {
   }
 
   refetch = (role) => {
-    this.setState({role});
-    this.props.refetch({role});
+    this.setState({ role });
+    this.props.refetch({ role });
   }
 
   render() {
@@ -91,10 +91,10 @@ class MembersWithData extends React.Component {
     members = members.filter(member => member.role !== 'FUNDRAISER');
     members = uniqBy(members, member => member.member.id);
 
-    const size = members.length > 50 ? "small" : "large";
-    let viewMode = (type && type.split(',')[0]) || "USER";
+    const size = members.length > 50 ? 'small' : 'large';
+    let viewMode = (type && type.split(',')[0]) || 'USER';
     if (tier && tier.name.match(/sponsor/i)) {
-      viewMode = "ORGANIZATION";
+      viewMode = 'ORGANIZATION';
     }
     const limit = this.props.limit || MEMBERS_PER_PAGE * 2;
     return (
@@ -229,20 +229,20 @@ export const addMembersData = graphql(getMembersQuery, {
       return data.fetchMore({
         variables: {
           offset: data.allMembers.length,
-          limit: MEMBERS_PER_PAGE
+          limit: MEMBERS_PER_PAGE,
         },
         updateQuery: (previousResult, { fetchMoreResult }) => {
           if (!fetchMoreResult) {
-            return previousResult
+            return previousResult;
           }
           return Object.assign({}, previousResult, {
             // Append the new posts results to the old one
             allMembers: [...previousResult.allMembers, ...fetchMoreResult.allMembers]
-          })
-        }
-      })
-    }
-  })
+          });
+        },
+      });
+    },
+  }),
 });
 
 export default addMembersData(withIntl(MembersWithData));
