@@ -56,7 +56,6 @@ export function findPaymentMethodProvider(paymentMethod) {
   if (!paymentMethodProvider) {
     throw new Error(`No payment provider found for ${this.service}:${this.type}`);
   }
-  console.log(">>> paymentMethodProvider", paymentMethodProvider);
   return paymentMethodProvider;
 }
 

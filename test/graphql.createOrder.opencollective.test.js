@@ -9,8 +9,8 @@ import * as utils from './utils';
 import * as store from './features/support/stores';
 
 /* What's being tested */
-import * as giftcard from '../server/paymentProviders/opencollective/giftcard';
-import * as prepaid from '../server/paymentProviders/opencollective/prepaid';
+import giftcard from '../server/paymentProviders/opencollective/giftcard';
+import prepaid from '../server/paymentProviders/opencollective/prepaid';
 
 
 const createOrderQuery = `
@@ -261,7 +261,7 @@ describe('grahpql.createOrder.opencollective', () => {
 
         expect(result.errors).to.exist;
         expect(result.errors[0].message).to.equal(
-          'The total amount of this order (R$50) is higher than your monthly spending limit on this payment method (R$30)');
+          'The total amount of this order (R$50) is higher than your monthly spending limit on this payment method (opencollective:giftcard) (R$30)');
       }); /* End of "should error if the card does not have enough balance" */
 
       it('should error if the card does not have enough balance', async () => {
