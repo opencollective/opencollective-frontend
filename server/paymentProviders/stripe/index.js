@@ -9,6 +9,8 @@ import { retrieveEvent } from './gateway';
 import creditcard from './creditcard';
 import stripeLib from 'stripe';
 import debugLib from 'debug';
+import { get } from 'lodash';
+import { addParamsToUrl } from '../../lib/utils';
 
 const debug = debugLib("stripe");
 const AUTHORIZE_URI = 'https://connect.stripe.com/oauth/authorize';
@@ -85,6 +87,8 @@ export default {
         return next(new errors.BadRequest('No state in the callback'));
       }
 
+      let redirectUrl = redirect || `${config.host.website}/${collective.slug}`;
+
       const createStripeAccount = data => models.ConnectedAccount.create({
         service: 'stripe',
         CollectiveId,
@@ -147,16 +151,26 @@ export default {
         .then(getToken(req.query.code))
         .then(getAccountInformation)
         .then(createStripeAccount)
+        .then(updateHost)
         .then(() => {
           if (typeof postAction === 'string' && postAction.match(/hostCollective/)) {
             const collectiveIdToHost = Number(postAction.substr(postAction.indexOf(':')+1));
+            redirectUrl = addParamsToUrl(redirectUrl, { HostCollectiveId: collective.id });
             models.Collective.findById(collectiveIdToHost)
               .then(collectiveToHost => collectiveToHost.addHost(collective, { id: CreatedByUserId }))
           }
         })
-        .then(updateHost)
-        .then(() => res.redirect(redirect || `${config.host.website}/${collective.slug}?message=StripeAccountConnected`))
-        .catch(next);
+        .then(() => {
+          redirectUrl = addParamsToUrl(redirectUrl, { message: 'StripeAccountConnected', CollectiveId: collective.id });
+          return res.redirect(redirectUrl)
+        })
+        .catch(e => {
+          if (get(e, 'data.error_description')) {
+            return next(new errors.BadRequest(e.data.error_description));
+          } else {
+            return next(e);
+          }
+        });
     }
   },
 

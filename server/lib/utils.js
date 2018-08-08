@@ -13,6 +13,14 @@ import sanitizeHtml from 'sanitize-html';
 
 const debug = debugLib('utils');
 
+export function addParamsToUrl(url, obj) {
+  const u = new URL(url);
+  Object.keys(obj).forEach(key => {
+    u.searchParams.set(key, obj[key]);
+  });
+  return u.href;
+};
+
 // source: https://stackoverflow.com/questions/8498592/extract-hostname-name-from-string
 function extractHostname(url) {
   let hostname;
