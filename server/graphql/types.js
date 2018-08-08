@@ -461,18 +461,17 @@ export const ExpenseType = new GraphQLObjectType({
         }
       },
       comments: {
-        type: new GraphQLList(CommentType),
+        type: CommentListType,
         args: {
           limit: { type: GraphQLInt },
           offset: { type: GraphQLInt }
         },
         resolve(expense, args) {
-          const query = {
-            where: { ExpenseId: expense.id},
-            limit: args.limit || 10,
-            offset: args.offset || 0
-          };
-          return models.Comment.findAll(query);
+          return {
+            where: { ExpenseId: expense.id },
+            limit: args.limit,
+            offset: args.offset
+          }
         }
       },
       collective: {
@@ -606,23 +605,64 @@ export const UpdateType = new GraphQLObjectType({
         }
       },
       comments: {
-        type: new GraphQLList(CommentType),
+        type: CommentListType,
         args: {
           limit: { type: GraphQLInt },
           offset: { type: GraphQLInt }
         },
         resolve(update, args) {
-          const query = {
-            where: { ExpenseId: update.id},
+          return {
+            where: { UpdateId: update.id },
             limit: args.limit || 10,
             offset: args.offset || 0
-          };
-          return models.Comment.findAll(query);
+          }
         }
       }
     }
   }
 });
+
+
+export const CommentListType = new GraphQLObjectType({
+  name: 'CommentListType',
+  description: 'List of comments with pagination info',
+  fields: () => ({
+    comments: {
+      type: new GraphQLList(CommentType),
+      async resolve(query, args, req) {
+        let rows;
+        if (query.where.ExpenseId) {
+          rows = await req.loaders.comments.findAllByAttribute('ExpenseId').load(query.where.ExpenseId);
+        }
+        if (query.where.UpdateId) {
+          rows = await req.loaders.comments.findAllByAttribute('UpdateId').load(query.where.UpdateId);
+        }
+        return rows.splice(query.offset, query.limit);
+      }
+    },
+    limit: {
+      type: GraphQLInt,
+      resolve(query) {
+        return query.limit;
+      }
+    },
+    offset: {
+      type: GraphQLInt,
+      resolve(query) {
+        return query.offset;
+      }
+    },
+    total: {
+      type: GraphQLInt,
+      async resolve(query, args, req) {
+        if (query.where.ExpenseId) {
+          return req.loaders.comments.countByExpenseId.load(query.where.ExpenseId);
+        }
+      }
+    },
+  }),
+});
+
 
 export const CommentType = new GraphQLObjectType({
   name: 'CommentType',
