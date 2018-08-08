@@ -155,7 +155,7 @@ export default {
         .then(() => {
           if (typeof postAction === 'string' && postAction.match(/hostCollective/)) {
             const collectiveIdToHost = Number(postAction.substr(postAction.indexOf(':')+1));
-            redirectUrl = addParamsToUrl(redirectUrl, { HostCollectiveId: collective.id });
+            redirectUrl = addParamsToUrl(redirectUrl, { HostedCollectiveId: collectiveIdToHost });
             models.Collective.findById(collectiveIdToHost)
               .then(collectiveToHost => collectiveToHost.addHost(collective, { id: CreatedByUserId }))
           }
