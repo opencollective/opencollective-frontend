@@ -36,7 +36,8 @@ class CreateCollective extends React.Component {
       settings: {
         apply: {
           title: this.props.intl.formatMessage(this.messages['collective.create.title']),
-          description: this.props.intl.formatMessage(this.messages['collective.create.description'])
+          description: this.props.intl.formatMessage(this.messages['collective.create.description']),
+          categories: ['association', 'coop', 'lobby', 'meetup', 'movement', 'neighborhood', 'opensource', 'politicalparty', 'pta', 'studentclub', 'other'],
         },
       },
     };
