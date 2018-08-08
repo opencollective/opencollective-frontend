@@ -15,7 +15,7 @@ import { TransactionTypes, OC_FEE_PERCENT } from '../../constants/transactions';
  *  prepaid credit card payment method.
  * @return {Object} with amount & currency from the payment method.
  */
-export async function getBalance(paymentMethod) {
+async function getBalance(paymentMethod) {
   if (!libpayments.isProvider('opencollective.prepaid', paymentMethod)) {
     throw new Error(`Expected opencollective.prepaid but got ${paymentMethod.service}.${paymentMethod.type}`);
   }
@@ -38,7 +38,7 @@ export async function getBalance(paymentMethod) {
  *  processing Giftcard orders, the transaction generated from it is
  *  returned.
  */
-export async function processOrder(order) {
+async function processOrder(order) {
   const user = order.createdByUser;
   const { paymentMethod: { data } } = order;
 
