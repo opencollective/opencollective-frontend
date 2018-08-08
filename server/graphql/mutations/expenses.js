@@ -1,4 +1,4 @@
-import { get } from 'lodash';
+import { get, set } from 'lodash';
 import errors from '../../lib/errors';
 import roles from '../../constants/roles';
 import statuses from '../../constants/expense_status';
@@ -31,6 +31,24 @@ async function _createActivity(expense, type) {
       transaction: transaction.info
     }
   });
+}
+
+async function _addUserIdToHostW9ReceivedList(expense) {
+  const host = await expense.collective.getHostCollective();
+  // If user is already included in Host data List, don't do anything
+  if (get(host, 'data.W9.receivedFromUserIds') && host.data.W9.receivedFromUserIds.includes(expense.UserId)) {
+    return false;
+  }
+  // Only Inserts User in W9 Received list if he is already present on
+  // the W9.requestSentToUserIds (which means this user already overstepped the W9 Threshold)
+  if (get(host, 'data.W9.requestSentToUserIds') && host.data.W9.requestSentToUserIds.includes(expense.UserId)) {
+    const receivedFromUserIds = !get(host, 'data.W9.receivedFromUserIds')
+      ? [expense.UserId]
+      : get(host, 'data.W9.receivedFromUserIds').concat([expense.UserId]);
+    set(host, 'data.W9.receivedFromUserIds', receivedFromUserIds);
+    return host.update({data:host.data});
+  }
+  return false;
 }
 
 /**
@@ -97,6 +115,7 @@ export async function updateExpenseStatus(remoteUser, expenseId, status) {
   const res = await expense.update({ status, lastEditedById: remoteUser.id });
   if (status === statuses.APPROVED) {
     await _createActivity(expense, activities.COLLECTIVE_EXPENSE_APPROVED);
+    await _addUserIdToHostW9ReceivedList(expense);
   }
 
   return res;
