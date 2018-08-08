@@ -167,7 +167,11 @@ export default function(Sequelize, DataTypes) {
       },
 
       features() {
-        return libpayments.findPaymentMethodProvider(this).features;
+        const paymentMethodProvider = libpayments.findPaymentMethodProvider(this);
+        if (!paymentMethodProvider) {
+          throw new Error(`No payment provider found for ${this.service}:${this.type}`);
+        }
+        return paymentMethodProvider.features;
       },
 
       minimal() {
@@ -198,13 +202,13 @@ export default function(Sequelize, DataTypes) {
    * @param {Object} user instanceof models.User
    */
   PaymentMethod.prototype.canBeUsedForOrder = async function(order, user) {
-    const name = (this.matching) ? 'matching fund' : 'payment method';
+    const name = (this.matching) ? 'matching fund' : `payment method (${this.service}:${this.type})`;
 
     if (this.expiryDate && new Date(this.expiryDate) < new Date) {
       throw new Error(`This ${name} has expired`);
     }
 
-    if (order.interval && !this.features.recurring) {
+    if (order.interval && !get(this.features, 'recurring')) {
       throw new Error(`This ${name} doesn't support recurring payments`);
     }
 
