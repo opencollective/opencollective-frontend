@@ -1013,6 +1013,7 @@ export default function(Sequelize, DataTypes) {
   /**
    * Change or remove host of the collective (only if balance === 0)
    * Note: when changing host, we also set the collective.isActive to false
+   *       unless the creatorUser (remoteUser) is an admin of the host
    * @param {*} newHostCollective: { id }
    * @param {*} creatorUser { id }
    */
@@ -1034,6 +1035,9 @@ export default function(Sequelize, DataTypes) {
     this.HostCollectiveId = null;
     this.isActive = false;
     if (newHostCollective.id) {
+      if (creatorUser.isAdmin(newHostCollective.id)) {
+        this.update({ isActive: true });
+      }
       return this.addHost(newHostCollective, creatorUser);
     } else {
       return this.save();

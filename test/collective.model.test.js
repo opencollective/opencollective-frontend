@@ -161,6 +161,14 @@ describe('Collective model', () => {
         type: "ORGANIZATION",
         CreatedByUserId: user1.id
       });
+      await models.Member.create({
+        CollectiveId: newHost.id,
+        MemberCollectiveId: user1.CollectiveId,
+        role: 'ADMIN',
+        CreatedByUserId: user1.id
+      });
+      user1.populateRoles();
+      user2.populateRoles();
     });
 
     it("fails to add another host", async () => {
@@ -184,15 +192,22 @@ describe('Collective model', () => {
         name: "New collective",
         slug: "new-collective",
         type: "COLLECTIVE",
+        isActive: false,
         CreatedByUserId: user1.id
       });
       await newCollective.addHost(host, user1);
       await newCollective.changeHost(newHost, user1);
       expect(newCollective.HostCollectiveId).to.equal(newHost.id);
+      // if the user making the request is an admin of the host, isActive should turn to true
+      expect(newCollective.isActive).to.be.true;
       const membership = await models.Member.findOne({ where: { role: 'HOST', CollectiveId: newCollective.id }});
       expect(membership).to.exist;
       expect(membership.MemberCollectiveId).to.equal(newHost.id);
       expect(newCollective.HostCollectiveId).to.equal(newHost.id);
+      // moving to a host where the user making the request is not an admin of turns isActive to false
+      await newCollective.changeHost(host, user2);
+      expect(newCollective.HostCollectiveId).to.equal(host.id);
+      expect(newCollective.isActive).to.be.false;
     });
   });
 

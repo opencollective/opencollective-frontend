@@ -56,7 +56,6 @@ export default {
         CollectiveId,
         CreatedByUserId: remoteUser.id,
         redirect: query.redirect,
-        postAction: query.postAction
       }, config.keys.opencollective.secret, {
         expiresIn: '45m' // People may need some time to set up their Stripe Account if they don't have one already
       });
@@ -81,7 +80,7 @@ export default {
         return next(new errors.BadRequest(`Invalid JWT: ${e.message}`));
       }
 
-      const { CollectiveId, CreatedByUserId, redirect, postAction } = state;
+      const { CollectiveId, CreatedByUserId, redirect } = state;
 
       if (!CollectiveId) {
         return next(new errors.BadRequest('No state in the callback'));
@@ -152,14 +151,6 @@ export default {
         .then(getAccountInformation)
         .then(createStripeAccount)
         .then(updateHost)
-        .then(() => {
-          if (typeof postAction === 'string' && postAction.match(/hostCollective/)) {
-            const collectiveIdToHost = Number(postAction.substr(postAction.indexOf(':')+1));
-            redirectUrl = addParamsToUrl(redirectUrl, { HostedCollectiveId: collectiveIdToHost });
-            models.Collective.findById(collectiveIdToHost)
-              .then(collectiveToHost => collectiveToHost.addHost(collective, { id: CreatedByUserId }))
-          }
-        })
         .then(() => {
           redirectUrl = addParamsToUrl(redirectUrl, { message: 'StripeAccountConnected', CollectiveId: collective.id });
           return res.redirect(redirectUrl)
