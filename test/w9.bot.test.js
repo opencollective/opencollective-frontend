@@ -30,6 +30,11 @@ const approveExpenseQuery = `
   mutation approveExpense($id: Int!) {
     approveExpense(id: $id) { id status } }`;
 
+const payExpenseQuery = `
+mutation payExpense($id: Int!, $fee: Int!) {
+  payExpense(id: $id, fee: $fee) { id status } }`;
+
+
 // W9 Bot Collective based on the migration file
 // 20180725202700-createW9BotCollective.js
 const botCollectiveData = {
@@ -398,9 +403,9 @@ describe('w9.bot.test.js', () => {
 
     });/* End of "creates 2 new expenses that adds up more than the W9 Bot Threshold and create Comment expense forms email" */
 
-    it('Host Data must NOT include user in W9 Received List if he didn\'t spend more than W9 Threshold after Expense is Approved', async () => {
+    it('Host Data must NOT include user in W9 Received List if he didn\'t spend more than W9 Threshold after Expense is Created', async () => {
       // Given that we have a collective
-      const { hostCollective, hostAdmin, collective } = await store.newCollectiveWithHost('rollup', 'USD', 'USD', 10);
+      const { hostCollective, collective } = await store.newCollectiveWithHost('rollup', 'USD', 'USD', 10);
       // And given a user that will file an expense
       const { user } = await store.newUser('an internet user', { paypalEmail: 'testuser@paypal.com' });
       // And given the above collective has one expense (created by
@@ -410,28 +415,27 @@ describe('w9.bot.test.js', () => {
         privateMessage: 'Private instructions to reimburse this expense',
         collective: { id: collective.id },
       };
-      const expense = await store.createExpense(user, { amount: 1, description: 'Pizza', ...data });
-
-      // When the expense is approved by the admin of host
-      const result = await utils.graphqlQuery(approveExpenseQuery, { id: expense.id }, hostAdmin);
-      result.errors && console.error(result.errors);
-      // Then there should be no errors in the result
-      expect(result.errors).to.not.exist;
-      // And then the approved expense should be set as APPROVED
-      expect(result.data.approveExpense.status).to.be.equal('APPROVED');
-
-      // Approved expense triggers one email as well
-      await utils.waitForCondition(() => emailSendMessageSpy.callCount > 1);
-      expect(emailSendMessageSpy.callCount).to.be.equal(2);
+      await store.createExpense(user, { amount: 1, description: 'Pizza', ...data });
 
       // And then the host data has to be null
       const updatedHost = await models.Collective.findById(hostCollective.id);
       expect(updatedHost.data).to.be.null;
     });/* End of "Host Data must NOT include user in W9 Received List if he didn\'t spend more than W9 Threshold after Expense is Approved" */
 
-    it('After User Expense is approved and User Expenses exceed W9 threshold, Host Data must include user in W9 Received List', async () => {
+    const addFunds = async (user, hostCollective, collective, amount) => {
+      await models.Transaction.create({
+        CreatedByUserId: user.id,
+        HostCollectiveId: hostCollective.id,
+        type: 'CREDIT',
+        netAmountInCollectiveCurrency: amount,
+        currency: 'USD',
+        CollectiveId: collective.id
+      });
+    };
+
+    it('After User Expense is Paid and User Expenses exceed W9 threshold, Host Data must include user in W9 Received List', async () => {
       // Given that we have a collective
-      const {  hostAdmin, collective } = await store.newCollectiveWithHost('rollup', 'USD', 'USD', 10);
+      const {  hostAdmin, hostCollective, collective } = await store.newCollectiveWithHost('rollup', 'USD', 'USD', 10);
       // And given a user that will file an expense
       const { user } = await store.newUser('an internet user', { paypalEmail: 'testuser@paypal.com' });
       // And given the W9 Bot information
@@ -446,7 +450,7 @@ describe('w9.bot.test.js', () => {
 
       // Then creates the first expense that exceeds the threshold
       const expenseData = {
-        currency: 'USD', payoutMethod: 'paypal',
+        currency: 'USD', payoutMethod: 'other',
         privateMessage: 'First expense',
         collective: { id: collective.id },
       };
@@ -464,30 +468,45 @@ describe('w9.bot.test.js', () => {
       expect(get(hostAfterCreatedExpense, 'data.W9.requestSentToUserIds')).to.have.lengthOf(1);
       expect(get(hostAfterCreatedExpense, 'data.W9.requestSentToUserIds')[0]).to.be.equal(user.id);
 
-      // And then another expense is created
-      const expense2 = await store.createExpense(user, { amount: 100, description: 'tet', ...expenseData });
+      // And then another expense is createdexpense. = '';
+      const expense2 = await store.createExpense(user, { amount: 100, payoutMethod: 'other', description: 'tet', ...expenseData });
 
       // And When the expense is approved by the admin of host
       const result = await utils.graphqlQuery(approveExpenseQuery, { id: expense2.id }, hostAdmin);
       result.errors && console.error(result.errors);
+
+      // And then add funds to the collective
+      await addFunds(user, hostCollective, collective, expense2.amount*10);
+      const balance = await collective.getBalance();
+      expect(balance).to.equal(expense2.amount*10);
 
       // Then there should be no errors in the result
       expect(result.errors).to.not.exist;
       // And then the expense status should be set as APPROVED
       expect(result.data.approveExpense.status).to.be.equal('APPROVED');
 
+      // Approved expense triggers one email as well
+      await utils.waitForCondition(() => emailSendMessageSpy.callCount > 2);
+
+      // When the expense is paid
+      const parameters = { id: expense2.id, fee: 0 };
+      await utils.graphqlQuery(payExpenseQuery, parameters, hostAdmin);
+
+      // Pay expense triggers one email as well
+      await utils.waitForCondition(() => emailSendMessageSpy.callCount > 3);
+
       // Refetching host data again after expense is approved
-      const hostAfterApprovedExpense = await models.Collective.findById(collective.HostCollectiveId);
+      const hostAfterPaidExpense = await models.Collective.findById(collective.HostCollectiveId);
       // Host.data.W9.receivedFromUserIds must include user
-      expect(hostAfterApprovedExpense.data).to.exist;
-      expect(get(hostAfterApprovedExpense, 'data.W9.receivedFromUserIds')).to.exist;
-      expect(get(hostAfterApprovedExpense, 'data.W9.receivedFromUserIds')).to.have.lengthOf(1);
-      expect(get(hostAfterApprovedExpense, 'data.W9.receivedFromUserIds')[0]).to.be.equal(user.id);
+      expect(hostAfterPaidExpense.data).to.exist;
+      expect(get(hostAfterPaidExpense, 'data.W9.receivedFromUserIds')).to.exist;
+      expect(get(hostAfterPaidExpense, 'data.W9.receivedFromUserIds')).to.have.lengthOf(1);
+      expect(get(hostAfterPaidExpense, 'data.W9.receivedFromUserIds')[0]).to.be.equal(user.id);
     });/* End of "After User Expenses exceed W9 threshold, Host Data must include user in W9 Received List" */
 
     it('User that\'s already in Host Data(W9 Received List) Must not be included again', async () => {
       // Given that we have a collective
-      const {  hostAdmin, collective } = await store.newCollectiveWithHost('rollup', 'USD', 'USD', 10);
+      const {  hostAdmin, hostCollective, collective } = await store.newCollectiveWithHost('rollup', 'USD', 'USD', 10);
       // And given a user that will file an expense
       const { user } = await store.newUser('an internet user', { paypalEmail: 'testuser@paypal.com' });
       // And given the W9 Bot information
@@ -502,7 +521,7 @@ describe('w9.bot.test.js', () => {
 
       // Then creates the first expense that exceeds the threshold
       const expenseData = {
-        currency: 'USD', payoutMethod: 'paypal',
+        currency: 'USD', payoutMethod: 'other',
         privateMessage: 'First expense',
         collective: { id: collective.id },
       };
@@ -520,30 +539,45 @@ describe('w9.bot.test.js', () => {
       expect(get(hostAfterCreatedExpense, 'data.W9.requestSentToUserIds')).to.have.lengthOf(1);
       expect(get(hostAfterCreatedExpense, 'data.W9.requestSentToUserIds')[0]).to.be.equal(user.id);
 
-      // And then another expense is created
-      const expense2 = await store.createExpense(user, { amount: 100, description: 'expense 2', ...expenseData });
+      // And then another expense is createdexpense. = '';
+      const expense2 = await store.createExpense(user, { amount: 100, payoutMethod: 'other', description: 'tet', ...expenseData });
 
       // And When the expense is approved by the admin of host
       const result = await utils.graphqlQuery(approveExpenseQuery, { id: expense2.id }, hostAdmin);
       result.errors && console.error(result.errors);
+
+      // And then add funds to the collective
+      await addFunds(user, hostCollective, collective, expense2.amount*100);
+      const balance = await collective.getBalance();
+      expect(balance).to.equal(expense2.amount*100);
 
       // Then there should be no errors in the result
       expect(result.errors).to.not.exist;
       // And then the expense status should be set as APPROVED
       expect(result.data.approveExpense.status).to.be.equal('APPROVED');
 
+      // Approved expense triggers one email as well
+      await utils.waitForCondition(() => emailSendMessageSpy.callCount > 2);
+
+      // When the expense is paid
+      let parameters = { id: expense2.id, fee: 0 };
+      await utils.graphqlQuery(payExpenseQuery, parameters, hostAdmin);
+
+      // Pay expense triggers one email as well
+      await utils.waitForCondition(() => emailSendMessageSpy.callCount > 3);
+
       // Refetching host data again after expense is approved
-      const hostAfterApprovedExpense = await models.Collective.findById(collective.HostCollectiveId);
+      const hostAfterPaidExpense = await models.Collective.findById(collective.HostCollectiveId);
       // Host.data.W9.receivedFromUserIds must include user
-      expect(hostAfterApprovedExpense.data).to.exist;
-      expect(get(hostAfterApprovedExpense, 'data.W9.receivedFromUserIds')).to.exist;
-      expect(get(hostAfterApprovedExpense, 'data.W9.receivedFromUserIds')).to.have.lengthOf(1);
-      expect(get(hostAfterApprovedExpense, 'data.W9.receivedFromUserIds')[0]).to.be.equal(user.id);
+      expect(hostAfterPaidExpense.data).to.exist;
+      expect(get(hostAfterPaidExpense, 'data.W9.receivedFromUserIds')).to.exist;
+      expect(get(hostAfterPaidExpense, 'data.W9.receivedFromUserIds')).to.have.lengthOf(1);
+      expect(get(hostAfterPaidExpense, 'data.W9.receivedFromUserIds')[0]).to.be.equal(user.id);
 
       // And then another expense is created
       const expense3 = await store.createExpense(user, { amount: 100, description: 'expense 3', ...expenseData });
 
-      // And When the expense is approved by the admin of host
+      // Then the expense is approved by the admin of host
       const result2 = await utils.graphqlQuery(approveExpenseQuery, { id: expense3.id }, hostAdmin);
       result.errors && console.error(result.errors);
 
@@ -551,6 +585,10 @@ describe('w9.bot.test.js', () => {
       expect(result2.errors).to.not.exist;
       // And then the expense status should be set as APPROVED
       expect(result2.data.approveExpense.status).to.be.equal('APPROVED');
+
+      // Then the expense is paid
+      parameters = { id: expense3.id, fee: 0 };
+      await utils.graphqlQuery(payExpenseQuery, parameters, hostAdmin);
 
       // Refetching host data again after expense is approved
       const hostAfterThirdExpense = await models.Collective.findById(collective.HostCollectiveId);
