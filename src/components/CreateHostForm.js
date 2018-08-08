@@ -22,7 +22,7 @@ class CreateHostForm extends React.Component {
     collective: PropTypes.object.isRequired,
     userCollective: PropTypes.object.isRequired,
     createOrganization: PropTypes.func.isRequired,
-    onSubmit: PropTypes.func.isRequired // when selecting the host to use
+    onSubmit: PropTypes.func.isRequired, // when selecting the host to use
   };
 
   constructor(props) {
@@ -33,20 +33,20 @@ class CreateHostForm extends React.Component {
     this.generateInputFields = this.generateInputFields.bind(this);
 
     this.state = {
-      form: { hostType: "user", HostCollectiveId: userCollective.id },
+      form: { hostType: 'user', HostCollectiveId: userCollective.id },
       services: ['stripe'],
-      organizationsOptions: []
+      organizationsOptions: [],
     };
 
     this.messages = defineMessages({
       'collective.connectedAccounts.stripe.button': { id: 'collective.connectedAccounts.stripe.button', defaultMessage: 'Connect Stripe' },
       'collective.connectedAccounts.stripe.description': { id: 'collective.connectedAccounts.stripe.description', defaultMessage: 'Connect a Stripe account to start accepting donations' },
-      'hostType.label': { id: 'host.types.label', defaultMessage: "Type of host entity"},
-      'HostCollectiveId.label': { id: 'host.HostCollectiveId.label', defaultMessage: "Select an organization"},
-      'host.types.user.label': { id: 'host.types.user.label', defaultMessage: "an individual" },
-      'host.types.user.description': { id: 'host.types.user.description', defaultMessage: "ou will receive the funds on behalf of the collective under your own name. Please check with your local fiscal authorities the allowance below which you don't have to report the donations as taxable income." },
-      'host.types.organization.label': { id: 'host.types.organization.label', defaultMessage: "an organization" },
-      'host.types.organization.description': { id: 'host.types.organization.description', defaultMessage: "Legal entity (ideally a non profit organization) that will receive the funds and issue invoices on behalf of the collective. Recommended if you plan to host more than one collective or if your collective expects to collect more than $10,000/year." },
+      'hostType.label': { id: 'host.types.label', defaultMessage: 'Type of host entity'},
+      'HostCollectiveId.label': { id: 'host.HostCollectiveId.label', defaultMessage: 'Select an organization'},
+      'host.types.user.label': { id: 'host.types.user.label', defaultMessage: 'an individual' },
+      'host.types.user.description': { id: 'host.types.user.description', defaultMessage: 'ou will receive the funds on behalf of the collective under your own name. Please check with your local fiscal authorities the allowance below which you don\'t have to report the donations as taxable income.' },
+      'host.types.organization.label': { id: 'host.types.organization.label', defaultMessage: 'an organization' },
+      'host.types.organization.description': { id: 'host.types.organization.description', defaultMessage: 'Legal entity (ideally a non profit organization) that will receive the funds and issue invoices on behalf of the collective. Recommended if you plan to host more than one collective or if your collective expects to collect more than $10,000/year.' },
       'organization.create': { id: 'tier.order.organization.create', defaultMessage: 'create an organization' }
     });
 
@@ -197,7 +197,6 @@ class CreateHostForm extends React.Component {
             <EditConnectedAccount
               collective={hostCollective}
               service="stripe"
-              options={{ postAction: `hostCollective:${collective.id}` }}
               />
             </div>
           )

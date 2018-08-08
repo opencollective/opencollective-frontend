@@ -39,7 +39,7 @@ class EditCollectiveForm extends React.Component {
     collective: PropTypes.object,
     loading: PropTypes.bool,
     onSubmit: PropTypes.func,
-    LoggedInUser: PropTypes.object.isRequired
+    LoggedInUser: PropTypes.object.isRequired,
   };
 
   constructor(props) {
@@ -139,10 +139,10 @@ class EditCollectiveForm extends React.Component {
       tiers: this.state.tiers,
       goals: this.state.goals,
       members: this.state.members,
-      paymentMethods: this.state.paymentMethods
+      paymentMethods: this.state.paymentMethods,
     };
     this.props.onSubmit(collective);
-    this.setState({ modified: false })
+    this.setState({ modified: false });
   }
 
   render() {
@@ -150,7 +150,7 @@ class EditCollectiveForm extends React.Component {
     const { collective, loading, intl, LoggedInUser } = this.props;
 
     const isNew = !(collective && collective.id);
-    const submitBtnLabel = loading ? "loading" : isNew ? "Create Event" : "Save";
+    const submitBtnLabel = loading ? 'loading' : isNew ? 'Create Event' : 'Save';
     const defaultStartsAt = new Date;
     const type = collective.type.toLowerCase();
     defaultStartsAt.setHours(19);
@@ -161,32 +161,32 @@ class EditCollectiveForm extends React.Component {
         {
           name: 'name',
           placeholder: '',
-          maxLength: 255
+          maxLength: 255,
         },
         {
           name: 'company',
           placeholder: '',
           maxLength: 255,
-          when: () => collective.type === 'USER'
+          when: () => collective.type === 'USER',
         },
         {
           name: 'description',
           type: 'text',
           maxLength: 255,
-          placeholder: ''
+          placeholder: '',
         },
         {
           name: 'twitterHandle',
           type: 'text',
           pre: 'https://twitter.com/',
           maxLength: 255,
-          placeholder: ''
+          placeholder: '',
         },
         {
           name: 'website',
           type: 'text',
           maxLength: 255,
-          placeholder: ''
+          placeholder: '',
         },
         // {
         //   name: 'location',
@@ -200,13 +200,13 @@ class EditCollectiveForm extends React.Component {
           name: 'longDescription',
           type: 'textarea',
           placeholder: '',
-          description: 'Protip: you can use markdown'
+          description: 'Protip: you can use markdown',
         },
         {
           name: 'tags',
           maxLength: 128,
           type: 'text',
-          placeholder: 'meetup, javascript'
+          placeholder: 'meetup, javascript',
         },
         {
           name: 'tos',
@@ -222,21 +222,21 @@ class EditCollectiveForm extends React.Component {
           type: 'dropzone',
           placeholder: 'Drop an image or click to upload',
           className: 'horizontal',
-          when: () => this.state.section === 'images'
+          when: () => this.state.section === 'images',
         },
         {
           name: 'backgroundImage',
           type: 'dropzone',
           placeholder: 'Drop an image or click to upload',
           className: 'horizontal',
-          when: () => this.state.section === 'images'
+          when: () => this.state.section === 'images',
         }
       ],
       expenses: [
         {
           name: 'expensePolicy',
           type: 'textarea',
-          description: 'Protip: you can use markdown'
+          description: 'Protip: you can use markdown',
         }
       ],
       advanced: [
@@ -244,22 +244,22 @@ class EditCollectiveForm extends React.Component {
           name: 'slug',
           pre: `https://opencollective.com/`,
           placeholder: '',
-          when: () => this.state.section === 'advanced'
+          when: () => this.state.section === 'advanced',
         },
         {
           name: 'sendInvoiceByEmail',
           type: 'switch',
           defaultValue: get(this.state.collective, 'settings.sendInvoiceByEmail'),
-          when: () => this.state.section === 'advanced' && (collective.type === 'USER' || collective.type === 'ORGANIZATION')
+          when: () => this.state.section === 'advanced' && (collective.type === 'USER' || collective.type === 'ORGANIZATION'),
         },
         {
           name: 'markdown',
           type: 'switch',
           defaultValue: get(this.state.collective, 'settings.editor') === 'markdown',
-          when: () => this.state.section === 'advanced' && (collective.type === 'USER' || collective.type === 'COLLECTIVE')
-        }
-      ]
-    }
+          when: () => this.state.section === 'advanced' && (collective.type === 'USER' || collective.type === 'COLLECTIVE'),
+        },
+      ],
+    };
 
     Object.keys(this.fields).map(fieldname => {
       this.fields[fieldname] = this.fields[fieldname].map(field => {

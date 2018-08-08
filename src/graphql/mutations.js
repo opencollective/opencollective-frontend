@@ -71,8 +71,25 @@ const editCollectiveQuery = gql`
       longDescription
       website
       twitterHandle
-      members {
+      host {
         id
+        createdAt
+        slug
+        name
+        image
+        description
+        website
+        twitterHandle
+        stats {
+          id
+          collectives {
+            hosted
+          }
+        }
+      }
+      members(roles: ["ADMIN", "MEMBER", "HOST"]) {
+        id
+        createdAt
         role
         description
       }

@@ -228,7 +228,7 @@ const getCollectiveToEditQuery = gql`
           }
         }
       }
-      members(roles: ["ADMIN", "MEMBER"]) {
+      members(roles: ["ADMIN", "MEMBER", "HOST"]) {
         id
         createdAt
         role

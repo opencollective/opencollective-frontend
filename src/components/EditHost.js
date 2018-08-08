@@ -10,7 +10,7 @@ import { Radio } from '@material-ui/core';
 import CreateHostFormWithData from './CreateHostFormWithData';
 import CollectivesWithData from './CollectivesWithData';
 import CollectiveCard from './CollectiveCard';
-import { formatDate, formatCurrency } from '../lib/utils';
+import { formatCurrency, getQueryParams } from '../lib/utils';
 import { Button } from 'react-bootstrap';
 
 const Option = styled.div`
@@ -18,6 +18,10 @@ const Option = styled.div`
     margin: 15px 0px 5px 0px;
     font-weight: bold;
   }
+`;
+
+const Fineprint = styled.div`
+  font-size: 14px;
 `;
 
 class EditHost extends React.Component {
@@ -36,46 +40,56 @@ class EditHost extends React.Component {
     this.state = { selectedOption: 'noHost', collective: props.collective };
   }
 
+  componentDidMount() {
+    const queryParams = getQueryParams();
+    if (queryParams.message === 'StripeAccountConnected') {
+      this.changeHost({ id: queryParams.CollectiveId });
+    }
+  }
+
   handleChange(attr, value) {
-    this.setState({[attr]: value});
+    this.setState({ [attr]: value });
   }
 
   async changeHost(newHost = { id: null }) {
-    const { collective } = this.state;
+    const { collective } = this.props;
+    console.log(">>> changing host from", collective.host, "to", newHost);
     await this.props.editCollectiveMutation({ id: collective.id, HostCollectiveId: newHost.id });
-    this.setState({ selectedOption: 'noHost', collective: { ...collective, host: newHost } });
+    if (!newHost.id) {
+      this.setState({ selectedOption: 'noHost' });
+    }
   }
 
   render() {
-    const { LoggedInUser } = this.props;
-    const { collective } = this.state;
+    const { LoggedInUser, collective } = this.props;
+    const hostMembership = get(collective, 'members', []).find(m => m.role === 'HOST');
 
     if (get(collective, 'host.id')) {
       return (
         <Flex>
           <Box p={1} mr={3}>
-            <CollectiveCard collective={collective.host} />
+            <CollectiveCard collective={collective.host} membership={hostMembership} />
           </Box>
           <Box>
             <p>
-              <FormattedMessage id="host.label" defaultMessage="Hosting {collectives} {collectives, plural, one {collective} other {collectives}} since {since}" values={{collectives: get(collective, 'host.stats.collectives.hosted'), since: formatDate(get(collective, 'host.createdAt'), { month: 'long', year: 'numeric' })}} />
+              <FormattedMessage id="editCollective.host.label" defaultMessage="{host} is hosting {collectives, plural, one {one collective} other {{collectives} collectives}}" values={{collectives: get(collective, 'host.stats.collectives.hosted'), host: get(collective, 'host.name') }} />
             </p>
             { collective.stats.balance > 0 &&
               <p>
-                <FormattedMessage id="host.balance" defaultMessage="Your host currently holds {balance} on behalf of your collective." values={{balance: formatCurrency(collective.stats.balance, collective.currency)}} /><br />
-                <FormattedMessage id="host.change.balanceNotEmpty" defaultMessage="If you would like to change host, you first need to empty your balance by filing expenses or transfering funds to another collective." />
+                <FormattedMessage id="editCollective.host.balance" defaultMessage="Your host currently holds {balance} on behalf of your collective." values={{balance: formatCurrency(collective.stats.balance, collective.currency)}} /><br />
+                <FormattedMessage id="editCollective.host.change.balanceNotEmpty" defaultMessage="If you would like to change host, you first need to empty your balance by filing expenses or transfering funds to another collective." />
               </p>
             }
             { collective.stats.balance === 0 &&
               <div>
                 <p>
                   <Button bsStyle="primary" type="submit" onClick={() => this.changeHost()} >
-                    <FormattedMessage id="host.removeBtn" defaultMessage="Remove Host" />
+                    <FormattedMessage id="editCollective.host.removeBtn" defaultMessage="Remove Host" />
                   </Button>
                 </p>
-                <p>
-                  <FormattedMessage id="host.change.removeFirst" defaultMessage="Once removed, you won't be able to accept donations anymore. But you will be able to select another host for your collective." />
-                </p>
+                <Fineprint>
+                  <FormattedMessage id="editCollective.host.change.removeFirst" defaultMessage="Once removed, you won't be able to accept donations anymore. But you will be able to select another host for your collective." />
+                </Fineprint>
               </div>
             }
           </Box>
