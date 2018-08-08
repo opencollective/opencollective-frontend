@@ -48,7 +48,16 @@ export function isProvider(fqn, paymentMethod) {
 export function findPaymentMethodProvider(paymentMethod) {
   const provider = paymentMethod ? paymentMethod.service : 'manual';
   const methodType = paymentMethod.type || 'default';
-  return paymentProviders[provider].types[methodType]; // eslint-disable-line import/namespace
+  let paymentMethodProvider = paymentProviders[provider];
+  if (!paymentMethodProvider) {
+    throw new Error(`No payment provider found for ${this.service}`);
+  }
+  paymentMethodProvider = paymentMethodProvider.types[methodType]; // eslint-disable-line import/namespace
+  if (!paymentMethodProvider) {
+    throw new Error(`No payment provider found for ${this.service}:${this.type}`);
+  }
+  console.log(">>> paymentMethodProvider", paymentMethodProvider);
+  return paymentMethodProvider;
 }
 
 /** Process an order using its payment information

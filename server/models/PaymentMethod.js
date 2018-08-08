@@ -167,11 +167,7 @@ export default function(Sequelize, DataTypes) {
       },
 
       features() {
-        const paymentMethodProvider = libpayments.findPaymentMethodProvider(this);
-        if (!paymentMethodProvider) {
-          throw new Error(`No payment provider found for ${this.service}:${this.type}`);
-        }
-        return paymentMethodProvider.features;
+        return libpayments.findPaymentMethodProvider(this).features;
       },
 
       minimal() {
