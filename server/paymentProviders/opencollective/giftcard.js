@@ -148,6 +148,7 @@ export default {
   },
   getBalance,
   processOrder,
+  createGiftcards,
 };
 
 /*  -- Giftcard Generation -- */
@@ -155,7 +156,7 @@ export default {
 const VERIFICATION_MODULO = 45797;
 
 /** Generate random string to be used in a Giftcard token */
-export function randomString(length, chars) {
+function randomString(length, chars) {
   let result = '';
   for (let i = length; i > 0; --i) {
     result += chars[Math.floor(Math.random() * chars.length)];
@@ -164,7 +165,7 @@ export function randomString(length, chars) {
 }
 
 /** Generate the verification number of a token */
-export function getVerificationNumber(str) {
+function getVerificationNumber(str) {
   const data = Array.prototype.map
     .call(str, c => c.charCodeAt(0))
     .reduce((a, b) => a * b) % VERIFICATION_MODULO;
@@ -172,7 +173,7 @@ export function getVerificationNumber(str) {
 }
 
 /** Generate a new token for a gift card */
-export function newToken(prefix) {
+function newToken(prefix) {
   // generate three letters (ignoring confusing ones)
   const letters = randomString(3, 'ACEFHJKLMNPRSTUVWXY');
   // generate three digit number
@@ -188,7 +189,7 @@ export function newToken(prefix) {
 }
 
 /** Create the data for batches of giftcards */
-export function createGiftcardData(batches, opts) {
+function createGiftcardData(batches, opts) {
   const {
     name,
     CollectiveId,
@@ -235,7 +236,7 @@ export function createGiftcardData(batches, opts) {
  *  the card that can be used per month in cents.
  * @param {String} opts.currency Currency of the giftcard.
  */
-export async function createGiftcards(batches, opts) {
+async function createGiftcards(batches, opts) {
   const data = createGiftcardData(batches, opts);
   return models.PaymentMethod.bulkCreate(data);
 }
