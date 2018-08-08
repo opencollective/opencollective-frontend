@@ -184,7 +184,7 @@ class CreateHostForm extends React.Component {
 
         { this.state.form.hostType === 'organization' && !hostCollective &&
           <div>
-            <CreateOrganizationForm header={false} onChange={org => this.handleChange("organization", org)} />
+            <CreateOrganizationForm header={false} onChange={org => this.handleChange('organization', org)} />
             <Button bsStyle="primary" type="submit" onClick={() => this.createOrganization(this.state.form.organization)} >
               <FormattedMessage id="organization.create" defaultMessage="Create organization" />
             </Button>
@@ -192,12 +192,12 @@ class CreateHostForm extends React.Component {
         }
 
         { hostCollective && !stripeAccount &&
-          ( <div key={`connect-${"stripe"}`}>
-            <h2>{capitalize("stripe")}</h2>
+          ( <div key={`connect-${'stripe'}`}>
+            <h2>{capitalize('stripe')}</h2>
             <EditConnectedAccount
               collective={hostCollective}
-              service={"stripe"}
-              options={ { postAction: `hostCollective:${collective.id}` }}
+              service="stripe"
+              options={{ postAction: `hostCollective:${collective.id}` }}
               />
             </div>
           )

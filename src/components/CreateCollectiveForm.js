@@ -16,7 +16,7 @@ class CreateCollectiveForm extends React.Component {
     host: PropTypes.object,
     collective: PropTypes.object,
     loading: PropTypes.bool,
-    onSubmit: PropTypes.func
+    onSubmit: PropTypes.func,
   };
 
   constructor(props) {
