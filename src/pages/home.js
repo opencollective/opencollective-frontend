@@ -440,7 +440,7 @@ class HomePage extends React.Component {
 
                 <P {...sectionDetailStyles}>Are you a developer who believes in supporting open and welcoming communities? Open Collective is open source (MIT License) so anyone can contribute code or report issues publicly.</P>
                 
-                <P {...sectionDetailStyles} my={3}>Our goal is to provide all communities around the world the software that they need to operate as open and transparent collectives. We want to enable them to thrive in the same way that Wordpress enabled millions of blogs to exist.</P>
+                <P {...sectionDetailStyles} my={3}>Our goal is to provide all communities around the world the software that they need to operate as open and transparent collectives. We want to enable them to thrive in the same way that WordPress enabled millions of blogs to exist.</P>
 
                 <P {...sectionDetailStyles} my={3}>Special thanks to all of you who already contributed in some way! 🙏</P>
 
