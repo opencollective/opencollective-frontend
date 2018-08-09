@@ -8,6 +8,7 @@ import {
   right,
   top,
 } from 'styled-system';
+import PropTypes from 'prop-types';
 
 import { pointerEvents } from './Container';
 
@@ -43,5 +44,27 @@ const Hide = styled(Box)`
   ${right}
   ${top}
 `;
+
+Hide.defaultProps = {
+  blacklist: [
+    'xs',
+    'sm',
+    'md',
+    'lg',
+  ],
+};
+
+Hide.propTypes = {
+  xs: PropTypes.bool,
+  sm: PropTypes.bool,
+  md: PropTypes.bool,
+  lg: PropTypes.bool,
+  ...bottom.propTypes,
+  ...height.propTypes,
+  ...left.propTypes,
+  ...position.propTypes,
+  ...right.propTypes,
+  ...top.propTypes,
+};
 
 export default Hide;

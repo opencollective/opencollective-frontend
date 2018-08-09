@@ -1,8 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
-import { maxWidth } from 'styled-system';
 import { Box, Flex } from 'grid-styled';
 import { P } from './Text';
+import Container from './Container';
 import {
   GithubIcon,
   MailIcon,
@@ -26,19 +26,6 @@ const SocialLink = styled.a`
   &:hover, &:focus {
     opacity: 1;
   }
-`;
-
-const Container = styled.div`
-  bottom: 0;
-  background-color: white;
-  border-top: 1px solid #aaaaaa;
-  min-height: 7.5rem;
-  padding: 1rem;
-  width: 100%;
-`;
-
-const FlexContainer = styled(Flex)`
-  ${maxWidth}
 `;
 
 const FlexList = styled.ul([],
@@ -80,17 +67,34 @@ class Footer extends React.Component {
     return (
       <Container 
         id="footer"
-        backgroundColor="white"
+        bg="white"
+        borderTop="1px solid #aaaaaa"
         bottom={0}
+        minHeight="7.5rem"
+        p="1rem"
+        width={1}
       >
         <Flex p={2} justifyContent="space-between" alignItems={['center', null, 'flex-start']} mx="auto" flexDirection={['column', null, 'row']} css="max-width: 1300px;">
-          <FlexContainer mt={3} w={[null, null, 1/3]} flexDirection="column" maxWidth="300px">
+          <Container
+            display="flex"
+            mt={3}
+            w={[null, null, 1/3]}
+            flexDirection="column"
+            maxWidth="300px"
+          >
             <Flex justifyContent={['center', null, 'flex-start']}>
               <object type="image/svg+xml" data="/static/images/opencollectivelogo-footer.svg" height="20"></object>
             </Flex>
             <P textAlign={['center', null, 'left']} color="#6E747A" fontSize="1.4rem" py={2}>An organization for your community, transparent by design.</P>
-          </FlexContainer>
-          <FlexContainer justifyContent="space-evenly" alignItems="center" w={1} my={3} order={[null, null, '3']} maxWidth="300px">
+          </Container>
+          <Container
+            display="flex"
+            justifyContent="space-evenly"
+            alignItems="center"
+            w={1} my={3}
+            order={[null, null, '3']}
+            maxWidth="300px"
+          >
             <SocialLink href="https://medium.com/open-collective">
               <MediumIcon size={15} fill="#9399A3" />
             </SocialLink>
@@ -106,7 +110,7 @@ class Footer extends React.Component {
             <SocialLink href="mailto:info@opencollective.com">
               <MailIcon size={15} fill="#9399A3" />
             </SocialLink>
-          </FlexContainer>
+          </Container>
           <Flex is="nav" flexWrap="wrap" justifyContent="center" mt={3} flex="1 1 auto">
             {Object.keys(navigation).map((key) => (
               <Box key={key} w={[0.5, null, 0.25]} mb={3}>

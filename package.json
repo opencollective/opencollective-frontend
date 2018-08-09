@@ -21,6 +21,7 @@
     "bluebird": "3.5.1",
     "cached-request": "1.1.4",
     "classnames": "2.2.6",
+    "clean-tag": "^2.0.0",
     "convert-svg-to-png": "0.4.0",
     "cross-fetch": "^2.2.1",
     "dotenv": "6.0.0",

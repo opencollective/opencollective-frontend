@@ -209,7 +209,7 @@ class HomePage extends React.Component {
             backgroundPosition="center top"
             backgroundSize="cover"
             backgroundRepeat="no-repeat"
-            boxShadown="inset 0px -60px 100px 0 rgba(78,121,187,0.1), 0px 40px 80px 0 rgba(78, 121,187, 0.12)"
+            boxShadow="inset 0px -60px 100px 0 rgba(78,121,187,0.1), 0px 40px 80px 0 rgba(78, 121,187, 0.12)"
             px={3}
             py="5rem"
           >
@@ -269,7 +269,7 @@ class HomePage extends React.Component {
                 <StyledLink href="/discover">See all &gt;</StyledLink>
               </Flex>
               <Container display="flex" flexWrap="wrap" justifyContent="space-between">
-                {collectives.map((c) => <Container w={[0.5, null, 0.25]} mb={2} px={1} maxWidth={224}><CollectiveStatsCard {...c} /></Container>)} 
+                {collectives.map((c) => <Container key={c.id} w={[0.5, null, 0.25]} mb={2} px={1} maxWidth={224}><CollectiveStatsCard {...c} /></Container>)} 
               </Container>
             </Container>
 
