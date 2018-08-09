@@ -16,7 +16,7 @@ const TransactionSimple = ({
   subscription,
   type,
 }) => {
-
+  const formattedCreatedAt = (new Date(createdAt)).toISOString();
   return (
     <Container display="flex" alignItems="center">
       <a href={`/${fromCollective.slug}`} title={fromCollective.name}>
@@ -43,7 +43,7 @@ const TransactionSimple = ({
         <Container position="relative" top={4} left={4} display="inline-block">
           <P fontSize="1.6rem">{type === 'DEBIT' && ' 🎉'}</P>
         </Container>
-        <P fontSize="1rem" color="#AEB2B8">{moment(createdAt).fromNow()}</P>
+        <P fontSize="1rem" color="#AEB2B8">{moment(formattedCreatedAt).fromNow()}</P>
       </Container>
     </Container>
   );
