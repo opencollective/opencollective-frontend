@@ -12,7 +12,7 @@ class EditConnectedAccount extends React.Component {
   static propTypes = {
     collective: PropTypes.object.isRequired,
     connectedAccounts: PropTypes.arrayOf(PropTypes.object),
-    options: PropTypes.object
+    options: PropTypes.object,
   };
 
   constructor(props) {
@@ -46,8 +46,7 @@ class EditConnectedAccount extends React.Component {
 
     connectAccount(collective.id, service, options)
     .then(json => {
-      console.log(`>>> /api/connected-accounts/${service} response`, json);
-      return window.location.replace(json.redirectUrl);
+      return window.location.href = json.redirectUrl;
     })
     .catch(err => {
       console.error(`>>> /api/connected-accounts/${service} error`, err);

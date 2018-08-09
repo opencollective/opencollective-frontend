@@ -92,6 +92,24 @@ const editCollectiveQuery = gql`
         createdAt
         role
         description
+        stats {
+          totalDonations
+        }
+        tier {
+          id
+          name
+        }
+        member {
+          id
+          name
+          image
+          slug
+          twitterHandle
+          description
+          ... on User {
+            email
+          }
+        }
       }
     }
   }

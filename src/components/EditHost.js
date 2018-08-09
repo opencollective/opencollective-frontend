@@ -43,7 +43,9 @@ class EditHost extends React.Component {
   componentDidMount() {
     const queryParams = getQueryParams();
     if (queryParams.message === 'StripeAccountConnected') {
-      this.changeHost({ id: queryParams.CollectiveId });
+      this.changeHost({ id: Number(queryParams.CollectiveId) });
+      // make sure we remove the query params, otherwise if the user refreshes the page, it will try to change the host again
+      window.location.replace(`/${this.props.collective.slug}/edit#host`);
     }
   }
 
@@ -53,7 +55,9 @@ class EditHost extends React.Component {
 
   async changeHost(newHost = { id: null }) {
     const { collective } = this.props;
-    console.log(">>> changing host from", collective.host, "to", newHost);
+    if (newHost.id === get(collective, 'host.id')) {
+      return;
+    }
     await this.props.editCollectiveMutation({ id: collective.id, HostCollectiveId: newHost.id });
     if (!newHost.id) {
       this.setState({ selectedOption: 'noHost' });
