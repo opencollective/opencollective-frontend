@@ -117,12 +117,12 @@ CollectiveStatsCard.propTypes = {
   backgroundImage: PropTypes.string,
   description: PropTypes.string,
   image: PropTypes.string,
-  name: PropTypes.isRequired,
+  name: PropTypes.string.isRequired,
   settings: PropTypes.shape({
     goals: PropTypes.arrayOf(PropTypes.shape({
-      amount: PropTypes.number.isRequired,
-      title: PropTypes.string.isRequired,
-      type: PropTypes.oneOf(['balance', 'yearlyBudget']).isRequired,
+      amount: PropTypes.number,
+      title: PropTypes.string,
+      type: PropTypes.oneOf(['balance', 'yearlyBudget']),
     })),
   }),
   slug: PropTypes.string.isRequired,
