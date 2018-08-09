@@ -9,21 +9,26 @@ import gql from 'graphql-tag'
 
 class Banner extends React.Component {
 
+  static getInitialProps ({ query: { collectiveSlug, id, style } }) {
+    return { collectiveSlug, id, style }
+  }
+
   constructor(props) {
     super(props);
     this.sendMessageToParentWindow = this.sendMessageToParentWindow.bind(this);
     this.onChange = this.onChange.bind(this);
   }
 
-  static getInitialProps ({ query: { collectiveSlug, id, style } }) {
-    return { collectiveSlug, id, style }
+  componentDidMount() {
+    this.onChange();
   }
 
-  sendMessageToParentWindow() {
-    if (!window.parent) return;
-    if (!this.height) return;
-    const message = `oc-${JSON.stringify({id: this.props.id, height: this.height})}`;
-    window.parent.postMessage(message, "*");
+  UNSAFE_componentWillReceiveProps() {
+    this.onChange();
+  }  
+
+  componentDidUpdate() {
+    this.onChange();
   }
 
   onChange() {
@@ -31,12 +36,11 @@ class Banner extends React.Component {
     this.sendMessageToParentWindow();
   }
 
-  UNSAFE_componentWillReceiveProps() {
-    this.onChange();
-  }
-
-  componentDidUpdate() {
-    this.onChange();
+  sendMessageToParentWindow() {
+    if (!window.parent) return;
+    if (!this.height) return;
+    const message = `oc-${JSON.stringify({ id: this.props.id, height: this.height })}`;
+    window.parent.postMessage(message, '*');
   }
 
   render() {
