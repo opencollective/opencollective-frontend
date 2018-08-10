@@ -17,237 +17,225 @@ import { getNextChargeAndPeriodStartDates, getChargeRetryCount} from '../../lib/
 
 const debugOrder = debug('order');
 
-export function createOrder(order, loaders, remoteUser) {
-  let tier, collective, fromCollective, paymentRequired, interval, orderCreated, user;
+// TODO:
+// - refactor to use await
+// - add logic for creating a pending collective if a website is provided instead of an id
+export async function createOrder(order, loaders, remoteUser) {
+  try {
+    if (order.paymentMethod && order.paymentMethod.service === 'stripe' && order.paymentMethod.uuid && !remoteUser) {
+      throw new Error("You need to be logged in to be able to use a payment method on file");
+    }
 
-  if (order.paymentMethod && order.paymentMethod.service === 'stripe' && order.paymentMethod.uuid && !remoteUser) {
-    throw new Error("You need to be logged in to be able to use a payment method on file");
-  }
+    if (!order.collective || !order.collective.id) {
+      throw new Error("No collective id provided");
+    }
 
-  if (!order.collective || !order.collective.id) {
-    throw new Error("No collective id provided");
-  }
+    if (order.platformFeePercent && !remoteUser.isRoot()) {
+      throw new Error(`Only a root can change the platformFeePercent`);
+    }
 
-  if (order.platformFeePercent && !remoteUser.isRoot()) {
-    throw new Error(`Only a root can change the platformFeePercent`);
-  }
+    // Check the existence of the recipient Collective
+    const collective = await loaders.collective.findById.load(order.collective.id);
 
-  // Check the existence of the recipient Collective
-  return loaders.collective.findById.load(order.collective.id)
-  .then(c => {
-    if (!c) {
+    if (!collective) {
       throw new Error(`No collective found with id: ${order.collective.id}`);
     }
-    order.collective = collective = c;
 
     if (!collective.isActive) {
-      throw new Error(`This collective is not active`);
+      throw new Error('This collective is not active');
     }
 
     if (order.fromCollective && order.fromCollective.id === collective.id) {
-      throw new Error(`Well tried. But no you can't order yourself something ;-)`);
+      throw new Error('Orders cannot be created for a collective by that same collective.');
     }
 
     if (order.hostFeePercent) {
-      return collective.getHostCollectiveId().then(HostCollectiveId => {
-        if (!remoteUser.isAdmin(HostCollectiveId)) {
-          throw new Error(`Only an admin of the host can change the hostFeePercent`);
+      const HostCollectiveId = await collective.getHostCollectiveId();
+
+      if (!remoteUser.isAdmin(HostCollectiveId)) {
+        throw new Error(`Only an admin of the host can change the hostFeePercent`);
+      }
+    }
+
+    order.collective = collective;
+
+    let tier;
+    if (order.tier) {
+      tier = await models.Tier.findById(order.tier.id);
+
+      if (!tier) {
+          throw new Error(`No tier found with tier id: ${order.tier.id} for collective slug ${collective.slug}`);
+      }
+    }
+
+    const paymentRequired = order.totalAmount > 0 || tier && tier.amount > 0;
+    if (
+      paymentRequired &&
+      (!order.paymentMethod || !(order.paymentMethod.uuid || order.paymentMethod.token))
+    ) {
+      throw new Error('This order requires a payment method');
+    }
+
+    if (tier.maxQuantityPerUser > 0 && order.quantity > tier.maxQuantityPerUser) {
+      throw new Error(`You can buy up to ${tier.maxQuantityPerUser} ${pluralize('ticket', tier.maxQuantityPerUser)} per person`);
+    }
+
+    const enoughQuantityAvailable = await tier.checkAvailableQuantity(order.quantity);
+    if (!enoughQuantityAvailable) {
+      throw new Error(`No more tickets left for ${tier.name}`);
+    }
+
+    // find or create user, check permissions to set `fromCollective`
+    let user;
+    if (order.user && order.user.email) {
+      user = await models.User.findOrCreateByEmail(order.user.email, {
+        ...order.user,
+        currency: order.currency,
+        CreatedByUserId: remoteUser ? remoteUser.id : null,
+      });
+    } else if (remoteUser) {
+      user = remoteUser;
+    }
+
+    let fromCollective;
+    if (!order.fromCollective || (!order.fromCollective.id && !order.fromCollective.name)) {
+      fromCollective = await loaders.collective.findById.load(user.CollectiveId);
+    }
+
+    // If a `fromCollective` is provided, we check its existence and if the user can create an order on its behalf
+    if (order.fromCollective && order.fromCollective.id) {
+      if (!remoteUser) {
+        throw new Error('You need to be logged in to create an order for an existing open collective');
+      }
+
+      fromCollective = await loaders.collective.findById.load(order.fromCollective.id);
+      if (!fromCollective) {
+        throw new Error(`From collective id ${order.fromCollective.id} not found`);
+      }
+
+      const possibleRoles = [roles.ADMIN, roles.HOST];
+      if (collective.type === types.ORGANIZATION) {
+        possibleRoles.push(roles.MEMBER);
+      }
+
+      if (!remoteUser.hasRole(possibleRoles, order.fromCollective.id)) {
+        // We only allow to add funds on behalf of a collective if the user is an admin of that collective or an admin of the host of the collective that receives the money
+        const HostId = await collective.getHostCollectiveId();
+        if (!remoteUser.isAdmin(HostId)) {
+          throw new Error(`You don't have sufficient permissions to create an order on behalf of the ${collective.name} ${collective.type.toLowerCase()}`);
+        }
+      }
+    }
+
+    if (!fromCollective) {
+      fromCollective = await models.Collective.createOrganization(order.fromCollective, user, remoteUser);
+    }
+
+    let matchingFund;
+    if (order.matchingFund) {
+      matchingFund = await models.PaymentMethod.getMatchingFund(order.matchingFund, { ForCollectiveId: collective.id });
+      const canBeUsedForOrder = await matchingFund.canBeUsedForOrder(order, user);
+
+      if (!canBeUsedForOrder) {
+        matchingFund = null;
+      }
+    }
+
+    if (matchingFund) {
+      order.matchingFund = matchingFund;
+      order.MatchingPaymentMethodId = matchingFund.id;
+      order.referral = { id: matchingFund.CollectiveId }; // if there is a matching fund, we force the referral to be the owner of the fund
+    }
+
+    const currency = tier && tier.currency || collective.currency;
+    if (order.currency && order.currency !== currency) {
+      throw new Error(`Invalid currency. Expected ${currency}.`);
+    }
+
+    const quantity = order.quantity || 1;
+
+    let totalAmount;
+    if (tier && tier.amount && !tier.presets) { // if the tier has presets, we can't enforce tier.amount
+      totalAmount = tier.amount * quantity;
+    } else {
+      totalAmount = order.totalAmount; // e.g. the donor tier doesn't set an amount
+    }
+
+    const tierNameInfo = (tier && tier.name) ? ` (${tier.name})` : '';
+
+    let defaultDescription;
+    if (order.interval) {
+      defaultDescription = `${capitalize(order.interval)}ly donation to ${collective.name}${tierNameInfo}`;
+    } else {
+      defaultDescription = `Donation to ${collective.name}${tierNameInfo}`
+    }
+
+    const orderData = {
+      CreatedByUserId: remoteUser ? remoteUser.id : user.id,
+      FromCollectiveId: fromCollective.id,
+      CollectiveId: collective.id,
+      TierId: tier && tier.id,
+      quantity,
+      totalAmount,
+      currency,
+      interval: order.interval,
+      description: order.description || defaultDescription,
+      publicMessage: order.publicMessage,
+      privateMessage: order.privateMessage,
+      processedAt: paymentRequired ? null : new Date,
+      MatchingPaymentMethodId: order.MatchingPaymentMethodId,
+    };
+
+    if (order.referral && get(order, 'referral.id') !== orderData.FromCollectiveId) {
+      orderData.ReferralCollectiveId = order.referral.id;
+    }
+
+    // using var so the scope is shared with the catch block below
+    var orderCreated = await models.Order.create(orderData);
+    orderCreated.interval = order.interval;
+    orderCreated.matchingFund = order.matchingFund;
+
+    if (order.paymentMethod && order.paymentMethod.save) {
+      order.paymentMethod.CollectiveId = orderCreated.FromCollectiveId;
+    }
+
+    if (paymentRequired) {
+      await orderCreated.setPaymentMethod(order.paymentMethod);
+      // also adds the user as a BACKER of collective
+      await libPayments.executeOrder(remoteUser || user, orderCreated, pick(order, ['hostFeePercent', 'platformFeePercent']));
+    } else if (collective.type === types.EVENT) {
+      // Free ticket, add user as an ATTENDEE
+      // const email = remoteUser ? remoteUser.email : order.user.email;
+      const UserId = remoteUser ? remoteUser.id : user.id;
+      await collective.addUserWithRole(user, roles.ATTENDEE);
+      await models.Activity.create({
+        type: activities.TICKET_CONFIRMED,
+        data: {
+          EventCollectiveId: collective.id,
+          UserId,
+          recipient: { name: fromCollective.name },
+          order: orderCreated.info,
+          tier: tier && tier.info
         }
       });
     }
-  })
-  // Check the existence of the tier
-  .then(() => {
-    if (!order.tier) return;
-    return models.Tier.findById(order.tier.id)
-      .then(tier => {
-        if (!tier) throw new Error(`No tier found with tier id: ${order.tier.id} for collective slug ${collective.slug}`);
-        return tier;
-      })
-  })
-  .then(t => {
-    tier = t; // we may not have a tier
-    paymentRequired = order.totalAmount > 0 || tier && tier.amount > 0;
 
-    // interval of the tier can only be overridden if it is null (e.g. for custom donations)
-    // TODO: using order.interval over Tiers will likely include donations that shouldn't be in tiers.
-    // Need to reevalute with always respecting user choice.
+    order = await models.Order.findById(orderCreated.id);
 
-    interval = order.interval;
-  })
-
-  // make sure that we have a payment method attached if this order requires a payment (totalAmount > 0)
-  .then(() => {
-    if (paymentRequired) {
-      if (!order.paymentMethod || !(order.paymentMethod.uuid || order.paymentMethod.token)) {
-        throw new Error(`This order requires a payment method`);
-      }
+    // If there was a referral for this order, we add it as a FUNDRAISER role
+    if (order.ReferralCollectiveId && order.ReferralCollectiveId !== user.CollectiveId) {
+      collective.addUserWithRole({ id: user.id, CollectiveId: order.ReferralCollectiveId }, roles.FUNDRAISER);
     }
-  })
 
-  // check for available quantity of the tier if any
-  .then(() => {
-    if (!tier) return;
-    if (tier.maxQuantityPerUser > 0 && order.quantity > tier.maxQuantityPerUser) {
-      Promise.reject(new Error(`You can buy up to ${tier.maxQuantityPerUser} ${pluralize('ticket', tier.maxQuantityPerUser)} per person`));
+    return order;
+  } catch (error) {
+    debugOrder("createOrder mutation error: ", error);
+    if (orderCreated && !orderCreated.processedAt) {
+      // TODO: Order should be updated with data JSON field to store the error to review later
+      orderCreated.update({ status: status.ERROR });
     }
-    return tier.checkAvailableQuantity(order.quantity)
-    .then(enoughQuantityAvailable => enoughQuantityAvailable ?
-      Promise.resolve() : Promise.reject(new Error(`No more tickets left for ${tier.name}`)))
-    })
-
-    // find or create user, check permissions to set `fromCollective`
-    .then(() => {
-      if (order.user && order.user.email) {
-        return models.User.findOrCreateByEmail(order.user.email, {
-          ...order.user,
-          currency: order.currency,
-          CreatedByUserId: remoteUser ? remoteUser.id : null,
-        });
-      }
-      if (remoteUser) return remoteUser;
-    })
-
-    // returns the fromCollective
-    .then(u => {
-      user = u;
-
-      if (!order.fromCollective || (!order.fromCollective.id && !order.fromCollective.name)) {
-        return models.Collective.findById(user.CollectiveId);
-      }
-
-      // If a `fromCollective` is provided, we check its existence and if the user can create an order on its behalf
-      if (order.fromCollective.id) {
-        if (!remoteUser) throw new Error(`You need to be logged in to create an order for an existing open collective`);
-        return loaders.collective.findById.load(order.fromCollective.id)
-        .then(c => {
-          if (!c) throw new Error(`From collective id ${order.fromCollective.id} not found`);
-          const possibleRoles = [roles.ADMIN, roles.HOST];
-          if (c.type === types.ORGANIZATION) {
-            possibleRoles.push(roles.MEMBER);
-          }
-          if (!remoteUser.hasRole(possibleRoles, order.fromCollective.id)) {
-            // We only allow to add funds on behalf of a collective if the user is an admin of that collective or an admin of the host of the collective that receives the money
-            return collective.getHostCollectiveId().then(HostCollectiveId => {
-              if (!remoteUser.isAdmin(HostCollectiveId)) {
-                throw new Error(`You don't have sufficient permissions to create an order on behalf of the ${c.name} ${c.type.toLowerCase()}`);
-              } else {
-                return c;
-              }
-            });
-          }
-          return c;
-        });
-      } else {
-        // Create new organization collective
-        return models.Collective.createOrganization(order.fromCollective, user, remoteUser);
-      }
-    })
-    .then(c => fromCollective = c)
-
-    // check if the MatchingFund is valid and has enough funds
-    .then(async () => {
-      if (order.matchingFund) {
-        const matchingPaymentMethod = await models.PaymentMethod.getMatchingFund(order.matchingFund, { ForCollectiveId: collective.id });
-        const canBeUsedForOrder = await matchingPaymentMethod.canBeUsedForOrder(order, user);
-        if (canBeUsedForOrder) return matchingPaymentMethod;
-        else return null;
-      }
-    })
-    .then((matchingFund) => {
-      if (matchingFund) {
-        order.matchingFund = matchingFund;
-        order.MatchingPaymentMethodId = matchingFund.id;
-        order.referral = { id: matchingFund.CollectiveId }; // if there is a matching fund, we force the referral to be the owner of the fund
-      }
-      const currency = tier && tier.currency || collective.currency;
-      if (order.currency && order.currency !== currency) {
-        throw new Error(`Invalid currency. Expected ${currency}.`);
-      }
-      const quantity = order.quantity || 1;
-      let totalAmount;
-      if (tier && tier.amount && !tier.presets) { // if the tier has presets, we can't enforce tier.amount
-        totalAmount = tier.amount * quantity;
-      } else {
-        totalAmount = order.totalAmount; // e.g. the donor tier doesn't set an amount
-      }
-
-      const tierNameInfo = (tier && tier.name) ? ` (${tier.name})` : '';
-      let defaultDescription;
-      if (interval) {
-        defaultDescription = `${capitalize(interval)}ly donation to ${collective.name}${tierNameInfo}`;
-      } else {
-        defaultDescription = `Donation to ${collective.name}${tierNameInfo}`
-      }
-
-      const orderData = {
-        CreatedByUserId: remoteUser ? remoteUser.id : user.id,
-        FromCollectiveId: fromCollective.id,
-        CollectiveId: collective.id,
-        TierId: tier && tier.id,
-        quantity,
-        totalAmount,
-        currency,
-        interval,
-        description: order.description || defaultDescription,
-        publicMessage: order.publicMessage,
-        privateMessage: order.privateMessage,
-        processedAt: paymentRequired ? null : new Date,
-        MatchingPaymentMethodId: order.MatchingPaymentMethodId
-      };
-
-      if (order.referral && get(order, 'referral.id') !== orderData.FromCollectiveId) {
-        orderData.ReferralCollectiveId = order.referral.id;
-      }
-
-      return models.Order.create(orderData)
-    })
-
-    // process payment, if needed
-    .then(oi => {
-      orderCreated = oi;
-      orderCreated.interval = interval;
-      orderCreated.matchingFund = order.matchingFund;
-      if (order.paymentMethod && order.paymentMethod.save) {
-        order.paymentMethod.CollectiveId = orderCreated.FromCollectiveId;
-      }
-      if (paymentRequired) {
-        return orderCreated
-          .setPaymentMethod(order.paymentMethod)
-          .then(() => libPayments.executeOrder(remoteUser || user, orderCreated, pick(order, ['hostFeePercent', 'platformFeePercent']))) // also adds the user as a BACKER of collective
-      } else if (collective.type === types.EVENT) {
-        // Free ticket, add user as an ATTENDEE
-        const UserId = remoteUser ? remoteUser.id : user.id;
-        return collective.addUserWithRole(user, roles.ATTENDEE)
-          .then(() => models.Activity.create({
-            type: activities.TICKET_CONFIRMED,
-            data: {
-              EventCollectiveId: collective.id,
-              UserId,
-              recipient: { name: fromCollective.name },
-              order: orderCreated.info,
-              tier: tier && tier.info
-            }
-          }));
-      }
-    })
-    // make sure we return the latest version of the Order Instance
-    .then(() => models.Order.findById(orderCreated.id))
-    .then(order => {
-      // If there was a referral for this order, we add it as a FUNDRAISER role
-      if (order.ReferralCollectiveId && order.ReferralCollectiveId !== user.CollectiveId) {
-        collective.addUserWithRole({ id: user.id, CollectiveId: order.ReferralCollectiveId }, roles.FUNDRAISER);
-      }
-      return order;
-    })
-    .catch(e => {
-      debugOrder("createOrder mutation error: ", e);
-      if (orderCreated && !orderCreated.processedAt) {
-        // TODO: Order should be updated with data JSON field to store the error to review later
-        orderCreated.update({ status: status.ERROR });
-      }
-      throw e;
-    });
+    throw error;
+  }
 }
 
 export function cancelSubscription(remoteUser, orderId) {
