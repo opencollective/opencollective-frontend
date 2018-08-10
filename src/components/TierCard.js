@@ -17,20 +17,22 @@ class TierCard extends React.Component {
   static propTypes = {
     tier: PropTypes.object.isRequired,
     collective: PropTypes.object.isRequired,
-    className: PropTypes.string
-  }
+    className: PropTypes.string,
+    referral: PropTypes.string,
+    intl: PropTypes.object.isRequired,
+  };
 
   constructor(props) {
     super(props);
-    this.anchor = get(props.tier, 'slug') || (get(props.tier, 'name') || "").toLowerCase().replace(/ /g,'-');
+    this.anchor = get(props.tier, 'slug') || (get(props.tier, 'name') || '').toLowerCase().replace(/ /g,'-');
 
     this.messages = defineMessages({
       'contribution': { id: 'contribution', defaultMessage: '{n, plural, one {contribution} other {contributions}}' },
-      'collective.types.organization': { id: 'collective.types.organization', defaultMessage: '{n, plural, one {organization} other {organizations}}'},
-      'collective.types.user': { id: 'collective.types.user', defaultMessage: '{n, plural, one {people} other {people}}'},
-      'collective.types.collective': { id: 'collective.types.collective', defaultMessage: '{n, plural, one {collective} other {collectives}}'},
-      'tier.error.hostMissing' : { id: 'tier.error.hostMissing', defaultMessage: "Your collective needs a host before you can start accepting money." },
-      'tier.error.collectiveInactive' : { id: 'tier.error.collectiveInactive', defaultMessage: "Your collective needs to be activated by your host before you can start accepting money." }
+      'collective.types.organization': { id: 'collective.types.organization', defaultMessage: '{n, plural, one {organization} other {organizations}}' },
+      'collective.types.user': { id: 'collective.types.user', defaultMessage: '{n, plural, one {people} other {people}}' },
+      'collective.types.collective': { id: 'collective.types.collective', defaultMessage: '{n, plural, one {collective} other {collectives}}' },
+      'tier.error.hostMissing' : { id: 'tier.error.hostMissing', defaultMessage: 'Your collective needs a host before you can start accepting money.' },
+      'tier.error.collectiveInactive' : { id: 'tier.error.collectiveInactive', defaultMessage: 'Your collective needs to be activated by your host before you can start accepting money.' },
     });
 
   }
@@ -46,18 +48,21 @@ class TierCard extends React.Component {
             display: flex;
             flex-wrap: wrap;
           }
-        `}</style>
+        `}
+        </style>
         <div className={`fromCollectives ${fromCollectiveTypeArray[0].toLowerCase()}`}>
           { fromCollectives.slice(0, limit).map(fromCollective => (
             <div className="image" key={`${tier.slug}-fromCollective-${fromCollective.id}`}>
-              <Link route={`/${fromCollective.slug}`}><a title={fromCollective.name}>
-                { fromCollectiveTypeArray.indexOf('USER') !== -1 &&
-                  <Avatar src={fromCollective.image} radius={32} />
-                }
-                { fromCollectiveTypeArray.indexOf('USER') === -1 &&
-                  <Logo src={fromCollective.image} website={fromCollective.website} height={32} />
-                }
-              </a></Link>
+              <Link route={`/${fromCollective.slug}`}>
+                <a title={fromCollective.name}>
+                  { fromCollectiveTypeArray.indexOf('USER') !== -1 &&
+                    <Avatar src={fromCollective.image} radius={32} />
+                  }
+                  { fromCollectiveTypeArray.indexOf('USER') === -1 &&
+                    <Logo src={fromCollective.image} website={fromCollective.website} height={32} />
+                  }
+                </a>
+              </Link>
             </div>
           ))}
         </div>
@@ -73,7 +78,7 @@ class TierCard extends React.Component {
     const totalOrders = tier.stats.totalOrders;
     let errorMsg;
     if (!collective.host) {
-      errorMsg = `hostMissing`;
+      errorMsg = 'hostMissing';
     } else if (!collective.isActive) {
       errorMsg = 'collectiveInactive';
     }
@@ -105,7 +110,8 @@ class TierCard extends React.Component {
           .TierCard .fromCollectives.user:first-child {
             margin-left: 15px;
           }
-        `}</style>
+        `}
+        </style>
         <style jsx>{`
           .TierCard {
             width: 280px;
@@ -210,7 +216,8 @@ class TierCard extends React.Component {
             color: #9ea2a6;
             color: var(--cool-grey);
           }
-        `}</style>
+        `}
+        </style>
         <div className="name">
           {tier.name}
         </div>
@@ -227,7 +234,7 @@ class TierCard extends React.Component {
                   defaultMessage="per {interval, select, month {month} year {year} other {}}"
                   values={{ interval: tier.interval }}
                   />
-                </div>
+              </div>
             }
           </div>
         }
@@ -242,7 +249,7 @@ class TierCard extends React.Component {
         }
         <div className="description">
           { tier.description && <Markdown source={tier.description} /> }
-          { !tier.description && <p><FormattedMessage id="tier.defaultDescription" defaultMessage="Become a {name} for {amount} per {interval} and help us sustain our activities!" values={{ name: tier.name, amount: formatCurrency(amount, tier.currency || collective.currency), interval: tier.interval}} /></p> }
+          { !tier.description && <p><FormattedMessage id="tier.defaultDescription" defaultMessage="Become a {name} for {amount} per {interval} and help us sustain our activities!" values={{ name: tier.name, amount: formatCurrency(amount, tier.currency || collective.currency), interval: tier.interval }} /></p> }
         </div>
         { tier.stats.totalOrders > 0 &&
           <div>
@@ -251,7 +258,7 @@ class TierCard extends React.Component {
               <div className="lastOrders">
                 { totalOrders > 0 &&
                 <div className="totalOrders">
-                  {totalOrders} {intl.formatMessage(this.messages[`contribution`], { n: totalOrders })}
+                  {totalOrders} {intl.formatMessage(this.messages['contribution'], { n: totalOrders })}
                 </div>
               }
                 {this.showLastOrders(['USER'], 10)}
