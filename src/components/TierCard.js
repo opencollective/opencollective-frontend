@@ -6,7 +6,7 @@ import { defineMessages, FormattedMessage } from 'react-intl';
 import { get, uniqBy } from 'lodash';
 import Avatar from './Avatar';
 import Logo from './Logo';
-import { Link, Router } from '../server/pages';
+import { Link } from '../server/pages';
 import Currency from './Currency';
 import colors from '../constants/colors';
 import { formatCurrency } from '../lib/utils';
@@ -67,7 +67,7 @@ class TierCard extends React.Component {
 
   render() {
 
-    const { collective, tier, intl } = this.props;
+    const { collective, tier, referral, intl } = this.props;
     const amount = tier.presets ? Math.min(tier.presets[0], tier.amount) : tier.amount;
     const disabled = amount > 0 && !collective.isActive;
     const totalOrders = tier.stats.totalOrders;
@@ -79,15 +79,16 @@ class TierCard extends React.Component {
     }
     const tooltip = disabled ? intl.formatMessage(this.messages[`tier.error.${errorMsg}`]) : '';
 
-    const onClick = () => {
-      if (disabled) return;
-      const { referral } = this.props;
-      const params = { collectiveSlug: collective.slug, TierId: tier.id };
-      if (referral) {
-        params.referral = referral;
-      }
-      Router.pushRoute('orderCollectiveTier', params);
+    const linkRouteParams =  { collectiveSlug: collective.slug, TierId: tier.id };
+    if (referral) {
+      linkRouteParams.referral = referral;
     }
+
+    const onClick = (e) => {
+      if (disabled) {
+        e.preventDefault();
+      }
+    };
 
     return (
       <div className={classNames('TierCard', this.props.className, this.anchor)}>
@@ -259,12 +260,13 @@ class TierCard extends React.Component {
             </div>
           </div>
         }
-        <a className={`action ${disabled ? 'disabled' : ''}`} title={tooltip} onClick={onClick} >
-          { tier.button && tier.button}
-          { !tier.button &&
-            <FormattedMessage id="tier.contribute" defaultMessage="contribute" />
-          }
-        </a>
+        <Link route="orderCollectiveTier" params={linkRouteParams}>
+          <a className={`action ${disabled ? 'disabled' : ''}`} title={tooltip} onClick={onClick}>
+            { tier.button ? tier.button : (
+              <FormattedMessage id="tier.contribute" defaultMessage="contribute" />
+            ) }
+          </a>
+        </Link>
       </div>
     );
   }
