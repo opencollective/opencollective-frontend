@@ -16,8 +16,7 @@ export const TOKEN_EXPIRATION_SESSION = daysToSeconds(90);
 /** Generate a JWToken with the received parameters */
 export function createJwt(subject, payload, expiresIn) {
   const { secret } = config.keys.opencollective;
-  const issuer = config.host.api;
-  return jwt.sign(payload, secret, { expiresIn, issuer, subject });
+  return jwt.sign(payload, secret, { expiresIn, subject });
 }
 
 /** Verify JWToken */

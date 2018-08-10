@@ -1,9 +1,12 @@
 import config from 'config';
+import debug from 'debug';
 
 import errors from '../../lib/errors';
 import {required_valid} from '../required_param';
 import roles from '../../constants/roles';
 import {authenticateUser} from './authentication';
+
+import models from '../../models';
 
 const {
   Forbidden, // I know who you are, but you permanently don't have access to this resource
@@ -17,11 +20,34 @@ const {
 } = roles;
 
 /**
+ * Check Client App
+ *
+ * Check Client Id if it exists
+ */
+export async function checkClientApp(req, res, next) {
+  const clientId = req.get('Client-Id') || req.query.clientId;
+  if (clientId) {
+    const app = await models.Application.findOne({ where: { clientId } });
+    if (app) {
+      debug('auth')('Valid Client App');
+      req.clientApp = app;
+      next();
+    } else {
+      debug('auth')(`Invalid Client App: ${clientId}.`);
+      next(new Unauthorized(`Invalid Client Id: ${clientId}.`));
+    }
+  } else {
+    next();
+    debug('auth')('No Client App');
+  }
+}
+
+/**
  * Authorize api_key
  *
  * All calls should provide a valid api_key
  */
-export function authorizeApiKey(req, res, next) {
+export function authorizeClientApp(req, res, next) {
 
   // TODO: we should remove those exceptions
   // those routes should only be accessed via the website (which automatically adds the api_key)
@@ -38,13 +64,21 @@ export function authorizeApiKey(req, res, next) {
     if (req.method === exceptions[i].method && req.originalUrl.match(exceptions[i].regex)) return next();
   }
 
-  required_valid('api_key')(req, res, (e) => {
-    if (e) return next(e);
-    const api_key = req.required.api_key;
-    if (api_key !== config.keys.opencollective.api_key)
-      return next(new Unauthorized(`Invalid API key: ${api_key}`));
+  const apiKey = req.query.api_key;
+
+  if (req.clientApp) {
+    debug('auth')(`Valid Client App`);
     next();
-  });
+  } else if (apiKey === config.keys.opencollective.api_key) {
+    debug('auth')(`Valid API key: ${apiKey}`);
+    next();
+  } else if (apiKey) {
+    debug('auth')(`Invalid API key: ${apiKey}`);
+    next(new Unauthorized(`Invalid API key: ${apiKey}`));
+  } else {
+    debug('auth')(`Missing API key or Client Id`);
+    next(new Unauthorized(`Missing API key or Client Id`));
+  }
 }
 
 /**

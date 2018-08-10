@@ -1,0 +1,22 @@
+Subject: Open Collective: App Login
+
+{{> header}}
+
+<h1>🗝</h1>
+
+<center>
+  <h3>You are one click away from logging into a third party app with your Open Collective account.</h3>
+  <a href="{{loginLink}}" class="btn blue"><div>One-click login</div></a>
+</center>
+
+<p>You will give it access to your Open Collective identity and let it fetch data on your behalf.</p>
+
+<div itemscope itemtype="http://schema.org/EmailMessage">
+  <div itemprop="potentialAction" itemscope itemtype="http://schema.org/ViewAction">
+    <link itemprop="url" content="{{loginLink}}"/>
+    <meta itemprop="name" content="login"/>
+  </div>
+  <meta itemprop="description" content="Login to opencollective.com"/>
+</div>
+
+{{> footer}}
