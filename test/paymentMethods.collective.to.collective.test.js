@@ -264,7 +264,7 @@ describe("paymentMethods.collective.to.collective.test.js", () => {
 
       // get Balance given the created user
       const ocPaymentMethodBalance = await openCollectivePaymentMethod.getBalanceForUser(user1);
-      
+
       // set an amount that's higher than the collective balance
       const amountHigherThanCollectiveBalance = ocPaymentMethodBalance.amount + 1;
 
