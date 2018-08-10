@@ -320,12 +320,12 @@ class CreateCollectiveForm extends React.Component {
             <div className="tos">
               <label>{intl.formatMessage(this.messages['tos.label'])}</label>
               <div>
-                <input type="checkbox" name="tos" onChange={(value) => this.handleChange("tos", value)} />
+                <input type="checkbox" name="tos" onChange={(value) => this.handleChange('tos', value)} />
                 <span>I agree with the <a href="/tos" target="_blank" rel="noopener noreferrer">terms of service of Open Collective</a></span>
               </div>
               { (get(host, 'settings.tos')) &&
                 <div>
-                  <input type="checkbox" name="hostTos" onChange={(value) => this.handleChange("hostTos", value)} />
+                  <input type="checkbox" name="hostTos" onChange={(value) => this.handleChange('hostTos', value)} />
                   <span>I agree with the <a href={get(host, 'settings.tos')} target="_blank" rel="noopener noreferrer">terms of service of the host</a> (<a href={`/${host.slug}`} target="_blank" rel="noopener noreferrer">{host.name}</a>) that will collect money on behalf of our collective</span>
                 </div>
               }

@@ -10,12 +10,12 @@ import { Radio } from '@material-ui/core';
 import CreateHostFormWithData from './CreateHostFormWithData';
 import CollectivesWithData from './CollectivesWithData';
 import CollectiveCard from './CollectiveCard';
-import { formatCurrency, getQueryParams } from '../lib/utils';
+import { formatCurrency, getQueryParams, formatDate } from '../lib/utils';
 import { Button } from 'react-bootstrap';
 
 const Option = styled.div`
   h2 {
-    margin: 15px 0px 5px 0px;
+    margin: 10px 0px 5px 0px;
     font-weight: bold;
   }
 `;
@@ -75,8 +75,13 @@ class EditHost extends React.Component {
             <CollectiveCard collective={collective.host} membership={hostMembership} />
           </Box>
           <Box>
+            { !collective.isActive &&
+              <p>
+                <FormattedMessage id="editCollective.host.pending" defaultMessage="You have applied to be hosted by {host} on {date}. Your application is being reviewed. As soon as the host accepts, you will be able to start collecting money for your collective." values={{ host: get(collective, 'host.name'), date: formatDate(get(hostMembership, 'createdAt'), { day: 'numeric', month: 'long', year: 'numeric' }) }} />
+              </p>
+            }
             <p>
-              <FormattedMessage id="editCollective.host.label" defaultMessage="{host} is hosting {collectives, plural, one {one collective} other {{collectives} collectives}}" values={{collectives: get(collective, 'host.stats.collectives.hosted'), host: get(collective, 'host.name') }} />
+              <FormattedMessage id="editCollective.host.label" defaultMessage="{host} is currently hosting {collectives, plural, one {one collective} other {{collectives} collectives}}" values={{collectives: get(collective, 'host.stats.collectives.hosted'), host: get(collective, 'host.name') }} />
             </p>
             { collective.stats.balance > 0 &&
               <p>
@@ -103,12 +108,12 @@ class EditHost extends React.Component {
 
     return (
       <div>
-        <Option>
+        <Option id="noHost">
           <Flex>
             <Box w="50px" mr={2}>
               <Radio
-                checked={this.state.selectedOption === "noHost"}
-                onChange={() => this.handleChange("selectedOption", "noHost")}
+                checked={this.state.selectedOption === 'noHost'}
+                onChange={() => this.handleChange('selectedOption', 'noHost')}
                 />
             </Box>
             <Box mb={4}>
@@ -118,18 +123,18 @@ class EditHost extends React.Component {
           </Flex>
         </Option>
 
-        <Option>
+        <Option id="createHost">
           <Flex>
             <Box w="50px" mr={2}>
               <Radio
-                checked={this.state.selectedOption === "createHost"}
-                onChange={() => this.handleChange("selectedOption", "createHost")}
+                checked={this.state.selectedOption === 'createHost'}
+                onChange={() => this.handleChange('selectedOption', 'createHost')}
                 />
             </Box>
             <Box mb={4}>
               <h2><FormattedMessage id="collective.edit.host.createHost.title" defaultMessage="Use your own host" /></h2>
               <FormattedMessage id="collective.edit.host.createHost.description" defaultMessage="You can create your own host as an individual or as an organization. You will be responsible for keeping custody of the funds raised by this collective and for paying out the expenses that have been approved." />&nbsp;<a href="https://github.com/opencollective/opencollective/wiki/Becoming-an-Open-Collective-Host"><FormattedMessage id="moreInfo" defaultMessage="More info" /></a>.
-              { this.state.selectedOption === "createHost" && LoggedInUser &&
+              { this.state.selectedOption === 'createHost' && LoggedInUser &&
                 <CreateHostFormWithData
                   collective={collective}
                   LoggedInUser={LoggedInUser}
@@ -140,18 +145,18 @@ class EditHost extends React.Component {
           </Flex>
         </Option>
 
-        <Option>
+        <Option id="findHost">
           <Flex>
             <Box w="50px" mr={2}>
               <Radio
-                checked={this.state.selectedOption === "findHost"}
-                onChange={() => this.handleChange("selectedOption", "findHost")}
+                checked={this.state.selectedOption === 'findHost'}
+                onChange={() => this.handleChange('selectedOption', 'findHost')}
                 />
             </Box>
             <Box mb={4}>
               <h2><FormattedMessage id="collective.edit.host.findHost.title" defaultMessage="Apply to an existing host" /></h2>
               <FormattedMessage id="collective.edit.host.findHost.description" defaultMessage="With this option, everything is taking care of for you. No need to create a new bank account, no need to worry about accounting and invoicing. All of that is being taken care of by an existing non profit organization that acts as your fiscal host. Note: most hosts charge a commission to cover the administrative overhead. " />
-              { this.state.selectedOption === "findHost" && LoggedInUser &&
+              { this.state.selectedOption === 'findHost' && LoggedInUser &&
                 <CollectivesWithData
                   isPublicHost={true}
                   />

@@ -176,6 +176,7 @@ const getCollectiveToEditQuery = gql`
       currency
       settings
       createdAt
+      isActive
       isHost
       expensePolicy
       stats {
