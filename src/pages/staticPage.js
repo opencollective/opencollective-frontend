@@ -6,37 +6,28 @@ import Footer from '../components/Footer';
 import NewsletterContainer from '../components/NewsletterContainer';
 import withIntl from '../lib/withIntl';
 
-const pages = {
-  'about': {
-    title: 'About Open Collective',
-  },
-  'widgets': {
-    title: 'Widgets',
-  },
-  'tos': {
-    title: 'Terms of Service',
-  },
-  'privacypolicy': {
-    title: 'Privacy Policy',
-  },
-};
-
 class StaticPage extends React.Component {
 
-  static async getInitialProps({ req }) {
-    const pageSlug = req._parsedUrl.pathname.substr(1);
+  static async getInitialProps(props) {
+    let { pageSlug } = props.query;
+    pageSlug = pageSlug.toLowerCase().replace(/faq/, 'FAQ');
     const content = await require(`../markdown/${pageSlug}.md`);
-    return { content, pageSlug };
+
+    // get the title from the html of the markdown
+    // e.g. <h1 id="about-open-collective">About Open Collective</h1> => About Open Collective
+    let title = content.substr(content.indexOf('<h1'), content.indexOf('</h1>'));
+    title = title.substr(title.indexOf('>') + 1);
+
+    return { title, content };
   }
 
   static propTypes = {
-    pageSlug: PropTypes.string.isRequired,
+    title: PropTypes.string.isRequired,
     content: PropTypes.string.isRequired,
   };
 
   constructor(props) {
     super(props);
-    this.page = pages[props.pageSlug];
   }
 
   render() {
@@ -68,7 +59,7 @@ class StaticPage extends React.Component {
           .staticPage .content {
             max-width: 96rem;
           }
-          .staticPage p {
+          .staticPage p, .staticPage li {
             color: #6E747A;
             font-family: 'Inter UI', 'lato','montserratlight', sans-serif;
             font-size: 16px;
@@ -86,7 +77,7 @@ class StaticPage extends React.Component {
           }
     
         `}</style>
-        <Header title={this.page.title} />
+        <Header title={this.props.title} />
         <Body>
           <div className="content" dangerouslySetInnerHTML={{ __html: this.props.content }} />
           <NewsletterContainer />
