@@ -17,7 +17,7 @@ import Footer from '../components/Footer';
 import Header from '../components/Header';
 import TransactionSimple from '../components/TransactionSimple';
 import { Link } from '../server/pages';
-import { Span, P, H1, H2, H3, H4 } from '../components/Text';
+import { Span, P, H1, H2, H3 } from '../components/Text';
 import ListItem from '../components/ListItem';
 import Hide from '../components/Hide';
 import Container from '../components/Container';
