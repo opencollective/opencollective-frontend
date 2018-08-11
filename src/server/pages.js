@@ -4,9 +4,10 @@ const pages = nextRoutes();
 
 pages
   .add('home', '/')
-  .add('widgets', '/widgets')
-  .add('tos', '/tos')
-  .add('privacypolicy', '/privacypolicy')
+  .add('about', '/about', 'staticPage')
+  .add('tos', '/tos', 'staticPage')
+  .add('widgets', '/widgets', 'staticPage')
+  .add('privacypolicy', '/privacypolicy', 'staticPage')
   .add('redeem', '/redeem')
   .add('signin', '/signin/:token?')
   .add('subscriptions_redirect', '/subscriptions', 'subscriptions-redirect')
