@@ -23,13 +23,13 @@ import Hide from '../components/Hide';
 import Container from '../components/Container';
 import StyledLink from '../components/StyledLink';
 import CollectiveStatsCard from '../components/CollectiveStatsCard';
+import NewsletterContainer from '../components/NewsletterContainer';
 import SponsorCard from '../components/SponsorCard';
 import {
   FacebookIcon,
   LinkedInIcon,
   TwitterIcon,
 } from '../components/icons';
-import StyledInput from '../components/StyledInput';
 import Carousel from '../components/Carousel';
 import Currency from '../components/Currency';
 import ErrorPage from '../components/ErrorPage';
@@ -562,52 +562,7 @@ a transparent operation? Let them know that Open Collective exists!</P>
             </Container>
           </Container>
 
-          <Container py={5}>
-            <H4 textAlign="center" fontSize={20} mb={4} px={3}>Stay updated about our news and progress.</H4>
-
-            <Flex justifyContent="center">
-              <form
-                action="https://opencollective.us12.list-manage.com/subscribe/post?u=88fc8f0f3b646152f1cfe447a&amp;id=c44469099e"
-                method="post"
-                name="mc-embedded-subscribe-form"
-                target="_blank"
-              >
-                <Container
-                  border="1px solid rgba(18,19,20,0.12)"
-                  borderRadius={50}
-                  bg="white"
-                  display="flex"
-                  justifyContent="space-between"
-                  overflow="hidden"
-                  width={300}
-                >
-                  <StyledInput
-                    fontSize={14}
-                    name="EMAIL"
-                    px={3}
-                    py={1}
-                    placeholder="Your email address"
-                    type="email"
-                    width={1}
-                  />
-                  <StyledInput
-                    bg="#3385FF"
-                    borderRadius={50}
-                    color="white"
-                    fontSize={12}
-                    fontWeight="bold"
-                    hover={{ color: 'white' }}
-                    px={3}
-                    py={2}
-                    textAlign="center"
-                    name="subscribe"
-                    type="submit"
-                    value="Subscribe"
-                  />
-                </Container>
-              </form>
-            </Flex>
-          </Container>
+          <NewsletterContainer />
         </Body>
         <Footer />
       </Fragment>
