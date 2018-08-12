@@ -1,3 +1,22 @@
+# FAQ for hosts
+
+### What is a host?
+The host is the organization or individual that acts as the fiscal sponsor of one or many Collectives. It receives the funds in the name of the Collective and reimburses the expenses that have been approved by its members.
+
+The host is responsible to do the accounting and to comply with all the tax regulations that apply in its jurisdiction. The Open Collective platforms makes this process easier by providing monthly and yearly reports with all the income and expenses (with their attachment) of the collectives hosted by the host.
+
+The host can define a commission for offering that service to the collective. Hosts on Open Collective charge anything from 0 to 30% depending on what services (branding, fiscal sponsorship, workshops, support, etc) they provide to the Collectives that they host.
+
+A host is basically the financial and legal entity behind the scene that makes it possible for Collectives to receive and pay out money without having to every worry about all the overhead of creating and maintaining a legal entity. By sharing a host, Collectives are effectively mutualizing the cost and overhead of having a legal entity. 
+
+There are diverse examples of Open Collective hosts:
+
+* [The Open Source Collective](https://opencollective.com/opensource) - host to open source software projects
+* [Women Who Code](https://opencollective.com/wwcode) - host for WWCode Meetup groups
+* [Brussels Together](https://opencollective.com/brusselstogether) - host for citizen projects in Brussels, Belgium
+
+Read more on [Why Becoming an Open Collective Host](becoming-an-open-collective-host).
+
 ### Where goes the money raised by the collectives that I host?
 
 Straight to the bank account attached to your Stripe Account.

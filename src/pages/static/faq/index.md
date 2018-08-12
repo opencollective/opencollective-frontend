@@ -1,14 +1,16 @@
+# FAQ
+
 ### Specific questions
 
-- [for collectives](FAQ-for-collectives)
-- [for submitting expenses and invoices to a collective](FAQ-for-expenses)
-- [for backers](FAQ-for-backers) (individuals and organizations)
-- [for host](FAQ-for-hosts)
+- [for collectives](collectives)
+- [for submitting expenses and invoices to a collective](expenses)
+- [for backers](backers) (individuals and organizations)
+- [for host](hosts)
 
 ### Where can I read more about Open Collective?
 
 Our blog is a good place to read more about Open Collective: <https://medium.com/open-collective>.
-Few blog post to highlight:
+Few blog posts to highlight:
 - [A New Form of Association for the Internet Generation](https://medium.com/open-collective/a-new-form-of-association-for-the-internet-generation-part-1-6d6c4f5dd27f#.bupyo3bl3) that talks about the original idea for Open Collective and the need to provide a new form of association that can be created as easily as a Facebook group and that gets out of the way, so that communities can focus on their purpose.
 - [A New Way to Fund Open Source Projects](https://medium.com/open-collective/a-new-way-to-fund-open-source-projects-91a51b1b7aac#.ky05pse2h) that talks about why simply putting a PayPal email doesn't work to raise funds for an open source community
 - [Ten Steps to Successful Open Source Crowdfunding](https://medium.com/open-collective/ten-steps-to-successful-open-source-crowdfunding-fa2b43e82687): money doesn't magically falls down from trees. This post provides a list of tips and tricks to be successful at fundraising for your open source project.
@@ -26,9 +28,11 @@ We also have created a non profit the [Open Collective Foundation 501c3](https:/
 
 ### When did you start?
 
-[Xavier Damman](https://twitter.com/xdamman) created the company in May 2015. He raised a first round of $500k in October 2015.
+[Xavier Damman](https://twitter.com/xdamman) created the company in May 2015. He raised a first round of $500k in October 2015 [with this deck](https://www.dropbox.com/s/klwxkewuf9mnjy1/OpenCollective.pdf?dl=0).
 
 Then [Pia and Aseem joined as cofounders in January 2016](https://medium.com/open-collective/pia-mancini-and-aseem-sood-join-opencollective-as-cofounders-2d4549bd46fd) ([Aseem left the company in April 2018](https://medium.com/open-collective/team-update-19749b964e39)).
+
+[Pia became CEO in April 2018](https://medium.com/open-collective/my-new-role-at-open-collective-3bbad22f1715).
 
 ### Where are you based?
 

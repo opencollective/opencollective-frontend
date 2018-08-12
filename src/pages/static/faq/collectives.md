@@ -1,3 +1,4 @@
+# FAQ for collectives
 
 ### What is an Open Collective?
 An Open Collective is a group of people with a shared mission that operates in full transparency. Everyone can see how they receive or spend money.
@@ -8,7 +9,7 @@ An Open Collective is a group of people with a shared mission that operates in f
 - Let your members submit expenses and reimburse them with a click ([example](https://opencollective.com/RailsGirlsAtl/expenses/new))
 - Give everyone visibility on your budget ([example](https://opencollective.com/RailsGirlsAtl/expenses))
 
-If you have an organization, you can use Open Collective to empower local chapters to raise money in their community and have their own budget ([example](https://opencollective.com/wwcode)). See [becoming an Open Collective Host](https://github.com/opencollective/opencollective/wiki/Becoming-an-Open-Collective-Host).
+If you have an organization, you can use Open Collective to empower local chapters to raise money in their community and have their own budget ([example](https://opencollective.com/wwcode)). See [becoming an Open Collective Host](becoming-an-open-collective-host).
 
 ### What is Open Collective good for?
 

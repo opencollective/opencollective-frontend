@@ -1,4 +1,6 @@
-### <a name="expense">How do I submit an expense and get paid?
+# FAQ for expenses
+
+### How do I submit an expense and get paid?
 Go to the page of the Collective you're submitting the expense to, and click "Submit Expense". You will need to upload a valid receipt or invoice, and provide your PayPal address.
 
 Each collective and host can specify expense policies and helpful info, like the details for invoicing, at the top of the 'new expense' page ([example](https://opencollective.com/webpack/expenses/new)).

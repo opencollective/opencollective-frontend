@@ -1,3 +1,5 @@
+# FAQ for backers
+
 ### How do I make a donation?
 
 You rock! We are delighted you are asking this question. Go to the Collective’s page (e.g. https://opencollective.com/wwcodeatl), choose one of the predefined tiers suggested by the collective or make a custom donation. Fill out the form (be sure to choose whether you'd like to make the donation as yourself an individual or as an organization), et voilà! Now you are part of that collective, your community will appreciate it.

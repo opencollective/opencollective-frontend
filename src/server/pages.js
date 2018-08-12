@@ -5,8 +5,7 @@ const pages = nextRoutes();
 pages
   .add('home', '/')
   .add('about', '/:pageSlug(about|widgets|tos|privacypolicy)', 'staticPage')
-  .add('faq', '/:pageSlug(faq|faq-for-collectives|faq-for-backers|faq-for-expenses|faq-for-hosts)', 'staticPage')
-  .add('host', '/:pageSlug(becoming-an-open-collective-host)', 'staticPage')
+  .add('faq', '/:path(faq)/:pageSlug(collectives|backers|expenses|hosts|becoming-an-open-collective-host)?', 'staticPage')
   .add('redeem', '/redeem')
   .add('signin', '/signin/:token?')
   .add('subscriptions_redirect', '/subscriptions', 'subscriptions-redirect')
