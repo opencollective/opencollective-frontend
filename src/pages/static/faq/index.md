@@ -28,9 +28,9 @@ We also have created a non profit the [Open Collective Foundation 501c3](https:/
 
 ### When did you start?
 
-[Xavier Damman](https://twitter.com/xdamman) created the company in May 2015. He raised a first round of $500k in October 2015 [with this deck](https://www.dropbox.com/s/klwxkewuf9mnjy1/OpenCollective.pdf?dl=0).
+[Xavier Damman](https://twitter.com/xdamman) created the company in May 2015. He raised a first round of $500k in October 2015 ([deck](https://www.dropbox.com/s/klwxkewuf9mnjy1/OpenCollective.pdf?dl=0)).
 
-Then [Pia and Aseem joined as cofounders in January 2016](https://medium.com/open-collective/pia-mancini-and-aseem-sood-join-opencollective-as-cofounders-2d4549bd46fd) ([Aseem left the company in April 2018](https://medium.com/open-collective/team-update-19749b964e39)).
+Then [Pia Mancini](https://twitter.com/piamancini) and [Aseem Sood](https://twitter.com/aseemsood_) [joined as cofounders in January 2016](https://medium.com/open-collective/pia-mancini-and-aseem-sood-join-opencollective-as-cofounders-2d4549bd46fd) ([Aseem left the company in April 2018](https://medium.com/open-collective/team-update-19749b964e39)).
 
 [Pia became CEO in April 2018](https://medium.com/open-collective/my-new-role-at-open-collective-3bbad22f1715).
 
@@ -43,7 +43,7 @@ Our team is distributed between New York City, Toronto, Guadalajara, Brussels an
 <details>
   <summary>We raised a total of $2,815,000 so far ($815k on convertible notes in 2015-2016, $2M Series Seed in June 2017)</summary>
 
-  <p>We did a first pre-seed round of $500k in October 2015 (<a href="https://www.ycombinator.com/docs/SAFE_Cap.rtf">SAFE</a>, $5M cap) with:
+  <p>We did a first pre-seed round of $500k in October 2015 (<a href="https://www.dropbox.com/s/klwxkewuf9mnjy1/OpenCollective.pdf?dl=0">deck</a>, <a href="https://www.ycombinator.com/docs/SAFE_Cap.rtf">SAFE</a>, $5M cap) with:
     <ul>
       <li><span>$250k</span> <a href="http://generalcatalyst.com">General Catalyst</a> (SF/NYC/Boston, <a href="https://www.linkedin.com/in/hemanttaneja">Hemant Taneja</a>)</li>
       <li><span>$50k</span> <a href="https://www.linkedin.com/in/jsiegel">Jonathan Siegel</a> (can't pin down his location)</li>

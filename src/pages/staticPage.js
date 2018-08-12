@@ -6,6 +6,8 @@ import Footer from '../components/Footer';
 import NewsletterContainer from '../components/NewsletterContainer';
 import withIntl from '../lib/withIntl';
 import Link from '../components/Link';
+import withData from '../lib/withData';
+import withLoggedInUser from '../lib/withLoggedInUser';
 
 class StaticPage extends React.Component {
 
@@ -34,8 +36,21 @@ class StaticPage extends React.Component {
     content: PropTypes.string.isRequired,
   };
 
+  static propTypes = {
+    getLoggedInUser: PropTypes.func.isRequired,
+    data: PropTypes.object,
+    query: PropTypes.object,
+  };
+
   constructor(props) {
     super(props);
+    this.state = {};
+  }
+
+  async componentDidMount() {
+    const { getLoggedInUser } = this.props;
+    const LoggedInUser = getLoggedInUser && await getLoggedInUser();
+    this.setState({ LoggedInUser });
   }
 
   render() {
@@ -85,7 +100,7 @@ class StaticPage extends React.Component {
           .staticPage .content {
             max-width: 96rem;
           }
-          .staticPage p, .staticPage li {
+          .staticPage p, .staticPage li, .staticPage summary {
             color: #6E747A;
             font-family: 'Inter UI', 'lato','montserratlight', sans-serif;
             font-size: 16px;
@@ -107,7 +122,7 @@ class StaticPage extends React.Component {
             line-height: 1.5rem;
           }
         `}</style>
-        <Header title={title} />
+        <Header title={title} LoggedInUser={this.state.LoggedInUser} />
         <Body>
           <div className="content">
             { path && pageSlug &&
@@ -125,4 +140,4 @@ class StaticPage extends React.Component {
   }
 }
 
-export default withIntl(StaticPage);
+export default withData(withLoggedInUser(withIntl(StaticPage)));
