@@ -1,10 +1,11 @@
+import { get, set } from 'lodash';
 import Temporal from 'sequelize-temporal';
 import { TransactionTypes } from '../constants/transactions';
-
+import activities from '../constants/activities';
 import status from '../constants/expense_status';
 import CustomDataTypes from '../models/DataTypes';
 import { reduceArrayToCurrency } from '../lib/currency';
-import { Op } from './';
+import models, { Op } from './';
 
 export default function (Sequelize, DataTypes) {
 
@@ -155,11 +156,60 @@ export default function (Sequelize, DataTypes) {
         }
       }
     },
+    hooks: {
+      afterUpdate(expense) {
+        switch (expense.status) {
+          case status.PAID:
+            expense._previousDataValues.status === status.APPROVED && expense.addUserIdToHostW9ReceivedList();
+            break;
+          case status.APPROVED:
+            expense.createActivity(activities.COLLECTIVE_EXPENSE_APPROVED);
+            break;
+        }
+      }
+    }
   });
 
   /**
    * Instance Methods
    */
+  Expense.prototype.createActivity = async function(type) {
+    const user = this.user || await models.User.findById(this.UserId);
+    const userCollective = await models.Collective.findById(user.CollectiveId);
+    const host = await this.collective.getHostCollective();
+    const transaction = this.status === status.PAID && await models.Transaction.findOne({ where: { type: 'DEBIT', ExpenseId: this.id }});
+    await models.Activity.create({
+      type,
+      UserId: this.UserId,
+      CollectiveId: this.collective.id,
+      data: {
+        host: host.minimal,
+        collective: this.collective.minimal,
+        user: user.minimal,
+        fromCollective: userCollective.minimal,
+        expense: this.info,
+        transaction: transaction.info
+      }
+    });
+  }
+
+  Expense.prototype.addUserIdToHostW9ReceivedList = async function() {
+    const host = await this.collective.getHostCollective();
+    // If user is already included in Host data List, don't do anything
+    if (get(host, 'data.W9.receivedFromUserIds') && host.data.W9.receivedFromUserIds.includes(this.UserId)) {
+      return false;
+    }
+    // Only Inserts User in W9 Received list if he is already present on
+    // the W9.requestSentToUserIds (which means this user already overstepped the W9 Threshold)
+    if (get(host, 'data.W9.requestSentToUserIds') && host.data.W9.requestSentToUserIds.includes(this.UserId)) {
+      const receivedFromUserIds = get(host, 'data.W9.receivedFromUserIds', []);
+      receivedFromUserIds.push(this.UserId);
+      set(host, 'data.W9.receivedFromUserIds', receivedFromUserIds);
+      return host.update({data:host.data});
+    }
+    return false;
+  }
+
   Expense.prototype.setApproved = function(lastEditedById) {
     if (this.status === status.PAID) {
       throw new Error("Can't approve an expense that is PAID");
