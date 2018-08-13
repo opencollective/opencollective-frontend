@@ -34,6 +34,7 @@ const createOrderQuery = `
   mutation createOrder($order: OrderInputType!) {
     createOrder(order: $order) {
       id
+      status
       createdByUser {
         id
       }
@@ -120,17 +121,27 @@ describe('createOrder', () => {
 
   afterEach(() => sandbox.restore());
 
-    it("fails if collective is not active", async () => {
+    it("creates a pending order (pledge) if the collective is not active", async () => {
       const collective = await models.Collective.create({
         slug: 'test',
         name: 'test',
-        isActive: false
+        isActive: false,
+        website: 'https://github.com/opencollective/frontend',
       });
       const thisOrder = cloneDeep(order);
       thisOrder.collective.id = collective.id;
+      thisOrder.user = {
+        firstName: "John",
+        lastName: "Smith",
+        email: "jsmith@email.com",
+        twitterHandle: "johnsmith",
+        newsletterOptIn: true,
+      };
+
       const res = await utils.graphqlQuery(createOrderQuery, { order: thisOrder });
-      expect(res.errors).to.exist;
-      expect(res.errors[0].message).to.equal("This collective is not active");
+
+      expect(res.errors).to.not.exist;
+      expect(res.data.createOrder.status).to.equal('PENDING');
     });
 
     it('creates an order as new user and sends a tweet', async () => {
@@ -284,8 +295,8 @@ describe('createOrder', () => {
       // When the query is executed
       const res = await utils.graphqlQuery(createOrderQuery, { order }, xdamman);
       // Then there should be no errors
-      res.errors && console.error(res.errors);
       expect(res.errors).to.not.exist;
+      expect(res.data.createOrder.status).to.equal('PAID');
       // And then the creator of the order should be xdamman
       const collective = res.data.createOrder.collective;
       const transaction = await models.Transaction.findOne({
@@ -381,8 +392,10 @@ describe('createOrder', () => {
       expect(res.errors).to.not.exist;
       // Then the created transaction should match the requested data
       const orderCreated = res.data.createOrder;
+      expect(orderCreated.status).to.equal('ACTIVE');
       const collective = orderCreated.collective;
       const subscription = orderCreated.subscription;
+
       expect(subscription.interval).to.equal('month');
       expect(subscription.isActive).to.be.true;
       expect(subscription.amount).to.equal(order.totalAmount);
