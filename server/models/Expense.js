@@ -202,10 +202,8 @@ export default function (Sequelize, DataTypes) {
     // Only Inserts User in W9 Received list if he is already present on
     // the W9.requestSentToUserIds (which means this user already overstepped the W9 Threshold)
     if (get(host, 'data.W9.requestSentToUserIds') && host.data.W9.requestSentToUserIds.includes(this.UserId)) {
-      const receivedFromUserIds = !get(host, 'data.W9.receivedFromUserIds')
-        ? []
-        : get(host, 'data.W9.receivedFromUserIds');
-        receivedFromUserIds.push(this.UserId);
+      const receivedFromUserIds = get(host, 'data.W9.receivedFromUserIds', []);
+      receivedFromUserIds.push(this.UserId);
       set(host, 'data.W9.receivedFromUserIds', receivedFromUserIds);
       return host.update({data:host.data});
     }
