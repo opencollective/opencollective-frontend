@@ -26,6 +26,7 @@ import models, { Op, sequelize } from '../models';
 import dataloaderSequelize from 'dataloader-sequelize';
 import { strip_tags } from '../lib/utils';
 import status from '../constants/expense_status';
+import orderStatus from '../constants/order_status';
 
 dataloaderSequelize(models.Order);
 dataloaderSequelize(models.Transaction);
@@ -942,9 +943,15 @@ export const StatsOrderType = new GraphQLObjectType({
   }
 });
 
+export const OrderStatusType = new GraphQLEnumType({
+  name: 'OrderStatus',
+  description: 'Possible statuses for an Order',
+  values: Object.keys(orderStatus).reduce((values, key) => ({ ...values, [key]: {} }), {}),
+});
+
 export const OrderType = new GraphQLObjectType({
   name: 'OrderType',
-  description: 'This is an order (for donations, buying tickets, subscribing to a Tier)',
+  description: 'This is an order (for donations, buying tickets, subscribing to a Tier, pledging to a Collective)',
   fields: () => {
     return {
        id: {
@@ -1114,7 +1121,14 @@ export const OrderType = new GraphQLObjectType({
           return order.getSubscription()
             .then(s => s ? s.isActive : null)
         }
-      }
+      },
+      status: {
+        description: 'Current status for an order',
+        type: OrderStatusType,
+        resolve(order) {
+          return order.status;
+        },
+      },
     }
   }
 });
