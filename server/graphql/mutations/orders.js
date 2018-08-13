@@ -17,17 +17,14 @@ import { getNextChargeAndPeriodStartDates, getChargeRetryCount} from '../../lib/
 
 const debugOrder = debug('order');
 
-// TODO:
-// - refactor to use await
-// - add logic for creating a pending collective if a website is provided instead of an id
 export async function createOrder(order, loaders, remoteUser) {
   try {
     if (order.paymentMethod && order.paymentMethod.service === 'stripe' && order.paymentMethod.uuid && !remoteUser) {
       throw new Error("You need to be logged in to be able to use a payment method on file");
     }
 
-    if (!order.collective || !order.collective.id) {
-      throw new Error("No collective id provided");
+    if (!order.collective || (!order.collective.id && !order.collective.website)) {
+      throw new Error("No collective id or website provided");
     }
 
     if (order.platformFeePercent && !remoteUser.isRoot()) {
@@ -35,14 +32,15 @@ export async function createOrder(order, loaders, remoteUser) {
     }
 
     // Check the existence of the recipient Collective
-    const collective = await loaders.collective.findById.load(order.collective.id);
-
-    if (!collective) {
-      throw new Error(`No collective found with id: ${order.collective.id}`);
+    let collective;
+    if (order.collective.id) {
+      collective = await loaders.collective.findById.load(order.collective.id);
+    } else if (order.collective.website) {
+      collective = (await models.Collective.findOrCreate({ where: {website: order.collective.website}, defaults: order.collective }))[0];
     }
 
-    if (!collective.isActive) {
-      throw new Error('This collective is not active');
+    if (!collective) {
+      throw new Error(`No collective found: ${order.collective.id || order.collective.website}`);
     }
 
     if (order.fromCollective && order.fromCollective.id === collective.id) {
@@ -64,11 +62,11 @@ export async function createOrder(order, loaders, remoteUser) {
       tier = await models.Tier.findById(order.tier.id);
 
       if (!tier) {
-          throw new Error(`No tier found with tier id: ${order.tier.id} for collective slug ${collective.slug}`);
+        throw new Error(`No tier found with tier id: ${order.tier.id} for collective slug ${order.collective.slug}`);
       }
     }
 
-    const paymentRequired = order.totalAmount > 0 || tier && tier.amount > 0;
+    const paymentRequired = (order.totalAmount > 0 || tier && tier.amount > 0) && collective.isActive;
     if (
       paymentRequired &&
       (!order.paymentMethod || !(order.paymentMethod.uuid || order.paymentMethod.token))
@@ -76,13 +74,15 @@ export async function createOrder(order, loaders, remoteUser) {
       throw new Error('This order requires a payment method');
     }
 
-    if (tier.maxQuantityPerUser > 0 && order.quantity > tier.maxQuantityPerUser) {
+    if (tier && tier.maxQuantityPerUser > 0 && order.quantity > tier.maxQuantityPerUser) {
       throw new Error(`You can buy up to ${tier.maxQuantityPerUser} ${pluralize('ticket', tier.maxQuantityPerUser)} per person`);
     }
 
-    const enoughQuantityAvailable = await tier.checkAvailableQuantity(order.quantity);
-    if (!enoughQuantityAvailable) {
-      throw new Error(`No more tickets left for ${tier.name}`);
+    if (tier) {
+      const enoughQuantityAvailable = await tier.checkAvailableQuantity(order.quantity);
+      if (!enoughQuantityAvailable) {
+        throw new Error(`No more tickets left for ${tier.name}`);
+      }
     }
 
     // find or create user, check permissions to set `fromCollective`
@@ -114,7 +114,7 @@ export async function createOrder(order, loaders, remoteUser) {
       }
 
       const possibleRoles = [roles.ADMIN, roles.HOST];
-      if (collective.type === types.ORGANIZATION) {
+      if (fromCollective.type === types.ORGANIZATION) {
         possibleRoles.push(roles.MEMBER);
       }
 
@@ -122,7 +122,7 @@ export async function createOrder(order, loaders, remoteUser) {
         // We only allow to add funds on behalf of a collective if the user is an admin of that collective or an admin of the host of the collective that receives the money
         const HostId = await collective.getHostCollectiveId();
         if (!remoteUser.isAdmin(HostId)) {
-          throw new Error(`You don't have sufficient permissions to create an order on behalf of the ${collective.name} ${collective.type.toLowerCase()}`);
+          throw new Error(`You don't have sufficient permissions to create an order on behalf of the ${fromCollective.name} ${fromCollective.type.toLowerCase()}`);
         }
       }
     }
@@ -191,6 +191,7 @@ export async function createOrder(order, loaders, remoteUser) {
     }
 
     // using var so the scope is shared with the catch block below
+    // eslint-disable-next-line no-var
     var orderCreated = await models.Order.create(orderData);
     orderCreated.interval = order.interval;
     orderCreated.matchingFund = order.matchingFund;
@@ -205,7 +206,6 @@ export async function createOrder(order, loaders, remoteUser) {
       await libPayments.executeOrder(remoteUser || user, orderCreated, pick(order, ['hostFeePercent', 'platformFeePercent']));
     } else if (collective.type === types.EVENT) {
       // Free ticket, add user as an ATTENDEE
-      // const email = remoteUser ? remoteUser.email : order.user.email;
       const UserId = remoteUser ? remoteUser.id : user.id;
       await collective.addUserWithRole(user, roles.ATTENDEE);
       await models.Activity.create({
