@@ -227,6 +227,7 @@ query Collective($slug: String) {
     }
     startsAt
     endsAt
+    timezone
     parentCollective {
       id
       slug
