@@ -212,7 +212,7 @@ class Event extends React.Component {
         }
         {event.startsAt &&
           <React.Fragment>
-            <FormattedDate value={event.startsAt} weekday="short" day="numeric" month="long" />, &nbsp;
+            <FormattedDate value={event.startsAt} timeZone={event.timezone} weekday="short" day="numeric" month="long" />, &nbsp;
             <FormattedTime value={event.startsAt} timeZone={event.timezone} />&nbsp; - &nbsp;
           </React.Fragment>
         }

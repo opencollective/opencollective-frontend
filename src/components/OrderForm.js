@@ -987,7 +987,7 @@ class OrderForm extends React.Component {
                           }
                           {collective.startsAt &&
                             <React.Fragment>
-                              <FormattedDate value={collective.startsAt} weekday="short" day="numeric" month="long" />, &nbsp;
+                              <FormattedDate value={collective.startsAt} timeZone={collective.timezone} weekday="short" day="numeric" month="long" />, &nbsp;
                               <FormattedTime value={collective.startsAt} timeZone={collective.timezone} />&nbsp; - &nbsp;
                             </React.Fragment>
                           }
