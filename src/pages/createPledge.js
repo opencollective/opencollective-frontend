@@ -1,5 +1,6 @@
 import React, { Fragment } from 'react';
 import slugify from 'slugify';
+import { withState } from 'recompose';
 
 import withData from '../lib/withData';
 import { addGetLoggedInUserFunction } from '../graphql/queries';
@@ -12,6 +13,34 @@ import { H1, H2, P, Span } from '../components/Text';
 import StyledInput, { SubmitInput, TextInput } from '../components/StyledInput';
 import { Box, Flex } from 'grid-styled';
 import Container from '../components/Container';
+
+const labelStyles = {
+  color: '#aaaaaa',
+  fontSize: '10px',
+  is: 'label',
+  letterSpacing: '0.5px',
+  mb: 1,
+};
+
+const WordCountTextarea = withState('wordCount', 'setWordCount', 140)(({ wordCount, setWordCount }) => (
+  <Flex flexDirection="column">
+    <Flex justifyContent="space-between">
+      <P {...labelStyles} for="message">A MESSAGE FOR THE COMMUNITY <Span fontWeight="200">- Optional</Span></P>
+      <P {...labelStyles} is="p">{wordCount}</P>
+    </Flex>
+    <StyledInput
+      border="1px solid #cccccc"
+      borderRadius="4px"
+      fontSize="14px"
+      is="textarea"
+      id="message"
+      onChange={({ target }) => setWordCount(() => 140 - target.value.length)}
+      px={2}
+      py={1}
+      rows={4}
+    />
+  </Flex>
+));
 
 class CreatePledgePage extends React.Component {
   static getInitialProps({ query = {} }) {
@@ -77,6 +106,8 @@ class CreatePledgePage extends React.Component {
             <form onSubmit={this.createOrder}>
               <Box mb={3}>
                 <H2 fontWeight="200" fontSize="21px" mb={3}>Pledge details</H2>
+
+                <WordCountTextarea />
               </Box>
 
               <Box mb={3}>
@@ -90,12 +121,12 @@ class CreatePledgePage extends React.Component {
 
                 <Flex flexDirection={['column', null, 'row']} alignItems={[null, null, 'flex-end']}>
                   <Flex flexDirection="column" mb={3}>
-                    <P is="label" for="name" color="#aaaaaa" fontSize="10px" mb={1} letterSpacing="0.5px">NAME</P>
+                    <P {...labelStyles} for="name">NAME</P>
                     <TextInput name="name" id="name" defaultValue={name} />
                   </Flex>
 
-                  <Flex flexDirection="column" mb={3} flex="1 1 auto" pl={3}>
-                    <P is="label" for="slug" color="#aaaaaa" fontSize="10px" mb={1} letterSpacing="0.5px">COLLECTIVE URL</P>
+                  <Flex flexDirection="column" mb={3} flex="1 1 auto" pl={[null, null, 3]}>
+                    <P {...labelStyles} for="slug">COLLECTIVE URL</P>
                     <Container border="1px solid #cccccc" borderRadius="4px" py={1} px={2} display="flex" alignItems="center">
                       <Span color="#aaaaaa" fontSize="14px">https://opencollective.com/</Span>
                       <StyledInput type="text" id="slug" name="slug" defaultValue={slugify(name)} overflow="scroll" maxWidth="150px" fontSize="14px" />
@@ -104,7 +135,7 @@ class CreatePledgePage extends React.Component {
                 </Flex>
 
                 <Flex flexDirection="column" mb={3}>
-                  <P is="label" for="website" color="#aaaaaa" fontSize="10px" mb={1} letterSpacing="0.5px">GITHUB OR MEETUP URL - More collective types soon!</P>
+                  <P {...labelStyles} for="website">GITHUB OR MEETUP URL - More collective types soon!</P>
                   <TextInput type="url" name="website" id="website" placeholder="https://" />
                 </Flex>
               </Box>
