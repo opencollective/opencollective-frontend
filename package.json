@@ -78,6 +78,7 @@
     "react-stickynode": "2.0.1",
     "react-tag-input": "5.2.2",
     "react-tooltip": "3.8.4",
+    "recompose": "0.28.2",
     "request": "2.88.0",
     "sanitize-html": "1.19.1",
     "showdown": "^1.8.6",
