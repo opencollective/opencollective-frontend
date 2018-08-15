@@ -14,9 +14,10 @@ import {
   textAlign,
   width,
 } from 'styled-system';
+import tag from 'clean-tag';
 import { overflow } from './Container';
 
-const StyledInput = styled.input(
+const StyledInput = styled(tag.input)(
   [],
   background,
   borders,
