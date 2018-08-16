@@ -123,8 +123,14 @@ class Event extends React.Component {
     const order = {
       tier: { id: tier.id },
       quantity: tier.quantity,
-      totalAmount: (tier.quantity || 1) * tier.amount,
-      interval: tier.interval
+      // We used to do it like that
+      // totalAmount: (tier.quantity || 1) * tier.amount,
+      // But looks like tier.amount is already updated to the totalAmount
+      // Look at components/Tier.js calcCurrentValues, see:
+      // https://github.com/opencollective/frontend/blob/03c30a5f6edd1bbbba45a3538b96ad2156e9a151/src/components/Tier.js#L74
+      // So, we're just using that value
+      totalAmount: tier.amount,
+      interval: tier.interval,
     }
     tierInfo[tier.id] = tier;
     this.setState({ order, tierInfo });
