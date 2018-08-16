@@ -41,7 +41,7 @@ async function getBalance(paymentMethod) {
 async function processOrder(order) {
   const user = order.createdByUser;
   const { paymentMethod: { data } } = order;
-
+  console.log(0);
   // Making sure the paymentMethod has the information we need to
   // process a prepaid card
   if (!order.paymentMethod.customerId)
@@ -52,9 +52,11 @@ async function processOrder(order) {
   // Check if the prepaid card was created for the collective making
   // the donation
   const fromCollective = await models.Collective.findById(order.FromCollectiveId);
-  if (order.paymentMethod.customerId !== fromCollective.slug)
-    throw new Error('Prepaid method can only be used by the organization that received it');
-
+  if (order.paymentMethod.customerId !== fromCollective.slug) {
+    //if the PM has the CollectiveId setup, it's supposed to be the same as the FromCollectiveId
+    if (!order.paymentMethod.CollectiveId || order.paymentMethod.CollectiveId !== order.FromCollectiveId)
+      throw new Error('Prepaid method can only be used by the organization that received it');
+  }
   // Check that target Collective's Host is same as gift card issuer
   const hostCollective = await order.collective.getHostCollective();
   if (hostCollective.id !== data.HostCollectiveId)
