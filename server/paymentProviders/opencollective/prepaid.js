@@ -41,7 +41,6 @@ async function getBalance(paymentMethod) {
 async function processOrder(order) {
   const user = order.createdByUser;
   const { paymentMethod: { data } } = order;
-  console.log(0);
   // Making sure the paymentMethod has the information we need to
   // process a prepaid card
   if (!order.paymentMethod.customerId)
