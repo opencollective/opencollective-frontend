@@ -6,7 +6,7 @@ import { defineMessages, FormattedMessage } from 'react-intl';
 import { get, uniqBy } from 'lodash';
 import Avatar from './Avatar';
 import Logo from './Logo';
-import { Link } from '../server/pages';
+import { Link, Router } from '../server/pages';
 import Currency from './Currency';
 import colors from '../constants/colors';
 import { formatCurrency } from '../lib/utils';
@@ -84,14 +84,24 @@ class TierCard extends React.Component {
     }
     const tooltip = disabled ? intl.formatMessage(this.messages[`tier.error.${errorMsg}`]) : '';
 
-    const linkRouteParams =  { collectiveSlug: collective.slug, TierId: tier.id };
+    const linkRoute = {
+      name: 'orderCollectiveTier',
+      params: { collectiveSlug: collective.slug, TierId: tier.id },
+      anchor: '#content',
+    };
     if (referral) {
-      linkRouteParams.referral = referral;
+      linkRoute.params.referral = referral;
     }
 
     const onClick = (e) => {
-      if (disabled) {
-        e.preventDefault();
+      e.preventDefault();
+      if (!disabled) {
+        // For better UX, we redirect to #content after the route is loaded
+        // without that, we would either scroll to the top or don't scroll at all
+        Router.pushRoute(linkRoute.name, linkRoute.params)
+          .then(() => {
+            window.location.hash = linkRoute.anchor;
+          });
       }
     };
 
@@ -267,7 +277,7 @@ class TierCard extends React.Component {
             </div>
           </div>
         }
-        <Link route="orderCollectiveTier" params={linkRouteParams}>
+        <Link route={linkRoute.name} params={linkRoute.params}>
           <a className={`action ${disabled ? 'disabled' : ''}`} title={tooltip} onClick={onClick}>
             { tier.button ? tier.button : (
               <FormattedMessage id="tier.contribute" defaultMessage="contribute" />
