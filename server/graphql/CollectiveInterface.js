@@ -29,6 +29,10 @@ import {
   TransactionInterfaceType
 } from './TransactionInterface';
 
+import {
+  ApplicationType
+} from './Application';
+
 import { types } from '../constants/collectives';
 import models, { Op } from '../models';
 import roles from '../constants/roles';
@@ -1134,7 +1138,15 @@ export const UserCollectiveType = new GraphQLObjectType({
           if (!req.remoteUser) return null;
           return userCollective && req.loaders.getUserDetailsByCollectiveId.load(userCollective.id).then(user => user.email);
         }
-      }
+      },
+      applications: {
+        type: new GraphQLList(ApplicationType),
+        resolve(userCollective) {
+          return models.Application.findAll({
+            where: { CreatedByUserId: userCollective.CreatedByUserId },
+          });
+        }
+      },
     }
   }
 });
