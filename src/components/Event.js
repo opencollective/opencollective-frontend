@@ -120,12 +120,13 @@ class Event extends React.Component {
 
   updateOrder(tier) {
     const tierInfo = Object.assign({}, {...this.state.tierInfo});
+    const singleAmount = tier.singleAmount || tier.amount;
     const order = {
       tier: { id: tier.id },
       quantity: tier.quantity,
-      totalAmount: (tier.quantity || 1) * tier.amount,
-      interval: tier.interval
-    }
+      totalAmount: (tier.quantity || 1) * singleAmount,
+      interval: tier.interval,
+    };
     tierInfo[tier.id] = tier;
     this.setState({ order, tierInfo });
     return order;

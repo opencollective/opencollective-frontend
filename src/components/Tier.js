@@ -19,15 +19,17 @@ class Tier extends React.Component {
     className: PropTypes.string,
     values: PropTypes.object, // overriding values {quantity, amount, interval}
     onChange: PropTypes.func, // onChange({ id, quantity, amount, interval })
-    onClick: PropTypes.func // onClick({ id, quantity, amount, interval })
-  }
+    onClick: PropTypes.func, // onClick({ id, quantity, amount, interval })
+  };
 
   constructor(props) {
     super(props);
     this.state = { customAmountError: null };
 
     this.onChange = this.props.onChange || function() {};
+    this.onClick = this.props.onClick || function() {};
     this.handleChange = this.handleChange.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
 
     this.currencyStyle = { style: 'currency', currencyDisplay: 'symbol', minimumFractionDigits: 0, maximumFractionDigits: 2};
 
@@ -60,7 +62,7 @@ class Tier extends React.Component {
 
     const { values, tier } = this.props;
 
-    let quantity, amount, interval, presets;
+    let quantity, amount, singleAmount, interval, presets;
 
     // Case 1: handle presets. Both interval and amount are changeable
     if (tier.presets) {
@@ -71,6 +73,7 @@ class Tier extends React.Component {
     } else if (tier.type === 'TICKET') {
       // Case 2: handle quantity. Can't be active at same time as presets
       quantity = (values && values.quantity) || 1;
+      singleAmount = tier.amount;
       amount = tier.amount * quantity;
     } else if (tier.amount || values.amount) {
       // Case 3: nothing is changeable, comes with amount (and interval optional)
@@ -78,7 +81,7 @@ class Tier extends React.Component {
       amount = tier.amount || values.amount;
       quantity = 1;
     }
-    return { interval, amount, quantity, presets }
+    return { interval, amount, singleAmount, quantity, presets }
   }
 
 
@@ -119,6 +122,14 @@ class Tier extends React.Component {
 
     response[field] = value;
     this.onChange(response);
+  }
+
+  handleSubmit() {
+    const { tier } = this.props;
+
+    const { quantity, amount, singleAmount, interval } = this.calcCurrentValues();
+
+    this.onClick({ id: tier.id, amount, singleAmount, quantity, interval });
   }
 
   render() {
@@ -340,12 +351,12 @@ class Tier extends React.Component {
           { type === 'TICKET' &&
             <div id="actions" className="actions">
               <TicketController value={quantity} onChange={(value) => this.handleTicketsChange(value)} />
-              {this.props.onClick && <CTAButton className="ctabtn blue ticket" label={(<FormattedMessage id="tier.GetTicket" values={{ quantity }} defaultMessage={`{quantity, plural, one {get ticket} other {get tickets}}`} />)} onClick={() => this.props.onClick({id: tier.id, amount, quantity, interval})} />}
+              {this.props.onClick && <CTAButton className="ctabtn blue ticket" label={(<FormattedMessage id="tier.GetTicket" values={{ quantity }} defaultMessage={`{quantity, plural, one {get ticket} other {get tickets}}`} />)} onClick={this.handleSubmit} />}
             </div>
           }
           { type !== 'TICKET' && this.props.onClick &&
             <div id="actions" className="actions">
-              <CTAButton className="ctabtn blue" label={tier.button || (<FormattedMessage id="tier.GetTier" values={{name}} defaultMessage={`become a {name}`} />)} onClick={() => this.props.onClick({id: tier.id, amount, quantity, interval})} />
+              <CTAButton className="ctabtn blue" label={tier.button || (<FormattedMessage id="tier.GetTier" values={{name}} defaultMessage={`become a {name}`} />)} onClick={this.handleSubmit} />
             </div>
           }
         </div>

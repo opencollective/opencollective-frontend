@@ -95,6 +95,7 @@ describe("Tier component", () => {
         expect(tier).toEqual({
           quantity: 2,
           amount: 2 * ticket.amount,
+          singleAmount: ticket.amount,
           id: ticket.id
         })
         done();
