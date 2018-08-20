@@ -62,7 +62,7 @@
     "react": "16.4.2",
     "react-add-to-calendar": "0.1.5",
     "react-apollo": "2.1.11",
-    "react-bootstrap": "0.32.1",
+    "react-bootstrap": "0.32.3",
     "react-datetime": "2.15.0",
     "react-dom": "16.4.2",
     "react-dropzone": "4.3.0",
