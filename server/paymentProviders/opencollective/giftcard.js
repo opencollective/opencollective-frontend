@@ -1,3 +1,7 @@
+/**
+ * /!\ This code should be deprecated
+ */
+
 import models from '../../models';
 import roles from '../../constants/roles';
 import * as libpayments from '../../lib/payments';

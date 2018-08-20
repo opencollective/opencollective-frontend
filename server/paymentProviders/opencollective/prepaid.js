@@ -3,6 +3,7 @@ import roles from '../../constants/roles';
 import * as libpayments from '../../lib/payments';
 import * as libtransactions from '../../lib/transactions';
 import { TransactionTypes, OC_FEE_PERCENT } from '../../constants/transactions';
+import { get } from 'lodash';
 
 /** Get the balance of a prepaid credit card
  *
@@ -43,19 +44,9 @@ async function processOrder(order) {
   const { paymentMethod: { data } } = order;
   // Making sure the paymentMethod has the information we need to
   // process a prepaid card
-  if (!order.paymentMethod.customerId)
-    throw new Error('Prepaid method must have a value for `customerId`');
-  if (!data || !data.HostCollectiveId)
-    throw new Error('Prepaid method must have a value for `data.HostCollectiveId`');
+  if (!get(data, 'HostCollectiveId'))
+    throw new Error('Prepaid payment method must have a value for `data.HostCollectiveId`');
 
-  // Check if the prepaid card was created for the collective making
-  // the donation
-  const fromCollective = await models.Collective.findById(order.FromCollectiveId);
-  if (order.paymentMethod.customerId !== fromCollective.slug) {
-    //if the PM has the CollectiveId setup, it's supposed to be the same as the FromCollectiveId
-    if (!order.paymentMethod.CollectiveId || order.paymentMethod.CollectiveId !== order.FromCollectiveId)
-      throw new Error('Prepaid method can only be used by the organization that received it');
-  }
   // Check that target Collective's Host is same as gift card issuer
   const hostCollective = await order.collective.getHostCollective();
   if (hostCollective.id !== data.HostCollectiveId)
