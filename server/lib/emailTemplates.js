@@ -50,6 +50,7 @@ const templateNames = [
   'payment.failed',
   'payment.failed.text',
   'processing',
+  'report.platform',
   'subscription.canceled',
   'ticket.confirmed',
   'ticket.confirmed.sustainoss',
