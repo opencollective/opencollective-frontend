@@ -217,16 +217,23 @@ export default function(Sequelize, DataTypes) {
       throw new Error(`This ${name} doesn't support recurring payments`);
     }
 
-    // If there is a monthly limit per member, the user needs to be a member or admin of the collective that owns the payment method
-    if (this.monthlyLimitPerMember && !user.isMember(this.CollectiveId)) {
-      throw new Error(`You don't have enough permissions to use this payment method (you need to be a member or an admin of the collective that owns this payment method)`);
-    }
+    // If there is no `this.CollectiveId`, it means that the user doesn't want to save this payment method to any collective
+    // In that case, we need to check that the user owns the payment method
+    if (!this.CollectiveId) {
+      if (user.id !== this.CreatedByUserId) {
+        throw new Error(`This payment method is not saved to any collective and can only be used by the user that created it`);
+      }
+    } else {
+      // If there is a monthly limit per member, the user needs to be a member or admin of the collective that owns the payment method
+      if (this.monthlyLimitPerMember && !user.isMember(this.CollectiveId)) {
+        throw new Error(`You don't have enough permissions to use this payment method (you need to be a member or an admin of the collective that owns this payment method)`);
+      }
 
-    // If there is no monthly limit, the user needs to be an admin of the collective that owns the payment method
-    if (!this.monthlyLimitPerMember && !user.isAdmin(this.CollectiveId)) {
-      throw new Error(`You don't have enough permissions to use this payment method (you need to be an admin of the collective that owns this payment method)`);
+      // If there is no monthly limit, the user needs to be an admin of the collective that owns the payment method
+      if (!this.monthlyLimitPerMember && !user.isAdmin(this.CollectiveId)) {
+        throw new Error(`You don't have enough permissions to use this payment method (you need to be an admin of the collective that owns this payment method)`);
+      }
     }
-
 
     // We get an estimate of the total amount of the order in the currency of the payment method
     const orderCurrency = order.currency || get(order, 'collective.currency');
