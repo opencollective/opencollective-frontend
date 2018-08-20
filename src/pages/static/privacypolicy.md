@@ -1,4 +1,4 @@
-# OPEN COLLECTIVE PRIVACY POLICY
+# Open Collective Privacy Policy
 
 **Last Updated: March 8th, 2017**
 

@@ -1,4 +1,4 @@
-# OPEN COLLECTIVE TERMS OF SERVICE
+# Terms of Service
 
 **Last Updated: 27th January 2017**
 
