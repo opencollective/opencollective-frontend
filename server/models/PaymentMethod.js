@@ -4,7 +4,6 @@ import libdebug from 'debug';
 import { get, intersection } from 'lodash';
 
 import { TransactionTypes } from '../constants/transactions';
-import { types as CollectiveTypes } from '../constants/collectives';
 
 import { sumTransactions } from '../lib/hostlib';
 import { formatCurrency } from '../lib/utils';
