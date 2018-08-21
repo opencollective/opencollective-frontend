@@ -218,10 +218,16 @@ export default function(Sequelize, DataTypes) {
     }
 
     // If there is no `this.CollectiveId`, it means that the user doesn't want to save this payment method to any collective
-    // In that case, we need to check that the user owns the payment method
+    // In that case, we need to check that the user is the creator of the payment method
     if (!this.CollectiveId) {
       if (user.id !== this.CreatedByUserId) {
         throw new Error(`This payment method is not saved to any collective and can only be used by the user that created it`);
+      }
+    } else if (this.matching) {
+      // If the payment method is a matching fund, the user doesn't need to own it
+      // but we need to make sure that the order is referencing this matching fund
+      if (order.matchingFund !== this.uuid.substr(0, 8)) {
+        throw new Error(`This payment method can only be used to match an order`);
       }
     } else {
       // If there is a monthly limit per member, the user needs to be a member or admin of the collective that owns the payment method
