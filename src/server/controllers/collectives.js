@@ -90,7 +90,7 @@ export async function logo(req, res, next) {
     collective = await fetchCollectiveImage(req.params.collectiveSlug);
   } catch (e) {
     if (e.message.match(/No collective found/)) {
-      return res.status(404).send("Not found");
+      return res.status(404).send('Not found');
     }
     logger.debug('>>> collectives.logo error', e);
     return next(e);
@@ -115,7 +115,7 @@ export async function logo(req, res, next) {
         colored: (req.query.colored === 'false') ? false : true,
         size: {
           height: params.height || 20,
-          width: params.width
+          width: params.width,
         },
         variant: req.query.variant || 'wide',
         trim: req.query.trim !== 'false',
@@ -154,7 +154,7 @@ export async function banner(req, res) {
       users = await fetchMembers(req.params);
       cache.set(queryString.stringify(req.params), users);
     } catch (e) {
-      logger.error(">>> collectives.banner: Error while fetching members", e);
+      logger.error('>>> collectives.banner: Error while fetching members', e);
       return res.status(404).send('Not found');
     }
   }
@@ -248,7 +248,7 @@ export async function avatar(req, res) {
   const user = (position < users.length) ?  users[position] : {};
 
   const format = req.params.format || 'svg';
-  let maxHeight;
+  let maxHeight, maxWidth;
   const selector = tierSlug || backerType;
   if (req.query.avatarHeight) {
     maxHeight = Number(req.query.avatarHeight);
@@ -257,6 +257,7 @@ export async function avatar(req, res) {
     if (selector.match(/silver/)) maxHeight *= 1.25;
     if (selector.match(/gold/)) maxHeight *= 1.5;
     if (selector.match(/diamond/)) maxHeight *= 2;
+    maxWidth = maxHeight * 3;
   }
 
   // We only record a page view when loading the first avatar
@@ -269,7 +270,7 @@ export async function avatar(req, res) {
     if (user.type === 'USER') {
       imageUrl = getCloudinaryUrl(user.image, { query: `/c_thumb,g_face,h_${maxHeight},r_max,w_${maxHeight},bo_3px_solid_white/c_thumb,h_${maxHeight},r_max,w_${maxHeight},bo_2px_solid_rgb:66C71A/e_trim/f_auto/` });
     } else {
-      imageUrl = getCloudinaryUrl(user.image, { height: maxHeight });
+      imageUrl = getCloudinaryUrl(user.image, { height: maxHeight, width: maxWidth });
     }
   }
 
