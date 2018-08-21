@@ -200,7 +200,7 @@ describe('graphql.tiers.test', () => {
 
         const result = await utils.graphqlQuery(createOrderQuery, { order }, user2);
         expect(result.errors).to.exist;
-        expect(result.errors[0].message).to.equal("You don't have sufficient permissions to access this payment method");
+        expect(result.errors[0].message).to.equal("You don't have enough permissions to use this payment method (you need to be an admin of the collective that owns this payment method)");
       });
 
       it("user1 becomes a backer of collective1 using a payment method on file", async () => {

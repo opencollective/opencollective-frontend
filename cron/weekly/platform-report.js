@@ -230,7 +230,11 @@ export default function run() {
     const report = reportString(results);
     console.log(report);
     const html = markdownConverter.makeHtml(report);
-    return emailLib.sendMessage('team@opencollective.com', title, html, { tag: 'platform-weekly-report' });
+    const data = {
+      title,
+      html
+    }
+    return emailLib.send('report.platform', 'team@opencollective.com', data);
   }).then(() => {
     console.log('Weekly reporting done!');
     process.exit();
