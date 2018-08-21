@@ -237,7 +237,7 @@ class OrderForm extends React.Component {
 
     const filterPMs = (pms) => (pms || []).filter(pm =>
       ((pm.service === 'stripe' || pm.service === 'paypal') ||
-       (pm.service === 'opencollective' && pm.type === 'prepaid')));
+       (pm.service === 'opencollective' && (pm.type === 'prepaid' || pm.type === 'collective') )));
 
     if (collective) {
       const paymentMethods = filterPMs(collective.paymentMethods);
@@ -271,7 +271,7 @@ class OrderForm extends React.Component {
       fromCollectiveOptions.push({ [LoggedInUser.CollectiveId]: LoggedInUser.collective.name });
       collectivesById[LoggedInUser.CollectiveId] = LoggedInUser.collective;
       LoggedInUser.memberOf.map(membership => {
-        if (membership.collective.type === 'COLLECTIVE') return;
+        if (membership.collective.type === 'COLLECTIVE' && membership.role !== 'ADMIN') return;
         if (membership.collective.type === 'EVENT') return;
         if (membership.collective.type === 'ORGANIZATION' && !this.allowOrganizations) return;
         if (['ADMIN','HOST'].indexOf(membership.role) === -1) return;
