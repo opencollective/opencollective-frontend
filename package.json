@@ -180,7 +180,8 @@
     "cron:weekly": "PG_MAX_CONNECTIONS=1 ./scripts/cron.sh weekly",
     "cron:monthly": "PG_MAX_CONNECTIONS=1 ./scripts/cron.sh monthly",
     "cron:yearly": "PG_MAX_CONNECTIONS=1 ./scripts/cron.sh yearly",
-    "compile:email": "babel-node scripts/compile-email.js"
+    "compile:email": "babel-node scripts/compile-email.js",
+    "compile:email:watch": "./scripts/watch_email_template.sh"
   },
   "nyc": {
     "reporter": [
