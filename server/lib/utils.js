@@ -19,7 +19,7 @@ export function addParamsToUrl(url, obj) {
     u.searchParams.set(key, obj[key]);
   });
   return u.href;
-};
+}
 
 // source: https://stackoverflow.com/questions/8498592/extract-hostname-name-from-string
 function extractHostname(url) {
