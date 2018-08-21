@@ -13,7 +13,7 @@ export function getCloudinaryUrl(src, { width, height, query }) {
 
   const format = (src.match(/\.png$/)) ? 'png' : 'jpg';
 
-  const queryurl = query || `/${size}c_fill,f_${format}/`;
+  const queryurl = query || `/${size}c_pad,f_${format}/`;
 
   return `${cloudinaryBaseUrl}${queryurl}${encodeURIComponent(src)}`;
 }

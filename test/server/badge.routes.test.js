@@ -73,7 +73,7 @@ describe("badge.routes.test.js", () => {
 
     test("loads the first member avatar.svg", async () => {
       const resText = await fetchText('/apex/tiers/sponsors/0/avatar.svg?isActive=false');
-      expect(resText).toMatch(/<image width="140" height="64"/);
+      expect(resText).toMatch(/<image width="192" height="64"/);
     }, timeout);
 
   });
