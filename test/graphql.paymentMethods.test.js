@@ -148,7 +148,7 @@ describe('graphql.paymentMethods.test.js', () => {
       };
       const result2 = await utils.graphqlQuery(createOrderQuery, { order }, user);
       expect(result2.errors).to.exist;
-      expect(result2.errors[0].message).to.equal(`You don't have sufficient permissions to access this payment method`);
+      expect(result2.errors[0].message).to.equal(`You don't have enough permissions to use this payment method (you need to be an admin of the collective that owns this payment method)`);
     });
 
     it('fails to change platformFeePercent if not root', async () => {

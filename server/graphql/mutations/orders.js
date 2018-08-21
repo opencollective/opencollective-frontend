@@ -438,7 +438,7 @@ export async function refundTransaction(_, args, req) {
  * @param {String} args.description The description of the new payment
  *  method.
  * @param {Number} args.CollectiveId The ID of the organization
- *  receiving the credit card.
+ *  receiving the prepaid card.
  * @param {Number} args.HostCollectiveId The ID of the host that
  *  received the money on its bank account.
  * @param {Number} args.totalAmount The total amount that will be
