@@ -6,6 +6,7 @@ import models from '../../models';
 import roles from '../../constants/roles';
 import * as libpayments from '../../lib/payments';
 import { TransactionTypes, OC_FEE_PERCENT } from '../../constants/transactions';
+import { get } from 'lodash';
 
 /** Get the balance of a giftcard
  *
@@ -45,7 +46,7 @@ export async function processOrder(order) {
 
   // hacky, HostCollectiveId doesn't quite make sense in this
   // context but required by ledger. TODO: fix later.
-  let HostCollectiveId = order.paymentMethod.CollectiveId;
+  let HostCollectiveId = get(order.paymentMethod, 'data.HostCollectiveId');
 
   // If this is a payment method of a host for a specific
   // collective, then we find the collective and its actual
@@ -69,7 +70,7 @@ export async function processOrder(order) {
   // transfer all money using gift card from Host to User
   await models.Transaction.createFromPayload({
     CreatedByUserId: user.id,
-    FromCollectiveId,
+    FromCollectiveId: HostCollectiveId,
     CollectiveId: user.CollectiveId,
     PaymentMethodId: order.PaymentMethodId,
     transaction: {
@@ -218,6 +219,7 @@ function createGiftcardData(batches, opts) {
         expiryDate: batch.expiryDate,
         CreatedByUserId,
         CollectiveId,
+        data: opts.data,
         service: 'opencollective',
         type: 'giftcard',
       });
