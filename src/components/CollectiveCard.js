@@ -260,6 +260,21 @@ class CollectiveCard extends React.Component {
                 </div>
               </div>
             ) }
+            { collective.stats && collective.stats.collectives && (
+              <div className="stats">
+                <div className="backers">
+                  <div className="value">{get(collective, 'stats.collectives.hosted')}</div>
+                  <div className="label">
+                    <FormattedMessage
+                      id="collective.card.collectives.count"
+                      defaultMessage="{n, plural, one {collective} other {collectives}} hosted"
+                      values={{ n: get(collective, 'stats.collectives.hosted') }}
+                      />
+                  </div>
+                </div>
+
+              </div>
+            ) }
             { membership &&
               <div className="membership">
                 <div className="role">{tierName}</div>

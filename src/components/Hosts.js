@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import Header from './Header';
 import Body from './Body';
 import Footer from './Footer';
-import CollectivesWithData from './CollectivesWithData';
+import HostsWithData from './HostsWithData';
 import HostsCover from './HostsCover';
 import { defineMessages } from 'react-intl';
 import withIntl from '../lib/withIntl';
@@ -11,15 +11,15 @@ import withIntl from '../lib/withIntl';
 class Hosts extends React.Component {
 
   static propTypes = {
-    collective: PropTypes.object
-  }
+    collective: PropTypes.object,
+  };
 
   constructor(props) {
     super(props);
     this.state = { status: 'idle', result: {} };
     this.messages = defineMessages({
-      "hosts.title": { id: "hosts.title", defaultMessage: "Open Collective Hosts" },
-      "hosts.description": { id: "hosts.description", defaultMessage: "Hosts are legal entities that collect money on behalf of open collectives so that they don't have to worry about accounting, taxes, etc. Some also provide extra services." }
+      'hosts.title': { id: 'hosts.title', defaultMessage: 'Open Collective Hosts' },
+      'hosts.description': { id: 'hosts.description', defaultMessage: 'Hosts are legal entities that collect money on behalf of open collectives so that they don\'t have to worry about accounting, taxes, etc. Some also provide extra services.' },
     });
   }
 
@@ -66,8 +66,7 @@ class Hosts extends React.Component {
             />
 
           <div className="content" >
-            <CollectivesWithData
-              isPublicHost={true}
+            <HostsWithData
               LoggedInUser={LoggedInUser}
               />
           </div>

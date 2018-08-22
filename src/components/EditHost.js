@@ -8,8 +8,9 @@ import styled from 'styled-components';
 import { Flex, Box } from 'grid-styled';
 import { Radio } from '@material-ui/core';
 import CreateHostFormWithData from './CreateHostFormWithData';
-import CollectivesWithData from './CollectivesWithData';
+import HostsWithData from './HostsWithData';
 import CollectiveCard from './CollectiveCard';
+import Link from './Link';
 import { formatCurrency, getQueryParams, formatDate } from '../lib/utils';
 import { Button } from 'react-bootstrap';
 
@@ -156,10 +157,14 @@ class EditHost extends React.Component {
             <Box mb={4}>
               <h2><FormattedMessage id="collective.edit.host.findHost.title" defaultMessage="Apply to an existing host" /></h2>
               <FormattedMessage id="collective.edit.host.findHost.description" defaultMessage="With this option, everything is taking care of for you. No need to create a new bank account, no need to worry about accounting and invoicing. All of that is being taken care of by an existing non profit organization that acts as your fiscal host. Note: most hosts charge a commission to cover the administrative overhead. " />
-              { this.state.selectedOption === 'findHost' && LoggedInUser &&
-                <CollectivesWithData
-                  isPublicHost={true}
-                  />
+              { this.state.selectedOption === 'findHost' &&
+                <div>
+                  <HostsWithData
+                    limit={6}
+                    tags={collective.tags}
+                    />
+                  <Link route="/hosts"><FormattedMessage id="collective.edit.host.viewAllHosts" defaultMessage="View all hosts" /></Link>
+                </div>
               }
             </Box>
           </Flex>

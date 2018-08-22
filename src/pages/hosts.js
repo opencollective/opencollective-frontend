@@ -8,15 +8,22 @@ import Hosts from '../components/Hosts';
 class HostsPage extends React.Component {
 
   static propTypes = {
-    LoggedInUser: PropTypes.object
-  }
+    getLoggedInUser: PropTypes.func,
+  };
 
   constructor(props) {
     super(props);
+    this.state = {};
+  }
+
+  async componentDidMount() {
+    const { getLoggedInUser } = this.props;
+    const LoggedInUser = getLoggedInUser && await getLoggedInUser();
+    this.setState({ LoggedInUser });
   }
 
   render() {
-    const { LoggedInUser } = this.props;
+    const { LoggedInUser } = this.state;
 
     return (
       <div>
