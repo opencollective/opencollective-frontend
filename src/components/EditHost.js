@@ -109,6 +109,20 @@ class EditHost extends React.Component {
 
     return (
       <div>
+        <style jsx>{`
+        .suggestedHostsTitle {
+          display: flex;
+          align-items: baseline;
+        }
+        .suggestedHostsTitle :global(a) {
+          font-size: 1.3rem;
+          margin-left: 0.5rem;
+        }
+        .subtitle {
+          color: #666F80;
+          font-size: 1.5rem;
+        }
+        `}</style>
         <Option id="noHost">
           <Flex>
             <Box w="50px" mr={2}>
@@ -159,11 +173,17 @@ class EditHost extends React.Component {
               <FormattedMessage id="collective.edit.host.findHost.description" defaultMessage="With this option, everything is taking care of for you. No need to create a new bank account, no need to worry about accounting and invoicing. All of that is being taken care of by an existing non profit organization that acts as your fiscal host. Note: most hosts charge a commission to cover the administrative overhead. " />
               { this.state.selectedOption === 'findHost' &&
                 <div>
+                  <div className="suggestedHostsTitle">
+                    <h3><FormattedMessage id="collective.edit.host.suggestedHosts.title" defaultMessage="Suggested hosts" /></h3>
+                    <Link route="/hosts"><FormattedMessage id="collective.edit.host.viewAllHosts" defaultMessage="View all hosts" /></Link>
+                  </div>
+                  <div className="suggestedHostsDescription subtitle">
+                    <FormattedMessage id="collective.edit.host.suggestedHosts.description" defaultMessage="Based on the tags of your collective ({tags})" values={{ tags: collective.tags }} />.
+                  </div>
                   <HostsWithData
                     limit={6}
                     tags={collective.tags}
                     />
-                  <Link route="/hosts"><FormattedMessage id="collective.edit.host.viewAllHosts" defaultMessage="View all hosts" /></Link>
                 </div>
               }
             </Box>
