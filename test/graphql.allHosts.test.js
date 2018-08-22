@@ -5,7 +5,7 @@ import models from '../server/models';
 import * as utils from './utils';
 
 describe('graphql.allHosts.test.js', () => {
-  let hostAdmin, publicHost, publicHost2, privateHost, collective1, collective2, user1;
+  let hostAdmin, publicHost, privateHost, collective1, collective2, user1;
 
   before('reset test db', () => utils.resetTestDB());
   before('build up db content', async () => {
@@ -13,7 +13,7 @@ describe('graphql.allHosts.test.js', () => {
     user1 = await models.User.createUserWithCollective({ email: "user1@gmail.com" });
     privateHost = user1.collective;
     publicHost = await models.Collective.create({ name: "BrusselsTogether ASBL", tags: ['host', 'brussels'], settings: { apply: { title: "apply" } }});
-    publicHost2 = await models.Collective.create({ name: "Open Collective Paris", tags: ['host', 'paris', 'chapter'], settings: { apply: { title: "apply" } }});
+    await models.Collective.create({ name: "Open Collective Paris", tags: ['host', 'paris', 'chapter'], settings: { apply: { title: "apply" } }});
     privateHost = await models.Collective.create({ name: "Xavier"  });
     await publicHost.addUserWithRole(hostAdmin, "ADMIN");
     collective1 = await models.Collective.create({ name: "VeganBrussels" });
