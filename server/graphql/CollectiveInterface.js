@@ -70,6 +70,25 @@ export const CollectiveOrderFieldType = new GraphQLEnumType({
   },
 });
 
+export const HostCollectiveOrderFieldType = new GraphQLEnumType({
+  name: 'HostCollectiveOrderFieldType',
+  description: 'Properties by which hosts can be ordered.',
+  values: {
+    createdAt: {
+      description: 'Order hosts by creation time.',
+    },
+    name: {
+      description: 'Order hosts by name.',
+    },
+    collectives: {
+      description: 'Order hosts by number of collectives it is hosting.',
+    },
+    updatedAt: {
+      description: 'Order hosts by updated time.',
+    },
+  },
+});
+
 export const BackersStatsType = new GraphQLObjectType({
   name: "BackersStatsType",
   description: "Breakdown of backers per type (ANY/USER/ORGANIZATION/COLLECTIVE)",

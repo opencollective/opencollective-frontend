@@ -17,6 +17,7 @@ import {
   CollectiveSearchResultsType,
   TypeOfCollectiveType,
   CollectiveOrderFieldType,
+  HostCollectiveOrderFieldType
 } from './CollectiveInterface';
 
 import {
@@ -564,7 +565,10 @@ const queries = {
   allCollectives: {
     type: CollectiveSearchResultsType,
     args: {
-      tags: { type: new GraphQLList(GraphQLString) },
+      tags: {
+        type: new GraphQLList(GraphQLString),
+        description: "Fetch all collectives that match at least one of the tags",
+      },
       type: {
         type: TypeOfCollectiveType,
         description: "COLLECTIVE, USER, ORGANIZATION, EVENT"
@@ -576,10 +580,6 @@ const queries = {
       hostCollectiveSlug: {
         type: GraphQLString,
         description: "Fetch all collectives hosted by hostCollectiveSlug"
-      },
-      isPublicHost: {
-        type: GraphQLBoolean,
-        description: "Fetch all public hosts that accept applications for hosting new collectives"
       },
       isActive: {
         description: 'Only return active collectives',
@@ -645,18 +645,6 @@ const queries = {
         query.include.push(memberCond);
       }
 
-      if (args.isPublicHost) {
-        query.where.settings = { apply: { [Op.ne]: null } };
-        const hostCond = {
-          model: models.ConnectedAccount,
-          required: true,
-          where: {
-            service: "stripe"
-          }
-        }
-        query.include.push(hostCond);
-      }
-
       if (args.HostCollectiveId) query.where.HostCollectiveId = args.HostCollectiveId;
       if (args.ParentCollectiveId) query.where.ParentCollectiveId = args.ParentCollectiveId;
       if (args.type) query.where.type = args.type;
@@ -692,7 +680,6 @@ const queries = {
           [Op.ne]: '',
         },
       };
-
       const result = await models.Collective.findAndCountAll(query);
 
       return {
@@ -701,6 +688,47 @@ const queries = {
         limit: args.limit,
         offset: args.offset,
       };
+    }
+  },
+
+  /*
+   * Returns all hosts
+   */
+  allHosts: {
+    type: CollectiveSearchResultsType,
+    description: "Returns all public hosts that are open for applications",
+    args: {
+      tags: {
+        type: new GraphQLList(GraphQLString),
+        description: "Fetch all collectives that match at least one of the tags",
+      },
+      orderBy: {
+        defaultValue: 'collectives',
+        type: HostCollectiveOrderFieldType
+      },
+      orderDirection: {
+        defaultValue: 'DESC',
+        type: OrderDirectionType,
+      },
+      limit: {
+        defaultValue: 10,
+        type: GraphQLInt,
+      },
+      offset: {
+        defaultValue: 0,
+        type: GraphQLInt
+      },
+    },
+    async resolve(_, args) {
+
+      const results = await rawQueries.getPublicHostsByTotalCollectives(args)
+      return {
+        total: results.length,
+        collectives: results,
+        limit: args.limit,
+        offset: args.offset,
+      }
+
     }
   },
 
