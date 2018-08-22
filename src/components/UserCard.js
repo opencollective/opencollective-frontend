@@ -37,17 +37,17 @@ const UserCard = ({ user, type }) => (
           color: #7fadf2;
         }
         .tier .name {
+          font-size: 1rem;
           font-weight: 700;
           text-transform: uppercase;
           color: #75cc1f;
           white-space: nowrap;
           text-overflow: ellipsis;
-          font-size: 0.6875rem;
           letter-spacing: 1.47px;
           margin-bottom: 0.3rem;
         }
         .tier .since {
-          font-size: .6875rem;
+          font-size: 1rem;
           letter-spacing: 0.05rem;
           opacity: 0.5;
           margin: 0;

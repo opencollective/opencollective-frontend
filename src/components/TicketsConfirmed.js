@@ -163,6 +163,7 @@ class TicketsConfirmed extends React.Component {
                 <div className="date">
                   <FormattedDate
                     value={event.startsAt}
+                    timeZone={event.timezone}
                     year="numeric"
                     month="long"
                     day="numeric"
@@ -170,7 +171,7 @@ class TicketsConfirmed extends React.Component {
                     />
                 </div>
                 <div className="time">
-                  <FormattedTime value={event.startsAt} />
+                  <FormattedTime value={event.startsAt} timeZone={event.timezone} />
                 </div>
               </div>
               <div className="location">

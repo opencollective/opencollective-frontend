@@ -17,19 +17,19 @@ import Footer from '../components/Footer';
 import Header from '../components/Header';
 import TransactionSimple from '../components/TransactionSimple';
 import { Link } from '../server/pages';
-import { Span, P, H1, H2, H3, H4 } from '../components/Text';
+import { Span, P, H1, H2, H3 } from '../components/Text';
 import ListItem from '../components/ListItem';
 import Hide from '../components/Hide';
 import Container from '../components/Container';
 import StyledLink from '../components/StyledLink';
 import CollectiveStatsCard from '../components/CollectiveStatsCard';
+import NewsletterContainer from '../components/NewsletterContainer';
 import SponsorCard from '../components/SponsorCard';
 import {
   FacebookIcon,
   LinkedInIcon,
   TwitterIcon,
 } from '../components/icons';
-import StyledInput from '../components/StyledInput';
 import Carousel from '../components/Carousel';
 import Currency from '../components/Currency';
 import ErrorPage from '../components/ErrorPage';
@@ -209,7 +209,7 @@ class HomePage extends React.Component {
             backgroundPosition="center top"
             backgroundSize="cover"
             backgroundRepeat="no-repeat"
-            boxShadown="inset 0px -60px 100px 0 rgba(78,121,187,0.1), 0px 40px 80px 0 rgba(78, 121,187, 0.12)"
+            boxShadow="inset 0px -60px 100px 0 rgba(78,121,187,0.1), 0px 40px 80px 0 rgba(78, 121,187, 0.12)"
             px={3}
             py="5rem"
           >
@@ -269,7 +269,7 @@ class HomePage extends React.Component {
                 <StyledLink href="/discover">See all &gt;</StyledLink>
               </Flex>
               <Container display="flex" flexWrap="wrap" justifyContent="space-between">
-                {collectives.map((c) => <Container w={[0.5, null, 0.25]} mb={2} px={1} maxWidth={224}><CollectiveStatsCard {...c} /></Container>)} 
+                {collectives.map((c) => <Container key={c.id} w={[0.5, null, 0.25]} mb={2} px={1} maxWidth={224}><CollectiveStatsCard {...c} /></Container>)} 
               </Container>
             </Container>
 
@@ -440,7 +440,7 @@ class HomePage extends React.Component {
 
                 <P {...sectionDetailStyles}>Are you a developer who believes in supporting open and welcoming communities? Open Collective is open source (MIT License) so anyone can contribute code or report issues publicly.</P>
                 
-                <P {...sectionDetailStyles} my={3}>Our goal is to provide all communities around the world the software that they need to operate as open and transparent collectives. We want to enable them to thrive in the same way that Wordpress enabled millions of blogs to exist.</P>
+                <P {...sectionDetailStyles} my={3}>Our goal is to provide all communities around the world the software that they need to operate as open and transparent collectives. We want to enable them to thrive in the same way that WordPress enabled millions of blogs to exist.</P>
 
                 <P {...sectionDetailStyles} my={3}>Special thanks to all of you who already contributed in some way! 🙏</P>
 
@@ -562,52 +562,7 @@ a transparent operation? Let them know that Open Collective exists!</P>
             </Container>
           </Container>
 
-          <Container py={5}>
-            <H4 textAlign="center" fontSize={20} mb={4} px={3}>Stay updated about our news and progress.</H4>
-
-            <Flex justifyContent="center">
-              <form
-                action="https://opencollective.us12.list-manage.com/subscribe/post?u=88fc8f0f3b646152f1cfe447a&amp;id=c44469099e"
-                method="post"
-                name="mc-embedded-subscribe-form"
-                target="_blank"
-              >
-                <Container
-                  border="1px solid rgba(18,19,20,0.12)"
-                  borderRadius={50}
-                  bg="white"
-                  display="flex"
-                  justifyContent="space-between"
-                  overflow="hidden"
-                  width={300}
-                >
-                  <StyledInput
-                    fontSize={14}
-                    name="EMAIL"
-                    px={3}
-                    py={1}
-                    placeholder="Your email address"
-                    type="email"
-                    width={1}
-                  />
-                  <StyledInput
-                    bg="#3385FF"
-                    borderRadius={50}
-                    color="white"
-                    fontSize={12}
-                    fontWeight="bold"
-                    hover={{ color: 'white' }}
-                    px={3}
-                    py={2}
-                    textAlign="center"
-                    name="subscribe"
-                    type="submit"
-                    value="Subscribe"
-                  />
-                </Container>
-              </form>
-            </Flex>
-          </Container>
+          <NewsletterContainer />
         </Body>
         <Footer />
       </Fragment>

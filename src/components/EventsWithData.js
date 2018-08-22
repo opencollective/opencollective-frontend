@@ -51,7 +51,7 @@ class EventsWithData extends React.Component {
         }
         {event.startsAt &&
           <React.Fragment>
-            <FormattedDate value={event.startsAt} day="numeric" month="long" />, &nbsp;
+            <FormattedDate value={event.startsAt} timeZone={event.timezone} day="numeric" month="long" />, &nbsp;
           </React.Fragment>
         }
         {event.location.name}

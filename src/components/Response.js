@@ -45,6 +45,7 @@ class Response extends React.Component {
             width: 100%;
             margin: 10px;
             max-width: 300px;
+            min-height: 90px;
             float: left;
             position: relative;
           }

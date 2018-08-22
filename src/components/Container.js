@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import tag from 'clean-tag';
 import {
   alignItems,
   alignSelf,
@@ -38,7 +39,7 @@ export const overflow = style({ prop: 'overflow' });
 
 export const pointerEvents = style({ prop: 'pointerEvents' });
 
-const Container = styled.div([],
+const Container = styled(tag)([],
   alignItems,
   alignSelf,
   background,

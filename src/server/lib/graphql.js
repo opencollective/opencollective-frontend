@@ -188,6 +188,7 @@ export async function fetchEvents(parentCollectiveSlug, options = { limit: 10 })
       image
       startsAt
       endsAt
+      timezone
       location {
         name
         address
@@ -214,6 +215,7 @@ export async function fetchEvent(eventSlug) {
       image
       startsAt
       endsAt
+      timezone
       location {
         name
         address

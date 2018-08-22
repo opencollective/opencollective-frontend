@@ -23,7 +23,7 @@ class CollectivePage extends React.Component {
     getLoggedInUser: PropTypes.func.isRequired,
     data: PropTypes.object,
     query: PropTypes.object,
-  }
+  };
 
   constructor(props) {
     super(props);

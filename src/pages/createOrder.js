@@ -181,7 +181,7 @@ class CreateOrderPage extends React.Component {
             className={coverClassName}
             />
 
-          <div className="content">
+          <div className="content" id="content">
             <OrderForm
               collective={collective}
               order={this.order}
@@ -227,6 +227,7 @@ query Collective($slug: String) {
     }
     startsAt
     endsAt
+    timezone
     parentCollective {
       id
       slug

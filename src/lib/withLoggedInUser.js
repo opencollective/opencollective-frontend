@@ -21,21 +21,21 @@ export default WrappedComponent => {
 
   return class withLoggedInUser extends React.Component {
 
-    static propTypes = {
-      client: PropTypes.object
-    }
-
     static getInitialProps (props) {
       return WrappedComponent.getInitialProps(props);
     }
 
+    static propTypes = {
+      client: PropTypes.object,
+    };
+
     getLoggedInUserFromServer = () =>
       this.props.client.query({ query: getLoggedInUserQuery }).then(result => {
         if (result.data && result.data.LoggedInUser) {
-          storage.set("LoggedInUser", result.data.LoggedInUser, 1000 * 60 * 60);
+          storage.set('LoggedInUser', result.data.LoggedInUser, 1000 * 60 * 60);
           return new LoggedInUser(result.data.LoggedInUser);
         } else {
-          storage.set("LoggedInUser", null);
+          storage.set('LoggedInUser', null);
           return null;
         }
       })
@@ -49,7 +49,7 @@ export default WrappedComponent => {
       // If no localStorage token, reset LoggedInUser
       const token = window.localStorage.getItem('accessToken');
       if (!token) {
-        storage.set("LoggedInUser", null);
+        storage.set('LoggedInUser', null);
         return null;
       }
 
@@ -57,7 +57,7 @@ export default WrappedComponent => {
       maybeRefreshAccessToken(token);
 
       // From cache
-      const cache = storage.get("LoggedInUser");
+      const cache = storage.get('LoggedInUser');
       if (cache) {
         // This is asynchronous and will take care of updating the cache
         this.getLoggedInUserFromServer();

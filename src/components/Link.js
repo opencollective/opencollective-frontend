@@ -14,7 +14,7 @@ class Link extends React.Component {
     className: PropTypes.string,
     title: PropTypes.string,
     children: PropTypes.node.isRequired,
-  }
+  };
 
   constructor(props) {
     super(props);
@@ -22,7 +22,7 @@ class Link extends React.Component {
   }
 
   componentDidMount() {
-    this.isIframe = window.self !== window.top && window.location.hostname !== "localhost"; // cypress is using an iframe for e2e testing
+    this.isIframe = window.self !== window.top && window.location.hostname !== 'localhost'; // cypress is using an iframe for e2e testing
   }
 
   render() {
