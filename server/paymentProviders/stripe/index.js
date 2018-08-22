@@ -79,14 +79,14 @@ export default {
       } catch (e) {
         return next(new errors.BadRequest(`Invalid JWT: ${e.message}`));
       }
-
+      debug("state", state);
       const { CollectiveId, CreatedByUserId, redirect } = state;
 
       if (!CollectiveId) {
         return next(new errors.BadRequest('No state in the callback'));
       }
 
-      let redirectUrl = redirect || `${config.host.website}/${collective.slug}`;
+      let redirectUrl = redirect;
 
       const createStripeAccount = data => models.ConnectedAccount.create({
         service: 'stripe',
@@ -136,6 +136,7 @@ export default {
       return models.Collective.findById(CollectiveId)
         .then(c => {
           collective = c;
+          redirectUrl = redirectUrl || `${config.host.website}/${collective.slug}`;
           if (collective.type === 'COLLECTIVE') {
             collective.becomeHost();
             collective.save();
@@ -153,6 +154,7 @@ export default {
         .then(updateHost)
         .then(() => {
           redirectUrl = addParamsToUrl(redirectUrl, { message: 'StripeAccountConnected', CollectiveId: collective.id });
+          debug("redirectUrl", redirectUrl);
           return res.redirect(redirectUrl)
         })
         .catch(e => {
