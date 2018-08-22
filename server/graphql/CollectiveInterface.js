@@ -841,7 +841,7 @@ const CollectiveFields = () => {
       args: {
         limit: { type: GraphQLInt },
         offset: { type: GraphQLInt },
-        type: { type: GraphQLString },
+        type: { type: GraphQLString, description: "Type of collective (COLLECTIVE, EVENT, ORGANIZATION)" },
         role: { type: GraphQLString },
         roles: { type: new GraphQLList(GraphQLString) }
       },

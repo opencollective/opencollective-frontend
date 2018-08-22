@@ -176,14 +176,14 @@ export default function (Sequelize, DataTypes) {
   Expense.prototype.createActivity = async function(type) {
     const user = this.user || await models.User.findById(this.UserId);
     const userCollective = await models.Collective.findById(user.CollectiveId);
-    const host = await this.collective.getHostCollective();
+    const host = await this.collective.getHostCollective(); // may be null
     const transaction = this.status === status.PAID && await models.Transaction.findOne({ where: { type: 'DEBIT', ExpenseId: this.id }});
     await models.Activity.create({
       type,
       UserId: this.UserId,
       CollectiveId: this.collective.id,
       data: {
-        host: host.minimal,
+        host: get(host, 'minimal'),
         collective: this.collective.minimal,
         user: user.minimal,
         fromCollective: userCollective.minimal,
