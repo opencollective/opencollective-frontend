@@ -10,9 +10,8 @@ class CreateOrganizationForm extends React.Component {
 
   static propTypes = {
     onChange: PropTypes.func.isRequired,
-    LoggedInUser: PropTypes.object.isRequired,
     intl: PropTypes.object.isRequired,
-    header: PropTypes.bool
+    header: PropTypes.bool,
   };
 
   constructor(props) {
@@ -44,29 +43,29 @@ class CreateOrganizationForm extends React.Component {
         { header !== false &&
           <SectionTitle section="organizationDetails" />
         }
-        <Row key={`organization.name.input`}>
+        <Row key="organization.name.input">
           <Col sm={12}>
             <InputField
               className="horizontal"
               type="text"
               name="organization_name"
               label={intl.formatMessage(this.messages['order.organization.name'])}
-              onChange={(value) => this.handleChange("name", value)}
+              onChange={(value) => this.handleChange('name', value)}
               />
           </Col>
         </Row>
-        <Row key={`organization.website.input`}>
+        <Row key="organization.website.input">
           <Col sm={12}>
             <InputField
               className="horizontal"
               type="text"
               name="organization_website"
               label={intl.formatMessage(this.messages['order.organization.website'])}
-              onChange={(value) => this.handleChange("website", value)}
+              onChange={(value) => this.handleChange('website', value)}
               />
           </Col>
         </Row>
-        <Row key={`organization.twitterHandle.input`}>
+        <Row key="organization.twitterHandle.input">
           <Col sm={12}>
             <InputField
               className="horizontal"
@@ -75,7 +74,7 @@ class CreateOrganizationForm extends React.Component {
               pre="@"
               label={intl.formatMessage(this.messages['order.organization.twitterHandle'])}
               help={intl.formatMessage(this.messages['order.organization.twitterHandle.description'])}
-              onChange={(value) => this.handleChange("twitterHandle", value)}
+              onChange={(value) => this.handleChange('twitterHandle', value)}
               />
           </Col>
         </Row>

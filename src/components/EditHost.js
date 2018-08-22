@@ -93,7 +93,7 @@ class EditHost extends React.Component {
             { collective.stats.balance === 0 &&
               <div>
                 <p>
-                  <Button bsStyle="primary" type="submit" onClick={() => this.changeHost()} >
+                  <Button bsStyle="primary" type="submit" onClick={() => this.changeHost()} className="removeHostBtn">
                     <FormattedMessage id="editCollective.host.removeBtn" defaultMessage="Remove Host" />
                   </Button>
                 </p>

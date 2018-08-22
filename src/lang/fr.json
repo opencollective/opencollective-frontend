@@ -115,7 +115,7 @@
   "host.hostFee.help": "The host fee is the fee that the host charges your collective to take care of paying out the expenses that have been approved and to take care of recording all transactions in their books to comply with local fiscal authorities.",
   "host.tos": "Terms of Service",
   "host.apply.btn": "Appliquer pour héberger votre collectif {collective}",
-  "host.apply.pending": "Application pending",
+  "host.apply.pending": "Demande en attente pour {collective}",
   "subscription.cancel.btn": "oui",
   "collective.created": "Votre collectif a été créé avec succès.",
   "collective.created.description": "Pendant que vous attendez l'approbation de votre hôte ({host}), vous pouvez déjà personaliser votre collectif, soumettre des dépenses et même créer des événements.",

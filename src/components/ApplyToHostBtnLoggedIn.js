@@ -6,6 +6,7 @@ import gql from 'graphql-tag'
 
 import withIntl from '../lib/withIntl';
 import Button from './Button';
+import Link from './Link';
 import { get } from 'lodash';
 
 class ApplyToHostBtnLoggedIn extends React.Component {
@@ -55,7 +56,7 @@ class ApplyToHostBtnLoggedIn extends React.Component {
           <Button onClick={this.onClick} className="blue"><FormattedMessage id="host.apply.btn" defaultMessage="Apply to host your collective {collective}" values={{ collective: this.inactiveCollective.name }} /></Button>
         }
         { get(this.inactiveCollective, 'host.id') === host.id &&
-          <FormattedMessage id="host.apply.pending" defaultMessage="Application pending" />
+          <FormattedMessage id="host.apply.pending" defaultMessage="Application pending for {collective}" values={{ collective: <Link route={`/${this.inactiveCollective.slug}`}>{this.inactiveCollective.name}</Link> }} />
         }
       </div>
     );

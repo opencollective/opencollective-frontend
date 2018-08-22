@@ -44,7 +44,7 @@ class CollectiveCategoryPicker extends React.Component {
     const { intl } = this.props;
 
     return (
-      <div className="category" onClick={() => this.handleChange(category)}>
+      <div className="category" onClick={() => this.handleChange(category)} key={`pickCategory-${category}`}>
         <style jsx>{`
           .category {
             width: 180px;

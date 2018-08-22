@@ -342,51 +342,51 @@ class EditCollectiveForm extends React.Component {
 
         <Flex>
           <Box width={1/5} mr={4}>
-            <MenuItem selected={this.state.section === 'info'} onClick={() => this.showSection('info')}>
+            <MenuItem selected={this.state.section === 'info'} onClick={() => this.showSection('info')} className="MenuItem info">
               <FormattedMessage id="editCollective.menu.info" defaultMessage="info" />
             </MenuItem>
-            <MenuItem selected={this.state.section === 'images'} onClick={() => this.showSection('images')}>
+            <MenuItem selected={this.state.section === 'images'} onClick={() => this.showSection('images')} className="MenuItem images">
               <FormattedMessage id="editCollective.menu." defaultMessage="images" />
             </MenuItem>
             { this.showEditMembers &&
-              <MenuItem selected={this.state.section === 'members'} onClick={() => this.showSection('members')}>
+              <MenuItem selected={this.state.section === 'members'} onClick={() => this.showSection('members')} className="MenuItem members">
                 <FormattedMessage id="editCollective.menu.members" defaultMessage="members" />
               </MenuItem>
             }
             { this.showEditGoals &&
-              <MenuItem selected={this.state.section === 'goals'} onClick={() => this.showSection('goals')}>
+              <MenuItem selected={this.state.section === 'goals'} onClick={() => this.showSection('goals')} className="MenuItem goals">
                 <FormattedMessage id="editCollective.menu.goals" defaultMessage="goals" />
               </MenuItem>
             }
             { this.showHost &&
-              <MenuItem selected={this.state.section === 'host'} onClick={() => this.showSection('host')}>
+              <MenuItem selected={this.state.section === 'host'} onClick={() => this.showSection('host')} className="MenuItem host">
                 <FormattedMessage id="editCollective.menu.host" defaultMessage="Fiscal Host" />
               </MenuItem>
             }
             { this.showEditTiers &&
-              <MenuItem selected={this.state.section === 'tiers'} onClick={() => this.showSection('tiers')}>
+              <MenuItem selected={this.state.section === 'tiers'} onClick={() => this.showSection('tiers')} className="MenuItem tiers">
                 <FormattedMessage id="editCollective.menu.tiers" defaultMessage="tiers" />
               </MenuItem>
             }
             { this.showExpenses &&
-              <MenuItem selected={this.state.section === 'expenses'} onClick={() => this.showSection('expenses')}>
+              <MenuItem selected={this.state.section === 'expenses'} onClick={() => this.showSection('expenses')} className="MenuItem expenses">
                 <FormattedMessage id="editCollective.menu.expenses" defaultMessage="expenses" />
               </MenuItem>
             }
             { this.showPaymentMethods &&
-              <MenuItem selected={this.state.section === 'paymentMethods'} onClick={() => this.showSection('paymentMethods')}>
+              <MenuItem selected={this.state.section === 'paymentMethods'} onClick={() => this.showSection('paymentMethods')} className="MenuItem paymentMethods">
                 <FormattedMessage id="editCollective.menu.paymentMethods" defaultMessage="Payment Methods" />
               </MenuItem>
             }
-            <MenuItem selected={this.state.section === 'connectedAccounts'} onClick={() => this.showSection('connectedAccounts')}>
+            <MenuItem selected={this.state.section === 'connectedAccounts'} onClick={() => this.showSection('connectedAccounts')} className="MenuItem connectedAccounts">
               <FormattedMessage id="editCollective.menu.connectedAccounts" defaultMessage="Connected Accounts" />
             </MenuItem>
             { collective.type === 'COLLECTIVE' &&
-            <MenuItem selected={this.state.section === 'export'} onClick={() => this.showSection('export')}>
+            <MenuItem selected={this.state.section === 'export'} onClick={() => this.showSection('export')} className="MenuItem export">
               <FormattedMessage id="editCollective.menu.export" defaultMessage="export" />
             </MenuItem>
             }
-            <MenuItem selected={this.state.section === 'advanced'} onClick={() => this.showSection('advanced')}>
+            <MenuItem selected={this.state.section === 'advanced'} onClick={() => this.showSection('advanced')} className="MenuItem advanced">
               <FormattedMessage id="editCollective.menu.advanced" defaultMessage="advanced" />
             </MenuItem>
           </Box>

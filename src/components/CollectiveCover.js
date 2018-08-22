@@ -287,7 +287,7 @@ ${description}`
                 { collective.type !== 'EVENT' &&
                   <div className="contact">
                     { collective.host && collective.isActive && <div className="host"><label><FormattedMessage id="collective.cover.hostedBy" defaultMessage="Hosted by" /></label><Link route={`/${collective.host.slug}`}>{collective.host.name} </Link></div> }
-                    { collective.host && !collective.isActive && <div className="host"><label><FormattedMessage id="collective.cover.pendingApprovalFrom" defaultMessage="Pending approval from" /></label><Link route={`/${collective.host.slug}`}>{collective.host.name} </Link></div> }
+                    { collective.host && !collective.isActive && LoggedInUser && LoggedInUser.canEditCollective(collective) && <div className="host"><label><FormattedMessage id="collective.cover.pendingApprovalFrom" defaultMessage="Pending approval from" /></label><Link route={`/${collective.host.slug}`}>{collective.host.name} </Link></div> }
                     { twitterHandle && <div className="twitterHandle"><a href={`https://twitter.com/${twitterHandle}`} target="_blank" rel="noopener noreferrer">@{twitterHandle}</a></div> }
                     { website && <div className="website"><a href={website} target="_blank" rel="noopener noreferrer">{prettyUrl(website) }</a></div> }
                   </div>

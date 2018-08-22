@@ -3,13 +3,9 @@ import PropTypes from 'prop-types';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import withIntl from '../lib/withIntl';
 import EditConnectedAccount from './EditConnectedAccount';
-import { groupBy, get } from 'lodash';
+import { groupBy } from 'lodash';
 import { capitalize } from '../lib/utils';
-import { graphql } from 'react-apollo'
-import gql from 'graphql-tag'
-import Loading from './Loading';
 import InputField from './InputField';
-import Link from './Link';
 import colors from '../constants/colors';
 import { Flex, Box } from 'grid-styled';
 import CreateOrganizationForm from './CreateOrganizationForm';
@@ -27,7 +23,7 @@ class CreateHostForm extends React.Component {
 
   constructor(props) {
     super(props);
-    const { organizations, intl, userCollective } = props;
+    const { intl, userCollective } = props;
     this.handleChange = this.handleChange.bind(this);
     this.createOrganization = this.createOrganization.bind(this);
     this.generateInputFields = this.generateInputFields.bind(this);
@@ -60,8 +56,8 @@ class CreateHostForm extends React.Component {
         label: intl.formatMessage(this.messages['host.types.organization.label']),
         value: 'organization',
         description: intl.formatMessage(this.messages['host.types.organization.description'])
-      }
-    ]
+      },
+    ];
 
   }
 
@@ -82,10 +78,10 @@ class CreateHostForm extends React.Component {
       hostCollective: collective,
       form: {
         ...this.state.form,
-        HostCollectiveId: collective.id
+        HostCollectiveId: collective.id,
       },
       status: 'idle',
-      result: { success: `Organization created successfully` }
+      result: { success: 'Organization created successfully' }
     });
 
   }
@@ -93,11 +89,12 @@ class CreateHostForm extends React.Component {
   handleChange(attr, value) {
     const { form } = this.state;
     form[attr] = value;
+    console.log(">>> CreateHostForm.handleChange", attr, value, "state.form", form);
     if (attr === 'hostType') {
       const defaultHostCollectiveId = {
         user: this.props.userCollective.id,
-        organization: this.state.organizationsOptions[0].value
-      }
+        organization: this.state.organizationsOptions[0].value,
+      };
       console.log(">>> defaultHostCollectiveId", defaultHostCollectiveId);
       form['HostCollectiveId'] = defaultHostCollectiveId[value];
     }
@@ -112,16 +109,16 @@ class CreateHostForm extends React.Component {
         name: 'hostType',
         type: 'select',
         options: this.hostTypesOptions,
-        focus: true
+        focus: true,
       },
       {
-        name: "HostCollectiveId",
-        type: "select",
+        name: 'HostCollectiveId',
+        type: 'select',
         options: this.state.organizationsOptions,
         value: this.state.form.HostCollectiveId,
         defaultValue: this.state.organizationsOptions[0] && this.state.organizationsOptions[0].value,
-        when: (form) => form.hostType === 'organization'
-      }
+        when: (form) => form.hostType === 'organization',
+      },
     ];
     console.log(">>> generateInputFields", this.state, this.fields);
     this.fields = this.fields.map(field => {
@@ -140,7 +137,7 @@ class CreateHostForm extends React.Component {
   }
 
   render() {
-    const { collective, userCollective, organizations, intl } = this.props;
+    const { userCollective, organizations } = this.props;
 
     this.generateInputFields();
     const hostCollective = this.state.hostCollective || (this.state.form.hostType === 'user' ? userCollective : organizations.find(c => c.id === Number(this.state.form.HostCollectiveId)));
@@ -185,7 +182,7 @@ class CreateHostForm extends React.Component {
         { this.state.form.hostType === 'organization' && !hostCollective &&
           <div>
             <CreateOrganizationForm header={false} onChange={org => this.handleChange('organization', org)} />
-            <Button bsStyle="primary" type="submit" onClick={() => this.createOrganization(this.state.form.organization)} >
+            <Button bsStyle="primary" type="submit" onClick={() => this.createOrganization(this.state.form.organization)} className="createOrganizationBtn">
               <FormattedMessage id="organization.create" defaultMessage="Create organization" />
             </Button>
           </div>
