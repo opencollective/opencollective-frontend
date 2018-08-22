@@ -998,7 +998,7 @@ export default function(Sequelize, DataTypes) {
    */
   Collective.prototype.addHost = function(hostCollective, creatorUser) {
     if (this.HostCollectiveId) {
-      throw new Error(`This collective already has a host (${this.HostCollectiveId})`);
+      throw new Error(`This collective already has a host (HostCollectiveId: ${this.HostCollectiveId})`);
     }
     const member = {
       role: roles.HOST,

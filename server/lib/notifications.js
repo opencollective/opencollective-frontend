@@ -296,7 +296,7 @@ async function notifyByEmail(activity) {
       if (get(activity, 'data.host.id')) {
         notifyAdminsOfCollective(activity.data.host.id, activity, { template: 'collective.created.for.host', collective: activity.data.host });
       }
-      if (get(activity, 'data.collective.tags', []).includes('meetup')) {
+      if ((get(activity, 'data.collective.tags') || []).includes('meetup')) {
         notifyAdminsOfCollective(activity.data.collective.id, activity, { template: 'collective.created.meetup' });
       } else {
         notifyAdminsOfCollective(activity.data.collective.id, activity);

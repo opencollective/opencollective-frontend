@@ -1,5 +1,5 @@
 import slugify from 'slug';
-import { get } from 'lodash';
+import { get, omit } from 'lodash';
 import models from '../../models';
 import * as errors from '../errors';
 import { types } from '../../constants/collectives';
@@ -165,15 +165,15 @@ export function createCollective(_, args, req) {
       }
     }
   })
-  .then(() => models.Collective.create(collectiveData))
+  .then(() => models.Collective.create(omit(collectiveData, 'HostCollectiveId')))
   .then(c => collective = c)
-  .then(() => collective.editTiers(collectiveData.tiers))
-  .then(() => collective.addUserWithRole(req.remoteUser, roles.ADMIN, { CreatedByUserId: req.remoteUser.id }))
   .then(() => {
-    if (collective.HostCollectiveId) {
+    if (collectiveData.HostCollectiveId) {
       return collective.addHost(hostCollective, req.remoteUser);
     }
   })
+  .then(() => collective.editTiers(collectiveData.tiers))
+  .then(() => collective.addUserWithRole(req.remoteUser, roles.ADMIN, { CreatedByUserId: req.remoteUser.id }))
   .then(() => collective.editPaymentMethods(args.collective.paymentMethods, { CreatedByUserId: req.remoteUser.id }))
   .then(async () => {
     // if the type of collective is an organization or an event, we don't notify the host
