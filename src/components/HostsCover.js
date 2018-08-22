@@ -9,19 +9,19 @@ class HostsCover extends React.Component {
   static propTypes = {
     host: PropTypes.object,
     title: PropTypes.string,
-    description: PropTypes.string
-  }
+    description: PropTypes.string,
+  };
 
   constructor(props) {
     super(props);
     this.messages = defineMessages({
-      "host.create.title": { id: "host.create.title", defaultMessage: "Become a host" }
+      'host.create.title': { id: 'host.create.title', defaultMessage: 'Become a host' }
     });
-    this.collective = { type: "COLLECTIVE" };
+    this.collective = { type: 'COLLECTIVE' };
   }
 
   error(msg) {
-    this.setState({ result: { error: msg }})
+    this.setState({ result: { error: msg } });
   }
 
   resetError() {
@@ -29,7 +29,7 @@ class HostsCover extends React.Component {
   }
 
   render() {
-    const { intl, title, description } = this.props;
+    const { title, description } = this.props;
 
     return (
       <CollectiveCover

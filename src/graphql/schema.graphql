@@ -1,5 +1,5 @@
-# source: https://opencollective.com/api/graphql
-# timestamp: Thu Aug 02 2018 09:45:06 GMT+0200 (Central European Summer Time)
+# source: http://localhost:3000/api/graphql
+# timestamp: Wed Aug 22 2018 17:28:41 GMT+0200 (Central European Summer Time)
 
 """Breakdown of backers per type (ANY/USER/ORGANIZATION/COLLECTIVE)"""
 type BackersStatsType {
@@ -70,7 +70,15 @@ type Collective implements CollectiveInterface {
   """
   Get all the collective this collective is a member of (as a member, backer, follower, etc.)
   """
-  memberOf(limit: Int, offset: Int, role: String, roles: [String]): [Member]
+  memberOf(
+    limit: Int
+    offset: Int
+
+    """Type of collective (COLLECTIVE, EVENT, ORGANIZATION)"""
+    type: String
+    role: String
+    roles: [String]
+  ): [Member]
   collectives(orderBy: CollectiveOrderField = name, orderDirection: OrderDirection = ASC, expenseStatus: String = null, limit: Int, offset: Int): CollectiveSearchResults
   followers(limit: Int, offset: Int): [CollectiveInterface]
   maxQuantity: Int
@@ -207,7 +215,15 @@ interface CollectiveInterface {
   membership relationship. Can filter by role
   (BACKER/MEMBER/ADMIN/HOST/FOLLOWER)
   """
-  memberOf(limit: Int, offset: Int, role: String, roles: [String]): [Member]
+  memberOf(
+    limit: Int
+    offset: Int
+
+    """Type of collective (COLLECTIVE, EVENT, ORGANIZATION)"""
+    type: String
+    role: String
+    roles: [String]
+  ): [Member]
 
   """List of all collectives hosted by this collective"""
   collectives(orderBy: CollectiveOrderField = name, orderDirection: OrderDirection = ASC, expenseStatus: String = null, limit: Int, offset: Int): CollectiveSearchResults
@@ -347,6 +363,14 @@ input CommentInputType {
   UpdateId: Int
 }
 
+"""List of comments with pagination info"""
+type CommentListType {
+  comments: [CommentType]
+  limit: Int
+  offset: Int
+  total: Int
+}
+
 """This represents a Comment"""
 type CommentType {
   id: Int
@@ -431,7 +455,15 @@ type Event implements CollectiveInterface {
   """
   Get all the collective this collective is a member of (as a member, backer, follower, etc.)
   """
-  memberOf(limit: Int, offset: Int, role: String, roles: [String]): [Member]
+  memberOf(
+    limit: Int
+    offset: Int
+
+    """Type of collective (COLLECTIVE, EVENT, ORGANIZATION)"""
+    type: String
+    role: String
+    roles: [String]
+  ): [Member]
   collectives(orderBy: CollectiveOrderField = name, orderDirection: OrderDirection = ASC, expenseStatus: String = null, limit: Int, offset: Int): CollectiveSearchResults
   followers(limit: Int, offset: Int): [CollectiveInterface]
   maxQuantity: Int
@@ -565,9 +597,24 @@ type ExpenseType {
   attachment: String
   user: UserDetails
   fromCollective: CollectiveInterface
-  comments(limit: Int, offset: Int): [CommentType]
+  comments(limit: Int, offset: Int): CommentListType
   collective: CollectiveInterface
   transaction: CollectiveInterface
+}
+
+"""Properties by which hosts can be ordered."""
+enum HostCollectiveOrderFieldType {
+  """Order hosts by creation time."""
+  createdAt
+
+  """Order hosts by name."""
+  name
+
+  """Order hosts by number of collectives it is hosting."""
+  collectives
+
+  """Order hosts by updated time."""
+  updatedAt
 }
 
 """This represents an Invoice"""
@@ -889,7 +936,15 @@ type Organization implements CollectiveInterface {
   """
   Get all the collective this collective is a member of (as a member, backer, follower, etc.)
   """
-  memberOf(limit: Int, offset: Int, role: String, roles: [String]): [Member]
+  memberOf(
+    limit: Int
+    offset: Int
+
+    """Type of collective (COLLECTIVE, EVENT, ORGANIZATION)"""
+    type: String
+    role: String
+    roles: [String]
+  ): [Member]
   collectives(orderBy: CollectiveOrderField = name, orderDirection: OrderDirection = ASC, expenseStatus: String = null, limit: Int, offset: Int): CollectiveSearchResults
   followers(limit: Int, offset: Int): [CollectiveInterface]
   maxQuantity: Int
@@ -1025,10 +1080,13 @@ type Query {
   Expense(id: Int!): ExpenseType
   Transaction(id: Int!): Transaction
   allCollectives(
+    """Fetch all collectives that match at least one of the tags"""
     tags: [String]
 
     """COLLECTIVE, USER, ORGANIZATION, EVENT"""
     type: TypeOfCollective
+
+    """Fetch all collectives hosted by HostCollectiveId"""
     HostCollectiveId: Int
 
     """Fetch all collectives hosted by hostCollectiveSlug"""
@@ -1054,6 +1112,16 @@ type Query {
     ParentCollectiveId: Int
     orderBy: CollectiveOrderField = name
     orderDirection: OrderDirection = ASC
+    limit: Int = 10
+    offset: Int = 0
+  ): CollectiveSearchResults
+
+  """Returns all public hosts that are open for applications"""
+  allHosts(
+    """Fetch all collectives that match at least one of the tags"""
+    tags: [String]
+    orderBy: HostCollectiveOrderFieldType = collectives
+    orderDirection: OrderDirection = DESC
     limit: Int = 10
     offset: Int = 0
   ): CollectiveSearchResults
@@ -1290,7 +1358,7 @@ type UpdateType {
   fromCollective: CollectiveInterface
   collective: CollectiveInterface
   tier: Tier
-  comments(limit: Int, offset: Int): [CommentType]
+  comments(limit: Int, offset: Int): CommentListType
 }
 
 """This represents a User Collective"""
@@ -1345,7 +1413,15 @@ type User implements CollectiveInterface {
   """
   Get all the collective this collective is a member of (as a member, backer, follower, etc.)
   """
-  memberOf(limit: Int, offset: Int, role: String, roles: [String]): [Member]
+  memberOf(
+    limit: Int
+    offset: Int
+
+    """Type of collective (COLLECTIVE, EVENT, ORGANIZATION)"""
+    type: String
+    role: String
+    roles: [String]
+  ): [Member]
   collectives(orderBy: CollectiveOrderField = name, orderDirection: OrderDirection = ASC, expenseStatus: String = null, limit: Int, offset: Int): CollectiveSearchResults
   followers(limit: Int, offset: Int): [CollectiveInterface]
   maxQuantity: Int
