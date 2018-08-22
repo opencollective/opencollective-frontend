@@ -96,7 +96,12 @@ class ExpensesPage extends React.Component {
               { expenseCreated &&
                 <Box m={3}>
                   <p className="expenseCreated">
-                    <FormattedMessage id="expense.created" defaultMessage="Your expense has been submitted with success. It is now pending approval from one of the core contributors of the collective. You will be notified by email once it has been approved. Then, the host ({host}) will proceed to reimburse your expense." values={{ host: collective.host.name }} />
+                    { collective.host &&
+                      <FormattedMessage id="expense.created" defaultMessage="Your expense has been submitted with success. It is now pending approval from one of the core contributors of the collective. You will be notified by email once it has been approved. Then, the host ({host}) will proceed to reimburse your expense." values={{ host: collective.host.name }} />
+                    }
+                    { !collective.host &&
+                      <FormattedMessage id="expense.created.noHost" defaultMessage="Your expense has been submitted with success. It is now pending approval from one of the core contributors of the collective. You will be notified by email once it has been approved." />
+                    }
                   </p>
                   <Flex justifyContent="center" mt={4} flexWrap="wrap">
                     <Button className="blue" onClick={() => this.setState({ expenseCreated: null, showNewExpenseForm: true })}>

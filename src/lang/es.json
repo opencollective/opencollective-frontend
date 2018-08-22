@@ -643,6 +643,7 @@
   "collective.section.backers.users.title": "{n} {n, plural, one {person is} other {people are}} supporting {collective}",
   "widget.becomeBacker": "Become a backer",
   "expense.created": "Your expense has been submitted with success. It is now pending approval from one of the core contributors of the collective. You will be notified by email once it has been approved. Then, the host {host} will proceed to reimburse your expense.",
+  "expense.created.noHost": "Your expense has been submitted with success. It is now pending approval from one of the core contributors of the collective. You will be notified by email once it has been approved.",
   "expenses.sendAnotherExpense": "Submit Another Expense",
   "tier.order.donation.title": "Contribuye",
   "tier.order.membership.title": "Become a member",
