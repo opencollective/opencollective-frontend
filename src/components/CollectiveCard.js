@@ -216,7 +216,7 @@ class CollectiveCard extends React.Component {
             <div className="description">{description}</div>
           </div>
           <div className="footer">
-            { collective.stats && collective.type === 'COLLECTIVE' &&
+            { collective.type === 'COLLECTIVE' && get(collective, 'stats.backers.all') &&
               <div className="stats">
                 <div className="backers">
                   <div className="value">{collective.stats.backers.all}</div>
