@@ -145,7 +145,10 @@ class Event extends React.Component {
       totalAmount: order.totalAmount,
       interval: order.interval
     });
-    Router.pushRoute('orderEventTier', params);
+    Router.pushRoute('orderEventTier', params)
+      .then(() => {
+        window.location.hash = '#content';
+      });
   }
 
   render() {

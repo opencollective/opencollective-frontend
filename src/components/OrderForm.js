@@ -212,15 +212,17 @@ class OrderForm extends React.Component {
       const brand = get(pm, 'data.brand') || get(pm, 'type');
       /* The expiryDate field will show up for prepaid cards */
       const expiration = pm.expiryDate
-        ? moment(pm.expiryDate).format("MM/Y")
-        : `${get(pm, 'data.expMonth')}/${get(pm, 'data.expYear')}`;
+        ? `- exp ${moment(pm.expiryDate).format("MM/Y")}`
+        : (get(pm, 'data.expMonth') || get(pm, 'data.expYear'))
+            ? `- exp ${get(pm, 'data.expMonth')}/${get(pm, 'data.expYear')}`
+            : '';
       /* Prepaid cards have their balance available */
       const balance = pm.balance
         ? `(${formatCurrency(pm.balance, pm.currency)})`
         : '';
       /* Assemble all the pieces in one string */
       const name = `${brand} ${pm.name}`;
-      const label = `💳  \xA0\xA0${collective.name} - ${name} - exp ${expiration} ${balance}`;
+      const label = `💳  \xA0\xA0${collective.name} - ${name} ${expiration} ${balance}`;
       return { [value]: label };
     });
   }
@@ -234,7 +236,7 @@ class OrderForm extends React.Component {
 
     const filterPMs = (pms) => (pms || []).filter(pm =>
       ((pm.service === 'stripe' || pm.service === 'paypal') ||
-       (pm.service === 'opencollective' && pm.type === 'prepaid')));
+       (pm.service === 'opencollective' && (pm.type === 'prepaid' || pm.type === 'collective') )));
 
     if (collective) {
       const paymentMethods = filterPMs(collective.paymentMethods);
@@ -268,7 +270,7 @@ class OrderForm extends React.Component {
       fromCollectiveOptions.push({ [LoggedInUser.CollectiveId]: LoggedInUser.collective.name });
       collectivesById[LoggedInUser.CollectiveId] = LoggedInUser.collective;
       LoggedInUser.memberOf.map(membership => {
-        if (membership.collective.type === 'COLLECTIVE') return;
+        if (membership.collective.type === 'COLLECTIVE' && membership.role !== 'ADMIN') return;
         if (membership.collective.type === 'EVENT') return;
         if (membership.collective.type === 'ORGANIZATION' && !this.allowOrganizations) return;
         if (['ADMIN','HOST'].indexOf(membership.role) === -1) return;

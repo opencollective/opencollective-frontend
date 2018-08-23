@@ -52,4 +52,4 @@ describe('collective.createOrder page', () => {
     cy.get('.result .error').contains('Credit card missing');
   });
 
-})
+});
