@@ -5,7 +5,6 @@ import Body from './Body';
 import Footer from './Footer';
 import HostsWithData from './HostsWithData';
 import HostsCover from './HostsCover';
-import Link from './Link';
 import { defineMessages } from 'react-intl';
 import withIntl from '../lib/withIntl';
 
