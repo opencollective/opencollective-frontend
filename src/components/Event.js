@@ -145,7 +145,10 @@ class Event extends React.Component {
       totalAmount: order.totalAmount,
       interval: order.interval
     });
-    Router.pushRoute('orderEventTier', params);
+    Router.pushRoute('orderEventTier', params)
+      .then(() => {
+        window.location.hash = '#content';
+      });
   }
 
   render() {
@@ -153,14 +156,13 @@ class Event extends React.Component {
     const { event } = this.state;
 
     const canEditEvent = LoggedInUser && LoggedInUser.canEditEvent(event);
-    const responses = {};
-    responses.sponsors = filterCollection(event.orders, { tier: { name: /sponsor/i }});
+    const responses = { sponsors: [] };
 
     const guests = {};
     guests.interested = [];
     filterCollection(event.members, { role: 'FOLLOWER' }).map(follower => {
       if (!follower.member) {
-        console.error(">>> no user collective for membership", follower);
+        console.error('>>> no user collective for membership', follower);
         return;
       }
       guests.interested.push({
@@ -171,14 +173,18 @@ class Event extends React.Component {
     guests.confirmed = [];
     event.orders.map(order => {
       if (!order.fromCollective) {
-        console.error(">>> no user collective for order", order);
+        console.error('>>> no user collective for order', order);
         return;
       }
-      guests.confirmed.push({
-        user: order.fromCollective,
-        createdAt: order.createdAt,
-        status: 'YES'
-      })
+      if (get(order, 'tier.name', '').match(/sponsor/i)) {
+        responses.sponsors.push(order);
+      } else {
+        guests.confirmed.push({
+          user: order.fromCollective,
+          createdAt: order.createdAt,
+          status: 'YES',
+        });
+      }
     });
 
     const allGuests = union(guests.interested, guests.confirmed).sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
@@ -307,6 +313,22 @@ class Event extends React.Component {
 
                 <Location location={event.location} />
 
+                { responses.sponsors.length > 0 &&
+                  <section id="sponsors">
+                    <h1>
+                      <FormattedMessage id="event.sponsors.title" defaultMessage={`Sponsors`} />
+                    </h1>
+                    <Sponsors
+                      sponsors={responses.sponsors.map(r => {
+                        const user = Object.assign({}, r.fromCollective);
+                        user.tier = r.tier;
+                        user.createdAt = new Date(r.createdAt);
+                        return user;
+                      })}
+                      />
+                  </section>
+                }
+
                 { responses.guests.length > 0 &&
                   <section id="responses">
                     <h1>
@@ -328,21 +350,6 @@ class Event extends React.Component {
                     </div>
                     }
                     <Responses responses={responses.guests} />
-                  </section>
-                }
-
-                { responses.sponsors.length > 0 &&
-                  <section id="sponsors">
-                    <h1>
-                      <FormattedMessage id="event.sponsors.title" defaultMessage={`Sponsors`} />
-                    </h1>
-                    <Sponsors sponsors={responses.sponsors.map(r => {
-                      const user = Object.assign({}, r.user);
-                      user.tier = r.tier;
-                      user.createdAt = new Date(r.createdAt);
-                      return user;
-                    })}
-                              />
                   </section>
                 }
 

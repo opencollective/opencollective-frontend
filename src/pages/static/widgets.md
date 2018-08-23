@@ -1,6 +1,8 @@
-# For collectives
+# Open Collective Widgets
 
-## Donate button
+## For collectives
+
+### Donate button
 
     <script src="https://opencollective.com/:collectiveSlug/:verb/button.js" color="[white|blue]"></script>
 
@@ -22,7 +24,7 @@ Result:
 On Medium, just download the image then upload it to your post (make sure the image file ends with "@2x" to make it retina size). To link it, select the image then press CMD+K (or CTRL+K on Windows). A pop up menu will show up where you can enter the URL to link the image to (see [Medium support page](https://help.medium.com/hc/en-us/articles/115004808847-Image-links)). Here is an example: https://medium.com/open-collective/open-collective-donate-button-e7e6d5965b2c
 
 
-## Show backers and sponsors
+### Show backers and sponsors
 
 Just add this script:
 
@@ -36,12 +38,12 @@ You can also add a style object (react style), e.g.
 
 Note: make sure that your style object is parsable with `JSON.stringify`.
 
-### Examples:
+#### Examples:
 - http://apex.run/#links
 - https://www.spinacms.com/
 
 
-### How to customize it?
+#### How to customize it?
 
 This will use the default styling of your `h1` and `h2` on your page.
 You can target them with CSS to customize them:
@@ -51,7 +53,7 @@ You can target them with CSS to customize them:
     }
 
 
-## Show next events
+### Show next events
 
     <script src="https://opencollective.com/:collectiveSlug/events.js" width="500"></script>
 
@@ -60,7 +62,7 @@ Example:
 <script src="https://opencollective.com/brusselstogether/events.js" width="500"></script>
 
 
-# For backers and sponsors
+## For backers and sponsors
 
 To show the list of collectives that you are backing on your website, just add this script:
 
@@ -74,6 +76,6 @@ E.g. http://polycode.co.uk
 ![](https://cl.ly/01082x0W042G/Screen%20Shot%202017-02-27%20at%205.22.09%20PM.png)
 
 
-# Feedback
+## Feedback
 
 If you would like a different or custom widget, let us know. Send us your feedback to info@opencollective.com or join us on our slack: https://slack.opencollective.com.
