@@ -41,6 +41,7 @@ describe('collective.createOrder page', () => {
     cy.get('.fromCollectiveSelector select').select('organization').blur();
     cy.wait(400);
     cy.get('.actions .submit button').click();
+    cy.wait(100);
     cy.get('.result .error').contains('Please provide a name for the new organization');
     cy.get('.organizationDetailsForm .organization_name input').type('new org');
     cy.wait(400);
