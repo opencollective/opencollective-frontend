@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import InputField from './InputField';
 import EditTiers from './EditTiers';
 import EditGoals from './EditGoals';
+import EditHost from './EditHost';
 import EditMembers from './EditMembers';
 import EditPaymentMethods from './EditPaymentMethods';
 import EditConnectedAccounts from './EditConnectedAccounts';
@@ -10,16 +11,35 @@ import ExportData from './ExportData';
 import { FormattedMessage, defineMessages } from 'react-intl';
 import { defaultBackgroundImage } from '../constants/collectives';
 import withIntl from '../lib/withIntl';
-import { ButtonGroup, Button } from 'react-bootstrap';
+import { Button } from 'react-bootstrap';
 import { Link } from '../server/pages';
 import { get } from 'lodash';
+import styled, { css } from 'styled-components';
+import { Flex, Box } from 'grid-styled'
+
+const selectedStyle = css`
+  background-color: #eee;
+  color: black;
+`;
+
+const MenuItem = styled.div`
+  border-radius: 5px;
+  padding: 5px 10px;
+  color: #888;
+  cursor: pointer;
+  &:hover {
+    color: black;
+  }
+  ${({ selected }) => selected && selectedStyle}
+`
 
 class EditCollectiveForm extends React.Component {
 
   static propTypes = {
     collective: PropTypes.object,
     loading: PropTypes.bool,
-    onSubmit: PropTypes.func
+    onSubmit: PropTypes.func,
+    LoggedInUser: PropTypes.object.isRequired,
   };
 
   constructor(props) {
@@ -45,6 +65,7 @@ class EditCollectiveForm extends React.Component {
     this.showEditTiers = ['COLLECTIVE', 'EVENT'].includes(collective.type);
     this.showExpenses = collective.type === 'COLLECTIVE' || collective.isHost;
     this.showEditGoals = collective.type === 'COLLECTIVE';
+    this.showHost = collective.type === 'COLLECTIVE';
     this.defaultTierType = collective.type === 'EVENT' ? 'TICKET' : 'TIER';
     this.showEditMembers = ['COLLECTIVE', 'ORGANIZATION'].includes(collective.type);
     this.showPaymentMethods = ['USER', 'ORGANIZATION'].includes(collective.type);
@@ -118,18 +139,18 @@ class EditCollectiveForm extends React.Component {
       tiers: this.state.tiers,
       goals: this.state.goals,
       members: this.state.members,
-      paymentMethods: this.state.paymentMethods
+      paymentMethods: this.state.paymentMethods,
     };
     this.props.onSubmit(collective);
-    this.setState({ modified: false })
+    this.setState({ modified: false });
   }
 
   render() {
 
-    const { collective, loading, intl } = this.props;
+    const { collective, loading, intl, LoggedInUser } = this.props;
 
     const isNew = !(collective && collective.id);
-    const submitBtnLabel = loading ? "loading" : isNew ? "Create Event" : "Save";
+    const submitBtnLabel = loading ? 'loading' : isNew ? 'Create Event' : 'Save';
     const defaultStartsAt = new Date;
     const type = collective.type.toLowerCase();
     defaultStartsAt.setHours(19);
@@ -140,32 +161,32 @@ class EditCollectiveForm extends React.Component {
         {
           name: 'name',
           placeholder: '',
-          maxLength: 255
+          maxLength: 255,
         },
         {
           name: 'company',
           placeholder: '',
           maxLength: 255,
-          when: () => collective.type === 'USER'
+          when: () => collective.type === 'USER',
         },
         {
           name: 'description',
           type: 'text',
           maxLength: 255,
-          placeholder: ''
+          placeholder: '',
         },
         {
           name: 'twitterHandle',
           type: 'text',
           pre: 'https://twitter.com/',
           maxLength: 255,
-          placeholder: ''
+          placeholder: '',
         },
         {
           name: 'website',
           type: 'text',
           maxLength: 255,
-          placeholder: ''
+          placeholder: '',
         },
         // {
         //   name: 'location',
@@ -179,13 +200,13 @@ class EditCollectiveForm extends React.Component {
           name: 'longDescription',
           type: 'textarea',
           placeholder: '',
-          description: 'Protip: you can use markdown'
+          description: 'Protip: you can use markdown',
         },
         {
           name: 'tags',
           maxLength: 128,
           type: 'text',
-          placeholder: 'meetup, javascript'
+          placeholder: 'meetup, javascript',
         },
         {
           name: 'tos',
@@ -201,21 +222,21 @@ class EditCollectiveForm extends React.Component {
           type: 'dropzone',
           placeholder: 'Drop an image or click to upload',
           className: 'horizontal',
-          when: () => this.state.section === 'images'
+          when: () => this.state.section === 'images',
         },
         {
           name: 'backgroundImage',
           type: 'dropzone',
           placeholder: 'Drop an image or click to upload',
           className: 'horizontal',
-          when: () => this.state.section === 'images'
+          when: () => this.state.section === 'images',
         }
       ],
       expenses: [
         {
           name: 'expensePolicy',
           type: 'textarea',
-          description: 'Protip: you can use markdown'
+          description: 'Protip: you can use markdown',
         }
       ],
       advanced: [
@@ -223,23 +244,22 @@ class EditCollectiveForm extends React.Component {
           name: 'slug',
           pre: `https://opencollective.com/`,
           placeholder: '',
-          when: () => this.state.section === 'advanced'
+          when: () => this.state.section === 'advanced',
         },
         {
           name: 'sendInvoiceByEmail',
           type: 'switch',
           defaultValue: get(this.state.collective, 'settings.sendInvoiceByEmail'),
-          when: () => this.state.section === 'advanced' && (collective.type === 'USER' || collective.type === 'ORGANIZATION')
+          when: () => this.state.section === 'advanced' && (collective.type === 'USER' || collective.type === 'ORGANIZATION'),
         },
         {
           name: 'markdown',
           type: 'switch',
           defaultValue: get(this.state.collective, 'settings.editor') === 'markdown',
-          when: () => this.state.section === 'advanced' && (collective.type === 'USER' || collective.type === 'COLLECTIVE')
-        }
-      ]
-    }
-
+          when: () => this.state.section === 'advanced' && (collective.type === 'USER' || collective.type === 'COLLECTIVE'),
+        },
+      ],
+    };
 
     Object.keys(this.fields).map(fieldname => {
       this.fields[fieldname] = this.fields[fieldname].map(field => {
@@ -273,8 +293,6 @@ class EditCollectiveForm extends React.Component {
         }
 
         .FormInputs {
-          max-width: 700px;
-          margin: 0 auto;
           overflow: hidden;
         }
 
@@ -322,124 +340,141 @@ class EditCollectiveForm extends React.Component {
         }
         `}</style>
 
-        <div className="menu">
-          <ButtonGroup className="menuBtnGroup">
-            <Button className="menuBtn info" bsStyle={this.state.section === 'info' ? 'primary' : 'default'} onClick={() => this.showSection('info')}>
+        <Flex>
+          <Box width={1/5} mr={4}>
+            <MenuItem selected={this.state.section === 'info'} onClick={() => this.showSection('info')} className="MenuItem info">
               <FormattedMessage id="editCollective.menu.info" defaultMessage="info" />
-            </Button>
-            <Button className="menuBtn images" bsStyle={this.state.section === 'images' ? 'primary' : 'default'} onClick={() => this.showSection('images')}>
+            </MenuItem>
+            <MenuItem selected={this.state.section === 'images'} onClick={() => this.showSection('images')} className="MenuItem images">
               <FormattedMessage id="editCollective.menu." defaultMessage="images" />
-            </Button>
+            </MenuItem>
             { this.showEditMembers &&
-              <Button className="menuBtn members" bsStyle={this.state.section === 'members' ? 'primary' : 'default'} onClick={() => this.showSection('members')}>
+              <MenuItem selected={this.state.section === 'members'} onClick={() => this.showSection('members')} className="MenuItem members">
                 <FormattedMessage id="editCollective.menu.members" defaultMessage="members" />
-              </Button>
+              </MenuItem>
             }
             { this.showEditGoals &&
-              <Button className="menuBtn goals" bsStyle={this.state.section === 'goals' ? 'primary' : 'default'} onClick={() => this.showSection('goals')}>
+              <MenuItem selected={this.state.section === 'goals'} onClick={() => this.showSection('goals')} className="MenuItem goals">
                 <FormattedMessage id="editCollective.menu.goals" defaultMessage="goals" />
-              </Button>
+              </MenuItem>
+            }
+            { this.showHost &&
+              <MenuItem selected={this.state.section === 'host'} onClick={() => this.showSection('host')} className="MenuItem host">
+                <FormattedMessage id="editCollective.menu.host" defaultMessage="Fiscal Host" />
+              </MenuItem>
             }
             { this.showEditTiers &&
-              <Button className="menuBtn tiers" bsStyle={this.state.section === 'tiers' ? 'primary' : 'default'} onClick={() => this.showSection('tiers')}>
+              <MenuItem selected={this.state.section === 'tiers'} onClick={() => this.showSection('tiers')} className="MenuItem tiers">
                 <FormattedMessage id="editCollective.menu.tiers" defaultMessage="tiers" />
-              </Button>
+              </MenuItem>
             }
             { this.showExpenses &&
-              <Button className="menuBtn expenses" bsStyle={this.state.section === 'expenses' ? 'primary' : 'default'} onClick={() => this.showSection('expenses')}>
-                <FormattedMessage id='editCollective.menu.expenses' defaultMessage='expenses' />
-              </Button>
+              <MenuItem selected={this.state.section === 'expenses'} onClick={() => this.showSection('expenses')} className="MenuItem expenses">
+                <FormattedMessage id="editCollective.menu.expenses" defaultMessage="expenses" />
+              </MenuItem>
             }
             { this.showPaymentMethods &&
-              <Button className="menuBtn paymentMethods" bsStyle={this.state.section === 'paymentMethods' ? 'primary' : 'default'} onClick={() => this.showSection('paymentMethods')}>
+              <MenuItem selected={this.state.section === 'paymentMethods'} onClick={() => this.showSection('paymentMethods')} className="MenuItem paymentMethods">
                 <FormattedMessage id="editCollective.menu.paymentMethods" defaultMessage="Payment Methods" />
-              </Button>
+              </MenuItem>
             }
-            <Button className="menuBtn connectedAccounts" bsStyle={this.state.section === 'connectedAccounts' ? 'primary' : 'default'} onClick={() => this.showSection('connectedAccounts')}>
+            <MenuItem selected={this.state.section === 'connectedAccounts'} onClick={() => this.showSection('connectedAccounts')} className="MenuItem connectedAccounts">
               <FormattedMessage id="editCollective.menu.connectedAccounts" defaultMessage="Connected Accounts" />
-            </Button>
+            </MenuItem>
             { collective.type === 'COLLECTIVE' &&
-            <Button className="menuBtn export" bsStyle={this.state.section === 'export' ? 'primary' : 'default'} onClick={() => this.showSection('export')}>
+            <MenuItem selected={this.state.section === 'export'} onClick={() => this.showSection('export')} className="MenuItem export">
               <FormattedMessage id="editCollective.menu.export" defaultMessage="export" />
-            </Button>
+            </MenuItem>
             }
-            <Button className="menuBtn advanced" bsStyle={this.state.section === 'advanced' ? 'primary' : 'default'} onClick={() => this.showSection('advanced')}>
+            <MenuItem selected={this.state.section === 'advanced'} onClick={() => this.showSection('advanced')} className="MenuItem advanced">
               <FormattedMessage id="editCollective.menu.advanced" defaultMessage="advanced" />
-            </Button>
-          </ButtonGroup>
-        </div>
+            </MenuItem>
+          </Box>
 
-        <div className="FormInputs">
-          { Object.keys(this.fields).map(section => this.state.section === section &&
-            <div className="inputs" key={section}>
-              {this.fields[section].map((field) => (!field.when || field.when()) && <InputField
-                key={field.name}
-                className={field.className}
-                defaultValue={field.defaultValue || this.state.collective[field.name]}
-                validate={field.validate}
-                ref={field.name}
-                name={field.name}
-                label={field.label}
-                description={field.description}
-                options={field.options}
-                placeholder={field.placeholder}
-                type={field.type}
-                pre={field.pre}
-                context={this.state.collective}
-                onChange={(value) => this.handleChange(field.name, value)}
-                />)}
+          <Box width={4/5}>
+
+            <div className="FormInputs">
+              { Object.keys(this.fields).map(section => this.state.section === section &&
+                <div className="inputs" key={section}>
+                  {this.fields[section].map((field) => (!field.when || field.when()) && <InputField
+                    key={field.name}
+                    className={field.className}
+                    defaultValue={field.defaultValue || this.state.collective[field.name]}
+                    validate={field.validate}
+                    ref={field.name}
+                    name={field.name}
+                    label={field.label}
+                    description={field.description}
+                    options={field.options}
+                    placeholder={field.placeholder}
+                    type={field.type}
+                    pre={field.pre}
+                    context={this.state.collective}
+                    onChange={(value) => this.handleChange(field.name, value)}
+                    />)}
+                </div>
+              )}
+              { this.state.section === 'members' &&
+                <EditMembers title="Edit members" members={this.members} collective={collective} onChange={this.handleObjectChange} />
+              }
+              { this.state.section === 'tiers' &&
+                <EditTiers
+                  title="Tiers"
+                  types={['TIER', 'MEMBERSHIP', 'SERVICE', 'PRODUCT', 'DONATION']}
+                  tiers={this.state.tiers}
+                  collective={collective}
+                  currency={collective.currency}
+                  onChange={this.handleObjectChange}
+                  defaultType={this.defaultTierType}
+                  />
+              }
+              { this.state.section === 'goals' &&
+                <EditGoals
+                  title="goals"
+                  goals={this.state.goals}
+                  collective={collective}
+                  currency={collective.currency}
+                  onChange={this.handleObjectChange}
+                  />
+              }
+              { this.state.section === 'host' &&
+                <EditHost
+                  collective={collective}
+                  LoggedInUser={LoggedInUser}
+                  editCollectiveMutation={this.props.onSubmit}
+                  />
+              }
+              { this.state.section === 'paymentMethods' &&
+                <EditPaymentMethods
+                  paymentMethods={this.state.paymentMethods}
+                  collective={collective}
+                  onChange={this.handleObjectChange}
+                  />
+              }
+              { this.state.section === 'connectedAccounts' &&
+                <EditConnectedAccounts
+                  collective={collective}
+                  connectedAccounts={collective.connectedAccounts}
+                  />
+              }
+              { this.state.section === 'export' &&
+                <ExportData
+                  collective={collective}
+                  />
+              }
             </div>
-          )}
-          { this.state.section === 'members' &&
-            <EditMembers title="Edit members" members={this.members} collective={collective} onChange={this.handleObjectChange} />
-          }
-          { this.state.section === 'tiers' &&
-            <EditTiers
-              title="Tiers"
-              tiers={this.state.tiers}
-              types={['TIER', 'MEMBERSHIP', 'SERVICE', 'PRODUCT', 'DONATION']}
-              collective={collective}
-              currency={collective.currency}
-              onChange={this.handleObjectChange}
-              defaultType={this.defaultTierType}
-              />
-          }
-          { this.state.section === 'goals' &&
-            <EditGoals
-              title="goals"
-              goals={this.state.goals}
-              collective={collective}
-              currency={collective.currency}
-              onChange={this.handleObjectChange}
-              />
-          }
-          { this.state.section === 'paymentMethods' &&
-            <EditPaymentMethods
-              paymentMethods={this.state.paymentMethods}
-              collective={collective}
-              onChange={this.handleObjectChange}
-              />
-          }
-          { this.state.section === 'connectedAccounts' &&
-            <EditConnectedAccounts
-              collective={collective}
-              connectedAccounts={collective.connectedAccounts}
-              />
-          }
-          { this.state.section === 'export' &&
-            <ExportData
-              collective={collective}
-              />
-          }
-        </div>
-        { ['export', 'connectedAccounts'].indexOf(this.state.section) === -1 &&
-          <div className="actions">
-            <Button bsStyle="primary" type="submit" onClick={this.handleSubmit} disabled={loading || !this.state.modified} >{submitBtnLabel}</Button>
-            <div className="backToProfile">
-              <Link route={`/${collective.slug}`}><a><FormattedMessage id="collective.edit.backToProfile" defaultMessage="or go back to the {type} page" values={{ type }} /></a></Link>
-            </div>
-          </div>
-        }
+
+            { ['export', 'connectedAccounts', 'host'].indexOf(this.state.section) === -1 &&
+              <div className="actions">
+                <Button bsStyle="primary" type="submit" onClick={this.handleSubmit} disabled={loading || !this.state.modified} >{submitBtnLabel}</Button>
+                <div className="backToProfile">
+                  <Link route={`/${collective.slug}`}><a><FormattedMessage id="collective.edit.backToProfile" defaultMessage="or go back to the {type} page" values={{ type }} /></a></Link>
+                </div>
+              </div>
+            }
+          </Box>
+        </Flex>
+
       </div>
     );
   }

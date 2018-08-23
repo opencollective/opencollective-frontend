@@ -15,8 +15,8 @@ import InputField from './InputField';
 import MatchingFundWithData from './MatchingFundWithData';
 import ActionButton from './Button';
 import SectionTitle from './SectionTitle';
+import CreateOrganizationForm from './CreateOrganizationForm';
 import withIntl from '../lib/withIntl';
-
 import { defineMessages, FormattedMessage, FormattedDate, FormattedTime } from 'react-intl';
 import { capitalize, formatCurrency, isValidEmail, getEnvVar } from '../lib/utils';
 import { getStripeToken } from '../lib/stripe';
@@ -75,17 +75,14 @@ class OrderForm extends React.Component {
     this.allowOrganizations = (order.tier.type !== 'TICKET');
 
     this.messages = defineMessages({
-      'order.contributeAs': { id: 'tier.order.contributeAs', defaultMessage: `Contribute as` },
-      'order.rsvpAs': { id: 'tier.order.rsvpAs', defaultMessage: `RSVP as` },
-      'order.profile.myself': { id: 'tier.order.profile.myself', defaultMessage: `myself` },
+      'order.contributeAs': { id: 'tier.order.contributeAs', defaultMessage: 'Contribute as' },
+      'order.rsvpAs': { id: 'tier.order.rsvpAs', defaultMessage: 'RSVP as' },
+      'order.profile.myself': { id: 'tier.order.profile.myself', defaultMessage: 'myself' },
       'order.success': { id: 'tier.order.success', defaultMessage: '🎉 Your order has been processed successfully' },
-      'order.error': { id: 'tier.order.error', defaultMessage: `An error occured 😳. The order didn't go through. Please try again in a few.` },
+      'order.error': { id: 'tier.order.error', defaultMessage: 'An error occured 😳. The order didn\'t go through. Please try again in a few.' },
       'order.button': { id: 'tier.order.button', defaultMessage: 'place order' },
-      'order.organization.create': { id: 'tier.order.organization.create', defaultMessage: `create an organization` },
-      'order.profile.logout': { id: 'tier.order.profile.logout', defaultMessage: `logout to create a new profile` },
-      'order.organization.name': { id: 'tier.order.organization.name', defaultMessage: `name` },
-      'order.organization.website': { id: 'tier.order.organization.website', defaultMessage: `website` },
-      'order.organization.twitterHandle': { id: 'tier.order.organization.twitterHandle', defaultMessage: `Twitter` },
+      'order.organization.create': { id: 'tier.order.organization.create', defaultMessage: 'create an organization' },
+      'order.profile.logout': { id: 'tier.order.profile.logout', defaultMessage: 'logout to create a new profile' },
       'error.email.invalid': { id: 'error.email.invalid', defaultMessage: 'Invalid email address' },
       'creditcard.label': { id: 'creditcard.label', defaultMessage: 'Credit Card' },
       'creditcard.save': { id: 'creditcard.save', defaultMessage: 'Save credit card to {type, select, user {my account} other {{type} account}}' },
@@ -95,14 +92,13 @@ class OrderForm extends React.Component {
       'paymentMethod.creditcard': { id: 'paymentMethod.creditcard', defaultMessage: 'credit card' },
       'paymentMethod.bitcoin': { id: 'paymentMethod.bitcoin', defaultMessage: 'bitcoin' },
       'paymentMethod.paypal': { id: 'paymentMethod.paypal', defaultMessage: 'paypal' },
-      'ocCard.label': {id: 'occard.label', defaultMessage: 'Gift Card'},
-      'ocCard.apply': {id: 'occard.apply', defaultMessage: 'Apply'},
-      'ocCard.invalid': {id: 'occard.invalid', defaultMessage: 'Invalid code'},
-      'ocCard.expired': {id: 'occard.expired', defaultMessage: 'Expired code'},
-      'ocCard.loading': {id: 'occard.loading', defaultMessage: 'Please wait...'},
-      'ocCard.amountremaining': {id: 'occard.amountremaining', defaultMessage: 'Valid code. Amount available: '},
-      'ocCard.amounterror': {id: 'occard.amounterror', defaultMessage: 'You can only contribute up to the amount available on your gift card.'},
-
+      'ocCard.label': { id: 'occard.label', defaultMessage: 'Gift Card' },
+      'ocCard.apply': { id: 'occard.apply', defaultMessage: 'Apply' },
+      'ocCard.invalid': { id: 'occard.invalid', defaultMessage: 'Invalid code' },
+      'ocCard.expired': { id: 'occard.expired', defaultMessage: 'Expired code' },
+      'ocCard.loading': { id: 'occard.loading', defaultMessage: 'Please wait...' },
+      'ocCard.amountremaining': { id: 'occard.amountremaining', defaultMessage: 'Valid code. Amount available: ' },
+      'ocCard.amounterror': { id: 'occard.amounterror', defaultMessage: 'You can only contribute up to the amount available on your gift card.' },
       'ticket.title': { id: 'tier.order.ticket.title', defaultMessage: 'RSVP' },
       'backer.title': { id: 'tier.order.backer.title', defaultMessage: 'Become a {name}' },
       'sponsor.title': { id: 'tier.order.sponsor.title', defaultMessage: 'Become a {name}' },
@@ -116,7 +112,7 @@ class OrderForm extends React.Component {
       'email.label': { id: 'user.email.label', defaultMessage: 'email' },
       'email.description': { id: 'user.email.description', defaultMessage: '* required' },
       'email.description.login': { id: 'signin.createAccount.description', defaultMessage: 'There is no user with this email address. Click on "Sign Up" to create a new Open Collective Account.' },
-      'email.description.signup': { id: 'signin.emailSent.description', defaultMessage: 'Login email sent. Please follow the instructions in that email to proceed.'},
+      'email.description.signup': { id: 'signin.emailSent.description', defaultMessage: 'Login email sent. Please follow the instructions in that email to proceed.' },
       'description.label': { id: 'user.description.label', defaultMessage: 'Short bio' },
       'description.description': { id: 'user.description.description', defaultMessage: 'Present yourself in 60 characters or less, if you can!' },
       'totalAmount.label': { id: 'tier.totalAmount.label', defaultMessage: 'Total amount' },
@@ -125,40 +121,37 @@ class OrderForm extends React.Component {
       'order.error.organization.name.required': { id: 'order.error.organization.name.required', defaultMessage: 'Please provide a name for the new organization' },
       'order.error.organization.website.required': { id: 'order.error.organization.website.required', defaultMessage: 'Please provide a website for the new organization' },
       'order.publicMessage.placeholder': { id: 'order.publicMessage.placeholder', defaultMessage: 'Use this space to add a personal message (public)' },
-      'newsletterOptIn.description': {
-        id: 'user.newsletterOptIn.description',
-        defaultMessage: 'Subscribe to the Open Collective newsletter.',
-      },
+      'newsletterOptIn.description': { id: 'user.newsletterOptIn.description', defaultMessage: 'Subscribe to the Open Collective newsletter.' },
     });
 
     this.fields = [
       {
         name: 'firstName',
-        maxLength: 127
+        maxLength: 127,
       },
       {
         name: 'lastName',
-        maxLength: 128
+        maxLength: 128,
       },
       {
         name: 'company',
-        maxLength: 255
+        maxLength: 255,
       },
       {
         name: 'website',
-        maxLength: 255
+        maxLength: 255,
       },
       {
         name: 'twitterHandle',
         pre: '@',
         maxLength: 255,
-        validate: (val) => val.match(/^[A-Za-z0-9_]{1,15}$/)
+        validate: (val) => val.match(/^[A-Za-z0-9_]{1,15}$/),
       },
       {
         name: 'description',
-        maxLength: 255
+        maxLength: 255,
       },
-    ]
+    ];
 
     this.fields = this.fields.map(field => {
       if (this.messages[`${field.name}.label`]) {
@@ -168,7 +161,7 @@ class OrderForm extends React.Component {
         field.description = intl.formatMessage(this.messages[`${field.name}.description`]);
       }
       return field;
-    })
+    });
 
     this.populateProfiles();
   }
@@ -521,21 +514,22 @@ class OrderForm extends React.Component {
   error = (msg) => {
     const error = `${msg}`;
     this.setState({ result: { error }});
-  }
+  };
 
   resetError = () => {
     this.setState({ result: { error: null }});
-  }
+  };
 
   validate = async () => {
     const TEST_ENVIRONMENT = (typeof window !== 'undefined' && window.location.search.match(/test=e2e/) && (window.location.hostname === 'staging.opencollective.com' || window.location.hostname === 'localhost'));
 
     const { intl } = this.props;
     const { order, user, creditcard, ocCard } = this.state;
-    const newState = {...this.state};
+    const newState = { ...this.state };
+
     // validate email
     if (this.state.isNewUser && !isValidEmail(user.email)) {
-      this.setState({ result: { error: intl.formatMessage(this.messages['error.email.invalid']) }});
+      this.setState({ result: { error: intl.formatMessage(this.messages['error.email.invalid']) } });
       return false;
     }
 
@@ -543,7 +537,7 @@ class OrderForm extends React.Component {
       if (!get(obj, attrPath)) {
         throw new Error(intl.formatMessage(this.messages[messageId]));
       }
-    }
+    };
 
     // validate new org
     if (this.state.orgDetails.show) {
@@ -551,7 +545,7 @@ class OrderForm extends React.Component {
         required(this.state, 'fromCollective.name', 'order.error.organization.name.required');
         required(this.state, 'fromCollective.website', 'order.error.organization.website.required');
       } catch (e) {
-        this.setState({ result: { error: e.message }});
+        this.setState({ result: { error: e.message } });
         return false;
       }
     }
@@ -561,7 +555,7 @@ class OrderForm extends React.Component {
       // favors ocCard over credit card
       if (ocCard.valid) {
         if (ocCard.balance < order.totalAmount) {
-          this.setState({ result: { error: intl.formatMessage(this.messages['ocCard.amounterror'])}});
+          this.setState({ result: { error: intl.formatMessage(this.messages['ocCard.amounterror']) } });
           return false;
         }
         newState.paymentMethod = pick(ocCard, ['token', 'service', 'type', 'uuid']);
@@ -930,44 +924,8 @@ class OrderForm extends React.Component {
           </section>
 
           { !fromCollective.id && this.state.orgDetails.show &&
-          <section className="organizationDetailsForm">
-            <SectionTitle section="organizationDetails" />
-            <Row key={`organization.name.input`}>
-              <Col sm={12}>
-                <InputField
-                  className="horizontal"
-                  type="text"
-                  name="organization_name"
-                  label={intl.formatMessage(this.messages['order.organization.name'])}
-                  onChange={(value) => this.handleChange("fromCollective", "name", value)}
-                  />
-              </Col>
-            </Row>
-            <Row key={`organization.website.input`}>
-              <Col sm={12}>
-                <InputField
-                  className="horizontal"
-                  type="text"
-                  name="organization_website"
-                  label={intl.formatMessage(this.messages['order.organization.website'])}
-                  onChange={(value) => this.handleChange("fromCollective", "website", value)}
-                  />
-              </Col>
-            </Row>
-            <Row key={`organization.twitterHandle.input`}>
-              <Col sm={12}>
-                <InputField
-                  className="horizontal"
-                  type="text"
-                  name="organization_twitterHandle"
-                  pre="@"
-                  label={intl.formatMessage(this.messages['order.organization.twitterHandle'])}
-                  onChange={(value) => this.handleChange("fromCollective", "twitterHandle", value)}
-                  />
-              </Col>
-            </Row>
-          </section>
-        }
+            <CreateOrganizationForm onChange={org => this.handleChange("fromCollective", org)} />
+          }
 
           { !requireLogin &&
           <div>

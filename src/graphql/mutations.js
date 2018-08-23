@@ -71,10 +71,45 @@ const editCollectiveQuery = gql`
       longDescription
       website
       twitterHandle
-      members {
+      host {
         id
+        createdAt
+        slug
+        name
+        image
+        description
+        website
+        twitterHandle
+        stats {
+          id
+          collectives {
+            hosted
+          }
+        }
+      }
+      members(roles: ["ADMIN", "MEMBER", "HOST"]) {
+        id
+        createdAt
         role
         description
+        stats {
+          totalDonations
+        }
+        tier {
+          id
+          name
+        }
+        member {
+          id
+          name
+          image
+          slug
+          twitterHandle
+          description
+          ... on User {
+            email
+          }
+        }
       }
     }
   }
@@ -173,6 +208,7 @@ export const addEditCollectiveMutation = graphql(editCollectiveQuery, {
         'currency',
         'quantity',
         'ParentCollectiveId',
+        'HostCollectiveId',
         'image',
         'backgroundImage',
         'settings'

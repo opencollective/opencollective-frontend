@@ -6,7 +6,7 @@ import Body from './Body';
 import Footer from './Footer';
 import { addCreateCollectiveMutation } from '../graphql/mutations';
 import CreateCollectiveForm from './CreateCollectiveForm';
-import CollectiveCover from './CollectiveCover';
+import CreateCollectiveCover from './CreateCollectiveCover';
 import ErrorPage from './ErrorPage';
 import SignInForm from './SignInForm';
 import { get } from 'lodash';
@@ -15,8 +15,9 @@ import { FormattedMessage, defineMessages } from 'react-intl';
 class CreateCollective extends React.Component {
 
   static propTypes = {
-    host: PropTypes.object
-  }
+    host: PropTypes.object,
+    intl: PropTypes.object.isRequired,
+  };
 
   constructor(props) {
     super(props);
@@ -25,8 +26,24 @@ class CreateCollective extends React.Component {
     this.error = this.error.bind(this);
     this.resetError = this.resetError.bind(this);
     this.messages = defineMessages({
-      "host.apply.title": { id: "host.apply.title", defaultMessage: "Apply to create a new {hostname} collective" }
+      'host.apply.title': { id: 'host.apply.title', defaultMessage: 'Apply to create a new {hostname} collective' },
+      'collective.create.title': { id: 'collective.create.title', defaultMessage: 'Create an Open Collective' },
+      'collective.create.description': { id: 'collective.create.description', defaultMessage: 'The place for your community to collect money and share your finance in full transparency.' },
     });
+
+    this.host = props.host || {
+      type: 'COLLECTIVE',
+      settings: {
+        apply: {
+          title: this.props.intl.formatMessage(this.messages['collective.create.title']),
+          description: this.props.intl.formatMessage(this.messages['collective.create.description']),
+          categories: ['association', 'coop', 'lobby', 'meetup', 'movement', 'neighborhood', 'opensource', 'politicalparty', 'pta', 'studentclub', 'other'],
+        },
+      },
+    };
+
+    this.next = props.host ? `/${props.host.slug}/apply` : '/create';
+
   }
 
   error(msg) {
@@ -38,18 +55,17 @@ class CreateCollective extends React.Component {
   }
 
   async createCollective(CollectiveInputType) {
-    const { host } = this.props;
-    if (!CollectiveInputType.tos || (get(host, 'settings.tos') && !CollectiveInputType.hostTos)) {
-      this.setState( { result: { error: "Please accept the terms of service" }})
+    if (!CollectiveInputType.tos || (get(this.host, 'settings.tos') && !CollectiveInputType.hostTos)) {
+      this.setState( { result: { error: 'Please accept the terms of service' }})
       return;
     }
     this.setState( { status: 'loading' });
     CollectiveInputType.type = 'COLLECTIVE';
-    CollectiveInputType.HostCollectiveId = host.id;
+    CollectiveInputType.HostCollectiveId = this.host.id;
     if (CollectiveInputType.tags) {
       CollectiveInputType.tags = CollectiveInputType.tags.split(',').map(t => t.trim());
     }
-    CollectiveInputType.tags = [...CollectiveInputType.tags || [], ...host.tags || []] || [];
+    CollectiveInputType.tags = [...CollectiveInputType.tags || [], ...this.host.tags || []] || [];
     if (CollectiveInputType.category) {
       CollectiveInputType.tags.push(CollectiveInputType.category);
     }
@@ -59,13 +75,18 @@ class CreateCollective extends React.Component {
     delete CollectiveInputType.category;
     delete CollectiveInputType.tos;
     delete CollectiveInputType.hostTos;
-
+    console.log(">>> creating collective ", CollectiveInputType);
     try {
       const res = await this.props.createCollective(CollectiveInputType);
       const collective = res.data.createCollective;
-      const collectiveUrl = `${window.location.protocol}//${window.location.host}/${collective.slug}?status=collectiveCreated&CollectiveId=${collective.id}`;
+      let successUrl;
+      if (CollectiveInputType.HostCollectiveId) {
+        successUrl = `${window.location.protocol}//${window.location.host}/${collective.slug}?status=collectiveCreated&CollectiveId=${collective.id}&collectiveSlug=${collective.slug}`;
+      } else {
+        successUrl = `${window.location.protocol}//${window.location.host}/${collective.slug}/edit#host`;
+      }
       this.setState({ status: 'idle', result: { success: `Collective created successfully` }});
-      window.location.replace(collectiveUrl);
+      window.location.replace(successUrl);
     } catch (err) {
       console.error(">>> createCollective error: ", JSON.stringify(err));
       const errorMsg = (err.graphQLErrors && err.graphQLErrors[0]) ? err.graphQLErrors[0].message : err.message;
@@ -75,14 +96,15 @@ class CreateCollective extends React.Component {
   }
 
   render() {
-    const { LoggedInUser, host, intl } = this.props;
-    const canApply = get(host, 'settings.apply');
+    const { LoggedInUser, intl } = this.props;
 
-    if (!host) {
+    const canApply = get(this.host, 'settings.apply');
+    const title = get(this.host, 'settings.apply.title') || intl.formatMessage(this.messages['host.apply.title'], { hostname: this.host.name });
+    const description = get(this.host, 'settings.apply.description') || intl.formatMessage(this.messages['collective.create.description'], { hostname: this.host.name });
+
+    if (!this.host) {
       return (<ErrorPage loading />);
     }
-
-    const title = get(host, 'settings.apply.title') || intl.formatMessage(this.messages["host.apply.title"], { hostname: host.name });
 
     return (
       <div className="CreateCollective">
@@ -108,21 +130,16 @@ class CreateCollective extends React.Component {
 
         <Header
           title={title}
-          description={host.description}
-          twitterHandle={host.twitterHandle}
-          image={host.image || host.backgroundImage}
+          description={description}
+          twitterHandle={this.host.twitterHandle}
+          image={this.host.image || this.host.backgroundImage}
           className={this.state.status}
           LoggedInUser={LoggedInUser}
           />
 
         <Body>
 
-          <CollectiveCover
-            href={`/${host.slug}`}
-            title={title}
-            collective={host}
-            className="small"
-            />
+          <CreateCollectiveCover host={this.host} />
 
           <div className="content" >
 
@@ -135,7 +152,7 @@ class CreateCollective extends React.Component {
             { canApply && !LoggedInUser &&
               <div className="signin">
                 <h2><FormattedMessage id="collectives.create.signin" defaultMessage="Sign in or create an Open Collective account" /></h2>
-                <SignInForm next={`/${host.slug}/apply`} />
+                <SignInForm next={this.next} />
               </div>
             }
 
@@ -143,7 +160,7 @@ class CreateCollective extends React.Component {
               <div>
 
                 <CreateCollectiveForm
-                  host={host}
+                  host={this.host}
                   collective={this.state.collective}
                   onSubmit={this.createCollective}
                   onChange={this.resetError}

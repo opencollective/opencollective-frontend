@@ -269,12 +269,12 @@ class MenuBar extends React.Component {
 
         `}
         </style>
-        { this.state.sticky && cta &&
+        { this.state.sticky && get(cta, 'label') &&
           <Link route={cta.href} animate={{ offset }}>
             <Button className="blue">{cta.label}</Button>
           </Link>
         }
-        { ["COLLECTIVE", "EVENT"].indexOf(collective.type) !== -1  &&
+        { ['COLLECTIVE', 'EVENT'].indexOf(collective.type) !== -1  &&
           <Button className="submitExpense darkBackground" href={`${collective.path}/expenses/new`}><FormattedMessage id="menu.submitExpense" defaultMessage="Submit Expense" /></Button>
         }
 
@@ -458,6 +458,10 @@ class MenuBar extends React.Component {
           width: 100%;
         }
         .sticky-inner-wrapper {
+          overflow: hidden;
+          background-color: #17181A;
+        }
+        .active .sticky-inner-wrapper {
           z-index: 2000;
           overflow: hidden;
           background-color: #17181A;

@@ -148,6 +148,22 @@ const getCollectiveToEditQuery = gql`
       createdByUser {
         id
       }
+      host {
+        id
+        createdAt
+        slug
+        name
+        image
+        description
+        website
+        twitterHandle
+        stats {
+          id
+          collectives {
+            hosted
+          }
+        }
+      }
       name
       company
       image
@@ -160,11 +176,13 @@ const getCollectiveToEditQuery = gql`
       currency
       settings
       createdAt
+      isActive
       isHost
       expensePolicy
       stats {
         id
         yearlyBudget
+        balance
         backers {
           all
         }
@@ -211,7 +229,7 @@ const getCollectiveToEditQuery = gql`
           }
         }
       }
-      members(roles: ["ADMIN", "MEMBER"]) {
+      members(roles: ["ADMIN", "MEMBER", "HOST"]) {
         id
         createdAt
         role
@@ -335,6 +353,7 @@ const getCollectiveQuery = gql`
         }
       }
       isHost
+      hostFeePercent
       canApply
       host {
         id

@@ -6,7 +6,6 @@ import Footer from './Footer';
 import SignInForm from './SignInForm';
 import EditCollectiveForm from './EditCollectiveForm';
 import CollectiveCover from './CollectiveCover';
-import { addEditCollectiveMutation, addDeleteCollectiveMutation } from '../graphql/mutations';
 import { defaultBackgroundImage } from '../constants/collectives';
 import { getStripeToken } from '../lib/stripe';
 import { defineMessages } from 'react-intl';
@@ -17,8 +16,11 @@ import { Router } from '../server/pages';
 class EditCollective extends React.Component {
 
   static propTypes = {
-    collective: PropTypes.object
-  }
+    collective: PropTypes.object.isRequired,
+    LoggedInUser: PropTypes.object.isRequired,
+    editCollective: PropTypes.func.isRequired,
+    deleteCollective: PropTypes.func.isRequired,
+  };
 
   constructor(props) {
     super(props);
@@ -26,7 +28,7 @@ class EditCollective extends React.Component {
     this.deleteCollective = this.deleteCollective.bind(this);
     this.state = { status: 'idle', result: {} };
     this.messages = defineMessages({
-      'creditcard.error': { id: 'creditcard.error', defaultMessage: 'Invalid credit card' }
+      'creditcard.error': { id: 'creditcard.error', defaultMessage: 'Invalid credit card' },
     });
   }
 
@@ -37,7 +39,29 @@ class EditCollective extends React.Component {
 
   async validate(CollectiveInputType) {
     const { intl } = this.props;
-    CollectiveInputType.tiers = this.cleanTiers(CollectiveInputType.tiers);
+    const tiers = this.cleanTiers(CollectiveInputType.tiers);
+    if (tiers) {
+      CollectiveInputType.tiers = tiers;
+    }
+
+    if (typeof CollectiveInputType.tags === 'string') {
+      CollectiveInputType.tags = CollectiveInputType.tags.split(',').map(t => t.trim());
+    }
+    if (CollectiveInputType.backgroundImage === defaultBackgroundImage[CollectiveInputType.type]) {
+      delete CollectiveInputType.backgroundImage;
+    }
+
+    const { collective } = this.props;
+    CollectiveInputType.settings = {
+      ...collective.settings,
+      goals: CollectiveInputType.goals,
+      editor: CollectiveInputType.markdown ? 'markdown' : 'html',
+      sendInvoiceByEmail: CollectiveInputType.sendInvoiceByEmail
+    };
+    delete CollectiveInputType.goals;
+    delete CollectiveInputType.markdown;
+    delete CollectiveInputType.sendInvoiceByEmail;
+
     if (!CollectiveInputType.paymentMethods) return CollectiveInputType;
 
     let newPaymentMethod, index;
@@ -68,8 +92,8 @@ class EditCollective extends React.Component {
           brand: res.card.brand,
           country: res.card.country,
           funding: res.card.funding,
-          zip: res.card.address_zip
-        }
+          zip: res.card.address_zip,
+        },
       };
       CollectiveInputType.paymentMethods[index] = paymentMethod;
       return CollectiveInputType;
@@ -113,6 +137,7 @@ class EditCollective extends React.Component {
     if (!CollectiveInputType) {
       return false;
     }
+
     if (typeof CollectiveInputType.tags === 'string') {
       CollectiveInputType.tags = CollectiveInputType.tags.split(',').map(t => t.trim());
     }
@@ -131,10 +156,6 @@ class EditCollective extends React.Component {
     delete CollectiveInputType.tos;
     this.setState( { status: 'loading' });
     try {
-      if (CollectiveInputType.backgroundImage === defaultBackgroundImage[CollectiveInputType.type]) {
-        delete CollectiveInputType.backgroundImage;
-      }
-
       const res = await this.props.editCollective(CollectiveInputType);
       const type = res.data.editCollective.type.toLowerCase();
       this.setState({ status: 'idle', result: { success: `${capitalize(type)} saved` }});
@@ -150,12 +171,13 @@ class EditCollective extends React.Component {
   }
 
   async deleteCollective() {
+    const { collective } = this.props;
     if (confirm("😱 Are you really sure you want to delete this collective?")) {
       this.setState( { status: 'loading' });
       try {
-        await this.props.deleteCollective(this.props.collective.id);
+        await this.props.deleteCollective(collective.id);
         this.setState({ status: 'idle', result: { success: `Collective deleted successfully` }});
-        const collectiveRoute = `/${this.props.collective.parentCollective.slug}`;
+        const collectiveRoute = `/${collective.parentCollective.slug}`;
         Router.pushRoute(collectiveRoute);
       } catch (err) {
         console.error(">>> deleteCollective error: ", JSON.stringify(err));
@@ -168,11 +190,9 @@ class EditCollective extends React.Component {
 
   render() {
 
-    const collective = this.props.collective || {};
+    const { LoggedInUser, collective } = this.props;
 
-    if (!collective.slug) return (<div />);
-
-    const { LoggedInUser } = this.props;
+    if (!collective || !collective.slug) return (<div />);
 
     const title = `Edit ${collective.name} ${collective.type.toLowerCase()}`;
     const canEditCollective = LoggedInUser && LoggedInUser.canEditCollective(collective);
@@ -222,7 +242,12 @@ class EditCollective extends React.Component {
             }
             { canEditCollective &&
               <div>
-                <EditCollectiveForm collective={collective} onSubmit={this.editCollective} loading={this.state.status === 'loading'} />
+                <EditCollectiveForm
+                  collective={collective}
+                  LoggedInUser={LoggedInUser}
+                  onSubmit={this.editCollective}
+                  loading={this.state.status === 'loading'}
+                  />
                 <div className="actions">
                   { collective.type === 'EVENT' && (<a onClick={this.deleteCollective}>delete event</a>)}
                   <div className="result">
@@ -240,4 +265,4 @@ class EditCollective extends React.Component {
   }
 }
 
-export default addEditCollectiveMutation(addDeleteCollectiveMutation(withIntl(EditCollective)));
+export default withIntl(EditCollective);

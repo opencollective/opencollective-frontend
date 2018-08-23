@@ -216,7 +216,7 @@ class CollectiveCard extends React.Component {
             <div className="description">{description}</div>
           </div>
           <div className="footer">
-            { collective.stats && collective.type === 'COLLECTIVE' &&
+            { collective.type === 'COLLECTIVE' && get(collective, 'stats.backers.all') &&
               <div className="stats">
                 <div className="backers">
                   <div className="value">{collective.stats.backers.all}</div>
@@ -258,6 +258,21 @@ class CollectiveCard extends React.Component {
                     <FormattedMessage id="collective.card.stats.totalAmountSpent" defaultMessage="contributed" />
                   </div>
                 </div>
+              </div>
+            ) }
+            { collective.stats && collective.stats.collectives && (
+              <div className="stats">
+                <div className="backers">
+                  <div className="value">{get(collective, 'stats.collectives.hosted')}</div>
+                  <div className="label">
+                    <FormattedMessage
+                      id="collective.card.collectives.count"
+                      defaultMessage="{n, plural, one {collective} other {collectives}} hosted"
+                      values={{ n: get(collective, 'stats.collectives.hosted') }}
+                      />
+                  </div>
+                </div>
+
               </div>
             ) }
             { membership &&

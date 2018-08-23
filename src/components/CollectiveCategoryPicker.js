@@ -44,16 +44,16 @@ class CollectiveCategoryPicker extends React.Component {
     const { intl } = this.props;
 
     return (
-      <div className="category" onClick={() => this.handleChange(category)}>
+      <div className="category" onClick={() => this.handleChange(category)} key={`pickCategory-${category}`}>
         <style jsx>{`
           .category {
             width: 180px;
             height: 90px;
             text-align: center;
+            margin: 2rem;
             padding: 0.5rem;
             background: ${colors.blue};
             color: white;
-            margin: 2rem;
             display: flex;
             justify-content: center;
             align-items: center;

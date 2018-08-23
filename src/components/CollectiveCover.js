@@ -20,25 +20,23 @@ class CollectiveCover extends React.Component {
   static propTypes = {
     collective: PropTypes.object.isRequired,
     href: PropTypes.string,
+    className: PropTypes.string,
     title: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
     description: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
     style: PropTypes.object,
-    cta: PropTypes.object // { href, label }
-  }
+    LoggedInUser: PropTypes.object,
+    intl: PropTypes.object.isRequired,
+    cta: PropTypes.object, // { href, label }
+  };
 
   constructor(props) {
     super(props);
     this.messages = defineMessages({
       'contribute': { id: 'collective.contribute', defaultMessage: 'contribute' },
-      'apply': { id: 'host.apply.btn', defaultMessage: "Apply to create a collective" },
+      'apply': { id: 'host.apply.btn', defaultMessage: 'Apply to host your collective {collective}' },
       'ADMIN': { id: 'roles.admin.label', defaultMessage: 'Core Contributor' },
-      'MEMBER': { id: 'roles.member.label', defaultMessage: 'Contributor' }
+      'MEMBER': { id: 'roles.member.label', defaultMessage: 'Contributor' },
     });
-
-    if (props.cta) {
-      const label = props.cta.label;
-      this.cta = { href: props.cta.href, label: this.messages[label] ? props.intl.formatMessage(this.messages[label]) : label };
-    }
   }
 
   getMemberTooltip(member) {
@@ -46,7 +44,7 @@ class CollectiveCover extends React.Component {
     let tooltip = member.member.name;
     if (this.messages[member.role]) {
       tooltip += `
-${intl.formatMessage(this.messages[member.role])}`;
+${this.messages[member.role] ? intl.formatMessage(this.messages[member.role]) : member.role}`;
     }
     const description = member.description || member.member.description;
     if (description) {
@@ -60,7 +58,8 @@ ${description}`
     const {
       collective,
       className,
-      LoggedInUser
+      LoggedInUser,
+      intl,
     } = this.props;
 
     const {
@@ -68,7 +67,7 @@ ${description}`
       type,
       website,
       twitterHandle,
-      stats
+      stats,
     } = collective;
 
     const href = this.props.href || collective.path || `/${collective.slug}`;
@@ -81,10 +80,19 @@ ${description}`
       backgroundPosition: 'center center',
       backgroundSize: 'cover',
       backgroundRepeat: 'no-repeat',
-      ...customStyles
+      ...customStyles,
     };
 
     const logo = collective.image || get(collective.parentCollective, 'image');
+    let cta;
+    if (this.props.cta) {
+      if (this.props.cta.href) {
+        const label = this.props.cta.label;
+        cta = <Button className="blue" href={this.props.cta.href}>{this.messages[label] ? intl.formatMessage(this.messages[label]) : label}</Button>
+      } else {
+        cta = this.props.cta;
+      }
+    }
 
     return (
       <div className={classNames('CollectiveCover', className, type)}>
@@ -93,16 +101,13 @@ ${description}`
           align-items: center;
           position: relative;
           text-align: center;
-          min-height: 400px;
+          min-height: 30rem;
           width: 100%;
           overflow: hidden;
         }
         .small .cover {
-          height: 22rem;
+          height: auto;
           min-height: 22rem;
-        }
-        .small .description, .small .contact, .small .stats, .small .members {
-          display: none;
         }
         .backgroundCover {
           position: absolute;
@@ -143,6 +148,11 @@ ${description}`
         }
         .content a:hover {
           color: #444;
+          text-decoration: underline !important;
+        }
+        .content a:hover {
+          color: #444;
+          text-decoration: underline !important;
         }
         .USER .cover {
           display: block;
@@ -248,7 +258,7 @@ ${description}`
           line-height: 1.25;
           margin: 1px;
         }
-        .cta {
+        .USER .cta, .ORGANIZATION .cta {
           margin: 4rem 0;
         }
         @media(max-width: 600px) {
@@ -256,13 +266,16 @@ ${description}`
             font-size: 2.5rem;
           }
         }
+        .small .contact, .small .stats, .small .statsContainer, .small .members {
+          display: none;
+        }
         `}</style>
         <style jsx global>{`
         .CollectiveCover .content a {
           color: white;
         }
         `}</style>
-        <div className="cover">
+        <div className={`cover ${collective.type}`}>
           <div className="backgroundCover" style={style} />
 
           <div className="content">
@@ -271,15 +284,15 @@ ${description}`
               { collective.type !== 'USER' && <Logo src={logo} className="logo" type={collective.type} website={collective.website} height="10rem" /> }
             </Link>
             <h1>{title}</h1>
+            { description && <p className="description">{description}</p> }
             { className !== 'small' &&
               <div>
                 { company && company.substr(0,1) === '@' && <p className="company"><Link route={`/${company.substr(1)}`}>{company.substr(1)}</Link></p> }
                 { company && company.substr(0,1) !== '@' && <p className="company">{company}</p> }
-                { description && <p className="description">{description}</p> }
                 { collective.type !== 'EVENT' &&
                   <div className="contact">
                     { collective.host && collective.isActive && <div className="host"><label><FormattedMessage id="collective.cover.hostedBy" defaultMessage="Hosted by" /></label><Link route={`/${collective.host.slug}`}>{collective.host.name} </Link></div> }
-                    { collective.host && !collective.isActive && <div className="host"><label><FormattedMessage id="collective.cover.pendingApprovalFrom" defaultMessage="Pending approval from" /></label><Link route={`/${collective.host.slug}`}>{collective.host.name} </Link></div> }
+                    { collective.host && !collective.isActive && LoggedInUser && LoggedInUser.canEditCollective(collective) && <div className="host"><label><FormattedMessage id="collective.cover.pendingApprovalFrom" defaultMessage="Pending approval from" /></label><Link route={`/${collective.host.slug}`}>{collective.host.name} </Link></div> }
                     { twitterHandle && <div className="twitterHandle"><a href={`https://twitter.com/${twitterHandle}`} target="_blank" rel="noopener noreferrer">@{twitterHandle}</a></div> }
                     { website && <div className="website"><a href={website} target="_blank" rel="noopener noreferrer">{prettyUrl(website) }</a></div> }
                   </div>
@@ -291,17 +304,15 @@ ${description}`
                     </div>
                   </div>
                 }
-
-                { collective.type !== 'COLLECTIVE' && this.props.cta &&
-                  <div className="cta">
-                    <Button className="blue" href={this.cta.href}>{this.cta.label}</Button>
-                  </div>
+                { collective.type !== 'COLLECTIVE' && cta &&
+                  <div className="cta">{cta}</div>
                 }
+
               </div>
             }
           </div>
 
-          { ['USER','ORGANIZATION'].indexOf(collective.type) !== -1 && stats && stats.totalAmountSpent > 0 && !collective.isHost &&
+          { ['USER','ORGANIZATION'].includes(collective.type) && stats && stats.totalAmountSpent > 0 && !collective.isHost &&
             <div className="statsContainer">
               <div className="stat">
                 <div className="totalAmountSpent value">
@@ -320,9 +331,9 @@ ${description}`
             </div>
           }
 
-          { collective.type === 'COLLECTIVE' &&
+          { collective.type === 'COLLECTIVE' && collective.isActive && collective.host &&
             <div className="statsContainer">
-              { className !== "small" && collective.type === "COLLECTIVE" &&
+              { className !== 'small' && collective.type === 'COLLECTIVE' &&
                 <div className="topContributors">
                   <TopBackersCoverWithData
                     collective={this.props.collective}
@@ -332,17 +343,15 @@ ${description}`
                 </div>
               }
 
-              { className !== "small" && collective.type === "COLLECTIVE" &&
+              { className !== 'small' && collective.type === 'COLLECTIVE' &&
                 <GoalsCover
                   collective={collective}
                   LoggedInUser={LoggedInUser}
                   />
               }
 
-              { this.props.cta &&
-                <div>
-                  <Button className="blue" href={this.cta.href}>{this.cta.label}</Button>
-                </div>
+              { cta &&
+                <div className="cta">{cta}</div>
               }
 
             </div>
@@ -350,11 +359,11 @@ ${description}`
 
         </div>
 
-        { className !== "small" &&
+        { className !== 'small' &&
           <MenuBar
             collective={collective}
             LoggedInUser={LoggedInUser}
-            cta={this.cta}
+            cta={cta}
             />
         }
 

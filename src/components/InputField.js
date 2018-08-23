@@ -81,12 +81,11 @@ class InputField extends React.Component {
     type: PropTypes.string,
     onChange: PropTypes.func.isRequired,
     required: PropTypes.bool,
-    style: PropTypes.object
-  }
+    style: PropTypes.object,
+  };
 
   constructor(props) {
     super(props);
-
     this.state = { value: props.value, validationState: null };
     this.handleChange = this.handleChange.bind(this);
     this.debouncedHandleChange = debounce(props.onChange, 500);
@@ -95,13 +94,13 @@ class InputField extends React.Component {
 
   UNSAFE_componentWillReceiveProps(nextProps) {
     if (nextProps.value != this.props.value) {
-      this.setState({value: nextProps.value});
+      this.setState({ value: nextProps.value });
     }
   }
 
   validate(value) {
     if (!value) return !this.props.required;
-    const type = this.props.type || "text";
+    const type = this.props.type || 'text';
     if (this.props.validate && !type.match(/^date/)) {
       return this.props.validate(value);
     }
@@ -144,13 +143,13 @@ class InputField extends React.Component {
               <InputTypeCreditCard options={field.options} onChange={this.handleChange} style={this.props.style} />
             </Col>
           </div>
-                        }
+          }
           {!horizontal &&
           <div>
             <ControlLabel>{capitalize(field.label)}</ControlLabel>
             <InputTypeCreditCard onChange={this.handleChange} style={this.props.style} />
           </div>
-                        }
+          }
         </FormGroup>)
         break;
 
@@ -325,7 +324,11 @@ class InputField extends React.Component {
         break;
 
       case 'select': {
-        const firstOptionValue = Object.keys(field.options[0])[0];
+        const firstOptionValue = field.options[0].value !== undefined ? field.options[0].value : Object.keys(field.options[0])[0];
+        if (field.options.length <= 1) {
+          console.warn('>>> InputField: options.length needs to be > 1', field.options);
+          return null;
+        }
         this.input = (
           <FieldGroup
             key={`${field.name}-${firstOptionValue}`} // make sure we instantiate a new component if first value changes
@@ -342,8 +345,8 @@ class InputField extends React.Component {
             onChange={event => this.handleChange(event.target.value)}
             >
             { field.options && field.options.map(option => {
-              const value = Object.keys(option)[0];
-              const label = option[value];
+              const value = option.value !== undefined ? option.value : Object.keys(option)[0];
+              const label = option.label || option[value];
               return (<option key={value} value={value}>{label}</option>)
               })
             }

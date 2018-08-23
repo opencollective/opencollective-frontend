@@ -53,11 +53,12 @@ export function upload(file) {
   })
 }
 
-export function connectAccount(CollectiveId, service) {
+export function connectAccount(CollectiveId, service, options = {}) {
 
   const params = {
-    redirect: window.location.href.replace(/\?.*/,''),
-    CollectiveId
+    redirect: options.redirect || window.location.href.replace(/\?.*/,''),
+    CollectiveId,
+    ...options,
   };
 
   return fetch(`/api/connected-accounts/${service}/oauthUrl?${queryString(params)}`, {

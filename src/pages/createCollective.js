@@ -4,11 +4,13 @@ import React from 'react';
 import CreateCollective from '../components/CreateCollective';
 import { addGetLoggedInUserFunction, addCollectiveCoverData } from '../graphql/queries';
 import ErrorPage from '../components/ErrorPage';
+import { get } from 'lodash';
+
 
 class CreateCollectivePage extends React.Component {
 
   static getInitialProps ({ query: { hostCollectiveSlug } }) {
-    return { slug: hostCollectiveSlug || "opencollective-host" }
+    return { slug: hostCollectiveSlug }
   }
 
   constructor(props) {
@@ -26,8 +28,10 @@ class CreateCollectivePage extends React.Component {
 
     const { data } = this.props;
 
-    if (this.state.loading || !data.Collective) {
-      return (<ErrorPage loading={this.state.loading} data={data} />)
+    const bypassErrorPage = get(data, 'error.message', '').includes('Please provide a slug or an id');
+
+    if ((this.state.loading || !data.Collective) && !bypassErrorPage) {
+      return (<ErrorPage loading={this.state.loading} data={data} />);
     }
 
     return (

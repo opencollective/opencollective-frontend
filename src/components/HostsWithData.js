@@ -10,15 +10,9 @@ import { FormattedMessage } from 'react-intl';
 
 const COLLECTIVE_CARDS_PER_PAGE = 10;
 
-class CollectivesWithData extends React.Component {
+class HostsWithData extends React.Component {
 
   static propTypes = {
-    HostCollectiveId: PropTypes.number, // only fetch collectives that are hosted by this collective id
-    hostCollectiveSlug: PropTypes.string, // only fetch collectives that are hosted by this collective slug
-    memberOfCollectiveSlug: PropTypes.string, // only fetch collectives that are a member of this collective slug
-    role: PropTypes.string, // filter collectives that have this given role (use only with memberOfCollectiveSlug)
-    type: PropTypes.string, // COLLECTIVE, EVENT, ORGANIZATION or USER
-    ParentCollectiveId: PropTypes.number, // only fetch collectives that are under this collective id
     tags: PropTypes.arrayOf(PropTypes.string), // only fetch collectives that have those tags
     onChange: PropTypes.func,
     limit: PropTypes.number,
@@ -61,17 +55,17 @@ class CollectivesWithData extends React.Component {
       console.error("graphql error>>>", data.error.message);
       return (<Error message="GraphQL error" />)
     }
-    if (!data.allCollectives || !data.allCollectives.collectives) {
+    if (!data.allHosts || !data.allHosts.collectives) {
       return (<div />);
     }
-    const collectives = [...data.allCollectives.collectives];
+    const collectives = [...data.allHosts.collectives];
     if (collectives.length === 0) {
-      return (<div />)
+      return (<div />);
     }
 
     const limit = this.props.limit || COLLECTIVE_CARDS_PER_PAGE * 2;
     return (
-      <div className="CollectivesContainer" ref={(node) => this.node = node}>
+      <div className="HostsContainer" ref={(node) => this.node = node}>
         <style jsx>{`
           :global(.loadMoreBtn) {
             margin: 1rem;
@@ -88,7 +82,7 @@ class CollectivesWithData extends React.Component {
           :global(.filterBtn) {
             width: 33%;
           }
-          .Collectives {
+          .Hosts {
             display: flex;
             flex-wrap: wrap;
             flex-direction: row;
@@ -96,12 +90,12 @@ class CollectivesWithData extends React.Component {
             overflow: hidden;
             margin: 1rem 0;
           }
-          .CollectivesContainer :global(.CollectiveCard) {
+          .HostsContainer :global(.CollectiveCard) {
             margin: 1rem;
           }
         `}</style>
 
-        <div className="Collectives cardsList">
+        <div className="Hosts cardsList">
           { collectives.map((collective) =>
             (<CollectiveCard
               key={collective.id}
@@ -123,27 +117,15 @@ class CollectivesWithData extends React.Component {
 
 }
 
-const getCollectivesQuery = gql`
-query allCollectives(
-  $HostCollectiveId: Int,
-  $hostCollectiveSlug: String,
-  $ParentCollectiveId: Int,
+const getHostsQuery = gql`
+query allHosts(
   $tags: [String],
-  $memberOfCollectiveSlug: String,
-  $role: String,
-  $type: TypeOfCollective,
   $limit: Int,
   $offset: Int,
-  $orderBy: CollectiveOrderField,
+  $orderBy: HostCollectiveOrderFieldType,
   $orderDirection: OrderDirection
   ) {
-  allCollectives(
-    HostCollectiveId: $HostCollectiveId,
-    hostCollectiveSlug: $hostCollectiveSlug,
-    memberOfCollectiveSlug: $memberOfCollectiveSlug,
-    role: $role,
-    type: $type,
-    ParentCollectiveId: $ParentCollectiveId,
+  allHosts(
     tags: $tags,
     limit: $limit,
     offset: $offset,
@@ -164,9 +146,8 @@ query allCollectives(
       backgroundImage
       stats {
         id
-        yearlyBudget
-        backers {
-          all
+        collectives {
+          hosted
         }
       }
     }
@@ -174,42 +155,36 @@ query allCollectives(
 }
 `;
 
-export const addCollectivesData = graphql(getCollectivesQuery, {
+export const addHostsData = graphql(getHostsQuery, {
   options(props) {
     return {
       variables: {
-        ParentCollectiveId: props.ParentCollectiveId,
         tags: props.tags,
-        HostCollectiveId: props.HostCollectiveId,
-        hostCollectiveSlug: props.hostCollectiveSlug,
-        memberOfCollectiveSlug: props.memberOfCollectiveSlug,
-        role: props.role,
-        type: props.type,
         orderBy: props.orderBy,
         orderDirection: props.orderDirection,
         offset: 0,
         limit: props.limit || COLLECTIVE_CARDS_PER_PAGE * 2,
-      }
-    }
+      },
+    };
   },
   props: ({ data, ownProps }) => ({
     data,
     fetchMore: () => data.fetchMore({
       variables: {
-        offset: data.allCollectives.collectives.length,
+        offset: data.allHosts.collectives.length,
         limit: ownProps.limit || COLLECTIVE_CARDS_PER_PAGE,
       },
       updateQuery: (previousResult, { fetchMoreResult }) => {
         if (!fetchMoreResult) return previousResult;
         // Update the results object with new entries
-        const { __typename, total, collectives } = previousResult.allCollectives;
-        const all = collectives.concat(fetchMoreResult.allCollectives.collectives);
+        const { __typename, total, collectives } = previousResult.allHosts;
+        const all = collectives.concat(fetchMoreResult.allHosts.collectives);
         return Object.assign({}, previousResult, {
-          allCollectives: { __typename, total, collectives: all } });
+          allHosts: { __typename, total, collectives: all } });
       },
     }),
   }),
 });
 
 
-export default addCollectivesData(withIntl(CollectivesWithData));
+export default addHostsData(withIntl(HostsWithData));

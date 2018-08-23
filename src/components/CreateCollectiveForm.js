@@ -16,7 +16,7 @@ class CreateCollectiveForm extends React.Component {
     host: PropTypes.object,
     collective: PropTypes.object,
     loading: PropTypes.bool,
-    onSubmit: PropTypes.func
+    onSubmit: PropTypes.func,
   };
 
   constructor(props) {
@@ -38,12 +38,11 @@ class CreateCollectiveForm extends React.Component {
       'company.description': { id: 'collective.company.description', defaultMessage: 'Start with a @ to reference an organization (e.g. @airbnb)' },
       'amount.label': { id: 'collective.amount.label', defaultMessage: 'amount' },
       'description.label': { id: 'collective.description.label', defaultMessage: 'Short description' },
-      'longDescription.label': { id: 'collective.longDescription.label', defaultMessage: 'Long description' },
       'startsAt.label': { id: 'collective.startsAt.label', defaultMessage: 'start date and time' },
       'image.label': { id: 'collective.image.label', defaultMessage: 'Avatar' },
       'backgroundImage.label': { id: 'collective.backgroundImage.label', defaultMessage: 'Cover image' },
-      'twitterHandle.label': { id: 'collective.twitterHandle.label', defaultMessage: 'Twitter' },
       'website.label': { id: 'collective.website.label', defaultMessage: 'Website' },
+      'website.description': { id: 'collective.website.description', defaultMessage: 'Enter the URL of your website or Facebook Page' },
       'location.label': { id: 'collective.location.label', defaultMessage: 'City' },
       'meetup.label': { id: 'collective.meetup.label', defaultMessage: 'Meetup URL' },
       'members.label': { id: 'collective.members.label', defaultMessage: 'Number of members' },
@@ -61,9 +60,16 @@ class CreateCollectiveForm extends React.Component {
       collective
     };
 
-    this.categories = get(props.host, 'settings.categories') || [];
+    this.categories = get(props.host, 'settings.apply.categories') || [];
     if (this.categories.length === 1) {
       this.state.collective.category = this.categories[0];
+    }
+
+    if (get(props.host, 'settings.apply.defaultValues')) {
+      this.state.collective = {
+        ...this.state.collective,
+        ... props.host.settings.apply.defaultValues
+      };
     }
 
     this.defineFields(this.state.collective.category);
@@ -108,31 +114,16 @@ class CreateCollectiveForm extends React.Component {
           placeholder: ''
         },
         {
-          name: 'twitterHandle',
-          type: 'text',
-          pre: 'https://twitter.com/',
-          maxLength: 255,
-          placeholder: ''
-        },
-        {
           name: 'website',
           type: 'text',
           maxLength: 255,
           placeholder: ''
         },
         {
-          name: 'location',
-          placeholder: 'Search cities',
-          type: 'location',
-          options: {
-            types: ['(cities)']
-          }
-        },
-        {
-          name: 'longDescription',
-          type: 'textarea',
-          placeholder: '',
-          help: 'Protip: you can use markdown'
+          name: 'tags',
+          placeholder: 'civic tech, open source, vegan',
+          maxLength: 255,
+          type: 'text'
         }
       ]
     }
@@ -149,11 +140,13 @@ class CreateCollectiveForm extends React.Component {
         maxLength: 255,
         placeholder: ''
       });
-      this.fields.info.push({
-        name: 'tags',
-        type: 'text',
-        maxLength: 255,
-        placeholder: 'meetup, nyc, bitcoin'
+      this.fields.info.push(        {
+        name: 'location',
+        placeholder: 'Search cities',
+        type: 'location',
+        options: {
+          types: ['(cities)']
+        }
       });
     }
 
@@ -258,10 +251,6 @@ class CreateCollectiveForm extends React.Component {
           overflow: hidden;
         }
 
-        :global(textarea[name=longDescription]) {
-          height: 30rem;
-        }
-
         .actions {
           margin: 5rem auto 1rem;
           text-align: center;
@@ -331,12 +320,12 @@ class CreateCollectiveForm extends React.Component {
             <div className="tos">
               <label>{intl.formatMessage(this.messages['tos.label'])}</label>
               <div>
-                <input type="checkbox" name="tos" onChange={(value) => this.handleChange("tos", value)} />
+                <input type="checkbox" name="tos" onChange={(value) => this.handleChange('tos', value)} />
                 <span>I agree with the <a href="/tos" target="_blank" rel="noopener noreferrer">terms of service of Open Collective</a></span>
               </div>
               { (get(host, 'settings.tos')) &&
                 <div>
-                  <input type="checkbox" name="hostTos" onChange={(value) => this.handleChange("hostTos", value)} />
+                  <input type="checkbox" name="hostTos" onChange={(value) => this.handleChange('hostTos', value)} />
                   <span>I agree with the <a href={get(host, 'settings.tos')} target="_blank" rel="noopener noreferrer">terms of service of the host</a> (<a href={`/${host.slug}`} target="_blank" rel="noopener noreferrer">{host.name}</a>) that will collect money on behalf of our collective</span>
                 </div>
               }
@@ -345,7 +334,7 @@ class CreateCollectiveForm extends React.Component {
             <div className="actions">
               <Button bsStyle="primary" type="submit" onClick={this.handleSubmit} disabled={loading || !this.state.modified} >
                 { loading && <FormattedMessage id="loading" defaultMessage="loading" /> }
-                { !loading && collective.type === 'COLLECTIVE' && <FormattedMessage id="host.apply.btn" defaultMessage="Apply to create a collective" /> }
+                { !loading && collective.type === 'COLLECTIVE' && <FormattedMessage id="collective.create.button" defaultMessage="Create Collective" /> }
                 { !loading && collective.type === 'ORGANIZATION' && <FormattedMessage id="organization.create" defaultMessage="Create organization" /> }
               </Button>
             </div>
