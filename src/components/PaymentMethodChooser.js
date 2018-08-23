@@ -15,7 +15,7 @@ class PaymentMethodChooser extends React.Component {
     paymentMethodsList: PropTypes.arrayOf(PropTypes.object),
     editMode: PropTypes.bool,
     onSubmit: PropTypes.func,
-    onCancel: PropTypes.func
+    onCancel: PropTypes.func,
   };
 
   constructor(props) {
@@ -33,18 +33,18 @@ class PaymentMethodChooser extends React.Component {
       showNewCreditCardForm: false,
       result: {},
       card: {},
-      showUnknownPaymentMethodHelp: Boolean(!this.props.paymentMethodInUse.name) // check for premigration payment methods
+      showUnknownPaymentMethodHelp: Boolean(!this.props.paymentMethodInUse.name), // check for premigration payment methods
     };
 
     this.messages = defineMessages({
       'paymentMethod.add': { id: 'paymentMethod.add', defaultMessage: 'Add credit card' },
-      'paymentMethod.save': { id: 'paymentMethod.save', defaultMessage: 'Save'},
-      'paymentMethod.cancel': { id: 'paymentMethod.cancel', defaultMessage: 'Cancel'},
-      'paymentMethod.success': { id: 'paymentMethod.success', defaultMessage: 'Successfully added!'},
-      'paymentMethod.expire': { id: 'paymentMethod.expire', defaultMessage: 'Exp'},
-      'paymentMethod.whyUnknownTitle': {id: 'paymentMethod.whyUnknownTitle', defaultMessage: 'Why is my credit card not showing up?'},
-      'paymentMethod.whyUnknown': {id: 'paymentMethod.whyUnknown', defaultMessage: 'This subscription was created using an early version of our site when we didn\'t store credit card numbers. We suggest that you update this subscription with a newer credit card.'},
-      'paymentMethod.cardUnavailable': {id: 'paymentMethod.cardUnavailable', defaultMessage: '(credit card info not available)'}
+      'paymentMethod.save': { id: 'paymentMethod.save', defaultMessage: 'Save' },
+      'paymentMethod.cancel': { id: 'paymentMethod.cancel', defaultMessage: 'Cancel' },
+      'paymentMethod.success': { id: 'paymentMethod.success', defaultMessage: 'Successfully added!' },
+      'paymentMethod.expire': { id: 'paymentMethod.expire', defaultMessage: 'Exp' },
+      'paymentMethod.whyUnknownTitle': { id: 'paymentMethod.whyUnknownTitle', defaultMessage: 'Why is my credit card not showing up?' },
+      'paymentMethod.whyUnknown': { id: 'paymentMethod.whyUnknown', defaultMessage: 'This subscription was created using an early version of our site when we didn\'t store credit card numbers. We suggest that you update this subscription with a newer credit card.' },
+      'paymentMethod.cardUnavailable': { id: 'paymentMethod.cardUnavailable', defaultMessage: '(credit card info not available)' },
     });
   }
 
@@ -56,7 +56,7 @@ class PaymentMethodChooser extends React.Component {
 
     if (!paymentMethodInUse.name) {
       // set state to modified
-      this.setState({ modified: true })
+      this.setState({ modified: true });
       // If there was an existing card, select that
       if (paymentMethodsList.length > 0) {
         this.handleChange({ uuid: paymentMethodsList[0].uuid });
@@ -187,18 +187,18 @@ class PaymentMethodChooser extends React.Component {
 
     const generateOptions = (paymentMethods) => {
       return paymentMethods.map(pm => {
-        const value = pm.uuid
+        const value = pm.uuid;
         const label = this.generatePMString(pm);
         const option = {};
         option[value] = label;
         return option;
       });
-    }
+    };
 
     paymentMethods = (this.props.paymentMethodsList || []).filter(pm => ['stripe', 'opencollective'].includes(pm.service));
     paymentMethodsOptions = generateOptions(paymentMethods);
 
-    paymentMethodsOptions.push({'add': intl.formatMessage(this.messages['paymentMethod.add'])});
+    paymentMethodsOptions.push({ 'add': intl.formatMessage(this.messages['paymentMethod.add']) });
 
     return paymentMethodsOptions;
   }

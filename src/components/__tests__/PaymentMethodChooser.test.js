@@ -12,14 +12,14 @@ describe("PaymentMethodChooser.test.js", () => {
     </IntlProvider>
     );
 
-  const defaultPaymentMethod = {name: '4242', data: { brand: 'VISA', expMonth: '01', expYear: '2020'}};
+  const defaultPaymentMethod = { service: 'stripe', name: '4242', data: { brand: 'VISA', expMonth: '01', expYear: '2020' } };
 
   const defaultValues = {
-    paymentMethodInUse: { name: '5555', data: { brand: 'VISA', expMonth:'02', expYear: '2021'}},
+    paymentMethodInUse: { service: 'stripe', name: '5555', data: { brand: 'VISA', expMonth:'02', expYear: '2021' } },
     paymentMethodsList: [defaultPaymentMethod],
     editMode: false,
     onSubmit: () => Promise.resolve(),
-    onCancel: () => Promise.resolve()
+    onCancel: () => Promise.resolve(),
   };
 
   const fillValue = (component, field, value) => {
@@ -43,7 +43,7 @@ describe("PaymentMethodChooser.test.js", () => {
   });
 
   it('shows selector when editMode is true', () => {
-    const values = Object.assign({}, defaultValues, {editMode: true});
+    const values = Object.assign({}, defaultValues, { editMode: true });
     const component = mountComponent(values);
 
     expect(component.find('.creditcardSelector').length).toEqual(1);
@@ -51,7 +51,7 @@ describe("PaymentMethodChooser.test.js", () => {
 
   // TODO: skipping this to get subscriptions out in time :(
   it.skip('shows creditcard form when "add card" is selected', () => {
-    const values = Object.assign({}, defaultValues, {editMode: true});
+    const values = Object.assign({}, defaultValues, { editMode: true });
     const component = mountComponent(values);
 
     // TODO: don't know why this fails. Issue with test, code is fine
@@ -60,5 +60,4 @@ describe("PaymentMethodChooser.test.js", () => {
     expect(component.find('.creditcard').length).toEqual(1);
 
   });
-
-})
+});
