@@ -75,14 +75,14 @@ class OrderForm extends React.Component {
     this.allowOrganizations = (order.tier.type !== 'TICKET');
 
     this.messages = defineMessages({
-      'order.contributeAs': { id: 'tier.order.contributeAs', defaultMessage: `Contribute as` },
-      'order.rsvpAs': { id: 'tier.order.rsvpAs', defaultMessage: `RSVP as` },
-      'order.profile.myself': { id: 'tier.order.profile.myself', defaultMessage: `myself` },
+      'order.contributeAs': { id: 'tier.order.contributeAs', defaultMessage: 'Contribute as' },
+      'order.rsvpAs': { id: 'tier.order.rsvpAs', defaultMessage: 'RSVP as' },
+      'order.profile.myself': { id: 'tier.order.profile.myself', defaultMessage: 'myself' },
       'order.success': { id: 'tier.order.success', defaultMessage: '🎉 Your order has been processed successfully' },
-      'order.error': { id: 'tier.order.error', defaultMessage: `An error occured 😳. The order didn't go through. Please try again in a few.` },
+      'order.error': { id: 'tier.order.error', defaultMessage: 'An error occured 😳. The order didn\'t go through. Please try again in a few.' },
       'order.button': { id: 'tier.order.button', defaultMessage: 'place order' },
-      'order.organization.create': { id: 'tier.order.organization.create', defaultMessage: `create an organization` },
-      'order.profile.logout': { id: 'tier.order.profile.logout', defaultMessage: `logout to create a new profile` },
+      'order.organization.create': { id: 'tier.order.organization.create', defaultMessage: 'create an organization' },
+      'order.profile.logout': { id: 'tier.order.profile.logout', defaultMessage: 'logout to create a new profile' },
       'error.email.invalid': { id: 'error.email.invalid', defaultMessage: 'Invalid email address' },
       'creditcard.label': { id: 'creditcard.label', defaultMessage: 'Credit Card' },
       'creditcard.save': { id: 'creditcard.save', defaultMessage: 'Save credit card to {type, select, user {my account} other {{type} account}}' },
@@ -92,14 +92,13 @@ class OrderForm extends React.Component {
       'paymentMethod.creditcard': { id: 'paymentMethod.creditcard', defaultMessage: 'credit card' },
       'paymentMethod.bitcoin': { id: 'paymentMethod.bitcoin', defaultMessage: 'bitcoin' },
       'paymentMethod.paypal': { id: 'paymentMethod.paypal', defaultMessage: 'paypal' },
-      'ocCard.label': {id: 'occard.label', defaultMessage: 'Gift Card'},
-      'ocCard.apply': {id: 'occard.apply', defaultMessage: 'Apply'},
-      'ocCard.invalid': {id: 'occard.invalid', defaultMessage: 'Invalid code'},
-      'ocCard.expired': {id: 'occard.expired', defaultMessage: 'Expired code'},
-      'ocCard.loading': {id: 'occard.loading', defaultMessage: 'Please wait...'},
-      'ocCard.amountremaining': {id: 'occard.amountremaining', defaultMessage: 'Valid code. Amount available: '},
-      'ocCard.amounterror': {id: 'occard.amounterror', defaultMessage: 'You can only contribute up to the amount available on your gift card.'},
-
+      'ocCard.label': { id: 'occard.label', defaultMessage: 'Gift Card' },
+      'ocCard.apply': { id: 'occard.apply', defaultMessage: 'Apply' },
+      'ocCard.invalid': { id: 'occard.invalid', defaultMessage: 'Invalid code' },
+      'ocCard.expired': { id: 'occard.expired', defaultMessage: 'Expired code' },
+      'ocCard.loading': { id: 'occard.loading', defaultMessage: 'Please wait...' },
+      'ocCard.amountremaining': { id: 'occard.amountremaining', defaultMessage: 'Valid code. Amount available: ' },
+      'ocCard.amounterror': { id: 'occard.amounterror', defaultMessage: 'You can only contribute up to the amount available on your gift card.' },
       'ticket.title': { id: 'tier.order.ticket.title', defaultMessage: 'RSVP' },
       'backer.title': { id: 'tier.order.backer.title', defaultMessage: 'Become a {name}' },
       'sponsor.title': { id: 'tier.order.sponsor.title', defaultMessage: 'Become a {name}' },
@@ -113,7 +112,7 @@ class OrderForm extends React.Component {
       'email.label': { id: 'user.email.label', defaultMessage: 'email' },
       'email.description': { id: 'user.email.description', defaultMessage: '* required' },
       'email.description.login': { id: 'signin.createAccount.description', defaultMessage: 'There is no user with this email address. Click on "Sign Up" to create a new Open Collective Account.' },
-      'email.description.signup': { id: 'signin.emailSent.description', defaultMessage: 'Login email sent. Please follow the instructions in that email to proceed.'},
+      'email.description.signup': { id: 'signin.emailSent.description', defaultMessage: 'Login email sent. Please follow the instructions in that email to proceed.' },
       'description.label': { id: 'user.description.label', defaultMessage: 'Short bio' },
       'description.description': { id: 'user.description.description', defaultMessage: 'Present yourself in 60 characters or less, if you can!' },
       'totalAmount.label': { id: 'tier.totalAmount.label', defaultMessage: 'Total amount' },
@@ -122,10 +121,7 @@ class OrderForm extends React.Component {
       'order.error.organization.name.required': { id: 'order.error.organization.name.required', defaultMessage: 'Please provide a name for the new organization' },
       'order.error.organization.website.required': { id: 'order.error.organization.website.required', defaultMessage: 'Please provide a website for the new organization' },
       'order.publicMessage.placeholder': { id: 'order.publicMessage.placeholder', defaultMessage: 'Use this space to add a personal message (public)' },
-      'newsletterOptIn.description': {
-        id: 'user.newsletterOptIn.description',
-        defaultMessage: 'Subscribe to the Open Collective newsletter.',
-      },
+      'newsletterOptIn.description': { id: 'user.newsletterOptIn.description', defaultMessage: 'Subscribe to the Open Collective newsletter.' },
     });
 
     this.fields = [
