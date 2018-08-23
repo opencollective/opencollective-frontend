@@ -33,9 +33,9 @@ class CollectiveCover extends React.Component {
     super(props);
     this.messages = defineMessages({
       'contribute': { id: 'collective.contribute', defaultMessage: 'contribute' },
-      'apply': { id: 'host.apply.btn', defaultMessage: "Apply to host your collective {collective}" },
+      'apply': { id: 'host.apply.btn', defaultMessage: 'Apply to host your collective {collective}' },
       'ADMIN': { id: 'roles.admin.label', defaultMessage: 'Core Contributor' },
-      'MEMBER': { id: 'roles.member.label', defaultMessage: 'Contributor' }
+      'MEMBER': { id: 'roles.member.label', defaultMessage: 'Contributor' },
     });
   }
 
@@ -148,6 +148,11 @@ ${description}`
         }
         .content a:hover {
           color: #444;
+          text-decoration: underline !important;
+        }
+        .content a:hover {
+          color: #444;
+          text-decoration: underline !important;
         }
         .USER .cover {
           display: block;

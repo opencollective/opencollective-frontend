@@ -21,17 +21,15 @@ class Hosts extends React.Component {
     this.messages = defineMessages({
       'hosts.title': { id: 'hosts.title', defaultMessage: 'Open Collective Hosts' },
       'hosts.description': { id: 'hosts.description', defaultMessage: 'Hosts are legal entities that collect money on behalf of open collectives so that they don\'t have to worry about accounting, taxes, etc. Some also provide extra services. {findOutMoreLink}' },
-      'hosts.findOutMoreLink': { id: 'hosts.description.findOutMoreLink', defaultMessage: 'Find out more about becoming an Open Collective Host.' },
     });
   }
 
   render() {
 
     const { LoggedInUser, intl } = this.props;
-    
+
     const title = intl.formatMessage(this.messages['hosts.title']);
-    const findOutMoreLink = intl.formatMessage(this.messages['hosts.findOutMoreLink']);;
-    const description = intl.formatMessage(this.messages['hosts.description'], { findOutMoreLink: <Link route="/faq/hosts/becoming-an-open-collective-host">{findOutMoreLink}</Link> });
+    const description = intl.formatMessage(this.messages['hosts.description'], { findOutMoreLink: '' });
 
     return (
       <div className="Hosts">
@@ -64,7 +62,7 @@ class Hosts extends React.Component {
           <HostsCover
             title={title}
             description={description}
-            href={`/hosts`}
+            href="/hosts"
             className="small"
             />
 

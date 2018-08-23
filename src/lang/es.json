@@ -408,6 +408,7 @@
   "cover.budget.text": "Thanks to your financial contributions, we are operating on an estimated annual budget of  {yearlyBudget}.",
   "hosts.title": "Open Collective Hosts",
   "hosts.description": "Hosts are legal entities that collect money on behalf of open collectives so that they don't have to worry about accounting, taxes, etc. Some also provide extra services.",
+  "hosts.description.findOutMoreLink": "Find out more about becoming an Open Collective Host.",
   "host.create.title": "Become a host",
   "uploadImage.placeholder": "Drop an image or click to upload",
   "uploadImage.isDragActive": "Drop it like it's hot 🔥",
