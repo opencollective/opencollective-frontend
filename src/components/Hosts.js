@@ -5,6 +5,7 @@ import Body from './Body';
 import Footer from './Footer';
 import HostsWithData from './HostsWithData';
 import HostsCover from './HostsCover';
+import Link from './Link';
 import { defineMessages } from 'react-intl';
 import withIntl from '../lib/withIntl';
 
@@ -19,7 +20,8 @@ class Hosts extends React.Component {
     this.state = { status: 'idle', result: {} };
     this.messages = defineMessages({
       'hosts.title': { id: 'hosts.title', defaultMessage: 'Open Collective Hosts' },
-      'hosts.description': { id: 'hosts.description', defaultMessage: 'Hosts are legal entities that collect money on behalf of open collectives so that they don\'t have to worry about accounting, taxes, etc. Some also provide extra services.' },
+      'hosts.description': { id: 'hosts.description', defaultMessage: 'Hosts are legal entities that collect money on behalf of open collectives so that they don\'t have to worry about accounting, taxes, etc. Some also provide extra services. {findOutMoreLink}' },
+      'hosts.findOutMoreLink': { id: 'hosts.description.findOutMoreLink', defaultMessage: 'Find out more about becoming an Open Collective Host.' },
     });
   }
 
@@ -28,7 +30,8 @@ class Hosts extends React.Component {
     const { LoggedInUser, intl } = this.props;
     
     const title = intl.formatMessage(this.messages['hosts.title']);
-    const description = intl.formatMessage(this.messages['hosts.description']);
+    const findOutMoreLink = intl.formatMessage(this.messages['hosts.findOutMoreLink']);;
+    const description = intl.formatMessage(this.messages['hosts.description'], { findOutMoreLink: <Link route="/faq/hosts/becoming-an-open-collective-host">{findOutMoreLink}</Link> });
 
     return (
       <div className="Hosts">

@@ -36,14 +36,17 @@ describe('create a collective', () => {
     cy.get('select[name="hostType"]').select('organization');
     fill('organization_name', 'new org');
     fill('organization_website', 'newco.com');
+    cy.wait(300);
     cy.get('#createHost .createOrganizationBtn').click();
-    cy.get('#createHost .inputField.HostCollectiveId').contains('new org');
+    cy.wait(300);
+    cy.get('#createHost .inputField.HostCollectiveId', { timeout: 10000 }).contains('new org');
     cy.get('#createHost .EditConnectedAccount .btn').contains('Connect Stripe');
     cy.get('#findHost input[type="radio"]').click();
     cy.get('#findHost a[href="/hosts"]').click();
     cy.get('.CollectiveCard', { timeout: 10000 }).should('have.length', 11);
     cy.get('.CollectiveCard').first().contains('collectives hosted');
     cy.get('.CollectiveCard').first().click();
+    cy.wait(300);
     cy.get('.ApplyToHostBtn', { timeout: 15000 }).contains('0% host fee');
     cy.get('.LoggedInUser .ApplyToHostBtn .Button:enabled').contains('Apply to host your collective New collective');
     cy.get('.LoggedInUser .ApplyToHostBtn .Button:enabled').click({ force: true });
