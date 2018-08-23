@@ -10,7 +10,7 @@ import queries from '../lib/queries';
 import { types } from '../constants/collectives';
 import roles from '../constants/roles';
 import { HOST_FEE_PERCENT } from '../constants/transactions';
-import { capitalize, flattenArray, getDomain } from '../lib/utils';
+import { capitalize, flattenArray, getDomain, formatCurrency } from '../lib/utils';
 import slugify from 'slug';
 import activities from '../constants/activities';
 import Promise from 'bluebird';
@@ -997,6 +997,9 @@ export default function(Sequelize, DataTypes) {
    * @param {*} creatorUser { id } (optional, falls back to hostCollective.CreatedByUserId)
    */
   Collective.prototype.addHost = function(hostCollective, creatorUser) {
+    if (this.HostCollectiveId) {
+      throw new Error(`This collective already has a host (HostCollectiveId: ${this.HostCollectiveId})`);
+    }
     const member = {
       role: roles.HOST,
       CreatedByUserId: creatorUser ? creatorUser.id : hostCollective.CreatedByUserId,
@@ -1006,6 +1009,40 @@ export default function(Sequelize, DataTypes) {
     return this.update({ HostCollectiveId: hostCollective.id })
       .then(() => models.Member.create(member));
   };
+
+  /**
+   * Change or remove host of the collective (only if balance === 0)
+   * Note: when changing host, we also set the collective.isActive to false
+   *       unless the creatorUser (remoteUser) is an admin of the host
+   * @param {*} newHostCollective: { id }
+   * @param {*} creatorUser { id }
+   */
+  Collective.prototype.changeHost = async function(newHostCollective, creatorUser) {
+    if (!newHostCollective || !newHostCollective.id === this.id) {
+      // do nothing
+      return;
+    }
+    const balance = await this.getBalance();
+    if (balance > 0) {
+      throw new Error(`Unable to change host: you still have a balance of ${formatCurrency(balance, this.currency)}`);
+    }
+    const membership = await models.Member.findOne({
+      where: { CollectiveId: this.id, MemberCollectiveId: this.HostCollectiveId, role: roles.HOST }
+    });
+    if (membership) {
+      membership.destroy();
+    }
+    this.HostCollectiveId = null;
+    this.isActive = false;
+    if (newHostCollective.id) {
+      if (creatorUser.isAdmin(newHostCollective.id)) {
+        this.update({ isActive: true });
+      }
+      return this.addHost(newHostCollective, creatorUser);
+    } else {
+      return this.save();
+    }
+  }
 
   // edit the list of members and admins of this collective (create/update/remove)
   // creates a User and a UserCollective if needed

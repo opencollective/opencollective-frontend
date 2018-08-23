@@ -32,6 +32,30 @@ const generateFXConversionSQL = (aggregate) => {
   return sql;
 };
 
+const getPublicHostsByTotalCollectives = (args) => {
+  let tagsCondition = '';
+  if (args.tags) {
+    tagsCondition = 'AND c.tags && $tags';
+  }
+  const query = `
+  WITH counts AS (
+    SELECT max(c.id) as "HostCollectiveId", count(m.id) as count FROM "Collectives" c
+    LEFT JOIN "Members" m ON m."MemberCollectiveId" = c.id AND m.role = 'HOST' AND m."deletedAt" IS NULL
+    WHERE c."settings" #>> '{apply}' IS NOT NULL
+      ${tagsCondition}
+      AND c."deletedAt" IS NULL
+    GROUP BY c.id
+  )
+  SELECT counts.count as collectives, c.*
+  FROM "Collectives" c INNER JOIN counts ON counts."HostCollectiveId" = c.id
+  ORDER BY ${args.orderBy} ${args.orderDirection} LIMIT ${args.limit} OFFSET ${args.offset}
+  `;
+  return sequelize.query(query, {
+    bind: { tags: args.tags || [] },
+    type: sequelize.QueryTypes.SELECT
+  })
+};
+
 const getTotalAnnualBudgetForHost = (HostCollectiveId) => {
   return sequelize.query(`
   WITH
@@ -742,6 +766,7 @@ if (useCache) {
 }
 
 const queries = {
+  getPublicHostsByTotalCollectives,
   getCollectivesOrderedByMonthlySpending,
   getCollectivesOrderedByMonthlySpendingQuery,
   getTotalDonationsByCollectiveType,

@@ -197,12 +197,12 @@ export const authenticateService = (req, res, next) => {
     return passport.authenticate(service, opts)(req, res, next);
   }
 
-  if (!req.query.CollectiveId) {
-    return next(new errors.ValidationFailed(`Please provide a CollectiveId as a query parameter`));
-  }
-
   if (!req.remoteUser || !req.remoteUser.isAdmin(req.query.CollectiveId)) {
     throw new errors.Unauthorized("Please login as an admin of this collective to add a connected account");
+  }
+
+  if (!req.query.CollectiveId) {
+    return next(new errors.ValidationFailed(`Please provide a CollectiveId as a query parameter`));
   }
 
   if (paymentProviders[service]) {

@@ -1,6 +1,7 @@
+import slugify from 'slug';
+import { get, omit } from 'lodash';
 import models from '../../models';
 import * as errors from '../errors';
-import slugify from 'slug';
 import { types } from '../../constants/collectives';
 import roles from '../../constants/roles';
 import activities from '../../constants/activities';
@@ -111,11 +112,11 @@ export function createCollective(_, args, req) {
           collectiveData.currency = 'GBP';
           args.collective.HostCollectiveId = 9806; // Open Collective UK Host
         }
-      } else {
-        args.collective.HostCollectiveId = 8674; // Open Collective Inc. Host
       }
       collectiveData.tags.push("Tech meetups");
     }
+  }
+  if (args.collective.HostCollectiveId) {
     promises.push(
       req.loaders
         .collective.findById.load(args.collective.HostCollectiveId)
@@ -164,15 +165,15 @@ export function createCollective(_, args, req) {
       }
     }
   })
-  .then(() => models.Collective.create(collectiveData))
+  .then(() => models.Collective.create(omit(collectiveData, 'HostCollectiveId')))
   .then(c => collective = c)
-  .then(() => collective.editTiers(collectiveData.tiers))
-  .then(() => collective.addUserWithRole(req.remoteUser, roles.ADMIN, { CreatedByUserId: req.remoteUser.id }))
   .then(() => {
-    if (collective.HostCollectiveId) {
+    if (collectiveData.HostCollectiveId) {
       return collective.addHost(hostCollective, req.remoteUser);
     }
   })
+  .then(() => collective.editTiers(collectiveData.tiers))
+  .then(() => collective.addUserWithRole(req.remoteUser, roles.ADMIN, { CreatedByUserId: req.remoteUser.id }))
   .then(() => collective.editPaymentMethods(args.collective.paymentMethods, { CreatedByUserId: req.remoteUser.id }))
   .then(async () => {
     // if the type of collective is an organization or an event, we don't notify the host
@@ -183,10 +184,10 @@ export function createCollective(_, args, req) {
     models.Activity.create({
       type: activities.COLLECTIVE_CREATED,
       UserId: req.remoteUser.id,
-      CollectiveId: hostCollective.id,
+      CollectiveId: get(hostCollective, 'id'),
       data: {
         collective: collective.info,
-        host: hostCollective.info,
+        host: get(hostCollective, 'info'),
         user: {
           email: req.remoteUser.email,
           collective: remoteUserCollective.info
@@ -286,6 +287,12 @@ export function editCollective(_, args, req) {
           errorMsg = `You must be logged in as an admin or as the host of this ${updatedCollectiveData.type.toLowerCase()} collective to edit it`;
       }
       return Promise.reject(new errors.Unauthorized({ message: errorMsg }));
+    }
+  })
+  .then(() => {
+    // If we try to change the host
+    if (updatedCollectiveData.HostCollectiveId !== undefined && updatedCollectiveData.HostCollectiveId !== collective.HostCollectiveId) {
+      return collective.changeHost({ id: updatedCollectiveData.HostCollectiveId }, req.remoteUser);
     }
   })
   .then(() => collective.update(updatedCollectiveData))

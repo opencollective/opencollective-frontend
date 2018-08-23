@@ -9,6 +9,8 @@ import { retrieveEvent } from './gateway';
 import creditcard from './creditcard';
 import stripeLib from 'stripe';
 import debugLib from 'debug';
+import { get } from 'lodash';
+import { addParamsToUrl } from '../../lib/utils';
 
 const debug = debugLib("stripe");
 const AUTHORIZE_URI = 'https://connect.stripe.com/oauth/authorize';
@@ -46,13 +48,14 @@ export default {
 
   oauth: {
     // Returns the redirectUrl to connect the Stripe Account to the Host Collective Id
-    redirectUrl: (remoteUser, CollectiveId) => {
+    redirectUrl: (remoteUser, CollectiveId, query) => {
       // Since we pass the redirectUrl in clear to the frontend, we cannot pass the CollectiveId in the state query variable
       // It would be trivial to change that value and attach a Stripe Account to someone else's collective
       // That's why we encode the state in a JWT
       const state = jwt.sign({
         CollectiveId,
-        CreatedByUserId: remoteUser.id
+        CreatedByUserId: remoteUser.id,
+        redirect: query.redirect,
       }, config.keys.opencollective.secret, {
         expiresIn: '45m' // People may need some time to set up their Stripe Account if they don't have one already
       });
@@ -76,12 +79,14 @@ export default {
       } catch (e) {
         return next(new errors.BadRequest(`Invalid JWT: ${e.message}`));
       }
-
-      const { CollectiveId, CreatedByUserId } = state;
+      debug("state", state);
+      const { CollectiveId, CreatedByUserId, redirect } = state;
 
       if (!CollectiveId) {
         return next(new errors.BadRequest('No state in the callback'));
       }
+
+      let redirectUrl = redirect;
 
       const createStripeAccount = data => models.ConnectedAccount.create({
         service: 'stripe',
@@ -131,6 +136,7 @@ export default {
       return models.Collective.findById(CollectiveId)
         .then(c => {
           collective = c;
+          redirectUrl = redirectUrl || `${config.host.website}/${collective.slug}`;
           if (collective.type === 'COLLECTIVE') {
             collective.becomeHost();
             collective.save();
@@ -146,8 +152,18 @@ export default {
         .then(getAccountInformation)
         .then(createStripeAccount)
         .then(updateHost)
-        .then(() => res.redirect(`${config.host.website}/${collective.slug}?message=StripeAccountConnected`))
-        .catch(next);
+        .then(() => {
+          redirectUrl = addParamsToUrl(redirectUrl, { message: 'StripeAccountConnected', CollectiveId: collective.id });
+          debug("redirectUrl", redirectUrl);
+          return res.redirect(redirectUrl)
+        })
+        .catch(e => {
+          if (get(e, 'data.error_description')) {
+            return next(new errors.BadRequest(e.data.error_description));
+          } else {
+            return next(e);
+          }
+        });
     }
   },
 

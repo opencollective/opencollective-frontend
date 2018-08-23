@@ -17,6 +17,7 @@ import {
   CollectiveSearchResultsType,
   TypeOfCollectiveType,
   CollectiveOrderFieldType,
+  HostCollectiveOrderFieldType
 } from './CollectiveInterface';
 
 import {
@@ -59,13 +60,18 @@ const queries = {
       id: { type: GraphQLInt }
     },
     resolve(_, args) {
+      let collective;
       if (args.slug) {
-        return models.Collective.findBySlug(args.slug.toLowerCase());
+        collective = models.Collective.findBySlug(args.slug.toLowerCase());
       } else if (args.id) {
-        return models.Collective.findById(args.id);
+        collective = models.Collective.findById(args.id);
       } else {
         return new Error("Please provide a slug or an id");
       }
+      if (!collective) {
+        throw new errors.NotFound("Collective not found");
+      }
+      return collective;
     }
   },
 
@@ -559,12 +565,18 @@ const queries = {
   allCollectives: {
     type: CollectiveSearchResultsType,
     args: {
-      tags: { type: new GraphQLList(GraphQLString) },
+      tags: {
+        type: new GraphQLList(GraphQLString),
+        description: "Fetch all collectives that match at least one of the tags",
+      },
       type: {
         type: TypeOfCollectiveType,
         description: "COLLECTIVE, USER, ORGANIZATION, EVENT"
       },
-      HostCollectiveId: { type: GraphQLInt },
+      HostCollectiveId: {
+        type: GraphQLInt,
+        description: "Fetch all collectives hosted by HostCollectiveId"
+      },
       hostCollectiveSlug: {
         type: GraphQLString,
         description: "Fetch all collectives hosted by hostCollectiveSlug"
@@ -637,7 +649,7 @@ const queries = {
       if (args.ParentCollectiveId) query.where.ParentCollectiveId = args.ParentCollectiveId;
       if (args.type) query.where.type = args.type;
       if (args.tags) query.where.tags = { [Op.overlap]: args.tags };
-      if (args.isActive) query.where.isActive = true;
+      if (typeof args.isActive === 'boolean') query.where.isActive = args.isActive;
 
       if (args.orderBy === 'balance' && (args.ParentCollectiveId || args.HostCollectiveId || args.tags)) {
         const { total, collectives } = await rawQueries.getCollectivesWithBalance(query.where, args);
@@ -668,7 +680,6 @@ const queries = {
           [Op.ne]: '',
         },
       };
-
       const result = await models.Collective.findAndCountAll(query);
 
       return {
@@ -677,6 +688,47 @@ const queries = {
         limit: args.limit,
         offset: args.offset,
       };
+    }
+  },
+
+  /*
+   * Returns all hosts
+   */
+  allHosts: {
+    type: CollectiveSearchResultsType,
+    description: "Returns all public hosts that are open for applications",
+    args: {
+      tags: {
+        type: new GraphQLList(GraphQLString),
+        description: "Fetch all collectives that match at least one of the tags",
+      },
+      orderBy: {
+        defaultValue: 'collectives',
+        type: HostCollectiveOrderFieldType
+      },
+      orderDirection: {
+        defaultValue: 'DESC',
+        type: OrderDirectionType,
+      },
+      limit: {
+        defaultValue: 10,
+        type: GraphQLInt,
+      },
+      offset: {
+        defaultValue: 0,
+        type: GraphQLInt
+      },
+    },
+    async resolve(_, args) {
+
+      const results = await rawQueries.getPublicHostsByTotalCollectives(args)
+      return {
+        total: results.length,
+        collectives: results,
+        limit: args.limit,
+        offset: args.offset,
+      }
+
     }
   },
 

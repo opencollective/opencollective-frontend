@@ -70,6 +70,25 @@ export const CollectiveOrderFieldType = new GraphQLEnumType({
   },
 });
 
+export const HostCollectiveOrderFieldType = new GraphQLEnumType({
+  name: 'HostCollectiveOrderFieldType',
+  description: 'Properties by which hosts can be ordered.',
+  values: {
+    createdAt: {
+      description: 'Order hosts by creation time.',
+    },
+    name: {
+      description: 'Order hosts by name.',
+    },
+    collectives: {
+      description: 'Order hosts by number of collectives it is hosting.',
+    },
+    updatedAt: {
+      description: 'Order hosts by updated time.',
+    },
+  },
+});
+
 export const BackersStatsType = new GraphQLObjectType({
   name: "BackersStatsType",
   description: "Breakdown of backers per type (ANY/USER/ORGANIZATION/COLLECTIVE)",
@@ -144,11 +163,10 @@ export const CollectivesStatsType = new GraphQLObjectType({
         type: GraphQLInt,
         description: "Returns the collectives hosted by this collective",
         async resolve(collective) {
-          return models.Collective.count({
+          return models.Member.count({
             where: {
-              HostCollectiveId: collective.id,
-              type: types.COLLECTIVE,
-              isActive: true
+              MemberCollectiveId: collective.id,
+              role: roles.HOST
             }
           });
         }
@@ -489,6 +507,7 @@ export const CollectiveInterfaceType = new GraphQLInterfaceType({
         args: {
           limit: { type: GraphQLInt },
           offset: { type: GraphQLInt },
+          type: { type: GraphQLString, description: "Type of collective (COLLECTIVE, EVENT, ORGANIZATION)" },
           role: { type: GraphQLString },
           roles: { type: new GraphQLList(GraphQLString) }
         }
@@ -822,6 +841,7 @@ const CollectiveFields = () => {
       args: {
         limit: { type: GraphQLInt },
         offset: { type: GraphQLInt },
+        type: { type: GraphQLString, description: "Type of collective (COLLECTIVE, EVENT, ORGANIZATION)" },
         role: { type: GraphQLString },
         roles: { type: new GraphQLList(GraphQLString) }
       },
@@ -831,13 +851,17 @@ const CollectiveFields = () => {
         if (roles && roles.length > 0) {
           where.role = { [Op.in]: roles };
         }
+        const collectiveConditions = { deletedAt: null };
+        if (args.type) {
+          collectiveConditions.type = args.type;
+        }
         return models.Member.findAll({
           where,
           limit: args.limit,
           offset: args.offset,
           include: [{
             model: models.Collective, as: 'collective',
-            where: { deletedAt: null },
+            where: collectiveConditions
           }]
         });
       }
