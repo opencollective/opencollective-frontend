@@ -95,7 +95,6 @@ paymentMethodProvider.processOrder = async (order, options = {}) => {
       throw new Error(`Payment Across hosts are only allowed when both have the same currency. Host ${fromCollectiveHost.name}` +
         ` is ${fromCollectiveHost.currency} and ${collectiveHost.name} is ${collectiveHost.currency}.`);
     }
-
     // try to find a credit card for the fromCollectiveHost
     const fromCollectiveHostPaymentMethod = await models.PaymentMethod.findOne({
       where: {
