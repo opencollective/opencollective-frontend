@@ -81,7 +81,7 @@ describe('graphql.paymentMethods.test.js', () => {
   });
 
   describe('add funds', () => {
-    let order, sandbox;
+    let paymentMethod, order, sandbox;
     const fxrate = 1.1654; // 1 EUR = 1.1654 USD
 
     beforeEach(() => {
@@ -94,6 +94,7 @@ describe('graphql.paymentMethods.test.js', () => {
           type: 'collective'
         }
       }).then(pm => {
+        paymentMethod = pm;
         order = {
           totalAmount: 1000, // €10
           collective: {
@@ -237,6 +238,49 @@ describe('graphql.paymentMethods.test.js', () => {
       expect(transaction.amountInHostCurrency).to.equal(Math.round(order.totalAmount * fxrate));
       expect(transaction.hostCurrencyFxRate).to.equal(fxrate);
       expect(transaction.amountInHostCurrency).to.equal(1165);
+    });
+
+    it('gets the list of fromCollectives for the opencollective payment method of the host', async () => {
+
+      // We add funds to the tipbox collective on behalf of Google and Facebook
+      order.fromCollective = {
+        name: "facebook",
+        website: "https://facebook.com"
+      };
+      let result;
+      result = await utils.graphqlQuery(createOrderQuery, { order }, admin);
+      result.errors && console.error(result.errors[0]);
+      order.fromCollective = {
+        name: "google",
+        website: "https://google.com"
+      };
+      result = await utils.graphqlQuery(createOrderQuery, { order }, admin);
+      result.errors && console.error(result.errors[0]);
+
+      // We fetch all the fromCollectives using the host paymentMethod
+      const paymentMethodQuery = `
+        query PaymentMethod($id: Int!) {
+          PaymentMethod(id: $id) {
+            id
+            service
+            type
+            fromCollectives {
+              total
+              collectives {
+                id
+                slug
+              }
+            }
+          }
+        }
+      `;
+      result = await utils.graphqlQuery(paymentMethodQuery, { id: paymentMethod.id }, admin);
+      result.errors && console.error(result.errors[0]);
+      const { total, collectives } = result.data.PaymentMethod.fromCollectives;
+      expect(total).to.equal(2);
+      const slugs = collectives.map(c => c.slug).sort();
+      expect(slugs[0]).to.equal('facebook');
+      expect(slugs[1]).to.equal('google');
     });
   });
 

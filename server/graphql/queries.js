@@ -910,7 +910,7 @@ const queries = {
   },
 
   /*
-   * Given a prepaid code, return validity and amount
+   * Deprecated: Given a prepaid code, return validity and amount
    */
   ocPaymentMethod: {
     type: PaymentMethodType,
@@ -927,6 +927,19 @@ const queries = {
           archivedAt: null // archived PMs are assumed to be used or inactive
         }
       });
+    }
+  },
+
+  /*
+   * Given a prepaid code, return validity and amount
+   */
+  PaymentMethod: {
+    type: PaymentMethodType,
+    args: {
+      id: { type: new GraphQLNonNull(GraphQLInt) }
+    },
+    resolve(_, args) {
+      return models.PaymentMethod.findById(args.id);
     }
   },
 
