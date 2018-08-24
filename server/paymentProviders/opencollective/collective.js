@@ -91,6 +91,11 @@ paymentMethodProvider.processOrder = async (order, options = {}) => {
     // If Hosts are not the same, then look for fromCollectiveHost Credit Card
     // and create transaction through the paymentLib Process order
   } else if (fromCollectiveHost.id !== collectiveHost.id) {
+    if (fromCollectiveHost.currency !== collectiveHost.currency) {
+      throw new Error(`Payment Across hosts are only allowed when both have the same currency. Host ${fromCollectiveHost.name}` +
+        ` is ${fromCollectiveHost.currency} and ${collectiveHost.name} is ${collectiveHost.currency}.`);
+    }
+
     // try to find a credit card for the fromCollectiveHost
     const fromCollectiveHostPaymentMethod = await models.PaymentMethod.findOne({
       where: {
