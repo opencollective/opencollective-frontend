@@ -19,7 +19,7 @@ const init = (skip_signin = false) => {
 
 const title = `New event ${Math.round(Math.random()*10000)}`;
 const updatedTitle = `New event updated ${Math.round(Math.random()*10000)}`;
-
+let i = 0;
 describe("event.create.test.js", () => {
 
   it ("create an event", () => {
@@ -42,13 +42,16 @@ describe("event.create.test.js", () => {
     cy.get(".EditTiers .tier .inputField.maxQuantity input").type("10");
     cy.get(".addTier").click();
     cy.get(".EditTiers .tier").last().find(".inputField.name input").type("Paid ticket");
-    cy.get(".EditTiers .tier").last().find(".inputField.amount input").type(15);
-    cy.get(".EditTiers .tier").last().find(".inputField.amount input").blur();
+    cy.get(".EditTiers .tier").last().find(".inputField.amount input").type(15).blur();
     cy.wait(300);
+    cy.screenshot(`s${i++}`);
     cy.get('.actions button').click();
     cy.wait(1000);
+    cy.screenshot(`s${i++}`);
     cy.get("#location .address").contains("Rue Lesbroussart 22, 1050");
     cy.get('#tickets .tier').should("have.length", 2);
+    cy.wait(500);
+    cy.screenshot(`s${i++}`);
     cy.get('#tickets .tier:nth-child(1) .amount').contains(15);
     cy.wait(300);
     cy.get(".desktopOnly .editCollective a").click();
@@ -59,6 +62,8 @@ describe("event.create.test.js", () => {
     cy.get('.actions button').click();
     cy.wait(1000);
     cy.reload(true);
+    cy.wait(500);
+    cy.screenshot(`s${i++}`);
     cy.get('#tickets .tier').should("have.length", 1);
     cy.get('.CollectiveCover h1').contains(updatedTitle);
   })
