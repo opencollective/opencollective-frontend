@@ -4,7 +4,7 @@ import gql from 'graphql-tag'
 import { FormControl } from 'react-bootstrap';
 import { graphql } from 'react-apollo'
 import { defineMessages, FormattedMessage } from 'react-intl';
-import { get, uniqBy, groupBy } from 'lodash';
+import { get, groupBy } from 'lodash';
 import withIntl from '../lib/withIntl';
 
 class AddFundsSourcePicker extends React.Component {

@@ -1,5 +1,5 @@
 # source: http://localhost:3000/api/graphql
-# timestamp: Wed Aug 22 2018 17:28:41 GMT+0200 (Central European Summer Time)
+# timestamp: Fri Aug 24 2018 16:39:15 GMT+0200 (Central European Summer Time)
 
 """Breakdown of backers per type (ANY/USER/ORGANIZATION/COLLECTIVE)"""
 type BackersStatsType {
@@ -1030,6 +1030,13 @@ type PaymentMethodType {
     """Only returns orders that have an active subscription (monthly/yearly)"""
     hasActiveSubscription: Boolean
   ): [OrderType]
+
+  """
+  Get the list of collectives that used this payment method. Useful to select
+  the list of a backers for which the host has manually added funds or to get
+  the list of backers that used a matching fund
+  """
+  fromCollectives(limit: Int, offset: Int): CollectiveSearchResults
   currency: String
 }
 
@@ -1145,6 +1152,7 @@ type Query {
   ): [Member]
   allEvents(slug: String, limit: Int, offset: Int): [CollectiveInterface]
   ocPaymentMethod(token: String!): PaymentMethodType
+  PaymentMethod(id: Int!): PaymentMethodType
   search(
     """
     Fetch collectives related to this term based on name, description, tags, slug, mission, and location
