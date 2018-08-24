@@ -43,15 +43,16 @@ class CollectiveCard extends React.Component {
       }
     }
 
-    const coverStyle = { ...get(collective, 'settings.style.hero.cover')};
-    const backgroundImage = imagePreview(collective.backgroundImage, collective.type === 'COLLECTIVE' && defaultBackgroundImage[collective.type], { width: 400 });
+    const coverStyle = get(collective, 'settings.style.hero.cover') || get(collective.parentCollective, 'settings.style.hero.cover') || {};
+    const backgroundImage = imagePreview(collective.backgroundImage || get(collective,'parentCollective.backgroundImage'), defaultBackgroundImage[collective.type], { width: 400 });
     if (!coverStyle.backgroundImage && backgroundImage) {
       coverStyle.backgroundImage = `url('${backgroundImage}')`;
       coverStyle.backgroundSize = 'cover';
       coverStyle.backgroundPosition = 'center center';
     }
 
-    const description = (collective.description && firstSentence(collective.description, 64)) ||(collective.longDescription && firstSentence(collective.longDescription, 64))
+    const truncatedDescription = (collective.description && firstSentence(collective.description, 80)) ||(collective.longDescription && firstSentence(collective.longDescription, 80))
+    const description = collective.description;
 
     let route = this.props.collective.path || `/${this.props.collective.slug}`;
     if (LoggedInUser) {
@@ -213,7 +214,7 @@ class CollectiveCard extends React.Component {
           </div>
           <div className="body">
             <div className="name">{collective.name}</div>
-            <div className="description">{description}</div>
+            <div className="description" title={description}>{truncatedDescription}</div>
           </div>
           <div className="footer">
             { collective.type === 'COLLECTIVE' && get(collective, 'stats.backers.all') &&
