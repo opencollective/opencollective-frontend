@@ -46,7 +46,7 @@ describe("event.create.test.js", () => {
     cy.wait(300);
     cy.screenshot(`s${i++}`);
     cy.get('.actions button').click();
-    cy.wait(1000);
+    cy.wait(500);
     cy.screenshot(`s${i++}`);
     cy.get("#location .address").contains("Rue Lesbroussart 22, 1050");
     cy.get('#tickets .tier').should("have.length", 2);
@@ -60,10 +60,9 @@ describe("event.create.test.js", () => {
     cy.get(".EditTiers .tier:nth-child(2) .removeTier").click();
     cy.wait(300);
     cy.get('.actions button').click();
-    cy.wait(1000);
+    cy.wait(500);
     cy.reload(true);
     cy.wait(500);
-    cy.screenshot(`s${i++}`);
     cy.get('#tickets .tier').should("have.length", 1);
     cy.get('.CollectiveCover h1').contains(updatedTitle);
   })
