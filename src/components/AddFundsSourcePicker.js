@@ -11,6 +11,7 @@ class AddFundsSourcePicker extends React.Component {
 
   static propTypes = {
     host: PropTypes.object,
+    paymentMethod: PropTypes.object.isRequired,
     collective: PropTypes.object,
     onChange: PropTypes.func
   }
@@ -26,15 +27,15 @@ class AddFundsSourcePicker extends React.Component {
   }
 
   onChange(e) {
-    const memberId = e.target.value;
-    this.props.onChange(memberId);
+    const FromCollectiveId = e.target.value;
+    this.props.onChange(FromCollectiveId);
   }
 
   renderSeparator(type) {
-    if (!this.membersByType[type]) return;
+    if (!this.fromCollectivesByType[type]) return;
     const { intl } = this.props;
 
-    let label = intl.formatMessage(this.messages[type.toLowerCase()], { n: this.membersByType[type].length });
+    let label = intl.formatMessage(this.messages[type.toLowerCase()], { n: this.fromCollectivesByType[type].length });
     if (label.length % 2 !== 0) {
       label += ' ';
     }
@@ -47,31 +48,31 @@ class AddFundsSourcePicker extends React.Component {
     return (<option value="">{`${dashes} ${(label).toUpperCase()} ${dashes}`}</option>)
   }
 
-  renderSourceEntry(member) {
-    return (<option key={`${member.member.type}-${member.member.id}`} value={member.member.id}>{member.member.name}</option>);
+  renderSourceEntry(fromCollective) {
+    return (<option key={`${fromCollective.type}-${fromCollective.id}`} value={fromCollective.id}>{fromCollective.name}</option>);
   }
 
   render() {
-    const { host, data: { loading, allMembers } } = this.props;
+    const { host, data: { loading, PaymentMethod } } = this.props;
     if (loading) return (<div />);
-    const uniqueMembers = uniqBy(allMembers, m => get(m, 'member.id'));
-    this.membersByType = {
+    const fromCollectives = get(PaymentMethod, 'fromCollectives.collectives', []).filter(c => c.id !== host.id);
+    this.fromCollectivesByType = {
       ORGANIZATION: [],
       COLLECTIVE: [],
       USER: [],
-      ...groupBy(uniqueMembers, m => get(m, 'member.type')),
+      ...groupBy(fromCollectives, m => get(m, 'type')),
     };
     return (
       <FormControl id="sourcePicker" name="template" componentClass="select" placeholder="select" onChange={this.onChange}>
         <option value={host.id}><FormattedMessage id="addfunds.fromCollective.host" values={{ host: host.name}} defaultMessage="Host ({host})" /></option>
-        { this.membersByType['COLLECTIVE'].length > 0 && this.renderSeparator("COLLECTIVE") }
-        { this.membersByType['COLLECTIVE'].map(this.renderSourceEntry) }
+        { this.fromCollectivesByType['COLLECTIVE'].length > 0 && this.renderSeparator("COLLECTIVE") }
+        { this.fromCollectivesByType['COLLECTIVE'].map(this.renderSourceEntry) }
 
-        { this.membersByType['ORGANIZATION'].length > 0 && this.renderSeparator("ORGANIZATION") }
-        { this.membersByType['ORGANIZATION'].map(this.renderSourceEntry) }
+        { this.fromCollectivesByType['ORGANIZATION'].length > 0 && this.renderSeparator("ORGANIZATION") }
+        { this.fromCollectivesByType['ORGANIZATION'].map(this.renderSourceEntry) }
 
-        { this.membersByType['USER'].length > 0 && this.renderSeparator("USER") }
-        { this.membersByType['USER'].map(this.renderSourceEntry) }
+        { this.fromCollectivesByType['USER'].length > 0 && this.renderSeparator("USER") }
+        { this.fromCollectivesByType['USER'].map(this.renderSourceEntry) }
 
         <option value="">---------------</option>
         <option value="other"><FormattedMessage id="addfunds.fromCollective.other" defaultMessage="other (please specify)" /></option>
@@ -111,16 +112,18 @@ class AddFundsSourcePickerForUser extends React.Component {
   }
 }
 
-
 const getSourcesQuery = gql`
-query allMembers($CollectiveId: Int) {
-  allMembers(CollectiveId: $CollectiveId, includeHostedCollectives: true) {
+query PaymentMethod($id: Int!) {
+  PaymentMethod(id: $id) {
     id
-    member {
-      id
-      type
-      name
-      slug
+    fromCollectives {
+      total
+      collectives {
+        id
+        type
+        name
+        slug
+      }
     }
   }
 }
@@ -129,7 +132,7 @@ query allMembers($CollectiveId: Int) {
 const addOrganizationsData = graphql(getSourcesQuery, {
   options: (props) => ({
     variables: {
-      CollectiveId: props.host.id
+      id: props.paymentMethod.id
     }
   })
 });

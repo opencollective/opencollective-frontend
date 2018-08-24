@@ -73,7 +73,8 @@ class AddFundsForm extends React.Component {
         component: AddFundsSourcePickerWithData,
         options: {
           collective: this.props.collective,
-          host: this.props.host
+          host: this.props.host,
+          paymentMethod: this.props.host.paymentMethods.find(pm => pm.service === 'opencollective'),
         }
       },
       {
