@@ -13,7 +13,8 @@ import GraphQLJSON from 'graphql-type-json';
 import he from 'he';
 
 import {
-  CollectiveInterfaceType
+  CollectiveInterfaceType,
+  CollectiveSearchResultsType
 } from './CollectiveInterface';
 
 import {
@@ -21,7 +22,7 @@ import {
   OrderDirectionType,
 } from './TransactionInterface';
 
-import models, { Op } from '../models';
+import models, { Op, sequelize } from '../models';
 import dataloaderSequelize from 'dataloader-sequelize';
 import { strip_tags } from '../lib/utils';
 import status from '../constants/expense_status';
@@ -1304,6 +1305,30 @@ export const PaymentMethodType = new GraphQLObjectType({
             ]
           }
           return paymentMethod.getOrders(query);
+        }
+      },
+      fromCollectives: {
+        type: CollectiveSearchResultsType,
+        args: {
+          limit: { type: GraphQLInt },
+          offset: { type: GraphQLInt }
+        },
+        description: 'Get the list of collectives that used this payment method. Useful to select the list of a backers for which the host has manually added funds or to get the list of backers that used a matching fund',
+        async resolve(paymentMethod, args) {
+          const res = await models.Transaction.findAll({
+            attributes: [ [sequelize.fn('DISTINCT', sequelize.col('FromCollectiveId')), 'FromCollectiveId']],
+            where: { PaymentMethodId: paymentMethod.id, type: 'CREDIT' },
+            logging: console.log
+          });
+          const FromCollectiveIds = res.map(r => r.dataValues.FromCollectiveId);
+          const result = await models.Collective.findAndCountAll({ where: { id: { [Op.in]: FromCollectiveIds }}});
+          const { count, rows } = result;
+          return {
+            total: count,
+            collectives: rows,
+            limit: args.limit,
+            offset: args.offset,
+          };
         }
       },
       currency: {

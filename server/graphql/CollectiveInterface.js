@@ -902,7 +902,7 @@ const CollectiveFields = () => {
         return {
           total: count,
           collectives: rows,
-          limit: args.limitg,
+          limit: args.limit,
           offset: args.offset,
         };
       }
