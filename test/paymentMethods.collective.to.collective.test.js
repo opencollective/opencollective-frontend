@@ -35,8 +35,9 @@ const createOrderQuery = `
 
 
 describe("paymentMethods.collective.to.collective.test.js", () => {
-  let sandbox, user1, user2, transactions,  collective1, collective2, collective3, collective4, host1,
-    host2, host3, organization, stripePaymentMethod, openCollectivePaymentMethod;
+  let sandbox, user1, user2, transactions,  collective1, collective2, 
+    collective3, collective4, collective5, collective6, host1, host2, host3, host4, 
+    organization, stripePaymentMethod, openCollectivePaymentMethod;
 
   before(async () => {
     await utils.resetTestDB();
@@ -56,13 +57,16 @@ describe("paymentMethods.collective.to.collective.test.js", () => {
 
     before('creates User 1', () => models.User.createUserWithCollective({ name: "User 1" }).then(u => user1 = u));
     before('creates User 2', () => models.User.createUserWithCollective({ name: "User 2" }).then(u => user2 = u));
-    before('create Host 1', () => models.Collective.create({ name: "Host 1", currency: "USD", isActive: true }).then(c => host1 = c));
-    before('create Host 2', () => models.Collective.create({ name: "Host 2", currency: "USD", isActive: true }).then(c => host2 = c));
-    before('create Host 3(In other Currency)', () => models.Collective.create({ name: "Host 3", currency: "EUR", isActive: true }).then(c => host3 = c));
-    before('create collective1', () => models.Collective.create({ name: "collective1", currency: "USD", HostCollectiveId: host1.id, isActive: true }).then(c => collective1 = c));
-    before('create collective2', () => models.Collective.create({ name: "collective2", currency: "USD", HostCollectiveId: host1.id, isActive: true }).then(c => collective2 = c));
-    before('create collective3', () => models.Collective.create({ name: "collective3", currency: "USD", HostCollectiveId: host2.id, isActive: true }).then(c => collective3 = c));
-    before('create collective4', () => models.Collective.create({ name: "collective4", currency: "EUR", HostCollectiveId: host3.id, isActive: true }).then(c => collective4 = c));
+    before('create Host 1(USD)', () => models.Collective.create({ name: "Host 1", currency: "USD", isActive: true }).then(c => host1 = c));
+    before('create Host 2(USD)', () => models.Collective.create({ name: "Host 2", currency: "USD", isActive: true }).then(c => host2 = c));
+    before('create Host 3(EUR)', () => models.Collective.create({ name: "Host 3", currency: "EUR", isActive: true }).then(c => host3 = c));
+    before('create Host 4(EUR)', () => models.Collective.create({ name: "Host 4", currency: "EUR", isActive: true }).then(c => host4 = c));
+    before('create collective1(currency USD, hostCurrency:USD)', () => models.Collective.create({ name: "collective1", currency: "USD", HostCollectiveId: host1.id, isActive: true }).then(c => collective1 = c));
+    before('create collective2(currency USD, hostCurrency:USD)', () => models.Collective.create({ name: "collective2", currency: "USD", HostCollectiveId: host1.id, isActive: true }).then(c => collective2 = c));
+    before('create collective3(currency USD, hostCurrency:USD)', () => models.Collective.create({ name: "collective3", currency: "USD", HostCollectiveId: host2.id, isActive: true }).then(c => collective3 = c));
+    before('create collective4(currency EUR, hostCurrency:EUR)', () => models.Collective.create({ name: "collective4", currency: "EUR", HostCollectiveId: host3.id, isActive: true }).then(c => collective4 = c));
+    before('create collective5(currency USD, hostCurrency:EUR)', () => models.Collective.create({ name: "collective5", currency: "USD", HostCollectiveId: host3.id, isActive: true }).then(c => collective5 = c));
+    before('create collective6(currency USD, hostCurrency:EUR)', () => models.Collective.create({ name: "collective6", currency: "USD", HostCollectiveId: host4.id, isActive: true }).then(c => collective6 = c));
     before('create an organization', () => models.Collective.create({ name: "pubnub", currency: "USD" }).then(o => organization = o));
     before('create a payment method', async () => models.PaymentMethod.create({
       name: '4242',
@@ -85,6 +89,23 @@ describe("paymentMethods.collective.to.collective.test.js", () => {
         PaymentMethodId: stripePaymentMethod.id,
         currency: collective1.currency,
         HostCollectiveId: collective1.HostCollectiveId,
+        type: 'DEBIT'
+      };
+      await models.Transaction.createManyDoubleEntry(transactions, transactionsDefaultValue);
+    });
+    beforeEach('create transactions for 3 donations from organization to collective5', async () => {
+      transactions = [
+        { amount: 500, netAmountInCollectiveCurrency: 500 },
+        { amount: 200, netAmountInCollectiveCurrency: 200 },
+        { amount: 1000,netAmountInCollectiveCurrency: 1000 }
+      ];
+      const transactionsDefaultValue = {
+        CreatedByUserId: user1.id,
+        FromCollectiveId: organization.id,
+        CollectiveId: collective5.id,
+        PaymentMethodId: stripePaymentMethod.id,
+        currency: collective5.currency,
+        HostCollectiveId: collective5.HostCollectiveId,
         type: 'DEBIT'
       };
       await models.Transaction.createManyDoubleEntry(transactions, transactionsDefaultValue);
@@ -274,7 +295,7 @@ describe("paymentMethods.collective.to.collective.test.js", () => {
       expect(res.errors[0].message).to.contain('don\'t have enough funds available ');
     });/** END OF "Cannot send money that exceeds Collective balance" */
 
-    it('Cannot send money If Hosts of Collectives have different currencies', async () => {
+    it('Cannot send money if The Collectives have different currencies', async () => {
       // Add user1 as an ADMIN of collective1
       await models.Member.create({
         CreatedByUserId: user1.id,
@@ -312,9 +333,122 @@ describe("paymentMethods.collective.to.collective.test.js", () => {
       // Then there should be errors
       expect(res.errors).to.exist;
       expect(res.errors).to.not.be.empty;
-      expect(res.errors[0].message).to.contain('Payment Across hosts are only allowed when both have the same currency.');
+      expect(res.errors[0].message).to.contain('Payments Across hosts are only allowed when both Collectives have the same currency.');
+
+    });/** END OF "Cannot send money if The Collectives have different currencies" */
+
+    it('Cannot send money If Hosts of Collectives have different currencies', async () => {
+      // Add user1 as an ADMIN of collective1
+      await models.Member.create({
+        CreatedByUserId: user1.id,
+        MemberCollectiveId: user1.CollectiveId,
+        CollectiveId: collective1.id,
+        role: 'ADMIN'
+      });
+
+      // Create stripe connected account to host of collective1
+      await store.stripeConnectedAccount(collective1.HostCollectiveId);
+      // Add credit card to collective1
+      await models.PaymentMethod.create({
+        name: '4242',
+        service: 'stripe',
+        type: 'creditcard',
+        token: 'tok_123456781234567812345678',
+        CollectiveId: collective1.HostCollectiveId,
+        monthlyLimitPerMember: 10000
+      });
+
+      // finding opencollective payment method for collective1
+      openCollectivePaymentMethod = await models.PaymentMethod.findOne({ where: {type: 'collective', CollectiveId: collective1.id}});
+
+      // Setting up order with amount less than the credit card monthly limit
+      const order = {
+        fromCollective: { id: collective1.id },
+        collective: { id: collective5.id },
+        paymentMethod: { uuid: openCollectivePaymentMethod.uuid },
+        totalAmount: 1000,
+      }
+
+      // Executing queries
+      const res = await utils.graphqlQuery(createOrderQuery, { order }, user1);
+
+      // Then there should be errors
+      expect(res.errors).to.exist;
+      expect(res.errors).to.not.be.empty;
+      expect(res.errors[0].message).to.contain('Payment Across Hosts are only allowed when both Hosts have the same currency.');
 
     });/** END OF "Cannot send money If Hosts of Collectives have different currencies" */
+
+    it('Transaction between Collectives with same currency(collective5 USD and collective6 USD) with different hosts that have the same currency(host3 EUR and host4 EUR) that\'s different from the collectives currencies', async () => {
+      // Add user1 as an ADMIN of collective5
+      await models.Member.create({
+        CreatedByUserId: user1.id,
+        MemberCollectiveId: user1.CollectiveId,
+        CollectiveId: collective5.id,
+        role: 'ADMIN'
+      });
+
+      // Create stripe connected account to host of collective1
+      await store.stripeConnectedAccount(collective5.HostCollectiveId);
+      // Add credit card to collective1
+      await models.PaymentMethod.create({
+        name: '4242',
+        service: 'stripe',
+        type: 'creditcard',
+        token: 'tok_123456781234567812345678',
+        CollectiveId: collective5.HostCollectiveId,
+        monthlyLimitPerMember: 10000
+      });
+
+      // Create stripe connected account to host of collective6
+      await store.stripeConnectedAccount(collective6.HostCollectiveId);
+      // Add credit card to collective3
+      await models.PaymentMethod.create({
+        name: '4343',
+        service: 'stripe',
+        type: 'creditcard',
+        token: 'tok_123456781234567812345678',
+        CollectiveId: collective6.HostCollectiveId,
+        monthlyLimitPerMember: 10000
+      });
+      
+      // finding opencollective payment method for collective1
+      openCollectivePaymentMethod = await models.PaymentMethod.findOne({ where: {type: 'collective', CollectiveId: collective5.id}});
+
+      // Setting up order with amount less than the credit card monthly limit
+      const order = {
+        fromCollective: { id: collective5.id },
+        collective: { id: collective6.id },
+        paymentMethod: { uuid: openCollectivePaymentMethod.uuid },
+        totalAmount: 1000,
+      }
+
+      // Executing queries
+      const res = await utils.graphqlQuery(createOrderQuery, { order }, user1);
+      
+      // Then there should be no errors
+      res.errors && console.error(res.errors);
+      expect(res.errors).to.not.exist;
+
+      // When the order is created
+      // Then the created transaction should match the requested data
+      const orderCreated = res.data.createOrder;
+      const transaction = await models.Transaction.findOne({
+        where: {
+          CollectiveId: orderCreated.collective.id,
+          FromCollectiveId: orderCreated.fromCollective.id,
+          amount: order.totalAmount,
+        }
+      });
+      // make sure the transaction has been recorded
+      expect(transaction.FromCollectiveId).to.equal(collective5.id);
+      expect(transaction.CollectiveId).to.equal(collective6.id);
+      expect(transaction.currency).to.equal(collective5.currency);
+
+    });/** END OF "Transaction between Collectives with same currency(collective5 USD and collective6 USD) with different hosts that have the same currency(host3 EUR and host4 EUR) that\'s different from the collectives currencies" */
+
+
+
 
     it('Transactions between Collectives through different hosts must have NO platform fees but still have stripe and host fees', async () => {
       // Add user1 as an ADMIN of collective1
@@ -373,7 +507,6 @@ describe("paymentMethods.collective.to.collective.test.js", () => {
       const transaction = await models.Transaction.findOne({
         where: { CollectiveId: orderCollective.id, amount: order.totalAmount }
       });
-
       // Then Check basic Transaction data
       expect(transaction.FromCollectiveId).to.equal(orderFromCollective.id);
       expect(orderCollective.id).to.equal(collective3.id);
