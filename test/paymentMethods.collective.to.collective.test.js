@@ -447,9 +447,6 @@ describe("paymentMethods.collective.to.collective.test.js", () => {
 
     });/** END OF "Transaction between Collectives with same currency(collective5 USD and collective6 USD) with different hosts that have the same currency(host3 EUR and host4 EUR) that\'s different from the collectives currencies" */
 
-
-
-
     it('Transactions between Collectives through different hosts must have NO platform fees but still have stripe and host fees', async () => {
       // Add user1 as an ADMIN of collective1
       await models.Member.create({
