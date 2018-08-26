@@ -145,6 +145,7 @@ ${description}`
         }
         .content, .content a {
           color: white;
+          text-shadow: 1px 0 1px rgba(0, 0, 0, 0.8), 0 -1px 1px rgba(0, 0, 0, 0.8), 0 1px 1px rgba(0, 0, 0, 0.8), -1px 0 1px rgba(0, 0, 0, 0.8);
         }
         .content a:hover {
           color: #444;
