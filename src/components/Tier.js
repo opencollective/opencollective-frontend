@@ -39,9 +39,24 @@ class Tier extends React.Component {
       'interval.label': { id: 'tier.interval.label', defaultMessage: 'interval' },
       'interval.onetime': { id: 'tier.interval.onetime', defaultMessage: 'one time' },
       'interval.month': { id: 'tier.interval.month', defaultMessage: 'month' },
-      'interval.year': { id: 'tier.interval.year', defaultMessage: 'year' }
+      'interval.year': { id: 'tier.interval.year', defaultMessage: 'year' },
     });
 
+    this.defaultDescription = <FormattedMessage id="tier.defaultDescription" defaultMessage="Become a {name} for {amount} per {interval} and help us sustain our activities!" values={{ name: props.tier.name, amount: formatCurrency(props.tier.amount, props.tier.currency), interval: props.tier.interval }} />;
+
+    switch (props.tier.type) {
+      case 'TICKET':
+        this.buttonLabel = (<FormattedMessage id="tier.ticket.button" values={{ quantity: this.state.response.quantity }} defaultMessage="{quantity, plural, one {Get this ticket} other {Get those tickets}}" />);
+        break;
+      case 'DONATION':
+        this.buttonLabel = (<FormattedMessage id="tier.donation.button" defaultMessage="donate" />);
+        this.defaultDescription = (<FormattedMessage id="tier.donation.description" defaultMessage="Thank you for your kind donation 🙏" />);
+        break;
+      case 'TIER':
+      default:
+        this.buttonLabel = (<FormattedMessage id="tier.button" values={{ name: this.props.tier.name }} defaultMessage="become a {name}" />);
+        break;
+    }
 
   }
 
@@ -281,7 +296,7 @@ class Tier extends React.Component {
             <div className="title" >{capitalize(name)}</div>
             { !presets &&
               <div className="title amount" >
-                { !amount && !presets && <FormattedMessage id="amount.free" defaultMessage="free" /> }
+                { !amount && !presets && tier.type !== 'DONATION' && <FormattedMessage id="amount.free" defaultMessage="free" /> }
                 { amount > 0 && <Currency value={amount} currency={currency} /> }
                 { interval &&
                   <div className="interval">
@@ -297,7 +312,7 @@ class Tier extends React.Component {
           </div>
           <div className="description">
             { description && <Markdown source={description} /> }
-            { !description && <p><FormattedMessage id="tier.defaultDescription" defaultMessage="Become a {name} for {amount} per {interval} and help us sustain our activities!" values={{ name: tier.name, amount: formatCurrency(tier.amount, tier.currency), interval: tier.interval}} /></p> }
+            { !description && <p>{this.defaultDescription}</p> }
 
             { presets &&
               <div>
@@ -351,12 +366,12 @@ class Tier extends React.Component {
           { type === 'TICKET' &&
             <div id="actions" className="actions">
               <TicketController value={quantity} onChange={(value) => this.handleTicketsChange(value)} />
-              {this.props.onClick && <CTAButton className="ctabtn blue ticket" label={(<FormattedMessage id="tier.GetTicket" values={{ quantity }} defaultMessage={`{quantity, plural, one {get ticket} other {get tickets}}`} />)} onClick={this.handleSubmit} />}
+              {this.props.onClick && <CTAButton className="ctabtn blue ticket" label={this.buttonLabel} onClick={this.handleSubmit} />}
             </div>
           }
           { type !== 'TICKET' && this.props.onClick &&
             <div id="actions" className="actions">
-              <CTAButton className="ctabtn blue" label={tier.button || (<FormattedMessage id="tier.GetTier" values={{name}} defaultMessage={`become a {name}`} />)} onClick={this.handleSubmit} />
+              <CTAButton className="ctabtn blue" label={tier.button || this.buttonLabel} onClick={this.handleSubmit} />
             </div>
           }
         </div>
