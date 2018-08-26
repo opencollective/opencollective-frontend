@@ -162,11 +162,6 @@ injectGlobal`
     font-weight: bold;
   }
 
-  .getTicketForm {
-    margin: 20px auto;
-    max-width: 400px;
-  }
-
   .map {
     border: 1px solid #eee;
     height: 300px;
