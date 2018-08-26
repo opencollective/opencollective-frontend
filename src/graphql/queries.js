@@ -437,6 +437,7 @@ const getEventCollectiveQuery = gql`
       }
       name
       image
+      backgroundImage
       description
       longDescription
       startsAt
