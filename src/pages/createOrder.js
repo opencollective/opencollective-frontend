@@ -57,8 +57,8 @@ class CreateOrderPage extends React.Component {
       'payment.title': { id: 'tier.name.payment', defaultMessage: 'payment' },
       'order.success': { id: 'tier.order.success', defaultMessage: 'order processed successfully' },
       'order.error': { id: 'tier.order.error', defaultMessage: '😱 Oh crap! An error occured. Try again, or shoot a quick email to support@opencollective.com and we\'ll figure things out.' },
-      'tier.button.donation': { id: 'tier.button.donation', defaultMessage: 'donate' },
-      'tier.description.donation': { id: 'tier.description.donation', defaultMessage: 'Thank you for your kind donation 🙏' }
+      'tier.donation.button': { id: 'tier.donation.button', defaultMessage: 'donate' },
+      'tier.donation.description': { id: 'tier.donation.description', defaultMessage: 'Thank you for your kind donation 🙏' }
     });
   }
 
@@ -139,15 +139,13 @@ class CreateOrderPage extends React.Component {
       type: this.defaultType,
       currency: collective.currency,
       interval: this.order.interval,
-      button: intl.formatMessage(this.messages['tier.button.donation']),
-      description: description || intl.formatMessage(this.messages['tier.description.donation'])
+      button: intl.formatMessage(this.messages['tier.donation.button']),
+      description: description || intl.formatMessage(this.messages['tier.donation.description']),
     };
 
     this.order.tier = tier;
     this.order.description = description;
 
-    // Tier names are inconsistent - singular or plural
-    // To avoid header like "Become a backers", this hack removes the last character if it's an 's'
     const coverClassName = collective.type === 'EVENT' ? 'small' : '';
 
     return (
@@ -176,7 +174,7 @@ class CreateOrderPage extends React.Component {
 
           <CollectiveCover
             collective={collective}
-            href={`/${collective.slug}`}
+            href={collective.path}
             LoggedInUser={LoggedInUser}
             className={coverClassName}
             />

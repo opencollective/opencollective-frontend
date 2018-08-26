@@ -5,7 +5,6 @@ import Body from './Body';
 import Footer from './Footer';
 import CollectiveCover from './CollectiveCover';
 import Location from './Location';
-import HashLink from 'react-scrollchor';
 import Tier from './Tier';
 import NotificationBar from './NotificationBar';
 import InterestedForm from './InterestedForm';
@@ -13,7 +12,7 @@ import Sponsors from './Sponsors';
 import Responses from './Responses';
 import { capitalize, filterCollection, trimObject } from '../lib/utils';
 import Markdown from 'react-markdown';
-import { defineMessages, FormattedMessage, FormattedDate, FormattedTime } from 'react-intl';
+import { defineMessages, FormattedMessage } from 'react-intl';
 import { uniqBy, get, union } from 'lodash';
 import { Router } from '../server/pages';
 import { addEventMutations } from '../graphql/mutations';
@@ -212,21 +211,6 @@ class Event extends React.Component {
       }
     }
 
-    const info = (
-      <HashLink to="#location">
-        {!event.startsAt &&
-          console.warn(`Event: event.startsAt should not be empty. event.id: ${event.id}`)
-        }
-        {event.startsAt &&
-          <React.Fragment>
-            <FormattedDate value={event.startsAt} timeZone={event.timezone} weekday="short" day="numeric" month="long" />, &nbsp;
-            <FormattedTime value={event.startsAt} timeZone={event.timezone} />&nbsp; - &nbsp;
-          </React.Fragment>
-        }
-        {event.location.name}
-      </HashLink>
-    );
-
     const backgroundImage = event.backgroundImage || get(event, 'parentCollective.backgroundImage') || defaultBackgroundImage;
 
     return (
@@ -283,7 +267,6 @@ class Event extends React.Component {
               <CollectiveCover
                 collective={event}
                 title={event.name}
-                description={info}
                 LoggedInUser={LoggedInUser}
                 style={get(event, 'settings.style.hero.cover') || get(event.parentCollective, 'settings.style.hero.cover')}
                 />

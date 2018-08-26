@@ -96,17 +96,17 @@ describe("Tier component", () => {
           quantity: 2,
           amount: 2 * ticket.amount,
           singleAmount: ticket.amount,
-          id: ticket.id
-        })
+          id: ticket.id,
+        });
         done();
-      }
+      };
 
-      const component = mountComponent({ tier: ticket, values: {quantity: 2}, onClick })
+      const component = mountComponent({ tier: ticket, values: { quantity: 2 }, onClick });
 
+      if (DEBUG) console.log(">>> state", component.state());
       expect(component.find('.title').first().text()).toEqual(capitalize(ticket.name));
       expect(component.find('.ctabtn').hostNodes().text()).toEqual('get tickets');
       component.find('.ctabtn').hostNodes().simulate('click');
-      if (DEBUG) console.log(">>> state", component.state());
     });
   })
 
