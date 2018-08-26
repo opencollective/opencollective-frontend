@@ -568,7 +568,7 @@
   "TicketsConfirmed.SeeYouSoon": "See you soon!",
   "tier.customAmount.error.minimumAmount": "Minimum amount should be {minimumAmount}",
   "tier.defaultDescription": "Become a {name} for {amount} per {interval} and help us sustain our activities!",
-  "tier.ticket.button": "{quantity, plural, one {Get this ticket} other {Get those tickets}}",
+  "tier.ticket.button": "{quantity, plural, one {get ticket} other {get tickets}}",
   "tier.donation.button": "donate",
   "tier.donation.description": "Thank you for your kind donation 🙏",
   "tier.button": "become a {name}",

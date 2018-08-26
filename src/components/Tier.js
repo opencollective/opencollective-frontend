@@ -45,9 +45,6 @@ class Tier extends React.Component {
     this.defaultDescription = <FormattedMessage id="tier.defaultDescription" defaultMessage="Become a {name} for {amount} per {interval} and help us sustain our activities!" values={{ name: props.tier.name, amount: formatCurrency(props.tier.amount, props.tier.currency), interval: props.tier.interval }} />;
 
     switch (props.tier.type) {
-      case 'TICKET':
-        this.buttonLabel = (<FormattedMessage id="tier.ticket.button" values={{ quantity: this.state.response.quantity }} defaultMessage="{quantity, plural, one {Get this ticket} other {Get those tickets}}" />);
-        break;
       case 'DONATION':
         this.buttonLabel = (<FormattedMessage id="tier.donation.button" defaultMessage="donate" />);
         this.defaultDescription = (<FormattedMessage id="tier.donation.description" defaultMessage="Thank you for your kind donation 🙏" />);
@@ -122,7 +119,7 @@ class Tier extends React.Component {
     const response = Object.assign({}, tier, {
       amount: currentValues.amount,
       interval: currentValues.interval,
-      quantity: currentValues.quantity
+      quantity: currentValues.quantity,
     });
 
     // Make sure that the custom amount entered by the user is never under the minimum preset amount
@@ -154,7 +151,11 @@ class Tier extends React.Component {
     const intervals = [ null, 'month', 'year'];
     const currentValues = this.calcCurrentValues();
     const { quantity, amount, interval, presets } = currentValues;
-    const anchor = (get(tier, 'name') || "").toLowerCase().replace(/ /g,'-');
+    const anchor = (get(tier, 'name') || '').toLowerCase().replace(/ /g,'-');
+
+    if (type === 'TICKET') {
+      this.buttonLabel = (<FormattedMessage id="tier.ticket.button" values={{ quantity }} defaultMessage="{quantity, plural, one {get ticket} other {get tickets}}" />);
+    }
 
     return (
       <div className={`${this.props.className} tier ${this.props.onClick ? 'withCTA' : ''}`} id={anchor}>
@@ -296,7 +297,7 @@ class Tier extends React.Component {
             <div className="title" >{capitalize(name)}</div>
             { !presets &&
               <div className="title amount" >
-                { !amount && !presets && tier.type !== 'DONATION' && <FormattedMessage id="amount.free" defaultMessage="free" /> }
+                { !amount && tier.type !== 'DONATION' && <FormattedMessage id="amount.free" defaultMessage="free" /> }
                 { amount > 0 && <Currency value={amount} currency={currency} /> }
                 { interval &&
                   <div className="interval">
