@@ -14,7 +14,6 @@ import Button from './Button';
 import GoalsCover from './GoalsCover';
 import MenuBar from './MenuBar';
 import TopBackersCoverWithData from './TopBackersCoverWithData';
-import HashLink from 'react-scrollchor';
 
 class CollectiveCover extends React.Component {
 
@@ -41,8 +40,9 @@ class CollectiveCover extends React.Component {
 
     this.description = props.description || props.collective.description;
     if (props.collective.type === 'EVENT') {
+      const eventLocationRoute = props.href ? `${props.href}#location` : '#location';
       this.description = (
-        <HashLink to="#location">
+        <Link route={eventLocationRoute}>
           {!props.collective.startsAt &&
             console.warn(`Event: props.collective.startsAt should not be empty. props.collective.id: ${props.collective.id}`)
           }
@@ -53,7 +53,7 @@ class CollectiveCover extends React.Component {
             </React.Fragment>
           }
           {props.collective.location.name}
-        </HashLink>
+        </Link>
       );
     }
   }

@@ -174,6 +174,7 @@ class CreateOrderPage extends React.Component {
 
           <CollectiveCover
             collective={collective}
+            href={collective.path}
             LoggedInUser={LoggedInUser}
             className={coverClassName}
             />
