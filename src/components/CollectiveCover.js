@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import withIntl from '../lib/withIntl';
-import { defineMessages, FormattedMessage } from 'react-intl';
+import { defineMessages, FormattedMessage, FormattedDate, FormattedTime } from 'react-intl';
 import { get } from 'lodash';
 import { prettyUrl, imagePreview } from '../lib/utils';
 import Currency from './Currency';
@@ -14,6 +14,7 @@ import Button from './Button';
 import GoalsCover from './GoalsCover';
 import MenuBar from './MenuBar';
 import TopBackersCoverWithData from './TopBackersCoverWithData';
+import HashLink from 'react-scrollchor';
 
 class CollectiveCover extends React.Component {
 
@@ -37,6 +38,24 @@ class CollectiveCover extends React.Component {
       'ADMIN': { id: 'roles.admin.label', defaultMessage: 'Core Contributor' },
       'MEMBER': { id: 'roles.member.label', defaultMessage: 'Contributor' },
     });
+
+    this.description = props.description || props.collective.description;
+    if (props.collective.type === 'EVENT') {
+      this.description = (
+        <HashLink to="#location">
+          {!props.collective.startsAt &&
+            console.warn(`Event: props.collective.startsAt should not be empty. props.collective.id: ${props.collective.id}`)
+          }
+          {props.collective.startsAt &&
+            <React.Fragment>
+              <FormattedDate value={props.collective.startsAt} timeZone={props.collective.timezone} weekday="short" day="numeric" month="long" />, &nbsp;
+              <FormattedTime value={props.collective.startsAt} timeZone={props.collective.timezone} />&nbsp; - &nbsp;
+            </React.Fragment>
+          }
+          {props.collective.location.name}
+        </HashLink>
+      );
+    }
   }
 
   getMemberTooltip(member) {
@@ -72,7 +91,6 @@ ${description}`
 
     const href = this.props.href || collective.path || `/${collective.slug}`;
     const title = this.props.title || collective.name;
-    const description = this.props.description || collective.description;
     const backgroundImage = imagePreview(collective.backgroundImage || get(collective,'parentCollective.backgroundImage'), defaultBackgroundImage[collective.type], { height: 500 });
     const customStyles = get(collective, 'settings.style.hero.cover') || get(collective.parentCollective, 'settings.style.hero.cover');
     const style = {
@@ -284,7 +302,7 @@ ${description}`
               { collective.type !== 'USER' && <Logo src={logo} className="logo" type={collective.type} website={collective.website} height="10rem" /> }
             </Link>
             <h1>{title}</h1>
-            { description && <p className="description">{description}</p> }
+            { this.description && <p className="description">{this.description}</p> }
             { className !== 'small' &&
               <div>
                 { company && company.substr(0,1) === '@' && <p className="company"><Link route={`/${company.substr(1)}`}>{company.substr(1)}</Link></p> }

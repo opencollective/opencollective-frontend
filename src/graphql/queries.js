@@ -458,6 +458,7 @@ const getEventCollectiveQuery = gql`
         name
         description
         amount
+        presets
         currency
         maxQuantity
       }
