@@ -384,7 +384,7 @@ describe('Mutation Tests', () => {
           const order = {
             user: { email: user1.email },
             collective: { id: 12324 },
-            tier: { id: 1 },
+            tier: { id: 3 },
             quantity:1
           };
           const result = await utils.graphqlQuery(query, { order });
@@ -422,7 +422,7 @@ describe('Mutation Tests', () => {
       });
 
       describe('after checking ticket quantity', () => {
-        it.only('and if not enough are available', async () => {
+        it('and if not enough are available', async () => {
           const query = `
             mutation createOrder($order: OrderInputType!) {
               createOrder(order: $order) {
@@ -442,7 +442,7 @@ describe('Mutation Tests', () => {
           const order = {
             user: { email: "user@email.com" },
             collective: { id: event1.id },
-            tier: { id: 1 },
+            tier: { id: 3 },
             quantity: 101
           };
           const result = await utils.graphqlQuery(query, { order });
@@ -471,7 +471,7 @@ describe('Mutation Tests', () => {
           const order = {
             user:{ email: "user@email.com" },
             collective: { id: event1.id },
-            tier: { id: 2 },
+            tier: { id: 4 },
             quantity: 2
           };
           const result = await utils.graphqlQuery(query, { order });
@@ -601,7 +601,7 @@ describe('Mutation Tests', () => {
             },
             collective: { id: collective1.id },
             publicMessage: "Looking forward!",
-            tier: { id: 3 },
+            tier: { id: 5 },
             quantity: 2
           };
           const result = await utils.graphqlQuery(query, { order });
@@ -618,7 +618,7 @@ describe('Mutation Tests', () => {
               },
               "id": 1,
               "tier": {
-                "id": 3
+                "id": 5
               }
             }
           });
@@ -673,7 +673,7 @@ describe('Mutation Tests', () => {
             },
             collective: { id: collective1.id },
             publicMessage: "Looking forward!",
-            tier: { id: 3 },
+            tier: { id: 5 },
             quantity: 2
           };
           const result = await utils.graphqlQuery(query, { order }, user2);
@@ -690,7 +690,7 @@ describe('Mutation Tests', () => {
               },
               "id": 1,
               "tier": {
-                "id": 3
+                "id": 5
               }
             }
           });
@@ -754,7 +754,7 @@ describe('Mutation Tests', () => {
             user: { email: user2.email },
             collective: { id: event1.id },
             publicMessage: "Looking forward!",
-            tier: { id: 1 },
+            tier: { id: 3 },
             quantity: 2
           };
           const result = await utils.graphqlQuery(query, { order });
@@ -772,7 +772,7 @@ describe('Mutation Tests', () => {
               "id": 1,
               "tier": {
                 "description": "free tickets for all",
-                "id": 1,
+                "id": 3,
                 "maxQuantity": 10,
                 "name": "Free ticket",
                 "stats": {
@@ -837,7 +837,7 @@ describe('Mutation Tests', () => {
         const order = {
           user: { email: "newuser@email.com" },
           collective: { id: event1.id },
-          tier: { id: 1 },
+          tier: { id: 3 },
           quantity: 2
         };
 
@@ -848,7 +848,7 @@ describe('Mutation Tests', () => {
               "id": 1,
               "tier": {
                 "description": "free tickets for all",
-                "id": 1,
+                "id": 3,
                 "maxQuantity": 10,
                 "name": "Free ticket",
                 "stats": {
@@ -916,8 +916,8 @@ describe('Mutation Tests', () => {
               }
             },
             collective: { id: event1.id },
-            tier: { id: 2 },
-            quantity:2
+            tier: { id: 4 },
+            quantity: 2
           };
           const result = await utils.graphqlQuery(query, { order });
           result.errors && console.error(result.errors[0]);
@@ -929,7 +929,7 @@ describe('Mutation Tests', () => {
                   "availableQuantity": 98,
                 },
                 "description": "$20 ticket",
-                "id": 2,
+                "id": 4,
                 "maxQuantity": 100,
                 "name": "paid ticket"
               },
@@ -947,7 +947,7 @@ describe('Mutation Tests', () => {
           expect(executeOrderStub.callCount).to.equal(1);
           executeOrderStub.resetHistory();
           expect(executeOrderArgument[1].id).to.equal(1);
-          expect(executeOrderArgument[1].TierId).to.equal(2);
+          expect(executeOrderArgument[1].TierId).to.equal(4);
           expect(executeOrderArgument[1].CollectiveId).to.equal(5);
           expect(executeOrderArgument[1].CreatedByUserId).to.equal(3);
           expect(executeOrderArgument[1].totalAmount).to.equal(4000);
@@ -998,7 +998,7 @@ describe('Mutation Tests', () => {
               }
             },
             collective: { id: event1.id },
-            tier: { id: 2 },
+            tier: { id: 4 },
             quantity: 2
           };
           const result = await utils.graphqlQuery(query, { order });
@@ -1010,7 +1010,7 @@ describe('Mutation Tests', () => {
                 "id": 1,
                 "tier": {
                   "description": "$20 ticket",
-                  "id": 2,
+                  "id": 4,
                   "maxQuantity": 100,
                   "name": "paid ticket",
                   "stats": {
@@ -1031,7 +1031,7 @@ describe('Mutation Tests', () => {
 
           expect(executeOrderStub.callCount).to.equal(1);
           expect(executeOrderArgument[1].id).to.equal(1);
-          expect(executeOrderArgument[1].TierId).to.equal(2);
+          expect(executeOrderArgument[1].TierId).to.equal(4);
           expect(executeOrderArgument[1].CollectiveId).to.equal(5);
           expect(executeOrderArgument[1].CreatedByUserId).to.equal(4);
           expect(executeOrderArgument[1].totalAmount).to.equal(4000);
