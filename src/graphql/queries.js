@@ -565,6 +565,9 @@ const getCollectiveCoverQuery = gql`
         slug
         name
       }
+      location {
+        name
+      }
       members {
         id
         role
