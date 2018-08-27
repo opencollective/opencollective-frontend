@@ -119,8 +119,10 @@ class EditTwitterAccount extends React.Component {
     return (
       <div className="EditTwitterAccount">
         <Form horizontal>
-          <h3><FormattedMessage id="connectedAccounts.twitter.settings" defaultMessage="Settings" /></h3>
-          { this.notificationTypes.map(this.renderNotification) }
+          <details>
+            <summary><FormattedMessage id="connectedAccounts.twitter.settings" defaultMessage="Settings" /></summary>
+            { this.notificationTypes.map(this.renderNotification) }
+          </details>
           <Row>
             <Col sm={3}></Col>
             <Col sm={9}>

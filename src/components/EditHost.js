@@ -43,10 +43,11 @@ class EditHost extends React.Component {
 
   componentDidMount() {
     const queryParams = getQueryParams();
+    const HostCollectiveId = Number(queryParams.CollectiveId);
     if (queryParams.message === 'StripeAccountConnected') {
-      this.changeHost({ id: Number(queryParams.CollectiveId) });
-      // make sure we remove the query params, otherwise if the user refreshes the page, it will try to change the host again
-      window.location.replace(`/${this.props.collective.slug}/edit#host`);
+      if (HostCollectiveId && HostCollectiveId !== get(this.props, 'collective.host.id')) {
+        this.changeHost({ id: HostCollectiveId });
+      }
     }
   }
 
@@ -62,6 +63,9 @@ class EditHost extends React.Component {
     await this.props.editCollectiveMutation({ id: collective.id, HostCollectiveId: newHost.id });
     if (!newHost.id) {
       this.setState({ selectedOption: 'noHost' });
+      if (window.location.search.length > 0) {
+        window.location.replace(`/${collective.slug}/edit#host`); // make sure we clean the query params if any
+      }
     }
   }
 
@@ -82,7 +86,7 @@ class EditHost extends React.Component {
               </p>
             }
             <p>
-              <FormattedMessage id="editCollective.host.label" defaultMessage="{host} is currently hosting {collectives, plural, one {one collective} other {{collectives} collectives}}" values={{collectives: get(collective, 'host.stats.collectives.hosted'), host: get(collective, 'host.name') }} />
+              <FormattedMessage id="editCollective.host.label" defaultMessage="Your host is {host}. It is currently hosting {collectives, plural, one {one collective} other {{collectives} collectives}}" values={{collectives: get(collective, 'host.stats.collectives.hosted'), host: get(collective, 'host.name') }} />
             </p>
             { collective.stats.balance > 0 &&
               <p>

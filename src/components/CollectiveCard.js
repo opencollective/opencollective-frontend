@@ -58,6 +58,7 @@ class CollectiveCard extends React.Component {
     if (LoggedInUser) {
       route += `?referral=${LoggedInUser.CollectiveId}`;
     }
+
     return (
       <Link route={route} target="_top">
         <div className={`CollectiveCard ${collective.type}`}>

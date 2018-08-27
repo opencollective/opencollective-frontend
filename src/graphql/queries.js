@@ -154,6 +154,8 @@ const getCollectiveToEditQuery = gql`
         slug
         name
         image
+        backgroundImage
+        settings
         description
         website
         twitterHandle
@@ -561,6 +563,9 @@ const getCollectiveCoverQuery = gql`
       parentCollective {
         id
         slug
+        name
+      }
+      location {
         name
       }
       members {

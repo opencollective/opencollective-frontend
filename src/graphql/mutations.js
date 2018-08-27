@@ -71,12 +71,15 @@ const editCollectiveQuery = gql`
       longDescription
       website
       twitterHandle
+      isActive
       host {
         id
         createdAt
         slug
         name
         image
+        backgroundImage
+        settings
         description
         website
         twitterHandle
