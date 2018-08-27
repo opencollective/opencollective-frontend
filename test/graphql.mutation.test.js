@@ -422,7 +422,7 @@ describe('Mutation Tests', () => {
       });
 
       describe('after checking ticket quantity', () => {
-        it('and if not enough are available', async () => {
+        it.only('and if not enough are available', async () => {
           const query = `
             mutation createOrder($order: OrderInputType!) {
               createOrder(order: $order) {
