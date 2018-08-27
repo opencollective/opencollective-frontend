@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import classNames from 'classnames';
 import withIntl from '../lib/withIntl';
 import { defineMessages, FormattedMessage, FormattedDate, FormattedTime } from 'react-intl';
 import { get } from 'lodash';
@@ -112,8 +111,14 @@ ${description}`
       }
     }
 
+    const classNames = ['CollectiveCover', className, type];
+
+    if (!collective.backgroundImage) {
+      classNames.push('defaultBackgroundImage');
+    }
+
     return (
-      <div className={classNames('CollectiveCover', className, type)}>
+      <div className={classNames.join(' ')}>
         <style jsx>{`
         .cover {
           align-items: center;
@@ -163,7 +168,10 @@ ${description}`
         }
         .content, .content a {
           color: white;
-          text-shadow: 1px 0 1px rgba(0, 0, 0, 0.8), 0 -1px 1px rgba(0, 0, 0, 0.8), 0 1px 1px rgba(0, 0, 0, 0.8), -1px 0 1px rgba(0, 0, 0, 0.8);
+          text-shadow: 1px 0 1px rgba(0, 0, 0, 0.8), 0 -1px 1px rgba(0, 0, 0, 0.8), 0 1px 1px rgba(0, 0, 0, 0.8), -1px 0 1px rgba(0, 0, 0, 0.8);        
+        }
+        .defaultBackgroundImage .content, .defaultBackgroundImage .content a {
+          text-shadow: none;
         }
         .content a:hover {
           color: #444;

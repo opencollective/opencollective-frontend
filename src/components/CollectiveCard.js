@@ -13,7 +13,7 @@ class CollectiveCard extends React.Component {
   static propTypes = {
     collective: PropTypes.object.isRequired,
     membership: PropTypes.object,
-    LoggedInUser: PropTypes.object
+    LoggedInUser: PropTypes.object,
   }
 
   constructor(props) {
@@ -273,6 +273,10 @@ class CollectiveCard extends React.Component {
                       values={{ n: get(collective, 'stats.collectives.hosted') }}
                       />
                   </div>
+                </div>
+                <div className="currency">
+                  <div className="value">{collective.currency}</div>
+                  <div className="label"><FormattedMessage id="currency" defaultMessage="currency" /></div>
                 </div>
 
               </div>

@@ -12,6 +12,7 @@ import { animateScroll } from 'react-scrollchor/lib/helpers';
 import colors from '../constants/colors';
 import withIntl from '../lib/withIntl';
 
+import Avatar from './Avatar';
 import Logo from './Logo';
 import Link from './Link';
 import Button from './Button';
@@ -504,7 +505,10 @@ class MenuBar extends React.Component {
                       { this.renderButtons() }
                     </div>
                     <div className="logo">
-                      <Link route={logoLink} key={logoLink}><Logo src={collective.image} type="COLLECTIVE" height={48} /></Link>
+                      <Link route={logoLink} key={logoLink}>
+                        { collective.type === 'USER' && <Avatar src={collective.image} className="logo" radius="4.8rem" /> }
+                        { collective.type !== 'USER' && <Logo src={collective.image} className="logo" type={collective.type} website={collective.website} height="48" /> }
+                      </Link>
                     </div>
                   </div>
                 </div>
@@ -523,7 +527,10 @@ class MenuBar extends React.Component {
                   { this.renderButtons() }
                 </div>
                 <div className="logo">
-                  <Link route={logoLink} key={logoLink}><Logo src={collective.image} type="COLLECTIVE" height={64} /></Link>
+                  <Link route={logoLink} key={logoLink}>
+                    { collective.type === 'USER' && <Avatar src={collective.image} className="logo" radius="6.4rem" /> }
+                    { collective.type !== 'USER' && <Logo src={collective.image} className="logo" type={collective.type} website={collective.website} height="64" /> }
+                  </Link>
                 </div>
                 <div className="pullLeft menu">
                   { this.renderMenu() }
