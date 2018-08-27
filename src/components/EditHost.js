@@ -11,6 +11,7 @@ import CreateHostFormWithData from './CreateHostFormWithData';
 import HostsWithData from './HostsWithData';
 import CollectiveCard from './CollectiveCard';
 import Link from './Link';
+import InputField from './InputField';
 import { formatCurrency, getQueryParams, formatDate } from '../lib/utils';
 import { Button } from 'react-bootstrap';
 
@@ -38,7 +39,7 @@ class EditHost extends React.Component {
     super(props);
     this.changeHost = this.changeHost.bind(this);
     this.handleChange = this.handleChange.bind(this);
-    this.state = { selectedOption: 'noHost', collective: props.collective };
+    this.state = { selectedOption: 'noHost', collective: props.collective, currency: props.collective.currency };
   }
 
   componentDidMount() {
@@ -126,6 +127,9 @@ class EditHost extends React.Component {
           color: #666F80;
           font-size: 1.5rem;
         }
+        :global(#findHost label) {
+          width: 100%;
+        }
         `}</style>
         <Option id="noHost">
           <Flex>
@@ -177,16 +181,27 @@ class EditHost extends React.Component {
               <FormattedMessage id="collective.edit.host.findHost.description" defaultMessage="With this option, everything is taking care of for you. No need to create a new bank account, no need to worry about accounting and invoicing. All of that is being taken care of by an existing non profit organization that acts as your fiscal host. Note: most hosts charge a commission to cover the administrative overhead. " />
               { this.state.selectedOption === 'findHost' &&
                 <div>
+                  <InputField
+                    name="currency"
+                    label="What will be the primary currency of your collective?"
+                    description=""
+                    type="select"
+                    options={[ { 'AUD': 'AUD' }, { 'CAD': 'CAD' }, { 'EUR': 'EUR' }, { 'GBP': 'GBP' }, { 'MXN' : 'MXN' }, { 'NZD': 'NZD' }, { 'USD': 'USD' }]}
+                    defaultValue={collective.currency}
+                    onChange={(val) => this.handleChange('currency', val)}
+                    />
                   <div className="suggestedHostsTitle">
                     <h3><FormattedMessage id="collective.edit.host.suggestedHosts.title" defaultMessage="Suggested hosts" /></h3>
                     <Link route="/hosts"><FormattedMessage id="collective.edit.host.viewAllHosts" defaultMessage="View all hosts" /></Link>
                   </div>
                   <div className="suggestedHostsDescription subtitle">
-                    <FormattedMessage id="collective.edit.host.suggestedHosts.description" defaultMessage="Based on the tags of your collective ({tags})" values={{ tags: collective.tags }} />.
+                    <FormattedMessage id="collective.edit.host.suggestedHosts.description" defaultMessage="Based on the currency of your collective ({currency}) and the tags ({tags})" values={{ tags: collective.tags, currency: this.state.currency }} />.
                   </div>
                   <HostsWithData
                     limit={6}
                     tags={collective.tags}
+                    currency={this.state.currency}
+                    empty={(<FormattedMessage id="collective.edit.host.suggestedHosts.empty" defaultMessage="No suggestion. Please look at all available hosts or consider creating a new host." />)}
                     />
                 </div>
               }
