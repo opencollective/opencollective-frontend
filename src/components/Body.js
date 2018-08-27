@@ -43,7 +43,6 @@ export default class Body extends React.Component {
         }
 
         .content p {
-          overflow: hidden;
           text-overflow: ellipsis;
           margin: 1.5rem 0;
         }

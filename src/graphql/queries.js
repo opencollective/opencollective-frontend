@@ -437,6 +437,7 @@ const getEventCollectiveQuery = gql`
       }
       name
       image
+      backgroundImage
       description
       longDescription
       startsAt
@@ -457,6 +458,7 @@ const getEventCollectiveQuery = gql`
         name
         description
         amount
+        presets
         currency
         maxQuantity
       }

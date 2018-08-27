@@ -743,7 +743,7 @@ exports[`Search Page renders empty results message 1`] = `
     </div>
   </header>
   <main
-    className="jsx-1964704679"
+    className="jsx-1238847522"
   >
     <div
       className="c20"
@@ -2081,7 +2081,7 @@ exports[`Search Page renders error message 1`] = `
     </div>
   </header>
   <main
-    className="jsx-1964704679"
+    className="jsx-1238847522"
   >
     <div
       className="content"
@@ -3393,7 +3393,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
     </div>
   </header>
   <main
-    className="jsx-1964704679"
+    className="jsx-1238847522"
   >
     <div
       className="c20"
@@ -4880,7 +4880,7 @@ exports[`Search Page renders search results with pagination 1`] = `
     </div>
   </header>
   <main
-    className="jsx-1964704679"
+    className="jsx-1238847522"
   >
     <div
       className="c20"

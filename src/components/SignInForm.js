@@ -94,6 +94,20 @@ class LoginForm extends React.Component {
     })
   }
 
+  componentDidMount() {
+    // This is required because with 1Password or browser autocomplete, the onChange doesn't get triggered :-/
+    let prevEmail;
+    this.interval = setInterval(() => {
+      const node = document.querySelector('input[name="email"]');
+      if (!node) return;
+      const email = node.value;
+      if (prevEmail !== email && isValidEmail(email)) {
+        prevEmail = email;
+        this.handleChange('user', 'email', email);
+      }
+    }, 500);
+  }
+
   handleChange(obj, attr, value) {
     const { intl } = this.props;
 
@@ -116,7 +130,7 @@ class LoginForm extends React.Component {
           }
         })
         .catch(e => {
-          if (e.message === "ECONNREFUSED") {
+          if (e.message === 'ECONNREFUSED') {
             this.error(intl.formatMessage(this.messages['api.error.unreachable']));
           }
         });
@@ -124,23 +138,9 @@ class LoginForm extends React.Component {
     }
 
     this.setState(newState);
-    if (typeof window !== "undefined") {
+    if (typeof window !== 'undefined') {
       window.state = newState;
     }
-  }
-
-  componentDidMount() {
-    // This is required because with 1Password or browser autocomplete, the onChange doesn't get triggered :-/
-    let prevEmail;
-    this.interval = setInterval(() => {
-      const node = document.querySelector('input[name="email"]');
-      if (!node) return;
-      const email = node.value;
-      if (prevEmail !== email && isValidEmail(email)) {
-        prevEmail = email;
-        this.handleChange("user", "email", email);
-      }
-    }, 500);
   }
 
   error(msg) {
@@ -209,7 +209,7 @@ class LoginForm extends React.Component {
       focus: true,
       label: intl.formatMessage(this.messages['email.label']),
       defaultValue: this.state.user['email'],
-      onChange: (value) => this.handleChange("user", "email", value)
+      onChange: (value) => this.handleChange('user', 'email', value)
     };
 
     if (this.state.loading) {
@@ -218,13 +218,13 @@ class LoginForm extends React.Component {
     } else if (!this.state.signup) {
       if (this.state.isNewUser === true) {
         inputEmail.button = <Button className="signup" onClick={() => this.setState({ signup: true })}><FormattedMessage id="signin.createAccount" defaultMessage="Sign Up" /></Button>;
-        inputEmail.description = <FormattedMessage id="signin.createAccount.description" defaultMessage={`There is no user with this email address. Click on "Sign Up" to create a new Open Collective Account.`} />;
+        inputEmail.description = <FormattedMessage id="signin.createAccount.description" defaultMessage='There is no user with this email address. Click on "Sign Up" to create a new Open Collective Account.' />;
       } else if (this.state.isNewUser === false) {
         inputEmail.button = <Button className="login" onClick={() => this.signin()}><FormattedMessage id="login.button" defaultMessage="login" /></Button>;
-        inputEmail.description = <FormattedMessage id="signin.login.description" defaultMessage={`Welcome back! Click on "Login" (or hit Enter) and we will send you a link to login by email.`} />;
+        inputEmail.description = <FormattedMessage id="signin.login.description" defaultMessage='Welcome back! Click on "Login" (or hit Enter) and we will send you a link to login by email.' />;
         if (this.state.loginSent) {
           inputEmail.button = <Button disabled={true}><FormattedMessage id="login.button" defaultMessage="login" /></Button>;
-          inputEmail.description = <FormattedMessage id="signin.emailSent.description" defaultMessage={`Login email sent. Please follow the instructions in that email to proceed.`} />
+          inputEmail.description = <FormattedMessage id="signin.emailSent.description" defaultMessage="Login email sent. Please follow the instructions in that email to proceed" />;
         }
       }
     }
@@ -297,7 +297,7 @@ class LoginForm extends React.Component {
           { showForm &&
             <Form horizontal onSubmit={this.handleSubmit}>
               <div className="userDetailsForm">
-                <Row key={`email.input`}>
+                <Row key="email.input">
                   <Col sm={12}>
                     <InputField
                       className="horizontal"
@@ -314,7 +314,7 @@ class LoginForm extends React.Component {
                             className="horizontal"
                             {...field}
                             defaultValue={this.state.user[field.name]}
-                            onChange={(value) => this.handleChange("user", field.name, value)}
+                            onChange={(value) => this.handleChange('user', field.name, value)}
                             />
                         </Col>
                       </Row>
