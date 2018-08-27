@@ -6,62 +6,6 @@ import { types } from '../../constants/collectives';
 import roles from '../../constants/roles';
 import activities from '../../constants/activities';
 
-const defaultTiers = (collectiveData) => {
-  const tiers = collectiveData.tiers || [];
-
-  if (collectiveData.HostCollectiveId === 858) { // if request coming from opencollective.com/meetups
-    tiers.push({
-      type: 'TIER',
-      name: '1 month',
-      description: "Sponsor our meetup and get: a shout-out on social media, presence on the merch table and your logo on our meetup page.",
-      slug: '1month-sponsor',
-      amount: 25000,
-      button: "become a sponsor",
-      currency: collectiveData.currency
-    });
-    tiers.push({
-      type: 'TIER',
-      name: '3 months',
-      description: "**10% off!** - Sponsor our meetup and get: a shout-out on social media, presence on the merch table and your logo on our meetup page.",
-      slug: '3month-sponsor',
-      amount: 67500,
-      button: "become a sponsor",
-      currency: collectiveData.currency
-    });
-    tiers.push({
-      type: 'TIER',
-      name: '6 months',
-      description: "**20% off!** - Sponsor our meetup and get: a shout-out on social media, presence on the merch table and your logo on our meetup page.",
-      slug: '6month-sponsor',
-      amount: 120000,
-      button: "become a sponsor",
-      currency: collectiveData.currency
-    });
-    return tiers;
-  }
-  if (collectiveData.tiers.length === 0) {
-    tiers.push({
-      type: 'TIER',
-      name: 'backer',
-      slug: 'backers',
-      amount: 500,
-      presets: [500, 1000, 2500, 5000],
-      interval: 'month',
-      currency: collectiveData.currency
-    });
-    tiers.push({
-      type: 'TIER',
-      name: 'sponsor',
-      slug: 'sponsors',
-      amount: 10000,
-      presets: [10000, 25000, 50000],
-      interval: 'month',
-      currency: collectiveData.currency
-    });
-  }
-  return tiers;
-}
-
 export function createCollective(_, args, req) {
   if (!req.remoteUser) {
     return Promise.reject(new errors.Unauthorized({ message: "You need to be logged in to create a collective"}));
@@ -77,11 +21,6 @@ export function createCollective(_, args, req) {
     ...args.collective,
     CreatedByUserId: req.remoteUser.id
   };
-
-  collectiveData.tiers = collectiveData.tiers || [];
-  if (collectiveData.tiers.length === 0) {
-    collectiveData.tiers = defaultTiers(collectiveData);
-  }
 
   const location = args.collective.location;
   if (location) {

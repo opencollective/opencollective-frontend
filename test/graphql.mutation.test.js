@@ -47,7 +47,7 @@ describe('Mutation Tests', () => {
   beforeEach("reset db", () => utils.resetTestDB());
 
   beforeEach("create user1", () => models.User.createUserWithCollective(utils.data('user1')).tap(u => user1 = u));
-  beforeEach("create host user 1", () => models.User.createUserWithCollective(utils.data('host1')).tap(u => host = u));
+  beforeEach("create host user 1", () => models.User.createUserWithCollective({...utils.data('host1'), currency: 'EUR' }).tap(u => host = u));
 
   beforeEach("create user2", () => models.User.createUserWithCollective(utils.data('user2')).tap(u => user2 = u));
   beforeEach("create collective1", () => models.Collective.create(utils.data('collective1')).tap(g => collective1 = g));
@@ -76,6 +76,7 @@ describe('Mutation Tests', () => {
       createCollective(collective: $collective) {
         id
         slug
+        currency
         host {
           id
         }
@@ -132,6 +133,7 @@ describe('Mutation Tests', () => {
         const hostMembership = await models.Member.findOne({ where: { CollectiveId: createdCollective.id, role: 'HOST' }});
         const adminMembership = await models.Member.findOne({ where: { CollectiveId: createdCollective.id, role: 'ADMIN' }});
         expect(createdCollective.host.id).to.equal(host.CollectiveId);
+        expect(createdCollective.currency).to.equal('EUR');
         expect(createdCollective.tiers).to.have.length(2);
         expect(createdCollective.tiers[0].presets).to.have.length(4);
         expect(createdCollective.isActive).to.be.false;
