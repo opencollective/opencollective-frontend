@@ -129,7 +129,6 @@ export default {
         }
         collective.currency = account.default_currency.toUpperCase();
         collective.timezone = collective.timezone || account.timezone;
-        collective.image = collective.image || account.business_logo;
         return collective.save();
       }
 
