@@ -16,6 +16,7 @@ class HostsWithData extends React.Component {
     tags: PropTypes.arrayOf(PropTypes.string), // only fetch collectives that have those tags
     onChange: PropTypes.func,
     limit: PropTypes.number,
+    empty: PropTypes.oneOf(PropTypes.node, PropTypes.stirng),
   };
 
   constructor(props) {
@@ -60,7 +61,7 @@ class HostsWithData extends React.Component {
     }
     const collectives = [...data.allHosts.collectives];
     if (collectives.length === 0) {
-      return (<div />);
+      return (<div className="empty" style={{ marginTop: '1rem' }}>{this.props.empty || ''}</div>);
     }
 
     const limit = this.props.limit || COLLECTIVE_CARDS_PER_PAGE * 2;
@@ -120,6 +121,7 @@ class HostsWithData extends React.Component {
 const getHostsQuery = gql`
 query allHosts(
   $tags: [String],
+  $currency: String,
   $limit: Int,
   $offset: Int,
   $orderBy: HostCollectiveOrderFieldType,
@@ -127,6 +129,7 @@ query allHosts(
   ) {
   allHosts(
     tags: $tags,
+    currency: $currency,
     limit: $limit,
     offset: $offset,
     orderBy: $orderBy,
@@ -160,6 +163,7 @@ export const addHostsData = graphql(getHostsQuery, {
     return {
       variables: {
         tags: props.tags,
+        currency: props.currency,
         orderBy: props.orderBy,
         orderDirection: props.orderDirection,
         offset: 0,
