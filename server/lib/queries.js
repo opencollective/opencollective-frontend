@@ -33,16 +33,19 @@ const generateFXConversionSQL = (aggregate) => {
 };
 
 const getPublicHostsByTotalCollectives = (args) => {
-  let tagsCondition = '';
-  if (args.tags) {
-    tagsCondition = 'AND c.tags && $tags';
+  let conditions = '';
+  if (args.tags && args.tags.length > 0) {
+    conditions = 'AND c.tags && $tags';
+  }
+  if (args.currency && args.currency.length === 3) {
+    conditions += ' AND c.currency=$currency';
   }
   const query = `
   WITH counts AS (
     SELECT max(c.id) as "HostCollectiveId", count(m.id) as count FROM "Collectives" c
     LEFT JOIN "Members" m ON m."MemberCollectiveId" = c.id AND m.role = 'HOST' AND m."deletedAt" IS NULL
     WHERE c."settings" #>> '{apply}' IS NOT NULL
-      ${tagsCondition}
+      ${conditions}
       AND c."deletedAt" IS NULL
     GROUP BY c.id
   )
@@ -51,7 +54,7 @@ const getPublicHostsByTotalCollectives = (args) => {
   ORDER BY ${args.orderBy} ${args.orderDirection} LIMIT ${args.limit} OFFSET ${args.offset}
   `;
   return sequelize.query(query, {
-    bind: { tags: args.tags || [] },
+    bind: { tags: args.tags || [], currency: args.currency },
     type: sequelize.QueryTypes.SELECT
   })
 };

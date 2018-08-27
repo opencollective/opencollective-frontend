@@ -12,8 +12,9 @@ describe('graphql.allHosts.test.js', () => {
     hostAdmin = await models.User.createUserWithCollective({ email: "admin@host.com" });
     user1 = await models.User.createUserWithCollective({ email: "user1@gmail.com" });
     privateHost = user1.collective;
-    publicHost = await models.Collective.create({ name: "BrusselsTogether ASBL", tags: ['host', 'brussels'], settings: { apply: { title: "apply" } }});
-    await models.Collective.create({ name: "Open Collective Paris", tags: ['host', 'paris', 'chapter'], settings: { apply: { title: "apply" } }});
+    publicHost = await models.Collective.create({ name: "BrusselsTogether ASBL", currency: 'EUR', tags: ['host', 'brussels'], settings: { apply: { title: "apply" } }});
+    await models.Collective.create({ name: "Open Collective Paris", currency: 'EUR', tags: ['host', 'paris', 'chapter'], settings: { apply: { title: "apply" } }});
+    await models.Collective.create({ name: "wwcodeinc", currency: 'USD', tags: ['host'], settings: { apply: { title: "apply" } }});
     privateHost = await models.Collective.create({ name: "Xavier"  });
     await publicHost.addUserWithRole(hostAdmin, "ADMIN");
     collective1 = await models.Collective.create({ name: "VeganBrussels" });
@@ -32,8 +33,8 @@ describe('graphql.allHosts.test.js', () => {
   describe("hosts", () => {
 
     const allHostsQuery = `
-    query allHosts($tags: [String]) {
-      allHosts(tags: $tags) {
+    query allHosts($tags: [String], $currency: String) {
+      allHosts(tags: $tags, currency: $currency) {
         total
         collectives {
           id
@@ -53,7 +54,7 @@ describe('graphql.allHosts.test.js', () => {
       expect(result.errors).to.not.exist;
       const { allHosts } = result.data;
       const hosts = allHosts.collectives;
-      expect(hosts).to.have.length(2);
+      expect(hosts).to.have.length(3);
       expect(hosts[0].slug).to.equal("brusselstogether-asbl");
       expect(hosts[0].canApply).to.be.true;
     });
@@ -66,6 +67,17 @@ describe('graphql.allHosts.test.js', () => {
       const hosts = allHosts.collectives;
       expect(hosts).to.have.length(1);
       expect(hosts[0].slug).to.equal("open-collective-paris");
+      expect(hosts[0].canApply).to.be.true;
+    });
+
+    it('gets all the public hosts by currency', async () => {
+      const result = await utils.graphqlQuery(allHostsQuery, { currency: 'USD' });
+      result.errors && console.error(result.errors);
+      expect(result.errors).to.not.exist;
+      const { allHosts } = result.data;
+      const hosts = allHosts.collectives;
+      expect(hosts).to.have.length(1);
+      expect(hosts[0].slug).to.equal("wwcodeinc");
       expect(hosts[0].canApply).to.be.true;
     });
 
