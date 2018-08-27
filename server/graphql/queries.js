@@ -702,6 +702,10 @@ const queries = {
         type: new GraphQLList(GraphQLString),
         description: "Fetch all collectives that match at least one of the tags",
       },
+      currency: {
+        type: GraphQLString,
+        description: "Filter hosts by currency",
+      },
       orderBy: {
         defaultValue: 'collectives',
         type: HostCollectiveOrderFieldType
