@@ -395,6 +395,7 @@ describe("paymentMethods.collective.to.collective.test.js", () => {
         name: '4242',
         service: 'stripe',
         type: 'creditcard',
+        currency: 'EUR',
         token: 'tok_123456781234567812345678',
         CollectiveId: collective5.HostCollectiveId,
         monthlyLimitPerMember: 10000
@@ -407,6 +408,7 @@ describe("paymentMethods.collective.to.collective.test.js", () => {
         name: '4343',
         service: 'stripe',
         type: 'creditcard',
+        currency: 'EUR',
         token: 'tok_123456781234567812345678',
         CollectiveId: collective6.HostCollectiveId,
         monthlyLimitPerMember: 10000
