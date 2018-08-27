@@ -24,6 +24,63 @@ import crypto from 'crypto';
 
 const debug = debugLib('collective');
 
+
+const defaultTiers = (HostCollectiveId, currency) => {
+  const tiers = [];
+
+  if (HostCollectiveId === 858) { // if request coming from opencollective.com/meetups
+    tiers.push({
+      type: 'TIER',
+      name: '1 month',
+      description: "Sponsor our meetup and get: a shout-out on social media, presence on the merch table and your logo on our meetup page.",
+      slug: '1month-sponsor',
+      amount: 25000,
+      button: "become a sponsor",
+      currency: currency
+    });
+    tiers.push({
+      type: 'TIER',
+      name: '3 months',
+      description: "**10% off!** - Sponsor our meetup and get: a shout-out on social media, presence on the merch table and your logo on our meetup page.",
+      slug: '3month-sponsor',
+      amount: 67500,
+      button: "become a sponsor",
+      currency: currency
+    });
+    tiers.push({
+      type: 'TIER',
+      name: '6 months',
+      description: "**20% off!** - Sponsor our meetup and get: a shout-out on social media, presence on the merch table and your logo on our meetup page.",
+      slug: '6month-sponsor',
+      amount: 120000,
+      button: "become a sponsor",
+      currency: currency
+    });
+    return tiers;
+  }
+  if (tiers.length === 0) {
+    tiers.push({
+      type: 'TIER',
+      name: 'backer',
+      slug: 'backers',
+      amount: 500,
+      presets: [500, 1000, 2500, 5000],
+      interval: 'month',
+      currency: currency
+    });
+    tiers.push({
+      type: 'TIER',
+      name: 'sponsor',
+      slug: 'sponsors',
+      amount: 10000,
+      presets: [10000, 25000, 50000],
+      interval: 'month',
+      currency: currency
+    });
+  }
+  return tiers;
+}
+
 /**
  * Collective Model.
  *
@@ -1006,8 +1063,19 @@ export default function(Sequelize, DataTypes) {
       MemberCollectiveId: hostCollective.id,
       CollectiveId: this.id,
     };
-    return this.update({ HostCollectiveId: hostCollective.id })
-      .then(() => models.Member.create(member));
+    const updatedValues = {
+      HostCollectiveId: hostCollective.id,
+      currency: hostCollective.currency
+    };
+    return this.getTiers()
+      .then(tiers => {
+        if (!tiers || tiers.length === 0) {
+          tiers = defaultTiers(hostCollective.id, hostCollective.currency);
+          return models.Tier.createMany(tiers, { CollectiveId: this.id });
+        }
+      })
+      .then(() => models.Member.create(member))
+      .then(() => this.update(updatedValues));
   };
 
   /**

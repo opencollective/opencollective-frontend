@@ -47,7 +47,7 @@ describe('Mutation Tests', () => {
   beforeEach("reset db", () => utils.resetTestDB());
 
   beforeEach("create user1", () => models.User.createUserWithCollective(utils.data('user1')).tap(u => user1 = u));
-  beforeEach("create host user 1", () => models.User.createUserWithCollective(utils.data('host1')).tap(u => host = u));
+  beforeEach("create host user 1", () => models.User.createUserWithCollective({...utils.data('host1'), currency: 'EUR' }).tap(u => host = u));
 
   beforeEach("create user2", () => models.User.createUserWithCollective(utils.data('user2')).tap(u => user2 = u));
   beforeEach("create collective1", () => models.Collective.create(utils.data('collective1')).tap(g => collective1 = g));
@@ -76,6 +76,7 @@ describe('Mutation Tests', () => {
       createCollective(collective: $collective) {
         id
         slug
+        currency
         host {
           id
         }
@@ -132,6 +133,7 @@ describe('Mutation Tests', () => {
         const hostMembership = await models.Member.findOne({ where: { CollectiveId: createdCollective.id, role: 'HOST' }});
         const adminMembership = await models.Member.findOne({ where: { CollectiveId: createdCollective.id, role: 'ADMIN' }});
         expect(createdCollective.host.id).to.equal(host.CollectiveId);
+        expect(createdCollective.currency).to.equal('EUR');
         expect(createdCollective.tiers).to.have.length(2);
         expect(createdCollective.tiers[0].presets).to.have.length(4);
         expect(createdCollective.isActive).to.be.false;
@@ -382,7 +384,7 @@ describe('Mutation Tests', () => {
           const order = {
             user: { email: user1.email },
             collective: { id: 12324 },
-            tier: { id: 1 },
+            tier: { id: 3 },
             quantity:1
           };
           const result = await utils.graphqlQuery(query, { order });
@@ -440,7 +442,7 @@ describe('Mutation Tests', () => {
           const order = {
             user: { email: "user@email.com" },
             collective: { id: event1.id },
-            tier: { id: 1 },
+            tier: { id: 3 },
             quantity: 101
           };
           const result = await utils.graphqlQuery(query, { order });
@@ -469,7 +471,7 @@ describe('Mutation Tests', () => {
           const order = {
             user:{ email: "user@email.com" },
             collective: { id: event1.id },
-            tier: { id: 2 },
+            tier: { id: 4 },
             quantity: 2
           };
           const result = await utils.graphqlQuery(query, { order });
@@ -599,7 +601,7 @@ describe('Mutation Tests', () => {
             },
             collective: { id: collective1.id },
             publicMessage: "Looking forward!",
-            tier: { id: 3 },
+            tier: { id: 5 },
             quantity: 2
           };
           const result = await utils.graphqlQuery(query, { order });
@@ -616,7 +618,7 @@ describe('Mutation Tests', () => {
               },
               "id": 1,
               "tier": {
-                "id": 3
+                "id": 5
               }
             }
           });
@@ -671,7 +673,7 @@ describe('Mutation Tests', () => {
             },
             collective: { id: collective1.id },
             publicMessage: "Looking forward!",
-            tier: { id: 3 },
+            tier: { id: 5 },
             quantity: 2
           };
           const result = await utils.graphqlQuery(query, { order }, user2);
@@ -688,7 +690,7 @@ describe('Mutation Tests', () => {
               },
               "id": 1,
               "tier": {
-                "id": 3
+                "id": 5
               }
             }
           });
@@ -752,7 +754,7 @@ describe('Mutation Tests', () => {
             user: { email: user2.email },
             collective: { id: event1.id },
             publicMessage: "Looking forward!",
-            tier: { id: 1 },
+            tier: { id: 3 },
             quantity: 2
           };
           const result = await utils.graphqlQuery(query, { order });
@@ -770,7 +772,7 @@ describe('Mutation Tests', () => {
               "id": 1,
               "tier": {
                 "description": "free tickets for all",
-                "id": 1,
+                "id": 3,
                 "maxQuantity": 10,
                 "name": "Free ticket",
                 "stats": {
@@ -835,7 +837,7 @@ describe('Mutation Tests', () => {
         const order = {
           user: { email: "newuser@email.com" },
           collective: { id: event1.id },
-          tier: { id: 1 },
+          tier: { id: 3 },
           quantity: 2
         };
 
@@ -846,7 +848,7 @@ describe('Mutation Tests', () => {
               "id": 1,
               "tier": {
                 "description": "free tickets for all",
-                "id": 1,
+                "id": 3,
                 "maxQuantity": 10,
                 "name": "Free ticket",
                 "stats": {
@@ -914,8 +916,8 @@ describe('Mutation Tests', () => {
               }
             },
             collective: { id: event1.id },
-            tier: { id: 2 },
-            quantity:2
+            tier: { id: 4 },
+            quantity: 2
           };
           const result = await utils.graphqlQuery(query, { order });
           result.errors && console.error(result.errors[0]);
@@ -927,7 +929,7 @@ describe('Mutation Tests', () => {
                   "availableQuantity": 98,
                 },
                 "description": "$20 ticket",
-                "id": 2,
+                "id": 4,
                 "maxQuantity": 100,
                 "name": "paid ticket"
               },
@@ -945,7 +947,7 @@ describe('Mutation Tests', () => {
           expect(executeOrderStub.callCount).to.equal(1);
           executeOrderStub.resetHistory();
           expect(executeOrderArgument[1].id).to.equal(1);
-          expect(executeOrderArgument[1].TierId).to.equal(2);
+          expect(executeOrderArgument[1].TierId).to.equal(4);
           expect(executeOrderArgument[1].CollectiveId).to.equal(5);
           expect(executeOrderArgument[1].CreatedByUserId).to.equal(3);
           expect(executeOrderArgument[1].totalAmount).to.equal(4000);
@@ -996,7 +998,7 @@ describe('Mutation Tests', () => {
               }
             },
             collective: { id: event1.id },
-            tier: { id: 2 },
+            tier: { id: 4 },
             quantity: 2
           };
           const result = await utils.graphqlQuery(query, { order });
@@ -1008,7 +1010,7 @@ describe('Mutation Tests', () => {
                 "id": 1,
                 "tier": {
                   "description": "$20 ticket",
-                  "id": 2,
+                  "id": 4,
                   "maxQuantity": 100,
                   "name": "paid ticket",
                   "stats": {
@@ -1029,7 +1031,7 @@ describe('Mutation Tests', () => {
 
           expect(executeOrderStub.callCount).to.equal(1);
           expect(executeOrderArgument[1].id).to.equal(1);
-          expect(executeOrderArgument[1].TierId).to.equal(2);
+          expect(executeOrderArgument[1].TierId).to.equal(4);
           expect(executeOrderArgument[1].CollectiveId).to.equal(5);
           expect(executeOrderArgument[1].CreatedByUserId).to.equal(4);
           expect(executeOrderArgument[1].totalAmount).to.equal(4000);
