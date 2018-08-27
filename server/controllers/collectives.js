@@ -334,14 +334,7 @@ export const createFromGithub = (req, res, next) => {
     .tap(g => createdCollective = g)
     .then(() => _addUserToCollective(createdCollective, creatorUser, options))
     .then(() => models.Collective.findById(defaultHostCollective("opensource").CollectiveId))
-    .then(hostCollective => createdCollective.addHost(hostCollective, creatorUser))
-    .then(() => {
-      if (collectiveData.tiers) {
-        return models.Tier.createMany(collectiveData.tiers, { CollectiveId: createdCollective.id, currency: collectiveData.currency })
-      }
-      return null;
-    })
-    .then(() => createdCollective.update({isActive: true}))
+    .tap(hostCollective => createdCollective.addHost(hostCollective, creatorUser))
     .tap((host) => Activity.create({
       type: activities.COLLECTIVE_CREATED,
       UserId: creatorUser.id,
@@ -352,6 +345,13 @@ export const createFromGithub = (req, res, next) => {
         user: creatorUser.info
       }
     }))
+    .then(() => {
+      if (collectiveData.tiers) {
+        return models.Tier.createMany(collectiveData.tiers, { CollectiveId: createdCollective.id, currency: collectiveData.currency })
+      }
+      return null;
+    })
+    .then(() => createdCollective.update({ isActive: true }))
     .then(() => {
       const data = {
         firstName: creatorUser.firstName,
