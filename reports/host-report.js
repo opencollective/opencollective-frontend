@@ -90,6 +90,7 @@ async function HostReport(year, month, hostId) {
   if (process.env.SLUGS) {
     const slugs = process.env.SLUGS.split(',');
     previewCondition = `AND c.slug IN ('${slugs.join("','")}')`
+    process.env.SKIP_PLATFORM_STATS = true;
   }
 
   const getPlatformStats = () => {
