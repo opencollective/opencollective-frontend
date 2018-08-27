@@ -1,5 +1,5 @@
 # source: http://localhost:3000/api/graphql
-# timestamp: Fri Aug 24 2018 16:39:15 GMT+0200 (Central European Summer Time)
+# timestamp: Tue Aug 28 2018 00:22:10 GMT+0200 (Central European Summer Time)
 
 """Breakdown of backers per type (ANY/USER/ORGANIZATION/COLLECTIVE)"""
 type BackersStatsType {
@@ -1127,6 +1127,9 @@ type Query {
   allHosts(
     """Fetch all collectives that match at least one of the tags"""
     tags: [String]
+
+    """Filter hosts by currency"""
+    currency: String
     orderBy: HostCollectiveOrderFieldType = collectives
     orderDirection: OrderDirection = DESC
     limit: Int = 10
