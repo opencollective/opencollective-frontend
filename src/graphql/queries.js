@@ -154,6 +154,8 @@ const getCollectiveToEditQuery = gql`
         slug
         name
         image
+        backgroundImage
+        settings
         description
         website
         twitterHandle
