@@ -1,6 +1,6 @@
 Hi {{recipient.firstName}}!
 
-Here is your {{#if month}}monthly{{else}}yearly{{/if}} report.
+Here is your {{#if month}}monthly{{else}}yearly{{/if}} report from {{{moment startDate}}} till {{{moment endDateIncluded}}} included.
 
 Balance as of {{{moment reportDate}}}: {{{currency stats.balance.totalInHostCurrency currency=host.currency}}} (+{{{currency stats.totalNetAmountReceived.totalInHostCurrency currency=host.currency}}}{{#if stats.totalAmountSpent.totalInHostCurrency}}, {{{currency stats.totalAmountSpent.totalInHostCurrency currency=host.currency}}}{{/if}})
 

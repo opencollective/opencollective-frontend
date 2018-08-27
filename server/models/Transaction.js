@@ -9,6 +9,7 @@ import debugLib from 'debug';
 import { toNegative } from '../lib/math';
 import { exportToCSV } from '../lib/utils';
 import { get } from 'lodash';
+import moment from 'moment';
 
 const debug = debugLib("transaction");
 
@@ -272,6 +273,7 @@ export default (Sequelize, DataTypes) => {
 
     const processValue = (attr, value) => {
       if (attr === "CollectiveId") return get(collectivesById[value], 'slug');
+      if (attr === 'createdAt') return moment(value).format('YYYY-MM-DD');
       if (['amount', 'netAmountInCollectiveCurrency', 'paymentProcessorFeeInHostCurrency', 'hostFeeInHostCurrency', 'platformFeeInHostCurrency', 'netAmountInHostCurrency'].indexOf(attr) !== -1) {
         return value / 100; // converts cents
       }
@@ -280,7 +282,7 @@ export default (Sequelize, DataTypes) => {
 
     return exportToCSV(transactions,
       [
-        'id', 'createdAt', 'CollectiveId', 'amount', 'currency', 'description', 'netAmountInCollectiveCurrency', 'hostCurrency', 'hostCurrencyFxRate',
+        'id', 'createdAt', 'type', 'CollectiveId', 'amount', 'currency', 'description', 'netAmountInCollectiveCurrency', 'hostCurrency', 'hostCurrencyFxRate',
         'paymentProcessorFeeInHostCurrency', 'hostFeeInHostCurrency', 'platformFeeInHostCurrency', 'netAmountInHostCurrency', 'Expense.privateMessage'
       ],
       getColumnName,
