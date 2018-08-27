@@ -172,7 +172,7 @@ describe('w9.bot.test.js', () => {
         collective: { id: collective.id }
       };
       const result = await utils.graphqlQuery(createExpenseQuery, { expense: data }, user);
-      result.errors && console.error(result.errors);
+      result.errors && console.error(data, JSON.stringify(result.errors, null, '  '));
 
       // Then there should be no errors in the response
       expect(result.errors).to.not.exist;

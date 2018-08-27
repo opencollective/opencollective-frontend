@@ -118,6 +118,11 @@ export async function newCollectiveWithHost(name, currency, hostCurrency, hostFe
   if (user) args['CreatedByUserId'] = user.id;
   const collective = await models.Collective.create(args);
   await collective.addHost(hostCollective);
+  // when adding the host, the collective.currency becomes the currency of the host
+  // so if we explicitly want a different currency for the collective, we need to update it again
+  if (currency !== hostCurrency) {
+    await collective.update({ currency });
+  }
   if (user) await collective.addUserWithRole(user, 'ADMIN');
   return { hostCollective, hostAdmin, collective, [slug]: collective };
 }
