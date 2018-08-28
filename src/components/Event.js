@@ -20,6 +20,7 @@ import { exportRSVPs } from '../lib/export_file';
 import ExpensesSection from '../apps/expenses/components/ExpensesSection';
 import withIntl from '../lib/withIntl';
 import Button from './Button';
+import SectionTitle from './SectionTitle';
 import SendMoneyToCollectiveBtn from './SendMoneyToCollectiveBtn';
 
 const defaultBackgroundImage = '/static/images/defaultBackgroundImage.png';
@@ -45,13 +46,14 @@ class Event extends React.Component {
       order: { tier: {} },
       tierInfo: {},
       api: { status: 'idle' },
-      event: this.props.event
-    }
+      event: this.props.event,
+    };
 
     this.messages = defineMessages({
       'event.over.sendMoneyToParent.title': { id: 'event.over.sendMoneyToParent.title', defaultMessage: 'Event is over and still has a positive balance'},
       'event.over.sendMoneyToParent.description': { id: 'event.over.sendMoneyToParent.description', defaultMessage: 'If you still have expenses related to this event, please file them. Otherwise consider moving the money to your collective {collective}'},
-      'event.over.sendMoneyToParent.transaction.description': { id: 'event.over.sendMoneyToParent.transaction.description', defaultMessage: 'Balance of {event}'}
+      'event.over.sendMoneyToParent.transaction.description': { id: 'event.over.sendMoneyToParent.transaction.description', defaultMessage: 'Balance of {event}'},
+      'event.tickets.edit': { id: 'event.tickets.edit', defaultMessage: 'Edit tickets' },
     });
 
     this.isEventOver = (new Date(this.event.endsAt)).getTime() < (new Date).getTime();
@@ -216,6 +218,9 @@ class Event extends React.Component {
     return (
       <div>
         <style jsx>{`
+          .EventPage .content {
+            max-width: 96rem;
+          }
           .adminActions {
             text-align: center;
             text-transform: uppercase;
@@ -236,8 +241,12 @@ class Event extends React.Component {
           .adminActions ul li {
             margin: 0 2rem;
           }
-          #tickets :global(.tier) {
-            margin: 4rem auto;
+          .ticketsGrid {
+            display: flex;
+            flex-wrap: wrap;
+          }
+          .ticketsGrid :global(.tier) {
+            margin: 1rem;
           }
         `}</style>
 
@@ -268,6 +277,7 @@ class Event extends React.Component {
                 collective={event}
                 title={event.name}
                 LoggedInUser={LoggedInUser}
+                cta={{ label: 'tickets', href: '#tickets' }}
                 style={get(event, 'settings.style.hero.cover') || get(event.parentCollective, 'settings.style.hero.cover')}
                 />
 
@@ -282,15 +292,22 @@ class Event extends React.Component {
                   </div>
 
                   <section id="tickets">
-                    { event.tiers.map((tier) =>
-                      (<Tier
-                        key={tier.id}
-                        tier={tier}
-                        values={this.state.tierInfo[tier.id] || {}}
-                        onChange={(response) => this.updateOrder(response)}
-                        onClick={(response) => this.handleOrderTier(response)}
-                        />)
-                    )}
+                    <SectionTitle
+                      section="tickets"
+                      action={LoggedInUser && LoggedInUser.canEditCollective(event) && { label: intl.formatMessage(this.messages['event.tickets.edit']), href: `/${event.slug}/edit#tiers` }}
+                      />
+
+                    <div className="ticketsGrid">
+                      { event.tiers.map((tier) =>
+                        (<Tier
+                          key={tier.id}
+                          tier={tier}
+                          values={this.state.tierInfo[tier.id] || {}}
+                          onChange={(response) => this.updateOrder(response)}
+                          onClick={(response) => this.handleOrderTier(response)}
+                          />)
+                      )}
+                    </div>
                   </section>
                 </div>
 
@@ -299,14 +316,14 @@ class Event extends React.Component {
                 { responses.sponsors.length > 0 &&
                   <section id="sponsors">
                     <h1>
-                      <FormattedMessage id="event.sponsors.title" defaultMessage={`Sponsors`} />
+                      <FormattedMessage id="event.sponsors.title" defaultMessage="Sponsors" />
                     </h1>
                     <Sponsors
                       sponsors={responses.sponsors.map(r => {
-                        const user = Object.assign({}, r.fromCollective);
-                        user.tier = r.tier;
-                        user.createdAt = new Date(r.createdAt);
-                        return user;
+                        const sponsorCollective = Object.assign({}, r.fromCollective);
+                        sponsorCollective.tier = r.tier;
+                        sponsorCollective.createdAt = new Date(r.createdAt);
+                        return sponsorCollective;
                       })}
                       />
                   </section>
@@ -315,11 +332,11 @@ class Event extends React.Component {
                 { responses.guests.length > 0 &&
                   <section id="responses">
                     <h1>
-                      <FormattedMessage id="event.responses.title.going" values={{n: responses.going.length}} defaultMessage={`{n} {n, plural, one {person going} other {people going}}`} />
+                      <FormattedMessage id="event.responses.title.going" values={{ n: responses.going.length }} defaultMessage="{n} {n, plural, one {person going} other {people going}}" />
                       { responses.interested.length > 0 &&
                         <span>
                           <span> - </span>
-                          <FormattedMessage id="event.responses.title.interested" values={{n: responses.interested.length}} defaultMessage={`{n} interested`} />
+                          <FormattedMessage id="event.responses.title.interested" values={{ n: responses.interested.length }} defaultMessage="{n} interested" />
                         </span>
                       }
                     </h1>

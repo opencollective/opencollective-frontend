@@ -1,11 +1,12 @@
 import React from 'react';
 import { FormattedMessage, FormattedDate } from 'react-intl';
+import { get } from 'lodash';
 
-const UserCard = ({ user, type }) => (
-  <a href={`/${user.username}`}>
-    <div className={`UserCard ${type}`}>
+const EventSponsorCard = ({ sponsor }) => (
+  <a href={`/${sponsor.slug}`}>
+    <div className="EventSponsorCard">
       <style jsx>{`
-        .UserCard {
+        .EventSponsorCard {
           display: inline-block;
           cursor: pointer;
           width: 12rem;
@@ -16,10 +17,10 @@ const UserCard = ({ user, type }) => (
           margin: 1rem;
           background: white;
         }
-        .UserCard:hover {
+        .EventSponsorCard:hover {
           box-shadow: 0 1px 5px rgba(46, 77, 97,.4);
         }
-        .UserCard.sponsor {
+        .EventSponsorCard.sponsor {
           width: 17.5rem;
         }
         img {
@@ -53,17 +54,17 @@ const UserCard = ({ user, type }) => (
           margin: 0;
         }
       `}</style>
-      <img src={user.image} />
-      <p className="name">{user.name}</p>
+      <img src={sponsor.image} />
+      <p className="name">{sponsor.name}</p>
       <div className="tier border-top border-gray px3 py2">
-        <p className="name">{user.tier.name}</p>
+        <p className="name">{get(sponsor, 'tier.name')}</p>
         <p className="since">
-          <FormattedMessage id="UserCard.since" defaultMessage={`since`} />&nbsp;
-          <FormattedDate value={user.createdAt} month="long" year="numeric" />
+          <FormattedMessage id="EventSponsorCard.since" defaultMessage="since" />&nbsp;
+          <FormattedDate value={sponsor.createdAt} month="long" year="numeric" />
         </p>
       </div>
     </div>
   </a>
 );
 
-export default UserCard;
+export default EventSponsorCard;

@@ -24,7 +24,7 @@ import Container from '../components/Container';
 import StyledLink from '../components/StyledLink';
 import CollectiveStatsCard from '../components/CollectiveStatsCard';
 import NewsletterContainer from '../components/NewsletterContainer';
-import SponsorCard from '../components/SponsorCard';
+import HomepageSponsorCard from '../components/HomepageSponsorCard';
 import {
   FacebookIcon,
   LinkedInIcon,
@@ -387,7 +387,7 @@ class HomePage extends React.Component {
                 </Link>
               </Container>
               <Container w={[1, null, 0.5]} display="flex" flexWrap="wrap" justifyContent="space-between" px={[1, null, 4]}>
-                {sponsors.map((c) => <Container w={[0.5, null, 0.33]} mb={2} px={1} maxWidth={224} key={c.id}><SponsorCard {...c} /></Container>)}
+                {sponsors.map((c) => <Container w={[0.5, null, 0.33]} mb={2} px={1} maxWidth={224} key={c.id}><HomepageSponsorCard {...c} /></Container>)}
               </Container>
             </Container>
 

@@ -1,12 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import UserCard from './UserCard';
+import EventSponsorCard from './EventSponsorCard';
 
 class Sponsors extends React.Component {
 
   static propTypes = {
-    sponsors: PropTypes.arrayOf(PropTypes.object).isRequired
-  }
+    sponsors: PropTypes.arrayOf(PropTypes.object).isRequired,
+  };
 
   constructor(props) {
     super(props);
@@ -26,7 +26,7 @@ class Sponsors extends React.Component {
         }
         `}</style>
         {sponsors.map((sponsor, index) =>
-          <UserCard type="sponsor" key={`sponsor${index}`} user={sponsor} />
+          <EventSponsorCard type="sponsor" key={`sponsor${index}`} sponsor={sponsor} />
         )}
       </div>
     )

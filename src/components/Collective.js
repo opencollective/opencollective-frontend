@@ -81,7 +81,7 @@ class Collective extends React.Component {
       notification.description = intl.formatMessage(this.messages['collective.created.description'], { host: collective.host.name });
     }
 
-    const cta = collective.isActive && collective.host && { href: `#contribute`, label: 'contribute' };
+    const cta = collective.isActive && collective.host && { href: '#contribute', label: 'contribute' };
 
     return (
       <div className={`CollectivePage ${collective.type}`}>
