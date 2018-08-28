@@ -74,7 +74,7 @@ class AddFundsForm extends React.Component {
         options: {
           collective: this.props.collective,
           host: this.props.host,
-          paymentMethod: get(this, 'props.host') ? this.props.host.paymentMethods.find(pm => pm.service === 'opencollective') : null,
+          paymentMethod: get(this, 'props.host.paymentMethods') ? this.props.host.paymentMethods.find(pm => pm.service === 'opencollective') : null,
         }
       },
       {
