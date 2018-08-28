@@ -142,43 +142,43 @@ class Banner extends React.Component {
           text-align: center;
         }
 
-        .btn { 
+        .button {
           width: 300px;
           height: 50px;
           overflow: hidden;
           margin: 0;
           padding: 0;
           background-repeat: no-repeat;
-          float:left;
+          float: left;
           border: none;
           background-color: transparent;
           cursor: pointer;
         }
 
-        .btn.contribute {
+        .button.contribute {
           width: 338px;
         }
-        .contribute.btn.blue {
+        .contribute.button.blue {
           background-image: url(/static/images/buttons/contribute-button-blue.svg);
         }
-        .btn:hover {
+        .button:hover {
           background-position: 0 -50px;
         }
-        .btn:active {
+        .button:active {
           background-position: 0 -100px;
         }
-        .btn:focus {
+        .button:focus {
           outline: 0;
         }
 
-        .btn.hover {
+        .button.hover {
           background-position: 0 -100px;
         }
         `}
         </style>
 
         { backers.organizations + backers.users === 0 &&
-          <a type="button" className="btn blue contribute" target="_blank" rel="noopener noreferrer" href={`https://opencollective.com/${collectiveSlug}`} />
+          <a type="button" className="button blue contribute" target="_blank" rel="noopener noreferrer" href={`https://opencollective.com/${collectiveSlug}`} />
         }
 
 
