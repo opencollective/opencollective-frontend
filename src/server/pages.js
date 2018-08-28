@@ -92,6 +92,15 @@ if (USE_PLEDGES) {
     .add('claimCollective', '/:collectiveSlug/claim');
 }
 
+// Application management
+pages
+  .add('applications', '/:collectiveSlug/applications')
+  .add(
+    'createApplication',
+    '/:collectiveSlug/applications/:type(apiKey|oauth)?/new',
+  )
+  .add('editApplication', '/:collectiveSlug/applications/:applicationId/edit');
+
 export default pages;
 
 export const { Link, Router } = pages;

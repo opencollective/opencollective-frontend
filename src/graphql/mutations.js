@@ -2,6 +2,8 @@ import { graphql, compose } from 'react-apollo';
 import gql from 'graphql-tag';
 import { pick, isArray } from 'lodash';
 
+import { getCollectiveApplicationsQuery } from './queries';
+
 const createOrderQuery = gql`
   mutation createOrder($order: OrderInputType!) {
     createOrder(order: $order) {
@@ -139,6 +141,38 @@ const editTiersQuery = gql`
 const deleteCollectiveQuery = gql`
   mutation deleteCollective($id: Int!) {
     deleteCollective(id: $id) {
+      id
+    }
+  }
+`;
+
+export const createApplicationMutation = gql`
+  mutation createApplication($application: ApplicationInput!) {
+    createApplication(application: $application) {
+      id
+      name
+      description
+      callbackUrl
+      clientId
+      clientSecret
+    }
+  }
+`;
+
+export const updateApplicationMutation = gql`
+  mutation updateApplication($id: String!, $application: ApplicationInput!) {
+    updateApplication(id: $id, application: $application) {
+      id
+      name
+      description
+      callbackUrl
+    }
+  }
+`;
+
+export const deleteApplicationMutation = gql`
+  mutation deleteApplication($id: String!) {
+    deleteApplication(id: $id) {
       id
     }
   }

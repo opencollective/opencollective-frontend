@@ -1,5 +1,5 @@
-# source: http://localhost:3000/api/graphql
-# timestamp: Thu Sep 20 2018 12:38:04 GMT+0200 (Central European Summer Time)
+# source: https://opencollective.com/api/graphql
+# timestamp: Fri Sep 21 2018 16:54:20 GMT+0200 (Central European Summer Time)
 
 """Application model"""
 type Application {
@@ -735,7 +735,20 @@ type Mutation {
   createApplication(application: ApplicationInput!): Application
   updateApplication(id: Int!, application: ApplicationInput!): Application
   deleteApplication(id: Int!): Application
-  createPaymentMethod(type: String!, amount: Int!, currency: String!, CollectiveId: Int!, PaymentMethodId: Int, description: String, expiryDate: String): PaymentMethodType
+  createPaymentMethod(
+    type: String!
+    amount: Int!
+    currency: String!
+
+    """
+    Limit this payment method to make donations to collectives having those tags
+    """
+    limitedToTags: [String]
+    CollectiveId: Int!
+    PaymentMethodId: Int
+    description: String
+    expiryDate: String
+  ): PaymentMethodType
   claimPaymentMethod(code: String!, user: UserInputType): PaymentMethodType
   claimCollective(id: Int!): CollectiveInterface
 }
