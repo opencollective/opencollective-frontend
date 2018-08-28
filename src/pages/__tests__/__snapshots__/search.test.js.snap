@@ -955,7 +955,7 @@ exports[`Search Page renders empty results message 1`] = `
         </a>
         <a
           className="c37"
-          href="https://slack.com/opencollective"
+          href="https://slack.opencollective.com"
         >
           <svg
             height={15}
@@ -2247,7 +2247,7 @@ exports[`Search Page renders error message 1`] = `
         </a>
         <a
           className="c34"
-          href="https://slack.com/opencollective"
+          href="https://slack.opencollective.com"
         >
           <svg
             height={15}
@@ -3733,7 +3733,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
         </a>
         <a
           className="c37"
-          href="https://slack.com/opencollective"
+          href="https://slack.opencollective.com"
         >
           <svg
             height={15}
@@ -5197,7 +5197,7 @@ exports[`Search Page renders search results with pagination 1`] = `
         </a>
         <a
           className="c37"
-          href="https://slack.com/opencollective"
+          href="https://slack.opencollective.com"
         >
           <svg
             height={15}
