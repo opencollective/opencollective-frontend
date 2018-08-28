@@ -46,8 +46,8 @@ export const TextInput = StyledInput.extend`
 
 TextInput.defaultProps = {
   fontSize: '14px',
-  px: 2,
-  py: 1,
+  px: 3,
+  py: 2,
   type: 'text',
 };
 
@@ -60,11 +60,11 @@ export const SubmitInput = StyledInput.extend`
 SubmitInput.defaultProps = {
   bg: '#3385ff',
   color: 'white',
+  fontSize: 14,
   fontWeight: 'bold',
-  maxWidth: 250,
-  py: 2,
+  px: 5,
+  py: 3,
   type: 'submit',
-  width: 1,
 };
 
 export default StyledInput;

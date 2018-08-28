@@ -15,7 +15,7 @@ import ErrorPage from '../components/ErrorPage';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
 import LoadingGrid from '../components/LoadingGrid';
-
+import StyledLink from '../components/StyledLink';
 import colors from '../constants/colors';
 
 import { addSearchQueryData } from '../graphql/queries';
@@ -167,6 +167,23 @@ class SearchPage extends React.Component {
                         &quot;
                       </em>
                     </p>
+                    <Link route={`/pledges/new?name=${term}`} passHref>
+                      <StyledLink
+                        bg="#3385FF"
+                        borderRadius="50px"
+                        color="white"
+                        display="block"
+                        fontSize="14px"
+                        fontWeight="bold"
+                        maxWidth="220px"
+                        hover={{ color: 'white' }}
+                        py={2}
+                        px={4}
+                        textAlign="center"
+                      >
+                        Make a pledge
+                      </StyledLink>
+                    </Link>
                   </Flex>
                 )}
             </Flex>

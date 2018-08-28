@@ -73,6 +73,7 @@ export const getLoggedInUserQuery = gql`
         type
         slug
         settings
+        currency
         paymentMethods(limit: 5) {
           id
           uuid
