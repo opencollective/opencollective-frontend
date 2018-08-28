@@ -202,8 +202,17 @@ class MenuBar extends React.Component {
 
   // Render Contribute and Submit Expense buttons
   renderButtons = () => {
-    const { collective, cta, LoggedInUser } = this.props;
+    const { collective, LoggedInUser } = this.props;
     const offset = -this.height;
+
+    let cta = this.props.cta;
+    if (get(cta, 'label')) {
+      cta = (
+        <Link route={cta.href} animate={{ offset }}>
+          <Button className="blue">{cta.label}</Button>
+        </Link>
+      );
+    }
 
     const AddFundsModal = () => (
       <Modal
@@ -221,9 +230,9 @@ class MenuBar extends React.Component {
                     <Button
                       className="blue"
                       onClick={() => this.setState({ fundsAdded: false, showAddFunds: false })}
-                    >
+                      >
                       Ok
-                  </Button>
+                    </Button>
                   </center>
                 </div> }
 
@@ -270,11 +279,7 @@ class MenuBar extends React.Component {
 
         `}
         </style>
-        { this.state.sticky && get(cta, 'label') &&
-          <Link route={cta.href} animate={{ offset }}>
-            <Button className="blue">{cta.label}</Button>
-          </Link>
-        }
+        { this.state.sticky && cta && cta }
         { ['COLLECTIVE', 'EVENT'].indexOf(collective.type) !== -1  &&
           <Button className="submitExpense darkBackground" href={`${collective.path}/expenses/new`}><FormattedMessage id="menu.submitExpense" defaultMessage="Submit Expense" /></Button>
         }

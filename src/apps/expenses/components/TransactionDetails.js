@@ -31,7 +31,7 @@ class TransactionDetails extends React.Component {
   render() {
     const { intl, collective, LoggedInUser, transaction } = this.props;
     const type = transaction.type.toLowerCase();
-    const hostFeePercent = `${transaction.host.hostFeePercent}%`;
+    const hostFeePercent = transaction.host && `${transaction.host.hostFeePercent}%`;
     const amountDetails = [intl.formatNumber(transaction.amount / 100, { currency: transaction.currency, ...this.currencyStyle })];
     if (transaction.hostCurrencyFxRate && transaction.hostCurrencyFxRate !== 1) {
       const amountInHostCurrency = transaction.amount * transaction.hostCurrencyFxRate;

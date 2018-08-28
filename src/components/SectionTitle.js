@@ -11,8 +11,8 @@ class SectionTitle extends React.Component {
     title: PropTypes.node,
     subtitle: PropTypes.node,
     values: PropTypes.object,
-    action: PropTypes.object // { label, href }
-  }
+    action: PropTypes.object, // { label, href }
+  };
 
   constructor(props) {
     super(props);
@@ -33,6 +33,7 @@ class SectionTitle extends React.Component {
       'contributors.subtitle': { id: 'section.contributors.subtitle', defaultMessage: `{organizations, plural, one {{organizations} organization and} other {{organizations} organizations and}} {users} {users, plural, one {person is} other {people are}} supporting us.` },
       'contributionDetails.title': { id: 'tier.order.contributionDetails', defaultMessage: 'Contribution details' },
       'contributionDetails.subtitle': { id: 'tier.order.contributionDetails.description', defaultMessage: 'Thank you for contributing to our budget! 🙏' },
+      'tickets.title': { id: 'section.tickets.title', defaultMessage: 'Tickets' },
       'ticketDetails.title': { id: 'tier.order.ticketDetails', defaultMessage: 'Ticket details' },
       'userDetails.title': { id: 'tier.order.userDetails', defaultMessage: 'Personal details' },
       'organizationDetails.title': { id: 'tier.order.organizationDetails', defaultMessage: 'Organization details' },
