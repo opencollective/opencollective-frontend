@@ -6,6 +6,7 @@ import { get } from 'lodash';
 import withIntl from '../../../lib/withIntl';
 import { capitalize } from '../../../lib/utils';
 import Avatar from '../../../components/Avatar';
+import Link from '../../../components/Link';
 
 import TransactionDetails from './TransactionDetails';
 
@@ -125,9 +126,9 @@ class Transaction extends React.Component {
           }
         `}</style>
         <div className="fromCollective">
-          <a href={`/${transaction.fromCollective.slug}`} title={transaction.fromCollective.name}>
+          <Link route={transaction.fromCollective.path} title={transaction.fromCollective.name}>
             <Avatar src={transaction.fromCollective.image} key={transaction.fromCollective.id} id={transaction.fromCollective.id} radius={40} />
-          </a>
+          </Link>
         </div>
         <div className="body">
           <div className="description">

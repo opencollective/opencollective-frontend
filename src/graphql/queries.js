@@ -24,6 +24,7 @@ export const transactionFields = `
     id
     name
     slug
+    path
     image
   }
   host {
