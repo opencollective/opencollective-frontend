@@ -26,7 +26,7 @@ class TransactionsPage extends React.Component {
   async componentDidMount() {
     const { getLoggedInUser } = this.props;
     const LoggedInUser = getLoggedInUser && await getLoggedInUser(this.props.collectiveSlug);
-    this.setState({LoggedInUser});
+    this.setState({ LoggedInUser });
   }
 
   render() {
@@ -36,7 +36,7 @@ class TransactionsPage extends React.Component {
     if (!data.Collective) return (<ErrorPage data={data} />);
 
     const collective = data.Collective;
-    const cta = ["USER", "ORGANIZATION"].indexOf(collective.type) === -1 && { href: `/${collective.slug}#contribute`, label: 'contribute' };
+    const cta = ['USER', 'ORGANIZATION'].indexOf(collective.type) === -1 && { href: `/${collective.slug}#contribute`, label: 'contribute' };
 
     return (
       <div className="TransactionsPage">
