@@ -210,6 +210,7 @@ class Tier extends React.Component {
             color: ${colors.darkgray};
           }
           .description {
+            min-height: 5rem;
             margin: 0rem 1rem 1rem 1rem;
             font-size: 1.5rem;
           }
