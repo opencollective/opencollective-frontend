@@ -104,7 +104,7 @@ class Footer extends React.Component {
             <SocialLink href="https://github.com/opencollective">
               <GithubIcon size={15} fill="#9399A3" />
             </SocialLink>
-            <SocialLink href="https://slack.com/opencollective">
+            <SocialLink href="https://slack.opencollective.com">
               <SlackIcon size={15} fill="#9399A3" />
             </SocialLink>
             <SocialLink href="mailto:info@opencollective.com">
