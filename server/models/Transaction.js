@@ -207,7 +207,8 @@ export default (Sequelize, DataTypes) => {
     let HostCollectiveId = this.HostCollectiveId;
     // if the transaction is from the perspective of the fromCollective
     if (!HostCollectiveId) {
-      HostCollectiveId = await models.Collective.getHostCollectiveId(this.FromCollectiveId);
+      const fromCollective = await models.Collective.findById(this.FromCollectiveId);
+      HostCollectiveId = await fromCollective.getHostCollectiveId();
     }
     return models.Collective.findById(HostCollectiveId);
   };
