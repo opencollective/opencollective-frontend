@@ -396,6 +396,12 @@ export default (Sequelize, DataTypes) => {
     return result;
   }
 
+  User.prototype.isRoot = function() {
+    const result = this.hasRole([roles.ADMIN], 1);
+    debug("isRoot?", result);
+    return result;
+  }
+
   User.prototype.isMember = function(CollectiveId) {
     const result = (this.CollectiveId === CollectiveId) || this.hasRole([roles.HOST, roles.ADMIN, roles.MEMBER], CollectiveId);
     debug("isMember of CollectiveId", CollectiveId, "?", result);
