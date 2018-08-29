@@ -41,7 +41,10 @@ Subject: Thank you for your {{{currency order.totalAmount currency=order.currenc
 </p>
 <p>Your donation is tax-deductible to the extent allowed by law. You may save this receipt for your records. San Francisco Art & Film for Teenagers is a qualified non-profit organization with 501-C status, tax ID: 94-3310464.</p>
 
-{{> subscriptions}}
+<p>
+  P.S: You can download a PDF receipt for your donation <a href="{{config.host.website}}/{{collective.slug}}/transactions/{{transaction.uuid}}/invoice.pdf">here</a>{{#if subscriptionsLink}}, and you can manage your subscriptions <a href="{{subscriptionsLink}}">here</a>{{/if}}.
+</p>
+
 {{> relatedcollectives}}
 
 {{> footer}}

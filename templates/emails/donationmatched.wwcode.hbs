@@ -17,7 +17,9 @@ Subject: You matched a {{{currency order.totalAmount currency=order.currency}}} 
 
 <p>On behalf of the Women Who Code Board of Executives, our leadership team, and our members worldwide, thank you for furthering our mission. We appreciate and value your contribution and continued support of our community.</p>
 
-<p>P.S: You can download a receipt for your donation in PDF <a href="{{config.host.website}}/{{collective.slug}}/transactions/{{transaction.uuid}}/invoice.pdf">here</a></p>
+<p>
+  P.S: You can download a PDF receipt for your donation <a href="{{config.host.website}}/{{collective.slug}}/transactions/{{transaction.uuid}}/invoice.pdf">here</a>{{#if subscriptionsLink}}, and you can manage your subscriptions <a href="{{subscriptionsLink}}">here</a>{{/if}}.
+</p>
 
 <p>Warmly,</p>
 

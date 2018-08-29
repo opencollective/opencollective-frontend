@@ -28,12 +28,12 @@ Subject: Thank you for your {{{currency order.totalAmount currency=order.currenc
   Your gift will help us continue our activities.</p>
 {{/if}}
 
-<p>Join our <a href="https://facebook.com/collectives/BrusselsTogether">Facebook Collective</a> or join the conversation on <a href="https://slack.brusselstogether.org">our slack</a>.
+<p>Join our <a href="https://facebook.com/collectives/BrusselsTogether">Facebook Group</a> or join the conversation on <a href="https://slack.brusselstogether.org">our slack</a>.
 And don't forget to use the hashtag #BrusselsTogether whenever you share something on social networks about initiatives that are happening that we need to support together.</p>
 
-{{> subscriptions}}
-
-<p>P.S: You can download a receipt for your donation in PDF <a href="{{config.host.website}}/{{collective.slug}}/transactions/{{transaction.uuid}}/invoice.pdf">here</a></p>
+<p>
+  P.S: You can download a PDF receipt for your donation <a href="{{config.host.website}}/{{collective.slug}}/transactions/{{transaction.uuid}}/invoice.pdf">here</a>{{#if subscriptionsLink}}, and you can manage your subscriptions <a href="{{subscriptionsLink}}">here</a>{{/if}}.
+</p>
 
 <p>Warmly,</p>
 
