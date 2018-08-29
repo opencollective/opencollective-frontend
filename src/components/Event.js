@@ -247,6 +247,7 @@ class Event extends React.Component {
           }
           .ticketsGrid :global(.tier) {
             margin: 1rem;
+            align-self: flex-start;
           }
         `}</style>
 
