@@ -32,9 +32,9 @@ Subject: Thank you for your {{{currency donation.amount currency=donation.curren
   <a href="https://opencollective.com/{{group.slug}}">https://opencollective.com/{{group.slug}}</a>.
 </p>
 
-{{> subscriptions}}
-
-<p>P.S: You can download a receipt for your donation in PDF <a href="{{config.host.website}}/{{group.slug}}/transactions/{{transaction.uuid}}/invoice.pdf">here</a></p>
+<p>
+  P.S: You can download a PDF receipt for your donation <a href="{{config.host.website}}/{{collective.slug}}/transactions/{{transaction.uuid}}/invoice.pdf">here</a>{{#if subscriptionsLink}}, and you can manage your subscriptions <a href="{{subscriptionsLink}}">here</a>{{/if}}.
+</p>
 
 <p>Warmly,</p>
 
