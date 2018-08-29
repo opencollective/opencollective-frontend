@@ -231,7 +231,7 @@ export default (Sequelize, DataTypes) => {
   Transaction.prototype.getDetailsForUser = function(user) {
     return user.populateRoles()
       .then(() => {
-        if (user.isAdmin(this.FromCollectiveId) || user.isAdmin(this.CollectiveId)) {
+        if (user.isAdmin(this.FromCollectiveId) || user.isAdmin(this.CollectiveId) || user.isRoot()) {
           return this.uuid;
         } else {
           return null;
