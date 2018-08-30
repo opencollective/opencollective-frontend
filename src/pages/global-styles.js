@@ -227,12 +227,13 @@ injectGlobal`
     }
   }
 
+  .col-sm-12 {
+    width: 100%;
+  }
+
   @media(max-width: 420px) {
     .mobileOnly {
       display: inherit !important;
-    }
-    .col-sm-12 {
-      width: 100%;
     }
   }
 `;
