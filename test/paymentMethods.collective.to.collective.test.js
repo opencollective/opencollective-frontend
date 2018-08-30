@@ -35,8 +35,8 @@ const createOrderQuery = `
 
 
 describe("paymentMethods.collective.to.collective.test.js", () => {
-  let sandbox, user1, user2, transactions,  collective1, collective2, 
-    collective3, collective4, collective5, collective6, host1, host2, host3, host4, 
+  let sandbox, user1, user2, transactions,  collective1, collective2,
+    collective3, collective4, collective5, collective6, host1, host2, host3, host4,
     organization, stripePaymentMethod, openCollectivePaymentMethod;
 
   before(async () => {
@@ -413,7 +413,7 @@ describe("paymentMethods.collective.to.collective.test.js", () => {
         CollectiveId: collective6.HostCollectiveId,
         monthlyLimitPerMember: 10000
       });
-      
+
       // finding opencollective payment method for collective1
       openCollectivePaymentMethod = await models.PaymentMethod.findOne({ where: {type: 'collective', CollectiveId: collective5.id}});
 
@@ -427,7 +427,7 @@ describe("paymentMethods.collective.to.collective.test.js", () => {
 
       // Executing queries
       const res = await utils.graphqlQuery(createOrderQuery, { order }, user1);
-      
+
       // Then there should be no errors
       res.errors && console.error(res.errors);
       expect(res.errors).to.not.exist;
