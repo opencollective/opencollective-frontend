@@ -320,7 +320,6 @@ const mutations = {
       CollectiveId: { type: new GraphQLNonNull(GraphQLInt) },
       HostCollectiveId: { type: new GraphQLNonNull(GraphQLInt) },
       description: { type: GraphQLString },
-      PaymentMethodId: { type: GraphQLInt },
     },
     resolve: async (_, args, req) => addFundsToOrg(args, req.remoteUser),
   }
