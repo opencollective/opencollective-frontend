@@ -108,8 +108,14 @@ paymentMethodProvider.processOrder = async (order, options = {}) => {
     const fromCollectiveHostPaymentMethod = await models.PaymentMethod.findOne({
       where: {
         CollectiveId: fromCollectiveHost.id,
-        type: 'creditcard'
-      }
+        type: 'creditcard',
+        matching: null,
+        archivedAt:  null ,
+        deletedAt: null,
+      },
+      order: [
+        ['initialBalance', 'DESC'],
+      ],
     });
     if (!fromCollectiveHostPaymentMethod) {
       throw new Error(`Host ${fromCollectiveHost.name} needs to add a credit card to send money to a different host (${collectiveHost.name}).`);
