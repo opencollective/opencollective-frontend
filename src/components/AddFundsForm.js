@@ -238,9 +238,6 @@ class AddFundsForm extends React.Component {
           color: red;
           font-weight: bold;
         }
-        :global(.col-sm-12) {
-          width: 100%;
-        }
         .value {
           padding-top: 7px;
           display: inline-block;
