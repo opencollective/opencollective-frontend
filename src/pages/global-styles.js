@@ -231,5 +231,8 @@ injectGlobal`
     .mobileOnly {
       display: inherit !important;
     }
+    .col-sm-12 {
+      width: 100%;
+    }
   }
 `;
