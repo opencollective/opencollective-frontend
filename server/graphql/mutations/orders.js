@@ -455,25 +455,11 @@ export async function addFundsToOrg(args, remoteUser) {
     models.Collective.findById(args.CollectiveId),
     models.Collective.findById(args.HostCollectiveId)
   ]);
-  // if a PaymentMethodId is defined it means we are going to try to
-  // increase the balance of an existing Payment method
-  if (args.PaymentMethodId) {
-    const paymentMethod = await models.PaymentMethod.findOne({ where: {
-      id: args.PaymentMethodId,
-    } });
-    // check whether query found the payment method id
-    if (paymentMethod) {
-      await paymentMethod.update({
-        initialBalance: paymentMethod.initialBalance + args.totalAmount,
-      });
-      return paymentMethod;
-    }
-  }
-  // otherwise, creates a new Payment method
+  // creates a new Payment method
   const paymentMethod = await models.PaymentMethod.create({
     name: args.description || 'Host funds',
     initialBalance: args.totalAmount,
-    monthlyLimitPerMember: args.totalAmount,
+    monthlyLimitPerMember: null,
     currency: hostCollective.currency,
     CollectiveId: args.CollectiveId,
     customerId: fromCollective.slug,
