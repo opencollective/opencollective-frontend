@@ -7,14 +7,6 @@ import models from '../server/models';
 import * as utils from './utils';
 import * as store from './features/support/stores';
 
-// const addFundsToOrgQuery = `
-//   mutation addFundsToOrg($totalAmount: Int!, $CollectiveId: Int!, $HostCollectiveId: Int!, $description: String) {
-//     addFundsToOrg(totalAmount: $totalAmount, CollectiveId: $CollectiveId, HostCollectiveId: $HostCollectiveId, description: $description) {
-//       id
-//     }
-//   }
-// `;
-
 const addFundsToOrgQuery = `
   mutation addFundsToOrg($totalAmount: Int!, $CollectiveId: Int!, $HostCollectiveId: Int!, $description: String, $PaymentMethodId: Int) {
     addFundsToOrg(totalAmount: $totalAmount, CollectiveId: $CollectiveId, HostCollectiveId: $HostCollectiveId, description: $description, PaymentMethodId: $PaymentMethodId) {
