@@ -39,7 +39,7 @@ class CollectivePage extends React.Component {
   }
 
   shouldComponentUpdate(nextProps) {
-    // It can be that Apollo is reseting data when navigating from a page to another
+    // It can be that Apollo is resetting data when navigating from a page to another
     // We try to detect that and prevent rendering
     // This is a workaround and the root cause should be ultimately fixed
     if (this.props.data.Collective && !nextProps.data.Collective) {
