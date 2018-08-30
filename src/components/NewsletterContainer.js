@@ -43,7 +43,6 @@ class NewsletterContainer extends React.Component {
                 color="white"
                 fontSize={12}
                 fontWeight="bold"
-                hover={{ color: 'white' }}
                 px={3}
                 py={2}
                 textAlign="center"

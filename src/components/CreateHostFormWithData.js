@@ -44,7 +44,7 @@ class CreateHostFormWithData extends React.Component {
     const userCollective = data.Collective;
     if (!userCollective) {
       return (
-        <Flex py={3} w={1} justifyContent="center">
+        <Flex py={3} width={1} justifyContent="center">
           <LoadingGrid />
         </Flex>
       )

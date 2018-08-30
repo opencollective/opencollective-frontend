@@ -6,7 +6,7 @@ const Loading = () => {
   return (
     <div className="Loading">
       <Flex justifyContent={['center', 'center', 'flex-start']} flexWrap="wrap">
-        <Flex py={3} w={1} justifyContent="center">
+        <Flex py={3} width={1} justifyContent="center">
           <LoadingGrid />
         </Flex>
       </Flex>

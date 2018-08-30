@@ -111,8 +111,8 @@ class SearchPage extends React.Component {
           showSearch={false}
         />
         <Body>
-          <Container mx="auto" px={3} w={[1, 0.85]}>
-            <Box w={1}>
+          <Container mx="auto" px={3} width={[1, 0.85]}>
+            <Box width={1}>
               <form method="GET" onSubmit={this.refetch}>
                 <FormGroup controlId="search" bsSize="large">
                   <ControlLabel className="h1">Search Open Collective</ControlLabel>
@@ -125,7 +125,7 @@ class SearchPage extends React.Component {
             </Box>
             <Flex justifyContent={['center', 'center', 'flex-start']} flexWrap="wrap">
               { loading && (		
-                <Flex py={3} w={1} justifyContent="center">
+                <Flex py={3} width={1} justifyContent="center">
                   <LoadingGrid />
                 </Flex>
               )}
@@ -137,7 +137,7 @@ class SearchPage extends React.Component {
 
               { /* TODO: add suggested collectives when the result is empty */ }
               {showCollectives && collectives.length === 0 && (
-                <Flex py={3} w={1} justifyContent="center">
+                <Flex py={3} width={1} justifyContent="center">
                   <p><em>No collectives found matching your query: &quot;{term}&quot;</em></p>
                 </Flex>
               )}

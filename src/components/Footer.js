@@ -78,7 +78,7 @@ class Footer extends React.Component {
           <Container
             display="flex"
             mt={3}
-            w={[null, null, 1/3]}
+            width={[1, null, 1/3]}
             flexDirection="column"
             maxWidth="300px"
           >
@@ -91,8 +91,9 @@ class Footer extends React.Component {
             display="flex"
             justifyContent="space-evenly"
             alignItems="center"
-            w={1} my={3}
-            order={[null, null, '3']}
+            width={1}
+            my={3}
+            order={['2', null, '3']}
             maxWidth="300px"
           >
             <SocialLink href="https://medium.com/open-collective">
@@ -111,9 +112,9 @@ class Footer extends React.Component {
               <MailIcon size={15} fill="#9399A3" />
             </SocialLink>
           </Container>
-          <Flex is="nav" flexWrap="wrap" justifyContent="center" mt={3} flex="1 1 auto">
+          <Flex is="nav" flexWrap="wrap" justifyContent="center" mt={3} flex="1 1 auto" order={['3', null, '2']}>
             {Object.keys(navigation).map((key) => (
-              <Box key={key} w={[0.5, null, 0.25]} mb={3}>
+              <Box key={key} width={[0.5, null, 0.25]} mb={3}>
                 <P textAlign={['center', null, 'left' ]} fontSize="1.2rem" color="#C2C6CC" letterSpacing="1px" pb={3}>{key}</P>
                 <FlexList justifyContent="center" flexDirection="column" pl={0} pr={2}>
                   {Object.keys(navigation[key]).map((item) => (

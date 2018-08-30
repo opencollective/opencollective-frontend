@@ -133,7 +133,7 @@ class EditHost extends React.Component {
         `}</style>
         <Option id="noHost">
           <Flex>
-            <Box w="50px" mr={2}>
+            <Box width="50px" mr={2}>
               <Radio
                 checked={this.state.selectedOption === 'noHost'}
                 onChange={() => this.handleChange('selectedOption', 'noHost')}
@@ -148,7 +148,7 @@ class EditHost extends React.Component {
 
         <Option id="createHost">
           <Flex>
-            <Box w="50px" mr={2}>
+            <Box width="50px" mr={2}>
               <Radio
                 checked={this.state.selectedOption === 'createHost'}
                 onChange={() => this.handleChange('selectedOption', 'createHost')}
@@ -170,7 +170,7 @@ class EditHost extends React.Component {
 
         <Option id="findHost">
           <Flex>
-            <Box w="50px" mr={2}>
+            <Box width="50px" mr={2}>
               <Radio
                 checked={this.state.selectedOption === 'findHost'}
                 onChange={() => this.handleChange('selectedOption', 'findHost')}

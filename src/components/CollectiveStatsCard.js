@@ -37,7 +37,7 @@ const CollectiveStatsCard = ({
     overflow="hidden"
   >
     <Container
-      backgroundImage={backgroundImage || defaultBackgroundImage[type]}
+      backgroundImage={`url(${backgroundImage || defaultBackgroundImage[type]})`}
       backgroundSize="cover"
       backgroundRepeat="no-repeat"
       backgroundPosition="center center"
@@ -49,7 +49,7 @@ const CollectiveStatsCard = ({
         <Link route={`/${slug}`} passHref><a>
           <Container
             bg="#2877ED"
-            backgroundImage={image || defaultImage[type]}
+            backgroundImage={`url(${image || defaultImage[type]})`}
             backgroundSize="contain"
             backgroundRepeat="no-repeat"
             backgroundPosition="center center"
@@ -96,11 +96,11 @@ const CollectiveStatsCard = ({
 
     <Container display="flex" borderTop="1px solid #E3E4E6" py={2} mt={3}>
       {(get(stats, 'backers.all', 0) || get(stats, 'backers.all', 0)) ? [
-        <Flex w={0.5} alignItems="center" flexDirection="column" key="backers">
+        <Flex width={0.5} alignItems="center" flexDirection="column" key="backers">
           <P fontSize="1.2rem" fontWeight="bold">{get(stats, 'backers.all', 0)}</P>
           <P fontSize="1.2rem">backers</P>
         </Flex>,
-        <Flex w={0.5} alignItems="center" flexDirection="column" key="monthly spending">
+        <Flex width={0.5} alignItems="center" flexDirection="column" key="monthly spending">
           <P fontSize="1.2rem" fontWeight="bold">
             <Currency value={get(stats, 'monthlySpending', 0)} currency={currency} precision={0} abbreviate />
           </P>

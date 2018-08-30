@@ -149,7 +149,7 @@ class TopBarProfileMenu extends React.Component {
             >
               <FormattedMessage id="collective" defaultMessage="my collectives" />
             </P>
-            <Container height="0.1rem" bg="#E6E6E6" w={1} minWidth={50} />
+            <Container height="0.1rem" bg="#E6E6E6" width={1} minWidth={50} />
             <Link route="/create">
               <StyledLink border="1px solid #D5DAE0" borderRadius="20px" px={2} py={1} color="#6E747A" display="inline-block" ml={2} fontSize="1rem" whiteSpace="nowrap">+ New</StyledLink>
             </Link>
@@ -160,7 +160,7 @@ class TopBarProfileMenu extends React.Component {
                 <Link route={`/${get(membership, 'collective.slug')}`}>
                   <StyledLink title={this.tooltip(membership)} color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial" fontWeight="400">
                     <Flex alignItems="center">
-                      <Avatar backgroundImage={get(membership, 'collective.image')} size="2.8rem" borderRadius="3px" border="1px solid rgba(18,19,20,0.12)" mr={2} />
+                      <Avatar backgroundImage={`url(${get(membership, 'collective.image')})`} size="2.8rem" borderRadius="3px" border="1px solid rgba(18,19,20,0.12)" mr={2} />
                       {get(membership, 'collective.slug')}
                     </Flex>
                   </StyledLink>
@@ -183,7 +183,7 @@ class TopBarProfileMenu extends React.Component {
             >
               <FormattedMessage id="organization" defaultMessage="my organizations" />
             </P>
-            <Container height="0.1rem" bg="#E6E6E6" w={1} minWidth={50} />
+            <Container height="0.1rem" bg="#E6E6E6" width={1} minWidth={50} />
             <Link route="/organizations/new">
               <StyledLink border="1px solid #D5DAE0" borderRadius="20px" px={2} py={1} color="#6E747A" display="inline-block" ml={2} fontSize="1rem" whiteSpace="nowrap">+ New</StyledLink>
             </Link>
@@ -194,7 +194,7 @@ class TopBarProfileMenu extends React.Component {
                 <Link route={`/${get(membership, 'collective.slug')}`}>
                   <StyledLink title={this.tooltip(membership)} color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial" fontWeight="400">
                     <Flex alignItems="center">
-                      <Avatar backgroundImage={get(membership, 'collective.image')} size="2.8rem" borderRadius="3px" border="1px solid rgba(18,19,20,0.12)" mr={2} />
+                      <Avatar backgroundImage={`url(${get(membership, 'collective.image')})`} size="2.8rem" borderRadius="3px" border="1px solid rgba(18,19,20,0.12)" mr={2} />
                       {get(membership, 'collective.slug')}
                     </Flex>
                   </StyledLink>
@@ -209,7 +209,7 @@ class TopBarProfileMenu extends React.Component {
             </Box>
           )}
         </Container>
-        <Container height="0.1rem" bg="#E6E6E6" w={1} />
+        <Container height="0.1rem" bg="#E6E6E6" width={1} />
         <Container p={[3]}>
             <P
               color="#B4BBBF"
@@ -263,7 +263,7 @@ class TopBarProfileMenu extends React.Component {
         {LoggedInUser.image && (
           <Avatar
             backgroundColor="#FDFDFD"
-            backgroundImage={LoggedInUser.image}
+            backgroundImage={`url(${LoggedInUser.image})`}
             borderRadius="100%"
             display="inline-block"
             size="2.6rem"
@@ -323,7 +323,6 @@ class TopBarProfileMenu extends React.Component {
               color="#3385FF"
               display="inline-block"
               fontSize="1.4rem"
-              hover={{ cursor: 'pointer' }}
               px={3}
               py={2}
             >

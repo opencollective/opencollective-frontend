@@ -22,11 +22,11 @@ const SponsorCard = ({
 }) => (
   <Container bg="white" borderRadius="8px" border="1px solid rgba(18,19,20,0.2)" minHeight="100%">
     <Container display="flex" justifyContent="space-between" alignItems="center" pt={3}>
-      <Container bg="#E8E9EB" height="1px" w={0.25} />
+      <Container bg="#E8E9EB" height="1px" width={0.25} />
 
       <Link route={`/${slug}`} passHref><a>
         <Container
-          backgroundImage={imagePreview(image || defaultImage[type])}
+          backgroundImage={`url(${imagePreview(image || defaultImage[type])})`}
           backgroundSize="contain"
           backgroundRepeat="no-repeat"
           backgroundPosition="center center"
@@ -37,7 +37,7 @@ const SponsorCard = ({
         />
       </a></Link>
 
-      <Container bg="#E8E9EB" height="1px" w={0.25} />
+      <Container bg="#E8E9EB" height="1px" width={0.25} />
     </Container>
 
     <P fontSize="1.4rem" textAlign="center" fontWeight="bold" mt={3} px={2}>

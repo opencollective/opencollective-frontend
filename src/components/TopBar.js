@@ -76,7 +76,7 @@ class TopBar extends React.Component {
 
           {showSearch && (
             <Flex justifyContent="center" flex="1 1 auto">
-              <Hide xs w={1}>
+              <Hide xs width={1}>
                 <SearchFormContainer p={2}>
                   <SearchForm />
                 </SearchFormContainer>
