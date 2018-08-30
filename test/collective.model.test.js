@@ -178,7 +178,7 @@ describe('Collective model', () => {
         expect(e.message).to.contain(`This collective already has a host`);
       }
     });
-    
+
     it("fails to change host if there is a pending balance", async () => {
       try {
         await collective.changeHost();
