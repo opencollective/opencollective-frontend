@@ -108,7 +108,7 @@ class MenuBar extends React.Component {
           anchor: el.id,
           title: titleEl && titleEl.innerText,
           link: `#${el.id}`,
-          position: el.offsetTop
+          position: el.offsetTop,
         };
         if (menuItem.title && menuItem.title.length < 30) {
           menuItemsFoundOnPage.push(menuItem);
@@ -139,7 +139,7 @@ class MenuBar extends React.Component {
 
   onResize = () => {
     this.height = this.domElement.current.clientHeight;
-  }
+  };
 
   onScroll = (e) => {
     const top = e.target.scrollingElement.scrollTop;
@@ -148,11 +148,13 @@ class MenuBar extends React.Component {
       .sort((a, b) => b.position - a.position)
       .find(menuItem => menuItem.position < top + this.height + 50);
     if (selectedMenuItem) {
+      const anchor = `#${selectedMenuItem.anchor}`;
       this.setState({ selectedAnchor: selectedMenuItem.anchor });
+      history.replaceState({ ...history.state, as: location.pathname + anchor }, undefined, anchor);
+    } else {
+      history.replaceState('', document.title, window.location.pathname + window.location.search);
     }
-    const anchor = selectedMenuItem ? `#${selectedMenuItem.anchor}` : '#';
-    history.replaceState({ ...history.state, as: location.pathname + anchor }, undefined, anchor);
-  }
+  };
 
   adjustScrollPosition = () => {
     if (window.location.hash) {
@@ -165,20 +167,20 @@ class MenuBar extends React.Component {
         .then(id => this.setState({ selectedAnchor: id }))
         .catch(() => {})
     }
-  }
+  };
 
   handleChange = (status) => {
     this.setState({ sticky: status.status === Sticky.STATUS_FIXED });
-  }
+  };
 
   addFundsToOrg = async (form) => {
     const err = (error) => this.setState({ error, loading: false });
 
     if (form.totalAmount === 0) {
-      return err("Total amount must be > 0");
+      return err('Total amount must be > 0');
     }
     if (!form.FromCollectiveId) {
-      return err("No host selected");
+      return err('No host selected');
     }
 
     const { collective } = this.props;
@@ -318,8 +320,8 @@ class MenuBar extends React.Component {
           </div>
         }
       </div>
-    )
-  }
+    );
+  };
 
   hideAddFunds = () => this.setState({ showAddFunds: false });
 
@@ -386,7 +388,7 @@ class MenuBar extends React.Component {
         )}
         { LoggedInUser && LoggedInUser.canEditCollective(collective) &&
           <div className="admin">
-            { ["USER", "ORGANIZATION"].indexOf(collective.type) !== -1 &&
+            { ['USER', 'ORGANIZATION'].indexOf(collective.type) !== -1 &&
               <div className="item transactions">
                 <Link route={`${collective.path}/transactions`}>
                   <FormattedMessage id="menu.transactions" defaultMessage="transactions" />
@@ -403,8 +405,8 @@ class MenuBar extends React.Component {
           </div>
         }
       </div>
-    )
-  }
+    );
+  };
 
   render() {
     const { collective } = this.props;
@@ -545,9 +547,8 @@ class MenuBar extends React.Component {
           </Sticky>
         </div>
       </div>
-    )
+    );
   }
-
 }
 
 const addFundsToOrgQuery = gql`
