@@ -21,7 +21,7 @@ class CollectivePage extends React.Component {
 
   static propTypes = {
     getLoggedInUser: PropTypes.func.isRequired,
-    data: PropTypes.object,
+    data: PropTypes.object.isRequired,
     query: PropTypes.object,
   };
 
@@ -36,6 +36,16 @@ class CollectivePage extends React.Component {
     this.setState({ LoggedInUser });
     window.OC = window.OC || {};
     window.OC.LoggedInUser = LoggedInUser;
+  }
+
+  shouldComponentUpdate(nextProps) {
+    // It can be that Apollo is resetting data when navigating from a page to another
+    // We try to detect that and prevent rendering
+    // This is a workaround and the root cause should be ultimately fixed
+    if (this.props.data.Collective && !nextProps.data.Collective) {
+      return false;
+    }
+    return true;
   }
 
   render() {
