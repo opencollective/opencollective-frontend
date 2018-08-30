@@ -81,7 +81,7 @@
     "styled-components": "3.4.5",
     "styled-jsx": "2.2.6",
     "styled-jsx-plugin-postcss": "0.1.3",
-    "styled-system": "2.3.3",
+    "styled-system": "3.0.2",
     "svg-to-png": "3.1.2",
     "universal-analytics": "0.4.17",
     "webpack": "3.10.0",
