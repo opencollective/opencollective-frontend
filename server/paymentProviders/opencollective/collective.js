@@ -109,7 +109,7 @@ paymentMethodProvider.processOrder = async (order, options = {}) => {
       where: {
         CollectiveId: fromCollectiveHost.id,
         type: 'creditcard',
-        primary: true,
+        matching: null,
         archivedAt:  null ,
         deletedAt: null,
       },
