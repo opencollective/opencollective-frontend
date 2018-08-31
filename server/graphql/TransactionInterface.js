@@ -138,7 +138,7 @@ const TransactionFields = () => {
     },
     netAmountInCollectiveCurrency: {
       type: GraphQLInt,
-      description: "Amount after fees received by the collective in the lowest unit of its own currency (typically cents)",
+      description: "Amount after fees received by the collective in the lowest unit of its own currency (ie. cents)",
       resolve(transaction) {
         return transaction.netAmountInCollectiveCurrency;
       }
