@@ -20,7 +20,7 @@ const reports = [
   },
   {
     template: 'host.monthlyreport',
-    command: 'cron/yearly/host-report.js'
+    command: 'cron/monthly/host-report.js'
   },
   {
     template: 'host.yearlyreport',

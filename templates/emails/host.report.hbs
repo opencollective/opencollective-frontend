@@ -123,27 +123,27 @@ th {
     <td colspan=3 height=10></td>
   </tr>
   <tr>
-    <td>Total donations (before fees)</td><td></td><td align="right">{{{currency stats.totalAmountDonations.totalInHostCurrency currency=host.currency}}}</td>
+    <td>Total donations (before fees)</td><td></td><td align="right">{{{currency stats.totalAmountDonations.totalInHostCurrency currency=host.currency precision=2}}}</td>
   </tr>
   <tr class="indent1">
     <td>Payment processor fees (Stripe)</td>
     <td></td>
     <td align="right">
-      {{{currency stats.paymentProcessorFees.totalInHostCurrency currency=host.currency}}}
+      {{{currency stats.paymentProcessorFees.totalInHostCurrency currency=host.currency precision=2}}}
     </td>
   </tr>
   <tr class="indent1">
     <td>Platform fees (Open Collective)</td>
     <td></td>
     <td align="right">
-      {{{currency stats.platformFees.totalInHostCurrency currency=host.currency}}}
+      {{{currency stats.platformFees.totalInHostCurrency currency=host.currency precision=2}}}
     </td>
   </tr>
   <tr>
     <td colspan=2></td><td height=10 class="line"><hr /></td>
   </tr>
   <tr>
-    <td>Total amount received</td><td></td><td align="right">{{{currency stats.totalNetAmountReceived.totalInHostCurrency currency=host.currency}}}</td>
+    <td>Total amount received</td><td></td><td align="right">{{{currency stats.totalNetAmountReceived.totalInHostCurrency currency=host.currency precision=2}}}</td>
   </tr>
   <tr>
     <td colspan=3 class="muted">Total amount transferred to your {{host.name}} bank account</td>
@@ -152,7 +152,7 @@ th {
     <td colspan=3 height=10></td>
   </tr>
   <tr>
-    <td>Host fees</td><td></td><td align="right">{{{currency stats.totalHostFees.totalInHostCurrency currency=host.currency}}}</td>
+    <td>Host fees</td><td></td><td align="right">{{{currency stats.totalHostFees.totalInHostCurrency currency=host.currency precision=2}}}</td>
   </tr>
   <tr>
     <td colspan=3 class="muted">Total commission for {{host.name}}</td>
@@ -161,7 +161,7 @@ th {
     <td colspan=3 height=10></td>
   </tr>
   <tr>
-    <td>Net amount</td><td></td><td align="right">{{{currency stats.totalNetAmountReceivedForCollectives.totalInHostCurrency currency=host.currency}}}</td>
+    <td>Net amount</td><td></td><td align="right">{{{currency stats.totalNetAmountReceivedForCollectives.totalInHostCurrency currency=host.currency precision=2}}}</td>
   </tr>
   <tr>
     <td colspan=3 class="muted">Net amount received for your {{{number stats.totalCollectives}}} {{{pluralize "collective" n=stats.totalCollectives}}}</td>
@@ -170,20 +170,20 @@ th {
     <td colspan=3 height=10></td>
   </tr>
   <tr>
-    <td>Expenses paid</td><td></td><td align="right">{{{currency stats.totalAmountPaidExpenses.totalInHostCurrency currency=host.currency}}}</td>
+    <td>Expenses paid</td><td></td><td align="right">{{{currency stats.totalAmountPaidExpenses.totalInHostCurrency currency=host.currency precision=2}}}</td>
   </tr>
   <tr class="indent1">
     <td>Payment processor fees (PayPal)</td>
     <td></td>
     <td align="right">
-      {{{currency stats.paymentProcessorFees.totalInHostCurrency currency=host.currency}}}
+      {{{currency stats.payoutProcessorFeesPaypal.totalInHostCurrency currency=host.currency precision=2}}}
     </td>
   </tr>
   <tr>
     <td colspan=2></td><td height=10 class="line"><hr /></td>
   </tr>
   <tr>
-    <td>Total amount spent</td><td></td><td align="right">{{{currency stats.totalAmountSpent.totalInHostCurrency currency=host.currency}}}</td>
+    <td>Total amount spent</td><td></td><td align="right">{{{currency stats.totalAmountSpent.totalInHostCurrency currency=host.currency precision=2}}}</td>
   </tr>
   <tr>
     <td colspan=3 class="muted">Total amount that left your {{host.name}} bank account</td>
