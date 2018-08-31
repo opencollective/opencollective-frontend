@@ -116,33 +116,16 @@ describe('Mutation Tests', () => {
       });
 
 
-      it("fails if authenticated but cannot edit collective", async () => {
+      it("fails if authenticated but cannot edit parent collective", async () => {
+        await host.collective.update({ settings: { apply: true }});
         const result = await utils.graphqlQuery(createCollectiveQuery, { collective: getEventData(collective1) }, user2);
         expect(result.errors).to.have.length(1);
         expect(result.errors[0].message).to.equal("You must be logged in as a member of the scouts collective to create an event");
       });
 
-      it("creates a collective on a host", async () => {
-        const collective = {
-          name: "new collective",
-          HostCollectiveId: host.CollectiveId
-        }
-        const result = await utils.graphqlQuery(createCollectiveQuery, { collective }, user1);
-        result.errors && console.error(result.errors[0]);
-        const createdCollective = result.data.createCollective;
-        const hostMembership = await models.Member.findOne({ where: { CollectiveId: createdCollective.id, role: 'HOST' }});
-        const adminMembership = await models.Member.findOne({ where: { CollectiveId: createdCollective.id, role: 'ADMIN' }});
-        expect(createdCollective.host.id).to.equal(host.CollectiveId);
-        expect(createdCollective.currency).to.equal('EUR');
-        expect(createdCollective.tiers).to.have.length(2);
-        expect(createdCollective.tiers[0].presets).to.have.length(4);
-        expect(createdCollective.isActive).to.be.false;
-        expect(hostMembership.MemberCollectiveId).to.equal(host.CollectiveId);
-        expect(adminMembership.MemberCollectiveId).to.equal(user1.CollectiveId);
-      });
-
       it("creates an event with multiple tiers", async () => {
 
+        await host.collective.update({ settings: { apply: true }});
         const event = getEventData(collective1);
 
         const result = await utils.graphqlQuery(createCollectiveQuery, { collective: event }, user1);
@@ -160,10 +143,12 @@ describe('Mutation Tests', () => {
           CollectiveId: event.id
         }});
 
-        expect(members).to.have.length(1);
+        expect(members).to.have.length(2);
         expect(members[0].CollectiveId).to.equal(event.id);
         expect(members[0].MemberCollectiveId).to.equal(user1.CollectiveId);
         expect(members[0].role).to.equal(roles.ADMIN);
+        expect(members[1].role).to.equal(roles.HOST);
+        expect(members[1].MemberCollectiveId).to.equal(collective1.HostCollectiveId);
 
         // We remove the first tier
         event.tiers.shift();
@@ -211,7 +196,8 @@ describe('Mutation Tests', () => {
           name: "new collective",
           website: "http://newcollective.org",
           twitterHandle: "newcollective",
-          HostCollectiveId: host.collective.id
+          HostCollectiveId: host.collective.id,
+          currency: 'EUR',
         };
       })
 
@@ -221,13 +207,32 @@ describe('Mutation Tests', () => {
         expect(res.errors[0].message).to.contain("You need to be logged in to create a collective");
       });
 
+      it("fails to create a collective on a host that doesn't accept applications", async () => {
+        const collective = {
+          name: "new collective",
+          HostCollectiveId: host.CollectiveId
+        }
+        const result = await utils.graphqlQuery(createCollectiveQuery, { collective }, user1);
+        expect(result.errors[0].message).to.equal("This host does not accept applications for new collectives");
+      });
+
       it("creates a collective", async () => {
+        await host.collective.update({ settings: { apply: true }});
         const res = await utils.graphqlQuery(createCollectiveQuery, { collective: newCollectiveData }, user1);
         res.errors && console.error(res.errors[0]);
         const newCollective = res.data.createCollective;
+        const hostMembership = await models.Member.findOne({ where: { CollectiveId: newCollective.id, role: 'HOST' }});
+        const adminMembership = await models.Member.findOne({ where: { CollectiveId: newCollective.id, role: 'ADMIN' }});
+
+        expect(newCollective.currency).to.equal(newCollectiveData.currency);
+        expect(newCollective.tiers).to.have.length(2);
+        expect(newCollective.tiers[0].presets).to.have.length(4);
+        expect(hostMembership.MemberCollectiveId).to.equal(host.CollectiveId);
+        expect(adminMembership.MemberCollectiveId).to.equal(user1.CollectiveId);
+
         expect(newCollective.isActive).to.be.false;
         expect(newCollective.host.id).to.equal(host.collective.id);
-        await utils.waitForCondition(() => emailSendMessageSpy.callCount > 0);
+        await utils.waitForCondition(() => emailSendMessageSpy.callCount > 1);
         expect(emailSendMessageSpy.callCount).to.equal(2);
         expect(emailSendMessageSpy.firstCall.args[0]).to.equal(host.email);
         expect(emailSendMessageSpy.firstCall.args[1]).to.contain("new collective would love to be hosted by you");
