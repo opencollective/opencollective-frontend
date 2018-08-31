@@ -164,7 +164,7 @@ async function HostReport(year, month, hostId) {
       platformFees:               sumTransactions("platformFeeInHostCurrency", { where: whereWithDateRange }, host.currency),
       paymentProcessorFees:       sumTransactions("paymentProcessorFeeInHostCurrency", { where: { ...whereWithDateRange, type: 'CREDIT'} }, host.currency), // total stripe fees
       payoutProcessorFeesPaypal:  sumTransactions("paymentProcessorFeeInHostCurrency", payoutProcessorFeesQuery("paypal"), host.currency), // total paypal fees
-      payoutProcessorFeesOther:   sumTransactions("paymentProcessorFeeInHostCurrency", payoutProcessorFeesQuery("opencollective"), host.currency) // total other payout processor fees (manual host fee)
+      payoutProcessorFeesOther:   sumTransactions("paymentProcessorFeeInHostCurrency", payoutProcessorFeesQuery("other"), host.currency) // total other payout processor fees (manually recorded)
     });
   }
 
