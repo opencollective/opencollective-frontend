@@ -24,7 +24,7 @@ import { convertToCurrency } from '../../server/lib/currency';
 import path from 'path';
 import fs from 'fs';
 
-const d = new Date;
+const d = process.env.START_DATE ? new Date(process.env.START_DATE) : new Date;
 d.setMonth(d.getMonth() - 1);
 const year = d.getFullYear();
 const month = moment(d).format('MMMM');
@@ -180,8 +180,13 @@ const processBacker = async (FromCollectiveId) => {
         collectives: collectivesWithOrders,
         manageSubscriptionsUrl: user.generateLoginLink('/subscriptions'),
         relatedCollectives,
-        stats
+        stats,
+        tags: stats.allTags,
       };
+      if (data.tags['open source']) {
+        data.opensource = true;
+      }
+      data[backerCollective.type] = true;
       const options = {
         attachments
       };
@@ -344,6 +349,7 @@ const computeStats = async (collectives, currency = 'USD') => {
     }
   })
   stats.topTags = getTopKeysFromObject(tagsIndex);
+  stats.allTags = tagsIndex;
   stats.topCategories = getTopKeysFromObject(categories, 'totalAmountInBackerCurrency');
   stats.categories = categories;
   stats.totalSpentString = formatCurrencyObject(stats.totalSpentPerCurrency);
