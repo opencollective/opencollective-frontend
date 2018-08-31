@@ -230,7 +230,7 @@ const processEvents = (events) => {
  * Processes the stats of a given collective and keeps the result in memory cache
  * Returns collective data object with
  * {
- *   ...{'id', 'name', 'slug', 'website', 'image', 'mission', 'currency','publicUrl', 'tags', 'backgroundImage', 'settings', 'totalDonations', 'contributorsCount'},
+ *   ...{'id', 'name', 'slug', 'website', 'image', 'description', 'currency','publicUrl', 'tags', 'backgroundImage', 'settings', 'totalDonations', 'contributorsCount'},
  *   stats: { balance, totalDonations, totalPaidExpenses, updates },
  *   contributorsCounts,
  *   yearlyIncome,
@@ -276,7 +276,7 @@ const processCollective =  async (CollectiveId) => {
   const results = await Promise.all(promises);
   console.log('***', collective.name, '***');
   const data = {};
-  data.collective = pick(collective, ['id', 'name', 'slug', 'website', 'image', 'mission', 'currency','publicUrl', 'tags', 'backgroundImage', 'settings', 'totalDonations', 'contributorsCount']);
+  data.collective = pick(collective, ['id', 'name', 'slug', 'website', 'image', 'description', 'currency','publicUrl', 'tags', 'backgroundImage', 'settings', 'totalDonations', 'contributorsCount']);
   data.collective.stats = results[0];
   data.collective.stats.balance = results[1];
   data.collective.stats.totalDonations = results[2];
