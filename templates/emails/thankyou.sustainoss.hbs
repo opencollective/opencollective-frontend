@@ -43,7 +43,9 @@ Subject: Thank you for your {{{currency order.totalAmount currency=order.currenc
  Pía Mancini: pia@opencollective.com
  </p>
 
-{{> subscriptions}}
+<p>
+  P.S: You can download a PDF receipt for your donation <a href="{{config.host.website}}/{{collective.slug}}/transactions/{{transaction.uuid}}/invoice.pdf">here</a>{{#if subscriptionsLink}}, and you can manage your subscriptions <a href="{{subscriptionsLink}}">here</a>{{/if}}.
+</p>
 
 <p>Warmly,</p>
 

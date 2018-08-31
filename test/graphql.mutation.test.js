@@ -47,7 +47,7 @@ describe('Mutation Tests', () => {
   beforeEach("reset db", () => utils.resetTestDB());
 
   beforeEach("create user1", () => models.User.createUserWithCollective(utils.data('user1')).tap(u => user1 = u));
-  beforeEach("create host user 1", () => models.User.createUserWithCollective(utils.data('host1')).tap(u => host = u));
+  beforeEach("create host user 1", () => models.User.createUserWithCollective({...utils.data('host1'), currency: 'EUR' }).tap(u => host = u));
 
   beforeEach("create user2", () => models.User.createUserWithCollective(utils.data('user2')).tap(u => user2 = u));
   beforeEach("create collective1", () => models.Collective.create(utils.data('collective1')).tap(g => collective1 = g));
@@ -76,6 +76,7 @@ describe('Mutation Tests', () => {
       createCollective(collective: $collective) {
         id
         slug
+        currency
         host {
           id
         }
@@ -115,32 +116,16 @@ describe('Mutation Tests', () => {
       });
 
 
-      it("fails if authenticated but cannot edit collective", async () => {
+      it("fails if authenticated but cannot edit parent collective", async () => {
+        await host.collective.update({ settings: { apply: true }});
         const result = await utils.graphqlQuery(createCollectiveQuery, { collective: getEventData(collective1) }, user2);
         expect(result.errors).to.have.length(1);
         expect(result.errors[0].message).to.equal("You must be logged in as a member of the scouts collective to create an event");
       });
 
-      it("creates a collective on a host", async () => {
-        const collective = {
-          name: "new collective",
-          HostCollectiveId: host.CollectiveId
-        }
-        const result = await utils.graphqlQuery(createCollectiveQuery, { collective }, user1);
-        result.errors && console.error(result.errors[0]);
-        const createdCollective = result.data.createCollective;
-        const hostMembership = await models.Member.findOne({ where: { CollectiveId: createdCollective.id, role: 'HOST' }});
-        const adminMembership = await models.Member.findOne({ where: { CollectiveId: createdCollective.id, role: 'ADMIN' }});
-        expect(createdCollective.host.id).to.equal(host.CollectiveId);
-        expect(createdCollective.tiers).to.have.length(2);
-        expect(createdCollective.tiers[0].presets).to.have.length(4);
-        expect(createdCollective.isActive).to.be.false;
-        expect(hostMembership.MemberCollectiveId).to.equal(host.CollectiveId);
-        expect(adminMembership.MemberCollectiveId).to.equal(user1.CollectiveId);
-      });
-
       it("creates an event with multiple tiers", async () => {
 
+        await host.collective.update({ settings: { apply: true }});
         const event = getEventData(collective1);
 
         const result = await utils.graphqlQuery(createCollectiveQuery, { collective: event }, user1);
@@ -154,14 +139,17 @@ describe('Mutation Tests', () => {
         event.tiers = createdEvent.tiers;
 
         // Make sure the creator of the event has been added as an ADMIN
-        const members = await models.Member.findAll({ where: {
-          CollectiveId: event.id
-        }});
+        const members = await models.Member.findAll({
+          where: { CollectiveId: event.id },
+          order: [ ['MemberCollectiveId', 'ASC'] ]
+        });
 
-        expect(members).to.have.length(1);
+        expect(members).to.have.length(2);
         expect(members[0].CollectiveId).to.equal(event.id);
         expect(members[0].MemberCollectiveId).to.equal(user1.CollectiveId);
         expect(members[0].role).to.equal(roles.ADMIN);
+        expect(members[1].role).to.equal(roles.HOST);
+        expect(members[1].MemberCollectiveId).to.equal(collective1.HostCollectiveId);
 
         // We remove the first tier
         event.tiers.shift();
@@ -209,7 +197,8 @@ describe('Mutation Tests', () => {
           name: "new collective",
           website: "http://newcollective.org",
           twitterHandle: "newcollective",
-          HostCollectiveId: host.collective.id
+          HostCollectiveId: host.collective.id,
+          currency: 'EUR',
         };
       })
 
@@ -219,16 +208,35 @@ describe('Mutation Tests', () => {
         expect(res.errors[0].message).to.contain("You need to be logged in to create a collective");
       });
 
+      it("fails to create a collective on a host that doesn't accept applications", async () => {
+        const collective = {
+          name: "new collective",
+          HostCollectiveId: host.CollectiveId
+        }
+        const result = await utils.graphqlQuery(createCollectiveQuery, { collective }, user1);
+        expect(result.errors[0].message).to.equal("This host does not accept applications for new collectives");
+      });
+
       it("creates a collective", async () => {
+        await host.collective.update({ settings: { apply: true }});
         const res = await utils.graphqlQuery(createCollectiveQuery, { collective: newCollectiveData }, user1);
         res.errors && console.error(res.errors[0]);
         const newCollective = res.data.createCollective;
+        const hostMembership = await models.Member.findOne({ where: { CollectiveId: newCollective.id, role: 'HOST' }});
+        const adminMembership = await models.Member.findOne({ where: { CollectiveId: newCollective.id, role: 'ADMIN' }});
+
+        expect(newCollective.currency).to.equal(newCollectiveData.currency);
+        expect(newCollective.tiers).to.have.length(2);
+        expect(newCollective.tiers[0].presets).to.have.length(4);
+        expect(hostMembership.MemberCollectiveId).to.equal(host.CollectiveId);
+        expect(adminMembership.MemberCollectiveId).to.equal(user1.CollectiveId);
+
         expect(newCollective.isActive).to.be.false;
         expect(newCollective.host.id).to.equal(host.collective.id);
-        await utils.waitForCondition(() => emailSendMessageSpy.callCount > 0);
+        await utils.waitForCondition(() => emailSendMessageSpy.callCount > 1);
         expect(emailSendMessageSpy.callCount).to.equal(2);
         expect(emailSendMessageSpy.firstCall.args[0]).to.equal(host.email);
-        expect(emailSendMessageSpy.firstCall.args[1]).to.contain("New collective pending new collective");
+        expect(emailSendMessageSpy.firstCall.args[1]).to.contain("new collective would love to be hosted by you");
         expect(emailSendMessageSpy.secondCall.args[0]).to.equal(user1.email);
         expect(emailSendMessageSpy.secondCall.args[1]).to.contain("Welcome to Open Collective!");
       });
@@ -382,7 +390,7 @@ describe('Mutation Tests', () => {
           const order = {
             user: { email: user1.email },
             collective: { id: 12324 },
-            tier: { id: 1 },
+            tier: { id: 3 },
             quantity:1
           };
           const result = await utils.graphqlQuery(query, { order });
@@ -440,7 +448,7 @@ describe('Mutation Tests', () => {
           const order = {
             user: { email: "user@email.com" },
             collective: { id: event1.id },
-            tier: { id: 1 },
+            tier: { id: 3 },
             quantity: 101
           };
           const result = await utils.graphqlQuery(query, { order });
@@ -469,7 +477,7 @@ describe('Mutation Tests', () => {
           const order = {
             user:{ email: "user@email.com" },
             collective: { id: event1.id },
-            tier: { id: 2 },
+            tier: { id: 4 },
             quantity: 2
           };
           const result = await utils.graphqlQuery(query, { order });
@@ -599,7 +607,7 @@ describe('Mutation Tests', () => {
             },
             collective: { id: collective1.id },
             publicMessage: "Looking forward!",
-            tier: { id: 3 },
+            tier: { id: 5 },
             quantity: 2
           };
           const result = await utils.graphqlQuery(query, { order });
@@ -616,7 +624,7 @@ describe('Mutation Tests', () => {
               },
               "id": 1,
               "tier": {
-                "id": 3
+                "id": 5
               }
             }
           });
@@ -671,7 +679,7 @@ describe('Mutation Tests', () => {
             },
             collective: { id: collective1.id },
             publicMessage: "Looking forward!",
-            tier: { id: 3 },
+            tier: { id: 5 },
             quantity: 2
           };
           const result = await utils.graphqlQuery(query, { order }, user2);
@@ -688,7 +696,7 @@ describe('Mutation Tests', () => {
               },
               "id": 1,
               "tier": {
-                "id": 3
+                "id": 5
               }
             }
           });
@@ -752,7 +760,7 @@ describe('Mutation Tests', () => {
             user: { email: user2.email },
             collective: { id: event1.id },
             publicMessage: "Looking forward!",
-            tier: { id: 1 },
+            tier: { id: 3 },
             quantity: 2
           };
           const result = await utils.graphqlQuery(query, { order });
@@ -770,7 +778,7 @@ describe('Mutation Tests', () => {
               "id": 1,
               "tier": {
                 "description": "free tickets for all",
-                "id": 1,
+                "id": 3,
                 "maxQuantity": 10,
                 "name": "Free ticket",
                 "stats": {
@@ -835,7 +843,7 @@ describe('Mutation Tests', () => {
         const order = {
           user: { email: "newuser@email.com" },
           collective: { id: event1.id },
-          tier: { id: 1 },
+          tier: { id: 3 },
           quantity: 2
         };
 
@@ -846,7 +854,7 @@ describe('Mutation Tests', () => {
               "id": 1,
               "tier": {
                 "description": "free tickets for all",
-                "id": 1,
+                "id": 3,
                 "maxQuantity": 10,
                 "name": "Free ticket",
                 "stats": {
@@ -914,8 +922,8 @@ describe('Mutation Tests', () => {
               }
             },
             collective: { id: event1.id },
-            tier: { id: 2 },
-            quantity:2
+            tier: { id: 4 },
+            quantity: 2
           };
           const result = await utils.graphqlQuery(query, { order });
           result.errors && console.error(result.errors[0]);
@@ -927,7 +935,7 @@ describe('Mutation Tests', () => {
                   "availableQuantity": 98,
                 },
                 "description": "$20 ticket",
-                "id": 2,
+                "id": 4,
                 "maxQuantity": 100,
                 "name": "paid ticket"
               },
@@ -945,7 +953,7 @@ describe('Mutation Tests', () => {
           expect(executeOrderStub.callCount).to.equal(1);
           executeOrderStub.resetHistory();
           expect(executeOrderArgument[1].id).to.equal(1);
-          expect(executeOrderArgument[1].TierId).to.equal(2);
+          expect(executeOrderArgument[1].TierId).to.equal(4);
           expect(executeOrderArgument[1].CollectiveId).to.equal(5);
           expect(executeOrderArgument[1].CreatedByUserId).to.equal(3);
           expect(executeOrderArgument[1].totalAmount).to.equal(4000);
@@ -996,7 +1004,7 @@ describe('Mutation Tests', () => {
               }
             },
             collective: { id: event1.id },
-            tier: { id: 2 },
+            tier: { id: 4 },
             quantity: 2
           };
           const result = await utils.graphqlQuery(query, { order });
@@ -1008,7 +1016,7 @@ describe('Mutation Tests', () => {
                 "id": 1,
                 "tier": {
                   "description": "$20 ticket",
-                  "id": 2,
+                  "id": 4,
                   "maxQuantity": 100,
                   "name": "paid ticket",
                   "stats": {
@@ -1029,7 +1037,7 @@ describe('Mutation Tests', () => {
 
           expect(executeOrderStub.callCount).to.equal(1);
           expect(executeOrderArgument[1].id).to.equal(1);
-          expect(executeOrderArgument[1].TierId).to.equal(2);
+          expect(executeOrderArgument[1].TierId).to.equal(4);
           expect(executeOrderArgument[1].CollectiveId).to.equal(5);
           expect(executeOrderArgument[1].CreatedByUserId).to.equal(4);
           expect(executeOrderArgument[1].totalAmount).to.equal(4000);

@@ -1,8 +1,8 @@
 /** @module paymentProviders/opencollective */
 
-import * as collective from './collective';
-import * as prepaid from './prepaid';
-import * as giftcard from './giftcard';
+import collective from './collective';
+import prepaid from './prepaid';
+import giftcard from './giftcard';
 
 /** Process orders from Open Collective payment method types */
 async function processOrder(order) {

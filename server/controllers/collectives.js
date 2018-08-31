@@ -1,7 +1,7 @@
 /**
  * Dependencies.
  */
-import _ from 'lodash';
+import { pick, omit } from 'lodash';
 import async from 'async';
 import { defaultHostCollective, getLinkHeader, getRequestedUrl, resizeImage } from '../lib/utils';
 import Promise from 'bluebird';
@@ -200,7 +200,7 @@ export const create = (req, res, next) => {
   ];
 
   // create collective
-  return Collective.create(collectiveData)
+  return Collective.create(omit(collectiveData, 'HostCollectiveId'))
     .tap(g => createdCollective = g)
     .tap(g => {
       // Setup each user with role
@@ -222,13 +222,12 @@ export const create = (req, res, next) => {
     })
     .tap(() => {
       // find Host
-      return models.Collective.findById(collectiveData.hostId)
+      return models.Collective.findById(collectiveData.hostId || collectiveData.HostCollectiveId)
       .then(h => {
         if (!h) {
           throw new Error('Host not found: ', collectiveData.hostId);
         }
         host = h;
-        createdCollective.HostCollectiveId = h.id;
         createdCollective.ParentCollectiveId = h.id; // TODO: this should be updated when we fix parent relationships
         createdCollective.currency = host.currency;
         createdCollective.save();
@@ -327,7 +326,6 @@ export const createFromGithub = (req, res, next) => {
       if (existingCollective) {
         collectiveData.slug = `${collectiveData.slug}-${Math.floor((Math.random() * 1000) + 1)}`;
       }
-      collectiveData.HostCollectiveId = defaultHostCollective('opensource').CollectiveId;
       collectiveData.ParentCollectiveId = defaultHostCollective('opensource').ParentCollectiveId;
       collectiveData.currency = 'USD';
       return Collective.create(Object.assign({}, collectiveData, { CreatedByUserId: creatorUser.id, LastEditedByUserId: creatorUser.id }));
@@ -336,14 +334,7 @@ export const createFromGithub = (req, res, next) => {
     .tap(g => createdCollective = g)
     .then(() => _addUserToCollective(createdCollective, creatorUser, options))
     .then(() => models.Collective.findById(defaultHostCollective("opensource").CollectiveId))
-    .then(hostCollective => createdCollective.addHost(hostCollective, creatorUser))
-    .then(() => {
-      if (collectiveData.tiers) {
-        return models.Tier.createMany(collectiveData.tiers, { CollectiveId: createdCollective.id, currency: collectiveData.currency })
-      }
-      return null;
-    })
-    .then(() => createdCollective.update({isActive: true}))
+    .tap(hostCollective => createdCollective.addHost(hostCollective, creatorUser))
     .tap((host) => Activity.create({
       type: activities.COLLECTIVE_CREATED,
       UserId: creatorUser.id,
@@ -354,6 +345,13 @@ export const createFromGithub = (req, res, next) => {
         user: creatorUser.info
       }
     }))
+    .then(() => {
+      if (collectiveData.tiers) {
+        return models.Tier.createMany(collectiveData.tiers, { CollectiveId: createdCollective.id, currency: collectiveData.currency })
+      }
+      return null;
+    })
+    .then(() => createdCollective.update({ isActive: true }))
     .then(() => {
       const data = {
         firstName: creatorUser.firstName,
@@ -382,7 +380,7 @@ export const update = (req, res, next) => {
     'isActive'
   ];
 
-  const updatedCollectiveAttrs = _.pick(req.required.group, whitelist);
+  const updatedCollectiveAttrs = pick(req.required.group, whitelist);
 
   updatedCollectiveAttrs.LastEditedByUserId = req.remoteUser.id;
 

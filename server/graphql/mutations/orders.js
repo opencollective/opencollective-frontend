@@ -438,7 +438,7 @@ export async function refundTransaction(_, args, req) {
  * @param {String} args.description The description of the new payment
  *  method.
  * @param {Number} args.CollectiveId The ID of the organization
- *  receiving the credit card.
+ *  receiving the prepaid card.
  * @param {Number} args.HostCollectiveId The ID of the host that
  *  received the money on its bank account.
  * @param {Number} args.totalAmount The total amount that will be
@@ -455,30 +455,22 @@ export async function addFundsToOrg(args, remoteUser) {
     models.Collective.findById(args.CollectiveId),
     models.Collective.findById(args.HostCollectiveId)
   ]);
-  let paymentMethod = await models.PaymentMethod.findOne({ where: {
+  // creates a new Payment method
+  const paymentMethod = await models.PaymentMethod.create({
+    name: args.description || 'Host funds',
+    initialBalance: args.totalAmount,
+    monthlyLimitPerMember: null,
+    currency: hostCollective.currency,
     CollectiveId: args.CollectiveId,
     customerId: fromCollective.slug,
-  } });
-  if (!paymentMethod) {
-    paymentMethod = await models.PaymentMethod.create({
-      name: args.description || 'Host funds',
-      initialBalance: args.totalAmount,
-      monthlyLimitPerMember: args.totalAmount,
-      currency: hostCollective.currency,
-      CollectiveId: args.CollectiveId,
-      customerId: fromCollective.slug,
-      expiryDate: moment().add(1, 'year').format(),
-      uuid: uuidv4(),
-      data: { HostCollectiveId: args.HostCollectiveId },
-      service: 'opencollective',
-      type: 'prepaid',
-      createdAt: new Date,
-      updatedAt: new Date,
-    });
-  } else {
-    await paymentMethod.update({
-      initialBalance: paymentMethod.initialBalance + args.totalAmount,
-    });
-  }
+    expiryDate: moment().add(1, 'year').format(),
+    uuid: uuidv4(),
+    data: { HostCollectiveId: args.HostCollectiveId },
+    service: 'opencollective',
+    type: 'prepaid',
+    createdAt: new Date,
+    updatedAt: new Date,
+  });
   return paymentMethod;
+
 }

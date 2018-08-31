@@ -10,7 +10,7 @@ const paymentMethodProvider = {};
 
 
 paymentMethodProvider.features = {
-  recurring: false,
+  recurring: true,
   waitToCharge: false
 };
 
@@ -87,15 +87,51 @@ paymentMethodProvider.processOrder = async (order, options = {}) => {
     if (order.collective.HostCollectiveId !== order.paymentMethod.CollectiveId) {
       throw new Error(`You need to use the payment method of the host (${order.collective.HostCollectiveId}) to add funds to this collective`);
     }
+    // If Hosts are not the same, then check if both have the same currency collectives
+    // and also both hosts of these collectives have the same currency as well
+    // then look for fromCollectiveHost Credit Card
+    // and create transaction through the paymentLib Process order
   } else if (fromCollectiveHost.id !== collectiveHost.id) {
-    throw new Error(`Cannot transfer money between different hosts (${fromCollectiveHost.name} -> ${collectiveHost.name})`);
+    const fromCollectiveHost = await order.fromCollective.getHostCollective();
+    const collectiveHost = await order.collective.getHostCollective();
+    // Check if collectives have the same currency
+    if (order.fromCollective.currency !== order.collective.currency) {
+      throw new Error(`Payments Across hosts are only allowed when both Collectives have the same currency. Collective ${order.collective.name}` +
+        ` is ${order.collective.currency} and ${order.fromCollective.name} is ${order.fromCollective.currency}.`);
+    }
+    // Check if Hosts have the same currency as well
+    if (fromCollectiveHost.currency !== collectiveHost.currency) {
+      throw new Error(`Payment Across Hosts are only allowed when both Hosts have the same currency. Host ${fromCollectiveHost.name}` +
+        ` is ${fromCollectiveHost.currency} and ${collectiveHost.name} is ${collectiveHost.currency}.`);
+    }
+    // try to find a credit card for the fromCollectiveHost
+    const fromCollectiveHostPaymentMethod = await models.PaymentMethod.findOne({
+      where: {
+        CollectiveId: fromCollectiveHost.id,
+        type: 'creditcard',
+        matching: null,
+        archivedAt:  null ,
+        deletedAt: null,
+      },
+      order: [
+        ['initialBalance', 'DESC'],
+      ],
+    });
+    if (!fromCollectiveHostPaymentMethod) {
+      throw new Error(`Host ${fromCollectiveHost.name} needs to add a credit card to send money to a different host (${collectiveHost.name}).`);
+    }
+    // Change paymentMethod to use credit card instead of collective
+    order.paymentMethod = fromCollectiveHostPaymentMethod;
+    // setting order platform fee to 0 in cross-host transactions
+    order.platformFee = 0;
+    return paymentsLib.processOrder(order);
   }
 
   const payload = {
     CreatedByUserId: order.CreatedByUserId,
     FromCollectiveId: order.FromCollectiveId,
     CollectiveId: order.CollectiveId,
-    PaymentMethodId: order.PaymentMethodId
+    PaymentMethodId: order.PaymentMethodId,
   };
 
   // Different collectives on the same host may have different currencies

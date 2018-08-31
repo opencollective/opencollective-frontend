@@ -1,6 +1,4 @@
 import { expect } from 'chai';
-import { describe, it } from 'mocha';
-
 import * as utils from './utils';
 import models from '../server/models';
 import roles from '../server/constants/roles';
@@ -83,7 +81,7 @@ describe('graphql.paymentMethods.test.js', () => {
   });
 
   describe('add funds', () => {
-    let order, sandbox;
+    let paymentMethod, order, sandbox;
     const fxrate = 1.1654; // 1 EUR = 1.1654 USD
 
     beforeEach(() => {
@@ -96,6 +94,7 @@ describe('graphql.paymentMethods.test.js', () => {
           type: 'collective'
         }
       }).then(pm => {
+        paymentMethod = pm;
         order = {
           totalAmount: 1000, // €10
           collective: {
@@ -150,7 +149,7 @@ describe('graphql.paymentMethods.test.js', () => {
       };
       const result2 = await utils.graphqlQuery(createOrderQuery, { order }, user);
       expect(result2.errors).to.exist;
-      expect(result2.errors[0].message).to.equal(`You don't have sufficient permissions to access this payment method`);
+      expect(result2.errors[0].message).to.equal(`You don't have enough permissions to use this payment method (you need to be an admin of the collective that owns this payment method)`);
     });
 
     it('fails to change platformFeePercent if not root', async () => {
@@ -161,26 +160,6 @@ describe('graphql.paymentMethods.test.js', () => {
       const result = await utils.graphqlQuery(createOrderQuery, { order }, user);
       expect(result.errors).to.exist;
       expect(result.errors[0].message).to.equal(`Only a root can change the platformFeePercent`);
-    });
-
-    it('fails to add funds to a collective not hosted on the same host', async () => {
-
-      const collective2 = await models.Collective.create({
-        name: "wwcode austin",
-        type: "COLLECTIVE",
-        isActive: true,
-        currency: "USD",
-        hostFeePercent: 5,
-        HostCollectiveId: user.CollectiveId
-      });
-      order.collective = { id: collective2.id };
-      order.fromCollective = {
-        id: host.id
-      };
-
-      const result = await utils.graphqlQuery(createOrderQuery, { order }, admin);
-      expect(result.errors).to.exist;
-      expect(result.errors[0].message).to.equal(`Cannot transfer money between different hosts (open source collective -> Xavier)`);
     });
 
     it('adds funds from the host (USD) to the collective (EUR)', async () => {
@@ -259,6 +238,49 @@ describe('graphql.paymentMethods.test.js', () => {
       expect(transaction.amountInHostCurrency).to.equal(Math.round(order.totalAmount * fxrate));
       expect(transaction.hostCurrencyFxRate).to.equal(fxrate);
       expect(transaction.amountInHostCurrency).to.equal(1165);
+    });
+
+    it('gets the list of fromCollectives for the opencollective payment method of the host', async () => {
+
+      // We add funds to the tipbox collective on behalf of Google and Facebook
+      order.fromCollective = {
+        name: "facebook",
+        website: "https://facebook.com"
+      };
+      let result;
+      result = await utils.graphqlQuery(createOrderQuery, { order }, admin);
+      result.errors && console.error(result.errors[0]);
+      order.fromCollective = {
+        name: "google",
+        website: "https://google.com"
+      };
+      result = await utils.graphqlQuery(createOrderQuery, { order }, admin);
+      result.errors && console.error(result.errors[0]);
+
+      // We fetch all the fromCollectives using the host paymentMethod
+      const paymentMethodQuery = `
+        query PaymentMethod($id: Int!) {
+          PaymentMethod(id: $id) {
+            id
+            service
+            type
+            fromCollectives {
+              total
+              collectives {
+                id
+                slug
+              }
+            }
+          }
+        }
+      `;
+      result = await utils.graphqlQuery(paymentMethodQuery, { id: paymentMethod.id }, admin);
+      result.errors && console.error(result.errors[0]);
+      const { total, collectives } = result.data.PaymentMethod.fromCollectives;
+      expect(total).to.equal(2);
+      const slugs = collectives.map(c => c.slug).sort();
+      expect(slugs[0]).to.equal('facebook');
+      expect(slugs[1]).to.equal('google');
     });
   });
 

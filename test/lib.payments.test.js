@@ -56,7 +56,7 @@ describe('lib.payments.test.js', () => {
 
   beforeEach('create a user', () => models.User.createUserWithCollective(userData).then(u => user = u));
   beforeEach('create a user', () => models.User.createUserWithCollective({ email: EMAIL, name: "anotheruser"}).then(u => user2 = u));
-  beforeEach('create a host', () => models.User.createUserWithCollective(utils.data('host1')).then(u => host = u));
+  beforeEach('create a host', () => models.User.createUserWithCollective({ ...utils.data('host1'), currency: CURRENCY }).then(u => host = u));
   beforeEach('create a collective', () => models.Collective.create(utils.data('collective1')).then(g => collective = g));
   beforeEach('create a collective', () => models.Collective.create(utils.data('collective2')).then(g => collective2 = g));
   beforeEach('create an order', () => models.Order.create({

@@ -4,7 +4,6 @@ import libdebug from 'debug';
 import { get, intersection } from 'lodash';
 
 import { TransactionTypes } from '../constants/transactions';
-import { types as CollectiveTypes } from '../constants/collectives';
 
 import { sumTransactions } from '../lib/hostlib';
 import { formatCurrency } from '../lib/utils';
@@ -46,6 +45,11 @@ export default function(Sequelize, DataTypes) {
       onUpdate: 'CASCADE'
     },
 
+    /**
+     * Can be NULL when the user doesn't want to remember the payment method information (e.g. credit card info)
+     * In that case we still need to store it for archive reasons (we want to be able to print the invoice and show the payment method that has been used)
+     * But in the case, we don't link the payment method to the User/Org CollectiveId.
+     */
     CollectiveId: {
       type: DataTypes.INTEGER,
       references: {
@@ -198,14 +202,43 @@ export default function(Sequelize, DataTypes) {
    * @param {Object} user instanceof models.User
    */
   PaymentMethod.prototype.canBeUsedForOrder = async function(order, user) {
-    const name = (this.matching) ? 'matching fund' : 'payment method';
+
+    // if the user is trying to reuse an existing payment method,
+    // we make sure it belongs to the logged in user or to a collective that the user is an admin of
+    if (!user) throw new Error("You need to be logged in to be able to use a payment method on file");
+
+    const name = (this.matching) ? 'matching fund' : `payment method (${this.service}:${this.type})`;
 
     if (this.expiryDate && new Date(this.expiryDate) < new Date) {
       throw new Error(`This ${name} has expired`);
     }
 
-    if (order.interval && !this.features.recurring) {
+    if (order.interval && !get(this.features, 'recurring')) {
       throw new Error(`This ${name} doesn't support recurring payments`);
+    }
+
+    // If there is no `this.CollectiveId`, it means that the user doesn't want to save this payment method to any collective
+    // In that case, we need to check that the user is the creator of the payment method
+    if (!this.CollectiveId) {
+      if (user.id !== this.CreatedByUserId) {
+        throw new Error(`This payment method is not saved to any collective and can only be used by the user that created it`);
+      }
+    } else if (this.matching) {
+      // If the payment method is a matching fund, the user doesn't need to own it
+      // but we need to make sure that the order is referencing this matching fund
+      if (order.matchingFund !== this.uuid.substr(0, 8)) {
+        throw new Error(`This payment method can only be used to match an order`);
+      }
+    } else {
+      // If there is a monthly limit per member, the user needs to be a member or admin of the collective that owns the payment method
+      if (this.monthlyLimitPerMember && !user.isMember(this.CollectiveId)) {
+        throw new Error(`You don't have enough permissions to use this payment method (you need to be a member or an admin of the collective that owns this payment method)`);
+      }
+
+      // If there is no monthly limit, the user needs to be an admin of the collective that owns the payment method
+      if (!this.monthlyLimitPerMember && !user.isAdmin(this.CollectiveId)) {
+        throw new Error(`You don't have enough permissions to use this payment method (you need to be an admin of the collective that owns this payment method)`);
+      }
     }
 
     // We get an estimate of the total amount of the order in the currency of the payment method
@@ -343,29 +376,13 @@ export default function(Sequelize, DataTypes) {
     } else if (paymentMethod.uuid && paymentMethod.uuid.length === 8) {
       return PaymentMethod.getMatchingFund(paymentMethod.uuid);
     } else {
-      // if the user is trying to reuse an existing payment method,
-      // we make sure it belongs to the logged in user or to a collective that the user is an admin of
-      if (!user) throw new Error("You need to be logged in to be able to use a payment method on file");
       return PaymentMethod
         .findOne({ where: { uuid: paymentMethod.uuid } })
         .then(pm => {
           if (!pm) {
             throw new Error(`You don't have a payment method with that uuid`);
           }
-          return models.Collective.findById(pm.CollectiveId)
-            .then(PaymentMethodCollective => {
-              // If this PaymentMethod is associated to an organization, members can use it within limit
-              if (PaymentMethodCollective.type === CollectiveTypes.ORGANIZATION) {
-                if (!user.isMember(PaymentMethodCollective.id)) {
-                  throw new Error("You don't have sufficient permissions to access this payment method");
-                }
-              } else {
-                if (!user.isAdmin(PaymentMethodCollective.id)) {
-                  throw new Error("You don't have sufficient permissions to access this payment method");
-                }
-              }
-              return pm;
-            });
+          return pm;
         })
     }
   }

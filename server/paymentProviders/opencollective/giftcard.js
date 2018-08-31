@@ -1,7 +1,12 @@
+/**
+ * /!\ This code should be deprecated
+ */
+
 import models from '../../models';
 import roles from '../../constants/roles';
 import * as libpayments from '../../lib/payments';
 import { TransactionTypes, OC_FEE_PERCENT } from '../../constants/transactions';
+import { get } from 'lodash';
 
 /** Get the balance of a giftcard
  *
@@ -35,26 +40,8 @@ export async function getBalance(paymentMethod) {
  */
 export async function processOrder(order) {
   const user = order.createdByUser;
-  const originalPM = order.paymentMethod;
-
-  let FromCollectiveId = order.paymentMethod.CollectiveId;
-
-  // hacky, HostCollectiveId doesn't quite make sense in this
-  // context but required by ledger. TODO: fix later.
-  let HostCollectiveId = order.paymentMethod.CollectiveId;
-
-  // If this is a payment method of a host for a specific
-  // collective, then we find the collective and its actual
-  // host. This is not hacky. The funds were added to this customer
-  // id in the host's bank account. We need this association in
-  // order to charge the host per transaction.
-  if (originalPM.customerId) {
-    const fromCollective = await models.Collective.findById(order.FromCollectiveId);
-    if (originalPM.customerId === fromCollective.slug) {
-      FromCollectiveId = fromCollective.id;
-      HostCollectiveId = originalPM.data.HostCollectiveId;
-    }
-  }
+  const pm = order.paymentMethod;
+  const HostCollectiveId = get(pm, 'data.HostCollectiveId');
 
   // Check that target Collective's Host is same as gift card issuer
   const hostCollective = await order.collective.getHostCollective();
@@ -65,7 +52,7 @@ export async function processOrder(order) {
   // transfer all money using gift card from Host to User
   await models.Transaction.createFromPayload({
     CreatedByUserId: user.id,
-    FromCollectiveId,
+    FromCollectiveId: HostCollectiveId,
     CollectiveId: user.CollectiveId,
     PaymentMethodId: order.PaymentMethodId,
     transaction: {
@@ -89,14 +76,14 @@ export async function processOrder(order) {
 
   // create new payment method to allow User to use the money
   const newPaymentMethod = await models.PaymentMethod.create({
-    name: originalPM.name,
+    name: pm.name,
     service: 'opencollective',
     type: 'collective', // changes to type collective
     confirmedAt: new Date(),
     CollectiveId: user.CollectiveId,
     CreatedByUserId: user.id,
-    MonthlyLimitPerMember: originalPM.monthlyLimitPerMember,
-    currency: originalPM.currency,
+    MonthlyLimitPerMember: pm.monthlyLimitPerMember,
+    currency: pm.currency,
     token: null // we don't pass the gift card token on
   });
 
@@ -148,6 +135,7 @@ export default {
   },
   getBalance,
   processOrder,
+  createGiftcards,
 };
 
 /*  -- Giftcard Generation -- */
@@ -155,7 +143,7 @@ export default {
 const VERIFICATION_MODULO = 45797;
 
 /** Generate random string to be used in a Giftcard token */
-export function randomString(length, chars) {
+function randomString(length, chars) {
   let result = '';
   for (let i = length; i > 0; --i) {
     result += chars[Math.floor(Math.random() * chars.length)];
@@ -164,7 +152,7 @@ export function randomString(length, chars) {
 }
 
 /** Generate the verification number of a token */
-export function getVerificationNumber(str) {
+function getVerificationNumber(str) {
   const data = Array.prototype.map
     .call(str, c => c.charCodeAt(0))
     .reduce((a, b) => a * b) % VERIFICATION_MODULO;
@@ -172,7 +160,7 @@ export function getVerificationNumber(str) {
 }
 
 /** Generate a new token for a gift card */
-export function newToken(prefix) {
+function newToken(prefix) {
   // generate three letters (ignoring confusing ones)
   const letters = randomString(3, 'ACEFHJKLMNPRSTUVWXY');
   // generate three digit number
@@ -188,7 +176,7 @@ export function newToken(prefix) {
 }
 
 /** Create the data for batches of giftcards */
-export function createGiftcardData(batches, opts) {
+function createGiftcardData(batches, opts) {
   const {
     name,
     CollectiveId,
@@ -213,6 +201,7 @@ export function createGiftcardData(batches, opts) {
         expiryDate: batch.expiryDate,
         CreatedByUserId,
         CollectiveId,
+        data: opts.data,
         service: 'opencollective',
         type: 'giftcard',
       });
@@ -235,7 +224,7 @@ export function createGiftcardData(batches, opts) {
  *  the card that can be used per month in cents.
  * @param {String} opts.currency Currency of the giftcard.
  */
-export async function createGiftcards(batches, opts) {
+async function createGiftcards(batches, opts) {
   const data = createGiftcardData(batches, opts);
   return models.PaymentMethod.bulkCreate(data);
 }

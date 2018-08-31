@@ -180,16 +180,28 @@ export const TierInputType = new GraphQLInputObjectType({
     type: { type: GraphQLString },
     name: { type: GraphQLString },
     description: { type: GraphQLString },
-    amount: { type: GraphQLInt },
+    amount: {
+      type: GraphQLInt,
+      description: "amount in the lowest unit of the currency of the host (ie. in cents)"
+    },
+    currency: { type: GraphQLString },
     presets: { type: new GraphQLList(GraphQLInt) },
     interval: { type: GraphQLString },
-    currency: { type: GraphQLString },
     maxQuantity: { type: GraphQLInt },
     maxQuantityPerUser: { type: GraphQLInt },
-    goal: { type: GraphQLInt },
+    goal: {
+      type: GraphQLInt,
+      description: "amount that you are trying to raise with this tier",
+    },
     password: { type: GraphQLString },
-    startsAt: { type: GraphQLString },
-    endsAt: { type: GraphQLString },
+    startsAt: {
+      type: GraphQLString,
+      description: "Start of the campaign",
+    },
+    endsAt: {
+      type: GraphQLString,
+      description: "End of the campaign",
+    },
   })
 });
 

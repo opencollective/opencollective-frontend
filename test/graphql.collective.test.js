@@ -69,19 +69,6 @@ describe('graphql.collective.test.js', () => {
       await expenses.payExpense(hostAdmin, expense.id, 0);
     }
 
-    // And given a tier object
-    await models.Tier.create({
-      name: "backer",
-      type: "TIER",
-      slug: "backers",
-      description: "$10/month",
-      amount: 1000,
-      interval: 'month',
-      currency: "USD",
-      maxQuantity: 10,
-      CollectiveId: apex.id,
-    });
-
     // When the following query is executed
     const query = `
     query Collective($slug: String) {
@@ -177,7 +164,7 @@ describe('graphql.collective.test.js', () => {
     expect(memberships[1].role).to.equal('ADMIN');
     expect(memberships[2].role).to.equal('BACKER');
     expect(collective.createdByUser.email).to.be.null;
-    expect(collective.tiers).to.have.length(1);
+    expect(collective.tiers).to.have.length(2);
 
     expect(collective.stats.backers).to.deep.equal({
       all: 11,

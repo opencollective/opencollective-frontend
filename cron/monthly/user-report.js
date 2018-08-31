@@ -24,7 +24,7 @@ import { convertToCurrency } from '../../server/lib/currency';
 import path from 'path';
 import fs from 'fs';
 
-const d = new Date;
+const d = process.env.START_DATE ? new Date(process.env.START_DATE) : new Date;
 d.setMonth(d.getMonth() - 1);
 const year = d.getFullYear();
 const month = moment(d).format('MMMM');
@@ -180,8 +180,13 @@ const processBacker = async (FromCollectiveId) => {
         collectives: collectivesWithOrders,
         manageSubscriptionsUrl: user.generateLoginLink('/subscriptions'),
         relatedCollectives,
-        stats
+        stats,
+        tags: stats.allTags || {},
       };
+      if (data.tags['open source']) {
+        data.tags.opensource = true;
+      }
+      data[backerCollective.type] = true;
       const options = {
         attachments
       };
@@ -225,7 +230,7 @@ const processEvents = (events) => {
  * Processes the stats of a given collective and keeps the result in memory cache
  * Returns collective data object with
  * {
- *   ...{'id', 'name', 'slug', 'website', 'image', 'mission', 'currency','publicUrl', 'tags', 'backgroundImage', 'settings', 'totalDonations', 'contributorsCount'},
+ *   ...{'id', 'name', 'slug', 'website', 'image', 'description', 'currency','publicUrl', 'tags', 'backgroundImage', 'settings', 'totalDonations', 'contributorsCount'},
  *   stats: { balance, totalDonations, totalPaidExpenses, updates },
  *   contributorsCounts,
  *   yearlyIncome,
@@ -271,7 +276,8 @@ const processCollective =  async (CollectiveId) => {
   const results = await Promise.all(promises);
   console.log('***', collective.name, '***');
   const data = {};
-  data.collective = pick(collective, ['id', 'name', 'slug', 'website', 'image', 'mission', 'currency','publicUrl', 'tags', 'backgroundImage', 'settings', 'totalDonations', 'contributorsCount']);
+  data.collective = pick(collective, ['id', 'name', 'slug', 'website', 'image', 'currency','publicUrl', 'tags', 'backgroundImage', 'settings', 'totalDonations', 'contributorsCount']);
+  data.collective.description = collective.description || collective.mission;
   data.collective.stats = results[0];
   data.collective.stats.balance = results[1];
   data.collective.stats.totalDonations = results[2];
@@ -344,6 +350,7 @@ const computeStats = async (collectives, currency = 'USD') => {
     }
   })
   stats.topTags = getTopKeysFromObject(tagsIndex);
+  stats.allTags = tagsIndex;
   stats.topCategories = getTopKeysFromObject(categories, 'totalAmountInBackerCurrency');
   stats.categories = categories;
   stats.totalSpentString = formatCurrencyObject(stats.totalSpentPerCurrency);

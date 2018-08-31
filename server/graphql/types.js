@@ -13,7 +13,8 @@ import GraphQLJSON from 'graphql-type-json';
 import he from 'he';
 
 import {
-  CollectiveInterfaceType
+  CollectiveInterfaceType,
+  CollectiveSearchResultsType
 } from './CollectiveInterface';
 
 import {
@@ -21,7 +22,7 @@ import {
   OrderDirectionType,
 } from './TransactionInterface';
 
-import models, { Op } from '../models';
+import models, { Op, sequelize } from '../models';
 import dataloaderSequelize from 'dataloader-sequelize';
 import { strip_tags } from '../lib/utils';
 import status from '../constants/expense_status';
@@ -461,18 +462,17 @@ export const ExpenseType = new GraphQLObjectType({
         }
       },
       comments: {
-        type: new GraphQLList(CommentType),
+        type: CommentListType,
         args: {
           limit: { type: GraphQLInt },
           offset: { type: GraphQLInt }
         },
         resolve(expense, args) {
-          const query = {
-            where: { ExpenseId: expense.id},
-            limit: args.limit || 10,
-            offset: args.offset || 0
-          };
-          return models.Comment.findAll(query);
+          return {
+            where: { ExpenseId: expense.id },
+            limit: args.limit,
+            offset: args.offset
+          }
         }
       },
       collective: {
@@ -606,23 +606,64 @@ export const UpdateType = new GraphQLObjectType({
         }
       },
       comments: {
-        type: new GraphQLList(CommentType),
+        type: CommentListType,
         args: {
           limit: { type: GraphQLInt },
           offset: { type: GraphQLInt }
         },
         resolve(update, args) {
-          const query = {
-            where: { ExpenseId: update.id},
+          return {
+            where: { UpdateId: update.id },
             limit: args.limit || 10,
             offset: args.offset || 0
-          };
-          return models.Comment.findAll(query);
+          }
         }
       }
     }
   }
 });
+
+
+export const CommentListType = new GraphQLObjectType({
+  name: 'CommentListType',
+  description: 'List of comments with pagination info',
+  fields: () => ({
+    comments: {
+      type: new GraphQLList(CommentType),
+      async resolve(query, args, req) {
+        let rows;
+        if (query.where.ExpenseId) {
+          rows = await req.loaders.comments.findAllByAttribute('ExpenseId').load(query.where.ExpenseId);
+        }
+        if (query.where.UpdateId) {
+          rows = await req.loaders.comments.findAllByAttribute('UpdateId').load(query.where.UpdateId);
+        }
+        return rows.splice(query.offset, query.limit);
+      }
+    },
+    limit: {
+      type: GraphQLInt,
+      resolve(query) {
+        return query.limit;
+      }
+    },
+    offset: {
+      type: GraphQLInt,
+      resolve(query) {
+        return query.offset;
+      }
+    },
+    total: {
+      type: GraphQLInt,
+      async resolve(query, args, req) {
+        if (query.where.ExpenseId) {
+          return req.loaders.comments.countByExpenseId.load(query.where.ExpenseId);
+        }
+      }
+    },
+  }),
+});
+
 
 export const CommentType = new GraphQLObjectType({
   name: 'CommentType',
@@ -1264,6 +1305,30 @@ export const PaymentMethodType = new GraphQLObjectType({
             ]
           }
           return paymentMethod.getOrders(query);
+        }
+      },
+      fromCollectives: {
+        type: CollectiveSearchResultsType,
+        args: {
+          limit: { type: GraphQLInt },
+          offset: { type: GraphQLInt }
+        },
+        description: 'Get the list of collectives that used this payment method. Useful to select the list of a backers for which the host has manually added funds or to get the list of backers that used a matching fund',
+        async resolve(paymentMethod, args) {
+          const res = await models.Transaction.findAll({
+            attributes: [ [sequelize.fn('DISTINCT', sequelize.col('FromCollectiveId')), 'FromCollectiveId']],
+            where: { PaymentMethodId: paymentMethod.id, type: 'CREDIT' },
+            logging: console.log
+          });
+          const FromCollectiveIds = res.map(r => r.dataValues.FromCollectiveId);
+          const result = await models.Collective.findAndCountAll({ where: { id: { [Op.in]: FromCollectiveIds }}});
+          const { count, rows } = result;
+          return {
+            total: count,
+            collectives: rows,
+            limit: args.limit,
+            offset: args.offset,
+          };
         }
       },
       currency: {

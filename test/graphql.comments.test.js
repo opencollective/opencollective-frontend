@@ -216,5 +216,29 @@ describe('graphql.comments.test', () => {
       expect(comments[0].markdown).to.equal("comment 3");
     });
 
+    it('get an expense with associated comments', async () => {
+      const expenseQuery = `
+      query Expense($id: Int!, $limit: Int) {
+        Expense(id: $id) {
+          description
+          amount
+          comments(limit: $limit) {
+            total
+            comments {
+              markdown
+              html
+            }
+          }
+        }
+      }
+      `;
+      const result = await utils.graphqlQuery(expenseQuery, { id: expense1.id, limit: 5 });
+      result.errors && console.error(result.errors);
+      expect(result.errors).to.not.exist;
+      const expense = result.data.Expense;
+      expect(expense.comments.total).to.equal(11);
+      expect(expense.comments.comments).to.have.length(5);
+    });
+
   });
 });

@@ -1,6 +1,6 @@
 {
   "name": "opencollective-api",
-  "version": "2.0.191",
+  "version": "2.0.208",
   "description": "Open Collective API",
   "author": "@philmod @arnaudbenard @xdamman @asood123",
   "main": "server/index.js",
@@ -125,6 +125,7 @@
     "nodemon": "1.12.5",
     "nsp": "2.6.1",
     "nyc": "10.1.2",
+    "prompts": "^1.0.0",
     "react": "16.3.2",
     "react-dom": "16.3.2",
     "sinon": "5.1.0",
@@ -145,6 +146,7 @@
     "nsp": "nsp check",
     "pretest": "npm run hint",
     "test": "TZ=UTC nyc npm run test:dev && npm run coverage",
+    "test:server": "./scripts/db_restore.sh -d opencollective_dvl -f test/dbdumps/opencollective_dvl.pgsql && PG_DATABASE=opencollective_dvl npm run dev",
     "test:dev": "npm run test:unit:dev && npm run test:bdd:dev",
     "test:unit:dev": "mocha --reporter-options mochaFile=$(bash scripts/test_output_dir.sh junit)/junit.xml",
     "test:unit": "nyc mocha --reporter-options mochaFile=$(bash scripts/test_output_dir.sh junit)/junit.xml",
@@ -170,6 +172,7 @@
     "git:clean": "./scripts/git_clean.sh",
     "deploy:staging": "bash -x scripts/deploy.sh staging",
     "deploy:production": "bash -x scripts/deploy.sh production",
+    "report": "node scripts/send_email_report_cli.js",
     "report:weekly": "node cron/weekly/slack-report.js",
     "report:monthly": "babel-node cron/monthly/slack-report.js",
     "check:transactions": "node scripts/check_transactions_on_stripe",
@@ -180,7 +183,8 @@
     "cron:weekly": "PG_MAX_CONNECTIONS=1 ./scripts/cron.sh weekly",
     "cron:monthly": "PG_MAX_CONNECTIONS=1 ./scripts/cron.sh monthly",
     "cron:yearly": "PG_MAX_CONNECTIONS=1 ./scripts/cron.sh yearly",
-    "compile:email": "babel-node scripts/compile-email.js"
+    "compile:email": "babel-node scripts/compile-email.js",
+    "compile:email:watch": "./scripts/watch_email_template.sh"
   },
   "nyc": {
     "reporter": [

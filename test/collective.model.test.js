@@ -148,6 +148,69 @@ describe('Collective model', () => {
       })
   })
 
+  describe("hosts", () => {
+    let newHost;
+
+    before(async () => {
+      expect(collective.HostCollectiveId).to.be.null;
+      await collective.addHost(host.collective, host);
+      expect(collective.HostCollectiveId).to.equal(host.CollectiveId);
+      newHost = await models.Collective.create({
+        name: "BrusselsTogether",
+        slug: "brusselstogether",
+        type: "ORGANIZATION",
+        CreatedByUserId: user1.id
+      });
+      await models.Member.create({
+        CollectiveId: newHost.id,
+        MemberCollectiveId: user1.CollectiveId,
+        role: 'ADMIN',
+        CreatedByUserId: user1.id
+      });
+      user1.populateRoles();
+      user2.populateRoles();
+    });
+
+    it("fails to add another host", async () => {
+      try {
+        await collective.addHost(newHost, user1);
+      } catch (e) {
+        expect(e.message).to.contain(`This collective already has a host`);
+      }
+    });
+
+    it("fails to change host if there is a pending balance", async () => {
+      try {
+        await collective.changeHost();
+      } catch (e) {
+        expect(e.message).to.contain("Unable to change host: you still have a balance of $965");
+      }
+    });
+
+    it("changes host successfully", async () => {
+      const newCollective = await models.Collective.create({
+        name: "New collective",
+        slug: "new-collective",
+        type: "COLLECTIVE",
+        isActive: false,
+        CreatedByUserId: user1.id
+      });
+      await newCollective.addHost(host, user1);
+      await newCollective.changeHost(newHost, user1);
+      expect(newCollective.HostCollectiveId).to.equal(newHost.id);
+      // if the user making the request is an admin of the host, isActive should turn to true
+      expect(newCollective.isActive).to.be.true;
+      const membership = await models.Member.findOne({ where: { role: 'HOST', CollectiveId: newCollective.id }});
+      expect(membership).to.exist;
+      expect(membership.MemberCollectiveId).to.equal(newHost.id);
+      expect(newCollective.HostCollectiveId).to.equal(newHost.id);
+      // moving to a host where the user making the request is not an admin of turns isActive to false
+      await newCollective.changeHost(host, user2);
+      expect(newCollective.HostCollectiveId).to.equal(host.id);
+      expect(newCollective.isActive).to.be.false;
+    });
+  });
+
   it('creates an organization and populates logo image', (done) => {
     models.Collective.create({
       name: "Open Collective",
@@ -331,8 +394,6 @@ describe('Collective model', () => {
   });
 
   describe("tiers", () => {
-    before('adding backer tier', () => models.Tier.create({ ...utils.data('tier1'), CollectiveId: collective.id })); // adding backer tier
-    before('adding sponsor tier', () => models.Tier.create({ ...utils.data('tier2'), CollectiveId: collective.id })); // adding sponsor tier
     before('adding user as backer', () => collective.addUserWithRole(user2, 'BACKER'))
     before('creating order for backer tier', () => models.Order.create({
       CreatedByUserId: user1.id,

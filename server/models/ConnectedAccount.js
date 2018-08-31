@@ -7,7 +7,7 @@ export default (Sequelize, DataTypes) => {
 
   const supportedServices = ['paypal', 'stripe', 'github', 'twitter', 'meetup'];
 
-  return Sequelize.define('ConnectedAccount', {
+  const ConnectedAccount = Sequelize.define('ConnectedAccount', {
 
     service: {
       type: DataTypes.STRING,
@@ -64,4 +64,10 @@ export default (Sequelize, DataTypes) => {
     }
 
   });
+
+  ConnectedAccount.associate = (m) => {
+    ConnectedAccount.belongsTo(m.Collective, { foreignKey: 'CollectiveId', as: 'collective' });
+  };
+
+  return ConnectedAccount;
 };

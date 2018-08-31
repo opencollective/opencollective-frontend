@@ -13,6 +13,14 @@ import sanitizeHtml from 'sanitize-html';
 
 const debug = debugLib('utils');
 
+export function addParamsToUrl(url, obj) {
+  const u = new URL(url);
+  Object.keys(obj).forEach(key => {
+    u.searchParams.set(key, obj[key]);
+  });
+  return u.href;
+}
+
 // source: https://stackoverflow.com/questions/8498592/extract-hostname-name-from-string
 function extractHostname(url) {
   let hostname;
@@ -454,7 +462,7 @@ export const defaultHostCollective = (tag) => {
     if (tag === 'opensource') {
       return { id: 772, CollectiveId: 11004, ParentCollectiveId: 83 }; // Open Source Host Collective
     } else {
-      return { id: 7944, CollectiveId: 8674, ParentCollectiveId: 83 }; // Non-open source Host Collective ('host-other')
+      return {}; // Don't automatically assign a host anymore
     }
   }
   return { id: 1, CollectiveId: 1 };

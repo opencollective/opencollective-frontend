@@ -5,9 +5,6 @@ import config from 'config';
 import { memoize, pick } from 'lodash';
 memoize.Cache = Map;
 
-const useCache = ['production', 'staging'].includes(process.env.NODE_ENV);
-const CACHE_REFRESH_INTERVAL = process.env.CACHE_REFRESH_INTERVAL || 1000 * 60 * 60;
-
 /*
 * Hacky way to do currency conversion
 */
@@ -30,6 +27,33 @@ const generateFXConversionSQL = (aggregate) => {
   sql += 'ELSE 0 END';
 
   return sql;
+};
+
+const getPublicHostsByTotalCollectives = (args) => {
+  let conditions = '';
+  if (args.tags && args.tags.length > 0) {
+    conditions = 'AND c.tags && $tags';
+  }
+  if (args.currency && args.currency.length === 3) {
+    conditions += ' AND c.currency=$currency';
+  }
+  const query = `
+  WITH counts AS (
+    SELECT max(c.id) as "HostCollectiveId", count(m.id) as count FROM "Collectives" c
+    LEFT JOIN "Members" m ON m."MemberCollectiveId" = c.id AND m.role = 'HOST' AND m."deletedAt" IS NULL
+    WHERE c."settings" #>> '{apply}' IS NOT NULL
+      ${conditions}
+      AND c."deletedAt" IS NULL
+    GROUP BY c.id
+  )
+  SELECT counts.count as collectives, c.*
+  FROM "Collectives" c INNER JOIN counts ON counts."HostCollectiveId" = c.id
+  ORDER BY ${args.orderBy} ${args.orderDirection} LIMIT ${args.limit} OFFSET ${args.offset}
+  `;
+  return sequelize.query(query, {
+    bind: { tags: args.tags || [], currency: args.currency },
+    type: sequelize.QueryTypes.SELECT
+  })
 };
 
 const getTotalAnnualBudgetForHost = (HostCollectiveId) => {
@@ -721,27 +745,8 @@ const getCollectivesWithMinBackersQuery = async ({ backerCount = 10, orderBy = '
 };
 const getCollectivesWithMinBackers = memoize(getCollectivesWithMinBackersQuery, JSON.stringify);
 
-// warming up the cache with the homepage queries
-const cacheEntries = [
-  { method: "getCollectivesOrderedByMonthlySpending", params: {"type":"COLLECTIVE","orderBy":"monthlySpending","orderDirection":"DESC","limit":4,"offset":0,"where":{"type":"COLLECTIVE"}} },
-  { method: "getCollectivesOrderedByMonthlySpending", params: {"type":"ORGANIZATION","orderBy":"monthlySpending","orderDirection":"DESC","limit":6,"offset":0,"where":{"type":"ORGANIZATION"}} },
-  { method: "getCollectivesOrderedByMonthlySpending", params: {"type":"USER","orderBy":"monthlySpending","orderDirection":"DESC","limit":30,"offset":0,"where":{"type":"USER"}} },
-  { method: "getCollectivesWithMinBackers", params: {"type":"COLLECTIVE","isActive":true,"minBackerCount":10,"orderBy":"createdAt","orderDirection":"DESC","limit":4,"offset":0,"where":{"type":"COLLECTIVE","isActive":true}}}
-];
-
-const refreshCache = async () => {
-  Promise.each(cacheEntries, async (entry) => {
-    const res = await queries[`${entry.method}Query`](entry.params);
-    queries[entry.method].cache.set(JSON.stringify(entry.params), res);
-  });
-};
-
-if (useCache) {
-  setInterval(refreshCache, CACHE_REFRESH_INTERVAL);
-  refreshCache();
-}
-
 const queries = {
+  getPublicHostsByTotalCollectives,
   getCollectivesOrderedByMonthlySpending,
   getCollectivesOrderedByMonthlySpendingQuery,
   getTotalDonationsByCollectiveType,

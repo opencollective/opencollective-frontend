@@ -12,27 +12,6 @@ import {
   createTransactionFromInKindDonation
 } from '../../lib/transactions';
 
-
-async function _createActivity(expense, type) {
-  const user = expense.user || await models.User.findById(expense.UserId);
-  const userCollective = await models.Collective.findById(user.CollectiveId);
-  const host = await expense.collective.getHostCollective();
-  const transaction = expense.status === statuses.PAID && await models.Transaction.findOne({ where: { type: 'DEBIT', ExpenseId: expense.id }});
-  await models.Activity.create({
-    type,
-    UserId: expense.UserId,
-    CollectiveId: expense.collective.id,
-    data: {
-      host: host.minimal,
-      collective: expense.collective.minimal,
-      user: user.minimal,
-      fromCollective: userCollective.minimal,
-      expense: expense.info,
-      transaction: transaction.info
-    }
-  });
-}
-
 /**
  * Only admin of expense.collective or of expense.collective.host can approve/reject expenses
  */
@@ -75,7 +54,6 @@ export async function updateExpenseStatus(remoteUser, expenseId, status) {
   if (!canUpdateExpenseStatus(remoteUser, expense)) {
     throw new errors.Unauthorized("You don't have permission to approve this expense");
   }
-
   switch (status) {
     case statuses.APPROVED:
       if (expense.status === statuses.PAID) {
@@ -93,12 +71,7 @@ export async function updateExpenseStatus(remoteUser, expenseId, status) {
       }
       break;
   }
-
   const res = await expense.update({ status, lastEditedById: remoteUser.id });
-  if (status === statuses.APPROVED) {
-    await _createActivity(expense, activities.COLLECTIVE_EXPENSE_APPROVED);
-  }
-
   return res;
 }
 
@@ -149,8 +122,7 @@ export async function createExpense(remoteUser, expenseData) {
 
   expense.user = remoteUser;
   expense.collective = collective;
-  await _createActivity(expense, activities.COLLECTIVE_EXPENSE_CREATED);
-
+  await expense.createActivity(activities.COLLECTIVE_EXPENSE_CREATED);
   return expense;
 }
 
@@ -186,7 +158,7 @@ export async function editExpense(remoteUser, expenseData) {
 
   expenseData.lastEditedById = remoteUser.id;
   await expense.update(expenseData);
-  _createActivity(expense, activities.COLLECTIVE_EXPENSE_UPDATED);
+  expense.createActivity(activities.COLLECTIVE_EXPENSE_UPDATED);
   return expense;
 }
 
@@ -212,7 +184,7 @@ export async function deleteExpense(remoteUser, expenseId) {
 /** Helper that finishes the process of paying an expense */
 async function payExpenseUpdate(expense) {
   const updatedExpense = await expense.update({ status: statuses.PAID });
-  await _createActivity(expense, activities.COLLECTIVE_EXPENSE_PAID);
+  await expense.createActivity(activities.COLLECTIVE_EXPENSE_PAID);
   return updatedExpense;
 }
 
@@ -220,25 +192,19 @@ export async function payExpense(remoteUser, expenseId, paymentProcessorFee) {
   if (!remoteUser) {
     throw new errors.Unauthorized("You need to be logged in to pay an expense");
   }
-
   const expense = await models.Expense.findById(expenseId, { include: [ { model: models.Collective, as: 'collective' } ] });
-
   if (!expense) {
     throw new errors.Unauthorized("Expense not found");
   }
-
   if (expense.status === statuses.PAID) {
     throw new errors.Unauthorized("Expense has already been paid");
   }
-
   if (expense.status !== statuses.APPROVED) {
     throw new errors.Unauthorized(`Expense needs to be approved. Current status of the expense: ${expense.status}.`);
   }
-
   if (!canUpdateExpenseStatus(remoteUser, expense)) {
     throw new errors.Unauthorized("You don't have permission to pay this expense");
   }
-
   const host = await expense.collective.getHostCollective();
 
   // Expenses in kind can be made for collectives without any
@@ -251,7 +217,6 @@ export async function payExpense(remoteUser, expenseId, paymentProcessorFee) {
     await expense.collective.addUserWithRole(user, 'BACKER');
     return payExpenseUpdate(expense);
   }
-
   const balance = await expense.collective.getBalance();
 
   if (expense.amount > balance) {
@@ -271,11 +236,9 @@ export async function payExpense(remoteUser, expenseId, paymentProcessorFee) {
   if ((expense.amount + paymentProcessorFee) > balance) {
     throw new Error(`You don't have enough funds to cover for the fees of this payment method. Current balance: ${formatCurrency(balance, expense.collective.currency)}, Expense amount: ${formatCurrency(expense.amount, expense.collective.currency)}, Estimated ${expense.payoutMethod} fees: ${formatCurrency(paymentProcessorFee, expense.collective.currency)}`);
   }
-
   if (expense.payoutMethod === 'paypal') {
     const paypalEmail = await expense.getPaypalEmail();
     const paymentMethod = await host.getPaymentMethod({ service: expense.payoutMethod });
-
     try {
       const paymentResponse = await paymentProviders[expense.payoutMethod].types['adaptive'].pay(expense.collective, expense, paypalEmail, paymentMethod.token);
       const preapprovalDetailsResponse = await paypalAdaptive.preapprovalDetails(paymentMethod.token);
@@ -289,7 +252,6 @@ export async function payExpense(remoteUser, expenseId, paymentProcessorFee) {
       }
     }
   }
-
   // note: we need to check for manual and other for legacy reasons
   if (expense.payoutMethod === 'manual' || expense.payoutMethod === 'other') {
     await createTransactionFromPaidExpense(host, null, expense, null, null, expense.UserId, paymentProcessorFee);

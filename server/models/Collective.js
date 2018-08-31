@@ -10,7 +10,7 @@ import queries from '../lib/queries';
 import { types } from '../constants/collectives';
 import roles from '../constants/roles';
 import { HOST_FEE_PERCENT } from '../constants/transactions';
-import { capitalize, flattenArray, getDomain } from '../lib/utils';
+import { capitalize, flattenArray, getDomain, formatCurrency } from '../lib/utils';
 import slugify from 'slug';
 import activities from '../constants/activities';
 import Promise from 'bluebird';
@@ -23,6 +23,63 @@ import fetch from 'isomorphic-fetch';
 import crypto from 'crypto';
 
 const debug = debugLib('collective');
+
+
+const defaultTiers = (HostCollectiveId, currency) => {
+  const tiers = [];
+
+  if (HostCollectiveId === 858) { // if request coming from opencollective.com/meetups
+    tiers.push({
+      type: 'TIER',
+      name: '1 month',
+      description: "Sponsor our meetup and get: a shout-out on social media, presence on the merch table and your logo on our meetup page.",
+      slug: '1month-sponsor',
+      amount: 25000,
+      button: "become a sponsor",
+      currency: currency
+    });
+    tiers.push({
+      type: 'TIER',
+      name: '3 months',
+      description: "**10% off!** - Sponsor our meetup and get: a shout-out on social media, presence on the merch table and your logo on our meetup page.",
+      slug: '3month-sponsor',
+      amount: 67500,
+      button: "become a sponsor",
+      currency: currency
+    });
+    tiers.push({
+      type: 'TIER',
+      name: '6 months',
+      description: "**20% off!** - Sponsor our meetup and get: a shout-out on social media, presence on the merch table and your logo on our meetup page.",
+      slug: '6month-sponsor',
+      amount: 120000,
+      button: "become a sponsor",
+      currency: currency
+    });
+    return tiers;
+  }
+  if (tiers.length === 0) {
+    tiers.push({
+      type: 'TIER',
+      name: 'backer',
+      slug: 'backers',
+      amount: 500,
+      presets: [500, 1000, 2500, 5000],
+      interval: 'month',
+      currency: currency
+    });
+    tiers.push({
+      type: 'TIER',
+      name: 'sponsor',
+      slug: 'sponsors',
+      amount: 10000,
+      presets: [10000, 25000, 50000],
+      interval: 'month',
+      currency: currency
+    });
+  }
+  return tiers;
+}
 
 /**
  * Collective Model.
@@ -996,16 +1053,73 @@ export default function(Sequelize, DataTypes) {
    * @param {*} hostCollective instanceof models.Collective
    * @param {*} creatorUser { id } (optional, falls back to hostCollective.CreatedByUserId)
    */
-  Collective.prototype.addHost = function(hostCollective, creatorUser) {
+  Collective.prototype.addHost = async function(hostCollective, creatorUser) {
+    if (this.HostCollectiveId) {
+      throw new Error(`This collective already has a host (HostCollectiveId: ${this.HostCollectiveId})`);
+    }
+
     const member = {
       role: roles.HOST,
       CreatedByUserId: creatorUser ? creatorUser.id : hostCollective.CreatedByUserId,
       MemberCollectiveId: hostCollective.id,
       CollectiveId: this.id,
     };
-    return this.update({ HostCollectiveId: hostCollective.id })
-      .then(() => models.Member.create(member));
+
+    const updatedValues = {
+      HostCollectiveId: hostCollective.id,
+      currency: hostCollective.currency
+    };
+
+    const promises = [
+      models.Member.create(member),
+      this.update(updatedValues)
+    ];
+
+    if (this.type === types.COLLECTIVE) {
+      let tiers = await this.getTiers();
+      if (!tiers || tiers.length === 0) {
+        tiers = defaultTiers(hostCollective.id, hostCollective.currency);
+        promises.push(models.Tier.createMany(tiers, { CollectiveId: this.id }));
+      }
+    }
+
+    await Promise.all(promises);
+    return this;
   };
+
+  /**
+   * Change or remove host of the collective (only if balance === 0)
+   * Note: when changing host, we also set the collective.isActive to false
+   *       unless the creatorUser (remoteUser) is an admin of the host
+   * @param {*} newHostCollective: { id }
+   * @param {*} creatorUser { id }
+   */
+  Collective.prototype.changeHost = async function(newHostCollective, creatorUser) {
+    if (!newHostCollective || !newHostCollective.id === this.id) {
+      // do nothing
+      return;
+    }
+    const balance = await this.getBalance();
+    if (balance > 0) {
+      throw new Error(`Unable to change host: you still have a balance of ${formatCurrency(balance, this.currency)}`);
+    }
+    const membership = await models.Member.findOne({
+      where: { CollectiveId: this.id, MemberCollectiveId: this.HostCollectiveId, role: roles.HOST }
+    });
+    if (membership) {
+      membership.destroy();
+    }
+    this.HostCollectiveId = null;
+    this.isActive = false;
+    if (newHostCollective.id) {
+      if (creatorUser.isAdmin(newHostCollective.id)) {
+        this.update({ isActive: true });
+      }
+      return this.addHost(newHostCollective, creatorUser);
+    } else {
+      return this.save();
+    }
+  }
 
   // edit the list of members and admins of this collective (create/update/remove)
   // creates a User and a UserCollective if needed

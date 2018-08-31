@@ -2,7 +2,7 @@ import axios from 'axios';
 import config from 'config';
 import Promise from 'bluebird';
 
-import { get, set } from 'lodash';
+import { get, set, template } from 'lodash';
 import activitiesLib from '../lib/activities';
 import slackLib from './slack';
 import twitter from './twitter';
@@ -11,6 +11,7 @@ import activityType from '../constants/activities';
 import {W9_BOT_SLUG} from '../constants/collectives';
 import models from '../models';
 import debugLib from 'debug';
+import { formatCurrency } from './utils';
 const debug = debugLib("notification");
 
 export default async (Sequelize, activity) => {
@@ -170,11 +171,22 @@ async function w9bot(activity) {
   // U$ 600.00 total amount allowed without form as of July 2018
   const threshold = get(w9Bot, 'settings.W9.threshold');
   if (threshold && totalAmountThisYear > threshold) {
+    const compiled = template(get(w9Bot, 'settings.W9.comment'), { interpolate: /{{([\s\S]+?)}}/g });
+    const html = compiled({
+      ExpenseId: activity.data.expense.id,
+      UserId: activity.data.user.id,
+      collective: activity.data.collective.name,
+      host: activity.data.collective.name,
+      fromName: activity.data.fromCollective.name,
+      totalAmountThisYear: formatCurrency(totalAmountThisYear, 'USD'),
+      expenseUrl: `${config.host.website}/${activity.data.collective.slug}/expenses/${activity.data.expense.id}`
+    });
+
     const commentData = {
       CollectiveId: activity.data.collective.id,
       ExpenseId: activity.data.expense.id,
       FromCollectiveId: w9Bot.id,
-      html: get(w9Bot, 'settings.W9.comment')
+      html,
     };
 
     // adding UserId to Host Data to keep track of all UserIds that received the request
@@ -265,7 +277,9 @@ async function notifyByEmail(activity) {
         activity.data.expense.payoutMethod = `PayPal (${activity.data.user.paypalEmail})`;
       }
       notifyUserId(activity.data.expense.UserId, activity);
-      notifyAdminsOfCollective(activity.data.host.id, activity, { template: 'collective.expense.approved.for.host', collective: activity.data.host })
+      if (get(activity, 'data.host.id')) {
+        notifyAdminsOfCollective(activity.data.host.id, activity, { template: 'collective.expense.approved.for.host', collective: activity.data.host })
+      }
       break;
 
     case activityType.COLLECTIVE_EXPENSE_PAID:
@@ -273,7 +287,9 @@ async function notifyByEmail(activity) {
         viewLatestExpenses: `${config.host.website}/${activity.data.collective.slug}/expenses#expense${activity.data.expense.id}`
       }
       notifyUserId(activity.data.expense.UserId, activity);
-      notifyAdminsOfCollective(activity.data.host.id, activity, { template: 'collective.expense.paid.for.host', collective: activity.data.host })
+      if (get(activity, 'data.host.id')) {
+        notifyAdminsOfCollective(activity.data.host.id, activity, { template: 'collective.expense.paid.for.host', collective: activity.data.host })
+      }
       break;
 
     case activityType.COLLECTIVE_APPROVED:
@@ -281,8 +297,10 @@ async function notifyByEmail(activity) {
       break;
 
     case activityType.COLLECTIVE_CREATED:
-      notifyAdminsOfCollective(activity.data.host.id, activity, { template: 'collective.created.for.host', collective: activity.data.host });
-      if (activity.data.collective.tags && activity.data.collective.tags.indexOf("meetup") !== -1) {
+      if (get(activity, 'data.host.id')) {
+        notifyAdminsOfCollective(activity.data.host.id, activity, { template: 'collective.created.for.host', collective: activity.data.host });
+      }
+      if ((get(activity, 'data.collective.tags') || []).includes('meetup')) {
         notifyAdminsOfCollective(activity.data.collective.id, activity, { template: 'collective.created.meetup' });
       } else {
         notifyAdminsOfCollective(activity.data.collective.id, activity);

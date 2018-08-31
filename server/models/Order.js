@@ -200,9 +200,14 @@ export default function(Sequelize, DataTypes) {
     });
   }
 
+  /**
+   * This will either create a new payment method or fetch an existing one
+   * in which case, this will also make sure that the user can actually use it
+   * (need to be a member of admin of the collective if there is a monthlyLimitPerUser or an admin if no limit)
+   */
   Order.prototype.setPaymentMethod = function(paymentMethodData) {
     debug("setPaymentMethod", paymentMethodData);
-    return this.getUser()
+    return this.getUser() // remote user (logged in user) that created the order
       .then(user => models.PaymentMethod.getOrCreate(user, paymentMethodData))
       .then(pm => this.validatePaymentMethod(pm))
       .then(pm => {

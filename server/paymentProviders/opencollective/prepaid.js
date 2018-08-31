@@ -3,6 +3,7 @@ import roles from '../../constants/roles';
 import * as libpayments from '../../lib/payments';
 import * as libtransactions from '../../lib/transactions';
 import { TransactionTypes, OC_FEE_PERCENT } from '../../constants/transactions';
+import { get } from 'lodash';
 
 /** Get the balance of a prepaid credit card
  *
@@ -15,7 +16,7 @@ import { TransactionTypes, OC_FEE_PERCENT } from '../../constants/transactions';
  *  prepaid credit card payment method.
  * @return {Object} with amount & currency from the payment method.
  */
-export async function getBalance(paymentMethod) {
+async function getBalance(paymentMethod) {
   if (!libpayments.isProvider('opencollective.prepaid', paymentMethod)) {
     throw new Error(`Expected opencollective.prepaid but got ${paymentMethod.service}.${paymentMethod.type}`);
   }
@@ -38,22 +39,13 @@ export async function getBalance(paymentMethod) {
  *  processing Giftcard orders, the transaction generated from it is
  *  returned.
  */
-export async function processOrder(order) {
+async function processOrder(order) {
   const user = order.createdByUser;
   const { paymentMethod: { data } } = order;
-
   // Making sure the paymentMethod has the information we need to
   // process a prepaid card
-  if (!order.paymentMethod.customerId)
-    throw new Error('Prepaid method must have a value for `customerId`');
-  if (!data || !data.HostCollectiveId)
-    throw new Error('Prepaid method must have a value for `data.HostCollectiveId`');
-
-  // Check if the prepaid card was created for the collective making
-  // the donation
-  const fromCollective = await models.Collective.findById(order.FromCollectiveId);
-  if (order.paymentMethod.customerId !== fromCollective.slug)
-    throw new Error('Prepaid method can only be used by the organization that received it');
+  if (!get(data, 'HostCollectiveId'))
+    throw new Error('Prepaid payment method must have a value for `data.HostCollectiveId`');
 
   // Check that target Collective's Host is same as gift card issuer
   const hostCollective = await order.collective.getHostCollective();

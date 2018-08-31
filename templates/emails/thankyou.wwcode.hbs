@@ -30,7 +30,9 @@ Subject: Thank you for your {{{currency order.totalAmount currency=order.currenc
 
 <p>On behalf of the Women Who Code Board of Executives, our leadership team, and our members worldwide, thank you for furthering our mission. We appreciate and value your contribution and continued support of our community.</p>
 
-<p>P.S: You can download a receipt for your donation in PDF <a href="{{config.host.website}}/{{collective.slug}}/transactions/{{transaction.uuid}}/invoice.pdf">here</a></p>
+<p>
+  P.S: You can download a PDF receipt for your donation <a href="{{config.host.website}}/{{collective.slug}}/transactions/{{transaction.uuid}}/invoice.pdf">here</a>{{#if subscriptionsLink}}, and you can manage your subscriptions <a href="{{subscriptionsLink}}">here</a>{{/if}}.
+</p>
 
 <p>Warmly,</p>
 
@@ -42,7 +44,5 @@ Subject: Thank you for your {{{currency order.totalAmount currency=order.currenc
 </p>
 
 <p>Your contribution is tax-deductible to the extent allowed by law. You may save or print this receipt for your records. This email certifies that you have made this donation as a charitable contribution and you are not receiving any goods or services in return. This receipt may be useful to you when completing your tax return. Women Who Code, registered 501(c)3 Nonprofit TAX ID: 46-4218859. </p>
-
-{{> subscriptions}}
 
 {{> footer}}

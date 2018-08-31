@@ -41,7 +41,12 @@ async function HostReport(year, month, hostId) {
 
   const d = new Date;
 
-  if (!month) {
+  if (process.env.START_DATE) {
+    startDate = new Date(process.env.START_DATE);
+    year = startDate.getFullYear();
+    previousStartDate =  new Date(year - 1, startDate.getMonth(), startDate.getDate());
+    endDate = new Date(year + 1, startDate.getMonth(), startDate.getDate());
+  } else if (!month) {
     // yearly report
     d.setFullYear(year);
     previousStartDate = new Date(d.getFullYear()-1, 0, 1);
@@ -53,6 +58,8 @@ async function HostReport(year, month, hostId) {
     startDate = new Date(d.getFullYear(), d.getMonth()+1, 1);
     endDate = new Date(d.getFullYear(), d.getMonth()+2, 1);
   }
+
+  const endDateIncluded = moment(endDate).subtract(1, 'days').toDate();
 
   const dateRange = {
     createdAt: { [Op.gte]: startDate, [Op.lt]: endDate }
@@ -83,10 +90,11 @@ async function HostReport(year, month, hostId) {
   if (process.env.SLUGS) {
     const slugs = process.env.SLUGS.split(',');
     previewCondition = `AND c.slug IN ('${slugs.join("','")}')`
+    process.env.SKIP_PLATFORM_STATS = true;
   }
 
   const getPlatformStats = () => {
-
+    console.log(">>> Computing platform stats (to skip, set the SKIP_PLATFORM_STATS env variable");
     return models.Collective.findAll({ where: { type: { [Op.in]: ['COLLECTIVE', 'EVENT'] } } })
       .then((collectives) => {
         const where = {
@@ -177,6 +185,9 @@ async function HostReport(year, month, hostId) {
     data.reportDate = endDate;
     data.month = month && moment(startDate).format('MMMM');
     data.year = year;
+    data.startDate = startDate;
+    data.endDate = endDate;
+    data.endDateIncluded = endDateIncluded;
     data.config = _.pick(config, 'host');
     data.maxSlugSize = 0;
     data.notes = null;
