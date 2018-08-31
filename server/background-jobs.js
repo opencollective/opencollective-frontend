@@ -2,8 +2,7 @@ import Promise from 'bluebird';
 
 import queries from './lib/queries';
 
-// const useCache = ['production', 'staging'].includes(process.env.NODE_ENV);
-const useCache = true;
+const useCache = ['production', 'staging'].includes(process.env.NODE_ENV);
 const CACHE_REFRESH_INTERVAL = process.env.CACHE_REFRESH_INTERVAL || 1000 * 60 * 60;
 
 // warming up the cache with the homepage queries
