@@ -1053,29 +1053,38 @@ export default function(Sequelize, DataTypes) {
    * @param {*} hostCollective instanceof models.Collective
    * @param {*} creatorUser { id } (optional, falls back to hostCollective.CreatedByUserId)
    */
-  Collective.prototype.addHost = function(hostCollective, creatorUser) {
+  Collective.prototype.addHost = async function(hostCollective, creatorUser) {
     if (this.HostCollectiveId) {
       throw new Error(`This collective already has a host (HostCollectiveId: ${this.HostCollectiveId})`);
     }
+
     const member = {
       role: roles.HOST,
       CreatedByUserId: creatorUser ? creatorUser.id : hostCollective.CreatedByUserId,
       MemberCollectiveId: hostCollective.id,
       CollectiveId: this.id,
     };
+
     const updatedValues = {
       HostCollectiveId: hostCollective.id,
       currency: hostCollective.currency
     };
-    return this.getTiers()
-      .then(tiers => {
-        if (!tiers || tiers.length === 0) {
-          tiers = defaultTiers(hostCollective.id, hostCollective.currency);
-          return models.Tier.createMany(tiers, { CollectiveId: this.id });
-        }
-      })
-      .then(() => models.Member.create(member))
-      .then(() => this.update(updatedValues));
+
+    const promises = [
+      models.Member.create(member),
+      this.update(updatedValues)
+    ];
+
+    if (this.type === types.COLLECTIVE) {
+      let tiers = await this.getTiers();
+      if (!tiers || tiers.length === 0) {
+        tiers = defaultTiers(hostCollective.id, hostCollective.currency);
+        promises.push(models.Tier.createMany(tiers, { CollectiveId: this.id }));
+      }
+    }
+
+    await Promise.all(promises);
+    return this;
   };
 
   /**

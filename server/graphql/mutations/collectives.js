@@ -6,13 +6,13 @@ import { types } from '../../constants/collectives';
 import roles from '../../constants/roles';
 import activities from '../../constants/activities';
 
-export function createCollective(_, args, req) {
+export async function createCollective(_, args, req) {
   if (!req.remoteUser) {
-    return Promise.reject(new errors.Unauthorized({ message: "You need to be logged in to create a collective"}));
+    throw new errors.Unauthorized({ message: "You need to be logged in to create a collective"});
   }
 
   if (!args.collective.name) {
-    return Promise.reject(new errors.ValidationFailed({ message: "collective.name required" }));
+    throw new errors.ValidationFailed({ message: "collective.name required" });
   }
 
   let hostCollective, parentCollective, collective;
@@ -31,7 +31,6 @@ export function createCollective(_, args, req) {
     }
   }
 
-  const promises = [];
   if (args.collective.HostCollectiveId) {
     if (args.collective.HostCollectiveId === 858) { // opencollective.com/meetups
       if (collectiveData.timezone) {
@@ -55,87 +54,50 @@ export function createCollective(_, args, req) {
       collectiveData.tags.push("Tech meetups");
     }
   }
-  if (args.collective.HostCollectiveId) {
-    promises.push(
-      req.loaders
-        .collective.findById.load(args.collective.HostCollectiveId)
-        .then(hc => {
-          if (!hc) return Promise.reject(new Error(`Host collective with id ${args.collective.HostCollectiveId} not found`));
-          hostCollective = hc;
-          collectiveData.currency = collectiveData.currency || hc.currency;
-          collectiveData.hostFeePercent = hc.hostFeePercent;
-          if (req.remoteUser.hasRole([roles.ADMIN, roles.HOST], hostCollective.id)) {
-            collectiveData.isActive = true;
-          }
-        })
-    );
-  }
+
   if (args.collective.ParentCollectiveId) {
-    promises.push(
-      req.loaders
-        .collective.findById.load(args.collective.ParentCollectiveId)
-        .then(pc => {
-          if (!pc) return Promise.reject(new Error(`Parent collective with id ${args.collective.ParentCollectiveId} not found`));
-          parentCollective = pc;
-          // The currency of the new created collective if not specified should be the one of its direct parent or the host (in this order)
-          collectiveData.currency = collectiveData.currency || pc.currency;
-          if (req.remoteUser.hasRole([roles.ADMIN, roles.HOST, roles.MEMBER], parentCollective.id)) {
-            collectiveData.isActive = true;
-          }
-        })
-    );
+    parentCollective = await req.loaders.collective.findById.load(args.collective.ParentCollectiveId);
+    if (!parentCollective) {
+      return Promise.reject(new Error(`Parent collective with id ${args.collective.ParentCollectiveId} not found`));
+    }
+    // The currency of the new created collective if not specified should be the one of its direct parent or the host (in this order)
+    collectiveData.currency = collectiveData.currency || parentCollective.currency;
+    collectiveData.HostCollectiveId = parentCollective.HostCollectiveId;
+    if (req.remoteUser.hasRole([roles.ADMIN, roles.HOST, roles.MEMBER], parentCollective.id)) {
+      collectiveData.isActive = true;
+    }
   }
-  return Promise.all(promises)
-  .then(() => {
-    // To ensure uniqueness of the slug, if the type of collective is not COLLECTIVE (e.g. EVENT)
-    // we force the slug to be of the form of `${slug}-${ParentCollectiveId}${collective.type.substr(0,2)}`
-    const slug = slugify(args.collective.slug || args.collective.name);
-    if (collectiveData.ParentCollectiveId) {
-      collectiveData.slug = `${slug}-${parentCollective.id}${collectiveData.type.substr(0,2)}`.toLowerCase();
-      const canCreateEvent = req.remoteUser.hasRole(['ADMIN', 'HOST', 'BACKER'], parentCollective.id);
-      if (!canCreateEvent) {
-        return Promise.reject(new errors.Unauthorized({ message: `You must be logged in as a member of the ${parentCollective.slug} collective to create an event`}));
-      }
-    } else if (collectiveData.HostCollectiveData) {
-      if (!hostCollective.settings.apply) {
-        return Promise.reject(new errors.Unauthorized({ message: `This host does not accept applications for new collectives` }))
-      } else {
-        collectiveData.isActive = false;
-      }
+
+  if (collectiveData.HostCollectiveId) {
+    hostCollective = await req.loaders.collective.findById.load(collectiveData.HostCollectiveId);
+    if (!hostCollective) {
+      return Promise.reject(new Error(`Host collective with id ${args.collective.HostCollectiveId} not found`));
     }
-  })
-  .then(() => models.Collective.create(omit(collectiveData, 'HostCollectiveId')))
-  .then(c => collective = c)
-  .then(() => {
-    if (collectiveData.HostCollectiveId) {
-      return collective.addHost(hostCollective, req.remoteUser);
+    collectiveData.currency = collectiveData.currency || hostCollective.currency;
+    collectiveData.hostFeePercent = hostCollective.hostFeePercent;
+    collectiveData.isActive = false;
+
+    if (collectiveData.type === 'EVENT' || req.remoteUser.hasRole([roles.ADMIN, roles.HOST], hostCollective.id)) {
+      collectiveData.isActive = true;
+    } else if (!get(hostCollective, 'settings.apply')) {
+      throw new errors.Unauthorized({ message: `This host does not accept applications for new collectives` });
     }
-  })
-  .then(() => collective.editTiers(collectiveData.tiers))
-  .then(() => collective.addUserWithRole(req.remoteUser, roles.ADMIN, { CreatedByUserId: req.remoteUser.id }))
-  .then(() => collective.editPaymentMethods(args.collective.paymentMethods, { CreatedByUserId: req.remoteUser.id }))
-  .then(async () => {
-    // if the type of collective is an organization or an event, we don't notify the host
-    if (collective.type !== types.COLLECTIVE) {
-      return collective;
+  }
+
+  // To ensure uniqueness of the slug, if the type of collective is not COLLECTIVE (e.g. EVENT)
+  // we force the slug to be of the form of `${slug}-${ParentCollectiveId}${collective.type.substr(0,2)}`
+  const slug = slugify(args.collective.slug || args.collective.name);
+  if (collectiveData.ParentCollectiveId) {
+    collectiveData.slug = `${slug}-${parentCollective.id}${collectiveData.type.substr(0,2)}`.toLowerCase();
+    const canCreateEvent = req.remoteUser.hasRole(['ADMIN', 'HOST', 'BACKER'], parentCollective.id);
+    if (!canCreateEvent) {
+      throw new errors.Unauthorized({ message: `You must be logged in as a member of the ${parentCollective.slug} collective to create an event`});
     }
-    const remoteUserCollective = await models.Collective.findById(req.remoteUser.CollectiveId);
-    models.Activity.create({
-      type: activities.COLLECTIVE_CREATED,
-      UserId: req.remoteUser.id,
-      CollectiveId: get(hostCollective, 'id'),
-      data: {
-        collective: collective.info,
-        host: get(hostCollective, 'info'),
-        user: {
-          email: req.remoteUser.email,
-          collective: remoteUserCollective.info
-        }
-      }
-    })
-    return collective;
-  })
-  .catch(e => {
+  }
+
+  try {
+    collective = await models.Collective.create(omit(collectiveData, 'HostCollectiveId'));
+  } catch (e) {
     let msg;
     switch (e.name) {
       case "SequelizeUniqueConstraintError":
@@ -146,7 +108,39 @@ export function createCollective(_, args, req) {
         break;
     }
     throw new Error(msg);
-  })
+  }
+
+  const promises = [
+    collective.editTiers(collectiveData.tiers),
+    collective.addUserWithRole(req.remoteUser, roles.ADMIN, { CreatedByUserId: req.remoteUser.id }),
+    collective.editPaymentMethods(args.collective.paymentMethods, { CreatedByUserId: req.remoteUser.id })
+  ];
+
+  if (collectiveData.HostCollectiveId) {
+    promises.push(collective.addHost(hostCollective, req.remoteUser));
+  }
+
+  await Promise.all(promises);
+
+  // if the type of collective is an organization or an event, we don't notify the host
+  if (collective.type !== types.COLLECTIVE) {
+    return collective;
+  }
+  const remoteUserCollective = await models.Collective.findById(req.remoteUser.CollectiveId);
+  models.Activity.create({
+    type: activities.COLLECTIVE_CREATED,
+    UserId: req.remoteUser.id,
+    CollectiveId: get(hostCollective, 'id'),
+    data: {
+      collective: collective.info,
+      host: get(hostCollective, 'info'),
+      user: {
+        email: req.remoteUser.email,
+        collective: remoteUserCollective.info
+      }
+    }
+  });
+  return collective;
 }
 
 export function editCollective(_, args, req) {
