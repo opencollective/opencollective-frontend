@@ -65,14 +65,13 @@ export default (server, app) => {
    * Prevent indexation from search engines
    * (out of 'production' environment)
    */
-  server.get('/robots.txt', (req, res, next) => {
+  server.get('/robots.txt', (req, res) => {
     res.setHeader('Content-Type', 'text/plain');
     if (process.env.NODE_ENV !== 'production' || process.env.ROBOTS_DISALLOW) {
       res.send("User-agent: *\nDisallow: /");
     } else {
       res.send("User-agent: *\nAllow: /");
     }
-    next();
   });
 
   /**
