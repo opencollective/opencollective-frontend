@@ -238,7 +238,7 @@ Subject: {{{capitalize month}}} Report
               </li>
             {{/if}}
           {{/each}}
-          {{#if opensource}}
+          {{#if tags.opensource}}
             {{#if ORGANIZATION}}
               <li><font color="red"><b>NEW!</b></font> Check your profile on <a href="https://backyourstack.com/{{fromCollective.slug}}">backyourstack.com/{{fromCollective.slug}}</a> to find out what are the open source projects that your organization is depending on and that need financial support! (note: you may need to adapt the url to match your organization slug on Github)</li>
             {{else}}

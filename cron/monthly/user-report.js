@@ -181,10 +181,10 @@ const processBacker = async (FromCollectiveId) => {
         manageSubscriptionsUrl: user.generateLoginLink('/subscriptions'),
         relatedCollectives,
         stats,
-        tags: stats.allTags,
+        tags: stats.allTags || {},
       };
       if (data.tags['open source']) {
-        data.opensource = true;
+        data.tags.opensource = true;
       }
       data[backerCollective.type] = true;
       const options = {
@@ -276,7 +276,8 @@ const processCollective =  async (CollectiveId) => {
   const results = await Promise.all(promises);
   console.log('***', collective.name, '***');
   const data = {};
-  data.collective = pick(collective, ['id', 'name', 'slug', 'website', 'image', 'description', 'currency','publicUrl', 'tags', 'backgroundImage', 'settings', 'totalDonations', 'contributorsCount']);
+  data.collective = pick(collective, ['id', 'name', 'slug', 'website', 'image', 'currency','publicUrl', 'tags', 'backgroundImage', 'settings', 'totalDonations', 'contributorsCount']);
+  data.collective.description = collective.description || collective.mission;
   data.collective.stats = results[0];
   data.collective.stats.balance = results[1];
   data.collective.stats.totalDonations = results[2];
