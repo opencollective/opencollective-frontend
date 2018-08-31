@@ -139,9 +139,10 @@ describe('Mutation Tests', () => {
         event.tiers = createdEvent.tiers;
 
         // Make sure the creator of the event has been added as an ADMIN
-        const members = await models.Member.findAll({ where: {
-          CollectiveId: event.id
-        }});
+        const members = await models.Member.findAll({
+          where: { CollectiveId: event.id },
+          order: [ ['MemberCollectiveId', 'ASC'] ]
+        });
 
         expect(members).to.have.length(2);
         expect(members[0].CollectiveId).to.equal(event.id);
