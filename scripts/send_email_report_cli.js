@@ -7,6 +7,10 @@ const moment = require('moment');
 
 const reports = [
   {
+    template: 'collective.monthlyreport',
+    command: 'cron/monthly/collective-report.js'
+  },
+  {
     template: 'user.monthlyreport',
     command: 'cron/monthly/user-report.js'
   },
