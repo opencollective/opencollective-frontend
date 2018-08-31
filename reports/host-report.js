@@ -164,7 +164,7 @@ async function HostReport(year, month, hostId) {
       platformFees:               sumTransactions("platformFeeInHostCurrency", { where: whereWithDateRange }, host.currency),
       paymentProcessorFees:       sumTransactions("paymentProcessorFeeInHostCurrency", { where: { ...whereWithDateRange, type: 'CREDIT'} }, host.currency), // total stripe fees
       payoutProcessorFeesPaypal:  sumTransactions("paymentProcessorFeeInHostCurrency", payoutProcessorFeesQuery("paypal"), host.currency), // total paypal fees
-      payoutProcessorFeesOther:  sumTransactions("paymentProcessorFeeInHostCurrency", payoutProcessorFeesQuery("opencollective"), host.currency) // total other payout processor fees (manual host fee)
+      payoutProcessorFeesOther:   sumTransactions("paymentProcessorFeeInHostCurrency", payoutProcessorFeesQuery("opencollective"), host.currency) // total other payout processor fees (manual host fee)
     });
   }
 
@@ -292,10 +292,10 @@ async function HostReport(year, month, hostId) {
           totalInHostCurrency: stats.totalAmountPaidExpenses.totalInHostCurrency + stats.paymentProcessorFees.totalInHostCurrency + stats.platformFees.totalInHostCurrency
         };
         stats.totalAmountSpent = {
-          totalInHostCurrency: stats.totalAmountPaidExpenses.totalInHostCurrency + stats.payoutProcessorFeesPaypal.totalInHostCurrency
+          totalInHostCurrency: stats.totalAmountPaidExpenses.totalInHostCurrency + stats.payoutProcessorFeesPaypal.totalInHostCurrency + stats.payoutProcessorFeesOther.totalInHostCurrency
         };
         stats.totalHostRevenue = {
-          totalInHostCurrency: stats.totalHostFees.totalInHostCurrency + stats.payoutProcessorFeesOther.totalInHostCurrency
+          totalInHostCurrency: stats.totalHostFees.totalInHostCurrency
         };
         stats.totalNetAmountReceived = {
           totalInHostCurrency: stats.totalNetAmountReceivedForCollectives.totalInHostCurrency - stats.totalHostFees.totalInHostCurrency // totalHostFees is negative
