@@ -18,10 +18,8 @@ import { getTiersStats } from '../../server/lib/utils';
 import models, { Op } from '../../server/models';
 import { notifyAdminsOfCollective } from '../../server/lib/notifications';
 
-const d = process.env.DATE ? new Date(process.env.DATE) : new Date;
-if (!process.env.DATE) {
-  d.setMonth(d.getMonth() - 1);
-}
+const d = process.env.START_DATE ? new Date(process.env.START_DATE) : new Date;
+d.setMonth(d.getMonth() - 1);
 const month = moment(d).format('MMMM');
 const year = d.getFullYear();
 const dateFormat = 'YYYYMM';
@@ -181,7 +179,10 @@ const processCollective = (collective) => {
                 data.collective.stats.totalDonations = results[3];
                 data.collective.stats.totalExpenses = results[4];
                 data.collective.expenses = results[5];
-                data.relatedCollectives = results[6];
+                data.relatedCollectives = (results[6] || []).map(c => {
+                  c.description = c.description || c.mission;
+                  return c;
+                });
                 data.collective.updates = results[10];
                 data.collective.transactions = results[12];
                 const nextGoal = results[11];
