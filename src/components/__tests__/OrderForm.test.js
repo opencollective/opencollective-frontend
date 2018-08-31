@@ -217,7 +217,7 @@ describe("OrderForm component", () => {
       component.find('.ocCardApply.btn').simulate('click');
 
       setTimeout(() => {
-        expect(component.find('.inputField .ocCard').html()).toContain('Invalid code');
+        expect(component.find('.inputField.ocCard').html()).toContain('Invalid code');
         done();
       }, 1000);
     });
@@ -238,7 +238,7 @@ describe("OrderForm component", () => {
       component.find('.ocCardApply.btn').simulate('click');
 
       setTimeout(() => {
-        expect(component.find('.inputField .ocCard').html()).toContain('Valid code. Amount available: $50.00');
+        expect(component.find('.inputField.ocCard').html()).toContain('Valid code. Amount available: $50.00');
         done();
       }, 1000);
     })
