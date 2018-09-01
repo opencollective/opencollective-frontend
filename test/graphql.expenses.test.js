@@ -536,81 +536,77 @@ describe('GraphQL Expenses API', () => {
         "You don't have enough funds to cover for the fees of this payment method. Current balance: $10, Expense amount: $10, Estimated paypal fees: $1");
     }); /* End of "fails if not enough funds to cover the fees" */
 
-    it("pays the expense manually and reduces the balance of the collective", async () => {
-      // Given that we have a host and a collective
-      const {
-        hostAdmin,
-        hostCollective,
-        collective,
-      } = await store.newCollectiveWithHost('Test Collective', 'USD', 'USD', 10);
-      // And given a user to file expenses
-      const { user } = await store.newUser('someone cool');
-      // And given the above collective has one expense (in PENDING
-      // state)
-      const expense = await store.createExpense(user, {
-        amount: 1000,
-        description: "Pizza",
-        currency: 'USD',
-        payoutMethod: 'manual',
-        collective: { id: collective.id }
-      });
-      // And given the expense is approved
-      expense.status = 'APPROVED';
-      expense.payoutMethod = 'other';
-      await expense.save();
-      // And then add funds to the collective
-      const initialBalance = 1500;
-      const fee = 100;
-      await addFunds(user, hostCollective, collective, initialBalance);
-      // When the expense is paid by the host admin
-      let balance = await collective.getBalance();
-      expect(balance).to.equal(1500);
-      const res = await utils.graphqlQuery(payExpenseQuery, { id: expense.id, fee }, hostAdmin);
-      res.errors && console.log(res.errors);
-      expect(res.errors).to.not.exist;
-      expect(res.data.payExpense.status).to.equal('PAID');
-      balance = await collective.getBalance();
-      expect(balance).to.equal(initialBalance - expense.amount - fee);
-      await utils.waitForCondition(() => emailSendMessageSpy.callCount > 0, { delay: 500 });
-      expect(emailSendMessageSpy.callCount).to.equal(4);
-    }); /* End of "pays the expense manually and reduces the balance of the collective" */
+    describe('success', () => {
+      let hostAdmin, hostCollective, collective, expense, user, userCollective;
 
-    it('Pay expense in kind', async () => {
-      // Given that we have a host and a collective
-      const { hostAdmin, collective } = await store.newCollectiveWithHost('Test Collective', 'USD', 'USD', 10);
-      // And given a user to file expenses
-      const { user, userCollective } = await store.newUser('someone cool');
-      // And given the above collective has one expense (in PENDING
-      // state)
-      const expense = await store.createExpense(user, {
-        amount: 7000,
-        description: "Pizza",
-        currency: 'USD',
-        payoutMethod: 'manual',
-        collective: { id: collective.id }
+      beforeEach(async () => {
+
+        // Given that we have a host and a collective
+        ({ hostAdmin,
+          hostCollective,
+          collective,
+        } = await store.newCollectiveWithHost('Test Collective', 'USD', 'USD', 10));
+
+        // And given a user to file expenses
+        ( { user, userCollective } = await store.newUser('someone cool'));
+
+        // And given the above collective has one expense (in PENDING
+        // state)
+        expense = await store.createExpense(user, {
+          amount: 1000,
+          description: "Pizza",
+          currency: 'USD',
+          payoutMethod: 'manual',
+          collective: { id: collective.id }
+        });
+
+        // And given the expense is approved
+        expense.status = 'APPROVED';
+
       });
-      // And given the expense is approved
-      expense.status = 'APPROVED';
-      // And the expense will be paid in kind
-      expense.payoutMethod = 'donation';
-      await expense.save();
-      // When the expense is paid by the host admin
-      const parameters = { id: expense.id, fee: 0 };
-      const result = await utils.graphqlQuery(payExpenseQuery, parameters, hostAdmin);
-      result.errors && console.log(result.errors);
-      // Then the collective's balance should stay 0
-      expect(await collective.getBalance()).to.equal(0);
-      // And then it should create a transaction for the user
-      expect(await libtransactions.sum({
-        FromCollectiveId: userCollective.id,
-        CollectiveId: collective.id,
-        currency: 'USD',
-        type: 'CREDIT',
-      })).to.equal(7000);
-      // And then the user should become a backer of the project
-      const membership = await models.Member.findOne({ where: { CollectiveId: collective.id, role: 'BACKER' }});
-      expect(membership).to.exist;
-      expect(membership.MemberCollectiveId).to.equal(user.CollectiveId);
+
+      it("pays the expense manually and reduces the balance of the collective", async () => {
+        expense.payoutMethod = 'other';
+        await expense.save();
+        // And then add funds to the collective
+        const initialBalance = 1500;
+        const fee = 100;
+        await addFunds(user, hostCollective, collective, initialBalance);
+        // When the expense is paid by the host admin
+        let balance = await collective.getBalance();
+        expect(balance).to.equal(1500);
+        const res = await utils.graphqlQuery(payExpenseQuery, { id: expense.id, fee }, hostAdmin);
+        res.errors && console.log(res.errors);
+        expect(res.errors).to.not.exist;
+        expect(res.data.payExpense.status).to.equal('PAID');
+        balance = await collective.getBalance();
+        expect(balance).to.equal(initialBalance - expense.amount - fee);
+        await utils.waitForCondition(() => emailSendMessageSpy.callCount > 0, { delay: 500 });
+        expect(emailSendMessageSpy.callCount).to.equal(4);
+      }); /* End of "pays the expense manually and reduces the balance of the collective" */
+
+      it('Pay expense in kind', async () => {
+        // And the expense will be paid in kind
+        expense.payoutMethod = 'donation';
+        await expense.save();
+        // When the expense is paid by the host admin
+        const parameters = { id: expense.id, fee: 0 };
+        const result = await utils.graphqlQuery(payExpenseQuery, parameters, hostAdmin);
+        result.errors && console.log(result.errors);
+        // Then the collective's balance should stay 0
+        expect(await collective.getBalance()).to.equal(0);
+        // And then it should create a transaction for the user
+        expect(await libtransactions.sum({
+          FromCollectiveId: userCollective.id,
+          CollectiveId: collective.id,
+          currency: 'USD',
+          type: 'CREDIT',
+        })).to.equal(expense.amount);
+        // And then the user should become a backer of the project
+        const membership = await models.Member.findOne({ where: { CollectiveId: collective.id, role: 'BACKER' }});
+        expect(membership).to.exist;
+        expect(membership.MemberCollectiveId).to.equal(user.CollectiveId);
+      });
     });
 
   }); /* End of #payExpense */
