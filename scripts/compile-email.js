@@ -1,3 +1,6 @@
+/**
+ * Use ./scripts/watch_email_template.sh [template] to compile an email template
+ */
 import nodemailer from 'nodemailer';
 import config from 'config';
 
@@ -18,6 +21,29 @@ data['collective.expense.approved'] = {
   expense: { amount: 1250, currency: "USD", privateMessage: "Private instructions", attachment: "https://opencollective-production.s3-us-west-1.amazonaws.com/5bdc1850-60d9-11e7-9f4e-6f8999022d4b.JPG" },
   collective: { slug: "wwcodeaustin", name: "Women Who Code Austin"},
   fromCollective: { slug: "xdamman", name: "Xavier Damman"},
+  user: { paypalEmail: "email@paypal.com" },
+  actions: {
+    viewLatestExpenses: "https://opencollective.com/wwcodeaustin/expenses"
+  }
+};
+data['collective.expense.paid'] = {
+  host: { id: 1, name: "WWCode", slug: "wwcode" },
+  expense: {
+    description: "Team dinner",
+    amount: 1250,
+    currency: "USD",
+    privateMessage: "Private instructions",
+    payoutMethod: "PayPal (paypal@domain.tld)",
+    attachment: "https://opencollective-production.s3-us-west-1.amazonaws.com/5bdc1850-60d9-11e7-9f4e-6f8999022d4b.JPG"
+  },
+  collective: {
+    slug: "wwcodeaustin",
+    name: "Women Who Code Austin"
+  },
+  fromCollective: {
+    slug: "xdamman",
+    name: "Xavier Damman"
+  },
   user: { paypalEmail: "email@paypal.com" },
   actions: {
     viewLatestExpenses: "https://opencollective.com/wwcodeaustin/expenses"
