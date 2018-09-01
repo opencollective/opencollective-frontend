@@ -248,7 +248,7 @@ class Event extends React.Component {
             margin: 0 2rem;
           }
           .ticketsGrid :global(.tier) {
-            margin: 1rem;
+            margin: 2rem auto;
           }
         `}</style>
 
