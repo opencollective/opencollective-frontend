@@ -10,7 +10,7 @@ class EditEventForm extends React.Component {
   static propTypes = {
     event: PropTypes.object,
     loading: PropTypes.bool,
-    onSubmit: PropTypes.func
+    onSubmit: PropTypes.func,
   };
 
   constructor(props) {
@@ -28,10 +28,11 @@ class EditEventForm extends React.Component {
       'type.label': { id: 'event.type.label', defaultMessage: 'type' },
       'name.label': { id: 'event.name.label', defaultMessage: 'name' },
       'amount.label': { id: 'event.amount.label', defaultMessage: 'amount' },
-      'longDescription.label': { id: 'event.longDescription.label', defaultMessage: 'description' },
+      'description.label': { id: 'event.description.label', defaultMessage: 'Short description' },
+      'longDescription.label': { id: 'event.longDescription.label', defaultMessage: 'Long description' },
       'startsAt.label': { id: 'event.startsAt.label', defaultMessage: 'start date and time' },
       'endsAt.label': { id: 'event.endsAt.label', defaultMessage: 'end date and time' },
-      'location.label': { id: 'event.location.label', defaultMessage: 'location' }
+      'location.label': { id: 'event.location.label', defaultMessage: 'location' },
     });
 
   }
@@ -74,7 +75,7 @@ class EditEventForm extends React.Component {
     if (!event.parentCollective) return (<div />);
 
     const isNew = !(event && event.id);
-    const submitBtnLabel = loading ? "loading" : isNew ? "Create Event" : "Save";
+    const submitBtnLabel = loading ? 'loading' : isNew ? 'Create Event' : 'Save';
     const defaultStartsAt = new Date;
     defaultStartsAt.setHours(19);
     defaultStartsAt.setMinutes(0);
@@ -83,12 +84,18 @@ class EditEventForm extends React.Component {
       {
         name: 'name',
         maxLength: 255,
-        placeholder: ''
+        placeholder: '',
+      },
+      {
+        name: 'description',
+        type: 'text',
+        maxLength: 255,
+        placeholder: '',
       },
       {
         name: 'longDescription',
         type: 'textarea',
-        placeholder: ''
+        placeholder: '',
       },
       {
         name: 'startsAt',
@@ -99,24 +106,24 @@ class EditEventForm extends React.Component {
           const yesterday = new Date;
           yesterday.setDate(yesterday.getDate() -1);
           return date.isAfter(yesterday);
-        }
+        },
       },
       {
         name: 'endsAt',
         type: 'datetime',
-        options: {timezone: event.timezone},
+        options: { timezone: event.timezone },
         placeholder: '',
         validate: (date) => {
           const yesterday = new Date(this.state.event.startsAt || defaultStartsAt);
           yesterday.setDate(yesterday.getDate() -1);
           return date.isAfter(yesterday);
-        }
+        },
       },
       {
         name: 'location',
         placeholder: '',
-        type: 'location'
-      }
+        type: 'location',
+      },
     ];
 
     this.fields = this.fields.map(field => {
@@ -151,7 +158,7 @@ class EditEventForm extends React.Component {
         }
 
         :global(textarea[name=longDescription]) {
-          height: 30rem;
+          height: 50rem;
         }
 
         .actions {
