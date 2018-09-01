@@ -51,7 +51,7 @@ class CollectiveCover extends React.Component {
               <FormattedTime value={props.collective.startsAt} timeZone={props.collective.timezone} />&nbsp; - &nbsp;
             </React.Fragment>
           }
-          {props.collective.location.name}
+          {get(props.collective, 'location.name')}
         </Link>
       );
     }

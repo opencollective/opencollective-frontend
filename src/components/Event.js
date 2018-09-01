@@ -200,17 +200,23 @@ class Event extends React.Component {
         title: intl.formatMessage(this.messages['event.over.sendMoneyToParent.title']),
         description: intl.formatMessage(this.messages['event.over.sendMoneyToParent.description'], { collective: event.parentCollective.name }),
         actions: [
-          <Button className="submitExpense gray" href={`${event.path}/expenses/new`}><FormattedMessage id="menu.submitExpense" defaultMessage="Submit Expense" /></Button>,
+          <Button
+            key="submitExpenseBtn"
+            className="submitExpense gray"
+            href={`${event.path}/expenses/new`}>
+            <FormattedMessage id="menu.submitExpense" defaultMessage="Submit Expense" />
+          </Button>,
           <SendMoneyToCollectiveBtn
+            key="SendMoneyToCollectiveBtn"
             fromCollective={event}
             toCollective={event.parentCollective}
             LoggedInUser={LoggedInUser}
             description={intl.formatMessage(this.messages['event.over.sendMoneyToParent.transaction.description'], { event: event.name })}
             amount={event.stats.balance}
             currency={event.currency}
-            />
-        ]
-      }
+            />,
+        ],
+      };
     }
 
     const backgroundImage = event.backgroundImage || get(event, 'parentCollective.backgroundImage') || defaultBackgroundImage;
@@ -241,13 +247,8 @@ class Event extends React.Component {
           .adminActions ul li {
             margin: 0 2rem;
           }
-          .ticketsGrid {
-            display: flex;
-            flex-wrap: wrap;
-          }
           .ticketsGrid :global(.tier) {
             margin: 1rem;
-            align-self: flex-start;
           }
         `}</style>
 
@@ -295,7 +296,7 @@ class Event extends React.Component {
                   <section id="tickets">
                     <SectionTitle
                       section="tickets"
-                      action={LoggedInUser && LoggedInUser.canEditCollective(event) && { label: intl.formatMessage(this.messages['event.tickets.edit']), href: `/${event.slug}/edit#tiers` }}
+                      action={LoggedInUser && LoggedInUser.canEditCollective(event) && { label: intl.formatMessage(this.messages['event.tickets.edit']), href: `${event.path}/edit#tiers` }}
                       />
 
                     <div className="ticketsGrid">
