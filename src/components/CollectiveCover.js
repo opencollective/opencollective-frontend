@@ -41,18 +41,21 @@ class CollectiveCover extends React.Component {
     if (props.collective.type === 'EVENT') {
       const eventLocationRoute = props.href ? `${props.href}#location` : '#location';
       this.description = (
-        <Link route={eventLocationRoute}>
-          {!props.collective.startsAt &&
-            console.warn(`Event: props.collective.startsAt should not be empty. props.collective.id: ${props.collective.id}`)
-          }
-          {props.collective.startsAt &&
-            <React.Fragment>
-              <FormattedDate value={props.collective.startsAt} timeZone={props.collective.timezone} weekday="short" day="numeric" month="long" />, &nbsp;
-              <FormattedTime value={props.collective.startsAt} timeZone={props.collective.timezone} />&nbsp; - &nbsp;
-            </React.Fragment>
-          }
-          {get(props.collective, 'location.name')}
-        </Link>
+        <div>
+          {props.collective.description && <div className="eventDescription">{props.collective.description}</div> }
+          <Link route={eventLocationRoute}>
+            {!props.collective.startsAt &&
+              console.warn(`Event: props.collective.startsAt should not be empty. props.collective.id: ${props.collective.id}`)
+            }
+            {props.collective.startsAt &&
+              <React.Fragment>
+                <FormattedDate value={props.collective.startsAt} timeZone={props.collective.timezone} weekday="short" day="numeric" month="long" />, &nbsp;
+                <FormattedTime value={props.collective.startsAt} timeZone={props.collective.timezone} />&nbsp; - &nbsp;
+              </React.Fragment>
+            }
+            {get(props.collective, 'location.name')}
+          </Link>
+        </div>
       );
     }
   }

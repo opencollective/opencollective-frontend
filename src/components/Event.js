@@ -290,7 +290,7 @@ class Event extends React.Component {
               <div>
                 <div className="content" >
                   <div className="eventDescription" >
-                    <Markdown source={event.description || event.longDescription} escapeHtml={false} />
+                    <Markdown source={event.longDescription || event.description} escapeHtml={false} />
                   </div>
 
                   <section id="tickets">
@@ -313,7 +313,7 @@ class Event extends React.Component {
                   </section>
                 </div>
 
-                <Location location={event.location} />
+                { get(event, 'location.name') && <Location location={event.location} /> }
 
                 { responses.sponsors.length > 0 &&
                   <section id="sponsors">
