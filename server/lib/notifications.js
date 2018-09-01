@@ -86,8 +86,7 @@ async function notifySubscribers(users, activity, options={}) {
     return;
   }
   debug("notifySubscribers", users.length, users.map(u => u && u.email, activity.type));
-  const CollectiveId = get(options, 'collective.id') || activity.CollectiveId;
-  const unsubscribedUserIds = await models.Notification.getUnsubscribersUserIds(activity.type, CollectiveId);
+  const unsubscribedUserIds = await models.Notification.getUnsubscribersUserIds(get(options, 'template', activity.type), get(options, 'collective.id', activity.CollectiveId));
   debug("unsubscribedUserIds", unsubscribedUserIds);
   if (process.env.ONLY) {
     debug("ONLY set to ", process.env.ONLY, " => skipping subscribers");

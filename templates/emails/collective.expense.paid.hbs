@@ -1,16 +1,31 @@
-Subject: Your {{{currency expense.amount currency=transaction.currency}}} expense submitted to {{collective.name}} has been paid
+Subject: 💰 {{{currency expense.amount currency=expense.currency}}} from {{collective.name}} for {{expense.description}}
 
 {{> header}}
 
+<style>
+  th {
+    text-align: right;
+    padding-right: 10px;
+  }
+</style>
+
 <center>
-  <h3> Hi there! Just a note to let you know that your expense was paid in {{collective.name}}. </h3>
-  <h2>{{{currency expense.amount currency=transaction.currency precision=2}}}</h2>
+  <h3>Hi there!</h3>
+  <p>Just a quick note to let you know that your expense <b>{{expense.description}}</b> that you filed on {{{moment expense.createdAt}}} to the <a href="{{config.host.website}}/{{collective.slug}}">{{collective.name}} collective</a> has just been paid.</p>
+  <h2>{{{currency expense.amount currency=expense.currency precision=2}}}</h2>
   <div>{{transaction.description}}</div>
-  <div>To: {{fromCollective.name}}</div>
-  <div>Paypal email: {{user.paypalEmail}}</div>
+  <table>
+    <tr>
+      <th>To:</th><td>{{fromCollective.name}}</td>
+    </tr>
+    <tr>
+      <th>Payout Method:</th><td>{{expense.payoutMethod}}</td>
+    </tr>
+  </table>
 
   <br /><br />
-  <a href="{{config.host.website}}/{{collective.slug}}/expenses" class="btn"><div>View Latest Expenses</div></a>
+  <a href="{{config.host.website}}/{{collective.slug}}/expenses/new" class="btn blue"><div>Submit Another Expenses</div></a>
+  <a href="{{config.host.website}}/{{collective.slug}}/expenses" class="btn"><div>View All Expenses</div></a>
 
 </center>
 
