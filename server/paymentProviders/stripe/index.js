@@ -129,6 +129,7 @@ export default {
         }
         collective.currency = account.default_currency.toUpperCase();
         collective.timezone = collective.timezone || account.timezone;
+        collective.becomeHost(); // adds the opencollective payment method to enable the host to allocate funds to collectives
         return collective.save();
       }
 
@@ -136,16 +137,6 @@ export default {
         .then(c => {
           collective = c;
           redirectUrl = redirectUrl || `${config.host.website}/${collective.slug}`;
-          if (collective.type === 'COLLECTIVE') {
-            collective.becomeHost();
-            collective.save();
-            models.Member.create({
-              CreatedByUserId,
-              CollectiveId: collective.id,
-              MemberCollectiveId: collective.id,
-              role: 'HOST'
-            });
-          }
         })
         .then(getToken(req.query.code))
         .then(getAccountInformation)

@@ -191,6 +191,16 @@ describe('stripe.routes.test.js', () => {
             cb();
           })
           .catch(cb);
+        }],
+
+        checkPaymentMethod: ['checkStripeAccount', (cb, results) => {
+          return models.PaymentMethod.findOne({ where: { CollectiveId: results.checkStripeAccount.CollectiveId }})
+          .then(pm => {
+            expect(pm.service).to.equal('opencollective');
+            expect(pm.currency).to.equal('EUR');
+            cb();
+          })
+          .catch(cb);
         }]
       }, done);
     });
