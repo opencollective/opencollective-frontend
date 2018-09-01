@@ -670,6 +670,12 @@ class OrderForm extends React.Component {
   renderDisclaimer = (values) => {
     return (
       <div className="disclaimer">
+        <style jsx>{`
+          .disclaimer {
+            margin: 0.5rem;
+            font-size: 1.2rem;
+          }
+        `}</style>
         <FormattedMessage
           id="collective.host.disclaimer"
           defaultMessage="By clicking above, you are pledging to give the host ({hostname}) {amount} {interval, select, month {per month} year {per year} other {}} for {collective}."
@@ -693,7 +699,7 @@ class OrderForm extends React.Component {
       name: 'ocCard',
       button: (
         <Button
-          className='ocCardApply'
+          className="ocCardApply"
           disabled={ocCard.loading}
           onClick={this.applyOcCardBalance}
           >
@@ -703,7 +709,7 @@ class OrderForm extends React.Component {
       required: true,
       label: intl.formatMessage(this.messages['ocCard.label']),
       defaultValue: ocCard['token'],
-      onChange: (value) => this.handleChange("ocCard", "token", value)
+      onChange: (value) => this.handleChange('ocCard', 'token', value),
     };
 
     if (ocCard.applySent) {
@@ -712,7 +718,7 @@ class OrderForm extends React.Component {
       } else if (ocCard.valid) {
         inputOcCard.description = `${intl.formatMessage(this.messages['ocCard.amountremaining'])} ${formatCurrency(ocCard.balance, ocCard.currency)}`;
       } else {
-        inputOcCard.description = intl.formatMessage(this.messages['ocCard.invalid'])
+        inputOcCard.description = intl.formatMessage(this.messages['ocCard.invalid']);
       }
     }
 
@@ -725,7 +731,7 @@ class OrderForm extends React.Component {
               className="horizontal"
               label={intl.formatMessage(this.messages['creditcard.label'])}
               name="creditcardSelector"
-              onChange={uuid => this.handleChange("creditcard", { uuid })}
+              onChange={uuid => this.handleChange('creditcard', { uuid })}
               options={this.paymentMethodsOptions}
               />
           }
@@ -736,7 +742,7 @@ class OrderForm extends React.Component {
                 type="creditcard"
                 name="creditcard"
                 className="horizontal"
-                onChange={(creditcardObject) => this.handleChange("creditcard", creditcardObject)}
+                onChange={(creditcardObject) => this.handleChange('creditcard', creditcardObject)}
                 />
             </div>
           }
@@ -782,7 +788,7 @@ class OrderForm extends React.Component {
       label: `${intl.formatMessage(this.messages['email.label'])}*`,
       description: intl.formatMessage(this.messages['email.description']),
       defaultValue: order['email'],
-      onChange: (value) => this.handleChange("user", "email", value)
+      onChange: (value) => this.handleChange('user', "email", value)
     };
     if (!this.state.isNewUser) {
       inputEmail.button = <Button onClick={this.signin} focus={true}>Login</Button>;
@@ -842,10 +848,6 @@ class OrderForm extends React.Component {
           padding-top: 7px;
           display: inline-block;
         }
-        .disclaimer {
-          margin: 0.5rem;
-          font-size: 1.2rem;
-        }
         p {
           margin-top: -2.5rem;
           color: #737373;
@@ -853,6 +855,9 @@ class OrderForm extends React.Component {
         .gift-card-expander {
           color: ${colors.blue};
           margin-left: 205px;
+        }
+        .info {
+          margin-top: 3px;
         }
         #paypal-checkout { padding-top: 30px; }
         .form-group#paypalFG { margin-bottom: 0px !important; }
@@ -865,14 +870,14 @@ class OrderForm extends React.Component {
               section="userDetails"
               subtitle={
                 <div>
-                  { !LoggedInUser && <FormattedMessage id="tier.order.userdetails.description" defaultMessage="If you wish to remain anonymous, only provide an email address without any other personal details." /> }
-                  { LoggedInUser && <FormattedMessage id="tier.order.userdetails.description.loggedin" defaultMessage="If you wish to remain anonymous, logout and use another email address without providing any other personal details." /> }
+                  { order.tier.type !== 'TICKET' && !LoggedInUser && <FormattedMessage id="tier.order.userdetails.description" defaultMessage="If you wish to remain anonymous, only provide an email address without any other personal details." /> }
+                  { order.tier.type !== 'TICKET' && LoggedInUser && <FormattedMessage id="tier.order.userdetails.description.loggedin" defaultMessage="If you wish to remain anonymous, logout and use another email address without providing any other personal details." /> }
                 </div>
                 }
               />
 
             { !LoggedInUser &&
-              <Row key={`email.input`}>
+              <Row key="email.input">
                 <Col sm={12}>
                   <InputField
                     className="horizontal"
@@ -888,7 +893,7 @@ class OrderForm extends React.Component {
                     className="horizontal"
                     {...field}
                     defaultValue={this.state.user[field.name]}
-                    onChange={(value) => this.handleChange("user", field.name, value)}
+                    onChange={(value) => this.handleChange('user', field.name, value)}
                     />
                 </Col>
               </Row>
@@ -905,7 +910,7 @@ class OrderForm extends React.Component {
                 />
             }
 
-            { !LoggedInUser && this.state.isNewUser && (
+            { !LoggedInUser && this.state.isNewUser && (get(collective, 'tags') || []).includes('open source') && (
               <Row key="newsletterOptIn.input">
                 <Col sm={12}>
                   <InputField
@@ -924,7 +929,7 @@ class OrderForm extends React.Component {
           </section>
 
           { !fromCollective.id && this.state.orgDetails.show &&
-            <CreateOrganizationForm onChange={org => this.handleChange("fromCollective", org)} />
+            <CreateOrganizationForm onChange={org => this.handleChange('fromCollective', org)} />
           }
 
           { !requireLogin &&
@@ -942,16 +947,18 @@ class OrderForm extends React.Component {
                           <FormattedMessage id="tier.order.ticket.info" defaultMessage="Event info" />
                         </label>
                         <Col sm={10}>
-                          {!collective.startsAt &&
-                            console.warn(`OrderForm: collective.startsAt should not be empty. collective.id: ${collective.id}`)
-                          }
-                          {collective.startsAt &&
-                            <React.Fragment>
-                              <FormattedDate value={collective.startsAt} timeZone={collective.timezone} weekday="short" day="numeric" month="long" />, &nbsp;
-                              <FormattedTime value={collective.startsAt} timeZone={collective.timezone} />&nbsp; - &nbsp;
-                            </React.Fragment>
-                          }
-                          { get(collective, 'location.name') }
+                          <div className="info">
+                            {!collective.startsAt &&
+                              console.warn(`OrderForm: collective.startsAt should not be empty. collective.id: ${collective.id}`)
+                            }
+                            {collective.startsAt &&
+                              <React.Fragment>
+                                <FormattedDate value={collective.startsAt} timeZone={collective.timezone} weekday="short" day="numeric" month="long" />, &nbsp;
+                                <FormattedTime value={collective.startsAt} timeZone={collective.timezone} />&nbsp; - &nbsp;
+                              </React.Fragment>
+                            }
+                            { get(collective, 'location.name') }
+                          </div>
                         </Col>
                       </div>
                     </Col>
@@ -1001,7 +1008,7 @@ class OrderForm extends React.Component {
                     placeholder={intl.formatMessage(this.messages['order.publicMessage.placeholder'])}
                     defaultValue={order.publicMessage}
                     maxLength={255}
-                    onChange={(value) => this.handleChange("order", "publicMessage", value)}
+                    onChange={(value) => this.handleChange('order', "publicMessage", value)}
                     />
                 </Col>
               </Row>
@@ -1020,7 +1027,7 @@ class OrderForm extends React.Component {
                         name="paymentMethodTypeSelector"
                         options={this.paymentMethodTypeOptions}
                         label={intl.formatMessage(this.messages['paymentMethod.type'])}
-                        onChange={(value) => this.handleChange("paymentMethod", "type", value)}
+                        onChange={(value) => this.handleChange('paymentMethod', "type", value)}
                         />
                     </Col>
                   </Row>
