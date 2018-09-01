@@ -112,6 +112,11 @@ injectGlobal`
     text-decoration: none;
   }
 
+  summary {
+    color: #337ab7;
+    cursor: pointer;
+  }
+
   body.showModal {
     overflow: hidden;
   }

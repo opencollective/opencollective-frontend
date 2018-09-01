@@ -210,6 +210,7 @@ query Collective($slug: String) {
     path
     name
     type
+    tags
     description
     twitterHandle
     image
@@ -263,6 +264,7 @@ query Collective($slug: String) {
       type
       name
       slug
+      description
       amount
       currency
       interval
