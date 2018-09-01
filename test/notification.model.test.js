@@ -6,11 +6,10 @@ import constants from '../server/constants/activities';
 import models from '../server/models';
 import roles from '../server/constants/roles';
 import Promise from 'bluebird';
+import sinon from 'sinon';
+import emailLib from '../server/lib/email';
 
 const application = utils.data('application');
-const hostUserData = utils.data('host1');
-const collectiveData = utils.data('collective1');
-const collective2Data = utils.data('collective2');
 const notificationData = { type: constants.COLLECTIVE_TRANSACTION_CREATED };
 
 const {
@@ -23,33 +22,43 @@ const {
 
 describe("notification.model.test.js", () => {
 
-  let hostUser;
-  let collective;
+  let host, collective, hostAdmin, sandbox, emailSendMessageSpy;
 
   beforeEach(() => utils.resetTestDB());
 
   beforeEach(() => {
+    sandbox = sinon.createSandbox();
+    emailSendMessageSpy = sandbox.spy(emailLib, 'sendMessage');
+  });
+
+  afterEach(() => sandbox.restore());
+
+  beforeEach(() => {
     const promises = [
-      User.createUserWithCollective(hostUserData),
-      Collective.create(collectiveData),
-      Collective.create(collective2Data)
+      Collective.create({ name: "host", type: "ORGANIZATION" }),
+      Collective.create({ name: "webpack", type: "COLLECTIVE" }),
+      User.createUserWithCollective({ name: "host admin", email: "admin@host.com" }),
     ];
     return Promise.all(promises).then((results) => {
-      hostUser = results[0];
+      host = results[0];
       collective = results[1];
-      return collective.addHost(hostUser.collective)
+      hostAdmin = results[2];
+      return Promise.all([
+        collective.addHost(host),
+        host.addUserWithRole(hostAdmin, 'ADMIN')
+      ]);
     })
   });
 
   it(`disables notification for the ${notificationData.type} email`, () =>
     request(app)
       .post(`/groups/${collective.id}/activities/${notificationData.type}/unsubscribe`)
-      .set('Authorization', `Bearer ${hostUser.jwt()}`)
+      .set('Authorization', `Bearer ${hostAdmin.jwt()}`)
       .send({ api_key: application.api_key })
       .expect(200)
       .then(() =>
         Notification.findAndCountAll({where: {
-          UserId: hostUser.id,
+          UserId: hostAdmin.id,
           CollectiveId: collective.id,
           type: notificationData.type,
           active: true
@@ -104,6 +113,60 @@ describe("notification.model.test.js", () => {
       await users[0].unsubscribe(event.id, `mailinglist.${event.slug}`)
       const subscribers2 = await Notification.getSubscribers(event.slug, event.slug);
       expect(subscribers2.length).to.equal(1);
+    })
+  });
+
+  describe('notifySubscribers', () => {
+    let user, expense;
+    beforeEach(async () => {
+      user = await models.User.createUserWithCollective({ name: "Xavier", email: "xavier@gmail.com" });
+      expense = await models.Expense.create({
+        lastEditedById: user.id,
+        incurredAt: new Date,
+        description: "pizza",
+        UserId: user.id,
+        CollectiveId: collective.id,
+        amount: 10000,
+        currency: 'USD'
+      });
+
+      await models.Transaction.createDoubleEntry({
+        CreatedByUserId: user.id,
+        ExpenseId: expense.id,
+        amount: expense.amount,
+        currency: expense.currency,
+        type: 'DEBIT',
+        CollectiveId: collective.id,
+        FromCollectiveId: user.collective.id,
+      });
+
+      await expense.createActivity('collective.expense.paid');
+
+    });
+
+    it("notifies the author of the expense and the admin of host when expense is paid", async () => {
+      // host admin pays the expense
+      await expense.setPaid(hostAdmin.id);
+      await utils.waitForCondition(() => emailSendMessageSpy.callCount > 1);
+      expect(emailSendMessageSpy.callCount).to.equal(2);
+      expect(emailSendMessageSpy.firstCall.args[0]).to.equal(user.email);
+      expect(emailSendMessageSpy.secondCall.args[0]).to.equal(hostAdmin.email);
+    });
+
+    it("doesn't notify admin of host if unsubscribed", async () => {
+      await models.Notification.create({
+        CollectiveId: host.id,
+        UserId: hostAdmin.id,
+        type: 'collective.expense.paid.for.host',
+        active: false,
+        channel: 'email'
+      });
+
+      // host admin pays the expense
+      await expense.setPaid(hostAdmin.id);
+      await utils.waitForCondition(() => emailSendMessageSpy.callCount > 0, { delay: 500 });
+      expect(emailSendMessageSpy.callCount).to.equal(1);
+      expect(emailSendMessageSpy.firstCall.args[0]).to.equal(user.email);
     })
   });
 });
