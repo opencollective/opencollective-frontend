@@ -154,6 +154,7 @@ const getCollectiveToEditQuery = gql`
         createdAt
         slug
         name
+        currency
         image
         backgroundImage
         settings
