@@ -8,6 +8,7 @@ import models from '../models';
 import emailLib from './email';
 import { types } from '../constants/collectives';
 import status from '../constants/order_status';
+import activities from '../constants/activities';
 import paymentProviders from '../paymentProviders';
 import * as libsubscription from './subscriptions';
 import * as libtransactions from './transactions';
@@ -307,17 +308,16 @@ const sendOrderConfirmedEmail = async (order) => {
   const user = order.createdByUser;
 
   if (collective.type === types.EVENT) {
-    return emailLib.send('ticket.confirmed', user.email,
-      {
-        order: pick(order, ['totalAmount', 'currency', 'createdAt', 'quantity']),
-        user: user.info,
+    return models.Activity.create({
+      type: activities.TICKET_CONFIRMED,
+      data: {
+        EventCollectiveId: collective.id,
+        UserId: user.id,
         recipient: { name: fromCollective.name },
-        collective: collective.info,
-        tier: tier.info
-      },
-      {
-        from: `${collective.name} <hello@${collective.slug}.opencollective.com>`
-      });
+        order: pick(order, ['totalAmount', 'currency', 'createdAt', 'quantity']),
+        tier: tier && tier.info
+      }
+    });
   } else {
     // normal order
     const relatedCollectives = await order.collective.getRelatedCollectives(3, 0);

@@ -22,6 +22,7 @@ export default {
   ORGANIZATION_COLLECTIVE_CREATED: 'organization.collective.created',
   SUBSCRIPTION_CONFIRMED: 'subscription.confirmed',
   SUBSCRIPTION_CANCELED: 'subscription.canceled',
+  TICKET_CONFIRMED: 'ticket.confirmed',
   USER_CREATED: 'user.created',
   WEBHOOK_STRIPE_RECEIVED: 'webhook.stripe.received',
   WEBHOOK_PAYPAL_RECEIVED: 'webhook.paypal.received',

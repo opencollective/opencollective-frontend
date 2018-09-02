@@ -86,8 +86,7 @@ async function notifySubscribers(users, activity, options={}) {
     return;
   }
   debug("notifySubscribers", users.length, users.map(u => u && u.email, activity.type));
-  const CollectiveId = get(options, 'collective.id') || activity.CollectiveId;
-  const unsubscribedUserIds = await models.Notification.getUnsubscribersUserIds(activity.type, CollectiveId);
+  const unsubscribedUserIds = await models.Notification.getUnsubscribersUserIds(get(options, 'template', activity.type), get(options, 'collective.id', activity.CollectiveId));
   debug("unsubscribedUserIds", unsubscribedUserIds);
   if (process.env.ONLY) {
     debug("ONLY set to ", process.env.ONLY, " => skipping subscribers");
@@ -118,9 +117,20 @@ async function notifySubscribers(users, activity, options={}) {
   });
 }
 
-async function notifyUserId(UserId, activity, options) {
+async function notifyUserId(UserId, activity, options = {}) {
   const user = await models.User.findById(UserId);
-  debug("notifyUserId", UserId, user.email);
+  debug("notifyUserId", UserId, user && user.email, activity.type);
+
+  if (activity.type === activityType.TICKET_CONFIRMED) {
+    const event = await models.Collective.findById(activity.data.EventCollectiveId);
+    const parentCollective = await event.getParentCollective();
+    const ics = await event.getICS();
+    options.attachments = [{ filename: `${event.slug}.ics`, content: ics }];
+    activity.data.event = event.info;
+    activity.data.collective = parentCollective.info;
+    options.from = `${parentCollective.name} <hello@${parentCollective.slug}.opencollective.com>`;
+  }
+
   return emailLib.send(activity.type, user.email, activity.data, options);
 }
 
@@ -212,6 +222,10 @@ async function notifyByEmail(activity) {
   debug("notifyByEmail", activity.type);
   debugLib("activity.data")("activity.data", activity.data);
   switch (activity.type) {
+
+    case activityType.TICKET_CONFIRMED:
+      notifyUserId(activity.data.UserId, activity);
+      break;
 
     case activityType.ORGANIZATION_COLLECTIVE_CREATED:
       notifyUserId(activity.UserId, activity);

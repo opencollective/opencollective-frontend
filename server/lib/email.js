@@ -122,14 +122,14 @@ const sendMessage = (recipients, subject, html, options = {}) => {
     to = process.env.ONLY;
   } else if (process.env.NODE_ENV !== 'production') {
     if (!to) {
-      return Promise.reject(new Error("No recipient defined"));
+      return Promise.reject(new Error("emailLib.sendMessage error: No recipient defined"));
   }
     to = `emailbcc+${to.replace(/@/g, '-at-')}@opencollective.com`;
   }
 
   debug(`sending email to ${to}`);
   if (recipients.length === 0) {
-    debug("No recipient to send to, only sending to bcc", options.bcc);
+    debug("emailLib.sendMessage error: No recipient to send to, only sending to bcc", options.bcc);
   }
 
   if (config.mailgun.user) {
@@ -219,6 +219,8 @@ const generateEmailFromTemplate = (template, recipient, data = {}, options = {})
   if (template === 'ticket.confirmed') {
     if (slug === 'sustainoss')
       template += '.sustainoss';
+    if (slug === 'webrussels')
+      template += '.webrussels';
   }
   if (template.match(/^host\.(monthly|yearly)report$/)) {
     template = 'host.report';

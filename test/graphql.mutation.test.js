@@ -802,20 +802,20 @@ describe('Mutation Tests', () => {
           });
           expect(members).to.have.length(1);
           expect(emailSendSpy.callCount).to.equal(2);
-          const activityData = emailSendSpy.lastCall.args[2];
+          const activityData = emailSendSpy.firstCall.args[2];
           expect(activityData.member.role).to.equal("ATTENDEE");
           expect(activityData.collective.type).to.equal("EVENT");
           expect(activityData.order.publicMessage).to.equal("Looking forward!");
           expect(activityData.collective.slug).to.equal(event1.slug);
           expect(activityData.member.memberCollective.slug).to.equal(user2.collective.slug);
-          expect(emailSendSpy.firstCall.args[0]).to.equal('ticket.confirmed');
-          expect(emailSendSpy.secondCall.args[0]).to.equal('collective.member.created');
+          expect(emailSendSpy.firstCall.args[0]).to.equal('collective.member.created');
+          expect(emailSendSpy.secondCall.args[0]).to.equal('ticket.confirmed');
           await utils.waitForCondition(() => emailSendMessageSpy.callCount > 1);
           expect(emailSendMessageSpy.callCount).to.equal(2);
-          expect(emailSendMessageSpy.firstCall.args[0]).to.equal("user2@opencollective.com");
-          expect(emailSendMessageSpy.firstCall.args[1]).to.equal("2 tickets confirmed for January meetup");
-          expect(emailSendMessageSpy.secondCall.args[0]).to.equal("user1@opencollective.com");
-          expect(emailSendMessageSpy.secondCall.args[1]).to.equal("Anish Bas joined January meetup as attendee");
+          expect(emailSendMessageSpy.firstCall.args[0]).to.equal("user1@opencollective.com");
+          expect(emailSendMessageSpy.firstCall.args[1]).to.equal("Anish Bas joined January meetup as attendee");
+          expect(emailSendMessageSpy.secondCall.args[0]).to.equal("user2@opencollective.com");
+          expect(emailSendMessageSpy.secondCall.args[1]).to.equal("2 tickets confirmed for January meetup");
         });
 
         it('from a new user', async () => {

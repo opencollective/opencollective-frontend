@@ -21,6 +21,8 @@ import emailLib from '../lib/email';
 import debugLib from 'debug';
 import fetch from 'isomorphic-fetch';
 import crypto from 'crypto';
+import moment from 'moment';
+const ics = require('ics'); // eslint-disable-line import/no-commonjs
 
 const debug = debugLib('collective');
 
@@ -508,6 +510,66 @@ export default function(Sequelize, DataTypes) {
       }
     })
     return nextGoal;
+  }
+
+  Collective.prototype.getParentCollective = function() {
+    if (!this.ParentCollectiveId) return Promise.resolve(null);
+    if (this.parentCollective) return Promise.resolve(this.parentCollective);
+    return models.Collective.findById(this.ParentCollectiveId);
+  };
+
+  Collective.prototype.getICS = function() {
+    if (this.type !== 'EVENT') {
+      throw new Error("Can only generate ICS for collectives of type EVENT");
+    }
+    return new Promise((resolve) => {
+      return this.getParentCollective().then(parentCollective => {
+        const url = `${config.host.website}/${parentCollective.slug}/events/${this.slug}`;
+        const start = moment(this.startsAt).format('YYYY-M-D-H-m').split("-");
+        const end = moment(this.endsAt).format('YYYY-M-D-H-m').split("-");
+        let description = this.description || '';
+        if (this.longDescription) {
+          description += `\n\n${this.longDescription}`;
+        }
+        let location = this.location.name || '';
+        if (this.location.address) {
+          location += `, ${this.location.address}`;
+        }
+        const alarms = [{
+          action: 'audio',
+          trigger: { hours: 24, minutes: 0, before: true },
+          repeat: 2,
+          attachType: 'VALUE=URI',
+          attach: 'Glass'
+        },{
+          action: 'audio',
+          trigger: { hours: 72, minutes: 0, before: true },
+          repeat: 2,
+          attachType: 'VALUE=URI',
+          attach: 'Glass'
+        }];
+        const event = {
+          title: this.name,
+          description,
+          start,
+          end,
+          location,
+          url,
+          status: 'CONFIRMED',
+          organizer: { name: parentCollective.name, email: `hello@${parentCollective.slug}.opencollective.com` },
+          alarms
+        }
+        if (this.location.lat) {
+          event.geo = { lat: this.location.lat, lon: this.location.long };
+        }
+        ics.createEvent(event, (err, res) => {
+          if (err) {
+            console.error(`Error while generating the ics file for event id ${this.id} (${url})`, err);
+          }
+          return resolve(res);
+        });
+      });
+    });
   }
 
   // If no image has been provided, try to find a good image using clearbit/gravatar and save it if it returns 200

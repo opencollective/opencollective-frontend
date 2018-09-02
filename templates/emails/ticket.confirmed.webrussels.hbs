@@ -1,0 +1,41 @@
+Subject: {{ order.quantity }} {{{pluralize "ticket" n=order.quantity}}} confirmed for {{ event.name }}
+
+{{> header}}
+{{> eventsnippet}}
+{{> toplogo}}
+
+{{#if recipient.name}}
+<p>Dear {{recipient.name}},</p>
+{{else}}
+<p>Hi!</p>
+{{/if}}
+
+<p>This confirms your {{ order.quantity }} {{{pluralize "ticket" n=order.quantity}}}{{#if order.totalAmount}} for a total of {{{currency order.totalAmount currency=order.currency}}}{{/if}}.</p>
+
+<p>Thanks again for registering to the <a href="{{config.host.website}}/{{collective.slug}}/events/{{event.slug}}">{{ event.name }}</a>.</p>
+ 
+<p>Doors will open at 9am at the <a href="http://kaaitheater.be">Kaai Theater</a> (<a href="https://goo.gl/maps/rYMaiZsaTkx">Square Sainctelette 20, 1000 Brussels</a>) Saturday September 22nd.</p>
+
+<p>You will be able to choose the workshop you want to enroll in at the time. Note: We will be offering free child care, for that, please <a href="https://docs.google.com/forms/d/e/1FAIpQLSegQsl31danpwksRx8PzBW8snLJMzMu2BE4F36KfFkFOBm5jw/viewform">register your kids</a> asap as places are limited.</p>
+ 
+<p>Till then, please help us make some noise about it by sharing the event on social media with the hashtag #fearlesscities</p>
+ 
+<p>We are also looking for volunteers to help us with the organization of the event.
+Please take a look at the <a href="https://docs.google.com/spreadsheets/d/1x_z1CpyjfRfogYa0iIBpKHiwAMcyWUNi7laXMn2ePWY/edit?usp=sharing">list of things that we still need to do</a> and see if there is anyway you can help. That would be amazing. Among other things, we are still looking for people to help us with child care, video recording, distributing flyers.</p>
+  
+<p>Looking forward to see you at Fearless Cities!</p>
+ 
+<section>
+  <h2>Questions about the event?</h2>
+  <p>See our FAQ, or contact us by replying to this email</p>
+</section>
+
+<p>Warmly,</p>
+
+<p>
+  – The {{event.name}} organizers
+</p>
+
+{{> eventdata}}
+
+{{> footer}}

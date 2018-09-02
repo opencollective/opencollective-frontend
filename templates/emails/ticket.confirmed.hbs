@@ -1,6 +1,7 @@
-Subject: {{ order.quantity }} {{{pluralize "ticket" n=order.quantity}}} confirmed for {{ collective.name }}
+Subject: {{ order.quantity }} {{{pluralize "ticket" n=order.quantity}}} confirmed for {{ event.name }}
 
 {{> header}}
+{{> eventsnippet}}
 
 {{> toplogo}}
 
@@ -10,46 +11,22 @@ Subject: {{ order.quantity }} {{{pluralize "ticket" n=order.quantity}}} confirme
 <p>Hi!</p>
 {{/if}}
 
-<p>We are excited that you'll be joining us at {{ collective.name }} on {{ moment collective.startsAt timezone=collective.timezone format="MMMM Do YYYY" }} at {{ collective.locationName }} ({{collective.address}}). The event starts at {{ moment collective.startsAt timezone=collective.timezone format="h:mma" }}.</p>
+<p>This confirms your {{ order.quantity }} {{{pluralize "ticket" n=order.quantity}}}{{#if order.totalAmount}} for a total of {{{currency order.totalAmount currency=order.currency}}}{{/if}}. </p>
 
-<p>This confirms your {{ order.quantity }} {{{pluralize "ticket" n=order.quantity}}}{{#if donation}} for a total of {{{currency order.totalAmount currency=order.currency}}}{{/if}}. </p>
+<p>We are excited that you'll be joining us at <a href="{{config.host.website}}/{{collective.slug}}/events/{{event.slug}}">{{ event.name }}</a> on {{ moment event.startsAt timezone=event.timezone format="MMMM Do YYYY" }} at {{ moment event.startsAt timezone=event.timezone format="h:mma" }} at {{ event.locationName }} ({{event.address}}).</p>
 
 <p>Warmly,</p>
 
 <p>
-  – The {{collective.name}} organizers
+  – The {{event.name}} organizers
 </p>
 
-<script type="application/ld+json">
-    {
-      "@context":              "http://schema.org",
-      "@type":                 "EventReservation",
-      "reservationNumber":     "{{order.id}}",
-      "reservationStatus":     "http://schema.org/Confirmed",
-      "numSeats":              "{{order.quantity}}",
-      "underName": {
-        "@type":               "Person",
-        "name":                "{{recipient.name}}"
-      },
-      "reservationFor": {
-        "@type":               "Event",
-        "name":                "{{collective.name}}",
-        "startDate":           "{{collective.startsAt}}",
-        "endDate":             "{{collective.endsAt}}",
-        "location": {
-          "@type":             "Place",
-          "name":              "{{collective.locationName}}",
-          "address": {
-            "@type":           "PostalAddress",
-            "streetAddress":   "{{collective.address}}",
-            "addressLocality": "",
-            "addressRegion":   "",
-            "postalCode":      "",
-            "addressCountry":  ""
-          }
-        }
-      }
-    }
-</script>
+
+<section>
+  <h2>Questions about the event?</h2>
+  <p>Reply to this email to contact the organizers.</p>
+</section>
+
+{{> eventdata}}
 
 {{> footer}}

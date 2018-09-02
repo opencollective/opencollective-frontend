@@ -148,6 +148,29 @@ describe('Collective model', () => {
       })
   })
 
+  describe('events', () => {
+    it('generates the ICS for an EVENT collective', async () => {
+      const d = new Date;
+      const startsAt = d.setMonth(d.getMonth() + 1);
+      const endsAt = new Date(startsAt);
+      endsAt.setHours(endsAt.getHours() + 2);
+      const event = await models.Collective.create({
+        type: 'EVENT',
+        ParentCollectiveId: collective.id,
+        name: "Sustain OSS London 2019",
+        description: "Short description",
+        longDescription: "Longer description",
+        slug: "sustainoss-london",
+        startsAt,
+        endsAt,
+      });
+      const ics = await event.getICS();
+      expect(ics).to.contain("STATUS:CONFIRMED");
+      expect(ics).to.contain("/tipbox/events/sustainoss-london");
+      expect(ics).to.contain("hello@tipbox.opencollective.com");
+    });
+  });
+
   describe("hosts", () => {
     let newHost;
 
