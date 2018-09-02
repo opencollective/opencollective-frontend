@@ -1,0 +1,34 @@
+
+<script type="application/ld+json">
+    {
+      "@context":              "http://schema.org",
+      "@type":                 "EventReservation",
+      "reservationNumber":     "{{order.id}}",
+      "reservationStatus":     "http://schema.org/Confirmed",
+      "numSeats":              "{{order.quantity}}",
+      "underName": {
+        "@type":               "Person",
+        "name":                "{{recipient.name}}"
+      },
+      "reservationNumber":     "{{order.id}}",
+      "reservationFor": {
+        "@type":               "Event",
+        "name":                "{{event.name}}",
+        "startDate":           "{{event.startsAt}}",
+        "endDate":             "{{event.endsAt}}",
+        "performer":           "{{collective.name}}",
+        "location": {
+          "@type":             "Place",
+          "name":              "{{event.locationName}}",
+          "address": {
+            "@type":           "PostalAddress",
+            "streetAddress":   "{{event.address}}",
+            "addressLocality": "",
+            "addressRegion":   "",
+            "postalCode":      "",
+            "addressCountry":  ""
+          }
+        }
+      }
+    }
+</script>

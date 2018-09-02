@@ -25,7 +25,11 @@ const reports = [
   {
     template: 'host.yearlyreport',
     command: 'cron/yearly/host-report.js'
-  }
+  },
+  {
+    template: 'ticket.confirmed',
+    command: 'scripts/compile-email.js ticket.confirmed'
+  },
 ];
 
 const PG_DATABASE = process.env.PG_DATABASE || 'opencollective_prod_snapshot';
@@ -77,7 +81,8 @@ async function runReport(responses) {
     env.SLUGS = slugs.join(',');
   }
 
-  const command = `./node_modules/.bin/babel-node ${responses.report}`;
+  const command = `./node_modules/.bin/babel-node ${responses.command}`;
+  console.log(">>> command", command);
   return new Promise((resolve) => {
     const cmd = exec(command, { env });
     cmd.stdout.pipe(process.stdout);
@@ -99,7 +104,7 @@ async function main ({ argv }) {
   const questions = [
     {
       type: 'select',
-      name: 'report',
+      name: 'command',
       message: 'Pick a report',
       choices: getChoices(reports),
       initial: 0

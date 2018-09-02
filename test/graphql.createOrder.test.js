@@ -8,6 +8,7 @@ import models from '../server/models';
 import twitter from '../server/lib/twitter';
 import * as utils from './utils';
 import * as store from './features/support/stores';
+import emailLib from '../server/lib/email';
 
 const order = {
   "quantity": 1,
@@ -76,7 +77,7 @@ const constants = {
 
 describe('createOrder', () => {
 
-  let sandbox, tweetStatusSpy, brusselstogether;
+  let sandbox, tweetStatusSpy, webrussels, emailSendMessageSpy;
 
   before(() => {
     nock('http://data.fixer.io')
@@ -98,13 +99,14 @@ describe('createOrder', () => {
     await utils.resetTestDB();
     sandbox = sinon.createSandbox();
     tweetStatusSpy = sandbox.spy(twitter, 'tweetStatus');
+    emailSendMessageSpy = sandbox.spy(emailLib, 'sendMessage');
 
     // Given a collective (with a host)
-    ({ brusselstogether } = await store.newCollectiveWithHost('brusselstogether', 'EUR', 'EUR', 5));
+    ({ webrussels } = await store.newCollectiveWithHost('webrussels', 'EUR', 'EUR', 5));
     // And the above collective's host has a stripe account
-    await store.stripeConnectedAccount(brusselstogether.HostCollectiveId);
+    await store.stripeConnectedAccount(webrussels.HostCollectiveId);
     // And given that the above collective is active
-    await brusselstogether.update({ isActive: true });
+    await webrussels.update({ isActive: true });
     // And given that the endpoint for creating customers on Stripe
     // is patched
     utils.stubStripeCreate(sandbox, { charge: { currency: 'eur', status: 'succeeded' } });
@@ -135,7 +137,7 @@ describe('createOrder', () => {
       // And given a twitter connected account for the above
       // collective
       await models.ConnectedAccount.create({
-        CollectiveId: brusselstogether.id,
+        CollectiveId: webrussels.id,
         service: "twitter",
         clientId: "clientid",
         token: "xxxx",
@@ -147,7 +149,7 @@ describe('createOrder', () => {
         }
       });
       // And given an order
-      order.collective = { id: brusselstogether.id };
+      order.collective = { id: webrussels.id };
       order.user = {
         firstName: "John",
         lastName: "Smith",
@@ -189,10 +191,67 @@ describe('createOrder', () => {
       expect(tweetStatusSpy.firstCall.args[1]).to.contain("@johnsmith thank you for your €1,543 donation!");
     });
 
+    it('creates an order for an event ticket and receives the ticket confirmation by email with iCal.ics attached', async () => {
+      const d = new Date;
+      const startsAt = d.setMonth(d.getMonth() + 1);
+      const endsAt = new Date(startsAt);
+      endsAt.setHours(endsAt.getHours() + 2);
+      const event = await models.Collective.create({
+        type: 'EVENT',
+        isActive: true,
+        ParentCollectiveId: webrussels.id,
+        name: "Sustain OSS London 2019",
+        description: "Short description",
+        longDescription: "Longer description",
+        locationName: "Github",
+        address: "San Francisco",
+        slug: "sustainoss-london",
+        startsAt,
+        endsAt,
+      });
+      // Given an order request
+      const newOrder = cloneDeep(order);
+      newOrder.collective = { id: event.id };
+      newOrder.user = {
+        firstName: "John",
+        lastName: "Appleseed",
+        email: "jsmith@email.com"
+      };
+      newOrder.totalAmount = 1000;
+
+      // When the GraphQL query is executed
+      let res;
+      res = await utils.graphqlQuery(createOrderQuery, { order: newOrder });
+
+      // Then there should be no errors
+      res.errors && console.error(res.errors);
+      expect(res.errors).to.not.exist;
+      await utils.waitForCondition(() => emailSendMessageSpy.callCount > 0);
+      expect(emailSendMessageSpy.callCount).to.equal(1);
+      expect(emailSendMessageSpy.firstCall.args[0]).to.equal(newOrder.user.email);
+      expect(emailSendMessageSpy.firstCall.args[1]).to.equal(`1 ticket confirmed for ${event.name}`);
+      expect(emailSendMessageSpy.firstCall.args[2]).to.contain('kaaitheater'); // double check that we use the custom email for webrussels
+      expect(emailSendMessageSpy.firstCall.args[3].attachments[0].filename).to.equal(`${event.slug}.ics`);
+      expect(emailSendMessageSpy.firstCall.args[3].attachments[0].content).to.contain('/webrussels/events/sustainoss-london');
+
+      // also test the different path for free tickets
+      newOrder.totalAmount = 0;
+      delete newOrder.paymentMethod;
+
+      res = await utils.graphqlQuery(createOrderQuery, { order: newOrder });
+
+      // Then there should be no errors
+      res.errors && console.error(res.errors);
+      expect(res.errors).to.not.exist;
+      await utils.waitForCondition(() => emailSendMessageSpy.callCount > 0);
+      expect(emailSendMessageSpy.callCount).to.equal(1);
+
+    });
+
     it('creates an order as new anonymous user', async () => {
       // Given an order request
       const newOrder = cloneDeep(order);
-      newOrder.collective = { id: brusselstogether.id };
+      newOrder.collective = { id: webrussels.id };
       newOrder.user = {
         firstName: "",
         lastName: "",
@@ -221,7 +280,7 @@ describe('createOrder', () => {
       // And given that the order is from the above user with the
       // above payment method
       order.fromCollective = { id: xdamman.CollectiveId };
-      order.collective = { id: brusselstogether.id };
+      order.collective = { id: webrussels.id };
       // When the query is executed
       const res = await utils.graphqlQuery(createOrderQuery, { order }, xdamman);
       // Then there should be no errors
@@ -277,7 +336,7 @@ describe('createOrder', () => {
       expect(res.errors).to.not.exist;
 
       // And the order is setup with the above data
-      order.collective = { id: brusselstogether.id };
+      order.collective = { id: webrussels.id };
       order.fromCollective = { id: xdamman.CollectiveId }
       order.paymentMethod = { uuid: res.data.editCollective.paymentMethods[0].uuid };
 
@@ -315,7 +374,7 @@ describe('createOrder', () => {
       order.paymentMethod = { ...constants.paymentMethod, token: 'tok_1B5j8xDjPFcHOcTm3ogdnq0K' };
       order.interval = 'month';
       order.totalAmount = 1000;
-      order.collective = { id: brusselstogether.id };
+      order.collective = { id: webrussels.id };
       // When the order is created
       const res = await utils.graphqlQuery(createOrderQuery, { order }, xdamman);
       res.errors && console.error(res.errors);
@@ -340,7 +399,7 @@ describe('createOrder', () => {
 
     it('creates an order as a new user for a new organization', async () => {
       // Given the following data for the order
-      order.collective = { id: brusselstogether.id };
+      order.collective = { id: webrussels.id };
       order.user = { firstName: "John", lastName: "Smith", email: "jsmith@email.com" };
       order.fromCollective = { name: "NewCo", website: "newco.com" };
       order.paymentMethod = { ...constants.paymentMethod, token: 'tok_3B5j8xDjPFcHOcTm3ogdnq0K' };
@@ -374,7 +433,7 @@ describe('createOrder', () => {
       });
       // And the order parameters
       order.fromCollective = { id: newco.id };
-      order.collective = { id: brusselstogether.id };
+      order.collective = { id: webrussels.id };
       order.paymentMethod = { ...constants.paymentMethod, token: 'tok_4B5j8xDjPFcHOcTm3ogdnq0K' };
       // Should fail if not an admin or member of the organization
       let res = await utils.graphqlQuery(createOrderQuery, { order }, duc);
@@ -412,7 +471,7 @@ describe('createOrder', () => {
         name: "newco",
         CreatedByUserId: duc.id
       });
-      order.collective = { id: brusselstogether.id };
+      order.collective = { id: webrussels.id };
       order.fromCollective = { id: newco.id };
       order.totalAmount = 20000;
       const paymentMethod = await models.PaymentMethod.create({

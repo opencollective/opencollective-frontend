@@ -55,6 +55,7 @@
     "he": "1.1.1",
     "helmet": "3.5.0",
     "html-pdf": "2.2.0",
+    "ics": "^2.7.2",
     "intl-messageformat": "2.2.0",
     "isomorphic-fetch": "2.2.1",
     "joi": "7.3.0",

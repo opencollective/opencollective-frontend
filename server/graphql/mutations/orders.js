@@ -8,7 +8,6 @@ import Promise from 'bluebird';
 import models from '../../models';
 import { capitalize, pluralize } from '../../lib/utils';
 import * as libPayments from '../../lib/payments';
-import emailLib from '../../lib/email';
 import { types } from '../../constants/collectives';
 import roles from '../../constants/roles';
 import status from '../../constants/order_status';
@@ -216,16 +215,20 @@ export function createOrder(order, loaders, remoteUser) {
         return orderCreated
           .setPaymentMethod(order.paymentMethod)
           .then(() => libPayments.executeOrder(remoteUser || user, orderCreated, pick(order, ['hostFeePercent', 'platformFeePercent']))) // also adds the user as a BACKER of collective
-      } else {
+      } else if (collective.type === types.EVENT) {
         // Free ticket, add user as an ATTENDEE
-        const email = (remoteUser) ? remoteUser.email : order.user.email;
+        const UserId = remoteUser ? remoteUser.id : user.id;
         return collective.addUserWithRole(user, roles.ATTENDEE)
-          .then(() => emailLib.send('ticket.confirmed', email, {
-          recipient: { name: fromCollective.name },
-          collective: collective.info,
-          order: orderCreated.info,
-          tier: tier && tier.info
-        }));
+          .then(() => models.Activity.create({
+            type: activities.TICKET_CONFIRMED,
+            data: {
+              EventCollectiveId: collective.id,
+              UserId,
+              recipient: { name: fromCollective.name },
+              order: orderCreated.info,
+              tier: tier && tier.info
+            }
+          }));
       }
     })
     // make sure we return the latest version of the Order Instance

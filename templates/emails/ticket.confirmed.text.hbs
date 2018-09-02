@@ -1,0 +1,18 @@
+{{#if recipient.name}}
+Dear {{recipient.name}},
+{{else}}
+Hi!
+{{/if}}
+
+This confirms your {{ order.quantity }} {{{pluralize "ticket" n=order.quantity}}}{{#if order.totalAmount}} for a total of {{{currency order.totalAmount currency=order.currency}}}{{/if}}.
+
+We are excited that you'll be joining us at {{ event.name }} on {{ moment event.startsAt timezone=event.timezone format="MMMM Do YYYY" }} at {{ moment event.startsAt timezone=event.timezone format="h:mma" }} at {{ event.locationName }} ({{event.address}}).
+
+Warmly,
+
+– The {{event.name}} organizers
+
+
+Questions about the event?
+Reply to this email to contact the organizers.
+Or visit the event page on {{config.host.website}}/{{collective.slug}}/events/{{event.slug}}

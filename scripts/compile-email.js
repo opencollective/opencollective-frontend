@@ -50,28 +50,33 @@ data['collective.expense.paid'] = {
   }
 };
 data['ticket.confirmed'] = {
-  user: {
+  recipient: {
     name: "Xavier Damman"
   },
   event: {
-    name: "SustainOSS",
-    startsAt: "2017-06-19 17:15:00+00",
+    name: "Sustain 2019 San Francisco",
+    slug: "sutain-2019-sf",
+    startsAt: "2019-06-19 17:15:00+00",
+    endsAt: "2019-06-19 21:15:00+00",
     timezone: "America/Los_Angeles",
-    location: {
-      name: "Github HQ",
-      address: "88 Colin P Kelly Jr Street, San Francisco, CA"
-    }
-  },
-  response: {
-    quantity: 2,
-  },
-  donation: {
-    amount: 5000,
-    currency: "USD"
+    locationName: "Github HQ",
+    address: "88 Colin P Kelly Jr Street, San Francisco, CA"
   },
   collective: {
-    slug: "sustainoss",
-    name: "SustainOSS"
+    slug: "sustainoss"
+  },
+  tier: {
+    id: 1,
+    name: "Regular Ticket",
+    description: "This gives you access to all the workshops",
+    amount: 1000,
+    currency: "USD"
+  },
+  order: {
+    id: 2312321,
+    quantity: 2,
+    totalAmount: 5000,
+    currency: "USD"
   }
 };
 data['ticket.confirmed.sustainoss'] = data['ticket.confirmed'];
@@ -257,7 +262,13 @@ if (!templateName) {
   const libEmailTemplates = require('../server/lib/emailTemplates');
   const template = libEmailTemplates[templateName];
   if (template) {
-    const html = juice(template({ ...data[templateName], ...defaultData }));
+    const emailData = { ...data[templateName], ...defaultData };
+    const html = juice(template(emailData));
+    let text;
+    if (libEmailTemplates[`${templateName}.text`]) {
+      text = libEmailTemplates[`${templateName}.text`](emailData);
+    }
+
     if (process.env.MAILGUN_PASSWORD) {
       const attributes = getTemplateAttributes(html);
       const mailgun = nodemailer.createTransport({
@@ -267,8 +278,8 @@ if (!templateName) {
           pass: config.mailgun.password
         }
       });
-      console.log(">>> Sending by email to ", process.env.EMAIL);
-      mailgun.sendMail({ from: config.email.from, to: process.env.EMAIL, subject: attributes.subject, html: attributes.body }, (err, info) => {
+      console.log(">>> Sending by email to ", process.env.ONLY);
+      mailgun.sendMail({ from: config.email.from, to: process.env.ONLY, subject: attributes.subject, text, html: attributes.body }, (err, info) => {
         console.log("email sent");
       });
     }
