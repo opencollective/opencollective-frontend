@@ -33,8 +33,8 @@ class OrderForm extends React.Component {
     matchingFund: PropTypes.string,
     redeemFlow: PropTypes.bool,
     intl: PropTypes.object,
-    client: PropTypes.object
-  }
+    client: PropTypes.object,
+  };
 
   constructor(props) {
     super(props);
@@ -47,7 +47,7 @@ class OrderForm extends React.Component {
       user: {},
       fromCollective: {},
       paymentMethod: {
-        type: 'creditcard'
+        type: 'creditcard',
       },
       creditcard: {
         show: !this.props.redeemFlow,
@@ -56,17 +56,17 @@ class OrderForm extends React.Component {
       ocCard: {
         applySent: false,
         loading: false,
-        expanded: this.props.redeemFlow
+        expanded: this.props.redeemFlow,
       },
       orgDetails: {
-        show: false
+        show: false,
       },
       /* Set by loadPayPalButton(). This field stores the data from
          the authorization so we can ask the user's confirmation
          before processing the payment. */
       paypalOrderRequest: null,
       order: order || {},
-      result: {}
+      result: {},
     };
 
     this.state.order.totalAmount = this.state.order.totalAmount || tier.amount * (tier.quantity || 1);
@@ -306,8 +306,8 @@ class OrderForm extends React.Component {
       fromCollective = {
         id: CollectiveId,
         type: collective.type,
-        name: collective.name
-      }
+        name: collective.name,
+      };
     }
     const newState = {
       ...this.state,
@@ -316,8 +316,8 @@ class OrderForm extends React.Component {
         show: Boolean(profile === 'organization')
       },
       creditcard: {
-        show: true
-      }
+        show: true,
+      },
     };
 
     if (collective) {
@@ -338,10 +338,10 @@ class OrderForm extends React.Component {
 
     this.setState(newState);
 
-    if (typeof window !== "undefined") {
+    if (typeof window !== 'undefined') {
       window.state = newState;
     }
-  }
+  };
 
   handleChange = (obj, attr, value) => {
     this.resetError();
@@ -383,7 +383,7 @@ class OrderForm extends React.Component {
     }
 
     this.setState(newState);
-    if (typeof window !== "undefined") {
+    if (typeof window !== 'undefined') {
       window.state = newState;
     }
 
@@ -391,7 +391,7 @@ class OrderForm extends React.Component {
     if (this.isPayPalSelected()) {
       this.loadPayPalButton();
     }
-  }
+  };
 
   /** Return true if PayPal is the selected payment method
    *
@@ -462,19 +462,19 @@ class OrderForm extends React.Component {
     } finally {
       button.removeAttribute('disabled');
     }
-  }
+  };
 
   getTotalAmount = () => {
     const { order } = this.state;
-    const quantity = (order.tier.quantity || 1);
+    const quantity = get(order, 'tier.quantity') || order.quantity || 1;
     const total = (quantity * order.tier.amount) || order.totalAmount;
     return total;
-  }
+  };
 
   prepareOrderRequest = () => {
     const { paymentMethod, order, fromCollective, user } = this.state;
     const { currency }  = (order.tier || this.props.collective);
-    const quantity = (order.tier && order.tier.quantity) || 1;
+    const quantity = get(order, 'tier.quantity') || order.quantity || 1;
     const orderRequest = {
       user,
       quantity,
@@ -491,7 +491,7 @@ class OrderForm extends React.Component {
       orderRequest.tier = { id: order.tier.id, amount: order.tier.amount };
     }
     return orderRequest;
-  }
+  };
 
   /** Call the underlying onSubmit method with an order request  */
   submitOrder = async (orderRequest) =>
@@ -592,9 +592,9 @@ class OrderForm extends React.Component {
             brand: res.card.brand,
             country: res.card.country,
             funding: res.card.funding,
-            zip: res.card.address_zip
+            zip: res.card.address_zip,
           },
-          save: true
+          save: true,
         };
         newState.paymentMethod = paymentMethod;
         this.setState(newState);
@@ -602,17 +602,17 @@ class OrderForm extends React.Component {
       }
     }
     return true;
-  }
+  };
 
   resetOrder = () => {
     this.setState({ order: {} });
-  }
+  };
 
   signin = () => {
     signin(this.state.user, `${window.location.pathname}${window.location.search}`).then(() => {
       this.setState({ loginSent: true })
-    })
-  }
+    });
+  };
 
   applyOcCardBalance = async () => {
     const { ocCard, creditcard, order } = this.state;
@@ -634,29 +634,28 @@ class OrderForm extends React.Component {
     this.setState({ ocCard: Object.assign(ocCard, { loading: false})})
 
     if (result.data && result.data.ocPaymentMethod) {
-
       // force a tier of the whole amount with null interval
       const tier = {
         interval: null,
         amount: result.data.ocPaymentMethod.balance,
         currency: result.data.ocPaymentMethod.currency,
-        description: "Thank you 🙏",
-        name: "Gift Card"
-      }
+        description: 'Thank you 🙏',
+        name: 'Gift Card',
+      };
 
       this.setState({
         ocCard: Object.assign(ocCard,
-          {...result.data.ocPaymentMethod, valid: true }),
+          { ...result.data.ocPaymentMethod, valid: true }),
         creditcard: Object.assign(creditcard,
           { show: false }),
-        order: Object.assign(order, {interval: null, totalAmount: result.data.ocPaymentMethod.balance, tier})
+        order: Object.assign(order, { interval: null, totalAmount: result.data.ocPaymentMethod.balance, tier }),
       });
     }
-  }
+  };
 
   expandGiftCard = () => {
     this.setState({ ocCard: Object.assign({}, this.state.ocCard, { expanded: true }) });
-  }
+  };
 
   renderPayPalButton = () => !this.isPayPalAuthorized() && (
     <FormGroup controlId="paypalFG" id="paypalFG">
@@ -688,7 +687,7 @@ class OrderForm extends React.Component {
           </div> }
       </div>
     );
-  }
+  };
 
   renderCreditCard = () => {
     const { intl } = this.props;
@@ -748,7 +747,7 @@ class OrderForm extends React.Component {
           }
           <div>
             { !ocCard.expanded &&
-              <Row key={`giftcard.checkbox`}>
+              <Row key="giftcard.checkbox">
                 <Col sm={2}></Col>
                 <Col sm={10}>
                   <a className="gift-card-expander" onClick={this.expandGiftCard}>
@@ -758,7 +757,7 @@ class OrderForm extends React.Component {
               </Row>
             }
             { ocCard.expanded &&
-              <Row key={`ocCard.input`}>
+              <Row key="ocCard.input">
                 <Col sm={12}>
                   <InputField
                     className="horizontal"
@@ -771,7 +770,7 @@ class OrderForm extends React.Component {
         </Col>
       </Row>
     );
-  }
+  };
 
   render() {
     const { intl, collective, LoggedInUser } = this.props;
@@ -788,7 +787,7 @@ class OrderForm extends React.Component {
       label: `${intl.formatMessage(this.messages['email.label'])}*`,
       description: intl.formatMessage(this.messages['email.description']),
       defaultValue: order['email'],
-      onChange: (value) => this.handleChange('user', "email", value)
+      onChange: (value) => this.handleChange('user', 'email', value),
     };
     if (!this.state.isNewUser) {
       inputEmail.button = <Button onClick={this.signin} focus={true}>Login</Button>;
@@ -1038,7 +1037,7 @@ class OrderForm extends React.Component {
               </section>
             }
 
-            <Row key={`summary-info`}>
+            <Row key="summary-info">
               <Col sm={2} />
               <Col sm={10}>
                 { order.totalAmount > 0 && !collective.host &&
@@ -1081,7 +1080,7 @@ class OrderForm extends React.Component {
         </Form>
 
       </div>
-    )
+    );
   }
 }
 

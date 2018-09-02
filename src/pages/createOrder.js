@@ -26,11 +26,11 @@ class CreateOrderPage extends React.Component {
     super(props);
     this.createOrder = this.createOrder.bind(this);
     this.state = { result: {}, loading: false };
-    const interval = (props.interval || "").toLowerCase().replace(/ly$/,'');
+    const interval = (props.interval || '').toLowerCase().replace(/ly$/,'');
      this.order = {
       quantity: parseInt(props.quantity, 10) || 1,
       interval: (['month', 'year'].indexOf(interval) !== -1) ? interval : null,
-      totalAmount: parseInt(props.totalAmount, 10) || null
+      totalAmount: parseInt(props.totalAmount, 10) || null,
     };
 
     switch (props.verb) {
@@ -99,7 +99,7 @@ class CreateOrderPage extends React.Component {
       delete order.user;
     }
     try {
-      this.setState({ loading: true});
+      this.setState({ loading: true });
       console.log(">>> createOrder", order);
       const res = await this.props.createOrder(order);
       const orderCreated = res.data.createOrder;
@@ -110,7 +110,7 @@ class CreateOrderPage extends React.Component {
         CollectiveId: order.collective.id,
         TierId: order.tier && order.tier.id,
         type: data.Collective.type,
-        totalAmount:order.totalAmount
+        totalAmount:order.totalAmount,
       });
     } catch (e) {
       console.error(">>> createOrder error: ", e);
@@ -124,7 +124,7 @@ class CreateOrderPage extends React.Component {
 
     if (!data.Collective) return (<ErrorPage data={data} />);
 
-    const description = decodeURIComponent(this.props.description || "");
+    const description = decodeURIComponent(this.props.description || '');
     const collective = data.Collective;
 
     const TierId = parseInt(this.props.TierId);
