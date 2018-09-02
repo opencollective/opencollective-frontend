@@ -963,6 +963,7 @@ describe('Mutation Tests', () => {
           expect(emailSendMessageSpy.callCount).to.equal(1);
           expect(emailSendMessageSpy.firstCall.args[0]).to.equal(user1.email);
           expect(emailSendMessageSpy.firstCall.args[1]).to.contain(`Anish Bas joined ${event1.name} as backer`);
+          expect(emailSendMessageSpy.firstCall.args[2]).to.contain(`/scouts/events/jan-meetup`);
         });
 
         it('from a new user', async () => {

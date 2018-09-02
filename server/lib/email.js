@@ -259,7 +259,7 @@ const generateEmailFromTemplate = (template, recipient, data = {}, options = {})
   if (template === 'collective.member.created') {
     if (get(data, 'member.memberCollective.twitterHandle') && get(data, 'member.role') === 'BACKER') {
       const collectiveMention = (get(data, 'collective.twitterHandle')) ? `@${data.collective.twitterHandle}` : data.collective.name;
-      const text = `Hi @${data.member.memberCollective.twitterHandle} thanks for your donation to ${collectiveMention} https://opencollective.com/${slug} 🎉😊`;
+      const text = `Hi @${data.member.memberCollective.twitterHandle} thanks for your donation to ${collectiveMention} ${config.host.website}${get(data, 'collective.urlPath')} 🎉😊`;
       data.tweet = {
         text,
         encoded: encodeURIComponent(text)
