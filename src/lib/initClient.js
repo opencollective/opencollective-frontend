@@ -42,11 +42,17 @@ function createClient(initialState, options = {}) {
 
   const errorLink = onError(({ graphQLErrors, networkError }) => {
     if (graphQLErrors) {
-      graphQLErrors.map(({ message, locations, path }) =>
-        console.error(
-          `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`,
-        ),
-      );
+      graphQLErrors.map((error) => {
+        if (error) {
+          const { message, locations, path } = error;
+          console.error(
+            `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`,
+          );
+          return;
+        }
+
+        console.error('[GraphQL error]: Received null error');
+      });
     }
 
     if (networkError) {
