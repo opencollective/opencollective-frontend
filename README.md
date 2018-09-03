@@ -50,6 +50,37 @@ $ docker-compose -f docker/docker-compose.yml up --build
 Then you'll be able to access the UI from http://localhost:13000 and
 the API from the address http://localhost:13060.
 
+### Local setup
+
+#### Requirements
+- A PostgreSQL installation (10.3, 9.6.8, 9.5.12, 9.4.17, 9.3.22 or newer)
+
+#### Steps
+
+Make sure you have python 2 as your active version. You can use `pyenv` to switch python versions.
+
+Copy `env.default` and rename it to `.env`
+ 
+Install the dependencies by running: 
+
+```
+npm install
+```
+
+If you're running into node-gyp issues related to Python 3 vs Python 2 you can run `npm rebuild` or run `npm install` again.
+
+Setup your database and restore the seed dump by running:
+
+```
+npm run db:setup && ./node_modules/.bin/babel-node ./scripts/db_restore.js opencollective_dvl
+```
+
+Start the API by running:
+
+```
+npm run dev
+```
+
 ### Once it's running
 
 This new environment is created with the `opencollective_dvl`
