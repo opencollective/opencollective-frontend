@@ -35,6 +35,9 @@ import sanitizer from './middleware/sanitizer';
 import { sanitizeForLogs } from './lib/utils';
 import debug from 'debug';
 
+import { ApolloServer } from 'apollo-server-express';
+import publicSchema from './graphql/public/schema';
+
 /**
  * NotImplemented response.
  */
@@ -107,6 +110,20 @@ export default app => {
   app.param('transactionuuid', params.transactionuuid);
   app.param('paranoidtransactionid', params.paranoidtransactionid);
   app.param('expenseid', params.expenseid);
+
+  /**
+   * GraphQL Public
+   */
+  const server = new ApolloServer({
+    schema: publicSchema,
+    // Align with behavior from express-graphql
+    context: ({ req }) => {
+      // console.log('context', 'arguments', arguments);
+      return req;
+    },
+  });
+
+  server.applyMiddleware({ app, path: '/graphql/public' });
 
   /**
    * GraphQL
