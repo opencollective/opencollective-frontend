@@ -1,7 +1,7 @@
 /**
  * Dependencies.
  */
-import _, { get, difference, uniq, pick } from 'lodash';
+import _, { get, difference, uniq, pick, omit } from 'lodash';
 import Temporal from 'sequelize-temporal';
 import config from 'config';
 import deepmerge from 'deepmerge';
@@ -1134,7 +1134,7 @@ export default function(Sequelize, DataTypes) {
 
     const promises = [
       models.Member.create(member),
-      this.update(updatedValues)
+      this.update(updatedValues),
     ];
 
     if (this.type === types.COLLECTIVE) {
@@ -1142,6 +1142,17 @@ export default function(Sequelize, DataTypes) {
       if (!tiers || tiers.length === 0) {
         tiers = defaultTiers(hostCollective.id, hostCollective.currency);
         promises.push(models.Tier.createMany(tiers, { CollectiveId: this.id }));
+      } else {
+        // if the collective already had some tiers, we delete the ones that don't have the same currency
+        // and we recreate new ones
+        tiers.map(t => {
+          if (t.currency !== hostCollective.currency) {
+            const newTierData = omit(t.dataValues, ['id']);
+            newTierData.currency = hostCollective.currency;
+            promises.push(models.Tier.create(newTierData));
+            promises.push(t.destroy());
+          }
+        })
       }
     }
 

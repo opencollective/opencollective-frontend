@@ -172,7 +172,7 @@ describe('Collective model', () => {
   });
 
   describe("hosts", () => {
-    let newHost;
+    let newHost, newCollective;
 
     before(async () => {
       expect(collective.HostCollectiveId).to.be.null;
@@ -182,6 +182,7 @@ describe('Collective model', () => {
         name: "BrusselsTogether",
         slug: "brusselstogether",
         type: "ORGANIZATION",
+        currency: 'EUR',
         CreatedByUserId: user1.id
       });
       await models.Member.create({
@@ -192,6 +193,14 @@ describe('Collective model', () => {
       });
       user1.populateRoles();
       user2.populateRoles();
+      newCollective = await models.Collective.create({
+        name: "New collective",
+        slug: "new-collective",
+        type: "COLLECTIVE",
+        isActive: false,
+        CreatedByUserId: user1.id
+      });
+      await newCollective.addHost(host, user1);
     });
 
     it("fails to add another host", async () => {
@@ -211,15 +220,18 @@ describe('Collective model', () => {
     });
 
     it("changes host successfully", async () => {
-      const newCollective = await models.Collective.create({
-        name: "New collective",
-        slug: "new-collective",
-        type: "COLLECTIVE",
-        isActive: false,
-        CreatedByUserId: user1.id
-      });
-      await newCollective.addHost(host, user1);
+
+      const assertCollectiveCurrency = async (collective, currency) => {
+        const tiers = await models.Tier.findAll({ where: { CollectiveId: collective.id }});
+        // console.log(`>>> assert that the ${tiers.length} tiers of ${collective.slug} (id: ${collective.id}) are in ${currency}`);
+        expect(collective.currency).to.equal(currency);
+        tiers.map(t => {
+          expect(t.currency).to.equal(currency);
+        })
+      }
+
       await newCollective.changeHost(newHost, user1);
+      await assertCollectiveCurrency(newCollective, newHost.currency);
       expect(newCollective.HostCollectiveId).to.equal(newHost.id);
       // if the user making the request is an admin of the host, isActive should turn to true
       expect(newCollective.isActive).to.be.true;
@@ -228,10 +240,12 @@ describe('Collective model', () => {
       expect(membership.MemberCollectiveId).to.equal(newHost.id);
       expect(newCollective.HostCollectiveId).to.equal(newHost.id);
       // moving to a host where the user making the request is not an admin of turns isActive to false
-      await newCollective.changeHost(host, user2);
+      await newCollective.changeHost(host.collective, user2);
+      await assertCollectiveCurrency(newCollective, host.collective.currency);
       expect(newCollective.HostCollectiveId).to.equal(host.id);
       expect(newCollective.isActive).to.be.false;
     });
+
   });
 
   it('creates an organization and populates logo image', (done) => {
