@@ -76,7 +76,7 @@ const sectionDetailStyles = {
 };
 const statsContainerStyles = {
   alignItems: 'center',
-  backgroundImage: '/static/images/oc-symbol.svg',
+  backgroundImage: 'url(/static/images/oc-symbol.svg)',
   backgroundPosition: 'center center',
   backgroundRepeat: 'no-repeat',
   backgroundSize: 'contain',
@@ -114,7 +114,7 @@ const BackerAvatar = ({
 }) => (
   <Link route={`/${slug}`} passHref><a>
     <Container
-      backgroundImage={imagePreview(image || pickAvatar())}
+      backgroundImage={`url(${imagePreview(image || pickAvatar())})`}
       backgroundSize="cover"
       backgroundPosition="center center"
       backgroundRepeat="no-repeat"
@@ -214,7 +214,7 @@ class HomePage extends React.Component {
             py="5rem"
           >
             <Container maxWidth={1200} display="flex" justifyContent="space-between" mx="auto">
-              <Container w={[1, null, 0.5]} pr={[null, null, 4]} maxWidth={500}>
+              <Container width={[1, null, 0.5]} pr={[0, null, 4]} maxWidth={500}>
                 <H1 fontWeight="normal" textAlign="left">A new form of association, <br /> <strong>transparent by design.</strong></H1>
 
                 <P my={3} color="#6E747A">
@@ -234,16 +234,16 @@ class HomePage extends React.Component {
                     maxWidth="220px"
                     hover={{ color: 'white' }}
                     py={3} textAlign="center"
-                    w={1}
+                    width={1}
                   >
                     Join the movement
                   </StyledLink>
 
-                  <StyledLink href="/learn-more" mt={[3, null, 0]} ml={[null, null, 3]}>How it works &gt;</StyledLink>
+                  <StyledLink href="/learn-more" mt={[3, null, 0]} ml={[0, null, 3]}>How it works &gt;</StyledLink>
                 </Flex>
               </Container>
 
-              <Hide xs sm w={0.5}>
+              <Hide xs sm width={0.5}>
                 <P textAlign="center" color="#C2C6CC" textTransform="uppercase" fontSize="1.2rem" letterSpacing="0.8px" mb={3}>Latest Transactions</P>
                 <Container maxHeight="50rem" overflow="scroll">
                   <Box is="ul" p={0}>
@@ -269,7 +269,7 @@ class HomePage extends React.Component {
                 <StyledLink href="/discover">See all &gt;</StyledLink>
               </Flex>
               <Container display="flex" flexWrap="wrap" justifyContent="space-between">
-                {collectives.map((c) => <Container key={c.id} w={[0.5, null, 0.25]} mb={2} px={1} maxWidth={224}><CollectiveStatsCard {...c} /></Container>)} 
+                {collectives.map((c) => <Container key={c.id} width={[0.5, null, 0.25]} mb={2} px={1} maxWidth={224}><CollectiveStatsCard {...c} /></Container>)} 
               </Container>
             </Container>
 
@@ -279,7 +279,7 @@ class HomePage extends React.Component {
                 <StyledLink href="/discover">See all &gt;</StyledLink>
               </Flex>
               <Container display="flex" flexWrap="wrap" justifyContent="space-between">
-                {topSpenders.map((c) => <Container w={[0.5, null, 0.25]} mb={2} px={1} maxWidth={224} key={c.id}><CollectiveStatsCard {...c} /></Container>)} 
+                {topSpenders.map((c) => <Container width={[0.5, null, 0.25]} mb={2} px={1} maxWidth={224} key={c.id}><CollectiveStatsCard {...c} /></Container>)} 
               </Container>
             </Container>
 
@@ -297,7 +297,7 @@ class HomePage extends React.Component {
               mx="auto"
               py={[2, null, 3]}
               textAlign="center"
-              w={[250, null, 320]}
+              width={[250, null, 320]}
             >
               Discover more collectives
             </StyledLink>
@@ -305,7 +305,7 @@ class HomePage extends React.Component {
 
           <Container bg="#EBF1FA" py={5} mt={5} id="movement">
             <Container maxWidth={800} mx="auto">
-              <H2 textAlign="center" fontWeight="900" px={2} lineHeight={['36px', null, '58px']} fontSize={[null, null, 56]}>
+              <H2 textAlign="center" fontWeight="900" px={2} lineHeight={['36px', null, '58px']} fontSize={[H2.defaultProps.fontSize, null, 56]}>
                 Join the movement for a world with more open, transparent, and sustainable communities.
               </H2>
               <P color="#6E747A" textAlign="center" fontSize={[16, null, 20]} lineHeight={['24px', null, '28px']} px={3} my={[3, null, 4]}>
@@ -316,7 +316,7 @@ class HomePage extends React.Component {
             <Container bg={['#3385FF', null, 'transparent']} height={2} width={32} mx="auto" my={[5, null, 3]} />
 
             <Container display="flex" flexDirection={['column', null, 'row']} maxWidth={1200} mx="auto" alignItems="center">
-              <Container w={[1, null, 0.5]}>
+              <Container width={[1, null, 0.5]}>
                 <H3 {...sectionHeadingStyles}>Create an open collective</H3>
 
                 <P {...sectionSubHeadingStyles}>
@@ -342,13 +342,13 @@ class HomePage extends React.Component {
                     hover={{ color: 'white' }}
                     py={3}
                     textAlign="center"
-                    w={[250, null, 320]}
+                    width={[250, null, 320]}
                   >
                     Create an open collective
                   </StyledLink>
                 </Link>
               </Container>
-              <Container w={[1, null, 0.5]}>
+              <Container width={[1, null, 0.5]}>
                 <Carousel content={carouselContent} />
               </Container>
             </Container>
@@ -356,7 +356,7 @@ class HomePage extends React.Component {
             <Container bg={['#3385FF', null, 'transparent']} height={2} width={32} mx="auto" my={[5]} />
 
             <Container display="flex" flexDirection={['column', null, 'row']} maxWidth={1200} mx="auto">
-              <Container w={[1, null, 0.5]}>
+              <Container width={[1, null, 0.5]}>
                 <H3 {...sectionHeadingStyles}>Become a sponsor</H3>
 
                 <P {...sectionSubHeadingStyles}>Great companies supporting great collectives with 💙</P>
@@ -380,21 +380,21 @@ class HomePage extends React.Component {
                     hover={{ color: 'white' }}
                     py={3}
                     textAlign="center"
-                    w={[250, null, 320]}
+                    width={[250, null, 320]}
                   >
                     Become a sponsor
                   </StyledLink>
                 </Link>
               </Container>
-              <Container w={[1, null, 0.5]} display="flex" flexWrap="wrap" justifyContent="space-between" px={[1, null, 4]}>
-                {sponsors.map((c) => <Container w={[0.5, null, 0.33]} mb={2} px={1} maxWidth={224} key={c.id}><HomepageSponsorCard {...c} /></Container>)}
+              <Container width={[1, null, 0.5]} display="flex" flexWrap="wrap" justifyContent="space-between" px={[1, null, 4]}>
+                {sponsors.map((c) => <Container width={[0.5, null, 0.33]} mb={2} px={1} maxWidth={224} key={c.id}><HomepageSponsorCard {...c} /></Container>)}
               </Container>
             </Container>
 
             <Container bg={['#3385FF', null, 'transparent']} height={2} width={32} mx="auto" my={[5]} />
 
             <Container display="flex" flexDirection={['column', null, 'row']} maxWidth={1200} mx="auto">
-              <Container w={[1, null, 0.5]} mb={4}>
+              <Container width={[1, null, 0.5]} mb={4}>
                 <H3 {...sectionHeadingStyles}>Become a backer</H3>
 
                 <P {...sectionSubHeadingStyles}>For those who believe in giving back</P>
@@ -415,12 +415,12 @@ class HomePage extends React.Component {
                   hover={{ color: 'white' }}
                   py={3}
                   textAlign="center"
-                  w={[250, null, 320]}
+                  width={[250, null, 320]}
                 >
                   Become a backer
                 </StyledLink>
               </Container>
-              <Container w={[1, null, 0.5]} overflow="hidden" position="relative">
+              <Container width={[1, null, 0.5]} overflow="hidden" position="relative">
                 <Container width={["100%", null, "160%"]} display="flex" flexWrap="wrap" justifyContent="center" alignItems="center" position="relative" >
                   {backers.filter(({ image }) => !!image).map((c) => <Container px={1} key={c.id}><BackerAvatar {...c} /></Container>)}
                 </Container>
@@ -433,7 +433,7 @@ class HomePage extends React.Component {
             <Container bg={['#3385FF', null, 'transparent']} height={2} width={32} mx="auto" my={[5]} />
 
             <Container display="flex" flexDirection={['column', null, 'row']} justifyContent="space-between" maxWidth={1200} mx="auto">
-              <Container w={[1, null, 0.5]}>
+              <Container width={[1, null, 0.5]}>
                 <H3 {...sectionHeadingStyles}>Contribute code 👩🏻‍💻👨🏿‍💻</H3>
 
                 <P {...sectionSubHeadingStyles}>Building Open Collective together to get further, faster 🚀</P>
@@ -448,7 +448,7 @@ class HomePage extends React.Component {
                   Check out our Github organization to find out more
                 </StyledLink>
               </Container>
-              <Container w={[1, null, 0.5]} textAlign="center" px={2} maxWidth={600}>
+              <Container width={[1, null, 0.5]} textAlign="center" px={2} maxWidth={600}>
                 <img src="/static/images/home-contributors.png" alt="Open Collective Contribution Commits" width="100%" height="auto" />
               </Container>
             </Container>
@@ -456,7 +456,7 @@ class HomePage extends React.Component {
             <Container bg={['#3385FF', null, 'transparent']} height={2} width={32} mx="auto" my={[5]} />
 
             <Container display="flex" flexDirection={['column', null, 'row']} maxWidth={1200} mx="auto" alignItems="center">
-              <Container w={[1, null, 0.5]}>
+              <Container width={[1, null, 0.5]}>
                 <H3 {...sectionHeadingStyles}>Become a host</H3>
 
                 <P {...sectionSubHeadingStyles}>Help provide the umbrella legal entities open collectives need to raise funds ⚖️</P>
@@ -477,13 +477,13 @@ class HomePage extends React.Component {
                     hover={{ color: 'white' }}
                     py={3}
                     textAlign="center"
-                    w={[250, null, 320]}
+                    width={[250, null, 320]}
                   >
                     Create a chapter
                   </StyledLink>
                 </Link>
               </Container>
-              <Container w={[1, null, 0.5]} textAlign="center" px={4} maxWidth={600} mt={[5, null, 0]}>
+              <Container width={[1, null, 0.5]} textAlign="center" px={4} maxWidth={600} mt={[5, null, 0]}>
                 <img src="/static/images/home-local-chapter.svg" alt="Open Collective Local Chapter" width="100%" height="auto" />
               </Container>
             </Container>

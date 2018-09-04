@@ -168,7 +168,7 @@ class CreateHostForm extends React.Component {
 
         { this.fields.map(field => (!field.when || field.when(this.state.form)) && (
           <Flex key={`${field.name}.input`}>
-            <Box w={1}>
+            <Box width={1}>
               <InputField
                 {...field}
                 className={field.className}

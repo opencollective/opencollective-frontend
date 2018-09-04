@@ -107,7 +107,7 @@ class ExpensesPage extends React.Component {
                     <Button className="blue" onClick={() => this.setState({ expenseCreated: null, showNewExpenseForm: true })}>
                       <FormattedMessage id="expenses.sendAnotherExpense" defaultMessage="Submit Another Expense" />
                     </Button>
-                    <Box ml={[null, null, 3]}>
+                    <Box ml={[0, null, 3]}>
                       <Button className="whiteblue viewAllExpenses" href={`/${collective.slug}/expenses`}>
                         <FormattedMessage id="expenses.viewAll" defaultMessage="View All Expenses" />
                       </Button>

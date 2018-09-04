@@ -9,7 +9,6 @@ import {
   fontFamily,
   fontSize,
   fontWeight,
-  hover,
   maxWidth,
   space,
   textAlign,
@@ -27,7 +26,6 @@ const StyledLink = styled.a`
   ${fontFamily}
   ${fontSize}
   ${fontWeight}
-  ${hover}
   ${maxWidth}
   ${space}
   ${textAlign}
