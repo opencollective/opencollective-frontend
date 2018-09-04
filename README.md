@@ -67,13 +67,9 @@ Install the dependencies by running:
 npm install
 ```
 
-If you're running into node-gyp issues related to Python 3 vs Python 2 you can run `npm rebuild` or run `npm install` again.
-
-Setup your database and restore the seed dump by running:
-
-```
-npm run db:setup && ./node_modules/.bin/babel-node ./scripts/db_restore.js opencollective_dvl
-```
+Troubleshooting:
+- If you're running into node-gyp issues related to Python 3 vs Python 2 you can run `npm rebuild` or run `npm install` again.
+- The postinstall script should set-up your default environment and bootstrap the database along with some seed data. If it is failing you can try to run: `npm run db:setup && ./node_modules/.bin/babel-node ./scripts/db_restore.js opencollective_dvl`
 
 Start the API by running:
 
