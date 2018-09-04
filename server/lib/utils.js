@@ -1,7 +1,5 @@
 import Url from 'url';
 import config from 'config';
-import crypto from 'crypto';
-import base64url from 'base64url';
 import Promise from 'bluebird';
 import debugLib from 'debug';
 import pdf from 'html-pdf';
@@ -58,26 +56,6 @@ export function getDomain(url = '') {
   return domain;
 }
 
-/**
- * Encrypt with resetPasswordSecret
- */
-export const encrypt = (text) => {
-  const cipher = crypto.createCipher('aes-256-cbc', config.keys.opencollective.resetPasswordSecret)
-  let crypted = cipher.update(text, 'utf8', 'hex')
-  crypted += cipher.final('hex');
-  return crypted;
-};
-
-/**
- * Descript wih resetPasswordSecret
- */
-export const decrypt = (text) => {
-  const decipher = crypto.createDecipher('aes-256-cbc', config.keys.opencollective.resetPasswordSecret)
-  let dec = decipher.update(text,'hex','utf8')
-  dec += decipher.final('utf8');
-  return dec;
-};
-
 export function strip_tags(str, allowedTags) {
   return sanitizeHtml(str, {
     allowedTags: allowedTags || sanitizeHtml.defaults.allowedTags.concat([
@@ -133,12 +111,6 @@ String.prototype.trunc = function(n, useWordBoundary ) {
     ? subString.substr(0, subString.lastIndexOf(' '))
     : subString)}&hellip;`;
 };
-
-/**
- * Generate a secured token that works inside URLs
- * http://stackoverflow.com/a/25690754
- */
-export const generateURLSafeToken = size => base64url(crypto.randomBytes(size));
 
 /**
  * Get current Url.
