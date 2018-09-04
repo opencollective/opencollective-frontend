@@ -48,9 +48,20 @@ class EditEventForm extends React.Component {
     event[fieldname] = value;
 
     // Make sure that endsAt is always >= startsAt
-    if (fieldname === 'startsAt' || fieldname === 'endsAt') {
+    if (fieldname === 'startsAt') {
       const endsAt = this.state.event.endsAt;
       if (!endsAt || new Date(endsAt) < new Date(value)) {
+        let newEndDate = new Date(value);
+        if (!endsAt) {
+          newEndDate.setHours(newEndDate.getHours() + 2);
+        } else {
+          // https://github.com/opencollective/opencollective/issues/1232
+          const endsAtDate = new Date(endsAt);
+          newEndDate = new Date(value);
+          newEndDate.setHours(endsAtDate.getHours());
+          newEndDate.setMinutes(endsAtDate.getMinutes());
+        }
+        value = newEndDate.toString();
         event['endsAt'] = value;
       }
     }
