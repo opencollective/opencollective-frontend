@@ -10,7 +10,6 @@ import { defaultBackgroundImage } from '../constants/collectives';
 import { getStripeToken } from '../lib/stripe';
 import { defineMessages } from 'react-intl';
 import withIntl from '../lib/withIntl';
-import { capitalize } from '../lib/utils';
 import { Router } from '../server/pages';
 
 class EditCollective extends React.Component {
