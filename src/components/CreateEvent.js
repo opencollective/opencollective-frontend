@@ -133,7 +133,7 @@ class CreateEvent extends React.Component {
                   </div>
                 </div>
 
-                <EditEventForm event={this.state.event} onSubmit={this.createEvent} onChange={this.resetError} />
+                <EditEventForm event={this.state.event} onSubmit={this.createEvent} onChange={this.resetError} loading={this.state.status === 'loading'} />
                 <div className="result">
                   <div className="success">{this.state.result.success}</div>
                   <div className="error">{this.state.result.error}</div>
