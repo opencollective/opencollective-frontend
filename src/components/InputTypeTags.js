@@ -1,6 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { WithOutContext as ReactTags } from 'react-tag-input';
+import withIntl from '../lib/withIntl';
+import { defineMessages } from 'react-intl';
+import { WithContext as ReactTags } from 'react-tag-input';
+import stylesheet from '../styles/react-tags.css';
 
 const KeyCodes = {
   comma: 188,
@@ -20,34 +23,38 @@ class InputTypeTags extends React.Component {
     super(props);
 
     this.state = {
-        tags: [
-            { id: 'Thailand', text: 'Thailand' },
-            { id: 'India', text: 'India' },
-          ],
-        suggestions: [
-            { id: 'USA', text: 'USA' },
-            { id: 'Germany', text: 'Germany' },
-            { id: 'Austria', text: 'Austria' },
-            { id: 'Costa Rica', text: 'Costa Rica' },
-            { id: 'Sri Lanka', text: 'Sri Lanka' },
-            { id: 'Thailand', text: 'Thailand' },
-          ]
+      tags: [
+        { id: 'Thailand', text: 'Thailand' },
+        { id: 'India', text: 'India' },
+      ],
+      suggestions: [
+        { id: 'USA', text: 'USA' },
+        { id: 'Germany', text: 'Germany' },
+        { id: 'Austria', text: 'Austria' },
+        { id: 'Costa Rica', text: 'Costa Rica' },
+        { id: 'Sri Lanka', text: 'Sri Lanka' },
+        { id: 'Thailand', text: 'Thailand' },
+      ],
     };
     this.handleDelete = this.handleDelete.bind(this);
     this.handleAddition = this.handleAddition.bind(this);
     this.handleDrag = this.handleDrag.bind(this);
+
+    this.messages = defineMessages({
+      'placeholder': { id: 'input.tags.placeholder', defaultMessage: 'Add a new tag (then press "enter")' },
+    });
   }
 
   handleDelete(i) {
     const tags = this.state.tags.filter((tag, index) => index !== i);
     this.setState({ tags });
-    this.props.onChange(tags);
+    this.props.onChange(tags.map(t => t.id).join(','));
   }
 
   handleAddition(tag) {
     const tags = [...this.state.tags, tag];
     this.setState({ tags });
-    this.props.onChange(tags);
+    this.props.onChange(tags.map(t => t.id).join(','));
   }
 
   handleDrag(tag, currPos, newPos) {
@@ -59,13 +66,15 @@ class InputTypeTags extends React.Component {
 
     // re-render
     this.setState({ tags: newTags });
-    this.props.onChange(newTags);
+    this.props.onChange(newTags.map(t => t.id).join(','));
   }
 
   render() {
+    const { intl } = this.props;
     const { tags, suggestions } = this.state;
     return (
       <div>
+        <style dangerouslySetInnerHTML={{ __html: stylesheet }} />
         <ReactTags
           tags={tags}
           suggestions={suggestions}
@@ -73,10 +82,11 @@ class InputTypeTags extends React.Component {
           handleAddition={this.handleAddition}
           handleDrag={this.handleDrag}
           delimiters={delimiters}
+          placeholder={intl.formatMessage(this.messages['placeholder'])}
           />
       </div>
     );
   }
 }
 
-export default InputTypeTags;
+export default withIntl(InputTypeTags);

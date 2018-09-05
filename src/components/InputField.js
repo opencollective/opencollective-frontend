@@ -189,14 +189,14 @@ class InputField extends React.Component {
                   {capitalize(field.label)}
                 </Col>
                 <Col sm={10}>
-                  <InputFieldTags {...field} />
+                  <InputTypeTags {...field} />
                 </Col>
               </div>
             }
             { !horizontal &&
               <div>
                 {field.label && <ControlLabel>{`${capitalize(field.label)}`}</ControlLabel>}
-                <InputFieldTags {...field} />
+                <InputTypeTags {...field} />
                 {field.description && <HelpBlock>{field.description}</HelpBlock>}
               </div>
             }
