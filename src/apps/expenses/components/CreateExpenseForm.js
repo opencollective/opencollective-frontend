@@ -282,7 +282,7 @@ class CreateExpenseForm extends React.Component {
             <div className="frame">
               <InputField
                 type="dropzone"
-                options={{ accept: "image/jpeg, image/png, application/pdf" }}
+                options={{ accept: 'image/jpeg, image/png, application/pdf' }}
                 name="attachment"
                 className="attachmentField"
                 onChange={attachment => this.handleChange('attachment', attachment)}

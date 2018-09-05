@@ -12,7 +12,7 @@ class InputTypeDropzone extends React.Component {
     defaultValue: PropTypes.string,
     className: PropTypes.string,
     onChange: PropTypes.func.isRequired,
-    options: PropTypes.object
+    options: PropTypes.object,
   };
 
   constructor(props) {
@@ -21,11 +21,11 @@ class InputTypeDropzone extends React.Component {
     this.handleChange = this.handleChange.bind(this);
     this.state = { loading: false, value: props.defaultValue, url: props.defaultValue }; // value can be base64 encoded after upload, url is always an url
     this.messages = defineMessages({
-      placeholder: { id: 'uploadImage.placeholder', defaultMessage: "Drop an image or click to upload" },
-      isDragActive: { id: 'uploadImage.isDragActive', defaultMessage: "Drop it like it's hot 🔥" },
-      isDragReject: { id: 'uploadImage.isDragReject', defaultMessage: "🚫 This file type is not accepted" },
-      error: { id: 'uploadImage.error', defaultMessage: "Error: {error}" }
-    })
+      placeholder: { id: 'uploadImage.placeholder', defaultMessage: 'Drop an image or click to upload' },
+      isDragActive: { id: 'uploadImage.isDragActive', defaultMessage: 'Drop it like it\'s hot 🔥' },
+      isDragReject: { id: 'uploadImage.isDragReject', defaultMessage: '🚫 This file type is not accepted' },
+      error: { id: 'uploadImage.error', defaultMessage: 'Error: {error}' }
+    });
   }
 
   handleChange(files) {
@@ -37,7 +37,7 @@ class InputTypeDropzone extends React.Component {
     this.setState({ loading: true });
     // for e2e testing purposes
     if (window.location.hostname === 'localhost') {
-      const fileUrl = "https://d.pr/free/i/OlQVIb+";
+      const fileUrl = 'https://d.pr/free/i/OlQVIb+';
       return setTimeout(() => {
         this.setState({ value: fileUrl, url: fileUrl, loading: false });
         return this.props.onChange(fileUrl);
@@ -51,23 +51,23 @@ class InputTypeDropzone extends React.Component {
         return this.props.onChange(fileUrl);
       })
       .catch(err => {
-        console.error(">>> error uploading image", file, err);
-        this.setState({ error: "error uploading image, please try again", loading: false });
+        console.error('>>> error uploading image', file, err);
+        this.setState({ error: 'error uploading image, please try again', loading: false });
       });
   }
 
   renderContainer({ isDragActive, isDragReject }) {
     const { intl } = this.props;
 
-    let messageId = "placeholder";
+    let messageId = 'placeholder';
     if (isDragActive) {
-      messageId = "isDragActive";
+      messageId = 'isDragActive';
     }
     if (isDragReject) {
-      messageId = "isDragReject";
+      messageId = 'isDragReject';
     }
     if (this.state.error) {
-      messageId = "error";
+      messageId = 'error';
     }
 
     return (
@@ -98,6 +98,9 @@ class InputTypeDropzone extends React.Component {
             0%    { transform: rotate(0deg); }
             100%  { transform: rotate(360deg); }
           }
+          img {
+            width: 100%;
+          }
         `}</style>
         { messageId &&
           <div className={`message ${messageId}`}>
@@ -125,6 +128,7 @@ class InputTypeDropzone extends React.Component {
             border: 2px dashed transparent;
             position: relative;
             min-height: 80px;
+            overflow: hidden;
           }
           .dropzone:hover .placeholder {
             display: flex;
