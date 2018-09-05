@@ -56,11 +56,13 @@ class EditCollective extends React.Component {
       ...collective.settings,
       goals: CollectiveInputType.goals,
       editor: CollectiveInputType.markdown ? 'markdown' : 'html',
-      sendInvoiceByEmail: CollectiveInputType.sendInvoiceByEmail
+      sendInvoiceByEmail: CollectiveInputType.sendInvoiceByEmail,
+      tos: CollectiveInputType.tos,
     };
     delete CollectiveInputType.goals;
     delete CollectiveInputType.markdown;
     delete CollectiveInputType.sendInvoiceByEmail;
+    delete CollectiveInputType.tos;
 
     if (!CollectiveInputType.paymentMethods) return CollectiveInputType;
 
@@ -77,7 +79,7 @@ class EditCollective extends React.Component {
     const card = newPaymentMethod.card;
     let res;
     try {
-      res = await getStripeToken('cc', card)
+      res = await getStripeToken('cc', card);
       const last4 = res.card.last4;
       const paymentMethod = {
         name: last4,
@@ -98,7 +100,7 @@ class EditCollective extends React.Component {
       CollectiveInputType.paymentMethods[index] = paymentMethod;
       return CollectiveInputType;
     } catch (e) {
-      this.setState({ result: { error: `${intl.formatMessage(this.messages['creditcard.error'])}: ${e}` }})
+      this.setState({ result: { error: `${intl.formatMessage(this.messages['creditcard.error'])}: ${e}` } });
       return false;
     }
   }
@@ -138,41 +140,25 @@ class EditCollective extends React.Component {
       return false;
     }
 
-    if (typeof CollectiveInputType.tags === 'string') {
-      CollectiveInputType.tags = CollectiveInputType.tags.split(',').map(t => t.trim());
-    }
-
-    const { collective } = this.props;
-    CollectiveInputType.settings = {
-      ...collective.settings,
-      goals: CollectiveInputType.goals,
-      editor: CollectiveInputType.markdown ? 'markdown' : 'html',
-      sendInvoiceByEmail: CollectiveInputType.sendInvoiceByEmail,
-      tos: CollectiveInputType.tos,
-    };
-    delete CollectiveInputType.goals;
-    delete CollectiveInputType.markdown;
-    delete CollectiveInputType.sendInvoiceByEmail;
-    delete CollectiveInputType.tos;
     this.setState( { status: 'loading' });
     try {
       const res = await this.props.editCollective(CollectiveInputType);
       const type = res.data.editCollective.type.toLowerCase();
-      this.setState({ status: 'idle', result: { success: `${capitalize(type)} saved` }});
+      this.setState({ status: 'idle', result: { success: `${capitalize(type)} saved` } });
       setTimeout(() => {
         this.setState({ status: 'idle', result: { success: null }});
       }, 3000);
     } catch (err) {
       console.error(">>> editCollective error: ", JSON.stringify(err));
       const errorMsg = (err.graphQLErrors && err.graphQLErrors[0]) ? err.graphQLErrors[0].message : err.message;
-      this.setState( { status: 'idle', result: { error: errorMsg }})
+      this.setState( { status: 'idle', result: { error: errorMsg } })
       throw new Error(errorMsg);
     }
   }
 
   async deleteCollective() {
     const { collective } = this.props;
-    if (confirm("😱 Are you really sure you want to delete this collective?")) {
+    if (confirm('😱 Are you really sure you want to delete this collective?')) {
       this.setState( { status: 'loading' });
       try {
         await this.props.deleteCollective(collective.id);
