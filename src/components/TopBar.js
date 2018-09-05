@@ -43,49 +43,49 @@ class TopBar extends React.Component {
     className: PropTypes.string,
     LoggedInUser: PropTypes.object,
     showSearch: PropTypes.bool,
-  }
+  };
 
   static defaultProps = {
     className: '',
     showSearch: true,
-  }
+  };
 
   constructor(props) {
     super(props);
     this.messages = defineMessages({
-      'menu.homepage': { id: 'menu.homepage', defaultMessage: `Go to Open Collective Homepage`}
+      'menu.homepage': { id: 'menu.homepage', defaultMessage: 'Go to Open Collective Homepage' },
     });
   }
 
   render() {
     const { className, LoggedInUser, showSearch } = this.props;
-    const shouldAnimate = className.includes && className.includes('loading');
+    const shouldAnimate = Array.isArray(className) && className.includes('loading');
 
     return (
       <Flex mx={3} my={2} alignItems="center" flexDirection="row" justifyContent="space-around">
-          <Link href="/">
-            <Flex is="a" alignItems="center">
-              <Logo width="24" height="24" animate={shouldAnimate} />
-              <Hide xs>
-                <Box mx={2}>
-                  <img height="16px" src="/static/images/logotype.svg" />
-                </Box>
-              </Hide>
-            </Flex>
-          </Link>
+        <Link href="/">
+          <Flex is="a" alignItems="center">
+            <Logo width="24" height="24" animate={shouldAnimate} />
+            <Hide xs>
+              <Box mx={2}>
+                <img height="16px" src="/static/images/logotype.svg" />
+              </Box>
+            </Hide>
+          </Flex>
+        </Link>
 
-          {showSearch && (
-            <Flex justifyContent="center" flex="1 1 auto">
-              <Hide xs width={1}>
-                <SearchFormContainer p={2}>
-                  <SearchForm />
-                </SearchFormContainer>
-              </Hide>
-            </Flex>
-          )}
+        {showSearch && (
+          <Flex justifyContent="center" flex="1 1 auto">
+            <Hide xs width={1}>
+              <SearchFormContainer p={2}>
+                <SearchForm />
+              </SearchFormContainer>
+            </Hide>
+          </Flex>
+        )}
 
         <Flex alignItems="center" justifyContent="flex-end" flex="1 1 auto">
-          
+
           <Hide sm md lg>
             <Box mx={3}>
               <Link href="/search">
@@ -113,7 +113,7 @@ class TopBar extends React.Component {
           <TopBarProfileMenu LoggedInUser={LoggedInUser} />
         </Flex>
       </Flex>
-    )
+    );
   }
 }
 

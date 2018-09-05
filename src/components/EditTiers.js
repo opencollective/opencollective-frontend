@@ -16,13 +16,12 @@ class EditTiers extends React.Component {
     collective: PropTypes.object,
     currency: PropTypes.string.isRequired,
     defaultType: PropTypes.string,
-    onChange: PropTypes.func.isRequired
+    onChange: PropTypes.func.isRequired,
   };
 
   constructor(props) {
     super(props);
     const { intl } = props;
-
     this.state = { tiers: [...props.tiers] || [{}] };
     this.renderTier = this.renderTier.bind(this);
     this.addTier = this.addTier.bind(this);
@@ -133,7 +132,7 @@ class EditTiers extends React.Component {
         label: intl.formatMessage(this.messages['maxQuantity.label']),
         description: intl.formatMessage(this.messages['maxQuantity.description']),
         when: (tier) => ['TICKET', 'PRODUCT', 'TIER'].indexOf(tier.type) !== -1
-      }
+      },
     ];
   }
 
@@ -168,7 +167,7 @@ class EditTiers extends React.Component {
       ...tier,
       type: tier.type || this.defaultType,
       _amountType: tier._amountType || (tier.presets ? 'flexible' : 'fixed')
-    }
+    };
 
     return (
       <div className={`tier ${tier.slug}`} key={`tier-${index}`}>

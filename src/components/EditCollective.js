@@ -26,7 +26,7 @@ class EditCollective extends React.Component {
     super(props);
     this.editCollective = this.editCollective.bind(this);
     this.deleteCollective = this.deleteCollective.bind(this);
-    this.state = { status: 'idle', result: {} };
+    this.state = { status: null, result: {} };
     this.messages = defineMessages({
       'creditcard.error': { id: 'creditcard.error', defaultMessage: 'Invalid credit card' },
     });
@@ -142,16 +142,15 @@ class EditCollective extends React.Component {
 
     this.setState( { status: 'loading' });
     try {
-      const res = await this.props.editCollective(CollectiveInputType);
-      const type = res.data.editCollective.type.toLowerCase();
-      this.setState({ status: 'idle', result: { success: `${capitalize(type)} saved` } });
+      await this.props.editCollective(CollectiveInputType);
+      this.setState({ status: 'saved' });
       setTimeout(() => {
-        this.setState({ status: 'idle', result: { success: null }});
+        this.setState({ status: null });
       }, 3000);
     } catch (err) {
-      console.error(">>> editCollective error: ", JSON.stringify(err));
+      console.error('>>> editCollective error:', JSON.stringify(err));
       const errorMsg = (err.graphQLErrors && err.graphQLErrors[0]) ? err.graphQLErrors[0].message : err.message;
-      this.setState( { status: 'idle', result: { error: errorMsg } })
+      this.setState( { status: null, result: { error: errorMsg } });
       throw new Error(errorMsg);
     }
   }
@@ -162,13 +161,13 @@ class EditCollective extends React.Component {
       this.setState( { status: 'loading' });
       try {
         await this.props.deleteCollective(collective.id);
-        this.setState({ status: 'idle', result: { success: `Collective deleted successfully` }});
+        this.setState({ status: null, result: { success: 'Collective deleted successfully' } });
         const collectiveRoute = `/${collective.parentCollective.slug}`;
         Router.pushRoute(collectiveRoute);
       } catch (err) {
-        console.error(">>> deleteCollective error: ", JSON.stringify(err));
+        console.error('>>> deleteCollective error: ', JSON.stringify(err) );
         const errorMsg = (err.graphQLErrors && err.graphQLErrors[0]) ? err.graphQLErrors[0].message : err.message;
-        this.setState( { result: { error: errorMsg }})
+        this.setState( { result: { error: errorMsg } });
         throw new Error(errorMsg);
       }
     }
@@ -232,7 +231,7 @@ class EditCollective extends React.Component {
                   collective={collective}
                   LoggedInUser={LoggedInUser}
                   onSubmit={this.editCollective}
-                  loading={this.state.status === 'loading'}
+                  status={this.state.status}
                   />
                 <div className="actions">
                   { collective.type === 'EVENT' && (<a onClick={this.deleteCollective}>delete event</a>)}
