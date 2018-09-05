@@ -13,57 +13,57 @@ exports[`Search Page renders empty results message 1`] = `
   box-sizing: border-box;
 }
 
-.c6 {
+.c5 {
   box-sizing: border-box;
   margin-left: 8px;
   margin-right: 8px;
 }
 
-.c8 {
+.c7 {
   box-sizing: border-box;
   -webkit-flex: 1 1 auto;
   -ms-flex: 1 1 auto;
   flex: 1 1 auto;
 }
 
-.c10 {
+.c9 {
   box-sizing: border-box;
   margin-left: 16px;
   margin-right: 16px;
 }
 
-.c14 {
+.c13 {
   margin: 0;
   box-sizing: border-box;
   margin: 0px;
   padding: 0px;
 }
 
-.c15 {
+.c14 {
   box-sizing: border-box;
   padding-left: 16px;
   padding-right: 16px;
 }
 
-.c21 {
+.c20 {
   box-sizing: border-box;
   width: 100%;
 }
 
-.c23 {
+.c22 {
   box-sizing: border-box;
   margin-top: 16px;
   margin-bottom: 16px;
 }
 
-.c28 {
+.c27 {
   box-sizing: border-box;
   width: 100%;
   padding-top: 16px;
   padding-bottom: 16px;
 }
 
-.c31 {
+.c30 {
   max-width: 1300px;
   box-sizing: border-box;
   margin-left: auto;
@@ -71,7 +71,7 @@ exports[`Search Page renders empty results message 1`] = `
   padding: 8px;
 }
 
-.c38 {
+.c37 {
   box-sizing: border-box;
   margin-top: 16px;
   -webkit-flex: 1 1 auto;
@@ -82,7 +82,7 @@ exports[`Search Page renders empty results message 1`] = `
   order: 3;
 }
 
-.c39 {
+.c38 {
   box-sizing: border-box;
   width: 50%;
   margin-bottom: 16px;
@@ -117,7 +117,7 @@ exports[`Search Page renders empty results message 1`] = `
   align-items: center;
 }
 
-.c7 {
+.c6 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -132,14 +132,14 @@ exports[`Search Page renders empty results message 1`] = `
   justify-content: flex-end;
 }
 
-.c11 {
+.c10 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
 }
 
-.c13 {
+.c12 {
   margin: 0;
   display: -webkit-box;
   display: -webkit-flex;
@@ -151,7 +151,7 @@ exports[`Search Page renders empty results message 1`] = `
   justify-content: space-around;
 }
 
-.c22 {
+.c21 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -162,7 +162,7 @@ exports[`Search Page renders empty results message 1`] = `
   align-items: flex-end;
 }
 
-.c26 {
+.c25 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -176,7 +176,7 @@ exports[`Search Page renders empty results message 1`] = `
   justify-content: center;
 }
 
-.c27 {
+.c26 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -187,7 +187,7 @@ exports[`Search Page renders empty results message 1`] = `
   justify-content: center;
 }
 
-.c30 {
+.c29 {
   max-width: 1300px;
   display: -webkit-box;
   display: -webkit-flex;
@@ -206,7 +206,7 @@ exports[`Search Page renders empty results message 1`] = `
   justify-content: space-between;
 }
 
-.c33 {
+.c32 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -217,7 +217,7 @@ exports[`Search Page renders empty results message 1`] = `
   justify-content: center;
 }
 
-.c37 {
+.c36 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -231,7 +231,7 @@ exports[`Search Page renders empty results message 1`] = `
   justify-content: center;
 }
 
-.c18 {
+.c17 {
   color: #46b0ed;
   display: inline-block;
   font-size: 1.2rem;
@@ -245,7 +245,7 @@ exports[`Search Page renders empty results message 1`] = `
   margin-right: 8px;
 }
 
-.c34 {
+.c33 {
   color: #6E747A;
   font-size: 1.4rem;
   margin: 0px;
@@ -254,7 +254,7 @@ exports[`Search Page renders empty results message 1`] = `
   text-align: center;
 }
 
-.c40 {
+.c39 {
   color: #C2C6CC;
   font-size: 1.2rem;
   -webkit-letter-spacing: 1px;
@@ -266,7 +266,7 @@ exports[`Search Page renders empty results message 1`] = `
   text-align: center;
 }
 
-.c29 {
+.c28 {
   background-color: white;
   border-top: 1px solid #aaaaaa;
   bottom: 0px;
@@ -275,7 +275,7 @@ exports[`Search Page renders empty results message 1`] = `
   width: 100%;
 }
 
-.c32 {
+.c31 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -288,7 +288,7 @@ exports[`Search Page renders empty results message 1`] = `
   width: 100%;
 }
 
-.c35 {
+.c34 {
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -310,35 +310,35 @@ exports[`Search Page renders empty results message 1`] = `
   width: 100%;
 }
 
-.c19 {
+.c18 {
   position: relative;
   display: inline-block;
   height: 0.6rem;
   width: 1.4rem;
 }
 
-.c19::before,
-.c19::after {
+.c18::before,
+.c18::after {
   content: '';
   position: absolute;
   top: 0;
 }
 
-.c19::before {
+.c18::before {
   border-left: 0.6rem solid transparent;
   border-right: 0.6rem solid transparent;
   border-top: 0.6rem solid #46b0ed;
   left: 0;
 }
 
-.c19::after {
+.c18::after {
   border-left: calc(0.6rem - 0.2rem) solid transparent;
   border-right: calc(0.6rem - 0.2rem) solid transparent;
   border-top: calc(0.6rem - 0.2rem) solid white;
   left: 0.2rem;
 }
 
-.c43 {
+.c42 {
   color: #6E747A;
   display: block;
   font-size: 1.4rem;
@@ -347,29 +347,24 @@ exports[`Search Page renders empty results message 1`] = `
   padding: 0px;
 }
 
-.c42 {
+.c41 {
   list-style: none;
   margin-bottom: 8px;
   text-align: center;
 }
 
-.c4 {
-  -webkit-animation: iECmZH 0.8s infinite linear;
-  animation: iECmZH 0.8s infinite linear;
-}
-
-.c12 {
+.c11 {
   list-style: none;
   min-width: 20rem;
   text-align: right;
 }
 
-.c16 {
+.c15 {
   color: #777777;
   font-size: 1.4rem;
 }
 
-.c36 {
+.c35 {
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -389,12 +384,12 @@ exports[`Search Page renders empty results message 1`] = `
   width: 48px;
 }
 
-.c36:hover,
-.c36:focus {
+.c35:hover,
+.c35:focus {
   opacity: 1;
 }
 
-.c41 {
+.c40 {
   box-sizing: border-box;
   padding-left: 0px;
   padding-right: 8px;
@@ -411,7 +406,7 @@ exports[`Search Page renders empty results message 1`] = `
   justify-content: center;
 }
 
-.c24.c24.c24 {
+.c23.c23.c23 {
   border: none;
   border-bottom: 2px solid #46B0ED;
   border-radius: 0;
@@ -422,11 +417,11 @@ exports[`Search Page renders empty results message 1`] = `
   padding: 0;
 }
 
-.c25.c25 {
+.c24.c24 {
   padding: 0 2rem;
 }
 
-.c20 {
+.c19 {
   box-sizing: border-box;
   width: 100%;
   margin-left: auto;
@@ -437,7 +432,7 @@ exports[`Search Page renders empty results message 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c38 {
+  .c37 {
     -webkit-order: 2;
     -ms-flex-order: 2;
     order: 2;
@@ -445,13 +440,13 @@ exports[`Search Page renders empty results message 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c39 {
+  .c38 {
     width: 25%;
   }
 }
 
 @media screen and (min-width:40em) {
-  .c26 {
+  .c25 {
     -webkit-box-pack: center;
     -webkit-justify-content: center;
     -ms-flex-pack: center;
@@ -460,7 +455,7 @@ exports[`Search Page renders empty results message 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c26 {
+  .c25 {
     -webkit-box-pack: start;
     -webkit-justify-content: flex-start;
     -ms-flex-pack: start;
@@ -469,7 +464,7 @@ exports[`Search Page renders empty results message 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c30 {
+  .c29 {
     -webkit-flex-direction: row;
     -ms-flex-direction: row;
     flex-direction: row;
@@ -477,7 +472,7 @@ exports[`Search Page renders empty results message 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c30 {
+  .c29 {
     -webkit-align-items: flex-start;
     -webkit-box-align: flex-start;
     -ms-flex-align: flex-start;
@@ -486,7 +481,7 @@ exports[`Search Page renders empty results message 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c33 {
+  .c32 {
     -webkit-box-pack: start;
     -webkit-justify-content: flex-start;
     -ms-flex-pack: start;
@@ -495,25 +490,25 @@ exports[`Search Page renders empty results message 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c34 {
+  .c33 {
     text-align: left;
   }
 }
 
 @media screen and (min-width:52em) {
-  .c40 {
+  .c39 {
     text-align: left;
   }
 }
 
 @media screen and (min-width:52em) {
-  .c32 {
+  .c31 {
     width: 33.33333333333333%;
   }
 }
 
 @media screen and (min-width:52em) {
-  .c35 {
+  .c34 {
     -webkit-order: 3;
     -ms-flex-order: 3;
     order: 3;
@@ -521,49 +516,49 @@ exports[`Search Page renders empty results message 1`] = `
 }
 
 @media screen and (max-width:40em) {
-  .c5 {
+  .c4 {
     display: none;
   }
 }
 
 @media screen and (min-width:40em) and (max-width:52em) {
-  .c9 {
+  .c8 {
     display: none;
   }
 }
 
 @media screen and (min-width:52em) and (max-width:64em) {
-  .c9 {
+  .c8 {
     display: none;
   }
 }
 
 @media screen and (min-width:64em) {
-  .c9 {
+  .c8 {
     display: none;
   }
 }
 
 @media screen and (max-width:40em) {
-  .c17 {
+  .c16 {
     display: none;
   }
 }
 
 @media screen and (min-width:40em) and (max-width:52em) {
-  .c17 {
+  .c16 {
     display: none;
   }
 }
 
 @media screen and (min-width:52em) {
-  .c42 {
+  .c41 {
     text-align: left;
   }
 }
 
 @media screen and (min-width:40em) {
-  .c20 {
+  .c19 {
     width: 85%;
   }
 }
@@ -582,16 +577,16 @@ exports[`Search Page renders empty results message 1`] = `
       >
         <img
           alt="Open Collective logo"
-          className="c4"
+          className=""
           height="24"
           src="/static/images/opencollective-icon.svg"
           width="24"
         />
         <div
-          className="c5 c2"
+          className="c4 c2"
         >
           <div
-            className="c6"
+            className="c5"
           >
             <img
               height="16px"
@@ -601,16 +596,16 @@ exports[`Search Page renders empty results message 1`] = `
         </div>
       </a>
       <div
-        className="c7 c8 sc-bdVaJa c2"
+        className="c6 c7 sc-bdVaJa c2"
       >
         <div
-          className="c9 c2"
+          className="c8 c2"
         >
           <div
-            className="c10"
+            className="c9"
           >
             <a
-              className="c11 c2"
+              className="c10 c2"
               onClick={[Function]}
             >
               <svg
@@ -634,13 +629,13 @@ exports[`Search Page renders empty results message 1`] = `
           </div>
         </div>
         <div
-          className="c9 c2"
+          className="c8 c2"
         >
           <div
-            className="c10"
+            className="c9"
           >
             <a
-              className="c11 c2"
+              className="c10 c2"
               onClick={[Function]}
             >
               <svg
@@ -673,16 +668,16 @@ exports[`Search Page renders empty results message 1`] = `
           </div>
         </div>
         <div
-          className="c5 c2"
+          className="c4 c2"
         >
           <ul
-            className="c12 c13 c14"
+            className="c11 c12 c13"
           >
             <li
-              className="c15"
+              className="c14"
             >
               <a
-                className="c16"
+                className="c15"
                 href="/discover"
               >
                 <span>
@@ -691,10 +686,10 @@ exports[`Search Page renders empty results message 1`] = `
               </a>
             </li>
             <li
-              className="c15"
+              className="c14"
             >
               <a
-                className="c16"
+                className="c15"
                 href="/learn-more"
               >
                 <span>
@@ -703,10 +698,10 @@ exports[`Search Page renders empty results message 1`] = `
               </a>
             </li>
             <li
-              className="c15"
+              className="c14"
             >
               <a
-                className="c16"
+                className="c15"
                 href="https://medium.com/open-collective"
               >
                 <span>
@@ -724,10 +719,10 @@ exports[`Search Page renders empty results message 1`] = `
             onClick={[Function]}
           >
             <div
-              className="c17 c2"
+              className="c16 c2"
             >
               <p
-                className="LoginTopBarProfileButton-name c18"
+                className="LoginTopBarProfileButton-name c17"
                 color="#46b0ed"
                 display="inline-block"
                 fontSize="1.2rem"
@@ -736,7 +731,7 @@ exports[`Search Page renders empty results message 1`] = `
               />
             </div>
             <div
-              className="c19"
+              className="c18"
               color="#46b0ed"
               display="inline-block"
               height="0.6rem"
@@ -752,10 +747,10 @@ exports[`Search Page renders empty results message 1`] = `
     className="jsx-1238847522"
   >
     <div
-      className="c20"
+      className="c19"
     >
       <div
-        className="c21"
+        className="c20"
       >
         <form
           method="GET"
@@ -771,10 +766,10 @@ exports[`Search Page renders empty results message 1`] = `
               Search Open Collective
             </label>
             <div
-              className="c22 c23 sc-bdVaJa c2"
+              className="c21 c22 sc-bdVaJa c2"
             >
               <input
-                className="c24 form-control"
+                className="c23 form-control"
                 defaultValue="test"
                 id="search"
                 name="q"
@@ -782,7 +777,7 @@ exports[`Search Page renders empty results message 1`] = `
                 type="search"
               />
               <button
-                className="jsx-2820878800 jsx-1599314605 Button blue c25"
+                className="jsx-2820878800 jsx-1599314605 Button blue c24"
                 onClick={[Function]}
                 type="submit"
               >
@@ -795,10 +790,10 @@ exports[`Search Page renders empty results message 1`] = `
         </form>
       </div>
       <div
-        className="c26 c2 sc-bdVaJa c2"
+        className="c25 c2 sc-bdVaJa c2"
       >
         <div
-          className="c27 c28 sc-bdVaJa c2"
+          className="c26 c27 sc-bdVaJa c2"
         >
           <p>
             <em>
@@ -812,17 +807,17 @@ exports[`Search Page renders empty results message 1`] = `
     </div>
   </main>
   <div
-    className="c29"
+    className="c28"
     id="footer"
   >
     <div
-      className="c30 c31 sc-bdVaJa c2"
+      className="c29 c30 sc-bdVaJa c2"
     >
       <div
-        className="c32"
+        className="c31"
       >
         <div
-          className="c33 c2 sc-bdVaJa c2"
+          className="c32 c2 sc-bdVaJa c2"
         >
           <object
             data="/static/images/opencollectivelogo-footer.svg"
@@ -831,7 +826,7 @@ exports[`Search Page renders empty results message 1`] = `
           />
         </div>
         <p
-          className="c34"
+          className="c33"
           color="#6E747A"
           fontSize="1.4rem"
         >
@@ -839,10 +834,10 @@ exports[`Search Page renders empty results message 1`] = `
         </p>
       </div>
       <div
-        className="c35"
+        className="c34"
       >
         <a
-          className="c36"
+          className="c35"
           href="https://medium.com/open-collective"
         >
           <svg
@@ -860,7 +855,7 @@ exports[`Search Page renders empty results message 1`] = `
           </svg>
         </a>
         <a
-          className="c36"
+          className="c35"
           href="https://twitter.com/opencollect"
         >
           <svg
@@ -910,7 +905,7 @@ exports[`Search Page renders empty results message 1`] = `
           </svg>
         </a>
         <a
-          className="c36"
+          className="c35"
           href="https://github.com/opencollective"
         >
           <svg
@@ -960,7 +955,7 @@ exports[`Search Page renders empty results message 1`] = `
           </svg>
         </a>
         <a
-          className="c36"
+          className="c35"
           href="https://slack.opencollective.com"
         >
           <svg
@@ -987,7 +982,7 @@ exports[`Search Page renders empty results message 1`] = `
           </svg>
         </a>
         <a
-          className="c36"
+          className="c35"
           href="mailto:info@opencollective.com"
         >
           <svg
@@ -1038,13 +1033,13 @@ exports[`Search Page renders empty results message 1`] = `
         </a>
       </div>
       <nav
-        className="c37 c38"
+        className="c36 c37"
       >
         <div
-          className="c39"
+          className="c38"
         >
           <p
-            className="c40"
+            className="c39"
             color="#C2C6CC"
             fontSize="1.2rem"
             letterSpacing="1px"
@@ -1052,13 +1047,13 @@ exports[`Search Page renders empty results message 1`] = `
             PLATFORM
           </p>
           <ul
-            className="c41"
+            className="c40"
           >
             <li
-              className="c42"
+              className="c41"
             >
               <a
-                className="c43"
+                className="c42"
                 color="#6E747A"
                 display="block"
                 fontSize="1.4rem"
@@ -1069,10 +1064,10 @@ exports[`Search Page renders empty results message 1`] = `
               </a>
             </li>
             <li
-              className="c42"
+              className="c41"
             >
               <a
-                className="c43"
+                className="c42"
                 color="#6E747A"
                 display="block"
                 fontSize="1.4rem"
@@ -1083,10 +1078,10 @@ exports[`Search Page renders empty results message 1`] = `
               </a>
             </li>
             <li
-              className="c42"
+              className="c41"
             >
               <a
-                className="c43"
+                className="c42"
                 color="#6E747A"
                 display="block"
                 fontSize="1.4rem"
@@ -1097,10 +1092,10 @@ exports[`Search Page renders empty results message 1`] = `
               </a>
             </li>
             <li
-              className="c42"
+              className="c41"
             >
               <a
-                className="c43"
+                className="c42"
                 color="#6E747A"
                 display="block"
                 fontSize="1.4rem"
@@ -1111,10 +1106,10 @@ exports[`Search Page renders empty results message 1`] = `
               </a>
             </li>
             <li
-              className="c42"
+              className="c41"
             >
               <a
-                className="c43"
+                className="c42"
                 color="#6E747A"
                 display="block"
                 fontSize="1.4rem"
@@ -1127,10 +1122,10 @@ exports[`Search Page renders empty results message 1`] = `
           </ul>
         </div>
         <div
-          className="c39"
+          className="c38"
         >
           <p
-            className="c40"
+            className="c39"
             color="#C2C6CC"
             fontSize="1.2rem"
             letterSpacing="1px"
@@ -1138,13 +1133,13 @@ exports[`Search Page renders empty results message 1`] = `
             JOIN THE MOVEMENT
           </p>
           <ul
-            className="c41"
+            className="c40"
           >
             <li
-              className="c42"
+              className="c41"
             >
               <a
-                className="c43"
+                className="c42"
                 color="#6E747A"
                 display="block"
                 fontSize="1.4rem"
@@ -1155,10 +1150,10 @@ exports[`Search Page renders empty results message 1`] = `
               </a>
             </li>
             <li
-              className="c42"
+              className="c41"
             >
               <a
-                className="c43"
+                className="c42"
                 color="#6E747A"
                 display="block"
                 fontSize="1.4rem"
@@ -1169,10 +1164,10 @@ exports[`Search Page renders empty results message 1`] = `
               </a>
             </li>
             <li
-              className="c42"
+              className="c41"
             >
               <a
-                className="c43"
+                className="c42"
                 color="#6E747A"
                 display="block"
                 fontSize="1.4rem"
@@ -1185,10 +1180,10 @@ exports[`Search Page renders empty results message 1`] = `
           </ul>
         </div>
         <div
-          className="c39"
+          className="c38"
         >
           <p
-            className="c40"
+            className="c39"
             color="#C2C6CC"
             fontSize="1.2rem"
             letterSpacing="1px"
@@ -1196,13 +1191,13 @@ exports[`Search Page renders empty results message 1`] = `
             COMMUNITY
           </p>
           <ul
-            className="c41"
+            className="c40"
           >
             <li
-              className="c42"
+              className="c41"
             >
               <a
-                className="c43"
+                className="c42"
                 color="#6E747A"
                 display="block"
                 fontSize="1.4rem"
@@ -1213,10 +1208,10 @@ exports[`Search Page renders empty results message 1`] = `
               </a>
             </li>
             <li
-              className="c42"
+              className="c41"
             >
               <a
-                className="c43"
+                className="c42"
                 color="#6E747A"
                 display="block"
                 fontSize="1.4rem"
@@ -1227,10 +1222,10 @@ exports[`Search Page renders empty results message 1`] = `
               </a>
             </li>
             <li
-              className="c42"
+              className="c41"
             >
               <a
-                className="c43"
+                className="c42"
                 color="#6E747A"
                 display="block"
                 fontSize="1.4rem"
@@ -1241,10 +1236,10 @@ exports[`Search Page renders empty results message 1`] = `
               </a>
             </li>
             <li
-              className="c42"
+              className="c41"
             >
               <a
-                className="c43"
+                className="c42"
                 color="#6E747A"
                 display="block"
                 fontSize="1.4rem"
@@ -1255,10 +1250,10 @@ exports[`Search Page renders empty results message 1`] = `
               </a>
             </li>
             <li
-              className="c42"
+              className="c41"
             >
               <a
-                className="c43"
+                className="c42"
                 color="#6E747A"
                 display="block"
                 fontSize="1.4rem"
@@ -1271,10 +1266,10 @@ exports[`Search Page renders empty results message 1`] = `
           </ul>
         </div>
         <div
-          className="c39"
+          className="c38"
         >
           <p
-            className="c40"
+            className="c39"
             color="#C2C6CC"
             fontSize="1.2rem"
             letterSpacing="1px"
@@ -1282,13 +1277,13 @@ exports[`Search Page renders empty results message 1`] = `
             COMPANY
           </p>
           <ul
-            className="c41"
+            className="c40"
           >
             <li
-              className="c42"
+              className="c41"
             >
               <a
-                className="c43"
+                className="c42"
                 color="#6E747A"
                 display="block"
                 fontSize="1.4rem"
@@ -1299,10 +1294,10 @@ exports[`Search Page renders empty results message 1`] = `
               </a>
             </li>
             <li
-              className="c42"
+              className="c41"
             >
               <a
-                className="c43"
+                className="c42"
                 color="#6E747A"
                 display="block"
                 fontSize="1.4rem"
@@ -1313,10 +1308,10 @@ exports[`Search Page renders empty results message 1`] = `
               </a>
             </li>
             <li
-              className="c42"
+              className="c41"
             >
               <a
-                className="c43"
+                className="c42"
                 color="#6E747A"
                 display="block"
                 fontSize="1.4rem"
@@ -1327,10 +1322,10 @@ exports[`Search Page renders empty results message 1`] = `
               </a>
             </li>
             <li
-              className="c42"
+              className="c41"
             >
               <a
-                className="c43"
+                className="c42"
                 color="#6E747A"
                 display="block"
                 fontSize="1.4rem"
@@ -1341,10 +1336,10 @@ exports[`Search Page renders empty results message 1`] = `
               </a>
             </li>
             <li
-              className="c42"
+              className="c41"
             >
               <a
-                className="c43"
+                className="c42"
                 color="#6E747A"
                 display="block"
                 fontSize="1.4rem"
@@ -2665,57 +2660,57 @@ exports[`Search Page renders loading grid SVG 1`] = `
   box-sizing: border-box;
 }
 
-.c6 {
+.c5 {
   box-sizing: border-box;
   margin-left: 8px;
   margin-right: 8px;
 }
 
-.c8 {
+.c7 {
   box-sizing: border-box;
   -webkit-flex: 1 1 auto;
   -ms-flex: 1 1 auto;
   flex: 1 1 auto;
 }
 
-.c10 {
+.c9 {
   box-sizing: border-box;
   margin-left: 16px;
   margin-right: 16px;
 }
 
-.c14 {
+.c13 {
   margin: 0;
   box-sizing: border-box;
   margin: 0px;
   padding: 0px;
 }
 
-.c15 {
+.c14 {
   box-sizing: border-box;
   padding-left: 16px;
   padding-right: 16px;
 }
 
-.c21 {
+.c20 {
   box-sizing: border-box;
   width: 100%;
 }
 
-.c23 {
+.c22 {
   box-sizing: border-box;
   margin-top: 16px;
   margin-bottom: 16px;
 }
 
-.c28 {
+.c27 {
   box-sizing: border-box;
   width: 100%;
   padding-top: 16px;
   padding-bottom: 16px;
 }
 
-.c31 {
+.c30 {
   max-width: 1300px;
   box-sizing: border-box;
   margin-left: auto;
@@ -2723,7 +2718,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
   padding: 8px;
 }
 
-.c38 {
+.c37 {
   box-sizing: border-box;
   margin-top: 16px;
   -webkit-flex: 1 1 auto;
@@ -2734,7 +2729,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
   order: 3;
 }
 
-.c39 {
+.c38 {
   box-sizing: border-box;
   width: 50%;
   margin-bottom: 16px;
@@ -2769,7 +2764,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
   align-items: center;
 }
 
-.c7 {
+.c6 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -2784,14 +2779,14 @@ exports[`Search Page renders loading grid SVG 1`] = `
   justify-content: flex-end;
 }
 
-.c11 {
+.c10 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
 }
 
-.c13 {
+.c12 {
   margin: 0;
   display: -webkit-box;
   display: -webkit-flex;
@@ -2803,7 +2798,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
   justify-content: space-around;
 }
 
-.c22 {
+.c21 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -2814,7 +2809,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
   align-items: flex-end;
 }
 
-.c26 {
+.c25 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -2828,7 +2823,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
   justify-content: center;
 }
 
-.c27 {
+.c26 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -2839,7 +2834,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
   justify-content: center;
 }
 
-.c30 {
+.c29 {
   max-width: 1300px;
   display: -webkit-box;
   display: -webkit-flex;
@@ -2858,7 +2853,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
   justify-content: space-between;
 }
 
-.c33 {
+.c32 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -2869,7 +2864,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
   justify-content: center;
 }
 
-.c37 {
+.c36 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -2883,7 +2878,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
   justify-content: center;
 }
 
-.c18 {
+.c17 {
   color: #46b0ed;
   display: inline-block;
   font-size: 1.2rem;
@@ -2897,7 +2892,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
   margin-right: 8px;
 }
 
-.c34 {
+.c33 {
   color: #6E747A;
   font-size: 1.4rem;
   margin: 0px;
@@ -2906,7 +2901,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
   text-align: center;
 }
 
-.c40 {
+.c39 {
   color: #C2C6CC;
   font-size: 1.2rem;
   -webkit-letter-spacing: 1px;
@@ -2918,7 +2913,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
   text-align: center;
 }
 
-.c29 {
+.c28 {
   background-color: white;
   border-top: 1px solid #aaaaaa;
   bottom: 0px;
@@ -2927,7 +2922,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
   width: 100%;
 }
 
-.c32 {
+.c31 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -2940,7 +2935,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
   width: 100%;
 }
 
-.c35 {
+.c34 {
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -2962,35 +2957,35 @@ exports[`Search Page renders loading grid SVG 1`] = `
   width: 100%;
 }
 
-.c19 {
+.c18 {
   position: relative;
   display: inline-block;
   height: 0.6rem;
   width: 1.4rem;
 }
 
-.c19::before,
-.c19::after {
+.c18::before,
+.c18::after {
   content: '';
   position: absolute;
   top: 0;
 }
 
-.c19::before {
+.c18::before {
   border-left: 0.6rem solid transparent;
   border-right: 0.6rem solid transparent;
   border-top: 0.6rem solid #46b0ed;
   left: 0;
 }
 
-.c19::after {
+.c18::after {
   border-left: calc(0.6rem - 0.2rem) solid transparent;
   border-right: calc(0.6rem - 0.2rem) solid transparent;
   border-top: calc(0.6rem - 0.2rem) solid white;
   left: 0.2rem;
 }
 
-.c43 {
+.c42 {
   color: #6E747A;
   display: block;
   font-size: 1.4rem;
@@ -2999,29 +2994,24 @@ exports[`Search Page renders loading grid SVG 1`] = `
   padding: 0px;
 }
 
-.c42 {
+.c41 {
   list-style: none;
   margin-bottom: 8px;
   text-align: center;
 }
 
-.c4 {
-  -webkit-animation: iECmZH 0.8s infinite linear;
-  animation: iECmZH 0.8s infinite linear;
-}
-
-.c12 {
+.c11 {
   list-style: none;
   min-width: 20rem;
   text-align: right;
 }
 
-.c16 {
+.c15 {
   color: #777777;
   font-size: 1.4rem;
 }
 
-.c36 {
+.c35 {
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -3041,12 +3031,12 @@ exports[`Search Page renders loading grid SVG 1`] = `
   width: 48px;
 }
 
-.c36:hover,
-.c36:focus {
+.c35:hover,
+.c35:focus {
   opacity: 1;
 }
 
-.c41 {
+.c40 {
   box-sizing: border-box;
   padding-left: 0px;
   padding-right: 8px;
@@ -3063,7 +3053,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
   justify-content: center;
 }
 
-.c24.c24.c24 {
+.c23.c23.c23 {
   border: none;
   border-bottom: 2px solid #46B0ED;
   border-radius: 0;
@@ -3074,11 +3064,11 @@ exports[`Search Page renders loading grid SVG 1`] = `
   padding: 0;
 }
 
-.c25.c25 {
+.c24.c24 {
   padding: 0 2rem;
 }
 
-.c20 {
+.c19 {
   box-sizing: border-box;
   width: 100%;
   margin-left: auto;
@@ -3089,7 +3079,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c38 {
+  .c37 {
     -webkit-order: 2;
     -ms-flex-order: 2;
     order: 2;
@@ -3097,13 +3087,13 @@ exports[`Search Page renders loading grid SVG 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c39 {
+  .c38 {
     width: 25%;
   }
 }
 
 @media screen and (min-width:40em) {
-  .c26 {
+  .c25 {
     -webkit-box-pack: center;
     -webkit-justify-content: center;
     -ms-flex-pack: center;
@@ -3112,7 +3102,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c26 {
+  .c25 {
     -webkit-box-pack: start;
     -webkit-justify-content: flex-start;
     -ms-flex-pack: start;
@@ -3121,7 +3111,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c30 {
+  .c29 {
     -webkit-flex-direction: row;
     -ms-flex-direction: row;
     flex-direction: row;
@@ -3129,7 +3119,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c30 {
+  .c29 {
     -webkit-align-items: flex-start;
     -webkit-box-align: flex-start;
     -ms-flex-align: flex-start;
@@ -3138,7 +3128,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c33 {
+  .c32 {
     -webkit-box-pack: start;
     -webkit-justify-content: flex-start;
     -ms-flex-pack: start;
@@ -3147,25 +3137,25 @@ exports[`Search Page renders loading grid SVG 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c34 {
+  .c33 {
     text-align: left;
   }
 }
 
 @media screen and (min-width:52em) {
-  .c40 {
+  .c39 {
     text-align: left;
   }
 }
 
 @media screen and (min-width:52em) {
-  .c32 {
+  .c31 {
     width: 33.33333333333333%;
   }
 }
 
 @media screen and (min-width:52em) {
-  .c35 {
+  .c34 {
     -webkit-order: 3;
     -ms-flex-order: 3;
     order: 3;
@@ -3173,49 +3163,49 @@ exports[`Search Page renders loading grid SVG 1`] = `
 }
 
 @media screen and (max-width:40em) {
-  .c5 {
+  .c4 {
     display: none;
   }
 }
 
 @media screen and (min-width:40em) and (max-width:52em) {
-  .c9 {
+  .c8 {
     display: none;
   }
 }
 
 @media screen and (min-width:52em) and (max-width:64em) {
-  .c9 {
+  .c8 {
     display: none;
   }
 }
 
 @media screen and (min-width:64em) {
-  .c9 {
+  .c8 {
     display: none;
   }
 }
 
 @media screen and (max-width:40em) {
-  .c17 {
+  .c16 {
     display: none;
   }
 }
 
 @media screen and (min-width:40em) and (max-width:52em) {
-  .c17 {
+  .c16 {
     display: none;
   }
 }
 
 @media screen and (min-width:52em) {
-  .c42 {
+  .c41 {
     text-align: left;
   }
 }
 
 @media screen and (min-width:40em) {
-  .c20 {
+  .c19 {
     width: 85%;
   }
 }
@@ -3234,16 +3224,16 @@ exports[`Search Page renders loading grid SVG 1`] = `
       >
         <img
           alt="Open Collective logo"
-          className="c4"
+          className=""
           height="24"
           src="/static/images/opencollective-icon.svg"
           width="24"
         />
         <div
-          className="c5 c2"
+          className="c4 c2"
         >
           <div
-            className="c6"
+            className="c5"
           >
             <img
               height="16px"
@@ -3253,16 +3243,16 @@ exports[`Search Page renders loading grid SVG 1`] = `
         </div>
       </a>
       <div
-        className="c7 c8 sc-bdVaJa c2"
+        className="c6 c7 sc-bdVaJa c2"
       >
         <div
-          className="c9 c2"
+          className="c8 c2"
         >
           <div
-            className="c10"
+            className="c9"
           >
             <a
-              className="c11 c2"
+              className="c10 c2"
               onClick={[Function]}
             >
               <svg
@@ -3286,13 +3276,13 @@ exports[`Search Page renders loading grid SVG 1`] = `
           </div>
         </div>
         <div
-          className="c9 c2"
+          className="c8 c2"
         >
           <div
-            className="c10"
+            className="c9"
           >
             <a
-              className="c11 c2"
+              className="c10 c2"
               onClick={[Function]}
             >
               <svg
@@ -3325,16 +3315,16 @@ exports[`Search Page renders loading grid SVG 1`] = `
           </div>
         </div>
         <div
-          className="c5 c2"
+          className="c4 c2"
         >
           <ul
-            className="c12 c13 c14"
+            className="c11 c12 c13"
           >
             <li
-              className="c15"
+              className="c14"
             >
               <a
-                className="c16"
+                className="c15"
                 href="/discover"
               >
                 <span>
@@ -3343,10 +3333,10 @@ exports[`Search Page renders loading grid SVG 1`] = `
               </a>
             </li>
             <li
-              className="c15"
+              className="c14"
             >
               <a
-                className="c16"
+                className="c15"
                 href="/learn-more"
               >
                 <span>
@@ -3355,10 +3345,10 @@ exports[`Search Page renders loading grid SVG 1`] = `
               </a>
             </li>
             <li
-              className="c15"
+              className="c14"
             >
               <a
-                className="c16"
+                className="c15"
                 href="https://medium.com/open-collective"
               >
                 <span>
@@ -3376,10 +3366,10 @@ exports[`Search Page renders loading grid SVG 1`] = `
             onClick={[Function]}
           >
             <div
-              className="c17 c2"
+              className="c16 c2"
             >
               <p
-                className="LoginTopBarProfileButton-name c18"
+                className="LoginTopBarProfileButton-name c17"
                 color="#46b0ed"
                 display="inline-block"
                 fontSize="1.2rem"
@@ -3388,7 +3378,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
               />
             </div>
             <div
-              className="c19"
+              className="c18"
               color="#46b0ed"
               display="inline-block"
               height="0.6rem"
@@ -3404,10 +3394,10 @@ exports[`Search Page renders loading grid SVG 1`] = `
     className="jsx-1238847522"
   >
     <div
-      className="c20"
+      className="c19"
     >
       <div
-        className="c21"
+        className="c20"
       >
         <form
           method="GET"
@@ -3423,10 +3413,10 @@ exports[`Search Page renders loading grid SVG 1`] = `
               Search Open Collective
             </label>
             <div
-              className="c22 c23 sc-bdVaJa c2"
+              className="c21 c22 sc-bdVaJa c2"
             >
               <input
-                className="c24 form-control"
+                className="c23 form-control"
                 defaultValue=""
                 id="search"
                 name="q"
@@ -3434,7 +3424,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
                 type="search"
               />
               <button
-                className="jsx-2820878800 jsx-1599314605 Button blue c25"
+                className="jsx-2820878800 jsx-1599314605 Button blue c24"
                 onClick={[Function]}
                 type="submit"
               >
@@ -3447,10 +3437,10 @@ exports[`Search Page renders loading grid SVG 1`] = `
         </form>
       </div>
       <div
-        className="c26 c2 sc-bdVaJa c2"
+        className="c25 c2 sc-bdVaJa c2"
       >
         <div
-          className="c27 c28 sc-bdVaJa c2"
+          className="c26 c27 sc-bdVaJa c2"
         >
           <svg
             fill="#46B0ED"
@@ -3592,17 +3582,17 @@ exports[`Search Page renders loading grid SVG 1`] = `
     </div>
   </main>
   <div
-    className="c29"
+    className="c28"
     id="footer"
   >
     <div
-      className="c30 c31 sc-bdVaJa c2"
+      className="c29 c30 sc-bdVaJa c2"
     >
       <div
-        className="c32"
+        className="c31"
       >
         <div
-          className="c33 c2 sc-bdVaJa c2"
+          className="c32 c2 sc-bdVaJa c2"
         >
           <object
             data="/static/images/opencollectivelogo-footer.svg"
@@ -3611,7 +3601,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
           />
         </div>
         <p
-          className="c34"
+          className="c33"
           color="#6E747A"
           fontSize="1.4rem"
         >
@@ -3619,10 +3609,10 @@ exports[`Search Page renders loading grid SVG 1`] = `
         </p>
       </div>
       <div
-        className="c35"
+        className="c34"
       >
         <a
-          className="c36"
+          className="c35"
           href="https://medium.com/open-collective"
         >
           <svg
@@ -3640,7 +3630,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
           </svg>
         </a>
         <a
-          className="c36"
+          className="c35"
           href="https://twitter.com/opencollect"
         >
           <svg
@@ -3690,7 +3680,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
           </svg>
         </a>
         <a
-          className="c36"
+          className="c35"
           href="https://github.com/opencollective"
         >
           <svg
@@ -3740,7 +3730,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
           </svg>
         </a>
         <a
-          className="c36"
+          className="c35"
           href="https://slack.opencollective.com"
         >
           <svg
@@ -3767,7 +3757,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
           </svg>
         </a>
         <a
-          className="c36"
+          className="c35"
           href="mailto:info@opencollective.com"
         >
           <svg
@@ -3818,13 +3808,13 @@ exports[`Search Page renders loading grid SVG 1`] = `
         </a>
       </div>
       <nav
-        className="c37 c38"
+        className="c36 c37"
       >
         <div
-          className="c39"
+          className="c38"
         >
           <p
-            className="c40"
+            className="c39"
             color="#C2C6CC"
             fontSize="1.2rem"
             letterSpacing="1px"
@@ -3832,13 +3822,13 @@ exports[`Search Page renders loading grid SVG 1`] = `
             PLATFORM
           </p>
           <ul
-            className="c41"
+            className="c40"
           >
             <li
-              className="c42"
+              className="c41"
             >
               <a
-                className="c43"
+                className="c42"
                 color="#6E747A"
                 display="block"
                 fontSize="1.4rem"
@@ -3849,10 +3839,10 @@ exports[`Search Page renders loading grid SVG 1`] = `
               </a>
             </li>
             <li
-              className="c42"
+              className="c41"
             >
               <a
-                className="c43"
+                className="c42"
                 color="#6E747A"
                 display="block"
                 fontSize="1.4rem"
@@ -3863,10 +3853,10 @@ exports[`Search Page renders loading grid SVG 1`] = `
               </a>
             </li>
             <li
-              className="c42"
+              className="c41"
             >
               <a
-                className="c43"
+                className="c42"
                 color="#6E747A"
                 display="block"
                 fontSize="1.4rem"
@@ -3877,10 +3867,10 @@ exports[`Search Page renders loading grid SVG 1`] = `
               </a>
             </li>
             <li
-              className="c42"
+              className="c41"
             >
               <a
-                className="c43"
+                className="c42"
                 color="#6E747A"
                 display="block"
                 fontSize="1.4rem"
@@ -3891,10 +3881,10 @@ exports[`Search Page renders loading grid SVG 1`] = `
               </a>
             </li>
             <li
-              className="c42"
+              className="c41"
             >
               <a
-                className="c43"
+                className="c42"
                 color="#6E747A"
                 display="block"
                 fontSize="1.4rem"
@@ -3907,10 +3897,10 @@ exports[`Search Page renders loading grid SVG 1`] = `
           </ul>
         </div>
         <div
-          className="c39"
+          className="c38"
         >
           <p
-            className="c40"
+            className="c39"
             color="#C2C6CC"
             fontSize="1.2rem"
             letterSpacing="1px"
@@ -3918,13 +3908,13 @@ exports[`Search Page renders loading grid SVG 1`] = `
             JOIN THE MOVEMENT
           </p>
           <ul
-            className="c41"
+            className="c40"
           >
             <li
-              className="c42"
+              className="c41"
             >
               <a
-                className="c43"
+                className="c42"
                 color="#6E747A"
                 display="block"
                 fontSize="1.4rem"
@@ -3935,10 +3925,10 @@ exports[`Search Page renders loading grid SVG 1`] = `
               </a>
             </li>
             <li
-              className="c42"
+              className="c41"
             >
               <a
-                className="c43"
+                className="c42"
                 color="#6E747A"
                 display="block"
                 fontSize="1.4rem"
@@ -3949,10 +3939,10 @@ exports[`Search Page renders loading grid SVG 1`] = `
               </a>
             </li>
             <li
-              className="c42"
+              className="c41"
             >
               <a
-                className="c43"
+                className="c42"
                 color="#6E747A"
                 display="block"
                 fontSize="1.4rem"
@@ -3965,10 +3955,10 @@ exports[`Search Page renders loading grid SVG 1`] = `
           </ul>
         </div>
         <div
-          className="c39"
+          className="c38"
         >
           <p
-            className="c40"
+            className="c39"
             color="#C2C6CC"
             fontSize="1.2rem"
             letterSpacing="1px"
@@ -3976,13 +3966,13 @@ exports[`Search Page renders loading grid SVG 1`] = `
             COMMUNITY
           </p>
           <ul
-            className="c41"
+            className="c40"
           >
             <li
-              className="c42"
+              className="c41"
             >
               <a
-                className="c43"
+                className="c42"
                 color="#6E747A"
                 display="block"
                 fontSize="1.4rem"
@@ -3993,10 +3983,10 @@ exports[`Search Page renders loading grid SVG 1`] = `
               </a>
             </li>
             <li
-              className="c42"
+              className="c41"
             >
               <a
-                className="c43"
+                className="c42"
                 color="#6E747A"
                 display="block"
                 fontSize="1.4rem"
@@ -4007,10 +3997,10 @@ exports[`Search Page renders loading grid SVG 1`] = `
               </a>
             </li>
             <li
-              className="c42"
+              className="c41"
             >
               <a
-                className="c43"
+                className="c42"
                 color="#6E747A"
                 display="block"
                 fontSize="1.4rem"
@@ -4021,10 +4011,10 @@ exports[`Search Page renders loading grid SVG 1`] = `
               </a>
             </li>
             <li
-              className="c42"
+              className="c41"
             >
               <a
-                className="c43"
+                className="c42"
                 color="#6E747A"
                 display="block"
                 fontSize="1.4rem"
@@ -4035,10 +4025,10 @@ exports[`Search Page renders loading grid SVG 1`] = `
               </a>
             </li>
             <li
-              className="c42"
+              className="c41"
             >
               <a
-                className="c43"
+                className="c42"
                 color="#6E747A"
                 display="block"
                 fontSize="1.4rem"
@@ -4051,10 +4041,10 @@ exports[`Search Page renders loading grid SVG 1`] = `
           </ul>
         </div>
         <div
-          className="c39"
+          className="c38"
         >
           <p
-            className="c40"
+            className="c39"
             color="#C2C6CC"
             fontSize="1.2rem"
             letterSpacing="1px"
@@ -4062,13 +4052,13 @@ exports[`Search Page renders loading grid SVG 1`] = `
             COMPANY
           </p>
           <ul
-            className="c41"
+            className="c40"
           >
             <li
-              className="c42"
+              className="c41"
             >
               <a
-                className="c43"
+                className="c42"
                 color="#6E747A"
                 display="block"
                 fontSize="1.4rem"
@@ -4079,10 +4069,10 @@ exports[`Search Page renders loading grid SVG 1`] = `
               </a>
             </li>
             <li
-              className="c42"
+              className="c41"
             >
               <a
-                className="c43"
+                className="c42"
                 color="#6E747A"
                 display="block"
                 fontSize="1.4rem"
@@ -4093,10 +4083,10 @@ exports[`Search Page renders loading grid SVG 1`] = `
               </a>
             </li>
             <li
-              className="c42"
+              className="c41"
             >
               <a
-                className="c43"
+                className="c42"
                 color="#6E747A"
                 display="block"
                 fontSize="1.4rem"
@@ -4107,10 +4097,10 @@ exports[`Search Page renders loading grid SVG 1`] = `
               </a>
             </li>
             <li
-              className="c42"
+              className="c41"
             >
               <a
-                className="c43"
+                className="c42"
                 color="#6E747A"
                 display="block"
                 fontSize="1.4rem"
@@ -4121,10 +4111,10 @@ exports[`Search Page renders loading grid SVG 1`] = `
               </a>
             </li>
             <li
-              className="c42"
+              className="c41"
             >
               <a
-                className="c43"
+                className="c42"
                 color="#6E747A"
                 display="block"
                 fontSize="1.4rem"
@@ -4155,50 +4145,50 @@ exports[`Search Page renders search results with pagination 1`] = `
   box-sizing: border-box;
 }
 
-.c6 {
+.c5 {
   box-sizing: border-box;
   margin-left: 8px;
   margin-right: 8px;
 }
 
-.c8 {
+.c7 {
   box-sizing: border-box;
   -webkit-flex: 1 1 auto;
   -ms-flex: 1 1 auto;
   flex: 1 1 auto;
 }
 
-.c10 {
+.c9 {
   box-sizing: border-box;
   margin-left: 16px;
   margin-right: 16px;
 }
 
-.c14 {
+.c13 {
   margin: 0;
   box-sizing: border-box;
   margin: 0px;
   padding: 0px;
 }
 
-.c15 {
+.c14 {
   box-sizing: border-box;
   padding-left: 16px;
   padding-right: 16px;
 }
 
-.c21 {
+.c20 {
   box-sizing: border-box;
   width: 100%;
 }
 
-.c23 {
+.c22 {
   box-sizing: border-box;
   margin-top: 16px;
   margin-bottom: 16px;
 }
 
-.c31 {
+.c30 {
   max-width: 1300px;
   box-sizing: border-box;
   margin-left: auto;
@@ -4206,7 +4196,7 @@ exports[`Search Page renders search results with pagination 1`] = `
   padding: 8px;
 }
 
-.c38 {
+.c37 {
   box-sizing: border-box;
   margin-top: 16px;
   -webkit-flex: 1 1 auto;
@@ -4217,13 +4207,13 @@ exports[`Search Page renders search results with pagination 1`] = `
   order: 3;
 }
 
-.c39 {
+.c38 {
   box-sizing: border-box;
   width: 50%;
   margin-bottom: 16px;
 }
 
-.c27 {
+.c26 {
   box-sizing: border-box;
   margin-left: 8px;
   margin-right: 8px;
@@ -4260,7 +4250,7 @@ exports[`Search Page renders search results with pagination 1`] = `
   align-items: center;
 }
 
-.c7 {
+.c6 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -4275,14 +4265,14 @@ exports[`Search Page renders search results with pagination 1`] = `
   justify-content: flex-end;
 }
 
-.c11 {
+.c10 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
 }
 
-.c13 {
+.c12 {
   margin: 0;
   display: -webkit-box;
   display: -webkit-flex;
@@ -4294,7 +4284,7 @@ exports[`Search Page renders search results with pagination 1`] = `
   justify-content: space-around;
 }
 
-.c22 {
+.c21 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -4305,7 +4295,7 @@ exports[`Search Page renders search results with pagination 1`] = `
   align-items: flex-end;
 }
 
-.c26 {
+.c25 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -4319,7 +4309,7 @@ exports[`Search Page renders search results with pagination 1`] = `
   justify-content: center;
 }
 
-.c28 {
+.c27 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -4330,7 +4320,7 @@ exports[`Search Page renders search results with pagination 1`] = `
   justify-content: center;
 }
 
-.c30 {
+.c29 {
   max-width: 1300px;
   display: -webkit-box;
   display: -webkit-flex;
@@ -4349,7 +4339,7 @@ exports[`Search Page renders search results with pagination 1`] = `
   justify-content: space-between;
 }
 
-.c33 {
+.c32 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -4360,7 +4350,7 @@ exports[`Search Page renders search results with pagination 1`] = `
   justify-content: center;
 }
 
-.c37 {
+.c36 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -4374,7 +4364,7 @@ exports[`Search Page renders search results with pagination 1`] = `
   justify-content: center;
 }
 
-.c18 {
+.c17 {
   color: #46b0ed;
   display: inline-block;
   font-size: 1.2rem;
@@ -4388,7 +4378,7 @@ exports[`Search Page renders search results with pagination 1`] = `
   margin-right: 8px;
 }
 
-.c34 {
+.c33 {
   color: #6E747A;
   font-size: 1.4rem;
   margin: 0px;
@@ -4397,7 +4387,7 @@ exports[`Search Page renders search results with pagination 1`] = `
   text-align: center;
 }
 
-.c40 {
+.c39 {
   color: #C2C6CC;
   font-size: 1.2rem;
   -webkit-letter-spacing: 1px;
@@ -4409,7 +4399,7 @@ exports[`Search Page renders search results with pagination 1`] = `
   text-align: center;
 }
 
-.c29 {
+.c28 {
   background-color: white;
   border-top: 1px solid #aaaaaa;
   bottom: 0px;
@@ -4418,7 +4408,7 @@ exports[`Search Page renders search results with pagination 1`] = `
   width: 100%;
 }
 
-.c32 {
+.c31 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -4431,7 +4421,7 @@ exports[`Search Page renders search results with pagination 1`] = `
   width: 100%;
 }
 
-.c35 {
+.c34 {
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -4453,35 +4443,35 @@ exports[`Search Page renders search results with pagination 1`] = `
   width: 100%;
 }
 
-.c19 {
+.c18 {
   position: relative;
   display: inline-block;
   height: 0.6rem;
   width: 1.4rem;
 }
 
-.c19::before,
-.c19::after {
+.c18::before,
+.c18::after {
   content: '';
   position: absolute;
   top: 0;
 }
 
-.c19::before {
+.c18::before {
   border-left: 0.6rem solid transparent;
   border-right: 0.6rem solid transparent;
   border-top: 0.6rem solid #46b0ed;
   left: 0;
 }
 
-.c19::after {
+.c18::after {
   border-left: calc(0.6rem - 0.2rem) solid transparent;
   border-right: calc(0.6rem - 0.2rem) solid transparent;
   border-top: calc(0.6rem - 0.2rem) solid white;
   left: 0.2rem;
 }
 
-.c43 {
+.c42 {
   color: #6E747A;
   display: block;
   font-size: 1.4rem;
@@ -4490,29 +4480,24 @@ exports[`Search Page renders search results with pagination 1`] = `
   padding: 0px;
 }
 
-.c42 {
+.c41 {
   list-style: none;
   margin-bottom: 8px;
   text-align: center;
 }
 
-.c4 {
-  -webkit-animation: iECmZH 0.8s infinite linear;
-  animation: iECmZH 0.8s infinite linear;
-}
-
-.c12 {
+.c11 {
   list-style: none;
   min-width: 20rem;
   text-align: right;
 }
 
-.c16 {
+.c15 {
   color: #777777;
   font-size: 1.4rem;
 }
 
-.c36 {
+.c35 {
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -4532,12 +4517,12 @@ exports[`Search Page renders search results with pagination 1`] = `
   width: 48px;
 }
 
-.c36:hover,
-.c36:focus {
+.c35:hover,
+.c35:focus {
   opacity: 1;
 }
 
-.c41 {
+.c40 {
   box-sizing: border-box;
   padding-left: 0px;
   padding-right: 8px;
@@ -4554,7 +4539,7 @@ exports[`Search Page renders search results with pagination 1`] = `
   justify-content: center;
 }
 
-.c24.c24.c24 {
+.c23.c23.c23 {
   border: none;
   border-bottom: 2px solid #46B0ED;
   border-radius: 0;
@@ -4565,11 +4550,11 @@ exports[`Search Page renders search results with pagination 1`] = `
   padding: 0;
 }
 
-.c25.c25 {
+.c24.c24 {
   padding: 0 2rem;
 }
 
-.c20 {
+.c19 {
   box-sizing: border-box;
   width: 100%;
   margin-left: auto;
@@ -4580,7 +4565,7 @@ exports[`Search Page renders search results with pagination 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c38 {
+  .c37 {
     -webkit-order: 2;
     -ms-flex-order: 2;
     order: 2;
@@ -4588,13 +4573,13 @@ exports[`Search Page renders search results with pagination 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c39 {
+  .c38 {
     width: 25%;
   }
 }
 
 @media screen and (min-width:40em) {
-  .c26 {
+  .c25 {
     -webkit-box-pack: center;
     -webkit-justify-content: center;
     -ms-flex-pack: center;
@@ -4603,7 +4588,7 @@ exports[`Search Page renders search results with pagination 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c26 {
+  .c25 {
     -webkit-box-pack: start;
     -webkit-justify-content: flex-start;
     -ms-flex-pack: start;
@@ -4612,7 +4597,7 @@ exports[`Search Page renders search results with pagination 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c30 {
+  .c29 {
     -webkit-flex-direction: row;
     -ms-flex-direction: row;
     flex-direction: row;
@@ -4620,7 +4605,7 @@ exports[`Search Page renders search results with pagination 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c30 {
+  .c29 {
     -webkit-align-items: flex-start;
     -webkit-box-align: flex-start;
     -ms-flex-align: flex-start;
@@ -4629,7 +4614,7 @@ exports[`Search Page renders search results with pagination 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c33 {
+  .c32 {
     -webkit-box-pack: start;
     -webkit-justify-content: flex-start;
     -ms-flex-pack: start;
@@ -4638,25 +4623,25 @@ exports[`Search Page renders search results with pagination 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c34 {
+  .c33 {
     text-align: left;
   }
 }
 
 @media screen and (min-width:52em) {
-  .c40 {
+  .c39 {
     text-align: left;
   }
 }
 
 @media screen and (min-width:52em) {
-  .c32 {
+  .c31 {
     width: 33.33333333333333%;
   }
 }
 
 @media screen and (min-width:52em) {
-  .c35 {
+  .c34 {
     -webkit-order: 3;
     -ms-flex-order: 3;
     order: 3;
@@ -4664,49 +4649,49 @@ exports[`Search Page renders search results with pagination 1`] = `
 }
 
 @media screen and (max-width:40em) {
-  .c5 {
+  .c4 {
     display: none;
   }
 }
 
 @media screen and (min-width:40em) and (max-width:52em) {
-  .c9 {
+  .c8 {
     display: none;
   }
 }
 
 @media screen and (min-width:52em) and (max-width:64em) {
-  .c9 {
+  .c8 {
     display: none;
   }
 }
 
 @media screen and (min-width:64em) {
-  .c9 {
+  .c8 {
     display: none;
   }
 }
 
 @media screen and (max-width:40em) {
-  .c17 {
+  .c16 {
     display: none;
   }
 }
 
 @media screen and (min-width:40em) and (max-width:52em) {
-  .c17 {
+  .c16 {
     display: none;
   }
 }
 
 @media screen and (min-width:52em) {
-  .c42 {
+  .c41 {
     text-align: left;
   }
 }
 
 @media screen and (min-width:40em) {
-  .c20 {
+  .c19 {
     width: 85%;
   }
 }
@@ -4725,16 +4710,16 @@ exports[`Search Page renders search results with pagination 1`] = `
       >
         <img
           alt="Open Collective logo"
-          className="c4"
+          className=""
           height="24"
           src="/static/images/opencollective-icon.svg"
           width="24"
         />
         <div
-          className="c5 c2"
+          className="c4 c2"
         >
           <div
-            className="c6"
+            className="c5"
           >
             <img
               height="16px"
@@ -4744,16 +4729,16 @@ exports[`Search Page renders search results with pagination 1`] = `
         </div>
       </a>
       <div
-        className="c7 c8 sc-bdVaJa c2"
+        className="c6 c7 sc-bdVaJa c2"
       >
         <div
-          className="c9 c2"
+          className="c8 c2"
         >
           <div
-            className="c10"
+            className="c9"
           >
             <a
-              className="c11 c2"
+              className="c10 c2"
               onClick={[Function]}
             >
               <svg
@@ -4777,13 +4762,13 @@ exports[`Search Page renders search results with pagination 1`] = `
           </div>
         </div>
         <div
-          className="c9 c2"
+          className="c8 c2"
         >
           <div
-            className="c10"
+            className="c9"
           >
             <a
-              className="c11 c2"
+              className="c10 c2"
               onClick={[Function]}
             >
               <svg
@@ -4816,16 +4801,16 @@ exports[`Search Page renders search results with pagination 1`] = `
           </div>
         </div>
         <div
-          className="c5 c2"
+          className="c4 c2"
         >
           <ul
-            className="c12 c13 c14"
+            className="c11 c12 c13"
           >
             <li
-              className="c15"
+              className="c14"
             >
               <a
-                className="c16"
+                className="c15"
                 href="/discover"
               >
                 <span>
@@ -4834,10 +4819,10 @@ exports[`Search Page renders search results with pagination 1`] = `
               </a>
             </li>
             <li
-              className="c15"
+              className="c14"
             >
               <a
-                className="c16"
+                className="c15"
                 href="/learn-more"
               >
                 <span>
@@ -4846,10 +4831,10 @@ exports[`Search Page renders search results with pagination 1`] = `
               </a>
             </li>
             <li
-              className="c15"
+              className="c14"
             >
               <a
-                className="c16"
+                className="c15"
                 href="https://medium.com/open-collective"
               >
                 <span>
@@ -4867,10 +4852,10 @@ exports[`Search Page renders search results with pagination 1`] = `
             onClick={[Function]}
           >
             <div
-              className="c17 c2"
+              className="c16 c2"
             >
               <p
-                className="LoginTopBarProfileButton-name c18"
+                className="LoginTopBarProfileButton-name c17"
                 color="#46b0ed"
                 display="inline-block"
                 fontSize="1.2rem"
@@ -4879,7 +4864,7 @@ exports[`Search Page renders search results with pagination 1`] = `
               />
             </div>
             <div
-              className="c19"
+              className="c18"
               color="#46b0ed"
               display="inline-block"
               height="0.6rem"
@@ -4895,10 +4880,10 @@ exports[`Search Page renders search results with pagination 1`] = `
     className="jsx-1238847522"
   >
     <div
-      className="c20"
+      className="c19"
     >
       <div
-        className="c21"
+        className="c20"
       >
         <form
           method="GET"
@@ -4914,10 +4899,10 @@ exports[`Search Page renders search results with pagination 1`] = `
               Search Open Collective
             </label>
             <div
-              className="c22 c23 sc-bdVaJa c2"
+              className="c21 c22 sc-bdVaJa c2"
             >
               <input
-                className="c24 form-control"
+                className="c23 form-control"
                 defaultValue="Test"
                 id="search"
                 name="q"
@@ -4925,7 +4910,7 @@ exports[`Search Page renders search results with pagination 1`] = `
                 type="search"
               />
               <button
-                className="jsx-2820878800 jsx-1599314605 Button blue c25"
+                className="jsx-2820878800 jsx-1599314605 Button blue c24"
                 onClick={[Function]}
                 type="submit"
               >
@@ -4938,10 +4923,10 @@ exports[`Search Page renders search results with pagination 1`] = `
         </form>
       </div>
       <div
-        className="c26 c2 sc-bdVaJa c2"
+        className="c25 c2 sc-bdVaJa c2"
       >
         <div
-          className="c11 c27 sc-bdVaJa c2"
+          className="c10 c26 sc-bdVaJa c2"
         >
           <a
             href="/test-collective"
@@ -5000,7 +4985,7 @@ exports[`Search Page renders search results with pagination 1`] = `
         </div>
       </div>
       <div
-        className="c28 c2 sc-bdVaJa c2"
+        className="c27 c2 sc-bdVaJa c2"
       >
         <ul
           className="pagination"
@@ -5060,17 +5045,17 @@ exports[`Search Page renders search results with pagination 1`] = `
     </div>
   </main>
   <div
-    className="c29"
+    className="c28"
     id="footer"
   >
     <div
-      className="c30 c31 sc-bdVaJa c2"
+      className="c29 c30 sc-bdVaJa c2"
     >
       <div
-        className="c32"
+        className="c31"
       >
         <div
-          className="c33 c2 sc-bdVaJa c2"
+          className="c32 c2 sc-bdVaJa c2"
         >
           <object
             data="/static/images/opencollectivelogo-footer.svg"
@@ -5079,7 +5064,7 @@ exports[`Search Page renders search results with pagination 1`] = `
           />
         </div>
         <p
-          className="c34"
+          className="c33"
           color="#6E747A"
           fontSize="1.4rem"
         >
@@ -5087,10 +5072,10 @@ exports[`Search Page renders search results with pagination 1`] = `
         </p>
       </div>
       <div
-        className="c35"
+        className="c34"
       >
         <a
-          className="c36"
+          className="c35"
           href="https://medium.com/open-collective"
         >
           <svg
@@ -5108,7 +5093,7 @@ exports[`Search Page renders search results with pagination 1`] = `
           </svg>
         </a>
         <a
-          className="c36"
+          className="c35"
           href="https://twitter.com/opencollect"
         >
           <svg
@@ -5158,7 +5143,7 @@ exports[`Search Page renders search results with pagination 1`] = `
           </svg>
         </a>
         <a
-          className="c36"
+          className="c35"
           href="https://github.com/opencollective"
         >
           <svg
@@ -5208,7 +5193,7 @@ exports[`Search Page renders search results with pagination 1`] = `
           </svg>
         </a>
         <a
-          className="c36"
+          className="c35"
           href="https://slack.opencollective.com"
         >
           <svg
@@ -5235,7 +5220,7 @@ exports[`Search Page renders search results with pagination 1`] = `
           </svg>
         </a>
         <a
-          className="c36"
+          className="c35"
           href="mailto:info@opencollective.com"
         >
           <svg
@@ -5286,13 +5271,13 @@ exports[`Search Page renders search results with pagination 1`] = `
         </a>
       </div>
       <nav
-        className="c37 c38"
+        className="c36 c37"
       >
         <div
-          className="c39"
+          className="c38"
         >
           <p
-            className="c40"
+            className="c39"
             color="#C2C6CC"
             fontSize="1.2rem"
             letterSpacing="1px"
@@ -5300,13 +5285,13 @@ exports[`Search Page renders search results with pagination 1`] = `
             PLATFORM
           </p>
           <ul
-            className="c41"
+            className="c40"
           >
             <li
-              className="c42"
+              className="c41"
             >
               <a
-                className="c43"
+                className="c42"
                 color="#6E747A"
                 display="block"
                 fontSize="1.4rem"
@@ -5317,10 +5302,10 @@ exports[`Search Page renders search results with pagination 1`] = `
               </a>
             </li>
             <li
-              className="c42"
+              className="c41"
             >
               <a
-                className="c43"
+                className="c42"
                 color="#6E747A"
                 display="block"
                 fontSize="1.4rem"
@@ -5331,10 +5316,10 @@ exports[`Search Page renders search results with pagination 1`] = `
               </a>
             </li>
             <li
-              className="c42"
+              className="c41"
             >
               <a
-                className="c43"
+                className="c42"
                 color="#6E747A"
                 display="block"
                 fontSize="1.4rem"
@@ -5345,10 +5330,10 @@ exports[`Search Page renders search results with pagination 1`] = `
               </a>
             </li>
             <li
-              className="c42"
+              className="c41"
             >
               <a
-                className="c43"
+                className="c42"
                 color="#6E747A"
                 display="block"
                 fontSize="1.4rem"
@@ -5359,10 +5344,10 @@ exports[`Search Page renders search results with pagination 1`] = `
               </a>
             </li>
             <li
-              className="c42"
+              className="c41"
             >
               <a
-                className="c43"
+                className="c42"
                 color="#6E747A"
                 display="block"
                 fontSize="1.4rem"
@@ -5375,10 +5360,10 @@ exports[`Search Page renders search results with pagination 1`] = `
           </ul>
         </div>
         <div
-          className="c39"
+          className="c38"
         >
           <p
-            className="c40"
+            className="c39"
             color="#C2C6CC"
             fontSize="1.2rem"
             letterSpacing="1px"
@@ -5386,13 +5371,13 @@ exports[`Search Page renders search results with pagination 1`] = `
             JOIN THE MOVEMENT
           </p>
           <ul
-            className="c41"
+            className="c40"
           >
             <li
-              className="c42"
+              className="c41"
             >
               <a
-                className="c43"
+                className="c42"
                 color="#6E747A"
                 display="block"
                 fontSize="1.4rem"
@@ -5403,10 +5388,10 @@ exports[`Search Page renders search results with pagination 1`] = `
               </a>
             </li>
             <li
-              className="c42"
+              className="c41"
             >
               <a
-                className="c43"
+                className="c42"
                 color="#6E747A"
                 display="block"
                 fontSize="1.4rem"
@@ -5417,10 +5402,10 @@ exports[`Search Page renders search results with pagination 1`] = `
               </a>
             </li>
             <li
-              className="c42"
+              className="c41"
             >
               <a
-                className="c43"
+                className="c42"
                 color="#6E747A"
                 display="block"
                 fontSize="1.4rem"
@@ -5433,10 +5418,10 @@ exports[`Search Page renders search results with pagination 1`] = `
           </ul>
         </div>
         <div
-          className="c39"
+          className="c38"
         >
           <p
-            className="c40"
+            className="c39"
             color="#C2C6CC"
             fontSize="1.2rem"
             letterSpacing="1px"
@@ -5444,13 +5429,13 @@ exports[`Search Page renders search results with pagination 1`] = `
             COMMUNITY
           </p>
           <ul
-            className="c41"
+            className="c40"
           >
             <li
-              className="c42"
+              className="c41"
             >
               <a
-                className="c43"
+                className="c42"
                 color="#6E747A"
                 display="block"
                 fontSize="1.4rem"
@@ -5461,10 +5446,10 @@ exports[`Search Page renders search results with pagination 1`] = `
               </a>
             </li>
             <li
-              className="c42"
+              className="c41"
             >
               <a
-                className="c43"
+                className="c42"
                 color="#6E747A"
                 display="block"
                 fontSize="1.4rem"
@@ -5475,10 +5460,10 @@ exports[`Search Page renders search results with pagination 1`] = `
               </a>
             </li>
             <li
-              className="c42"
+              className="c41"
             >
               <a
-                className="c43"
+                className="c42"
                 color="#6E747A"
                 display="block"
                 fontSize="1.4rem"
@@ -5489,10 +5474,10 @@ exports[`Search Page renders search results with pagination 1`] = `
               </a>
             </li>
             <li
-              className="c42"
+              className="c41"
             >
               <a
-                className="c43"
+                className="c42"
                 color="#6E747A"
                 display="block"
                 fontSize="1.4rem"
@@ -5503,10 +5488,10 @@ exports[`Search Page renders search results with pagination 1`] = `
               </a>
             </li>
             <li
-              className="c42"
+              className="c41"
             >
               <a
-                className="c43"
+                className="c42"
                 color="#6E747A"
                 display="block"
                 fontSize="1.4rem"
@@ -5519,10 +5504,10 @@ exports[`Search Page renders search results with pagination 1`] = `
           </ul>
         </div>
         <div
-          className="c39"
+          className="c38"
         >
           <p
-            className="c40"
+            className="c39"
             color="#C2C6CC"
             fontSize="1.2rem"
             letterSpacing="1px"
@@ -5530,13 +5515,13 @@ exports[`Search Page renders search results with pagination 1`] = `
             COMPANY
           </p>
           <ul
-            className="c41"
+            className="c40"
           >
             <li
-              className="c42"
+              className="c41"
             >
               <a
-                className="c43"
+                className="c42"
                 color="#6E747A"
                 display="block"
                 fontSize="1.4rem"
@@ -5547,10 +5532,10 @@ exports[`Search Page renders search results with pagination 1`] = `
               </a>
             </li>
             <li
-              className="c42"
+              className="c41"
             >
               <a
-                className="c43"
+                className="c42"
                 color="#6E747A"
                 display="block"
                 fontSize="1.4rem"
@@ -5561,10 +5546,10 @@ exports[`Search Page renders search results with pagination 1`] = `
               </a>
             </li>
             <li
-              className="c42"
+              className="c41"
             >
               <a
-                className="c43"
+                className="c42"
                 color="#6E747A"
                 display="block"
                 fontSize="1.4rem"
@@ -5575,10 +5560,10 @@ exports[`Search Page renders search results with pagination 1`] = `
               </a>
             </li>
             <li
-              className="c42"
+              className="c41"
             >
               <a
-                className="c43"
+                className="c42"
                 color="#6E747A"
                 display="block"
                 fontSize="1.4rem"
@@ -5589,10 +5574,10 @@ exports[`Search Page renders search results with pagination 1`] = `
               </a>
             </li>
             <li
-              className="c42"
+              className="c41"
             >
               <a
-                className="c43"
+                className="c42"
                 color="#6E747A"
                 display="block"
                 fontSize="1.4rem"

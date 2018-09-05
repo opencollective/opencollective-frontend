@@ -37,7 +37,7 @@ class EditCollectiveForm extends React.Component {
 
   static propTypes = {
     collective: PropTypes.object,
-    loading: PropTypes.bool,
+    status: PropTypes.string, // loading, saved
     onSubmit: PropTypes.func,
     LoggedInUser: PropTypes.object.isRequired,
   };
@@ -72,6 +72,10 @@ class EditCollectiveForm extends React.Component {
     this.members = collective.members && collective.members.filter(m => ['ADMIN','MEMBER'].includes(m.role));
 
     this.messages = defineMessages({
+      'loading': { id: 'loading', defaultMessage: 'loading' },
+      'save': { id: 'save', defaultMessage: 'save' },
+      'saved': { id: 'saved', defaultMessage: 'saved' },
+      'event.create.btn': { id: 'event.create.btn', defaultMessage: 'Create Event' },
       'slug.label': { id: 'collective.slug.label', defaultMessage: 'Change your URL' },
       'type.label': { id: 'collective.type.label', defaultMessage: 'type' },
       'name.label': { id: 'collective.name.label', defaultMessage: 'name' },
@@ -96,17 +100,12 @@ class EditCollectiveForm extends React.Component {
       'markdown.description': { id: 'collective.markdown.description', defaultMessage: 'Use markdown editor' },
       'sendInvoiceByEmail.label': { id: 'collective.sendInvoiceByEmail.label', defaultMessage: 'Invoices' },
       'sendInvoiceByEmail.description': { id: 'collective.sendInvoiceByEmail.description', defaultMessage: 'Automatically attach the PDF of your receipts to the monthly report email' },
-      'location.label': { id: 'collective.location.label', defaultMessage: 'City' }
+      'location.label': { id: 'collective.location.label', defaultMessage: 'City' },
     });
 
     collective.backgroundImage = collective.backgroundImage || defaultBackgroundImage[collective.type];
 
     window.OC = { collective, state: this.state };
-  }
-
-  showSection(section) {
-    window.location.hash = `#${section}`;
-    this.setState({section});
   }
 
   componentDidMount() {
@@ -120,6 +119,11 @@ class EditCollectiveForm extends React.Component {
     if (nextProps.collective && (!this.props.collective || nextProps.collective.name != this.props.collective.name)) {
       this.setState({ collective: nextProps.collective, tiers: nextProps.collective.tiers });
     }
+  }
+
+  showSection(section) {
+    window.location.hash = `#${section}`;
+    this.setState({ section });
   }
 
   handleChange(fieldname, value) {
@@ -147,10 +151,15 @@ class EditCollectiveForm extends React.Component {
 
   render() {
 
-    const { collective, loading, intl, LoggedInUser } = this.props;
+    const { collective, status, intl, LoggedInUser } = this.props;
 
     const isNew = !(collective && collective.id);
-    const submitBtnLabel = loading ? 'loading' : isNew ? 'Create Event' : 'Save';
+    let submitBtnMessageId = isNew ? 'event.create.btn' : 'save';
+    if (['loading', 'saved'].includes(status)) {
+      submitBtnMessageId = status;
+    }
+    console.log(">>> submitBtnMessageId", submitBtnMessageId);
+    const submitBtnLabel = this.messages[submitBtnMessageId] && intl.formatMessage(this.messages[submitBtnMessageId]);
     const defaultStartsAt = new Date;
     const type = collective.type.toLowerCase();
     defaultStartsAt.setHours(19);
@@ -466,9 +475,9 @@ class EditCollectiveForm extends React.Component {
 
             { ['export', 'connectedAccounts', 'host'].indexOf(this.state.section) === -1 &&
               <div className="actions">
-                <Button bsStyle="primary" type="submit" onClick={this.handleSubmit} disabled={loading || !this.state.modified} >{submitBtnLabel}</Button>
+                <Button bsStyle="primary" type="submit" onClick={this.handleSubmit} disabled={status === 'loading' || !this.state.modified} >{submitBtnLabel}</Button>
                 <div className="backToProfile">
-                  <Link route={`/${collective.slug}`}><a><FormattedMessage id="collective.edit.backToProfile" defaultMessage="or go back to the {type} page" values={{ type }} /></a></Link>
+                  <Link route={`/${collective.slug}`}><a><FormattedMessage id="collective.edit.backToProfile" defaultMessage="view the {type} page" values={{ type }} /></a></Link>
                 </div>
               </div>
             }

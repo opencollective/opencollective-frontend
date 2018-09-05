@@ -171,7 +171,7 @@ class Comment extends React.Component {
             <div className="actions">
               { this.state.mode === 'edit' &&
                 <div>
-                  <SmallButton className="primary save" onClick={this.save} disabled={!this.state.modified}><FormattedMessage id="comment.save" defaultMessage="save" /></SmallButton>
+                  <SmallButton className="primary save" onClick={this.save} disabled={!this.state.modified}><FormattedMessage id="save" defaultMessage="save" /></SmallButton>
                 </div>
               }
             </div>
