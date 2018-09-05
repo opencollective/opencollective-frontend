@@ -205,7 +205,7 @@ class EditCollectiveForm extends React.Component {
         {
           name: 'tags',
           maxLength: 128,
-          type: 'text',
+          type: 'tags',
           placeholder: 'meetup, javascript',
         },
         {
@@ -230,14 +230,14 @@ class EditCollectiveForm extends React.Component {
           placeholder: 'Drop an image or click to upload',
           className: 'horizontal',
           when: () => this.state.section === 'images',
-        }
+        },
       ],
       expenses: [
         {
           name: 'expensePolicy',
           type: 'textarea',
           description: 'Protip: you can use markdown',
-        }
+        },
       ],
       advanced: [
         {

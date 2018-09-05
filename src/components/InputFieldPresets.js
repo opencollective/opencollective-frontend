@@ -7,8 +7,8 @@ class InputFieldPresets extends React.Component {
   static propTypes = {
     defaultValue: PropTypes.arrayOf(PropTypes.number),
     pre: PropTypes.string,
-    onChange: PropTypes.func
-  }
+    onChange: PropTypes.func,
+  };
 
   constructor(props) {
     super(props);
@@ -43,7 +43,7 @@ class InputFieldPresets extends React.Component {
         pre={this.props.pre}
         onChange={val => this.handleChange(index, val)}
         />
-    )
+    );
   }
 
   render() {
