@@ -38,7 +38,7 @@ class PaymentMethodChooser extends React.Component {
 
     this.messages = defineMessages({
       'paymentMethod.add': { id: 'paymentMethod.add', defaultMessage: 'Add credit card' },
-      'paymentMethod.save': { id: 'paymentMethod.save', defaultMessage: 'Save' },
+      'paymentMethod.save': { id: 'save', defaultMessage: 'save' },
       'paymentMethod.cancel': { id: 'paymentMethod.cancel', defaultMessage: 'Cancel' },
       'paymentMethod.success': { id: 'paymentMethod.success', defaultMessage: 'Successfully added!' },
       'paymentMethod.expire': { id: 'paymentMethod.expire', defaultMessage: 'Exp' },
@@ -284,18 +284,24 @@ class PaymentMethodChooser extends React.Component {
             name="creditcard"
             className="horizontal"
             onChange={(creditcardObject) => this.handleChange(creditcardObject)}
-            style={{base: { fontSize }}}
+            style={{ base: { fontSize } }}
             />
         </div>}
 
         { this.props.editMode &&
         <div className="actions">
           <SmallButton className="no" bsStyle="primary" onClick={this.resetForm}>
-            {intl.formatMessage(this.messages[`paymentMethod.cancel`])}
+            {intl.formatMessage(this.messages['paymentMethod.cancel'])}
           </SmallButton>
 
-          <SmallButton className="yes" bsStyle="primary" onClick={this.onSubmit} disabled={this.state.loading || !this.state.modified} style={{minWidth: '80px'}}>
-            {intl.formatMessage(this.messages[`paymentMethod.save`])}
+          <SmallButton
+            className="yes"
+            bsStyle="primary"
+            onClick={this.onSubmit}
+            disabled={this.state.loading || !this.state.modified}
+            style={{ minWidth: '80px' }}
+            >
+            {intl.formatMessage(this.messages['paymentMethod.save'])}
           </SmallButton>
         </div>}
 

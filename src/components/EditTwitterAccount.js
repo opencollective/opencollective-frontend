@@ -106,7 +106,7 @@ class EditTwitterAccount extends React.Component {
                 charCount={true}
                 name={`${notificationType}.tweet`}
                 defaultValue={connectedAccount.settings[notificationType].tweet || intl.formatMessage(this.messages[`${notificationType}.tweet`])}
-                onChange={(tweet) => this.handleChange(notificationType, "tweet", tweet)}
+                onChange={(tweet) => this.handleChange(notificationType, 'tweet', tweet)}
                 />
             }
           </Col>
@@ -128,7 +128,7 @@ class EditTwitterAccount extends React.Component {
             <Col sm={9}>
               { this.state.isModified &&
                 <SmallButton className="default" bsStyle="primary" onClick={this.onClick}>
-                  <FormattedMessage id="connectedAccount.save.btn" defaultMessage="save" />
+                  <FormattedMessage id="save" defaultMessage="save" />
                 </SmallButton>
               }
             </Col>

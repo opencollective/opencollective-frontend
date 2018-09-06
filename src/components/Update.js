@@ -3,8 +3,8 @@ import PropTypes from 'prop-types';
 import withIntl from '../lib/withIntl';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import { capitalize, formatDate } from '../lib/utils';
-import { graphql } from 'react-apollo'
-import gql from 'graphql-tag'
+import { graphql } from 'react-apollo';
+import gql from 'graphql-tag';
 import Avatar from './Avatar';
 import Role from './Role';
 import UpdateTextWithData from './UpdateTextWithData';
@@ -22,8 +22,8 @@ class Update extends React.Component {
     compact: PropTypes.bool, // if compact true, only show the summary
     editable: PropTypes.bool,
     includeHostedCollectives: PropTypes.bool,
-    LoggedInUser: PropTypes.object
-  }
+    LoggedInUser: PropTypes.object,
+  };
 
   constructor(props) {
     super(props);
@@ -31,7 +31,7 @@ class Update extends React.Component {
     this.state = {
       modified: false,
       update: {},
-      mode: props.compact ? "summary" : "details"
+      mode: props.compact ? 'summary' : 'details',
     };
 
     this.save = this.save.bind(this);
@@ -44,7 +44,7 @@ class Update extends React.Component {
       'rejected': { id: 'update.rejected', defaultMessage: 'rejected' },
       'edit': { id: 'update.edit', defaultMessage: 'edit' },
       'cancelEdit': { id: 'update.cancelEdit', defaultMessage: 'cancel edit' },
-      'viewLatestUpdates': { id: 'update.viewLatestUpdates', defaultMessage: "View latest updates" }
+      'viewLatestUpdates': { id: 'update.viewLatestUpdates', defaultMessage: 'View latest updates' },
     });
   }
 
@@ -66,9 +66,9 @@ class Update extends React.Component {
 
   async save(update) {
     update.id = get(this.props, 'update.id');
-    console.log(">>> updating ", update);
+    console.log('>>> updating ', update);
     const res = await this.props.editUpdate(update);
-    console.log(">>> save res", res);
+    console.log('>>> save res', res);
     this.setState({ modified: false, mode: 'details' });
   }
 
@@ -157,13 +157,13 @@ class Update extends React.Component {
         </div>
         <div className="body">
 
-          { mode === "summary" &&
+          { mode === 'summary' &&
             <div className="title">
               <Link route={`/${collective.slug}/updates/${update.slug}`}><a>{capitalize(update.title)}</a></Link>
             </div>
           }
 
-          { mode === "details" &&
+          { mode === 'details' &&
             <div className="title">
               {capitalize(update.title)}
             </div>
@@ -187,17 +187,17 @@ class Update extends React.Component {
             }
           </div>
 
-          { mode === "summary" &&
+          { mode === 'summary' &&
             <div className="summary" dangerouslySetInnerHTML={{ __html: update.summary }} />
           }
 
-          { mode === "details" && !this.props.compact &&
+          { mode === 'details' && !this.props.compact &&
             <div>
               { update.html && <div dangerouslySetInnerHTML={{ __html: update.html }} /> }
               { !update.html && <UpdateTextWithData id={update.id} /> }
               { update.publishedAt &&
-                <Link route={`/${collective.slug}/updates`}><a className="viewLatestUpdates">
-                  {intl.formatMessage(this.messages[`viewLatestUpdates`])}</a>
+                <Link route={`/${collective.slug}/updates`} className="viewLatestUpdates">
+                  {intl.formatMessage(this.messages['viewLatestUpdates'])}
                 </Link>
               }
             </div>
@@ -212,9 +212,11 @@ class Update extends React.Component {
           { mode !== 'summary' &&
             <div className="actions">
               { mode === 'edit' && this.state.modified &&
-                <SmallButton className="primary save" onClick={this.save}><FormattedMessage id="update.save" defaultMessage="save" /></SmallButton>
+                <SmallButton className="primary save" onClick={this.save}>
+                  <FormattedMessage id="save" defaultMessage="save" />
+                </SmallButton>
               }
-              { mode === "details" && canPublishUpdate &&
+              { mode === 'details' && canPublishUpdate &&
                 <PublishUpdateBtnWithData id={update.id} />
               }
             </div>
