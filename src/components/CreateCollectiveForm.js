@@ -47,7 +47,7 @@ class CreateCollectiveForm extends React.Component {
       'meetup.label': { id: 'collective.meetup.label', defaultMessage: 'Meetup URL' },
       'members.label': { id: 'collective.members.label', defaultMessage: 'Number of members' },
       'tags.label': { id: 'collective.tags.label', defaultMessage: 'Tags' },
-      'tags.description': { id: 'collective.tags.description', defaultMessage: 'Tags helps people discover your collective. Separate them with a comma.' },
+      'tags.description': { id: 'collective.tags.description', defaultMessage: 'Tags helps people discover your collective' },
       'tos.label': { id: 'collective.tos.label', defaultMessage: 'Terms of Service' }
     });
 
@@ -57,7 +57,7 @@ class CreateCollectiveForm extends React.Component {
     this.state = {
       modified: false,
       section: 'info',
-      collective
+      collective,
     };
 
     this.categories = get(props.host, 'settings.apply.categories') || [];
@@ -68,7 +68,7 @@ class CreateCollectiveForm extends React.Component {
     if (get(props.host, 'settings.apply.defaultValues')) {
       this.state.collective = {
         ...this.state.collective,
-        ... props.host.settings.apply.defaultValues
+        ... props.host.settings.apply.defaultValues,
       };
     }
 
@@ -99,54 +99,55 @@ class CreateCollectiveForm extends React.Component {
         {
           name: 'name',
           placeholder: '',
-          maxLength: 255
+          maxLength: 255,
+          focus: true,
         },
         {
           name: 'company',
           placeholder: '',
           maxLength: 255,
-          when: () => get(this.state, 'collective.type') === 'USER'
+          when: () => get(this.state, 'collective.type') === 'USER',
         },
         {
           name: 'description',
           type: 'text',
           maxLength: 255,
-          placeholder: ''
+          placeholder: '',
         },
         {
           name: 'website',
           type: 'text',
           maxLength: 255,
-          placeholder: ''
+          placeholder: '',
         },
         {
           name: 'tags',
           placeholder: 'civic tech, open source, vegan',
           maxLength: 255,
-          type: 'text'
-        }
-      ]
-    }
+          type: 'tags',
+        },
+      ],
+    };
 
     if (category === 'meetup') {
       this.fields.info.splice(2, 0, {
         name: 'members',
-        type: 'number'
+        type: 'number',
       });
       this.fields.info.unshift({
         name: 'meetup',
         type: 'text',
         pre: 'https://meetup.com/',
         maxLength: 255,
-        placeholder: ''
+        placeholder: '',
       });
       this.fields.info.push(        {
         name: 'location',
         placeholder: 'Search cities',
         type: 'location',
         options: {
-          types: ['(cities)']
-        }
+          types: ['(cities)'],
+        },
       });
     }
 
@@ -304,6 +305,7 @@ class CreateCollectiveForm extends React.Component {
                   validate={field.validate}
                   ref={field.name}
                   name={field.name}
+                  focus={field.focus}
                   label={field.label}
                   description={field.description}
                   options={field.options}

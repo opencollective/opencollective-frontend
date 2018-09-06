@@ -12,7 +12,8 @@ div.ReactTags__tagInput {
 div.ReactTags__tagInput input.ReactTags__tagInputField,
 div.ReactTags__tagInput input.ReactTags__tagInputField:focus {
   height: 31px;
-  margin: 0;
+  margin: 3px;
+  padding: 0 5px;
   font-size: 12px;
   width: 100%;
   border: 1px solid #eee;
@@ -20,14 +21,14 @@ div.ReactTags__tagInput input.ReactTags__tagInputField:focus {
 
 /* Styles for selected tags */
 div.ReactTags__selected span.ReactTags__tag {
-  border: 1px solid #ddd;
-  background: #eee;
+  border: 1px solid #99C2FF;
+  background: #EBF3FF;
   font-size: 12px;
   display: inline-block;
-  padding: 5px;
-  margin: 0 5px;
+  padding: 2px 5px;
+  margin: 0 3px;
   cursor: move;
-  border-radius: 2px;
+  border-radius: 5px;
 }
 div.ReactTags__selected a.ReactTags__remove {
   color: #aaa;

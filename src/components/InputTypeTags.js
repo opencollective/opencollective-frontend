@@ -22,19 +22,11 @@ class InputTypeTags extends React.Component {
   constructor(props) {
     super(props);
 
+    const tags = (props.defaultValue || []).map(t => t.trim());
+
     this.state = {
-      tags: [
-        { id: 'Thailand', text: 'Thailand' },
-        { id: 'India', text: 'India' },
-      ],
-      suggestions: [
-        { id: 'USA', text: 'USA' },
-        { id: 'Germany', text: 'Germany' },
-        { id: 'Austria', text: 'Austria' },
-        { id: 'Costa Rica', text: 'Costa Rica' },
-        { id: 'Sri Lanka', text: 'Sri Lanka' },
-        { id: 'Thailand', text: 'Thailand' },
-      ],
+      tags: tags.map(t => ({ id: t, text: t })),
+      suggestions: [],
     };
     this.handleDelete = this.handleDelete.bind(this);
     this.handleAddition = this.handleAddition.bind(this);
@@ -82,6 +74,7 @@ class InputTypeTags extends React.Component {
           handleAddition={this.handleAddition}
           handleDrag={this.handleDrag}
           delimiters={delimiters}
+          autofocus={false}
           placeholder={intl.formatMessage(this.messages['placeholder'])}
           />
       </div>

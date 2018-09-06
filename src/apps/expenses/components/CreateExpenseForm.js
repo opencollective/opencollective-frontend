@@ -241,10 +241,6 @@ class CreateExpenseForm extends React.Component {
             width: 100%;
           }
 
-          .CreateExpenseForm .help-block {
-            font-size: 1.2rem;
-          }
-
           @media(max-width: 600px) {
             .attachmentField {
               width: 90%;

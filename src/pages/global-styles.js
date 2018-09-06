@@ -236,6 +236,10 @@ injectGlobal`
     width: 100%;
   }
 
+  .help-block {
+    font-size: 1.2rem;
+  }
+
   @media(max-width: 420px) {
     .mobileOnly {
       display: inherit !important;
