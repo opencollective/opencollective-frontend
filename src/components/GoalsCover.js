@@ -9,8 +9,8 @@ class GoalsCover extends React.Component {
 
   static propTypes = {
     collective: PropTypes.object.isRequired,
-    LoggedInUser: PropTypes.object
-  }
+    LoggedInUser: PropTypes.object,
+  };
 
   constructor(props) {
     super(props);
@@ -21,27 +21,27 @@ class GoalsCover extends React.Component {
       goals: {},
       styles: {
         balance: { textAlign: 'left', left: 0 },
-        yearlyBudget: { textAlign: 'right', right: 0 }
-      }
+        yearlyBudget: { textAlign: 'right', right: 0 },
+      },
     };
 
     this.messages = defineMessages({
-      'admin': { id: 'menu.admin', defaultMessage: "admin" },
-      'backer': { id: 'menu.backer', defaultMessage: "backer" },
-      'attendee': { id: 'menu.attendee', defaultMessage: "attendee" },
-      'fundraiser': { id: 'menu.fundraiser', defaultMessage: "fundraiser" },
-      'parenting': { id: 'menu.parenting', defaultMessage: "member collectives" },
-      'about': { id: 'menu.about', defaultMessage: "about" },
-      'events': { id: 'menu.events', defaultMessage: "events" },
-      'updates': { id: 'menu.updates', defaultMessage: "updates" },
-      'budget': { id: 'menu.budget', defaultMessage: "budget" },
-      'contributors': { id: 'menu.contributors', defaultMessage: "contributors" },
-      'menu.edit.collective': { id: 'menu.edit.collective', defaultMessage: "edit collective" },
-      'menu.edit.user': { id: 'menu.edit.user', defaultMessage: "edit profile" },
-      'menu.edit.organization': { id: 'menu.edit.organization', defaultMessage: "edit organization" },
-      'menu.edit.event': { id: 'menu.edit.event', defaultMessage: "edit event" },
-      'bar.balance': { id: 'cover.bar.balance', defaultMessage: "Today's Balance" },
-      'bar.yearlyBudget': { id: 'cover.bar.yearlyBudget', defaultMessage: "Estimated Annual Budget" }
+      'admin': { id: 'menu.admin', defaultMessage: 'admin' },
+      'backer': { id: 'menu.backer', defaultMessage: 'backer' },
+      'attendee': { id: 'menu.attendee', defaultMessage: 'attendee' },
+      'fundraiser': { id: 'menu.fundraiser', defaultMessage: 'fundraiser' },
+      'parenting': { id: 'menu.parenting', defaultMessage: 'member collectives' },
+      'about': { id: 'menu.about', defaultMessage: 'about' },
+      'events': { id: 'menu.events', defaultMessage: 'events' },
+      'updates': { id: 'menu.updates', defaultMessage: 'updates' },
+      'budget': { id: 'menu.budget', defaultMessage: 'budget' },
+      'contributors': { id: 'menu.contributors', defaultMessage: 'contributors' },
+      'menu.edit.collective': { id: 'menu.edit.collective', defaultMessage: 'edit collective' },
+      'menu.edit.user': { id: 'menu.edit.user', defaultMessage: 'edit profile' },
+      'menu.edit.organization': { id: 'menu.edit.organization', defaultMessage: 'edit organization' },
+      'menu.edit.event': { id: 'menu.edit.event', defaultMessage: 'edit event' },
+      'bar.balance': { id: 'cover.bar.balance', defaultMessage: 'Today\'s Balance' },
+      'bar.yearlyBudget': { id: 'cover.bar.yearlyBudget', defaultMessage: 'Estimated Annual Budget' },
     });
 
     this.goals = [
@@ -51,27 +51,35 @@ class GoalsCover extends React.Component {
         title: intl.formatMessage(this.messages['bar.balance']),
         amount: get(collective, 'stats.balance'),
         precision: 2,
-        position: 'below'
+        position: 'below',
       },
-      {
-        slug: 'yearlyBudget',
-        title: intl.formatMessage(this.messages['bar.yearlyBudget']),
-        amount: get(collective, 'stats.yearlyBudget'),
-        precision: 0,
-        position: 'below'
-      },
-      ... get(collective, 'settings.goals') || []
-    ].sort((a, b) => a.amount > b.amount);
+    ];
+
+    if (get(collective, 'stats.yearlyBudget') > 0 && get(collective, 'stats.yearlyBudget') !== get(collective, 'stats.balance')) {
+      this.goals.push(
+        {
+          slug: 'yearlyBudget',
+          title: intl.formatMessage(this.messages['bar.yearlyBudget']),
+          amount: get(collective, 'stats.yearlyBudget'),
+          precision: 0,
+          position: 'below',
+        }
+      );
+    }
+
+    (get(collective, 'settings.goals') || []).map(g => this.goals.push(g));
+
+    this.goals.sort((a, b) => a.amount > b.amount);
 
     const lastGoalAtPosition = {};
     for (let i=0; i<this.goals.length; i++) {
       const goal = { ...this.goals[i] };
       goal.slug = goal.slug || `goal${i}`;
-      goal.position = goal.position || "above";
+      goal.position = goal.position || 'above';
       lastGoalAtPosition[goal.position] = goal;
       goal.style = {
-        textAlign: lastGoalAtPosition[goal.position] ? 'right' : 'left'
-      }
+        textAlign: lastGoalAtPosition[goal.position] ? 'right' : 'left',
+      };
       this.goals[i] = goal;
     }
     this.maxAmount = maxBy(this.goals, g => g.amount).amount;
@@ -126,12 +134,12 @@ class GoalsCover extends React.Component {
     const slug = goal.slug || `goal${index}`;
     const zIndex = (20 - index) * 10;
     const amount = formatCurrency(goal.animate ? (get(this.state, `goals.${slug}.amount`) || 0) : goal.amount, collective.currency, { precision: goal.precision || 0 });
-    const position = goal.position || "above";
+    const position = goal.position || 'above';
     const level = get(this.state, `goals.${slug}.level`) || 0;
     const style = {
       width: get(this.state, `goals.${slug}.posX`) || posX,
       opacity: get(this.state, `goals.${slug}.opacity`) || 1,
-      zIndex
+      zIndex,
     };
 
     if (position === 'below' && level === 1) {
@@ -219,7 +227,7 @@ class GoalsCover extends React.Component {
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   render() {
@@ -279,9 +287,8 @@ class GoalsCover extends React.Component {
           </div>
         </div>
       </div>
-    )
+    );
   }
-
 }
 
 export default withIntl(GoalsCover);
