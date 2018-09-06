@@ -418,6 +418,7 @@
   "uploadImage.isDragActive": "Dépose l'image",
   "uploadImage.isDragReject": "🚫 Ce type de fichier n'est pas accepté",
   "uploadImage.error": "Erreur: {error}",
+  "input.tags.placeholder": "Ajoutez un nouveau tag (et appuyez sur \"entrer\")",
   "InterestedForm.RemindMe": "rappelle-moi",
   "collective.about.title": "A propos",
   "order.matchingfund.label": "Matching fund",

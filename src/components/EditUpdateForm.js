@@ -128,10 +128,6 @@ class EditUpdateForm extends React.Component {
             width: 50%;
           }
 
-          .EditUpdateForm .help-block {
-            font-size: 1.2rem;
-          }
-
         `}</style>
 
         <form onSubmit={this.onSubmit}>

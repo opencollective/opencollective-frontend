@@ -8,6 +8,7 @@ import moment from 'moment-timezone';
 import InputTypeDropzone from './InputTypeDropzone';
 import InputTypeLocation from './InputTypeLocation';
 import InputTypeCreditCard from './InputTypeCreditCard';
+import InputTypeTags from './InputTypeTags';
 import { Col, HelpBlock, FormGroup, InputGroup, FormControl, ControlLabel, Checkbox } from 'react-bootstrap';
 import Switch from "@material-ui/core/Switch";
 import MarkdownEditor from './MarkdownEditor';
@@ -150,7 +151,7 @@ class InputField extends React.Component {
             <InputTypeCreditCard onChange={this.handleChange} style={this.props.style} />
           </div>
           }
-        </FormGroup>)
+        </FormGroup>);
         break;
 
       case 'textarea': {
@@ -175,9 +176,33 @@ class InputField extends React.Component {
           value={this.state.value || this.props.defaultValue}
           onChange={event => this.handleChange(event.target.value)}
           />
-                      )
+        );
         break;
       }
+
+      case 'tags':
+        this.input = (
+          <FormGroup>
+            { horizontal &&
+              <div>
+                <Col componentClass={ControlLabel} sm={2}>
+                  {capitalize(field.label)}
+                </Col>
+                <Col sm={10}>
+                  <InputTypeTags {...field} />
+                </Col>
+              </div>
+            }
+            { !horizontal &&
+              <div>
+                {field.label && <ControlLabel>{`${capitalize(field.label)}`}</ControlLabel>}
+                <InputTypeTags {...field} />
+                {field.description && <HelpBlock>{field.description}</HelpBlock>}
+              </div>
+            }
+          </FormGroup>
+        );
+        break;
 
       case 'date':
       case 'datetime': {
@@ -186,12 +211,26 @@ class InputField extends React.Component {
 
         this.input = (
           <FormGroup>
-            {horizontal &&
-            <div>
-              <Col componentClass={ControlLabel} sm={2}>
-                {capitalize(field.label)}
-              </Col>
-              <Col sm={10}>
+            { horizontal &&
+              <div>
+                <Col componentClass={ControlLabel} sm={2}>
+                  {capitalize(field.label)}
+                </Col>
+                <Col sm={10}>
+                  <DateTime
+                    name={field.name}
+                    timeFormat={field.timeFormat || timeFormat}
+                    value={moment.tz(new Date(this.state.value || field.defaultValue), context.timezone || 'utc')}
+                    isValidDate={field.validate}
+                    onChange={date => date.toISOString ? this.handleChange(date.toISOString()) : false}
+                    closeOnSelect={closeOnSelect}
+                    />
+                </Col>
+              </div>
+            }
+            { !horizontal &&
+              <div>
+                {field.label && <ControlLabel>{`${capitalize(field.label)}`}</ControlLabel>}
                 <DateTime
                   name={field.name}
                   timeFormat={field.timeFormat || timeFormat}
@@ -200,25 +239,11 @@ class InputField extends React.Component {
                   onChange={date => date.toISOString ? this.handleChange(date.toISOString()) : false}
                   closeOnSelect={closeOnSelect}
                   />
-              </Col>
-            </div>
-          }
-            {!horizontal &&
-            <div>
-              {field.label && <ControlLabel>{`${capitalize(field.label)}`}</ControlLabel>}
-              <DateTime
-                name={field.name}
-                timeFormat={field.timeFormat || timeFormat}
-                value={moment.tz(new Date(this.state.value || field.defaultValue), context.timezone || 'utc')}
-                isValidDate={field.validate}
-                onChange={date => date.toISOString ? this.handleChange(date.toISOString()) : false}
-                closeOnSelect={closeOnSelect}
-                />
-              {field.description && <HelpBlock>{field.description}</HelpBlock>}
-            </div>
-          }
+                {field.description && <HelpBlock>{field.description}</HelpBlock>}
+              </div>
+            }
           </FormGroup>
-        )
+        );
         break;
       }
 
@@ -243,7 +268,7 @@ class InputField extends React.Component {
             </div>
           }
           </FormGroup>
-        )
+        );
         break;
 
       case 'location':
@@ -258,7 +283,7 @@ class InputField extends React.Component {
               />
             {field.description && <HelpBlock>{field.description}</HelpBlock>}
           </FormGroup>
-        )
+        );
         break;
 
       case 'dropzone':
@@ -295,7 +320,7 @@ class InputField extends React.Component {
             </div>
           }
           </FormGroup>
-        )
+        );
         break;
 
       case 'currency':
@@ -320,7 +345,7 @@ class InputField extends React.Component {
             onFocus={(event) => event.target.select()}
             value={value}
             />
-          )
+          );
         break;
 
       case 'select': {
@@ -350,7 +375,7 @@ class InputField extends React.Component {
               return (<option key={value} value={value}>{label}</option>)
               })
             }
-          </FieldGroup>)
+          </FieldGroup>);
         break;
       }
 
@@ -370,14 +395,14 @@ class InputField extends React.Component {
               </Col>
             )}
           </div>
-                        }
+          }
           {!horizontal &&
           <div>
             { field.label && <ControlLabel>{capitalize(field.label)}</ControlLabel> }
             <Checkbox defaultChecked={field.defaultValue} onChange={event => this.handleChange(event.target.checked)}>{field.description}</Checkbox>
           </div>
-                        }
-        </FormGroup>)
+          }
+        </FormGroup>);
         break;
 
       case 'switch':
@@ -392,7 +417,7 @@ class InputField extends React.Component {
               {field.description && <HelpBlock>{field.description}</HelpBlock>}
             </Col>
           </div>
-                        }
+          }
           {!horizontal &&
           <div>
             <ControlLabel>{capitalize(field.label)}</ControlLabel>
@@ -401,8 +426,8 @@ class InputField extends React.Component {
               {field.description && <HelpBlock>{field.description}</HelpBlock>}
             </div>
           </div>
-                        }
-        </FormGroup>)
+          }
+        </FormGroup>);
         break;
 
       case 'html':
@@ -415,7 +440,7 @@ class InputField extends React.Component {
               className={field.className}
               />
           </div>
-        )
+        );
         break;
 
       case 'markdown':
@@ -424,7 +449,7 @@ class InputField extends React.Component {
             { field.label && <ControlLabel>{capitalize(field.label)}</ControlLabel> }
             <MarkdownEditor defaultValue={field.defaultValue} onChange={this.handleChange} />
           </div>
-        )
+        );
         break;
 
       default:
