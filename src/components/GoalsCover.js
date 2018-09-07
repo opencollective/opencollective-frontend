@@ -45,7 +45,7 @@ class GoalsCover extends React.Component {
 
   }
 
-  componentDidMount() {
+  populateGoals() {
     const { intl, collective } = this.props;
     const state = this.state;
     const previous = {};
@@ -126,21 +126,21 @@ class GoalsCover extends React.Component {
       state.goals[slug] = pos;
       previous[position] = pos;
     });
-    this.setState(state);
+    return state;
   }
 
-  renderGoal(goal, index) {
+  renderGoal(goal, index, state) {
     if (!goal.title) return;
     const { collective } = this.props;
     const posX = goal.animate ? 0 : `${Math.round(goal.amount / this.maxAmount * 100)}%`;
     const slug = goal.slug || `goal${index}`;
     const zIndex = (20 - index) * 10;
-    const amount = formatCurrency(goal.animate ? (get(this.state, `goals.${slug}.amount`) || 0) : goal.amount, collective.currency, { precision: goal.precision || 0 });
+    const amount = formatCurrency(goal.animate ? (get(state, `goals.${slug}.amount`) || 0) : goal.amount, collective.currency, { precision: goal.precision || 0 });
     const position = goal.position || 'above';
-    const level = get(this.state, `goals.${slug}.level`) || 0;
+    const level = get(state, `goals.${slug}.level`) || 0;
     const style = {
-      width: get(this.state, `goals.${slug}.posX`) || posX,
-      opacity: get(this.state, `goals.${slug}.opacity`) || 1,
+      width: get(state, `goals.${slug}.posX`) || posX,
+      opacity: get(state, `goals.${slug}.opacity`) || 1,
       zIndex,
     };
 
@@ -239,6 +239,8 @@ class GoalsCover extends React.Component {
       return (<div />);
     }
 
+    const state = this.populateGoals();
+
     return (
       <div className="GoalsCover">
         <style jsx>{`
@@ -282,9 +284,9 @@ class GoalsCover extends React.Component {
               <span className="annualBudget">{formatCurrency(get(collective, 'stats.yearlyBudget'), collective.currency, { precision: 0 })}</span>
             </div>
           }
-          <div className="barContainer" style={get(this.state, 'styles.barContainer')} ref={node => this.nodes.barContainer = node}>
+          <div className="barContainer" style={get(state, 'styles.barContainer')} ref={node => this.nodes.barContainer = node}>
             <div className="bars">
-              { this.goals && this.goals.map(this.renderGoal) }
+              { this.goals && this.goals.map((goal, index) => this.renderGoal(goal, index, state)) }
             </div>
           </div>
         </div>
