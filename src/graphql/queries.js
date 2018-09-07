@@ -78,6 +78,7 @@ export const getLoggedInUserQuery = gql`
         paymentMethods(limit: 5) {
           id
           uuid
+          currency
           type
           service
           name
@@ -102,6 +103,7 @@ export const getLoggedInUserQuery = gql`
           paymentMethods(limit: 5) {
             id
             uuid
+            currency
             name
             service
             type
