@@ -2,7 +2,7 @@ import axios from 'axios';
 import config from 'config';
 import Promise from 'bluebird';
 
-import { get, template } from 'lodash';
+import { get, set, template } from 'lodash';
 import activitiesLib from '../lib/activities';
 import slackLib from './slack';
 import twitter from './twitter';
@@ -198,8 +198,9 @@ async function w9bot(activity) {
       html,
     };
     // adding UserId to Host Data to keep track of all UserIds that received the request
-    get(host, 'data.W9.requestSentToUserIds', []);
-    host.data.W9.requestSentToUserIds.push(activity.data.user.id);
+    const requestSentToUserIds = get(host, 'data.W9.requestSentToUserIds', []);
+    requestSentToUserIds.push(activity.data.user.id);
+    set(host, 'data.W9.requestSentToUserIds', requestSentToUserIds);
     host.update({ data: host.data });
 
     return models.Comment.create(commentData);
