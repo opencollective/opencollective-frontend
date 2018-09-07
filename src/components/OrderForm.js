@@ -196,7 +196,7 @@ class OrderForm extends React.Component {
        source collective for now. */
     if (hostId === 11004 && this.interval() === null) {
       paymentMethodTypeOptions.push({
-        payment: intl.formatMessage(this.messages['paymentMethod.paypal'])
+        payment: intl.formatMessage(this.messages['paymentMethod.paypal']),
       });
     }
     this.paymentMethodTypeOptions = paymentMethodTypeOptions;
@@ -204,11 +204,11 @@ class OrderForm extends React.Component {
 
   paymentMethodsOptionsForCollective = (paymentMethods, collective) => {
     return paymentMethods.map(pm => {
-      const value = pm.uuid
+      const value = pm.uuid;
       const brand = get(pm, 'data.brand') || get(pm, 'type');
       /* The expiryDate field will show up for prepaid cards */
       const expiration = pm.expiryDate
-        ? `- exp ${moment(pm.expiryDate).format("MM/Y")}`
+        ? `- exp ${moment(pm.expiryDate).format('MM/Y')}`
         : (get(pm, 'data.expMonth') || get(pm, 'data.expYear'))
             ? `- exp ${get(pm, 'data.expMonth')}/${get(pm, 'data.expYear')}`
             : '';
@@ -1026,7 +1026,7 @@ class OrderForm extends React.Component {
                         name="paymentMethodTypeSelector"
                         options={this.paymentMethodTypeOptions}
                         label={intl.formatMessage(this.messages['paymentMethod.type'])}
-                        onChange={(value) => this.handleChange('paymentMethod', "type", value)}
+                        onChange={(value) => this.handleChange('paymentMethod', 'type', value)}
                         />
                     </Col>
                   </Row>
@@ -1050,7 +1050,7 @@ class OrderForm extends React.Component {
 
                     <div className="submit">
                       <ActionButton className="blue" onClick={this.handleSubmit} disabled={this.state.loading}>
-                        {this.state.loading ? <FormattedMessage id='form.processing' defaultMessage='processing' /> : order.tier.button || capitalize(intl.formatMessage(this.messages['order.button']))}
+                        {this.state.loading ? <FormattedMessage id="form.processing" defaultMessage="processing" /> : order.tier.button || capitalize(intl.formatMessage(this.messages['order.button']))}
                       </ActionButton>
                     </div>
 
