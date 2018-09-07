@@ -220,6 +220,7 @@ query Collective($slug: String) {
       name
       slug
       image
+      settings
     }
     location {
       name
