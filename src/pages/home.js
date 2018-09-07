@@ -463,7 +463,7 @@ class HomePage extends React.Component {
 
                 <P {...sectionDetailStyles}><Span fontWeight="bold">Grow the movement</Span> by becoming a host of open collectives in your city or your industry. Hosts are acting as fiscal sponsors. They collect the money on behalf of the collectives and enable them to issue invoices. They are mutualising the legal and accounting overhead that come with creating and maintaining a legal entity so that the open collectives that they host can focus on their mission.</P>
 
-                <Link route="/chapters" passHref>
+                <Link route="/hosts" passHref>
                   <StyledLink
                     bg="#3385FF"
                     borderRadius="50px"
@@ -474,12 +474,11 @@ class HomePage extends React.Component {
                     maxWidth="220px"
                     mx={['auto', null, 4]}
                     mt={4}
-                    hover={{ color: 'white' }}
                     py={3}
                     textAlign="center"
                     width={[250, null, 320]}
                   >
-                    Create a chapter
+                    Become a host
                   </StyledLink>
                 </Link>
               </Container>
