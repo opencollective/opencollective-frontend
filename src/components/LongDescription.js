@@ -34,7 +34,8 @@ class LongDescription extends React.Component {
           top: 0;
           left: 0;
           width: 100%;
-          max-width: 640px;
+          max-width: 800px;
+          max-height: 450px;
           height: 100%;
         }
         `}</style>
