@@ -48,8 +48,8 @@ if [ -z "$LOCALDBNAME" ]; then usage; fi;
 # where pg_stat_activity.datname = '$LOCALDBNAME'
 # EOF
 
-dropdb $LOCALDBNAME;
-createdb -O $LOCALDBUSER $LOCALDBNAME 2> /dev/null
+dropdb --if-exists $LOCALDBNAME;
+createdb $LOCALDBNAME 2> /dev/null
 
 # Add POSTGIS extension
 psql "${LOCALDBNAME}" -c "CREATE EXTENSION POSTGIS;" 1> /dev/null
