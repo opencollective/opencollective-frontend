@@ -156,7 +156,6 @@ async function w9bot(activity) {
   if (!host) {
     throw new Error(`w9bot: Host id ${HostCollectiveId} not found`);
   }
-
   // Host is not USD based so it wont trigger the bot comment
   if (host.currency !== 'USD') return;
 
@@ -174,8 +173,8 @@ async function w9bot(activity) {
 
   const w9Bot = await models.Collective.findOne({
     where: {
-      slug: W9_BOT_SLUG
-    }
+      slug: W9_BOT_SLUG,
+    },
   });
 
   // U$ 600.00 total amount allowed without form as of July 2018
@@ -198,12 +197,11 @@ async function w9bot(activity) {
       FromCollectiveId: w9Bot.id,
       html,
     };
-
     // adding UserId to Host Data to keep track of all UserIds that received the request
-    set(host, 'data.W9.requestSentToUserIds', []);
+    get(host, 'data.W9.requestSentToUserIds', []);
     host.data.W9.requestSentToUserIds.push(activity.data.user.id);
+    host.update({ data: host.data });
 
-    host.save();
     return models.Comment.create(commentData);
   }
   return true;
