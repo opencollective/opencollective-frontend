@@ -16,10 +16,10 @@ class LongDescription extends React.Component {
 
   constructor(props) {
     super(props);
-    this.sections = processMarkdown(props.longDescription || '').sections.filter(s => s.markdown);
   }
 
   render() {
+    const sections = processMarkdown(this.props.longDescription || '').sections.filter(s => s.markdown);
     return (
       <div className="longDescription">
         <style jsx>{`
@@ -39,7 +39,7 @@ class LongDescription extends React.Component {
           height: 100%;
         }
         `}</style>
-        {this.sections.map(section => (
+        {sections.map(section => (
           <section key={section.id || 'about'} id={section.id || 'about'} className="longDescription">
             <SectionTitle
               title={section.title || <FormattedMessage id="collective.about.title" defaultMessage="About" />}
