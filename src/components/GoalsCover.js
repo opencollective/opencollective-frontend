@@ -14,7 +14,6 @@ class GoalsCover extends React.Component {
 
   constructor(props) {
     super(props);
-    const { intl, collective } = props;
     this.renderGoal = this.renderGoal.bind(this);
     this.nodes = {};
     this.state = {
@@ -43,6 +42,13 @@ class GoalsCover extends React.Component {
       'bar.balance': { id: 'cover.bar.balance', defaultMessage: 'Today\'s Balance' },
       'bar.yearlyBudget': { id: 'cover.bar.yearlyBudget', defaultMessage: 'Estimated Annual Budget' },
     });
+
+  }
+
+  componentDidMount() {
+    const { intl, collective } = this.props;
+    const state = this.state;
+    const previous = {};
 
     this.goals = [
       {
@@ -83,12 +89,7 @@ class GoalsCover extends React.Component {
       this.goals[i] = goal;
     }
     this.maxAmount = maxBy(this.goals, g => g.amount).amount;
-  }
 
-  componentDidMount() {
-    const state = this.state;
-    const previous = {};
-    const barLength = this.nodes.barContainer.offsetWidth;
     this.goals.forEach(goal => {
       const pos = { level: 0, amount: goal.amount };
       const { slug, position } = goal;
@@ -115,7 +116,8 @@ class GoalsCover extends React.Component {
           state.styles.barContainer = { marginTop: '10rem' };
         }
       }
-      if (goal.animate) {
+      if (goal.animate && this.nodes.barContainer) {
+        const barLength = this.nodes.barContainer.offsetWidth;
         const width =  Math.ceil(goal.amount / this.maxAmount * barLength);
         pos.posX = width;
       }
@@ -282,7 +284,7 @@ class GoalsCover extends React.Component {
           }
           <div className="barContainer" style={get(this.state, 'styles.barContainer')} ref={node => this.nodes.barContainer = node}>
             <div className="bars">
-              { this.goals.map(this.renderGoal) }
+              { this.goals && this.goals.map(this.renderGoal) }
             </div>
           </div>
         </div>
