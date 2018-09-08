@@ -219,8 +219,8 @@ const generateEmailFromTemplate = (template, recipient, data = {}, options = {})
   if (template === 'ticket.confirmed') {
     if (slug === 'sustainoss')
       template += '.sustainoss';
-    if (slug === 'webrussels')
-      template += '.webrussels';
+    if (slug === 'fearlesscitiesbrussels')
+      template += '.fearlesscitiesbrussels';
   }
   if (template.match(/^host\.(monthly|yearly)report$/)) {
     template = 'host.report';

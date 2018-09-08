@@ -1,0 +1,56 @@
+{{#if interval }}
+Subject: Thank you for your {{{currency order.totalAmount currency=order.currency}}}/{{interval}} donation to {{collective.name}}
+{{else}}
+Subject: Thank you for your {{{currency order.totalAmount currency=order.currency}}} donation to {{collective.name}}
+{{/if}}
+
+{{> header}}
+
+{{> toplogo}}
+
+{{#if fromCollective.name}}
+<p>Dear {{fromCollective.name}},</p>
+{{else}}
+<p>Hi!</p>
+{{/if}}
+
+{{#if interval}}
+  {{#if firstPayment }}
+    <p>We would like to thank you for your pledge to give {{{currency order.totalAmount currency=order.currency}}} per {{interval}}.
+      Your first payment was received on {{{moment order.createdAt}}}. Your donation helps us continue our activities.</p>
+  {{else}}
+    <p>We would like to thank you for your continued support. Your latest {{interval}}ly donation of {{{currency order.totalAmount currency=order.currency}}} was received on {{{moment transaction.createdAt}}}.
+      Your donation helps us continue our activities.</p>
+  {{/if}}
+  {{> charge_date_notice }}
+{{else}}
+<p>We would like to thank you for your donation of {{{currency order.totalAmount currency=order.currency}}} on {{{moment order.createdAt}}}.
+  Your gift will help us make the first Fearless Cities Brussels a reality. Thank you! 🙏</p>
+{{/if}}
+
+<p>Don't forget to <a href="https://opencollective.com/fearlesscitiesbrussels/events/september-2018"></a>register for the event</a>.</p>
+
+<p>Till then, please help us make some noise about it by sharing the event on social media with the hashtag #fearlesscities.</p>
+ 
+<p>We are also looking for volunteers to help us with the organization of the event.
+Please take a look at the <a href="https://docs.google.com/spreadsheets/d/1x_z1CpyjfRfogYa0iIBpKHiwAMcyWUNi7laXMn2ePWY/edit?usp=sharing">list of things that we still need to do</a> and see if there is anyway you can help. That would be amazing. Among other things, we are still looking for people to help us with child care, video recording, distributing flyers.</p>
+
+<p>
+  P.S: You can download a PDF receipt for your donation <a href="{{config.host.website}}/{{collective.slug}}/transactions/{{transaction.uuid}}/invoice.pdf">here</a>{{#if subscriptionsLink}}, and you can manage your subscriptions <a href="{{subscriptionsLink}}">here</a>{{/if}}.
+</p>
+
+<p>Warmly,</p>
+
+<p>
+  – The {{collective.name}} collective
+</p>
+
+{{> relatedcollectives}}
+
+{{> footer}}
+
+<p style="text-align:center;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;box-sizing:border-box;font-size:12px;color:#999;">
+BrusselsTogether ASBL/VZW<br />
+Tax number: 0664932030<br />
+Rue de l'Industrie, 11<br />
+1000 Brussels</p>
