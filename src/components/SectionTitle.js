@@ -30,7 +30,7 @@ class SectionTitle extends React.Component {
       'expenses.title': { id: 'section.expenses.title', defaultMessage: 'Expenses' },
       'expenses.subtitle': { id: 'section.expenses.subtitle', defaultMessage: 'All expenses' },
       'contributors.title': { id: 'section.contributors.title', defaultMessage: 'Contributors' },
-      'contributors.subtitle': { id: 'section.contributors.subtitle', defaultMessage: `{organizations, plural, one {{organizations} organization and} other {{organizations} organizations and}} {users} {users, plural, one {person is} other {people are}} supporting us.` },
+      'contributors.subtitle': { id: 'section.contributors.subtitle', defaultMessage: '{organizations, plural, one {{organizations} organization and} other {{organizations} organizations and}} {users} {users, plural, one {person is} other {people are}} supporting us.' },
       'contributionDetails.title': { id: 'tier.order.contributionDetails', defaultMessage: 'Contribution details' },
       'contributionDetails.subtitle': { id: 'tier.order.contributionDetails.description', defaultMessage: 'Thank you for contributing to our budget! 🙏' },
       'tickets.title': { id: 'section.tickets.title', defaultMessage: 'Tickets' },
@@ -38,7 +38,7 @@ class SectionTitle extends React.Component {
       'userDetails.title': { id: 'tier.order.userDetails', defaultMessage: 'Personal details' },
       'organizationDetails.title': { id: 'tier.order.organizationDetails', defaultMessage: 'Organization details' },
       'organizationDetails.subtitle': { id: 'tier.order.organizationDetails.description', defaultMessage: 'Create an organization. You can edit it later to add other members.' },
-      'paymentDetails.title': { id: 'tier.order.paymentDetails', defaultMessage: 'Payment details' }
+      'paymentDetails.title': { id: 'tier.order.paymentDetails', defaultMessage: 'Payment details' },
     });
   }
 

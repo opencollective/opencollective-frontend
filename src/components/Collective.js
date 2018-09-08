@@ -82,6 +82,8 @@ class Collective extends React.Component {
     }
 
     const cta = collective.isActive && collective.host && { href: '#contribute', label: 'contribute' };
+    const contributorsStats = { ...get(collective, 'stats.backers') };
+    contributorsStats.organizations += contributorsStats.collectives || 0;
 
     return (
       <div className={`CollectivePage ${collective.type}`}>
@@ -257,12 +259,12 @@ class Collective extends React.Component {
                   <div>
                     <SectionTitle
                       section="contributors"
-                      values={get(collective, 'stats.backers')}
+                      values={contributorsStats}
                       />
 
                     <MembersWithData
                       collective={collective}
-                      type="ORGANIZATION"
+                      type="ORGANIZATION,COLLECTIVE"
                       LoggedInUser={LoggedInUser}
                       role="BACKER"
                       orderBy="totalDonations"
