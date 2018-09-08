@@ -195,19 +195,19 @@ class OrderForm extends React.Component {
     ];
     /* We only support paypal for one time donations to the open
        source collective for now. */
-    if (host.id === 11004 && !this.interval()) {
+    if (host.id === 11004 && this.interval() === null) {
       paymentMethodTypeOptions.push({
         payment: intl.formatMessage(this.messages['paymentMethod.paypal']),
       });
     }
     // Add the option to pay by wire transfer for the BrusselsTogether host
-    if (get(host, 'settings.paymentMethods.manual') && !this.interval()) {
+    if (get(host, 'settings.paymentMethods.manual') && this.interval() === null) {
       paymentMethodTypeOptions.push({
-        manual: intl.formatMessage(this.messages['paymentMethod.manual']),
+        manual: get(host, 'settings.paymentMethods.manual.title') || intl.formatMessage(this.messages['paymentMethod.manual']),
       });
     }
     this.paymentMethodTypeOptions = paymentMethodTypeOptions;
-  }
+  };
 
   paymentMethodsOptionsForCollective = (paymentMethods, collective) => {
     return paymentMethods.map(pm => {
