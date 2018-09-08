@@ -92,6 +92,7 @@ class OrderForm extends React.Component {
       'paymentMethod.creditcard': { id: 'paymentMethod.creditcard', defaultMessage: 'credit card' },
       'paymentMethod.bitcoin': { id: 'paymentMethod.bitcoin', defaultMessage: 'bitcoin' },
       'paymentMethod.paypal': { id: 'paymentMethod.paypal', defaultMessage: 'paypal' },
+      'paymentMethod.manual': { id: 'paymentMethod.manual', defaultMessage: 'bank transfer' },
       'ocCard.label': { id: 'occard.label', defaultMessage: 'Gift Card' },
       'ocCard.apply': { id: 'occard.apply', defaultMessage: 'Apply' },
       'ocCard.invalid': { id: 'occard.invalid', defaultMessage: 'Invalid code' },
@@ -187,16 +188,22 @@ class OrderForm extends React.Component {
     this.state.order.interval || (this.state.tier && this.state.tier.interval);
 
   /** Populate the combo of payment methods */
-  populatePaymentMethodTypes = (hostId) => {
+  populatePaymentMethodTypes = (host) => {
     const { intl } = this.props;
     const paymentMethodTypeOptions = [
       { creditcard: intl.formatMessage(this.messages['paymentMethod.creditcard']) },
     ];
     /* We only support paypal for one time donations to the open
        source collective for now. */
-    if (hostId === 11004 && this.interval() === null) {
+    if (host.id === 11004 && !this.interval()) {
       paymentMethodTypeOptions.push({
         payment: intl.formatMessage(this.messages['paymentMethod.paypal']),
+      });
+    }
+    // Add the option to pay by wire transfer for the BrusselsTogether host
+    if (get(host, 'settings.paymentMethods.manual') && !this.interval()) {
+      paymentMethodTypeOptions.push({
+        manual: intl.formatMessage(this.messages['paymentMethod.manual']),
       });
     }
     this.paymentMethodTypeOptions = paymentMethodTypeOptions;
@@ -566,6 +573,8 @@ class OrderForm extends React.Component {
         newState.paymentMethod = { uuid: creditcard.uuid };
         this.setState(newState);
         return true;
+      } else if (get(newState, 'paymentMethod.type') === 'manual') {
+        return true;
       } else {
         let res;
         if (!creditcard.addEventListener && !TEST_ENVIRONMENT) {
@@ -631,7 +640,7 @@ class OrderForm extends React.Component {
       return;
     }
 
-    this.setState({ ocCard: Object.assign(ocCard, { loading: false})})
+    this.setState({ ocCard: Object.assign(ocCard, { loading: false }) });
 
     if (result.data && result.data.ocPaymentMethod) {
       // force a tier of the whole amount with null interval
@@ -777,12 +786,13 @@ class OrderForm extends React.Component {
     const { order, fromCollective } = this.state;
     const currency = (order.tier && order.tier.currency) || collective.currency;
 
-    this.populatePaymentMethodTypes(collective.host.id);
+    this.populatePaymentMethodTypes(collective.host);
 
     const requireLogin = !this.state.isNewUser && !LoggedInUser;
     const inputEmail = {
       type: 'email',
       name: 'email',
+      focus: true,
       required: true,
       label: `${intl.formatMessage(this.messages['email.label'])}*`,
       description: intl.formatMessage(this.messages['email.description']),
@@ -857,6 +867,15 @@ class OrderForm extends React.Component {
         }
         .info {
           margin-top: 3px;
+        }
+        .manualPaymentMethod .instructions {
+          max-width: 50rem;
+        }
+        .manualPaymentMethod :global(code) {
+          display: block;
+          color: black;
+          border: 1px solid #99C2FF;
+          background: #EBF3FF;
         }
         #paypal-checkout { padding-top: 30px; }
         .form-group#paypalFG { margin-bottom: 0px !important; }
@@ -1007,7 +1026,7 @@ class OrderForm extends React.Component {
                     placeholder={intl.formatMessage(this.messages['order.publicMessage.placeholder'])}
                     defaultValue={order.publicMessage}
                     maxLength={255}
-                    onChange={(value) => this.handleChange('order', "publicMessage", value)}
+                    onChange={(value) => this.handleChange('order', 'publicMessage', value)}
                     />
                 </Col>
               </Row>
@@ -1032,49 +1051,57 @@ class OrderForm extends React.Component {
                   </Row>
                 }
 
-                { this.isPayPalSelected() || this.renderCreditCard() }
-                { this.isPayPalSelected() && this.renderPayPalButton() }
+                { this.state.paymentMethod.type === 'creditcard' && this.renderCreditCard() }
+                { this.state.paymentMethod.type === 'payment' && this.renderPayPalButton() }
+                { this.state.paymentMethod.type === 'manual' &&
+                  <div className="horizontal form-group manualPaymentMethod ">
+                    <label className="col-sm-2 control-label"></label>
+                    <div className="col-sm-10 instructions" dangerouslySetInnerHTML={{ __html: intl.formatMessage({ id: 'host.paymentMethod.manual.instructions', defaultMessage: get(collective.host, 'settings.paymentMethods.manual.instructions') }, { amount: formatCurrency(order.totalAmount, order.tier.currency), email: get(this.state, 'user.email', '').replace('@',' at '), collective: collective.slug, TierId: order.tier.id }) }} />
+                  </div>
+                }
               </section>
             }
 
-            <Row key="summary-info">
-              <Col sm={2} />
-              <Col sm={10}>
-                { order.totalAmount > 0 && !collective.host &&
-                  <div className="error">
-                    <FormattedMessage id="order.error.hostRequired" defaultMessage="This collective doesn't have a host that can receive money on their behalf" />
-                  </div> }
+            { this.state.paymentMethod.type !== 'manual' &&
+              <Row key="summary-info">
+                <Col sm={2} />
+                <Col sm={10}>
+                  { order.totalAmount > 0 && !collective.host &&
+                    <div className="error">
+                      <FormattedMessage id="order.error.hostRequired" defaultMessage="This collective doesn't have a host that can receive money on their behalf" />
+                    </div> }
 
-                { (collective.host || order.totalAmount === 0) && !this.isPayPalSelected() &&
-                  <div className="actions">
+                  { (collective.host || order.totalAmount === 0) && !this.isPayPalSelected() &&
+                    <div className="actions">
 
-                    <div className="submit">
-                      <ActionButton className="blue" onClick={this.handleSubmit} disabled={this.state.loading}>
-                        {this.state.loading ? <FormattedMessage id="form.processing" defaultMessage="processing" /> : order.tier.button || capitalize(intl.formatMessage(this.messages['order.button']))}
-                      </ActionButton>
+                      <div className="submit">
+                        <ActionButton className="blue" onClick={this.handleSubmit} disabled={this.state.loading}>
+                          {this.state.loading ? <FormattedMessage id="form.processing" defaultMessage="processing" /> : order.tier.button || capitalize(intl.formatMessage(this.messages['order.button']))}
+                        </ActionButton>
+                      </div>
+
+                      { order.totalAmount > 0 && this.renderDisclaimer({
+                          hostname: collective.host.name,
+                          amount: formatCurrency(order.totalAmount, currency),
+                          interval: order.interval || order.tier.interval,
+                          collective: collective.name,
+                      }) }
+
+                      <div className="result">
+                        { this.state.loading &&
+                          <div className="loading"><FormattedMessage id="form.processing" defaultMessage="processing" />...</div> }
+
+                        { this.state.result.success &&
+                          <div className="success">{this.state.result.success}</div> }
+
+                        { this.state.result.error &&
+                          <div className="error">{this.state.result.error}</div> }
+                      </div>
                     </div>
-
-                    { order.totalAmount > 0 && this.renderDisclaimer({
-                        hostname: collective.host.name,
-                        amount: formatCurrency(order.totalAmount, currency),
-                        interval: order.interval || order.tier.interval,
-                        collective: collective.name,
-                    }) }
-
-                    <div className="result">
-                      { this.state.loading &&
-                        <div className="loading"><FormattedMessage id="form.processing" defaultMessage="processing" />...</div> }
-
-                      { this.state.result.success &&
-                        <div className="success">{this.state.result.success}</div> }
-
-                      { this.state.result.error &&
-                        <div className="error">{this.state.result.error}</div> }
-                    </div>
-                  </div>
-                }
-              </Col>
-            </Row>
+                  }
+                </Col>
+              </Row>
+            }
           </div>
         }
         </Form>
