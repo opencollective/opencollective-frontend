@@ -1056,50 +1056,52 @@ class OrderForm extends React.Component {
                 { this.state.paymentMethod.type === 'manual' &&
                   <div className="horizontal form-group manualPaymentMethod ">
                     <label className="col-sm-2 control-label"></label>
-                    <div className="col-sm-10 instructions" dangerouslySetInnerHTML={{ __html: intl.formatMessage({ id: 'host.paymentMethod.manual.instructions', defaultMessage: get(collective.host, 'settings.paymentMethods.manual.instructions') }, { email: get(this.state, 'user.email', '').replace('@',' at '), collective: collective.slug, TierId: order.tier.id }) }} />
+                    <div className="col-sm-10 instructions" dangerouslySetInnerHTML={{ __html: intl.formatMessage({ id: 'host.paymentMethod.manual.instructions', defaultMessage: get(collective.host, 'settings.paymentMethods.manual.instructions') }, { amount: formatCurrency(order.totalAmount, order.tier.currency), email: get(this.state, 'user.email', '').replace('@',' at '), collective: collective.slug, TierId: order.tier.id }) }} />
                   </div>
                 }
               </section>
             }
 
-            <Row key="summary-info">
-              <Col sm={2} />
-              <Col sm={10}>
-                { order.totalAmount > 0 && !collective.host &&
-                  <div className="error">
-                    <FormattedMessage id="order.error.hostRequired" defaultMessage="This collective doesn't have a host that can receive money on their behalf" />
-                  </div> }
+            { this.state.paymentMethod.type !== 'manual' &&
+              <Row key="summary-info">
+                <Col sm={2} />
+                <Col sm={10}>
+                  { order.totalAmount > 0 && !collective.host &&
+                    <div className="error">
+                      <FormattedMessage id="order.error.hostRequired" defaultMessage="This collective doesn't have a host that can receive money on their behalf" />
+                    </div> }
 
-                { (collective.host || order.totalAmount === 0) && !this.isPayPalSelected() &&
-                  <div className="actions">
+                  { (collective.host || order.totalAmount === 0) && !this.isPayPalSelected() &&
+                    <div className="actions">
 
-                    <div className="submit">
-                      <ActionButton className="blue" onClick={this.handleSubmit} disabled={this.state.loading}>
-                        {this.state.loading ? <FormattedMessage id="form.processing" defaultMessage="processing" /> : order.tier.button || capitalize(intl.formatMessage(this.messages['order.button']))}
-                      </ActionButton>
+                      <div className="submit">
+                        <ActionButton className="blue" onClick={this.handleSubmit} disabled={this.state.loading}>
+                          {this.state.loading ? <FormattedMessage id="form.processing" defaultMessage="processing" /> : order.tier.button || capitalize(intl.formatMessage(this.messages['order.button']))}
+                        </ActionButton>
+                      </div>
+
+                      { order.totalAmount > 0 && this.renderDisclaimer({
+                          hostname: collective.host.name,
+                          amount: formatCurrency(order.totalAmount, currency),
+                          interval: order.interval || order.tier.interval,
+                          collective: collective.name,
+                      }) }
+
+                      <div className="result">
+                        { this.state.loading &&
+                          <div className="loading"><FormattedMessage id="form.processing" defaultMessage="processing" />...</div> }
+
+                        { this.state.result.success &&
+                          <div className="success">{this.state.result.success}</div> }
+
+                        { this.state.result.error &&
+                          <div className="error">{this.state.result.error}</div> }
+                      </div>
                     </div>
-
-                    { order.totalAmount > 0 && this.renderDisclaimer({
-                        hostname: collective.host.name,
-                        amount: formatCurrency(order.totalAmount, currency),
-                        interval: order.interval || order.tier.interval,
-                        collective: collective.name,
-                    }) }
-
-                    <div className="result">
-                      { this.state.loading &&
-                        <div className="loading"><FormattedMessage id="form.processing" defaultMessage="processing" />...</div> }
-
-                      { this.state.result.success &&
-                        <div className="success">{this.state.result.success}</div> }
-
-                      { this.state.result.error &&
-                        <div className="error">{this.state.result.error}</div> }
-                    </div>
-                  </div>
-                }
-              </Col>
-            </Row>
+                  }
+                </Col>
+              </Row>
+            }
           </div>
         }
         </Form>
