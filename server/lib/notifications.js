@@ -396,6 +396,11 @@ async function notifyByEmail(activity) {
       notifyAdminsOfCollective(activity.data.collective.id, activity);
       break;
 
+    case activityType.COLLECTIVE_APPLY:
+      notifyAdminsOfCollective(activity.data.host.id, activity, { template: 'collective.apply.for.host' });
+      notifyAdminsOfCollective(activity.data.collective.id, activity);
+      break;
+
     case activityType.COLLECTIVE_CREATED:
       if (get(activity, 'data.host.id')) {
         notifyAdminsOfCollective(activity.data.host.id, activity, {

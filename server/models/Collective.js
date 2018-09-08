@@ -1294,6 +1294,8 @@ export default function(Sequelize, DataTypes) {
       );
     }
 
+    creatorUser = creatorUser || { id: hostCollective.CreatedByUserId };
+
     const member = {
       role: roles.HOST,
       CreatedByUserId: creatorUser
@@ -1306,6 +1308,7 @@ export default function(Sequelize, DataTypes) {
     const updatedValues = {
       HostCollectiveId: hostCollective.id,
       currency: hostCollective.currency,
+      isActive: creatorUser.isAdmin && creatorUser.isAdmin(hostCollective.id),
     };
 
     const promises = [models.Member.create(member), this.update(updatedValues)];
@@ -1326,6 +1329,16 @@ export default function(Sequelize, DataTypes) {
             promises.push(t.destroy());
           }
         });
+      }
+      if (!updatedValues.isActive) {
+        promises.push(models.Activity.create({
+          CollectiveId: this.id,
+          type: activities.COLLECTIVE_APPLY,
+          data: {
+            host: hostCollective.info,
+            collective: this.info,
+          }
+        }));
       }
     }
 
@@ -1368,13 +1381,11 @@ export default function(Sequelize, DataTypes) {
       membership.destroy();
     }
     this.HostCollectiveId = null;
-    this.isActive = false;
+    this.isActive = false; // we should rename isActive to isApproved (by the host)
     if (newHostCollective.id) {
-      if (creatorUser.isAdmin(newHostCollective.id)) {
-        this.update({ isActive: true });
-      }
       return this.addHost(newHostCollective, creatorUser);
     } else {
+      // if we remove the host
       return this.save();
     }
   };
