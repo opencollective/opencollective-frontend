@@ -24,8 +24,9 @@ const EventSponsorCard = ({ sponsor }) => (
           width: 17.5rem;
         }
         img {
-          max-width: 15rem;
+          max-width: 10rem;
           max-height: 5rem;
+          margin-bottom: 0.5rem;
         }
         .tier {
           padding: 1rem 0.5rem;
@@ -36,6 +37,7 @@ const EventSponsorCard = ({ sponsor }) => (
         }
         .name {
           color: #7fadf2;
+          font-size: 1.2rem;
         }
         .tier .name {
           font-size: 1rem;
