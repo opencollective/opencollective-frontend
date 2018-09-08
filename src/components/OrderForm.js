@@ -70,7 +70,6 @@ class OrderForm extends React.Component {
     };
 
     this.state.order.totalAmount = this.state.order.totalAmount || tier.amount * (tier.quantity || 1);
-
     this.paymentMethodsOptions = [];
     this.allowOrganizations = (order.tier.type !== 'TICKET');
 
@@ -185,7 +184,7 @@ class OrderForm extends React.Component {
 
   /** Interval set either in the tier or in the order object */
   interval = () =>
-    this.state.order.interval || (this.state.tier && this.state.tier.interval);
+    this.state.order.interval || (get(this.state, 'order.tier.interval'))
 
   /** Populate the combo of payment methods */
   populatePaymentMethodTypes = (host) => {
@@ -201,7 +200,7 @@ class OrderForm extends React.Component {
       });
     }
     // Add the option to pay by wire transfer for the BrusselsTogether host
-    if (get(host, 'settings.paymentMethods.manual') && this.interval() === null) {
+    if (get(host, 'settings.paymentMethods.manual') && !this.interval()) {
       paymentMethodTypeOptions.push({
         manual: get(host, 'settings.paymentMethods.manual.title') || intl.formatMessage(this.messages['paymentMethod.manual']),
       });
