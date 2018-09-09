@@ -130,7 +130,21 @@ export default function(Sequelize, DataTypes) {
     limitedToCollectiveIds: {
       type: DataTypes.ARRAY(DataTypes.INTEGER),
       description: "if not null, this payment method can only be used for collectives listed by their id"
-    }
+    },
+
+    claimUrl: {
+      type: DataTypes.STRING,
+    },
+
+    SourcePaymentMethodId: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'PaymentMethods',
+        key: 'id'
+      },
+      onDelete: 'SET NULL',
+      onUpdate: 'CASCADE'
+    },
 
   }, {
     paranoid: true,
