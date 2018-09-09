@@ -230,7 +230,7 @@ export default (app) => {
    * Application Management
    */
   app.post('/applications/create', auth.mustBeLoggedIn, applications.create);
-  app.get('/applications/:id', applications.read);
+  app.get('/applications/:id', auth.mustBeLoggedIn, applications.read);
   app.post('/applications/:id', auth.mustBeLoggedIn, applications.update);
   app.delete('/applications/:id', auth.mustBeLoggedIn, applications.del);
 

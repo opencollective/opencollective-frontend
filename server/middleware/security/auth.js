@@ -9,6 +9,7 @@ import {authenticateUser} from './authentication';
 import models from '../../models';
 
 const {
+  BadRequest,
   Forbidden, // I know who you are, but you permanently don't have access to this resource
   Unauthorized // You are not authorized, try to authenticate again
 } = errors;
@@ -64,7 +65,7 @@ export function authorizeClientApp(req, res, next) {
     if (req.method === exceptions[i].method && req.originalUrl.match(exceptions[i].regex)) return next();
   }
 
-  const apiKey = req.query.api_key;
+  const apiKey = req.get('Api-Key') || req.query.apiKey || req.query.api_key || req.body.api_key;
 
   if (req.clientApp) {
     debug('auth')(`Valid Client App`);
@@ -77,7 +78,7 @@ export function authorizeClientApp(req, res, next) {
     next(new Unauthorized(`Invalid API key: ${apiKey}`));
   } else {
     debug('auth')(`Missing API key or Client Id`);
-    next(new Unauthorized(`Missing API key or Client Id`));
+    next(new BadRequest(`Missing API key or Client Id`));
   }
 }
 

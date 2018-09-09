@@ -143,34 +143,18 @@ export const sendNewTokenByEmail = (req, res, next) => {
 export const signin = (req, res, next) => {
   const { user, redirect } = req.body;
   let loginLink;
-  return models.User.findOne({ where: { email: user.email.toLowerCase() }})
+  return models.User.findOne({ where: { email: user.email.toLowerCase() } })
     .then(u => u || models.User.createUserWithCollective(user))
     .then(u => {
-      cache.set(u.email, true)
-      if (req.clientApp) {
-        const loginToken = auth.createJwt(
-          u.id,
-          { scope: 'login', app: req.clientApp.id },
-          auth.TOKEN_EXPIRATION_LOGIN
-        );
-        loginLink = `${req.clientApp.callbackUrl}?token=${loginToken}`;
-        return emailLib.send('user.app.login', u.email,
-          { loginLink },
-          { bcc: 'ops@opencollective.com'}); // allows us to log in as users to debug issue
-      } else {
-        loginLink = u.generateLoginLink(redirect || '/');
-        return emailLib.send('user.new.token', u.email,
-          { loginLink },
-          { bcc: 'ops@opencollective.com'}); // allows us to log in as users to debug issue
-      }
+      cache.set(u.email, true);
+      loginLink = u.generateLoginLink(redirect || '/');
+      return emailLib.send('user.new.token', u.email,
+        { loginLink },
+        { bcc: 'ops@opencollective.com' }); // allows us to log in as users to debug issue
     })
     .then(() => {
       const response = { success: true };
 
-      // In developement mode, share loginLink on the console
-      if (process.env.NODE_ENV === 'development') {
-        console.log(loginLink);
-      }
       // For e2e testing, we enable testuser+(admin|member)@opencollective.com to automatically receive the login link
       if (process.env.NODE_ENV !== 'production' && user.email.match(/.*test.*@opencollective.com$/)) {
         response.redirect = loginLink;

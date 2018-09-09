@@ -30,20 +30,26 @@ export const ApplicationType = new GraphQLObjectType({
       },
       clientId: {
         type: GraphQLString,
-        resolve(application) {
-          return application.clientId;
+        resolve(application, args, req) {
+          if (req.remoteUser.id === application.CreatedByUserId) {
+            return application.clientId;
+          }
         }
       },
       clientSecret: {
         type: GraphQLString,
-        resolve(application) {
-          return application.clientSecret;
+        resolve(application, args, req) {
+          if (req.remoteUser.id === application.CreatedByUserId) {
+            return application.clientSecret;
+          }
         }
       },
       callbackUrl: {
         type: GraphQLString,
-        resolve(application) {
-          return application.callbackUrl;
+        resolve(application, args, req) {
+          if (req.remoteUser.id === application.CreatedByUserId) {
+            return application.callbackUrl;
+          }
         }
       },
     }

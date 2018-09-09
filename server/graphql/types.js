@@ -22,10 +22,6 @@ import {
   OrderDirectionType,
 } from './TransactionInterface';
 
-import {
-  ApplicationType,
-} from './Application';
-
 import models, { Op, sequelize } from '../models';
 import dataloaderSequelize from 'dataloader-sequelize';
 import { strip_tags } from '../lib/utils';
@@ -120,14 +116,6 @@ export const UserType = new GraphQLObjectType({
         type: GraphQLString,
         resolve(user, args, req) {
           return user.getPersonalDetails(req.remoteUser).then(user => user.paypalEmail);
-        }
-      },
-      applications: {
-        type: new GraphQLList(ApplicationType),
-        resolve(user) {
-          return models.Application.findAll({
-            where: { CreatedByUserId: user.id },
-          });
         }
       },
     }
