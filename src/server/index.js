@@ -1,11 +1,4 @@
-// Load environment variables
-import dotenv from 'dotenv';
-dotenv.config();
-
-// Only load newrelic when we explicitly want it
-if (process.env.NEW_RELIC_ENABLED) {
-  require('newrelic');
-}
+import './env';
 
 import path from 'path';
 import http from 'http';
