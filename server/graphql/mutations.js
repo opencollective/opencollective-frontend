@@ -6,6 +6,7 @@ import { editConnectedAccount } from './mutations/connectedAccounts';
 import { createExpense, editExpense, updateExpenseStatus, payExpense, deleteExpense } from './mutations/expenses';
 import * as updateMutations from './mutations/updates';
 import * as commentMutations from './mutations/comments';
+import * as applicationMutations from './mutations/applications';
 
 import statuses from '../constants/expense_status';
 
@@ -34,6 +35,11 @@ import {
 import {
   TransactionInterfaceType,
 } from './TransactionInterface';
+
+import {
+  ApplicationType,
+  ApplicationInputType,
+} from './Application';
 
 import {
   CollectiveInputType,
@@ -322,7 +328,43 @@ const mutations = {
       description: { type: GraphQLString },
     },
     resolve: async (_, args, req) => addFundsToOrg(args, req.remoteUser),
-  }
+  },
+  createApplication: {
+    type: ApplicationType,
+    args: {
+      application: {
+        type: new GraphQLNonNull(ApplicationInputType),
+      }
+    },
+    resolve(_, args, req) {
+      return applicationMutations.createApplication(_, args, req);
+    }
+  },
+  updateApplication: {
+    type: ApplicationType,
+    args: {
+      id: {
+        type: new GraphQLNonNull(GraphQLInt)
+      },
+      application: {
+         type: new GraphQLNonNull(ApplicationInputType)
+      }
+    },
+    resolve(_, args, req) {
+      return applicationMutations.updateApplication(_, args, req);
+    }
+  },
+  deleteApplication: {
+    type: ApplicationType,
+    args: {
+      id: {
+        type: new GraphQLNonNull(GraphQLInt)
+      },
+    },
+    resolve(_, args, req) {
+      return applicationMutations.deleteApplication(_, args, req);
+    }
+  },
 };
 
 export default mutations;

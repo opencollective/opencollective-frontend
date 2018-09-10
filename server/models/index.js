@@ -58,6 +58,7 @@ export function setupModels(client) {
 
   [
     'Activity',
+    'Application',
     'ConnectedAccount',
     'Order',
     'Expense',

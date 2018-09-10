@@ -29,6 +29,10 @@ import {
 } from './TransactionInterface';
 
 import {
+  ApplicationType
+} from './Application';
+
+import {
   UserType,
   TierType,
   ExpenseStatusType,
@@ -101,6 +105,13 @@ const queries = {
     type: UserType,
     resolve(_, args, req) {
       return req.remoteUser;
+    }
+  },
+
+  AuthenticatedUser: {
+    type: CollectiveInterfaceType,
+    resolve(_, args, req) {
+      return models.Collective.findById(req.remoteUser.CollectiveId);
     }
   },
 
@@ -328,6 +339,20 @@ const queries = {
       }
       const CollectiveId = await fetchCollectiveId(args.collectiveSlug);
       return models.Update.findOne({ where: { CollectiveId, slug: args.updateSlug } });
+    }
+  },
+
+  Application: {
+    type: ApplicationType,
+    args: {
+      id: { type: GraphQLInt },
+    },
+    async resolve(_, args) {
+      if (args.id) {
+        return models.Application.findById(args.id);
+      } else {
+        return new Error("Please provide an id.");
+      }
     }
   },
 

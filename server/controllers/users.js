@@ -143,14 +143,14 @@ export const sendNewTokenByEmail = (req, res, next) => {
 export const signin = (req, res, next) => {
   const { user, redirect } = req.body;
   let loginLink;
-  return models.User.findOne({ where: { email: user.email.toLowerCase() }})
+  return models.User.findOne({ where: { email: user.email.toLowerCase() } })
     .then(u => u || models.User.createUserWithCollective(user))
     .then(u => {
       cache.set(u.email, true);
       loginLink = u.generateLoginLink(redirect || '/');
       return emailLib.send('user.new.token', u.email,
         { loginLink },
-        { bcc: 'ops@opencollective.com'}); // allows us to log in as users to debug issue
+        { bcc: 'ops@opencollective.com' }); // allows us to log in as users to debug issue
     })
     .then(() => {
       const response = { success: true };
@@ -207,3 +207,19 @@ export const show = (req, res, next) => {
     res.send(userData);
   }
 };
+
+/**
+ * Token.
+ */
+export const token = async (req, res) => {
+    const userId = req.remoteUser.id;
+    const appId = req.clientApp.id;
+
+    const sessionToken = auth.createJwt(
+      userId,
+      { 'app': appId, 'scope': 'session' },
+      auth.TOKEN_EXPIRATION_SESSION
+    );
+
+    res.send({ token: sessionToken });
+}

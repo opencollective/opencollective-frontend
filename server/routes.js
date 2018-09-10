@@ -14,6 +14,7 @@ import * as notifications from './controllers/notifications';
 import getPaymentMethods from './controllers/paymentMethods';
 import * as test from './controllers/test';
 import * as users from './controllers/users';
+import * as applications from './controllers/applications';
 import stripeWebhook from './controllers/webhooks';
 
 import * as email from './controllers/services/email';
@@ -45,9 +46,9 @@ export default (app) => {
    */
   app.use('/status', serverStatus(app));
 
-  if (process.env.NODE_ENV !== 'development') {
-    app.use('*', auth.authorizeApiKey);
-  }
+  app.use('*', auth.checkClientApp);
+
+  app.use('*', auth.authorizeClientApp);
 
   if (process.env.DEBUG) {
     app.use('*', (req, res, next) => {
@@ -71,6 +72,7 @@ export default (app) => {
    * User reset password or new token flow (no jwt verification)
    */
   app.post('/users/signin', required('user'), users.signin);
+  app.post('/users/token', auth.mustBeLoggedIn, users.token);
   app.post('/users/update-token', auth.mustBeLoggedIn, users.updateToken);
 
   // These two endpoints are used by opencollective-website and might
@@ -223,6 +225,14 @@ export default (app) => {
    * Github API - fetch all repositories using the user's access_token
    */
   app.get('/github-repositories', connectedAccounts.fetchAllRepositories);
+
+  /**
+   * Application Management
+   */
+  app.post('/applications/create', auth.mustBeLoggedIn, applications.create);
+  app.get('/applications/:id', auth.mustBeLoggedIn, applications.read);
+  app.post('/applications/:id', auth.mustBeLoggedIn, applications.update);
+  app.delete('/applications/:id', auth.mustBeLoggedIn, applications.del);
 
   /**
    * test-api routes

@@ -117,7 +117,7 @@ export const UserType = new GraphQLObjectType({
         resolve(user, args, req) {
           return user.getPersonalDetails(req.remoteUser).then(user => user.paypalEmail);
         }
-      }
+      },
     }
   }
 });
