@@ -126,7 +126,14 @@ class Collective extends React.Component {
           .actions :global(button.btn) {
             margin-right: 5px;
           }
+          .tiers :global(.TierCard) {
+            margin: 1rem;
+          }
           @media(min-width: 600px) {
+            .leftContent {
+              width: 60%;
+              float: left;
+            }
             .sidebar {
               float: right;
               margin: 3rem 0 3rem 3rem;
@@ -165,6 +172,29 @@ class Collective extends React.Component {
               <div>
                 <div className="content" >
 
+                  <div className="leftContent">
+                    { (get(collective, 'stats.updates') > 0 || canEditCollective) &&
+                      <UpdatesSection
+                        LoggedInUser={LoggedInUser}
+                        collective={collective}
+                        />
+                    }
+
+                    { (get(collective, 'stats.events') > 0 || canEditCollective) &&
+                      <EventsSection
+                        LoggedInUser={LoggedInUser}
+                        collective={collective}
+                        />
+                    }
+                    <LongDescription longDescription={collective.longDescription} defaultSubtitle={collective.description} />
+
+                    <TeamSection
+                      collective={collective}
+                      LoggedInUser={LoggedInUser}
+                      limit={10}
+                      />
+                  </div>
+
                   { collective.isActive && collective.host &&
                     <div className="sidebar tiers" id="contribute">
                       { collective.tiers.map(tier => (
@@ -182,28 +212,8 @@ class Collective extends React.Component {
                       </div>
                     </div>
                   }
-
-                  { (get(collective, 'stats.updates') > 0 || canEditCollective) &&
-                    <UpdatesSection
-                      LoggedInUser={LoggedInUser}
-                      collective={collective}
-                      />
-                  }
-
-                  { (get(collective, 'stats.events') > 0 || canEditCollective) &&
-                    <EventsSection
-                      LoggedInUser={LoggedInUser}
-                      collective={collective}
-                      />
-                  }
-                  <LongDescription longDescription={collective.longDescription} defaultSubtitle={collective.description} />
-
-                  <TeamSection
-                    collective={collective}
-                    LoggedInUser={LoggedInUser}
-                    limit={10}
-                    />
                 </div>
+
               </div>
 
               { get(collective, 'stats.collectives.memberOf') > 0 &&
