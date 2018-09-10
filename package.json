@@ -145,7 +145,6 @@
     "raf": "^3.4.0",
     "react-test-renderer": "^16.5.0",
     "regenerator-runtime": "^0.12.1",
-    "semantic-release": "^15.9.8",
     "sinon": "6.1.5",
     "webpack-bundle-analyzer": "^3.0.1"
   },
@@ -162,11 +161,6 @@
     "commitizen": {
       "path": "./node_modules/cz-conventional-changelog"
     }
-  },
-  "release": {
-    "publish": [
-      "@semantic-release/github"
-    ]
   },
   "greenkeeper": {
     "ignore": [
