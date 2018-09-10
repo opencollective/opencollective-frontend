@@ -395,7 +395,7 @@ describe('Mutation Tests', () => {
           };
           const result = await utils.graphqlQuery(query, { order });
           expect(result.errors.length).to.equal(1);
-          expect(result.errors[0].message).to.equal(`No collective found with id: ${order.collective.id}`);
+          expect(result.errors[0].message).to.equal(`No collective found: ${order.collective.id}`);
         });
 
         it('when tier doesn\'t exist', async () => {

@@ -148,6 +148,7 @@ describe('graphql.cancelSubscriptions.test.js', () => {
       // check that subscription is updated in database
       expect(orders[0].Subscription.isActive).to.equal(false);
       expect(orders[0].Subscription.deactivatedAt).to.not.equal(null);
+      expect(orders[0].status).to.equal('CANCELLED');
 
       // check that activity is created
       const activity = await models.Activity.findOne({where: {type: 'subscription.canceled'}});
