@@ -111,7 +111,7 @@ class ExpensesSection extends React.Component {
                     </h2>
                     <SmallButton
                       disabled={this.totalExpenses < 5}
-                      className="light"
+                      className="light ViewAllExpensesBtn"
                       onClick={() => Router.pushRoute(`${collective.path}/expenses`)}
                       >
                       <FormattedMessage id="expenses.viewAll" defaultMessage="View All Expenses" />
@@ -138,7 +138,7 @@ class ExpensesSection extends React.Component {
                     </h2>
                     <SmallButton
                       disabled={this.totalTransactions < 5}
-                      className="light"
+                      className="light ViewAllTransactionsBtn"
                       onClick={() => Router.pushRoute(`${collective.path}/transactions`)}
                       >
                       <FormattedMessage id="transactions.viewAll" defaultMessage="View All Transactions" />
