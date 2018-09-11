@@ -2,13 +2,7 @@
   "presets": [
     "@babel/preset-env",
     "@babel/preset-stage-0",
-    ["next/babel", {
-      "styled-jsx": {
-        "plugins": [
-          "styled-jsx-plugin-postcss"
-        ]
-      }
-    }]
+    "next/babel"
   ],
   "plugins": [
     "lodash",

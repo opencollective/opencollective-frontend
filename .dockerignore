@@ -3,6 +3,5 @@
 !src
 !package.json
 !package-lock.json
-!postcss.config.js
 src/.next
 src/**/__tests__/*
