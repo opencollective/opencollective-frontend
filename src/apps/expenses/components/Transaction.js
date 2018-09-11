@@ -1,4 +1,3 @@
-import moment from 'moment';
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { FormattedNumber, FormattedMessage } from 'react-intl';
@@ -10,6 +9,7 @@ import { P, Span } from '../../../components/Text';
 import TransactionDetails from './TransactionDetails';
 import { Box, Flex } from 'grid-styled';
 import Link from '../../../components/Link';
+import Moment from '../../../components/Moment';
 
 class Transaction extends React.Component {
 
@@ -63,12 +63,10 @@ class Transaction extends React.Component {
       currency,
       fromCollective,
       collective,
-      subscription,
       type,
       paymentProcessorFeeInHostCurrency,
     } = this.props;
 
-    const formattedCreatedAt = (new Date(createdAt)).toISOString();
     return (
       <Flex my={4}>
         <Container alignSelf="flex-start" >
@@ -108,7 +106,7 @@ class Transaction extends React.Component {
           <Container fontSize="1.2rem" color="#AEB2B8">
             <a href={`/${fromCollective.slug}`} title={fromCollective.name}>{fromCollective.name}</a>
             { ' | ' }
-            <span title={moment(formattedCreatedAt).format('LLLL')}>{moment(formattedCreatedAt).fromNow()}</span>
+            <Moment relative={true} value={createdAt} />
             { paymentProcessorFeeInHostCurrency !== undefined &&
               <Fragment>
                 { ' | ' }
