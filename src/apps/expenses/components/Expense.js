@@ -255,7 +255,7 @@ class Expense extends React.Component {
         `}</style>
           <div className="fromCollective">
             <a href={`/${expense.fromCollective.slug}`} title={expense.fromCollective.name}>
-              <Avatar src={expense.fromCollective.image} key={expense.fromCollective.id} radius={40} />
+              <Avatar src={expense.fromCollective.image} key={expense.fromCollective.id} radius={40} className="noFrame" />
             </a>
           </div>
           <div className="body">
