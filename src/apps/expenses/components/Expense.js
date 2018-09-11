@@ -171,11 +171,11 @@ class Expense extends React.Component {
             }
             .fromCollective {
               float: left;
-              margin-right: 1rem;
+              margin-right: 1.6rem;
             }
             .body {
               overflow: hidden;
-              font-size: 1.5rem;
+              font-size: 1.4rem;
               width: 100%;
             }
             .description {
@@ -199,10 +199,8 @@ class Expense extends React.Component {
               color: #919599;
             }
             .amount {
-              width: 10rem;
               margin-left: 0.5rem;
               text-align: right;
-              font-family: montserratlight, arial;
               font-size: 1.5rem;
               font-weight: 300;
             }

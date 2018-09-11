@@ -62,57 +62,58 @@ class Expenses extends React.Component {
 
     return (
       <div className="Expenses">
-        <style jsx>
-          {`
-            .Expenses {
-              min-width: 30rem;
-              max-width: 80rem;
-            }
-            :global(.loadMoreBtn) {
-              margin: 1rem;
-              text-align: center;
-            }
-            .filter {
-              width: 100%;
-              max-width: 400px;
-              margin: 0 auto;
-            }
-            :global(.filterBtnGroup) {
-              width: 100%;
-              display: flex;
-              justify-content: center;
-            }
-            :global(.filterBtn) {
-              width: 25%;
-            }
-            .empty {
-              text-align: center;
-              margin: 4rem;
-              color: ${colors.darkgray};
-            }
-            .itemsList {
-              position: relative;
-            }
-            .loading {
-              color: ${colors.darkgray};
-              position: absolute;
-              top: 0;
-              left: 0;
-              width: 100%;
-              height: 100%;
-              display: flex;
-              justify-content: center;
-              align-items: center;
-              background: rgba(255, 255, 255, 0.85);
-              text-transform: uppercase;
-              letter-spacing: 3px;
-              font-weight: bold;
-              z-index: 10;
-              -webkit-backdrop-filter: blur(2px);
-              backdrop-filter: blur(5px);
-            }
-          `}
-        </style>
+        <style jsx>{`
+          .Expenses {
+            min-width: 30rem;
+            max-width: 80rem;
+          }
+          :global(.loadMoreBtn) {
+            margin: 1rem;
+            text-align: center;
+          }
+          .filter {
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
+          }
+          :global(.filterBtnGroup) {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+          }
+          :global(.filterBtn) {
+            width: 25%;
+          }
+          .empty {
+            text-align: center;
+            margin: 4rem;
+            color: ${colors.darkgray}
+          }
+          .itemsList {
+            position: relative;
+          }
+          .itemsList :global(.item) {
+            border-bottom: 1px solid #E8E9EB;
+          }
+          .loading {
+            color: ${colors.darkgray};
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: rgba(255,255,255,0.85);
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            font-weight: bold;
+            z-index: 10;
+            -webkit-backdrop-filter: blur(2px);
+            backdrop-filter: blur(5px);
+          }
+        `}</style>
 
         {filters && (
           <div className="filter">
@@ -168,22 +169,23 @@ class Expenses extends React.Component {
             <div className="loading">
               <FormattedMessage id="loading" defaultMessage="loading" />
             </div>
-          )}
+          }
           {expenses.map(expense => (
-            <Expense
-              key={expense.id}
-              collective={expense.collective || collective}
-              expense={expense}
-              editable={editable}
-              view={view}
-              includeHostedCollectives={includeHostedCollectives}
-              LoggedInUser={LoggedInUser}
-              allowPayAction={!this.state.isPayActionLocked}
-              lockPayAction={this.setPayActionLock.bind(this, true)}
-              unlockPayAction={this.setPayActionLock.bind(this, false)}
-            />
+            <div className="item" key={expense.id}>
+              <Expense
+                collective={expense.collective || collective}
+                expense={expense}
+                editable={editable}
+                view={view}
+                includeHostedCollectives={includeHostedCollectives}
+                LoggedInUser={LoggedInUser}
+                allowPayAction={!this.state.isPayActionLocked}
+                lockPayAction={this.setPayActionLock.bind(this, true)}
+                unlockPayAction={this.setPayActionLock.bind(this, false)}
+                />
+            </div>
           ))}
-          {expenses.length === 0 && (
+          { expenses.length === 0 &&
             <div className="empty">
               <FormattedMessage
                 id="expenses.empty"

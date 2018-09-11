@@ -18,6 +18,27 @@ class SmallButton extends React.Component {
             background: white;
             padding: 0 2rem;
           }
+          .SmallButton.light button {
+            border: 1px solid #76777A;
+            color: #76777A;
+            font-size: 1.2rem;
+            height: 2.8rem;
+            line-height: 2.8rem;
+            font-weight: 500;
+          }
+          .SmallButton.light button:hover {
+            color: #99C2FF;
+            border: 1px solid #99C2FF;
+          }
+          .SmallButton.light button:active {
+            background: #3385FF;
+            color: white;
+            border: 1px solid #3385FF;
+          }
+          .SmallButton.light button:disabled {
+            color: #DCDEE0;
+            border: 1px solid #DCDEE0;
+          }
           .SmallButton.primary button {
             background: #297acc;
             border-color: rgba(24, 25, 26, 0.12);
