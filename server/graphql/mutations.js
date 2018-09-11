@@ -383,7 +383,7 @@ const mutations = {
       code: { type: new GraphQLNonNull(GraphQLString) },
       email: { type: new GraphQLNonNull(GraphQLString) },
     },
-    resolve: async (_, args, req) => claimVirtualCard(args),
+    resolve: async (_, args, req) => claimVirtualCard(args, req),
   }
 };
 
