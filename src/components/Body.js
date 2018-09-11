@@ -22,21 +22,24 @@ export default class Body extends React.Component {
             text-decoration: none !important;
             cursor: pointer;
           }
+
+          h1 {
+            font-size: 4rem;
+            letter-spacing: -1.2px;
+          }
+
+          h2,
+          h3 {
+            letter-spacing: -0.4px;
+          }
+
           button {
             cursor: pointer;
           }
 
-          section h1 {
-            font-size: 1.8rem;
-          }
-
-          section h2 {
-            font-size: 1.6rem;
-          }
-
           .content {
-            max-width: 1244px;
-            padding: 2rem 3rem;
+            max-width: 1080px;
+            padding: 2rem 0rem;
             margin: 0 auto;
             line-height: 1.5;
             overflow: hidden;

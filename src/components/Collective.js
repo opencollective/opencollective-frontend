@@ -176,7 +176,7 @@ class Collective extends React.Component {
               font-size: 1.4rem;
             }
             section {
-              max-width: 1244px;
+              max-width: 1080px;
               margin: 0 auto 5rem;
             }
             #events .eventsList {

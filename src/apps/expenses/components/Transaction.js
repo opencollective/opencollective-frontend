@@ -82,7 +82,7 @@ class Transaction extends React.Component {
         <Container ml={3} width={1}>
           <Flex justifyContent="space-between" alignItems="center">
             <div>
-              <P fontSize="1.4rem" color="#9399A3" display="inline">
+              <P fontSize="1.4rem" color="#313233" display="inline">
                 {description}
                 {type === 'DEBIT' && ' expense '}
                 {collective && (
