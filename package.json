@@ -144,7 +144,7 @@
     "regenerator-runtime": "^0.12.1",
     "semantic-release": "^15.9.8",
     "sinon": "6.1.5",
-    "webpack-bundle-analyzer": "^2.13.1"
+    "webpack-bundle-analyzer": "^3.0.1"
   },
   "jest": {
     "moduleNameMapper": {
