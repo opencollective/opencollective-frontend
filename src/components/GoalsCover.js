@@ -73,7 +73,12 @@ class GoalsCover extends React.Component {
       );
     }
 
-    (get(collective, 'settings.goals') || []).map(g => this.goals.push(g));
+    (get(collective, 'settings.goals') || []).map(g => {
+      if (g.title) {
+        this.hasCustomGoals = true;
+        this.goals.push(g);
+      }
+    });
 
     this.goals.sort((a, b) => a.amount > b.amount);
 
@@ -237,7 +242,6 @@ class GoalsCover extends React.Component {
     if (!collective) {
       return (<div />);
     }
-
     const state = this.populateGoals();
 
     return (
@@ -262,6 +266,10 @@ class GoalsCover extends React.Component {
           min-height: 80px;
         }
 
+        .barContainer.withGoals {
+          margin-top: 9rem;
+        }
+
         .annualBudget {
           font-weight: bold;
           color: white;
@@ -282,7 +290,7 @@ class GoalsCover extends React.Component {
               <span className="annualBudget">{formatCurrency(get(collective, 'stats.yearlyBudget'), collective.currency, { precision: 0 })}</span>
             </div>
           }
-          <div className="barContainer" style={get(state, 'styles.barContainer')} ref={node => this.nodes.barContainer = node}>
+          <div className={`barContainer ${this.hasCustomGoals ? 'withGoals' : ''}`} style={get(state, 'styles.barContainer')} ref={node => this.nodes.barContainer = node}>
             <div className="bars">
               { this.goals && this.goals.map((goal, index) => this.renderGoal(goal, index, state)) }
             </div>
