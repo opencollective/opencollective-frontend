@@ -291,6 +291,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   background-color: white;
   border-top: 1px solid #aaaaaa;
   bottom: 0px;
+  background-color: white;
   min-height: 7.5rem;
   padding: 1rem;
   width: 100%;
@@ -446,7 +447,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
 
 .c24.c24.c24 {
   border: none;
-  border-bottom: 2px solid #46B0ED;
+  border-bottom: 2px solid #3385FF;
   border-radius: 0;
   box-shadow: none;
   display: block;
@@ -807,7 +808,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
                 type="search"
               />
               <button
-                className="jsx-1144918383 jsx-3840138619 Button blue c25"
+                className="jsx-1375211830 jsx-3370595267 Button blue c25"
                 onClick={[Function]}
                 type="submit"
               >
@@ -1619,6 +1620,7 @@ exports[`Search Page renders empty results message 1`] = `
   background-color: white;
   border-top: 1px solid #aaaaaa;
   bottom: 0px;
+  background-color: white;
   min-height: 7.5rem;
   padding: 1rem;
   width: 100%;
@@ -1758,7 +1760,7 @@ exports[`Search Page renders empty results message 1`] = `
 
 .c24.c24.c24 {
   border: none;
-  border-bottom: 2px solid #46B0ED;
+  border-bottom: 2px solid #3385FF;
   border-radius: 0;
   box-shadow: none;
   display: block;
@@ -2119,7 +2121,7 @@ exports[`Search Page renders empty results message 1`] = `
                 type="search"
               />
               <button
-                className="jsx-1144918383 jsx-3840138619 Button blue c25"
+                className="jsx-1375211830 jsx-3370595267 Button blue c25"
                 onClick={[Function]}
                 type="submit"
               >
@@ -2890,6 +2892,7 @@ exports[`Search Page renders error message 1`] = `
   background-color: white;
   border-top: 1px solid #aaaaaa;
   bottom: 0px;
+  background-color: white;
   min-height: 7.5rem;
   padding: 1rem;
   width: 100%;
@@ -4136,6 +4139,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
   background-color: white;
   border-top: 1px solid #aaaaaa;
   bottom: 0px;
+  background-color: white;
   min-height: 7.5rem;
   padding: 1rem;
   width: 100%;
@@ -4275,7 +4279,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
 
 .c24.c24.c24 {
   border: none;
-  border-bottom: 2px solid #46B0ED;
+  border-bottom: 2px solid #3385FF;
   border-radius: 0;
   box-shadow: none;
   display: block;
@@ -4636,7 +4640,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
                 type="search"
               />
               <button
-                className="jsx-1144918383 jsx-3840138619 Button blue c25"
+                className="jsx-1375211830 jsx-3370595267 Button blue c25"
                 onClick={[Function]}
                 type="submit"
               >
@@ -4655,7 +4659,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
           className="c27 c28 sc-bdVaJa c2"
         >
           <svg
-            fill="#46B0ED"
+            fill="#3385FF"
             height={100}
             viewBox="0 0 105 105"
             width={100}
@@ -5559,6 +5563,7 @@ exports[`Search Page renders search results with pagination 1`] = `
   background-color: white;
   border-top: 1px solid #aaaaaa;
   bottom: 0px;
+  background-color: white;
   min-height: 7.5rem;
   padding: 1rem;
   width: 100%;
@@ -5698,7 +5703,7 @@ exports[`Search Page renders search results with pagination 1`] = `
 
 .c24.c24.c24 {
   border: none;
-  border-bottom: 2px solid #46B0ED;
+  border-bottom: 2px solid #3385FF;
   border-radius: 0;
   box-shadow: none;
   display: block;
@@ -6059,7 +6064,7 @@ exports[`Search Page renders search results with pagination 1`] = `
                 type="search"
               />
               <button
-                className="jsx-1144918383 jsx-3840138619 Button blue c25"
+                className="jsx-1375211830 jsx-3370595267 Button blue c25"
                 onClick={[Function]}
                 type="submit"
               >

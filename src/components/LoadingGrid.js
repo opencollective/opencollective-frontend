@@ -108,7 +108,7 @@ LoadingGrid.propTypes = {
 };
 
 LoadingGrid.defaultProps = {
-  color: '#46B0ED',
+  color: '#3385FF',
   size: 100,
 };
 
