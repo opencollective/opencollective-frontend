@@ -3,7 +3,7 @@ import errors from '../../lib/errors';
 export function editTiers(_, args, req) {
   let collective;
   if (!req.remoteUser) {
-    throw new errors.Unauthorized("You need to be logged in to edit tiers");
+    throw new errors.Unauthorized('You need to be logged in to edit tiers');
   }
 
   return req.loaders.collective.findById.load(args.id)
@@ -15,5 +15,5 @@ export function editTiers(_, args, req) {
   .then(canEdit => {
     if (!canEdit) throw new errors.Unauthorized(`You need to be logged in as a core contributor or as a host of the ${collective.name} collective`);
   })
-  .then(() => collective.editTiers(args.tiers))
+  .then(() => collective.editTiers(args.tiers));
 }

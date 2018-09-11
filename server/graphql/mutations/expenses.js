@@ -9,7 +9,7 @@ import { formatCurrency } from '../../lib/utils';
 import paypalAdaptive from '../../paymentProviders/paypal/adaptiveGateway';
 import {
   createFromPaidExpense as createTransactionFromPaidExpense,
-  createTransactionFromInKindDonation
+  createTransactionFromInKindDonation,
 } from '../../lib/transactions';
 
 /**
@@ -38,17 +38,17 @@ function canEditExpense(remoteUser, expense) {
 
 export async function updateExpenseStatus(remoteUser, expenseId, status) {
   if (!remoteUser) {
-    throw new errors.Unauthorized("You need to be logged in to update the status of an expense");
+    throw new errors.Unauthorized('You need to be logged in to update the status of an expense');
   }
 
   if (Object.keys(statuses).indexOf(status) === -1) {
-    throw new errors.ValidationFailed("Invalid status, status must be one of ", Object.keys(statuses).join(', '));
+    throw new errors.ValidationFailed('Invalid status, status must be one of ', Object.keys(statuses).join(', '));
   }
 
   const expense = await models.Expense.findById(expenseId, { include: [ { model: models.Collective, as: 'collective' } ] });
 
   if (!expense) {
-    throw new errors.Unauthorized("Expense not found");
+    throw new errors.Unauthorized('Expense not found');
   }
 
   if (!canUpdateExpenseStatus(remoteUser, expense)) {
@@ -67,7 +67,7 @@ export async function updateExpenseStatus(remoteUser, expenseId, status) {
       break;
     case statuses.PAID:
       if (expense.status !== statuses.APPROVED) {
-        throw new errors.Unauthorized("The expense must be approved before you can set it to paid");
+        throw new errors.Unauthorized('The expense must be approved before you can set it to paid');
       }
       break;
   }
@@ -77,10 +77,10 @@ export async function updateExpenseStatus(remoteUser, expenseId, status) {
 
 export async function createExpense(remoteUser, expenseData) {
   if (!remoteUser) {
-    throw new errors.Unauthorized("You need to be logged in to create an expense");
+    throw new errors.Unauthorized('You need to be logged in to create an expense');
   }
   if (!get(expenseData, 'collective.id')) {
-    throw new errors.Unauthorized("Missing expense.collective.id");
+    throw new errors.Unauthorized('Missing expense.collective.id');
   }
 
   // Update remoteUser's paypal email if it has changed
@@ -97,7 +97,7 @@ export async function createExpense(remoteUser, expenseData) {
   }
 
   if (!collective) {
-    throw new errors.ValidationFailed("Collective not found");
+    throw new errors.ValidationFailed('Collective not found');
   }
 
   if (expenseData.currency && expenseData.currency !== collective.currency) {
@@ -109,12 +109,12 @@ export async function createExpense(remoteUser, expenseData) {
     status: statuses.PENDING,
     CollectiveId: collective.id,
     lastEditedById: expenseData.UserId,
-    incurredAt: expenseData.incurredAt || new Date
+    incurredAt: expenseData.incurredAt || new Date,
   });
 
   collective.addUserWithRole(remoteUser, roles.CONTRIBUTOR).catch(e => {
     if (e.name === 'SequelizeUniqueConstraintError') {
-      console.log("User ", remoteUser.id, "is already a contributor");
+      console.log('User ', remoteUser.id, 'is already a contributor');
     } else {
       console.error(e);
     }
@@ -128,13 +128,13 @@ export async function createExpense(remoteUser, expenseData) {
 
 export async function editExpense(remoteUser, expenseData) {
   if (!remoteUser) {
-    throw new errors.Unauthorized("You need to be logged in to edit an expense");
+    throw new errors.Unauthorized('You need to be logged in to edit an expense');
   }
 
   const expense = await models.Expense.findById(expenseData.id, { include: [ { model: models.Collective, as: 'collective' } ] });
 
   if (!expense) {
-    throw new errors.Unauthorized("Expense not found");
+    throw new errors.Unauthorized('Expense not found');
   }
 
   if (!canEditExpense(remoteUser, expense)) {
@@ -164,13 +164,13 @@ export async function editExpense(remoteUser, expenseData) {
 
 export async function deleteExpense(remoteUser, expenseId) {
   if (!remoteUser) {
-    throw new errors.Unauthorized("You need to be logged in to delete an expense");
+    throw new errors.Unauthorized('You need to be logged in to delete an expense');
   }
 
   const expense = await models.Expense.findById(expenseId, { include: [ { model: models.Collective, as: 'collective' } ] });
 
   if (!expense) {
-    throw new errors.Unauthorized("Expense not found");
+    throw new errors.Unauthorized('Expense not found');
   }
 
   if (!canEditExpense(remoteUser, expense)) {
@@ -190,14 +190,14 @@ async function payExpenseUpdate(expense) {
 
 export async function payExpense(remoteUser, expenseId, paymentProcessorFee) {
   if (!remoteUser) {
-    throw new errors.Unauthorized("You need to be logged in to pay an expense");
+    throw new errors.Unauthorized('You need to be logged in to pay an expense');
   }
   const expense = await models.Expense.findById(expenseId, { include: [ { model: models.Collective, as: 'collective' } ] });
   if (!expense) {
-    throw new errors.Unauthorized("Expense not found");
+    throw new errors.Unauthorized('Expense not found');
   }
   if (expense.status === statuses.PAID) {
-    throw new errors.Unauthorized("Expense has already been paid");
+    throw new errors.Unauthorized('Expense has already been paid');
   }
   if (expense.status !== statuses.APPROVED) {
     throw new errors.Unauthorized(`Expense needs to be approved. Current status of the expense: ${expense.status}.`);
@@ -246,9 +246,9 @@ export async function payExpense(remoteUser, expenseId, paymentProcessorFee) {
       expense.setPaid(remoteUser.id);
     } catch (err) {
       if (err.message.indexOf('The total amount of all payments exceeds the maximum total amount for all payments') !==-1) {
-        return new errors.BadRequest(`Not enough funds in your existing Paypal preapproval. Please refill your PayPal payment balance.`);
+        return new errors.BadRequest('Not enough funds in your existing Paypal preapproval. Please refill your PayPal payment balance.');
       } else {
-        return new errors.BadRequest(err.message)
+        return new errors.BadRequest(err.message);
       }
     }
   }

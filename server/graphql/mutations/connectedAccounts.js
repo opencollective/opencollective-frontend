@@ -5,7 +5,7 @@ import { pick } from 'lodash';
 
 const ediableAttributes = ['settings'];
 
-/**connectedAccount
+/** connectedAccount
  * Only the author or an admin of the collective can edit a connectedAccount
  */
 function canEditConnectedAccount(remoteUser, connectedAccount) {
@@ -15,13 +15,13 @@ function canEditConnectedAccount(remoteUser, connectedAccount) {
 
 export async function editConnectedAccount(remoteUser, connectedAccountData) {
   if (!remoteUser) {
-    throw new errors.Unauthorized("You need to be logged in to edit a connected account");
+    throw new errors.Unauthorized('You need to be logged in to edit a connected account');
   }
 
   const connectedAccount = await models.ConnectedAccount.findById(connectedAccountData.id);
 
   if (!connectedAccount) {
-    throw new errors.Unauthorized("Connected account not found");
+    throw new errors.Unauthorized('Connected account not found');
   }
 
   if (!canEditConnectedAccount(remoteUser, connectedAccount)) {
@@ -34,13 +34,13 @@ export async function editConnectedAccount(remoteUser, connectedAccountData) {
 
 export async function deleteConnectedAccount(remoteUser, connectedAccountId) {
   if (!remoteUser) {
-    throw new errors.Unauthorized("You need to be logged in to delete a connected account");
+    throw new errors.Unauthorized('You need to be logged in to delete a connected account');
   }
 
   const connectedAccount = await models.ConnectedAccount.findById(connectedAccountId);
 
   if (!connectedAccount) {
-    throw new errors.Unauthorized("Connected account not found");
+    throw new errors.Unauthorized('Connected account not found');
   }
 
   if (!canEditConnectedAccount(remoteUser, connectedAccount)) {
