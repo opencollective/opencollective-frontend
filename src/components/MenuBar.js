@@ -142,7 +142,7 @@ class MenuBar extends React.Component {
     uniqBy(document.querySelectorAll('section'), el => el.id)
       .filter(el => !!el.id)
       .forEach(el => {
-        const titleEl = el.querySelector('.title');
+        const titleEl = el.querySelector('h1');
         const menuItem = {
           anchor: el.id,
           title: titleEl && titleEl.innerText,

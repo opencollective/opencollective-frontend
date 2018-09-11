@@ -23,25 +23,28 @@ class LongDescription extends React.Component {
     ).sections.filter(s => s.markdown);
     return (
       <div className="longDescription">
-        <style jsx>
-          {`
-            .longDescription :global(.video) {
-              position: relative;
-              padding-bottom: 56.25%; /* 16:9 */
-              padding-top: 25px;
-              height: 0;
-            }
-            .longDescription :global(.video iframe) {
-              position: absolute;
-              top: 0;
-              left: 0;
-              width: 100%;
-              max-width: 800px;
-              max-height: 450px;
-              height: 100%;
-            }
-          `}
-        </style>
+        <style jsx>{`
+          .longDescription :global(.video) {
+            position: relative;
+            padding-bottom: 56.25%; /* 16:9 */
+            padding-top: 25px;
+            height: 0;
+          }
+          .longDescription :global(.video iframe) {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            max-width: 800px;
+            max-height: 450px;
+            height: 100%;
+          }
+          .longDescription .markdown :global(h1) {
+            text-align: left;
+            font-size: 1.8rem;
+            letter-spacing: -0.4px;
+          }
+        `}</style>
         {sections.map(section => (
           <section
             key={section.id || 'about'}
@@ -59,8 +62,8 @@ class LongDescription extends React.Component {
               }
               subtitle={section.title ? '' : this.props.defaultSubtitle}
             />
-
             <div
+              className="markdown"
               dangerouslySetInnerHTML={{
                 __html: converter.makeHtml(section.markdown),
               }}
