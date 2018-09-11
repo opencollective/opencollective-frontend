@@ -132,10 +132,6 @@ export default function(Sequelize, DataTypes) {
       description: "if not null, this payment method can only be used for collectives listed by their id"
     },
 
-    claimUrl: {
-      type: DataTypes.STRING,
-    },
-
     SourcePaymentMethodId: {
       type: DataTypes.INTEGER,
       references: {
