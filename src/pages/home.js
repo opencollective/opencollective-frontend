@@ -205,7 +205,7 @@ class HomePage extends React.Component {
         <Body>
           <Container
             alignItems="center"
-            backgroundImage="/static/images/hero-bg.svg"
+            backgroundImage="url(/static/images/hero-bg.svg)"
             backgroundPosition="center top"
             backgroundSize="cover"
             backgroundRepeat="no-repeat"
