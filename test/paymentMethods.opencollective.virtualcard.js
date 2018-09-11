@@ -530,7 +530,7 @@ describe('opencollective.virtualcard', () => {
           amount: 10000,
         };
         return request(app)
-        .post('/payment-methods')
+        .post('/v1/payment-methods')
         .send(args)
         .expect(400);
       });
@@ -541,7 +541,7 @@ describe('opencollective.virtualcard', () => {
           amount: 10000,
         };
         return request(app)
-        .post('/payment-methods')
+        .post('/v1/payment-methods')
         .set('Authorization', `Bearer ${user1.jwt()}`)
         .set('Client-Id', appKeyData.clientId)
         .send(args)

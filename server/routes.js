@@ -158,7 +158,7 @@ export default (app) => {
   *
   *  Let's assume for now a paymentMethod is linked to a user.
   */
-  app.post('/payment-methods', createPaymentMethod); // Creates a payment method.
+  app.post('/v1/payment-methods', createPaymentMethod); // Creates a payment method.
 
   /**
    * Collectives.
