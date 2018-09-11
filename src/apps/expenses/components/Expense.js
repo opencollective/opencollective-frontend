@@ -14,6 +14,7 @@ import Avatar from '../../../components/Avatar';
 import { capitalize, formatCurrency } from '../../../lib/utils';
 import Link from '../../../components/Link';
 import SmallButton from '../../../components/SmallButton';
+import Moment from '../../../components/Moment';
 
 import ExpenseDetails from './ExpenseDetails';
 import ApproveExpenseBtn from './ApproveExpenseBtn';
@@ -271,6 +272,7 @@ class Expense extends React.Component {
             }
           `}
         </style>
+
         <div className="fromCollective">
           <a
             href={`/${expense.fromCollective.slug}`}
@@ -304,31 +306,25 @@ class Expense extends React.Component {
               </Link>
             </div>
             <div className="meta">
-              <span className="incurredAt">
-                <FormattedDate
-                  value={expense.incurredAt}
-                  day="numeric"
-                  month="numeric"
-                />
-              </span>{' '}
-              |&nbsp;
+              <Moment relative={true} value={expense.incurredAt} />
+              {' | '}
               {includeHostedCollectives && (
                 <span className="collective">
                   <Link route={`/${expense.collective.slug}`}>
                     {expense.collective.slug}
-                  </Link>{' '}
+                  </Link>
                   (balance:{' '}
                   {formatCurrency(
                     expense.collective.stats.balance,
                     expense.collective.currency,
                   )}
-                  ) |{' '}
+                  ){' | '}
                 </span>
               )}
               <span className="status">
                 {intl.formatMessage(this.messages[status])}
-              </span>{' '}
-              |
+              </span>
+              {' | '}
               <span className="metaItem">
                 <Link
                   route="expenses"
@@ -346,8 +342,7 @@ class Expense extends React.Component {
                 LoggedInUser &&
                 LoggedInUser.canEditExpense(expense) && (
                   <span>
-                    {' '}
-                    |{' '}
+                    {' | '}
                     <a className="toggleEditExpense" onClick={this.toggleEdit}>
                       {intl.formatMessage(
                         this.messages[
@@ -360,8 +355,7 @@ class Expense extends React.Component {
               {mode !== 'edit' &&
                 view === 'list' && (
                   <span>
-                    {' '}
-                    |{' '}
+                    {' | '}
                     <a className="toggleDetails" onClick={this.toggleDetails}>
                       {intl.formatMessage(
                         this.messages[
