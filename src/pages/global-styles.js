@@ -187,6 +187,10 @@ injectGlobal`
     flex-direction: row;
   }
 
+  a {
+    color: #3385FF;
+  }
+
   .btn-primary {
     background-color: ${colors.blue};
     border-color: ${colors.blue};

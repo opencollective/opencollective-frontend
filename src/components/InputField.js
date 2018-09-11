@@ -503,10 +503,10 @@ class InputField extends React.Component {
             align-items: center;            
           }
           .inputField .MuiSwitch-colorSecondary-7.MuiSwitch-checked-5 {
-            color: #46B0ED;
+            color: #3385FF;
           }
           .inputField .MuiSwitch-colorSecondary-7.MuiSwitch-checked-5 + .MuiSwitch-bar-9 {
-            background-color: #46B0ED;
+            background-color: #3385FF;
           }
         `}</style>
         <style dangerouslySetInnerHTML={{ __html: stylesheet }} />

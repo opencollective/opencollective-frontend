@@ -151,7 +151,7 @@ class Button extends React.Component {
           width: 100%;
           border-radius: 0;
           height: 100%;
-          border-color: #46B0ED;
+          border-color: #3385FF;
           text-transform: uppercase;
           font-weight: bold;
           font-size: 1.7rem;

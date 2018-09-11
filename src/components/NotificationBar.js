@@ -54,7 +54,7 @@ class NotificationBar extends React.Component {
           height: 4px;
           width: 100%;
           position: relative;
-          background-color: #46B0ED;
+          background-color: #3385FF;
         }
         .loading .oc-bar {
           display: block;

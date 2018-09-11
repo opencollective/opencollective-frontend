@@ -270,6 +270,7 @@ exports[`Search Page renders empty results message 1`] = `
   background-color: white;
   border-top: 1px solid #aaaaaa;
   bottom: 0px;
+  background-color: white;
   min-height: 7.5rem;
   padding: 1rem;
   width: 100%;
@@ -408,7 +409,7 @@ exports[`Search Page renders empty results message 1`] = `
 
 .c23.c23.c23 {
   border: none;
-  border-bottom: 2px solid #46B0ED;
+  border-bottom: 2px solid #3385FF;
   border-radius: 0;
   box-shadow: none;
   display: block;
@@ -777,7 +778,7 @@ exports[`Search Page renders empty results message 1`] = `
                 type="search"
               />
               <button
-                className="jsx-2820878800 jsx-1599314605 Button blue c24"
+                className="jsx-2820878800 jsx-3220292068 Button blue c24"
                 onClick={[Function]}
                 type="submit"
               >
@@ -1591,6 +1592,7 @@ exports[`Search Page renders error message 1`] = `
   background-color: white;
   border-top: 1px solid #aaaaaa;
   bottom: 0px;
+  background-color: white;
   min-height: 7.5rem;
   padding: 1rem;
   width: 100%;
@@ -2917,6 +2919,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
   background-color: white;
   border-top: 1px solid #aaaaaa;
   bottom: 0px;
+  background-color: white;
   min-height: 7.5rem;
   padding: 1rem;
   width: 100%;
@@ -3055,7 +3058,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
 
 .c23.c23.c23 {
   border: none;
-  border-bottom: 2px solid #46B0ED;
+  border-bottom: 2px solid #3385FF;
   border-radius: 0;
   box-shadow: none;
   display: block;
@@ -3424,7 +3427,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
                 type="search"
               />
               <button
-                className="jsx-2820878800 jsx-1599314605 Button blue c24"
+                className="jsx-2820878800 jsx-3220292068 Button blue c24"
                 onClick={[Function]}
                 type="submit"
               >
@@ -3443,7 +3446,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
           className="c26 c27 sc-bdVaJa c2"
         >
           <svg
-            fill="#46B0ED"
+            fill="#3385FF"
             height={100}
             viewBox="0 0 105 105"
             width={100}
@@ -4403,6 +4406,7 @@ exports[`Search Page renders search results with pagination 1`] = `
   background-color: white;
   border-top: 1px solid #aaaaaa;
   bottom: 0px;
+  background-color: white;
   min-height: 7.5rem;
   padding: 1rem;
   width: 100%;
@@ -4541,7 +4545,7 @@ exports[`Search Page renders search results with pagination 1`] = `
 
 .c23.c23.c23 {
   border: none;
-  border-bottom: 2px solid #46B0ED;
+  border-bottom: 2px solid #3385FF;
   border-radius: 0;
   box-shadow: none;
   display: block;
@@ -4910,7 +4914,7 @@ exports[`Search Page renders search results with pagination 1`] = `
                 type="search"
               />
               <button
-                className="jsx-2820878800 jsx-1599314605 Button blue c24"
+                className="jsx-2820878800 jsx-3220292068 Button blue c24"
                 onClick={[Function]}
                 type="submit"
               >
