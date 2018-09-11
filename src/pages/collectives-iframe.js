@@ -46,45 +46,16 @@ class CollectivesIframe extends React.Component {
       <div>
         <Head>
           <meta name="viewport" content="width=device-width, initial-scale=1" />
-          <link
-            rel="stylesheet"
-            href="https://fonts.googleapis.com/css?family=Lato:400,700,900"
-          />
-          <title>{`${collectiveSlug} collectives`}</title>
+          <title>{`${this.props.collectiveSlug} collectives`}</title>
         </Head>
 
         <style jsx global>
           {`
-            @font-face {
-              font-family: 'montserratlight';
-              src: url('/static/fonts/montserrat/montserrat-light-webfont.eot');
-              src: url('/static/fonts/montserrat/montserrat-light-webfont.eot?#iefix')
-                  format('embedded-opentype'),
-                url('/static/fonts/montserrat/montserrat-light-webfont.woff2')
-                  format('woff2'),
-                url('/static/fonts/montserrat/montserrat-light-webfont.woff')
-                  format('woff'),
-                url('/static/fonts/montserrat/montserrat-light-webfont.ttf')
-                  format('truetype'),
-                url('/static/fonts/montserrat/montserrat-light-webfont.svg#montserratlight')
-                  format('svg');
-              font-weight: normal;
-              font-style: normal;
-            }
-            @font-face {
-              font-family: 'lato';
-              src: url('/static/fonts/montserrat/lato-regular.ttf')
-                format('truetype');
-              font-weight: normal;
-              font-style: normal;
-            }
-
             body {
               width: 100%;
               height: 100%;
               padding: 0;
               margin: 0;
-              font-family: Lato, Helvetica, sans-serif;
               font-weight: 300;
               font-size: 1rem;
               line-height: 1.5;

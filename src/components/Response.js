@@ -40,49 +40,45 @@ class Response extends React.Component {
     return (
       <a href={linkTo} title={title}>
         <div>
-          <style jsx>
-            {`
-              .Response {
-                display: flex;
-                align-items: flex-start;
-                width: 100%;
-                margin: 10px;
-                max-width: 300px;
-                min-height: 90px;
-                float: left;
-                position: relative;
-              }
+          <style jsx>{`
+            .Response {
+              display: flex;
+              align-items: flex-start;
+              width: 100%;
+              margin: 10px;
+              max-width: 300px;
+              min-height: 90px;
+              float: left;
+              position: relative;
+            }
 
-              img {
-                float: left;
-                width: 45px;
-                border-radius: 50%;
-                margin-top: 1rem;
-              }
+            img {
+              float: left;
+              width: 45px;
+              border-radius: 50%;
+              margin-top: 1rem;
+            }
 
-              .bubble {
-                padding: 1rem;
-              }
+            .bubble {
+              padding: 1rem;
+            }
 
-              .name {
-                font-family: 'montserratlight';
-                font-size: 1.7rem;
-              }
+            .name {
+              font-size: 1.7rem;
+            }
 
-              .description {
-                font-family: 'lato';
-                font-size: 1.4rem;
-              }
+            .description {
+              font-size: 1.4rem;
+            }
 
-              .star {
-                width: 14px;
-                height: 14px;
-                position: absolute;
-                top: 45px;
-                left: 0;
-              }
-            `}
-          </style>
+            .star {
+              width: 14px;
+              height: 14px;
+              position: absolute;
+              top: 45px;
+              left: 0;
+            }
+          `}</style>
           <div className="Response">
             {status === 'INTERESTED' && (
               <object

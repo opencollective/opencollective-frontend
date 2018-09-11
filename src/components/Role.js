@@ -31,30 +31,27 @@ class Role extends React.Component {
 
     return (
       <div className="Role">
-        <style jsx>
-          {`
-            .Role {
-              box-sizing: border-box;
-              height: 22px;
-              padding: 0 1rem;
-              display: flex;
-              align-items: center;
-              border: 1px solid #cacbcc;
-              border-radius: 4px;
-              background-color: #ffffff;
-              text-align: center;
-            }
-            label {
-              color: #666f80;
-              font-family: Rubik;
-              font-size: 11px;
-              font-weight: normal;
-              line-height: 13px;
-              text-align: center;
-              margin: 0;
-            }
-          `}
-        </style>
+        <style jsx>{`
+          .Role {
+            box-sizing: border-box;
+            height: 22px;
+            padding: 0 1rem;
+            display: flex;
+            align-items: center;
+            border: 1px solid #cacbcc;
+            border-radius: 4px;
+            background-color: #ffffff;
+            text-align: center;
+          }
+          label {
+            color: #666f80;
+            font-size: 11px;
+            font-weight: normal;
+            line-height: 13px;
+            text-align: center;
+            margin: 0;
+          }
+        `}</style>
         <label>{intl.formatMessage(this.messages[role])}</label>
       </div>
     );

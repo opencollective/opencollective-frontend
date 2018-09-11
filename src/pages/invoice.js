@@ -259,190 +259,239 @@ class InvoicePage extends React.Component {
     }
     return (
       <div className={`InvoicePages ${invoice.fromCollective.slug}`}>
-        <style jsx global>
-          {`
-            @font-face {
-              font-family: 'montserratlight';
-              src: url('/static/fonts/montserrat/montserrat-light-webfont.eot');
-              src: url('/static/fonts/montserrat/montserrat-light-webfont.eot?#iefix')
-                  format('embedded-opentype'),
-                url('/static/fonts/montserrat/montserrat-light-webfont.woff2')
-                  format('woff2'),
-                url('/static/fonts/montserrat/montserrat-light-webfont.woff')
-                  format('woff'),
-                url('/static/fonts/montserrat/montserrat-light-webfont.ttf')
-                  format('truetype'),
-                url('/static/fonts/montserrat/montserrat-light-webfont.svg#montserratlight')
-                  format('svg');
-              font-weight: normal;
-              font-style: normal;
-            }
-            @font-face {
-              font-family: 'lato';
-              src: url('/static/fonts/montserrat/lato-regular.ttf')
-                format('truetype');
-              font-weight: normal;
-              font-style: normal;
-            }
+        <style jsx global>{`
+          @font-face {
+            font-family: 'Inter UI';
+            font-style: normal;
+            font-weight: 400;
+            src: url('/static/fonts/inter-ui/Inter-UI-Regular.woff2')
+                format('woff2'),
+              url('/static/fonts/inter-ui/Inter-UI-Regular.woff') format('woff');
+          }
 
-            html {
-              font-size: 62.5%;
-              width: ${this.page.width} ${this.dimensions.unit};
-              zoom: 0.75;
-            }
+          @font-face {
+            font-family: 'Inter UI';
+            font-style: italic;
+            font-weight: 400;
+            src: url('/static/fonts/inter-ui/Inter-UI-Italic.woff2')
+                format('woff2'),
+              url('/static/fonts/inter-ui/Inter-UI-Italic.woff') format('woff');
+          }
 
-            body {
-              width: ${this.page.width} ${this.dimensions.unit};
-              padding: 0;
-              margin: 0;
-              font-family: Lato, Helvetica, sans-serif;
-              font-weight: 300;
-              font-size: 1.4rem;
-              line-height: 1.5;
-            }
+          @font-face {
+            font-family: 'Inter UI';
+            font-style: normal;
+            font-weight: 500;
+            src: url('/static/fonts/inter-ui/Inter-UI-Medium.woff2')
+                format('woff2'),
+              url('/static/fonts/inter-ui/Inter-UI-Medium.woff') format('woff');
+          }
 
-            .page {
-              width: ${this.page.width} ${this.dimensions.unit};
-              height: ${this.page.height} ${this.dimensions.unit};
-              overflow: hidden;
-              box-sizing: border-box;
-            }
+          @font-face {
+            font-family: 'Inter UI';
+            font-style: italic;
+            font-weight: 500;
+            src: url('/static/fonts/inter-ui/Inter-UI-MediumItalic.woff2')
+                format('woff2'),
+              url('/static/fonts/inter-ui/Inter-UI-MediumItalic.woff')
+                format('woff');
+          }
 
-            .InvoicePage {
-              margin: 0 auto;
-              padding: 2rem 3rem;
-              width: 100%;
-            }
+          @font-face {
+            font-family: 'Inter UI';
+            font-style: normal;
+            font-weight: 700;
+            src: url('/static/fonts/inter-ui/Inter-UI-Bold.woff2')
+                format('woff2'),
+              url('/static/fonts/inter-ui/Inter-UI-Bold.woff') format('woff');
+          }
 
-            .Invoice {
-              padding: 3rem;
-              font-size: 12px;
-              display: flex;
-              flex-direction: column;
-              justify-content: space-between;
-              -webkit-flex: 1;
-              -webkit-flex-direction: column;
-              -webkit-justify-content: space-between;
-              box-sizing: border-box;
-            }
-            .header {
-              margin: 10px 0px;
-              overflow: hidden;
-            }
+          @font-face {
+            font-family: 'Inter UI';
+            font-style: italic;
+            font-weight: 700;
+            src: url('/static/fonts/inter-ui/Inter-UI-BoldItalic.woff2')
+                format('woff2'),
+              url('/static/fonts/inter-ui/Inter-UI-BoldItalic.woff')
+                format('woff');
+          }
 
-            a {
-              text-decoration: none;
-            }
+          @font-face {
+            font-family: 'Inter UI';
+            font-style: normal;
+            font-weight: 900;
+            src: url('/static/fonts/inter-ui/Inter-UI-Black.woff2')
+                format('woff2'),
+              url('/static/fonts/inter-ui/Inter-UI-Black.woff') format('woff');
+          }
 
-            h1 {
-              margin: 10px 0px 5px;
-              line-height: 20px;
-              font-size: 2rem;
-            }
+          @font-face {
+            font-family: 'Inter UI';
+            font-style: italic;
+            font-weight: 900;
+            src: url('/static/fonts/inter-ui/Inter-UI-BlackItalic.woff2')
+                format('woff2'),
+              url('/static/fonts/inter-ui/Inter-UI-BlackItalic.woff')
+                format('woff');
+          }
 
-            h2 {
-              margin-bottom: 0;
-              font-size: 1.6rem;
-            }
+          html {
+            font-size: 62.5%;
+            width: ${this.page.width} ${this.dimensions.unit};
+            zoom: 0.75;
+          }
 
-            .row {
-              overflow: hidden;
-            }
+          body {
+            width: ${this.page.width} ${this.dimensions.unit};
+            padding: 0;
+            margin: 0;
+            font-family: 'Inter UI', sans-serif;
+            font-weight: 300;
+            font-size: 1.4rem;
+            line-height: 1.5;
+          }
 
-            .hero {
-              border-radius: 3px;
-              float: left;
-              overflow: hidden;
-              width: 120px;
-              height: 60px;
-              position: relative;
-              margin: 0px 20px 20px 0px;
-            }
+          .page {
+            width: ${this.page.width} ${this.dimensions.unit};
+            height: ${this.page.height} ${this.dimensions.unit};
+            overflow: hidden;
+            box-sizing: border-box;
+          }
 
-            .cover {
-              position: absolute;
-              background-size: cover;
-              width: 100%;
-              height: 100%;
-              top: 0;
-              left: 0;
-            }
+          .InvoicePage {
+            margin: 0 auto;
+            padding: 2rem 3rem;
+            width: 100%;
+          }
 
-            .logo {
-              background-size: contain;
-              background-repeat: no-repeat;
-              background-position: center;
-              position: absolute;
-              left: 0;
-              right: 0;
-              top: 0;
-              bottom: 0;
-              max-width: 75%;
-              max-height: 75%;
-              margin: auto;
-            }
+          .Invoice {
+            padding: 3rem;
+            font-size: 12px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            -webkit-flex: 1;
+            -webkit-flex-direction: column;
+            -webkit-justify-content: space-between;
+            box-sizing: border-box;
+          }
+          .header {
+            margin: 10px 0px;
+            overflow: hidden;
+          }
 
-            .invoiceDetails {
-              float: left;
-            }
+          a {
+            text-decoration: none;
+          }
 
-            .fromCollectiveBillingAddress {
-              float: right;
-              padding-right: 15rem;
-            }
+          h1 {
+            margin: 10px 0px 5px;
+            line-height: 20px;
+            font-size: 2rem;
+          }
 
-            label {
-              display: inline-block;
-              width: 8rem;
-            }
+          h2 {
+            margin-bottom: 0;
+            font-size: 1.6rem;
+          }
 
-            .rc-table {
-              clear: both;
-              margin: 100px 0px;
-            }
+          .row {
+            overflow: hidden;
+          }
 
-            table {
-              margin: 8rem 0rem;
-              overflow: hidden;
-              width: 95%;
-            }
+          .hero {
+            border-radius: 3px;
+            float: left;
+            overflow: hidden;
+            width: 120px;
+            height: 60px;
+            position: relative;
+            margin: 0px 20px 20px 0px;
+          }
 
-            td,
-            th {
-              padding: 5px;
-              vertical-align: top;
-              font-size: 1.2rem;
-            }
+          .cover {
+            position: absolute;
+            background-size: cover;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+          }
 
-            .date {
-              width: 2rem;
-            }
+          .logo {
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            max-width: 75%;
+            max-height: 75%;
+            margin: auto;
+          }
 
-            .amount {
-              width: 3rem;
-              text-align: right;
-              padding-right: 2rem;
-            }
+          .invoiceDetails {
+            float: left;
+          }
 
-            tr.footer {
-              border-top: 1px solid grey;
-              font-weight: bold;
-              text-align: left;
-            }
+          .fromCollectiveBillingAddress {
+            float: right;
+            padding-right: 15rem;
+          }
 
-            tr.footer td {
-              font-size: 1.4rem;
-            }
+          label {
+            display: inline-block;
+            width: 8rem;
+          }
 
-            tr.footer img {
-              max-height: 100px;
-            }
+          .rc-table {
+            clear: both;
+            margin: 100px 0px;
+          }
 
-            tr.footer .description {
-              text-align: right;
-            }
-          `}
-        </style>
+          table {
+            margin: 8rem 0rem;
+            overflow: hidden;
+            width: 95%;
+          }
+
+          td,
+          th {
+            padding: 5px;
+            vertical-align: top;
+            font-size: 1.2rem;
+          }
+
+          .date {
+            width: 2rem;
+          }
+
+          .amount {
+            width: 3rem;
+            text-align: right;
+            padding-right: 2rem;
+          }
+
+          tr.footer {
+            border-top: 1px solid grey;
+            font-weight: bold;
+            text-align: left;
+          }
+
+          tr.footer td {
+            font-size: 1.4rem;
+          }
+
+          tr.footer img {
+            max-height: 100px;
+          }
+
+          tr.footer .description {
+            text-align: right;
+          }
+        `}</style>
 
         <div className="pages">
           {transactions.map((transaction, index) => {

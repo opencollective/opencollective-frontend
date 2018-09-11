@@ -27,20 +27,17 @@ class PublishUpdateBtn extends React.Component {
 
     return (
       <div className="PublishUpdateBtn">
-        <style jsx>
-          {`
-            .PublishUpdateBtn {
-              display: flex;
-              align-items: center;
-            }
-            .notice {
-              color: #525866;
-              font-family: Rubik;
-              font-size: 12px;
-              margin-left: 1rem;
-            }
-          `}
-        </style>
+        <style jsx>{`
+          .PublishUpdateBtn {
+            display: flex;
+            align-items: center;
+          }
+          .notice {
+            color: #525866;
+            font-size: 12px;
+            margin-left: 1rem;
+          }
+        `}</style>
         <SmallButton className="publish" onClick={this.onClick}>
           <FormattedMessage id="update.publish.btn" defaultMessage="publish" />
         </SmallButton>

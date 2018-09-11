@@ -94,56 +94,52 @@ ${totalDonationsStr}`;
       <div
         className={`Member ${className} ${member.type} viewMode-${viewMode}`}
       >
-        <style jsx>
-          {`
-            .Member {
-              width: 100%;
-              max-width: 300px;
-              float: left;
-              position: relative;
-            }
+        <style jsx>{`
+          .Member {
+            width: 100%;
+            max-width: 300px;
+            float: left;
+            position: relative;
+          }
 
-            .Member.small {
-              width: 48px;
-            }
+          .Member.small {
+            width: 48px;
+          }
 
-            .Member.viewMode-ORGANIZATION {
-              width: 200px;
-            }
+          .Member.viewMode-ORGANIZATION {
+            width: 200px;
+          }
 
-            .Member :global(.Avatar) {
-              float: left;
-              width: 45px;
-              height: 45px;
-              margin-top: 1rem;
-            }
+          .Member :global(.Avatar) {
+            float: left;
+            width: 45px;
+            height: 45px;
+            margin-top: 1rem;
+          }
 
-            .bubble {
-              padding: 1rem;
-              text-align: left;
-              overflow: hidden;
-            }
+          .bubble {
+            padding: 1rem;
+            text-align: left;
+            overflow: hidden;
+          }
 
-            .small .avatar {
-              margin: 0;
-            }
+          .small .avatar {
+            margin: 0;
+          }
 
-            .small .bubble {
-              display: none;
-            }
+          .small .bubble {
+            display: none;
+          }
 
-            .name {
-              font-family: 'montserratlight';
-              font-size: 1.7rem;
-            }
+          .name {
+            font-size: 1.7rem;
+          }
 
-            .description,
-            .meta {
-              font-family: 'lato';
-              font-size: 1.4rem;
-            }
-          `}
-        </style>
+          .description,
+          .meta {
+            font-size: 1.4rem;
+          }
+        `}</style>
         <div>
           {viewMode === 'USER' && (
             <Link

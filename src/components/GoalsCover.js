@@ -217,7 +217,6 @@ class GoalsCover extends React.Component {
             .caption {
               padding: 1rem 0.5rem 1rem 0.5rem;
               color: #aaaeb3;
-              font-family: Rubik;
               font-size: 13px;
               line-height: 15px;
             }
@@ -286,7 +285,6 @@ class GoalsCover extends React.Component {
             .budgetText {
               text-align: center;
               color: #c2c7cc;
-              font-family: Rubik;
               font-size: 14px;
               line-height: 26px;
               margin: 3rem 0;

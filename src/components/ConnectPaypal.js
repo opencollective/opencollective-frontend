@@ -60,7 +60,6 @@ class ConnectPaypal extends React.Component {
               margin: 1rem 0.5rem 1rem 0;
             }
             .amount {
-              font-family: Rubik;
               font-size: 3.6rem;
               font-weight: 500;
               line-height: 1.11;
@@ -70,7 +69,6 @@ class ConnectPaypal extends React.Component {
 
             .description,
             label {
-              font-family: Rubik;
               font-size: 1.4rem;
               line-height: 1.5;
               text-align: right;

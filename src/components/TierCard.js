@@ -179,7 +179,6 @@ class TierCard extends React.Component {
             .name {
               margin: 3rem 0rem 1rem 3rem;
               width: 160px;
-              font-family: Rubik;
               font-size: 22px;
               font-weight: 300;
               line-height: 1.32;
@@ -191,7 +190,6 @@ class TierCard extends React.Component {
               position: absolute;
               top: 3rem;
               right: 3rem;
-              font-family: Rubik;
               font-size: 1.6rem;
               font-weight: 500;
               line-height: 1;
@@ -205,7 +203,6 @@ class TierCard extends React.Component {
             }
             .limited {
               margin: 0rem 3rem;
-              font-family: Rubik;
               font-size: 1.1rem;
               font-weight: 500;
               line-height: 2.09;
@@ -239,7 +236,6 @@ class TierCard extends React.Component {
               height: 56px;
               border-radius: 0 0 8px 8px;
               background-color: ${colors.blue};
-              font-family: Rubik, sans-serif;
               font-size: 14px;
               font-weight: 500;
               text-align: center;
@@ -260,7 +256,6 @@ class TierCard extends React.Component {
             }
             .totalOrders {
               height: 14px;
-              font-family: Rubik;
               font-size: 12px;
               text-align: left;
               color: #9ea2a6;

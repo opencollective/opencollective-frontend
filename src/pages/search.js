@@ -33,7 +33,6 @@ const SearchInput = styled(FormControl)`
     border-radius: 0;
     box-shadow: none;
     display: block;
-    font-family: lato;
     height: 3.4rem;
     padding: 0;
   }

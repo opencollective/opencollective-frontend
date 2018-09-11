@@ -41,11 +41,25 @@ class TransactionDetails extends React.Component {
   constructor(props) {
     super(props);
     this.messages = defineMessages({
-      'hostFeeInHostCurrency': { id: 'transaction.hostFeeInHostCurrency', defaultMessage: '{hostFeePercent} host fee' },
-      'platformFeeInHostCurrency': { id: 'transaction.platformFeeInHostCurrency', defaultMessage: '5% Open Collective fee' },
-      'paymentProcessorFeeInHostCurrency': { id: 'transaction.paymentProcessorFeeInHostCurrency', defaultMessage: 'payment processor fee' },
+      hostFeeInHostCurrency: {
+        id: 'transaction.hostFeeInHostCurrency',
+        defaultMessage: '{hostFeePercent} host fee',
+      },
+      platformFeeInHostCurrency: {
+        id: 'transaction.platformFeeInHostCurrency',
+        defaultMessage: '5% Open Collective fee',
+      },
+      paymentProcessorFeeInHostCurrency: {
+        id: 'transaction.paymentProcessorFeeInHostCurrency',
+        defaultMessage: 'payment processor fee',
+      },
     });
-    this.currencyStyle = { style: 'currency', currencyDisplay: 'symbol', minimumFractionDigits: 0, maximumFractionDigits: 2 };
+    this.currencyStyle = {
+      style: 'currency',
+      currencyDisplay: 'symbol',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 2,
+    };
   }
 
   render() {
@@ -69,21 +83,38 @@ class TransactionDetails extends React.Component {
 
     // can refund if root user or if admin of collective (only for collectives hosted by /brusselstogetherasbl for now)
     const canRefund =
-    LoggedInUser &&
-    (LoggedInUser.isRoot() ||
-      (get(transaction, 'host.id') === 9802 &&
-        LoggedInUser.canEditCollective(collective)));
-  
+      LoggedInUser &&
+      (LoggedInUser.isRoot() ||
+        (get(transaction, 'host.id') === 9802 &&
+          LoggedInUser.canEditCollective(collective)));
+
     const hostFeePercent = host && `${host.hostFeePercent}%`;
-    const amountDetails = [intl.formatNumber(amount / 100, { currency: currency, ...this.currencyStyle })];
+    const amountDetails = [
+      intl.formatNumber(amount / 100, {
+        currency: currency,
+        ...this.currencyStyle,
+      }),
+    ];
     if (hostCurrencyFxRate && hostCurrencyFxRate !== 1) {
       const amountInHostCurrency = amount * hostCurrencyFxRate;
-      amountDetails.push(` (${intl.formatNumber(amountInHostCurrency / 100, { currency: hostCurrency, ...this.currencyStyle })})`);
+      amountDetails.push(
+        ` (${intl.formatNumber(amountInHostCurrency / 100, {
+          currency: hostCurrency,
+          ...this.currencyStyle,
+        })})`,
+      );
     }
     const addFees = feesArray => {
       feesArray.forEach(feeName => {
         if (this.props[feeName]) {
-          amountDetails.push(`${intl.formatNumber(this.props[feeName] / 100, { currency: hostCurrency, ...this.currencyStyle })} (${intl.formatMessage(this.messages[feeName], { hostFeePercent })})`);
+          amountDetails.push(
+            `${intl.formatNumber(this.props[feeName] / 100, {
+              currency: hostCurrency,
+              ...this.currencyStyle,
+            })} (${intl.formatMessage(this.messages[feeName], {
+              hostFeePercent,
+            })})`,
+          );
         }
       });
     };
@@ -99,84 +130,97 @@ class TransactionDetails extends React.Component {
 
     return (
       <div className={`TransactionDetails ${this.props.mode}`}>
-        <style jsx>
-          {`
+        <style jsx>{`
+          .TransactionDetails {
+            font-size: 1.2rem;
+            overflow: hidden;
+            transition: max-height 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            max-height: 19rem;
+          }
+          .TransactionDetails.closed {
+            max-height: 0;
+          }
+          .TransactionDetails .frame {
+            padding: 4px;
+            margin-top: 1rem;
+            margin-right: 1rem;
+            float: left;
+            background-color: #f3f4f5;
+          }
+          .TransactionDetails img {
+            width: 64px;
+          }
+          .col {
+            float: left;
+            display: flex;
+            flex-direction: column;
+            margin-right: 1rem;
+            margin-top: 1rem;
+          }
+          label {
+            text-transform: uppercase;
+            color: #aaaeb3;
+            font-weight: 300;
+            white-space: nowrap;
+          }
+          .netAmountInCollectiveCurrency {
+            font-weight: bold;
+          }
+          .TransactionDetails .actions {
+            clear: both;
+          }
+
+          @media (max-width: 600px) {
             .TransactionDetails {
-              font-size: 1.2rem;
-              overflow: hidden;
-              transition: max-height 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-              max-height: 19rem;
+              max-height: 30rem;
             }
-            .TransactionDetails.closed {
-              max-height: 0;
-            }
-            .TransactionDetails .frame {
-              padding: 4px;
-              margin-top: 1rem;
-              margin-right: 1rem;
-              float: left;
-              background-color: #f3f4f5;
-            }
-            .TransactionDetails img {
-              width: 64px;
-            }
-            .col {
-              float: left;
-              display: flex;
-              flex-direction: column;
-              margin-right: 1rem;
-              margin-top: 1rem;
-            }
-            label {
-              text-transform: uppercase;
-              color: #aaaeb3;
-              font-weight: 300;
-              font-family: lato, montserratlight, arial;
-              white-space: nowrap;
-            }
-            .netAmountInCollectiveCurrency {
-              font-weight: bold;
-            }
-            .TransactionDetails .actions {
-              clear: both;
-            }
+          }
+        `}</style>
 
-            @media (max-width: 600px) {
-              .TransactionDetails {
-                max-height: 30rem;
-              }
-            }
-          `}
-        </style>
-
-        {type === 'DEBIT' &&
+        {type === 'DEBIT' && (
           <div className="frame">
-            {attachment &&
-              <a href={attachment} target="_blank" rel="noopener noreferrer" title="Open receipt in a new window">
+            {attachment && (
+              <a
+                href={attachment}
+                target="_blank"
+                rel="noopener noreferrer"
+                title="Open receipt in a new window"
+              >
                 <img src={imagePreview(attachment)} />
               </a>
-            }
-            {!attachment &&
-              <img src={'/static/images/receipt.svg'} />
-            }
+            )}
+            {!attachment && <img src={'/static/images/receipt.svg'} />}
           </div>
-        }
-        { get(host, 'name') &&
+        )}
+        {get(host, 'name') && (
           <div className="col">
-            <label><FormattedMessage id="transaction.host" defaultMessage="host" /></label>
+            <label>
+              <FormattedMessage id="transaction.host" defaultMessage="host" />
+            </label>
             {host.name} ({hostCurrency})
           </div>
-        }
+        )}
         <div className="col">
-          <label><FormattedMessage id="transaction.paymentMethod" defaultMessage="payment method" /></label>
+          <label>
+            <FormattedMessage
+              id="transaction.paymentMethod"
+              defaultMessage="payment method"
+            />
+          </label>
           {paymentMethod && capitalize(paymentMethod.service)}
         </div>
-        { hostCurrencyFxRate && hostCurrencyFxRate !== 1 &&
-          <div className="col">
-            <label><FormattedMessage id="transaction.fxrate" defaultMessage="fx rate" /></label>
-            {hostCurrencyFxRate}
-          </div>
-        }
+        {hostCurrencyFxRate &&
+          hostCurrencyFxRate !== 1 && (
+            <div className="col">
+              <label>
+                <FormattedMessage
+                  id="transaction.fxrate"
+                  defaultMessage="fx rate"
+                />
+              </label>
+              {hostCurrencyFxRate}
+            </div>
+          )}
         <div className="col">
           <label>
             <FormattedMessage
@@ -212,25 +256,39 @@ class TransactionDetails extends React.Component {
           </div>
         </div>
 
-        { type === 'DEBIT' && canEditCollective && !isRefund &&
-          <div className="col invoice">
-            <label><FormattedMessage id="transaction.invoice" defaultMessage="invoice" /></label>
-            <div>
-              <a href={`/${collective.slug}/transactions/${uuid}/invoice.pdf`}>
-                <FormattedMessage id="transaction.downloadPDF" defaultMessage="Download (pdf)" />
-              </a>
+        {type === 'DEBIT' &&
+          canEditCollective &&
+          !isRefund && (
+            <div className="col invoice">
+              <label>
+                <FormattedMessage
+                  id="transaction.invoice"
+                  defaultMessage="invoice"
+                />
+              </label>
+              <div>
+                <a
+                  href={`/${collective.slug}/transactions/${uuid}/invoice.pdf`}
+                >
+                  <FormattedMessage
+                    id="transaction.downloadPDF"
+                    defaultMessage="Download (pdf)"
+                  />
+                </a>
+              </div>
             </div>
           )}
+
         <div className="actions">
-          { canRefund &&
+          {canRefund && (
             <div className="transactionActions">
               <RefundTransactionBtn
                 id={id}
                 isRefund={isRefund}
                 CollectiveId={collective.id}
-                />
-              </div>
-            }
+              />
+            </div>
+          )}
         </div>
       </div>
     );

@@ -18,24 +18,18 @@ class Location extends React.Component {
 
     return (
       <section id="location" className="location">
-        <style jsx>
-          {`
-            .location {
-              text-align: center;
-            }
-            .description {
-              margin: 30px 10px;
-            }
-            .name {
-              font-size: 1.7rem;
-              font-family: 'montserratlight';
-              margin: 5px 0px;
-            }
-            .address {
-              font-family: 'lato';
-            }
-          `}
-        </style>
+        <style jsx>{`
+          .location {
+            text-align: center;
+          }
+          .description {
+            margin: 30px 10px;
+          }
+          .name {
+            font-size: 1.7rem;
+            margin: 5px 0px;
+          }
+        `}</style>
         <div className="description">
           {this.props.showTitle && <h1>Location</h1>}
           <div className="name">{name}</div>
