@@ -1,3 +1,5 @@
+import config from 'config';
+import moment from 'moment';
 import models, { Op } from '../models';
 import { extend, get, pick, pluck } from 'lodash';
 import * as utils from '../graphql/utils';
@@ -15,6 +17,7 @@ const createPaymentMethodQuery = `
       SourcePaymentMethodId
       initialBalance
       expiryDate
+      currency
     }
   }
 `;
@@ -45,10 +48,11 @@ async function createVirtualCardThroughGraphQL(args, user) {
     id: paymentMethod.id,
     name: paymentMethod.name,
     CollectiveId: paymentMethod.collective.id,
-    SourcePaymentMethodId: paymentMethod.SourcePaymentMethodId,
     balance: paymentMethod.initialBalance,
-    code: paymentMethod.uuid.slice(-8),
-    expiryDate: paymentMethod.expiryDate,
+    currency: paymentMethod.currency,
+    code: paymentMethod.uuid.substring(0,8),
+    expiryDate: moment(paymentMethod.expiryDate).format(),
+    redeemUrl: `${config.host.website}/redeem?code=${paymentMethod.uuid.substring(0,8)}`
   };
 }
 
