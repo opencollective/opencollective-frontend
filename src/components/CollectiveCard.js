@@ -6,7 +6,6 @@ import Link from './Link';
 import Logo from './Logo';
 import { get } from 'lodash';
 import { firstSentence, imagePreview } from '../lib/utils';
-import { defaultBackgroundImage } from '../constants/collectives';
 
 class CollectiveCard extends React.Component {
 
@@ -44,7 +43,7 @@ class CollectiveCard extends React.Component {
     }
 
     const coverStyle = get(collective, 'settings.style.hero.cover') || get(collective.parentCollective, 'settings.style.hero.cover') || {};
-    const backgroundImage = imagePreview(collective.backgroundImage || get(collective,'parentCollective.backgroundImage'), defaultBackgroundImage[collective.type], { width: 400 });
+    const backgroundImage = imagePreview(collective.backgroundImage || get(collective,'parentCollective.backgroundImage'), null, { width: 400 });
     if (!coverStyle.backgroundImage && backgroundImage) {
       coverStyle.backgroundImage = `url('${backgroundImage}')`;
       coverStyle.backgroundSize = 'cover';

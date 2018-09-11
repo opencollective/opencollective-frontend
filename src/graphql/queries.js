@@ -380,6 +380,7 @@ const getCollectiveQuery = gql`
           slug
           type
           image
+          backgroundImage
         }
       }
       ... on User {
