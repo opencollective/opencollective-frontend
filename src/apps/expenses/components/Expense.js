@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { defineMessages, FormattedMessage, FormattedNumber, FormattedDate } from 'react-intl';
+import { defineMessages, FormattedMessage } from 'react-intl';
 import { graphql } from 'react-apollo'
 import gql from 'graphql-tag'
 
@@ -11,6 +11,7 @@ import Link from '../../../components/Link';
 import SmallButton from '../../../components/SmallButton';
 import Moment from '../../../components/Moment';
 
+import AmountCurrency from './AmountCurrency';
 import ExpenseDetails from './ExpenseDetails';
 import ApproveExpenseBtn from './ApproveExpenseBtn';
 import RejectExpenseBtn from './RejectExpenseBtn';
@@ -261,11 +262,7 @@ class Expense extends React.Component {
           <div className="body">
             <div className="header">
               <div className="amount pullRight">
-                <FormattedNumber
-                  value={expense.amount / 100}
-                  currency={expense.currency}
-                  {...this.currencyStyle}
-                  />
+                <AmountCurrency amount={-expense.amount} currency={expense.currency} />
               </div>
               <div className="description">
                 <Link route={`/${collective.slug}/expenses/${expense.id}`} title={capitalize(title)}>
