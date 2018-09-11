@@ -137,15 +137,16 @@ injectGlobal`
     overflow: hidden;
   }
 
-  h1, h2, h3, h4 {
-    font-family: 'Inter UI', sans-serif;
-  }
-
   h1 {
     text-align: center;
     margin: 40px 0px 20px;
-    font-size: 1.8rem;
+    font-size: 4rem;
+    letter-spacing: -1.2px;
     font-weight: bold;
+  }
+
+  h2, h3 {
+    letter-spacing: -0.4px;
   }
 
   .map {

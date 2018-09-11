@@ -121,7 +121,6 @@ class SectionTitle extends React.Component {
               margin-top: 4rem;
               overflow: hidden;
               text-align: center;
-              padding-left: 2.8rem;
               margin-bottom: 7.2rem;
             }
             .SectionTitle .title :global(.action) {

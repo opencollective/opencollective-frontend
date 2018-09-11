@@ -38,8 +38,8 @@ export default class Body extends React.Component {
           }
 
           .content {
-            max-width: 1080px;
-            padding: 2rem 0rem;
+            max-width: 111rem;
+            padding: 2rem 1.5rem;
             margin: 0 auto;
             line-height: 1.5;
             overflow: hidden;
