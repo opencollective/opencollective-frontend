@@ -744,7 +744,7 @@ exports[`Search Page renders empty results message 1`] = `
     </div>
   </header>
   <main
-    className="jsx-1238847522"
+    className="jsx-1936554220"
   >
     <div
       className="c19"
@@ -777,7 +777,7 @@ exports[`Search Page renders empty results message 1`] = `
                 type="search"
               />
               <button
-                className="jsx-2820878800 jsx-3220292068 Button blue c24"
+                className="jsx-2820878800 jsx-3805780651 Button blue c24"
                 onClick={[Function]}
                 type="submit"
               >
@@ -2081,7 +2081,7 @@ exports[`Search Page renders error message 1`] = `
     </div>
   </header>
   <main
-    className="jsx-1238847522"
+    className="jsx-1936554220"
   >
     <div
       className="content"
@@ -3392,7 +3392,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
     </div>
   </header>
   <main
-    className="jsx-1238847522"
+    className="jsx-1936554220"
   >
     <div
       className="c19"
@@ -3425,7 +3425,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
                 type="search"
               />
               <button
-                className="jsx-2820878800 jsx-3220292068 Button blue c24"
+                className="jsx-2820878800 jsx-3805780651 Button blue c24"
                 onClick={[Function]}
                 type="submit"
               >
@@ -4878,7 +4878,7 @@ exports[`Search Page renders search results with pagination 1`] = `
     </div>
   </header>
   <main
-    className="jsx-1238847522"
+    className="jsx-1936554220"
   >
     <div
       className="c19"
@@ -4911,7 +4911,7 @@ exports[`Search Page renders search results with pagination 1`] = `
                 type="search"
               />
               <button
-                className="jsx-2820878800 jsx-3220292068 Button blue c24"
+                className="jsx-2820878800 jsx-3805780651 Button blue c24"
                 onClick={[Function]}
                 type="submit"
               >
@@ -4934,17 +4934,17 @@ exports[`Search Page renders search results with pagination 1`] = `
             onClick={[Function]}
           >
             <div
-              className="jsx-3446301333 CollectiveCard undefined"
+              className="jsx-1471964952 CollectiveCard undefined"
             >
               <div
-                className="jsx-3446301333 head"
+                className="jsx-1471964952 head"
               >
                 <div
-                  className="jsx-3446301333 background"
+                  className="jsx-1471964952 background"
                   style={Object {}}
                 />
                 <div
-                  className="jsx-3446301333 logo"
+                  className="jsx-1471964952 logo"
                 >
                   <div
                     className="jsx-1454345377 Logo"
@@ -4969,17 +4969,17 @@ exports[`Search Page renders search results with pagination 1`] = `
                 </div>
               </div>
               <div
-                className="jsx-3446301333 body"
+                className="jsx-1471964952 body"
               >
                 <div
-                  className="jsx-3446301333 name"
+                  className="jsx-1471964952 name"
                 />
                 <div
-                  className="jsx-3446301333 description"
+                  className="jsx-1471964952 description"
                 />
               </div>
               <div
-                className="jsx-3446301333 footer"
+                className="jsx-1471964952 footer"
               />
             </div>
           </a>
