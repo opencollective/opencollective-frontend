@@ -9,8 +9,6 @@ import models from '../server/models';
 import virtualcard from '../server/paymentProviders/opencollective/virtualcard';
 import * as store from './features/support/stores';
 
-const application = utils.data('application');
-
 const ORDER_TOTAL_AMOUNT = 5000;
 const STRIPE_FEE_STUBBED_VALUE = 300;
 
@@ -532,18 +530,18 @@ describe('opencollective.virtualcard', () => {
           amount: 10000,
         };
         return request(app)
-        .post(`/payment-methods`)
+        .post('/payment-methods')
         .send(args)
         .expect(400);
       });
 
-      it.only('should create a U$100 virtual card payment method', () => {
+      it('should create a U$100 virtual card payment method', () => {
         const args = {
           CollectiveId: collective1.id,
           amount: 10000,
         };
         return request(app)
-        .post(`/payment-methods`)
+        .post('/payment-methods')
         .set('Authorization', `Bearer ${user1.jwt()}`)
         .set('Client-Id', appKeyData.clientId)
         .send(args)
