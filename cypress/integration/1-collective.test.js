@@ -18,7 +18,7 @@ describe("collective page", () => {
   });
 
   it ("opens all expenses page", () => {
-    cy.get("#expenses .ViewAllExpensesBtn").click();
+    cy.get("#expenses .ViewAllExpensesBtn button").click();
     cy.wait(300);
     cy.get(".ExpensesPage .ExpensesStats").contains("Available balance");
     cy.get(".ExpensesPage .ExpensesStats").contains("Engineering ($3,808)");
@@ -35,11 +35,12 @@ describe("collective page", () => {
 
   it ("loads the latest transactions", () => {
     cy.get("#transactions .itemsList .transaction").should("have.length", 5);
-    cy.get("#transactions .itemsList .transaction:first .amount").contains("$2");
+    cy.get("#transactions .itemsList .transaction:first .AmountCurrency").contains("$2");
+    cy.get("#transactions .itemsList .transaction:first .AmountCurrency .currency").contains("USD");
   });
 
   it ("opens all transactions page", () => {
-    cy.get("#transactions .ViewAllTransactionsBtn").click();
+    cy.get("#transactions .ViewAllTransactionsBtn button").click();
     cy.wait(500);
     cy.get(".TransactionsPage .itemsList .transaction").should("have.length", 20);
     cy.get(".TransactionsPage .loadMoreBtn");
