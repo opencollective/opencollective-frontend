@@ -190,7 +190,6 @@ class Expense extends React.Component {
             width: 10rem;
             margin-left: 0.5rem;
             text-align: right;
-            font-family: montserratlight, arial;
             font-size: 1.5rem;
             font-weight: 300;
           }

@@ -66,25 +66,6 @@ injectGlobal`
     url('/static/fonts/inter-ui/Inter-UI-BlackItalic.woff') format('woff');
   }
 
-  @font-face {
-    font-family: 'montserratlight';
-    src: url('/static/fonts/montserrat/montserrat-light-webfont.eot');
-    src: url('/static/fonts/montserrat/montserrat-light-webfont.eot?#iefix') format('embedded-opentype'),
-      url('/static/fonts/montserrat/montserrat-light-webfont.woff2') format('woff2'),
-      url('/static/fonts/montserrat/montserrat-light-webfont.woff') format('woff'),
-      url('/static/fonts/montserrat/montserrat-light-webfont.ttf') format('truetype'),
-      url('/static/fonts/montserrat/montserrat-light-webfont.svg#montserratlight') format('svg');
-    font-weight: normal;
-    font-style: normal;
-  }
-
-  @font-face {
-    font-family: 'lato';
-    src: url('/static/fonts/montserrat/lato-regular.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
-  }
-
   html {
     --charcoal-grey-two: #373a3d;
     --charcoal-grey-three: #45484c;
@@ -101,7 +82,7 @@ injectGlobal`
   }
 
   body {
-    font-family: 'Inter UI', 'lato', 'montserratlight', sans-serif;
+    font-family: 'Inter UI', sans-serif;
     height: 100%;
     margin: 0;
     padding: 0;
@@ -157,7 +138,7 @@ injectGlobal`
   }
 
   h1, h2, h3, h4 {
-    font-family: 'Inter UI', 'lato','montserratlight', sans-serif;
+    font-family: 'Inter UI', sans-serif;
   }
 
   h1 {

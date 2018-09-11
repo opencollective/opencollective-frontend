@@ -79,20 +79,17 @@ class RedeemPage extends React.Component {
         }
         .Redeem-hero-line1 {
           margin: auto;
-          font-family: Rubik;
           font-size: 40px;
           font-weight: 700;
           line-height: 1.08;
           text-align: center;
           color: ${colors.white};
-          letter-spacing: -0.5px;
           padding-bottom: 20px;
         }
         .Redeem-hero-line2 {
           margin: auto;
           margin-top: 40px;
           height: 78px;
-          font-family: Rubik;
           font-size: 16px;
           line-height: 1.63;
           text-align: center;
@@ -102,7 +99,6 @@ class RedeemPage extends React.Component {
         .Redeem-hero-line3 {
           margin: auto;
           margin-top: 40px;
-          font-family: Rubik;
           font-size: 18px;
           font-weight: 500;
           line-height: 1.44;
@@ -114,7 +110,6 @@ class RedeemPage extends React.Component {
           min-width: 20rem;
           padding: 0 2rem;
           margin: 2rem 0 0 0;
-          font-family: Lato;
           text-transform: uppercase;
           background-color: #75cc1f;
           font-size: 1.5rem;

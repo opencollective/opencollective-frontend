@@ -339,7 +339,6 @@ class MenuBar extends React.Component {
         }
         .item {
           color: #FAFAFA;
-          font-family: Rubik;
           font-size: 14px;
           line-height: 40px;
           margin: 32px;

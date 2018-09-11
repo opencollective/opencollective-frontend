@@ -11,7 +11,6 @@ class SmallButton extends React.Component {
             height: 29px;
             border-radius: 100px;
             border: solid 1px #797c80;
-            font-family: Rubik;
             font-size: 12px;
             line-height: 1.5;
             text-align: center;

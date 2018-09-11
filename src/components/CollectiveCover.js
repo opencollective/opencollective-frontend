@@ -269,7 +269,6 @@ ${description}`
           margin: 1rem 0px;
         }
         .counter .-character {
-          font-family: Lato;
           font-size: 22px;
           font-weight: bold;
           margin: 1px;
@@ -281,7 +280,6 @@ ${description}`
           border-radius: 3px;
           background-color: rgba(0, 0, 0, 0.6);
           border: solid 1px #000000;
-          font-family: Lato;
           font-size: 22px;
           color: #ffffff;
           font-weight: bold;

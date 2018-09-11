@@ -34,11 +34,7 @@ class Location extends React.Component {
         }
         .name {
           font-size: 1.7rem;
-          font-family: 'montserratlight';
           margin: 5px 0px;
-        }
-        .address {
-          font-family: 'lato';
         }
         `}</style>
         <div className="description">

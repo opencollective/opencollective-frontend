@@ -52,7 +52,6 @@ class Button extends React.Component {
         <style jsx>{`
         .Button {
           --webkit-appearance: none;
-          font-family: Rubik;
           font-size: 1.4rem;
           font-weight: 500;
           height: 3.6rem;

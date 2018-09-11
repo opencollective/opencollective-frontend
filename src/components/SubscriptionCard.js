@@ -139,7 +139,6 @@ class SubscriptionCard extends React.Component {
             overflow: visible;
             text-decoration: none !important;
             margin: 2rem 2rem 2rem 0;
-            font-family: lato, Montserrat;
           }
 
           .polygon {

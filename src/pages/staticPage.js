@@ -62,9 +62,7 @@ class StaticPage extends React.Component {
         <style global jsx>{`
           .staticPage .path {
             color: #9399A3;
-            font-family: "Inter UI";
             font-size: 1.5rem;
-            letter-spacing: -0.2px;
             margin-bottom: -2rem;
             margin-left: 0.5rem;
             margin-top: 1rem;
@@ -72,20 +70,16 @@ class StaticPage extends React.Component {
           }
           .staticPage h1 {
             margin: 4rem 0px 6rem;
-            font-family: 'Inter UI', 'lato','montserratlight', sans-serif;
             font-size: 4.8rem;
             color: #121314;
-            letter-spacing: -0.8px;
             line-height: 5.2rem;
             font-weight: 300;
             text-align: left;
           }
           .staticPage h2 {
-            font-family: 'Inter UI', 'lato','montserratlight', sans-serif;
             font-size: 2.4rem;
             color: #6E747A;
             font-weight: 500;
-            letter-spacing: -0.4px;
             line-height: 3.2rem;
             margin: 5rem 0 1rem;
           }
@@ -102,9 +96,7 @@ class StaticPage extends React.Component {
           }
           .staticPage p, .staticPage li, .staticPage summary {
             color: #6E747A;
-            font-family: 'Inter UI', 'lato','montserratlight', sans-serif;
             font-size: 16px;
-            letter-spacing: -0.2px;
             line-height: 24px;
           }
           .staticPage th {

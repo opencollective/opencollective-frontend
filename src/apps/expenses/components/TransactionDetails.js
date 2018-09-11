@@ -120,7 +120,6 @@ class TransactionDetails extends React.Component {
             text-transform: uppercase;
             color: #aaaeb3;
             font-weight: 300;
-            font-family: lato, montserratlight, arial;
             white-space: nowrap;
           }
           .netAmountInCollectiveCurrency {

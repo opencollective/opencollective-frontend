@@ -413,7 +413,6 @@ exports[`Search Page renders empty results message 1`] = `
   border-radius: 0;
   box-shadow: none;
   display: block;
-  font-family: lato;
   height: 3.4rem;
   padding: 0;
 }
@@ -3062,7 +3061,6 @@ exports[`Search Page renders loading grid SVG 1`] = `
   border-radius: 0;
   box-shadow: none;
   display: block;
-  font-family: lato;
   height: 3.4rem;
   padding: 0;
 }
@@ -4549,7 +4547,6 @@ exports[`Search Page renders search results with pagination 1`] = `
   border-radius: 0;
   box-shadow: none;
   display: block;
-  font-family: lato;
   height: 3.4rem;
   padding: 0;
 }

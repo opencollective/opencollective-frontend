@@ -103,12 +103,10 @@ ${totalDonationsStr}`
         }
 
         .name {
-          font-family: 'montserratlight';
           font-size: 1.7rem;
         }
 
         .description, .meta {
-          font-family: 'lato';
           font-size: 1.4rem;
         }
 

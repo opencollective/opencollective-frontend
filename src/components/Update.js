@@ -105,7 +105,6 @@ class Update extends React.Component {
 
           .title {
             color: #18191A;
-            font-family: Rubik;
             font-size: 20px;
             font-weight: 500;
             line-height: 28px;

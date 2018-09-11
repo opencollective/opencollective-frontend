@@ -133,7 +133,6 @@ Financial contribution: ${percentage}% (${formatCurrency(member.stats.totalDonat
             height: 48px;
             line-height: 48px;
             color: #FFFFFF;
-            font-family: Rubik;
             font-size: 12px;
             font-weight: 500;
             text-align: center;
