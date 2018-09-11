@@ -6,7 +6,6 @@ import Link from './Link';
 import Logo from './Logo';
 import { get } from 'lodash';
 import { firstSentence, imagePreview } from '../lib/utils';
-import { defaultBackgroundImage } from '../constants/collectives';
 
 class CollectiveCard extends React.Component {
   static propTypes = {
