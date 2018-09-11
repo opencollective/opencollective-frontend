@@ -143,7 +143,7 @@ async function create(args) {
  * @param {email} args.email The email of the user claiming the virtual card
  * @returns {models.PaymentMethod} return the virtual card payment method.
  */
-export async function claim(args) {
+async function claim(args) {
   // validate code
   const virtualCardPaymentMethod = await models.PaymentMethod.findOne({
     where: sequelize.and(
