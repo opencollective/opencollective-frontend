@@ -7,7 +7,7 @@ import Avatar from './Avatar';
 import Container from './Container';
 import { P, Span } from './Text';
 
-const TransactionSimple = ({
+const HomepageActivityItem = ({
   amount,
   createdAt,
   currency,
@@ -49,7 +49,7 @@ const TransactionSimple = ({
   );
 };
 
-TransactionSimple.propTypes = {
+HomepageActivityItem.propTypes = {
   amount: PropTypes.number.isRequired,
   createdAt: PropTypes.string.isRequired,
   currency: PropTypes.string.isRequired,
@@ -69,4 +69,4 @@ TransactionSimple.propTypes = {
   type: PropTypes.oneOf(['CREDIT', 'DEBIT']),
 };
 
-export default TransactionSimple;
+export default HomepageActivityItem;

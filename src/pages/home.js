@@ -15,7 +15,7 @@ import { getBaseApiUrl, imagePreview } from '../lib/utils';
 import Body from '../components/Body';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
-import TransactionSimple from '../components/TransactionSimple';
+import HomepageActivityItem from '../components/HomepageActivityItem';
 import { Link } from '../server/pages';
 import { Span, P, H1, H2, H3 } from '../components/Text';
 import ListItem from '../components/ListItem';
@@ -250,7 +250,7 @@ class HomePage extends React.Component {
                     {filteredTransactions.map((transaction) => (
                       <ListItem key={transaction.id} mb={1}>
                         <Container bg="white" border="1px solid rgba(0, 0, 0, 0.1)" borderRadius="8px" boxShadow="0 2px 4px 0 rgba(46,48,51,0.08);" p={3}>
-                          <TransactionSimple {...transaction} />
+                          <HomepageActivityItem {...transaction} />
                         </Container>
                       </ListItem>
                     ))}
