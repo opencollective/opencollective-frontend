@@ -27,6 +27,7 @@ export const transactionFields = `
   }
   host {
     id
+    slug
     name
     currency
     hostFeePercent

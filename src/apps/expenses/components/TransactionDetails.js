@@ -7,6 +7,8 @@ import { get } from 'lodash';
 
 import RefundTransactionBtn from './RefundTransactionBtn';
 
+import Link from '../../../components/Link';
+
 class TransactionDetails extends React.Component {
   static propTypes = {
     collective: PropTypes.shape({
@@ -31,6 +33,7 @@ class TransactionDetails extends React.Component {
     host: PropTypes.shape({
       hostFeePercent: PropTypes.number,
       slug: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired,
     }),
     type: PropTypes.oneOf(['CREDIT', 'DEBIT']),
     isRefund: PropTypes.bool, // whether or not this transaction refers to a refund
@@ -197,7 +200,7 @@ class TransactionDetails extends React.Component {
             <label>
               <FormattedMessage id="transaction.host" defaultMessage="host" />
             </label>
-            {host.name} ({hostCurrency})
+            <Link route={`/${host.slug}`}>{host.name}</Link> ({hostCurrency})
           </div>
         )}
         <div className="col">
