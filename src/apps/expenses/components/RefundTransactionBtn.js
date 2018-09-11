@@ -14,18 +14,19 @@ import SmallButton from '../../../components/SmallButton';
 
 class RefundTransactionBtn extends React.Component {
   static propTypes = {
-    transaction: PropTypes.object.isRequired,
-    collective: PropTypes.object.isRequired,
+    id: PropTypes.number.isRequired,
+    isRefund: PropTypes.bool,
+    CollectiveId: PropTypes.number.isRequired,
   };
 
   constructor(props) {
     super(props);
 
-    const canRefund = !props.transaction.refundTransaction;
+    const canRefund = !props.isRefund;
     this.state = {
       showing: {
         canRefund,
-        refunded: !canRefund,
+        refunded: props.isRefund,
         confirmRefund: false,
         refunding: false,
       },
@@ -60,7 +61,7 @@ class RefundTransactionBtn extends React.Component {
   async onClickRefund() {
     this.setShowingState({ refunding: true });
     try {
-      await this.props.refundTransaction(this.props.transaction.id);
+      await this.props.refundTransaction(this.props.id);
     } finally {
       this.setShowingState({ refunded: true });
     }
@@ -128,7 +129,7 @@ class RefundTransactionBtn extends React.Component {
                 className="refund"
                 bsStyle="danger"
                 bsSize="xsmall"
-                onClick={::this.onClickRefund}
+                onClick={() => this.onClickRefund()}
               >
                 <FormattedMessage
                   id="transaction.refund.yes.btn"
@@ -139,7 +140,7 @@ class RefundTransactionBtn extends React.Component {
                 className="no"
                 bsStyle="primary"
                 bsSize="xsmall"
-                onClick={() => ::this.setShowingState({ canRefund: true })}
+                onClick={() => this.setShowingState({ canRefund: true })}
               >
                 <FormattedMessage
                   id="transaction.refund.no.btn"
@@ -177,7 +178,7 @@ const addMutation = graphql(refundTransactionQuery, {
         variables: { id },
         update: (proxy, { data: { refundTransaction } }) => {
           const variables = {
-            CollectiveId: ownProps.collective.id,
+            CollectiveId: ownProps.CollectiveId,
             limit: 20,
             offset: 0,
           };
