@@ -14,15 +14,15 @@ const application = utils.data('application');
 const ORDER_TOTAL_AMOUNT = 5000;
 const STRIPE_FEE_STUBBED_VALUE = 300;
 
-const createVirtualCardQuery = `
-  mutation createVirtualPaymentMethod($totalAmount: Int!, $CollectiveId: Int!, $PaymentMethodId: Int, $description: String, $expiryDate: String) {
-    createVirtualPaymentMethod(totalAmount: $totalAmount, CollectiveId: $CollectiveId, PaymentMethodId: $PaymentMethodId, description: $description, expiryDate: $expiryDate) {
+const createPaymentMethodQuery = `
+  mutation createPaymentMethod($amount: Int!, $CollectiveId: Int!, $PaymentMethodId: Int, $description: String, $expiryDate: String, $type: String!) {
+    createPaymentMethod(amount: $amount, CollectiveId: $CollectiveId, PaymentMethodId: $PaymentMethodId, description: $description, expiryDate: $expiryDate, type:$type) {
       id
     }
   }
 `;
 const claimVirtualCardQuery = `
-  mutation claimVirtualCard($email: String!, $code: String!) {
+  mutation claimVirtualCard($email: String, $code: String!) {
     claimVirtualCard(email: $email, code: $code) {
       id
     }
@@ -94,19 +94,19 @@ describe('opencollective.virtualcard', () => {
         type: 'creditcard',
         token: 'tok_123456781234567812345678',
         CollectiveId: collective1.id,
-        monthlyLimitPerMember: 10000,
+        monthlyLimitPerMember: null,
       }));
 
       it('should create a U$100 virtual card payment method', async () => {
         const args = {
           description: 'virtual card test',
           CollectiveId: collective1.id,
-          totalAmount: 10000,
+          amount: 10000,
         };
         const paymentMethod = await virtualcard.create(args);
         expect(paymentMethod).to.exist;
         expect(paymentMethod.CollectiveId).to.be.equal(collective1.id);
-        expect(paymentMethod.initialBalance).to.be.equal(args.totalAmount);
+        expect(paymentMethod.initialBalance).to.be.equal(args.amount);
         expect(paymentMethod.service).to.be.equal('opencollective');
         expect(paymentMethod.type).to.be.equal('virtualcard');
         expect(moment(paymentMethod.expiryDate).format('YYYY-MM-DD'))
@@ -128,18 +128,18 @@ describe('opencollective.virtualcard', () => {
         type: 'creditcard',
         token: 'tok_123456781234567812345678',
         CollectiveId: collective1.id,
-        monthlyLimitPerMember: 10000,
+        monthlyLimitPerMember: null,
       }).then(pm => paymentMethod1 = pm));
 
       before('create a virtual card payment method', () => virtualcard.create({
         description: 'virtual card test',
         CollectiveId: collective1.id,
-        totalAmount: 10000,
+        amount: 10000,
       }).then(pm => virtualCardPaymentMethod = pm));
 
       it('new User should claim a virtual card', async () => {
         // setting correct code to claim virtual card by new User
-        const virtualCardCode = virtualCardPaymentMethod.uuid.slice(-8);
+        const virtualCardCode = virtualCardPaymentMethod.uuid.substring(0,8);
         const args = {
           email: 'new@user.com',
           code: virtualCardCode,
@@ -189,18 +189,18 @@ describe('opencollective.virtualcard', () => {
         type: 'creditcard',
         token: 'tok_123456781234567812345678',
         CollectiveId: collective1.id,
-        monthlyLimitPerMember: 10000,
+        monthlyLimitPerMember: null,
       }).then(pm => paymentMethod1 = pm));
 
       before('create a virtual card payment method', () => virtualcard.create({
         description: 'virtual card test',
         CollectiveId: collective1.id,
-        totalAmount: 10000,
+        amount: 10000,
       }).then(pm => virtualCardPaymentMethod = pm));
 
       before('new user claims a virtual card', () => virtualcard.claim({
         email: 'new@user.com',
-        code: virtualCardPaymentMethod.uuid.slice(-8),
+        code: virtualCardPaymentMethod.uuid.substring(0,8),
       }).then(async (pm) => {
         virtualCardPaymentMethod = await models.PaymentMethod.findById(pm.id);
         userCollective = await models.Collective.findById(virtualCardPaymentMethod.CollectiveId);
@@ -289,25 +289,24 @@ describe('opencollective.virtualcard', () => {
         type: 'creditcard',
         token: 'tok_123456781234567812345678',
         CollectiveId: collective1.id,
-        monthlyLimitPerMember: 10000,
+        monthlyLimitPerMember: null,
       }));
 
       it('should create a U$100 virtual card payment method', async () => {
         const args = {
-          description: 'virtual card test',
+          type: 'virtualcard',
           CollectiveId: collective1.id,
-          totalAmount: 10000,
+          amount: 10000,
         };
         // call graphql mutation
-        const gqlResult = await utils.graphqlQuery(createVirtualCardQuery, args, user1);
+        const gqlResult = await utils.graphqlQuery(createPaymentMethodQuery, args, user1);
 
         gqlResult.errors && console.error(gqlResult.errors[0]);
         expect(gqlResult.errors).to.be.empty;
-
-        const paymentMethod = await models.PaymentMethod.findById(gqlResult.data.createVirtualPaymentMethod.id);
+        const paymentMethod = await models.PaymentMethod.findById(gqlResult.data.createPaymentMethod.id);
         expect(paymentMethod).to.exist;
         expect(paymentMethod.CollectiveId).to.be.equal(collective1.id);
-        expect(paymentMethod.initialBalance).to.be.equal(args.totalAmount);
+        expect(paymentMethod.initialBalance).to.be.equal(args.amount);
         expect(paymentMethod.service).to.be.equal('opencollective');
         expect(paymentMethod.type).to.be.equal('virtualcard');
         expect(moment(paymentMethod.expiryDate).format('YYYY-MM-DD'))
@@ -329,18 +328,18 @@ describe('opencollective.virtualcard', () => {
         type: 'creditcard',
         token: 'tok_123456781234567812345678',
         CollectiveId: collective1.id,
-        monthlyLimitPerMember: 10000,
+        monthlyLimitPerMember: null,
       }).then(pm => paymentMethod1 = pm));
 
       before('create a virtual card payment method', () => virtualcard.create({
         description: 'virtual card test',
         CollectiveId: collective1.id,
-        totalAmount: 10000,
+        amount: 10000,
       }).then(pm => virtualCardPaymentMethod = pm));
 
       it('new User should claim a virtual card', async () => {
         // setting correct code to claim virtual card by new User
-        const virtualCardCode = virtualCardPaymentMethod.uuid.slice(-8);
+        const virtualCardCode = virtualCardPaymentMethod.uuid.substring(0,8);
         const args = {
           email: 'new@user.com',
           code: virtualCardCode,
@@ -402,18 +401,18 @@ describe('opencollective.virtualcard', () => {
         type: 'creditcard',
         token: 'tok_123456781234567812345678',
         CollectiveId: collective1.id,
-        monthlyLimitPerMember: 10000,
+        monthlyLimitPerMember: null,
       }));
 
       before('create a virtual card payment method', () => virtualcard.create({
         description: 'virtual card test',
         CollectiveId: collective1.id,
-        totalAmount: 10000,
+        amount: 10000,
       }).then(pm => virtualCardPaymentMethod = pm));
 
       before('new user claims a virtual card', () => virtualcard.claim({
         email: 'new@user.com',
-        code: virtualCardPaymentMethod.uuid.slice(-8),
+        code: virtualCardPaymentMethod.uuid.substring(0,8),
       }).then(async (pm) => {
         virtualCardPaymentMethod = await models.PaymentMethod.findById(pm.id);
         userVirtualCardCollective = await models.Collective.findById(virtualCardPaymentMethod.CollectiveId);
@@ -502,10 +501,11 @@ describe('opencollective.virtualcard', () => {
 
   describe('routes.paymentMethods.virtualcard', () => {
 
-    describe('POST /payment-methods/virtual-cards to Create a virtual card', async () => {
-      let host1, collective1, user1;
+    describe('POST /payment-methods to Create a virtual card', async () => {
+      let host1, collective1, user1, appKeyData;
 
       before(() => utils.resetTestDB());
+      before('create Host 1(USD)', () => models.Application.create({}).then(key => appKeyData = key));
       before('create Host 1(USD)', () => models.Collective.create({ name: 'Host 1', currency: 'USD', isActive: true }).then(c => host1 = c));
       before('create collective1(currency USD, hostCurrency:USD)', () => models.Collective.create({ name: 'collective1', currency: 'USD', HostCollectiveId: host1.id, isActive: true }).then(c => collective1 = c));
       before('creates User 1', () => models.User.createUserWithCollective({ name: 'User 1' }).then(u => user1 = u));
@@ -522,31 +522,30 @@ describe('opencollective.virtualcard', () => {
         type: 'creditcard',
         token: 'tok_123456781234567812345678',
         CollectiveId: collective1.id,
-        monthlyLimitPerMember: 10000,
+        monthlyLimitPerMember: null,
       }));
 
-      it('should Get 401 because there is no user authenticated', () => {
+      it('should Get 400 because there is no user authenticated', () => {
         const args = {
           description: 'virtual card test',
           CollectiveId: collective1.id,
-          totalAmount: 10000,
+          amount: 10000,
         };
         return request(app)
-        .post(`/payment-methods/virtual-cards?api_key=${application.api_key}`)
+        .post(`/payment-methods`)
         .send(args)
-        .expect(401);
+        .expect(400);
       });
 
-      it('should create a U$100 virtual card payment method', () => {
+      it.only('should create a U$100 virtual card payment method', () => {
         const args = {
-          description: 'virtual card test',
           CollectiveId: collective1.id,
-          totalAmount: 10000,
+          amount: 10000,
         };
         return request(app)
-        .post(`/payment-methods/virtual-cards?api_key=${application.api_key}`)
+        .post(`/payment-methods`)
         .set('Authorization', `Bearer ${user1.jwt()}`)
-        // .set('Client-Id', `Bearer ${user1.jwt()}`)
+        .set('Client-Id', appKeyData.clientId)
         .send(args)
         .expect(200)
         .toPromise()
@@ -554,7 +553,7 @@ describe('opencollective.virtualcard', () => {
           expect(res.body).to.exist;
           const paymentMethod = res.body;
           expect(paymentMethod.CollectiveId).to.be.equal(collective1.id);
-          expect(paymentMethod.balance).to.be.equal(args.totalAmount);
+          expect(paymentMethod.balance).to.be.equal(args.amount);
         });
       });
 

@@ -1,5 +1,21 @@
 import virtualcard from '../../paymentProviders/opencollective/virtualcard';
 
+
+/** Create a Payment Method through a collective(organization or user)
+ *
+ * @param {Object} args contains the parameters to create the new
+ *  payment method.
+* @param {Object} args contains the parameters to create the new
+ *  payment method.
+*/
+export async function createPaymentMethod(args, remoteUser) {
+  // We only support the creation of virtual cards payment methods at the moment
+  if (!args || !args.type || args.type != 'virtualcard') {
+    throw Error('Creation of Payment Method not allowed.');
+  }
+  return createVirtualPaymentMethod(args, remoteUser);
+}
+
 /** Create the Virtual Card Payment Method through an organization
  *
  * @param {Object} args contains the parameters to create the new
@@ -14,7 +30,7 @@ import virtualcard from '../../paymentProviders/opencollective/virtualcard';
  * @param {Date} [args.expiryDate] The expiry date of the payment method
  * @returns {models.PaymentMethod} return the virtual card payment method.
  */
-export async function createVirtualPaymentMethod(args, remoteUser) {
+async function createVirtualPaymentMethod(args, remoteUser) {
   if (!remoteUser.isAdmin(args.CollectiveId)) {
     throw new Error('Only an admin of a Collective can create Virtual cards on its behalf.');
   }

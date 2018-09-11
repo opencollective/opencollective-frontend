@@ -67,24 +67,18 @@ async function processOrder(order) {
   const sourcePaymentMethodProvider = libpayments.findPaymentMethodProvider(sourcePaymentMethod);
 
   // gets the Credit transaction generated
-  const creditTransaction = await sourcePaymentMethodProvider.processOrder(order);
+  let creditTransaction = await sourcePaymentMethodProvider.processOrder(order);
   // gets the Debit transaction generated through the TransactionGroup field.
-  const debitTransaction = await models.Transaction.findOne({
-    where: {
-      type: 'DEBIT',
-      TransactionGroup: creditTransaction.TransactionGroup,
-    },
-  });
-  // Updating already created transactions to use the Virtual Payment Method id instead
-  const updatedPaymentMethodTransactions =
-    await Promise.map([creditTransaction, debitTransaction], async (transaction) => {
-      await transaction.update({ PaymentMethodId: paymentMethod.id });
-      return transaction;
-  });
-  return updatedPaymentMethodTransactions[0];
+  const updatedTransactions = await models.Transaction.update(
+    { PaymentMethodId: paymentMethod.id },
+    { where: { TransactionGroup: creditTransaction.TransactionGroup }, returning: true },
+  );
+  // updating creditTransaction with latest data
+  creditTransaction = updatedTransactions[1].filter(t => t.type === 'CREDIT')[0];
+  return creditTransaction;
 }
 
-/** Create Virtual payment method through an organization
+/** Create Virtual payment method for a collective(organization or user)
  *
  * @param {Object} args contains the parameters to create the new
  *  payment method.
@@ -93,7 +87,7 @@ async function processOrder(order) {
  * @param {Number} args.CollectiveId The ID of the organization creating the virtual card.
  * @param {Number} [args.PaymentMethodId] The ID of the Source Payment method the
  *                 organization wants to use
- * @param {Number} args.totalAmount The total amount that will be
+ * @param {Number} args.amount The total amount that will be
  *  credited to the newly created payment method.
  * @param {Date} [args.expiryDate] The expiry date of the payment method
  * @returns {models.PaymentMethod + code} return the virtual card payment method with
@@ -102,38 +96,35 @@ async function processOrder(order) {
 async function create(args) {
   const collective = await models.Collective.findById(args.CollectiveId);
   const hostCollective = await models.Collective.findById(collective.HostCollectiveId);
-  const pmDescription = `${args.totalAmount} ${hostCollective.currency} Virtual card by ${collective.name}`;
-  let sourcePaymentMethodId = args.PaymentMethodId;
+  const pmDescription = `${args.amount} ${hostCollective.currency} card from ${collective.name}`;
+  let SourcePaymentMethodId = args.PaymentMethodId;
   if (!args.PaymentMethodId) {
-    const sourcePaymentMethod = await models.PaymentMethod.findOne({
-      where: {
-        CollectiveId: collective.id,
-        service: 'stripe',
-        type: 'creditcard',
-      },
-    });
+    const sourcePaymentMethod = await collective.getPaymentMethod({
+      service: 'stripe',
+      type: 'creditcard',
+    }, false); 
     if (!sourcePaymentMethod) {
       throw Error(`Collective id ${collective.id} needs to have a credit card to create virtual cards.`);
     }
-    sourcePaymentMethodId = sourcePaymentMethod.id;
+    SourcePaymentMethodId = sourcePaymentMethod.id;
   }
   const expiryDate = args.expiryDate ? moment(args.expiryDate).format() : moment().add(3, 'months').format();
   // creates a new Virtual card Payment method
   const paymentMethod = await models.PaymentMethod.create({
     name: args.description || pmDescription,
-    initialBalance: args.totalAmount,
+    initialBalance: args.amount,
     currency: hostCollective.currency,
     CollectiveId: args.CollectiveId,
     expiryDate: expiryDate,
     uuid: uuidv4(),
     service: 'opencollective',
     type: 'virtualcard',
-    SourcePaymentMethodId: sourcePaymentMethodId,
+    SourcePaymentMethodId: SourcePaymentMethodId,
     createdAt: new Date,
     updatedAt: new Date,
   });
   // adding code to payment method
-  paymentMethod.code = paymentMethod.uuid.slice(-8);
+  paymentMethod.code = paymentMethod.uuid.substring(0, 8);
   return paymentMethod;
 }
 
@@ -143,11 +134,11 @@ async function create(args) {
  * @param {email} args.email The email of the user claiming the virtual card
  * @returns {models.PaymentMethod} return the virtual card payment method.
  */
-async function claim(args) {
+async function claim(args, remoteUser) {
   // validate code
   const virtualCardPaymentMethod = await models.PaymentMethod.findOne({
     where: sequelize.and(
-        sequelize.where(sequelize.cast(sequelize.col('uuid'), 'text'), { [Op.like]: `%${args.code}` }),
+        sequelize.where(sequelize.cast(sequelize.col('uuid'), 'text'), { [Op.like]: `${args.code}%` }),
         { service: 'opencollective' },
         { type: 'virtualcard' },
       ),
@@ -162,9 +153,9 @@ async function claim(args) {
     throw Error('Virtual card not available to be claimed.');
   }
   // find or creating a user with its collective
-  const user = await models.User.findOrCreateByEmail(args.email);
+  const user = remoteUser || await models.User.findOrCreateByEmail(args.email);
   // updating virtual card with collective Id of the user
-  await virtualCardPaymentMethod.update({ CollectiveId: user.CollectiveId });
+  await virtualCardPaymentMethod.update({ CollectiveId: user.CollectiveId, confirmedAt: new Date });
   return virtualCardPaymentMethod;
 }
 

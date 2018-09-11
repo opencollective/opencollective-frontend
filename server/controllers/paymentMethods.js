@@ -1,11 +1,11 @@
 import models, { Op } from '../models';
-import _, { get } from 'lodash';
-import * as utils from '../../test/utils';
+import { extend, get, pick, pluck } from 'lodash';
+import * as utils from '../graphql/utils';
 const { PaymentMethod } = models;
 
-const createVirtualCardQuery = `
-  mutation createVirtualPaymentMethod($totalAmount: Int!, $CollectiveId: Int!, $PaymentMethodId: Int, $description: String, $expiryDate: String) {
-    createVirtualPaymentMethod(totalAmount: $totalAmount, CollectiveId: $CollectiveId, PaymentMethodId: $PaymentMethodId, description: $description, expiryDate: $expiryDate) {
+const createPaymentMethodQuery = `
+  mutation createPaymentMethod($amount: Int!, $CollectiveId: Int!, $PaymentMethodId: Int, $description: String, $expiryDate: String) {
+    createVirtualMethod(amount: $amount, CollectiveId: $CollectiveId, PaymentMethodId: $PaymentMethodId, description: $description, expiryDate: $expiryDate) {
       id
       name
       uuid
@@ -26,17 +26,17 @@ const createVirtualCardQuery = `
  */
 export function getPaymentMethods(req, res, next) {
   const { filter } = req.query;
-  const query = _.extend({}, filter, { CollectiveId: req.user.CollectiveId, confirmedAt: { [Op.ne]: null } });
+  const query = extend({}, filter, { CollectiveId: req.user.CollectiveId, confirmedAt: { [Op.ne]: null } });
 
   return PaymentMethod.findAll({ where: query })
   .then((response) => {
-    res.send(_.pluck(response, 'info'));
+    res.send(pluck(response, 'info'));
   })
   .catch(next);
 }
 
 async function createVirtualCardThroughGraphQL(args, user) {
-  const gqlResult = await utils.graphqlQuery(createVirtualCardQuery, args, user);
+  const gqlResult = await utils.graphqlQuery(createPaymentMethodQuery, args, user);
   if (!get(gqlResult, 'data.createVirtualPaymentMethod')) {
     throw Error('Graphql Query did not return a result');
   }
@@ -57,26 +57,19 @@ async function createVirtualCardThroughGraphQL(args, user) {
  * CollectiveId(if the logged in user is and admin of the collective).
  */
 export function createVirtualCard(req, res, next) {
-  if (!get(req, 'remoteUser')) {
-    return res.status(401).send('User not logged in');
-  }
-  if (!get(req, 'body.CollectiveId')) {
-    return res.status(400).send('Request Payload does not contain "CollectiveId" field');
-  }
-  if (!get(req, 'body.totalAmount')) {
-    return res.status(400).send('Request Payload does not contain "totalAmount" field');
-  }
-  const args = {
-    description: req.body.description,
-    CollectiveId: req.body.CollectiveId,
-    PaymentMethodId: req.body.PaymentMethodId,
-    totalAmount: req.body.totalAmount,
-    expiryDate: req.body.expiryDate,
-  };
-
+  const args = pick(req.body, ['description','CollectiveId','PaymentMethodId','amount','expiryDate']);
+  args.type = args.type || 'virtualcard';
   return createVirtualCardThroughGraphQL(args, req.remoteUser)
   .then(response => {
     res.send(response);
   })
   .catch(next);
+}
+
+export function createPaymentMethod(req, res, next) {
+  // We only support creation of "virtualcard" payment methods 
+  if (get(req, 'body.type') && get(req, 'body.type') !== 'virtualcard') {
+    throw Error(`Creation of payment methods with type ${get(req, 'body.type')} not Allowed`);
+  }
+  return createVirtualCard(req, res, next);
 }

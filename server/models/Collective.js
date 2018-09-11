@@ -1340,15 +1340,18 @@ export default function(Sequelize, DataTypes) {
   };
 
   // Returns the last payment method that has been confirmed attached to this collective
-  Collective.prototype.getPaymentMethod = async function(where) {
-    return models.PaymentMethod.findOne({
+  Collective.prototype.getPaymentMethod = async function(where, mustBeConfirmed = true) {
+    const query = {
       where: {
         ...where,
         CollectiveId: this.id,
-        confirmedAt: { [Op.ne]: null }
       },
-      order: [['confirmedAt', 'DESC']]
-    })
+      order: [['confirmedAt', 'DESC'], ['createdAt', 'DESC']]
+    };
+    if (mustBeConfirmed) {
+      query.where.confirmedAt = { [Op.ne]: null };
+    }
+    return models.PaymentMethod.findOne(query)
     .tap(paymentMethod => {
       if (!paymentMethod) {
         throw new Error(`No payment method found`);
