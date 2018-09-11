@@ -3,12 +3,14 @@
 import collective from './collective';
 import prepaid from './prepaid';
 import giftcard from './giftcard';
+import virtualcard from './virtualcard';
 
 /** Process orders from Open Collective payment method types */
 async function processOrder(order) {
   switch (order.paymentMethod.type) {
   case 'prepaid': return prepaid.processOrder(order);
   case 'giftcard': return giftcard.processOrder(order);
+  case 'virtualcard': return virtualcard.processOrder(order);
   case 'collective':        // Fall through
   default: return collective.processOrder(order);
   }
@@ -23,6 +25,7 @@ export default {
     collective,
     giftcard,
     prepaid,
+    virtualcard,
   },
   processOrder,
 };
