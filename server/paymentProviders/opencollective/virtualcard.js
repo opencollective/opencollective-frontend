@@ -1,6 +1,5 @@
 import moment from 'moment';
 import uuidv4 from 'uuid/v4';
-import Promise from 'bluebird';
 import { get } from 'lodash';
 import models, { Op, sequelize } from '../../models';
 import * as libpayments from '../../lib/payments';
