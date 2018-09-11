@@ -1,0 +1,33 @@
+import React from 'react';
+
+import { Span } from '../../../components/Text';
+import { Box, Flex } from 'grid-styled';
+import Currency from '../../../components/Currency';
+
+const AmountCurrency = ({
+  abbreviate = false,
+  currency,
+  precision = 0,
+  amount,
+  ...styles,
+}) => (
+  <Flex alignItems="baseline">
+    <Span fontWeight="bold" fontSize="1.6rem">
+      <Currency
+        value={amount}
+        currency={currency}
+        abbreviate={abbreviate}
+        precision={precision}
+        {...styles}
+        />
+    </Span>
+    <Box ml={1}>
+      <Span color="#9D9FA3" fontSize="1.4rem" letterSpacing="-0.2px">{currency}</Span>
+    </Box>
+    <Box ml={2}>
+      <object type="image/svg+xml" data={`/static/icons/${amount < 0 ? 'debit' : 'credit'}-arrow.svg`} height="16"></object>
+    </Box>
+  </Flex>
+);
+
+export default AmountCurrency;

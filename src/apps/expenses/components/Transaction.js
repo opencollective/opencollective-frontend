@@ -1,7 +1,7 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { Box, Flex } from 'grid-styled';
-import { FormattedNumber, FormattedMessage } from 'react-intl';
+import { Flex } from 'grid-styled';
+import { FormattedMessage } from 'react-intl';
 
 import Avatar from '../../../components/Avatar';
 import Container from '../../../components/Container';
@@ -10,6 +10,7 @@ import Moment from '../../../components/Moment';
 import { P, Span } from '../../../components/Text';
 
 import TransactionDetails from './TransactionDetails';
+import AmountCurrency from './AmountCurrency';
 
 class Transaction extends React.Component {
   static propTypes = {
@@ -96,30 +97,7 @@ class Transaction extends React.Component {
               </P>
               <Span fontSize="1.6rem">{type === 'CREDIT' && ' 🎉'}</Span>
             </div>
-            <Flex alignItems="baseline">
-              <Span fontWeight="bold" fontSize="1.6rem">
-                <FormattedNumber
-                  currency={currency}
-                  currencyDisplay="symbol"
-                  maximumFractionDigits={2}
-                  minimumFractionDigits={2}
-                  style="currency"
-                  value={Math.abs(amount) / 100}
-                />
-              </Span>
-              <Box ml={1}>
-                <Span color="#9D9FA3" fontSize="1.4rem" letterSpacing="-0.2px">
-                  {currency}
-                </Span>
-              </Box>
-              <Box ml={2}>
-                <object
-                  type="image/svg+xml"
-                  data={`/static/icons/${type.toLowerCase()}-arrow.svg`}
-                  height="16"
-                />
-              </Box>
-            </Flex>
+            <AmountCurrency amount={amount} currency={currency} />
           </Flex>
           <Container fontSize="1.2rem" color="#AEB2B8">
             <a href={`/${fromCollective.slug}`} title={fromCollective.name}>{fromCollective.name}</a>
