@@ -6,8 +6,8 @@ import * as utils from '../graphql/utils';
 const { PaymentMethod } = models;
 
 const createPaymentMethodQuery = `
-  mutation createPaymentMethod($amount: Int!, $CollectiveId: Int!, $PaymentMethodId: Int, $description: String, $expiryDate: String, $type: String!) {
-    createPaymentMethod(amount: $amount, CollectiveId: $CollectiveId, PaymentMethodId: $PaymentMethodId, description: $description, expiryDate: $expiryDate, type: $type) {
+  mutation createPaymentMethod($amount: Int!, $CollectiveId: Int!, $PaymentMethodId: Int, $description: String, $expiryDate: String, $type: String!, $currency: String!) {
+    createPaymentMethod(amount: $amount, CollectiveId: $CollectiveId, PaymentMethodId: $PaymentMethodId, description: $description, expiryDate: $expiryDate, type: $type, currency: $currency) {
       id
       name
       uuid
@@ -63,7 +63,7 @@ async function createVirtualCardThroughGraphQL(args, user) {
  */
 export function createVirtualCard(req, res) {
 
-  const args = pick(req.body, ['description','CollectiveId','PaymentMethodId','amount','expiryDate']);
+  const args = pick(req.body, ['description','CollectiveId','PaymentMethodId','amount', 'currency','expiryDate']);
   args.type = args.type || 'virtualcard';
 
   return createVirtualCardThroughGraphQL(args, req.remoteUser)
