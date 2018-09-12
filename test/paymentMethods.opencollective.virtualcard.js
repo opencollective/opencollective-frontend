@@ -8,6 +8,7 @@ import * as utils from './utils';
 import models from '../server/models';
 import virtualcard from '../server/paymentProviders/opencollective/virtualcard';
 import * as store from './features/support/stores';
+import emailLib from '../server/lib/email';
 
 const ORDER_TOTAL_AMOUNT = 5000;
 const STRIPE_FEE_STUBBED_VALUE = 300;
@@ -54,10 +55,11 @@ const createOrderQuery = `
 
 describe('opencollective.virtualcard', () => {
 
-  let sandbox;
+  let sandbox, sendEmailSpy;
 
   beforeEach(() => {
     sandbox = sinon.createSandbox();
+    sendEmailSpy = sandbox.spy(emailLib, 'sendMessage');
     // And given that the endpoint for creating customers on Stripe
     // is patched
     utils.stubStripeCreate(sandbox, { charge: { currency: 'usd', status: 'succeeded' } });
@@ -315,6 +317,7 @@ describe('opencollective.virtualcard', () => {
         expect(gqlResult.errors).to.be.empty;
         const paymentMethod = await models.PaymentMethod.findById(gqlResult.data.createPaymentMethod.id);
         expect(paymentMethod).to.exist;
+        expect(paymentMethod.CreatedByUserId).to.be.equal(user1.id);
         expect(paymentMethod.CollectiveId).to.be.equal(collective1.id);
         expect(paymentMethod.initialBalance).to.be.equal(args.amount);
         expect(paymentMethod.service).to.be.equal('opencollective');
@@ -382,6 +385,11 @@ describe('opencollective.virtualcard', () => {
         // and check if both have the same expiry
         expect(moment(paymentMethod.expiryDate).format()).to.be
           .equal(moment(virtualCardPaymentMethod.expiryDate).format());
+
+        await utils.waitForCondition(() => sendEmailSpy.callCount > 0);
+        expect(sendEmailSpy.firstCall.args[0]).to.equal(args.email);
+        expect(sendEmailSpy.firstCall.args[1]).to.contain('You received $100 from collective1 to donate on Open Collective');
+        expect(sendEmailSpy.firstCall.args[2]).to.contain("next=/redeemed?name=&amount=10000&currency=USD&emitterSlug=collective1&emitterName=collective1");
       }); /** End Of "#new User should claim a virtual card" */
 
       it('Existing User should claim a virtual card', async () => {

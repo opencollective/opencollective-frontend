@@ -1,5 +1,6 @@
 import virtualcard from '../../paymentProviders/opencollective/virtualcard';
-
+import emailLib from '../../lib/email';
+import models from '../../models';
 
 /** Create a Payment Method through a collective(organization or user)
  *
@@ -43,7 +44,7 @@ async function createVirtualPaymentMethod(args, remoteUser) {
   if (!['USD', 'EUR'].includes(args.currency)) {
     throw new Error(`Currency ${args.currency} not supported. We only support USD and EUR at the moment.`);
   }
-  const paymentMethod = await virtualcard.create(args);
+  const paymentMethod = await virtualcard.create(args, remoteUser);
   return paymentMethod;
 }
 
@@ -55,5 +56,18 @@ async function createVirtualPaymentMethod(args, remoteUser) {
  */
 export async function claimVirtualCard(args, remoteUser) {
   const paymentMethod = await virtualcard.claim(args, remoteUser);
+  const user = await models.User.findOne({ where: { CollectiveId: paymentMethod.CollectiveId }});
+  const amount = paymentMethod.initialBalance;
+  const currency = paymentMethod.currency;
+  const emitter = await models.Collective.findById(paymentMethod.sourcePaymentMethod.CollectiveId);
+  const userCollective = await user.getCollective();
+  const name = userCollective.name && userCollective.name.match(/anonymous/i) ? '' : user.name;
+
+  emailLib.send('user.card.claimed', args.email, {
+    loginLink: user.generateLoginLink(`/redeemed?name=${name}&amount=${amount}&currency=${currency}&emitterSlug=${emitter.slug}&emitterName=${emitter.name}`),
+    amount,
+    currency,
+    emitter,
+  })
   return paymentMethod;
 }

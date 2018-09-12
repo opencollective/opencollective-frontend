@@ -94,7 +94,7 @@ async function processOrder(order) {
  * @returns {models.PaymentMethod + code} return the virtual card payment method with
             an extra property "code" that is basically the last 8 digits of the UUID
  */
-async function create(args) {
+async function create(args, remoteUser) {
   const collective = await models.Collective.findById(args.CollectiveId);
   let SourcePaymentMethodId = args.PaymentMethodId;
   let sourcePaymentMethod;
@@ -109,10 +109,11 @@ async function create(args) {
     SourcePaymentMethodId = sourcePaymentMethod.id;
   }
   const expiryDate = args.expiryDate ? moment(args.expiryDate).format() : moment().add(3, 'months').format();
-  
+
   const pmDescription = `${formatCurrency(args.amount, args.currency)} card from ${collective.name}`;
   // creates a new Virtual card Payment method
   const paymentMethod = await models.PaymentMethod.create({
+    CreatedByUserId: remoteUser && remoteUser.id,
     name: args.description || pmDescription,
     initialBalance: args.amount,
     currency: args.currency,
@@ -156,6 +157,7 @@ async function claim(args, remoteUser) {
   const user = remoteUser || await models.User.findOrCreateByEmail(args.email);
   // updating virtual card with collective Id of the user
   await virtualCardPaymentMethod.update({ CollectiveId: user.CollectiveId, confirmedAt: new Date });
+  virtualCardPaymentMethod.sourcePaymentMethod = sourcePaymentMethod;
   return virtualCardPaymentMethod;
 }
 
