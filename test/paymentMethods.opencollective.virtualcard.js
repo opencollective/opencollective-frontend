@@ -521,7 +521,7 @@ describe('opencollective.virtualcard', () => {
       let host1, collective1, user1, appKeyData;
 
       before(() => utils.resetTestDB());
-      before('create Host 1(USD)', () => models.Application.create({}).then(key => appKeyData = key));
+      before('generating API KEY)', () => models.Application.create({}).then(key => appKeyData = key));
       before('create Host 1(USD)', () => models.Collective.create({ name: 'Host 1', currency: 'USD', isActive: true }).then(c => host1 = c));
       before('create collective1(currency USD, No Host)', () => models.Collective.create({ name: 'collective1', currency: 'USD', isActive: true }).then(c => collective1 = c));
       before('creates User 1', () => models.User.createUserWithCollective({ name: 'User 1' }).then(u => user1 = u));
@@ -588,6 +588,7 @@ describe('opencollective.virtualcard', () => {
         .expect(200)
         .toPromise()
         .then(res => {
+          console.log(`res: ${res}`);
           expect(res.body).to.exist;
           const paymentMethod = res.body;
           expect(paymentMethod.CollectiveId).to.be.equal(collective1.id);
