@@ -41,7 +41,8 @@ export function getPaymentMethods(req, res, next) {
 async function createVirtualCardThroughGraphQL(args, user) {
   const gqlResult = await utils.graphqlQuery(createPaymentMethodQuery, args, user);
   if (!get(gqlResult, 'data.createPaymentMethod')) {
-    throw Error('Graphql Query did not return a result');
+    const error = gqlResult.errors ? gqlResult.errors[0] : Error('Graphql Query did not return a result');
+    throw error;
   }
   const paymentMethod = gqlResult.data.createPaymentMethod;
   return {
@@ -60,7 +61,7 @@ async function createVirtualCardThroughGraphQL(args, user) {
  * Creates a virtual card given (at least) an amount and a
  * CollectiveId(if the logged in user is and admin of the collective).
  */
-export function createVirtualCard(req, res, next) {
+export function createVirtualCard(req, res) {
 
   const args = pick(req.body, ['description','CollectiveId','PaymentMethodId','amount','expiryDate']);
   args.type = args.type || 'virtualcard';
@@ -69,7 +70,9 @@ export function createVirtualCard(req, res, next) {
   .then(response => {
     res.send(response);
   })
-  .catch(next);
+  .catch(error => {
+    res.status(400).send({error: error.toString()});
+  });
 }
 
 export function createPaymentMethod(req, res, next) {
