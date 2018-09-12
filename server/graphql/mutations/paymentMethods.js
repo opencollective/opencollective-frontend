@@ -31,8 +31,11 @@ export async function createPaymentMethod(args, remoteUser) {
  * @returns {models.PaymentMethod} return the virtual card payment method.
  */
 async function createVirtualPaymentMethod(args, remoteUser) {
+  if (!remoteUser) {
+    throw new Error('You need to be logged in to create this payment method.');
+  }
   if (!remoteUser.isAdmin(args.CollectiveId)) {
-    throw new Error('Only an admin of a Collective can create Virtual cards on its behalf.');
+    throw new Error('You must be an admin of this Collective.');
   }
   const paymentMethod = await virtualcard.create(args);
   return paymentMethod;
@@ -44,7 +47,7 @@ async function createVirtualPaymentMethod(args, remoteUser) {
  * @param {email} args.email The email of the user claiming the virtual card
  * @returns {models.PaymentMethod} return the virtual card payment method.
  */
-export async function claimVirtualCard(args) {
-  const paymentMethod = await virtualcard.claim(args);
+export async function claimVirtualCard(args, remoteUser) {
+  const paymentMethod = await virtualcard.claim(args, remoteUser);
   return paymentMethod;
 }
