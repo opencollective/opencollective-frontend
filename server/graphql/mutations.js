@@ -371,6 +371,7 @@ const mutations = {
     args: {
       type: { type: new GraphQLNonNull(GraphQLString) },
       amount: { type: new GraphQLNonNull(GraphQLInt) },
+      currency: { type: new GraphQLNonNull(GraphQLString) },
       CollectiveId: { type: new GraphQLNonNull(GraphQLInt) },
       PaymentMethodId: { type: GraphQLInt },
       description: { type: GraphQLString },

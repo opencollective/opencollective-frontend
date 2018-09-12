@@ -25,8 +25,9 @@ export async function createPaymentMethod(args, remoteUser) {
  * @param {Number} args.CollectiveId The ID of the organization creating the virtual card.
  * @param {Number} [args.PaymentMethodId] The ID of the Source Payment method the
  *                 organization wants to use
- * @param {Number} args.totalAmount The total amount that will be
+ * @param {Number} args.amount The total amount that will be
  *  credited to the newly created payment method.
+ * @param {String} args.currency The currency of the virtual card
  * @param {Date} [args.expiryDate] The expiry date of the payment method
  * @returns {models.PaymentMethod} return the virtual card payment method.
  */
@@ -36,6 +37,11 @@ async function createVirtualPaymentMethod(args, remoteUser) {
   }
   if (!remoteUser.isAdmin(args.CollectiveId)) {
     throw new Error('You must be an admin of this Collective.');
+  }
+  // making sure it's a string, trim and uppercase it.
+  args.currency = args.currency.toString().toUpperCase();
+  if (!['USD', 'EUR'].includes(args.currency)) {
+    throw new Error(`Currency ${args.currency} not supported. We only support USD and EUR at the moment.`);
   }
   const paymentMethod = await virtualcard.create(args);
   return paymentMethod;
