@@ -1,5 +1,22 @@
 # source: http://localhost:3000/api/graphql
-# timestamp: Tue Aug 28 2018 00:22:10 GMT+0200 (Central European Summer Time)
+# timestamp: Wed Sep 12 2018 12:38:31 GMT-0400 (Eastern Daylight Time)
+
+"""Application model"""
+type Application {
+  id: Int
+  name: String
+  description: String
+  clientId: String
+  clientSecret: String
+  callbackUrl: String
+}
+
+"""Input type for Application"""
+input ApplicationInput {
+  name: String
+  description: String
+  callbackUrl: String
+}
 
 """Breakdown of backers per type (ANY/USER/ORGANIZATION/COLLECTIVE)"""
 type BackersStatsType {
@@ -520,7 +537,7 @@ type Expense implements Transaction {
   paymentProcessorFeeInHostCurrency: Int
 
   """
-  Amount after fees received by the collective in the lowest unit of its own currency (typically cents)
+  Amount after fees received by the collective in the lowest unit of its own currency (ie. cents)
   """
   netAmountInCollectiveCurrency: Int
   host: User
@@ -709,6 +726,11 @@ type Mutation {
   updateSubscription(id: Int!, paymentMethod: PaymentMethodInputType, amount: Int): OrderType
   refundTransaction(id: Int!): Transaction
   addFundsToOrg(totalAmount: Int!, CollectiveId: Int!, HostCollectiveId: Int!, description: String): PaymentMethodType
+  createApplication(application: ApplicationInput!): Application
+  updateApplication(id: Int!, application: ApplicationInput!): Application
+  deleteApplication(id: Int!): Application
+  createPaymentMethod(type: String!, amount: Int!, currency: String!, CollectiveId: Int!, PaymentMethodId: Int, description: String, expiryDate: String): PaymentMethodType
+  claimVirtualCard(code: String!, email: String): PaymentMethodType
 }
 
 """Order model"""
@@ -744,7 +766,7 @@ type Order implements Transaction {
   paymentProcessorFeeInHostCurrency: Int
 
   """
-  Amount after fees received by the collective in the lowest unit of its own currency (typically cents)
+  Amount after fees received by the collective in the lowest unit of its own currency (ie. cents)
   """
   netAmountInCollectiveCurrency: Int
   host: User
@@ -812,8 +834,18 @@ input OrderInputType {
   tier: TierInputType
 }
 
+"""Possible statuses for an Order"""
+enum OrderStatus {
+  PENDING
+  PAID
+  ACTIVE
+  CANCELLED
+  REJECTED
+  ERROR
+}
+
 """
-This is an order (for donations, buying tickets, subscribing to a Tier)
+This is an order (for donations, buying tickets, subscribing to a Tier, pledging to a Collective)
 """
 type OrderType {
   id: Int
@@ -882,6 +914,9 @@ type OrderType {
 
   """If there is a subscription, is it active?"""
   isSubscriptionActive: Boolean
+
+  """Current status for an order"""
+  status: OrderStatus
 }
 
 """This represents a Organization Collective"""
@@ -1010,6 +1045,7 @@ type PaymentMethodType {
   createdAt: String
   expiryDate: String
   service: String
+  SourcePaymentMethodId: Int
   type: String
   data: JSON
   name: String
@@ -1050,6 +1086,7 @@ type Query {
   """
   MatchingFund(uuid: String!, ForCollectiveId: Int): PaymentMethodType
   LoggedInUser: UserDetails
+  AuthenticatedUser: CollectiveInterface
   allInvoices(fromCollectiveSlug: String!): [InvoiceType]
   Invoice(
     """
@@ -1068,6 +1105,7 @@ type Query {
     type: TransactionType
   ): PaginatedTransactions
   Update(collectiveSlug: String, updateSlug: String, id: Int): UpdateType
+  Application(id: Int): Application
   allComments(ExpenseId: Int, UpdateId: Int, limit: Int, offset: Int): [UpdateType]
   allUpdates(CollectiveId: Int!, includeHostedCollectives: Boolean, limit: Int, offset: Int): [UpdateType]
   allExpenses(CollectiveId: Int!, includeHostedCollectives: Boolean, status: String, category: String, FromCollectiveId: Int, fromCollectiveSlug: String, limit: Int, offset: Int): [ExpenseType]
@@ -1234,15 +1272,23 @@ input TierInputType {
   type: String
   name: String
   description: String
+
+  """amount in the lowest unit of the currency of the host (ie. in cents)"""
   amount: Int
+  currency: String
   presets: [Int]
   interval: String
-  currency: String
   maxQuantity: Int
   maxQuantityPerUser: Int
+
+  """amount that you are trying to raise with this tier"""
   goal: Int
   password: String
+
+  """Start of the campaign"""
   startsAt: String
+
+  """End of the campaign"""
   endsAt: String
 }
 
@@ -1457,6 +1503,7 @@ type User implements CollectiveInterface {
   firstName: String
   lastName: String
   email: String
+  applications: [Application]
 }
 
 """This represents the details of a User"""
