@@ -1,185 +1,224 @@
-import React from 'react'
+import React from 'react';
 
 import Header from '../components/Header';
 import Body from '../components/Body';
 import Footer from '../components/Footer';
-import CollectivesForRedeemPageWithData from '../components/CollectivesForRedeemPageWithData';
+import withLoggedInUser from '../lib/withLoggedInUser';
 import withIntl from '../lib/withIntl';
-import withData from '../lib/withData'
-import colors from '../constants/colors';
-import { addGetLoggedInUserFunction } from '../graphql/queries';
+import withData from '../lib/withData';
+import { graphql } from 'react-apollo';
+import gql from 'graphql-tag';
 
+import Container from '../components/Container';
+// import Button from '../components/Button';
+import { Flex, Box } from 'grid-styled';
+import { FormattedMessage, defineMessages } from 'react-intl';
+
+import RedeemForm from '../components/RedeemForm';
+import RedeemSuccess from '../components/RedeemSuccess';
+
+import { P, H1, H5 } from '../components/Text';
+
+import styled from 'styled-components';
+import { backgroundSize, fontSize, minHeight, maxWidth } from 'styled-system';
+import { isValidEmail } from '../lib/utils';
+import { get } from 'lodash';
+
+const Error = styled(P)`
+  color: red;
+`;
+
+const BlueButton = styled.button`
+  --webkit-appearance: none;
+  width: 336px;
+  height: 56px;
+  border: none;
+  background: #3385FF;
+  border-radius: 100px;
+  color: white;
+  font-size: 1.6rem;
+  line-height: 5.2rem;
+  text-align:center;
+  margin: 16px;
+  &&:hover {
+    background: #66A3FF;
+  }
+  &&:active {
+    background: #145ECC;
+  }
+  &&:disabled {
+    background: #E0EDFF;
+  }
+`;
+
+const ShadowBox = styled(Box)`
+  box-shadow: 0px 8px 16px rgba(20, 20, 20, 0.12);
+`;
+
+const Title = styled(H1)`
+  color: white;
+  ${fontSize};
+`;
+
+const Subtitle = styled(H5)`
+  color: white;
+  ${fontSize};
+  ${maxWidth};
+`;
+
+const Hero = styled(Box)`
+  width: 100%;
+  ${minHeight};
+  background-image: url('/static/images/redeem-hero.svg');
+  background-position: center top;
+  background-repeat: no-repeat;
+  background-size: auto 376px;
+  ${backgroundSize}
+`;
 
 class RedeemPage extends React.Component {
 
+  static getInitialProps ({ query: { code, email } }) {
+    return { code, email };
+  }
+
   constructor(props) {
     super(props);
-
+    const { code, email } = props;
+    this.handleChange = this.handleChange.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
     this.state = {
-      LoggedInUser: null
-    }
-
+      loading: false,
+      view: 'form', // form or success
+      form: { code, email },
+      LoggedInUser: null,
+    };
+    this.messages = defineMessages({
+      'error.email.invalid': { id: 'error.email.invalid', defaultMessage: 'Invalid email address' },
+      'error.code.invalid': { id: 'error.code.invalid', defaultMessage: 'Invalid gift card code' },
+    });
   }
 
   async componentDidMount() {
     const { getLoggedInUser } = this.props;
-    const LoggedInUser = getLoggedInUser && await getLoggedInUser();
+    const LoggedInUser = await getLoggedInUser();
     this.setState({ LoggedInUser });
   }
 
+  async claimVirtualCard() {
+    this.setState({ loading: true });
+    const { code, email } = this.state.form;
+    console.log(">>> this.state.form", this.state.form);
+    try {
+      const res = await this.props.claimVirtualCard(code, email);
+      console.log(">>> res graphql: ", JSON.stringify(res, null, '  '));
+      this.setState({ loading: false, view: 'success' });
+    } catch (e) {
+      const error = e.graphQLErrors && e.graphQLErrors[0].message;
+      this.setState({ loading: false, error });
+      // console.log(">>> error graphql: ", JSON.stringify(error, null, '  '));
+      console.log(">>> error graphql: ", error);
+    }
+  }
+
+  handleSubmit() {
+    const { intl } = this.props;
+    if (!isValidEmail(this.state.form.email)) {
+      return this.setState({ error: intl.formatMessage(this.messages['error.email.invalid']) });
+    }
+    if (get(this.state, 'form.code', '').length !== 8) {
+      return this.setState({ error: intl.formatMessage(this.messages['error.code.invalid']) });
+    }
+    this.claimVirtualCard();
+  }
+
+  handleChange(form) {
+    this.setState({ form, error: null });
+  }
+
   render() {
+    const { code, email } = this.props;
+
     return (
-      <div className="RedeemPage">
+      <div className="RedeemedPage">
         <Header
           title="Redeem gift card"
           description="Use your gift card to support open source projects that you are contributing to."
           LoggedInUser={this.state.LoggedInUser}
           />
-        <style jsx global>{`
-          .Redeem-hero .ctabtn a {
-            color: white !important;
-          }
-        `}</style>
-        <style jsx>{`
-        .Redeem-container {
-          background-color: ${colors.offwhite};
-        }
-        .Redeem-hero {
-          display: flex;
-          align-items: center;
-          position: relative;
-          text-align: center;
-          min-height: 500px;
-          width: 100%;
-          overflow: hidden;
-        }
-        .small .Redeem-hero {
-          height: 22rem;
-          min-height: 22rem;
-        }
-        .backgroundCover {
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          background-image: url('/static/images/redeem-cover-background.svg');
-        }
-        .content {
-          position: relative;
-          display: flex;
-          flex-direction: column;
-          justify-content: space-around;
-          align-items: center;
-          color: black;
-          margin-top: 70px;
-        }
-        .small .content {
-          margin-top: 0px;
-        }
-        .Redeem-hero-line1 {
-          margin: auto;
-          font-family: Rubik;
-          font-size: 40px;
-          font-weight: 700;
-          line-height: 1.08;
-          text-align: center;
-          color: ${colors.white};
-          letter-spacing: -0.5px;
-          padding-bottom: 20px;
-        }
-        .Redeem-hero-line2 {
-          margin: auto;
-          margin-top: 40px;
-          height: 78px;
-          font-family: Rubik;
-          font-size: 16px;
-          line-height: 1.63;
-          text-align: center;
-          color: ${colors.white};
-          text-align: center;
-        }
-        .Redeem-hero-line3 {
-          margin: auto;
-          margin-top: 40px;
-          font-family: Rubik;
-          font-size: 18px;
-          font-weight: 500;
-          line-height: 1.44;
-          text-align: center;
-          color: ${colors.white};
-        }
-        .Redeem-hero :global(.ctabtn) {
-          width: auto;
-          min-width: 20rem;
-          padding: 0 2rem;
-          margin: 2rem 0 0 0;
-          font-family: Lato;
-          text-transform: uppercase;
-          background-color: #75cc1f;
-          font-size: 1.5rem;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          color: white !important;
-          border-radius: 2.8rem;
-        }
-        .Redeem-listing {
-          margin: auto;
-          margin-top: -80px;
-          max-width: 1024px;
-        }
-        .cardsList {
-          display: flex;
-          flex-wrap: wrap;
-          flex-direction: row;
-          justify-content: center;
-        }
-        @media(max-width: 600px) {
-          h1 {
-            font-size: 2.5rem;
-          }
-        }
-        `}
-        </style>
         <Body>
-          <div className="Redeem-container">
+          <Flex alignItems="center" flexDirection="column">
 
-            <div className="Redeem-hero">
-              <div className="backgroundCover" />
-              <div className="content">
-                <div className="Redeem-hero-line1">
-                  Redeem Gift Card
-                </div>
-                <div className="Redeem-hero-line2">
-                  Open Collective helps communities - like open source projects, meetups, etc - raise money and operate transparently.
+            <Hero minHeight={['500px', null, '700px']} backgroundSize={['auto 300px', 'auto 380px']}>
+              <Flex alignItems="center" flexDirection="column">
 
-                  It&apos;s easy. Enter your gift code at the bottom of a project and we&apos;ll credit them with your gift card amount.
-                </div>
-                <div className="Redeem-hero-line3">
-                  Check out some of our popular collectives below!
-                </div>
-              </div>
-            </div>
+                <Box mt={5}>
+                  <Title fontSize={['3rem', null, '4rem']}>Redeem Gift Card</Title>
+                </Box>
 
-            <div className="Redeem-listing">
-              <div className="cardsList">
-                <CollectivesForRedeemPageWithData
-                  HostCollectiveId={11004} // hard-coded to only show open source projects
-                  orderBy="balance"
-                  orderDirection="DESC"
-                  limit={12}
-                  />
-              </div>
-            </div>
-          </div>
+                <Box mt={2}>
+                  <Subtitle fontSize={['1.5rem', null, '2rem']} maxWidth={['90%', '640px']}>
+                    <Box><FormattedMessage id="redeem.subtitle.line1" defaultMessage="Open Collective helps communities - like open source projects, meetups, etc - raise money and operate transparently." /></Box>
+                  </Subtitle>
+                </Box>
+
+                <Box mt={[4,5]}>
+
+                  <Flex justifyContent="center" flexDirection="column">
+
+                    <Container background="white" borderRadius="16px" width="400px">
+                      <ShadowBox py="24px" px="32px">
+                        { this.state.view === 'form' && <RedeemForm
+                          code={code}
+                          email={email}
+                          onChange={this.handleChange}
+                          />
+                        }
+                        { this.state.view === 'success' && <RedeemSuccess email={email} /> }
+                      </ShadowBox>
+                    </Container>
+                    { this.state.view === 'form' &&
+                      <Box my={3} align="center">
+                        <BlueButton onClick={this.handleSubmit} disabled={this.state.loading}>
+                          { this.state.loading
+                            ? <FormattedMessage id="form.processing" defaultMessage="processing" />
+                            : <FormattedMessage id="redeem.form.redeem.btn" defaultMessage="redeem" />
+                          }
+                        </BlueButton>
+                        { this.state.error && <Error>{this.state.error}</Error> }
+                      </Box>
+                    }
+                  </Flex>
+
+                </Box>
+              </Flex>
+            </Hero>
+
+          </Flex>
 
         </Body>
         <Footer />
 
       </div>
-    )
+    );
   }
 }
 
-export default withData(addGetLoggedInUserFunction(withIntl(RedeemPage)));
+const redeemMutation = gql`
+mutation claimVirtualCard($code: String!, $email: String) {
+  claimVirtualCard(code: $code, email: $email) {
+    id
+    description
+  }
+}
+`;
+
+const addMutation = graphql(redeemMutation, {
+  props: ( { mutate }) => ({
+    claimVirtualCard: async (code, email) => {
+      return await mutate({ variables: { code, email } });
+    },
+  }),
+});
+
+export default withData(withLoggedInUser(withIntl(addMutation(RedeemPage))));
