@@ -1345,11 +1345,13 @@ export default function(Sequelize, DataTypes) {
       where: {
         ...where,
         CollectiveId: this.id,
-      },
-      order: [['confirmedAt', 'DESC'], ['createdAt', 'DESC']]
+      }
     };
     if (mustBeConfirmed) {
       query.where.confirmedAt = { [Op.ne]: null };
+      query.order = [['confirmedAt', 'DESC']];
+    } else {
+      query.order = [['createdAt', 'DESC']];
     }
     return models.PaymentMethod.findOne(query)
     .tap(paymentMethod => {

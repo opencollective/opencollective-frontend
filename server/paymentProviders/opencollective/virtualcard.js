@@ -4,6 +4,7 @@ import { get } from 'lodash';
 import models, { Op, sequelize } from '../../models';
 import * as libpayments from '../../lib/payments';
 import * as libtransactions from '../../lib/transactions';
+import { formatCurrency } from '../../lib/utils';
 
 /**
  * Virtual Card Payment method - This payment Method works basically as an alias
@@ -94,25 +95,26 @@ async function processOrder(order) {
  */
 async function create(args) {
   const collective = await models.Collective.findById(args.CollectiveId);
-  const hostCollective = await models.Collective.findById(collective.HostCollectiveId);
-  const pmDescription = `${args.amount} ${hostCollective.currency} card from ${collective.name}`;
   let SourcePaymentMethodId = args.PaymentMethodId;
+  let sourcePaymentMethod;
   if (!args.PaymentMethodId) {
-    const sourcePaymentMethod = await collective.getPaymentMethod({
+    sourcePaymentMethod = await collective.getPaymentMethod({
       service: 'stripe',
       type: 'creditcard',
-    }, false); 
+    }, false);
     if (!sourcePaymentMethod) {
       throw Error(`Collective id ${collective.id} needs to have a credit card to create virtual cards.`);
     }
     SourcePaymentMethodId = sourcePaymentMethod.id;
   }
   const expiryDate = args.expiryDate ? moment(args.expiryDate).format() : moment().add(3, 'months').format();
+  const pmDescription = `${formatCurrency(args.amount, sourcePaymentMethod.currency)} ${sourcePaymentMethod.currency} card from ${collective.name}`;
+
   // creates a new Virtual card Payment method
   const paymentMethod = await models.PaymentMethod.create({
     name: args.description || pmDescription,
     initialBalance: args.amount,
-    currency: hostCollective.currency,
+    currency: sourcePaymentMethod.currency,
     CollectiveId: args.CollectiveId,
     expiryDate: expiryDate,
     uuid: uuidv4(),
