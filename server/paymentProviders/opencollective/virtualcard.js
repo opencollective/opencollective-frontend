@@ -108,13 +108,16 @@ async function create(args) {
     SourcePaymentMethodId = sourcePaymentMethod.id;
   }
   const expiryDate = args.expiryDate ? moment(args.expiryDate).format() : moment().add(3, 'months').format();
-  const pmDescription = `${formatCurrency(args.amount, sourcePaymentMethod.currency)} ${sourcePaymentMethod.currency} card from ${collective.name}`;
+  // validating and formatting currency of payment method(or collective if PM has no currency defined)
+  const formattedCurrency = get(sourcePaymentMethod, 'currency') ? formatCurrency(args.amount, sourcePaymentMethod.currency) :
+    (get(collective, 'currency') ? formatCurrency(args.amount, collective.currency) : args.amount);
 
+  const pmDescription = `${formattedCurrency} ${sourcePaymentMethod.currency} card from ${collective.name}`;
   // creates a new Virtual card Payment method
   const paymentMethod = await models.PaymentMethod.create({
     name: args.description || pmDescription,
     initialBalance: args.amount,
-    currency: sourcePaymentMethod.currency,
+    currency: sourcePaymentMethod.currency ? sourcePaymentMethod.currency : collective.currency,
     CollectiveId: args.CollectiveId,
     expiryDate: expiryDate,
     uuid: uuidv4(),
@@ -124,8 +127,6 @@ async function create(args) {
     createdAt: new Date,
     updatedAt: new Date,
   });
-  // adding code to payment method
-  paymentMethod.code = paymentMethod.uuid.substring(0, 8);
   return paymentMethod;
 }
 
