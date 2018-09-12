@@ -89,6 +89,7 @@ async function processOrder(order) {
  *                 organization wants to use
  * @param {Number} args.amount The total amount that will be
  *  credited to the newly created payment method.
+ * @param {String} args.currency The currency of the card to be created.
  * @param {Date} [args.expiryDate] The expiry date of the payment method
  * @returns {models.PaymentMethod + code} return the virtual card payment method with
             an extra property "code" that is basically the last 8 digits of the UUID
@@ -108,17 +109,13 @@ async function create(args) {
     SourcePaymentMethodId = sourcePaymentMethod.id;
   }
   const expiryDate = args.expiryDate ? moment(args.expiryDate).format() : moment().add(3, 'months').format();
-  // validating and formatting currency of payment method(or collective if PM has no currency defined)
-  let formattedCurrency = get(collective, 'currency') ? formatCurrency(args.amount, collective.currency) : args.amount;
-  if (get(sourcePaymentMethod, 'currency')) {
-    formattedCurrency = formatCurrency(args.amount, sourcePaymentMethod.currency);
-  }
-  const pmDescription = `${formattedCurrency} card from ${collective.name}`;
+  
+  const pmDescription = `${formatCurrency(args.amount, args.currency)} card from ${collective.name}`;
   // creates a new Virtual card Payment method
   const paymentMethod = await models.PaymentMethod.create({
     name: args.description || pmDescription,
     initialBalance: args.amount,
-    currency: sourcePaymentMethod.currency ? sourcePaymentMethod.currency : collective.currency,
+    currency: args.currency,
     CollectiveId: args.CollectiveId,
     expiryDate: expiryDate,
     uuid: uuidv4(),
