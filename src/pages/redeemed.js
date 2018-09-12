@@ -1,4 +1,5 @@
-import React from 'react'
+import React from 'react';
+import PropTypes from 'prop-types';
 
 import Header from '../components/Header';
 import Body from '../components/Body';
@@ -6,14 +7,13 @@ import Footer from '../components/Footer';
 import CollectivesWithData from '../components/CollectivesWithData';
 import withLoggedInUser from '../lib/withLoggedInUser';
 import withIntl from '../lib/withIntl';
-import withData from '../lib/withData'
-import colors from '../constants/colors';
+import withData from '../lib/withData';
+import sanitizeHtml from 'sanitize-html';
 
 import Container from '../components/Container';
-import Button from '../components/Button';
 import { P, H1, H5 } from '../components/Text';
 import { Flex, Box } from 'grid-styled';
-import { FormattedMessage, defineMessages } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
 
 import GiftCard from '../components/GiftCard';
 import SearchForm from '../components/SearchForm';
@@ -49,26 +49,25 @@ const Hero = styled(Box)`
 
 class RedeemedPage extends React.Component {
 
-  static getInitialProps ({ query: { shortUUID } }) {
-    return { shortUUID };
+  static propTypes = {
+    name: PropTypes.string,
+    emitterSlug: PropTypes.string,
+    emitterName: PropTypes.string,
+    amount: PropTypes.number.isRequired,
+  };
+
+  static getInitialProps ({ query: { amount, name, emitterSlug, emitterName } }) {
+    return {
+      amount: amount && Number(amount),
+      name: sanitizeHtml(name, { allowedTags: [], allowedAttributes: [] }),
+      emitterSlug: sanitizeHtml(emitterSlug, { allowedTags: [], allowedAttributes: [] }),
+      emitterName: sanitizeHtml(emitterName, { allowedTags: [], allowedAttributes: [] }),
+    };
   }
 
   constructor(props) {
     super(props);
-    this.handleChange = this.handleChange.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
-    this.state = {
-      loading: false,
-      view: 'form',
-      form: {},
-      LoggedInUser: null,
-    };
-
-    this.messages = defineMessages({
-      'email': { id: 'user.email.label', defaultMessage: 'email' },
-      'code': { id: 'redeem.form.code.label', defaultMessage: 'Gift card code' },
-    });
-
+    this.state = {};
   }
 
   async componentDidMount() {
@@ -77,27 +76,8 @@ class RedeemedPage extends React.Component {
     this.setState({ LoggedInUser });
   }
 
-  async redeem() {
-    this.setState({ loading: true });
-    if (true) {
-      this.setState({ loading: false, view: 'confirmEmail' });
-    }
-  }
-
-  handleSubmit() {
-    this.redeem();
-  }
-
-  handleChange(fieldname, value) {
-    const { form } = this.state;
-    form[fieldname] = value;
-    this.setState({ form });
-  }
-
   render() {
-    const { LoggedInUser } = this.state;
-    const { code } =  this.props;
-    const emitter = { slug: 'triplebyte', name: 'Tripebyte' };
+    const { amount, emitterSlug, emitterName, name } =  this.props;
     return (
       <div className="RedeemedPage">
         <Header
@@ -125,10 +105,10 @@ class RedeemedPage extends React.Component {
 
                 <Box mt={[4,5]}>
                   <GiftCard
-                    amount={10000}
+                    amount={amount}
                     currency="USD"
-                    emitter={emitter}
-                    name="Maria"
+                    emitter={{ slug: emitterSlug, name: emitterName }}
+                    name={name}
                     />
                 </Box>
               </Flex>
