@@ -10,7 +10,7 @@ function require(args, path) {
 
 export async function createUpdate(_, args, req) {
   const CollectiveId = get(args, 'update.collective.id');
-  mustHaveRole(req.remoteUser, 'ADMIN', CollectiveId, "create an update");
+  mustHaveRole(req.remoteUser, 'ADMIN', CollectiveId, 'create an update');
   require(args, 'update.title');
 
   const markdown = args.update.markdown
@@ -24,7 +24,7 @@ export async function createUpdate(_, args, req) {
     CollectiveId,
     TierId: get(args, 'update.tier.id'),
     CreatedByUserId: req.remoteUser.id,
-    FromCollectiveId: req.remoteUser.CollectiveId
+    FromCollectiveId: req.remoteUser.CollectiveId,
   });
 
   return update;

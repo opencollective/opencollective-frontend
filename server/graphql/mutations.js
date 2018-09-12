@@ -4,6 +4,7 @@ import { createMember, removeMember } from './mutations/members';
 import { editTiers } from './mutations/tiers';
 import { editConnectedAccount } from './mutations/connectedAccounts';
 import { createExpense, editExpense, updateExpenseStatus, payExpense, deleteExpense } from './mutations/expenses';
+import { createPaymentMethod, claimVirtualCard } from './mutations/paymentMethods';
 import * as updateMutations from './mutations/updates';
 import * as commentMutations from './mutations/comments';
 import * as applicationMutations from './mutations/applications';
@@ -14,7 +15,7 @@ import {
   GraphQLNonNull,
   GraphQLList,
   GraphQLString,
-  GraphQLInt
+  GraphQLInt,
 } from 'graphql';
 
 import {
@@ -365,6 +366,27 @@ const mutations = {
       return applicationMutations.deleteApplication(_, args, req);
     }
   },
+  createPaymentMethod: {
+    type: PaymentMethodType,
+    args: {
+      type: { type: new GraphQLNonNull(GraphQLString) },
+      amount: { type: new GraphQLNonNull(GraphQLInt) },
+      currency: { type: new GraphQLNonNull(GraphQLString) },
+      CollectiveId: { type: new GraphQLNonNull(GraphQLInt) },
+      PaymentMethodId: { type: GraphQLInt },
+      description: { type: GraphQLString },
+      expiryDate: { type: GraphQLString },
+    },
+    resolve: async (_, args, req) => createPaymentMethod(args, req.remoteUser),
+  },
+  claimVirtualCard: {
+    type: PaymentMethodType,
+    args: {
+      code: { type: new GraphQLNonNull(GraphQLString) },
+      email: { type: GraphQLString },
+    },
+    resolve: async (_, args, req) => claimVirtualCard(args, req.remoteUser),
+  }
 };
 
 export default mutations;

@@ -1215,6 +1215,12 @@ export const PaymentMethodType = new GraphQLObjectType({
           return paymentMethod.service;
         }
       },
+      SourcePaymentMethodId: {
+        type: GraphQLInt,
+        resolve(paymentMethod) {
+          return paymentMethod.SourcePaymentMethodId;
+        }
+      },
       type: {
         type: GraphQLString,
         resolve(paymentMethod) {

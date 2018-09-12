@@ -66,7 +66,6 @@ export function authorizeClientApp(req, res, next) {
   }
 
   const apiKey = req.get('Api-Key') || req.query.apiKey || req.query.api_key || req.body.api_key;
-
   if (req.clientApp) {
     debug('auth')(`Valid Client App`);
     next();

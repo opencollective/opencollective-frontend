@@ -11,7 +11,7 @@ import getHomePage from './controllers/homepage';
 import uploadImage from './controllers/images';
 import * as mw from './controllers/middlewares';
 import * as notifications from './controllers/notifications';
-import getPaymentMethods from './controllers/paymentMethods';
+import {getPaymentMethods, createPaymentMethod} from './controllers/paymentMethods';
 import * as test from './controllers/test';
 import * as users from './controllers/users';
 import * as applications from './controllers/applications';
@@ -152,6 +152,13 @@ export default (app) => {
   app.post('/users/:userid/payment-methods', NotImplemented); // Create a user's paymentMethod.
   app.put('/users/:userid/payment-methods/:paymentMethodid', NotImplemented); // Update a user's paymentMethod.
   app.delete('/users/:userid/payment-methods/:paymentMethodid', NotImplemented); // Delete a user's paymentMethod.
+
+  /**
+  * Credit paymentMethod.
+  *
+  *  Let's assume for now a paymentMethod is linked to a user.
+  */
+  app.post('/v1/payment-methods', createPaymentMethod); // Creates a payment method.
 
   /**
    * Collectives.
