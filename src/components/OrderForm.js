@@ -238,7 +238,7 @@ class OrderForm extends React.Component {
 
     const filterPMs = (pms) => (pms || []).filter(pm =>
       ((pm.service === 'stripe' || pm.service === 'paypal') ||
-       (pm.service === 'opencollective' && (pm.type === 'prepaid' || pm.type === 'collective') )));
+       (pm.service === 'opencollective' && ['prepaid', 'collective', 'virtualcard'].includes(pm.type) )));
 
     if (collective) {
       const paymentMethods = filterPMs(collective.paymentMethods);
