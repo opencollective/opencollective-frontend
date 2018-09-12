@@ -66,6 +66,8 @@ const templateNames = [
   'thankyou.ispcwa',
   'thankyou.fr',
   'thankyou.laprimaire',
+  'user.card.claimed',
+  'user.card.claimed.text',
   'user.forgot.password',
   'user.monthlyreport',
   'user.monthlyreport.text',
