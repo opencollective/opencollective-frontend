@@ -248,6 +248,10 @@ exports[`Search Page renders empty results message 1`] = `
 .c33 {
   color: #6E747A;
   font-size: 1.4rem;
+  -webkit-letter-spacing: -0.2px;
+  -moz-letter-spacing: -0.2px;
+  -ms-letter-spacing: -0.2px;
+  letter-spacing: -0.2px;
   margin: 0px;
   padding-top: 8px;
   padding-bottom: 8px;
@@ -829,6 +833,7 @@ exports[`Search Page renders empty results message 1`] = `
           className="c33"
           color="#6E747A"
           fontSize="1.4rem"
+          letterSpacing="-0.2px"
         >
           An organization for your community, transparent by design.
         </p>
@@ -1383,20 +1388,20 @@ exports[`Search Page renders error message 1`] = `
   flex: 1 1 auto;
 }
 
-.c18 {
+.c19 {
   box-sizing: border-box;
   margin-left: 16px;
   margin-right: 16px;
 }
 
-.c22 {
+.c23 {
   margin: 0;
   box-sizing: border-box;
   margin: 0px;
   padding: 0px;
 }
 
-.c23 {
+.c24 {
   box-sizing: border-box;
   padding-left: 16px;
   padding-right: 16px;
@@ -1407,7 +1412,7 @@ exports[`Search Page renders error message 1`] = `
   width: 100%;
 }
 
-.c28 {
+.c29 {
   max-width: 1300px;
   box-sizing: border-box;
   margin-left: auto;
@@ -1415,7 +1420,7 @@ exports[`Search Page renders error message 1`] = `
   padding: 8px;
 }
 
-.c35 {
+.c36 {
   box-sizing: border-box;
   margin-top: 16px;
   -webkit-flex: 1 1 auto;
@@ -1426,7 +1431,7 @@ exports[`Search Page renders error message 1`] = `
   order: 3;
 }
 
-.c36 {
+.c37 {
   box-sizing: border-box;
   width: 50%;
   margin-bottom: 16px;
@@ -1442,7 +1447,15 @@ exports[`Search Page renders error message 1`] = `
   padding: 4px;
 }
 
-.c15 {
+.c14 {
+  box-sizing: border-box;
+  width: 100%;
+  padding-left: 16px;
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+.c16 {
   box-sizing: border-box;
   margin-right: 4px;
   padding: 4px;
@@ -1477,7 +1490,7 @@ exports[`Search Page renders error message 1`] = `
   align-items: center;
 }
 
-.c16 {
+.c17 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -1492,14 +1505,14 @@ exports[`Search Page renders error message 1`] = `
   justify-content: flex-end;
 }
 
-.c19 {
+.c20 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
 }
 
-.c21 {
+.c22 {
   margin: 0;
   display: -webkit-box;
   display: -webkit-flex;
@@ -1522,7 +1535,7 @@ exports[`Search Page renders error message 1`] = `
   justify-content: center;
 }
 
-.c27 {
+.c28 {
   max-width: 1300px;
   display: -webkit-box;
   display: -webkit-flex;
@@ -1541,7 +1554,7 @@ exports[`Search Page renders error message 1`] = `
   justify-content: space-between;
 }
 
-.c30 {
+.c31 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -1552,7 +1565,7 @@ exports[`Search Page renders error message 1`] = `
   justify-content: center;
 }
 
-.c34 {
+.c35 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -1566,16 +1579,20 @@ exports[`Search Page renders error message 1`] = `
   justify-content: center;
 }
 
-.c31 {
+.c32 {
   color: #6E747A;
   font-size: 1.4rem;
+  -webkit-letter-spacing: -0.2px;
+  -moz-letter-spacing: -0.2px;
+  -ms-letter-spacing: -0.2px;
+  letter-spacing: -0.2px;
   margin: 0px;
   padding-top: 8px;
   padding-bottom: 8px;
   text-align: center;
 }
 
-.c37 {
+.c38 {
   color: #C2C6CC;
   font-size: 1.2rem;
   -webkit-letter-spacing: 1px;
@@ -1587,7 +1604,7 @@ exports[`Search Page renders error message 1`] = `
   text-align: center;
 }
 
-.c26 {
+.c27 {
   background-color: white;
   border-top: 1px solid #aaaaaa;
   bottom: 0px;
@@ -1596,7 +1613,7 @@ exports[`Search Page renders error message 1`] = `
   width: 100%;
 }
 
-.c29 {
+.c30 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -1609,7 +1626,7 @@ exports[`Search Page renders error message 1`] = `
   width: 100%;
 }
 
-.c32 {
+.c33 {
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -1631,7 +1648,7 @@ exports[`Search Page renders error message 1`] = `
   width: 100%;
 }
 
-.c40 {
+.c41 {
   color: #6E747A;
   display: block;
   font-size: 1.4rem;
@@ -1640,7 +1657,7 @@ exports[`Search Page renders error message 1`] = `
   padding: 0px;
 }
 
-.c25 {
+.c26 {
   border: 1px solid #D5DAE0;
   border-radius: 20px;
   color: #3385FF;
@@ -1652,7 +1669,7 @@ exports[`Search Page renders error message 1`] = `
   padding-bottom: 8px;
 }
 
-.c39 {
+.c40 {
   list-style: none;
   margin-bottom: 8px;
   text-align: center;
@@ -1675,14 +1692,6 @@ exports[`Search Page renders error message 1`] = `
   border-radius: 20px;
 }
 
-.c13 {
-  box-sizing: border-box;
-  width: 100%;
-  padding-left: 16px;
-  padding-top: 4px;
-  padding-bottom: 4px;
-}
-
 .c13.c13 {
   background-color: transparent;
   border: none;
@@ -1693,14 +1702,14 @@ exports[`Search Page renders error message 1`] = `
   letter-spacing: 0.1rem;
 }
 
-.c14 {
+.c15 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
 }
 
-.c14.c14 {
+.c15.c15 {
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
@@ -1713,18 +1722,18 @@ exports[`Search Page renders error message 1`] = `
   min-width: 10rem;
 }
 
-.c20 {
+.c21 {
   list-style: none;
   min-width: 20rem;
   text-align: right;
 }
 
-.c24 {
+.c25 {
   color: #777777;
   font-size: 1.4rem;
 }
 
-.c33 {
+.c34 {
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -1744,12 +1753,12 @@ exports[`Search Page renders error message 1`] = `
   width: 48px;
 }
 
-.c33:hover,
-.c33:focus {
+.c34:hover,
+.c34:focus {
   opacity: 1;
 }
 
-.c38 {
+.c39 {
   box-sizing: border-box;
   padding-left: 0px;
   padding-right: 8px;
@@ -1767,7 +1776,7 @@ exports[`Search Page renders error message 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c35 {
+  .c36 {
     -webkit-order: 2;
     -ms-flex-order: 2;
     order: 2;
@@ -1775,13 +1784,13 @@ exports[`Search Page renders error message 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c36 {
+  .c37 {
     width: 25%;
   }
 }
 
 @media screen and (min-width:52em) {
-  .c27 {
+  .c28 {
     -webkit-flex-direction: row;
     -ms-flex-direction: row;
     flex-direction: row;
@@ -1789,7 +1798,7 @@ exports[`Search Page renders error message 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c27 {
+  .c28 {
     -webkit-align-items: flex-start;
     -webkit-box-align: flex-start;
     -ms-flex-align: flex-start;
@@ -1798,7 +1807,7 @@ exports[`Search Page renders error message 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c30 {
+  .c31 {
     -webkit-box-pack: start;
     -webkit-justify-content: flex-start;
     -ms-flex-pack: start;
@@ -1807,25 +1816,25 @@ exports[`Search Page renders error message 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c31 {
+  .c32 {
     text-align: left;
   }
 }
 
 @media screen and (min-width:52em) {
-  .c37 {
+  .c38 {
     text-align: left;
   }
 }
 
 @media screen and (min-width:52em) {
-  .c29 {
+  .c30 {
     width: 33.33333333333333%;
   }
 }
 
 @media screen and (min-width:52em) {
-  .c32 {
+  .c33 {
     -webkit-order: 3;
     -ms-flex-order: 3;
     order: 3;
@@ -1839,25 +1848,25 @@ exports[`Search Page renders error message 1`] = `
 }
 
 @media screen and (min-width:40em) and (max-width:52em) {
-  .c17 {
+  .c18 {
     display: none;
   }
 }
 
 @media screen and (min-width:52em) and (max-width:64em) {
-  .c17 {
+  .c18 {
     display: none;
   }
 }
 
 @media screen and (min-width:64em) {
-  .c17 {
+  .c18 {
     display: none;
   }
 }
 
 @media screen and (min-width:52em) {
-  .c39 {
+  .c40 {
     text-align: left;
   }
 }
@@ -1914,13 +1923,13 @@ exports[`Search Page renders error message 1`] = `
                 className="c11 c12 sc-bdVaJa c2"
               >
                 <input
-                  className="c13"
+                  className="c13 c14"
                   name="q"
                   placeholder="Search Open Collective"
                   type="search"
                 />
                 <button
-                  className="c14 c15"
+                  className="c15 c16"
                 >
                   <svg
                     height={16}
@@ -1946,16 +1955,16 @@ exports[`Search Page renders error message 1`] = `
         </div>
       </div>
       <div
-        className="c16 c7 sc-bdVaJa c2"
+        className="c17 c7 sc-bdVaJa c2"
       >
         <div
-          className="c17 c2"
+          className="c18 c2"
         >
           <div
-            className="c18"
+            className="c19"
           >
             <a
-              className="c19 c2"
+              className="c20 c2"
               onClick={[Function]}
             >
               <svg
@@ -1979,13 +1988,13 @@ exports[`Search Page renders error message 1`] = `
           </div>
         </div>
         <div
-          className="c17 c2"
+          className="c18 c2"
         >
           <div
-            className="c18"
+            className="c19"
           >
             <a
-              className="c19 c2"
+              className="c20 c2"
               onClick={[Function]}
             >
               <svg
@@ -2021,13 +2030,13 @@ exports[`Search Page renders error message 1`] = `
           className="c4 c2"
         >
           <ul
-            className="c20 c21 c22"
+            className="c21 c22 c23"
           >
             <li
-              className="c23"
+              className="c24"
             >
               <a
-                className="c24"
+                className="c25"
                 href="/discover"
               >
                 <span>
@@ -2036,10 +2045,10 @@ exports[`Search Page renders error message 1`] = `
               </a>
             </li>
             <li
-              className="c23"
+              className="c24"
             >
               <a
-                className="c24"
+                className="c25"
                 href="/learn-more"
               >
                 <span>
@@ -2048,10 +2057,10 @@ exports[`Search Page renders error message 1`] = `
               </a>
             </li>
             <li
-              className="c23"
+              className="c24"
             >
               <a
-                className="c24"
+                className="c25"
                 href="https://medium.com/open-collective"
               >
                 <span>
@@ -2065,7 +2074,7 @@ exports[`Search Page renders error message 1`] = `
           className="LoginTopBarProfileButton"
         >
           <a
-            className="c25"
+            className="c26"
             color="#3385FF"
             display="inline-block"
             fontSize="1.4rem"
@@ -2097,17 +2106,17 @@ exports[`Search Page renders error message 1`] = `
     </div>
   </main>
   <div
-    className="c26"
+    className="c27"
     id="footer"
   >
     <div
-      className="c27 c28 sc-bdVaJa c2"
+      className="c28 c29 sc-bdVaJa c2"
     >
       <div
-        className="c29"
+        className="c30"
       >
         <div
-          className="c30 c2 sc-bdVaJa c2"
+          className="c31 c2 sc-bdVaJa c2"
         >
           <object
             data="/static/images/opencollectivelogo-footer.svg"
@@ -2116,18 +2125,19 @@ exports[`Search Page renders error message 1`] = `
           />
         </div>
         <p
-          className="c31"
+          className="c32"
           color="#6E747A"
           fontSize="1.4rem"
+          letterSpacing="-0.2px"
         >
           An organization for your community, transparent by design.
         </p>
       </div>
       <div
-        className="c32"
+        className="c33"
       >
         <a
-          className="c33"
+          className="c34"
           href="https://medium.com/open-collective"
         >
           <svg
@@ -2145,7 +2155,7 @@ exports[`Search Page renders error message 1`] = `
           </svg>
         </a>
         <a
-          className="c33"
+          className="c34"
           href="https://twitter.com/opencollect"
         >
           <svg
@@ -2195,7 +2205,7 @@ exports[`Search Page renders error message 1`] = `
           </svg>
         </a>
         <a
-          className="c33"
+          className="c34"
           href="https://github.com/opencollective"
         >
           <svg
@@ -2245,7 +2255,7 @@ exports[`Search Page renders error message 1`] = `
           </svg>
         </a>
         <a
-          className="c33"
+          className="c34"
           href="https://slack.opencollective.com"
         >
           <svg
@@ -2272,7 +2282,7 @@ exports[`Search Page renders error message 1`] = `
           </svg>
         </a>
         <a
-          className="c33"
+          className="c34"
           href="mailto:info@opencollective.com"
         >
           <svg
@@ -2323,13 +2333,13 @@ exports[`Search Page renders error message 1`] = `
         </a>
       </div>
       <nav
-        className="c34 c35"
+        className="c35 c36"
       >
         <div
-          className="c36"
+          className="c37"
         >
           <p
-            className="c37"
+            className="c38"
             color="#C2C6CC"
             fontSize="1.2rem"
             letterSpacing="1px"
@@ -2337,13 +2347,13 @@ exports[`Search Page renders error message 1`] = `
             PLATFORM
           </p>
           <ul
-            className="c38"
+            className="c39"
           >
             <li
-              className="c39"
+              className="c40"
             >
               <a
-                className="c40"
+                className="c41"
                 color="#6E747A"
                 display="block"
                 fontSize="1.4rem"
@@ -2354,10 +2364,10 @@ exports[`Search Page renders error message 1`] = `
               </a>
             </li>
             <li
-              className="c39"
+              className="c40"
             >
               <a
-                className="c40"
+                className="c41"
                 color="#6E747A"
                 display="block"
                 fontSize="1.4rem"
@@ -2368,10 +2378,10 @@ exports[`Search Page renders error message 1`] = `
               </a>
             </li>
             <li
-              className="c39"
+              className="c40"
             >
               <a
-                className="c40"
+                className="c41"
                 color="#6E747A"
                 display="block"
                 fontSize="1.4rem"
@@ -2382,10 +2392,10 @@ exports[`Search Page renders error message 1`] = `
               </a>
             </li>
             <li
-              className="c39"
+              className="c40"
             >
               <a
-                className="c40"
+                className="c41"
                 color="#6E747A"
                 display="block"
                 fontSize="1.4rem"
@@ -2396,10 +2406,10 @@ exports[`Search Page renders error message 1`] = `
               </a>
             </li>
             <li
-              className="c39"
+              className="c40"
             >
               <a
-                className="c40"
+                className="c41"
                 color="#6E747A"
                 display="block"
                 fontSize="1.4rem"
@@ -2412,10 +2422,10 @@ exports[`Search Page renders error message 1`] = `
           </ul>
         </div>
         <div
-          className="c36"
+          className="c37"
         >
           <p
-            className="c37"
+            className="c38"
             color="#C2C6CC"
             fontSize="1.2rem"
             letterSpacing="1px"
@@ -2423,13 +2433,13 @@ exports[`Search Page renders error message 1`] = `
             JOIN THE MOVEMENT
           </p>
           <ul
-            className="c38"
+            className="c39"
           >
             <li
-              className="c39"
+              className="c40"
             >
               <a
-                className="c40"
+                className="c41"
                 color="#6E747A"
                 display="block"
                 fontSize="1.4rem"
@@ -2440,10 +2450,10 @@ exports[`Search Page renders error message 1`] = `
               </a>
             </li>
             <li
-              className="c39"
+              className="c40"
             >
               <a
-                className="c40"
+                className="c41"
                 color="#6E747A"
                 display="block"
                 fontSize="1.4rem"
@@ -2454,10 +2464,10 @@ exports[`Search Page renders error message 1`] = `
               </a>
             </li>
             <li
-              className="c39"
+              className="c40"
             >
               <a
-                className="c40"
+                className="c41"
                 color="#6E747A"
                 display="block"
                 fontSize="1.4rem"
@@ -2470,10 +2480,10 @@ exports[`Search Page renders error message 1`] = `
           </ul>
         </div>
         <div
-          className="c36"
+          className="c37"
         >
           <p
-            className="c37"
+            className="c38"
             color="#C2C6CC"
             fontSize="1.2rem"
             letterSpacing="1px"
@@ -2481,13 +2491,13 @@ exports[`Search Page renders error message 1`] = `
             COMMUNITY
           </p>
           <ul
-            className="c38"
+            className="c39"
           >
             <li
-              className="c39"
+              className="c40"
             >
               <a
-                className="c40"
+                className="c41"
                 color="#6E747A"
                 display="block"
                 fontSize="1.4rem"
@@ -2498,10 +2508,10 @@ exports[`Search Page renders error message 1`] = `
               </a>
             </li>
             <li
-              className="c39"
+              className="c40"
             >
               <a
-                className="c40"
+                className="c41"
                 color="#6E747A"
                 display="block"
                 fontSize="1.4rem"
@@ -2512,10 +2522,10 @@ exports[`Search Page renders error message 1`] = `
               </a>
             </li>
             <li
-              className="c39"
+              className="c40"
             >
               <a
-                className="c40"
+                className="c41"
                 color="#6E747A"
                 display="block"
                 fontSize="1.4rem"
@@ -2526,10 +2536,10 @@ exports[`Search Page renders error message 1`] = `
               </a>
             </li>
             <li
-              className="c39"
+              className="c40"
             >
               <a
-                className="c40"
+                className="c41"
                 color="#6E747A"
                 display="block"
                 fontSize="1.4rem"
@@ -2540,10 +2550,10 @@ exports[`Search Page renders error message 1`] = `
               </a>
             </li>
             <li
-              className="c39"
+              className="c40"
             >
               <a
-                className="c40"
+                className="c41"
                 color="#6E747A"
                 display="block"
                 fontSize="1.4rem"
@@ -2556,10 +2566,10 @@ exports[`Search Page renders error message 1`] = `
           </ul>
         </div>
         <div
-          className="c36"
+          className="c37"
         >
           <p
-            className="c37"
+            className="c38"
             color="#C2C6CC"
             fontSize="1.2rem"
             letterSpacing="1px"
@@ -2567,13 +2577,13 @@ exports[`Search Page renders error message 1`] = `
             COMPANY
           </p>
           <ul
-            className="c38"
+            className="c39"
           >
             <li
-              className="c39"
+              className="c40"
             >
               <a
-                className="c40"
+                className="c41"
                 color="#6E747A"
                 display="block"
                 fontSize="1.4rem"
@@ -2584,10 +2594,10 @@ exports[`Search Page renders error message 1`] = `
               </a>
             </li>
             <li
-              className="c39"
+              className="c40"
             >
               <a
-                className="c40"
+                className="c41"
                 color="#6E747A"
                 display="block"
                 fontSize="1.4rem"
@@ -2598,10 +2608,10 @@ exports[`Search Page renders error message 1`] = `
               </a>
             </li>
             <li
-              className="c39"
+              className="c40"
             >
               <a
-                className="c40"
+                className="c41"
                 color="#6E747A"
                 display="block"
                 fontSize="1.4rem"
@@ -2612,10 +2622,10 @@ exports[`Search Page renders error message 1`] = `
               </a>
             </li>
             <li
-              className="c39"
+              className="c40"
             >
               <a
-                className="c40"
+                className="c41"
                 color="#6E747A"
                 display="block"
                 fontSize="1.4rem"
@@ -2626,10 +2636,10 @@ exports[`Search Page renders error message 1`] = `
               </a>
             </li>
             <li
-              className="c39"
+              className="c40"
             >
               <a
-                className="c40"
+                className="c41"
                 color="#6E747A"
                 display="block"
                 fontSize="1.4rem"
@@ -2895,6 +2905,10 @@ exports[`Search Page renders loading grid SVG 1`] = `
 .c33 {
   color: #6E747A;
   font-size: 1.4rem;
+  -webkit-letter-spacing: -0.2px;
+  -moz-letter-spacing: -0.2px;
+  -ms-letter-spacing: -0.2px;
+  letter-spacing: -0.2px;
   margin: 0px;
   padding-top: 8px;
   padding-bottom: 8px;
@@ -3604,6 +3618,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
           className="c33"
           color="#6E747A"
           fontSize="1.4rem"
+          letterSpacing="-0.2px"
         >
           An organization for your community, transparent by design.
         </p>
@@ -4381,6 +4396,10 @@ exports[`Search Page renders search results with pagination 1`] = `
 .c33 {
   color: #6E747A;
   font-size: 1.4rem;
+  -webkit-letter-spacing: -0.2px;
+  -moz-letter-spacing: -0.2px;
+  -ms-letter-spacing: -0.2px;
+  letter-spacing: -0.2px;
   margin: 0px;
   padding-top: 8px;
   padding-bottom: 8px;
@@ -5067,6 +5086,7 @@ exports[`Search Page renders search results with pagination 1`] = `
           className="c33"
           color="#6E747A"
           fontSize="1.4rem"
+          letterSpacing="-0.2px"
         >
           An organization for your community, transparent by design.
         </p>
