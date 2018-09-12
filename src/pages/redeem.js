@@ -108,7 +108,6 @@ class RedeemPage extends React.Component {
   async claimVirtualCard() {
     this.setState({ loading: true });
     const { code, email } = this.state.form;
-    console.log(">>> this.state.form", this.state.form);
     try {
       const res = await this.props.claimVirtualCard(code, email);
       console.log(">>> res graphql: ", JSON.stringify(res, null, '  '));

@@ -141,7 +141,6 @@ class CreateHostForm extends React.Component {
 
     this.generateInputFields();
     const hostCollective = this.state.hostCollective || (this.state.form.hostType === 'user' ? userCollective : organizations.find(c => c.id === Number(this.state.form.HostCollectiveId)));
-    console.log(">>> this.state.form", this.state.form, "hostCollective", hostCollective);
 
     const connectedAccounts = hostCollective && groupBy(hostCollective.connectedAccounts, 'service');
     const stripeAccount = connectedAccounts && connectedAccounts["stripe"] && connectedAccounts["stripe"][0];
