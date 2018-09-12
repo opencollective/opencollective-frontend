@@ -50,6 +50,7 @@ export const P = styled.p`
 
 P.defaultProps = {
   m: 0,
+  letterSpacing: '-0.2px',
 };
 
 export const H1 = styled.h1`
@@ -147,7 +148,10 @@ export const H5 = styled.h5`
 `;
 
 H5.defaultProps = {
-  fontSize: '1.2rem',
-  fontWeight: 'bold',
+  fontSize: '2rem',
+  lineHeight: '2.4rem',
+  textAlign: 'center',
+  fontWeight: 500,
+  color: '#313233',
   m: 0,
 };
