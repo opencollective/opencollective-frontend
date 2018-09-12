@@ -108,7 +108,14 @@ injectGlobal`
   }
 
   a:hover {
-    color: #797d80;
+    color: #ffffff;
+    background-color: #66A3FF;
+    text-decoration: none;
+  }
+
+  a:active {
+    color: #ffffff;
+    background-color: #145ECC;
     text-decoration: none;
   }
 
