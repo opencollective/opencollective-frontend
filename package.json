@@ -108,7 +108,8 @@
     "pretest": "npm run lint:quiet",
     "commit": "git-cz",
     "semantic-release": "semantic-release",
-    "cypress": "TZ=UTC cypress run"
+    "cypress": "TZ=UTC cypress run",
+    "prettier": "prettier src/**/*.js test/**/*.js --write"
   },
   "devDependencies": {
     "@babel/cli": "7.0.0-beta.42",
@@ -140,6 +141,7 @@
     "jest-styled-components": "^6.0.1",
     "jsdom": "^12.0.0",
     "mkdirp": "^0.5.1",
+    "prettier": "^1.14.2",
     "raf": "^3.4.0",
     "react-test-renderer": "^16.5.0",
     "regenerator-runtime": "^0.12.1",
