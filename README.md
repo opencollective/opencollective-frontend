@@ -1,98 +1,97 @@
 # Open Collective Frontend
 
-[![Circle CI](https://circleci.com/gh/opencollective/frontend/tree/master.svg?style=shield)](https://circleci.com/gh/opencollective/frontend/tree/master)
+[![Circle CI](https://circleci.com/gh/opencollective/opencollective-frontend/tree/master.svg?style=shield)](https://circleci.com/gh/opencollective/opencollective-frontend/tree/master)
 [![Slack Status](https://slack.opencollective.org/badge.svg)](https://slack.opencollective.org)
-[![Dependency Status](https://david-dm.org/opencollective/frontend/status.svg)](https://david-dm.org/opencollective/frontend)
-[![Greenkeeper badge](https://badges.greenkeeper.io/opencollective/frontend.svg)](https://greenkeeper.io/)
+[![Dependency Status](https://david-dm.org/opencollective/opencollective-frontend/status.svg)](https://david-dm.org/opencollective/opencollective-frontend)
+[![Greenkeeper badge](https://badges.greenkeeper.io/opencollective/opencollective-frontend.svg)](https://greenkeeper.io/)
 
-![](https://d.pr/i/MOS677+)
+<p align="center">
+  <a href="https://github.com/opencollective/opencollective-frontend">
+    <img width="525"src="http://res.cloudinary.com/opencollective/image/upload/c_scale,w_525/v1536861775/opencollective-babel-2018-09-13_ue8yhg.png" alt="Babel - Open Collective">
+  </a>
+</p>
 
-## How to get started
+## Foreword
 
-Note: If you see a step below that could be improved (or is outdated), please update instructions. We rarely go through this process ourselves, so your fresh pair of eyes and your recent experience with it, makes you the best candidate to improve them for other users.
+If you see a step below that could be improved (or is outdated), please update the instructions. We rarely go through this process ourselves, so your fresh pair of eyes and your recent experience with it, makes you the best candidate to improve them for other users. Thank you!
 
-## Installation
+## Development
 
-1. Install the API
+### Prerequisite
 
-We recommend creating a new directory in your dev folder for `opencollective`
+1. Make sure you have Node.js version >= 10.
+  - We recommend using [nvm](https://github.com/creationix/nvm): `nvm use`.
+2. Make sure you have [GraphicsMagick](http://www.graphicsmagick.org) installed.
+  - On Debian/Ubuntu: `sudo apt-get install graphicsmagick`
+  - On MacOS (with [Homebrew](https://brew.sh/)): `brew install graphicsmagick`
 
-```
-mkdir opencollective;
-cd opencollective;
-git clone git@github.com:opencollective/opencollective-api.git api;
-cd api;
-npm install;
-```
+### Install
 
-See the [API GitHub Repo](https://github.com/opencollective/opencollective-api) for more details.
-
-2. Install the Frontend
-
-```
-git clone git@github.com:opencollective/frontend.git frontend;
-cd frontend;
-npm install;
-```
-
-If you are using Ubuntu, make sure you have [GraphicsMagick](http://www.graphicsmagick.org) installed:
+We recommend cloning the repository in a folder dedicated to `opencollective` projects.
 
 ```
-sudo apt-get install graphicsmagick
+git clone git@github.com:opencollective/opencollective-frontend.git opencollective/frontend
+cd opencollective/frontend
+npm install
 ```
 
-3. Run
+### Environment variables
+
+This project requires an access to the Open Collective API. You have two options:
+
+- `cp .env-staging .env` to connect to the Open Collective staging API
+- `cp .env-local .env` to connect to the API running locally
+
+If you decide to pick the local strategy, make sure you install and run the [opencollective-api](https://github.com/opencollective/opencollective-api) project.
+
+### Start
 
 ```
-$> npm run dev
+npm run dev
 ```
-
-This will start the Frontend on http://localhost:3000 in development environment. It will automatically update whenever a file changes (using hot module reloading).
-
-The API comes with a sanitized version of the database that includes the following collectives:
-- [http://localhost:3000/opensource](http://localhost:3000/opensource)
-- [http://localhost:3000/apex](http://localhost:3000/apex)
-- [http://localhost:3000/railsgirlsatl](http://localhost:3000/railsgirlsatl)
-- [http://localhost:3000/tipbox](http://localhost:3000/tipbox)
-- [http://localhost:3000/brusselstogether](http://localhost:3000/brusselstogether)
-- [http://localhost:3000/veganizerbxl](http://localhost:3000/veganizerbxl)
-
-## Tests
-
-We are using [Jest](https://facebook.github.io/jest/) for testing.
-You can run the tests using `npm test` or more specifically `npm run test:src`, `npm run test:server`, `npm run test:e2e`.
-
-End-to-end tests are using [Cypress](https://www.cypress.io/). 
-
-To update the Jest snapshots, run `npm run test:src -- -u`
-
-## Stack
-
-We are using NodeJS.
-
-The Frontend is using [next](https://zeit.co/next) (which includes Webpack and hot module reloading), React.
-
-The API is using Postgres, GraphQL.
-
-## Localize
-
-To add a translation to a new language, copy paste the `en.json` from `frontend/src/lang` and rename the copy using the 2 or 4 letter code for your country/language (e.g. `fr-BE.json` or `fr.json`).
-
-You will also need to copy paste the last line in `frontend/scripts/translate.js`:
-```
-fs.writeFileSync(LANG_DIR + 'ja.json', JSON.stringify(translatedMessages('ja'), null, 2));
-```
-
-and replace `ja` with your 2-4 letter locale code.
-
-Then you can submit a pull request, like this one :-)
-https://github.com/opencollective/frontend/pull/119
 
 ## Contributing
 
-1. Your commits conform to the conventions established [here](https://github.com/conventional-changelog/conventional-changelog-angular/blob/master/convention.md)
-2. This project used [commitizen](https://github.com/commitizen/cz-cli) and [semantic-release](https://github.com/semantic-release/semantic-release) to handle npm version from CI
-  + run git add first to add your changes to staging
-  + use `npm run commit` to commit, and CI will do the rest.
-  + if changes contain breaking change, use `BREAKING CHANGE` keyword in the comment to trigger major release
-  + before push to git and trigger CI, you can dry run `npm run semantic-release` locally to make sure the version number is push as expected.
+Code style? Commit convention? Please check our [Contributing guidelines](CONTRIBUTING.md).
+
+TL;DR: we use [Prettier](https://prettier.io/) and [ESLint](https://eslint.org/), we do like great commit messages and clean Git history.
+
+## Tests
+
+You can run the tests using `npm test` or more specifically:
+
+- `npm run test:src` for pages and components
+- `npm run test:server` for api and badges
+- `npm run test:e2e` for end-to-end tests using [Cypress](https://www.cypress.io/)
+
+To update the Jest snapshots, run `npm run test:src -- -u`
+
+## Localization
+
+To add a translation to a new language, copy paste the `en.json` from `src/lang` and rename the copy using the 2 or 4 letter code for your country/language (e.g. `fr-BE.json` or `fr.json`).
+
+You will also need to copy paste the last line in `scripts/translate.js`, and replace `ja` with your 2-4 letter locale code.
+
+```
+fs.writeFileSync(`${LANG_DIR}ja.json`, JSON.stringify(translatedMessages('ja'), null, 2));
+```
+
+## Deployment
+
+To deploy to staging or production, you need to be a core member of the Open Collective team.
+
+### Staging (heroku)
+
+```
+npm run deploy:staging
+```
+
+URL: https://staging.opencollective.com/
+
+### Production (heroku)
+
+```
+npm run deploy:production
+```
+
+URL: https://opencollective.com/

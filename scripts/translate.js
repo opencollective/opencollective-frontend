@@ -41,7 +41,8 @@ const translatedMessages = (locale) => {
 }
 
 mkdirpSync(LANG_DIR);
-fs.writeFileSync(`${LANG_DIR  }en.json`, JSON.stringify(defaultMessages, null, 2));
-fs.writeFileSync(`${LANG_DIR  }fr.json`, JSON.stringify(translatedMessages('fr'), null, 2));
-fs.writeFileSync(`${LANG_DIR  }es.json`, JSON.stringify(translatedMessages('es'), null, 2));
-fs.writeFileSync(`${LANG_DIR  }ja.json`, JSON.stringify(translatedMessages('ja'), null, 2));
+fs.writeFileSync(`${LANG_DIR}en.json`, JSON.stringify(defaultMessages, null, 2));
+fs.writeFileSync(`${LANG_DIR}fr.json`, JSON.stringify(translatedMessages('fr'), null, 2));
+fs.writeFileSync(`${LANG_DIR}es.json`, JSON.stringify(translatedMessages('es'), null, 2));
+fs.writeFileSync(`${LANG_DIR}ja.json`, JSON.stringify(translatedMessages('ja'), null, 2));
+
