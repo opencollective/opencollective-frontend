@@ -7,7 +7,7 @@
 
 <p align="center">
   <a href="https://github.com/opencollective/opencollective-frontend">
-    <img width="525"src="http://res.cloudinary.com/opencollective/image/upload/c_scale,w_525/v1536861775/opencollective-babel-2018-09-13_ue8yhg.png" alt="Babel - Open Collective">
+    <img width="525"src="http://res.cloudinary.com/opencollective/image/upload/c_scale,w_1050/v1536861775/opencollective-babel-2018-09-13_ue8yhg.png" alt="Babel - Open Collective">
   </a>
 </p>
 

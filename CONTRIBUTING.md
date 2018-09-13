@@ -30,7 +30,7 @@ Note: it's not mandatory to always commit with this tool (we don't), but it's gr
 
 We do aim having a clean Git history! When submitting a Pull Request, make sure:
   - each commit make sense and have a self-explaining message
-  - there is no unnecessary commits (such as "typo", "fix", "fix again", "eslint", "eslint again", "merge commits")
+  - there is no unnecessary commits (such as "typo", "fix", "fix again", "eslint", "eslint again" or merge commits)
 
 Some tips to keep a clean Git history while working on your feature branch:
   - always update from master with `git pull --rebase origin master` or similar
@@ -38,4 +38,4 @@ Some tips to keep a clean Git history while working on your feature branch:
   - `git commit --amend` to modify your last commit with "fix", "typo", "prettier" or "eslint" modifications
   - `git rebase --interactive` to rewrite the history
   
-We understand Git is not always easy for everyone and want to be inclusive. If it's difficult for you to submit a PR request with a clean Git history, that's all right, we can always [squash and merge](https://help.github.com/articles/about-pull-request-merges/#squash-and-merge-your-pull-request-commits) it.
+We understand Git is not always easy for everyone and want to be inclusive. If it's difficult for you to submit a Pull request with a clean Git history, that's all right, we can always [squash and merge](https://help.github.com/articles/about-pull-request-merges/#squash-and-merge-your-pull-request-commits) it.
