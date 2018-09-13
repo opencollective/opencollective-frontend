@@ -52,7 +52,7 @@
     "next": "6.1.2",
     "next-routes": "1.4.2",
     "node-fetch": "2.2.0",
-    "nuka-carousel": "4.3.9",
+    "nuka-carousel": "4.3.10",
     "payment": "2.3.0",
     "prop-types": "15.6.2",
     "qrcode.react": "0.8.0",
