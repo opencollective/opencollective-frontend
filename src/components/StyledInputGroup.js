@@ -7,7 +7,7 @@ const StyledInputGroup = ({ prepend, ...inputProps }) => (
     <Container bg="#F7F8FA" borderRadius="4px 0 0 4px" py={2} px={3} mr={1}>
       <Span color="#C2C6CC" fontSize="14px">{prepend}</Span>
     </Container>
-    <StyledInput type="text" overflow="scroll" fontSize="14px" {...inputProps} />
+    <StyledInput type="text" overflow="scroll" fontSize="14px" flex="1 1 auto" {...inputProps} />
   </Container>
 );
 
