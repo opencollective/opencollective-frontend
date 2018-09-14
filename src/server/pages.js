@@ -22,6 +22,7 @@ pages
   .add('createCollective', '/:hostCollectiveSlug?/(apply|create)')
   .add('createOrganization', '/organizations/new')
   .add('createPledge', '/pledges/new')
+  .add('claimCollective', '/:collectiveSlug/claim')
   .add('events-iframe', '/:collectiveSlug/events.html')
   .add('collectives-iframe', '/:collectiveSlug/(collectives|widget).html')
   .add('banner-iframe', '/:collectiveSlug/banner.html')

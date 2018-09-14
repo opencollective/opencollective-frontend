@@ -83,6 +83,9 @@ export const getLoggedInUserQuery = gql`
           name
           data
         }
+        connectedAccounts {
+          service
+        }
       }
       memberOf {
         id
@@ -425,6 +428,10 @@ const getCollectiveQuery = gql`
             backgroundImage
           }
         }
+      }
+      pledges: orders(status: PENDING) {
+        status
+        totalAmount
       }
     }
   }
