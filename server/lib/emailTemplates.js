@@ -51,7 +51,7 @@ const templateNames = [
   'payment.failed',
   'payment.failed.text',
   'pledge.complete',
-  'processing',
+  'order.processing',
   'report.platform',
   'subscription.canceled',
   'ticket.confirmed',

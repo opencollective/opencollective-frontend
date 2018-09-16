@@ -473,19 +473,14 @@ const sendOrderProcessingEmail = order => {
   const user = order.createdByUser;
 
   return emailLib.send(
-    'processing',
-    user.email,
-    {
-      order: order.info,
-      user: user.info,
-      collective: collective.info,
-      fromCollective: fromCollective.minimal,
-      subscriptionsLink: user.generateLoginLink(
-        `/${fromCollective.slug}/subscriptions`,
-      ),
-    },
-    {
-      from: `${collective.name} <hello@${collective.slug}.opencollective.com>`,
-    },
-  );
+      'order.processing',
+      user.email,
+      { order: order.info,
+        user: user.info,
+        collective: collective.info,
+        fromCollective: fromCollective.minimal,
+        subscriptionsLink: user.generateLoginLink(`/${fromCollective.slug}/subscriptions`)
+      }, {
+        from: `${collective.name} <hello@${collective.slug}.opencollective.com>`
+      });
 };
