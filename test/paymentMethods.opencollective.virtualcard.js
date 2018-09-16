@@ -408,7 +408,7 @@ describe('opencollective.virtualcard', () => {
         expect(sendEmailSpy.firstCall.args[0]).to.equal(args.user.email);
         expect(sendEmailSpy.firstCall.args[1]).to.contain('You received $100 from collective1 to donate on Open Collective');
         expect(sendEmailSpy.firstCall.args[2]).to.contain("next=/redeemed?name=New%20User&amount=10000&currency=USD&emitterSlug=collective1&emitterName=collective1");
-        expect(sendEmailSpy.firstCall.args[2]).to.contain(collective1.image);
+        expect(sendEmailSpy.firstCall.args[2]).to.contain(collective1.image.substr(collective1.image.lastIndexOf('/')+1));
       }); /** End Of "#new User should claim a virtual card" */
 
       it('Existing User should claim a virtual card', async () => {
