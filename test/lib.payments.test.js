@@ -243,18 +243,16 @@ describe('lib.payments.test.js', () => {
                 expect(member).to.exist;
               }));
 
-            it('successfully sends out an email to donor1', done => {
-              setTimeout(() => {
-                expect(emailSendSpy.lastCall.args[0]).to.equal('thankyou');
-                expect(emailSendSpy.lastCall.args[1]).to.equal(user.email);
-                expect(
-                  emailSendSpy.lastCall.args[2].relatedCollectives,
-                ).to.have.length(1);
-                expect(
-                  emailSendSpy.lastCall.args[2].relatedCollectives[0],
-                ).to.have.property('settings');
-                done();
-              }, 150);
+            it('successfully sends out an email to donor1', async () => {
+              await utils.waitForCondition(() => emailSendSpy.callCount > 0);
+              expect(emailSendSpy.lastCall.args[0]).to.equal('thankyou');
+              expect(emailSendSpy.lastCall.args[1]).to.equal(user.email);
+              expect(
+                emailSendSpy.lastCall.args[2].relatedCollectives,
+              ).to.have.length(1);
+              expect(
+                emailSendSpy.lastCall.args[2].relatedCollectives[0],
+              ).to.have.property('settings');
             });
           });
 

@@ -80,7 +80,7 @@ export async function processOrder(order, options) {
 
 export async function updateOrderStatus(order, transaction) {
   if (transaction) {
-    order.update({
+    await order.update({
       status: status.PAID,
       processedAt: new Date(),
     });
@@ -305,7 +305,7 @@ export const createSubscription = async order => {
   // https://github.com/opencollective/opencollective/issues/729
   order.Subscription.chargeNumber = 1;
   order.Subscription.activate();
-  order.update({
+  await order.update({
     status: status.ACTIVE,
     SubscriptionId: order.Subscription.id,
   });
@@ -356,9 +356,9 @@ export const executeOrder = async (user, order, options) => {
   await order.populate();
 
   const transaction = await processOrder(order, options);
-  order.matchingFund && processMatchingFund(order, options);
-  transaction && updateOrderStatus(order, transaction);
-  addBackerToCollective(
+  order.matchingFund && (await processMatchingFund(order, options));
+  transaction && (await updateOrderStatus(order, transaction));
+  await addBackerToCollective(
     { id: user.id, CollectiveId: order.FromCollectiveId },
     order.collective,
     get(order, 'tier.id'),
@@ -454,6 +454,8 @@ const sendOrderConfirmedEmail = async order => {
       } else {
         return emailLib.send('thankyou', user.email, data, emailOptions);
       }
+    } else {
+      return emailLib.send('thankyou', user.email, data, emailOptions);
     }
   }
 };

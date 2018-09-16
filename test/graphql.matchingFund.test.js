@@ -238,19 +238,19 @@ describe('graphql.matchingFund.test.js', () => {
 
     // check that email went out
     expect(emailSendSpy.callCount).to.equal(2);
-    expect(emailSendSpy.firstCall.args[0]).to.equal('thankyou');
-    expect(emailSendSpy.firstCall.args[1]).to.equal(user2.email);
-    expect(
-      emailSendSpy.firstCall.args[2].matchingFund.collective.slug,
-    ).to.equal(user1.collective.slug);
-    expect(emailSendSpy.secondCall.args[0]).to.equal('donationmatched');
-    expect(emailSendSpy.secondCall.args[1][0]).to.equal(user1.email);
-    expect(emailSendSpy.secondCall.args[2].fromCollective.slug).to.equal(
+    expect(emailSendSpy.firstCall.args[0]).to.equal('donationmatched');
+    expect(emailSendSpy.firstCall.args[1][0]).to.equal(user1.email);
+    expect(emailSendSpy.firstCall.args[2].fromCollective.slug).to.equal(
       user2.collective.slug,
     );
-    expect(emailSendSpy.secondCall.args[2].transaction.uuid).to.equal(
+    expect(emailSendSpy.firstCall.args[2].transaction.uuid).to.equal(
       matchingTransaction.uuid,
     );
+    expect(emailSendSpy.secondCall.args[0]).to.equal('thankyou');
+    expect(emailSendSpy.secondCall.args[1]).to.equal(user2.email);
+    expect(
+      emailSendSpy.secondCall.args[2].matchingFund.collective.slug,
+    ).to.equal(user1.collective.slug);
   });
 
   it('fails if not enough funds available in matching fund', async () => {
