@@ -57,15 +57,20 @@ async function createVirtualPaymentMethod(args, remoteUser) {
 export async function claimPaymentMethod(args, remoteUser) {
   const paymentMethod = await virtualcard.claim(args, remoteUser);
   const user = await models.User.findOne({ where: { CollectiveId: paymentMethod.CollectiveId }});
-  const amount = paymentMethod.initialBalance;
-  const currency = paymentMethod.currency;
+  const {
+    initialBalance,
+    currency,
+    name
+   } = paymentMethod;
+
   const emitter = await models.Collective.findById(paymentMethod.sourcePaymentMethod.CollectiveId);
   const userCollective = await user.getCollective();
-  const name = userCollective.name && userCollective.name.match(/anonymous/i) ? '' : user.name;
+  const userName = userCollective.name && userCollective.name.match(/anonymous/i) ? '' : userCollective.name;
 
-  emailLib.send('user.card.claimed', args.email, {
-    loginLink: user.generateLoginLink(`/redeemed?name=${name}&amount=${amount}&currency=${currency}&emitterSlug=${emitter.slug}&emitterName=${emitter.name}`),
-    amount,
+  emailLib.send('user.card.claimed', user.email, {
+    loginLink: user.generateLoginLink(`/redeemed?name=${encodeURIComponent(userName)}&amount=${initialBalance}&currency=${currency}&emitterSlug=${emitter.slug}&emitterName=${encodeURIComponent(emitter.name)}`),
+    initialBalance,
+    name,
     currency,
     emitter,
   })
