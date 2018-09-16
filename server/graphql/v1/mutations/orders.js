@@ -344,6 +344,7 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
         reqIp,
         recaptchaResponse: recaptchaResponse,
       },
+      status: status.PENDING, // default status, will get updated after the order is processed
     };
 
     if (
