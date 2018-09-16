@@ -4,7 +4,7 @@ import { createMember, removeMember } from './mutations/members';
 import { editTiers } from './mutations/tiers';
 import { editConnectedAccount } from './mutations/connectedAccounts';
 import { createExpense, editExpense, updateExpenseStatus, payExpense, deleteExpense } from './mutations/expenses';
-import { createPaymentMethod, claimVirtualCard } from './mutations/paymentMethods';
+import { createPaymentMethod, claimPaymentMethod } from './mutations/paymentMethods';
 import * as updateMutations from './mutations/updates';
 import * as commentMutations from './mutations/comments';
 import * as applicationMutations from './mutations/applications';
@@ -379,13 +379,13 @@ const mutations = {
     },
     resolve: async (_, args, req) => createPaymentMethod(args, req.remoteUser),
   },
-  claimVirtualCard: {
+  claimPaymentMethod: {
     type: PaymentMethodType,
     args: {
       code: { type: new GraphQLNonNull(GraphQLString) },
       email: { type: GraphQLString },
     },
-    resolve: async (_, args, req) => claimVirtualCard(args, req.remoteUser),
+    resolve: async (_, args, req) => claimPaymentMethod(args, req.remoteUser),
   }
 };
 

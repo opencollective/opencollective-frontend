@@ -54,7 +54,7 @@ async function createVirtualPaymentMethod(args, remoteUser) {
  * @param {email} args.email The email of the user claiming the virtual card
  * @returns {models.PaymentMethod} return the virtual card payment method.
  */
-export async function claimVirtualCard(args, remoteUser) {
+export async function claimPaymentMethod(args, remoteUser) {
   const paymentMethod = await virtualcard.claim(args, remoteUser);
   const user = await models.User.findOne({ where: { CollectiveId: paymentMethod.CollectiveId }});
   const amount = paymentMethod.initialBalance;

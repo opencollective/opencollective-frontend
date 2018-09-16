@@ -20,9 +20,9 @@ const createPaymentMethodQuery = `
     }
   }
 `;
-const claimVirtualCardQuery = `
-  mutation claimVirtualCard($email: String, $code: String!) {
-    claimVirtualCard(email: $email, code: $code) {
+const claimPaymentMethodQuery = `
+  mutation claimPaymentMethod($user: UserInputType, $code: String!) {
+    claimPaymentMethod(user: $user, code: $code) {
       id
     }
   }
