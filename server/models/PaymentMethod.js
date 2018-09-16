@@ -253,33 +253,56 @@ export default function(Sequelize, DataTypes) {
     }
 
     if (this.limitedToTags) {
-      const collective = order.collective || await order.getCollective();
+      const collective = order.collective || (await order.getCollective());
       if (intersection(collective.tags, this.limitedToTags).length === 0) {
-        throw new Error(`This payment method can only be used for collectives in ${formatArrayToString(this.limitedToTags)}`);
+        throw new Error(
+          `This payment method can only be used for collectives in ${formatArrayToString(
+            this.limitedToTags,
+          )}`,
+        );
       }
     }
 
     // quick helper to get the name of a collective given its id to format better error messages
-    const fetchCollectiveName = (CollectiveId) => {
-      return CollectiveId && models.Collective.findOne({
-        attributes: ['name'],
-        where: { id: CollectiveId },
-      }).then(r => r && r.name);
+    const fetchCollectiveName = CollectiveId => {
+      return (
+        CollectiveId &&
+        models.Collective.findOne({
+          attributes: ['name'],
+          where: { id: CollectiveId },
+        }).then(r => r && r.name)
+      );
     };
 
     if (this.limitedToCollectiveIds) {
-      const collective = order.collective || await order.getCollective();
+      const collective = order.collective || (await order.getCollective());
       if (!this.limitedToCollectiveIds.includes(collective.HostCollectiveId)) {
-        const collectives = await Promise.map(this.limitedToCollectiveIds, fetchCollectiveName);
-        throw new Error(`This payment method can only be used for the following collectives ${formatArrayToString(collectives)}`);
+        const collectives = await Promise.map(
+          this.limitedToCollectiveIds,
+          fetchCollectiveName,
+        );
+        throw new Error(
+          `This payment method can only be used for the following collectives ${formatArrayToString(
+            collectives,
+          )}`,
+        );
       }
     }
 
     if (this.limitedToHostCollectiveIds) {
-      const collective = order.collective || await order.getCollective();
-      if (!this.limitedToHostCollectiveIds.includes(collective.HostCollectiveId)) {
-        const hostCollectives = await Promise.map(this.limitedToHostCollectiveIds, fetchCollectiveName);
-        throw new Error(`This payment method can only be used for collectives hosted by ${formatArrayToString(hostCollectives)}`);
+      const collective = order.collective || (await order.getCollective());
+      if (
+        !this.limitedToHostCollectiveIds.includes(collective.HostCollectiveId)
+      ) {
+        const hostCollectives = await Promise.map(
+          this.limitedToHostCollectiveIds,
+          fetchCollectiveName,
+        );
+        throw new Error(
+          `This payment method can only be used for collectives hosted by ${formatArrayToString(
+            hostCollectives,
+          )}`,
+        );
       }
     }
 
@@ -308,9 +331,13 @@ export default function(Sequelize, DataTypes) {
       }
 
       // If there is no monthly limit, the user needs to be an admin of the collective that owns the payment method
-      if (!this.monthlyLimitPerMember && !user.isAdmin(this.CollectiveId)) {
+      if (
+        !this.monthlyLimitPerMember &&
+        !user.isAdmin(this.CollectiveId) &&
+        this.type !== 'manual'
+      ) {
         throw new Error(
-          "You don't have enough permissions to use this payment method (you need to be an admin of the collective that owns this payment method)",
+          `You don't have enough permissions to use this payment method (you need to be an admin of the collective that owns this payment method)`,
         );
       }
     }
