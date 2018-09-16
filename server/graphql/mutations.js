@@ -53,7 +53,8 @@ import {
   CommentInputType,
   CommentAttributesInputType,
   ConnectedAccountInputType,
-  PaymentMethodInputType
+  PaymentMethodInputType,
+  UserInputType,
 } from './inputTypes';
 
 const mutations = {
@@ -383,7 +384,7 @@ const mutations = {
     type: PaymentMethodType,
     args: {
       code: { type: new GraphQLNonNull(GraphQLString) },
-      email: { type: GraphQLString },
+      user: { type: UserInputType },
     },
     resolve: async (_, args, req) => claimPaymentMethod(args, req.remoteUser),
   }
