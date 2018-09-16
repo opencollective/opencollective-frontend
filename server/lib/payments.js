@@ -8,6 +8,7 @@ import models from '../models';
 import emailLib from './email';
 import { types } from '../constants/collectives';
 import status from '../constants/order_status';
+import roles from '../constants/roles';
 import activities from '../constants/activities';
 import paymentProviders from '../paymentProviders';
 import * as libsubscription from './subscriptions';
@@ -71,6 +72,13 @@ export function findPaymentMethodProvider(paymentMethod) {
 export async function processOrder(order, options) {
   const paymentMethod = findPaymentMethodProvider(order.paymentMethod);
   return await paymentMethod.processOrder(order, options);
+export async function updateOrderStatus(order, transaction) {
+  if (transaction) {
+    order.update({
+      status: status.PAID,
+      processedAt: new Date,
+    });
+  }
 }
 
 /** Refund a transaction
@@ -212,6 +220,11 @@ export async function associateTransactionRefundId(transaction, refund, data) {
   // graphql mutation needs it to return to the user. However we have
   // to return the updated instances, not the ones we received.
   return find([tr1, tr2, tr3, tr4], { id: transaction.id });
+}
+
+
+export const addBackerToCollective = async (user, collective, TierId) => {
+  return await collective.findOrAddUserWithRole(user, roles.BACKER, { CreatedByUserId: user.id, TierId });
 }
 
 /**
