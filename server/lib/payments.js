@@ -70,8 +70,14 @@ export function findPaymentMethodProvider(paymentMethod) {
  *  the `PaymentMethods` table.
  */
 export async function processOrder(order, options) {
-  const paymentMethod = findPaymentMethodProvider(order.paymentMethod);
-  return await paymentMethod.processOrder(order, options);
+  const paymentMethodProvider = findPaymentMethodProvider(order.paymentMethod);
+  if (get(paymentMethodProvider, 'features.waitToCharge')) {
+    return sendOrderProcessingEmail(order, options);
+  } else {
+    return await paymentMethodProvider.processOrder(order, options);
+  }
+}
+
 export async function updateOrderStatus(order, transaction) {
   if (transaction) {
     order.update({
