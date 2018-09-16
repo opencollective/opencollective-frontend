@@ -21,35 +21,35 @@ describe('lib.transactions.test.js', () => {
       currency,
       10,
     );
-    const { userCollective } = await store.newUser('a new user');
+    const { user } = await store.newUser('a new user');
     // And given some transactions
     await store.stripeConnectedAccount(collective.HostCollectiveId);
     await store.stripeOneTimeDonation({
-      userCollective,
+      remoteUser: user,
       collective,
       currency,
       amount: 100,
     });
     await store.stripeOneTimeDonation({
-      userCollective,
+      remoteUser: user,
       collective,
       currency,
       amount: 200,
     });
     await store.stripeOneTimeDonation({
-      userCollective,
+      remoteUser: user,
       collective,
       currency,
       amount: 300,
     });
     await store.stripeOneTimeDonation({
-      userCollective,
+      remoteUser: user,
       collective,
       currency,
       amount: 400,
     });
     await store.stripeOneTimeDonation({
-      userCollective,
+      remoteUser: user,
       collective,
       currency,
       amount: 500,

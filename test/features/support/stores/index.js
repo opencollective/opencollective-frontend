@@ -287,19 +287,21 @@ export async function stripeConnectedAccount(hostId) {
  *  value. Not a percentage.
  */
 export async function stripeOneTimeDonation(opt) {
-  const {
-    user,
-    userCollective,
-    collective,
-    amount,
-    currency,
-    appFee,
-    ppFee,
-  } = opt;
+  const { remoteUser, collective, amount, currency, appFee, ppFee } = opt;
   const { createdAt } = opt; // Optional
 
+  const from = opt.fromCollective || (remoteUser && remoteUser.collective);
+  if (!remoteUser) {
+    throw Error('stripeOneTimeDonation: please specify the remoteUser');
+  }
+  if (!from) {
+    throw Error(
+      'stripeOneTimeDonation: please specify the fromCollective or remoteUser.collective',
+    );
+  }
+
   // Create a new order
-  const params = { from: userCollective, to: collective, amount, currency };
+  const params = { from, to: collective, amount, currency };
   const { order } = await newOrder(params);
 
   // Every transaction made can use different values, so we stub the
@@ -320,7 +322,7 @@ export async function stripeOneTimeDonation(opt) {
     // Although it's supposed to be OK to omit `await' when returning
     // a promise, it's causing this call to fail probably because of
     // the try/catch so I'm keeping it here.
-    return await libpayments.executeOrder(user, order);
+    return await libpayments.executeOrder(remoteUser, order);
   } finally {
     sandbox.restore();
   }

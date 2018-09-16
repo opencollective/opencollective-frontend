@@ -37,18 +37,16 @@ describe('graphql.transaction.test.js', () => {
     // in sequence, not in parallel since stripeOneTimeDonation can't
     // patch the same object more than once at a time.
     for (let i = 0; i < userNames.length; i++) {
-      const { user, userCollective } = await store.newUser(userNames[i]);
+      const { user } = await store.newUser(userNames[i]);
       await store.stripeOneTimeDonation({
-        user,
-        userCollective,
+        remoteUser: user,
         collective,
         currency: 'USD',
         amount: 1000 * (i + 1),
         createdAt: new Date(2018, i, i, 0, 0, i),
       });
       await store.stripeOneTimeDonation({
-        user,
-        userCollective,
+        remoteUser: user,
         collective,
         currency: 'USD',
         amount: 1000 * (i + 1),

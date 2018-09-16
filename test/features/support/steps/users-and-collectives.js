@@ -125,7 +125,7 @@ async function handleDonation(
   }[paymentMethodName];
   if (!method) throw new Error(`Payment Method ${paymentMethod} doesn't exist`);
   return method({
-    user,
+    remoteUser: user,
     userCollective,
     collective,
     currency,

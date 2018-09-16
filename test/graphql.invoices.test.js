@@ -17,12 +17,12 @@ import * as store from './features/support/stores';
  *
  * The payment method is always stripe for now.
  */
-async function donate(userCollective, currency, amount, createdAt, collective) {
+async function donate(user, currency, amount, createdAt, collective) {
   const timer = sinon.useFakeTimers(new Date(createdAt).getTime());
   try {
     await store.stripeConnectedAccount(collective.HostCollectiveId);
     await store.stripeOneTimeDonation({
-      userCollective,
+      remoteUser: user,
       collective,
       currency,
       amount,
@@ -39,7 +39,7 @@ describe('graphql.invoices.test.js', () => {
     // First reset the test database
     await utils.resetTestDB();
     // Given a user and its collective
-    const { userCollective, user } = await store.newUser('xdamman');
+    const { user } = await store.newUser('xdamman');
     xdamman = user;
     // And given the collective (with their host)
     const { collective } = await store.newCollectiveWithHost(
@@ -49,11 +49,11 @@ describe('graphql.invoices.test.js', () => {
       10,
     );
     // And given some donations to that collective
-    await donate(userCollective, 'EUR', 1000, '2017-09-03 00:00', collective);
-    await donate(userCollective, 'EUR', 1000, '2017-10-05 00:00', collective);
-    await donate(userCollective, 'EUR', 500, '2017-10-25 00:00', collective);
-    await donate(userCollective, 'EUR', 500, '2017-11-05 00:00', collective);
-    await donate(userCollective, 'EUR', 500, '2017-11-25 00:00', collective);
+    await donate(user, 'EUR', 1000, '2017-09-03 00:00', collective);
+    await donate(user, 'EUR', 1000, '2017-10-05 00:00', collective);
+    await donate(user, 'EUR', 500, '2017-10-25 00:00', collective);
+    await donate(user, 'EUR', 500, '2017-11-05 00:00', collective);
+    await donate(user, 'EUR', 500, '2017-11-25 00:00', collective);
   });
 
   describe('return transactions', () => {
