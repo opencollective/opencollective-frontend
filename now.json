@@ -1,8 +1,5 @@
 {
   "type": "docker",
-  "alias": [
-    "opencollective-frontend"
-  ],
   "scale": {
     "sfo1": {
       "min": 1,
