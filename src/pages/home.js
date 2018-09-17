@@ -1,22 +1,20 @@
 import React, { Fragment } from 'react';
+import PropTypes from 'prop-types';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import fetch from 'node-fetch';
-
 import { Box, Flex } from 'grid-styled';
 import { FormattedNumber } from 'react-intl';
 
 import { pickAvatar } from '../lib/collective.lib';
-import withData from '../lib/withData'
-import withIntl from '../lib/withIntl';
-import withLoggedInUser from '../lib/withLoggedInUser';
 import { getBaseApiUrl, imagePreview } from '../lib/utils';
+
+import { Link } from '../server/pages';
 
 import Body from '../components/Body';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
 import TransactionSimple from '../components/TransactionSimple';
-import { Link } from '../server/pages';
 import { Span, P, H1, H2, H3 } from '../components/Text';
 import ListItem from '../components/ListItem';
 import Hide from '../components/Hide';
@@ -33,6 +31,10 @@ import {
 import Carousel from '../components/Carousel';
 import Currency from '../components/Currency';
 import ErrorPage from '../components/ErrorPage';
+
+import withData from '../lib/withData';
+import withIntl from '../lib/withIntl';
+import withLoggedInUser from '../lib/withLoggedInUser';
 
 const carouselContent = [{
   image: '/static/images/home-slide-01.svg',
@@ -124,8 +126,9 @@ const BackerAvatar = ({
       maxWidth={[80, null, 120]}
       minHeight={[30, null, 50]}
       minWidth={[30, null, 50]}
-    />
-  </a></Link>
+      />
+  </a>
+  </Link>
 );
 
 class HomePage extends React.Component {
@@ -136,13 +139,18 @@ class HomePage extends React.Component {
     }
   }
 
+  static propTypes = {
+    data: PropTypes.object.isRequired, // from withData
+    getLoggedInUser: PropTypes.func.isRequired, // from withLoggedInUser
+  };
+
   state = {
     LoggedInUser: {},
     stats: {},
-  }
+  };
 
   async componentDidMount() {
-    const LoggedInUser = this.props.getLoggedInUser && await this.props.getLoggedInUser();
+    const LoggedInUser = await this.props.getLoggedInUser();
     this.setState({ LoggedInUser });
 
     // separate request to not block showing LoggedInUser
@@ -201,7 +209,7 @@ class HomePage extends React.Component {
         <Header
           title="Home"
           LoggedInUser={LoggedInUser}
-        />
+          />
         <Body>
           <Container
             alignItems="center"
@@ -212,7 +220,7 @@ class HomePage extends React.Component {
             boxShadow="inset 0px -60px 100px 0 rgba(78,121,187,0.1), 0px 40px 80px 0 rgba(78, 121,187, 0.12)"
             px={3}
             py="5rem"
-          >
+            >
             <Container maxWidth={1200} display="flex" justifyContent="space-between" mx="auto">
               <Container width={[1, null, 0.5]} pr={[0, null, 4]} maxWidth={500}>
                 <H1 fontWeight="normal" textAlign="left">A new form of association, <br /> <strong>transparent by design.</strong></H1>
@@ -235,7 +243,7 @@ class HomePage extends React.Component {
                     hover={{ color: 'white' }}
                     py={3} textAlign="center"
                     width={1}
-                  >
+                    >
                     Join the movement
                   </StyledLink>
 
@@ -261,7 +269,7 @@ class HomePage extends React.Component {
           </Container>
 
           <Container maxWidth={1200} mx="auto" px={2}>
-            <H2 textAlign={["center", null, "left"]} pb={3} >Active collectives</H2>
+            <H2 textAlign={['center', null, 'left']} pb={3} >Active collectives</H2>
 
             <Container py={3}>
               <Flex mb={3} justifyContent="space-between" px={[1, null, 0]}>
@@ -269,7 +277,7 @@ class HomePage extends React.Component {
                 <StyledLink href="/discover">See all &gt;</StyledLink>
               </Flex>
               <Container display="flex" flexWrap="wrap" justifyContent="space-between">
-                {collectives.map((c) => <Container key={c.id} width={[0.5, null, 0.25]} mb={2} px={1} maxWidth={224}><CollectiveStatsCard {...c} /></Container>)} 
+                {collectives.map((c) => <Container key={c.id} width={[0.5, null, 0.25]} mb={2} px={1} maxWidth={224}><CollectiveStatsCard {...c} /></Container>)}
               </Container>
             </Container>
 
@@ -279,7 +287,7 @@ class HomePage extends React.Component {
                 <StyledLink href="/discover">See all &gt;</StyledLink>
               </Flex>
               <Container display="flex" flexWrap="wrap" justifyContent="space-between">
-                {topSpenders.map((c) => <Container width={[0.5, null, 0.25]} mb={2} px={1} maxWidth={224} key={c.id}><CollectiveStatsCard {...c} /></Container>)} 
+                {topSpenders.map((c) => <Container width={[0.5, null, 0.25]} mb={2} px={1} maxWidth={224} key={c.id}><CollectiveStatsCard {...c} /></Container>)}
               </Container>
             </Container>
 
@@ -290,7 +298,7 @@ class HomePage extends React.Component {
               borderRadius="50px"
               color="#3385FF"
               display="block"
-              fontSize={["1.4rem", null, "1.6rem"]}
+              fontSize={['1.4rem', null, '1.6rem']}
               fontWeight="bold"
               hover={{ color: '#3385FF' }}
               mt={4}
@@ -298,7 +306,7 @@ class HomePage extends React.Component {
               py={[2, null, 3]}
               textAlign="center"
               width={[250, null, 320]}
-            >
+              >
               Discover more collectives
             </StyledLink>
           </Container>
@@ -343,7 +351,7 @@ class HomePage extends React.Component {
                     py={3}
                     textAlign="center"
                     width={[250, null, 320]}
-                  >
+                    >
                     Create an open collective
                   </StyledLink>
                 </Link>
@@ -381,7 +389,7 @@ class HomePage extends React.Component {
                     py={3}
                     textAlign="center"
                     width={[250, null, 320]}
-                  >
+                    >
                     Become a sponsor
                   </StyledLink>
                 </Link>
@@ -416,12 +424,12 @@ class HomePage extends React.Component {
                   py={3}
                   textAlign="center"
                   width={[250, null, 320]}
-                >
+                  >
                   Become a backer
                 </StyledLink>
               </Container>
               <Container width={[1, null, 0.5]} overflow="hidden" position="relative">
-                <Container width={["100%", null, "160%"]} display="flex" flexWrap="wrap" justifyContent="center" alignItems="center" position="relative" >
+                <Container width={['100%', null, '160%']} display="flex" flexWrap="wrap" justifyContent="center" alignItems="center" position="relative" >
                   {backers.filter(({ image }) => !!image).map((c) => <Container px={1} key={c.id}><BackerAvatar {...c} /></Container>)}
                 </Container>
                 <Hide xs sm position="absolute" top={0} left={0} width="100%" height="100%" pointerEvents="none">
@@ -439,7 +447,7 @@ class HomePage extends React.Component {
                 <P {...sectionSubHeadingStyles}>Building Open Collective together to get further, faster 🚀</P>
 
                 <P {...sectionDetailStyles}>Are you a developer who believes in supporting open and welcoming communities? Open Collective is open source (MIT License) so anyone can contribute code or report issues publicly.</P>
-                
+
                 <P {...sectionDetailStyles} my={3}>Our goal is to provide all communities around the world the software that they need to operate as open and transparent collectives. We want to enable them to thrive in the same way that WordPress enabled millions of blogs to exist.</P>
 
                 <P {...sectionDetailStyles} my={3}>Special thanks to all of you who already contributed in some way! 🙏</P>
@@ -477,7 +485,7 @@ class HomePage extends React.Component {
                     py={3}
                     textAlign="center"
                     width={[250, null, 320]}
-                  >
+                    >
                     Become a host
                   </StyledLink>
                 </Link>
@@ -507,7 +515,7 @@ class HomePage extends React.Component {
                     <P {...statsStyles}>
                       <FormattedNumber value={totalChapters} />
                     </P>
-                    <P><Link route={"chapters"}>chapters</Link></P>
+                    <P><Link route={'chapters'}>chapters</Link></P>
                   </Container>
                   <Container {...statsContainerStyles}>
                     <P {...statsStyles}>
@@ -524,14 +532,15 @@ class HomePage extends React.Component {
 
               <Container maxWidth={600} mx="auto">
                 <P textAlign="center" fontSize={[14, null, 16]} color="#494D52" mb={4}>Do you know people or organizations that will benefit from an open structure and
-a transparent operation? Let them know that Open Collective exists!</P>
+a transparent operation? Let them know that Open Collective exists!
+                </P>
               </Container>
 
               <Flex flexDirection={['column', null, 'row']} justifyContent="center">
                 <StyledLink
                   {...socialButtonStyles}
                   href="https://twitter.com/intent/tweet?text=Check%20out%20Open%20Collection%2C%20a%20platform%20for%20organizations%2C%20communities%2C%20and%20projects%20to%20operate%20transparently!&url=https%3A%2F%2Fopencollective.com"
-                >
+                  >
                   <Container display="flex" alignItems="center" justifyContent="space-evenly">
                     <TwitterIcon size={18} fill="#3385FF" />
                     <Span>Share on Twitter</Span>
@@ -541,7 +550,7 @@ a transparent operation? Let them know that Open Collective exists!</P>
                 <StyledLink
                   {...socialButtonStyles}
                   href="https://www.facebook.com/sharer/sharer.php?u=https%3A//opencollective.com"
-                >
+                  >
                   <Container display="flex" alignItems="center" justifyContent="space-evenly">
                     <FacebookIcon size={18} fill="#3385FF" />
                     <Span>Share on Facebook</Span>
@@ -551,7 +560,7 @@ a transparent operation? Let them know that Open Collective exists!</P>
                 <StyledLink
                   {...socialButtonStyles}
                   href="https://www.linkedin.com/shareArticle?mini=true&url=https%3A//opencollective.com&title=Check%20out%20Open%20Collective&summary=Open%20Collection%20is%20a%20platform%20for%20organizations,%20communities,%20and%20projects%20to%20operate%20transparently&source="
-                >
+                  >
                   <Container display="flex" alignItems="center" justifyContent="space-evenly">
                     <LinkedInIcon size={18} fill="#3385FF" />
                     <Span>Share on LinkedIn</Span>
@@ -562,6 +571,7 @@ a transparent operation? Let them know that Open Collective exists!</P>
           </Container>
 
           <NewsletterContainer />
+
         </Body>
         <Footer />
       </Fragment>
@@ -681,7 +691,8 @@ const query = gql`
   }
 `;
 
-const addHomeData = graphql(query)
+const addHomeData = graphql(query);
 
 export { HomePage as MockHomePage };
+
 export default withData(withLoggedInUser(addHomeData(withIntl(HomePage))));

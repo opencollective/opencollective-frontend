@@ -1,18 +1,28 @@
 import React from 'react';
-import { addTiersData } from '../graphql/queries';
-import withData from '../lib/withData';
-import withIntl from '../lib/withIntl';
+import PropTypes from 'prop-types';
+
 import EditTiersComponent from '../components/EditTiers';
 import Header from '../components/Header';
 import Body from '../components/Body';
 import Button from '../components/Button';
+
+import { addTiersData } from '../graphql/queries';
 import { addEditTiersMutation } from '../graphql/mutations';
 
-class EditTiers extends React.Component {
+import withData from '../lib/withData';
+import withIntl from '../lib/withIntl';
+
+class EditTiersPage extends React.Component {
 
   static getInitialProps ({ query: { collectiveSlug } }) {
-    return { collectiveSlug }
+    return { slug: collectiveSlug };
   }
+
+  static propTypes = {
+    slug: PropTypes.string, // for addTiersData
+    editTiers: PropTypes.func.isRequired, // from addEditTiersMutation
+    data: PropTypes.object.isRequired, // from withData
+  };
 
   constructor(props) {
     super(props);
@@ -24,9 +34,6 @@ class EditTiers extends React.Component {
       tiers.push({});
     }
     this.state = { status: 'idle', tiers, result: {} };
-    console.log(">>> state", this.state, "tiers", Collective.tiers);
-    this.handleTiersChange = this.handleTiersChange.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
   }
 
   async editTiers(TiersInputType) {
@@ -36,23 +43,21 @@ class EditTiers extends React.Component {
       await this.props.editTiers(Collective.id, TiersInputType);
       const tiersUrl = `${window.location.protocol}//${window.location.host}/${Collective.slug}/tiers`;
       window.location.replace(tiersUrl);
-      this.setState({ result: { success: `Tiers edited successfully. (redirecting...)` }});
+      this.setState({ result: { success: 'Tiers edited successfully. (redirecting...)' } });
     } catch (err) {
-      console.error(">>> editTiers error: ", JSON.stringify(err));
       const errorMsg = (err.graphQLErrors && err.graphQLErrors[0]) ? err.graphQLErrors[0].message : err.message;
-      this.setState( { status: 'idle', result: { error: errorMsg }})
+      this.setState( { status: 'idle', result: { error: errorMsg } });
       throw new Error(errorMsg);
     }
   }
 
-  handleTiersChange(tiers) {
-    console.log("update tiers", tiers);
-    this.setState( { tiers })
-  }
-
-  handleSubmit() {
+  handleSubmit = () => {
     return this.editTiers(this.state.tiers);
-  }
+  };
+
+  handleTiersChange = tiers => {
+    this.setState( { tiers } );
+  };
 
   render() {
     const { loading, Collective } = this.props.data;
@@ -77,7 +82,8 @@ class EditTiers extends React.Component {
             text-align: center;
             margin: 5rem;
           }
-          `}</style>
+          `}
+          </style>
           <div className="content">
             <EditTiersComponent
               title={`Edit tiers for ${Collective.name}`}
@@ -99,7 +105,6 @@ class EditTiers extends React.Component {
       </div>
     );
   }
-
 }
 
-export default withData(withIntl(addTiersData(addEditTiersMutation(EditTiers))));
+export default withData(withIntl(addTiersData(addEditTiersMutation(EditTiersPage))));

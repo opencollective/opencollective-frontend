@@ -1,59 +1,70 @@
 import React from 'react';
+import PropTypes from 'prop-types';
+import { FormattedMessage } from 'react-intl';
+import { graphql, compose } from 'react-apollo';
+import { get } from 'lodash';
+import gql from 'graphql-tag';
+
+import { Router } from '../server/pages';
+
 import Header from '../components/Header';
 import Body from '../components/Body';
 import Footer from '../components/Footer';
 import CollectiveCover from '../components/CollectiveCover';
-import { addCollectiveCoverData, addGetLoggedInUserFunction } from '../graphql/queries';
 import ErrorPage from '../components/ErrorPage';
+import EditUpdateForm from '../components/EditUpdateForm';
+import Button from '../components/Button';
+
+import { addCollectiveCoverData } from '../graphql/queries';
+
 import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
-import { get } from 'lodash';
-import { FormattedMessage } from 'react-intl'
-import EditUpdateForm from '../components/EditUpdateForm';
-import { graphql, compose } from 'react-apollo'
-import gql from 'graphql-tag'
-import { Router } from '../server/pages';
-import Button from '../components/Button';
+import withLoggedInUser from '../lib/withLoggedInUser';
 
 class CreateUpdatePage extends React.Component {
 
-  static getInitialProps (props) {
-    const { query: { collectiveSlug, action }, data } = props;
-    return { slug: collectiveSlug, data, action }
+  static getInitialProps ({ query: { collectiveSlug, action } }) {
+    return { slug: collectiveSlug, action };
   }
+
+  static propTypes = {
+    slug: PropTypes.string, // for addCollectiveCoverData
+    action: PropTypes.string, // not used atm, not clear where it's coming from, not in the route
+    createUpdate: PropTypes.func, // from addMutation/createUpdateQuery
+    data: PropTypes.object.isRequired, // from withData
+    getLoggedInUser: PropTypes.func.isRequired, // from withLoggedInUser
+  };
 
   constructor(props) {
     super(props);
     this.state = { update: {} };
-    this.handleChange = this.handleChange.bind(this);
-    this.createUpdate = this.createUpdate.bind(this);
   }
 
   async componentDidMount() {
     const { getLoggedInUser } = this.props;
-    const LoggedInUser = getLoggedInUser && await getLoggedInUser(this.props.collectiveSlug);
-    this.setState({LoggedInUser});
+    const LoggedInUser = await getLoggedInUser();
+    this.setState({ LoggedInUser });
   }
 
-  handleChange(attr, value) {
-    const update = this.state.update;
-    update[attr] = value;
-    this.setState({ update, isModified: true });
-  }
-
-  async createUpdate(update) {
+  createUpdate = async update => {
     const { data: { Collective } } = this.props;
     try {
       update.collective = { id: Collective.id };
-      console.log(">>> createUpdate", update);
+      console.log('>>> createUpdate', update);
       const res = await this.props.createUpdate(update);
-      console.log(">>> createUpdate res", res);
+      console.log('>>> createUpdate res', res);
       this.setState({ isModified: false });
       return Router.pushRoute(`/${Collective.slug}/updates/${res.data.createUpdate.slug}`);
     } catch (e) {
       console.error(e);
     }
-  }
+  };
+
+  handleChange = (attr, value) => {
+    const update = this.state.update;
+    update[attr] = value;
+    this.setState({ update, isModified: true });
+  };
 
   render() {
     const { data } = this.props;
@@ -72,7 +83,8 @@ class CreateUpdatePage extends React.Component {
           .CreateUpdatePage .Updates .update {
             border-top: 1px solid #CACBCC;
           }
-        `}</style>
+        `}
+        </style>
         <Header
           title={collective.name}
           description={collective.description}
@@ -112,8 +124,8 @@ class CreateUpdatePage extends React.Component {
       </div>
     );
   }
-
 }
+
 const createUpdateQuery = gql`
 mutation createUpdate($update: UpdateInputType!) {
   createUpdate(update: $update) {
@@ -145,11 +157,11 @@ mutation createUpdate($update: UpdateInputType!) {
 const addMutation = graphql(createUpdateQuery, {
   props: ( { mutate }) => ({
     createUpdate: async (update) => {
-      return await mutate({ variables: { update } })
-    }
-  })
+      return await mutate({ variables: { update } });
+    },
+  }),
 });
 
-const addGraphQL = compose(addGetLoggedInUserFunction, addCollectiveCoverData, addMutation);
+const addGraphQL = compose(addCollectiveCoverData, addMutation);
 
-export default withData(addGraphQL(withIntl(CreateUpdatePage)));
+export default withData(withIntl(withLoggedInUser(addGraphQL(CreateUpdatePage))));

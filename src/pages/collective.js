@@ -1,12 +1,15 @@
-import React from 'react'
+import React from 'react';
 import PropTypes from 'prop-types';
-import { addCollectiveData } from '../graphql/queries';
-import withData from '../lib/withData';
-import withLoggedInUser from '../lib/withLoggedInUser';
-import withIntl from '../lib/withIntl';
+
 import ErrorPage from '../components/ErrorPage';
 import Collective from '../components/Collective';
 import UserCollective from '../components/UserCollective';
+
+import { addCollectiveData } from '../graphql/queries';
+
+import withData from '../lib/withData';
+import withIntl from '../lib/withIntl';
+import withLoggedInUser from '../lib/withLoggedInUser';
 
 class CollectivePage extends React.Component {
 
@@ -16,13 +19,14 @@ class CollectivePage extends React.Component {
       res.setHeader('Cache-Control','public, max-age=300');
     }
 
-    return { slug: query && query.slug, query }
+    return { slug: query && query.slug, query };
   }
 
   static propTypes = {
-    getLoggedInUser: PropTypes.func.isRequired,
-    data: PropTypes.object.isRequired,
-    query: PropTypes.object,
+    slug: PropTypes.string, // from getInitialProps, for addCollectiveData
+    query: PropTypes.object, // from getInitialProps
+    data: PropTypes.object.isRequired, // from withData
+    getLoggedInUser: PropTypes.func.isRequired, // from withLoggedInUser
   };
 
   constructor(props) {
@@ -32,7 +36,7 @@ class CollectivePage extends React.Component {
 
   async componentDidMount() {
     const { getLoggedInUser } = this.props;
-    const LoggedInUser = getLoggedInUser && await getLoggedInUser();
+    const LoggedInUser = await getLoggedInUser();
     this.setState({ LoggedInUser });
     window.OC = window.OC || {};
     window.OC.LoggedInUser = LoggedInUser;
@@ -77,4 +81,4 @@ class CollectivePage extends React.Component {
   }
 }
 
-export default withData(withLoggedInUser(addCollectiveData(withIntl(CollectivePage))));
+export default withData(withIntl(withLoggedInUser(addCollectiveData(CollectivePage))));

@@ -1,13 +1,13 @@
 import React from 'react';
-import { pick } from 'lodash';
+import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import { graphql, compose } from 'react-apollo';
 import gql from 'graphql-tag';
 import { Box, Flex } from 'grid-styled';
+import { pick } from 'lodash';
 
-import { addGetLoggedInUserFunction } from '../graphql/queries';
-import withData from '../lib/withData';
-import withIntl from '../lib/withIntl';
+import ExpensesStatsWithData from '../apps/expenses/components/ExpensesStatsWithData';
+import CreateExpenseForm from '../apps/expenses/components/CreateExpenseForm';
 
 import ErrorPage from '../components/ErrorPage';
 import Button from '../components/Button';
@@ -16,30 +16,36 @@ import Header from '../components/Header';
 import Body from '../components/Body';
 import Footer from '../components/Footer';
 
-import ExpensesStatsWithData from '../apps/expenses/components/ExpensesStatsWithData';
-import CreateExpenseForm from '../apps/expenses/components/CreateExpenseForm';
+import withData from '../lib/withData';
+import withIntl from '../lib/withIntl';
+import withLoggedInUser from '../lib/withLoggedInUser';
 
+class CreateExpensePage extends React.Component {
 
-class ExpensesPage extends React.Component {
-
-  static getInitialProps (props) {
-    const { query: { collectiveSlug, action }, data } = props;
-    return { slug: collectiveSlug, data, action }
+  static getInitialProps ( { query: { collectiveSlug, action } }) {
+    return { slug: collectiveSlug, action };
   }
+
+  static propTypes = {
+    slug: PropTypes.string, // for addCollectiveData
+    action: PropTypes.string, // not used atm, not clear where it's coming from, not in the route
+    createExpense: PropTypes.func.isRequired, // from addMutation
+    data: PropTypes.object.isRequired, // from withData
+    getLoggedInUser: PropTypes.func.isRequired, // from withLoggedInUser
+  };
 
   constructor(props) {
     super(props);
-    this.createExpense = this.createExpense.bind(this);
     this.state = { expenseCreated: false };
   }
 
   async componentDidMount() {
     const { getLoggedInUser } = this.props;
-    const LoggedInUser = getLoggedInUser && await getLoggedInUser(this.props.collectiveSlug);
+    const LoggedInUser = await getLoggedInUser();
     this.setState({ LoggedInUser });
   }
 
-  async createExpense(expense) {
+  createExpense = async expense => {
     const { LoggedInUser } = this.state;
     const collective = this.props.data.Collective;
 
@@ -52,18 +58,19 @@ class ExpensesPage extends React.Component {
       if (LoggedInUser) {
         expense.user.id = LoggedInUser.id;
       }
-      console.log(">>> createExpense", expense);
+      console.log('>>> createExpense', expense);
       const res = await this.props.createExpense(expense);
-      console.log(">>> createExpense res", res);
-      this.setState({ showNewExpenseForm: false, expenseCreated: res.data.createExpense })
+      console.log('>>> createExpense res', res);
+      this.setState({ showNewExpenseForm: false, expenseCreated: res.data.createExpense });
     } catch (e) {
       console.error(e);
     }
-  }
+  };
 
   render() {
     const { data } = this.props;
     const { LoggedInUser, expenseCreated } = this.state;
+
     if (!data.Collective) return (<ErrorPage data={data} />);
 
     const collective = data.Collective;
@@ -78,7 +85,7 @@ class ExpensesPage extends React.Component {
           image={collective.image || collective.backgroundImage}
           className={this.state.status}
           LoggedInUser={LoggedInUser}
-        />
+          />
 
         <Body>
 
@@ -121,7 +128,7 @@ class ExpensesPage extends React.Component {
                   collective={collective}
                   LoggedInUser={LoggedInUser}
                   onSubmit={this.createExpense}
-                />
+                  />
               }
 
             </Box>
@@ -147,7 +154,6 @@ class ExpensesPage extends React.Component {
       </div>
     );
   }
-
 }
 
 const createExpenseQuery = gql`
@@ -258,13 +264,13 @@ const getCollectiveQuery = gql`
 const addMutation = graphql(createExpenseQuery, {
   props: ( { mutate }) => ({
     createExpense: async (expense) => {
-      return await mutate({ variables: { expense } })
-    }
-  })
+      return await mutate({ variables: { expense } });
+    },
+  }),
 });
 
 const addCollectiveData = graphql(getCollectiveQuery);
 
 const addData = compose(addCollectiveData, addMutation);
 
-export default withData(addGetLoggedInUserFunction(addData(withIntl(ExpensesPage))));
+export default withData(withIntl(withLoggedInUser(addData(CreateExpensePage))));

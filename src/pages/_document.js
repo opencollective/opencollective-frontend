@@ -71,17 +71,17 @@ export default class IntlDocument extends Document {
                 // eslint-disable-next-line
                 stripe = Stripe(stripePublishableKey);
               }
-              `
+              `,
             }}
             />
           <script
             dangerouslySetInnerHTML={{
-              __html: this.props.localeDataScript
+              __html: this.props.localeDataScript,
             }}
             />
           <NextScript />
         </body>
       </html>
-    )
+    );
   }
 }

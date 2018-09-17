@@ -1,24 +1,36 @@
-import withData from '../lib/withData'
-import withIntl from '../lib/withIntl';
-import React from 'react'
-import { addEventCollectiveData, addGetLoggedInUserFunction } from '../graphql/queries';
-import ErrorPage from '../components/ErrorPage';
+import React from 'react';
+import PropTypes from 'prop-types';
+
 import EditEvent from '../components/EditEvent';
+import ErrorPage from '../components/ErrorPage';
+
+import { addEventCollectiveData } from '../graphql/queries';
+
+import withData from '../lib/withData';
+import withIntl from '../lib/withIntl';
+import withLoggedInUser from '../lib/withLoggedInUser';
 
 class EditEventPage extends React.Component {
+
+  static getInitialProps ({ query: { parentCollectiveSlug, eventSlug } }) {
+    return { parentCollectiveSlug, eventSlug };
+  }
+
+  static propTypes = {
+    parentCollectiveSlug: PropTypes.string, // not used atm
+    eventSlug: PropTypes.string, // for addEventCollectiveData
+    data: PropTypes.object.isRequired, // from withData
+    getLoggedInUser: PropTypes.func.isRequired, // from withLoggedInUser
+  };
 
   constructor(props) {
     super(props);
     this.state = { loading: true };
   }
 
-  static getInitialProps ({ query: { parentCollectiveSlug, eventSlug } }) {
-    return { parentCollectiveSlug, eventSlug }
-  }
-
   async componentDidMount() {
     const { getLoggedInUser } = this.props;
-    const LoggedInUser = getLoggedInUser && await getLoggedInUser();
+    const LoggedInUser = await getLoggedInUser();
     this.setState({ LoggedInUser, loading: false });
   }
 
@@ -26,18 +38,16 @@ class EditEventPage extends React.Component {
     const { data } = this.props;
 
     if (this.state.loading || !data.Collective) {
-      return (<ErrorPage loading={this.state.loading} data={data} />)
+      return (<ErrorPage loading={this.state.loading} data={data} />);
     }
 
     const { LoggedInUser } = this.state;
     const event = data.Collective;
 
     return (
-      <div>
-        <EditEvent event={event} LoggedInUser={LoggedInUser} />
-      </div>
+      <EditEvent event={event} LoggedInUser={LoggedInUser} />
     );
   }
 }
 
-export default withData(addGetLoggedInUserFunction(addEventCollectiveData(withIntl(EditEventPage))));
+export default withData(withIntl(withLoggedInUser(addEventCollectiveData(EditEventPage))));

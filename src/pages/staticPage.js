@@ -1,12 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+
 import Header from '../components/Header';
 import Body from '../components/Body';
 import Footer from '../components/Footer';
 import NewsletterContainer from '../components/NewsletterContainer';
-import withIntl from '../lib/withIntl';
 import Link from '../components/Link';
+
 import withData from '../lib/withData';
+import withIntl from '../lib/withIntl';
 import withLoggedInUser from '../lib/withLoggedInUser';
 
 class StaticPage extends React.Component {
@@ -121,7 +123,8 @@ class StaticPage extends React.Component {
             margin: -7px 0;
             line-height: 1.5rem;
           }
-        `}</style>
+        `}
+        </style>
         <Header title={title} LoggedInUser={this.state.LoggedInUser} />
         <Body>
           <div className="content">
@@ -136,8 +139,8 @@ class StaticPage extends React.Component {
         </Body>
         <Footer />
       </div>
-    )
+    );
   }
 }
 
-export default withData(withLoggedInUser(withIntl(StaticPage)));
+export default withData(withIntl(withLoggedInUser(StaticPage)));

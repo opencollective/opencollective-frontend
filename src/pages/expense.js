@@ -1,9 +1,9 @@
 import React from 'react';
-import withData from '../lib/withData';
-import withIntl from '../lib/withIntl';
-import { FormattedMessage } from 'react-intl'
+import PropTypes from 'prop-types';
+import { FormattedMessage } from 'react-intl';
 
-import { addCollectiveCoverData, addGetLoggedInUserFunction } from '../graphql/queries';
+import ExpenseWithData from '../apps/expenses/components/ExpenseWithData';
+
 import Header from '../components/Header';
 import Body from '../components/Body';
 import Footer from '../components/Footer';
@@ -11,15 +11,24 @@ import CollectiveCover from '../components/CollectiveCover';
 import ErrorPage from '../components/ErrorPage';
 import Link from '../components/Link';
 
-import ExpenseWithData from '../apps/expenses/components/ExpenseWithData';
+import { addCollectiveCoverData } from '../graphql/queries';
 
+import withData from '../lib/withData';
+import withIntl from '../lib/withIntl';
+import withLoggedInUser from '../lib/withLoggedInUser';
 
 class ExpensePage extends React.Component {
 
-  static getInitialProps (props) {
-    const { query: { collectiveSlug, ExpenseId }, data } = props;
-    return { slug: collectiveSlug, data, ExpenseId }
+  static getInitialProps ({ query: { collectiveSlug, ExpenseId } }) {
+    return { slug: collectiveSlug, ExpenseId };
   }
+
+  static propTypes = {
+    slug: PropTypes.string, // for addCollectiveCoverData
+    ExpenseId: PropTypes.number,
+    data: PropTypes.object.isRequired, // from withData
+    getLoggedInUser: PropTypes.func.isRequired, // from withLoggedInUser
+  };
 
   constructor(props) {
     super(props);
@@ -30,7 +39,7 @@ class ExpensePage extends React.Component {
 
   async componentDidMount() {
     const { getLoggedInUser } = this.props;
-    const LoggedInUser = getLoggedInUser && await getLoggedInUser(this.props.collectiveSlug);
+    const LoggedInUser = await getLoggedInUser();
     this.setState({ LoggedInUser });
   }
 
@@ -74,7 +83,8 @@ class ExpensePage extends React.Component {
           .viewAllExpenses {
             font-size: 1.2rem;
           }
-        `}</style>
+        `}
+        </style>
 
         <Header
           title={collective.name}
@@ -110,7 +120,7 @@ class ExpensePage extends React.Component {
                   allowPayAction={!this.state.isPayActionLocked}
                   lockPayAction={() => this.setState({ isPayActionLocked: true })}
                   unlockPayAction={() => this.setState({ isPayActionLocked: false })}
-                />
+                  />
 
               </div>
 
@@ -130,4 +140,4 @@ class ExpensePage extends React.Component {
 
 }
 
-export default withData(addGetLoggedInUserFunction(addCollectiveCoverData(withIntl(ExpensePage))));
+export default withData(withIntl(withLoggedInUser(addCollectiveCoverData(ExpensePage))));

@@ -1,16 +1,23 @@
-import withData from '../lib/withData';
-import withIntl from '../lib/withIntl';
 import React from 'react';
+import PropTypes from 'prop-types';
+
 import CreateHostForm from '../components/CreateHostForm';
-import { addGetLoggedInUserFunction } from '../graphql/queries';
 import Loading from '../components/Loading';
 import SignInForm from '../components/SignInForm';
+
+import withData from '../lib/withData';
+import withIntl from '../lib/withIntl';
+import withLoggedInUser from '../lib/withLoggedInUser';
 
 class CreateHostPage extends React.Component {
 
   static getInitialProps ({ query: { collectiveSlug } }) {
-    return { slug: collectiveSlug || "none" }
+    return { slug: collectiveSlug || 'none' };
   }
+
+  static propTypes = {
+    slug: PropTypes.string,
+  };
 
   constructor(props) {
     super(props);
@@ -40,11 +47,11 @@ class CreateHostPage extends React.Component {
           <div className="login">
             <p>You need to be logged in to conitnue.</p>
             <SignInForm next={`/${this.props.slug}/edit`} />
-          </div>        
+          </div>
         }
       </div>
     );
   }
 }
 
-export default withData(withIntl(addGetLoggedInUserFunction(CreateHostPage)));
+export default withData(withIntl(withLoggedInUser(CreateHostPage)));

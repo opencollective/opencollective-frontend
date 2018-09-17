@@ -1,6 +1,6 @@
 import React from 'react';
 import renderer from 'react-test-renderer';
-import { shallow } from 'enzyme'
+import { shallow } from 'enzyme';
 import 'jest-styled-components';
 
 import Router from 'next/router';

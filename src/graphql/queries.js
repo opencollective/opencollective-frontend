@@ -1,8 +1,6 @@
 import { graphql } from 'react-apollo'
 import gql from 'graphql-tag'
 
-import withLoggedInUser from '../lib/withLoggedInUser';
-
 export const transactionFields = `
   id
   uuid
@@ -742,24 +740,9 @@ export const searchCollectivesQuery = gql`
 `;
 
 export const addCollectiveData = graphql(getCollectiveQuery);
-export const addCollectiveCoverData = graphql(getCollectiveCoverQuery, {
-  options(props) {
-    return {
-      variables: {
-        slug: props.collectiveSlug || props.slug
-      }
-    }
-  }
-});
+export const addCollectiveCoverData = graphql(getCollectiveCoverQuery);
 export const addCollectiveToEditData = graphql(getCollectiveToEditQuery);
 export const addEventCollectiveData = graphql(getEventCollectiveQuery);
 export const addTiersData = graphql(getTiersQuery);
 export const addSubscriptionsData = graphql(getSubscriptionsQuery);
 export const addSearchQueryData = graphql(searchCollectivesQuery);
-
-export const addGetLoggedInUserFunction = component => {
-  if (process.env.NODE_ENV == 'development') {
-    console.warn('addGetLoggedInUserFunction is deprecated, use withLoggedInUser instead');
-  }
-  return withLoggedInUser(component);
-}

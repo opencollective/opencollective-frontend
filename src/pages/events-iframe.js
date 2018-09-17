@@ -1,41 +1,44 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import Head from 'next/head';
+
 import EventsWithData from '../components/EventsWithData';
-import withData from '../lib/withData'
-import withIntl from '../lib/withIntl'
 
-class Events extends React.Component {
+import withData from '../lib/withData';
+import withIntl from '../lib/withIntl';
 
-  constructor(props) {
-    super(props);
-    this.sendMessageToParentWindow = this.sendMessageToParentWindow.bind(this);
-    this.onChange = this.onChange.bind(this);
-  }
+class EventsIframe extends React.Component {
 
   static getInitialProps ({ query: { collectiveSlug, id } }) {
-    return { collectiveSlug, id }
+    return { collectiveSlug, id };
   }
 
-  sendMessageToParentWindow() {
-    if (!window.parent) return;
-    if (!this.height) return;
-    const message = `oc-${JSON.stringify({id: this.props.id, height: this.height})}`;
-    window.parent.postMessage(message, "*");
-  }
+  static propTypes = {
+    collectiveSlug: PropTypes.string,
+    id: PropTypes.number,
+  };
 
-  onChange(change) {
+  onChange = change => {
     if (!change) return;
     this.height = change.height;
     this.sendMessageToParentWindow();
-  }
+  };
+
+  sendMessageToParentWindow = () => {
+    if (!window.parent) return;
+    if (!this.height) return;
+    const message = `oc-${JSON.stringify({ id: this.props.id, height: this.height })}`;
+    window.parent.postMessage(message, '*');
+  };
 
   render() {
+    const { collectiveSlug } = this.props;
     return (
       <div>
         <Head>
           <meta name="viewport" content="width=device-width, initial-scale=1" />
           <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,900" />
-          <title>{`${this.props.collectiveSlug} events`}</title>
+          <title>{`${collectiveSlug} events`}</title>
         </Head>
 
         <style jsx global>{`
@@ -131,13 +134,12 @@ class Events extends React.Component {
         `}
         </style>
         <EventsWithData
-          collectiveSlug={this.props.collectiveSlug}
+          collectiveSlug={collectiveSlug}
           onChange={this.onChange}
           />
       </div>
     );
   }
-
 }
 
-export default withData(withIntl(Events));
+export default withData(withIntl(EventsIframe));

@@ -1,24 +1,23 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import sanitizeHtml from 'sanitize-html';
+import styled from 'styled-components';
+import { Flex, Box } from 'grid-styled';
+import { backgroundSize, fontSize, minHeight, maxWidth } from 'styled-system';
+import { FormattedMessage } from 'react-intl';
 
 import Header from '../components/Header';
 import Body from '../components/Body';
 import Footer from '../components/Footer';
 import CollectivesWithData from '../components/CollectivesWithData';
-import withLoggedInUser from '../lib/withLoggedInUser';
-import withIntl from '../lib/withIntl';
-import withData from '../lib/withData';
-import sanitizeHtml from 'sanitize-html';
-
 import Container from '../components/Container';
 import { P, H1, H5 } from '../components/Text';
-import { Flex, Box } from 'grid-styled';
-import { FormattedMessage } from 'react-intl';
-
 import GiftCard from '../components/GiftCard';
 import SearchForm from '../components/SearchForm';
-import styled from 'styled-components';
-import { backgroundSize, fontSize, minHeight, maxWidth } from 'styled-system';
+
+import withData from '../lib/withData';
+import withIntl from '../lib/withIntl';
+import withLoggedInUser from '../lib/withLoggedInUser';
 
 const Title = styled(H1)`
   color: white;
@@ -46,16 +45,7 @@ const Hero = styled(Box)`
   ${backgroundSize}
 `;
 
-
 class RedeemedPage extends React.Component {
-
-  static propTypes = {
-    name: PropTypes.string,
-    emitterSlug: PropTypes.string,
-    emitterName: PropTypes.string,
-    amount: PropTypes.number.isRequired,
-  };
-
   static getInitialProps ({ query: { amount, name, emitterSlug, emitterName } }) {
     return {
       amount: amount && Number(amount),
@@ -64,6 +54,13 @@ class RedeemedPage extends React.Component {
       emitterName: sanitizeHtml(emitterName, { allowedTags: [], allowedAttributes: [] }),
     };
   }
+
+  static propTypes = {
+    name: PropTypes.string,
+    emitterSlug: PropTypes.string,
+    emitterName: PropTypes.string,
+    amount: PropTypes.number.isRequired,
+  };
 
   constructor(props) {
     super(props);
@@ -148,4 +145,4 @@ class RedeemedPage extends React.Component {
 }
 
 
-export default withData(withLoggedInUser(withIntl(RedeemedPage)));
+export default withData(withIntl(withLoggedInUser(RedeemedPage)));
