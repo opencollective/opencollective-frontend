@@ -2,7 +2,8 @@ import algoliasearch from 'algoliasearch';
 import config from 'config';
 import Promise from 'bluebird';
 
-import errors from '../lib/errors';
+import errors from '../../lib/errors';
+
 import {
   GraphQLList,
   GraphQLNonNull,
@@ -43,9 +44,9 @@ import {
 } from './types';
 
 import { find, get, uniq } from 'lodash';
-import models, { sequelize, Op } from '../models';
-import rawQueries from '../lib/queries';
-import { fetchCollectiveId } from '../lib/cache';
+import models, { sequelize, Op } from '../../models';
+import rawQueries from '../../lib/queries';
+import { fetchCollectiveId } from '../../lib/cache';
 
 const {
   appId: ALGOLIA_APP_ID,

@@ -11,7 +11,7 @@ import {
 } from 'graphql';
 
 import GraphQLJSON from 'graphql-type-json';
-import queries from '../lib/queries';
+import queries from '../../lib/queries';
 
 import {
   LocationType,
@@ -32,9 +32,9 @@ import {
 
 import { ApplicationType } from './Application';
 
-import { types } from '../constants/collectives';
-import models, { Op } from '../models';
-import roles from '../constants/roles';
+import { types } from '../../constants/collectives';
+import models, { Op } from '../../models';
+import roles from '../../constants/roles';
 import { get } from 'lodash';
 
 export const TypeOfCollectiveType = new GraphQLEnumType({

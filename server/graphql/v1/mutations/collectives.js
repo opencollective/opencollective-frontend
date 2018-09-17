@@ -1,14 +1,15 @@
 import debugLib from 'debug';
 import slugify from 'slug';
 import { get, omit } from 'lodash';
-import models from '../../models';
-import * as errors from '../errors';
-import { types } from '../../constants/collectives';
-import roles from '../../constants/roles';
-import activities from '../../constants/activities';
-import { defaultHostCollective } from '../../lib/utils';
-import emailLib from '../../lib/email';
-import { defaultTiers } from '../../models/Collective';
+
+import models from '../../../models';
+import * as errors from '../../errors';
+import { types } from '../../../constants/collectives';
+import roles from '../../../constants/roles';
+import activities from '../../../constants/activities';
+import { defaultHostCollective } from '../../../lib/utils';
+import emailLib from '../../../lib/email';
+import { defaultTiers } from '../../../models/Collective';
 
 const debug = debugLib('claim');
 
@@ -82,9 +83,15 @@ export async function createCollective(_, args, req) {
       );
     }
     // The currency of the new created collective if not specified should be the one of its direct parent or the host (in this order)
-    collectiveData.currency = collectiveData.currency || parentCollective.currency;
+    collectiveData.currency =
+      collectiveData.currency || parentCollective.currency;
     collectiveData.HostCollectiveId = parentCollective.HostCollectiveId;
-    if (req.remoteUser.hasRole([roles.ADMIN, roles.HOST, roles.MEMBER], parentCollective.id)) {
+    if (
+      req.remoteUser.hasRole(
+        [roles.ADMIN, roles.HOST, roles.MEMBER],
+        parentCollective.id,
+      )
+    ) {
       collectiveData.isActive = true;
     }
   }
@@ -102,10 +109,14 @@ export async function createCollective(_, args, req) {
         ),
       );
     }
-    collectiveData.currency = collectiveData.currency || hostCollective.currency;
+    collectiveData.currency =
+      collectiveData.currency || hostCollective.currency;
     collectiveData.hostFeePercent = hostCollective.hostFeePercent;
 
-    if (collectiveData.type === 'EVENT' || req.remoteUser.hasRole([roles.ADMIN, roles.HOST], hostCollective.id)) {
+    if (
+      collectiveData.type === 'EVENT' ||
+      req.remoteUser.hasRole([roles.ADMIN, roles.HOST], hostCollective.id)
+    ) {
       collectiveData.isActive = true;
     } else if (!get(hostCollective, 'settings.apply')) {
       throw new errors.Unauthorized({
@@ -394,38 +405,50 @@ export function deleteCollective(_, args, req) {
   });
 }
 
-export async function claimCollective (_, args, req) {
+export async function claimCollective(_, args, req) {
   if (!req.remoteUser) {
-    throw new errors.Unauthorized({ message: "You need to be logged in to claim a collective" });
+    throw new errors.Unauthorized({
+      message: 'You need to be logged in to claim a collective',
+    });
   }
 
-  const collective = await models.Collective.findById(args.id)
+  const collective = await models.Collective.findById(args.id);
 
   if (!collective) {
-    throw new errors.NotFound({ message: `Collective with id ${args.id} not found` });
+    throw new errors.NotFound({
+      message: `Collective with id ${args.id} not found`,
+    });
   }
 
   const admins = await collective.getAdmins();
 
   if (admins.length > 0) {
-    throw new errors.ValidationFailed({ message: 'This collective has already been claimed' });
+    throw new errors.ValidationFailed({
+      message: 'This collective has already been claimed',
+    });
   }
 
   // add opensource collective as host
-  collective.ParentCollectiveId = defaultHostCollective('opensource').ParentCollectiveId;
+  collective.ParentCollectiveId = defaultHostCollective(
+    'opensource',
+  ).ParentCollectiveId;
 
   // add default tiers
-  collective.tiers = defaultTiers(defaultHostCollective('opensource').CollectiveId, collective.currency)
-  await models.Tier.createMany(collective.tiers, { CollectiveId: collective.id, currency: collective.currency });
+  collective.tiers = defaultTiers(
+    defaultHostCollective('opensource').CollectiveId,
+    collective.currency,
+  );
+  await models.Tier.createMany(collective.tiers, {
+    CollectiveId: collective.id,
+    currency: collective.currency,
+  });
 
   // set collective.isActive to true
   collective.isActive = true;
 
   // get pledges
   const pledges = await models.Order.findAll({
-    include: [
-      { all: true },
-    ],
+    include: [{ all: true }],
     where: {
       CollectiveId: collective.id,
       status: 'PENDING',
@@ -435,12 +458,7 @@ export async function claimCollective (_, args, req) {
 
   // send complete-pledge emails to pledges
   const emails = pledges.map(pledge => {
-    const {
-      collective,
-      createdByUser,
-      fromCollective,
-      Subscription,
-    } = pledge;
+    const { collective, createdByUser, fromCollective, Subscription } = pledge;
     return emailLib.send('pledge.complete', createdByUser.email, {
       collective: collective.info,
       fromCollective: fromCollective.minimal,

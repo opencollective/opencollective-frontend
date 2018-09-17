@@ -1,8 +1,8 @@
-import models from '../../models';
-import * as errors from '../errors';
-import { mustHaveRole } from '../../lib/auth';
+import models from '../../../models';
+import * as errors from '../../errors';
+import { mustHaveRole } from '../../../lib/auth';
 import { get } from 'lodash';
-import { strip_tags } from '../../lib/utils';
+import { strip_tags } from '../../../lib/utils';
 
 function require(args, path) {
   if (!get(args, path))

@@ -22,11 +22,11 @@ import {
   OrderDirectionType,
 } from './TransactionInterface';
 
-import models, { Op, sequelize } from '../models';
+import models, { Op, sequelize } from '../../models';
 import dataloaderSequelize from 'dataloader-sequelize';
-import { strip_tags } from '../lib/utils';
-import status from '../constants/expense_status';
-import orderStatus from '../constants/order_status';
+import { strip_tags } from '../../lib/utils';
+import status from '../../constants/expense_status';
+import orderStatus from '../../constants/order_status';
 
 dataloaderSequelize(models.Order);
 dataloaderSequelize(models.Transaction);

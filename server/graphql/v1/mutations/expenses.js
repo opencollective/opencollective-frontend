@@ -1,16 +1,16 @@
 import { get } from 'lodash';
-import errors from '../../lib/errors';
-import roles from '../../constants/roles';
-import statuses from '../../constants/expense_status';
-import activities from '../../constants/activities';
-import models from '../../models';
-import paymentProviders from '../../paymentProviders';
-import { formatCurrency } from '../../lib/utils';
-import paypalAdaptive from '../../paymentProviders/paypal/adaptiveGateway';
+import errors from '../../../lib/errors';
+import roles from '../../../constants/roles';
+import statuses from '../../../constants/expense_status';
+import activities from '../../../constants/activities';
+import models from '../../../models';
+import paymentProviders from '../../../paymentProviders';
+import { formatCurrency } from '../../../lib/utils';
+import paypalAdaptive from '../../../paymentProviders/paypal/adaptiveGateway';
 import {
   createFromPaidExpense as createTransactionFromPaidExpense,
   createTransactionFromInKindDonation,
-} from '../../lib/transactions';
+} from '../../../lib/transactions';
 
 /**
  * Only admin of expense.collective or of expense.collective.host can approve/reject expenses

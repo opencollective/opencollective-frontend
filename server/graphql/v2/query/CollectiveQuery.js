@@ -4,7 +4,7 @@ import models from '../../../models';
 
 import { Collective } from '../object/Collective';
 
-import { NotFound } from '../errors';
+import { NotFound } from '../../errors';
 
 const CollectiveQuery = {
   type: Collective,

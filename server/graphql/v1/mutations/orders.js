@@ -5,18 +5,18 @@ import uuidv4 from 'uuid/v4';
 import debug from 'debug';
 import Promise from 'bluebird';
 
-import models from '../../models';
-import { capitalize, pluralize } from '../../lib/utils';
-import * as libPayments from '../../lib/payments';
-import { types } from '../../constants/collectives';
-import roles from '../../constants/roles';
-import status from '../../constants/order_status';
-import * as errors from '../errors';
-import activities from '../../constants/activities';
+import models from '../../../models';
+import { capitalize, pluralize } from '../../../lib/utils';
+import * as libPayments from '../../../lib/payments';
+import { types } from '../../../constants/collectives';
+import roles from '../../../constants/roles';
+import status from '../../../constants/order_status';
+import * as errors from '../../errors';
+import activities from '../../../constants/activities';
 import {
   getNextChargeAndPeriodStartDates,
   getChargeRetryCount,
-} from '../../lib/subscriptions';
+} from '../../../lib/subscriptions';
 
 const debugOrder = debug('order');
 

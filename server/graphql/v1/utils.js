@@ -1,6 +1,6 @@
 import debug from 'debug';
 import { graphql } from 'graphql';
-import { loaders } from './loaders';
+import { loaders } from '../loaders';
 import schema from './schema';
 
 export const makeRequest = (remoteUser, query) => {

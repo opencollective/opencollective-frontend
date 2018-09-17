@@ -2,7 +2,6 @@ import serverStatus from 'express-server-status';
 import GraphHTTP from 'express-graphql';
 import curlify from 'request-as-curl';
 
-import schema from './graphql/schema';
 import * as connectedAccounts from './controllers/connectedAccounts';
 import getDiscoverPage from './controllers/discover';
 import * as transactions from './controllers/transactions';
@@ -36,7 +35,9 @@ import { sanitizeForLogs } from './lib/utils';
 import debug from 'debug';
 
 import { ApolloServer } from 'apollo-server-express';
-import publicSchema from './graphql/public/schema';
+
+import graphqlSchemaV1 from './graphql/v1/schema';
+import graphqlSchemaV2 from './graphql/v2/schema';
 
 /**
  * NotImplemented response.
@@ -112,35 +113,38 @@ export default app => {
   app.param('expenseid', params.expenseid);
 
   /**
-   * GraphQL Public
+   * GraphQL V1
+   */
+  const graphqlV1 = GraphHTTP({
+    formatError,
+    schema: graphqlSchemaV1,
+    pretty:
+      process.env.NODE_ENV !== 'production' &&
+      process.env.NODE_ENV !== 'staging',
+    graphiql:
+      process.env.NODE_ENV !== 'production' &&
+      process.env.NODE_ENV !== 'staging',
+  });
+
+  app.use('/graphql/v1', graphqlV1);
+
+  /**
+   * GraphQL V2
    */
   const server = new ApolloServer({
-    schema: publicSchema,
+    schema: graphqlSchemaV2,
     // Align with behavior from express-graphql
     context: ({ req }) => {
-      // console.log('context', 'arguments', arguments);
       return req;
     },
   });
 
-  server.applyMiddleware({ app, path: '/graphql/public' });
+  server.applyMiddleware({ app, path: '/graphql/v2' });
 
   /**
-   * GraphQL
+   * GraphQL (default)
    */
-  app.use(
-    '/graphql',
-    GraphHTTP({
-      formatError,
-      schema: schema,
-      pretty:
-        process.env.NODE_ENV !== 'production' &&
-        process.env.NODE_ENV !== 'staging',
-      graphiql:
-        process.env.NODE_ENV !== 'production' &&
-        process.env.NODE_ENV !== 'staging',
-    }),
-  );
+  app.use('/graphql', graphqlV1);
 
   /**
    * Webhooks that should bypass api key check

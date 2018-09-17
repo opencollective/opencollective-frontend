@@ -1,6 +1,6 @@
-import models from '../../models';
-import errors from '../../lib/errors';
-import roles from '../../constants/roles';
+import models from '../../../models';
+import errors from '../../../lib/errors';
+import roles from '../../../constants/roles';
 
 export function createMember(_, args, req) {
   let collective;

@@ -1,4 +1,4 @@
-import errors from '../../lib/errors';
+import errors from '../../../lib/errors';
 
 export function editTiers(_, args, req) {
   let collective;

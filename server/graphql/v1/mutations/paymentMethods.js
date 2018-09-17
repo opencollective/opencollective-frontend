@@ -1,6 +1,6 @@
-import virtualcard from '../../paymentProviders/opencollective/virtualcard';
-import emailLib from '../../lib/email';
-import models from '../../models';
+import virtualcard from '../../../paymentProviders/opencollective/virtualcard';
+import emailLib from '../../../lib/email';
+import models from '../../../models';
 import queryString from 'query-string';
 
 /** Create a Payment Method through a collective(organization or user)

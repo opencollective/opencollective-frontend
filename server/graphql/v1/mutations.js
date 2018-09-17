@@ -30,7 +30,7 @@ import * as updateMutations from './mutations/updates';
 import * as commentMutations from './mutations/comments';
 import * as applicationMutations from './mutations/applications';
 
-import statuses from '../constants/expense_status';
+import statuses from '../../constants/expense_status';
 
 import {
   GraphQLNonNull,

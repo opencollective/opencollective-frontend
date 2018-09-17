@@ -4,7 +4,7 @@ import { Account } from '../interface/Account';
 
 import models from '../../../models';
 
-import { NotFound } from '../errors';
+import { NotFound } from '../../errors';
 
 const AccountQuery = {
   type: Account,

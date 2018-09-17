@@ -1,5 +1,5 @@
-import models from '../../models';
-import * as errors from '../errors';
+import models from '../../../models';
+import * as errors from '../../errors';
 import { get } from 'lodash';
 
 const { Application } = models;
