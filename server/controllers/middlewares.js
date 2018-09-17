@@ -7,16 +7,20 @@ import queries from '../lib/queries';
 import models, { Op } from '../models';
 import errors from '../lib/errors';
 
-const {
-  User
-} = models;
+const { User } = models;
 
 /**
  * Fetch backers of a collective by tier
  */
 export const fetchUsers = (req, res, next) => {
-  queries.getMembersWithTotalDonations({ CollectiveId: req.collective.id, role: 'BACKER' })
-    .then(backerCollectives => models.Tier.appendTier(req.collective, backerCollectives))
+  queries
+    .getMembersWithTotalDonations({
+      CollectiveId: req.collective.id,
+      role: 'BACKER',
+    })
+    .then(backerCollectives =>
+      models.Tier.appendTier(req.collective, backerCollectives),
+    )
     .then(backerCollectives => {
       req.users = backerCollectives;
     })
@@ -28,35 +32,31 @@ export const fetchUsers = (req, res, next) => {
  * Add this middleware before the controller (before calling res.send)
  * `format` should be 'csv'
  */
-export const format = (format) => {
-
+export const format = format => {
   return (req, res, next) => {
-
     switch (format) {
       case 'csv': {
-        const {send} = res;
-        res.send = (data) => {
-          data = _.map(data, (row) => {
+        const { send } = res;
+        res.send = data => {
+          data = _.map(data, row => {
             if (row.createdAt)
-              row.createdAt = moment(row.createdAt).format("YYYY-MM-DD HH:mm");
+              row.createdAt = moment(row.createdAt).format('YYYY-MM-DD HH:mm');
             if (row.totalDonations)
-              row.totalDonations = (row.totalDonations/100).toFixed(2); // convert from cents
+              row.totalDonations = (row.totalDonations / 100).toFixed(2); // convert from cents
             return row;
           });
-          const fields = (data.length > 0) ? Object.keys(data[0]) : [];
-          json2csv({data, fields }, (err, csv) => {
+          const fields = data.length > 0 ? Object.keys(data[0]) : [];
+          json2csv({ data, fields }, (err, csv) => {
             res.setHeader('content-type', 'text/csv');
             send.call(res, csv);
           });
-        }
+        };
         return next();
       }
       default:
         return next();
     }
-
-  }
-
+  };
 };
 
 /**
@@ -64,17 +64,17 @@ export const format = (format) => {
  * Used for creating a transaction from a new/returning donor or an expense from a new/returning user.
  */
 export const getOrCreateUser = (req, res, next) => {
-
   // If already logged in, proceed
   if (req.remoteUser) {
     if (req.body.expense) {
       const { name, paypalEmail } = req.body.expense;
-      return req.remoteUser.updateWhiteListedAttributes({ name, paypalEmail })
-        .then(user => req.user = user)
-        .then(() => next())
+      return req.remoteUser
+        .updateWhiteListedAttributes({ name, paypalEmail })
+        .then(user => (req.user = user))
+        .then(() => next());
     } else {
       req.user = req.remoteUser;
-      return next()
+      return next();
     }
   }
 
@@ -96,7 +96,7 @@ export const getOrCreateUser = (req, res, next) => {
   const password = req.body.password || req.query.password;
 
   if (!email && !paypalEmail) {
-    return next(new errors.ValidationFailed("Email or paypalEmail required"));
+    return next(new errors.ValidationFailed('Email or paypalEmail required'));
   }
 
   if (password) {
@@ -113,22 +113,21 @@ export const getOrCreateUser = (req, res, next) => {
   const userData = {
     name,
     email: email || paypalEmail,
-    paypalEmail
+    paypalEmail,
   };
 
   User.findOne({
     where: {
       [Op.or]: {
         email: userData.email,
-        paypalEmail: userData.paypalEmail
-      }
-    }
+        paypalEmail: userData.paypalEmail,
+      },
+    },
   })
-  .then(user => user || users._create(userData))
-  .tap(user => req.user = user)
-  .tap(() => next())
-  .catch(next);
-
+    .then(user => user || users._create(userData))
+    .tap(user => (req.user = user))
+    .tap(() => next())
+    .catch(next);
 };
 
 /**
@@ -145,8 +144,7 @@ export const authenticate = (req, res, next) => {
     return next();
   }
 
-  User.auth((username || email), password, (e, user) => {
-
+  User.auth(username || email, password, (e, user) => {
     const errorMsg = 'Invalid username/email or password';
 
     if (e) {
@@ -170,37 +168,36 @@ export const authenticate = (req, res, next) => {
 /**
  * Paginate.
  */
-export const paginate = (options) => {
+export const paginate = options => {
   options = options || {};
 
   options = {
     default: options.default || 100,
     min: options.min || 1,
     max: options.max || 100,
-    maxTotal: options.maxTotal || false
+    maxTotal: options.maxTotal || false,
   };
 
   return function(req, res, next) {
-
     // Since ID.
     const sinceId = req.body.since_id || req.query.since_id;
     if (sinceId) {
       req.pagination = {
         where: {
-          id: {[Op.gt]: sinceId}
-        }
+          id: { [Op.gt]: sinceId },
+        },
       };
       return next();
     }
 
     // Page / Per_page.
-    let perPage = (req.body.per_page || req.query.per_page);
+    let perPage = req.body.per_page || req.query.per_page;
     perPage = perPage * 1 || options.default;
     let page = (req.body.page || req.query.page) * 1 || 1;
 
-    page = (page < 1) ? 1 : page;
-    perPage = (perPage < options.min) ? options.min : perPage;
-    perPage = (perPage > options.max) ? options.max : perPage;
+    page = page < 1 ? 1 : page;
+    perPage = perPage < options.min ? options.min : perPage;
+    perPage = perPage > options.max ? options.max : perPage;
 
     req.pagination = paginateOffset(page, perPage);
 
@@ -211,11 +208,11 @@ export const paginate = (options) => {
 /**
  * Sorting.
  */
-export const sorting = (options) => {
+export const sorting = options => {
   options = options || {};
 
-  options.key = (typeof options.key !== 'undefined') ? options.key : 'id';
-  options.dir = (typeof options.dir !== 'undefined') ? options.dir : 'ASC';
+  options.key = typeof options.key !== 'undefined' ? options.key : 'id';
+  options.dir = typeof options.dir !== 'undefined' ? options.dir : 'ASC';
 
   return function(req, res, next) {
     const key = req.body.sort || req.query.sort;
@@ -223,7 +220,7 @@ export const sorting = (options) => {
 
     req.sorting = {
       key: key || options.key,
-      dir: (dir || options.dir).toUpperCase()
+      dir: (dir || options.dir).toUpperCase(),
     };
 
     next();

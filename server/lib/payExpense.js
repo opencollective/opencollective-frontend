@@ -7,7 +7,7 @@ const services = {
   paypal: (collective, expense, email, preapprovalKey) => {
     const uri = `/collectives/${collective.id}/expenses/${expense.id}/paykey/`;
     const baseUrl = config.host.webapp + uri;
-    const amount = expense.amount/100;
+    const amount = expense.amount / 100;
     let createPaymentResponse;
     const payload = {
       // Note: if we change this to 'PAY', payment will complete in one step
@@ -27,25 +27,28 @@ const services = {
           {
             email,
             amount,
-            paymentType: 'SERVICE'
-          }
-        ]
-      }
+            paymentType: 'SERVICE',
+          },
+        ],
+      },
     };
 
-    return paypalAdaptive.pay(payload)
-    .tap(payResponse => createPaymentResponse = payResponse)
-    .then(payResponse => paypalAdaptive.executePayment(payResponse.payKey))
-    .then(executePaymentResponse => {
-      return { createPaymentResponse, executePaymentResponse}
-    });
-  }
+    return paypalAdaptive
+      .pay(payload)
+      .tap(payResponse => (createPaymentResponse = payResponse))
+      .then(payResponse => paypalAdaptive.executePayment(payResponse.payKey))
+      .then(executePaymentResponse => {
+        return { createPaymentResponse, executePaymentResponse };
+      });
+  },
 };
 
 export default service => {
   const s = services[service];
   if (!s) {
-    throw new errors.NotImplemented('This service is not implemented yet for payment.');
+    throw new errors.NotImplemented(
+      'This service is not implemented yet for payment.',
+    );
   }
   return s;
 };

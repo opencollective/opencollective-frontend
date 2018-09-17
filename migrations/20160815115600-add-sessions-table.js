@@ -1,39 +1,42 @@
 'use strict';
 
 module.exports = {
-  up: function (queryInterface, Sequelize) {
+  up: function(queryInterface, Sequelize) {
     return queryInterface.createTable(
-      'Sessions', {
+      'Sessions',
+      {
         sid: {
           type: Sequelize.STRING(32),
-          primaryKey: true
+          primaryKey: true,
         },
 
         expires: {
-          type: Sequelize.DATE
+          type: Sequelize.DATE,
         },
 
         data: {
-          type: Sequelize.TEXT
+          type: Sequelize.TEXT,
         },
 
         createdAt: {
           type: Sequelize.DATE,
           defaultValue: Sequelize.NOW,
-          allowNull: false
+          allowNull: false,
         },
 
         updatedAt: {
           type: Sequelize.DATE,
           defaultValue: Sequelize.NOW,
-          allowNull: false
-        }
-      }, {
-        paranoid: true
-      });
+          allowNull: false,
+        },
+      },
+      {
+        paranoid: true,
+      },
+    );
   },
 
-  down: function (queryInterface) {
+  down: function(queryInterface) {
     return queryInterface.dropTable('Sessions');
-  }
+  },
 };

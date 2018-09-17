@@ -1,14 +1,14 @@
 'use strict';
 
 module.exports = {
-  up: function (queryInterface) {
+  up: function(queryInterface) {
     return queryInterface.addIndex('Groups', ['slug'], {
       indexName: 'UniqueSlugIndex',
-      indicesType: 'UNIQUE'
+      indicesType: 'UNIQUE',
     });
   },
 
-  down: function (queryInterface) {
+  down: function(queryInterface) {
     return queryInterface.removeIndex('Groups', 'UniqueSlugIndex');
-  }
+  },
 };

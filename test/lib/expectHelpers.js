@@ -3,9 +3,9 @@ export function badRequest(req, message) {
     error: {
       code: 400,
       type: 'bad_request',
-      message
-    }
-  })
+      message,
+    },
+  });
 }
 
 export function missingRequired(req, field) {
@@ -15,8 +15,8 @@ export function missingRequired(req, field) {
       type: 'missing_required',
       message: 'Missing required fields',
       fields: {
-        [field]: `Required field ${field} missing`
-      }
-    }
-  })
+        [field]: `Required field ${field} missing`,
+      },
+    },
+  });
 }

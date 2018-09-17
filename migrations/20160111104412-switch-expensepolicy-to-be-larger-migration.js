@@ -1,15 +1,15 @@
 'use strict';
 
 module.exports = {
-  up: function (queryInterface, DataTypes) {
+  up: function(queryInterface, DataTypes) {
     return queryInterface.changeColumn('Groups', 'expensePolicy', {
-      type: DataTypes.TEXT('long')
-    })
+      type: DataTypes.TEXT('long'),
+    });
   },
 
-  down: function (queryInterface, DataTypes) {
+  down: function(queryInterface, DataTypes) {
     return queryInterface.changeColumn('Groups', 'expensePolicy', {
-      type: DataTypes.STRING
-    })
-  }
+      type: DataTypes.STRING,
+    });
+  },
 };

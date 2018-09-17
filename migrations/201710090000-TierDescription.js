@@ -1,15 +1,15 @@
 'use strict';
 
 module.exports = {
-  up: function (queryInterface, DataTypes) {
+  up: function(queryInterface, DataTypes) {
     return queryInterface.changeColumn('Tiers', 'description', {
-      type: DataTypes.STRING(510)
-    })
+      type: DataTypes.STRING(510),
+    });
   },
 
-  down: function (queryInterface, DataTypes) {
+  down: function(queryInterface, DataTypes) {
     return queryInterface.changeColumn('Tiers', 'description', {
-      type: DataTypes.STRING(255)
-    })
-  }
+      type: DataTypes.STRING(255),
+    });
+  },
 };

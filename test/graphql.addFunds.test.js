@@ -16,14 +16,17 @@ const addFundsToOrgQuery = `
 `;
 
 describe('graphql.addFunds', () => {
-
   let user, collective, hostCollective;
 
   beforeEach(async () => {
     await utils.resetTestDB();
     ({ user } = await store.newUser('a user'));
     ({ collective, hostCollective } = await store.newCollectiveWithHost(
-      'test-collective', 'USD', 'USD', 10));
+      'test-collective',
+      'USD',
+      'USD',
+      10,
+    ));
   }); /* End of "before" */
 
   it('should create a new prepaid payment method', async () => {
@@ -44,7 +47,7 @@ describe('graphql.addFunds', () => {
     // And then there should be a new payment method created in the
     // database
     const dbResult = await models.PaymentMethod.findAll({
-      where: { customerId: collective.slug }
+      where: { customerId: collective.slug },
     });
 
     expect(dbResult.length).to.equal(1);
@@ -86,7 +89,7 @@ describe('graphql.addFunds', () => {
     // And then there should be 2 payment methods created in the
     // database
     const dbResult = await models.PaymentMethod.findAll({
-      where: { customerId: collective.slug }
+      where: { customerId: collective.slug },
     });
     expect(dbResult.length).to.equal(3);
     expect(dbResult[0].name).to.equal('test funds');
@@ -98,7 +101,5 @@ describe('graphql.addFunds', () => {
     expect(dbResult[2].name).to.equal('third test on adding funds');
     expect(dbResult[2].initialBalance).to.equal(4000);
     expect(dbResult[2].monthlyLimitPerMember).to.be.null;
-
   }); /* End of "should always create a new prepaid payment method when adding funds" */
-
 }); /* End of "graphql.addFunds" */

@@ -29,15 +29,17 @@ describe('XSS.test', () => {
 
   beforeEach('create a user', () => models.User.create(userData));
 
-  beforeEach('create collective with user as first member', (done) => {
+  beforeEach('create collective with user as first member', done => {
     request(app)
       .post('/groups')
       .send({
         api_key: application.api_key,
-        group: Object.assign(collectiveData, { users: [{ email: userData2.email, role: roles.HOST}]})
+        group: Object.assign(collectiveData, {
+          users: [{ email: userData2.email, role: roles.HOST }],
+        }),
       })
       .expect(200)
-      .end((e) => {
+      .end(e => {
         expect(e).to.not.exist;
         done();
       });
@@ -57,46 +59,46 @@ describe('XSS.test', () => {
           test3: 'Im <b>technically</b> allowed.',
           test4: null,
           test5: 1,
-          test6: '& This &lt;shouldnt&gt; work'
-        }
+          test6: '& This &lt;shouldnt&gt; work',
+        },
       };
       next = sinon.spy();
       done();
     });
 
     it('should be defined', () => {
-        expect(middleware).to.exist;
+      expect(middleware).to.exist;
     });
 
     it('should be a function', () => {
-        expect(middleware).to.be.a('function');
+      expect(middleware).to.be.a('function');
     });
 
     it('should sanitize XSS from body', () => {
-        middleware()(req, {}, next);
-        expect(req.body.test1).to.equal('This is clean');
-        expect(req.body.test2).to.equal('This  isnt!');
-        expect(req.body.test3).to.equal('Im technically allowed.');
-        expect(req.body.test4).to.equal(null);
-        expect(req.body.test5).to.equal(1);
-        expect(req.body.test6).to.equal('& This  work');
+      middleware()(req, {}, next);
+      expect(req.body.test1).to.equal('This is clean');
+      expect(req.body.test2).to.equal('This  isnt!');
+      expect(req.body.test3).to.equal('Im technically allowed.');
+      expect(req.body.test4).to.equal(null);
+      expect(req.body.test5).to.equal(1);
+      expect(req.body.test6).to.equal('& This  work');
     });
 
     it('should call next callback', () => {
-        middleware()(req, {}, next);
-        expect(next).calledOnce;
+      middleware()(req, {}, next);
+      expect(next).calledOnce;
     });
-  })
+  });
 
   describe('sanitizes user', () => {
-    it('creates a user', (done) => {
+    it('creates a user', done => {
       request(app)
         .post(`/users?api_key=${application.api_key}`)
         .send({
           user: {
-            firstName: "<script>alert(\"hi\")</script>Janel",
-            email: "aseem@opencollective.com",
-          }
+            firstName: '<script>alert("hi")</script>Janel',
+            email: 'aseem@opencollective.com',
+          },
         })
         .end((err, res) => {
           const { body } = res;
@@ -106,5 +108,4 @@ describe('XSS.test', () => {
         });
     });
   });
-
 });

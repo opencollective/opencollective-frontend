@@ -12,25 +12,24 @@ import * as store from './features/support/stores';
 import giftcard from '../server/paymentProviders/opencollective/giftcard';
 import prepaid from '../server/paymentProviders/opencollective/prepaid';
 
-
 const createOrderQuery = `
   mutation createOrder($order: OrderInputType!) {
     createOrder(order: $order) { id }
   }
 `;
 
-
 describe('grahpql.createOrder.opencollective', () => {
-
   describe('prepaid', () => {
-
     describe('#getBalance', () => {
-
       before(utils.resetTestDB);
 
       it('should error if payment method is not a prepaid', async () => {
-        expect(prepaid.getBalance({ service: 'opencollective', type: 'giftcard' }))
-          .to.be.eventually.rejectedWith(Error, 'Expected opencollective.prepaid but got opencollective.giftcard');
+        expect(
+          prepaid.getBalance({ service: 'opencollective', type: 'giftcard' }),
+        ).to.be.eventually.rejectedWith(
+          Error,
+          'Expected opencollective.prepaid but got opencollective.giftcard',
+        );
       }); /* End of "should error if payment method is not a prepaid" */
 
       it('should return initial balance of payment method if nothing was spend on the card', async () => {
@@ -42,14 +41,17 @@ describe('grahpql.createOrder.opencollective', () => {
         });
         expect(await prepaid.getBalance(paymentMethod)).to.deep.equal({
           amount: 10000,
-          currency: 'USD'
+          currency: 'USD',
         });
       }); /* End of "should return initial balance of payment method if nothing was spend on the card" */
 
       it('should return initial balance of payment method minus credit already spent', async () => {
         // Given a user & collective
         const { user, userCollective } = await store.newUser('new user');
-        const { hostCollective, collective } = await store.newCollectiveWithHost('test', 'USD', 'USD', 0);
+        const {
+          hostCollective,
+          collective,
+        } = await store.newCollectiveWithHost('test', 'USD', 'USD', 0);
 
         // And given the following order with a payment method
         const { order } = await store.newOrder({
@@ -64,7 +66,7 @@ describe('grahpql.createOrder.opencollective', () => {
             initialBalance: 10000,
             currency: 'USD',
             data: { HostCollectiveId: hostCollective.id },
-          }
+          },
         });
 
         // When the above order is executed
@@ -74,22 +76,27 @@ describe('grahpql.createOrder.opencollective', () => {
         // minus what was already spent.
         expect(await prepaid.getBalance(order.paymentMethod)).to.deep.equal({
           amount: 8000,
-          currency: 'USD'
+          currency: 'USD',
         });
       }); /* End of "should return initial balance of payment method minus credit already spent" */
-
     }); /* End of "#getBalance" */
 
     describe('#processOrder', () => {
-
       let user, user2, userCollective, hostCollective, collective;
 
       beforeEach(async () => {
         await utils.resetTestDB();
         ({ user, userCollective } = await store.newUser('new user'));
         // for some obscure reason, it doesn't work to copy paste previous line for user2
-        user2 = await models.User.createUserWithCollective({ name: 'new user 2'});
-        ({ hostCollective, collective } = await store.newCollectiveWithHost('test', 'USD', 'USD', 10));
+        user2 = await models.User.createUserWithCollective({
+          name: 'new user 2',
+        });
+        ({ hostCollective, collective } = await store.newCollectiveWithHost(
+          'test',
+          'USD',
+          'USD',
+          10,
+        ));
       }); /* End of "beforeEach" */
 
       it('should fail if payment method does not have a host id', async () => {
@@ -105,13 +112,17 @@ describe('grahpql.createOrder.opencollective', () => {
             type: 'prepaid',
             initialBalance: 10000,
             currency: 'USD',
-          }
+          },
         });
 
         // When the above order is executed; Then the transaction
         // should be unsuccessful.
-        await expect(libpayments.executeOrder(user, order)).to.be.eventually.rejectedWith(
-          Error, 'Prepaid payment method must have a value for `data.HostCollectiveId`');
+        await expect(
+          libpayments.executeOrder(user, order),
+        ).to.be.eventually.rejectedWith(
+          Error,
+          'Prepaid payment method must have a value for `data.HostCollectiveId`',
+        );
       }); /* End of "should fail if payment method does not have a host id" */
 
       it('should fail if payment method from someone else is used', async () => {
@@ -133,12 +144,14 @@ describe('grahpql.createOrder.opencollective', () => {
             amount: 2000,
             currency: 'USD',
             paymentMethodData: {
-              uuid: pm.uuid
-            }
+              uuid: pm.uuid,
+            },
           });
         } catch (e) {
           expect(e).to.exist;
-          expect(e.message).to.equal("You don't have enough permissions to use this payment method (you need to be an admin of the collective that owns this payment method)");
+          expect(e.message).to.equal(
+            "You don't have enough permissions to use this payment method (you need to be an admin of the collective that owns this payment method)",
+          );
         }
       }); /* End of "should fail if payment method from someone else is used" */
 
@@ -156,29 +169,32 @@ describe('grahpql.createOrder.opencollective', () => {
             initialBalance: 10000,
             currency: 'USD',
             data: { HostCollectiveId: 2000 },
-          }
+          },
         });
 
         // When the above order is executed; Then the transaction
         // should be unsuccessful.
-        await expect(libpayments.executeOrder(user, order)).to.be.eventually.rejectedWith(
-          Error, 'Prepaid method can only be used in collectives from the same host');
+        await expect(
+          libpayments.executeOrder(user, order),
+        ).to.be.eventually.rejectedWith(
+          Error,
+          'Prepaid method can only be used in collectives from the same host',
+        );
       }); /* End of "should fail if from collective and collective are from different hosts" */
 
-      it('should fail to place an order if there is not enough balance', () => {
-      }); /* End of "should fail to place an order if there is not enough balance" */
-
+      it('should fail to place an order if there is not enough balance', () => {}); /* End of "should fail to place an order if there is not enough balance" */
     }); /* End of "#processOrder" */
-
   }); /* End of "prepaid" */
 
   describe('giftcard', () => {
-
     describe('#getBalance', () => {
-
       it('should error if payment method is not a giftcard', async () => {
-        expect(giftcard.getBalance({ service: 'opencollective', type: 'prepaid' }))
-          .to.be.rejectedWith(Error, 'Expected opencollective.giftcard but got opencollective.prepaid');
+        expect(
+          giftcard.getBalance({ service: 'opencollective', type: 'prepaid' }),
+        ).to.be.rejectedWith(
+          Error,
+          'Expected opencollective.giftcard but got opencollective.prepaid',
+        );
       }); /* End of "should error if payment method is not a giftcard" */
 
       it('should return the monthlyLimitPerMember as amount', async () => {
@@ -191,15 +207,12 @@ describe('grahpql.createOrder.opencollective', () => {
 
         expect(await giftcard.getBalance(paymentMethod)).to.deep.equal({
           amount: 5000,
-          currency: 'USD'
+          currency: 'USD',
         });
-
       }); /* End of "should return the monthlyLimitPerMember as amount" */
-
     }); /* End of "#getBalance" */
 
     describe('#processOrder', async () => {
-
       beforeEach(utils.resetTestDB);
 
       let user, userCollective, collective, hostCollective, hostAdmin;
@@ -217,16 +230,21 @@ describe('grahpql.createOrder.opencollective', () => {
 
       it('should error if the card does not have enough balance', async () => {
         // Given a giftcard with 30 BRL
-        const [pm] = await giftcard.createGiftcards([{
-          count: 1,
-          expiryDate: new Date('2218-12-15 08:00:00'), // will break CI in 2218!!
-        }], {
-          name: 'test giftcard',
-          currency: 'BRL',
-          monthlyLimitPerMember: 3000,
-          CollectiveId: userCollective.id,
-          CreatedByUserId: hostAdmin.id,
-        });
+        const [pm] = await giftcard.createGiftcards(
+          [
+            {
+              count: 1,
+              expiryDate: new Date('2218-12-15 08:00:00'), // will break CI in 2218!!
+            },
+          ],
+          {
+            name: 'test giftcard',
+            currency: 'BRL',
+            monthlyLimitPerMember: 3000,
+            CollectiveId: userCollective.id,
+            CreatedByUserId: hostAdmin.id,
+          },
+        );
 
         // And given an order
         const order = {
@@ -239,29 +257,39 @@ describe('grahpql.createOrder.opencollective', () => {
             token: pm.token,
           },
           quantity: 1,
-          totalAmount: 5000
+          totalAmount: 5000,
         };
 
-        const result = await utils.graphqlQuery(createOrderQuery, { order }, user);
+        const result = await utils.graphqlQuery(
+          createOrderQuery,
+          { order },
+          user,
+        );
 
         expect(result.errors).to.exist;
         expect(result.errors[0].message).to.equal(
-          'The total amount of this order (R$50) is higher than your monthly spending limit on this payment method (opencollective:giftcard) (R$30)');
+          'The total amount of this order (R$50) is higher than your monthly spending limit on this payment method (opencollective:giftcard) (R$30)',
+        );
       }); /* End of "should error if the card does not have enough balance" */
 
       it('should error if the card does not have enough balance', async () => {
         // Given a giftcard with 50 BRL
-        const [pm] = await giftcard.createGiftcards([{
-          count: 1,
-          expiryDate: new Date('2218-12-15 08:00:00'), // will break CI in 2218!!
-        }], {
-          name: 'test giftcard',
-          currency: 'BRL',
-          monthlyLimitPerMember: 5000,
-          CollectiveId: userCollective.id,
-          data: { HostCollectiveId: hostCollective.id },
-          CreatedByUserId: hostAdmin.id,
-        });
+        const [pm] = await giftcard.createGiftcards(
+          [
+            {
+              count: 1,
+              expiryDate: new Date('2218-12-15 08:00:00'), // will break CI in 2218!!
+            },
+          ],
+          {
+            name: 'test giftcard',
+            currency: 'BRL',
+            monthlyLimitPerMember: 5000,
+            CollectiveId: userCollective.id,
+            data: { HostCollectiveId: hostCollective.id },
+            CreatedByUserId: hostAdmin.id,
+          },
+        );
 
         // And given an order
         const order = {
@@ -274,10 +302,14 @@ describe('grahpql.createOrder.opencollective', () => {
             token: pm.token,
           },
           quantity: 1,
-          totalAmount: 5000
+          totalAmount: 5000,
         };
 
-        const result = await utils.graphqlQuery(createOrderQuery, { order }, user);
+        const result = await utils.graphqlQuery(
+          createOrderQuery,
+          { order },
+          user,
+        );
         result.errors && console.log(result.errors);
         expect(result.errors).to.not.exist;
 
@@ -303,13 +335,11 @@ describe('grahpql.createOrder.opencollective', () => {
         expect(tr4.type).to.equal('CREDIT');
 
         // Original payment method should be archived
-        const originalPm = await models.PaymentMethod.findOne({ where: { token: pm.token } });
+        const originalPm = await models.PaymentMethod.findOne({
+          where: { token: pm.token },
+        });
         expect(originalPm.archivedAt).to.not.be.null;
-
       }); /* End of "should error if the card does not have enough balance" */
-
     }); /* End of "#processOrder" */
-
   }); /* End of "giftcard" */
-
 }); /* End of "grahpql.createOrder.opencollective" */

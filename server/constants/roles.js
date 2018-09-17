@@ -6,5 +6,5 @@ export default {
   BACKER: 'BACKER', // supporter giving money
   FUNDRAISER: 'FUNDRAISER', // someone helping to raise money (using referral)
   ATTENDEE: 'ATTENDEE', // someone who registered for a free tier (typically a free event ticket)
-  FOLLOWER: 'FOLLOWER' // someone interested to follow the activities of the collective/event
+  FOLLOWER: 'FOLLOWER', // someone interested to follow the activities of the collective/event
 };

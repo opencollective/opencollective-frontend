@@ -8,7 +8,6 @@ import config from 'config';
 const emailData = utils.data('emailData');
 
 describe('lib/email', () => {
-
   let nm;
 
   // create a fake nodemailer transport
@@ -17,13 +16,13 @@ describe('lib/email', () => {
     config.mailgun.password = 'password';
 
     nm = nodemailer.createTransport({
-          name: 'testsend',
-          service: 'Mailgun',
-          sendMail (data, callback) {
-              callback();
-          },
-          logger: false
-        });
+      name: 'testsend',
+      service: 'Mailgun',
+      sendMail(data, callback) {
+        callback();
+      },
+      logger: false,
+    });
     sinon.stub(nodemailer, 'createTransport').callsFake(() => {
       return nm;
     });
@@ -41,7 +40,7 @@ describe('lib/email', () => {
   afterEach(done => {
     nm.sendMail.restore();
     done();
-  })
+  });
 
   afterEach(() => {
     config.mailgun.user = '';
@@ -49,48 +48,52 @@ describe('lib/email', () => {
     nodemailer.createTransport.restore();
   });
 
-
   it('sends the thankyou.fr email template', () => {
-
     const template = 'thankyou';
-    const collective = { name: "En Marche", slug: "enmarchebe" };
+    const collective = { name: 'En Marche', slug: 'enmarchebe' };
     const data = {
-      order: { totalAmount: 5000, currency: 'EUR'},
+      order: { totalAmount: 5000, currency: 'EUR' },
       transaction: { uuid: '17811b3e-0ac4-4101-81d4-86e9e0aefd7b' },
       config: { host: config.host },
       interval: 'month',
       firstPayment: false,
       user: emailData.user,
-      fromCollective: { id: 1, slug: "xdamman", name: "Xavier" },
-      collective
+      fromCollective: { id: 1, slug: 'xdamman', name: 'Xavier' },
+      collective,
     };
     const options = {
       from: `${collective.name} <hello@${collective.slug}.opencollective.com>`,
     };
-    return emailLib.send(template, data.user.email, data, options)
-      .tap(() => {
-        let amountStr = 50;
-        amountStr = amountStr.toLocaleString('fr-BE', {
-          style: 'currency',
-          currency: 'EUR',
-          minimumFractionDigits : 0,
-          maximumFractionDigits : 0
-        });
-        expect(nm.sendMail.lastCall.args[0].from).to.equal(options.from);
-        expect(nm.sendMail.lastCall.args[0].to).to.equal('emailbcc+user1-at-opencollective.com@opencollective.com');
-        expect(nm.sendMail.lastCall.args[0].subject).to.contain(`Merci pour votre donation de ${amountStr}/mois à En Marche`);
-        expect(nm.sendMail.lastCall.args[0].html).to.contain(`Merci pour continuer à nous soutenir`);
-        expect(nm.sendMail.lastCall.args[0].html).to.contain(`donate?referral=1`);
-        expect(nm.sendMail.lastCall.args[0].headers['X-Mailgun-Tag']).to.equal('internal');
+    return emailLib.send(template, data.user.email, data, options).tap(() => {
+      let amountStr = 50;
+      amountStr = amountStr.toLocaleString('fr-BE', {
+        style: 'currency',
+        currency: 'EUR',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
       });
+      expect(nm.sendMail.lastCall.args[0].from).to.equal(options.from);
+      expect(nm.sendMail.lastCall.args[0].to).to.equal(
+        'emailbcc+user1-at-opencollective.com@opencollective.com',
+      );
+      expect(nm.sendMail.lastCall.args[0].subject).to.contain(
+        `Merci pour votre donation de ${amountStr}/mois à En Marche`,
+      );
+      expect(nm.sendMail.lastCall.args[0].html).to.contain(
+        'Merci pour continuer à nous soutenir',
+      );
+      expect(nm.sendMail.lastCall.args[0].html).to.contain('donate?referral=1');
+      expect(nm.sendMail.lastCall.args[0].headers['X-Mailgun-Tag']).to.equal(
+        'internal',
+      );
+    });
   });
 
   it('sends the thankyou.wwcode email template', () => {
-
     const paymentData = {
       totalAmount: 5000,
-      currency: 'USD'
-     };
+      currency: 'USD',
+    };
 
     const data = {
       order: paymentData,
@@ -99,31 +102,33 @@ describe('lib/email', () => {
       interval: 'month',
       user: emailData.user,
       collective: {
-        name: "WWCode Austin",
-        slug: "wwcodeaustin"
-      }
+        name: 'WWCode Austin',
+        slug: 'wwcodeaustin',
+      },
     };
-    return emailLib.send('thankyou', data.user.email, data)
-      .tap(() => {
-        let amountStr = 50;
-        amountStr = amountStr.toLocaleString('en-US', {
-          style: 'currency',
-          currency: 'USD',
-          minimumFractionDigits : 0,
-          maximumFractionDigits : 0
-        });
-        expect(nm.sendMail.lastCall.args[0].to).to.equal('emailbcc+user1-at-opencollective.com@opencollective.com');
-        expect(nm.sendMail.lastCall.args[0].subject).to.contain(`Thank you for your ${amountStr}/month donation to WWCode Austin`);
-        expect(nm.sendMail.lastCall.args[0].html).to.contain('4218859');
+    return emailLib.send('thankyou', data.user.email, data).tap(() => {
+      let amountStr = 50;
+      amountStr = amountStr.toLocaleString('en-US', {
+        style: 'currency',
+        currency: 'USD',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
       });
+      expect(nm.sendMail.lastCall.args[0].to).to.equal(
+        'emailbcc+user1-at-opencollective.com@opencollective.com',
+      );
+      expect(nm.sendMail.lastCall.args[0].subject).to.contain(
+        `Thank you for your ${amountStr}/month donation to WWCode Austin`,
+      );
+      expect(nm.sendMail.lastCall.args[0].html).to.contain('4218859');
+    });
   });
 
   it('sends the thankyou.brusselstogether email template', () => {
-
     const paymentData = {
       totalAmount: 5000,
-      currency: 'EUR'
-     };
+      currency: 'EUR',
+    };
 
     const data = {
       order: paymentData,
@@ -134,27 +139,37 @@ describe('lib/email', () => {
       collective: {
         name: '#BrusselsTogether',
         slug: 'brusselstogether',
-        image: 'https://cl.ly/0Q3N193Z1e3u/BrusselsTogetherLogo.png'
+        image: 'https://cl.ly/0Q3N193Z1e3u/BrusselsTogetherLogo.png',
       },
-      relatedCollectives: utils.data('relatedCollectives')
+      relatedCollectives: utils.data('relatedCollectives'),
     };
-    const from = `BrusselsTogether <info@brusselstogether.opencollective.com>`;
-    return emailLib.send('thankyou', data.user.email, data, { from })
+    const from = 'BrusselsTogether <info@brusselstogether.opencollective.com>';
+    return emailLib
+      .send('thankyou', data.user.email, data, { from })
       .tap(() => {
         let amountStr = 50;
         amountStr = amountStr.toLocaleString('EUR', {
           style: 'currency',
           currency: 'EUR',
-          minimumFractionDigits : 0,
-          maximumFractionDigits : 0
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0,
         });
 
         expect(nm.sendMail.lastCall.args[0].from).to.equal(from);
-        expect(nm.sendMail.lastCall.args[0].to).to.equal('emailbcc+user1-at-opencollective.com@opencollective.com');
-        expect(nm.sendMail.lastCall.args[0].subject).to.contain(`Thank you for your ${amountStr}/month donation to #BrusselsTogether`);
-        expect(nm.sendMail.lastCall.args[0].html).to.contain(data.relatedCollectives[0].name);
-        expect(nm.sendMail.lastCall.args[0].html).to.contain(`${config.host.website}/${data.collective.slug}/transactions/${data.transaction.uuid}/invoice.pdf`);
+        expect(nm.sendMail.lastCall.args[0].to).to.equal(
+          'emailbcc+user1-at-opencollective.com@opencollective.com',
+        );
+        expect(nm.sendMail.lastCall.args[0].subject).to.contain(
+          `Thank you for your ${amountStr}/month donation to #BrusselsTogether`,
+        );
+        expect(nm.sendMail.lastCall.args[0].html).to.contain(
+          data.relatedCollectives[0].name,
+        );
+        expect(nm.sendMail.lastCall.args[0].html).to.contain(
+          `${config.host.website}/${data.collective.slug}/transactions/${
+            data.transaction.uuid
+          }/invoice.pdf`,
+        );
       });
   });
-
 });

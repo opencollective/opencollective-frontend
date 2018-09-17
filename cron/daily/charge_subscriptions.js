@@ -28,23 +28,34 @@ const csvFields = [
   'chargeDateBefore',
   'chargeDateAfter',
   'nextPeriodStartBefore',
-  'nextPeriodStartAfter'
+  'nextPeriodStartAfter',
 ];
 
 /** Run the script with parameters read from the command line */
 async function run(options) {
-  const start = new Date;
+  const start = new Date();
   const allOrders = await ordersWithPendingCharges();
-  const orders = (options.limit) ? allOrders.slice(0, options.limit) : allOrders;
-  vprint(options, `${allOrders.length} subscriptions pending charges. Charging ${orders.length} subscriptions right now. dryRun: ${options.dryRun}`);
+  const orders = options.limit ? allOrders.slice(0, options.limit) : allOrders;
+  vprint(
+    options,
+    `${allOrders.length} subscriptions pending charges. Charging ${
+      orders.length
+    } subscriptions right now. dryRun: ${options.dryRun}`,
+  );
   const data = [];
-  await promiseSeq(orders, async (order) => {
-    vprint(options,
-           `order: ${order.id}, subscription: ${order.Subscription.id}, ` +
-           `attempt: #${order.Subscription.chargeRetryCount}, ` +
-           `due: ${order.Subscription.nextChargeDate}`);
-    data.push(await processOrderWithSubscription(options, order));
-  }, options.batchSize);
+  await promiseSeq(
+    orders,
+    async order => {
+      vprint(
+        options,
+        `order: ${order.id}, subscription: ${order.Subscription.id}, ` +
+          `attempt: #${order.Subscription.chargeRetryCount}, ` +
+          `due: ${order.Subscription.nextChargeDate}`,
+      );
+      data.push(await processOrderWithSubscription(options, order));
+    },
+    options.batchSize,
+  );
 
   if (data.length > 0) {
     await json2csv({ data, fields: csvFields }, async (err, csv) => {
@@ -56,11 +67,18 @@ async function run(options) {
         } else {
           if (!options.dryRun) {
             vprint(options, 'Sending email report');
-            const attachments = [{
-              filename: `${(new Date).toLocaleDateString()}.csv`,
-              content: csv
-            }];
-            await emailReport(start, orders, groupProcessedOrders(data), attachments);
+            const attachments = [
+              {
+                filename: `${new Date().toLocaleDateString()}.csv`,
+                content: csv,
+              },
+            ];
+            await emailReport(
+              start,
+              orders,
+              groupProcessedOrders(data),
+              attachments,
+            );
           }
         }
       }
@@ -72,11 +90,12 @@ async function run(options) {
 }
 
 /** Send an email with a message just notifying that there were no
-    subscriptions to charge. */
+ subscriptions to charge. */
 
 async function emailReportNoCharges(start) {
   // Time we spent running the whole script
-  const now = new Date, end = now - start;
+  const now = new Date(),
+    end = now - start;
   // Build & send message
   const text = `No subscriptions pending charges found\n\nTotal time taken: ${end}ms`;
   const subject = `Ø Daily Subscription Report - ${now.toLocaleDateString()}`;
@@ -85,21 +104,32 @@ async function emailReportNoCharges(start) {
 
 /** Send an email with details of the subscriptions processed */
 async function emailReport(start, orders, data, attachments) {
-  const icon = (err) => err ? '❌' : '✅';
-  let result = [`Total Subscriptions pending charges found: ${orders.length}`, ''];
+  const icon = err => (err ? '❌' : '✅');
+  let result = [
+    `Total Subscriptions pending charges found: ${orders.length}`,
+    '',
+  ];
 
   // Add entries of each group to the result list
-  const printGroup = ([ name, { total, entries } ]) => {
-    result.push(`>>> ${entries.length} orders ${name} (sum of amounts: ${total})`);
-    result = result.concat(entries.map((i) => [
-      ` ${i.status !== 'unattempted' ? icon(i.error) : ''} order: ${i.orderId}`,
-      `subscription: ${i.subscriptionId}`,
-      `amount: ${i.amount}`,
-      `from: ${i.from}`,
-      `to: ${i.to}`,
-      `status: ${i.status}`,
-      `error: ${i.error}`,
-    ].join(', ')));
+  const printGroup = ([name, { total, entries }]) => {
+    result.push(
+      `>>> ${entries.length} orders ${name} (sum of amounts: ${total})`,
+    );
+    result = result.concat(
+      entries.map(i =>
+        [
+          ` ${i.status !== 'unattempted' ? icon(i.error) : ''} order: ${
+            i.orderId
+          }`,
+          `subscription: ${i.subscriptionId}`,
+          `amount: ${i.amount}`,
+          `from: ${i.from}`,
+          `to: ${i.to}`,
+          `status: ${i.status}`,
+          `error: ${i.error}`,
+        ].join(', '),
+      ),
+    );
     result.push('');
   };
 
@@ -108,18 +138,21 @@ async function emailReport(start, orders, data, attachments) {
   for (const group of data) printGroup(group);
 
   // Time we spent running the whole script
-  const now = new Date, end = now - start;
+  const now = new Date(),
+    end = now - start;
   result.push(`\n\nTotal time taken: ${end}ms`);
 
   // Subject line of the email
   const issuesFound = data.get('canceled') || data.get('past_due');
-  const subject = `${icon(issuesFound)} Daily Subscription Report - ${now.toLocaleDateString()}`;
+  const subject = `${icon(
+    issuesFound,
+  )} Daily Subscription Report - ${now.toLocaleDateString()}`;
 
   // Actual send
   return emailLib.sendMessage(REPORT_EMAIL, subject, '', {
     bcc: ' ',
     text: result.join('\n'),
-    attachments
+    attachments,
   });
 }
 
@@ -149,18 +182,18 @@ export function parseCommandLineArguments() {
     constant: true,
   });
   parser.addArgument(['-l', '--limit'], {
-    help: 'total subscriptions to process'
+    help: 'total subscriptions to process',
   });
   parser.addArgument(['-b', '--batch-size'], {
     help: 'batch size to fetch at a time',
-    defaultValue: 10
+    defaultValue: 10,
   });
   const args = parser.parseArgs();
   return {
     dryRun: args.dryrun,
     verbose: !args.quiet,
     limit: args.limit,
-    batchSize: args.batch_size
+    batchSize: args.batch_size,
   };
 }
 

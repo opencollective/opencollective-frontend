@@ -24,7 +24,12 @@ routes(app);
 const port = process.env.PORT || 3060;
 const server = app.listen(port, () => {
   const host = os.hostname();
-  console.log('Open Collective API listening at http://%s:%s in %s environment.\n', host, server.address().port, app.set('env'));
+  console.log(
+    'Open Collective API listening at http://%s:%s in %s environment.\n',
+    host,
+    server.address().port,
+    app.set('env'),
+  );
 });
 
 server.timeout = 25000; // sets timeout to 25 seconds

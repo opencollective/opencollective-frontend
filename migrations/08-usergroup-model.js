@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = {
-  up: function (queryInterface, DataTypes) {
+  up: function(queryInterface, DataTypes) {
     return queryInterface.createTable('UserGroups', {
       // Role.
       role: DataTypes.ENUM('admin', 'writer', 'viewer'),
@@ -9,33 +9,33 @@ module.exports = {
       // Dates.
       createdAt: {
         type: DataTypes.DATE,
-        defaultValue: DataTypes.NOW
+        defaultValue: DataTypes.NOW,
       },
       updatedAt: {
         type: DataTypes.DATE,
-        defaultValue: DataTypes.NOW
+        defaultValue: DataTypes.NOW,
       },
       deletedAt: {
-        type: DataTypes.DATE
+        type: DataTypes.DATE,
       },
       UserId: {
         type: DataTypes.INTEGER,
-        references: {key: 'id', model: 'Users'},
+        references: { key: 'id', model: 'Users' },
         primaryKey: true,
         allowNull: false,
         onDelete: 'CASCADE',
-        onUpdate: 'CASCADE'
+        onUpdate: 'CASCADE',
       },
       GroupId: {
         type: DataTypes.INTEGER,
-        references: {key: 'id', model: 'Groups' },
+        references: { key: 'id', model: 'Groups' },
         primaryKey: true,
-        allowNull: false
+        allowNull: false,
       },
     });
   },
 
-  down: function (queryInterface) {
+  down: function(queryInterface) {
     return queryInterface.dropTable('UserGroups');
-  }
+  },
 };

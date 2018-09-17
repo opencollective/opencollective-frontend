@@ -12,20 +12,22 @@ import * as store from './features/support/stores';
 
 describe('graphql.search.test.js', () => {
   let sandbox;
-  const hits = [{
-    id: 5,
-    name: 'Open Source Collective',
-    description: 'This is the Open Source Collective.',
-    currency: 'USD',
-    slug: 'test-collective',
-    mission: 'test mission',
-    tags: ['open', 'test', 'collective'],
-    locationName: 'Testland',
-    image: '',
-    balance: 1300,
-    yearlyBudget: 3600,
-    backersCount: 130
-  }];
+  const hits = [
+    {
+      id: 5,
+      name: 'Open Source Collective',
+      description: 'This is the Open Source Collective.',
+      currency: 'USD',
+      slug: 'test-collective',
+      mission: 'test mission',
+      tags: ['open', 'test', 'collective'],
+      locationName: 'Testland',
+      image: '',
+      balance: 1300,
+      yearlyBudget: 3600,
+      backersCount: 130,
+    },
+  ];
   const nbHits = 10;
 
   before(async () => {
@@ -35,8 +37,14 @@ describe('graphql.search.test.js', () => {
     // Given a random collective
     await store.newCollectiveWithHost('A random collective', 'USD', 'USD', 5);
     // Given the open source collective host
-    const { hostCollective } = await store.newHost('Open Source Collective', 'USD', 5);
-    await hostCollective.update({ description: 'This is the Open Source Collective.' });
+    const { hostCollective } = await store.newHost(
+      'Open Source Collective',
+      'USD',
+      5,
+    );
+    await hostCollective.update({
+      description: 'This is the Open Source Collective.',
+    });
   });
 
   beforeEach(() => {
@@ -59,12 +67,16 @@ describe('graphql.search.test.js', () => {
 
     const result = await utils.graphqlQuery(query, { term: 'open' });
 
-    expect(Index.prototype.search.firstCall.calledWith({
-      query: 'open',
-      length: 20,
-      offset: 0,
-    })).to.be.true;
-    expect(result.data.search).to.deep.equal({ collectives: [{ id: hits[0].id }]});
+    expect(
+      Index.prototype.search.firstCall.calledWith({
+        query: 'open',
+        length: 20,
+        offset: 0,
+      }),
+    ).to.be.true;
+    expect(result.data.search).to.deep.equal({
+      collectives: [{ id: hits[0].id }],
+    });
   });
 
   it('accepts limit and offset arguments', async () => {
@@ -83,21 +95,28 @@ describe('graphql.search.test.js', () => {
     }
     `;
 
-    const result = await utils.graphqlQuery(query, { term: 'open', limit: 20, offset: 0 });
-
-    expect(Index.prototype.search.firstCall.calledWith({
-      query: 'open',
-      length: 20,
+    const result = await utils.graphqlQuery(query, {
+      term: 'open',
+      limit: 20,
       offset: 0,
-    })).to.be.true;
+    });
 
-    expect(result.data.search)
-    .to.deep.equal({
-      collectives: [{
-        id: hits[0].id,
-        name: hits[0].name,
-        description: hits[0].description,
-      }],
+    expect(
+      Index.prototype.search.firstCall.calledWith({
+        query: 'open',
+        length: 20,
+        offset: 0,
+      }),
+    ).to.be.true;
+
+    expect(result.data.search).to.deep.equal({
+      collectives: [
+        {
+          id: hits[0].id,
+          name: hits[0].name,
+          description: hits[0].description,
+        },
+      ],
       total: nbHits,
       limit: 20,
       offset: 0,

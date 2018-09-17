@@ -6,9 +6,9 @@ import models from '../../models';
  *
  * @param {Object} args contains the parameters to create the new
  *  payment method.
-* @param {Object} args contains the parameters to create the new
+ * @param {Object} args contains the parameters to create the new
  *  payment method.
-*/
+ */
 export async function createPaymentMethod(args, remoteUser) {
   // We only support the creation of virtual cards payment methods at the moment
   if (!args || !args.type || args.type != 'virtualcard') {
@@ -42,7 +42,11 @@ async function createVirtualPaymentMethod(args, remoteUser) {
   // making sure it's a string, trim and uppercase it.
   args.currency = args.currency.toString().toUpperCase();
   if (!['USD', 'EUR'].includes(args.currency)) {
-    throw new Error(`Currency ${args.currency} not supported. We only support USD and EUR at the moment.`);
+    throw new Error(
+      `Currency ${
+        args.currency
+      } not supported. We only support USD and EUR at the moment.`,
+    );
   }
   const paymentMethod = await virtualcard.create(args, remoteUser);
   return paymentMethod;
@@ -56,18 +60,29 @@ async function createVirtualPaymentMethod(args, remoteUser) {
  */
 export async function claimVirtualCard(args, remoteUser) {
   const paymentMethod = await virtualcard.claim(args, remoteUser);
-  const user = await models.User.findOne({ where: { CollectiveId: paymentMethod.CollectiveId }});
+  const user = await models.User.findOne({
+    where: { CollectiveId: paymentMethod.CollectiveId },
+  });
   const amount = paymentMethod.initialBalance;
   const currency = paymentMethod.currency;
-  const emitter = await models.Collective.findById(paymentMethod.sourcePaymentMethod.CollectiveId);
+  const emitter = await models.Collective.findById(
+    paymentMethod.sourcePaymentMethod.CollectiveId,
+  );
   const userCollective = await user.getCollective();
-  const name = userCollective.name && userCollective.name.match(/anonymous/i) ? '' : user.name;
+  const name =
+    userCollective.name && userCollective.name.match(/anonymous/i)
+      ? ''
+      : user.name;
 
   emailLib.send('user.card.claimed', args.email, {
-    loginLink: user.generateLoginLink(`/redeemed?name=${name}&amount=${amount}&currency=${currency}&emitterSlug=${emitter.slug}&emitterName=${emitter.name}`),
+    loginLink: user.generateLoginLink(
+      `/redeemed?name=${name}&amount=${amount}&currency=${currency}&emitterSlug=${
+        emitter.slug
+      }&emitterName=${emitter.name}`,
+    ),
     amount,
     currency,
     emitter,
-  })
+  });
   return paymentMethod;
 }

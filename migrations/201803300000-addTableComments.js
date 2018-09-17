@@ -1,86 +1,85 @@
 'use strict';
 
 module.exports = {
-  up: function (queryInterface, DataTypes) {
-
+  up: function(queryInterface, DataTypes) {
     const commentAttributes = {
       id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
-        autoIncrement: true
+        autoIncrement: true,
       },
-  
+
       CollectiveId: {
         type: DataTypes.INTEGER,
         references: {
           model: 'Collectives',
-          key: 'id'
+          key: 'id',
         },
         onDelete: 'SET NULL',
         onUpdate: 'CASCADE',
-        allowNull: false
+        allowNull: false,
       },
-  
+
       FromCollectiveId: {
         type: DataTypes.INTEGER,
         references: {
           model: 'Collectives',
-          key: 'id'
+          key: 'id',
         },
         onDelete: 'SET NULL',
         onUpdate: 'CASCADE',
-        allowNull: false          
+        allowNull: false,
       },
-  
+
       CreatedByUserId: {
         type: DataTypes.INTEGER,
         references: {
           model: 'Users',
-          key: 'id'
+          key: 'id',
         },
         onDelete: 'SET NULL',
         onUpdate: 'CASCADE',
-        allowNull: false
+        allowNull: false,
       },
-  
+
       ExpenseId: {
         type: DataTypes.INTEGER,
         references: {
           model: 'Expenses',
-          key: 'id'
+          key: 'id',
         },
         onDelete: 'SET NULL',
         onUpdate: 'CASCADE',
-        allowNull: true
+        allowNull: true,
       },
 
       UpdateId: {
         type: DataTypes.INTEGER,
         references: {
           model: 'Updates',
-          key: 'id'
+          key: 'id',
         },
         onDelete: 'SET NULL',
         onUpdate: 'CASCADE',
-        allowNull: true
+        allowNull: true,
       },
-  
+
       markdown: DataTypes.TEXT,
       html: DataTypes.TEXT,
-  
+
       createdAt: {
         type: DataTypes.DATE,
-        defaultValue: DataTypes.NOW
+        defaultValue: DataTypes.NOW,
       },
-  
+
       updatedAt: {
         type: DataTypes.DATE,
-        defaultValue: DataTypes.NOW
+        defaultValue: DataTypes.NOW,
       },
-    
+
       deletedAt: {
-        type: DataTypes.DATE
-      }  
+        type: DataTypes.DATE,
+      },
     };
 
     const commentHistoriesAttributes = {
@@ -89,29 +88,37 @@ module.exports = {
         type: DataTypes.BIGINT,
         primaryKey: true,
         autoIncrement: true,
-        unique: true
+        unique: true,
       },
       archivedAt: {
         type: DataTypes.DATE,
         allowNull: false,
-        defaultValue: DataTypes.NOW
-      }  
+        defaultValue: DataTypes.NOW,
+      },
     };
-    return queryInterface.createTable('Comments', commentAttributes, { paranoid: true })
-      .then(() => queryInterface.addIndex('Comments', ['ExpenseId', 'createdAt'], {
-        indexName: `Comments_ExpenseId_createdAt`
-      }))
-      .then(() => queryInterface.addIndex('Comments', ['UpdateId', 'createdAt'], {
-        indexName: `Comments_UpdateId_createdAt`
-      }))
-      .then(() => queryInterface.createTable('CommentHistories', {
-        ...commentAttributes,
-        ...commentHistoriesAttributes
-      }))
+    return queryInterface
+      .createTable('Comments', commentAttributes, { paranoid: true })
+      .then(() =>
+        queryInterface.addIndex('Comments', ['ExpenseId', 'createdAt'], {
+          indexName: `Comments_ExpenseId_createdAt`,
+        }),
+      )
+      .then(() =>
+        queryInterface.addIndex('Comments', ['UpdateId', 'createdAt'], {
+          indexName: `Comments_UpdateId_createdAt`,
+        }),
+      )
+      .then(() =>
+        queryInterface.createTable('CommentHistories', {
+          ...commentAttributes,
+          ...commentHistoriesAttributes,
+        }),
+      );
   },
 
-  down: function (queryInterface) {
-    return queryInterface.dropTable('Comments')
+  down: function(queryInterface) {
+    return queryInterface
+      .dropTable('Comments')
       .then(() => queryInterface.dropTable('CommmentHistories'));
-  }
+  },
 };

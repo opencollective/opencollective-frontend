@@ -9,5 +9,5 @@ export default {
   PENDING: 'PENDING',
   APPROVED: 'APPROVED',
   REJECTED: 'REJECTED',
-  PAID: 'PAID'
+  PAID: 'PAID',
 };

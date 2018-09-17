@@ -27,7 +27,7 @@ export async function main(args) {
 
   const data = await hasData(clientApp);
 
-  if (!data || data && args.force) {
+  if (!data || (data && args.force)) {
     await libdb.loadDB(args.file);
   }
 
@@ -38,7 +38,7 @@ export async function main(args) {
 function parseCommandLineArguments() {
   const parser = new ArgumentParser({
     addHelp: true,
-    description: 'Restore dump file into a Database'
+    description: 'Restore dump file into a Database',
   });
   parser.addArgument(['-q', '--quiet'], {
     help: 'Silence output',
@@ -47,13 +47,13 @@ function parseCommandLineArguments() {
     constant: false,
   });
   parser.addArgument(['-f', '--force'], {
-    help: "Overwrite existing database",
+    help: 'Overwrite existing database',
     defaultValue: false,
     action: 'storeConst',
     constant: true,
   });
   parser.addArgument(['file'], {
-    help: "Path for the dump file",
+    help: 'Path for the dump file',
     action: 'store',
   });
   return parser.parseArgs();

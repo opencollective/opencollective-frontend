@@ -1,7 +1,4 @@
-import {
-  GraphQLObjectType,
-  GraphQLSchema,
-} from 'graphql';
+import { GraphQLObjectType, GraphQLSchema } from 'graphql';
 
 import {
   CollectiveInterfaceType,
@@ -16,13 +13,10 @@ import {
 import {
   TransactionInterfaceType,
   TransactionOrderType,
-  TransactionExpenseType
+  TransactionExpenseType,
 } from './TransactionInterface';
 
-import {
-  ApplicationType,
-  ApplicationInputType
-} from './Application';
+import { ApplicationType, ApplicationInputType } from './Application';
 
 import query from './queries';
 import mutation from './mutations';
@@ -31,17 +25,17 @@ const Query = new GraphQLObjectType({
   name: 'Query',
   description: 'This is a root query',
   fields: () => {
-    return query
-  }
+    return query;
+  },
 });
 
 const Mutation = new GraphQLObjectType({
   name: 'Mutation',
   description: 'This is the root mutation',
   fields: () => {
-    return mutation
-  }
-})
+    return mutation;
+  },
+});
 
 const Schema = new GraphQLSchema({
   types: [
@@ -59,7 +53,7 @@ const Schema = new GraphQLSchema({
     ApplicationInputType,
   ],
   query: Query,
-  mutation: Mutation
+  mutation: Mutation,
 });
 
-export default Schema
+export default Schema;

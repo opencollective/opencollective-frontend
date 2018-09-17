@@ -10,7 +10,6 @@ const paypalPaymentMethod = utils.data('paymentMethod1');
 const stripePaymentMethod = utils.data('paymentMethod2');
 
 describe('paymentMethods.routes.test.js', () => {
-
   let user;
   let user2;
   let paymentMethod1;
@@ -18,25 +17,35 @@ describe('paymentMethods.routes.test.js', () => {
   beforeEach(() => utils.resetTestDB());
 
   // Create users.
-  beforeEach(() => models.User.createUserWithCollective(utils.data('user1')).tap(u => user = u));
+  beforeEach(() =>
+    models.User.createUserWithCollective(utils.data('user1')).tap(
+      u => (user = u),
+    ));
 
-  beforeEach(() => models.User.createUserWithCollective(utils.data('user2')).tap(u => user2 = u));
+  beforeEach(() =>
+    models.User.createUserWithCollective(utils.data('user2')).tap(
+      u => (user2 = u),
+    ));
 
   // Create paymentMethod.
   beforeEach(() => {
-    const data = _.extend(paypalPaymentMethod, { CreatedByUserId: user.id, CollectiveId: user.CollectiveId });
-    return models.PaymentMethod.create(data).tap(pm => paymentMethod1 = pm);
+    const data = _.extend(paypalPaymentMethod, {
+      CreatedByUserId: user.id,
+      CollectiveId: user.CollectiveId,
+    });
+    return models.PaymentMethod.create(data).tap(pm => (paymentMethod1 = pm));
   });
 
   beforeEach(() => {
-    const data = _.extend(stripePaymentMethod, { CreatedByUserId: user.id, CollectiveId: user.CollectiveId });
+    const data = _.extend(stripePaymentMethod, {
+      CreatedByUserId: user.id,
+      CollectiveId: user.CollectiveId,
+    });
     return models.PaymentMethod.create(data);
   });
 
-
   describe('#getMembers', () => {
-
-    it('fails getting another user\'s paymentMethods', (done) => {
+    it("fails getting another user's paymentMethods", done => {
       request(app)
         .get(`/users/${user.id}/payment-methods?api_key=${application.api_key}`)
         .set('Authorization', `Bearer ${user2.jwt()}`)
@@ -47,7 +56,7 @@ describe('paymentMethods.routes.test.js', () => {
         });
     });
 
-    it('successfully get a user\'s paymentMethod', (done) => {
+    it("successfully get a user's paymentMethod", done => {
       request(app)
         .get(`/users/${user.id}/payment-methods?api_key=${application.api_key}`)
         .set('Authorization', `Bearer ${user.jwt()}`)
@@ -64,13 +73,13 @@ describe('paymentMethods.routes.test.js', () => {
         });
     });
 
-    it('successfully get a user\'s paymentMethod and filters by service', (done) => {
+    it("successfully get a user's paymentMethod and filters by service", done => {
       request(app)
         .get(`/users/${user.id}/payment-methods?api_key=${application.api_key}`)
         .query({
           filter: {
-            service: 'paypal'
-          }
+            service: 'paypal',
+          },
         })
         .set('Authorization', `Bearer ${user.jwt()}`)
         .expect(200)
@@ -85,6 +94,5 @@ describe('paymentMethods.routes.test.js', () => {
           done();
         });
     });
-
   });
 });

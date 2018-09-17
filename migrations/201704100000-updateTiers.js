@@ -1,33 +1,37 @@
 'use strict';
 
 module.exports = {
-  up: function (queryInterface, Sequelize) {
-    return queryInterface.changeColumn('Tiers', 'EventId', {
+  up: function(queryInterface, Sequelize) {
+    return queryInterface
+      .changeColumn('Tiers', 'EventId', {
         type: Sequelize.INTEGER,
         references: {
           model: 'Events',
-          key: 'id'
+          key: 'id',
         },
         onDelete: 'SET NULL',
         onUpdate: 'CASCADE',
-        allowNull: true
+        allowNull: true,
       })
-      .then(() => queryInterface.addColumn('Tiers', 'slug', {
-        type: Sequelize.STRING
-      }))
+      .then(() =>
+        queryInterface.addColumn('Tiers', 'slug', {
+          type: Sequelize.STRING,
+        }),
+      );
   },
 
-  down: function (queryInterface, Sequelize) {
-    return queryInterface.changeColumn('Tiers', 'EventId', {
+  down: function(queryInterface, Sequelize) {
+    return queryInterface
+      .changeColumn('Tiers', 'EventId', {
         type: Sequelize.INTEGER,
         references: {
           model: 'Events',
-          key: 'id'
+          key: 'id',
         },
         onDelete: 'SET NULL',
         onUpdate: 'CASCADE',
-        allowNull: false
+        allowNull: false,
       })
-      .then(() => queryInterface.removeColumn('Tiers', 'slug'))
-  }
+      .then(() => queryInterface.removeColumn('Tiers', 'slug'));
+  },
 };

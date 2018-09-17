@@ -4,15 +4,18 @@ import errors from '../lib/errors';
 import requestPromise from 'request-promise';
 
 class Meetup {
-
   constructor(meetupAccount, collective) {
     if (!meetupAccount || !meetupAccount.token)
-      return Promise.reject(new errors.ValidationFailed("This collective doesn't have a meetup.com account connected"));
+      return Promise.reject(
+        new errors.ValidationFailed(
+          "This collective doesn't have a meetup.com account connected",
+        ),
+      );
 
     this.collective = collective;
     this.settings = {
       api_key: meetupAccount.token,
-      slug: meetupAccount.username
+      slug: meetupAccount.username,
     };
   }
 
@@ -21,7 +24,9 @@ class Meetup {
    * Otherwise we show the 10 top backers
    */
   makeHeader() {
-    let header = '', usersList = '', tier = {};
+    let header = '',
+      usersList = '',
+      tier = {};
     const users = values(this.collective.users);
 
     // Order backers by totalDonations DESC
@@ -37,28 +42,41 @@ class Meetup {
     }
 
     if (tier.users.length > 0) {
-      usersList = tier.users.map((user) => (user.website) ? `<a href="${user.website}">${user.name}</a>` : user.name).join(', ');
-      usersList = usersList.replace(/,([^,]*)$/,' and$1');
+      usersList = tier.users
+        .map(
+          user =>
+            user.website
+              ? `<a href="${user.website}">${user.name}</a>`
+              : user.name,
+        )
+        .join(', ');
+      usersList = usersList.replace(/,([^,]*)$/, ' and$1');
       header += `<p>Thank you to our ${tier.name}s ${usersList}</p> `;
     }
 
-    header += `<p><a href="https://opencollective.com/${this.collective.slug}#${tier.name}s"><img src="https://opencollective.com/${this.collective.slug}/${tier.name}s.png?width=700"></a></p>`;
+    header += `<p><a href="https://opencollective.com/${this.collective.slug}#${
+      tier.name
+    }s"><img src="https://opencollective.com/${this.collective.slug}/${
+      tier.name
+    }s.png?width=700"></a></p>`;
 
     return header;
   }
 
   updateMeetupDescription(eventId, description) {
     return requestPromise({
-      url: `http://api.meetup.com/2/event/${eventId}?key=${this.settings.api_key}`,
+      url: `http://api.meetup.com/2/event/${eventId}?key=${
+        this.settings.api_key
+      }`,
       method: 'post',
       form: { description },
-      json: true
+      json: true,
     });
   }
 
   generateNewDescription(action, description) {
     const descriptionHeader = this.makeHeader();
-    const regex = new RegExp(`<p><a href="https://opencollective.com/`);
+    const regex = new RegExp('<p><a href="https://opencollective.com/');
     let newDescription = null;
     switch (action) {
       case 'addHeader':
@@ -70,8 +88,14 @@ class Meetup {
         if (description.match(regex)) {
           const paragraphs = description.split('</p> <p>');
           // If there were no backers, we only have one paragraph to remove
-          const numberOfParagraphsToSkip = ( paragraphs[1].substr(0,36) === `<a href="https://opencollective.com/`) ? 2 : 1;
-          newDescription = `<p>${paragraphs.slice(numberOfParagraphsToSkip).join('</p> <p>')}`;
+          const numberOfParagraphsToSkip =
+            paragraphs[1].substr(0, 36) ===
+            '<a href="https://opencollective.com/'
+              ? 2
+              : 1;
+          newDescription = `<p>${paragraphs
+            .slice(numberOfParagraphsToSkip)
+            .join('</p> <p>')}`;
         }
         break;
     }
@@ -79,35 +103,46 @@ class Meetup {
   }
 
   syncCollective(action = 'addHeader') {
-
     if (!this.settings.api_key)
-      return Promise.reject(new errors.ValidationFailed("This collective doesn't have a meetup.com account connected"));
+      return Promise.reject(
+        new errors.ValidationFailed(
+          "This collective doesn't have a meetup.com account connected",
+        ),
+      );
 
     const urlname = this.settings.slug;
 
     const reqopt = {
-      url: `http://api.meetup.com/${urlname}/events?key=${this.settings.api_key}`,
-      json: true
+      url: `http://api.meetup.com/${urlname}/events?key=${
+        this.settings.api_key
+      }`,
+      json: true,
     };
 
     const promises = [];
     return requestPromise(reqopt)
       .then(meetups => {
-        for (let i=0;i<meetups.length;i++) {
+        for (let i = 0; i < meetups.length; i++) {
           const meetup = meetups[i];
-          const newDescription = this.generateNewDescription(action, meetup.description);
+          const newDescription = this.generateNewDescription(
+            action,
+            meetup.description,
+          );
           if (newDescription)
-            promises.push(this.updateMeetupDescription(meetup.id, newDescription));
+            promises.push(
+              this.updateMeetupDescription(meetup.id, newDescription),
+            );
         }
         return Promise.all(promises);
       })
       .catch(e => {
-        const error = (e.error && e.error.errors && e.error.errors.length > 0) ? e.error.errors[0].message : e.message || e;
+        const error =
+          e.error && e.error.errors && e.error.errors.length > 0
+            ? e.error.errors[0].message
+            : e.message || e;
         return Promise.reject(new errors.BadRequest(error));
       });
-
   }
-
 }
 
 export default Meetup;

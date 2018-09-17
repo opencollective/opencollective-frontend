@@ -18,28 +18,22 @@ const {
 } = config.algolia;
 const chunkSize = 10; // number of collectives to send at once
 
-
-const done = (error) => {
+const done = error => {
   if (error) {
-    debug('Error in updating index', error)
+    debug('Error in updating index', error);
 
-    return emailLib.sendMessage(
-      'ops@opencollective.com',
-      'Error in updating index',
-      '',
-      {
+    return emailLib
+      .sendMessage('ops@opencollective.com', 'Error in updating index', '', {
         bcc: ' ',
         text: error,
-      },
-    )
-    .then(process.exit)
-    .catch(console.error)
+      })
+      .then(process.exit)
+      .catch(console.error);
   }
 
   debug('Finished updating search records');
   process.exit();
-}
-
+};
 
 const populateIndex = async () => {
   const collectives = await models.Collective.findAll({
@@ -48,14 +42,14 @@ const populateIndex = async () => {
         [Op.or]: [collectiveTypes.COLLECTIVE, collectiveTypes.ORGANIZATION],
       },
       id: {
-        [Op.notIn]: [1, 7]
+        [Op.notIn]: [1, 7],
       },
     },
 
     attributes: {
-      exclude: ['settings', 'data', 'longDescription']
+      exclude: ['settings', 'data', 'longDescription'],
     }, // exclude json fields to not fetch a lot of data
-    order: ['id']
+    order: ['id'],
   });
   debug(`Collectives found: ${collectives.length}`);
 
@@ -65,12 +59,8 @@ const populateIndex = async () => {
     - include events (currently not included because no way to redirect directly to the event without parentCollective info). Might be easiest to include a publicUrl in the metadata
   */
 
-  const searchData = await Promise.map(collectives, async (collective) => {
-    const [
-      backersCount,
-      balance,
-      yearlyBudget,
-    ] = await Promise.all([
+  const searchData = await Promise.map(collectives, async collective => {
+    const [backersCount, balance, yearlyBudget] = await Promise.all([
       collective.getBackersCount(),
       collective.getBalance(),
       collective.getYearlyIncome(),
@@ -81,7 +71,7 @@ const populateIndex = async () => {
       backersCount,
       balance,
       yearlyBudget,
-      objectID: collective.id
+      objectID: collective.id,
     };
   });
 
@@ -91,25 +81,30 @@ const populateIndex = async () => {
   // we need to send these in batches, there is a limit of 18kb per request
   const chunkedData = chunkArray(searchData, chunkSize);
 
-  const indexedCount = await Promise.reduce(chunkedData, async (total, chunk) => {
-    await index.addObjects(chunk);
-    return total + chunk.length;
-  }, 0);
+  const indexedCount = await Promise.reduce(
+    chunkedData,
+    async (total, chunk) => {
+      await index.addObjects(chunk);
+      return total + chunk.length;
+    },
+    0,
+  );
   debug(`Total collectives indexed: ${indexedCount}`);
-}
+};
 
-
-const initializeClientandIndex = (indexName) => {
-  const client = algoliasearch(ALGOLIA_APP_ID, ALGOLIA_KEY, { protocol: 'https:'});
+const initializeClientandIndex = indexName => {
+  const client = algoliasearch(ALGOLIA_APP_ID, ALGOLIA_KEY, {
+    protocol: 'https:',
+  });
   const index = client.initIndex(indexName);
   return index;
-}
+};
 
 const run = () => {
-  debug("Starting job to populate index on Algolia");
+  debug('Starting job to populate index on Algolia');
   return populateIndex()
     .then(() => done())
-    .catch(done)
-}
+    .catch(done);
+};
 
 run();

@@ -5,20 +5,19 @@ import { get } from 'lodash';
 import { strip_tags } from '../../lib/utils';
 
 function require(args, path) {
-  if (!get(args, path)) throw new errors.ValidationFailed({ message: `${path} required` });
+  if (!get(args, path))
+    throw new errors.ValidationFailed({ message: `${path} required` });
 }
 
 export async function createComment(_, args, req) {
   if (!args.comment.markdown && !args.comment.html) {
-    throw new errors.ValidationFailed({ message: 'comment.markdown or comment.html required' });
+    throw new errors.ValidationFailed({
+      message: 'comment.markdown or comment.html required',
+    });
   }
   mustBeLoggedInTo(req.remoteUser, 'create a comment');
   const {
-    comment: {
-      CollectiveId,
-      ExpenseId,
-      UpdateId,
-    },
+    comment: { CollectiveId, ExpenseId, UpdateId },
   } = args;
 
   const commentData = {
@@ -44,7 +43,8 @@ export async function createComment(_, args, req) {
 
 async function fetchComment(id) {
   const comment = await models.Comment.findById(id);
-  if (!comment) throw new errors.NotFound({ message: `Comment with id ${id} not found` });
+  if (!comment)
+    throw new errors.NotFound({ message: `Comment with id ${id} not found` });
   return comment;
 }
 

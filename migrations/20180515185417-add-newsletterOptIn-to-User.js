@@ -2,7 +2,8 @@
 
 module.exports = {
   up: (queryInterface, Sequelize) => {
-    return queryInterface.addColumn('Users', 'newsletterOptIn', {
+    return queryInterface
+      .addColumn('Users', 'newsletterOptIn', {
         allowNull: false,
         defaultValue: true, // existing Users are opted in
         type: Sequelize.BOOLEAN,

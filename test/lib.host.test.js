@@ -8,7 +8,6 @@ import * as store from './features/support/stores';
 import * as libhost from '../server/lib/hostlib';
 import * as libcurrency from '../server/lib/currency';
 
-
 async function donation(collective, user, amount, currency, createdAt) {
   return store.stripeOneTimeDonation({
     amount,
@@ -19,16 +18,14 @@ async function donation(collective, user, amount, currency, createdAt) {
   });
 }
 
-
 /**
  * The goal here is to test a host with collectives in multiple currencies
  * We use sanitized data from wwcode for this
  */
 describe('libhost', () => {
-
   const where = {}; // Will be filled in by 'get hosted collectives'
-  const startDate = new Date("2017-02-01");
-  const endDate = new Date("2017-03-01");
+  const startDate = new Date('2017-02-01');
+  const endDate = new Date('2017-03-01');
   let sandbox, hostId, collectiveids;
 
   before(async () => {
@@ -36,20 +33,40 @@ describe('libhost', () => {
     // Given that we stub the currency conversion machinery
     sandbox = sinon.createSandbox();
     sandbox.stub(libcurrency, 'getFxRate').callsFake(() => 0.75779);
-    sandbox.stub(libcurrency, 'convertToCurrency').callsFake((a) => a * 2);
+    sandbox.stub(libcurrency, 'convertToCurrency').callsFake(a => a * 2);
 
     // Given a host with a collective
     const currency = 'USD';
-    const { hostCollective } = await store.newHost('Open Source Collective', currency, 10);
+    const { hostCollective } = await store.newHost(
+      'Open Source Collective',
+      currency,
+      10,
+    );
 
     // Add stripe accounts to the newly created host colective
     await store.stripeConnectedAccount(hostCollective.id);
 
     // And a few collectives
-    const { apex } = await store.newCollectiveInHost('apex', currency, hostCollective);
-    const { babel } = await store.newCollectiveInHost('babel', currency, hostCollective);
-    const { rollup } = await store.newCollectiveInHost('rollup', currency, hostCollective);
-    const { parcel } = await store.newCollectiveInHost('parcel', currency, hostCollective);
+    const { apex } = await store.newCollectiveInHost(
+      'apex',
+      currency,
+      hostCollective,
+    );
+    const { babel } = await store.newCollectiveInHost(
+      'babel',
+      currency,
+      hostCollective,
+    );
+    const { rollup } = await store.newCollectiveInHost(
+      'rollup',
+      currency,
+      hostCollective,
+    );
+    const { parcel } = await store.newCollectiveInHost(
+      'parcel',
+      currency,
+      hostCollective,
+    );
 
     // And a few users
     const { user1 } = await store.newUser('user1');
@@ -85,7 +102,11 @@ describe('libhost', () => {
   });
 
   it('get the backers stats', async () => {
-    const stats = await libhost.getBackersStats(startDate, endDate, collectiveids);
+    const stats = await libhost.getBackersStats(
+      startDate,
+      endDate,
+      collectiveids,
+    );
     expect(stats.total).to.equal(4);
     expect(stats.new).to.equal(2);
     expect(stats.repeat).to.equal(1);
@@ -93,24 +114,30 @@ describe('libhost', () => {
   });
 
   it('get the total amount of funds held by the host', async () => {
-    const res = await libhost.sumTransactionsByCurrency("netAmountInCollectiveCurrency", { where });
+    const res = await libhost.sumTransactionsByCurrency(
+      'netAmountInCollectiveCurrency',
+      { where },
+    );
     const usd = res.find(a => a.currency === 'USD');
     expect(usd.amount).to.equal(315000);
     expect(res.length).to.equal(2);
   });
 
   it('get the total amount of funds held by the host in host currency', async () => {
-    const res = await libhost.sumTransactions("netAmountInCollectiveCurrency", { where });
+    const res = await libhost.sumTransactions('netAmountInCollectiveCurrency', {
+      where,
+    });
     expect(res.byCurrency).to.have.length(2);
     expect(res.totalInHostCurrency).to.equal(720000);
   });
 
   it('get the total net amount of host fees', async () => {
-    const res = await libhost.sumTransactions("hostFeeInHostCurrency", { where });
+    const res = await libhost.sumTransactions('hostFeeInHostCurrency', {
+      where,
+    });
     expect(res.byCurrency).to.have.length(2);
     expect(res.totalInHostCurrency).to.equal(-80000);
     const cad = res.byCurrency.find(a => a.currency === 'CAD');
     expect(cad.amount).to.equal(-5000);
   });
-
 });

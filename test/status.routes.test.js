@@ -3,10 +3,8 @@ import { expect } from 'chai';
 import request from 'supertest';
 
 describe('status.routes.test.js', () => {
-
   describe('GET /status', () => {
-
-    it('responds with status information', (done) => {
+    it('responds with status information', done => {
       request(app)
         .get('/status')
         .expect(200)
@@ -21,7 +19,5 @@ describe('status.routes.test.js', () => {
           done();
         });
     });
-
   });
-
 });

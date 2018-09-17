@@ -7,22 +7,19 @@ import models from '../server/models';
 
 const debug = require('debug')('subscribe');
 
-const {
-  Notification,
-  User
-} = models;
+const { Notification, User } = models;
 
-const processRows = (rows) => {
-    return Promise.map(rows, processRow);
+const processRows = rows => {
+  return Promise.map(rows, processRow);
 };
 
 const init = () => {
   User.findAll()
-  .then(processRows)
-  .then(() => process.exit(0));
-}
+    .then(processRows)
+    .then(() => process.exit(0));
+};
 
-const processRow = (row) => {
+const processRow = row => {
   const type = 'user.monthlyreport';
   debug(`Subscribing UserId ${row.id} to ${type}`);
 
@@ -33,10 +30,14 @@ const processRow = (row) => {
   */
   return Notification.create({
     UserId: row.id,
-    type
+    type,
   })
-  .then(notification => console.log(`> UserId ${row.id} is now subscribed to ${type}`))
-  .catch(() => console.error(`UserId ${row.id} already subscribed to ${type}`));
+    .then(notification =>
+      console.log(`> UserId ${row.id} is now subscribed to ${type}`),
+    )
+    .catch(() =>
+      console.error(`UserId ${row.id} already subscribed to ${type}`),
+    );
 };
 
 init();

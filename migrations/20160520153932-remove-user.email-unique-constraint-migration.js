@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = {
-  up: function (queryInterface, Sequelize) {
+  up: function(queryInterface, Sequelize) {
     return queryInterface.changeColumn('Users', 'email', {
       type: Sequelize.STRING,
       allowNull: true,
@@ -9,11 +9,11 @@ module.exports = {
     });
   },
 
-  down: function (queryInterface, Sequelize) {
+  down: function(queryInterface, Sequelize) {
     return queryInterface.changeColumn('Users', 'email', {
       type: Sequelize.STRING,
       allowNull: false,
       unique: true,
     });
-  }
+  },
 };

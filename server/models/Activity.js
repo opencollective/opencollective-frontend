@@ -1,29 +1,31 @@
 import notify from '../lib/notifications';
 
 export default function(Sequelize, DataTypes) {
+  const Activity = Sequelize.define(
+    'Activity',
+    {
+      type: DataTypes.STRING,
 
-  const Activity = Sequelize.define('Activity', {
-    type: DataTypes.STRING,
+      data: DataTypes.JSON,
 
-    data: DataTypes.JSON,
+      createdAt: {
+        type: DataTypes.DATE,
+        defaultValue: Sequelize.NOW,
+      },
+    },
+    {
+      updatedAt: false,
 
-    createdAt: {
-      type: DataTypes.DATE,
-      defaultValue: Sequelize.NOW
-    }
-  }, {
-    updatedAt: false,
-
-    hooks: {
-      afterCreate(activity) {
-        notify(Sequelize, activity); // intentionally no return statement, needs to be async
-      }
-    }
-  });
+      hooks: {
+        afterCreate(activity) {
+          notify(Sequelize, activity); // intentionally no return statement, needs to be async
+        },
+      },
+    },
+  );
 
   return Activity;
 }
-
 
 /*
 Types:

@@ -9,10 +9,11 @@ import * as libpayments from '../../lib/payments';
 /** Build an URL for the PayPal API */
 export function paypalUrl(path) {
   if (path.startsWith('/')) throw new Error("Please don't use absolute paths");
-  const baseUrl = config.paypal.payment.environment === 'sandbox'
-    ? 'https://api.sandbox.paypal.com/v1/'
-    : 'https://api.paypal.com/v1/';
-  return (new URL(baseUrl + path)).toString();
+  const baseUrl =
+    config.paypal.payment.environment === 'sandbox'
+      ? 'https://api.sandbox.paypal.com/v1/'
+      : 'https://api.paypal.com/v1/';
+  return new URL(baseUrl + path).toString();
 }
 
 /** Exchange clientid and secretid by an auth token with PayPal API */
@@ -23,7 +24,7 @@ export async function retrieveOAuthToken() {
   /* The OAuth token entrypoint uses Basic HTTP Auth */
   const authStr = `${clientId}:${clientSecret}`;
   const basicAuth = Buffer.from(authStr).toString('base64');
-  const headers = { Authorization: `Basic ${basicAuth}`};
+  const headers = { Authorization: `Basic ${basicAuth}` };
   /* Execute the request and unpack the token */
   const response = await fetch(url, { method: 'post', body, headers });
   const jsonOutput = await response.json();
@@ -54,7 +55,7 @@ export async function paypalRequest(urlPath, body) {
  */
 export async function createPayment(req, res) {
   const { amount, currency } = req.body;
-  if (!amount || !currency) throw new Error("Amount & Currency are required");
+  if (!amount || !currency) throw new Error('Amount & Currency are required');
   const paymentParams = {
     intent: 'sale',
     payer: { payment_method: 'paypal' },
@@ -64,8 +65,8 @@ export async function createPayment(req, res) {
        reasonable. */
     redirect_urls: {
       return_url: 'https://opencollective.com',
-      cancel_url: 'https://opencollective.com'
-    }
+      cancel_url: 'https://opencollective.com',
+    },
   };
   const payment = await paypalRequest('payments/payment', paymentParams);
   return res.json({ id: payment.id });
@@ -78,33 +79,39 @@ export async function createPayment(req, res) {
  */
 export async function executePayment(order) {
   const { paymentID, payerID } = order.paymentMethod.data;
-  return paypalRequest(`payments/payment/${paymentID}/execute`, { payer_id: payerID });
+  return paypalRequest(`payments/payment/${paymentID}/execute`, {
+    payer_id: payerID,
+  });
 }
 
 /** Create transaction in our database to reflect a PayPal charge */
 export async function createTransaction(order, paymentInfo) {
   /* The `* 100` in the next lines convert from PayPal format in
      dollars to Open Collective format in cents */
-  const amountFromPayPal = paymentInfo.transactions.map(
-    t => parseFloat(t.amount.total)) * 100;
-  const paypalFee = paymentInfo.transactions.map(
-    t => t.related_resources.map(
-      r => parseFloat(r.sale.transaction_fee.value))) * 100;
+  const amountFromPayPal =
+    paymentInfo.transactions.map(t => parseFloat(t.amount.total)) * 100;
+  const paypalFee =
+    paymentInfo.transactions.map(t =>
+      t.related_resources.map(r => parseFloat(r.sale.transaction_fee.value)),
+    ) * 100;
   const currencyFromPayPal = paymentInfo.transactions.map(
-    t => t.amount.currency)[0];
+    t => t.amount.currency,
+  )[0];
 
   const hostFeeInHostCurrency = libpayments.calcFee(
     amountFromPayPal,
-    order.collective.hostFeePercent);
+    order.collective.hostFeePercent,
+  );
   const platformFeeInHostCurrency = libpayments.calcFee(
     amountFromPayPal,
-    constants.OC_FEE_PERCENT);
+    constants.OC_FEE_PERCENT,
+  );
 
   const payload = {
     CreatedByUserId: order.createdByUser.id,
     FromCollectiveId: order.FromCollectiveId,
     CollectiveId: order.collective.id,
-    PaymentMethodId: order.paymentMethod.id
+    PaymentMethodId: order.paymentMethod.id,
   };
   payload.transaction = {
     type: constants.TransactionTypes.CREDIT,
@@ -128,7 +135,11 @@ export async function addUserToCollective(order) {
   const userId = order.createdByUser.id;
   const donorInfo = { id: userId, CollectiveId: order.FromCollectiveId };
   const tierInfo = { CreatedByUserId: userId, TierId: order.TierId };
-  return order.collective.findOrAddUserWithRole(donorInfo, roles.BACKER, tierInfo);
+  return order.collective.findOrAddUserWithRole(
+    donorInfo,
+    roles.BACKER,
+    tierInfo,
+  );
 }
 
 /** Process order in paypal and create transactions in our db */
@@ -137,7 +148,7 @@ export async function processOrder(order) {
   const transaction = await createTransaction(order, paymentInfo);
   await addUserToCollective(order);
   await order.update({ processedAt: new Date() });
-  await order.paymentMethod.update({ confirmedAt: new Date });
+  await order.paymentMethod.update({ confirmedAt: new Date() });
   return transaction;
 }
 
