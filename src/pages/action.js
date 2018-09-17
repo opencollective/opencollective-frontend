@@ -18,8 +18,7 @@ import withLoggedInUser from '../lib/withLoggedInUser';
  * This page is used to approve/reject in one click an expense or a collective
  */
 class ActionPage extends React.Component {
-
-  static getInitialProps ({ query: { action, table, id } }) {
+  static getInitialProps({ query: { action, table, id } }) {
     return { action, table, id, ssr: false };
   }
 
@@ -34,7 +33,10 @@ class ActionPage extends React.Component {
   constructor(props) {
     super(props);
     this.state = { loading: true };
-    this.mutation = `${props.action}${capitalize(props.table).replace(/s$/,'')}`;
+    this.mutation = `${props.action}${capitalize(props.table).replace(
+      /s$/,
+      '',
+    )}`;
   }
 
   async componentDidMount() {
@@ -57,39 +59,58 @@ class ActionPage extends React.Component {
 
     return (
       <div className="ActionPage">
-
         <Header
           title={action}
-          className={this.state.loading ? 'loading': ''}
+          className={this.state.loading ? 'loading' : ''}
           LoggedInUser={LoggedInUser}
-          />
+        />
 
         <Body>
-
-          <div className="content" >
-            { loading && this.mutation === 'approveCollective' && <FormattedMessage id="actions.approveCollective.processing" defaultMessage="Approving collective" /> }
-            { loading && this.mutation === 'approveExpense' && <FormattedMessage id="actions.approveExpense.processing" defaultMessage="Approving expense" /> }
-            { loading && this.mutation === 'rejectExpense' && <FormattedMessage id="actions.rejectExpense.processing" defaultMessage="Rejecting expense" /> }
-            { !loading && !this.state.error && <FormattedMessage id="actions.done" defaultMessage="done " /> }
-            { this.state.error &&
+          <div className="content">
+            {loading &&
+              this.mutation === 'approveCollective' && (
+                <FormattedMessage
+                  id="actions.approveCollective.processing"
+                  defaultMessage="Approving collective"
+                />
+              )}
+            {loading &&
+              this.mutation === 'approveExpense' && (
+                <FormattedMessage
+                  id="actions.approveExpense.processing"
+                  defaultMessage="Approving expense"
+                />
+              )}
+            {loading &&
+              this.mutation === 'rejectExpense' && (
+                <FormattedMessage
+                  id="actions.rejectExpense.processing"
+                  defaultMessage="Rejecting expense"
+                />
+              )}
+            {!loading &&
+              !this.state.error && (
+                <FormattedMessage id="actions.done" defaultMessage="done " />
+              )}
+            {this.state.error && (
               <div className="error">
-                <h2><FormattedMessage id="error.label" defaultMessage="Error" /></h2>
+                <h2>
+                  <FormattedMessage id="error.label" defaultMessage="Error" />
+                </h2>
                 <div className="message">{this.state.error.message}</div>
               </div>
-            }
+            )}
           </div>
-
         </Body>
 
         <Footer />
-
       </div>
     );
   }
 }
 
 /* eslint-disable graphql/template-strings, graphql/no-deprecated-fields, graphql/capitalized-type-name, graphql/named-operations */
-const getQueryForAction = (action) => gql`
+const getQueryForAction = action => gql`
 mutation ${action}($id: Int!) {
   ${action}(id: $id) {
     id
@@ -98,15 +119,19 @@ mutation ${action}($id: Int!) {
 `;
 /* eslint-disable graphql/template-strings, graphql/no-deprecated-fields, graphql/capitalized-type-name, graphql/named-operations */
 
-const addMutationForAction = (action) => graphql(getQueryForAction(action), {
-  props: ( { mutate }) => ({
-    [action]: async (id) => {
-      return await mutate({ variables: { id } });
-    },
-  }),
-});
+const addMutationForAction = action =>
+  graphql(getQueryForAction(action), {
+    props: ({ mutate }) => ({
+      [action]: async id => {
+        return await mutate({ variables: { id } });
+      },
+    }),
+  });
 
 const actions = ['approveCollective', 'approveExpense', 'rejectExpense'];
-const addMutations = compose.apply(this, actions.map(action => addMutationForAction(action)));
+const addMutations = compose.apply(
+  this,
+  actions.map(action => addMutationForAction(action)),
+);
 
 export default withData(withIntl(withLoggedInUser(addMutations(ActionPage))));

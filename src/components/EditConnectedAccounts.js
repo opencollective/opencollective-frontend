@@ -7,10 +7,9 @@ import { groupBy } from 'lodash';
 import { capitalize } from '../lib/utils';
 
 class EditConnectedAccounts extends React.Component {
-
   static propTypes = {
     collective: PropTypes.object.isRequired,
-    connectedAccounts: PropTypes.arrayOf(PropTypes.object)
+    connectedAccounts: PropTypes.arrayOf(PropTypes.object),
   };
 
   constructor(props) {
@@ -20,8 +19,14 @@ class EditConnectedAccounts extends React.Component {
     this.state = { services: ['twitter'], editMode: props.editMode || false };
 
     this.messages = defineMessages({
-      'collective.connectedAccounts.stripe.button': { id: 'collective.connectedAccounts.stripe.button', defaultMessage: 'Connect Stripe' },
-      'collective.connectedAccounts.stripe.description': { id: 'collective.connectedAccounts.stripe.description', defaultMessage: 'Connect a Stripe account to start accepting donations' }
+      'collective.connectedAccounts.stripe.button': {
+        id: 'collective.connectedAccounts.stripe.button',
+        defaultMessage: 'Connect Stripe',
+      },
+      'collective.connectedAccounts.stripe.description': {
+        id: 'collective.connectedAccounts.stripe.description',
+        defaultMessage: 'Connect a Stripe account to start accepting donations',
+      },
     });
     this.connectedAccounts = groupBy(props.connectedAccounts, 'service');
 
@@ -32,7 +37,10 @@ class EditConnectedAccounts extends React.Component {
 
   componentDidMount() {
     const { collective } = this.props;
-    if (window.location.href.match(/service=stripe/) && (collective.type === 'USER' || collective.type === 'ORGANIZATION')) {
+    if (
+      window.location.href.match(/service=stripe/) &&
+      (collective.type === 'USER' || collective.type === 'ORGANIZATION')
+    ) {
       const { services } = this.state;
       services.push('stripe');
       this.setState({ services });
@@ -44,18 +52,22 @@ class EditConnectedAccounts extends React.Component {
 
     return (
       <div className="EditConnectedAccounts">
-
-        { this.state.services.map(service =>
-        (<div key={`connect-${service}`}>
-          <h2>{capitalize(service)}</h2>
-          <EditConnectedAccount collective={collective} service={service} connectedAccount={this.connectedAccounts[service] && this.connectedAccounts[service][0]} />
-        </div>)
-        ) }
-
+        {this.state.services.map(service => (
+          <div key={`connect-${service}`}>
+            <h2>{capitalize(service)}</h2>
+            <EditConnectedAccount
+              collective={collective}
+              service={service}
+              connectedAccount={
+                this.connectedAccounts[service] &&
+                this.connectedAccounts[service][0]
+              }
+            />
+          </div>
+        ))}
       </div>
     );
   }
-
 }
 
 export default withIntl(EditConnectedAccounts);

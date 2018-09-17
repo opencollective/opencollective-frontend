@@ -14,9 +14,8 @@ import { isValidUrl } from '../lib/utils';
 import withIntl from '../lib/withIntl';
 
 class SigninPage extends React.Component {
-
-  static getInitialProps ({ query: { token, next } }) {
-    next = isValidUrl(next) && next.substr(0,1) === '/' ? next : null;
+  static getInitialProps({ query: { token, next } }) {
+    next = isValidUrl(next) && next.substr(0, 1) === '/' ? next : null;
     return { token, next };
   }
 
@@ -46,37 +45,45 @@ class SigninPage extends React.Component {
 
   render() {
     if (this.props.token && !this.state.error) {
-      return (<ErrorPage loading />);
+      return <ErrorPage loading />;
     }
     return (
       <div className="LoginPage">
         <Header
           title="Sign Up"
           description="Create your profile on Open Collective and show the world the open collectives that you are contributing to."
-          />
-        <style jsx>{`
-        .signin {
-          max-width: 70rem;
-          margin: 15rem auto;
-          text-align:center;
-        }
-        h2 {
-          font-size: 2rem;
-          padding: 2rem;
-        }
-        `}
+        />
+        <style jsx>
+          {`
+            .signin {
+              max-width: 70rem;
+              margin: 15rem auto;
+              text-align: center;
+            }
+            h2 {
+              font-size: 2rem;
+              padding: 2rem;
+            }
+          `}
         </style>
         <Body>
           <div className="signin">
-            {this.state.error &&
-            <h1>Authentication Failed. Please try to generate a new token.</h1>}
+            {this.state.error && (
+              <h1>
+                Authentication Failed. Please try to generate a new token.
+              </h1>
+            )}
 
-            <h2><FormattedMessage id="loginform.title" defaultMessage="Sign in or Create an Account" /></h2>
+            <h2>
+              <FormattedMessage
+                id="loginform.title"
+                defaultMessage="Sign in or Create an Account"
+              />
+            </h2>
             <SignInForm next={this.props.next} />
           </div>
         </Body>
         <Footer />
-
       </div>
     );
   }

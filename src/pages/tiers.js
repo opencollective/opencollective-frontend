@@ -16,8 +16,7 @@ import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
 
 class TiersPage extends React.Component {
-
-  static getInitialProps ({ query: { collectiveSlug } }) {
+  static getInitialProps({ query: { collectiveSlug } }) {
     return { slug: collectiveSlug };
   }
 
@@ -30,7 +29,10 @@ class TiersPage extends React.Component {
   constructor(props) {
     super(props);
     this.messages = defineMessages({
-      'tiers.title': { id: 'tiers.title', defaultMessage: 'Join the collective' },
+      'tiers.title': {
+        id: 'tiers.title',
+        defaultMessage: 'Join the collective',
+      },
     });
   }
 
@@ -39,27 +41,26 @@ class TiersPage extends React.Component {
     Router.pushRoute(`/${Collective.slug}/tiers/${response.tier.id}`);
   };
 
-  updateResponse = () => {
-
-  };
+  updateResponse = () => {};
 
   render() {
     const { intl } = this.props;
     const { loading, Collective } = this.props.data;
 
-    if (loading) return (<div />);
+    if (loading) return <div />;
 
     return (
       <div>
-        <style jsx>{`
-          .tiers {
-            margin: 0 auto;
-            max-width: 400px;
-          }
-          .tiers :global(.tier) {
-            margin: 3rem 0;
-          }
-        `}
+        <style jsx>
+          {`
+            .tiers {
+              margin: 0 auto;
+              max-width: 400px;
+            }
+            .tiers :global(.tier) {
+              margin: 3rem 0;
+            }
+          `}
         </style>
         <Header />
         <Body>
@@ -70,17 +71,17 @@ class TiersPage extends React.Component {
             className="small"
             backgroundImage={Collective.backgroundImage}
             style={get(Collective, 'settings.style.hero.cover')}
-            />
+          />
           <div className="tiers">
             {Collective.tiers.map(tier => (
               <Tier
                 key={tier.id}
                 className="tier"
                 tier={tier}
-                onChange={(response) => this.updateResponse(response)}
-                onClick={(response) => this.handleGetTierClick(response)}
-                />
-          ))}
+                onChange={response => this.updateResponse(response)}
+                onClick={response => this.handleGetTierClick(response)}
+              />
+            ))}
           </div>
         </Body>
       </div>

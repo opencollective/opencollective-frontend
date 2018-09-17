@@ -21,8 +21,7 @@ import withIntl from '../lib/withIntl';
 import withLoggedInUser from '../lib/withLoggedInUser';
 
 class CreateExpensePage extends React.Component {
-
-  static getInitialProps ( { query: { collectiveSlug, action } }) {
+  static getInitialProps({ query: { collectiveSlug, action } }) {
     return { slug: collectiveSlug, action };
   }
 
@@ -61,7 +60,10 @@ class CreateExpensePage extends React.Component {
       console.log('>>> createExpense', expense);
       const res = await this.props.createExpense(expense);
       console.log('>>> createExpense res', res);
-      this.setState({ showNewExpenseForm: false, expenseCreated: res.data.createExpense });
+      this.setState({
+        showNewExpenseForm: false,
+        expenseCreated: res.data.createExpense,
+      });
     } catch (e) {
       console.error(e);
     }
@@ -71,7 +73,7 @@ class CreateExpensePage extends React.Component {
     const { data } = this.props;
     const { LoggedInUser, expenseCreated } = this.state;
 
-    if (!data.Collective) return (<ErrorPage data={data} />);
+    if (!data.Collective) return <ErrorPage data={data} />;
 
     const collective = data.Collective;
     const showNewExpenseForm = !expenseCreated;
@@ -85,120 +87,141 @@ class CreateExpensePage extends React.Component {
           image={collective.image || collective.backgroundImage}
           className={this.state.status}
           LoggedInUser={LoggedInUser}
-          />
+        />
 
         <Body>
-
           <CollectiveCover
             collective={collective}
             href={`/${collective.slug}`}
-            cta={{ href: `/${collective.slug}#contribute`, label: 'contribute' }}
+            cta={{
+              href: `/${collective.slug}#contribute`,
+              label: 'contribute',
+            }}
             LoggedInUser={LoggedInUser}
-            />
+          />
 
           <Flex flexDirection={['column', null, 'row']}>
-
-            <Box width={[1, null, 3/4]} >
-
-              { expenseCreated &&
+            <Box width={[1, null, 3 / 4]}>
+              {expenseCreated && (
                 <Box m={3}>
                   <p className="expenseCreated">
-                    { collective.host &&
-                      <FormattedMessage id="expense.created" defaultMessage="Your expense has been submitted with success. It is now pending approval from one of the core contributors of the collective. You will be notified by email once it has been approved. Then, the host ({host}) will proceed to reimburse your expense." values={{ host: collective.host.name }} />
-                    }
-                    { !collective.host &&
-                      <FormattedMessage id="expense.created.noHost" defaultMessage="Your expense has been submitted with success. It is now pending approval from one of the core contributors of the collective. You will be notified by email once it has been approved." />
-                    }
+                    {collective.host && (
+                      <FormattedMessage
+                        id="expense.created"
+                        defaultMessage="Your expense has been submitted with success. It is now pending approval from one of the core contributors of the collective. You will be notified by email once it has been approved. Then, the host ({host}) will proceed to reimburse your expense."
+                        values={{ host: collective.host.name }}
+                      />
+                    )}
+                    {!collective.host && (
+                      <FormattedMessage
+                        id="expense.created.noHost"
+                        defaultMessage="Your expense has been submitted with success. It is now pending approval from one of the core contributors of the collective. You will be notified by email once it has been approved."
+                      />
+                    )}
                   </p>
                   <Flex justifyContent="center" mt={4} flexWrap="wrap">
-                    <Button className="blue" onClick={() => this.setState({ expenseCreated: null, showNewExpenseForm: true })}>
-                      <FormattedMessage id="expenses.sendAnotherExpense" defaultMessage="Submit Another Expense" />
+                    <Button
+                      className="blue"
+                      onClick={() =>
+                        this.setState({
+                          expenseCreated: null,
+                          showNewExpenseForm: true,
+                        })
+                      }
+                    >
+                      <FormattedMessage
+                        id="expenses.sendAnotherExpense"
+                        defaultMessage="Submit Another Expense"
+                      />
                     </Button>
                     <Box ml={[0, null, 3]}>
-                      <Button className="whiteblue viewAllExpenses" href={`/${collective.slug}/expenses`}>
-                        <FormattedMessage id="expenses.viewAll" defaultMessage="View All Expenses" />
+                      <Button
+                        className="whiteblue viewAllExpenses"
+                        href={`/${collective.slug}/expenses`}
+                      >
+                        <FormattedMessage
+                          id="expenses.viewAll"
+                          defaultMessage="View All Expenses"
+                        />
                       </Button>
                     </Box>
                   </Flex>
                 </Box>
-              }
+              )}
 
-              { showNewExpenseForm &&
+              {showNewExpenseForm && (
                 <CreateExpenseForm
                   collective={collective}
                   LoggedInUser={LoggedInUser}
                   onSubmit={this.createExpense}
-                  />
-              }
-
+                />
+              )}
             </Box>
 
-            <Box width={[1, null, 1/4]} pb={4} px={3}>
-
+            <Box width={[1, null, 1 / 4]} pb={4} px={3}>
               <ExpensesStatsWithData slug={collective.slug} />
 
               <Flex mt="5rem" justifyContent={['center', null, 'flex-start']}>
                 <Button href={`/${collective.slug}/expenses`}>
-                  <FormattedMessage id="expenses.viewAll" defaultMessage="View All Expenses" />
+                  <FormattedMessage
+                    id="expenses.viewAll"
+                    defaultMessage="View All Expenses"
+                  />
                 </Button>
               </Flex>
-
             </Box>
-
           </Flex>
-
         </Body>
 
         <Footer />
-
       </div>
     );
   }
 }
 
 const createExpenseQuery = gql`
-mutation createExpense($expense: ExpenseInputType!) {
-  createExpense(expense: $expense) {
-    id
-    description
-    status
-    createdAt
-    updatedAt
-    incurredAt
-    category
-    amount
-    currency
-    payoutMethod
-    privateMessage
-    attachment
-    collective {
+  mutation createExpense($expense: ExpenseInputType!) {
+    createExpense(expense: $expense) {
       id
-      slug
+      description
+      status
+      createdAt
+      updatedAt
+      incurredAt
+      category
+      amount
       currency
-      name
-      host {
+      payoutMethod
+      privateMessage
+      attachment
+      collective {
         id
         slug
+        currency
+        name
+        host {
+          id
+          slug
+        }
+        stats {
+          id
+          balance
+        }
       }
-      stats {
+      fromCollective {
         id
-        balance
+        type
+        name
+        slug
+        image
       }
-    }
-    fromCollective {
-      id
-      type
-      name
-      slug
-      image
-    }
-    user {
-      id
-      email
-      paypalEmail
+      user {
+        id
+        email
+        paypalEmail
+      }
     }
   }
-}
 `;
 
 const getCollectiveQuery = gql`
@@ -262,8 +285,8 @@ const getCollectiveQuery = gql`
 `;
 
 const addMutation = graphql(createExpenseQuery, {
-  props: ( { mutate }) => ({
-    createExpense: async (expense) => {
+  props: ({ mutate }) => ({
+    createExpense: async expense => {
       return await mutate({ variables: { expense } });
     },
   }),
@@ -271,6 +294,9 @@ const addMutation = graphql(createExpenseQuery, {
 
 const addCollectiveData = graphql(getCollectiveQuery);
 
-const addData = compose(addCollectiveData, addMutation);
+const addData = compose(
+  addCollectiveData,
+  addMutation,
+);
 
 export default withData(withIntl(withLoggedInUser(addData(CreateExpensePage))));

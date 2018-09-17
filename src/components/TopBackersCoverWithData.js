@@ -2,8 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Error from './Error';
 import withIntl from '../lib/withIntl';
-import { graphql } from 'react-apollo'
-import gql from 'graphql-tag'
+import { graphql } from 'react-apollo';
+import gql from 'graphql-tag';
 import Avatar from './Avatar';
 import Logo from './Logo';
 import Link from './Link';
@@ -11,14 +11,13 @@ import { formatCurrency } from '../lib/utils';
 import { get } from 'lodash';
 
 class TopBackersCoverWithData extends React.Component {
-
   static propTypes = {
     collective: PropTypes.object,
     tier: PropTypes.object,
     limit: PropTypes.number,
     onChange: PropTypes.func,
-    LoggedInUser: PropTypes.object
-  }
+    LoggedInUser: PropTypes.object,
+  };
 
   constructor(props) {
     super(props);
@@ -27,59 +26,77 @@ class TopBackersCoverWithData extends React.Component {
     this.renderOrganization = this.renderOrganization.bind(this);
     this.state = {
       role: null,
-      loading: false
+      loading: false,
     };
   }
 
   renderOrganization(member, index) {
     const org = member.member;
-    const percentage = Math.round((member.stats.totalDonations / this.props.collective.stats.totalAmountReceived) * 100);
+    const percentage = Math.round(
+      (member.stats.totalDonations /
+        this.props.collective.stats.totalAmountReceived) *
+        100,
+    );
     let title = `${org.name}`;
     if (org.description) {
       title += `
 ${org.description}
-`
+`;
     }
     title += `
-Financial contribution: ${percentage}% (${formatCurrency(member.stats.totalDonations, this.props.collective.currency, { precision: 0 })})`;
+Financial contribution: ${percentage}% (${formatCurrency(
+      member.stats.totalDonations,
+      this.props.collective.currency,
+      { precision: 0 },
+    )})`;
     const className = index >= 5 ? 'desktopOnly' : '';
     return (
-      <div key={`topBacker-${index}`} className={className} >
+      <div key={`topBacker-${index}`} className={className}>
         <div className="org backer">
-          <style jsx>{`
-          .org {
-            border-radius: 16px;
-            background: rgba(255, 255, 255, 0.5);
-            padding: 5px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-          }
-          .org :global(img) {
-            height: auto;
-            max-width: 96px;
-          }
-          `}</style>
+          <style jsx>
+            {`
+              .org {
+                border-radius: 16px;
+                background: rgba(255, 255, 255, 0.5);
+                padding: 5px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+              }
+              .org :global(img) {
+                height: auto;
+                max-width: 96px;
+              }
+            `}
+          </style>
           <Link route={`/${org.slug}`} title={title}>
             <Logo src={org.image} height={36} />
           </Link>
         </div>
       </div>
-    )
+    );
   }
 
   renderUser(member, index) {
     const user = member.member;
 
-    const percentage = Math.round((member.stats.totalDonations / this.props.collective.stats.totalAmountReceived) * 100);
+    const percentage = Math.round(
+      (member.stats.totalDonations /
+        this.props.collective.stats.totalAmountReceived) *
+        100,
+    );
     let title = `${user.name}`;
     if (user.description) {
       title += `
 ${user.description}
-`
+`;
     }
     title += `
-Financial contribution: ${percentage}% (${formatCurrency(member.stats.totalDonations, this.props.collective.currency, { precision: 0 })})`;
+Financial contribution: ${percentage}% (${formatCurrency(
+      member.stats.totalDonations,
+      this.props.collective.currency,
+      { precision: 0 },
+    )})`;
     const className = index >= 5 ? 'desktopOnly' : '';
     return (
       <div key={`topBacker-${index}`} className={`user backer ${className}`}>
@@ -87,12 +104,14 @@ Financial contribution: ${percentage}% (${formatCurrency(member.stats.totalDonat
           <Avatar src={user.image} radius={48} className="noFrame" />
         </Link>
       </div>
-    )
+    );
   }
 
   renderMember(member, index) {
-    if (member.member.type === 'ORGANIZATION') return this.renderOrganization(member, index);
-    if (member.member.type === 'COLLECTIVE') return this.renderOrganization(member, index);
+    if (member.member.type === 'ORGANIZATION')
+      return this.renderOrganization(member, index);
+    if (member.member.type === 'COLLECTIVE')
+      return this.renderOrganization(member, index);
     if (member.member.type === 'USER') return this.renderUser(member, index);
   }
 
@@ -100,112 +119,132 @@ Financial contribution: ${percentage}% (${formatCurrency(member.stats.totalDonat
     const { data, collective } = this.props;
 
     if (data.error) {
-      console.error("graphql error>>>", data.error.message);
-      return (<Error message="GraphQL error" />)
+      console.error('graphql error>>>', data.error.message);
+      return <Error message="GraphQL error" />;
     }
 
     if (!data.allMembers) {
-      return (<div />);
+      return <div />;
     }
     const members = [...data.allMembers];
     if (members.length === 0) {
-      return (<div />)
+      return <div />;
     }
-    const additionalBackers = get(collective, 'stats.backers.all') - members.length;
+    const additionalBackers =
+      get(collective, 'stats.backers.all') - members.length;
 
     return (
-      <div className="TopBackersCover" ref={(node) => this.node = node}>
-        <style jsx>{`
-          .TopBackersCover {
-            text-align: center;
-          }
-          .list {
-            display: flex;
-            justify-content: center;
-          }
-          .list :global(> div) {
-            margin: 5px;
-          }
-          .totalBackersStat {
-            border-radius: 50%;
-            background-color: black;
-            width: 48px;
-            height: 48px;
-            line-height: 48px;
-            color: #FFFFFF;
-            font-family: Rubik;
-            font-size: 12px;
-            font-weight: 500;
-            text-align: center;
-          }
-          @media(max-width: 420px) {
+      <div className="TopBackersCover" ref={node => (this.node = node)}>
+        <style jsx>
+          {`
+            .TopBackersCover {
+              text-align: center;
+            }
+            .list {
+              display: flex;
+              justify-content: center;
+            }
             .list :global(> div) {
-              margin: 3px;
+              margin: 5px;
             }
             .totalBackersStat {
-              height: 30px;
-              width: 30px;
-              line-height: 30px;
-              font-size: 10px;
+              border-radius: 50%;
+              background-color: black;
+              width: 48px;
+              height: 48px;
+              line-height: 48px;
+              color: #ffffff;
+              font-family: Rubik;
+              font-size: 12px;
+              font-weight: 500;
+              text-align: center;
             }
-          }
-        `}</style>
-        <style jsx global>{`
-        @media(max-width: 420px) {
-          .TopBackersCover {
-            margin-top: 5px;
-          }
-          .TopBackersCover .backer {
-            padding: 3px !important;
-            border-radius: 8px;
-          }
-          .TopBackersCover .backer .Logo, .TopBackersCover .Logo img {
-            height: 24px !important;
-          }
-          .TopBackersCover .backer .Avatar, .TopBackersCover .backer .Avatar > div {
-            height: 30px !important;
-            width: 30px !important;
-          }
-        }
-        `}</style>
+            @media (max-width: 420px) {
+              .list :global(> div) {
+                margin: 3px;
+              }
+              .totalBackersStat {
+                height: 30px;
+                width: 30px;
+                line-height: 30px;
+                font-size: 10px;
+              }
+            }
+          `}
+        </style>
+        <style jsx global>
+          {`
+            @media (max-width: 420px) {
+              .TopBackersCover {
+                margin-top: 5px;
+              }
+              .TopBackersCover .backer {
+                padding: 3px !important;
+                border-radius: 8px;
+              }
+              .TopBackersCover .backer .Logo,
+              .TopBackersCover .Logo img {
+                height: 24px !important;
+              }
+              .TopBackersCover .backer .Avatar,
+              .TopBackersCover .backer .Avatar > div {
+                height: 30px !important;
+                width: 30px !important;
+              }
+            }
+          `}
+        </style>
         <div className="list">
           {members.map(this.renderMember)}
-          { additionalBackers > 0 &&
+          {additionalBackers > 0 && (
             <div className="backer stats">
-              <Link route="#contributors"><div className="totalBackersStat">+{additionalBackers}</div></Link>
+              <Link route="#contributors">
+                <div className="totalBackersStat">+{additionalBackers}</div>
+              </Link>
             </div>
-          }
+          )}
         </div>
       </div>
     );
   }
-
 }
 
 const getTopBackersQuery = gql`
-query getTopBackersQuery($CollectiveId: Int!, $TierId: Int, $role: String, $limit: Int, $orderBy: String) {
-  allMembers(CollectiveId: $CollectiveId, TierId: $TierId, role: $role, limit: $limit, orderBy: $orderBy) {
-    id
-    role
-    createdAt
-    stats {
-      totalDonations
-    }
-    tier {
+  query getTopBackersQuery(
+    $CollectiveId: Int!
+    $TierId: Int
+    $role: String
+    $limit: Int
+    $orderBy: String
+  ) {
+    allMembers(
+      CollectiveId: $CollectiveId
+      TierId: $TierId
+      role: $role
+      limit: $limit
+      orderBy: $orderBy
+    ) {
       id
-      name
-    }
-    member {
-      id
-      type
-      name
-      company
-      description
-      slug
-      image
+      role
+      createdAt
+      stats {
+        totalDonations
+      }
+      tier {
+        id
+        name
+      }
+      member {
+        id
+        type
+        name
+        company
+        description
+        slug
+        image
+      }
     }
   }
-}
 `;
 
 export const addBackersData = graphql(getTopBackersQuery, {
@@ -215,13 +254,12 @@ export const addBackersData = graphql(getTopBackersQuery, {
         CollectiveId: props.collective.id,
         TierId: props.tier && props.tier.id,
         offset: 0,
-        role: "BACKER",
-        orderBy: "totalDonations",
-        limit: props.limit || 5
-      }
-    }
-  }
+        role: 'BACKER',
+        orderBy: 'totalDonations',
+        limit: props.limit || 5,
+      },
+    };
+  },
 });
-
 
 export default addBackersData(withIntl(TopBackersCoverWithData));

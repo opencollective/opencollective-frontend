@@ -1,9 +1,5 @@
 import styled from 'styled-components';
-import {
-  display,
-  height,
-  width,
-} from 'styled-system';
+import { display, height, width } from 'styled-system';
 
 const Caret = styled.div`
   position: relative;
@@ -26,9 +22,13 @@ const Caret = styled.div`
   }
 
   &::after {
-    border-left: ${props => `calc(${props.height} - ${props.strokeWidth}) solid transparent`};
-    border-right: ${props => `calc(${props.height} - ${props.strokeWidth}) solid transparent`};
-    border-top: ${props => `calc(${props.height} - ${props.strokeWidth}) solid ${props.bgColor || 'white'}`};
+    border-left: ${props =>
+      `calc(${props.height} - ${props.strokeWidth}) solid transparent`};
+    border-right: ${props =>
+      `calc(${props.height} - ${props.strokeWidth}) solid transparent`};
+    border-top: ${props =>
+      `calc(${props.height} - ${props.strokeWidth}) solid ${props.bgColor ||
+        'white'}`};
     left: ${props => props.strokeWidth}
   }
 `;

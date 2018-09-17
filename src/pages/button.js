@@ -4,7 +4,8 @@ import styled from 'styled-components';
 
 const CollectButton = styled.a`
   background-color: transparent;
-  background-image: ${({ color, verb }) => `url(/static/images/buttons/${verb}-button-${color}.svg)`};
+  background-image: ${({ color, verb }) =>
+    `url(/static/images/buttons/${verb}-button-${color}.svg)`};
   background-repeat: no-repeat;
   cursor: pointer;
   display: block;
@@ -13,7 +14,7 @@ const CollectButton = styled.a`
   margin: 0;
   overflow: hidden;
   padding: 0;
-  width: ${({ verb }) => verb === 'contribute' ? '338px' : '300px'};
+  width: ${({ verb }) => (verb === 'contribute' ? '338px' : '300px')};
 
   &:hover {
     background-position: 0 -50px;
@@ -29,8 +30,7 @@ const CollectButton = styled.a`
 `;
 
 class ButtonPage extends React.Component {
-
-  static getInitialProps ({ query: { color, collectiveSlug, verb } }) {
+  static getInitialProps({ query: { color, collectiveSlug, verb } }) {
     return { color, collectiveSlug, verb };
   }
 
@@ -51,7 +51,7 @@ class ButtonPage extends React.Component {
         href={`https://opencollective.com/${collectiveSlug}/${verb}`}
         color={color}
         verb={verb}
-        />
+      />
     );
   }
 }

@@ -1,13 +1,13 @@
 import { GraphQLClient } from 'graphql-request';
 import { uniqBy } from 'lodash';
 
-import { getGraphqlUrl } from '../../lib/utils'
+import { getGraphqlUrl } from '../../lib/utils';
 
 let client;
 
 function getClient() {
   if (!client) {
-    client = new GraphQLClient(getGraphqlUrl(), { headers: {} })
+    client = new GraphQLClient(getGraphqlUrl(), { headers: {} });
   }
   return client;
 }
@@ -72,9 +72,9 @@ export async function fetchMembersStats(params) {
       const count = (backerType.match(/sponsor/)) ? res.Collective.stats.backers.organizations : res.Collective.stats.backers.users;
       return {
         name: backerType,
-        count
-      }
-    }
+        count,
+      };
+    };
   } else if (tierSlug) {
     query = `
     query Collective($collectiveSlug: String, $tierSlug: String) {
@@ -93,9 +93,9 @@ export async function fetchMembersStats(params) {
       return {
         count: res.Collective.tiers[0].stats.totalDistinctOrders,
         slug: res.Collective.tiers[0].slug,
-        name: res.Collective.tiers[0].name
-      }
-    }
+        name: res.Collective.tiers[0].name,
+      };
+    };
   }
   const result = await getClient().request(query, params);
   const count = processResult(result);
@@ -116,16 +116,16 @@ export async function fetchMembers({ collectiveSlug, tierSlug, backerType, isAct
     processResult = (res) => {
       const users = res.Collective.data.githubContributors;
       return Object.keys(users).map(username => {
-        const commits = users[username]
+        const commits = users[username];
         return {
           slug: username,
           type: 'USER',
           image: `https://avatars.githubusercontent.com/${username}?s=96`,
           website: `https://github.com/${username}`,
-          stats: { c: commits }
-        }
+          stats: { c: commits },
+        };
       });
-    }
+    };
   } else if (backerType) {
     type = backerType.match(/sponsor/i) ? 'ORGANIZATION' : 'USER';
     if (backerType.match(/(backer|sponsor)/)) {
@@ -284,7 +284,7 @@ export async function fetchInvoice(invoiceSlug, accessToken) {
     }
   }
   `;
-  const client = new GraphQLClient(getGraphqlUrl(), { headers: { authorization: `Bearer ${accessToken}`} })
+  const client = new GraphQLClient(getGraphqlUrl(), { headers: { authorization: `Bearer ${accessToken}` } });
   const result = await client.request(query, { invoiceSlug });
   return result.Invoice;
 }

@@ -5,17 +5,17 @@ import { pick, isArray } from 'lodash';
 const createOrderQuery = gql`
   mutation createOrder($order: OrderInputType!) {
     createOrder(order: $order) {
-      id,
-      createdAt,
+      id
+      createdAt
       createdByUser {
-        id,
-      },
+        id
+      }
       fromCollective {
-        id,
+        id
         slug
       }
       collective {
-        id,
+        id
         slug
       }
     }
@@ -23,31 +23,38 @@ const createOrderQuery = gql`
 `;
 
 const createMemberQuery = gql`
-mutation createMember($member: CollectiveAttributesInputType!, $collective: CollectiveAttributesInputType!, $role: String!) {
-  createMember(member: $member, collective: $collective, role: $role) {
-    id
-    createdAt
-    member {
+  mutation createMember(
+    $member: CollectiveAttributesInputType!
+    $collective: CollectiveAttributesInputType!
+    $role: String!
+  ) {
+    createMember(member: $member, collective: $collective, role: $role) {
       id
-      name
-      image
-      slug
-      twitterHandle
-      description
+      createdAt
+      member {
+        id
+        name
+        image
+        slug
+        twitterHandle
+        description
+      }
+      role
     }
-    role
   }
-}
 `;
 
 const removeMemberQuery = gql`
-  mutation removeMember($member: CollectiveAttributesInputType!, $collective: CollectiveAttributesInputType!, $role: String!) {
+  mutation removeMember(
+    $member: CollectiveAttributesInputType!
+    $collective: CollectiveAttributesInputType!
+    $role: String!
+  ) {
     removeMember(member: $member, collective: $collective, role: $role) {
       id
     }
   }
 `;
-
 
 const createCollectiveQuery = gql`
   mutation createCollective($collective: CollectiveInputType!) {
@@ -121,9 +128,9 @@ const editCollectiveQuery = gql`
 const editTiersQuery = gql`
   mutation editTiers($id: Int!, $tiers: [TierInputType]!) {
     editTiers(id: $id, tiers: $tiers) {
-      id,
-      type,
-      name,
+      id
+      type
+      name
       amount
     }
   }
@@ -138,28 +145,34 @@ const deleteCollectiveQuery = gql`
 `;
 
 export const addCreateOrderMutation = graphql(createOrderQuery, {
-  props: ( { mutate }) => ({
-    createOrder: (order) => mutate({ variables: { order } })
-  })
+  props: ({ mutate }) => ({
+    createOrder: order => mutate({ variables: { order } }),
+  }),
 });
 
 export const addCreateMemberMutation = graphql(createMemberQuery, {
-  props: ( { mutate }) => ({
-    createMember: (member, collective, role) => mutate({ variables: { member, collective, role } })
-  })
+  props: ({ mutate }) => ({
+    createMember: (member, collective, role) =>
+      mutate({ variables: { member, collective, role } }),
+  }),
 });
 
 export const addRemoveMemberMutation = graphql(removeMemberQuery, {
-  props: ( { mutate }) => ({
-    removeMember: (member, collective, role) => mutate({ variables: { member, collective, role } })
-  })
+  props: ({ mutate }) => ({
+    removeMember: (member, collective, role) =>
+      mutate({ variables: { member, collective, role } }),
+  }),
 });
 
-export const addEventMutations = compose(addCreateOrderMutation, addCreateMemberMutation, addRemoveMemberMutation);
+export const addEventMutations = compose(
+  addCreateOrderMutation,
+  addCreateMemberMutation,
+  addRemoveMemberMutation,
+);
 
 export const addCreateCollectiveMutation = graphql(createCollectiveQuery, {
-  props: ( { mutate }) => ({
-    createCollective: async (collective) => {
+  props: ({ mutate }) => ({
+    createCollective: async collective => {
       const CollectiveInputType = pick(collective, [
         'slug',
         'type',
@@ -179,18 +192,32 @@ export const addCreateCollectiveMutation = graphql(createCollectiveQuery, {
         'quantity',
         'HostCollectiveId',
         'ParentCollectiveId',
-        'data'
+        'data',
       ]);
-      CollectiveInputType.tiers = (collective.tiers || []).map(tier => pick(tier, ['type', 'name', 'description', 'amount', 'maxQuantity', 'maxQuantityPerUser']));
-      CollectiveInputType.location = pick(collective.location, ['name','address','lat','long']);
-      return await mutate({ variables: { collective: CollectiveInputType } })
-    }
-  })
+      CollectiveInputType.tiers = (collective.tiers || []).map(tier =>
+        pick(tier, [
+          'type',
+          'name',
+          'description',
+          'amount',
+          'maxQuantity',
+          'maxQuantityPerUser',
+        ]),
+      );
+      CollectiveInputType.location = pick(collective.location, [
+        'name',
+        'address',
+        'lat',
+        'long',
+      ]);
+      return await mutate({ variables: { collective: CollectiveInputType } });
+    },
+  }),
 });
 
 export const addEditCollectiveMutation = graphql(editCollectiveQuery, {
-  props: ( { mutate }) => ({
-    editCollective: async (collective) => {
+  props: ({ mutate }) => ({
+    editCollective: async collective => {
       const CollectiveInputType = pick(collective, [
         'id',
         'type',
@@ -214,15 +241,36 @@ export const addEditCollectiveMutation = graphql(editCollectiveQuery, {
         'HostCollectiveId',
         'image',
         'backgroundImage',
-        'settings'
+        'settings',
       ]);
       if (collective.paymentMethods && collective.paymentMethods.length > 0) {
-        CollectiveInputType.paymentMethods = collective.paymentMethods.map(pm => pick(pm, ['id', 'name', 'token', 'data', 'monthlyLimitPerMember', 'currency']));
+        CollectiveInputType.paymentMethods = collective.paymentMethods.map(pm =>
+          pick(pm, [
+            'id',
+            'name',
+            'token',
+            'data',
+            'monthlyLimitPerMember',
+            'currency',
+          ]),
+        );
       } else {
         CollectiveInputType.paymentMethods = []; // force removing existing payment methods
       }
       if (isArray(collective.tiers)) {
-        CollectiveInputType.tiers = collective.tiers.map(tier => pick(tier, ['id', 'type', 'name', 'description', 'amount', 'interval', 'maxQuantity', 'maxQuantityPerUser', 'presets']));
+        CollectiveInputType.tiers = collective.tiers.map(tier =>
+          pick(tier, [
+            'id',
+            'type',
+            'name',
+            'description',
+            'amount',
+            'interval',
+            'maxQuantity',
+            'maxQuantityPerUser',
+            'presets',
+          ]),
+        );
       }
       if (isArray(collective.members)) {
         CollectiveInputType.members = collective.members.map(member => {
@@ -232,30 +280,47 @@ export const addEditCollectiveMutation = graphql(editCollectiveQuery, {
             description: member.description,
             member: {
               name: member.member.name,
-              email: member.member.email
-            }
-          }
+              email: member.member.email,
+            },
+          };
         });
       }
-      CollectiveInputType.location = pick(collective.location, ['name','address','lat','long']);
-      return await mutate({ variables: { collective: CollectiveInputType } })
-    }
-  })
+      CollectiveInputType.location = pick(collective.location, [
+        'name',
+        'address',
+        'lat',
+        'long',
+      ]);
+      return await mutate({ variables: { collective: CollectiveInputType } });
+    },
+  }),
 });
 
 export const addEditTiersMutation = graphql(editTiersQuery, {
-  props: ( { mutate }) => ({
+  props: ({ mutate }) => ({
     editTiers: async (collectiveSlug, tiers) => {
-      tiers = tiers.map(tier => pick(tier, ['id', 'type', 'name', 'description', 'amount', 'maxQuantity', 'maxQuantityPerUser', 'interval', 'endsAt']));
-      return await mutate({ variables: { collectiveSlug, tiers } })
-    }
-  })
+      tiers = tiers.map(tier =>
+        pick(tier, [
+          'id',
+          'type',
+          'name',
+          'description',
+          'amount',
+          'maxQuantity',
+          'maxQuantityPerUser',
+          'interval',
+          'endsAt',
+        ]),
+      );
+      return await mutate({ variables: { collectiveSlug, tiers } });
+    },
+  }),
 });
 
 export const addDeleteCollectiveMutation = graphql(deleteCollectiveQuery, {
-  props: ( { mutate }) => ({
-    deleteCollective: async (id) => {
-      return await mutate({ variables: { id } })
-    }
-  })
+  props: ({ mutate }) => ({
+    deleteCollective: async id => {
+      return await mutate({ variables: { id } });
+    },
+  }),
 });

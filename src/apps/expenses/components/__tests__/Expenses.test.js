@@ -12,21 +12,21 @@ import initClient from '../../../../lib/initClient';
 
 const apolloClient = initClient();
 
-describe("Expenses component", () => {
+describe('Expenses component', () => {
 
   const collective = {
     slug: 'test',
     id: 1,
     name: 'webpack',
-    stats: { balance: 10000}
-  }
+    stats: { balance: 10000 },
+  };
 
   const fromCollective = {
     id: 2,
     type: 'USER',
     slug: 'user1',
 
-  }
+  };
 
   const expenseConsts = {
     currency: 'USD',
@@ -34,11 +34,11 @@ describe("Expenses component", () => {
     payoutMethod: 'paypal',
     incurredAt: '2017-11-05',
     collective,
-    fromCollective};
+    fromCollective };
 
   const expenses = [
-    Object.assign({}, {...expenseConsts}, {id: 1, amount: 1000}),
-    Object.assign({}, {...expenseConsts}, {id: 2, amount: 1000})
+    Object.assign({}, { ...expenseConsts }, { id: 1, amount: 1000 }),
+    Object.assign({}, { ...expenseConsts }, { id: 2, amount: 1000 }),
   ];
 
   const loggedInUser = {
@@ -48,8 +48,8 @@ describe("Expenses component", () => {
     canEditExpense: () => true,
     collective: {
       id: 3,
-      slug: 'hostuser'
-    }}
+      slug: 'hostuser',
+    } };
 
   const component = mount(
     <IntlProvider locale="en">
@@ -59,7 +59,7 @@ describe("Expenses component", () => {
           editable={true}
           LoggedInUser={loggedInUser}
           payExpense={() => setTimeout(() => Promise.resolve(), 2000)}
-          />
+        />
       </ApolloProvider>
     </IntlProvider>
   );
@@ -83,8 +83,8 @@ describe("Expenses component", () => {
       setTimeout(() => {
         expect(component.find('.PayExpenseBtn button').length).toEqual(1);
         expect(component.find('.PayExpenseBtn button[disabled]').length).toEqual(undefined);
-      }, 2000)
+      }, 2000);
       done();
     });
-  })
+  });
 });

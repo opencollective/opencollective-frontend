@@ -16,8 +16,7 @@ import withIntl from '../lib/withIntl';
 import withLoggedInUser from '../lib/withLoggedInUser';
 
 class UpdatePage extends React.Component {
-
-  static getInitialProps ({ query: { collectiveSlug, updateSlug } }) {
+  static getInitialProps({ query: { collectiveSlug, updateSlug } }) {
     return { slug: collectiveSlug, updateSlug };
   }
 
@@ -33,7 +32,10 @@ class UpdatePage extends React.Component {
     super(props);
     this.state = {};
     this.messages = defineMessages({
-      'collective.contribute': { id: 'collective.contribute', defaultMessage: 'contribute' },
+      'collective.contribute': {
+        id: 'collective.contribute',
+        defaultMessage: 'contribute',
+      },
     });
   }
 
@@ -48,14 +50,13 @@ class UpdatePage extends React.Component {
     const { LoggedInUser } = this.state;
 
     if (!data.Collective) {
-      return (<ErrorPage data={data} />);
+      return <ErrorPage data={data} />;
     }
 
     const collective = data.Collective;
 
     return (
       <div className="UpdatePage">
-
         <Header
           title={collective.name}
           description={collective.description}
@@ -63,33 +64,34 @@ class UpdatePage extends React.Component {
           image={collective.image || collective.backgroundImage}
           className={this.state.status}
           LoggedInUser={LoggedInUser}
-          />
+        />
 
         <Body>
-
           <CollectiveCover
             collective={collective}
-            cta={{ href: '#contribute', label: intl.formatMessage(this.messages['collective.contribute']) }}
+            cta={{
+              href: '#contribute',
+              label: intl.formatMessage(this.messages['collective.contribute']),
+            }}
             href={`/${collective.slug}`}
-            />
+          />
 
-          <div className="content" >
+          <div className="content">
             <UpdateWithData
               collectiveSlug={collective.slug}
               updateSlug={updateSlug}
               editable={true}
               LoggedInUser={LoggedInUser}
-              />
+            />
           </div>
-
         </Body>
 
         <Footer />
-
       </div>
     );
   }
-
 }
 
-export default withData(withIntl(withLoggedInUser(addCollectiveCoverData(UpdatePage))));
+export default withData(
+  withIntl(withLoggedInUser(addCollectiveCoverData(UpdatePage))),
+);

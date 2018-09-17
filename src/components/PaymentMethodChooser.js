@@ -9,7 +9,6 @@ import { getStripeToken } from '../lib/stripe';
 import SmallButton from './SmallButton';
 
 class PaymentMethodChooser extends React.Component {
-
   static propTypes = {
     paymentMethodInUse: PropTypes.object.isRequired,
     paymentMethodsList: PropTypes.arrayOf(PropTypes.object),
@@ -33,18 +32,42 @@ class PaymentMethodChooser extends React.Component {
       showNewCreditCardForm: false,
       result: {},
       card: {},
-      showUnknownPaymentMethodHelp: Boolean(!this.props.paymentMethodInUse.name), // check for premigration payment methods
+      showUnknownPaymentMethodHelp: Boolean(
+        !this.props.paymentMethodInUse.name,
+      ), // check for premigration payment methods
     };
 
     this.messages = defineMessages({
-      'paymentMethod.add': { id: 'paymentMethod.add', defaultMessage: 'Add credit card' },
+      'paymentMethod.add': {
+        id: 'paymentMethod.add',
+        defaultMessage: 'Add credit card',
+      },
       'paymentMethod.save': { id: 'save', defaultMessage: 'save' },
-      'paymentMethod.cancel': { id: 'paymentMethod.cancel', defaultMessage: 'Cancel' },
-      'paymentMethod.success': { id: 'paymentMethod.success', defaultMessage: 'Successfully added!' },
-      'paymentMethod.expire': { id: 'paymentMethod.expire', defaultMessage: 'Exp' },
-      'paymentMethod.whyUnknownTitle': { id: 'paymentMethod.whyUnknownTitle', defaultMessage: 'Why is my credit card not showing up?' },
-      'paymentMethod.whyUnknown': { id: 'paymentMethod.whyUnknown', defaultMessage: 'This subscription was created using an early version of our site when we didn\'t store credit card numbers. We suggest that you update this subscription with a newer credit card.' },
-      'paymentMethod.cardUnavailable': { id: 'paymentMethod.cardUnavailable', defaultMessage: '(credit card info not available)' },
+      'paymentMethod.cancel': {
+        id: 'paymentMethod.cancel',
+        defaultMessage: 'Cancel',
+      },
+      'paymentMethod.success': {
+        id: 'paymentMethod.success',
+        defaultMessage: 'Successfully added!',
+      },
+      'paymentMethod.expire': {
+        id: 'paymentMethod.expire',
+        defaultMessage: 'Exp',
+      },
+      'paymentMethod.whyUnknownTitle': {
+        id: 'paymentMethod.whyUnknownTitle',
+        defaultMessage: 'Why is my credit card not showing up?',
+      },
+      'paymentMethod.whyUnknown': {
+        id: 'paymentMethod.whyUnknown',
+        defaultMessage:
+          "This subscription was created using an early version of our site when we didn't store credit card numbers. We suggest that you update this subscription with a newer credit card.",
+      },
+      'paymentMethod.cardUnavailable': {
+        id: 'paymentMethod.cardUnavailable',
+        defaultMessage: '(credit card info not available)',
+      },
     });
   }
 
@@ -70,9 +93,8 @@ class PaymentMethodChooser extends React.Component {
 
     // handles the case where there are no existing credit cards
     if (paymentMethodsList.length === 0 && editMode) {
-      this.setState({ showNewCreditCardForm: true});
+      this.setState({ showNewCreditCardForm: true });
     }
-
   }
 
   resetForm() {
@@ -81,18 +103,18 @@ class PaymentMethodChooser extends React.Component {
       showSelector: false,
       showNewCreditCardForm: false,
       result: {},
-      card: {}
-    })
+      card: {},
+    });
     return this.props.onCancel();
   }
 
   error(msg) {
     const error = `${msg}`;
-    this.setState({ result: { error }});
+    this.setState({ result: { error } });
   }
 
   resetError() {
-    this.setState({ result: { error: null }});
+    this.setState({ result: { error: null } });
   }
 
   handleChange(value) {
@@ -100,15 +122,15 @@ class PaymentMethodChooser extends React.Component {
 
     // determine if anything has changed
     if (this.props.paymentMethodInUse.uuid !== newUuid) {
-      this.setState({ modified: true })
+      this.setState({ modified: true });
     } else {
-      this.setState({ modified: false })
+      this.setState({ modified: false });
     }
 
     if (value && value.uuid === 'add') {
-      this.setState({ showNewCreditCardForm: true});
+      this.setState({ showNewCreditCardForm: true });
     } else {
-      this.setState({card: value});
+      this.setState({ card: value });
     }
   }
 
@@ -119,7 +141,7 @@ class PaymentMethodChooser extends React.Component {
       try {
         res = await getStripeToken('cc', card);
       } catch (e) {
-        console.log(">>> error: ", typeof e, e);
+        console.log('>>> error: ', typeof e, e);
         this.error(e);
         return false;
       }
@@ -136,24 +158,23 @@ class PaymentMethodChooser extends React.Component {
           brand: res.card.brand,
           country: res.card.country,
           funding: res.card.funding,
-          zip: res.card.address_zip
+          zip: res.card.address_zip,
         },
       };
-      this.setState({card: paymentMethod});
+      this.setState({ card: paymentMethod });
     }
     return true;
-
   }
 
   async onSubmit() {
     this.setState({ loading: true });
 
-    if (! await this.validate()) {
+    if (!(await this.validate())) {
       return false;
     }
     const { card } = this.state;
 
-    this.setState({ loading: false })
+    this.setState({ loading: false });
     await this.props.onSubmit(card);
   }
 
@@ -164,7 +185,9 @@ class PaymentMethodChooser extends React.Component {
       return `${pm.name} (${pm.service} ${pm.type})`;
     }
 
-    const defaultString = intl.formatMessage(this.messages['paymentMethod.cardUnavailable']);
+    const defaultString = intl.formatMessage(
+      this.messages['paymentMethod.cardUnavailable'],
+    );
 
     if (!pm.name || !pm.data) return defaultString;
 
@@ -173,19 +196,26 @@ class PaymentMethodChooser extends React.Component {
     if (pmData.brand.toLowerCase() === 'american express') {
       pmData.brand = 'AMEX';
     } else if (pmData.brand.length > 10) {
-      pmData.brand = `${pmData.brand.slice(0, 8)}...`
+      pmData.brand = `${pmData.brand.slice(0, 8)}...`;
     }
 
-    const expiryString = (pmData.expMonth && pmData.expYear) ? ` (${intl.formatMessage(this.messages['paymentMethod.expire'])}: ${pmData.expMonth}/${pmData.expYear})` : '';
+    const expiryString =
+      pmData.expMonth && pmData.expYear
+        ? ` (${intl.formatMessage(this.messages['paymentMethod.expire'])}: ${
+            pmData.expMonth
+          }/${pmData.expYear})`
+        : '';
 
-    return `💳 \xA0\xA0${pmData.brand.toUpperCase()} ***${pm.name || pmData.last4}${expiryString}`
+    return `💳 \xA0\xA0${pmData.brand.toUpperCase()} ***${pm.name ||
+      pmData.last4}${expiryString}`;
   }
 
   populatePaymentMethods() {
     const { intl } = this.props;
-    let paymentMethods = [], paymentMethodsOptions = [];
+    let paymentMethods = [],
+      paymentMethodsOptions = [];
 
-    const generateOptions = (paymentMethods) => {
+    const generateOptions = paymentMethods => {
       return paymentMethods.map(pm => {
         const value = pm.uuid;
         const label = this.generatePMString(pm);
@@ -195,10 +225,14 @@ class PaymentMethodChooser extends React.Component {
       });
     };
 
-    paymentMethods = (this.props.paymentMethodsList || []).filter(pm => ['stripe', 'opencollective'].includes(pm.service));
+    paymentMethods = (this.props.paymentMethodsList || []).filter(pm =>
+      ['stripe', 'opencollective'].includes(pm.service),
+    );
     paymentMethodsOptions = generateOptions(paymentMethods);
 
-    paymentMethodsOptions.push({ 'add': intl.formatMessage(this.messages['paymentMethod.add']) });
+    paymentMethodsOptions.push({
+      add: intl.formatMessage(this.messages['paymentMethod.add']),
+    });
 
     return paymentMethodsOptions;
   }
@@ -206,113 +240,139 @@ class PaymentMethodChooser extends React.Component {
   render() {
     const { intl } = this.props;
 
-    const paymentMethodString = this.generatePMString(this.props.paymentMethodInUse);
+    const paymentMethodString = this.generatePMString(
+      this.props.paymentMethodInUse,
+    );
 
     const paymentMethodsOptions = this.populatePaymentMethods();
 
-    const popover = (<Popover id="popover-positioned-top" title={intl.formatMessage(this.messages['paymentMethod.whyUnknownTitle'])} >
-      {intl.formatMessage(this.messages['paymentMethod.whyUnknown'])}
-    </Popover>);
+    const popover = (
+      <Popover
+        id="popover-positioned-top"
+        title={intl.formatMessage(
+          this.messages['paymentMethod.whyUnknownTitle'],
+        )}
+      >
+        {intl.formatMessage(this.messages['paymentMethod.whyUnknown'])}
+      </Popover>
+    );
 
     const fontSize = '12px';
 
     return (
       <div className="PaymentMethodChooser">
         <style jsx global>{`
-        .PaymentMethodChooser .form-group .control-label {
-          display: none;
-        }
-        .PaymentMethodChooser .form-control {
-          font-size: 11px;
-        }
+          .PaymentMethodChooser .form-group .control-label {
+            display: none;
+          }
+          .PaymentMethodChooser .form-control {
+            font-size: 11px;
+          }
 
-        .PaymentMethodChooser .horizontal.form-group {
-          overflow: hidden;
-        }
+          .PaymentMethodChooser .horizontal.form-group {
+            overflow: hidden;
+          }
 
-        .PaymentMethodChooser .horizontal.creditcard {
-          overflow: hidden;
-        }
+          .PaymentMethodChooser .horizontal.creditcard {
+            overflow: hidden;
+          }
 
-        .PaymentMethodChooser .CreditCardForm {
-          padding-top: 0.5rem;
-        }
+          .PaymentMethodChooser .CreditCardForm {
+            padding-top: 0.5rem;
+          }
 
-        .PaymentMethodChooser #card-errors {
-          font-size: ${fontSize};
-        }
+          .PaymentMethodChooser #card-errors {
+            font-size: ${fontSize};
+          }
 
-        .PaymentMethodChooser .col-sm-10 {
-          width: 100%;
-        }
-      `}</style>
+          .PaymentMethodChooser .col-sm-10 {
+            width: 100%;
+          }
+        `}</style>
         <style jsx>{`
-        .actions {
-          display: flex;
-          flex-direction: row;
-          width: 200px;
-          justify-content: space-evenly;
-          margin: auto;
-          margin-top: 6px;
-        }
-      `}</style>
+          .actions {
+            display: flex;
+            flex-direction: row;
+            width: 200px;
+            justify-content: space-evenly;
+            margin: auto;
+            margin-top: 6px;
+          }
+        `}</style>
 
-        {!this.props.editMode &&
-        <div className="paymentmethod-info">
-          {paymentMethodString} {this.state.showUnknownPaymentMethodHelp &&
-            <OverlayTrigger trigger="click" placement={"top"} overlay={popover} rootClose>
-              <img className="help-image" src="/static/images/help-icon.svg" />
-            </OverlayTrigger>
-            }
-        </div>}
+        {!this.props.editMode && (
+          <div className="paymentmethod-info">
+            {paymentMethodString}{' '}
+            {this.state.showUnknownPaymentMethodHelp && (
+              <OverlayTrigger
+                trigger="click"
+                placement={'top'}
+                overlay={popover}
+                rootClose
+              >
+                <img
+                  className="help-image"
+                  src="/static/images/help-icon.svg"
+                />
+              </OverlayTrigger>
+            )}
+          </div>
+        )}
 
-        { this.props.editMode && !this.state.showNewCreditCardForm &&
-        <InputField
-          type="select"
-          className="horizontal"
-          name="creditcardSelector"
-          onChange={uuid => this.handleChange({ uuid })}
-          options={paymentMethodsOptions}
-          defaultValue={this.props.paymentMethodInUse.uuid}
-          />}
-
-
-        { this.props.editMode && this.state.showNewCreditCardForm &&
-        <div>
-          <InputField
-            type="creditcard"
-            name="creditcard"
-            className="horizontal"
-            onChange={(creditcardObject) => this.handleChange(creditcardObject)}
-            style={{ base: { fontSize } }}
+        {this.props.editMode &&
+          !this.state.showNewCreditCardForm && (
+            <InputField
+              type="select"
+              className="horizontal"
+              name="creditcardSelector"
+              onChange={uuid => this.handleChange({ uuid })}
+              options={paymentMethodsOptions}
+              defaultValue={this.props.paymentMethodInUse.uuid}
             />
-        </div>}
+          )}
 
-        { this.props.editMode &&
-        <div className="actions">
-          <SmallButton className="no" bsStyle="primary" onClick={this.resetForm}>
-            {intl.formatMessage(this.messages['paymentMethod.cancel'])}
-          </SmallButton>
+        {this.props.editMode &&
+          this.state.showNewCreditCardForm && (
+            <div>
+              <InputField
+                type="creditcard"
+                name="creditcard"
+                className="horizontal"
+                onChange={creditcardObject =>
+                  this.handleChange(creditcardObject)
+                }
+                style={{ base: { fontSize } }}
+              />
+            </div>
+          )}
 
-          <SmallButton
-            className="yes"
-            bsStyle="primary"
-            onClick={this.onSubmit}
-            disabled={this.state.loading || !this.state.modified}
-            style={{ minWidth: '80px' }}
+        {this.props.editMode && (
+          <div className="actions">
+            <SmallButton
+              className="no"
+              bsStyle="primary"
+              onClick={this.resetForm}
             >
-            {intl.formatMessage(this.messages['paymentMethod.save'])}
-          </SmallButton>
-        </div>}
+              {intl.formatMessage(this.messages['paymentMethod.cancel'])}
+            </SmallButton>
+
+            <SmallButton
+              className="yes"
+              bsStyle="primary"
+              onClick={this.onSubmit}
+              disabled={this.state.loading || !this.state.modified}
+              style={{ minWidth: '80px' }}
+            >
+              {intl.formatMessage(this.messages['paymentMethod.save'])}
+            </SmallButton>
+          </div>
+        )}
 
         <div className="result">
-          { this.state.result.error &&
-            <div className="error">
-              {this.state.result.error}
-            </div>
-          }
+          {this.state.result.error && (
+            <div className="error">{this.state.result.error}</div>
+          )}
         </div>
-
       </div>
     );
   }

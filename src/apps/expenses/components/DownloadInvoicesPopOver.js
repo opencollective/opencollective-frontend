@@ -2,10 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
 import { FormattedMessage } from 'react-intl';
-import { graphql } from 'react-apollo'
-import gql from 'graphql-tag'
+import { graphql } from 'react-apollo';
+import gql from 'graphql-tag';
 import { Popover, OverlayTrigger } from 'react-bootstrap';
-import { saveAs } from 'file-saver'
+import { saveAs } from 'file-saver';
 import { uniq } from 'lodash';
 
 import withIntl from '../../../lib/withIntl';
@@ -18,8 +18,8 @@ import InputField from '../../../components/InputField';
 class Overlay extends React.Component {
 
   static propTypes = {
-    data: PropTypes.object.isRequired
-  }
+    data: PropTypes.object.isRequired,
+  };
 
   constructor(props) {
     super(props);
@@ -28,14 +28,14 @@ class Overlay extends React.Component {
     this.renderInvoice = this.renderInvoice.bind(this);
     this.state = {
       loading: false,
-      year: (new Date).getFullYear()
+      year: (new Date).getFullYear(),
     };
   }
 
   async download(invoice) {
-    this.setState({ loading: invoice.slug })
+    this.setState({ loading: invoice.slug });
     const { fromCollectiveSlug } = this.props;
-    const file = await api.get(`/${fromCollectiveSlug}/invoices/${invoice.slug}.pdf`, { format: 'blob'});
+    const file = await api.get(`/${fromCollectiveSlug}/invoices/${invoice.slug}.pdf`, { format: 'blob' });
     this.setState({ loading: false });
     return saveAs(file, `${invoice.slug}.pdf`);
   }
@@ -45,7 +45,7 @@ class Overlay extends React.Component {
       const obj = {};
       obj[key] = key;
       return obj;
-    })
+    });
   }
 
   renderInvoice(invoice) {
@@ -62,13 +62,14 @@ class Overlay extends React.Component {
           img {
             margin-right: 5px;
           }
-        `}</style>
+        `}
+        </style>
         <a onClick={() => this.download(invoice)}>
           <img height={24} src={icon} />
           {invoice.host.slug} ({formatCurrency(invoice.totalAmount, invoice.currency, { precision: 0 })})
         </a>
       </div>
-    )
+    );
   }
 
   renderMonth(month) {
@@ -80,11 +81,12 @@ class Overlay extends React.Component {
           h2 {
             font-size: 1.8rem;
           }
-        `}</style>
+        `}
+        </style>
         <h2>{moment(new Date(`${this.state.year}-${month2digit}-01`)).format('MMMM')}</h2>
         {invoices.map(this.renderInvoice)}
       </div>
-    )
+    );
   }
 
   render() {
@@ -94,7 +96,7 @@ class Overlay extends React.Component {
         <Popover id="downloadInvoicesPopover" title="Download invoices" {...this.props}>
           <div><FormattedMessage id="loading" defaultMessage="loading" />...</div>
         </Popover>
-      )
+      );
     }
     const invoices = data.allInvoices;
     const years = uniq(invoices.map(i => i.year));
@@ -106,12 +108,12 @@ class Overlay extends React.Component {
           type="select"
           options={this.arrayToFormOptions(years)}
           onChange={(year => this.setState({ year }))}
-          />
+        />
         <div>
           { months.map(this.renderMonth)}
         </div>
       </Popover>
-    )
+    );
   }
 }
 
@@ -145,7 +147,7 @@ class PopoverButton extends React.Component {
           <FormattedMessage id="transactions.downloadinvoicesbutton" defaultMessage="Download Receipts" />
         </a>
       </OverlayTrigger>
-    )
+    );
   }
 }
 

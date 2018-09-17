@@ -1,13 +1,6 @@
 import styled from 'styled-components';
 import { Box } from 'grid-styled';
-import {
-  bottom,
-  height,
-  left,
-  position,
-  right,
-  top,
-} from 'styled-system';
+import { bottom, height, left, position, right, top } from 'styled-system';
 import PropTypes from 'prop-types';
 
 import { pointerEvents } from './Container';
@@ -19,11 +12,14 @@ export const breakpoints = {
   lg: '@media screen and (min-width: 64em)',
 };
 
-export const hidden = key => props => props[key] ? {
-  [breakpoints[key]]: {
-    display: 'none'
-  }
-} : null;
+export const hidden = key => props =>
+  props[key]
+    ? {
+        [breakpoints[key]]: {
+          display: 'none',
+        },
+      }
+    : null;
 
 export const xs = hidden('xs');
 export const sm = hidden('sm');
@@ -46,12 +42,7 @@ const Hide = styled(Box)`
 `;
 
 Hide.defaultProps = {
-  blacklist: [
-    'xs',
-    'sm',
-    'md',
-    'lg',
-  ],
+  blacklist: ['xs', 'sm', 'md', 'lg'],
 };
 
 Hide.propTypes = {

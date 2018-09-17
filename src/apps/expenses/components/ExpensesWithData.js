@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from 'react-apollo'
-import gql from 'graphql-tag'
+import { graphql } from 'react-apollo';
+import gql from 'graphql-tag';
 
 import withIntl from '../../../lib/withIntl';
 import Error from '../../../components/Error';
@@ -18,8 +18,8 @@ class ExpensesWithData extends React.Component {
     defaultAction: PropTypes.string, // "new" to open the new expense form by default
     includeHostedCollectives: PropTypes.bool,
     filters: PropTypes.bool,
-    LoggedInUser: PropTypes.object
-  }
+    LoggedInUser: PropTypes.object,
+  };
 
   constructor(props) {
     super(props);
@@ -32,12 +32,12 @@ class ExpensesWithData extends React.Component {
       collective,
       view,
       includeHostedCollectives,
-      filters
+      filters,
     } = this.props;
 
     if (data.error) {
-      console.error("graphql error>>>", data.error.message);
-      return (<Error message="GraphQL error" />)
+      console.error('graphql error>>>', data.error.message);
+      return (<Error message="GraphQL error" />);
     }
 
     const expenses = data.allExpenses;
@@ -55,7 +55,7 @@ class ExpensesWithData extends React.Component {
           filters={filters}
           LoggedInUser={LoggedInUser}
           includeHostedCollectives={includeHostedCollectives}
-          />
+        />
 
       </div>
     );
@@ -114,7 +114,7 @@ const getExpensesVariables = (props) => {
     offset: 0,
     limit: props.limit || EXPENSES_PER_PAGE * 2,
     includeHostedCollectives: props.includeHostedCollectives || false,
-    ...props.filter
+    ...props.filter,
   };
   if (vars.category) {
     vars.fromCollectiveSlug = null;
@@ -122,14 +122,14 @@ const getExpensesVariables = (props) => {
     vars.category = null;
   }
   return vars;
-}
+};
 
 const EXPENSES_PER_PAGE = 10;
 export const addExpensesData = graphql(getExpensesQuery, {
   options(props) {
     return {
-      variables: getExpensesVariables(props)
-    }
+      variables: getExpensesVariables(props),
+    };
   },
   props: ({ data }) => ({
     data,
@@ -137,20 +137,20 @@ export const addExpensesData = graphql(getExpensesQuery, {
       return data.fetchMore({
         variables: {
           offset: data.allExpenses.length,
-          limit: EXPENSES_PER_PAGE
+          limit: EXPENSES_PER_PAGE,
         },
         updateQuery: (previousResult, { fetchMoreResult }) => {
           if (!fetchMoreResult) {
-            return previousResult
+            return previousResult;
           }
           return Object.assign({}, previousResult, {
             // Append the new posts results to the old one
-            allExpenses: [...previousResult.allExpenses, ...fetchMoreResult.allExpenses]
-          })
-        }
-      })
-    }
-  })
+            allExpenses: [...previousResult.allExpenses, ...fetchMoreResult.allExpenses],
+          });
+        },
+      });
+    },
+  }),
 });
 
 export default addExpensesData(withIntl(ExpensesWithData));

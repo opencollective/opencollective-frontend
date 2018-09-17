@@ -1,16 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import withIntl from '../lib/withIntl';
-import { FormattedMessage } from 'react-intl'
+import { FormattedMessage } from 'react-intl';
 import SectionTitle from './SectionTitle';
 import EventsWithData from './EventsWithData';
 
 class EventsSection extends React.Component {
-
   static propTypes = {
     collective: PropTypes.object.isRequired, // collective.id
-    LoggedInUser: PropTypes.object
-  }
+    LoggedInUser: PropTypes.object,
+  };
 
   constructor(props) {
     super(props);
@@ -22,8 +21,13 @@ class EventsSection extends React.Component {
     if (LoggedInUser && LoggedInUser.canEditCollective(collective)) {
       action = {
         href: `/${collective.slug}/events/new`,
-        label: <FormattedMessage id="sections.events.new" defaultMessage="Create an Event" />
-      }
+        label: (
+          <FormattedMessage
+            id="sections.events.new"
+            defaultMessage="Create an Event"
+          />
+        ),
+      };
     }
 
     return (
@@ -35,7 +39,6 @@ class EventsSection extends React.Component {
       </section>
     );
   }
-
 }
 
 export default withIntl(EventsSection);

@@ -15,8 +15,7 @@ import withIntl from '../lib/withIntl';
 import withLoggedInUser from '../lib/withLoggedInUser';
 
 class UpdatesPage extends React.Component {
-
-  static getInitialProps ({ query: { collectiveSlug, action } }) {
+  static getInitialProps({ query: { collectiveSlug, action } }) {
     return { slug: collectiveSlug, action };
   }
 
@@ -42,7 +41,7 @@ class UpdatesPage extends React.Component {
     const { data, action } = this.props;
     const { LoggedInUser } = this.state;
 
-    if (!data.Collective) return (<ErrorPage data={data} />);
+    if (!data.Collective) return <ErrorPage data={data} />;
 
     const collective = data.Collective;
 
@@ -55,35 +54,34 @@ class UpdatesPage extends React.Component {
           image={collective.image || collective.backgroundImage}
           className={this.state.status}
           LoggedInUser={LoggedInUser}
-          />
+        />
 
         <Body>
-
           <CollectiveCover
             collective={collective}
             href={`/${collective.slug}`}
-            cta={{ href: `/${collective.slug}#contribute`, label: 'contribute' }}
-            />
+            cta={{
+              href: `/${collective.slug}#contribute`,
+              label: 'contribute',
+            }}
+          />
 
-          <div className="content" >
-
+          <div className="content">
             <UpdatesWithData
               collective={collective}
               includeHostedCollectives={collective.isHost}
               defaultAction={action}
               LoggedInUser={this.state.LoggedInUser}
-              />
-
+            />
           </div>
-
         </Body>
 
         <Footer />
-
       </div>
     );
   }
-
 }
 
-export default withData(withIntl(withLoggedInUser(addCollectiveCoverData(UpdatesPage))));
+export default withData(
+  withIntl(withLoggedInUser(addCollectiveCoverData(UpdatesPage))),
+);

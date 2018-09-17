@@ -10,7 +10,7 @@ export async function list(req, res) {
     collectiveSlug,
     eventSlug,
     role,
-    tierSlug
+    tierSlug,
   } = req.params;
 
   let backerType;
@@ -106,11 +106,11 @@ export async function list(req, res) {
     if (r.tier.interval === 'month' && days(new Date(r.transactions[0].createdAt)) <= 31) return true;
     if (r.tier.interval === 'year' && days(new Date(r.transactions[0].createdAt)) <= 365) return true;
     return false;
-  }
+  };
 
   const mapping = {
     'MemberId': 'id',
-    'createdAt': r => moment(new Date(r.createdAt)).format("YYYY-MM-DD HH:mm"),
+    'createdAt': r => moment(new Date(r.createdAt)).format('YYYY-MM-DD HH:mm'),
     'type': 'member.type',
     'role': 'role',
     'tier': 'tier.name',
@@ -118,7 +118,7 @@ export async function list(req, res) {
     'totalAmountDonated': (r) => (get(r, 'stats.totalDonations') || 0) / 100,
     'currency': 'transactions[0].currency',
     'lastTransactionAt': r => {
-      return moment(r.transactions[0] && new Date(r.transactions[0].createdAt)).format("YYYY-MM-DD HH:mm");
+      return moment(r.transactions[0] && new Date(r.transactions[0].createdAt)).format('YYYY-MM-DD HH:mm');
     },
     'lastTransactionAmount': (r) => (get(r, 'transactions[0].amount') || 0) / 100,
     'profile': (r) => `${process.env.WEBSITE_URL}/${r.member.slug}`,
@@ -134,8 +134,8 @@ export async function list(req, res) {
       const githubAccount = r.member.connectedAccounts.find(c => c.service === 'github');
       return githubAccount ? `https://github.com/${githubAccount.username}` : null;
     },
-    'website': 'member.website'
-  }
+    'website': 'member.website',
+  };
 
   const fields = Object.keys(mapping);
 
@@ -150,7 +150,7 @@ export async function list(req, res) {
       }
     });
     return res;
-  }
+  };
 
   const data = members.map(applyMapping);
 

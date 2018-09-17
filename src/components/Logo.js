@@ -16,24 +16,28 @@ const Logo = ({ src, style = {}, height, type = 'ORGANIZATION', website }) => {
   if (!src) {
     backgroundStyle.backgroundImage = `url(${defaultImage[type]})`;
   }
-  const image = imagePreview(src, defaultImage[type], { height: style.maxHeight });
+  const image = imagePreview(src, defaultImage[type], {
+    height: style.maxHeight,
+  });
   return (
     <div className="Logo" style={backgroundStyle}>
-      <style jsx>{`
-        .Logo {
-          background-repeat: no-repeat;
-          background-position: center center;
-          background-size: cover;
-          overflow: hidden;
-          display: flex;
-          align-items: center;
-        }
-        .image {
-          background-repeat: no-repeat;
-          background-position: center center;
-          background-size: cover;
-        }
-      `}</style>
+      <style jsx>
+        {`
+          .Logo {
+            background-repeat: no-repeat;
+            background-position: center center;
+            background-size: cover;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+          }
+          .image {
+            background-repeat: no-repeat;
+            background-position: center center;
+            background-size: cover;
+          }
+        `}
+      </style>
       <img className="logo" src={image} style={style} />
     </div>
   );

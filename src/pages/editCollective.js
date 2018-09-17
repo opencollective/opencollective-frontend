@@ -6,7 +6,10 @@ import EditCollective from '../components/EditCollective';
 import ErrorPage from '../components/ErrorPage';
 
 import { addCollectiveToEditData } from '../graphql/queries';
-import { addEditCollectiveMutation, addDeleteCollectiveMutation } from '../graphql/mutations';
+import {
+  addEditCollectiveMutation,
+  addDeleteCollectiveMutation,
+} from '../graphql/mutations';
 
 import { getQueryParams } from '../lib/utils';
 
@@ -15,11 +18,9 @@ import withIntl from '../lib/withIntl';
 import withLoggedInUser from '../lib/withLoggedInUser';
 
 class EditCollectivePage extends React.Component {
-
-  static getInitialProps ({ query, res }) {
-
-    if (res){
-      res.setHeader('Cache-Control','no-cache');
+  static getInitialProps({ query, res }) {
+    if (res) {
+      res.setHeader('Cache-Control', 'no-cache');
     }
 
     return { slug: query && query.slug, query, ssr: false };
@@ -54,7 +55,7 @@ class EditCollectivePage extends React.Component {
     const { loading, LoggedInUser } = this.state;
 
     if (loading || !data.Collective) {
-      return (<ErrorPage loading={loading} data={data} />);
+      return <ErrorPage loading={loading} data={data} />;
     }
 
     const collective = data.Collective;
@@ -68,7 +69,7 @@ class EditCollectivePage extends React.Component {
           LoggedInUser={LoggedInUser}
           editCollective={editCollective}
           deleteCollective={deleteCollective}
-          />
+        />
       </div>
     );
   }
@@ -77,7 +78,9 @@ class EditCollectivePage extends React.Component {
 const addGraphQL = compose(
   addCollectiveToEditData,
   addEditCollectiveMutation,
-  addDeleteCollectiveMutation
+  addDeleteCollectiveMutation,
 );
 
-export default withData(withIntl(withLoggedInUser(addGraphQL(EditCollectivePage))));
+export default withData(
+  withIntl(withLoggedInUser(addGraphQL(EditCollectivePage))),
+);

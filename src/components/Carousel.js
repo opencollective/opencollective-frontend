@@ -34,30 +34,25 @@ const Dot = styled.button`
   outline: 0;
   padding: 10px;
 
-  ${({ active }) => `opacity: ${active ? 1 : 0.5};`}
+  ${({ active }) => `opacity: ${active ? 1 : 0.5};`};
 `;
 
-const Controls = ({
-  currentSlide,
-  goToSlide,
-  slideCount,
-  slidesToScroll,
-}) => (
+const Controls = ({ currentSlide, goToSlide, slideCount, slidesToScroll }) => (
   <List>
     {getIndexes(slideCount, slidesToScroll).map(index => (
       <ListItem key={index}>
         <Dot
           active={currentSlide === index}
           onClick={goToSlide.bind(null, index)}
-        >&bull;</Dot>
+        >
+          &bull;
+        </Dot>
       </ListItem>
     ))}
   </List>
 );
 
-const Carousel = ({
-  content,
-}) => {
+const Carousel = ({ content }) => {
   return (
     <NukaCarousel
       autoplay
@@ -74,8 +69,12 @@ const Carousel = ({
       {content.map(({ details, heading, image }) => (
         <Container key={image + heading + details}>
           <img src={image} />
-          <H4 textAlign="center" mb={3} fontSize={20}>{heading}</H4>
-          <P textAlign="center" color="#6E747A" fontSize={14}>{details}</P>
+          <H4 textAlign="center" mb={3} fontSize={20}>
+            {heading}
+          </H4>
+          <P textAlign="center" color="#6E747A" fontSize={14}>
+            {details}
+          </P>
         </Container>
       ))}
     </NukaCarousel>
@@ -83,11 +82,13 @@ const Carousel = ({
 };
 
 Carousel.propTypes = {
-  content: PropTypes.arrayOf(PropTypes.shape({
-    image: PropTypes.string.isRequired,
-    heading: PropTypes.string.isRequired,
-    details: PropTypes.string.isRequired,
-  })),
+  content: PropTypes.arrayOf(
+    PropTypes.shape({
+      image: PropTypes.string.isRequired,
+      heading: PropTypes.string.isRequired,
+      details: PropTypes.string.isRequired,
+    }),
+  ),
 };
 
 Carousel.defaultProps = {

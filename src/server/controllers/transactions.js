@@ -8,7 +8,7 @@ export async function invoice(req, res, next) {
   res.setHeader('Cache-Control', `public, max-age=${60*10}`);
   let invoice, html;
   const authorizationHeader = req.headers && req.headers.authorization;
-  if (!authorizationHeader) return next(new Error("Not authorized. Please provide an accessToken."));
+  if (!authorizationHeader) return next(new Error('Not authorized. Please provide an accessToken.'));
 
   const parts = authorizationHeader.split(' ');
   const scheme = parts[0];
@@ -23,7 +23,7 @@ export async function invoice(req, res, next) {
     invoice = await fetchInvoice(invoiceSlug, accessToken);
   } catch (e) {
     if (e.message.match(/No collective found/)) {
-      return res.status(404).send("Not found");
+      return res.status(404).send('Not found');
     }
     logger.debug('>>> transactions.invoice error', e);
     return next(e);
@@ -35,7 +35,7 @@ export async function invoice(req, res, next) {
 
   const params = {
     invoice,
-    pageFormat
+    pageFormat,
   };
 
   switch (format) {
@@ -43,14 +43,14 @@ export async function invoice(req, res, next) {
       res.send(invoice);
       break;
     case 'html':
-      html = await req.app.renderToHTML(req, res, `/invoice`, params);
+      html = await req.app.renderToHTML(req, res, '/invoice', params);
       res.send(html);
       break;
     case 'pdf': {
-      html = await req.app.renderToHTML(req, res, `/invoice`, params);
+      html = await req.app.renderToHTML(req, res, '/invoice', params);
       const options = {
         format: pageFormat,
-        renderDelay: 3000
+        renderDelay: 3000,
       };
       html = html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,'');
       const filename = `${invoice.slug}.pdf`;

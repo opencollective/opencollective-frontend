@@ -9,7 +9,7 @@ import initClient from '../../lib/initClient';
 
 const apolloClient = initClient();
 
-describe("SubscriptionCard.test.js", () => {
+describe('SubscriptionCard.test.js', () => {
 
   const mountComponent = (props) => mount(
     <IntlProvider locale="en">
@@ -29,14 +29,14 @@ describe("SubscriptionCard.test.js", () => {
       isSubscriptionActive: true,
       collective: {
         backgroundImage: null,
-        slug: 'collectiveSlug'
-      }
-    }
-  }
+        slug: 'collectiveSlug',
+      },
+    },
+  };
 
   it('doesn\'t display actions when not logged in', () => {
 
-    const values = Object.assign({}, defaultValues, { paymentMethodInUse: {}});
+    const values = Object.assign({}, defaultValues, { paymentMethodInUse: {} });
     const component = mountComponent(values);
 
     expect(component.find('.actions').length).toEqual(0);
@@ -45,7 +45,7 @@ describe("SubscriptionCard.test.js", () => {
   // TODO: skipping these tests to get subscriptions out in time
   it.skip('displays actions when logged in for this user', () => {
 
-  })
+  });
 
   it.skip('displays past-due status when subscription is past-due', () => {
 
@@ -63,4 +63,4 @@ describe("SubscriptionCard.test.js", () => {
 
   });
 
-})
+});

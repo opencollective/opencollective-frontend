@@ -6,7 +6,10 @@ import { ApolloClient } from 'apollo-client';
 import { HttpLink } from 'apollo-link-http';
 import { ApolloLink } from 'apollo-link';
 import { onError } from 'apollo-link-error';
-import { InMemoryCache, IntrospectionFragmentMatcher } from 'apollo-cache-inmemory';
+import {
+  InMemoryCache,
+  IntrospectionFragmentMatcher,
+} from 'apollo-cache-inmemory';
 
 import { getGraphqlUrl } from './utils';
 
@@ -17,16 +20,13 @@ const fragmentMatcher = new IntrospectionFragmentMatcher({
     __schema: {
       types: [
         {
-          kind: "INTERFACE",
-          name: "Transaction",
-          possibleTypes: [
-            { name: "Expense" },
-            { name: "Donation" },
-          ],
-        }
+          kind: 'INTERFACE',
+          name: 'Transaction',
+          possibleTypes: [{ name: 'Expense' }, { name: 'Donation' }],
+        },
       ],
     },
-  }
+  },
 });
 
 function createClient(initialState, options = {}) {
@@ -36,13 +36,17 @@ function createClient(initialState, options = {}) {
   }
 
   const cache = new InMemoryCache({
-    dataIdFromObject: result => `${result.__typename}:${result.id || result.name || result.slug || Math.floor(Math.random()*1000000)}`,
+    dataIdFromObject: result =>
+      `${result.__typename}:${result.id ||
+        result.name ||
+        result.slug ||
+        Math.floor(Math.random() * 1000000)}`,
     fragmentMatcher,
   });
 
   const errorLink = onError(({ graphQLErrors, networkError }) => {
     if (graphQLErrors) {
-      graphQLErrors.map((error) => {
+      graphQLErrors.map(error => {
         if (error) {
           const { message, locations, path } = error;
           console.error(
@@ -85,7 +89,8 @@ export default function initClient(initialState, options = {}) {
 
   // Reuse client on the client-side
   if (!apolloClient) {
-    options.accessToken = process.browser && window.localStorage.getItem('accessToken');
+    options.accessToken =
+      process.browser && window.localStorage.getItem('accessToken');
     apolloClient = createClient(initialState, options);
   }
 

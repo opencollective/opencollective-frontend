@@ -3,7 +3,7 @@ import webpack from 'webpack';
 module.exports = {
   onDemandEntries: {
     // Make sure entries are not getting disposed.
-    maxInactiveAge: 1000 * 60 * 60
+    maxInactiveAge: 1000 * 60 * 60,
   },
   webpack: (config) => {
     config.plugins.push(
@@ -19,9 +19,9 @@ module.exports = {
         new BundleAnalyzerPlugin({
           analyzerMode: 'static',
           generateStatsFile: true,
-          openAnalyzer: false
+          openAnalyzer: false,
         }),
-      )
+      );
     }
     config.module.rules.push(
       {
@@ -33,7 +33,7 @@ module.exports = {
         test: /\.md$/,
         use: ['babel-loader', 'raw-loader', 'markdown-loader'],
       }
-    )
-    return config
-  }
+    );
+    return config;
+  },
 };

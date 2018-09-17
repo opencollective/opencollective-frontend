@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from 'react-apollo'
+import { graphql } from 'react-apollo';
 
 import withIntl from '../../../lib/withIntl';
 import Error from '../../../components/Error';
@@ -33,7 +33,7 @@ class TransactionsWithData extends React.Component {
 
     if (data.error) {
       console.error('graphql error>>>', data.error.message);
-      return (<Error message="GraphQL error" />)
+      return (<Error message="GraphQL error" />);
     }
 
     const transactions = data.allTransactions;
@@ -49,7 +49,7 @@ class TransactionsWithData extends React.Component {
           filters={filters}
           LoggedInUser={LoggedInUser}
           showCSVlink={showCSVlink}
-          />
+        />
 
       </div>
     );
@@ -82,7 +82,7 @@ export const addTransactionsData = graphql(getTransactionsQuery, {
           }
           return Object.assign({}, previousResult, {
             // Append the new posts results to the old one
-            allTransactions: [...previousResult.allTransactions, ...fetchMoreResult.allTransactions]
+            allTransactions: [...previousResult.allTransactions, ...fetchMoreResult.allTransactions],
           });
         },
       });

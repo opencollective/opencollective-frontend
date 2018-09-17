@@ -13,8 +13,7 @@ import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
 
 class EditTiersPage extends React.Component {
-
-  static getInitialProps ({ query: { collectiveSlug } }) {
+  static getInitialProps({ query: { collectiveSlug } }) {
     return { slug: collectiveSlug };
   }
 
@@ -37,16 +36,23 @@ class EditTiersPage extends React.Component {
   }
 
   async editTiers(TiersInputType) {
-    this.setState( { status: 'loading' });
+    this.setState({ status: 'loading' });
     const { Collective } = this.props.data;
     try {
       await this.props.editTiers(Collective.id, TiersInputType);
-      const tiersUrl = `${window.location.protocol}//${window.location.host}/${Collective.slug}/tiers`;
+      const tiersUrl = `${window.location.protocol}//${window.location.host}/${
+        Collective.slug
+      }/tiers`;
       window.location.replace(tiersUrl);
-      this.setState({ result: { success: 'Tiers edited successfully. (redirecting...)' } });
+      this.setState({
+        result: { success: 'Tiers edited successfully. (redirecting...)' },
+      });
     } catch (err) {
-      const errorMsg = (err.graphQLErrors && err.graphQLErrors[0]) ? err.graphQLErrors[0].message : err.message;
-      this.setState( { status: 'idle', result: { error: errorMsg } });
+      const errorMsg =
+        err.graphQLErrors && err.graphQLErrors[0]
+          ? err.graphQLErrors[0].message
+          : err.message;
+      this.setState({ status: 'idle', result: { error: errorMsg } });
       throw new Error(errorMsg);
     }
   }
@@ -56,33 +62,34 @@ class EditTiersPage extends React.Component {
   };
 
   handleTiersChange = tiers => {
-    this.setState( { tiers } );
+    this.setState({ tiers });
   };
 
   render() {
     const { loading, Collective } = this.props.data;
 
-    if (loading) return (<div />);
+    if (loading) return <div />;
 
     return (
       <div>
         <Header />
         <Body>
-          <style jsx>{`
-          .success {
-            color: green;
-          }
-          .error {
-            color: red;
-          }
-          .login {
-            text-align: center;
-          }
-          .actions {
-            text-align: center;
-            margin: 5rem;
-          }
-          `}
+          <style jsx>
+            {`
+              .success {
+                color: green;
+              }
+              .error {
+                color: red;
+              }
+              .login {
+                text-align: center;
+              }
+              .actions {
+                text-align: center;
+                margin: 5rem;
+              }
+            `}
           </style>
           <div className="content">
             <EditTiersComponent
@@ -92,9 +99,15 @@ class EditTiersPage extends React.Component {
               defaultType="BACKER"
               currency={Collective.currency}
               onChange={this.handleTiersChange}
-              />
+            />
             <div className="actions">
-              <Button type="submit" className="green" label="save" onClick={this.handleSubmit} disabled={this.state.status === 'loading'} />
+              <Button
+                type="submit"
+                className="green"
+                label="save"
+                onClick={this.handleSubmit}
+                disabled={this.state.status === 'loading'}
+              />
               <div className="result">
                 <div className="success">{this.state.result.success}</div>
                 <div className="error">{this.state.result.error}</div>
@@ -107,4 +120,6 @@ class EditTiersPage extends React.Component {
   }
 }
 
-export default withData(withIntl(addTiersData(addEditTiersMutation(EditTiersPage))));
+export default withData(
+  withIntl(addTiersData(addEditTiersMutation(EditTiersPage))),
+);

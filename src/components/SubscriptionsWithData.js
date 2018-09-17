@@ -8,11 +8,10 @@ import Subscriptions from './Subscriptions';
 import { cloneDeep } from 'lodash';
 
 class SubscriptionsWithData extends React.Component {
-
   static propTypes = {
     slug: PropTypes.string.isRequired,
-    LoggedInUser: PropTypes.object
-  }
+    LoggedInUser: PropTypes.object,
+  };
 
   constructor(props) {
     super(props);
@@ -22,8 +21,8 @@ class SubscriptionsWithData extends React.Component {
     const { data, LoggedInUser, subscriptions } = this.props;
 
     if (data.error) {
-      console.error("graphql error>>>", data.error.message);
-      return (<Error message="GraphQL error" />)
+      console.error('graphql error>>>', data.error.message);
+      return <Error message="GraphQL error" />;
     }
 
     return (
@@ -34,11 +33,10 @@ class SubscriptionsWithData extends React.Component {
           LoggedInUser={LoggedInUser}
           collective={data.Collective}
           loading={data.loading}
-          />
+        />
       </div>
     );
   }
-
 }
 
 export const addSubscriptionsData = graphql(getSubscriptionsQuery, {
@@ -46,12 +44,11 @@ export const addSubscriptionsData = graphql(getSubscriptionsQuery, {
     return {
       variables: {
         slug: props.slug,
-      }
-    }
+      },
+    };
   },
 
   props: ({ data }) => {
-
     let subscriptions = [];
 
     // since membership data is separate, we can combine it here once
@@ -59,21 +56,20 @@ export const addSubscriptionsData = graphql(getSubscriptionsQuery, {
       subscriptions = cloneDeep(data.Collective.ordersFromCollective);
 
       subscriptions.map(s => {
-        const memberInfo = data.Collective.memberOf.filter(member => member.collective.id === s.collective.id)[0];
+        const memberInfo = data.Collective.memberOf.filter(
+          member => member.collective.id === s.collective.id,
+        )[0];
         if (memberInfo) {
           s.stats = memberInfo.stats || {};
         }
       });
-
     }
 
-    return ({
+    return {
       data,
-      subscriptions
-    })
-  }
-
+      subscriptions,
+    };
+  },
 });
-
 
 export default addSubscriptionsData(withIntl(SubscriptionsWithData));

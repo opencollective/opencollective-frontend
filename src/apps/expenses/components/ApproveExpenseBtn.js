@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from 'react-apollo'
+import { graphql } from 'react-apollo';
 import { FormattedMessage } from 'react-intl';
-import gql from 'graphql-tag'
+import gql from 'graphql-tag';
 
 import withIntl from '../../../lib/withIntl';
 import SmallButton from '../../../components/SmallButton';
@@ -11,8 +11,8 @@ import SmallButton from '../../../components/SmallButton';
 class ApproveExpenseBtn extends React.Component {
 
   static propTypes = {
-    id: PropTypes.number.isRequired
-  }
+    id: PropTypes.number.isRequired,
+  };
 
   constructor(props) {
     super(props);
@@ -46,9 +46,9 @@ mutation approveExpense($id: Int!) {
 const addMutation = graphql(approveExpenseQuery, {
   props: ( { mutate }) => ({
     approveExpense: async (id) => {
-      return await mutate({ variables: { id } })
-    }
-  })
+      return await mutate({ variables: { id } });
+    },
+  }),
 });
 
 export default addMutation(withIntl(ApproveExpenseBtn));

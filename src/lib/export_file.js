@@ -13,24 +13,31 @@ export function exportFile(mimeType, filename, text) {
 export function json2csv(json) {
   const lines = [`"${Object.keys(json[0]).join('","')}"`];
   json.forEach(row => {
-    lines.push(`"${Object.values(row).map(td => {
-        if (typeof td === 'string')
-          return td.replace(/"/g,'""').replace(/\n/g,'  ');
-        else
-          return `${td || ''  }`;
-      }).join('","')}"`);
-  })
+    lines.push(
+      `"${Object.values(row)
+        .map(td => {
+          if (typeof td === 'string')
+            return td.replace(/"/g, '""').replace(/\n/g, '  ');
+          else return `${td || ''}`;
+        })
+        .join('","')}"`,
+    );
+  });
   return lines.join('\n');
 }
 
 function formatDate(d) {
   const mm = d.getMonth() + 1;
   const dd = d.getDate();
-  return [d.getFullYear(), (mm < 10) ? `0${mm}` : mm, (dd < 10) ? `0${dd}` : dd].join('-');
+  return [
+    d.getFullYear(),
+    mm < 10 ? `0${mm}` : mm,
+    dd < 10 ? `0${dd}` : dd,
+  ].join('-');
 }
 
 export async function exportRSVPs(event) {
-  const date = formatDate(new Date);
+  const date = formatDate(new Date());
   const rows = event.orders.map(r => {
     return {
       createdAt: formatDate(new Date(r.createdAt)),
@@ -40,16 +47,25 @@ export async function exportRSVPs(event) {
       name: r.fromCollective.name,
       company: r.fromCollective.company,
       email: r.fromCollective.email,
-      twitter: r.fromCollective.twitterHandle && `https://twitter.com/${r.fromCollective.twitterHandle}`,
-      description: r.description || r.fromCollective.description
-    }
+      twitter:
+        r.fromCollective.twitterHandle &&
+        `https://twitter.com/${r.fromCollective.twitterHandle}`,
+      description: r.description || r.fromCollective.description,
+    };
   });
   const csv = json2csv(rows);
-  return exportFile('text/plain;charset=utf-8', `${date.replace('-','')}-${event.parentCollective.slug}-${event.slug}.csv`, csv);
+  return exportFile(
+    'text/plain;charset=utf-8',
+    `${date.replace('-', '')}-${event.parentCollective.slug}-${event.slug}.csv`,
+    csv,
+  );
 }
 
-
-export async function exportMembers(collectiveSlug, tierSlug, options = { type: 'all' }) {
+export async function exportMembers(
+  collectiveSlug,
+  tierSlug,
+  options = { type: 'all' },
+) {
   let path = `/${collectiveSlug}`;
   path += tierSlug ? `/tiers/${tierSlug}/` : '/members/';
 
@@ -62,7 +78,10 @@ export async function exportMembers(collectiveSlug, tierSlug, options = { type: 
   path += `${selector}.${options.format}`;
 
   const csv = await get(path, options);
-  const date = formatDate(new Date);
-  return exportFile('text/plain;charset=utf-8', `${date.replace(/-/g,'')}${path.replace(/\//g,'-')}`, csv);
-
+  const date = formatDate(new Date());
+  return exportFile(
+    'text/plain;charset=utf-8',
+    `${date.replace(/-/g, '')}${path.replace(/\//g, '-')}`,
+    csv,
+  );
 }

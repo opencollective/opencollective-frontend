@@ -7,15 +7,17 @@ import EditEventForm from './EditEventForm';
 import CollectiveCover from './CollectiveCover';
 import { Button } from 'react-bootstrap';
 import { get } from 'lodash';
-import { addEditCollectiveMutation, addDeleteCollectiveMutation } from '../graphql/mutations';
+import {
+  addEditCollectiveMutation,
+  addDeleteCollectiveMutation,
+} from '../graphql/mutations';
 import { Router } from '../server/pages';
 import { FormattedMessage } from 'react-intl';
 
 class EditEvent extends React.Component {
-
   static propTypes = {
-    event: PropTypes.object
-  }
+    event: PropTypes.object,
+  };
 
   constructor(props) {
     super(props);
@@ -25,45 +27,55 @@ class EditEvent extends React.Component {
   }
 
   async editEvent(EventInputType) {
-    this.setState( { status: 'loading' });
+    this.setState({ status: 'loading' });
     try {
       EventInputType.type = 'EVENT';
       EventInputType.ParentCollectiveId = this.props.event.parentCollective.id;
       const res = await this.props.editCollective(EventInputType);
       const event = res.data.editCollective;
-      const eventRoute = `/${this.props.event.parentCollective.slug}/events/${event.slug}`;
+      const eventRoute = `/${this.props.event.parentCollective.slug}/events/${
+        event.slug
+      }`;
       Router.pushRoute(eventRoute);
-      this.setState({ result: { success: `Event edited successfully` }});
+      this.setState({ result: { success: 'Event edited successfully' } });
     } catch (err) {
-      console.error(">>> editEvent error: ", JSON.stringify(err));
-      const errorMsg = (err.graphQLErrors && err.graphQLErrors[0]) ? err.graphQLErrors[0].message : err.message;
-      this.setState( { status: 'idle', result: { error: errorMsg }})
+      console.error('>>> editEvent error: ', JSON.stringify(err));
+      const errorMsg =
+        err.graphQLErrors && err.graphQLErrors[0]
+          ? err.graphQLErrors[0].message
+          : err.message;
+      this.setState({ status: 'idle', result: { error: errorMsg } });
       throw new Error(errorMsg);
     }
   }
 
   async deleteEvent() {
-    if (confirm("😱 Are you really sure you want to delete this event?")) {
-      this.setState( { status: 'loading' });
+    if (confirm('😱 Are you really sure you want to delete this event?')) {
+      this.setState({ status: 'loading' });
       try {
         await this.props.deleteCollective(this.props.event.id);
-        this.setState({ status: 'idle', result: { success: `Event deleted successfully` }});
+        this.setState({
+          status: 'idle',
+          result: { success: 'Event deleted successfully' },
+        });
         const collectiveRoute = `/${this.props.event.parentCollective.slug}`;
         Router.pushRoute(collectiveRoute);
       } catch (err) {
-        console.error(">>> deleteEvent error: ", JSON.stringify(err));
-        const errorMsg = (err.graphQLErrors && err.graphQLErrors[0]) ? err.graphQLErrors[0].message : err.message;
-        this.setState( { result: { error: errorMsg }})
+        console.error('>>> deleteEvent error: ', JSON.stringify(err));
+        const errorMsg =
+          err.graphQLErrors && err.graphQLErrors[0]
+            ? err.graphQLErrors[0].message
+            : err.message;
+        this.setState({ result: { error: errorMsg } });
         throw new Error(errorMsg);
       }
     }
   }
 
   render() {
-
     const event = this.props.event || {};
 
-    if (!event.name) return (<div />);
+    if (!event.name) return <div />;
 
     const { LoggedInUser } = this.props;
 
@@ -72,21 +84,23 @@ class EditEvent extends React.Component {
 
     return (
       <div className="EditEvent">
-        <style jsx>{`
-          .success {
-            color: green;
-          }
-          .error {
-            color: red;
-          }
-          .login {
-            text-align: center;
-          }
-          .actions {
-            text-align: center;
-            margin-bottom: 5rem;
-          }
-        `}</style>
+        <style jsx>
+          {`
+            .success {
+              color: green;
+            }
+            .error {
+              color: red;
+            }
+            .login {
+              text-align: center;
+            }
+            .actions {
+              text-align: center;
+              margin-bottom: 5rem;
+            }
+          `}
+        </style>
 
         <Header
           title={parentCollective.name}
@@ -95,27 +109,49 @@ class EditEvent extends React.Component {
           image={parentCollective.image || parentCollective.backgroundImage}
           className={this.state.status}
           LoggedInUser={this.props.LoggedInUser}
-          />
+        />
 
         <Body>
-
           <CollectiveCover
             collective={parentCollective}
             className="small"
-            title={<FormattedMessage id="menu.edit.event" defaultMessage="edit event" />}
-            style={get(parentCollective, 'settings.style.hero.cover')}
-            />
-
-          <div className="content" >
-            {!canEditEvent &&
-              <div className="login">
-                <p>You need to be logged in as the creator of this event<br />or as a core contributor of the {event.parentCollective.name} collective.</p>
-                <p><Button bsStyle="primary" href={`/signin?next=/${event.slug}/edit`}>Login</Button></p>
-              </div>
+            title={
+              <FormattedMessage
+                id="menu.edit.event"
+                defaultMessage="edit event"
+              />
             }
-            { canEditEvent &&
+            style={get(parentCollective, 'settings.style.hero.cover')}
+          />
+
+          <div className="content">
+            {!canEditEvent && (
+              <div className="login">
+                <p>
+                  You need to be logged in as the creator of this event
+                  <br />
+                  or as a core contributor of the {
+                    event.parentCollective.name
+                  }{' '}
+                  collective.
+                </p>
+                <p>
+                  <Button
+                    bsStyle="primary"
+                    href={`/signin?next=/${event.slug}/edit`}
+                  >
+                    Login
+                  </Button>
+                </p>
+              </div>
+            )}
+            {canEditEvent && (
               <div>
-                <EditEventForm event={event} onSubmit={this.editEvent} loading={this.state.status === 'loading'} />
+                <EditEventForm
+                  event={event}
+                  onSubmit={this.editEvent}
+                  loading={this.state.status === 'loading'}
+                />
                 <div className="actions">
                   (<a onClick={this.deleteEvent}>delete event</a>)
                   <div className="result">
@@ -124,7 +160,7 @@ class EditEvent extends React.Component {
                   </div>
                 </div>
               </div>
-            }
+            )}
           </div>
         </Body>
         <Footer />
@@ -133,4 +169,6 @@ class EditEvent extends React.Component {
   }
 }
 
-export default addEditCollectiveMutation(addDeleteCollectiveMutation(EditEvent));
+export default addEditCollectiveMutation(
+  addDeleteCollectiveMutation(EditEvent),
+);

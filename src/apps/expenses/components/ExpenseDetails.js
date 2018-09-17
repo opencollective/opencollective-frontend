@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { defineMessages, FormattedNumber, FormattedMessage } from 'react-intl';
-import { graphql } from 'react-apollo'
-import gql from 'graphql-tag'
+import { graphql } from 'react-apollo';
+import gql from 'graphql-tag';
 import { get } from 'lodash';
 
 import withIntl from '../../../lib/withIntl';
@@ -18,14 +18,14 @@ class ExpenseDetails extends React.Component {
     expense: PropTypes.object,
     LoggedInUser: PropTypes.object,
     onChange: PropTypes.func,
-    mode: PropTypes.string // summary, edit or details
-  }
+    mode: PropTypes.string, // summary, edit or details
+  };
 
   constructor(props) {
     super(props);
     this.getOptions = this.getOptions.bind(this);
     this.handleChange = this.handleChange.bind(this);
-    this.currencyStyle = { style: 'currency', currencyDisplay: 'symbol', minimumFractionDigits: 2, maximumFractionDigits: 2};
+    this.currencyStyle = { style: 'currency', currencyDisplay: 'symbol', minimumFractionDigits: 2, maximumFractionDigits: 2 };
 
     this.messages = defineMessages({
       'paypal': { id: 'expense.payoutMethod.paypal', defaultMessage: 'PayPal ({paypalEmail, select, missing {missing} hidden {hidden} other {{paypalEmail}}})' },
@@ -43,15 +43,15 @@ class ExpenseDetails extends React.Component {
       const obj = {};
       obj[key] = this.props.intl.formatMessage(this.messages[key], intlVars);
       return obj;
-    })
+    });
   }
 
   handleChange(attr, value) {
     const expense = {
       ...this.state.expense,
-      [attr]: value
+      [attr]: value,
     };
-    this.setState({ modified: true, expense })
+    this.setState({ modified: true, expense });
     this.props.onChange && this.props.onChange(expense);
   }
 
@@ -65,9 +65,9 @@ class ExpenseDetails extends React.Component {
     const previewAttachmentImage = expense.attachment ? imagePreview(expense.attachment) : '/static/images/receipt.svg';
     const payoutMethod = this.state.expense.payoutMethod || expense.payoutMethod;
     const paypalEmail = get(expense, 'user.paypalEmail') || get(expense, 'user.email');
-    const payoutMethods = this.getOptions(['paypal', 'other', 'donation'], { paypalEmail: paypalEmail || (canEditExpense ? "missing" : "hidden") });
+    const payoutMethods = this.getOptions(['paypal', 'other', 'donation'], { paypalEmail: paypalEmail || (canEditExpense ? 'missing' : 'hidden') });
     const categoriesOptions = categories(expense.collective.slug).map(category => {
-      return { [category]: category }
+      return { [category]: category };
     });
 
     return (
@@ -126,7 +126,8 @@ class ExpenseDetails extends React.Component {
               max-height: 30rem;
             }
           }
-        `}</style>
+        `}
+        </style>
         <style global jsx>{`
           .ExpenseDetails .inputField {
             margin: 0;
@@ -156,7 +157,8 @@ class ExpenseDetails extends React.Component {
           .col.privateMessage {
             width: 100%;
           }
-        `}</style>
+        `}
+        </style>
 
         <div className="leftColumn">
           <div className="frame">
@@ -168,7 +170,7 @@ class ExpenseDetails extends React.Component {
                 className="attachmentField"
                 onChange={attachment => this.handleChange('attachment', attachment)}
                 defaultValue={expense.attachment || '/static/images/receipt.svg'}
-                />
+              />
             }
             { !editMode && expense.attachment &&
               <a href={expense.attachment} target="_blank" rel="noopener noreferrer" title="Open receipt in a new window">
@@ -194,7 +196,7 @@ class ExpenseDetails extends React.Component {
                       defaultValue={expense.description}
                       className="descriptionField"
                       onChange={description => this.handleChange('description', description)}
-                      />
+                    />
                   </span>
                 </div>
               </div>
@@ -213,7 +215,7 @@ class ExpenseDetails extends React.Component {
                     defaultValue={expense.category}
                     className="categoryField"
                     onChange={category => this.handleChange('category', category)}
-                    />
+                  />
                 </span>
               </div>
             </div>
@@ -231,14 +233,14 @@ class ExpenseDetails extends React.Component {
                     type="currency"
                     className="amountField"
                     onChange={amount => this.handleChange('amount', amount)}
-                    />
+                  />
                 }
                 { !(editMode && canEditAmount) &&
                   <FormattedNumber
                     value={expense.amount / 100}
                     currency={expense.currency}
                     {...this.currencyStyle}
-                    />
+                  />
                 }
               </span>
             </div>
@@ -246,7 +248,7 @@ class ExpenseDetails extends React.Component {
 
           <div className="col">
             <label><FormattedMessage id="expense.payoutMethod" defaultMessage="payout method" /></label>
-            { !editMode && capitalize(intl.formatMessage(this.messages[expense.payoutMethod], { paypalEmail: paypalEmail || (canEditExpense ? "missing" : "hidden")}))}
+            { !editMode && capitalize(intl.formatMessage(this.messages[expense.payoutMethod], { paypalEmail: paypalEmail || (canEditExpense ? 'missing' : 'hidden') }))}
             { editMode &&
               <InputField
                 name="payoutMethod"
@@ -254,7 +256,7 @@ class ExpenseDetails extends React.Component {
                 options={payoutMethods}
                 defaultValue={expense.payoutMethod}
                 onChange={payoutMethod => this.handleChange('payoutMethod', payoutMethod)}
-                />
+              />
             }
           </div>
 
@@ -268,7 +270,7 @@ class ExpenseDetails extends React.Component {
                   name="privateMessage"
                   onChange={privateMessage => this.handleChange('privateMessage', privateMessage)}
                   defaultValue={expense.privateMessage}
-                  />
+                />
               }
             </div>
           }
@@ -325,12 +327,12 @@ return graphql(getExpenseQuery, {
   options(props) {
     return {
       variables: {
-        id: props.expense.id
-      }
-    }
-  }
+        id: props.expense.id,
+      },
+    };
+  },
 })(component);
-}
+};
 
 
 export default addGetExpense(withIntl(ExpenseDetails));

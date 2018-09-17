@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage } from 'react-intl'
+import { FormattedMessage } from 'react-intl';
 import { get } from 'lodash';
 
 import withIntl from '../../../lib/withIntl';
@@ -18,8 +18,8 @@ class ExpensesSection extends React.Component {
   static propTypes = {
     collective: PropTypes.object.isRequired, // collective.id
     LoggedInUser: PropTypes.object,
-    limit: PropTypes.number
-  }
+    limit: PropTypes.number,
+  };
 
   constructor(props) {
     super(props);
@@ -33,8 +33,8 @@ class ExpensesSection extends React.Component {
     if (LoggedInUser && LoggedInUser.canEditCollective(collective)) {
       action = {
         href: `/${collective.slug}/expenses/new`,
-        label: <FormattedMessage id="expense.new.submit" defaultMessage="Submit Expense" />
-      }
+        label: <FormattedMessage id="expense.new.submit" defaultMessage="Submit Expense" />,
+      };
     }
 
     if (!collective) return (<NotFound />);
@@ -51,7 +51,7 @@ class ExpensesSection extends React.Component {
             section="budget"
             values={{ balance: formatCurrency(get(collective, 'stats.balance'), collective.currency) }}
             action={action}
-            />
+          />
 
           <div className="ExpensesSection">
             <style jsx>{`
@@ -74,7 +74,8 @@ class ExpensesSection extends React.Component {
                 flex-direction: column;
               }
             }
-            `}</style>
+            `}
+            </style>
             <div className="columns">
               { this.totalExpenses > 0 &&
                 <div id="expenses" className="col">
@@ -82,15 +83,15 @@ class ExpensesSection extends React.Component {
                     <FormattedMessage
                       id="collective.expenses.title"
                       values={{ n: this.totalExpenses }}
-                      defaultMessage={`{n, plural, one {Latest expense} other {Latest expenses}}`}
-                      />
+                      defaultMessage={'{n, plural, one {Latest expense} other {Latest expenses}}'}
+                    />
                   </h2>
                   <ExpensesWithData
                     collective={collective}
                     LoggedInUser={LoggedInUser}
                     view="compact"
                     limit={5}
-                    />
+                  />
                   { this.totalExpenses > 0 &&
                     <div className="actions">
                       <a className="ViewAllExpensesBtn" onClick={() => Router.pushRoute(`${collective.path}/expenses`)}><FormattedMessage id="expenses.viewAll" defaultMessage="View All Expenses" /></a>
@@ -105,15 +106,15 @@ class ExpensesSection extends React.Component {
                     <FormattedMessage
                       id="collective.transactions.title"
                       values={{ n: this.totalTransactions }}
-                      defaultMessage={`{n, plural, one {Latest transaction} other {Latest transactions}}`}
-                      />
+                      defaultMessage={'{n, plural, one {Latest transaction} other {Latest transactions}}'}
+                    />
                   </h2>
                   <TransactionsWithData
                     collective={collective}
                     LoggedInUser={LoggedInUser}
                     limit={5}
                     showCSVlink={false}
-                    />
+                  />
                   { this.totalTransactions > 0 &&
                     <div className="actions">
                       <a className="ViewAllTransactionsBtn" onClick={() => Router.pushRoute(`${collective.path}/transactions`)}><FormattedMessage id="transactions.viewAll" defaultMessage="View All Transactions" /></a>
@@ -124,7 +125,7 @@ class ExpensesSection extends React.Component {
             </div>
           </div>
         </div>
-      </section>     
+      </section>
     );
   }
 

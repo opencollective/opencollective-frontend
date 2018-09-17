@@ -11,5 +11,5 @@ export default {
   black: '#484B4C',
   white: '#FFFFFF',
   offwhite: '#F5F6F7',
-  ocblue: '#3399FF'
-}
+  ocblue: '#3399FF',
+};

@@ -8,7 +8,6 @@ import withIntl from '../lib/withIntl';
 import withLoggedInUser from '../lib/withLoggedInUser';
 
 class HostsPage extends React.Component {
-
   static propTypes = {
     getLoggedInUser: PropTypes.func,
   };
@@ -20,7 +19,7 @@ class HostsPage extends React.Component {
 
   async componentDidMount() {
     const { getLoggedInUser } = this.props;
-    const LoggedInUser = getLoggedInUser && await getLoggedInUser();
+    const LoggedInUser = getLoggedInUser && (await getLoggedInUser());
     this.setState({ LoggedInUser });
   }
 

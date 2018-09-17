@@ -14,8 +14,8 @@ class RefundTransactionBtn extends React.Component {
 
   static propTypes = {
     transaction: PropTypes.object.isRequired,
-    collective: PropTypes.object.isRequired
-  }
+    collective: PropTypes.object.isRequired,
+  };
 
   constructor(props) {
     super(props);
@@ -27,7 +27,7 @@ class RefundTransactionBtn extends React.Component {
         refunded: !canRefund,
         confirmRefund: false,
         refunding: false,
-      }
+      },
     };
   }
 
@@ -45,7 +45,7 @@ class RefundTransactionBtn extends React.Component {
       confirmRefund: !!confirmRefund,
       refunded: !!refunded,
       refunding: !!refunding,
-    }});
+    } });
   }
 
   /** Fires off the actual refund action.
@@ -84,7 +84,8 @@ class RefundTransactionBtn extends React.Component {
           .confirmation-buttons .SmallButton.refund {
             margin-right: 10px;
           }
-        `}</style>
+        `}
+        </style>
 
         {/* Already refunded so we don't really don't need to show
             anything */}
@@ -100,7 +101,7 @@ class RefundTransactionBtn extends React.Component {
               <SmallButton
                 className="refund" bsStyle="danger" bsSize="xsmall"
                 onClick={() => ::this.setShowingState({ confirmRefund: true })}
-                >
+              >
                 <FormattedMessage id="transaction.refund.btn" defaultMessage="refund" />
               </SmallButton>
             </div>
@@ -113,13 +114,13 @@ class RefundTransactionBtn extends React.Component {
               <SmallButton
                 className="refund" bsStyle="danger" bsSize="xsmall"
                 onClick={::this.onClickRefund}
-                >
+              >
                 <FormattedMessage id="transaction.refund.yes.btn" defaultMessage="Yes, refund!" />
               </SmallButton>
               <SmallButton
                 className="no" bsStyle="primary" bsSize="xsmall"
                 onClick={() => ::this.setShowingState({ canRefund: true })}
-                >
+              >
                 <FormattedMessage id="transaction.refund.no.btn" defaultMessage="no" />
               </SmallButton>
             </div>
@@ -149,11 +150,11 @@ const addMutation = graphql(refundTransactionQuery, {
   props: ({ ownProps, mutate }) => ({
     refundTransaction: async (id) => await mutate({
       variables: { id },
-      update: (proxy, { data: { refundTransaction }}) => {
+      update: (proxy, { data: { refundTransaction } }) => {
         const variables = {
           CollectiveId: ownProps.collective.id,
           limit: 20,
-          offset: 0
+          offset: 0,
         };
 
         // Retrieve the query from the cache
@@ -164,9 +165,9 @@ const addMutation = graphql(refundTransactionQuery, {
 
         // write data back for the query
         proxy.writeQuery({ query: getTransactionsQuery, variables, data });
-      }
-    })
-  })
+      },
+    }),
+  }),
 });
 
 export default addMutation(withIntl(RefundTransactionBtn));

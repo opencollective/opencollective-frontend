@@ -2,8 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Error from './Error';
 import withIntl from '../lib/withIntl';
-import { graphql } from 'react-apollo'
-import gql from 'graphql-tag'
+import { graphql } from 'react-apollo';
+import gql from 'graphql-tag';
 import CollectiveCard from './CollectiveCard';
 import { Button } from 'react-bootstrap';
 import { FormattedMessage } from 'react-intl';
@@ -11,7 +11,6 @@ import { FormattedMessage } from 'react-intl';
 const COLLECTIVE_CARDS_PER_PAGE = 10;
 
 class CollectivesWithData extends React.Component {
-
   static propTypes = {
     HostCollectiveId: PropTypes.number, // only fetch collectives that are hosted by this collective id
     hostCollectiveSlug: PropTypes.string, // only fetch collectives that are hosted by this collective slug
@@ -50,128 +49,131 @@ class CollectivesWithData extends React.Component {
   }
 
   refetch(role) {
-    this.setState({role});
-    this.props.refetch({role});
+    this.setState({ role });
+    this.props.refetch({ role });
   }
 
   render() {
     const { data } = this.props;
 
     if (data.error) {
-      console.error("graphql error>>>", data.error.message);
-      return (<Error message="GraphQL error" />)
+      console.error('graphql error>>>', data.error.message);
+      return <Error message="GraphQL error" />;
     }
     if (!data.allCollectives || !data.allCollectives.collectives) {
-      return (<div />);
+      return <div />;
     }
     const collectives = [...data.allCollectives.collectives];
     if (collectives.length === 0) {
-      return (<div />)
+      return <div />;
     }
 
     const limit = this.props.limit || COLLECTIVE_CARDS_PER_PAGE * 2;
     return (
-      <div className="CollectivesContainer" ref={(node) => this.node = node}>
-        <style jsx>{`
-          :global(.loadMoreBtn) {
-            margin: 1rem;
-            text-align: center;
-          }
-          .filter {
-            width: 100%;
-            max-width: 400px;
-            margin: 0 auto;
-          }
-          :global(.filterBtnGroup) {
-            width: 100%;
-          }
-          :global(.filterBtn) {
-            width: 33%;
-          }
-          .Collectives {
-            display: flex;
-            flex-wrap: wrap;
-            flex-direction: row;
-            justify-content: center;   
-            overflow: hidden;
-            margin: 1rem 0;
-          }
-          .CollectivesContainer :global(.CollectiveCard) {
-            margin: 1rem;
-          }
-        `}</style>
+      <div className="CollectivesContainer" ref={node => (this.node = node)}>
+        <style jsx>
+          {`
+            :global(.loadMoreBtn) {
+              margin: 1rem;
+              text-align: center;
+            }
+            .filter {
+              width: 100%;
+              max-width: 400px;
+              margin: 0 auto;
+            }
+            :global(.filterBtnGroup) {
+              width: 100%;
+            }
+            :global(.filterBtn) {
+              width: 33%;
+            }
+            .Collectives {
+              display: flex;
+              flex-wrap: wrap;
+              flex-direction: row;
+              justify-content: center;
+              overflow: hidden;
+              margin: 1rem 0;
+            }
+            .CollectivesContainer :global(.CollectiveCard) {
+              margin: 1rem;
+            }
+          `}
+        </style>
 
         <div className="Collectives cardsList">
-          { collectives.map((collective) =>
-            (<CollectiveCard
-              key={collective.id}
-              collective={collective}
-              />)
-          )}
+          {collectives.map(collective => (
+            <CollectiveCard key={collective.id} collective={collective} />
+          ))}
         </div>
-        { collectives.length % 10 === 0 && collectives.length >= limit &&
-          <div className="loadMoreBtn">
-            <Button bsStyle="default" onClick={this.fetchMore}>
-              {this.state.loading && <FormattedMessage id="loading" defaultMessage="loading" />}
-              {!this.state.loading && <FormattedMessage id="loadMore" defaultMessage="load more" />}
-            </Button>
-          </div>
-        }
+        {collectives.length % 10 === 0 &&
+          collectives.length >= limit && (
+            <div className="loadMoreBtn">
+              <Button bsStyle="default" onClick={this.fetchMore}>
+                {this.state.loading && (
+                  <FormattedMessage id="loading" defaultMessage="loading" />
+                )}
+                {!this.state.loading && (
+                  <FormattedMessage id="loadMore" defaultMessage="load more" />
+                )}
+              </Button>
+            </div>
+          )}
       </div>
     );
   }
-
 }
 
 const getCollectivesQuery = gql`
-query allCollectives(
-  $HostCollectiveId: Int,
-  $hostCollectiveSlug: String,
-  $ParentCollectiveId: Int,
-  $tags: [String],
-  $memberOfCollectiveSlug: String,
-  $role: String,
-  $type: TypeOfCollective,
-  $limit: Int,
-  $offset: Int,
-  $orderBy: CollectiveOrderField,
-  $orderDirection: OrderDirection
+  query allCollectives(
+    $HostCollectiveId: Int
+    $hostCollectiveSlug: String
+    $ParentCollectiveId: Int
+    $tags: [String]
+    $memberOfCollectiveSlug: String
+    $role: String
+    $type: TypeOfCollective
+    $limit: Int
+    $offset: Int
+    $orderBy: CollectiveOrderField
+    $orderDirection: OrderDirection
   ) {
-  allCollectives(
-    HostCollectiveId: $HostCollectiveId,
-    hostCollectiveSlug: $hostCollectiveSlug,
-    memberOfCollectiveSlug: $memberOfCollectiveSlug,
-    role: $role,
-    type: $type,
-    ParentCollectiveId: $ParentCollectiveId,
-    tags: $tags,
-    limit: $limit,
-    offset: $offset,
-    orderBy: $orderBy,
-    orderDirection: $orderDirection
+    allCollectives(
+      HostCollectiveId: $HostCollectiveId
+      hostCollectiveSlug: $hostCollectiveSlug
+      memberOfCollectiveSlug: $memberOfCollectiveSlug
+      role: $role
+      type: $type
+      ParentCollectiveId: $ParentCollectiveId
+      tags: $tags
+      limit: $limit
+      offset: $offset
+      orderBy: $orderBy
+      orderDirection: $orderDirection
     ) {
-    total
-    collectives {
-      id
-      type
-      createdAt
-      slug
-      name
-      description
-      longDescription
-      image
-      currency
-      backgroundImage
-      stats {
+      total
+      collectives {
         id
-        yearlyBudget
-        backers {
-          all
+        type
+        createdAt
+        slug
+        name
+        description
+        longDescription
+        image
+        currency
+        backgroundImage
+        stats {
+          id
+          yearlyBudget
+          backers {
+            all
+          }
         }
       }
     }
   }
-}
 `;
 
 export const addCollectivesData = graphql(getCollectivesQuery, {
@@ -189,27 +191,34 @@ export const addCollectivesData = graphql(getCollectivesQuery, {
         orderDirection: props.orderDirection,
         offset: 0,
         limit: props.limit || COLLECTIVE_CARDS_PER_PAGE * 2,
-      }
-    }
+      },
+    };
   },
   props: ({ data, ownProps }) => ({
     data,
-    fetchMore: () => data.fetchMore({
-      variables: {
-        offset: data.allCollectives.collectives.length,
-        limit: ownProps.limit || COLLECTIVE_CARDS_PER_PAGE,
-      },
-      updateQuery: (previousResult, { fetchMoreResult }) => {
-        if (!fetchMoreResult) return previousResult;
-        // Update the results object with new entries
-        const { __typename, total, collectives } = previousResult.allCollectives;
-        const all = collectives.concat(fetchMoreResult.allCollectives.collectives);
-        return Object.assign({}, previousResult, {
-          allCollectives: { __typename, total, collectives: all } });
-      },
-    }),
+    fetchMore: () =>
+      data.fetchMore({
+        variables: {
+          offset: data.allCollectives.collectives.length,
+          limit: ownProps.limit || COLLECTIVE_CARDS_PER_PAGE,
+        },
+        updateQuery: (previousResult, { fetchMoreResult }) => {
+          if (!fetchMoreResult) return previousResult;
+          // Update the results object with new entries
+          const {
+            __typename,
+            total,
+            collectives,
+          } = previousResult.allCollectives;
+          const all = collectives.concat(
+            fetchMoreResult.allCollectives.collectives,
+          );
+          return Object.assign({}, previousResult, {
+            allCollectives: { __typename, total, collectives: all },
+          });
+        },
+      }),
   }),
 });
-
 
 export default addCollectivesData(withIntl(CollectivesWithData));

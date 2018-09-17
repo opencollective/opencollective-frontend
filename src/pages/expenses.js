@@ -19,8 +19,7 @@ import withIntl from '../lib/withIntl';
 import withLoggedInUser from '../lib/withLoggedInUser';
 
 class ExpensesPage extends React.Component {
-
-  static getInitialProps ({ query: { collectiveSlug, filter, value } }) {
+  static getInitialProps({ query: { collectiveSlug, filter, value } }) {
     return { slug: collectiveSlug, filter, value };
   }
 
@@ -47,58 +46,76 @@ class ExpensesPage extends React.Component {
     const { data } = this.props;
     const { LoggedInUser } = this.state;
 
-    if (!data.Collective) return (<ErrorPage data={data} />);
+    if (!data.Collective) return <ErrorPage data={data} />;
 
     const collective = data.Collective;
 
     let action, subtitle, filter;
     if (this.props.value) {
       action = {
-        label: <FormattedMessage id="expenses.viewAll" defaultMessage="View All Expenses" />,
+        label: (
+          <FormattedMessage
+            id="expenses.viewAll"
+            defaultMessage="View All Expenses"
+          />
+        ),
         href: `/${collective.slug}/expenses`,
       };
 
       if (this.props.filter === 'categories') {
         const category = decodeURIComponent(this.props.value);
         filter = { category };
-        subtitle = <FormattedMessage id="expenses.byCategory" defaultMessage="Expenses in {category}" values={{ category }} />;
+        subtitle = (
+          <FormattedMessage
+            id="expenses.byCategory"
+            defaultMessage="Expenses in {category}"
+            values={{ category }}
+          />
+        );
       }
       if (this.props.filter === 'recipients') {
         const recipient = decodeURIComponent(this.props.value);
         filter = { recipient };
-        subtitle = <FormattedMessage id="expenses.byRecipient" defaultMessage="Expenses by {recipient}" values={{ recipient }} />;
+        subtitle = (
+          <FormattedMessage
+            id="expenses.byRecipient"
+            defaultMessage="Expenses by {recipient}"
+            values={{ recipient }}
+          />
+        );
       }
     }
 
     return (
       <div className="ExpensesPage">
-        <style jsx>{`
-          .columns {
-            display: flex;
-          }
-
-          .col.side {
-            width: 100%;
-            min-width: 20rem;
-            max-width: 25%;
-            margin-left: 5rem;
-          }
-
-          .col.large {
-            width: 100%;
-            min-width: 30rem;
-            max-width: 75%;
-          }
-
-          @media(max-width: 600px) {
+        <style jsx>
+          {`
             .columns {
-              flex-direction: column-reverse;
+              display: flex;
             }
-            .columns .col {
-              max-width: 100%;
+
+            .col.side {
+              width: 100%;
+              min-width: 20rem;
+              max-width: 25%;
+              margin-left: 5rem;
             }
-          }
-        `}
+
+            .col.large {
+              width: 100%;
+              min-width: 30rem;
+              max-width: 75%;
+            }
+
+            @media (max-width: 600px) {
+              .columns {
+                flex-direction: column-reverse;
+              }
+              .columns .col {
+                max-width: 100%;
+              }
+            }
+          `}
         </style>
 
         <Header
@@ -108,45 +125,47 @@ class ExpensesPage extends React.Component {
           image={collective.image || collective.backgroundImage}
           className={this.state.status}
           LoggedInUser={LoggedInUser}
-          />
+        />
 
         <Body>
-
           <CollectiveCover
             collective={collective}
-            cta={{ href: `/${collective.slug}#contribute`, label: 'contribute' }}
+            cta={{
+              href: `/${collective.slug}#contribute`,
+              label: 'contribute',
+            }}
             LoggedInUser={LoggedInUser}
+          />
+
+          <div className="content">
+            <SectionTitle
+              section="expenses"
+              subtitle={subtitle}
+              action={action}
             />
 
-          <div className="content" >
-
-            <SectionTitle section="expenses" subtitle={subtitle} action={action} />
-
-            <div className=" columns" >
-
+            <div className=" columns">
               <div className="col large">
                 <ExpensesWithData
                   collective={collective}
                   LoggedInUser={this.state.LoggedInUser}
                   filter={filter}
-                  />
+                />
               </div>
 
               <div className="col side">
                 <ExpensesStatsWithData slug={collective.slug} />
               </div>
-
             </div>
           </div>
-
         </Body>
 
         <Footer />
-
       </div>
     );
   }
-
 }
 
-export default withData(withIntl(withLoggedInUser(addCollectiveCoverData(ExpensesPage))));
+export default withData(
+  withIntl(withLoggedInUser(addCollectiveCoverData(ExpensesPage))),
+);

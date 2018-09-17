@@ -14,9 +14,7 @@ function getComponentDisplayName(Component) {
 }
 
 export default ComposedComponent => {
-
   return class WithData extends React.Component {
-
     static async getInitialProps(ctx) {
       // Initial serverState with apollo (empty)
       let serverState = {};
@@ -49,16 +47,16 @@ export default ComposedComponent => {
             router: {
               asPath: ctx.asPath,
               pathname: ctx.pathname,
-              query: ctx.query
+              query: ctx.query,
             },
-            client: apollo
-          }
+            client: apollo,
+          },
         );
       } catch (error) {
         // Prevent Apollo Client GraphQL errors from crashing SSR.
         // Handle them in components via the data.error prop:
         // http://dev.apollodata.com/react/api-queries.html#graphql-query-data-error
-        if (process.env.DEBUG) console.error(">>> apollo error: ", error);
+        if (process.env.DEBUG) console.error('>>> apollo error: ', error);
       }
 
       if (!process.browser) {
@@ -70,29 +68,32 @@ export default ComposedComponent => {
       // Extract query data from the Apollo store
       serverState = {
         apollo: {
-          data: apollo.cache.extract()
-        }
+          data: apollo.cache.extract(),
+        },
       };
 
       return {
         options,
         serverState,
-        ...composedInitialProps
+        ...composedInitialProps,
       };
     }
 
     static displayName = `WithData(${getComponentDisplayName(
-      ComposedComponent
+      ComposedComponent,
     )})`;
 
     static propTypes = {
       serverState: PropTypes.object.isRequired,
-      options: PropTypes.object
+      options: PropTypes.object,
     };
 
     constructor(props) {
       super(props);
-      this.apollo = initClient(this.props.serverState.apollo.data, this.props.options);
+      this.apollo = initClient(
+        this.props.serverState.apollo.data,
+        this.props.options,
+      );
     }
 
     render() {

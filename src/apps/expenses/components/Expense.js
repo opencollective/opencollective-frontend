@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { defineMessages, FormattedMessage, FormattedNumber, FormattedDate } from 'react-intl';
-import { graphql } from 'react-apollo'
-import gql from 'graphql-tag'
+import { graphql } from 'react-apollo';
+import gql from 'graphql-tag';
 
 import withIntl from '../../../lib/withIntl';
 import Avatar from '../../../components/Avatar';
@@ -27,8 +27,8 @@ class Expense extends React.Component {
     LoggedInUser: PropTypes.object,
     allowPayAction: PropTypes.bool,
     lockPayAction: PropTypes.func,
-    unlockPayAction: PropTypes.func
-  }
+    unlockPayAction: PropTypes.func,
+  };
 
   constructor(props) {
     super(props);
@@ -36,7 +36,7 @@ class Expense extends React.Component {
     this.state = {
       modified: false,
       expense: {},
-      mode: undefined
+      mode: undefined,
     };
 
     this.save = this.save.bind(this);
@@ -51,9 +51,9 @@ class Expense extends React.Component {
       'closeDetails': { id: 'expense.closeDetails', defaultMessage: 'Close Details' },
       'edit': { id: 'expense.edit', defaultMessage: 'edit' },
       'cancelEdit': { id: 'expense.cancelEdit', defaultMessage: 'cancel edit' },
-      'viewDetails': { id: 'expense.viewDetails', defaultMessage: 'View Details' }
+      'viewDetails': { id: 'expense.viewDetails', defaultMessage: 'View Details' },
     });
-    this.currencyStyle = { style: 'currency', currencyDisplay: 'symbol', minimumFractionDigits: 2, maximumFractionDigits: 2};
+    this.currencyStyle = { style: 'currency', currencyDisplay: 'symbol', minimumFractionDigits: 2, maximumFractionDigits: 2 };
   }
 
   toggleDetails() {
@@ -81,8 +81,8 @@ class Expense extends React.Component {
   async save() {
     const expense = {
       id: this.props.expense.id,
-      ...this.state.expense
-    }
+      ...this.state.expense,
+    };
     await this.props.editExpense(expense);
     this.setState({ modified: false, mode: 'details' });
   }
@@ -95,7 +95,7 @@ class Expense extends React.Component {
       includeHostedCollectives,
       LoggedInUser,
       editable,
-      view
+      view,
     } = this.props;
 
     const title = expense.description;
@@ -265,7 +265,7 @@ class Expense extends React.Component {
                   value={expense.amount / 100}
                   currency={expense.currency}
                   {...this.currencyStyle}
-                  />
+                />
               </div>
               <div className="description">
                 <Link route={`/${collective.slug}/expenses/${expense.id}`} title={capitalize(title)}>
@@ -280,7 +280,7 @@ class Expense extends React.Component {
               }
                 <span className="status">{intl.formatMessage(this.messages[status])}</span> |
                 <span className="metaItem">
-                  <Link route="expenses" params={{collectiveSlug: expense.collective.slug, filter: 'categories', value: expense.category }} scroll={false}>
+                  <Link route="expenses" params={{ collectiveSlug: expense.collective.slug, filter: 'categories', value: expense.category }} scroll={false}>
                     {capitalize(expense.category)}
                   </Link>
                 </span>
@@ -299,7 +299,7 @@ class Expense extends React.Component {
               collective={collective}
               onChange={this.handleChange}
               mode={mode}
-              />
+            />
 
             { editable &&
             <div className="actions">
@@ -320,7 +320,7 @@ class Expense extends React.Component {
                       disabled={!this.props.allowPayAction}
                       lock={this.props.lockPayAction}
                       unlock={this.props.unlockPayAction}
-                      />
+                    />
                   }
                   { canApprove && <ApproveExpenseBtn id={expense.id} /> }
                   { canReject && <RejectExpenseBtn id={expense.id} /> }
@@ -352,9 +352,9 @@ mutation editExpense($expense: ExpenseInputType!) {
 const addMutation = graphql(editExpenseQuery, {
 props: ( { mutate }) => ({
   editExpense: async (expense) => {
-    return await mutate({ variables: { expense } })
-  }
-})
+    return await mutate({ variables: { expense } });
+  },
+}),
 });
 
 export default withIntl(addMutation(Expense));

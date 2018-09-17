@@ -7,8 +7,7 @@ import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
 
 class EventsPage extends React.Component {
-
-  static getInitialProps ({ query: { collectiveSlug } }) {
+  static getInitialProps({ query: { collectiveSlug } }) {
     return { collectiveSlug };
   }
 
@@ -18,11 +17,8 @@ class EventsPage extends React.Component {
 
   render() {
     const { collectiveSlug } = this.props;
-    return (
-      <EventsWithData collectiveSlug={collectiveSlug} />
-    );
+    return <EventsWithData collectiveSlug={collectiveSlug} />;
   }
-
 }
 
 export default withData(withIntl(EventsPage));

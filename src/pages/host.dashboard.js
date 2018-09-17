@@ -20,8 +20,7 @@ import withIntl from '../lib/withIntl';
 import withLoggedInUser from '../lib/withLoggedInUser';
 
 class HostExpensesPage extends React.Component {
-
-  static getInitialProps ({ query: { hostCollectiveSlug } }) {
+  static getInitialProps({ query: { hostCollectiveSlug } }) {
     return { collectiveSlug: hostCollectiveSlug, ssr: false };
   }
 
@@ -51,39 +50,41 @@ class HostExpensesPage extends React.Component {
     const { data } = this.props;
     const { LoggedInUser } = this.state;
 
-    if (!data.Collective) return (<ErrorPage data={data} />);
-    if (!data.Collective.isHost) return (<ErrorPage message="collective.is.not.host" />);
+    if (!data.Collective) return <ErrorPage data={data} />;
+    if (!data.Collective.isHost)
+      return <ErrorPage message="collective.is.not.host" />;
 
     const collective = data.Collective;
     const selectedCollective = this.state.selectedCollective || collective;
-    const includeHostedCollectives = (selectedCollective.id === collective.id);
+    const includeHostedCollectives = selectedCollective.id === collective.id;
 
     return (
       <div className="HostExpensesPage">
-        <style jsx>{`
-        .col.side {
-          width: 100%;
-          min-width: 20rem;
-          max-width: 25%;
-          margin-left: 5rem;
-        }
+        <style jsx>
+          {`
+            .col.side {
+              width: 100%;
+              min-width: 20rem;
+              max-width: 25%;
+              margin-left: 5rem;
+            }
 
-        .col.large {
-          margin-left: 6rem;
-          min-width: 30rem;
-          width: 50%;
-          max-width: 75%;
-        }
+            .col.large {
+              margin-left: 6rem;
+              min-width: 30rem;
+              width: 50%;
+              max-width: 75%;
+            }
 
-        @media(max-width: 600px) {
-          .columns {
-            flex-direction: column-reverse;
-          }
-          .columns .col {
-            max-width: 100%;
-          }
-        }
-        `}
+            @media (max-width: 600px) {
+              .columns {
+                flex-direction: column-reverse;
+              }
+              .columns .col {
+                max-width: 100%;
+              }
+            }
+          `}
         </style>
 
         <Header
@@ -93,27 +94,27 @@ class HostExpensesPage extends React.Component {
           image={collective.image || collective.backgroundImage}
           className={this.state.status}
           LoggedInUser={LoggedInUser}
-          />
+        />
 
         <Body>
-
           <CollectiveCover
             collective={collective}
             href={`/${collective.slug}`}
             className="small"
             style={get(collective, 'settings.style.hero.cover')}
-            />
+          />
 
-          { LoggedInUser &&
+          {LoggedInUser && (
             <CollectivePicker
               hostCollectiveSlug={this.props.collectiveSlug}
               LoggedInUser={LoggedInUser}
-              onChange={(selectedCollective => this.pickCollective(selectedCollective))}
-              />
-          }
+              onChange={selectedCollective =>
+                this.pickCollective(selectedCollective)
+              }
+            />
+          )}
 
           <div className="content">
-
             <div className="col large pullLeft">
               <ExpensesWithData
                 collective={selectedCollective}
@@ -121,40 +122,37 @@ class HostExpensesPage extends React.Component {
                 LoggedInUser={this.state.LoggedInUser}
                 filters={true}
                 editable={true}
-                />
+              />
             </div>
 
-            { this.state.selectedCollective &&
+            {this.state.selectedCollective && (
               <div className="col side pullLeft">
                 <ExpensesStatsWithData slug={selectedCollective.slug} />
               </div>
-            }
-
+            )}
           </div>
-
         </Body>
 
         <Footer />
-
       </div>
     );
   }
 }
 
 const getDataQuery = gql`
-query Collective($collectiveSlug: String) {
-  Collective(slug: $collectiveSlug) {
-    id
-    type
-    slug
-    name
-    currency
-    backgroundImage
-    settings
-    image
-    isHost
+  query Collective($collectiveSlug: String) {
+    Collective(slug: $collectiveSlug) {
+      id
+      type
+      slug
+      name
+      currency
+      backgroundImage
+      settings
+      image
+      isHost
+    }
   }
-}
 `;
 
 export const addData = graphql(getDataQuery);

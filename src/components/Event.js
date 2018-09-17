@@ -26,11 +26,10 @@ import SendMoneyToCollectiveBtn from './SendMoneyToCollectiveBtn';
 const defaultBackgroundImage = '/static/images/defaultBackgroundImage.png';
 
 class Event extends React.Component {
-
   static propTypes = {
     event: PropTypes.object.isRequired,
-    LoggedInUser: PropTypes.object
-  }
+    LoggedInUser: PropTypes.object,
+  };
 
   constructor(props) {
     super(props);
@@ -50,13 +49,27 @@ class Event extends React.Component {
     };
 
     this.messages = defineMessages({
-      'event.over.sendMoneyToParent.title': { id: 'event.over.sendMoneyToParent.title', defaultMessage: 'Event is over and still has a positive balance'},
-      'event.over.sendMoneyToParent.description': { id: 'event.over.sendMoneyToParent.description', defaultMessage: 'If you still have expenses related to this event, please file them. Otherwise consider moving the money to your collective {collective}'},
-      'event.over.sendMoneyToParent.transaction.description': { id: 'event.over.sendMoneyToParent.transaction.description', defaultMessage: 'Balance of {event}'},
-      'event.tickets.edit': { id: 'event.tickets.edit', defaultMessage: 'Edit tickets' },
+      'event.over.sendMoneyToParent.title': {
+        id: 'event.over.sendMoneyToParent.title',
+        defaultMessage: 'Event is over and still has a positive balance',
+      },
+      'event.over.sendMoneyToParent.description': {
+        id: 'event.over.sendMoneyToParent.description',
+        defaultMessage:
+          'If you still have expenses related to this event, please file them. Otherwise consider moving the money to your collective {collective}',
+      },
+      'event.over.sendMoneyToParent.transaction.description': {
+        id: 'event.over.sendMoneyToParent.transaction.description',
+        defaultMessage: 'Balance of {event}',
+      },
+      'event.tickets.edit': {
+        id: 'event.tickets.edit',
+        defaultMessage: 'Edit tickets',
+      },
     });
 
-    this.isEventOver = (new Date(this.event.endsAt)).getTime() < (new Date).getTime();
+    this.isEventOver =
+      new Date(this.event.endsAt).getTime() < new Date().getTime();
   }
 
   componentDidMount() {
@@ -65,11 +78,19 @@ class Event extends React.Component {
 
   async removeInterested() {
     const { LoggedInUser } = this.props;
-    const memberCollectiveId = this.state.interestedUserCollectiveId || LoggedInUser && LoggedInUser.CollectiveId;
-    const res = await this.props.removeMember({ id: memberCollectiveId }, { id: this.state.event.id }, 'FOLLOWER');
+    const memberCollectiveId =
+      this.state.interestedUserCollectiveId ||
+      (LoggedInUser && LoggedInUser.CollectiveId);
+    const res = await this.props.removeMember(
+      { id: memberCollectiveId },
+      { id: this.state.event.id },
+      'FOLLOWER',
+    );
     const memberRemoved = res.data.removeMember;
-    const event = { ... this.state.event };
-    event.members = event.members.filter(member => member.id !== memberRemoved.id);
+    const event = { ...this.state.event };
+    event.members = event.members.filter(
+      member => member.id !== memberRemoved.id,
+    );
     this.setState({ showInterestedForm: false, event });
   }
 
@@ -78,20 +99,32 @@ class Event extends React.Component {
    * Otherwise, we show the form to enter an email address
    */
   async setInterested(member) {
-    member = member || this.props.LoggedInUser && { id: this.props.LoggedInUser.CollectiveId };
+    member =
+      member ||
+      (this.props.LoggedInUser && { id: this.props.LoggedInUser.CollectiveId });
     if (member) {
-      const parts = member.email && member.email.substr(0, member.email.indexOf('@')).split('.');
+      const parts =
+        member.email &&
+        member.email.substr(0, member.email.indexOf('@')).split('.');
       if (parts && parts.length > 1) {
         member.firstName = capitalize(parts[0] || '');
         member.lastName = capitalize(parts[1] || '');
       }
       try {
-        const res = await this.props.createMember(member, { id: this.state.event.id }, 'FOLLOWER');
+        const res = await this.props.createMember(
+          member,
+          { id: this.state.event.id },
+          'FOLLOWER',
+        );
         const memberCreated = res.data.createMember;
         const interestedUserCollectiveId = memberCreated.member.id;
-        const event = { ... this.state.event };
-        event.members = [ ...event.members, memberCreated ];
-        this.setState({ showInterestedForm: false, event, interestedUserCollectiveId });
+        const event = { ...this.state.event };
+        event.members = [...event.members, memberCreated];
+        this.setState({
+          showInterestedForm: false,
+          event,
+          interestedUserCollectiveId,
+        });
         this.setState({ showInterestedForm: false });
       } catch (e) {
         console.error(e);
@@ -99,7 +132,9 @@ class Event extends React.Component {
         if (e && e.graphQLErrors) {
           message = ` (error: ${e.graphQLErrors[0].message})`;
         }
-        this.error(`An error occured 😳. We couldn't register you as interested. Please try again in a few.${message}`);
+        this.error(
+          `An error occured 😳. We couldn't register you as interested. Please try again in a few.${message}`,
+        );
       }
       return;
     } else {
@@ -120,7 +155,7 @@ class Event extends React.Component {
   }
 
   updateOrder(tier) {
-    const tierInfo = Object.assign({}, {...this.state.tierInfo});
+    const tierInfo = Object.assign({}, { ...this.state.tierInfo });
     const singleAmount = tier.singleAmount || tier.amount;
     const order = {
       tier: { id: tier.id },
@@ -144,12 +179,11 @@ class Event extends React.Component {
       TierId: order.tier.id,
       quantity: order.quantity,
       totalAmount: order.totalAmount,
-      interval: order.interval
+      interval: order.interval,
     });
-    Router.pushRoute('orderEventTier', params)
-      .then(() => {
-        window.location.hash = '#content';
-      });
+    Router.pushRoute('orderEventTier', params).then(() => {
+      window.location.hash = '#content';
+    });
   }
 
   render() {
@@ -168,7 +202,7 @@ class Event extends React.Component {
       }
       guests.interested.push({
         user: follower.member,
-        status: 'INTERESTED'
+        status: 'INTERESTED',
       });
     });
     guests.confirmed = [];
@@ -188,72 +222,99 @@ class Event extends React.Component {
       }
     });
 
-    const allGuests = union(guests.interested, guests.confirmed).sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-    responses.guests = uniqBy(allGuests, (r) => r.user && r.user.id);
+    const allGuests = union(guests.interested, guests.confirmed).sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+    );
+    responses.guests = uniqBy(allGuests, r => r.user && r.user.id);
     responses.going = filterCollection(responses.guests, { status: 'YES' });
-    responses.interested = filterCollection(responses.guests, { status: 'INTERESTED' });
+    responses.interested = filterCollection(responses.guests, {
+      status: 'INTERESTED',
+    });
 
     let notification = {};
     // If event is over and has a positive balance, we ask the admins if they want to move the money to the parent collective
-    if (this.isEventOver && get(this.props.event, 'stats.balance') > 0 && canEditEvent) {
+    if (
+      this.isEventOver &&
+      get(this.props.event, 'stats.balance') > 0 &&
+      canEditEvent
+    ) {
       notification = {
-        title: intl.formatMessage(this.messages['event.over.sendMoneyToParent.title']),
-        description: intl.formatMessage(this.messages['event.over.sendMoneyToParent.description'], { collective: event.parentCollective.name }),
+        title: intl.formatMessage(
+          this.messages['event.over.sendMoneyToParent.title'],
+        ),
+        description: intl.formatMessage(
+          this.messages['event.over.sendMoneyToParent.description'],
+          { collective: event.parentCollective.name },
+        ),
         actions: [
           <Button
             key="submitExpenseBtn"
             className="submitExpense gray"
-            href={`${event.path}/expenses/new`}>
-            <FormattedMessage id="menu.submitExpense" defaultMessage="Submit Expense" />
+            href={`${event.path}/expenses/new`}
+          >
+            <FormattedMessage
+              id="menu.submitExpense"
+              defaultMessage="Submit Expense"
+            />
           </Button>,
           <SendMoneyToCollectiveBtn
             key="SendMoneyToCollectiveBtn"
             fromCollective={event}
             toCollective={event.parentCollective}
             LoggedInUser={LoggedInUser}
-            description={intl.formatMessage(this.messages['event.over.sendMoneyToParent.transaction.description'], { event: event.name })}
+            description={intl.formatMessage(
+              this.messages[
+                'event.over.sendMoneyToParent.transaction.description'
+              ],
+              { event: event.name },
+            )}
             amount={event.stats.balance}
             currency={event.currency}
-            />,
+          />,
         ],
       };
     }
 
-    const backgroundImage = event.backgroundImage || get(event, 'parentCollective.backgroundImage') || defaultBackgroundImage;
+    const backgroundImage =
+      event.backgroundImage ||
+      get(event, 'parentCollective.backgroundImage') ||
+      defaultBackgroundImage;
 
     return (
       <div>
-        <style jsx>{`
-          .EventPage .content {
-            max-width: 96rem;
-          }
-          .adminActions {
-            text-align: center;
-            text-transform: uppercase;
-            font-size: 1.3rem;
-            font-weight: 600;
-            letter-spacing: 0.05rem;
-          }
-          .adminActions ul {
-            overflow: hidden;
-            text-align: center;
-            margin: 0 auto;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            flex-direction: row;
-            list-style: none;
-          }
-          .adminActions ul li {
-            margin: 0 2rem;
-          }
-          .ticketsGrid :global(.tier) {
-            margin: 2rem auto;
-          }
-        `}</style>
+        <style jsx>
+          {`
+            .EventPage .content {
+              max-width: 96rem;
+            }
+            .adminActions {
+              text-align: center;
+              text-transform: uppercase;
+              font-size: 1.3rem;
+              font-weight: 600;
+              letter-spacing: 0.05rem;
+            }
+            .adminActions ul {
+              overflow: hidden;
+              text-align: center;
+              margin: 0 auto;
+              padding: 0;
+              display: flex;
+              justify-content: center;
+              flex-direction: row;
+              list-style: none;
+            }
+            .adminActions ul li {
+              margin: 0 2rem;
+            }
+            .ticketsGrid :global(.tier) {
+              margin: 2rem auto;
+            }
+          `}
+        </style>
 
         <div className="EventPage">
-
           <Header
             title={event.name}
             description={event.description || event.longDescription}
@@ -261,113 +322,158 @@ class Event extends React.Component {
             image={event.parentCollective.image || backgroundImage}
             className={this.state.status}
             LoggedInUser={LoggedInUser}
-            />
+          />
 
           <Body>
-
             <div className={`EventPage ${this.state.modal && 'showModal'}`}>
-
               <NotificationBar
                 status={this.state.status}
                 title={notification.title}
                 description={notification.description}
                 actions={notification.actions}
                 error={this.state.error}
-                />
+              />
 
               <CollectiveCover
                 collective={event}
                 title={event.name}
                 LoggedInUser={LoggedInUser}
                 cta={{ label: 'tickets', href: '#tickets' }}
-                style={get(event, 'settings.style.hero.cover') || get(event.parentCollective, 'settings.style.hero.cover')}
-                />
+                style={
+                  get(event, 'settings.style.hero.cover') ||
+                  get(event.parentCollective, 'settings.style.hero.cover')
+                }
+              />
 
-              { this.state.showInterestedForm &&
+              {this.state.showInterestedForm && (
                 <InterestedForm onSubmit={this.setInterested} />
-              }
+              )}
 
               <div>
-                <div className="content" >
-                  <div className="eventDescription" >
-                    <Markdown source={event.longDescription || event.description} escapeHtml={false} />
+                <div className="content">
+                  <div className="eventDescription">
+                    <Markdown
+                      source={event.longDescription || event.description}
+                      escapeHtml={false}
+                    />
                   </div>
 
                   <section id="tickets">
                     <SectionTitle
                       section="tickets"
-                      action={LoggedInUser && LoggedInUser.canEditCollective(event) && { label: intl.formatMessage(this.messages['event.tickets.edit']), href: `${event.path}/edit#tiers` }}
-                      />
+                      action={
+                        LoggedInUser &&
+                        LoggedInUser.canEditCollective(event) && {
+                          label: intl.formatMessage(
+                            this.messages['event.tickets.edit'],
+                          ),
+                          href: `${event.path}/edit#tiers`,
+                        }
+                      }
+                    />
 
                     <div className="ticketsGrid">
-                      { event.tiers.map((tier) =>
-                        (<Tier
+                      {event.tiers.map(tier => (
+                        <Tier
                           key={tier.id}
                           tier={tier}
                           values={this.state.tierInfo[tier.id] || {}}
-                          onChange={(response) => this.updateOrder(response)}
-                          onClick={(response) => this.handleOrderTier(response)}
-                          />)
-                      )}
+                          onChange={response => this.updateOrder(response)}
+                          onClick={response => this.handleOrderTier(response)}
+                        />
+                      ))}
                     </div>
                   </section>
                 </div>
 
-                { get(event, 'location.name') && <Location location={event.location} /> }
+                {get(event, 'location.name') && (
+                  <Location location={event.location} />
+                )}
 
-                { responses.sponsors.length > 0 &&
+                {responses.sponsors.length > 0 && (
                   <section id="sponsors">
                     <h1>
-                      <FormattedMessage id="event.sponsors.title" defaultMessage="Sponsors" />
+                      <FormattedMessage
+                        id="event.sponsors.title"
+                        defaultMessage="Sponsors"
+                      />
                     </h1>
                     <Sponsors
                       sponsors={responses.sponsors.map(r => {
-                        const sponsorCollective = Object.assign({}, r.fromCollective);
+                        const sponsorCollective = Object.assign(
+                          {},
+                          r.fromCollective,
+                        );
                         sponsorCollective.tier = r.tier;
                         sponsorCollective.createdAt = new Date(r.createdAt);
                         return sponsorCollective;
                       })}
-                      />
+                    />
                   </section>
-                }
+                )}
 
-                { responses.guests.length > 0 &&
+                {responses.guests.length > 0 && (
                   <section id="responses">
                     <h1>
-                      <FormattedMessage id="event.responses.title.going" values={{ n: responses.going.length }} defaultMessage="{n} {n, plural, one {person going} other {people going}}" />
-                      { responses.interested.length > 0 &&
+                      <FormattedMessage
+                        id="event.responses.title.going"
+                        values={{ n: responses.going.length }}
+                        defaultMessage="{n} {n, plural, one {person going} other {people going}}"
+                      />
+                      {responses.interested.length > 0 && (
                         <span>
                           <span> - </span>
-                          <FormattedMessage id="event.responses.title.interested" values={{ n: responses.interested.length }} defaultMessage="{n} interested" />
+                          <FormattedMessage
+                            id="event.responses.title.interested"
+                            values={{ n: responses.interested.length }}
+                            defaultMessage="{n} interested"
+                          />
                         </span>
-                      }
+                      )}
                     </h1>
-                    { canEditEvent &&
-                    <div className="adminActions" id="adminActions">
-                      <ul>
-                        <li><a href={`/${event.parentCollective.slug}/events/${event.slug}/nametags.pdf`}>Print name tags</a></li>
-                        <li><a href={`mailto:${event.slug}@${event.parentCollective.slug}.opencollective.com`}>Send email</a></li>
-                        <li><a onClick={() => exportRSVPs(event)}>Export CSV</a></li>
-                      </ul>
-                    </div>
-                    }
+                    {canEditEvent && (
+                      <div className="adminActions" id="adminActions">
+                        <ul>
+                          <li>
+                            <a
+                              href={`/${event.parentCollective.slug}/events/${
+                                event.slug
+                              }/nametags.pdf`}
+                            >
+                              Print name tags
+                            </a>
+                          </li>
+                          <li>
+                            <a
+                              href={`mailto:${event.slug}@${
+                                event.parentCollective.slug
+                              }.opencollective.com`}
+                            >
+                              Send email
+                            </a>
+                          </li>
+                          <li>
+                            <a onClick={() => exportRSVPs(event)}>Export CSV</a>
+                          </li>
+                        </ul>
+                      </div>
+                    )}
                     <Responses responses={responses.guests} />
                   </section>
-                }
+                )}
 
                 <ExpensesSection
                   collective={event}
                   LoggedInUser={LoggedInUser}
                   limit={10}
-                  />
-
+                />
               </div>
             </div>
           </Body>
           <Footer />
         </div>
       </div>
-    )
+    );
   }
 }
 

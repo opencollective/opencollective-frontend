@@ -11,8 +11,7 @@ import withIntl from '../lib/withIntl';
 import withLoggedInUser from '../lib/withLoggedInUser';
 
 class EventPage extends React.Component {
-
-  static getInitialProps ({ query: { parentCollectiveSlug, eventSlug } }) {
+  static getInitialProps({ query: { parentCollectiveSlug, eventSlug } }) {
     return { parentCollectiveSlug, eventSlug };
   }
 
@@ -38,7 +37,7 @@ class EventPage extends React.Component {
     const { data } = this.props;
     const { LoggedInUser } = this.state;
 
-    if (!data.Collective) return (<ErrorPage data={data} />);
+    if (!data.Collective) return <ErrorPage data={data} />;
 
     const event = data.Collective;
 
@@ -56,4 +55,6 @@ class EventPage extends React.Component {
   }
 }
 
-export default withData(withIntl(withLoggedInUser(addEventCollectiveData(EventPage))));
+export default withData(
+  withIntl(withLoggedInUser(addEventCollectiveData(EventPage))),
+);

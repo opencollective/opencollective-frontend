@@ -15,7 +15,7 @@ import StyledLink from './StyledLink';
 
 const SocialLink = styled.a`
   align-items: center;
-  border: 1px solid #9399A3;
+  border: 1px solid #9399a3;
   border-radius: 50%;
   display: flex;
   height: 48px;
@@ -23,12 +23,14 @@ const SocialLink = styled.a`
   opacity: 0.6;
   width: 48px;
 
-  &:hover, &:focus {
+  &:hover,
+  &:focus {
     opacity: 1;
   }
 `;
 
-const FlexList = styled.ul([],
+const FlexList = styled.ul(
+  [],
   ...Box.componentStyle.rules,
   ...Flex.componentStyle.rules,
 );
@@ -48,14 +50,15 @@ const navigation = {
   },
   COMMUNITY: {
     'Open Source': '/opensource',
-    'Report an issue': 'https://github.com/opencollective/opencollective/issues',
+    'Report an issue':
+      'https://github.com/opencollective/opencollective/issues',
     Slack: 'https://slack.opencollective.com',
     Wiki: 'https://github.com/opencollective/opencollective/wiki',
-    'Email Support': 'mailto:support@opencollective.com'
+    'Email Support': 'mailto:support@opencollective.com',
   },
   COMPANY: {
     About: '/about',
-    'FAQ': '/faq',
+    FAQ: '/faq',
     Blog: 'https://medium.com/open-collective',
     'Terms of Service': '/tos',
     'Privacy Policy': '/privacypolicy',
@@ -65,7 +68,7 @@ const navigation = {
 class Footer extends React.Component {
   render() {
     return (
-      <Container 
+      <Container
         id="footer"
         bg="white"
         borderTop="1px solid #aaaaaa"
@@ -74,18 +77,36 @@ class Footer extends React.Component {
         p="1rem"
         width={1}
       >
-        <Flex p={2} justifyContent="space-between" alignItems={['center', null, 'flex-start']} mx="auto" flexDirection={['column', null, 'row']} css="max-width: 1300px;">
+        <Flex
+          p={2}
+          justifyContent="space-between"
+          alignItems={['center', null, 'flex-start']}
+          mx="auto"
+          flexDirection={['column', null, 'row']}
+          css="max-width: 1300px;"
+        >
           <Container
             display="flex"
             mt={3}
-            width={[1, null, 1/3]}
+            width={[1, null, 1 / 3]}
             flexDirection="column"
             maxWidth="300px"
           >
             <Flex justifyContent={['center', null, 'flex-start']}>
-              <object type="image/svg+xml" data="/static/images/opencollectivelogo-footer.svg" height="20"></object>
+              <object
+                type="image/svg+xml"
+                data="/static/images/opencollectivelogo-footer.svg"
+                height="20"
+              />
             </Flex>
-            <P textAlign={['center', null, 'left']} color="#6E747A" fontSize="1.4rem" py={2}>An organization for your community, transparent by design.</P>
+            <P
+              textAlign={['center', null, 'left']}
+              color="#6E747A"
+              fontSize="1.4rem"
+              py={2}
+            >
+              An organization for your community, transparent by design.
+            </P>
           </Container>
           <Container
             display="flex"
@@ -112,13 +133,37 @@ class Footer extends React.Component {
               <MailIcon size={15} fill="#9399A3" />
             </SocialLink>
           </Container>
-          <Flex is="nav" flexWrap="wrap" justifyContent="center" mt={3} flex="1 1 auto" order={['3', null, '2']}>
-            {Object.keys(navigation).map((key) => (
+          <Flex
+            is="nav"
+            flexWrap="wrap"
+            justifyContent="center"
+            mt={3}
+            flex="1 1 auto"
+            order={['3', null, '2']}
+          >
+            {Object.keys(navigation).map(key => (
               <Box key={key} width={[0.5, null, 0.25]} mb={3}>
-                <P textAlign={['center', null, 'left' ]} fontSize="1.2rem" color="#C2C6CC" letterSpacing="1px" pb={3}>{key}</P>
-                <FlexList justifyContent="center" flexDirection="column" pl={0} pr={2}>
-                  {Object.keys(navigation[key]).map((item) => (
-                    <ListItem key={item} textAlign={['center', null, 'left']} mb={2}>
+                <P
+                  textAlign={['center', null, 'left']}
+                  fontSize="1.2rem"
+                  color="#C2C6CC"
+                  letterSpacing="1px"
+                  pb={3}
+                >
+                  {key}
+                </P>
+                <FlexList
+                  justifyContent="center"
+                  flexDirection="column"
+                  pl={0}
+                  pr={2}
+                >
+                  {Object.keys(navigation[key]).map(item => (
+                    <ListItem
+                      key={item}
+                      textAlign={['center', null, 'left']}
+                      mb={2}
+                    >
                       <StyledLink
                         href={navigation[key][item]}
                         color="#6E747A"
@@ -143,4 +188,3 @@ class Footer extends React.Component {
 }
 
 export default Footer;
-

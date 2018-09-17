@@ -9,35 +9,33 @@ import 'intl/locale-data/jsonp/en.js'; // for old browsers without window.Intl
 // locale data was added to the page by `pages/_document.js`. This only happens
 // once, on initial page load in the browser.
 if (typeof window !== 'undefined' && window.ReactIntlLocaleData) {
-  Object.keys(window.ReactIntlLocaleData).forEach((lang) => {
-    addLocaleData(window.ReactIntlLocaleData[lang])
-  })
+  Object.keys(window.ReactIntlLocaleData).forEach(lang => {
+    addLocaleData(window.ReactIntlLocaleData[lang]);
+  });
 }
 
-export default (Page) => {
-
-  const IntlPage = injectIntl(Page)
+export default Page => {
+  const IntlPage = injectIntl(Page);
 
   return class WithIntl extends React.Component {
-
-    static displayName = `WithIntl(${Page.displayName})`
+    static displayName = `WithIntl(${Page.displayName})`;
 
     static propTypes = {
       locale: PropTypes.string,
       messages: PropTypes.object,
       now: PropTypes.number,
-    }
+    };
 
     static defaultProps = {
-      locale: 'en'
-    }
+      locale: 'en',
+    };
 
     // Note: when adding withIntl to a child component, getInitialProps doesn't get called
     // and it doesn't populate the messages in the props
-    static async getInitialProps (context) {
-      let props
+    static async getInitialProps(context) {
+      let props;
       if (typeof Page.getInitialProps === 'function') {
-        props = await Page.getInitialProps(context)
+        props = await Page.getInitialProps(context);
       }
 
       // Get the `locale` and `messages` from the request object on the server.
@@ -47,12 +45,12 @@ export default (Page) => {
 
       // Always update the current time on page load/transition because the
       // <IntlProvider> will be a new instance even with pushState routing.
-      const now = Date.now()
+      const now = Date.now();
 
-      return {...props, locale, messages, now}
+      return { ...props, locale, messages, now };
     }
 
-    render () {
+    render() {
       const { locale, messages, now, ...props } = this.props;
 
       const intlProps = {};
@@ -68,7 +66,7 @@ export default (Page) => {
         <IntlProvider {...intlProps} initialNow={now}>
           <IntlPage {...props} />
         </IntlProvider>
-      )
+      );
     }
-  }
-}
+  };
+};

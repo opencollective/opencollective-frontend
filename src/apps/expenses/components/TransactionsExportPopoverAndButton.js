@@ -14,9 +14,9 @@ import InputField from '../../../components/InputField';
 /* Convert the output of the allTransactions query into a CSV payload
    that can be downloaded directly by the user */
 export const transformResultInCSV = (json) => {
-  const q = (value) => `"${value}"`              /* Quote value */
+  const q = (value) => `"${value}"`;              /* Quote value */
   const f = (value) => (value / 100).toFixed(2); /* Add cents */
-  const d = (value) => moment(new Date(value)).format("YYYY-MM-DD HH:mm:ss");
+  const d = (value) => moment(new Date(value)).format('YYYY-MM-DD HH:mm:ss');
 
   // Sanity check. It will return an empty CSV for the user
   if (json.length === 0) return '';
@@ -27,19 +27,19 @@ export const transformResultInCSV = (json) => {
   const collectiveCurrency = json[0].currency;
 
   const header = [
-    "Transaction Description",
-    "User Name",
-    "User Profile",
-    "Transaction Date",
-    "Collective Currency",
-    "Host Currency",
-    "Transaction Amount",
+    'Transaction Description',
+    'User Name',
+    'User Profile',
+    'Transaction Date',
+    'Collective Currency',
+    'Host Currency',
+    'Transaction Amount',
     `Host Fee (${hostCurrency})`,
     `Open Collective Fee (${hostCurrency})`,
     `Payment Processor Fee (${hostCurrency})`,
     `Net Amount (${collectiveCurrency})`,
-    "Subscription Interval",
-    "Order Date",
+    'Subscription Interval',
+    'Order Date',
   ].join(',');
 
   const lines = json.map((i) => {
@@ -63,13 +63,13 @@ export const transformResultInCSV = (json) => {
   });
 
   return [header].concat(lines).join('\n');
-}
+};
 
 class ExportForm extends React.Component {
 
   static propTypes = {
     collective: PropTypes.object,
-  }
+  };
 
   constructor(props) {
     super(props);
@@ -107,8 +107,8 @@ class ExportForm extends React.Component {
 
     // Helper to prepare date values to be part of the file name
     const format = (d) => moment(d).format('YYYYMMDDHHMMSS');
-    let fileName = `${this.props.collective.slug}--`
-    fileName += `${format(this.state.dateFrom)}-`
+    let fileName = `${this.props.collective.slug}--`;
+    fileName += `${format(this.state.dateFrom)}-`;
     fileName += `${format(this.state.dateTo)}.csv`;
     return exportFile('text/plain;charset=utf-8', fileName, csv);
   }
@@ -116,7 +116,7 @@ class ExportForm extends React.Component {
   updateSearchProps(entries) {
     this.setState(entries);
     this.setState({
-      downloadBtnDisabled: !(this.state.dateFrom && this.state.dateTo)
+      downloadBtnDisabled: !(this.state.dateFrom && this.state.dateTo),
     });
   }
 
@@ -132,7 +132,8 @@ class ExportForm extends React.Component {
           padding-top: 10px;
           color: #e21a60;
         }
-        `}</style>
+        `}
+        </style>
         <InputField
           name="dateFrom"
           label="Start date"
@@ -140,7 +141,7 @@ class ExportForm extends React.Component {
           closeOnSelect
           defaultValue={this.state.dateFrom}
           onChange={(dateFrom) => this.updateSearchProps({ dateFrom })}
-          />
+        />
         <InputField
           name="dateTo"
           label="End date"
@@ -148,22 +149,23 @@ class ExportForm extends React.Component {
           defaultValue={this.state.dateTo}
           closeOnSelect
           onChange={(dateTo) => this.updateSearchProps({ dateTo })}
-          />
+        />
         <Button
           disabled={this.state.disabled}
           bsSize="small"
           bsStyle="primary"
           onClick={this.download.bind(this)}
-          >Download</Button>
+        >Download
+        </Button>
         {this.state.searchReturnedEmpty &&
         <div className="empty-search-error">
           <FormattedMessage
             id="transactions.emptysearch"
             defaultMessage="There are no transactions in this date range."
-            />
+          />
         </div>}
       </Popover>
-    )
+    );
   }
 }
 
@@ -179,7 +181,7 @@ class PopoverButton extends React.Component {
           <FormattedMessage id="transactions.downloadcsvbutton" defaultMessage="Download CSV" />
         </a>
       </OverlayTrigger>
-    )
+    );
   }
 }
 

@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
-import { graphql } from 'react-apollo'
-import gql from 'graphql-tag'
+import { graphql } from 'react-apollo';
+import gql from 'graphql-tag';
 import { get } from 'lodash';
 
 import withIntl from '../../../lib/withIntl';
@@ -13,8 +13,8 @@ import Currency from '../../../components/Currency';
 class ExpensesStatsWithData extends React.Component {
 
   static propTypes = {
-    slug: PropTypes.string.isRequired // update.id
-  }
+    slug: PropTypes.string.isRequired, // update.id
+  };
 
   constructor(props) {
     super(props);
@@ -48,7 +48,8 @@ class ExpensesStatsWithData extends React.Component {
             color: #797c80;
             font-size: 1.2rem;
           }
-        `}</style>
+        `}
+        </style>
 
         <h1><FormattedMessage id="collective.stats.balance.title" defaultMessage="Available balance" /></h1>
         <Currency value={Collective.stats.balance} currency={Collective.currency} precision={2} />

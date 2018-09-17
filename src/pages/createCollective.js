@@ -12,8 +12,7 @@ import withIntl from '../lib/withIntl';
 import withLoggedInUser from '../lib/withLoggedInUser';
 
 class CreateCollectivePage extends React.Component {
-
-  static getInitialProps ({ query: { hostCollectiveSlug } }) {
+  static getInitialProps({ query: { hostCollectiveSlug } }) {
     return { slug: hostCollectiveSlug };
   }
 
@@ -35,19 +34,25 @@ class CreateCollectivePage extends React.Component {
   }
 
   render() {
-
     const { data } = this.props;
 
-    const bypassErrorPage = get(data, 'error.message', '').includes('Please provide a slug or an id');
+    const bypassErrorPage = get(data, 'error.message', '').includes(
+      'Please provide a slug or an id',
+    );
 
     if ((this.state.loading || !data.Collective) && !bypassErrorPage) {
-      return (<ErrorPage loading={this.state.loading} data={data} />);
+      return <ErrorPage loading={this.state.loading} data={data} />;
     }
 
     return (
-      <CreateCollective host={data.Collective} LoggedInUser={this.state.LoggedInUser} />
+      <CreateCollective
+        host={data.Collective}
+        LoggedInUser={this.state.LoggedInUser}
+      />
     );
   }
 }
 
-export default withData(withIntl(withLoggedInUser(addCollectiveCoverData(CreateCollectivePage))));
+export default withData(
+  withIntl(withLoggedInUser(addCollectiveCoverData(CreateCollectivePage))),
+);
