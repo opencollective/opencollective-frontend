@@ -373,7 +373,7 @@ exports[`Search Page renders empty results message 1`] = `
   -webkit-box-align: center;
   -ms-flex-align: center;
   align-items: center;
-  border: 1px solid #9399A3;
+  border: 1px solid #9399a3;
   border-radius: 50%;
   display: -webkit-box;
   display: -webkit-flex;
@@ -748,7 +748,7 @@ exports[`Search Page renders empty results message 1`] = `
     </div>
   </header>
   <main
-    className="jsx-1238847522"
+    className="jsx-96768397"
   >
     <div
       className="c19"
@@ -781,7 +781,7 @@ exports[`Search Page renders empty results message 1`] = `
                 type="search"
               />
               <button
-                className="jsx-2820878800 jsx-1599314605 Button blue c24"
+                className="jsx-1144918383 jsx-3840138619 Button blue c24"
                 onClick={[Function]}
                 type="submit"
               >
@@ -1738,7 +1738,7 @@ exports[`Search Page renders error message 1`] = `
   -webkit-box-align: center;
   -ms-flex-align: center;
   align-items: center;
-  border: 1px solid #9399A3;
+  border: 1px solid #9399a3;
   border-radius: 50%;
   display: -webkit-box;
   display: -webkit-flex;
@@ -2089,16 +2089,16 @@ exports[`Search Page renders error message 1`] = `
     </div>
   </header>
   <main
-    className="jsx-1238847522"
+    className="jsx-96768397"
   >
     <div
       className="content"
     >
       <div
-        className="jsx-300638056"
+        className="jsx-1072026091"
       >
         <h1
-          className="jsx-300638056"
+          className="jsx-1072026091"
         >
           Unknown error
         </h1>
@@ -3030,7 +3030,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
   -webkit-box-align: center;
   -ms-flex-align: center;
   align-items: center;
-  border: 1px solid #9399A3;
+  border: 1px solid #9399a3;
   border-radius: 50%;
   display: -webkit-box;
   display: -webkit-flex;
@@ -3405,7 +3405,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
     </div>
   </header>
   <main
-    className="jsx-1238847522"
+    className="jsx-96768397"
   >
     <div
       className="c19"
@@ -3438,7 +3438,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
                 type="search"
               />
               <button
-                className="jsx-2820878800 jsx-1599314605 Button blue c24"
+                className="jsx-1144918383 jsx-3840138619 Button blue c24"
                 onClick={[Function]}
                 type="submit"
               >
@@ -4521,7 +4521,7 @@ exports[`Search Page renders search results with pagination 1`] = `
   -webkit-box-align: center;
   -ms-flex-align: center;
   align-items: center;
-  border: 1px solid #9399A3;
+  border: 1px solid #9399a3;
   border-radius: 50%;
   display: -webkit-box;
   display: -webkit-flex;
@@ -4896,7 +4896,7 @@ exports[`Search Page renders search results with pagination 1`] = `
     </div>
   </header>
   <main
-    className="jsx-1238847522"
+    className="jsx-96768397"
   >
     <div
       className="c19"
@@ -4929,7 +4929,7 @@ exports[`Search Page renders search results with pagination 1`] = `
                 type="search"
               />
               <button
-                className="jsx-2820878800 jsx-1599314605 Button blue c24"
+                className="jsx-1144918383 jsx-3840138619 Button blue c24"
                 onClick={[Function]}
                 type="submit"
               >
@@ -4952,20 +4952,20 @@ exports[`Search Page renders search results with pagination 1`] = `
             onClick={[Function]}
           >
             <div
-              className="jsx-3446301333 CollectiveCard undefined"
+              className="jsx-3769176122 CollectiveCard undefined"
             >
               <div
-                className="jsx-3446301333 head"
+                className="jsx-3769176122 head"
               >
                 <div
-                  className="jsx-3446301333 background"
+                  className="jsx-3769176122 background"
                   style={Object {}}
                 />
                 <div
-                  className="jsx-3446301333 logo"
+                  className="jsx-3769176122 logo"
                 >
                   <div
-                    className="jsx-1454345377 Logo"
+                    className="jsx-3454192051 Logo"
                     style={
                       Object {
                         "backgroundImage": "url(/static/images/default-organization-logo.png)",
@@ -4975,7 +4975,7 @@ exports[`Search Page renders search results with pagination 1`] = `
                     }
                   >
                     <img
-                      className="jsx-1454345377 logo"
+                      className="jsx-3454192051 logo"
                       src="/static/images/default-organization-logo.png"
                       style={
                         Object {
@@ -4987,17 +4987,17 @@ exports[`Search Page renders search results with pagination 1`] = `
                 </div>
               </div>
               <div
-                className="jsx-3446301333 body"
+                className="jsx-3769176122 body"
               >
                 <div
-                  className="jsx-3446301333 name"
+                  className="jsx-3769176122 name"
                 />
                 <div
-                  className="jsx-3446301333 description"
+                  className="jsx-3769176122 description"
                 />
               </div>
               <div
-                className="jsx-3446301333 footer"
+                className="jsx-3769176122 footer"
               />
             </div>
           </a>
