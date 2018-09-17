@@ -10,7 +10,7 @@ import imageToAscii from 'image-to-ascii';
 import { getCloudinaryUrl } from './utils';
 import { logger } from '../logger';
 
-const WEBSITE_URL = process.env.WEBSITE_URL || "https://opencollective.com";
+const WEBSITE_URL = process.env.WEBSITE_URL || 'https://opencollective.com';
 
 const cachedRequest = cachedRequestLib(request);
 cachedRequest.setCacheDirectory('/tmp');
@@ -34,7 +34,7 @@ export function generateAsciiFromImage(imgsrc, options) {
     bits : '# '.split('').reverse(),
     binary : '01 '.split('').reverse(),
     greyscale : ' ▤▦▩█'.split(''),
-    blocks : ' ▖▚▜█'.split('')
+    blocks : ' ▖▚▜█'.split(''),
   };
 
   return new Promise((resolve, reject) => {
@@ -54,7 +54,7 @@ export function generateAsciiFromImage(imgsrc, options) {
  * (returns a promise)
  */
 export function svg2png(svg) {
-  const outputDir = `/tmp`;
+  const outputDir = '/tmp';
   const outputFile = `${outputDir}/${md5(svg)}.png`;
 
   return fs
@@ -72,10 +72,10 @@ export function svg2png(svg) {
 
 
 export function generateSVGBannerForUsers(users, options) {
-  logger.debug(">>> generateSVGBannerForUsers %d users, options: %j", users.length, options);
+  logger.debug('>>> generateSVGBannerForUsers %d users, options: %j', users.length, options);
 
   const {
-    style, limit, collectiveSlug
+    style, limit, collectiveSlug,
   } = options;
 
   const imageWidth = options.width;
@@ -96,7 +96,7 @@ export function generateSVGBannerForUsers(users, options) {
   const avatarHeight = Number(options.avatarHeight) || defaultAvatarHeight;
   const margin = Number(options.margin) || defaultMargin;
 
-  const params = (style === 'rounded') ? { query: `/c_thumb,g_face,h_${avatarHeight*2},r_max,w_${avatarHeight*2},bo_3px_solid_white/c_thumb,h_${avatarHeight*2},r_max,w_${avatarHeight*2},bo_2px_solid_rgb:66C71A/e_trim/f_auto/` } : { width: avatarHeight * 2, height: avatarHeight * 2};
+  const params = (style === 'rounded') ? { query: `/c_thumb,g_face,h_${avatarHeight*2},r_max,w_${avatarHeight*2},bo_3px_solid_white/c_thumb,h_${avatarHeight*2},r_max,w_${avatarHeight*2},bo_2px_solid_rgb:66C71A/e_trim/f_auto/` } : { width: avatarHeight * 2, height: avatarHeight * 2 };
 
   const promises = [];
   for (let i = 0 ; i < count ; i++) {
@@ -105,7 +105,7 @@ export function generateSVGBannerForUsers(users, options) {
       if (users[i].type === 'USER' || style === 'rounded') {
         image = getCloudinaryUrl(image, params);
       }
-      const promiseOptions = {url: image, encoding: null, ttl: 60 * 60 * 24 * 30 * 1000}; // 30 days caching
+      const promiseOptions = { url: image, encoding: null, ttl: 60 * 60 * 24 * 30 * 1000 }; // 30 days caching
       promises.push(requestPromise(promiseOptions));
     } else {
       promises.push(Promise.resolve());
@@ -116,13 +116,13 @@ export function generateSVGBannerForUsers(users, options) {
     const btn = {
       url: options.buttonImage,
       encoding: null,
-      ttl: 60 * 60 * 24 * 30 * 1000
+      ttl: 60 * 60 * 24 * 30 * 1000,
     };
 
     users.push({
       slug: collectiveSlug,
-      website: `${WEBSITE_URL}/${collectiveSlug}#support`
-    })
+      website: `${WEBSITE_URL}/${collectiveSlug}#support`,
+    });
 
     promises.push(requestPromise(btn));
   }
@@ -150,7 +150,7 @@ export function generateSVGBannerForUsers(users, options) {
           avatarWidth = Math.round(dimensions.width / dimensions.height * avatarHeight);
         } catch (e) {
           // Otherwise, we skip it
-          logger.warn(`Cannot get the dimensions of the avatar of %s.`, user.slug, { image: user.image });
+          logger.warn('Cannot get the dimensions of the avatar of %s.', user.slug, { image: user.image });
           continue;
         }
 
@@ -170,6 +170,6 @@ export function generateSVGBannerForUsers(users, options) {
       </svg>`;
     })
     .catch(e => {
-      logger.error(">>> Error in image-generator:generateSVGBannerForUsers", e);
-    })
+      logger.error('>>> Error in image-generator:generateSVGBannerForUsers', e);
+    });
   }

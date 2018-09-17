@@ -1,17 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import withIntl from '../lib/withIntl';
-import { graphql } from 'react-apollo'
-import gql from 'graphql-tag'
+import { graphql } from 'react-apollo';
+import gql from 'graphql-tag';
 import Update from './Update';
 import NotFound from './NotFound';
 
 class UpdateWithData extends React.Component {
-
   static propTypes = {
     id: PropTypes.number.isRequired, // update.id
-    editable: PropTypes.bool
-  }
+    editable: PropTypes.bool,
+  };
 
   constructor(props) {
     super(props);
@@ -19,12 +18,12 @@ class UpdateWithData extends React.Component {
 
   render() {
     const { data, editable, LoggedInUser } = this.props;
-    if (data.loading) return (<div />);
+    if (data.loading) return <div />;
     const update = data.Update;
-    if (!update) return (<NotFound />);
+    if (!update) return <NotFound />;
 
     return (
-      <div className={`UpdateWithData`}>
+      <div className={'UpdateWithData'}>
         <Update
           key={update.id}
           collective={update.collective}
@@ -32,7 +31,7 @@ class UpdateWithData extends React.Component {
           editable={editable}
           LoggedInUser={LoggedInUser}
           compact={false}
-          />
+        />
       </div>
     );
   }

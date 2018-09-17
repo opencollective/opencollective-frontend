@@ -1,18 +1,25 @@
 import Payment from 'payment';
 
 const getStripeToken = (type = 'cc', data) => {
-
   // for testing only
-  if (typeof window !== 'undefined' && window.location.search.match(/test=e2e/) && (window.location.hostname === 'staging.opencollective.com' || window.location.hostname === 'localhost')) {
-    return Promise.resolve({ token: `tok_bypassPending`, card: {
-      last4: 4242,
-      exp_month: 11,
-      exp_year: 23,
-      brand: 'visa',
-      country: 'us',
-      funding: 'credit',
-      address_zip: 10014
-    }});
+  if (
+    typeof window !== 'undefined' &&
+    window.location.search.match(/test=e2e/) &&
+    (window.location.hostname === 'staging.opencollective.com' ||
+      window.location.hostname === 'localhost')
+  ) {
+    return Promise.resolve({
+      token: 'tok_bypassPending',
+      card: {
+        last4: 4242,
+        exp_month: 11,
+        exp_year: 23,
+        brand: 'visa',
+        country: 'us',
+        funding: 'credit',
+        address_zip: 10014,
+      },
+    });
   }
 
   // eslint-disable-next-line
@@ -25,13 +32,20 @@ const getStripeToken = (type = 'cc', data) => {
         return { token: res.token.id, card: res.token.card };
       });
   }
-}
+};
 
-const isValidCard = (card) => {
+const isValidCard = card => {
   if (typeof card.cvc !== 'string') {
     card.cvc = `${card.cvc}`;
   }
-  return (card && card.cvc && card.cvc.length >= 3 && card.exp_month && card.exp_year && Payment.fns.validateCardNumber(card.number));
-}
+  return (
+    card &&
+    card.cvc &&
+    card.cvc.length >= 3 &&
+    card.exp_month &&
+    card.exp_year &&
+    Payment.fns.validateCardNumber(card.number)
+  );
+};
 
 export { getStripeToken, isValidCard };

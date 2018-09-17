@@ -18,7 +18,7 @@ const Logo = styled.img.attrs({
   src: '/static/images/opencollective-icon.svg',
   alt: 'Open Collective logo',
 })`
-  ${({ animate }) => animate ? rotateMixin : null}
+  ${({ animate }) => (animate ? rotateMixin : null)};
 `;
 
 const SearchFormContainer = styled(Box)`
@@ -38,7 +38,6 @@ const NavLink = styled.a`
 `;
 
 class TopBar extends React.Component {
-
   static propTypes = {
     className: PropTypes.string,
     LoggedInUser: PropTypes.object,
@@ -53,16 +52,26 @@ class TopBar extends React.Component {
   constructor(props) {
     super(props);
     this.messages = defineMessages({
-      'menu.homepage': { id: 'menu.homepage', defaultMessage: 'Go to Open Collective Homepage' },
+      'menu.homepage': {
+        id: 'menu.homepage',
+        defaultMessage: 'Go to Open Collective Homepage',
+      },
     });
   }
 
   render() {
     const { className, LoggedInUser, showSearch } = this.props;
-    const shouldAnimate = Array.isArray(className) && className.includes('loading');
+    const shouldAnimate =
+      Array.isArray(className) && className.includes('loading');
 
     return (
-      <Flex mx={3} my={2} alignItems="center" flexDirection="row" justifyContent="space-around">
+      <Flex
+        mx={3}
+        my={2}
+        alignItems="center"
+        flexDirection="row"
+        justifyContent="space-around"
+      >
         <Link href="/">
           <Flex is="a" alignItems="center">
             <Logo width="24" height="24" animate={shouldAnimate} />
@@ -85,11 +94,12 @@ class TopBar extends React.Component {
         )}
 
         <Flex alignItems="center" justifyContent="flex-end" flex="1 1 auto">
-
           <Hide sm md lg>
             <Box mx={3}>
               <Link href="/search">
-                <Flex is="a"><SearchIcon fill="#aaaaaa" size={24} /></Flex>
+                <Flex is="a">
+                  <SearchIcon fill="#aaaaaa" size={24} />
+                </Flex>
               </Link>
             </Box>
           </Hide>
@@ -97,16 +107,42 @@ class TopBar extends React.Component {
           <Hide sm md lg>
             <Box mx={3}>
               <Link href="#footer">
-                <Flex is="a"><MenuIcon fill="#aaaaaa" size={24} /></Flex>
+                <Flex is="a">
+                  <MenuIcon fill="#aaaaaa" size={24} />
+                </Flex>
               </Link>
             </Box>
           </Hide>
 
           <Hide xs>
-            <NavList is="ul" p={0} m={0} justifyContent="space-around" css="margin: 0;">
-              <Box is="li" px={3}><NavLink href="/discover"><FormattedMessage id="menu.discover" defaultMessage="Discover" /></NavLink></Box>
-              <Box is="li" px={3}><NavLink href="/learn-more"><FormattedMessage id="menu.howItWorks" defaultMessage="How it Works" /></NavLink></Box>
-              <Box is="li" px={3}><NavLink href="https://medium.com/open-collective"><FormattedMessage id="menu.blog" defaultMessage="Blog" /></NavLink></Box>
+            <NavList
+              is="ul"
+              p={0}
+              m={0}
+              justifyContent="space-around"
+              css="margin: 0;"
+            >
+              <Box is="li" px={3}>
+                <NavLink href="/discover">
+                  <FormattedMessage
+                    id="menu.discover"
+                    defaultMessage="Discover"
+                  />
+                </NavLink>
+              </Box>
+              <Box is="li" px={3}>
+                <NavLink href="/learn-more">
+                  <FormattedMessage
+                    id="menu.howItWorks"
+                    defaultMessage="How it Works"
+                  />
+                </NavLink>
+              </Box>
+              <Box is="li" px={3}>
+                <NavLink href="https://medium.com/open-collective">
+                  <FormattedMessage id="menu.blog" defaultMessage="Blog" />
+                </NavLink>
+              </Box>
             </NavList>
           </Hide>
 

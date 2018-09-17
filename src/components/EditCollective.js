@@ -13,7 +13,6 @@ import withIntl from '../lib/withIntl';
 import { Router } from '../server/pages';
 
 class EditCollective extends React.Component {
-
   static propTypes = {
     collective: PropTypes.object.isRequired,
     LoggedInUser: PropTypes.object.isRequired,
@@ -27,7 +26,10 @@ class EditCollective extends React.Component {
     this.deleteCollective = this.deleteCollective.bind(this);
     this.state = { status: null, result: {} };
     this.messages = defineMessages({
-      'creditcard.error': { id: 'creditcard.error', defaultMessage: 'Invalid credit card' },
+      'creditcard.error': {
+        id: 'creditcard.error',
+        defaultMessage: 'Invalid credit card',
+      },
     });
   }
 
@@ -44,9 +46,14 @@ class EditCollective extends React.Component {
     }
 
     if (typeof CollectiveInputType.tags === 'string') {
-      CollectiveInputType.tags = CollectiveInputType.tags.split(',').map(t => t.trim());
+      CollectiveInputType.tags = CollectiveInputType.tags
+        .split(',')
+        .map(t => t.trim());
     }
-    if (CollectiveInputType.backgroundImage === defaultBackgroundImage[CollectiveInputType.type]) {
+    if (
+      CollectiveInputType.backgroundImage ===
+      defaultBackgroundImage[CollectiveInputType.type]
+    ) {
       delete CollectiveInputType.backgroundImage;
     }
 
@@ -99,7 +106,13 @@ class EditCollective extends React.Component {
       CollectiveInputType.paymentMethods[index] = paymentMethod;
       return CollectiveInputType;
     } catch (e) {
-      this.setState({ result: { error: `${intl.formatMessage(this.messages['creditcard.error'])}: ${e}` } });
+      this.setState({
+        result: {
+          error: `${intl.formatMessage(
+            this.messages['creditcard.error'],
+          )}: ${e}`,
+        },
+      });
       return false;
     }
   }
@@ -124,13 +137,13 @@ class EditCollective extends React.Component {
       const cleanTier = { ...tier };
       resetAttributes.map(attr => {
         cleanTier[attr] = null;
-      })
+      });
       if (tier._amountType === 'fixed') {
         cleanTier.presets = null;
       }
       delete cleanTier._amountType;
       return cleanTier;
-    })
+    });
   }
 
   async editCollective(CollectiveInputType) {
@@ -139,7 +152,7 @@ class EditCollective extends React.Component {
       return false;
     }
 
-    this.setState( { status: 'loading' });
+    this.setState({ status: 'loading' });
     try {
       await this.props.editCollective(CollectiveInputType);
       this.setState({ status: 'saved' });
@@ -148,8 +161,11 @@ class EditCollective extends React.Component {
       }, 3000);
     } catch (err) {
       console.error('>>> editCollective error:', JSON.stringify(err));
-      const errorMsg = (err.graphQLErrors && err.graphQLErrors[0]) ? err.graphQLErrors[0].message : err.message;
-      this.setState( { status: null, result: { error: errorMsg } });
+      const errorMsg =
+        err.graphQLErrors && err.graphQLErrors[0]
+          ? err.graphQLErrors[0].message
+          : err.message;
+      this.setState({ status: null, result: { error: errorMsg } });
       throw new Error(errorMsg);
     }
   }
@@ -157,47 +173,55 @@ class EditCollective extends React.Component {
   async deleteCollective() {
     const { collective } = this.props;
     if (confirm('😱 Are you really sure you want to delete this collective?')) {
-      this.setState( { status: 'loading' });
+      this.setState({ status: 'loading' });
       try {
         await this.props.deleteCollective(collective.id);
-        this.setState({ status: null, result: { success: 'Collective deleted successfully' } });
+        this.setState({
+          status: null,
+          result: { success: 'Collective deleted successfully' },
+        });
         const collectiveRoute = `/${collective.parentCollective.slug}`;
         Router.pushRoute(collectiveRoute);
       } catch (err) {
-        console.error('>>> deleteCollective error: ', JSON.stringify(err) );
-        const errorMsg = (err.graphQLErrors && err.graphQLErrors[0]) ? err.graphQLErrors[0].message : err.message;
-        this.setState( { result: { error: errorMsg } });
+        console.error('>>> deleteCollective error: ', JSON.stringify(err));
+        const errorMsg =
+          err.graphQLErrors && err.graphQLErrors[0]
+            ? err.graphQLErrors[0].message
+            : err.message;
+        this.setState({ result: { error: errorMsg } });
         throw new Error(errorMsg);
       }
     }
   }
 
   render() {
-
     const { LoggedInUser, collective } = this.props;
 
-    if (!collective || !collective.slug) return (<div />);
+    if (!collective || !collective.slug) return <div />;
 
     const title = `Edit ${collective.name} ${collective.type.toLowerCase()}`;
-    const canEditCollective = LoggedInUser && LoggedInUser.canEditCollective(collective);
+    const canEditCollective =
+      LoggedInUser && LoggedInUser.canEditCollective(collective);
 
     return (
       <div className="EditCollective">
-        <style jsx>{`
-          .success {
-            color: green;
-          }
-          .error {
-            color: red;
-          }
-          .login {
-            text-align: center;
-          }
-          .actions {
-            text-align: center;
-            margin-bottom: 5rem;
-          }
-        `}</style>
+        <style jsx>
+          {`
+            .success {
+              color: green;
+            }
+            .error {
+              color: red;
+            }
+            .login {
+              text-align: center;
+            }
+            .actions {
+              text-align: center;
+              margin-bottom: 5rem;
+            }
+          `}
+        </style>
 
         <Header
           title={collective.name}
@@ -206,41 +230,46 @@ class EditCollective extends React.Component {
           image={collective.image || collective.backgroundImage}
           className={this.state.status}
           LoggedInUser={this.props.LoggedInUser}
-          />
+        />
 
         <Body>
-
           <CollectiveCover
             href={`/${collective.slug}`}
             collective={collective}
             title={title}
             className="small"
-            />
+          />
 
-          <div className="content" >
-            {!canEditCollective &&
+          <div className="content">
+            {!canEditCollective && (
               <div className="login">
-                <p>You need to be logged in as the creator of this collective<br />or as a core contributor of the {collective.name} collective.</p>
+                <p>
+                  You need to be logged in as the creator of this collective
+                  <br />
+                  or as a core contributor of the {collective.name} collective.
+                </p>
                 <SignInForm next={`/${collective.slug}/edit`} />
               </div>
-            }
-            { canEditCollective &&
+            )}
+            {canEditCollective && (
               <div>
                 <EditCollectiveForm
                   collective={collective}
                   LoggedInUser={LoggedInUser}
                   onSubmit={this.editCollective}
                   status={this.state.status}
-                  />
+                />
                 <div className="actions">
-                  { collective.type === 'EVENT' && (<a onClick={this.deleteCollective}>delete event</a>)}
+                  {collective.type === 'EVENT' && (
+                    <a onClick={this.deleteCollective}>delete event</a>
+                  )}
                   <div className="result">
                     <div className="success">{this.state.result.success}</div>
                     <div className="error">{this.state.result.error}</div>
                   </div>
                 </div>
               </div>
-            }
+            )}
           </div>
         </Body>
         <Footer />

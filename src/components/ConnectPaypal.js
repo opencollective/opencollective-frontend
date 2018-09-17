@@ -7,11 +7,10 @@ import { FormattedMessage } from 'react-intl';
 import { connectAccount } from '../lib/api';
 
 class ConnectPaypal extends React.Component {
-
   static propTypes = {
     collective: PropTypes.object.isRequired,
-    onChange: PropTypes.func
-  }
+    onChange: PropTypes.func,
+  };
 
   constructor(props) {
     super(props);
@@ -40,78 +39,108 @@ class ConnectPaypal extends React.Component {
     const { collective } = this.props;
 
     if (!collective || !collective.paymentMethods) {
-      return (<div />);
+      return <div />;
     }
-    const paypalPaymentMethod = collective.paymentMethods.find(pm => pm.service === 'paypal');
+    const paypalPaymentMethod = collective.paymentMethods.find(
+      pm => pm.service === 'paypal',
+    );
 
     return (
       <div className="CollectivesContainer">
-        <style jsx>{`
-          .collectivesFilter {
-            display: flex;
-            justify-content: center;
-          }
-          .collectiveBalance {
-            text-align: center;
-          }
-          .collectiveBalance label {
-            margin: 1rem 0.5rem 1rem 0;
-          }
-          .amount {
-            font-family: Rubik;
-            font-size: 3.6rem;
-            font-weight: 500;
-            line-height: 1.11;
-            color: #252729;
-            margin: 0.5rem 0;
-          }
+        <style jsx>
+          {`
+            .collectivesFilter {
+              display: flex;
+              justify-content: center;
+            }
+            .collectiveBalance {
+              text-align: center;
+            }
+            .collectiveBalance label {
+              margin: 1rem 0.5rem 1rem 0;
+            }
+            .amount {
+              font-family: Rubik;
+              font-size: 3.6rem;
+              font-weight: 500;
+              line-height: 1.11;
+              color: #252729;
+              margin: 0.5rem 0;
+            }
 
-          .description, label {
-            font-family: Rubik;
-            font-size: 1.4rem;
-            line-height: 1.5;
-            text-align: right;
-            color: #aaaeb3;
-            font-weight: normal;
-          }
+            .description,
+            label {
+              font-family: Rubik;
+              font-size: 1.4rem;
+              line-height: 1.5;
+              text-align: right;
+              color: #aaaeb3;
+              font-weight: normal;
+            }
 
-          .description {
-            width: 22rem;
-            margin: 0.5rem 0;
-            font-size: 1.1rem;
-          }
-        `}</style>
+            .description {
+              width: 22rem;
+              margin: 0.5rem 0;
+              font-size: 1.1rem;
+            }
+          `}
+        </style>
         <div className="connectPaypal">
-          { paypalPaymentMethod &&
-          <div style={{ textAlign: 'center' }}>
-            <div className="balance">
-              <FormattedMessage id="host.dashboard.paypal.balance" defaultMessage="PayPal card balance:" />
-              <div className="amount">
-                <Currency value={paypalPaymentMethod.balance} currency={paypalPaymentMethod.currency} />
+          {paypalPaymentMethod && (
+            <div style={{ textAlign: 'center' }}>
+              <div className="balance">
+                <FormattedMessage
+                  id="host.dashboard.paypal.balance"
+                  defaultMessage="PayPal card balance:"
+                />
+                <div className="amount">
+                  <Currency
+                    value={paypalPaymentMethod.balance}
+                    currency={paypalPaymentMethod.currency}
+                  />
+                </div>
+                <div>
+                  <SmallButton
+                    bsStyle="primary"
+                    bsSize="xsmall"
+                    onClick={this.connectPaypal}
+                    disabled={this.state.connectingPaypal}
+                  >
+                    {this.state.connectingPaypal && 'Processing...'}
+                    {!this.state.connectingPaypal && 'refill balance'}
+                  </SmallButton>
+                </div>
               </div>
-              <div>
-                <SmallButton bsStyle="primary" bsSize="xsmall" onClick={this.connectPaypal} disabled={this.state.connectingPaypal}>
-                  { this.state.connectingPaypal && "Processing..."}
-                  { !this.state.connectingPaypal && "refill balance"}
-                </SmallButton>
+              <div className="description">
+                <FormattedMessage
+                  id="collective.connectedAccounts.paypal.connected"
+                  defaultMessage="Paypal account connected on {createdAt, date, short}"
+                  values={{
+                    createdAt: new Date(paypalPaymentMethod.createdAt),
+                  }}
+                />
               </div>
             </div>
-            <div className="description">
-              <FormattedMessage id="collective.connectedAccounts.paypal.connected" defaultMessage="Paypal account connected on {createdAt, date, short}" values={{ createdAt: new Date(paypalPaymentMethod.createdAt) }} />
+          )}
+          {!paypalPaymentMethod && (
+            <div>
+              <SmallButton
+                className="primary"
+                bsStyle="primary"
+                onClick={this.connectPaypal}
+                disabled={this.state.connectingPaypal}
+              >
+                {this.state.connectingPaypal && 'Connecting...'}
+                {!this.state.connectingPaypal && 'Connect Paypal'}
+              </SmallButton>
+              <div className="description">
+                <FormattedMessage
+                  id="collective.connectedAccounts.paypal.description"
+                  defaultMessage="Connect a PayPal account to reimburse approved expenses in one click"
+                />
+              </div>
             </div>
-          </div>
-        }
-          { !paypalPaymentMethod &&
-          <div>
-            <SmallButton className="primary" bsStyle="primary" onClick={this.connectPaypal} disabled={this.state.connectingPaypal}>
-              { this.state.connectingPaypal && "Connecting..."}
-              { !this.state.connectingPaypal && "Connect Paypal"}
-            </SmallButton>
-            <div className="description">
-              <FormattedMessage id="collective.connectedAccounts.paypal.description" defaultMessage="Connect a PayPal account to reimburse approved expenses in one click" />
-            </div>
-          </div>
-        }
+          )}
         </div>
       </div>
     );

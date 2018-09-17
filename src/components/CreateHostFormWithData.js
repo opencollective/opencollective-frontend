@@ -2,14 +2,13 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import withIntl from '../lib/withIntl';
 import { get } from 'lodash';
-import { graphql, compose } from 'react-apollo'
-import gql from 'graphql-tag'
+import { graphql, compose } from 'react-apollo';
+import gql from 'graphql-tag';
 import LoadingGrid from './LoadingGrid';
 import CreateHostForm from './CreateHostForm';
 import { Flex } from 'grid-styled';
 
 class CreateHostFormWithData extends React.Component {
-
   static propTypes = {
     LoggedInUser: PropTypes.object.isRequired,
     collective: PropTypes.object.isRequired,
@@ -23,17 +22,20 @@ class CreateHostFormWithData extends React.Component {
   }
 
   async createOrganization(CollectiveInputType) {
-    this.setState( { status: 'loading' });
+    this.setState({ status: 'loading' });
     CollectiveInputType.type = 'ORGANIZATION';
-    console.log(">>> createOrganization", CollectiveInputType);
+    console.log('>>> createOrganization', CollectiveInputType);
     try {
       const res = await this.props.createCollective(CollectiveInputType);
       const collective = res.data.createCollective;
       return collective;
     } catch (err) {
-      console.error(">>> createOrganization error: ", JSON.stringify(err));
-      const errorMsg = (err.graphQLErrors && err.graphQLErrors[0]) ? err.graphQLErrors[0].message : err.message;
-      this.setState( { result: { error: errorMsg }})
+      console.error('>>> createOrganization error: ', JSON.stringify(err));
+      const errorMsg =
+        err.graphQLErrors && err.graphQLErrors[0]
+          ? err.graphQLErrors[0].message
+          : err.message;
+      this.setState({ result: { error: errorMsg } });
       throw new Error(errorMsg);
     }
   }
@@ -47,7 +49,7 @@ class CreateHostFormWithData extends React.Component {
         <Flex py={3} width={1} justifyContent="center">
           <LoadingGrid />
         </Flex>
-      )
+      );
     }
 
     const organizations = [];
@@ -62,55 +64,53 @@ class CreateHostFormWithData extends React.Component {
         userCollective={userCollective}
         createOrganization={this.createOrganization}
         onSubmit={this.props.onSubmit}
-        />
+      />
     );
   }
-
 }
 
 const getConnectedAccountsQuery = gql`
-query Collective($slug: String!) {
-  Collective(slug: $slug) {
-    id
-    isHost
-    slug
-    memberOf(role: "ADMIN", type: "ORGANIZATION") {
+  query Collective($slug: String!) {
+    Collective(slug: $slug) {
       id
-      collective {
+      isHost
+      slug
+      memberOf(role: "ADMIN", type: "ORGANIZATION") {
         id
-        slug
-        name
-        isHost
-        createdAt
-        image
-        connectedAccounts {
+        collective {
           id
-          service
+          slug
+          name
+          isHost
           createdAt
-          updatedAt
+          image
+          connectedAccounts {
+            id
+            service
+            createdAt
+            updatedAt
+          }
         }
       }
-    }
-    connectedAccounts {
-      id
-      service
-      createdAt
-      updatedAt
+      connectedAccounts {
+        id
+        service
+        createdAt
+        updatedAt
+      }
     }
   }
-}
 `;
 
 export const addConnectedAccountsQuery = graphql(getConnectedAccountsQuery, {
   options(props) {
     return {
       variables: {
-        slug: get(props, 'LoggedInUser.collective.slug')
-      }
-    }
-  }
+        slug: get(props, 'LoggedInUser.collective.slug'),
+      },
+    };
+  },
 });
-
 
 const createCollectiveQuery = gql`
   mutation createCollective($collective: CollectiveInputType!) {
@@ -126,36 +126,47 @@ const createCollectiveQuery = gql`
 
 const addMutation = graphql(createCollectiveQuery, {
   props: ({ ownProps, mutate }) => ({
-    createCollective: async (CollectiveInputType) => await mutate({
-      variables: { collective: CollectiveInputType },
-      update: (proxy, { data: { createCollective }}) => {
-        const variables = {
-          slug: get(ownProps, 'LoggedInUser.collective.slug')
-        };
+    createCollective: async CollectiveInputType =>
+      await mutate({
+        variables: { collective: CollectiveInputType },
+        update: (proxy, { data: { createCollective } }) => {
+          const variables = {
+            slug: get(ownProps, 'LoggedInUser.collective.slug'),
+          };
 
-        // Retrieve the query from the cache
-        const data = proxy.readQuery({ query: getConnectedAccountsQuery, variables });
+          // Retrieve the query from the cache
+          const data = proxy.readQuery({
+            query: getConnectedAccountsQuery,
+            variables,
+          });
 
-        // Insert new Collective at the beginning
-        const membership = {
-          createdAt: createCollective.createdAt,
-          id: Math.round(Math.random() * 10000000),
-          __typename: "MemberType",
-          collective: {
-            ...createCollective,
-            isHost: false,
-            connectedAccounts: []
-          }
-        }
-        data.Collective.memberOf.push(membership);
+          // Insert new Collective at the beginning
+          const membership = {
+            createdAt: createCollective.createdAt,
+            id: Math.round(Math.random() * 10000000),
+            __typename: 'MemberType',
+            collective: {
+              ...createCollective,
+              isHost: false,
+              connectedAccounts: [],
+            },
+          };
+          data.Collective.memberOf.push(membership);
 
-        // write data back for the query
-        proxy.writeQuery({ query: getConnectedAccountsQuery, variables, data });
-      }
-    })
-  })
+          // write data back for the query
+          proxy.writeQuery({
+            query: getConnectedAccountsQuery,
+            variables,
+            data,
+          });
+        },
+      }),
+  }),
 });
 
-const addGraphQL = compose(addConnectedAccountsQuery, addMutation);
+const addGraphQL = compose(
+  addConnectedAccountsQuery,
+  addMutation,
+);
 
 export default withIntl(addGraphQL(CreateHostFormWithData));

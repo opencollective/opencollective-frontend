@@ -3,11 +3,10 @@ import PropTypes from 'prop-types';
 import Tier from './Tier';
 
 class Tiers extends React.Component {
-
   static propTypes = {
     tiers: PropTypes.array,
-    event: PropTypes.object
-  }
+    event: PropTypes.object,
+  };
 
   getTicket(tier) {
     const { event } = this.props;
@@ -19,16 +18,16 @@ class Tiers extends React.Component {
 
     return (
       <div id="tickets" className="tiers">
-        {tiers.map((tier) =>
-          (<Tier
+        {tiers.map(tier => (
+          <Tier
             key={tier.id}
             name={tier.name}
             description={tier.description}
             amount={tier.amount}
             currency={tier.currency}
-            onClick={(tier) => this.getTicket(tier)}
-            />)
-        )}
+            onClick={tier => this.getTicket(tier)}
+          />
+        ))}
       </div>
     );
   }

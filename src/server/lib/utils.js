@@ -20,10 +20,10 @@ export function getCloudinaryUrl(src, { width, height, query }) {
 
 export const queryString = {
   stringify: (obj) => {
-    let str = "";
+    let str = '';
     for (const key in obj) {
-      if (str != "") {
-        str += "&";
+      if (str != '') {
+        str += '&';
       }
       str += `${key}=${encodeURIComponent(obj[key])}`;
     }
@@ -38,5 +38,5 @@ export const queryString = {
       res[decodeURIComponent(pair[0])] = decodeURIComponent(pair[1]);
     }
     return res;
-  }
-}
+  },
+};

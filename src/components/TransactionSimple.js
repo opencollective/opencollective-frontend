@@ -16,15 +16,22 @@ const TransactionSimple = ({
   subscription,
   type,
 }) => {
-  const formattedCreatedAt = (new Date(createdAt)).toISOString();
+  const formattedCreatedAt = new Date(createdAt).toISOString();
   return (
     <Container display="flex" alignItems="center">
       <a href={`/${fromCollective.slug}`} title={fromCollective.name}>
-        <Avatar src={fromCollective.image} id={fromCollective.id} radius={40} className="noFrame" />
+        <Avatar
+          src={fromCollective.image}
+          id={fromCollective.id}
+          radius={40}
+          className="noFrame"
+        />
       </a>
       <Container ml={3}>
         <P fontSize="1.2rem" color="#9399A3" display="inline">
-          <a href={`/${fromCollective.slug}`} title={fromCollective.name}>{fromCollective.name}</a>
+          <a href={`/${fromCollective.slug}`} title={fromCollective.name}>
+            {fromCollective.name}
+          </a>
           {type === 'DEBIT' ? ' submitted a ' : ' contributed '}
           <Span color="#2E3033">
             <FormattedNumber
@@ -38,12 +45,18 @@ const TransactionSimple = ({
           </Span>
           {subscription && ` a ${subscription.interval} `}
           {type === 'DEBIT' && ' expense '}
-          {' to '} <a href={`/${collective.slug}`} title={collective.name}>{collective.name}</a>.
+          {' to '}{' '}
+          <a href={`/${collective.slug}`} title={collective.name}>
+            {collective.name}
+          </a>
+          .
         </P>
         <Container position="relative" top={4} left={4} display="inline-block">
           <P fontSize="1.6rem">{type === 'DEBIT' && ' 🎉'}</P>
         </Container>
-        <P fontSize="1rem" color="#AEB2B8">{moment(formattedCreatedAt).fromNow()}</P>
+        <P fontSize="1rem" color="#AEB2B8">
+          {moment(formattedCreatedAt).fromNow()}
+        </P>
       </Container>
     </Container>
   );

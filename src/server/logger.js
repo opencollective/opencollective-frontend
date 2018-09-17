@@ -4,7 +4,10 @@ import expressWinston from 'express-winston';
 function getLogLevel() {
   if (process.env.DEBUG) {
     return 'debug';
-  } else if (process.env.NODE_ENV === 'test' || process.env.NODE_ENV === 'circleci') {
+  } else if (
+    process.env.NODE_ENV === 'test' ||
+    process.env.NODE_ENV === 'circleci'
+  ) {
     return 'warn';
   } else {
     return 'info';
@@ -18,11 +21,11 @@ const winstonConsole = new winston.transports.Console({
   format: winston.format.combine(
     winston.format.colorize(),
     winston.format.splat(),
-    winston.format.simple()
-  )
+    winston.format.simple(),
+  ),
 });
 
-logger.add(winstonConsole)
+logger.add(winstonConsole);
 logger.exceptions.handle(winstonConsole);
 
 const loggerMiddleware = {
@@ -31,14 +34,11 @@ const loggerMiddleware = {
     meta: false,
     colorize: true,
     expressFormat: true,
-    ignoreRoute: req => req.url.match(/^\/_/)
+    ignoreRoute: req => req.url.match(/^\/_/),
   }),
   errorLogger: expressWinston.errorLogger({
-    winstonInstance: logger
-  })
-}
+    winstonInstance: logger,
+  }),
+};
 
-export {
-  logger,
-  loggerMiddleware
-}
+export { logger, loggerMiddleware };

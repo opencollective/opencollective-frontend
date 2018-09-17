@@ -10,8 +10,7 @@ import withIntl from '../lib/withIntl';
 import withLoggedInUser from '../lib/withLoggedInUser';
 
 class CreateHostPage extends React.Component {
-
-  static getInitialProps ({ query: { collectiveSlug } }) {
+  static getInitialProps({ query: { collectiveSlug } }) {
     return { slug: collectiveSlug || 'none' };
   }
 
@@ -26,7 +25,7 @@ class CreateHostPage extends React.Component {
 
   async componentDidMount() {
     const { getLoggedInUser } = this.props;
-    const LoggedInUser = getLoggedInUser && await getLoggedInUser();
+    const LoggedInUser = getLoggedInUser && (await getLoggedInUser());
     this.setState({ LoggedInUser, loading: false });
   }
 
@@ -38,17 +37,13 @@ class CreateHostPage extends React.Component {
 
     return (
       <div>
-        { LoggedInUser &&
-          <CreateHostForm
-            LoggedInUser={LoggedInUser}
-            />
-        }
-        { !LoggedInUser &&
+        {LoggedInUser && <CreateHostForm LoggedInUser={LoggedInUser} />}
+        {!LoggedInUser && (
           <div className="login">
             <p>You need to be logged in to conitnue.</p>
             <SignInForm next={`/${this.props.slug}/edit`} />
           </div>
-        }
+        )}
       </div>
     );
   }

@@ -10,13 +10,12 @@ import { pick, get } from 'lodash';
 import storage from '../lib/storage';
 
 class EditUpdateForm extends React.Component {
-
   static propTypes = {
     collective: PropTypes.object,
     update: PropTypes.object,
     LoggedInUser: PropTypes.object,
-    onSubmit: PropTypes.func
-  }
+    onSubmit: PropTypes.func,
+  };
 
   constructor(props) {
     super(props);
@@ -24,22 +23,25 @@ class EditUpdateForm extends React.Component {
     this.onSubmit = this.onSubmit.bind(this);
 
     this.messages = defineMessages({
-      'title.label': { id: 'updates.new.title.label', defaultMessage: "Title"}
+      'title.label': { id: 'updates.new.title.label', defaultMessage: 'Title' },
     });
 
     this.state = {
       modified: false,
-      update: props.update ? pick(props.update, 'title', 'html', 'markdown') : {},
-      loading: false
+      update: props.update
+        ? pick(props.update, 'title', 'html', 'markdown')
+        : {},
+      loading: false,
     };
 
-    this.storageKey = `EditUpdateForm#${get(this.props, 'update.id') || get(this.props, 'collective.slug')}`;
+    this.storageKey = `EditUpdateForm#${get(this.props, 'update.id') ||
+      get(this.props, 'collective.slug')}`;
   }
 
   componentDidMount() {
     const savedState = storage.get(this.storageKey);
     if (savedState && !this.props.update) {
-      console.log(">>> restoring EditUpdateForm state", savedState);
+      console.log('>>> restoring EditUpdateForm state', savedState);
       this.setState(savedState);
     }
     this._isMounted = true;
@@ -49,11 +51,11 @@ class EditUpdateForm extends React.Component {
   handleChange(attr, value) {
     const update = {
       ...this.state.update,
-      [attr]: value
+      [attr]: value,
     };
     const newState = { modified: true, update };
     storage.set(this.storageKey, newState);
-    this.setState(newState)
+    this.setState(newState);
     this.props.onChange && this.props.onChange(update);
   }
 
@@ -68,7 +70,7 @@ class EditUpdateForm extends React.Component {
       storage.set(this.storageKey, null);
     } catch (e) {
       this.setState({ loading: false });
-      console.error("EditUpdateForm onSubmit error", e);
+      console.error('EditUpdateForm onSubmit error', e);
     }
     return false;
   }
@@ -76,59 +78,66 @@ class EditUpdateForm extends React.Component {
   render() {
     const { intl, collective, LoggedInUser } = this.props;
     const { update } = this.state;
-    if (!this._isMounted) return (<div />);
+    if (!this._isMounted) return <div />;
 
-    const editor = (get(LoggedInUser, 'collective.settings.editor') === 'markdown' || get(collective, 'settings.editor') === 'markdown') ? 'markdown' : 'html';
+    const editor =
+      get(LoggedInUser, 'collective.settings.editor') === 'markdown' ||
+      get(collective, 'settings.editor') === 'markdown'
+        ? 'markdown'
+        : 'html';
 
     return (
       <div className={`EditUpdateForm ${this.props.mode}`}>
-        <style jsx>{`
-          .EditUpdateForm {
-            font-size: 1.2rem;
-            margin: 0 1rem 5rem 1rem;
-          }
-          .col {
-            float: left;
-            display: flex;
-            flex-direction: column;
-            margin-right: 1rem;
-            margin-top: 1rem;
-          }
-          .row {
-            clear: both;
-            margin-left: 0;
-            margin-right: 0;
-          }
-          .row .col.large {
-            width: 100%;
-          }
-          .row.actions {
-            margin-top: 7rem;
-          }
-          label {
-            text-transform: uppercase;
-            color: #aaaeb3;
-            font-weight: 300;
-            font-family: lato, montserratlight, arial;
-            white-space: nowrap;
-          }
-          .netAmountInCollectiveCurrency {
-            font-weight: bold;
-          }
-          .error {
-            color: red;
-          }
-        `}</style>
-        <style global jsx>{`
-          .EditUpdateForm .inputField {
-            margin: 0;
-          }
+        <style jsx>
+          {`
+            .EditUpdateForm {
+              font-size: 1.2rem;
+              margin: 0 1rem 5rem 1rem;
+            }
+            .col {
+              float: left;
+              display: flex;
+              flex-direction: column;
+              margin-right: 1rem;
+              margin-top: 1rem;
+            }
+            .row {
+              clear: both;
+              margin-left: 0;
+              margin-right: 0;
+            }
+            .row .col.large {
+              width: 100%;
+            }
+            .row.actions {
+              margin-top: 7rem;
+            }
+            label {
+              text-transform: uppercase;
+              color: #aaaeb3;
+              font-weight: 300;
+              font-family: lato, montserratlight, arial;
+              white-space: nowrap;
+            }
+            .netAmountInCollectiveCurrency {
+              font-weight: bold;
+            }
+            .error {
+              color: red;
+            }
+          `}
+        </style>
+        <style global jsx>
+          {`
+            .EditUpdateForm .inputField {
+              margin: 0;
+            }
 
-          .EditUpdateForm .inputField.title {
-            width: 50%;
-          }
-
-        `}</style>
+            .EditUpdateForm .inputField.title {
+              width: 50%;
+            }
+          `}
+        </style>
 
         <form onSubmit={this.onSubmit}>
           <div className="row">
@@ -137,44 +146,55 @@ class EditUpdateForm extends React.Component {
                 name="title"
                 defaultValue={update.title}
                 label={intl.formatMessage(this.messages['title.label'])}
-                onChange={(title) => this.handleChange('title', title)}
-                />
+                onChange={title => this.handleChange('title', title)}
+              />
             </div>
           </div>
           <div className="row">
             <div className="col large">
-              { editor === 'markdown' &&
+              {editor === 'markdown' && (
                 <MarkdownEditor
-                  onChange={(markdown) => this.handleChange('markdown', markdown)}
+                  onChange={markdown => this.handleChange('markdown', markdown)}
                   defaultValue={update.markdown}
-                  />
-              }
-              { editor === 'html' &&
+                />
+              )}
+              {editor === 'html' && (
                 <HTMLEditor
-                  onChange={(html) => this.handleChange('html', html)}
+                  onChange={html => this.handleChange('html', html)}
                   defaultValue={update.html}
-                  />
-              }
+                />
+              )}
             </div>
           </div>
 
           <div className="row actions">
-            <Button className="bluewhite" type="submit" disabled={this.state.loading} >
-              { this.state.loading && <FormattedMessage id="form.processing" defaultMessage="processing" /> }
-              { !this.state.loading && <FormattedMessage id="update.new.save" defaultMessage="Save Update" /> }
+            <Button
+              className="bluewhite"
+              type="submit"
+              disabled={this.state.loading}
+            >
+              {this.state.loading && (
+                <FormattedMessage
+                  id="form.processing"
+                  defaultMessage="processing"
+                />
+              )}
+              {!this.state.loading && (
+                <FormattedMessage
+                  id="update.new.save"
+                  defaultMessage="Save Update"
+                />
+              )}
             </Button>
           </div>
 
           <div className="row">
             <div className="col large">
-              { this.state.error &&
-                <div className="error">
-                  {this.state.error}
-                </div>
-              }
+              {this.state.error && (
+                <div className="error">{this.state.error}</div>
+              )}
             </div>
           </div>
-
         </form>
       </div>
     );

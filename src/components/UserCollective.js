@@ -20,14 +20,13 @@ import { Button } from 'react-bootstrap';
 import { Router } from '../server/pages';
 
 class UserCollective extends React.Component {
-
   static propTypes = {
     collective: PropTypes.object.isRequired,
     LoggedInUser: PropTypes.object,
     query: PropTypes.object,
     intl: PropTypes.object.isRequired,
     message: PropTypes.string,
-  }
+  };
 
   constructor(props) {
     super(props);
@@ -39,35 +38,128 @@ class UserCollective extends React.Component {
     };
 
     this.messages = defineMessages({
-      'organization.created': { id: 'organization.created', defaultMessage: 'Your organization has been created with success.' },
-      'organization.created.description': { id: 'organization.created.description', defaultMessage: 'You can now make contributions as an organization. You can also edit your organization profile, add members and other administrators and attach a credit card that can be used by its members within a monthly limit.' },
-      'organization.collective.since': { id: 'organization.collective.since', defaultMessage: 'Contributing Since {year}' },
-      'user.collective.since': { id: 'user.collective.since', defaultMessage: 'Contributing Since {year}' },
-      'organization.collective.edit': { id: 'organization.collective.edit', defaultMessage: 'edit organization' },
-      'user.collective.edit': { id: 'user.collective.edit', defaultMessage: 'edit profile' },
-      'user.collective.memberOf.collective.host.title': { id: 'user.collective.memberOf.collective.host.title', defaultMessage: 'I\'m hosting {n, plural, one {this collective} other {these {n} collectives}}' },
-      'user.collective.memberOf.organization.admin.title': { id: 'user.collective.memberOf.organization.admin.title', defaultMessage: 'I\'m an administrator of {n, plural, one {this organization} other {these {n} organizations}}' },
-      'user.collective.memberOf.organization.member.title': { id: 'user.collective.memberOf.organization.member.title', defaultMessage: 'I\'m a member of {n, plural, one {this organization} other {these {n} organizations}}' },
-      'user.collective.memberOf.collective.admin.title': { id: 'user.collective.memberOf.collective.admin.title', defaultMessage: 'I\'m a core contributor of {n, plural, one {this collective} other {these {n} collectives}}' },
-      'user.collective.memberOf.collective.member.title': { id: 'user.collective.memberOf.collective.member.title', defaultMessage: 'I\'m a member of {n, plural, one {this collective} other {these {n} collectives}}' },
-      'user.collective.memberOf.collective.backer.title': { id: 'user.collective.memberOf.collective.backer.title', defaultMessage: 'I\'m backing {n, plural, one {this collective} other {these {n} collectives}}' },
-      'user.collective.memberOf.event.attendee.title': { id: 'user.collective.memberOf.event.attendee.title', defaultMessage: 'I\'ve attended {n, plural, one {this event} other {these {n} events}}' },
-      'user.collective.memberOf.collective.fundraiser.title': { id: 'user.collective.memberOf.collective.fundraiser.title', defaultMessage: 'I\'ve helped raise money for {n, plural, one {this collective} other {these {n} collectives}}' },
-      'user.collective.memberOf.collective.fundraiser.LoggedInDescription': { id: 'user.collective.memberOf.collective.fundraiser.LoggedInDescription', defaultMessage: 'Share the URL in the email receipt for each of your donation to track how much money you helped raised! (Alternatively, you can also click on any collective that you are contributing to on this page. We will add your referral id to the URL.)' },
-      'user.collective.memberOf.collective.follower.title': { id: 'user.collective.memberOf.collective.follower.title', defaultMessage: 'I\'m following {n, plural, one {this collective} other {these {n} collectives}}' },
-      'organization.collective.memberOf.collective.host.title': { id: 'organization.collective.memberOf.collective.host.title', defaultMessage: 'We are hosting {n, plural, one {this collective} other {{n} collectives}}' },
-      'organization.collective.memberOf.collective.admin.title': { id: 'organization.collective.memberOf.collective.admin.title', defaultMessage: 'We are a core contributor of {n, plural, one {this collective} other {these {n} collectives}}' },
-      'organization.collective.memberOf.collective.member.title': { id: 'organization.collective.memberOf.collective.member.title', defaultMessage: 'We are a member of {n, plural, one {this collective} other {these {n} collectives}}' },
-      'organization.collective.memberOf.collective.backer.title': { id: 'organization.collective.memberOf.collective.backer.title', defaultMessage: 'We are backing {n, plural, one {this collective} other {these {n} collectives}}' },
-      'organization.collective.memberOf.collective.follower.title': { id: 'organization.collective.memberOf.collective.follower.title', defaultMessage: 'We are following {n, plural, one {this collective} other {these {n} collectives}}' },
-      'organization.collective.memberOf.collective.fundraiser.title': { id: 'organization.collective.memberOf.collective.fundraiser.title', defaultMessage: 'We\'ve helped raise money for {n, plural, one {this collective} other {these {n} collectives}}' },
+      'organization.created': {
+        id: 'organization.created',
+        defaultMessage: 'Your organization has been created with success.',
+      },
+      'organization.created.description': {
+        id: 'organization.created.description',
+        defaultMessage:
+          'You can now make contributions as an organization. You can also edit your organization profile, add members and other administrators and attach a credit card that can be used by its members within a monthly limit.',
+      },
+      'organization.collective.since': {
+        id: 'organization.collective.since',
+        defaultMessage: 'Contributing Since {year}',
+      },
+      'user.collective.since': {
+        id: 'user.collective.since',
+        defaultMessage: 'Contributing Since {year}',
+      },
+      'organization.collective.edit': {
+        id: 'organization.collective.edit',
+        defaultMessage: 'edit organization',
+      },
+      'user.collective.edit': {
+        id: 'user.collective.edit',
+        defaultMessage: 'edit profile',
+      },
+      'user.collective.memberOf.collective.host.title': {
+        id: 'user.collective.memberOf.collective.host.title',
+        defaultMessage:
+          "I'm hosting {n, plural, one {this collective} other {these {n} collectives}}",
+      },
+      'user.collective.memberOf.organization.admin.title': {
+        id: 'user.collective.memberOf.organization.admin.title',
+        defaultMessage:
+          "I'm an administrator of {n, plural, one {this organization} other {these {n} organizations}}",
+      },
+      'user.collective.memberOf.organization.member.title': {
+        id: 'user.collective.memberOf.organization.member.title',
+        defaultMessage:
+          "I'm a member of {n, plural, one {this organization} other {these {n} organizations}}",
+      },
+      'user.collective.memberOf.collective.admin.title': {
+        id: 'user.collective.memberOf.collective.admin.title',
+        defaultMessage:
+          "I'm a core contributor of {n, plural, one {this collective} other {these {n} collectives}}",
+      },
+      'user.collective.memberOf.collective.member.title': {
+        id: 'user.collective.memberOf.collective.member.title',
+        defaultMessage:
+          "I'm a member of {n, plural, one {this collective} other {these {n} collectives}}",
+      },
+      'user.collective.memberOf.collective.backer.title': {
+        id: 'user.collective.memberOf.collective.backer.title',
+        defaultMessage:
+          "I'm backing {n, plural, one {this collective} other {these {n} collectives}}",
+      },
+      'user.collective.memberOf.event.attendee.title': {
+        id: 'user.collective.memberOf.event.attendee.title',
+        defaultMessage:
+          "I've attended {n, plural, one {this event} other {these {n} events}}",
+      },
+      'user.collective.memberOf.collective.fundraiser.title': {
+        id: 'user.collective.memberOf.collective.fundraiser.title',
+        defaultMessage:
+          "I've helped raise money for {n, plural, one {this collective} other {these {n} collectives}}",
+      },
+      'user.collective.memberOf.collective.fundraiser.LoggedInDescription': {
+        id:
+          'user.collective.memberOf.collective.fundraiser.LoggedInDescription',
+        defaultMessage:
+          'Share the URL in the email receipt for each of your donation to track how much money you helped raised! (Alternatively, you can also click on any collective that you are contributing to on this page. We will add your referral id to the URL.)',
+      },
+      'user.collective.memberOf.collective.follower.title': {
+        id: 'user.collective.memberOf.collective.follower.title',
+        defaultMessage:
+          "I'm following {n, plural, one {this collective} other {these {n} collectives}}",
+      },
+      'organization.collective.memberOf.collective.host.title': {
+        id: 'organization.collective.memberOf.collective.host.title',
+        defaultMessage:
+          'We are hosting {n, plural, one {this collective} other {{n} collectives}}',
+      },
+      'organization.collective.memberOf.collective.admin.title': {
+        id: 'organization.collective.memberOf.collective.admin.title',
+        defaultMessage:
+          'We are a core contributor of {n, plural, one {this collective} other {these {n} collectives}}',
+      },
+      'organization.collective.memberOf.collective.member.title': {
+        id: 'organization.collective.memberOf.collective.member.title',
+        defaultMessage:
+          'We are a member of {n, plural, one {this collective} other {these {n} collectives}}',
+      },
+      'organization.collective.memberOf.collective.backer.title': {
+        id: 'organization.collective.memberOf.collective.backer.title',
+        defaultMessage:
+          'We are backing {n, plural, one {this collective} other {these {n} collectives}}',
+      },
+      'organization.collective.memberOf.collective.follower.title': {
+        id: 'organization.collective.memberOf.collective.follower.title',
+        defaultMessage:
+          'We are following {n, plural, one {this collective} other {these {n} collectives}}',
+      },
+      'organization.collective.memberOf.collective.fundraiser.title': {
+        id: 'organization.collective.memberOf.collective.fundraiser.title',
+        defaultMessage:
+          "We've helped raise money for {n, plural, one {this collective} other {these {n} collectives}}",
+      },
       'section.host': { id: 'section.host', defaultMessage: 'Hosting' },
-      'section.admin': { id: 'section.admin', defaultMessage: 'Administrating' },
+      'section.admin': {
+        id: 'section.admin',
+        defaultMessage: 'Administrating',
+      },
       'section.member': { id: 'section.member', defaultMessage: 'Memberships' },
       'section.backer': { id: 'section.backer', defaultMessage: 'Backing' },
       'section.attendee': { id: 'section.attendee', defaultMessage: 'Events' },
-      'section.fundraiser': { id: 'section.fundraiser', defaultMessage: 'Fund raising' },
-      'section.follower': { id: 'section.follower', defaultMessage: 'Following' },
+      'section.fundraiser': {
+        id: 'section.fundraiser',
+        defaultMessage: 'Fund raising',
+      },
+      'section.follower': {
+        id: 'section.follower',
+        defaultMessage: 'Following',
+      },
     });
   }
 
@@ -80,10 +172,12 @@ class UserCollective extends React.Component {
     const type = collective.type.toLowerCase();
     const memberOfByRole = groupBy(collective.memberOf, 'role');
 
-    const renderRoleForType = (memberOfCollectiveType) => {
+    const renderRoleForType = memberOfCollectiveType => {
       if (role === 'ADMIN' && memberOfCollectiveType === 'EVENT') return;
 
-      let memberships = memberOfByRole[role].filter(m => get(m, 'collective.type') === memberOfCollectiveType);
+      let memberships = memberOfByRole[role].filter(
+        m => get(m, 'collective.type') === memberOfCollectiveType,
+      );
       memberships = uniqBy(memberships, member => member.collective.id);
       if (memberships.length === 0) return;
 
@@ -91,7 +185,9 @@ class UserCollective extends React.Component {
       const collectiveType = memberOfCollectiveType.toLowerCase();
       const titleMessageId = `section.${role.toLowerCase()}`;
       const values = { n: memberships.length };
-      const title = this.messages[titleMessageId] && intl.formatMessage(this.messages[titleMessageId], values);
+      const title =
+        this.messages[titleMessageId] &&
+        intl.formatMessage(this.messages[titleMessageId], values);
       if (!title) return;
       const subtitleMessageId = `${type}.collective.memberOf.${collectiveType}.${role.toLowerCase()}.title`;
       const loggedInSubtitleMessageId = `${type}.collective.memberOf.${collectiveType}.${role.toLowerCase()}.LoggedInDescription`;
@@ -102,31 +198,31 @@ class UserCollective extends React.Component {
       }
 
       return (
-        <section id={role.toLowerCase()} className={collectiveType} key={`${role}-${memberOfCollectiveType}`}>
+        <section
+          id={role.toLowerCase()}
+          className={collectiveType}
+          key={`${role}-${memberOfCollectiveType}`}
+        >
           <div className="content">
-            <SectionTitle
-              title={title}
-              subtitle={subtitle}
-              />
+            <SectionTitle title={title} subtitle={subtitle} />
 
             <Memberships
               className={role}
               LoggedInUser={LoggedInUser}
               memberships={memberships}
-              />
+            />
           </div>
         </section>
-      )
-    }
+      );
+    };
 
     return (
       <div key={role}>
-        { renderRoleForType('ORGANIZATION') }
-        { renderRoleForType('COLLECTIVE') }
-        { renderRoleForType('EVENT') }
+        {renderRoleForType('ORGANIZATION')}
+        {renderRoleForType('COLLECTIVE')}
+        {renderRoleForType('EVENT')}
       </div>
-    )
-
+    );
   }
 
   render() {
@@ -138,8 +234,11 @@ class UserCollective extends React.Component {
     if (LoggedInUser) {
       this.classNames.push('LoggedInUser');
     }
-    const isProfileEmpty = !(collective.description || collective.longDescription);
-    const canEditCollective = LoggedInUser && LoggedInUser.canEditCollective(collective);
+    const isProfileEmpty = !(
+      collective.description || collective.longDescription
+    );
+    const canEditCollective =
+      LoggedInUser && LoggedInUser.canEditCollective(collective);
     const type = collective.type.toLowerCase();
     let cta;
     if (collective.canApply) {
@@ -148,155 +247,201 @@ class UserCollective extends React.Component {
 
     const notification = {};
     if (query && query.CollectiveId) {
-      if (query.status === 'collectiveCreated' && collective.type === 'ORGANIZATION') {
-        notification.title = intl.formatMessage(this.messages['organization.created']);
-        notification.description = intl.formatMessage(this.messages['organization.created.description']);
+      if (
+        query.status === 'collectiveCreated' &&
+        collective.type === 'ORGANIZATION'
+      ) {
+        notification.title = intl.formatMessage(
+          this.messages['organization.created'],
+        );
+        notification.description = intl.formatMessage(
+          this.messages['organization.created.description'],
+        );
       }
       Object.assign(order, {
         ...order,
         ...pick(query || {}, 'totalAmount', 'CollectiveId', 'TierId'),
-        collective: ((collective.memberOf || []).find(m => get(m, 'collective.id') === parseInt(query.CollectiveId)) || {}).collective
+        collective: (
+          (collective.memberOf || []).find(
+            m => get(m, 'collective.id') === parseInt(query.CollectiveId),
+          ) || {}
+        ).collective,
       });
     }
 
     return (
       <div className={this.classNames.join(' ')}>
-        <style jsx>{`
-          h1 {
-            font-size: 2rem;
-          }
-          .cardsList {
-            margin: 0 2rem;
-          }
-          .message {
-            margin: 5rem;
-            text-align: center;
-          }
-          .message .editBtn {
-            margin: 2rem;
-          }
-          .description {
-            font-size: 1.4rem;
-            text-align: center;
-            max-width: 800px;
-            margin: 0 auto;
-          }
-          #tiers {
-            overflow: hidden;
-            width: 100%;
-            display: flex;
-          }
-          #tiers :global(.tier) {
-            margin: 4rem auto;
-            max-width: 300px;
-            float: left;
-          }
-          .adminActions {
-            text-align: center;
-            text-transform: uppercase;
-            font-size: 1.3rem;
-            font-weight: 600;
-            letter-spacing: 0.05rem;
-          }
-          .adminActions ul {
-            overflow: hidden;
-            text-align: center;
-            margin: 0 auto;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            flex-direction: row;
-            list-style: none;
-          }
-          .adminActions ul li {
-            margin: 0 2rem;
-          }
-        `}</style>
+        <style jsx>
+          {`
+            h1 {
+              font-size: 2rem;
+            }
+            .cardsList {
+              margin: 0 2rem;
+            }
+            .message {
+              margin: 5rem;
+              text-align: center;
+            }
+            .message .editBtn {
+              margin: 2rem;
+            }
+            .description {
+              font-size: 1.4rem;
+              text-align: center;
+              max-width: 800px;
+              margin: 0 auto;
+            }
+            #tiers {
+              overflow: hidden;
+              width: 100%;
+              display: flex;
+            }
+            #tiers :global(.tier) {
+              margin: 4rem auto;
+              max-width: 300px;
+              float: left;
+            }
+            .adminActions {
+              text-align: center;
+              text-transform: uppercase;
+              font-size: 1.3rem;
+              font-weight: 600;
+              letter-spacing: 0.05rem;
+            }
+            .adminActions ul {
+              overflow: hidden;
+              text-align: center;
+              margin: 0 auto;
+              padding: 0;
+              display: flex;
+              justify-content: center;
+              flex-direction: row;
+              list-style: none;
+            }
+            .adminActions ul li {
+              margin: 0 2rem;
+            }
+          `}
+        </style>
 
         <Header
           title={collective.name}
           description={collective.description || collective.longDescription}
-          twitterHandle={collective.twitterHandle || get(collective.parentCollective, 'twitterHandle')}
+          twitterHandle={
+            collective.twitterHandle ||
+            get(collective.parentCollective, 'twitterHandle')
+          }
           image={get(collective.parentCollective, 'image')}
           className={this.state.status}
           LoggedInUser={LoggedInUser}
           href={`/${collective.slug}`}
-          />
+        />
 
         <Body>
-
           <div>
-
             <NotificationBar
               status={this.state.status}
               title={notification.title}
               description={notification.description}
               error={this.state.error}
-              />
+            />
 
-            { this.props.message && <MessageModal message={this.props.message} /> }
+            {this.props.message && (
+              <MessageModal message={this.props.message} />
+            )}
 
             <CollectiveCover
               collective={collective}
               cta={cta}
               LoggedInUser={LoggedInUser}
-              />
+            />
 
             <div>
+              {(get(query, 'status') === 'orderCreated' ||
+                get(query, 'status') === 'orderProcessing') && (
+                <OrderCreated
+                  order={order}
+                  type={query.type}
+                  status={query.status}
+                />
+              )}
 
-              { (get(query, 'status') === 'orderCreated' || get(query, 'status') === 'orderProcessing') &&  <OrderCreated order={order} type={query.type} status={query.status} /> }
-
-              { /* Make sure we don't show an empty div.content if no description unless canEditCollective */ }
-              { (collective.longDescription || canEditCollective) &&
-                <div className="content" >
-                  { isProfileEmpty && canEditCollective &&
-                    <div className="message">
-                      <div className="editBtn">
-                        <Button onClick={() => Router.pushRoute(`/${collective.slug}/edit`)}>{intl.formatMessage(this.messages[`${type}.collective.edit`])}</Button>
+              {/* Make sure we don't show an empty div.content if no description unless canEditCollective */}
+              {(collective.longDescription || canEditCollective) && (
+                <div className="content">
+                  {isProfileEmpty &&
+                    canEditCollective && (
+                      <div className="message">
+                        <div className="editBtn">
+                          <Button
+                            onClick={() =>
+                              Router.pushRoute(`/${collective.slug}/edit`)
+                            }
+                          >
+                            {intl.formatMessage(
+                              this.messages[`${type}.collective.edit`],
+                            )}
+                          </Button>
+                        </div>
                       </div>
-                    </div>
-                  }
-                  { collective.longDescription &&
-                    <LongDescription longDescription={collective.longDescription} defaultSubtitle={collective.description} />
-                  }
+                    )}
+                  {collective.longDescription && (
+                    <LongDescription
+                      longDescription={collective.longDescription}
+                      defaultSubtitle={collective.description}
+                    />
+                  )}
                 </div>
-              }
+              )}
 
-              { get(collective, 'stats.collectives.hosted') > 0 &&
+              {get(collective, 'stats.collectives.hosted') > 0 && (
                 <section id="hosting">
                   <h1>
                     <FormattedMessage
                       id="organization.collective.memberOf.collective.host.title"
                       values={{ n: collective.stats.collectives.hosted }}
-                      defaultMessage={`We are hosting {n, plural, one {this collective} other {{n} collectives}}`}
-                      />
+                      defaultMessage={
+                        'We are hosting {n, plural, one {this collective} other {{n} collectives}}'
+                      }
+                    />
                   </h1>
-                  { LoggedInUser && LoggedInUser.canEditCollective(collective) &&
-                    <div className="adminActions" id="adminActions">
-                      <ul>
-                        <li><Link route={`/${collective.slug}/dashboard`}><FormattedMessage id="host.dashboard" defaultMessage="Dashboard" /></Link></li>
-                      </ul>
-                    </div>
-                  }
+                  {LoggedInUser &&
+                    LoggedInUser.canEditCollective(collective) && (
+                      <div className="adminActions" id="adminActions">
+                        <ul>
+                          <li>
+                            <Link route={`/${collective.slug}/dashboard`}>
+                              <FormattedMessage
+                                id="host.dashboard"
+                                defaultMessage="Dashboard"
+                              />
+                            </Link>
+                          </li>
+                        </ul>
+                      </div>
+                    )}
                   <div className="cardsList">
                     <CollectivesWithData
                       HostCollectiveId={collective.id}
                       orderBy="balance"
                       orderDirection="DESC"
                       limit={20}
-                      />
+                    />
                   </div>
                 </section>
-              }
+              )}
 
-              { get(collective, 'stats.collectives.memberOf') > 0 &&
+              {get(collective, 'stats.collectives.memberOf') > 0 && (
                 <section id="parenting">
                   <h1>
                     <FormattedMessage
                       id="organization.collective.memberOf.collective.parent.title"
                       values={{ n: collective.stats.collectives.memberOf }}
-                      defaultMessage={`{n, plural, one {this collective is} other {{n} collectives are}} part of our organization`}
-                      />
+                      defaultMessage={
+                        '{n, plural, one {this collective is} other {{n} collectives are}} part of our organization'
+                      }
+                    />
                   </h1>
                   <div className="cardsList">
                     <CollectivesWithData
@@ -304,19 +449,25 @@ class UserCollective extends React.Component {
                       orderBy="balance"
                       orderDirection="DESC"
                       limit={20}
-                      />
+                    />
                   </div>
                 </section>
-              }
+              )}
 
-              { get(collective, 'settings.superCollectiveTags') &&
+              {get(collective, 'settings.superCollectiveTags') && (
                 <section id="parenting">
                   <h1>
                     <FormattedMessage
                       id="organization.supercollective.title"
-                      values={{ tags: get(collective, 'settings.superCollectiveTags').join(', '), n: collective.stats.collectives.memberOf }}
-                      defaultMessage={`{tags} collectives`}
-                      />
+                      values={{
+                        tags: get(
+                          collective,
+                          'settings.superCollectiveTags',
+                        ).join(', '),
+                        n: collective.stats.collectives.memberOf,
+                      }}
+                      defaultMessage={'{tags} collectives'}
+                    />
                   </h1>
                   <div className="cardsList">
                     <CollectivesWithData
@@ -324,19 +475,20 @@ class UserCollective extends React.Component {
                       orderBy="balance"
                       orderDirection="DESC"
                       limit={20}
-                      />
+                    />
                   </div>
                 </section>
-              }
+              )}
 
-              { Object.keys(memberOfByRole).map(role => role !== 'HOST' && this.renderRole(role)) }
-
+              {Object.keys(memberOfByRole).map(
+                role => role !== 'HOST' && this.renderRole(role),
+              )}
             </div>
           </div>
         </Body>
         <Footer />
       </div>
-    )
+    );
   }
 }
 

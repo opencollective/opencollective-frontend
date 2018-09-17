@@ -7,5 +7,5 @@ export default {
   collectives,
   events,
   members,
-  transactions
+  transactions,
 };

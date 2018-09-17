@@ -9,26 +9,24 @@ import { loggerMiddleware, logger } from './logger';
 import accepts from 'accepts';
 import { getLocaleDataScript, getMessages, languages } from './intl';
 
-const env = process.env.NODE_ENV || "development";
-const dev = (env === 'development' || env === 'docker');
+const env = process.env.NODE_ENV || 'development';
+const dev = env === 'development' || env === 'docker';
 const server = express();
 const app = next({ dev, dir: path.dirname(__dirname) });
 server.next = app;
 
 const port = process.env.PORT || 3000;
 
-app.prepare()
-.then(() => {
-
+app.prepare().then(() => {
   server.use(loggerMiddleware.logger);
 
   server.use((req, res, next) => {
-    const accept = accepts(req)
-    const locale = accept.language(languages)  || 'en';
-    logger.debug("url %s locale %s", req.url, locale);
+    const accept = accepts(req);
+    const locale = accept.language(languages) || 'en';
+    logger.debug('url %s locale %s', req.url, locale);
     req.locale = locale;
-    req.localeDataScript = getLocaleDataScript(locale)
-    req.messages = getMessages(locale)
+    req.localeDataScript = getLocaleDataScript(locale);
+    req.messages = getMessages(locale);
     // req.messages = dev ? {} : getMessages(locale)
     next();
   });
@@ -39,11 +37,13 @@ app.prepare()
   const httpServer = http.createServer(server);
 
   httpServer.on('error', err => {
-    logger.error(`Can't start server on http://localhost:${port} in ${env} environment. %s`, err);
-  })
+    logger.error(
+      `Can't start server on http://localhost:${port} in ${env} environment. %s`,
+      err,
+    );
+  });
 
   httpServer.listen(port, () => {
     logger.info(`Ready on http://localhost:${port} in ${env} environment`);
   });
-
 });

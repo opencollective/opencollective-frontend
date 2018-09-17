@@ -1,5 +1,5 @@
-import { graphql } from 'react-apollo'
-import gql from 'graphql-tag'
+import { graphql } from 'react-apollo';
+import gql from 'graphql-tag';
 
 export const transactionFields = `
   id
@@ -591,10 +591,10 @@ const getCollectiveCoverQuery = gql`
 export const getOcCardBalanceQuery = gql`
   query checkOcPaymentMethod($token: String!) {
     ocPaymentMethod(token: $token) {
-      id,
-      name,
-      currency,
-      balance,
+      id
+      name
+      currency
+      balance
       uuid
       service
       type
@@ -626,7 +626,7 @@ export const getSubscriptionsQuery = gql`
         totalAmountSpent
         totalAmountRaised
       }
-      ordersFromCollective (subscriptionsOnly: true) {
+      ordersFromCollective(subscriptionsOnly: true) {
         id
         currency
         totalAmount

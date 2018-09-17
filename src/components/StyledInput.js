@@ -17,7 +17,8 @@ import {
   width,
 } from 'styled-system';
 
-const StyledInput = styled.input([],
+const StyledInput = styled.input(
+  [],
   background,
   borders,
   borderColor,

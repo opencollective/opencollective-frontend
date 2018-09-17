@@ -1,17 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import withIntl from '../lib/withIntl';
-import { graphql, compose } from 'react-apollo'
+import { graphql, compose } from 'react-apollo';
 import { FormattedMessage } from 'react-intl';
-import gql from 'graphql-tag'
+import gql from 'graphql-tag';
 import SmallButton from './SmallButton';
 import { get } from 'lodash';
 
 class PublishUpdateBtn extends React.Component {
-
   static propTypes = {
-    id: PropTypes.number.isRequired
-  }
+    id: PropTypes.number.isRequired,
+  };
 
   constructor(props) {
     super(props);
@@ -28,35 +27,42 @@ class PublishUpdateBtn extends React.Component {
 
     return (
       <div className="PublishUpdateBtn">
-        <style jsx>{`
-          .PublishUpdateBtn {
-            display: flex;
-            align-items: center;
-          }
-          .notice {
-            color: #525866;
-            font-family: Rubik;
-            font-size: 12px;
-            margin-left: 1rem;
-          }
-        `}</style>
-        <SmallButton className="publish" onClick={this.onClick}><FormattedMessage id="update.publish.btn" defaultMessage="publish" /></SmallButton>
+        <style jsx>
+          {`
+            .PublishUpdateBtn {
+              display: flex;
+              align-items: center;
+            }
+            .notice {
+              color: #525866;
+              font-family: Rubik;
+              font-size: 12px;
+              margin-left: 1rem;
+            }
+          `}
+        </style>
+        <SmallButton className="publish" onClick={this.onClick}>
+          <FormattedMessage id="update.publish.btn" defaultMessage="publish" />
+        </SmallButton>
         <div className="notice">
-          <FormattedMessage id="update.publish.backers" defaultMessage={`Your update will be sent to {n} backers`} values={{ n: get(update, 'collective.stats.backers.all') }} />
+          <FormattedMessage
+            id="update.publish.backers"
+            defaultMessage={'Your update will be sent to {n} backers'}
+            values={{ n: get(update, 'collective.stats.backers.all') }}
+          />
         </div>
       </div>
     );
   }
-
 }
 
 const publishUpdateQuery = gql`
-mutation publishUpdate($id: Int!) {
-  publishUpdate(id: $id) {
-    id
-    publishedAt
+  mutation publishUpdate($id: Int!) {
+    publishUpdate(id: $id) {
+      id
+      publishedAt
+    }
   }
-}
 `;
 
 const getUpdateQuery = gql`
@@ -79,13 +85,16 @@ const getUpdateQuery = gql`
 export const addGetUpdate = graphql(getUpdateQuery);
 
 const addMutation = graphql(publishUpdateQuery, {
-  props: ( { mutate }) => ({
-    publishUpdate: async (id) => {
-      return await mutate({ variables: { id } })
-    }
-  })
+  props: ({ mutate }) => ({
+    publishUpdate: async id => {
+      return await mutate({ variables: { id } });
+    },
+  }),
 });
 
-const addGraphQL = compose(addMutation, addGetUpdate);
+const addGraphQL = compose(
+  addMutation,
+  addGetUpdate,
+);
 
 export default addGraphQL(withIntl(PublishUpdateBtn));

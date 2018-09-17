@@ -44,7 +44,7 @@ export function processMarkdown(text) {
   let currentTitle;
   let isHeader = true;
   let paragraph = [];
-  lines.forEach((line) => {
+  lines.forEach(line => {
     if (line.length === 0) {
       return paragraph.push(line);
     }
@@ -67,7 +67,10 @@ export function processMarkdown(text) {
     }
     let videoid;
     let videoPlatform;
-    const tokens = line.match(/^https?:\/\/(www\.)?(youtu).be\/([^/?]+).*$/i) || line.match(/^https?:\/\/(www\.)?(youtu)be\.com\/watch\?v=([^&]*).*$/i) || line.match(/^https?:\/\/(www\.)?(vimeo)\.com\/([0-9]+)/i);
+    const tokens =
+      line.match(/^https?:\/\/(www\.)?(youtu).be\/([^/?]+).*$/i) ||
+      line.match(/^https?:\/\/(www\.)?(youtu)be\.com\/watch\?v=([^&]*).*$/i) ||
+      line.match(/^https?:\/\/(www\.)?(vimeo)\.com\/([0-9]+)/i);
     if (tokens && tokens.length > 3) {
       videoPlatform = tokens[2];
       videoid = tokens[3];

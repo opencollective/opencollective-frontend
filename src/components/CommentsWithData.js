@@ -4,20 +4,19 @@ import Error from './Error';
 import withIntl from '../lib/withIntl';
 import Comments from './Comments';
 import CommentForm from './CommentForm';
-import { graphql, compose } from 'react-apollo'
-import gql from 'graphql-tag'
+import { graphql, compose } from 'react-apollo';
+import gql from 'graphql-tag';
 import { FormattedMessage } from 'react-intl';
 import { get } from 'lodash';
 
 class CommentsWithData extends React.Component {
-
   static propTypes = {
     collective: PropTypes.object,
     expense: PropTypes.object,
     UpdateId: PropTypes.number,
     limit: PropTypes.number,
-    LoggedInUser: PropTypes.object
-  }
+    LoggedInUser: PropTypes.object,
+  };
 
   constructor(props) {
     super(props);
@@ -31,47 +30,73 @@ class CommentsWithData extends React.Component {
       ...comment,
       CollectiveId: collective.id,
       FromCollectiveId: LoggedInUser.collective.id,
-      ExpenseId: expense.id
-    }
-    console.log(">>> createComment", CommentInputType);
+      ExpenseId: expense.id,
+    };
+    console.log('>>> createComment', CommentInputType);
     let res;
     try {
       res = await this.props.createComment(CommentInputType);
     } catch (e) {
-      console.error(">>> error while trying to create the comment", CommentInputType, e);
+      console.error(
+        '>>> error while trying to create the comment',
+        CommentInputType,
+        e,
+      );
     }
     return res;
   }
 
   render() {
-    const {
-      data,
-      LoggedInUser,
-      collective,
-      expense,
-      view
-    } = this.props;
+    const { data, LoggedInUser, collective, expense, view } = this.props;
 
     if (data.error) {
-      console.error("graphql error>>>", data.error.message);
-      return (<Error message="GraphQL error" />)
+      console.error('graphql error>>>', data.error.message);
+      return <Error message="GraphQL error" />;
     }
 
     const comments = data.allComments;
     let notice;
     if (LoggedInUser && LoggedInUser.id !== get(expense, 'user.id')) {
-      notice = <FormattedMessage id="comment.post.to.author" defaultMessage={`Note: Your comment will be public and we will notify the person who submitted the expense`} />
+      notice = (
+        <FormattedMessage
+          id="comment.post.to.author"
+          defaultMessage={
+            'Note: Your comment will be public and we will notify the person who submitted the expense'
+          }
+        />
+      );
     }
-    if (LoggedInUser && LoggedInUser.id === get(expense, 'user.id') && expense.status === 'APPROVED') {
-      notice = <FormattedMessage id="comment.post.to.host" defaultMessage={`Note: Your comment will be public and we will notify the administrators of the host of this collective`} />
+    if (
+      LoggedInUser &&
+      LoggedInUser.id === get(expense, 'user.id') &&
+      expense.status === 'APPROVED'
+    ) {
+      notice = (
+        <FormattedMessage
+          id="comment.post.to.host"
+          defaultMessage={
+            'Note: Your comment will be public and we will notify the administrators of the host of this collective'
+          }
+        />
+      );
     }
-    if (LoggedInUser && LoggedInUser.id === get(expense, 'user.id') && expense.status !== 'APPROVED') {
-      notice = <FormattedMessage id="comment.post.to.collective" defaultMessage={`Note: Your comment will be public and we will notify the administrators of this collective`} />
+    if (
+      LoggedInUser &&
+      LoggedInUser.id === get(expense, 'user.id') &&
+      expense.status !== 'APPROVED'
+    ) {
+      notice = (
+        <FormattedMessage
+          id="comment.post.to.collective"
+          defaultMessage={
+            'Note: Your comment will be public and we will notify the administrators of this collective'
+          }
+        />
+      );
     }
 
     return (
       <div className="CommentsWithData">
-
         <Comments
           collective={collective}
           comments={comments}
@@ -79,69 +104,68 @@ class CommentsWithData extends React.Component {
           editable={view !== 'compact'}
           fetchMore={this.props.fetchMore}
           LoggedInUser={LoggedInUser}
-          />
+        />
 
-        { LoggedInUser && LoggedInUser.canCreateCommentOnExpense(expense) &&
-          <CommentForm
-            onSubmit={this.createComment}
-            LoggedInUser={LoggedInUser}
-            notice={notice}
+        {LoggedInUser &&
+          LoggedInUser.canCreateCommentOnExpense(expense) && (
+            <CommentForm
+              onSubmit={this.createComment}
+              LoggedInUser={LoggedInUser}
+              notice={notice}
             />
-        }
+          )}
       </div>
     );
   }
-
 }
-
 
 const getCommentsQuery = gql`
-query Comments($ExpenseId: Int) {
-  allComments(ExpenseId: $ExpenseId) {
-    id
-    html
-    createdAt
-    collective {
+  query Comments($ExpenseId: Int) {
+    allComments(ExpenseId: $ExpenseId) {
       id
-      slug
-      currency
-      name
-      host {
+      html
+      createdAt
+      collective {
         id
         slug
+        currency
+        name
+        host {
+          id
+          slug
+        }
+        stats {
+          id
+          balance
+        }
       }
-      stats {
+      fromCollective {
         id
-        balance
+        type
+        name
+        slug
+        image
       }
-    }
-    fromCollective {
-      id
-      type
-      name
-      slug
-      image
     }
   }
-}
 `;
 
-const getCommentsVariables = (props) => {
+const getCommentsVariables = props => {
   const vars = {
     ExpenseId: props.expense.id,
     UpdateId: props.UpdateId,
     offset: 0,
-    limit: props.limit || EXPENSES_PER_PAGE * 2
+    limit: props.limit || EXPENSES_PER_PAGE * 2,
   };
   return vars;
-}
+};
 
 const EXPENSES_PER_PAGE = 10;
 export const addCommentsData = graphql(getCommentsQuery, {
   options(props) {
     return {
-      variables: getCommentsVariables(props)
-    }
+      variables: getCommentsVariables(props),
+    };
   },
   props: ({ data }) => ({
     data,
@@ -149,77 +173,82 @@ export const addCommentsData = graphql(getCommentsQuery, {
       return data.fetchMore({
         variables: {
           offset: data.allComments.length,
-          limit: EXPENSES_PER_PAGE
+          limit: EXPENSES_PER_PAGE,
         },
         updateQuery: (previousResult, { fetchMoreResult }) => {
           if (!fetchMoreResult) {
-            return previousResult
+            return previousResult;
           }
           return Object.assign({}, previousResult, {
             // Append the new posts results to the old one
-            allComments: [...previousResult.allComments, ...fetchMoreResult.allComments]
-          })
-        }
-      })
-    }
-  })
+            allComments: [
+              ...previousResult.allComments,
+              ...fetchMoreResult.allComments,
+            ],
+          });
+        },
+      });
+    },
+  }),
 });
 
 const createCommentQuery = gql`
-mutation createComment($comment: CommentInputType!) {
-  createComment(comment: $comment) {
-    id
-    html
-    createdAt
-    updatedAt
-    collective {
+  mutation createComment($comment: CommentInputType!) {
+    createComment(comment: $comment) {
       id
-      slug
-      currency
-      name
-      host {
+      html
+      createdAt
+      updatedAt
+      collective {
         id
         slug
+        currency
+        name
+        host {
+          id
+          slug
+        }
+        stats {
+          id
+          balance
+        }
       }
-      stats {
+      fromCollective {
         id
-        balance
+        type
+        name
+        slug
+        image
       }
-    }
-    fromCollective {
-      id
-      type
-      name
-      slug
-      image
     }
   }
-}
 `;
 
 const addMutation = graphql(createCommentQuery, {
-  props: ( { ownProps, mutate }) => ({
-    createComment: async (comment) => {
+  props: ({ ownProps, mutate }) => ({
+    createComment: async comment => {
       return await mutate({
         variables: { comment },
-        update: (proxy, { data: { createComment} }) => {
+        update: (proxy, { data: { createComment } }) => {
           const data = proxy.readQuery({
             query: getCommentsQuery,
-            variables: getCommentsVariables(ownProps)
+            variables: getCommentsVariables(ownProps),
           });
           data.allComments.push(createComment);
           proxy.writeQuery({
             query: getCommentsQuery,
             variables: getCommentsVariables(ownProps),
-            data
+            data,
           });
         },
-      })
-    }
-  })
+      });
+    },
+  }),
 });
 
-const addData = compose(addCommentsData, addMutation);
-
+const addData = compose(
+  addCommentsData,
+  addMutation,
+);
 
 export default addData(withIntl(CommentsWithData));

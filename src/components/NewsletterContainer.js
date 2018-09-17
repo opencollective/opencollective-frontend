@@ -6,11 +6,15 @@ import { Flex } from 'grid-styled';
 import StyledInput from '../components/StyledInput';
 
 class NewsletterContainer extends React.Component {
-
   render() {
     return (
       <Container py={5}>
-        <H4 textAlign="center" fontSize={20} mb={4} px={3}><FormattedMessage id="newsletter.container.title" defaultMessage="Stay updated about our news and progress." /></H4>
+        <H4 textAlign="center" fontSize={20} mb={4} px={3}>
+          <FormattedMessage
+            id="newsletter.container.title"
+            defaultMessage="Stay updated about our news and progress."
+          />
+        </H4>
 
         <Flex justifyContent="center">
           <form
@@ -18,7 +22,7 @@ class NewsletterContainer extends React.Component {
             method="post"
             name="mc-embedded-subscribe-form"
             target="_blank"
-            >
+          >
             <Container
               border="1px solid rgba(18,19,20,0.12)"
               borderRadius={50}
@@ -27,7 +31,7 @@ class NewsletterContainer extends React.Component {
               justifyContent="space-between"
               overflow="hidden"
               width={300}
-              >
+            >
               <StyledInput
                 fontSize={14}
                 name="EMAIL"
@@ -36,7 +40,7 @@ class NewsletterContainer extends React.Component {
                 placeholder="Your email address"
                 type="email"
                 width={1}
-                />
+              />
               <StyledInput
                 bg="#3385FF"
                 borderRadius={50}
@@ -49,7 +53,7 @@ class NewsletterContainer extends React.Component {
                 name="subscribe"
                 type="submit"
                 value="Subscribe"
-                />
+              />
             </Container>
           </form>
         </Flex>

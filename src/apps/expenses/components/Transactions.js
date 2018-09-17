@@ -19,8 +19,8 @@ class Transactions extends React.Component {
     filters: PropTypes.bool, // show or hide filters (all/credits/debits)
     refetch: PropTypes.func,
     fetchMore: PropTypes.func,
-    LoggedInUser: PropTypes.object
-  }
+    LoggedInUser: PropTypes.object,
+  };
 
   constructor(props) {
     super(props);
@@ -38,8 +38,8 @@ class Transactions extends React.Component {
   }
 
   refetch(type) {
-    this.setState({type, loading: true});
-    this.props.refetch({type}).then(() => {
+    this.setState({ type, loading: true });
+    this.props.refetch({ type }).then(() => {
       this.setState({ loading: false });
     });
   }
@@ -99,7 +99,8 @@ class Transactions extends React.Component {
             -webkit-backdrop-filter: blur(2px);
             backdrop-filter: blur(5px);
           }
-        `}</style>
+        `}
+        </style>
 
         {showCSVlink && transactions.length > 0 &&
           <div>
@@ -138,7 +139,7 @@ class Transactions extends React.Component {
               collective={collective}
               transaction={transaction}
               LoggedInUser={LoggedInUser}
-              />)
+            />)
           )}
           { transactions.length === 0 &&
             <div className="empty">

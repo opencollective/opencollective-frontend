@@ -18,8 +18,8 @@ class Expenses extends React.Component {
     view: PropTypes.string, // "compact" for homepage (can't edit expense, don't show header), "list" for list view, "details" for details view
     includeHostedCollectives: PropTypes.bool,
     filters: PropTypes.bool, // show or hide filters (all/pending/paid)
-    LoggedInUser: PropTypes.object
-  }
+    LoggedInUser: PropTypes.object,
+  };
 
   constructor(props) {
     super(props);
@@ -37,14 +37,14 @@ class Expenses extends React.Component {
   }
 
   refetch(status) {
-    this.setState({status, loading: true});
-    this.props.refetch({status}).then(() => {
+    this.setState({ status, loading: true });
+    this.props.refetch({ status }).then(() => {
       this.setState({ loading: false });
     });
   }
 
   setPayActionLock(val) {
-    this.setState({ isPayActionLocked: val})
+    this.setState({ isPayActionLocked: val });
   }
 
   render() {
@@ -55,7 +55,7 @@ class Expenses extends React.Component {
       editable,
       view,
       includeHostedCollectives,
-      filters
+      filters,
     } = this.props;
 
     if (!expenses) {
@@ -112,7 +112,8 @@ class Expenses extends React.Component {
             -webkit-backdrop-filter: blur(2px);
             backdrop-filter: blur(5px);
           }
-        `}</style>
+        `}
+        </style>
 
         { filters &&
           <div className="filter">
@@ -151,7 +152,7 @@ class Expenses extends React.Component {
               allowPayAction={!this.state.isPayActionLocked}
               lockPayAction={this.setPayActionLock.bind(this, true)}
               unlockPayAction={this.setPayActionLock.bind(this, false)}
-              />)
+            />)
           )}
           { expenses.length === 0 &&
             <div className="empty">

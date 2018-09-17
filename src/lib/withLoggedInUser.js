@@ -8,9 +8,11 @@ import storage from '../lib/storage';
 import LoggedInUser from '../classes/LoggedInUser';
 import { getLoggedInUserQuery } from '../graphql/queries';
 
-const maybeRefreshAccessToken = async (currentToken) => {
+const maybeRefreshAccessToken = async currentToken => {
   const { exp } = jwt.decode(currentToken);
-  const shouldUpdate = moment(exp * 1000).subtract(1, 'month').isBefore(new Date);
+  const shouldUpdate = moment(exp * 1000)
+    .subtract(1, 'month')
+    .isBefore(new Date());
   if (shouldUpdate) {
     const { token } = await api.refreshToken(currentToken);
     window.localStorage.setItem('accessToken', token);
@@ -18,13 +20,13 @@ const maybeRefreshAccessToken = async (currentToken) => {
 };
 
 export default WrappedComponent => {
-
   return class withLoggedInUser extends React.Component {
-
     static displayName = `withLoggedInUser(${WrappedComponent.displayName})`;
 
-    static async getInitialProps (context) {
-      return typeof WrappedComponent.getInitialProps === 'function' ? await WrappedComponent.getInitialProps(context) : {};
+    static async getInitialProps(context) {
+      return typeof WrappedComponent.getInitialProps === 'function'
+        ? await WrappedComponent.getInitialProps(context)
+        : {};
     }
 
     static propTypes = {
@@ -76,10 +78,8 @@ export default WrappedComponent => {
         <WrappedComponent
           getLoggedInUser={this.getLoggedInUser}
           {...this.props}
-          />
+        />
       );
     }
-
   };
-
 };

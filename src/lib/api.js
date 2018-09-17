@@ -3,11 +3,11 @@ import { isValidEmail } from './utils';
 // Webpack error: Cannot find module 'webpack/lib/RequestShortener'
 // import queryString from 'query-string';
 
-const queryString = (params) => {
+const queryString = params => {
   return Object.keys(params)
-  .map(k => `${k}=${encodeURIComponent(params[k])}`)
-  .join('&');
-}
+    .map(k => `${k}=${encodeURIComponent(params[k])}`)
+    .join('&');
+};
 
 /**
  * The Promise returned from fetch() won't reject on HTTP error status. We
@@ -18,8 +18,7 @@ export function checkResponseStatus(response) {
   if (status >= 200 && status < 300) {
     return response.json();
   } else {
-    return response.json()
-    .then((json) => {
+    return response.json().then(json => {
       const error = new Error(json.error ? json.error.message : json.code);
       error.json = json;
       error.response = response;
@@ -47,34 +46,39 @@ export function upload(file) {
     headers: addAuthTokenToHeader(),
     body: formData,
   })
-  .then(checkResponseStatus)
-  .then(json => {
-    return json.url;
-  })
+    .then(checkResponseStatus)
+    .then(json => {
+      return json.url;
+    });
 }
 
 export function connectAccount(CollectiveId, service, options = {}) {
-
   const params = {
-    redirect: options.redirect || window.location.href.replace(/\?.*/,''),
+    redirect: options.redirect || window.location.href.replace(/\?.*/, ''),
     CollectiveId,
     ...options,
   };
 
-  return fetch(`/api/connected-accounts/${service}/oauthUrl?${queryString(params)}`, {
+  return fetch(
+    `/api/connected-accounts/${service}/oauthUrl?${queryString(params)}`,
+    {
       method: 'get',
-      headers: addAuthTokenToHeader()
-    })
-    .then(checkResponseStatus);
+      headers: addAuthTokenToHeader(),
+    },
+  ).then(checkResponseStatus);
 }
 
 export async function getAccountClientToken(CollectiveId, service) {
   const params = { CollectiveId };
-  const url = `/api/connected-accounts/${service}/clientToken?${queryString(params)}`;
-  return checkResponseStatus(await fetch(url, {
-    method: 'get',
-    headers: addAuthTokenToHeader(),
-  }));
+  const url = `/api/connected-accounts/${service}/clientToken?${queryString(
+    params,
+  )}`;
+  return checkResponseStatus(
+    await fetch(url, {
+      method: 'get',
+      headers: addAuthTokenToHeader(),
+    }),
+  );
 }
 
 export function checkUserExistence(email) {
@@ -100,11 +104,10 @@ export function addFunds(CollectiveId, order) {
     headers: {
       ...addAuthTokenToHeader(),
       Accept: 'application/json',
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ order })
-  })
-  .then(checkResponseStatus);
+    body: JSON.stringify({ order }),
+  }).then(checkResponseStatus);
 }
 
 export function signin(user, redirect) {
@@ -113,17 +116,16 @@ export function signin(user, redirect) {
     headers: {
       ...addAuthTokenToHeader(),
       Accept: 'application/json',
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ user, redirect })
-  })
-  .then(checkResponseStatus);
+    body: JSON.stringify({ user, redirect }),
+  }).then(checkResponseStatus);
 }
 
 export async function refreshToken(currentToken) {
   const response = await fetch('/api/users/update-token', {
     method: 'POST',
-    headers: { Authorization: `Bearer ${currentToken}` }
+    headers: { Authorization: `Bearer ${currentToken}` },
   });
   try {
     return await response.json();
@@ -133,15 +135,15 @@ export async function refreshToken(currentToken) {
 }
 
 export function get(path, options = {}) {
-  if (path.substr(0,1) !== '/') throw new Error("Can only get resources with a relative path");
+  if (path.substr(0, 1) !== '/')
+    throw new Error('Can only get resources with a relative path');
 
   return fetch(path, {
     method: 'get',
-    headers: addAuthTokenToHeader()
-  })
-  .then(response => {
+    headers: addAuthTokenToHeader(),
+  }).then(response => {
     if (options.format === 'csv') return response.text();
     if (options.format === 'blob') return response.blob();
     return checkResponseStatus(response);
-  })
+  });
 }

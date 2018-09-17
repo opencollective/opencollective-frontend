@@ -39,7 +39,8 @@ export const overflow = style({ prop: 'overflow' });
 
 export const pointerEvents = style({ prop: 'pointerEvents' });
 
-const Container = styled(tag)([],
+const Container = styled(tag)(
+  [],
   alignItems,
   alignSelf,
   background,

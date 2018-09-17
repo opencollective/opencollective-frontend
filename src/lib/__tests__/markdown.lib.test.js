@@ -1,4 +1,4 @@
-import * as markdown from '../markdown.lib.js'
+import * as markdown from '../markdown.lib.js';
 
 const md = `
 This is first paragraph
@@ -20,9 +20,9 @@ describe('markdown lib', () => {
   it('process sections', () => {
     const { sections } = markdown.processMarkdown(md);
     expect(sections.length).toEqual(3);
-    expect(sections[1].title).toEqual("FAQ");
-    expect(sections[1].id).toEqual("faq");
-    expect(sections[2].id).toEqual("another-section");
-    expect(sections[2].markdown).toEqual("Hello world!");
-  })
-})
+    expect(sections[1].title).toEqual('FAQ');
+    expect(sections[1].id).toEqual('faq');
+    expect(sections[2].id).toEqual('another-section');
+    expect(sections[2].markdown).toEqual('Hello world!');
+  });
+});

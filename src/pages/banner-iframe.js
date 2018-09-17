@@ -12,7 +12,7 @@ import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
 
 class BannerIframe extends React.Component {
-  static getInitialProps ({ query: { collectiveSlug, id, style } }) {
+  static getInitialProps({ query: { collectiveSlug, id, style } }) {
     return { collectiveSlug, id, style };
   }
 
@@ -48,14 +48,20 @@ class BannerIframe extends React.Component {
   sendMessageToParentWindow = () => {
     if (!window.parent) return;
     if (!this.height) return;
-    const message = `oc-${JSON.stringify({ id: this.props.id, height: this.height })}`;
+    const message = `oc-${JSON.stringify({
+      id: this.props.id,
+      height: this.height,
+    })}`;
     window.parent.postMessage(message, '*');
   };
 
   sendMessageToParentWindow = () => {
     if (!window.parent) return;
     if (!this.height) return;
-    const message = `oc-${JSON.stringify({ id: this.props.id, height: this.height })}`;
+    const message = `oc-${JSON.stringify({
+      id: this.props.id,
+      height: this.height,
+    })}`;
     window.parent.postMessage(message, '*');
   };
 
@@ -70,145 +76,185 @@ class BannerIframe extends React.Component {
     }
 
     if (data.loading) {
-      return <div ref={(node) => this.node = node}><FormattedMessage id="loading" defaultMessage="loading" /></div>;
+      return (
+        <div ref={node => (this.node = node)}>
+          <FormattedMessage id="loading" defaultMessage="loading" />
+        </div>
+      );
     }
 
     const collective = data.Collective;
     if (!collective) {
-      return <div ref={(node) => this.node = node}><FormattedMessage id="notFound" defaultMessage="not found" /></div>;
+      return (
+        <div ref={node => (this.node = node)}>
+          <FormattedMessage id="notFound" defaultMessage="not found" />
+        </div>
+      );
     }
 
     const { backers } = collective.stats;
 
     return (
-      <div className="iframeContainer" ref={(node) => this.node = node}>
+      <div className="iframeContainer" ref={node => (this.node = node)}>
         <Head>
           <meta name="viewport" content="width=device-width, initial-scale=1" />
-          <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,900" />
+          <link
+            rel="stylesheet"
+            href="https://fonts.googleapis.com/css?family=Lato:400,700,900"
+          />
           <title>{`${collectiveSlug} collectives`}</title>
         </Head>
 
-        <style jsx global>{`
-        @font-face {
-          font-family: 'montserratlight';
-          src: url('/static/fonts/montserrat/montserrat-light-webfont.eot');
-          src: url('/static/fonts/montserrat/montserrat-light-webfont.eot?#iefix') format('embedded-opentype'),
-            url('/static/fonts/montserrat/montserrat-light-webfont.woff2') format('woff2'),
-            url('/static/fonts/montserrat/montserrat-light-webfont.woff') format('woff'),
-            url('/static/fonts/montserrat/montserrat-light-webfont.ttf') format('truetype'),
-            url('/static/fonts/montserrat/montserrat-light-webfont.svg#montserratlight') format('svg');
-          font-weight: normal;
-          font-style: normal;
-        }
-        @font-face {
-          font-family: 'lato';
-          src: url('/static/fonts/montserrat/lato-regular.ttf') format('truetype');
-          font-weight: normal;
-          font-style: normal;
-        }
+        <style jsx global>
+          {`
+            @font-face {
+              font-family: 'montserratlight';
+              src: url('/static/fonts/montserrat/montserrat-light-webfont.eot');
+              src: url('/static/fonts/montserrat/montserrat-light-webfont.eot?#iefix')
+                  format('embedded-opentype'),
+                url('/static/fonts/montserrat/montserrat-light-webfont.woff2')
+                  format('woff2'),
+                url('/static/fonts/montserrat/montserrat-light-webfont.woff')
+                  format('woff'),
+                url('/static/fonts/montserrat/montserrat-light-webfont.ttf')
+                  format('truetype'),
+                url('/static/fonts/montserrat/montserrat-light-webfont.svg#montserratlight')
+                  format('svg');
+              font-weight: normal;
+              font-style: normal;
+            }
+            @font-face {
+              font-family: 'lato';
+              src: url('/static/fonts/montserrat/lato-regular.ttf')
+                format('truetype');
+              font-weight: normal;
+              font-style: normal;
+            }
 
-        body {
-          width: 100%;
-          height: 100%;
-          padding: 0;
-          margin: 0;
-          font-family: ${style.body && `${style.body.fontFamily},`}Lato,Helvetica,sans-serif;
-          font-weight: 300;
-          font-size: 1rem;
-          line-height: 1.5;
-          overflow-x: hidden;
-        }
+            body {
+              width: 100%;
+              height: 100%;
+              padding: 0;
+              margin: 0;
+              font-family: ${style.body && `${style.body.fontFamily},`}Lato,
+                Helvetica, sans-serif;
+              font-weight: 300;
+              font-size: 1rem;
+              line-height: 1.5;
+              overflow-x: hidden;
+            }
 
-        .iframeContainer {
-          overflow: hidden;
-        }
+            .iframeContainer {
+              overflow: hidden;
+            }
 
-        a {
-          text-decoration: none;
-          color: ${style.a && style.a.color || '#46b0ed'};
-          cursor: pointer;
-          font-size: 14px;
-        }
+            a {
+              text-decoration: none;
+              color: ${(style.a && style.a.color) || '#46b0ed'};
+              cursor: pointer;
+              font-size: 14px;
+            }
 
-        .actions {
-          text-align: center;
-        }
+            .actions {
+              text-align: center;
+            }
 
-        .title {
-          display: flex;
-          align-items: baseline;
-        }
+            .title {
+              display: flex;
+              align-items: baseline;
+            }
 
-        .title .action {
-          font-size: 0.8rem;
-        }
+            .title .action {
+              font-size: 0.8rem;
+            }
 
-        h2 {
-          font-size: 16px;
-          margin-bottom: 0;
-          font-weight: 300;
-        }
+            h2 {
+              font-size: 16px;
+              margin-bottom: 0;
+              font-weight: 300;
+            }
 
-        ul {
-          list-style: none;
-          padding: 0;
-        }
+            ul {
+              list-style: none;
+              padding: 0;
+            }
 
-        section h1, section h2 {
-          text-align: center;
-        }
+            section h1,
+            section h2 {
+              text-align: center;
+            }
 
-        .button {
-          width: 300px;
-          height: 50px;
-          overflow: hidden;
-          margin: 0;
-          padding: 0;
-          background-repeat: no-repeat;
-          float: left;
-          border: none;
-          background-color: transparent;
-          cursor: pointer;
-        }
+            .button {
+              width: 300px;
+              height: 50px;
+              overflow: hidden;
+              margin: 0;
+              padding: 0;
+              background-repeat: no-repeat;
+              float: left;
+              border: none;
+              background-color: transparent;
+              cursor: pointer;
+            }
 
-        .button.contribute {
-          width: 338px;
-        }
-        .contribute.button.blue {
-          background-image: url(/static/images/buttons/contribute-button-blue.svg);
-        }
-        .button:hover {
-          background-position: 0 -50px;
-        }
-        .button:active {
-          background-position: 0 -100px;
-        }
-        .button:focus {
-          outline: 0;
-        }
+            .button.contribute {
+              width: 338px;
+            }
+            .contribute.button.blue {
+              background-image: url(/static/images/buttons/contribute-button-blue.svg);
+            }
+            .button:hover {
+              background-position: 0 -50px;
+            }
+            .button:active {
+              background-position: 0 -100px;
+            }
+            .button:focus {
+              outline: 0;
+            }
 
-        .button.hover {
-          background-position: 0 -100px;
-        }
-        `}
+            .button.hover {
+              background-position: 0 -100px;
+            }
+          `}
         </style>
 
-        { backers.organizations + backers.users === 0 &&
-          <a type="button" className="button blue contribute" target="_blank" rel="noopener noreferrer" href={`https://opencollective.com/${collectiveSlug}`} />
-        }
+        {backers.organizations + backers.users === 0 && (
+          <a
+            type="button"
+            className="button blue contribute"
+            target="_blank"
+            rel="noopener noreferrer"
+            href={`https://opencollective.com/${collectiveSlug}`}
+          />
+        )}
 
-
-        { backers.organizations > 0 &&
+        {backers.organizations > 0 && (
           <section id="organizations" className="tier">
             <h2 style={style.h2}>
               <FormattedMessage
                 id="collective.section.backers.organizations.title"
-                values={{ n: backers.organizations, collective: collective.name }}
-                defaultMessage={'{n} {n, plural, one {organization is} other {organizations are}} supporting {collective}'}
-                />
+                values={{
+                  n: backers.organizations,
+                  collective: collective.name,
+                }}
+                defaultMessage={
+                  '{n} {n, plural, one {organization is} other {organizations are}} supporting {collective}'
+                }
+              />
             </h2>
             <div className="actions">
-              <a href={`https://opencollective.com/${collectiveSlug}`} target="_blank" rel="noopener noreferrer" style={style.a}><FormattedMessage id="widget.becomeSponsor" defaultMessage="Become a sponsor" /></a>
+              <a
+                href={`https://opencollective.com/${collectiveSlug}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={style.a}
+              >
+                <FormattedMessage
+                  id="widget.becomeSponsor"
+                  defaultMessage="Become a sponsor"
+                />
+              </a>
             </div>
             <MembersWithData
               collective={collective}
@@ -216,22 +262,34 @@ class BannerIframe extends React.Component {
               type="ORGANIZATION"
               role="BACKER"
               limit={100}
-              />
+            />
           </section>
-        }
+        )}
 
-        { backers.users > 0 &&
+        {backers.users > 0 && (
           <section id="backers" className="tier">
             <h2 style={style.h2}>
               <FormattedMessage
                 id="collective.section.backers.users.title"
                 values={{ n: backers.users, collective: collective.name }}
-                defaultMessage={'{n} {n, plural, one {person is} other {people are}} supporting {collective}'}
-                />
+                defaultMessage={
+                  '{n} {n, plural, one {person is} other {people are}} supporting {collective}'
+                }
+              />
             </h2>
 
             <div className="actions">
-              <a href={`https://opencollective.com/${collectiveSlug}`} target="_blank" rel="noopener noreferrer" style={style.a}><FormattedMessage id="widget.becomeBacker" defaultMessage="Become a backer" /></a>
+              <a
+                href={`https://opencollective.com/${collectiveSlug}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={style.a}
+              >
+                <FormattedMessage
+                  id="widget.becomeBacker"
+                  defaultMessage="Become a backer"
+                />
+              </a>
             </div>
             <MembersWithData
               collective={collective}
@@ -240,31 +298,30 @@ class BannerIframe extends React.Component {
               role="BACKER"
               limit={100}
               orderBy="totalDonations"
-              />
+            />
           </section>
-        }
-
+        )}
       </div>
     );
   }
 }
 
 const getMembersQuery = gql`
-query Collective($collectiveSlug: String) {
-  Collective(slug: $collectiveSlug) {
-    id
-    name
-    currency
-    stats {
+  query Collective($collectiveSlug: String) {
+    Collective(slug: $collectiveSlug) {
       id
-      backers {
+      name
+      currency
+      stats {
         id
-        users
-        organizations
+        backers {
+          id
+          users
+          organizations
+        }
       }
     }
   }
-}
 `;
 
 export const addCollectiveData = graphql(getMembersQuery);

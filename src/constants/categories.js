@@ -2,11 +2,9 @@
  * Static data the for the expense form
  */
 export default function(slug = '') {
-
   let categories = [];
   let base_slug = slug;
-  if (slug.match(/^wwcode/))
-    base_slug = 'wwcode';
+  if (slug.match(/^wwcode/)) base_slug = 'wwcode';
 
   switch (base_slug) {
     // Women Who Code
@@ -30,7 +28,7 @@ export default function(slug = '') {
         'Study Group',
         'Workshop',
         'Other WWCode Event',
-        'Other'
+        'Other',
       ];
       break;
     case 'laprimaire': // laprimaire
@@ -48,9 +46,9 @@ export default function(slug = '') {
         'Papeterie',
         'Représentation',
         'Serveur',
-        'Transport'
+        'Transport',
       ];
-       break;
+      break;
     case 'partidodigital':
     case 'technovationmx':
       categories = [
@@ -67,7 +65,7 @@ export default function(slug = '') {
         'Equipo',
         'Oficina',
         'Otros',
-        'Servicios Digitales'
+        'Servicios Digitales',
       ];
       break;
     case 'analizebasilicata':
@@ -85,7 +83,7 @@ export default function(slug = '') {
         'Squadra',
         'Ufficio',
         'Altro',
-        'Servizi web'
+        'Servizi web',
       ];
       break;
     case 'rappdutchess':
@@ -107,12 +105,7 @@ export default function(slug = '') {
     case 'brighterstars':
     case 'adoptivefamliescapitalregion':
     case 'affcny':
-       categories = [
-        'Training',
-        'Outreach',
-        'Supplies',
-        'Other'
-       ];
+      categories = ['Training', 'Outreach', 'Supplies', 'Other'];
       break;
 
     default:
@@ -130,7 +123,7 @@ export default function(slug = '') {
         'Team',
         'Office',
         'Other',
-        'Web services'
+        'Web services',
       ];
   }
   return categories.sort();

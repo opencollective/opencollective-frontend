@@ -13,10 +13,10 @@ import { svg2png, generateSVGBannerForUsers, generateAsciiFromImage } from '../l
 // Cache the list of members of a collective to avoid requesting it for every single /:collectiveSlug/backers/:position/avatar
 const cache = require('lru-cache')({
   max: 5000,
-  maxAge: 1000 * 60 * 10
+  maxAge: 1000 * 60 * 10,
 });
 
-const WEBSITE_URL = process.env.WEBSITE_URL || "https://opencollective.com";
+const WEBSITE_URL = process.env.WEBSITE_URL || 'https://opencollective.com';
 
 const fetchText = path => fetch(path).then(response => response.text());
 
@@ -43,7 +43,7 @@ export async function badge(req, res) {
       res.setHeader('cache-control','max-age=600');
       return res.send(imageRequest);
     } catch (e) {
-      logger.error(">>> collectives.badge: Error while fetching %s", imageUrl, e);
+      logger.error('>>> collectives.badge: Error while fetching %s', imageUrl, e);
       res.setHeader('cache-control','max-age=30');
       return res.status(500).send(`Unable to fetch ${imageUrl}`);
     }
@@ -63,7 +63,7 @@ export async function info(req, res, next) {
     collective = await fetchCollective(req.params.collectiveSlug);
   } catch (e) {
     if (e.message.match(/No collective found/)) {
-      return res.status(404).send("Not found");
+      return res.status(404).send('Not found');
     }
     logger.debug('>>> collectives.info error', e);
     return next(e);
@@ -74,8 +74,8 @@ export async function info(req, res, next) {
     balance: collective.stats.balance,
     yearlyIncome: collective.stats.yearlyBudget,
     backersCount: collective.stats.backers.all,
-    contributorsCount: Object.keys(get(collective, 'data.githubContributors') || {}).length
-  }
+    contributorsCount: Object.keys(get(collective, 'data.githubContributors') || {}).length,
+  };
 
   res.send(response);
 }
@@ -119,7 +119,7 @@ export async function logo(req, res, next) {
         },
         variant: req.query.variant || 'wide',
         trim: req.query.trim !== 'false',
-        reverse: (req.query.reverse === 'true') ? true : false
+        reverse: (req.query.reverse === 'true') ? true : false,
       }).then(ascii => {
         res.setHeader('content-type', 'text/plain; charset=us-ascii');
         res.send(`${ascii}\n`);
@@ -225,7 +225,7 @@ export async function website(req, res) {
   parsedUrl.search = `?${queryString.stringify(params)}`;
   redirectUrl = url.format(parsedUrl);
 
-  req.ga.event(`GithubWidget-${selector}`, `Click`, user.slug, position);
+  req.ga.event(`GithubWidget-${selector}`, 'Click', user.slug, position);
 
   res.redirect(301, redirectUrl);
 
@@ -278,7 +278,7 @@ export async function avatar(req, res) {
     const btnImage = (selector.match(/sponsor/)) ? 'sponsor' : 'backer';
     imageUrl = `/static/images/become_${btnImage}.svg`;
   } else if (position > users.length) {
-    imageUrl = "/static/images/1px.png";
+    imageUrl = '/static/images/1px.png';
   }
 
   if (imageUrl.substr(0,1) === '/') {
@@ -286,7 +286,7 @@ export async function avatar(req, res) {
   }
 
   if (format === 'svg') {
-    request({url: imageUrl, encoding: null}, (err, r, data) => {
+    request({ url: imageUrl, encoding: null }, (err, r, data) => {
       if (err) {
         return res.status(500).send(`Unable to fetch ${imageUrl}`);
       }
@@ -316,7 +316,7 @@ export async function avatar(req, res) {
     req
       .pipe(request(imageUrl))
       .on('error', (e) => {
-        logger.error(">>> collectives.avatar: Error proxying %s", imageUrl, e);
+        logger.error('>>> collectives.avatar: Error proxying %s', imageUrl, e);
         res.status(500).send(e);
       })
       .on('response', (res) => {

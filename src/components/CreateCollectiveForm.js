@@ -11,7 +11,6 @@ import fetch from 'fetch-jsonp';
 import { firstSentence } from '../lib/utils';
 
 class CreateCollectiveForm extends React.Component {
-
   static propTypes = {
     host: PropTypes.object,
     collective: PropTypes.object,
@@ -27,31 +26,74 @@ class CreateCollectiveForm extends React.Component {
     this.handleChange = this.handleChange.bind(this);
     this.handleObjectChange = this.handleObjectChange.bind(this);
 
-    const collective = { ... props.collective || {} };
-    collective.slug = collective.slug ? collective.slug.replace(/.*\//, '') : '';
+    const collective = { ...(props.collective || {}) };
+    collective.slug = collective.slug
+      ? collective.slug.replace(/.*\//, '')
+      : '';
 
     this.messages = defineMessages({
       'slug.label': { id: 'collective.slug.label', defaultMessage: 'url' },
       'type.label': { id: 'collective.type.label', defaultMessage: 'type' },
       'name.label': { id: 'collective.name.label', defaultMessage: 'name' },
-      'company.label': { id: 'collective.company.label', defaultMessage: 'company' },
-      'company.description': { id: 'collective.company.description', defaultMessage: 'Start with a @ to reference an organization (e.g. @airbnb)' },
-      'amount.label': { id: 'collective.amount.label', defaultMessage: 'amount' },
-      'description.label': { id: 'collective.description.label', defaultMessage: 'Short description' },
-      'startsAt.label': { id: 'collective.startsAt.label', defaultMessage: 'start date and time' },
+      'company.label': {
+        id: 'collective.company.label',
+        defaultMessage: 'company',
+      },
+      'company.description': {
+        id: 'collective.company.description',
+        defaultMessage:
+          'Start with a @ to reference an organization (e.g. @airbnb)',
+      },
+      'amount.label': {
+        id: 'collective.amount.label',
+        defaultMessage: 'amount',
+      },
+      'description.label': {
+        id: 'collective.description.label',
+        defaultMessage: 'Short description',
+      },
+      'startsAt.label': {
+        id: 'collective.startsAt.label',
+        defaultMessage: 'start date and time',
+      },
       'image.label': { id: 'collective.image.label', defaultMessage: 'Avatar' },
-      'backgroundImage.label': { id: 'collective.backgroundImage.label', defaultMessage: 'Cover image' },
-      'website.label': { id: 'collective.website.label', defaultMessage: 'Website' },
-      'website.description': { id: 'collective.website.description', defaultMessage: 'Enter the URL of your website or Facebook Page' },
-      'location.label': { id: 'collective.location.label', defaultMessage: 'City' },
-      'meetup.label': { id: 'collective.meetup.label', defaultMessage: 'Meetup URL' },
-      'members.label': { id: 'collective.members.label', defaultMessage: 'Number of members' },
+      'backgroundImage.label': {
+        id: 'collective.backgroundImage.label',
+        defaultMessage: 'Cover image',
+      },
+      'website.label': {
+        id: 'collective.website.label',
+        defaultMessage: 'Website',
+      },
+      'website.description': {
+        id: 'collective.website.description',
+        defaultMessage: 'Enter the URL of your website or Facebook Page',
+      },
+      'location.label': {
+        id: 'collective.location.label',
+        defaultMessage: 'City',
+      },
+      'meetup.label': {
+        id: 'collective.meetup.label',
+        defaultMessage: 'Meetup URL',
+      },
+      'members.label': {
+        id: 'collective.members.label',
+        defaultMessage: 'Number of members',
+      },
       'tags.label': { id: 'collective.tags.label', defaultMessage: 'Tags' },
-      'tags.description': { id: 'collective.tags.description', defaultMessage: 'Tags helps people discover your collective' },
-      'tos.label': { id: 'collective.tos.label', defaultMessage: 'Terms of Service' }
+      'tags.description': {
+        id: 'collective.tags.description',
+        defaultMessage: 'Tags helps people discover your collective',
+      },
+      'tos.label': {
+        id: 'collective.tos.label',
+        defaultMessage: 'Terms of Service',
+      },
     });
 
-    collective.backgroundImage = collective.backgroundImage || defaultBackgroundImage[collective.type];
+    collective.backgroundImage =
+      collective.backgroundImage || defaultBackgroundImage[collective.type];
 
     this.masterKey = '';
     this.state = {
@@ -68,7 +110,7 @@ class CreateCollectiveForm extends React.Component {
     if (get(props.host, 'settings.apply.defaultValues')) {
       this.state.collective = {
         ...this.state.collective,
-        ... props.host.settings.apply.defaultValues,
+        ...props.host.settings.apply.defaultValues,
       };
     }
 
@@ -76,7 +118,6 @@ class CreateCollectiveForm extends React.Component {
     this.addLabels();
 
     window.OC = { collective, state: this.state };
-
   }
 
   componentDidMount() {
@@ -87,13 +128,19 @@ class CreateCollectiveForm extends React.Component {
   }
 
   UNSAFE_componentWillReceiveProps(nextProps) {
-    if (nextProps.collective && (!this.props.collective || get(nextProps, 'collective.name') != get(this.props, 'collective.name'))) {
-      this.setState({ collective: nextProps.collective, tiers: nextProps.collective.tiers });
+    if (
+      nextProps.collective &&
+      (!this.props.collective ||
+        get(nextProps, 'collective.name') != get(this.props, 'collective.name'))
+    ) {
+      this.setState({
+        collective: nextProps.collective,
+        tiers: nextProps.collective.tiers,
+      });
     }
   }
 
   defineFields(category) {
-
     this.fields = {
       info: [
         {
@@ -141,7 +188,7 @@ class CreateCollectiveForm extends React.Component {
         maxLength: 255,
         placeholder: '',
       });
-      this.fields.info.push(        {
+      this.fields.info.push({
         name: 'location',
         placeholder: 'Search cities',
         type: 'location',
@@ -158,21 +205,26 @@ class CreateCollectiveForm extends React.Component {
     const { intl } = this.props;
     Object.keys(this.fields).map(key => {
       this.fields[key] = this.fields[key].map(field => {
-      if (this.messages[`${field.name}.label`]) {
-        field.label = intl.formatMessage(this.messages[`${field.name}.label`]);
-      }
-      if (this.messages[`${field.name}.description`]) {
-        field.description = intl.formatMessage(this.messages[`${field.name}.description`]);
-      }
-      this.state.collective[field.name] = this.state.collective[field.name] || field.defaultValue;
-      return field;
+        if (this.messages[`${field.name}.label`]) {
+          field.label = intl.formatMessage(
+            this.messages[`${field.name}.label`],
+          );
+        }
+        if (this.messages[`${field.name}.description`]) {
+          field.description = intl.formatMessage(
+            this.messages[`${field.name}.description`],
+          );
+        }
+        this.state.collective[field.name] =
+          this.state.collective[field.name] || field.defaultValue;
+        return field;
       });
     });
   }
 
   handleChange(fieldname, value) {
     if (fieldname === 'category' && value === 'opensource') {
-      return window.location = '/opensource/apply';
+      return (window.location = '/opensource/apply');
     }
 
     if (fieldname === 'category') {
@@ -181,7 +233,9 @@ class CreateCollectiveForm extends React.Component {
 
     const collective = {};
     if (fieldname === 'meetup') {
-      fetch(`https://api.meetup.com/${value}?fields=plain_text_description,topics`)
+      fetch(
+        `https://api.meetup.com/${value}?fields=plain_text_description,topics`,
+      )
         .then(response => {
           if (response.ok) {
             return response.json();
@@ -189,25 +243,49 @@ class CreateCollectiveForm extends React.Component {
         })
         .then(json => {
           if (!json) return;
-          const { city, localized_location, lat, lon, members, plain_text_description, name, timezone, key_photo, link, created, topics } = json.data;
-          Object.assign(collective, { name, timezone })
+          const {
+            city,
+            localized_location,
+            lat,
+            lon,
+            members,
+            plain_text_description,
+            name,
+            timezone,
+            key_photo,
+            link,
+            created,
+            topics,
+          } = json.data;
+          Object.assign(collective, { name, timezone });
           collective.description = firstSentence(plain_text_description, 255);
           collective.longDescription = plain_text_description;
-          collective.location = { name: city, address: localized_location, lat, long: lon };
+          collective.location = {
+            name: city,
+            address: localized_location,
+            lat,
+            long: lon,
+          };
           collective.image = get(key_photo, 'highres_link');
           collective.tags = topics && topics.map(t => t.urlkey).join(', ');
           collective.website = link;
           collective.members = members;
           collective.data = {
-            created: new Date(created)
-          }
+            created: new Date(created),
+          };
           this.masterKey = value; // making sure we recreate the form with new prefilled values
-          this.setState( { modified: true, collective: Object.assign({}, this.state.collective, collective) });
+          this.setState({
+            modified: true,
+            collective: Object.assign({}, this.state.collective, collective),
+          });
           window.state = this.state;
-        })
+        });
     }
     collective[fieldname] = value;
-    this.setState( { modified: true, collective: Object.assign({}, this.state.collective, collective) });
+    this.setState({
+      modified: true,
+      collective: Object.assign({}, this.state.collective, collective),
+    });
     window.state = this.state;
   }
 
@@ -218,135 +296,203 @@ class CreateCollectiveForm extends React.Component {
 
   async handleSubmit() {
     this.props.onSubmit(this.state.collective);
-    this.setState({ modified: false })
+    this.setState({ modified: false });
   }
 
   render() {
-
     const { host, collective, loading, intl } = this.props;
 
-    const showForm = Boolean(this.categories.length === 0 || this.state.collective.category);
-    const defaultStartsAt = new Date;
+    const showForm = Boolean(
+      this.categories.length === 0 || this.state.collective.category,
+    );
+    const defaultStartsAt = new Date();
     defaultStartsAt.setHours(19);
     defaultStartsAt.setMinutes(0);
 
     return (
       <div className="CreateCollectiveForm">
-        <style jsx>{`
-        :global(.field) {
-          margin: 1rem;
-        }
-        :global(label) {
-          width: 150px;
-          display: inline-block;
-          vertical-align: top;
-        }
-        :global(input), select, :global(textarea) {
-          width: 300px;
-          font-size: 1.5rem;
-        }
+        <style jsx>
+          {`
+            :global(.field) {
+              margin: 1rem;
+            }
+            :global(label) {
+              width: 150px;
+              display: inline-block;
+              vertical-align: top;
+            }
+            :global(input),
+            select,
+            :global(textarea) {
+              width: 300px;
+              font-size: 1.5rem;
+            }
 
-        .FormInputs {
-          max-width: 700px;
-          margin: 0 auto;
-          overflow: hidden;
-        }
+            .FormInputs {
+              max-width: 700px;
+              margin: 0 auto;
+              overflow: hidden;
+            }
 
-        .actions {
-          margin: 5rem auto 1rem;
-          text-align: center;
-        }
-        .backToProfile {
-          font-size: 1.3rem;
-          margin: 1rem;
-        }
-        input[type="checkbox"] {
-          width: 25px;
-        }
-        `}</style>
-        <style global jsx>{`
-        section#location {
-          margin-top: 0;
-        }
+            .actions {
+              margin: 5rem auto 1rem;
+              text-align: center;
+            }
+            .backToProfile {
+              font-size: 1.3rem;
+              margin: 1rem;
+            }
+            input[type='checkbox'] {
+              width: 25px;
+            }
+          `}
+        </style>
+        <style global jsx>
+          {`
+            section#location {
+              margin-top: 0;
+            }
 
-        .image .InputTypeDropzone {
-          width: 100px;
-        }
+            .image .InputTypeDropzone {
+              width: 100px;
+            }
 
-        .backgroundImage-dropzone {
-          max-width: 500px;
-          overflow: hidden;
-        }
+            .backgroundImage-dropzone {
+              max-width: 500px;
+              overflow: hidden;
+            }
 
-        .user .image-dropzone {
-          width: 64px;
-          height: 64px;
-          border-radius: 50%;
-          overflow: hidden
-        }
+            .user .image-dropzone {
+              width: 64px;
+              height: 64px;
+              border-radius: 50%;
+              overflow: hidden;
+            }
 
-        .menu {
-          text-align:center;
-          margin: 1rem 0 3rem 0;
-        }
-        `}</style>
+            .menu {
+              text-align: center;
+              margin: 1rem 0 3rem 0;
+            }
+          `}
+        </style>
 
-        { this.categories.length > 1 && <CollectiveCategoryPicker categories={this.categories} onChange={(value) => this.handleChange("category", value)} /> }
+        {this.categories.length > 1 && (
+          <CollectiveCategoryPicker
+            categories={this.categories}
+            onChange={value => this.handleChange('category', value)}
+          />
+        )}
 
-        { showForm &&
+        {showForm && (
           <div className="FormInputs">
-            { Object.keys(this.fields).map(key =>
-              (<div className="inputs" key={key}>
-                {this.fields[key].map((field) => (!field.when || field.when()) && <InputField
-                  key={`${this.masterKey}-${field.name}`}
-                  value={this.state.collective[field.name]}
-                  className={field.className}
-                  defaultValue={this.state.collective[field.name] || field.defaultValue}
-                  validate={field.validate}
-                  ref={field.name}
-                  name={field.name}
-                  focus={field.focus}
-                  label={field.label}
-                  description={field.description}
-                  options={field.options}
-                  placeholder={field.placeholder}
-                  type={field.type}
-                  help={field.help}
-                  pre={field.pre}
-                  context={this.state.collective}
-                  onChange={(value) => this.handleChange(field.name, value)}
-                  />)}
-              </div>)
-            )}
+            {Object.keys(this.fields).map(key => (
+              <div className="inputs" key={key}>
+                {this.fields[key].map(
+                  field =>
+                    (!field.when || field.when()) && (
+                      <InputField
+                        key={`${this.masterKey}-${field.name}`}
+                        value={this.state.collective[field.name]}
+                        className={field.className}
+                        defaultValue={
+                          this.state.collective[field.name] ||
+                          field.defaultValue
+                        }
+                        validate={field.validate}
+                        ref={field.name}
+                        name={field.name}
+                        focus={field.focus}
+                        label={field.label}
+                        description={field.description}
+                        options={field.options}
+                        placeholder={field.placeholder}
+                        type={field.type}
+                        help={field.help}
+                        pre={field.pre}
+                        context={this.state.collective}
+                        onChange={value => this.handleChange(field.name, value)}
+                      />
+                    ),
+                )}
+              </div>
+            ))}
 
             <div className="tos">
               <label>{intl.formatMessage(this.messages['tos.label'])}</label>
               <div>
-                <input type="checkbox" name="tos" onChange={(value) => this.handleChange('tos', value)} />
-                <span>I agree with the <a href="/tos" target="_blank" rel="noopener noreferrer">terms of service of Open Collective</a></span>
+                <input
+                  type="checkbox"
+                  name="tos"
+                  onChange={value => this.handleChange('tos', value)}
+                />
+                <span>
+                  I agree with the{' '}
+                  <a href="/tos" target="_blank" rel="noopener noreferrer">
+                    terms of service of Open Collective
+                  </a>
+                </span>
               </div>
-              { (get(host, 'settings.tos')) &&
+              {get(host, 'settings.tos') && (
                 <div>
-                  <input type="checkbox" name="hostTos" onChange={(value) => this.handleChange('hostTos', value)} />
-                  <span>I agree with the <a href={get(host, 'settings.tos')} target="_blank" rel="noopener noreferrer">terms of service of the host</a> (<a href={`/${host.slug}`} target="_blank" rel="noopener noreferrer">{host.name}</a>) that will collect money on behalf of our collective</span>
+                  <input
+                    type="checkbox"
+                    name="hostTos"
+                    onChange={value => this.handleChange('hostTos', value)}
+                  />
+                  <span>
+                    I agree with the{' '}
+                    <a
+                      href={get(host, 'settings.tos')}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      terms of service of the host
+                    </a>{' '}
+                    (
+                    <a
+                      href={`/${host.slug}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {host.name}
+                    </a>
+                    ) that will collect money on behalf of our collective
+                  </span>
                 </div>
-              }
+              )}
             </div>
 
             <div className="actions">
-              <Button bsStyle="primary" type="submit" onClick={this.handleSubmit} disabled={loading || !this.state.modified} >
-                { loading && <FormattedMessage id="loading" defaultMessage="loading" /> }
-                { !loading && collective.type === 'COLLECTIVE' && <FormattedMessage id="collective.create.button" defaultMessage="Create Collective" /> }
-                { !loading && collective.type === 'ORGANIZATION' && <FormattedMessage id="organization.create" defaultMessage="Create organization" /> }
+              <Button
+                bsStyle="primary"
+                type="submit"
+                onClick={this.handleSubmit}
+                disabled={loading || !this.state.modified}
+              >
+                {loading && (
+                  <FormattedMessage id="loading" defaultMessage="loading" />
+                )}
+                {!loading &&
+                  collective.type === 'COLLECTIVE' && (
+                    <FormattedMessage
+                      id="collective.create.button"
+                      defaultMessage="Create Collective"
+                    />
+                  )}
+                {!loading &&
+                  collective.type === 'ORGANIZATION' && (
+                    <FormattedMessage
+                      id="organization.create"
+                      defaultMessage="Create organization"
+                    />
+                  )}
               </Button>
             </div>
-
           </div>
-        }
+        )}
       </div>
     );
   }
-
 }
 
 export default withIntl(CreateCollectiveForm);

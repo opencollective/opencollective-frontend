@@ -8,20 +8,19 @@ import classNames from 'classnames';
  * Simple editor component that takes placeholder text as a prop
  */
 class HTMLEditor extends React.Component {
-
   static propTypes = {
     placeholder: PropTypes.string,
     defaultValue: PropTypes.string,
     className: PropTypes.string,
-    onChange: PropTypes.func
+    onChange: PropTypes.func,
   };
 
-  constructor (props) {
-    super(props)
-    this.state = { editorHtml: '', theme: 'snow' }
-    this.handleChange = this.handleChange.bind(this)
-    this.saveToServer = this.saveToServer.bind(this)
-    this.insertToEditor = this.insertToEditor.bind(this)
+  constructor(props) {
+    super(props);
+    this.state = { editorHtml: '', theme: 'snow' };
+    this.handleChange = this.handleChange.bind(this);
+    this.saveToServer = this.saveToServer.bind(this);
+    this.insertToEditor = this.insertToEditor.bind(this);
     if (typeof window !== 'undefined') {
       this.ReactQuill = require('react-quill');
     }
@@ -33,38 +32,46 @@ class HTMLEditor extends React.Component {
     this.modules = {
       toolbar: {
         container: [
-          [{ 'header': '1'}, {'header': '2'}],
-          [{size: []}],
+          [{ header: '1' }, { header: '2' }],
+          [{ size: [] }],
           ['bold', 'italic', 'underline', 'blockquote'],
-          [{'list': 'ordered'}, {'list': 'bullet'},
-          ],
-          ['link', 'image', 'video']
+          [{ list: 'ordered' }, { list: 'bullet' }],
+          ['link', 'image', 'video'],
         ],
         handlers: {
-          'image': () => {
+          image: () => {
             this.selectLocalImage();
-          }
-        }
+          },
+        },
       },
       clipboard: {
         // toggle to add extra line breaks when pasting HTML:
         matchVisual: false,
-      }
-    }
+      },
+    };
     /*
     * Quill editor formats
     * See https://quilljs.com/docs/formats/
     */
     this.formats = [
-      'header', 'font', 'size',
-      'bold', 'italic', 'underline', 'strike', 'blockquote',
-      'list', 'bullet', 'indent',
-      'link', 'image', 'video'
-    ]
-
+      'header',
+      'font',
+      'size',
+      'bold',
+      'italic',
+      'underline',
+      'strike',
+      'blockquote',
+      'list',
+      'bullet',
+      'indent',
+      'link',
+      'image',
+      'video',
+    ];
   }
 
-  handleChange (html) {
+  handleChange(html) {
     this.setState({ editorHtml: html });
     this.props.onChange(html);
   }
@@ -98,8 +105,8 @@ class HTMLEditor extends React.Component {
         return this.insertToEditor(fileUrl);
       })
       .catch(e => {
-        console.error("Error uploading image", e);
-      })
+        console.error('Error uploading image', e);
+      });
   }
 
   /**
@@ -114,33 +121,34 @@ class HTMLEditor extends React.Component {
     editor.insertEmbed(range.index, 'image', url);
   }
 
-  render () {
-
+  render() {
     if (!this.ReactQuill) {
-      return (<div />);
+      return <div />;
     }
 
     return (
-      <div className={classNames("HTMLEditor", this.props.className)}>
+      <div className={classNames('HTMLEditor', this.props.className)}>
         <style dangerouslySetInnerHTML={{ __html: stylesheet }} />
-        <style jsx>{`
-          .HTMLEditor :global(.quill) {
-            height: 1rem;
-            min-height: 40rem;
-          }
-          .HTMLEditor :global(.ql-container) {
-            height: 35rem;
-          }
-          .HTMLEditor.small :global(.quill) {
-            height: 1rem;
-            min-height: 20rem;
-          }
-          .HTMLEditor.small :global(.ql-container) {
-            height: 15rem;
-          }
-        `}</style>
+        <style jsx>
+          {`
+            .HTMLEditor :global(.quill) {
+              height: 1rem;
+              min-height: 40rem;
+            }
+            .HTMLEditor :global(.ql-container) {
+              height: 35rem;
+            }
+            .HTMLEditor.small :global(.quill) {
+              height: 1rem;
+              min-height: 20rem;
+            }
+            .HTMLEditor.small :global(.ql-container) {
+              height: 15rem;
+            }
+          `}
+        </style>
         <this.ReactQuill
-          ref={el => this.reactQuillRef = el}
+          ref={el => (this.reactQuillRef = el)}
           theme="snow"
           onChange={this.handleChange}
           // value={this.state.editorHtml}
@@ -149,9 +157,9 @@ class HTMLEditor extends React.Component {
           formats={this.formats}
           bounds={'.app'}
           placeholder={this.props.placeholder}
-          />
+        />
       </div>
-     )
+    );
   }
 }
 

@@ -1,13 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Dropzone from 'react-dropzone'
+import Dropzone from 'react-dropzone';
 import { imagePreview } from '../lib/utils';
 import { upload } from '../lib/api';
 import withIntl from '../lib/withIntl';
 import { defineMessages } from 'react-intl';
 
 class InputTypeDropzone extends React.Component {
-
   static propTypes = {
     defaultValue: PropTypes.string,
     className: PropTypes.string,
@@ -19,12 +18,25 @@ class InputTypeDropzone extends React.Component {
     super(props);
     this.renderContainer = this.renderContainer.bind(this);
     this.handleChange = this.handleChange.bind(this);
-    this.state = { loading: false, value: props.defaultValue, url: props.defaultValue }; // value can be base64 encoded after upload, url is always an url
+    this.state = {
+      loading: false,
+      value: props.defaultValue,
+      url: props.defaultValue,
+    }; // value can be base64 encoded after upload, url is always an url
     this.messages = defineMessages({
-      placeholder: { id: 'uploadImage.placeholder', defaultMessage: 'Drop an image or click to upload' },
-      isDragActive: { id: 'uploadImage.isDragActive', defaultMessage: 'Drop it like it\'s hot 🔥' },
-      isDragReject: { id: 'uploadImage.isDragReject', defaultMessage: '🚫 This file type is not accepted' },
-      error: { id: 'uploadImage.error', defaultMessage: 'Error: {error}' }
+      placeholder: {
+        id: 'uploadImage.placeholder',
+        defaultMessage: 'Drop an image or click to upload',
+      },
+      isDragActive: {
+        id: 'uploadImage.isDragActive',
+        defaultMessage: "Drop it like it's hot 🔥",
+      },
+      isDragReject: {
+        id: 'uploadImage.isDragReject',
+        defaultMessage: '🚫 This file type is not accepted',
+      },
+      error: { id: 'uploadImage.error', defaultMessage: 'Error: {error}' },
     });
   }
 
@@ -52,7 +64,10 @@ class InputTypeDropzone extends React.Component {
       })
       .catch(err => {
         console.error('>>> error uploading image', file, err);
-        this.setState({ error: 'error uploading image, please try again', loading: false });
+        this.setState({
+          error: 'error uploading image, please try again',
+          loading: false,
+        });
       });
   }
 
@@ -72,49 +87,67 @@ class InputTypeDropzone extends React.Component {
 
     return (
       <div>
-        <style jsx>{`
-          .message {
-            position: absolute;
-            font-size: 1rem;
-            padding: 1rem;
-            text-align: center;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width: 100%;
-            height: 100%;
-            background: rgba(255,255,255,0.4);
-          }
-          .loading {
-            background: rgba(255,255,255,0.5);
-          }
-          .placeholder {
-            display: none;
-          }
-          .loading img {
-            animation: oc-rotate 0.8s infinite linear;
-          }
-          @keyframes oc-rotate {
-            0%    { transform: rotate(0deg); }
-            100%  { transform: rotate(360deg); }
-          }
-          img {
-            width: 100%;
-          }
-        `}</style>
-        { messageId &&
+        <style jsx>
+          {`
+            .message {
+              position: absolute;
+              font-size: 1rem;
+              padding: 1rem;
+              text-align: center;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              width: 100%;
+              height: 100%;
+              background: rgba(255, 255, 255, 0.4);
+            }
+            .loading {
+              background: rgba(255, 255, 255, 0.5);
+            }
+            .placeholder {
+              display: none;
+            }
+            .loading img {
+              animation: oc-rotate 0.8s infinite linear;
+            }
+            @keyframes oc-rotate {
+              0% {
+                transform: rotate(0deg);
+              }
+              100% {
+                transform: rotate(360deg);
+              }
+            }
+            img {
+              width: 100%;
+            }
+          `}
+        </style>
+        {messageId && (
           <div className={`message ${messageId}`}>
-            {intl.formatMessage(this.messages[messageId], { error: this.state.error })}
+            {intl.formatMessage(this.messages[messageId], {
+              error: this.state.error,
+            })}
           </div>
-        }
-        { this.state.loading &&
+        )}
+        {this.state.loading && (
           <div className="message loading">
-            <img src="/static/images/opencollective-icon.svg" width="40" height="40" className="logo" alt="Open Collective logo" />
+            <img
+              src="/static/images/opencollective-icon.svg"
+              width="40"
+              height="40"
+              className="logo"
+              alt="Open Collective logo"
+            />
           </div>
-        }
-        <img src={imagePreview(this.state.url, this.props.placeholder, { width: 128 })} />
+        )}
+        <img
+          src={imagePreview(this.state.url, this.props.placeholder, {
+            width: 128,
+          })}
+        />
       </div>
-    )
+    );
   }
 
   render() {
@@ -123,38 +156,45 @@ class InputTypeDropzone extends React.Component {
 
     return (
       <div className={`InputTypeDropzone ${this.props.className}`}>
-        <style jsx global>{`
-          .dropzone {
-            border: 2px dashed transparent;
-            position: relative;
-            min-height: 80px;
-            overflow: hidden;
-          }
-          .dropzone:hover .placeholder {
-            display: flex;
-          }
-          .dropzone:hover, .dropzone.empty {
-            border: 2px dashed grey;
-          }
-          .dropzone:hover .placeholder, .dropzone.empty .placeholder {
-            display: flex;
-          }
-          .removeImage {
-            font-size: 11px;
-          }
-        `}</style>
+        <style jsx global>
+          {`
+            .dropzone {
+              border: 2px dashed transparent;
+              position: relative;
+              min-height: 80px;
+              overflow: hidden;
+            }
+            .dropzone:hover .placeholder {
+              display: flex;
+            }
+            .dropzone:hover,
+            .dropzone.empty {
+              border: 2px dashed grey;
+            }
+            .dropzone:hover .placeholder,
+            .dropzone.empty .placeholder {
+              display: flex;
+            }
+            .removeImage {
+              font-size: 11px;
+            }
+          `}
+        </style>
         <Dropzone
           multiple={false}
           onDrop={this.handleChange}
-          className={`${this.props.name}-dropzone dropzone ${!this.state.value && 'empty'}`}
+          className={`${this.props.name}-dropzone dropzone ${!this.state
+            .value && 'empty'}`}
           style={{}}
           {...options}
-          >
-          { this.renderContainer }
+        >
+          {this.renderContainer}
         </Dropzone>
-        { this.state.value &&
-          <a className="removeImage" onClick={() => this.handleChange(null)}>❌ remove image</a>
-        }
+        {this.state.value && (
+          <a className="removeImage" onClick={() => this.handleChange(null)}>
+            ❌ remove image
+          </a>
+        )}
       </div>
     );
   }

@@ -13,7 +13,6 @@ const KeyCodes = {
 const delimiters = [KeyCodes.comma, KeyCodes.enter];
 
 class InputTypeTags extends React.Component {
-
   static propTypes = {
     defaultValue: PropTypes.arrayOf(PropTypes.string),
     onChange: PropTypes.func,
@@ -33,7 +32,10 @@ class InputTypeTags extends React.Component {
     this.handleDrag = this.handleDrag.bind(this);
 
     this.messages = defineMessages({
-      'placeholder': { id: 'input.tags.placeholder', defaultMessage: 'Add a new tag (then press "enter")' },
+      placeholder: {
+        id: 'input.tags.placeholder',
+        defaultMessage: 'Add a new tag (then press "enter")',
+      },
     });
   }
 
@@ -76,7 +78,7 @@ class InputTypeTags extends React.Component {
           delimiters={delimiters}
           autofocus={false}
           placeholder={intl.formatMessage(this.messages['placeholder'])}
-          />
+        />
       </div>
     );
   }

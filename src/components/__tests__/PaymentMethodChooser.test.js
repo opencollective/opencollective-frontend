@@ -4,7 +4,7 @@ import { IntlProvider } from 'react-intl';
 
 import PaymentMethodChooser from '../PaymentMethodChooser';
 
-describe("PaymentMethodChooser.test.js", () => {
+describe('PaymentMethodChooser.test.js', () => {
 
   const mountComponent = (props) => mount(
     <IntlProvider locale="en">
@@ -25,11 +25,11 @@ describe("PaymentMethodChooser.test.js", () => {
   const fillValue = (component, field, value) => {
     const c = component.find({ name: field }).hostNodes();
     c.simulate('change', { target: { value } });
-  }
+  };
 
   it('displays correct text when paymentMethodInUse doesn\'t have a name', () => {
 
-    const values = Object.assign({}, defaultValues, { paymentMethodInUse: {}});
+    const values = Object.assign({}, defaultValues, { paymentMethodInUse: {} });
 
     const component = mountComponent(values);
 

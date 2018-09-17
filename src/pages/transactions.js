@@ -16,8 +16,7 @@ import withIntl from '../lib/withIntl';
 import withLoggedInUser from '../lib/withLoggedInUser';
 
 class TransactionsPage extends React.Component {
-
-  static getInitialProps ({ query: { collectiveSlug } }) {
+  static getInitialProps({ query: { collectiveSlug } }) {
     return { slug: collectiveSlug };
   }
 
@@ -42,14 +41,16 @@ class TransactionsPage extends React.Component {
     const { data } = this.props;
     const { LoggedInUser } = this.state;
 
-    if (!data.Collective) return (<ErrorPage data={data} />);
+    if (!data.Collective) return <ErrorPage data={data} />;
 
     const collective = data.Collective;
-    const cta = ['USER', 'ORGANIZATION'].indexOf(collective.type) === -1 && { href: `/${collective.slug}#contribute`, label: 'contribute' };
+    const cta = ['USER', 'ORGANIZATION'].indexOf(collective.type) === -1 && {
+      href: `/${collective.slug}#contribute`,
+      label: 'contribute',
+    };
 
     return (
       <div className="TransactionsPage">
-
         <Header
           title={collective.name}
           description={collective.description}
@@ -57,36 +58,32 @@ class TransactionsPage extends React.Component {
           image={collective.image || collective.backgroundImage}
           className={this.state.status}
           LoggedInUser={LoggedInUser}
-          />
+        />
 
         <Body>
-
           <CollectiveCover
             collective={collective}
             href={`/${collective.slug}`}
             cta={cta}
             LoggedInUser={LoggedInUser}
-            />
+          />
 
-          <div className="content" >
-
+          <div className="content">
             <TransactionsWithData
               collective={collective}
               LoggedInUser={this.state.LoggedInUser}
               showCSVlink={true}
               filters={true}
-              />
-
+            />
           </div>
-
         </Body>
 
         <Footer />
-
       </div>
     );
   }
-
 }
 
-export default withData(withIntl(withLoggedInUser(addCollectiveCoverData(TransactionsPage))));
+export default withData(
+  withIntl(withLoggedInUser(addCollectiveCoverData(TransactionsPage))),
+);

@@ -14,7 +14,7 @@ const SearchInput = styled(Box)`
     border: none;
     font-size: 1.2rem;
     letter-spacing: 0.1rem;
-    ${fontSize}
+    ${fontSize};
   }
 `;
 
@@ -33,12 +33,12 @@ const SearchForm = ({ fontSize }) => (
       justifyContent="space-between"
       p={1}
     >
-      <SearchInput 
+      <SearchInput
         is="input"
-        type="search" 
-        name="q" 
-        placeholder="Search Open Collective" 
-        py={1} 
+        type="search"
+        name="q"
+        placeholder="Search Open Collective"
+        py={1}
         pl={3}
         width={1}
         fontSize={fontSize}

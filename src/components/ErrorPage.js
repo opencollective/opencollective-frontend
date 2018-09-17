@@ -10,7 +10,6 @@ import Loading from './Loading';
 import NotFound from './NotFound';
 
 class ErrorPage extends React.Component {
-
   static propTypes = {
     message: PropTypes.string,
     loading: PropTypes.bool,
@@ -22,14 +21,27 @@ class ErrorPage extends React.Component {
     super(props);
 
     this.messages = defineMessages({
-      'loading': { id: 'page.loading', defaultMessage: 'Loading' },
-      'loading.description': { id: 'page.loading.description', defaultMessage: 'Please wait...' },
-      'collective.is.not.host': { id: 'page.error.collective.is.not.host', defaultMessage: 'This page is only for hosts' },
-      'networkError': { id: 'page.error.networkError', defaultMessage: 'The Open Collective Server is momentarily unreachable 🙀' },
-      'networkError.description': { id: 'page.error.networkError.description', defaultMessage: 'Worry not! One of our engineers is probably already on it  👩🏻‍💻👨🏿‍💻. Please try again later. Thank you for your patience 🙏 (and sorry for the inconvenience!)' },
-      'unknown': { id: 'page.error.unknown', defaultMessage: 'Unknown error' },
+      loading: { id: 'page.loading', defaultMessage: 'Loading' },
+      'loading.description': {
+        id: 'page.loading.description',
+        defaultMessage: 'Please wait...',
+      },
+      'collective.is.not.host': {
+        id: 'page.error.collective.is.not.host',
+        defaultMessage: 'This page is only for hosts',
+      },
+      networkError: {
+        id: 'page.error.networkError',
+        defaultMessage:
+          'The Open Collective Server is momentarily unreachable 🙀',
+      },
+      'networkError.description': {
+        id: 'page.error.networkError.description',
+        defaultMessage:
+          'Worry not! One of our engineers is probably already on it  👩🏻‍💻👨🏿‍💻. Please try again later. Thank you for your patience 🙏 (and sorry for the inconvenience!)',
+      },
+      unknown: { id: 'page.error.unknown', defaultMessage: 'Unknown error' },
     });
-
   }
 
   getErrorComponent() {
@@ -60,41 +72,42 @@ class ErrorPage extends React.Component {
     const { intl } = this.props;
     return (
       <div>
-        <style jsx>{`
-          h1 {
-            text-align:center;
-            padding: 10rem;
-          }
-          p {
-            text-align: center;
-            max-width: 600px;
-            margin: -5rem auto 10rem;
-          }
-        `}</style>
+        <style jsx>
+          {`
+            h1 {
+              text-align: center;
+              padding: 10rem;
+            }
+            p {
+              text-align: center;
+              max-width: 600px;
+              margin: -5rem auto 10rem;
+            }
+          `}
+        </style>
         <h1>{intl.formatMessage(this.messages[this.message])}</h1>
         {this.component}
-        { this.messages[`${this.message}.description`] &&
-          <p>{intl.formatMessage(this.messages[`${this.message}.description`])}</p>
-        }
+        {this.messages[`${this.message}.description`] && (
+          <p>
+            {intl.formatMessage(this.messages[`${this.message}.description`])}
+          </p>
+        )}
       </div>
-    )
+    );
   }
 
   render() {
-
     const component = this.getErrorComponent();
 
     return (
       <div className="ErrorPage">
         <Header />
         <Body>
-          <div className="content">
-            { component }
-          </div>
+          <div className="content">{component}</div>
         </Body>
         <Footer />
       </div>
-    )
+    );
   }
 }
 

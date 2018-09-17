@@ -2,8 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Error from './Error';
 import withIntl from '../lib/withIntl';
-import { graphql } from 'react-apollo'
-import gql from 'graphql-tag'
+import { graphql } from 'react-apollo';
+import gql from 'graphql-tag';
 import CollectiveCard from './CollectiveCard';
 import { Button } from 'react-bootstrap';
 import { FormattedMessage } from 'react-intl';
@@ -11,7 +11,6 @@ import { FormattedMessage } from 'react-intl';
 const COLLECTIVE_CARDS_PER_PAGE = 10;
 
 class HostsWithData extends React.Component {
-
   static propTypes = {
     tags: PropTypes.arrayOf(PropTypes.string), // only fetch collectives that have those tags
     onChange: PropTypes.func,
@@ -45,117 +44,124 @@ class HostsWithData extends React.Component {
   }
 
   refetch(role) {
-    this.setState({role});
-    this.props.refetch({role});
+    this.setState({ role });
+    this.props.refetch({ role });
   }
 
   render() {
     const { data } = this.props;
 
     if (data.error) {
-      console.error("graphql error>>>", data.error.message);
-      return (<Error message="GraphQL error" />)
+      console.error('graphql error>>>', data.error.message);
+      return <Error message="GraphQL error" />;
     }
     if (!data.allHosts || !data.allHosts.collectives) {
-      return (<div />);
+      return <div />;
     }
     const collectives = [...data.allHosts.collectives];
     if (collectives.length === 0) {
-      return (<div className="empty" style={{ marginTop: '1rem' }}>{this.props.empty || ''}</div>);
+      return (
+        <div className="empty" style={{ marginTop: '1rem' }}>
+          {this.props.empty || ''}
+        </div>
+      );
     }
 
     const limit = this.props.limit || COLLECTIVE_CARDS_PER_PAGE * 2;
     return (
-      <div className="HostsContainer" ref={(node) => this.node = node}>
-        <style jsx>{`
-          :global(.loadMoreBtn) {
-            margin: 1rem;
-            text-align: center;
-          }
-          .filter {
-            width: 100%;
-            max-width: 400px;
-            margin: 0 auto;
-          }
-          :global(.filterBtnGroup) {
-            width: 100%;
-          }
-          :global(.filterBtn) {
-            width: 33%;
-          }
-          .Hosts {
-            display: flex;
-            flex-wrap: wrap;
-            flex-direction: row;
-            justify-content: center;   
-            overflow: hidden;
-            margin: 1rem 0;
-          }
-          .HostsContainer :global(.CollectiveCard) {
-            margin: 1rem;
-          }
-        `}</style>
+      <div className="HostsContainer" ref={node => (this.node = node)}>
+        <style jsx>
+          {`
+            :global(.loadMoreBtn) {
+              margin: 1rem;
+              text-align: center;
+            }
+            .filter {
+              width: 100%;
+              max-width: 400px;
+              margin: 0 auto;
+            }
+            :global(.filterBtnGroup) {
+              width: 100%;
+            }
+            :global(.filterBtn) {
+              width: 33%;
+            }
+            .Hosts {
+              display: flex;
+              flex-wrap: wrap;
+              flex-direction: row;
+              justify-content: center;
+              overflow: hidden;
+              margin: 1rem 0;
+            }
+            .HostsContainer :global(.CollectiveCard) {
+              margin: 1rem;
+            }
+          `}
+        </style>
 
         <div className="Hosts cardsList">
-          { collectives.map((collective) =>
-            (<CollectiveCard
-              key={collective.id}
-              collective={collective}
-              />)
-          )}
+          {collectives.map(collective => (
+            <CollectiveCard key={collective.id} collective={collective} />
+          ))}
         </div>
-        { collectives.length % 10 === 0 && collectives.length >= limit &&
-          <div className="loadMoreBtn">
-            <Button bsStyle="default" onClick={this.fetchMore}>
-              {this.state.loading && <FormattedMessage id="loading" defaultMessage="loading" />}
-              {!this.state.loading && <FormattedMessage id="loadMore" defaultMessage="load more" />}
-            </Button>
-          </div>
-        }
+        {collectives.length % 10 === 0 &&
+          collectives.length >= limit && (
+            <div className="loadMoreBtn">
+              <Button bsStyle="default" onClick={this.fetchMore}>
+                {this.state.loading && (
+                  <FormattedMessage id="loading" defaultMessage="loading" />
+                )}
+                {!this.state.loading && (
+                  <FormattedMessage id="loadMore" defaultMessage="load more" />
+                )}
+              </Button>
+            </div>
+          )}
       </div>
     );
   }
-
 }
 
 const getHostsQuery = gql`
-query allHosts(
-  $tags: [String],
-  $currency: String,
-  $limit: Int,
-  $offset: Int,
-  $orderBy: HostCollectiveOrderFieldType,
-  $orderDirection: OrderDirection
+  query allHosts(
+    $tags: [String]
+    $currency: String
+    $limit: Int
+    $offset: Int
+    $orderBy: HostCollectiveOrderFieldType
+    $orderDirection: OrderDirection
   ) {
-  allHosts(
-    tags: $tags,
-    currency: $currency,
-    limit: $limit,
-    offset: $offset,
-    orderBy: $orderBy,
-    orderDirection: $orderDirection
+    allHosts(
+      tags: $tags
+      currency: $currency
+      limit: $limit
+      offset: $offset
+      orderBy: $orderBy
+      orderDirection: $orderDirection
     ) {
-    total
-    collectives {
-      id
-      type
-      createdAt
-      slug
-      name
-      description
-      longDescription
-      image
-      currency
-      backgroundImage
-      stats {
+      total
+      collectives {
         id
-        collectives {
-          hosted
+        type
+        createdAt
+        slug
+        name
+        description
+        longDescription
+        image
+        currency
+        backgroundImage
+        stats {
+          id
+          collectives {
+            hosted
+          }
         }
       }
     }
   }
-}
 `;
 
 export const addHostsData = graphql(getHostsQuery, {
@@ -173,22 +179,23 @@ export const addHostsData = graphql(getHostsQuery, {
   },
   props: ({ data, ownProps }) => ({
     data,
-    fetchMore: () => data.fetchMore({
-      variables: {
-        offset: data.allHosts.collectives.length,
-        limit: ownProps.limit || COLLECTIVE_CARDS_PER_PAGE,
-      },
-      updateQuery: (previousResult, { fetchMoreResult }) => {
-        if (!fetchMoreResult) return previousResult;
-        // Update the results object with new entries
-        const { __typename, total, collectives } = previousResult.allHosts;
-        const all = collectives.concat(fetchMoreResult.allHosts.collectives);
-        return Object.assign({}, previousResult, {
-          allHosts: { __typename, total, collectives: all } });
-      },
-    }),
+    fetchMore: () =>
+      data.fetchMore({
+        variables: {
+          offset: data.allHosts.collectives.length,
+          limit: ownProps.limit || COLLECTIVE_CARDS_PER_PAGE,
+        },
+        updateQuery: (previousResult, { fetchMoreResult }) => {
+          if (!fetchMoreResult) return previousResult;
+          // Update the results object with new entries
+          const { __typename, total, collectives } = previousResult.allHosts;
+          const all = collectives.concat(fetchMoreResult.allHosts.collectives);
+          return Object.assign({}, previousResult, {
+            allHosts: { __typename, total, collectives: all },
+          });
+        },
+      }),
   }),
 });
-
 
 export default addHostsData(withIntl(HostsWithData));

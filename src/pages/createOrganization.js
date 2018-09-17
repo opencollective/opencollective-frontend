@@ -9,7 +9,6 @@ import withIntl from '../lib/withIntl';
 import withLoggedInUser from '../lib/withLoggedInUser';
 
 class CreateOrganizationPage extends React.Component {
-
   static propTypes = {
     getLoggedInUser: PropTypes.func.isRequired, // from withLoggedInUser
   };
@@ -27,7 +26,7 @@ class CreateOrganizationPage extends React.Component {
 
   render() {
     if (this.state.loading) {
-      return (<ErrorPage loading />);
+      return <ErrorPage loading />;
     }
 
     return (

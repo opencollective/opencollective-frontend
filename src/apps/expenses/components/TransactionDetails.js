@@ -23,9 +23,9 @@ class TransactionDetails extends React.Component {
     this.messages = defineMessages({
       'hostFeeInHostCurrency': { id: 'transaction.hostFeeInHostCurrency', defaultMessage: '{hostFeePercent} host fee' },
       'platformFeeInHostCurrency': { id: 'transaction.platformFeeInHostCurrency', defaultMessage: '5% Open Collective fee' },
-      'paymentProcessorFeeInHostCurrency': { id: 'transaction.paymentProcessorFeeInHostCurrency', defaultMessage: 'payment processor fee' }
+      'paymentProcessorFeeInHostCurrency': { id: 'transaction.paymentProcessorFeeInHostCurrency', defaultMessage: 'payment processor fee' },
     });
-    this.currencyStyle = { style: 'currency', currencyDisplay: 'symbol', minimumFractionDigits: 0, maximumFractionDigits: 2};
+    this.currencyStyle = { style: 'currency', currencyDisplay: 'symbol', minimumFractionDigits: 0, maximumFractionDigits: 2 };
   }
 
   render() {
@@ -42,8 +42,8 @@ class TransactionDetails extends React.Component {
         if (transaction[feeName]) {
           amountDetails.push(`${intl.formatNumber(transaction[feeName] / 100, { currency: transaction.hostCurrency, ...this.currencyStyle })} (${intl.formatMessage(this.messages[feeName], { hostFeePercent })})`);
         }
-      })
-    }
+      });
+    };
 
     addFees(['hostFeeInHostCurrency', 'platformFeeInHostCurrency', 'paymentProcessorFeeInHostCurrency']);
 
@@ -97,7 +97,8 @@ class TransactionDetails extends React.Component {
               max-height: 30rem;
             }
           }
-        `}</style>
+        `}
+        </style>
 
         {type === 'debit' &&
           <div className="frame">
@@ -141,7 +142,7 @@ class TransactionDetails extends React.Component {
                 value={transaction.netAmountInCollectiveCurrency / 100}
                 currency={transaction.currency}
                 {...this.currencyStyle}
-                />
+              />
             </span>
             &nbsp;
             <span className="netAmountInCollectiveCurrencyDescription">
@@ -165,7 +166,7 @@ class TransactionDetails extends React.Component {
               <RefundTransactionBtn
                 transaction={transaction}
                 collective={collective}
-                />
+              />
             </div> }
         </div>
 

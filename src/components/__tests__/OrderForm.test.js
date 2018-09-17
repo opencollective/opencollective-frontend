@@ -1,4 +1,4 @@
-import { ApolloProvider } from 'react-apollo'
+import { ApolloProvider } from 'react-apollo';
 import React from 'react';
 import OrderForm from '../OrderForm';
 import sinon from 'sinon';
@@ -16,14 +16,14 @@ const getStripeToken = sinon.stub(stripe, 'getStripeToken').callsFake(() => {
     card: {
       country: 'US',
       brand: 'VISA',
-      funding: 'credit'
-    }
-  }
-})
+      funding: 'credit',
+    },
+  };
+});
 
 sinon.stub(api, 'checkUserExistence').callsFake(() => Promise.resolve(false));
 
-describe("OrderForm component", () => {
+describe('OrderForm component', () => {
 
   const tiers = {
     donor: {
@@ -31,20 +31,20 @@ describe("OrderForm component", () => {
       slug: 'donors',
       presets: [1000, 5000, 25000],
       currency: 'USD',
-      button: 'donate'
+      button: 'donate',
     },
     backer: {
       name: 'backer',
       amount: 1000,
-      interval: 'month'
-    }
-  }
+      interval: 'month',
+    },
+  };
   const collective = {
     host: {
-      name: "host name",
-      slug: "host"
-    }
-  }
+      name: 'host name',
+      slug: 'host',
+    },
+  };
   const order = {
     totalAmount: 1000,
     interval: 'month',
@@ -53,19 +53,19 @@ describe("OrderForm component", () => {
 
   const expectValue = (component, className, value) => {
     expect(component.find(`.${className} .value`).text()).toEqual(value);
-  }
+  };
 
   const fillValue = (component, field, value) => {
     const c = component.find({ name: field }).hostNodes();
     c.simulate('change', { target: { value } });
-  }
+  };
 
   const mountComponent = (props, queryStub) => mount(
     <ApolloProvider
       client={{
-        query: queryStub || Promise.resolve
+        query: queryStub || Promise.resolve,
       }}
-      >
+    >
       <IntlProvider locale="en">
         <OrderForm {...props} />
       </IntlProvider>
@@ -78,21 +78,21 @@ describe("OrderForm component", () => {
     if (component) {
       component.unmount();
     }
-  })
+  });
 
   describe('error messages', () => {
 
     it('error.email.invalid', (done) => {
-      component = mountComponent({ collective, order })
+      component = mountComponent({ collective, order });
       fillValue(component, 'email', 'testuser');
       setTimeout(() => {
         component.find('.submit button').simulate('click');
         const errorNode = component.find('.result .error').hostNodes();
-        expect(errorNode.text()).toEqual("Invalid email address");
+        expect(errorNode.text()).toEqual('Invalid email address');
         done();
       }, 500);
     });
-  })
+  });
 
   describe('not logged in', () => {
 
@@ -101,20 +101,20 @@ describe("OrderForm component", () => {
 
       const onSubmit = (order) => {
         expect(getStripeToken.callCount).toEqual(1);
-        expect(order.user).toEqual({...LoggedInUser });
+        expect(order.user).toEqual({ ...LoggedInUser });
         expect(order.totalAmount).toEqual(tiers.donor.presets[2]);
         done();
-      }
+      };
 
       const LoggedInUser = {
         email: 'xavier@opencollective.com',
         firstName: 'Xavier',
         lastName: 'Damman',
         twitterHandle: 'xdamman',
-        description: 'entrepreneur'
+        description: 'entrepreneur',
       };
 
-      component = mountComponent({ collective, order, onSubmit })
+      component = mountComponent({ collective, order, onSubmit });
 
       expect(component.find('input[type="email"]').exists()).toBeTrue;
       for (const prop in LoggedInUser) {
@@ -149,12 +149,12 @@ describe("OrderForm component", () => {
             role: 'ADMIN',
             collective: {
               id: 7,
-              name: "Tipbox"
-            }
-          }
+              name: 'Tipbox',
+            },
+          },
         ],
         collective: {
-          name: "Xavier Damman",
+          name: 'Xavier Damman',
           paymentMethods: [
             {
               uuid: '8cbb6e96-aee5-482e-a027-cf242e12a139',
@@ -162,11 +162,11 @@ describe("OrderForm component", () => {
               data: {
                 brand: 'visa',
                 expMonth: 12,
-                expYear: 2022
-              }
-            }
-          ]
-        }
+                expYear: 2022,
+              },
+            },
+          ],
+        },
       };
 
       const onSubmit = (order) => {
@@ -175,15 +175,15 @@ describe("OrderForm component", () => {
           id: LoggedInUser.id,
           paymentMethod: {
             save: true,
-            uuid: LoggedInUser.paymentMethods[0].uuid
-          }
+            uuid: LoggedInUser.paymentMethods[0].uuid,
+          },
         });
         expect(order.publicMessage).toEqual('public message');
         expect(order.totalAmount).toEqual(order.totalAmount);
         done();
-      }
+      };
 
-      component = mountComponent({ collective, order, onSubmit, LoggedInUser })
+      component = mountComponent({ collective, order, onSubmit, LoggedInUser });
       component.setProps({ LoggedInUser });
 
       expect(component.find('input[type="email"]').exists()).toBeFalse;
@@ -199,7 +199,7 @@ describe("OrderForm component", () => {
       setTimeout(() => {
         component.find('.submit button').simulate('click');
         setTimeout(() => {
-          console.log(">>> result: ", component.find('.result').html());
+          console.log('>>> result: ', component.find('.result').html());
         }, 500);
       }, 2000);
     });
@@ -209,7 +209,7 @@ describe("OrderForm component", () => {
 
     it('gives invalid error', (done) => {
 
-      component = mountComponent({ collective, order }, () => Promise.resolve({ data: null}));
+      component = mountComponent({ collective, order }, () => Promise.resolve({ data: null }));
 
       component.find('.gift-card-expander').simulate('click');
       fillValue(component, 'ocCard', 'BB-FTC1900');
@@ -228,9 +228,9 @@ describe("OrderForm component", () => {
           ocPaymentMethod: {
             balance: 5000,
             valid: true,
-            currency: 'USD'
-          }
-      }}));
+            currency: 'USD',
+          },
+      } }));
 
       component.find('.gift-card-expander').simulate('click');
       fillValue(component, 'ocCard', 'BB-FTC1900');
@@ -241,7 +241,7 @@ describe("OrderForm component", () => {
         expect(component.find('.inputField.ocCard').html()).toContain('Valid code. Amount available: $50.00');
         done();
       }, 1000);
-    })
+    });
 
   });
 });

@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import InputField from './InputField';
 
 class InputFieldPresets extends React.Component {
-
   static propTypes = {
     defaultValue: PropTypes.arrayOf(PropTypes.number),
     pre: PropTypes.string,
@@ -13,7 +12,7 @@ class InputFieldPresets extends React.Component {
   constructor(props) {
     super(props);
     this.maxLength = 5;
-    const values = props.defaultValue ? [ ...props.defaultValue] : [ 1000 ];
+    const values = props.defaultValue ? [...props.defaultValue] : [1000];
     this.state = { values };
     this.onChange = this.onChange.bind(this);
     this.handleChange = this.handleChange.bind(this);
@@ -42,38 +41,37 @@ class InputFieldPresets extends React.Component {
         value={this.state.values[index]}
         pre={this.props.pre}
         onChange={val => this.handleChange(index, val)}
-        />
+      />
     );
   }
 
   render() {
-    const values = [ ...this.state.values ];
+    const values = [...this.state.values];
     if (values.length < this.maxLength) {
       values.push(null);
     }
     return (
       <div className="InputFieldPresets">
-        <style jsx>{`
-          .values {
-            display: flex;
-          }
-          .InputFieldPresets :global(.inputField) {
-            max-width: 14rem;
-            margin: 0;
-          }
-          .InputFieldPresets :global(.form-group) {
-            margin-bottom: 0;
-            margin-left: 0;
-            margin-right: 1rem;
-          }
-        `}</style>
-        <div className="values">
-          { values.map(this.renderSingleInput) }
-        </div>
+        <style jsx>
+          {`
+            .values {
+              display: flex;
+            }
+            .InputFieldPresets :global(.inputField) {
+              max-width: 14rem;
+              margin: 0;
+            }
+            .InputFieldPresets :global(.form-group) {
+              margin-bottom: 0;
+              margin-left: 0;
+              margin-right: 1rem;
+            }
+          `}
+        </style>
+        <div className="values">{values.map(this.renderSingleInput)}</div>
       </div>
     );
   }
-
 }
 
 export default InputFieldPresets;

@@ -4,7 +4,7 @@ export function truncate(str, length) {
   if (!str || typeof str !== 'string' || str.length <= length) {
     return str;
   }
-  const subString = str.substr(0, length-1);
+  const subString = str.substr(0, length - 1);
   return `${subString.substr(0, subString.lastIndexOf(' '))} …`;
 }
 
@@ -21,10 +21,12 @@ export function trimObject(obj) {
 /**
  * Gives the number of days between two dates
  */
-export const days = (d1, d2 = new Date) => {
-  const oneDay = 24*60*60*1000; // hours*minutes*seconds*milliseconds
-  return Math.round(Math.abs((new Date(d1).getTime() - new Date(d2).getTime())/(oneDay)));
-}
+export const days = (d1, d2 = new Date()) => {
+  const oneDay = 24 * 60 * 60 * 1000; // hours*minutes*seconds*milliseconds
+  return Math.round(
+    Math.abs((new Date(d1).getTime() - new Date(d2).getTime()) / oneDay),
+  );
+};
 
 export function filterCollection(array, cond, inverse) {
   if (!array || !cond) return array;
@@ -32,44 +34,54 @@ export function filterCollection(array, cond, inverse) {
   const test = (obj, cond, depth = 0) => {
     if (depth > 5) return false;
     if (!obj) return false;
-    if (cond instanceof RegExp)
-      return Boolean(obj.match(cond));
-    if (typeof cond === 'string')
-      return obj === cond;
+    if (cond instanceof RegExp) return Boolean(obj.match(cond));
+    if (typeof cond === 'string') return obj === cond;
 
     const nextKey = Object.keys(cond)[0];
     return test(obj[nextKey], cond[nextKey], ++depth);
-  }
+  };
 
-  return array.filter((r) => inverse ? !test(r, cond) : test(r, cond))
+  return array.filter(r => (inverse ? !test(r, cond) : test(r, cond)));
 }
 
-export const isValidUrl = (url) => {
+export const isValidUrl = url => {
   if (typeof url !== 'string') return false;
-  return Boolean(url.match(/^(?:([A-Za-z]+):)?(\/{0,3})([0-9.\-A-Za-z]+)(?::(\d+))?(?:\/([^?#]*))?(?:\?([^#]*))?(?:#(.*))?$/));
-}
+  return Boolean(
+    url.match(
+      /^(?:([A-Za-z]+):)?(\/{0,3})([0-9.\-A-Za-z]+)(?::(\d+))?(?:\/([^?#]*))?(?:\?([^#]*))?(?:#(.*))?$/,
+    ),
+  );
+};
 
-export const isValidEmail = (email) => {
+export const isValidEmail = email => {
   if (typeof email !== 'string') return false;
-  return email.match(/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/);
+  return email.match(
+    /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+  );
 };
 
 export function getCurrencySymbol(currency) {
- const r = Number(0).toLocaleString(currency, { style: 'currency', currency, minimumFractionDigits: 0, maximumFractionDigits: 0});
- return r.replace(/0$/,'');
+  const r = Number(0).toLocaleString(currency, {
+    style: 'currency',
+    currency,
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  });
+  return r.replace(/0$/, '');
 }
 
 /** Retrieve variables set in the environment */
-export const getEnvVar = (v) => (process.browser)
-  ? get(window, ['__NEXT_DATA__', 'env', v])
-  : get(process, ['env', v]);
+export const getEnvVar = v =>
+  process.browser
+    ? get(window, ['__NEXT_DATA__', 'env', v])
+    : get(process, ['env', v]);
 
 export const getBaseImagesUrl = () => getEnvVar('IMAGES_URL');
 
 export function resizeImage(imageUrl, { width, height, query, baseUrl }) {
   if (!imageUrl) return null;
   if (imageUrl.substr(0, 1) === '/') return imageUrl; // if image is a local image, we don't resize it with the proxy.
-  if (imageUrl.substr(0,4).toLowerCase() !== 'http') return null; // Invalid imageUrl;
+  if (imageUrl.substr(0, 4).toLowerCase() !== 'http') return null; // Invalid imageUrl;
   if (!query && imageUrl.match(/\.svg$/)) return imageUrl; // if we don't need to transform the image, no need to proxy it.
   let queryurl = '';
   if (query) {
@@ -79,20 +91,24 @@ export function resizeImage(imageUrl, { width, height, query, baseUrl }) {
     if (height) queryurl += `&height=${height}`;
   }
 
-  return `${getBaseImagesUrl() || baseUrl || ''}/proxy/images/?src=${encodeURIComponent(imageUrl)}${queryurl}`;
+  return `${getBaseImagesUrl() ||
+    baseUrl ||
+    ''}/proxy/images/?src=${encodeURIComponent(imageUrl)}${queryurl}`;
 }
 
 export function isValidImageUrl(src) {
-  return src && (src.substr(0,1) === '/' || src.substr(0,4).toLowerCase() === 'http');
+  return (
+    src &&
+    (src.substr(0, 1) === '/' || src.substr(0, 4).toLowerCase() === 'http')
+  );
 }
 
 export function imagePreview(src, defaultImage, options = { width: 640 }) {
-
   if (typeof options.width === 'string') {
-    options.width = Number(options.width.replace(/rem/,'')) * 10;
+    options.width = Number(options.width.replace(/rem/, '')) * 10;
   }
   if (typeof options.height === 'string') {
-    options.height = Number(options.height.replace(/rem/,'')) * 10;
+    options.height = Number(options.height.replace(/rem/, '')) * 10;
   }
 
   if (src) return resizeImage(src, options);
@@ -102,7 +118,10 @@ export function imagePreview(src, defaultImage, options = { width: 640 }) {
 
 export function prettyUrl(url) {
   if (!url) return '';
-  return url.replace(/^https?:\/\/(www\.)?/i,'').replace(/\?.+/, '').replace(/\/$/,'');
+  return url
+    .replace(/^https?:\/\/(www\.)?/i, '')
+    .replace(/\?.+/, '')
+    .replace(/\/$/, '');
 }
 
 function getLocaleFromCurrency(currency) {
@@ -123,35 +142,34 @@ function getLocaleFromCurrency(currency) {
 export function getQueryParams() {
   const urlParams = {};
   let match;
-  const pl     = /\+/g,  // Regex for replacing addition symbol with a space
-        search = /([^&=]+)=?([^&]*)/g,
-        decode = function (s) {
- return decodeURIComponent(s.replace(pl, " "));
-},
-        query  = window.location.search.substring(1);
+  const pl = /\+/g, // Regex for replacing addition symbol with a space
+    search = /([^&=]+)=?([^&]*)/g,
+    decode = function(s) {
+      return decodeURIComponent(s.replace(pl, ' '));
+    },
+    query = window.location.search.substring(1);
 
   // eslint-disable-next-line no-cond-assign
-  while (match = search.exec(query)) {
+  while ((match = search.exec(query))) {
     urlParams[decode(match[1])] = decode(match[2]);
   }
   return urlParams;
 }
 
-
 // source: https://stackoverflow.com/questions/8498592/extract-hostname-name-from-string
 function extractHostname(url) {
   let hostname;
-  //find & remove protocol (http, ftp, etc.) and get hostname
+  // find & remove protocol (http, ftp, etc.) and get hostname
 
-  if (url.indexOf("://") > -1) {
-      hostname = url.split('/')[2];
+  if (url.indexOf('://') > -1) {
+    hostname = url.split('/')[2];
   } else {
-      hostname = url.split('/')[0];
+    hostname = url.split('/')[0];
   }
 
-  //find & remove port number
+  // find & remove port number
   hostname = hostname.split(':')[0];
-  //find & remove "?"
+  // find & remove "?"
   hostname = hostname.split('?')[0];
 
   return hostname;
@@ -159,24 +177,28 @@ function extractHostname(url) {
 
 export function getDomain(url = '') {
   let domain = extractHostname(url);
-  const splitArr = domain.split('.'), arrLen = splitArr.length;
+  const splitArr = domain.split('.'),
+    arrLen = splitArr.length;
 
-  //extracting the root domain here
-  //if there is a subdomain
+  // extracting the root domain here
+  // if there is a subdomain
   if (arrLen > 2) {
-      domain = `${splitArr[arrLen - 2]  }.${  splitArr[arrLen - 1]}`;
-      //check to see if it's using a Country Code Top Level Domain (ccTLD) (i.e. ".me.uk")
-      if (splitArr[arrLen - 1].length == 2 && splitArr[arrLen - 1].length == 2) {
-          //this is using a ccTLD
-          domain = `${splitArr[arrLen - 3]  }.${  domain}`;
-      }
+    domain = `${splitArr[arrLen - 2]}.${splitArr[arrLen - 1]}`;
+    // check to see if it's using a Country Code Top Level Domain (ccTLD) (i.e. ".me.uk")
+    if (splitArr[arrLen - 1].length == 2 && splitArr[arrLen - 1].length == 2) {
+      // this is using a ccTLD
+      domain = `${splitArr[arrLen - 3]}.${domain}`;
+    }
   }
   return domain;
 }
 
 export function formatDate(date, options = { month: 'long', year: 'numeric' }) {
   const d = new Date(date);
-  const locale = (typeof window !== 'undefined') ? window.navigator.language : options.locale || 'en-US';
+  const locale =
+    typeof window !== 'undefined'
+      ? window.navigator.language
+      : options.locale || 'en-US';
   return d.toLocaleDateString(locale, options);
 }
 
@@ -187,7 +209,7 @@ export function formatCurrency(amount, currency = 'USD', options = {}) {
   let maximumFractionDigits = 2;
 
   if (options.hasOwnProperty('minimumFractionDigits')) {
-    minimumFractionDigits = options.minimumFractionDigits
+    minimumFractionDigits = options.minimumFractionDigits;
   } else if (options.hasOwnProperty('precision')) {
     minimumFractionDigits = options.precision;
     maximumFractionDigits = options.precision;
@@ -196,19 +218,19 @@ export function formatCurrency(amount, currency = 'USD', options = {}) {
   return amount.toLocaleString(getLocaleFromCurrency(currency), {
     style: 'currency',
     currency,
-    minimumFractionDigits : minimumFractionDigits,
-    maximumFractionDigits : maximumFractionDigits
-  })
+    minimumFractionDigits: minimumFractionDigits,
+    maximumFractionDigits: maximumFractionDigits,
+  });
 }
 
-export const singular = (str) => {
+export const singular = str => {
   if (!str) return '';
-  return str.replace(/ies$/,'y').replace(/s$/,'');
-}
+  return str.replace(/ies$/, 'y').replace(/s$/, '');
+};
 
 export const pluralize = (str, n) => {
-  return (n > 1) ? `${str}s` : str;
-}
+  return n > 1 ? `${str}s` : str;
+};
 
 export const getBaseApiUrl = ({ internal } = {}) => {
   if (process.browser) {
@@ -225,22 +247,25 @@ export const getGraphqlUrl = () => {
   return `${getBaseApiUrl()}/graphql${apiKey ? `?api_key=${apiKey}` : ''}`;
 };
 
-export const translateApiUrl = (url) => {
-  const withoutParams = getBaseApiUrl({ internal : true }) + (url.replace('/api/', '/'));
-  const hasParams = `${url}`.match(/\?/)
+export const translateApiUrl = url => {
+  const withoutParams =
+    getBaseApiUrl({ internal: true }) + url.replace('/api/', '/');
+  const hasParams = `${url}`.match(/\?/);
   if (process.env.API_KEY) {
-    return `${withoutParams}${hasParams ? '&' : '?'}api_key=${process.env.API_KEY}`;
+    return `${withoutParams}${hasParams ? '&' : '?'}api_key=${
+      process.env.API_KEY
+    }`;
   } else {
     return withoutParams;
   }
 };
 
-export const capitalize = (str) => {
+export const capitalize = str => {
   if (typeof str !== 'string') return '';
   str = str.trim();
   if (str.length === 0) return '';
   return `${str[0].toUpperCase()}${str.substr(1)}`;
-}
+};
 
 export const trim = (str, length) => {
   if (!str) return '';
@@ -250,14 +275,14 @@ export const trim = (str, length) => {
   const res = [];
   let res_length = 0;
   const words = str.split(' ');
-  let i=0;
+  let i = 0;
   while (res_length < length && i < words.length) {
     const w = words[i++];
     res_length += w.length + 1;
     res.push(w);
   }
   return `${res.join(' ')} …`;
-}
+};
 
 export const firstSentence = (str, length) => {
   if (!str) return '';
@@ -271,7 +296,7 @@ export const firstSentence = (str, length) => {
   }
   str = trim(str, length);
   return str;
-}
+};
 
 /*
 * Shortens a number to the abbreviated thousands, millions, billions, etc
@@ -285,27 +310,24 @@ export const firstSentence = (str, length) => {
 * abbreviateNumber(12345, 1)
 */
 
-const SI_PREFIXES = ["", "k", "M", "G", "T", "P", "E"];
+const SI_PREFIXES = ['', 'k', 'M', 'G', 'T', 'P', 'E'];
 
 export const abbreviateNumber = (number, precision = 0) => {
+  // what tier? (determines SI prefix)
+  const tier = (Math.log10(number) / 3) | 0;
 
-    // what tier? (determines SI prefix)
-    const tier = Math.log10(number) / 3 | 0;
+  const round = value => {
+    return precision === 0 ? Math.round(value) : value.toFixed(precision);
+  };
 
-    const round = (value) => {
-      return precision === 0
-      ? Math.round(value)
-      : value.toFixed(precision);
-    };
+  // if zero, we don't need a prefix
+  if (tier == 0) return round(number);
 
-    // if zero, we don't need a prefix
-    if (tier == 0) return round(number);
+  // get prefix and determine scale
+  const scale = Math.pow(10, tier * 3);
 
-    // get prefix and determine scale
-    const scale = Math.pow(10, tier * 3);
+  // scale the number
+  const scaled = number / scale;
 
-    // scale the number
-    const scaled = number / scale;
-
-    return round(scaled) + SI_PREFIXES[tier];
+  return round(scaled) + SI_PREFIXES[tier];
 };

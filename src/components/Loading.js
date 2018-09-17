@@ -11,7 +11,7 @@ const Loading = () => {
         </Flex>
       </Flex>
     </div>
-  )
+  );
 };
 
 export default Loading;

@@ -17,7 +17,7 @@ class Transaction extends React.Component {
     collective: PropTypes.object,
     transaction: PropTypes.object,
     LoggedInUser: PropTypes.object,
-  }
+  };
 
   constructor(props) {
     super(props);
@@ -31,13 +31,13 @@ class Transaction extends React.Component {
       'refund.meta': { id: 'transaction.refund.meta', defaultMessage: 'Refunded to {name}, paid on {createdAt, date, medium}' },
       'credit.meta': { id: 'transaction.credit.meta', defaultMessage: 'Donation made by {name} on {createdAt, date, medium}' },
       'closeDetails': { id: 'transaction.closeDetails', defaultMessage: 'Close Details' },
-      'viewDetails': { id: 'transaction.viewDetails', defaultMessage: 'View Details' }
+      'viewDetails': { id: 'transaction.viewDetails', defaultMessage: 'View Details' },
     });
-    this.currencyStyle = { style: 'currency', currencyDisplay: 'symbol', minimumFractionDigits: 2, maximumFractionDigits: 2};
+    this.currencyStyle = { style: 'currency', currencyDisplay: 'symbol', minimumFractionDigits: 2, maximumFractionDigits: 2 };
   }
 
   toggleDetails() {
-    this.setState({loadDetails: true, view: this.state.view === 'details' ? 'compact' : 'details'})
+    this.setState({ loadDetails: true, view: this.state.view === 'details' ? 'compact' : 'details' });
   }
 
   render() {
@@ -50,14 +50,14 @@ class Transaction extends React.Component {
 
     let title = transaction.description;
     if (type === 'credit' && (!title || !title.match(/Matching/) && title.match(/donation to /i) && !title.match(/Refund/))) {
-      title = intl.formatMessage(this.messages['credit.title'], {collective: collective.name, interval: get(transaction, 'subscription.interval')})
+      title = intl.formatMessage(this.messages['credit.title'], { collective: collective.name, interval: get(transaction, 'subscription.interval') });
     }
 
     const meta = [];
     meta.push(transaction.category);
     meta.push(intl.formatMessage(this.messages[`${messageType}.meta`], { name: transaction.fromCollective.name, createdAt: new Date(transaction.createdAt) }));
 
-    const amount = (["USER", "ORGANIZATION"].indexOf(collective.type) !== -1) ? transaction.netAmountInCollectiveCurrency : transaction.amount;
+    const amount = (['USER', 'ORGANIZATION'].indexOf(collective.type) !== -1) ? transaction.netAmountInCollectiveCurrency : transaction.amount;
 
     return (
       <div className={`transaction ${type} ${this.state.view}View`}>
@@ -124,7 +124,8 @@ class Transaction extends React.Component {
               max-height: 30rem;
             }
           }
-        `}</style>
+        `}
+        </style>
         <div className="fromCollective">
           <Link route={transaction.fromCollective.path} title={transaction.fromCollective.name}>
             <Avatar src={transaction.fromCollective.image} key={transaction.fromCollective.id} id={transaction.fromCollective.id} radius={40} />
@@ -146,14 +147,14 @@ class Transaction extends React.Component {
               transaction={transaction}
               collective={collective}
               mode={this.state.view === 'details' ? 'open' : 'closed'}
-              />}
+            />}
         </div>
         <div className="amount">
           <FormattedNumber
             value={amount / 100}
             currency={transaction.currency}
             {...this.currencyStyle}
-            />
+          />
         </div>
       </div>
     );

@@ -3,11 +3,10 @@ import PropTypes from 'prop-types';
 import CollectiveCard from './CollectiveCard';
 
 class Membership extends React.Component {
-
   static propTypes = {
     membership: PropTypes.object.isRequired,
-    LoggedInUser: PropTypes.object
-  }
+    LoggedInUser: PropTypes.object,
+  };
 
   constructor(props) {
     super(props);
@@ -18,22 +17,29 @@ class Membership extends React.Component {
     const { collective } = membership;
 
     if (!collective) {
-      console.error(">>> no collective attached to this membership:", membership);
+      console.error(
+        '>>> no collective attached to this membership:',
+        membership,
+      );
       return <div />;
     }
 
-    const name = ((collective.name && collective.name.match(/^null/)) ? null : collective.name) || collective.slug;
+    const name =
+      (collective.name && collective.name.match(/^null/)
+        ? null
+        : collective.name) || collective.slug;
 
-    if (!name) return (<div />);
+    if (!name) return <div />;
 
     return (
       <React.Fragment>
-        <style jsx>{`
-        .Membership {
-          float: left;
-          margin: 1rem;
-        }
-        `}
+        <style jsx>
+          {`
+            .Membership {
+              float: left;
+              margin: 1rem;
+            }
+          `}
         </style>
 
         <div className="Membership">
@@ -41,12 +47,11 @@ class Membership extends React.Component {
             membership={membership}
             collective={collective}
             LoggedInUser={LoggedInUser}
-            />
+          />
         </div>
       </React.Fragment>
-    )
+    );
   }
-
 }
 
 export default Membership;

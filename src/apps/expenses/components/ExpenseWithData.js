@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import gql from 'graphql-tag'
-import { graphql } from 'react-apollo'
-import { FormattedMessage } from 'react-intl'
+import gql from 'graphql-tag';
+import { graphql } from 'react-apollo';
+import { FormattedMessage } from 'react-intl';
 
 import Error from '../../../components/Error';
 import withIntl from '../../../lib/withIntl';
@@ -23,7 +23,7 @@ class ExpenseWithData extends React.Component {
     allowPayAction: PropTypes.bool,
     lockPayAction: PropTypes.func,
     unlockPayAction: PropTypes.func,
-  }
+  };
 
   constructor(props) {
     super(props);
@@ -41,8 +41,8 @@ class ExpenseWithData extends React.Component {
     } = this.props;
 
     if (data.error) {
-      console.error("graphql error>>>", data.error.message);
-      return (<Error message="GraphQL error" />)
+      console.error('graphql error>>>', data.error.message);
+      return (<Error message="GraphQL error" />);
     }
 
     if (data.loading) {
@@ -71,7 +71,7 @@ class ExpenseWithData extends React.Component {
             expense={expense}
             collective={collective}
             LoggedInUser={LoggedInUser}
-            />
+          />
         }
 
       </div>

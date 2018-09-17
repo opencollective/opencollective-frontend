@@ -13,7 +13,7 @@ import {
   space,
   textAlign,
   width,
-} from 'styled-system'; 
+} from 'styled-system';
 import { whiteSpace } from './Text';
 
 const StyledLink = styled.a`

@@ -4,10 +4,9 @@ import SignInUp from './SignInUp';
 import { FormattedMessage } from 'react-intl';
 
 class InterestedForm extends React.Component {
-
   static propTypes = {
-    onSubmit: PropTypes.func
-  }
+    onSubmit: PropTypes.func,
+  };
 
   constructor(props) {
     super(props);
@@ -23,25 +22,37 @@ class InterestedForm extends React.Component {
   render() {
     return (
       <div className="InterestedPane">
-        <style jsx>{`
-          .InterestedPane {
-            position: absolute;
-            display: flex;
-            justify-content: center;
-            width: 100%;
-          }
-          .InterestedForm {
-            width: 100%;
-            background: white;
-            max-width: 500px;
-            box-shadow: 0px 2px 4px rgba(0,0,0,0.1);
-            border-radius: 0px 0px 10px 10px;
-            margin: 0px auto 40px auto;
-            padding: 10px 20px 20px 20px;
-          }
-        `}</style>
+        <style jsx>
+          {`
+            .InterestedPane {
+              position: absolute;
+              display: flex;
+              justify-content: center;
+              width: 100%;
+            }
+            .InterestedForm {
+              width: 100%;
+              background: white;
+              max-width: 500px;
+              box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+              border-radius: 0px 0px 10px 10px;
+              margin: 0px auto 40px auto;
+              padding: 10px 20px 20px 20px;
+            }
+          `}
+        </style>
         <div className="InterestedForm">
-          <SignInUp label={(<FormattedMessage id="InterestedForm.RemindMe" defaultMessage="remind me" />)} emailOnly={true} showLabels={false} onSubmit={this.handleSubmit} />
+          <SignInUp
+            label={
+              <FormattedMessage
+                id="InterestedForm.RemindMe"
+                defaultMessage="remind me"
+              />
+            }
+            emailOnly={true}
+            showLabels={false}
+            onSubmit={this.handleSubmit}
+          />
         </div>
       </div>
     );

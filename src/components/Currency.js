@@ -10,7 +10,7 @@ const Currency = ({
   currency,
   precision = 0,
   value,
-  ...styles,
+  ...styles
 }) => (
   <FormattedNumber
     value={value / 100}
@@ -20,9 +20,15 @@ const Currency = ({
     minimumFractionDigits={precision}
     maximumFractionDigits={precision}
   >
-    {formattedNumber => abbreviate ?
-      <Span {...styles}>{formattedNumber.slice(0, 1)}{abbreviateNumber(value/100, precision)}</Span>
-      : <Span {...styles}>{formattedNumber}</Span>
+    {formattedNumber =>
+      abbreviate ? (
+        <Span {...styles}>
+          {formattedNumber.slice(0, 1)}
+          {abbreviateNumber(value / 100, precision)}
+        </Span>
+      ) : (
+        <Span {...styles}>{formattedNumber}</Span>
+      )
     }
   </FormattedNumber>
 );
