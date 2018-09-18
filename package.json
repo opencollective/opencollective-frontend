@@ -109,7 +109,7 @@
     "commit": "git-cz",
     "semantic-release": "semantic-release",
     "cypress": "TZ=UTC cypress run",
-    "prettier": "prettier src/**/*.js test/**/*.js --write"
+    "prettier": "prettier \"src/**/*.js\" \"test/**/*.js\" --write"
   },
   "devDependencies": {
     "@babel/cli": "7.0.0-beta.42",
