@@ -24,8 +24,8 @@ import * as utils from '../graphql/utils';
 const { Activity, Notification, Collective, ConnectedAccount, User } = models;
 
 const allTransactionsQuery = `
-  query allTransactions($collectiveSlug: String!, $limit: Int, $offset: Int, $type: String) {
-    allTransactions(collectiveSlug: $collectiveSlug, limit: $limit, offset: $offset, type: $type) {
+  query allTransactions($collectiveSlug: String!, $limit: Int, $offset: Int, $type: String, $includeVirtualCards: Boolean ) {
+    allTransactions(collectiveSlug: $collectiveSlug, limit: $limit, offset: $offset, type: $type, includeVirtualCards: $includeVirtualCards) {
       id
       uuid
       type
