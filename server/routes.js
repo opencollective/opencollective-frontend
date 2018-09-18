@@ -11,10 +11,14 @@ import getHomePage from './controllers/homepage';
 import uploadImage from './controllers/images';
 import * as mw from './controllers/middlewares';
 import * as notifications from './controllers/notifications';
+<<<<<<< HEAD
 import {
   getPaymentMethods,
   createPaymentMethod,
 } from './controllers/paymentMethods';
+=======
+import { getPaymentMethods, createPaymentMethod, getPaymentMethodTransactions } from './controllers/paymentMethods';
+>>>>>>> feat: add 2 endpoints: to get transactions from a give collective slug and to get transactions from a given payment method
 import * as test from './controllers/test';
 import * as users from './controllers/users';
 import * as applications from './controllers/applications';
@@ -194,11 +198,17 @@ export default app => {
   app.delete('/users/:userid/payment-methods/:paymentMethodid', NotImplemented); // Delete a user's paymentMethod.
 
   /**
-   * Credit paymentMethod.
-   *
-   *  Let's assume for now a paymentMethod is linked to a user.
-   */
-  app.post('/v1/payment-methods', createPaymentMethod); // Creates a payment method.
+  * Create a payment method.
+  *
+  *  Let's assume for now a paymentMethod is linked to a user.
+  */
+  app.post('/v1/payment-methods', createPaymentMethod);
+
+ /**
+  * Get transactions of a collective given its slug.
+  *
+  */
+ app.get('/v1/collectives/:collectiveSlug/transactions', collectives.getCollectiveTransactions);
 
   /**
    * Collectives.
