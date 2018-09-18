@@ -1,7 +1,7 @@
 /**
  * Dependencies.
  */
-import { pick, omit } from 'lodash';
+import { get, pick, omit } from 'lodash';
 import async from 'async';
 import {
   defaultHostCollective,
@@ -19,8 +19,48 @@ import errors from '../lib/errors';
 import debugLib from 'debug';
 import config from 'config';
 import prependHttp from 'prepend-http';
+import * as utils from '../graphql/utils';
 
 const { Activity, Notification, Collective, ConnectedAccount, User } = models;
+
+const allTransactionsQuery = `
+  query allTransactions($collectiveSlug: String!, $limit: Int, $offset: Int, $type: String) {
+    allTransactions(collectiveSlug: $collectiveSlug, limit: $limit, offset: $offset, type: $type) {
+      id
+      uuid
+      type
+      amount
+      currency
+      hostCurrency
+      hostCurrencyFxRate
+      hostFeeInHostCurrency
+      platformFeeInHostCurrency
+      paymentProcessorFeeInHostCurrency
+      netAmountInCollectiveCurrency
+      createdAt
+      updatedAt
+      host {
+        id
+        slug
+      }
+      createdByUser {
+        id
+        email
+      }
+      fromCollective {
+        id
+        slug
+      }
+      collective {
+        id
+        slug
+      }
+      paymentMethod {
+        id
+      }
+    }
+  }
+`;
 
 const _addUserToCollective = (collective, user, options) => {
   const checkIfCollectiveHasHost = () => {
@@ -658,4 +698,23 @@ export const getTransactions = (req, res, next) => {
       );
     })
     .catch(next);
+};
+
+/**
+ * Get array of all transactions of a collective given its slug
+ */
+export const getCollectiveTransactions = (req, res) => {
+  const args = req.query;
+  args.collectiveSlug = get(req, 'params.collectiveSlug');
+  return utils.graphqlQuery(allTransactionsQuery, req.query)
+  .then(response => {
+    if (response.errors) {
+      throw new Error(response.errors[0]);
+    }
+    const result = get(response, 'data.allTransactions', []);
+    res.send({ result });
+  })
+  .catch(error => {
+    res.status(400).send({ error: error.toString() });
+  });
 };
