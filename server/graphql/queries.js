@@ -3,7 +3,6 @@ import config from 'config';
 import Promise from 'bluebird';
 
 import errors from '../lib/errors';
-
 import {
   GraphQLList,
   GraphQLNonNull,
@@ -252,7 +251,7 @@ const queries = {
       if (args.includeVirtualCards) {
         // find all Payment methods of CollectiveId
         const collectivePaymentMethodsIds = await models.PaymentMethod.findAll({
-          where: { CollectiveId },
+          where: { CollectiveId: CollectiveId },
         }).map(pm => pm.id);
         // find all Virtual Cards with SourcePaymentMethodId included in Collective Payment methods
         const virtualCardsMadeByCollectivePaymentMethodsIds = await models.PaymentMethod.findAll({
@@ -261,8 +260,10 @@ const queries = {
         // either find through collective id or through query: OR:[CollectiveId, virtualcards]
         query.where.CollectiveId = CollectiveId;
         if (virtualCardsMadeByCollectivePaymentMethodsIds.length > 0) {
-          // find Collective Payment methods + Virtual cards created by the collective
-          query.where = { [Op.or]: [ { CollectiveId: CollectiveId }, { PaymentMethodId: virtualCardsMadeByCollectivePaymentMethodsIds }] };
+          query.where = sequelize.or(
+            { CollectiveId: CollectiveId },
+            { PaymentMethodId: virtualCardsMadeByCollectivePaymentMethodsIds }
+          );
         }
       }
       if (CollectiveId && !args.includeVirtualCards) query.where.CollectiveId = CollectiveId;
