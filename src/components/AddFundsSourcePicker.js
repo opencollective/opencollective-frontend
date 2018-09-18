@@ -39,25 +39,14 @@ class AddFundsSourcePicker extends React.Component {
     this.props.onChange(FromCollectiveId);
   }
 
-  renderSeparator(type) {
-    if (!this.fromCollectivesByType[type]) return;
+  getGroupLabel(type) {
     const { intl } = this.props;
 
-    let label = intl.formatMessage(this.messages[type.toLowerCase()], {
-      n: this.fromCollectivesByType[type].length,
-    });
-    if (label.length % 2 !== 0) {
-      label += ' ';
-    }
-
-    let dashes = '';
-    for (let i = 0; i < (40 - label.length) / 2; i++) {
-      dashes += '-';
-    }
-
-    return (
-      <option value="">{`${dashes} ${label.toUpperCase()} ${dashes}`}</option>
-    );
+    return intl
+      .formatMessage(this.messages[type.toLowerCase()], {
+        n: this.fromCollectivesByType[type].length,
+      })
+      .toUpperCase();
   }
 
   renderSourceEntry(fromCollective) {
@@ -96,32 +85,44 @@ class AddFundsSourcePicker extends React.Component {
         placeholder="select"
         onChange={this.onChange}
       >
-        <option value={host.id}>
-          <FormattedMessage
-            id="addfunds.fromCollective.host"
-            values={{ host: host.name }}
-            defaultMessage="Host ({host})"
-          />
-        </option>
-        {this.fromCollectivesByType['COLLECTIVE'].length > 0 &&
-          this.renderSeparator('COLLECTIVE')}
-        {this.fromCollectivesByType['COLLECTIVE'].map(this.renderSourceEntry)}
+        <FormattedMessage
+          id="addfunds.fromCollective.host"
+          values={{ host: host.name }}
+          defaultMessage="Host ({host})"
+        >
+          {message => <option value={host.id}>{message}</option>}
+        </FormattedMessage>
 
-        {this.fromCollectivesByType['ORGANIZATION'].length > 0 &&
-          this.renderSeparator('ORGANIZATION')}
-        {this.fromCollectivesByType['ORGANIZATION'].map(this.renderSourceEntry)}
+        {this.fromCollectivesByType['COLLECTIVE'].length > 0 && (
+          <optgroup label={this.getGroupLabel('COLLECTIVE')}>
+            {this.fromCollectivesByType['COLLECTIVE'].map(
+              this.renderSourceEntry,
+            )}
+          </optgroup>
+        )}
 
-        {this.fromCollectivesByType['USER'].length > 0 &&
-          this.renderSeparator('USER')}
-        {this.fromCollectivesByType['USER'].map(this.renderSourceEntry)}
+        {this.fromCollectivesByType['ORGANIZATION'].length > 0 && (
+          <optgroup label={this.getGroupLabel('ORGANIZATION')}>
+            {this.fromCollectivesByType['ORGANIZATION'].map(
+              this.renderSourceEntry,
+            )}
+          </optgroup>
+        )}
 
-        <option value="">---------------</option>
-        <option value="other">
+        {this.fromCollectivesByType['USER'].length > 0 && (
+          <optgroup label={this.getGroupLabel('USER')}>
+            {this.fromCollectivesByType['USER'].map(this.renderSourceEntry)}
+          </optgroup>
+        )}
+
+        <optgroup label="OTHER">
           <FormattedMessage
             id="addfunds.fromCollective.other"
             defaultMessage="other (please specify)"
-          />
-        </option>
+          >
+            {message => <option value="other">{message}</option>}
+          </FormattedMessage>
+        </optgroup>
       </FormControl>
     );
   }
@@ -195,6 +196,12 @@ export const AddFundsSourcePickerWithData = withIntl(
 );
 
 export const AddFundsSourcePickerForUserWithData = withIntl(
+  AddFundsSourcePickerForUser,
+);
+
+// for testing
+export const MockAddFundsSourcePicker = withIntl(AddFundsSourcePicker);
+export const MockAddFundsSourcePickerForUser = withIntl(
   AddFundsSourcePickerForUser,
 );
 
