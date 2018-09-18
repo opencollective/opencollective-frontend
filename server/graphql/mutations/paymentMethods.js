@@ -55,7 +55,7 @@ async function createVirtualPaymentMethod(args, remoteUser) {
 /** Claim the Virtual Card Payment Method By an (existing or not) user
  * @param {Object} args contains the parameters
  * @param {String} args.code The 8 last digits of the UUID
- * @param {email} args.email The email of the user claiming the virtual card
+ * @param {String} args.email The email of the user claiming the virtual card
  * @returns {models.PaymentMethod} return the virtual card payment method.
  */
 export async function claimVirtualCard(args, remoteUser) {
