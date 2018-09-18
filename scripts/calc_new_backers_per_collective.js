@@ -8,31 +8,32 @@ import moment from 'moment';
 import json2csv from 'json2csv';
 import models, { sequelize, Op } from '../server/models';
 
-
-const done = (err) => {
+const done = err => {
   if (err) console.log(err);
-  console.log('\ndone!\n');``
+  console.log('\ndone!\n');
+  ``;
   process.exit();
-}
+};
 
 const results = {};
 const arrayLength = 30;
 const outputFilename = 'backer_count_output.csv';
 
 const initiateNewCollectiveStats = (firstOrder, isNewBacker) => {
-
-  const generateMonths = (collectiveStats) => {
-    const numArray = Array.apply(null, {length: arrayLength}).map(Number.call, Number).slice(2, arrayLength);
+  const generateMonths = collectiveStats => {
+    const numArray = Array.apply(null, { length: arrayLength })
+      .map(Number.call, Number)
+      .slice(2, arrayLength);
 
     numArray.map(i => {
       collectiveStats.months[i] = {
         newBackerCount: 0,
-        oldBackerCount: 0
-      }
+        oldBackerCount: 0,
+      };
     });
 
     return collectiveStats;
-  }
+  };
 
   const collectiveStats = {
     id: firstOrder.CollectiveId,
@@ -41,12 +42,12 @@ const initiateNewCollectiveStats = (firstOrder, isNewBacker) => {
       1: {
         date: firstOrder.createdAt,
         newBackerCount: isNewBacker ? 1 : 0,
-        oldBackerCount: isNewBacker ? 0 : 1
-      }
-    }
-  }
+        oldBackerCount: isNewBacker ? 0 : 1,
+      },
+    },
+  };
   const newCollectiveStats = generateMonths(collectiveStats);
-  console.log("newCollectiveStats", newCollectiveStats);
+  console.log('newCollectiveStats', newCollectiveStats);
   return newCollectiveStats;
 };
 
@@ -63,19 +64,18 @@ const countOrderInStats = (order, isNewBacker) => {
 
   if (diff < 0) diff = 0;
 
-  const month = Math.floor(diff / 1000 / 3600 / 24 / 30) % 30 + 1;
+  const month = (Math.floor(diff / 1000 / 3600 / 24 / 30) % 30) + 1;
 
-  console.log("month", month);
+  console.log('month', month);
 
   if (isNewBacker) {
     orderStats.months[`${month}`].newBackerCount += 1;
   } else {
     orderStats.months[`${month}`].oldBackerCount += 1;
   }
-}
+};
 
 const calculateBackersPerCollective = () => {
-
   const seenFromCollectiveIdList = {};
 
   return models.Order.findAll({
@@ -84,77 +84,89 @@ const calculateBackersPerCollective = () => {
         [Op.not]: null
       }*/
       CollectiveId: {
-        [Op.notIn]: [ 1 ]
+        [Op.notIn]: [1],
       },
     },
     include: [
       { model: models.Collective, as: 'fromCollective', paranoid: false },
-      { model: models.Collective, as: 'collective', paranoid: false }
+      { model: models.Collective, as: 'collective', paranoid: false },
     ],
-    order: ['id']
+    order: ['id'],
   })
-  .tap(orders => console.log('Orders found: ', orders.length))
-  .each(order => {
-    if (order.FromCollectiveId in seenFromCollectiveIdList) {
-      // means this is now an old backer
-      if (order.CollectiveId in results) {
-        //results[order.CollectiveId]['oldBackerCount'] += 1;
-        countOrderInStats(order, false);
+    .tap(orders => console.log('Orders found: ', orders.length))
+    .each(order => {
+      if (order.FromCollectiveId in seenFromCollectiveIdList) {
+        // means this is now an old backer
+        if (order.CollectiveId in results) {
+          //results[order.CollectiveId]['oldBackerCount'] += 1;
+          countOrderInStats(order, false);
+        } else {
+          //results[order.CollectiveId] = { id: order.CollectiveId, slug: order.collective.slug, newBackerCount: 0, oldBackerCount: 1};
+          results[order.CollectiveId] = initiateNewCollectiveStats(
+            order,
+            false,
+          );
+        }
       } else {
-        //results[order.CollectiveId] = { id: order.CollectiveId, slug: order.collective.slug, newBackerCount: 0, oldBackerCount: 1};
-        results[order.CollectiveId] = initiateNewCollectiveStats(order, false);
+        // means this is a new backer
+        seenFromCollectiveIdList[order.FromCollectiveId] = true;
+        if (order.CollectiveId in results) {
+          //results[order.CollectiveId]['newBackerCount'] += 1;
+          countOrderInStats(order, true);
+        } else {
+          // results[order.CollectiveId] = { id: order.CollectiveId, slug: order.collective.slug, newBackerCount: 1, oldBackerCount: 0};
+          results[order.CollectiveId] = initiateNewCollectiveStats(order, true);
+        }
       }
-    } else {
-      // means this is a new backer
-      seenFromCollectiveIdList[order.FromCollectiveId] = true;
-      if (order.CollectiveId in results) {
-        //results[order.CollectiveId]['newBackerCount'] += 1;
-        countOrderInStats(order, true);
-      } else {
-        // results[order.CollectiveId] = { id: order.CollectiveId, slug: order.collective.slug, newBackerCount: 1, oldBackerCount: 0};
-        results[order.CollectiveId] = initiateNewCollectiveStats(order, true);
-      }
-    }
-  })
-  .then(() => {
-    let csvFields = ['id', 'slug'];
-    const array = Array.apply(null, {length: arrayLength}).map(Number.call, Number).slice(0, -1);
+    })
+    .then(() => {
+      let csvFields = ['id', 'slug'];
+      const array = Array.apply(null, { length: arrayLength })
+        .map(Number.call, Number)
+        .slice(0, -1);
 
-    array.map(n => csvFields = csvFields.concat([`month${n+1}NewBackerCount`, `month${n+1}OldBackerCount`]));
+      array.map(
+        n =>
+          (csvFields = csvFields.concat([
+            `month${n + 1}NewBackerCount`,
+            `month${n + 1}OldBackerCount`,
+          ])),
+      );
 
-    console.log(csvFields);
+      console.log(csvFields);
 
-    //console.log(results);
+      //console.log(results);
 
-    console.log(array);
+      console.log(array);
 
-    const data = Object.keys(results).map(key => {
-      const obj = { id: results[key].id, slug: results[key].slug};
-      array.map(n => {
-        console.log(`${n+1}`, results[key].months[`${n+1}`]);
-        obj[`month${n+1}NewBackerCount`] = results[key].months[`${n+1}`].newBackerCount;
-        obj[`month${n+1}OldBackerCount`] = results[key].months[`${n+1}`].oldBackerCount;
-      })
-      return obj;
+      const data = Object.keys(results).map(key => {
+        const obj = { id: results[key].id, slug: results[key].slug };
+        array.map(n => {
+          console.log(`${n + 1}`, results[key].months[`${n + 1}`]);
+          obj[`month${n + 1}NewBackerCount`] =
+            results[key].months[`${n + 1}`].newBackerCount;
+          obj[`month${n + 1}OldBackerCount`] =
+            results[key].months[`${n + 1}`].oldBackerCount;
+        });
+        return obj;
+      });
+
+      console.log('data', data);
+
+      json2csv({ data, fields: csvFields }, (err, csv) => {
+        console.log('Writing the output to', outputFilename);
+        if (err) console.log(err);
+        fs.writeFileSync(outputFilename, csv);
+      });
     });
-
-    console.log('data', data);
-
-    json2csv({ data, fields: csvFields }, (err, csv) => {
-      console.log('Writing the output to', outputFilename);
-      if (err) console.log(err);
-      fs.writeFileSync(outputFilename, csv)
-    });
-  })
-
-}
+};
 
 const run = () => {
-  console.log('\nStarting calc_new_backers_per_collective...')
+  console.log('\nStarting calc_new_backers_per_collective...');
 
   return calculateBackersPerCollective()
-  .then(() => done())
-  .catch(done)
-}
+    .then(() => done())
+    .catch(done);
+};
 
 run();

@@ -5,11 +5,11 @@
 import models, { sequelize } from '../server/models';
 import { createFromPaidExpense as createTransactionFromPaidExpense } from '../server/lib/transactions';
 
-const done = (err) => {
+const done = err => {
   if (err) console.log('err', err);
   console.log('done!');
   process.exit();
-}
+};
 
 const expensesFixed = [];
 
@@ -18,7 +18,9 @@ function run() {
     Find all expenses that are paid, with payout method 'manual' or 'other'
     and don't have an entry in the Transactions table.
    */
-  return sequelize.query(`
+  return sequelize
+    .query(
+      `
     SELECT 
       e.id AS id
     FROM "Expenses" e
@@ -29,32 +31,45 @@ function run() {
       AND e."deletedAt" IS NULL 
       AND (e."payoutMethod" ILIKE 'other' OR e."payoutMethod" ILIKE 'manual')
     ORDER BY "ExpenseId" DESC, e."updatedAt"
-    `, { type: sequelize.QueryTypes.SELECT})
-  .then(expenses => {
-    console.log("Expenses found", expenses.length)
-    return expenses
-  })
-  .each(expenseId => {
-    let expense;
-    return models.Expense.findOne({
-      where: {
-        id: expenseId.id
-      },
-      include: [{
-        model: models.Collective,
-        as: 'collective'
-      }]
+    `,
+      { type: sequelize.QueryTypes.SELECT },
+    )
+    .then(expenses => {
+      console.log('Expenses found', expenses.length);
+      return expenses;
     })
-    .then(e => {
-      expense = e;
-      return e.collective.getHostCollective() 
+    .each(expenseId => {
+      let expense;
+      return models.Expense.findOne({
+        where: {
+          id: expenseId.id,
+        },
+        include: [
+          {
+            model: models.Collective,
+            as: 'collective',
+          },
+        ],
+      })
+        .then(e => {
+          expense = e;
+          return e.collective.getHostCollective();
+        })
+        .then(host =>
+          createTransactionFromPaidExpense(
+            host,
+            null,
+            expense,
+            null,
+            null,
+            expense.UserId,
+          ),
+        )
+        .then(() => expensesFixed.push(expenseId));
     })
-    .then(host => createTransactionFromPaidExpense(host, null, expense, null, null, expense.UserId))
-    .then(() => expensesFixed.push(expenseId))
-  })
-  .then(() => console.log("Expenses fixed: ", expensesFixed.length))
-  .then(() => done())
-  .catch(done)
+    .then(() => console.log('Expenses fixed: ', expensesFixed.length))
+    .then(() => done())
+    .catch(done);
 }
 
 run();

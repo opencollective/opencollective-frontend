@@ -1,13 +1,13 @@
 'use strict';
 
 module.exports = {
-  up: function (queryInterface, DataTypes) {
+  up: function(queryInterface, DataTypes) {
     return queryInterface.addColumn('Transactions', 'data', {
-      type: DataTypes.JSON
+      type: DataTypes.JSON,
     });
   },
 
-  down: function (queryInterface, Sequelize) {
+  down: function(queryInterface, Sequelize) {
     return queryInterface.removeColumn('Transactions', 'data');
-  }
+  },
 };

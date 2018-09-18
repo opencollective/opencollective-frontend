@@ -18,7 +18,11 @@ import { get } from 'lodash';
  */
 async function getBalance(paymentMethod) {
   if (!libpayments.isProvider('opencollective.prepaid', paymentMethod)) {
-    throw new Error(`Expected opencollective.prepaid but got ${paymentMethod.service}.${paymentMethod.type}`);
+    throw new Error(
+      `Expected opencollective.prepaid but got ${paymentMethod.service}.${
+        paymentMethod.type
+      }`,
+    );
   }
   /* Result will be negative (We're looking for DEBIT transactions) */
   const spent = await libtransactions.sum({
@@ -41,23 +45,32 @@ async function getBalance(paymentMethod) {
  */
 async function processOrder(order) {
   const user = order.createdByUser;
-  const { paymentMethod: { data } } = order;
+  const {
+    paymentMethod: { data },
+  } = order;
   // Making sure the paymentMethod has the information we need to
   // process a prepaid card
   if (!get(data, 'HostCollectiveId'))
-    throw new Error('Prepaid payment method must have a value for `data.HostCollectiveId`');
+    throw new Error(
+      'Prepaid payment method must have a value for `data.HostCollectiveId`',
+    );
 
   // Check that target Collective's Host is same as gift card issuer
   const hostCollective = await order.collective.getHostCollective();
   if (hostCollective.id !== data.HostCollectiveId)
-    throw new Error('Prepaid method can only be used in collectives from the same host');
+    throw new Error(
+      'Prepaid method can only be used in collectives from the same host',
+    );
 
   // Use the above payment method to donate to Collective
   const hostFeeInHostCurrency = libpayments.calcFee(
     order.totalAmount,
-    order.collective.hostFeePercent);
+    order.collective.hostFeePercent,
+  );
   const platformFeeInHostCurrency = libpayments.calcFee(
-    order.totalAmount, OC_FEE_PERCENT);
+    order.totalAmount,
+    OC_FEE_PERCENT,
+  );
   const transactions = await models.Transaction.createFromPayload({
     CreatedByUserId: user.id,
     FromCollectiveId: order.FromCollectiveId,
@@ -74,14 +87,19 @@ async function processOrder(order) {
       hostFeeInHostCurrency,
       platformFeeInHostCurrency,
       paymentProcessorFeeInHostCurrency: 0,
-      description: order.description
-    }
+      description: order.description,
+    },
   });
 
   // add roles
-  await order.collective.findOrAddUserWithRole({ id: user.id, CollectiveId: order.fromCollective.id}, roles.BACKER, {
-    CreatedByUserId: user.id, TierId: order.TierId,
-  });
+  await order.collective.findOrAddUserWithRole(
+    { id: user.id, CollectiveId: order.fromCollective.id },
+    roles.BACKER,
+    {
+      CreatedByUserId: user.id,
+      TierId: order.TierId,
+    },
+  );
 
   // Mark order row as processed
   await order.update({ processedAt: new Date() });
@@ -96,7 +114,7 @@ async function processOrder(order) {
 export default {
   features: {
     recurring: true,
-    waitToCharge: false
+    waitToCharge: false,
   },
   getBalance,
   processOrder,

@@ -7,25 +7,27 @@ import emailLib from '../lib/email';
 const debug = libdebug('express');
 
 const sendErrorByEmail = (req, err) => {
-  let errorHTML = 'To reproduce this error, run this CURL command:<br />\n<br />\n';
+  let errorHTML =
+    'To reproduce this error, run this CURL command:<br />\n<br />\n';
 
-  if (req.body.password)
-    req.body.password = '***********';
+  if (req.body.password) req.body.password = '***********';
 
   if (req.body.passwordConfirmation)
     req.body.passwordConfirmation = '***********';
 
   errorHTML += curlify(req, req.body);
-  errorHTML += "<br />\n<br />\n";
-  errorHTML += "Error: <br />\n";
+  errorHTML += '<br />\n<br />\n';
+  errorHTML += 'Error: <br />\n';
   errorHTML += JSON.stringify(err);
 
-  emailLib.sendMessage(
-    'server-errors@opencollective.com',
-    `[${req.app.set('env')}] Error ${err.code}: ${req.method} ${req.url}`,
-    errorHTML,
-    {bcc: ' '})
-  .catch(console.error);
+  emailLib
+    .sendMessage(
+      'server-errors@opencollective.com',
+      `[${req.app.set('env')}] Error ${err.code}: ${req.method} ${req.url}`,
+      errorHTML,
+      { bcc: ' ' },
+    )
+    .catch(console.error);
 };
 
 /**
@@ -38,7 +40,8 @@ export default (err, req, res, next) => {
 
   const { name } = err;
 
-  if (name === 'UnauthorizedError') {// because of jwt-express
+  if (name === 'UnauthorizedError') {
+    // because of jwt-express
     err.code = err.status;
   }
 
@@ -48,25 +51,35 @@ export default (err, req, res, next) => {
   const e = name && name.toLowerCase ? name.toLowerCase() : '';
 
   if (e.indexOf('validation') !== -1) {
-    err = new errors.ValidationFailed(null, _.map(err.errors, (e) => e.path), err.message);
+    err = new errors.ValidationFailed(
+      null,
+      _.map(err.errors, e => e.path),
+      err.message,
+    );
   } else if (e.indexOf('uniqueconstraint') !== -1) {
-    err = new errors.ValidationFailed(null, _.map(err.errors, (e) => e.path), 'Unique Constraint Error.');
+    err = new errors.ValidationFailed(
+      null,
+      _.map(err.errors, e => e.path),
+      'Unique Constraint Error.',
+    );
   }
 
   if (!err.code || !Number.isInteger(err.code)) {
-    const code = (err.type && err.type.indexOf('Stripe') > -1) ? 400 : 500;
+    const code = err.type && err.type.indexOf('Stripe') > -1 ? 400 : 500;
     err.code = err.status || code;
   }
 
   // only send email for important errors. When someone gets wrong jwt token or api key, it shouldn't spam us.
-  if (req.app.set('env') === 'production' &&
+  if (
+    req.app.set('env') === 'production' &&
     !(err.code === 400 && req.method === 'GET') &&
-    !(err.code === 404 && req.method === 'GET')) {
+    !(err.code === 404 && req.method === 'GET')
+  ) {
     sendErrorByEmail(req, err);
   }
 
   debug('Error Express : ', err);
   if (err.stack) debug(err.stack);
 
-  res.status(err.code).send({error: err});
+  res.status(err.code).send({ error: err });
 };

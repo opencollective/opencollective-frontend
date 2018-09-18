@@ -10,15 +10,9 @@ import errors from '../../lib/errors';
 import debug from 'debug';
 import paymentProviders from '../../paymentProviders';
 
-const {
-  User
-} = models;
+const { User } = models;
 
-const {
-  BadRequest,
-  CustomError,
-  Unauthorized
-} = errors;
+const { BadRequest, CustomError, Unauthorized } = errors;
 
 const { secret } = config.keys.opencollective;
 
@@ -42,7 +36,8 @@ const { secret } = config.keys.opencollective;
  * decodes the token (expected behaviour).
  */
 export const parseJwtNoExpiryCheck = (req, res, next) => {
-  let token = req.params.access_token || req.query.access_token || req.body.access_token;
+  let token =
+    req.params.access_token || req.query.access_token || req.body.access_token;
   if (!token) {
     const header = req.headers && req.headers.authorization;
     if (!header) return next();
@@ -78,12 +73,8 @@ export const checkJwtExpiry = (req, res, next) => {
   return next();
 };
 
-
 export function authenticateUserByJwtNoExpiry() {
-  return [
-    this.parseJwtNoExpiryCheck,
-    this._authenticateUserByJwt
-  ]
+  return [this.parseJwtNoExpiryCheck, this._authenticateUserByJwt];
 }
 
 /**
@@ -94,8 +85,7 @@ export function authenticateUserByJwtNoExpiry() {
 export const _authenticateUserByJwt = (req, res, next) => {
   if (!req.jwtPayload) return next();
   const userid = req.jwtPayload.sub;
-  User
-    .findById(userid)
+  User.findById(userid)
     .then(user => {
       if (!user) throw errors.Unauthorized(`User id ${userid} not found`);
       user.update({ seenAt: new Date() });
@@ -103,12 +93,24 @@ export const _authenticateUserByJwt = (req, res, next) => {
       return user.populateRoles();
     })
     .then(() => {
-      debug('auth')('logged in user', req.remoteUser.id, "roles:", req.remoteUser.rolesByCollectiveId);
+      debug('auth')(
+        'logged in user',
+        req.remoteUser.id,
+        'roles:',
+        req.remoteUser.rolesByCollectiveId,
+      );
 
       // Populates req.remoteUser.canEditCurrentCollective, used for GraphQL to keep track whether the remoteUser can see members' details
-      const CollectiveId = get(req, 'body.variables.collective.id') || req.params.collectiveid;
-      req.remoteUser.canEditCurrentCollective = CollectiveId && req.remoteUser.isAdmin(CollectiveId);
-      debug('auth')('Can edit current collective', CollectiveId, '?', req.remoteUser.canEditCollective);
+      const CollectiveId =
+        get(req, 'body.variables.collective.id') || req.params.collectiveid;
+      req.remoteUser.canEditCurrentCollective =
+        CollectiveId && req.remoteUser.isAdmin(CollectiveId);
+      debug('auth')(
+        'Can edit current collective',
+        CollectiveId,
+        '?',
+        req.remoteUser.canEditCollective,
+      );
       next();
       return null;
     })
@@ -125,59 +127,60 @@ export const _authenticateUserByJwt = (req, res, next) => {
 export function authenticateUser(req, res, next) {
   if (req.remoteUser && req.remoteUser.id) return next();
 
-  parseJwtNoExpiryCheck(req, res, (e) => {
+  parseJwtNoExpiryCheck(req, res, e => {
     // If a token was submitted but is invalid, we continue without authenticating the user
     if (e) {
-      debug('auth')(">>> checkJwtExpiry invalid error", e);
+      debug('auth')('>>> checkJwtExpiry invalid error', e);
       return next();
     }
 
-    checkJwtExpiry(req, res, (e) => {
+    checkJwtExpiry(req, res, e => {
       // If a token was submitted and is expired, we continue without authenticating the user
       if (e) {
-        debug('auth')(">>> checkJwtExpiry expiry error", e);
+        debug('auth')('>>> checkJwtExpiry expiry error', e);
         return next();
       }
       _authenticateUserByJwt(req, res, next);
     });
-
   });
 }
 
 export function authenticateInternalUserByJwt() {
   return (req, res, next) => {
-    parseJwtNoExpiryCheck(req, res, (e) => {
+    parseJwtNoExpiryCheck(req, res, e => {
       if (e) {
-        debug('auth')(">>> parseJwtNoExpiryCheck error", e);
+        debug('auth')('>>> parseJwtNoExpiryCheck error', e);
         return next(e);
       }
-      checkJwtExpiry(req, res, (e) => {
+      checkJwtExpiry(req, res, e => {
         if (e) {
-          debug('auth')(">>> checkJwtExpiry error", e);
+          debug('auth')('>>> checkJwtExpiry error', e);
           return next(e);
         }
-        _authenticateUserByJwt(req, res, (e) => {
+        _authenticateUserByJwt(req, res, e => {
           if (e) {
-            debug('auth')(">>> _authenticateUserByJwt error", e);
+            debug('auth')('>>> _authenticateUserByJwt error', e);
             return next(e);
           }
           _authenticateInternalUserById(req, res, next);
         });
       });
     });
-  }
+  };
 }
 
 export const _authenticateInternalUserById = (req, res, next) => {
-  if (req.jwtPayload && contains([1,2,4,5,6,7,8,30,40,212,772], req.jwtPayload.sub)) {
+  if (
+    req.jwtPayload &&
+    contains([1, 2, 4, 5, 6, 7, 8, 30, 40, 212, 772], req.jwtPayload.sub)
+  ) {
     next();
   } else {
     throw new Unauthorized();
   }
-}
+};
 
 export const authenticateService = (req, res, next) => {
-
   const { service } = req.params;
   const opts = { callbackURL: getOAuthCallbackUrl(req) };
 
@@ -193,20 +196,27 @@ export const authenticateService = (req, res, next) => {
       Update: removing public_repo as well, since technically we shouldn't need it.
     */
 
-    opts.scope = [ 'user:email', 'public_repo' ];
+    opts.scope = ['user:email', 'public_repo'];
     return passport.authenticate(service, opts)(req, res, next);
   }
 
   if (!req.remoteUser || !req.remoteUser.isAdmin(req.query.CollectiveId)) {
-    throw new errors.Unauthorized("Please login as an admin of this collective to add a connected account");
+    throw new errors.Unauthorized(
+      'Please login as an admin of this collective to add a connected account',
+    );
   }
 
   if (!req.query.CollectiveId) {
-    return next(new errors.ValidationFailed(`Please provide a CollectiveId as a query parameter`));
+    return next(
+      new errors.ValidationFailed(
+        'Please provide a CollectiveId as a query parameter',
+      ),
+    );
   }
 
   if (paymentProviders[service]) {
-    return paymentProviders[service].oauth.redirectUrl(req.remoteUser, req.query.CollectiveId, req.query)
+    return paymentProviders[service].oauth
+      .redirectUrl(req.remoteUser, req.query.CollectiveId, req.query)
       .then(redirectUrl => res.send({ redirectUrl }))
       .catch(next);
   }
@@ -216,7 +226,6 @@ export const authenticateService = (req, res, next) => {
   }
 
   return passport.authenticate(service, opts)(req, res, next);
-
 };
 
 export const authenticateServiceCallback = (req, res, next) => {
@@ -240,10 +249,19 @@ export const authenticateServiceCallback = (req, res, next) => {
         uri: 'https://api.github.com/user/emails',
         qs: { access_token: accessToken },
         headers: { 'User-Agent': 'OpenCollective' },
-        json: true
+        json: true,
       })
         .then(json => json.map(entry => entry.email))
-        .then(emails => createOrUpdateConnectedAccount(req, res, next, accessToken, data, emails))
+        .then(emails =>
+          createOrUpdateConnectedAccount(
+            req,
+            res,
+            next,
+            accessToken,
+            data,
+            emails,
+          ),
+        )
         .catch(next);
     } else {
       createOrUpdateConnectedAccount(req, res, next, accessToken, data);
@@ -253,7 +271,14 @@ export const authenticateServiceCallback = (req, res, next) => {
 
 function getOAuthCallbackUrl(req) {
   const { utm_source, CollectiveId, access_token, redirect } = req.query;
-  const params = qs.stringify({ utm_source, CollectiveId, access_token, redirect });
+  const params = qs.stringify({
+    utm_source,
+    CollectiveId,
+    access_token,
+    redirect,
+  });
   const { service } = req.params;
-  return `${config.host.website}/api/connected-accounts/${service}/callback?${params}`;
+  return `${
+    config.host.website
+  }/api/connected-accounts/${service}/callback?${params}`;
 }

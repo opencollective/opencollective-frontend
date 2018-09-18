@@ -2,51 +2,53 @@ import CustomDataTypes from './DataTypes';
 import Temporal from 'sequelize-temporal';
 
 export default (Sequelize, DataTypes) => {
+  const Subscription = Sequelize.define(
+    'Subscription',
+    {
+      amount: {
+        type: DataTypes.INTEGER,
+        validate: { min: 0 },
+      },
 
-  const Subscription = Sequelize.define('Subscription', {
+      currency: CustomDataTypes(DataTypes).currency,
 
-    amount: {
-      type: DataTypes.INTEGER,
-      validate: { min: 0 }
+      interval: {
+        type: DataTypes.STRING(8),
+        validate: {
+          isIn: {
+            args: [['month', 'year']],
+            msg: 'Must be month or year',
+          },
+        },
+      },
+
+      isActive: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+      },
+
+      nextChargeDate: DataTypes.DATE,
+
+      nextPeriodStart: DataTypes.DATE,
+
+      chargeRetryCount: DataTypes.INTEGER,
+
+      quantity: DataTypes.INTEGER,
+
+      chargeNumber: DataTypes.INTEGER,
+
+      data: DataTypes.JSON,
+
+      stripeSubscriptionId: DataTypes.STRING,
+
+      activatedAt: DataTypes.DATE,
+
+      deactivatedAt: DataTypes.DATE,
     },
-
-    currency: CustomDataTypes(DataTypes).currency,
-
-    interval: {
-      type: DataTypes.STRING(8),
-      validate: {
-        isIn: {
-          args: [['month', 'year']],
-          msg: 'Must be month or year'
-        }
-      }
+    {
+      paranoid: true,
     },
-
-    isActive: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: false
-    },
-
-    nextChargeDate: DataTypes.DATE,
-
-    nextPeriodStart: DataTypes.DATE,
-
-    chargeRetryCount: DataTypes.INTEGER,
-
-    quantity: DataTypes.INTEGER,
-
-    chargeNumber: DataTypes.INTEGER,
-
-    data: DataTypes.JSON,
-
-    stripeSubscriptionId: DataTypes.STRING,
-
-    activatedAt: DataTypes.DATE,
-
-    deactivatedAt: DataTypes.DATE
-  }, {
-    paranoid: true
-  });
+  );
 
   Subscription.prototype.activate = function() {
     this.isActive = true;
@@ -65,5 +67,3 @@ export default (Sequelize, DataTypes) => {
   Temporal(Subscription, Sequelize);
   return Subscription;
 };
-
-

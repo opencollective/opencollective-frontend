@@ -10,31 +10,45 @@ import * as utils from './utils';
 import * as store from './features/support/stores';
 
 describe('graphql.transaction.test.js', () => {
-
   before(async () => {
     await utils.resetTestDB();
     // Given a host
     const { hostCollective } = await store.newHost('wwcode', 'USD', 5);
     // Given a collective
     const { collective } = await store.newCollectiveInHost(
-      'wwcodeaustin', 'USD', hostCollective, null, { isActive: true });
+      'wwcodeaustin',
+      'USD',
+      hostCollective,
+      null,
+      { isActive: true },
+    );
     // And given the host has a stripe account
     await store.stripeConnectedAccount(hostCollective.id);
     // And given that we have 5 users making one purchase each
-    const userNames = ['Craft Work', 'Geoff Frey', 'Holly Day', 'Max Point', 'Praxent'];
+    const userNames = [
+      'Craft Work',
+      'Geoff Frey',
+      'Holly Day',
+      'Max Point',
+      'Praxent',
+    ];
     // Not using Promise.all because I want the entries to be created
     // in sequence, not in parallel since stripeOneTimeDonation can't
     // patch the same object more than once at a time.
     for (let i = 0; i < userNames.length; i++) {
       const { user, userCollective } = await store.newUser(userNames[i]);
       await store.stripeOneTimeDonation({
-        user, userCollective, collective,
+        user,
+        userCollective,
+        collective,
         currency: 'USD',
         amount: 1000 * (i + 1),
         createdAt: new Date(2018, i, i, 0, 0, i),
       });
       await store.stripeOneTimeDonation({
-        user, userCollective, collective,
+        user,
+        userCollective,
+        collective,
         currency: 'USD',
         amount: 1000 * (i + 1),
         createdAt: new Date(2017, i, i, 0, 0, i),
@@ -79,7 +93,10 @@ describe('graphql.transaction.test.js', () => {
           }
         }
       `;
-      const result = await utils.graphqlQuery(query, { slug: "WWCodeAustin", limit });
+      const result = await utils.graphqlQuery(query, {
+        slug: 'WWCodeAustin',
+        limit,
+      });
       expect(result.data.Collective).to.exist;
       expect(result.data.Collective.transactions).to.have.length(10);
       expect(result).to.matchSnapshot();
@@ -87,7 +104,6 @@ describe('graphql.transaction.test.js', () => {
   });
 
   describe('return transactions', () => {
-
     it('returns one transaction ', async () => {
       const query = `
         query Transaction($id: Int!) {
@@ -133,7 +149,11 @@ describe('graphql.transaction.test.js', () => {
           }
         }
       `;
-      const result = await utils.graphqlQuery(query, { CollectiveId: 3, limit, type: 'CREDIT' });
+      const result = await utils.graphqlQuery(query, {
+        CollectiveId: 3,
+        limit,
+        type: 'CREDIT',
+      });
       expect(result.data.allTransactions).to.have.length(10);
       expect(result).to.matchSnapshot();
     });
@@ -220,7 +240,11 @@ describe('graphql.transaction.test.js', () => {
           }
         }
       `;
-      const result = await utils.graphqlQuery(query, { CollectiveId: 3, limit, offset });
+      const result = await utils.graphqlQuery(query, {
+        CollectiveId: 3,
+        limit,
+        offset,
+      });
       expect(result).to.matchSnapshot();
     });
 

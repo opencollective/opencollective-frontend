@@ -1,27 +1,28 @@
 'use strict';
 
 module.exports = {
-  up: function (queryInterface, Sequelize) {
+  up: function(queryInterface, Sequelize) {
     return queryInterface.createTable(
-      'Donations', {
+      'Donations',
+      {
         id: {
           type: Sequelize.INTEGER,
           primaryKey: true,
-          autoIncrement: true
+          autoIncrement: true,
         },
 
         UserId: {
           type: Sequelize.INTEGER,
-          references: {key: 'id', model: 'Users' },
+          references: { key: 'id', model: 'Users' },
           onDelete: 'SET NULL',
-          onUpdate: 'CASCADE'
+          onUpdate: 'CASCADE',
         },
 
         GroupId: {
           type: Sequelize.INTEGER,
-          references: {key: 'id', model: 'Groups'},
+          references: { key: 'id', model: 'Groups' },
           onDelete: 'SET NULL',
-          onUpdate: 'CASCADE'
+          onUpdate: 'CASCADE',
         },
 
         currency: {
@@ -31,7 +32,7 @@ module.exports = {
             if (val && val.toUpperCase) {
               this.setDataValue('currency', val.toUpperCase());
             }
-          }
+          },
         },
 
         amount: Sequelize.INTEGER,
@@ -39,30 +40,32 @@ module.exports = {
 
         SubscriptionId: {
           type: Sequelize.INTEGER,
-          references: {key: 'id', model: 'Subscriptions'},
+          references: { key: 'id', model: 'Subscriptions' },
           onDelete: 'SET NULL',
-          onUpdate: 'CASCADE'
+          onUpdate: 'CASCADE',
         },
 
         createdAt: {
           type: Sequelize.DATE,
-          defaultValue: Sequelize.NOW
+          defaultValue: Sequelize.NOW,
         },
 
         updatedAt: {
           type: Sequelize.DATE,
-          defaultValue: Sequelize.NOW
+          defaultValue: Sequelize.NOW,
         },
 
         deletedAt: {
-          type: Sequelize.DATE
-        }
-      }, {
-        paranoid: true
-      });
+          type: Sequelize.DATE,
+        },
+      },
+      {
+        paranoid: true,
+      },
+    );
   },
 
-  down: function (queryInterface) {
+  down: function(queryInterface) {
     return queryInterface.dropTable('Donations');
-  }
+  },
 };

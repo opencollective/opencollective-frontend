@@ -21,11 +21,24 @@ import { exec } from 'child_process';
  * @param {string} name of the file under the `/dumps` directory.
  */
 export async function loadDB(name) {
-  const fullPath = path.join(__dirname, '..', '..', 'test', 'dbdumps', `${name}.pgsql`);
+  const fullPath = path.join(
+    __dirname,
+    '..',
+    '..',
+    'test',
+    'dbdumps',
+    `${name}.pgsql`,
+  );
   const { database, username, password, host, port } = getDBConf('database');
   const cmd = format(
     '/usr/bin/pg_restore --no-acl --no-owner --clean --schema=public --if-exists --role=%I --host=%I --port=%s --username=%I -w --dbname=%I %s',
-    username, host, port, username, database, fullPath);
+    username,
+    host,
+    port,
+    username,
+    database,
+    fullPath,
+  );
   const pexec = promisify(exec);
   await pexec(cmd, { env: { PGPASSWORD: password } });
 }
@@ -76,10 +89,11 @@ export async function getConnectedClient(url) {
  */
 export async function createDatabaseQuery(client, database, owner) {
   const exists = await client.query(
-    'SELECT 1 FROM pg_database WHERE datname=$1', [database]);
+    'SELECT 1 FROM pg_database WHERE datname=$1',
+    [database],
+  );
   if (!exists.rowCount) {
-    await client.query(format(
-      'CREATE DATABASE %s OWNER %s;', database, owner));
+    await client.query(format('CREATE DATABASE %s OWNER %s;', database, owner));
     console.log(`database ${database} created`);
   } else {
     console.log('database already exists');
@@ -93,15 +107,19 @@ export async function createDatabaseQuery(client, database, owner) {
  */
 export async function dropDatabaseQuery(client, database) {
   const exists = await client.query(
-    'SELECT 1 FROM pg_database WHERE datname=$1', [database]);
+    'SELECT 1 FROM pg_database WHERE datname=$1',
+    [database],
+  );
   if (exists.rowCount) {
     await client.query(
       `UPDATE pg_database SET datallowconn = 'false'
        WHERE datname = '${database}';
-       ALTER DATABASE ${database} CONNECTION LIMIT 1;`);
+       ALTER DATABASE ${database} CONNECTION LIMIT 1;`,
+    );
     await client.query(
       `SELECT pg_terminate_backend(pid) FROM pg_stat_activity
-       WHERE datname = '${database}';`);
+       WHERE datname = '${database}';`,
+    );
     await client.query(format('DROP DATABASE %s;', database));
     console.log(`database ${database} droped`);
   } else {
@@ -127,7 +145,7 @@ export async function createExtensionsQuery(client) {
  *  closed. The 0th item is the connection to the maintenance database
  *  and the 1st item is the connection to the application database.
  */
-export async function recreateDatabase(destroy=true) {
+export async function recreateDatabase(destroy = true) {
   /* Parameters from the application database */
   const { database, username } = getDBConf('database');
 

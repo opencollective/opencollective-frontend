@@ -1,5 +1,4 @@
 const errors = {
-
   BadRequest(msg) {
     this.code = 400;
     this.type = 'bad_request';
@@ -58,16 +57,16 @@ const errors = {
   },
 
   ConflictError(msg, data) {
-    this.code    = 409;
-    this.type    = 'conflict';
+    this.code = 409;
+    this.type = 'conflict';
     this.message = msg;
     if (data) this.data = data;
     Error.call(this, msg);
   },
 
   NotImplemented(msg) {
-    this.code    = 501;
-    this.type    = 'not_implemented';
+    this.code = 501;
+    this.type = 'not_implemented';
     this.message = msg || 'This is not implemented.';
     Error.call(this, msg);
   },
@@ -77,8 +76,7 @@ const errors = {
     this.type = type;
     this.message = msg;
     Error.call(this, msg);
-  }
-
+  },
 };
 
 Object.keys(errors).forEach(error => {
@@ -90,7 +88,7 @@ Error.prototype.info = function() {
     type: this.type,
     message: this.message || '',
     fields: this.fields,
-    data: this.data
+    data: this.data,
   };
 
   if (!this.code || this.code >= 500) {

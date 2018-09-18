@@ -22,32 +22,35 @@ const yesterday = moment()
   .subtract(1, 'days')
   .format();
 
-const done = (error) => {
+const done = error => {
   if (error) {
     debug('Error when cleaning index', error);
 
-    return emailLib.sendMessage(
-      'ops@opencollective.com',
-      'Error when cleaning search index',
-      '',
-      {
-        bcc: ' ',
-        text: error,
-      },
-    )
-    .then(process.exit)
-    .catch(console.error);
+    return emailLib
+      .sendMessage(
+        'ops@opencollective.com',
+        'Error when cleaning search index',
+        '',
+        {
+          bcc: ' ',
+          text: error,
+        },
+      )
+      .then(process.exit)
+      .catch(console.error);
   }
 
   debug('Finished removing deleted records from search index');
   process.exit();
 };
 
-const initializeClientandIndex = (indexName) => {
-  const client = algoliasearch(ALGOLIA_APP_ID, ALGOLIA_KEY, { protocol: 'https:'});
+const initializeClientandIndex = indexName => {
+  const client = algoliasearch(ALGOLIA_APP_ID, ALGOLIA_KEY, {
+    protocol: 'https:',
+  });
   const index = client.initIndex(indexName);
   return index;
-}
+};
 
 const cleanIndex = async () => {
   const collectives = await models.Collective.findAll({
@@ -74,4 +77,6 @@ const cleanIndex = async () => {
 };
 
 debug('Starting job to cleanup deleted records in search index');
-cleanIndex().then(() => done()).catch(done);
+cleanIndex()
+  .then(() => done())
+  .catch(done);

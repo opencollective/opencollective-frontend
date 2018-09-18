@@ -16,33 +16,33 @@ describe('images.routes.test.js', () => {
    * Create user
    */
 
-  beforeEach(() => models.User.create(userData).tap(u => user = u));
+  beforeEach(() => models.User.create(userData).tap(u => (user = u)));
 
-  it('should upload an image to S3', (done) => {
+  it('should upload an image to S3', done => {
     request(app)
-    .post(`/images/?api_key=${application.api_key}`)
-    .attach('file', 'test/mocks/images/camera.png')
-    .set('Authorization', `Bearer ${user.jwt()}`)
-    .expect(200)
-    .end((err, res) => {
-      expect(res.body.url).to.contain('.png');
-      done();
-    });
+      .post(`/images/?api_key=${application.api_key}`)
+      .attach('file', 'test/mocks/images/camera.png')
+      .set('Authorization', `Bearer ${user.jwt()}`)
+      .expect(200)
+      .end((err, res) => {
+        expect(res.body.url).to.contain('.png');
+        done();
+      });
   });
 
-  it('should throw an error if no file field is sent', (done) => {
+  it('should throw an error if no file field is sent', done => {
     request(app)
-    .post(`/images/?api_key=${application.api_key}`)
-    .set('Authorization', `Bearer ${user.jwt()}`)
-    .expect(400)
-    .end(done);
+      .post(`/images/?api_key=${application.api_key}`)
+      .set('Authorization', `Bearer ${user.jwt()}`)
+      .expect(400)
+      .end(done);
   });
 
-  it('should upload if the user is not logged in', (done) => {
+  it('should upload if the user is not logged in', done => {
     request(app)
-    .post(`/images/?api_key=${application.api_key}`)
-    .attach('file', 'test/mocks/images/camera.png')
-    .expect(200)
-    .end(done);
+      .post(`/images/?api_key=${application.api_key}`)
+      .attach('file', 'test/mocks/images/camera.png')
+      .expect(200)
+      .end(done);
   });
 });

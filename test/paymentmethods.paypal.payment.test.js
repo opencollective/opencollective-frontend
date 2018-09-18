@@ -20,9 +20,7 @@ import * as paypalPayment from '../server/paymentProviders/paypal/payment';
 const application = utils.data('application');
 
 describe('paypal.payment', () => {
-
   describe('#paypalUrl', () => {
-
     let configStub;
 
     afterEach(() => {
@@ -31,17 +29,20 @@ describe('paypal.payment', () => {
     }); /* End of `afterEach()' */
 
     it('should use Sandbox API when config says so', () => {
-      configStub = sinon.stub(config.paypal.payment, 'environment').get(() => 'sandbox');
+      configStub = sinon
+        .stub(config.paypal.payment, 'environment')
+        .get(() => 'sandbox');
       const url = paypalPayment.paypalUrl('foo');
       expect(url).to.equal('https://api.sandbox.paypal.com/v1/foo');
     }); /* End of `should use Sandbox API when config says so' */
 
     it('should use Production API when config says so', () => {
-      configStub = sinon.stub(config.paypal.payment, 'environment').get(() => 'production');
+      configStub = sinon
+        .stub(config.paypal.payment, 'environment')
+        .get(() => 'production');
       const url = paypalPayment.paypalUrl('foo');
       expect(url).to.equal('https://api.paypal.com/v1/foo');
     }); /* End of `should use Production API when config says so' */
-
   }); /* End of `#paypalUrl' */
 
   describe('With PayPal auth', () => {
@@ -63,7 +64,7 @@ describe('paypal.payment', () => {
       nock('https://api.sandbox.paypal.com')
         .persist()
         .post('/v1/oauth2/token')
-        .basicAuth({ user: 'my-client-id', pass: 'my-client-secret'})
+        .basicAuth({ user: 'my-client-id', pass: 'my-client-secret' })
         .reply(200, { access_token: 'dat-token' });
     }); /* End of "before()" */
 
@@ -82,7 +83,7 @@ describe('paypal.payment', () => {
     describe('#paypalRequest', () => {
       before(() => {
         nock('https://api.sandbox.paypal.com')
-          .matchHeader('Authorization', `Bearer dat-token`)
+          .matchHeader('Authorization', 'Bearer dat-token')
           .post('/v1/path/we/are/testing')
           .reply(200, { success: 1 });
       }); /* End of "before()" */
@@ -96,14 +97,16 @@ describe('paypal.payment', () => {
     describe('#createPayment', () => {
       before(() => {
         nock('https://api.sandbox.paypal.com')
-          .matchHeader('Authorization', `Bearer dat-token`)
+          .matchHeader('Authorization', 'Bearer dat-token')
           .post('/v1/payments/payment')
           .reply(200, { id: 'a very legit payment id' });
       }); /* End of "before()" */
 
       it('should call payments/payment endpoint of the PayPal API', async () => {
         const output = await request(app)
-          .post(`/services/paypal/create-payment?api_key=${application.api_key}`)
+          .post(
+            `/services/paypal/create-payment?api_key=${application.api_key}`,
+          )
           .send({ amount: '50', currency: 'USD' })
           .expect(200);
         expect(output.body.id).to.equal('a very legit payment id');
@@ -113,7 +116,7 @@ describe('paypal.payment', () => {
     describe('#executePayment', () => {
       before(() => {
         nock('https://api.sandbox.paypal.com')
-          .matchHeader('Authorization', `Bearer dat-token`)
+          .matchHeader('Authorization', 'Bearer dat-token')
           .post('/v1/payments/payment/my-payment-id/execute')
           .reply(200, { success: 'Reply from payment execution' });
       }); /* End of "before()" */
@@ -124,7 +127,7 @@ describe('paypal.payment', () => {
         const order = {
           paymentMethod: {
             data: { paymentID: 'my-payment-id', payerID: 'my-payer-id' },
-          }
+          },
         };
         const output = await paypalPayment.executePayment(order);
         expect(output.success).to.equal('Reply from payment execution');
@@ -133,18 +136,21 @@ describe('paypal.payment', () => {
 
     describe('#createTransaction', () => {
       it('should create new transactions reflecting the PayPal charges', async () => {
-
         const { user } = await store.newUser('itsa-mi-mario');
 
         const { collective } = await store.newCollectiveWithHost(
-          'hoodie', 'USD', 'USD', 10);
+          'hoodie',
+          'USD',
+          'USD',
+          10,
+        );
 
         const paymentMethod = await models.PaymentMethod.create({
           name: 'test paypal',
           service: 'paypal',
           type: 'payment',
-          createdAt: new Date,
-          updatedAt: new Date,
+          createdAt: new Date(),
+          updatedAt: new Date(),
           CreatedByUserId: user.id,
           uuid: uuidv4(),
           token: 'EC-88888888888888888',
@@ -165,12 +171,16 @@ describe('paypal.payment', () => {
         order.paymentMethod = paymentMethod;
 
         const paymentInfo = {
-          transactions: [{
-            amount: { total: '50.00', currency: 'USD' },
-            related_resources: [{
-              sale: { transaction_fee: { value: '1.75' } }
-            }]
-          }]
+          transactions: [
+            {
+              amount: { total: '50.00', currency: 'USD' },
+              related_resources: [
+                {
+                  sale: { transaction_fee: { value: '1.75' } },
+                },
+              ],
+            },
+          ],
         };
 
         const tr = await paypalPayment.createTransaction(order, paymentInfo);
@@ -189,6 +199,5 @@ describe('paypal.payment', () => {
         expect(tr.paymentProcessorFeeInHostCurrency).to.equal(-175);
       });
     });
-
   }); /* End of "With PayPal auth" */
 });

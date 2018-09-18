@@ -1,21 +1,21 @@
 'use strict';
 
 module.exports = {
-  up: function (queryInterface, DataTypes) {
+  up: function(queryInterface, DataTypes) {
     return queryInterface.createTable('Applications', {
       id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
-        autoIncrement: true
+        autoIncrement: true,
       },
       CreatedByUserId: {
         type: DataTypes.INTEGER,
         references: {
           model: 'Users',
-          key: 'id'
+          key: 'id',
         },
         onDelete: 'SET NULL',
-        onUpdate: 'CASCADE'
+        onUpdate: 'CASCADE',
       },
       clientId: DataTypes.STRING,
       clientSecret: DataTypes.STRING,
@@ -24,23 +24,23 @@ module.exports = {
       description: DataTypes.STRING,
       disabled: {
         type: DataTypes.BOOLEAN,
-        defaultValue: false
+        defaultValue: false,
       },
       createdAt: {
         type: DataTypes.DATE,
-        defaultValue: DataTypes.NOW
+        defaultValue: DataTypes.NOW,
       },
       updatedAt: {
         type: DataTypes.DATE,
-        defaultValue: DataTypes.NOW
+        defaultValue: DataTypes.NOW,
       },
       deletedAt: {
-        type: DataTypes.DATE
+        type: DataTypes.DATE,
       },
     });
   },
 
-  down: function (queryInterface) {
+  down: function(queryInterface) {
     return queryInterface.dropTable('Applications');
-  }
+  },
 };

@@ -12,16 +12,9 @@ import emailLib from '../server/lib/email';
 const application = utils.data('application');
 const notificationData = { type: constants.COLLECTIVE_TRANSACTION_CREATED };
 
-const {
-  User,
-  Collective,
-  Notification,
-  Tier,
-  Order
-} = models;
+const { User, Collective, Notification, Tier, Order } = models;
 
-describe("notification.model.test.js", () => {
-
+describe('notification.model.test.js', () => {
   let host, collective, hostAdmin, sandbox, emailSendMessageSpy;
 
   beforeEach(() => utils.resetTestDB());
@@ -35,48 +28,68 @@ describe("notification.model.test.js", () => {
 
   beforeEach(() => {
     const promises = [
-      Collective.create({ name: "host", type: "ORGANIZATION" }),
-      Collective.create({ name: "webpack", type: "COLLECTIVE" }),
-      User.createUserWithCollective({ name: "host admin", email: "admin@host.com" }),
+      Collective.create({ name: 'host', type: 'ORGANIZATION' }),
+      Collective.create({ name: 'webpack', type: 'COLLECTIVE' }),
+      User.createUserWithCollective({
+        name: 'host admin',
+        email: 'admin@host.com',
+      }),
     ];
-    return Promise.all(promises).then((results) => {
+    return Promise.all(promises).then(results => {
       host = results[0];
       collective = results[1];
       hostAdmin = results[2];
       return Promise.all([
         collective.addHost(host),
-        host.addUserWithRole(hostAdmin, 'ADMIN')
+        host.addUserWithRole(hostAdmin, 'ADMIN'),
       ]);
-    })
+    });
   });
 
   it(`disables notification for the ${notificationData.type} email`, () =>
     request(app)
-      .post(`/groups/${collective.id}/activities/${notificationData.type}/unsubscribe`)
+      .post(
+        `/groups/${collective.id}/activities/${
+          notificationData.type
+        }/unsubscribe`,
+      )
       .set('Authorization', `Bearer ${hostAdmin.jwt()}`)
       .send({ api_key: application.api_key })
       .expect(200)
       .then(() =>
-        Notification.findAndCountAll({where: {
-          UserId: hostAdmin.id,
-          CollectiveId: collective.id,
-          type: notificationData.type,
-          active: true
-        }}))
+        Notification.findAndCountAll({
+          where: {
+            UserId: hostAdmin.id,
+            CollectiveId: collective.id,
+            type: notificationData.type,
+            active: true,
+          },
+        }),
+      )
       .tap(res => expect(res.count).to.equal(0)));
 
   describe('getSubscribers', () => {
-
     let users;
-    beforeEach(() => Promise.map([utils.data('user3'), utils.data('user4')], user => models.User.createUserWithCollective(user)).then(result => users = result))
+    beforeEach(() =>
+      Promise.map([utils.data('user3'), utils.data('user4')], user =>
+        models.User.createUserWithCollective(user),
+      ).then(result => (users = result)));
 
     it('getSubscribers to the backers mailinglist', async () => {
-      await Promise.map(users, user => collective.addUserWithRole(user, 'BACKER'));
-      const subscribers = await Notification.getSubscribersUsers(collective.slug, 'backers');
+      await Promise.map(users, user =>
+        collective.addUserWithRole(user, 'BACKER'),
+      );
+      const subscribers = await Notification.getSubscribersUsers(
+        collective.slug,
+        'backers',
+      );
       expect(subscribers.length).to.equal(2);
 
-      await subscribers[0].unsubscribe(collective.id, 'mailinglist.backers')
-      const subscribers2 = await Notification.getSubscribers(collective.slug, 'backers');
+      await subscribers[0].unsubscribe(collective.id, 'mailinglist.backers');
+      const subscribers2 = await Notification.getSubscribers(
+        collective.slug,
+        'backers',
+      );
       expect(subscribers2.length).to.equal(1);
     });
 
@@ -89,45 +102,56 @@ describe("notification.model.test.js", () => {
       });
       const tier = Tier.create({
         ...tierData,
-        CollectiveId: event.id
+        CollectiveId: event.id,
       });
-      await Promise.map(users, (user) => {
+      await Promise.map(users, user => {
         return Order.create({
           CreatedByUserId: user.id,
           FromCollectiveId: user.CollectiveId,
           CollectiveId: collective.id,
-          TierId: tier.id
-        })
+          TierId: tier.id,
+        });
       });
-      await Promise.map(users, user => models.Member.create({
-        CreatedByUserId: user.id,
-        MemberCollectiveId: user.CollectiveId,
-        CollectiveId: event.id,
-        TierId: tier.id,
-        role: roles.FOLLOWER
-      }))
+      await Promise.map(users, user =>
+        models.Member.create({
+          CreatedByUserId: user.id,
+          MemberCollectiveId: user.CollectiveId,
+          CollectiveId: event.id,
+          TierId: tier.id,
+          role: roles.FOLLOWER,
+        }),
+      );
 
-      const subscribers = await Notification.getSubscribers(event.slug, event.slug);
+      const subscribers = await Notification.getSubscribers(
+        event.slug,
+        event.slug,
+      );
       expect(subscribers.length).to.equal(2);
 
-      await users[0].unsubscribe(event.id, `mailinglist.${event.slug}`)
-      const subscribers2 = await Notification.getSubscribers(event.slug, event.slug);
+      await users[0].unsubscribe(event.id, `mailinglist.${event.slug}`);
+      const subscribers2 = await Notification.getSubscribers(
+        event.slug,
+        event.slug,
+      );
       expect(subscribers2.length).to.equal(1);
-    })
+    });
   });
 
   describe('notifySubscribers', () => {
     let user, expense;
     beforeEach(async () => {
-      user = await models.User.createUserWithCollective({ name: "Xavier", email: "xavier@gmail.com" });
+      user = await models.User.createUserWithCollective({
+        name: 'Xavier',
+        email: 'xavier@gmail.com',
+      });
       expense = await models.Expense.create({
         lastEditedById: user.id,
-        incurredAt: new Date,
-        description: "pizza",
+        incurredAt: new Date(),
+        description: 'pizza',
         UserId: user.id,
         CollectiveId: collective.id,
         amount: 10000,
-        currency: 'USD'
+        currency: 'USD',
       });
 
       await models.Transaction.createDoubleEntry({
@@ -141,10 +165,9 @@ describe("notification.model.test.js", () => {
       });
 
       await expense.createActivity('collective.expense.paid');
-
     });
 
-    it("notifies the author of the expense and the admin of host when expense is paid", async () => {
+    it('notifies the author of the expense and the admin of host when expense is paid', async () => {
       // host admin pays the expense
       await expense.setPaid(hostAdmin.id);
       await utils.waitForCondition(() => emailSendMessageSpy.callCount > 1);
@@ -159,14 +182,16 @@ describe("notification.model.test.js", () => {
         UserId: hostAdmin.id,
         type: 'collective.expense.paid.for.host',
         active: false,
-        channel: 'email'
+        channel: 'email',
       });
 
       // host admin pays the expense
       await expense.setPaid(hostAdmin.id);
-      await utils.waitForCondition(() => emailSendMessageSpy.callCount > 0, { delay: 500 });
+      await utils.waitForCondition(() => emailSendMessageSpy.callCount > 0, {
+        delay: 500,
+      });
       expect(emailSendMessageSpy.callCount).to.equal(1);
       expect(emailSendMessageSpy.firstCall.args[0]).to.equal(user.email);
-    })
+    });
   });
 });

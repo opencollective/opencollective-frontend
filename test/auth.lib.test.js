@@ -27,8 +27,8 @@ describe('authlib', () => {
     expect(decoded.foo).to.equal('bar');
   });
 
-  it("should validate tokens", () => {
+  it('should validate tokens', () => {
     const token = auth.createJwt('sub', {}, 5);
-    expect(Boolean(auth.verifyJwt(token))).to.be.true
+    expect(Boolean(auth.verifyJwt(token))).to.be.true;
   });
 });

@@ -1,12 +1,12 @@
 'use strict';
 
 module.exports = {
-  up: function (queryInterface, DataTypes) {
+  up: function(queryInterface, DataTypes) {
     return queryInterface.createTable('StripeManagedAccounts', {
       id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
-        autoIncrement: true
+        autoIncrement: true,
       },
 
       stripeId: DataTypes.STRING,
@@ -15,19 +15,19 @@ module.exports = {
 
       createdAt: {
         type: DataTypes.DATE,
-        defaultValue: DataTypes.NOW
+        defaultValue: DataTypes.NOW,
       },
       updatedAt: {
         type: DataTypes.DATE,
-        defaultValue: DataTypes.NOW
+        defaultValue: DataTypes.NOW,
       },
       deletedAt: {
-        type: DataTypes.DATE
-      }
+        type: DataTypes.DATE,
+      },
     });
   },
 
-  down: function (queryInterface) {
+  down: function(queryInterface) {
     return queryInterface.dropTable('StripeManagedAccounts');
-  }
+  },
 };

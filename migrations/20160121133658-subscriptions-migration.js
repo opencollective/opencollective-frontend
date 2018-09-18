@@ -1,21 +1,18 @@
 'use strict';
 
 module.exports = {
-  up: function (queryInterface, Sequelize) {
-    
-    queryInterface.createTable(
-      'Subscriptions',
-      {
-        
+  up: function(queryInterface, Sequelize) {
+    queryInterface
+      .createTable('Subscriptions', {
         id: {
           type: Sequelize.INTEGER,
           primaryKey: true,
-          autoIncrement: true
+          autoIncrement: true,
         },
 
-        channel: { 
-          defaultValue: 'email', 
-          type: Sequelize.STRING 
+        channel: {
+          defaultValue: 'email',
+          type: Sequelize.STRING,
         },
 
         type: Sequelize.STRING,
@@ -24,35 +21,38 @@ module.exports = {
 
         createdAt: {
           type: Sequelize.DATE,
-          defaultValue: Sequelize.NOW
+          defaultValue: Sequelize.NOW,
         },
 
         updatedAt: {
           type: Sequelize.DATE,
-          defaultValue: Sequelize.NOW
+          defaultValue: Sequelize.NOW,
         },
-        
+
         UserId: {
           type: Sequelize.INTEGER,
-          references: {key: 'id', model: 'Users'},
+          references: { key: 'id', model: 'Users' },
           onDelete: 'SET NULL',
-          onUpdate: 'CASCADE'
+          onUpdate: 'CASCADE',
         },
-        
+
         GroupId: {
           type: Sequelize.INTEGER,
-          references: {key: 'id', model: 'Groups'},
+          references: { key: 'id', model: 'Groups' },
           onDelete: 'SET NULL',
-          onUpdate: 'CASCADE'
-        }
-    
-     })
-     .then(() => {
-       return queryInterface.addIndex('Subscriptions', ['type', 'GroupId', 'UserId'], { indicesType: 'UNIQUE' } );
-     });
+          onUpdate: 'CASCADE',
+        },
+      })
+      .then(() => {
+        return queryInterface.addIndex(
+          'Subscriptions',
+          ['type', 'GroupId', 'UserId'],
+          { indicesType: 'UNIQUE' },
+        );
+      });
   },
 
-  down: function (queryInterface, Sequelize) {
+  down: function(queryInterface, Sequelize) {
     return queryInterface.dropTable('Subscriptions');
-  }
+  },
 };

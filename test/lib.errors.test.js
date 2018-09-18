@@ -5,7 +5,6 @@ import { expect } from 'chai';
  * Tests.
  */
 describe('lib.errors.test.js', () => {
-
   it('BadRequest', () => {
     const e = new errors.BadRequest('message');
     expect(e).to.have.property('message', 'message');
@@ -59,5 +58,4 @@ describe('lib.errors.test.js', () => {
     expect(e).to.have.property('type', 'type');
     expect(e).to.have.property('code', 123);
   });
-
 });

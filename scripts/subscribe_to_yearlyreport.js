@@ -8,22 +8,19 @@ import models from '../server/models';
 
 const debug = require('debug')('subscribe');
 
-const {
-  Notification,
-  User
-} = models;
+const { Notification, User } = models;
 
-const processRows = (rows) => {
-    return Promise.map(rows, processRow);
+const processRows = rows => {
+  return Promise.map(rows, processRow);
 };
 
 const init = () => {
   User.findAll()
-  .then(processRows)
-  .then(() => process.exit(0));
-}
+    .then(processRows)
+    .then(() => process.exit(0));
+};
 
-const processRow = (row) => {
+const processRow = row => {
   const type = 'user.yearlyreport';
   debug(`Subscribing UserId ${row.id} to ${type}`);
 

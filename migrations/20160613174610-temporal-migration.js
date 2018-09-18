@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = {
-  up: function (queryInterface, DataTypes) {
+  up: function(queryInterface, DataTypes) {
     return queryInterface.createTable('ExpenseHistories', {
       id: DataTypes.INTEGER,
       UserId: DataTypes.INTEGER,
@@ -26,17 +26,17 @@ module.exports = {
         type: DataTypes.BIGINT,
         primaryKey: true,
         autoIncrement: true,
-        unique: true
+        unique: true,
       },
       archivedAt: {
         type: DataTypes.DATE,
         allowNull: false,
-        defaultValue: DataTypes.NOW
-      }
+        defaultValue: DataTypes.NOW,
+      },
     });
   },
 
-  down: function (queryInterface) {
+  down: function(queryInterface) {
     return queryInterface.dropTable('ExpenseHistories');
-  }
+  },
 };

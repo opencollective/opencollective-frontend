@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 import { GitHubClient } from 'opencollective-jobs';
 import models from '../../server/models';
-const _ = require('lodash'); //eslint-disable-line import/no-commonjs
+const _ = require('lodash'); // eslint-disable-line import/no-commonjs
 
-const client = GitHubClient({logLevel: 'verbose'});
+const client = GitHubClient({ logLevel: 'verbose' });
 const { log } = client; // repurpose the logger
 const { Collective } = models;
 
@@ -14,40 +14,46 @@ const { Collective } = models;
 
 Collective.findAll({
   where: {
-    type: "COLLECTIVE"
-  }
+    type: 'COLLECTIVE',
+  },
 })
   .tap(collectives => {
-    log.verbose('collectives', `Found ${collectives.length} collective(s) to inspect`);
+    log.verbose(
+      'collectives',
+      `Found ${collectives.length} collective(s) to inspect`,
+    );
   })
   .each(collective => {
     const org = _.get(collective, 'settings.githubOrg');
     const repoLink = _.get(collective, 'settings.githubRepo');
     if (!org && !repoLink) {
-      log.warn(collective.name, `No GitHub org or repo associated`);
+      log.warn(collective.name, 'No GitHub org or repo associated');
       return;
     }
     let fetchPromise;
 
     if (org) {
-      fetchPromise = client.contributorsInOrg({orgs: [org]})
+      fetchPromise = client
+        .contributorsInOrg({ orgs: [org] })
         .get(org)
         .then(repos => {
           const data = {};
           data.contributorData = _(repos)
-              .map('contributors')
-              .reduce((acc, contributions) => {
-                _.each(contributions, (count, user) => {
-                  acc[user] = (acc[user] || 0) + count;
-                });
-                return acc;
-              }, {});
-          data.repoData = _.mapValues(repos, repo => _.omit(repo, 'contributors'));
+            .map('contributors')
+            .reduce((acc, contributions) => {
+              _.each(contributions, (count, user) => {
+                acc[user] = (acc[user] || 0) + count;
+              });
+              return acc;
+            }, {});
+          data.repoData = _.mapValues(repos, repo =>
+            _.omit(repo, 'contributors'),
+          );
           data.stars = _(repos)
-              .map('stars')
-              .reduce((sum, n) => {
-                return sum + n;
-              }, 0)
+            .map('stars')
+            .reduce((sum, n) => {
+              return sum + n;
+            }, 0);
           return data;
         });
     } else {
@@ -58,27 +64,28 @@ Collective.findAll({
       }
       const options = {
         user: split[0],
-        repo: split[1]
-      }
-      fetchPromise = client.contributorsForRepo(options)
-        .then(data => {
-          const contributorData = {};
-          data.map(dataEntry => contributorData[dataEntry.user] = dataEntry.contributions);
-          return {contributorData}
-        });
+        repo: split[1],
+      };
+      fetchPromise = client.contributorsForRepo(options).then(data => {
+        const contributorData = {};
+        data.map(
+          dataEntry =>
+            (contributorData[dataEntry.user] = dataEntry.contributions),
+        );
+        return { contributorData };
+      });
     }
 
     return fetchPromise
       .then(githubData => {
-        const data =_.assign(collective.data || {}, {
+        const data = _.assign(collective.data || {}, {
           githubContributors: githubData.contributorData,
-          repos: githubData.repoData
+          repos: githubData.repoData,
         });
         return collective.update({ data });
       })
       .then(() => {
-        log.info(collective.name,
-          `Successfully updated contribution data`);
+        log.info(collective.name, 'Successfully updated contribution data');
       })
       .catch(err => {
         log.error(collective.name, err.stack);

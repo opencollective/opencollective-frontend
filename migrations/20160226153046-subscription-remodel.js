@@ -1,12 +1,12 @@
 'use strict';
 
 module.exports = {
-  up: function (queryInterface, DataTypes) {
+  up: function(queryInterface, DataTypes) {
     return queryInterface.createTable('Subscriptions', {
       id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
-        autoIncrement: true
+        autoIncrement: true,
       },
 
       amount: DataTypes.FLOAT,
@@ -20,7 +20,7 @@ module.exports = {
 
       isActive: {
         type: DataTypes.BOOLEAN,
-        defaultValue: false
+        defaultValue: false,
       },
 
       data: DataTypes.JSON,
@@ -33,22 +33,21 @@ module.exports = {
 
       createdAt: {
         type: DataTypes.DATE,
-        defaultValue: DataTypes.NOW
+        defaultValue: DataTypes.NOW,
       },
 
       updatedAt: {
         type: DataTypes.DATE,
-        defaultValue: DataTypes.NOW
+        defaultValue: DataTypes.NOW,
       },
 
       deletedAt: {
-        type: DataTypes.DATE
-      }
-
+        type: DataTypes.DATE,
+      },
     });
   },
 
-  down: function (queryInterface) {
+  down: function(queryInterface) {
     return queryInterface.dropTable('Subscriptions');
-  }
+  },
 };

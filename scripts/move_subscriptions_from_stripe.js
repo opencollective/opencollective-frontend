@@ -22,7 +22,6 @@ const csvFields = [
   'error',
 ];
 
-
 function successLine(order, stripeStatus, nextChargeDate, nextPeriodStart) {
   return {
     orderId: order.id,
@@ -31,11 +30,15 @@ function successLine(order, stripeStatus, nextChargeDate, nextPeriodStart) {
     interval: order.Subscription.interval,
     stripeStatus,
     nextChargeDate,
-    nextChargeDateHuman: nextChargeDate ? moment(nextChargeDate * 1000).format() : null,
+    nextChargeDateHuman: nextChargeDate
+      ? moment(nextChargeDate * 1000).format()
+      : null,
     nextPeriodStart,
-    nextPeriodStartHuman: nextPeriodStart ? moment(nextPeriodStart * 1000).format() : null,
+    nextPeriodStartHuman: nextPeriodStart
+      ? moment(nextPeriodStart * 1000).format()
+      : null,
     state: 'done',
-    error: ''
+    error: '',
   };
 }
 
@@ -51,7 +54,7 @@ function errorLine(order, state, error) {
     nextPeriodStart: '',
     nextPeriodStartHuman: '',
     state,
-    error: error.message
+    error: error.message,
   };
 }
 
@@ -60,21 +63,21 @@ async function updateLocalSubscription(order, stripeSubscription) {
   const status = stripeSubscription.status;
 
   switch (status) {
-  case 'trialing':
-    nextChargeDate = nextPeriodStart = stripeSubscription.trial_end;
-    break;
-  case 'active':
-    nextChargeDate = nextPeriodStart = stripeSubscription.current_period_end;
-    break;
-  case 'past_due':
-  case 'unpaid':
-    nextChargeDate = Math.floor((new Date).getTime() / 1000); // In milliseconds
-    nextPeriodStart = stripeSubscription.current_period_end;
-    break;
-  case 'cancelled':
-    // cancel the subscription in our DB
-    nextChargeDate = nextPeriodStart = null;
-    break;
+    case 'trialing':
+      nextChargeDate = nextPeriodStart = stripeSubscription.trial_end;
+      break;
+    case 'active':
+      nextChargeDate = nextPeriodStart = stripeSubscription.current_period_end;
+      break;
+    case 'past_due':
+    case 'unpaid':
+      nextChargeDate = Math.floor(new Date().getTime() / 1000); // In milliseconds
+      nextPeriodStart = stripeSubscription.current_period_end;
+      break;
+    case 'cancelled':
+      // cancel the subscription in our DB
+      nextChargeDate = nextPeriodStart = null;
+      break;
   }
 
   if (nextChargeDate && nextPeriodStart) {
@@ -83,7 +86,7 @@ async function updateLocalSubscription(order, stripeSubscription) {
   } else {
     // Cancel the subscription
     order.Subscription.isActive = false;
-    order.Subscription.deactivatedAt = new Date;
+    order.Subscription.deactivatedAt = new Date();
   }
   return { status, nextChargeDate, nextPeriodStart };
 }
@@ -103,7 +106,9 @@ async function eachOrder(order, options) {
   }
   try {
     stripeSubscription = await stripeGateway.retrieveSubscription(
-      stripeAccount, stripeSubscriptionId);
+      stripeAccount,
+      stripeSubscriptionId,
+    );
   } catch (error) {
     return errorLine(order, 'getStripeAccount', error);
   }
@@ -123,30 +128,51 @@ async function eachOrder(order, options) {
   // Then cancel the subscription on stripe if we're doing it for real
   if (!options.dryRun) {
     try {
-      await stripeGateway.cancelSubscription(stripeAccount, stripeSubscriptionId);
+      await stripeGateway.cancelSubscription(
+        stripeAccount,
+        stripeSubscriptionId,
+      );
     } catch (error) {
       return errorLine(order, 'cancelStripeSubscription', error);
     }
   }
 
   // All good, just save important info
-  return successLine(order, updates.status, updates.nextChargeDate, updates.nextPeriodStart);
+  return successLine(
+    order,
+    updates.status,
+    updates.nextChargeDate,
+    updates.nextPeriodStart,
+  );
 }
 
 /** Run the script with parameters read from the command line */
 async function run(options) {
   const allOrders = await findStripeSubscriptions();
-  const orders = (options.limit) ? allOrders.slice(0, options.limit) : allOrders;
-  vprint(options, `Migrating ${orders.length} subscriptions from a total of ${allOrders.length} (dryRun: ${options.dryRun})`);
+  const orders = options.limit ? allOrders.slice(0, options.limit) : allOrders;
+  vprint(
+    options,
+    `Migrating ${orders.length} subscriptions from a total of ${
+      allOrders.length
+    } (dryRun: ${options.dryRun})`,
+  );
   const data = [];
-  await promiseSeq(orders, async (o) => {
-    const line = await eachOrder(o, options);
-    data.push(line);
-    vprint(options,
-           `orderId: ${line.orderId}, subId: ${line.localSubscriptionId} ` +
-           `stripeSubId: ${line.stripeSubscriptionId}, stripeStatus: ${line.stripeStatus} ` +
-           `state: ${line.state}, error: ${line.error}.`);
-  }, options.batchSize);
+  await promiseSeq(
+    orders,
+    async o => {
+      const line = await eachOrder(o, options);
+      data.push(line);
+      vprint(
+        options,
+        `orderId: ${line.orderId}, subId: ${line.localSubscriptionId} ` +
+          `stripeSubId: ${line.stripeSubscriptionId}, stripeStatus: ${
+            line.stripeStatus
+          } ` +
+          `state: ${line.state}, error: ${line.error}.`,
+      );
+    },
+    options.batchSize,
+  );
 
   if (data.length > 0) {
     json2csv({ data, fields: csvFields }, (err, csv) => {
@@ -164,20 +190,23 @@ async function findStripeSubscriptions() {
   return models.Order.findAll({
     order: ['id'],
     where: { SubscriptionId: { [Op.ne]: null } },
-    include: [{
-      model: models.Subscription,
-      where: {
-        isActive: true,
-        deletedAt: null,
-        deactivatedAt: null,
-        activatedAt: { [Op.lte]: new Date },
-        nextChargeDate: null,
-        stripeSubscriptionId: { [Op.ne]: null }
-      }
-    }, {
-      model: models.Collective,
-      as: 'collective'
-    }]
+    include: [
+      {
+        model: models.Subscription,
+        where: {
+          isActive: true,
+          deletedAt: null,
+          deactivatedAt: null,
+          activatedAt: { [Op.lte]: new Date() },
+          nextChargeDate: null,
+          stripeSubscriptionId: { [Op.ne]: null },
+        },
+      },
+      {
+        model: models.Collective,
+        as: 'collective',
+      },
+    ],
   });
 }
 
@@ -192,33 +221,33 @@ function vprint(options, message) {
 function parseCommandLineArguments() {
   const parser = new ArgumentParser({
     addHelp: true,
-    description: 'Charge due subscriptions'
+    description: 'Charge due subscriptions',
   });
   parser.addArgument(['-v', '--verbose'], {
     help: 'Verbose output',
     defaultValue: false,
     action: 'storeConst',
-    constant: true
+    constant: true,
   });
   parser.addArgument(['--notdryrun'], {
     help: "Pass this flag when you're ready to run the script for real",
     defaultValue: false,
     action: 'storeConst',
-    constant: true
+    constant: true,
   });
   parser.addArgument(['-l', '--limit'], {
-    help: 'total subscriptions to process'
+    help: 'total subscriptions to process',
   });
   parser.addArgument(['-b', '--batch_size'], {
     help: 'batch size to fetch at a time',
-    defaultValue: 10
+    defaultValue: 10,
   });
   const args = parser.parseArgs();
   return {
     dryRun: !args.notdryrun,
     verbose: args.verbose,
     limit: args.limit,
-    batchSize: args.batch_size || 100
+    batchSize: args.batch_size || 100,
   };
 }
 
