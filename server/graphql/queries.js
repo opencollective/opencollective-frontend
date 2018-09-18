@@ -254,16 +254,23 @@ const queries = {
           where: { CollectiveId: CollectiveId },
         }).map(pm => pm.id);
         // find all Virtual Cards with SourcePaymentMethodId included in Collective Payment methods
-        const virtualCardsMadeByCollectivePaymentMethodsIds = await models.PaymentMethod.findAll({
+        const virtualCardsMadeByCollectivePaymentMethodsPair = await models.PaymentMethod.findAll({
           where: { SourcePaymentMethodId: collectivePaymentMethodsIds },
-        }).map(pm => pm.id);
+        }).map( virtualCard => {
+          return {
+            PaymentMethodId: virtualCard.id,
+            CollectiveId: virtualCard.CollectiveId,
+          };
+        });
         // either find through collective id or through query: OR:[CollectiveId, virtualcards]
         query.where.CollectiveId = CollectiveId;
-        if (virtualCardsMadeByCollectivePaymentMethodsIds.length > 0) {
-          query.where = sequelize.or(
-            { CollectiveId: CollectiveId },
-            { PaymentMethodId: virtualCardsMadeByCollectivePaymentMethodsIds }
-          );
+        if (virtualCardsMadeByCollectivePaymentMethodsPair.length > 0) {
+          query.where = {
+            [Op.or]: [
+              { CollectiveId: CollectiveId },
+              ...virtualCardsMadeByCollectivePaymentMethodsPair,
+            ],
+          };
         }
       }
       if (CollectiveId && !args.includeVirtualCards) query.where.CollectiveId = CollectiveId;
