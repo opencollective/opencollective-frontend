@@ -88,6 +88,7 @@ data['ticket.confirmed'] = {
   },
 };
 data['ticket.confirmed.sustainoss'] = data['ticket.confirmed'];
+data['ticket.confirmed.fearlesscitiesbrussels'] = data['ticket.confirmed'];
 data['github.signup'] = {
   collective: {
     name: 'webpack',
