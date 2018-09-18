@@ -7,9 +7,7 @@ import gql from 'graphql-tag';
 import withIntl from '../../../lib/withIntl';
 import SmallButton from '../../../components/SmallButton';
 
-
 class RejectExpenseBtn extends React.Component {
-
   static propTypes = {
     id: PropTypes.number.isRequired,
   };
@@ -27,25 +25,26 @@ class RejectExpenseBtn extends React.Component {
   render() {
     return (
       <div className="RejectExpenseBtn">
-        <SmallButton className="reject" bsStyle="danger" onClick={this.onClick}><FormattedMessage id="expense.reject.btn" defaultMessage="reject" /></SmallButton>
+        <SmallButton className="reject" bsStyle="danger" onClick={this.onClick}>
+          <FormattedMessage id="expense.reject.btn" defaultMessage="reject" />
+        </SmallButton>
       </div>
     );
   }
-
 }
 
 const rejectExpenseQuery = gql`
-mutation rejectExpense($id: Int!) {
-  rejectExpense(id: $id) {
-    id
-    status
+  mutation rejectExpense($id: Int!) {
+    rejectExpense(id: $id) {
+      id
+      status
+    }
   }
-}
 `;
 
 const addMutation = graphql(rejectExpenseQuery, {
-  props: ( { mutate }) => ({
-    rejectExpense: async (id) => {
+  props: ({ mutate }) => ({
+    rejectExpense: async id => {
       return await mutate({ variables: { id } });
     },
   }),

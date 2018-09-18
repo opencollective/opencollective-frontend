@@ -68,8 +68,10 @@ export async function fetchMembersStats(params) {
       }
     }
     `;
-    processResult = (res) => {
-      const count = (backerType.match(/sponsor/)) ? res.Collective.stats.backers.organizations : res.Collective.stats.backers.users;
+    processResult = res => {
+      const count = backerType.match(/sponsor/)
+        ? res.Collective.stats.backers.organizations
+        : res.Collective.stats.backers.users;
       return {
         name: backerType,
         count,
@@ -89,7 +91,7 @@ export async function fetchMembersStats(params) {
       }
     }
     `;
-    processResult = (res) => {
+    processResult = res => {
       return {
         count: res.Collective.tiers[0].stats.totalDistinctOrders,
         slug: res.Collective.tiers[0].slug,
@@ -102,7 +104,10 @@ export async function fetchMembersStats(params) {
   return count;
 }
 
-export async function fetchMembers({ collectiveSlug, tierSlug, backerType, isActive }, options = {}) {
+export async function fetchMembers(
+  { collectiveSlug, tierSlug, backerType, isActive },
+  options = {},
+) {
   let query, processResult, type, role;
   if (backerType === 'contributors') {
     query = `
@@ -113,7 +118,7 @@ export async function fetchMembers({ collectiveSlug, tierSlug, backerType, isAct
       }
     }
     `;
-    processResult = (res) => {
+    processResult = res => {
       const users = res.Collective.data.githubContributors;
       return Object.keys(users).map(username => {
         const commits = users[username];
@@ -147,7 +152,7 @@ export async function fetchMembers({ collectiveSlug, tierSlug, backerType, isAct
       }
     }
     `;
-    processResult = (res) => uniqBy(res.allMembers.map(m => m.member), m => m.id);
+    processResult = res => uniqBy(res.allMembers.map(m => m.member), m => m.id);
   } else if (tierSlug) {
     query = `
     query Collective($collectiveSlug: String, $tierSlug: String!, $isActive: Boolean) {
@@ -169,15 +174,28 @@ export async function fetchMembers({ collectiveSlug, tierSlug, backerType, isAct
       }
     }
     `;
-    processResult = (res) => uniqBy(res.Collective.tiers[0].orders.map(o => o.fromCollective), m => m.id);
+    processResult = res =>
+      uniqBy(
+        res.Collective.tiers[0].orders.map(o => o.fromCollective),
+        m => m.id,
+      );
   }
 
-  const result = await (options.client || getClient()).request(query, { collectiveSlug, tierSlug, type, role, isActive });
+  const result = await (options.client || getClient()).request(query, {
+    collectiveSlug,
+    tierSlug,
+    type,
+    role,
+    isActive,
+  });
   const members = processResult(result);
   return members;
 }
 
-export async function fetchEvents(parentCollectiveSlug, options = { limit: 10 }) {
+export async function fetchEvents(
+  parentCollectiveSlug,
+  options = { limit: 10 },
+) {
   const query = `
   query allEvents($slug: String!, $limit: Int) {
     allEvents(slug:$slug, limit: $limit) {
@@ -199,7 +217,10 @@ export async function fetchEvents(parentCollectiveSlug, options = { limit: 10 })
   }
   `;
 
-  const result = await getClient().request(query, { slug: parentCollectiveSlug, limit: options.limit || 10 });
+  const result = await getClient().request(query, {
+    slug: parentCollectiveSlug,
+    limit: options.limit || 10,
+  });
   return result.allEvents;
 }
 
@@ -284,7 +305,9 @@ export async function fetchInvoice(invoiceSlug, accessToken) {
     }
   }
   `;
-  const client = new GraphQLClient(getGraphqlUrl(), { headers: { authorization: `Bearer ${accessToken}` } });
+  const client = new GraphQLClient(getGraphqlUrl(), {
+    headers: { authorization: `Bearer ${accessToken}` },
+  });
   const result = await client.request(query, { invoiceSlug });
   return result.Invoice;
 }

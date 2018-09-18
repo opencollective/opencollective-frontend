@@ -1,8 +1,14 @@
 export function getCloudinaryUrl(src, { width, height, query }) {
-  const cloudinaryBaseUrl = 'https://res.cloudinary.com/opencollective/image/fetch';
+  const cloudinaryBaseUrl =
+    'https://res.cloudinary.com/opencollective/image/fetch';
 
   // We don't try to resize animated gif, svg or images already processed by cloudinary
-  if (src.substr(0, cloudinaryBaseUrl.length) === cloudinaryBaseUrl || src.match(/\.gif$/) || (src.match(/\.svg/) && !query) || src.match(/localhost:3000/)) {
+  if (
+    src.substr(0, cloudinaryBaseUrl.length) === cloudinaryBaseUrl ||
+    src.match(/\.gif$/) ||
+    (src.match(/\.svg/) && !query) ||
+    src.match(/localhost:3000/)
+  ) {
     return src;
   }
 
@@ -11,7 +17,7 @@ export function getCloudinaryUrl(src, { width, height, query }) {
   if (height) size += `h_${height},`;
   if (size === '') size = 'w_320,';
 
-  const format = (src.match(/\.png$/)) ? 'png' : 'jpg';
+  const format = src.match(/\.png$/) ? 'png' : 'jpg';
 
   const queryurl = query || `/${size}c_pad,f_${format}/`;
 
@@ -19,7 +25,7 @@ export function getCloudinaryUrl(src, { width, height, query }) {
 }
 
 export const queryString = {
-  stringify: (obj) => {
+  stringify: obj => {
     let str = '';
     for (const key in obj) {
       if (str != '') {
@@ -29,7 +35,7 @@ export const queryString = {
     }
     return str;
   },
-  parse: (query) => {
+  parse: query => {
     if (!query) return {};
     const vars = query.split('&');
     const res = {};

@@ -13,7 +13,6 @@ import initClient from '../../../../lib/initClient';
 const apolloClient = initClient();
 
 describe('Expenses component', () => {
-
   const collective = {
     slug: 'test',
     id: 1,
@@ -25,7 +24,6 @@ describe('Expenses component', () => {
     id: 2,
     type: 'USER',
     slug: 'user1',
-
   };
 
   const expenseConsts = {
@@ -34,7 +32,8 @@ describe('Expenses component', () => {
     payoutMethod: 'paypal',
     incurredAt: '2017-11-05',
     collective,
-    fromCollective };
+    fromCollective,
+  };
 
   const expenses = [
     Object.assign({}, { ...expenseConsts }, { id: 1, amount: 1000 }),
@@ -49,7 +48,8 @@ describe('Expenses component', () => {
     collective: {
       id: 3,
       slug: 'hostuser',
-    } };
+    },
+  };
 
   const component = mount(
     <IntlProvider locale="en">
@@ -61,28 +61,36 @@ describe('Expenses component', () => {
           payExpense={() => setTimeout(() => Promise.resolve(), 2000)}
         />
       </ApolloProvider>
-    </IntlProvider>
+    </IntlProvider>,
   );
 
   describe('Paying expenses', () => {
     it('disables all buttons while one expense is being paid', done => {
-
       // make sure there are two pay buttons on the page
       expect(component.find('.PayExpenseBtn button').length).toEqual(2);
 
       // make sure none are disabled
-      expect(component.find('.PayExpenseBtn button[disabled]').lenght).toEqual(undefined);
+      expect(component.find('.PayExpenseBtn button[disabled]').lenght).toEqual(
+        undefined,
+      );
 
       // click on the first one
-      component.find('.PayExpenseBtn button').first().simulate('click');
+      component
+        .find('.PayExpenseBtn button')
+        .first()
+        .simulate('click');
 
       // expect two disabled buttons again
-      expect(component.find('.PayExpenseBtn button[disabled]').length).toEqual(2);
+      expect(component.find('.PayExpenseBtn button[disabled]').length).toEqual(
+        2,
+      );
 
       // after timeout, make sure there is only button and it's not disabled.
       setTimeout(() => {
         expect(component.find('.PayExpenseBtn button').length).toEqual(1);
-        expect(component.find('.PayExpenseBtn button[disabled]').length).toEqual(undefined);
+        expect(
+          component.find('.PayExpenseBtn button[disabled]').length,
+        ).toEqual(undefined);
       }, 2000);
       done();
     });

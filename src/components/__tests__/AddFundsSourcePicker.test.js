@@ -18,7 +18,9 @@ describe('AddFundsSourcePicker component', () => {
   };
 
   it('renders default options', () => {
-    const tree = renderer.create(<MockAddFundsSourcePicker {...defaultProps} />).toJSON();
+    const tree = renderer
+      .create(<MockAddFundsSourcePicker {...defaultProps} />)
+      .toJSON();
     expect(tree).toMatchSnapshot();
   });
 
@@ -29,7 +31,9 @@ describe('AddFundsSourcePicker component', () => {
         loading: true,
       },
     };
-    const tree = renderer.create(<MockAddFundsSourcePicker {...props} />).toJSON();
+    const tree = renderer
+      .create(<MockAddFundsSourcePicker {...props} />)
+      .toJSON();
     expect(tree).toMatchSnapshot();
   });
 
@@ -42,7 +46,9 @@ describe('AddFundsSourcePicker component', () => {
       },
     };
 
-    const tree = renderer.create(<MockAddFundsSourcePicker {...props} />).toJSON();
+    const tree = renderer
+      .create(<MockAddFundsSourcePicker {...props} />)
+      .toJSON();
     expect(tree).toMatchSnapshot();
   });
 
@@ -52,25 +58,31 @@ describe('AddFundsSourcePicker component', () => {
       data: {
         PaymentMethod: {
           fromCollectives: {
-            collectives: [{
-              id: 'collective-id',
-              name: 'Example Collective',
-              type: 'COLLECTIVE',
-            }, {
-              id: 'organization-id',
-              name: 'Example Organzation',
-              type: 'ORGANIZATION'
-            }, {
-              id: 'user-id',
-              name: 'Example Person',
-              type: 'USER',
-            }],
+            collectives: [
+              {
+                id: 'collective-id',
+                name: 'Example Collective',
+                type: 'COLLECTIVE',
+              },
+              {
+                id: 'organization-id',
+                name: 'Example Organzation',
+                type: 'ORGANIZATION',
+              },
+              {
+                id: 'user-id',
+                name: 'Example Person',
+                type: 'USER',
+              },
+            ],
           },
         },
       },
     };
 
-    const tree = renderer.create(<MockAddFundsSourcePicker {...props} />).toJSON();
+    const tree = renderer
+      .create(<MockAddFundsSourcePicker {...props} />)
+      .toJSON();
     expect(tree).toMatchSnapshot();
   });
 
@@ -98,7 +110,9 @@ describe('AddFundsSourcePickerForUser component', () => {
   };
 
   it('renders default options', () => {
-    const tree = renderer.create(<MockAddFundsSourcePickerForUser {...defaultProps} />).toJSON();
+    const tree = renderer
+      .create(<MockAddFundsSourcePickerForUser {...defaultProps} />)
+      .toJSON();
     expect(tree).toMatchSnapshot();
   });
 
@@ -106,14 +120,18 @@ describe('AddFundsSourcePickerForUser component', () => {
     const props = {
       ...defaultProps,
       LoggedInUser: {
-        hostsUserIsAdminOf: () => [{
-          id: 'host-id',
-          name: 'Example Host',
-        }],
+        hostsUserIsAdminOf: () => [
+          {
+            id: 'host-id',
+            name: 'Example Host',
+          },
+        ],
       },
     };
 
-    const tree = renderer.create(<MockAddFundsSourcePickerForUser {...props} />).toJSON();
+    const tree = renderer
+      .create(<MockAddFundsSourcePickerForUser {...props} />)
+      .toJSON();
     expect(tree).toMatchSnapshot();
   });
 });

@@ -7,8 +7,17 @@ import { get, pick } from 'lodash';
 
 import { logger } from '../logger';
 import { queryString, getCloudinaryUrl } from '../lib/utils';
-import { fetchCollective, fetchCollectiveImage, fetchMembersStats, fetchMembers } from '../lib/graphql';
-import { svg2png, generateSVGBannerForUsers, generateAsciiFromImage } from '../lib/image-generator';
+import {
+  fetchCollective,
+  fetchCollectiveImage,
+  fetchMembersStats,
+  fetchMembers,
+} from '../lib/graphql';
+import {
+  svg2png,
+  generateSVGBannerForUsers,
+  generateAsciiFromImage,
+} from '../lib/image-generator';
 
 // Cache the list of members of a collective to avoid requesting it for every single /:collectiveSlug/backers/:position/avatar
 const cache = require('lru-cache')({
@@ -31,7 +40,9 @@ export async function badge(req, res) {
     let imageUrl;
     try {
       const stats = await fetchMembersStats(req.params);
-      const filename = `${label || stats.name}-${stats.count? stats.count : 0}-${color}.svg`;
+      const filename = `${label || stats.name}-${
+        stats.count ? stats.count : 0
+      }-${color}.svg`;
       imageUrl = `https://img.shields.io/badge/${filename}?style=${style}`;
     } catch (e) {
       return res.status(404).send('Not found');
@@ -39,24 +50,33 @@ export async function badge(req, res) {
 
     try {
       const imageRequest = await fetchText(imageUrl);
-      res.setHeader('content-type','image/svg+xml;charset=utf-8');
-      res.setHeader('cache-control','max-age=600');
+      res.setHeader('content-type', 'image/svg+xml;charset=utf-8');
+      res.setHeader('cache-control', 'max-age=600');
       return res.send(imageRequest);
     } catch (e) {
-      logger.error('>>> collectives.badge: Error while fetching %s', imageUrl, e);
-      res.setHeader('cache-control','max-age=30');
+      logger.error(
+        '>>> collectives.badge: Error while fetching %s',
+        imageUrl,
+        e,
+      );
+      res.setHeader('cache-control', 'max-age=30');
       return res.status(500).send(`Unable to fetch ${imageUrl}`);
     }
   } catch (e) {
     logger.debug('>>> collectives.badge error', e);
-    return res.status(500).send(`Unable to generate badge for ${req.params.collectiveSlug}/${req.params.backerType}`);
+    return res
+      .status(500)
+      .send(
+        `Unable to generate badge for ${req.params.collectiveSlug}/${
+          req.params.backerType
+        }`,
+      );
   }
 }
 
 export async function info(req, res, next) {
-
   // Keeping the resulting image for 1h in the CDN cache (we purge that cache on deploy)
-  res.setHeader('Cache-Control', `public, max-age=${60*60}`);
+  res.setHeader('Cache-Control', `public, max-age=${60 * 60}`);
 
   let collective;
   try {
@@ -74,16 +94,17 @@ export async function info(req, res, next) {
     balance: collective.stats.balance,
     yearlyIncome: collective.stats.yearlyBudget,
     backersCount: collective.stats.backers.all,
-    contributorsCount: Object.keys(get(collective, 'data.githubContributors') || {}).length,
+    contributorsCount: Object.keys(
+      get(collective, 'data.githubContributors') || {},
+    ).length,
   };
 
   res.send(response);
 }
 
 export async function logo(req, res, next) {
-
   // Keeping the resulting image for 60 days in the CDN cache (we purge that cache on deploy)
-  res.setHeader('Cache-Control', `public, max-age=${60*24*60*60}`);
+  res.setHeader('Cache-Control', `public, max-age=${60 * 24 * 60 * 60}`);
 
   let collective;
   try {
@@ -109,24 +130,27 @@ export async function logo(req, res, next) {
   switch (req.params.format) {
     case 'txt':
       generateAsciiFromImage(imagesrc, {
-        bg: (req.query.bg === 'true') ? true : false,
-        fg: (req.query.fg === 'true') ? true : false,
-        white_bg: (req.query.white_bg === 'false') ? false : true,
-        colored: (req.query.colored === 'false') ? false : true,
+        bg: req.query.bg === 'true' ? true : false,
+        fg: req.query.fg === 'true' ? true : false,
+        white_bg: req.query.white_bg === 'false' ? false : true,
+        colored: req.query.colored === 'false' ? false : true,
         size: {
           height: params.height || 20,
           width: params.width,
         },
         variant: req.query.variant || 'wide',
         trim: req.query.trim !== 'false',
-        reverse: (req.query.reverse === 'true') ? true : false,
-      }).then(ascii => {
-        res.setHeader('content-type', 'text/plain; charset=us-ascii');
-        res.send(`${ascii}\n`);
+        reverse: req.query.reverse === 'true' ? true : false,
       })
-      .catch(() => {
-        return next(new Error(`Unable to create an ASCII art for ${imagesrc}`));
-      });
+        .then(ascii => {
+          res.setHeader('content-type', 'text/plain; charset=us-ascii');
+          res.send(`${ascii}\n`);
+        })
+        .catch(() => {
+          return next(
+            new Error(`Unable to create an ASCII art for ${imagesrc}`),
+          );
+        });
       break;
 
     default:
@@ -146,7 +170,7 @@ export async function banner(req, res) {
   const width = Number(req.query.width) || 0;
   const height = Number(req.query.height) || 0;
   const { avatarHeight, margin } = req.query;
-  const showBtn = (req.query.button === 'false') ? false : true;
+  const showBtn = req.query.button === 'false' ? false : true;
 
   let users = cache.get(queryString.stringify(req.params));
   if (!users) {
@@ -160,17 +184,33 @@ export async function banner(req, res) {
   }
 
   const selector = tierSlug || backerType;
-  const linkToProfile = (selector === 'contributors' || selector == 'sponsors') ? false : true;
-  const buttonImage = showBtn && `${WEBSITE_URL}/static/images/become_${(selector.match(/sponsor/)) ? 'sponsor' : 'backer'}.svg`;
-  return generateSVGBannerForUsers(users, { format, style, limit, buttonImage, width, height, avatarHeight, margin, linkToProfile, collectiveSlug })
+  const linkToProfile =
+    selector === 'contributors' || selector == 'sponsors' ? false : true;
+  const buttonImage =
+    showBtn &&
+    `${WEBSITE_URL}/static/images/become_${
+      selector.match(/sponsor/) ? 'sponsor' : 'backer'
+    }.svg`;
+  return generateSVGBannerForUsers(users, {
+    format,
+    style,
+    limit,
+    buttonImage,
+    width,
+    height,
+    avatarHeight,
+    margin,
+    linkToProfile,
+    collectiveSlug,
+  })
     .then(svg => {
       switch (format) {
         case 'svg':
-          res.setHeader('content-type','image/svg+xml;charset=utf-8');
+          res.setHeader('content-type', 'image/svg+xml;charset=utf-8');
           return svg;
 
         case 'png':
-          res.setHeader('content-type','image/png');
+          res.setHeader('content-type', 'image/png');
           return svg2png(svg);
       }
     })
@@ -187,11 +227,21 @@ export async function website(req, res) {
   req.params.isActive = true;
   const { collectiveSlug, tierSlug, backerType, isActive } = req.params;
 
-  let users = cache.get(queryString.stringify({ collectiveSlug, tierSlug, backerType, isActive }));
+  let users = cache.get(
+    queryString.stringify({ collectiveSlug, tierSlug, backerType, isActive }),
+  );
   if (!users) {
     try {
       users = await fetchMembers(req.params);
-      cache.set(queryString.stringify({ collectiveSlug, tierSlug, backerType, isActive }), users);
+      cache.set(
+        queryString.stringify({
+          collectiveSlug,
+          tierSlug,
+          backerType,
+          isActive,
+        }),
+        users,
+      );
     } catch (e) {
       return res.status(404).send('Not found');
     }
@@ -207,8 +257,10 @@ export async function website(req, res) {
   const selector = tierSlug || backerType;
   let redirectUrl = `${WEBSITE_URL}/${user.slug}`;
   if (selector.match(/sponsor/)) {
-    user.twitter = user.twitterHandle ? `https://twitter.com/${user.twitterHandle}` : null;
-    redirectUrl =  user.website || user.twitter || `${WEBSITE_URL}/${user.slug}`;
+    user.twitter = user.twitterHandle
+      ? `https://twitter.com/${user.twitterHandle}`
+      : null;
+    redirectUrl = user.website || user.twitter || `${WEBSITE_URL}/${user.slug}`;
   }
 
   if (position === users.length) {
@@ -228,24 +280,33 @@ export async function website(req, res) {
   req.ga.event(`GithubWidget-${selector}`, 'Click', user.slug, position);
 
   res.redirect(301, redirectUrl);
-
 }
 
 export async function avatar(req, res) {
-  req.params.isActive = (req.query.isActive === 'false') ? false : true;
+  req.params.isActive = req.query.isActive === 'false' ? false : true;
   const { collectiveSlug, tierSlug, backerType, isActive } = req.params;
-  let users = cache.get(queryString.stringify({ collectiveSlug, tierSlug, backerType, isActive }));
+  let users = cache.get(
+    queryString.stringify({ collectiveSlug, tierSlug, backerType, isActive }),
+  );
   if (!users) {
     try {
       users = await fetchMembers(req.params);
-      cache.set(queryString.stringify({ collectiveSlug, tierSlug, backerType, isActive }), users);
+      cache.set(
+        queryString.stringify({
+          collectiveSlug,
+          tierSlug,
+          backerType,
+          isActive,
+        }),
+        users,
+      );
     } catch (e) {
       return res.status(404).send('Not found');
     }
   }
 
   const position = parseInt(req.params.position, 10);
-  const user = (position < users.length) ?  users[position] : {};
+  const user = position < users.length ? users[position] : {};
 
   const format = req.params.format || 'svg';
   let maxHeight, maxWidth;
@@ -253,7 +314,7 @@ export async function avatar(req, res) {
   if (req.query.avatarHeight) {
     maxHeight = Number(req.query.avatarHeight);
   } else {
-    maxHeight = (format === 'svg' ) ? 128 : 64;
+    maxHeight = format === 'svg' ? 128 : 64;
     if (selector.match(/silver/)) maxHeight *= 1.25;
     if (selector.match(/gold/)) maxHeight *= 1.5;
     if (selector.match(/diamond/)) maxHeight *= 2;
@@ -261,27 +322,32 @@ export async function avatar(req, res) {
   }
 
   // We only record a page view when loading the first avatar
-  if (position==0) {
+  if (position == 0) {
     req.ga.pageview();
   }
-  const collectiveType = (user.type === 'USER') ? 'user' : 'organization';
+  const collectiveType = user.type === 'USER' ? 'user' : 'organization';
   let imageUrl = `/static/images/${collectiveType}.svg`;
-  if (user.image && user.image.substr(0,1) !== '/') {
+  if (user.image && user.image.substr(0, 1) !== '/') {
     if (user.type === 'USER') {
-      imageUrl = getCloudinaryUrl(user.image, { query: `/c_thumb,g_face,h_${maxHeight},r_max,w_${maxHeight},bo_3px_solid_white/c_thumb,h_${maxHeight},r_max,w_${maxHeight},bo_2px_solid_rgb:66C71A/e_trim/f_auto/` });
+      imageUrl = getCloudinaryUrl(user.image, {
+        query: `/c_thumb,g_face,h_${maxHeight},r_max,w_${maxHeight},bo_3px_solid_white/c_thumb,h_${maxHeight},r_max,w_${maxHeight},bo_2px_solid_rgb:66C71A/e_trim/f_auto/`,
+      });
     } else {
-      imageUrl = getCloudinaryUrl(user.image, { height: maxHeight, width: maxWidth });
+      imageUrl = getCloudinaryUrl(user.image, {
+        height: maxHeight,
+        width: maxWidth,
+      });
     }
   }
 
   if (position == users.length) {
-    const btnImage = (selector.match(/sponsor/)) ? 'sponsor' : 'backer';
+    const btnImage = selector.match(/sponsor/) ? 'sponsor' : 'backer';
     imageUrl = `/static/images/become_${btnImage}.svg`;
   } else if (position > users.length) {
     imageUrl = '/static/images/1px.png';
   }
 
-  if (imageUrl.substr(0,1) === '/') {
+  if (imageUrl.substr(0, 1) === '/') {
     return res.redirect(imageUrl);
   }
 
@@ -297,9 +363,15 @@ export async function avatar(req, res) {
       if (selector.match(/sponsor/)) {
         try {
           const dimensions = sizeOf(data);
-          imageWidth = Math.round(dimensions.width / dimensions.height * imageHeight);
+          imageWidth = Math.round(
+            (dimensions.width / dimensions.height) * imageHeight,
+          );
         } catch (e) {
-          logger.error('>>> collectives.avatar: Unable to get image dimensions for %s', imageUrl, e);
+          logger.error(
+            '>>> collectives.avatar: Unable to get image dimensions for %s',
+            imageUrl,
+            e,
+          );
           return res.status(500).send(`Unable to fetch ${imageUrl}`);
         }
       }
@@ -309,17 +381,17 @@ export async function avatar(req, res) {
         <image width="${imageWidth}" height="${imageHeight}" xlink:href="data:${contentType};base64,${base64data}"/>
       </svg>`;
       res.setHeader('Cache-Control', 'public, max-age=300');
-      res.setHeader('content-type','image/svg+xml;charset=utf-8');
+      res.setHeader('content-type', 'image/svg+xml;charset=utf-8');
       return res.send(svg);
     });
   } else {
     req
       .pipe(request(imageUrl))
-      .on('error', (e) => {
+      .on('error', e => {
         logger.error('>>> collectives.avatar: Error proxying %s', imageUrl, e);
         res.status(500).send(e);
       })
-      .on('response', (res) => {
+      .on('response', res => {
         res.headers['Cache-Control'] = 'public, max-age=300';
       })
       .pipe(res);

@@ -10,13 +10,12 @@ import { exportFile } from '../../../lib/export_file';
 import withIntl from '../../../lib/withIntl';
 import InputField from '../../../components/InputField';
 
-
 /* Convert the output of the allTransactions query into a CSV payload
    that can be downloaded directly by the user */
-export const transformResultInCSV = (json) => {
-  const q = (value) => `"${value}"`;              /* Quote value */
-  const f = (value) => (value / 100).toFixed(2); /* Add cents */
-  const d = (value) => moment(new Date(value)).format('YYYY-MM-DD HH:mm:ss');
+export const transformResultInCSV = json => {
+  const q = value => `"${value}"`; /* Quote value */
+  const f = value => (value / 100).toFixed(2); /* Add cents */
+  const d = value => moment(new Date(value)).format('YYYY-MM-DD HH:mm:ss');
 
   // Sanity check. It will return an empty CSV for the user
   if (json.length === 0) return '';
@@ -42,23 +41,25 @@ export const transformResultInCSV = (json) => {
     'Order Date',
   ].join(',');
 
-  const lines = json.map((i) => {
+  const lines = json.map(i => {
     const profile = `http://opencollective.com/${i.fromCollective.slug}`;
-    const subscriptionInterval = i.subscription ? i.subscription.interval : 'one time';
+    const subscriptionInterval = i.subscription
+      ? i.subscription.interval
+      : 'one time';
     return [
-      q(i.description),                       /* Transaction Description */
-      q(i.fromCollective.name),               /* User Name  */
-      q(profile),                             /* User Profile  */
-      d(i.createdAt),                         /* Transaction Date  */
-      q(i.currency),                          /* Currency */
-      q(hostCurrency),                        /* Host Currency */
-      f(i.amount),                            /* Transaction Amount */
-      f(i.hostFeeInHostCurrency),             /* Host Fee */
-      f(i.platformFeeInHostCurrency),         /* Platform Fee */
-      f(i.paymentProcessorFeeInHostCurrency), /* Payment Processor Fee */
-      f(i.netAmountInCollectiveCurrency),     /* Net Amount */
-      q(subscriptionInterval),                /* Interval of subscription */
-      q(new Date(i.createdAt).toISOString()), /* Order Date */
+      q(i.description) /* Transaction Description */,
+      q(i.fromCollective.name) /* User Name  */,
+      q(profile) /* User Profile  */,
+      d(i.createdAt) /* Transaction Date  */,
+      q(i.currency) /* Currency */,
+      q(hostCurrency) /* Host Currency */,
+      f(i.amount) /* Transaction Amount */,
+      f(i.hostFeeInHostCurrency) /* Host Fee */,
+      f(i.platformFeeInHostCurrency) /* Platform Fee */,
+      f(i.paymentProcessorFeeInHostCurrency) /* Payment Processor Fee */,
+      f(i.netAmountInCollectiveCurrency) /* Net Amount */,
+      q(subscriptionInterval) /* Interval of subscription */,
+      q(new Date(i.createdAt).toISOString()) /* Order Date */,
     ].join(',');
   });
 
@@ -66,7 +67,6 @@ export const transformResultInCSV = (json) => {
 };
 
 class ExportForm extends React.Component {
-
   static propTypes = {
     collective: PropTypes.object,
   };
@@ -76,8 +76,12 @@ class ExportForm extends React.Component {
 
     // Calculate the start: first day of previous month & end date: today.
     const oneMonthAgo = moment().subtract(1, 'months')._d;
-    const defaultStartDate = new Date(oneMonthAgo.getFullYear(), oneMonthAgo.getMonth(), 1);
-    const defaultEndDate = new Date;
+    const defaultStartDate = new Date(
+      oneMonthAgo.getFullYear(),
+      oneMonthAgo.getMonth(),
+      1,
+    );
+    const defaultEndDate = new Date();
 
     this.state = {
       dateFrom: defaultStartDate,
@@ -106,7 +110,7 @@ class ExportForm extends React.Component {
     }
 
     // Helper to prepare date values to be part of the file name
-    const format = (d) => moment(d).format('YYYYMMDDHHMMSS');
+    const format = d => moment(d).format('YYYYMMDDHHMMSS');
     let fileName = `${this.props.collective.slug}--`;
     fileName += `${format(this.state.dateFrom)}-`;
     fileName += `${format(this.state.dateTo)}.csv`;
@@ -123,16 +127,17 @@ class ExportForm extends React.Component {
   render() {
     return (
       <Popover id="csv-date-range" title="Download CSV file" {...this.props}>
-        <style jsx global>{`
-        .control-label {
-          font-weight: 100;
-          font-size: 14px;
-        }
-        .empty-search-error {
-          padding-top: 10px;
-          color: #e21a60;
-        }
-        `}
+        <style jsx global>
+          {`
+            .control-label {
+              font-weight: 100;
+              font-size: 14px;
+            }
+            .empty-search-error {
+              padding-top: 10px;
+              color: #e21a60;
+            }
+          `}
         </style>
         <InputField
           name="dateFrom"
@@ -140,7 +145,7 @@ class ExportForm extends React.Component {
           type="date"
           closeOnSelect
           defaultValue={this.state.dateFrom}
-          onChange={(dateFrom) => this.updateSearchProps({ dateFrom })}
+          onChange={dateFrom => this.updateSearchProps({ dateFrom })}
         />
         <InputField
           name="dateTo"
@@ -148,22 +153,24 @@ class ExportForm extends React.Component {
           type="date"
           defaultValue={this.state.dateTo}
           closeOnSelect
-          onChange={(dateTo) => this.updateSearchProps({ dateTo })}
+          onChange={dateTo => this.updateSearchProps({ dateTo })}
         />
         <Button
           disabled={this.state.disabled}
           bsSize="small"
           bsStyle="primary"
           onClick={this.download.bind(this)}
-        >Download
+        >
+          Download
         </Button>
-        {this.state.searchReturnedEmpty &&
-        <div className="empty-search-error">
-          <FormattedMessage
-            id="transactions.emptysearch"
-            defaultMessage="There are no transactions in this date range."
-          />
-        </div>}
+        {this.state.searchReturnedEmpty && (
+          <div className="empty-search-error">
+            <FormattedMessage
+              id="transactions.emptysearch"
+              defaultMessage="There are no transactions in this date range."
+            />
+          </div>
+        )}
       </Popover>
     );
   }
@@ -175,10 +182,25 @@ class PopoverButton extends React.Component {
   render() {
     const form = <ExportFormWithClient collective={this.props.collective} />;
     return (
-      <OverlayTrigger trigger="click" placement="bottom" overlay={form} rootClose>
-        <a className="download-csv" role="button" style={{ float: 'right', fontSize: '12px', padding: 7 }}>
-          <img src="/static/images/icons/download.svg" style={{ paddingRight: 5 }} />
-          <FormattedMessage id="transactions.downloadcsvbutton" defaultMessage="Download CSV" />
+      <OverlayTrigger
+        trigger="click"
+        placement="bottom"
+        overlay={form}
+        rootClose
+      >
+        <a
+          className="download-csv"
+          role="button"
+          style={{ float: 'right', fontSize: '12px', padding: 7 }}
+        >
+          <img
+            src="/static/images/icons/download.svg"
+            style={{ paddingRight: 5 }}
+          />
+          <FormattedMessage
+            id="transactions.downloadcsvbutton"
+            defaultMessage="Download CSV"
+          />
         </a>
       </OverlayTrigger>
     );

@@ -1,4 +1,3 @@
-
 import { mount } from 'enzyme';
 import React from 'react';
 import EditEventForm from '../EditEventForm';
@@ -11,29 +10,38 @@ import en from 'react-intl/locale-data/en';
 addLocaleData([...en]);
 
 describe('EditEventForm component', () => {
-
-  const onSubmit = (form) => {
+  const onSubmit = form => {
     expect(form.id).toEqual(event.id);
     expect(form.tiers.length).toEqual(event.tiers.length - 2);
   };
 
   const component = mount(
     <IntlProvider locale="en">
-      <EditEventForm
-        event={event}
-        onSubmit={onSubmit}
-      />
-    </IntlProvider>
+      <EditEventForm event={event} onSubmit={onSubmit} />
+    </IntlProvider>,
   );
 
   // @TODO: update: no need for slug anymore
   it.skip('show input type text with slug prefilled', () => {
-    component.find('a.removeTier').first().simulate('click');
-    component.find('a.removeTier').first().simulate('click');
+    component
+      .find('a.removeTier')
+      .first()
+      .simulate('click');
+    component
+      .find('a.removeTier')
+      .first()
+      .simulate('click');
     component.find('.actions Button').simulate('click');
     // console.log("labels", component.find('label').map(node => node.text()));
-    expect(component.find('label').first().text()).toEqual('Name');
+    expect(
+      component
+        .find('label')
+        .first()
+        .text(),
+    ).toEqual('Name');
     expect(component.find('input[name="slug"]').exists()).toBeTrue;
-    expect(component.find('input[name="slug"]').prop('value')).toEqual(event.slug.replace(/.*\//,''));
+    expect(component.find('input[name="slug"]').prop('value')).toEqual(
+      event.slug.replace(/.*\//, ''),
+    );
   });
 });

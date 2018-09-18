@@ -17,8 +17,8 @@ import messages from '../src/lang/en.json';
 
 addLocaleData([...en]);
 addLocaleData({
-    locale: 'en-US',
-    parentLocale: 'en',
+  locale: 'en-US',
+  parentLocale: 'en',
 });
 
 // Create the IntlProvider to retrieve context for wrapping around.
@@ -42,6 +42,6 @@ export function shallowWithIntl(node) {
 export function mountWithIntl(node) {
   return mount(nodeWithIntlProp(node), {
     context: { intl },
-    childContextTypes: { intl: intlShape }
+    childContextTypes: { intl: intlShape },
   });
 }

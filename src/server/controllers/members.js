@@ -5,13 +5,7 @@ import { days, getGraphqlUrl } from '../../lib/utils';
 import { json2csv } from '../../lib/export_file';
 
 export async function list(req, res) {
-
-  const {
-    collectiveSlug,
-    eventSlug,
-    role,
-    tierSlug,
-  } = req.params;
+  const { collectiveSlug, eventSlug, role, tierSlug } = req.params;
 
   let backerType;
   switch (req.params.backerType) {
@@ -28,10 +22,10 @@ export async function list(req, res) {
 
   const headers = {};
   if (req.headers.authorization) {
-    res.setHeader('cache-control','no-cache'); // don't cache at CDN level as the result contains private information
+    res.setHeader('cache-control', 'no-cache'); // don't cache at CDN level as the result contains private information
     headers.authorization = req.headers.authorization;
   } else {
-    res.setHeader('cache-control','max-age=6000');
+    res.setHeader('cache-control', 'max-age=6000');
   }
 
   const client = new GraphQLClient(getGraphqlUrl(), { headers });
@@ -100,53 +94,69 @@ export async function list(req, res) {
   const result = await client.request(query, vars);
   const members = result.Collective.members;
 
-  const isActive = (r) => {
+  const isActive = r => {
     if (!r.tier || !r.tier.interval) return true;
     if (!r.transactions[0] || !r.transactions[0].createdAt) return false;
-    if (r.tier.interval === 'month' && days(new Date(r.transactions[0].createdAt)) <= 31) return true;
-    if (r.tier.interval === 'year' && days(new Date(r.transactions[0].createdAt)) <= 365) return true;
+    if (
+      r.tier.interval === 'month' &&
+      days(new Date(r.transactions[0].createdAt)) <= 31
+    )
+      return true;
+    if (
+      r.tier.interval === 'year' &&
+      days(new Date(r.transactions[0].createdAt)) <= 365
+    )
+      return true;
     return false;
   };
 
   const mapping = {
-    'MemberId': 'id',
-    'createdAt': r => moment(new Date(r.createdAt)).format('YYYY-MM-DD HH:mm'),
-    'type': 'member.type',
-    'role': 'role',
-    'tier': 'tier.name',
-    'isActive': isActive,
-    'totalAmountDonated': (r) => (get(r, 'stats.totalDonations') || 0) / 100,
-    'currency': 'transactions[0].currency',
-    'lastTransactionAt': r => {
-      return moment(r.transactions[0] && new Date(r.transactions[0].createdAt)).format('YYYY-MM-DD HH:mm');
+    MemberId: 'id',
+    createdAt: r => moment(new Date(r.createdAt)).format('YYYY-MM-DD HH:mm'),
+    type: 'member.type',
+    role: 'role',
+    tier: 'tier.name',
+    isActive: isActive,
+    totalAmountDonated: r => (get(r, 'stats.totalDonations') || 0) / 100,
+    currency: 'transactions[0].currency',
+    lastTransactionAt: r => {
+      return moment(
+        r.transactions[0] && new Date(r.transactions[0].createdAt),
+      ).format('YYYY-MM-DD HH:mm');
     },
-    'lastTransactionAmount': (r) => (get(r, 'transactions[0].amount') || 0) / 100,
-    'profile': (r) => `${process.env.WEBSITE_URL}/${r.member.slug}`,
-    'name': 'member.name',
-    'company': 'member.company',
-    'description': 'member.description',
-    'image': 'member.image',
-    'email': 'member.email',
-    'twitter': (r) => {
-      return r.member.twitterHandle ? `https://twitter.com/${r.member.twitterHandle}` : null;
+    lastTransactionAmount: r => (get(r, 'transactions[0].amount') || 0) / 100,
+    profile: r => `${process.env.WEBSITE_URL}/${r.member.slug}`,
+    name: 'member.name',
+    company: 'member.company',
+    description: 'member.description',
+    image: 'member.image',
+    email: 'member.email',
+    twitter: r => {
+      return r.member.twitterHandle
+        ? `https://twitter.com/${r.member.twitterHandle}`
+        : null;
     },
-    'github': (r) => {
-      const githubAccount = r.member.connectedAccounts.find(c => c.service === 'github');
-      return githubAccount ? `https://github.com/${githubAccount.username}` : null;
+    github: r => {
+      const githubAccount = r.member.connectedAccounts.find(
+        c => c.service === 'github',
+      );
+      return githubAccount
+        ? `https://github.com/${githubAccount.username}`
+        : null;
     },
-    'website': 'member.website',
+    website: 'member.website',
   };
 
   const fields = Object.keys(mapping);
 
-  const applyMapping = (row) => {
+  const applyMapping = row => {
     const res = {};
     fields.map(key => {
       const val = mapping[key];
       if (typeof val === 'function') {
-        return res[key] = val(row);
+        return (res[key] = val(row));
       } else {
-        return res[key] = get(row, val);
+        return (res[key] = get(row, val));
       }
     });
     return res;

@@ -7,9 +7,7 @@ import withIntl from '../../../lib/withIntl';
 import Error from '../../../components/Error';
 import Expenses from './Expenses';
 
-
 class ExpensesWithData extends React.Component {
-
   static propTypes = {
     collective: PropTypes.object,
     limit: PropTypes.number,
@@ -37,14 +35,13 @@ class ExpensesWithData extends React.Component {
 
     if (data.error) {
       console.error('graphql error>>>', data.error.message);
-      return (<Error message="GraphQL error" />);
+      return <Error message="GraphQL error" />;
     }
 
     const expenses = data.allExpenses;
 
     return (
       <div className="ExpensesWithData">
-
         <Expenses
           collective={collective}
           expenses={expenses}
@@ -56,59 +53,73 @@ class ExpensesWithData extends React.Component {
           LoggedInUser={LoggedInUser}
           includeHostedCollectives={includeHostedCollectives}
         />
-
       </div>
     );
   }
-
 }
 
 const getExpensesQuery = gql`
-query Expenses($CollectiveId: Int!, $status: String, $category: String, $fromCollectiveSlug: String, $limit: Int, $offset: Int, $includeHostedCollectives: Boolean) {
-  allExpenses(CollectiveId: $CollectiveId, status: $status, category: $category, fromCollectiveSlug: $fromCollectiveSlug, limit: $limit, offset: $offset, includeHostedCollectives: $includeHostedCollectives) {
-    id
-    description
-    status
-    createdAt
-    updatedAt
-    incurredAt
-    category
-    amount
-    currency
-    payoutMethod
-    privateMessage
-    attachment
-    collective {
+  query Expenses(
+    $CollectiveId: Int!
+    $status: String
+    $category: String
+    $fromCollectiveSlug: String
+    $limit: Int
+    $offset: Int
+    $includeHostedCollectives: Boolean
+  ) {
+    allExpenses(
+      CollectiveId: $CollectiveId
+      status: $status
+      category: $category
+      fromCollectiveSlug: $fromCollectiveSlug
+      limit: $limit
+      offset: $offset
+      includeHostedCollectives: $includeHostedCollectives
+    ) {
       id
-      slug
+      description
+      status
+      createdAt
+      updatedAt
+      incurredAt
+      category
+      amount
       currency
-      name
-      host {
+      payoutMethod
+      privateMessage
+      attachment
+      collective {
         id
         slug
+        currency
+        name
+        host {
+          id
+          slug
+        }
+        stats {
+          id
+          balance
+        }
       }
-      stats {
+      fromCollective {
         id
-        balance
+        type
+        name
+        slug
+        image
       }
-    }
-    fromCollective {
-      id
-      type
-      name
-      slug
-      image
-    }
-    user {
-      id
-      paypalEmail
-      email
+      user {
+        id
+        paypalEmail
+        email
+      }
     }
   }
-}
 `;
 
-const getExpensesVariables = (props) => {
+const getExpensesVariables = props => {
   const vars = {
     CollectiveId: props.collective.id,
     offset: 0,
@@ -145,7 +156,10 @@ export const addExpensesData = graphql(getExpensesQuery, {
           }
           return Object.assign({}, previousResult, {
             // Append the new posts results to the old one
-            allExpenses: [...previousResult.allExpenses, ...fetchMoreResult.allExpenses],
+            allExpenses: [
+              ...previousResult.allExpenses,
+              ...fetchMoreResult.allExpenses,
+            ],
           });
         },
       });
