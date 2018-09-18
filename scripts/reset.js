@@ -1,4 +1,4 @@
-import '../server/lib/load-dot-env'; // important to load first for environment config
+import '../server/env'; // important to load first for environment config
 import models from '../server/models';
 
 const exec = require('child-process-promise').exec;
