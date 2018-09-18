@@ -21,6 +21,45 @@ const createPaymentMethodQuery = `
     }
   }
 `;
+
+const allTransactionsFromPaymentMethodQuery = `
+  query allTransactionsFromPaymentMethod($uuid: String!, $dateFrom: String, $dateTo: String, $limit: Int, $offset: Int, $type: String) {
+    allTransactionsFromPaymentMethod(uuid: $uuid, dateFrom: $dateFrom, dateTo: $dateTo, limit: $limit, offset: $offset, type: $type) {
+      id
+      uuid
+      type
+      amount
+      currency
+      hostCurrency
+      hostCurrencyFxRate
+      hostFeeInHostCurrency
+      platformFeeInHostCurrency
+      paymentProcessorFeeInHostCurrency
+      netAmountInCollectiveCurrency
+      createdAt
+      updatedAt
+      host {
+        id
+        slug
+      }
+      createdByUser {
+        id
+        email
+      }
+      fromCollective {
+        id
+        slug
+      }
+      collective {
+        id
+        slug
+      }
+      paymentMethod {
+        id
+      }
+    }
+  }
+`;
 /**
  * Get the paymentMethods of the user.
  *
@@ -69,7 +108,7 @@ async function createVirtualCardThroughGraphQL(args, user) {
 }
 
 /**
- * Creates a virtual card given (at least) an amount and a
+ * Creates a virtual card given (at least) an amount, a currency and a
  * CollectiveId(if the logged in user is and admin of the collective).
  */
 export function createVirtualCard(req, res) {
@@ -92,6 +131,11 @@ export function createVirtualCard(req, res) {
     });
 }
 
+/**
+ * Creates a payment method given (at least) an amount, , a currency and a
+ * CollectiveId(if the logged in user is and admin of the collective).
+ * PS.: Only supports creating Virtual cards at the moment.
+ */
 export function createPaymentMethod(req, res, next) {
   // We only support creation of "virtualcard" payment methods
   if (get(req, 'body.type') && get(req, 'body.type') !== 'virtualcard') {
