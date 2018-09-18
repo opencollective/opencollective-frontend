@@ -1,8 +1,6 @@
-import moment from 'moment';
-import { get, pick } from 'lodash';
 import virtualcard from '../../paymentProviders/opencollective/virtualcard';
 import emailLib from '../../lib/email';
-import models, { Op } from '../../models';
+import models from '../../models';
 
 /** Create a Payment Method through a collective(organization or user)
  *
