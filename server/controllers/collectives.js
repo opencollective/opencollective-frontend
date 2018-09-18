@@ -703,18 +703,17 @@ export const getTransactions = (req, res, next) => {
 /**
  * Get array of all transactions of a collective given its slug
  */
-export const getCollectiveTransactions = (req, res) => {
-  const args = req.query;
-  args.collectiveSlug = get(req, 'params.collectiveSlug');
-  return utils.graphqlQuery(allTransactionsQuery, req.query)
-  .then(response => {
+export const getCollectiveTransactions = async (req, res) => {
+  try {
+    const args = req.query;
+    args.collectiveSlug = get(req, 'params.collectiveSlug');
+    const response = await utils.graphqlQuery(allTransactionsQuery, req.query);
     if (response.errors) {
       throw new Error(response.errors[0]);
     }
     const result = get(response, 'data.allTransactions', []);
     res.send({ result });
-  })
-  .catch(error => {
+  } catch (error) {
     res.status(400).send({ error: error.toString() });
-  });
+  }
 };
