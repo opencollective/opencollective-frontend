@@ -21,45 +21,6 @@ const createPaymentMethodQuery = `
     }
   }
 `;
-
-const allTransactionsFromPaymentMethodQuery = `
-  query allTransactionsFromPaymentMethod($uuid: String!, $dateFrom: String, $dateTo: String, $limit: Int, $offset: Int, $type: String) {
-    allTransactionsFromPaymentMethod(uuid: $uuid, dateFrom: $dateFrom, dateTo: $dateTo, limit: $limit, offset: $offset, type: $type) {
-      id
-      uuid
-      type
-      amount
-      currency
-      hostCurrency
-      hostCurrencyFxRate
-      hostFeeInHostCurrency
-      platformFeeInHostCurrency
-      paymentProcessorFeeInHostCurrency
-      netAmountInCollectiveCurrency
-      createdAt
-      updatedAt
-      host {
-        id
-        slug
-      }
-      createdByUser {
-        id
-        email
-      }
-      fromCollective {
-        id
-        slug
-      }
-      collective {
-        id
-        slug
-      }
-      paymentMethod {
-        id
-      }
-    }
-  }
-`;
 /**
  * Get the paymentMethods of the user.
  *

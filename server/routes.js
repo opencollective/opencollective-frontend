@@ -11,14 +11,7 @@ import getHomePage from './controllers/homepage';
 import uploadImage from './controllers/images';
 import * as mw from './controllers/middlewares';
 import * as notifications from './controllers/notifications';
-<<<<<<< HEAD
-import {
-  getPaymentMethods,
-  createPaymentMethod,
-} from './controllers/paymentMethods';
-=======
-import { getPaymentMethods, createPaymentMethod, getPaymentMethodTransactions } from './controllers/paymentMethods';
->>>>>>> feat: add 2 endpoints: to get transactions from a give collective slug and to get transactions from a given payment method
+import { getPaymentMethods, createPaymentMethod } from './controllers/paymentMethods';
 import * as test from './controllers/test';
 import * as users from './controllers/users';
 import * as applications from './controllers/applications';
