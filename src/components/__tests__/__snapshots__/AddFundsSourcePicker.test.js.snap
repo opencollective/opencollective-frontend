@@ -1,0 +1,138 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`AddFundsSourcePicker component renders default options 1`] = `
+<select
+  className="form-control"
+  id="sourcePicker"
+  name="template"
+  onChange={[Function]}
+  placeholder="select"
+>
+  <option>
+    Host ()
+  </option>
+  <optgroup
+    label="OTHER"
+  >
+    <option
+      value="other"
+    >
+      other (please specify)
+    </option>
+  </optgroup>
+</select>
+`;
+
+exports[`AddFundsSourcePicker component renders fromCollectives by type in optgroup 1`] = `
+<select
+  className="form-control"
+  id="sourcePicker"
+  name="template"
+  onChange={[Function]}
+  placeholder="select"
+>
+  <option>
+    Host ()
+  </option>
+  <optgroup
+    label="COLLECTIVE"
+  >
+    <option
+      value="collective-id"
+    >
+      Example Collective
+    </option>
+  </optgroup>
+  <optgroup
+    label="ORGANIZATION"
+  >
+    <option
+      value="organization-id"
+    >
+      Example Organzation
+    </option>
+  </optgroup>
+  <optgroup
+    label="PEOPLE"
+  >
+    <option
+      value="user-id"
+    >
+      Example Person
+    </option>
+  </optgroup>
+  <optgroup
+    label="OTHER"
+  >
+    <option
+      value="other"
+    >
+      other (please specify)
+    </option>
+  </optgroup>
+</select>
+`;
+
+exports[`AddFundsSourcePicker component renders host name as first option 1`] = `
+<select
+  className="form-control"
+  id="sourcePicker"
+  name="template"
+  onChange={[Function]}
+  placeholder="select"
+>
+  <option
+    value="example-id"
+  >
+    Host (Example Host)
+  </option>
+  <optgroup
+    label="OTHER"
+  >
+    <option
+      value="other"
+    >
+      other (please specify)
+    </option>
+  </optgroup>
+</select>
+`;
+
+exports[`AddFundsSourcePicker component renders loading state 1`] = `<div />`;
+
+exports[`AddFundsSourcePickerForUser component render host options 1`] = `
+<div>
+  <select
+    className="form-control"
+    id="sourcePicker"
+    name="template"
+    onChange={[Function]}
+    placeholder="select"
+  >
+    <option
+      value=""
+    />
+    <option
+      value="host-id"
+    >
+      Example Host
+    </option>
+  </select>
+</div>
+`;
+
+exports[`AddFundsSourcePickerForUser component renders default options 1`] = `
+<div>
+  <select
+    className="form-control"
+    id="sourcePicker"
+    name="template"
+    onChange={[Function]}
+    placeholder="select"
+  >
+    <option
+      value=""
+    />
+  </select>
+</div>
+`;

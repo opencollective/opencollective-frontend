@@ -199,4 +199,10 @@ export const AddFundsSourcePickerForUserWithData = withIntl(
   AddFundsSourcePickerForUser,
 );
 
+// for testing
+export const MockAddFundsSourcePicker = withIntl(AddFundsSourcePicker);
+export const MockAddFundsSourcePickerForUser = withIntl(
+  AddFundsSourcePickerForUser,
+);
+
 export default AddFundsSourcePickerWithData;
