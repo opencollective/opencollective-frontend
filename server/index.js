@@ -1,7 +1,5 @@
-import './lib/load-dot-env'; // important to load first for environment config
+import './env'; // important to load first for environment config
 
-import 'newrelic';
-import 'babel-polyfill';
 import express from 'express';
 import routes from './routes';
 import os from 'os';
