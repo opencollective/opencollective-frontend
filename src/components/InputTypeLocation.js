@@ -25,6 +25,10 @@ class InputTypeLocation extends React.Component {
   }
 
   handleChange(value) {
+    if (!value) {
+      this.setState({ value: {} });
+      return this.props.onChange({});
+    }
     const label = value.label && value.label.replace(/,.+/, '');
     const location = {
       name: label,

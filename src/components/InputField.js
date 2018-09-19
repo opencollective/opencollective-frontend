@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { get, debounce } from 'lodash';
+import { get } from 'lodash';
 import { capitalize } from '../lib/utils';
 import DateTime from 'react-datetime';
 import stylesheet from '../styles/react-datetime.css';
@@ -133,7 +133,6 @@ class InputField extends React.Component {
     super(props);
     this.state = { value: props.value, validationState: null };
     this.handleChange = this.handleChange.bind(this);
-    this.debouncedHandleChange = debounce(props.onChange, 500);
   }
 
   UNSAFE_componentWillReceiveProps(nextProps) {
@@ -167,7 +166,7 @@ class InputField extends React.Component {
       this.setState({ validationState: 'error' });
     }
     this.setState({ value });
-    this.debouncedHandleChange(value);
+    this.props.onChange(value);
   }
 
   render() {
