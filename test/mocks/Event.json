@@ -17,7 +17,7 @@
           "hero": {
             "cover": {
               "transform": "scale(1.06)",
-              "backgroundImage": "url(http://localhost:3000/public/images/collectives/default-header-bg.jpg)"
+              "backgroundImage": "url(http://localhost:3000/static/images/default-header-bg.jpg)"
             },
             "a": {}
           }
