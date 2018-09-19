@@ -6,9 +6,9 @@ const image4 = '/static/images/avatar-04.svg';
 const avatars = [image1, image2, image3, image4];
 
 const logos = [
-  '/public/images/code.svg',
-  '/public/images/rocket.svg',
-  '/public/images/repo.svg',
+  '/static/images/code.svg',
+  '/static/images/rocket.svg',
+  '/static/images/repo.svg',
 ];
 
 export function pickAvatar(NameOrId) {

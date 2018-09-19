@@ -27,7 +27,7 @@ export default (server, app) => {
 
   server.get('/favicon.*', mw.maxAge(300000), (req, res) => {
     return res.sendFile(
-      path.join(__dirname, '../public/images/favicon.ico.png'),
+      path.join(__dirname, '../static/images/favicon.ico.png'),
     );
   });
 

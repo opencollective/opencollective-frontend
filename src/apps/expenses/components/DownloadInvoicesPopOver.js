@@ -52,7 +52,7 @@ class Overlay extends React.Component {
   renderInvoice(invoice) {
     const icon =
       this.state.loading === invoice.slug
-        ? '/public/images/loading.gif'
+        ? '/static/images/loading.gif'
         : imagePreview(invoice.host.image, defaultImage.ORGANIZATION, {
             height: 48,
           });

@@ -47,9 +47,9 @@ Subscribe to our [Talks Playlist on YouTube](https://www.youtube.com/playlist?li
 
 ## Media / Logo
 
-- Download the [Open Collective Logo](https://opencollective.com/public/images/opencollectivelogo.png) in high resolution: [svg](https://opencollective.com/public/images/opencollectivelogo.svg) - [png](https://opencollective.com/public/images/opencollectivelogo.png)
+- Download the [Open Collective Logo](https://opencollective.com/static/images/opencollectivelogo.png) in high resolution: [svg](https://opencollective.com/static/images/opencollectivelogo.svg) - [png](https://opencollective.com/static/images/opencollectivelogo.png)
 
-![](https://opencollective.com/public/images/opencollectivelogo.svg)
+![](https://opencollective.com/static/images/opencollectivelogo.svg)
 
 ## Follow us
 
