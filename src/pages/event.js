@@ -11,10 +11,13 @@ import withIntl from '../lib/withIntl';
 import withLoggedInUser from '../lib/withLoggedInUser';
 
 class EventPage extends React.Component {
-  static getInitialProps({ res, query: { parentCollectiveSlug, eventSlug } }) {
-    if (res) {
-      res.setHeader('Cache-Control', 'public, max-age=300');
+  static getInitialProps({ req, res, query }) {
+    const { parentCollectiveSlug, eventSlug } = query;
+
+    if (res && req && req.locale == 'en') {
+      res.setHeader('Cache-Control', 's-maxage=300');
     }
+
     return { parentCollectiveSlug, eventSlug };
   }
 

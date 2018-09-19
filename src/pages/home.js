@@ -133,9 +133,9 @@ const BackerAvatar = ({ slug, image, stats: { totalAmountSpent } }) => (
 );
 
 class HomePage extends React.Component {
-  static getInitialProps(context) {
-    if (context.res) {
-      context.res.setHeader('Cache-Control', 'public, max-age=7200');
+  static getInitialProps({ req, res }) {
+    if (res && req && req.locale == 'en') {
+      res.setHeader('Cache-Control', 's-maxage=7200');
     }
   }
 

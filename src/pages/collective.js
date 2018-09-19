@@ -12,9 +12,9 @@ import withIntl from '../lib/withIntl';
 import withLoggedInUser from '../lib/withLoggedInUser';
 
 class CollectivePage extends React.Component {
-  static getInitialProps({ query, res }) {
-    if (res) {
-      res.setHeader('Cache-Control', 'public, max-age=300');
+  static getInitialProps({ req, res, query }) {
+    if (res && req && req.locale == 'en') {
+      res.setHeader('Cache-Control', 's-maxage=300');
     }
 
     return { slug: query && query.slug, query };
