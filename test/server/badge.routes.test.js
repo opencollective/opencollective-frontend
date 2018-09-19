@@ -90,7 +90,7 @@ describe('badge.routes.test.js', () => {
       'loads the badge (svg)',
       async () => {
         const resText = await fetchText('/apex/tiers/sponsors/badge.svg');
-        expect(resText).toMatch(/Sponsors<\/text>/);
+        expect(resText).toMatch(/sponsors<\/text>/);
       },
       timeout,
     );
