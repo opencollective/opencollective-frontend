@@ -11,9 +11,7 @@ import SignInForm from '../../../components/SignInForm';
 import categories from '../../../constants/categories';
 import Button from '../../../components/Button';
 
-
 class CreateExpenseForm extends React.Component {
-
   static propTypes = {
     collective: PropTypes.object,
     LoggedInUser: PropTypes.object,
@@ -28,15 +26,45 @@ class CreateExpenseForm extends React.Component {
     this.onSubmit = this.onSubmit.bind(this);
 
     this.messages = defineMessages({
-      'paypal': { id: 'expense.payoutMethod.paypal', defaultMessage: 'PayPal ({paypalEmail, select, missing {missing} other {{paypalEmail}}})' },
-      'newExpense.paypal.label': { id: 'newExpense.paypal.label', defaultMessage: 'Please provide address' },
-      'other': { id: 'expense.payoutMethod.manual', defaultMessage: 'Other (see instructions)' },
-      'donation': { id: 'expense.payoutMethod.donation', defaultMessage: 'Donation' },
-      'error.descriptionMissing': { id: 'expense.error.descriptionMissing', defaultMessage: 'Missing description' },
-      'error.amountMissing': { id: 'expense.error.amountMissing', defaultMessage: 'Amount must be greater than 0' },
-      'error.privateMessageMissing': { id: 'expense.error.privateMessageMissing', defaultMessage: 'Please provide instructions on how you\'d like to be reimbursed as a private note' },
-      'error.paypalEmailMissing': { id: 'expense.error.paypalEmailMissing', defaultMessage: 'Please provide your PayPal email address (or change the payout method)' },
-      'error.attachmentMissing': { id: 'expense.error.attachmentMissing', defaultMessage: 'Missing attachment' },
+      paypal: {
+        id: 'expense.payoutMethod.paypal',
+        defaultMessage:
+          'PayPal ({paypalEmail, select, missing {missing} other {{paypalEmail}}})',
+      },
+      'newExpense.paypal.label': {
+        id: 'newExpense.paypal.label',
+        defaultMessage: 'Please provide address',
+      },
+      other: {
+        id: 'expense.payoutMethod.manual',
+        defaultMessage: 'Other (see instructions)',
+      },
+      donation: {
+        id: 'expense.payoutMethod.donation',
+        defaultMessage: 'Donation',
+      },
+      'error.descriptionMissing': {
+        id: 'expense.error.descriptionMissing',
+        defaultMessage: 'Missing description',
+      },
+      'error.amountMissing': {
+        id: 'expense.error.amountMissing',
+        defaultMessage: 'Amount must be greater than 0',
+      },
+      'error.privateMessageMissing': {
+        id: 'expense.error.privateMessageMissing',
+        defaultMessage:
+          "Please provide instructions on how you'd like to be reimbursed as a private note",
+      },
+      'error.paypalEmailMissing': {
+        id: 'expense.error.paypalEmailMissing',
+        defaultMessage:
+          'Please provide your PayPal email address (or change the payout method)',
+      },
+      'error.attachmentMissing': {
+        id: 'expense.error.attachmentMissing',
+        defaultMessage: 'Missing attachment',
+      },
     });
 
     this.categoriesOptions = categories(props.collective.slug).map(category => {
@@ -48,12 +76,12 @@ class CreateExpenseForm extends React.Component {
       expense: {
         category: Object.keys(this.categoriesOptions[0])[0],
         payoutMethod: 'paypal',
-        paypalEmail: (props.LoggedInUser && props.LoggedInUser.paypalEmail) || null,
+        paypalEmail:
+          (props.LoggedInUser && props.LoggedInUser.paypalEmail) || null,
       },
       isExpenseValid: false,
       loading: false,
     };
-
   }
 
   getOptions(arr, intlVars) {
@@ -67,23 +95,33 @@ class CreateExpenseForm extends React.Component {
   validate(expense) {
     const { intl } = this.props;
     if (!expense.description) {
-      this.setState({ error: intl.formatMessage(this.messages['error.descriptionMissing']) });
+      this.setState({
+        error: intl.formatMessage(this.messages['error.descriptionMissing']),
+      });
       return false;
     }
     if (!expense.amount > 0) {
-      this.setState({ error: intl.formatMessage(this.messages['error.amountMissing']) });
+      this.setState({
+        error: intl.formatMessage(this.messages['error.amountMissing']),
+      });
       return false;
     }
     if (!expense.attachment) {
-      this.setState({ error: intl.formatMessage(this.messages['error.attachmentMissing']) });
+      this.setState({
+        error: intl.formatMessage(this.messages['error.attachmentMissing']),
+      });
       return false;
     }
     if (expense.payoutMethod === 'other' && !expense.privateMessage) {
-      this.setState({ error: intl.formatMessage(this.messages['error.privateMessageMissing']) });
+      this.setState({
+        error: intl.formatMessage(this.messages['error.privateMessageMissing']),
+      });
       return false;
     }
     if (expense.payoutMethod === 'paypal' && !expense.paypalEmail) {
-      this.setState({ error: intl.formatMessage(this.messages['error.paypalEmailMissing']) });
+      this.setState({
+        error: intl.formatMessage(this.messages['error.paypalEmailMissing']),
+      });
       return false;
     }
     this.setState({ error: null });
@@ -95,13 +133,21 @@ class CreateExpenseForm extends React.Component {
       ...this.state.expense,
       [attr]: value,
     };
-    const newState = { modified: true, expense, isExpenseValid: this.validate(expense) };
+    const newState = {
+      modified: true,
+      expense,
+      isExpenseValid: this.validate(expense),
+    };
     this.setState(newState);
     this.props.onChange && this.props.onChange(expense);
   }
 
   UNSAFE_componentWillReceiveProps(newProps) {
-    if (!this.props.LoggedInUser && newProps.LoggedInUser && !this.state.expense.paypalEmail) {
+    if (
+      !this.props.LoggedInUser &&
+      newProps.LoggedInUser &&
+      !this.state.expense.paypalEmail
+    ) {
       this.handleChange('paypalEmail', newProps.LoggedInUser.paypalEmail);
     }
   }
@@ -112,7 +158,12 @@ class CreateExpenseForm extends React.Component {
     }
     try {
       await this.props.onSubmit(this.state.expense);
-      this.setState({ modified: false, isExpenseValid: false, expense: {}, loading: false });
+      this.setState({
+        modified: false,
+        isExpenseValid: false,
+        expense: {},
+        loading: false,
+      });
     } catch (e) {
       this.setState({ loading: false });
       console.error('CreateExpenseForm onSubmit error', e);
@@ -125,155 +176,190 @@ class CreateExpenseForm extends React.Component {
     const { expense } = this.state;
 
     const payoutMethods = this.getOptions(['paypal', 'other', 'donation'], {
-      paypalEmail: get(expense, 'user.paypalEmail') || intl.formatMessage(this.messages['newExpense.paypal.label']),
+      paypalEmail:
+        get(expense, 'user.paypalEmail') ||
+        intl.formatMessage(this.messages['newExpense.paypal.label']),
     });
 
     return (
       <div className={`CreateExpenseForm ${this.props.mode}`}>
-        <style jsx>{`
-          .CreateExpenseForm {
-            font-size: 1.2rem;
-            overflow: hidden;
-            margin: 0 1rem 5rem 1rem;
-          }
-          .disclaimer, .expensePolicy {
-            font-size: 1.4rem;
-            margin: 2rem 0;
-          }
-          .description {
-            font-size: 1.4rem;
-          }
-          .CreateExpenseForm .frame {
-            padding: 4px;
-            margin-top: 1rem;
-            margin-right: 1rem;
-            float: left;
-            width: 128px;
-          }
-          .CreateExpenseForm img {
-            width: 100%;
-          }
-          .leftColumn, .rightColumn {
-            overflow: hidden;
-          }
-          .leftColumn {
-            float: left;
-            margin-right: 2rem;
-            display: flex;
-            flex-direction: column;
-          }
-          .col {
-            float: left;
-            display: flex;
-            flex-direction: column;
-            margin-right: 1rem;
-            margin-top: 1rem;
-          }
-          .col.incurredAt {
-            width: 12rem;
-          }
-          .col.emailInput {
-            width: 25rem;
-          }
-          .row {
-            clear: both;
-            margin-left: 0;
-            margin-right: 0;
-          }
-          .row .col.large {
-            width: 100%;
-          }
-          label {
-            text-transform: uppercase;
-            color: #aaaeb3;
-            font-weight: 300;
-            font-family: lato, montserratlight, arial;
-            white-space: nowrap;
-          }
-          .netAmountInCollectiveCurrency {
-            font-weight: bold;
-          }
-          .error {
-            display: flex;
-            align-items: center;
-            color: red;
-            margin-left: 1rem;
-          }
-          @media(max-width: 600px) {
+        <style jsx>
+          {`
+            .CreateExpenseForm {
+              font-size: 1.2rem;
+              overflow: hidden;
+              margin: 0 1rem 5rem 1rem;
+            }
+            .disclaimer,
+            .expensePolicy {
+              font-size: 1.4rem;
+              margin: 2rem 0;
+            }
+            .description {
+              font-size: 1.4rem;
+            }
+            .CreateExpenseForm .frame {
+              padding: 4px;
+              margin-top: 1rem;
+              margin-right: 1rem;
+              float: left;
+              width: 128px;
+            }
+            .CreateExpenseForm img {
+              width: 100%;
+            }
+            .leftColumn,
+            .rightColumn {
+              overflow: hidden;
+            }
             .leftColumn {
-              float: none;
+              float: left;
+              margin-right: 2rem;
               display: flex;
-              justify-content: center;
+              flex-direction: column;
+            }
+            .col {
+              float: left;
+              display: flex;
+              flex-direction: column;
+              margin-right: 1rem;
+              margin-top: 1rem;
+            }
+            .col.incurredAt {
+              width: 12rem;
+            }
+            .col.emailInput {
+              width: 25rem;
+            }
+            .row {
+              clear: both;
+              margin-left: 0;
+              margin-right: 0;
+            }
+            .row .col.large {
+              width: 100%;
+            }
+            label {
+              text-transform: uppercase;
+              color: #aaaeb3;
+              font-weight: 300;
+              font-family: lato, montserratlight, arial;
+              white-space: nowrap;
+            }
+            .netAmountInCollectiveCurrency {
+              font-weight: bold;
+            }
+            .error {
+              display: flex;
               align-items: center;
+              color: red;
+              margin-left: 1rem;
             }
-            .attachment img {
-              width: 90%;
+            @media (max-width: 600px) {
+              .leftColumn {
+                float: none;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+              }
+              .attachment img {
+                width: 90%;
+              }
             }
-          }
-        `}
+          `}
         </style>
-        <style global jsx>{`
-          .CreateExpenseForm .inputField {
-            margin: 0;
-          }
-
-          .CreateExpenseForm .descriptionField {
-            width: 50rem;
-            max-width: 100%;
-          }
-
-          .CreateExpenseForm .amountField {
-            max-width: 15rem;
-          }
-
-          .CreateExpenseForm .inputField textarea {
-            font-size: 1.2rem;
-          }
-
-          .CreateExpenseForm .attachmentField {
-            width: 128px;
-          }
-
-          .CreateExpenseForm .attachmentField .form-group {
-            margin: 0;
-          }
-
-          .CreateExpenseForm .col.privateMessage {
-            width: 100%;
-          }
-
-          @media(max-width: 600px) {
-            .attachmentField {
-              width: 90%;
+        <style global jsx>
+          {`
+            .CreateExpenseForm .inputField {
+              margin: 0;
             }
-          }
-        `}
+
+            .CreateExpenseForm .descriptionField {
+              width: 50rem;
+              max-width: 100%;
+            }
+
+            .CreateExpenseForm .amountField {
+              max-width: 15rem;
+            }
+
+            .CreateExpenseForm .inputField textarea {
+              font-size: 1.2rem;
+            }
+
+            .CreateExpenseForm .attachmentField {
+              width: 128px;
+            }
+
+            .CreateExpenseForm .attachmentField .form-group {
+              margin: 0;
+            }
+
+            .CreateExpenseForm .col.privateMessage {
+              width: 100%;
+            }
+
+            @media (max-width: 600px) {
+              .attachmentField {
+                width: 90%;
+              }
+            }
+          `}
         </style>
 
         <form onSubmit={this.onSubmit}>
-          { !collective.expensePolicy && LoggedInUser && LoggedInUser.canEditCollective(collective) &&
+          {!collective.expensePolicy &&
+            LoggedInUser &&
+            LoggedInUser.canEditCollective(collective) && (
+              <div className="expensePolicy">
+                <h2>
+                  <FormattedMessage
+                    id="collective.expensePolicy.label"
+                    defaultMessage="Expense policy"
+                  />
+                </h2>
+                <p>
+                  <FormattedMessage
+                    id="collective.expensePolicy.description"
+                    defaultMessage="It can be daunting for the community to file an expense. Help them by providing a clear expense policy to explain what they can expense."
+                  />
+                </p>
+                <Button
+                  className="blue"
+                  href={`/${collective.slug}/edit#expenses`}
+                >
+                  <FormattedMessage
+                    id="expense.expensePolicy.add"
+                    defaultMessage="add an expense policy"
+                  />
+                </Button>
+              </div>
+            )}
+          {(collective.expensePolicy ||
+            get(collective, 'host.expensePolicy')) && (
             <div className="expensePolicy">
-              <h2><FormattedMessage id="collective.expensePolicy.label" defaultMessage="Expense policy" /></h2>
-              <p><FormattedMessage id="collective.expensePolicy.description" defaultMessage="It can be daunting for the community to file an expense. Help them by providing a clear expense policy to explain what they can expense." /></p>
-              <Button className="blue" href={`/${collective.slug}/edit#expenses`}>
-                <FormattedMessage id="expense.expensePolicy.add" defaultMessage="add an expense policy" />
-              </Button>
-            </div>
-          }
-          { (collective.expensePolicy || get(collective, 'host.expensePolicy') ) &&
-            <div className="expensePolicy">
-              <h2><FormattedMessage id="expense.expensePolicy" defaultMessage="Expense policy" /></h2>
-              { collective.expensePolicy &&
+              <h2>
+                <FormattedMessage
+                  id="expense.expensePolicy"
+                  defaultMessage="Expense policy"
+                />
+              </h2>
+              {collective.expensePolicy && (
                 <Markdown source={collective.expensePolicy} />
-              }
-              { get(collective, 'host.expensePolicy') &&
+              )}
+              {get(collective, 'host.expensePolicy') && (
                 <Markdown source={get(collective, 'host.expensePolicy')} />
-              }
+              )}
             </div>
-          }
+          )}
           <div className="disclaimer">
-            <FormattedMessage id="expense.disclaimer" defaultMessage="You must upload a valid receipt or invoice. We should be able to see clearly on the picture (or PDF) the total amount paid, the date, the items purchased and the legal address." />
-            <a href="https://opencollective.com/faq#expense"><FormattedMessage id="needHelp" defaultMessage="Need help?" /></a>
+            <FormattedMessage
+              id="expense.disclaimer"
+              defaultMessage="You must upload a valid receipt or invoice. We should be able to see clearly on the picture (or PDF) the total amount paid, the date, the items purchased and the legal address."
+            />
+            <a href="https://opencollective.com/faq#expense">
+              <FormattedMessage id="needHelp" defaultMessage="Need help?" />
+            </a>
           </div>
 
           <div className="leftColumn">
@@ -283,10 +369,17 @@ class CreateExpenseForm extends React.Component {
                 options={{ accept: 'image/jpeg, image/png, application/pdf' }}
                 name="attachment"
                 className="attachmentField"
-                onChange={attachment => this.handleChange('attachment', attachment)}
+                onChange={attachment =>
+                  this.handleChange('attachment', attachment)
+                }
                 defaultValue={expense.attachment}
                 placeholder={'/static/images/receipt.svg'}
-                description={<FormattedMessage id="expense.attachment.description" defaultMessage="Upload receipt or invoice (photo or PDF)" />}
+                description={
+                  <FormattedMessage
+                    id="expense.attachment.description"
+                    defaultMessage="Upload receipt or invoice (photo or PDF)"
+                  />
+                }
               />
             </div>
           </div>
@@ -294,7 +387,12 @@ class CreateExpenseForm extends React.Component {
           <div className="rightColumn">
             <div className="row">
               <div className="col large">
-                <label><FormattedMessage id="expense.description" defaultMessage="description" /></label>
+                <label>
+                  <FormattedMessage
+                    id="expense.description"
+                    defaultMessage="description"
+                  />
+                </label>
                 <div className="description">
                   <span className="description">
                     <InputField
@@ -303,7 +401,9 @@ class CreateExpenseForm extends React.Component {
                       defaultValue={expense.description}
                       className="descriptionField"
                       maxLength={255}
-                      onChange={description => this.handleChange('description', description)}
+                      onChange={description =>
+                        this.handleChange('description', description)
+                      }
                     />
                   </span>
                 </div>
@@ -311,7 +411,9 @@ class CreateExpenseForm extends React.Component {
             </div>
 
             <div className="col">
-              <label><FormattedMessage id="expense.amount" defaultMessage="amount" /></label>
+              <label>
+                <FormattedMessage id="expense.amount" defaultMessage="amount" />
+              </label>
               <div className="amountDetails">
                 <span className="amount">
                   <InputField
@@ -327,22 +429,34 @@ class CreateExpenseForm extends React.Component {
             </div>
 
             <div className="col incurredAt">
-              <label><FormattedMessage id="expense.incurredAt" defaultMessage="Date" /></label>
+              <label>
+                <FormattedMessage
+                  id="expense.incurredAt"
+                  defaultMessage="Date"
+                />
+              </label>
               <div className="incurredAt">
                 <span className="incurredAt">
                   <InputField
-                    defaultValue={new Date}
+                    defaultValue={new Date()}
                     type="date"
                     name="incurredAt"
                     className="incurredAtField"
-                    onChange={incurredAt => this.handleChange('incurredAt', incurredAt)}
+                    onChange={incurredAt =>
+                      this.handleChange('incurredAt', incurredAt)
+                    }
                   />
                 </span>
               </div>
             </div>
 
             <div className="col">
-              <label><FormattedMessage id="expense.category" defaultMessage="category" /></label>
+              <label>
+                <FormattedMessage
+                  id="expense.category"
+                  defaultMessage="category"
+                />
+              </label>
               <div className="category">
                 <span className="category">
                   <InputField
@@ -351,64 +465,101 @@ class CreateExpenseForm extends React.Component {
                     defaultValue={expense.category}
                     name="category"
                     className="categoryField"
-                    onChange={category => this.handleChange('category', category)}
+                    onChange={category =>
+                      this.handleChange('category', category)
+                    }
                   />
                 </span>
               </div>
             </div>
 
             <div className="col">
-              <label><FormattedMessage id="expense.payoutMethod" defaultMessage="payout method" /></label>
+              <label>
+                <FormattedMessage
+                  id="expense.payoutMethod"
+                  defaultMessage="payout method"
+                />
+              </label>
               <InputField
                 type="select"
                 name="payoutMethod"
                 options={payoutMethods}
                 defaultValue={expense.payoutMethod}
-                onChange={payoutMethod => this.handleChange('payoutMethod', payoutMethod)}
+                onChange={payoutMethod =>
+                  this.handleChange('payoutMethod', payoutMethod)
+                }
               />
             </div>
 
-            { this.state.expense.payoutMethod === 'paypal' &&
+            {this.state.expense.payoutMethod === 'paypal' && (
               <div className="col emailInput">
-                <label><FormattedMessage id="expense.payoutMethod.paypal.label" defaultMessage="PayPal address" /></label>
+                <label>
+                  <FormattedMessage
+                    id="expense.payoutMethod.paypal.label"
+                    defaultMessage="PayPal address"
+                  />
+                </label>
                 <InputField
                   type="email"
                   name="paypalEmail"
                   key={`paypalEmail-${get(LoggedInUser, 'id')}`}
                   defaultValue={this.state.expense.paypalEmail}
-                  onChange={paypalEmail => this.handleChange('paypalEmail', paypalEmail)}
+                  onChange={paypalEmail =>
+                    this.handleChange('paypalEmail', paypalEmail)
+                  }
                 />
               </div>
-            }
+            )}
 
             <div className="col privateMessage">
               <label>
-                <FormattedMessage id="expense.privateMessage" defaultMessage="Private instructions" />
+                <FormattedMessage
+                  id="expense.privateMessage"
+                  defaultMessage="Private instructions"
+                />
               </label>
               <InputField
                 type="textarea"
                 name="privateMessage"
-                onChange={privateMessage => this.handleChange('privateMessage', privateMessage)}
+                onChange={privateMessage =>
+                  this.handleChange('privateMessage', privateMessage)
+                }
                 defaultValue={expense.privateMessage}
-                description={<FormattedMessage id="expense.privateMessage.description" defaultMessage="Private instructions for the host to reimburse your expense" />}
+                description={
+                  <FormattedMessage
+                    id="expense.privateMessage.description"
+                    defaultMessage="Private instructions for the host to reimburse your expense"
+                  />
+                }
               />
             </div>
 
             <div className="row">
               <div>
-                <Button className="blue" type="submit" disabled={this.state.loading || !this.state.isExpenseValid} >
-                  { this.state.loading && <FormattedMessage id="form.processing" defaultMessage="processing" /> }
-                  { !this.state.loading && <FormattedMessage id="expense.new.submit" defaultMessage="Submit Expense" /> }
+                <Button
+                  className="blue"
+                  type="submit"
+                  disabled={this.state.loading || !this.state.isExpenseValid}
+                >
+                  {this.state.loading && (
+                    <FormattedMessage
+                      id="form.processing"
+                      defaultMessage="processing"
+                    />
+                  )}
+                  {!this.state.loading && (
+                    <FormattedMessage
+                      id="expense.new.submit"
+                      defaultMessage="Submit Expense"
+                    />
+                  )}
                 </Button>
               </div>
 
-              { this.state.error &&
-                <div className="error">
-                  {this.state.error}
-                </div>
-              }
+              {this.state.error && (
+                <div className="error">{this.state.error}</div>
+              )}
             </div>
-
           </div>
         </form>
       </div>
@@ -421,7 +572,12 @@ class CreateExpenseForm extends React.Component {
     if (!LoggedInUser) {
       return (
         <div className="CreateExpenseForm">
-          <p><FormattedMessage id="expenses.create.login" defaultMessage="Sign up or login to submit an expense." /></p>
+          <p>
+            <FormattedMessage
+              id="expenses.create.login"
+              defaultMessage="Sign up or login to submit an expense."
+            />
+          </p>
           <SignInForm next={`/${collective.slug}/expenses/new`} />
         </div>
       );

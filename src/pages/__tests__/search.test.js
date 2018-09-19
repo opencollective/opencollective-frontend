@@ -36,7 +36,9 @@ describe('Search Page', () => {
       term: 'test',
     };
 
-    const tree = renderer.create(<MockSearchPage {...emptyResultsProps} />).toJSON();
+    const tree = renderer
+      .create(<MockSearchPage {...emptyResultsProps} />)
+      .toJSON();
     expect(tree).toMatchSnapshot();
   });
 
@@ -59,9 +61,11 @@ describe('Search Page', () => {
       ...props,
       data: {
         search: {
-          collectives: [{
-            slug: 'test-collective',
-          }],
+          collectives: [
+            {
+              slug: 'test-collective',
+            },
+          ],
           limit: 20,
           offset: 0,
           total: 100,

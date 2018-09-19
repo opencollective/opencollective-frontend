@@ -24,7 +24,6 @@ const getStripeToken = sinon.stub(stripe, 'getStripeToken').callsFake(() => {
 sinon.stub(api, 'checkUserExistence').callsFake(() => Promise.resolve(false));
 
 describe('OrderForm component', () => {
-
   const tiers = {
     donor: {
       name: 'donor',
@@ -60,17 +59,18 @@ describe('OrderForm component', () => {
     c.simulate('change', { target: { value } });
   };
 
-  const mountComponent = (props, queryStub) => mount(
-    <ApolloProvider
-      client={{
-        query: queryStub || Promise.resolve,
-      }}
-    >
-      <IntlProvider locale="en">
-        <OrderForm {...props} />
-      </IntlProvider>
-    </ApolloProvider>
-  );
+  const mountComponent = (props, queryStub) =>
+    mount(
+      <ApolloProvider
+        client={{
+          query: queryStub || Promise.resolve,
+        }}
+      >
+        <IntlProvider locale="en">
+          <OrderForm {...props} />
+        </IntlProvider>
+      </ApolloProvider>,
+    );
 
   let component;
 
@@ -81,8 +81,7 @@ describe('OrderForm component', () => {
   });
 
   describe('error messages', () => {
-
-    it('error.email.invalid', (done) => {
+    it('error.email.invalid', done => {
       component = mountComponent({ collective, order });
       fillValue(component, 'email', 'testuser');
       setTimeout(() => {
@@ -95,11 +94,9 @@ describe('OrderForm component', () => {
   });
 
   describe('not logged in', () => {
-
     // Doesn't work anymore because of Stripe Element
-    it.skip('show the user details form and credit card form', (done) => {
-
-      const onSubmit = (order) => {
+    it.skip('show the user details form and credit card form', done => {
+      const onSubmit = order => {
         expect(getStripeToken.callCount).toEqual(1);
         expect(order.user).toEqual({ ...LoggedInUser });
         expect(order.totalAmount).toEqual(tiers.donor.presets[2]);
@@ -122,19 +119,19 @@ describe('OrderForm component', () => {
       }
       fillValue(component, 'publicMessage', 'public message');
 
-      component.find('.presetBtn').last().simulate('click');
+      component
+        .find('.presetBtn')
+        .last()
+        .simulate('click');
       setTimeout(() => {
         component.find('.submit button').simulate('click');
       }, 2000);
     });
   });
 
-
   describe('logged in', () => {
-
     // @TODO: update this test for new OrderForm
-    it.skip('let the user pick a credit card', (done) => {
-
+    it.skip('let the user pick a credit card', done => {
       getStripeToken.reset();
 
       const LoggedInUser = {
@@ -169,7 +166,7 @@ describe('OrderForm component', () => {
         },
       };
 
-      const onSubmit = (order) => {
+      const onSubmit = order => {
         expect(getStripeToken.callCount).toEqual(0);
         expect(order.user).toEqual({
           id: LoggedInUser.id,
@@ -195,7 +192,9 @@ describe('OrderForm component', () => {
         }
       }
       expect(component.find('.creditcardSelector').exists()).toBeTrue;
-      expect(component.find('.creditcardSelector').html()).toContain(LoggedInUser.paymentMethods[0].identifier);
+      expect(component.find('.creditcardSelector').html()).toContain(
+        LoggedInUser.paymentMethods[0].identifier,
+      );
       setTimeout(() => {
         component.find('.submit button').simulate('click');
         setTimeout(() => {
@@ -206,10 +205,10 @@ describe('OrderForm component', () => {
   });
 
   describe('gift card', () => {
-
-    it('gives invalid error', (done) => {
-
-      component = mountComponent({ collective, order }, () => Promise.resolve({ data: null }));
+    it('gives invalid error', done => {
+      component = mountComponent({ collective, order }, () =>
+        Promise.resolve({ data: null }),
+      );
 
       component.find('.gift-card-expander').simulate('click');
       fillValue(component, 'ocCard', 'BB-FTC1900');
@@ -217,20 +216,25 @@ describe('OrderForm component', () => {
       component.find('.ocCardApply.btn').simulate('click');
 
       setTimeout(() => {
-        expect(component.find('.inputField.ocCard').html()).toContain('Invalid code');
+        expect(component.find('.inputField.ocCard').html()).toContain(
+          'Invalid code',
+        );
         done();
       }, 1000);
     });
 
-    it('gives correct amount on success', (done) => {
-
-      component = mountComponent({ collective, order }, () => Promise.resolve({ data: {
-          ocPaymentMethod: {
-            balance: 5000,
-            valid: true,
-            currency: 'USD',
+    it('gives correct amount on success', done => {
+      component = mountComponent({ collective, order }, () =>
+        Promise.resolve({
+          data: {
+            ocPaymentMethod: {
+              balance: 5000,
+              valid: true,
+              currency: 'USD',
+            },
           },
-      } }));
+        }),
+      );
 
       component.find('.gift-card-expander').simulate('click');
       fillValue(component, 'ocCard', 'BB-FTC1900');
@@ -238,11 +242,11 @@ describe('OrderForm component', () => {
       component.find('.ocCardApply.btn').simulate('click');
 
       setTimeout(() => {
-        expect(component.find('.inputField.ocCard').html()).toContain('Valid code. Amount available: $50.00');
+        expect(component.find('.inputField.ocCard').html()).toContain(
+          'Valid code. Amount available: $50.00',
+        );
         done();
       }, 1000);
     });
-
   });
 });
-

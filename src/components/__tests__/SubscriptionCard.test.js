@@ -10,14 +10,14 @@ import initClient from '../../lib/initClient';
 const apolloClient = initClient();
 
 describe('SubscriptionCard.test.js', () => {
-
-  const mountComponent = (props) => mount(
-    <IntlProvider locale="en">
-      <ApolloProvider client={apolloClient}>
-        <SubscriptionCard {...props} />
-      </ApolloProvider>
-    </IntlProvider>
-  );
+  const mountComponent = props =>
+    mount(
+      <IntlProvider locale="en">
+        <ApolloProvider client={apolloClient}>
+          <SubscriptionCard {...props} />
+        </ApolloProvider>
+      </IntlProvider>,
+    );
 
   const defaultValues = {
     slug: 'userSlug',
@@ -34,8 +34,7 @@ describe('SubscriptionCard.test.js', () => {
     },
   };
 
-  it('doesn\'t display actions when not logged in', () => {
-
+  it("doesn't display actions when not logged in", () => {
     const values = Object.assign({}, defaultValues, { paymentMethodInUse: {} });
     const component = mountComponent(values);
 
@@ -43,24 +42,13 @@ describe('SubscriptionCard.test.js', () => {
   });
 
   // TODO: skipping these tests to get subscriptions out in time
-  it.skip('displays actions when logged in for this user', () => {
+  it.skip('displays actions when logged in for this user', () => {});
 
-  });
+  it.skip('displays past-due status when subscription is past-due', () => {});
 
-  it.skip('displays past-due status when subscription is past-due', () => {
+  it.skip('displays cancel buttons when Cancel Contribution is selected', () => {});
 
-  });
+  it.skip('reverts back to normal state when Cancel action is canceled', () => {});
 
-  it.skip('displays cancel buttons when Cancel Contribution is selected', () => {
-
-  });
-
-  it.skip('reverts back to normal state when Cancel action is canceled', () => {
-
-  });
-
-  it.skip('displays paymentmethod options when Update Payment Method is selected', () => {
-
-  });
-
+  it.skip('displays paymentmethod options when Update Payment Method is selected', () => {});
 });

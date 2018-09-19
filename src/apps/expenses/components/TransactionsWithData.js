@@ -8,9 +8,7 @@ import { getTransactionsQuery } from '../../../graphql/queries';
 
 import Transactions from './Transactions';
 
-
 class TransactionsWithData extends React.Component {
-
   static propTypes = {
     collective: PropTypes.object,
     limit: PropTypes.number,
@@ -29,18 +27,24 @@ class TransactionsWithData extends React.Component {
   }
 
   render() {
-    const { data, LoggedInUser, collective, fetchMore, showCSVlink, filters } = this.props;
+    const {
+      data,
+      LoggedInUser,
+      collective,
+      fetchMore,
+      showCSVlink,
+      filters,
+    } = this.props;
 
     if (data.error) {
       console.error('graphql error>>>', data.error.message);
-      return (<Error message="GraphQL error" />);
+      return <Error message="GraphQL error" />;
     }
 
     const transactions = data.allTransactions;
 
     return (
       <div className="TransactionsContainer">
-
         <Transactions
           collective={collective}
           transactions={transactions}
@@ -50,11 +54,9 @@ class TransactionsWithData extends React.Component {
           LoggedInUser={LoggedInUser}
           showCSVlink={showCSVlink}
         />
-
       </div>
     );
   }
-
 }
 
 const TRANSACTIONS_PER_PAGE = 10;
@@ -82,13 +84,15 @@ export const addTransactionsData = graphql(getTransactionsQuery, {
           }
           return Object.assign({}, previousResult, {
             // Append the new posts results to the old one
-            allTransactions: [...previousResult.allTransactions, ...fetchMoreResult.allTransactions],
+            allTransactions: [
+              ...previousResult.allTransactions,
+              ...fetchMoreResult.allTransactions,
+            ],
           });
         },
       });
     },
   }),
 });
-
 
 export default addTransactionsData(withIntl(TransactionsWithData));

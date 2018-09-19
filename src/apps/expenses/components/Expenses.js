@@ -6,9 +6,7 @@ import colors from '../../../constants/colors';
 
 import Expense from './Expense';
 
-
 class Expenses extends React.Component {
-
   static propTypes = {
     collective: PropTypes.object,
     expenses: PropTypes.array,
@@ -59,89 +57,120 @@ class Expenses extends React.Component {
     } = this.props;
 
     if (!expenses) {
-      return (<div />);
+      return <div />;
     }
 
     return (
       <div className="Expenses">
-        <style jsx>{`
-          .Expenses {
-            min-width: 30rem;
-            max-width: 80rem;
-          }
-          :global(.loadMoreBtn) {
-            margin: 1rem;
-            text-align: center;
-          }
-          .filter {
-            width: 100%;
-            max-width: 400px;
-            margin: 0 auto;
-          }
-          :global(.filterBtnGroup) {
-            width: 100%;
-            display: flex;
-            justify-content: center;
-          }
-          :global(.filterBtn) {
-            width: 25%;
-          }
-          .empty {
-            text-align: center;
-            margin: 4rem;
-            color: ${colors.darkgray}
-          }
-          .itemsList {
-            position: relative;
-          }
-          .loading {
-            color: ${colors.darkgray};
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: rgba(255,255,255,0.85);
-            text-transform: uppercase;
-            letter-spacing: 3px;
-            font-weight: bold;
-            z-index: 10;
-            -webkit-backdrop-filter: blur(2px);
-            backdrop-filter: blur(5px);
-          }
-        `}
+        <style jsx>
+          {`
+            .Expenses {
+              min-width: 30rem;
+              max-width: 80rem;
+            }
+            :global(.loadMoreBtn) {
+              margin: 1rem;
+              text-align: center;
+            }
+            .filter {
+              width: 100%;
+              max-width: 400px;
+              margin: 0 auto;
+            }
+            :global(.filterBtnGroup) {
+              width: 100%;
+              display: flex;
+              justify-content: center;
+            }
+            :global(.filterBtn) {
+              width: 25%;
+            }
+            .empty {
+              text-align: center;
+              margin: 4rem;
+              color: ${colors.darkgray};
+            }
+            .itemsList {
+              position: relative;
+            }
+            .loading {
+              color: ${colors.darkgray};
+              position: absolute;
+              top: 0;
+              left: 0;
+              width: 100%;
+              height: 100%;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              background: rgba(255, 255, 255, 0.85);
+              text-transform: uppercase;
+              letter-spacing: 3px;
+              font-weight: bold;
+              z-index: 10;
+              -webkit-backdrop-filter: blur(2px);
+              backdrop-filter: blur(5px);
+            }
+          `}
         </style>
 
-        { filters &&
+        {filters && (
           <div className="filter">
             <ButtonGroup className="filterBtnGroup">
-              <Button className="filterBtn all" bsSize="small" bsStyle={!this.state.status ? 'primary' : 'default'} onClick={() => this.refetch()}>
+              <Button
+                className="filterBtn all"
+                bsSize="small"
+                bsStyle={!this.state.status ? 'primary' : 'default'}
+                onClick={() => this.refetch()}
+              >
                 <FormattedMessage id="expenses.all" defaultMessage="all" />
               </Button>
-              <Button className="filterBtn pending" bsSize="small" bsStyle={this.state.status === 'PENDING' ? 'primary' : 'default'} onClick={() => this.refetch('PENDING')}>
-                <FormattedMessage id="expenses.pending" defaultMessage="pending" />
+              <Button
+                className="filterBtn pending"
+                bsSize="small"
+                bsStyle={
+                  this.state.status === 'PENDING' ? 'primary' : 'default'
+                }
+                onClick={() => this.refetch('PENDING')}
+              >
+                <FormattedMessage
+                  id="expenses.pending"
+                  defaultMessage="pending"
+                />
               </Button>
-              <Button className="filterBtn approved" bsSize="small" bsStyle={this.state.status === 'APPROVED' ? 'primary' : 'default'} onClick={() => this.refetch('APPROVED')}>
-                <FormattedMessage id="expenses.approved" defaultMessage="approved" />
+              <Button
+                className="filterBtn approved"
+                bsSize="small"
+                bsStyle={
+                  this.state.status === 'APPROVED' ? 'primary' : 'default'
+                }
+                onClick={() => this.refetch('APPROVED')}
+              >
+                <FormattedMessage
+                  id="expenses.approved"
+                  defaultMessage="approved"
+                />
               </Button>
-              <Button className="filterBtn paid" bsSize="small" bsStyle={this.state.status === 'PAID' ? 'primary' : 'default'} onClick={() => this.refetch('PAID')}>
+              <Button
+                className="filterBtn paid"
+                bsSize="small"
+                bsStyle={this.state.status === 'PAID' ? 'primary' : 'default'}
+                onClick={() => this.refetch('PAID')}
+              >
                 <FormattedMessage id="expenses.paid" defaultMessage="paid" />
               </Button>
             </ButtonGroup>
           </div>
-        }
+        )}
 
         <div className="itemsList">
-          { this.state.loading &&
+          {this.state.loading && (
             <div className="loading">
               <FormattedMessage id="loading" defaultMessage="loading" />
             </div>
-          }
-          {expenses.map((expense) =>
-            (<Expense
+          )}
+          {expenses.map(expense => (
+            <Expense
               key={expense.id}
               collective={expense.collective || collective}
               expense={expense}
@@ -152,21 +181,32 @@ class Expenses extends React.Component {
               allowPayAction={!this.state.isPayActionLocked}
               lockPayAction={this.setPayActionLock.bind(this, true)}
               unlockPayAction={this.setPayActionLock.bind(this, false)}
-            />)
-          )}
-          { expenses.length === 0 &&
+            />
+          ))}
+          {expenses.length === 0 && (
             <div className="empty">
-              <FormattedMessage id="expenses.empty" defaultMessage="No expenses" />
+              <FormattedMessage
+                id="expenses.empty"
+                defaultMessage="No expenses"
+              />
             </div>
-          }
-          { expenses.length >= 10 && expenses.length % 10 === 0 &&
-            <div className="loadMoreBtn">
-              <Button bsStyle="default" onClick={this.fetchMore}>
-                {this.state.loading && <FormattedMessage id="loading" defaultMessage="loading" />}
-                {!this.state.loading && <FormattedMessage id="loadMore" defaultMessage="load more" />}
-              </Button>
-            </div>
-          }
+          )}
+          {expenses.length >= 10 &&
+            expenses.length % 10 === 0 && (
+              <div className="loadMoreBtn">
+                <Button bsStyle="default" onClick={this.fetchMore}>
+                  {this.state.loading && (
+                    <FormattedMessage id="loading" defaultMessage="loading" />
+                  )}
+                  {!this.state.loading && (
+                    <FormattedMessage
+                      id="loadMore"
+                      defaultMessage="load more"
+                    />
+                  )}
+                </Button>
+              </div>
+            )}
         </div>
       </div>
     );

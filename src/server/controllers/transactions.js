@@ -5,16 +5,21 @@ import { fetchInvoice } from '../lib/graphql';
 
 export async function invoice(req, res, next) {
   // Keeping the resulting info for 10mn in the CDN cache
-  res.setHeader('Cache-Control', `public, max-age=${60*10}`);
+  res.setHeader('Cache-Control', `public, max-age=${60 * 10}`);
   let invoice, html;
   const authorizationHeader = req.headers && req.headers.authorization;
-  if (!authorizationHeader) return next(new Error('Not authorized. Please provide an accessToken.'));
+  if (!authorizationHeader)
+    return next(new Error('Not authorized. Please provide an accessToken.'));
 
   const parts = authorizationHeader.split(' ');
   const scheme = parts[0];
   const accessToken = parts[1];
   if (!/^Bearer$/i.test(scheme) || !accessToken) {
-    return next(new Error('Invalid authorization header. Format should be: Authorization: Bearer [token]'));
+    return next(
+      new Error(
+        'Invalid authorization header. Format should be: Authorization: Bearer [token]',
+      ),
+    );
   }
 
   const { invoiceSlug, format } = req.params;
@@ -29,9 +34,10 @@ export async function invoice(req, res, next) {
     return next(e);
   }
 
-  const pageFormat = (req.query.pageFormat === 'A4' || invoice.fromCollective.currency === 'EUR')
-    ? 'A4'
-    : 'Letter';
+  const pageFormat =
+    req.query.pageFormat === 'A4' || invoice.fromCollective.currency === 'EUR'
+      ? 'A4'
+      : 'Letter';
 
   const params = {
     invoice,
@@ -52,10 +58,13 @@ export async function invoice(req, res, next) {
         format: pageFormat,
         renderDelay: 3000,
       };
-      html = html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,'');
+      html = html.replace(
+        /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
+        '',
+      );
       const filename = `${invoice.slug}.pdf`;
 
-      res.setHeader('content-type','application/pdf');
+      res.setHeader('content-type', 'application/pdf');
       res.setHeader('content-disposition', `inline; filename="${filename}"`); // or attachment?
       pdf.create(html, options).toStream((err, stream) => {
         if (err) {
@@ -67,5 +76,4 @@ export async function invoice(req, res, next) {
       break;
     }
   }
-
 }

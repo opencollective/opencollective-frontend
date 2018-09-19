@@ -5,7 +5,7 @@ module.exports = {
     // Make sure entries are not getting disposed.
     maxInactiveAge: 1000 * 60 * 60,
   },
-  webpack: (config) => {
+  webpack: config => {
     config.plugins.push(
       // Ignore __tests__
       new webpack.IgnorePlugin(/\/__tests__\//),
@@ -27,12 +27,11 @@ module.exports = {
       {
         test: /\.css$/,
         use: ['babel-loader', 'raw-loader'],
-      }
-      ,
+      },
       {
         test: /\.md$/,
         use: ['babel-loader', 'raw-loader', 'markdown-loader'],
-      }
+      },
     );
     return config;
   },

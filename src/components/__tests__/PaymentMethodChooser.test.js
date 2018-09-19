@@ -5,17 +5,25 @@ import { IntlProvider } from 'react-intl';
 import PaymentMethodChooser from '../PaymentMethodChooser';
 
 describe('PaymentMethodChooser.test.js', () => {
-
-  const mountComponent = (props) => mount(
-    <IntlProvider locale="en">
-      <PaymentMethodChooser {...props} />
-    </IntlProvider>
+  const mountComponent = props =>
+    mount(
+      <IntlProvider locale="en">
+        <PaymentMethodChooser {...props} />
+      </IntlProvider>,
     );
 
-  const defaultPaymentMethod = { service: 'stripe', name: '4242', data: { brand: 'VISA', expMonth: '01', expYear: '2020' } };
+  const defaultPaymentMethod = {
+    service: 'stripe',
+    name: '4242',
+    data: { brand: 'VISA', expMonth: '01', expYear: '2020' },
+  };
 
   const defaultValues = {
-    paymentMethodInUse: { service: 'stripe', name: '5555', data: { brand: 'VISA', expMonth:'02', expYear: '2021' } },
+    paymentMethodInUse: {
+      service: 'stripe',
+      name: '5555',
+      data: { brand: 'VISA', expMonth: '02', expYear: '2021' },
+    },
     paymentMethodsList: [defaultPaymentMethod],
     editMode: false,
     onSubmit: () => Promise.resolve(),
@@ -27,19 +35,22 @@ describe('PaymentMethodChooser.test.js', () => {
     c.simulate('change', { target: { value } });
   };
 
-  it('displays correct text when paymentMethodInUse doesn\'t have a name', () => {
-
+  it("displays correct text when paymentMethodInUse doesn't have a name", () => {
     const values = Object.assign({}, defaultValues, { paymentMethodInUse: {} });
 
     const component = mountComponent(values);
 
-    expect(component.find('.paymentmethod-info').text()).toContain('(credit card info not available)');
+    expect(component.find('.paymentmethod-info').text()).toContain(
+      '(credit card info not available)',
+    );
   });
 
   it('displays paymentMethodInUse correctly', () => {
     const component = mountComponent(defaultValues);
 
-    expect(component.find('.paymentmethod-info').text()).toContain('💳   VISA ***5555 (Exp: 02/2021)');
+    expect(component.find('.paymentmethod-info').text()).toContain(
+      '💳   VISA ***5555 (Exp: 02/2021)',
+    );
   });
 
   it('shows selector when editMode is true', () => {
@@ -58,6 +69,5 @@ describe('PaymentMethodChooser.test.js', () => {
     fillValue(component, 'creditcardSelector', 'add');
     expect(component.find('.creditcardSelector').length).toEqual(0);
     expect(component.find('.creditcard').length).toEqual(1);
-
   });
 });

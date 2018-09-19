@@ -5,13 +5,14 @@ import { graphql } from 'react-apollo';
 import { FormattedMessage } from 'react-intl';
 
 import withIntl from '../../../lib/withIntl';
-import { getTransactionsQuery, transactionFields } from '../../../graphql/queries';
+import {
+  getTransactionsQuery,
+  transactionFields,
+} from '../../../graphql/queries';
 
 import SmallButton from '../../../components/SmallButton';
 
-
 class RefundTransactionBtn extends React.Component {
-
   static propTypes = {
     transaction: PropTypes.object.isRequired,
     collective: PropTypes.object.isRequired,
@@ -40,12 +41,14 @@ class RefundTransactionBtn extends React.Component {
     if (canRefund && confirmRefund && refunded && refunding) {
       throw new Error("Can't set more than one state to true");
     }
-    this.setState({ showing: {
-      canRefund: !!canRefund,
-      confirmRefund: !!confirmRefund,
-      refunded: !!refunded,
-      refunding: !!refunding,
-    } });
+    this.setState({
+      showing: {
+        canRefund: !!canRefund,
+        confirmRefund: !!confirmRefund,
+        refunded: !!refunded,
+        refunding: !!refunding,
+      },
+    });
   }
 
   /** Fires off the actual refund action.
@@ -66,65 +69,86 @@ class RefundTransactionBtn extends React.Component {
   render() {
     return (
       <div>
-        <style jsx>{`
-          .confirmation {
-            border-top: solid 1px #ddd;
-            margin: 10px 0;
-            padding: 10px 0;
-          }
-          .confirmation strong {
-            display: block;
-            padding-bottom: 5px;
-          }
-          .confirmation-buttons {
-            display: flex;
-            flex-direction: row;
-            justify-content: flex-start;
-          }
-          .confirmation-buttons .SmallButton.refund {
-            margin-right: 10px;
-          }
-        `}
+        <style jsx>
+          {`
+            .confirmation {
+              border-top: solid 1px #ddd;
+              margin: 10px 0;
+              padding: 10px 0;
+            }
+            .confirmation strong {
+              display: block;
+              padding-bottom: 5px;
+            }
+            .confirmation-buttons {
+              display: flex;
+              flex-direction: row;
+              justify-content: flex-start;
+            }
+            .confirmation-buttons .SmallButton.refund {
+              margin-right: 10px;
+            }
+          `}
         </style>
 
         {/* Already refunded so we don't really don't need to show
             anything */}
-        { this.state.showing.refunded && <div /> }
+        {this.state.showing.refunded && <div />}
 
         {/* User just pressed refunding. Display loading spinner */}
-        { this.state.showing.refunding &&
-          <div className="confirmation"><em>Refunding</em></div> }
+        {this.state.showing.refunding && (
+          <div className="confirmation">
+            <em>Refunding</em>
+          </div>
+        )}
 
-        { this.state.showing.canRefund &&
+        {this.state.showing.canRefund && (
           <div className="confirmation">
             <div className="confirmation-buttons">
               <SmallButton
-                className="refund" bsStyle="danger" bsSize="xsmall"
+                className="refund"
+                bsStyle="danger"
+                bsSize="xsmall"
                 onClick={() => ::this.setShowingState({ confirmRefund: true })}
               >
-                <FormattedMessage id="transaction.refund.btn" defaultMessage="refund" />
+                <FormattedMessage
+                  id="transaction.refund.btn"
+                  defaultMessage="refund"
+                />
               </SmallButton>
             </div>
-          </div> }
+          </div>
+        )}
 
-        { this.state.showing.confirmRefund &&
+        {this.state.showing.confirmRefund && (
           <div className="confirmation">
             <strong>Do you really want to refund this transaction?</strong>
             <div className="confirmation-buttons">
               <SmallButton
-                className="refund" bsStyle="danger" bsSize="xsmall"
+                className="refund"
+                bsStyle="danger"
+                bsSize="xsmall"
                 onClick={::this.onClickRefund}
               >
-                <FormattedMessage id="transaction.refund.yes.btn" defaultMessage="Yes, refund!" />
+                <FormattedMessage
+                  id="transaction.refund.yes.btn"
+                  defaultMessage="Yes, refund!"
+                />
               </SmallButton>
               <SmallButton
-                className="no" bsStyle="primary" bsSize="xsmall"
+                className="no"
+                bsStyle="primary"
+                bsSize="xsmall"
                 onClick={() => ::this.setShowingState({ canRefund: true })}
               >
-                <FormattedMessage id="transaction.refund.no.btn" defaultMessage="no" />
+                <FormattedMessage
+                  id="transaction.refund.no.btn"
+                  defaultMessage="no"
+                />
               </SmallButton>
             </div>
-          </div> }
+          </div>
+        )}
       </div>
     );
   }
@@ -148,25 +172,29 @@ const refundTransactionQuery = gql`
 
 const addMutation = graphql(refundTransactionQuery, {
   props: ({ ownProps, mutate }) => ({
-    refundTransaction: async (id) => await mutate({
-      variables: { id },
-      update: (proxy, { data: { refundTransaction } }) => {
-        const variables = {
-          CollectiveId: ownProps.collective.id,
-          limit: 20,
-          offset: 0,
-        };
+    refundTransaction: async id =>
+      await mutate({
+        variables: { id },
+        update: (proxy, { data: { refundTransaction } }) => {
+          const variables = {
+            CollectiveId: ownProps.collective.id,
+            limit: 20,
+            offset: 0,
+          };
 
-        // Retrieve the query from the cache
-        const data = proxy.readQuery({ query: getTransactionsQuery, variables });
+          // Retrieve the query from the cache
+          const data = proxy.readQuery({
+            query: getTransactionsQuery,
+            variables,
+          });
 
-        // Insert new transaction at the beginning
-        data.allTransactions.unshift(refundTransaction.refundTransaction);
+          // Insert new transaction at the beginning
+          data.allTransactions.unshift(refundTransaction.refundTransaction);
 
-        // write data back for the query
-        proxy.writeQuery({ query: getTransactionsQuery, variables, data });
-      },
-    }),
+          // write data back for the query
+          proxy.writeQuery({ query: getTransactionsQuery, variables, data });
+        },
+      }),
   }),
 });
 

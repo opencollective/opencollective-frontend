@@ -10,9 +10,7 @@ import Expense from './Expense';
 
 import CommentsWithData from '../../../components/CommentsWithData';
 
-
 class ExpenseWithData extends React.Component {
-
   static propTypes = {
     collective: PropTypes.object,
     limit: PropTypes.number,
@@ -42,18 +40,21 @@ class ExpenseWithData extends React.Component {
 
     if (data.error) {
       console.error('graphql error>>>', data.error.message);
-      return (<Error message="GraphQL error" />);
+      return <Error message="GraphQL error" />;
     }
 
     if (data.loading) {
-      return <div><FormattedMessage id="loading" defaultMessage="loading" /></div>;
+      return (
+        <div>
+          <FormattedMessage id="loading" defaultMessage="loading" />
+        </div>
+      );
     }
 
     const expense = data.Expense;
 
     return (
       <div className="ExpenseWithData">
-
         <Expense
           key={expense.id}
           collective={collective}
@@ -66,64 +67,61 @@ class ExpenseWithData extends React.Component {
           unlockPayAction={unlockPayAction}
         />
 
-        { view === 'details' &&
+        {view === 'details' && (
           <CommentsWithData
             expense={expense}
             collective={collective}
             LoggedInUser={LoggedInUser}
           />
-        }
-
+        )}
       </div>
     );
   }
-
 }
-
 
 const getExpenseQuery = gql`
-query Expense($id: Int!) {
-  Expense(id: $id) {
-    id
-    description
-    status
-    createdAt
-    updatedAt
-    incurredAt
-    category
-    amount
-    currency
-    payoutMethod
-    privateMessage
-    attachment
-    collective {
+  query Expense($id: Int!) {
+    Expense(id: $id) {
       id
-      slug
+      description
+      status
+      createdAt
+      updatedAt
+      incurredAt
+      category
+      amount
       currency
-      name
-      host {
+      payoutMethod
+      privateMessage
+      attachment
+      collective {
         id
         slug
+        currency
+        name
+        host {
+          id
+          slug
+        }
+        stats {
+          id
+          balance
+        }
       }
-      stats {
+      fromCollective {
         id
-        balance
+        type
+        name
+        slug
+        image
       }
-    }
-    fromCollective {
-      id
-      type
-      name
-      slug
-      image
-    }
-    user {
-      id
-      paypalEmail
-      email
+      user {
+        id
+        paypalEmail
+        email
+      }
     }
   }
-}
 `;
 
 export const addExpenseData = graphql(getExpenseQuery);
