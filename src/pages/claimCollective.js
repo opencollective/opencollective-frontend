@@ -25,7 +25,7 @@ const WEBSITE_URL = process.env.WEBSITE_URL || 'https://opencollective.com';
 const { API_KEY } = process.env;
 
 class ClaimCollectivePage extends React.Component {
-  static getInitialProps ({ query }) {
+  static getInitialProps({ query }) {
     return {
       slug: query && query.collectiveSlug,
       token: query && query.token,
@@ -37,25 +37,27 @@ class ClaimCollectivePage extends React.Component {
     loadingUserLogin: true,
     LoggedInUser: {},
     repos: [],
-  }
+  };
 
   async componentDidMount() {
-    const {
-      getLoggedInUser,
-      token,
-    } = this.props;
-    const LoggedInUser = getLoggedInUser && await getLoggedInUser();
+    const { getLoggedInUser, token } = this.props;
+    const LoggedInUser = getLoggedInUser && (await getLoggedInUser());
     this.setState({
       LoggedInUser,
       loadingUserLogin: false,
     });
 
-    const isConnected = token
-      && LoggedInUser
-      && LoggedInUser.collective
-      && LoggedInUser.collective.connectedAccounts.some(({ service }) => service === 'github');
+    const isConnected =
+      token &&
+      LoggedInUser &&
+      LoggedInUser.collective &&
+      LoggedInUser.collective.connectedAccounts.some(
+        ({ service }) => service === 'github',
+      );
     if (isConnected) {
-      const repos = await fetch(`${getBaseApiUrl()}/github-repositories?access_token=${token}`).then(response => response.json());
+      const repos = await fetch(
+        `${getBaseApiUrl()}/github-repositories?access_token=${token}`,
+      ).then(response => response.json());
       this.setState({ repos });
     }
   }
@@ -64,9 +66,7 @@ class ClaimCollectivePage extends React.Component {
     try {
       const {
         data: {
-          claimCollective: {
-            slug,
-          },
+          claimCollective: { slug },
         },
       } = await this.props.claimCollective(id);
       Router.pushRoute(`/${slug}`);
@@ -76,25 +76,11 @@ class ClaimCollectivePage extends React.Component {
   }
 
   render() {
-    const {
-      data,
-      slug,
-      token,
-    } = this.props;
-    const {
-      error,
-      LoggedInUser,
-      loadingUserLogin,
-      repos,
-    } = this.state;
+    const { data, slug, token } = this.props;
+    const { error, LoggedInUser, loadingUserLogin, repos } = this.state;
 
     const {
-      Collective: {
-        currency,
-        id,
-        pledges,
-        website,
-      },
+      Collective: { currency, id, pledges, website },
       loading,
     } = data;
 
@@ -103,14 +89,29 @@ class ClaimCollectivePage extends React.Component {
     }
 
     if (loading || error) {
-      return <ErrorPage loading={loading} data={data} message={error && error.message} />;
+      return (
+        <ErrorPage
+          loading={loading}
+          data={data}
+          message={error && error.message}
+        />
+      );
     }
 
-    const totalPledged = pledges.reduce((total, { totalAmount }) => total + totalAmount, 0);
-    const connectUrl = `${getBaseApiUrl({ internal: true })}/connected-accounts/github?${API_KEY ? `api_key=${API_KEY}&` : ''}redirect=${WEBSITE_URL}/${slug}/claim`
+    const totalPledged = pledges.reduce(
+      (total, { totalAmount }) => total + totalAmount,
+      0,
+    );
+    const connectUrl = `${getBaseApiUrl({
+      internal: true,
+    })}/connected-accounts/github?${
+      API_KEY ? `api_key=${API_KEY}&` : ''
+    }redirect=${WEBSITE_URL}/${slug}/claim`;
 
     const [_, websitePath] = website.split(':');
-    const [repo] = repos.filter(({ html_url }) => html_url.includes(websitePath));
+    const [repo] = repos.filter(({ html_url }) =>
+      html_url.includes(websitePath),
+    );
 
     const isAdmin = (repo && repo.pemissions.admin) || true;
 
@@ -143,37 +144,42 @@ class ClaimCollectivePage extends React.Component {
                 />
               </P>
             </Box>
-          {!token && repos.length === 0 &&
-            <StyledLink
-              href={connectUrl}
-              bg="#3385FF"
-              borderRadius="50px"
-              color="white"
-              fontSize="1.6rem"
-              fontWeight="bold"
-              maxWidth="220px"
-              hover={{ color: 'white' }}
-              py={2}
-              px={3}
-              textAlign="center"
-              width={1}
-            >
-              Connect to GitHub
-            </StyledLink>
-          }
-          {repos.length > 0 && !isAdmin &&
-            <P textAlign="center">
-              You are not an admin of a repo matching {website}.
-            </P>
-          }
-          {token && isAdmin &&
-            <Fragment>
-              <P textAlign="center" mb={2}>
-                Congrats! You can now claim this collective. 👍
-              </P>
-              <Button className="blue" onClick={() => this.claim(id)}>Claim!</Button>
-            </Fragment>
-          }
+            {!token &&
+              repos.length === 0 && (
+                <StyledLink
+                  href={connectUrl}
+                  bg="#3385FF"
+                  borderRadius="50px"
+                  color="white"
+                  fontSize="1.6rem"
+                  fontWeight="bold"
+                  maxWidth="220px"
+                  hover={{ color: 'white' }}
+                  py={2}
+                  px={3}
+                  textAlign="center"
+                  width={1}
+                >
+                  Connect to GitHub
+                </StyledLink>
+              )}
+            {repos.length > 0 &&
+              !isAdmin && (
+                <P textAlign="center">
+                  You are not an admin of a repo matching {website}.
+                </P>
+              )}
+            {token &&
+              isAdmin && (
+                <Fragment>
+                  <P textAlign="center" mb={2}>
+                    Congrats! You can now claim this collective. 👍
+                  </P>
+                  <Button className="blue" onClick={() => this.claim(id)}>
+                    Claim!
+                  </Button>
+                </Fragment>
+              )}
           </Container>
         </Body>
         <Footer />
@@ -196,17 +202,19 @@ const addPledgesData = graphql(gql`
   }
 `);
 
-const addClaimCollectiveMutation = graphql(gql`
-  mutation claimCollective($id: Int!) {
-    claimCollective(id: $id) {
-      id
-      slug
+const addClaimCollectiveMutation = graphql(
+  gql`
+    mutation claimCollective($id: Int!) {
+      claimCollective(id: $id) {
+        id
+        slug
+      }
     }
-  }`,
+  `,
   {
-    props: ( { mutate }) => ({
-      claimCollective: (id) => mutate({ variables: { id } })
-    })
+    props: ({ mutate }) => ({
+      claimCollective: id => mutate({ variables: { id } }),
+    }),
   },
 );
 
@@ -216,4 +224,6 @@ const addGraphQL = compose(
 );
 
 export { ClaimCollectivePage as MockClaimCollectivePage };
-export default withData(withLoggedInUser(addGraphQL(withIntl(ClaimCollectivePage))));
+export default withData(
+  withLoggedInUser(addGraphQL(withIntl(ClaimCollectivePage))),
+);

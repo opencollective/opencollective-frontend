@@ -103,9 +103,7 @@ class ErrorPage extends React.Component {
             {intl.formatMessage(this.messages[`${this.message}.description`])}
           </p>
         )}
-        {this.message === 'graphQLError' && (
-          <p>{message}</p>
-        )}
+        {this.message === 'graphQLError' && <p>{message}</p>}
       </div>
     );
   }

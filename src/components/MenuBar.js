@@ -261,7 +261,8 @@ class MenuBar extends React.Component {
       );
     }
 
-    const hasPledges = !collective.isActive && collective.pledges && collective.pledges.length;
+    const hasPledges =
+      !collective.isActive && collective.pledges && collective.pledges.length;
 
     const AddFundsModal = () => (
       <Modal
@@ -338,26 +339,38 @@ class MenuBar extends React.Component {
         </style>
         {this.state.sticky && cta && cta}
         {['COLLECTIVE', 'EVENT'].indexOf(collective.type) !== -1 &&
-         !hasPledges && (
-          <Button
-            className="submitExpense darkBackground"
-            href={`${collective.path}/expenses/new`}
-          >
-            <FormattedMessage
-              id="menu.submitExpense"
-              defaultMessage="Submit Expense"
-            />
-          </Button>
-        )}
+          !hasPledges && (
+            <Button
+              className="submitExpense darkBackground"
+              href={`${collective.path}/expenses/new`}
+            >
+              <FormattedMessage
+                id="menu.submitExpense"
+                defaultMessage="Submit Expense"
+              />
+            </Button>
+          )}
 
         {hasPledges && (
           <Fragment>
-            <Button className="claimCollective blue" href={`${collective.path}/claim`}>
-              <FormattedMessage id="menu.claimCollective" defaultMessage="Claim Collective" />
+            <Button
+              className="claimCollective blue"
+              href={`${collective.path}/claim`}
+            >
+              <FormattedMessage
+                id="menu.claimCollective"
+                defaultMessage="Claim Collective"
+              />
             </Button>
 
-            <Button className="createPledge darkBackground" href={`/pledges/new?name=${collective.slug}`}>
-              <FormattedMessage id="menu.createPledge" defaultMessage="Make a Pledge" />
+            <Button
+              className="createPledge darkBackground"
+              href={`/pledges/new?name=${collective.slug}`}
+            >
+              <FormattedMessage
+                id="menu.createPledge"
+                defaultMessage="Make a Pledge"
+              />
             </Button>
           </Fragment>
         )}

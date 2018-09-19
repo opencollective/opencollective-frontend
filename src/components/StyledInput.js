@@ -54,7 +54,7 @@ TextInput.defaultProps = {
 export const SubmitInput = StyledInput.extend`
   border: none;
   border-radius: 30px;
-  opacity: ${props => props.disabled ? 0.5 : 1};
+  opacity: ${props => (props.disabled ? 0.5 : 1)};
 `;
 
 SubmitInput.defaultProps = {
