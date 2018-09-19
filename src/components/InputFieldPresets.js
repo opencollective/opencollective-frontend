@@ -23,8 +23,7 @@ class InputFieldPresets extends React.Component {
     let { values } = this.state;
     values[index] = val;
     values = values.filter(v => v !== null);
-    this.setState({ values });
-    this.onChange();
+    this.setState({ values }, () => this.onChange());
   }
 
   onChange() {
