@@ -1,6 +1,7 @@
 import virtualcard from '../../paymentProviders/opencollective/virtualcard';
 import emailLib from '../../lib/email';
 import models from '../../models';
+import queryString from 'query-string';
 
 /** Create a Payment Method through a collective(organization or user)
  *
@@ -66,18 +67,27 @@ export async function claimPaymentMethod(args, remoteUser) {
   const {
     initialBalance,
     currency,
-    name
+    name,
+    expiryDate,
    } = paymentMethod;
 
   const emitter = await models.Collective.findById(paymentMethod.sourcePaymentMethod.CollectiveId);
   const userCollective = await user.getCollective();
   const userName = userCollective.name && userCollective.name.match(/anonymous/i) ? '' : userCollective.name;
 
+  const qs = queryString.stringify({
+    name: userName,
+    amount: initialBalance,
+    currency,
+    emitterSlug: emitter.slug,
+    emitterName: emitter.name,
+  });
   emailLib.send('user.card.claimed', user.email, {
-    loginLink: user.generateLoginLink(`/redeemed?name=${encodeURIComponent(userName)}&amount=${initialBalance}&currency=${currency}&emitterSlug=${emitter.slug}&emitterName=${encodeURIComponent(emitter.name)}`),
+    loginLink: user.generateLoginLink(`/redeemed?${qs}`),
     initialBalance,
     name,
     currency,
+    expiryDate,
     emitter,
   });
   return paymentMethod;
