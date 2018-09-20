@@ -87,6 +87,7 @@
     "pg-format": "1.0.4",
     "pg-hstore": "2.3.2",
     "prepend-http": "2.0.0",
+    "query-string": "^6.1.0",
     "querystring": "0.2.0",
     "request-as-curl": "0.1.0",
     "request-promise": "4.1.1",
