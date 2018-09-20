@@ -30,6 +30,7 @@ export async function createPaymentMethod(args, remoteUser) {
  * @param {Number} args.amount The total amount that will be
  *  credited to the newly created payment method.
  * @param {String} args.currency The currency of the virtual card
+ * @param {[limitedToTags]} [args.limitedToTags] Limit this payment method to donate to collectives having those tags
  * @param {Date} [args.expiryDate] The expiry date of the payment method
  * @returns {models.PaymentMethod} return the virtual card payment method.
  */

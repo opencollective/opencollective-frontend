@@ -115,6 +115,7 @@ async function processOrder(order) {
  *  credited to the newly created payment method.
  * @param {String} args.currency The currency of the card to be created.
  * @param {Date} [args.expiryDate] The expiry date of the payment method
+ * @param {[limitedToTags]} [args.limitedToTags] Limit this payment method to donate to collectives having those tags
  * @returns {models.PaymentMethod + code} return the virtual card payment method with
             an extra property "code" that is basically the last 8 digits of the UUID
  */
@@ -155,6 +156,7 @@ async function create(args, remoteUser) {
     currency: args.currency,
     CollectiveId: args.CollectiveId,
     expiryDate: expiryDate,
+    limitedToTags: args.limitedToTags,
     uuid: uuidv4(),
     service: 'opencollective',
     type: 'virtualcard',

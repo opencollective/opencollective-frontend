@@ -14,8 +14,8 @@ const ORDER_TOTAL_AMOUNT = 5000;
 const STRIPE_FEE_STUBBED_VALUE = 300;
 
 const createPaymentMethodQuery = `
-  mutation createPaymentMethod($amount: Int!, $CollectiveId: Int!, $PaymentMethodId: Int, $description: String, $expiryDate: String, $type: String!, $currency: String!) {
-    createPaymentMethod(amount: $amount, CollectiveId: $CollectiveId, PaymentMethodId: $PaymentMethodId, description: $description, expiryDate: $expiryDate, type:  $type, currency: $currency) {
+  mutation createPaymentMethod($amount: Int!, $CollectiveId: Int!, $PaymentMethodId: Int, $description: String, $expiryDate: String, $type: String!, $currency: String!, $limitedToTags: [String]) {
+    createPaymentMethod(amount: $amount, CollectiveId: $CollectiveId, PaymentMethodId: $PaymentMethodId, description: $description, expiryDate: $expiryDate, type:  $type, currency: $currency, limitedToTags: $limitedToTags) {
       id
     }
   }
@@ -387,12 +387,13 @@ describe('opencollective.virtualcard', () => {
         expect(gqlResult.errors[0].toString()).to.contain('not provided');
       }); /** End of "should fail creating a virtual card because there is no currency defined" */
 
-      it('should create a U$100 virtual card payment method', async () => {
+      it('should create a U$100 virtual card payment method limited to open source', async () => {
         const args = {
           type: 'virtualcard',
           CollectiveId: collective1.id,
           amount: 10000,
           currency: 'USD',
+          limitedToTags: ['open source'],
         };
         // call graphql mutation
         const gqlResult = await utils.graphqlQuery(
@@ -407,6 +408,7 @@ describe('opencollective.virtualcard', () => {
           gqlResult.data.createPaymentMethod.id,
         );
         expect(paymentMethod).to.exist;
+        expect(paymentMethod.limitedToTags).to.contain('open source');
         expect(paymentMethod.CreatedByUserId).to.be.equal(user1.id);
         expect(paymentMethod.CollectiveId).to.be.equal(collective1.id);
         expect(paymentMethod.initialBalance).to.be.equal(args.amount);
