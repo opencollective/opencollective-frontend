@@ -8,27 +8,27 @@ const moment = require('moment');
 const reports = [
   {
     template: 'collective.monthlyreport',
-    command: 'cron/monthly/collective-report.js'
+    command: 'cron/monthly/collective-report.js',
   },
   {
     template: 'user.monthlyreport',
-    command: 'cron/monthly/user-report.js'
+    command: 'cron/monthly/user-report.js',
   },
   {
     template: 'user.yearlyreport',
-    command: 'cron/yearly/user-report.js'
+    command: 'cron/yearly/user-report.js',
   },
   {
     template: 'host.monthlyreport',
-    command: 'cron/monthly/host-report.js'
+    command: 'cron/monthly/host-report.js',
   },
   {
     template: 'host.yearlyreport',
-    command: 'cron/yearly/host-report.js'
+    command: 'cron/yearly/host-report.js',
   },
   {
-    template: 'ticket.confirmed',
-    command: 'scripts/compile-email.js ticket.confirmed'
+    template: 'ticket.confirmed.fearlesscitiesbrussels',
+    command: 'scripts/compile-email.js ticket.confirmed.fearlesscitiesbrussels',
   },
 ];
 
@@ -44,16 +44,23 @@ async function getConfig() {
   let res;
 
   try {
-    res = await execPromise('heroku config --app opencollective-prod-api | grep MAILGUN');
+    res = await execPromise(
+      'heroku config --app opencollective-prod-api | grep MAILGUN',
+    );
   } catch (e) {
-    throw new Error("Unable to fetch the config vars from heroku. Make sure you have the heroku client installed and that you have access to the production environmnent");
+    throw new Error(
+      'Unable to fetch the config vars from heroku. Make sure you have the heroku client installed and that you have access to the production environmnent',
+    );
   }
 
-  res.stdout.replace(/: +/g, '=').split('\n').forEach(line => {
-    if (line.length === 0) return;
-    const tokens = line.split('=');
-    config[tokens[0]] = tokens[1]; 
-  }); 
+  res.stdout
+    .replace(/: +/g, '=')
+    .split('\n')
+    .forEach(line => {
+      if (line.length === 0) return;
+      const tokens = line.split('=');
+      config[tokens[0]] = tokens[1];
+    });
 
   return config;
 }
@@ -68,13 +75,13 @@ async function runReport(responses) {
     ...config,
     PG_DATABASE,
     DEBUG: 'email,preview',
-    WEBSITE_URL: 'https://opencollective.com'
+    WEBSITE_URL: 'https://opencollective.com',
   };
   if (responses.startDate) {
-    env.START_DATE = responses.startDate
+    env.START_DATE = responses.startDate;
   }
   if (responses.recipient) {
-    env.ONLY = responses.recipient
+    env.ONLY = responses.recipient;
   }
   const slugs = responses.slugs.filter(s => s.length > 0);
   if (slugs.length > 0) {
@@ -82,24 +89,26 @@ async function runReport(responses) {
   }
 
   const command = `./node_modules/.bin/babel-node ${responses.command}`;
-  console.log(">>> command", command);
-  return new Promise((resolve) => {
+  console.log('>>> command', command);
+  return new Promise(resolve => {
     const cmd = exec(command, { env });
     cmd.stdout.pipe(process.stdout);
-    cmd.on('exit', (code) => {
+    cmd.on('exit', code => {
       resolve();
     });
-  })
+  });
 }
 
-async function main ({ argv }) {
+async function main({ argv }) {
   // console.log('hi', argv)
 
-  console.log("This utility generates one of the automatic email reports for users or hosts.");
-  console.log("Useful for resending a report or for testing.");
-  console.log("");
+  console.log(
+    'This utility generates one of the automatic email reports for users or hosts.',
+  );
+  console.log('Useful for resending a report or for testing.');
+  console.log('');
   console.log(`PG_DATABASE=${PG_DATABASE}`);
-  console.log("");
+  console.log('');
 
   const questions = [
     {
@@ -107,34 +116,36 @@ async function main ({ argv }) {
       name: 'command',
       message: 'Pick a report',
       choices: getChoices(reports),
-      initial: 0
+      initial: 0,
     },
     {
       type: !process.env.SLUGS && 'list',
       name: 'slugs',
-      message: 'List of slugs of the collectives to process (leave empty to process all)'
+      message:
+        'List of slugs of the collectives to process (leave empty to process all)',
     },
     {
       type: !process.env.START_DATE && 'text',
       name: 'startDate',
       message: 'Start date',
       initial: moment().format('YYYY-MM-DD'),
-      format: val => moment(val).format('YYYY-MM-DD')
+      format: val => moment(val).format('YYYY-MM-DD'),
     },
     {
       type: 'confirm',
       name: 'send',
       message: 'Send email?',
-      initial: false
+      initial: false,
     },
     {
-      type: prev => (process.env.ONLY || prev) ? 'text' : null,
+      type: prev => (process.env.ONLY || prev ? 'text' : null),
       name: 'recipient',
-      message: 'Recipient email (leave empty to send to the default recipients)',
-      validate: val => !val || val.match(/.+@.+\..+/)
-    }
+      message:
+        'Recipient email (leave empty to send to the default recipients)',
+      validate: val => !val || val.match(/.+@.+\..+/),
+    },
   ];
-   
+
   const responses = await prompts(questions);
 
   await runReport(responses);
@@ -147,4 +158,4 @@ main(process)
   .catch(err => {
     console.error(err);
     process.exit(1);
-  })
+  });

@@ -1,23 +1,23 @@
 'use strict';
 
 module.exports = {
-  up: function (queryInterface, DataTypes) {
+  up: function(queryInterface, DataTypes) {
     return queryInterface.createTable('Groups', {
       id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
-        autoIncrement: true
+        autoIncrement: true,
       },
       name: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: false,
       },
       description: DataTypes.STRING,
 
       budget: DataTypes.FLOAT,
       currency: {
         type: DataTypes.STRING,
-        defaultValue: 'USD'
+        defaultValue: 'USD',
       },
 
       membership_type: DataTypes.ENUM('donation', 'monthlyfee', 'yearlyfee'),
@@ -25,25 +25,25 @@ module.exports = {
 
       createdAt: {
         type: DataTypes.DATE,
-        defaultValue: DataTypes.NOW
+        defaultValue: DataTypes.NOW,
       },
       updatedAt: {
         type: DataTypes.DATE,
-        defaultValue: DataTypes.NOW
+        defaultValue: DataTypes.NOW,
       },
       deletedAt: {
-        type: DataTypes.DATE
+        type: DataTypes.DATE,
       },
       StripeManagedAccountId: {
         type: DataTypes.INTEGER,
-        references: {key: 'id', model: 'StripeManagedAccounts'},
+        references: { key: 'id', model: 'StripeManagedAccounts' },
         onDelete: 'SET NULL',
         onUpdate: 'CASCADE',
-      }
+      },
     });
   },
 
-  down: function (queryInterface) {
+  down: function(queryInterface) {
     return queryInterface.dropTable('Groups');
-  }
+  },
 };

@@ -18,17 +18,21 @@ import * as store from './features/support/stores';
  * The payment method is always stripe for now.
  */
 async function donate(userCollective, currency, amount, createdAt, collective) {
-  const timer = sinon.useFakeTimers((new Date(createdAt)).getTime());
+  const timer = sinon.useFakeTimers(new Date(createdAt).getTime());
   try {
     await store.stripeConnectedAccount(collective.HostCollectiveId);
-    await store.stripeOneTimeDonation({ userCollective, collective, currency, amount });
+    await store.stripeOneTimeDonation({
+      userCollective,
+      collective,
+      currency,
+      amount,
+    });
   } finally {
     timer.restore();
   }
 }
 
 describe('graphql.invoices.test.js', () => {
-
   let xdamman;
 
   before(async () => {
@@ -39,17 +43,20 @@ describe('graphql.invoices.test.js', () => {
     xdamman = user;
     // And given the collective (with their host)
     const { collective } = await store.newCollectiveWithHost(
-      'brusselstogether', 'EUR', 'EUR', 10);
+      'brusselstogether',
+      'EUR',
+      'EUR',
+      10,
+    );
     // And given some donations to that collective
     await donate(userCollective, 'EUR', 1000, '2017-09-03 00:00', collective);
     await donate(userCollective, 'EUR', 1000, '2017-10-05 00:00', collective);
-    await donate(userCollective, 'EUR',  500, '2017-10-25 00:00', collective);
-    await donate(userCollective, 'EUR',  500, '2017-11-05 00:00', collective);
-    await donate(userCollective, 'EUR',  500, '2017-11-25 00:00', collective);
+    await donate(userCollective, 'EUR', 500, '2017-10-25 00:00', collective);
+    await donate(userCollective, 'EUR', 500, '2017-11-05 00:00', collective);
+    await donate(userCollective, 'EUR', 500, '2017-11-25 00:00', collective);
   });
 
   describe('return transactions', () => {
-
     it('fails to return list of invoices for a given user if not logged in as that user', async () => {
       const query = `
         query allInvoices($fromCollectiveSlug: String!) {
@@ -63,9 +70,13 @@ describe('graphql.invoices.test.js', () => {
           }
         }
       `;
-      const result = await utils.graphqlQuery(query, { fromCollectiveSlug: "xdamman" });
+      const result = await utils.graphqlQuery(query, {
+        fromCollectiveSlug: 'xdamman',
+      });
       expect(result.errors).to.exist;
-      expect(result.errors[0].message).to.contain("You don't have permission to access invoices for this user");
+      expect(result.errors[0].message).to.contain(
+        "You don't have permission to access invoices for this user",
+      );
     });
 
     it('returns list of invoices for a given user', async () => {
@@ -87,7 +98,11 @@ describe('graphql.invoices.test.js', () => {
           }
         }
       `;
-      const result = await utils.graphqlQuery(query, { fromCollectiveSlug: "xdamman" }, xdamman);
+      const result = await utils.graphqlQuery(
+        query,
+        { fromCollectiveSlug: 'xdamman' },
+        xdamman,
+      );
       result.errors && console.error(result.errors[0]);
       expect(result.errors).to.not.exist;
       const invoices = result.data.allInvoices;
@@ -95,9 +110,9 @@ describe('graphql.invoices.test.js', () => {
       expect(invoices[0].year).to.equal(2017);
       expect(invoices[0].month).to.equal(11);
       expect(invoices[0].totalAmount).to.equal(1000);
-      expect(invoices[0].currency).to.equal("EUR");
-      expect(invoices[0].host.slug).to.equal("brusselstogether-host");
-      expect(invoices[0].fromCollective.slug).to.equal("xdamman");
+      expect(invoices[0].currency).to.equal('EUR');
+      expect(invoices[0].host.slug).to.equal('brusselstogether-host');
+      expect(invoices[0].fromCollective.slug).to.equal('xdamman');
     });
 
     it('returns invoice data for a given year/month', async () => {
@@ -132,16 +147,19 @@ describe('graphql.invoices.test.js', () => {
           }
         }
       `;
-      const result = await utils.graphqlQuery(query, { invoiceSlug: "201710-brusselstogether-host-xdamman" }, xdamman);
+      const result = await utils.graphqlQuery(
+        query,
+        { invoiceSlug: '201710-brusselstogether-host-xdamman' },
+        xdamman,
+      );
       result.errors && console.error(result.errors[0]);
       expect(result.errors).to.not.exist;
       const invoice = result.data.Invoice;
-      expect(invoice.host.slug).to.equal("brusselstogether-host");
-      expect(invoice.fromCollective.slug).to.equal("xdamman");
+      expect(invoice.host.slug).to.equal('brusselstogether-host');
+      expect(invoice.fromCollective.slug).to.equal('xdamman');
       expect(invoice.totalAmount).to.equal(1500);
-      expect(invoice.currency).to.equal("EUR");
+      expect(invoice.currency).to.equal('EUR');
       expect(invoice.transactions).to.have.length(2);
     });
-
   });
 });

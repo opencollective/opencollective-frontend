@@ -1,13 +1,14 @@
 'use strict';
 
 module.exports = {
-  up: function (queryInterface, DataTypes) {
+  up: function(queryInterface, DataTypes) {
     return queryInterface.createTable(
-      'Events', {
+      'Events',
+      {
         id: {
           type: DataTypes.INTEGER,
           primaryKey: true,
-          autoIncrement: true
+          autoIncrement: true,
         },
 
         name: DataTypes.STRING,
@@ -17,20 +18,20 @@ module.exports = {
           type: DataTypes.INTEGER,
           references: {
             model: 'Users',
-            key: 'id'
+            key: 'id',
           },
           onDelete: 'SET NULL',
-          onUpdate: 'CASCADE'
+          onUpdate: 'CASCADE',
         },
 
         GroupId: {
           type: DataTypes.INTEGER,
           references: {
             model: 'Groups',
-            key: 'id'
+            key: 'id',
           },
           onDelete: 'SET NULL',
-          onUpdate: 'CASCADE'
+          onUpdate: 'CASCADE',
         },
 
         slug: DataTypes.STRING,
@@ -39,17 +40,17 @@ module.exports = {
 
         startsAt: {
           type: DataTypes.DATE,
-          defaultValue: DataTypes.NOW
+          defaultValue: DataTypes.NOW,
         },
 
         endsAt: {
           type: DataTypes.DATE,
-          defaultValue: DataTypes.NOW
+          defaultValue: DataTypes.NOW,
         },
 
         maxAmount: {
           type: DataTypes.INTEGER, // In cents
-          min: 0
+          min: 0,
         },
 
         currency: {
@@ -59,7 +60,7 @@ module.exports = {
             if (val && val.toUpperCase) {
               this.setDataValue('currency', val.toUpperCase());
             }
-          }
+          },
         },
 
         quantity: {
@@ -68,23 +69,25 @@ module.exports = {
 
         createdAt: {
           type: DataTypes.DATE,
-          defaultValue: DataTypes.NOW
+          defaultValue: DataTypes.NOW,
         },
 
         updatedAt: {
           type: DataTypes.DATE,
-          defaultValue: DataTypes.NOW
+          defaultValue: DataTypes.NOW,
         },
 
         deletedAt: {
-          type: DataTypes.DATE
-        }
-      }, {
+          type: DataTypes.DATE,
+        },
+      },
+      {
         paranoid: true,
-      });
+      },
+    );
   },
 
-  down: function (queryInterface) {
+  down: function(queryInterface) {
     return queryInterface.dropTable('Events');
-  }
+  },
 };

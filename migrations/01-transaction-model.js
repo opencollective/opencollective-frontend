@@ -1,19 +1,19 @@
 'use strict';
 
 module.exports = {
-  up: function (queryInterface, DataTypes) {
+  up: function(queryInterface, DataTypes) {
     return queryInterface.createTable('Transactions', {
       id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
-        autoIncrement: true
+        autoIncrement: true,
       },
       type: DataTypes.STRING,
       description: DataTypes.STRING,
       amount: DataTypes.FLOAT,
       currency: {
         type: DataTypes.STRING,
-        defaultValue: 'USD'
+        defaultValue: 'USD',
       },
       beneficiary: DataTypes.STRING,
       paidby: DataTypes.STRING,
@@ -24,23 +24,23 @@ module.exports = {
 
       approved: {
         type: DataTypes.BOOLEAN,
-        defaultValue: false
+        defaultValue: false,
       },
 
       createdAt: {
         type: DataTypes.DATE,
-        defaultValue: DataTypes.NOW
+        defaultValue: DataTypes.NOW,
       },
       approvedAt: DataTypes.DATE,
       reimbursedAt: DataTypes.DATE,
       updatedAt: {
         type: DataTypes.DATE,
-        allowNull: false
-      }
+        allowNull: false,
+      },
     });
   },
 
-  down: function (queryInterface) {
+  down: function(queryInterface) {
     return queryInterface.dropTable('Transactions');
-  }
+  },
 };

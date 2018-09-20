@@ -8,7 +8,7 @@ if (config.aws.s3.key) {
     key: config.aws.s3.key,
     secret: config.aws.s3.secret,
     bucket: config.aws.s3.bucket,
-    region: 'us-west-1'
+    region: 'us-west-1',
   });
 }
 

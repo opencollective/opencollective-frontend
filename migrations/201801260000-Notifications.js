@@ -6,9 +6,10 @@
 
 module.exports = {
   up: (queryInterface, DataTypes) => {
-      return queryInterface.sequelize.query(`DELETE FROM "Notifications" WHERE active IS TRUE AND channel='email'`);
+    return queryInterface.sequelize.query(
+      `DELETE FROM "Notifications" WHERE active IS TRUE AND channel='email'`,
+    );
   },
 
-  down: (queryInterface, Sequelize) => {
-  }
+  down: (queryInterface, Sequelize) => {},
 };

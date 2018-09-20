@@ -1,14 +1,14 @@
 'use strict';
 
 module.exports = {
-  up: function (queryInterface) {
+  up: function(queryInterface) {
     return queryInterface.addIndex('Transactions', ['DonationId'], {
       indexName: 'DonationId',
-      indicesType: 'INDEX'
+      indicesType: 'INDEX',
     });
   },
 
-  down: function (queryInterface) {
+  down: function(queryInterface) {
     return queryInterface.removeIndex('Transactions', 'DonationId');
-  }
+  },
 };

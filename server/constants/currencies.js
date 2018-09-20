@@ -8,5 +8,5 @@ export default {
   MXN: { fxrate: 17.74, format: value => `${value} MXN` },
   SEK: { fxrate: 7.96, format: value => `kr ${value}` },
   USD: { fxrate: 1, format: value => `$${value}` },
-  UYU: { fxrate: 29.17, format: value => `$U ${value}` }
+  UYU: { fxrate: 29.17, format: value => `$U ${value}` },
 };

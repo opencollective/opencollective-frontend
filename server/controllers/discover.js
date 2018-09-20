@@ -2,7 +2,7 @@ import models from '../models';
 
 export default (req, res, next) => {
   const show = req.query.show || 'all';
-  const sort = (req.query.sort === 'newest') ? 'newest' : 'most popular';
+  const sort = req.query.sort === 'newest' ? 'newest' : 'most popular';
   const { offset } = req.query;
 
   let orderBy;
@@ -24,16 +24,16 @@ export default (req, res, next) => {
     false,
     orderBy,
     'desc',
-    offset
+    offset,
   )
-  .then(collectives => {
-    const di = {
-      show,
-      sort,
-      offset,
-      collectives
-    };
-    res.send(di);
-  })
-  .catch(next);
+    .then(collectives => {
+      const di = {
+        show,
+        sort,
+        offset,
+        collectives,
+      };
+      res.send(di);
+    })
+    .catch(next);
 };

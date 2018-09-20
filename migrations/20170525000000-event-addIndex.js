@@ -1,14 +1,14 @@
 'use strict';
 
 module.exports = {
-  up: function (queryInterface) {
+  up: function(queryInterface) {
     return queryInterface.addIndex('Events', ['GroupId', 'slug'], {
       indexName: 'UniqueGroupIdSlugIndex',
-      indicesType: 'UNIQUE'
+      indicesType: 'UNIQUE',
     });
   },
 
-  down: function (queryInterface) {
+  down: function(queryInterface) {
     return queryInterface.removeIndex('Events', 'UniqueGroupIdSlugIndex');
-  }
+  },
 };

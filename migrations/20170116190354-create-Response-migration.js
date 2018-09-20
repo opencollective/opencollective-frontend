@@ -1,57 +1,58 @@
 'use strict';
 
 module.exports = {
-  up: function (queryInterface, DataTypes) {
+  up: function(queryInterface, DataTypes) {
     return queryInterface.createTable(
-      'Responses', {
+      'Responses',
+      {
         id: {
           type: DataTypes.INTEGER,
           primaryKey: true,
-          autoIncrement: true
+          autoIncrement: true,
         },
 
         UserId: {
           type: DataTypes.INTEGER,
           references: {
             model: 'Users',
-            key: 'id'
+            key: 'id',
           },
           onDelete: 'SET NULL',
-          onUpdate: 'CASCADE'
+          onUpdate: 'CASCADE',
         },
 
         GroupId: {
           type: DataTypes.INTEGER,
           references: {
             model: 'Groups',
-            key: 'id'
+            key: 'id',
           },
           onDelete: 'SET NULL',
-          onUpdate: 'CASCADE'
+          onUpdate: 'CASCADE',
         },
 
         TierId: {
           type: DataTypes.INTEGER,
           references: {
             model: 'Tiers',
-            key: 'id'
+            key: 'id',
           },
           onDelete: 'SET NULL',
-          onUpdate: 'CASCADE'
+          onUpdate: 'CASCADE',
         },
 
         EventId: {
           type: DataTypes.INTEGER,
           references: {
             model: 'Events',
-            key: 'id'
+            key: 'id',
           },
           onDelete: 'SET NULL',
-          onUpdate: 'CASCADE'
+          onUpdate: 'CASCADE',
         },
 
         confirmedAt: {
-          type: DataTypes.DATE
+          type: DataTypes.DATE,
         },
 
         status: {
@@ -61,35 +62,37 @@ module.exports = {
           validate: {
             isIn: {
               args: [['PENDING', 'INTERESTED', 'YES', 'NO']],
-              msg: 'Must be PENDING, INTERESTED, YES or NO'
-            }
-          }
+              msg: 'Must be PENDING, INTERESTED, YES or NO',
+            },
+          },
         },
 
         quantity: {
           type: DataTypes.INTEGER,
-          min: 0
+          min: 0,
         },
 
         createdAt: {
           type: DataTypes.DATE,
-          defaultValue: DataTypes.NOW
+          defaultValue: DataTypes.NOW,
         },
 
         updatedAt: {
           type: DataTypes.DATE,
-          defaultValue: DataTypes.NOW
+          defaultValue: DataTypes.NOW,
         },
 
         deletedAt: {
-          type: DataTypes.DATE
-        }
-      }, {
+          type: DataTypes.DATE,
+        },
+      },
+      {
         paranoid: true,
-      });
+      },
+    );
   },
 
-  down: function (queryInterface) {
+  down: function(queryInterface) {
     return queryInterface.dropTable('Responses');
-  }
+  },
 };

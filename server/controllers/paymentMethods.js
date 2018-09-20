@@ -29,19 +29,28 @@ const createPaymentMethodQuery = `
  */
 export function getPaymentMethods(req, res, next) {
   const { filter } = req.query;
-  const query = extend({}, filter, { CollectiveId: req.user.CollectiveId, confirmedAt: { [Op.ne]: null } });
+  const query = extend({}, filter, {
+    CollectiveId: req.user.CollectiveId,
+    confirmedAt: { [Op.ne]: null },
+  });
 
   return PaymentMethod.findAll({ where: query })
-  .then((response) => {
-    res.send(pluck(response, 'info'));
-  })
-  .catch(next);
+    .then(response => {
+      res.send(pluck(response, 'info'));
+    })
+    .catch(next);
 }
 
 async function createVirtualCardThroughGraphQL(args, user) {
-  const gqlResult = await utils.graphqlQuery(createPaymentMethodQuery, args, user);
+  const gqlResult = await utils.graphqlQuery(
+    createPaymentMethodQuery,
+    args,
+    user,
+  );
   if (!get(gqlResult, 'data.createPaymentMethod')) {
-    const error = gqlResult.errors ? gqlResult.errors[0] : Error('Graphql Query did not return a result');
+    const error = gqlResult.errors
+      ? gqlResult.errors[0]
+      : Error('Graphql Query did not return a result');
     throw error;
   }
   const paymentMethod = gqlResult.data.createPaymentMethod;
@@ -51,34 +60,52 @@ async function createVirtualCardThroughGraphQL(args, user) {
     CollectiveId: paymentMethod.collective.id,
     balance: paymentMethod.initialBalance,
     currency: paymentMethod.currency,
-    code: paymentMethod.uuid.substring(0,8),
+    code: paymentMethod.uuid.substring(0, 8),
     expiryDate: moment(paymentMethod.expiryDate).format(),
-    redeemUrl: `${config.host.website}/redeem?code=${paymentMethod.uuid.substring(0,8)}`
+    redeemUrl: `${
+      config.host.website
+    }/redeem?code=${paymentMethod.uuid.substring(0, 8)}`,
   };
 }
 
 /**
- * Creates a virtual card given (at least) an amount and a
+ * Creates a virtual card given (at least) an amount, a currency and a
  * CollectiveId(if the logged in user is and admin of the collective).
  */
 export function createVirtualCard(req, res) {
-
-  const args = pick(req.body, ['description','CollectiveId','PaymentMethodId','amount', 'currency','expiryDate']);
+  const args = pick(req.body, [
+    'description',
+    'CollectiveId',
+    'PaymentMethodId',
+    'amount',
+    'currency',
+    'expiryDate',
+  ]);
   args.type = args.type || 'virtualcard';
 
   return createVirtualCardThroughGraphQL(args, req.remoteUser)
-  .then(response => {
-    res.send(response);
-  })
-  .catch(error => {
-    res.status(400).send({error: error.toString()});
-  });
+    .then(response => {
+      res.send(response);
+    })
+    .catch(error => {
+      res.status(400).send({ error: error.toString() });
+    });
 }
 
+/**
+ * Creates a payment method given (at least) an amount, , a currency and a
+ * CollectiveId(if the logged in user is and admin of the collective).
+ * PS.: Only supports creating Virtual cards at the moment.
+ */
 export function createPaymentMethod(req, res, next) {
   // We only support creation of "virtualcard" payment methods
   if (get(req, 'body.type') && get(req, 'body.type') !== 'virtualcard') {
-    throw Error(`Creation of payment methods with type ${get(req, 'body.type')} not Allowed`);
+    throw Error(
+      `Creation of payment methods with type ${get(
+        req,
+        'body.type',
+      )} not Allowed`,
+    );
   }
   return createVirtualCard(req, res, next);
 }

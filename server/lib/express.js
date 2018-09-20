@@ -30,7 +30,7 @@ export default function(app) {
 
   if (process.env.DEBUG && process.env.DEBUG.match(/response/)) {
     app.use((req, res, next) => {
-      const temp = res.end
+      const temp = res.end;
       res.end = function(str) {
         try {
           const obj = JSON.parse(str);
@@ -38,8 +38,8 @@ export default function(app) {
         } catch (e) {
           debug('response', str);
         }
-        temp.apply(this,arguments);
-      }
+        temp.apply(this, arguments);
+      };
       next();
     });
   }
@@ -49,26 +49,31 @@ export default function(app) {
     app.use(morgan('dev'));
 
   // Body parser.
-  app.use(bodyParser.json({limit: '50mb'}));
+  app.use(bodyParser.json({ limit: '50mb' }));
   app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
   // check for slow requests
   app.use((req, res, next) => {
-    req.startAt = new Date;
+    req.startAt = new Date();
     const temp = res.end;
 
     res.end = function() {
-      const timeElapsed = (new Date) - req.startAt;
+      const timeElapsed = new Date() - req.startAt;
       if (timeElapsed > (process.env.SLOW_REQUEST_THRESHOLD || 1000)) {
         if (req.body && req.body.query) {
-          console.log(`>>> slow request ${timeElapsed}ms`, req.body.operationName, "query:", req.body.query.substr(0, req.body.query.indexOf(")")+1));
+          console.log(
+            `>>> slow request ${timeElapsed}ms`,
+            req.body.operationName,
+            'query:',
+            req.body.query.substr(0, req.body.query.indexOf(')') + 1),
+          );
           if (req.body.variables) {
-            console.log(">>> variables: ", sanitizeForLogs(req.body.variables));
+            console.log('>>> variables: ', sanitizeForLogs(req.body.variables));
           }
         }
       }
-      temp.apply(this,arguments);
-    }
+      temp.apply(this, arguments);
+    };
     next();
   });
 
@@ -80,7 +85,10 @@ export default function(app) {
   app.use(multer());
 
   // Error handling.
-  if (process.env.NODE_ENV !== 'production' && process.env.NODE_ENV !== 'staging') {
+  if (
+    process.env.NODE_ENV !== 'production' &&
+    process.env.NODE_ENV !== 'staging'
+  ) {
     app.use(errorHandler());
   }
 
@@ -92,20 +100,23 @@ export default function(app) {
   passport.serializeUser((user, cb) => cb(null, user));
   passport.deserializeUser((obj, cb) => cb(null, obj));
 
-  const verify = (accessToken, tokenSecret, profile, done) => done(null, accessToken, { tokenSecret, profile });
+  const verify = (accessToken, tokenSecret, profile, done) =>
+    done(null, accessToken, { tokenSecret, profile });
   passport.use(new GitHubStrategy(config.github, verify));
   passport.use(new MeetupStrategy(config.meetup, verify));
   passport.use(new TwitterStrategy(config.twitter, verify));
 
   app.use(cookieParser());
-  app.use(session({
-    secret: config.keys.opencollective.session_secret,
-    resave: false,
-    cookie: { maxAge: 1000 * 60 * 5 },
-    saveUninitialized: false,
-    store: new SequelizeStore({ db }),
-    proxy: true
-  }));
+  app.use(
+    session({
+      secret: config.keys.opencollective.session_secret,
+      resave: false,
+      cookie: { maxAge: 1000 * 60 * 5 },
+      saveUninitialized: false,
+      store: new SequelizeStore({ db }),
+      proxy: true,
+    }),
+  );
   app.use(passport.initialize());
   app.use(passport.session());
 }

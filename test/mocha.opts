@@ -2,7 +2,6 @@
 --reporter spec
 --reporter mocha-circleci-reporter
 --require babel-core/register
---require babel-polyfill
---file ./server/lib/load-dot-env.js
+--file ./server/env.js
 --file ./test/setup.js
 --exit

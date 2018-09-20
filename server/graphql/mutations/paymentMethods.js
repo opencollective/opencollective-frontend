@@ -6,9 +6,9 @@ import models from '../../models';
  *
  * @param {Object} args contains the parameters to create the new
  *  payment method.
-* @param {Object} args contains the parameters to create the new
+ * @param {Object} args contains the parameters to create the new
  *  payment method.
-*/
+ */
 export async function createPaymentMethod(args, remoteUser) {
   // We only support the creation of virtual cards payment methods at the moment
   if (!args || !args.type || args.type != 'virtualcard') {
@@ -42,7 +42,11 @@ async function createVirtualPaymentMethod(args, remoteUser) {
   // making sure it's a string, trim and uppercase it.
   args.currency = args.currency.toString().toUpperCase();
   if (!['USD', 'EUR'].includes(args.currency)) {
-    throw new Error(`Currency ${args.currency} not supported. We only support USD and EUR at the moment.`);
+    throw new Error(
+      `Currency ${
+        args.currency
+      } not supported. We only support USD and EUR at the moment.`,
+    );
   }
   const paymentMethod = await virtualcard.create(args, remoteUser);
   return paymentMethod;
@@ -51,12 +55,14 @@ async function createVirtualPaymentMethod(args, remoteUser) {
 /** Claim the Virtual Card Payment Method By an (existing or not) user
  * @param {Object} args contains the parameters
  * @param {String} args.code The 8 last digits of the UUID
- * @param {email} args.email The email of the user claiming the virtual card
+ * @param {String} args.email The email of the user claiming the virtual card
  * @returns {models.PaymentMethod} return the virtual card payment method.
  */
 export async function claimPaymentMethod(args, remoteUser) {
   const paymentMethod = await virtualcard.claim(args, remoteUser);
-  const user = await models.User.findOne({ where: { CollectiveId: paymentMethod.CollectiveId }});
+  const user = await models.User.findOne({
+    where: { CollectiveId: paymentMethod.CollectiveId },
+  });
   const {
     initialBalance,
     currency,
@@ -73,6 +79,6 @@ export async function claimPaymentMethod(args, remoteUser) {
     name,
     currency,
     emitter,
-  })
+  });
   return paymentMethod;
 }

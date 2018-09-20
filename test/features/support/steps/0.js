@@ -6,6 +6,6 @@ import { expect } from 'chai';
 //
 // Since this step is not using the world object, it's fine to use an
 // arrow function.
-Then('{int} is zero', (number) => {
+Then('{int} is zero', number => {
   expect(number).to.equal(0);
 });

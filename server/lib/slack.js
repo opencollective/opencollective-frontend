@@ -11,16 +11,18 @@ import constants from '../constants/activities';
 const debugSlack = debug('slack');
 
 export default {
-
   /*
    * Post a given activity to OpenCollective private channel
    * This method can only publish to our webhookUrl and our private channel, so we don't leak info by mistake
    */
   postActivityOnPrivateChannel(activity) {
-    const message = activitiesLib.formatMessageForPrivateChannel(activity, 'slack');
+    const message = activitiesLib.formatMessageForPrivateChannel(
+      activity,
+      'slack',
+    );
     const options = {
       attachments: formatAttachment(activity),
-      channel: config.slack.privateActivityChannel
+      channel: config.slack.privateActivityChannel,
     };
     return this.postMessage(message, config.slack.webhookUrl, options);
   },
@@ -32,8 +34,11 @@ export default {
     if (!options) {
       options = {};
     }
-      const message = activitiesLib.formatMessageForPublicChannel(activity, 'slack');
-      return this.postMessage(message, webhookUrl, options);
+    const message = activitiesLib.formatMessageForPublicChannel(
+      activity,
+      'slack',
+    );
+    return this.postMessage(message, webhookUrl, options);
   },
 
   /*
@@ -45,14 +50,14 @@ export default {
     }
 
     if (options.linkTwitterMentions) {
-      msg = msg.replace(/@([a-z\d_]+)/ig, '<http://twitter.com/$1|@$1>');
+      msg = msg.replace(/@([a-z\d_]+)/gi, '<http://twitter.com/$1|@$1>');
     }
 
     const slackOptions = {
       text: msg,
       username: 'OpenCollective Activity Bot',
       icon_url: 'https://opencollective.com/favicon.ico',
-      attachments: options.attachments || []
+      attachments: options.attachments || [],
     };
 
     // note that channel is optional on slack, as every webhook has a default channel
@@ -70,25 +75,26 @@ export default {
         return resolve();
       }
 
-      return new Slack(webhookUrl, {})
-        .send(slackOptions, (err) => {
-          if (err) {
-            debugSlack(err);
-            return reject(err);
-          }
-          return resolve();
-        });
+      return new Slack(webhookUrl, {}).send(slackOptions, err => {
+        if (err) {
+          debugSlack(err);
+          return reject(err);
+        }
+        return resolve();
+      });
     });
-  }
+  },
 };
 
-const formatAttachment = (activity) => {
+const formatAttachment = activity => {
   if (activity.type === constants.WEBHOOK_STRIPE_RECEIVED) {
-    return [{
-      title: 'Data',
-      color: 'good',
-      text: activitiesLib.formatAttachment(activity.data)
-    }];
+    return [
+      {
+        title: 'Data',
+        color: 'good',
+        text: activitiesLib.formatAttachment(activity.data),
+      },
+    ];
   }
   return [];
-}
+};

@@ -26,17 +26,17 @@ module.exports = {
         type: DataTypes.BIGINT,
         primaryKey: true,
         autoIncrement: true,
-        unique: true
+        unique: true,
       },
       archivedAt: {
         type: DataTypes.DATE,
         allowNull: false,
-        defaultValue: DataTypes.NOW
-      }
+        defaultValue: DataTypes.NOW,
+      },
     });
   },
 
   down: (queryInterface, Sequelize) => {
     return queryInterface.dropTable('OrderHistories');
-  }
+  },
 };

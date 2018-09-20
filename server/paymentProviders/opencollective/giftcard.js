@@ -16,7 +16,11 @@ import { get } from 'lodash';
  */
 export async function getBalance(paymentMethod) {
   if (!libpayments.isProvider('opencollective.giftcard', paymentMethod)) {
-    throw new Error(`Expected opencollective.giftcard but got ${paymentMethod.service}.${paymentMethod.type}`);
+    throw new Error(
+      `Expected opencollective.giftcard but got ${paymentMethod.service}.${
+        paymentMethod.type
+      }`,
+    );
   }
   return {
     amount: paymentMethod.monthlyLimitPerMember,
@@ -68,11 +72,11 @@ export async function processOrder(order) {
       paymentProcessorFeeInHostCurrency: 0,
       description: order.paymentMethod.name,
       HostCollectiveId,
-    }
+    },
   });
 
   // mark gift card as used, so no one can use it again
-  await order.paymentMethod.update({archivedAt: new Date()});
+  await order.paymentMethod.update({ archivedAt: new Date() });
 
   // create new payment method to allow User to use the money
   const newPaymentMethod = await models.PaymentMethod.create({
@@ -84,15 +88,18 @@ export async function processOrder(order) {
     CreatedByUserId: user.id,
     MonthlyLimitPerMember: pm.monthlyLimitPerMember,
     currency: pm.currency,
-    token: null // we don't pass the gift card token on
+    token: null, // we don't pass the gift card token on
   });
 
   // Use the above payment method to donate to Collective
   const hostFeeInHostCurrency = libpayments.calcFee(
     order.totalAmount,
-    order.collective.hostFeePercent);
+    order.collective.hostFeePercent,
+  );
   const platformFeeInHostCurrency = libpayments.calcFee(
-    order.totalAmount, OC_FEE_PERCENT);
+    order.totalAmount,
+    OC_FEE_PERCENT,
+  );
   const transactions = await models.Transaction.createFromPayload({
     CreatedByUserId: user.id,
     FromCollectiveId: order.FromCollectiveId,
@@ -109,14 +116,19 @@ export async function processOrder(order) {
       hostFeeInHostCurrency,
       platformFeeInHostCurrency,
       paymentProcessorFeeInHostCurrency: 0,
-      description: order.description
-    }
+      description: order.description,
+    },
   });
 
   // add roles
-  await order.collective.findOrAddUserWithRole({ id: user.id, CollectiveId: order.fromCollective.id}, roles.BACKER, {
-    CreatedByUserId: user.id, TierId: order.TierId,
-  });
+  await order.collective.findOrAddUserWithRole(
+    { id: user.id, CollectiveId: order.fromCollective.id },
+    roles.BACKER,
+    {
+      CreatedByUserId: user.id,
+      TierId: order.TierId,
+    },
+  );
 
   // Mark order row as processed
   await order.update({ processedAt: new Date() });
@@ -131,7 +143,7 @@ export async function processOrder(order) {
 export default {
   features: {
     recurring: true,
-    waitToCharge: false
+    waitToCharge: false,
   },
   getBalance,
   processOrder,
@@ -153,9 +165,10 @@ function randomString(length, chars) {
 
 /** Generate the verification number of a token */
 function getVerificationNumber(str) {
-  const data = Array.prototype.map
-    .call(str, c => c.charCodeAt(0))
-    .reduce((a, b) => a * b) % VERIFICATION_MODULO;
+  const data =
+    Array.prototype.map
+      .call(str, c => c.charCodeAt(0))
+      .reduce((a, b) => a * b) % VERIFICATION_MODULO;
   return data.toString().substr(-1);
 }
 
@@ -169,7 +182,11 @@ function newToken(prefix) {
   const code = `${prefix}${letters}${numbers}`;
   const verification = getVerificationNumber(code);
 
-  if (letters.length !== 3 || numbers.toString().length != 3 || verification.toString().length !== 1) {
+  if (
+    letters.length !== 3 ||
+    numbers.toString().length != 3 ||
+    verification.toString().length !== 1
+  ) {
     throw new Error('Incorrect length found', letters, numbers, verification);
   }
   return `${code}${verification}`;

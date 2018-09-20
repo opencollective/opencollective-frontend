@@ -9,5 +9,5 @@ export const HOST_FEE_PERCENT = 5;
 /** Types of Transactions */
 export const TransactionTypes = {
   CREDIT: 'CREDIT',
-  DEBIT: 'DEBIT'
+  DEBIT: 'DEBIT',
 };

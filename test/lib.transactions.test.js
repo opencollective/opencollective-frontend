@@ -10,22 +10,53 @@ import models from '../server/models';
 import * as libtransactions from '../server/lib/transactions';
 
 describe('lib.transactions.test.js', () => {
-
   beforeEach(utils.resetTestDB);
 
   it('exports transactions', async () => {
     // Given a host with a collective
     const currency = 'USD';
-    const { collective } = await store.newCollectiveWithHost('apex', currency, currency, 10);
+    const { collective } = await store.newCollectiveWithHost(
+      'apex',
+      currency,
+      currency,
+      10,
+    );
     const { userCollective } = await store.newUser('a new user');
     // And given some transactions
     await store.stripeConnectedAccount(collective.HostCollectiveId);
-    await store.stripeOneTimeDonation({ userCollective, collective, currency, amount: 100 });
-    await store.stripeOneTimeDonation({ userCollective, collective, currency, amount: 200 });
-    await store.stripeOneTimeDonation({ userCollective, collective, currency, amount: 300 });
-    await store.stripeOneTimeDonation({ userCollective, collective, currency, amount: 400 });
-    await store.stripeOneTimeDonation({ userCollective, collective, currency, amount: 500 });
-    const transactions = await models.Transaction.findAll({ where: { CollectiveId: collective.id } });
+    await store.stripeOneTimeDonation({
+      userCollective,
+      collective,
+      currency,
+      amount: 100,
+    });
+    await store.stripeOneTimeDonation({
+      userCollective,
+      collective,
+      currency,
+      amount: 200,
+    });
+    await store.stripeOneTimeDonation({
+      userCollective,
+      collective,
+      currency,
+      amount: 300,
+    });
+    await store.stripeOneTimeDonation({
+      userCollective,
+      collective,
+      currency,
+      amount: 400,
+    });
+    await store.stripeOneTimeDonation({
+      userCollective,
+      collective,
+      currency,
+      amount: 500,
+    });
+    const transactions = await models.Transaction.findAll({
+      where: { CollectiveId: collective.id },
+    });
     expect(transactions.length).to.equal(5);
     // When the newly created transactions are exported
     const csv = libtransactions.exportTransactions(transactions);
@@ -33,5 +64,4 @@ describe('lib.transactions.test.js', () => {
     expect(lines.length).to.equal(6);
     expect(lines[0].split('","').length).to.equal(12);
   }); /* End of "exports transactions" */
-
 }); /* End of "lib.transactions.test.js" */

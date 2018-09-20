@@ -34,24 +34,32 @@ const searchTransactions = (billingAgreementId, paypalConfig) => {
       (err, res) => {
         if (err) return reject(err);
         return resolve(res.agreement_transaction_list);
-      }
+      },
     );
-  })
+  });
 };
 
 const findUnregisteredTransaction = (transactions, paypalTransactions) => {
-  return paypalTransactions.filter((pt) => {
-    return !_.find(transactions, (t) => {
-      return t.data && (t.data.transaction_id === pt.transaction_id);
+  return paypalTransactions.filter(pt => {
+    return !_.find(transactions, t => {
+      return t.data && t.data.transaction_id === pt.transaction_id;
     });
   });
-}
+};
 
-const updateTransactions = (subscription, collective, user, paypalTransactions) => {
+const updateTransactions = (
+  subscription,
+  collective,
+  user,
+  paypalTransactions,
+) => {
   // Find the missing transactions in our db and create them
-  const missingPaypalTransactions = findUnregisteredTransaction(subscription.Transactions, paypalTransactions);
+  const missingPaypalTransactions = findUnregisteredTransaction(
+    subscription.Transactions,
+    paypalTransactions,
+  );
 
-  return Bluebird.map(missingPaypalTransactions, (pt) => {
+  return Bluebird.map(missingPaypalTransactions, pt => {
     const transaction = {
       type: 'payment',
       amount: subscription.amount,
@@ -60,45 +68,49 @@ const updateTransactions = (subscription, collective, user, paypalTransactions) 
       tags: ['Donation'],
       interval: subscription.interval,
       SubscriptionId: subscription.id,
-      data: pt
+      data: pt,
     };
 
     return models.Transaction.createFromPayload({
-        transaction,
-        collective,
-        user
-      });
+      transaction,
+      collective,
+      user,
+    });
   });
 };
 
-const updateFirstTransaction = (transaction, subscription, paypalTransaction) => {
+const updateFirstTransaction = (
+  transaction,
+  subscription,
+  paypalTransaction,
+) => {
   const updateTransaction = () => {
     transaction.data = paypalTransaction;
     return transaction.save();
   };
 
-  return Bluebird.props({ // for testing
+  return Bluebird.props({
+    // for testing
     transaction: updateTransaction(),
-    subscription: subscription.activate()
+    subscription: subscription.activate(),
   });
 };
 
 export const findSubscriptions = () => {
   return models.Subscription.findAll({
     where: {
-      stripeSubscriptionId: null
+      stripeSubscriptionId: null,
     },
-    include: [{
-      model: models.Transaction,
-      include: [
-        { model: models.Collective },
-        { model: models.User }
-      ]
-    }]
+    include: [
+      {
+        model: models.Transaction,
+        include: [{ model: models.Collective }, { model: models.User }],
+      },
+    ],
   });
 };
 
-const log = (message) => {
+const log = message => {
   console.log(message);
 
   if (process.env.NODE_ENV === 'production') {
@@ -108,11 +120,16 @@ const log = (message) => {
   return message; // for testing
 };
 
-export const handlePaypalTransactions = (paypalTransactions, transaction, subscription, billingAgreementId) => {
+export const handlePaypalTransactions = (
+  paypalTransactions,
+  transaction,
+  subscription,
+  billingAgreementId,
+) => {
   const collective = transaction.Collective;
   const user = transaction.User;
-  const completedList = _.filter(paypalTransactions, { status: 'Completed'});
-  const created = _.find(paypalTransactions, { status: 'Created'});
+  const completedList = _.filter(paypalTransactions, { status: 'Completed' });
+  const created = _.find(paypalTransactions, { status: 'Created' });
 
   if (!created) {
     return log(`No Created event, invalid: ${billingAgreementId}`);
@@ -120,59 +137,85 @@ export const handlePaypalTransactions = (paypalTransactions, transaction, subscr
 
   // Unactive subscription
   if (!subscription.isActive) {
-
     // No completed events, it takes up to one day for paypal to process the subscription,
     // so we will just pass
     if (completedList.length === 0) {
-      return log(`Billing agreement (${billingAgreementId}) not processed yet, no completed event`);
+      return log(
+        `Billing agreement (${billingAgreementId}) not processed yet, no completed event`,
+      );
 
-    // Only one completed item means that it is the first payment, no
-    // need to create a new Transaction. We just need to activate the subscription
-    // and save the paypalTransaction in our transaction.
+      // Only one completed item means that it is the first payment, no
+      // need to create a new Transaction. We just need to activate the subscription
+      // and save the paypalTransaction in our transaction.
     } else if (completedList.length === 1) {
-      return updateFirstTransaction(transaction, subscription, completedList[0]);
+      return updateFirstTransaction(
+        transaction,
+        subscription,
+        completedList[0],
+      );
     } else {
-      return log(`Invalid subscription ${subscription.id} with billingAgreement ${billingAgreementId}, it should be activated already`);
+      return log(
+        `Invalid subscription ${
+          subscription.id
+        } with billingAgreement ${billingAgreementId}, it should be activated already`,
+      );
     }
 
-  // Active subscription
+    // Active subscription
   } else {
-
     if (completedList.length === 0) {
-      return log(`Subscription should not be active, subscription.id: ${subscription.id}, billingAgreementId: ${billingAgreementId}`);
+      return log(
+        `Subscription should not be active, subscription.id: ${
+          subscription.id
+        }, billingAgreementId: ${billingAgreementId}`,
+      );
     } else {
       return updateTransactions(subscription, collective, user, completedList);
     }
   }
-
 };
 
-export const populateTransactions = (subscription) => {
+export const populateTransactions = subscription => {
   const billingAgreementId = subscription.data.billingAgreementId;
   const transaction = subscription.Transactions[0] || {};
   const collective = transaction.Collective;
   const user = transaction.User;
 
   if (!billingAgreementId) {
-    return log(`No billingAgreementId, subscription.id ${subscription.id}, transaction.id ${transaction.id}`);
+    return log(
+      `No billingAgreementId, subscription.id ${
+        subscription.id
+      }, transaction.id ${transaction.id}`,
+    );
   }
 
   if (!user) {
-    return log(`No user, subscription.id ${subscription.id}, transaction.id ${transaction.id}`)
+    return log(
+      `No user, subscription.id ${subscription.id}, transaction.id ${
+        transaction.id
+      }`,
+    );
   }
 
   if (!collective) {
-    return log(`No collective, subscription.id ${subscription.id}, transaction.id ${transaction.id}`);
+    return log(
+      `No collective, subscription.id ${subscription.id}, transaction.id ${
+        transaction.id
+      }`,
+    );
   }
 
-  return collective.getConnectedAccount()
-    .then(connectedAccount => searchTransactions(billingAgreementId, connectedAccount.paypalConfig))
-    .then((paypalTransactions) => {
+  return collective
+    .getConnectedAccount()
+    .then(connectedAccount =>
+      searchTransactions(billingAgreementId, connectedAccount.paypalConfig),
+    )
+    .then(paypalTransactions => {
       return handlePaypalTransactions(
         paypalTransactions,
         transaction,
         subscription,
-        billingAgreementId
+        billingAgreementId,
       );
     });
 };

@@ -11,7 +11,20 @@ import { toNegative } from '../lib/math';
  * @param {*} transactions
  */
 export function exportTransactions(transactions, attributes) {
-  attributes = attributes || ['id', 'createdAt', 'amount', 'currency', 'description', 'netAmountInCollectiveCurrency', 'hostCurrency', 'hostCurrencyFxRate', 'paymentProcessorFeeInHostCurrency', 'hostFeeInHostCurrency', 'platformFeeInHostCurrency', 'netAmountInHostCurrency' ];
+  attributes = attributes || [
+    'id',
+    'createdAt',
+    'amount',
+    'currency',
+    'description',
+    'netAmountInCollectiveCurrency',
+    'hostCurrency',
+    'hostCurrencyFxRate',
+    'paymentProcessorFeeInHostCurrency',
+    'hostFeeInHostCurrency',
+    'platformFeeInHostCurrency',
+    'netAmountInHostCurrency',
+  ];
 
   return exportToCSV(transactions, attributes);
 }
@@ -23,22 +36,35 @@ export function exportTransactions(transactions, attributes) {
  * @param {*} endDate
  * @param {*} limit
  */
-export function getTransactions(collectiveids, startDate = new Date("2015-01-01"), endDate = new Date, options) {
+export function getTransactions(
+  collectiveids,
+  startDate = new Date('2015-01-01'),
+  endDate = new Date(),
+  options,
+) {
   const where = options.where || {};
   const query = {
     where: {
       ...where,
       CollectiveId: { [Op.in]: collectiveids },
-      createdAt: { [Op.gte]: startDate, [Op.lt]: endDate }
+      createdAt: { [Op.gte]: startDate, [Op.lt]: endDate },
     },
-    order: [ ['createdAt', 'DESC' ]]
+    order: [['createdAt', 'DESC']],
   };
   if (options.limit) query.limit = options.limit;
   if (options.include) query.include = options.include;
   return models.Transaction.findAll(query);
 }
 
-export function createFromPaidExpense(host, paymentMethod, expense, paymentResponses, preapprovalDetails, UserId, paymentProcessorFeeInHostCurrency = 0) {
+export function createFromPaidExpense(
+  host,
+  paymentMethod,
+  expense,
+  paymentResponses,
+  preapprovalDetails,
+  UserId,
+  paymentProcessorFeeInHostCurrency = 0,
+) {
   const hostCurrency = host.currency;
   let createPaymentResponse, executePaymentResponse;
   let fxrate;
@@ -47,7 +73,6 @@ export function createFromPaidExpense(host, paymentMethod, expense, paymentRespo
 
   // If PayPal
   if (paymentResponses) {
-
     createPaymentResponse = paymentResponses.createPaymentResponse;
     executePaymentResponse = paymentResponses.executePaymentResponse;
 
@@ -61,31 +86,48 @@ export function createFromPaidExpense(host, paymentMethod, expense, paymentRespo
          * it creates a payKey that we can use to redirect the user to PayPal.com to manually approve that payment
          * TODO We should handle that case on the frontend
          */
-        throw new errors.BadRequest(`Please approve this payment manually on ${createPaymentResponse.paymentApprovalUrl}`);
+        throw new errors.BadRequest(
+          `Please approve this payment manually on ${
+            createPaymentResponse.paymentApprovalUrl
+          }`,
+        );
 
       default:
-        throw new errors.ServerError(`controllers.expenses.pay: Unknown error while trying to create transaction for expense ${expense.id}. The full response was: ${JSON.stringify(executePaymentResponse)}`);
+        throw new errors.ServerError(
+          `controllers.expenses.pay: Unknown error while trying to create transaction for expense ${
+            expense.id
+          }. The full response was: ${JSON.stringify(executePaymentResponse)}`,
+        );
     }
 
     const senderFees = createPaymentResponse.defaultFundingPlan.senderFees;
     paymentProcessorFeeInCollectiveCurrency = senderFees.amount * 100; // paypal sends this in float
 
-    const currencyConversion = createPaymentResponse.defaultFundingPlan.currencyConversion || { exchangeRate: 1 };
-    fxrate = 1/parseFloat(currencyConversion.exchangeRate); // paypal returns a float from host.currency to expense.currency
-    paymentProcessorFeeInHostCurrency = fxrate * paymentProcessorFeeInCollectiveCurrency;
+    const currencyConversion = createPaymentResponse.defaultFundingPlan
+      .currencyConversion || { exchangeRate: 1 };
+    fxrate = 1 / parseFloat(currencyConversion.exchangeRate); // paypal returns a float from host.currency to expense.currency
+    paymentProcessorFeeInHostCurrency =
+      fxrate * paymentProcessorFeeInCollectiveCurrency;
 
     getFxRatePromise = Promise.resolve(fxrate);
   } else {
     // If manual (add funds or manual reimbursement of an expense)
-    getFxRatePromise = getFxRate(expense.currency, host.currency, expense.incurredAt || expense.createdAt);
+    getFxRatePromise = getFxRate(
+      expense.currency,
+      host.currency,
+      expense.incurredAt || expense.createdAt,
+    );
   }
 
   // We assume that all expenses are in Collective currency
   // (otherwise, ledger breaks with a triple currency conversion)
   const transaction = {
-    netAmountInCollectiveCurrency: -1 * (expense.amount + paymentProcessorFeeInCollectiveCurrency),
+    netAmountInCollectiveCurrency:
+      -1 * (expense.amount + paymentProcessorFeeInCollectiveCurrency),
     hostCurrency,
-    paymentProcessorFeeInHostCurrency: toNegative(paymentProcessorFeeInHostCurrency),
+    paymentProcessorFeeInHostCurrency: toNegative(
+      paymentProcessorFeeInHostCurrency,
+    ),
     ExpenseId: expense.id,
     type: TransactionTypes.DEBIT,
     amount: -expense.amount,
@@ -94,14 +136,16 @@ export function createFromPaidExpense(host, paymentMethod, expense, paymentRespo
     CreatedByUserId: UserId,
     CollectiveId: expense.CollectiveId,
     HostCollectiveId: host.id,
-    PaymentMethodId: paymentMethod ? paymentMethod.id : null
+    PaymentMethodId: paymentMethod ? paymentMethod.id : null,
   };
 
   return getFxRatePromise
     .then(hostCurrencyFxRate => {
       if (!isNaN(hostCurrencyFxRate)) {
         transaction.hostCurrencyFxRate = hostCurrencyFxRate;
-        transaction.amountInHostCurrency = -Math.round(hostCurrencyFxRate * expense.amount); // amountInHostCurrency is an INTEGER (in cents)
+        transaction.amountInHostCurrency = -Math.round(
+          hostCurrencyFxRate * expense.amount,
+        ); // amountInHostCurrency is an INTEGER (in cents)
       }
       return transaction;
     })
@@ -111,7 +155,7 @@ export function createFromPaidExpense(host, paymentMethod, expense, paymentRespo
       return transaction;
     })
     .then(transaction => models.Transaction.createDoubleEntry(transaction));
-  }
+}
 
 /** Create transaction for donation in kind
  *
@@ -138,7 +182,8 @@ export async function createTransactionFromInKindDonation(expenseTransaction) {
     FromCollectiveId: expenseTransaction.FromCollectiveId,
     HostCollectiveId: expenseTransaction.HostCollectiveId,
     PaymentMethodId: expenseTransaction.PaymentMethodId,
-    paymentProcessorFeeInHostCurrency: expenseTransaction.paymentProcessorFeeInHostCurrency,
+    paymentProcessorFeeInHostCurrency:
+      expenseTransaction.paymentProcessorFeeInHostCurrency,
     ExpenseId: expenseTransaction.ExpenseId,
   });
 }
@@ -151,8 +196,11 @@ export async function createTransactionFromInKindDonation(expenseTransaction) {
  *   Therefore, amountInHostCurrency / hostCurrencyFxRate= netAmountInCollectiveCurrency
  */
 export function netAmount(tr) {
-  const fees = (tr.hostFeeInHostCurrency + tr.platformFeeInHostCurrency + tr.paymentProcessorFeeInHostCurrency) || 0;
-  return Math.round( (tr.amountInHostCurrency + fees) / tr.hostCurrencyFxRate);
+  const fees =
+    tr.hostFeeInHostCurrency +
+      tr.platformFeeInHostCurrency +
+      tr.paymentProcessorFeeInHostCurrency || 0;
+  return Math.round((tr.amountInHostCurrency + fees) / tr.hostCurrencyFxRate);
 }
 
 /**
@@ -161,8 +209,10 @@ export function netAmount(tr) {
 export function verify(tr) {
   if (tr.type === 'CREDIT' && tr.amount <= 0) return 'amount <= 0';
   if (tr.type === 'DEBIT' && tr.amount >= 0) return 'amount >= 0';
-  if (tr.type === 'CREDIT' && tr.netAmountInCollectiveCurrency <= 0) return 'netAmount <= 0';
-  if (tr.type === 'DEBIT' && tr.netAmountInCollectiveCurrency >= 0) return 'netAmount >= 0';
+  if (tr.type === 'CREDIT' && tr.netAmountInCollectiveCurrency <= 0)
+    return 'netAmount <= 0';
+  if (tr.type === 'DEBIT' && tr.netAmountInCollectiveCurrency >= 0)
+    return 'netAmount >= 0';
   const diff = Math.abs(netAmount(tr) - tr.netAmountInCollectiveCurrency);
   // if the difference is within one cent, it's most likely a rounding error (because of the number of decimals in the hostCurrencyFxRate)
   if (diff > 0 && diff < 10) {
@@ -191,8 +241,12 @@ export function difference(tr) {
  * @return the sum of the column `amount`.
  */
 export async function sum(where) {
-  const totalAttr = sequelize.fn('COALESCE', sequelize.fn('SUM', sequelize.col('netAmountInCollectiveCurrency')), 0);
-  const attributes = [[ totalAttr, 'total' ]];
+  const totalAttr = sequelize.fn(
+    'COALESCE',
+    sequelize.fn('SUM', sequelize.col('netAmountInCollectiveCurrency')),
+    0,
+  );
+  const attributes = [[totalAttr, 'total']];
   const result = await models.Transaction.find({ attributes, where });
   return result.dataValues.total;
 }

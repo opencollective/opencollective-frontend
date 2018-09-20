@@ -25,7 +25,9 @@ import * as libpayments from '../../../../server/lib/payments';
  */
 export function randEmail(email) {
   const [user, domain] = email.replace(/\s/g, '-').split('@');
-  const rand = Math.random().toString(36).substring(2, 15);
+  const rand = Math.random()
+    .toString(36)
+    .substring(2, 15);
   return `${user}-${rand}@${domain}`;
 }
 
@@ -43,7 +45,7 @@ function slugify(value) {
  *  "description" can't be overrided.
  * @return {Object} with references for `user` and `userCollective`.
  */
-export async function newUser(name, data={}) {
+export async function newUser(name, data = {}) {
   const slug = slugify(name);
   const email = randEmail(`${slug}@oc.com`);
   const user = await models.User.createUserWithCollective({
@@ -66,13 +68,17 @@ export async function newUser(name, data={}) {
  * @returns {Object} with references for `hostCollective`,
  *  `hostAdmin`.
  */
-export async function newHost(name, currency, hostFee, userData={}) {
+export async function newHost(name, currency, hostFee, userData = {}) {
   // Host Admin
   const slug = slugify(name);
   const hostAdmin = (await newUser(`${name} Admin`, userData)).user;
   const hostFeePercent = hostFee ? parseInt(hostFee) : 0;
   const hostCollective = await models.Collective.create({
-    name, slug, currency, hostFeePercent, CreatedByUserId: hostAdmin.id,
+    name,
+    slug,
+    currency,
+    hostFeePercent,
+    CreatedByUserId: hostAdmin.id,
   });
   await hostCollective.addUserWithRole(hostAdmin, 'ADMIN');
   return { hostAdmin, hostCollective, [slug]: hostCollective };
@@ -110,8 +116,20 @@ export async function newOrganization(orgData, adminUser) {
  * @returns {Object} with references for `hostCollective`,
  *  `hostAdmin`, and `collective`.
  */
-export async function newCollectiveWithHost(name, currency, hostCurrency, hostFee, user=null, data={}) {
-  const { hostAdmin, hostCollective } = await newHost(`${name} Host`, hostCurrency, hostFee, { currency });
+export async function newCollectiveWithHost(
+  name,
+  currency,
+  hostCurrency,
+  hostFee,
+  user = null,
+  data = {},
+) {
+  const { hostAdmin, hostCollective } = await newHost(
+    `${name} Host`,
+    hostCurrency,
+    hostFee,
+    { currency },
+  );
   const slug = slugify(name);
   const { hostFeePercent } = hostCollective;
   const args = { ...data, name, slug, currency, hostFeePercent };
@@ -139,7 +157,13 @@ export async function newCollectiveWithHost(name, currency, hostCurrency, hostFe
  * @return {models.Collective} a newly created collective hosted by
  *  `hostCollective`.
  */
-export async function newCollectiveInHost(name, currency, hostCollective, user=null, data={}) {
+export async function newCollectiveInHost(
+  name,
+  currency,
+  hostCollective,
+  user = null,
+  data = {},
+) {
   const slug = slugify(name);
   const { hostFeePercent } = hostCollective;
   const args = { ...data, name, slug, currency, hostFeePercent };
@@ -213,10 +237,12 @@ export async function newOrder(opt) {
     FromCollectiveId: from.id,
     CollectiveId: to.id,
   });
-  await order.setPaymentMethod(paymentMethodData || {
-    token: 'tok_123456781234567812345678',
-    currency,
-  });
+  await order.setPaymentMethod(
+    paymentMethodData || {
+      token: 'tok_123456781234567812345678',
+      currency,
+    },
+  );
   return { order };
 }
 
@@ -259,8 +285,16 @@ export async function stripeConnectedAccount(hostId) {
  *  value. Not a percentage.
  */
 export async function stripeOneTimeDonation(opt) {
-  const { user, userCollective, collective, amount, currency, appFee, ppFee } = opt;
-  const { createdAt } = opt;    // Optional
+  const {
+    user,
+    userCollective,
+    collective,
+    amount,
+    currency,
+    appFee,
+    ppFee,
+  } = opt;
+  const { createdAt } = opt; // Optional
 
   // Create a new order
   const params = { from: userCollective, to: collective, amount, currency };
@@ -274,7 +308,7 @@ export async function stripeOneTimeDonation(opt) {
   // Freeze the time to guarantee that all the objects have the
   // requested creation date. It will be reset right after the
   // execution of the order.
-  if (createdAt) sandbox.useFakeTimers((new Date(createdAt)).getTime());
+  if (createdAt) sandbox.useFakeTimers(new Date(createdAt).getTime());
 
   // Stub the stripe calls before executing the order.
   try {

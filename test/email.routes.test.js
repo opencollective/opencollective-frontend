@@ -14,13 +14,16 @@ import nock from 'nock';
 import initNock from './email.routes.test.nock.js';
 
 const generateToken = (email, slug, template) => {
-  const uid = `${email}.${slug}.${template}.${config.keys.opencollective.secret}`;
-  return crypto.createHash('md5').update(uid).digest("hex");
-}
+  const uid = `${email}.${slug}.${template}.${
+    config.keys.opencollective.secret
+  }`;
+  return crypto
+    .createHash('md5')
+    .update(uid)
+    .digest('hex');
+};
 
-const {
-  Collective
-} = models;
+const { Collective } = models;
 
 const usersData = [
   {
@@ -28,38 +31,39 @@ const usersData = [
     lastName: 'Damman',
     email: 'xdamman+test@gmail.com',
     role: 'ADMIN',
-    image: 'https://pbs.twimg.com/profile_images/3075727251/5c825534ad62223ae6a539f6a5076d3c.jpeg'
+    image:
+      'https://pbs.twimg.com/profile_images/3075727251/5c825534ad62223ae6a539f6a5076d3c.jpeg',
   },
   {
     firstName: 'Aseem',
     lastName: 'Sood',
     email: 'asood123+test@gmail.com',
-    role: 'ADMIN'
+    role: 'ADMIN',
   },
   {
     firstName: 'Pia',
     lastName: 'Mancini',
     email: 'pia+test@opencollective.com',
-    role: 'BACKER'
+    role: 'BACKER',
   },
   {
     firstName: 'github',
     lastName: '',
     email: 'github+test@opencollective.com',
-    role: 'BACKER'
-  }
+    role: 'BACKER',
+  },
 ];
 
 const collectiveData = {
   slug: 'testcollective',
   name: 'Test Collective',
-  settings: {}
+  settings: {},
 };
 
-let collective, users = [];
+let collective,
+  users = [];
 
-describe("email.routes.test", () => {
-
+describe('email.routes.test', () => {
   let sandbox;
 
   before(() => utils.resetTestDB());
@@ -78,10 +82,9 @@ describe("email.routes.test", () => {
     nock.cleanAll();
   });
 
-  before('create collective and members', (done) => {
-
+  before('create collective and members', done => {
     Collective.create(collectiveData)
-      .tap(g => collective = g )
+      .tap(g => (collective = g))
       .then(() => Promise.map(usersData, models.User.createUserWithCollective))
       .tap(users => {
         return Promise.map(users, (user, index) => {
@@ -92,205 +95,252 @@ describe("email.routes.test", () => {
         users = usersRows;
         return Promise.map(usersRows, (user, index) => {
           const lists = usersData[index].lists || [];
-          return Promise.map(lists, (list) => models.Notification.create({
+          return Promise.map(lists, list =>
+            models.Notification.create({
               channel: 'email',
               UserId: user.id,
               CollectiveId: collective.id,
-              type: list
-            })
+              type: list,
+            }),
           );
-        })
+        });
       })
       .then(() => done())
       .catch(console.error);
   });
 
-  it("forwards emails sent to info@:slug.opencollective.com", () => {
-
+  it('forwards emails sent to info@:slug.opencollective.com', () => {
     const spy = sandbox.spy(emailLib, 'sendMessage');
 
     return request(app)
       .post('/webhooks/mailgun')
-      .send(Object.assign({}, webhookBodyPayload, { recipient: 'info@testcollective.opencollective.com' }))
-      .then((res) => {
+      .send(
+        Object.assign({}, webhookBodyPayload, {
+          recipient: 'info@testcollective.opencollective.com',
+        }),
+      )
+      .then(res => {
         expect(res.statusCode).to.equal(200);
-        expect(spy.lastCall.args[0]).to.equal('info@testcollective.opencollective.com');
+        expect(spy.lastCall.args[0]).to.equal(
+          'info@testcollective.opencollective.com',
+        );
         expect(spy.lastCall.args[1]).to.equal(webhookBodyPayload.subject);
-        expect(usersData.map(u => u.email).indexOf(spy.lastCall.args[3].bcc) !== -1).to.be.true;
+        expect(
+          usersData.map(u => u.email).indexOf(spy.lastCall.args[3].bcc) !== -1,
+        ).to.be.true;
       });
   });
 
-  it("forwards the email for approval to the core members", () => {
+  it('forwards the email for approval to the core members', () => {
     const spy = sandbox.spy(emailLib, 'send');
     return request(app)
       .post('/webhooks/mailgun')
       .send(webhookBodyPayload)
-      .then((res) => {
+      .then(res => {
         expect(res.statusCode).to.equal(200);
         if (spy.args[0][1] !== 'admins@testcollective.opencollective.com') {
           utils.inspectSpy(spy, 4);
         }
-        expect(spy.args[0][1]).to.equal('admins@testcollective.opencollective.com');
-        const emailSentTo = [spy.args[0][3].bcc,spy.args[1][3].bcc];
+        expect(spy.args[0][1]).to.equal(
+          'admins@testcollective.opencollective.com',
+        );
+        const emailSentTo = [spy.args[0][3].bcc, spy.args[1][3].bcc];
         expect(emailSentTo.indexOf(usersData[0].email) !== -1).to.be.true;
         expect(emailSentTo.indexOf(usersData[1].email) !== -1).to.be.true;
       });
   });
 
-
-  it("skip the email if already processed", () => {
+  it('skip the email if already processed', () => {
     const spy = sandbox.spy(emailLib, 'send');
 
     return request(app)
       .post('/webhooks/mailgun')
       .send(webhookBodyApprove)
-      .then((res) => {
+      .then(res => {
         expect(res.statusCode).to.equal(200);
         expect(spy.called).to.be.false;
       });
   });
 
-  it("rejects emails sent to unknown mailing list", () => {
-
-    const unknownMailingListWebhook = Object.assign({}, webhookBodyPayload, { recipient: 'unknown@testcollective.opencollective.com' });
+  it('rejects emails sent to unknown mailing list', () => {
+    const unknownMailingListWebhook = Object.assign({}, webhookBodyPayload, {
+      recipient: 'unknown@testcollective.opencollective.com',
+    });
 
     return request(app)
       .post('/webhooks/mailgun')
       .send(unknownMailingListWebhook)
-      .then((res) => {
+      .then(res => {
         expect(res.statusCode).to.equal(200);
-        expect(res.body.error.message).to.equal('Invalid mailing list address unknown@testcollective.opencollective.com');
+        expect(res.body.error.message).to.equal(
+          'Invalid mailing list address unknown@testcollective.opencollective.com',
+        );
       });
   });
 
-  it("approves the email", () => {
-
+  it('approves the email', () => {
     const spy = sandbox.spy(emailLib, 'send');
 
     return request(app)
-      .get(`/services/email/approve?messageId=eyJwIjpmYWxzZSwiayI6Ijc3NjFlZTBjLTc1NGQtNGIwZi05ZDlkLWU1NTgxODJkMTlkOSIsInMiOiI2NDhjZDg1ZTE1IiwiYyI6InNhb3JkIn0=&approver=${encodeURIComponent(usersData[1].email)}`)
+      .get(
+        `/services/email/approve?messageId=eyJwIjpmYWxzZSwiayI6Ijc3NjFlZTBjLTc1NGQtNGIwZi05ZDlkLWU1NTgxODJkMTlkOSIsInMiOiI2NDhjZDg1ZTE1IiwiYyI6InNhb3JkIn0=&approver=${encodeURIComponent(
+          usersData[1].email,
+        )}`,
+      )
       .then(() => {
         expect(spy.callCount).to.equal(2);
-        expect(spy.args[0][1]).to.equal('admins@testcollective.opencollective.com');
+        expect(spy.args[0][1]).to.equal(
+          'admins@testcollective.opencollective.com',
+        );
         expect(spy.args[0][2].subject).to.equal('test collective admins');
-        expect([spy.args[0][3].bcc, spy.args[1][3].bcc]).to.contain(usersData[0].email);
-        expect(spy.args[0][3].from).to.equal('testcollective collective <hello@testcollective.opencollective.com>');
+        expect([spy.args[0][3].bcc, spy.args[1][3].bcc]).to.contain(
+          usersData[0].email,
+        );
+        expect(spy.args[0][3].from).to.equal(
+          'testcollective collective <hello@testcollective.opencollective.com>',
+        );
       });
   });
 
-  it("return 404 if message not found", () => {
-    const messageId = 'eyJwIjpmYWxzZSwiayI6IjY5MTdlYTZlLWVhNzctNGQzOC04OGUxLWMzMTQwMzdmNGRhNiIsInMiOiIwMjNjMzgwYWFlIiwiYyI6InNhaWFkIn0=';
+  it('return 404 if message not found', () => {
+    const messageId =
+      'eyJwIjpmYWxzZSwiayI6IjY5MTdlYTZlLWVhNzctNGQzOC04OGUxLWMzMTQwMzdmNGRhNiIsInMiOiIwMjNjMzgwYWFlIiwiYyI6InNhaWFkIn0=';
     return request(app)
-      .get(`/services/email/approve?messageId=${messageId}&approver=xdamman%40gmail.com&mailserver=so`)
-      .then((res) => {
+      .get(
+        `/services/email/approve?messageId=${messageId}&approver=xdamman%40gmail.com&mailserver=so`,
+      )
+      .then(res => {
         expect(res.statusCode).to.equal(404);
         expect(res.body.error.message).to.contain(messageId);
       });
   });
 
-  describe("send email to event", () => {
-
+  describe('send email to event', () => {
     let spy;
-    const slug = `event1-ev111`;
-    const subject = "email reminder for event 1";
+    const slug = 'event1-ev111';
+    const subject = 'email reminder for event 1';
 
     before(async () => {
-
       const event = await models.Collective.create({
-        type: "EVENT",
-        name: "event 1",
+        type: 'EVENT',
+        name: 'event 1',
         ParentCollectiveId: collective.id,
-        slug
+        slug,
       });
 
       await models.Member.create({
         CreatedByUserId: users[0].id,
         MemberCollectiveId: users[0].CollectiveId,
         CollectiveId: event.id,
-        role: 'FOLLOWER'
+        role: 'FOLLOWER',
       });
 
       await models.Member.create({
         CreatedByUserId: users[1].id,
         MemberCollectiveId: users[1].CollectiveId,
         CollectiveId: event.id,
-        role: 'ATTENDEE'
+        role: 'ATTENDEE',
       });
-
     });
 
-    it("send please approve email when sending email to eventSlug@parentCollectiveSlug.opencollective.com", async () => {
+    it('send please approve email when sending email to eventSlug@parentCollectiveSlug.opencollective.com', async () => {
       spy = sandbox.spy(emailLib, 'sendMessage');
       return request(app)
-      .post('/webhooks/mailgun')
-      .send(Object.assign({}, webhookBodyPayload, { recipient: `${slug}@${collective.slug}.opencollective.com`, subject }))
-      .then((res) => {
-        expect(res.statusCode).to.equal(200);
-        expect(spy.args[0][0]).to.equal(`admins@${collective.slug}.opencollective.com`);
-        expect(spy.args[0][1]).to.equal(`Please approve: ${subject}`);
-        expect(usersData.map(u => u.email).indexOf(spy.args[0][3].bcc) !== -1).to.be.true;
-      });
+        .post('/webhooks/mailgun')
+        .send(
+          Object.assign({}, webhookBodyPayload, {
+            recipient: `${slug}@${collective.slug}.opencollective.com`,
+            subject,
+          }),
+        )
+        .then(res => {
+          expect(res.statusCode).to.equal(200);
+          expect(spy.args[0][0]).to.equal(
+            `admins@${collective.slug}.opencollective.com`,
+          );
+          expect(spy.args[0][1]).to.equal(`Please approve: ${subject}`);
+          expect(usersData.map(u => u.email).indexOf(spy.args[0][3].bcc) !== -1)
+            .to.be.true;
+        });
     });
 
-    it("approves an email sent to eventSlug@parentCollectiveSlug.opencollective.com", (done) => {
-
+    it('approves an email sent to eventSlug@parentCollectiveSlug.opencollective.com', done => {
       spy = sandbox.spy(emailLib, 'send');
       request(app)
-        .get(`/services/email/approve?messageId=abJwIjpmYWxzZSwiayI6Ijc3NjFlZTBjLTc1NGQtNGIwZi05ZDlkLWU1NTgxODJkMTlkOSIsInMiOiI2NDhjZDg1ZTE1IiwiYyI6InNhb3JkIn0=&approver=${encodeURIComponent(usersData[1].email)}`)
+        .get(
+          `/services/email/approve?messageId=abJwIjpmYWxzZSwiayI6Ijc3NjFlZTBjLTc1NGQtNGIwZi05ZDlkLWU1NTgxODJkMTlkOSIsInMiOiI2NDhjZDg1ZTE1IiwiYyI6InNhb3JkIn0=&approver=${encodeURIComponent(
+            usersData[1].email,
+          )}`,
+        )
         .then(() => {
-          expect([users[0].email, users[1].email].indexOf(spy.args[0][3].bcc) !== -1).to.be.true;
-          expect([users[0].email, users[1].email].indexOf(spy.args[1][3].bcc) !== -1).to.be.true;
+          expect(
+            [users[0].email, users[1].email].indexOf(spy.args[0][3].bcc) !== -1,
+          ).to.be.true;
+          expect(
+            [users[0].email, users[1].email].indexOf(spy.args[1][3].bcc) !== -1,
+          ).to.be.true;
           done();
         });
-
     });
   });
 
-  describe("unsubscribe", () => {
-
+  describe('unsubscribe', () => {
     const template = 'mailinglist.admins';
 
-    const generateUnsubscribeUrl = (email) => {
+    const generateUnsubscribeUrl = email => {
       const token = generateToken(email, collectiveData.slug, template);
-      return `/services/email/unsubscribe/${encodeURIComponent(email)}/${collectiveData.slug}/${template}/${token}`;
-    }
+      return `/services/email/unsubscribe/${encodeURIComponent(email)}/${
+        collectiveData.slug
+      }/${template}/${token}`;
+    };
 
-    it("returns an error if invalid token", () => {
+    it('returns an error if invalid token', () => {
       return request(app)
-        .get(`/services/email/unsubscribe/${encodeURIComponent(usersData[0].email)}/${collectiveData.slug}/${template}/xxxxxxxxxx`)
-        .then((res) => {
+        .get(
+          `/services/email/unsubscribe/${encodeURIComponent(
+            usersData[0].email,
+          )}/${collectiveData.slug}/${template}/xxxxxxxxxx`,
+        )
+        .then(res => {
           expect(res.statusCode).to.equal(400);
           expect(res.body.error.message).to.equal('Invalid token');
         });
     });
 
-    it("sends the unsubscribe link in the footer of the email", () => {
+    it('sends the unsubscribe link in the footer of the email', () => {
+      const spy = sandbox.stub(emailLib, 'sendMessage');
 
-    const spy = sandbox.stub(emailLib, 'sendMessage');
-
-    return request(app)
-      .get(`/services/email/approve?messageId=eyJwIjpmYWxzZSwiayI6Ijc3NjFlZTBjLTc1NGQtNGIwZi05ZDlkLWU1NTgxODJkMTlkOSIsInMiOiI2NDhjZDg1ZTE1IiwiYyI6InNhb3JkIn0=&approver=${encodeURIComponent(usersData[1].email)}`)
-      .then(() => {
-        for (const i in spy.args) {
-          const emailBody = spy.args[i][2];
-          expect(emailBody).to.contain(generateUnsubscribeUrl(spy.args[i][3].bcc));
-          expect(emailBody).to.contain("To unsubscribe from the admins mailing list");
-        }
-      });
+      return request(app)
+        .get(
+          `/services/email/approve?messageId=eyJwIjpmYWxzZSwiayI6Ijc3NjFlZTBjLTc1NGQtNGIwZi05ZDlkLWU1NTgxODJkMTlkOSIsInMiOiI2NDhjZDg1ZTE1IiwiYyI6InNhb3JkIn0=&approver=${encodeURIComponent(
+            usersData[1].email,
+          )}`,
+        )
+        .then(() => {
+          for (const i in spy.args) {
+            const emailBody = spy.args[i][2];
+            expect(emailBody).to.contain(
+              generateUnsubscribeUrl(spy.args[i][3].bcc),
+            );
+            expect(emailBody).to.contain(
+              'To unsubscribe from the admins mailing list',
+            );
+          }
+        });
     });
 
-    it("unsubscribes", () => {
+    it('unsubscribes', () => {
       const where = {
         UserId: users[0].id,
         CollectiveId: collective.id,
         type: 'mailinglist.admins',
-        active: true
+        active: true,
       };
 
       return request(app)
         .get(generateUnsubscribeUrl(users[0].email))
         .then(() => models.Notification.count({ where }))
-        .then(count => expect(count).to.equal(0))
+        .then(count => expect(count).to.equal(0));
     });
   });
 });

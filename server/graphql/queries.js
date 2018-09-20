@@ -3,7 +3,6 @@ import config from 'config';
 import Promise from 'bluebird';
 
 import errors from '../lib/errors';
-
 import {
   GraphQLList,
   GraphQLNonNull,
@@ -17,7 +16,7 @@ import {
   CollectiveSearchResultsType,
   TypeOfCollectiveType,
   CollectiveOrderFieldType,
-  HostCollectiveOrderFieldType
+  HostCollectiveOrderFieldType,
 } from './CollectiveInterface';
 
 import {
@@ -28,9 +27,7 @@ import {
   OrderDirectionType,
 } from './TransactionInterface';
 
-import {
-  ApplicationType
-} from './Application';
+import { ApplicationType } from './Application';
 
 import {
   UserType,
@@ -243,16 +240,40 @@ const queries = {
       offset: { type: GraphQLInt },
       dateFrom: { type: GraphQLString },
       dateTo: { type: GraphQLString },
+      includeVirtualCards: { type: GraphQLBoolean },
     },
     async resolve(_, args) {
       const query = {
         where: {},
-        order: [ ['createdAt', 'DESC'] ]
+        order: [ ['createdAt', 'DESC'] ],
       };
-
       const CollectiveId = args.CollectiveId || await fetchCollectiveId(args.collectiveSlug);
-
-      if (CollectiveId) query.where.CollectiveId = CollectiveId;
+      if (args.includeVirtualCards) {
+        // find all Payment methods of CollectiveId
+        const collectivePaymentMethodsIds = await models.PaymentMethod.findAll({
+          where: { CollectiveId: CollectiveId },
+        }).map(pm => pm.id);
+        // find all Virtual Cards with SourcePaymentMethodId included in Collective Payment methods
+        const virtualCardsMadeByCollectivePaymentMethodsPair = await models.PaymentMethod.findAll({
+          where: { SourcePaymentMethodId: collectivePaymentMethodsIds },
+        }).map( virtualCard => {
+          return {
+            PaymentMethodId: virtualCard.id,
+            CollectiveId: virtualCard.CollectiveId,
+          };
+        });
+        // either find through collective id or through query: OR:[CollectiveId, virtualcards]
+        query.where.CollectiveId = CollectiveId;
+        if (virtualCardsMadeByCollectivePaymentMethodsPair.length > 0) {
+          query.where = {
+            [Op.or]: [
+              { CollectiveId: CollectiveId },
+              ...virtualCardsMadeByCollectivePaymentMethodsPair,
+            ],
+          };
+        }
+      }
+      if (CollectiveId && !args.includeVirtualCards) query.where.CollectiveId = CollectiveId;
       if (args.type) query.where.type = args.type;
       if (args.limit) query.limit = args.limit;
       if (args.offset) query.offset = args.offset;
@@ -264,7 +285,7 @@ const queries = {
         if (args.dateTo) query.where.createdAt[Op.lte] = args.dateTo;
       }
       return models.Transaction.findAll(query);
-    }
+    },
   },
 
   /*
@@ -1033,8 +1054,52 @@ const queries = {
         offset,
         total,
       };
-    }
-  }
-}
+    },
+  },
+  /** Gets the transactions of a payment method
+    * @param {Object} args contains the parameters
+    * @param {Number} args.uuid The Payment method id
+    * @param {String} [args.type] The transaction type - Debit or Credit
+    * @param {Number} [args.limit] The limit of records to be returned
+    * @param {String} [args.offset] The offset of the query
+    * @param {String} [args.dateFrom] The start date(field createdAt) to return the list of transactions
+    * @param {String} [args.dateTo] The end date(field createdAt) to return the list of transactions
+    * @returns {[models.Transaction]} returns an array of transactions.
+   */
+  allTransactionsFromPaymentMethod: {
+    type: new GraphQLList(TransactionInterfaceType),
+    args: {
+      uuid: { type: new GraphQLNonNull(GraphQLString) },
+      type: { type: GraphQLString },
+      limit: { type: GraphQLInt },
+      offset: { type: GraphQLInt },
+      dateFrom: { type: GraphQLString },
+      dateTo: { type: GraphQLString },
+    },
+    resolve: async (_, args) => {
+      const paymentMethod = await models.PaymentMethod.findOne({ where: { uuid: args.uuid } });
+      if (!paymentMethod) {
+        throw Error(`Payment Method with uuid ${args.uuid} not found.`);
+      }
+      const query = {
+        where: {
+          PaymentMethodId: paymentMethod.id,
+        },
+        order: [ ['createdAt', 'DESC'] ],
+      };
+      if (args.type) query.where.type = args.type;
+      if (args.limit) query.limit = args.limit;
+      if (args.offset) query.offset = args.offset;
+
+      if (args.dateFrom || args.dateTo) {
+        query.where.createdAt = {};
+        if (args.dateFrom) query.where.createdAt[Op.gte] = args.dateFrom;
+        if (args.dateTo) query.where.createdAt[Op.lte] = args.dateTo;
+      }
+      const transactions =  await models.Transaction.findAll(query);
+      return transactions;
+    },
+  },
+};
 
 export default queries;

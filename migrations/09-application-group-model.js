@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = {
-  up: function (queryInterface, DataTypes) {
+  up: function(queryInterface, DataTypes) {
     return queryInterface.createTable('ApplicationGroup', {
       // Dates.
       createdAt: {
@@ -16,7 +16,7 @@ module.exports = {
       },
       GroupId: {
         type: DataTypes.INTEGER,
-        references: {key: 'id', model: 'Groups' },
+        references: { key: 'id', model: 'Groups' },
         onDelete: 'CASCADE',
         onUpdate: 'CASCADE',
         allowNull: false,
@@ -24,14 +24,14 @@ module.exports = {
       },
       ApplicationId: {
         type: DataTypes.INTEGER,
-        references: {key: 'id', model: 'Applications'},
+        references: { key: 'id', model: 'Applications' },
         allowNull: false,
         primaryKey: true,
       },
     });
   },
 
-  down: function (queryInterface) {
+  down: function(queryInterface) {
     return queryInterface.dropTable('ApplicationGroup');
-  }
+  },
 };

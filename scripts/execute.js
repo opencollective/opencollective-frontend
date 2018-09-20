@@ -18,12 +18,13 @@ const script = require(`./${name}`);
 
 console.log(`Running ${name}`);
 
-script.run()
+script
+  .run()
   .then(() => {
     console.log(`Script ${name} done`);
     process.exit();
   })
-  .catch((err) => {
+  .catch(err => {
     if (process.env.NODE_ENV === 'production') {
       slack.postMessage(err.message, { channel: '#critical' });
     }
@@ -33,6 +34,9 @@ script.run()
   });
 
 function moduleExists(name) {
-  try { return require.resolve(`./${name}`); }
-  catch( e ) { return false }
+  try {
+    return require.resolve(`./${name}`);
+  } catch (e) {
+    return false;
+  }
 }
