@@ -15,7 +15,7 @@ import Body from '../components/Body';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
 import TransactionSimple from '../components/TransactionSimple';
-import { Span, P, H1, H2, H3 } from '../components/Text';
+import { Span, P, H1, H2, H3, H4 } from '../components/Text';
 import ListItem from '../components/ListItem';
 import Hide from '../components/Hide';
 import Container from '../components/Container';
@@ -856,6 +856,89 @@ class HomePage extends React.Component {
                   </Container>
                 </StyledLink>
               </Flex>
+            </Container>
+          </Container>
+
+          <Container
+            background="linear-gradient(182.45deg, #222584 4.38%, #6266EC 118.14%)"
+            position="relative"
+            py={6}
+          >
+            <Container
+              background="#EBF1FA"
+              height="15rem"
+              position="absolute"
+              style={{ clipPath: 'ellipse(58% 48% at 50% 52%)' }}
+              top={-80}
+              width={1}
+            />
+            <Container
+              alignItems="center"
+              display="flex"
+              flexDirection={['column', null, 'row']}
+              justifyContent="space-around"
+              maxWidth={1200}
+              mx="auto"
+            >
+              <Container maxWidth={550} px={[3, null, 0]}>
+                <P color="rgba(255, 255, 255, 0.5)" fontSize="1.6rem" mb={4}>
+                  Introducing
+                </P>
+
+                <H3
+                  color="white"
+                  fontSize={['3.2rem', null, '4.8rem']}
+                  fontStyle="italic"
+                  fontWeight="800"
+                  mb={4}
+                >
+                  back
+                  <Span color="#9092FF" fontWeight="300">
+                    your
+                  </Span>
+                  stack
+                </H3>
+
+                <H4 color="white" fontSize="2.4rem" mb={4}>
+                  Discover the Open Source projects your organization is using
+                  that need financial support.
+                </H4>
+
+                <P color="white" fontSize="1.6rem">
+                  BackYourStack is a community project initiated by Open
+                  Collective.
+                  <StyledLink
+                    href="https://backyourstack.com/contributing"
+                    color="white"
+                    px={2}
+                    textDecoration="underline"
+                  >
+                    Learn how to contribute here.
+                  </StyledLink>
+                </P>
+
+                <StyledLink
+                  href="https://backyourstack.com/"
+                  bg="#FFF"
+                  borderRadius="50px"
+                  color="#3C40AE"
+                  display="block"
+                  fontSize="1.6rem"
+                  fontWeight="bold"
+                  maxWidth="220px"
+                  mx={['auto', null, 0]}
+                  mt={4}
+                  py={3}
+                  textAlign="center"
+                  width={[250, null, 320]}
+                >
+                  Go to Back Your Stack
+                </StyledLink>
+              </Container>
+
+              <Box order={[-1, null, 1]}>
+                <img src="/static/images/bys-logo.svg" alt="Back Your Stack" />
+              </Box>
             </Container>
           </Container>
 
