@@ -27,8 +27,8 @@ const reports = [
     command: 'cron/yearly/host-report.js',
   },
   {
-    template: 'ticket.confirmed.fearlesscitiesbrussels',
-    command: 'scripts/compile-email.js ticket.confirmed.fearlesscitiesbrussels',
+    template: 'user.card.claimed',
+    command: 'scripts/compile-email.js user.card.claimed',
   },
 ];
 

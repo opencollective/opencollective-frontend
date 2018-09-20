@@ -57,6 +57,20 @@ data['collective.expense.paid'] = {
     viewLatestExpenses: 'https://opencollective.com/wwcodeaustin/expenses',
   },
 };
+data['user.card.claimed'] = {
+  currency: 'USD',
+  initialBalance: 10000,
+  expiryDate: (new Date).setMonth((new Date).getMonth() + 3),
+  emitter: {
+    slug: 'triplebyte',
+    name: 'Triplebyte',
+    description: 'Triplebyte lets talented software engineers skip resumes  recruiters and go straight to final interviews at multiple top tech companies at once.',
+    image: 'https://opencollective-production.s3-us-west-1.amazonaws.com/02f87560-b2f1-11e8-85a0-75f200a0e2db.png',
+    backgroundImage: 'https://d.pr/free/i/GEbbjb+',
+    previewImage: 'https://opencollective-production.s3-us-west-1.amazonaws.com/02f87560-b2f1-11e8-85a0-75f200a0e2db.png'
+  },
+  loginLink: 'https://opencollective.com/signin?next=',
+},
 data['ticket.confirmed'] = {
   recipient: {
     name: 'Xavier Damman',
