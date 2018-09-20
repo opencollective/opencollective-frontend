@@ -1,5 +1,5 @@
 # source: http://localhost:3000/api/graphql
-# timestamp: Wed Sep 12 2018 12:38:31 GMT-0400 (Eastern Daylight Time)
+# timestamp: Thu Sep 20 2018 12:38:04 GMT+0200 (Central European Summer Time)
 
 """Application model"""
 type Application {
@@ -730,7 +730,7 @@ type Mutation {
   updateApplication(id: Int!, application: ApplicationInput!): Application
   deleteApplication(id: Int!): Application
   createPaymentMethod(type: String!, amount: Int!, currency: String!, CollectiveId: Int!, PaymentMethodId: Int, description: String, expiryDate: String): PaymentMethodType
-  claimVirtualCard(code: String!, email: String): PaymentMethodType
+  claimPaymentMethod(code: String!, user: UserInputType): PaymentMethodType
 }
 
 """Order model"""
@@ -1094,7 +1094,7 @@ type Query {
     """
     invoiceSlug: String!
   ): InvoiceType
-  allTransactions(CollectiveId: Int, collectiveSlug: String, type: String, limit: Int, offset: Int, dateFrom: String, dateTo: String): [Transaction]
+  allTransactions(CollectiveId: Int, collectiveSlug: String, type: String, limit: Int, offset: Int, dateFrom: String, dateTo: String, includeVirtualCards: Boolean): [Transaction]
   transactions(
     """Defaults to 100"""
     limit: Int = 100
@@ -1204,6 +1204,7 @@ type Query {
     limit: Int = 20
     offset: Int = 0
   ): CollectiveSearchResults
+  allTransactionsFromPaymentMethod(uuid: String!, type: String, limit: Int, offset: Int, dateFrom: String, dateTo: String): [Transaction]
 }
 
 """Stats about a membership"""
