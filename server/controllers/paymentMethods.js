@@ -6,8 +6,8 @@ import * as utils from '../graphql/utils';
 const { PaymentMethod } = models;
 
 const createPaymentMethodQuery = `
-  mutation createPaymentMethod($amount: Int!, $CollectiveId: Int!, $PaymentMethodId: Int, $description: String, $expiryDate: String, $type: String!, $currency: String!) {
-    createPaymentMethod(amount: $amount, CollectiveId: $CollectiveId, PaymentMethodId: $PaymentMethodId, description: $description, expiryDate: $expiryDate, type: $type, currency: $currency) {
+  mutation createPaymentMethod($amount: Int!, $CollectiveId: Int!, $PaymentMethodId: Int, $description: String, $expiryDate: String, $type: String!, $currency: String!, $limitedToTags: [String]) {
+    createPaymentMethod(amount: $amount, CollectiveId: $CollectiveId, PaymentMethodId: $PaymentMethodId, description: $description, expiryDate: $expiryDate, type: $type, currency: $currency, limitedToTags: $limitedToTags) {
       id
       name
       uuid
