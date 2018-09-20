@@ -1,6 +1,7 @@
 import virtualcard from '../../paymentProviders/opencollective/virtualcard';
 import emailLib from '../../lib/email';
 import models from '../../models';
+import queryString from 'query-string';
 
 /** Create a Payment Method through a collective(organization or user)
  *
@@ -58,30 +59,35 @@ async function createVirtualPaymentMethod(args, remoteUser) {
  * @param {String} args.email The email of the user claiming the virtual card
  * @returns {models.PaymentMethod} return the virtual card payment method.
  */
-export async function claimVirtualCard(args, remoteUser) {
+export async function claimPaymentMethod(args, remoteUser) {
   const paymentMethod = await virtualcard.claim(args, remoteUser);
   const user = await models.User.findOne({
     where: { CollectiveId: paymentMethod.CollectiveId },
   });
-  const amount = paymentMethod.initialBalance;
-  const currency = paymentMethod.currency;
-  const emitter = await models.Collective.findById(
-    paymentMethod.sourcePaymentMethod.CollectiveId,
-  );
-  const userCollective = await user.getCollective();
-  const name =
-    userCollective.name && userCollective.name.match(/anonymous/i)
-      ? ''
-      : user.name;
-
-  emailLib.send('user.card.claimed', args.email, {
-    loginLink: user.generateLoginLink(
-      `/redeemed?name=${name}&amount=${amount}&currency=${currency}&emitterSlug=${
-        emitter.slug
-      }&emitterName=${emitter.name}`,
-    ),
-    amount,
+  const {
+    initialBalance,
     currency,
+    name,
+    expiryDate,
+   } = paymentMethod;
+
+  const emitter = await models.Collective.findById(paymentMethod.sourcePaymentMethod.CollectiveId);
+  const userCollective = await user.getCollective();
+  const userName = userCollective.name && userCollective.name.match(/anonymous/i) ? '' : userCollective.name;
+
+  const qs = queryString.stringify({
+    name: userName,
+    amount: initialBalance,
+    currency,
+    emitterSlug: emitter.slug,
+    emitterName: emitter.name,
+  });
+  emailLib.send('user.card.claimed', user.email, {
+    loginLink: user.generateLoginLink(`/redeemed?${qs}`),
+    initialBalance,
+    name,
+    currency,
+    expiryDate,
     emitter,
   });
   return paymentMethod;

@@ -1,15 +1,31 @@
-Subject: {{#ifCond currency '===' 'USD'}}💵 {{/ifCond}}{{#ifCond currency '===' 'EUR'}}💶 {{/ifCond}}{{#ifCond currency '===' 'GBP'}}💷 {{/ifCond}}You received {{{currency amount currency=currency}}} from {{emitter.name}} to donate on Open Collective
-
+Subject: {{#ifCond currency '===' 'USD'}}💵 {{/ifCond}}{{#ifCond currency '===' 'EUR'}}💶 {{/ifCond}}{{#ifCond currency '===' 'GBP'}}💷 {{/ifCond}}You received {{{currency initialBalance currency=currency}}} from {{emitter.name}} to donate on Open Collective
 
 {{> header}}
 
-<center><a href="{{config.host.website}}/{{emitter.slug}}"><img src="{{emitter.image}}"></a></center>
 
-<h1>{{#ifCond currency '===' 'USD'}}💵{{/ifCond}}{{#ifCond currency '===' 'EUR'}}💶{{/ifCond}}{{#ifCond currency '===' 'GBP'}}💷{{/ifCond}}</h1>
+<table>
+  <tr>
+   <td>
+     <center>
+      <h1>{{#ifCond currency '===' 'USD'}}💵{{/ifCond}}{{#ifCond currency '===' 'EUR'}}💶{{/ifCond}}{{#ifCond currency '===' 'GBP'}}💷{{/ifCond}}</h1>
+      <p>The {{{currency initialBalance currency=currency}}} gift card offered by <a href="{{config.host.website}}/{{emitter.slug}}">{{emitter.name}}</a> has been added to your Open Collective account. 🎉</p>
+      <p>&nbsp;</p>
+     </center>
+   </td>
+   <td></td>
+   <td valign="top">
+     {{> collectivecard emitter}}
+   </td>
+  </tr>
+</table>
+
+<p>Click on the button below to log in, choose the project(s) that you want to support and select <b>{{name}}</b> from the list of available payment methods.</p>
 
 <center>
-  <h3>Click here to login to your account and support the open source projects that you love ❤️</h3>
   <a href="{{loginLink}}" class="btn blue"><div>One-click login</div></a>
 </center>
+
+<p>You can donate the full amount to one project or divide it between the projects that make your life easier. You can also use that credit to start subscriptions. We will let you know when your gift card runs out. <strong>Hurry up, as this card expires on {{{moment expiryDate}}}</strong>.</p>
+
 
 {{> footer}}

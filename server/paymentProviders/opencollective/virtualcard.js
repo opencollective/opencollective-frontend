@@ -145,14 +145,12 @@ async function create(args, remoteUser) {
         .add(3, 'months')
         .format();
 
-  const pmDescription = `${formatCurrency(
-    args.amount,
-    args.currency,
-  )} card from ${collective.name}`;
+  const description = `${formatCurrency(args.amount, args.currency)} card from ${collective.name}`;
   // creates a new Virtual card Payment method
   const paymentMethod = await models.PaymentMethod.create({
     CreatedByUserId: remoteUser && remoteUser.id,
-    name: args.description || pmDescription,
+    name: description,
+    description: args.description || description,
     initialBalance: args.amount,
     currency: args.currency,
     CollectiveId: args.CollectiveId,
@@ -170,7 +168,7 @@ async function create(args, remoteUser) {
 /** Claim the Virtual Card Payment Method By an (existing or not) user
  * @param {Object} args contains the parameters
  * @param {String} args.code The 8 last digits of the UUID
- * @param {email} args.email The email of the user claiming the virtual card
+ * @param {email} args.user.email The email of the user claiming the virtual card
  * @returns {models.PaymentMethod} return the virtual card payment method.
  */
 async function claim(args, remoteUser) {
@@ -192,15 +190,14 @@ async function claim(args, remoteUser) {
   );
   // if the virtual card PM Collective Id is different than the Source PM Collective Id
   // it means this virtual card was already claimend
-  if (
-    !sourcePaymentMethod ||
-    sourcePaymentMethod.CollectiveId !== virtualCardPaymentMethod.CollectiveId
-  ) {
-    throw Error('Virtual card not available to be claimed.');
+  if (!sourcePaymentMethod || sourcePaymentMethod.CollectiveId !== virtualCardPaymentMethod.CollectiveId) {
+    throw Error('Virtual card already claimed.');
   }
   // find or creating a user with its collective
-  const user =
-    remoteUser || (await models.User.findOrCreateByEmail(args.email));
+  const user = remoteUser || await models.User.findOrCreateByEmail(get(args, 'user.email'), args.user);
+  if (!user) {
+    throw Error(`Please provide user details or make this request as a logged in user.`);
+  }
   // updating virtual card with collective Id of the user
   await virtualCardPaymentMethod.update({
     CollectiveId: user.CollectiveId,

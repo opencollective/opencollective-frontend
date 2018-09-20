@@ -50,10 +50,14 @@ const allTransactionsQuery = `
       fromCollective {
         id
         slug
+        name
+        image
       }
       collective {
         id
         slug
+        name
+        image
       }
       paymentMethod {
         id

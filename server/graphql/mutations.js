@@ -23,7 +23,7 @@ import {
 } from './mutations/expenses';
 import {
   createPaymentMethod,
-  claimVirtualCard,
+  claimPaymentMethod,
 } from './mutations/paymentMethods';
 import * as updateMutations from './mutations/updates';
 import * as commentMutations from './mutations/comments';
@@ -67,6 +67,7 @@ import {
   CommentAttributesInputType,
   ConnectedAccountInputType,
   PaymentMethodInputType,
+  UserInputType,
 } from './inputTypes';
 
 const mutations = {
@@ -392,13 +393,13 @@ const mutations = {
     },
     resolve: async (_, args, req) => createPaymentMethod(args, req.remoteUser),
   },
-  claimVirtualCard: {
+  claimPaymentMethod: {
     type: PaymentMethodType,
     args: {
       code: { type: new GraphQLNonNull(GraphQLString) },
-      email: { type: GraphQLString },
+      user: { type: UserInputType },
     },
-    resolve: async (_, args, req) => claimVirtualCard(args, req.remoteUser),
+    resolve: async (_, args, req) => claimPaymentMethod(args, req.remoteUser),
   },
 };
 

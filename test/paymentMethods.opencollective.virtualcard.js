@@ -20,10 +20,18 @@ const createPaymentMethodQuery = `
     }
   }
 `;
-const claimVirtualCardQuery = `
-  mutation claimVirtualCard($email: String, $code: String!) {
-    claimVirtualCard(email: $email, code: $code) {
+const claimPaymentMethodQuery = `
+  mutation claimPaymentMethod($user: UserInputType, $code: String!) {
+    claimPaymentMethod(user: $user, code: $code) {
       id
+      SourcePaymentMethodId
+      expiryDate
+      collective {
+        id
+        slug
+        name
+        twitterHandle
+      }
     }
   }
 `;
@@ -174,7 +182,7 @@ describe('opencollective.virtualcard', () => {
         // setting correct code to claim virtual card by new User
         const virtualCardCode = virtualCardPaymentMethod.uuid.substring(0, 8);
         const args = {
-          email: 'new@user.com',
+          user: { email: 'new@user.com' },
           code: virtualCardCode,
         };
         // claim virtual
@@ -200,7 +208,7 @@ describe('opencollective.virtualcard', () => {
           },
         });
         // then check if the user email matches the email on the argument used on the claim
-        expect(user.email).to.be.equal(args.email);
+        expect(user.email).to.be.equal(args.user.email);
         // then check if both have the same uuid
         expect(paymentMethod.uuid).not.to.be.equal(virtualCardPaymentMethod.id);
         // and check if both have the same expiry
@@ -220,76 +228,43 @@ describe('opencollective.virtualcard', () => {
         userCollective;
 
       before(() => utils.resetTestDB());
-      before('create Host 1(USD)', () =>
-        models.Collective.create({
-          name: 'Host 1',
-          currency: 'USD',
-          isActive: true,
-        }).then(c => {
-          host1 = c;
-          // Create stripe connected account to host
-          return store.stripeConnectedAccount(host1.id);
-        }),
-      );
 
-      before('create collective1', () =>
-        models.Collective.create({
-          name: 'collective1',
-          currency: 'USD',
-          HostCollectiveId: host1.id,
-          isActive: true,
-        }).then(c => (collective1 = c)),
-      );
-      before('create collective2', () =>
-        models.Collective.create({
-          name: 'collective2',
-          currency: 'USD',
-          HostCollectiveId: host1.id,
-          isActive: true,
-        }).then(c => (collective2 = c)),
-      );
-      before('create a credit card payment method', () =>
-        models.PaymentMethod.create({
-          name: '4242',
-          service: 'stripe',
-          type: 'creditcard',
-          token: 'tok_123456781234567812345678',
-          CollectiveId: collective1.id,
-          monthlyLimitPerMember: null,
-        }).then(pm => (paymentMethod1 = pm)),
-      );
+      before('create Host 1(USD)', () => models.Collective.create({ name: 'Host 1', currency: 'USD', isActive: true }).then(c => {
+        host1 = c;
+        // Create stripe connected account to host
+        return store.stripeConnectedAccount(host1.id);
+      }));
 
-      before('create a virtual card payment method', () =>
-        virtualcard
-          .create({
-            description: 'virtual card test',
-            CollectiveId: collective1.id,
-            amount: 10000,
-            currency: 'USD',
-          })
-          .then(pm => (virtualCardPaymentMethod = pm)),
-      );
+      before('create collective1', () => models.Collective.create({ name: 'collective1', currency: 'USD', HostCollectiveId: host1.id, isActive: true }).then(c => collective1 = c));
+      before('create collective2', () => models.Collective.create({ name: 'collective2', currency: 'USD', HostCollectiveId: host1.id, isActive: true }).then(c => collective2 = c));
+      before('create a credit card payment method', () => models.PaymentMethod.create({
+        name: '4242',
+        service: 'stripe',
+        type: 'creditcard',
+        token: 'tok_123456781234567812345678',
+        CollectiveId: collective1.id,
+        monthlyLimitPerMember: null,
+      }).then(pm => paymentMethod1 = pm));
 
-      before('new user claims a virtual card', () =>
-        virtualcard
-          .claim({
-            email: 'new@user.com',
-            code: virtualCardPaymentMethod.uuid.substring(0, 8),
-          })
-          .then(async pm => {
-            virtualCardPaymentMethod = await models.PaymentMethod.findById(
-              pm.id,
-            );
-            userCollective = await models.Collective.findById(
-              virtualCardPaymentMethod.CollectiveId,
-            );
-            user = await models.User.findOne({
-              where: {
-                CollectiveId: userCollective.id,
-              },
-            });
-          }),
-      );
+      before('create a virtual card payment method', () => virtualcard.create({
+        description: 'virtual card test',
+        CollectiveId: collective1.id,
+        amount: 10000,
+        currency: 'USD',
+      }).then(pm => virtualCardPaymentMethod = pm));
+
+      before('new user claims a virtual card', () => virtualcard.claim({
+        user: { email: 'new@user.com' },
+        code: virtualCardPaymentMethod.uuid.substring(0,8),
+      }).then(async (pm) => {
+        virtualCardPaymentMethod = await models.PaymentMethod.findById(pm.id);
+        userCollective = await models.Collective.findById(virtualCardPaymentMethod.CollectiveId);
+        user = await models.User.findOne({
+          where: {
+            CollectiveId: userCollective.id,
+          },
+        });
+      }));
 
       it('Order should NOT be executed because its amount exceeds the balance of the virtual card', async () => {
         expect(virtualCardPaymentMethod.SourcePaymentMethodId).to.be.equal(
@@ -451,13 +426,16 @@ describe('opencollective.virtualcard', () => {
       let collective1, paymentMethod1, virtualCardPaymentMethod;
 
       before(() => utils.resetTestDB());
+
       before('create collective1(currency USD, No Host)', () =>
         models.Collective.create({
           name: 'collective1',
           currency: 'USD',
-          isActive: true,
-        }).then(c => (collective1 = c)),
+          image: 'https://cldup.com/rdmBCmH20l.png',
+          isActive: true
+        }).then(c => collective1 = c)
       );
+
       before('create a credit card payment method', () =>
         models.PaymentMethod.create({
           name: '4242',
@@ -466,51 +444,47 @@ describe('opencollective.virtualcard', () => {
           token: 'tok_123456781234567812345678',
           CollectiveId: collective1.id,
           monthlyLimitPerMember: null,
-        }).then(pm => (paymentMethod1 = pm)),
+        }).then(pm => paymentMethod1 = pm)
       );
 
       beforeEach('create a virtual card payment method', () =>
-        virtualcard
-          .create({
-            description: 'virtual card test',
-            CollectiveId: collective1.id,
-            amount: 10000,
-            currency: 'USD',
-          })
-          .then(pm => (virtualCardPaymentMethod = pm)),
+        virtualcard.create({
+          description: 'virtual card test',
+          CollectiveId: collective1.id,
+          amount: 10000,
+         currency: 'USD',
+        }).then(pm => virtualCardPaymentMethod = pm)
       );
 
       it('new User should claim a virtual card', async () => {
         // setting correct code to claim virtual card by new User
         const virtualCardCode = virtualCardPaymentMethod.uuid.substring(0, 8);
         const args = {
-          email: 'new@user.com',
+          user: {
+            name: 'New User',
+            email: 'new@user.com',
+            twitterHandle: 'xdamman'
+          },
           code: virtualCardCode,
         };
         // claim virtual card
         // call graphql mutation
-        const gqlResult = await utils.graphqlQuery(claimVirtualCardQuery, args);
+        const gqlResult = await utils.graphqlQuery(claimPaymentMethodQuery, args);
 
         gqlResult.errors && console.error(gqlResult.errors[0]);
         expect(gqlResult.errors).to.be.empty;
-
-        const paymentMethod = await models.PaymentMethod.findById(
-          gqlResult.data.claimVirtualCard.id,
-        );
+        const paymentMethod = gqlResult.data.claimPaymentMethod;
         // payment method should exist
         expect(paymentMethod).to.exist;
         // then paymentMethod SourcePaymentMethodId should be paymentMethod1.id(the PM of the organization collective1)
-        expect(paymentMethod.SourcePaymentMethodId).to.be.equal(
-          paymentMethod1.id,
-        );
+        expect(paymentMethod.SourcePaymentMethodId).to.equal(paymentMethod1.id);
+        expect(paymentMethod.collective.name).to.equal(args.user.name);
+        expect(paymentMethod.collective.twitterHandle).to.equal(args.user.twitterHandle);
         // and collective id of "original" virtual card should be different than the one returned
-        expect(virtualCardPaymentMethod.CollectiveId).not.to.be.equal(
-          paymentMethod.CollectiveId,
-        );
+        expect(virtualCardPaymentMethod.CollectiveId).not.to.equal(paymentMethod.collective.id);
         // then find collective of created user
-        const userCollective = await models.Collective.findById(
-          paymentMethod.CollectiveId,
-        );
+        const userCollective = paymentMethod.collective;
+
         // then find the user
         const user = await models.User.findOne({
           where: {
@@ -518,22 +492,19 @@ describe('opencollective.virtualcard', () => {
           },
         });
         // then check if the user email matches the email on the argument used on the claim
-        expect(user.email).to.be.equal(args.email);
+        expect(user.email).to.be.equal(args.user.email);
         // then check if both have the same uuid
         expect(paymentMethod.uuid).not.to.be.equal(virtualCardPaymentMethod.id);
         // and check if both have the same expiry
-        expect(moment(paymentMethod.expiryDate).format()).to.be.equal(
-          moment(virtualCardPaymentMethod.expiryDate).format(),
-        );
+        expect(moment(new Date(paymentMethod.expiryDate)).format()).to.be
+          .equal(moment(virtualCardPaymentMethod.expiryDate).format());
 
         await utils.waitForCondition(() => sendEmailSpy.callCount > 0);
-        expect(sendEmailSpy.firstCall.args[0]).to.equal(args.email);
-        expect(sendEmailSpy.firstCall.args[1]).to.contain(
-          'You received $100 from collective1 to donate on Open Collective',
-        );
-        expect(sendEmailSpy.firstCall.args[2]).to.contain(
-          'next=/redeemed?name=&amount=10000&currency=USD&emitterSlug=collective1&emitterName=collective1',
-        );
+        expect(sendEmailSpy.firstCall.args[0]).to.equal(args.user.email);
+        expect(sendEmailSpy.firstCall.args[1]).to.contain('You received $100 from collective1 to donate on Open Collective');
+        expect(sendEmailSpy.firstCall.args[2]).to.contain('next=/redeemed?amount=10000&currency=USD&emitterName=collective1&emitterSlug=collective1&name=New%20User');
+        expect(sendEmailSpy.firstCall.args[2]).to.contain(collective1.image.substr(collective1.image.lastIndexOf('/')+1));
+
       }); /** End Of "#new User should claim a virtual card" */
 
       it('Existing User should claim a virtual card', async () => {
@@ -547,18 +518,13 @@ describe('opencollective.virtualcard', () => {
         };
         // claim virtual card
         // call graphql mutation
-        const gqlResult = await utils.graphqlQuery(
-          claimVirtualCardQuery,
-          args,
-          existingUser,
-        );
+        const gqlResult = await utils.graphqlQuery(claimPaymentMethodQuery, args , existingUser);
 
         gqlResult.errors && console.error(gqlResult.errors[0]);
         expect(gqlResult.errors).to.be.empty;
 
-        const paymentMethod = await models.PaymentMethod.findById(
-          gqlResult.data.claimVirtualCard.id,
-        );
+        const paymentMethod = await models.PaymentMethod.findById(gqlResult.data.claimPaymentMethod.id);
+
         // payment method should exist
         expect(paymentMethod).to.exist;
         // then paymentMethod SourcePaymentMethodId should be paymentMethod1.id(the PM of the organization collective1)
@@ -601,88 +567,49 @@ describe('opencollective.virtualcard', () => {
         userVirtualCardCollective;
 
       before(() => utils.resetTestDB());
-      before('create Host 1(USD)', () =>
-        models.Collective.create({
-          name: 'Host 1',
-          currency: 'USD',
-          isActive: true,
-        }).then(c => {
-          host1 = c;
-          // Create stripe connected account to host
-          return store.stripeConnectedAccount(host1.id);
-        }),
-      );
-      before('create collective1', () =>
-        models.Collective.create({
-          name: 'collective1',
-          currency: 'USD',
-          HostCollectiveId: host1.id,
-          isActive: true,
-        }).then(c => (collective1 = c)),
-      );
-      before('create collective2', () =>
-        models.Collective.create({
-          name: 'collective2',
-          currency: 'USD',
-          HostCollectiveId: host1.id,
-          isActive: true,
-        }).then(c => (collective2 = c)),
-      );
-      before('creates User 1', () =>
-        models.User.createUserWithCollective({ name: 'User 1' }).then(
-          u => (user1 = u),
-        ),
-      );
-      before('user1 to become Admin of collective1', () =>
-        models.Member.create({
-          CreatedByUserId: user1.id,
-          MemberCollectiveId: user1.CollectiveId,
-          CollectiveId: collective1.id,
-          role: 'ADMIN',
-        }),
-      );
-      before('create a credit card payment method', () =>
-        models.PaymentMethod.create({
-          name: '4242',
-          service: 'stripe',
-          type: 'creditcard',
-          token: 'tok_123456781234567812345678',
-          CollectiveId: collective1.id,
-          monthlyLimitPerMember: null,
-        }),
-      );
 
-      before('create a virtual card payment method', () =>
-        virtualcard
-          .create({
-            description: 'virtual card test',
-            CollectiveId: collective1.id,
-            amount: 10000,
-            currency: 'USD',
-          })
-          .then(pm => (virtualCardPaymentMethod = pm)),
-      );
+      before('create Host 1(USD)', () => models.Collective.create({ name: 'Host 1', currency: 'USD', isActive: true }).then(c => {
+        host1 = c;
+        // Create stripe connected account to host
+        return store.stripeConnectedAccount(host1.id);
+      }));
+      before('create collective1', () => models.Collective.create({ name: 'collective1', currency: 'USD', HostCollectiveId: host1.id, isActive: true }).then(c => collective1 = c));
+      before('create collective2', () => models.Collective.create({ name: 'collective2', currency: 'USD', HostCollectiveId: host1.id, isActive: true }).then(c => collective2 = c));
+      before('creates User 1', () => models.User.createUserWithCollective({ name: 'User 1' }).then(u => user1 = u));
+      before('user1 to become Admin of collective1', () => models.Member.create({
+        CreatedByUserId: user1.id,
+        MemberCollectiveId: user1.CollectiveId,
+        CollectiveId: collective1.id,
+        role: 'ADMIN',
+      }));
+      before('create a credit card payment method', () => models.PaymentMethod.create({
+        name: '4242',
+        service: 'stripe',
+        type: 'creditcard',
+        token: 'tok_123456781234567812345678',
+        CollectiveId: collective1.id,
+        monthlyLimitPerMember: null,
+      }));
 
-      before('new user claims a virtual card', () =>
-        virtualcard
-          .claim({
-            email: 'new@user.com',
-            code: virtualCardPaymentMethod.uuid.substring(0, 8),
-          })
-          .then(async pm => {
-            virtualCardPaymentMethod = await models.PaymentMethod.findById(
-              pm.id,
-            );
-            userVirtualCardCollective = await models.Collective.findById(
-              virtualCardPaymentMethod.CollectiveId,
-            );
-            userVirtualCard = await models.User.findOne({
-              where: {
-                CollectiveId: userVirtualCardCollective.id,
-              },
-            });
-          }),
-      );
+      before('create a virtual card payment method', () => virtualcard.create({
+        description: 'virtual card test',
+        CollectiveId: collective1.id,
+        amount: 10000,
+        currency: 'USD',
+      }).then(pm => virtualCardPaymentMethod = pm));
+
+      before('new user claims a virtual card', () => virtualcard.claim({
+        user: { email: 'new@user.com' },
+        code: virtualCardPaymentMethod.uuid.substring(0,8),
+      }).then(async (pm) => {
+        virtualCardPaymentMethod = await models.PaymentMethod.findById(pm.id);
+        userVirtualCardCollective = await models.Collective.findById(virtualCardPaymentMethod.CollectiveId);
+        userVirtualCard = await models.User.findOne({
+          where: {
+            CollectiveId: userVirtualCardCollective.id,
+          },
+        });
+      }));
 
       it('Order should NOT be executed because its amount exceeds the balance of the virtual card', async () => {
         // Setting up order
