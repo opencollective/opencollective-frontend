@@ -31,7 +31,7 @@ const Subtitle = styled(H5)`
 `;
 
 const SearchFormContainer = styled(Box)`
-  margin: 64px auto;
+  margin: 64px auto 32px;
   text-align: center;
 `;
 
@@ -147,6 +147,16 @@ class RedeemedPage extends React.Component {
                 </Box>
                 <SearchForm fontSize="1.4rem" />
               </SearchFormContainer>
+            </Box>
+
+            <Box width={['320px', '640px']} my={3}>
+              <P color="#76777A" textAlign="center">
+                <FormattedMessage
+                  id="redeemed.backyourstack"
+                  defaultMessage="or discover the open source projects that your organization is depending on and that need funding on {link}"
+                  values={{ link: <a href="https://backyourstack.com">BackYourStack.com</a> }}
+                />
+              </P>
             </Box>
 
             <P color="#76777A" textAlign="center">

@@ -82,7 +82,7 @@ class RedeemPage extends React.Component {
   static propTypes = {
     getLoggedInUser: PropTypes.func.isRequired, // from withLoggedInUser
     intl: PropTypes.object.isRequired, // from withIntl
-    claimVirtualCard: PropTypes.func.isRequired, // from redeemMutation
+    claimPaymentMethod: PropTypes.func.isRequired, // from redeemMutation
     code: PropTypes.string,
     email: PropTypes.string,
   };
@@ -116,11 +116,12 @@ class RedeemPage extends React.Component {
     this.setState({ LoggedInUser });
   }
 
-  async claimVirtualCard() {
+  async claimPaymentMethod() {
     this.setState({ loading: true });
     const { code, email } = this.state.form;
+    const user = { email };
     try {
-      const res = await this.props.claimVirtualCard(code, email);
+      const res = await this.props.claimPaymentMethod(code, user);
       console.log('>>> res graphql: ', JSON.stringify(res, null, '  '));
       this.setState({ loading: false, view: 'success' });
     } catch (e) {
@@ -147,7 +148,7 @@ class RedeemPage extends React.Component {
         error: intl.formatMessage(this.messages['error.code.invalid']),
       });
     }
-    this.claimVirtualCard();
+    this.claimPaymentMethod();
   }
 
   render() {
@@ -241,8 +242,8 @@ class RedeemPage extends React.Component {
 }
 
 const redeemMutation = gql`
-  mutation claimVirtualCard($code: String!, $email: String) {
-    claimVirtualCard(code: $code, email: $email) {
+  mutation claimPaymentMethod($code: String!, $user: UserInputType) {
+    claimPaymentMethod(code: $code, user: $user) {
       id
       description
     }
@@ -251,8 +252,8 @@ const redeemMutation = gql`
 
 const addMutation = graphql(redeemMutation, {
   props: ({ mutate }) => ({
-    claimVirtualCard: async (code, email) => {
-      return await mutate({ variables: { code, email } });
+    claimPaymentMethod: async (code, user) => {
+      return await mutate({ variables: { code, user } });
     },
   }),
 });
