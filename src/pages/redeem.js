@@ -7,6 +7,7 @@ import { backgroundSize, fontSize, minHeight, maxWidth } from 'styled-system';
 import { Flex, Box } from 'grid-styled';
 import { FormattedMessage, defineMessages } from 'react-intl';
 import { get } from 'lodash';
+import sanitizeHtml from 'sanitize-html';
 
 import Header from '../components/Header';
 import Body from '../components/Body';
@@ -75,8 +76,12 @@ const Hero = styled(Box)`
 `;
 
 class RedeemPage extends React.Component {
-  static getInitialProps({ query: { code, email } }) {
-    return { code, email };
+  static getInitialProps({ query: { code, email,name } }) {
+    return {
+      code: sanitizeHtml(code || '', { allowedTags: [], allowedAttributes: [] }),
+      email: sanitizeHtml(email || '', { allowedTags: [], allowedAttributes: [] }),
+      name: sanitizeHtml(name || '', { allowedTags: [], allowedAttributes: [] }),
+    };
   }
 
   static propTypes = {
@@ -84,18 +89,19 @@ class RedeemPage extends React.Component {
     intl: PropTypes.object.isRequired, // from withIntl
     claimPaymentMethod: PropTypes.func.isRequired, // from redeemMutation
     code: PropTypes.string,
+    name: PropTypes.string,
     email: PropTypes.string,
   };
 
   constructor(props) {
     super(props);
-    const { code, email } = props;
+    const { code, email, name } = props;
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.state = {
       loading: false,
       view: 'form', // form or success
-      form: { code, email },
+      form: { code, email, name },
       LoggedInUser: null,
     };
     this.messages = defineMessages({
@@ -118,8 +124,8 @@ class RedeemPage extends React.Component {
 
   async claimPaymentMethod() {
     this.setState({ loading: true });
-    const { code, email } = this.state.form;
-    const user = { email };
+    const { code, email, name } = this.state.form;
+    const user = { email, name };
     try {
       const res = await this.props.claimPaymentMethod(code, user);
       console.log('>>> res graphql: ', JSON.stringify(res, null, '  '));
@@ -152,7 +158,7 @@ class RedeemPage extends React.Component {
   }
 
   render() {
-    const { code, email } = this.props;
+    const { code, email, name } = this.props;
 
     return (
       <div className="RedeemedPage">
@@ -199,6 +205,7 @@ class RedeemPage extends React.Component {
                         {this.state.view === 'form' && (
                           <RedeemForm
                             code={code}
+                            name={name}
                             email={email}
                             onChange={this.handleChange}
                           />

@@ -11,7 +11,7 @@ import styled from 'styled-components';
 
 const Description = styled(P)`
   color: #4e5052;
-  font-size: 1.2rem;
+  font-size: 1.3rem;
   line-height: 1.5;
   margin: 12px 0;
 `;
@@ -20,6 +20,7 @@ class RedeemForm extends React.Component {
   static propTypes = {
     code: PropTypes.string,
     email: PropTypes.string,
+    name: PropTypes.string,
     onChange: PropTypes.func.isRequired,
   };
 
@@ -33,6 +34,7 @@ class RedeemForm extends React.Component {
 
     this.messages = defineMessages({
       email: { id: 'user.email.label', defaultMessage: 'email' },
+      name: { id: 'user.name.label', defaultMessage: 'name' },
       code: { id: 'redeem.form.code.label', defaultMessage: 'Gift card code' },
     });
   }
@@ -45,17 +47,24 @@ class RedeemForm extends React.Component {
   }
 
   render() {
-    const { intl, code, email } = this.props;
+    const { intl, code, email, name } = this.props;
 
     return (
       <div>
         <Description>
           <FormattedMessage
             id="redeem.card.info"
-            defaultMessage="It’s easy. Sign in below with your email address, enter your gift code and find open collectives to donate to."
+            defaultMessage="It’s easy. Just provide your name and email address, enter your gift code and your open collective account will be created (if needed) and the gift card will be automatically attached to your account."
           />
         </Description>
         <Flex flexDirection="column">
+          <InputField
+            label={intl.formatMessage(this.messages['name'])}
+            name="name"
+            type="name"
+            defaultValue={name}
+            onChange={value => this.handleChange('name', value)}
+          />
           <InputField
             label={intl.formatMessage(this.messages['email'])}
             name="email"
