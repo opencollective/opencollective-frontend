@@ -4,6 +4,7 @@ import {
   display,
   fontFamily,
   fontSize,
+  fontStyle,
   fontWeight,
   lineHeight,
   letterSpacing,
@@ -25,6 +26,7 @@ export const Span = styled.span`
   ${display}
   ${fontFamily}
   ${fontSize}
+  ${fontStyle}
   ${fontWeight}
   ${lineHeight}
   ${letterSpacing}
@@ -39,6 +41,7 @@ export const P = styled.p`
   ${display}
   ${fontFamily}
   ${fontSize}
+  ${fontStyle}
   ${fontWeight}
   ${lineHeight}
   ${letterSpacing}
@@ -58,6 +61,7 @@ export const H1 = styled.h1`
   ${display}
   ${fontFamily}
   ${fontSize}
+  ${fontStyle}
   ${fontWeight}
   ${lineHeight}
   ${letterSpacing}
@@ -78,6 +82,7 @@ export const H2 = styled.h2`
   ${display}
   ${fontFamily}
   ${fontSize}
+  ${fontStyle}
   ${fontWeight}
   ${lineHeight}
   ${letterSpacing}
@@ -98,6 +103,7 @@ export const H3 = styled.h3`
   ${display}
   ${fontFamily}
   ${fontSize}
+  ${fontStyle}
   ${fontWeight}
   ${lineHeight}
   ${letterSpacing}
@@ -118,6 +124,7 @@ export const H4 = styled.h4`
   ${display}
   ${fontFamily}
   ${fontSize}
+  ${fontStyle}
   ${fontWeight}
   ${lineHeight}
   ${letterSpacing}
@@ -138,6 +145,7 @@ export const H5 = styled.h5`
   ${display}
   ${fontFamily}
   ${fontSize}
+  ${fontStyle}
   ${fontWeight}
   ${lineHeight}
   ${letterSpacing}
