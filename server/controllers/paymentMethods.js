@@ -60,6 +60,7 @@ async function createVirtualCardThroughGraphQL(args, user) {
     CollectiveId: paymentMethod.collective.id,
     balance: paymentMethod.initialBalance,
     currency: paymentMethod.currency,
+    limitedToTags: paymentMethod.limitedToTags,
     code: paymentMethod.uuid.substring(0, 8),
     expiryDate: moment(paymentMethod.expiryDate).format(),
     redeemUrl: `${
@@ -80,6 +81,7 @@ export function createVirtualCard(req, res) {
     'amount',
     'currency',
     'expiryDate',
+    'limitedToTags',
   ]);
   args.type = args.type || 'virtualcard';
 

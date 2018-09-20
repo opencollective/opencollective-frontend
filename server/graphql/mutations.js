@@ -386,6 +386,10 @@ const mutations = {
       type: { type: new GraphQLNonNull(GraphQLString) },
       amount: { type: new GraphQLNonNull(GraphQLInt) },
       currency: { type: new GraphQLNonNull(GraphQLString) },
+      limitedToTags: {
+        type: new GraphQLList(GraphQLString),
+        description: 'Limit this payment method to make donations to collectives having those tags',
+      },
       CollectiveId: { type: new GraphQLNonNull(GraphQLInt) },
       PaymentMethodId: { type: GraphQLInt },
       description: { type: GraphQLString },
