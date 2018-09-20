@@ -32,8 +32,3 @@ jobs:
     - run: npm run test
     - store_test_results:
         path: /tmp/circleci-test-results
-
-    branches:
-      ignore:
-        - staging
-        - production
