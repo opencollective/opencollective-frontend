@@ -51,7 +51,7 @@ class RedeemedPage extends React.Component {
   }) {
     return {
       amount: amount && Number(amount),
-      name: sanitizeHtml(name, { allowedTags: [], allowedAttributes: [] }),
+      name: sanitizeHtml(name || '', { allowedTags: [], allowedAttributes: [] }),
       emitterSlug: sanitizeHtml(emitterSlug, {
         allowedTags: [],
         allowedAttributes: [],
