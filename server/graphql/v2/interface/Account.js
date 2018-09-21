@@ -7,6 +7,8 @@ import {
 
 import { GraphQLDateTime } from 'graphql-iso-date';
 
+import { idEncode } from '../identifiers';
+
 import { HasMembersFields } from '../interface/HasMembers';
 import { IsMemberOfFields } from '../interface/IsMemberOf';
 
@@ -14,15 +16,63 @@ import {
   MemberCollection,
   MemberOfCollection,
 } from '../collection/MemberCollection';
+import { TransactionCollection } from '../collection/TransactionCollection';
+
 import { AccountType } from '../enum/AccountType';
+import { TransactionType } from '../enum/TransactionType';
+
 import { MemberRole } from '../object/Member';
 import { AccountStats } from '../object/AccountStats';
 
+import { ChronologicalOrder } from '../input/ChronologicalOrder';
+
+import models from '../../../models';
+
+const accountTransactions = {
+  type: TransactionCollection,
+  args: {
+    type: { type: TransactionType },
+    limit: { type: GraphQLInt, defaultValue: 10 },
+    offset: { type: GraphQLInt, defaultValue: 0 },
+    orderBy: {
+      type: ChronologicalOrder,
+      defaultValue: ChronologicalOrder.defaultValue,
+    },
+  },
+  resolve(collective, args) {
+    const where = { CollectiveId: collective.id };
+
+    if (args.type) {
+      where.type = args.type;
+    }
+
+    console.log({
+      where,
+      limit: args.limit,
+      offset: args.offset,
+      order: [args.orderBy.field, args.orderBy.direction],
+    });
+
+    return models.Transaction.findAndCountAll({
+      where,
+      limit: args.limit,
+      offset: args.offset,
+      order: [[args.orderBy.field, args.orderBy.direction]],
+    });
+  },
+};
+
 export const AccountFields = {
-  id: {
+  _internal_id: {
     type: GraphQLInt,
+    resolve(transaction) {
+      return transaction.id;
+    },
+  },
+  id: {
+    type: GraphQLString,
     resolve(collective) {
-      return collective.id;
+      return idEncode(collective.id);
     },
   },
   slug: {
@@ -63,6 +113,7 @@ export const AccountFields = {
   },
   ...HasMembersFields,
   ...IsMemberOfFields,
+  transactions: accountTransactions,
 };
 
 export const Account = new GraphQLInterfaceType({
@@ -70,8 +121,11 @@ export const Account = new GraphQLInterfaceType({
   description: 'Account interface',
   fields: () => {
     return {
-      id: {
+      _internal_id: {
         type: GraphQLInt,
+      },
+      id: {
+        type: GraphQLString,
       },
       slug: {
         type: GraphQLString,
@@ -107,6 +161,20 @@ export const Account = new GraphQLInterfaceType({
           offset: { type: GraphQLInt },
           role: { type: new GraphQLList(MemberRole) },
           accountType: { type: new GraphQLList(AccountType) },
+        },
+      },
+      transactions: {
+        type: TransactionCollection,
+        args: {
+          limit: { type: GraphQLInt },
+          offset: { type: GraphQLInt },
+          type: {
+            type: TransactionType,
+            description: 'type of transaction (DEBIT/CREDIT)',
+          },
+          orderBy: {
+            type: ChronologicalOrder,
+          },
         },
       },
     };

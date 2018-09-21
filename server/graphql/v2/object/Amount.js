@@ -10,7 +10,7 @@ export const Amount = new GraphQLObjectType({
       value: {
         type: GraphQLFloat,
         resolve(amount) {
-          if (!amount.value) {
+          if (typeof amount.value === 'undefined') {
             return parseInt(amount, 10) / 100;
           } else {
             return parseInt(amount.value, 10) / 100;
@@ -20,7 +20,7 @@ export const Amount = new GraphQLObjectType({
       currency: {
         type: Currency,
         resolve(amount) {
-          if (!amount.currency) {
+          if (typeof amount.currency === 'undefined') {
             return 'USD';
           } else {
             return amount.currency;

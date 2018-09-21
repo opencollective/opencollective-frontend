@@ -53,6 +53,7 @@
     "graphql-iso-date": "^3.5.0",
     "graphql-type-json": "0.2.1",
     "handlebars": "4.0.5",
+    "hashids": "^1.2.2",
     "he": "1.1.1",
     "helmet": "3.5.0",
     "html-pdf": "2.2.0",
