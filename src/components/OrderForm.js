@@ -576,15 +576,16 @@ class OrderForm extends React.Component {
       });
     }
 
-    this.setState(newState);
-    if (typeof window !== 'undefined') {
-      window.state = newState;
-    }
+    this.setState(newState, () => {
+      if (typeof window !== 'undefined') {
+        window.state = newState;
+      }
 
-    /* This is the type of the PayPal payment method */
-    if (this.isPayPalSelected()) {
-      this.loadPayPalButton();
-    }
+      /* This is the type of the PayPal payment method */
+      if (this.isPayPalSelected()) {
+        this.loadPayPalButton();
+      }
+    });
   };
 
   /** Return true if PayPal is the selected payment method
