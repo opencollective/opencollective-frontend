@@ -19,7 +19,7 @@ export default class Body extends React.Component {
             }
 
             a {
-              text-decoration: none !important;
+              text-decoration: none;
               cursor: pointer;
             }
             button {

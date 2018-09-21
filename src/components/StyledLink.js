@@ -11,10 +11,15 @@ import {
   fontWeight,
   maxWidth,
   space,
+  style,
   textAlign,
   width,
 } from 'styled-system';
 import { whiteSpace } from './Text';
+
+const textDecoration = style({
+  prop: 'textDecoration',
+});
 
 const StyledLink = styled.a`
   ${active}
@@ -29,6 +34,7 @@ const StyledLink = styled.a`
   ${maxWidth}
   ${space}
   ${textAlign}
+  ${textDecoration}
   ${whiteSpace}
   ${width}
 `;
