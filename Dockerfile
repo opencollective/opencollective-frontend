@@ -4,9 +4,14 @@ RUN apt-get update -y && apt-get install -y graphicsmagick
 
 WORKDIR /usr/src/frontend
 
-COPY package*.json ./
+# Pre-install heavy dependencies
+RUN npm install cypress
+RUN npm install puppeteer
+RUN npm install phantomjs-prebuilt
 
-RUN npm install
+# Install dependencies first
+COPY package*.json ./
+RUN npm install --unsafe-perm
 
 COPY . .
 

@@ -1,4 +1,5 @@
 {
+  "name": "opencollective-frontend",
   "type": "docker",
   "scale": {
     "sfo1": {
