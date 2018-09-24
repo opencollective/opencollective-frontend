@@ -885,19 +885,9 @@ class HomePage extends React.Component {
                   Introducing
                 </P>
 
-                <H3
-                  color="white"
-                  fontSize={['3.2rem', null, '4.8rem']}
-                  fontStyle="italic"
-                  fontWeight="800"
-                  mb={4}
-                >
-                  back
-                  <Span color="#9092FF" fontWeight="300">
-                    your
-                  </Span>
-                  stack
-                </H3>
+                <Box mb={3}>
+                  <img src="/static/images/backyourstack.svg" alt="Back Your Stack" />
+                </Box>
 
                 <H4 color="white" fontSize="2.4rem" mb={4}>
                   Discover the Open Source projects your organization is using
