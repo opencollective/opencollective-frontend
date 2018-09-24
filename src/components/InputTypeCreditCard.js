@@ -4,6 +4,8 @@ import { FormControl } from 'react-bootstrap';
 import withIntl from '../lib/withIntl';
 import { FormattedMessage } from 'react-intl';
 
+import { getStripe } from '../lib/stripe';
+
 class InputTypeCreditCard extends React.Component {
   static propTypes = {
     name: PropTypes.string,
@@ -24,8 +26,10 @@ class InputTypeCreditCard extends React.Component {
     this.props.onChange({ [fieldname]: value });
   }
 
-  componentDidMount() {
-    if (typeof window.stripe !== 'undefined') {
+  async componentDidMount() {
+    const stripe = await getStripe();
+
+    if (stripe) {
       const style = Object.assign(
         {},
         {
@@ -37,7 +41,7 @@ class InputTypeCreditCard extends React.Component {
         this.props.style,
       );
 
-      const elements = window.stripe.elements();
+      const elements = stripe.elements();
       const card = elements.create('card', { style: style });
 
       // Add an instance of the card Element into the `card-element` <div>

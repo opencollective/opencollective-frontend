@@ -1,5 +1,7 @@
 import { get } from 'lodash';
 
+import loadScript from 'load-script';
+
 export function truncate(str, length) {
   if (!str || typeof str !== 'string' || str.length <= length) {
     return str;
@@ -331,3 +333,14 @@ export const abbreviateNumber = (number, precision = 0) => {
 
   return round(scaled) + SI_PREFIXES[tier];
 };
+
+export const loadScriptAsync = url =>
+  new Promise((resolve, reject) => {
+    loadScript(url, (err, script) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(script);
+      }
+    });
+  });

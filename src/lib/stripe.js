@@ -1,13 +1,32 @@
 import Payment from 'payment';
 
+import { getEnvVar, loadScriptAsync } from './utils';
+
+let stripe;
+
+const getStripe = async () => {
+  if (!stripe) {
+    const stripeKey = getEnvVar('STRIPE_KEY');
+    if (stripeKey) {
+      if (typeof window.Stripe === 'undefined') {
+        await loadScriptAsync('https://js.stripe.com/v3/');
+      }
+      stripe = window.Stripe(stripeKey);
+    } else {
+      throw new Error("'STRIPE_KEY' is undefined.");
+    }
+  }
+  return stripe;
+};
+
 const getStripeToken = (type = 'cc', data) => {
   // for testing only
-  if (
+  const TEST_ENVIRONMENT =
     typeof window !== 'undefined' &&
     window.location.search.match(/test=e2e/) &&
     (window.location.hostname === 'staging.opencollective.com' ||
-      window.location.hostname === 'localhost')
-  ) {
+      window.location.hostname === 'localhost');
+  if (TEST_ENVIRONMENT) {
     return Promise.resolve({
       token: 'tok_bypassPending',
       card: {
@@ -22,15 +41,16 @@ const getStripeToken = (type = 'cc', data) => {
     });
   }
 
-  // eslint-disable-next-line
   switch (type) {
     case 'cc': // credit card
-      return window.stripe.createToken(data).then(res => {
-        if (res.error) {
-          throw new Error(res.error.message);
-        }
-        return { token: res.token.id, card: res.token.card };
-      });
+      return getStripe()
+        .then(stripe => stripe.createToken(data))
+        .then(res => {
+          if (res.error) {
+            throw new Error(res.error.message);
+          }
+          return { token: res.token.id, card: res.token.card };
+        });
   }
 };
 
@@ -48,4 +68,4 @@ const isValidCard = card => {
   );
 };
 
-export { getStripeToken, isValidCard };
+export { getStripe, getStripeToken, isValidCard };
