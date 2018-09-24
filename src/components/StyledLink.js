@@ -1,6 +1,5 @@
 import styled from 'styled-components';
 import {
-  active,
   bgColor,
   border,
   borderRadius,
@@ -22,7 +21,6 @@ const textDecoration = style({
 });
 
 const StyledLink = styled.a`
-  ${active}
   ${bgColor}
   ${border}
   ${borderRadius}
