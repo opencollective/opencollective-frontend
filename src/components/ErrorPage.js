@@ -48,7 +48,10 @@ class ErrorPage extends React.Component {
     const { message, data, loading } = this.props;
 
     if (get(data, 'error')) {
-      console.error(data.error);
+      if (data.error.message !== 'Test error') {
+        // That might not be the right place to log the error. Remove?
+        console.error(data.error);
+      }
     }
 
     this.message = this.messages[message] ? message : 'unknown';
