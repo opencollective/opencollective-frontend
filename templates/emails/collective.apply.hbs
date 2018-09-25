@@ -1,0 +1,17 @@
+Subject: Thanks for applying to {{host.name}}
+
+{{> header}}
+
+<div class="hidden">Your application is pending.</div>
+
+<p>Oh hey {{user.collective.name}} 👋 </p>
+<p>Thank you for applying to host your collective <a href="{{config.host.website}}/{{collective.slug}}">{{collective.name}}</a> on the <a href="{{config.host.website}}/{{host.slug}}">{{host.name}}</a> host</a>.</p>
+<p>Your application is being reviewed. Please make sure that your <a href="{{config.host.website}}/{{collective.slug}}">collective page</a> describes as accurately as possible the activities of your collective and what the money that you will be collecting will be used for.</p>
+<p>You can also already <a href="{{config.host.website}}/{{collective.slug}}/edit#tiers">create tiers</a>. 
+This will help us get an idea of the different ways that you will be collecting money.</p>
+
+<p>If you have any questions, feel free to respond to this email.</p>
+
+<p>– {{host.name}}</p>
+
+{{> footer}}

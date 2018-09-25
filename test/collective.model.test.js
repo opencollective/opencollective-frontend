@@ -234,8 +234,6 @@ describe('Collective model', () => {
         role: 'ADMIN',
         CreatedByUserId: user1.id,
       });
-      user1.populateRoles();
-      user2.populateRoles();
       newCollective = await models.Collective.create({
         name: 'New collective',
         slug: 'new-collective',
@@ -243,7 +241,12 @@ describe('Collective model', () => {
         isActive: false,
         CreatedByUserId: user1.id,
       });
-      await newCollective.addHost(hostUser.collective, user1);
+      await Promise.all([
+        user1.populateRoles(),
+        user2.populateRoles(),
+        newCollective.addUserWithRole(user1, 'ADMIN'),
+        newCollective.addHost(hostUser.collective, user1),
+      ]);
     });
 
     it('fails to add another host', async () => {
@@ -265,7 +268,6 @@ describe('Collective model', () => {
     });
 
     it('changes host successfully and sends email notification to host', async () => {
-      await user2.populateRoles();
       const assertCollectiveCurrency = async (collective, currency) => {
         const tiers = await models.Tier.findAll({
           where: { CollectiveId: collective.id },
@@ -293,9 +295,13 @@ describe('Collective model', () => {
       await assertCollectiveCurrency(newCollective, hostUser.collective.currency);
       expect(newCollective.HostCollectiveId).to.equal(hostUser.id);
       expect(newCollective.isActive).to.be.false;
-      await utils.waitForCondition(() => sendEmailSpy.callCount > 0);
+      await utils.waitForCondition(() => sendEmailSpy.callCount > 1);
+      expect(sendEmailSpy.firstCall.args[0]).to.equal(hostUser.email);
       expect(sendEmailSpy.firstCall.args[1]).to.equal(`New collective would love to be hosted by ${hostUser.collective.name}`);
+      expect(sendEmailSpy.secondCall.args[0]).to.equal(user1.email);
+      expect(sendEmailSpy.secondCall.args[1]).to.equal(`Thanks for applying to ${hostUser.collective.name}`);
       expect(sendEmailSpy.firstCall.args[2]).to.contain(user2.collective.name);
+      expect(sendEmailSpy.secondCall.args[3].from).to.equal('hello@wwcode.opencollective.com');
     });
   });
 

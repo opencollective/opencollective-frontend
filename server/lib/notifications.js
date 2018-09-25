@@ -398,7 +398,9 @@ async function notifyByEmail(activity) {
 
     case activityType.COLLECTIVE_APPLY:
       notifyAdminsOfCollective(activity.data.host.id, activity, { template: 'collective.apply.for.host' });
-      notifyAdminsOfCollective(activity.data.collective.id, activity);
+      notifyAdminsOfCollective(activity.data.collective.id, activity, {
+        from: `hello@${activity.data.host.slug}.opencollective.com`,
+      });
       break;
 
     case activityType.COLLECTIVE_CREATED:

@@ -15,6 +15,7 @@ const templateNames = [
   'email.approve',
   'email.message',
   'github.signup',
+  'collective.apply',
   'collective.apply.for.host',
   'collective.approved',
   'collective.comment.created',
