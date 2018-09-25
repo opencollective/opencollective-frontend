@@ -84,9 +84,11 @@ class SignInUp extends React.Component {
       <div className="field" key={field.name}>
         {this.props.showLabels &&
           this.messages[`${field.name}.label`] && (
-            <label>{`${capitalize(
-              intl.formatMessage(this.messages[`${field.name}.label`]),
-            )}:`}</label>
+            <label>
+              {`${capitalize(
+                intl.formatMessage(this.messages[`${field.name}.label`]),
+              )}:`}
+            </label>
           )}
         <input
           type="text"

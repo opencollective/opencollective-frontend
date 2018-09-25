@@ -76,11 +76,20 @@ const Hero = styled(Box)`
 `;
 
 class RedeemPage extends React.Component {
-  static getInitialProps({ query: { code, email,name } }) {
+  static getInitialProps({ query: { code, email, name } }) {
     return {
-      code: sanitizeHtml(code || '', { allowedTags: [], allowedAttributes: [] }),
-      email: sanitizeHtml(email || '', { allowedTags: [], allowedAttributes: [] }),
-      name: sanitizeHtml(name || '', { allowedTags: [], allowedAttributes: [] }),
+      code: sanitizeHtml(code || '', {
+        allowedTags: [],
+        allowedAttributes: [],
+      }),
+      email: sanitizeHtml(email || '', {
+        allowedTags: [],
+        allowedAttributes: [],
+      }),
+      name: sanitizeHtml(name || '', {
+        allowedTags: [],
+        allowedAttributes: [],
+      }),
     };
   }
 

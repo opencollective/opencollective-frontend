@@ -103,14 +103,14 @@
     "stop:staging": "heroku ps:scale web=0 -a oc-staging-frontend && heroku ps:scale web=0 -a opencollective-staging-website && heroku ps:scale web=0 -a opencollective-staging-api",
     "git:clean": "./scripts/git_clean.sh",
     "postinstall": "if test \"$NODE_ENV\" = \"\" || test \"$NODE_ENV\" = \"development\" ; then echo \"Skipping postinstall build because NODE_ENV is '${NODE_ENV}'\" ; else npm run build ; fi",
-    "lint": "eslint \"src/**/*.js\"",
+    "lint": "eslint \"cypress/**/*.js\" \"src/**/*.js\" \"test/**/*.js\"",
     "lint:fix": "npm run lint -- --fix",
     "lint:quiet": "npm run lint -- --quiet",
     "pretest": "npm run lint:quiet",
     "commit": "git-cz",
     "semantic-release": "semantic-release",
     "cypress": "TZ=UTC cypress run",
-    "prettier": "prettier \"src/**/*.js\" \"test/**/*.js\" --write"
+    "prettier": "prettier \"cypress/**/*.js\" \"src/**/*.js\" \"test/**/*.js\" --write"
   },
   "devDependencies": {
     "@babel/cli": "7.0.0",

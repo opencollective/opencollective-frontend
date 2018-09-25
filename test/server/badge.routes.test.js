@@ -98,7 +98,7 @@ describe('badge.routes.test.js', () => {
     test(
       'loads the banner (svg)',
       async () => {
-        const res = await fetchResponse(`/apex/tiers/backers.svg`);
+        const res = await fetchResponse('/apex/tiers/backers.svg');
         expect(res.status).toEqual(200);
       },
       timeout,
@@ -107,7 +107,7 @@ describe('badge.routes.test.js', () => {
     test.skip(
       'loads the banner (png)',
       async () => {
-        const res = await fetchResponse(`/apex/tiers/backers.png`);
+        const res = await fetchResponse('/apex/tiers/backers.png');
         expect(res.status).toEqual(200);
       },
       timeout,

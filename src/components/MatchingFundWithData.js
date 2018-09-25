@@ -141,11 +141,11 @@ class MatchingFundWithData extends React.Component {
                 <Member member={member} />
               </div>
               <div className="info">
-                <div className="amount">{`+${formatCurrency(
-                  amounts.totalAmount,
-                  currency,
-                  { precision: 0 },
-                )}`}</div>
+                <div className="amount">
+                  {`+${formatCurrency(amounts.totalAmount, currency, {
+                    precision: 0,
+                  })}`}
+                </div>
                 <div className="description">{MatchingFund.description}</div>
                 <div className="disclaimer">
                   <span>
