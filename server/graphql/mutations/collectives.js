@@ -61,6 +61,7 @@ export async function createCollective(_, args, req) {
     }
   }
 
+  collectiveData.isActive = false;
   if (args.collective.ParentCollectiveId) {
     parentCollective = await req.loaders.collective.findById.load(
       args.collective.ParentCollectiveId,
@@ -75,15 +76,9 @@ export async function createCollective(_, args, req) {
       );
     }
     // The currency of the new created collective if not specified should be the one of its direct parent or the host (in this order)
-    collectiveData.currency =
-      collectiveData.currency || parentCollective.currency;
+    collectiveData.currency = collectiveData.currency || parentCollective.currency;
     collectiveData.HostCollectiveId = parentCollective.HostCollectiveId;
-    if (
-      req.remoteUser.hasRole(
-        [roles.ADMIN, roles.HOST, roles.MEMBER],
-        parentCollective.id,
-      )
-    ) {
+    if (req.remoteUser.hasRole([roles.ADMIN, roles.HOST, roles.MEMBER], parentCollective.id)) {
       collectiveData.isActive = true;
     }
   }
@@ -101,15 +96,10 @@ export async function createCollective(_, args, req) {
         ),
       );
     }
-    collectiveData.currency =
-      collectiveData.currency || hostCollective.currency;
+    collectiveData.currency = collectiveData.currency || hostCollective.currency;
     collectiveData.hostFeePercent = hostCollective.hostFeePercent;
-    collectiveData.isActive = false;
 
-    if (
-      collectiveData.type === 'EVENT' ||
-      req.remoteUser.hasRole([roles.ADMIN, roles.HOST], hostCollective.id)
-    ) {
+    if (collectiveData.type === 'EVENT' || req.remoteUser.hasRole([roles.ADMIN, roles.HOST], hostCollective.id)) {
       collectiveData.isActive = true;
     } else if (!get(hostCollective, 'settings.apply')) {
       throw new errors.Unauthorized({

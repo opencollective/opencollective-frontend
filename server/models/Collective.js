@@ -1305,10 +1305,18 @@ export default function(Sequelize, DataTypes) {
       CollectiveId: this.id,
     };
 
+    let isActive = false;
+    if (creatorUser.isAdmin) {
+      if (this.ParentCollectiveId && creatorUser.isAdmin(this.ParentCollectiveId)) {
+        isActive = true;
+      } else if (creatorUser.isAdmin(hostCollective.id)) {
+        isActive = true;
+      }
+    }
     const updatedValues = {
       HostCollectiveId: hostCollective.id,
       currency: hostCollective.currency,
-      isActive: creatorUser.isAdmin && creatorUser.isAdmin(hostCollective.id),
+      isActive,
     };
 
     const promises = [models.Member.create(member), this.update(updatedValues)];
@@ -1331,7 +1339,9 @@ export default function(Sequelize, DataTypes) {
         });
       }
       if (!updatedValues.isActive) {
-        creatorUser.collective = creatorUser.collective || await creatorUser.getCollective();
+        if (!creatorUser.collective && creatorUser.getCollective) {
+          creatorUser.collective = await creatorUser.getCollective();
+        }
         const data = {
           host: pick(hostCollective, ['id', 'name', 'slug']),
           collective: pick(this, ['id', 'slug', 'name', 'description', 'twitterHandle', 'website', 'tags', 'data']),

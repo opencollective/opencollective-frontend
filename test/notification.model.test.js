@@ -165,6 +165,7 @@ describe('notification.model.test.js', () => {
       });
 
       await expense.createActivity('collective.expense.paid');
+      emailSendMessageSpy.resetHistory();
     });
 
     it('notifies the author of the expense and the admin of host when expense is paid', async () => {

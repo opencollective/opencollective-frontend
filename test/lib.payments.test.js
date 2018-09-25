@@ -103,10 +103,10 @@ describe('lib.payments.test.js', () => {
       .then(t => (order = t)),
   );
   beforeEach('add host to collective', () =>
-    collective.addHost(host.collective),
+    collective.addHost(host.collective, host),
   );
   beforeEach('add host to collective2', () =>
-    collective2.addHost(host.collective),
+    collective2.addHost(host.collective, host),
   );
 
   beforeEach('create stripe account', done => {

@@ -218,7 +218,6 @@ describe('groups.routes.test.js', () => {
         .send({
           api_key: application.api_key,
           group: Object.assign({}, publicGroupData, {
-            isActive: true,
             slug: 'another',
             users: [Object.assign({}, userData, { role: roles.ADMIN })],
           }),
@@ -285,7 +284,6 @@ describe('groups.routes.test.js', () => {
           expect(e).to.not.exist;
           expect(res.body).to.have.property('id', publicCollective.id);
           expect(res.body).to.have.property('name', publicCollective.name);
-          expect(res.body).to.have.property('isActive', true);
           expect(res.body).to.have.property('yearlyIncome');
           expect(res.body).to.have.property('backersCount');
           expect(res.body).to.have.property('related');
@@ -307,7 +305,6 @@ describe('groups.routes.test.js', () => {
           expect(e).to.not.exist;
           expect(res.body).to.have.property('id', publicCollective.id);
           expect(res.body).to.have.property('name', publicCollective.name);
-          expect(res.body).to.have.property('isActive', true);
           done();
         });
     });
