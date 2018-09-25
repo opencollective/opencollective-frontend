@@ -267,6 +267,7 @@ describe('createOrder', () => {
 
     // When the GraphQL query is executed
     let res;
+    emailSendMessageSpy.resetHistory();
     res = await utils.graphqlQuery(createOrderQuery, { order: newOrder });
 
     // Then there should be no errors

@@ -1294,6 +1294,8 @@ export default function(Sequelize, DataTypes) {
       );
     }
 
+    creatorUser = creatorUser || { id: hostCollective.CreatedByUserId };
+
     const member = {
       role: roles.HOST,
       CreatedByUserId: creatorUser
@@ -1303,9 +1305,18 @@ export default function(Sequelize, DataTypes) {
       CollectiveId: this.id,
     };
 
+    let isActive = false;
+    if (creatorUser.isAdmin) {
+      if (this.ParentCollectiveId && creatorUser.isAdmin(this.ParentCollectiveId)) {
+        isActive = true;
+      } else if (creatorUser.isAdmin(hostCollective.id)) {
+        isActive = true;
+      }
+    }
     const updatedValues = {
       HostCollectiveId: hostCollective.id,
       currency: hostCollective.currency,
+      isActive,
     };
 
     const promises = [models.Member.create(member), this.update(updatedValues)];
@@ -1326,6 +1337,24 @@ export default function(Sequelize, DataTypes) {
             promises.push(t.destroy());
           }
         });
+      }
+      if (!updatedValues.isActive) {
+        if (!creatorUser.collective && creatorUser.getCollective) {
+          creatorUser.collective = await creatorUser.getCollective();
+        }
+        const data = {
+          host: pick(hostCollective, ['id', 'name', 'slug']),
+          collective: pick(this, ['id', 'slug', 'name', 'description', 'twitterHandle', 'website', 'tags', 'data']),
+          user: {
+            email: creatorUser.email,
+            collective: pick(creatorUser.collective, ['id', 'slug', 'name', 'website', 'twitterHandle']),
+          },
+        };
+        promises.push(models.Activity.create({
+          CollectiveId: this.id,
+          type: activities.COLLECTIVE_APPLY,
+          data,
+        }));
       }
     }
 
@@ -1368,13 +1397,11 @@ export default function(Sequelize, DataTypes) {
       membership.destroy();
     }
     this.HostCollectiveId = null;
-    this.isActive = false;
+    this.isActive = false; // we should rename isActive to isApproved (by the host)
     if (newHostCollective.id) {
-      if (creatorUser.isAdmin(newHostCollective.id)) {
-        this.update({ isActive: true });
-      }
       return this.addHost(newHostCollective, creatorUser);
     } else {
+      // if we remove the host
       return this.save();
     }
   };

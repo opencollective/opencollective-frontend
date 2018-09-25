@@ -170,6 +170,8 @@ export async function newCollectiveInHost(
   if (user) args['CreatedByUserId'] = user.id;
   const collective = await models.Collective.create(args);
   await collective.addHost(hostCollective);
+  collective.isActive = true;
+  await collective.save();
   if (user) await collective.addUserWithRole(user, 'ADMIN');
   return { collective, [slug]: collective };
 }

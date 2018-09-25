@@ -415,9 +415,7 @@ describe('graphql.collective.test.js', () => {
     }
     `;
 
-    const result = await utils.graphqlQuery(query, {
-      slug: 'brusselstogether',
-    });
+    const result = await utils.graphqlQuery(query, { slug: 'brusselstogether' });
     result.errors && console.error(result.errors);
     expect(result.errors).to.not.exist;
 

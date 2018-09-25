@@ -104,6 +104,10 @@ describe('graphql.comments.test', () => {
     };
   });
 
+  beforeEach(() => {
+    sendEmailSpy.resetHistory();
+  });
+
   describe('create a comment', () => {
     const createCommentQuery = `
     mutation createComment($comment: CommentInputType!) {
@@ -138,7 +142,7 @@ describe('graphql.comments.test', () => {
         '<p>This is the <strong>comment</strong></p>',
       );
       await utils.waitForCondition(() => sendEmailSpy.callCount === 3);
-      // utils.inspectSpy(sendEmailSpy, 2);
+      utils.inspectSpy(sendEmailSpy, 2);
       expect(sendEmailSpy.callCount).to.equal(3);
       expect(sendEmailSpy.firstCall.args[0]).to.equal(user1.email);
       expect(sendEmailSpy.firstCall.args[1]).to.contain(

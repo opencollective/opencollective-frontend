@@ -126,6 +126,7 @@ describe('w9.bot.test.js', () => {
         incurredAt: new Date(),
         collective: { id: collective.id },
       };
+      emailSendMessageSpy.resetHistory();
       const result = await utils.graphqlQuery(
         createExpenseQuery,
         { expense: data },
@@ -181,6 +182,7 @@ describe('w9.bot.test.js', () => {
         data: { W9: { receivedFromUserIds: [user.id] } },
       });
 
+      emailSendMessageSpy.resetHistory();
       // And given the W9 Bot THRESHOLD
       const w9Bot = await models.Collective.findOne({
         where: {
@@ -273,6 +275,7 @@ describe('w9.bot.test.js', () => {
         incurredAt: new Date(),
         collective: { id: collective.id },
       };
+      emailSendMessageSpy.resetHistory();
       const result = await utils.graphqlQuery(
         createExpenseQuery,
         { expense: data },
@@ -377,6 +380,7 @@ describe('w9.bot.test.js', () => {
         incurredAt: new Date(),
         collective: { id: collective.id },
       };
+      emailSendMessageSpy.resetHistory();
       const firstExpense = await utils.graphqlQuery(
         createExpenseQuery,
         { expense: firstExpenseData },
@@ -482,6 +486,7 @@ describe('w9.bot.test.js', () => {
         incurredAt: new Date(),
         collective: { id: collective.id },
       };
+      emailSendMessageSpy.resetHistory();
       const firstExpense = await utils.graphqlQuery(
         createExpenseQuery,
         { expense: firstExpenseData },
@@ -583,6 +588,7 @@ describe('w9.bot.test.js', () => {
       const { user } = await store.newUser('an internet user', {
         paypalEmail: 'testuser@paypal.com',
       });
+      emailSendMessageSpy.resetHistory();
       // And given the W9 Bot information
       const w9Bot = await models.Collective.findOne({
         where: {
@@ -687,6 +693,7 @@ describe('w9.bot.test.js', () => {
       const { user } = await store.newUser('an internet user', {
         paypalEmail: 'testuser@paypal.com',
       });
+      emailSendMessageSpy.resetHistory();
       // And given the W9 Bot information
       const w9Bot = await models.Collective.findOne({
         where: {

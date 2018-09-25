@@ -50,8 +50,8 @@ describe('graphql.tiers.test', () => {
   beforeEach(() =>
     collective1.createTier(utils.data('tier1')).tap(t => (tier1 = t)));
 
-  beforeEach(() => collective1.addHost(host.collective));
-  beforeEach(() => collective2.addHost(host.collective));
+  beforeEach(() => collective1.addHost(host.collective, host));
+  beforeEach(() => collective2.addHost(host.collective, host));
   beforeEach(() => collective2.addUserWithRole(user1, 'ADMIN'));
 
   beforeEach('create stripe account', done => {
