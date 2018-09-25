@@ -11,7 +11,7 @@ describe('Collective model', () => {
     opensourceCollective,
     user1,
     user2,
-    host;
+    hostUser;
   let sandbox, sendEmailSpy;
 
   const collectiveData = {
@@ -35,11 +35,13 @@ describe('Collective model', () => {
 
   const users = [
     {
-      username: 'xdamman',
+      slug: 'xdamman',
+      name: 'Xavier Damman',
       email: 'xdamman@opencollective.com',
     },
     {
-      username: 'piamancini',
+      slug: 'piamancini',
+      name: 'Pia Mancini',
       email: 'pia@opencollective.com',
     },
   ];
@@ -114,7 +116,7 @@ describe('Collective model', () => {
       .then(() => User.createUserWithCollective(users[1]))
       .tap(u => (user2 = u))
       .then(() => User.createUserWithCollective(utils.data('host1')))
-      .tap(u => (host = u))
+      .tap(u => (hostUser = u))
       .then(() => Collective.create(collectiveData))
       .then(g => (collective = g))
       .then(() =>
@@ -153,13 +155,13 @@ describe('Collective model', () => {
       .then(() =>
         Transaction.createManyDoubleEntry([transactions[2]], {
           CollectiveId: opensourceCollective.id,
-          HostCollectiveId: host.CollectiveId,
+          HostCollectiveId: hostUser.CollectiveId,
         }),
       )
       .then(() =>
         Transaction.createManyDoubleEntry(transactions, {
           CollectiveId: collective.id,
-          HostCollectiveId: host.CollectiveId,
+          HostCollectiveId: hostUser.CollectiveId,
         }),
       ),
   );
@@ -217,8 +219,8 @@ describe('Collective model', () => {
 
     before(async () => {
       expect(collective.HostCollectiveId).to.be.null;
-      await collective.addHost(host.collective, host);
-      expect(collective.HostCollectiveId).to.equal(host.CollectiveId);
+      await collective.addHost(hostUser.collective, hostUser);
+      expect(collective.HostCollectiveId).to.equal(hostUser.CollectiveId);
       newHost = await models.Collective.create({
         name: 'BrusselsTogether',
         slug: 'brusselstogether',
@@ -241,7 +243,7 @@ describe('Collective model', () => {
         isActive: false,
         CreatedByUserId: user1.id,
       });
-      await newCollective.addHost(host, user1);
+      await newCollective.addHost(hostUser.collective, user1);
     });
 
     it('fails to add another host', async () => {
@@ -262,7 +264,8 @@ describe('Collective model', () => {
       }
     });
 
-    it('changes host successfully', async () => {
+    it('changes host successfully and sends email notification to host', async () => {
+      await user2.populateRoles();
       const assertCollectiveCurrency = async (collective, currency) => {
         const tiers = await models.Tier.findAll({
           where: { CollectiveId: collective.id },
@@ -273,7 +276,6 @@ describe('Collective model', () => {
           expect(t.currency).to.equal(currency);
         });
       };
-
       await newCollective.changeHost(newHost, user1);
       await assertCollectiveCurrency(newCollective, newHost.currency);
       expect(newCollective.HostCollectiveId).to.equal(newHost.id);
@@ -286,10 +288,14 @@ describe('Collective model', () => {
       expect(membership.MemberCollectiveId).to.equal(newHost.id);
       expect(newCollective.HostCollectiveId).to.equal(newHost.id);
       // moving to a host where the user making the request is not an admin of turns isActive to false
-      await newCollective.changeHost(host.collective, user2);
-      await assertCollectiveCurrency(newCollective, host.collective.currency);
-      expect(newCollective.HostCollectiveId).to.equal(host.id);
+      sendEmailSpy.resetHistory();
+      await newCollective.changeHost(hostUser.collective, user2);
+      await assertCollectiveCurrency(newCollective, hostUser.collective.currency);
+      expect(newCollective.HostCollectiveId).to.equal(hostUser.id);
       expect(newCollective.isActive).to.be.false;
+      await utils.waitForCondition(() => sendEmailSpy.callCount > 0);
+      expect(sendEmailSpy.firstCall.args[1]).to.equal(`New collective would love to be hosted by ${hostUser.collective.name}`);
+      expect(sendEmailSpy.firstCall.args[2]).to.contain(user2.collective.name);
     });
   });
 
@@ -428,7 +434,7 @@ describe('Collective model', () => {
 
   it('get the related collectives', () => {
     const defaultValues = {
-      HostCollectiveId: host.CollectiveId,
+      HostCollectiveId: hostUser.CollectiveId,
       PaymentMethodId: 1,
     };
     return Collective.createMany(utils.data('relatedCollectives'))

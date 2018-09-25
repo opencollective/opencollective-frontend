@@ -1331,13 +1331,19 @@ export default function(Sequelize, DataTypes) {
         });
       }
       if (!updatedValues.isActive) {
+        creatorUser.collective = creatorUser.collective || await creatorUser.getCollective();
+        const data = {
+          host: pick(hostCollective, ['id', 'name', 'slug']),
+          collective: pick(this, ['id', 'slug', 'name', 'description', 'twitterHandle', 'website', 'tags', 'data']),
+          user: {
+            email: creatorUser.email,
+            collective: pick(creatorUser.collective, ['id', 'slug', 'name', 'website', 'twitterHandle']),
+          },
+        };
         promises.push(models.Activity.create({
           CollectiveId: this.id,
           type: activities.COLLECTIVE_APPLY,
-          data: {
-            host: hostCollective.info,
-            collective: this.info,
-          }
+          data,
         }));
       }
     }
