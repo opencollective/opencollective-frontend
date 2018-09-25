@@ -3,7 +3,7 @@ import SearchIcon from './SearchIcon';
 import { fontSize } from 'styled-system';
 import styled from 'styled-components';
 
-const SearchInputContainer = Flex.extend`
+const SearchInputContainer = styled(Flex)`
   border: solid 1px var(--silver-four);
   border-radius: 20px;
 `;
@@ -18,7 +18,7 @@ const SearchInput = styled(Box)`
   }
 `;
 
-const SearchButton = Flex.extend`
+const SearchButton = styled(Flex)`
   && {
     appearance: none;
     background-color: transparent;
