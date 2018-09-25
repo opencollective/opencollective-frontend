@@ -151,122 +151,126 @@ class Expense extends React.Component {
 
     return (
       <div className={`expense ${status} ${this.state.mode}View`}>
-        <style jsx>{`
-          .expense {
-            width: 100%;
-            margin: 0.5em 0;
-            padding: 0.5em;
-            transition: max-height 1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-            overflow: hidden;
-            position: relative;
-            display: flex;
-          }
-          .ExpenseId {
-            color: ${colors.gray};
-            margin-left: 0.5rem;
-          }
-          .expense.detailsView {
-            background-color: #fafafa;
-          }
-          a {
-            cursor: pointer;
-          }
-          .fromCollective {
-            float: left;
-            margin-right: 1rem;
-          }
-          .body {
-            overflow: hidden;
-            font-size: 1.5rem;
-            width: 100%;
-          }
-          .description {
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            overflow: hidden;
-            display: block;
-          }
-          .meta {
-            color: #919599;
-            font-size: 1.2rem;
-          }
-          .meta .metaItem {
-            margin: 0 0.2rem;
-          }
-          .meta .collective {
-            margin-right: 0.2rem;
-          }
-          .amount .balance {
-            font-size: 1.2rem;
-            color: #919599;
-          }
-          .amount {
-            width: 10rem;
-            margin-left: 0.5rem;
-            text-align: right;
-            font-family: montserratlight, arial;
-            font-size: 1.5rem;
-            font-weight: 300;
-          }
-          .rejected .status {
-            color: #e21a60;
-          }
-          .approved .status {
-            color: #72ce00;
-          }
-
-          .status {
-            text-transform: uppercase;
-          }
-
-          .actions > div {
-            align-items: flex-end;
-            display: flex;
-            flex-wrap: wrap;
-            margin: 0.5rem 0;
-          }
-
-          .actions .leftColumn {
-            width: 72px;
-            margin-right: 1rem;
-            float: left;
-          }
-
-          .expenseActions :global(> div) {
-            margin-right: 0.5rem;
-          }
-
-          @media (max-width: 600px) {
+        <style jsx>
+          {`
             .expense {
-              max-height: 50rem;
-              padding: 2rem 0.5rem;
+              width: 100%;
+              margin: 0.5em 0;
+              padding: 0.5em;
+              transition: max-height 1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+              overflow: hidden;
+              position: relative;
+              display: flex;
+            }
+            .ExpenseId {
+              color: ${colors.gray};
+              margin-left: 0.5rem;
             }
             .expense.detailsView {
-              max-height: 45rem;
+              background-color: #fafafa;
             }
-            .details {
-              max-height: 30rem;
+            a {
+              cursor: pointer;
             }
-          }
-        `}</style>
-        <style jsx global>{`
-          .expense .actions > div > div {
-            margin-right: 0.5rem;
-          }
-
-          @media screen and (max-width: 700px) {
-            .expense .PayExpenseBtn ~ .RejectExpenseBtn {
-              flex-grow: 1;
+            .fromCollective {
+              float: left;
+              margin-right: 1rem;
             }
-            .expense .SmallButton {
-              flex-grow: 1;
-              margin-top: 1rem;
-            }
-            .expense .SmallButton button {
+            .body {
+              overflow: hidden;
+              font-size: 1.5rem;
               width: 100%;
             }
-          }
-        `}</style>
+            .description {
+              text-overflow: ellipsis;
+              white-space: nowrap;
+              overflow: hidden;
+              display: block;
+            }
+            .meta {
+              color: #919599;
+              font-size: 1.2rem;
+            }
+            .meta .metaItem {
+              margin: 0 0.2rem;
+            }
+            .meta .collective {
+              margin-right: 0.2rem;
+            }
+            .amount .balance {
+              font-size: 1.2rem;
+              color: #919599;
+            }
+            .amount {
+              width: 10rem;
+              margin-left: 0.5rem;
+              text-align: right;
+              font-family: montserratlight, arial;
+              font-size: 1.5rem;
+              font-weight: 300;
+            }
+            .rejected .status {
+              color: #e21a60;
+            }
+            .approved .status {
+              color: #72ce00;
+            }
+
+            .status {
+              text-transform: uppercase;
+            }
+
+            .actions > div {
+              align-items: flex-end;
+              display: flex;
+              flex-wrap: wrap;
+              margin: 0.5rem 0;
+            }
+
+            .actions .leftColumn {
+              width: 72px;
+              margin-right: 1rem;
+              float: left;
+            }
+
+            .expenseActions :global(> div) {
+              margin-right: 0.5rem;
+            }
+
+            @media (max-width: 600px) {
+              .expense {
+                max-height: 50rem;
+                padding: 2rem 0.5rem;
+              }
+              .expense.detailsView {
+                max-height: 45rem;
+              }
+              .details {
+                max-height: 30rem;
+              }
+            }
+          `}
+        </style>
+        <style jsx global>
+          {`
+            .expense .actions > div > div {
+              margin-right: 0.5rem;
+            }
+
+            @media screen and (max-width: 700px) {
+              .expense .PayExpenseBtn ~ .RejectExpenseBtn {
+                flex-grow: 1;
+              }
+              .expense .SmallButton {
+                flex-grow: 1;
+                margin-top: 1rem;
+              }
+              .expense .SmallButton button {
+                width: 100%;
+              }
+            }
+          `}
+        </style>
         <div className="fromCollective">
           <a
             href={`/${expense.fromCollective.slug}`}

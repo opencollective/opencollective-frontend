@@ -72,24 +72,26 @@ class InputTypeCreditCard extends React.Component {
 
     return (
       <div className="CreditCardForm">
-        <style jsx>{`
-          .CreditCardForm {
-            max-width: 350px;
-            margin: 0;
-            border: 1px solid #ccc;
-            padding: 1rem;
-            max-height: 55px;
-            border-radius: 3px;
-          }
-          .oneline {
-            display: flex;
-            flex-direction: row;
-            margin-top: 0.5rem;
-          }
-          :global(.creditcardSelector) {
-            margin-bottom: 2rem;
-          }
-        `}</style>
+        <style jsx>
+          {`
+            .CreditCardForm {
+              max-width: 350px;
+              margin: 0;
+              border: 1px solid #ccc;
+              padding: 1rem;
+              max-height: 55px;
+              border-radius: 3px;
+            }
+            .oneline {
+              display: flex;
+              flex-direction: row;
+              margin-top: 0.5rem;
+            }
+            :global(.creditcardSelector) {
+              margin-bottom: 2rem;
+            }
+          `}
+        </style>
 
         {options.length > 0 && (
           <FormControl

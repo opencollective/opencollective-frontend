@@ -261,44 +261,48 @@ class PaymentMethodChooser extends React.Component {
 
     return (
       <div className="PaymentMethodChooser">
-        <style jsx global>{`
-          .PaymentMethodChooser .form-group .control-label {
-            display: none;
-          }
-          .PaymentMethodChooser .form-control {
-            font-size: 11px;
-          }
+        <style jsx global>
+          {`
+            .PaymentMethodChooser .form-group .control-label {
+              display: none;
+            }
+            .PaymentMethodChooser .form-control {
+              font-size: 11px;
+            }
 
-          .PaymentMethodChooser .horizontal.form-group {
-            overflow: hidden;
-          }
+            .PaymentMethodChooser .horizontal.form-group {
+              overflow: hidden;
+            }
 
-          .PaymentMethodChooser .horizontal.creditcard {
-            overflow: hidden;
-          }
+            .PaymentMethodChooser .horizontal.creditcard {
+              overflow: hidden;
+            }
 
-          .PaymentMethodChooser .CreditCardForm {
-            padding-top: 0.5rem;
-          }
+            .PaymentMethodChooser .CreditCardForm {
+              padding-top: 0.5rem;
+            }
 
-          .PaymentMethodChooser #card-errors {
-            font-size: ${fontSize};
-          }
+            .PaymentMethodChooser #card-errors {
+              font-size: ${fontSize};
+            }
 
-          .PaymentMethodChooser .col-sm-10 {
-            width: 100%;
-          }
-        `}</style>
-        <style jsx>{`
-          .actions {
-            display: flex;
-            flex-direction: row;
-            width: 200px;
-            justify-content: space-evenly;
-            margin: auto;
-            margin-top: 6px;
-          }
-        `}</style>
+            .PaymentMethodChooser .col-sm-10 {
+              width: 100%;
+            }
+          `}
+        </style>
+        <style jsx>
+          {`
+            .actions {
+              display: flex;
+              flex-direction: row;
+              width: 200px;
+              justify-content: space-evenly;
+              margin: auto;
+              margin-top: 6px;
+            }
+          `}
+        </style>
 
         {!this.props.editMode && (
           <div className="paymentmethod-info">

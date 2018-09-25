@@ -223,9 +223,11 @@ class OrderCreated extends React.Component {
                       href={`https://opencollective.com${
                         collective.path
                       }?referral=${fromCollective.id}`}
-                    >{`https://opencollective.com${collective.path}?referral=${
-                      fromCollective.id
-                    }`}</a>
+                    >
+                      {`https://opencollective.com${collective.path}?referral=${
+                        fromCollective.id
+                      }`}
+                    </a>
                   </div>
                   {type === 'COLLECTIVE' && (
                     <FormattedMessage

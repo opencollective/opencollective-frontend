@@ -51,7 +51,10 @@ class RedeemedPage extends React.Component {
   }) {
     return {
       amount: amount && Number(amount),
-      name: sanitizeHtml(name || '', { allowedTags: [], allowedAttributes: [] }),
+      name: sanitizeHtml(name || '', {
+        allowedTags: [],
+        allowedAttributes: [],
+      }),
       emitterSlug: sanitizeHtml(emitterSlug, {
         allowedTags: [],
         allowedAttributes: [],
@@ -154,7 +157,11 @@ class RedeemedPage extends React.Component {
                 <FormattedMessage
                   id="redeemed.backyourstack"
                   defaultMessage="or discover the open source projects that your organization is depending on and that need funding on {link}"
-                  values={{ link: <a href="https://backyourstack.com">BackYourStack.com</a> }}
+                  values={{
+                    link: (
+                      <a href="https://backyourstack.com">BackYourStack.com</a>
+                    ),
+                  }}
                 />
               </P>
             </Box>
