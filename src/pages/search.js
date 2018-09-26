@@ -45,7 +45,7 @@ const SearchButton = styled(Button).attrs({
   }
 `;
 
-const Container = Box.extend`
+const Container = styled(Box)`
   max-width: 1200px;
 `;
 
