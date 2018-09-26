@@ -36,7 +36,7 @@ export default class IntlDocument extends Document {
       STRIPE_KEY: process.env.STRIPE_KEY || 'pk_test_5aBB887rPuzvWzbdRiSzV3QB',
       GOOGLE_MAPS_API_KEY:
         process.env.GOOGLE_MAPS_API_KEY ||
-        'AIzaSyCRLIexl7EkMQk_0_yNsjO4Vqb_MccD',
+        'AIzaSyCRLIexl7EkMQk_0_yNsjO4Vqb_MccD-RI',
     };
   }
 

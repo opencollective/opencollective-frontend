@@ -13,7 +13,8 @@ import withLoggedInUser from '../lib/withLoggedInUser';
 
 class CreateCollectivePage extends React.Component {
   static getInitialProps({ query: { hostCollectiveSlug } }) {
-    return { slug: hostCollectiveSlug };
+    const scripts = { googleMaps: true }; // Used in <InputTypeLocation>
+    return { slug: hostCollectiveSlug, scripts };
   }
 
   static propTypes = {
