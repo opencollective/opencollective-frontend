@@ -541,6 +541,7 @@ export function resizeImage(imageUrl, { width, height, query, defaultImage }) {
 
 export function formatArrayToString(arr, conjonction = 'and') {
   if (arr.length === 1) return arr[0];
+  if (!arr.slice) return '';
   return `${arr.slice(0, arr.length - 1).join(', ')} ${conjonction} ${arr.slice(
     -1,
   )}`;

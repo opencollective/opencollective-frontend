@@ -14,8 +14,8 @@ const ORDER_TOTAL_AMOUNT = 5000;
 const STRIPE_FEE_STUBBED_VALUE = 300;
 
 const createPaymentMethodQuery = `
-  mutation createPaymentMethod($amount: Int!, $CollectiveId: Int!, $PaymentMethodId: Int, $description: String, $expiryDate: String, $type: String!, $currency: String!, $limitedToTags: [String]) {
-    createPaymentMethod(amount: $amount, CollectiveId: $CollectiveId, PaymentMethodId: $PaymentMethodId, description: $description, expiryDate: $expiryDate, type:  $type, currency: $currency, limitedToTags: $limitedToTags) {
+  mutation createPaymentMethod($amount: Int!, $CollectiveId: Int!, $PaymentMethodId: Int, $description: String, $expiryDate: String, $type: String!, $currency: String!, $limitedToTags: [String], $limitedToCollectiveIds: [Int], $limitedToHostCollectiveIds: [Int]) {
+    createPaymentMethod(amount: $amount, CollectiveId: $CollectiveId, PaymentMethodId: $PaymentMethodId, description: $description, expiryDate: $expiryDate, type:  $type, currency: $currency, limitedToTags: $limitedToTags, limitedToCollectiveIds: $limitedToCollectiveIds, limitedToHostCollectiveIds: $limitedToHostCollectiveIds) {
       id
     }
   }
@@ -561,6 +561,7 @@ describe('opencollective.virtualcard', () => {
 
     describe('#processOrder', async () => {
       let host1,
+        host2,
         collective1,
         collective2,
         virtualCardPaymentMethod,
@@ -575,8 +576,19 @@ describe('opencollective.virtualcard', () => {
         // Create stripe connected account to host
         return store.stripeConnectedAccount(host1.id);
       }));
-      before('create collective1', () => models.Collective.create({ name: 'collective1', currency: 'USD', HostCollectiveId: host1.id, isActive: true }).then(c => collective1 = c));
-      before('create collective2', () => models.Collective.create({ name: 'collective2', currency: 'USD', HostCollectiveId: host1.id, isActive: true }).then(c => collective2 = c));
+      before('create Host 2(USD)', () => models.Collective.create({ name: 'Host 2', currency: 'USD', isActive: true }).then(c => {
+        host2 = c;
+        // Create stripe connected account to host
+        return store.stripeConnectedAccount(host2.id);
+      }));
+      before('create collective1', () => models.Collective.create({ name: 'collective1', currency: 'USD', isActive: true, tags: ['open source'] }).then(c => collective1 = c));
+      before('create collective2', () => models.Collective.create({ name: 'collective2', currency: 'USD', isActive: true, tags: ['meetup'] }).then(c => collective2 = c));
+      before('add hosts', async () => {
+        await collective1.addHost(host1);
+        await collective1.update({ isActive: true });
+        await collective2.addHost(host2);
+        await collective2.update({ isActive: true });
+      });
       before('creates User 1', () => models.User.createUserWithCollective({ name: 'User 1' }).then(u => user1 = u));
       before('user1 to become Admin of collective1', () => models.Member.create({
         CreatedByUserId: user1.id,
@@ -598,6 +610,8 @@ describe('opencollective.virtualcard', () => {
         CollectiveId: collective1.id,
         amount: 10000,
         currency: 'USD',
+        limitedToHostCollectiveIds: [host1.id],
+        limitedToTags: ['open source'],
       }).then(pm => virtualCardPaymentMethod = pm));
 
       before('new user claims a virtual card', () => virtualcard.claim({
@@ -617,7 +631,7 @@ describe('opencollective.virtualcard', () => {
         // Setting up order
         const order = {
           fromCollective: { id: userVirtualCard.CollectiveId },
-          collective: { id: collective2.id },
+          collective: { id: collective1.id },
           paymentMethod: { uuid: virtualCardPaymentMethod.uuid },
           totalAmount: 1000000,
         };
@@ -629,16 +643,53 @@ describe('opencollective.virtualcard', () => {
         );
         expect(gqlResult.errors).to.not.be.empty;
         expect(gqlResult.errors[0]).to.exist;
-        expect(gqlResult.errors[0].toString()).to.contain(
-          "You don't have enough funds available",
-        );
+        expect(gqlResult.errors[0].toString()).to.contain("You don't have enough funds available");
       }); /** End Of "Order should NOT be executed because its amount exceeds the balance of the virtual card" */
+
+      it('Order should NOT be executed because the virtual card is limited to be used on collectives with tag open source', async () => {
+        // Setting up order
+        const order = {
+          fromCollective: { id: userVirtualCard.CollectiveId },
+          collective: { id: collective2.id },
+          paymentMethod: { uuid: virtualCardPaymentMethod.uuid },
+          totalAmount: 1000,
+        };
+        // Executing queries
+        const gqlResult = await utils.graphqlQuery(
+          createOrderQuery,
+          { order },
+          userVirtualCard,
+        );
+        expect(gqlResult.errors).to.not.be.empty;
+        expect(gqlResult.errors[0]).to.exist;
+        expect(gqlResult.errors[0].toString()).to.contain('This payment method can only be used for collectives in open source');
+      });
+
+      it('Order should NOT be executed because the virtual card is limited to be used on another host', async () => {
+        // Setting up order
+        await virtualCardPaymentMethod.update({ limitedToTags: null });
+        const order = {
+          fromCollective: { id: userVirtualCard.CollectiveId },
+          collective: { id: collective2.id },
+          paymentMethod: { uuid: virtualCardPaymentMethod.uuid },
+          totalAmount: 1000,
+        };
+        // Executing queries
+        const gqlResult = await utils.graphqlQuery(
+          createOrderQuery,
+          { order },
+          userVirtualCard,
+        );
+        expect(gqlResult.errors).to.not.be.empty;
+        expect(gqlResult.errors[0]).to.exist;
+        expect(gqlResult.errors[0].toString()).to.contain('This payment method can only be used for collectives hosted by Host 1');
+      });
 
       it('Process order of a virtual card', async () => {
         // Setting up order
         const order = {
           fromCollective: { id: userVirtualCard.CollectiveId },
-          collective: { id: collective2.id },
+          collective: { id: collective1.id },
           paymentMethod: { uuid: virtualCardPaymentMethod.uuid },
           totalAmount: ORDER_TOTAL_AMOUNT,
         };
@@ -668,7 +719,7 @@ describe('opencollective.virtualcard', () => {
         expect(creditTransaction.FromCollectiveId).to.be.equal(
           userVirtualCard.CollectiveId,
         );
-        expect(creditTransaction.CollectiveId).to.be.equal(collective2.id);
+        expect(creditTransaction.CollectiveId).to.be.equal(collective1.id);
         expect(creditTransaction.amount).to.be.equal(ORDER_TOTAL_AMOUNT);
         expect(creditTransaction.amountInHostCurrency).to.be.equal(
           ORDER_TOTAL_AMOUNT,
@@ -688,7 +739,7 @@ describe('opencollective.virtualcard', () => {
         // Setting up order
         const order = {
           fromCollective: { id: userVirtualCard.CollectiveId },
-          collective: { id: collective2.id },
+          collective: { id: collective1.id },
           paymentMethod: { uuid: virtualCardPaymentMethod.uuid },
           totalAmount: ORDER_TOTAL_AMOUNT,
         };
@@ -781,6 +832,8 @@ describe('opencollective.virtualcard', () => {
           CollectiveId: collective1.id,
           amount: 10000,
           currency: 'USD',
+          limitedToTags: ['open source', 'diversity in tech'],
+          limitedToHostCollectiveIds: [1],
         };
         return request(app)
           .post('/v1/payment-methods')
@@ -793,6 +846,8 @@ describe('opencollective.virtualcard', () => {
             expect(res.body).to.exist;
             const paymentMethod = res.body;
             expect(paymentMethod.CollectiveId).to.be.equal(collective1.id);
+            expect(paymentMethod.limitedToTags[0]).to.be.equal(args.limitedToTags[0]);
+            expect(paymentMethod.limitedToHostCollectiveIds[0]).to.be.equal(args.limitedToHostCollectiveIds[0]);
             expect(paymentMethod.balance).to.be.equal(args.amount);
           });
       });
