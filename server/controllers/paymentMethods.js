@@ -6,8 +6,30 @@ import * as utils from '../graphql/utils';
 const { PaymentMethod } = models;
 
 const createPaymentMethodQuery = `
-  mutation createPaymentMethod($amount: Int!, $CollectiveId: Int!, $PaymentMethodId: Int, $description: String, $expiryDate: String, $type: String!, $currency: String!, $limitedToTags: [String]) {
-    createPaymentMethod(amount: $amount, CollectiveId: $CollectiveId, PaymentMethodId: $PaymentMethodId, description: $description, expiryDate: $expiryDate, type: $type, currency: $currency, limitedToTags: $limitedToTags) {
+  mutation createPaymentMethod(
+    $amount: Int!,
+    $CollectiveId: Int!,
+    $PaymentMethodId: Int,
+    $description: String,
+    $expiryDate: String,
+    $type: String!,
+    $currency: String!,
+    $limitedToTags: [String],
+    $limitedToCollectiveIds: [Int],
+    $limitedToHostCollectiveIds: [Int]
+    ) {
+    createPaymentMethod(
+      amount: $amount,
+      CollectiveId: $CollectiveId,
+      PaymentMethodId: $PaymentMethodId,
+      description: $description,
+      expiryDate: $expiryDate,
+      type: $type,
+      currency: $currency,
+      limitedToTags: $limitedToTags,
+      limitedToCollectiveIds: $limitedToCollectiveIds,
+      limitedToHostCollectiveIds: $limitedToHostCollectiveIds
+      ) {
       id
       name
       uuid
@@ -18,6 +40,9 @@ const createPaymentMethodQuery = `
       initialBalance
       expiryDate
       currency
+      limitedToTags
+      limitedToCollectiveIds
+      limitedToHostCollectiveIds
     }
   }
 `;
@@ -61,6 +86,8 @@ async function createVirtualCardThroughGraphQL(args, user) {
     balance: paymentMethod.initialBalance,
     currency: paymentMethod.currency,
     limitedToTags: paymentMethod.limitedToTags,
+    limitedToCollectiveIds: paymentMethod.limitedToCollectiveIds,
+    limitedToHostCollectiveIds: paymentMethod.limitedToHostCollectiveIds,
     code: paymentMethod.uuid.substring(0, 8),
     expiryDate: moment(paymentMethod.expiryDate).format(),
     redeemUrl: `${
@@ -82,6 +109,8 @@ export function createVirtualCard(req, res) {
     'currency',
     'expiryDate',
     'limitedToTags',
+    'limitedToCollectiveIds',
+    'limitedToHostCollectiveIds',
   ]);
   args.type = args.type || 'virtualcard';
 
@@ -90,6 +119,7 @@ export function createVirtualCard(req, res) {
       res.send(response);
     })
     .catch(error => {
+      console.error(error);
       res.status(400).send({ error: error.toString() });
     });
 }

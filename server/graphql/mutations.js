@@ -390,6 +390,14 @@ const mutations = {
         type: new GraphQLList(GraphQLString),
         description: 'Limit this payment method to make donations to collectives having those tags',
       },
+      limitedToCollectiveIds: {
+        type: new GraphQLList(GraphQLInt),
+        description: 'Limit this payment method to make donations to those collectives',
+      },
+      limitedToHostCollectiveIds: {
+        type: new GraphQLList(GraphQLInt),
+        description: 'Limit this payment method to make donations to the collectives hosted by those hosts',
+      },
       CollectiveId: { type: new GraphQLNonNull(GraphQLInt) },
       PaymentMethodId: { type: GraphQLInt },
       description: { type: GraphQLString },

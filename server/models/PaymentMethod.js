@@ -1,12 +1,13 @@
 /** @module models/PaymentMethod */
 
 import libdebug from 'debug';
+import Promise from 'bluebird';
 import { get, intersection } from 'lodash';
 
 import { TransactionTypes } from '../constants/transactions';
 
 import { sumTransactions } from '../lib/hostlib';
-import { formatCurrency } from '../lib/utils';
+import { formatCurrency, formatArrayToString } from '../lib/utils';
 import { getFxRate } from '../lib/currency';
 
 import CustomDataTypes from './DataTypes';
@@ -136,6 +137,12 @@ export default function(Sequelize, DataTypes) {
           'if not null, this payment method can only be used for collectives listed by their id',
       },
 
+      limitedToHostCollectiveIds: {
+        type: DataTypes.ARRAY(DataTypes.INTEGER),
+        description:
+          'if not null, this payment method can only be used for collectives hosted by these collective ids',
+      },
+
       SourcePaymentMethodId: {
         type: DataTypes.INTEGER,
         references: {
@@ -243,6 +250,37 @@ export default function(Sequelize, DataTypes) {
 
     if (order.interval && !get(this.features, 'recurring')) {
       throw new Error(`This ${name} doesn't support recurring payments`);
+    }
+
+    if (this.limitedToTags) {
+      const collective = order.collective || await order.getCollective();
+      if (intersection(collective.tags, this.limitedToTags).length === 0) {
+        throw new Error(`This payment method can only be used for collectives in ${formatArrayToString(this.limitedToTags)}`);
+      }
+    }
+
+    // quick helper to get the name of a collective given its id to format better error messages
+    const fetchCollectiveName = (CollectiveId) => {
+      return CollectiveId && models.Collective.findOne({
+        attributes: ['name'],
+        where: { id: CollectiveId },
+      }).then(r => r && r.name);
+    };
+
+    if (this.limitedToCollectiveIds) {
+      const collective = order.collective || await order.getCollective();
+      if (!this.limitedToCollectiveIds.includes(collective.HostCollectiveId)) {
+        const collectives = await Promise.map(this.limitedToCollectiveIds, fetchCollectiveName);
+        throw new Error(`This payment method can only be used for the following collectives ${formatArrayToString(collectives)}`);
+      }
+    }
+
+    if (this.limitedToHostCollectiveIds) {
+      const collective = order.collective || await order.getCollective();
+      if (!this.limitedToHostCollectiveIds.includes(collective.HostCollectiveId)) {
+        const hostCollectives = await Promise.map(this.limitedToHostCollectiveIds, fetchCollectiveName);
+        throw new Error(`This payment method can only be used for collectives hosted by ${formatArrayToString(hostCollectives)}`);
+      }
     }
 
     // If there is no `this.CollectiveId`, it means that the user doesn't want to save this payment method to any collective

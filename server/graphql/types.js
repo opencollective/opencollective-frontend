@@ -1394,6 +1394,12 @@ export const PaymentMethodType = new GraphQLObjectType({
           return paymentMethod.limitedToCollectiveIds;
         },
       },
+      limitedToHostCollectiveIds: {
+        type: new GraphQLList(GraphQLInt),
+        resolve(paymentMethod) {
+          return paymentMethod.limitedToHostCollectiveIds;
+        },
+      },
       orders: {
         type: new GraphQLList(OrderType),
         args: {
