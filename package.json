@@ -3,7 +3,7 @@
   "version": "2.2.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/opencollective/frontend.git"
+    "url": "https://github.com/opencollective/opencollective-frontend.git"
   },
   "private": true,
   "engines": {
