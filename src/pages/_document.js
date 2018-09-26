@@ -41,40 +41,11 @@ export default class IntlDocument extends Document {
   }
 
   render() {
-    const scriptsUrls = {
-    };
-
-    const scripts = [];
-    const pathname = this.props.__NEXT_DATA__.pathname;
-
-    const page =
-      pathname.indexOf('/') !== -1
-        ? pathname.substr(pathname.lastIndexOf('/') + 1)
-        : pathname;
-
-    const noScriptPages = [
-      'nametags',
-      'events',
-      'events-iframe',
-      'collectives-iframe',
-      'about',
-      'tos',
-      'privacypolicy',
-      'widgets',
-    ];
-    if (noScriptPages.indexOf(page) === -1) {
-      const requiredScripts = Object.keys(scriptsUrls);
-      requiredScripts.forEach(script => scripts.push(scriptsUrls[script]));
-    }
-
     return (
       <html>
         <Head>{this.props.styleTags}</Head>
         <body>
           <Main />
-          {scripts.map(script => (
-            <script key={script} type="text/javascript" src={script} />
-          ))}
           <script
             dangerouslySetInnerHTML={{
               __html: this.props.localeDataScript,
