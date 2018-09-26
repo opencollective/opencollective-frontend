@@ -22,6 +22,7 @@ import {
   PaymentMethodType,
   ConnectedAccountType,
   ExpenseType,
+  OrderStatusType,
 } from './types';
 
 import {
@@ -585,7 +586,12 @@ export const CollectiveInterfaceType = new GraphQLInterfaceType({
           slug: { type: GraphQLString },
         },
       },
-      orders: { type: new GraphQLList(OrderType) },
+      orders: {
+        type: new GraphQLList(OrderType),
+        args: {
+          status: { type: OrderStatusType },
+        },
+      },
       ordersFromCollective: {
         type: new GraphQLList(OrderType),
         args: {
@@ -1012,10 +1018,18 @@ const CollectiveFields = () => {
     },
     orders: {
       type: new GraphQLList(OrderType),
-      resolve(collective) {
+      args: {
+        status: { type: OrderStatusType },
+      },
+      resolve(collective, args = {}) {
         return collective.getIncomingOrders({
-          where: { processedAt: { [Op.ne]: null } },
-          order: [['createdAt', 'DESC']],
+          where: {
+            [Op.or]: [
+              { processedAt: { [Op.ne]: null } },
+              args,
+            ],
+          },
+          order: [ ['createdAt', 'DESC'] ]
         });
       },
     },
