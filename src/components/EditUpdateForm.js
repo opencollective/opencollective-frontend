@@ -1,13 +1,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import withIntl from '../lib/withIntl';
+import dynamic from 'next/dynamic';
 import { defineMessages, FormattedMessage } from 'react-intl';
-import InputField from './InputField';
-import HTMLEditor from './HTMLEditor';
-import MarkdownEditor from './MarkdownEditor';
-import Button from './Button';
 import { pick, get } from 'lodash';
+
+import InputField from './InputField';
+import Button from './Button';
+
 import storage from '../lib/storage';
+import withIntl from '../lib/withIntl';
+
+const HTMLEditor = dynamic(import('./HTMLEditor'));
+const MarkdownEditor = dynamic(import('./MarkdownEditor'));
 
 class EditUpdateForm extends React.Component {
   static propTypes = {

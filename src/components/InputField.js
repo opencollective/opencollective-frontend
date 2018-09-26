@@ -1,14 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { get } from 'lodash';
-import { capitalize } from '../lib/utils';
+import dynamic from 'next/dynamic';
 import DateTime from 'react-datetime';
-import stylesheet from '../styles/react-datetime.css';
 import moment from 'moment-timezone';
-import InputTypeDropzone from './InputTypeDropzone';
-import InputTypeLocation from './InputTypeLocation';
-import InputTypeCreditCard from './InputTypeCreditCard';
-import InputTypeTags from './InputTypeTags';
+import { get } from 'lodash';
 import {
   Col,
   HelpBlock,
@@ -19,8 +14,18 @@ import {
   Checkbox,
 } from 'react-bootstrap';
 import Switch from '@material-ui/core/Switch';
-import MarkdownEditor from './MarkdownEditor';
-import HTMLEditor from './HTMLEditor';
+
+import InputTypeDropzone from './InputTypeDropzone';
+import InputTypeLocation from './InputTypeLocation';
+import InputTypeCreditCard from './InputTypeCreditCard';
+import InputTypeTags from './InputTypeTags';
+
+import { capitalize } from '../lib/utils';
+
+import stylesheet from '../styles/react-datetime.css';
+
+const HTMLEditor = dynamic(import('./HTMLEditor'));
+const MarkdownEditor = dynamic(import('./MarkdownEditor'));
 
 function FieldGroup({
   controlId,
