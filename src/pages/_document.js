@@ -45,7 +45,6 @@ export default class IntlDocument extends Document {
       }`,
       google:
         'https://maps.googleapis.com/maps/api/js?key=AIzaSyCRLIexl7EkMQk_0_yNsjO4Vqb_MccD-RI&libraries=places',
-      paypalCheckout: 'https://www.paypalobjects.com/api/checkout.js',
     };
 
     const scripts = [];
