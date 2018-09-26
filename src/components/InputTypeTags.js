@@ -3,7 +3,8 @@ import PropTypes from 'prop-types';
 import withIntl from '../lib/withIntl';
 import { defineMessages } from 'react-intl';
 import { WithContext as ReactTags } from 'react-tag-input';
-import stylesheet from '../styles/react-tags.css';
+
+import '../styles/react-tags.css';
 
 const KeyCodes = {
   comma: 188,
@@ -68,7 +69,6 @@ class InputTypeTags extends React.Component {
     const { tags, suggestions } = this.state;
     return (
       <div>
-        <style dangerouslySetInnerHTML={{ __html: stylesheet }} />
         <ReactTags
           tags={tags}
           suggestions={suggestions}
