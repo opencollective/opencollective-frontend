@@ -34,13 +34,14 @@ export default class IntlDocument extends Document {
       IMAGES_URL: process.env.IMAGES_URL || '',
       PAYPAL_ENVIRONMENT: process.env.PAYPAL_ENVIRONMENT || 'sandbox',
       STRIPE_KEY: process.env.STRIPE_KEY || 'pk_test_5aBB887rPuzvWzbdRiSzV3QB',
+      GOOGLE_MAPS_API_KEY:
+        process.env.GOOGLE_MAPS_API_KEY ||
+        'AIzaSyCRLIexl7EkMQk_0_yNsjO4Vqb_MccD',
     };
   }
 
   render() {
     const scriptsUrls = {
-      google:
-        'https://maps.googleapis.com/maps/api/js?key=AIzaSyCRLIexl7EkMQk_0_yNsjO4Vqb_MccD-RI&libraries=places',
     };
 
     const scripts = [];
