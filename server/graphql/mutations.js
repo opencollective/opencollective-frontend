@@ -1,4 +1,5 @@
 import {
+  claimCollective,
   createCollective,
   editCollective,
   deleteCollective,
@@ -97,6 +98,15 @@ const mutations = {
     resolve(_, args, req) {
       return deleteCollective(_, args, req);
     },
+  },
+  claimCollective: {
+    type: CollectiveInterfaceType,
+    args: {
+      id: { type: new GraphQLNonNull(GraphQLInt) },
+    },
+    resolve(...args) {
+      return claimCollective(...args);
+    }
   },
   approveCollective: {
     type: CollectiveInterfaceType,
