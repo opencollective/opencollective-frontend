@@ -89,8 +89,9 @@
   "scripts": {
     "start": "node build/server",
     "dev": "babel-node src/server",
-    "build": "npm run build:server && npm run build:next",
-    "build:server": "babel --copy-files ./src --out-dir ./build --ignore src/templates/widget.js,src/**/__tests__/*",
+    "build": "npm run build:clean && npm run build:server && npm run build:next",
+    "build:clean": "rm -rf build",
+    "build:server": "babel --copy-files ./src --out-dir ./build --ignore src/templates/widget.js,src/**/__tests__/*,src/.next/*",
     "build:next": "next build build",
     "test": "npm run test:src && npm run test:e2e",
     "test:src": "TZ=UTC jest src/*",
