@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { get } from 'lodash';
 
 import Header from '../components/Header';
 import Body from '../components/Body';
@@ -11,13 +12,21 @@ import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
 import withLoggedInUser from '../lib/withLoggedInUser';
 
+import staticPages from './static';
+
+const getContent = (path, pageSlug) => {
+  if (path) {
+    return get(staticPages, [path, pageSlug || 'index']);
+  } else {
+    return get(staticPages, pageSlug);
+  }
+};
+
 class StaticPage extends React.Component {
   static async getInitialProps(props) {
     const { path, pageSlug } = props.query;
-    const filepath = `./static/${path || ''}/${pageSlug || 'index'}.md`
-      .toLowerCase()
-      .replace('//', '/');
-    let content = await require(`${filepath}`);
+
+    let content = getContent(path, pageSlug);
 
     // we rewrite the links to be relative to root /
     if (path === 'faq') {
