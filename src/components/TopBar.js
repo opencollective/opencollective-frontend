@@ -72,7 +72,7 @@ class TopBar extends React.Component {
         flexDirection="row"
         justifyContent="space-around"
       >
-        <Link href="/">
+        <Link route="home" passHref>
           <Flex is="a" alignItems="center">
             <Logo width="24" height="24" animate={shouldAnimate} />
             <Hide xs>

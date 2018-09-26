@@ -580,6 +580,7 @@ exports[`Search Page renders empty results message 1`] = `
     >
       <a
         className="c3 c2"
+        href="/"
         onClick={[Function]}
       >
         <img
@@ -1882,6 +1883,7 @@ exports[`Search Page renders error message 1`] = `
     >
       <a
         className="c3 c2"
+        href="/"
         onClick={[Function]}
       >
         <img
@@ -3236,6 +3238,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
     >
       <a
         className="c3 c2"
+        href="/"
         onClick={[Function]}
       >
         <img
@@ -4730,6 +4733,7 @@ exports[`Search Page renders search results with pagination 1`] = `
     >
       <a
         className="c3 c2"
+        href="/"
         onClick={[Function]}
       >
         <img

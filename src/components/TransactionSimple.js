@@ -7,6 +7,8 @@ import Avatar from './Avatar';
 import Container from './Container';
 import { P, Span } from './Text';
 
+import { Link } from '../server/pages';
+
 const TransactionSimple = ({
   amount,
   createdAt,
@@ -19,19 +21,21 @@ const TransactionSimple = ({
   const formattedCreatedAt = new Date(createdAt).toISOString();
   return (
     <Container display="flex" alignItems="center">
-      <a href={`/${fromCollective.slug}`} title={fromCollective.name}>
-        <Avatar
-          src={fromCollective.image}
-          id={fromCollective.id}
-          radius={40}
-          className="noFrame"
-        />
-      </a>
+      <Link route="collective" params={{ slug: fromCollective.slug }}>
+        <a title={fromCollective.name}>
+          <Avatar
+            src={fromCollective.image}
+            id={fromCollective.id}
+            radius={40}
+            className="noFrame"
+          />
+        </a>
+      </Link>
       <Container ml={3}>
         <P fontSize="1.2rem" color="#9399A3" display="inline">
-          <a href={`/${fromCollective.slug}`} title={fromCollective.name}>
-            {fromCollective.name}
-          </a>
+          <Link route="collective" params={{ slug: fromCollective.slug }}>
+            <a title={fromCollective.name}>{fromCollective.name}</a>
+          </Link>
           {type === 'DEBIT' ? ' submitted a ' : ' contributed '}
           <Span color="#2E3033">
             <FormattedNumber
@@ -46,9 +50,9 @@ const TransactionSimple = ({
           {subscription && ` a ${subscription.interval} `}
           {type === 'DEBIT' && ' expense '}
           {' to '}{' '}
-          <a href={`/${collective.slug}`} title={collective.name}>
-            {collective.name}
-          </a>
+          <Link route="collective" params={{ slug: collective.slug }}>
+            <a title={collective.name}>{collective.name}</a>
+          </Link>
           .
         </P>
         <Container position="relative" top={4} left={4} display="inline-block">
