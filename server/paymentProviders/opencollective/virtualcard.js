@@ -106,14 +106,16 @@ async function processOrder(order) {
  *
  * @param {Object} args contains the parameters to create the new
  *  payment method.
+ * @param {Number} args.CollectiveId The ID of the organization creating the virtual card.
+ * @param {String} args.currency The currency of the card to be created.
+ * @param {Number} [args.amount] The total amount that will be
+ *  credited to the newly created payment method.
+ * @param {Number} [args.monthlyLimitPerMember] Limit for the value of
+ *  the card that can be used per month in cents.
  * @param {String} [args.description] The description of the new payment
  *  method.
- * @param {Number} args.CollectiveId The ID of the organization creating the virtual card.
  * @param {Number} [args.PaymentMethodId] The ID of the Source Payment method the
  *                 organization wants to use
- * @param {Number} args.amount The total amount that will be
- *  credited to the newly created payment method.
- * @param {String} args.currency The currency of the card to be created.
  * @param {Date} [args.expiryDate] The expiry date of the payment method
  * @param {[limitedToTags]} [args.limitedToTags] Limit this payment method to donate to collectives having those tags
  * @param {[limitedToCollectiveIds]} [args.limitedToCollectiveIds] Limit this payment method to those collective ids
@@ -147,14 +149,24 @@ async function create(args, remoteUser) {
     : moment()
         .add(3, 'months')
         .format();
+  // If monthlyLimitPerMember is defined, we ignore the amount field and
+  // consider monthlyLimitPerMember times the months from now until the expiry date
+  let monthlyLimitPerMember;
+  let amount = args.amount;
+  if (args.monthlyLimitPerMember) {
+    monthlyLimitPerMember = args.monthlyLimitPerMember;
+    const monthsFromNowToExpiryDate = Math.round(moment(expiryDate).diff(moment(), 'months', true));
+    amount = Math.round(monthlyLimitPerMember * monthsFromNowToExpiryDate);
+  }
 
-  const description = `${formatCurrency(args.amount, args.currency)} card from ${collective.name}`;
+  const description = `${formatCurrency(amount, args.currency)} card from ${collective.name}`;
   // creates a new Virtual card Payment method
   const paymentMethod = await models.PaymentMethod.create({
     CreatedByUserId: remoteUser && remoteUser.id,
     name: description,
     description: args.description || description,
-    initialBalance: args.amount,
+    initialBalance: amount,
+    monthlyLimitPerMember: monthlyLimitPerMember,
     currency: args.currency,
     CollectiveId: args.CollectiveId,
     expiryDate: expiryDate,
