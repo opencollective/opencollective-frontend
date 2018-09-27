@@ -24,8 +24,15 @@ import { capitalize } from '../lib/utils';
 
 import stylesheet from '../styles/react-datetime.css';
 
-const HTMLEditor = dynamic(import('./HTMLEditor'));
-const MarkdownEditor = dynamic(import('./MarkdownEditor'));
+// We use the DYNAMIC_IMPORT env variable to skip dynamic while using Jest
+const HTMLEditor = process.env.DYNAMIC_IMPORT
+  ? dynamic(import('./HTMLEditor'))
+  : require('./HTMLEditor');
+
+// We use the DYNAMIC_IMPORT env variable to skip dynamic while using Jest
+const MarkdownEditor = process.env.DYNAMIC_IMPORT
+  ? dynamic(import('./MarkdownEditor'))
+  : require('./MarkdownEditor');
 
 function FieldGroup({
   controlId,
