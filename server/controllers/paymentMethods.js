@@ -7,7 +7,8 @@ const { PaymentMethod } = models;
 
 const createPaymentMethodQuery = `
   mutation createPaymentMethod(
-    $amount: Int!,
+    $amount: Int,
+    $monthlyLimitPerMember: Int,
     $CollectiveId: Int!,
     $PaymentMethodId: Int,
     $description: String,
@@ -20,6 +21,7 @@ const createPaymentMethodQuery = `
     ) {
     createPaymentMethod(
       amount: $amount,
+      monthlyLimitPerMember: $monthlyLimitPerMember,
       CollectiveId: $CollectiveId,
       PaymentMethodId: $PaymentMethodId,
       description: $description,
@@ -38,6 +40,7 @@ const createPaymentMethodQuery = `
       }
       SourcePaymentMethodId
       initialBalance
+      monthlyLimitPerMember
       expiryDate
       currency
       limitedToTags
@@ -84,6 +87,7 @@ async function createVirtualCardThroughGraphQL(args, user) {
     name: paymentMethod.name,
     CollectiveId: paymentMethod.collective.id,
     balance: paymentMethod.initialBalance,
+    monthlyLimitPerMember: paymentMethod.monthlyLimitPerMember,
     currency: paymentMethod.currency,
     limitedToTags: paymentMethod.limitedToTags,
     limitedToCollectiveIds: paymentMethod.limitedToCollectiveIds,
@@ -106,6 +110,7 @@ export function createVirtualCard(req, res) {
     'CollectiveId',
     'PaymentMethodId',
     'amount',
+    'monthlyLimitPerMember',
     'currency',
     'expiryDate',
     'limitedToTags',
