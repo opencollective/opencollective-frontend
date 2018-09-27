@@ -384,8 +384,9 @@ const mutations = {
     type: PaymentMethodType,
     args: {
       type: { type: new GraphQLNonNull(GraphQLString) },
-      amount: { type: new GraphQLNonNull(GraphQLInt) },
       currency: { type: new GraphQLNonNull(GraphQLString) },
+      amount: { type: GraphQLInt },
+      monthlyLimitPerMember: { type: GraphQLInt },
       limitedToTags: {
         type: new GraphQLList(GraphQLString),
         description: 'Limit this payment method to make donations to collectives having those tags',
@@ -403,7 +404,13 @@ const mutations = {
       description: { type: GraphQLString },
       expiryDate: { type: GraphQLString },
     },
-    resolve: async (_, args, req) => createPaymentMethod(args, req.remoteUser),
+    resolve: async (_, args, req) => {
+      // either amount or monthlyLimitPerMember needs to be present
+      if (!args.amount && !args.monthlyLimitPerMember) {
+        throw Error('you need to define either the amount or the monthlyLimitPerMember of the payment method.');
+      }
+      return createPaymentMethod(args, req.remoteUser);
+    } ,
   },
   claimPaymentMethod: {
     type: PaymentMethodType,
