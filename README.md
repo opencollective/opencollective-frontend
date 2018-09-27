@@ -64,7 +64,7 @@ You can run the tests using `npm test` or more specifically:
 - `npm run test:server` for api and badges
 - `npm run test:e2e` for end-to-end tests using [Cypress](https://www.cypress.io/)
 
-To update the Jest snapshots, run `npm run test:src -- -u`
+To update the Jest snapshots, run `npm run test:update`
 
 ## Localization
 
