@@ -15,6 +15,7 @@ import {
   display,
   size,
   space,
+  style,
 } from 'styled-system';
 import { Box, Flex } from 'grid-styled';
 import Hide from './Hide';
@@ -23,6 +24,10 @@ import Caret from './Caret';
 import StyledLink from './StyledLink';
 import ListItem from './ListItem';
 import Container from './Container';
+
+const cursor = style({
+  prop: 'cursor',
+});
 
 const Avatar = styled.div`
   background-position: center;
@@ -37,6 +42,8 @@ const Avatar = styled.div`
   ${display}
   ${size}
   ${space}
+
+  ${cursor}
 `;
 
 class TopBarProfileMenu extends React.Component {
@@ -417,6 +424,7 @@ class TopBarProfileMenu extends React.Component {
             display="inline-block"
             size="2.6rem"
             mr={2}
+            cursor="pointer"
           />
         )}
         <Hide xs sm>
@@ -428,6 +436,7 @@ class TopBarProfileMenu extends React.Component {
             letterSpacing="1px"
             mx={2}
             className="LoginTopBarProfileButton-name"
+            cursor="pointer"
           >
             {LoggedInUser.username}
           </P>
@@ -438,6 +447,7 @@ class TopBarProfileMenu extends React.Component {
           height="0.6rem"
           strokeWidth="0.2rem"
           width="1.4rem"
+          cursor="pointer"
         />
         {showProfileMenu && this.renderProfileMenu()}
       </Flex>

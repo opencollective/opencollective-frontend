@@ -1,5 +1,9 @@
 import styled from 'styled-components';
-import { display, height, width } from 'styled-system';
+import { display, height, width, style } from 'styled-system';
+
+const cursor = style({
+  prop: 'cursor',
+});
 
 const Caret = styled.div`
   position: relative;
@@ -7,6 +11,8 @@ const Caret = styled.div`
   ${display}
   ${height}
   ${width}
+
+  ${cursor}
 
   &::before, &::after {
     content: '';
