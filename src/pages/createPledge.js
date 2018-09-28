@@ -3,7 +3,7 @@ import slugify from 'slugify';
 import { withState } from 'recompose';
 
 import withData from '../lib/withData';
-import { addGetLoggedInUserFunction } from '../graphql/queries';
+import withLoggedInUser from '../lib/withLoggedInUser';
 import { addCreateOrderMutation } from '../graphql/mutations';
 import { Router } from '../server/pages';
 
@@ -339,5 +339,5 @@ class CreatePledgePage extends React.Component {
 
 export { CreatePledgePage as MockCreatePledgePage };
 export default withData(
-  addGetLoggedInUserFunction(addCreateOrderMutation(CreatePledgePage)),
+  withLoggedInUser(addCreateOrderMutation(CreatePledgePage)),
 );

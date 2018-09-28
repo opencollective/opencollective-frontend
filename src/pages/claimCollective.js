@@ -14,8 +14,8 @@ import { Router } from '../server/pages';
 import Header from '../components/Header';
 import Body from '../components/Body';
 import Footer from '../components/Footer';
-import { H1, H2, P, Span } from '../components/Text';
-import { Box, Flex } from 'grid-styled';
+import { H1, P } from '../components/Text';
+import { Box } from 'grid-styled';
 import Container from '../components/Container';
 import ErrorPage from '../components/ErrorPage';
 import StyledLink from '../components/StyledLink';
@@ -108,7 +108,7 @@ class ClaimCollectivePage extends React.Component {
       API_KEY ? `api_key=${API_KEY}&` : ''
     }redirect=${WEBSITE_URL}/${slug}/claim`;
 
-    const [_, websitePath] = website.split(':');
+    const websitePath = website.split(':')[1];
     const [repo] = repos.filter(({ html_url }) =>
       html_url.includes(websitePath),
     );
