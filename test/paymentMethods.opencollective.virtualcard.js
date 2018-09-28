@@ -142,12 +142,12 @@ describe('opencollective.virtualcard', () => {
             .add(3, 'months')
             .format('YYYY-MM-DD'),
         );
+        expect(paymentMethod.description).to.be.equal(args.description);
       }); /** End Of "should create a U$100 virtual card payment method" */
 
       it('should create a U$100 virtual card payment method defining an expiry date', async () => {
         const expiryDate = moment().add(6, 'months').format('YYYY-MM-DD');
         const args = {
-          description: 'virtual card test',
           CollectiveId: collective1.id,
           amount: 10000,
           currency: 'USD',
@@ -160,11 +160,12 @@ describe('opencollective.virtualcard', () => {
         expect(paymentMethod.service).to.be.equal('opencollective');
         expect(paymentMethod.type).to.be.equal('virtualcard');
         expect(moment(paymentMethod.expiryDate).format('YYYY-MM-DD')).to.be.equal(expiryDate);
+        expect(paymentMethod.description).to.contain('card from');
+        expect(paymentMethod.description).to.not.contain('monthly card');
       }); /** End Of "should create a U$100 virtual card payment method defining an expiry date" */
 
       it('should create a virtual card with monthly limit member of U$100 per month', async () => {
         const args = {
-          description: 'virtual card test',
           CollectiveId: collective1.id,
           monthlyLimitPerMember: 10000,
           currency: 'USD',
@@ -186,6 +187,7 @@ describe('opencollective.virtualcard', () => {
         // monthlyLimitPerMember times the months from now until the expiry date
         const monthsFromNowToExpiryDate = Math.round(moment(paymentMethod.expiryDate).diff(moment(), 'months', true));
         expect(paymentMethod.initialBalance).to.be.equal(Math.round(paymentMethod.monthlyLimitPerMember * monthsFromNowToExpiryDate));
+        expect(paymentMethod.description).to.contain('monthly card from');
       }); /** End Of "should create a virtual card with monthly limit member of U$100 per month" */
 
       it('should create a virtual card with monthly limit member of U$100 per month defining an expiry date', async () => {
