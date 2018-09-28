@@ -81,13 +81,15 @@ class AddFundsForm extends React.Component {
       'website.label': { id: 'user.website.label', defaultMessage: 'website' },
     });
 
+    this.totalAmountField = {
+      name: 'totalAmount',
+      type: 'currency',
+      focus: true,
+      pre: getCurrencySymbol(props.collective.currency),
+    };
+
     this.fields = [
-      {
-        name: 'totalAmount',
-        type: 'currency',
-        pre: getCurrencySymbol(props.collective.currency),
-        focus: true,
-      },
+      this.totalAmountField,
       {
         name: 'description',
       },
@@ -249,6 +251,9 @@ class AddFundsForm extends React.Component {
       this.isAddFundsToOrg &&
       this.state.form.totalAmount > 0 &&
       (hostFeePercent > 0 || platformFeePercent > 0);
+
+    // recompute this value based on new props
+    this.totalAmountField.pre = getCurrencySymbol(this.props.collective.currency);
 
     return (
       <div className="AddFundsForm">
