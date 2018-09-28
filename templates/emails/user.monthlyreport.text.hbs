@@ -25,7 +25,7 @@ You have contributed {{{currency order.totalAmount currency=order.currency}}}.
 {{name}}:
 {{publicUrl}}
 Backers: {{stats.backers.lastMonth}} (+{{stats.backers.new}}{{#if stats.backers.lost}}, -{{stats.backers.lost}}{{/if}})
-Current balance: {{{currency stats.balance currency=currency}}} (+{{{currency stats.totalDonations currency=currency}}}{{#if stats.totalPaidExpenses}}, {{{currency stats.totalPaidExpenses currency=currency}}}{{/if}}) 
+Current balance: {{{currency stats.balance currency=currency}}} (+{{{currency stats.totalDonations currency=currency}}}{{#if stats.totalPaidExpenses}}, -{{{currency stats.totalPaidExpenses currency=currency}}}{{/if}}) 
 {{#if nextGoal}}
 Next goal: {{{currency nextGoal.amount currency=currency}}}{{#if nextGoal.interval}}/{{nextGoal.interval}}{{/if}} to {{nextGoal.title}} ({{nextGoal.percentage}} - missing {{{currency nextGoal.missing.amount currency=currency}}}{{#if nextGoal.missing.interval}}/{{nextGoal.missing.interval}}{{/if}})
 {{/if}}
