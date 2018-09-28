@@ -100,7 +100,13 @@ some examples:
 - http://localhost:13000/tipbox
 - http://localhost:13000/brusselstogether
 - http://localhost:13000/veganizerbxl
-  
+
+### Local Email
+
+Email templates can be viewed locally by running `npm run compile:email <template name>` and making sure there is data for that template in `scripts/compile-email.js`.
+
+Email sending can done by running [`npm run maildev`](https://danfarrelly.nyc/MailDev/) locally and setting the `MAILDEV` environment variable to `true`. Then open `http://localhost:1080` to see any outgoing emails from the `opencollective-api` server.
+
 ## Participate on the discussion
 
 If you have any questions, ping us on Slack

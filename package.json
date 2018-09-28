@@ -121,6 +121,7 @@
     "graphiql": "0.11.11",
     "jsdoc": "3.5.5",
     "jsdoc-simple-theme": "1.2.6",
+    "maildev": "^1.0.0-rc3",
     "mocha": "5.1.1",
     "mocha-circleci-reporter": "0.0.2",
     "mocha-lcov-reporter": "1.3.0",
@@ -193,7 +194,8 @@
     "cron:monthly": "PG_MAX_CONNECTIONS=1 ./scripts/cron.sh monthly",
     "cron:yearly": "PG_MAX_CONNECTIONS=1 ./scripts/cron.sh yearly",
     "compile:email": "babel-node scripts/compile-email.js",
-    "compile:email:watch": "./scripts/watch_email_template.sh"
+    "compile:email:watch": "./scripts/watch_email_template.sh",
+    "maildev": "maildev"
   },
   "nyc": {
     "reporter": [

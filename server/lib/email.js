@@ -154,14 +154,18 @@ const sendMessage = (recipients, subject, html, options = {}) => {
     );
   }
 
-  if (config.mailgun.user) {
-    const mailgun = nodemailer.createTransport({
+  if (config.mailgun.user || process.env.MAILDEV) {
+    const transport = process.env.MAILDEV ? {
+      ignoreTLS: true,
+      port: 1025,
+    } : {
       service: 'Mailgun',
       auth: {
         user: config.mailgun.user,
         pass: config.mailgun.password,
       },
-    });
+    };
+    const mailgun = nodemailer.createTransport(transport);
 
     return new Promise((resolve, reject) => {
       const from = options.from || config.email.from;
