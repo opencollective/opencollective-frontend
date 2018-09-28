@@ -12,7 +12,8 @@ import { TransactionType } from '../enum/TransactionType';
 
 export const Transaction = new GraphQLInterfaceType({
   name: 'Transaction',
-  description: 'Transaction interface',
+  description:
+    'Transaction interface shared by all kind of transactions (Debit, Credit)',
   fields: () => {
     return {
       _internal_id: {
@@ -74,7 +75,7 @@ export const TransactionFields = () => {
     id: {
       type: GraphQLString,
       resolve(transaction) {
-        return idEncode(transaction.id);
+        return idEncode(transaction.id, 'transaction');
       },
     },
     type: {

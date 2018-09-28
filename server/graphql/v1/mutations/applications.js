@@ -4,7 +4,7 @@ import { get } from 'lodash';
 
 const { Application } = models;
 
-function require(args, path) {
+function requireArgs(args, path) {
   if (!get(args, path))
     throw new errors.ValidationFailed({ message: `${path} required` });
 }
@@ -16,11 +16,16 @@ export async function createApplication(_, args, req) {
     );
   }
 
-  require(args, 'application.name');
+  requireArgs(args, 'application.type');
+
+  if (args.application.type === 'oauth') {
+    requireArgs(args, 'application.name');
+  }
 
   const app = await Application.create({
     ...args.application,
     CreatedByUserId: req.remoteUser.id,
+    CollectiveId: req.remoteUser.CollectiveId,
   });
 
   return app;

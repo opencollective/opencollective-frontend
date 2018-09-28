@@ -22,15 +22,35 @@ const { HOST, ADMIN, BACKER } = roles;
  * Check Client Id if it exists
  */
 export async function checkClientApp(req, res, next) {
+  const apiKey = req.get('Api-Key') || req.query.apiKey;
   const clientId = req.get('Client-Id') || req.query.clientId;
-  if (clientId) {
-    const app = await models.Application.findOne({ where: { clientId } });
+  if (apiKey) {
+    const app = await models.Application.findOne({
+      where: { type: 'apiKey', apiKey },
+    });
+    if (app) {
+      debug('auth')('Valid Client App (apiKey)');
+      req.clientApp = app;
+      const collectiveId = app.CollectiveId;
+      if (collectiveId) {
+        req.loggedInAccount = await models.Collective.findById(collectiveId);
+        req.remoteUser = await models.User.findById(collectiveId);
+      }
+    } else {
+      debug('auth')(`Invalid Client App (apiKey: ${apiKey}).`);
+      next(new Unauthorized(`Invalid Api Key: ${apiKey}.`));
+    }
+  } else if (clientId) {
+    const app = await models.Application.findOne({
+      type: 'oAuth',
+      where: { clientId },
+    });
     if (app) {
       debug('auth')('Valid Client App');
       req.clientApp = app;
       next();
     } else {
-      debug('auth')(`Invalid Client App: ${clientId}.`);
+      debug('auth')(`Invalid Client App (clientId: ${clientId}).`);
       next(new Unauthorized(`Invalid Client Id: ${clientId}.`));
     }
   } else {

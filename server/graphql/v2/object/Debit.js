@@ -5,7 +5,7 @@ import { Transaction, TransactionFields } from '../interface/Transaction';
 
 export const Debit = new GraphQLObjectType({
   name: 'Debit',
-  description: 'This represents a Debit',
+  description: 'This represents a Debit transaction',
   interfaces: () => [Transaction],
   isTypeOf: transaction => transaction.type === 'DEBIT',
   fields: () => {

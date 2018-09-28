@@ -4,7 +4,7 @@ import { Transaction } from '../interface/Transaction';
 
 export const TransactionCollection = new GraphQLObjectType({
   name: 'TransactionCollection',
-  description: 'This represents a collection of Transaction',
+  description: 'A collection of Transactions (Debit or Credit)',
   fields: () => {
     return {
       totalCount: {

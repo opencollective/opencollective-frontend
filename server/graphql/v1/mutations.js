@@ -369,7 +369,7 @@ const mutations = {
     type: ApplicationType,
     args: {
       id: {
-        type: new GraphQLNonNull(GraphQLInt),
+        type: new GraphQLNonNull(GraphQLString),
       },
       application: {
         type: new GraphQLNonNull(ApplicationInputType),
@@ -383,7 +383,7 @@ const mutations = {
     type: ApplicationType,
     args: {
       id: {
-        type: new GraphQLNonNull(GraphQLInt),
+        type: new GraphQLNonNull(GraphQLString),
       },
     },
     resolve(_, args, req) {
@@ -399,15 +399,18 @@ const mutations = {
       monthlyLimitPerMember: { type: GraphQLInt },
       limitedToTags: {
         type: new GraphQLList(GraphQLString),
-        description: 'Limit this payment method to make donations to collectives having those tags',
+        description:
+          'Limit this payment method to make donations to collectives having those tags',
       },
       limitedToCollectiveIds: {
         type: new GraphQLList(GraphQLInt),
-        description: 'Limit this payment method to make donations to those collectives',
+        description:
+          'Limit this payment method to make donations to those collectives',
       },
       limitedToHostCollectiveIds: {
         type: new GraphQLList(GraphQLInt),
-        description: 'Limit this payment method to make donations to the collectives hosted by those hosts',
+        description:
+          'Limit this payment method to make donations to the collectives hosted by those hosts',
       },
       CollectiveId: { type: new GraphQLNonNull(GraphQLInt) },
       PaymentMethodId: { type: GraphQLInt },

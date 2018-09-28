@@ -1,29 +1,24 @@
-import { GraphQLInt, GraphQLEnumType, GraphQLObjectType } from 'graphql';
+import { GraphQLInt, GraphQLString, GraphQLObjectType } from 'graphql';
 
 import { GraphQLDateTime } from 'graphql-iso-date';
 
 import { Account } from '../interface/Account';
 import { Amount } from '../object/Amount';
+import { MemberRole } from '../enum/MemberRole';
 
-export const MemberRole = new GraphQLEnumType({
-  name: 'MemberRole',
-  values: {
-    BACKER: {},
-    ADMIN: {},
-    CONTRIBUTOR: {},
-    HOST: {},
-    ATTENDEE: {},
-    MEMBER: {},
-    FUNDRAISER: {},
-    FOLLOWER: {},
-  },
-});
+import { idEncode } from '../identifiers';
 
 const MemberFields = {
-  id: {
+  _internal_id: {
     type: GraphQLInt,
     resolve(member) {
       return member.id;
+    },
+  },
+  id: {
+    type: GraphQLString,
+    resolve(member) {
+      return idEncode(member.id, 'member');
     },
   },
   role: {
@@ -46,7 +41,7 @@ const MemberFields = {
   },
   totalDonations: {
     type: Amount,
-    description: 'total amount donated by this member',
+    description: 'Total amount donated',
     resolve(member, args, req) {
       return (
         member.totalDonations ||
@@ -61,7 +56,8 @@ const MemberFields = {
 
 export const Member = new GraphQLObjectType({
   name: 'Member',
-  description: 'This represents a Member',
+  description:
+    'This represents a Member relationship (ie: Organization backing a Collective)',
   fields: () => {
     return {
       ...MemberFields,
@@ -80,7 +76,8 @@ export const Member = new GraphQLObjectType({
 
 export const MemberOf = new GraphQLObjectType({
   name: 'MemberOf',
-  description: 'This represents a MemberOf',
+  description:
+    'This represents a MemberOf relationship (ie: Collective backed by an Organization)',
   fields: () => {
     return {
       ...MemberFields,

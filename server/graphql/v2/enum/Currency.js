@@ -2,6 +2,7 @@ import { GraphQLEnumType } from 'graphql';
 
 export const Currency = new GraphQLEnumType({
   name: 'Currency',
+  description: 'All supported currencies',
   values: {
     USD: { description: 'US Dollar' },
     EUR: { description: 'Euro' },

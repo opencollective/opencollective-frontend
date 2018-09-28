@@ -20,8 +20,8 @@ import { TransactionCollection } from '../collection/TransactionCollection';
 
 import { AccountType } from '../enum/AccountType';
 import { TransactionType } from '../enum/TransactionType';
+import { MemberRole } from '../enum/MemberRole';
 
-import { MemberRole } from '../object/Member';
 import { AccountStats } from '../object/AccountStats';
 
 import { ChronologicalOrder } from '../input/ChronologicalOrder';
@@ -46,13 +46,6 @@ const accountTransactions = {
       where.type = args.type;
     }
 
-    console.log({
-      where,
-      limit: args.limit,
-      offset: args.offset,
-      order: [args.orderBy.field, args.orderBy.direction],
-    });
-
     return models.Transaction.findAndCountAll({
       where,
       limit: args.limit,
@@ -72,7 +65,7 @@ export const AccountFields = {
   id: {
     type: GraphQLString,
     resolve(collective) {
-      return idEncode(collective.id);
+      return idEncode(collective.id, 'account');
     },
   },
   slug: {
@@ -118,17 +111,22 @@ export const AccountFields = {
 
 export const Account = new GraphQLInterfaceType({
   name: 'Account',
-  description: 'Account interface',
+  description:
+    'Account interface shared by all kind of accounts (Bot, Collective, Event, User, Organization)',
   fields: () => {
     return {
       _internal_id: {
         type: GraphQLInt,
+        description: 'The internal database identifier (should not be public)',
       },
       id: {
         type: GraphQLString,
+        description:
+          'The public id identifying the account (ie: 5v08jk63-w4g9nbpz-j7qmyder-p7ozax5g)',
       },
       slug: {
         type: GraphQLString,
+        description: 'The slug identifying the account (ie: babel)',
       },
       name: {
         type: GraphQLString,
@@ -138,9 +136,11 @@ export const Account = new GraphQLInterfaceType({
       },
       createdAt: {
         type: GraphQLDateTime,
+        description: 'The creation time',
       },
       updatedAt: {
         type: GraphQLDateTime,
+        description: 'The update time',
       },
       stats: {
         type: AccountStats,
@@ -160,7 +160,11 @@ export const Account = new GraphQLInterfaceType({
           limit: { type: GraphQLInt },
           offset: { type: GraphQLInt },
           role: { type: new GraphQLList(MemberRole) },
-          accountType: { type: new GraphQLList(AccountType) },
+          accountType: {
+            type: new GraphQLList(AccountType),
+            description:
+              'Type of accounts (BOT/COLLECTIVE/EVENT/ORGANIZATION/USER)',
+          },
         },
       },
       transactions: {
@@ -170,7 +174,7 @@ export const Account = new GraphQLInterfaceType({
           offset: { type: GraphQLInt },
           type: {
             type: TransactionType,
-            description: 'type of transaction (DEBIT/CREDIT)',
+            description: 'Type of transaction (DEBIT/CREDIT)',
           },
           orderBy: {
             type: ChronologicalOrder,
@@ -180,3 +184,5 @@ export const Account = new GraphQLInterfaceType({
     };
   },
 });
+
+export default Account;

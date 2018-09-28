@@ -4,7 +4,7 @@ import { Account, AccountFields } from '../interface/Account';
 
 export const User = new GraphQLObjectType({
   name: 'User',
-  description: 'This represents a User',
+  description: 'This represents a User account',
   interfaces: () => [Account],
   isTypeOf: collective => collective.type === 'USER',
   fields: () => {

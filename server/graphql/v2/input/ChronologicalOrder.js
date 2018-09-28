@@ -1,29 +1,19 @@
-import { GraphQLInputObjectType, GraphQLEnumType } from 'graphql';
+import { GraphQLInputObjectType } from 'graphql';
 
 import { OrderDirectionType } from '../enum/OrderDirectionType';
+import { DateTimeField } from '../enum/DateTimeField';
 
 export const ChronologicalOrder = new GraphQLInputObjectType({
   name: 'ChronologicalOrder',
-  description: 'Ordering results chronologically',
+  description: 'Input to order results chronologically',
   fields: {
     field: {
-      description: 'The field to chronologically order by.',
+      description: 'Field to chronologically order by.',
       defaultValue: 'createdAt',
-      type: new GraphQLEnumType({
-        name: 'ChronologicalOrderField',
-        description:
-          'Properties by which result can be chronologically ordered.',
-        values: {
-          CREATED_AT: {
-            value: 'createdAt',
-            description: 'Order results by creation time.',
-          },
-        },
-      }),
+      type: DateTimeField,
     },
     direction: {
-      name: 'ChronologicalOrderDirection',
-      description: 'The ordering direction.',
+      description: 'Ordering direction.',
       defaultValue: 'DESC',
       type: OrderDirectionType,
     },

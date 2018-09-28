@@ -3,6 +3,8 @@ import {
   GraphQLString,
   GraphQLObjectType,
   GraphQLInputObjectType,
+  GraphQLEnumType,
+  GraphQLNonNull,
 } from 'graphql';
 
 export const ApplicationType = new GraphQLObjectType({
@@ -14,6 +16,12 @@ export const ApplicationType = new GraphQLObjectType({
         type: GraphQLInt,
         resolve(application) {
           return application.id;
+        },
+      },
+      type: {
+        type: GraphQLString,
+        resolve(application) {
+          return application.type;
         },
       },
       name: {
@@ -28,10 +36,25 @@ export const ApplicationType = new GraphQLObjectType({
           return application.description;
         },
       },
+      apiKey: {
+        type: GraphQLString,
+        resolve(application, args, req) {
+          console.log('get apiKey', req.remoteUser && req.remoteUser.id);
+          if (
+            req.remoteUser &&
+            req.remoteUser.id === application.CreatedByUserId
+          ) {
+            return application.apiKey;
+          }
+        },
+      },
       clientId: {
         type: GraphQLString,
         resolve(application, args, req) {
-          if (req.remoteUser.id === application.CreatedByUserId) {
+          if (
+            req.remoteUser &&
+            req.remoteUser.id === application.CreatedByUserId
+          ) {
             return application.clientId;
           }
         },
@@ -39,7 +62,10 @@ export const ApplicationType = new GraphQLObjectType({
       clientSecret: {
         type: GraphQLString,
         resolve(application, args, req) {
-          if (req.remoteUser.id === application.CreatedByUserId) {
+          if (
+            req.remoteUser &&
+            req.remoteUser.id === application.CreatedByUserId
+          ) {
             return application.clientSecret;
           }
         },
@@ -47,7 +73,10 @@ export const ApplicationType = new GraphQLObjectType({
       callbackUrl: {
         type: GraphQLString,
         resolve(application, args, req) {
-          if (req.remoteUser.id === application.CreatedByUserId) {
+          if (
+            req.remoteUser &&
+            req.remoteUser.id === application.CreatedByUserId
+          ) {
             return application.callbackUrl;
           }
         },
@@ -56,10 +85,20 @@ export const ApplicationType = new GraphQLObjectType({
   },
 });
 
+const ApplicationTypeType = new GraphQLEnumType({
+  name: 'ApplicationType',
+  description: 'All application types',
+  values: {
+    API_KEY: { value: 'apiKey' },
+    OAUTH: { value: 'oAuth' },
+  },
+});
+
 export const ApplicationInputType = new GraphQLInputObjectType({
   name: 'ApplicationInput',
   description: 'Input type for Application',
   fields: () => ({
+    type: { type: new GraphQLNonNull(ApplicationTypeType) },
     name: { type: GraphQLString },
     description: { type: GraphQLString },
     callbackUrl: { type: GraphQLString },

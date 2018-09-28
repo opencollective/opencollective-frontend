@@ -2,7 +2,7 @@ import { GraphQLInt, GraphQLList } from 'graphql';
 
 import { MemberOfCollection } from '../collection/MemberCollection';
 import { AccountType } from '../enum/AccountType';
-import { MemberRole } from '../object/Member';
+import { MemberRole } from '../enum/MemberRole';
 
 import models, { Op } from '../../../models';
 

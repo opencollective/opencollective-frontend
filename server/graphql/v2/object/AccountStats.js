@@ -4,6 +4,8 @@ import { GraphQLInt, GraphQLObjectType } from 'graphql';
 
 import { Amount } from '../object/Amount';
 
+import { idEncode } from '../identifiers';
+
 import queries from '../../../lib/queries';
 
 export const AccountStats = new GraphQLObjectType({
@@ -11,11 +13,10 @@ export const AccountStats = new GraphQLObjectType({
   description: 'Stats for the Account',
   fields: () => {
     return {
-      // We always have to return an id for apollo's caching
       id: {
         type: GraphQLInt,
         resolve(collective) {
-          return collective.id;
+          return idEncode(collective.id);
         },
       },
       balance: {
@@ -23,7 +24,10 @@ export const AccountStats = new GraphQLObjectType({
           'Amount of money in cents in the currency of the collective currently available to spend',
         type: Amount,
         resolve(collective, args, req) {
-          return req.loaders.collective.balance.load(collective.id);
+          return {
+            value: req.loaders.collective.balance.load(collective.id),
+            currency: 'USD',
+          };
         },
       },
       monthlySpending: {
@@ -42,21 +46,30 @@ export const AccountStats = new GraphQLObjectType({
         description: 'Total amount spent',
         type: Amount,
         resolve(collective) {
-          return collective.getTotalAmountSpent();
+          return {
+            value: collective.getTotalAmountSpent(),
+            currency: 'USD',
+          };
         },
       },
       totalAmountReceived: {
         description: 'Net amount received',
         type: Amount,
         resolve(collective) {
-          return collective.getTotalAmountReceived();
+          return {
+            value: collective.getTotalAmountReceived(),
+            currency: 'USD',
+          };
         },
       },
       totalAmountRaised: {
         description: 'Total amount raised through referral',
         type: Amount,
         resolve(collective) {
-          return collective.getTotalAmountRaised();
+          return {
+            value: collective.getTotalAmountRaised(),
+            currency: 'USD',
+          };
         },
       },
       yearlyBudget: {
@@ -66,7 +79,10 @@ export const AccountStats = new GraphQLObjectType({
           if (collective.id === collective.HostCollectiveId) {
             return queries.getTotalAnnualBudgetForHost(collective.id);
           }
-          return collective.getYearlyIncome();
+          return {
+            value: collective.getYearlyIncome(),
+            currency: 'USD',
+          };
         },
       },
     };

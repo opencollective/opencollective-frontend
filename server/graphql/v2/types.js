@@ -9,6 +9,10 @@ import { Bot } from './object/Bot';
 import { Debit } from './object/Debit';
 import { Credit } from './object/Credit';
 
+import { Amount } from './object/Amount';
+
+import { Member, MemberOf } from './object/Member';
+
 const types = [
   Account,
   User,
@@ -18,6 +22,9 @@ const types = [
   Bot,
   Debit,
   Credit,
+  Amount,
+  Member,
+  MemberOf,
 ];
 
 export default types;
