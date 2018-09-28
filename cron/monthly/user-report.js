@@ -17,7 +17,7 @@ import config from 'config';
 import Promise from 'bluebird';
 import fetch from 'node-fetch';
 import debugLib from 'debug';
-import models, { Op, sequelize } from '../../server/models';
+import models, { Op } from '../../server/models';
 import emailLib from '../../server/lib/email';
 import roles from '../../server/constants/roles';
 import {
@@ -77,18 +77,16 @@ const fetchUserSubscribers = async (notificationType, backerCollective) => {
 const init = async () => {
   const startTime = new Date();
   const query = {
-    attributes: [
-      [
-        sequelize.fn('DISTINCT', sequelize.col('FromCollectiveId')),
-        'FromCollectiveId',
-      ],
-    ],
+    attributes: ['FromCollectiveId'],
     where: {
       type: 'CREDIT',
       OrderId: { [Op.ne]: null }, // make sure we don't consider collectives paying out expenses as backers of user collectives
       RefundTransactionId: null, // make sure we don't consider refunds
       createdAt: { [Op.gte]: startDate, [Op.lt]: endDate },
     },
+    include: [
+      { model: models.Collective, as: 'collective', where: { type: 'COLLECTIVE' } },
+    ],
   };
 
   let FromCollectiveIds;
@@ -100,10 +98,10 @@ const init = async () => {
     });
     FromCollectiveIds = res.map(r => r.id);
   } else if (process.env.DEBUG && process.env.DEBUG.match(/preview/)) {
-    FromCollectiveIds = [1729, 12671]; // xdamman, coinbase
+    FromCollectiveIds = [21272, 20568, 1729, 12671]; // fcb-event-user, fcb-event-anonymous, xdamman, coinbase
   } else {
-    const distinctTransactions = await models.Transaction.findAll(query);
-    FromCollectiveIds = distinctTransactions.map(t => t.FromCollectiveId);
+    const transactions = await models.Transaction.findAll(query);
+    FromCollectiveIds = uniq(transactions.map(t => t.FromCollectiveId));
   }
 
   console.log(
@@ -120,9 +118,9 @@ const init = async () => {
 const processBacker = async FromCollectiveId => {
   const backerCollective = await models.Collective.findById(FromCollectiveId);
   console.log('>>> Processing backer', backerCollective.slug);
-  const distinctTransactions = await models.Transaction.findAll({
+  const query = {
     attributes: [
-      [sequelize.fn('DISTINCT', sequelize.col('CollectiveId')), 'CollectiveId'],
+      'CollectiveId',
       'HostCollectiveId',
     ],
     where: {
@@ -130,7 +128,25 @@ const processBacker = async FromCollectiveId => {
       type: 'CREDIT',
       createdAt: { [Op.gte]: startDate, [Op.lt]: endDate },
     },
+    include: [
+      { model: models.Collective, as: 'collective', where: { type: 'COLLECTIVE' } },
+    ],
+  };
+  const transactions = await models.Transaction.findAll(query);
+
+  console.log('>>> transactions found', transactions.length);
+  const distinctTransactions = [], collectiveIds = {};
+  transactions.map(t => {
+    if (!collectiveIds[t.CollectiveId]) {
+      collectiveIds[t.CollectiveId] = true;
+      distinctTransactions.push(t);
+    }
   });
+
+  if (distinctTransactions.length === 0) {
+    console.log('>>> no transaction for', backerCollective.slug);
+    return;
+  }
 
   console.log(
     `>>> Collective ${FromCollectiveId} has backed ${
@@ -147,6 +163,11 @@ const processBacker = async FromCollectiveId => {
   console.log(
     `>>> Collective ${FromCollectiveId} has ${subscribers.length} subscribers`,
   );
+
+  if (subscribers.length === 0) {
+    console.log('>>> no subscriber');
+    return;
+  }
 
   const attachments = [];
   if (get(backerCollective, 'settings.sendInvoiceByEmail')) {
