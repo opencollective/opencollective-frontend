@@ -958,6 +958,7 @@ describe('Mutation Tests', () => {
             },
           });
           expect(members).to.have.length(1);
+          await utils.waitForCondition(() => emailSendMessageSpy.callCount > 1);
           expect(emailSendSpy.callCount).to.equal(2);
           const activityData = emailSendSpy.firstCall.args[2];
           expect(activityData.member.role).to.equal('ATTENDEE');
@@ -971,7 +972,6 @@ describe('Mutation Tests', () => {
             'collective.member.created',
           );
           expect(emailSendSpy.secondCall.args[0]).to.equal('ticket.confirmed');
-          await utils.waitForCondition(() => emailSendMessageSpy.callCount > 1);
           expect(emailSendMessageSpy.callCount).to.equal(2);
           expect(emailSendMessageSpy.firstCall.args[0]).to.equal(
             'user1@opencollective.com',
