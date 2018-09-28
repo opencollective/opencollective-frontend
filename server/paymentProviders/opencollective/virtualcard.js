@@ -153,13 +153,14 @@ async function create(args, remoteUser) {
   // consider monthlyLimitPerMember times the months from now until the expiry date
   let monthlyLimitPerMember;
   let amount = args.amount;
+  let description = `${formatCurrency(amount, args.currency)} card from ${collective.name}`;
   if (args.monthlyLimitPerMember) {
     monthlyLimitPerMember = args.monthlyLimitPerMember;
     const monthsFromNowToExpiryDate = Math.round(moment(expiryDate).diff(moment(), 'months', true));
     amount = Math.round(monthlyLimitPerMember * monthsFromNowToExpiryDate);
+    description = `${formatCurrency(args. monthlyLimitPerMember, args.currency)} monthly card from ${collective.name}`;
   }
 
-  const description = `${formatCurrency(amount, args.currency)} card from ${collective.name}`;
   // creates a new Virtual card Payment method
   const paymentMethod = await models.PaymentMethod.create({
     CreatedByUserId: remoteUser && remoteUser.id,
