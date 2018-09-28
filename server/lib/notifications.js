@@ -130,6 +130,7 @@ async function notifySubscribers(users, activity, options = {}) {
           break;
 
         case activityType.COLLECTIVE_CREATED:
+        case activityType.COLLECTIVE_APPLY:
           data.actions = {
             approve: u.generateLoginLink(
               `/${data.host.slug}/collectives/${data.collective.id}/approve`,
