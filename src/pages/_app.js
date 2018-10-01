@@ -3,6 +3,8 @@ import App, { Container } from 'next/app';
 import Router from 'next/router';
 import NProgress from 'nprogress';
 
+import '../../node_modules/bootstrap/dist/css/bootstrap.min.css';
+import '../../node_modules/font-awesome/css/font-awesome.min.css';
 import '../../node_modules/nprogress/nprogress.css';
 import '../styles/app.css';
 

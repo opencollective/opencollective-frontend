@@ -1,7 +1,7 @@
 import webpack from 'webpack';
 import withCSS from '@zeit/next-css';
 
-module.exports = withCSS({
+const nextConfig = {
   onDemandEntries: {
     // Make sure entries are not getting disposed.
     maxInactiveAge: 1000 * 60 * 60,
@@ -38,6 +38,26 @@ module.exports = withCSS({
       test: /\.md$/,
       use: ['babel-loader', 'raw-loader', 'markdown-loader'],
     });
+
+    // Inspired by https://github.com/rohanray/next-fonts
+    config.module.rules.push({
+      test: /\.(woff|woff2|eot|ttf|otf|svg)$/,
+      use: [
+        {
+          loader: 'url-loader',
+          options: {
+            limit: 8192,
+            fallback: 'file-loader',
+            publicPath: '/_next/static/fonts/',
+            outputPath: 'static/fonts/',
+            name: '[name]-[hash].[ext]',
+          },
+        },
+      ],
+    });
+
     return config;
   },
-});
+};
+
+module.exports = withCSS(nextConfig);
