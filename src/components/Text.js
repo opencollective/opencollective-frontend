@@ -21,6 +21,10 @@ export const whiteSpace = style({
   prop: 'whiteSpace',
 });
 
+export const cursor = style({
+  prop: 'cursor',
+});
+
 export const Span = styled.span`
   ${color}
   ${display}
@@ -49,6 +53,7 @@ export const P = styled.p`
   ${textAlign}
   ${textTransform}
   ${whiteSpace}
+  ${cursor}
 `;
 
 P.defaultProps = {

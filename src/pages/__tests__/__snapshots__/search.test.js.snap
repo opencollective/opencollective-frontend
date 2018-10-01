@@ -252,6 +252,7 @@ exports[`Search Page renders empty results message 1`] = `
   margin: 0px;
   margin-left: 8px;
   margin-right: 8px;
+  cursor: pointer;
 }
 
 .c34 {
@@ -328,6 +329,7 @@ exports[`Search Page renders empty results message 1`] = `
   display: inline-block;
   height: 0.6rem;
   width: 1.4rem;
+  cursor: pointer;
 }
 
 .c18::before,
@@ -732,6 +734,7 @@ exports[`Search Page renders empty results message 1`] = `
               <p
                 className="LoginTopBarProfileButton-name c17"
                 color="#46b0ed"
+                cursor="pointer"
                 display="inline-block"
                 fontSize="1.2rem"
                 fontWeight="bold"
@@ -741,6 +744,7 @@ exports[`Search Page renders empty results message 1`] = `
             <div
               className="c18"
               color="#46b0ed"
+              cursor="pointer"
               display="inline-block"
               height="0.6rem"
               strokeWidth="0.2rem"
@@ -2946,6 +2950,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
   margin: 0px;
   margin-left: 8px;
   margin-right: 8px;
+  cursor: pointer;
 }
 
 .c34 {
@@ -3022,6 +3027,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
   display: inline-block;
   height: 0.6rem;
   width: 1.4rem;
+  cursor: pointer;
 }
 
 .c18::before,
@@ -3426,6 +3432,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
               <p
                 className="LoginTopBarProfileButton-name c17"
                 color="#46b0ed"
+                cursor="pointer"
                 display="inline-block"
                 fontSize="1.2rem"
                 fontWeight="bold"
@@ -3435,6 +3442,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
             <div
               className="c18"
               color="#46b0ed"
+              cursor="pointer"
               display="inline-block"
               height="0.6rem"
               strokeWidth="0.2rem"
@@ -4459,6 +4467,7 @@ exports[`Search Page renders search results with pagination 1`] = `
   margin: 0px;
   margin-left: 8px;
   margin-right: 8px;
+  cursor: pointer;
 }
 
 .c34 {
@@ -4535,6 +4544,7 @@ exports[`Search Page renders search results with pagination 1`] = `
   display: inline-block;
   height: 0.6rem;
   width: 1.4rem;
+  cursor: pointer;
 }
 
 .c18::before,
@@ -4939,6 +4949,7 @@ exports[`Search Page renders search results with pagination 1`] = `
               <p
                 className="LoginTopBarProfileButton-name c17"
                 color="#46b0ed"
+                cursor="pointer"
                 display="inline-block"
                 fontSize="1.2rem"
                 fontWeight="bold"
@@ -4948,6 +4959,7 @@ exports[`Search Page renders search results with pagination 1`] = `
             <div
               className="c18"
               color="#46b0ed"
+              cursor="pointer"
               display="inline-block"
               height="0.6rem"
               strokeWidth="0.2rem"
