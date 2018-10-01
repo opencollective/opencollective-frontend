@@ -7,6 +7,15 @@ import {
   GraphQLNonNull,
 } from 'graphql';
 
+const ApplicationTypeType = new GraphQLEnumType({
+  name: 'ApplicationType',
+  description: 'All application types',
+  values: {
+    API_KEY: { value: 'apiKey' },
+    OAUTH: { value: 'oAuth' },
+  },
+});
+
 export const ApplicationType = new GraphQLObjectType({
   name: 'Application',
   description: 'Application model',
@@ -19,7 +28,7 @@ export const ApplicationType = new GraphQLObjectType({
         },
       },
       type: {
-        type: GraphQLString,
+        type: ApplicationTypeType,
         resolve(application) {
           return application.type;
         },
@@ -39,7 +48,6 @@ export const ApplicationType = new GraphQLObjectType({
       apiKey: {
         type: GraphQLString,
         resolve(application, args, req) {
-          console.log('get apiKey', req.remoteUser && req.remoteUser.id);
           if (
             req.remoteUser &&
             req.remoteUser.id === application.CreatedByUserId
@@ -82,15 +90,6 @@ export const ApplicationType = new GraphQLObjectType({
         },
       },
     };
-  },
-});
-
-const ApplicationTypeType = new GraphQLEnumType({
-  name: 'ApplicationType',
-  description: 'All application types',
-  values: {
-    API_KEY: { value: 'apiKey' },
-    OAUTH: { value: 'oAuth' },
   },
 });
 
