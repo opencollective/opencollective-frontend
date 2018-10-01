@@ -24,6 +24,8 @@ import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
 import withLoggedInUser from '../lib/withLoggedInUser';
 
+const { USE_PLEDGES } = process.env;
+
 const SearchInput = styled(FormControl)`
   &&& {
     border: none;
@@ -167,23 +169,25 @@ class SearchPage extends React.Component {
                         &quot;
                       </em>
                     </p>
-                    <Link route={`/pledges/new?name=${term}`} passHref>
-                      <StyledLink
-                        bg="#3385FF"
-                        borderRadius="50px"
-                        color="white"
-                        display="block"
-                        fontSize="14px"
-                        fontWeight="bold"
-                        maxWidth="220px"
-                        hover={{ color: 'white' }}
-                        py={2}
-                        px={4}
-                        textAlign="center"
-                      >
-                        Make a pledge
-                      </StyledLink>
-                    </Link>
+                    {USE_PLEDGES && (
+                      <Link route={`/pledges/new?name=${term}`} passHref>
+                        <StyledLink
+                          bg="#3385FF"
+                          borderRadius="50px"
+                          color="white"
+                          display="block"
+                          fontSize="14px"
+                          fontWeight="bold"
+                          maxWidth="220px"
+                          hover={{ color: 'white' }}
+                          py={2}
+                          px={4}
+                          textAlign="center"
+                        >
+                          Make a pledge
+                        </StyledLink>
+                      </Link>
+                    )}
                   </Flex>
                 )}
             </Flex>

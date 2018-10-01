@@ -21,8 +21,7 @@ import ErrorPage from '../components/ErrorPage';
 import StyledLink from '../components/StyledLink';
 import Button from '../components/Button';
 
-const WEBSITE_URL = process.env.WEBSITE_URL || 'https://opencollective.com';
-const { API_KEY } = process.env;
+const { WEBSITE_URL } = process.env;
 
 class ClaimCollectivePage extends React.Component {
   static getInitialProps({ query }) {
@@ -102,11 +101,7 @@ class ClaimCollectivePage extends React.Component {
       (total, { totalAmount }) => total + totalAmount,
       0,
     );
-    const connectUrl = `${getBaseApiUrl({
-      internal: true,
-    })}/connected-accounts/github?${
-      API_KEY ? `api_key=${API_KEY}&` : ''
-    }redirect=${WEBSITE_URL}/${slug}/claim`;
+    const connectUrl = `/api/connected-accounts/github?redirect=${WEBSITE_URL}/${slug}/claim`;
 
     const websitePath = website.split(':')[1];
     const [repo] = repos.filter(({ html_url }) =>

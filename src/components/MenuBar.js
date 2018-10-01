@@ -18,6 +18,8 @@ import Link from './Link';
 import Button from './Button';
 import AddFundsForm from './AddFundsForm';
 
+const { USE_PLEDGES } = process.env;
+
 class MenuBar extends React.Component {
   static propTypes = {
     collective: PropTypes.object.isRequired,
@@ -262,7 +264,7 @@ class MenuBar extends React.Component {
     }
 
     const hasPledges =
-      !collective.isActive && collective.pledges && collective.pledges.length;
+      !collective.isActive && collective.pledges && collective.pledges.length && USE_PLEDGES;
 
     const AddFundsModal = () => (
       <Modal

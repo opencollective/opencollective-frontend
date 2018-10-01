@@ -1,5 +1,7 @@
 import nextRoutes from 'next-routes';
 
+const { USE_PLEDGES } = process.env;
+
 const pages = nextRoutes();
 
 pages
@@ -21,8 +23,6 @@ pages
   .add('createEvent', '/:parentCollectiveSlug/events/(new|create)')
   .add('createCollective', '/:hostCollectiveSlug?/(apply|create)')
   .add('createOrganization', '/organizations/new')
-  .add('createPledge', '/pledges/new')
-  .add('claimCollective', '/:collectiveSlug/claim')
   .add('events-iframe', '/:collectiveSlug/events.html')
   .add('collectives-iframe', '/:collectiveSlug/(collectives|widget).html')
   .add('banner-iframe', '/:collectiveSlug/banner.html')
@@ -85,6 +85,12 @@ pages
   )
   .add('collective', '/:slug')
   .add('editCollective', '/:slug/edit');
+
+if (USE_PLEDGES) {
+  pages
+    .add('createPledge', '/pledges/new')
+    .add('claimCollective', '/:collectiveSlug/claim');
+}
 
 export default pages;
 
