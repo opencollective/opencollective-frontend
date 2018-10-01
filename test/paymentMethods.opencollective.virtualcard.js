@@ -14,8 +14,8 @@ const ORDER_TOTAL_AMOUNT = 5000;
 const STRIPE_FEE_STUBBED_VALUE = 300;
 
 const createPaymentMethodQuery = `
-  mutation createPaymentMethod($amount: Int!, $CollectiveId: Int!, $PaymentMethodId: Int, $description: String, $expiryDate: String, $type: String!, $currency: String!, $limitedToTags: [String], $limitedToCollectiveIds: [Int], $limitedToHostCollectiveIds: [Int]) {
-    createPaymentMethod(amount: $amount, CollectiveId: $CollectiveId, PaymentMethodId: $PaymentMethodId, description: $description, expiryDate: $expiryDate, type:  $type, currency: $currency, limitedToTags: $limitedToTags, limitedToCollectiveIds: $limitedToCollectiveIds, limitedToHostCollectiveIds: $limitedToHostCollectiveIds) {
+  mutation createPaymentMethod($amount: Int, $monthlyLimitPerMember: Int, $CollectiveId: Int!, $PaymentMethodId: Int, $description: String, $expiryDate: String, $type: String!, $currency: String!, $limitedToTags: [String], $limitedToCollectiveIds: [Int], $limitedToHostCollectiveIds: [Int]) {
+    createPaymentMethod(amount: $amount, monthlyLimitPerMember: $monthlyLimitPerMember, CollectiveId: $CollectiveId, PaymentMethodId: $PaymentMethodId, description: $description, expiryDate: $expiryDate, type:  $type, currency: $currency, limitedToTags: $limitedToTags, limitedToCollectiveIds: $limitedToCollectiveIds, limitedToHostCollectiveIds: $limitedToHostCollectiveIds) {
       id
     }
   }
@@ -142,7 +142,72 @@ describe('opencollective.virtualcard', () => {
             .add(3, 'months')
             .format('YYYY-MM-DD'),
         );
-      });
+        expect(paymentMethod.description).to.be.equal(args.description);
+      }); /** End Of "should create a U$100 virtual card payment method" */
+
+      it('should create a U$100 virtual card payment method defining an expiry date', async () => {
+        const expiryDate = moment().add(6, 'months').format('YYYY-MM-DD');
+        const args = {
+          CollectiveId: collective1.id,
+          amount: 10000,
+          currency: 'USD',
+          expiryDate: expiryDate,
+        };
+        const paymentMethod = await virtualcard.create(args);
+        expect(paymentMethod).to.exist;
+        expect(paymentMethod.CollectiveId).to.be.equal(collective1.id);
+        expect(paymentMethod.initialBalance).to.be.equal(args.amount);
+        expect(paymentMethod.service).to.be.equal('opencollective');
+        expect(paymentMethod.type).to.be.equal('virtualcard');
+        expect(moment(paymentMethod.expiryDate).format('YYYY-MM-DD')).to.be.equal(expiryDate);
+        expect(paymentMethod.description).to.contain('card from');
+        expect(paymentMethod.description).to.not.contain('monthly card');
+      }); /** End Of "should create a U$100 virtual card payment method defining an expiry date" */
+
+      it('should create a virtual card with monthly limit member of U$100 per month', async () => {
+        const args = {
+          CollectiveId: collective1.id,
+          monthlyLimitPerMember: 10000,
+          currency: 'USD',
+        };
+        const paymentMethod = await virtualcard.create(args);
+        expect(paymentMethod).to.exist;
+        expect(paymentMethod.CollectiveId).to.be.equal(collective1.id);
+        expect(paymentMethod.service).to.be.equal('opencollective');
+        expect(paymentMethod.type).to.be.equal('virtualcard');
+        expect(
+          moment(paymentMethod.expiryDate).format('YYYY-MM-DD'),
+        ).to.be.equal(
+          moment()
+            .add(3, 'months')
+            .format('YYYY-MM-DD'),
+        );
+        expect(paymentMethod.monthlyLimitPerMember).to.be.equal(args.monthlyLimitPerMember);
+        // if there is a monthlyLimitPerMember balance must not exist
+        expect(paymentMethod.balance).to.not.exist;
+        expect(paymentMethod.description).to.contain('monthly card from');
+      }); /** End Of "should create a virtual card with monthly limit member of U$100 per month" */
+
+      it('should create a virtual card with monthly limit member of U$100 per month defining an expiry date', async () => {
+        const expiryDate = moment().add(6, 'months').format('YYYY-MM-DD');
+        const args = {
+          description: 'virtual card test',
+          CollectiveId: collective1.id,
+          monthlyLimitPerMember: 10000,
+          currency: 'USD',
+          expiryDate: expiryDate,
+        };
+        const paymentMethod = await virtualcard.create(args);
+        expect(paymentMethod).to.exist;
+        expect(paymentMethod.CollectiveId).to.be.equal(collective1.id);
+        expect(paymentMethod.service).to.be.equal('opencollective');
+        expect(paymentMethod.type).to.be.equal('virtualcard');
+        expect(moment(paymentMethod.expiryDate).format('YYYY-MM-DD')).to.be.equal(expiryDate);
+        expect(paymentMethod.monthlyLimitPerMember).to.be.equal(args.monthlyLimitPerMember);
+        // if there is a monthlyLimitPerMember balance must not exist
+        expect(paymentMethod.balance).to.not.exist;
+      }); /** End Of "should create a virtual card with monthly limit member of U$100 per month defining an expiry date" */
+
     }); /** End Of "#create" */
 
     describe('#claim', async () => {
@@ -215,7 +280,7 @@ describe('opencollective.virtualcard', () => {
         expect(moment(paymentMethod.expiryDate).format()).to.be.equal(
           moment(virtualCardPaymentMethod.expiryDate).format(),
         );
-      });
+      }); /** End Of "new User should claim a virtual card" */
     }); /** End Of "#claim" */
 
     describe('#processOrder', async () => {
@@ -290,7 +355,7 @@ describe('opencollective.virtualcard', () => {
           expect(error).to.exist;
           expect(error.toString()).to.contain('Order amount exceeds balance');
         }
-      });
+      }); /** End Of "Order should NOT be executed because its amount exceeds the balance of the virtual card" */
 
       it('Process order of a virtual card', async () => {
         const order = await models.Order.create({
@@ -330,7 +395,7 @@ describe('opencollective.virtualcard', () => {
         expect(virtualCardCurrentBalance.amount).to.be.equal(
           virtualCardPaymentMethod.initialBalance - ORDER_TOTAL_AMOUNT,
         );
-      });
+      }); /** End Of "Process order of a virtual card" */
     }); /** End Of "#processOrder" */
   }); /** End Of "paymentProviders.opencollective.virtualcard" */
 
@@ -384,8 +449,24 @@ describe('opencollective.virtualcard', () => {
           user1,
         );
         expect(gqlResult.errors[0]).to.exist;
-        expect(gqlResult.errors[0].toString()).to.contain('not provided');
+        expect(gqlResult.errors[0].toString()).to.contain('"$currency" of required type "String!" was not provided.');
       }); /** End of "should fail creating a virtual card because there is no currency defined" */
+
+      it('should fail creating a virtual card because there is no amount or monthlyLimitPerMember defined', async () => {
+        const args = {
+          type: 'virtualcard',
+          currency: 'USD',
+          CollectiveId: collective1.id,
+        };
+        // call graphql mutation
+        const gqlResult = await utils.graphqlQuery(
+          createPaymentMethodQuery,
+          args,
+          user1,
+        );
+        expect(gqlResult.errors[0]).to.exist;
+        expect(gqlResult.errors[0].toString()).to.contain('you need to define either the amount or the monthlyLimitPerMember of the payment method.');
+      }); /** End of "should fail creating a virtual card because there is amount or monthlyLimitPerMember defined" */
 
       it('should create a U$100 virtual card payment method limited to open source', async () => {
         const args = {
@@ -812,7 +893,7 @@ describe('opencollective.virtualcard', () => {
           .post('/v1/payment-methods')
           .send(args)
           .expect(400);
-      });
+      }); /** End Of "should Get 400 because there is no user authenticated" */
 
       it('should fail creating a virtual card without a currency defined', () => {
         const args = {
@@ -825,7 +906,7 @@ describe('opencollective.virtualcard', () => {
           .set('Client-Id', appKeyData.clientId)
           .send(args)
           .expect(400);
-      });
+      }); /** End Of "should fail creating a virtual card without a currency defined" */
 
       it('should create a U$100 virtual card payment method', () => {
         const args = {
@@ -850,7 +931,41 @@ describe('opencollective.virtualcard', () => {
             expect(paymentMethod.limitedToHostCollectiveIds[0]).to.be.equal(args.limitedToHostCollectiveIds[0]);
             expect(paymentMethod.balance).to.be.equal(args.amount);
           });
-      });
-    }); /** End Of "#create" */
+      }); /** End Of "should create a U$100 virtual card payment method" */
+
+      it('should create a virtual card with monthly limit member of U$100 per month', () => {
+        const args = {
+          CollectiveId: collective1.id,
+          monthlyLimitPerMember: 10000,
+          currency: 'USD',
+          limitedToTags: ['open source', 'diversity in tech'],
+          limitedToHostCollectiveIds: [1],
+        };
+        return request(app)
+          .post('/v1/payment-methods')
+          .set('Authorization', `Bearer ${user1.jwt()}`)
+          .set('Client-Id', appKeyData.clientId)
+          .send(args)
+          .expect(200)
+          .toPromise()
+          .then(res => {
+            expect(res.body).to.exist;
+            const paymentMethod = res.body;
+            expect(paymentMethod.CollectiveId).to.be.equal(collective1.id);
+            expect(paymentMethod.limitedToTags[0]).to.be.equal(args.limitedToTags[0]);
+            expect(paymentMethod.limitedToHostCollectiveIds[0]).to.be.equal(args.limitedToHostCollectiveIds[0]);
+            expect(
+              moment(paymentMethod.expiryDate).format('YYYY-MM-DD'),
+            ).to.be.equal(
+              moment()
+                .add(3, 'months')
+                .format('YYYY-MM-DD'),
+            );
+            expect(paymentMethod.monthlyLimitPerMember).to.be.equal(args.monthlyLimitPerMember);
+            // if there is a monthlyLimitPerMember balance must not exist
+            expect(paymentMethod.balance).to.not.exist;
+          });
+      }); /** End Of "should create a virtual card with monthly limit member of U$100 per month" */
+    }); /** End Of "POST /payment-methods to Create a virtual card" */
   }); /** End Of "routes.paymentMethods.virtualcard" */
 });

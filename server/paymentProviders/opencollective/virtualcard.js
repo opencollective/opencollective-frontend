@@ -26,16 +26,30 @@ async function getBalance(paymentMethod) {
       }`,
     );
   }
-  /* Result will be negative (We're looking for DEBIT transactions) */
-  const spent = await libtransactions.sum({
+  let query = {
     PaymentMethodId: paymentMethod.id,
     currency: paymentMethod.currency,
     type: 'DEBIT',
-  });
-  return {
-    amount: paymentMethod.initialBalance + spent,
+  };
+  let initialBalance = paymentMethod.initialBalance;
+  if (paymentMethod.monthlyLimitPerMember) {
+    // consider initial balance as monthly limit
+    initialBalance = paymentMethod.monthlyLimitPerMember;
+    // find first and last days of current month(first and last ms of those days)
+    const date = new Date();
+    const firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
+    const lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+    lastDay.setHours(23,59,59,999);
+    // update query to filter result through the dates
+    query = { ...query, createdAt: { [Op.between]: [firstDay, lastDay] } };
+  }
+  /* Result will be negative (We're looking for DEBIT transactions) */
+  const spent = await libtransactions.sum(query);
+  const balance = {
+    amount: initialBalance + spent,
     currency: paymentMethod.currency,
   };
+  return balance;
 }
 
 /** Process a virtual card order
@@ -58,7 +72,7 @@ async function processOrder(order) {
   // Checking if balance is ok or will still be after completing the order
   const balance = await getBalance(paymentMethod);
   if (!balance || balance.amount <= 0) {
-    throw new Error('Virtual card has no balance to complete this order');
+    throw new Error('This payment method has no balance to complete this order');
   }
   if (balance.amount - order.totalAmount < 0) {
     throw new Error(
@@ -106,14 +120,16 @@ async function processOrder(order) {
  *
  * @param {Object} args contains the parameters to create the new
  *  payment method.
+ * @param {Number} args.CollectiveId The ID of the organization creating the virtual card.
+ * @param {String} args.currency The currency of the card to be created.
+ * @param {Number} [args.amount] The total amount that will be
+ *  credited to the newly created payment method.
+ * @param {Number} [args.monthlyLimitPerMember] Limit for the value of
+ *  the card that can be used per month in cents.
  * @param {String} [args.description] The description of the new payment
  *  method.
- * @param {Number} args.CollectiveId The ID of the organization creating the virtual card.
  * @param {Number} [args.PaymentMethodId] The ID of the Source Payment method the
  *                 organization wants to use
- * @param {Number} args.amount The total amount that will be
- *  credited to the newly created payment method.
- * @param {String} args.currency The currency of the card to be created.
  * @param {Date} [args.expiryDate] The expiry date of the payment method
  * @param {[limitedToTags]} [args.limitedToTags] Limit this payment method to donate to collectives having those tags
  * @param {[limitedToCollectiveIds]} [args.limitedToCollectiveIds] Limit this payment method to those collective ids
@@ -147,14 +163,24 @@ async function create(args, remoteUser) {
     : moment()
         .add(3, 'months')
         .format();
+  // If monthlyLimitPerMember is defined, we ignore the amount field and
+  // consider monthlyLimitPerMember times the months from now until the expiry date
+  let monthlyLimitPerMember;
+  let amount = args.amount;
+  let description = `${formatCurrency(amount, args.currency)} card from ${collective.name}`;
+  if (args.monthlyLimitPerMember) {
+    monthlyLimitPerMember = args.monthlyLimitPerMember;
+    amount = null;
+    description = `${formatCurrency(args. monthlyLimitPerMember, args.currency)} monthly card from ${collective.name}`;
+  }
 
-  const description = `${formatCurrency(args.amount, args.currency)} card from ${collective.name}`;
   // creates a new Virtual card Payment method
   const paymentMethod = await models.PaymentMethod.create({
     CreatedByUserId: remoteUser && remoteUser.id,
     name: description,
     description: args.description || description,
-    initialBalance: args.amount,
+    initialBalance: amount,
+    monthlyLimitPerMember: monthlyLimitPerMember,
     currency: args.currency,
     CollectiveId: args.CollectiveId,
     expiryDate: expiryDate,
