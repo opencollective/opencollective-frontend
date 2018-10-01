@@ -125,7 +125,7 @@
     "babel-plugin-lodash": "^3.3.4",
     "babel-plugin-react-intl": "^3.0.1",
     "babel-plugin-styled-components": "^1.7.1",
-    "commitizen": "^2.10.1",
+    "commitizen": "^3.0.1",
     "cypress": "3.1.0",
     "cz-conventional-changelog": "^2.1.0",
     "enzyme": "^3.6.0",
