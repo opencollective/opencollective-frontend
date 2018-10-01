@@ -59,7 +59,7 @@ class Apps extends React.Component {
     }
 
     const apiKeys = Collective.applications.filter(
-      app => app.type === 'apiKey',
+      app => app.type === 'API_KEY',
     );
 
     return (
@@ -108,6 +108,8 @@ class Apps extends React.Component {
                     {apiKeys.map(application => (
                       <div className="app" key={application.id}>
                         <div className="keys">
+                          API Key: <code>{application.apiKey}</code>
+                          &nbsp; - &nbsp;
                           <Link
                             route="editApplication"
                             params={{
@@ -115,9 +117,7 @@ class Apps extends React.Component {
                               applicationId: application.id,
                             }}
                           >
-                            <a>
-                              API Key: <code>{application.apiKey}</code>
-                            </a>
+                            <a>Delete</a>
                           </Link>
                         </div>
                       </div>

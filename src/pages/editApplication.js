@@ -145,7 +145,7 @@ class EditApplication extends React.Component {
                 onSubmit={this.handleSubmit}
                 ref={this.createForm}
               >
-                {this.state.form.type === 'apiKey' && (
+                {this.state.form.type === 'API_KEY' && (
                   <Fragment>
                     <h3>Edit an API Key</h3>
                     <div className="separator">
@@ -159,7 +159,7 @@ class EditApplication extends React.Component {
                     </div>
                   </Fragment>
                 )}
-                {this.state.form.type !== 'apiKey' && (
+                {this.state.form.type !== 'API_KEY' && (
                   <Fragment>
                     <h3>Edit an application</h3>
                     <Row key="app.name.input">
