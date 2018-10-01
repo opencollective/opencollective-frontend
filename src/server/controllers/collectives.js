@@ -277,8 +277,6 @@ export async function website(req, res) {
   parsedUrl.search = `?${queryString.stringify(params)}`;
   redirectUrl = url.format(parsedUrl);
 
-  req.ga.event(`GithubWidget-${selector}`, 'Click', user.slug, position);
-
   res.redirect(301, redirectUrl);
 }
 
@@ -321,10 +319,6 @@ export async function avatar(req, res) {
     maxWidth = maxHeight * 3;
   }
 
-  // We only record a page view when loading the first avatar
-  if (position == 0) {
-    req.ga.pageview();
-  }
   const collectiveType = user.type === 'USER' ? 'user' : 'organization';
   let imageUrl = `/static/images/${collectiveType}.svg`;
   if (user.image && user.image.substr(0, 1) !== '/') {
