@@ -1,5 +1,15 @@
 import React from 'react';
 import App, { Container } from 'next/app';
+import Router from 'next/router';
+import NProgress from 'nprogress';
+
+import '../../node_modules/nprogress/nprogress.css';
+
+Router.onRouteChangeStart = () => NProgress.start();
+
+Router.onRouteChangeComplete = () => NProgress.done();
+
+Router.onRouteChangeError = () => NProgress.done();
 
 import { getGoogleMapsScriptUrl, loadGoogleMaps } from '../lib/google-maps';
 

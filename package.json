@@ -54,6 +54,7 @@
     "next": "7.0.1",
     "next-routes": "1.4.2",
     "node-fetch": "2.2.0",
+    "nprogress": "0.2.0",
     "nuka-carousel": "4.4.0",
     "payment": "2.3.0",
     "prop-types": "15.6.2",
