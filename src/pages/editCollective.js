@@ -23,7 +23,8 @@ class EditCollectivePage extends React.Component {
       res.setHeader('Cache-Control', 'no-cache');
     }
 
-    return { slug: query && query.slug, query, ssr: false };
+    const scripts = { googleMaps: true }; // Used in <InputTypeLocation>
+    return { slug: query && query.slug, query, ssr: false, scripts };
   }
 
   static propTypes = {

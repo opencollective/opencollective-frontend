@@ -1,6 +1,3 @@
-/* global paypal */
-/* The `paypal` global comes from a script included in _document.js */
-
 import React from 'react';
 import moment from 'moment';
 import PropTypes from 'prop-types';
@@ -29,6 +26,7 @@ import {
   isValidEmail,
   getEnvVar,
 } from '../lib/utils';
+import { getPaypal } from '../lib/paypal';
 import { getStripeToken } from '../lib/stripe';
 import { checkUserExistence, signin } from '../lib/api';
 import { getOcCardBalanceQuery } from '../graphql/queries';
@@ -649,6 +647,7 @@ class OrderForm extends React.Component {
     };
 
     try {
+      const paypal = await getPaypal();
       paypal.Button.render(renderOptions, '#paypal-checkout');
     } catch (error) {
       console.error(error);

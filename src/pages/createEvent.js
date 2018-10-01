@@ -12,7 +12,9 @@ import withLoggedInUser from '../lib/withLoggedInUser';
 
 class CreateEventPage extends React.Component {
   static getInitialProps({ query: { parentCollectiveSlug } }) {
-    return { slug: parentCollectiveSlug };
+    const scripts = { googleMaps: true }; // Used in <InputTypeLocation>
+
+    return { slug: parentCollectiveSlug, scripts };
   }
 
   static propTypes = {

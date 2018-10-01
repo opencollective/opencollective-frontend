@@ -18,7 +18,9 @@ class EventPage extends React.Component {
       res.setHeader('Cache-Control', 's-maxage=300');
     }
 
-    return { parentCollectiveSlug, eventSlug };
+    const scripts = { googleMaps: true }; // Used in <Event> -> <Location> -> <Map>
+
+    return { parentCollectiveSlug, eventSlug, scripts };
   }
 
   static propTypes = {

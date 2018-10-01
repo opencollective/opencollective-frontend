@@ -9,6 +9,7 @@ describe('collective page', () => {
   });
 
   it('loads the collective page', () => {
+    cy.wait(100);
     cy.get('#contribute .TierCard').should('have.length', 2);
     cy.get('#contributors .CollectiveCard')
       .first()
