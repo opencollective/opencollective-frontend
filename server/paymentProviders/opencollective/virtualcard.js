@@ -26,16 +26,30 @@ async function getBalance(paymentMethod) {
       }`,
     );
   }
-  /* Result will be negative (We're looking for DEBIT transactions) */
-  const spent = await libtransactions.sum({
+  let query = {
     PaymentMethodId: paymentMethod.id,
     currency: paymentMethod.currency,
     type: 'DEBIT',
-  });
-  return {
-    amount: paymentMethod.initialBalance + spent,
+  };
+  let initialBalance = paymentMethod.initialBalance;
+  if (paymentMethod.monthlyLimitPerMember) {
+    // consider initial balance as monthly limit
+    initialBalance = paymentMethod.monthlyLimitPerMember;
+    // find first and last days of current month(first and last ms of those days)
+    const date = new Date();
+    const firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
+    const lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+    lastDay.setHours(23,59,59,999);
+    // update query to filter result through the dates
+    query = { ...query, createdAt: { [Op.between]: [firstDay, lastDay] } };
+  }
+  /* Result will be negative (We're looking for DEBIT transactions) */
+  const spent = await libtransactions.sum(query);
+  const balance = {
+    amount: initialBalance + spent,
     currency: paymentMethod.currency,
   };
+  return balance;
 }
 
 /** Process a virtual card order
@@ -58,7 +72,7 @@ async function processOrder(order) {
   // Checking if balance is ok or will still be after completing the order
   const balance = await getBalance(paymentMethod);
   if (!balance || balance.amount <= 0) {
-    throw new Error('Virtual card has no balance to complete this order');
+    throw new Error('This payment method has no balance to complete this order');
   }
   if (balance.amount - order.totalAmount < 0) {
     throw new Error(
