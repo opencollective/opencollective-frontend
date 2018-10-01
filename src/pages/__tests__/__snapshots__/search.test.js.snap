@@ -1068,6 +1068,7 @@ exports[`Search Page renders empty results message 1`] = `
                 fontSize="1.4rem"
                 fontWeight="400"
                 href="/discover"
+                onClick={[Function]}
               >
                 Discover
               </a>
@@ -1082,6 +1083,7 @@ exports[`Search Page renders empty results message 1`] = `
                 fontSize="1.4rem"
                 fontWeight="400"
                 href="/learn-more"
+                onClick={[Function]}
               >
                 How it Works
               </a>
@@ -1096,6 +1098,7 @@ exports[`Search Page renders empty results message 1`] = `
                 fontSize="1.4rem"
                 fontWeight="400"
                 href="/opensource"
+                onClick={[Function]}
               >
                 Use Cases
               </a>
@@ -1110,6 +1113,7 @@ exports[`Search Page renders empty results message 1`] = `
                 fontSize="1.4rem"
                 fontWeight="400"
                 href="/signin"
+                onClick={[Function]}
               >
                 Sign Up
               </a>
@@ -1124,6 +1128,7 @@ exports[`Search Page renders empty results message 1`] = `
                 fontSize="1.4rem"
                 fontWeight="400"
                 href="/signin"
+                onClick={[Function]}
               >
                 Login
               </a>
@@ -1154,6 +1159,7 @@ exports[`Search Page renders empty results message 1`] = `
                 fontSize="1.4rem"
                 fontWeight="400"
                 href="/create"
+                onClick={[Function]}
               >
                 Create a Collective
               </a>
@@ -1168,6 +1174,7 @@ exports[`Search Page renders empty results message 1`] = `
                 fontSize="1.4rem"
                 fontWeight="400"
                 href="/organizations/new"
+                onClick={[Function]}
               >
                 Become a Sponsor
               </a>
@@ -1182,6 +1189,7 @@ exports[`Search Page renders empty results message 1`] = `
                 fontSize="1.4rem"
                 fontWeight="400"
                 href="/chapters"
+                onClick={[Function]}
               >
                 Create a chapter
               </a>
@@ -1212,6 +1220,7 @@ exports[`Search Page renders empty results message 1`] = `
                 fontSize="1.4rem"
                 fontWeight="400"
                 href="/opensource"
+                onClick={[Function]}
               >
                 Open Source
               </a>
@@ -1226,6 +1235,7 @@ exports[`Search Page renders empty results message 1`] = `
                 fontSize="1.4rem"
                 fontWeight="400"
                 href="https://github.com/opencollective/opencollective/issues"
+                onClick={[Function]}
               >
                 Report an issue
               </a>
@@ -1240,6 +1250,7 @@ exports[`Search Page renders empty results message 1`] = `
                 fontSize="1.4rem"
                 fontWeight="400"
                 href="https://slack.opencollective.com"
+                onClick={[Function]}
               >
                 Slack
               </a>
@@ -1254,6 +1265,7 @@ exports[`Search Page renders empty results message 1`] = `
                 fontSize="1.4rem"
                 fontWeight="400"
                 href="https://github.com/opencollective/opencollective/wiki"
+                onClick={[Function]}
               >
                 Wiki
               </a>
@@ -1268,6 +1280,7 @@ exports[`Search Page renders empty results message 1`] = `
                 fontSize="1.4rem"
                 fontWeight="400"
                 href="mailto:support@opencollective.com"
+                onClick={[Function]}
               >
                 Email Support
               </a>
@@ -1298,6 +1311,7 @@ exports[`Search Page renders empty results message 1`] = `
                 fontSize="1.4rem"
                 fontWeight="400"
                 href="/about"
+                onClick={[Function]}
               >
                 About
               </a>
@@ -1312,6 +1326,7 @@ exports[`Search Page renders empty results message 1`] = `
                 fontSize="1.4rem"
                 fontWeight="400"
                 href="/faq"
+                onClick={[Function]}
               >
                 FAQ
               </a>
@@ -1326,6 +1341,7 @@ exports[`Search Page renders empty results message 1`] = `
                 fontSize="1.4rem"
                 fontWeight="400"
                 href="https://medium.com/open-collective"
+                onClick={[Function]}
               >
                 Blog
               </a>
@@ -1340,6 +1356,7 @@ exports[`Search Page renders empty results message 1`] = `
                 fontSize="1.4rem"
                 fontWeight="400"
                 href="/tos"
+                onClick={[Function]}
               >
                 Terms of Service
               </a>
@@ -1354,6 +1371,7 @@ exports[`Search Page renders empty results message 1`] = `
                 fontSize="1.4rem"
                 fontWeight="400"
                 href="/privacypolicy"
+                onClick={[Function]}
               >
                 Privacy Policy
               </a>
@@ -2360,6 +2378,7 @@ exports[`Search Page renders error message 1`] = `
                 fontSize="1.4rem"
                 fontWeight="400"
                 href="/discover"
+                onClick={[Function]}
               >
                 Discover
               </a>
@@ -2374,6 +2393,7 @@ exports[`Search Page renders error message 1`] = `
                 fontSize="1.4rem"
                 fontWeight="400"
                 href="/learn-more"
+                onClick={[Function]}
               >
                 How it Works
               </a>
@@ -2388,6 +2408,7 @@ exports[`Search Page renders error message 1`] = `
                 fontSize="1.4rem"
                 fontWeight="400"
                 href="/opensource"
+                onClick={[Function]}
               >
                 Use Cases
               </a>
@@ -2402,6 +2423,7 @@ exports[`Search Page renders error message 1`] = `
                 fontSize="1.4rem"
                 fontWeight="400"
                 href="/signin"
+                onClick={[Function]}
               >
                 Sign Up
               </a>
@@ -2416,6 +2438,7 @@ exports[`Search Page renders error message 1`] = `
                 fontSize="1.4rem"
                 fontWeight="400"
                 href="/signin"
+                onClick={[Function]}
               >
                 Login
               </a>
@@ -2446,6 +2469,7 @@ exports[`Search Page renders error message 1`] = `
                 fontSize="1.4rem"
                 fontWeight="400"
                 href="/create"
+                onClick={[Function]}
               >
                 Create a Collective
               </a>
@@ -2460,6 +2484,7 @@ exports[`Search Page renders error message 1`] = `
                 fontSize="1.4rem"
                 fontWeight="400"
                 href="/organizations/new"
+                onClick={[Function]}
               >
                 Become a Sponsor
               </a>
@@ -2474,6 +2499,7 @@ exports[`Search Page renders error message 1`] = `
                 fontSize="1.4rem"
                 fontWeight="400"
                 href="/chapters"
+                onClick={[Function]}
               >
                 Create a chapter
               </a>
@@ -2504,6 +2530,7 @@ exports[`Search Page renders error message 1`] = `
                 fontSize="1.4rem"
                 fontWeight="400"
                 href="/opensource"
+                onClick={[Function]}
               >
                 Open Source
               </a>
@@ -2518,6 +2545,7 @@ exports[`Search Page renders error message 1`] = `
                 fontSize="1.4rem"
                 fontWeight="400"
                 href="https://github.com/opencollective/opencollective/issues"
+                onClick={[Function]}
               >
                 Report an issue
               </a>
@@ -2532,6 +2560,7 @@ exports[`Search Page renders error message 1`] = `
                 fontSize="1.4rem"
                 fontWeight="400"
                 href="https://slack.opencollective.com"
+                onClick={[Function]}
               >
                 Slack
               </a>
@@ -2546,6 +2575,7 @@ exports[`Search Page renders error message 1`] = `
                 fontSize="1.4rem"
                 fontWeight="400"
                 href="https://github.com/opencollective/opencollective/wiki"
+                onClick={[Function]}
               >
                 Wiki
               </a>
@@ -2560,6 +2590,7 @@ exports[`Search Page renders error message 1`] = `
                 fontSize="1.4rem"
                 fontWeight="400"
                 href="mailto:support@opencollective.com"
+                onClick={[Function]}
               >
                 Email Support
               </a>
@@ -2590,6 +2621,7 @@ exports[`Search Page renders error message 1`] = `
                 fontSize="1.4rem"
                 fontWeight="400"
                 href="/about"
+                onClick={[Function]}
               >
                 About
               </a>
@@ -2604,6 +2636,7 @@ exports[`Search Page renders error message 1`] = `
                 fontSize="1.4rem"
                 fontWeight="400"
                 href="/faq"
+                onClick={[Function]}
               >
                 FAQ
               </a>
@@ -2618,6 +2651,7 @@ exports[`Search Page renders error message 1`] = `
                 fontSize="1.4rem"
                 fontWeight="400"
                 href="https://medium.com/open-collective"
+                onClick={[Function]}
               >
                 Blog
               </a>
@@ -2632,6 +2666,7 @@ exports[`Search Page renders error message 1`] = `
                 fontSize="1.4rem"
                 fontWeight="400"
                 href="/tos"
+                onClick={[Function]}
               >
                 Terms of Service
               </a>
@@ -2646,6 +2681,7 @@ exports[`Search Page renders error message 1`] = `
                 fontSize="1.4rem"
                 fontWeight="400"
                 href="/privacypolicy"
+                onClick={[Function]}
               >
                 Privacy Policy
               </a>
@@ -3854,6 +3890,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
                 fontSize="1.4rem"
                 fontWeight="400"
                 href="/discover"
+                onClick={[Function]}
               >
                 Discover
               </a>
@@ -3868,6 +3905,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
                 fontSize="1.4rem"
                 fontWeight="400"
                 href="/learn-more"
+                onClick={[Function]}
               >
                 How it Works
               </a>
@@ -3882,6 +3920,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
                 fontSize="1.4rem"
                 fontWeight="400"
                 href="/opensource"
+                onClick={[Function]}
               >
                 Use Cases
               </a>
@@ -3896,6 +3935,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
                 fontSize="1.4rem"
                 fontWeight="400"
                 href="/signin"
+                onClick={[Function]}
               >
                 Sign Up
               </a>
@@ -3910,6 +3950,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
                 fontSize="1.4rem"
                 fontWeight="400"
                 href="/signin"
+                onClick={[Function]}
               >
                 Login
               </a>
@@ -3940,6 +3981,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
                 fontSize="1.4rem"
                 fontWeight="400"
                 href="/create"
+                onClick={[Function]}
               >
                 Create a Collective
               </a>
@@ -3954,6 +3996,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
                 fontSize="1.4rem"
                 fontWeight="400"
                 href="/organizations/new"
+                onClick={[Function]}
               >
                 Become a Sponsor
               </a>
@@ -3968,6 +4011,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
                 fontSize="1.4rem"
                 fontWeight="400"
                 href="/chapters"
+                onClick={[Function]}
               >
                 Create a chapter
               </a>
@@ -3998,6 +4042,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
                 fontSize="1.4rem"
                 fontWeight="400"
                 href="/opensource"
+                onClick={[Function]}
               >
                 Open Source
               </a>
@@ -4012,6 +4057,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
                 fontSize="1.4rem"
                 fontWeight="400"
                 href="https://github.com/opencollective/opencollective/issues"
+                onClick={[Function]}
               >
                 Report an issue
               </a>
@@ -4026,6 +4072,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
                 fontSize="1.4rem"
                 fontWeight="400"
                 href="https://slack.opencollective.com"
+                onClick={[Function]}
               >
                 Slack
               </a>
@@ -4040,6 +4087,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
                 fontSize="1.4rem"
                 fontWeight="400"
                 href="https://github.com/opencollective/opencollective/wiki"
+                onClick={[Function]}
               >
                 Wiki
               </a>
@@ -4054,6 +4102,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
                 fontSize="1.4rem"
                 fontWeight="400"
                 href="mailto:support@opencollective.com"
+                onClick={[Function]}
               >
                 Email Support
               </a>
@@ -4084,6 +4133,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
                 fontSize="1.4rem"
                 fontWeight="400"
                 href="/about"
+                onClick={[Function]}
               >
                 About
               </a>
@@ -4098,6 +4148,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
                 fontSize="1.4rem"
                 fontWeight="400"
                 href="/faq"
+                onClick={[Function]}
               >
                 FAQ
               </a>
@@ -4112,6 +4163,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
                 fontSize="1.4rem"
                 fontWeight="400"
                 href="https://medium.com/open-collective"
+                onClick={[Function]}
               >
                 Blog
               </a>
@@ -4126,6 +4178,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
                 fontSize="1.4rem"
                 fontWeight="400"
                 href="/tos"
+                onClick={[Function]}
               >
                 Terms of Service
               </a>
@@ -4140,6 +4193,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
                 fontSize="1.4rem"
                 fontWeight="400"
                 href="/privacypolicy"
+                onClick={[Function]}
               >
                 Privacy Policy
               </a>
@@ -5326,6 +5380,7 @@ exports[`Search Page renders search results with pagination 1`] = `
                 fontSize="1.4rem"
                 fontWeight="400"
                 href="/discover"
+                onClick={[Function]}
               >
                 Discover
               </a>
@@ -5340,6 +5395,7 @@ exports[`Search Page renders search results with pagination 1`] = `
                 fontSize="1.4rem"
                 fontWeight="400"
                 href="/learn-more"
+                onClick={[Function]}
               >
                 How it Works
               </a>
@@ -5354,6 +5410,7 @@ exports[`Search Page renders search results with pagination 1`] = `
                 fontSize="1.4rem"
                 fontWeight="400"
                 href="/opensource"
+                onClick={[Function]}
               >
                 Use Cases
               </a>
@@ -5368,6 +5425,7 @@ exports[`Search Page renders search results with pagination 1`] = `
                 fontSize="1.4rem"
                 fontWeight="400"
                 href="/signin"
+                onClick={[Function]}
               >
                 Sign Up
               </a>
@@ -5382,6 +5440,7 @@ exports[`Search Page renders search results with pagination 1`] = `
                 fontSize="1.4rem"
                 fontWeight="400"
                 href="/signin"
+                onClick={[Function]}
               >
                 Login
               </a>
@@ -5412,6 +5471,7 @@ exports[`Search Page renders search results with pagination 1`] = `
                 fontSize="1.4rem"
                 fontWeight="400"
                 href="/create"
+                onClick={[Function]}
               >
                 Create a Collective
               </a>
@@ -5426,6 +5486,7 @@ exports[`Search Page renders search results with pagination 1`] = `
                 fontSize="1.4rem"
                 fontWeight="400"
                 href="/organizations/new"
+                onClick={[Function]}
               >
                 Become a Sponsor
               </a>
@@ -5440,6 +5501,7 @@ exports[`Search Page renders search results with pagination 1`] = `
                 fontSize="1.4rem"
                 fontWeight="400"
                 href="/chapters"
+                onClick={[Function]}
               >
                 Create a chapter
               </a>
@@ -5470,6 +5532,7 @@ exports[`Search Page renders search results with pagination 1`] = `
                 fontSize="1.4rem"
                 fontWeight="400"
                 href="/opensource"
+                onClick={[Function]}
               >
                 Open Source
               </a>
@@ -5484,6 +5547,7 @@ exports[`Search Page renders search results with pagination 1`] = `
                 fontSize="1.4rem"
                 fontWeight="400"
                 href="https://github.com/opencollective/opencollective/issues"
+                onClick={[Function]}
               >
                 Report an issue
               </a>
@@ -5498,6 +5562,7 @@ exports[`Search Page renders search results with pagination 1`] = `
                 fontSize="1.4rem"
                 fontWeight="400"
                 href="https://slack.opencollective.com"
+                onClick={[Function]}
               >
                 Slack
               </a>
@@ -5512,6 +5577,7 @@ exports[`Search Page renders search results with pagination 1`] = `
                 fontSize="1.4rem"
                 fontWeight="400"
                 href="https://github.com/opencollective/opencollective/wiki"
+                onClick={[Function]}
               >
                 Wiki
               </a>
@@ -5526,6 +5592,7 @@ exports[`Search Page renders search results with pagination 1`] = `
                 fontSize="1.4rem"
                 fontWeight="400"
                 href="mailto:support@opencollective.com"
+                onClick={[Function]}
               >
                 Email Support
               </a>
@@ -5556,6 +5623,7 @@ exports[`Search Page renders search results with pagination 1`] = `
                 fontSize="1.4rem"
                 fontWeight="400"
                 href="/about"
+                onClick={[Function]}
               >
                 About
               </a>
@@ -5570,6 +5638,7 @@ exports[`Search Page renders search results with pagination 1`] = `
                 fontSize="1.4rem"
                 fontWeight="400"
                 href="/faq"
+                onClick={[Function]}
               >
                 FAQ
               </a>
@@ -5584,6 +5653,7 @@ exports[`Search Page renders search results with pagination 1`] = `
                 fontSize="1.4rem"
                 fontWeight="400"
                 href="https://medium.com/open-collective"
+                onClick={[Function]}
               >
                 Blog
               </a>
@@ -5598,6 +5668,7 @@ exports[`Search Page renders search results with pagination 1`] = `
                 fontSize="1.4rem"
                 fontWeight="400"
                 href="/tos"
+                onClick={[Function]}
               >
                 Terms of Service
               </a>
@@ -5612,6 +5683,7 @@ exports[`Search Page renders search results with pagination 1`] = `
                 fontSize="1.4rem"
                 fontWeight="400"
                 href="/privacypolicy"
+                onClick={[Function]}
               >
                 Privacy Policy
               </a>

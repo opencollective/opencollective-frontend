@@ -1,6 +1,9 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Box, Flex } from 'grid-styled';
+
+import { Link } from '../server/pages';
+
 import { P } from './Text';
 import Container from './Container';
 import {
@@ -164,17 +167,18 @@ class Footer extends React.Component {
                       textAlign={['center', null, 'left']}
                       mb={2}
                     >
-                      <StyledLink
-                        href={navigation[key][item]}
-                        color="#6E747A"
-                        display="block"
-                        fontSize="1.4rem"
-                        fontWeight="400"
-                        m={0}
-                        p={0}
-                      >
-                        {item}
-                      </StyledLink>
+                      <Link route={navigation[key][item]} passHref>
+                        <StyledLink
+                          color="#6E747A"
+                          display="block"
+                          fontSize="1.4rem"
+                          fontWeight="400"
+                          m={0}
+                          p={0}
+                        >
+                          {item}
+                        </StyledLink>
+                      </Link>
                     </ListItem>
                   ))}
                 </FlexList>
