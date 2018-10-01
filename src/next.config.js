@@ -1,6 +1,7 @@
 import webpack from 'webpack';
+import withCSS from '@zeit/next-css';
 
-module.exports = {
+module.exports = withCSS({
   onDemandEntries: {
     // Make sure entries are not getting disposed.
     maxInactiveAge: 1000 * 60 * 60,
@@ -29,16 +30,10 @@ module.exports = {
         }),
       );
     }
-    config.module.rules.push(
-      {
-        test: /\.css$/,
-        use: ['babel-loader', 'raw-loader'],
-      },
-      {
-        test: /\.md$/,
-        use: ['babel-loader', 'raw-loader', 'markdown-loader'],
-      },
-    );
+    config.module.rules.push({
+      test: /\.md$/,
+      use: ['babel-loader', 'raw-loader', 'markdown-loader'],
+    });
     return config;
   },
-};
+});

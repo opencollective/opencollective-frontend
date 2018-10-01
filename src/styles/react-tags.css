@@ -1,3 +1,8 @@
+/*
+  Mostly copy from:
+  https://raw.githubusercontent.com/prakhar1989/react-tags/master/example/reactTags.css
+*/
+
 /* Example Styles for React Tags*/
 div.ReactTags__tags {
   position: relative;

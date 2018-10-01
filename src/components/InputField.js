@@ -22,8 +22,6 @@ import InputTypeTags from './InputTypeTags';
 
 import { capitalize } from '../lib/utils';
 
-import stylesheet from '../styles/react-datetime.css';
-
 // We use the DYNAMIC_IMPORT env variable to skip dynamic while using Jest
 const HTMLEditor = process.env.DYNAMIC_IMPORT
   ? dynamic(import('./HTMLEditor'))
@@ -33,6 +31,8 @@ const HTMLEditor = process.env.DYNAMIC_IMPORT
 const MarkdownEditor = process.env.DYNAMIC_IMPORT
   ? dynamic(import('./MarkdownEditor'))
   : require('./MarkdownEditor');
+
+import '../../node_modules/react-datetime/css/react-datetime.css';
 
 function FieldGroup({
   controlId,
@@ -675,7 +675,6 @@ class InputField extends React.Component {
             }
           `}
         </style>
-        <style dangerouslySetInnerHTML={{ __html: stylesheet }} />
         {this.input}
       </div>
     );
