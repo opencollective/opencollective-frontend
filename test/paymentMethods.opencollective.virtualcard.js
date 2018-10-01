@@ -183,10 +183,8 @@ describe('opencollective.virtualcard', () => {
             .format('YYYY-MM-DD'),
         );
         expect(paymentMethod.monthlyLimitPerMember).to.be.equal(args.monthlyLimitPerMember);
-        // paymentMethod.initialBalance should be equals 
-        // monthlyLimitPerMember times the months from now until the expiry date
-        const monthsFromNowToExpiryDate = Math.round(moment(paymentMethod.expiryDate).diff(moment(), 'months', true));
-        expect(paymentMethod.initialBalance).to.be.equal(Math.round(paymentMethod.monthlyLimitPerMember * monthsFromNowToExpiryDate));
+        // if there is a monthlyLimitPerMember balance must not exist
+        expect(paymentMethod.balance).to.not.exist;
         expect(paymentMethod.description).to.contain('monthly card from');
       }); /** End Of "should create a virtual card with monthly limit member of U$100 per month" */
 
@@ -206,10 +204,8 @@ describe('opencollective.virtualcard', () => {
         expect(paymentMethod.type).to.be.equal('virtualcard');
         expect(moment(paymentMethod.expiryDate).format('YYYY-MM-DD')).to.be.equal(expiryDate);
         expect(paymentMethod.monthlyLimitPerMember).to.be.equal(args.monthlyLimitPerMember);
-        // paymentMethod.initialBalance should be equals 
-        // monthlyLimitPerMember times the months from now until the expiry date
-        const monthsFromNowToExpiryDate = Math.round(moment(paymentMethod.expiryDate).diff(moment(), 'months', true));
-        expect(paymentMethod.initialBalance).to.be.equal(Math.round(paymentMethod.monthlyLimitPerMember * monthsFromNowToExpiryDate));
+        // if there is a monthlyLimitPerMember balance must not exist
+        expect(paymentMethod.balance).to.not.exist;
       }); /** End Of "should create a virtual card with monthly limit member of U$100 per month defining an expiry date" */
 
     }); /** End Of "#create" */
@@ -966,10 +962,8 @@ describe('opencollective.virtualcard', () => {
                 .format('YYYY-MM-DD'),
             );
             expect(paymentMethod.monthlyLimitPerMember).to.be.equal(args.monthlyLimitPerMember);
-            // paymentMethod.initialBalance should be equals 
-            // monthlyLimitPerMember times the months from now until the expiry date
-            const monthsFromNowToExpiryDate = Math.round(moment(paymentMethod.expiryDate).diff(moment(), 'months', true));
-            expect(paymentMethod.balance).to.be.equal(Math.round(paymentMethod.monthlyLimitPerMember * monthsFromNowToExpiryDate));
+            // if there is a monthlyLimitPerMember balance must not exist
+            expect(paymentMethod.balance).to.not.exist;
           });
       }); /** End Of "should create a virtual card with monthly limit member of U$100 per month" */
     }); /** End Of "POST /payment-methods to Create a virtual card" */
