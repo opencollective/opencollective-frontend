@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { ControlLabel, FormControl, FormGroup } from 'react-bootstrap';
 import { Box, Flex } from 'grid-styled';
-import Router from 'next/router';
+import { withRouter } from 'next/router';
 import classNames from 'classnames';
 import styled from 'styled-components';
 
@@ -91,10 +91,10 @@ class SearchPage extends React.Component {
     event.preventDefault();
 
     const { target: form } = event;
-    const { url } = this.props;
+    const { router } = this.props;
     const { q } = form;
 
-    Router.push({ pathname: url.pathname, query: { q: q.value } });
+    router.push({ pathname: router.pathname, query: { q: q.value } });
   };
 
   render() {
@@ -232,5 +232,5 @@ class SearchPage extends React.Component {
 export { SearchPage as MockSearchPage };
 
 export default withData(
-  withIntl(withLoggedInUser(addSearchQueryData(SearchPage))),
+  withIntl(withLoggedInUser(addSearchQueryData(withRouter(SearchPage)))),
 );
