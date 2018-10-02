@@ -3490,6 +3490,7 @@ exports[`Search Page renders error message 1`] = `
             color="#3385FF"
             display="inline-block"
             fontSize="1.4rem"
+            href="/signin?next=%2F"
             onClick={[Function]}
           >
             <span>
