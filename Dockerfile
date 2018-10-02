@@ -1,12 +1,9 @@
 FROM node:10
 
-RUN apt-get update -y && apt-get install -y graphicsmagick
-
 WORKDIR /usr/src/frontend
 
 # Pre-install heavy dependencies
 RUN npm install cypress
-RUN npm install puppeteer
 RUN npm install phantomjs-prebuilt
 
 # Install dependencies first
