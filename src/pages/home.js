@@ -775,7 +775,9 @@ class HomePage extends React.Component {
                       <FormattedNumber value={totalChapters} />
                     </P>
                     <P>
-                      <Link route={'chapters'}>chapters</Link>
+                      <Link route={'chapters'}>
+                        <a>chapters</a>
+                      </Link>
                     </P>
                   </Container>
                   <Container {...statsContainerStyles}>
