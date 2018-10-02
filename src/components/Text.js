@@ -12,6 +12,7 @@ import {
   style,
   textAlign,
 } from 'styled-system';
+import tag from 'clean-tag';
 
 export const textTransform = style({
   prop: 'textTransform',
@@ -25,22 +26,7 @@ export const cursor = style({
   prop: 'cursor',
 });
 
-export const Span = styled.span`
-  ${color}
-  ${display}
-  ${fontFamily}
-  ${fontSize}
-  ${fontStyle}
-  ${fontWeight}
-  ${lineHeight}
-  ${letterSpacing}
-  ${space}
-  ${textAlign}
-  ${textTransform}
-  ${whiteSpace}
-`;
-
-export const P = styled.p`
+export const P = styled(tag.p)`
   ${color}
   ${display}
   ${fontFamily}
@@ -61,20 +47,9 @@ P.defaultProps = {
   letterSpacing: '-0.2px',
 };
 
-export const H1 = styled.h1`
-  ${color}
-  ${display}
-  ${fontFamily}
-  ${fontSize}
-  ${fontStyle}
-  ${fontWeight}
-  ${lineHeight}
-  ${letterSpacing}
-  ${space}
-  ${textAlign}
-  ${textTransform}
-  ${whiteSpace}
-`;
+export const Span = P.withComponent(tag.span);
+
+export const H1 = P.withComponent(tag.h1);
 
 H1.defaultProps = {
   fontSize: '3.6rem',
@@ -82,20 +57,7 @@ H1.defaultProps = {
   m: 0,
 };
 
-export const H2 = styled.h2`
-  ${color}
-  ${display}
-  ${fontFamily}
-  ${fontSize}
-  ${fontStyle}
-  ${fontWeight}
-  ${lineHeight}
-  ${letterSpacing}
-  ${space}
-  ${textAlign}
-  ${textTransform}
-  ${whiteSpace}
-`;
+export const H2 = P.withComponent(tag.h2);
 
 H2.defaultProps = {
   fontSize: '3rem',
@@ -103,20 +65,7 @@ H2.defaultProps = {
   m: 0,
 };
 
-export const H3 = styled.h3`
-  ${color}
-  ${display}
-  ${fontFamily}
-  ${fontSize}
-  ${fontStyle}
-  ${fontWeight}
-  ${lineHeight}
-  ${letterSpacing}
-  ${space}
-  ${textAlign}
-  ${textTransform}
-  ${whiteSpace}
-`;
+export const H3 = P.withComponent(tag.h3);
 
 H3.defaultProps = {
   fontSize: '2.4rem',
@@ -124,20 +73,7 @@ H3.defaultProps = {
   m: 0,
 };
 
-export const H4 = styled.h4`
-  ${color}
-  ${display}
-  ${fontFamily}
-  ${fontSize}
-  ${fontStyle}
-  ${fontWeight}
-  ${lineHeight}
-  ${letterSpacing}
-  ${space}
-  ${textAlign}
-  ${textTransform}
-  ${whiteSpace}
-`;
+export const H4 = P.withComponent(tag.h4);
 
 H4.defaultProps = {
   fontSize: '1.8rem',
@@ -145,20 +81,7 @@ H4.defaultProps = {
   m: 0,
 };
 
-export const H5 = styled.h5`
-  ${color}
-  ${display}
-  ${fontFamily}
-  ${fontSize}
-  ${fontStyle}
-  ${fontWeight}
-  ${lineHeight}
-  ${letterSpacing}
-  ${space}
-  ${textAlign}
-  ${textTransform}
-  ${whiteSpace}
-`;
+export const H5 = P.withComponent(tag.h5);
 
 H5.defaultProps = {
   fontSize: '2rem',

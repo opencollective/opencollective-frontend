@@ -100,7 +100,9 @@ type Collective implements CollectiveInterface {
   followers(limit: Int, offset: Int): [CollectiveInterface]
   maxQuantity: Int
   tiers(id: Int, slug: String): [Tier]
-  orders: [OrderType]
+  orders(
+    status: OrderStatus
+  ): [OrderType]
   ordersFromCollective(subscriptionsOnly: Boolean): [OrderType]
   transactions(
     """type of transaction (DEBIT/CREDIT)"""
@@ -249,7 +251,9 @@ interface CollectiveInterface {
   followers(limit: Int, offset: Int): [CollectiveInterface]
   maxQuantity: Int
   tiers(id: Int, slug: String): [Tier]
-  orders: [OrderType]
+  orders(
+    status: OrderStatus
+  ): [OrderType]
   ordersFromCollective(subscriptionsOnly: Boolean): [OrderType]
   stats: CollectiveStatsType
   transactions(type: String, limit: Int, offset: Int): [Transaction]
@@ -485,7 +489,9 @@ type Event implements CollectiveInterface {
   followers(limit: Int, offset: Int): [CollectiveInterface]
   maxQuantity: Int
   tiers(id: Int, slug: String): [Tier]
-  orders: [OrderType]
+  orders(
+    status: OrderStatus
+  ): [OrderType]
   ordersFromCollective(subscriptionsOnly: Boolean): [OrderType]
   transactions(
     """type of transaction (DEBIT/CREDIT)"""
@@ -731,6 +737,7 @@ type Mutation {
   deleteApplication(id: Int!): Application
   createPaymentMethod(type: String!, amount: Int!, currency: String!, CollectiveId: Int!, PaymentMethodId: Int, description: String, expiryDate: String): PaymentMethodType
   claimPaymentMethod(code: String!, user: UserInputType): PaymentMethodType
+  claimCollective(id: Int!): CollectiveInterface
 }
 
 """Order model"""
@@ -984,7 +991,9 @@ type Organization implements CollectiveInterface {
   followers(limit: Int, offset: Int): [CollectiveInterface]
   maxQuantity: Int
   tiers(id: Int, slug: String): [Tier]
-  orders: [OrderType]
+  orders(
+    status: OrderStatus
+  ): [OrderType]
   ordersFromCollective(subscriptionsOnly: Boolean): [OrderType]
   transactions(
     """type of transaction (DEBIT/CREDIT)"""
@@ -1484,7 +1493,9 @@ type User implements CollectiveInterface {
   followers(limit: Int, offset: Int): [CollectiveInterface]
   maxQuantity: Int
   tiers(id: Int, slug: String): [Tier]
-  orders: [OrderType]
+  orders(
+    status: OrderStatus
+  ): [OrderType]
   ordersFromCollective(subscriptionsOnly: Boolean): [OrderType]
   transactions(
     """type of transaction (DEBIT/CREDIT)"""

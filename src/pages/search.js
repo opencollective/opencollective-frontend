@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { ControlLabel, FormControl, FormGroup } from 'react-bootstrap';
 import { Box, Flex } from 'grid-styled';
-import Router from 'next/router';
+import { withRouter } from 'next/router';
 import classNames from 'classnames';
 import styled from 'styled-components';
 
@@ -15,7 +15,7 @@ import ErrorPage from '../components/ErrorPage';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
 import LoadingGrid from '../components/LoadingGrid';
-
+import StyledLink from '../components/StyledLink';
 import colors from '../constants/colors';
 
 import { addSearchQueryData } from '../graphql/queries';
@@ -23,6 +23,8 @@ import { addSearchQueryData } from '../graphql/queries';
 import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
 import withLoggedInUser from '../lib/withLoggedInUser';
+
+const { USE_PLEDGES } = process.env;
 
 const SearchInput = styled(FormControl)`
   &&& {
@@ -55,6 +57,7 @@ class SearchPage extends React.Component {
       term: query.q || '',
       limit: query.limit || 20,
       offset: query.offset || 0,
+      usePledges: USE_PLEDGES || false,
     };
   }
 
@@ -62,9 +65,14 @@ class SearchPage extends React.Component {
     term: PropTypes.string, // for addSearchQueryData
     limit: PropTypes.number, // for addSearchQueryData
     offset: PropTypes.number, // for addSearchQueryData
-    url: PropTypes.object,
+    router: PropTypes.object, // from next.js
     data: PropTypes.object.isRequired, // from withData
     getLoggedInUser: PropTypes.func.isRequired, // from withLoggedInUser
+    usePledges: PropTypes.bool,
+  };
+
+  static defaultProps = {
+    usePledges: false,
   };
 
   state = {
@@ -89,16 +97,17 @@ class SearchPage extends React.Component {
     event.preventDefault();
 
     const { target: form } = event;
-    const { url } = this.props;
+    const { router } = this.props;
     const { q } = form;
 
-    Router.push({ pathname: url.pathname, query: { q: q.value } });
+    router.push({ pathname: router.pathname, query: { q: q.value } });
   };
 
   render() {
     const {
       data: { error, loading, search },
       term = '',
+      usePledges,
     } = this.props;
     const { loadingUserLogin, LoggedInUser } = this.state;
 
@@ -159,7 +168,7 @@ class SearchPage extends React.Component {
               {/* TODO: add suggested collectives when the result is empty */}
               {showCollectives &&
                 collectives.length === 0 && (
-                  <Flex py={3} width={1} justifyContent="center">
+                  <Flex py={3} width={1} justifyContent="center" flexDirection="column" alignItems="center">
                     <p>
                       <em>
                         No collectives found matching your query: &quot;
@@ -167,6 +176,25 @@ class SearchPage extends React.Component {
                         &quot;
                       </em>
                     </p>
+                    {usePledges && (
+                      <Link route={`/pledges/new?name=${term}`} passHref>
+                        <StyledLink
+                          bg="#3385FF"
+                          borderRadius="50px"
+                          color="white"
+                          display="block"
+                          fontSize="14px"
+                          fontWeight="bold"
+                          maxWidth="220px"
+                          hover={{ color: 'white' }}
+                          py={2}
+                          px={4}
+                          textAlign="center"
+                        >
+                          Make a pledge
+                        </StyledLink>
+                      </Link>
+                    )}
                   </Flex>
                 )}
             </Flex>
@@ -211,5 +239,5 @@ class SearchPage extends React.Component {
 export { SearchPage as MockSearchPage };
 
 export default withData(
-  withIntl(withLoggedInUser(addSearchQueryData(SearchPage))),
+  withIntl(withLoggedInUser(addSearchQueryData(withRouter(SearchPage)))),
 );

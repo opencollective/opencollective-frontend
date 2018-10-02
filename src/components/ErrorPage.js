@@ -30,6 +30,10 @@ class ErrorPage extends React.Component {
         id: 'page.error.collective.is.not.host',
         defaultMessage: 'This page is only for hosts',
       },
+      graphQLError: {
+        id: 'page.error.graphQLError',
+        defaultMessage: 'Request Error',
+      },
       networkError: {
         id: 'page.error.networkError',
         defaultMessage:
@@ -59,6 +63,10 @@ class ErrorPage extends React.Component {
       this.message = 'networkError';
     }
 
+    if (get(data, 'error.graphQLErrors')) {
+      this.message = 'graphQLError';
+    }
+
     if (loading || get(data, 'loading')) {
       this.message = 'loading';
       return <Loading />;
@@ -72,7 +80,7 @@ class ErrorPage extends React.Component {
   }
 
   defaultComponent() {
-    const { intl } = this.props;
+    const { intl, message } = this.props;
     return (
       <div>
         <style jsx>
@@ -95,6 +103,7 @@ class ErrorPage extends React.Component {
             {intl.formatMessage(this.messages[`${this.message}.description`])}
           </p>
         )}
+        {this.message === 'graphQLError' && <p>{message}</p>}
       </div>
     );
   }

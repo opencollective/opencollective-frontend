@@ -15,7 +15,11 @@ module.exports = withCSS({
       // Set extra environment variables accessible through process.env.*
       // Will be replaced by webpack by their values!
       new webpack.EnvironmentPlugin({
+        API_KEY: null,
+        API_URL: 'https://api.opencollective.com',
         DYNAMIC_IMPORT: true,
+        USE_PLEDGES: null, // should be unset by default
+        WEBSITE_URL: 'https://opencollective.com',
       }),
     );
 

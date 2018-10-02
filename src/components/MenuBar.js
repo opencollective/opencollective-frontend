@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import Sticky from 'react-stickynode';
 import gql from 'graphql-tag';
@@ -17,6 +17,8 @@ import Logo from './Logo';
 import Link from './Link';
 import Button from './Button';
 import AddFundsForm from './AddFundsForm';
+
+const { USE_PLEDGES } = process.env;
 
 class MenuBar extends React.Component {
   static propTypes = {
@@ -106,6 +108,10 @@ class MenuBar extends React.Component {
       'menu.edit.event': {
         id: 'menu.edit.event',
         defaultMessage: 'edit event',
+      },
+      'menu.createPledge': {
+        id: 'menu.createPledge',
+        defaultMessage: 'Make a Pledge',
       },
     });
 
@@ -257,6 +263,9 @@ class MenuBar extends React.Component {
       );
     }
 
+    const hasPledges =
+      !collective.isActive && collective.pledges && collective.pledges.length && USE_PLEDGES;
+
     const AddFundsModal = () => (
       <Modal
         show={this.state.showAddFunds}
@@ -331,16 +340,41 @@ class MenuBar extends React.Component {
           `}
         </style>
         {this.state.sticky && cta && cta}
-        {['COLLECTIVE', 'EVENT'].indexOf(collective.type) !== -1 && (
-          <Button
-            className="submitExpense darkBackground"
-            href={`${collective.path}/expenses/new`}
-          >
-            <FormattedMessage
-              id="menu.submitExpense"
-              defaultMessage="Submit Expense"
-            />
-          </Button>
+        {['COLLECTIVE', 'EVENT'].indexOf(collective.type) !== -1 &&
+          !hasPledges && (
+            <Button
+              className="submitExpense darkBackground"
+              href={`${collective.path}/expenses/new`}
+            >
+              <FormattedMessage
+                id="menu.submitExpense"
+                defaultMessage="Submit Expense"
+              />
+            </Button>
+          )}
+
+        {hasPledges && (
+          <Fragment>
+            <Button
+              className="claimCollective blue"
+              href={`${collective.path}/claim`}
+            >
+              <FormattedMessage
+                id="menu.claimCollective"
+                defaultMessage="Claim Collective"
+              />
+            </Button>
+
+            <Button
+              className="createPledge darkBackground"
+              href={`/pledges/new?name=${collective.slug}`}
+            >
+              <FormattedMessage
+                id="menu.createPledge"
+                defaultMessage="Make a Pledge"
+              />
+            </Button>
+          </Fragment>
         )}
 
         {LoggedInUser &&

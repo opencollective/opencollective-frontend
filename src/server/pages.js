@@ -1,5 +1,7 @@
 import nextRoutes from 'next-routes';
 
+const { USE_PLEDGES } = process.env;
+
 const pages = nextRoutes();
 
 pages
@@ -83,6 +85,12 @@ pages
   )
   .add('collective', '/:slug')
   .add('editCollective', '/:slug/edit');
+
+if (USE_PLEDGES) {
+  pages
+    .add('createPledge', '/pledges/new')
+    .add('claimCollective', '/:collectiveSlug/claim');
+}
 
 export default pages;
 

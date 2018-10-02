@@ -73,6 +73,7 @@ export const getLoggedInUserQuery = gql`
         type
         slug
         settings
+        currency
         paymentMethods(limit: 5) {
           id
           uuid
@@ -81,6 +82,9 @@ export const getLoggedInUserQuery = gql`
           service
           name
           data
+        }
+        connectedAccounts {
+          service
         }
       }
       memberOf {
@@ -424,6 +428,10 @@ const getCollectiveQuery = gql`
             backgroundImage
           }
         }
+      }
+      pledges: orders(status: PENDING) {
+        status
+        totalAmount
       }
     }
   }

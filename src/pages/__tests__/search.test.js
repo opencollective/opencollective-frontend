@@ -42,6 +42,24 @@ describe('Search Page', () => {
     expect(tree).toMatchSnapshot();
   });
 
+  it('renders "Make pledge" button with empty results', () => {
+    const emptyResultsProps = {
+      ...props,
+      data: {
+        search: {
+          collectives: [],
+        },
+      },
+      term: 'test',
+      usePledges: true,
+    };
+
+    const tree = renderer
+      .create(<MockSearchPage {...emptyResultsProps} />)
+      .toJSON();
+    expect(tree).toMatchSnapshot();
+  });
+
   it('renders error message', () => {
     const errorProps = {
       ...props,
@@ -83,8 +101,9 @@ describe('Search Page', () => {
 
     const submitProps = {
       ...props,
-      url: {
+      router: {
         pathname: '/search',
+        push: Router.push,
       },
     };
     const event = {
