@@ -145,7 +145,6 @@ class HomePage extends React.Component {
   };
 
   state = {
-    LoggedInUser: {},
     stats: {},
   };
 
