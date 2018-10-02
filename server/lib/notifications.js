@@ -204,8 +204,8 @@ async function w9bot(activity) {
 
   // Host has already received form from the current user so it won't trigger
   if (
-    get(host, 'data.W9.receivedFromUserIds') &&
-    host.data.W9.receivedFromUserIds.includes(activity.data.user.id)
+    get(host, 'data.W9.requestSentToUserIds') &&
+    host.data.W9.requestSentToUserIds.includes(activity.data.user.id)
   ) {
     return;
   }
