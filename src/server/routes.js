@@ -4,7 +4,6 @@ import fs from 'fs';
 import pdf from 'html-pdf';
 import moment from 'moment';
 import request from 'request';
-import express from 'express';
 
 import pages from './pages';
 import controllers from './controllers';
@@ -55,10 +54,6 @@ export default (server, app) => {
    * Ideally we should consolidate those routes under:
    * `/:collectiveSlug/members/:backerType(all|users|organizations)`
    */
-  server.use(
-    '/public',
-    express.static(path.join(__dirname, '../public'), { maxAge: '1d' }),
-  );
 
   server.get(
     '/:collectiveSlug/:backerType/:position/website(.:format(png|jpg|svg))?',
