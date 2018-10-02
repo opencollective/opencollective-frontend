@@ -57,6 +57,7 @@ class SearchPage extends React.Component {
       term: query.q || '',
       limit: query.limit || 20,
       offset: query.offset || 0,
+      usePledges: USE_PLEDGES || false,
     };
   }
 
@@ -64,9 +65,14 @@ class SearchPage extends React.Component {
     term: PropTypes.string, // for addSearchQueryData
     limit: PropTypes.number, // for addSearchQueryData
     offset: PropTypes.number, // for addSearchQueryData
-    url: PropTypes.object,
+    router: PropTypes.object, // from next.js
     data: PropTypes.object.isRequired, // from withData
     getLoggedInUser: PropTypes.func.isRequired, // from withLoggedInUser
+    usePledges: PropTypes.bool,
+  };
+
+  static defaultProps = {
+    usePledges: false,
   };
 
   state = {
@@ -101,6 +107,7 @@ class SearchPage extends React.Component {
     const {
       data: { error, loading, search },
       term = '',
+      usePledges,
     } = this.props;
     const { loadingUserLogin, LoggedInUser } = this.state;
 
@@ -169,7 +176,7 @@ class SearchPage extends React.Component {
                         &quot;
                       </em>
                     </p>
-                    {USE_PLEDGES && (
+                    {usePledges && (
                       <Link route={`/pledges/new?name=${term}`} passHref>
                         <StyledLink
                           bg="#3385FF"
