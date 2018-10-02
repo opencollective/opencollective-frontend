@@ -50,6 +50,7 @@ const templateNames = [
   'organization.newmember',
   'payment.failed',
   'payment.failed.text',
+  'pledge.complete',
   'processing',
   'report.platform',
   'subscription.canceled',

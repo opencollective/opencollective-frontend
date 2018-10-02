@@ -34,6 +34,7 @@ export const createOrUpdate = (req, res, next, accessToken, data, emails) => {
       const image = `https://images.githubusercontent.com/${
         data.profile.username
       }`;
+
       // TODO should simplify using findOrCreate but need to upgrade Sequelize to have this fix:
       // https://github.com/sequelize/sequelize/issues/4631
       if (req.remoteUser) {
@@ -91,12 +92,13 @@ export const createOrUpdate = (req, res, next, accessToken, data, emails) => {
             caId,
             data.profile.username,
           );
-          res.redirect(
-            redirect ||
-              `${
-                config.host.website
-              }/github/apply/${token}?utm_source=${utm_source}`,
-          );
+          const newLocation = redirect ?
+            `${redirect}?token=${token}` : 
+            `${
+              config.host.website
+            }/github/apply/${token}?utm_source=${utm_source}`;
+
+          res.redirect(newLocation);
         })
         .catch(next);
     }

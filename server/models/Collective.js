@@ -31,7 +31,7 @@ const ics = require('ics'); // eslint-disable-line import/no-commonjs
 
 const debug = debugLib('collective');
 
-const defaultTiers = (HostCollectiveId, currency) => {
+export const defaultTiers = (HostCollectiveId, currency) => {
   const tiers = [];
 
   if (HostCollectiveId === 858) {
@@ -1138,7 +1138,7 @@ export default function(Sequelize, DataTypes) {
   Collective.prototype.addUserWithRole = function(
     user,
     role,
-    defaultAttributes,
+    defaultAttributes = {},
   ) {
     if (role === roles.HOST) {
       return console.error(

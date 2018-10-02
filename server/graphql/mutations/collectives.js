@@ -1,3 +1,4 @@
+import debugLib from 'debug';
 import slugify from 'slug';
 import { get, omit } from 'lodash';
 import models from '../../models';
@@ -5,6 +6,11 @@ import * as errors from '../errors';
 import { types } from '../../constants/collectives';
 import roles from '../../constants/roles';
 import activities from '../../constants/activities';
+import { defaultHostCollective } from '../../lib/utils';
+import emailLib from '../../lib/email';
+import { defaultTiers } from '../../models/Collective';
+
+const debug = debugLib('claim');
 
 export async function createCollective(_, args, req) {
   if (!req.remoteUser) {
@@ -386,4 +392,69 @@ export function deleteCollective(_, args, req) {
 
     return collective.destroy();
   });
+}
+
+export async function claimCollective (_, args, req) {
+  if (!req.remoteUser) {
+    throw new errors.Unauthorized({ message: "You need to be logged in to claim a collective" });
+  }
+
+  const collective = await models.Collective.findById(args.id)
+
+  if (!collective) {
+    throw new errors.NotFound({ message: `Collective with id ${args.id} not found` });
+  }
+
+  const admins = await collective.getAdmins();
+
+  if (admins.length > 0) {
+    throw new errors.ValidationFailed({ message: 'This collective has already been claimed' });
+  }
+
+  // add opensource collective as host
+  collective.ParentCollectiveId = defaultHostCollective('opensource').ParentCollectiveId;
+
+  // add default tiers
+  collective.tiers = defaultTiers(defaultHostCollective('opensource').CollectiveId, collective.currency)
+  await models.Tier.createMany(collective.tiers, { CollectiveId: collective.id, currency: collective.currency });
+
+  // set collective.isActive to true
+  collective.isActive = true;
+
+  // get pledges
+  const pledges = await models.Order.findAll({
+    include: [
+      { all: true },
+    ],
+    where: {
+      CollectiveId: collective.id,
+      status: 'PENDING',
+    },
+  });
+  debug(`${pledges.length} pledges found for collective ${collective.name}`);
+
+  // send complete-pledge emails to pledges
+  const emails = pledges.map(pledge => {
+    const {
+      collective,
+      createdByUser,
+      fromCollective,
+      Subscription,
+    } = pledge;
+    return emailLib.send('pledge.complete', createdByUser.email, {
+      collective: collective.info,
+      fromCollective: fromCollective.minimal,
+      interval: Subscription && Subscription.interval,
+      order: pledge.info,
+    });
+  });
+  Promise.all(emails);
+
+  // add remoteUser as admin of collective
+  await collective.addUserWithRole(req.remoteUser, roles.ADMIN);
+  collective.CreatedByUserId = req.remoteUser.id;
+
+  // return successful status, frontend should redirect to claimed collective page
+  await collective.save();
+  return collective;
 }
