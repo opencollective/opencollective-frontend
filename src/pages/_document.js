@@ -1,6 +1,7 @@
 import React from 'react';
 import Document, { Head, Main, NextScript } from 'next/document';
 import { ServerStyleSheet } from 'styled-components';
+import flush from 'styled-jsx/server';
 import './global-styles';
 
 // The document (which is SSR-only) needs to be customized to expose the locale
@@ -18,6 +19,7 @@ export default class IntlDocument extends Document {
       sheet.collectStyles(<App {...props} />),
     );
     const styleTags = sheet.getStyleElement();
+    const styles = flush();
 
     return {
       ...props,
@@ -25,6 +27,7 @@ export default class IntlDocument extends Document {
       locale,
       localeDataScript,
       styleTags,
+      styles,
     };
   }
 
