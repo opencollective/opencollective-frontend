@@ -35,6 +35,7 @@ const ButtonGroup = ({ onChange = () => {}, values = [], value }) => (
         isLast={index === values.length - 1}
         onClick={() => onChange(v)}
         selected={v === value}
+        type="button"
       >
         {v}
       </Button>
