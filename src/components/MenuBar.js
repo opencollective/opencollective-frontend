@@ -370,7 +370,7 @@ class MenuBar extends React.Component {
 
             <Button
               className="createPledge darkBackground"
-              href={`/pledges/new?name=${collective.slug}`}
+              href={`/${collective.slug}/pledges/new`}
             >
               <FormattedMessage
                 id="menu.createPledge"

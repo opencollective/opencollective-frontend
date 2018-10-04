@@ -1,6 +1,8 @@
 import React, { Fragment } from 'react';
 import slugify from 'slugify';
 import { withState } from 'recompose';
+import gql from 'graphql-tag';
+import { graphql, compose } from 'react-apollo';
 
 import withData from '../lib/withData';
 import withLoggedInUser from '../lib/withLoggedInUser';
@@ -44,6 +46,7 @@ const WordCountTextarea = withState('wordCount', 'setWordCount', 140)(
         is="textarea"
         id="publicMessage"
         name="publicMessage"
+        placeholder="This will be public and it is also optional"
         onChange={({ target }) => setWordCount(() => 140 - target.value.length)}
         px={2}
         py={1}
@@ -87,10 +90,12 @@ class CreatePledgePage extends React.Component {
   static getInitialProps({ query = {} }) {
     return {
       name: query.name || '',
+      slug: query.slug,
     };
   }
 
   state = {
+    errorMessage: null,
     loadingUserLogin: true,
     LoggedInUser: null,
   };
@@ -115,17 +120,28 @@ class CreatePledgePage extends React.Component {
         elements: { name, slug, totalAmount, fromCollective, website },
       },
     } = event;
+    const {
+      data,
+    } = this.props;
+
     const order = {
-      collective: {
-        name: name.value,
-        slug: slug.value,
-        website: website.value,
-      },
+      collective: {},
       fromCollective: {
         id: Number(fromCollective.value),
       },
       totalAmount: Number(totalAmount.value) * 100,
     };
+
+    if (data) {
+      order.collective.id = data.Collective.id;
+    } else {
+      order.collective = {
+        name: name.value,
+        slug: slug.value,
+        website: website.value,
+      };
+    }
+
     try {
       const {
         data: { createOrder: result },
@@ -134,16 +150,29 @@ class CreatePledgePage extends React.Component {
         Router.pushRoute(`/${result.collective.slug}`);
       }
     } catch (error) {
-      // TODO: handle server error
-      console.error(error);
+      this.setState({
+        errorMessage: error.toString(),
+      });
     }
   }
 
-  validate() {}
-
   render() {
-    const { loadingUserLogin, LoggedInUser } = this.state;
-    const { name } = this.props;
+    const {
+      errorMessage,
+      loadingUserLogin,
+      LoggedInUser,
+    } = this.state;
+    const {
+      name,
+      slug,
+    } = this.props;
+
+    const profiles = LoggedInUser &&
+      LoggedInUser.memberOf
+      .concat({ ...LoggedInUser, role: 'ADMIN' })
+      .filter(
+        ({ role }) => ~['ADMIN', 'HOST'].indexOf(role),
+      );
 
     return (
       <Fragment>
@@ -200,10 +229,16 @@ class CreatePledgePage extends React.Component {
                     Pledge as:
                   </H2>
 
+                  {loadingUserLogin && (
+                    <P fontSize={14} my={3} color="#9399A3">
+                      Loading profile...
+                    </P>
+                  )}
+
                   {!loadingUserLogin &&
                     !LoggedInUser && (
                       <P fontSize={14} my={3} color="#9399A3">
-                        Sign up or login to submit an expense.
+                        Sign up or login to create a pledge.
                       </P>
                     )}
 
@@ -217,16 +252,11 @@ class CreatePledgePage extends React.Component {
                         name="fromCollective"
                         defaultValue={LoggedInUser.CollectiveId}
                       >
-                        {LoggedInUser.memberOf
-                          .concat({ ...LoggedInUser, role: 'ADMIN' })
-                          .filter(
-                            ({ role }) => ~['ADMIN', 'HOST'].indexOf(role),
-                          )
-                          .map(({ collective }) => (
-                            <option key={collective.name} value={collective.id}>
-                              {collective.name}
-                            </option>
-                          ))}
+                        {profiles.map(({ collective }) => (
+                          <option key={collective.name} value={collective.id}>
+                            {collective.name}
+                          </option>
+                        ))}
                       </select>
                     </Flex>
                   )}
@@ -263,65 +293,73 @@ class CreatePledgePage extends React.Component {
                   <WordCountTextarea />
                 </Box>
 
-                <Box mb={3}>
-                  <H2 fontWeight="200" fontSize="20px" mb={3}>
-                    Details of the new collective:
-                  </H2>
+                {!slug && (
+                  <Box mb={3}>
+                    <H2 fontWeight="200" fontSize="20px" mb={3}>
+                      Details of the new collective:
+                    </H2>
 
-                  <P fontWeight="bold">You are the first pledger!</P>
+                    <P fontWeight="bold">You are the first pledger!</P>
 
-                  <P color="#9399A3" fontSize={12} mt={2}>
-                    You’ve earned the priviledge to name and describe this
-                    awesome cause. We’ll create a pledged collective page for it
-                    so other people can find it and pledge to it too.
-                  </P>
+                    <P color="#9399A3" fontSize={12} mt={2}>
+                      You’ve earned the priviledge to name and describe this
+                      awesome cause. We’ll create a pledged collective page for it
+                      so other people can find it and pledge to it too.
+                    </P>
 
-                  <Flex
-                    flexDirection={['column', null, 'row']}
-                    alignItems={['flex-start', null, 'flex-end']}
-                    mt={4}
-                    flexWrap="wrap"
-                  >
-                    <Flex flexDirection="column" mb={3} pr={[0, null, 3]}>
-                      <P {...labelStyles} htmlFor="name">
-                        Name
-                      </P>
-                      <TextInput name="name" id="name" defaultValue={name} />
+                    <Flex
+                      flexDirection={['column', null, 'row']}
+                      alignItems={['flex-start', null, 'flex-end']}
+                      mt={4}
+                      flexWrap="wrap"
+                    >
+                      <Flex flexDirection="column" mb={3} pr={[0, null, 3]}>
+                        <P {...labelStyles} htmlFor="name">
+                          Name
+                        </P>
+                        <TextInput name="name" id="name" defaultValue={name} />
+                      </Flex>
+
+                      <Flex flexDirection="column" mb={3}>
+                        <P {...labelStyles} htmlFor="slug">
+                          Collective URL
+                        </P>
+                        <StyledInputGroup
+                          prepend="https://opencollective.com/"
+                          id="slug"
+                          name="slug"
+                          defaultValue={slugify(name)}
+                        />
+                      </Flex>
                     </Flex>
 
                     <Flex flexDirection="column" mb={3}>
-                      <P {...labelStyles} htmlFor="slug">
-                        Collective URL
+                      <P {...labelStyles} htmlFor="website">
+                        GitHub URL - More collective types soon!
                       </P>
                       <StyledInputGroup
-                        prepend="https://opencollective.com/"
-                        id="slug"
-                        name="slug"
-                        defaultValue={slugify(name)}
+                        prepend="https://"
+                        id="website"
+                        name="website"
+                        placeholder="i.e. github.com/airbnb or meetup.com/wwc"
                       />
                     </Flex>
-                  </Flex>
-
-                  <Flex flexDirection="column" mb={3}>
-                    <P {...labelStyles} htmlFor="website">
-                      GitHub or Meetup URL - More collective types soon!
-                    </P>
-                    <StyledInputGroup
-                      prepend="https://"
-                      id="website"
-                      name="website"
-                      placeholder="i.e. github.com/airbnb or meetup.com/wwc"
-                    />
-                  </Flex>
-                </Box>
+                  </Box>
+                )}
 
                 <SubmitInput
                   value="Make Pledge"
                   mt={4}
                   mx={['auto', null, 0]}
                   display="block"
+                  disabled={!LoggedInUser}
                 />
               </form>
+              {errorMessage && (
+                <P color="red" mt={3}>
+                  {errorMessage}
+                </P>
+              )}
             </Container>
           </Container>
         </Body>
@@ -331,7 +369,22 @@ class CreatePledgePage extends React.Component {
   }
 }
 
+const addCollectiveData = graphql(gql`
+  query getCollective($slug: String!) {
+    Collective(slug: $slug) {
+      id
+    }
+  }
+`, {
+  skip: (props) => !props.slug,
+})
+
+const addGraphQL = compose(
+  addCollectiveData,
+  addCreateOrderMutation,
+);
+
 export { CreatePledgePage as MockCreatePledgePage };
 export default withData(
-  withLoggedInUser(addCreateOrderMutation(CreatePledgePage)),
+  withLoggedInUser(addGraphQL(CreatePledgePage)),
 );
