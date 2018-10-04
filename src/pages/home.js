@@ -113,7 +113,9 @@ const BackerAvatar = ({ slug, image, stats: { totalAmountSpent } }) => (
   <Link route={`/${slug}`} passHref>
     <a>
       <Container
-        backgroundImage={`url(${imagePreview(image || pickAvatar())})`}
+        backgroundImage={`url(${imagePreview(image, pickAvatar(), {
+          width: 120,
+        })})`}
         backgroundSize="cover"
         backgroundPosition="center center"
         backgroundRepeat="no-repeat"

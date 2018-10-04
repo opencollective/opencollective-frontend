@@ -4,6 +4,8 @@ import { get, isEqual } from 'lodash';
 
 import { defaultImage, defaultBackgroundImage } from '../constants/collectives';
 
+import { imagePreview } from '../lib/utils';
+
 import { Flex } from 'grid-styled';
 import Container from './Container';
 import { P, Span } from './Text';
@@ -40,8 +42,11 @@ const CollectiveStatsCard = ({
     overflow="hidden"
   >
     <Container
-      backgroundImage={`url(${backgroundImage ||
-        defaultBackgroundImage[type]})`}
+      backgroundImage={`url(${imagePreview(
+        backgroundImage,
+        defaultBackgroundImage[type],
+        { width: 224 },
+      )})`}
       backgroundSize="cover"
       backgroundRepeat="no-repeat"
       backgroundPosition="center center"
@@ -62,7 +67,9 @@ const CollectiveStatsCard = ({
           <a>
             <Container
               bg="#2877ED"
-              backgroundImage={`url(${image || defaultImage[type]})`}
+              backgroundImage={`url(${imagePreview(image, defaultImage[type], {
+                width: 65,
+              })})`}
               backgroundSize="contain"
               backgroundRepeat="no-repeat"
               backgroundPosition="center center"

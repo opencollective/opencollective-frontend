@@ -95,7 +95,7 @@ export function resizeImage(imageUrl, { width, height, query, baseUrl }) {
 
   return `${getBaseImagesUrl() ||
     baseUrl ||
-    ''}/proxy/images/?src=${encodeURIComponent(imageUrl)}${queryurl}`;
+    ''}/proxy/images?src=${encodeURIComponent(imageUrl)}${queryurl}`;
 }
 
 export function isValidImageUrl(src) {
