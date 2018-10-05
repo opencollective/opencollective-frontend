@@ -109,7 +109,8 @@
     "commit": "git-cz",
     "semantic-release": "semantic-release",
     "cypress": "TZ=UTC cypress run",
-    "prettier": "prettier \"cypress/**/*.js\" \"src/**/*.js\" \"test/**/*.js\" --write"
+    "prettier": "prettier \"cypress/**/*.js\" \"src/**/*.js\" \"test/**/*.js\" --write",
+    "optimize-png": "npm install --no-save imagemin imagemin-optipng && babel-node ./scripts/optimize-png"
   },
   "devDependencies": {
     "@babel/cli": "7.0.0",
