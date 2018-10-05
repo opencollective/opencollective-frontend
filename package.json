@@ -157,7 +157,7 @@
     "prettier": "prettier \"**/*.js\" --ignore-path .eslintignore --write",
     "nsp": "nsp check",
     "pretest": "npm run lint:quiet",
-    "test": "NODE_ENV=test TZ=UTC nyc npm run test:dev && npm run coverage",
+    "test": "TZ=UTC nyc npm run test:dev && npm run coverage",
     "test:server": "./scripts/db_restore.sh -d opencollective_dvl -f test/dbdumps/opencollective_dvl.pgsql && PG_DATABASE=opencollective_dvl npm run dev",
     "test:dev": "npm run test:unit:dev && npm run test:bdd:dev",
     "test:unit:dev": "mocha --reporter-options mochaFile=$(bash scripts/test_output_dir.sh junit)/junit.xml",

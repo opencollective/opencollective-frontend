@@ -18,8 +18,8 @@ fi
 
 # Set up .env file if needed
 if [ ! -f .env ]; then
-    echo "✓ .env not found, copying .env.default to .env"
-    cp .env.default .env
+    echo "✓ .env not found, copying .env.development to .env"
+    cp .env.development .env
 fi
 
 # On circleci environment
