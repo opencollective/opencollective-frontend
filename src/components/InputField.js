@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import dynamic from 'next/dynamic';
 import DateTime from 'react-datetime';
-import moment from 'moment-timezone';
 import { get } from 'lodash';
 import {
   Col,
@@ -21,6 +20,11 @@ import InputTypeCreditCard from './InputTypeCreditCard';
 import InputTypeTags from './InputTypeTags';
 
 import { capitalize } from '../lib/utils';
+
+// We use the DYNAMIC_IMPORT env variable to skip dynamic while using Jest
+const momentTimezone = process.env.DYNAMIC_IMPORT
+  ? dynamic(import('moment-timezone'))
+  : require('moment-timezone');
 
 // We use the DYNAMIC_IMPORT env variable to skip dynamic while using Jest
 const HTMLEditor = process.env.DYNAMIC_IMPORT
@@ -288,7 +292,7 @@ class InputField extends React.Component {
                   <DateTime
                     name={field.name}
                     timeFormat={field.timeFormat || timeFormat}
-                    value={moment.tz(
+                    value={momentTimezone.tz(
                       new Date(this.state.value || field.defaultValue),
                       context.timezone || 'utc',
                     )}
@@ -311,7 +315,7 @@ class InputField extends React.Component {
                 <DateTime
                   name={field.name}
                   timeFormat={field.timeFormat || timeFormat}
-                  value={moment.tz(
+                  value={momentTimezone.tz(
                     new Date(this.state.value || field.defaultValue),
                     context.timezone || 'utc',
                   )}
