@@ -144,6 +144,38 @@ const deleteCollectiveQuery = gql`
   }
 `;
 
+export const createApplicationMutation = gql`
+  mutation createApplication($application: ApplicationInput!) {
+    createApplication(application: $application) {
+      id
+      name
+      description
+      callbackUrl
+      clientId
+      clientSecret
+    }
+  }
+`;
+
+export const updateApplicationMutation = gql`
+  mutation updateApplication($id: String!, $application: ApplicationInput!) {
+    updateApplication(id: $id, application: $application) {
+      id
+      name
+      description
+      callbackUrl
+    }
+  }
+`;
+
+export const deleteApplicationMutation = gql`
+  mutation deleteApplication($id: String!) {
+    deleteApplication(id: $id) {
+      id
+    }
+  }
+`;
+
 export const addCreateOrderMutation = graphql(createOrderQuery, {
   props: ({ mutate }) => ({
     createOrder: order => mutate({ variables: { order } }),

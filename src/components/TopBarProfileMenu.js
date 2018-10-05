@@ -68,6 +68,10 @@ class TopBarProfileMenu extends React.Component {
         id: 'menu.transactions',
         defaultMessage: 'transactions',
       },
+      'menu.applications': {
+        id: 'menu.applications',
+        defaultMessage: 'applications',
+      },
     });
   }
 
@@ -196,7 +200,7 @@ class TopBarProfileMenu extends React.Component {
               />
             </P>
             <Container height="0.1rem" bg="#E6E6E6" width={1} minWidth={50} />
-            <Link route="/create">
+            <Link route="/create" passHref>
               <StyledLink
                 border="1px solid #D5DAE0"
                 borderRadius="20px"
@@ -221,7 +225,7 @@ class TopBarProfileMenu extends React.Component {
                   'collective.slug',
                 )}`}
               >
-                <Link route={`/${get(membership, 'collective.slug')}`}>
+                <Link route={`/${get(membership, 'collective.slug')}`} passHref>
                   <StyledLink
                     title={this.tooltip(membership)}
                     color="#494D52"
@@ -270,7 +274,7 @@ class TopBarProfileMenu extends React.Component {
               />
             </P>
             <Container height="0.1rem" bg="#E6E6E6" width={1} minWidth={50} />
-            <Link route="/organizations/new">
+            <Link route="/organizations/new" passHref>
               <StyledLink
                 border="1px solid #D5DAE0"
                 borderRadius="20px"
@@ -295,7 +299,7 @@ class TopBarProfileMenu extends React.Component {
                   'collective.slug',
                 )}`}
               >
-                <Link route={`/${get(membership, 'collective.slug')}`}>
+                <Link route={`/${get(membership, 'collective.slug')}`} passHref>
                   <StyledLink
                     title={this.tooltip(membership)}
                     color="#494D52"
@@ -348,7 +352,11 @@ class TopBarProfileMenu extends React.Component {
           </P>
           <Box is="ul" p={0} my={2}>
             <ListItem py={1}>
-              <Link route="collective" params={{ slug: LoggedInUser.username }}>
+              <Link
+                route="collective"
+                params={{ slug: LoggedInUser.username }}
+                passHref
+              >
                 <StyledLink
                   color="#494D52"
                   fontSize="1.2rem"
@@ -365,6 +373,7 @@ class TopBarProfileMenu extends React.Component {
               <Link
                 route="subscriptions"
                 params={{ collectiveSlug: LoggedInUser.username }}
+                passHref
               >
                 <StyledLink
                   color="#494D52"
@@ -382,6 +391,7 @@ class TopBarProfileMenu extends React.Component {
               <Link
                 route="transactions"
                 params={{ collectiveSlug: LoggedInUser.username }}
+                passHref
               >
                 <StyledLink
                   color="#494D52"
@@ -390,6 +400,23 @@ class TopBarProfileMenu extends React.Component {
                 >
                   {capitalize(
                     intl.formatMessage(this.messages['menu.transactions']),
+                  )}
+                </StyledLink>
+              </Link>
+            </ListItem>
+            <ListItem py={1}>
+              <Link
+                route="applications"
+                params={{ collectiveSlug: LoggedInUser.username }}
+                passHref
+              >
+                <StyledLink
+                  color="#494D52"
+                  fontSize="1.2rem"
+                  fontFamily="montserratlight, arial"
+                >
+                  {capitalize(
+                    intl.formatMessage(this.messages['menu.applications']),
                   )}
                 </StyledLink>
               </Link>
@@ -498,7 +525,11 @@ class TopBarProfileMenu extends React.Component {
         )}
 
         {status === 'loggedout' && (
-          <Link route="signin" params={{ next: this.redirectAfterSignin }}>
+          <Link
+            route="signin"
+            params={{ next: this.redirectAfterSignin }}
+            passHref
+          >
             <StyledLink
               border="1px solid #D5DAE0"
               borderRadius="20px"

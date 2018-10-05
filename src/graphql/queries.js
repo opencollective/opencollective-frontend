@@ -747,6 +747,26 @@ export const searchCollectivesQuery = gql`
   }
 `;
 
+export const getCollectiveApplicationsQuery = gql`
+  query Collective($slug: String) {
+    Collective(slug: $slug) {
+      id
+      ... on User {
+        applications {
+          id
+          type
+          name
+          description
+          callbackUrl
+          apiKey
+          clientId
+          clientSecret
+        }
+      }
+    }
+  }
+`;
+
 export const addCollectiveData = graphql(getCollectiveQuery);
 export const addCollectiveCoverData = graphql(getCollectiveCoverQuery);
 export const addCollectiveToEditData = graphql(getCollectiveToEditQuery);

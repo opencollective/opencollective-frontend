@@ -1,11 +1,13 @@
-# source: http://localhost:3000/api/graphql
-# timestamp: Thu Sep 20 2018 12:38:04 GMT+0200 (Central European Summer Time)
+# source: http://localhost:3000/api/graphql/v1
+# timestamp: Mon Oct 01 2018 15:10:59 GMT+0200 (Central European Summer Time)
 
 """Application model"""
 type Application {
   id: Int
+  type: ApplicationType
   name: String
   description: String
+  apiKey: String
   clientId: String
   clientSecret: String
   callbackUrl: String
@@ -13,9 +15,16 @@ type Application {
 
 """Input type for Application"""
 input ApplicationInput {
+  type: ApplicationType!
   name: String
   description: String
   callbackUrl: String
+}
+
+"""All application types"""
+enum ApplicationType {
+  API_KEY
+  OAUTH
 }
 
 """Breakdown of backers per type (ANY/USER/ORGANIZATION/COLLECTIVE)"""
@@ -733,9 +742,30 @@ type Mutation {
   refundTransaction(id: Int!): Transaction
   addFundsToOrg(totalAmount: Int!, CollectiveId: Int!, HostCollectiveId: Int!, description: String): PaymentMethodType
   createApplication(application: ApplicationInput!): Application
-  updateApplication(id: Int!, application: ApplicationInput!): Application
-  deleteApplication(id: Int!): Application
-  createPaymentMethod(type: String!, amount: Int!, currency: String!, CollectiveId: Int!, PaymentMethodId: Int, description: String, expiryDate: String): PaymentMethodType
+  updateApplication(id: String!, application: ApplicationInput!): Application
+  deleteApplication(id: String!): Application
+  createPaymentMethod(
+    type: String!
+    amount: Int!
+    currency: String!
+
+    """
+    Limit this payment method to make donations to collectives having those tags
+    """
+    limitedToTags: [String]
+
+    """Limit this payment method to make donations to those collectives"""
+    limitedToCollectiveIds: [Int]
+
+    """
+    Limit this payment method to make donations to the collectives hosted by those hosts
+    """
+    limitedToHostCollectiveIds: [Int]
+    CollectiveId: Int!
+    PaymentMethodId: Int
+    description: String
+    expiryDate: String
+  ): PaymentMethodType
   claimPaymentMethod(code: String!, user: UserInputType): PaymentMethodType
   claimCollective(id: Int!): CollectiveInterface
 }
@@ -1071,6 +1101,7 @@ type PaymentMethodType {
   collective: CollectiveInterface
   limitedToTags: JSON
   limitedToCollectiveIds: [Int]
+  limitedToHostCollectiveIds: [Int]
   orders(
     """Only returns orders that have an active subscription (monthly/yearly)"""
     hasActiveSubscription: Boolean
