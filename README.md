@@ -20,10 +20,8 @@ If you see a step below that could be improved (or is outdated), please update t
 ### Prerequisite
 
 1. Make sure you have Node.js version >= 10.
-  - We recommend using [nvm](https://github.com/creationix/nvm): `nvm use`.
-2. Make sure you have [GraphicsMagick](http://www.graphicsmagick.org) installed.
-  - On Debian/Ubuntu: `sudo apt-get install graphicsmagick`
-  - On MacOS (with [Homebrew](https://brew.sh/)): `brew install graphicsmagick`
+
+- We recommend using [nvm](https://github.com/creationix/nvm): `nvm use`.
 
 ### Install
 
@@ -61,7 +59,7 @@ TL;DR: we use [Prettier](https://prettier.io/) and [ESLint](https://eslint.org/)
 You can run the tests using `npm test` or more specifically:
 
 - `npm run test:src` for pages and components
-- `npm run test:server` for api and badges
+- `npm run test:server` for api
 - `npm run test:e2e` for end-to-end tests using [Cypress](https://www.cypress.io/)
 
 To update the Jest snapshots, run `npm run test:update`

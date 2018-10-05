@@ -4,13 +4,11 @@ import fs from 'fs';
 import pdf from 'html-pdf';
 import moment from 'moment';
 import request from 'request';
-import express from 'express';
 
 import pages from './pages';
 import controllers from './controllers';
 import { maxAge } from './middlewares';
 import { logger } from './logger';
-import { getCloudinaryUrl } from './lib/utils';
 import { translateApiUrl } from '../lib/utils';
 
 export default (server, app) => {
@@ -39,25 +37,6 @@ export default (server, app) => {
   });
 
   /**
-   * Proxy all images so that we can serve them from the opencollective.com domain
-   * and we can cache them at cloudflare level (to reduce bandwidth at cloudinary level)
-   * Format: /proxy/images?src=:encoded_url&width=:width
-   */
-  server.get('/proxy/images', maxAge(7200), (req, res) => {
-    const { src, width, height, query } = req.query;
-
-    const url = getCloudinaryUrl(src, { width, height, query });
-
-    req
-      .pipe(request(url, { followRedirect: false }))
-      .on('error', e => {
-        logger.error('>>> Error proxying %s', url, e);
-        res.status(500).send(e);
-      })
-      .pipe(res);
-  });
-
-  /**
    * Prevent indexation from search engines
    * (out of 'production' environment)
    */
@@ -75,38 +54,12 @@ export default (server, app) => {
    * Ideally we should consolidate those routes under:
    * `/:collectiveSlug/members/:backerType(all|users|organizations)`
    */
-  server.use(
-    '/public',
-    express.static(path.join(__dirname, '../public'), { maxAge: '1d' }),
-  );
 
-  server.get(
-    '/:collectiveSlug/:image(avatar|logo).:format(txt|png|jpg|gif|svg)',
-    maxAge(7200),
-    controllers.collectives.logo,
-  );
-  server.get(
-    '/:collectiveSlug/:backerType.svg',
-    controllers.collectives.banner,
-  );
-  server.get(
-    '/:collectiveSlug/:backerType/badge.svg',
-    controllers.collectives.badge,
-  );
-  server.get(
-    '/:collectiveSlug/:backerType/:position/avatar(.:format(png|jpg|svg))?',
-    maxAge(7200),
-    controllers.collectives.avatar,
-  );
   server.get(
     '/:collectiveSlug/:backerType/:position/website(.:format(png|jpg|svg))?',
     controllers.collectives.website,
   );
 
-  server.get(
-    '/:collectiveSlug/tiers/:tierSlug.:format(png|jpg|svg)',
-    controllers.collectives.banner,
-  );
   server.get('/:collectiveSlug.:format(json)', controllers.collectives.info);
   server.get(
     '/:collectiveSlug/members.:format(json|csv)',
@@ -119,15 +72,6 @@ export default (server, app) => {
   server.get(
     '/:collectiveSlug/tiers/:tierSlug/:backerType(all|users|organizations).:format(json|csv)',
     controllers.members.list,
-  );
-  server.get(
-    '/:collectiveSlug/tiers/:tierSlug/badge.svg',
-    controllers.collectives.badge,
-  );
-  server.get(
-    '/:collectiveSlug/tiers/:tierSlug/:position/avatar(.:format(png|jpg|svg))?',
-    maxAge(7200),
-    controllers.collectives.avatar,
   );
   server.get(
     '/:collectiveSlug/tiers/:tierSlug/:position/website(.:format(png|jpg|svg))?',
