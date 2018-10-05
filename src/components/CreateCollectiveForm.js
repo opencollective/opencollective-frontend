@@ -147,7 +147,6 @@ class CreateCollectiveForm extends React.Component {
           name: 'name',
           placeholder: '',
           maxLength: 255,
-          focus: true,
         },
         {
           name: 'company',
@@ -242,7 +241,7 @@ class CreateCollectiveForm extends React.Component {
           }
         })
         .then(json => {
-          if (!json) return;
+          if (!json || !json.data || json.data.errors) return;
           const {
             city,
             localized_location,
@@ -267,7 +266,7 @@ class CreateCollectiveForm extends React.Component {
             long: lon,
           };
           collective.image = get(key_photo, 'highres_link');
-          collective.tags = topics && topics.map(t => t.urlkey).join(', ');
+          collective.tags = topics && topics.map(t => t.urlkey);
           collective.website = link;
           collective.members = members;
           collective.data = {
