@@ -35,9 +35,9 @@ const SponsorCard = ({
       <Link route={`/${slug}`} passHref>
         <a>
           <Container
-            backgroundImage={`url(${imagePreview(
-              image || defaultImage[type],
-            )})`}
+            backgroundImage={`url(${imagePreview(image, defaultImage[type], {
+              width: 76,
+            })})`}
             backgroundSize="contain"
             backgroundRepeat="no-repeat"
             backgroundPosition="center center"
