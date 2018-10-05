@@ -21,7 +21,8 @@ tempStripe.js
 .env
 .env.*
 
-!.env.default
+!.env.development
+!.env.test
 
 .vscode
 jsconfig.json
