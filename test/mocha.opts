@@ -2,6 +2,6 @@
 --reporter spec
 --reporter mocha-circleci-reporter
 --require babel-core/register
---file ./server/env.js
 --file ./test/setup.js
+--file ./server/env.js
 --exit
