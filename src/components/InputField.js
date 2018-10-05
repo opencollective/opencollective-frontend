@@ -18,19 +18,21 @@ import Switch from '@material-ui/core/Switch';
 import InputTypeDropzone from './InputTypeDropzone';
 import InputTypeLocation from './InputTypeLocation';
 import InputTypeCreditCard from './InputTypeCreditCard';
-import InputTypeTags from './InputTypeTags';
 
 import { capitalize } from '../lib/utils';
 
+// Dynamic imports: this components have a huge impact on bundle size and are externalized
 // We use the DYNAMIC_IMPORT env variable to skip dynamic while using Jest
-const HTMLEditor = process.env.DYNAMIC_IMPORT
-  ? dynamic(import('./HTMLEditor'))
-  : require('./HTMLEditor');
-
-// We use the DYNAMIC_IMPORT env variable to skip dynamic while using Jest
-const MarkdownEditor = process.env.DYNAMIC_IMPORT
-  ? dynamic(import('./MarkdownEditor'))
-  : require('./MarkdownEditor');
+let HTMLEditor, MarkdownEditor, InputTypeTags;
+if (process.env.DYNAMIC_IMPORT) {
+  HTMLEditor = dynamic(() => import('./HTMLEditor'));
+  MarkdownEditor = dynamic(() => import('./MarkdownEditor'));
+  InputTypeTags = dynamic(() => import('./InputTypeTags'));
+} else {
+  HTMLEditor = require('./HTMLEditor');
+  MarkdownEditor = require('./MarkdownEditor');
+  InputTypeTags = require('./InputTypeTags');
+}
 
 import '../../node_modules/react-datetime/css/react-datetime.css';
 
