@@ -653,8 +653,9 @@ export default function(Sequelize, DataTypes) {
       checkAndUpdateImage(image);
       return image;
     }
-    if (this.type === 'USER' && user) {
-      if (user.email) {
+
+    if (this.type === 'USER') {
+      if (user && user.email && user.name && user.name !== 'anonymous') {
         const md5 = crypto
           .createHash('md5')
           .update(user.email.toLowerCase().trim())
