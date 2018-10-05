@@ -1,16 +1,23 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Header from './Header';
-import Body from './Body';
-import Footer from './Footer';
-import { addCreateCollectiveMutation } from '../graphql/mutations';
-import moment from 'moment-timezone';
-import EventTemplatePicker from './EventTemplatePicker';
-import EditEventForm from './EditEventForm';
-import CollectiveCover from './CollectiveCover';
+import dynamic from 'next/dynamic';
 import { Button } from 'react-bootstrap';
 import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
+
+import Header from './Header';
+import Body from './Body';
+import Footer from './Footer';
+import EventTemplatePicker from './EventTemplatePicker';
+import EditEventForm from './EditEventForm';
+import CollectiveCover from './CollectiveCover';
+
+import { addCreateCollectiveMutation } from '../graphql/mutations';
+
+// We use the DYNAMIC_IMPORT env variable to skip dynamic while using Jest
+const momentTimezone = process.env.DYNAMIC_IMPORT
+  ? dynamic(import('moment-timezone'))
+  : require('moment-timezone');
 
 class CreateEvent extends React.Component {
   static propTypes = {
@@ -19,7 +26,7 @@ class CreateEvent extends React.Component {
 
   constructor(props) {
     super(props);
-    const timezone = moment.tz.guess();
+    const timezone = momentTimezone.tz.guess();
     this.state = {
       event: {
         parentCollective: props.parentCollective,
