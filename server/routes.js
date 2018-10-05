@@ -2,7 +2,6 @@ import serverStatus from 'express-server-status';
 import GraphHTTP from 'express-graphql';
 import curlify from 'request-as-curl';
 
-import schema from './graphql/schema';
 import * as connectedAccounts from './controllers/connectedAccounts';
 import getDiscoverPage from './controllers/discover';
 import * as transactions from './controllers/transactions';
@@ -34,6 +33,11 @@ import * as paypal from './paymentProviders/paypal/payment';
 import sanitizer from './middleware/sanitizer';
 import { sanitizeForLogs } from './lib/utils';
 import debug from 'debug';
+
+import { ApolloServer } from 'apollo-server-express';
+
+import graphqlSchemaV1 from './graphql/v1/schema';
+import graphqlSchemaV2 from './graphql/v2/schema';
 
 /**
  * NotImplemented response.
@@ -109,21 +113,38 @@ export default app => {
   app.param('expenseid', params.expenseid);
 
   /**
-   * GraphQL
+   * GraphQL V1
    */
-  app.use(
-    '/graphql',
-    GraphHTTP({
-      formatError,
-      schema: schema,
-      pretty:
-        process.env.NODE_ENV !== 'production' &&
-        process.env.NODE_ENV !== 'staging',
-      graphiql:
-        process.env.NODE_ENV !== 'production' &&
-        process.env.NODE_ENV !== 'staging',
-    }),
-  );
+  const graphqlV1 = GraphHTTP({
+    formatError,
+    schema: graphqlSchemaV1,
+    pretty:
+      process.env.NODE_ENV !== 'production' &&
+      process.env.NODE_ENV !== 'staging',
+    graphiql:
+      process.env.NODE_ENV !== 'production' &&
+      process.env.NODE_ENV !== 'staging',
+  });
+
+  app.use('/graphql/v1', graphqlV1);
+
+  /**
+   * GraphQL V2
+   */
+  const server = new ApolloServer({
+    schema: graphqlSchemaV2,
+    // Align with behavior from express-graphql
+    context: ({ req }) => {
+      return req;
+    },
+  });
+
+  server.applyMiddleware({ app, path: '/graphql/v2' });
+
+  /**
+   * GraphQL (default)
+   */
+  app.use('/graphql', graphqlV1);
 
   /**
    * Webhooks that should bypass api key check

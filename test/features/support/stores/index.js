@@ -9,7 +9,7 @@ import * as utils from '../../../utils';
 
 /* Libraries that create the objects */
 import models from '../../../../server/models';
-import * as expenses from '../../../../server/graphql/mutations/expenses';
+import * as expenses from '../../../../server/graphql/v1/mutations/expenses';
 import * as libpayments from '../../../../server/lib/payments';
 
 /** Randomize email since it's a unique key in the database

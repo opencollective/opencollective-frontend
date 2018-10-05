@@ -2,7 +2,7 @@ import config from 'config';
 import moment from 'moment';
 import models, { Op } from '../models';
 import { extend, get, pick, pluck } from 'lodash';
-import * as utils from '../graphql/utils';
+import * as utils from '../graphql/v1/utils';
 const { PaymentMethod } = models;
 
 const createPaymentMethodQuery = `

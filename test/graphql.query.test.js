@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
-import schema from '../server/graphql/schema';
+import schema from '../server/graphql/v1/schema';
 import { graphql } from 'graphql';
 
 import * as utils from './utils';

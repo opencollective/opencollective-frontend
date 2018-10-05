@@ -4,7 +4,7 @@ import { describe, it } from 'mocha';
 
 import models from '../server/models';
 import { appStripe } from '../server/paymentProviders/stripe/gateway';
-import * as expenses from '../server/graphql/mutations/expenses';
+import * as expenses from '../server/graphql/v1/mutations/expenses';
 
 import * as utils from './utils';
 import * as store from './features/support/stores';

@@ -38,7 +38,7 @@ export default () => {
       req.checksum = checksum;
 
       let cached = cache.get(checksum);
-      if (cached) {
+      if (cached && cached.contentType && cached.response) {
         debug('cache hit', cached.status);
         switch (cached.status) {
           case 'finished':

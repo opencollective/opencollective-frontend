@@ -10,6 +10,15 @@ export default function(Sequelize, DataTypes) {
         primaryKey: true,
         autoIncrement: true,
       },
+      CollectiveId: {
+        type: DataTypes.INTEGER,
+        references: {
+          model: 'Collectives',
+          key: 'id',
+        },
+        onDelete: 'SET NULL',
+        onUpdate: 'CASCADE',
+      },
       CreatedByUserId: {
         type: DataTypes.INTEGER,
         references: {
@@ -18,6 +27,13 @@ export default function(Sequelize, DataTypes) {
         },
         onDelete: 'SET NULL',
         onUpdate: 'CASCADE',
+      },
+      type: {
+        type: DataTypes.ENUM,
+        values: ['apiKey', 'oAuth'],
+      },
+      apiKey: {
+        type: DataTypes.STRING,
       },
       clientId: {
         type: DataTypes.STRING,
@@ -58,6 +74,7 @@ export default function(Sequelize, DataTypes) {
           return {
             name: this.name,
             description: this.description,
+            apiKey: this.apiKey,
             clientId: this.clientId,
             clientSecret: this.clientSecret,
             callbackUrl: this.callbackUrl,
@@ -68,11 +85,17 @@ export default function(Sequelize, DataTypes) {
   );
 
   Application.create = props => {
-    props = merge(props, {
-      clientId: crypto.randomBytes(20).toString('hex'),
-      clientSecret: crypto.randomBytes(40).toString('hex'),
-    });
-
+    if (props.type === 'apiKey') {
+      props = merge(props, {
+        apiKey: crypto.randomBytes(20).toString('hex'),
+      });
+    }
+    if (props.type === 'oAuth') {
+      props = merge(props, {
+        clientId: crypto.randomBytes(20).toString('hex'),
+        clientSecret: crypto.randomBytes(40).toString('hex'),
+      });
+    }
     return Application.build(props).save();
   };
 

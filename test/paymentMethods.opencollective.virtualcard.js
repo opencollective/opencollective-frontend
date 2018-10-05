@@ -848,7 +848,9 @@ describe('opencollective.virtualcard', () => {
 
       before(() => utils.resetTestDB());
       before('generating API KEY)', () =>
-        models.Application.create({}).then(key => (appKeyData = key)),
+        models.Application.create({ type: 'oAuth' }).then(
+          key => (appKeyData = key),
+        ),
       );
       before('create collective1(currency USD, No Host)', () =>
         models.Collective.create({

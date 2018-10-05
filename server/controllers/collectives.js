@@ -19,7 +19,7 @@ import errors from '../lib/errors';
 import debugLib from 'debug';
 import config from 'config';
 import prependHttp from 'prepend-http';
-import * as utils from '../graphql/utils';
+import * as utils from '../graphql/v1/utils';
 
 const { Activity, Notification, Collective, ConnectedAccount, User } = models;
 

@@ -12,7 +12,7 @@ import jsonData from './mocks/data';
 
 /* Server code being used */
 import userlib from '../server/lib/userlib';
-import schema from '../server/graphql/schema';
+import schema from '../server/graphql/v1/schema';
 import { loaders } from '../server/graphql/loaders';
 import { sequelize } from '../server/models';
 import * as libcache from '../server/lib/cache';
