@@ -2,8 +2,10 @@ FROM node:10
 
 WORKDIR /usr/src/frontend
 
+# Skip Cypress Install
+ENV CYPRESS_INSTALL_BINARY 0
+
 # Pre-install heavy dependencies
-RUN npm install cypress
 RUN npm install phantomjs-prebuilt
 
 # Install dependencies first
