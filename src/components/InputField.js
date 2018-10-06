@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import dynamic from 'next/dynamic';
 import DateTime from 'react-datetime';
-import moment from 'moment-timezone';
 import { get } from 'lodash';
 import {
   Col,
@@ -290,7 +289,7 @@ class InputField extends React.Component {
                   <DateTime
                     name={field.name}
                     timeFormat={field.timeFormat || timeFormat}
-                    value={moment.tz(
+                    value={context.momentTimezone.tz(
                       new Date(this.state.value || field.defaultValue),
                       context.timezone || 'utc',
                     )}
@@ -313,7 +312,7 @@ class InputField extends React.Component {
                 <DateTime
                   name={field.name}
                   timeFormat={field.timeFormat || timeFormat}
-                  value={moment.tz(
+                  value={context.momentTimezone.tz(
                     new Date(this.state.value || field.defaultValue),
                     context.timezone || 'utc',
                   )}

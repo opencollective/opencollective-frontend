@@ -3,6 +3,8 @@ import PropTypes from 'prop-types';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import { get } from 'lodash';
 import Markdown from 'react-markdown';
+import momentTimezone from 'moment-timezone';
+
 import withIntl from '../../../lib/withIntl';
 import { getCurrencySymbol } from '../../../lib/utils';
 
@@ -445,6 +447,7 @@ class CreateExpenseForm extends React.Component {
                     onChange={incurredAt =>
                       this.handleChange('incurredAt', incurredAt)
                     }
+                    context={{ momentTimezone }}
                   />
                 </span>
               </div>
