@@ -1,5 +1,6 @@
 import webpack from 'webpack';
 import withCSS from '@zeit/next-css';
+import { get } from 'lodash';
 
 const nextConfig = {
   onDemandEntries: {
@@ -55,6 +56,12 @@ const nextConfig = {
         },
       ],
     });
+
+    // Disable the rule forcing react to be bundled in commons bundle
+    // Currently needed to skip the react-dom shipped by react-tag-input
+    if (get(config, 'optimization.splitChunks.cacheGroups.react')) {
+      delete config.optimization.splitChunks.cacheGroups.react;
+    }
 
     return config;
   },
