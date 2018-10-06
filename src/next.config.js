@@ -57,10 +57,20 @@ const nextConfig = {
       ],
     });
 
-    // Disable the rule forcing react to be bundled in commons bundle
+    // Disable the rule forcing react to be bundled in commons chunk
     // Currently needed to skip the react-dom shipped by react-tag-input
     if (get(config, 'optimization.splitChunks.cacheGroups.react')) {
       delete config.optimization.splitChunks.cacheGroups.react;
+    }
+
+    // Extract moment-timezone in its own chunk
+    if (get(config, 'optimization.splitChunks.cacheGroups')) {
+      config.optimization.splitChunks.cacheGroups.momentTimezone = {
+        name: 'moment-timezone',
+        chunks: 'all',
+        test: /[\\/]node_modules[\\/]moment-timezone[\\/]/,
+        priority: 10,
+      };
     }
 
     return config;
