@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import momentTimezone from 'moment-timezone';
 import { defineMessages, injectIntl } from 'react-intl';
 
 import Button from './Button';
@@ -228,7 +227,6 @@ class EditEventForm extends React.Component {
                 type={field.type}
                 pre={field.pre}
                 context={{
-                  momentTimezone,
                   timezone: this.state.event.timezone,
                 }}
                 onChange={value => this.handleChange(field.name, value)}

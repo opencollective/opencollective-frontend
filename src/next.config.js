@@ -63,16 +63,6 @@ const nextConfig = {
       delete config.optimization.splitChunks.cacheGroups.react;
     }
 
-    // Extract moment-timezone in its own chunk
-    if (get(config, 'optimization.splitChunks.cacheGroups')) {
-      config.optimization.splitChunks.cacheGroups.momentTimezone = {
-        name: 'moment-timezone',
-        chunks: 'all',
-        test: /[\\/]node_modules[\\/]moment-timezone[\\/]/,
-        priority: 10,
-      };
-    }
-
     return config;
   },
 };

@@ -4,7 +4,6 @@ import moment from 'moment';
 import { withApollo } from 'react-apollo';
 import { FormattedMessage } from 'react-intl';
 import { Button, Popover, OverlayTrigger } from 'react-bootstrap';
-import momentTimezone from 'moment-timezone';
 
 import { getTransactionsQuery } from '../../../graphql/queries';
 import { exportFile } from '../../../lib/export_file';
@@ -147,7 +146,6 @@ class ExportForm extends React.Component {
           closeOnSelect
           defaultValue={this.state.dateFrom}
           onChange={dateFrom => this.updateSearchProps({ dateFrom })}
-          context={{ momentTimezone }}
         />
         <InputField
           name="dateTo"
@@ -156,7 +154,6 @@ class ExportForm extends React.Component {
           defaultValue={this.state.dateTo}
           closeOnSelect
           onChange={dateTo => this.updateSearchProps({ dateTo })}
-          context={{ momentTimezone }}
         />
         <Button
           disabled={this.state.disabled}
