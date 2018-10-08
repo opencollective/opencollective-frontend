@@ -23,10 +23,18 @@ import { capitalize } from '../lib/utils';
 // We use the DYNAMIC_IMPORT env variable to skip dynamic while using Jest
 let HTMLEditor, MarkdownEditor, InputTypeTags, DateTime;
 if (process.env.DYNAMIC_IMPORT) {
-  HTMLEditor = dynamic(() => import('./HTMLEditor'));
-  MarkdownEditor = dynamic(() => import('./MarkdownEditor'));
-  InputTypeTags = dynamic(() => import('./InputTypeTags'));
-  DateTime = dynamic(() => import('./DateTime'));
+  HTMLEditor = dynamic(() =>
+    import(/* webpackChunkName: 'HTMLEditor' */ './HTMLEditor'),
+  );
+  MarkdownEditor = dynamic(() =>
+    import(/* webpackChunkName: 'MarkdownEditor' */ './MarkdownEditor'),
+  );
+  InputTypeTags = dynamic(() =>
+    import(/* webpackChunkName: 'InputTypeTags' */ './InputTypeTags'),
+  );
+  DateTime = dynamic(() =>
+    import(/* webpackChunkName: 'DateTime' */ './DateTime'),
+  );
 } else {
   HTMLEditor = require('./HTMLEditor').default;
   MarkdownEditor = require('./MarkdownEditor').default;
