@@ -133,6 +133,7 @@ export default app => {
    */
   const server = new ApolloServer({
     schema: graphqlSchemaV2,
+    introspection: true,
     // Align with behavior from express-graphql
     context: ({ req }) => {
       return req;
