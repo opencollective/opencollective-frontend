@@ -3330,6 +3330,7 @@ exports[`Search Page renders error message 1`] = `
             <form
               action="/search"
               method="GET"
+              onSubmit={[Function]}
             >
               <div
                 className="c11 c12 c13 sc-bdVaJa c2"
@@ -3337,6 +3338,7 @@ exports[`Search Page renders error message 1`] = `
                 <input
                   className="c14 c15"
                   name="q"
+                  onChange={[Function]}
                   placeholder="Search Open Collective"
                   type="search"
                 />
