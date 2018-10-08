@@ -34,7 +34,7 @@ export default class IntlDocument extends Document {
   constructor(props) {
     super(props);
     props.__NEXT_DATA__.env = {
-      IMAGES_URL: process.env.IMAGES_URL || '',
+      IMAGES_URL: process.env.IMAGES_URL || 'https://images.opencollective.com',
       PAYPAL_ENVIRONMENT: process.env.PAYPAL_ENVIRONMENT || 'sandbox',
       STRIPE_KEY: process.env.STRIPE_KEY || 'pk_test_5aBB887rPuzvWzbdRiSzV3QB',
       GOOGLE_MAPS_API_KEY:
