@@ -36,6 +36,7 @@ export async function checkClientApp(req, res, next) {
         req.loggedInAccount = await models.Collective.findById(collectiveId);
         req.remoteUser = await models.User.findById(collectiveId);
       }
+      next();
     } else {
       debug('auth')(`Invalid Client App (apiKey: ${apiKey}).`);
       next(new Unauthorized(`Invalid Api Key: ${apiKey}.`));
