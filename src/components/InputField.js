@@ -1,8 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import dynamic from 'next/dynamic';
-import DateTime from 'react-datetime';
-import moment from 'moment-timezone';
 import { get } from 'lodash';
 import {
   Col,
@@ -23,18 +21,18 @@ import { capitalize } from '../lib/utils';
 
 // Dynamic imports: this components have a huge impact on bundle size and are externalized
 // We use the DYNAMIC_IMPORT env variable to skip dynamic while using Jest
-let HTMLEditor, MarkdownEditor, InputTypeTags;
+let HTMLEditor, MarkdownEditor, InputTypeTags, DateTime;
 if (process.env.DYNAMIC_IMPORT) {
   HTMLEditor = dynamic(() => import('./HTMLEditor'));
   MarkdownEditor = dynamic(() => import('./MarkdownEditor'));
   InputTypeTags = dynamic(() => import('./InputTypeTags'));
+  DateTime = dynamic(() => import('./DateTime'));
 } else {
-  HTMLEditor = require('./HTMLEditor');
-  MarkdownEditor = require('./MarkdownEditor');
-  InputTypeTags = require('./InputTypeTags');
+  HTMLEditor = require('./HTMLEditor').default;
+  MarkdownEditor = require('./MarkdownEditor').default;
+  InputTypeTags = require('./InputTypeTags').default;
+  DateTime = require('./DateTime').default;
 }
-
-import '../../node_modules/react-datetime/css/react-datetime.css';
 
 function FieldGroup({
   controlId,
@@ -290,10 +288,8 @@ class InputField extends React.Component {
                   <DateTime
                     name={field.name}
                     timeFormat={field.timeFormat || timeFormat}
-                    value={moment.tz(
-                      new Date(this.state.value || field.defaultValue),
-                      context.timezone || 'utc',
-                    )}
+                    date={this.state.value || field.defaultValue}
+                    timezone={context.timezone || 'utc'}
                     isValidDate={field.validate}
                     onChange={date =>
                       date.toISOString
@@ -313,10 +309,8 @@ class InputField extends React.Component {
                 <DateTime
                   name={field.name}
                   timeFormat={field.timeFormat || timeFormat}
-                  value={moment.tz(
-                    new Date(this.state.value || field.defaultValue),
-                    context.timezone || 'utc',
-                  )}
+                  date={this.state.value || field.defaultValue}
+                  timezone={context.timezone || 'utc'}
                   isValidDate={field.validate}
                   onChange={date =>
                     date.toISOString

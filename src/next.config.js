@@ -57,7 +57,7 @@ const nextConfig = {
       ],
     });
 
-    // Disable the rule forcing react to be bundled in commons bundle
+    // Disable the rule forcing react to be bundled in commons chunk
     // Currently needed to skip the react-dom shipped by react-tag-input
     if (get(config, 'optimization.splitChunks.cacheGroups.react')) {
       delete config.optimization.splitChunks.cacheGroups.react;

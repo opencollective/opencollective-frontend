@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import { get } from 'lodash';
 import Markdown from 'react-markdown';
+
 import withIntl from '../../../lib/withIntl';
 import { getCurrencySymbol } from '../../../lib/utils';
 

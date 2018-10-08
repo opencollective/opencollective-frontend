@@ -1,9 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { defineMessages, injectIntl } from 'react-intl';
+
 import Button from './Button';
 import InputField from './InputField';
 import EditTiers from './EditTiers';
-import { defineMessages, injectIntl } from 'react-intl';
 
 class EditEventForm extends React.Component {
   static propTypes = {
@@ -225,7 +226,9 @@ class EditEventForm extends React.Component {
                 placeholder={field.placeholder}
                 type={field.type}
                 pre={field.pre}
-                context={this.state.event}
+                context={{
+                  timezone: this.state.event.timezone,
+                }}
                 onChange={value => this.handleChange(field.name, value)}
               />
             ))}
