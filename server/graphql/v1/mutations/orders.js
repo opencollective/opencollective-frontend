@@ -320,6 +320,58 @@ export async function createOrder(order, loaders, remoteUser) {
   }
 }
 
+export async function updateOrder(remoteUser, order) {
+  if (!remoteUser) {
+    throw new errors.Unauthorized({
+      message: 'You need to be logged in to update an order',
+    });
+  }
+
+  const existingOrder = await models.Order.findOne({
+    where: {
+      id: order.id,
+    },
+    include: [
+      { model: models.Collective, as: 'collective' },
+      { model: models.Collective, as: 'fromCollective' },
+    ],
+  });
+
+  if (!existingOrder) {
+    throw new errors.NotFound({
+      message: 'Existing order not found',
+    });
+  }
+
+  const paymentRequired =
+    order.totalAmount > 0 && existingOrder.collective.isActive;
+
+  if (
+    paymentRequired &&
+    (!order.paymentMethod ||
+      !(order.paymentMethod.uuid || order.paymentMethod.token))
+  ) {
+    throw new Error('This order requires a payment method');
+  }
+
+  if (order.paymentMethod && order.paymentMethod.save) {
+    order.paymentMethod.CollectiveId = existingOrder.FromCollectiveId;
+  }
+
+  if (paymentRequired) {
+    existingOrder.interval = order.interval;
+    await existingOrder.setPaymentMethod(order.paymentMethod);
+    // also adds the user as a BACKER of collective
+    await libPayments.executeOrder(
+      remoteUser,
+      existingOrder,
+      pick(order, ['hostFeePercent', 'platformFeePercent']),
+    );
+  }
+  await existingOrder.reload();
+  return existingOrder;
+}
+
 export function cancelSubscription(remoteUser, orderId) {
   if (!remoteUser) {
     throw new errors.Unauthorized({

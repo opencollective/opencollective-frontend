@@ -11,6 +11,7 @@ import {
   updateSubscription,
   refundTransaction,
   addFundsToOrg,
+  updateOrder,
 } from './mutations/orders';
 import { createMember, removeMember } from './mutations/members';
 import { editTiers } from './mutations/tiers';
@@ -223,6 +224,17 @@ const mutations = {
     },
     resolve(_, args, req) {
       return createOrder(args.order, req.loaders, req.remoteUser);
+    },
+  },
+  updateOrder: {
+    type: OrderType,
+    args: {
+      order: {
+        type: new GraphQLNonNull(OrderInputType),
+      },
+    },
+    resolve(_, args, req) {
+      return updateOrder(req.remoteUser, args.order);
     },
   },
   createUpdate: {
