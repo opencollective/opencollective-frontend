@@ -39,6 +39,7 @@ import {
   UpdateType,
   MemberType,
   OrderByType,
+  OrderType,
   PaginatedExpensesType,
   PaymentMethodType,
 } from './types';
@@ -1194,6 +1195,19 @@ const queries = {
       }
       const transactions = await models.Transaction.findAll(query);
       return transactions;
+    },
+  },
+
+  Order: {
+    type: OrderType,
+    args: {
+      id: {
+        type: new GraphQLNonNull(GraphQLInt),
+      },
+    },
+    resolve: async (_, args) => {
+      const order = await models.Order.findById(args.id);
+      return order;
     },
   },
 };
