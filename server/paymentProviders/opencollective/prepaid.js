@@ -1,7 +1,7 @@
 import models from '../../models';
 import roles from '../../constants/roles';
 import * as libpayments from '../../lib/payments';
-import * as libtransactions from '../../lib/transactions';
+import * as currency from '../../lib/currency';
 import { TransactionTypes, OC_FEE_PERCENT } from '../../constants/transactions';
 import { get } from 'lodash';
 
@@ -25,11 +25,22 @@ async function getBalance(paymentMethod) {
     );
   }
   /* Result will be negative (We're looking for DEBIT transactions) */
-  const spent = await libtransactions.sum({
-    PaymentMethodId: paymentMethod.id,
-    currency: paymentMethod.currency,
-    type: 'DEBIT',
+  const allTransactions = await models.Transaction.findAll({
+    attributes: ['netAmountInCollectiveCurrency', 'currency'],
+    where: {
+      PaymentMethodId: paymentMethod.id,
+      type: 'DEBIT',
+    }
   });
+  let spent = 0;
+  for ( const transaction of allTransactions) {
+    if (transaction.currency != paymentMethod.currency) {
+      const fxRate = await currency.getFxRate(transaction.currency, paymentMethod.currency);
+      spent += transaction.netAmountInCollectiveCurrency * fxRate;
+    } else {
+      spent += transaction.netAmountInCollectiveCurrency;
+    }
+  }
   return {
     amount: paymentMethod.initialBalance + spent,
     currency: paymentMethod.currency,
