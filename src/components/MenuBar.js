@@ -196,8 +196,8 @@ class MenuBar extends React.Component {
       );
     } else {
       history.replaceState(
-        '',
-        document.title,
+        history.state,
+        undefined,
         window.location.pathname + window.location.search,
       );
     }
