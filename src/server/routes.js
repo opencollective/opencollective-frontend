@@ -79,6 +79,10 @@ export default (server, app) => {
   );
   server.get(
     '/:collectiveSlug/invoices/:invoiceSlug.:format(html|pdf|json)',
+    (req, res, next) => {
+      req.app = app;
+      next();
+    },
     controllers.transactions.invoice,
   );
 
