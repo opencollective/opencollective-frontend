@@ -88,6 +88,7 @@ if (USE_PLEDGES) {
   pages
     .add('createPledge', '/pledges/new')
     .add('createCollectivePledge', '/:slug/pledges/new', 'createPledge')
+    .add('completePledge', '/pledges/:id')
     .add('claimCollective', '/:collectiveSlug/claim');
 }
 
