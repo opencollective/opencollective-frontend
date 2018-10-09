@@ -108,7 +108,7 @@ class ClaimCollectivePage extends React.Component {
       html_url.includes(websitePath),
     );
 
-    const isAdmin = (repo && repo.pemissions.admin) || true;
+    const isAdmin = (repo && repo.pemissions.admin) || process.env.NODE_ENV === 'development';
 
     return (
       <Fragment>
