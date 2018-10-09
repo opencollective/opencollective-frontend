@@ -4,6 +4,7 @@ import { get } from 'lodash';
 import models, { Op, sequelize } from '../../models';
 import * as libpayments from '../../lib/payments';
 import * as libtransactions from '../../lib/transactions';
+import * as currency from '../../lib/currency';
 import { formatCurrency } from '../../lib/utils';
 
 /**
@@ -28,7 +29,6 @@ async function getBalance(paymentMethod) {
   }
   let query = {
     PaymentMethodId: paymentMethod.id,
-    currency: paymentMethod.currency,
     type: 'DEBIT',
   };
   let initialBalance = paymentMethod.initialBalance;
@@ -44,7 +44,20 @@ async function getBalance(paymentMethod) {
     query = { ...query, createdAt: { [Op.between]: [firstDay, lastDay] } };
   }
   /* Result will be negative (We're looking for DEBIT transactions) */
-  const spent = await libtransactions.sum(query);
+  // const spent = await libtransactions.sum(query);
+  const allTransactions = await models.Transaction.findAll({
+    attributes: ['netAmountInCollectiveCurrency', 'currency'],
+    where: query,
+  });
+  let spent = 0;
+  for ( const transaction of allTransactions) {
+    if (transaction.currency != paymentMethod.currency) {
+      const fxRate = await currency.getFxRate(transaction.currency, paymentMethod.currency);
+      spent += transaction.netAmountInCollectiveCurrency * fxRate;
+    } else {
+      spent += transaction.netAmountInCollectiveCurrency;
+    }
+  }
   const balance = {
     amount: initialBalance + spent,
     currency: paymentMethod.currency,
@@ -74,7 +87,13 @@ async function processOrder(order) {
   if (!balance || balance.amount <= 0) {
     throw new Error('This payment method has no balance to complete this order');
   }
-  if (balance.amount - order.totalAmount < 0) {
+  // converting(or keeping if it's the same currency) order amount to the payment method currency
+  let orderAmountInPaymentMethodCurrency = order.totalAmount;
+  if (order.currency != paymentMethod.currency) {
+    const fxRate = await currency.getFxRate(order.currency, paymentMethod.currency);
+    orderAmountInPaymentMethodCurrency = order.totalAmount * fxRate;
+  }
+  if (balance.amount - orderAmountInPaymentMethodCurrency < 0) {
     throw new Error(
       `Order amount exceeds balance(${balance.amount} ${
         paymentMethod.currency
