@@ -3,7 +3,6 @@ import uuidv4 from 'uuid/v4';
 import { get } from 'lodash';
 import models, { Op, sequelize } from '../../models';
 import * as libpayments from '../../lib/payments';
-import * as libtransactions from '../../lib/transactions';
 import * as currency from '../../lib/currency';
 import { formatCurrency } from '../../lib/utils';
 
@@ -44,7 +43,6 @@ async function getBalance(paymentMethod) {
     query = { ...query, createdAt: { [Op.between]: [firstDay, lastDay] } };
   }
   /* Result will be negative (We're looking for DEBIT transactions) */
-  // const spent = await libtransactions.sum(query);
   const allTransactions = await models.Transaction.findAll({
     attributes: ['netAmountInCollectiveCurrency', 'currency'],
     where: query,

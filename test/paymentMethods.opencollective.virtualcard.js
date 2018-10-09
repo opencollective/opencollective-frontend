@@ -2,6 +2,7 @@
 import app from '../server/index';
 import sinon from 'sinon';
 import moment from 'moment';
+import nock from 'nock';
 import request from 'supertest-as-promised';
 import { expect } from 'chai';
 import * as utils from './utils';
@@ -9,6 +10,7 @@ import models from '../server/models';
 import virtualcard from '../server/paymentProviders/opencollective/virtualcard';
 import * as store from './features/support/stores';
 import emailLib from '../server/lib/email';
+import initNock from './paymentMethods.opencollective.virtualcard.nock';
 
 const ORDER_TOTAL_AMOUNT = 5000;
 const STRIPE_FEE_STUBBED_VALUE = 300;
@@ -63,6 +65,11 @@ const createOrderQuery = `
 
 describe('opencollective.virtualcard', () => {
   let sandbox, sendEmailSpy;
+
+  before(initNock);
+  after(() => {
+    nock.cleanAll();
+  });
 
   beforeEach(() => {
     sandbox = sinon.createSandbox();
@@ -311,14 +318,14 @@ describe('opencollective.virtualcard', () => {
         monthlyLimitPerMember: null,
       }).then(pm => paymentMethod1 = pm));
 
-      before('create a virtual card payment method', () => virtualcard.create({
+      beforeEach('create a virtual card payment method', () => virtualcard.create({
         description: 'virtual card test',
         CollectiveId: collective1.id,
         amount: 10000,
         currency: 'USD',
       }).then(pm => virtualCardPaymentMethod = pm));
 
-      before('new user claims a virtual card', () => virtualcard.claim({
+      beforeEach('new user claims a virtual card', () => virtualcard.claim({
         user: { email: 'new@user.com' },
         code: virtualCardPaymentMethod.uuid.substring(0,8),
       }).then(async (pm) => {
@@ -356,6 +363,71 @@ describe('opencollective.virtualcard', () => {
           expect(error.toString()).to.contain('Order amount exceeds balance');
         }
       }); /** End Of "Order should NOT be executed because its amount exceeds the balance of the virtual card" */
+
+      it('Order should NOT be executed because the virtual card has not enough balance', async () => {
+        expect(virtualCardPaymentMethod.SourcePaymentMethodId).to.be.equal(
+          paymentMethod1.id,
+        );
+        const order = await models.Order.create({
+          CreatedByUserId: user.id,
+          FromCollectiveId: userCollective.id,
+          CollectiveId: collective2.id,
+          PaymentMethodId: virtualCardPaymentMethod.id,
+          totalAmount: 10000,
+          currency: 'USD',
+        });
+        order.fromCollective = userCollective;
+        order.collective = collective2;
+        order.createdByUser = user;
+        order.paymentMethod = virtualCardPaymentMethod;
+
+        try {
+          // should succeed because card has balance
+          await virtualcard.processOrder(order);
+          // should fail because virtual card has $0 balance
+          await virtualcard.processOrder(order);
+          throw Error('Process should not be executed...');
+        } catch (error) {
+          expect(error).to.exist;
+          expect(error.toString()).to.contain('This payment method has no balance to complete this order');
+        }
+      }); /** End Of "Order should NOT be executed because its amount exceeds the balance of the virtual card" */
+
+      it('Order should NOT be executed because its amount exceeds the balance with transactions of different currencies', async () => {
+        expect(virtualCardPaymentMethod.SourcePaymentMethodId).to.be.equal(
+          paymentMethod1.id,
+        );
+        const orderEUR = await models.Order.create({
+          CreatedByUserId: user.id,
+          FromCollectiveId: userCollective.id,
+          CollectiveId: collective2.id,
+          PaymentMethodId: virtualCardPaymentMethod.id,
+          totalAmount: 5000,
+          currency: 'EUR',
+        });
+        const orderUSD = await models.Order.create({
+          CreatedByUserId: user.id,
+          FromCollectiveId: userCollective.id,
+          CollectiveId: collective2.id,
+          PaymentMethodId: virtualCardPaymentMethod.id,
+          totalAmount: 9000,
+          currency: 'USD',
+        });
+        orderEUR.fromCollective = orderUSD.fromCollective = userCollective;
+        orderEUR.collective = orderUSD.collective  = collective2;
+        orderEUR.createdByUser = orderUSD.createdByUser = user;
+        orderEUR.paymentMethod = orderUSD.paymentMethod = virtualCardPaymentMethod;
+        try {
+          // executing order in USD, has balance
+          await virtualcard.processOrder(orderEUR);
+          // executing order in EUR, still has balance
+          await virtualcard.processOrder(orderUSD);
+          throw Error('Process should not be executed...');
+        } catch (error) {
+          expect(error).to.exist;
+          expect(error.toString()).to.contain('Order amount exceeds balance');
+        }
+      }); /** End Of "Order should NOT be executed because its amount exceeds the balance with transactions of different currencies" */
 
       it('Process order of a virtual card', async () => {
         const order = await models.Order.create({
