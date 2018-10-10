@@ -14,7 +14,9 @@ const Logo = ({ src, style = {}, height, type = 'ORGANIZATION', website }) => {
     backgroundStyle.minWidth = parseInt(height, 10) / 2;
   }
   if (!src) {
-    backgroundStyle.backgroundImage = `url(${defaultImage[type]})`;
+    if (defaultImage[type]) {
+      backgroundStyle.backgroundImage = `url(${defaultImage[type]})`;
+    }
   }
   const image = imagePreview(src, defaultImage[type], {
     height: style.maxHeight,

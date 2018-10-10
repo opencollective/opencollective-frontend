@@ -362,13 +362,14 @@ class Event extends React.Component {
                     <SectionTitle
                       section="tickets"
                       action={
-                        LoggedInUser &&
-                        LoggedInUser.canEditCollective(event) && {
-                          label: intl.formatMessage(
-                            this.messages['event.tickets.edit'],
-                          ),
-                          href: `${event.path}/edit#tiers`,
-                        }
+                        LoggedInUser && LoggedInUser.canEditCollective(event)
+                          ? {
+                              label: intl.formatMessage(
+                                this.messages['event.tickets.edit'],
+                              ),
+                              href: `${event.path}/edit#tiers`,
+                            }
+                          : null
                       }
                     />
 

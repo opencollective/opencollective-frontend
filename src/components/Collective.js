@@ -152,8 +152,10 @@ class Collective extends React.Component {
       );
     }
 
-    const cta = collective.isActive &&
-      collective.host && { href: '#contribute', label: 'contribute' };
+    const cta =
+      collective.isActive && collective.host
+        ? { href: '#contribute', label: 'contribute' }
+        : null;
     const contributorsStats = { ...get(collective, 'stats.backers') };
     contributorsStats.organizations += contributorsStats.collectives || 0;
 

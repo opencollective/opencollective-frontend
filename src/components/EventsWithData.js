@@ -26,23 +26,27 @@ class EventsWithData extends React.Component {
   }
 
   createEvent(e) {
-    if (this.isIframe) return;
-    Router.pushRoute('createEvent');
+    if (this.isIframe) {
+      return;
+    }
+    Router.pushRoute('createEvent').then(() => {
+      window.scrollTo(0, 0);
+    });
     e.preventDefault();
-    return false;
   }
 
-  openEvent(eventSlug) {
-    const { collectiveSlug } = this.props;
-    if (!this.isIframe) {
-      return true; // continue with default behavior of <a href>
-    } else {
-      Router.pushRoute('event', {
-        parentCollectiveSlug: collectiveSlug,
-        eventSlug,
-      });
-      return false;
+  openEvent(e, eventSlug) {
+    if (this.isIframe) {
+      return; // continue with default behavior of <a href>
     }
+    const { collectiveSlug } = this.props;
+    Router.pushRoute('event', {
+      parentCollectiveSlug: collectiveSlug,
+      eventSlug,
+    }).then(() => {
+      window.scrollTo(0, 0);
+    });
+    e.preventDefault();
   }
 
   renderEventEntry(event) {
@@ -50,7 +54,7 @@ class EventsWithData extends React.Component {
       <li key={event.id}>
         <a
           href={`/${event.parentCollective.slug}/events/${event.slug}`}
-          onClick={() => this.openEvent(event.slug)}
+          onClick={e => this.openEvent(e, event.slug)}
           target="_top"
         >
           {event.name}
