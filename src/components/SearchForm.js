@@ -34,7 +34,7 @@ const SearchButton = styled(Flex)`
 const handleSubmit = event => {
   const searchInput = event.target.elements.q;
   Router.pushRoute('search', { q: searchInput.value });
-  return false;
+  event.preventDefault();
 };
 
 const SearchForm = ({ fontSize, onSubmit = handleSubmit }) => (
