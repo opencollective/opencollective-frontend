@@ -603,6 +603,7 @@
   "update.paid": "payé",
   "update.approved": "approuvé",
   "update.rejected": "rejeté",
+  "update.delete": "supprimer",
   "update.edit": "éditer",
   "update.cancelEdit": "annuler les changements",
   "update.viewLatestUpdates": "Voir les dernières news",
