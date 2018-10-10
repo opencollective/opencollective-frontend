@@ -76,29 +76,10 @@ npm install
 npm run dev
 ```
 
-
 ##### Troubleshooting:
 
 - If you're running into node-gyp issues related to Python 3 vs Python 2 you can run `npm rebuild` or run `npm install` again.
 - The postinstall script should set-up your default environment and bootstrap the database along with some seed data. If it is failing you can try to run: `npm run db:setup && ./node_modules/.bin/babel-node ./scripts/db_restore.js opencollective_dvl`
-
-**Unset Environment Variables**
-
-You may need to specify some more environment variables(other than the ones in the dotenv files[`.env.development` and `.env.test`]) in a more specific case(example: you want to test a slack webhook or a github integration):
-
-```
-CLEARBIT_KEY=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-EXPRESS_SESSION_SECRET=xxxxxxxxxxxxxxx
-GITHUB_CLIENT_ID=xxxxxxxxxxxxxx
-MEETUP_CLIENT_ID=xxxxxxxxxxxx
-MEETUP_CLIENT_SECRET=xxxxxxxxxx
-SLACK_HOOK_URL=https://hooks.slack.com/services/XXXXXXXXX/XXXXXXXXX/xxxxxxxxxxxxxxxxxxxxxxxx
-STRIPE_CLIENT_ID=ca_xxxxxxxxxxxxxxxx
-STRIPE_KEY=pk_test_xxxxxxxxxx
-STRIPE_SECRET=sk_test_xxxxxxxxxxxxxxxxxxxxx
-TWITTER_CONSUMER_KEY=xxxxxxxxxxxx
-TWITTER_CONSUMER_SECRET=xxxxxxxxxx
-```
 
 ### Once it's running
 
@@ -135,6 +116,12 @@ Email sending can done by running [`npm run maildev`](https://danfarrelly.nyc/Ma
 If you have any questions, ping us on Slack
 (https://slack.opencollective.org) or on Twitter
 ([@opencollect](https://twitter.com/opencollect)).
+
+## More documentation:
+
+- [postgres](docs/postgres.md) - More details on the postgres configuration
+- [dev](docs/dev.md) - more details on setting up the environment
+- [Environment Variables](docs/environment_variable.md) - list of environment variables present on the server
 
 ## TODO
 
