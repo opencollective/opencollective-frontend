@@ -125,7 +125,7 @@ type Collective implements CollectiveInterface {
   website: String
   updates(limit: Int, offset: Int): [Event]
   events(limit: Int, offset: Int): [Event]
-  paymentMethods(service: String, limit: Int): [PaymentMethodType]
+  paymentMethods(service: String, limit: Int, hasBalanceAboveZero: Boolean): [PaymentMethodType]
   connectedAccounts: [ConnectedAccountType]
   stats: CollectiveStatsType
 }
@@ -272,7 +272,7 @@ interface CollectiveInterface {
   website: String
   updates(limit: Int, offset: Int): [Event]
   events(limit: Int, offset: Int): [Event]
-  paymentMethods(service: String, limit: Int): [PaymentMethodType]
+  paymentMethods(service: String, limit: Int, hasBalanceAboveZero: Boolean): [PaymentMethodType]
   connectedAccounts: [ConnectedAccountType]
 }
 
@@ -514,7 +514,7 @@ type Event implements CollectiveInterface {
   website: String
   updates(limit: Int, offset: Int): [Event]
   events(limit: Int, offset: Int): [Event]
-  paymentMethods(service: String, limit: Int): [PaymentMethodType]
+  paymentMethods(service: String, limit: Int, hasBalanceAboveZero: Boolean): [PaymentMethodType]
   connectedAccounts: [ConnectedAccountType]
   stats: CollectiveStatsType
 }
@@ -1037,7 +1037,7 @@ type Organization implements CollectiveInterface {
   website: String
   updates(limit: Int, offset: Int): [Event]
   events(limit: Int, offset: Int): [Event]
-  paymentMethods(service: String, limit: Int): [PaymentMethodType]
+  paymentMethods(service: String, limit: Int, hasBalanceAboveZero: Boolean): [PaymentMethodType]
   connectedAccounts: [ConnectedAccountType]
   stats: CollectiveStatsType
   email: String
@@ -1540,7 +1540,7 @@ type User implements CollectiveInterface {
   website: String
   updates(limit: Int, offset: Int): [Event]
   events(limit: Int, offset: Int): [Event]
-  paymentMethods(service: String, limit: Int): [PaymentMethodType]
+  paymentMethods(service: String, limit: Int, hasBalanceAboveZero: Boolean): [PaymentMethodType]
   connectedAccounts: [ConnectedAccountType]
   stats: CollectiveStatsType
   firstName: String

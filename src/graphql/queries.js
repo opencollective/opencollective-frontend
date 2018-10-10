@@ -74,7 +74,7 @@ export const getLoggedInUserQuery = gql`
         slug
         settings
         currency
-        paymentMethods(limit: 5) {
+        paymentMethods(limit: 10, hasBalanceAboveZero: true) {
           id
           uuid
           currency
@@ -102,7 +102,7 @@ export const getLoggedInUserQuery = gql`
             id
             balance
           }
-          paymentMethods(limit: 5) {
+          paymentMethods(limit: 10, hasBalanceAboveZero: true) {
             id
             uuid
             currency
