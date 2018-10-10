@@ -62,7 +62,7 @@ the API from the address http://localhost:13060.
 
 1. Setup your environment
 
-Copy `env.default` and rename it to `.env`
+Make sure you have python 2 as your active version. You can use `pyenv` to switch python versions.
 
 2. Install dependencies
 
@@ -76,10 +76,29 @@ npm install
 npm run dev
 ```
 
+
 ##### Troubleshooting:
 
 - If you're running into node-gyp issues related to Python 3 vs Python 2 you can run `npm rebuild` or run `npm install` again.
 - The postinstall script should set-up your default environment and bootstrap the database along with some seed data. If it is failing you can try to run: `npm run db:setup && ./node_modules/.bin/babel-node ./scripts/db_restore.js opencollective_dvl`
+
+**Unset Environment Variables**
+
+You may need to specify some more environment variables(other than the ones in the dotenv files[`.env.development` and `.env.test`]) in a more specific case(example: you want to test a slack webhook or a github integration):
+
+```
+CLEARBIT_KEY=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+EXPRESS_SESSION_SECRET=xxxxxxxxxxxxxxx
+GITHUB_CLIENT_ID=xxxxxxxxxxxxxx
+MEETUP_CLIENT_ID=xxxxxxxxxxxx
+MEETUP_CLIENT_SECRET=xxxxxxxxxx
+SLACK_HOOK_URL=https://hooks.slack.com/services/XXXXXXXXX/XXXXXXXXX/xxxxxxxxxxxxxxxxxxxxxxxx
+STRIPE_CLIENT_ID=ca_xxxxxxxxxxxxxxxx
+STRIPE_KEY=pk_test_xxxxxxxxxx
+STRIPE_SECRET=sk_test_xxxxxxxxxxxxxxxxxxxxx
+TWITTER_CONSUMER_KEY=xxxxxxxxxxxx
+TWITTER_CONSUMER_SECRET=xxxxxxxxxx
+```
 
 ### Once it's running
 
