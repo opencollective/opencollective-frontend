@@ -16,12 +16,6 @@ else
   echo "𐄂 psql command doesn't exist. Make sure you have Postgres installed ($> brew install postgres)"
 fi
 
-# Set up .env file if needed
-if [ ! -f .env ]; then
-    echo "✓ .env not found, copying .env.development to .env"
-    cp .env.development .env
-fi
-
 # On circleci environment
 if [ "$NODE_ENV" = "circleci" ]; then
   echo "- setup db user and run migration if any"

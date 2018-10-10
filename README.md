@@ -62,7 +62,7 @@ the API from the address http://localhost:13060.
 
 1. Setup your environment
 
-Copy `env.default` and rename it to `.env`
+Make sure you have python 2 as your active version. You can use `pyenv` to switch python versions.
 
 2. Install dependencies
 
@@ -116,6 +116,12 @@ Email sending can done by running [`npm run maildev`](https://danfarrelly.nyc/Ma
 If you have any questions, ping us on Slack
 (https://slack.opencollective.org) or on Twitter
 ([@opencollect](https://twitter.com/opencollect)).
+
+## More documentation:
+
+- [postgres](docs/postgres.md) - More details on the postgres configuration
+- [dev](docs/dev.md) - more details on setting up the environment
+- [Environment Variables](docs/environment_variable.md) - list of environment variables present on the server
 
 ## TODO
 
