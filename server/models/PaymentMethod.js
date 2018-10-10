@@ -395,6 +395,10 @@ export default function(Sequelize, DataTypes) {
     if (user) {
       await user.populateRoles();
     }
+    // virtualcard monthlyLimitPerMember are calculated differently so the getBalance already returns the right result
+    if (this.type === 'virtualcard') {
+      return getBalance(this);
+    }
 
     const balance = await getBalance(this);
 
