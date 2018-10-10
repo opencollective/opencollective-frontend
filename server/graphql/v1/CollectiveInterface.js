@@ -639,6 +639,7 @@ export const CollectiveInterfaceType = new GraphQLInterfaceType({
         args: {
           service: { type: GraphQLString },
           limit: { type: GraphQLInt },
+          hasBalanceAboveZero: { type: GraphQLBoolean },
         },
       },
       connectedAccounts: { type: new GraphQLList(ConnectedAccountType) },
@@ -1163,23 +1164,31 @@ const CollectiveFields = () => {
       args: {
         service: { type: GraphQLString },
         limit: { type: GraphQLInt },
+        hasBalanceAboveZero: { type: GraphQLBoolean },
       },
-      resolve(collective, args, req) {
+      async resolve(collective, args, req) {
         if (!req.remoteUser || !req.remoteUser.isAdmin(collective.id))
           return [];
-        return req.loaders.paymentMethods.findByCollectiveId
-          .load(collective.id)
-          .then(paymentMethods => {
-            if (args.service) {
-              paymentMethods = paymentMethods.filter(
-                pm => pm.service === args.service,
-              );
+        let paymentMethods = await req.loaders.paymentMethods.findByCollectiveId.load(collective.id);
+        if (args.service) {
+          paymentMethods = paymentMethods.filter(
+            pm => pm.service === args.service,
+          );
+        }
+        if (args.hasBalanceAboveZero) {
+          const filteredArray = [];
+          for (const paymentMethod of paymentMethods) {
+            const balance = await paymentMethod.getBalanceForUser(req.remoteUser);
+            if (balance.amount > 0) {
+              filteredArray.push(paymentMethod);
             }
-            if (args.limit) {
-              paymentMethods = paymentMethods.slice(0, args.limit);
-            }
-            return paymentMethods;
-          });
+          }
+          paymentMethods = filteredArray;
+        }
+        if (args.limit) {
+          paymentMethods = paymentMethods.slice(0, args.limit);
+        }
+        return paymentMethods;
       },
     },
     connectedAccounts: {
