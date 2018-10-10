@@ -117,12 +117,17 @@ class CreatePledgePage extends React.Component {
     event.preventDefault();
     const {
       target: {
-        elements: { name, slug, totalAmount, fromCollective, website },
+        elements: {
+          name,
+          slug,
+          totalAmount,
+          fromCollective,
+          website,
+          publicMessage,
+        },
       },
     } = event;
-    const {
-      data,
-    } = this.props;
+    const { data } = this.props;
 
     const order = {
       collective: {},
@@ -130,6 +135,7 @@ class CreatePledgePage extends React.Component {
         id: Number(fromCollective.value),
       },
       totalAmount: Number(totalAmount.value) * 100,
+      publicMessage: publicMessage.value,
     };
 
     if (data) {
@@ -157,22 +163,14 @@ class CreatePledgePage extends React.Component {
   }
 
   render() {
-    const {
-      errorMessage,
-      loadingUserLogin,
-      LoggedInUser,
-    } = this.state;
-    const {
-      name,
-      slug,
-    } = this.props;
+    const { errorMessage, loadingUserLogin, LoggedInUser } = this.state;
+    const { name, slug } = this.props;
 
-    const profiles = LoggedInUser &&
+    const profiles =
+      LoggedInUser &&
       LoggedInUser.memberOf
-      .concat({ ...LoggedInUser, role: 'ADMIN' })
-      .filter(
-        ({ role }) => ~['ADMIN', 'HOST'].indexOf(role),
-      );
+        .concat({ ...LoggedInUser, role: 'ADMIN' })
+        .filter(({ role }) => ~['ADMIN', 'HOST'].indexOf(role));
 
     return (
       <Fragment>
@@ -303,8 +301,8 @@ class CreatePledgePage extends React.Component {
 
                     <P color="#9399A3" fontSize={12} mt={2}>
                       You’ve earned the priviledge to name and describe this
-                      awesome cause. We’ll create a pledged collective page for it
-                      so other people can find it and pledge to it too.
+                      awesome cause. We’ll create a pledged collective page for
+                      it so other people can find it and pledge to it too.
                     </P>
 
                     <Flex
@@ -341,7 +339,7 @@ class CreatePledgePage extends React.Component {
                         prepend="https://"
                         id="website"
                         name="website"
-                        placeholder="i.e. github.com/airbnb or meetup.com/wwc"
+                        placeholder="i.e. github.com/babel/babel"
                       />
                     </Flex>
                   </Box>
@@ -369,15 +367,18 @@ class CreatePledgePage extends React.Component {
   }
 }
 
-const addCollectiveData = graphql(gql`
-  query getCollective($slug: String!) {
-    Collective(slug: $slug) {
-      id
+const addCollectiveData = graphql(
+  gql`
+    query getCollective($slug: String!) {
+      Collective(slug: $slug) {
+        id
+      }
     }
-  }
-`, {
-  skip: (props) => !props.slug,
-})
+  `,
+  {
+    skip: props => !props.slug,
+  },
+);
 
 const addGraphQL = compose(
   addCollectiveData,
@@ -385,6 +386,4 @@ const addGraphQL = compose(
 );
 
 export { CreatePledgePage as MockCreatePledgePage };
-export default withData(
-  withLoggedInUser(addGraphQL(CreatePledgePage)),
-);
+export default withData(withLoggedInUser(addGraphQL(CreatePledgePage)));
