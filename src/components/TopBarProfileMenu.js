@@ -428,7 +428,7 @@ class TopBarProfileMenu extends React.Component {
                 fontFamily="montserratlight, arial"
                 onClick={this.logout}
               >
-                <FormattedMessage id="menu.logout" defaultMessage="logout" />
+                <FormattedMessage id="menu.logout" defaultMessage="Log out" />
               </StyledLink>
             </ListItem>
           </Box>
