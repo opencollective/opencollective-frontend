@@ -39,41 +39,40 @@ export const overflow = style({ prop: 'overflow' });
 
 export const pointerEvents = style({ prop: 'pointerEvents' });
 
-const Container = styled(tag)(
-  [],
-  alignItems,
-  alignSelf,
-  background,
-  backgroundImage,
-  backgroundPosition,
-  backgroundRepeat,
-  backgroundSize,
-  bgColor,
-  borders,
-  borderRadius,
-  bottom,
-  boxShadow,
-  display,
-  flex,
-  flexDirection,
-  flexWrap,
-  height,
-  justifyContent,
-  left,
-  maxHeight,
-  maxWidth,
-  minHeight,
-  minWidth,
-  order,
-  overflow,
-  pointerEvents,
-  position,
-  right,
-  size,
-  space,
-  top,
-  width,
-  zIndex,
-);
+const Container = styled(tag)`
+  ${alignItems}
+  ${alignSelf}
+  ${background}
+  ${backgroundImage}
+  ${backgroundPosition}
+  ${backgroundRepeat}
+  ${backgroundSize}
+  ${bgColor}
+  ${borders}
+  ${borderRadius}
+  ${bottom}
+  ${boxShadow}
+  ${display}
+  ${flex}
+  ${flexDirection}
+  ${flexWrap}
+  ${height}
+  ${justifyContent}
+  ${left}
+  ${maxHeight}
+  ${maxWidth}
+  ${minHeight}
+  ${minWidth}
+  ${order}
+  ${overflow}
+  ${pointerEvents}
+  ${position}
+  ${right}
+  ${size}
+  ${space}
+  ${top}
+  ${width}
+  ${zIndex}
+`;
 
 export default Container;
