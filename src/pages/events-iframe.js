@@ -14,7 +14,7 @@ class EventsIframe extends React.Component {
 
   static propTypes = {
     collectiveSlug: PropTypes.string,
-    id: PropTypes.number,
+    id: PropTypes.string,
   };
 
   onChange = change => {
