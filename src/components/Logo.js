@@ -16,8 +16,6 @@ const Logo = ({ src, style = {}, height, type = 'ORGANIZATION', website }) => {
   if (!src) {
     if (defaultImage[type]) {
       backgroundStyle.backgroundImage = `url(${defaultImage[type]})`;
-    } else {
-      console.warn(`No defaultImage for type '${type}'`);
     }
   }
   const image = imagePreview(src, defaultImage[type], {
