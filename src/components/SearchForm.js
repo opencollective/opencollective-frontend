@@ -1,7 +1,12 @@
+import React from 'react';
+import PropTypes from 'prop-types';
 import { Box, Flex } from 'grid-styled';
-import SearchIcon from './SearchIcon';
 import { fontSize } from 'styled-system';
 import styled from 'styled-components';
+
+import { Router } from '../server/pages';
+
+import SearchIcon from './SearchIcon';
 
 const SearchInputContainer = styled(Flex)`
   border: solid 1px var(--silver-four);
@@ -26,8 +31,14 @@ const SearchButton = styled(Flex)`
   }
 `;
 
-const SearchForm = ({ fontSize }) => (
-  <form action="/search" method="GET">
+const handleSubmit = event => {
+  const searchInput = event.target.elements.q;
+  Router.pushRoute('search', { q: searchInput.value });
+  return false;
+};
+
+const SearchForm = ({ fontSize, onSubmit = handleSubmit }) => (
+  <form action="/search" method="GET" onSubmit={onSubmit}>
     <SearchInputContainer
       alignItems="center"
       justifyContent="space-between"
@@ -49,5 +60,10 @@ const SearchForm = ({ fontSize }) => (
     </SearchInputContainer>
   </form>
 );
+
+SearchForm.propTypes = {
+  fontSize: PropTypes.string,
+  onSubmit: PropTypes.func,
+};
 
 export default SearchForm;
