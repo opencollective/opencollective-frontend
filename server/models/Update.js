@@ -6,7 +6,7 @@ import _, { pick } from 'lodash';
 import Temporal from 'sequelize-temporal';
 import slugify from 'slug';
 import activities from '../constants/activities';
-import { mustBeLoggedInTo, mustHaveRole } from '../lib/auth';
+import { mustHaveRole } from '../lib/auth';
 import Promise from 'bluebird';
 import showdown from 'showdown';
 const markdownConverter = new showdown.Converter();
@@ -203,16 +203,7 @@ export default function(Sequelize, DataTypes) {
 
   // Edit an update
   Update.prototype.edit = async function(remoteUser, newUpdateData) {
-    mustBeLoggedInTo(remoteUser, 'edit this update');
-    if (
-      remoteUser.id !== this.CreatedByUserId ||
-      !remoteUser.isAdmin(this.CollectiveId)
-    ) {
-      throw new errors.Unauthorized({
-        message:
-          'You must be the author or an admin of this collective to edit this update',
-      });
-    }
+    mustHaveRole(remoteUser, 'ADMIN', this.CollectiveId, 'edit this update');
     if (newUpdateData.TierId) {
       const tier = await models.Tier.findById(newUpdateData.TierId);
       if (!tier) {
@@ -275,17 +266,7 @@ export default function(Sequelize, DataTypes) {
   };
 
   Update.prototype.delete = async function(remoteUser) {
-    mustBeLoggedInTo(remoteUser, 'delete this update');
-    if (
-      !remoteUser.isAdmin(this.id) &&
-      !remoteUser.isAdmin(this.ParentUpdateId)
-    ) {
-      throw new errors.Unauthorized({
-        message:
-          'You need to be logged in as a core contributor or as a host to delete this update',
-      });
-    }
-
+    mustHaveRole(remoteUser, 'ADMIN', this.CollectiveId, 'delete this update');
     return this.destroy();
   };
 
