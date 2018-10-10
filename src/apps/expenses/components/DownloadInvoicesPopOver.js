@@ -6,7 +6,7 @@ import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import { Popover, OverlayTrigger } from 'react-bootstrap';
 import { saveAs } from 'file-saver';
-import { uniq } from 'lodash';
+import { uniq, omit } from 'lodash';
 
 import withIntl from '../../../lib/withIntl';
 import * as api from '../../../lib/api';
@@ -89,7 +89,7 @@ class Overlay extends React.Component {
     );
     const month2digit = month < 10 ? `0${month}` : month;
     return (
-      <div>
+      <div key={`${this.state.year}-${month}`}>
         <style jsx>
           {`
             h2 {
@@ -109,12 +109,14 @@ class Overlay extends React.Component {
 
   render() {
     const { data } = this.props;
+    const forwardedProps = omit(this.props, ['fromCollectiveSlug', 'data']);
+
     if (data.loading) {
       return (
         <Popover
           id="downloadInvoicesPopover"
           title="Download invoices"
-          {...this.props}
+          {...forwardedProps}
         >
           <div>
             <FormattedMessage id="loading" defaultMessage="loading" />
@@ -135,7 +137,7 @@ class Overlay extends React.Component {
       <Popover
         id="downloadInvoicesPopover"
         title="Download invoices"
-        {...this.props}
+        {...forwardedProps}
       >
         <InputField
           type="select"
@@ -170,7 +172,7 @@ const addData = graphql(getInvoicesQuery);
 
 class PopoverButton extends React.Component {
   render() {
-    const overlay = <Overlay data={this.props.data} />;
+    const overlay = <Overlay {...this.props} />;
     return (
       <OverlayTrigger
         trigger="click"
