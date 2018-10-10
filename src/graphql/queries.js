@@ -102,7 +102,7 @@ export const getLoggedInUserQuery = gql`
             id
             balance
           }
-          paymentMethods(limit: 10) {
+          paymentMethods(limit: 10, hasBalanceAboveZero: true) {
             id
             uuid
             currency
