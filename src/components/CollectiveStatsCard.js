@@ -42,16 +42,18 @@ const CollectiveStatsCard = ({
     overflow="hidden"
   >
     <Container
-      backgroundImage={`url(${imagePreview(
-        backgroundImage,
-        defaultBackgroundImage[type],
-        { width: 224 },
-      )})`}
       backgroundSize="cover"
       backgroundRepeat="no-repeat"
       backgroundPosition="center center"
       height={['9rem', null, '12rem']}
       position="relative"
+      style={{
+        backgroundImage: `url(${imagePreview(
+          backgroundImage,
+          defaultBackgroundImage[type],
+          { width: 224 },
+        )})`,
+      }}
     >
       <Container
         position="absolute"
@@ -67,9 +69,6 @@ const CollectiveStatsCard = ({
           <a>
             <Container
               bg="#2877ED"
-              backgroundImage={`url(${imagePreview(image, defaultImage[type], {
-                width: 65,
-              })})`}
               backgroundSize="contain"
               backgroundRepeat="no-repeat"
               backgroundPosition="center center"
@@ -77,6 +76,13 @@ const CollectiveStatsCard = ({
               border="2px solid white"
               height={[52, null, 65]}
               width={[52, null, 65]}
+              style={{
+                backgroundImage: `url(${imagePreview(
+                  image,
+                  defaultImage[type],
+                  { width: 65 },
+                )})`,
+              }}
             />
           </a>
         </Link>
