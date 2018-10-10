@@ -734,6 +734,7 @@ type Mutation {
   createMember(member: CollectiveAttributesInputType!, collective: CollectiveAttributesInputType!, role: String!): Member
   removeMember(member: CollectiveAttributesInputType!, collective: CollectiveAttributesInputType!, role: String!): Member
   createOrder(order: OrderInputType!): OrderType
+  updateOrder(order: OrderInputType!): OrderType
   createUpdate(update: UpdateInputType!): UpdateType
   editUpdate(update: UpdateAttributesInputType!): UpdateType
   publishUpdate(id: Int!): UpdateType
@@ -1251,6 +1252,7 @@ type Query {
     offset: Int = 0
   ): CollectiveSearchResults
   allTransactionsFromPaymentMethod(uuid: String!, type: String, limit: Int, offset: Int, dateFrom: String, dateTo: String): [Transaction]
+  Order(id: Int!): OrderType
 }
 
 """Stats about a membership"""
