@@ -18,6 +18,7 @@ const Description = styled(P)`
 
 class RedeemForm extends React.Component {
   static propTypes = {
+    intl: PropTypes.object.isRequired,
     code: PropTypes.string,
     email: PropTypes.string,
     name: PropTypes.string,
