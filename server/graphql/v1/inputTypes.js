@@ -211,6 +211,7 @@ export const OrderInputType = new GraphQLInputObjectType({
   name: 'OrderInputType',
   description: 'Input type for OrderType',
   fields: () => ({
+    id: { type: GraphQLInt },
     quantity: { type: GraphQLInt },
     totalAmount: { type: GraphQLInt },
     hostFeePercent: { type: GraphQLInt },
