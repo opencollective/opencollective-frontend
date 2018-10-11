@@ -1,6 +1,7 @@
 import React, { Fragment } from 'react';
 import { graphql, compose } from 'react-apollo';
 import gql from 'graphql-tag';
+import { get } from 'lodash';
 
 import { Router } from '../server/pages';
 import withData from '../lib/withData';
@@ -12,7 +13,8 @@ import Footer from '../components/Footer';
 import ErrorPage from '../components/ErrorPage';
 import OrderForm from '../components/OrderForm';
 import SignInForm from '../components/SignInForm';
-import { H1 } from '../components/Text';
+import { H1, P } from '../components/Text';
+import Container from '../components/Container';
 
 class CompletePledgePage extends React.Component {
   static getInitialProps({ query = {} }) {
@@ -75,15 +77,22 @@ class CompletePledgePage extends React.Component {
       );
     }
 
-    Order.tier = {
-      name: 'Pledge',
-      presets: !Order.totalAmount && [1000, 5000, 10000], // we only offer to customize the contribution if it hasn't been specified in the URL
-      type: 'DONATION',
-      currency: Order.collective.currency,
-      interval: Order.interval,
-      button: 'donate',
-      description: 'Thank you for your kind donation',
-    };
+    if (Order) {
+      Order.tier = {
+        name: 'Pledge',
+        presets: !Order.totalAmount && [1000, 5000, 10000], // we only offer to customize the contribution if it hasn't been specified in the URL
+        type: 'DONATION',
+        currency: Order.collective.currency,
+        interval: Order.interval,
+        button: 'donate',
+        description: 'Thank you for your kind donation',
+      };
+    }
+
+    const pledgeComplete = Order && ['ACTIVE', 'PAID'].includes(Order.status);
+    const collectiveActive = get(Order, 'collective.isActive');
+    const showForm =
+      LoggedInUser && !pledgeComplete && get(Order, 'collective.isActive');
 
     return (
       <Fragment>
@@ -93,16 +102,40 @@ class CompletePledgePage extends React.Component {
           title="Complete Pledge"
         />
         <Body>
-          <H1>Complete Your Pledge</H1>
-          {!loadingUserLogin && !LoggedInUser && <SignInForm />}
-          {LoggedInUser && (
-            <OrderForm
-              collective={Order.collective}
-              LoggedInUser={LoggedInUser}
-              onSubmit={order => this.submitForm({ ...order, id: Order.id })}
-              order={Order}
-            />
-          )}
+          <Container maxWidth={1200} px={4} py={5}>
+            <H1>Complete Your Pledge</H1>
+
+            {!loadingUserLogin &&
+              !LoggedInUser && (
+                <Fragment>
+                  <p>You must be signed in to complete your pledge</p>
+                  <SignInForm />
+                </Fragment>
+              )}
+
+            {pledgeComplete && (
+              <P fontWeight="bold" textAlign="center" mt={4}>
+                This pledge has already been completed. No action needed at this
+                time.
+              </P>
+            )}
+
+            {!collectiveActive && (
+              <P fontWeight="bold" textAlign="center" mt={4}>
+                The {get(Order, 'collective.name')} collective has not been
+                claimed. You will be notified once that occurs.
+              </P>
+            )}
+
+            {showForm && (
+              <OrderForm
+                collective={Order.collective}
+                LoggedInUser={LoggedInUser}
+                onSubmit={order => this.submitForm({ ...order, id: Order.id })}
+                order={Order}
+              />
+            )}
+          </Container>
         </Body>
         <Footer />
       </Fragment>
@@ -118,6 +151,7 @@ const addOrderData = graphql(gql`
       publicMessage
       quantity
       totalAmount
+      status
       collective {
         slug
         currency
@@ -125,6 +159,7 @@ const addOrderData = graphql(gql`
           id
           name
         }
+        isActive
         name
         paymentMethods {
           id
