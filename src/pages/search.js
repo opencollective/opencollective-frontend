@@ -76,7 +76,7 @@ class SearchPage extends React.Component {
 
   state = {
     loadingUserLogin: true,
-    LoggedInUser: {},
+    LoggedInUser: undefined,
   };
 
   async componentDidMount() {

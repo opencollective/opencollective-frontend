@@ -111,7 +111,7 @@ class RedeemPage extends React.Component {
       loading: false,
       view: 'form', // form or success
       form: { code, email, name },
-      LoggedInUser: null,
+      LoggedInUser: undefined,
     };
     this.messages = defineMessages({
       'error.email.invalid': {
