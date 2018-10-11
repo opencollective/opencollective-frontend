@@ -680,7 +680,7 @@
   "expenses.byRecipient": "Expenses by {recipient}",
   "error.code.invalid": "Invalid gift card code",
   "redeem.subtitle.line1": "Open Collective helps communities - like open source projects, meetups, etc - raise money and operate transparently.",
-  "redeem.form.redeem.btn": "redeem",
+  "redeem.form.redeem.btn": "Redeem",
   "redeemed.subtitle.line1": "The card has been added to your account.",
   "redeemed.subtitle.line2": "You can now donate to any collective of your choice.",
   "redeemed.findCollectives": "Find open collectives to support.",

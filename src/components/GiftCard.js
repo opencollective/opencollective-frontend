@@ -66,7 +66,7 @@ class GiftCard extends React.Component {
   }
 
   render() {
-    const { amount, currency, name, emitter } = this.props;
+    const { amount, currency, collective, emitter } = this.props;
 
     return (
       <ShadowCard width={['300px', '400px']} height={['168px', '224px']}>
@@ -79,7 +79,7 @@ class GiftCard extends React.Component {
             <FormattedMessage
               id="giftcard.user.name"
               defaultMessage="Hello again, {name}!"
-              values={{ name }}
+              values={{ name: collective.name }}
             />
           </Title>
           <Text fontSize={['12px', '14px']}>

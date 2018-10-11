@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import sanitizeHtml from 'sanitize-html';
 import styled from 'styled-components';
+import gql from 'graphql-tag';
 import { Flex, Box } from 'grid-styled';
 import { backgroundSize, fontSize, minHeight, maxWidth } from 'styled-system';
 import { FormattedMessage } from 'react-intl';
+import { get } from 'lodash';
 
 import Header from '../components/Header';
 import Body from '../components/Body';
@@ -18,6 +20,28 @@ import SearchForm from '../components/SearchForm';
 import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
 import withLoggedInUser from '../lib/withLoggedInUser';
+
+const paymentMethodQuery = gql`
+  query PaymentMethod($code: String) {
+    PaymentMethod(code: $code) {
+      id
+      initialBalance
+      monthlyLimitPerMember
+      currency
+      name
+      collective {
+        id
+        name
+        slug
+      }
+      emitter {
+        id
+        name
+        slug
+      }
+    }
+  }
+`;
 
 const Title = styled(H1)`
   color: white;
@@ -47,9 +71,10 @@ const Hero = styled(Box)`
 
 class RedeemedPage extends React.Component {
   static getInitialProps({
-    query: { amount, name, emitterSlug, emitterName },
+    query: { code, amount, name, emitterSlug, emitterName },
   }) {
     return {
+      code,
       amount: amount && Number(amount),
       name: sanitizeHtml(name || '', {
         allowedTags: [],
@@ -67,31 +92,83 @@ class RedeemedPage extends React.Component {
   }
 
   static propTypes = {
+    client: PropTypes.object.isRequired,
+    getLoggedInUser: PropTypes.func.isRequired,
+    code: PropTypes.string,
     name: PropTypes.string,
     emitterSlug: PropTypes.string,
     emitterName: PropTypes.string,
-    amount: PropTypes.number.isRequired,
+    amount: PropTypes.number,
   };
 
   constructor(props) {
     super(props);
-    this.state = {};
+
+    if (!props.code) {
+      this.state = {
+        amount: props.amount,
+        collective: {
+          name: props.name,
+        },
+        emitter: {
+          slug: props.emitterSlug,
+          name: props.emitterName,
+        },
+      };
+    } else {
+      this.state = { loading: true };
+    }
   }
 
   async componentDidMount() {
-    const { getLoggedInUser } = this.props;
-    const LoggedInUser = await getLoggedInUser();
-    this.setState({ LoggedInUser });
+    const { getLoggedInUser, client, code } = this.props;
+
+    getLoggedInUser().then(LoggedInUser => {
+      this.setState({ LoggedInUser });
+    });
+
+    if (code) {
+      client
+        .query({ query: paymentMethodQuery, variables: { code } })
+        .then(result => {
+          const { PaymentMethod } = result.data;
+          if (PaymentMethod) {
+            this.setState({
+              amount:
+                PaymentMethod.initialBalance ||
+                PaymentMethod.monthlyLimitPerMember,
+              name: PaymentMethod.collective.name,
+              collective: PaymentMethod.collective,
+              emitter: PaymentMethod.emitter,
+              currency: PaymentMethod.currency,
+              loading: false,
+            });
+          }
+        });
+    }
   }
 
   render() {
-    const { amount, emitterSlug, emitterName, name } = this.props;
+    const {
+      amount,
+      emitter,
+      collective,
+      currency,
+      LoggedInUser,
+      loading,
+    } = this.state;
+
+    let error;
+    if (get(LoggedInUser, 'collective.id') !== get(collective, 'id')) {
+      error = 'account mismatch';
+    }
+
     return (
       <div className="RedeemedPage">
         <Header
-          title="Gift card redeemed"
+          title="Gift Card Redeemed"
           description="Use your gift card to support open source projects that you are contributing to."
-          LoggedInUser={this.state.LoggedInUser}
+          LoggedInUser={LoggedInUser}
         />
 
         <Body>
@@ -107,34 +184,50 @@ class RedeemedPage extends React.Component {
                   </Title>
                 </Box>
 
-                <Box mt={2}>
-                  <Subtitle
-                    fontSize={['1.5rem', null, '2rem']}
-                    maxWidth={['90%', '640px']}
-                  >
-                    <Box>
-                      <FormattedMessage
-                        id="redeemed.subtitle.line1"
-                        defaultMessage="The card has been added to your account."
-                      />
-                    </Box>
-                    <Box>
-                      <FormattedMessage
-                        id="redeemed.subtitle.line2"
-                        defaultMessage="You can now donate to any collective of your choice."
-                      />
-                    </Box>
-                  </Subtitle>
-                </Box>
+                {error && (
+                  <Box mt={2}>
+                    <Subtitle
+                      fontSize={['1.5rem', null, '2rem']}
+                      maxWidth={['90%', '640px']}
+                    >
+                      Error: {error}
+                    </Subtitle>
+                  </Box>
+                )}
 
-                <Box mt={[4, 5]}>
-                  <GiftCard
-                    amount={amount}
-                    currency="USD"
-                    emitter={{ slug: emitterSlug, name: emitterName }}
-                    name={name}
-                  />
-                </Box>
+                {!loading &&
+                  !error && (
+                    <Fragment>
+                      <Box mt={2}>
+                        <Subtitle
+                          fontSize={['1.5rem', null, '2rem']}
+                          maxWidth={['90%', '640px']}
+                        >
+                          <Box>
+                            <FormattedMessage
+                              id="redeemed.subtitle.line1"
+                              defaultMessage="The card has been added to your account."
+                            />
+                          </Box>
+                          <Box>
+                            <FormattedMessage
+                              id="redeemed.subtitle.line2"
+                              defaultMessage="You can now donate to any collective of your choice."
+                            />
+                          </Box>
+                        </Subtitle>
+                      </Box>
+
+                      <Box mt={[4, 5]}>
+                        <GiftCard
+                          amount={amount}
+                          currency={currency || 'USD'}
+                          emitter={emitter}
+                          collective={collective}
+                        />
+                      </Box>
+                    </Fragment>
+                  )}
               </Flex>
             </Hero>
 

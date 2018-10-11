@@ -1240,7 +1240,7 @@ type Query {
   ): [Member]
   allEvents(slug: String, limit: Int, offset: Int): [CollectiveInterface]
   ocPaymentMethod(token: String!): PaymentMethodType
-  PaymentMethod(id: Int!): PaymentMethodType
+  PaymentMethod(id: Int, code: String): PaymentMethodType
   search(
     """
     Fetch collectives related to this term based on name, description, tags, slug, mission, and location
