@@ -2,12 +2,14 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import gql from 'graphql-tag';
 import styled from 'styled-components';
+import sanitizeHtml from 'sanitize-html';
 import { graphql } from 'react-apollo';
 import { backgroundSize, fontSize, minHeight, maxWidth } from 'styled-system';
 import { Flex, Box } from 'grid-styled';
 import { FormattedMessage, defineMessages } from 'react-intl';
 import { get } from 'lodash';
-import sanitizeHtml from 'sanitize-html';
+
+import { Router } from '../server/pages';
 
 import Header from '../components/Header';
 import Body from '../components/Body';
@@ -134,10 +136,18 @@ class RedeemPage extends React.Component {
   async claimPaymentMethod() {
     this.setState({ loading: true });
     const { code, email, name } = this.state.form;
-    const user = { email, name };
     try {
-      const res = await this.props.claimPaymentMethod(code, user);
+      let res;
+      if (this.state.LoggedInUser) {
+        res = await this.props.claimPaymentMethod(code);
+        Router.pushRoute('redeemed', { code });
+        return;
+      } else {
+        res = await this.props.claimPaymentMethod(code, { email, name });
+      }
       console.log('>>> res graphql: ', JSON.stringify(res, null, '  '));
+      // TODO: need to know from API if an account was created or not
+      // TODO: or refuse to create an account automatically and ask to sign in
       this.setState({ loading: false, view: 'success' });
     } catch (e) {
       const error = e.graphQLErrors && e.graphQLErrors[0].message;
@@ -153,7 +163,7 @@ class RedeemPage extends React.Component {
 
   handleSubmit() {
     const { intl } = this.props;
-    if (!isValidEmail(this.state.form.email)) {
+    if (!this.state.LoggedInUser && !isValidEmail(this.state.form.email)) {
       return this.setState({
         error: intl.formatMessage(this.messages['error.email.invalid']),
       });
@@ -168,13 +178,14 @@ class RedeemPage extends React.Component {
 
   render() {
     const { code, email, name } = this.props;
+    const { LoggedInUser } = this.state;
 
     return (
       <div className="RedeemedPage">
         <Header
           title="Redeem gift card"
           description="Use your gift card to support open source projects that you are contributing to."
-          LoggedInUser={this.state.LoggedInUser}
+          LoggedInUser={LoggedInUser}
         />
         <Body>
           <Flex alignItems="center" flexDirection="column">
@@ -216,6 +227,7 @@ class RedeemPage extends React.Component {
                             code={code}
                             name={name}
                             email={email}
+                            LoggedInUser={LoggedInUser}
                             onChange={this.handleChange}
                           />
                         )}
