@@ -76,7 +76,6 @@ export default class Body extends React.Component {
           .content code {
             background-color: #f6f8fa;
             padding: 0.5rem;
-            overflow: scroll;
             max-width: 100%;
           }
 
