@@ -715,4 +715,15 @@ describe('Collective model', () => {
       expect(nextGoal.missing.interval).to.equal('month');
     });
   });
+
+  describe('third party accounts handles', () => {
+    it('stores Github handle and strip first @ character', () => {
+      return Collective.create({
+        slug: 'my-collective',
+        githubHandle: '@test',
+      }).tap(collective => {
+        expect(collective.githubHandle).to.equal('test');
+      });
+    });
+  });
 });

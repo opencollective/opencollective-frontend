@@ -97,6 +97,7 @@ describe('graphql.collective.test.js', () => {
         name
         website
         twitterHandle
+        githubHandle
         image
         description
         longDescription

@@ -277,6 +277,14 @@ export default function(Sequelize, DataTypes) {
         },
       },
 
+      githubHandle: {
+        type: DataTypes.STRING,
+        set(githubHandle) {
+          if (typeof githubHandle !== 'string') return;
+          this.setDataValue('githubHandle', githubHandle.replace(/^@/, ''));
+        },
+      },
+
       website: {
         type: DataTypes.STRING,
         get() {
@@ -372,6 +380,7 @@ export default function(Sequelize, DataTypes) {
             settings: this.settings,
             website: this.website,
             twitterHandle: this.twitterHandle,
+            githubHandle: this.githubHandle,
             publicUrl: this.publicUrl,
             hostFeePercent: this.hostFeePercent,
             tags: this.tags,
@@ -419,6 +428,7 @@ export default function(Sequelize, DataTypes) {
             image: this.image,
             slug: this.slug,
             twitterHandle: this.twitterHandle,
+            githubHandle: this.githubHandle,
             publicUrl: this.publicUrl,
             mission: this.mission,
             isSupercollective: this.isSupercollective,
@@ -433,6 +443,7 @@ export default function(Sequelize, DataTypes) {
             company: this.company,
             website: this.website,
             twitterHandle: this.twitterHandle,
+            githubHandle: this.githubHandle,
             description: this.description,
             previewImage: this.previewImage,
           };
@@ -1345,10 +1356,27 @@ export default function(Sequelize, DataTypes) {
         }
         const data = {
           host: pick(hostCollective, ['id', 'name', 'slug']),
-          collective: pick(this, ['id', 'slug', 'name', 'description', 'twitterHandle', 'website', 'tags', 'data']),
+          collective: pick(this, [
+            'id',
+            'slug',
+            'name',
+            'description',
+            'twitterHandle',
+            'githubHandle',
+            'website',
+            'tags',
+            'data',
+          ]),
           user: {
             email: creatorUser.email,
-            collective: pick(creatorUser.collective, ['id', 'slug', 'name', 'website', 'twitterHandle']),
+            collective: pick(creatorUser.collective, [
+              'id',
+              'slug',
+              'name',
+              'website',
+              'twitterHandle',
+              'githubHandle',
+            ]),
           },
         };
         promises.push(models.Activity.create({
