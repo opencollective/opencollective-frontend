@@ -8,6 +8,8 @@ import CreateCollectiveForm from './CreateCollectiveForm';
 import CollectiveCover from './CollectiveCover';
 import SignInForm from './SignInForm';
 import { FormattedMessage } from 'react-intl';
+import { Router } from '../server/pages';
+import { get } from 'lodash';
 
 class CreateOrganization extends React.Component {
   static propTypes = {
@@ -31,9 +33,18 @@ class CreateOrganization extends React.Component {
   }
 
   async createCollective(CollectiveInputType) {
+    if (
+      !CollectiveInputType.tos ||
+      (get(this.props.host, 'settings.tos') && !CollectiveInputType.hostTos)
+    ) {
+      this.error('Please accept the terms of service');
+      return;
+    }
+
     this.setState({ status: 'loading' });
     CollectiveInputType.type = 'ORGANIZATION';
     console.log('>>> createOrganization', CollectiveInputType);
+
     try {
       const res = await this.props.createCollective(CollectiveInputType);
       const collective = res.data.createCollective;
@@ -48,7 +59,11 @@ class CreateOrganization extends React.Component {
           success: `Organization created successfully: ${collectiveUrl}`,
         },
       });
-      window.location.replace(collectiveUrl);
+      Router.pushRoute('collective', {
+        CollectiveId: collective.id,
+        slug: collective.slug,
+        status: 'collectiveCreated',
+      });
     } catch (err) {
       console.error('>>> createOrganization error: ', JSON.stringify(err));
       const errorMsg =
