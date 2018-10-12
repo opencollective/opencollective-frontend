@@ -774,7 +774,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
     </div>
   </header>
   <main
-    className="jsx-2466309592"
+    className="jsx-2024985731"
   >
     <div
       className="c19 c20"
@@ -2160,7 +2160,7 @@ exports[`Search Page renders empty results message 1`] = `
     </div>
   </header>
   <main
-    className="jsx-2466309592"
+    className="jsx-2024985731"
   >
     <div
       className="c19 c20"
@@ -3503,7 +3503,7 @@ exports[`Search Page renders error message 1`] = `
     </div>
   </header>
   <main
-    className="jsx-2466309592"
+    className="jsx-2024985731"
   >
     <div
       className="content"
@@ -4825,7 +4825,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
     </div>
   </header>
   <main
-    className="jsx-2466309592"
+    className="jsx-2024985731"
   >
     <div
       className="c19 c20"
@@ -6322,7 +6322,7 @@ exports[`Search Page renders search results with pagination 1`] = `
     </div>
   </header>
   <main
-    className="jsx-2466309592"
+    className="jsx-2024985731"
   >
     <div
       className="c19 c20"
