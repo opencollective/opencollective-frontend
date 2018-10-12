@@ -34,7 +34,9 @@ export async function checkClientApp(req, res, next) {
       const collectiveId = app.CollectiveId;
       if (collectiveId) {
         req.loggedInAccount = await models.Collective.findById(collectiveId);
-        req.remoteUser = await models.User.findById(collectiveId);
+        req.remoteUser = await models.User.findOne({
+          where: { CollectiveId: collectiveId },
+        });
       }
       next();
     } else {
