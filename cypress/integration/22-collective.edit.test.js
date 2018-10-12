@@ -38,6 +38,7 @@ describe('edit collective', () => {
     cy.get('.name.inputField input').type(' edited');
     cy.get('.description.inputField input').type(' edited');
     cy.get('.twitterHandle.inputField input').type('{selectall}opencollect');
+    cy.get('.githubHandle.inputField input').type('{selectall}@AwesomeHandle');
     cy.get('.website.inputField input').type('{selectall}opencollective.com');
     cy.get('.longDescription.inputField textarea').type(
       '{selectall}Testing *markdown* [link to google](https://google.com).',
@@ -48,6 +49,7 @@ describe('edit collective', () => {
     cy.wait(500);
     cy.get('.CollectivePage .cover h1').contains('edited');
     cy.get('.cover .twitterHandle').contains('@opencollect');
+    cy.get('.cover .githubHandle').contains('AwesomeHandle');
     cy.get('.cover .website').contains('opencollective.com');
     cy.get('.CollectivePage .longDescription').contains(
       'Testing markdown link to google',

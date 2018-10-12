@@ -238,6 +238,7 @@
   "collective.longDescription.label": "Long description",
   "collective.expensePolicy.placeholder": "E.g. Feel free to expense your public transport or Uber/Lyft drive for up to XX. You can also expense drinks and food for meetups for up to XX. For other types of expenses, feel free to ask us.",
   "collective.twitterHandle.label": "Twitter",
+  "collective.githubHandle.label": "Github",
   "collective.markdown.label": "Default editor",
   "collective.markdown.description": "Use markdown editor",
   "collective.sendInvoiceByEmail.label": "Invoices",

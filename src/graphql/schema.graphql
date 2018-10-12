@@ -1,5 +1,5 @@
-# source: http://localhost:3000/api/graphql/v1
-# timestamp: Mon Oct 01 2018 15:10:59 GMT+0200 (Central European Summer Time)
+# source: http://localhost:3000/api/graphql
+# timestamp: Fri Oct 12 2018 18:04:01 GMT+0200 (Central European Summer Time)
 
 """Application model"""
 type Application {
@@ -122,6 +122,7 @@ type Collective implements CollectiveInterface {
   expenses(type: String, limit: Int, offset: Int, includeHostedCollectives: Boolean, status: String): [ExpenseType]
   role: String
   twitterHandle: String
+  githubHandle: String
   website: String
   updates(limit: Int, offset: Int): [Event]
   events(limit: Int, offset: Int): [Event]
@@ -145,6 +146,7 @@ input CollectiveAttributesInputType {
   expensePolicy: String
   website: String
   twitterHandle: String
+  githubHandle: String
   location: LocationInputType
   startsAt: String
   endsAt: String
@@ -163,6 +165,7 @@ input CollectiveInputType {
   company: String
   website: String
   twitterHandle: String
+  githubHandle: String
   description: String
   longDescription: String
   expensePolicy: String
@@ -269,6 +272,7 @@ interface CollectiveInterface {
   expenses(type: String, limit: Int, offset: Int, status: String, includeHostedCollectives: Boolean): [ExpenseType]
   role: String
   twitterHandle: String
+  githubHandle: String
   website: String
   updates(limit: Int, offset: Int): [Event]
   events(limit: Int, offset: Int): [Event]
@@ -511,6 +515,7 @@ type Event implements CollectiveInterface {
   expenses(type: String, limit: Int, offset: Int, includeHostedCollectives: Boolean, status: String): [ExpenseType]
   role: String
   twitterHandle: String
+  githubHandle: String
   website: String
   updates(limit: Int, offset: Int): [Event]
   events(limit: Int, offset: Int): [Event]
@@ -1034,6 +1039,7 @@ type Organization implements CollectiveInterface {
   expenses(type: String, limit: Int, offset: Int, includeHostedCollectives: Boolean, status: String): [ExpenseType]
   role: String
   twitterHandle: String
+  githubHandle: String
   website: String
   updates(limit: Int, offset: Int): [Event]
   events(limit: Int, offset: Int): [Event]
@@ -1537,6 +1543,7 @@ type User implements CollectiveInterface {
   expenses(type: String, limit: Int, offset: Int, includeHostedCollectives: Boolean, status: String): [ExpenseType]
   role: String
   twitterHandle: String
+  githubHandle: String
   website: String
   updates(limit: Int, offset: Int): [Event]
   events(limit: Int, offset: Int): [Event]
@@ -1577,6 +1584,7 @@ input UserInputType {
   username: String
   description: String
   twitterHandle: String
+  githubHandle: String
   website: String
   paypalEmail: String
   newsletterOptIn: Boolean

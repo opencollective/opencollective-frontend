@@ -155,6 +155,10 @@ class EditCollectiveForm extends React.Component {
         id: 'collective.twitterHandle.label',
         defaultMessage: 'Twitter',
       },
+      'githubHandle.label': {
+        id: 'collective.githubHandle.label',
+        defaultMessage: 'Github',
+      },
       'website.label': {
         id: 'collective.website.label',
         defaultMessage: 'Website',
@@ -280,6 +284,13 @@ class EditCollectiveForm extends React.Component {
           type: 'text',
           pre: 'https://twitter.com/',
           maxLength: 255,
+          placeholder: '',
+        },
+        {
+          name: 'githubHandle',
+          type: 'text',
+          pre: 'https://github.com/',
+          maxLength: 39,
           placeholder: '',
         },
         {

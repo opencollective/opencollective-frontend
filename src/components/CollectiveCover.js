@@ -109,7 +109,14 @@ ${description}`;
   render() {
     const { collective, className, LoggedInUser, intl } = this.props;
 
-    const { company, type, website, twitterHandle, stats } = collective;
+    const {
+      company,
+      type,
+      website,
+      twitterHandle,
+      githubHandle,
+      stats,
+    } = collective;
 
     const href = this.props.href || collective.path || `/${collective.slug}`;
     const title = this.props.title || collective.name;
@@ -180,6 +187,11 @@ ${description}`;
             .twitterHandle {
               background: url('/static/icons/twitter-handler.svg') no-repeat 0px
                 6px;
+              padding-left: 22px;
+            }
+            .githubHandle {
+              background: url('/static/icons/github-handler.svg') no-repeat 0px
+                3px;
               padding-left: 22px;
             }
             .website {
@@ -428,6 +440,17 @@ ${description}`;
                           rel="noopener noreferrer"
                         >
                           @{twitterHandle}
+                        </a>
+                      </div>
+                    )}
+                    {githubHandle && (
+                      <div className="githubHandle">
+                        <a
+                          href={`https://github.com/${githubHandle}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          {githubHandle}
                         </a>
                       </div>
                     )}
