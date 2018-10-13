@@ -191,6 +191,17 @@ describe('Collective model', () => {
       });
   });
 
+  it('does not create collective with a blacklisted slug', () => {
+    return Collective.create({ name: 'learn more' }).then(collective => {
+      // `https://host/learn-more` is a protected page.
+      expect(collective.slug).to.not.equal('learn-more');
+      // However we'd like to keep the base slug: if an collective with the
+      // name "Learn More" is created, we expect to have an URL like
+      // `https://host/learn-more1`
+      expect(collective.slug.startsWith('learn-more')).to.equal(true);
+    });
+  });
+
   describe('events', () => {
     it('generates the ICS for an EVENT collective', async () => {
       const d = new Date();

@@ -27,6 +27,7 @@ import debugLib from 'debug';
 import fetch from 'isomorphic-fetch';
 import crypto from 'crypto';
 import moment from 'moment';
+import { isBlacklistedCollectiveSlug } from '../lib/collectivelib';
 const ics = require('ics'); // eslint-disable-line import/no-commonjs
 
 const debug = debugLib('collective');
@@ -2070,7 +2071,7 @@ export default function(Sequelize, DataTypes) {
     */
     const slugSuggestionHelper = (slugToCheck, slugList, count) => {
       const slug = count > 0 ? `${slugToCheck}${count}` : slugToCheck;
-      if (slugList.indexOf(slug) === -1) {
+      if (slugList.indexOf(slug) === -1 && !isBlacklistedCollectiveSlug(slug)) {
         return slug;
       } else {
         return slugSuggestionHelper(`${slugToCheck}`, slugList, count + 1);
