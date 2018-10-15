@@ -265,7 +265,7 @@ describe('graphql.updates.test', () => {
       );
     });
 
-    it('fails if not authenticated as author or admin of collective', async () => {
+    it('fails if not authenticated as admin of collective', async () => {
       const result = await utils.graphqlQuery(
         editUpdateQuery,
         { update: { id: update1.id } },
@@ -273,7 +273,7 @@ describe('graphql.updates.test', () => {
       );
       expect(result.errors).to.exist;
       expect(result.errors[0].message).to.equal(
-        'You must be the author or an admin of this collective to edit this update',
+        "You don't have sufficient permissions to edit this update",
       );
     });
 
@@ -339,7 +339,7 @@ describe('graphql.updates.test', () => {
       );
       expect(result.errors).to.exist;
       expect(result.errors[0].message).to.equal(
-        'You need to be logged in as a core contributor or as a host to delete this update',
+        "You don't have sufficient permissions to delete this update",
       );
       return models.Update.findById(update1.id).then(updateFound => {
         expect(updateFound).to.not.be.null;
