@@ -11,6 +11,7 @@ import ErrorPage from './ErrorPage';
 import SignInForm from './SignInForm';
 import { get } from 'lodash';
 import { FormattedMessage, defineMessages } from 'react-intl';
+import { Router } from '../server/pages';
 
 class CreateCollective extends React.Component {
   static propTypes = {
@@ -111,23 +112,25 @@ class CreateCollective extends React.Component {
     try {
       const res = await this.props.createCollective(CollectiveInputType);
       const collective = res.data.createCollective;
-      let successUrl;
+      const successParams = {
+        slug: collective.slug,
+      };
+      let route = 'collective';
+
       if (CollectiveInputType.HostCollectiveId) {
-        successUrl = `${window.location.protocol}//${window.location.host}/${
-          collective.slug
-        }?status=collectiveCreated&CollectiveId=${
-          collective.id
-        }&collectiveSlug=${collective.slug}`;
+        successParams.status = 'collectiveCreated';
+        successParams.CollectiveId = collective.id;
+        successParams.collectiveSlug = collective.slug;
       } else {
-        successUrl = `${window.location.protocol}//${window.location.host}/${
-          collective.slug
-        }/edit#host`;
+        route = `/${collective.slug}/edit#host`;
       }
+
       this.setState({
         status: 'idle',
         result: { success: 'Collective created successfully' },
       });
-      window.location.replace(successUrl);
+
+      Router.pushRoute(route, successParams);
     } catch (err) {
       console.error('>>> createCollective error: ', JSON.stringify(err));
       const errorMsg =
