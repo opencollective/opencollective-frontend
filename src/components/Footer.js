@@ -32,6 +32,15 @@ const SocialLink = styled.a`
   }
 `;
 
+const MenuLink = styled(StyledLink)`
+  color: #6e747a;
+  display: block;
+  fontsize: 1.4rem;
+  fontweight: 400;
+  margin: 0;
+  padding: 0;
+`;
+
 const FlexList = styled.ul(
   [],
   ...Box.componentStyle.rules,
@@ -67,6 +76,13 @@ const navigation = {
     'Privacy Policy': '/privacypolicy',
   },
 };
+
+/**
+ * Patch for "How it works" and "Discover" menu links that
+ * are still hosted on legacy website and cannot be linked with NextJS Link
+ * component. See https://github.com/opencollective/opencollective/issues/1361
+ */
+const routesWithoutRouter = ['/learn-more', '/discover'];
 
 class Footer extends React.Component {
   render() {
@@ -167,18 +183,13 @@ class Footer extends React.Component {
                       textAlign={['center', null, 'left']}
                       mb={2}
                     >
-                      <Link route={navigation[key][item]} passHref>
-                        <StyledLink
-                          color="#6E747A"
-                          display="block"
-                          fontSize="1.4rem"
-                          fontWeight="400"
-                          m={0}
-                          p={0}
-                        >
-                          {item}
-                        </StyledLink>
-                      </Link>
+                      {routesWithoutRouter.includes(navigation[key][item]) ? (
+                        <MenuLink href={navigation[key][item]}>{item}</MenuLink>
+                      ) : (
+                        <Link route={navigation[key][item]} passHref>
+                          <MenuLink>{item}</MenuLink>
+                        </Link>
+                      )}
                     </ListItem>
                   ))}
                 </FlexList>
