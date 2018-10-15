@@ -102,6 +102,18 @@ describe('user.models.test.js', () => {
         expect(user.collective.slug.startsWith('user')).to.equal(true);
       });
     });
+
+    it('knows how to deal with special characters', () => {
+      return User.createUserWithCollective({
+        email: randEmail('user@domain.com'),
+        firstName: '很棒的用户',
+        lastName: 'awesome',
+      }).then(user => {
+        expect(user.collective.slug).to.equal(
+          'hen3-bang4-de-yong4-hu4-awesome',
+        );
+      });
+    });
   });
 
   /**

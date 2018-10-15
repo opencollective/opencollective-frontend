@@ -16,7 +16,7 @@ import {
   getDomain,
   formatCurrency,
 } from '../lib/utils';
-import slugify from 'slug';
+import slugify from 'limax';
 import activities from '../constants/activities';
 import Promise from 'bluebird';
 import userlib from '../lib/userlib';
@@ -2080,12 +2080,7 @@ export default function(Sequelize, DataTypes) {
 
     suggestions = suggestions
       .filter(slug => (slug ? true : false)) // filter out any nulls
-      .map(slug => slugify(slug.trim()).toLowerCase(/\./g, '')) // lowercase them all
-      // remove any '+' signs
-      .map(
-        slug =>
-          slug.indexOf('+') !== -1 ? slug.substr(0, slug.indexOf('+')) : slug,
-      );
+      .map(slug => slugify(slug)); // Will also trim, lowercase and remove + signs
 
     // fetch any matching slugs or slugs for the top choice in the list above
     return Sequelize.query(

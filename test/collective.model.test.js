@@ -187,7 +187,7 @@ describe('Collective model', () => {
       })
       .then(() => Collective.create({ name: 'hélène & les g.arçons' }))
       .then(collective => {
-        expect(collective.slug).to.equal('helene-and-les-garcons');
+        expect(collective.slug).to.equal('helene-and-les-g-arcons');
       });
   });
 

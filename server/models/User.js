@@ -4,7 +4,7 @@
 import bcrypt from 'bcrypt';
 import config from 'config';
 import Promise from 'bluebird';
-import slugify from 'slug';
+import slugify from 'limax';
 
 import * as auth from '../lib/auth';
 import errors from '../lib/errors';
