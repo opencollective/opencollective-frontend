@@ -768,7 +768,9 @@ export const getCollectiveApplicationsQuery = gql`
 `;
 
 export const addCollectiveData = graphql(getCollectiveQuery);
-export const addCollectiveCoverData = graphql(getCollectiveCoverQuery);
+export const addCollectiveCoverData = (component, options) => {
+  return graphql(getCollectiveCoverQuery, options)(component);
+};
 export const addCollectiveToEditData = graphql(getCollectiveToEditQuery);
 export const addEventCollectiveData = graphql(getEventCollectiveQuery);
 export const addTiersData = graphql(getTiersQuery);
