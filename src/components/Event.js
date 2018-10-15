@@ -31,9 +31,13 @@ class Event extends React.Component {
     LoggedInUser: PropTypes.object,
   };
 
+  static getDerivedStateFromProps(props) {
+    return { event: props.event };
+  }
+
   constructor(props) {
     super(props);
-    this.event = this.props.event; // pre-loaded by SSR
+
     this.setInterested = this.setInterested.bind(this);
     this.removeInterested = this.removeInterested.bind(this);
     this.updateOrder = this.updateOrder.bind(this);
@@ -45,7 +49,6 @@ class Event extends React.Component {
       order: { tier: {} },
       tierInfo: {},
       api: { status: 'idle' },
-      event: this.props.event,
     };
 
     this.messages = defineMessages({
@@ -67,13 +70,6 @@ class Event extends React.Component {
         defaultMessage: 'Edit tickets',
       },
     });
-
-    this.isEventOver =
-      new Date(this.event.endsAt).getTime() < new Date().getTime();
-  }
-
-  componentDidMount() {
-    window.oc = { event: this.state.event }; // for easy debugging
   }
 
   async removeInterested() {
@@ -193,6 +189,8 @@ class Event extends React.Component {
     const canEditEvent = LoggedInUser && LoggedInUser.canEditEvent(event);
     const responses = { sponsors: [] };
 
+    const isEventOver = new Date(event.endsAt).getTime() < new Date().getTime();
+
     const guests = {};
     guests.interested = [];
     filterCollection(event.members, { role: 'FOLLOWER' }).map(follower => {
@@ -235,7 +233,7 @@ class Event extends React.Component {
     let notification = {};
     // If event is over and has a positive balance, we ask the admins if they want to move the money to the parent collective
     if (
-      this.isEventOver &&
+      isEventOver &&
       get(this.props.event, 'stats.balance') > 0 &&
       canEditEvent
     ) {
