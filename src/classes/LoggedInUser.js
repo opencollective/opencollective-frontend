@@ -53,7 +53,7 @@ LoggedInUser.prototype.canEditComment = function(comment) {
 
 LoggedInUser.prototype.canCreateCommentOnExpense = function(expense) {
   // if author
-  if (LoggedInUser.id === expense.user.id) return true;
+  if (this.id === expense.user.id) return true;
   return this.canApproveExpense(expense);
 };
 
