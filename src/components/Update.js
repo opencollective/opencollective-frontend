@@ -3,16 +3,16 @@ import PropTypes from 'prop-types';
 import withIntl from '../lib/withIntl';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import { capitalize, formatDate } from '../lib/utils';
-import { graphql } from 'react-apollo';
+import { graphql, compose } from 'react-apollo';
 import gql from 'graphql-tag';
+import { get } from 'lodash';
 import Avatar from './Avatar';
 import Role from './Role';
 import UpdateTextWithData from './UpdateTextWithData';
-import { Link } from '../server/pages';
+import { Router, Link } from '../server/pages';
 import SmallButton from './SmallButton';
 import EditUpdateForm from './EditUpdateForm';
 import PublishUpdateBtnWithData from './PublishUpdateBtnWithData';
-import { get } from 'lodash';
 
 class Update extends React.Component {
   static propTypes = {
@@ -36,6 +36,7 @@ class Update extends React.Component {
     this.save = this.save.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.toggleEdit = this.toggleEdit.bind(this);
+    this.deleteUpdate = this.deleteUpdate.bind(this);
     this.messages = defineMessages({
       pending: { id: 'update.pending', defaultMessage: 'pending' },
       paid: { id: 'update.paid', defaultMessage: 'paid' },
@@ -60,6 +61,18 @@ class Update extends React.Component {
 
   toggleEdit() {
     this.state.mode === 'edit' ? this.cancelEdit() : this.edit();
+  }
+
+  async deleteUpdate() {
+    if (!confirm('😱 Are you really sure you want to delete this update?'))
+      return;
+
+    try {
+      await this.props.deleteUpdate(this.props.update.id);
+      Router.pushRoute('collective', { slug: this.props.collective.slug });
+    } catch (err) {
+      console.error('>>> deleteUpdate error: ', JSON.stringify(err));
+    }
   }
 
   handleChange(update) {
@@ -212,13 +225,25 @@ class Update extends React.Component {
               </div>
             )}
             {editable && (
-              <div>
-                <a className="toggleEditUpdate" onClick={this.toggleEdit}>
-                  {intl.formatMessage(
-                    this.messages[`${mode === 'edit' ? 'cancelEdit' : 'edit'}`],
-                  )}
-                </a>
-              </div>
+              <React.Fragment>
+                <div>
+                  <a className="toggleEditUpdate" onClick={this.toggleEdit}>
+                    {intl.formatMessage(
+                      this.messages[
+                        `${mode === 'edit' ? 'cancelEdit' : 'edit'}`
+                      ],
+                    )}
+                  </a>
+                </div>
+                <div>
+                  <a className="deleteUpdateUpdate" onClick={this.deleteUpdate}>
+                    <FormattedMessage
+                      id="update.delete"
+                      defaultMessage="delete"
+                    />
+                  </a>
+                </div>
+              </React.Fragment>
             )}
           </div>
 
@@ -287,7 +312,15 @@ const editUpdateQuery = gql`
   }
 `;
 
-const addMutation = graphql(editUpdateQuery, {
+const deleteUpdateQuery = gql`
+  mutation deleteUpdate($id: Int!) {
+    deleteUpdate(id: $id) {
+      id
+    }
+  }
+`;
+
+const editUpdateMutation = graphql(editUpdateQuery, {
   props: ({ mutate }) => ({
     editUpdate: async update => {
       return await mutate({ variables: { update } });
@@ -295,4 +328,17 @@ const addMutation = graphql(editUpdateQuery, {
   }),
 });
 
-export default withIntl(addMutation(Update));
+const deleteUpdateMutation = graphql(deleteUpdateQuery, {
+  props: ({ mutate }) => ({
+    deleteUpdate: async updateID => {
+      return await mutate({ variables: { id: updateID } });
+    },
+  }),
+});
+
+const addUpdateMutations = compose(
+  editUpdateMutation,
+  deleteUpdateMutation,
+);
+
+export default withIntl(addUpdateMutations(Update));
