@@ -121,6 +121,18 @@ const editCollectiveQuery = gql`
           }
         }
       }
+      tiers {
+        id
+        slug
+        type
+        name
+        description
+        amount
+        presets
+        interval
+        currency
+        maxQuantity
+      }
     }
   }
 `;
