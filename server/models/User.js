@@ -171,6 +171,12 @@ export default (Sequelize, DataTypes) => {
           );
         },
 
+        githubHandle() {
+          return this.userCollective.then(
+            collective => collective.githubHandle,
+          );
+        },
+
         website() {
           return this.userCollective.then(collective => collective.website);
         },
@@ -311,6 +317,7 @@ export default (Sequelize, DataTypes) => {
       'description',
       'longDescription',
       'twitterHandle',
+      'githubHandle',
       'website',
       'image',
       'paypalEmail',
@@ -605,6 +612,7 @@ export default (Sequelize, DataTypes) => {
           longDescription: userData.longDescription,
           website: userData.website,
           twitterHandle: userData.twitterHandle,
+          githubHandle: userData.githubHandle,
           currency: userData.currency,
           isActive: true,
           CreatedByUserId: userData.CreatedByUserId || user.id,

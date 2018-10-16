@@ -619,6 +619,7 @@ export const CollectiveInterfaceType = new GraphQLInterfaceType({
       },
       role: { type: GraphQLString },
       twitterHandle: { type: GraphQLString },
+      githubHandle: { type: GraphQLString },
       website: { type: GraphQLString },
       updates: {
         type: new GraphQLList(EventCollectiveType),
@@ -1123,6 +1124,10 @@ const CollectiveFields = () => {
       resolve(collective) {
         return collective.twitterHandle;
       },
+    },
+    githubHandle: {
+      type: GraphQLString,
+      resolve: collective => collective.githubHandle,
     },
     website: {
       type: GraphQLString,
