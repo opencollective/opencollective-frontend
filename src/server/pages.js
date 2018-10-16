@@ -30,8 +30,6 @@ pages
   .add('editEvent', '/:parentCollectiveSlug/events/:eventSlug/edit')
   .add('events', '/:collectiveSlug/events')
   .add('subscriptions', '/:collectiveSlug/subscriptions')
-  .add('tiers', '/:collectiveSlug/tiers')
-  .add('editTiers', '/:collectiveSlug/tiers/edit')
   .add(
     'orderCollectiveTier',
     '/:collectiveSlug/order/:TierId/:amount?/:interval?',
