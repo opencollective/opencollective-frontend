@@ -112,13 +112,7 @@ class CreatePledgePage extends React.Component {
     event.preventDefault();
     const {
       target: {
-        elements: {
-          name,
-          slug,
-          totalAmount,
-          fromCollective,
-          website,
-        },
+        elements: { name, slug, totalAmount, fromCollective, website },
       },
     } = event;
     const order = {

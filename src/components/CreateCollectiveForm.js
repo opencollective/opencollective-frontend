@@ -423,7 +423,9 @@ class CreateCollectiveForm extends React.Component {
                   type="checkbox"
                   name="tos"
                   required
-                  onChange={({ target }) => this.handleChange('tos', target.checked)}
+                  onChange={({ target }) =>
+                    this.handleChange('tos', target.checked)
+                  }
                 />
                 <span>
                   I agree with the{' '}
@@ -438,7 +440,9 @@ class CreateCollectiveForm extends React.Component {
                     type="checkbox"
                     name="hostTos"
                     required
-                    onChange={({ target }) => this.handleChange('hostTos', target.checked)}
+                    onChange={({ target }) =>
+                      this.handleChange('hostTos', target.checked)
+                    }
                   />
                   <span>
                     I agree with the{' '}

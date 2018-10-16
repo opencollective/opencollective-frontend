@@ -264,7 +264,10 @@ class MenuBar extends React.Component {
     }
 
     const hasPledges =
-      !collective.isActive && collective.pledges && collective.pledges.length && USE_PLEDGES;
+      !collective.isActive &&
+      collective.pledges &&
+      collective.pledges.length &&
+      USE_PLEDGES;
 
     const AddFundsModal = () => (
       <Modal
@@ -383,20 +386,20 @@ class MenuBar extends React.Component {
         collective.type ===
           'ORGANIZATION' /* We can only create a prepaid card for an organization */ &&
         !collective.isHost /* If the collective being browsed is a host, don't show either */ && (
-        <div>
-          <div className="item editCollective">
-            <AddFundsModal />
-            <Button
-              className="addFunds darkBackground"
-              onClick={() => this.setState({ showAddFunds: true })}
-            >
-              <FormattedMessage
-                id="menu.addFunds"
-                defaultMessage="Add funds"
-              />
-            </Button>
-          </div>
-        </div>
+            <div>
+              <div className="item editCollective">
+                <AddFundsModal />
+                <Button
+                  className="addFunds darkBackground"
+                  onClick={() => this.setState({ showAddFunds: true })}
+                >
+                  <FormattedMessage
+                    id="menu.addFunds"
+                    defaultMessage="Add funds"
+                  />
+                </Button>
+              </div>
+            </div>
           )}
         {collective.isHost &&
           LoggedInUser &&

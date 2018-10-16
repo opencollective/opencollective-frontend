@@ -168,7 +168,13 @@ class SearchPage extends React.Component {
               {/* TODO: add suggested collectives when the result is empty */}
               {showCollectives &&
                 collectives.length === 0 && (
-                  <Flex py={3} width={1} justifyContent="center" flexDirection="column" alignItems="center">
+                  <Flex
+                    py={3}
+                    width={1}
+                    justifyContent="center"
+                    flexDirection="column"
+                    alignItems="center"
+                  >
                     <p>
                       <em>
                         No collectives found matching your query: &quot;

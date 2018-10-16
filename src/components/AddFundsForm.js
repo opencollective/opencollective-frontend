@@ -253,7 +253,9 @@ class AddFundsForm extends React.Component {
       (hostFeePercent > 0 || platformFeePercent > 0);
 
     // recompute this value based on new props
-    this.totalAmountField.pre = getCurrencySymbol(this.props.collective.currency);
+    this.totalAmountField.pre = getCurrencySymbol(
+      this.props.collective.currency,
+    );
 
     return (
       <div className="AddFundsForm">

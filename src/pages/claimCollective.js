@@ -135,7 +135,9 @@ class ClaimCollectivePage extends React.Component {
                     n: pledges.length,
                     total: formatCurrency(totalPledged, currency),
                   }}
-                  defaultMessage={`{total} currently pledged to this collective from {n} {n, plural, one {supporter} other {supporters}}`}
+                  defaultMessage={
+                    '{total} currently pledged to this collective from {n} {n, plural, one {supporter} other {supporters}}'
+                  }
                 />
               </P>
             </Box>

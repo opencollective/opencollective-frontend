@@ -889,7 +889,10 @@ class HomePage extends React.Component {
                 </P>
 
                 <Box mb={3}>
-                  <img src="/static/images/backyourstack.svg" alt="Back Your Stack" />
+                  <img
+                    src="/static/images/backyourstack.svg"
+                    alt="Back Your Stack"
+                  />
                 </Box>
 
                 <H4 color="white" fontSize="2.4rem" mb={4}>
