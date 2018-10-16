@@ -308,6 +308,17 @@ describe('graphql.updates.test', () => {
         { where: { id: update1.id } },
       );
     });
+
+    it('fails if update title is not set', async () => {
+      const result = await utils.graphqlQuery(
+        editUpdateQuery,
+        { update: { id: update1.id, title: '' } },
+        user1,
+      );
+      expect(result.errors[0].message).to.equal(
+        'Validation error: Validation len on title failed',
+      );
+    });
   });
   describe('delete Update', () => {
     const deleteUpdateQuery = `

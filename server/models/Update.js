@@ -100,7 +100,13 @@ export default function(Sequelize, DataTypes) {
         allowNull: true, // needs to be true because of old rows
       },
 
-      title: DataTypes.STRING,
+      title: {
+        type: DataTypes.STRING,
+        validate: {
+          len: [1, 255],
+        },
+      },
+
       markdown: DataTypes.TEXT,
       html: {
         type: DataTypes.TEXT,
