@@ -36,9 +36,17 @@ class EventPage extends React.Component {
   }
 
   async componentDidMount() {
-    const { getLoggedInUser } = this.props;
+    const { getLoggedInUser, data } = this.props;
+    const event = data.Collective;
+
     const LoggedInUser = await getLoggedInUser();
     this.setState({ LoggedInUser });
+
+    if (LoggedInUser && LoggedInUser.canEditEvent(event)) {
+      // We refetch the data to get the email addresses of the participants
+      // We need to bypass the cache otherwise it won't update the list of participants with the email addresses
+      data.refetch({ options: { fetchPolicy: 'network-only' } });
+    }
   }
 
   render() {
@@ -48,12 +56,6 @@ class EventPage extends React.Component {
     if (!data.Collective) return <ErrorPage data={data} />;
 
     const event = data.Collective;
-
-    if (LoggedInUser && LoggedInUser.canEditEvent(event)) {
-      // We refetch the data to get the email addresses of the participants
-      // We need to bypass the cache otherwise it won't update the list of participants with the email addresses
-      data.refetch({ options: { fetchPolicy: 'network-only' } });
-    }
 
     return (
       <div>
