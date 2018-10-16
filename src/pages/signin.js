@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
@@ -10,18 +10,22 @@ import SignInForm from '../components/SignInForm';
 
 import * as api from '../lib/api';
 import { isValidUrl } from '../lib/utils';
+import { Router } from '../server/pages';
 
+import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
+import withLoggedInUser from '../lib/withLoggedInUser';
 
 class SigninPage extends React.Component {
   static getInitialProps({ query: { token, next } }) {
     next = isValidUrl(next) && next.substr(0, 1) === '/' ? next : null;
-    return { token, next };
+    return { loginToken: token, next };
   }
 
   static propTypes = {
-    token: PropTypes.string,
+    loginToken: PropTypes.string,
     next: PropTypes.string,
+    getLoggedInUser: PropTypes.func.isRequired, // from withLoggedInUser
   };
 
   constructor(props) {
@@ -31,22 +35,39 @@ class SigninPage extends React.Component {
   }
 
   async componentDidMount() {
-    if (this.props.token) {
-      const { error, token } = await api.refreshToken(this.props.token);
+    const { loginToken, getLoggedInUser } = this.props;
+
+    if (loginToken) {
+      const { error, token } = await api.refreshToken(loginToken);
       if (error) {
-        this.setState({ error });
-        console.log(error);
+        this.setState({ error, LoggedInUser: null });
+        window.localStorage.removeItem('accessToken');
+        window.localStorage.removeItem('LoggedInUser');
       } else {
         window.localStorage.setItem('accessToken', token);
-        window.location.replace(this.props.next || '/');
+        // We can't already fetch LoggedInUser
+        // because Appollo client is already instanciated without the accessToken
+        // so we just skip it
+        // const LoggedInUser = await getLoggedInUser();
+        // this.setState({ LoggedInUser });
+        Router.pushRoute(this.props.next || '/');
+      }
+    } else {
+      const LoggedInUser = await getLoggedInUser();
+      if (LoggedInUser) {
+        Router.pushRoute(this.props.next || '/');
       }
     }
   }
 
   render() {
-    if (this.props.token && !this.state.error) {
+    const { loginToken } = this.props;
+    const { error } = this.state;
+
+    if (loginToken && !error) {
       return <ErrorPage loading />;
     }
+
     return (
       <div className="LoginPage">
         <Header
@@ -68,19 +89,21 @@ class SigninPage extends React.Component {
         </style>
         <Body>
           <div className="signin">
-            {this.state.error && (
-              <h1>
-                Authentication Failed. Please try to generate a new token.
-              </h1>
+            {error && (
+              <h1>Authentication Failed. Please try to login again.</h1>
             )}
 
-            <h2>
-              <FormattedMessage
-                id="loginform.title"
-                defaultMessage="Sign in or Create an Account"
-              />
-            </h2>
-            <SignInForm next={this.props.next} />
+            {(!loginToken || error) && (
+              <Fragment>
+                <h2>
+                  <FormattedMessage
+                    id="loginform.title"
+                    defaultMessage="Sign in or Create an Account"
+                  />
+                </h2>
+                <SignInForm next={this.props.next} />
+              </Fragment>
+            )}
           </div>
         </Body>
         <Footer />
@@ -89,4 +112,4 @@ class SigninPage extends React.Component {
   }
 }
 
-export default withIntl(SigninPage);
+export default withData(withIntl(withLoggedInUser(SigninPage)));

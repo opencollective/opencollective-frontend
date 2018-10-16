@@ -54,7 +54,7 @@ class TopBarProfileMenu extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = { showProfileMenu: false, loading: true };
+    this.state = { showProfileMenu: false };
     this.messages = defineMessages({
       'tooltip.balance': {
         id: 'profilemenu.memberships.tooltip.balance',
@@ -82,9 +82,6 @@ class TopBarProfileMenu extends React.Component {
         /^https?:\/\/[^/]+/,
         '',
       );
-      if (!window.localStorage.accessToken) {
-        this.setState({ loading: false });
-      }
     }
   }
 
@@ -482,13 +479,12 @@ class TopBarProfileMenu extends React.Component {
   }
 
   render() {
-    const { loading } = this.state;
     const { LoggedInUser } = this.props;
 
     let status;
     if (this.state.status) {
       status = this.state.status;
-    } else if (loading && typeof LoggedInUser === 'undefined') {
+    } else if (typeof LoggedInUser === 'undefined') {
       status = 'loading';
     } else if (!LoggedInUser) {
       status = 'loggedout';

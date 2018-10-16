@@ -14,6 +14,7 @@ import {
 import { getGraphqlUrl } from './utils';
 
 let apolloClient = null;
+let apolloClientAccessToken = null;
 
 const fragmentMatcher = new IntrospectionFragmentMatcher({
   introspectionQueryResultData: {
@@ -87,11 +88,14 @@ export default function initClient(initialState, options = {}) {
     return createClient(initialState, options);
   }
 
-  // Reuse client on the client-side
-  if (!apolloClient) {
-    options.accessToken =
-      process.browser && window.localStorage.getItem('accessToken');
+  if (localStorage) {
+    options.accessToken = localStorage.getItem('accessToken');
+  }
+
+  // Reuse client on the client-side (if accessToken match)
+  if (!apolloClient || options.accessToken !== apolloClientAccessToken) {
     apolloClient = createClient(initialState, options);
+    apolloClientAccessToken = options.accessToken;
   }
 
   return apolloClient;
