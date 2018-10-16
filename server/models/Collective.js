@@ -16,7 +16,7 @@ import {
   getDomain,
   formatCurrency,
 } from '../lib/utils';
-import slugify from 'slug';
+import slugify from 'limax';
 import activities from '../constants/activities';
 import Promise from 'bluebird';
 import userlib from '../lib/userlib';
@@ -27,6 +27,7 @@ import debugLib from 'debug';
 import fetch from 'isomorphic-fetch';
 import crypto from 'crypto';
 import moment from 'moment';
+import { isBlacklistedCollectiveSlug } from '../lib/collectivelib';
 const ics = require('ics'); // eslint-disable-line import/no-commonjs
 
 const debug = debugLib('collective');
@@ -2070,7 +2071,7 @@ export default function(Sequelize, DataTypes) {
     */
     const slugSuggestionHelper = (slugToCheck, slugList, count) => {
       const slug = count > 0 ? `${slugToCheck}${count}` : slugToCheck;
-      if (slugList.indexOf(slug) === -1) {
+      if (slugList.indexOf(slug) === -1 && !isBlacklistedCollectiveSlug(slug)) {
         return slug;
       } else {
         return slugSuggestionHelper(`${slugToCheck}`, slugList, count + 1);
@@ -2079,12 +2080,7 @@ export default function(Sequelize, DataTypes) {
 
     suggestions = suggestions
       .filter(slug => (slug ? true : false)) // filter out any nulls
-      .map(slug => slugify(slug.trim()).toLowerCase(/\./g, '')) // lowercase them all
-      // remove any '+' signs
-      .map(
-        slug =>
-          slug.indexOf('+') !== -1 ? slug.substr(0, slug.indexOf('+')) : slug,
-      );
+      .map(slug => slugify(slug)); // Will also trim, lowercase and remove + signs
 
     // fetch any matching slugs or slugs for the top choice in the list above
     return Sequelize.query(

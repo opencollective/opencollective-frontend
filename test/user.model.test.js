@@ -3,6 +3,7 @@ import config from 'config';
 import url from 'url';
 import { expect } from 'chai';
 import * as utils from '../test/utils';
+import { randEmail } from './features/support/stores';
 
 import models from '../server/models';
 import * as auth from '../server/lib/auth';
@@ -80,6 +81,37 @@ describe('user.models.test.js', () => {
         expect(user).to.have.property('createdAt');
         expect(user).to.have.property('password_hash');
         expect(user).to.have.property('updatedAt');
+      });
+    });
+  });
+
+  describe('#createUserWithCollective', () => {
+    it('uses "anonymous" slug if name is not provided', () => {
+      const userParams = { email: 'frank@zappa.com' };
+      return User.createUserWithCollective(userParams).then(user => {
+        expect(user.collective.slug.startsWith('anonymous')).to.equal(true);
+      });
+    });
+
+    it('uses "user" slug if name is not sluggifyable', () => {
+      return User.createUserWithCollective({
+        email: randEmail('user@domain.com'),
+        firstName: '...',
+        lastName: '?????',
+      }).then(user => {
+        expect(user.collective.slug.startsWith('user')).to.equal(true);
+      });
+    });
+
+    it('knows how to deal with special characters', () => {
+      return User.createUserWithCollective({
+        email: randEmail('user@domain.com'),
+        firstName: '很棒的用户',
+        lastName: 'awesome',
+      }).then(user => {
+        expect(user.collective.slug).to.equal(
+          'hen3-bang4-de-yong4-hu4-awesome',
+        );
       });
     });
   });

@@ -4,6 +4,7 @@
 import bcrypt from 'bcrypt';
 import config from 'config';
 import Promise from 'bluebird';
+import slugify from 'limax';
 
 import * as auth from '../lib/auth';
 import errors from '../lib/errors';
@@ -585,9 +586,19 @@ export default (Sequelize, DataTypes) => {
         if (name && userData.lastName) {
           name += ` ${userData.lastName}`;
         }
+
+        // If user doesn't provide a name, set it to "anonymous". If we cannot
+        // slugify it (for example firstName="------") then fallback on "user".
+        let collectiveName = userData.name || name;
+        if (!collectiveName || collectiveName.trim().length === 0) {
+          collectiveName = 'anonymous';
+        } else if (slugify(collectiveName).length === 0) {
+          collectiveName = 'user';
+        }
+
         const userCollective = {
           type: 'USER',
-          name: userData.name || name || 'anonymous',
+          name: collectiveName,
           image: userData.image,
           mission: userData.mission,
           description: userData.description,
