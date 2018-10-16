@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { get } from 'lodash';
 
 import CreateCollective from '../components/CreateCollective';
 import ErrorPage from '../components/ErrorPage';
