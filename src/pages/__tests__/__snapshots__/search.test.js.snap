@@ -3034,6 +3034,21 @@ exports[`Search Page renders error message 1`] = `
   text-align: center;
 }
 
+.c27 {
+  color: #D5DAE0;
+  display: inline-block;
+  font-size: 1.4rem;
+  -webkit-letter-spacing: -0.2px;
+  -moz-letter-spacing: -0.2px;
+  -ms-letter-spacing: -0.2px;
+  letter-spacing: -0.2px;
+  margin: 0px;
+  padding-left: 16px;
+  padding-right: 16px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
 .c28 {
   background-color: white;
   border-top: 1px solid #aaaaaa;
@@ -3085,18 +3100,6 @@ exports[`Search Page renders error message 1`] = `
   font-weight: 400;
   margin: 0px;
   padding: 0px;
-}
-
-.c27 {
-  border: 1px solid #D5DAE0;
-  border-radius: 20px;
-  color: #3385FF;
-  display: inline-block;
-  font-size: 1.4rem;
-  padding-left: 16px;
-  padding-right: 16px;
-  padding-top: 8px;
-  padding-bottom: 8px;
 }
 
 .c41 {
@@ -3486,18 +3489,14 @@ exports[`Search Page renders error message 1`] = `
         <div
           className="LoginTopBarProfileButton"
         >
-          <a
+          <p
             className="c27"
-            color="#3385FF"
-            display="inline-block"
-            fontSize="1.4rem"
-            href="/signin?next=%2F"
-            onClick={[Function]}
           >
             <span>
-              Login
+              loading
             </span>
-          </a>
+            …
+          </p>
         </div>
       </div>
     </div>
