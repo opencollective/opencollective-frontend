@@ -7,7 +7,6 @@ import { ThemeProvider } from 'styled-components';
 import theme from '../constants/theme';
 
 import '../../node_modules/bootstrap/dist/css/bootstrap.min.css';
-import '../../node_modules/font-awesome/css/font-awesome.min.css';
 import '../../node_modules/nprogress/nprogress.css';
 import '../styles/app.css';
 

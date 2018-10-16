@@ -2,12 +2,14 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Sticky from 'react-stickynode';
 import gql from 'graphql-tag';
+import styled from 'styled-components';
 import { get, throttle, uniqBy, pick } from 'lodash';
 import { graphql } from 'react-apollo';
 import { Modal, Row, Col } from 'react-bootstrap';
 
 import { FormattedMessage, defineMessages } from 'react-intl';
 import { animateScroll } from 'react-scrollchor/lib/helpers';
+import { Pencil } from 'styled-icons/octicons/Pencil.cjs';
 
 import colors from '../constants/colors';
 import withIntl from '../lib/withIntl';
@@ -17,6 +19,13 @@ import Logo from './Logo';
 import Link from './Link';
 import Button from './Button';
 import AddFundsForm from './AddFundsForm';
+
+const PencilIcon = styled(Pencil)`
+  margin-right: 8px;
+  padding: 0.3em;
+  background-color: #393d40;
+  border-radius: 4px;
+`;
 
 class MenuBar extends React.Component {
   static propTypes = {
@@ -344,9 +353,9 @@ class MenuBar extends React.Component {
               <FormattedMessage
                 id="menu.submitExpense"
                 defaultMessage="Submit Expense"
-              />
-            </Button>
-          )}
+            />
+          </Button>
+        )}
 
         {LoggedInUser &&
         LoggedInUser.isRoot() /* Only Site admins can do that for now */ &&
@@ -354,7 +363,7 @@ class MenuBar extends React.Component {
         collective.type ===
           'ORGANIZATION' /* We can only create a prepaid card for an organization */ &&
         !collective.isHost /* If the collective being browsed is a host, don't show either */ && (
-            <div>
+        <div>
               <div className="item editCollective">
                 <AddFundsModal />
                 <Button
@@ -424,20 +433,6 @@ class MenuBar extends React.Component {
             .admin a {
               line-height: 24px;
             }
-            .icon {
-              height: 24px;
-              width: 24px;
-              border-radius: 4px;
-              background-color: #393d40;
-              float: left;
-              background-repeat: no-repeat;
-              background-position: center center;
-              margin-top: 8px;
-              margin-right: 8px;
-            }
-            .edit {
-              background-image: url(/static/icons/edit.svg);
-            }
             .separator {
               background-color: #393d40;
               width: 1px;
@@ -475,7 +470,7 @@ class MenuBar extends React.Component {
               <div className="separator" />
               <div className="item editCollective">
                 <Link route={`${collective.path}/edit`}>
-                  <div className="icon edit" />
+                  <PencilIcon size="1.75em" />
                   {intl.formatMessage(
                     this.messages[`menu.edit.${collective.type.toLowerCase()}`],
                   )}

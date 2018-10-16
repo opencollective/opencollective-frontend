@@ -2,6 +2,7 @@ import React, { Fragment } from 'react';
 import { graphql, compose } from 'react-apollo';
 import gql from 'graphql-tag';
 import fetch from 'node-fetch';
+import { Github } from 'styled-icons/fa-brands/Github.cjs';
 
 import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
@@ -19,7 +20,6 @@ import Container from '../components/Container';
 import ErrorPage from '../components/ErrorPage';
 import StyledLink from '../components/StyledLink';
 import StyledButton from '../components/StyledButton';
-import { GithubIcon } from '../components/icons';
 
 const { WEBSITE_URL } = process.env;
 
@@ -206,7 +206,7 @@ class ClaimCollectivePage extends React.Component {
                           alignItems="center"
                           justifyContent="space-evenly"
                         >
-                          <GithubIcon size={15} fill={colors.black[500]} />
+                          <Github size={17} color={colors.black[500]} />
                           Authenticate
                         </Flex>
                       </StyledLink>
@@ -270,7 +270,7 @@ class ClaimCollectivePage extends React.Component {
                         alignItems="center"
                         justifyContent="space-evenly"
                       >
-                        <GithubIcon size={15} fill={colors.black[500]} />
+                        <Github size={17} fill={colors.black[500]} />
                         Authenticate
                       </Flex>
                     </StyledLink>

@@ -5,6 +5,9 @@ import gql from 'graphql-tag';
 import fetch from 'node-fetch';
 import { Box, Flex } from 'grid-styled';
 import { FormattedNumber } from 'react-intl';
+import { Facebook } from 'styled-icons/fa-brands/Facebook.cjs';
+import { Twitter } from 'styled-icons/fa-brands/Twitter.cjs';
+import { Linkedin } from 'styled-icons/fa-brands/Linkedin.cjs';
 
 import { pickAvatar } from '../lib/collective.lib';
 import { getBaseApiUrl, imagePreview } from '../lib/utils';
@@ -24,7 +27,6 @@ import StyledLink from '../components/StyledLink';
 import CollectiveStatsCard from '../components/CollectiveStatsCard';
 import NewsletterContainer from '../components/NewsletterContainer';
 import HomepageSponsorCard from '../components/HomepageSponsorCard';
-import { FacebookIcon, LinkedInIcon, TwitterIcon } from '../components/icons';
 import Carousel from '../components/Carousel';
 import Currency from '../components/Currency';
 import ErrorPage from '../components/ErrorPage';
@@ -795,7 +797,7 @@ class HomePage extends React.Component {
                     alignItems="center"
                     justifyContent="space-evenly"
                   >
-                    <TwitterIcon size={18} fill={colors.primary[500]} />
+                    <Twitter size={18} color={colors.primary[500]} />
                     <Span>Share on Twitter</Span>
                   </Container>
                 </StyledLink>
@@ -809,7 +811,7 @@ class HomePage extends React.Component {
                     alignItems="center"
                     justifyContent="space-evenly"
                   >
-                    <FacebookIcon size={18} fill={colors.primary[500]} />
+                    <Facebook size={18} color={colors.primary[500]} />
                     <Span>Share on Facebook</Span>
                   </Container>
                 </StyledLink>
@@ -823,7 +825,7 @@ class HomePage extends React.Component {
                     alignItems="center"
                     justifyContent="space-evenly"
                   >
-                    <LinkedInIcon size={18} fill={colors.primary[500]} />
+                    <Linkedin size={18} color={colors.primary[500]} />
                     <Span>Share on LinkedIn</Span>
                   </Container>
                 </StyledLink>

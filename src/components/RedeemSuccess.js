@@ -5,14 +5,22 @@ import withIntl from '../lib/withIntl';
 
 import { Flex, Box } from 'grid-styled';
 import { FormattedMessage } from 'react-intl';
-import { P, H5 } from './Text';
 import styled from 'styled-components';
+import { Check } from 'styled-icons/fa-solid/Check.cjs';
+import { P, H5 } from './Text';
 
 const Title = styled(H5)``;
 
 const Instructions = styled(P)`
   font-size: 1.2rem;
   color: #9d9fa3;
+`;
+
+const CheckCircleIcon = styled(Check)`
+  color: #00b65c;
+  border: 1.3px solid #73e3ac;
+  border-radius: 20px;
+  padding: 10px;
 `;
 
 class RedeemSuccess extends React.Component {
@@ -27,11 +35,7 @@ class RedeemSuccess extends React.Component {
       <div>
         <Flex flexDirection="column">
           <Flex justifyContent="center" my={3}>
-            <object
-              type="image/svg+xml"
-              data="/static/icons/success.svg"
-              height="32"
-            />
+            <CheckCircleIcon size="40px" />
           </Flex>
 
           <Box my={2}>

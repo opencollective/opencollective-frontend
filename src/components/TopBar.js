@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Bars as MenuIcon } from 'styled-icons/fa-solid/Bars.cjs';
 import SearchIcon from './SearchIcon';
-import MenuIcon from './icons/MenuIcon';
 import TopBarProfileMenu from './TopBarProfileMenu';
 import SearchForm from './SearchForm';
 import { defineMessages, FormattedMessage } from 'react-intl';
@@ -108,7 +108,7 @@ class TopBar extends React.Component {
             <Box mx={3}>
               <Link href="#footer">
                 <Flex is="a">
-                  <MenuIcon fill="#aaaaaa" size={24} />
+                  <MenuIcon color="#aaaaaa" size={24} />
                 </Flex>
               </Link>
             </Box>

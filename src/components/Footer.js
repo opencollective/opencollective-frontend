@@ -1,18 +1,16 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Box, Flex } from 'grid-styled';
+import { Github } from 'styled-icons/fa-brands/Github.cjs';
+import { MediumM } from 'styled-icons/fa-brands/MediumM.cjs';
+import { Slack } from 'styled-icons/fa-brands/Slack.cjs';
+import { Twitter } from 'styled-icons/fa-brands/Twitter.cjs';
+import { Mail } from 'styled-icons/material/Mail.cjs';
 
 import { Link } from '../server/pages';
 
 import { P } from './Text';
 import Container from './Container';
-import {
-  GithubIcon,
-  MailIcon,
-  MediumIcon,
-  SlackIcon,
-  TwitterIcon,
-} from './icons';
 import ListItem from './ListItem';
 import StyledLink from './StyledLink';
 
@@ -137,19 +135,19 @@ class Footer extends React.Component {
             maxWidth="300px"
           >
             <SocialLink href="https://medium.com/open-collective">
-              <MediumIcon size={15} fill="#9399A3" />
+              <MediumM size={17} color="#9399A3" />
             </SocialLink>
             <SocialLink href="https://twitter.com/opencollect">
-              <TwitterIcon size={15} fill="#9399A3" />
+              <Twitter size={17} color="#9399A3" />
             </SocialLink>
             <SocialLink href="https://github.com/opencollective">
-              <GithubIcon size={15} fill="#9399A3" />
+              <Github size={17} color="#9399A3" />
             </SocialLink>
             <SocialLink href="https://slack.opencollective.com">
-              <SlackIcon size={15} fill="#9399A3" />
+              <Slack size={17} color="#9399A3" />
             </SocialLink>
             <SocialLink href="mailto:info@opencollective.com">
-              <MailIcon size={15} fill="#9399A3" />
+              <Mail size={19} color="#9399A3" />
             </SocialLink>
           </Container>
           <Flex
