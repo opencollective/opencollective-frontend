@@ -122,17 +122,18 @@ const editCollectiveQuery = gql`
           }
         }
       }
-    }
-  }
-`;
-
-const editTiersQuery = gql`
-  mutation editTiers($id: Int!, $tiers: [TierInputType]!) {
-    editTiers(id: $id, tiers: $tiers) {
-      id
-      type
-      name
-      amount
+      tiers {
+        id
+        slug
+        type
+        name
+        description
+        amount
+        presets
+        interval
+        currency
+        maxQuantity
+      }
     }
   }
 `;
@@ -327,27 +328,6 @@ export const addEditCollectiveMutation = graphql(editCollectiveQuery, {
         'long',
       ]);
       return await mutate({ variables: { collective: CollectiveInputType } });
-    },
-  }),
-});
-
-export const addEditTiersMutation = graphql(editTiersQuery, {
-  props: ({ mutate }) => ({
-    editTiers: async (collectiveSlug, tiers) => {
-      tiers = tiers.map(tier =>
-        pick(tier, [
-          'id',
-          'type',
-          'name',
-          'description',
-          'amount',
-          'maxQuantity',
-          'maxQuantityPerUser',
-          'interval',
-          'endsAt',
-        ]),
-      );
-      return await mutate({ variables: { collectiveSlug, tiers } });
     },
   }),
 });
