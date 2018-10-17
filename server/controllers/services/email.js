@@ -2,7 +2,7 @@ import emailLib from '../../lib/email';
 import Promise from 'bluebird';
 import config from 'config';
 import request from 'request-promise';
-import _ from 'lodash';
+import { pick } from 'lodash';
 import crypto from 'crypto';
 import debug from 'debug';
 import models, { sequelize, Op } from '../../models';
@@ -94,15 +94,25 @@ export const approve = (req, res, next) => {
   let email = {};
 
   const fetchSenderAndApprover = email => {
+    sender = { name: email.From, email: email.sender }; // default value
     const where = {
       [Op.or]: [{ email: approverEmail }, { email: email.sender }],
     };
-    sender = { name: email.From, email: email.sender }; // default value
-    return models.User.findAll({ where })
+    return models.User.findAll({
+      attributes: ['email', 'CollectiveId'],
+      where,
+      include: { model: models.Collective, as: 'collective' },
+    })
       .then(users => {
         users.map(user => {
-          if (approverEmail === user.email) approver = user;
-          if (email.sender === user.email) sender = user;
+          if (approverEmail === user.email) {
+            approver = pick(user.collective, ['name', 'image']);
+            approver.email = user.email;
+          }
+          if (email.sender === user.email) {
+            sender = pick(user.collective, ['name', 'image']);
+            sender.email = user.email;
+          }
         });
       })
       .catch(e => {
@@ -134,10 +144,10 @@ export const approve = (req, res, next) => {
         subject: email.Subject,
         body: email['body-html'] || email['body-plain'],
         to: email.To,
-        sender: _.pick(sender, ['email', 'name', 'image']),
+        sender: pick(sender, ['email', 'name', 'image']),
       };
       if (approver && approver.email !== sender.email)
-        emailData.approver = _.pick(approver, ['email', 'name', 'image']);
+        emailData.approver = pick(approver, ['email', 'name', 'image']);
 
       return sendEmailToList(email.To, emailData);
     })
