@@ -641,42 +641,44 @@ class InputField extends React.Component {
         className={`inputField ${this.props.className} ${this.props.name}`}
         key={`input-${this.props.name}`}
       >
-        <style jsx global>{`
-          span.input-group {
-            width: 100%;
-          }
-          .inputField {
-            margin: 1rem 0;
-          }
-          .inputField,
-          .inputField textarea {
-            font-size: 1.6rem;
-          }
-          .form-horizontal .form-group label {
-            padding-top: 3px;
-          }
-          .inputField .checkbox label {
-            width: auto;
-          }
-          .inputField .right input[type='number'] {
-            text-align: right;
-          }
-          .inputField .currency input[type='number'] {
-            text-align: left;
-          }
-          .inputField .switch {
-            display: flex;
-            align-items: center;
-          }
-          .inputField .MuiSwitch-colorSecondary-7.MuiSwitch-checked-5 {
-            color: #3385ff;
-          }
-          .inputField
-            .MuiSwitch-colorSecondary-7.MuiSwitch-checked-5
-            + .MuiSwitch-bar-9 {
-            background-color: #3385ff;
-          }
-        `}</style>
+        <style jsx global>
+          {`
+            span.input-group {
+              width: 100%;
+            }
+            .inputField {
+              margin: 1rem 0;
+            }
+            .inputField,
+            .inputField textarea {
+              font-size: 1.6rem;
+            }
+            .form-horizontal .form-group label {
+              padding-top: 3px;
+            }
+            .inputField .checkbox label {
+              width: auto;
+            }
+            .inputField .right input[type='number'] {
+              text-align: right;
+            }
+            .inputField .currency input[type='number'] {
+              text-align: left;
+            }
+            .inputField .switch {
+              display: flex;
+              align-items: center;
+            }
+            .inputField .MuiSwitch-colorSecondary-7.MuiSwitch-checked-5 {
+              color: #3385ff;
+            }
+            .inputField
+              .MuiSwitch-colorSecondary-7.MuiSwitch-checked-5
+              + .MuiSwitch-bar-9 {
+              background-color: #3385ff;
+            }
+          `}
+        </style>
         {this.input}
       </div>
     );

@@ -133,52 +133,54 @@ class TransactionDetails extends React.Component {
 
     return (
       <div className={`TransactionDetails ${this.props.mode}`}>
-        <style jsx>{`
-          .TransactionDetails {
-            font-size: 1.2rem;
-            overflow: hidden;
-            transition: max-height 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-            max-height: 19rem;
-          }
-          .TransactionDetails.closed {
-            max-height: 0;
-          }
-          .TransactionDetails .frame {
-            padding: 4px;
-            margin-top: 1rem;
-            margin-right: 1rem;
-            float: left;
-            background-color: #f3f4f5;
-          }
-          .TransactionDetails img {
-            width: 64px;
-          }
-          .col {
-            float: left;
-            display: flex;
-            flex-direction: column;
-            margin-right: 1rem;
-            margin-top: 1rem;
-          }
-          label {
-            text-transform: uppercase;
-            color: #aaaeb3;
-            font-weight: 300;
-            white-space: nowrap;
-          }
-          .netAmountInCollectiveCurrency {
-            font-weight: bold;
-          }
-          .TransactionDetails .actions {
-            clear: both;
-          }
-
-          @media (max-width: 600px) {
+        <style jsx>
+          {`
             .TransactionDetails {
-              max-height: 30rem;
+              font-size: 1.2rem;
+              overflow: hidden;
+              transition: max-height 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+              max-height: 19rem;
             }
-          }
-        `}</style>
+            .TransactionDetails.closed {
+              max-height: 0;
+            }
+            .TransactionDetails .frame {
+              padding: 4px;
+              margin-top: 1rem;
+              margin-right: 1rem;
+              float: left;
+              background-color: #f3f4f5;
+            }
+            .TransactionDetails img {
+              width: 64px;
+            }
+            .col {
+              float: left;
+              display: flex;
+              flex-direction: column;
+              margin-right: 1rem;
+              margin-top: 1rem;
+            }
+            label {
+              text-transform: uppercase;
+              color: #aaaeb3;
+              font-weight: 300;
+              white-space: nowrap;
+            }
+            .netAmountInCollectiveCurrency {
+              font-weight: bold;
+            }
+            .TransactionDetails .actions {
+              clear: both;
+            }
+
+            @media (max-width: 600px) {
+              .TransactionDetails {
+                max-height: 30rem;
+              }
+            }
+          `}
+        </style>
 
         {type === 'DEBIT' && (
           <div className="frame">

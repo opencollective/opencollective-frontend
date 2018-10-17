@@ -63,41 +63,43 @@ class ExpensesSection extends React.Component {
           />
 
           <div className="ExpensesSection">
-            <style jsx>{`
-              .columns {
-                display: flex;
-                max-width: 1080px;
-              }
-              .col {
-                width: 50%;
-                max-width: 488px;
-                min-width: 300px;
-              }
-              .col.first {
-                margin-right: 104px;
-              }
-              .actions {
-                text-align: center;
-                font-size: 1.4rem;
-              }
-              .col .header {
-                display: flex;
-                align-items: baseline;
-                justify-content: space-between;
-              }
-              h2 {
-                line-height: 24px;
-                color: black;
-                font-weight: 500;
-                font-size: 2rem;
-                margin-bottom: 4.8rem;
-              }
-              @media (max-width: 660px) {
+            <style jsx>
+              {`
                 .columns {
-                  flex-direction: column;
+                  display: flex;
+                  max-width: 1080px;
                 }
-              }
-            `}</style>
+                .col {
+                  width: 50%;
+                  max-width: 488px;
+                  min-width: 300px;
+                }
+                .col.first {
+                  margin-right: 104px;
+                }
+                .actions {
+                  text-align: center;
+                  font-size: 1.4rem;
+                }
+                .col .header {
+                  display: flex;
+                  align-items: baseline;
+                  justify-content: space-between;
+                }
+                h2 {
+                  line-height: 24px;
+                  color: black;
+                  font-weight: 500;
+                  font-size: 2rem;
+                  margin-bottom: 4.8rem;
+                }
+                @media (max-width: 660px) {
+                  .columns {
+                    flex-direction: column;
+                  }
+                }
+              `}
+            </style>
             <div className="columns">
               {this.totalExpenses > 0 && (
                 <div id="expenses" className="first col">

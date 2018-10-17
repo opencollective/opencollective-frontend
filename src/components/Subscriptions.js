@@ -70,70 +70,72 @@ class Subscriptions extends React.Component {
     }
     return (
       <div className="Subscriptions">
-        <style jsx>{`
-          Subscriptions {
-            min-height: 500px;
-          }
-          :global(.loadMoreBtn) {
-            margin: 1rem;
-            text-align: center;
-          }
-          .filter {
-            width: 100%;
-            max-width: 400px;
-            margin: 0 auto;
-          }
-          :global(.filterBtnGroup) {
-            width: 100%;
-          }
-          :global(.filterBtn) {
-            width: 33%;
-          }
-          .active,
-          .canceled {
-            display: flex;
-            flex-wrap: wrap;
-            flex-direction: row;
-            justify-content: left;
-            overflow: hidden;
-            margin: 1rem 0;
-          }
-          .subscriptions-cancelled-label {
-            width: 100%;
-            text-align: left;
-            margin: 30px 0 30px;
-            font-size: 20px;
-            font-weight: 700;
-            line-height: 1.08;
-            border-bottom: 1px solid ${colors.gray};
-            line-height: 0.1rem;
-            color: ${colors.black};
-          }
+        <style jsx>
+          {`
+            Subscriptions {
+              min-height: 500px;
+            }
+            :global(.loadMoreBtn) {
+              margin: 1rem;
+              text-align: center;
+            }
+            .filter {
+              width: 100%;
+              max-width: 400px;
+              margin: 0 auto;
+            }
+            :global(.filterBtnGroup) {
+              width: 100%;
+            }
+            :global(.filterBtn) {
+              width: 33%;
+            }
+            .active,
+            .canceled {
+              display: flex;
+              flex-wrap: wrap;
+              flex-direction: row;
+              justify-content: left;
+              overflow: hidden;
+              margin: 1rem 0;
+            }
+            .subscriptions-cancelled-label {
+              width: 100%;
+              text-align: left;
+              margin: 30px 0 30px;
+              font-size: 20px;
+              font-weight: 700;
+              line-height: 1.08;
+              border-bottom: 1px solid ${colors.gray};
+              line-height: 0.1rem;
+              color: ${colors.black};
+            }
 
-          .subscriptions-cancelled-label span {
-            background: ${colors.offwhite};
-            padding: 0 10px;
-          }
-          .subscriptions-noactive {
-            text-align: left;
-            font-weight: 300;
-            font-size: 18px;
-            margin-top: 50px;
-            text-align: center;
-            margin-bottom: 70px;
-          }
-          .subscriptions-noactive-image {
-            padding-left: 36px;
-          }
-          .subscriptions-noactive-text {
-            padding-top: 2rem;
-            width: 100%;
-          }
-          .subscriptions-noactive-link {
-            padding-top: 1rem;
-            padding-left: 104px;
-          }
-        `}</style>
+            .subscriptions-cancelled-label span {
+              background: ${colors.offwhite};
+              padding: 0 10px;
+            }
+            .subscriptions-noactive {
+              text-align: left;
+              font-weight: 300;
+              font-size: 18px;
+              margin-top: 50px;
+              text-align: center;
+              margin-bottom: 70px;
+            }
+            .subscriptions-noactive-image {
+              padding-left: 36px;
+            }
+            .subscriptions-noactive-text {
+              padding-top: 2rem;
+              width: 100%;
+            }
+            .subscriptions-noactive-link {
+              padding-top: 1rem;
+              padding-left: 104px;
+            }
+          `}
+        </style>
 
         <div className="active">
           {activeSubs.map(subscription => (

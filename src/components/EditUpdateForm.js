@@ -92,51 +92,55 @@ class EditUpdateForm extends React.Component {
 
     return (
       <div className={`EditUpdateForm ${this.props.mode}`}>
-        <style jsx>{`
-          .EditUpdateForm {
-            font-size: 1.2rem;
-            margin: 0 1rem 5rem 1rem;
-          }
-          .col {
-            float: left;
-            display: flex;
-            flex-direction: column;
-            margin-right: 1rem;
-            margin-top: 1rem;
-          }
-          .row {
-            clear: both;
-            margin-left: 0;
-            margin-right: 0;
-          }
-          .row .col.large {
-            width: 100%;
-          }
-          .row.actions {
-            margin-top: 7rem;
-          }
-          label {
-            text-transform: uppercase;
-            color: #aaaeb3;
-            font-weight: 300;
-            white-space: nowrap;
-          }
-          .netAmountInCollectiveCurrency {
-            font-weight: bold;
-          }
-          .error {
-            color: red;
-          }
-        `}</style>
-        <style global jsx>{`
-          .EditUpdateForm .inputField {
-            margin: 0;
-          }
+        <style jsx>
+          {`
+            .EditUpdateForm {
+              font-size: 1.2rem;
+              margin: 0 1rem 5rem 1rem;
+            }
+            .col {
+              float: left;
+              display: flex;
+              flex-direction: column;
+              margin-right: 1rem;
+              margin-top: 1rem;
+            }
+            .row {
+              clear: both;
+              margin-left: 0;
+              margin-right: 0;
+            }
+            .row .col.large {
+              width: 100%;
+            }
+            .row.actions {
+              margin-top: 7rem;
+            }
+            label {
+              text-transform: uppercase;
+              color: #aaaeb3;
+              font-weight: 300;
+              white-space: nowrap;
+            }
+            .netAmountInCollectiveCurrency {
+              font-weight: bold;
+            }
+            .error {
+              color: red;
+            }
+          `}
+        </style>
+        <style global jsx>
+          {`
+            .EditUpdateForm .inputField {
+              margin: 0;
+            }
 
-          .EditUpdateForm .inputField.title {
-            width: 50%;
-          }
-        `}</style>
+            .EditUpdateForm .inputField.title {
+              width: 50%;
+            }
+          `}
+        </style>
 
         <form onSubmit={this.onSubmit}>
           <div className="row">

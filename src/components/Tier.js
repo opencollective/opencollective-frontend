@@ -213,142 +213,146 @@ class Tier extends React.Component {
         }`}
         id={anchor}
       >
-        <style jsx global>{`
-          .tier .inputAmount .form-group {
-            margin: 0;
-          }
-        `}</style>
-        <style jsx>{`
-          .tier {
-            width: 100%;
-            max-width: 400px;
-            min-height: 12rem;
-            position: relative;
-            border: 1px solid ${colors.lightgray};
-            color: ${colors.black};
-            box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.04);
-            border: solid 1px rgba(37, 39, 41, 0.16);
-            border-radius: 8px;
-            padding: 2rem;
-          }
-          .header {
-            margin: 1rem;
-            display: flex;
-            justify-content: space-between;
-          }
-          .title {
-            font-size: 2.2rem;
-            color: var(--charcoal-grey-two);
-          }
-          .amount {
-            position: absolute;
-            top: 3rem;
-            right: 3rem;
-            font-size: 1.6rem;
-            font-weight: 500;
-            line-height: 1;
-            text-align: right;
-            color: #45484c;
-            color: var(--charcoal-grey-three);
-          }
-          .customAmount {
-            width: 12rem;
-          }
-          .customAmount .error {
-            font-size: 11px;
-            color: red;
-          }
-          .interval {
-            font-size: 1.2rem;
-            color: ${colors.darkgray};
-          }
-          .description {
-            min-height: 5rem;
-            margin: 0rem 1rem 1rem 1rem;
-            font-size: 1.5rem;
-          }
-          .actions {
-            display: flex;
-            justify-content: space-between;
-            flex-direction: row;
-            height: 6rem;
-            width: 100%;
-          }
-          .ctabtn {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 1.2rem;
-            font-weight: bold;
-            width: 100%;
-            text-transform: uppercase;
-          }
-          .ctabtn.blue {
-            color: white;
-            background: ${colors.blue};
-          }
-          .ctabtn.gray {
-            color: white;
-            background: ${colors.darkgray};
-          }
-          .inputRow {
-            margin: 1rem 0;
-          }
-          label {
-            text-transform: uppercase;
-            color: #aaaeb3;
-            font-weight: 300;
-            white-space: nowrap;
-            font-size: 1rem;
-          }
-          .tier label {
-            width: 100%;
-          }
-          .presets {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-          }
-          .tier :global(.presetBtnGroup) {
-            margin: 0.5rem 0;
-          }
-          .tier :global(.inputAmount) {
-            width: 12rem;
-            margin: 0.2rem 0;
-          }
-          .tier :global(input[name='amount']) {
-            max-width: 8rem;
-          }
-          .tier :global(.btn-group),
-          .tier :global(.inputField),
-          .tier :global(.form-group),
-          .tier :global(.form-control) {
-            border-radius: 3px;
-            background-color: #ffffff;
-            box-shadow: inset 0 -3px 0 0 rgba(0, 0, 0, 0.03);
-            height: 40px;
-          }
-          .tier :global(.btn-group > .btn) {
-            height: 40px;
-          }
-          .tier :global(.btn-primary),
-          :global(.btn-primary:hover),
-          :global(.btn-primary:active),
-          :global(.btn-primary:focus) {
-            background-color: #f0f3f5;
-            box-shadow: inset 0 3px 0 0 rgba(0, 0, 0, 0.07);
-            border: solid 1px #dcdfe1;
-            font-weight: bold;
-            font-size: 1.2rem;
-            color: #494b4d;
-          }
-          .tier:global(.btn-default) {
-            font-size: 1.2rem;
-            color: #494b4d;
-            background-color: transparent;
-            border: solid 1px #dcdfe1;
-          }
-        `}</style>
+        <style jsx global>
+          {`
+            .tier .inputAmount .form-group {
+              margin: 0;
+            }
+          `}
+        </style>
+        <style jsx>
+          {`
+            .tier {
+              width: 100%;
+              max-width: 400px;
+              min-height: 12rem;
+              position: relative;
+              border: 1px solid ${colors.lightgray};
+              color: ${colors.black};
+              box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.04);
+              border: solid 1px rgba(37, 39, 41, 0.16);
+              border-radius: 8px;
+              padding: 2rem;
+            }
+            .header {
+              margin: 1rem;
+              display: flex;
+              justify-content: space-between;
+            }
+            .title {
+              font-size: 2.2rem;
+              color: var(--charcoal-grey-two);
+            }
+            .amount {
+              position: absolute;
+              top: 3rem;
+              right: 3rem;
+              font-size: 1.6rem;
+              font-weight: 500;
+              line-height: 1;
+              text-align: right;
+              color: #45484c;
+              color: var(--charcoal-grey-three);
+            }
+            .customAmount {
+              width: 12rem;
+            }
+            .customAmount .error {
+              font-size: 11px;
+              color: red;
+            }
+            .interval {
+              font-size: 1.2rem;
+              color: ${colors.darkgray};
+            }
+            .description {
+              min-height: 5rem;
+              margin: 0rem 1rem 1rem 1rem;
+              font-size: 1.5rem;
+            }
+            .actions {
+              display: flex;
+              justify-content: space-between;
+              flex-direction: row;
+              height: 6rem;
+              width: 100%;
+            }
+            .ctabtn {
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              font-size: 1.2rem;
+              font-weight: bold;
+              width: 100%;
+              text-transform: uppercase;
+            }
+            .ctabtn.blue {
+              color: white;
+              background: ${colors.blue};
+            }
+            .ctabtn.gray {
+              color: white;
+              background: ${colors.darkgray};
+            }
+            .inputRow {
+              margin: 1rem 0;
+            }
+            label {
+              text-transform: uppercase;
+              color: #aaaeb3;
+              font-weight: 300;
+              white-space: nowrap;
+              font-size: 1rem;
+            }
+            .tier label {
+              width: 100%;
+            }
+            .presets {
+              display: flex;
+              flex-wrap: wrap;
+              justify-content: space-between;
+            }
+            .tier :global(.presetBtnGroup) {
+              margin: 0.5rem 0;
+            }
+            .tier :global(.inputAmount) {
+              width: 12rem;
+              margin: 0.2rem 0;
+            }
+            .tier :global(input[name='amount']) {
+              max-width: 8rem;
+            }
+            .tier :global(.btn-group),
+            .tier :global(.inputField),
+            .tier :global(.form-group),
+            .tier :global(.form-control) {
+              border-radius: 3px;
+              background-color: #ffffff;
+              box-shadow: inset 0 -3px 0 0 rgba(0, 0, 0, 0.03);
+              height: 40px;
+            }
+            .tier :global(.btn-group > .btn) {
+              height: 40px;
+            }
+            .tier :global(.btn-primary),
+            :global(.btn-primary:hover),
+            :global(.btn-primary:active),
+            :global(.btn-primary:focus) {
+              background-color: #f0f3f5;
+              box-shadow: inset 0 3px 0 0 rgba(0, 0, 0, 0.07);
+              border: solid 1px #dcdfe1;
+              font-weight: bold;
+              font-size: 1.2rem;
+              color: #494b4d;
+            }
+            .tier:global(.btn-default) {
+              font-size: 1.2rem;
+              color: #494b4d;
+              background-color: transparent;
+              border: solid 1px #dcdfe1;
+            }
+          `}
+        </style>
         <div>
           <div className="header">
             <div className="title">{capitalize(name)}</div>

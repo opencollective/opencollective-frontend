@@ -7,8 +7,7 @@ import fetch from 'node-fetch';
 import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
 import withLoggedInUser from '../lib/withLoggedInUser';
-import { formatCurrency } from '../lib/utils';
-import { getBaseApiUrl } from '../lib/utils';
+import { formatCurrency, getBaseApiUrl } from '../lib/utils';
 import { Router } from '../server/pages';
 
 import Header from '../components/Header';

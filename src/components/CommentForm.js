@@ -77,35 +77,37 @@ class CommentForm extends React.Component {
         : 'html';
 
     return (
-      <div className={`CommentForm`}>
-        <style jsx>{`
-          .CommentForm {
-            font-size: 1.2rem;
-            overflow: hidden;
-            margin: 0.5rem;
-            padding: 0.5rem;
-          }
-          .fromCollective {
-            float: left;
-            margin-right: 1rem;
-          }
-          .meta {
-            color: #919599;
-            font-size: 1.2rem;
-          }
-          .body {
-            overflow: hidden;
-          }
-          .actions {
-            display: flex;
-            align-items: center;
-          }
-          .notice {
-            color: #525866;
-            font-size: 12px;
-            margin-left: 1rem;
-          }
-        `}</style>
+      <div className={'CommentForm'}>
+        <style jsx>
+          {`
+            .CommentForm {
+              font-size: 1.2rem;
+              overflow: hidden;
+              margin: 0.5rem;
+              padding: 0.5rem;
+            }
+            .fromCollective {
+              float: left;
+              margin-right: 1rem;
+            }
+            .meta {
+              color: #919599;
+              font-size: 1.2rem;
+            }
+            .body {
+              overflow: hidden;
+            }
+            .actions {
+              display: flex;
+              align-items: center;
+            }
+            .notice {
+              color: #525866;
+              font-size: 12px;
+              margin-left: 1rem;
+            }
+          `}
+        </style>
 
         <div className="fromCollective">
           <a

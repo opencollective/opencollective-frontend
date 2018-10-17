@@ -59,57 +59,59 @@ class Transactions extends React.Component {
 
     return (
       <div className="Transactions">
-        <style jsx>{`
-          .Transactions {
-            min-width: 30rem;
-            max-width: 1080px;
-            width: 100%;
-          }
-          :global(.loadMoreBtn) {
-            margin: 1rem;
-            text-align: center;
-          }
-          .filter {
-            width: 100%;
-            max-width: 400px;
-            margin: 0 auto;
-          }
-          :global(.filterBtnGroup) {
-            width: 100%;
-          }
-          :global(.filterBtn) {
-            width: 33%;
-          }
-          .empty {
-            text-align: center;
-            margin: 4rem;
-            color: ${colors.darkgray};
-          }
-          .itemsList {
-            position: relative;
-          }
-          .itemsList :global(.transaction) {
-            border-bottom: 1px solid #e8e9eb;
-          }
-          .loading {
-            color: ${colors.darkgray};
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: rgba(255, 255, 255, 0.85);
-            text-transform: uppercase;
-            letter-spacing: 3px;
-            font-weight: bold;
-            z-index: 10;
-            -webkit-backdrop-filter: blur(2px);
-            backdrop-filter: blur(5px);
-          }
-        `}</style>
+        <style jsx>
+          {`
+            .Transactions {
+              min-width: 30rem;
+              max-width: 1080px;
+              width: 100%;
+            }
+            :global(.loadMoreBtn) {
+              margin: 1rem;
+              text-align: center;
+            }
+            .filter {
+              width: 100%;
+              max-width: 400px;
+              margin: 0 auto;
+            }
+            :global(.filterBtnGroup) {
+              width: 100%;
+            }
+            :global(.filterBtn) {
+              width: 33%;
+            }
+            .empty {
+              text-align: center;
+              margin: 4rem;
+              color: ${colors.darkgray};
+            }
+            .itemsList {
+              position: relative;
+            }
+            .itemsList :global(.transaction) {
+              border-bottom: 1px solid #e8e9eb;
+            }
+            .loading {
+              color: ${colors.darkgray};
+              position: absolute;
+              top: 0;
+              left: 0;
+              width: 100%;
+              height: 100%;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              background: rgba(255, 255, 255, 0.85);
+              text-transform: uppercase;
+              letter-spacing: 3px;
+              font-weight: bold;
+              z-index: 10;
+              -webkit-backdrop-filter: blur(2px);
+              backdrop-filter: blur(5px);
+            }
+          `}
+        </style>
 
         {showCSVlink &&
           transactions.length > 0 && (

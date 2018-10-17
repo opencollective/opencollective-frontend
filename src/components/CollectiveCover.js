@@ -162,196 +162,201 @@ ${description}`;
 
     return (
       <div className={classNames.join(' ')}>
-        <style jsx>{`
-          .cover {
-            align-items: center;
-            position: relative;
-            text-align: center;
-            min-height: 30rem;
-            width: 100%;
-            overflow: hidden;
-          }
-          .small .cover {
-            height: auto;
-            min-height: 22rem;
-          }
-          .backgroundCover {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 0;
-          }
-          .twitterHandle {
-            background: url('/static/icons/twitter-handler.svg') no-repeat 0px
-              6px;
-            padding-left: 22px;
-          }
-          .website {
-            background: url('/static/icons/external-link.svg') no-repeat 0px 6px;
-            padding-left: 22px;
-          }
-          .host label {
-            font-weight: 300;
-            margin-right: 5px;
-            opacity: 0.75;
-          }
-          .content {
-            z-index: 1;
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-around;
-            align-items: center;
-            color: black;
-            margin-top: 70px;
-          }
-          .small .content {
-            margin-top: 0px;
-          }
-          .content,
-          .content a {
-            color: white;
-            text-shadow: 1px 0 1px rgba(0, 0, 0, 0.8),
-              0 -1px 1px rgba(0, 0, 0, 0.8), 0 1px 1px rgba(0, 0, 0, 0.8),
-              -1px 0 1px rgba(0, 0, 0, 0.8);
-          }
-          .defaultBackgroundImage .content,
-          .defaultBackgroundImage .content a {
-            text-shadow: none;
-          }
-          .content a:hover {
-            color: #444;
-            text-decoration: underline !important;
-          }
-          .content a:hover {
-            color: #444;
-            text-decoration: underline !important;
-          }
-          .USER .cover {
-            display: block;
-          }
-          .COLLECTIVE .content {
-            margin-top: 0px;
-          }
-          .logo {
-            max-width: 20rem;
-            max-height: 10rem;
-            margin: 2rem auto;
-            display: block;
-          }
-          .USER .logo {
-            border: 3px solid #fff;
-            box-shadow: 0 0 0 2px #75cc1f;
-            border-radius: 50%;
-            margin: 3rem auto;
-          }
-          .USER.small .logo {
-            margin: 2rem auto;
-          }
-          h1 {
-            font-size: 3rem;
-            margin: 1.5rem;
-          }
-          .contact {
-            display: flex;
-            flex-direction: row;
-            justify-content: center;
-            flex-wrap: wrap;
-          }
-          .contact div {
-            margin: 1rem;
-          }
-          .members {
-            display: flex;
-            justify-content: center;
-            margin: 2rem 0;
-          }
-          .members a {
-            margin: 0.3rem;
-          }
-          .avatar {
-            float: left;
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            margin: 0 0.5rem;
-            background-repeat: no-repeat;
-            background-position: center center;
-            background-size: cover;
-            border: 2px solid #fff;
-            box-shadow: 0 0 0 1px #75cc1f;
-          }
-          .MoreBackers {
-            font-size: 2rem;
-            line-height: 36px;
-            margin-left: 1rem;
-          }
-          .statsContainer {
-            position: relative;
-            margin-top: 3rem;
-            padding: 3rem 1rem;
-            z-index: 1;
-            font-size: 1.3rem;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            color: white;
-            background-color: #252729;
-          }
-          .topContributors {
-            margin-top: -6rem;
-            min-height: 30px;
-          }
-          .statsContainer .value {
-            font-size: 3rem;
-          }
-          .stat {
-            margin: 1rem;
-          }
-          .counter {
-            margin: 1rem 0px;
-          }
-          .counter .-character {
-            font-size: 22px;
-            font-weight: bold;
-            margin: 1px;
-          }
-          .counter .-digit {
-            display: inline-block;
-            width: 20px;
-            height: 28px;
-            border-radius: 3px;
-            background-color: rgba(0, 0, 0, 0.6);
-            border: solid 1px #000000;
-            font-size: 22px;
-            color: #ffffff;
-            font-weight: bold;
-            line-height: 1.25;
-            margin: 1px;
-          }
-          .USER .cta,
-          .ORGANIZATION .cta {
-            margin: 4rem 0;
-          }
-          @media (max-width: 600px) {
-            h1 {
-              font-size: 2.5rem;
+        <style jsx>
+          {`
+            .cover {
+              align-items: center;
+              position: relative;
+              text-align: center;
+              min-height: 30rem;
+              width: 100%;
+              overflow: hidden;
             }
-          }
-          .small .contact,
-          .small .stats,
-          .small .statsContainer,
-          .small .members {
-            display: none;
-          }
-        `}</style>
-        <style jsx global>{`
-          .CollectiveCover .content a {
-            color: white;
-          }
-        `}</style>
+            .small .cover {
+              height: auto;
+              min-height: 22rem;
+            }
+            .backgroundCover {
+              position: absolute;
+              top: 0;
+              left: 0;
+              width: 100%;
+              height: 100%;
+              z-index: 0;
+            }
+            .twitterHandle {
+              background: url('/static/icons/twitter-handler.svg') no-repeat 0px
+                6px;
+              padding-left: 22px;
+            }
+            .website {
+              background: url('/static/icons/external-link.svg') no-repeat 0px
+                6px;
+              padding-left: 22px;
+            }
+            .host label {
+              font-weight: 300;
+              margin-right: 5px;
+              opacity: 0.75;
+            }
+            .content {
+              z-index: 1;
+              position: relative;
+              display: flex;
+              flex-direction: column;
+              justify-content: space-around;
+              align-items: center;
+              color: black;
+              margin-top: 70px;
+            }
+            .small .content {
+              margin-top: 0px;
+            }
+            .content,
+            .content a {
+              color: white;
+              text-shadow: 1px 0 1px rgba(0, 0, 0, 0.8),
+                0 -1px 1px rgba(0, 0, 0, 0.8), 0 1px 1px rgba(0, 0, 0, 0.8),
+                -1px 0 1px rgba(0, 0, 0, 0.8);
+            }
+            .defaultBackgroundImage .content,
+            .defaultBackgroundImage .content a {
+              text-shadow: none;
+            }
+            .content a:hover {
+              color: #444;
+              text-decoration: underline !important;
+            }
+            .content a:hover {
+              color: #444;
+              text-decoration: underline !important;
+            }
+            .USER .cover {
+              display: block;
+            }
+            .COLLECTIVE .content {
+              margin-top: 0px;
+            }
+            .logo {
+              max-width: 20rem;
+              max-height: 10rem;
+              margin: 2rem auto;
+              display: block;
+            }
+            .USER .logo {
+              border: 3px solid #fff;
+              box-shadow: 0 0 0 2px #75cc1f;
+              border-radius: 50%;
+              margin: 3rem auto;
+            }
+            .USER.small .logo {
+              margin: 2rem auto;
+            }
+            h1 {
+              font-size: 3rem;
+              margin: 1.5rem;
+            }
+            .contact {
+              display: flex;
+              flex-direction: row;
+              justify-content: center;
+              flex-wrap: wrap;
+            }
+            .contact div {
+              margin: 1rem;
+            }
+            .members {
+              display: flex;
+              justify-content: center;
+              margin: 2rem 0;
+            }
+            .members a {
+              margin: 0.3rem;
+            }
+            .avatar {
+              float: left;
+              width: 36px;
+              height: 36px;
+              border-radius: 50%;
+              margin: 0 0.5rem;
+              background-repeat: no-repeat;
+              background-position: center center;
+              background-size: cover;
+              border: 2px solid #fff;
+              box-shadow: 0 0 0 1px #75cc1f;
+            }
+            .MoreBackers {
+              font-size: 2rem;
+              line-height: 36px;
+              margin-left: 1rem;
+            }
+            .statsContainer {
+              position: relative;
+              margin-top: 3rem;
+              padding: 3rem 1rem;
+              z-index: 1;
+              font-size: 1.3rem;
+              display: flex;
+              flex-direction: column;
+              justify-content: center;
+              color: white;
+              background-color: #252729;
+            }
+            .topContributors {
+              margin-top: -6rem;
+              min-height: 30px;
+            }
+            .statsContainer .value {
+              font-size: 3rem;
+            }
+            .stat {
+              margin: 1rem;
+            }
+            .counter {
+              margin: 1rem 0px;
+            }
+            .counter .-character {
+              font-size: 22px;
+              font-weight: bold;
+              margin: 1px;
+            }
+            .counter .-digit {
+              display: inline-block;
+              width: 20px;
+              height: 28px;
+              border-radius: 3px;
+              background-color: rgba(0, 0, 0, 0.6);
+              border: solid 1px #000000;
+              font-size: 22px;
+              color: #ffffff;
+              font-weight: bold;
+              line-height: 1.25;
+              margin: 1px;
+            }
+            .USER .cta,
+            .ORGANIZATION .cta {
+              margin: 4rem 0;
+            }
+            @media (max-width: 600px) {
+              h1 {
+                font-size: 2.5rem;
+              }
+            }
+            .small .contact,
+            .small .stats,
+            .small .statsContainer,
+            .small .members {
+              display: none;
+            }
+          `}
+        </style>
+        <style jsx global>
+          {`
+            .CollectiveCover .content a {
+              color: white;
+            }
+          `}
+        </style>
         <div className={`cover ${collective.type}`}>
           <div className="backgroundCover" style={style} />
 

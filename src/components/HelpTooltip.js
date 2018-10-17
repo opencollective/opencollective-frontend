@@ -26,27 +26,29 @@ class HelpTooltip extends React.Component {
   render() {
     return (
       <div className="HelpTooltip">
-        <style jsx global>{`
-          .HelpTooltip {
-            display: inline-block;
-            margin: 0 5px;
-          }
-          .customTooltip {
-            max-width: 400px;
-            z-index: 1000000;
-            background: white !important;
-            color: #6e747a !important;
-            font-size: 12px !important;
-            line-height: 18px !important;
-            border: 1px solid rgba(18, 19, 20, 0.12) !important;
-            box-shadow: 0 8px 16px 0 rgba(12, 16, 20, 0.12) !important;
-          }
-          .customTooltip.place-bottom::after {
-            border-color: white transparent !important;
-          }
-          .helpIcon {
-          }
-        `}</style>
+        <style jsx global>
+          {`
+            .HelpTooltip {
+              display: inline-block;
+              margin: 0 5px;
+            }
+            .customTooltip {
+              max-width: 400px;
+              z-index: 1000000;
+              background: white !important;
+              color: #6e747a !important;
+              font-size: 12px !important;
+              line-height: 18px !important;
+              border: 1px solid rgba(18, 19, 20, 0.12) !important;
+              box-shadow: 0 8px 16px 0 rgba(12, 16, 20, 0.12) !important;
+            }
+            .customTooltip.place-bottom::after {
+              border-color: white transparent !important;
+            }
+            .helpIcon {
+            }
+          `}
+        </style>
         {!this._isMounted && (
           <a data-tip data-for={this.id}>
             ?
