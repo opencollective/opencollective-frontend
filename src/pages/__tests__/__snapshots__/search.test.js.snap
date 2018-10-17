@@ -774,7 +774,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
     </div>
   </header>
   <main
-    className="jsx-2884704896"
+    className="jsx-916984404"
   >
     <div
       className="c19 c20"
@@ -807,7 +807,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
                 type="search"
               />
               <button
-                className="jsx-1375211830 jsx-733528736 Button blue c25"
+                className="jsx-1144918383 jsx-3101740563 Button blue c25"
                 onClick={[Function]}
                 type="submit"
               >
@@ -2086,7 +2086,7 @@ exports[`Search Page renders empty results message 1`] = `
     </div>
   </header>
   <main
-    className="jsx-2884704896"
+    className="jsx-916984404"
   >
     <div
       className="c19 c20"
@@ -2119,7 +2119,7 @@ exports[`Search Page renders empty results message 1`] = `
                 type="search"
               />
               <button
-                className="jsx-1375211830 jsx-733528736 Button blue c25"
+                className="jsx-1144918383 jsx-3101740563 Button blue c25"
                 onClick={[Function]}
                 type="submit"
               >
@@ -3356,7 +3356,7 @@ exports[`Search Page renders error message 1`] = `
     </div>
   </header>
   <main
-    className="jsx-2884704896"
+    className="jsx-916984404"
   >
     <div
       className="content"
@@ -4604,7 +4604,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
     </div>
   </header>
   <main
-    className="jsx-2884704896"
+    className="jsx-916984404"
   >
     <div
       className="c19 c20"
@@ -4637,7 +4637,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
                 type="search"
               />
               <button
-                className="jsx-1375211830 jsx-733528736 Button blue c25"
+                className="jsx-1144918383 jsx-3101740563 Button blue c25"
                 onClick={[Function]}
                 type="submit"
               >
@@ -6027,11 +6027,7 @@ exports[`Search Page renders search results with pagination 1`] = `
     </div>
   </header>
   <main
-<<<<<<< HEAD
-    className="jsx-3821428578"
-=======
-    className="jsx-1936554220"
->>>>>>> chore(tests): update test jest snapshot
+    className="jsx-916984404"
   >
     <div
       className="c19 c20"
@@ -6064,11 +6060,7 @@ exports[`Search Page renders search results with pagination 1`] = `
                 type="search"
               />
               <button
-<<<<<<< HEAD
-                className="jsx-1375211830 jsx-3370595267 Button blue c25"
-=======
-                className="jsx-2820878800 jsx-3805780651 Button blue c24"
->>>>>>> chore(tests): update test jest snapshot
+                className="jsx-1144918383 jsx-3101740563 Button blue c25"
                 onClick={[Function]}
                 type="submit"
               >
@@ -6091,31 +6083,17 @@ exports[`Search Page renders search results with pagination 1`] = `
             onClick={[Function]}
           >
             <div
-<<<<<<< HEAD
-              className="jsx-3769176122 CollectiveCard undefined"
+              className="jsx-136688120 CollectiveCard undefined"
             >
               <div
-                className="jsx-3769176122 head"
+                className="jsx-136688120 head"
               >
                 <div
-                  className="jsx-3769176122 background"
+                  className="jsx-136688120 background"
                   style={Object {}}
                 />
                 <div
-                  className="jsx-3769176122 logo"
-=======
-              className="jsx-1471964952 CollectiveCard undefined"
-            >
-              <div
-                className="jsx-1471964952 head"
-              >
-                <div
-                  className="jsx-1471964952 background"
-                  style={Object {}}
-                />
-                <div
-                  className="jsx-1471964952 logo"
->>>>>>> chore(tests): update test jest snapshot
+                  className="jsx-136688120 logo"
                 >
                   <div
                     className="jsx-3454192051 Logo"
@@ -6140,31 +6118,17 @@ exports[`Search Page renders search results with pagination 1`] = `
                 </div>
               </div>
               <div
-<<<<<<< HEAD
-                className="jsx-3769176122 body"
+                className="jsx-136688120 body"
               >
                 <div
-                  className="jsx-3769176122 name"
+                  className="jsx-136688120 name"
                 />
                 <div
-                  className="jsx-3769176122 description"
+                  className="jsx-136688120 description"
                 />
               </div>
               <div
-                className="jsx-3769176122 footer"
-=======
-                className="jsx-1471964952 body"
-              >
-                <div
-                  className="jsx-1471964952 name"
-                />
-                <div
-                  className="jsx-1471964952 description"
-                />
-              </div>
-              <div
-                className="jsx-1471964952 footer"
->>>>>>> chore(tests): update test jest snapshot
+                className="jsx-136688120 footer"
               />
             </div>
           </a>
