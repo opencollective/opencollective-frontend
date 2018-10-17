@@ -41,8 +41,9 @@ const nextConfig = {
     });
 
     // Inspired by https://github.com/rohanray/next-fonts
+    // Load Bootstrap and Font-Awesome fonts
     config.module.rules.push({
-      test: /\.(woff|woff2|eot|ttf|otf|svg)$/,
+      test: /fonts\/.*\.(woff|woff2|eot|ttf|otf|svg)$/,
       use: [
         {
           loader: 'url-loader',
