@@ -296,7 +296,6 @@ class EditTiers extends React.Component {
   render() {
     const { intl, defaultType = 'TICKET' } = this.props;
 
-    console.log(this.state.tiers);
     return (
       <div className="EditTiers">
         <style jsx>
