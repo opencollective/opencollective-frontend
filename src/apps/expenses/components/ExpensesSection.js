@@ -64,42 +64,42 @@ class ExpensesSection extends React.Component {
 
           <div className="ExpensesSection">
             <style jsx>{`
-            .columns {
-              display: flex;
-              max-width: 1080px;
-            }
-            .col {
-              width: 50%;
-              max-width: 488px;
-              min-width: 300px;
-            }
-            .col.first {
-              margin-right: 104px;
-            }
-            .actions {
-              text-align: center;
-              font-size: 1.4rem;
-            }
-            .col .header {
-              display: flex;
-              align-items: baseline;
-              justify-content: space-between;
-            }
-            h2 {
-              line-height: 24px;
-              color: black;
-              font-weight: 500;
-              font-size: 2rem;
-              margin-bottom: 4.8rem;
-            }
-            @media(max-width: 660px) {
               .columns {
-                flex-direction: column;
+                display: flex;
+                max-width: 1080px;
               }
-            }
+              .col {
+                width: 50%;
+                max-width: 488px;
+                min-width: 300px;
+              }
+              .col.first {
+                margin-right: 104px;
+              }
+              .actions {
+                text-align: center;
+                font-size: 1.4rem;
+              }
+              .col .header {
+                display: flex;
+                align-items: baseline;
+                justify-content: space-between;
+              }
+              h2 {
+                line-height: 24px;
+                color: black;
+                font-weight: 500;
+                font-size: 2rem;
+                margin-bottom: 4.8rem;
+              }
+              @media (max-width: 660px) {
+                .columns {
+                  flex-direction: column;
+                }
+              }
             `}</style>
             <div className="columns">
-              { this.totalExpenses > 0 &&
+              {this.totalExpenses > 0 && (
                 <div id="expenses" className="first col">
                   <div className="header">
                     <h2>
@@ -107,14 +107,19 @@ class ExpensesSection extends React.Component {
                         id="collective.expenses.title"
                         values={{ n: this.totalExpenses }}
                         defaultMessage="{n, plural, one {Latest expense} other {Latest expenses}}"
-                        />
+                      />
                     </h2>
                     <SmallButton
                       disabled={this.totalExpenses < 5}
                       className="light ViewAllExpensesBtn"
-                      onClick={() => Router.pushRoute(`${collective.path}/expenses`)}
-                      >
-                      <FormattedMessage id="expenses.viewAll" defaultMessage="View All Expenses" />
+                      onClick={() =>
+                        Router.pushRoute(`${collective.path}/expenses`)
+                      }
+                    >
+                      <FormattedMessage
+                        id="expenses.viewAll"
+                        defaultMessage="View All Expenses"
+                      />
                     </SmallButton>
                   </div>
                   <ExpensesWithData
@@ -122,7 +127,7 @@ class ExpensesSection extends React.Component {
                     LoggedInUser={LoggedInUser}
                     view="compact"
                     limit={5}
-                    />
+                  />
                 </div>
               )}
 
@@ -134,14 +139,19 @@ class ExpensesSection extends React.Component {
                         id="collective.transactions.title"
                         values={{ n: this.totalTransactions }}
                         defaultMessage="{n, plural, one {Latest transaction} other {Latest transactions}}"
-                        />
+                      />
                     </h2>
                     <SmallButton
                       disabled={this.totalTransactions < 5}
                       className="light ViewAllTransactionsBtn"
-                      onClick={() => Router.pushRoute(`${collective.path}/transactions`)}
-                      >
-                      <FormattedMessage id="transactions.viewAll" defaultMessage="View All Transactions" />
+                      onClick={() =>
+                        Router.pushRoute(`${collective.path}/transactions`)
+                      }
+                    >
+                      <FormattedMessage
+                        id="transactions.viewAll"
+                        defaultMessage="View All Transactions"
+                      />
                     </SmallButton>
                   </div>
                   <TransactionsWithData
@@ -149,7 +159,7 @@ class ExpensesSection extends React.Component {
                     LoggedInUser={LoggedInUser}
                     limit={5}
                     showCSVlink={false}
-                    />
+                  />
                 </div>
               )}
             </div>

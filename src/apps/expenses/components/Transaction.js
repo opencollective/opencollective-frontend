@@ -100,10 +100,12 @@ class Transaction extends React.Component {
             <AmountCurrency amount={amount} currency={currency} />
           </Flex>
           <Container fontSize="1.2rem" color="#AEB2B8">
-            <a href={`/${fromCollective.slug}`} title={fromCollective.name}>{fromCollective.name}</a>
-            { ' | ' }
+            <a href={`/${fromCollective.slug}`} title={fromCollective.name}>
+              {fromCollective.name}
+            </a>
+            {' | '}
             <Moment relative={true} value={createdAt} />
-            { paymentProcessorFeeInHostCurrency !== undefined &&
+            {paymentProcessorFeeInHostCurrency !== undefined && (
               <Fragment>
                 {' | '}
                 <a

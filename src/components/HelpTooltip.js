@@ -35,11 +35,11 @@ class HelpTooltip extends React.Component {
             max-width: 400px;
             z-index: 1000000;
             background: white !important;
-            color: #6E747A !important;
+            color: #6e747a !important;
             font-size: 12px !important;
             line-height: 18px !important;
-            border: 1px solid rgba(18,19,20,0.12) !important;
-            box-shadow: 0 8px 16px 0 rgba(12,16,20,0.12) !important;
+            border: 1px solid rgba(18, 19, 20, 0.12) !important;
+            box-shadow: 0 8px 16px 0 rgba(12, 16, 20, 0.12) !important;
           }
           .customTooltip.place-bottom::after {
             border-color: white transparent !important;
@@ -47,10 +47,12 @@ class HelpTooltip extends React.Component {
           .helpIcon {
           }
         `}</style>
-        { !this._isMounted &&
-          <a data-tip data-for={this.id}>?</a>
-        }
-        { this._isMounted &&
+        {!this._isMounted && (
+          <a data-tip data-for={this.id}>
+            ?
+          </a>
+        )}
+        {this._isMounted && (
           <div>
             <a data-tip data-for={this.id}>
               <img src={this.iconsrc} className="helpIcon" />

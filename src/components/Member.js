@@ -141,8 +141,13 @@ ${totalDonationsStr}`;
           }
         `}</style>
         <div>
-          { viewMode === 'USER' &&
-            <Link route={'collective'} params={{ slug: this.props.member.member.slug}} target="_top" title={title}>
+          {viewMode === 'USER' && (
+            <Link
+              route={'collective'}
+              params={{ slug: this.props.member.member.slug }}
+              target="_top"
+              title={title}
+            >
               <Avatar src={member.image} radius={45} className="noFrame" />
               <div className="bubble">
                 <div className="name">{name}</div>

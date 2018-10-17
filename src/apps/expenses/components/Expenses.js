@@ -87,13 +87,13 @@ class Expenses extends React.Component {
           .empty {
             text-align: center;
             margin: 4rem;
-            color: ${colors.darkgray}
+            color: ${colors.darkgray};
           }
           .itemsList {
             position: relative;
           }
           .itemsList :global(.item) {
-            border-bottom: 1px solid #E8E9EB;
+            border-bottom: 1px solid #e8e9eb;
           }
           .loading {
             color: ${colors.darkgray};
@@ -105,7 +105,7 @@ class Expenses extends React.Component {
             display: flex;
             justify-content: center;
             align-items: center;
-            background: rgba(255,255,255,0.85);
+            background: rgba(255, 255, 255, 0.85);
             text-transform: uppercase;
             letter-spacing: 3px;
             font-weight: bold;
@@ -169,7 +169,7 @@ class Expenses extends React.Component {
             <div className="loading">
               <FormattedMessage id="loading" defaultMessage="loading" />
             </div>
-          }
+          )}
           {expenses.map(expense => (
             <div className="item" key={expense.id}>
               <Expense
@@ -182,10 +182,10 @@ class Expenses extends React.Component {
                 allowPayAction={!this.state.isPayActionLocked}
                 lockPayAction={this.setPayActionLock.bind(this, true)}
                 unlockPayAction={this.setPayActionLock.bind(this, false)}
-                />
+              />
             </div>
           ))}
-          { expenses.length === 0 &&
+          {expenses.length === 0 && (
             <div className="empty">
               <FormattedMessage
                 id="expenses.empty"

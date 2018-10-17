@@ -267,28 +267,42 @@ class Expense extends React.Component {
           `}
         </style>
 
-          <div className="fromCollective">
-            <a href={`/${expense.fromCollective.slug}`} title={expense.fromCollective.name}>
-              <Avatar src={expense.fromCollective.image} key={expense.fromCollective.id} radius={40} className="noFrame" />
-            </a>
-          </div>
-          <div className="body">
-            <div className="header">
-              <div className="amount pullRight">
-                <AmountCurrency amount={-expense.amount} currency={expense.currency} />
-              </div>
-              <div className="description">
-                <Link route={`/${collective.slug}/expenses/${expense.id}`} title={capitalize(title)}>
-                  {capitalize(title)}
-                  { view !== 'compact' && <span className="ExpenseId">#{expense.id}</span> }
-                </Link>
-              </div>
-              <div className="meta">
-                <Moment relative={true} value={expense.incurredAt} />
-                { ' | ' }
-                { includeHostedCollectives &&
-
-
+        <div className="fromCollective">
+          <a
+            href={`/${expense.fromCollective.slug}`}
+            title={expense.fromCollective.name}
+          >
+            <Avatar
+              src={expense.fromCollective.image}
+              key={expense.fromCollective.id}
+              radius={40}
+              className="noFrame"
+            />
+          </a>
+        </div>
+        <div className="body">
+          <div className="header">
+            <div className="amount pullRight">
+              <AmountCurrency
+                amount={-expense.amount}
+                currency={expense.currency}
+              />
+            </div>
+            <div className="description">
+              <Link
+                route={`/${collective.slug}/expenses/${expense.id}`}
+                title={capitalize(title)}
+              >
+                {capitalize(title)}
+                {view !== 'compact' && (
+                  <span className="ExpenseId">#{expense.id}</span>
+                )}
+              </Link>
+            </div>
+            <div className="meta">
+              <Moment relative={true} value={expense.incurredAt} />
+              {' | '}
+              {includeHostedCollectives && (
                 <span className="collective">
                   <Link route={`/${expense.collective.slug}`}>
                     {expense.collective.slug}

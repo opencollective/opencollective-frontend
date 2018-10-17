@@ -15,7 +15,6 @@ import Body from '../components/Body';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
 import HomepageActivityItem from '../components/HomepageActivityItem';
-import { Link } from '../server/pages';
 import { Span, P, H1, H2, H3, H4 } from '../components/Text';
 import ListItem from '../components/ListItem';
 import Hide from '../components/Hide';
