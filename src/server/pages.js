@@ -80,9 +80,7 @@ pages
   .add(
     'expenses',
     '/:parentCollectiveSlug?/:collectiveType(events)?/:collectiveSlug/expenses/:filter(categories|recipients)?/:value?',
-  )
-  .add('collective', '/:slug')
-  .add('editCollective', '/:slug/edit');
+  );
 
 if (USE_PLEDGES) {
   pages
@@ -100,6 +98,14 @@ pages
     '/:collectiveSlug/applications/:type(apiKey|oauth)?/new',
   )
   .add('editApplication', '/:collectiveSlug/applications/:applicationId/edit');
+
+// Marketing Pages
+
+pages.add('marketing', '/:pageSlug(sponsor)', 'marketingPage');
+
+// Collective
+
+pages.add('collective', '/:slug').add('editCollective', '/:slug/edit');
 
 export default pages;
 

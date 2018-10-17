@@ -57,6 +57,44 @@ const nextConfig = {
       ],
     });
 
+    // Configuration for static/marketing pages
+    config.module.rules.unshift(
+      {
+        test: /static\/.*\.(html)$/,
+        use: {
+          loader: 'html-loader',
+        },
+      },
+      {
+        test: /static\/.*\.(css)$/,
+        use: {
+          loader: 'raw-loader',
+        },
+      },
+      {
+        test: /static\/.*\.(js)$/,
+        use: {
+          loader: 'file-loader',
+          options: {
+            publicPath: '/_next/static/js/',
+            outputPath: 'static/js/',
+            name: '[name]-[hash].[ext]',
+          },
+        },
+      },
+      {
+        test: /static\/.*\.(jpg|gif|png|svg)$/,
+        use: {
+          loader: 'file-loader',
+          options: {
+            publicPath: '/_next/static/img/',
+            outputPath: 'static/img/',
+            name: '[name]-[hash].[ext]',
+          },
+        },
+      },
+    );
+
     // Disable the rule forcing react to be bundled in commons chunk
     // Currently needed to skip the react-dom shipped by react-tag-input
     if (get(config, 'optimization.splitChunks.cacheGroups.react')) {
