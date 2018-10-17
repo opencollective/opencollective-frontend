@@ -235,16 +235,18 @@ export const webhook = (req, res, next) => {
       collective = g;
     })
     // We fetch all the recipients of that mailing list to give a preview in the approval email
-    .then(collective =>
-      models.Notification.getSubscribers(collective.slug, mailinglist),
-    )
+    .then(collective => models.Notification.getSubscribersCollectives(collective.slug, mailinglist))
     .tap(results => {
       debugWebhook('getSubscribers', mailinglist, results);
       if (results.length === 0) throw new Error('no_subscribers');
       subscribers = results.map(s => {
-        s.roundedAvatar = `https://res.cloudinary.com/opencollective/image/fetch/c_thumb,g_face,h_48,r_max,w_48,bo_3px_solid_white/c_thumb,h_48,r_max,w_48,bo_2px_solid_rgb:66C71A/e_trim/f_auto/${encodeURIComponent(
-          s.image,
-        )}`;
+        if (s.image) {
+          s.roundedAvatar = `https://res.cloudinary.com/opencollective/image/fetch/c_thumb,g_face,h_48,r_max,w_48,bo_3px_solid_white/c_thumb,h_48,r_max,w_48,bo_2px_solid_rgb:66C71A/e_trim/f_auto/${encodeURIComponent(
+            s.image,
+          )}`;
+        } else {
+          s.roundedAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(s.name)}&rounded=true&size=48`;
+        }
         return s;
       });
     })

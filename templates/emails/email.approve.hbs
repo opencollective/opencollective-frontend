@@ -3,29 +3,9 @@ Subject: Please approve: {{subject}}
 {{> header}}
 
 <style>
-.btn {
-  background: #dde1e4;
-  background-color: #80d823;
-  border: 1px solid transparent;
-  border-radius: 28px;
-  display: inline-block;
-  padding: .75rem 1rem;
-  text-transform: uppercase;
-  text-align: center;
-  font-weight: 700;
-  min-width: 150px;
-  box-sizing: border-box;
-  vertical-align: middle;
-}
-
-.btn a {
-  color: #fff;
-  text-decoration: none;
-}
-
-.image {
-  margin: 0px 1px;
-}
+  .image {
+    margin: 0px 1px;
+  }
 </style>
 
 <table width="100%">
@@ -40,7 +20,8 @@ Subject: Please approve: {{subject}}
   <tr>
     <td>
       {{#each latestSubscribers}}
-        <a href="https://opencollective.com/{{username}}"><img alt="{{name}}" src="{{roundedAvatar}}" width=24 height=24 border=0 class="image" /></a>
+      <a href="https://opencollective.com/{{username}}"><img alt="{{name}}" src="{{roundedAvatar}}" width=24 height=24
+          border=0 class="image" /></a>
       {{/each}}
     </td>
   </tr>
@@ -58,7 +39,11 @@ Subject: Please approve: {{subject}}
     <td colspan=2 height=20></td>
   </tr>
   <tr>
-    <td colspan=2 align="center"><div class="btn"><a href="{{approve_url}}">Approve</a></div></td>
+    <td colspan=2 align="center">
+      <a href="{{approve_url}}" class="btn blue">
+        <div>APPROVE</div>
+      </a>
+    </td>
   </tr>
 </table>
 

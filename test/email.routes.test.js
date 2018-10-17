@@ -50,6 +50,8 @@ const usersData = [
     firstName: 'github',
     lastName: '',
     email: 'github+test@opencollective.com',
+    image:
+      'https://assets-cdn.github.com/images/modules/logos_page/GitHub-Logo.png',
     role: 'BACKER',
   },
 ];
@@ -138,13 +140,26 @@ describe('email.routes.test', () => {
       .send(webhookBodyPayload)
       .then(res => {
         expect(res.statusCode).to.equal(200);
-        if (spy.args[0][1] !== 'admins@testcollective.opencollective.com') {
-          utils.inspectSpy(spy, 4);
+        const emailSentTo = [];
+        for (let i = 0; i < spy.args.length; i++) {
+          if (spy.args[i][0] === 'email.approve') {
+            // We expect that the email.to is admins@testcollective.opencollective.com
+            expect(spy.args[i][1]).to.equal(
+              'admins@testcollective.opencollective.com',
+            );
+            // We check that latest subscribers are present with their avatar (or default avatar)
+            const latestSubscribers = spy.args[i][2].latestSubscribers.sort(
+              (a, b) => (a.name === b.name ? 0 : a.name < b.name ? 1 : -1),
+            );
+            expect(latestSubscribers[0].roundedAvatar).to.equal(
+              'https://res.cloudinary.com/opencollective/image/fetch/c_thumb,g_face,h_48,r_max,w_48,bo_3px_solid_white/c_thumb,h_48,r_max,w_48,bo_2px_solid_rgb:66C71A/e_trim/f_auto/https%3A%2F%2Fassets-cdn.github.com%2Fimages%2Fmodules%2Flogos_page%2FGitHub-Logo.png',
+            );
+            expect(latestSubscribers[1].roundedAvatar).to.equal(
+              'https://ui-avatars.com/api/?name=Pia%20Mancini&rounded=true&size=48',
+            );
+            emailSentTo.push(spy.args[i][3].bcc);
+          }
         }
-        expect(spy.args[0][1]).to.equal(
-          'admins@testcollective.opencollective.com',
-        );
-        const emailSentTo = [spy.args[0][3].bcc, spy.args[1][3].bcc];
         expect(emailSentTo.indexOf(usersData[0].email) !== -1).to.be.true;
         expect(emailSentTo.indexOf(usersData[1].email) !== -1).to.be.true;
       });
@@ -188,15 +203,21 @@ describe('email.routes.test', () => {
         )}`,
       )
       .then(() => {
-        expect(spy.callCount).to.equal(2);
-        expect(spy.args[0][1]).to.equal(
+        const emailsSent = spy.args.filter(c => c[0] === 'email.message');
+        const emailData = emailsSent[0][2];
+        expect(emailData.sender.email).to.equal(usersData[0].email);
+        expect(emailData.sender.image).to.equal(usersData[0].image);
+        expect(emailData.approver.email).to.equal(usersData[1].email);
+        expect(emailData.approver.image).to.equal(usersData[1].image);
+        expect(emailsSent.length).to.equal(2);
+        expect(emailsSent[0][1]).to.equal(
           'admins@testcollective.opencollective.com',
         );
-        expect(spy.args[0][2].subject).to.equal('test collective admins');
-        expect([spy.args[0][3].bcc, spy.args[1][3].bcc]).to.contain(
+        expect(emailsSent[0][2].subject).to.equal('test collective admins');
+        expect([emailsSent[0][3].bcc, emailsSent[1][3].bcc]).to.contain(
           usersData[0].email,
         );
-        expect(spy.args[0][3].from).to.equal(
+        expect(emailsSent[0][3].from).to.equal(
           'testcollective collective <hello@testcollective.opencollective.com>',
         );
       });
