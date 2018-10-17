@@ -180,6 +180,7 @@ const getCollectiveToEditQuery = gql`
       longDescription
       tags
       twitterHandle
+      githubHandle
       website
       currency
       settings
@@ -300,6 +301,7 @@ const getCollectiveQuery = gql`
       description
       longDescription
       twitterHandle
+      githubHandle
       website
       currency
       settings

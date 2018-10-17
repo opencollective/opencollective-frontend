@@ -78,6 +78,7 @@ const editCollectiveQuery = gql`
       longDescription
       website
       twitterHandle
+      githubHandle
       isActive
       host {
         id
@@ -214,6 +215,7 @@ export const addCreateCollectiveMutation = graphql(createCollectiveQuery, {
         'longDescription',
         'location',
         'twitterHandle',
+        'githubHandle',
         'website',
         'tags',
         'startsAt',
@@ -262,6 +264,7 @@ export const addEditCollectiveMutation = graphql(editCollectiveQuery, {
         'expensePolicy',
         'website',
         'twitterHandle',
+        'githubHandle',
         'location',
         'startsAt',
         'endsAt',

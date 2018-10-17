@@ -238,6 +238,7 @@
   "collective.longDescription.label": "Longue description",
   "collective.expensePolicy.placeholder": "E.g. Vous pouvez soumettre vos dépenses de déplacement jusqu'à €50. Vous pouvez également soumettre vos dépenses de boisson et nourriture pour les meetups. Pour tout autre dépense, merci de nous demander! ",
   "collective.twitterHandle.label": "Twitter",
+  "collective.githubHandle.label": "Github",
   "collective.markdown.label": "Éditeur de texte par défaut",
   "collective.markdown.description": "Utiliser markdown comme éditeur",
   "collective.sendInvoiceByEmail.label": "Factures",
