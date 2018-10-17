@@ -43,9 +43,12 @@ class TransactionDetails extends React.Component {
   render() {
     const { intl, collective, LoggedInUser, transaction } = this.props;
 
+    // can refund if root user or if admin of collective (only for collectives hosted by /brusselstogetherasbl for now)
     const canRefund =
       LoggedInUser &&
-      (LoggedInUser.isRoot() || LoggedInUser.canEditCollective(collective));
+      (LoggedInUser.isRoot() ||
+        (get(transaction, 'host.id') === 9802 &&
+          LoggedInUser.canEditCollective(collective)));
 
     const type = transaction.type.toLowerCase();
     const hostFeePercent =
