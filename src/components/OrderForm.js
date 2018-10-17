@@ -1203,6 +1203,7 @@ class OrderForm extends React.Component {
                   name="fromCollectiveSelector"
                   onChange={CollectiveId => this.selectProfile(CollectiveId)}
                   options={this.fromCollectiveOptions}
+                  defaultValue={get(order, 'fromCollective.id')}
                 />
               )}
 

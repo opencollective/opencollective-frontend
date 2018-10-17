@@ -68,7 +68,7 @@ class ClaimCollectivePage extends React.Component {
           claimCollective: { slug },
         },
       } = await this.props.claimCollective(id);
-      Router.pushRoute(`/${slug}`);
+      Router.pushRoute('collective', { slug });
     } catch (error) {
       this.setState({ error });
     }
@@ -108,7 +108,8 @@ class ClaimCollectivePage extends React.Component {
       html_url.includes(websitePath),
     );
 
-    const isAdmin = (repo && repo.pemissions.admin) || true;
+    const isAdmin =
+      (repo && repo.pemissions.admin) || process.env.NODE_ENV === 'development';
 
     return (
       <Fragment>
