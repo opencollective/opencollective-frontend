@@ -124,6 +124,25 @@ export default function(Sequelize, DataTypes) {
     );
   };
 
+  Notification.getSubscribersCollectives = async (
+    collectiveSlug,
+    mailinglist,
+  ) => {
+    debug('getSubscribersCollectives', collectiveSlug, mailinglist);
+    const getCollectives = memberships => {
+      if (!memberships || memberships.length === 0) return [];
+      return models.Collective.findAll({
+        where: {
+          id: { [Op.in]: memberships.map(m => m.MemberCollectiveId) },
+        },
+      });
+    };
+
+    return await Notification.getSubscribers(collectiveSlug, mailinglist).then(
+      getCollectives,
+    );
+  };
+
   /**
    * Get an array of all the UserId that have unsubscribed from the `notificationType` notification for (optional) CollectiveId
    * @param {*} notificationType
