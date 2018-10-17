@@ -42,6 +42,11 @@ class TransactionDetails extends React.Component {
 
   render() {
     const { intl, collective, LoggedInUser, transaction } = this.props;
+
+    const canRefund =
+      LoggedInUser &&
+      (LoggedInUser.isRoot() || LoggedInUser.canEditCollective(collective));
+
     const type = transaction.type.toLowerCase();
     const hostFeePercent =
       transaction.host && `${transaction.host.hostFeePercent}%`;
@@ -248,15 +253,14 @@ class TransactionDetails extends React.Component {
             </div>
           )}
         <div className="actions">
-          {LoggedInUser &&
-            LoggedInUser.isRoot() && (
-              <div className="transactionActions">
-                <RefundTransactionBtn
-                  transaction={transaction}
-                  collective={collective}
-                />
-              </div>
-            )}
+          {canRefund && (
+            <div className="transactionActions">
+              <RefundTransactionBtn
+                transaction={transaction}
+                collective={collective}
+              />
+            </div>
+          )}
         </div>
       </div>
     );
