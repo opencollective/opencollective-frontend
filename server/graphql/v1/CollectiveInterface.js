@@ -1024,13 +1024,16 @@ const CollectiveFields = () => {
         status: { type: OrderStatusType },
       },
       resolve(collective, args = {}) {
+        const where = {};
+
+        if (args.status) {
+          where.status = args.status;
+        } else {
+          where.processedAt = { [Op.ne]: null };
+        }
+
         return collective.getIncomingOrders({
-          where: {
-            [Op.or]: [
-              { processedAt: { [Op.ne]: null } },
-              args,
-            ],
-          },
+          where,
           order: [ ['createdAt', 'DESC'] ]
         });
       },
