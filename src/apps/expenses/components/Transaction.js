@@ -80,7 +80,7 @@ class Transaction extends React.Component {
           </a>
         </Container>
         <Container ml={3} width={1}>
-          <Flex justifyContent="space-between" alignItems="center">
+          <Flex justifyContent="space-between" alignItems="baseline">
             <div>
               <P fontSize="1.4rem" color="#313233" display="inline">
                 {description}
