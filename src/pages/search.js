@@ -163,7 +163,7 @@ class SearchPage extends React.Component {
                   <Flex key={collective.slug} my={3} mx={2}>
                     <CollectiveCard collective={collective} />
                   </Flex>
-                ))}
+              ))}
 
               {/* TODO: add suggested collectives when the result is empty */}
               {showCollectives &&
@@ -232,6 +232,42 @@ class SearchPage extends React.Component {
                         </li>
                       ))}
                   </ul>
+                </Flex>
+              )}
+
+              {showCollectives && collectives.length !== 0 && (
+                <Flex
+                  py={3}
+                  width={1}
+                  justifyContent="center"
+                  flexDirection="column"
+                  alignItems="center"
+                >
+                  <p>
+                    <em>
+                      If you don't see the collective you're searching for:
+                    </em>
+                  </p>
+
+                  {usePledges && (
+                    <Link route={`/pledges/new?name=${term}`} passHref>
+                      <StyledLink
+                        bg="#3385FF"
+                        borderRadius="50px"
+                        color="white"
+                        display="block"
+                        fontSize="14px"
+                        fontWeight="bold"
+                        maxWidth="220px"
+                        hover={{ color: 'white' }}
+                        py={2}
+                        px={4}
+                        textAlign="center"
+                      >
+                        Make a pledge
+                      </StyledLink>
+                    </Link>
+                  )}
                 </Flex>
               )}
           </Container>
