@@ -360,15 +360,6 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   left: 0.2rem;
 }
 
-.c44 {
-  color: #6E747A;
-  display: block;
-  font-size: 1.4rem;
-  font-weight: 400;
-  margin: 0px;
-  padding: 0px;
-}
-
 .c29 {
   background-color: #3385FF;
   border-radius: 50px;
@@ -425,6 +416,15 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
 .c37:hover,
 .c37:focus {
   opacity: 1;
+}
+
+.c44 {
+  color: #6e747a;
+  display: block;
+  fontsize: 1.4rem;
+  fontweight: 400;
+  margin: 0;
+  padding: 0;
 }
 
 .c42 {
@@ -1089,13 +1089,8 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
               className="c43"
             >
               <a
-                className="c44"
-                color="#6E747A"
-                display="block"
-                fontSize="1.4rem"
-                fontWeight="400"
+                className="c44 "
                 href="/discover"
-                onClick={[Function]}
               >
                 Discover
               </a>
@@ -1104,13 +1099,8 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
               className="c43"
             >
               <a
-                className="c44"
-                color="#6E747A"
-                display="block"
-                fontSize="1.4rem"
-                fontWeight="400"
+                className="c44 "
                 href="/learn-more"
-                onClick={[Function]}
               >
                 How it Works
               </a>
@@ -1119,11 +1109,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
               className="c43"
             >
               <a
-                className="c44"
-                color="#6E747A"
-                display="block"
-                fontSize="1.4rem"
-                fontWeight="400"
+                className="c44 "
                 href="/opensource"
                 onClick={[Function]}
               >
@@ -1134,11 +1120,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
               className="c43"
             >
               <a
-                className="c44"
-                color="#6E747A"
-                display="block"
-                fontSize="1.4rem"
-                fontWeight="400"
+                className="c44 "
                 href="/signin"
                 onClick={[Function]}
               >
@@ -1149,11 +1131,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
               className="c43"
             >
               <a
-                className="c44"
-                color="#6E747A"
-                display="block"
-                fontSize="1.4rem"
-                fontWeight="400"
+                className="c44 "
                 href="/signin"
                 onClick={[Function]}
               >
@@ -1177,11 +1155,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
               className="c43"
             >
               <a
-                className="c44"
-                color="#6E747A"
-                display="block"
-                fontSize="1.4rem"
-                fontWeight="400"
+                className="c44 "
                 href="/create"
                 onClick={[Function]}
               >
@@ -1192,11 +1166,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
               className="c43"
             >
               <a
-                className="c44"
-                color="#6E747A"
-                display="block"
-                fontSize="1.4rem"
-                fontWeight="400"
+                className="c44 "
                 href="/organizations/new"
                 onClick={[Function]}
               >
@@ -1207,11 +1177,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
               className="c43"
             >
               <a
-                className="c44"
-                color="#6E747A"
-                display="block"
-                fontSize="1.4rem"
-                fontWeight="400"
+                className="c44 "
                 href="/chapters"
                 onClick={[Function]}
               >
@@ -1235,11 +1201,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
               className="c43"
             >
               <a
-                className="c44"
-                color="#6E747A"
-                display="block"
-                fontSize="1.4rem"
-                fontWeight="400"
+                className="c44 "
                 href="/opensource"
                 onClick={[Function]}
               >
@@ -1250,11 +1212,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
               className="c43"
             >
               <a
-                className="c44"
-                color="#6E747A"
-                display="block"
-                fontSize="1.4rem"
-                fontWeight="400"
+                className="c44 "
                 href="https://github.com/opencollective/opencollective/issues"
                 onClick={[Function]}
               >
@@ -1265,11 +1223,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
               className="c43"
             >
               <a
-                className="c44"
-                color="#6E747A"
-                display="block"
-                fontSize="1.4rem"
-                fontWeight="400"
+                className="c44 "
                 href="https://slack.opencollective.com"
                 onClick={[Function]}
               >
@@ -1280,11 +1234,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
               className="c43"
             >
               <a
-                className="c44"
-                color="#6E747A"
-                display="block"
-                fontSize="1.4rem"
-                fontWeight="400"
+                className="c44 "
                 href="https://github.com/opencollective/opencollective/wiki"
                 onClick={[Function]}
               >
@@ -1295,11 +1245,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
               className="c43"
             >
               <a
-                className="c44"
-                color="#6E747A"
-                display="block"
-                fontSize="1.4rem"
-                fontWeight="400"
+                className="c44 "
                 href="mailto:support@opencollective.com"
                 onClick={[Function]}
               >
@@ -1323,11 +1269,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
               className="c43"
             >
               <a
-                className="c44"
-                color="#6E747A"
-                display="block"
-                fontSize="1.4rem"
-                fontWeight="400"
+                className="c44 "
                 href="/about"
                 onClick={[Function]}
               >
@@ -1338,11 +1280,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
               className="c43"
             >
               <a
-                className="c44"
-                color="#6E747A"
-                display="block"
-                fontSize="1.4rem"
-                fontWeight="400"
+                className="c44 "
                 href="/faq"
                 onClick={[Function]}
               >
@@ -1353,11 +1291,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
               className="c43"
             >
               <a
-                className="c44"
-                color="#6E747A"
-                display="block"
-                fontSize="1.4rem"
-                fontWeight="400"
+                className="c44 "
                 href="https://medium.com/open-collective"
                 onClick={[Function]}
               >
@@ -1368,11 +1302,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
               className="c43"
             >
               <a
-                className="c44"
-                color="#6E747A"
-                display="block"
-                fontSize="1.4rem"
-                fontWeight="400"
+                className="c44 "
                 href="/tos"
                 onClick={[Function]}
               >
@@ -1383,11 +1313,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
               className="c43"
             >
               <a
-                className="c44"
-                color="#6E747A"
-                display="block"
-                fontSize="1.4rem"
-                fontWeight="400"
+                className="c44 "
                 href="/privacypolicy"
                 onClick={[Function]}
               >
@@ -1762,15 +1688,6 @@ exports[`Search Page renders empty results message 1`] = `
   left: 0.2rem;
 }
 
-.c43 {
-  color: #6E747A;
-  display: block;
-  font-size: 1.4rem;
-  font-weight: 400;
-  margin: 0px;
-  padding: 0px;
-}
-
 .c42 {
   list-style: none;
   margin-bottom: 8px;
@@ -1811,6 +1728,15 @@ exports[`Search Page renders empty results message 1`] = `
 .c36:hover,
 .c36:focus {
   opacity: 1;
+}
+
+.c43 {
+  color: #6e747a;
+  display: block;
+  fontsize: 1.4rem;
+  fontweight: 400;
+  margin: 0;
+  padding: 0;
 }
 
 .c41 {
@@ -2464,13 +2390,8 @@ exports[`Search Page renders empty results message 1`] = `
               className="c42"
             >
               <a
-                className="c43"
-                color="#6E747A"
-                display="block"
-                fontSize="1.4rem"
-                fontWeight="400"
+                className="c43 "
                 href="/discover"
-                onClick={[Function]}
               >
                 Discover
               </a>
@@ -2479,13 +2400,8 @@ exports[`Search Page renders empty results message 1`] = `
               className="c42"
             >
               <a
-                className="c43"
-                color="#6E747A"
-                display="block"
-                fontSize="1.4rem"
-                fontWeight="400"
+                className="c43 "
                 href="/learn-more"
-                onClick={[Function]}
               >
                 How it Works
               </a>
@@ -2494,11 +2410,7 @@ exports[`Search Page renders empty results message 1`] = `
               className="c42"
             >
               <a
-                className="c43"
-                color="#6E747A"
-                display="block"
-                fontSize="1.4rem"
-                fontWeight="400"
+                className="c43 "
                 href="/opensource"
                 onClick={[Function]}
               >
@@ -2509,11 +2421,7 @@ exports[`Search Page renders empty results message 1`] = `
               className="c42"
             >
               <a
-                className="c43"
-                color="#6E747A"
-                display="block"
-                fontSize="1.4rem"
-                fontWeight="400"
+                className="c43 "
                 href="/signin"
                 onClick={[Function]}
               >
@@ -2524,11 +2432,7 @@ exports[`Search Page renders empty results message 1`] = `
               className="c42"
             >
               <a
-                className="c43"
-                color="#6E747A"
-                display="block"
-                fontSize="1.4rem"
-                fontWeight="400"
+                className="c43 "
                 href="/signin"
                 onClick={[Function]}
               >
@@ -2552,11 +2456,7 @@ exports[`Search Page renders empty results message 1`] = `
               className="c42"
             >
               <a
-                className="c43"
-                color="#6E747A"
-                display="block"
-                fontSize="1.4rem"
-                fontWeight="400"
+                className="c43 "
                 href="/create"
                 onClick={[Function]}
               >
@@ -2567,11 +2467,7 @@ exports[`Search Page renders empty results message 1`] = `
               className="c42"
             >
               <a
-                className="c43"
-                color="#6E747A"
-                display="block"
-                fontSize="1.4rem"
-                fontWeight="400"
+                className="c43 "
                 href="/organizations/new"
                 onClick={[Function]}
               >
@@ -2582,11 +2478,7 @@ exports[`Search Page renders empty results message 1`] = `
               className="c42"
             >
               <a
-                className="c43"
-                color="#6E747A"
-                display="block"
-                fontSize="1.4rem"
-                fontWeight="400"
+                className="c43 "
                 href="/chapters"
                 onClick={[Function]}
               >
@@ -2610,11 +2502,7 @@ exports[`Search Page renders empty results message 1`] = `
               className="c42"
             >
               <a
-                className="c43"
-                color="#6E747A"
-                display="block"
-                fontSize="1.4rem"
-                fontWeight="400"
+                className="c43 "
                 href="/opensource"
                 onClick={[Function]}
               >
@@ -2625,11 +2513,7 @@ exports[`Search Page renders empty results message 1`] = `
               className="c42"
             >
               <a
-                className="c43"
-                color="#6E747A"
-                display="block"
-                fontSize="1.4rem"
-                fontWeight="400"
+                className="c43 "
                 href="https://github.com/opencollective/opencollective/issues"
                 onClick={[Function]}
               >
@@ -2640,11 +2524,7 @@ exports[`Search Page renders empty results message 1`] = `
               className="c42"
             >
               <a
-                className="c43"
-                color="#6E747A"
-                display="block"
-                fontSize="1.4rem"
-                fontWeight="400"
+                className="c43 "
                 href="https://slack.opencollective.com"
                 onClick={[Function]}
               >
@@ -2655,11 +2535,7 @@ exports[`Search Page renders empty results message 1`] = `
               className="c42"
             >
               <a
-                className="c43"
-                color="#6E747A"
-                display="block"
-                fontSize="1.4rem"
-                fontWeight="400"
+                className="c43 "
                 href="https://github.com/opencollective/opencollective/wiki"
                 onClick={[Function]}
               >
@@ -2670,11 +2546,7 @@ exports[`Search Page renders empty results message 1`] = `
               className="c42"
             >
               <a
-                className="c43"
-                color="#6E747A"
-                display="block"
-                fontSize="1.4rem"
-                fontWeight="400"
+                className="c43 "
                 href="mailto:support@opencollective.com"
                 onClick={[Function]}
               >
@@ -2698,11 +2570,7 @@ exports[`Search Page renders empty results message 1`] = `
               className="c42"
             >
               <a
-                className="c43"
-                color="#6E747A"
-                display="block"
-                fontSize="1.4rem"
-                fontWeight="400"
+                className="c43 "
                 href="/about"
                 onClick={[Function]}
               >
@@ -2713,11 +2581,7 @@ exports[`Search Page renders empty results message 1`] = `
               className="c42"
             >
               <a
-                className="c43"
-                color="#6E747A"
-                display="block"
-                fontSize="1.4rem"
-                fontWeight="400"
+                className="c43 "
                 href="/faq"
                 onClick={[Function]}
               >
@@ -2728,11 +2592,7 @@ exports[`Search Page renders empty results message 1`] = `
               className="c42"
             >
               <a
-                className="c43"
-                color="#6E747A"
-                display="block"
-                fontSize="1.4rem"
-                fontWeight="400"
+                className="c43 "
                 href="https://medium.com/open-collective"
                 onClick={[Function]}
               >
@@ -2743,11 +2603,7 @@ exports[`Search Page renders empty results message 1`] = `
               className="c42"
             >
               <a
-                className="c43"
-                color="#6E747A"
-                display="block"
-                fontSize="1.4rem"
-                fontWeight="400"
+                className="c43 "
                 href="/tos"
                 onClick={[Function]}
               >
@@ -2758,11 +2614,7 @@ exports[`Search Page renders empty results message 1`] = `
               className="c42"
             >
               <a
-                className="c43"
-                color="#6E747A"
-                display="block"
-                fontSize="1.4rem"
-                fontWeight="400"
+                className="c43 "
                 href="/privacypolicy"
                 onClick={[Function]}
               >
@@ -3078,15 +2930,6 @@ exports[`Search Page renders error message 1`] = `
   width: 100%;
 }
 
-.c42 {
-  color: #6E747A;
-  display: block;
-  font-size: 1.4rem;
-  font-weight: 400;
-  margin: 0px;
-  padding: 0px;
-}
-
 .c27 {
   border: 1px solid #D5DAE0;
   border-radius: 20px;
@@ -3167,6 +3010,15 @@ exports[`Search Page renders error message 1`] = `
 .c35:hover,
 .c35:focus {
   opacity: 1;
+}
+
+.c42 {
+  color: #6e747a;
+  display: block;
+  fontsize: 1.4rem;
+  fontweight: 400;
+  margin: 0;
+  padding: 0;
 }
 
 .c40 {
@@ -3761,13 +3613,8 @@ exports[`Search Page renders error message 1`] = `
               className="c41"
             >
               <a
-                className="c42"
-                color="#6E747A"
-                display="block"
-                fontSize="1.4rem"
-                fontWeight="400"
+                className="c42 "
                 href="/discover"
-                onClick={[Function]}
               >
                 Discover
               </a>
@@ -3776,13 +3623,8 @@ exports[`Search Page renders error message 1`] = `
               className="c41"
             >
               <a
-                className="c42"
-                color="#6E747A"
-                display="block"
-                fontSize="1.4rem"
-                fontWeight="400"
+                className="c42 "
                 href="/learn-more"
-                onClick={[Function]}
               >
                 How it Works
               </a>
@@ -3791,11 +3633,7 @@ exports[`Search Page renders error message 1`] = `
               className="c41"
             >
               <a
-                className="c42"
-                color="#6E747A"
-                display="block"
-                fontSize="1.4rem"
-                fontWeight="400"
+                className="c42 "
                 href="/opensource"
                 onClick={[Function]}
               >
@@ -3806,11 +3644,7 @@ exports[`Search Page renders error message 1`] = `
               className="c41"
             >
               <a
-                className="c42"
-                color="#6E747A"
-                display="block"
-                fontSize="1.4rem"
-                fontWeight="400"
+                className="c42 "
                 href="/signin"
                 onClick={[Function]}
               >
@@ -3821,11 +3655,7 @@ exports[`Search Page renders error message 1`] = `
               className="c41"
             >
               <a
-                className="c42"
-                color="#6E747A"
-                display="block"
-                fontSize="1.4rem"
-                fontWeight="400"
+                className="c42 "
                 href="/signin"
                 onClick={[Function]}
               >
@@ -3849,11 +3679,7 @@ exports[`Search Page renders error message 1`] = `
               className="c41"
             >
               <a
-                className="c42"
-                color="#6E747A"
-                display="block"
-                fontSize="1.4rem"
-                fontWeight="400"
+                className="c42 "
                 href="/create"
                 onClick={[Function]}
               >
@@ -3864,11 +3690,7 @@ exports[`Search Page renders error message 1`] = `
               className="c41"
             >
               <a
-                className="c42"
-                color="#6E747A"
-                display="block"
-                fontSize="1.4rem"
-                fontWeight="400"
+                className="c42 "
                 href="/organizations/new"
                 onClick={[Function]}
               >
@@ -3879,11 +3701,7 @@ exports[`Search Page renders error message 1`] = `
               className="c41"
             >
               <a
-                className="c42"
-                color="#6E747A"
-                display="block"
-                fontSize="1.4rem"
-                fontWeight="400"
+                className="c42 "
                 href="/chapters"
                 onClick={[Function]}
               >
@@ -3907,11 +3725,7 @@ exports[`Search Page renders error message 1`] = `
               className="c41"
             >
               <a
-                className="c42"
-                color="#6E747A"
-                display="block"
-                fontSize="1.4rem"
-                fontWeight="400"
+                className="c42 "
                 href="/opensource"
                 onClick={[Function]}
               >
@@ -3922,11 +3736,7 @@ exports[`Search Page renders error message 1`] = `
               className="c41"
             >
               <a
-                className="c42"
-                color="#6E747A"
-                display="block"
-                fontSize="1.4rem"
-                fontWeight="400"
+                className="c42 "
                 href="https://github.com/opencollective/opencollective/issues"
                 onClick={[Function]}
               >
@@ -3937,11 +3747,7 @@ exports[`Search Page renders error message 1`] = `
               className="c41"
             >
               <a
-                className="c42"
-                color="#6E747A"
-                display="block"
-                fontSize="1.4rem"
-                fontWeight="400"
+                className="c42 "
                 href="https://slack.opencollective.com"
                 onClick={[Function]}
               >
@@ -3952,11 +3758,7 @@ exports[`Search Page renders error message 1`] = `
               className="c41"
             >
               <a
-                className="c42"
-                color="#6E747A"
-                display="block"
-                fontSize="1.4rem"
-                fontWeight="400"
+                className="c42 "
                 href="https://github.com/opencollective/opencollective/wiki"
                 onClick={[Function]}
               >
@@ -3967,11 +3769,7 @@ exports[`Search Page renders error message 1`] = `
               className="c41"
             >
               <a
-                className="c42"
-                color="#6E747A"
-                display="block"
-                fontSize="1.4rem"
-                fontWeight="400"
+                className="c42 "
                 href="mailto:support@opencollective.com"
                 onClick={[Function]}
               >
@@ -3995,11 +3793,7 @@ exports[`Search Page renders error message 1`] = `
               className="c41"
             >
               <a
-                className="c42"
-                color="#6E747A"
-                display="block"
-                fontSize="1.4rem"
-                fontWeight="400"
+                className="c42 "
                 href="/about"
                 onClick={[Function]}
               >
@@ -4010,11 +3804,7 @@ exports[`Search Page renders error message 1`] = `
               className="c41"
             >
               <a
-                className="c42"
-                color="#6E747A"
-                display="block"
-                fontSize="1.4rem"
-                fontWeight="400"
+                className="c42 "
                 href="/faq"
                 onClick={[Function]}
               >
@@ -4025,11 +3815,7 @@ exports[`Search Page renders error message 1`] = `
               className="c41"
             >
               <a
-                className="c42"
-                color="#6E747A"
-                display="block"
-                fontSize="1.4rem"
-                fontWeight="400"
+                className="c42 "
                 href="https://medium.com/open-collective"
                 onClick={[Function]}
               >
@@ -4040,11 +3826,7 @@ exports[`Search Page renders error message 1`] = `
               className="c41"
             >
               <a
-                className="c42"
-                color="#6E747A"
-                display="block"
-                fontSize="1.4rem"
-                fontWeight="400"
+                className="c42 "
                 href="/tos"
                 onClick={[Function]}
               >
@@ -4055,11 +3837,7 @@ exports[`Search Page renders error message 1`] = `
               className="c41"
             >
               <a
-                className="c42"
-                color="#6E747A"
-                display="block"
-                fontSize="1.4rem"
-                fontWeight="400"
+                className="c42 "
                 href="/privacypolicy"
                 onClick={[Function]}
               >
@@ -4427,15 +4205,6 @@ exports[`Search Page renders loading grid SVG 1`] = `
   left: 0.2rem;
 }
 
-.c43 {
-  color: #6E747A;
-  display: block;
-  font-size: 1.4rem;
-  font-weight: 400;
-  margin: 0px;
-  padding: 0px;
-}
-
 .c42 {
   list-style: none;
   margin-bottom: 8px;
@@ -4476,6 +4245,15 @@ exports[`Search Page renders loading grid SVG 1`] = `
 .c36:hover,
 .c36:focus {
   opacity: 1;
+}
+
+.c43 {
+  color: #6e747a;
+  display: block;
+  fontsize: 1.4rem;
+  fontweight: 400;
+  margin: 0;
+  padding: 0;
 }
 
 .c41 {
@@ -5257,13 +5035,8 @@ exports[`Search Page renders loading grid SVG 1`] = `
               className="c42"
             >
               <a
-                className="c43"
-                color="#6E747A"
-                display="block"
-                fontSize="1.4rem"
-                fontWeight="400"
+                className="c43 "
                 href="/discover"
-                onClick={[Function]}
               >
                 Discover
               </a>
@@ -5272,13 +5045,8 @@ exports[`Search Page renders loading grid SVG 1`] = `
               className="c42"
             >
               <a
-                className="c43"
-                color="#6E747A"
-                display="block"
-                fontSize="1.4rem"
-                fontWeight="400"
+                className="c43 "
                 href="/learn-more"
-                onClick={[Function]}
               >
                 How it Works
               </a>
@@ -5287,11 +5055,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
               className="c42"
             >
               <a
-                className="c43"
-                color="#6E747A"
-                display="block"
-                fontSize="1.4rem"
-                fontWeight="400"
+                className="c43 "
                 href="/opensource"
                 onClick={[Function]}
               >
@@ -5302,11 +5066,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
               className="c42"
             >
               <a
-                className="c43"
-                color="#6E747A"
-                display="block"
-                fontSize="1.4rem"
-                fontWeight="400"
+                className="c43 "
                 href="/signin"
                 onClick={[Function]}
               >
@@ -5317,11 +5077,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
               className="c42"
             >
               <a
-                className="c43"
-                color="#6E747A"
-                display="block"
-                fontSize="1.4rem"
-                fontWeight="400"
+                className="c43 "
                 href="/signin"
                 onClick={[Function]}
               >
@@ -5345,11 +5101,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
               className="c42"
             >
               <a
-                className="c43"
-                color="#6E747A"
-                display="block"
-                fontSize="1.4rem"
-                fontWeight="400"
+                className="c43 "
                 href="/create"
                 onClick={[Function]}
               >
@@ -5360,11 +5112,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
               className="c42"
             >
               <a
-                className="c43"
-                color="#6E747A"
-                display="block"
-                fontSize="1.4rem"
-                fontWeight="400"
+                className="c43 "
                 href="/organizations/new"
                 onClick={[Function]}
               >
@@ -5375,11 +5123,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
               className="c42"
             >
               <a
-                className="c43"
-                color="#6E747A"
-                display="block"
-                fontSize="1.4rem"
-                fontWeight="400"
+                className="c43 "
                 href="/chapters"
                 onClick={[Function]}
               >
@@ -5403,11 +5147,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
               className="c42"
             >
               <a
-                className="c43"
-                color="#6E747A"
-                display="block"
-                fontSize="1.4rem"
-                fontWeight="400"
+                className="c43 "
                 href="/opensource"
                 onClick={[Function]}
               >
@@ -5418,11 +5158,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
               className="c42"
             >
               <a
-                className="c43"
-                color="#6E747A"
-                display="block"
-                fontSize="1.4rem"
-                fontWeight="400"
+                className="c43 "
                 href="https://github.com/opencollective/opencollective/issues"
                 onClick={[Function]}
               >
@@ -5433,11 +5169,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
               className="c42"
             >
               <a
-                className="c43"
-                color="#6E747A"
-                display="block"
-                fontSize="1.4rem"
-                fontWeight="400"
+                className="c43 "
                 href="https://slack.opencollective.com"
                 onClick={[Function]}
               >
@@ -5448,11 +5180,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
               className="c42"
             >
               <a
-                className="c43"
-                color="#6E747A"
-                display="block"
-                fontSize="1.4rem"
-                fontWeight="400"
+                className="c43 "
                 href="https://github.com/opencollective/opencollective/wiki"
                 onClick={[Function]}
               >
@@ -5463,11 +5191,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
               className="c42"
             >
               <a
-                className="c43"
-                color="#6E747A"
-                display="block"
-                fontSize="1.4rem"
-                fontWeight="400"
+                className="c43 "
                 href="mailto:support@opencollective.com"
                 onClick={[Function]}
               >
@@ -5491,11 +5215,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
               className="c42"
             >
               <a
-                className="c43"
-                color="#6E747A"
-                display="block"
-                fontSize="1.4rem"
-                fontWeight="400"
+                className="c43 "
                 href="/about"
                 onClick={[Function]}
               >
@@ -5506,11 +5226,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
               className="c42"
             >
               <a
-                className="c43"
-                color="#6E747A"
-                display="block"
-                fontSize="1.4rem"
-                fontWeight="400"
+                className="c43 "
                 href="/faq"
                 onClick={[Function]}
               >
@@ -5521,11 +5237,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
               className="c42"
             >
               <a
-                className="c43"
-                color="#6E747A"
-                display="block"
-                fontSize="1.4rem"
-                fontWeight="400"
+                className="c43 "
                 href="https://medium.com/open-collective"
                 onClick={[Function]}
               >
@@ -5536,11 +5248,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
               className="c42"
             >
               <a
-                className="c43"
-                color="#6E747A"
-                display="block"
-                fontSize="1.4rem"
-                fontWeight="400"
+                className="c43 "
                 href="/tos"
                 onClick={[Function]}
               >
@@ -5551,11 +5259,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
               className="c42"
             >
               <a
-                className="c43"
-                color="#6E747A"
-                display="block"
-                fontSize="1.4rem"
-                fontWeight="400"
+                className="c43 "
                 href="/privacypolicy"
                 onClick={[Function]}
               >
@@ -5924,15 +5628,6 @@ exports[`Search Page renders search results with pagination 1`] = `
   left: 0.2rem;
 }
 
-.c43 {
-  color: #6E747A;
-  display: block;
-  font-size: 1.4rem;
-  font-weight: 400;
-  margin: 0px;
-  padding: 0px;
-}
-
 .c42 {
   list-style: none;
   margin-bottom: 8px;
@@ -5973,6 +5668,15 @@ exports[`Search Page renders search results with pagination 1`] = `
 .c36:hover,
 .c36:focus {
   opacity: 1;
+}
+
+.c43 {
+  color: #6e747a;
+  display: block;
+  fontsize: 1.4rem;
+  fontweight: 400;
+  margin: 0;
+  padding: 0;
 }
 
 .c41 {
@@ -6731,13 +6435,8 @@ exports[`Search Page renders search results with pagination 1`] = `
               className="c42"
             >
               <a
-                className="c43"
-                color="#6E747A"
-                display="block"
-                fontSize="1.4rem"
-                fontWeight="400"
+                className="c43 "
                 href="/discover"
-                onClick={[Function]}
               >
                 Discover
               </a>
@@ -6746,13 +6445,8 @@ exports[`Search Page renders search results with pagination 1`] = `
               className="c42"
             >
               <a
-                className="c43"
-                color="#6E747A"
-                display="block"
-                fontSize="1.4rem"
-                fontWeight="400"
+                className="c43 "
                 href="/learn-more"
-                onClick={[Function]}
               >
                 How it Works
               </a>
@@ -6761,11 +6455,7 @@ exports[`Search Page renders search results with pagination 1`] = `
               className="c42"
             >
               <a
-                className="c43"
-                color="#6E747A"
-                display="block"
-                fontSize="1.4rem"
-                fontWeight="400"
+                className="c43 "
                 href="/opensource"
                 onClick={[Function]}
               >
@@ -6776,11 +6466,7 @@ exports[`Search Page renders search results with pagination 1`] = `
               className="c42"
             >
               <a
-                className="c43"
-                color="#6E747A"
-                display="block"
-                fontSize="1.4rem"
-                fontWeight="400"
+                className="c43 "
                 href="/signin"
                 onClick={[Function]}
               >
@@ -6791,11 +6477,7 @@ exports[`Search Page renders search results with pagination 1`] = `
               className="c42"
             >
               <a
-                className="c43"
-                color="#6E747A"
-                display="block"
-                fontSize="1.4rem"
-                fontWeight="400"
+                className="c43 "
                 href="/signin"
                 onClick={[Function]}
               >
@@ -6819,11 +6501,7 @@ exports[`Search Page renders search results with pagination 1`] = `
               className="c42"
             >
               <a
-                className="c43"
-                color="#6E747A"
-                display="block"
-                fontSize="1.4rem"
-                fontWeight="400"
+                className="c43 "
                 href="/create"
                 onClick={[Function]}
               >
@@ -6834,11 +6512,7 @@ exports[`Search Page renders search results with pagination 1`] = `
               className="c42"
             >
               <a
-                className="c43"
-                color="#6E747A"
-                display="block"
-                fontSize="1.4rem"
-                fontWeight="400"
+                className="c43 "
                 href="/organizations/new"
                 onClick={[Function]}
               >
@@ -6849,11 +6523,7 @@ exports[`Search Page renders search results with pagination 1`] = `
               className="c42"
             >
               <a
-                className="c43"
-                color="#6E747A"
-                display="block"
-                fontSize="1.4rem"
-                fontWeight="400"
+                className="c43 "
                 href="/chapters"
                 onClick={[Function]}
               >
@@ -6877,11 +6547,7 @@ exports[`Search Page renders search results with pagination 1`] = `
               className="c42"
             >
               <a
-                className="c43"
-                color="#6E747A"
-                display="block"
-                fontSize="1.4rem"
-                fontWeight="400"
+                className="c43 "
                 href="/opensource"
                 onClick={[Function]}
               >
@@ -6892,11 +6558,7 @@ exports[`Search Page renders search results with pagination 1`] = `
               className="c42"
             >
               <a
-                className="c43"
-                color="#6E747A"
-                display="block"
-                fontSize="1.4rem"
-                fontWeight="400"
+                className="c43 "
                 href="https://github.com/opencollective/opencollective/issues"
                 onClick={[Function]}
               >
@@ -6907,11 +6569,7 @@ exports[`Search Page renders search results with pagination 1`] = `
               className="c42"
             >
               <a
-                className="c43"
-                color="#6E747A"
-                display="block"
-                fontSize="1.4rem"
-                fontWeight="400"
+                className="c43 "
                 href="https://slack.opencollective.com"
                 onClick={[Function]}
               >
@@ -6922,11 +6580,7 @@ exports[`Search Page renders search results with pagination 1`] = `
               className="c42"
             >
               <a
-                className="c43"
-                color="#6E747A"
-                display="block"
-                fontSize="1.4rem"
-                fontWeight="400"
+                className="c43 "
                 href="https://github.com/opencollective/opencollective/wiki"
                 onClick={[Function]}
               >
@@ -6937,11 +6591,7 @@ exports[`Search Page renders search results with pagination 1`] = `
               className="c42"
             >
               <a
-                className="c43"
-                color="#6E747A"
-                display="block"
-                fontSize="1.4rem"
-                fontWeight="400"
+                className="c43 "
                 href="mailto:support@opencollective.com"
                 onClick={[Function]}
               >
@@ -6965,11 +6615,7 @@ exports[`Search Page renders search results with pagination 1`] = `
               className="c42"
             >
               <a
-                className="c43"
-                color="#6E747A"
-                display="block"
-                fontSize="1.4rem"
-                fontWeight="400"
+                className="c43 "
                 href="/about"
                 onClick={[Function]}
               >
@@ -6980,11 +6626,7 @@ exports[`Search Page renders search results with pagination 1`] = `
               className="c42"
             >
               <a
-                className="c43"
-                color="#6E747A"
-                display="block"
-                fontSize="1.4rem"
-                fontWeight="400"
+                className="c43 "
                 href="/faq"
                 onClick={[Function]}
               >
@@ -6995,11 +6637,7 @@ exports[`Search Page renders search results with pagination 1`] = `
               className="c42"
             >
               <a
-                className="c43"
-                color="#6E747A"
-                display="block"
-                fontSize="1.4rem"
-                fontWeight="400"
+                className="c43 "
                 href="https://medium.com/open-collective"
                 onClick={[Function]}
               >
@@ -7010,11 +6648,7 @@ exports[`Search Page renders search results with pagination 1`] = `
               className="c42"
             >
               <a
-                className="c43"
-                color="#6E747A"
-                display="block"
-                fontSize="1.4rem"
-                fontWeight="400"
+                className="c43 "
                 href="/tos"
                 onClick={[Function]}
               >
@@ -7025,11 +6659,7 @@ exports[`Search Page renders search results with pagination 1`] = `
               className="c42"
             >
               <a
-                className="c43"
-                color="#6E747A"
-                display="block"
-                fontSize="1.4rem"
-                fontWeight="400"
+                className="c43 "
                 href="/privacypolicy"
                 onClick={[Function]}
               >
