@@ -432,8 +432,18 @@ const getCollectiveQuery = gql`
         }
       }
       pledges: orders(status: PENDING) {
+        currency
+        id
+        interval
+        publicMessage
         status
         totalAmount
+        fromCollective {
+          name
+          image
+          slug
+          type
+        }
       }
     }
   }
