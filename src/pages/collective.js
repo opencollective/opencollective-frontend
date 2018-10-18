@@ -54,7 +54,9 @@ class CollectivePage extends React.Component {
     const { data, query } = this.props;
     const { LoggedInUser } = this.state;
 
-    if (!data.Collective) return <ErrorPage data={data} />;
+    if (!data.Collective) {
+      return <ErrorPage LoggedInUser={LoggedInUser} data={data} />;
+    }
 
     const collective = data.Collective;
 

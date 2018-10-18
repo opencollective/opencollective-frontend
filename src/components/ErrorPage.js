@@ -15,6 +15,7 @@ class ErrorPage extends React.Component {
     loading: PropTypes.bool,
     data: PropTypes.object, // we can pass the data object of Apollo to detect and handle GraphQL errors
     intl: PropTypes.object.isRequired,
+    LoggedInUser: PropTypes.object,
   };
 
   constructor(props) {
@@ -109,11 +110,12 @@ class ErrorPage extends React.Component {
   }
 
   render() {
+    const { LoggedInUser } = this.props;
     const component = this.getErrorComponent();
 
     return (
       <div className="ErrorPage">
-        <Header />
+        <Header LoggedInUser={LoggedInUser} />
         <Body>
           <div className="content">{component}</div>
         </Body>
