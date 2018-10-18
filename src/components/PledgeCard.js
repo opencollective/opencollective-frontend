@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { imagePreview } from '../lib/utils';
-import { defaultImage, defaultBackgroundImage } from '../constants/collectives';
+import { defaultImage } from '../constants/collectives';
 
 import Container from './Container';
 import { P, Span } from './Text';
@@ -34,10 +34,13 @@ const PledgeCard = ({
       <Link route="collective" params={{ slug: fromCollective.slug }} passHref>
         <a>
           <Container
-            bg="#2877ED"
-            backgroundImage={`url(${imagePreview(fromCollective.image, defaultImage[fromCollective.type], {
-              width: 65,
-            })})`}
+            backgroundImage={`url(${imagePreview(
+              fromCollective.image,
+              defaultImage[fromCollective.type],
+              {
+                width: 65,
+              },
+            )})`}
             backgroundSize="contain"
             backgroundRepeat="no-repeat"
             backgroundPosition="center center"
@@ -60,9 +63,7 @@ const PledgeCard = ({
 
     <P fontSize="1rem" textAlign="center" mt={2} px={2} pb={2}>
       Has pledged:
-
       <br />
-
       <Span fontSize="1.2rem">
         <Currency
           fontWeight="bold"

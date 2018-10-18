@@ -163,7 +163,7 @@ class SearchPage extends React.Component {
                   <Flex key={collective.slug} my={3} mx={2}>
                     <CollectiveCard collective={collective} />
                   </Flex>
-              ))}
+                ))}
 
               {/* TODO: add suggested collectives when the result is empty */}
               {showCollectives &&
@@ -235,7 +235,8 @@ class SearchPage extends React.Component {
                 </Flex>
               )}
 
-              {showCollectives && collectives.length !== 0 && (
+            {showCollectives &&
+              collectives.length !== 0 && (
                 <Flex
                   py={3}
                   width={1}
@@ -245,7 +246,7 @@ class SearchPage extends React.Component {
                 >
                   <p>
                     <em>
-                      If you don't see the collective you're searching for:
+                      If you don&apos;t see the collective you&apos;re searching for:
                     </em>
                   </p>
 

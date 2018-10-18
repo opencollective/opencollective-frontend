@@ -66,10 +66,8 @@ class CollectivePage extends React.Component {
       query,
     };
 
-    const isPledgedCollective = collective && collective.pledges;
-
     if (collective && collective.pledges.length > 0 && !collective.isActive) {
-      return <PledgedCollective {...props} />
+      return <PledgedCollective {...props} />;
     }
 
     if (collective.type === 'COLLECTIVE') {
