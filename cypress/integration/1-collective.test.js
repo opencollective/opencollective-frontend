@@ -27,7 +27,7 @@ describe('collective page', () => {
   });
 
   it('opens all expenses page', () => {
-    cy.get('#expenses .ViewAllExpensesBtn button').click();
+    cy.get('#expenses .ViewAllExpensesBtn a').click();
     cy.wait(300);
     cy.get('.ExpensesPage .ExpensesStats').contains('Available balance');
     cy.get('.ExpensesPage .ExpensesStats').contains('Engineering ($3,808)');
@@ -55,7 +55,7 @@ describe('collective page', () => {
   });
 
   it('opens all transactions page', () => {
-    cy.get('#transactions .ViewAllTransactionsBtn button').click();
+    cy.get('#transactions .ViewAllTransactionsBtn a').click();
     cy.wait(500);
     cy.get('.TransactionsPage .itemsList .transaction').should(
       'have.length',
