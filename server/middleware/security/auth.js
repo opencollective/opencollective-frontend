@@ -22,7 +22,7 @@ const { HOST, ADMIN, BACKER } = roles;
  * Check Client Id if it exists
  */
 export async function checkClientApp(req, res, next) {
-  const apiKey = req.get('Api-Key') || req.query.apiKey;
+  const apiKey = req.get('Api-Key') || req.query.apiKey || req.apiKey;
   const clientId = req.get('Client-Id') || req.query.clientId;
   if (apiKey) {
     const app = await models.Application.findOne({

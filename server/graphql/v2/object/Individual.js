@@ -2,9 +2,9 @@ import { GraphQLString, GraphQLObjectType } from 'graphql';
 
 import { Account, AccountFields } from '../interface/Account';
 
-export const User = new GraphQLObjectType({
-  name: 'User',
-  description: 'This represents a User account',
+export const Individual = new GraphQLObjectType({
+  name: 'Individual',
+  description: 'This represents an Individual account',
   interfaces: () => [Account],
   isTypeOf: collective => collective.type === 'USER',
   fields: () => {
@@ -47,3 +47,5 @@ export const User = new GraphQLObjectType({
     };
   },
 });
+
+export default Individual;
