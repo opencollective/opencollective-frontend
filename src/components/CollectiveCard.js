@@ -69,7 +69,7 @@ class CollectiveCard extends React.Component {
     const backgroundImage = imagePreview(
       collective.backgroundImage ||
         get(collective, 'parentCollective.backgroundImage'),
-      defaultBackgroundImage[collective.type],
+      null,
       { width: 400 },
     );
     if (!coverStyle.backgroundImage && backgroundImage) {
