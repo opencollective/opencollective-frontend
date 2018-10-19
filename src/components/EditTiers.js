@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 
 import { Button, Form } from 'react-bootstrap';
 import { defineMessages, injectIntl } from 'react-intl';
+import uuidv4 from 'uuid/v4';
 
 import InputField from './InputField';
 import InputFieldPresets from './InputFieldPresets';
@@ -234,7 +235,7 @@ class EditTiers extends React.Component {
 
   addTier(tier) {
     const tiers = this.state.tiers;
-    tiers.push(tier || {});
+    tiers.push({ ...(tier || {}), __uuid: uuidv4() });
     this.setState({ tiers });
   }
 
@@ -248,6 +249,7 @@ class EditTiers extends React.Component {
 
   renderTier(tier, index) {
     const { intl } = this.props;
+    const key = tier.id ? `tier-${tier.id}` : `newTier-${tier.__uuid};`;
 
     const defaultValues = {
       ...tier,
@@ -256,7 +258,7 @@ class EditTiers extends React.Component {
     };
 
     return (
-      <div className={`tier ${tier.slug}`} key={`tier-${index}`}>
+      <div className={`tier ${tier.slug}`} key={key}>
         <div className="tierActions">
           <a
             className="removeTier"
