@@ -62,8 +62,8 @@ class GoalsCover extends React.Component {
   }
 
   componentDidMount() {
-    const state = this.populateGoals();
-    this.setState(state);
+    this.populateGoals();
+    window.onresize = () => this.populateGoals();
   }
 
   populateGoals() {
@@ -95,9 +95,7 @@ class GoalsCover extends React.Component {
       });
     }
 
-    const maxGoalsToShow =
-      window.screen.availWidth < 400 ? this.goals.length + 1 : 10;
-
+    const maxGoalsToShow = window.innerWidth < 400 ? this.goals.length + 1 : 10;
     (get(collective, 'settings.goals') || []).map(g => {
       if (g.title) {
         this.hasCustomGoals = true;
@@ -163,7 +161,8 @@ class GoalsCover extends React.Component {
       state.goals[slug] = pos;
       previous[position] = pos;
     });
-    return state;
+
+    this.setState(state);
   }
 
   renderGoal(goal, index, state) {
