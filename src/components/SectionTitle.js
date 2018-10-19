@@ -140,11 +140,6 @@ class SectionTitle extends React.Component {
             .content {
               padding: 0.8rem 0;
             }
-            @media (max-width: 420px) {
-              .SectionTitle {
-                padding-left: 1.5rem;
-              }
-            }
           `}
         </style>
 
