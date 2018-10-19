@@ -1,5 +1,4 @@
 import React from 'react';
-import colors from '../constants/colors';
 import Link from './Link';
 
 class LinkButton extends React.Component {
