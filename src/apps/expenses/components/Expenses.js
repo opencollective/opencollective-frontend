@@ -93,7 +93,7 @@ class Expenses extends React.Component {
             .itemsList {
               position: relative;
             }
-            .itemsList :global(.item) {
+            .itemsList .item {
               border-bottom: 1px solid #e8e9eb;
             }
             .loading {
