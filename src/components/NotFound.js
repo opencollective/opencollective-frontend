@@ -13,7 +13,7 @@ const NotFound = ({ slug }) => {
           .shrug {
             font-size: 3.6rem;
             text-align: center;
-            color: #46b0ed;
+            color: #3385ff;
           }
           p {
             margin: 4rem 0;

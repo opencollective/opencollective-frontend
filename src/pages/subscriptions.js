@@ -67,13 +67,11 @@ class SubscriptionsPage extends React.Component {
             }
             .Subscriptions-title {
               margin: auto;
-              font-family: Rubik;
               font-size: 40px;
               font-weight: 700;
               line-height: 1.08;
               text-align: left;
               color: ${colors.black};
-              letter-spacing: -0.5px;
               border-left: 4px solid ${colors.ocblue};
               padding-left: 32px;
             }

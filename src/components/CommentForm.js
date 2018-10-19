@@ -103,7 +103,6 @@ class CommentForm extends React.Component {
             }
             .notice {
               color: #525866;
-              font-family: Rubik;
               font-size: 12px;
               margin-left: 1rem;
             }

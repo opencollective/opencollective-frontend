@@ -27,6 +27,7 @@ export const transactionFields = `
   }
   host {
     id
+    slug
     name
     currency
     hostFeePercent
@@ -383,6 +384,7 @@ const getCollectiveQuery = gql`
           slug
           type
           image
+          backgroundImage
         }
       }
       ... on User {

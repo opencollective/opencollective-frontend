@@ -10,6 +10,8 @@ import Transaction from './Transaction';
 import TransactionsExportPopoverAndButton from './TransactionsExportPopoverAndButton';
 import DownloadInvoicesPopOver from './DownloadInvoicesPopOver';
 
+import { Box } from 'grid-styled';
+
 class Transactions extends React.Component {
   static propTypes = {
     collective: PropTypes.object,
@@ -61,6 +63,7 @@ class Transactions extends React.Component {
           {`
             .Transactions {
               min-width: 30rem;
+              max-width: 1080px;
               width: 100%;
             }
             :global(.loadMoreBtn) {
@@ -85,6 +88,9 @@ class Transactions extends React.Component {
             }
             .itemsList {
               position: relative;
+            }
+            .itemsList :global(.transaction) {
+              border-bottom: 1px solid #e8e9eb;
             }
             .loading {
               color: ${colors.darkgray};
@@ -166,12 +172,17 @@ class Transactions extends React.Component {
             </div>
           )}
           {transactions.map(transaction => (
-            <Transaction
-              key={transaction.id}
-              collective={collective}
-              transaction={transaction}
-              LoggedInUser={LoggedInUser}
-            />
+            <Box className="transaction" key={transaction.id} my={3}>
+              <Transaction
+                {...transaction}
+                isRefund={Boolean(transaction.refundTransaction)}
+                canEditCollective={
+                  LoggedInUser &&
+                  (LoggedInUser.canEditCollective(collective) ||
+                    LoggedInUser.isRoot())
+                }
+              />
+            </Box>
           ))}
           {transactions.length === 0 && (
             <div className="empty">

@@ -133,13 +133,11 @@ ${totalDonationsStr}`;
             }
 
             .name {
-              font-family: 'montserratlight';
               font-size: 1.7rem;
             }
 
             .description,
             .meta {
-              font-family: 'lato';
               font-size: 1.4rem;
             }
           `}
@@ -152,7 +150,7 @@ ${totalDonationsStr}`;
               target="_top"
               title={title}
             >
-              <Avatar src={member.image} radius={45} />
+              <Avatar src={member.image} radius={45} className="noFrame" />
               <div className="bubble">
                 <div className="name">{name}</div>
                 <div className="description" style={{ color: colors.darkgray }}>

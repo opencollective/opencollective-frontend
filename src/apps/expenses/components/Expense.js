@@ -1,11 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {
-  defineMessages,
-  FormattedMessage,
-  FormattedNumber,
-  FormattedDate,
-} from 'react-intl';
+import { defineMessages, FormattedMessage } from 'react-intl';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 
@@ -14,7 +9,9 @@ import Avatar from '../../../components/Avatar';
 import { capitalize, formatCurrency } from '../../../lib/utils';
 import Link from '../../../components/Link';
 import SmallButton from '../../../components/SmallButton';
+import Moment from '../../../components/Moment';
 
+import AmountCurrency from './AmountCurrency';
 import ExpenseDetails from './ExpenseDetails';
 import ApproveExpenseBtn from './ApproveExpenseBtn';
 import RejectExpenseBtn from './RejectExpenseBtn';
@@ -174,11 +171,11 @@ class Expense extends React.Component {
             }
             .fromCollective {
               float: left;
-              margin-right: 1rem;
+              margin-right: 1.6rem;
             }
             .body {
               overflow: hidden;
-              font-size: 1.5rem;
+              font-size: 1.4rem;
               width: 100%;
             }
             .description {
@@ -202,10 +199,8 @@ class Expense extends React.Component {
               color: #919599;
             }
             .amount {
-              width: 10rem;
               margin-left: 0.5rem;
               text-align: right;
-              font-family: montserratlight, arial;
               font-size: 1.5rem;
               font-weight: 300;
             }
@@ -271,6 +266,7 @@ class Expense extends React.Component {
             }
           `}
         </style>
+
         <div className="fromCollective">
           <a
             href={`/${expense.fromCollective.slug}`}
@@ -280,16 +276,16 @@ class Expense extends React.Component {
               src={expense.fromCollective.image}
               key={expense.fromCollective.id}
               radius={40}
+              className="noFrame"
             />
           </a>
         </div>
         <div className="body">
           <div className="header">
             <div className="amount pullRight">
-              <FormattedNumber
-                value={expense.amount / 100}
+              <AmountCurrency
+                amount={-expense.amount}
                 currency={expense.currency}
-                {...this.currencyStyle}
               />
             </div>
             <div className="description">
@@ -304,31 +300,25 @@ class Expense extends React.Component {
               </Link>
             </div>
             <div className="meta">
-              <span className="incurredAt">
-                <FormattedDate
-                  value={expense.incurredAt}
-                  day="numeric"
-                  month="numeric"
-                />
-              </span>{' '}
-              |&nbsp;
+              <Moment relative={true} value={expense.incurredAt} />
+              {' | '}
               {includeHostedCollectives && (
                 <span className="collective">
                   <Link route={`/${expense.collective.slug}`}>
                     {expense.collective.slug}
-                  </Link>{' '}
+                  </Link>
                   (balance:{' '}
                   {formatCurrency(
                     expense.collective.stats.balance,
                     expense.collective.currency,
                   )}
-                  ) |{' '}
+                  ){' | '}
                 </span>
               )}
               <span className="status">
                 {intl.formatMessage(this.messages[status])}
-              </span>{' '}
-              |
+              </span>
+              {' | '}
               <span className="metaItem">
                 <Link
                   route="expenses"
@@ -346,8 +336,7 @@ class Expense extends React.Component {
                 LoggedInUser &&
                 LoggedInUser.canEditExpense(expense) && (
                   <span>
-                    {' '}
-                    |{' '}
+                    {' | '}
                     <a className="toggleEditExpense" onClick={this.toggleEdit}>
                       {intl.formatMessage(
                         this.messages[
@@ -360,8 +349,7 @@ class Expense extends React.Component {
               {mode !== 'edit' &&
                 view === 'list' && (
                   <span>
-                    {' '}
-                    |{' '}
+                    {' | '}
                     <a className="toggleDetails" onClick={this.toggleDetails}>
                       {intl.formatMessage(
                         this.messages[

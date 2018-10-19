@@ -57,7 +57,6 @@ class Modal extends React.Component {
               color: white;
               background: rgba(50, 50, 50, 0.9);
               width: 100%;
-              font-family: 'montserratlight';
               text-align: center;
               z-index: 100;
             }

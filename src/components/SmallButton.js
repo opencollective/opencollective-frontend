@@ -12,13 +12,33 @@ class SmallButton extends React.Component {
               height: 29px;
               border-radius: 100px;
               border: solid 1px #797c80;
-              font-family: Rubik;
               font-size: 12px;
               line-height: 1.5;
               text-align: center;
               color: #797c80;
               background: white;
               padding: 0 2rem;
+            }
+            .SmallButton.light button {
+              border: 1px solid #76777a;
+              color: #76777a;
+              font-size: 1.2rem;
+              height: 2.8rem;
+              line-height: 2.8rem;
+              font-weight: 500;
+            }
+            .SmallButton.light button:hover {
+              color: #99c2ff;
+              border: 1px solid #99c2ff;
+            }
+            .SmallButton.light button:active {
+              background: #3385ff;
+              color: white;
+              border: 1px solid #3385ff;
+            }
+            .SmallButton.light button:disabled {
+              color: #dcdee0;
+              border: 1px solid #dcdee0;
             }
             .SmallButton.primary button {
               background: #297acc;

@@ -93,6 +93,9 @@ class Expenses extends React.Component {
             .itemsList {
               position: relative;
             }
+            .itemsList :global(.item) {
+              border-bottom: 1px solid #e8e9eb;
+            }
             .loading {
               color: ${colors.darkgray};
               position: absolute;
@@ -170,18 +173,19 @@ class Expenses extends React.Component {
             </div>
           )}
           {expenses.map(expense => (
-            <Expense
-              key={expense.id}
-              collective={expense.collective || collective}
-              expense={expense}
-              editable={editable}
-              view={view}
-              includeHostedCollectives={includeHostedCollectives}
-              LoggedInUser={LoggedInUser}
-              allowPayAction={!this.state.isPayActionLocked}
-              lockPayAction={this.setPayActionLock.bind(this, true)}
-              unlockPayAction={this.setPayActionLock.bind(this, false)}
-            />
+            <div className="item" key={expense.id}>
+              <Expense
+                collective={expense.collective || collective}
+                expense={expense}
+                editable={editable}
+                view={view}
+                includeHostedCollectives={includeHostedCollectives}
+                LoggedInUser={LoggedInUser}
+                allowPayAction={!this.state.isPayActionLocked}
+                lockPayAction={this.setPayActionLock.bind(this, true)}
+                unlockPayAction={this.setPayActionLock.bind(this, false)}
+              />
+            </div>
           ))}
           {expenses.length === 0 && (
             <div className="empty">

@@ -247,7 +247,6 @@ class Tier extends React.Component {
               position: absolute;
               top: 3rem;
               right: 3rem;
-              font-family: Rubik;
               font-size: 1.6rem;
               font-weight: 500;
               line-height: 1;
@@ -302,7 +301,6 @@ class Tier extends React.Component {
               text-transform: uppercase;
               color: #aaaeb3;
               font-weight: 300;
-              font-family: lato, montserratlight, arial;
               white-space: nowrap;
               font-size: 1rem;
             }
@@ -343,13 +341,11 @@ class Tier extends React.Component {
               background-color: #f0f3f5;
               box-shadow: inset 0 3px 0 0 rgba(0, 0, 0, 0.07);
               border: solid 1px #dcdfe1;
-              font-family: lato, montserralight, Montserrat;
               font-weight: bold;
               font-size: 1.2rem;
               color: #494b4d;
             }
             .tier:global(.btn-default) {
-              font-family: montserralight, Montserrat;
               font-size: 1.2rem;
               color: #494b4d;
               background-color: transparent;

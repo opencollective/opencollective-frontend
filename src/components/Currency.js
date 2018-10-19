@@ -22,12 +22,14 @@ const Currency = ({
   >
     {formattedNumber =>
       abbreviate ? (
-        <Span {...styles}>
+        <Span {...styles} whiteSpace="nowrap">
           {formattedNumber.slice(0, 1)}
           {abbreviateNumber(value / 100, precision)}
         </Span>
       ) : (
-        <Span {...styles}>{formattedNumber}</Span>
+        <Span {...styles} whiteSpace="nowrap">
+          {formattedNumber}
+        </Span>
       )
     }
   </FormattedNumber>

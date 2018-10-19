@@ -78,66 +78,57 @@ class StaticPage extends React.Component {
       <div className="staticPage">
         <style global jsx>
           {`
-            .staticPage .content {
-              max-width: 96rem;
-            }
-            .staticPage .content .path {
+            .staticPage .path {
               color: #9399a3;
-              font-family: 'Inter UI';
               font-size: 1.5rem;
-              letter-spacing: -0.2px;
               margin-bottom: -2rem;
               margin-left: 0.5rem;
               margin-top: 1rem;
               text-transform: uppercase;
             }
-            .staticPage .content h1 {
+            .staticPage h1 {
               margin: 4rem 0px 6rem;
-              font-family: 'Inter UI', 'lato', 'montserratlight', sans-serif;
               font-size: 4.8rem;
               color: #121314;
-              letter-spacing: -0.8px;
               line-height: 5.2rem;
               font-weight: 300;
               text-align: left;
             }
-            .staticPage .content h2 {
-              font-family: 'Inter UI', 'lato', 'montserratlight', sans-serif;
+            .staticPage h2 {
               font-size: 2.4rem;
               color: #6e747a;
               font-weight: 500;
-              letter-spacing: -0.4px;
               line-height: 3.2rem;
               margin: 5rem 0 1rem;
             }
-            .staticPage .content h3 {
+            .staticPage h3 {
               margin-top: 2.5rem;
               line-height: 1.3;
             }
-            .staticPage .content h4 {
+            .staticPage h4 {
               margin-top: 1rem;
               line-height: 1.3;
             }
-
-            .staticPage .content p,
-            .staticPage .content li,
-            .staticPage .content summary {
+            .staticPage .content {
+              max-width: 96rem;
+            }
+            .staticPage p,
+            .staticPage li,
+            .staticPage summary {
               color: #6e747a;
-              font-family: 'Inter UI', 'lato', 'montserratlight', sans-serif;
               font-size: 16px;
-              letter-spacing: -0.2px;
               line-height: 24px;
             }
-            .staticPage .content th {
+            .staticPage th {
               min-width: 200px;
               text-align: left;
               vertical-align: top;
               padding-top: 1rem;
             }
-            .staticPage .content li {
+            .staticPage li {
               margin: 0.5rem;
             }
-            .staticPage .content code {
+            .staticPage code {
               padding: 0.5rem !important;
               margin: -7px 0;
               line-height: 1.5rem;

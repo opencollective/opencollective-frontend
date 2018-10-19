@@ -291,6 +291,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   background-color: white;
   border-top: 1px solid #aaaaaa;
   bottom: 0px;
+  background-color: white;
   min-height: 7.5rem;
   padding: 1rem;
   width: 100%;
@@ -446,11 +447,10 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
 
 .c24.c24.c24 {
   border: none;
-  border-bottom: 2px solid #46B0ED;
+  border-bottom: 2px solid #3385FF;
   border-radius: 0;
   box-shadow: none;
   display: block;
-  font-family: lato;
   height: 3.4rem;
   padding: 0;
 }
@@ -774,7 +774,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
     </div>
   </header>
   <main
-    className="jsx-3821428578"
+    className="jsx-916984404"
   >
     <div
       className="c19 c20"
@@ -807,7 +807,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
                 type="search"
               />
               <button
-                className="jsx-1144918383 jsx-3840138619 Button blue c25"
+                className="jsx-1144918383 jsx-3101740563 Button blue c25"
                 onClick={[Function]}
                 type="submit"
               >
@@ -1619,6 +1619,7 @@ exports[`Search Page renders empty results message 1`] = `
   background-color: white;
   border-top: 1px solid #aaaaaa;
   bottom: 0px;
+  background-color: white;
   min-height: 7.5rem;
   padding: 1rem;
   width: 100%;
@@ -1758,11 +1759,10 @@ exports[`Search Page renders empty results message 1`] = `
 
 .c24.c24.c24 {
   border: none;
-  border-bottom: 2px solid #46B0ED;
+  border-bottom: 2px solid #3385FF;
   border-radius: 0;
   box-shadow: none;
   display: block;
-  font-family: lato;
   height: 3.4rem;
   padding: 0;
 }
@@ -2086,7 +2086,7 @@ exports[`Search Page renders empty results message 1`] = `
     </div>
   </header>
   <main
-    className="jsx-3821428578"
+    className="jsx-916984404"
   >
     <div
       className="c19 c20"
@@ -2119,7 +2119,7 @@ exports[`Search Page renders empty results message 1`] = `
                 type="search"
               />
               <button
-                className="jsx-1144918383 jsx-3840138619 Button blue c25"
+                className="jsx-1144918383 jsx-3101740563 Button blue c25"
                 onClick={[Function]}
                 type="submit"
               >
@@ -2890,6 +2890,7 @@ exports[`Search Page renders error message 1`] = `
   background-color: white;
   border-top: 1px solid #aaaaaa;
   bottom: 0px;
+  background-color: white;
   min-height: 7.5rem;
   padding: 1rem;
   width: 100%;
@@ -3355,7 +3356,7 @@ exports[`Search Page renders error message 1`] = `
     </div>
   </header>
   <main
-    className="jsx-3821428578"
+    className="jsx-916984404"
   >
     <div
       className="content"
@@ -4136,6 +4137,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
   background-color: white;
   border-top: 1px solid #aaaaaa;
   bottom: 0px;
+  background-color: white;
   min-height: 7.5rem;
   padding: 1rem;
   width: 100%;
@@ -4275,11 +4277,10 @@ exports[`Search Page renders loading grid SVG 1`] = `
 
 .c24.c24.c24 {
   border: none;
-  border-bottom: 2px solid #46B0ED;
+  border-bottom: 2px solid #3385FF;
   border-radius: 0;
   box-shadow: none;
   display: block;
-  font-family: lato;
   height: 3.4rem;
   padding: 0;
 }
@@ -4603,7 +4604,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
     </div>
   </header>
   <main
-    className="jsx-3821428578"
+    className="jsx-916984404"
   >
     <div
       className="c19 c20"
@@ -4636,7 +4637,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
                 type="search"
               />
               <button
-                className="jsx-1144918383 jsx-3840138619 Button blue c25"
+                className="jsx-1144918383 jsx-3101740563 Button blue c25"
                 onClick={[Function]}
                 type="submit"
               >
@@ -4655,7 +4656,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
           className="c27 c28 sc-bdVaJa c2"
         >
           <svg
-            fill="#46B0ED"
+            fill="#3385FF"
             height={100}
             viewBox="0 0 105 105"
             width={100}
@@ -5559,6 +5560,7 @@ exports[`Search Page renders search results with pagination 1`] = `
   background-color: white;
   border-top: 1px solid #aaaaaa;
   bottom: 0px;
+  background-color: white;
   min-height: 7.5rem;
   padding: 1rem;
   width: 100%;
@@ -5698,11 +5700,10 @@ exports[`Search Page renders search results with pagination 1`] = `
 
 .c24.c24.c24 {
   border: none;
-  border-bottom: 2px solid #46B0ED;
+  border-bottom: 2px solid #3385FF;
   border-radius: 0;
   box-shadow: none;
   display: block;
-  font-family: lato;
   height: 3.4rem;
   padding: 0;
 }
@@ -6026,7 +6027,7 @@ exports[`Search Page renders search results with pagination 1`] = `
     </div>
   </header>
   <main
-    className="jsx-3821428578"
+    className="jsx-916984404"
   >
     <div
       className="c19 c20"
@@ -6059,7 +6060,7 @@ exports[`Search Page renders search results with pagination 1`] = `
                 type="search"
               />
               <button
-                className="jsx-1144918383 jsx-3840138619 Button blue c25"
+                className="jsx-1144918383 jsx-3101740563 Button blue c25"
                 onClick={[Function]}
                 type="submit"
               >
@@ -6082,17 +6083,17 @@ exports[`Search Page renders search results with pagination 1`] = `
             onClick={[Function]}
           >
             <div
-              className="jsx-3769176122 CollectiveCard undefined"
+              className="jsx-136688120 CollectiveCard undefined"
             >
               <div
-                className="jsx-3769176122 head"
+                className="jsx-136688120 head"
               >
                 <div
-                  className="jsx-3769176122 background"
+                  className="jsx-136688120 background"
                   style={Object {}}
                 />
                 <div
-                  className="jsx-3769176122 logo"
+                  className="jsx-136688120 logo"
                 >
                   <div
                     className="jsx-3454192051 Logo"
@@ -6117,17 +6118,17 @@ exports[`Search Page renders search results with pagination 1`] = `
                 </div>
               </div>
               <div
-                className="jsx-3769176122 body"
+                className="jsx-136688120 body"
               >
                 <div
-                  className="jsx-3769176122 name"
+                  className="jsx-136688120 name"
                 />
                 <div
-                  className="jsx-3769176122 description"
+                  className="jsx-136688120 description"
                 />
               </div>
               <div
-                className="jsx-3769176122 footer"
+                className="jsx-136688120 footer"
               />
             </div>
           </a>

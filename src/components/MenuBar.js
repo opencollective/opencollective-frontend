@@ -142,7 +142,7 @@ class MenuBar extends React.Component {
     uniqBy(document.querySelectorAll('section'), el => el.id)
       .filter(el => !!el.id)
       .forEach(el => {
-        const titleEl = el.querySelector('.title');
+        const titleEl = el.querySelector('h1');
         const menuItem = {
           anchor: el.id,
           title: titleEl && titleEl.innerText,
@@ -439,7 +439,6 @@ class MenuBar extends React.Component {
             }
             .item {
               color: #fafafa;
-              font-family: Rubik;
               font-size: 14px;
               line-height: 40px;
               margin: 32px;

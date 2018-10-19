@@ -275,7 +275,6 @@ class CollectivePickerWithData extends React.Component {
             .submenu {
               width: 100%;
               min-height: 16rem;
-              font-family: Rubik;
               padding: 2rem 2rem 2rem 6rem;
               display: flex;
               justify-content: space-between;
@@ -290,7 +289,6 @@ class CollectivePickerWithData extends React.Component {
             }
 
             .submenu .title h1 {
-              font-family: Rubik;
               font-size: 3.6rem;
               margin: 0 2rem 0 0;
               font-weight: 500;
@@ -299,7 +297,6 @@ class CollectivePickerWithData extends React.Component {
             }
 
             .submenu .title h2 {
-              font-family: Rubik;
               font-size: 2.4rem;
               margin: 0;
               font-weight: 300;

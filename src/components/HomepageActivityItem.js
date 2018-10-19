@@ -9,7 +9,7 @@ import { P, Span } from './Text';
 
 import { Link } from '../server/pages';
 
-const TransactionSimple = ({
+const HomepageActivityItem = ({
   amount,
   createdAt,
   currency,
@@ -66,7 +66,7 @@ const TransactionSimple = ({
   );
 };
 
-TransactionSimple.propTypes = {
+HomepageActivityItem.propTypes = {
   amount: PropTypes.number.isRequired,
   createdAt: PropTypes.string.isRequired,
   currency: PropTypes.string.isRequired,
@@ -86,4 +86,4 @@ TransactionSimple.propTypes = {
   type: PropTypes.oneOf(['CREDIT', 'DEBIT']),
 };
 
-export default TransactionSimple;
+export default HomepageActivityItem;

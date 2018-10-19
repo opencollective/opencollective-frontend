@@ -189,11 +189,6 @@ ${description}`;
                 6px;
               padding-left: 22px;
             }
-            .githubHandle {
-              background: url('/static/icons/github-handler.svg') no-repeat 0px
-                3px;
-              padding-left: 22px;
-            }
             .website {
               background: url('/static/icons/external-link.svg') no-repeat 0px
                 6px;
@@ -321,7 +316,6 @@ ${description}`;
               margin: 1rem 0px;
             }
             .counter .-character {
-              font-family: Lato;
               font-size: 22px;
               font-weight: bold;
               margin: 1px;
@@ -333,7 +327,6 @@ ${description}`;
               border-radius: 3px;
               background-color: rgba(0, 0, 0, 0.6);
               border: solid 1px #000000;
-              font-family: Lato;
               font-size: 22px;
               color: #ffffff;
               font-weight: bold;

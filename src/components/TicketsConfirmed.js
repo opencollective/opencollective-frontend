@@ -85,7 +85,6 @@ class TicketsConfirmed extends React.Component {
                 font-weight: bold;
                 text-transform: uppercase;
                 background: white;
-                font-family: Arial, Helvetica, sans-serif;
               }
 
               #ticket .topbar .numberTickets {

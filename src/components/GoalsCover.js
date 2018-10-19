@@ -90,7 +90,12 @@ class GoalsCover extends React.Component {
       });
     }
 
-    (get(collective, 'settings.goals') || []).map(g => this.goals.push(g));
+    (get(collective, 'settings.goals') || []).map(g => {
+      if (g.title) {
+        this.hasCustomGoals = true;
+        this.goals.push(g);
+      }
+    });
 
     this.goals.sort((a, b) => a.amount > b.amount);
 
@@ -217,7 +222,6 @@ class GoalsCover extends React.Component {
             .caption {
               padding: 1rem 0.5rem 1rem 0.5rem;
               color: #aaaeb3;
-              font-family: Rubik;
               font-size: 13px;
               line-height: 15px;
             }
@@ -272,7 +276,6 @@ class GoalsCover extends React.Component {
     if (!collective) {
       return <div />;
     }
-
     const state = this.populateGoals();
 
     return (
@@ -286,7 +289,6 @@ class GoalsCover extends React.Component {
             .budgetText {
               text-align: center;
               color: #c2c7cc;
-              font-family: Rubik;
               font-size: 14px;
               line-height: 26px;
               margin: 3rem 0;
@@ -299,12 +301,15 @@ class GoalsCover extends React.Component {
               min-height: 80px;
             }
 
+            .barContainer.withGoals {
+              margin-top: 9rem;
+            }
+
             .annualBudget {
               font-weight: bold;
               color: white;
               margin-left: 5px;
             }
-
             @media (max-width: 420px) {
               .barContainer {
                 width: 95%;
@@ -329,7 +334,7 @@ class GoalsCover extends React.Component {
             </div>
           )}
           <div
-            className="barContainer"
+            className={`barContainer ${this.hasCustomGoals ? 'withGoals' : ''}`}
             style={get(state, 'styles.barContainer')}
             ref={node => (this.nodes.barContainer = node)}
           >

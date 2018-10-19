@@ -40,6 +40,11 @@ class LongDescription extends React.Component {
               max-height: 450px;
               height: 100%;
             }
+            .longDescription .markdown :global(h1) {
+              text-align: left;
+              font-size: 1.8rem;
+              letter-spacing: -0.4px;
+            }
           `}
         </style>
         {sections.map(section => (
@@ -59,8 +64,8 @@ class LongDescription extends React.Component {
               }
               subtitle={section.title ? '' : this.props.defaultSubtitle}
             />
-
             <div
+              className="markdown"
               dangerouslySetInnerHTML={{
                 __html: converter.makeHtml(section.markdown),
               }}

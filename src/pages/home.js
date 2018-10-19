@@ -14,7 +14,7 @@ import { Link } from '../server/pages';
 import Body from '../components/Body';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
-import TransactionSimple from '../components/TransactionSimple';
+import HomepageActivityItem from '../components/HomepageActivityItem';
 import { Span, P, H1, H2, H3, H4 } from '../components/Text';
 import ListItem from '../components/ListItem';
 import Hide from '../components/Hide';
@@ -282,7 +282,7 @@ class HomePage extends React.Component {
                           boxShadow="0 2px 4px 0 rgba(46,48,51,0.08);"
                           p={3}
                         >
-                          <TransactionSimple {...transaction} />
+                          <HomepageActivityItem {...transaction} />
                         </Container>
                       </ListItem>
                     ))}

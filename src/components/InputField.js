@@ -670,12 +670,12 @@ class InputField extends React.Component {
               align-items: center;
             }
             .inputField .MuiSwitch-colorSecondary-7.MuiSwitch-checked-5 {
-              color: #46b0ed;
+              color: #3385ff;
             }
             .inputField
               .MuiSwitch-colorSecondary-7.MuiSwitch-checked-5
               + .MuiSwitch-bar-9 {
-              background-color: #46b0ed;
+              background-color: #3385ff;
             }
           `}
         </style>

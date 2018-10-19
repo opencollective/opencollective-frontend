@@ -65,12 +65,10 @@ class Response extends React.Component {
               }
 
               .name {
-                font-family: 'montserratlight';
                 font-size: 1.7rem;
               }
 
               .description {
-                font-family: 'lato';
                 font-size: 1.4rem;
               }
 

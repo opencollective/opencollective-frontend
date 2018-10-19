@@ -37,9 +37,7 @@ class HelpTooltip extends React.Component {
               z-index: 1000000;
               background: white !important;
               color: #6e747a !important;
-              font-family: 'Inter UI', 'lato', 'montserratlight', sans-serif !important;
               font-size: 12px !important;
-              letter-spacing: -0.2px !important;
               line-height: 18px !important;
               border: 1px solid rgba(18, 19, 20, 0.12) !important;
               box-shadow: 0 8px 16px 0 rgba(12, 16, 20, 0.12) !important;

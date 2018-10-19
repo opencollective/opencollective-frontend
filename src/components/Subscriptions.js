@@ -106,7 +106,6 @@ class Subscriptions extends React.Component {
               font-size: 20px;
               font-weight: 700;
               line-height: 1.08;
-              letter-spacing: -0.5px;
               border-bottom: 1px solid ${colors.gray};
               line-height: 0.1rem;
               color: ${colors.black};

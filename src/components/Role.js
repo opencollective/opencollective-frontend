@@ -46,7 +46,6 @@ class Role extends React.Component {
             }
             label {
               color: #666f80;
-              font-family: Rubik;
               font-size: 11px;
               font-weight: normal;
               line-height: 13px;

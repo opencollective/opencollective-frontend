@@ -6,6 +6,7 @@ import Link from './Link';
 import Logo from './Logo';
 import { get } from 'lodash';
 import { firstSentence, imagePreview } from '../lib/utils';
+
 import { defaultBackgroundImage } from '../constants/collectives';
 
 class CollectiveCard extends React.Component {
@@ -154,7 +155,6 @@ class CollectiveCard extends React.Component {
                 min-height: 20px;
                 font-size: 14px;
                 margin: 5px;
-                font-family: lato, Montserrat;
                 font-weight: 700;
                 text-align: center;
                 color: #303233;
@@ -162,7 +162,6 @@ class CollectiveCard extends React.Component {
               }
 
               .description {
-                font-family: lato;
                 font-weight: normal;
                 text-align: center;
                 color: #787d80;
@@ -201,7 +200,6 @@ class CollectiveCard extends React.Component {
 
               .role {
                 min-height: 13px;
-                font-family: Lato;
                 font-weight: 700;
                 letter-spacing: 3px;
                 color: #75cc1f;
@@ -215,7 +213,6 @@ class CollectiveCard extends React.Component {
               }
 
               .value {
-                font-family: Lato;
                 font-weight: normal;
                 text-align: center;
                 color: #303233;
@@ -224,7 +221,6 @@ class CollectiveCard extends React.Component {
               }
 
               .label {
-                font-family: Lato;
                 font-size: 9px;
                 text-align: center;
                 font-weight: 300;
@@ -234,7 +230,6 @@ class CollectiveCard extends React.Component {
 
               .since {
                 min-height: 18px;
-                font-family: Lato;
                 font-size: 12px;
                 font-weight: 500;
                 line-height: 1.5;

@@ -1,232 +1,140 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { defineMessages, FormattedNumber } from 'react-intl';
-import { get } from 'lodash';
+import { Flex } from 'grid-styled';
+import { FormattedMessage } from 'react-intl';
 
-import withIntl from '../../../lib/withIntl';
-import { capitalize } from '../../../lib/utils';
 import Avatar from '../../../components/Avatar';
+import Container from '../../../components/Container';
 import Link from '../../../components/Link';
+import Moment from '../../../components/Moment';
+import { P, Span } from '../../../components/Text';
 
 import TransactionDetails from './TransactionDetails';
+import AmountCurrency from './AmountCurrency';
 
 class Transaction extends React.Component {
   static propTypes = {
-    collective: PropTypes.object,
-    transaction: PropTypes.object,
-    LoggedInUser: PropTypes.object,
+    id: PropTypes.number.isRequired,
+    amount: PropTypes.number.isRequired,
+    canEditCollective: PropTypes.bool, // LoggedInUser.canEditCollective(collective) || LoggedInUser.isRoot()
+    createdAt: PropTypes.string.isRequired,
+    description: PropTypes.string,
+    currency: PropTypes.string.isRequired,
+    attachment: PropTypes.string,
+    uuid: PropTypes.number,
+    netAmountInCollectiveCurrency: PropTypes.number,
+    platformFeeInHostCurrency: PropTypes.number,
+    paymentProcessorFeeInHostCurrency: PropTypes.number,
+    hostCurrency: PropTypes.string,
+    hostCurrencyFxRate: PropTypes.number,
+    paymentMethod: PropTypes.shape({
+      service: PropTypes.string.isRequired,
+    }),
+    host: PropTypes.shape({
+      hostFeePercent: PropTypes.number,
+      slug: PropTypes.string.isRequired,
+    }),
+    fromCollective: PropTypes.shape({
+      id: PropTypes.number,
+      image: PropTypes.string,
+      name: PropTypes.string.isRequired,
+      slug: PropTypes.string.isRequired,
+    }),
+    collective: PropTypes.shape({
+      id: PropTypes.number,
+      type: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired,
+      slug: PropTypes.string.isRequired,
+    }),
+    subscription: PropTypes.shape({
+      interval: PropTypes.oneOf(['month', 'year']),
+    }),
+    type: PropTypes.oneOf(['CREDIT', 'DEBIT']),
+    isRefund: PropTypes.bool, // whether or not this transaction refers to a refund
   };
 
-  constructor(props) {
-    super(props);
-    this.state = { view: 'compact' };
-    this.toggleDetails = this.toggleDetails.bind(this);
-    this.messages = defineMessages({
-      debit: { id: 'transaction.debit', defaultMessage: 'debit' },
-      credit: { id: 'transaction.credit', defaultMessage: 'credit' },
-      'credit.title': {
-        id: 'transaction.credit.title',
-        defaultMessage:
-          '{interval, select, month {monthly} year {yearly} other {}} donation to {collective}',
-      },
-      'debit.meta': {
-        id: 'transaction.debit.meta',
-        defaultMessage:
-          'Expense submitted by {name}, paid on {createdAt, date, medium}',
-      },
-      'refund.meta': {
-        id: 'transaction.refund.meta',
-        defaultMessage: 'Refunded to {name}, paid on {createdAt, date, medium}',
-      },
-      'credit.meta': {
-        id: 'transaction.credit.meta',
-        defaultMessage: 'Donation made by {name} on {createdAt, date, medium}',
-      },
-      closeDetails: {
-        id: 'transaction.closeDetails',
-        defaultMessage: 'Close Details',
-      },
-      viewDetails: {
-        id: 'transaction.viewDetails',
-        defaultMessage: 'View Details',
-      },
-    });
-    this.currencyStyle = {
-      style: 'currency',
-      currencyDisplay: 'symbol',
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    };
-  }
-
-  toggleDetails() {
-    this.setState({
-      loadDetails: true,
-      view: this.state.view === 'details' ? 'compact' : 'details',
-    });
-  }
+  state = { showDetails: false };
 
   render() {
-    const { intl, collective, transaction, LoggedInUser } = this.props;
-
-    if (!transaction.fromCollective) return <div />; // This only occurs for host collectives when they add funds
-
-    const type = transaction.type.toLowerCase();
-    const messageType = transaction.refundTransaction ? 'refund' : type;
-
-    let title = transaction.description;
-    if (
-      type === 'credit' &&
-      (!title ||
-        (!title.match(/Matching/) &&
-          title.match(/donation to /i) &&
-          !title.match(/Refund/)))
-    ) {
-      title = intl.formatMessage(this.messages['credit.title'], {
-        collective: collective.name,
-        interval: get(transaction, 'subscription.interval'),
-      });
-    }
-
-    const meta = [];
-    meta.push(transaction.category);
-    meta.push(
-      intl.formatMessage(this.messages[`${messageType}.meta`], {
-        name: transaction.fromCollective.name,
-        createdAt: new Date(transaction.createdAt),
-      }),
-    );
-
-    const amount =
-      ['USER', 'ORGANIZATION'].indexOf(collective.type) !== -1
-        ? transaction.netAmountInCollectiveCurrency
-        : transaction.amount;
+    const {
+      amount,
+      description,
+      createdAt,
+      currency,
+      fromCollective,
+      collective,
+      type,
+      paymentProcessorFeeInHostCurrency,
+    } = this.props;
 
     return (
-      <div className={`transaction ${type} ${this.state.view}View`}>
-        <style jsx>
-          {`
-            .transaction {
-              width: 100%;
-              margin: 0.5em 0;
-              padding: 0.5em;
-              transition: max-height 1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-              overflow: hidden;
-              max-height: 7rem;
-              position: relative;
-              display: flex;
-            }
-            .transaction.detailsView {
-              background-color: #fafafa;
-              max-height: 26rem;
-            }
-            a {
-              cursor: pointer;
-            }
-            .fromCollective {
-              float: left;
-              margin-right: 1rem;
-            }
-            .body {
-              overflow: hidden;
-              font-size: 1.5rem;
-              width: 100%;
-            }
-            .description {
-              text-overflow: ellipsis;
-              white-space: nowrap;
-              overflow: hidden;
-              display: block;
-            }
-            .meta {
-              color: #919599;
-              font-size: 1.2rem;
-            }
-            .amount {
-              width: 10rem;
-              margin-left: 0.5rem;
-              text-align: right;
-              font-family: montserratlight, arial;
-              font-size: 1.5rem;
-              font-weight: 300;
-            }
-            .debit .amount {
-              color: #e21a60;
-            }
-            .credit .amount {
-              color: #72ce00;
-            }
-
-            @media (max-width: 600px) {
-              .transaction {
-                max-height: 23rem;
-              }
-              .transaction.detailsView {
-                max-height: 45rem;
-              }
-              .details {
-                max-height: 30rem;
-              }
-            }
-          `}
-        </style>
-        <div className="fromCollective">
-          <Link
-            route={transaction.fromCollective.path}
-            title={transaction.fromCollective.name}
-          >
+      <Flex my={4}>
+        <Container alignSelf="flex-start">
+          <a href={`/${fromCollective.slug}`} title={fromCollective.name}>
             <Avatar
-              src={transaction.fromCollective.image}
-              key={transaction.fromCollective.id}
-              id={transaction.fromCollective.id}
+              src={fromCollective.image}
+              id={fromCollective.id}
               radius={40}
+              className="noFrame"
             />
-          </Link>
-        </div>
-        <div className="body">
-          <div className="description">
-            <a onClick={this.toggleDetails} title={capitalize(title)}>
-              {/* should link to `/${collective.slug}/transactions/${transaction.uuid}` once we have a page for it */}
-              {capitalize(title)}
-            </a>
-          </div>
-          <div className="meta">
-            {capitalize(meta.join(' '))}
-            <span>
-              {' '}
-              |{' '}
-              <a onClick={this.toggleDetails}>
-                {intl.formatMessage(
-                  this.messages[
-                    `${
-                      this.state.view === 'details'
-                        ? 'closeDetails'
-                        : 'viewDetails'
-                    }`
-                  ],
+          </a>
+        </Container>
+        <Container ml={3} width={1}>
+          <Flex justifyContent="space-between" alignItems="baseline">
+            <div>
+              <P fontSize="1.4rem" color="#313233" display="inline">
+                {description}
+                {type === 'DEBIT' && ' expense '}
+                {collective && (
+                  <Fragment>
+                    {' to '}{' '}
+                    <Link route={`/${collective.slug}`} title={collective.name}>
+                      {collective.name}
+                    </Link>
+                    .
+                  </Fragment>
                 )}
-              </a>
-            </span>
-          </div>
-          {this.state.loadDetails && (
-            <TransactionDetails
-              LoggedInUser={LoggedInUser}
-              transaction={transaction}
-              collective={collective}
-              mode={this.state.view === 'details' ? 'open' : 'closed'}
-            />
+              </P>
+              <Span fontSize="1.6rem">{type === 'CREDIT' && ' 🎉'}</Span>
+            </div>
+            <AmountCurrency amount={amount} currency={currency} />
+          </Flex>
+          <Container fontSize="1.2rem" color="#AEB2B8">
+            <a href={`/${fromCollective.slug}`} title={fromCollective.name}>
+              {fromCollective.name}
+            </a>
+            {' | '}
+            <Moment relative={true} value={createdAt} />
+            {paymentProcessorFeeInHostCurrency !== undefined && (
+              <Fragment>
+                {' | '}
+                <a
+                  onClick={() =>
+                    this.setState({ viewDetails: !this.state.viewDetails })
+                  }
+                >
+                  {this.state.viewDetails ? (
+                    <FormattedMessage
+                      id="transaction.closeDetails"
+                      defaultMessage="Close Details"
+                    />
+                  ) : (
+                    <FormattedMessage
+                      id="transaction.viewDetails"
+                      defaultMessage="View Details"
+                    />
+                  )}
+                </a>
+              </Fragment>
+            )}
+          </Container>
+          {this.state.viewDetails && (
+            <TransactionDetails {...this.props} mode="open" />
           )}
-        </div>
-        <div className="amount">
-          <FormattedNumber
-            value={amount / 100}
-            currency={transaction.currency}
-            {...this.currencyStyle}
-          />
-        </div>
-      </div>
+        </Container>
+      </Flex>
     );
   }
 }
 
-export default withIntl(Transaction);
+export default Transaction;
