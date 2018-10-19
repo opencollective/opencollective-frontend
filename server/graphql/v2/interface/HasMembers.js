@@ -1,7 +1,7 @@
 import { GraphQLInt, GraphQLList } from 'graphql';
 
 import { MemberCollection } from '../collection/MemberCollection';
-import { AccountType } from '../enum/AccountType';
+import { AccountType, AccountTypeToModelMapping } from '../enum/AccountType';
 import { MemberRole } from '../enum/MemberRole';
 
 import models, { Op } from '../../../models';
@@ -24,7 +24,11 @@ export const HasMembersFields = {
       }
       const collectiveConditions = { deletedAt: null };
       if (args.accountType && args.accountType.length > 0) {
-        collectiveConditions.type = { [Op.in]: args.accountType };
+        collectiveConditions.type = {
+          [Op.in]: args.accountType.map(
+            value => AccountTypeToModelMapping[value],
+          ),
+        };
       }
       return models.Member.findAndCountAll({
         where,

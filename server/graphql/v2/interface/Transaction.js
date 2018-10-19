@@ -1,4 +1,8 @@
-import { GraphQLInt, GraphQLString, GraphQLInterfaceType } from 'graphql';
+import {
+  // GraphQLInt,
+  GraphQLString,
+  GraphQLInterfaceType,
+} from 'graphql';
 
 import { GraphQLDateTime } from 'graphql-iso-date';
 
@@ -16,9 +20,9 @@ export const Transaction = new GraphQLInterfaceType({
     'Transaction interface shared by all kind of transactions (Debit, Credit)',
   fields: () => {
     return {
-      _internal_id: {
-        type: GraphQLInt,
-      },
+      // _internal_id: {
+      //   type: GraphQLInt,
+      // },
       id: {
         type: GraphQLString,
       },
@@ -66,12 +70,12 @@ export const Transaction = new GraphQLInterfaceType({
 
 export const TransactionFields = () => {
   return {
-    _internal_id: {
-      type: GraphQLInt,
-      resolve(transaction) {
-        return transaction.id;
-      },
-    },
+    // _internal_id: {
+    //   type: GraphQLInt,
+    //   resolve(transaction) {
+    //     return transaction.id;
+    //   },
+    // },
     id: {
       type: GraphQLString,
       resolve(transaction) {

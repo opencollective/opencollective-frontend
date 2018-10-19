@@ -3,20 +3,20 @@ import { GraphQLString } from 'graphql';
 import models from '../../../models';
 import { NotFound } from '../../errors';
 import { idDecode } from '../identifiers';
-import { Collective } from '../object/Collective';
+import { Individual } from '../object/Individual';
 
-const CollectiveQuery = {
-  type: Collective,
+const IndividualQuery = {
+  type: Individual,
   args: {
     id: {
       type: GraphQLString,
       description:
-        'The public id identifying the collective (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)',
+        'The public id identifying the individual (ie: ggnxdwzj-3le5mpwa-5eqy8rvb-ko04a97b)',
     },
     slug: {
       type: GraphQLString,
       description:
-        'The slug identifying the collective (ie: babel for https://opencollective.com/babel)',
+        'The slug identifying the individual (ie: piamancini for https://opencollective.com/piamancini)',
     },
   },
   async resolve(_, args) {
@@ -31,13 +31,13 @@ const CollectiveQuery = {
       return new Error('Please provide a slug or an id');
     }
     if (!collective) {
-      throw new NotFound({ message: 'Collective Not Found' });
+      throw new NotFound({ message: 'Individual Not Found' });
     }
-    if (collective.type !== 'COLLECTIVE') {
-      throw new NotFound({ message: 'Not a Collective Account ' });
+    if (collective.type !== 'USER') {
+      throw new NotFound({ message: 'Not an Individual Account ' });
     }
     return collective;
   },
 };
 
-export default CollectiveQuery;
+export default IndividualQuery;

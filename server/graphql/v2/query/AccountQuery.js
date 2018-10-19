@@ -14,7 +14,7 @@ const AccountQuery = {
     id: {
       type: GraphQLString,
       description:
-        'The public id identifying the account (ie: 5v08jk63-w4g9nbpz-j7qmyder-p7ozax5g)',
+        'The public id identifying the account (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)',
     },
     slug: {
       type: GraphQLString,

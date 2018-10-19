@@ -1,6 +1,6 @@
 import { Account } from './interface/Account';
 
-import { User } from './object/User';
+import { Individual } from './object/Individual';
 import { Organization } from './object/Organization';
 import { Collective } from './object/Collective';
 import { Event } from './object/Event';
@@ -15,7 +15,7 @@ import { Member, MemberOf } from './object/Member';
 
 const types = [
   Account,
-  User,
+  Individual,
   Organization,
   Collective,
   Event,

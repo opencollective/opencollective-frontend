@@ -51,6 +51,14 @@ export default app => {
    */
   app.use('/status', serverStatus(app));
 
+  /**
+   * Extract GraphQL API Key
+   */
+  app.use('/graphql/:version/:apiKey?', (req, res, next) => {
+    req.apiKey = req.params.apiKey;
+    next();
+  });
+
   app.use('*', auth.checkClientApp);
 
   app.use('*', auth.authorizeClientApp);
@@ -113,9 +121,9 @@ export default app => {
   app.param('expenseid', params.expenseid);
 
   /**
-   * GraphQL V1
+   * GraphQL v1
    */
-  const graphqlV1 = GraphHTTP({
+  const graphqlServerV1 = GraphHTTP({
     formatError,
     schema: graphqlSchemaV1,
     pretty:
@@ -126,26 +134,27 @@ export default app => {
       process.env.NODE_ENV !== 'staging',
   });
 
-  app.use('/graphql/v1', graphqlV1);
+  app.use('/graphql/v1', graphqlServerV1);
 
   /**
-   * GraphQL V2
+   * GraphQL v2
    */
-  const server = new ApolloServer({
+  const graphqlServerV2 = new ApolloServer({
     schema: graphqlSchemaV2,
     introspection: true,
+    playground: false,
     // Align with behavior from express-graphql
     context: ({ req }) => {
       return req;
     },
   });
 
-  server.applyMiddleware({ app, path: '/graphql/v2' });
+  graphqlServerV2.applyMiddleware({ app, path: '/graphql/v2' });
 
   /**
-   * GraphQL (default)
+   * GraphQL default (v1)
    */
-  app.use('/graphql', graphqlV1);
+  app.use('/graphql', graphqlServerV1);
 
   /**
    * Webhooks that should bypass api key check

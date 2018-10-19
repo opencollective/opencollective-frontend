@@ -22,7 +22,7 @@ import { AccountType } from '../enum/AccountType';
 import { TransactionType } from '../enum/TransactionType';
 import { MemberRole } from '../enum/MemberRole';
 
-import { AccountStats } from '../object/AccountStats';
+// import { AccountStats } from '../object/AccountStats';
 
 import { ChronologicalOrder } from '../input/ChronologicalOrder';
 
@@ -56,12 +56,12 @@ const accountTransactions = {
 };
 
 export const AccountFields = {
-  _internal_id: {
-    type: GraphQLInt,
-    resolve(transaction) {
-      return transaction.id;
-    },
-  },
+  // _internal_id: {
+  //   type: GraphQLInt,
+  //   resolve(transaction) {
+  //     return transaction.id;
+  //   },
+  // },
   id: {
     type: GraphQLString,
     resolve(collective) {
@@ -98,12 +98,12 @@ export const AccountFields = {
       return collective.updatedAt || collective.createdAt;
     },
   },
-  stats: {
-    type: AccountStats,
-    resolve(collective) {
-      return collective;
-    },
-  },
+  // stats: {
+  //   type: AccountStats,
+  //   resolve(collective) {
+  //     return collective;
+  //   },
+  // },
   ...HasMembersFields,
   ...IsMemberOfFields,
   transactions: accountTransactions,
@@ -115,10 +115,10 @@ export const Account = new GraphQLInterfaceType({
     'Account interface shared by all kind of accounts (Bot, Collective, Event, User, Organization)',
   fields: () => {
     return {
-      _internal_id: {
-        type: GraphQLInt,
-        description: 'The internal database identifier (should not be public)',
-      },
+      // _internal_id: {
+      //   type: GraphQLInt,
+      //   description: 'The internal database identifier (should not be public)',
+      // },
       id: {
         type: GraphQLString,
         description:
@@ -142,9 +142,9 @@ export const Account = new GraphQLInterfaceType({
         type: GraphQLDateTime,
         description: 'The update time',
       },
-      stats: {
-        type: AccountStats,
-      },
+      // stats: {
+      //   type: AccountStats,
+      // },
       members: {
         type: MemberCollection,
         args: {
@@ -163,7 +163,7 @@ export const Account = new GraphQLInterfaceType({
           accountType: {
             type: new GraphQLList(AccountType),
             description:
-              'Type of accounts (BOT/COLLECTIVE/EVENT/ORGANIZATION/USER)',
+              'Type of accounts (BOT/COLLECTIVE/EVENT/ORGANIZATION/INDIVIDUAL)',
           },
         },
       },
