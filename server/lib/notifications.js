@@ -290,7 +290,8 @@ async function notifyByEmail(activity) {
         },
       );
       notifyMembersOfCollective(activity.data.update.CollectiveId, activity, {
-        from: `hello@${activity.data.collective.slug}.opencollective.com`,
+        from: `${activity.data.collective.name} 
+        <hello@${activity.data.collective.slug}.opencollective.com>`,
       });
       break;
 
@@ -398,7 +399,9 @@ async function notifyByEmail(activity) {
       break;
 
     case activityType.COLLECTIVE_APPLY:
-      notifyAdminsOfCollective(activity.data.host.id, activity, { template: 'collective.apply.for.host' });
+      notifyAdminsOfCollective(activity.data.host.id, activity, {
+        template: 'collective.apply.for.host',
+      });
       notifyAdminsOfCollective(activity.data.collective.id, activity, {
         from: `hello@${activity.data.host.slug}.opencollective.com`,
       });
@@ -406,7 +409,9 @@ async function notifyByEmail(activity) {
 
     case activityType.COLLECTIVE_CREATED:
       if (get(activity, 'data.host.id')) {
-        notifyAdminsOfCollective(activity.data.host.id, activity, { template: 'collective.apply.for.host' });
+        notifyAdminsOfCollective(activity.data.host.id, activity, {
+          template: 'collective.apply.for.host',
+        });
       }
       if ((get(activity, 'data.collective.tags') || []).includes('meetup')) {
         notifyAdminsOfCollective(activity.data.collective.id, activity, {
