@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import ErrorPage from '../components/ErrorPage';
 import Collective from '../components/Collective';
 import UserCollective from '../components/UserCollective';
+import PledgedCollective from '../components/PledgedCollective';
 
 import { addCollectiveData } from '../graphql/queries';
 
@@ -33,11 +34,15 @@ class CollectivePage extends React.Component {
   }
 
   async componentDidMount() {
-    const { getLoggedInUser } = this.props;
+    const { getLoggedInUser, query, data = {} } = this.props;
     const LoggedInUser = await getLoggedInUser();
     this.setState({ LoggedInUser });
     window.OC = window.OC || {};
     window.OC.LoggedInUser = LoggedInUser;
+
+    if (query.refetch && data.refetch) {
+      data.refetch();
+    }
   }
 
   shouldComponentUpdate(nextProps) {
@@ -59,25 +64,23 @@ class CollectivePage extends React.Component {
     }
 
     const collective = data.Collective;
+    const props = {
+      collective,
+      LoggedInUser,
+      query,
+    };
 
-    return (
-      <div>
-        {collective.type === 'COLLECTIVE' && (
-          <Collective
-            collective={collective}
-            LoggedInUser={LoggedInUser}
-            query={query}
-          />
-        )}
-        {['USER', 'ORGANIZATION'].includes(collective.type) && (
-          <UserCollective
-            collective={collective}
-            LoggedInUser={LoggedInUser}
-            query={query}
-          />
-        )}
-      </div>
-    );
+    if (collective && collective.pledges.length > 0 && !collective.isActive) {
+      return <PledgedCollective {...props} />;
+    }
+
+    if (collective.type === 'COLLECTIVE') {
+      return <Collective {...props} />;
+    }
+
+    if (['USER', 'ORGANIZATION'].includes(collective.type)) {
+      return <UserCollective {...props} />;
+    }
   }
 }
 

@@ -2,6 +2,9 @@ import React from 'react';
 import App, { Container } from 'next/app';
 import Router from 'next/router';
 import NProgress from 'nprogress';
+import { ThemeProvider } from 'styled-components';
+
+import theme from '../constants/theme';
 
 import '../../node_modules/bootstrap/dist/css/bootstrap.min.css';
 import '../../node_modules/font-awesome/css/font-awesome.min.css';
@@ -44,7 +47,9 @@ export default class OpenCollectiveFrontendApp extends App {
 
     return (
       <Container>
-        <Component {...pageProps} />
+        <ThemeProvider theme={theme}>
+          <Component {...pageProps} />
+        </ThemeProvider>
         {Object.keys(scripts).map(key => (
           <script key={key} type="text/javascript" src={scripts[key]} />
         ))}
