@@ -6,12 +6,11 @@ import { get } from 'lodash';
 import withIntl from '../../../lib/withIntl';
 import NotFound from '../../../components/NotFound';
 import { formatCurrency } from '../../../lib/utils';
-import { Router } from '../../../server/pages';
 import SectionTitle from '../../../components/SectionTitle';
 
 import ExpensesWithData from './ExpensesWithData';
 import TransactionsWithData from './TransactionsWithData';
-import SmallButton from '../../../components/SmallButton';
+import LinkButton from '../../../components/LinkButton';
 
 class ExpensesSection extends React.Component {
   static propTypes = {
@@ -111,18 +110,17 @@ class ExpensesSection extends React.Component {
                         defaultMessage="{n, plural, one {Latest expense} other {Latest expenses}}"
                       />
                     </h2>
-                    <SmallButton
-                      disabled={this.totalExpenses < 5}
-                      className="light ViewAllExpensesBtn"
-                      onClick={() =>
-                        Router.pushRoute(`${collective.path}/expenses`)
-                      }
-                    >
-                      <FormattedMessage
-                        id="expenses.viewAll"
-                        defaultMessage="View All Expenses"
-                      />
-                    </SmallButton>
+                    {this.totalExpenses >= 5 && (
+                      <LinkButton
+                        className="light ViewAllExpensesBtn"
+                        href={`${collective.path}/expenses`}
+                      >
+                        <FormattedMessage
+                          id="expenses.viewAll"
+                          defaultMessage="View All Expenses"
+                        />
+                      </LinkButton>
+                    )}
                   </div>
                   <ExpensesWithData
                     collective={collective}
@@ -143,18 +141,17 @@ class ExpensesSection extends React.Component {
                         defaultMessage="{n, plural, one {Latest transaction} other {Latest transactions}}"
                       />
                     </h2>
-                    <SmallButton
-                      disabled={this.totalTransactions < 5}
-                      className="light ViewAllTransactionsBtn"
-                      onClick={() =>
-                        Router.pushRoute(`${collective.path}/transactions`)
-                      }
-                    >
-                      <FormattedMessage
-                        id="transactions.viewAll"
-                        defaultMessage="View All Transactions"
-                      />
-                    </SmallButton>
+                    {this.totalTransactions >= 5 && (
+                      <LinkButton
+                        className="light ViewAllTransactionsBtn"
+                        href={`${collective.path}/transactions`}
+                      >
+                        <FormattedMessage
+                          id="transactions.viewAll"
+                          defaultMessage="View All Transactions"
+                        />
+                      </LinkButton>
+                    )}
                   </div>
                   <TransactionsWithData
                     collective={collective}
