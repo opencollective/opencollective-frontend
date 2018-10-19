@@ -834,10 +834,11 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
           </p>
           <a
             className="c29"
-            color="white"
-            display="block"
-            fontSize="14px"
-            fontWeight="bold"
+            hover={
+              Object {
+                "color": "white",
+              }
+            }
             href="/pledges/new?name=test"
             onClick={[Function]}
           >
@@ -3340,9 +3341,6 @@ exports[`Search Page renders error message 1`] = `
         >
           <a
             className="c27"
-            color="#3385FF"
-            display="inline-block"
-            fontSize="1.4rem"
             href="/signin?next=%2F"
             onClick={[Function]}
           >
@@ -5339,7 +5337,14 @@ exports[`Search Page renders search results with pagination 1`] = `
   margin-bottom: 16px;
 }
 
-.c31 {
+.c30 {
+  box-sizing: border-box;
+  width: 100%;
+  padding-top: 16px;
+  padding-bottom: 16px;
+}
+
+.c33 {
   max-width: 1300px;
   box-sizing: border-box;
   margin-left: auto;
@@ -5347,7 +5352,7 @@ exports[`Search Page renders search results with pagination 1`] = `
   padding: 8px;
 }
 
-.c38 {
+.c40 {
   box-sizing: border-box;
   margin-top: 16px;
   -webkit-flex: 1 1 auto;
@@ -5358,7 +5363,7 @@ exports[`Search Page renders search results with pagination 1`] = `
   order: 3;
 }
 
-.c39 {
+.c41 {
   box-sizing: border-box;
   width: 50%;
   margin-bottom: 16px;
@@ -5471,7 +5476,7 @@ exports[`Search Page renders search results with pagination 1`] = `
   justify-content: center;
 }
 
-.c30 {
+.c32 {
   max-width: 1300px;
   display: -webkit-box;
   display: -webkit-flex;
@@ -5490,7 +5495,7 @@ exports[`Search Page renders search results with pagination 1`] = `
   justify-content: space-between;
 }
 
-.c33 {
+.c35 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -5501,7 +5506,7 @@ exports[`Search Page renders search results with pagination 1`] = `
   justify-content: center;
 }
 
-.c37 {
+.c39 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -5509,6 +5514,24 @@ exports[`Search Page renders search results with pagination 1`] = `
   -webkit-flex-wrap: wrap;
   -ms-flex-wrap: wrap;
   flex-wrap: wrap;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+}
+
+.c29 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
   -webkit-box-pack: center;
   -webkit-justify-content: center;
   -ms-flex-pack: center;
@@ -5530,7 +5553,7 @@ exports[`Search Page renders search results with pagination 1`] = `
   cursor: pointer;
 }
 
-.c34 {
+.c36 {
   color: #6E747A;
   font-size: 1.4rem;
   -webkit-letter-spacing: -0.2px;
@@ -5543,7 +5566,7 @@ exports[`Search Page renders search results with pagination 1`] = `
   text-align: center;
 }
 
-.c40 {
+.c42 {
   color: #C2C6CC;
   font-size: 1.2rem;
   -webkit-letter-spacing: 1px;
@@ -5555,7 +5578,7 @@ exports[`Search Page renders search results with pagination 1`] = `
   text-align: center;
 }
 
-.c29 {
+.c31 {
   background-color: white;
   border-top: 1px solid #aaaaaa;
   bottom: 0px;
@@ -5564,7 +5587,7 @@ exports[`Search Page renders search results with pagination 1`] = `
   width: 100%;
 }
 
-.c32 {
+.c34 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -5577,7 +5600,7 @@ exports[`Search Page renders search results with pagination 1`] = `
   width: 100%;
 }
 
-.c35 {
+.c37 {
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -5628,7 +5651,7 @@ exports[`Search Page renders search results with pagination 1`] = `
   left: 0.2rem;
 }
 
-.c42 {
+.c44 {
   list-style: none;
   margin-bottom: 8px;
   text-align: center;
@@ -5645,7 +5668,7 @@ exports[`Search Page renders search results with pagination 1`] = `
   font-size: 1.4rem;
 }
 
-.c36 {
+.c38 {
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -5665,12 +5688,12 @@ exports[`Search Page renders search results with pagination 1`] = `
   width: 48px;
 }
 
-.c36:hover,
-.c36:focus {
+.c38:hover,
+.c38:focus {
   opacity: 1;
 }
 
-.c43 {
+.c45 {
   color: #6e747a;
   display: block;
   fontsize: 1.4rem;
@@ -5679,7 +5702,7 @@ exports[`Search Page renders search results with pagination 1`] = `
   padding: 0;
 }
 
-.c41 {
+.c43 {
   box-sizing: border-box;
   padding-left: 0px;
   padding-right: 8px;
@@ -5722,7 +5745,7 @@ exports[`Search Page renders search results with pagination 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c38 {
+  .c40 {
     -webkit-order: 2;
     -ms-flex-order: 2;
     order: 2;
@@ -5730,7 +5753,7 @@ exports[`Search Page renders search results with pagination 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c39 {
+  .c41 {
     width: 25%;
   }
 }
@@ -5754,7 +5777,7 @@ exports[`Search Page renders search results with pagination 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c30 {
+  .c32 {
     -webkit-flex-direction: row;
     -ms-flex-direction: row;
     flex-direction: row;
@@ -5762,7 +5785,7 @@ exports[`Search Page renders search results with pagination 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c30 {
+  .c32 {
     -webkit-align-items: flex-start;
     -webkit-box-align: flex-start;
     -ms-flex-align: flex-start;
@@ -5771,7 +5794,7 @@ exports[`Search Page renders search results with pagination 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c33 {
+  .c35 {
     -webkit-box-pack: start;
     -webkit-justify-content: flex-start;
     -ms-flex-pack: start;
@@ -5780,25 +5803,25 @@ exports[`Search Page renders search results with pagination 1`] = `
 }
 
 @media screen and (min-width:52em) {
+  .c36 {
+    text-align: left;
+  }
+}
+
+@media screen and (min-width:52em) {
+  .c42 {
+    text-align: left;
+  }
+}
+
+@media screen and (min-width:52em) {
   .c34 {
-    text-align: left;
-  }
-}
-
-@media screen and (min-width:52em) {
-  .c40 {
-    text-align: left;
-  }
-}
-
-@media screen and (min-width:52em) {
-  .c32 {
     width: 33.33333333333333%;
   }
 }
 
 @media screen and (min-width:52em) {
-  .c35 {
+  .c37 {
     -webkit-order: 3;
     -ms-flex-order: 3;
     order: 3;
@@ -5842,7 +5865,7 @@ exports[`Search Page renders search results with pagination 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c42 {
+  .c44 {
     text-align: left;
   }
 }
@@ -6191,20 +6214,29 @@ exports[`Search Page renders search results with pagination 1`] = `
           </li>
         </ul>
       </div>
+      <div
+        className="c29 c30 sc-bdVaJa c2"
+      >
+        <p>
+          <em>
+            If you don't see the collective you're searching for:
+          </em>
+        </p>
+      </div>
     </div>
   </main>
   <div
-    className="c29"
+    className="c31"
     id="footer"
   >
     <div
-      className="c30 c31 sc-bdVaJa c2"
+      className="c32 c33 sc-bdVaJa c2"
     >
       <div
-        className="c32"
+        className="c34"
       >
         <div
-          className="c33 c2 sc-bdVaJa c2"
+          className="c35 c2 sc-bdVaJa c2"
         >
           <object
             data="/static/images/opencollectivelogo-footer.svg"
@@ -6213,16 +6245,16 @@ exports[`Search Page renders search results with pagination 1`] = `
           />
         </div>
         <p
-          className="c34"
+          className="c36"
         >
           An organization for your community, transparent by design.
         </p>
       </div>
       <div
-        className="c35"
+        className="c37"
       >
         <a
-          className="c36"
+          className="c38"
           href="https://medium.com/open-collective"
         >
           <svg
@@ -6240,7 +6272,7 @@ exports[`Search Page renders search results with pagination 1`] = `
           </svg>
         </a>
         <a
-          className="c36"
+          className="c38"
           href="https://twitter.com/opencollect"
         >
           <svg
@@ -6290,7 +6322,7 @@ exports[`Search Page renders search results with pagination 1`] = `
           </svg>
         </a>
         <a
-          className="c36"
+          className="c38"
           href="https://github.com/opencollective"
         >
           <svg
@@ -6340,7 +6372,7 @@ exports[`Search Page renders search results with pagination 1`] = `
           </svg>
         </a>
         <a
-          className="c36"
+          className="c38"
           href="https://slack.opencollective.com"
         >
           <svg
@@ -6367,7 +6399,7 @@ exports[`Search Page renders search results with pagination 1`] = `
           </svg>
         </a>
         <a
-          className="c36"
+          className="c38"
           href="mailto:info@opencollective.com"
         >
           <svg
@@ -6418,44 +6450,44 @@ exports[`Search Page renders search results with pagination 1`] = `
         </a>
       </div>
       <nav
-        className="c37 c38"
+        className="c39 c40"
       >
         <div
-          className="c39"
+          className="c41"
         >
           <p
-            className="c40"
+            className="c42"
           >
             PLATFORM
           </p>
           <ul
-            className="c41"
+            className="c43"
           >
             <li
-              className="c42"
+              className="c44"
             >
               <a
-                className="c43 "
+                className="c45 "
                 href="/discover"
               >
                 Discover
               </a>
             </li>
             <li
-              className="c42"
+              className="c44"
             >
               <a
-                className="c43 "
+                className="c45 "
                 href="/learn-more"
               >
                 How it Works
               </a>
             </li>
             <li
-              className="c42"
+              className="c44"
             >
               <a
-                className="c43 "
+                className="c45 "
                 href="/opensource"
                 onClick={[Function]}
               >
@@ -6463,10 +6495,10 @@ exports[`Search Page renders search results with pagination 1`] = `
               </a>
             </li>
             <li
-              className="c42"
+              className="c44"
             >
               <a
-                className="c43 "
+                className="c45 "
                 href="/signin"
                 onClick={[Function]}
               >
@@ -6474,10 +6506,10 @@ exports[`Search Page renders search results with pagination 1`] = `
               </a>
             </li>
             <li
-              className="c42"
+              className="c44"
             >
               <a
-                className="c43 "
+                className="c45 "
                 href="/signin"
                 onClick={[Function]}
               >
@@ -6487,21 +6519,21 @@ exports[`Search Page renders search results with pagination 1`] = `
           </ul>
         </div>
         <div
-          className="c39"
+          className="c41"
         >
           <p
-            className="c40"
+            className="c42"
           >
             JOIN THE MOVEMENT
           </p>
           <ul
-            className="c41"
+            className="c43"
           >
             <li
-              className="c42"
+              className="c44"
             >
               <a
-                className="c43 "
+                className="c45 "
                 href="/create"
                 onClick={[Function]}
               >
@@ -6509,10 +6541,10 @@ exports[`Search Page renders search results with pagination 1`] = `
               </a>
             </li>
             <li
-              className="c42"
+              className="c44"
             >
               <a
-                className="c43 "
+                className="c45 "
                 href="/organizations/new"
                 onClick={[Function]}
               >
@@ -6520,10 +6552,10 @@ exports[`Search Page renders search results with pagination 1`] = `
               </a>
             </li>
             <li
-              className="c42"
+              className="c44"
             >
               <a
-                className="c43 "
+                className="c45 "
                 href="/chapters"
                 onClick={[Function]}
               >
@@ -6533,21 +6565,21 @@ exports[`Search Page renders search results with pagination 1`] = `
           </ul>
         </div>
         <div
-          className="c39"
+          className="c41"
         >
           <p
-            className="c40"
+            className="c42"
           >
             COMMUNITY
           </p>
           <ul
-            className="c41"
+            className="c43"
           >
             <li
-              className="c42"
+              className="c44"
             >
               <a
-                className="c43 "
+                className="c45 "
                 href="/opensource"
                 onClick={[Function]}
               >
@@ -6555,10 +6587,10 @@ exports[`Search Page renders search results with pagination 1`] = `
               </a>
             </li>
             <li
-              className="c42"
+              className="c44"
             >
               <a
-                className="c43 "
+                className="c45 "
                 href="https://github.com/opencollective/opencollective/issues"
                 onClick={[Function]}
               >
@@ -6566,10 +6598,10 @@ exports[`Search Page renders search results with pagination 1`] = `
               </a>
             </li>
             <li
-              className="c42"
+              className="c44"
             >
               <a
-                className="c43 "
+                className="c45 "
                 href="https://slack.opencollective.com"
                 onClick={[Function]}
               >
@@ -6577,10 +6609,10 @@ exports[`Search Page renders search results with pagination 1`] = `
               </a>
             </li>
             <li
-              className="c42"
+              className="c44"
             >
               <a
-                className="c43 "
+                className="c45 "
                 href="https://github.com/opencollective/opencollective/wiki"
                 onClick={[Function]}
               >
@@ -6588,10 +6620,10 @@ exports[`Search Page renders search results with pagination 1`] = `
               </a>
             </li>
             <li
-              className="c42"
+              className="c44"
             >
               <a
-                className="c43 "
+                className="c45 "
                 href="mailto:support@opencollective.com"
                 onClick={[Function]}
               >
@@ -6601,21 +6633,21 @@ exports[`Search Page renders search results with pagination 1`] = `
           </ul>
         </div>
         <div
-          className="c39"
+          className="c41"
         >
           <p
-            className="c40"
+            className="c42"
           >
             COMPANY
           </p>
           <ul
-            className="c41"
+            className="c43"
           >
             <li
-              className="c42"
+              className="c44"
             >
               <a
-                className="c43 "
+                className="c45 "
                 href="/about"
                 onClick={[Function]}
               >
@@ -6623,10 +6655,10 @@ exports[`Search Page renders search results with pagination 1`] = `
               </a>
             </li>
             <li
-              className="c42"
+              className="c44"
             >
               <a
-                className="c43 "
+                className="c45 "
                 href="/faq"
                 onClick={[Function]}
               >
@@ -6634,10 +6666,10 @@ exports[`Search Page renders search results with pagination 1`] = `
               </a>
             </li>
             <li
-              className="c42"
+              className="c44"
             >
               <a
-                className="c43 "
+                className="c45 "
                 href="https://medium.com/open-collective"
                 onClick={[Function]}
               >
@@ -6645,10 +6677,10 @@ exports[`Search Page renders search results with pagination 1`] = `
               </a>
             </li>
             <li
-              className="c42"
+              className="c44"
             >
               <a
-                className="c43 "
+                className="c45 "
                 href="/tos"
                 onClick={[Function]}
               >
@@ -6656,10 +6688,10 @@ exports[`Search Page renders search results with pagination 1`] = `
               </a>
             </li>
             <li
-              className="c42"
+              className="c44"
             >
               <a
-                className="c43 "
+                className="c45 "
                 href="/privacypolicy"
                 onClick={[Function]}
               >
