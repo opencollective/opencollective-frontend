@@ -24,6 +24,7 @@ import Caret from './Caret';
 import StyledLink from './StyledLink';
 import ListItem from './ListItem';
 import Container from './Container';
+import LoginBtn from './LoginBtn';
 
 const cursor = style({
   prop: 'cursor',
@@ -78,10 +79,6 @@ class TopBarProfileMenu extends React.Component {
   componentDidMount() {
     document.addEventListener('click', this.onClickOutside);
     if (typeof window !== 'undefined') {
-      this.redirectAfterSignin = window.location.href.replace(
-        /^https?:\/\/[^/]+/,
-        '',
-      );
       if (!window.localStorage.accessToken) {
         this.setState({ loading: false });
       }
@@ -516,25 +513,7 @@ class TopBarProfileMenu extends React.Component {
           </P>
         )}
 
-        {status === 'loggedout' && (
-          <Link
-            route="signin"
-            params={{ next: this.redirectAfterSignin }}
-            passHref
-          >
-            <StyledLink
-              border="1px solid #D5DAE0"
-              borderRadius="20px"
-              color="#3385FF"
-              display="inline-block"
-              fontSize="1.4rem"
-              px={3}
-              py={2}
-            >
-              <FormattedMessage id="login.button" defaultMessage="Login" />
-            </StyledLink>
-          </Link>
-        )}
+        {status === 'loggedout' && <LoginBtn />}
 
         {status === 'loggedin' && this.renderLoggedInUser()}
       </div>
