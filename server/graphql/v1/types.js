@@ -1393,6 +1393,22 @@ export const PaymentMethodType = new GraphQLObjectType({
           );
         },
       },
+      emitter: {
+        type: CollectiveInterfaceType,
+        async resolve(paymentMethod, args, req) {
+          // TODO: could we have a getter for SourcePaymentMethod?
+          if (paymentMethod.SourcePaymentMethodId) {
+            const sourcePaymentMethod = await models.PaymentMethod.findById(
+              paymentMethod.SourcePaymentMethodId,
+            );
+            if (sourcePaymentMethod) {
+              return req.loaders.collective.findById.load(
+                sourcePaymentMethod.CollectiveId,
+              );
+            }
+          }
+        },
+      },
       limitedToTags: {
         type: GraphQLJSON,
         resolve(paymentMethod) {
