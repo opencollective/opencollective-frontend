@@ -96,6 +96,16 @@ class ExpensesSection extends React.Component {
                   .columns {
                     flex-direction: column;
                   }
+                  .col {
+                    width: 100%;
+                  }
+                  .col.first {
+                    margin-right: 0;
+                    margin-bottom: 4rem;
+                  }
+                  h2 {
+                    margin-bottom: 1.2rem;
+                  }
                 }
               `}
             </style>

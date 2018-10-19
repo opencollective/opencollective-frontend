@@ -7,8 +7,6 @@ import Logo from './Logo';
 import { get } from 'lodash';
 import { firstSentence, imagePreview } from '../lib/utils';
 
-import { defaultBackgroundImage } from '../constants/collectives';
-
 class CollectiveCard extends React.Component {
   static propTypes = {
     collective: PropTypes.object.isRequired,
@@ -69,7 +67,7 @@ class CollectiveCard extends React.Component {
     const backgroundImage = imagePreview(
       collective.backgroundImage ||
         get(collective, 'parentCollective.backgroundImage'),
-      defaultBackgroundImage[collective.type],
+      null,
       { width: 400 },
     );
     if (!coverStyle.backgroundImage && backgroundImage) {
