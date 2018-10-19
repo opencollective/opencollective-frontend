@@ -37,9 +37,12 @@ class PledgedCollective extends React.Component {
       {
         USER: 0,
         ORGANIZATION: 0,
+        COLLECTIVE: 0,
         total: 0,
       },
     );
+
+    const pledges = collective.pledges.slice(0).reverse();
 
     return (
       <Fragment>
@@ -98,10 +101,10 @@ class PledgedCollective extends React.Component {
               <FormattedMessage
                 id="pledge.stats"
                 values={{
-                  both: pledgeStats.ORGANIZATION && pledgeStats.USER ? 1 : 0,
-                  orgCount: pledgeStats.ORGANIZATION,
+                  both: (pledgeStats.ORGANIZATION + pledgeStats.COLLECTIVE) && pledgeStats.USER ? 1 : 0,
+                  orgCount: pledgeStats.ORGANIZATION + pledgeStats.COLLECTIVE,
                   userCount: pledgeStats.USER,
-                  totalCount: pledgeStats.ORGANIZATION + pledgeStats.USER,
+                  totalCount: pledgeStats.ORGANIZATION + pledgeStats.COLLECTIVE + pledgeStats.USER,
                 }}
                 defaultMessage={
                   '{orgCount, plural, =0 {} one {# organization} other {# organizations}} {both, plural, =0 {} one { and }} {userCount, plural, =0 {} one {# person } other {# people }} {totalCount, plural, one {has } other {have }}'
@@ -136,13 +139,13 @@ class PledgedCollective extends React.Component {
             mb={5}
             px={3}
           >
-            {collective.pledges.map((pledge, index) => (
+            {pledges.map((pledge, index) => (
               <Container
                 width={[0.5, null, 0.25]}
                 mb={2}
                 position="relative"
                 px={1}
-                maxWidth={160}
+                minWidth={160}
                 key={pledge.id}
               >
                 {index === 0 && (
