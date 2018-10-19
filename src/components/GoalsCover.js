@@ -61,6 +61,11 @@ class GoalsCover extends React.Component {
     });
   }
 
+  componentDidMount() {
+    const state = this.populateGoals();
+    this.setState(state);
+  }
+
   populateGoals() {
     const { intl, collective } = this.props;
     const state = this.state;
@@ -90,6 +95,9 @@ class GoalsCover extends React.Component {
       });
     }
 
+    const maxGoalsToShow =
+      window.screen.availWidth < 400 ? this.goals.length + 1 : 10;
+
     (get(collective, 'settings.goals') || []).map(g => {
       if (g.title) {
         this.hasCustomGoals = true;
@@ -110,6 +118,9 @@ class GoalsCover extends React.Component {
       };
       this.goals[i] = goal;
     }
+
+    this.goals = this.goals.slice(0, maxGoalsToShow);
+
     this.maxAmount = maxBy(this.goals, g => g.amount).amount;
 
     this.goals.forEach(goal => {
@@ -276,7 +287,6 @@ class GoalsCover extends React.Component {
     if (!collective) {
       return <div />;
     }
-    const state = this.populateGoals();
 
     return (
       <div className="GoalsCover">
@@ -335,13 +345,13 @@ class GoalsCover extends React.Component {
           )}
           <div
             className={`barContainer ${this.hasCustomGoals ? 'withGoals' : ''}`}
-            style={get(state, 'styles.barContainer')}
+            style={get(this.state, 'styles.barContainer')}
             ref={node => (this.nodes.barContainer = node)}
           >
             <div className="bars">
               {this.goals &&
                 this.goals.map((goal, index) =>
-                  this.renderGoal(goal, index, state),
+                  this.renderGoal(goal, index, this.state),
                 )}
             </div>
           </div>
