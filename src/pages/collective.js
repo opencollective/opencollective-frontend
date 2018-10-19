@@ -34,11 +34,15 @@ class CollectivePage extends React.Component {
   }
 
   async componentDidMount() {
-    const { getLoggedInUser } = this.props;
+    const { getLoggedInUser, query, data = {} } = this.props;
     const LoggedInUser = await getLoggedInUser();
     this.setState({ LoggedInUser });
     window.OC = window.OC || {};
     window.OC.LoggedInUser = LoggedInUser;
+
+    if (query.refetch && data.refetch) {
+      data.refetch();
+    }
   }
 
   shouldComponentUpdate(nextProps) {

@@ -153,7 +153,11 @@ class CreatePledgePage extends React.Component {
         data: { createOrder: result },
       } = await this.props.createOrder(order);
       if (result.collective.slug) {
-        Router.pushRoute('collective', { slug: result.collective.slug });
+        const params = { slug: result.collective.slug };
+        if (data.Collective) {
+          params.refetch = true;
+        }
+        Router.pushRoute('collective', params);
       }
     } catch (error) {
       this.setState({
