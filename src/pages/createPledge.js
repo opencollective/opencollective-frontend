@@ -153,7 +153,7 @@ class CreatePledgePage extends React.Component {
         data: { createOrder: result },
       } = await this.props.createOrder(order);
       if (result.collective.slug) {
-        Router.pushRoute(`/${result.collective.slug}`);
+        Router.pushRoute('collective', { slug: result.collective.slug });
       }
     } catch (error) {
       this.setState({
