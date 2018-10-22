@@ -174,6 +174,7 @@ class Transactions extends React.Component {
           {transactions.map(transaction => (
             <Box className="transaction" key={transaction.id} my={3}>
               <Transaction
+                collective={collective}
                 {...transaction}
                 isRefund={Boolean(transaction.refundTransaction)}
                 canEditCollective={
