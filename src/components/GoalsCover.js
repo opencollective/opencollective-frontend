@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage, defineMessages } from 'react-intl';
-import { get, maxBy } from 'lodash';
+import { get, maxBy, throttle } from 'lodash';
 import withIntl from '../lib/withIntl';
 import { formatCurrency } from '../lib/utils';
 
@@ -14,6 +14,7 @@ class GoalsCover extends React.Component {
   constructor(props) {
     super(props);
     this.renderGoal = this.renderGoal.bind(this);
+    this.populateGoals = this.populateGoals.bind(this);
     this.nodes = {};
     this.state = {
       goals: {},
@@ -63,7 +64,8 @@ class GoalsCover extends React.Component {
 
   componentDidMount() {
     this.populateGoals();
-    window.onresize = () => this.populateGoals();
+    const onResize = throttle(this.populateGoals, 500);
+    window.addEventListener('resize', onResize);
   }
 
   populateGoals() {
