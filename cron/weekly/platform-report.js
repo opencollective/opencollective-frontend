@@ -205,13 +205,23 @@ export default function run() {
     stripeDonationAmount: Transaction.aggregate(
       'amount',
       'SUM',
-      merge({}, lastWeekDonations, groupAndOrderBy('Transaction')),
+      merge(
+        {},
+        lastWeekDonations,
+        groupAndOrderBy('Transaction'),
+        service('stripe'),
+      ),
     ),
 
     priorStripeDonationAmount: Transaction.aggregate(
       'amount',
       'SUM',
-      merge({}, weekBeforeDonations, groupAndOrderBy('Transaction')),
+      merge(
+        {},
+        weekBeforeDonations,
+        groupAndOrderBy('Transaction'),
+        service('stripe'),
+      ),
     ),
 
     manualDonationAmount: Transaction.aggregate(
