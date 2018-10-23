@@ -86,7 +86,7 @@ const PledgeCard = ({
 PledgeCard.propTypes = {
   currency: PropTypes.string.isRequired,
   fromCollective: PropTypes.shape({
-    image: PropTypes.string.isRequired,
+    image: PropTypes.string,
     name: PropTypes.string.isRequired,
     slug: PropTypes.string.isRequired,
     type: PropTypes.string.isRequired,
