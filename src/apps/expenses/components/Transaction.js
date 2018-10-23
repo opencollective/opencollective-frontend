@@ -41,7 +41,7 @@ class Transaction extends React.Component {
       slug: PropTypes.string.isRequired,
     }),
     collective: PropTypes.shape({
-      id: PropTypes.number,
+      id: PropTypes.number.isRequired,
       type: PropTypes.string.isRequired,
       name: PropTypes.string.isRequired,
       slug: PropTypes.string.isRequired,
