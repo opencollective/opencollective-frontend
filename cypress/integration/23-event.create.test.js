@@ -42,7 +42,8 @@ describe('event.create.test.js', () => {
     cy.wait(100);
     cy.get('.geosuggest__suggests > :nth-child(1)').click();
     cy.wait(100);
-    cy.get('#location .address').contains('Rue Lesbroussart 22, 1050');
+    cy.get('#location .address').contains('Lesbroussart');
+    cy.get('#location .address').contains('1050');
     cy.get('.EditTiers .tier .inputField.name input').type('Free ticket');
     cy.get('.EditTiers .tier .inputField.description textarea').type(
       'Free ticket for students',
@@ -63,14 +64,15 @@ describe('event.create.test.js', () => {
     cy.get('.actions button').click();
     cy.wait(500);
     cy.screenshot(`s${i++}`);
-    cy.get('#location .address').contains('Rue Lesbroussart 22, 1050');
+    cy.get('#location .address').contains('Lesbroussart');
+    cy.get('#location .address').contains('1050');
     cy.get('#tickets .tier').should('have.length', 2);
     cy.wait(500);
     cy.screenshot(`s${i++}`);
     cy.get('#tickets .tier:nth-child(1) .amount').contains(15);
     cy.wait(300);
     cy.get('.desktopOnly .editCollective a').click();
-    cy.wait(500);
+    cy.wait(1000);
     cy.get('.inputs .inputField.name input', { timeout: 10000 }).type(
       `{selectall}${updatedTitle}`,
     );
