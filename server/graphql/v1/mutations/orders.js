@@ -280,6 +280,18 @@ export async function createOrder(order, loaders, remoteUser) {
         orderCreated,
         pick(order, ['hostFeePercent', 'platformFeePercent']),
       );
+    } else if (
+      !paymentRequired &&
+      order.interval &&
+      collective.type === types.COLLECTIVE
+    ) {
+      // create inactive subscription to hold the interval info
+      const subscription = await models.Subscription.create({
+        amount: order.totalAmount,
+        interval: order.interval,
+        currency: order.currency,
+      });
+      await orderCreated.update({ SubscriptionId: subscription.id });
     } else if (collective.type === types.EVENT) {
       // Free ticket, add user as an ATTENDEE
       const UserId = remoteUser ? remoteUser.id : user.id;

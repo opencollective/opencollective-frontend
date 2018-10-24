@@ -250,7 +250,9 @@ export const executeOrder = (user, order, options) => {
     .then(() => {
       if (payment.interval) {
         // @lincoln: shouldn't this section be executed after we successfully charge the user for the first payment? (ie. after `processOrder`)
-        return models.Subscription.create(payment)
+        return order
+          .getSubscription({ rejectOnEmpty: true })
+          .catch(() => models.Subscription.create(payment))
           .then(subscription => {
             // The order instance doesn't have the Subscription field
             // here because it was just created and no models were
