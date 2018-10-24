@@ -46,4 +46,8 @@ const StyledLink = styled(tag.a)`
   ${buttonStyle}
 `;
 
+StyledLink.defaultProps = {
+  blacklist: tag.defaultProps.blacklist.concat('buttonStyle'),
+};
+
 export default StyledLink;

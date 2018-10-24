@@ -42,6 +42,7 @@ const StyledButton = styled(tag.button)`
 `;
 
 StyledButton.defaultProps = {
+  blacklist: tag.defaultProps.blacklist.concat('buttonStyle'),
   buttonStyle: 'standard',
 };
 

@@ -11,12 +11,18 @@ import {
   fontWeight,
   maxWidth,
   minWidth,
+  variant,
   space,
   textAlign,
   width,
 } from 'styled-system';
 import tag from 'clean-tag';
 import { overflow } from './Container';
+
+const buttonStyle = variant({
+  key: 'buttons',
+  prop: 'buttonStyle',
+});
 
 const StyledInput = styled(tag.input)(
   [],
@@ -38,15 +44,15 @@ const StyledInput = styled(tag.input)(
 );
 
 StyledInput.defaultProps = {
+  blacklist: tag.defaultProps.blacklist.concat('buttonStyle'),
   border: 'none',
 };
 
-export const TextInput = styled(StyledInput)`
-  border: 1px solid #cccccc;
-  border-radius: 4px;
-`;
+export const TextInput = styled(StyledInput)``;
 
 TextInput.defaultProps = {
+  border: '1px solid #cccccc',
+  borderRadius: '4px',
   fontSize: '14px',
   px: 3,
   py: 2,
@@ -54,14 +60,11 @@ TextInput.defaultProps = {
 };
 
 export const SubmitInput = styled(StyledInput)`
-  border: none;
-  border-radius: 30px;
-  opacity: ${props => (props.disabled ? 0.5 : 1)};
+  ${buttonStyle};
 `;
 
 SubmitInput.defaultProps = {
-  bg: '#3385ff',
-  color: 'white',
+  buttonStyle: 'primary',
   fontSize: 14,
   fontWeight: 'bold',
   px: 5,
