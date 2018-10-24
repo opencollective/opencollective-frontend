@@ -38,12 +38,13 @@ class MarketingPage extends React.Component {
     const { pageSlug } = this.props;
     const { LoggedInUser } = this.state;
 
-    let html, script, style;
+    let html, script, style, className;
 
     if (pageSlug === 'sponsor') {
       html = sponsorPageHtml;
       script = sponsorPageScript;
       style = sponsorPageStyle;
+      className = 'sponsorPage';
     }
 
     return (
@@ -51,10 +52,13 @@ class MarketingPage extends React.Component {
         <style global jsx>
           {style}
         </style>
-        <div className="marketingPage">
+        <div>
           <Header LoggedInUser={LoggedInUser} />
           <Body>
-            <div dangerouslySetInnerHTML={{ __html: html }} />
+            <div
+              className={className}
+              dangerouslySetInnerHTML={{ __html: html }}
+            />
             <script type="text/javascript" src={script} />
           </Body>
           <Footer />

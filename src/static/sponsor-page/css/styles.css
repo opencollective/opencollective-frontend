@@ -1,13 +1,13 @@
-.marketingPage {
+.sponsorPage {
   box-sizing: border-box;
   font-size: 10px;
 }
-.marketingPage *,
-.marketingPage *::before,
-.marketingPage *::after {
+.sponsorPage *,
+.sponsorPage *::before,
+.sponsorPage *::after {
   box-sizing: inherit;
 }
-.marketingPage {
+.sponsorPage {
   font-size: 1.8rem;
   margin: 0;
   padding: 0;
@@ -15,17 +15,17 @@
   -moz-osx-font-smoothing: grayscale;
   font-family: 'Inter UI';
 }
-.marketingPage img {
+.sponsorPage img {
   display: inline-block;
   vertical-align: middle;
   max-width: 100%;
   height: auto;
   -ms-interpolation-mode: bicubic;
 }
-.marketingPage a {
+.sponsorPage a {
   text-decoration: none;
 }
-.marketingPage p {
+.sponsorPage p {
   margin: 15px 0px;
 }
 
