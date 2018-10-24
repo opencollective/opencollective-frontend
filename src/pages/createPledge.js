@@ -159,6 +159,7 @@ class CreatePledgePage extends React.Component {
           fromCollective,
           website,
           publicMessage,
+          interval,
         },
       },
     } = event;
@@ -173,6 +174,7 @@ class CreatePledgePage extends React.Component {
       },
       totalAmount: Number(totalAmount.value) * 100,
       publicMessage: publicMessage.value,
+      interval: interval.value,
     };
 
     if (data) {
@@ -395,10 +397,10 @@ class CreatePledgePage extends React.Component {
                       name="interval"
                       defaultValue="monthly"
                     >
-                      <option key="monthly" value="monthly">
+                      <option key="monthly" value="month">
                         Monthly
                       </option>
-                      <option key="yearly" value="yearly">
+                      <option key="yearly" value="year">
                         Yearly
                       </option>
                       <option key="none" value={null}>
