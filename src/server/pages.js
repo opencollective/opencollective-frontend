@@ -101,7 +101,7 @@ pages
 
 // Marketing Pages
 
-pages.add('marketing', '/:pageSlug(sponsor)', 'marketingPage');
+pages.add('marketing', '/:pageSlug(become-a-sponsor)', 'marketingPage');
 
 // Collective
 

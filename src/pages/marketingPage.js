@@ -40,7 +40,7 @@ class MarketingPage extends React.Component {
 
     let html, script, style, className;
 
-    if (pageSlug === 'sponsor') {
+    if (pageSlug === 'become-a-sponsor') {
       html = sponsorPageHtml;
       script = sponsorPageScript;
       style = sponsorPageStyle;
