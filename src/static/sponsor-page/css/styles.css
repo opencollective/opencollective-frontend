@@ -185,7 +185,7 @@ input[type='search']::-webkit-search-cancel-button {
   font-size: 5.2rem;
   font-weight: 900;
   text-align: center;
-  max-width: 785px;
+  max-width: 685px;
   padding: 20px 0px;
   margin: 0px auto;
 }
