@@ -43,6 +43,7 @@ export const P = styled(tag.p)`
 `;
 
 P.defaultProps = {
+  blacklist: tag.defaultProps.blacklist.concat(['textTransform', 'whiteSpace']),
   m: 0,
   letterSpacing: '-0.2px',
 };
