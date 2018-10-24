@@ -23,6 +23,10 @@ class Subscriptions extends React.Component {
         id: 'subscription.cancelled.label',
         defaultMessage: 'Cancelled Subscriptions',
       },
+      'subscription.pending.label': {
+        id: 'subscription.pending.label',
+        defaultMessage: 'Pending Subscriptions',
+      },
       'subscription.login.message': {
         id: 'subscription.login.message',
         defaultMessage:
@@ -61,7 +65,10 @@ class Subscriptions extends React.Component {
       .filter(s => s.isSubscriptionActive)
       .sort(this.sortBycreatedAt);
     const canceledSubs = subscriptions
-      .filter(s => !s.isSubscriptionActive)
+      .filter(s => !s.isSubscriptionActive && s.status !== 'PENDING')
+      .sort(this.sortBycreatedAt);
+    const pendingSubs = subscriptions
+      .filter(({ status }) => status === 'PENDING')
       .sort(this.sortBycreatedAt);
 
     let userString = `${collective.name || collective.slug} isn't`;
@@ -91,7 +98,8 @@ class Subscriptions extends React.Component {
               width: 33%;
             }
             .active,
-            .canceled {
+            .canceled,
+            .pending {
               display: flex;
               flex-wrap: wrap;
               flex-direction: row;
@@ -179,6 +187,25 @@ class Subscriptions extends React.Component {
         )}
         <div className="canceled">
           {canceledSubs.map(subscription => (
+            <SubscriptionCard
+              subscription={subscription}
+              key={`canceled-${subscription.id}`}
+              LoggedInUser={LoggedInUser}
+              paymentMethods={collective.paymentMethods}
+              slug={collective.slug}
+            />
+          ))}
+        </div>
+        {pendingSubs.length > 0 && (
+          <div className="subscriptions-cancelled-label">
+            {' '}
+            <span>
+              {intl.formatMessage(this.messages['subscription.pending.label'])}{' '}
+            </span>
+          </div>
+        )}
+        <div className="pending">
+          {pendingSubs.map(subscription => (
             <SubscriptionCard
               subscription={subscription}
               key={`canceled-${subscription.id}`}
