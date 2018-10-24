@@ -32,6 +32,7 @@ import {
   size,
   space,
   style,
+  textAlign,
   top,
   width,
   zIndex,
@@ -40,6 +41,8 @@ import {
 export const overflow = style({ prop: 'overflow' });
 
 export const pointerEvents = style({ prop: 'pointerEvents' });
+
+export const float = style({ prop: 'float' });
 
 const Container = styled(tag)(
   [],
@@ -60,6 +63,7 @@ const Container = styled(tag)(
   flex,
   flexDirection,
   flexWrap,
+  float,
   fontSize,
   height,
   justifyContent,
@@ -76,8 +80,21 @@ const Container = styled(tag)(
   size,
   space,
   top,
+  textAlign,
   width,
   zIndex,
+  props =>
+    props.clearfix && {
+      '::after': {
+        content: '""',
+        display: 'table',
+        clear: 'both',
+      },
+    },
 );
+
+Container.defaultProps = {
+  blacklist: tag.defaultProps.blacklist.concat('float'),
+};
 
 export default Container;
