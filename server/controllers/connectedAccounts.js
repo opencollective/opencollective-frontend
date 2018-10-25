@@ -199,7 +199,7 @@ export const fetchAllRepositories = (req, res, next) => {
   const payload = req.jwtPayload;
   ConnectedAccount.findOne({ where: { id: payload.connectedAccountId } })
     .then(ca => {
-      return Promise.map([1, 2, 3, 4, 5], page =>
+      return Promise.map([1, 2, 3, 4, 5, 6, 7, 8, 9], page =>
         request({
           uri: 'https://api.github.com/user/repos',
           qs: {
