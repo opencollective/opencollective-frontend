@@ -229,4 +229,47 @@ describe('updateOrder', () => {
     expect(subscription.isActive).to.be.true;
     expect(subscription.amount).to.equal(order.totalAmount);
   });
+
+  it('updates an order with an existing subscription', async () => {
+    const existingSubscription = await models.Subscription.create({
+      amount: existingOrder.totalAmount,
+      currency: existingOrder.currency,
+      interval: 'month',
+    });
+    await existingOrder.update({ SubscriptionId: existingSubscription.id });
+
+    order.id = existingOrder.id;
+    order.interval = 'month';
+    order.totalAmount = existingOrder.totalAmount;
+    order.paymentMethod = pick(paymentMethod, [
+      'id',
+      'uuid',
+      'service',
+      'token',
+      'name',
+    ]);
+
+    utils.stubStripeBalance(
+      sandbox,
+      order.totalAmount,
+      'eur',
+      Math.round(order.totalAmount * 0.05),
+      4500,
+    ); // This is the payment processor fee.
+
+    // When the query is executed
+    const res = await utils.graphqlQuery(updateOrderQuery, { order }, user2);
+
+    // Then there should be no errors
+    expect(res.errors).to.not.exist;
+    expect(res.data.updateOrder.subscription).to.exist;
+    expect(res.data.updateOrder.status).to.equal('ACTIVE');
+
+    const { subscription } = res.data.updateOrder;
+
+    expect(subscription.id).to.equal(subscription.id);
+    expect(subscription.interval).to.equal('month');
+    expect(subscription.isActive).to.be.true;
+    expect(subscription.amount).to.equal(order.totalAmount);
+  });
 });
