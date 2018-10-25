@@ -167,6 +167,33 @@ describe('createOrder', () => {
     expect(res.data.createOrder.status).to.equal('PENDING');
   });
 
+  it('creates a pending order (pledge) with inactive subscription if interval is included and collective is not active', async () => {
+    const collective = await models.Collective.create({
+      slug: 'test',
+      name: 'test',
+      isActive: false,
+      website: 'https://github.com/opencollective/frontend',
+    });
+    const thisOrder = cloneDeep(order);
+    thisOrder.collective.id = collective.id;
+    thisOrder.user = {
+      firstName: 'John',
+      lastName: 'Smith',
+      email: 'jsmith@email.com',
+      twitterHandle: 'johnsmith',
+      newsletterOptIn: true,
+    };
+    thisOrder.interval = 'month';
+
+    const res = await utils.graphqlQuery(createOrderQuery, {
+      order: thisOrder,
+    });
+
+    expect(res.errors).to.not.exist;
+    expect(res.data.createOrder.status).to.equal('PENDING');
+    expect(res.data.createOrder.subscription.interval).to.equal('month');
+  });
+
   it('creates an order as new user and sends a tweet', async () => {
     // And given a twitter connected account for the above
     // collective
