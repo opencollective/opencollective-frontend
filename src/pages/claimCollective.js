@@ -2,7 +2,6 @@ import React, { Fragment } from 'react';
 import { graphql, compose } from 'react-apollo';
 import gql from 'graphql-tag';
 import fetch from 'node-fetch';
-import styled from 'styled-components';
 
 import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
@@ -20,14 +19,6 @@ import ErrorPage from '../components/ErrorPage';
 import StyledLink from '../components/StyledLink';
 import StyledButton from '../components/StyledButton';
 import { GithubIcon } from '../components/icons';
-
-const List = styled.ul`
-  font-size: 1.2rem;
-  line-height: 20px;
-  margin: 0;
-  padding: 0;
-  padding-left: 1.2rem;
-`;
 
 const { WEBSITE_URL } = process.env;
 
@@ -168,24 +159,14 @@ class ClaimCollectivePage extends React.Component {
                         textAlign="left"
                         mb={2}
                       >
-                        What are we going to do with it?
+                        Why are we asking you to do this?
                       </P>
 
-                      <List>
-                        <li>
-                          Validate that you&apos;re an admin in the repository
-                          associated with this collective.
-                        </li>
-                        <li>
-                          The data will be cached up to 24 hours, not stored
-                          longer than that.
-                        </li>
-                        <li>On Sign Out, we will revoke all permissions.</li>
-                        <li>
-                          Trust us, the code is Open Source and you can audit
-                          it.
-                        </li>
-                      </List>
+                      <P
+                        fontSize="1.2rem"
+                      >
+                        We need to validate that you have owner rights to the repository linked to this pledged collective.
+                      </P>
 
                       <P
                         fontSize="1.6rem"
@@ -194,15 +175,14 @@ class ClaimCollectivePage extends React.Component {
                         mb={2}
                         mt={3}
                       >
-                        Want to analyze your Organization repositories too?
+                        Want to onboard an organization instead of a single repository?
                       </P>
 
-                      <List>
-                        <li>
-                          Make sure to Grant access in the GitHub permission
-                          page.
-                        </li>
-                      </List>
+                      <P
+                        fontSize="1.2rem"
+                      >
+                        Make sure to Grant access in the GitHub permission page.
+                      </P>
 
                       <StyledLink
                         buttonStyle="standard"
@@ -270,6 +250,7 @@ class ClaimCollectivePage extends React.Component {
                       Sorry, we were unable to succesfully validated your admin
                       status. Try again, or if you believe this is a mistake,
                       please get in touch with the repository owners.
+                      Make sure you granted us access as an organization if that&apos;s what you are trying to onboard. 
                     </P>
                     <StyledLink
                       buttonStyle="standard"

@@ -107,7 +107,7 @@ class PledgedCollective extends React.Component {
                   totalCount: pledgeStats.ORGANIZATION + pledgeStats.COLLECTIVE + pledgeStats.USER,
                 }}
                 defaultMessage={
-                  '{orgCount, plural, =0 {} one {# organization} other {# organizations}} {both, plural, =0 {} one { and }} {userCount, plural, =0 {} one {# person } other {# people }} {totalCount, plural, one {has } other {have }}'
+                  '{orgCount, plural, =0 {} one {# organization} other {# organizations}} {both, plural, =0 {} one { and }} {userCount, plural, =0 {} one {# individual } other {# individuals }} {totalCount, plural, one {has } other {have }}'
                 }
               />{' '}
               already pledged a total of{' '}
@@ -121,10 +121,10 @@ class PledgedCollective extends React.Component {
             </H2>
 
             <P color="#76777A" fontSize={12} my={4}>
-              A pledge is how the community shows its interest in supporting a
-              cause or collective that is not yet on Open Collective, just like{' '}
+              A pledge is a way for the community to show interest in supporting a
+              cause or project that is not yet on Open Collective, just like{' '}
               <Span fontWeight="bold">{collective.name}</Span>
-              . This will incentivize them to create an open collective for
+              . This will incentivize them to create a collective for
               their activities and offer you much more visibility on how your
               money is spent to advance their cause. Once they create it, you
               will receive an email to ask you to fulfill your pledge.
@@ -179,8 +179,7 @@ class PledgedCollective extends React.Component {
                   Do you own <Span fontWeight="bold">{collective.name}</Span>?
                 </H3>
                 <P fontSize={12} color="#9D9FA3">
-                  Short text explaining the benefits that come with claiming
-                  this open collective.
+                  You can claim this collective! You will be able to start raising funds and manage your expenses transparently. We will contact the organizations and individuals who made commitment for them to fulfill their pledge.
                 </P>
               </Box>
               <Flex
