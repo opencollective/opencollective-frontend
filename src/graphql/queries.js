@@ -656,6 +656,7 @@ export const getSubscriptionsQuery = gql`
         createdAt
         isSubscriptionActive
         isPastDue
+        status
         collective {
           id
           name

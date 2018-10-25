@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { FormattedMessage } from 'react-intl';
 
 import { imagePreview } from '../lib/utils';
 import { defaultImage } from '../constants/collectives';
@@ -73,7 +74,13 @@ const PledgeCard = ({
           abbreviate
         />
 
-        {interval ? ` / ${interval}` : null}
+        {interval && (
+          <FormattedMessage
+            id="order.interval"
+            values={{ interval }}
+            defaultMessage=" / {interval, select, month {mo.} year {yr.}}"
+          />
+        )}
       </Span>
     </P>
 
