@@ -103,7 +103,7 @@ class ClaimCollectivePage extends React.Component {
     const websitePath = new RegExp(website.split('://')[1], 'i');
     const [repo] = repos.filter(({ html_url }) => html_url.match(websitePath));
 
-    const isAdmin = repo && repo.pemissions.admin;
+    const isAdmin = repo && repo.permissions.admin;
 
     const invalid = repos.length > 0 && !isAdmin;
 
