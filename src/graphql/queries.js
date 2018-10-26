@@ -610,20 +610,6 @@ const getCollectiveCoverQuery = gql`
   }
 `;
 
-export const getOcCardBalanceQuery = gql`
-  query checkOcPaymentMethod($token: String!) {
-    ocPaymentMethod(token: $token) {
-      id
-      name
-      currency
-      balance
-      uuid
-      service
-      type
-    }
-  }
-`;
-
 export const getSubscriptionsQuery = gql`
   query Collective($slug: String) {
     Collective(slug: $slug) {
