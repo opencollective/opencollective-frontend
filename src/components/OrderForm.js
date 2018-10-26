@@ -325,23 +325,36 @@ class OrderForm extends React.Component {
     this.paymentMethodTypeOptions = paymentMethodTypeOptions;
   };
 
+  paymentMethodName = pm => {
+    if (pm.type === 'virtualcard') {
+      return pm.name.replace('card from', 'Gift Card from');
+    } else {
+      return `${get(pm, 'data.brand', get(pm, 'type'))} ${pm.name}`;
+    }
+  };
+
+  paymentMethodExpiration = pm => {
+    /* The expiryDate field will show up for prepaid cards */
+    return pm.expiryDate
+      ? `- exp ${moment(pm.expiryDate).format('MM/Y')}`
+      : get(pm, 'data.expMonth') || get(pm, 'data.expYear')
+        ? `- exp ${get(pm, 'data.expMonth')}/${get(pm, 'data.expYear')}`
+        : '';
+  };
+
+  paymentMethodBalance = pm => {
+    /* Prepaid cards have their balance available */
+    return pm.balance ? `(${formatCurrency(pm.balance, pm.currency)})` : '';
+  };
+
   paymentMethodsOptionsForCollective = (paymentMethods, collective) => {
     return paymentMethods.map(pm => {
       const value = pm.uuid;
-      const brand = get(pm, 'data.brand') || get(pm, 'type');
-      /* The expiryDate field will show up for prepaid cards */
-      const expiration = pm.expiryDate
-        ? `- exp ${moment(pm.expiryDate).format('MM/Y')}`
-        : get(pm, 'data.expMonth') || get(pm, 'data.expYear')
-          ? `- exp ${get(pm, 'data.expMonth')}/${get(pm, 'data.expYear')}`
-          : '';
-      /* Prepaid cards have their balance available */
-      const balance = pm.balance
-        ? `(${formatCurrency(pm.balance, pm.currency)})`
-        : '';
+      const expiration = this.paymentMethodExpiration(pm);
+      const balance = this.paymentMethodBalance(pm);
+      const name = this.paymentMethodName(pm);
       /* Assemble all the pieces in one string */
-      const name = `${brand} ${pm.name}`;
-      const label = `💳  \xA0\xA0${
+      const label = `💳 \xA0\xA0${
         collective.name
       } - ${name} ${expiration} ${balance}`;
       return { [value]: label };
