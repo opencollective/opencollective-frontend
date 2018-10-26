@@ -188,7 +188,9 @@ async function create(args, remoteUser) {
   // consider monthlyLimitPerMember times the months from now until the expiry date
   let monthlyLimitPerMember;
   let amount = args.amount;
-  let description = `${formatCurrency(amount, args.currency)} card from ${collective.name}`;
+  let description = `${formatCurrency(amount, args.currency)} Gift Card from ${
+    collective.name
+  }`;
   if (args.monthlyLimitPerMember) {
     monthlyLimitPerMember = args.monthlyLimitPerMember;
     amount = null;
