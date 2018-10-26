@@ -35,6 +35,7 @@ class ClaimCollectivePage extends React.Component {
   state = {
     error: null,
     loadingUserLogin: true,
+    loadingRepos: false,
     LoggedInUser: {},
     repos: [],
   };
@@ -55,10 +56,14 @@ class ClaimCollectivePage extends React.Component {
         ({ service }) => service === 'github',
       );
     if (isConnected) {
+      this.setState({ loadingRepos: true });
       const repos = await fetch(
         `${getBaseApiUrl()}/github-repositories?access_token=${token}`,
       ).then(response => response.json());
-      this.setState({ repos });
+      this.setState({
+        loadingRepos: false,
+        repos,
+      });
     }
   }
 
@@ -77,10 +82,10 @@ class ClaimCollectivePage extends React.Component {
 
   render() {
     const { data, slug, token } = this.props;
-    const { error, LoggedInUser, loadingUserLogin, repos } = this.state;
+    const { error, LoggedInUser, loadingUserLogin, loadingRepos, repos } = this.state;
 
     const {
-      Collective: { id, name, website },
+      Collective: { id, name, website } = {},
       loading,
     } = data;
 
@@ -100,7 +105,7 @@ class ClaimCollectivePage extends React.Component {
 
     const connectUrl = `/api/connected-accounts/github?redirect=${WEBSITE_URL}/${slug}/claim`;
 
-    const websitePath = new RegExp(website.split('://')[1], 'i');
+    const websitePath = website && new RegExp(website.split('://')[1], 'i');
     const [repo] = repos.filter(({ html_url }) => html_url.match(websitePath));
 
     const isAdmin = repo && repo.permissions.admin;
@@ -145,6 +150,9 @@ class ClaimCollectivePage extends React.Component {
                 py={4}
                 width={0.8}
               >
+                {(loadingRepos || loadingUserLogin) && (
+                  <P textAlign="center">Analyzing your GitHub repos...</P>
+                )}
                 {!token &&
                   repos.length === 0 && (
                     <Fragment>
