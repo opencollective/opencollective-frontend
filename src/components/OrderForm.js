@@ -110,6 +110,10 @@ class OrderForm extends React.Component {
         id: 'error.email.invalid',
         defaultMessage: 'Invalid email address',
       },
+      'paymentmethod.label': {
+        id: 'paymentmethod.label',
+        defaultMessage: 'Payment Method',
+      },
       'creditcard.label': {
         id: 'creditcard.label',
         defaultMessage: 'Credit Card',
@@ -843,7 +847,7 @@ class OrderForm extends React.Component {
               <InputField
                 type="select"
                 className="horizontal"
-                label={intl.formatMessage(this.messages['creditcard.label'])}
+                label={intl.formatMessage(this.messages['paymentmethod.label'])}
                 name="creditcardSelector"
                 onChange={uuid => this.handleChange('creditcard', { uuid })}
                 options={this.paymentMethodsOptions}
