@@ -29,7 +29,6 @@ import {
 import { getPaypal } from '../lib/paypal';
 import { getStripeToken } from '../lib/stripe';
 import { checkUserExistence, signin } from '../lib/api';
-import { getOcCardBalanceQuery } from '../graphql/queries';
 
 class OrderForm extends React.Component {
   static propTypes = {
@@ -59,11 +58,6 @@ class OrderForm extends React.Component {
       creditcard: {
         show: !this.props.redeemFlow,
         save: true,
-      },
-      ocCard: {
-        applySent: false,
-        loading: false,
-        expanded: this.props.redeemFlow,
       },
       orgDetails: {
         show: false,
@@ -152,29 +146,6 @@ class OrderForm extends React.Component {
       'paymentMethod.manual': {
         id: 'paymentMethod.manual',
         defaultMessage: 'bank transfer',
-      },
-      'ocCard.label': { id: 'occard.label', defaultMessage: 'Gift Card' },
-      'ocCard.apply': { id: 'occard.apply', defaultMessage: 'Apply' },
-      'ocCard.invalid': {
-        id: 'occard.invalid',
-        defaultMessage: 'Invalid code',
-      },
-      'ocCard.expired': {
-        id: 'occard.expired',
-        defaultMessage: 'Expired code',
-      },
-      'ocCard.loading': {
-        id: 'occard.loading',
-        defaultMessage: 'Please wait...',
-      },
-      'ocCard.amountremaining': {
-        id: 'occard.amountremaining',
-        defaultMessage: 'Valid code. Amount available: ',
-      },
-      'ocCard.amounterror': {
-        id: 'occard.amounterror',
-        defaultMessage:
-          'You can only contribute up to the amount available on your gift card.',
       },
       'ticket.title': { id: 'tier.order.ticket.title', defaultMessage: 'RSVP' },
       'backer.title': {
@@ -720,7 +691,7 @@ class OrderForm extends React.Component {
         window.location.hostname === 'localhost');
 
     const { intl } = this.props;
-    const { order, user, creditcard, ocCard } = this.state;
+    const { order, user, creditcard } = this.state;
     const newState = { ...this.state };
 
     // validate email
@@ -760,25 +731,7 @@ class OrderForm extends React.Component {
 
     // validate payment method
     if (order.totalAmount > 0) {
-      // favors ocCard over credit card
-      if (ocCard.valid) {
-        if (ocCard.balance < order.totalAmount) {
-          this.setState({
-            result: {
-              error: intl.formatMessage(this.messages['ocCard.amounterror']),
-            },
-          });
-          return false;
-        }
-        newState.paymentMethod = pick(ocCard, [
-          'token',
-          'service',
-          'type',
-          'uuid',
-        ]);
-        this.setState(newState);
-        return true;
-      } else if (creditcard.uuid && creditcard.uuid.length === 36) {
+      if (creditcard.uuid && creditcard.uuid.length === 36) {
         newState.paymentMethod = { uuid: creditcard.uuid };
         this.setState(newState);
         return true;
@@ -835,57 +788,6 @@ class OrderForm extends React.Component {
     });
   };
 
-  applyOcCardBalance = async () => {
-    const { ocCard, creditcard, order } = this.state;
-
-    this.setState({
-      ocCard: Object.assign(ocCard, { applySent: true, loading: true }),
-    });
-    const { token } = ocCard;
-
-    const args = { query: getOcCardBalanceQuery, variables: { token } };
-    let result = null;
-    try {
-      result = await this.props.client.query(args);
-    } catch (error) {
-      this.setState({ ocCard: { loading: false } });
-      this.error(error);
-      return;
-    }
-
-    this.setState({ ocCard: Object.assign(ocCard, { loading: false }) });
-
-    if (result.data && result.data.ocPaymentMethod) {
-      // force a tier of the whole amount with null interval
-      const tier = {
-        interval: null,
-        amount: result.data.ocPaymentMethod.balance,
-        currency: result.data.ocPaymentMethod.currency,
-        description: 'Thank you 🙏',
-        name: 'Gift Card',
-      };
-
-      this.setState({
-        ocCard: Object.assign(ocCard, {
-          ...result.data.ocPaymentMethod,
-          valid: true,
-        }),
-        creditcard: Object.assign(creditcard, { show: false }),
-        order: Object.assign(order, {
-          interval: null,
-          totalAmount: result.data.ocPaymentMethod.balance,
-          tier,
-        }),
-      });
-    }
-  };
-
-  expandGiftCard = () => {
-    this.setState({
-      ocCard: Object.assign({}, this.state.ocCard, { expanded: true }),
-    });
-  };
-
   renderPayPalButton = () =>
     !this.isPayPalAuthorized() && (
       <FormGroup controlId="paypalFG" id="paypalFG">
@@ -929,44 +831,9 @@ class OrderForm extends React.Component {
 
   renderCreditCard = () => {
     const { intl } = this.props;
-    const { ocCard, creditcard } = this.state;
+    const { creditcard } = this.state;
     const showNewCreditCardForm =
-      !ocCard.show &&
-      creditcard.show &&
-      (!creditcard.uuid || creditcard.uuid === 'other');
-    const inputOcCard = {
-      type: 'text',
-      name: 'ocCard',
-      button: (
-        <Button
-          className="ocCardApply"
-          disabled={ocCard.loading}
-          onClick={this.applyOcCardBalance}
-        >
-          {intl.formatMessage(this.messages['ocCard.apply'])}
-        </Button>
-      ),
-      required: true,
-      label: intl.formatMessage(this.messages['ocCard.label']),
-      defaultValue: ocCard['token'],
-      onChange: value => this.handleChange('ocCard', 'token', value),
-    };
-
-    if (ocCard.applySent) {
-      if (ocCard.loading) {
-        inputOcCard.description = intl.formatMessage(
-          this.messages['ocCard.loading'],
-        );
-      } else if (ocCard.valid) {
-        inputOcCard.description = `${intl.formatMessage(
-          this.messages['ocCard.amountremaining'],
-        )} ${formatCurrency(ocCard.balance, ocCard.currency)}`;
-      } else {
-        inputOcCard.description = intl.formatMessage(
-          this.messages['ocCard.invalid'],
-        );
-      }
-    }
+      creditcard.show && (!creditcard.uuid || creditcard.uuid === 'other');
 
     return (
       <Row>
@@ -995,31 +862,6 @@ class OrderForm extends React.Component {
               />
             </div>
           )}
-          <div>
-            {!ocCard.expanded && (
-              <Row key="giftcard.checkbox">
-                <Col sm={2} />
-                <Col sm={10}>
-                  <a
-                    className="gift-card-expander"
-                    onClick={this.expandGiftCard}
-                  >
-                    <FormattedMessage
-                      id="paymentMethod.useGiftCard"
-                      defaultMessage="Use a Gift Card"
-                    />
-                  </a>
-                </Col>
-              </Row>
-            )}
-            {ocCard.expanded && (
-              <Row key="ocCard.input">
-                <Col sm={12}>
-                  <InputField className="horizontal" {...inputOcCard} />
-                </Col>
-              </Row>
-            )}
-          </div>
         </Col>
       </Row>
     );
