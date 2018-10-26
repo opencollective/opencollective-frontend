@@ -21,7 +21,7 @@ class Transaction extends React.Component {
     description: PropTypes.string,
     currency: PropTypes.string.isRequired,
     attachment: PropTypes.string,
-    uuid: PropTypes.number,
+    uuid: PropTypes.string,
     netAmountInCollectiveCurrency: PropTypes.number,
     platformFeeInHostCurrency: PropTypes.number,
     paymentProcessorFeeInHostCurrency: PropTypes.number,
