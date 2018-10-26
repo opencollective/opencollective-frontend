@@ -362,10 +362,6 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
 }
 
 .c29 {
-  background-color: #3385FF;
-  border-radius: 50px;
-  color: white;
-  background-color: #3385FF;
   display: block;
   font-size: 14px;
   font-weight: bold;
@@ -834,11 +830,6 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
           </p>
           <a
             className="c29"
-            hover={
-              Object {
-                "color": "white",
-              }
-            }
             href="/pledges/new?name=test"
             onClick={[Function]}
           >
