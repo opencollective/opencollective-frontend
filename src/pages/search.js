@@ -184,17 +184,14 @@ class SearchPage extends React.Component {
                     {usePledges && (
                       <Link route={`/pledges/new?name=${term}`} passHref>
                         <StyledLink
-                          bg="#3385FF"
-                          borderRadius="50px"
-                          color="white"
                           display="block"
                           fontSize="14px"
                           fontWeight="bold"
                           maxWidth="220px"
-                          hover={{ color: 'white' }}
                           py={2}
                           px={4}
                           textAlign="center"
+                          buttonStyle="primary"
                         >
                           Make a pledge
                         </StyledLink>
@@ -252,17 +249,14 @@ class SearchPage extends React.Component {
                   {usePledges && (
                     <Link route={`/pledges/new?name=${term}`} passHref>
                       <StyledLink
-                        bg="#3385FF"
-                        borderRadius="50px"
-                        color="white"
                         display="block"
                         fontSize="14px"
                         fontWeight="bold"
                         maxWidth="220px"
-                        hover={{ color: 'white' }}
                         py={2}
                         px={4}
                         textAlign="center"
+                        buttonStyle="primary"
                       >
                         Make a pledge
                       </StyledLink>
