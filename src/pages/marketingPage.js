@@ -9,9 +9,11 @@ import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
 import withLoggedInUser from '../lib/withLoggedInUser';
 
+import { loadScriptAsync } from '../lib/utils';
+
 import sponsorPageHtml from '../static/sponsor-page/index.html';
 import sponsorPageScript from '../static/sponsor-page/js/scripts.js';
-import sponsorPageStyle from '../static/sponsor-page/css/styles.css';
+import sponsorPageStyle from '!css-loader!../static/sponsor-page/css/styles.css'; // eslint-disable-line
 
 class MarketingPage extends React.Component {
   static getInitialProps({ query: { pageSlug } }) {
@@ -32,34 +34,37 @@ class MarketingPage extends React.Component {
     this.props.getLoggedInUser().then(LoggedInUser => {
       this.setState({ LoggedInUser });
     });
+
+    if (this.props.pageSlug === 'become-a-sponsor') {
+      loadScriptAsync(sponsorPageScript);
+    }
   }
 
   render() {
     const { pageSlug } = this.props;
     const { LoggedInUser } = this.state;
 
-    let html, script, style, className;
+    let html, style, className;
 
     if (pageSlug === 'become-a-sponsor') {
       html = sponsorPageHtml;
-      script = sponsorPageScript;
       style = sponsorPageStyle;
       className = 'sponsorPage';
     }
 
     return (
       <Fragment>
-        <style global jsx>
-          {style}
-        </style>
         <div>
           <Header LoggedInUser={LoggedInUser} />
           <Body>
+            <style
+              type="text/css"
+              dangerouslySetInnerHTML={{ __html: style }}
+            />
             <div
               className={className}
               dangerouslySetInnerHTML={{ __html: html }}
             />
-            <script type="text/javascript" src={script} />
           </Body>
           <Footer />
         </div>
