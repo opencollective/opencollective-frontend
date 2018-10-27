@@ -45,7 +45,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   padding-right: 16px;
 }
 
-.c20 {
+.c18 {
   box-sizing: border-box;
   width: 100%;
   margin-left: auto;
@@ -54,25 +54,25 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   padding-right: 16px;
 }
 
-.c21 {
+.c19 {
   box-sizing: border-box;
   width: 100%;
 }
 
-.c23 {
+.c21 {
   box-sizing: border-box;
   margin-top: 16px;
   margin-bottom: 16px;
 }
 
-.c28 {
+.c26 {
   box-sizing: border-box;
   width: 100%;
   padding-top: 16px;
   padding-bottom: 16px;
 }
 
-.c32 {
+.c30 {
   max-width: 1300px;
   box-sizing: border-box;
   margin-left: auto;
@@ -80,7 +80,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   padding: 8px;
 }
 
-.c39 {
+.c37 {
   box-sizing: border-box;
   margin-top: 16px;
   -webkit-flex: 1 1 auto;
@@ -91,7 +91,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   order: 3;
 }
 
-.c40 {
+.c38 {
   box-sizing: border-box;
   width: 50%;
   margin-bottom: 16px;
@@ -160,7 +160,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   justify-content: space-around;
 }
 
-.c22 {
+.c20 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -171,7 +171,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   align-items: flex-end;
 }
 
-.c26 {
+.c24 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -185,7 +185,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   justify-content: center;
 }
 
-.c31 {
+.c29 {
   max-width: 1300px;
   display: -webkit-box;
   display: -webkit-flex;
@@ -204,7 +204,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   justify-content: space-between;
 }
 
-.c34 {
+.c32 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -215,7 +215,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   justify-content: center;
 }
 
-.c38 {
+.c36 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -229,7 +229,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   justify-content: center;
 }
 
-.c27 {
+.c25 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -247,23 +247,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   justify-content: center;
 }
 
-.c17 {
-  color: #46b0ed;
-  display: inline-block;
-  font-size: 1.2rem;
-  font-weight: bold;
-  line-height: Paragraph;
-  -webkit-letter-spacing: 1px;
-  -moz-letter-spacing: 1px;
-  -ms-letter-spacing: 1px;
-  letter-spacing: 1px;
-  margin: 0px;
-  margin-left: 8px;
-  margin-right: 8px;
-  cursor: pointer;
-}
-
-.c35 {
+.c33 {
   color: #6E747A;
   font-size: 1.4rem;
   line-height: Paragraph;
@@ -277,7 +261,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   text-align: center;
 }
 
-.c41 {
+.c39 {
   color: #C2C6CC;
   font-size: 1.2rem;
   line-height: Paragraph;
@@ -290,7 +274,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   text-align: center;
 }
 
-.c30 {
+.c28 {
   border-top: 1px solid #aaaaaa;
   bottom: 0px;
   background-color: white;
@@ -299,7 +283,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   width: 100%;
 }
 
-.c33 {
+.c31 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -312,7 +296,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   width: 100%;
 }
 
-.c36 {
+.c34 {
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -334,36 +318,19 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   width: 100%;
 }
 
-.c18 {
-  position: relative;
+.c16 {
+  border: 1px solid #D5DAE0;
+  border-radius: 20px;
+  color: #3385FF;
   display: inline-block;
-  height: 0.6rem;
-  width: 1.4rem;
-  cursor: pointer;
+  font-size: 1.4rem;
+  padding-left: 16px;
+  padding-right: 16px;
+  padding-top: 8px;
+  padding-bottom: 8px;
 }
 
-.c18::before,
-.c18::after {
-  content: '';
-  position: absolute;
-  top: 0;
-}
-
-.c18::before {
-  border-left: 0.6rem solid transparent;
-  border-right: 0.6rem solid transparent;
-  border-top: 0.6rem solid #46b0ed;
-  left: 0;
-}
-
-.c18::after {
-  border-left: calc(0.6rem - 0.2rem) solid transparent;
-  border-right: calc(0.6rem - 0.2rem) solid transparent;
-  border-top: calc(0.6rem - 0.2rem) solid white;
-  left: 0.2rem;
-}
-
-.c29 {
+.c27 {
   display: block;
   font-size: Paragraph;
   font-weight: bold;
@@ -375,7 +342,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   text-align: center;
 }
 
-.c43 {
+.c41 {
   list-style: none;
   margin-bottom: 8px;
   text-align: center;
@@ -392,7 +359,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   font-size: 1.4rem;
 }
 
-.c37 {
+.c35 {
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -412,12 +379,12 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   width: 48px;
 }
 
-.c37:hover,
-.c37:focus {
+.c35:hover,
+.c35:focus {
   opacity: 1;
 }
 
-.c44 {
+.c42 {
   color: #6e747a;
   display: block;
   fontsize: 1.4rem;
@@ -426,7 +393,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   padding: 0;
 }
 
-.c42 {
+.c40 {
   box-sizing: border-box;
   padding-left: 0px;
   padding-right: 8px;
@@ -443,7 +410,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   justify-content: center;
 }
 
-.c24.c24.c24 {
+.c22.c22.c22 {
   border: none;
   border-bottom: 2px solid #3385FF;
   border-radius: 0;
@@ -453,22 +420,22 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   padding: 0;
 }
 
-.c25.c25 {
+.c23.c23 {
   padding: 0 2rem;
 }
 
-.c19 {
+.c17 {
   max-width: 1200px;
 }
 
 @media screen and (min-width:40em) {
-  .c20 {
+  .c18 {
     width: 85%;
   }
 }
 
 @media screen and (min-width:52em) {
-  .c39 {
+  .c37 {
     -webkit-order: 2;
     -ms-flex-order: 2;
     order: 2;
@@ -476,13 +443,13 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c40 {
+  .c38 {
     width: 25%;
   }
 }
 
 @media screen and (min-width:40em) {
-  .c26 {
+  .c24 {
     -webkit-box-pack: center;
     -webkit-justify-content: center;
     -ms-flex-pack: center;
@@ -491,7 +458,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c26 {
+  .c24 {
     -webkit-box-pack: start;
     -webkit-justify-content: flex-start;
     -ms-flex-pack: start;
@@ -500,7 +467,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c31 {
+  .c29 {
     -webkit-flex-direction: row;
     -ms-flex-direction: row;
     flex-direction: row;
@@ -508,7 +475,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c31 {
+  .c29 {
     -webkit-align-items: flex-start;
     -webkit-box-align: flex-start;
     -ms-flex-align: flex-start;
@@ -517,7 +484,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c34 {
+  .c32 {
     -webkit-box-pack: start;
     -webkit-justify-content: flex-start;
     -ms-flex-pack: start;
@@ -526,25 +493,25 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c35 {
-    text-align: left;
-  }
-}
-
-@media screen and (min-width:52em) {
-  .c41 {
-    text-align: left;
-  }
-}
-
-@media screen and (min-width:52em) {
   .c33 {
+    text-align: left;
+  }
+}
+
+@media screen and (min-width:52em) {
+  .c39 {
+    text-align: left;
+  }
+}
+
+@media screen and (min-width:52em) {
+  .c31 {
     width: 33.33333333333333%;
   }
 }
 
 @media screen and (min-width:52em) {
-  .c36 {
+  .c34 {
     -webkit-order: 3;
     -ms-flex-order: 3;
     order: 3;
@@ -575,20 +542,8 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   }
 }
 
-@media screen and (max-width:40em) {
-  .c16 {
-    display: none;
-  }
-}
-
-@media screen and (min-width:40em) and (max-width:52em) {
-  .c16 {
-    display: none;
-  }
-}
-
 @media screen and (min-width:52em) {
-  .c43 {
+  .c41 {
     text-align: left;
   }
 }
@@ -745,28 +700,15 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
         <div
           className="LoginTopBarProfileButton"
         >
-          <div
-            className="c3 c2 sc-bdVaJa c2"
+          <a
+            className="c16"
+            href="/signin?next=%2F"
             onClick={[Function]}
           >
-            <div
-              className="c16 c2"
-            >
-              <p
-                className="LoginTopBarProfileButton-name c17"
-                cursor="pointer"
-              />
-            </div>
-            <div
-              className="c18"
-              color="#46b0ed"
-              cursor="pointer"
-              display="inline-block"
-              height="0.6rem"
-              strokeWidth="0.2rem"
-              width="1.4rem"
-            />
-          </div>
+            <span>
+              Login
+            </span>
+          </a>
         </div>
       </div>
     </div>
@@ -775,10 +717,10 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
     className="jsx-916984404"
   >
     <div
-      className="c19 c20"
+      className="c17 c18"
     >
       <div
-        className="c21"
+        className="c19"
       >
         <form
           method="GET"
@@ -794,10 +736,10 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
               Search Open Collective
             </label>
             <div
-              className="c22 c23 sc-bdVaJa c2"
+              className="c20 c21 sc-bdVaJa c2"
             >
               <input
-                className="c24 form-control"
+                className="c22 form-control"
                 defaultValue="test"
                 id="search"
                 name="q"
@@ -805,7 +747,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
                 type="search"
               />
               <button
-                className="jsx-1144918383 jsx-3101740563 Button blue c25"
+                className="jsx-1144918383 jsx-3101740563 Button blue c23"
                 onClick={[Function]}
                 type="submit"
               >
@@ -818,10 +760,10 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
         </form>
       </div>
       <div
-        className="c26 c2 sc-bdVaJa c2"
+        className="c24 c2 sc-bdVaJa c2"
       >
         <div
-          className="c27 c28 sc-bdVaJa c2"
+          className="c25 c26 sc-bdVaJa c2"
         >
           <p>
             <em>
@@ -831,7 +773,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
             </em>
           </p>
           <a
-            className="c29"
+            className="c27"
             href="createPledge"
             onClick={[Function]}
           >
@@ -842,17 +784,17 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
     </div>
   </main>
   <div
-    className="c30"
+    className="c28"
     id="footer"
   >
     <div
-      className="c31 c32 sc-bdVaJa c2"
+      className="c29 c30 sc-bdVaJa c2"
     >
       <div
-        className="c33"
+        className="c31"
       >
         <div
-          className="c34 c2 sc-bdVaJa c2"
+          className="c32 c2 sc-bdVaJa c2"
         >
           <object
             data="/static/images/opencollectivelogo-footer.svg"
@@ -861,16 +803,16 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
           />
         </div>
         <p
-          className="c35"
+          className="c33"
         >
           An organization for your community, transparent by design.
         </p>
       </div>
       <div
-        className="c36"
+        className="c34"
       >
         <a
-          className="c37"
+          className="c35"
           href="https://medium.com/open-collective"
         >
           <svg
@@ -888,7 +830,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
           </svg>
         </a>
         <a
-          className="c37"
+          className="c35"
           href="https://twitter.com/opencollect"
         >
           <svg
@@ -938,7 +880,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
           </svg>
         </a>
         <a
-          className="c37"
+          className="c35"
           href="https://github.com/opencollective"
         >
           <svg
@@ -988,7 +930,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
           </svg>
         </a>
         <a
-          className="c37"
+          className="c35"
           href="https://slack.opencollective.com"
         >
           <svg
@@ -1015,7 +957,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
           </svg>
         </a>
         <a
-          className="c37"
+          className="c35"
           href="mailto:info@opencollective.com"
         >
           <svg
@@ -1066,44 +1008,44 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
         </a>
       </div>
       <nav
-        className="c38 c39"
+        className="c36 c37"
       >
         <div
-          className="c40"
+          className="c38"
         >
           <p
-            className="c41"
+            className="c39"
           >
             PLATFORM
           </p>
           <ul
-            className="c42"
+            className="c40"
           >
             <li
-              className="c43"
+              className="c41"
             >
               <a
-                className="c44 "
+                className="c42 "
                 href="/discover"
               >
                 Discover
               </a>
             </li>
             <li
-              className="c43"
+              className="c41"
             >
               <a
-                className="c44 "
+                className="c42 "
                 href="/learn-more"
               >
                 How it Works
               </a>
             </li>
             <li
-              className="c43"
+              className="c41"
             >
               <a
-                className="c44 "
+                className="c42 "
                 href="/opensource"
                 onClick={[Function]}
               >
@@ -1111,10 +1053,10 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
               </a>
             </li>
             <li
-              className="c43"
+              className="c41"
             >
               <a
-                className="c44 "
+                className="c42 "
                 href="/signin"
                 onClick={[Function]}
               >
@@ -1122,10 +1064,10 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
               </a>
             </li>
             <li
-              className="c43"
+              className="c41"
             >
               <a
-                className="c44 "
+                className="c42 "
                 href="/signin"
                 onClick={[Function]}
               >
@@ -1135,21 +1077,21 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
           </ul>
         </div>
         <div
-          className="c40"
+          className="c38"
         >
           <p
-            className="c41"
+            className="c39"
           >
             JOIN THE MOVEMENT
           </p>
           <ul
-            className="c42"
+            className="c40"
           >
             <li
-              className="c43"
+              className="c41"
             >
               <a
-                className="c44 "
+                className="c42 "
                 href="/create"
                 onClick={[Function]}
               >
@@ -1157,10 +1099,10 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
               </a>
             </li>
             <li
-              className="c43"
+              className="c41"
             >
               <a
-                className="c44 "
+                className="c42 "
                 href="/become-a-sponsor"
                 onClick={[Function]}
               >
@@ -1168,10 +1110,10 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
               </a>
             </li>
             <li
-              className="c43"
+              className="c41"
             >
               <a
-                className="c44 "
+                className="c42 "
                 href="/chapters"
                 onClick={[Function]}
               >
@@ -1181,21 +1123,21 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
           </ul>
         </div>
         <div
-          className="c40"
+          className="c38"
         >
           <p
-            className="c41"
+            className="c39"
           >
             COMMUNITY
           </p>
           <ul
-            className="c42"
+            className="c40"
           >
             <li
-              className="c43"
+              className="c41"
             >
               <a
-                className="c44 "
+                className="c42 "
                 href="/opensource"
                 onClick={[Function]}
               >
@@ -1203,10 +1145,10 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
               </a>
             </li>
             <li
-              className="c43"
+              className="c41"
             >
               <a
-                className="c44 "
+                className="c42 "
                 href="https://github.com/opencollective/opencollective/issues"
                 onClick={[Function]}
               >
@@ -1214,10 +1156,10 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
               </a>
             </li>
             <li
-              className="c43"
+              className="c41"
             >
               <a
-                className="c44 "
+                className="c42 "
                 href="https://slack.opencollective.com"
                 onClick={[Function]}
               >
@@ -1225,10 +1167,10 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
               </a>
             </li>
             <li
-              className="c43"
+              className="c41"
             >
               <a
-                className="c44 "
+                className="c42 "
                 href="https://github.com/opencollective/opencollective/wiki"
                 onClick={[Function]}
               >
@@ -1236,10 +1178,10 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
               </a>
             </li>
             <li
-              className="c43"
+              className="c41"
             >
               <a
-                className="c44 "
+                className="c42 "
                 href="mailto:support@opencollective.com"
                 onClick={[Function]}
               >
@@ -1249,21 +1191,21 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
           </ul>
         </div>
         <div
-          className="c40"
+          className="c38"
         >
           <p
-            className="c41"
+            className="c39"
           >
             COMPANY
           </p>
           <ul
-            className="c42"
+            className="c40"
           >
             <li
-              className="c43"
+              className="c41"
             >
               <a
-                className="c44 "
+                className="c42 "
                 href="/about"
                 onClick={[Function]}
               >
@@ -1271,10 +1213,10 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
               </a>
             </li>
             <li
-              className="c43"
+              className="c41"
             >
               <a
-                className="c44 "
+                className="c42 "
                 href="/faq"
                 onClick={[Function]}
               >
@@ -1282,10 +1224,10 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
               </a>
             </li>
             <li
-              className="c43"
+              className="c41"
             >
               <a
-                className="c44 "
+                className="c42 "
                 href="https://medium.com/open-collective"
                 onClick={[Function]}
               >
@@ -1293,10 +1235,10 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
               </a>
             </li>
             <li
-              className="c43"
+              className="c41"
             >
               <a
-                className="c44 "
+                className="c42 "
                 href="/tos"
                 onClick={[Function]}
               >
@@ -1304,10 +1246,10 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
               </a>
             </li>
             <li
-              className="c43"
+              className="c41"
             >
               <a
-                className="c44 "
+                className="c42 "
                 href="/privacypolicy"
                 onClick={[Function]}
               >
@@ -1367,7 +1309,7 @@ exports[`Search Page renders empty results message 1`] = `
   padding-right: 16px;
 }
 
-.c20 {
+.c18 {
   box-sizing: border-box;
   width: 100%;
   margin-left: auto;
@@ -1376,25 +1318,25 @@ exports[`Search Page renders empty results message 1`] = `
   padding-right: 16px;
 }
 
-.c21 {
+.c19 {
   box-sizing: border-box;
   width: 100%;
 }
 
-.c23 {
+.c21 {
   box-sizing: border-box;
   margin-top: 16px;
   margin-bottom: 16px;
 }
 
-.c28 {
+.c26 {
   box-sizing: border-box;
   width: 100%;
   padding-top: 16px;
   padding-bottom: 16px;
 }
 
-.c31 {
+.c29 {
   max-width: 1300px;
   box-sizing: border-box;
   margin-left: auto;
@@ -1402,7 +1344,7 @@ exports[`Search Page renders empty results message 1`] = `
   padding: 8px;
 }
 
-.c38 {
+.c36 {
   box-sizing: border-box;
   margin-top: 16px;
   -webkit-flex: 1 1 auto;
@@ -1413,7 +1355,7 @@ exports[`Search Page renders empty results message 1`] = `
   order: 3;
 }
 
-.c39 {
+.c37 {
   box-sizing: border-box;
   width: 50%;
   margin-bottom: 16px;
@@ -1482,7 +1424,7 @@ exports[`Search Page renders empty results message 1`] = `
   justify-content: space-around;
 }
 
-.c22 {
+.c20 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -1493,7 +1435,7 @@ exports[`Search Page renders empty results message 1`] = `
   align-items: flex-end;
 }
 
-.c26 {
+.c24 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -1507,7 +1449,7 @@ exports[`Search Page renders empty results message 1`] = `
   justify-content: center;
 }
 
-.c30 {
+.c28 {
   max-width: 1300px;
   display: -webkit-box;
   display: -webkit-flex;
@@ -1526,7 +1468,7 @@ exports[`Search Page renders empty results message 1`] = `
   justify-content: space-between;
 }
 
-.c33 {
+.c31 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -1537,7 +1479,7 @@ exports[`Search Page renders empty results message 1`] = `
   justify-content: center;
 }
 
-.c37 {
+.c35 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -1551,7 +1493,7 @@ exports[`Search Page renders empty results message 1`] = `
   justify-content: center;
 }
 
-.c27 {
+.c25 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -1569,23 +1511,7 @@ exports[`Search Page renders empty results message 1`] = `
   justify-content: center;
 }
 
-.c17 {
-  color: #46b0ed;
-  display: inline-block;
-  font-size: 1.2rem;
-  font-weight: bold;
-  line-height: Paragraph;
-  -webkit-letter-spacing: 1px;
-  -moz-letter-spacing: 1px;
-  -ms-letter-spacing: 1px;
-  letter-spacing: 1px;
-  margin: 0px;
-  margin-left: 8px;
-  margin-right: 8px;
-  cursor: pointer;
-}
-
-.c34 {
+.c32 {
   color: #6E747A;
   font-size: 1.4rem;
   line-height: Paragraph;
@@ -1599,7 +1525,7 @@ exports[`Search Page renders empty results message 1`] = `
   text-align: center;
 }
 
-.c40 {
+.c38 {
   color: #C2C6CC;
   font-size: 1.2rem;
   line-height: Paragraph;
@@ -1612,7 +1538,7 @@ exports[`Search Page renders empty results message 1`] = `
   text-align: center;
 }
 
-.c29 {
+.c27 {
   border-top: 1px solid #aaaaaa;
   bottom: 0px;
   background-color: white;
@@ -1621,7 +1547,7 @@ exports[`Search Page renders empty results message 1`] = `
   width: 100%;
 }
 
-.c32 {
+.c30 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -1634,7 +1560,7 @@ exports[`Search Page renders empty results message 1`] = `
   width: 100%;
 }
 
-.c35 {
+.c33 {
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -1656,36 +1582,19 @@ exports[`Search Page renders empty results message 1`] = `
   width: 100%;
 }
 
-.c18 {
-  position: relative;
+.c16 {
+  border: 1px solid #D5DAE0;
+  border-radius: 20px;
+  color: #3385FF;
   display: inline-block;
-  height: 0.6rem;
-  width: 1.4rem;
-  cursor: pointer;
+  font-size: 1.4rem;
+  padding-left: 16px;
+  padding-right: 16px;
+  padding-top: 8px;
+  padding-bottom: 8px;
 }
 
-.c18::before,
-.c18::after {
-  content: '';
-  position: absolute;
-  top: 0;
-}
-
-.c18::before {
-  border-left: 0.6rem solid transparent;
-  border-right: 0.6rem solid transparent;
-  border-top: 0.6rem solid #46b0ed;
-  left: 0;
-}
-
-.c18::after {
-  border-left: calc(0.6rem - 0.2rem) solid transparent;
-  border-right: calc(0.6rem - 0.2rem) solid transparent;
-  border-top: calc(0.6rem - 0.2rem) solid white;
-  left: 0.2rem;
-}
-
-.c42 {
+.c40 {
   list-style: none;
   margin-bottom: 8px;
   text-align: center;
@@ -1702,7 +1611,7 @@ exports[`Search Page renders empty results message 1`] = `
   font-size: 1.4rem;
 }
 
-.c36 {
+.c34 {
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -1722,12 +1631,12 @@ exports[`Search Page renders empty results message 1`] = `
   width: 48px;
 }
 
-.c36:hover,
-.c36:focus {
+.c34:hover,
+.c34:focus {
   opacity: 1;
 }
 
-.c43 {
+.c41 {
   color: #6e747a;
   display: block;
   fontsize: 1.4rem;
@@ -1736,7 +1645,7 @@ exports[`Search Page renders empty results message 1`] = `
   padding: 0;
 }
 
-.c41 {
+.c39 {
   box-sizing: border-box;
   padding-left: 0px;
   padding-right: 8px;
@@ -1753,7 +1662,7 @@ exports[`Search Page renders empty results message 1`] = `
   justify-content: center;
 }
 
-.c24.c24.c24 {
+.c22.c22.c22 {
   border: none;
   border-bottom: 2px solid #3385FF;
   border-radius: 0;
@@ -1763,22 +1672,22 @@ exports[`Search Page renders empty results message 1`] = `
   padding: 0;
 }
 
-.c25.c25 {
+.c23.c23 {
   padding: 0 2rem;
 }
 
-.c19 {
+.c17 {
   max-width: 1200px;
 }
 
 @media screen and (min-width:40em) {
-  .c20 {
+  .c18 {
     width: 85%;
   }
 }
 
 @media screen and (min-width:52em) {
-  .c38 {
+  .c36 {
     -webkit-order: 2;
     -ms-flex-order: 2;
     order: 2;
@@ -1786,13 +1695,13 @@ exports[`Search Page renders empty results message 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c39 {
+  .c37 {
     width: 25%;
   }
 }
 
 @media screen and (min-width:40em) {
-  .c26 {
+  .c24 {
     -webkit-box-pack: center;
     -webkit-justify-content: center;
     -ms-flex-pack: center;
@@ -1801,7 +1710,7 @@ exports[`Search Page renders empty results message 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c26 {
+  .c24 {
     -webkit-box-pack: start;
     -webkit-justify-content: flex-start;
     -ms-flex-pack: start;
@@ -1810,7 +1719,7 @@ exports[`Search Page renders empty results message 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c30 {
+  .c28 {
     -webkit-flex-direction: row;
     -ms-flex-direction: row;
     flex-direction: row;
@@ -1818,7 +1727,7 @@ exports[`Search Page renders empty results message 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c30 {
+  .c28 {
     -webkit-align-items: flex-start;
     -webkit-box-align: flex-start;
     -ms-flex-align: flex-start;
@@ -1827,7 +1736,7 @@ exports[`Search Page renders empty results message 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c33 {
+  .c31 {
     -webkit-box-pack: start;
     -webkit-justify-content: flex-start;
     -ms-flex-pack: start;
@@ -1836,25 +1745,25 @@ exports[`Search Page renders empty results message 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c34 {
-    text-align: left;
-  }
-}
-
-@media screen and (min-width:52em) {
-  .c40 {
-    text-align: left;
-  }
-}
-
-@media screen and (min-width:52em) {
   .c32 {
+    text-align: left;
+  }
+}
+
+@media screen and (min-width:52em) {
+  .c38 {
+    text-align: left;
+  }
+}
+
+@media screen and (min-width:52em) {
+  .c30 {
     width: 33.33333333333333%;
   }
 }
 
 @media screen and (min-width:52em) {
-  .c35 {
+  .c33 {
     -webkit-order: 3;
     -ms-flex-order: 3;
     order: 3;
@@ -1885,20 +1794,8 @@ exports[`Search Page renders empty results message 1`] = `
   }
 }
 
-@media screen and (max-width:40em) {
-  .c16 {
-    display: none;
-  }
-}
-
-@media screen and (min-width:40em) and (max-width:52em) {
-  .c16 {
-    display: none;
-  }
-}
-
 @media screen and (min-width:52em) {
-  .c42 {
+  .c40 {
     text-align: left;
   }
 }
@@ -2055,28 +1952,15 @@ exports[`Search Page renders empty results message 1`] = `
         <div
           className="LoginTopBarProfileButton"
         >
-          <div
-            className="c3 c2 sc-bdVaJa c2"
+          <a
+            className="c16"
+            href="/signin?next=%2F"
             onClick={[Function]}
           >
-            <div
-              className="c16 c2"
-            >
-              <p
-                className="LoginTopBarProfileButton-name c17"
-                cursor="pointer"
-              />
-            </div>
-            <div
-              className="c18"
-              color="#46b0ed"
-              cursor="pointer"
-              display="inline-block"
-              height="0.6rem"
-              strokeWidth="0.2rem"
-              width="1.4rem"
-            />
-          </div>
+            <span>
+              Login
+            </span>
+          </a>
         </div>
       </div>
     </div>
@@ -2085,10 +1969,10 @@ exports[`Search Page renders empty results message 1`] = `
     className="jsx-916984404"
   >
     <div
-      className="c19 c20"
+      className="c17 c18"
     >
       <div
-        className="c21"
+        className="c19"
       >
         <form
           method="GET"
@@ -2104,10 +1988,10 @@ exports[`Search Page renders empty results message 1`] = `
               Search Open Collective
             </label>
             <div
-              className="c22 c23 sc-bdVaJa c2"
+              className="c20 c21 sc-bdVaJa c2"
             >
               <input
-                className="c24 form-control"
+                className="c22 form-control"
                 defaultValue="test"
                 id="search"
                 name="q"
@@ -2115,7 +1999,7 @@ exports[`Search Page renders empty results message 1`] = `
                 type="search"
               />
               <button
-                className="jsx-1144918383 jsx-3101740563 Button blue c25"
+                className="jsx-1144918383 jsx-3101740563 Button blue c23"
                 onClick={[Function]}
                 type="submit"
               >
@@ -2128,10 +2012,10 @@ exports[`Search Page renders empty results message 1`] = `
         </form>
       </div>
       <div
-        className="c26 c2 sc-bdVaJa c2"
+        className="c24 c2 sc-bdVaJa c2"
       >
         <div
-          className="c27 c28 sc-bdVaJa c2"
+          className="c25 c26 sc-bdVaJa c2"
         >
           <p>
             <em>
@@ -2145,17 +2029,17 @@ exports[`Search Page renders empty results message 1`] = `
     </div>
   </main>
   <div
-    className="c29"
+    className="c27"
     id="footer"
   >
     <div
-      className="c30 c31 sc-bdVaJa c2"
+      className="c28 c29 sc-bdVaJa c2"
     >
       <div
-        className="c32"
+        className="c30"
       >
         <div
-          className="c33 c2 sc-bdVaJa c2"
+          className="c31 c2 sc-bdVaJa c2"
         >
           <object
             data="/static/images/opencollectivelogo-footer.svg"
@@ -2164,16 +2048,16 @@ exports[`Search Page renders empty results message 1`] = `
           />
         </div>
         <p
-          className="c34"
+          className="c32"
         >
           An organization for your community, transparent by design.
         </p>
       </div>
       <div
-        className="c35"
+        className="c33"
       >
         <a
-          className="c36"
+          className="c34"
           href="https://medium.com/open-collective"
         >
           <svg
@@ -2191,7 +2075,7 @@ exports[`Search Page renders empty results message 1`] = `
           </svg>
         </a>
         <a
-          className="c36"
+          className="c34"
           href="https://twitter.com/opencollect"
         >
           <svg
@@ -2241,7 +2125,7 @@ exports[`Search Page renders empty results message 1`] = `
           </svg>
         </a>
         <a
-          className="c36"
+          className="c34"
           href="https://github.com/opencollective"
         >
           <svg
@@ -2291,7 +2175,7 @@ exports[`Search Page renders empty results message 1`] = `
           </svg>
         </a>
         <a
-          className="c36"
+          className="c34"
           href="https://slack.opencollective.com"
         >
           <svg
@@ -2318,7 +2202,7 @@ exports[`Search Page renders empty results message 1`] = `
           </svg>
         </a>
         <a
-          className="c36"
+          className="c34"
           href="mailto:info@opencollective.com"
         >
           <svg
@@ -2369,44 +2253,44 @@ exports[`Search Page renders empty results message 1`] = `
         </a>
       </div>
       <nav
-        className="c37 c38"
+        className="c35 c36"
       >
         <div
-          className="c39"
+          className="c37"
         >
           <p
-            className="c40"
+            className="c38"
           >
             PLATFORM
           </p>
           <ul
-            className="c41"
+            className="c39"
           >
             <li
-              className="c42"
+              className="c40"
             >
               <a
-                className="c43 "
+                className="c41 "
                 href="/discover"
               >
                 Discover
               </a>
             </li>
             <li
-              className="c42"
+              className="c40"
             >
               <a
-                className="c43 "
+                className="c41 "
                 href="/learn-more"
               >
                 How it Works
               </a>
             </li>
             <li
-              className="c42"
+              className="c40"
             >
               <a
-                className="c43 "
+                className="c41 "
                 href="/opensource"
                 onClick={[Function]}
               >
@@ -2414,10 +2298,10 @@ exports[`Search Page renders empty results message 1`] = `
               </a>
             </li>
             <li
-              className="c42"
+              className="c40"
             >
               <a
-                className="c43 "
+                className="c41 "
                 href="/signin"
                 onClick={[Function]}
               >
@@ -2425,10 +2309,10 @@ exports[`Search Page renders empty results message 1`] = `
               </a>
             </li>
             <li
-              className="c42"
+              className="c40"
             >
               <a
-                className="c43 "
+                className="c41 "
                 href="/signin"
                 onClick={[Function]}
               >
@@ -2438,21 +2322,21 @@ exports[`Search Page renders empty results message 1`] = `
           </ul>
         </div>
         <div
-          className="c39"
+          className="c37"
         >
           <p
-            className="c40"
+            className="c38"
           >
             JOIN THE MOVEMENT
           </p>
           <ul
-            className="c41"
+            className="c39"
           >
             <li
-              className="c42"
+              className="c40"
             >
               <a
-                className="c43 "
+                className="c41 "
                 href="/create"
                 onClick={[Function]}
               >
@@ -2460,10 +2344,10 @@ exports[`Search Page renders empty results message 1`] = `
               </a>
             </li>
             <li
-              className="c42"
+              className="c40"
             >
               <a
-                className="c43 "
+                className="c41 "
                 href="/become-a-sponsor"
                 onClick={[Function]}
               >
@@ -2471,10 +2355,10 @@ exports[`Search Page renders empty results message 1`] = `
               </a>
             </li>
             <li
-              className="c42"
+              className="c40"
             >
               <a
-                className="c43 "
+                className="c41 "
                 href="/chapters"
                 onClick={[Function]}
               >
@@ -2484,21 +2368,21 @@ exports[`Search Page renders empty results message 1`] = `
           </ul>
         </div>
         <div
-          className="c39"
+          className="c37"
         >
           <p
-            className="c40"
+            className="c38"
           >
             COMMUNITY
           </p>
           <ul
-            className="c41"
+            className="c39"
           >
             <li
-              className="c42"
+              className="c40"
             >
               <a
-                className="c43 "
+                className="c41 "
                 href="/opensource"
                 onClick={[Function]}
               >
@@ -2506,10 +2390,10 @@ exports[`Search Page renders empty results message 1`] = `
               </a>
             </li>
             <li
-              className="c42"
+              className="c40"
             >
               <a
-                className="c43 "
+                className="c41 "
                 href="https://github.com/opencollective/opencollective/issues"
                 onClick={[Function]}
               >
@@ -2517,10 +2401,10 @@ exports[`Search Page renders empty results message 1`] = `
               </a>
             </li>
             <li
-              className="c42"
+              className="c40"
             >
               <a
-                className="c43 "
+                className="c41 "
                 href="https://slack.opencollective.com"
                 onClick={[Function]}
               >
@@ -2528,10 +2412,10 @@ exports[`Search Page renders empty results message 1`] = `
               </a>
             </li>
             <li
-              className="c42"
+              className="c40"
             >
               <a
-                className="c43 "
+                className="c41 "
                 href="https://github.com/opencollective/opencollective/wiki"
                 onClick={[Function]}
               >
@@ -2539,10 +2423,10 @@ exports[`Search Page renders empty results message 1`] = `
               </a>
             </li>
             <li
-              className="c42"
+              className="c40"
             >
               <a
-                className="c43 "
+                className="c41 "
                 href="mailto:support@opencollective.com"
                 onClick={[Function]}
               >
@@ -2552,21 +2436,21 @@ exports[`Search Page renders empty results message 1`] = `
           </ul>
         </div>
         <div
-          className="c39"
+          className="c37"
         >
           <p
-            className="c40"
+            className="c38"
           >
             COMPANY
           </p>
           <ul
-            className="c41"
+            className="c39"
           >
             <li
-              className="c42"
+              className="c40"
             >
               <a
-                className="c43 "
+                className="c41 "
                 href="/about"
                 onClick={[Function]}
               >
@@ -2574,10 +2458,10 @@ exports[`Search Page renders empty results message 1`] = `
               </a>
             </li>
             <li
-              className="c42"
+              className="c40"
             >
               <a
-                className="c43 "
+                className="c41 "
                 href="/faq"
                 onClick={[Function]}
               >
@@ -2585,10 +2469,10 @@ exports[`Search Page renders empty results message 1`] = `
               </a>
             </li>
             <li
-              className="c42"
+              className="c40"
             >
               <a
-                className="c43 "
+                className="c41 "
                 href="https://medium.com/open-collective"
                 onClick={[Function]}
               >
@@ -2596,10 +2480,10 @@ exports[`Search Page renders empty results message 1`] = `
               </a>
             </li>
             <li
-              className="c42"
+              className="c40"
             >
               <a
-                className="c43 "
+                className="c41 "
                 href="/tos"
                 onClick={[Function]}
               >
@@ -2607,10 +2491,10 @@ exports[`Search Page renders empty results message 1`] = `
               </a>
             </li>
             <li
-              className="c42"
+              className="c40"
             >
               <a
-                className="c43 "
+                className="c41 "
                 href="/privacypolicy"
                 onClick={[Function]}
               >
@@ -3895,7 +3779,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
   padding-right: 16px;
 }
 
-.c20 {
+.c18 {
   box-sizing: border-box;
   width: 100%;
   margin-left: auto;
@@ -3904,25 +3788,25 @@ exports[`Search Page renders loading grid SVG 1`] = `
   padding-right: 16px;
 }
 
-.c21 {
+.c19 {
   box-sizing: border-box;
   width: 100%;
 }
 
-.c23 {
+.c21 {
   box-sizing: border-box;
   margin-top: 16px;
   margin-bottom: 16px;
 }
 
-.c28 {
+.c26 {
   box-sizing: border-box;
   width: 100%;
   padding-top: 16px;
   padding-bottom: 16px;
 }
 
-.c31 {
+.c29 {
   max-width: 1300px;
   box-sizing: border-box;
   margin-left: auto;
@@ -3930,7 +3814,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
   padding: 8px;
 }
 
-.c38 {
+.c36 {
   box-sizing: border-box;
   margin-top: 16px;
   -webkit-flex: 1 1 auto;
@@ -3941,7 +3825,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
   order: 3;
 }
 
-.c39 {
+.c37 {
   box-sizing: border-box;
   width: 50%;
   margin-bottom: 16px;
@@ -4010,7 +3894,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
   justify-content: space-around;
 }
 
-.c22 {
+.c20 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -4021,7 +3905,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
   align-items: flex-end;
 }
 
-.c26 {
+.c24 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -4035,7 +3919,1381 @@ exports[`Search Page renders loading grid SVG 1`] = `
   justify-content: center;
 }
 
+.c25 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+}
+
+.c28 {
+  max-width: 1300px;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: justify;
+  -webkit-justify-content: space-between;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
+}
+
+.c31 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+}
+
+.c35 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-wrap: wrap;
+  -ms-flex-wrap: wrap;
+  flex-wrap: wrap;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+}
+
+.c32 {
+  color: #6E747A;
+  font-size: 1.4rem;
+  line-height: Paragraph;
+  -webkit-letter-spacing: -0.2px;
+  -moz-letter-spacing: -0.2px;
+  -ms-letter-spacing: -0.2px;
+  letter-spacing: -0.2px;
+  margin: 0px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  text-align: center;
+}
+
+.c38 {
+  color: #C2C6CC;
+  font-size: 1.2rem;
+  line-height: Paragraph;
+  -webkit-letter-spacing: 1px;
+  -moz-letter-spacing: 1px;
+  -ms-letter-spacing: 1px;
+  letter-spacing: 1px;
+  margin: 0px;
+  padding-bottom: 16px;
+  text-align: center;
+}
+
 .c27 {
+  border-top: 1px solid #aaaaaa;
+  bottom: 0px;
+  background-color: white;
+  min-height: 7.5rem;
+  padding: 1rem;
+  width: 100%;
+}
+
+.c30 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  max-width: 300px;
+  margin-top: 16px;
+  width: 100%;
+}
+
+.c33 {
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: space-evenly;
+  -webkit-justify-content: space-evenly;
+  -ms-flex-pack: space-evenly;
+  justify-content: space-evenly;
+  max-width: 300px;
+  -webkit-order: 2;
+  -ms-flex-order: 2;
+  order: 2;
+  margin-top: 16px;
+  margin-bottom: 16px;
+  width: 100%;
+}
+
+.c16 {
+  border: 1px solid #D5DAE0;
+  border-radius: 20px;
+  color: #3385FF;
+  display: inline-block;
+  font-size: 1.4rem;
+  padding-left: 16px;
+  padding-right: 16px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+.c40 {
+  list-style: none;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.c11 {
+  list-style: none;
+  min-width: 20rem;
+  text-align: right;
+}
+
+.c15 {
+  color: #777777;
+  font-size: 1.4rem;
+}
+
+.c34 {
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  border: 1px solid #9399a3;
+  border-radius: 50%;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  height: 48px;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  opacity: 0.6;
+  width: 48px;
+}
+
+.c34:hover,
+.c34:focus {
+  opacity: 1;
+}
+
+.c41 {
+  color: #6e747a;
+  display: block;
+  fontsize: 1.4rem;
+  fontweight: 400;
+  margin: 0;
+  padding: 0;
+}
+
+.c39 {
+  box-sizing: border-box;
+  padding-left: 0px;
+  padding-right: 8px;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+}
+
+.c22.c22.c22 {
+  border: none;
+  border-bottom: 2px solid #3385FF;
+  border-radius: 0;
+  box-shadow: none;
+  display: block;
+  height: 3.4rem;
+  padding: 0;
+}
+
+.c23.c23 {
+  padding: 0 2rem;
+}
+
+.c17 {
+  max-width: 1200px;
+}
+
+@media screen and (min-width:40em) {
+  .c18 {
+    width: 85%;
+  }
+}
+
+@media screen and (min-width:52em) {
+  .c36 {
+    -webkit-order: 2;
+    -ms-flex-order: 2;
+    order: 2;
+  }
+}
+
+@media screen and (min-width:52em) {
+  .c37 {
+    width: 25%;
+  }
+}
+
+@media screen and (min-width:40em) {
+  .c24 {
+    -webkit-box-pack: center;
+    -webkit-justify-content: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+  }
+}
+
+@media screen and (min-width:52em) {
+  .c24 {
+    -webkit-box-pack: start;
+    -webkit-justify-content: flex-start;
+    -ms-flex-pack: start;
+    justify-content: flex-start;
+  }
+}
+
+@media screen and (min-width:52em) {
+  .c28 {
+    -webkit-flex-direction: row;
+    -ms-flex-direction: row;
+    flex-direction: row;
+  }
+}
+
+@media screen and (min-width:52em) {
+  .c28 {
+    -webkit-align-items: flex-start;
+    -webkit-box-align: flex-start;
+    -ms-flex-align: flex-start;
+    align-items: flex-start;
+  }
+}
+
+@media screen and (min-width:52em) {
+  .c31 {
+    -webkit-box-pack: start;
+    -webkit-justify-content: flex-start;
+    -ms-flex-pack: start;
+    justify-content: flex-start;
+  }
+}
+
+@media screen and (min-width:52em) {
+  .c32 {
+    text-align: left;
+  }
+}
+
+@media screen and (min-width:52em) {
+  .c38 {
+    text-align: left;
+  }
+}
+
+@media screen and (min-width:52em) {
+  .c30 {
+    width: 33.33333333333333%;
+  }
+}
+
+@media screen and (min-width:52em) {
+  .c33 {
+    -webkit-order: 3;
+    -ms-flex-order: 3;
+    order: 3;
+  }
+}
+
+@media screen and (max-width:40em) {
+  .c4 {
+    display: none;
+  }
+}
+
+@media screen and (min-width:40em) and (max-width:52em) {
+  .c8 {
+    display: none;
+  }
+}
+
+@media screen and (min-width:52em) and (max-width:64em) {
+  .c8 {
+    display: none;
+  }
+}
+
+@media screen and (min-width:64em) {
+  .c8 {
+    display: none;
+  }
+}
+
+@media screen and (min-width:52em) {
+  .c40 {
+    text-align: left;
+  }
+}
+
+<div>
+  <header>
+    <div
+      id="top"
+    />
+    <div
+      className="c0 c1 sc-bdVaJa c2"
+    >
+      <a
+        className="c3 c2"
+        href="/"
+        onClick={[Function]}
+      >
+        <img
+          alt="Open Collective logo"
+          className=""
+          height="24"
+          src="/static/images/opencollective-icon.svg"
+          width="24"
+        />
+        <div
+          className="c4 c2"
+        >
+          <div
+            className="c5"
+          >
+            <img
+              height="16px"
+              src="/static/images/logotype.svg"
+            />
+          </div>
+        </div>
+      </a>
+      <div
+        className="c6 c7 sc-bdVaJa c2"
+      >
+        <div
+          className="c8 c2"
+        >
+          <div
+            className="c9"
+          >
+            <a
+              className="c10 c2"
+              onClick={[Function]}
+            >
+              <svg
+                height={24}
+                version="1.1"
+                viewBox="10 10 30 30"
+                width={24}
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <title>
+                  magnifying glass icon
+                </title>
+                <path
+                  d="M28.5404814,30.1903972 C26.7995948,31.5736628 24.5962981,32.4 22.2,32.4 C16.5666956,32.4 12,27.8333044 12,22.2 C12,16.5666956 16.5666956,12 22.2,12 C27.8333044,12 32.4,16.5666956 32.4,22.2 C32.4,24.5962981 31.5736628,26.7995948 30.1903972,28.5404814 L35.6582912,34.0083754 C36.1139029,34.4639871 36.1139029,35.2026796 35.6582912,35.6582912 C35.2026796,36.1139029 34.4639871,36.1139029 34.0083754,35.6582912 L28.5404814,30.1903972 Z M22.2,30 C26.507821,30 30,26.507821 30,22.2 C30,17.892179 26.507821,14.4 22.2,14.4 C17.892179,14.4 14.4,17.892179 14.4,22.2 C14.4,26.507821 17.892179,30 22.2,30 Z"
+                  fill="#aaaaaa"
+                  fillRule="nonzero"
+                  id="magnifying-glass"
+                />
+              </svg>
+            </a>
+          </div>
+        </div>
+        <div
+          className="c8 c2"
+        >
+          <div
+            className="c9"
+          >
+            <a
+              className="c10 c2"
+              onClick={[Function]}
+            >
+              <svg
+                height={16.799999999999997}
+                version="1.1"
+                viewBox="0 0 20 14"
+                width={24}
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <title>
+                  menu icon
+                </title>
+                <path
+                  d="M19,6 L1,6 C0.4,6 0,6.4 0,7 C0,7.6 0.4,8 1,8 L19,8 C19.6,8 20,7.6 20,7 C20,6.4 19.6,6 19,6 Z"
+                  fill="#aaaaaa"
+                  fillRule="nonzero"
+                />
+                <path
+                  d="M0.85,2 L16.15,2 C16.66,2 17,1.6 17,1 C17,0.4 16.66,0 16.15,0 L0.85,0 C0.34,0 0,0.4 0,1 C0,1.6 0.34,2 0.85,2 Z"
+                  fill="#aaaaaa"
+                  fillRule="nonzero"
+                />
+                <path
+                  d="M16.15,12 L0.85,12 C0.34,12 0,12.4 0,13 C0,13.6 0.34,14 0.85,14 L16.15,14 C16.66,14 17,13.6 17,13 C17,12.4 16.66,12 16.15,12 Z"
+                  fill="#aaaaaa"
+                  fillRule="nonzero"
+                />
+              </svg>
+            </a>
+          </div>
+        </div>
+        <div
+          className="c4 c2"
+        >
+          <ul
+            className="c11 c12 c13"
+          >
+            <li
+              className="c14"
+            >
+              <a
+                className="c15"
+                href="/discover"
+              >
+                <span>
+                  Discover
+                </span>
+              </a>
+            </li>
+            <li
+              className="c14"
+            >
+              <a
+                className="c15"
+                href="/learn-more"
+              >
+                <span>
+                  How it Works
+                </span>
+              </a>
+            </li>
+            <li
+              className="c14"
+            >
+              <a
+                className="c15"
+                href="https://medium.com/open-collective"
+              >
+                <span>
+                  Blog
+                </span>
+              </a>
+            </li>
+          </ul>
+        </div>
+        <div
+          className="LoginTopBarProfileButton"
+        >
+          <a
+            className="c16"
+            href="/signin?next=%2F"
+            onClick={[Function]}
+          >
+            <span>
+              Login
+            </span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </header>
+  <main
+    className="jsx-916984404"
+  >
+    <div
+      className="c17 c18"
+    >
+      <div
+        className="c19"
+      >
+        <form
+          method="GET"
+          onSubmit={[Function]}
+        >
+          <div
+            className="form-group form-group-lg"
+          >
+            <label
+              className="h1 control-label"
+              htmlFor="search"
+            >
+              Search Open Collective
+            </label>
+            <div
+              className="c20 c21 sc-bdVaJa c2"
+            >
+              <input
+                className="c22 form-control"
+                defaultValue=""
+                id="search"
+                name="q"
+                placeholder="open source"
+                type="search"
+              />
+              <button
+                className="jsx-1144918383 jsx-3101740563 Button blue c23"
+                onClick={[Function]}
+                type="submit"
+              >
+                <span
+                  className="fa fa-search"
+                />
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div
+        className="c24 c2 sc-bdVaJa c2"
+      >
+        <div
+          className="c25 c26 sc-bdVaJa c2"
+        >
+          <svg
+            fill="#3385FF"
+            height={100}
+            viewBox="0 0 105 105"
+            width={100}
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <circle
+              cx="12.5"
+              cy="12.5"
+              r="12.5"
+            >
+              <animate
+                attributeName="fill-opacity"
+                begin="0s"
+                calcMode="linear"
+                dur="1s"
+                repeatCount="indefinite"
+                values="1;.2;1"
+              />
+            </circle>
+            <circle
+              cx="12.5"
+              cy="52.5"
+              fillOpacity=".5"
+              r="12.5"
+            >
+              <animate
+                attributeName="fill-opacity"
+                begin="100ms"
+                calcMode="linear"
+                dur="1s"
+                repeatCount="indefinite"
+                values="1;.2;1"
+              />
+            </circle>
+            <circle
+              cx="52.5"
+              cy="12.5"
+              r="12.5"
+            >
+              <animate
+                attributeName="fill-opacity"
+                begin="300ms"
+                calcMode="linear"
+                dur="1s"
+                repeatCount="indefinite"
+                values="1;.2;1"
+              />
+            </circle>
+            <circle
+              cx="52.5"
+              cy="52.5"
+              r="12.5"
+            >
+              <animate
+                attributeName="fill-opacity"
+                begin="600ms"
+                calcMode="linear"
+                dur="1s"
+                repeatCount="indefinite"
+                values="1;.2;1"
+              />
+            </circle>
+            <circle
+              cx="92.5"
+              cy="12.5"
+              r="12.5"
+            >
+              <animate
+                attributeName="fill-opacity"
+                begin="800ms"
+                calcMode="linear"
+                dur="1s"
+                repeatCount="indefinite"
+                values="1;.2;1"
+              />
+            </circle>
+            <circle
+              cx="92.5"
+              cy="52.5"
+              r="12.5"
+            >
+              <animate
+                attributeName="fill-opacity"
+                begin="400ms"
+                calcMode="linear"
+                dur="1s"
+                repeatCount="indefinite"
+                values="1;.2;1"
+              />
+            </circle>
+            <circle
+              cx="12.5"
+              cy="92.5"
+              r="12.5"
+            >
+              <animate
+                attributeName="fill-opacity"
+                begin="700ms"
+                calcMode="linear"
+                dur="1s"
+                repeatCount="indefinite"
+                values="1;.2;1"
+              />
+            </circle>
+            <circle
+              cx="52.5"
+              cy="92.5"
+              r="12.5"
+            >
+              <animate
+                attributeName="fill-opacity"
+                begin="500ms"
+                calcMode="linear"
+                dur="1s"
+                repeatCount="indefinite"
+                values="1;.2;1"
+              />
+            </circle>
+            <circle
+              cx="92.5"
+              cy="92.5"
+              r="12.5"
+            >
+              <animate
+                attributeName="fill-opacity"
+                begin="200ms"
+                calcMode="linear"
+                dur="1s"
+                repeatCount="indefinite"
+                values="1;.2;1"
+              />
+            </circle>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </main>
+  <div
+    className="c27"
+    id="footer"
+  >
+    <div
+      className="c28 c29 sc-bdVaJa c2"
+    >
+      <div
+        className="c30"
+      >
+        <div
+          className="c31 c2 sc-bdVaJa c2"
+        >
+          <object
+            data="/static/images/opencollectivelogo-footer.svg"
+            height="20"
+            type="image/svg+xml"
+          />
+        </div>
+        <p
+          className="c32"
+        >
+          An organization for your community, transparent by design.
+        </p>
+      </div>
+      <div
+        className="c33"
+      >
+        <a
+          className="c34"
+          href="https://medium.com/open-collective"
+        >
+          <svg
+            height={15}
+            viewBox="0 0 32 32"
+            width={15}
+          >
+            <title>
+              medium icon
+            </title>
+            <path
+              d="M3.795 8.48c0.040-0.393-0.111-0.781-0.404-1.045l-2.987-3.6v-0.537h9.276l7.171 15.727 6.304-15.727h8.845v0.537l-2.556 2.449c-0.22 0.168-0.329 0.444-0.284 0.717v18c-0.045 0.272 0.064 0.547 0.284 0.716l2.493 2.449v0.537h-12.547v-0.537l2.583-2.509c0.253-0.253 0.253-0.328 0.253-0.717v-14.548l-7.187 18.251h-0.969l-8.367-18.251v12.232c-0.069 0.515 0.101 1.032 0.463 1.404l3.36 4.080v0.536h-9.527v-0.537l3.36-4.080c0.36-0.371 0.52-0.893 0.435-1.403v-14.144z"
+              fill="#9399A3"
+            />
+          </svg>
+        </a>
+        <a
+          className="c34"
+          href="https://twitter.com/opencollect"
+        >
+          <svg
+            height={12.5}
+            version="1.1"
+            viewBox="0 0 18 15"
+            width={15}
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <title>
+              twitter icon
+            </title>
+            <g
+              fill="none"
+              fillRule="evenodd"
+              id="Homepage"
+              stroke="none"
+              strokeWidth="1"
+            >
+              <g
+                id="Homepage---XS-(small-handset)"
+                transform="translate(-97.000000, -9521.000000)"
+              >
+                <g
+                  id="JOIN-MOVEMENT"
+                  transform="translate(-69.000000, 3570.000000)"
+                >
+                  <g
+                    id="::-06---spread-the-word"
+                    transform="translate(85.000000, 5758.000000)"
+                  >
+                    <g
+                      id="::-button-(share-twitter)"
+                      transform="translate(44.000000, 176.000000)"
+                    >
+                      <path
+                        d="M55,18.7756985 C54.33775,19.0771597 53.626,19.2801846 52.879,19.3716996 C53.64175,18.9033581 54.22675,18.1612407 54.50275,17.2768521 C53.7895,17.710587 52.999,18.0258908 52.1575,18.1958472 C51.484,17.4598821 50.524,17 49.462,17 C47.42275,17 45.769,18.695719 45.769,20.7867214 C45.769,21.0835683 45.802,21.3727249 45.86425,21.649577 C42.79525,21.4919251 40.07425,19.9838503 38.2525,17.6928993 C37.93525,18.2519867 37.753,18.9025891 37.753,19.5970264 C37.753,20.9105358 38.40475,22.0694694 39.3955,22.748526 C38.79025,22.7285311 38.221,22.5585747 37.723,22.2748013 C37.723,22.290951 37.723,22.3063317 37.723,22.3224814 C37.723,24.1573955 38.99575,25.6877724 40.6855,26.0353755 C40.37575,26.1222763 40.0495,26.1684184 39.712,26.1684184 C39.47425,26.1684184 39.2425,26.1445783 39.0175,26.1007434 C39.48775,27.6049731 40.85125,28.7000769 42.4675,28.7308382 C41.20375,29.7467316 39.6115,30.351961 37.88125,30.351961 C37.5835,30.351961 37.2895,30.3342733 37,30.2988977 C38.63425,31.3732376 40.57525,32 42.661,32 C49.45375,32 53.16775,26.229941 53.16775,21.2258395 C53.16775,21.0620354 53.164,20.8982312 53.15725,20.7359651 C53.87875,20.2014868 54.505,19.5347347 55,18.7756985 Z"
+                        fill="#9399A3"
+                        fillRule="nonzero"
+                        id="twitter"
+                      />
+                    </g>
+                  </g>
+                </g>
+              </g>
+            </g>
+          </svg>
+        </a>
+        <a
+          className="c34"
+          href="https://github.com/opencollective"
+        >
+          <svg
+            height={15}
+            version="1.1"
+            viewBox="0 0 22 22"
+            width={15}
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <title>
+              github icon
+            </title>
+            <g
+              fill="none"
+              fillRule="evenodd"
+              id="Homepage"
+              stroke="none"
+              strokeWidth="1"
+            >
+              <g
+                id="Homepage---XS-(small-handset)"
+                transform="translate(-149.000000, -10919.000000)"
+              >
+                <g
+                  id="FOOTER"
+                  transform="translate(0.000000, 10758.000000)"
+                >
+                  <g
+                    id="::-social-networks"
+                    transform="translate(24.000000, 148.000000)"
+                  >
+                    <g
+                      id="::-icon-(github)"
+                      transform="translate(112.000000, 0.000000)"
+                    >
+                      <path
+                        d="M24,13 C17.9133333,13 13,17.962963 13,24.1111111 C13,29.2222222 16.4466667,33.6666667 21.36,34.9259259 C21.4333333,34.9259259 21.58,34.9259259 21.6533333,34.8518519 C21.7266667,34.7777778 21.8,34.7037037 21.8,34.5555556 L21.8,31.8888889 C21.8,31.8148148 21.7266667,31.6666667 21.7266667,31.5925926 C21.6533333,31.5185185 21.58,31.5185185 21.4333333,31.5185185 L20.7,31.5185185 C19.5266667,31.5185185 18.7933333,30.4074074 18.1333333,29.4444444 C17.9866667,29.2962963 17.9133333,29.0740741 17.7666667,28.9259259 C18.2066667,29.1481481 18.5,29.4444444 18.8666667,29.8148148 C19.38,30.3333333 19.8933333,30.8518519 20.7733333,30.8518519 C20.7733333,30.8518519 20.7733333,30.8518519 20.7733333,30.8518519 C21.14,30.8518519 21.8733333,30.4814815 21.8733333,29.3703704 L21.8733333,29 C21.8733333,28.8518519 21.8,28.7037037 21.58,28.6296296 C19.0866667,27.8888889 17.4733333,25.8888889 17.4733333,23.5925926 C17.4733333,22.4074074 17.9866667,21.2222222 18.8666667,20.3333333 C18.8666667,20.1851852 18.8666667,20.037037 18.8666667,19.8888889 C18.5,19.1481481 18.8666667,18.1111111 19.38,17.5185185 C19.8933333,17.7407407 20.4066667,18.3333333 20.8466667,18.7777778 C20.92,18.9259259 21.14,18.9259259 21.2866667,18.8518519 L21.5066667,18.7777778 C22.3133333,18.4814815 23.2666667,18.1111111 24.1466667,18.1111111 C25.0266667,18.1111111 25.98,18.4814815 26.7866667,18.7777778 L27.0066667,18.8518519 C27.1533333,18.9259259 27.3,18.8518519 27.4466667,18.7777778 C27.8866667,18.2592593 28.4,17.7407407 28.9133333,17.5185185 C29.4266667,18.1851852 29.7933333,19.1481481 29.4266667,19.8888889 C29.1333333,20.037037 29.1333333,20.1851852 29.2066667,20.3333333 C30.0866667,21.2962963 30.6,22.3333333 30.6,23.4444444 C30.6,25.8888889 28.7666667,28.037037 26.1266667,28.6296296 C25.98,28.6296296 25.9066667,28.7037037 25.9066667,28.8518519 C25.9066667,29 25.8333333,29.0740741 25.9066667,29.1481481 C26.1266667,29.5185185 26.2,30.2592593 26.2,31.2222222 C26.2,32.4814815 26.2,34.6296296 26.2,34.6296296 C26.2,34.7777778 26.2733333,34.8518519 26.3466667,34.9259259 C26.42,35 26.4933333,35 26.5666667,35 C26.5666667,35 26.64,35 26.64,35 C31.5533333,33.6666667 35,29.2222222 35,24.1111111 C35,17.962963 30.0866667,13 24,13 Z"
+                        fill="#9399A3"
+                        fillRule="nonzero"
+                        id="github"
+                      />
+                    </g>
+                  </g>
+                </g>
+              </g>
+            </g>
+          </svg>
+        </a>
+        <a
+          className="c34"
+          href="https://slack.opencollective.com"
+        >
+          <svg
+            height={15}
+            version="1.1"
+            viewBox="0 0 20 20"
+            width={15}
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <title>
+              slack icon
+            </title>
+            <g
+              fill="#9399A3"
+              id="slack"
+            >
+              <path
+                d="M19.1625,7.25 C21.225,14.125 19.62125,17.1 12.75,19.1625 C5.875,21.225 2.9,19.62125 0.8375,12.75 C-1.225,5.875 0.38,2.9 7.25,0.8375 C14.1225,-1.225 17.1,0.38 19.1625,7.25 Z M15.6875,11.7125 L15.695,11.73875 C16.2325,11.56375 16.5275,10.97625 16.345,10.42625 C16.16375,9.87625 15.57625,9.58875 15.0325,9.76375 L13.74,10.19375 L12.8775,7.6225 L14.175,7.185 C14.71625,7.005 15.01,6.4175 14.82875,5.8725 C14.64625,5.335 14.05875,5.04 13.51625,5.2225 L12.22,5.6475 L11.77,4.2975 C11.59,3.75 11.00125,3.4625 10.4575,3.6375 C9.9125,3.825 9.625,4.4125 9.8,4.95 L10.25,6.2875 L7.58875,7.1825 L7.13875,5.8425 C6.96375,5.3025 6.37625,5.00625 5.82625,5.19 C5.27625,5.37 4.98875,5.9575 5.16375,6.5025 L5.61375,7.84 L4.31375,8.2725 C3.76375,8.45625 3.47625,9.04375 3.65125,9.585 C3.78875,10.01 4.18875,10.27875 4.60125,10.29125 C4.72,10.29375 4.84,10.2775 4.9575,10.2375 L6.25,9.8 L7.07375,12.37375 L5.77375,12.81125 C5.23625,12.98625 4.93625,13.57375 5.12375,14.12375 C5.27375,14.54875 5.66125,14.82375 6.08625,14.83625 C6.21125,14.83625 6.32375,14.82375 6.44875,14.78625 L7.74875,14.34875 L8.19875,15.69875 C8.34875,16.12375 8.73625,16.39375 9.16125,16.40625 C9.28625,16.40875 9.39875,16.3925 9.52375,16.3525 C10.07375,16.17125 10.36125,15.58375 10.18625,15.04 L9.73625,13.7 L12.41125,12.805 L12.86125,14.145 C13.01125,14.57 13.39875,14.84 13.82375,14.8525 C13.94875,14.85625 14.06125,14.8375 14.18625,14.8 C14.72875,14.6175 15.0225,14.03 14.84125,13.4875 L14.39125,12.14625 L15.6875,11.7125 Z"
+              />
+              <polygon
+                points="8.2325 9.1625 9.095 11.73375 11.76625 10.83875 10.90375 8.27625 8.2325 9.17625"
+              />
+            </g>
+          </svg>
+        </a>
+        <a
+          className="c34"
+          href="mailto:info@opencollective.com"
+        >
+          <svg
+            height={13.125}
+            version="1.1"
+            viewBox="0 0 16 14"
+            width={15}
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <title>
+              email icon
+            </title>
+            <g
+              fill="none"
+              fillRule="evenodd"
+              id="Homepage"
+              stroke="none"
+              strokeWidth="1"
+            >
+              <g
+                id="Homepage---XS-(small-handset)"
+                transform="translate(-264.000000, -10923.000000)"
+              >
+                <g
+                  id="FOOTER"
+                  transform="translate(0.000000, 10758.000000)"
+                >
+                  <g
+                    id="::-social-networks"
+                    transform="translate(24.000000, 148.000000)"
+                  >
+                    <g
+                      id="::-icon-(email)"
+                      transform="translate(224.000000, 0.000000)"
+                    >
+                      <path
+                        d="M30.4,17 L17.6,17 C16.72,17 16.008,17.9 16.008,19 L16,29 C16,30.1 16.72,31 17.6,31 L30.4,31 C31.28,31 32,30.1 32,29 L32,19 C32,17.9 31.28,17 30.4,17 Z M30,21 L24,25 L18,21 L18,19 L24,23 L30,19 L30,21 Z"
+                        fill="#9399A3"
+                        fillRule="nonzero"
+                        id="email"
+                      />
+                    </g>
+                  </g>
+                </g>
+              </g>
+            </g>
+          </svg>
+        </a>
+      </div>
+      <nav
+        className="c35 c36"
+      >
+        <div
+          className="c37"
+        >
+          <p
+            className="c38"
+          >
+            PLATFORM
+          </p>
+          <ul
+            className="c39"
+          >
+            <li
+              className="c40"
+            >
+              <a
+                className="c41 "
+                href="/discover"
+              >
+                Discover
+              </a>
+            </li>
+            <li
+              className="c40"
+            >
+              <a
+                className="c41 "
+                href="/learn-more"
+              >
+                How it Works
+              </a>
+            </li>
+            <li
+              className="c40"
+            >
+              <a
+                className="c41 "
+                href="/opensource"
+                onClick={[Function]}
+              >
+                Use Cases
+              </a>
+            </li>
+            <li
+              className="c40"
+            >
+              <a
+                className="c41 "
+                href="/signin"
+                onClick={[Function]}
+              >
+                Sign Up
+              </a>
+            </li>
+            <li
+              className="c40"
+            >
+              <a
+                className="c41 "
+                href="/signin"
+                onClick={[Function]}
+              >
+                Login
+              </a>
+            </li>
+          </ul>
+        </div>
+        <div
+          className="c37"
+        >
+          <p
+            className="c38"
+          >
+            JOIN THE MOVEMENT
+          </p>
+          <ul
+            className="c39"
+          >
+            <li
+              className="c40"
+            >
+              <a
+                className="c41 "
+                href="/create"
+                onClick={[Function]}
+              >
+                Create a Collective
+              </a>
+            </li>
+            <li
+              className="c40"
+            >
+              <a
+                className="c41 "
+                href="/become-a-sponsor"
+                onClick={[Function]}
+              >
+                Become a Sponsor
+              </a>
+            </li>
+            <li
+              className="c40"
+            >
+              <a
+                className="c41 "
+                href="/chapters"
+                onClick={[Function]}
+              >
+                Create a chapter
+              </a>
+            </li>
+          </ul>
+        </div>
+        <div
+          className="c37"
+        >
+          <p
+            className="c38"
+          >
+            COMMUNITY
+          </p>
+          <ul
+            className="c39"
+          >
+            <li
+              className="c40"
+            >
+              <a
+                className="c41 "
+                href="/opensource"
+                onClick={[Function]}
+              >
+                Open Source
+              </a>
+            </li>
+            <li
+              className="c40"
+            >
+              <a
+                className="c41 "
+                href="https://github.com/opencollective/opencollective/issues"
+                onClick={[Function]}
+              >
+                Report an issue
+              </a>
+            </li>
+            <li
+              className="c40"
+            >
+              <a
+                className="c41 "
+                href="https://slack.opencollective.com"
+                onClick={[Function]}
+              >
+                Slack
+              </a>
+            </li>
+            <li
+              className="c40"
+            >
+              <a
+                className="c41 "
+                href="https://github.com/opencollective/opencollective/wiki"
+                onClick={[Function]}
+              >
+                Wiki
+              </a>
+            </li>
+            <li
+              className="c40"
+            >
+              <a
+                className="c41 "
+                href="mailto:support@opencollective.com"
+                onClick={[Function]}
+              >
+                Email Support
+              </a>
+            </li>
+          </ul>
+        </div>
+        <div
+          className="c37"
+        >
+          <p
+            className="c38"
+          >
+            COMPANY
+          </p>
+          <ul
+            className="c39"
+          >
+            <li
+              className="c40"
+            >
+              <a
+                className="c41 "
+                href="/about"
+                onClick={[Function]}
+              >
+                About
+              </a>
+            </li>
+            <li
+              className="c40"
+            >
+              <a
+                className="c41 "
+                href="/faq"
+                onClick={[Function]}
+              >
+                FAQ
+              </a>
+            </li>
+            <li
+              className="c40"
+            >
+              <a
+                className="c41 "
+                href="https://medium.com/open-collective"
+                onClick={[Function]}
+              >
+                Blog
+              </a>
+            </li>
+            <li
+              className="c40"
+            >
+              <a
+                className="c41 "
+                href="/tos"
+                onClick={[Function]}
+              >
+                Terms of Service
+              </a>
+            </li>
+            <li
+              className="c40"
+            >
+              <a
+                className="c41 "
+                href="/privacypolicy"
+                onClick={[Function]}
+              >
+                Privacy Policy
+              </a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`Search Page renders search results with pagination 1`] = `
+.c1 {
+  box-sizing: border-box;
+  padding-left: 16px;
+  padding-right: 16px;
+  padding-top: 16px;
+  padding-bottom: 16px;
+}
+
+.c2 {
+  box-sizing: border-box;
+}
+
+.c5 {
+  box-sizing: border-box;
+  margin-left: 8px;
+  margin-right: 8px;
+}
+
+.c7 {
+  box-sizing: border-box;
+  -webkit-flex: 1 1 auto;
+  -ms-flex: 1 1 auto;
+  flex: 1 1 auto;
+}
+
+.c9 {
+  box-sizing: border-box;
+  margin-left: 16px;
+  margin-right: 16px;
+}
+
+.c13 {
+  margin: 0;
+  box-sizing: border-box;
+  margin: 0px;
+  padding: 0px;
+}
+
+.c14 {
+  box-sizing: border-box;
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+.c18 {
+  box-sizing: border-box;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+.c19 {
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.c21 {
+  box-sizing: border-box;
+  margin-top: 16px;
+  margin-bottom: 16px;
+}
+
+.c28 {
+  box-sizing: border-box;
+  width: 100%;
+  padding-top: 16px;
+  padding-bottom: 16px;
+}
+
+.c31 {
+  max-width: 1300px;
+  box-sizing: border-box;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 8px;
+}
+
+.c38 {
+  box-sizing: border-box;
+  margin-top: 16px;
+  -webkit-flex: 1 1 auto;
+  -ms-flex: 1 1 auto;
+  flex: 1 1 auto;
+  -webkit-order: 3;
+  -ms-flex-order: 3;
+  order: 3;
+}
+
+.c39 {
+  box-sizing: border-box;
+  width: 50%;
+  margin-bottom: 16px;
+}
+
+.c25 {
+  box-sizing: border-box;
+  margin-left: 8px;
+  margin-right: 8px;
+  margin-top: 16px;
+  margin-bottom: 16px;
+}
+
+.c0 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-direction: row;
+  -ms-flex-direction: row;
+  flex-direction: row;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: space-around;
+  -webkit-justify-content: space-around;
+  -ms-flex-pack: space-around;
+  justify-content: space-around;
+}
+
+.c3 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+}
+
+.c6 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: end;
+  -webkit-justify-content: flex-end;
+  -ms-flex-pack: end;
+  justify-content: flex-end;
+}
+
+.c10 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+}
+
+.c12 {
+  margin: 0;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: space-around;
+  -webkit-justify-content: space-around;
+  -ms-flex-pack: space-around;
+  justify-content: space-around;
+}
+
+.c20 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: flex-end;
+  -webkit-box-align: flex-end;
+  -ms-flex-align: flex-end;
+  align-items: flex-end;
+}
+
+.c24 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-wrap: wrap;
+  -ms-flex-wrap: wrap;
+  flex-wrap: wrap;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+}
+
+.c26 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -4090,20 +5348,22 @@ exports[`Search Page renders loading grid SVG 1`] = `
   justify-content: center;
 }
 
-.c17 {
-  color: #46b0ed;
-  display: inline-block;
-  font-size: 1.2rem;
-  font-weight: bold;
-  line-height: Paragraph;
-  -webkit-letter-spacing: 1px;
-  -moz-letter-spacing: 1px;
-  -ms-letter-spacing: 1px;
-  letter-spacing: 1px;
-  margin: 0px;
-  margin-left: 8px;
-  margin-right: 8px;
-  cursor: pointer;
+.c27 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
 }
 
 .c34 {
@@ -4177,33 +5437,16 @@ exports[`Search Page renders loading grid SVG 1`] = `
   width: 100%;
 }
 
-.c18 {
-  position: relative;
+.c16 {
+  border: 1px solid #D5DAE0;
+  border-radius: 20px;
+  color: #3385FF;
   display: inline-block;
-  height: 0.6rem;
-  width: 1.4rem;
-  cursor: pointer;
-}
-
-.c18::before,
-.c18::after {
-  content: '';
-  position: absolute;
-  top: 0;
-}
-
-.c18::before {
-  border-left: 0.6rem solid transparent;
-  border-right: 0.6rem solid transparent;
-  border-top: 0.6rem solid #46b0ed;
-  left: 0;
-}
-
-.c18::after {
-  border-left: calc(0.6rem - 0.2rem) solid transparent;
-  border-right: calc(0.6rem - 0.2rem) solid transparent;
-  border-top: calc(0.6rem - 0.2rem) solid white;
-  left: 0.2rem;
+  font-size: 1.4rem;
+  padding-left: 16px;
+  padding-right: 16px;
+  padding-top: 8px;
+  padding-bottom: 8px;
 }
 
 .c42 {
@@ -4274,7 +5517,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
   justify-content: center;
 }
 
-.c24.c24.c24 {
+.c22.c22.c22 {
   border: none;
   border-bottom: 2px solid #3385FF;
   border-radius: 0;
@@ -4284,16 +5527,16 @@ exports[`Search Page renders loading grid SVG 1`] = `
   padding: 0;
 }
 
-.c25.c25 {
+.c23.c23 {
   padding: 0 2rem;
 }
 
-.c19 {
+.c17 {
   max-width: 1200px;
 }
 
 @media screen and (min-width:40em) {
-  .c20 {
+  .c18 {
     width: 85%;
   }
 }
@@ -4313,7 +5556,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
 }
 
 @media screen and (min-width:40em) {
-  .c26 {
+  .c24 {
     -webkit-box-pack: center;
     -webkit-justify-content: center;
     -ms-flex-pack: center;
@@ -4322,7 +5565,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c26 {
+  .c24 {
     -webkit-box-pack: start;
     -webkit-justify-content: flex-start;
     -ms-flex-pack: start;
@@ -4402,18 +5645,6 @@ exports[`Search Page renders loading grid SVG 1`] = `
 
 @media screen and (min-width:64em) {
   .c8 {
-    display: none;
-  }
-}
-
-@media screen and (max-width:40em) {
-  .c16 {
-    display: none;
-  }
-}
-
-@media screen and (min-width:40em) and (max-width:52em) {
-  .c16 {
     display: none;
   }
 }
@@ -4576,28 +5807,15 @@ exports[`Search Page renders loading grid SVG 1`] = `
         <div
           className="LoginTopBarProfileButton"
         >
-          <div
-            className="c3 c2 sc-bdVaJa c2"
+          <a
+            className="c16"
+            href="/signin?next=%2F"
             onClick={[Function]}
           >
-            <div
-              className="c16 c2"
-            >
-              <p
-                className="LoginTopBarProfileButton-name c17"
-                cursor="pointer"
-              />
-            </div>
-            <div
-              className="c18"
-              color="#46b0ed"
-              cursor="pointer"
-              display="inline-block"
-              height="0.6rem"
-              strokeWidth="0.2rem"
-              width="1.4rem"
-            />
-          </div>
+            <span>
+              Login
+            </span>
+          </a>
         </div>
       </div>
     </div>
@@ -4606,10 +5824,10 @@ exports[`Search Page renders loading grid SVG 1`] = `
     className="jsx-916984404"
   >
     <div
-      className="c19 c20"
+      className="c17 c18"
     >
       <div
-        className="c21"
+        className="c19"
       >
         <form
           method="GET"
@@ -4625,18 +5843,18 @@ exports[`Search Page renders loading grid SVG 1`] = `
               Search Open Collective
             </label>
             <div
-              className="c22 c23 sc-bdVaJa c2"
+              className="c20 c21 sc-bdVaJa c2"
             >
               <input
-                className="c24 form-control"
-                defaultValue=""
+                className="c22 form-control"
+                defaultValue="Test"
                 id="search"
                 name="q"
                 placeholder="open source"
                 type="search"
               />
               <button
-                className="jsx-1144918383 jsx-3101740563 Button blue c25"
+                className="jsx-1144918383 jsx-3101740563 Button blue c23"
                 onClick={[Function]}
                 type="submit"
               >
@@ -4649,147 +5867,133 @@ exports[`Search Page renders loading grid SVG 1`] = `
         </form>
       </div>
       <div
-        className="c26 c2 sc-bdVaJa c2"
+        className="c24 c2 sc-bdVaJa c2"
       >
         <div
-          className="c27 c28 sc-bdVaJa c2"
+          className="c10 c25 sc-bdVaJa c2"
         >
-          <svg
-            fill="#3385FF"
-            height={100}
-            viewBox="0 0 105 105"
-            width={100}
-            xmlns="http://www.w3.org/2000/svg"
+          <a
+            href="/test-collective"
+            onClick={[Function]}
           >
-            <circle
-              cx="12.5"
-              cy="12.5"
-              r="12.5"
+            <div
+              className="jsx-136688120 CollectiveCard undefined"
             >
-              <animate
-                attributeName="fill-opacity"
-                begin="0s"
-                calcMode="linear"
-                dur="1s"
-                repeatCount="indefinite"
-                values="1;.2;1"
+              <div
+                className="jsx-136688120 head"
+              >
+                <div
+                  className="jsx-136688120 background"
+                  style={Object {}}
+                />
+                <div
+                  className="jsx-136688120 logo"
+                >
+                  <div
+                    className="jsx-3454192051 Logo"
+                    style={
+                      Object {
+                        "backgroundImage": "url(/static/images/default-organization-logo.png)",
+                        "height": 65,
+                        "minWidth": 32.5,
+                      }
+                    }
+                  >
+                    <img
+                      className="jsx-3454192051 logo"
+                      src="/static/images/default-organization-logo.png"
+                      style={
+                        Object {
+                          "maxHeight": 65,
+                        }
+                      }
+                    />
+                  </div>
+                </div>
+              </div>
+              <div
+                className="jsx-136688120 body"
+              >
+                <div
+                  className="jsx-136688120 name"
+                />
+                <div
+                  className="jsx-136688120 description"
+                />
+              </div>
+              <div
+                className="jsx-136688120 footer"
               />
-            </circle>
-            <circle
-              cx="12.5"
-              cy="52.5"
-              fillOpacity=".5"
-              r="12.5"
-            >
-              <animate
-                attributeName="fill-opacity"
-                begin="100ms"
-                calcMode="linear"
-                dur="1s"
-                repeatCount="indefinite"
-                values="1;.2;1"
-              />
-            </circle>
-            <circle
-              cx="52.5"
-              cy="12.5"
-              r="12.5"
-            >
-              <animate
-                attributeName="fill-opacity"
-                begin="300ms"
-                calcMode="linear"
-                dur="1s"
-                repeatCount="indefinite"
-                values="1;.2;1"
-              />
-            </circle>
-            <circle
-              cx="52.5"
-              cy="52.5"
-              r="12.5"
-            >
-              <animate
-                attributeName="fill-opacity"
-                begin="600ms"
-                calcMode="linear"
-                dur="1s"
-                repeatCount="indefinite"
-                values="1;.2;1"
-              />
-            </circle>
-            <circle
-              cx="92.5"
-              cy="12.5"
-              r="12.5"
-            >
-              <animate
-                attributeName="fill-opacity"
-                begin="800ms"
-                calcMode="linear"
-                dur="1s"
-                repeatCount="indefinite"
-                values="1;.2;1"
-              />
-            </circle>
-            <circle
-              cx="92.5"
-              cy="52.5"
-              r="12.5"
-            >
-              <animate
-                attributeName="fill-opacity"
-                begin="400ms"
-                calcMode="linear"
-                dur="1s"
-                repeatCount="indefinite"
-                values="1;.2;1"
-              />
-            </circle>
-            <circle
-              cx="12.5"
-              cy="92.5"
-              r="12.5"
-            >
-              <animate
-                attributeName="fill-opacity"
-                begin="700ms"
-                calcMode="linear"
-                dur="1s"
-                repeatCount="indefinite"
-                values="1;.2;1"
-              />
-            </circle>
-            <circle
-              cx="52.5"
-              cy="92.5"
-              r="12.5"
-            >
-              <animate
-                attributeName="fill-opacity"
-                begin="500ms"
-                calcMode="linear"
-                dur="1s"
-                repeatCount="indefinite"
-                values="1;.2;1"
-              />
-            </circle>
-            <circle
-              cx="92.5"
-              cy="92.5"
-              r="12.5"
-            >
-              <animate
-                attributeName="fill-opacity"
-                begin="200ms"
-                calcMode="linear"
-                dur="1s"
-                repeatCount="indefinite"
-                values="1;.2;1"
-              />
-            </circle>
-          </svg>
+            </div>
+          </a>
         </div>
+      </div>
+      <div
+        className="c26 c2 sc-bdVaJa c2"
+      >
+        <ul
+          className="pagination"
+        >
+          <li
+            className="active"
+          >
+            <a
+              href="?limit=20&offset=0&q=Test"
+              onClick={[Function]}
+            >
+              1
+            </a>
+          </li>
+          <li
+            className=""
+          >
+            <a
+              href="?limit=20&offset=20&q=Test"
+              onClick={[Function]}
+            >
+              2
+            </a>
+          </li>
+          <li
+            className=""
+          >
+            <a
+              href="?limit=20&offset=40&q=Test"
+              onClick={[Function]}
+            >
+              3
+            </a>
+          </li>
+          <li
+            className=""
+          >
+            <a
+              href="?limit=20&offset=60&q=Test"
+              onClick={[Function]}
+            >
+              4
+            </a>
+          </li>
+          <li
+            className=""
+          >
+            <a
+              href="?limit=20&offset=80&q=Test"
+              onClick={[Function]}
+            >
+              5
+            </a>
+          </li>
+        </ul>
+      </div>
+      <div
+        className="c27 c28 sc-bdVaJa c2"
+      >
+        <p>
+          <em>
+            If you don't see the collective you're searching for:
+          </em>
+        </p>
       </div>
     </div>
   </main>
@@ -5260,1442 +6464,6 @@ exports[`Search Page renders loading grid SVG 1`] = `
             >
               <a
                 className="c43 "
-                href="/privacypolicy"
-                onClick={[Function]}
-              >
-                Privacy Policy
-              </a>
-            </li>
-          </ul>
-        </div>
-      </nav>
-    </div>
-  </div>
-</div>
-`;
-
-exports[`Search Page renders search results with pagination 1`] = `
-.c1 {
-  box-sizing: border-box;
-  padding-left: 16px;
-  padding-right: 16px;
-  padding-top: 16px;
-  padding-bottom: 16px;
-}
-
-.c2 {
-  box-sizing: border-box;
-}
-
-.c5 {
-  box-sizing: border-box;
-  margin-left: 8px;
-  margin-right: 8px;
-}
-
-.c7 {
-  box-sizing: border-box;
-  -webkit-flex: 1 1 auto;
-  -ms-flex: 1 1 auto;
-  flex: 1 1 auto;
-}
-
-.c9 {
-  box-sizing: border-box;
-  margin-left: 16px;
-  margin-right: 16px;
-}
-
-.c13 {
-  margin: 0;
-  box-sizing: border-box;
-  margin: 0px;
-  padding: 0px;
-}
-
-.c14 {
-  box-sizing: border-box;
-  padding-left: 16px;
-  padding-right: 16px;
-}
-
-.c20 {
-  box-sizing: border-box;
-  width: 100%;
-  margin-left: auto;
-  margin-right: auto;
-  padding-left: 16px;
-  padding-right: 16px;
-}
-
-.c21 {
-  box-sizing: border-box;
-  width: 100%;
-}
-
-.c23 {
-  box-sizing: border-box;
-  margin-top: 16px;
-  margin-bottom: 16px;
-}
-
-.c30 {
-  box-sizing: border-box;
-  width: 100%;
-  padding-top: 16px;
-  padding-bottom: 16px;
-}
-
-.c33 {
-  max-width: 1300px;
-  box-sizing: border-box;
-  margin-left: auto;
-  margin-right: auto;
-  padding: 8px;
-}
-
-.c40 {
-  box-sizing: border-box;
-  margin-top: 16px;
-  -webkit-flex: 1 1 auto;
-  -ms-flex: 1 1 auto;
-  flex: 1 1 auto;
-  -webkit-order: 3;
-  -ms-flex-order: 3;
-  order: 3;
-}
-
-.c41 {
-  box-sizing: border-box;
-  width: 50%;
-  margin-bottom: 16px;
-}
-
-.c27 {
-  box-sizing: border-box;
-  margin-left: 8px;
-  margin-right: 8px;
-  margin-top: 16px;
-  margin-bottom: 16px;
-}
-
-.c0 {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-flex-direction: row;
-  -ms-flex-direction: row;
-  flex-direction: row;
-  -webkit-align-items: center;
-  -webkit-box-align: center;
-  -ms-flex-align: center;
-  align-items: center;
-  -webkit-box-pack: space-around;
-  -webkit-justify-content: space-around;
-  -ms-flex-pack: space-around;
-  justify-content: space-around;
-}
-
-.c3 {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-align-items: center;
-  -webkit-box-align: center;
-  -ms-flex-align: center;
-  align-items: center;
-}
-
-.c6 {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-align-items: center;
-  -webkit-box-align: center;
-  -ms-flex-align: center;
-  align-items: center;
-  -webkit-box-pack: end;
-  -webkit-justify-content: flex-end;
-  -ms-flex-pack: end;
-  justify-content: flex-end;
-}
-
-.c10 {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-}
-
-.c12 {
-  margin: 0;
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-pack: space-around;
-  -webkit-justify-content: space-around;
-  -ms-flex-pack: space-around;
-  justify-content: space-around;
-}
-
-.c22 {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-align-items: flex-end;
-  -webkit-box-align: flex-end;
-  -ms-flex-align: flex-end;
-  align-items: flex-end;
-}
-
-.c26 {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-flex-wrap: wrap;
-  -ms-flex-wrap: wrap;
-  flex-wrap: wrap;
-  -webkit-box-pack: center;
-  -webkit-justify-content: center;
-  -ms-flex-pack: center;
-  justify-content: center;
-}
-
-.c28 {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-pack: center;
-  -webkit-justify-content: center;
-  -ms-flex-pack: center;
-  justify-content: center;
-}
-
-.c32 {
-  max-width: 1300px;
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-flex-direction: column;
-  -ms-flex-direction: column;
-  flex-direction: column;
-  -webkit-align-items: center;
-  -webkit-box-align: center;
-  -ms-flex-align: center;
-  align-items: center;
-  -webkit-box-pack: justify;
-  -webkit-justify-content: space-between;
-  -ms-flex-pack: justify;
-  justify-content: space-between;
-}
-
-.c35 {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-pack: center;
-  -webkit-justify-content: center;
-  -ms-flex-pack: center;
-  justify-content: center;
-}
-
-.c39 {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-flex-wrap: wrap;
-  -ms-flex-wrap: wrap;
-  flex-wrap: wrap;
-  -webkit-box-pack: center;
-  -webkit-justify-content: center;
-  -ms-flex-pack: center;
-  justify-content: center;
-}
-
-.c29 {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-flex-direction: column;
-  -ms-flex-direction: column;
-  flex-direction: column;
-  -webkit-align-items: center;
-  -webkit-box-align: center;
-  -ms-flex-align: center;
-  align-items: center;
-  -webkit-box-pack: center;
-  -webkit-justify-content: center;
-  -ms-flex-pack: center;
-  justify-content: center;
-}
-
-.c17 {
-  color: #46b0ed;
-  display: inline-block;
-  font-size: 1.2rem;
-  font-weight: bold;
-  line-height: Paragraph;
-  -webkit-letter-spacing: 1px;
-  -moz-letter-spacing: 1px;
-  -ms-letter-spacing: 1px;
-  letter-spacing: 1px;
-  margin: 0px;
-  margin-left: 8px;
-  margin-right: 8px;
-  cursor: pointer;
-}
-
-.c36 {
-  color: #6E747A;
-  font-size: 1.4rem;
-  line-height: Paragraph;
-  -webkit-letter-spacing: -0.2px;
-  -moz-letter-spacing: -0.2px;
-  -ms-letter-spacing: -0.2px;
-  letter-spacing: -0.2px;
-  margin: 0px;
-  padding-top: 8px;
-  padding-bottom: 8px;
-  text-align: center;
-}
-
-.c42 {
-  color: #C2C6CC;
-  font-size: 1.2rem;
-  line-height: Paragraph;
-  -webkit-letter-spacing: 1px;
-  -moz-letter-spacing: 1px;
-  -ms-letter-spacing: 1px;
-  letter-spacing: 1px;
-  margin: 0px;
-  padding-bottom: 16px;
-  text-align: center;
-}
-
-.c31 {
-  border-top: 1px solid #aaaaaa;
-  bottom: 0px;
-  background-color: white;
-  min-height: 7.5rem;
-  padding: 1rem;
-  width: 100%;
-}
-
-.c34 {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-flex-direction: column;
-  -ms-flex-direction: column;
-  flex-direction: column;
-  max-width: 300px;
-  margin-top: 16px;
-  width: 100%;
-}
-
-.c37 {
-  -webkit-align-items: center;
-  -webkit-box-align: center;
-  -ms-flex-align: center;
-  align-items: center;
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-pack: space-evenly;
-  -webkit-justify-content: space-evenly;
-  -ms-flex-pack: space-evenly;
-  justify-content: space-evenly;
-  max-width: 300px;
-  -webkit-order: 2;
-  -ms-flex-order: 2;
-  order: 2;
-  margin-top: 16px;
-  margin-bottom: 16px;
-  width: 100%;
-}
-
-.c18 {
-  position: relative;
-  display: inline-block;
-  height: 0.6rem;
-  width: 1.4rem;
-  cursor: pointer;
-}
-
-.c18::before,
-.c18::after {
-  content: '';
-  position: absolute;
-  top: 0;
-}
-
-.c18::before {
-  border-left: 0.6rem solid transparent;
-  border-right: 0.6rem solid transparent;
-  border-top: 0.6rem solid #46b0ed;
-  left: 0;
-}
-
-.c18::after {
-  border-left: calc(0.6rem - 0.2rem) solid transparent;
-  border-right: calc(0.6rem - 0.2rem) solid transparent;
-  border-top: calc(0.6rem - 0.2rem) solid white;
-  left: 0.2rem;
-}
-
-.c44 {
-  list-style: none;
-  margin-bottom: 8px;
-  text-align: center;
-}
-
-.c11 {
-  list-style: none;
-  min-width: 20rem;
-  text-align: right;
-}
-
-.c15 {
-  color: #777777;
-  font-size: 1.4rem;
-}
-
-.c38 {
-  -webkit-align-items: center;
-  -webkit-box-align: center;
-  -ms-flex-align: center;
-  align-items: center;
-  border: 1px solid #9399a3;
-  border-radius: 50%;
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  height: 48px;
-  -webkit-box-pack: center;
-  -webkit-justify-content: center;
-  -ms-flex-pack: center;
-  justify-content: center;
-  opacity: 0.6;
-  width: 48px;
-}
-
-.c38:hover,
-.c38:focus {
-  opacity: 1;
-}
-
-.c45 {
-  color: #6e747a;
-  display: block;
-  fontsize: 1.4rem;
-  fontweight: 400;
-  margin: 0;
-  padding: 0;
-}
-
-.c43 {
-  box-sizing: border-box;
-  padding-left: 0px;
-  padding-right: 8px;
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-flex-direction: column;
-  -ms-flex-direction: column;
-  flex-direction: column;
-  -webkit-box-pack: center;
-  -webkit-justify-content: center;
-  -ms-flex-pack: center;
-  justify-content: center;
-}
-
-.c24.c24.c24 {
-  border: none;
-  border-bottom: 2px solid #3385FF;
-  border-radius: 0;
-  box-shadow: none;
-  display: block;
-  height: 3.4rem;
-  padding: 0;
-}
-
-.c25.c25 {
-  padding: 0 2rem;
-}
-
-.c19 {
-  max-width: 1200px;
-}
-
-@media screen and (min-width:40em) {
-  .c20 {
-    width: 85%;
-  }
-}
-
-@media screen and (min-width:52em) {
-  .c40 {
-    -webkit-order: 2;
-    -ms-flex-order: 2;
-    order: 2;
-  }
-}
-
-@media screen and (min-width:52em) {
-  .c41 {
-    width: 25%;
-  }
-}
-
-@media screen and (min-width:40em) {
-  .c26 {
-    -webkit-box-pack: center;
-    -webkit-justify-content: center;
-    -ms-flex-pack: center;
-    justify-content: center;
-  }
-}
-
-@media screen and (min-width:52em) {
-  .c26 {
-    -webkit-box-pack: start;
-    -webkit-justify-content: flex-start;
-    -ms-flex-pack: start;
-    justify-content: flex-start;
-  }
-}
-
-@media screen and (min-width:52em) {
-  .c32 {
-    -webkit-flex-direction: row;
-    -ms-flex-direction: row;
-    flex-direction: row;
-  }
-}
-
-@media screen and (min-width:52em) {
-  .c32 {
-    -webkit-align-items: flex-start;
-    -webkit-box-align: flex-start;
-    -ms-flex-align: flex-start;
-    align-items: flex-start;
-  }
-}
-
-@media screen and (min-width:52em) {
-  .c35 {
-    -webkit-box-pack: start;
-    -webkit-justify-content: flex-start;
-    -ms-flex-pack: start;
-    justify-content: flex-start;
-  }
-}
-
-@media screen and (min-width:52em) {
-  .c36 {
-    text-align: left;
-  }
-}
-
-@media screen and (min-width:52em) {
-  .c42 {
-    text-align: left;
-  }
-}
-
-@media screen and (min-width:52em) {
-  .c34 {
-    width: 33.33333333333333%;
-  }
-}
-
-@media screen and (min-width:52em) {
-  .c37 {
-    -webkit-order: 3;
-    -ms-flex-order: 3;
-    order: 3;
-  }
-}
-
-@media screen and (max-width:40em) {
-  .c4 {
-    display: none;
-  }
-}
-
-@media screen and (min-width:40em) and (max-width:52em) {
-  .c8 {
-    display: none;
-  }
-}
-
-@media screen and (min-width:52em) and (max-width:64em) {
-  .c8 {
-    display: none;
-  }
-}
-
-@media screen and (min-width:64em) {
-  .c8 {
-    display: none;
-  }
-}
-
-@media screen and (max-width:40em) {
-  .c16 {
-    display: none;
-  }
-}
-
-@media screen and (min-width:40em) and (max-width:52em) {
-  .c16 {
-    display: none;
-  }
-}
-
-@media screen and (min-width:52em) {
-  .c44 {
-    text-align: left;
-  }
-}
-
-<div>
-  <header>
-    <div
-      id="top"
-    />
-    <div
-      className="c0 c1 sc-bdVaJa c2"
-    >
-      <a
-        className="c3 c2"
-        href="/"
-        onClick={[Function]}
-      >
-        <img
-          alt="Open Collective logo"
-          className=""
-          height="24"
-          src="/static/images/opencollective-icon.svg"
-          width="24"
-        />
-        <div
-          className="c4 c2"
-        >
-          <div
-            className="c5"
-          >
-            <img
-              height="16px"
-              src="/static/images/logotype.svg"
-            />
-          </div>
-        </div>
-      </a>
-      <div
-        className="c6 c7 sc-bdVaJa c2"
-      >
-        <div
-          className="c8 c2"
-        >
-          <div
-            className="c9"
-          >
-            <a
-              className="c10 c2"
-              onClick={[Function]}
-            >
-              <svg
-                height={24}
-                version="1.1"
-                viewBox="10 10 30 30"
-                width={24}
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <title>
-                  magnifying glass icon
-                </title>
-                <path
-                  d="M28.5404814,30.1903972 C26.7995948,31.5736628 24.5962981,32.4 22.2,32.4 C16.5666956,32.4 12,27.8333044 12,22.2 C12,16.5666956 16.5666956,12 22.2,12 C27.8333044,12 32.4,16.5666956 32.4,22.2 C32.4,24.5962981 31.5736628,26.7995948 30.1903972,28.5404814 L35.6582912,34.0083754 C36.1139029,34.4639871 36.1139029,35.2026796 35.6582912,35.6582912 C35.2026796,36.1139029 34.4639871,36.1139029 34.0083754,35.6582912 L28.5404814,30.1903972 Z M22.2,30 C26.507821,30 30,26.507821 30,22.2 C30,17.892179 26.507821,14.4 22.2,14.4 C17.892179,14.4 14.4,17.892179 14.4,22.2 C14.4,26.507821 17.892179,30 22.2,30 Z"
-                  fill="#aaaaaa"
-                  fillRule="nonzero"
-                  id="magnifying-glass"
-                />
-              </svg>
-            </a>
-          </div>
-        </div>
-        <div
-          className="c8 c2"
-        >
-          <div
-            className="c9"
-          >
-            <a
-              className="c10 c2"
-              onClick={[Function]}
-            >
-              <svg
-                height={16.799999999999997}
-                version="1.1"
-                viewBox="0 0 20 14"
-                width={24}
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <title>
-                  menu icon
-                </title>
-                <path
-                  d="M19,6 L1,6 C0.4,6 0,6.4 0,7 C0,7.6 0.4,8 1,8 L19,8 C19.6,8 20,7.6 20,7 C20,6.4 19.6,6 19,6 Z"
-                  fill="#aaaaaa"
-                  fillRule="nonzero"
-                />
-                <path
-                  d="M0.85,2 L16.15,2 C16.66,2 17,1.6 17,1 C17,0.4 16.66,0 16.15,0 L0.85,0 C0.34,0 0,0.4 0,1 C0,1.6 0.34,2 0.85,2 Z"
-                  fill="#aaaaaa"
-                  fillRule="nonzero"
-                />
-                <path
-                  d="M16.15,12 L0.85,12 C0.34,12 0,12.4 0,13 C0,13.6 0.34,14 0.85,14 L16.15,14 C16.66,14 17,13.6 17,13 C17,12.4 16.66,12 16.15,12 Z"
-                  fill="#aaaaaa"
-                  fillRule="nonzero"
-                />
-              </svg>
-            </a>
-          </div>
-        </div>
-        <div
-          className="c4 c2"
-        >
-          <ul
-            className="c11 c12 c13"
-          >
-            <li
-              className="c14"
-            >
-              <a
-                className="c15"
-                href="/discover"
-              >
-                <span>
-                  Discover
-                </span>
-              </a>
-            </li>
-            <li
-              className="c14"
-            >
-              <a
-                className="c15"
-                href="/learn-more"
-              >
-                <span>
-                  How it Works
-                </span>
-              </a>
-            </li>
-            <li
-              className="c14"
-            >
-              <a
-                className="c15"
-                href="https://medium.com/open-collective"
-              >
-                <span>
-                  Blog
-                </span>
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div
-          className="LoginTopBarProfileButton"
-        >
-          <div
-            className="c3 c2 sc-bdVaJa c2"
-            onClick={[Function]}
-          >
-            <div
-              className="c16 c2"
-            >
-              <p
-                className="LoginTopBarProfileButton-name c17"
-                cursor="pointer"
-              />
-            </div>
-            <div
-              className="c18"
-              color="#46b0ed"
-              cursor="pointer"
-              display="inline-block"
-              height="0.6rem"
-              strokeWidth="0.2rem"
-              width="1.4rem"
-            />
-          </div>
-        </div>
-      </div>
-    </div>
-  </header>
-  <main
-    className="jsx-916984404"
-  >
-    <div
-      className="c19 c20"
-    >
-      <div
-        className="c21"
-      >
-        <form
-          method="GET"
-          onSubmit={[Function]}
-        >
-          <div
-            className="form-group form-group-lg"
-          >
-            <label
-              className="h1 control-label"
-              htmlFor="search"
-            >
-              Search Open Collective
-            </label>
-            <div
-              className="c22 c23 sc-bdVaJa c2"
-            >
-              <input
-                className="c24 form-control"
-                defaultValue="Test"
-                id="search"
-                name="q"
-                placeholder="open source"
-                type="search"
-              />
-              <button
-                className="jsx-1144918383 jsx-3101740563 Button blue c25"
-                onClick={[Function]}
-                type="submit"
-              >
-                <span
-                  className="fa fa-search"
-                />
-              </button>
-            </div>
-          </div>
-        </form>
-      </div>
-      <div
-        className="c26 c2 sc-bdVaJa c2"
-      >
-        <div
-          className="c10 c27 sc-bdVaJa c2"
-        >
-          <a
-            href="/test-collective"
-            onClick={[Function]}
-          >
-            <div
-              className="jsx-136688120 CollectiveCard undefined"
-            >
-              <div
-                className="jsx-136688120 head"
-              >
-                <div
-                  className="jsx-136688120 background"
-                  style={Object {}}
-                />
-                <div
-                  className="jsx-136688120 logo"
-                >
-                  <div
-                    className="jsx-3454192051 Logo"
-                    style={
-                      Object {
-                        "backgroundImage": "url(/static/images/default-organization-logo.png)",
-                        "height": 65,
-                        "minWidth": 32.5,
-                      }
-                    }
-                  >
-                    <img
-                      className="jsx-3454192051 logo"
-                      src="/static/images/default-organization-logo.png"
-                      style={
-                        Object {
-                          "maxHeight": 65,
-                        }
-                      }
-                    />
-                  </div>
-                </div>
-              </div>
-              <div
-                className="jsx-136688120 body"
-              >
-                <div
-                  className="jsx-136688120 name"
-                />
-                <div
-                  className="jsx-136688120 description"
-                />
-              </div>
-              <div
-                className="jsx-136688120 footer"
-              />
-            </div>
-          </a>
-        </div>
-      </div>
-      <div
-        className="c28 c2 sc-bdVaJa c2"
-      >
-        <ul
-          className="pagination"
-        >
-          <li
-            className="active"
-          >
-            <a
-              href="?limit=20&offset=0&q=Test"
-              onClick={[Function]}
-            >
-              1
-            </a>
-          </li>
-          <li
-            className=""
-          >
-            <a
-              href="?limit=20&offset=20&q=Test"
-              onClick={[Function]}
-            >
-              2
-            </a>
-          </li>
-          <li
-            className=""
-          >
-            <a
-              href="?limit=20&offset=40&q=Test"
-              onClick={[Function]}
-            >
-              3
-            </a>
-          </li>
-          <li
-            className=""
-          >
-            <a
-              href="?limit=20&offset=60&q=Test"
-              onClick={[Function]}
-            >
-              4
-            </a>
-          </li>
-          <li
-            className=""
-          >
-            <a
-              href="?limit=20&offset=80&q=Test"
-              onClick={[Function]}
-            >
-              5
-            </a>
-          </li>
-        </ul>
-      </div>
-      <div
-        className="c29 c30 sc-bdVaJa c2"
-      >
-        <p>
-          <em>
-            If you don't see the collective you're searching for:
-          </em>
-        </p>
-      </div>
-    </div>
-  </main>
-  <div
-    className="c31"
-    id="footer"
-  >
-    <div
-      className="c32 c33 sc-bdVaJa c2"
-    >
-      <div
-        className="c34"
-      >
-        <div
-          className="c35 c2 sc-bdVaJa c2"
-        >
-          <object
-            data="/static/images/opencollectivelogo-footer.svg"
-            height="20"
-            type="image/svg+xml"
-          />
-        </div>
-        <p
-          className="c36"
-        >
-          An organization for your community, transparent by design.
-        </p>
-      </div>
-      <div
-        className="c37"
-      >
-        <a
-          className="c38"
-          href="https://medium.com/open-collective"
-        >
-          <svg
-            height={15}
-            viewBox="0 0 32 32"
-            width={15}
-          >
-            <title>
-              medium icon
-            </title>
-            <path
-              d="M3.795 8.48c0.040-0.393-0.111-0.781-0.404-1.045l-2.987-3.6v-0.537h9.276l7.171 15.727 6.304-15.727h8.845v0.537l-2.556 2.449c-0.22 0.168-0.329 0.444-0.284 0.717v18c-0.045 0.272 0.064 0.547 0.284 0.716l2.493 2.449v0.537h-12.547v-0.537l2.583-2.509c0.253-0.253 0.253-0.328 0.253-0.717v-14.548l-7.187 18.251h-0.969l-8.367-18.251v12.232c-0.069 0.515 0.101 1.032 0.463 1.404l3.36 4.080v0.536h-9.527v-0.537l3.36-4.080c0.36-0.371 0.52-0.893 0.435-1.403v-14.144z"
-              fill="#9399A3"
-            />
-          </svg>
-        </a>
-        <a
-          className="c38"
-          href="https://twitter.com/opencollect"
-        >
-          <svg
-            height={12.5}
-            version="1.1"
-            viewBox="0 0 18 15"
-            width={15}
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <title>
-              twitter icon
-            </title>
-            <g
-              fill="none"
-              fillRule="evenodd"
-              id="Homepage"
-              stroke="none"
-              strokeWidth="1"
-            >
-              <g
-                id="Homepage---XS-(small-handset)"
-                transform="translate(-97.000000, -9521.000000)"
-              >
-                <g
-                  id="JOIN-MOVEMENT"
-                  transform="translate(-69.000000, 3570.000000)"
-                >
-                  <g
-                    id="::-06---spread-the-word"
-                    transform="translate(85.000000, 5758.000000)"
-                  >
-                    <g
-                      id="::-button-(share-twitter)"
-                      transform="translate(44.000000, 176.000000)"
-                    >
-                      <path
-                        d="M55,18.7756985 C54.33775,19.0771597 53.626,19.2801846 52.879,19.3716996 C53.64175,18.9033581 54.22675,18.1612407 54.50275,17.2768521 C53.7895,17.710587 52.999,18.0258908 52.1575,18.1958472 C51.484,17.4598821 50.524,17 49.462,17 C47.42275,17 45.769,18.695719 45.769,20.7867214 C45.769,21.0835683 45.802,21.3727249 45.86425,21.649577 C42.79525,21.4919251 40.07425,19.9838503 38.2525,17.6928993 C37.93525,18.2519867 37.753,18.9025891 37.753,19.5970264 C37.753,20.9105358 38.40475,22.0694694 39.3955,22.748526 C38.79025,22.7285311 38.221,22.5585747 37.723,22.2748013 C37.723,22.290951 37.723,22.3063317 37.723,22.3224814 C37.723,24.1573955 38.99575,25.6877724 40.6855,26.0353755 C40.37575,26.1222763 40.0495,26.1684184 39.712,26.1684184 C39.47425,26.1684184 39.2425,26.1445783 39.0175,26.1007434 C39.48775,27.6049731 40.85125,28.7000769 42.4675,28.7308382 C41.20375,29.7467316 39.6115,30.351961 37.88125,30.351961 C37.5835,30.351961 37.2895,30.3342733 37,30.2988977 C38.63425,31.3732376 40.57525,32 42.661,32 C49.45375,32 53.16775,26.229941 53.16775,21.2258395 C53.16775,21.0620354 53.164,20.8982312 53.15725,20.7359651 C53.87875,20.2014868 54.505,19.5347347 55,18.7756985 Z"
-                        fill="#9399A3"
-                        fillRule="nonzero"
-                        id="twitter"
-                      />
-                    </g>
-                  </g>
-                </g>
-              </g>
-            </g>
-          </svg>
-        </a>
-        <a
-          className="c38"
-          href="https://github.com/opencollective"
-        >
-          <svg
-            height={15}
-            version="1.1"
-            viewBox="0 0 22 22"
-            width={15}
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <title>
-              github icon
-            </title>
-            <g
-              fill="none"
-              fillRule="evenodd"
-              id="Homepage"
-              stroke="none"
-              strokeWidth="1"
-            >
-              <g
-                id="Homepage---XS-(small-handset)"
-                transform="translate(-149.000000, -10919.000000)"
-              >
-                <g
-                  id="FOOTER"
-                  transform="translate(0.000000, 10758.000000)"
-                >
-                  <g
-                    id="::-social-networks"
-                    transform="translate(24.000000, 148.000000)"
-                  >
-                    <g
-                      id="::-icon-(github)"
-                      transform="translate(112.000000, 0.000000)"
-                    >
-                      <path
-                        d="M24,13 C17.9133333,13 13,17.962963 13,24.1111111 C13,29.2222222 16.4466667,33.6666667 21.36,34.9259259 C21.4333333,34.9259259 21.58,34.9259259 21.6533333,34.8518519 C21.7266667,34.7777778 21.8,34.7037037 21.8,34.5555556 L21.8,31.8888889 C21.8,31.8148148 21.7266667,31.6666667 21.7266667,31.5925926 C21.6533333,31.5185185 21.58,31.5185185 21.4333333,31.5185185 L20.7,31.5185185 C19.5266667,31.5185185 18.7933333,30.4074074 18.1333333,29.4444444 C17.9866667,29.2962963 17.9133333,29.0740741 17.7666667,28.9259259 C18.2066667,29.1481481 18.5,29.4444444 18.8666667,29.8148148 C19.38,30.3333333 19.8933333,30.8518519 20.7733333,30.8518519 C20.7733333,30.8518519 20.7733333,30.8518519 20.7733333,30.8518519 C21.14,30.8518519 21.8733333,30.4814815 21.8733333,29.3703704 L21.8733333,29 C21.8733333,28.8518519 21.8,28.7037037 21.58,28.6296296 C19.0866667,27.8888889 17.4733333,25.8888889 17.4733333,23.5925926 C17.4733333,22.4074074 17.9866667,21.2222222 18.8666667,20.3333333 C18.8666667,20.1851852 18.8666667,20.037037 18.8666667,19.8888889 C18.5,19.1481481 18.8666667,18.1111111 19.38,17.5185185 C19.8933333,17.7407407 20.4066667,18.3333333 20.8466667,18.7777778 C20.92,18.9259259 21.14,18.9259259 21.2866667,18.8518519 L21.5066667,18.7777778 C22.3133333,18.4814815 23.2666667,18.1111111 24.1466667,18.1111111 C25.0266667,18.1111111 25.98,18.4814815 26.7866667,18.7777778 L27.0066667,18.8518519 C27.1533333,18.9259259 27.3,18.8518519 27.4466667,18.7777778 C27.8866667,18.2592593 28.4,17.7407407 28.9133333,17.5185185 C29.4266667,18.1851852 29.7933333,19.1481481 29.4266667,19.8888889 C29.1333333,20.037037 29.1333333,20.1851852 29.2066667,20.3333333 C30.0866667,21.2962963 30.6,22.3333333 30.6,23.4444444 C30.6,25.8888889 28.7666667,28.037037 26.1266667,28.6296296 C25.98,28.6296296 25.9066667,28.7037037 25.9066667,28.8518519 C25.9066667,29 25.8333333,29.0740741 25.9066667,29.1481481 C26.1266667,29.5185185 26.2,30.2592593 26.2,31.2222222 C26.2,32.4814815 26.2,34.6296296 26.2,34.6296296 C26.2,34.7777778 26.2733333,34.8518519 26.3466667,34.9259259 C26.42,35 26.4933333,35 26.5666667,35 C26.5666667,35 26.64,35 26.64,35 C31.5533333,33.6666667 35,29.2222222 35,24.1111111 C35,17.962963 30.0866667,13 24,13 Z"
-                        fill="#9399A3"
-                        fillRule="nonzero"
-                        id="github"
-                      />
-                    </g>
-                  </g>
-                </g>
-              </g>
-            </g>
-          </svg>
-        </a>
-        <a
-          className="c38"
-          href="https://slack.opencollective.com"
-        >
-          <svg
-            height={15}
-            version="1.1"
-            viewBox="0 0 20 20"
-            width={15}
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <title>
-              slack icon
-            </title>
-            <g
-              fill="#9399A3"
-              id="slack"
-            >
-              <path
-                d="M19.1625,7.25 C21.225,14.125 19.62125,17.1 12.75,19.1625 C5.875,21.225 2.9,19.62125 0.8375,12.75 C-1.225,5.875 0.38,2.9 7.25,0.8375 C14.1225,-1.225 17.1,0.38 19.1625,7.25 Z M15.6875,11.7125 L15.695,11.73875 C16.2325,11.56375 16.5275,10.97625 16.345,10.42625 C16.16375,9.87625 15.57625,9.58875 15.0325,9.76375 L13.74,10.19375 L12.8775,7.6225 L14.175,7.185 C14.71625,7.005 15.01,6.4175 14.82875,5.8725 C14.64625,5.335 14.05875,5.04 13.51625,5.2225 L12.22,5.6475 L11.77,4.2975 C11.59,3.75 11.00125,3.4625 10.4575,3.6375 C9.9125,3.825 9.625,4.4125 9.8,4.95 L10.25,6.2875 L7.58875,7.1825 L7.13875,5.8425 C6.96375,5.3025 6.37625,5.00625 5.82625,5.19 C5.27625,5.37 4.98875,5.9575 5.16375,6.5025 L5.61375,7.84 L4.31375,8.2725 C3.76375,8.45625 3.47625,9.04375 3.65125,9.585 C3.78875,10.01 4.18875,10.27875 4.60125,10.29125 C4.72,10.29375 4.84,10.2775 4.9575,10.2375 L6.25,9.8 L7.07375,12.37375 L5.77375,12.81125 C5.23625,12.98625 4.93625,13.57375 5.12375,14.12375 C5.27375,14.54875 5.66125,14.82375 6.08625,14.83625 C6.21125,14.83625 6.32375,14.82375 6.44875,14.78625 L7.74875,14.34875 L8.19875,15.69875 C8.34875,16.12375 8.73625,16.39375 9.16125,16.40625 C9.28625,16.40875 9.39875,16.3925 9.52375,16.3525 C10.07375,16.17125 10.36125,15.58375 10.18625,15.04 L9.73625,13.7 L12.41125,12.805 L12.86125,14.145 C13.01125,14.57 13.39875,14.84 13.82375,14.8525 C13.94875,14.85625 14.06125,14.8375 14.18625,14.8 C14.72875,14.6175 15.0225,14.03 14.84125,13.4875 L14.39125,12.14625 L15.6875,11.7125 Z"
-              />
-              <polygon
-                points="8.2325 9.1625 9.095 11.73375 11.76625 10.83875 10.90375 8.27625 8.2325 9.17625"
-              />
-            </g>
-          </svg>
-        </a>
-        <a
-          className="c38"
-          href="mailto:info@opencollective.com"
-        >
-          <svg
-            height={13.125}
-            version="1.1"
-            viewBox="0 0 16 14"
-            width={15}
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <title>
-              email icon
-            </title>
-            <g
-              fill="none"
-              fillRule="evenodd"
-              id="Homepage"
-              stroke="none"
-              strokeWidth="1"
-            >
-              <g
-                id="Homepage---XS-(small-handset)"
-                transform="translate(-264.000000, -10923.000000)"
-              >
-                <g
-                  id="FOOTER"
-                  transform="translate(0.000000, 10758.000000)"
-                >
-                  <g
-                    id="::-social-networks"
-                    transform="translate(24.000000, 148.000000)"
-                  >
-                    <g
-                      id="::-icon-(email)"
-                      transform="translate(224.000000, 0.000000)"
-                    >
-                      <path
-                        d="M30.4,17 L17.6,17 C16.72,17 16.008,17.9 16.008,19 L16,29 C16,30.1 16.72,31 17.6,31 L30.4,31 C31.28,31 32,30.1 32,29 L32,19 C32,17.9 31.28,17 30.4,17 Z M30,21 L24,25 L18,21 L18,19 L24,23 L30,19 L30,21 Z"
-                        fill="#9399A3"
-                        fillRule="nonzero"
-                        id="email"
-                      />
-                    </g>
-                  </g>
-                </g>
-              </g>
-            </g>
-          </svg>
-        </a>
-      </div>
-      <nav
-        className="c39 c40"
-      >
-        <div
-          className="c41"
-        >
-          <p
-            className="c42"
-          >
-            PLATFORM
-          </p>
-          <ul
-            className="c43"
-          >
-            <li
-              className="c44"
-            >
-              <a
-                className="c45 "
-                href="/discover"
-              >
-                Discover
-              </a>
-            </li>
-            <li
-              className="c44"
-            >
-              <a
-                className="c45 "
-                href="/learn-more"
-              >
-                How it Works
-              </a>
-            </li>
-            <li
-              className="c44"
-            >
-              <a
-                className="c45 "
-                href="/opensource"
-                onClick={[Function]}
-              >
-                Use Cases
-              </a>
-            </li>
-            <li
-              className="c44"
-            >
-              <a
-                className="c45 "
-                href="/signin"
-                onClick={[Function]}
-              >
-                Sign Up
-              </a>
-            </li>
-            <li
-              className="c44"
-            >
-              <a
-                className="c45 "
-                href="/signin"
-                onClick={[Function]}
-              >
-                Login
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div
-          className="c41"
-        >
-          <p
-            className="c42"
-          >
-            JOIN THE MOVEMENT
-          </p>
-          <ul
-            className="c43"
-          >
-            <li
-              className="c44"
-            >
-              <a
-                className="c45 "
-                href="/create"
-                onClick={[Function]}
-              >
-                Create a Collective
-              </a>
-            </li>
-            <li
-              className="c44"
-            >
-              <a
-                className="c45 "
-                href="/become-a-sponsor"
-                onClick={[Function]}
-              >
-                Become a Sponsor
-              </a>
-            </li>
-            <li
-              className="c44"
-            >
-              <a
-                className="c45 "
-                href="/chapters"
-                onClick={[Function]}
-              >
-                Create a chapter
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div
-          className="c41"
-        >
-          <p
-            className="c42"
-          >
-            COMMUNITY
-          </p>
-          <ul
-            className="c43"
-          >
-            <li
-              className="c44"
-            >
-              <a
-                className="c45 "
-                href="/opensource"
-                onClick={[Function]}
-              >
-                Open Source
-              </a>
-            </li>
-            <li
-              className="c44"
-            >
-              <a
-                className="c45 "
-                href="https://github.com/opencollective/opencollective/issues"
-                onClick={[Function]}
-              >
-                Report an issue
-              </a>
-            </li>
-            <li
-              className="c44"
-            >
-              <a
-                className="c45 "
-                href="https://slack.opencollective.com"
-                onClick={[Function]}
-              >
-                Slack
-              </a>
-            </li>
-            <li
-              className="c44"
-            >
-              <a
-                className="c45 "
-                href="https://github.com/opencollective/opencollective/wiki"
-                onClick={[Function]}
-              >
-                Wiki
-              </a>
-            </li>
-            <li
-              className="c44"
-            >
-              <a
-                className="c45 "
-                href="mailto:support@opencollective.com"
-                onClick={[Function]}
-              >
-                Email Support
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div
-          className="c41"
-        >
-          <p
-            className="c42"
-          >
-            COMPANY
-          </p>
-          <ul
-            className="c43"
-          >
-            <li
-              className="c44"
-            >
-              <a
-                className="c45 "
-                href="/about"
-                onClick={[Function]}
-              >
-                About
-              </a>
-            </li>
-            <li
-              className="c44"
-            >
-              <a
-                className="c45 "
-                href="/faq"
-                onClick={[Function]}
-              >
-                FAQ
-              </a>
-            </li>
-            <li
-              className="c44"
-            >
-              <a
-                className="c45 "
-                href="https://medium.com/open-collective"
-                onClick={[Function]}
-              >
-                Blog
-              </a>
-            </li>
-            <li
-              className="c44"
-            >
-              <a
-                className="c45 "
-                href="/tos"
-                onClick={[Function]}
-              >
-                Terms of Service
-              </a>
-            </li>
-            <li
-              className="c44"
-            >
-              <a
-                className="c45 "
                 href="/privacypolicy"
                 onClick={[Function]}
               >
