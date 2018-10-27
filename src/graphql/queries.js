@@ -17,6 +17,9 @@ export const transactionFields = `
   paymentProcessorFeeInHostCurrency
   paymentMethod {
     service
+    type
+    name
+    data
   }
   fromCollective {
     id
