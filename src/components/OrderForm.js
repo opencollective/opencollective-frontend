@@ -344,7 +344,12 @@ class OrderForm extends React.Component {
 
   paymentMethodBalance = pm => {
     /* Prepaid cards have their balance available */
-    return pm.balance ? `(${formatCurrency(pm.balance, pm.currency)})` : '';
+    if (pm.type === 'prepaid' || pm.type === 'virtualcard') {
+      if (pm.balance) {
+        return `(${formatCurrency(pm.balance, pm.currency)})`;
+      }
+    }
+    return '';
   };
 
   paymentMethodsOptionsForCollective = (paymentMethods, collective) => {
