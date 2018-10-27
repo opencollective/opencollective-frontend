@@ -79,10 +79,12 @@ export const getLoggedInUserQuery = gql`
           id
           uuid
           currency
-          type
-          service
           name
+          service
+          type
           data
+          balance
+          expiryDate
         }
         connectedAccounts {
           service
