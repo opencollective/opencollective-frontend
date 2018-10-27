@@ -45,7 +45,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   padding-right: 16px;
 }
 
-.c21 {
+.c18 {
   box-sizing: border-box;
   width: 100%;
   margin-left: auto;
@@ -54,25 +54,25 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   padding-right: 16px;
 }
 
-.c22 {
+.c19 {
   box-sizing: border-box;
   width: 100%;
 }
 
-.c24 {
+.c21 {
   box-sizing: border-box;
   margin-top: 16px;
   margin-bottom: 16px;
 }
 
-.c29 {
+.c26 {
   box-sizing: border-box;
   width: 100%;
   padding-top: 16px;
   padding-bottom: 16px;
 }
 
-.c33 {
+.c30 {
   max-width: 1300px;
   box-sizing: border-box;
   margin-left: auto;
@@ -80,7 +80,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   padding: 8px;
 }
 
-.c45 {
+.c37 {
   box-sizing: border-box;
   margin-top: 16px;
   -webkit-flex: 1 1 auto;
@@ -91,7 +91,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   order: 3;
 }
 
-.c46 {
+.c38 {
   box-sizing: border-box;
   width: 50%;
   margin-bottom: 16px;
@@ -160,7 +160,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   justify-content: space-around;
 }
 
-.c23 {
+.c20 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -171,7 +171,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   align-items: flex-end;
 }
 
-.c27 {
+.c24 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -185,7 +185,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   justify-content: center;
 }
 
-.c32 {
+.c29 {
   max-width: 1300px;
   display: -webkit-box;
   display: -webkit-flex;
@@ -204,7 +204,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   justify-content: space-between;
 }
 
-.c35 {
+.c32 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -215,7 +215,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   justify-content: center;
 }
 
-.c44 {
+.c36 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -229,7 +229,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   justify-content: center;
 }
 
-.c28 {
+.c25 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -247,23 +247,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   justify-content: center;
 }
 
-.c18 {
-  color: #46b0ed;
-  display: inline-block;
-  font-size: 1.2rem;
-  font-weight: bold;
-  line-height: Paragraph;
-  -webkit-letter-spacing: 1px;
-  -moz-letter-spacing: 1px;
-  -ms-letter-spacing: 1px;
-  letter-spacing: 1px;
-  margin: 0px;
-  margin-left: 8px;
-  margin-right: 8px;
-  cursor: pointer;
-}
-
-.c36 {
+.c33 {
   color: #6E747A;
   font-size: 1.4rem;
   line-height: Paragraph;
@@ -277,7 +261,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   text-align: center;
 }
 
-.c47 {
+.c39 {
   color: #C2C6CC;
   font-size: 1.2rem;
   line-height: Paragraph;
@@ -290,13 +274,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   text-align: center;
 }
 
-.c11 {
-  display: inline-block;
-  vertical-align: -.125em;
-  overflow: hidden;
-}
-
-.c31 {
+.c28 {
   border-top: 1px solid #aaaaaa;
   bottom: 0px;
   background-color: white;
@@ -305,7 +283,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   width: 100%;
 }
 
-.c34 {
+.c31 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -318,7 +296,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   width: 100%;
 }
 
-.c37 {
+.c34 {
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -340,36 +318,19 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   width: 100%;
 }
 
-.c19 {
-  position: relative;
+.c16 {
+  border: 1px solid #D5DAE0;
+  border-radius: 20px;
+  color: #3385FF;
   display: inline-block;
-  height: 0.6rem;
-  width: 1.4rem;
-  cursor: pointer;
+  font-size: 1.4rem;
+  padding-left: 16px;
+  padding-right: 16px;
+  padding-top: 8px;
+  padding-bottom: 8px;
 }
 
-.c19::before,
-.c19::after {
-  content: '';
-  position: absolute;
-  top: 0;
-}
-
-.c19::before {
-  border-left: 0.6rem solid transparent;
-  border-right: 0.6rem solid transparent;
-  border-top: 0.6rem solid #46b0ed;
-  left: 0;
-}
-
-.c19::after {
-  border-left: calc(0.6rem - 0.2rem) solid transparent;
-  border-right: calc(0.6rem - 0.2rem) solid transparent;
-  border-top: calc(0.6rem - 0.2rem) solid white;
-  left: 0.2rem;
-}
-
-.c30 {
+.c27 {
   display: block;
   font-size: Paragraph;
   font-weight: bold;
@@ -381,7 +342,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   text-align: center;
 }
 
-.c49 {
+.c41 {
   list-style: none;
   margin-bottom: 8px;
   text-align: center;
@@ -398,37 +359,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   font-size: 1.4rem;
 }
 
-.c41 {
-  display: inline-block;
-  vertical-align: -.125em;
-  overflow: hidden;
-}
-
-.c39 {
-  display: inline-block;
-  vertical-align: -.125em;
-  overflow: hidden;
-}
-
-.c42 {
-  display: inline-block;
-  vertical-align: -.125em;
-  overflow: hidden;
-}
-
-.c40 {
-  display: inline-block;
-  vertical-align: -.125em;
-  overflow: hidden;
-}
-
-.c43 {
-  display: inline-block;
-  vertical-align: middle;
-  overflow: hidden;
-}
-
-.c38 {
+.c35 {
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -448,12 +379,12 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   width: 48px;
 }
 
-.c38:hover,
-.c38:focus {
+.c35:hover,
+.c35:focus {
   opacity: 1;
 }
 
-.c50 {
+.c42 {
   color: #6e747a;
   display: block;
   fontsize: 1.4rem;
@@ -462,7 +393,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   padding: 0;
 }
 
-.c48 {
+.c40 {
   box-sizing: border-box;
   padding-left: 0px;
   padding-right: 8px;
@@ -479,7 +410,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   justify-content: center;
 }
 
-.c25.c25.c25 {
+.c22.c22.c22 {
   border: none;
   border-bottom: 2px solid #3385FF;
   border-radius: 0;
@@ -489,22 +420,22 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   padding: 0;
 }
 
-.c26.c26 {
+.c23.c23 {
   padding: 0 2rem;
 }
 
-.c20 {
+.c17 {
   max-width: 1200px;
 }
 
 @media screen and (min-width:40em) {
-  .c21 {
+  .c18 {
     width: 85%;
   }
 }
 
 @media screen and (min-width:52em) {
-  .c45 {
+  .c37 {
     -webkit-order: 2;
     -ms-flex-order: 2;
     order: 2;
@@ -512,13 +443,13 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c46 {
+  .c38 {
     width: 25%;
   }
 }
 
 @media screen and (min-width:40em) {
-  .c27 {
+  .c24 {
     -webkit-box-pack: center;
     -webkit-justify-content: center;
     -ms-flex-pack: center;
@@ -527,7 +458,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c27 {
+  .c24 {
     -webkit-box-pack: start;
     -webkit-justify-content: flex-start;
     -ms-flex-pack: start;
@@ -536,7 +467,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c32 {
+  .c29 {
     -webkit-flex-direction: row;
     -ms-flex-direction: row;
     flex-direction: row;
@@ -544,7 +475,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c32 {
+  .c29 {
     -webkit-align-items: flex-start;
     -webkit-box-align: flex-start;
     -ms-flex-align: flex-start;
@@ -553,7 +484,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c35 {
+  .c32 {
     -webkit-box-pack: start;
     -webkit-justify-content: flex-start;
     -ms-flex-pack: start;
@@ -562,25 +493,25 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c36 {
+  .c33 {
     text-align: left;
   }
 }
 
 @media screen and (min-width:52em) {
-  .c47 {
+  .c39 {
     text-align: left;
   }
 }
 
 @media screen and (min-width:52em) {
-  .c34 {
+  .c31 {
     width: 33.33333333333333%;
   }
 }
 
 @media screen and (min-width:52em) {
-  .c37 {
+  .c34 {
     -webkit-order: 3;
     -ms-flex-order: 3;
     order: 3;
@@ -611,20 +542,8 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   }
 }
 
-@media screen and (max-width:40em) {
-  .c17 {
-    display: none;
-  }
-}
-
-@media screen and (min-width:40em) and (max-width:52em) {
-  .c17 {
-    display: none;
-  }
-}
-
 @media screen and (min-width:52em) {
-  .c49 {
+  .c41 {
     text-align: left;
   }
 }
@@ -771,28 +690,15 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
         <div
           className="LoginTopBarProfileButton"
         >
-          <div
-            className="c3 c2 sc-bdVaJa c2"
+          <a
+            className="c16"
+            href="/signin?next=%2F"
             onClick={[Function]}
           >
-            <div
-              className="c17 c2"
-            >
-              <p
-                className="LoginTopBarProfileButton-name c18"
-                cursor="pointer"
-              />
-            </div>
-            <div
-              className="c19"
-              color="#46b0ed"
-              cursor="pointer"
-              display="inline-block"
-              height="0.6rem"
-              strokeWidth="0.2rem"
-              width="1.4rem"
-            />
-          </div>
+            <span>
+              Login
+            </span>
+          </a>
         </div>
       </div>
     </div>
@@ -801,10 +707,10 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
     className="jsx-916984404"
   >
     <div
-      className="c20 c21"
+      className="c17 c18"
     >
       <div
-        className="c22"
+        className="c19"
       >
         <form
           method="GET"
@@ -820,10 +726,10 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
               Search Open Collective
             </label>
             <div
-              className="c23 c24 sc-bdVaJa c2"
+              className="c20 c21 sc-bdVaJa c2"
             >
               <input
-                className="c25 form-control"
+                className="c22 form-control"
                 defaultValue="test"
                 id="search"
                 name="q"
@@ -831,7 +737,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
                 type="search"
               />
               <button
-                className="jsx-1144918383 jsx-3101740563 Button blue c26"
+                className="jsx-1144918383 jsx-3101740563 Button blue c23"
                 onClick={[Function]}
                 type="submit"
               >
@@ -844,10 +750,10 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
         </form>
       </div>
       <div
-        className="c27 c2 sc-bdVaJa c2"
+        className="c24 c2 sc-bdVaJa c2"
       >
         <div
-          className="c28 c29 sc-bdVaJa c2"
+          className="c25 c26 sc-bdVaJa c2"
         >
           <p>
             <em>
@@ -857,7 +763,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
             </em>
           </p>
           <a
-            className="c30"
+            className="c27"
             href="createPledge"
             onClick={[Function]}
           >
@@ -868,17 +774,17 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
     </div>
   </main>
   <div
-    className="c31"
+    className="c28"
     id="footer"
   >
     <div
-      className="c32 c33 sc-bdVaJa c2"
+      className="c29 c30 sc-bdVaJa c2"
     >
       <div
-        className="c34"
+        className="c31"
       >
         <div
-          className="c35 c2 sc-bdVaJa c2"
+          className="c32 c2 sc-bdVaJa c2"
         >
           <object
             data="/static/images/opencollectivelogo-footer.svg"
@@ -887,16 +793,16 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
           />
         </div>
         <p
-          className="c36"
+          className="c33"
         >
           An organization for your community, transparent by design.
         </p>
       </div>
       <div
-        className="c37"
+        className="c34"
       >
         <a
-          className="c38"
+          className="c35"
           href="https://medium.com/open-collective"
         >
           <svg
@@ -917,7 +823,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
           </svg>
         </a>
         <a
-          className="c38"
+          className="c35"
           href="https://twitter.com/opencollect"
         >
           <svg
@@ -938,7 +844,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
           </svg>
         </a>
         <a
-          className="c38"
+          className="c35"
           href="https://github.com/opencollective"
         >
           <svg
@@ -959,7 +865,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
           </svg>
         </a>
         <a
-          className="c38"
+          className="c35"
           href="https://slack.opencollective.com"
         >
           <svg
@@ -980,7 +886,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
           </svg>
         </a>
         <a
-          className="c38"
+          className="c35"
           href="mailto:info@opencollective.com"
         >
           <svg
@@ -1001,44 +907,44 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
         </a>
       </div>
       <nav
-        className="c44 c45"
+        className="c36 c37"
       >
         <div
-          className="c46"
+          className="c38"
         >
           <p
-            className="c47"
+            className="c39"
           >
             PLATFORM
           </p>
           <ul
-            className="c48"
+            className="c40"
           >
             <li
-              className="c49"
+              className="c41"
             >
               <a
-                className="c50 "
+                className="c42 "
                 href="/discover"
               >
                 Discover
               </a>
             </li>
             <li
-              className="c49"
+              className="c41"
             >
               <a
-                className="c50 "
+                className="c42 "
                 href="/learn-more"
               >
                 How it Works
               </a>
             </li>
             <li
-              className="c49"
+              className="c41"
             >
               <a
-                className="c50 "
+                className="c42 "
                 href="/opensource"
                 onClick={[Function]}
               >
@@ -1046,10 +952,10 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
               </a>
             </li>
             <li
-              className="c49"
+              className="c41"
             >
               <a
-                className="c50 "
+                className="c42 "
                 href="/signin"
                 onClick={[Function]}
               >
@@ -1057,10 +963,10 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
               </a>
             </li>
             <li
-              className="c49"
+              className="c41"
             >
               <a
-                className="c50 "
+                className="c42 "
                 href="/signin"
                 onClick={[Function]}
               >
@@ -1070,21 +976,21 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
           </ul>
         </div>
         <div
-          className="c46"
+          className="c38"
         >
           <p
-            className="c47"
+            className="c39"
           >
             JOIN THE MOVEMENT
           </p>
           <ul
-            className="c48"
+            className="c40"
           >
             <li
-              className="c49"
+              className="c41"
             >
               <a
-                className="c50 "
+                className="c42 "
                 href="/create"
                 onClick={[Function]}
               >
@@ -1092,10 +998,10 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
               </a>
             </li>
             <li
-              className="c49"
+              className="c41"
             >
               <a
-                className="c50 "
+                className="c42 "
                 href="/become-a-sponsor"
                 onClick={[Function]}
               >
@@ -1103,10 +1009,10 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
               </a>
             </li>
             <li
-              className="c49"
+              className="c41"
             >
               <a
-                className="c50 "
+                className="c42 "
                 href="/chapters"
                 onClick={[Function]}
               >
@@ -1116,21 +1022,21 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
           </ul>
         </div>
         <div
-          className="c46"
+          className="c38"
         >
           <p
-            className="c47"
+            className="c39"
           >
             COMMUNITY
           </p>
           <ul
-            className="c48"
+            className="c40"
           >
             <li
-              className="c49"
+              className="c41"
             >
               <a
-                className="c50 "
+                className="c42 "
                 href="/opensource"
                 onClick={[Function]}
               >
@@ -1138,10 +1044,10 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
               </a>
             </li>
             <li
-              className="c49"
+              className="c41"
             >
               <a
-                className="c50 "
+                className="c42 "
                 href="https://github.com/opencollective/opencollective/issues"
                 onClick={[Function]}
               >
@@ -1149,10 +1055,10 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
               </a>
             </li>
             <li
-              className="c49"
+              className="c41"
             >
               <a
-                className="c50 "
+                className="c42 "
                 href="https://slack.opencollective.com"
                 onClick={[Function]}
               >
@@ -1160,10 +1066,10 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
               </a>
             </li>
             <li
-              className="c49"
+              className="c41"
             >
               <a
-                className="c50 "
+                className="c42 "
                 href="https://github.com/opencollective/opencollective/wiki"
                 onClick={[Function]}
               >
@@ -1171,10 +1077,10 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
               </a>
             </li>
             <li
-              className="c49"
+              className="c41"
             >
               <a
-                className="c50 "
+                className="c42 "
                 href="mailto:support@opencollective.com"
                 onClick={[Function]}
               >
@@ -1184,21 +1090,21 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
           </ul>
         </div>
         <div
-          className="c46"
+          className="c38"
         >
           <p
-            className="c47"
+            className="c39"
           >
             COMPANY
           </p>
           <ul
-            className="c48"
+            className="c40"
           >
             <li
-              className="c49"
+              className="c41"
             >
               <a
-                className="c50 "
+                className="c42 "
                 href="/about"
                 onClick={[Function]}
               >
@@ -1206,10 +1112,10 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
               </a>
             </li>
             <li
-              className="c49"
+              className="c41"
             >
               <a
-                className="c50 "
+                className="c42 "
                 href="/faq"
                 onClick={[Function]}
               >
@@ -1217,10 +1123,10 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
               </a>
             </li>
             <li
-              className="c49"
+              className="c41"
             >
               <a
-                className="c50 "
+                className="c42 "
                 href="https://medium.com/open-collective"
                 onClick={[Function]}
               >
@@ -1228,10 +1134,10 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
               </a>
             </li>
             <li
-              className="c49"
+              className="c41"
             >
               <a
-                className="c50 "
+                className="c42 "
                 href="/tos"
                 onClick={[Function]}
               >
@@ -1239,10 +1145,10 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
               </a>
             </li>
             <li
-              className="c49"
+              className="c41"
             >
               <a
-                className="c50 "
+                className="c42 "
                 href="/privacypolicy"
                 onClick={[Function]}
               >
@@ -1302,7 +1208,7 @@ exports[`Search Page renders empty results message 1`] = `
   padding-right: 16px;
 }
 
-.c21 {
+.c18 {
   box-sizing: border-box;
   width: 100%;
   margin-left: auto;
@@ -1311,25 +1217,25 @@ exports[`Search Page renders empty results message 1`] = `
   padding-right: 16px;
 }
 
-.c22 {
+.c19 {
   box-sizing: border-box;
   width: 100%;
 }
 
-.c24 {
+.c21 {
   box-sizing: border-box;
   margin-top: 16px;
   margin-bottom: 16px;
 }
 
-.c29 {
+.c26 {
   box-sizing: border-box;
   width: 100%;
   padding-top: 16px;
   padding-bottom: 16px;
 }
 
-.c32 {
+.c29 {
   max-width: 1300px;
   box-sizing: border-box;
   margin-left: auto;
@@ -1337,7 +1243,7 @@ exports[`Search Page renders empty results message 1`] = `
   padding: 8px;
 }
 
-.c44 {
+.c36 {
   box-sizing: border-box;
   margin-top: 16px;
   -webkit-flex: 1 1 auto;
@@ -1348,7 +1254,7 @@ exports[`Search Page renders empty results message 1`] = `
   order: 3;
 }
 
-.c45 {
+.c37 {
   box-sizing: border-box;
   width: 50%;
   margin-bottom: 16px;
@@ -1417,7 +1323,7 @@ exports[`Search Page renders empty results message 1`] = `
   justify-content: space-around;
 }
 
-.c23 {
+.c20 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -1428,7 +1334,7 @@ exports[`Search Page renders empty results message 1`] = `
   align-items: flex-end;
 }
 
-.c27 {
+.c24 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -1442,7 +1348,7 @@ exports[`Search Page renders empty results message 1`] = `
   justify-content: center;
 }
 
-.c31 {
+.c28 {
   max-width: 1300px;
   display: -webkit-box;
   display: -webkit-flex;
@@ -1461,7 +1367,7 @@ exports[`Search Page renders empty results message 1`] = `
   justify-content: space-between;
 }
 
-.c34 {
+.c31 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -1472,7 +1378,7 @@ exports[`Search Page renders empty results message 1`] = `
   justify-content: center;
 }
 
-.c43 {
+.c35 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -1486,7 +1392,7 @@ exports[`Search Page renders empty results message 1`] = `
   justify-content: center;
 }
 
-.c28 {
+.c25 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -1504,23 +1410,7 @@ exports[`Search Page renders empty results message 1`] = `
   justify-content: center;
 }
 
-.c18 {
-  color: #46b0ed;
-  display: inline-block;
-  font-size: 1.2rem;
-  font-weight: bold;
-  line-height: Paragraph;
-  -webkit-letter-spacing: 1px;
-  -moz-letter-spacing: 1px;
-  -ms-letter-spacing: 1px;
-  letter-spacing: 1px;
-  margin: 0px;
-  margin-left: 8px;
-  margin-right: 8px;
-  cursor: pointer;
-}
-
-.c35 {
+.c32 {
   color: #6E747A;
   font-size: 1.4rem;
   line-height: Paragraph;
@@ -1534,7 +1424,7 @@ exports[`Search Page renders empty results message 1`] = `
   text-align: center;
 }
 
-.c46 {
+.c38 {
   color: #C2C6CC;
   font-size: 1.2rem;
   line-height: Paragraph;
@@ -1547,13 +1437,7 @@ exports[`Search Page renders empty results message 1`] = `
   text-align: center;
 }
 
-.c11 {
-  display: inline-block;
-  vertical-align: -.125em;
-  overflow: hidden;
-}
-
-.c30 {
+.c27 {
   border-top: 1px solid #aaaaaa;
   bottom: 0px;
   background-color: white;
@@ -1562,7 +1446,7 @@ exports[`Search Page renders empty results message 1`] = `
   width: 100%;
 }
 
-.c33 {
+.c30 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -1575,7 +1459,7 @@ exports[`Search Page renders empty results message 1`] = `
   width: 100%;
 }
 
-.c36 {
+.c33 {
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -1597,36 +1481,19 @@ exports[`Search Page renders empty results message 1`] = `
   width: 100%;
 }
 
-.c19 {
-  position: relative;
+.c16 {
+  border: 1px solid #D5DAE0;
+  border-radius: 20px;
+  color: #3385FF;
   display: inline-block;
-  height: 0.6rem;
-  width: 1.4rem;
-  cursor: pointer;
+  font-size: 1.4rem;
+  padding-left: 16px;
+  padding-right: 16px;
+  padding-top: 8px;
+  padding-bottom: 8px;
 }
 
-.c19::before,
-.c19::after {
-  content: '';
-  position: absolute;
-  top: 0;
-}
-
-.c19::before {
-  border-left: 0.6rem solid transparent;
-  border-right: 0.6rem solid transparent;
-  border-top: 0.6rem solid #46b0ed;
-  left: 0;
-}
-
-.c19::after {
-  border-left: calc(0.6rem - 0.2rem) solid transparent;
-  border-right: calc(0.6rem - 0.2rem) solid transparent;
-  border-top: calc(0.6rem - 0.2rem) solid white;
-  left: 0.2rem;
-}
-
-.c48 {
+.c40 {
   list-style: none;
   margin-bottom: 8px;
   text-align: center;
@@ -1643,37 +1510,7 @@ exports[`Search Page renders empty results message 1`] = `
   font-size: 1.4rem;
 }
 
-.c40 {
-  display: inline-block;
-  vertical-align: -.125em;
-  overflow: hidden;
-}
-
-.c38 {
-  display: inline-block;
-  vertical-align: -.125em;
-  overflow: hidden;
-}
-
-.c41 {
-  display: inline-block;
-  vertical-align: -.125em;
-  overflow: hidden;
-}
-
-.c39 {
-  display: inline-block;
-  vertical-align: -.125em;
-  overflow: hidden;
-}
-
-.c42 {
-  display: inline-block;
-  vertical-align: middle;
-  overflow: hidden;
-}
-
-.c37 {
+.c34 {
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -1693,12 +1530,12 @@ exports[`Search Page renders empty results message 1`] = `
   width: 48px;
 }
 
-.c37:hover,
-.c37:focus {
+.c34:hover,
+.c34:focus {
   opacity: 1;
 }
 
-.c49 {
+.c41 {
   color: #6e747a;
   display: block;
   fontsize: 1.4rem;
@@ -1707,7 +1544,7 @@ exports[`Search Page renders empty results message 1`] = `
   padding: 0;
 }
 
-.c47 {
+.c39 {
   box-sizing: border-box;
   padding-left: 0px;
   padding-right: 8px;
@@ -1724,7 +1561,7 @@ exports[`Search Page renders empty results message 1`] = `
   justify-content: center;
 }
 
-.c25.c25.c25 {
+.c22.c22.c22 {
   border: none;
   border-bottom: 2px solid #3385FF;
   border-radius: 0;
@@ -1734,22 +1571,22 @@ exports[`Search Page renders empty results message 1`] = `
   padding: 0;
 }
 
-.c26.c26 {
+.c23.c23 {
   padding: 0 2rem;
 }
 
-.c20 {
+.c17 {
   max-width: 1200px;
 }
 
 @media screen and (min-width:40em) {
-  .c21 {
+  .c18 {
     width: 85%;
   }
 }
 
 @media screen and (min-width:52em) {
-  .c44 {
+  .c36 {
     -webkit-order: 2;
     -ms-flex-order: 2;
     order: 2;
@@ -1757,13 +1594,13 @@ exports[`Search Page renders empty results message 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c45 {
+  .c37 {
     width: 25%;
   }
 }
 
 @media screen and (min-width:40em) {
-  .c27 {
+  .c24 {
     -webkit-box-pack: center;
     -webkit-justify-content: center;
     -ms-flex-pack: center;
@@ -1772,7 +1609,7 @@ exports[`Search Page renders empty results message 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c27 {
+  .c24 {
     -webkit-box-pack: start;
     -webkit-justify-content: flex-start;
     -ms-flex-pack: start;
@@ -1781,7 +1618,7 @@ exports[`Search Page renders empty results message 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c31 {
+  .c28 {
     -webkit-flex-direction: row;
     -ms-flex-direction: row;
     flex-direction: row;
@@ -1789,7 +1626,7 @@ exports[`Search Page renders empty results message 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c31 {
+  .c28 {
     -webkit-align-items: flex-start;
     -webkit-box-align: flex-start;
     -ms-flex-align: flex-start;
@@ -1798,7 +1635,7 @@ exports[`Search Page renders empty results message 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c34 {
+  .c31 {
     -webkit-box-pack: start;
     -webkit-justify-content: flex-start;
     -ms-flex-pack: start;
@@ -1807,25 +1644,25 @@ exports[`Search Page renders empty results message 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c35 {
+  .c32 {
     text-align: left;
   }
 }
 
 @media screen and (min-width:52em) {
-  .c46 {
+  .c38 {
     text-align: left;
   }
 }
 
 @media screen and (min-width:52em) {
-  .c33 {
+  .c30 {
     width: 33.33333333333333%;
   }
 }
 
 @media screen and (min-width:52em) {
-  .c36 {
+  .c33 {
     -webkit-order: 3;
     -ms-flex-order: 3;
     order: 3;
@@ -1856,20 +1693,8 @@ exports[`Search Page renders empty results message 1`] = `
   }
 }
 
-@media screen and (max-width:40em) {
-  .c17 {
-    display: none;
-  }
-}
-
-@media screen and (min-width:40em) and (max-width:52em) {
-  .c17 {
-    display: none;
-  }
-}
-
 @media screen and (min-width:52em) {
-  .c48 {
+  .c40 {
     text-align: left;
   }
 }
@@ -2016,28 +1841,15 @@ exports[`Search Page renders empty results message 1`] = `
         <div
           className="LoginTopBarProfileButton"
         >
-          <div
-            className="c3 c2 sc-bdVaJa c2"
+          <a
+            className="c16"
+            href="/signin?next=%2F"
             onClick={[Function]}
           >
-            <div
-              className="c17 c2"
-            >
-              <p
-                className="LoginTopBarProfileButton-name c18"
-                cursor="pointer"
-              />
-            </div>
-            <div
-              className="c19"
-              color="#46b0ed"
-              cursor="pointer"
-              display="inline-block"
-              height="0.6rem"
-              strokeWidth="0.2rem"
-              width="1.4rem"
-            />
-          </div>
+            <span>
+              Login
+            </span>
+          </a>
         </div>
       </div>
     </div>
@@ -2046,10 +1858,10 @@ exports[`Search Page renders empty results message 1`] = `
     className="jsx-916984404"
   >
     <div
-      className="c20 c21"
+      className="c17 c18"
     >
       <div
-        className="c22"
+        className="c19"
       >
         <form
           method="GET"
@@ -2065,10 +1877,10 @@ exports[`Search Page renders empty results message 1`] = `
               Search Open Collective
             </label>
             <div
-              className="c23 c24 sc-bdVaJa c2"
+              className="c20 c21 sc-bdVaJa c2"
             >
               <input
-                className="c25 form-control"
+                className="c22 form-control"
                 defaultValue="test"
                 id="search"
                 name="q"
@@ -2076,7 +1888,7 @@ exports[`Search Page renders empty results message 1`] = `
                 type="search"
               />
               <button
-                className="jsx-1144918383 jsx-3101740563 Button blue c26"
+                className="jsx-1144918383 jsx-3101740563 Button blue c23"
                 onClick={[Function]}
                 type="submit"
               >
@@ -2089,10 +1901,10 @@ exports[`Search Page renders empty results message 1`] = `
         </form>
       </div>
       <div
-        className="c27 c2 sc-bdVaJa c2"
+        className="c24 c2 sc-bdVaJa c2"
       >
         <div
-          className="c28 c29 sc-bdVaJa c2"
+          className="c25 c26 sc-bdVaJa c2"
         >
           <p>
             <em>
@@ -2106,17 +1918,17 @@ exports[`Search Page renders empty results message 1`] = `
     </div>
   </main>
   <div
-    className="c30"
+    className="c27"
     id="footer"
   >
     <div
-      className="c31 c32 sc-bdVaJa c2"
+      className="c28 c29 sc-bdVaJa c2"
     >
       <div
-        className="c33"
+        className="c30"
       >
         <div
-          className="c34 c2 sc-bdVaJa c2"
+          className="c31 c2 sc-bdVaJa c2"
         >
           <object
             data="/static/images/opencollectivelogo-footer.svg"
@@ -2125,16 +1937,16 @@ exports[`Search Page renders empty results message 1`] = `
           />
         </div>
         <p
-          className="c35"
+          className="c32"
         >
           An organization for your community, transparent by design.
         </p>
       </div>
       <div
-        className="c36"
+        className="c33"
       >
         <a
-          className="c37"
+          className="c34"
           href="https://medium.com/open-collective"
         >
           <svg
@@ -2155,7 +1967,7 @@ exports[`Search Page renders empty results message 1`] = `
           </svg>
         </a>
         <a
-          className="c37"
+          className="c34"
           href="https://twitter.com/opencollect"
         >
           <svg
@@ -2176,7 +1988,7 @@ exports[`Search Page renders empty results message 1`] = `
           </svg>
         </a>
         <a
-          className="c37"
+          className="c34"
           href="https://github.com/opencollective"
         >
           <svg
@@ -2197,7 +2009,7 @@ exports[`Search Page renders empty results message 1`] = `
           </svg>
         </a>
         <a
-          className="c37"
+          className="c34"
           href="https://slack.opencollective.com"
         >
           <svg
@@ -2218,7 +2030,7 @@ exports[`Search Page renders empty results message 1`] = `
           </svg>
         </a>
         <a
-          className="c37"
+          className="c34"
           href="mailto:info@opencollective.com"
         >
           <svg
@@ -2239,44 +2051,44 @@ exports[`Search Page renders empty results message 1`] = `
         </a>
       </div>
       <nav
-        className="c43 c44"
+        className="c35 c36"
       >
         <div
-          className="c45"
+          className="c37"
         >
           <p
-            className="c46"
+            className="c38"
           >
             PLATFORM
           </p>
           <ul
-            className="c47"
+            className="c39"
           >
             <li
-              className="c48"
+              className="c40"
             >
               <a
-                className="c49 "
+                className="c41 "
                 href="/discover"
               >
                 Discover
               </a>
             </li>
             <li
-              className="c48"
+              className="c40"
             >
               <a
-                className="c49 "
+                className="c41 "
                 href="/learn-more"
               >
                 How it Works
               </a>
             </li>
             <li
-              className="c48"
+              className="c40"
             >
               <a
-                className="c49 "
+                className="c41 "
                 href="/opensource"
                 onClick={[Function]}
               >
@@ -2284,10 +2096,10 @@ exports[`Search Page renders empty results message 1`] = `
               </a>
             </li>
             <li
-              className="c48"
+              className="c40"
             >
               <a
-                className="c49 "
+                className="c41 "
                 href="/signin"
                 onClick={[Function]}
               >
@@ -2295,10 +2107,10 @@ exports[`Search Page renders empty results message 1`] = `
               </a>
             </li>
             <li
-              className="c48"
+              className="c40"
             >
               <a
-                className="c49 "
+                className="c41 "
                 href="/signin"
                 onClick={[Function]}
               >
@@ -2308,21 +2120,21 @@ exports[`Search Page renders empty results message 1`] = `
           </ul>
         </div>
         <div
-          className="c45"
+          className="c37"
         >
           <p
-            className="c46"
+            className="c38"
           >
             JOIN THE MOVEMENT
           </p>
           <ul
-            className="c47"
+            className="c39"
           >
             <li
-              className="c48"
+              className="c40"
             >
               <a
-                className="c49 "
+                className="c41 "
                 href="/create"
                 onClick={[Function]}
               >
@@ -2330,10 +2142,10 @@ exports[`Search Page renders empty results message 1`] = `
               </a>
             </li>
             <li
-              className="c48"
+              className="c40"
             >
               <a
-                className="c49 "
+                className="c41 "
                 href="/become-a-sponsor"
                 onClick={[Function]}
               >
@@ -2341,10 +2153,10 @@ exports[`Search Page renders empty results message 1`] = `
               </a>
             </li>
             <li
-              className="c48"
+              className="c40"
             >
               <a
-                className="c49 "
+                className="c41 "
                 href="/chapters"
                 onClick={[Function]}
               >
@@ -2354,21 +2166,21 @@ exports[`Search Page renders empty results message 1`] = `
           </ul>
         </div>
         <div
-          className="c45"
+          className="c37"
         >
           <p
-            className="c46"
+            className="c38"
           >
             COMMUNITY
           </p>
           <ul
-            className="c47"
+            className="c39"
           >
             <li
-              className="c48"
+              className="c40"
             >
               <a
-                className="c49 "
+                className="c41 "
                 href="/opensource"
                 onClick={[Function]}
               >
@@ -2376,10 +2188,10 @@ exports[`Search Page renders empty results message 1`] = `
               </a>
             </li>
             <li
-              className="c48"
+              className="c40"
             >
               <a
-                className="c49 "
+                className="c41 "
                 href="https://github.com/opencollective/opencollective/issues"
                 onClick={[Function]}
               >
@@ -2387,10 +2199,10 @@ exports[`Search Page renders empty results message 1`] = `
               </a>
             </li>
             <li
-              className="c48"
+              className="c40"
             >
               <a
-                className="c49 "
+                className="c41 "
                 href="https://slack.opencollective.com"
                 onClick={[Function]}
               >
@@ -2398,10 +2210,10 @@ exports[`Search Page renders empty results message 1`] = `
               </a>
             </li>
             <li
-              className="c48"
+              className="c40"
             >
               <a
-                className="c49 "
+                className="c41 "
                 href="https://github.com/opencollective/opencollective/wiki"
                 onClick={[Function]}
               >
@@ -2409,10 +2221,10 @@ exports[`Search Page renders empty results message 1`] = `
               </a>
             </li>
             <li
-              className="c48"
+              className="c40"
             >
               <a
-                className="c49 "
+                className="c41 "
                 href="mailto:support@opencollective.com"
                 onClick={[Function]}
               >
@@ -2422,21 +2234,21 @@ exports[`Search Page renders empty results message 1`] = `
           </ul>
         </div>
         <div
-          className="c45"
+          className="c37"
         >
           <p
-            className="c46"
+            className="c38"
           >
             COMPANY
           </p>
           <ul
-            className="c47"
+            className="c39"
           >
             <li
-              className="c48"
+              className="c40"
             >
               <a
-                className="c49 "
+                className="c41 "
                 href="/about"
                 onClick={[Function]}
               >
@@ -2444,10 +2256,10 @@ exports[`Search Page renders empty results message 1`] = `
               </a>
             </li>
             <li
-              className="c48"
+              className="c40"
             >
               <a
-                className="c49 "
+                className="c41 "
                 href="/faq"
                 onClick={[Function]}
               >
@@ -2455,10 +2267,10 @@ exports[`Search Page renders empty results message 1`] = `
               </a>
             </li>
             <li
-              className="c48"
+              className="c40"
             >
               <a
-                className="c49 "
+                className="c41 "
                 href="https://medium.com/open-collective"
                 onClick={[Function]}
               >
@@ -2466,10 +2278,10 @@ exports[`Search Page renders empty results message 1`] = `
               </a>
             </li>
             <li
-              className="c48"
+              className="c40"
             >
               <a
-                className="c49 "
+                className="c41 "
                 href="/tos"
                 onClick={[Function]}
               >
@@ -2477,10 +2289,10 @@ exports[`Search Page renders empty results message 1`] = `
               </a>
             </li>
             <li
-              className="c48"
+              className="c40"
             >
               <a
-                className="c49 "
+                className="c41 "
                 href="/privacypolicy"
                 onClick={[Function]}
               >
@@ -3700,7 +3512,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
   padding-right: 16px;
 }
 
-.c21 {
+.c18 {
   box-sizing: border-box;
   width: 100%;
   margin-left: auto;
@@ -3709,25 +3521,25 @@ exports[`Search Page renders loading grid SVG 1`] = `
   padding-right: 16px;
 }
 
-.c22 {
+.c19 {
   box-sizing: border-box;
   width: 100%;
 }
 
-.c24 {
+.c21 {
   box-sizing: border-box;
   margin-top: 16px;
   margin-bottom: 16px;
 }
 
-.c29 {
+.c26 {
   box-sizing: border-box;
   width: 100%;
   padding-top: 16px;
   padding-bottom: 16px;
 }
 
-.c32 {
+.c29 {
   max-width: 1300px;
   box-sizing: border-box;
   margin-left: auto;
@@ -3735,7 +3547,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
   padding: 8px;
 }
 
-.c44 {
+.c36 {
   box-sizing: border-box;
   margin-top: 16px;
   -webkit-flex: 1 1 auto;
@@ -3746,7 +3558,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
   order: 3;
 }
 
-.c45 {
+.c37 {
   box-sizing: border-box;
   width: 50%;
   margin-bottom: 16px;
@@ -3815,7 +3627,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
   justify-content: space-around;
 }
 
-.c23 {
+.c20 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -3826,7 +3638,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
   align-items: flex-end;
 }
 
-.c27 {
+.c24 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -3840,7 +3652,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
   justify-content: center;
 }
 
-.c28 {
+.c25 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -3851,7 +3663,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
   justify-content: center;
 }
 
-.c31 {
+.c28 {
   max-width: 1300px;
   display: -webkit-box;
   display: -webkit-flex;
@@ -3870,7 +3682,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
   justify-content: space-between;
 }
 
-.c34 {
+.c31 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -3881,7 +3693,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
   justify-content: center;
 }
 
-.c43 {
+.c35 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -3895,23 +3707,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
   justify-content: center;
 }
 
-.c18 {
-  color: #46b0ed;
-  display: inline-block;
-  font-size: 1.2rem;
-  font-weight: bold;
-  line-height: Paragraph;
-  -webkit-letter-spacing: 1px;
-  -moz-letter-spacing: 1px;
-  -ms-letter-spacing: 1px;
-  letter-spacing: 1px;
-  margin: 0px;
-  margin-left: 8px;
-  margin-right: 8px;
-  cursor: pointer;
-}
-
-.c35 {
+.c32 {
   color: #6E747A;
   font-size: 1.4rem;
   line-height: Paragraph;
@@ -3925,7 +3721,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
   text-align: center;
 }
 
-.c46 {
+.c38 {
   color: #C2C6CC;
   font-size: 1.2rem;
   line-height: Paragraph;
@@ -3938,13 +3734,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
   text-align: center;
 }
 
-.c11 {
-  display: inline-block;
-  vertical-align: -.125em;
-  overflow: hidden;
-}
-
-.c30 {
+.c27 {
   border-top: 1px solid #aaaaaa;
   bottom: 0px;
   background-color: white;
@@ -3953,7 +3743,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
   width: 100%;
 }
 
-.c33 {
+.c30 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -3966,7 +3756,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
   width: 100%;
 }
 
-.c36 {
+.c33 {
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -3988,36 +3778,19 @@ exports[`Search Page renders loading grid SVG 1`] = `
   width: 100%;
 }
 
-.c19 {
-  position: relative;
+.c16 {
+  border: 1px solid #D5DAE0;
+  border-radius: 20px;
+  color: #3385FF;
   display: inline-block;
-  height: 0.6rem;
-  width: 1.4rem;
-  cursor: pointer;
+  font-size: 1.4rem;
+  padding-left: 16px;
+  padding-right: 16px;
+  padding-top: 8px;
+  padding-bottom: 8px;
 }
 
-.c19::before,
-.c19::after {
-  content: '';
-  position: absolute;
-  top: 0;
-}
-
-.c19::before {
-  border-left: 0.6rem solid transparent;
-  border-right: 0.6rem solid transparent;
-  border-top: 0.6rem solid #46b0ed;
-  left: 0;
-}
-
-.c19::after {
-  border-left: calc(0.6rem - 0.2rem) solid transparent;
-  border-right: calc(0.6rem - 0.2rem) solid transparent;
-  border-top: calc(0.6rem - 0.2rem) solid white;
-  left: 0.2rem;
-}
-
-.c48 {
+.c40 {
   list-style: none;
   margin-bottom: 8px;
   text-align: center;
@@ -4034,37 +3807,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
   font-size: 1.4rem;
 }
 
-.c40 {
-  display: inline-block;
-  vertical-align: -.125em;
-  overflow: hidden;
-}
-
-.c38 {
-  display: inline-block;
-  vertical-align: -.125em;
-  overflow: hidden;
-}
-
-.c41 {
-  display: inline-block;
-  vertical-align: -.125em;
-  overflow: hidden;
-}
-
-.c39 {
-  display: inline-block;
-  vertical-align: -.125em;
-  overflow: hidden;
-}
-
-.c42 {
-  display: inline-block;
-  vertical-align: middle;
-  overflow: hidden;
-}
-
-.c37 {
+.c34 {
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -4084,12 +3827,12 @@ exports[`Search Page renders loading grid SVG 1`] = `
   width: 48px;
 }
 
-.c37:hover,
-.c37:focus {
+.c34:hover,
+.c34:focus {
   opacity: 1;
 }
 
-.c49 {
+.c41 {
   color: #6e747a;
   display: block;
   fontsize: 1.4rem;
@@ -4098,7 +3841,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
   padding: 0;
 }
 
-.c47 {
+.c39 {
   box-sizing: border-box;
   padding-left: 0px;
   padding-right: 8px;
@@ -4115,7 +3858,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
   justify-content: center;
 }
 
-.c25.c25.c25 {
+.c22.c22.c22 {
   border: none;
   border-bottom: 2px solid #3385FF;
   border-radius: 0;
@@ -4125,22 +3868,22 @@ exports[`Search Page renders loading grid SVG 1`] = `
   padding: 0;
 }
 
-.c26.c26 {
+.c23.c23 {
   padding: 0 2rem;
 }
 
-.c20 {
+.c17 {
   max-width: 1200px;
 }
 
 @media screen and (min-width:40em) {
-  .c21 {
+  .c18 {
     width: 85%;
   }
 }
 
 @media screen and (min-width:52em) {
-  .c44 {
+  .c36 {
     -webkit-order: 2;
     -ms-flex-order: 2;
     order: 2;
@@ -4148,13 +3891,13 @@ exports[`Search Page renders loading grid SVG 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c45 {
+  .c37 {
     width: 25%;
   }
 }
 
 @media screen and (min-width:40em) {
-  .c27 {
+  .c24 {
     -webkit-box-pack: center;
     -webkit-justify-content: center;
     -ms-flex-pack: center;
@@ -4163,7 +3906,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c27 {
+  .c24 {
     -webkit-box-pack: start;
     -webkit-justify-content: flex-start;
     -ms-flex-pack: start;
@@ -4172,7 +3915,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c31 {
+  .c28 {
     -webkit-flex-direction: row;
     -ms-flex-direction: row;
     flex-direction: row;
@@ -4180,7 +3923,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c31 {
+  .c28 {
     -webkit-align-items: flex-start;
     -webkit-box-align: flex-start;
     -ms-flex-align: flex-start;
@@ -4189,7 +3932,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c34 {
+  .c31 {
     -webkit-box-pack: start;
     -webkit-justify-content: flex-start;
     -ms-flex-pack: start;
@@ -4198,25 +3941,25 @@ exports[`Search Page renders loading grid SVG 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c35 {
+  .c32 {
     text-align: left;
   }
 }
 
 @media screen and (min-width:52em) {
-  .c46 {
+  .c38 {
     text-align: left;
   }
 }
 
 @media screen and (min-width:52em) {
-  .c33 {
+  .c30 {
     width: 33.33333333333333%;
   }
 }
 
 @media screen and (min-width:52em) {
-  .c36 {
+  .c33 {
     -webkit-order: 3;
     -ms-flex-order: 3;
     order: 3;
@@ -4247,20 +3990,8 @@ exports[`Search Page renders loading grid SVG 1`] = `
   }
 }
 
-@media screen and (max-width:40em) {
-  .c17 {
-    display: none;
-  }
-}
-
-@media screen and (min-width:40em) and (max-width:52em) {
-  .c17 {
-    display: none;
-  }
-}
-
 @media screen and (min-width:52em) {
-  .c48 {
+  .c40 {
     text-align: left;
   }
 }
@@ -4407,28 +4138,15 @@ exports[`Search Page renders loading grid SVG 1`] = `
         <div
           className="LoginTopBarProfileButton"
         >
-          <div
-            className="c3 c2 sc-bdVaJa c2"
+          <a
+            className="c16"
+            href="/signin?next=%2F"
             onClick={[Function]}
           >
-            <div
-              className="c17 c2"
-            >
-              <p
-                className="LoginTopBarProfileButton-name c18"
-                cursor="pointer"
-              />
-            </div>
-            <div
-              className="c19"
-              color="#46b0ed"
-              cursor="pointer"
-              display="inline-block"
-              height="0.6rem"
-              strokeWidth="0.2rem"
-              width="1.4rem"
-            />
-          </div>
+            <span>
+              Login
+            </span>
+          </a>
         </div>
       </div>
     </div>
@@ -4437,10 +4155,10 @@ exports[`Search Page renders loading grid SVG 1`] = `
     className="jsx-916984404"
   >
     <div
-      className="c20 c21"
+      className="c17 c18"
     >
       <div
-        className="c22"
+        className="c19"
       >
         <form
           method="GET"
@@ -4456,10 +4174,10 @@ exports[`Search Page renders loading grid SVG 1`] = `
               Search Open Collective
             </label>
             <div
-              className="c23 c24 sc-bdVaJa c2"
+              className="c20 c21 sc-bdVaJa c2"
             >
               <input
-                className="c25 form-control"
+                className="c22 form-control"
                 defaultValue=""
                 id="search"
                 name="q"
@@ -4467,7 +4185,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
                 type="search"
               />
               <button
-                className="jsx-1144918383 jsx-3101740563 Button blue c26"
+                className="jsx-1144918383 jsx-3101740563 Button blue c23"
                 onClick={[Function]}
                 type="submit"
               >
@@ -4480,10 +4198,10 @@ exports[`Search Page renders loading grid SVG 1`] = `
         </form>
       </div>
       <div
-        className="c27 c2 sc-bdVaJa c2"
+        className="c24 c2 sc-bdVaJa c2"
       >
         <div
-          className="c28 c29 sc-bdVaJa c2"
+          className="c25 c26 sc-bdVaJa c2"
         >
           <svg
             fill="#3385FF"
@@ -4625,17 +4343,17 @@ exports[`Search Page renders loading grid SVG 1`] = `
     </div>
   </main>
   <div
-    className="c30"
+    className="c27"
     id="footer"
   >
     <div
-      className="c31 c32 sc-bdVaJa c2"
+      className="c28 c29 sc-bdVaJa c2"
     >
       <div
-        className="c33"
+        className="c30"
       >
         <div
-          className="c34 c2 sc-bdVaJa c2"
+          className="c31 c2 sc-bdVaJa c2"
         >
           <object
             data="/static/images/opencollectivelogo-footer.svg"
@@ -4644,16 +4362,16 @@ exports[`Search Page renders loading grid SVG 1`] = `
           />
         </div>
         <p
-          className="c35"
+          className="c32"
         >
           An organization for your community, transparent by design.
         </p>
       </div>
       <div
-        className="c36"
+        className="c33"
       >
         <a
-          className="c37"
+          className="c34"
           href="https://medium.com/open-collective"
         >
           <svg
@@ -4674,7 +4392,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
           </svg>
         </a>
         <a
-          className="c37"
+          className="c34"
           href="https://twitter.com/opencollect"
         >
           <svg
@@ -4695,7 +4413,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
           </svg>
         </a>
         <a
-          className="c37"
+          className="c34"
           href="https://github.com/opencollective"
         >
           <svg
@@ -4716,7 +4434,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
           </svg>
         </a>
         <a
-          className="c37"
+          className="c34"
           href="https://slack.opencollective.com"
         >
           <svg
@@ -4737,7 +4455,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
           </svg>
         </a>
         <a
-          className="c37"
+          className="c34"
           href="mailto:info@opencollective.com"
         >
           <svg
@@ -4758,44 +4476,44 @@ exports[`Search Page renders loading grid SVG 1`] = `
         </a>
       </div>
       <nav
-        className="c43 c44"
+        className="c35 c36"
       >
         <div
-          className="c45"
+          className="c37"
         >
           <p
-            className="c46"
+            className="c38"
           >
             PLATFORM
           </p>
           <ul
-            className="c47"
+            className="c39"
           >
             <li
-              className="c48"
+              className="c40"
             >
               <a
-                className="c49 "
+                className="c41 "
                 href="/discover"
               >
                 Discover
               </a>
             </li>
             <li
-              className="c48"
+              className="c40"
             >
               <a
-                className="c49 "
+                className="c41 "
                 href="/learn-more"
               >
                 How it Works
               </a>
             </li>
             <li
-              className="c48"
+              className="c40"
             >
               <a
-                className="c49 "
+                className="c41 "
                 href="/opensource"
                 onClick={[Function]}
               >
@@ -4803,10 +4521,10 @@ exports[`Search Page renders loading grid SVG 1`] = `
               </a>
             </li>
             <li
-              className="c48"
+              className="c40"
             >
               <a
-                className="c49 "
+                className="c41 "
                 href="/signin"
                 onClick={[Function]}
               >
@@ -4814,10 +4532,10 @@ exports[`Search Page renders loading grid SVG 1`] = `
               </a>
             </li>
             <li
-              className="c48"
+              className="c40"
             >
               <a
-                className="c49 "
+                className="c41 "
                 href="/signin"
                 onClick={[Function]}
               >
@@ -4827,21 +4545,21 @@ exports[`Search Page renders loading grid SVG 1`] = `
           </ul>
         </div>
         <div
-          className="c45"
+          className="c37"
         >
           <p
-            className="c46"
+            className="c38"
           >
             JOIN THE MOVEMENT
           </p>
           <ul
-            className="c47"
+            className="c39"
           >
             <li
-              className="c48"
+              className="c40"
             >
               <a
-                className="c49 "
+                className="c41 "
                 href="/create"
                 onClick={[Function]}
               >
@@ -4849,10 +4567,10 @@ exports[`Search Page renders loading grid SVG 1`] = `
               </a>
             </li>
             <li
-              className="c48"
+              className="c40"
             >
               <a
-                className="c49 "
+                className="c41 "
                 href="/become-a-sponsor"
                 onClick={[Function]}
               >
@@ -4860,10 +4578,10 @@ exports[`Search Page renders loading grid SVG 1`] = `
               </a>
             </li>
             <li
-              className="c48"
+              className="c40"
             >
               <a
-                className="c49 "
+                className="c41 "
                 href="/chapters"
                 onClick={[Function]}
               >
@@ -4873,21 +4591,21 @@ exports[`Search Page renders loading grid SVG 1`] = `
           </ul>
         </div>
         <div
-          className="c45"
+          className="c37"
         >
           <p
-            className="c46"
+            className="c38"
           >
             COMMUNITY
           </p>
           <ul
-            className="c47"
+            className="c39"
           >
             <li
-              className="c48"
+              className="c40"
             >
               <a
-                className="c49 "
+                className="c41 "
                 href="/opensource"
                 onClick={[Function]}
               >
@@ -4895,10 +4613,10 @@ exports[`Search Page renders loading grid SVG 1`] = `
               </a>
             </li>
             <li
-              className="c48"
+              className="c40"
             >
               <a
-                className="c49 "
+                className="c41 "
                 href="https://github.com/opencollective/opencollective/issues"
                 onClick={[Function]}
               >
@@ -4906,10 +4624,10 @@ exports[`Search Page renders loading grid SVG 1`] = `
               </a>
             </li>
             <li
-              className="c48"
+              className="c40"
             >
               <a
-                className="c49 "
+                className="c41 "
                 href="https://slack.opencollective.com"
                 onClick={[Function]}
               >
@@ -4917,10 +4635,10 @@ exports[`Search Page renders loading grid SVG 1`] = `
               </a>
             </li>
             <li
-              className="c48"
+              className="c40"
             >
               <a
-                className="c49 "
+                className="c41 "
                 href="https://github.com/opencollective/opencollective/wiki"
                 onClick={[Function]}
               >
@@ -4928,10 +4646,10 @@ exports[`Search Page renders loading grid SVG 1`] = `
               </a>
             </li>
             <li
-              className="c48"
+              className="c40"
             >
               <a
-                className="c49 "
+                className="c41 "
                 href="mailto:support@opencollective.com"
                 onClick={[Function]}
               >
@@ -4941,21 +4659,21 @@ exports[`Search Page renders loading grid SVG 1`] = `
           </ul>
         </div>
         <div
-          className="c45"
+          className="c37"
         >
           <p
-            className="c46"
+            className="c38"
           >
             COMPANY
           </p>
           <ul
-            className="c47"
+            className="c39"
           >
             <li
-              className="c48"
+              className="c40"
             >
               <a
-                className="c49 "
+                className="c41 "
                 href="/about"
                 onClick={[Function]}
               >
@@ -4963,10 +4681,10 @@ exports[`Search Page renders loading grid SVG 1`] = `
               </a>
             </li>
             <li
-              className="c48"
+              className="c40"
             >
               <a
-                className="c49 "
+                className="c41 "
                 href="/faq"
                 onClick={[Function]}
               >
@@ -4974,10 +4692,10 @@ exports[`Search Page renders loading grid SVG 1`] = `
               </a>
             </li>
             <li
-              className="c48"
+              className="c40"
             >
               <a
-                className="c49 "
+                className="c41 "
                 href="https://medium.com/open-collective"
                 onClick={[Function]}
               >
@@ -4985,10 +4703,10 @@ exports[`Search Page renders loading grid SVG 1`] = `
               </a>
             </li>
             <li
-              className="c48"
+              className="c40"
             >
               <a
-                className="c49 "
+                className="c41 "
                 href="/tos"
                 onClick={[Function]}
               >
@@ -4996,10 +4714,10 @@ exports[`Search Page renders loading grid SVG 1`] = `
               </a>
             </li>
             <li
-              className="c48"
+              className="c40"
             >
               <a
-                className="c49 "
+                className="c41 "
                 href="/privacypolicy"
                 onClick={[Function]}
               >
@@ -5059,7 +4777,7 @@ exports[`Search Page renders search results with pagination 1`] = `
   padding-right: 16px;
 }
 
-.c21 {
+.c18 {
   box-sizing: border-box;
   width: 100%;
   margin-left: auto;
@@ -5068,25 +4786,25 @@ exports[`Search Page renders search results with pagination 1`] = `
   padding-right: 16px;
 }
 
-.c22 {
+.c19 {
   box-sizing: border-box;
   width: 100%;
 }
 
-.c24 {
+.c21 {
   box-sizing: border-box;
   margin-top: 16px;
   margin-bottom: 16px;
 }
 
-.c31 {
+.c28 {
   box-sizing: border-box;
   width: 100%;
   padding-top: 16px;
   padding-bottom: 16px;
 }
 
-.c34 {
+.c31 {
   max-width: 1300px;
   box-sizing: border-box;
   margin-left: auto;
@@ -5094,7 +4812,7 @@ exports[`Search Page renders search results with pagination 1`] = `
   padding: 8px;
 }
 
-.c46 {
+.c38 {
   box-sizing: border-box;
   margin-top: 16px;
   -webkit-flex: 1 1 auto;
@@ -5105,13 +4823,13 @@ exports[`Search Page renders search results with pagination 1`] = `
   order: 3;
 }
 
-.c47 {
+.c39 {
   box-sizing: border-box;
   width: 50%;
   margin-bottom: 16px;
 }
 
-.c28 {
+.c25 {
   box-sizing: border-box;
   margin-left: 8px;
   margin-right: 8px;
@@ -5182,7 +4900,7 @@ exports[`Search Page renders search results with pagination 1`] = `
   justify-content: space-around;
 }
 
-.c23 {
+.c20 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -5193,7 +4911,7 @@ exports[`Search Page renders search results with pagination 1`] = `
   align-items: flex-end;
 }
 
-.c27 {
+.c24 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -5207,7 +4925,7 @@ exports[`Search Page renders search results with pagination 1`] = `
   justify-content: center;
 }
 
-.c29 {
+.c26 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -5218,7 +4936,7 @@ exports[`Search Page renders search results with pagination 1`] = `
   justify-content: center;
 }
 
-.c33 {
+.c30 {
   max-width: 1300px;
   display: -webkit-box;
   display: -webkit-flex;
@@ -5237,7 +4955,7 @@ exports[`Search Page renders search results with pagination 1`] = `
   justify-content: space-between;
 }
 
-.c36 {
+.c33 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -5248,7 +4966,7 @@ exports[`Search Page renders search results with pagination 1`] = `
   justify-content: center;
 }
 
-.c45 {
+.c37 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -5262,7 +4980,7 @@ exports[`Search Page renders search results with pagination 1`] = `
   justify-content: center;
 }
 
-.c30 {
+.c27 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -5280,23 +4998,7 @@ exports[`Search Page renders search results with pagination 1`] = `
   justify-content: center;
 }
 
-.c18 {
-  color: #46b0ed;
-  display: inline-block;
-  font-size: 1.2rem;
-  font-weight: bold;
-  line-height: Paragraph;
-  -webkit-letter-spacing: 1px;
-  -moz-letter-spacing: 1px;
-  -ms-letter-spacing: 1px;
-  letter-spacing: 1px;
-  margin: 0px;
-  margin-left: 8px;
-  margin-right: 8px;
-  cursor: pointer;
-}
-
-.c37 {
+.c34 {
   color: #6E747A;
   font-size: 1.4rem;
   line-height: Paragraph;
@@ -5310,7 +5012,7 @@ exports[`Search Page renders search results with pagination 1`] = `
   text-align: center;
 }
 
-.c48 {
+.c40 {
   color: #C2C6CC;
   font-size: 1.2rem;
   line-height: Paragraph;
@@ -5323,13 +5025,7 @@ exports[`Search Page renders search results with pagination 1`] = `
   text-align: center;
 }
 
-.c11 {
-  display: inline-block;
-  vertical-align: -.125em;
-  overflow: hidden;
-}
-
-.c32 {
+.c29 {
   border-top: 1px solid #aaaaaa;
   bottom: 0px;
   background-color: white;
@@ -5338,7 +5034,7 @@ exports[`Search Page renders search results with pagination 1`] = `
   width: 100%;
 }
 
-.c35 {
+.c32 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -5351,7 +5047,7 @@ exports[`Search Page renders search results with pagination 1`] = `
   width: 100%;
 }
 
-.c38 {
+.c35 {
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -5373,36 +5069,19 @@ exports[`Search Page renders search results with pagination 1`] = `
   width: 100%;
 }
 
-.c19 {
-  position: relative;
+.c16 {
+  border: 1px solid #D5DAE0;
+  border-radius: 20px;
+  color: #3385FF;
   display: inline-block;
-  height: 0.6rem;
-  width: 1.4rem;
-  cursor: pointer;
+  font-size: 1.4rem;
+  padding-left: 16px;
+  padding-right: 16px;
+  padding-top: 8px;
+  padding-bottom: 8px;
 }
 
-.c19::before,
-.c19::after {
-  content: '';
-  position: absolute;
-  top: 0;
-}
-
-.c19::before {
-  border-left: 0.6rem solid transparent;
-  border-right: 0.6rem solid transparent;
-  border-top: 0.6rem solid #46b0ed;
-  left: 0;
-}
-
-.c19::after {
-  border-left: calc(0.6rem - 0.2rem) solid transparent;
-  border-right: calc(0.6rem - 0.2rem) solid transparent;
-  border-top: calc(0.6rem - 0.2rem) solid white;
-  left: 0.2rem;
-}
-
-.c50 {
+.c42 {
   list-style: none;
   margin-bottom: 8px;
   text-align: center;
@@ -5419,37 +5098,7 @@ exports[`Search Page renders search results with pagination 1`] = `
   font-size: 1.4rem;
 }
 
-.c42 {
-  display: inline-block;
-  vertical-align: -.125em;
-  overflow: hidden;
-}
-
-.c40 {
-  display: inline-block;
-  vertical-align: -.125em;
-  overflow: hidden;
-}
-
-.c43 {
-  display: inline-block;
-  vertical-align: -.125em;
-  overflow: hidden;
-}
-
-.c41 {
-  display: inline-block;
-  vertical-align: -.125em;
-  overflow: hidden;
-}
-
-.c44 {
-  display: inline-block;
-  vertical-align: middle;
-  overflow: hidden;
-}
-
-.c39 {
+.c36 {
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -5469,12 +5118,12 @@ exports[`Search Page renders search results with pagination 1`] = `
   width: 48px;
 }
 
-.c39:hover,
-.c39:focus {
+.c36:hover,
+.c36:focus {
   opacity: 1;
 }
 
-.c51 {
+.c43 {
   color: #6e747a;
   display: block;
   fontsize: 1.4rem;
@@ -5483,7 +5132,7 @@ exports[`Search Page renders search results with pagination 1`] = `
   padding: 0;
 }
 
-.c49 {
+.c41 {
   box-sizing: border-box;
   padding-left: 0px;
   padding-right: 8px;
@@ -5500,7 +5149,7 @@ exports[`Search Page renders search results with pagination 1`] = `
   justify-content: center;
 }
 
-.c25.c25.c25 {
+.c22.c22.c22 {
   border: none;
   border-bottom: 2px solid #3385FF;
   border-radius: 0;
@@ -5510,22 +5159,22 @@ exports[`Search Page renders search results with pagination 1`] = `
   padding: 0;
 }
 
-.c26.c26 {
+.c23.c23 {
   padding: 0 2rem;
 }
 
-.c20 {
+.c17 {
   max-width: 1200px;
 }
 
 @media screen and (min-width:40em) {
-  .c21 {
+  .c18 {
     width: 85%;
   }
 }
 
 @media screen and (min-width:52em) {
-  .c46 {
+  .c38 {
     -webkit-order: 2;
     -ms-flex-order: 2;
     order: 2;
@@ -5533,13 +5182,13 @@ exports[`Search Page renders search results with pagination 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c47 {
+  .c39 {
     width: 25%;
   }
 }
 
 @media screen and (min-width:40em) {
-  .c27 {
+  .c24 {
     -webkit-box-pack: center;
     -webkit-justify-content: center;
     -ms-flex-pack: center;
@@ -5548,7 +5197,7 @@ exports[`Search Page renders search results with pagination 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c27 {
+  .c24 {
     -webkit-box-pack: start;
     -webkit-justify-content: flex-start;
     -ms-flex-pack: start;
@@ -5557,7 +5206,7 @@ exports[`Search Page renders search results with pagination 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c33 {
+  .c30 {
     -webkit-flex-direction: row;
     -ms-flex-direction: row;
     flex-direction: row;
@@ -5565,7 +5214,7 @@ exports[`Search Page renders search results with pagination 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c33 {
+  .c30 {
     -webkit-align-items: flex-start;
     -webkit-box-align: flex-start;
     -ms-flex-align: flex-start;
@@ -5574,7 +5223,7 @@ exports[`Search Page renders search results with pagination 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c36 {
+  .c33 {
     -webkit-box-pack: start;
     -webkit-justify-content: flex-start;
     -ms-flex-pack: start;
@@ -5583,25 +5232,25 @@ exports[`Search Page renders search results with pagination 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c37 {
+  .c34 {
     text-align: left;
   }
 }
 
 @media screen and (min-width:52em) {
-  .c48 {
+  .c40 {
     text-align: left;
   }
 }
 
 @media screen and (min-width:52em) {
-  .c35 {
+  .c32 {
     width: 33.33333333333333%;
   }
 }
 
 @media screen and (min-width:52em) {
-  .c38 {
+  .c35 {
     -webkit-order: 3;
     -ms-flex-order: 3;
     order: 3;
@@ -5632,20 +5281,8 @@ exports[`Search Page renders search results with pagination 1`] = `
   }
 }
 
-@media screen and (max-width:40em) {
-  .c17 {
-    display: none;
-  }
-}
-
-@media screen and (min-width:40em) and (max-width:52em) {
-  .c17 {
-    display: none;
-  }
-}
-
 @media screen and (min-width:52em) {
-  .c50 {
+  .c42 {
     text-align: left;
   }
 }
@@ -5792,28 +5429,15 @@ exports[`Search Page renders search results with pagination 1`] = `
         <div
           className="LoginTopBarProfileButton"
         >
-          <div
-            className="c3 c2 sc-bdVaJa c2"
+          <a
+            className="c16"
+            href="/signin?next=%2F"
             onClick={[Function]}
           >
-            <div
-              className="c17 c2"
-            >
-              <p
-                className="LoginTopBarProfileButton-name c18"
-                cursor="pointer"
-              />
-            </div>
-            <div
-              className="c19"
-              color="#46b0ed"
-              cursor="pointer"
-              display="inline-block"
-              height="0.6rem"
-              strokeWidth="0.2rem"
-              width="1.4rem"
-            />
-          </div>
+            <span>
+              Login
+            </span>
+          </a>
         </div>
       </div>
     </div>
@@ -5822,10 +5446,10 @@ exports[`Search Page renders search results with pagination 1`] = `
     className="jsx-916984404"
   >
     <div
-      className="c20 c21"
+      className="c17 c18"
     >
       <div
-        className="c22"
+        className="c19"
       >
         <form
           method="GET"
@@ -5841,10 +5465,10 @@ exports[`Search Page renders search results with pagination 1`] = `
               Search Open Collective
             </label>
             <div
-              className="c23 c24 sc-bdVaJa c2"
+              className="c20 c21 sc-bdVaJa c2"
             >
               <input
-                className="c25 form-control"
+                className="c22 form-control"
                 defaultValue="Test"
                 id="search"
                 name="q"
@@ -5852,7 +5476,7 @@ exports[`Search Page renders search results with pagination 1`] = `
                 type="search"
               />
               <button
-                className="jsx-1144918383 jsx-3101740563 Button blue c26"
+                className="jsx-1144918383 jsx-3101740563 Button blue c23"
                 onClick={[Function]}
                 type="submit"
               >
@@ -5865,10 +5489,10 @@ exports[`Search Page renders search results with pagination 1`] = `
         </form>
       </div>
       <div
-        className="c27 c2 sc-bdVaJa c2"
+        className="c24 c2 sc-bdVaJa c2"
       >
         <div
-          className="c10 c28 sc-bdVaJa c2"
+          className="c10 c25 sc-bdVaJa c2"
         >
           <a
             href="/test-collective"
@@ -5926,7 +5550,7 @@ exports[`Search Page renders search results with pagination 1`] = `
         </div>
       </div>
       <div
-        className="c29 c2 sc-bdVaJa c2"
+        className="c26 c2 sc-bdVaJa c2"
       >
         <ul
           className="pagination"
@@ -5984,7 +5608,7 @@ exports[`Search Page renders search results with pagination 1`] = `
         </ul>
       </div>
       <div
-        className="c30 c31 sc-bdVaJa c2"
+        className="c27 c28 sc-bdVaJa c2"
       >
         <p>
           <em>
@@ -5995,17 +5619,17 @@ exports[`Search Page renders search results with pagination 1`] = `
     </div>
   </main>
   <div
-    className="c32"
+    className="c29"
     id="footer"
   >
     <div
-      className="c33 c34 sc-bdVaJa c2"
+      className="c30 c31 sc-bdVaJa c2"
     >
       <div
-        className="c35"
+        className="c32"
       >
         <div
-          className="c36 c2 sc-bdVaJa c2"
+          className="c33 c2 sc-bdVaJa c2"
         >
           <object
             data="/static/images/opencollectivelogo-footer.svg"
@@ -6014,16 +5638,16 @@ exports[`Search Page renders search results with pagination 1`] = `
           />
         </div>
         <p
-          className="c37"
+          className="c34"
         >
           An organization for your community, transparent by design.
         </p>
       </div>
       <div
-        className="c38"
+        className="c35"
       >
         <a
-          className="c39"
+          className="c36"
           href="https://medium.com/open-collective"
         >
           <svg
@@ -6044,7 +5668,7 @@ exports[`Search Page renders search results with pagination 1`] = `
           </svg>
         </a>
         <a
-          className="c39"
+          className="c36"
           href="https://twitter.com/opencollect"
         >
           <svg
@@ -6065,7 +5689,7 @@ exports[`Search Page renders search results with pagination 1`] = `
           </svg>
         </a>
         <a
-          className="c39"
+          className="c36"
           href="https://github.com/opencollective"
         >
           <svg
@@ -6086,7 +5710,7 @@ exports[`Search Page renders search results with pagination 1`] = `
           </svg>
         </a>
         <a
-          className="c39"
+          className="c36"
           href="https://slack.opencollective.com"
         >
           <svg
@@ -6107,7 +5731,7 @@ exports[`Search Page renders search results with pagination 1`] = `
           </svg>
         </a>
         <a
-          className="c39"
+          className="c36"
           href="mailto:info@opencollective.com"
         >
           <svg
@@ -6128,44 +5752,44 @@ exports[`Search Page renders search results with pagination 1`] = `
         </a>
       </div>
       <nav
-        className="c45 c46"
+        className="c37 c38"
       >
         <div
-          className="c47"
+          className="c39"
         >
           <p
-            className="c48"
+            className="c40"
           >
             PLATFORM
           </p>
           <ul
-            className="c49"
+            className="c41"
           >
             <li
-              className="c50"
+              className="c42"
             >
               <a
-                className="c51 "
+                className="c43 "
                 href="/discover"
               >
                 Discover
               </a>
             </li>
             <li
-              className="c50"
+              className="c42"
             >
               <a
-                className="c51 "
+                className="c43 "
                 href="/learn-more"
               >
                 How it Works
               </a>
             </li>
             <li
-              className="c50"
+              className="c42"
             >
               <a
-                className="c51 "
+                className="c43 "
                 href="/opensource"
                 onClick={[Function]}
               >
@@ -6173,10 +5797,10 @@ exports[`Search Page renders search results with pagination 1`] = `
               </a>
             </li>
             <li
-              className="c50"
+              className="c42"
             >
               <a
-                className="c51 "
+                className="c43 "
                 href="/signin"
                 onClick={[Function]}
               >
@@ -6184,10 +5808,10 @@ exports[`Search Page renders search results with pagination 1`] = `
               </a>
             </li>
             <li
-              className="c50"
+              className="c42"
             >
               <a
-                className="c51 "
+                className="c43 "
                 href="/signin"
                 onClick={[Function]}
               >
@@ -6197,21 +5821,21 @@ exports[`Search Page renders search results with pagination 1`] = `
           </ul>
         </div>
         <div
-          className="c47"
+          className="c39"
         >
           <p
-            className="c48"
+            className="c40"
           >
             JOIN THE MOVEMENT
           </p>
           <ul
-            className="c49"
+            className="c41"
           >
             <li
-              className="c50"
+              className="c42"
             >
               <a
-                className="c51 "
+                className="c43 "
                 href="/create"
                 onClick={[Function]}
               >
@@ -6219,10 +5843,10 @@ exports[`Search Page renders search results with pagination 1`] = `
               </a>
             </li>
             <li
-              className="c50"
+              className="c42"
             >
               <a
-                className="c51 "
+                className="c43 "
                 href="/become-a-sponsor"
                 onClick={[Function]}
               >
@@ -6230,10 +5854,10 @@ exports[`Search Page renders search results with pagination 1`] = `
               </a>
             </li>
             <li
-              className="c50"
+              className="c42"
             >
               <a
-                className="c51 "
+                className="c43 "
                 href="/chapters"
                 onClick={[Function]}
               >
@@ -6243,21 +5867,21 @@ exports[`Search Page renders search results with pagination 1`] = `
           </ul>
         </div>
         <div
-          className="c47"
+          className="c39"
         >
           <p
-            className="c48"
+            className="c40"
           >
             COMMUNITY
           </p>
           <ul
-            className="c49"
+            className="c41"
           >
             <li
-              className="c50"
+              className="c42"
             >
               <a
-                className="c51 "
+                className="c43 "
                 href="/opensource"
                 onClick={[Function]}
               >
@@ -6265,10 +5889,10 @@ exports[`Search Page renders search results with pagination 1`] = `
               </a>
             </li>
             <li
-              className="c50"
+              className="c42"
             >
               <a
-                className="c51 "
+                className="c43 "
                 href="https://github.com/opencollective/opencollective/issues"
                 onClick={[Function]}
               >
@@ -6276,10 +5900,10 @@ exports[`Search Page renders search results with pagination 1`] = `
               </a>
             </li>
             <li
-              className="c50"
+              className="c42"
             >
               <a
-                className="c51 "
+                className="c43 "
                 href="https://slack.opencollective.com"
                 onClick={[Function]}
               >
@@ -6287,10 +5911,10 @@ exports[`Search Page renders search results with pagination 1`] = `
               </a>
             </li>
             <li
-              className="c50"
+              className="c42"
             >
               <a
-                className="c51 "
+                className="c43 "
                 href="https://github.com/opencollective/opencollective/wiki"
                 onClick={[Function]}
               >
@@ -6298,10 +5922,10 @@ exports[`Search Page renders search results with pagination 1`] = `
               </a>
             </li>
             <li
-              className="c50"
+              className="c42"
             >
               <a
-                className="c51 "
+                className="c43 "
                 href="mailto:support@opencollective.com"
                 onClick={[Function]}
               >
@@ -6311,21 +5935,21 @@ exports[`Search Page renders search results with pagination 1`] = `
           </ul>
         </div>
         <div
-          className="c47"
+          className="c39"
         >
           <p
-            className="c48"
+            className="c40"
           >
             COMPANY
           </p>
           <ul
-            className="c49"
+            className="c41"
           >
             <li
-              className="c50"
+              className="c42"
             >
               <a
-                className="c51 "
+                className="c43 "
                 href="/about"
                 onClick={[Function]}
               >
@@ -6333,10 +5957,10 @@ exports[`Search Page renders search results with pagination 1`] = `
               </a>
             </li>
             <li
-              className="c50"
+              className="c42"
             >
               <a
-                className="c51 "
+                className="c43 "
                 href="/faq"
                 onClick={[Function]}
               >
@@ -6344,10 +5968,10 @@ exports[`Search Page renders search results with pagination 1`] = `
               </a>
             </li>
             <li
-              className="c50"
+              className="c42"
             >
               <a
-                className="c51 "
+                className="c43 "
                 href="https://medium.com/open-collective"
                 onClick={[Function]}
               >
@@ -6355,10 +5979,10 @@ exports[`Search Page renders search results with pagination 1`] = `
               </a>
             </li>
             <li
-              className="c50"
+              className="c42"
             >
               <a
-                className="c51 "
+                className="c43 "
                 href="/tos"
                 onClick={[Function]}
               >
@@ -6366,10 +5990,10 @@ exports[`Search Page renders search results with pagination 1`] = `
               </a>
             </li>
             <li
-              className="c50"
+              className="c42"
             >
               <a
-                className="c51 "
+                className="c43 "
                 href="/privacypolicy"
                 onClick={[Function]}
               >
