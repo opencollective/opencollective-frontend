@@ -1,5 +1,5 @@
 # source: http://localhost:3000/api/graphql
-# timestamp: Fri Oct 12 2018 18:04:01 GMT+0200 (Central European Summer Time)
+# timestamp: Sat Oct 27 2018 13:55:20 GMT+0100 (British Summer Time)
 
 """Application model"""
 type Application {
@@ -109,9 +109,7 @@ type Collective implements CollectiveInterface {
   followers(limit: Int, offset: Int): [CollectiveInterface]
   maxQuantity: Int
   tiers(id: Int, slug: String): [Tier]
-  orders(
-    status: OrderStatus
-  ): [OrderType]
+  orders(status: OrderStatus): [OrderType]
   ordersFromCollective(subscriptionsOnly: Boolean): [OrderType]
   transactions(
     """type of transaction (DEBIT/CREDIT)"""
@@ -263,9 +261,7 @@ interface CollectiveInterface {
   followers(limit: Int, offset: Int): [CollectiveInterface]
   maxQuantity: Int
   tiers(id: Int, slug: String): [Tier]
-  orders(
-    status: OrderStatus
-  ): [OrderType]
+  orders(status: OrderStatus): [OrderType]
   ordersFromCollective(subscriptionsOnly: Boolean): [OrderType]
   stats: CollectiveStatsType
   transactions(type: String, limit: Int, offset: Int): [Transaction]
@@ -502,9 +498,7 @@ type Event implements CollectiveInterface {
   followers(limit: Int, offset: Int): [CollectiveInterface]
   maxQuantity: Int
   tiers(id: Int, slug: String): [Tier]
-  orders(
-    status: OrderStatus
-  ): [OrderType]
+  orders(status: OrderStatus): [OrderType]
   ordersFromCollective(subscriptionsOnly: Boolean): [OrderType]
   transactions(
     """type of transaction (DEBIT/CREDIT)"""
@@ -720,6 +714,7 @@ type Mutation {
   createCollective(collective: CollectiveInputType!): CollectiveInterface
   editCollective(collective: CollectiveInputType!): CollectiveInterface
   deleteCollective(id: Int!): CollectiveInterface
+  claimCollective(id: Int!): CollectiveInterface
 
   """Approve a collective"""
   approveCollective(id: Int!): CollectiveInterface
@@ -752,8 +747,9 @@ type Mutation {
   deleteApplication(id: String!): Application
   createPaymentMethod(
     type: String!
-    amount: Int!
     currency: String!
+    amount: Int
+    monthlyLimitPerMember: Int
 
     """
     Limit this payment method to make donations to collectives having those tags
@@ -773,7 +769,6 @@ type Mutation {
     expiryDate: String
   ): PaymentMethodType
   claimPaymentMethod(code: String!, user: UserInputType): PaymentMethodType
-  claimCollective(id: Int!): CollectiveInterface
 }
 
 """Order model"""
@@ -853,6 +848,7 @@ enum OrderDirection {
 
 """Input type for OrderType"""
 input OrderInputType {
+  id: Int
   quantity: Int
   totalAmount: Int
   hostFeePercent: Int
@@ -1027,9 +1023,7 @@ type Organization implements CollectiveInterface {
   followers(limit: Int, offset: Int): [CollectiveInterface]
   maxQuantity: Int
   tiers(id: Int, slug: String): [Tier]
-  orders(
-    status: OrderStatus
-  ): [OrderType]
+  orders(status: OrderStatus): [OrderType]
   ordersFromCollective(subscriptionsOnly: Boolean): [OrderType]
   transactions(
     """type of transaction (DEBIT/CREDIT)"""
@@ -1106,6 +1100,7 @@ type PaymentMethodType {
   """Returns the balance in the currency of this paymentMethod"""
   balance: Int
   collective: CollectiveInterface
+  emitter: CollectiveInterface
   limitedToTags: JSON
   limitedToCollectiveIds: [Int]
   limitedToHostCollectiveIds: [Int]
@@ -1532,9 +1527,7 @@ type User implements CollectiveInterface {
   followers(limit: Int, offset: Int): [CollectiveInterface]
   maxQuantity: Int
   tiers(id: Int, slug: String): [Tier]
-  orders(
-    status: OrderStatus
-  ): [OrderType]
+  orders(status: OrderStatus): [OrderType]
   ordersFromCollective(subscriptionsOnly: Boolean): [OrderType]
   transactions(
     """type of transaction (DEBIT/CREDIT)"""
