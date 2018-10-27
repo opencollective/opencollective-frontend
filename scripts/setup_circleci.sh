@@ -34,18 +34,20 @@ if [ ! $TARBALL_SIZE ]; then
   TARBALL_SIZE=$(curl -s --head  --request GET "${API_TARBALL_URL}${BRANCH}" | grep "Content-Length" | sed -E "s/.*: *([0-9]+).*/\1/")
 fi
 
-if [ -e "${BRANCH}.tgz" ];
+ARCHIVE="${BRANCH//\//-}.tgz"
+
+if [ -e $ARCHIVE ];
 then
-  LSIZE=$(wc -c ${BRANCH}.tgz | sed -E "s/ ?([0-9]+).*/\1/")
-  test $TARBALL_SIZE = $LSIZE && echo "Size matches $BRANCH.tgz (${TARBALL_SIZE}:${LSIZE})" || (echo "> Removing old ${BRANCH}.tgz (size doesn't match: ${TARBALL_SIZE}:${LSIZE})"; rm "${BRANCH}.tgz"; echo "File removed";)
+  LSIZE=$(wc -c $ARCHIVE | sed -E "s/ ?([0-9]+).*/\1/")
+  test $TARBALL_SIZE = $LSIZE && echo "Size matches $ARCHIVE (${TARBALL_SIZE}:${LSIZE})" || (echo "> Removing old $ARCHIVE (size doesn't match: ${TARBALL_SIZE}:${LSIZE})"; rm $ARCHIVE; echo "File removed";)
 fi
 
-if [ ! -e "${BRANCH}.tgz" ];
+if [ ! -e $ARCHIVE ];
 then
   echo "> Downloading tarball ${API_TARBALL_URL}${BRANCH}"
-  curl  "${API_TARBALL_URL}${BRANCH}" -o "${BRANCH}.tgz"
-  echo "> Extracting ${BRANCH}.tgz"
-  tar -xzf "${BRANCH}.tgz"
+  curl  "${API_TARBALL_URL}${BRANCH}" -o $ARCHIVE
+  echo "> Extracting $ARCHIVE"
+  tar -xzf $ARCHIVE
   if [ -d "opencollective-api" ]; then
     rm -rf opencollective-api
   fi
