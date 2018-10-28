@@ -1159,7 +1159,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
             >
               <a
                 className="c44 "
-                href="/organizations/new"
+                href="/become-a-sponsor"
                 onClick={[Function]}
               >
                 Become a Sponsor
@@ -2460,7 +2460,7 @@ exports[`Search Page renders empty results message 1`] = `
             >
               <a
                 className="c43 "
-                href="/organizations/new"
+                href="/become-a-sponsor"
                 onClick={[Function]}
               >
                 Become a Sponsor
@@ -3681,7 +3681,7 @@ exports[`Search Page renders error message 1`] = `
             >
               <a
                 className="c42 "
-                href="/organizations/new"
+                href="/become-a-sponsor"
                 onClick={[Function]}
               >
                 Become a Sponsor
@@ -5103,7 +5103,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
             >
               <a
                 className="c43 "
-                href="/organizations/new"
+                href="/become-a-sponsor"
                 onClick={[Function]}
               >
                 Become a Sponsor
@@ -6537,7 +6537,7 @@ exports[`Search Page renders search results with pagination 1`] = `
             >
               <a
                 className="c45 "
-                href="/organizations/new"
+                href="/become-a-sponsor"
                 onClick={[Function]}
               >
                 Become a Sponsor
