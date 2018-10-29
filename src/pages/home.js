@@ -483,7 +483,7 @@ class HomePage extends React.Component {
                   we’ll gladly set them up and get them going.
                 </P>
 
-                <Link route="/organizations/new" passHref>
+                <Link route="marketing" params={{ pageSlug: 'become-a-sponsor' }} passHref>
                   <StyledLink
                     bg="#3385FF"
                     borderRadius="50px"
