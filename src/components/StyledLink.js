@@ -13,20 +13,16 @@ import {
   space,
   style,
   textAlign,
-  variant,
   width,
 } from 'styled-system';
 import tag from 'clean-tag';
 import { whiteSpace } from './Text';
+import { buttonSize, buttonStyle } from '../constants/theme';
 
 const textDecoration = style({
   prop: 'textDecoration',
 });
 
-const buttonStyle = variant({
-  key: 'buttons',
-  prop: 'buttonStyle',
-});
 
 const StyledLink = styled(tag.a)`
   ${bgColor}
@@ -46,10 +42,11 @@ const StyledLink = styled(tag.a)`
   ${width}
 
   ${buttonStyle}
+  ${buttonSize}
 `;
 
 StyledLink.defaultProps = {
-  blacklist: tag.defaultProps.blacklist.concat('buttonStyle'),
+  blacklist: tag.defaultProps.blacklist.concat('buttonStyle', 'buttonSize'),
 };
 
 export default StyledLink;

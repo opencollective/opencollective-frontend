@@ -82,7 +82,7 @@ class PledgedCollective extends React.Component {
               params={{ slug: collective.slug }}
               passHref
             >
-              <StyledLink fontSize={16} px={5} py={3} buttonStyle="primary">
+              <StyledLink buttonStyle="primary" buttonSize="large">
                 Make a pledge
               </StyledLink>
             </Link>
@@ -193,11 +193,9 @@ class PledgedCollective extends React.Component {
                   passHref
                 >
                   <StyledLink
-                    fontSize={14}
-                    px={4}
-                    py={2}
                     textAlign="center"
                     width={1}
+                    buttonSize="medium"
                     buttonStyle="standard"
                   >
                     Claim this collective
