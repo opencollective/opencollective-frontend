@@ -1,3 +1,5 @@
+import { variant } from 'styled-system';
+
 const colors = {
   black: {
     900: '#141414',
@@ -58,8 +60,26 @@ const colors = {
   },
 };
 
+const fontSizes = {
+  H1: 56,
+  H2: 40,
+  H3: 32,
+  H4: 24,
+  H5: 20,
+  H6: 9,
+  LeadParagraph: 16,
+  Paragraph: 14,
+  Caption: 12,
+  Tiny: 10,
+};
+
+// using default space values from styled-system
+const space = [0, 4, 8, 16, 32, 64, 128, 256, 512];
+
 const theme = {
   colors,
+  fontSizes,
+  space,
   buttons: {
     standard: {
       backgroundColor: 'white',
@@ -106,6 +126,45 @@ const theme = {
       },
     },
   },
+  buttonSizes: {
+    large: {
+      fontSize: toPx(fontSizes.LeadParagraph),
+      paddingBottom: toPx(space[3]),
+      paddingLeft: toPx(space[5]),
+      paddingRight: toPx(space[5]),
+      paddingTop: toPx(space[3]),
+    },
+
+    medium: {
+      fontSize: toPx(fontSizes.Paragraph),
+      paddingBottom: toPx(space[2]),
+      paddingLeft: toPx(space[3]),
+      paddingRight: toPx(space[3]),
+      paddingTop: toPx(space[2]),
+    },
+
+    small: {
+      fontSize: toPx(fontSizes.Caption),
+      paddingBottom: toPx(space[1]),
+      paddingLeft: toPx(space[2]),
+      paddingRight: toPx(space[2]),
+      paddingTop: toPx(space[1]),
+    },
+  },
 };
 
+export const buttonStyle = variant({
+  key: 'buttons',
+  prop: 'buttonStyle',
+});
+
+export const buttonSize = variant({
+  key: 'buttonSizes',
+  prop: 'buttonSize',
+});
+
 export default theme;
+
+function toPx (value) {
+  return value + 'px';
+}
