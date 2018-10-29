@@ -576,7 +576,7 @@ class CreatePledgePage extends React.Component {
               <Details>
                 <summary>What is a pledge?</summary>A pledge allows supporters
                 (companies and individuals) to pledge funds towards a collective
-                that hasn’t been created yet. If you can’t collective you want
+                that hasn’t been created yet. If you can’t find a collective you want
                 to support, pledge to it!
               </Details>
 
