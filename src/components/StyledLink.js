@@ -2,6 +2,7 @@ import styled from 'styled-components';
 import {
   bgColor,
   border,
+  borderColor,
   borderRadius,
   color,
   display,
@@ -30,6 +31,7 @@ const buttonStyle = variant({
 const StyledLink = styled(tag.a)`
   ${bgColor}
   ${border}
+  ${borderColor}
   ${borderRadius}
   ${color}
   ${display}
