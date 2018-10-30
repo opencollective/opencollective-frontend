@@ -1,20 +1,20 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
-import { H4 } from './Text';
+import { H5 } from './Text';
 import Container from './Container';
 import { Flex } from 'grid-styled';
-import StyledInput from '../components/StyledInput';
+import StyledInput, { SubmitInput } from '../components/StyledInput';
 
 class NewsletterContainer extends React.Component {
   render() {
     return (
       <Container py={5}>
-        <H4 textAlign="center" fontSize={20} mb={4} px={3}>
+        <H5 mb={4} px={3}>
           <FormattedMessage
             id="newsletter.container.title"
             defaultMessage="Stay updated about our news and progress."
           />
-        </H4>
+        </H5>
 
         <Flex justifyContent="center">
           <form
@@ -24,16 +24,17 @@ class NewsletterContainer extends React.Component {
             target="_blank"
           >
             <Container
-              border="1px solid rgba(18,19,20,0.12)"
+              border="1px solid"
+              borderColor="black.transparent.20"
               borderRadius={50}
-              bg="white"
+              bg="white.full"
               display="flex"
               justifyContent="space-between"
               overflow="hidden"
               width={300}
             >
               <StyledInput
-                fontSize={14}
+                fontSize="Paragraph"
                 name="EMAIL"
                 px={3}
                 py={1}
@@ -41,14 +42,9 @@ class NewsletterContainer extends React.Component {
                 type="email"
                 width={1}
               />
-              <StyledInput
-                bg="#3385FF"
-                borderRadius={50}
-                color="white"
-                fontSize={12}
-                fontWeight="bold"
-                px={3}
-                py={2}
+              <SubmitInput
+                buttonSize="small"
+                fontWeight="500"
                 textAlign="center"
                 name="subscribe"
                 type="submit"

@@ -46,7 +46,7 @@ P.defaultProps = {
   blacklist: tag.defaultProps.blacklist.concat(['textTransform', 'whiteSpace']),
   fontSize: 'Paragraph',
   letterSpacing: '-0.2px',
-  lineHeight: '20px',
+  lineHeight: 'Paragraph',
   m: 0,
 };
 
@@ -62,7 +62,7 @@ H1.defaultProps = {
   fontSize: 'H1',
   fontWeight: 'bold',
   letterSpacing: '-1.2px',
-  lineHeight: '56px',
+  lineHeight: 'H1',
   m: 0,
 };
 
@@ -72,7 +72,7 @@ H2.defaultProps = {
   fontSize: 'H2',
   fontWeight: 'bold',
   letterSpacing: '-0.4px',
-  lineHeight: '44px',
+  lineHeight: 'H2',
   m: 0,
 };
 
@@ -82,7 +82,7 @@ H3.defaultProps = {
   fontSize: 'H3',
   fontWeight: 'bold',
   letterSpacing: '-0.4px',
-  lineHeight: '36px',
+  lineHeight: 'H3',
   m: 0,
 };
 
@@ -92,7 +92,7 @@ H4.defaultProps = {
   fontSize: 'H4',
   fontWeight: 'bold',
   letterSpacing: '-0.2px',
-  lineHeight: '32px',
+  lineHeight: 'H4',
   m: 0,
 };
 
@@ -101,7 +101,7 @@ export const H5 = P.withComponent(tag.h5);
 H5.defaultProps = {
   fontSize: 'H5',
   letterSpacing: '-0.2px',
-  lineHeight: '24px',
+  lineHeight: 'H5',
   textAlign: 'center',
   fontWeight: 500,
   color: 'black.800',

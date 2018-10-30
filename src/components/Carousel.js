@@ -2,8 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
-import Container from './Container';
-import { H4, P } from './Text';
+import { H5, P } from './Text';
 import NukaCarousel from 'nuka-carousel';
 
 const getIndexes = (count, increment) => {
@@ -67,15 +66,15 @@ const Carousel = ({ content }) => {
       wrapAround
     >
       {content.map(({ details, heading, image }) => (
-        <Container key={image + heading + details}>
+        <div key={image + heading + details}>
           <img src={image} />
-          <H4 textAlign="center" mb={3} fontSize={20}>
+          <H5 color="black.800" textAlign="center" mb={3}>
             {heading}
-          </H4>
-          <P textAlign="center" color="#6E747A" fontSize={14}>
+          </H5>
+          <P textAlign="center" color="black.600" fontSize="Caption">
             {details}
           </P>
-        </Container>
+        </div>
       ))}
     </NukaCarousel>
   );
