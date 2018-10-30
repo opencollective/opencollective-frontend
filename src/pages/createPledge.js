@@ -6,6 +6,7 @@ import { graphql, compose } from 'react-apollo';
 import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
+import { themeGet } from 'styled-system';
 
 import withData from '../lib/withData';
 import withLoggedInUser from '../lib/withLoggedInUser';
@@ -18,7 +19,7 @@ import { defaultImage } from '../constants/collectives';
 import Header from '../components/Header';
 import Body from '../components/Body';
 import Footer from '../components/Footer';
-import { H1, H2, H3, P, Span } from '../components/Text';
+import { H3, H4, H5, P, Span } from '../components/Text';
 import StyledInput, { SubmitInput, TextInput } from '../components/StyledInput';
 import StyledInputGroup from '../components/StyledInputGroup';
 import { Box, Flex } from 'grid-styled';
@@ -30,18 +31,16 @@ import Currency from '../components/Currency';
 const defaultPledgedLogo = '/static/images/default-pledged-logo.svg';
 
 const labelStyles = {
-  color: '#6E747A',
-  fontSize: '14px',
+  color: 'black.600',
   fontWeight: 400,
   is: 'label',
-  letterSpacing: '0.5px',
   mb: 1,
 };
 
 const Details = styled.details`
   &[open] {
-    font-size: 14px;
-    margin-bottom: 32px;
+    font-size: ${themeGet('fontSizes.Paragraph')}px;
+    margin-bottom: ${themeGet('space.4')}px;
 
     summary::after {
       content: '-';
@@ -49,16 +48,16 @@ const Details = styled.details`
   }
 
   summary {
-    color: #141414;
-    font-size: 16px;
+    color: ${themeGet('colors.black.900')};
+    font-size: ${themeGet('fontSizes.LeadParagraph')}px;
     font-weight: 500;
-    margin-bottom: 16px;
+    margin-bottom: ${themeGet('space.3')}px;
   }
 
   summary::after {
     content: '+';
     display: inline-block;
-    padding-left: 1rem;
+    padding-left: ${themeGet('space.2')}px;
   }
 `;
 
@@ -74,9 +73,10 @@ const WordCountTextarea = withState('wordCount', 'setWordCount', 140)(
         </P>
       </Flex>
       <StyledInput
-        border="1px solid #D5DAE0"
+        border="1px solid"
+        borderColor="black.300"
         borderRadius="4px"
-        fontSize="14px"
+        fontSize="Paragraph"
         is="textarea"
         id="publicMessage"
         name="publicMessage"
@@ -261,11 +261,11 @@ class CreatePledgePage extends React.Component {
               px={3}
               width={[1, null, 0.5]}
             >
-              <H1 color="#121314" textAlign="left" mb={4}>
+              <H3 is="h1" color="black.900" textAlign="left" mb={4}>
                 Make a pledge
-              </H1>
+              </H3>
 
-              <P fontSize={14} my={3} color="#9399A3">
+              <P my={3} color="black.500">
                 If the cause or collective that you want to support is not yet
                 on Open Collective, you can make a pledge. This will incentivize
                 them to create an open collective for their activities and offer
@@ -273,7 +273,7 @@ class CreatePledgePage extends React.Component {
                 their cause.
               </P>
 
-              <P fontSize={14} my={3} color="#9399A3">
+              <P my={3} color="black.500">
                 Once they create it (and verify that they own the URL you’ll
                 enter in this form), you will receive an email to ask you to
                 fulfill your pledge.
@@ -282,9 +282,9 @@ class CreatePledgePage extends React.Component {
               <form onSubmit={this.createOrder.bind(this)}>
                 {!slug && (
                   <Box mb={3}>
-                    <H2 fontSize="20px" mb={4}>
+                    <H5 textAlign="left" mb={4}>
                       Details of the new collective:
-                    </H2>
+                    </H5>
 
                     <Container position="relative">
                       <Container position="absolute" left={-45} top={0}>
@@ -297,7 +297,7 @@ class CreatePledgePage extends React.Component {
                       <P fontWeight="bold">You are the first pledger!</P>
                     </Container>
 
-                    <P color="#9399A3" fontSize={12} mt={2}>
+                    <P color="black.500" fontSize="Caption" mt={2}>
                       You’ve earned the priviledge to name and describe this
                       awesome cause. We’ll create a pledged collective page for
                       it so other people can find it and pledge to it too.
@@ -344,19 +344,19 @@ class CreatePledgePage extends React.Component {
                 )}
 
                 <Box my={5}>
-                  <H2 fontSize="20px" mb={3}>
+                  <H5 textAlign="left" mb={3}>
                     Pledge as:
-                  </H2>
+                  </H5>
 
                   {loadingUserLogin && (
-                    <P fontSize={14} my={3} color="#9399A3">
+                    <P my={3} color="black.500">
                       Loading profile...
                     </P>
                   )}
 
                   {!loadingUserLogin &&
                     !LoggedInUser && (
-                      <P fontSize={14} my={3} color="#9399A3">
+                      <P my={3} color="black.500">
                         Sign up or login to create a pledge.
                       </P>
                     )}
@@ -382,9 +382,9 @@ class CreatePledgePage extends React.Component {
                 </Box>
 
                 <Box mb={5}>
-                  <H2 fontSize="20px" mb={3}>
+                  <H5 textAlign="left" mb={3}>
                     Pledge details:
-                  </H2>
+                  </H5>
 
                   <AmountField LoggedInUser={LoggedInUser} />
 
@@ -421,7 +421,7 @@ class CreatePledgePage extends React.Component {
                 />
               </form>
               {errorMessage && (
-                <P color="red" mt={3}>
+                <P color="red.500" mt={3}>
                   {errorMessage}
                 </P>
               )}
@@ -430,7 +430,8 @@ class CreatePledgePage extends React.Component {
             {slug && (
               <Fragment>
                 <Container
-                  borderBottom={['1px solid #DCDEE0', null, 'none']}
+                  borderBottom={['1px solid', null, 'none']}
+                  borderColor="black.300"
                   float={['none', null, 'right']}
                   pb={[4, null, 0]}
                   px={[3, null, 5]}
@@ -440,11 +441,11 @@ class CreatePledgePage extends React.Component {
                 >
                   <img src={defaultPledgedLogo} alt="Pledged Collective" />
 
-                  <H2 fontSize={28} mt={3} mb={1}>
+                  <H3 mt={3} mb={1}>
                     {data.Collective.name}
-                  </H2>
+                  </H3>
 
-                  <StyledLink fontSize={14} href={data.Collective.website}>
+                  <StyledLink fontSize="Paragraph" href={data.Collective.website}>
                     {data.Collective.website}
                   </StyledLink>
                 </Container>
@@ -456,7 +457,7 @@ class CreatePledgePage extends React.Component {
                   mt={5}
                   width={[1, null, 0.5]}
                 >
-                  <H3 fontSize={28} fontWeight="normal" mb={2}>
+                  <H5 textAlign="left" fontWeight="normal" mb={2}>
                     <Currency
                       fontWeight="bold"
                       value={pledgeStats.total}
@@ -464,9 +465,9 @@ class CreatePledgePage extends React.Component {
                       precision={0}
                     />{' '}
                     {data.Collective.currency} pledged
-                  </H3>
+                  </H5>
 
-                  <P color="#6E747A">
+                  <P color="black.600">
                     <FormattedMessage
                       id="pledge.stats"
                       values={{
@@ -569,9 +570,9 @@ class CreatePledgePage extends React.Component {
               order={4}
               width={[1, null, 0.5]}
             >
-              <H3 fontSize={24} fontWeight="medium" mb={3}>
+              <H4 fontWeight="medium" mb={3}>
                 FAQs
-              </H3>
+              </H4>
 
               <Details>
                 <summary>What is a pledge?</summary>A pledge allows supporters
