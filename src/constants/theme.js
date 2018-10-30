@@ -166,5 +166,5 @@ export const buttonSize = variant({
 export default theme;
 
 function toPx (value) {
-  return value + 'px';
+  return `${value}px`;
 }
