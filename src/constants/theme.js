@@ -1,6 +1,6 @@
 import { variant } from 'styled-system';
 
-const colors = {
+export const colors = {
   black: {
     900: '#141414',
     800: '#313233',
@@ -47,6 +47,7 @@ const colors = {
     100: '#F2FAD2',
   },
   white: {
+    full: '#FFFFFF',
     transparent: {
       72: 'rgba(255, 255, 255, 0.72)',
       48: 'rgba(255, 255, 255, 0.48)',
