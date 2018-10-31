@@ -832,7 +832,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
           </p>
           <a
             className="c29"
-            href="/pledges/new?name=test"
+            href="createPledge"
             onClick={[Function]}
           >
             Make a pledge
