@@ -575,7 +575,7 @@ class HomePage extends React.Component {
                   pointerEvents="none"
                 >
                   <Container
-                    background="linear-gradient(to left, #EBF1FA, rgba(255, 255, 255, 0) 50%)"
+                    background={`linear-gradient(to left, ${colors.primary[200]}, rgba(255, 255, 255, 0) 50%)`}
                     width="100%"
                     height="100%"
                   />
