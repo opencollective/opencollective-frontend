@@ -62,7 +62,7 @@ export const colors = {
 };
 
 const fontSizes = {
-  H1: 56,
+  H1: 52,
   H2: 40,
   H3: 32,
   H4: 24,
@@ -74,12 +74,26 @@ const fontSizes = {
   Tiny: 10,
 };
 
+const lineHeights = {
+  H1: '56px',
+  H2: '44px',
+  H3: '36px',
+  H4: '32px',
+  H5: '24px',
+  H6: '14px',
+  LeadParagraph: '24px',
+  Paragraph: '20px',
+  Caption: '18px',
+  Tiny: '14px',
+};
+
 // using default space values from styled-system
 const space = [0, 4, 8, 16, 32, 64, 128, 256, 512];
 
 const theme = {
   colors,
   fontSizes,
+  lineHeights,
   space,
   buttons: {
     standard: {
