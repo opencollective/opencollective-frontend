@@ -13,7 +13,9 @@ const converter = unified()
   .use(remarkParse)
   .use(remarkRehype)
   .use(rehypeSanitize)
-  .use(rehypeReact);
+  .use(rehypeReact, {
+    createElement: React.createElement,
+  });
 
 class LongDescription extends React.Component {
   static propTypes = {
