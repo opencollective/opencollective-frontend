@@ -20,7 +20,7 @@ jobs:
     - run: sudo apt -y install libnotify-dev
     - run: sudo apt -y install libgconf-2-4 libnss3 libxss1
     - run: sudo apt -y install libasound2 xvfb
-    - run: npm install
+    - run: npm ci
     - run: ./scripts/setup_circleci.sh
     - save_cache: # special step to save the dependency cache
         key: cache-{{ checksum "package.json" }}

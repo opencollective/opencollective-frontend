@@ -15,6 +15,7 @@ const SearchInputContainer = styled(Flex)`
 
 const SearchInput = styled(Box)`
   && {
+    appearance: none;
     background-color: transparent;
     border: none;
     font-size: 1.2rem;
