@@ -65,28 +65,36 @@ class TransactionDetails extends React.Component {
     };
   }
 
-  render() {
+  /**
+   * Amount details:
+   * /airbnb/transactions DEBITS AirBnB gives $1,000 to Webpack
+   * $1,000 - $50 (host fees) - $50 (Open Collective fees) - $30 (Payment Processor Fees) = $870 (net amount for Webpack)
+   * /webpack/transactions CREDITS AirBnB gives $1,000 to Webpack
+   * $1,000 - $50 (host fees) - $50 (Open Collective fees) - $30 (Payment Processor Fees) = $870 (net amount for Webpack)
+   * /webpack/transactions DEBIT Tobiaz receives $1,000 from Webpack
+   * -$1,000 - $30 (Payment Processor Fees) = -$1,030 (net amount for Webpack)
+   */
+  formatAmountDetails() {
     const {
       intl,
-      canEditCollective,
-      collective,
-      attachment,
-      id,
       type,
-      host,
+      netAmountInCollectiveCurrency,
       amount,
+      collective,
       currency,
+      host,
       hostCurrency,
       hostCurrencyFxRate,
-      netAmountInCollectiveCurrency,
-      paymentMethod,
-      isRefund,
-      uuid,
     } = this.props;
 
     const hostFeePercent = host && `${host.hostFeePercent}%`;
+
+    const initialAmount = ['ORGANIZATION', 'USER'].includes(collective.type)
+      ? -netAmountInCollectiveCurrency
+      : amount;
+
     const amountDetails = [
-      intl.formatNumber(amount / 100, {
+      intl.formatNumber(initialAmount / 100, {
         currency: currency,
         ...this.currencyStyle,
       }),
@@ -121,8 +129,45 @@ class TransactionDetails extends React.Component {
       'paymentProcessorFeeInHostCurrency',
     ]);
 
-    const amountDetailsStr =
+    let amountDetailsStr =
       amountDetails.length > 1 ? amountDetails.join(' ') : null;
+
+    if (
+      ['ORGANIZATION', 'USER'].includes(collective.type) &&
+      type === 'CREDIT'
+    ) {
+      amountDetailsStr = amountDetailsStr.replace(/-/g, '+');
+    }
+
+    return amountDetailsStr;
+  }
+
+  render() {
+    const {
+      canEditCollective,
+      collective,
+      fromCollective,
+      attachment,
+      id,
+      type,
+      host,
+      currency,
+      hostCurrency,
+      hostCurrencyFxRate,
+      amount,
+      netAmountInCollectiveCurrency,
+      paymentMethod,
+      isRefund,
+      uuid,
+    } = this.props;
+
+    const amountDetailsStr = this.formatAmountDetails();
+    let finalAmount = netAmountInCollectiveCurrency,
+      recipient = collective;
+    if (['ORGANIZATION', 'USER'].includes(collective.type)) {
+      finalAmount = -amount;
+      recipient = fromCollective;
+    }
 
     return (
       <div className={`TransactionDetails ${this.props.mode}`}>
@@ -132,7 +177,7 @@ class TransactionDetails extends React.Component {
               font-size: 1.2rem;
               overflow: hidden;
               transition: max-height 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-              max-height: 19rem;
+              max-height: 21rem;
             }
             .TransactionDetails.closed {
               max-height: 0;
@@ -219,40 +264,6 @@ class TransactionDetails extends React.Component {
               {hostCurrencyFxRate}
             </div>
           )}
-        <div className="col">
-          <label>
-            <FormattedMessage
-              id="transaction.amountDetails"
-              defaultMessage="amount details"
-            />
-          </label>
-          <div className="amountDetails">
-            {amountDetailsStr && (
-              <span>
-                <span>{amountDetailsStr}</span>
-                <span className="netAmountInCollectiveCurrency">
-                  &nbsp;=&nbsp;
-                </span>
-              </span>
-            )}
-            <span className="netAmountInCollectiveCurrency">
-              <FormattedNumber
-                value={netAmountInCollectiveCurrency / 100}
-                currency={currency}
-                {...this.currencyStyle}
-              />
-            </span>
-            &nbsp;
-            <span className="netAmountInCollectiveCurrencyDescription">
-              (
-              <FormattedMessage
-                id="transaction.netAmountInCollectiveCurrency.description"
-                defaultMessage="net amount added to your collective's balance"
-              />
-              )
-            </span>
-          </div>
-        </div>
 
         {type === 'DEBIT' &&
           canEditCollective &&
@@ -276,6 +287,42 @@ class TransactionDetails extends React.Component {
               </div>
             </div>
           )}
+
+        <div className="col">
+          <label>
+            <FormattedMessage
+              id="transaction.amountDetails"
+              defaultMessage="amount details"
+            />
+          </label>
+          <div className="amountDetails">
+            {amountDetailsStr && (
+              <span>
+                <span>{amountDetailsStr}</span>
+                <span className="netAmountInCollectiveCurrency">
+                  &nbsp;=&nbsp;
+                </span>
+              </span>
+            )}
+            <span className="netAmountInCollectiveCurrency">
+              <FormattedNumber
+                value={finalAmount / 100}
+                currency={currency}
+                {...this.currencyStyle}
+              />
+            </span>
+            &nbsp;
+            <span className="netAmountInCollectiveCurrencyDescription">
+              (
+              <FormattedMessage
+                id="transaction.netAmountInCollectiveCurrency.description"
+                defaultMessage="net amount for {collective}"
+                values={{ collective: recipient.name }}
+              />
+              )
+            </span>
+          </div>
+        </div>
 
         <div className="actions">
           {canEditCollective && (

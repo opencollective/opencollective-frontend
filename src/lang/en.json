@@ -76,7 +76,7 @@
   "transaction.paymentMethod": "payment method",
   "transaction.fxrate": "fx rate",
   "transaction.amountDetails": "amount details",
-  "transaction.netAmountInCollectiveCurrency.description": "net amount added to your collective's balance",
+  "transaction.netAmountInCollectiveCurrency.description": "net amount for {collective}",
   "transaction.invoice": "invoice",
   "transaction.downloadPDF": "Download (pdf)",
   "transactions.all": "all",

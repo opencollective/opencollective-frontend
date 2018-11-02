@@ -76,7 +76,7 @@
   "transaction.paymentMethod": "méthode de paiement",
   "transaction.fxrate": "taux de change",
   "transaction.amountDetails": "détails du montant",
-  "transaction.netAmountInCollectiveCurrency.description": "net amount added to your collective's balance",
+  "transaction.netAmountInCollectiveCurrency.description": "montant net ajouté à {collective}",
   "transaction.invoice": "facture",
   "transaction.downloadPDF": "Télécharger (pdf)",
   "transactions.all": "tout",
