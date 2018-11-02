@@ -90,16 +90,6 @@ class Transaction extends React.Component {
             <div>
               <P fontSize="1.4rem" color="#313233" display="inline">
                 {description}
-                {type === 'DEBIT' && ' expense '}
-                {collective && (
-                  <Fragment>
-                    {' to '}{' '}
-                    <Link route={`/${collective.slug}`} title={collective.name}>
-                      {collective.name}
-                    </Link>
-                    .
-                  </Fragment>
-                )}
               </P>
               <Span fontSize="1.6rem">{type === 'CREDIT' && ' 🎉'}</Span>
             </div>
