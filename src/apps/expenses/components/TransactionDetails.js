@@ -18,7 +18,8 @@ class TransactionDetails extends React.Component {
     }),
     id: PropTypes.number.isRequired,
     amount: PropTypes.number.isRequired,
-    canEditCollective: PropTypes.bool,
+    canDownloadInvoice: PropTypes.bool,
+    canRefund: PropTypes.bool,
     currency: PropTypes.string.isRequired,
     attachment: PropTypes.string,
     uuid: PropTypes.number,
@@ -144,7 +145,8 @@ class TransactionDetails extends React.Component {
 
   render() {
     const {
-      canEditCollective,
+      canDownloadInvoice,
+      canRefund,
       collective,
       fromCollective,
       attachment,
@@ -266,7 +268,7 @@ class TransactionDetails extends React.Component {
           )}
 
         {type === 'DEBIT' &&
-          canEditCollective &&
+          canDownloadInvoice &&
           !isRefund && (
             <div className="col invoice">
               <label>
@@ -325,7 +327,7 @@ class TransactionDetails extends React.Component {
         </div>
 
         <div className="actions">
-          {canEditCollective && (
+          {canRefund && (
             <div className="transactionActions">
               <RefundTransactionBtn
                 id={id}
