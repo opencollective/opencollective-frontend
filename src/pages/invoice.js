@@ -380,7 +380,7 @@ class InvoicePage extends React.Component {
               box-sizing: border-box;
             }
             .header {
-              margin: 10px 0px;
+              margin: 10px 50px 0px 0px;
               overflow: hidden;
             }
 
@@ -390,13 +390,17 @@ class InvoicePage extends React.Component {
 
             h1 {
               margin: 10px 0px 5px;
-              line-height: 20px;
+              line-height: 50px;
               font-size: 2rem;
             }
 
             h2 {
               margin-bottom: 0;
               font-size: 1.6rem;
+            }
+
+            .collectiveInfo {
+              margin: 0px 50px 0px 0px;
             }
 
             .row {
