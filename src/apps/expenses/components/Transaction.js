@@ -5,7 +5,6 @@ import { FormattedMessage } from 'react-intl';
 
 import Avatar from '../../../components/Avatar';
 import Container from '../../../components/Container';
-import Link from '../../../components/Link';
 import Moment from '../../../components/Moment';
 import { P, Span } from '../../../components/Text';
 
