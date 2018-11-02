@@ -178,6 +178,13 @@ export const CollectivesStatsType = new GraphQLObjectType({
               MemberCollectiveId: collective.id,
               role: roles.HOST,
             },
+            include: [
+              {
+                model: models.Collective,
+                as: 'collective',
+                where: { type: types.COLLECTIVE },
+              },
+            ],
           });
         },
       },
@@ -1034,7 +1041,7 @@ const CollectiveFields = () => {
 
         return collective.getIncomingOrders({
           where,
-          order: [ ['createdAt', 'DESC'] ]
+          order: [['createdAt', 'DESC']],
         });
       },
     },
@@ -1177,7 +1184,9 @@ const CollectiveFields = () => {
       async resolve(collective, args, req) {
         if (!req.remoteUser || !req.remoteUser.isAdmin(collective.id))
           return [];
-        let paymentMethods = await req.loaders.paymentMethods.findByCollectiveId.load(collective.id);
+        let paymentMethods = await req.loaders.paymentMethods.findByCollectiveId.load(
+          collective.id,
+        );
         if (args.service) {
           paymentMethods = paymentMethods.filter(
             pm => pm.service === args.service,
@@ -1186,7 +1195,9 @@ const CollectiveFields = () => {
         if (args.hasBalanceAboveZero) {
           const filteredArray = [];
           for (const paymentMethod of paymentMethods) {
-            const balance = await paymentMethod.getBalanceForUser(req.remoteUser);
+            const balance = await paymentMethod.getBalanceForUser(
+              req.remoteUser,
+            );
             if (balance.amount > 0) {
               filteredArray.push(paymentMethod);
             }
