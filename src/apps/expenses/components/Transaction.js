@@ -58,6 +58,7 @@ class Transaction extends React.Component {
   render() {
     const {
       amount,
+      netAmountInCollectiveCurrency,
       description,
       createdAt,
       currency,
@@ -66,6 +67,10 @@ class Transaction extends React.Component {
       type,
       paymentProcessorFeeInHostCurrency,
     } = this.props;
+
+    const amountToDisplay = ['ORGANIZATION', 'USER'].includes(collective.type)
+      ? netAmountInCollectiveCurrency
+      : amount;
 
     return (
       <Flex my={4}>
@@ -97,7 +102,7 @@ class Transaction extends React.Component {
               </P>
               <Span fontSize="1.6rem">{type === 'CREDIT' && ' 🎉'}</Span>
             </div>
-            <AmountCurrency amount={amount} currency={currency} />
+            <AmountCurrency amount={amountToDisplay} currency={currency} />
           </Flex>
           <Container fontSize="1.2rem" color="#AEB2B8">
             <a href={`/${fromCollective.slug}`} title={fromCollective.name}>
