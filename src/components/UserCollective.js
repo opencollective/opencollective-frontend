@@ -424,6 +424,7 @@ class UserCollective extends React.Component {
                   <div className="cardsList">
                     <CollectivesWithData
                       HostCollectiveId={collective.id}
+                      type="COLLECTIVE"
                       orderBy="balance"
                       orderDirection="DESC"
                       limit={20}
