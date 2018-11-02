@@ -5,7 +5,6 @@ import { FormattedMessage } from 'react-intl';
 
 import Avatar from '../../../components/Avatar';
 import Container from '../../../components/Container';
-import Link from '../../../components/Link';
 import Moment from '../../../components/Moment';
 import { P, Span } from '../../../components/Text';
 
@@ -90,16 +89,6 @@ class Transaction extends React.Component {
             <div>
               <P fontSize="1.4rem" color="#313233" display="inline">
                 {description}
-                {type === 'DEBIT' && ' expense '}
-                {collective && (
-                  <Fragment>
-                    {' to '}{' '}
-                    <Link route={`/${collective.slug}`} title={collective.name}>
-                      {collective.name}
-                    </Link>
-                    .
-                  </Fragment>
-                )}
               </P>
               <Span fontSize="1.6rem">{type === 'CREDIT' && ' 🎉'}</Span>
             </div>
