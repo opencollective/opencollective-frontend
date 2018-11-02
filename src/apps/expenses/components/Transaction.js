@@ -16,7 +16,8 @@ class Transaction extends React.Component {
   static propTypes = {
     id: PropTypes.number.isRequired,
     amount: PropTypes.number.isRequired,
-    canEditCollective: PropTypes.bool, // LoggedInUser.canEditCollective(collective) || LoggedInUser.isRoot()
+    canDownloadInvoice: PropTypes.bool, // LoggedInUser.canEditCollective(collective) || LoggedInUser.isRoot()
+    canRefund: PropTypes.bool, // LoggedInUser.isRoot()
     createdAt: PropTypes.string.isRequired,
     description: PropTypes.string,
     currency: PropTypes.string.isRequired,
