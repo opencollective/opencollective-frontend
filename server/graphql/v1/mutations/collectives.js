@@ -9,7 +9,6 @@ import roles from '../../../constants/roles';
 import activities from '../../../constants/activities';
 import { defaultHostCollective } from '../../../lib/utils';
 import emailLib from '../../../lib/email';
-import { defaultTiers } from '../../../models/Collective';
 
 const debug = debugLib('claim');
 
@@ -412,7 +411,7 @@ export async function claimCollective(_, args, req) {
     });
   }
 
-  const collective = await models.Collective.findById(args.id);
+  let collective = await models.Collective.findById(args.id);
 
   if (!collective) {
     throw new errors.NotFound({
@@ -428,23 +427,23 @@ export async function claimCollective(_, args, req) {
     });
   }
 
-  // add opensource collective as host
-  collective.ParentCollectiveId = defaultHostCollective(
-    'opensource',
-  ).ParentCollectiveId;
-
-  // add default tiers
-  collective.tiers = defaultTiers(
-    defaultHostCollective('opensource').CollectiveId,
-    collective.currency,
-  );
-  await models.Tier.createMany(collective.tiers, {
-    CollectiveId: collective.id,
-    currency: collective.currency,
+  // add remoteUser as admin of collective
+  await collective.addUserWithRole(req.remoteUser, roles.ADMIN);
+  collective = await collective.update({
+    CreatedByUserId: req.remoteUser.id,
+    LastEditedByUserId: req.remoteUser.id,
   });
 
-  // set collective.isActive to true
-  collective.isActive = true;
+  // add opensource collective as host
+  // set collective as active
+  // create default tiers
+  const host = await models.Collective.findById(
+    defaultHostCollective('opensource').CollectiveId
+  );
+  collective = await collective.addHost(host, {
+    ...req.remoteUser.minimal,
+    isAdmin: () => true,
+  });
 
   // get pledges
   const pledges = await models.Order.findAll({
@@ -467,10 +466,6 @@ export async function claimCollective(_, args, req) {
     });
   });
   Promise.all(emails);
-
-  // add remoteUser as admin of collective
-  await collective.addUserWithRole(req.remoteUser, roles.ADMIN);
-  collective.CreatedByUserId = req.remoteUser.id;
 
   // return successful status, frontend should redirect to claimed collective page
   await collective.save();
