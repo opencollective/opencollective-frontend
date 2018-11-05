@@ -8,8 +8,8 @@ import {
   backgroundPosition,
   backgroundRepeat,
   backgroundSize,
-  bgColor,
   borders,
+  borderColor,
   borderRadius,
   bottom,
   boxShadow,
@@ -43,6 +43,7 @@ export const overflow = style({ prop: 'overflow' });
 export const pointerEvents = style({ prop: 'pointerEvents' });
 
 export const float = style({ prop: 'float' });
+export const clear = style({ prop: 'clear' });
 
 const Container = styled(tag)(
   [],
@@ -53,11 +54,12 @@ const Container = styled(tag)(
   backgroundPosition,
   backgroundRepeat,
   backgroundSize,
-  bgColor,
   borders,
+  borderColor,
   borderRadius,
   bottom,
   boxShadow,
+  clear,
   color,
   display,
   flex,
@@ -94,7 +96,7 @@ const Container = styled(tag)(
 );
 
 Container.defaultProps = {
-  blacklist: tag.defaultProps.blacklist.concat('float'),
+  blacklist: tag.defaultProps.blacklist.concat('float', 'clear'),
 };
 
 export default Container;

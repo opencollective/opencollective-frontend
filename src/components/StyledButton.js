@@ -12,14 +12,9 @@ import {
   maxWidth,
   space,
   textAlign,
-  variant,
   width,
 } from 'styled-system';
-
-const buttonStyle = variant({
-  key: 'buttons',
-  prop: 'buttonStyle',
-});
+import { buttonSize, buttonStyle } from '../constants/theme';
 
 const StyledButton = styled(tag.button)`
   appearance: none;
@@ -39,10 +34,12 @@ const StyledButton = styled(tag.button)`
   ${width}
 
   ${buttonStyle}
+  ${buttonSize}
 `;
 
 StyledButton.defaultProps = {
-  blacklist: tag.defaultProps.blacklist.concat('buttonStyle'),
+  blacklist: tag.defaultProps.blacklist.concat('buttonStyle', 'buttonSize'),
+  buttonSize: 'medium',
   buttonStyle: 'standard',
 };
 

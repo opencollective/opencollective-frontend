@@ -170,7 +170,7 @@ class TopBarProfileMenu extends React.Component {
 
     return (
       <Container
-        bg="white"
+        bg="white.full"
         border="1px solid rgba(18,19,20,0.12)"
         borderRadius="12px"
         boxShadow="0 4px 8px 0 rgba(61,82,102,0.08)"
@@ -202,14 +202,10 @@ class TopBarProfileMenu extends React.Component {
             <Container height="0.1rem" bg="#E6E6E6" width={1} minWidth={50} />
             <Link route="/create" passHref>
               <StyledLink
-                border="1px solid #D5DAE0"
-                borderRadius="20px"
-                px={2}
-                py={1}
-                color="#6E747A"
+                buttonStyle="standard"
+                buttonSize="small"
                 display="inline-block"
                 ml={2}
-                fontSize="1rem"
                 whiteSpace="nowrap"
               >
                 + New
@@ -276,14 +272,10 @@ class TopBarProfileMenu extends React.Component {
             <Container height="0.1rem" bg="#E6E6E6" width={1} minWidth={50} />
             <Link route="/organizations/new" passHref>
               <StyledLink
-                border="1px solid #D5DAE0"
-                borderRadius="20px"
-                px={2}
-                py={1}
-                color="#6E747A"
+                buttonStyle="standard"
+                buttonSize="small"
                 display="inline-block"
                 ml={2}
-                fontSize="1rem"
                 whiteSpace="nowrap"
               >
                 + New

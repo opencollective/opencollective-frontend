@@ -3,9 +3,19 @@ import PropTypes from 'prop-types';
 import { processMarkdown } from '../lib/markdown.lib';
 import SectionTitle from './SectionTitle';
 import { FormattedMessage } from 'react-intl';
-import showdown from 'showdown';
+import unified from 'unified';
+import remarkParse from 'remark-parse';
+import remarkRehype from 'remark-rehype';
+import rehypeSanitize from 'rehype-sanitize';
+import rehypeReact from 'rehype-react';
 
-const converter = new showdown.Converter();
+const converter = unified()
+  .use(remarkParse)
+  .use(remarkRehype)
+  .use(rehypeSanitize)
+  .use(rehypeReact, {
+    createElement: React.createElement,
+  });
 
 class LongDescription extends React.Component {
   static propTypes = {
@@ -64,12 +74,9 @@ class LongDescription extends React.Component {
               }
               subtitle={section.title ? '' : this.props.defaultSubtitle}
             />
-            <div
-              className="markdown"
-              dangerouslySetInnerHTML={{
-                __html: converter.makeHtml(section.markdown),
-              }}
-            />
+            <div className="markdown">
+              {converter.processSync(section.markdown).contents}
+            </div>
           </section>
         ))}
       </div>

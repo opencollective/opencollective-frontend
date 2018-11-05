@@ -177,7 +177,8 @@ class Transactions extends React.Component {
                 collective={collective}
                 {...transaction}
                 isRefund={Boolean(transaction.refundTransaction)}
-                canEditCollective={
+                canRefund={LoggedInUser && LoggedInUser.isRoot()}
+                canDownloadInvoice={
                   LoggedInUser &&
                   (LoggedInUser.canEditCollective(collective) ||
                     LoggedInUser.isRoot())
