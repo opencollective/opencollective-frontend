@@ -162,6 +162,7 @@ describe('graphql.cancelSubscriptions.test.js', () => {
           CollectiveId: collective.id,
           PaymentMethodId: paymentMethod.id,
           SubscriptionId: sub.id,
+          status: 'CANCELLED',
         }),
       );
 
