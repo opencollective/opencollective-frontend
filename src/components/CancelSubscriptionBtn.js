@@ -53,6 +53,7 @@ const cancelSubscriptionQuery = gql`
     cancelSubscription(id: $id) {
       id
       isSubscriptionActive
+      status
     }
   }
 `;
