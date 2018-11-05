@@ -85,15 +85,17 @@ export async function website(req, res) {
     redirectUrl = `${WEBSITE_URL}/${collectiveSlug}#support`;
   }
 
-  const parsedUrl = url.parse(redirectUrl);
-  const params = queryString.parse(parsedUrl.query);
-
-  params.utm_source = params.utm_source || 'opencollective';
-  params.utm_medium = params.utm_medium || 'github';
-  params.utm_campaign = params.utm_campaign || collectiveSlug;
-
-  parsedUrl.search = `?${queryString.stringify(params)}`;
-  redirectUrl = url.format(parsedUrl);
+  const parsedUrl = new url.URL(redirectUrl);
+  if (!parsedUrl.searchParams.has('utm_source')) {
+    parsedUrl.searchParams.set('utm_source', 'opencollective');
+  }
+  if (!parsedUrl.searchParams.has('utm_medium')) {
+    parsedUrl.searchParams.set('utm_medium', 'github');
+  }
+  if (!parsedUrl.searchParams.has('utm_campaign')) {
+    parsedUrl.searchParams.set('utm_campaign', collectiveSlug);
+  }
+  redirectUrl = parsedUrl.toString();
 
   res.redirect(301, redirectUrl);
 }
