@@ -5,7 +5,7 @@ import uuidv4 from 'uuid/v4';
 import debug from 'debug';
 import Promise from 'bluebird';
 
-import models from '../../../models';
+import models, { Op } from '../../../models';
 import { capitalize, pluralize } from '../../../lib/utils';
 import * as libPayments from '../../../lib/payments';
 import { types } from '../../../constants/collectives';
@@ -153,6 +153,22 @@ export async function createOrder(order, loaders, remoteUser) {
       if (!remoteUser) {
         throw new Error(
           'You need to be logged in to create an order for an existing open collective',
+        );
+      }
+
+      // if there are more than 5 transactions in the last hour, blocks new orders
+      const end = new Date();
+      const start = new Date();
+      start.setHours(start.getHours() - 1);
+      const where = {
+        FromCollectiveId: order.fromCollective.id,
+        createdAt: { [Op.between]: [start, end] },
+        type: 'CREDIT',
+      };
+      const lastHourTransactionsCount = await models.Transaction.count({ where });
+      if ( lastHourTransactionsCount >= 5 ) {
+        throw new Error(
+          'You\'ve reached your hourly limit of orders. Please wait one more hour and try again.',
         );
       }
 
