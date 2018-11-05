@@ -568,7 +568,7 @@ class CreatePledgePage extends React.Component {
             )}
 
             <Container
-              clear={slug ? 'both' : 'none'}
+              clear={(!LoggedInUser && slug) ? 'both' : 'none'}
               float={['none', null, 'right']}
               mt={5}
               px={[3, null, 5]}
