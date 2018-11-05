@@ -420,7 +420,7 @@ export function cancelSubscription(remoteUser, orderId) {
         return Promise.resolve();
       })
       .tap(order => {
-        if (!order.Subscription.isActive) {
+        if (!order.Subscription.isActive && order.status === status.CANCELLED) {
           throw new Error('Subscription already canceled');
         }
         return Promise.resolve();
