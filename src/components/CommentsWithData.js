@@ -8,6 +8,7 @@ import { graphql, compose } from 'react-apollo';
 import gql from 'graphql-tag';
 import { FormattedMessage } from 'react-intl';
 import { get } from 'lodash';
+import LoginBtn from './LoginBtn';
 
 class CommentsWithData extends React.Component {
   static propTypes = {
@@ -44,6 +45,38 @@ class CommentsWithData extends React.Component {
       );
     }
     return res;
+  }
+
+  renderUserAction(LoggedInUser, expense, notice) {
+    if (!LoggedInUser)
+      return (
+        <div>
+          <hr />
+          <LoginBtn>
+            <FormattedMessage
+              id="comment.login"
+              defaultMessage="Login to comment"
+            />
+          </LoginBtn>
+        </div>
+      );
+    else if (!LoggedInUser.canCreateCommentOnExpense(expense))
+      return (
+        <div>
+          <hr />
+          <FormattedMessage
+            id="comment.badPermissions"
+            defaultMessage="You don't have permission to comment on this expense."
+          />
+        </div>
+      );
+    return (
+      <CommentForm
+        onSubmit={this.createComment}
+        LoggedInUser={LoggedInUser}
+        notice={notice}
+      />
+    );
   }
 
   render() {
@@ -106,14 +139,7 @@ class CommentsWithData extends React.Component {
           LoggedInUser={LoggedInUser}
         />
 
-        {LoggedInUser &&
-          LoggedInUser.canCreateCommentOnExpense(expense) && (
-            <CommentForm
-              onSubmit={this.createComment}
-              LoggedInUser={LoggedInUser}
-              notice={notice}
-            />
-          )}
+        {this.renderUserAction(LoggedInUser, expense, notice)}
       </div>
     );
   }
