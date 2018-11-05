@@ -33,6 +33,19 @@ function getByKeyValue(model, key, value) {
   });
 }
 
+export function uuid(req, res, next, uuid) {
+  if (
+    uuid.match(
+      /^[A-F\d]{8}-[A-F\d]{4}-4[A-F\d]{3}-[89AB][A-F\d]{3}-[A-F\d]{12}$/i,
+    )
+  ) {
+    req.params.uuid = uuid;
+  } else {
+    req.params.uuid = null;
+  }
+  next();
+}
+
 /**
  * userid
  */

@@ -114,6 +114,7 @@ export default app => {
   /**
    * Parameters.
    */
+  app.param('uuid', params.uuid);
   app.param('userid', params.userid);
   app.param('collectiveid', params.collectiveid);
   app.param('transactionuuid', params.transactionuuid);
