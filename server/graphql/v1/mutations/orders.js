@@ -167,6 +167,7 @@ export async function createOrder(order, loaders, remoteUser) {
       };
       const lastHourTransactionsCount = await models.Transaction.count({ where });
       if ( lastHourTransactionsCount >= 5 ) {
+        debugOrder('Order blocks as there is already more than 5 orders recently', lastHourTransactionsCount);
         throw new Error(
           'You\'ve reached your hourly limit of orders. Please wait one more hour and try again.',
         );
