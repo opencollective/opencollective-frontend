@@ -6,6 +6,7 @@ import * as connectedAccounts from './controllers/connectedAccounts';
 import getDiscoverPage from './controllers/discover';
 import * as transactions from './controllers/transactions';
 import * as collectives from './controllers/collectives';
+import * as RestApi from './graphql/v1/restapi';
 import getHomePage from './controllers/homepage';
 import uploadImage from './controllers/images';
 import * as mw from './controllers/middlewares';
@@ -229,12 +230,6 @@ export default app => {
   */
   app.post('/v1/payment-methods', createPaymentMethod);
 
- /**
-  * Get transactions of a collective given its slug.
-  *
-  */
- app.get('/v1/collectives/:collectiveSlug/transactions', collectives.getCollectiveTransactions);
-
   /**
    * Collectives.
    */
@@ -294,6 +289,16 @@ export default app => {
   /**
    * Transactions (financial).
    */
+
+  // Get transactions of a collective given its slug.
+  app.get(
+    '/v1/collectives/:collectiveSlug/transactions',
+    RestApi.getLatestTransactions,
+  );
+  app.get(
+    '/v1/collectives/:collectiveSlug/transactions/:uuid',
+    RestApi.getTransaction,
+  );
   app.get('/transactions/:transactionuuid', transactions.getOne); // Get the transaction details
   app.get(
     '/groups/:collectiveid/transactions',
