@@ -44,7 +44,7 @@
     "lru-cache": "4.1.3",
     "markdown-loader": "4.0.0",
     "moment": "2.22.2",
-    "moment-timezone": "0.5.21",
+    "moment-timezone": "0.5.23",
     "newrelic": "4.10.0",
     "next": "7.0.2",
     "next-routes": "1.4.2",
