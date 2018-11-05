@@ -18,6 +18,9 @@ const createOrderQuery = gql`
         id
         slug
       }
+      transactions(type: "CREDIT") {
+        id
+      }
     }
   }
 `;
