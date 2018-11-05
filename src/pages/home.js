@@ -8,6 +8,7 @@ import { FormattedNumber } from 'react-intl';
 
 import { pickAvatar } from '../lib/collective.lib';
 import { getBaseApiUrl, imagePreview } from '../lib/utils';
+import { colors } from '../constants/theme';
 
 import { Link } from '../server/pages';
 
@@ -15,7 +16,7 @@ import Body from '../components/Body';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
 import HomepageActivityItem from '../components/HomepageActivityItem';
-import { Span, P, H1, H2, H3, H4 } from '../components/Text';
+import { Span, P, H1, H2, H3, H4, H5 } from '../components/Text';
 import ListItem from '../components/ListItem';
 import Hide from '../components/Hide';
 import Container from '../components/Container';
@@ -61,20 +62,25 @@ const carouselContent = [
 
 const responsiveAlign = ['center', null, 'left'];
 const sectionHeadingStyles = {
-  fontSize: [28, null, 48],
+  fontSize: ['H4', null, 'H2'],
+  lineHeight: ['H4', null, 'H2'],
   fontWeight: 800,
   px: [3, null, 4],
   textAlign: responsiveAlign,
 };
 const sectionSubHeadingStyles = {
   ...sectionHeadingStyles,
-  color: '#2E3033',
-  fontSize: [20, null, 28],
+  color: 'black.900',
+  fontSize: ['H5', null, 'H4'],
+  lineHeight: ['H5', null, 'H4'],
   fontWeight: 600,
   my: 3,
+  textAlign: responsiveAlign,
 };
 const sectionDetailStyles = {
-  color: '#2E3033',
+  color: 'black.900',
+  fontSize: 'LeadParagraph',
+  lineHeight: 'LeadParagraph',
   px: [3, null, 4],
   textAlign: responsiveAlign,
 };
@@ -90,15 +96,17 @@ const statsContainerStyles = {
   size: [148, null, 240],
 };
 const statsStyles = {
-  fontSize: [20, null, 36],
+  fontSize: ['H5', null, 'H3'],
+  lineHeight: ['H5', null, 'H3'],
   fontWeight: 'bold',
 };
 const socialButtonStyles = {
-  border: '1px solid #99C2FF',
+  border: '1px solid',
+  borderColor: 'primary.300',
   borderRadius: 50,
-  color: '#3385FF',
+  color: 'pimary.500',
   display: 'block',
-  fontSize: 14,
+  fontSize: 'Paragraph',
   maxWidth: 200,
   mb: 3,
   mx: ['auto', null, 3],
@@ -207,27 +215,29 @@ class HomePage extends React.Component {
             py="5rem"
           >
             <Container
+              alignItems="center"
               maxWidth={1200}
               display="flex"
               justifyContent="space-between"
               mx="auto"
             >
               <Container
-                width={[1, null, 0.5]}
+                width={[1, null, 0.6]}
                 pr={[0, null, 4]}
-                maxWidth={500}
               >
-                <H1 fontWeight="normal" textAlign="left">
+                <H1 fontSize={['H3', null, 'H1']} lineHeight={['H3', null, 'H1']} fontWeight="normal" textAlign="left" mb={4}>
                   A new form of association, <br />{' '}
                   <strong>transparent by design.</strong>
                 </H1>
 
-                <P my={3} color="#6E747A">
-                  The Internet generation needs organizations that reflect who
-                  we are; where anybody can contribute to a shared mission;
-                  where leaders can easily change; and where money flows in full
-                  transparency. Create an Open Collective for your community.
-                </P>
+                <Container maxWidth={500}>
+                  <P fontSize="LeadParagraph" lineHeight="LeadParagraph" my={3} color="black.700">
+                    The Internet generation needs organizations that reflect who
+                    we are; where anybody can contribute to a shared mission;
+                    where leaders can easily change; and where money flows in full
+                    transparency. Create an Open Collective for your community.
+                  </P>
+                </Container>
 
                 <Flex
                   alignItems="center"
@@ -236,14 +246,10 @@ class HomePage extends React.Component {
                 >
                   <StyledLink
                     href="#movement"
-                    bg="#3385FF"
-                    borderRadius="50px"
-                    color="white"
-                    fontSize="1.6rem"
-                    fontWeight="bold"
-                    maxWidth="220px"
-                    hover={{ color: 'white' }}
-                    py={3}
+                    buttonStyle="primary"
+                    buttonSize="large"
+                    fontWeight="500"
+                    maxWidth="270px"
                     textAlign="center"
                     width={1}
                   >
@@ -260,23 +266,13 @@ class HomePage extends React.Component {
                 </Flex>
               </Container>
 
-              <Hide xs sm width={0.5}>
-                <P
-                  textAlign="center"
-                  color="#C2C6CC"
-                  textTransform="uppercase"
-                  fontSize="1.2rem"
-                  letterSpacing="0.8px"
-                  mb={3}
-                >
-                  Latest Transactions
-                </P>
+              <Hide xs sm width={0.4}>
                 <Container maxHeight="50rem" overflow="scroll">
                   <Box is="ul" p={0}>
                     {filteredTransactions.map(transaction => (
                       <ListItem key={transaction.id} mb={1}>
                         <Container
-                          bg="white"
+                          bg="white.full"
                           border="1px solid rgba(0, 0, 0, 0.1)"
                           borderRadius="8px"
                           boxShadow="0 2px 4px 0 rgba(46,48,51,0.08);"
@@ -293,13 +289,13 @@ class HomePage extends React.Component {
           </Container>
 
           <Container maxWidth={1200} mx="auto" px={2}>
-            <H2 textAlign={['center', null, 'left']} pb={3}>
+            <H3 is="h2" textAlign={['center', null, 'left']} pb={3}>
               Active collectives
-            </H2>
+            </H3>
 
             <Container py={3}>
               <Flex mb={3} justifyContent="space-between" px={[1, null, 0]}>
-                <H3>Recently created</H3>
+                <H5 textAlign="left">Recently created</H5>
                 <StyledLink href="/discover">See all &gt;</StyledLink>
               </Flex>
               <Container
@@ -323,7 +319,7 @@ class HomePage extends React.Component {
 
             <Container py={3}>
               <Flex mb={3} justifyContent="space-between" px={[1, null, 0]}>
-                <H3>Most active</H3>
+                <H5 textAlign="left">Most active</H5>
                 <StyledLink href="/discover">See all &gt;</StyledLink>
               </Flex>
               <Container
@@ -347,41 +343,37 @@ class HomePage extends React.Component {
 
             <StyledLink
               href="/discover"
-              bg="white"
-              border="1px solid #D5DAE0"
-              borderRadius="50px"
-              color="#3385FF"
+              buttonStyle="standard"
+              buttonSize="large"
               display="block"
-              fontSize={['1.4rem', null, '1.6rem']}
-              fontWeight="bold"
-              hover={{ color: '#3385FF' }}
+              fontWeight="500"
+              maxWidth={330}
               mt={4}
               mx="auto"
-              py={[2, null, 3]}
               textAlign="center"
-              width={[250, null, 320]}
             >
               Discover more collectives
             </StyledLink>
           </Container>
 
-          <Container bg="#EBF1FA" py={5} mt={5} id="movement">
+          <Container bg="primary.200" py={5} mt={5} id="movement">
             <Container maxWidth={800} mx="auto">
-              <H2
+              <H1
                 textAlign="center"
                 fontWeight="900"
                 px={2}
-                lineHeight={['36px', null, '58px']}
-                fontSize={[H2.defaultProps.fontSize, null, 56]}
+                is="h2"
+                fontSize={['H2', null, 'H1']}
+                lineHeight={['H2', null, 'H1']}
               >
                 Join the movement for a world with more open, transparent, and
                 sustainable communities.
-              </H2>
+              </H1>
               <P
-                color="#6E747A"
+                color="black.700"
                 textAlign="center"
-                fontSize={[16, null, 20]}
-                lineHeight={['24px', null, '28px']}
+                fontSize="LeadParagraph"
+                lineHeight="LeadParagraph"
                 px={3}
                 my={[3, null, 4]}
               >
@@ -393,7 +385,7 @@ class HomePage extends React.Component {
             </Container>
 
             <Container
-              bg={['#3385FF', null, 'transparent']}
+              bg={['primary.500', null, 'transparent']}
               height={2}
               width={32}
               mx="auto"
@@ -408,12 +400,12 @@ class HomePage extends React.Component {
               alignItems="center"
             >
               <Container width={[1, null, 0.5]}>
-                <H3 {...sectionHeadingStyles}>Create an open collective</H3>
+                <H2 {...sectionHeadingStyles}>Create an open collective</H2>
 
-                <P {...sectionSubHeadingStyles}>
+                <H4 {...sectionSubHeadingStyles}>
                   A group of people with a shared mission that operates in full
                   transparency 👀
-                </P>
+                </H4>
 
                 <P {...sectionDetailStyles}>
                   Create an open collective for your group and leverage the
@@ -421,34 +413,28 @@ class HomePage extends React.Component {
                   <a href="/discover">Learn more.</a>
                 </P>
 
-                <Link route="/create" passHref>
-                  <StyledLink
-                    bg="#3385FF"
-                    borderRadius="50px"
-                    color="white"
-                    display="block"
-                    fontSize="1.6rem"
-                    fontWeight="bold"
-                    maxWidth="220px"
-                    mx={['auto', null, 4]}
-                    mt={4}
-                    mb={4}
-                    hover={{ color: 'white' }}
-                    py={3}
-                    textAlign="center"
-                    width={[250, null, 320]}
-                  >
-                    Create an open collective
-                  </StyledLink>
-                </Link>
+                <Flex mx={['auto', null, 4]} my={4} justifyContent={['center', null, 'flex-start']}>
+                  <Link route="/create" passHref>
+                    <StyledLink
+                      buttonStyle="primary"
+                      buttonSize="large"
+                      display="inline-block"
+                      fontWeight="500"
+                      textAlign="center"
+                    >
+                      Create an open collective
+                    </StyledLink>
+                  </Link>
+                </Flex>
               </Container>
+
               <Container width={[1, null, 0.5]}>
                 <Carousel content={carouselContent} />
               </Container>
             </Container>
 
             <Container
-              bg={['#3385FF', null, 'transparent']}
+              bg={['primary.500', null, 'transparent']}
               height={2}
               width={32}
               mx="auto"
@@ -462,18 +448,18 @@ class HomePage extends React.Component {
               mx="auto"
             >
               <Container width={[1, null, 0.5]}>
-                <H3 {...sectionHeadingStyles}>Become a sponsor</H3>
+                <H2 {...sectionHeadingStyles}>Become a sponsor</H2>
 
-                <P {...sectionSubHeadingStyles}>
+                <H4 {...sectionSubHeadingStyles}>
                   Great companies supporting great collectives with 💙
-                </P>
+                </H4>
 
                 <P {...sectionDetailStyles}>
                   Support collectives on behalf of your organization.{' '}
-                  <Span fontWeight="bold">
+                  <strong>
                     You&apos;ll get an invoice for every financial contribution
                     your company makes as well as a monthly report.
-                  </Span>
+                  </strong>
                 </P>
 
                 <P {...sectionDetailStyles} my={3}>
@@ -483,26 +469,19 @@ class HomePage extends React.Component {
                   we’ll gladly set them up and get them going.
                 </P>
 
-                <Link route="/organizations/new" passHref>
-                  <StyledLink
-                    bg="#3385FF"
-                    borderRadius="50px"
-                    color="white"
-                    display="block"
-                    fontSize="1.6rem"
-                    fontWeight="bold"
-                    maxWidth="220px"
-                    mx={['auto', null, 4]}
-                    mt={4}
-                    mb={4}
-                    hover={{ color: 'white' }}
-                    py={3}
-                    textAlign="center"
-                    width={[250, null, 320]}
-                  >
-                    Become a sponsor
-                  </StyledLink>
-                </Link>
+                <Flex mx={['auto', null, 4]} my={4} justifyContent={['center', null, 'flex-start']}>
+                    <Link route="marketing" params={{ pageSlug: 'become-a-sponsor' }} passHref>
+                    <StyledLink
+                      buttonStyle="primary"
+                      buttonSize="large"
+                      display="inline-block"
+                      fontWeight="bold"
+                      textAlign="center"
+                    >
+                      Become a sponsor
+                    </StyledLink>
+                  </Link>
+                </Flex>
               </Container>
               <Container
                 width={[1, null, 0.5]}
@@ -526,7 +505,7 @@ class HomePage extends React.Component {
             </Container>
 
             <Container
-              bg={['#3385FF', null, 'transparent']}
+              bg={['primary.500', null, 'transparent']}
               height={2}
               width={32}
               mx="auto"
@@ -540,37 +519,31 @@ class HomePage extends React.Component {
               mx="auto"
             >
               <Container width={[1, null, 0.5]} mb={4}>
-                <H3 {...sectionHeadingStyles}>Become a backer</H3>
+                <H2 {...sectionHeadingStyles}>Become a backer</H2>
 
-                <P {...sectionSubHeadingStyles}>
+                <H4 {...sectionSubHeadingStyles}>
                   For those who believe in giving back
-                </P>
+                </H4>
 
                 <P {...sectionDetailStyles}>
                   Join Open Collective and discover the different initiatives
                   that need your support. Embrace the mission that drives them
                   and contribute to their group effort.{' '}
-                  <Span fontWeight="bold">Become part of the movement.</Span>
+                  <strong>Become part of the movement.</strong>
                 </P>
 
-                <StyledLink
-                  bg="#3385FF"
-                  borderRadius="50px"
-                  color="white"
-                  display="block"
-                  href="/discover"
-                  fontSize="1.6rem"
-                  fontWeight="bold"
-                  maxWidth="220px"
-                  mx={['auto', null, 4]}
-                  mt={4}
-                  hover={{ color: 'white' }}
-                  py={3}
-                  textAlign="center"
-                  width={[250, null, 320]}
-                >
-                  Become a backer
-                </StyledLink>
+                <Flex mx={['auto', null, 4]} my={4} justifyContent={['center', null, 'flex-start']}>
+                  <StyledLink
+                    buttonStyle="primary"
+                    buttonSize="large"
+                    display="inline-block"
+                    href="/discover"
+                    fontWeight="bold"
+                    textAlign="center"
+                  >
+                    Become a backer
+                  </StyledLink>
+                </Flex>
               </Container>
               <Container
                 width={[1, null, 0.5]}
@@ -602,7 +575,7 @@ class HomePage extends React.Component {
                   pointerEvents="none"
                 >
                   <Container
-                    background="linear-gradient(to left, #EBF1FA, rgba(255, 255, 255, 0) 50%)"
+                    background={`linear-gradient(to left, ${colors.primary[200]}, rgba(255, 255, 255, 0) 50%)`}
                     width="100%"
                     height="100%"
                   />
@@ -611,7 +584,7 @@ class HomePage extends React.Component {
             </Container>
 
             <Container
-              bg={['#3385FF', null, 'transparent']}
+              bg={['primary.500', null, 'transparent']}
               height={2}
               width={32}
               mx="auto"
@@ -626,11 +599,11 @@ class HomePage extends React.Component {
               mx="auto"
             >
               <Container width={[1, null, 0.5]}>
-                <H3 {...sectionHeadingStyles}>Contribute code 👩🏻‍💻👨🏿‍💻</H3>
+                <H2 {...sectionHeadingStyles}>Contribute code 👩🏻‍💻👨🏿‍💻</H2>
 
-                <P {...sectionSubHeadingStyles}>
+                <H4 {...sectionSubHeadingStyles}>
                   Building Open Collective together to get further, faster 🚀
-                </P>
+                </H4>
 
                 <P {...sectionDetailStyles}>
                   Are you a developer who believes in supporting open and
@@ -653,7 +626,7 @@ class HomePage extends React.Component {
 
                 <StyledLink
                   {...sectionDetailStyles}
-                  color="#3385FF"
+                  color="primary.700"
                   display="inline-block"
                   my={4}
                   href="https://github.com/opencollective"
@@ -677,7 +650,7 @@ class HomePage extends React.Component {
             </Container>
 
             <Container
-              bg={['#3385FF', null, 'transparent']}
+              bg={['primary.500', null, 'transparent']}
               height={2}
               width={32}
               mx="auto"
@@ -692,15 +665,15 @@ class HomePage extends React.Component {
               alignItems="center"
             >
               <Container width={[1, null, 0.5]}>
-                <H3 {...sectionHeadingStyles}>Become a host</H3>
+                <H2 {...sectionHeadingStyles}>Become a host</H2>
 
-                <P {...sectionSubHeadingStyles}>
+                <H4 {...sectionSubHeadingStyles}>
                   Help provide the umbrella legal entities open collectives need
                   to raise funds ⚖️
-                </P>
+                </H4>
 
                 <P {...sectionDetailStyles}>
-                  <Span fontWeight="bold">Grow the movement</Span> by becoming a
+                  <strong>Grow the movement</strong> by becoming a
                   host of open collectives in your city or your industry. Hosts
                   are acting as fiscal sponsors. They collect the money on
                   behalf of the collectives and enable them to issue invoices.
@@ -709,24 +682,19 @@ class HomePage extends React.Component {
                   open collectives that they host can focus on their mission.
                 </P>
 
-                <Link route="/hosts" passHref>
-                  <StyledLink
-                    bg="#3385FF"
-                    borderRadius="50px"
-                    color="white"
-                    display="block"
-                    fontSize="1.6rem"
-                    fontWeight="bold"
-                    maxWidth="220px"
-                    mx={['auto', null, 4]}
-                    mt={4}
-                    py={3}
-                    textAlign="center"
-                    width={[250, null, 320]}
-                  >
-                    Become a host
-                  </StyledLink>
-                </Link>
+                <Flex mx={['auto', null, 4]} my={4} justifyContent={['center', null, 'flex-start']}>
+                  <Link route="/hosts" passHref>
+                    <StyledLink
+                      buttonStyle="primary"
+                      buttonSize="large"
+                      display="inline-block"
+                      fontWeight="500"
+                      textAlign="center"
+                    >
+                      Become a host
+                    </StyledLink>
+                  </Link>
+                </Flex>
               </Container>
               <Container
                 width={[1, null, 0.5]}
@@ -796,15 +764,16 @@ class HomePage extends React.Component {
             </Container>
 
             <Container mt={5} px={3}>
-              <H3 textAlign="center" fontSize={[28, null, 48]} pb={4}>
+              <H3 textAlign="center" fontSize={['H4', null, 'H2']} lineHeight={['H4', null, 'H2']} pb={4}>
                 Spread the word!
               </H3>
 
               <Container maxWidth={600} mx="auto">
                 <P
                   textAlign="center"
-                  fontSize={[14, null, 16]}
-                  color="#494D52"
+                  fontSize={['Paragraph', null, 'LeadParagraph']}
+                  lineHeight={['Paragraph', null, 'LeadParagraph']}
+                  color="black.700"
                   mb={4}
                 >
                   Do you know people or organizations that will benefit from an
@@ -826,7 +795,7 @@ class HomePage extends React.Component {
                     alignItems="center"
                     justifyContent="space-evenly"
                   >
-                    <TwitterIcon size={18} fill="#3385FF" />
+                    <TwitterIcon size={18} fill={colors.primary[500]} />
                     <Span>Share on Twitter</Span>
                   </Container>
                 </StyledLink>
@@ -840,7 +809,7 @@ class HomePage extends React.Component {
                     alignItems="center"
                     justifyContent="space-evenly"
                   >
-                    <FacebookIcon size={18} fill="#3385FF" />
+                    <FacebookIcon size={18} fill={colors.primary[500]} />
                     <Span>Share on Facebook</Span>
                   </Container>
                 </StyledLink>
@@ -854,7 +823,7 @@ class HomePage extends React.Component {
                     alignItems="center"
                     justifyContent="space-evenly"
                   >
-                    <LinkedInIcon size={18} fill="#3385FF" />
+                    <LinkedInIcon size={18} fill={colors.primary[500]} />
                     <Span>Share on LinkedIn</Span>
                   </Container>
                 </StyledLink>
@@ -868,7 +837,7 @@ class HomePage extends React.Component {
             py={6}
           >
             <Container
-              background="#EBF1FA"
+              bg="primary.200"
               height="15rem"
               position="absolute"
               style={{ clipPath: 'ellipse(58% 48% at 50% 52%)' }}
@@ -884,7 +853,7 @@ class HomePage extends React.Component {
               mx="auto"
             >
               <Container maxWidth={550} px={[3, null, 0]}>
-                <P color="rgba(255, 255, 255, 0.5)" fontSize="1.6rem" mb={4}>
+                <P color="white.transparent.48" fontSize="LeadParagraph" mb={4}>
                   Introducing
                 </P>
 
@@ -895,17 +864,17 @@ class HomePage extends React.Component {
                   />
                 </Box>
 
-                <H4 color="white" fontSize="2.4rem" mb={4}>
+                <H4 color="white.full" mb={4}>
                   Discover the Open Source projects your organization is using
                   that need financial support.
                 </H4>
 
-                <P color="white" fontSize="1.6rem">
+                <P color="white.full" fontSize="LeadParagraph" lineHeight="24px">
                   BackYourStack is a community project initiated by Open
                   Collective.
                   <StyledLink
                     href="https://backyourstack.com/contributing"
-                    color="white"
+                    color="white.full"
                     px={2}
                     textDecoration="underline"
                   >
@@ -915,18 +884,16 @@ class HomePage extends React.Component {
 
                 <StyledLink
                   href="https://backyourstack.com/"
-                  bg="#FFF"
+                  bg="white.full"
                   borderRadius="50px"
                   color="#3C40AE"
                   display="block"
-                  fontSize="1.6rem"
                   fontWeight="bold"
-                  maxWidth="220px"
+                  maxWidth={300}
                   mx={['auto', null, 0]}
                   mt={4}
-                  py={3}
                   textAlign="center"
-                  width={[250, null, 320]}
+                  buttonSize="large"
                 >
                   Go to Back Your Stack
                 </StyledLink>

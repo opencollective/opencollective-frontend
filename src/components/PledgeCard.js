@@ -21,7 +21,8 @@ const PledgeCard = ({
   <Container
     bg="white"
     borderRadius="8px"
-    border="1px solid rgba(18,19,20,0.2)"
+    border="1px solid"
+    borderColor="black.transparent.20"
     minHeight="100%"
   >
     <Container
@@ -30,7 +31,7 @@ const PledgeCard = ({
       alignItems="center"
       pt={4}
     >
-      <Container bg="#E8E9EB" height="1px" width={0.25} />
+      <Container bg="black.200" height="1px" width={0.25} />
 
       <Link route="collective" params={{ slug: fromCollective.slug }} passHref>
         <a>
@@ -53,19 +54,19 @@ const PledgeCard = ({
         </a>
       </Link>
 
-      <Container bg="#E8E9EB" height="1px" width={0.25} />
+      <Container bg="black.200" height="1px" width={0.25} />
     </Container>
 
-    <P fontSize="1.4rem" textAlign="center" fontWeight="bold" mt={3} px={2}>
+    <P textAlign="center" fontWeight="bold" mt={3} px={2}>
       <Link route="collective" params={{ slug: fromCollective.slug }} passHref>
-        <StyledLink color="#2E3033">{fromCollective.name}</StyledLink>
+        <StyledLink color="black.800">{fromCollective.name}</StyledLink>
       </Link>
     </P>
 
-    <P fontSize="1rem" textAlign="center" mt={2} px={2} pb={2}>
+    <P fontSize="Tiny" textAlign="center" mt={2} px={2} pb={2}>
       Has pledged:
       <br />
-      <Span fontSize="1.2rem">
+      <Span fontSize="Caption">
         <Currency
           fontWeight="bold"
           value={totalAmount}
@@ -84,7 +85,7 @@ const PledgeCard = ({
       </Span>
     </P>
 
-    <P color="#76777A" fontSize="1rem" textAlign="center" mt={1} px={3} pb={4}>
+    <P color="black.600" fontSize="Tiny" textAlign="center" mt={1} px={3} pb={4}>
       {publicMessage}
     </P>
   </Container>

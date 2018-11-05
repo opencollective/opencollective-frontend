@@ -11,18 +11,13 @@ import {
   fontWeight,
   maxWidth,
   minWidth,
-  variant,
   space,
   textAlign,
   width,
 } from 'styled-system';
 import tag from 'clean-tag';
 import { overflow } from './Container';
-
-const buttonStyle = variant({
-  key: 'buttons',
-  prop: 'buttonStyle',
-});
+import { buttonSize, buttonStyle } from '../constants/theme';
 
 const StyledInput = styled(tag.input)(
   [],
@@ -44,7 +39,7 @@ const StyledInput = styled(tag.input)(
 );
 
 StyledInput.defaultProps = {
-  blacklist: tag.defaultProps.blacklist.concat('buttonStyle'),
+  blacklist: tag.defaultProps.blacklist.concat('buttonStyle', 'buttonSize'),
   border: 'none',
 };
 
@@ -61,14 +56,13 @@ TextInput.defaultProps = {
 
 export const SubmitInput = styled(StyledInput)`
   ${buttonStyle};
+  ${buttonSize};
 `;
 
 SubmitInput.defaultProps = {
   buttonStyle: 'primary',
-  fontSize: 14,
+  buttonSize: 'large',
   fontWeight: 'bold',
-  px: 5,
-  py: 3,
   type: 'submit',
 };
 

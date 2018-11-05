@@ -5,7 +5,6 @@ import { FormattedMessage } from 'react-intl';
 
 import Avatar from '../../../components/Avatar';
 import Container from '../../../components/Container';
-import Link from '../../../components/Link';
 import Moment from '../../../components/Moment';
 import { P, Span } from '../../../components/Text';
 
@@ -16,7 +15,8 @@ class Transaction extends React.Component {
   static propTypes = {
     id: PropTypes.number.isRequired,
     amount: PropTypes.number.isRequired,
-    canEditCollective: PropTypes.bool, // LoggedInUser.canEditCollective(collective) || LoggedInUser.isRoot()
+    canDownloadInvoice: PropTypes.bool, // LoggedInUser.canEditCollective(collective) || LoggedInUser.isRoot()
+    canRefund: PropTypes.bool, // LoggedInUser.isRoot()
     createdAt: PropTypes.string.isRequired,
     description: PropTypes.string,
     currency: PropTypes.string.isRequired,
@@ -58,6 +58,7 @@ class Transaction extends React.Component {
   render() {
     const {
       amount,
+      netAmountInCollectiveCurrency,
       description,
       createdAt,
       currency,
@@ -66,6 +67,10 @@ class Transaction extends React.Component {
       type,
       paymentProcessorFeeInHostCurrency,
     } = this.props;
+
+    const amountToDisplay = ['ORGANIZATION', 'USER'].includes(collective.type)
+      ? netAmountInCollectiveCurrency
+      : amount;
 
     return (
       <Flex my={4}>
@@ -84,20 +89,10 @@ class Transaction extends React.Component {
             <div>
               <P fontSize="1.4rem" color="#313233" display="inline">
                 {description}
-                {type === 'DEBIT' && ' expense '}
-                {collective && (
-                  <Fragment>
-                    {' to '}{' '}
-                    <Link route={`/${collective.slug}`} title={collective.name}>
-                      {collective.name}
-                    </Link>
-                    .
-                  </Fragment>
-                )}
               </P>
               <Span fontSize="1.6rem">{type === 'CREDIT' && ' 🎉'}</Span>
             </div>
-            <AmountCurrency amount={amount} currency={currency} />
+            <AmountCurrency amount={amountToDisplay} currency={currency} />
           </Flex>
           <Container fontSize="1.2rem" color="#AEB2B8">
             <a href={`/${fromCollective.slug}`} title={fromCollective.name}>

@@ -3,10 +3,10 @@
 exports[`Search Page renders "Make pledge" button with empty results 1`] = `
 .c1 {
   box-sizing: border-box;
-  margin-left: 16px;
-  margin-right: 16px;
-  margin-top: 8px;
-  margin-bottom: 8px;
+  padding-left: 16px;
+  padding-right: 16px;
+  padding-top: 16px;
+  padding-bottom: 16px;
 }
 
 .c2 {
@@ -252,6 +252,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   display: inline-block;
   font-size: 1.2rem;
   font-weight: bold;
+  line-height: Paragraph;
   -webkit-letter-spacing: 1px;
   -moz-letter-spacing: 1px;
   -ms-letter-spacing: 1px;
@@ -265,6 +266,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
 .c35 {
   color: #6E747A;
   font-size: 1.4rem;
+  line-height: Paragraph;
   -webkit-letter-spacing: -0.2px;
   -moz-letter-spacing: -0.2px;
   -ms-letter-spacing: -0.2px;
@@ -278,6 +280,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
 .c41 {
   color: #C2C6CC;
   font-size: 1.2rem;
+  line-height: Paragraph;
   -webkit-letter-spacing: 1px;
   -moz-letter-spacing: 1px;
   -ms-letter-spacing: 1px;
@@ -288,7 +291,6 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
 }
 
 .c30 {
-  background-color: white;
   border-top: 1px solid #aaaaaa;
   bottom: 0px;
   background-color: white;
@@ -363,7 +365,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
 
 .c29 {
   display: block;
-  font-size: 14px;
+  font-size: Paragraph;
   font-weight: bold;
   max-width: 220px;
   padding-left: 32px;
@@ -830,7 +832,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
           </p>
           <a
             className="c29"
-            href="/pledges/new?name=test"
+            href="createPledge"
             onClick={[Function]}
           >
             Make a pledge
@@ -1159,7 +1161,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
             >
               <a
                 className="c44 "
-                href="/organizations/new"
+                href="/become-a-sponsor"
                 onClick={[Function]}
               >
                 Become a Sponsor
@@ -1323,10 +1325,10 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
 exports[`Search Page renders empty results message 1`] = `
 .c1 {
   box-sizing: border-box;
-  margin-left: 16px;
-  margin-right: 16px;
-  margin-top: 8px;
-  margin-bottom: 8px;
+  padding-left: 16px;
+  padding-right: 16px;
+  padding-top: 16px;
+  padding-bottom: 16px;
 }
 
 .c2 {
@@ -1572,6 +1574,7 @@ exports[`Search Page renders empty results message 1`] = `
   display: inline-block;
   font-size: 1.2rem;
   font-weight: bold;
+  line-height: Paragraph;
   -webkit-letter-spacing: 1px;
   -moz-letter-spacing: 1px;
   -ms-letter-spacing: 1px;
@@ -1585,6 +1588,7 @@ exports[`Search Page renders empty results message 1`] = `
 .c34 {
   color: #6E747A;
   font-size: 1.4rem;
+  line-height: Paragraph;
   -webkit-letter-spacing: -0.2px;
   -moz-letter-spacing: -0.2px;
   -ms-letter-spacing: -0.2px;
@@ -1598,6 +1602,7 @@ exports[`Search Page renders empty results message 1`] = `
 .c40 {
   color: #C2C6CC;
   font-size: 1.2rem;
+  line-height: Paragraph;
   -webkit-letter-spacing: 1px;
   -moz-letter-spacing: 1px;
   -ms-letter-spacing: 1px;
@@ -1608,7 +1613,6 @@ exports[`Search Page renders empty results message 1`] = `
 }
 
 .c29 {
-  background-color: white;
   border-top: 1px solid #aaaaaa;
   bottom: 0px;
   background-color: white;
@@ -2460,7 +2464,7 @@ exports[`Search Page renders empty results message 1`] = `
             >
               <a
                 className="c43 "
-                href="/organizations/new"
+                href="/become-a-sponsor"
                 onClick={[Function]}
               >
                 Become a Sponsor
@@ -2622,14 +2626,6 @@ exports[`Search Page renders empty results message 1`] = `
 `;
 
 exports[`Search Page renders error message 1`] = `
-.c1 {
-  box-sizing: border-box;
-  margin-left: 16px;
-  margin-right: 16px;
-  margin-top: 8px;
-  margin-bottom: 8px;
-}
-
 .c2 {
   box-sizing: border-box;
 }
@@ -2694,6 +2690,14 @@ exports[`Search Page renders error message 1`] = `
   box-sizing: border-box;
   width: 50%;
   margin-bottom: 16px;
+}
+
+.c1 {
+  box-sizing: border-box;
+  padding-left: 16px;
+  padding-right: 16px;
+  padding-top: 8px;
+  padding-bottom: 8px;
 }
 
 .c10 {
@@ -2856,6 +2860,7 @@ exports[`Search Page renders error message 1`] = `
 .c33 {
   color: #6E747A;
   font-size: 1.4rem;
+  line-height: Paragraph;
   -webkit-letter-spacing: -0.2px;
   -moz-letter-spacing: -0.2px;
   -ms-letter-spacing: -0.2px;
@@ -2869,6 +2874,7 @@ exports[`Search Page renders error message 1`] = `
 .c39 {
   color: #C2C6CC;
   font-size: 1.2rem;
+  line-height: Paragraph;
   -webkit-letter-spacing: 1px;
   -moz-letter-spacing: 1px;
   -ms-letter-spacing: 1px;
@@ -2879,7 +2885,6 @@ exports[`Search Page renders error message 1`] = `
 }
 
 .c28 {
-  background-color: white;
   border-top: 1px solid #aaaaaa;
   bottom: 0px;
   background-color: white;
@@ -2947,6 +2952,9 @@ exports[`Search Page renders error message 1`] = `
 }
 
 .c14.c14 {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
   background-color: transparent;
   border: none;
   font-size: 1.2rem;
@@ -3681,7 +3689,7 @@ exports[`Search Page renders error message 1`] = `
             >
               <a
                 className="c42 "
-                href="/organizations/new"
+                href="/become-a-sponsor"
                 onClick={[Function]}
               >
                 Become a Sponsor
@@ -3845,10 +3853,10 @@ exports[`Search Page renders error message 1`] = `
 exports[`Search Page renders loading grid SVG 1`] = `
 .c1 {
   box-sizing: border-box;
-  margin-left: 16px;
-  margin-right: 16px;
-  margin-top: 8px;
-  margin-bottom: 8px;
+  padding-left: 16px;
+  padding-right: 16px;
+  padding-top: 16px;
+  padding-bottom: 16px;
 }
 
 .c2 {
@@ -4087,6 +4095,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
   display: inline-block;
   font-size: 1.2rem;
   font-weight: bold;
+  line-height: Paragraph;
   -webkit-letter-spacing: 1px;
   -moz-letter-spacing: 1px;
   -ms-letter-spacing: 1px;
@@ -4100,6 +4109,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
 .c34 {
   color: #6E747A;
   font-size: 1.4rem;
+  line-height: Paragraph;
   -webkit-letter-spacing: -0.2px;
   -moz-letter-spacing: -0.2px;
   -ms-letter-spacing: -0.2px;
@@ -4113,6 +4123,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
 .c40 {
   color: #C2C6CC;
   font-size: 1.2rem;
+  line-height: Paragraph;
   -webkit-letter-spacing: 1px;
   -moz-letter-spacing: 1px;
   -ms-letter-spacing: 1px;
@@ -4123,7 +4134,6 @@ exports[`Search Page renders loading grid SVG 1`] = `
 }
 
 .c29 {
-  background-color: white;
   border-top: 1px solid #aaaaaa;
   bottom: 0px;
   background-color: white;
@@ -5103,7 +5113,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
             >
               <a
                 className="c43 "
-                href="/organizations/new"
+                href="/become-a-sponsor"
                 onClick={[Function]}
               >
                 Become a Sponsor
@@ -5267,10 +5277,10 @@ exports[`Search Page renders loading grid SVG 1`] = `
 exports[`Search Page renders search results with pagination 1`] = `
 .c1 {
   box-sizing: border-box;
-  margin-left: 16px;
-  margin-right: 16px;
-  margin-top: 8px;
-  margin-bottom: 8px;
+  padding-left: 16px;
+  padding-right: 16px;
+  padding-top: 16px;
+  padding-bottom: 16px;
 }
 
 .c2 {
@@ -5535,6 +5545,7 @@ exports[`Search Page renders search results with pagination 1`] = `
   display: inline-block;
   font-size: 1.2rem;
   font-weight: bold;
+  line-height: Paragraph;
   -webkit-letter-spacing: 1px;
   -moz-letter-spacing: 1px;
   -ms-letter-spacing: 1px;
@@ -5548,6 +5559,7 @@ exports[`Search Page renders search results with pagination 1`] = `
 .c36 {
   color: #6E747A;
   font-size: 1.4rem;
+  line-height: Paragraph;
   -webkit-letter-spacing: -0.2px;
   -moz-letter-spacing: -0.2px;
   -ms-letter-spacing: -0.2px;
@@ -5561,6 +5573,7 @@ exports[`Search Page renders search results with pagination 1`] = `
 .c42 {
   color: #C2C6CC;
   font-size: 1.2rem;
+  line-height: Paragraph;
   -webkit-letter-spacing: 1px;
   -moz-letter-spacing: 1px;
   -ms-letter-spacing: 1px;
@@ -5571,7 +5584,6 @@ exports[`Search Page renders search results with pagination 1`] = `
 }
 
 .c31 {
-  background-color: white;
   border-top: 1px solid #aaaaaa;
   bottom: 0px;
   background-color: white;
@@ -6537,7 +6549,7 @@ exports[`Search Page renders search results with pagination 1`] = `
             >
               <a
                 className="c45 "
-                href="/organizations/new"
+                href="/become-a-sponsor"
                 onClick={[Function]}
               >
                 Become a Sponsor

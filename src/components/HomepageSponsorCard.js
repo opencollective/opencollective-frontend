@@ -19,9 +19,10 @@ const SponsorCard = ({
   type,
 }) => (
   <Container
-    bg="white"
+    bg="white.full"
     borderRadius="8px"
-    border="1px solid rgba(18,19,20,0.2)"
+    border="1px solid"
+    borderColor="black.transparent.20"
     minHeight="100%"
   >
     <Container
@@ -30,9 +31,9 @@ const SponsorCard = ({
       alignItems="center"
       pt={3}
     >
-      <Container bg="#E8E9EB" height="1px" width={0.25} />
+      <Container bg="black.200" height="1px" width={0.25} />
 
-      <Link route={`/${slug}`} passHref>
+      <Link route="collective" params={{ slug }} passHref>
         <a>
           <Container
             backgroundImage={`url(${imagePreview(image, defaultImage[type], {
@@ -49,16 +50,16 @@ const SponsorCard = ({
         </a>
       </Link>
 
-      <Container bg="#E8E9EB" height="1px" width={0.25} />
+      <Container bg="black.200" height="1px" width={0.25} />
     </Container>
 
-    <P fontSize="1.4rem" textAlign="center" fontWeight="bold" mt={3} px={2}>
-      <Link route={`/${slug}`} passHref>
-        <StyledLink color="#2E3033">{name}</StyledLink>
+    <P textAlign="center" fontWeight="bold" mt={3} px={2}>
+      <Link route="collective" params={{ slug }} passHref>
+        <StyledLink color="black.800">{name}</StyledLink>
       </Link>
     </P>
 
-    <P fontSize="1.4rem" textAlign="center" mt={2} px={2} pb={3}>
+    <P textAlign="center" mt={2} px={2} pb={3}>
       Total donated:{' '}
       <Currency
         fontWeight="bold"
