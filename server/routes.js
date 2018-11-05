@@ -11,7 +11,10 @@ import getHomePage from './controllers/homepage';
 import uploadImage from './controllers/images';
 import * as mw from './controllers/middlewares';
 import * as notifications from './controllers/notifications';
-import { getPaymentMethods, createPaymentMethod } from './controllers/paymentMethods';
+import {
+  getPaymentMethods,
+  createPaymentMethod,
+} from './controllers/paymentMethods';
 import * as test from './controllers/test';
 import * as users from './controllers/users';
 import * as applications from './controllers/applications';
@@ -224,10 +227,10 @@ export default app => {
   app.delete('/users/:userid/payment-methods/:paymentMethodid', NotImplemented); // Delete a user's paymentMethod.
 
   /**
-  * Create a payment method.
-  *
-  *  Let's assume for now a paymentMethod is linked to a user.
-  */
+   * Create a payment method.
+   *
+   *  Let's assume for now a paymentMethod is linked to a user.
+   */
   app.post('/v1/payment-methods', createPaymentMethod);
 
   /**
