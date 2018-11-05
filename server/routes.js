@@ -302,7 +302,11 @@ export default app => {
     '/v1/collectives/:collectiveSlug/transactions/:uuid',
     RestApi.getTransaction,
   );
+
+  // xdamman: Is this route still being used anywhere? If not, we should deprecate this
   app.get('/transactions/:transactionuuid', transactions.getOne); // Get the transaction details
+
+  // xdamman: Is this route still being used anywhere? If not, we should deprecate this
   app.get(
     '/groups/:collectiveid/transactions',
     mw.paginate(),
