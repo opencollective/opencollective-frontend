@@ -66,8 +66,8 @@ class TopBar extends React.Component {
 
     return (
       <Flex
-        mx={3}
-        my={2}
+        px={3}
+        py={showSearch ? 2 : 3}
         alignItems="center"
         flexDirection="row"
         justifyContent="space-around"

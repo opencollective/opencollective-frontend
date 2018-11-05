@@ -41,8 +41,9 @@ const nextConfig = {
     });
 
     // Inspired by https://github.com/rohanray/next-fonts
+    // Load Bootstrap and Font-Awesome fonts
     config.module.rules.push({
-      test: /\.(woff|woff2|eot|ttf|otf|svg)$/,
+      test: /fonts\/.*\.(woff|woff2|eot|ttf|otf|svg)$/,
       use: [
         {
           loader: 'url-loader',
@@ -56,6 +57,33 @@ const nextConfig = {
         },
       ],
     });
+
+    // Configuration for static/marketing pages
+    config.module.rules.unshift(
+      {
+        test: /static\/.*\.(html)$/,
+        use: {
+          loader: 'html-loader',
+        },
+      },
+      {
+        test: /static\/.*\.(css)$/,
+        use: {
+          loader: 'raw-loader',
+        },
+      },
+      {
+        test: /static\/.*\.(jpg|gif|png|svg)$/,
+        use: {
+          loader: 'file-loader',
+          options: {
+            publicPath: '/_next/static/img/',
+            outputPath: 'static/img/',
+            name: '[name]-[hash].[ext]',
+          },
+        },
+      },
+    );
 
     // Disable the rule forcing react to be bundled in commons chunk
     // Currently needed to skip the react-dom shipped by react-tag-input

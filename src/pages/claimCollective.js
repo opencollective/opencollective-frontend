@@ -8,11 +8,12 @@ import withIntl from '../lib/withIntl';
 import withLoggedInUser from '../lib/withLoggedInUser';
 import { getBaseApiUrl } from '../lib/utils';
 import { Router, Link } from '../server/pages';
+import { colors } from '../constants/theme';
 
 import Header from '../components/Header';
 import Body from '../components/Body';
 import Footer from '../components/Footer';
-import { H1, H2, P } from '../components/Text';
+import { H2, H5, P } from '../components/Text';
 import { Flex } from 'grid-styled';
 import Container from '../components/Container';
 import ErrorPage from '../components/ErrorPage';
@@ -133,12 +134,12 @@ class ClaimCollectivePage extends React.Component {
               py={4}
             >
               <img src={defaultPledgedLogo} alt="Pledged Collective" />
-              <H1>{name}</H1>
+              <H2 is="h1">{name}</H2>
 
               <Container
-                bg="white"
+                bg="white.full"
                 border={`1px solid ${
-                  invalid ? '#FF99AA' : 'rgba(19, 20, 20, 0.08)'
+                  invalid ? colors.red[300] : colors.black.transparent[8]
                 }`}
                 borderRadius="16px"
                 display="flex"
@@ -156,14 +157,13 @@ class ClaimCollectivePage extends React.Component {
                 {!token &&
                   repos.length === 0 && (
                     <Fragment>
-                      <H2 fontSize="2rem" fontWeight="medium" mb={4}>
+                      <H5 textAlign="left" fontWeight="medium" mb={4}>
                         To claim this collective you first need to authenticate
                         with your GitHub account.
-                      </H2>
+                      </H5>
 
                       <P
-                        fontSize="1.6rem"
-                        fontWeight="bold"
+                        fontSize="LeadParagraph"
                         textAlign="left"
                         mb={2}
                       >
@@ -171,14 +171,13 @@ class ClaimCollectivePage extends React.Component {
                       </P>
 
                       <P
-                        fontSize="1.2rem"
+                        fontSize="Caption"
                       >
                         We need to validate that you have owner rights to the repository linked to this pledged collective.
                       </P>
 
                       <P
-                        fontSize="1.6rem"
-                        fontWeight="bold"
+                        fontSize="LeadParagraph"
                         textAlign="left"
                         mb={2}
                         mt={3}
@@ -187,21 +186,19 @@ class ClaimCollectivePage extends React.Component {
                       </P>
 
                       <P
-                        fontSize="1.2rem"
+                        fontSize="Caption"
                       >
                         Make sure to Grant access in the GitHub permission page.
                       </P>
 
                       <StyledLink
                         buttonStyle="standard"
+                        buttonSize="medium"
                         href={connectUrl}
-                        fontSize="1.4rem"
                         fontWeight="medium"
                         maxWidth="220px"
                         mt={4}
                         mx="auto"
-                        py={3}
-                        px={4}
                         width={1}
                       >
                         <Flex
@@ -209,7 +206,7 @@ class ClaimCollectivePage extends React.Component {
                           alignItems="center"
                           justifyContent="space-evenly"
                         >
-                          <GithubIcon size={15} fill="#9399A3" />
+                          <GithubIcon size={15} fill={colors.black[500]} />
                           Authenticate
                         </Flex>
                       </StyledLink>
@@ -219,6 +216,7 @@ class ClaimCollectivePage extends React.Component {
                   <Fragment>
                     <Flex justifyContent="center" mb={4}>
                       <svg
+                        id="error"
                         width="66"
                         height="66"
                         viewBox="0 0 66 66"
@@ -230,7 +228,7 @@ class ClaimCollectivePage extends React.Component {
                           cy="33"
                           r="32.5"
                           fill="white"
-                          stroke="#FF99AA"
+                          stroke={colors.red[300]}
                         />
                         <path
                           fillRule="evenodd"
@@ -241,18 +239,16 @@ class ClaimCollectivePage extends React.Component {
                       </svg>
                     </Flex>
 
-                    <H2
-                      fontSize="2rem"
+                    <H5
                       fontWeight="medium"
                       mb={4}
                       textAlign="center"
                     >
                       Validation unsuccessful
-                    </H2>
+                    </H5>
                     <P
-                      fontSize="1.4rem"
                       textAlign="center"
-                      color="#76777A"
+                      color="black.600"
                       mb={4}
                     >
                       Sorry, we were unable to succesfully validated your admin
@@ -262,13 +258,11 @@ class ClaimCollectivePage extends React.Component {
                     </P>
                     <StyledLink
                       buttonStyle="standard"
+                      buttonSize="medium"
                       href={connectUrl}
-                      fontSize="1.4rem"
                       fontWeight="medium"
                       maxWidth="220px"
                       mx="auto"
-                      py={3}
-                      px={4}
                       width={1}
                     >
                       <Flex
@@ -276,7 +270,7 @@ class ClaimCollectivePage extends React.Component {
                         alignItems="center"
                         justifyContent="space-evenly"
                       >
-                        <GithubIcon size={15} fill="#9399A3" />
+                        <GithubIcon size={15} fill={colors.black[500]} />
                         Authenticate
                       </Flex>
                     </StyledLink>
@@ -287,6 +281,7 @@ class ClaimCollectivePage extends React.Component {
                     <Fragment>
                       <Flex justifyContent="center" mb={4}>
                         <svg
+                          id="success"
                           width="66"
                           height="66"
                           viewBox="0 0 66 66"
@@ -306,18 +301,16 @@ class ClaimCollectivePage extends React.Component {
                           />
                         </svg>
                       </Flex>
-                      <H2
-                        fontSize="2rem"
+                      <H5
                         fontWeight="medium"
                         mb={4}
                         textAlign="center"
                       >
                         Congratulations!
-                      </H2>
+                      </H5>
                       <P
-                        fontSize="1.4rem"
                         textAlign="center"
-                        color="#76777A"
+                        color="black.600"
                         mb={4}
                       >
                         We have succesfully validated your admin status. Press
@@ -326,11 +319,9 @@ class ClaimCollectivePage extends React.Component {
                       </P>
                       <StyledButton
                         buttonStyle="primary"
-                        fontSize="1.4rem"
+                        buttonSize="medium"
                         maxWidth={300}
                         mx="auto"
-                        px={5}
-                        py={3}
                         onClick={() => this.claim(id)}
                       >
                         Activate open collective
@@ -340,7 +331,7 @@ class ClaimCollectivePage extends React.Component {
               </Container>
 
               <Link route="collective" params={{ slug }} passHref>
-                <StyledLink fontSize="1.2rem" mt={5} textAlign="center">
+                <StyledLink fontSize="Caption" mt={5} textAlign="center">
                   &larr; Back to the collective page
                 </StyledLink>
               </Link>

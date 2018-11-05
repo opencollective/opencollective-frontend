@@ -182,10 +182,10 @@ class SearchPage extends React.Component {
                       </em>
                     </p>
                     {usePledges && (
-                      <Link route={`/pledges/new?name=${term}`} passHref>
+                      <Link route="createPledge" params={{ name: term }} passHref>
                         <StyledLink
                           display="block"
-                          fontSize="14px"
+                          fontSize="Paragraph"
                           fontWeight="bold"
                           maxWidth="220px"
                           py={2}
@@ -247,10 +247,10 @@ class SearchPage extends React.Component {
                   </p>
 
                   {usePledges && (
-                    <Link route={`/pledges/new?name=${term}`} passHref>
+                    <Link route="createPledge" params={{ name: term }} passHref>
                       <StyledLink
                         display="block"
-                        fontSize="14px"
+                        fontSize="Paragraph"
                         fontWeight="bold"
                         maxWidth="220px"
                         py={2}
