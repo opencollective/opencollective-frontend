@@ -5,7 +5,7 @@ import uuidv4 from 'uuid/v4';
 import debug from 'debug';
 import Promise from 'bluebird';
 
-import models from '../../../models';
+import models, { Op } from '../../../models';
 import { capitalize, pluralize } from '../../../lib/utils';
 import * as libPayments from '../../../lib/payments';
 import { types } from '../../../constants/collectives';
@@ -154,6 +154,36 @@ export async function createOrder(order, loaders, remoteUser) {
         throw new Error(
           'You need to be logged in to create an order for an existing open collective',
         );
+      }
+
+      const nowLessOneHour = new Date();
+      nowLessOneHour.setHours(nowLessOneHour.getHours() - 1);
+      // Checking hourly limit of donations per fromCollective
+      const fromCollectiveOrdersCountLastHourQuery = {
+        FromCollectiveId: order.fromCollective.id,
+        createdAt: { [Op.gt]: nowLessOneHour },
+        type: 'CREDIT',
+      };
+      const fromCollectiveOrdersLastHourCount = await models.Transaction.count({
+        where: fromCollectiveOrdersCountLastHourQuery,
+      });
+      if ( fromCollectiveOrdersLastHourCount > 10 ) {
+        debugOrder('You have reached your hourly limit of donations');
+        throw new Error('You have reached the hourly limit of donations');
+      }
+      // Checking hourly limit of donations per fromCollective and Collective
+      const collectiveAndFromCollectiveOrdersCountLastHourQuery = {
+        CollectiveId: order.collective.id,
+        FromCollectiveId: order.fromCollective.id,
+        createdAt: { [Op.gt]: nowLessOneHour },
+        type: 'CREDIT',
+      };
+      const collectiveAndFromCollectiveOrdersLastHourCount = await models.Transaction.count({
+        where: collectiveAndFromCollectiveOrdersCountLastHourQuery,
+      });
+      if ( collectiveAndFromCollectiveOrdersLastHourCount > 2 ) {
+        debugOrder('You have reached the hourly limit of donations per collective');
+        throw new Error('You have reached the hourly limit of donations per collective');
       }
 
       fromCollective = await loaders.collective.findById.load(
