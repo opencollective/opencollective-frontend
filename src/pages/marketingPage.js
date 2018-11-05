@@ -12,7 +12,8 @@ import withLoggedInUser from '../lib/withLoggedInUser';
 import { loadScriptAsync } from '../lib/utils';
 
 import sponsorPageHtml from '../static/sponsor-page/index.html';
-import sponsorPageScript from '../static/sponsor-page/js/scripts.js';
+// hardcode loaders for specific files
+import sponsorPageScript from '!file-loader?publicPath=/_next/static/js/&outputPath=static/js/&name=[name]-[hash].[ext]!../static/sponsor-page/js/scripts.js'; // eslint-disable-line
 import sponsorPageStyle from '!css-loader!../static/sponsor-page/css/styles.css'; // eslint-disable-line
 
 class MarketingPage extends React.Component {

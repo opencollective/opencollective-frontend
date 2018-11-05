@@ -73,17 +73,6 @@ const nextConfig = {
         },
       },
       {
-        test: /static\/.*\.(js)$/,
-        use: {
-          loader: 'file-loader',
-          options: {
-            publicPath: '/_next/static/js/',
-            outputPath: 'static/js/',
-            name: '[name]-[hash].[ext]',
-          },
-        },
-      },
-      {
         test: /static\/.*\.(jpg|gif|png|svg)$/,
         use: {
           loader: 'file-loader',
