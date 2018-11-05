@@ -638,11 +638,14 @@ const queries = {
     type: TransactionInterfaceType,
     args: {
       id: {
-        type: new GraphQLNonNull(GraphQLInt),
+        type: GraphQLInt,
+      },
+      uuid: {
+        type: GraphQLString,
       },
     },
     resolve(_, args) {
-      return models.Transaction.findOne({ where: { id: args.id } });
+      return models.Transaction.findOne({ where: { ...args } });
     },
   },
 
