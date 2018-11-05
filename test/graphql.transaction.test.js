@@ -5,6 +5,7 @@
 
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
+import models from '../server/models';
 
 import * as utils from './utils';
 import * as store from './features/support/stores';
@@ -104,9 +105,9 @@ describe('graphql.transaction.test.js', () => {
   });
 
   describe('return transactions', () => {
-    it('returns one transaction ', async () => {
+    it('returns one transaction by id', async () => {
       const query = `
-        query Transaction($id: Int!) {
+        query Transaction($id: Int) {
           Transaction(id: $id) {
             id
             type
@@ -136,6 +137,44 @@ describe('graphql.transaction.test.js', () => {
         }
       `;
       const result = await utils.graphqlQuery(query, { id: 2 });
+      expect(result).to.matchSnapshot();
+    });
+
+    it('returns one transaction by uuid', async () => {
+      const query = `
+        query Transaction($uuid: String) {
+          Transaction(uuid: $uuid) {
+            id
+            type
+            createdByUser {
+              id
+              firstName
+              email
+            },
+            host {
+              id
+              slug
+            },
+            ... on Expense {
+              attachment
+            }
+            ... on Order {
+              paymentMethod {
+                id
+                name
+              },
+              subscription {
+                id
+                interval
+              }
+            }
+          }
+        }
+      `;
+      const transaction = await models.Transaction.findOne();
+      const result = await utils.graphqlQuery(query, {
+        uuid: transaction.uuid,
+      });
       expect(result).to.matchSnapshot();
     });
 
