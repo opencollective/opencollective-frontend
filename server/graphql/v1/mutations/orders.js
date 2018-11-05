@@ -156,21 +156,34 @@ export async function createOrder(order, loaders, remoteUser) {
         );
       }
 
-      // if there are more than 5 transactions in the last hour, blocks new orders
-      const end = new Date();
-      const start = new Date();
-      start.setHours(start.getHours() - 1);
-      const where = {
+      const nowLessOneHour = new Date();
+      nowLessOneHour.setHours(nowLessOneHour.getHours() - 1);
+      // Checking hourly limit of donations per fromCollective
+      const fromCollectiveOrdersCountLastHourQuery = {
         FromCollectiveId: order.fromCollective.id,
-        createdAt: { [Op.between]: [start, end] },
+        createdAt: { [Op.gt]: nowLessOneHour },
         type: 'CREDIT',
       };
-      const lastHourTransactionsCount = await models.Transaction.count({ where });
-      if ( lastHourTransactionsCount >= 5 ) {
-        debugOrder('Order blocks as there is already more than 5 orders recently', lastHourTransactionsCount);
-        throw new Error(
-          'You\'ve reached your hourly limit of orders. Please wait one more hour and try again.',
-        );
+      const fromCollectiveOrdersLastHourCount = await models.Transaction.count({
+        where: fromCollectiveOrdersCountLastHourQuery,
+      });
+      if ( fromCollectiveOrdersLastHourCount > 10 ) {
+        debugOrder('You have reached your hourly limit of donations');
+        throw new Error('You have reached the hourly limit of donations');
+      }
+      // Checking hourly limit of donations per fromCollective and Collective
+      const collectiveAndFromCollectiveOrdersCountLastHourQuery = {
+        CollectiveId: order.collective.id,
+        FromCollectiveId: order.fromCollective.id,
+        createdAt: { [Op.gt]: nowLessOneHour },
+        type: 'CREDIT',
+      };
+      const collectiveAndFromCollectiveOrdersLastHourCount = await models.Transaction.count({
+        where: collectiveAndFromCollectiveOrdersCountLastHourQuery,
+      });
+      if ( collectiveAndFromCollectiveOrdersLastHourCount > 2 ) {
+        debugOrder('You have reached the hourly limit of donations per collective');
+        throw new Error('You have reached the hourly limit of donations per collective');
       }
 
       fromCollective = await loaders.collective.findById.load(
