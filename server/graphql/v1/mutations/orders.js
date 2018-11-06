@@ -28,32 +28,34 @@ const ordersLimitCache = LRU({
 const debugOrder = debug('order');
 
 function checkOrdersLimit(order) {
+  const fromCollectiveIdOrUserEmailKey = get(order, 'fromCollective.id') || get(order, 'user.email');
+  const collectiveIdKey = get(order, 'collective.id');
   // First of all, check if creation of orders has reached a limit but disabling behaviour
   // temporarily for "test" or "circleci" ENVs(both test environments) as most tests create more than 2 orders per (fromcollective,collective) and it fails
   if (process.env.NODE_ENV !== 'test' && process.env.NODE_ENV !== 'circleci' &&
-      get(order, 'fromCollective.id') && get(order, 'collective.id')) {
-    const fromCollectiveValue = ordersLimitCache.get(order.fromCollective.id);
+      fromCollectiveIdOrUserEmailKey && collectiveIdKey) {
+    const fromCollectiveValue = ordersLimitCache.get(fromCollectiveIdOrUserEmailKey);
     // Check if FromCollective reached max limit of orders per hour
     if (fromCollectiveValue) {
       if (fromCollectiveValue > 10) {
-        debugOrder(`Orders Cache: ${get(order, 'fromCollective.id')} has reached the hourly limit of donations`);
+        debugOrder(`Orders Cache: ${fromCollectiveIdOrUserEmailKey} has reached the hourly limit of donations`);
         throw new Error('Error while processing your request, please try again or contact support@opencollective.com');
       }
-      ordersLimitCache.set(order.fromCollective.id, fromCollectiveValue + 1);
+      ordersLimitCache.set(fromCollectiveIdOrUserEmailKey, fromCollectiveValue + 1);
     } else {
-      ordersLimitCache.set(order.fromCollective.id, 1);
+      ordersLimitCache.set(fromCollectiveIdOrUserEmailKey, 1);
     }
-    const fromCollectiveAndCollectiveValue = ordersLimitCache.get(`${order.fromCollective.id}_${order.collective.id}`);
+    const fromCollectiveAndCollectiveValue = ordersLimitCache.get(`${fromCollectiveIdOrUserEmailKey}_${collectiveIdKey}`);
     // Check if pair (FromCollective, Collective) reached max limit of orders per hour
     if (fromCollectiveAndCollectiveValue) {
       if (fromCollectiveAndCollectiveValue > 2) {
-        debugOrder(`Orders Cache: fromCollective Id ${get(order, 'fromCollective.id')} has reached the hourly
-          limit of donations for collective id ${get(order, 'collective.id')}`);
+        debugOrder(`Orders Cache: fromCollective Id ${fromCollectiveIdOrUserEmailKey} has reached the hourly
+          limit of donations for collective id ${collectiveIdKey}`);
         throw new Error('Error while processing your request, please try again or contact support@opencollective.com');
       }
-      ordersLimitCache.set(`${order.fromCollective.id}_${order.collective.id}`, fromCollectiveAndCollectiveValue + 1);
+      ordersLimitCache.set(`${fromCollectiveIdOrUserEmailKey}_${collectiveIdKey}`, fromCollectiveAndCollectiveValue + 1);
     } else {
-      ordersLimitCache.set(`${order.fromCollective.id}_${order.collective.id}`, 1);
+      ordersLimitCache.set(`${fromCollectiveIdOrUserEmailKey}_${collectiveIdKey}`, 1);
     }
     debugOrder('Orders limit cache', ordersLimitCache);
   }
