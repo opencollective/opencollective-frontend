@@ -6,6 +6,7 @@ export const defaultBackgroundImage = {
 };
 
 export const defaultImage = {
-  ORGANIZATION: '/static/images/default-organization-logo.png',
-  COLLECTIVE: '/static/images/default-collective-logo.png',
+  ORGANIZATION: '/static/images/default-organization-logo.svg',
+  COLLECTIVE: '/static/images/default-collective-logo.svg',
+  CHAPTER: '/static/images/default-chapter-logo.svg',
 };
