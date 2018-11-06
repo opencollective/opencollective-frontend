@@ -5,7 +5,7 @@ import uuidv4 from 'uuid/v4';
 import debug from 'debug';
 import Promise from 'bluebird';
 
-import models, { Op } from '../../../models';
+import models from '../../../models';
 import { capitalize, pluralize } from '../../../lib/utils';
 import * as libPayments from '../../../lib/payments';
 import { types } from '../../../constants/collectives';
@@ -17,6 +17,13 @@ import {
   getNextChargeAndPeriodStartDates,
   getChargeRetryCount,
 } from '../../../lib/subscriptions';
+import LRU from 'lru-cache';
+
+// Create Orders Cache Object to limit FromCollective orders to up to 10 orders/hour
+const ordersLimitCache = LRU({
+  max: 1000,
+  maxAge: 1000 * 60 * 60, // we keep it max 1 hour
+});
 
 const debugOrder = debug('order');
 
@@ -66,6 +73,28 @@ export async function createOrder(order, loaders, remoteUser) {
       throw new Error(
         'Orders cannot be created for a collective by that same collective.',
       );
+    }
+    const fromCollectiveValue = ordersLimitCache.get(order.fromCollective.id);
+    // Check if FromCollective reached max limit of orders per hour
+    if (fromCollectiveValue) {
+      if (fromCollectiveValue > 10) {
+        debugOrder('Orders Cache: You have reached the hourly limit of donations');
+        throw new Error('You have reached the hourly limit of donations');
+      }
+      ordersLimitCache.set(order.fromCollective.id, fromCollectiveValue + 1);
+    } else {
+      ordersLimitCache.set(order.fromCollective.id, 1);
+    }
+    const fromCollectiveAndCollectiveValue = ordersLimitCache.get(`${order.fromCollective.id}_${order.collective.id}`);
+    // Check if pair (FromCollective, Collective) reached max limit of orders per hour
+    if (fromCollectiveAndCollectiveValue) {
+      if (fromCollectiveAndCollectiveValue > 2) {
+        debugOrder('Orders Cache: You have reached the hourly limit of donations for this Collective');
+        throw new Error('You have reached the hourly limit of donations for this Collective');
+      }
+      ordersLimitCache.set(`${order.fromCollective.id}_${order.collective.id}`, fromCollectiveAndCollectiveValue + 1);
+    } else {
+      ordersLimitCache.set(`${order.fromCollective.id}_${order.collective.id}`, 1);
     }
 
     if (order.hostFeePercent) {
@@ -154,36 +183,6 @@ export async function createOrder(order, loaders, remoteUser) {
         throw new Error(
           'You need to be logged in to create an order for an existing open collective',
         );
-      }
-
-      const nowLessOneHour = new Date();
-      nowLessOneHour.setHours(nowLessOneHour.getHours() - 1);
-      // Checking hourly limit of donations per fromCollective
-      const fromCollectiveOrdersCountLastHourQuery = {
-        FromCollectiveId: order.fromCollective.id,
-        createdAt: { [Op.gt]: nowLessOneHour },
-        type: 'CREDIT',
-      };
-      const fromCollectiveOrdersLastHourCount = await models.Transaction.count({
-        where: fromCollectiveOrdersCountLastHourQuery,
-      });
-      if ( fromCollectiveOrdersLastHourCount > 10 ) {
-        debugOrder('You have reached your hourly limit of donations');
-        throw new Error('You have reached the hourly limit of donations');
-      }
-      // Checking hourly limit of donations per fromCollective and Collective
-      const collectiveAndFromCollectiveOrdersCountLastHourQuery = {
-        CollectiveId: order.collective.id,
-        FromCollectiveId: order.fromCollective.id,
-        createdAt: { [Op.gt]: nowLessOneHour },
-        type: 'CREDIT',
-      };
-      const collectiveAndFromCollectiveOrdersLastHourCount = await models.Transaction.count({
-        where: collectiveAndFromCollectiveOrdersCountLastHourQuery,
-      });
-      if ( collectiveAndFromCollectiveOrdersLastHourCount > 2 ) {
-        debugOrder('You have reached the hourly limit of donations per collective');
-        throw new Error('You have reached the hourly limit of donations per collective');
       }
 
       fromCollective = await loaders.collective.findById.load(
