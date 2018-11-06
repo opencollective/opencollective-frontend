@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import gql from 'graphql-tag';
 import { graphql } from 'react-apollo';
@@ -476,29 +476,27 @@ class SubscriptionCard extends React.Component {
                     />
                   </CustomToggle>
                   <Dropdown.Menu className="menu-item">
-                    {subscription.status !== 'PENDING' && (
-                      <Fragment>
-                        <MenuItem
-                          style={menuItemStyle}
-                          eventKey={this.stateConstants.editPaymentMethod}
-                        >
-                          <FormattedMessage
-                            id="subscription.menu.editPaymentMethod"
-                            defaultMessage="Update payment method"
-                          />
-                        </MenuItem>
-                        <MenuItem
-                          style={menuItemStyle}
-                          eventKey={this.stateConstants.editAmount}
-                        >
-                          <FormattedMessage
-                            id="subscription.menu.editAmount"
-                            defaultMessage="Update amount"
-                          />
-                        </MenuItem>
-                        <MenuItem style={{ margin: '2px' }} divider />
-                      </Fragment>
-                    )}
+                    {subscription.status !== 'PENDING' && [
+                      <MenuItem
+                        style={menuItemStyle}
+                        eventKey={this.stateConstants.editPaymentMethod}
+                      >
+                        <FormattedMessage
+                          id="subscription.menu.editPaymentMethod"
+                          defaultMessage="Update payment method"
+                        />
+                      </MenuItem>,
+                      <MenuItem
+                        style={menuItemStyle}
+                        eventKey={this.stateConstants.editAmount}
+                      >
+                        <FormattedMessage
+                          id="subscription.menu.editAmount"
+                          defaultMessage="Update amount"
+                        />
+                      </MenuItem>,
+                      <MenuItem style={{ margin: '2px' }} divider />
+                    ]}
                     <MenuItem
                       style={menuItemStyle}
                       eventKey={this.stateConstants.cancelConf}
