@@ -183,6 +183,7 @@ class CreatePledgePage extends React.Component {
       order.collective = {
         name: name.value,
         slug: slug.value,
+        tags: ['open source', 'pledged'],
         website: website.value,
       };
     }
