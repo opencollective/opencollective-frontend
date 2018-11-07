@@ -124,7 +124,7 @@ class CreateOrderPage extends React.Component {
       'order.error': {
         id: 'tier.order.error',
         defaultMessage:
-          "😱 Oh crap! An error occured. Try again, or shoot a quick email to support@opencollective.com and we'll figure things out.",
+          "An error occured 😳. The order didn't go through. Please try again in a few.",
       },
       'tier.donation.button': {
         id: 'tier.donation.button',
@@ -206,10 +206,14 @@ class CreateOrderPage extends React.Component {
       }
     } catch (e) {
       console.error('>>> createOrder error: ', e);
+      const error = e
+        .toString()
+        .replace('GraphQL error: ', '')
+        .replace('Error:', '');
       this.setState({
         loading: false,
         result: {
-          error: `${intl.formatMessage(this.messages['order.error'])}: ${e}`,
+          error: error || intl.formatMessage(this.messages['order.error']),
         },
       });
     }
@@ -253,11 +257,11 @@ class CreateOrderPage extends React.Component {
       <div>
         <style jsx>
           {`
+            .result {
+              margin-bottom: 5rem;
+            }
             .success {
               color: green;
-            }
-            .result {
-              text-align: center;
             }
             .error {
               color: red;
@@ -290,9 +294,14 @@ class CreateOrderPage extends React.Component {
               redeemFlow={this.props.redeem}
               matchingFund={this.state.matchingFund}
             />
-            <div className="result">
-              <div className="success">{this.state.result.success}</div>
-              <div className="error">{this.state.result.error}</div>
+            <div className="row result">
+              <div className="col-sm-2" />
+              <div className="col-sm-10">
+                <div className="success">{this.state.result.success}</div>
+                {this.state.result.error && (
+                  <div className="error">{this.state.result.error}</div>
+                )}
+              </div>
             </div>
           </div>
         </Body>
