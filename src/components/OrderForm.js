@@ -164,8 +164,8 @@ class OrderForm extends React.Component {
         defaultMessage: 'Expired code',
       },
       'ocCard.loading': {
-        id: 'occard.loading',
-        defaultMessage: 'Please wait...',
+        id: 'pleasewait',
+        defaultMessage: 'please wait...',
       },
       'ocCard.amountremaining': {
         id: 'occard.amountremaining',
