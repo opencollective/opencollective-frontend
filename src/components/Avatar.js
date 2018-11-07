@@ -1,53 +1,59 @@
 import React from 'react';
-import classNames from 'classnames';
-import { pickAvatar } from '../lib/collective.lib';
+import PropTypes from 'prop-types';
+import styled from 'styled-components';
+import { backgroundImage, borders, borderColor, size, themeGet } from 'styled-system';
+import tag from 'clean-tag';
+import { Flex } from 'grid-styled';
 import { imagePreview } from '../lib/utils';
+import { defaultImage } from '../constants/collectives';
 
-export default ({ src, radius, id, title, className }) => {
-  const image = imagePreview(src, null, { width: radius });
+const getInitials = name => (
+  name
+    .split(' ')
+    .reduce((result, value) => result += value.slice(0, 1).toUpperCase(), '')
+);
+
+export const StyledAvatar = styled(Flex)`
+  align-items: center;
+  background-color: ${({theme, type}) => type === 'USER' ? themeGet('colors.black.100')({ theme }) : 'none'};
+  ${backgroundImage}
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  border-radius: ${({ type }) => type === 'USER' ? '100px' : '25%'};
+  ${borders}
+  ${borderColor}
+  color: ${themeGet('colors.black.400')};
+  font-weight: bold;
+  justify-content: center;
+  overflow: hidden;
+  ${size}
+`;
+
+StyledAvatar.defaultProps = {
+  blacklist: tag.defaultProps.blacklist.concat('backgroundImage'),
+};
+
+const Avatar = ({ src, type = 'USER', radius, name, ...styleProps }) => {
+  const image = imagePreview(src, defaultImage[type], { width: radius });
   return (
-    <div
-      className={classNames('Avatar', className)}
-      style={{
-        width: radius,
-        height: radius,
-        backgroundImage: `url(${pickAvatar(id || title || src)})`,
-      }}
+    <StyledAvatar
+      backgroundImage={`url(${image})`}
+      size={radius}
+      type={type}
+      {...styleProps}
     >
-      <style jsx>
-        {`
-          .Avatar {
-            background-repeat: no-repeat;
-            background-position: center center;
-            background-size: cover;
-            border-radius: 50%;
-            overflow: hidden;
-            border: 2px solid #fff;
-            box-shadow: 0 0 0 1px #75cc1f;
-          }
-          .noFrame {
-            border: 0px;
-            border-radius: 50%;
-            box-shadow: none;
-          }
-          .image {
-            background-repeat: no-repeat;
-            background-position: center center;
-            border-radius: 50%;
-            background-size: cover;
-          }
-        `}
-      </style>
-      {image && (
-        <div
-          className="image"
-          style={{
-            backgroundImage: `url(${image})`,
-            width: radius,
-            height: radius,
-          }}
-        />
+      {!image && type === 'USER' && name && (
+        <span>{getInitials(name)}</span>
       )}
-    </div>
+    </StyledAvatar>
   );
 };
+
+Avatar.propTypes = {
+  name: PropTypes.string,
+  src: PropTypes.string,
+  type: PropTypes.oneOf(['USER', 'COLLECTIVE', 'ORGANIZATION', 'CHAPTER']),
+};
+
+export default Avatar;
