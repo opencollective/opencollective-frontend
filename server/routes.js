@@ -6,11 +6,15 @@ import * as connectedAccounts from './controllers/connectedAccounts';
 import getDiscoverPage from './controllers/discover';
 import * as transactions from './controllers/transactions';
 import * as collectives from './controllers/collectives';
+import * as RestApi from './graphql/v1/restapi';
 import getHomePage from './controllers/homepage';
 import uploadImage from './controllers/images';
 import * as mw from './controllers/middlewares';
 import * as notifications from './controllers/notifications';
-import { getPaymentMethods, createPaymentMethod } from './controllers/paymentMethods';
+import {
+  getPaymentMethods,
+  createPaymentMethod,
+} from './controllers/paymentMethods';
 import * as test from './controllers/test';
 import * as users from './controllers/users';
 import * as applications from './controllers/applications';
@@ -114,6 +118,7 @@ export default app => {
   /**
    * Parameters.
    */
+  app.param('uuid', params.uuid);
   app.param('userid', params.userid);
   app.param('collectiveid', params.collectiveid);
   app.param('transactionuuid', params.transactionuuid);
@@ -222,17 +227,11 @@ export default app => {
   app.delete('/users/:userid/payment-methods/:paymentMethodid', NotImplemented); // Delete a user's paymentMethod.
 
   /**
-  * Create a payment method.
-  *
-  *  Let's assume for now a paymentMethod is linked to a user.
-  */
+   * Create a payment method.
+   *
+   *  Let's assume for now a paymentMethod is linked to a user.
+   */
   app.post('/v1/payment-methods', createPaymentMethod);
-
- /**
-  * Get transactions of a collective given its slug.
-  *
-  */
- app.get('/v1/collectives/:collectiveSlug/transactions', collectives.getCollectiveTransactions);
 
   /**
    * Collectives.
@@ -293,7 +292,21 @@ export default app => {
   /**
    * Transactions (financial).
    */
+
+  // Get transactions of a collective given its slug.
+  app.get(
+    '/v1/collectives/:collectiveSlug/transactions',
+    RestApi.getLatestTransactions,
+  );
+  app.get(
+    '/v1/collectives/:collectiveSlug/transactions/:IdOrUUID',
+    RestApi.getTransaction,
+  );
+
+  // xdamman: Is this route still being used anywhere? If not, we should deprecate this
   app.get('/transactions/:transactionuuid', transactions.getOne); // Get the transaction details
+
+  // xdamman: Is this route still being used anywhere? If not, we should deprecate this
   app.get(
     '/groups/:collectiveid/transactions',
     mw.paginate(),

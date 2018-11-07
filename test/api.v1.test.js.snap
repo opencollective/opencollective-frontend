@@ -1,0 +1,143 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`api.test.js #get get one transaction details by uuid 1`] = `
+Object {
+  "amount": -20000,
+  "collective": Object {
+    "id": 3,
+    "image": null,
+    "name": "Scouts d'Arlon",
+    "slug": "scouts",
+  },
+  "currency": "USD",
+  "description": "Homepage design",
+  "fromCollective": Object {
+    "id": 1,
+    "image": null,
+    "name": "Phil Mod",
+    "slug": "philmod",
+  },
+  "host": Object {
+    "id": 2,
+    "image": null,
+    "name": "WWCode",
+    "slug": "wwcode",
+  },
+  "hostCurrency": "USD",
+  "hostCurrencyFxRate": null,
+  "hostFeeInHostCurrency": null,
+  "netAmountInCollectiveCurrency": null,
+  "paymentMethod": null,
+  "paymentProcessorFeeInHostCurrency": null,
+  "platformFeeInHostCurrency": null,
+  "type": "DEBIT",
+  "uuid": null,
+}
+`;
+
+exports[`api.test.js #get get the latest transactions 1`] = `
+Object {
+  "amount": 5000,
+  "collective": Object {
+    "id": 3,
+    "image": null,
+    "name": "Scouts d'Arlon",
+    "slug": "scouts",
+  },
+  "createdByUser": Object {
+    "email": null,
+    "id": 1,
+  },
+  "currency": "USD",
+  "fromCollective": Object {
+    "id": 1,
+    "image": null,
+    "name": "Phil Mod",
+    "slug": "philmod",
+  },
+  "host": Object {
+    "id": 2,
+    "slug": "wwcode",
+  },
+  "hostCurrency": null,
+  "hostCurrencyFxRate": null,
+  "hostFeeInHostCurrency": null,
+  "netAmountInCollectiveCurrency": 4500,
+  "paymentMethod": null,
+  "paymentProcessorFeeInHostCurrency": null,
+  "platformFeeInHostCurrency": null,
+  "type": "CREDIT",
+  "uuid": null,
+}
+`;
+
+exports[`api.v1.test.js #get get one transaction details by uuid 1`] = `
+Object {
+  "amount": -20000,
+  "collective": Object {
+    "id": 3,
+    "image": null,
+    "name": "Scouts d'Arlon",
+    "slug": "scouts",
+  },
+  "currency": "USD",
+  "description": "Homepage design",
+  "fromCollective": Object {
+    "id": 1,
+    "image": null,
+    "name": "Phil Mod",
+    "slug": "philmod",
+  },
+  "host": Object {
+    "id": 2,
+    "image": null,
+    "name": "WWCode",
+    "slug": "wwcode",
+  },
+  "hostCurrency": "USD",
+  "hostCurrencyFxRate": null,
+  "hostFeeInHostCurrency": null,
+  "netAmountInCollectiveCurrency": null,
+  "paymentMethod": null,
+  "paymentProcessorFeeInHostCurrency": null,
+  "platformFeeInHostCurrency": null,
+  "type": "DEBIT",
+  "uuid": null,
+}
+`;
+
+exports[`api.v1.test.js #get get the latest transactions 1`] = `
+Object {
+  "amount": 5000,
+  "collective": Object {
+    "id": 3,
+    "image": null,
+    "name": "Scouts d'Arlon",
+    "slug": "scouts",
+  },
+  "createdByUser": Object {
+    "email": null,
+    "id": 1,
+  },
+  "currency": "USD",
+  "fromCollective": Object {
+    "id": 1,
+    "image": null,
+    "name": "Phil Mod",
+    "slug": "philmod",
+  },
+  "host": Object {
+    "id": 2,
+    "slug": "wwcode",
+  },
+  "hostCurrency": null,
+  "hostCurrencyFxRate": null,
+  "hostFeeInHostCurrency": null,
+  "netAmountInCollectiveCurrency": 4500,
+  "paymentMethod": null,
+  "paymentProcessorFeeInHostCurrency": null,
+  "platformFeeInHostCurrency": null,
+  "type": "CREDIT",
+  "uuid": null,
+}
+`;

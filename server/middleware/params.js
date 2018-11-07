@@ -9,7 +9,7 @@ const { User, Collective, Transaction, Expense } = models;
  * Parse id or uuid and returns the where condition to get the element
  * @POST: { uuid: String } or { id: Int }
  */
-const parseId = param => {
+const parseIdOrUUID = param => {
   if (isUUID(param)) {
     return Promise.resolve({ uuid: param });
   }
@@ -31,6 +31,20 @@ function getByKeyValue(model, key, value) {
     if (!result)
       throw new errors.NotFound(`${model.getTableName()} '${value}' not found`);
   });
+}
+
+export function uuid(req, res, next, uuid) {
+  if (
+    uuid.match(
+      /^[A-F\d]{8}-[A-F\d]{4}-4[A-F\d]{3}-[89AB][A-F\d]{3}-[A-F\d]{12}$/i,
+    )
+  ) {
+    req.params.uuid = uuid;
+  } else {
+    const id = parseInt(uuid);
+    if (!_.isNaN(id)) req.params.id = id;
+  }
+  next();
 }
 
 /**
@@ -82,7 +96,7 @@ export function transactionuuid(req, res, next, transactionuuid) {
  * Transactionid for a paranoid (deleted) ressource
  */
 export function paranoidtransactionid(req, res, next, id) {
-  parseId(id)
+  parseIdOrUUID(id)
     .then(where => {
       return Transaction.findOne({
         where,
@@ -112,7 +126,7 @@ export function expenseid(req, res, next, expenseid) {
     queryInCollective = { CollectiveId: req.params.collectiveid };
     NotFoundInCollective = `in collective ${req.params.collectiveid}`;
   }
-  parseId(expenseid)
+  parseIdOrUUID(expenseid)
     .then(where =>
       Expense.findOne({
         where: Object.assign({}, where, queryInCollective),

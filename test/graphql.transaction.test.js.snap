@@ -1172,6 +1172,52 @@ Object {
 }
 `;
 
+exports[`graphql.transaction.test.js return transactions returns one transaction by id 1`] = `
+Object {
+  "data": Object {
+    "Transaction": Object {
+      "createdByUser": Object {
+        "email": null,
+        "firstName": null,
+        "id": 2,
+      },
+      "host": Object {
+        "id": 2,
+        "slug": "wwcode",
+      },
+      "id": 2,
+      "paymentMethod": Object {
+        "id": 3,
+        "name": null,
+      },
+      "subscription": null,
+      "type": "CREDIT",
+    },
+  },
+}
+`;
+
+exports[`graphql.transaction.test.js return transactions returns one transaction by uuid 1`] = `
+Object {
+  "data": Object {
+    "Transaction": Object {
+      "attachment": null,
+      "createdByUser": Object {
+        "email": null,
+        "firstName": null,
+        "id": 2,
+      },
+      "host": Object {
+        "id": 2,
+        "slug": "wwcode",
+      },
+      "id": 1,
+      "type": "DEBIT",
+    },
+  },
+}
+`;
+
 exports[`graphql.transaction.test.js return transactions with dateFrom 1`] = `
 Object {
   "data": Object {

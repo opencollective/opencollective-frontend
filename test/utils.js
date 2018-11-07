@@ -5,7 +5,7 @@ import nock from 'nock';
 import Promise from 'bluebird';
 import Stripe from 'stripe';
 import { graphql } from 'graphql';
-import { isArray, values } from 'lodash';
+import { isArray, values, get, cloneDeep } from 'lodash';
 
 /* Test data */
 import jsonData from './mocks/data';
@@ -31,9 +31,9 @@ jsonData.application = {
   api_key: config.keys.opencollective.api_key,
 };
 
-export const data = item => {
-  const copy = Object.assign({}, jsonData[item]); // to avoid changing these data
-  return isArray(jsonData[item]) ? values(copy) : copy;
+export const data = path => {
+  const copy = cloneDeep(get(jsonData, path)); // to avoid changing these data
+  return isArray(get(jsonData, path)) ? values(copy) : copy;
 };
 
 export const clearbitStubBeforeEach = sandbox => {
