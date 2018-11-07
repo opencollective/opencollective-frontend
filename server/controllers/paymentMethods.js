@@ -1,7 +1,7 @@
 import config from 'config';
 import moment from 'moment';
 import models, { Op } from '../models';
-import { extend, get, pick, pluck } from 'lodash';
+import { extend, get, pick, map } from 'lodash';
 import * as utils from '../graphql/v1/utils';
 const { PaymentMethod } = models;
 
@@ -64,7 +64,7 @@ export function getPaymentMethods(req, res, next) {
 
   return PaymentMethod.findAll({ where: query })
     .then(response => {
-      res.send(pluck(response, 'info'));
+      res.send(map(response, 'info'));
     })
     .catch(next);
 }

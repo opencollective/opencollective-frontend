@@ -414,7 +414,7 @@ async function HostReport(year, month, hostId) {
 
     return getHostedCollectives(host.id, endDate)
       .tap(collectives => {
-        collectivesById = _.indexBy(collectives, 'id');
+        collectivesById = _.keyBy(collectives, 'id');
         data.stats.totalCollectives = Object.keys(collectivesById).length;
         summary.totalCollectives += data.stats.totalCollectives;
         console.log(
@@ -482,7 +482,7 @@ async function HostReport(year, month, hostId) {
           ...data.stats,
           ...stats,
           totalActiveCollectives: Object.keys(
-            _.indexBy(data.transactions, 'CollectiveId'),
+            _.keyBy(data.transactions, 'CollectiveId'),
           ).length,
           numberTransactions: data.transactions.length,
           numberDonations:

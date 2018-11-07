@@ -1,5 +1,5 @@
 import config from 'config';
-import _, { isArray, pick, get } from 'lodash';
+import { isArray, pick, get, merge, includes } from 'lodash';
 import Promise from 'bluebird';
 import juice from 'juice';
 import nodemailer from 'nodemailer';
@@ -18,7 +18,7 @@ const render = (template, data) => {
     data.collective &&
     data.collective.image &&
     !data.collective.image.endsWith('.svg');
-  data = _.merge({}, data);
+  data = merge({}, data);
   delete data.config;
   data.config = { host: config.host };
 
@@ -288,7 +288,7 @@ const generateEmailFromTemplate = (
     if (slug.match(/wwcode/)) template += '.wwcode';
 
     if (
-      _.contains(
+      includes(
         ['chsf', 'kendraio', 'brusselstogether', 'sustainoss', 'ispcwa'],
         slug,
       )
@@ -297,7 +297,7 @@ const generateEmailFromTemplate = (
     }
 
     if (
-      _.contains(
+      includes(
         [
           'laprimaire',
           'lesbarbares',
