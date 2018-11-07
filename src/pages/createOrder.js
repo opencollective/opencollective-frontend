@@ -20,6 +20,7 @@ import storage from '../lib/storage';
 import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
 import withLoggedInUser from '../lib/withLoggedInUser';
+import { isValidUrl } from '../lib/utils';
 
 class CreateOrderPage extends React.Component {
   static getInitialProps({
@@ -34,6 +35,7 @@ class CreateOrderPage extends React.Component {
       description,
       verb,
       redeem,
+      redirect,
     },
   }) {
     return {
@@ -45,6 +47,7 @@ class CreateOrderPage extends React.Component {
       description,
       verb,
       redeem,
+      redirect,
     };
   }
 
@@ -56,6 +59,7 @@ class CreateOrderPage extends React.Component {
     interval: PropTypes.string,
     description: PropTypes.string,
     verb: PropTypes.string,
+    redirect: PropTypes.string,
     redeem: PropTypes.bool,
     createOrder: PropTypes.func.isRequired, // from addCreateOrderMutation
     data: PropTypes.object.isRequired, // from withData
@@ -157,7 +161,7 @@ class CreateOrderPage extends React.Component {
   }
 
   createOrder = async order => {
-    const { intl, data } = this.props;
+    const { intl, data, redirect } = this.props;
 
     if (this.referral && this.referral > 0) {
       order.referral = { id: this.referral };
@@ -186,14 +190,20 @@ class CreateOrderPage extends React.Component {
         order,
         result: { success: intl.formatMessage(this.messages['order.success']) },
       });
-      Router.pushRoute('collective', {
-        slug: orderCreated.fromCollective.slug,
-        status: 'orderCreated',
-        CollectiveId: order.collective.id,
-        TierId: order.tier && order.tier.id,
-        type: data.Collective.type,
-        totalAmount: order.totalAmount,
-      });
+      if (redirect && isValidUrl(redirect)) {
+        const transaction = orderCreated.transactions[0];
+        const redirectTo = `${redirect}?transactionid=${transaction.id}`;
+        window.location.href = redirectTo;
+      } else {
+        Router.pushRoute('collective', {
+          slug: orderCreated.fromCollective.slug,
+          status: 'orderCreated',
+          CollectiveId: order.collective.id,
+          TierId: order.tier && order.tier.id,
+          type: data.Collective.type,
+          totalAmount: order.totalAmount,
+        });
+      }
     } catch (e) {
       console.error('>>> createOrder error: ', e);
       this.setState({
