@@ -562,6 +562,16 @@ export default (Sequelize, DataTypes) => {
       return Promise.reject(new Error('Please provide a valid email address'));
     }
     debug('findOrCreateByEmail', email, 'other attributes: ', otherAttributes);
+    return User.findByEmailOrPaypalEmail(email).then(
+      user =>
+        user ||
+        models.User.createUserWithCollective(
+          Object.assign({}, { email }, otherAttributes),
+        ),
+    );
+  };
+
+  User.findByEmailOrPaypalEmail = email => {
     return User.findOne({
       where: {
         [Op.or]: {
@@ -569,13 +579,7 @@ export default (Sequelize, DataTypes) => {
           paypalEmail: email,
         },
       },
-    }).then(
-      user =>
-        user ||
-        models.User.createUserWithCollective(
-          Object.assign({}, { email }, otherAttributes),
-        ),
-    );
+    });
   };
 
   User.createUserWithCollective = userData => {

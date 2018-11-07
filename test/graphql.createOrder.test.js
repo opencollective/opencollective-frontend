@@ -10,7 +10,7 @@ import * as utils from './utils';
 import * as store from './features/support/stores';
 import emailLib from '../server/lib/email';
 
-const order = {
+const baseOrder = Object.freeze({
   quantity: 1,
   interval: null,
   totalAmount: 154300,
@@ -28,7 +28,7 @@ const order = {
   collective: {
     id: null,
   },
-};
+});
 
 const createOrderQuery = `
   mutation createOrder($order: OrderInputType!) {
@@ -64,7 +64,7 @@ const createOrderQuery = `
   }
   `;
 
-const constants = {
+const constants = Object.freeze({
   paymentMethod: {
     name: 'payment method',
     service: 'stripe',
@@ -74,7 +74,7 @@ const constants = {
       expYear: 2025,
     },
   },
-};
+});
 
 describe('createOrder', () => {
   let sandbox, tweetStatusSpy, fearlesscitiesbrussels, emailSendMessageSpy;
@@ -133,9 +133,9 @@ describe('createOrder', () => {
     // the `totalAmount' field doesn't change throught the tests.
     utils.stubStripeBalance(
       sandbox,
-      order.totalAmount,
+      baseOrder.totalAmount,
       'eur',
-      Math.round(order.totalAmount * 0.05),
+      Math.round(baseOrder.totalAmount * 0.05),
       4500,
     ); // This is the payment processor fee.
   });
@@ -149,7 +149,7 @@ describe('createOrder', () => {
       isActive: false,
       website: 'https://github.com/opencollective/frontend',
     });
-    const thisOrder = cloneDeep(order);
+    const thisOrder = cloneDeep(baseOrder);
     thisOrder.collective.id = collective.id;
     thisOrder.user = {
       firstName: 'John',
@@ -174,7 +174,7 @@ describe('createOrder', () => {
       isActive: false,
       website: 'https://github.com/opencollective/frontend',
     });
-    const thisOrder = cloneDeep(order);
+    const thisOrder = cloneDeep(baseOrder);
     thisOrder.collective.id = collective.id;
     thisOrder.user = {
       firstName: 'John',
@@ -195,6 +195,7 @@ describe('createOrder', () => {
   });
 
   it('creates an order as new user and sends a tweet', async () => {
+    const order = cloneDeep(baseOrder);
     // And given a twitter connected account for the above
     // collective
     await models.ConnectedAccount.create({
@@ -283,26 +284,22 @@ describe('createOrder', () => {
       endsAt,
     });
     // Given an order request
-    const newOrder = cloneDeep(order);
+    const user = (await store.newUser('John Appleseed')).user;
+    const newOrder = cloneDeep(baseOrder);
     newOrder.collective = { id: event.id };
-    newOrder.user = {
-      firstName: 'John',
-      lastName: 'Appleseed',
-      email: 'jsmith@email.com',
-    };
     newOrder.totalAmount = 1000;
 
     // When the GraphQL query is executed
     let res;
     emailSendMessageSpy.resetHistory();
-    res = await utils.graphqlQuery(createOrderQuery, { order: newOrder });
+    res = await utils.graphqlQuery(createOrderQuery, { order: newOrder }, user);
 
     // Then there should be no errors
     res.errors && console.error(res.errors);
     expect(res.errors).to.not.exist;
     await utils.waitForCondition(() => emailSendMessageSpy.callCount > 0);
     expect(emailSendMessageSpy.callCount).to.equal(1);
-    expect(emailSendMessageSpy.firstCall.args[0]).to.equal(newOrder.user.email);
+    expect(emailSendMessageSpy.firstCall.args[0]).to.equal(user.email);
     expect(emailSendMessageSpy.firstCall.args[1]).to.equal(
       `1 ticket confirmed for ${event.name}`,
     );
@@ -318,7 +315,7 @@ describe('createOrder', () => {
     newOrder.totalAmount = 0;
     delete newOrder.paymentMethod;
 
-    res = await utils.graphqlQuery(createOrderQuery, { order: newOrder });
+    res = await utils.graphqlQuery(createOrderQuery, { order: newOrder }, user);
 
     // Then there should be no errors
     res.errors && console.error(res.errors);
@@ -329,7 +326,7 @@ describe('createOrder', () => {
 
   it('creates an order as new anonymous user', async () => {
     // Given an order request
-    const newOrder = cloneDeep(order);
+    const newOrder = cloneDeep(baseOrder);
     newOrder.collective = { id: fearlesscitiesbrussels.id };
     newOrder.user = {
       firstName: '',
@@ -356,6 +353,7 @@ describe('createOrder', () => {
   it('creates an order as logged in user', async () => {
     // Given a user
     const xdamman = (await store.newUser('xdamman')).user;
+    const order = cloneDeep(baseOrder);
     // And given that the order is from the above user with the
     // above payment method
     order.fromCollective = { id: xdamman.CollectiveId };
@@ -428,6 +426,7 @@ describe('createOrder', () => {
     expect(res.errors).to.not.exist;
 
     // And the order is setup with the above data
+    const order = cloneDeep(baseOrder);
     order.collective = { id: fearlesscitiesbrussels.id };
     order.fromCollective = { id: xdamman.CollectiveId };
     order.paymentMethod = {
@@ -472,6 +471,7 @@ describe('createOrder', () => {
   it('creates a recurring donation as logged in user', async () => {
     // Given a user
     const xdamman = (await store.newUser('xdamman')).user;
+    const order = cloneDeep(baseOrder);
     // And the parameters for the query
     order.fromCollective = { id: xdamman.CollectiveId };
     order.paymentMethod = {
@@ -510,6 +510,7 @@ describe('createOrder', () => {
   });
 
   it('creates an order as a new user for a new organization', async () => {
+    const order = cloneDeep(baseOrder);
     // Given the following data for the order
     order.collective = { id: fearlesscitiesbrussels.id };
     order.user = {
@@ -543,6 +544,7 @@ describe('createOrder', () => {
   });
 
   it('creates an order as a logged in user for an existing organization', async () => {
+    const order = cloneDeep(baseOrder);
     // Given some users
     const xdamman = (await store.newUser('xdamman')).user;
     const duc = (await store.newUser('another user')).user;
@@ -592,8 +594,48 @@ describe('createOrder', () => {
     expect(transactions[1].CollectiveId).to.equal(collective.id);
   });
 
+  it('fails if trying to donate using an existing email without being logged in', async () => {
+    const order = cloneDeep(baseOrder);
+    const legitUser = (await store.newUser('legit user', {
+      email: store.randEmail('legit@opencollective.com'),
+    })).user;
+    const remoteUser = null;
+    order.collective = { id: fearlesscitiesbrussels.id };
+    const res = await utils.graphqlQuery(
+      createOrderQuery,
+      { order: { ...order, user: { email: legitUser.email } } },
+      remoteUser,
+    );
+
+    expect(res.errors).to.exist;
+    expect(res.errors[0].message).to.equal(
+      'An account already exists for this email address. Please login.',
+    );
+  });
+
+  it('fails if trying to donate using an existing paypal email without being logged in', async () => {
+    const order = cloneDeep(baseOrder);
+    const legitUser = (await store.newUser('legit user', {
+      email: store.randEmail('legit@opencollective.com'),
+      paypalEmail: store.randEmail('legit-paypal@opencollective.com'),
+    })).user;
+    const remoteUser = null;
+    order.collective = { id: fearlesscitiesbrussels.id };
+    const res = await utils.graphqlQuery(
+      createOrderQuery,
+      { order: { ...order, user: { email: legitUser.paypalEmail } } },
+      remoteUser,
+    );
+
+    expect(res.errors).to.exist;
+    expect(res.errors[0].message).to.equal(
+      'An account already exists for this email address. Please login.',
+    );
+  });
+
   it("creates an order as a logged in user for an existing collective using the collective's payment method", async () => {
     const duc = (await store.newUser('another user')).user;
+    const order = cloneDeep(baseOrder);
     const newco = await models.Collective.create({
       type: 'ORGANIZATION',
       name: 'newco',
@@ -665,6 +707,7 @@ describe('createOrder', () => {
   });
 
   describe('host moves funds between collectives', async () => {
+    const order = cloneDeep(baseOrder);
     let hostAdmin, hostCollective;
 
     beforeEach(async () => {
@@ -735,6 +778,7 @@ describe('createOrder', () => {
 
   it("creates an order as a logged in user for an existing collective using the collective's balance", async () => {
     const xdamman = (await store.newUser('xdamman')).user;
+    const order = cloneDeep(baseOrder);
     const { hostCollective } = await store.newHost(
       'Host Collective',
       'USD',

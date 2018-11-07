@@ -5,6 +5,7 @@ import * as payments from '../server/lib/payments';
 
 import * as utils from './utils';
 import models from '../server/models';
+import * as store from './features/support/stores';
 
 describe('Query Tests', () => {
   let user1, user2, host, collective1, collective2, tier1, ticket1, sandbox;
@@ -100,12 +101,9 @@ describe('Query Tests', () => {
     });
 
     describe('payment methods', () => {
-      const generateOrder = (user, tier = tier1) => {
+      const generateLoggedInOrder = (tier = tier1) => {
         return {
           description: 'test order',
-          user: {
-            email: user.email,
-          },
           paymentMethod: {
             service: 'stripe',
             name: '4242',
@@ -121,6 +119,15 @@ describe('Query Tests', () => {
           },
           collective: { id: collective1.id },
           tier: { id: tier.id },
+        };
+      };
+
+      const generateLoggedOutOrder = (user, tier = tier1) => {
+        return {
+          ...generateLoggedInOrder(tier),
+          user: {
+            email: user.email,
+          },
         };
       };
 
@@ -141,9 +148,11 @@ describe('Query Tests', () => {
           }
         }`;
 
-        const result = await utils.graphqlQuery(query, {
-          order: generateOrder(user1),
-        });
+        const result = await utils.graphqlQuery(
+          query,
+          { order: generateLoggedInOrder() },
+          user1,
+        );
         result.errors && console.error(result.errors);
         expect(result.errors).to.not.exist;
         const paymentMethods = await models.PaymentMethod.findAll({
@@ -158,7 +167,7 @@ describe('Query Tests', () => {
       });
 
       it('does not save a payment method to the user', async () => {
-        const order = generateOrder(user1);
+        const order = generateLoggedInOrder();
         order.paymentMethod.save = false;
         const query = `
         mutation createOrder($order: OrderInputType!) {
@@ -173,7 +182,7 @@ describe('Query Tests', () => {
           }
         }`;
 
-        const result = await utils.graphqlQuery(query, { order });
+        const result = await utils.graphqlQuery(query, { order }, user1);
         result.errors && console.error(result.errors);
         expect(result.errors).to.not.exist;
         const paymentMethods = await models.PaymentMethod.findAll({
@@ -183,7 +192,7 @@ describe('Query Tests', () => {
         expect(paymentMethods[0].CollectiveId).to.be.null;
       });
 
-      it("doesn't get the payment method of the user if not logged in as that user", async () => {
+      it("doesn't get the payment method of the user if not logged in", async () => {
         const createOrderQuery = `
         mutation createOrder($order: OrderInputType!) {
           createOrder(order: $order) {
@@ -192,7 +201,10 @@ describe('Query Tests', () => {
         }`;
 
         await utils.graphqlQuery(createOrderQuery, {
-          order: generateOrder(user1, ticket1),
+          order: generateLoggedOutOrder(
+            { email: store.randEmail('user@opencollective.com') },
+            ticket1,
+          ),
         });
 
         const query = `
@@ -231,7 +243,7 @@ describe('Query Tests', () => {
       });
 
       it('gets the payment method of the user if logged in as that user', async () => {
-        const order = generateOrder(user1);
+        const order = generateLoggedInOrder();
         const createOrderQuery = `
         mutation createOrder($order: OrderInputType!) {
           createOrder(order: $order) {
@@ -239,7 +251,7 @@ describe('Query Tests', () => {
           }
         }`;
 
-        await utils.graphqlQuery(createOrderQuery, { order });
+        await utils.graphqlQuery(createOrderQuery, { order }, user1);
         await models.PaymentMethod.update(
           { confirmedAt: new Date() },
           { where: { CreatedByUserId: user1.id } },

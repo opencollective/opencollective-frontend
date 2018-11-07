@@ -188,12 +188,9 @@ describe('graphql.tiers.test', () => {
         }
       }`;
 
-      const generateOrder = user => {
+      const generateLoggedInOrder = () => {
         return {
           description: 'test order',
-          user: {
-            email: user.email,
-          },
           collective: { id: collective1.id },
           tier: { id: tier1.id },
           paymentMethod: {
@@ -211,8 +208,12 @@ describe('graphql.tiers.test', () => {
         };
       };
 
+      const generateLoggedOutOrder = email => {
+        return { ...generateLoggedInOrder(), user: { email } };
+      };
+
       it('fails to use a payment method on file if not logged in', async () => {
-        const order = generateOrder(user1);
+        const order = generateLoggedOutOrder(user1.email);
         order.paymentMethod = { uuid: paymentMethod1.uuid, service: 'stripe' };
 
         const result = await utils.graphqlQuery(createOrderQuery, { order });
@@ -223,7 +224,7 @@ describe('graphql.tiers.test', () => {
       });
 
       it('fails to use a payment method on file if not logged in as the owner', async () => {
-        const order = generateOrder(user1);
+        const order = generateLoggedInOrder();
         order.paymentMethod = { uuid: paymentMethod1.uuid };
 
         const result = await utils.graphqlQuery(
@@ -238,7 +239,7 @@ describe('graphql.tiers.test', () => {
       });
 
       it('user1 becomes a backer of collective1 using a payment method on file', async () => {
-        const orderInput = generateOrder(user1);
+        const orderInput = generateLoggedInOrder();
         orderInput.paymentMethod = { uuid: paymentMethod1.uuid };
 
         const result = await utils.graphqlQuery(
@@ -280,9 +281,11 @@ describe('graphql.tiers.test', () => {
       });
 
       it('user1 becomes a backer of collective1 using a new payment method', async () => {
-        const result = await utils.graphqlQuery(createOrderQuery, {
-          order: generateOrder(user1),
-        });
+        const result = await utils.graphqlQuery(
+          createOrderQuery,
+          { order: generateLoggedInOrder() },
+          user1,
+        );
         result.errors && console.error(result.errors[0]);
         expect(result.errors).to.not.exist;
         const members = await models.Member.findAll({
