@@ -9,7 +9,7 @@ const { User, Collective, Transaction, Expense } = models;
  * Parse id or uuid and returns the where condition to get the element
  * @POST: { uuid: String } or { id: Int }
  */
-const parseId = param => {
+const parseIdOrUUID = param => {
   if (isUUID(param)) {
     return Promise.resolve({ uuid: param });
   }
@@ -41,7 +41,8 @@ export function uuid(req, res, next, uuid) {
   ) {
     req.params.uuid = uuid;
   } else {
-    req.params.uuid = null;
+    const id = parseInt(uuid);
+    if (!_.isNaN(id)) req.params.id = id;
   }
   next();
 }
@@ -95,7 +96,7 @@ export function transactionuuid(req, res, next, transactionuuid) {
  * Transactionid for a paranoid (deleted) ressource
  */
 export function paranoidtransactionid(req, res, next, id) {
-  parseId(id)
+  parseIdOrUUID(id)
     .then(where => {
       return Transaction.findOne({
         where,
@@ -125,7 +126,7 @@ export function expenseid(req, res, next, expenseid) {
     queryInCollective = { CollectiveId: req.params.collectiveid };
     NotFoundInCollective = `in collective ${req.params.collectiveid}`;
   }
-  parseId(expenseid)
+  parseIdOrUUID(expenseid)
     .then(where =>
       Expense.findOne({
         where: Object.assign({}, where, queryInCollective),

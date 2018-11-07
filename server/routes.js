@@ -299,7 +299,7 @@ export default app => {
     RestApi.getLatestTransactions,
   );
   app.get(
-    '/v1/collectives/:collectiveSlug/transactions/:uuid',
+    '/v1/collectives/:collectiveSlug/transactions/:IdOrUUID',
     RestApi.getTransaction,
   );
 
