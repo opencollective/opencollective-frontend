@@ -2,7 +2,7 @@
  * All calls to stripe are meant to go through this gateway
  */
 
-import _ from 'lodash';
+import { includes } from 'lodash';
 import Stripe from 'stripe';
 import config from 'config';
 import debugLib from 'debug';
@@ -34,7 +34,7 @@ export const getOrCreatePlan = (stripeAccount, plan) => {
     .catch(err => {
       if (
         err.type === 'StripeInvalidRequestError' &&
-        _.contains(err.message.toLowerCase(), 'no such plan')
+        includes(err.message.toLowerCase(), 'no such plan')
       ) {
         return appStripe.plans.create(plan, {
           stripe_account: stripeAccount.username,

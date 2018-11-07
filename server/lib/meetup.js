@@ -1,5 +1,4 @@
-import filter from 'lodash/collection/filter';
-import values from 'lodash/object/values';
+import { filter, values } from 'lodash';
 import errors from '../lib/errors';
 import requestPromise from 'request-promise';
 
