@@ -80,7 +80,11 @@ To deploy to staging or production, you need to be a core member of the Open Col
 
 ### Staging (heroku)
 
-```
+```bash
+# Before first deployment, configure staging remote
+git remote add staging https://git.heroku.com/oc-staging-frontend.git
+
+# Then deploy master with
 npm run deploy:staging
 ```
 
@@ -88,7 +92,11 @@ URL: https://staging.opencollective.com/
 
 ### Production (heroku)
 
-```
+```bash
+# Before first deployment, configure production remote
+git remote add production https://git.heroku.com/oc-prod-frontend.git
+
+# Then deploy master with
 npm run deploy:production
 ```
 
