@@ -36,6 +36,25 @@ describe('collective.createOrder page', () => {
     cy.get('.message').contains('apex');
   });
 
+  it('makes an order logged out as a new user with a redirect url', () => {
+    const email = `testuser+${Math.round(Math.random() * 1000000)}@gmail.com`;
+    cy.visit(
+      `${WEBSITE_URL}/apex/donate?test=e2e&redirect=http://localhost:3000/callback`,
+    );
+    cy.get(".inputField textarea[name='publicMessage']").type('public message');
+    fill('email', email);
+    fill('firstName', 'Xavier');
+    fill('lastName', 'Damman');
+    fill('website', 'http://xdamman.com');
+    fill('twitterHandle', 'xdamman');
+    fill('description', 'short description');
+    cy.get('.submit button').click();
+    cy.wait(6500);
+    cy.location().should(location => {
+      expect(location.search).to.match(/\?transactionid=[0-9]+/);
+    });
+  });
+
   it('makes an order as a new organization', () => {
     cy.visit(`${WEBSITE_URL}/apex/donate`);
     cy.get('.inputField.email input').type('testuser@opencollective.com');
