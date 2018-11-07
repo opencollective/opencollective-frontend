@@ -28,6 +28,8 @@ const HomepageActivityItem = ({
             id={fromCollective.id}
             radius={40}
             className="noFrame"
+            type={fromCollective.type}
+            name={fromCollective.name}
           />
         </a>
       </Link>
@@ -75,6 +77,7 @@ HomepageActivityItem.propTypes = {
     image: PropTypes.string,
     name: PropTypes.string.isRequired,
     slug: PropTypes.string.isRequired,
+    type: PropTypes.string.isRequired,
   }),
   collective: PropTypes.shape({
     name: PropTypes.string.isRequired,

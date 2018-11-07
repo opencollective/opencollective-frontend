@@ -87,7 +87,7 @@ class TierCard extends React.Component {
               <Link route={`/${fromCollective.slug}`}>
                 <a title={fromCollective.name}>
                   {fromCollectiveTypeArray.indexOf('USER') !== -1 && (
-                    <Avatar src={fromCollective.image} radius={32} />
+                    <Avatar src={fromCollective.image} radius={32} type={fromCollective.type} name={fromCollective.name} ml="-15px" />
                   )}
                   {fromCollectiveTypeArray.indexOf('USER') === -1 && (
                     <Logo

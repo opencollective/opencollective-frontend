@@ -159,6 +159,8 @@ class Comment extends React.Component {
           >
             <Avatar
               src={comment.fromCollective.image}
+              type={comment.fromCollective.type}
+              name={comment.fromCollective.name}
               key={comment.fromCollective.id}
               radius={40}
             />

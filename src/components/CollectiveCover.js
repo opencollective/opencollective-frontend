@@ -7,10 +7,10 @@ import {
   FormattedDate,
   FormattedTime,
 } from 'react-intl';
-import { get } from 'lodash';
 import { Github } from 'styled-icons/fa-brands/Github.cjs';
 import { Twitter } from 'styled-icons/fa-brands/Twitter.cjs';
 import { ExternalLinkAlt } from 'styled-icons/fa-solid/ExternalLinkAlt.cjs';
+import { get, pick } from 'lodash';
 import { prettyUrl, imagePreview } from '../lib/utils';
 import Currency from './Currency';
 import Avatar from './Avatar';
@@ -356,7 +356,12 @@ ${description}`;
           <div className="content">
             <Link route={href} className="goBack">
               {collective.type === 'USER' && (
-                <Avatar src={logo} className="logo" radius="10rem" />
+                <Avatar
+                  src={logo}
+                  className="logo"
+                  radius="10rem"
+                  {...pick(collective, ['type', 'name'])}
+                />
               )}
               {collective.type !== 'USER' && (
                 <Logo

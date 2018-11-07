@@ -100,8 +100,8 @@ Financial contribution: ${percentage}% (${formatCurrency(
     const className = index >= 5 ? 'desktopOnly' : '';
     return (
       <div key={`topBacker-${index}`} className={`user backer ${className}`}>
-        <Link route={`/${user.slug}`} title={title}>
-          <Avatar src={user.image} radius={48} className="noFrame" />
+        <Link route="collective" params={{ slug: user.slug }} title={title} passHref>
+          <Avatar src={user.image} name={user.name} type={user.type} radius={48} size={[30, null, 48]} className="noFrame" />
         </Link>
       </div>
     );

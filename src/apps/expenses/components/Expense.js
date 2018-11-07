@@ -274,6 +274,8 @@ class Expense extends React.Component {
           >
             <Avatar
               src={expense.fromCollective.image}
+              type={expense.fromCollective.type}
+              name={expense.fromCollective.name}
               key={expense.fromCollective.id}
               radius={40}
               className="noFrame"

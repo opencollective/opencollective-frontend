@@ -6,18 +6,8 @@ import withIntl from '../lib/withIntl';
 import { formatCurrency, capitalize } from '../lib/utils';
 import { Badge } from 'react-bootstrap';
 import { get, uniqBy } from 'lodash';
-import styled from 'styled-components';
-import {
-  backgroundImage,
-  bgColor,
-  border,
-  borderRadius,
-  display,
-  size,
-  space,
-  style,
-} from 'styled-system';
 import { Box, Flex } from 'grid-styled';
+import Avatar from './Avatar';
 import Hide from './Hide';
 import { P } from './Text';
 import Caret from './Caret';
@@ -25,27 +15,6 @@ import StyledLink from './StyledLink';
 import ListItem from './ListItem';
 import Container from './Container';
 import LoginBtn from './LoginBtn';
-
-const cursor = style({
-  prop: 'cursor',
-});
-
-const Avatar = styled.div`
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: contain;
-  overflow: hidden;
-
-  ${bgColor}
-  ${backgroundImage}
-  ${border}
-  ${borderRadius}
-  ${display}
-  ${size}
-  ${space}
-
-  ${cursor}
-`;
 
 class TopBarProfileMenu extends React.Component {
   static propTypes = {
@@ -228,13 +197,13 @@ class TopBarProfileMenu extends React.Component {
                   >
                     <Flex alignItems="center">
                       <Avatar
-                        backgroundImage={`url(${get(
+                        src={get(
                           membership,
                           'collective.image',
-                        )})`}
-                        size="2.8rem"
-                        borderRadius="3px"
-                        border="1px solid rgba(18,19,20,0.12)"
+                        )}
+                        type={get(membership, 'collective.type')}
+                        name={get(membership, 'collective.name')}
+                        radius="2.8rem"
                         mr={2}
                       />
                       {get(membership, 'collective.slug')}
@@ -298,13 +267,13 @@ class TopBarProfileMenu extends React.Component {
                   >
                     <Flex alignItems="center">
                       <Avatar
-                        backgroundImage={`url(${get(
+                        src={get(
                           membership,
                           'collective.image',
-                        )})`}
-                        size="2.8rem"
-                        borderRadius="3px"
-                        border="1px solid rgba(18,19,20,0.12)"
+                        )}
+                        type={get(membership, 'collective.type')}
+                        name={get(membership, 'collective.name')}
+                        radius="2.8rem"
                         mr={2}
                       />
                       {get(membership, 'collective.slug')}
@@ -434,13 +403,11 @@ class TopBarProfileMenu extends React.Component {
       <Flex alignItems="center" onClick={this.toggleProfileMenu}>
         {LoggedInUser.image && (
           <Avatar
-            backgroundColor="#FDFDFD"
-            backgroundImage={`url(${LoggedInUser.image})`}
-            borderRadius="100%"
-            display="inline-block"
-            size="2.6rem"
+            radius="3rem"
             mr={2}
-            cursor="pointer"
+            src={LoggedInUser.image}
+            type={get(LoggedInUser, 'collective.type')}
+            name={get(LoggedInUser, 'collective.name')}
           />
         )}
         <Hide xs sm>

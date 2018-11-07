@@ -591,6 +591,8 @@ class MenuBar extends React.Component {
                         {collective.type === 'USER' && (
                           <Avatar
                             src={collective.image}
+                            type={collective.type}
+                            name={collective.name}
                             className="logo"
                             radius="4.8rem"
                           />
@@ -623,6 +625,8 @@ class MenuBar extends React.Component {
                     {collective.type === 'USER' && (
                       <Avatar
                         src={collective.image}
+                        type={collective.type}
+                        name={collective.name}
                         className="logo"
                         radius="6.4rem"
                       />

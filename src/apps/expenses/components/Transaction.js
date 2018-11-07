@@ -78,6 +78,8 @@ class Transaction extends React.Component {
           <a href={`/${fromCollective.slug}`} title={fromCollective.name}>
             <Avatar
               src={fromCollective.image}
+              type={fromCollective.type}
+              name={fromCollective.name}
               id={fromCollective.id}
               radius={40}
               className="noFrame"

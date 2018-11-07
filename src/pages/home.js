@@ -929,6 +929,7 @@ const query = gql`
           image
           name
           slug
+          type
         }
         collective {
           name

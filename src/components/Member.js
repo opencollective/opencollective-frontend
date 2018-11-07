@@ -150,7 +150,7 @@ ${totalDonationsStr}`;
               target="_top"
               title={title}
             >
-              <Avatar src={member.image} radius={45} className="noFrame" />
+              <Avatar src={member.image} radius={45} name={name} type={member.type} mt={2} className="noFrame" />
               <div className="bubble">
                 <div className="name">{name}</div>
                 <div className="description" style={{ color: colors.darkgray }}>
