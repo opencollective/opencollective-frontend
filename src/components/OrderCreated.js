@@ -218,17 +218,17 @@ class OrderCreated extends React.Component {
                     id="collective.user.orderCreated.helpUsRaise.shareUrl"
                     defaultMessage="Share this URL:"
                   />
-                  <div>
-                    <a
-                      href={`https://opencollective.com${
-                        collective.path
-                      }?referral=${fromCollective.id}`}
-                    >
-                      {`https://opencollective.com${collective.path}?referral=${
-                        fromCollective.id
-                      }`}
-                    </a>
-                  </div>
+                  <br />
+                  <a
+                    href={`https://opencollective.com${
+                      collective.path
+                    }?referral=${fromCollective.id}`}
+                  >
+                    {`https://opencollective.com${collective.path}?referral=${
+                      fromCollective.id
+                    }`}
+                  </a>
+                  <br />
                   {type === 'COLLECTIVE' && (
                     <FormattedMessage
                       id="collective.user.orderCreated.helpUsRaise.description"
