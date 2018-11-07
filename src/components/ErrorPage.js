@@ -24,8 +24,8 @@ class ErrorPage extends React.Component {
     this.messages = defineMessages({
       loading: { id: 'page.loading', defaultMessage: 'Loading' },
       'loading.description': {
-        id: 'page.loading.description',
-        defaultMessage: 'Please wait...',
+        id: 'pleasewait',
+        defaultMessage: 'please wait...',
       },
       'collective.is.not.host': {
         id: 'page.error.collective.is.not.host',

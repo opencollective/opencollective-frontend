@@ -164,8 +164,8 @@ class OrderForm extends React.Component {
         defaultMessage: 'Expired code',
       },
       'ocCard.loading': {
-        id: 'occard.loading',
-        defaultMessage: 'Please wait...',
+        id: 'pleasewait',
+        defaultMessage: 'please wait...',
       },
       'ocCard.amountremaining': {
         id: 'occard.amountremaining',
@@ -1095,9 +1095,6 @@ class OrderForm extends React.Component {
               max-width: 100%;
               padding-right: 1rem;
             }
-            .actions {
-              margin-top: 3rem;
-            }
             .result {
               margin-top: 3rem;
             }
@@ -1137,6 +1134,14 @@ class OrderForm extends React.Component {
             }
             .form-group#paypalFG {
               margin-bottom: 0px !important;
+            }
+            .submit {
+              display: flex;
+              align-items: center;
+            }
+            .pleasewait {
+              margin-left: 2rem;
+              font-size: 1.4rem;
             }
           `}
         </style>
@@ -1457,6 +1462,15 @@ class OrderForm extends React.Component {
                                 )
                               )}
                             </ActionButton>
+                            {this.state.loading && (
+                              <div className="pleasewait">
+                                <FormattedMessage
+                                  id="pleasewait"
+                                  defaultMessage="please wait..."
+                                />
+                                ...
+                              </div>
+                            )}
                           </div>
 
                           {order.totalAmount > 0 &&
@@ -1471,22 +1485,11 @@ class OrderForm extends React.Component {
                             })}
 
                           <div className="result">
-                            {this.state.loading && (
-                              <div className="loading">
-                                <FormattedMessage
-                                  id="form.processing"
-                                  defaultMessage="processing"
-                                />
-                                ...
-                              </div>
-                            )}
-
                             {this.state.result.success && (
                               <div className="success">
                                 {this.state.result.success}
                               </div>
                             )}
-
                             {this.state.result.error && (
                               <div className="error">
                                 {this.state.result.error}

@@ -189,7 +189,7 @@ class Tier extends React.Component {
 
   render() {
     const { intl, tier } = this.props;
-    const { type, name, description, currency } = this.props.tier;
+    const { type, name, description, currency, maxQuantity } = this.props.tier;
 
     const intervals = [null, 'month', 'year'];
     const currentValues = this.calcCurrentValues();
@@ -264,6 +264,16 @@ class Tier extends React.Component {
             .interval {
               font-size: 1.2rem;
               color: ${colors.darkgray};
+            }
+            .limited {
+              margin: -1.5rem 0 0 1rem;
+              font-size: 1.1rem;
+              font-weight: 500;
+              line-height: 2.09;
+              letter-spacing: 1px;
+              text-align: left;
+              color: #e69900;
+              color: var(--attention);
             }
             .description {
               min-height: 5rem;
@@ -375,6 +385,18 @@ class Tier extends React.Component {
               </div>
             )}
           </div>
+          {maxQuantity > 0 && (
+            <div className="limited">
+              <FormattedMessage
+                id="tier.limited"
+                values={{
+                  maxQuantity,
+                  availableQuantity: get(tier, 'stats.availableQuantity'),
+                }}
+                defaultMessage="LIMITED: {availableQuantity} LEFT OUT OF {maxQuantity}"
+              />
+            </div>
+          )}
           <div className="description">
             {description && <Markdown source={description} />}
             {!description && <p>{this.defaultDescription}</p>}
