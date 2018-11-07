@@ -60,7 +60,7 @@
     "react-apollo": "2.2.4",
     "react-bootstrap": "0.32.4",
     "react-datetime": "2.16.1",
-    "react-dom": "16.6.0",
+    "react-dom": "16.6.1",
     "react-dropzone": "5.1.1",
     "react-geosuggest": "2.9.0",
     "react-gmaps": "1.9.0",
