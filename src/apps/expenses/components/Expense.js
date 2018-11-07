@@ -268,9 +268,11 @@ class Expense extends React.Component {
         </style>
 
         <div className="fromCollective">
-          <a
-            href={`/${expense.fromCollective.slug}`}
+          <Link
+            route="collective"
+            params={{ slug: expense.fromCollective.slug }}
             title={expense.fromCollective.name}
+            passHref
           >
             <Avatar
               src={expense.fromCollective.image}
@@ -280,7 +282,7 @@ class Expense extends React.Component {
               radius={40}
               className="noFrame"
             />
-          </a>
+          </Link>
         </div>
         <div className="body">
           <div className="header">

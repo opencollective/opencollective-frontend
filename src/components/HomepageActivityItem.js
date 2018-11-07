@@ -21,7 +21,7 @@ const HomepageActivityItem = ({
   const formattedCreatedAt = new Date(createdAt).toISOString();
   return (
     <Container display="flex" alignItems="center">
-      <Link route="collective" params={{ slug: fromCollective.slug }}>
+      <Link route="collective" params={{ slug: fromCollective.slug }} passHref>
         <a title={fromCollective.name}>
           <Avatar
             src={fromCollective.image}
@@ -35,7 +35,7 @@ const HomepageActivityItem = ({
       </Link>
       <Container ml={3}>
         <P fontSize="1.2rem" color="#9399A3" display="inline">
-          <Link route="collective" params={{ slug: fromCollective.slug }}>
+          <Link route="collective" params={{ slug: fromCollective.slug }} passHref>
             <a title={fromCollective.name}>{fromCollective.name}</a>
           </Link>
           {type === 'DEBIT' ? ' submitted a ' : ' contributed '}

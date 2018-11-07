@@ -153,9 +153,11 @@ class Comment extends React.Component {
           `}
         </style>
         <div className="fromCollective">
-          <a
-            href={`/${comment.fromCollective.slug}`}
+          <Link
+            route="collective"
+            params={{ slug: comment.fromCollective.slug }}
             title={comment.fromCollective.name}
+            passHref
           >
             <Avatar
               src={comment.fromCollective.image}
@@ -164,7 +166,7 @@ class Comment extends React.Component {
               key={comment.fromCollective.id}
               radius={40}
             />
-          </a>
+          </Link>
         </div>
         <div className="body">
           <div className="header">
