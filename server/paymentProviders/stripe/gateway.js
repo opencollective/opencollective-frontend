@@ -209,6 +209,24 @@ export const retrieveBalanceTransaction = (stripeAccount, txn) => {
 };
 
 /**
+ * Given a charge id, retrieves the refund data if there is one.
+ */
+export const retrieveRefundFromChargeId = (stripeAccount, chargeId) => {
+  return retrieveCharge(stripeAccount, chargeId)
+  .then(charge => {
+    const refundId = _.get(charge, 'refunds.data[0].id');
+    if (!refundId) {
+      throw new Error(`charge with id ${chargeId} has no refunds.`);
+    }
+    return appStripe.refunds.retrieve(refundId, {
+      stripe_account: stripeAccount.username,
+    });
+  }).catch(err => {
+    throw err;
+  });
+};
+
+/**
  * Retreive an event (for webhook)
  */
 export const retrieveEvent = (stripeAccount, eventId) => {
