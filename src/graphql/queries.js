@@ -487,6 +487,10 @@ const getEventCollectiveQuery = gql`
         presets
         currency
         maxQuantity
+        stats {
+          id
+          availableQuantity
+        }
       }
       parentCollective {
         id

@@ -370,6 +370,11 @@ const addData = graphql(gql`
         currency
         interval
         presets
+        maxQuantity
+        stats {
+          id
+          availableQuantity
+        }
       }
     }
   }
