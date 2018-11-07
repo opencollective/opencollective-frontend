@@ -520,7 +520,7 @@ describe('opencollective.virtualcard', () => {
 
   describe('graphql.mutations.paymentMethods.virtualcard', () => {
     describe('#create', async () => {
-      let collective1, user1;
+      let collective1, collective2, creditCard2, user1;
 
       before(() => utils.resetTestDB());
       before('create collective1(currency USD, No Host)', () =>
@@ -529,6 +529,13 @@ describe('opencollective.virtualcard', () => {
           currency: 'USD',
           isActive: true,
         }).then(c => (collective1 = c)),
+      );
+      before('create collective2(currency USD, No Host)', () =>
+        models.Collective.create({
+          name: 'collective2',
+          currency: 'USD',
+          isActive: true,
+        }).then(c => (collective2 = c)),
       );
       before('creates User 1', () =>
         models.User.createUserWithCollective({ name: 'User 1' }).then(
@@ -543,16 +550,11 @@ describe('opencollective.virtualcard', () => {
           role: 'ADMIN',
         }),
       );
-
-      before('create a payment method', () =>
-        models.PaymentMethod.create({
-          name: '4242',
-          service: 'stripe',
-          type: 'creditcard',
-          token: 'tok_123456781234567812345678',
-          CollectiveId: collective1.id,
-          monthlyLimitPerMember: null,
-        }),
+      before('create a payment method for collective 1', () =>
+        store.createCreditCard(collective1.id),
+      );
+      before('create a payment method for collective 2', () =>
+        store.createCreditCard(collective2.id).then(c => (creditCard2 = c)),
       );
 
       it('should fail creating a virtual card because there is no currency defined', async () => {
@@ -626,6 +628,27 @@ describe('opencollective.virtualcard', () => {
             .format('YYYY-MM-DD'),
         );
       }); /** End of "should create a U$100 virtual card payment method" */
+
+      it("should fail if payment method does't belongs to collective", async () => {
+        const args = {
+          type: 'virtualcard',
+          currency: 'USD',
+          CollectiveId: collective1.id,
+          amount: 10000,
+          PaymentMethodId: creditCard2.id,
+        };
+        // call graphql mutation
+        const gqlResult = await utils.graphqlQuery(
+          createPaymentMethodQuery,
+          args,
+          user1,
+        );
+        expect(gqlResult.errors).to.exist;
+        expect(gqlResult.errors[0]).to.exist;
+        expect(gqlResult.errors[0].toString()).to.contain(
+          'Invalid PaymentMethodId',
+        );
+      });
     }); /** End Of "#create" */
 
     describe('#claim', async () => {

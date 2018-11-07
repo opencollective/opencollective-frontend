@@ -186,6 +186,13 @@ async function create(args, remoteUser) {
       );
     }
     SourcePaymentMethodId = sourcePaymentMethod.id;
+  } else {
+    sourcePaymentMethod = await models.PaymentMethod.findById(
+      args.PaymentMethodId,
+    );
+    if (sourcePaymentMethod.CollectiveId !== collective.id) {
+      throw Error('Invalid PaymentMethodId');
+    }
   }
   const expiryDate = args.expiryDate
     ? moment(args.expiryDate).format()
