@@ -85,7 +85,11 @@ const init = async () => {
       createdAt: { [Op.gte]: startDate, [Op.lt]: endDate },
     },
     include: [
-      { model: models.Collective, as: 'collective', where: { type: 'COLLECTIVE' } },
+      {
+        model: models.Collective,
+        as: 'collective',
+        where: { type: 'COLLECTIVE' },
+      },
     ],
   };
 
@@ -119,23 +123,25 @@ const processBacker = async FromCollectiveId => {
   const backerCollective = await models.Collective.findById(FromCollectiveId);
   console.log('>>> Processing backer', backerCollective.slug);
   const query = {
-    attributes: [
-      'CollectiveId',
-      'HostCollectiveId',
-    ],
+    attributes: ['CollectiveId', 'HostCollectiveId'],
     where: {
       FromCollectiveId,
       type: 'CREDIT',
       createdAt: { [Op.gte]: startDate, [Op.lt]: endDate },
     },
     include: [
-      { model: models.Collective, as: 'collective', where: { type: 'COLLECTIVE' } },
+      {
+        model: models.Collective,
+        as: 'collective',
+        where: { type: 'COLLECTIVE' },
+      },
     ],
   };
   const transactions = await models.Transaction.findAll(query);
 
   console.log('>>> transactions found', transactions.length);
-  const distinctTransactions = [], collectiveIds = {};
+  const distinctTransactions = [],
+    collectiveIds = {};
   transactions.map(t => {
     if (!collectiveIds[t.CollectiveId]) {
       collectiveIds[t.CollectiveId] = true;

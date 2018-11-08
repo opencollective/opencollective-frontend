@@ -38,7 +38,7 @@ async function getBalance(paymentMethod) {
     const date = new Date();
     const firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
     const lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0);
-    lastDay.setHours(23,59,59,999);
+    lastDay.setHours(23, 59, 59, 999);
     // update query to filter result through the dates
     query = { ...query, createdAt: { [Op.between]: [firstDay, lastDay] } };
   }
@@ -48,9 +48,12 @@ async function getBalance(paymentMethod) {
     where: query,
   });
   let spent = 0;
-  for ( const transaction of allTransactions) {
+  for (const transaction of allTransactions) {
     if (transaction.currency != paymentMethod.currency) {
-      const fxRate = await currency.getFxRate(transaction.currency, paymentMethod.currency);
+      const fxRate = await currency.getFxRate(
+        transaction.currency,
+        paymentMethod.currency,
+      );
       spent += transaction.netAmountInCollectiveCurrency * fxRate;
     } else {
       spent += transaction.netAmountInCollectiveCurrency;
@@ -83,12 +86,17 @@ async function processOrder(order) {
   // Checking if balance is ok or will still be after completing the order
   const balance = await getBalance(paymentMethod);
   if (!balance || balance.amount <= 0) {
-    throw new Error('This payment method has no balance to complete this order');
+    throw new Error(
+      'This payment method has no balance to complete this order',
+    );
   }
   // converting(or keeping if it's the same currency) order amount to the payment method currency
   let orderAmountInPaymentMethodCurrency = order.totalAmount;
   if (order.currency != paymentMethod.currency) {
-    const fxRate = await currency.getFxRate(order.currency, paymentMethod.currency);
+    const fxRate = await currency.getFxRate(
+      order.currency,
+      paymentMethod.currency,
+    );
     orderAmountInPaymentMethodCurrency = order.totalAmount * fxRate;
   }
   if (balance.amount - orderAmountInPaymentMethodCurrency < 0) {
@@ -194,7 +202,10 @@ async function create(args, remoteUser) {
   if (args.monthlyLimitPerMember) {
     monthlyLimitPerMember = args.monthlyLimitPerMember;
     amount = null;
-    description = `${formatCurrency(args. monthlyLimitPerMember, args.currency)} monthly card from ${collective.name}`;
+    description = `${formatCurrency(
+      args.monthlyLimitPerMember,
+      args.currency,
+    )} monthly card from ${collective.name}`;
   }
 
   // creates a new Virtual card Payment method
@@ -245,13 +256,20 @@ async function claim(args, remoteUser) {
   );
   // if the virtual card PM Collective Id is different than the Source PM Collective Id
   // it means this virtual card was already claimend
-  if (!sourcePaymentMethod || sourcePaymentMethod.CollectiveId !== virtualCardPaymentMethod.CollectiveId) {
+  if (
+    !sourcePaymentMethod ||
+    sourcePaymentMethod.CollectiveId !== virtualCardPaymentMethod.CollectiveId
+  ) {
     throw Error('Virtual card already claimed.');
   }
   // find or creating a user with its collective
-  const user = remoteUser || await models.User.findOrCreateByEmail(get(args, 'user.email'), args.user);
+  const user =
+    remoteUser ||
+    (await models.User.findOrCreateByEmail(get(args, 'user.email'), args.user));
   if (!user) {
-    throw Error(`Please provide user details or make this request as a logged in user.`);
+    throw Error(
+      'Please provide user details or make this request as a logged in user.',
+    );
   }
   // updating virtual card with collective Id of the user
   await virtualCardPaymentMethod.update({

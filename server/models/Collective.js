@@ -1320,7 +1320,10 @@ export default function(Sequelize, DataTypes) {
 
     let isActive = false;
     if (creatorUser.isAdmin) {
-      if (this.ParentCollectiveId && creatorUser.isAdmin(this.ParentCollectiveId)) {
+      if (
+        this.ParentCollectiveId &&
+        creatorUser.isAdmin(this.ParentCollectiveId)
+      ) {
         isActive = true;
       } else if (creatorUser.isAdmin(hostCollective.id)) {
         isActive = true;
@@ -1380,11 +1383,13 @@ export default function(Sequelize, DataTypes) {
             ]),
           },
         };
-        promises.push(models.Activity.create({
-          CollectiveId: this.id,
-          type: activities.COLLECTIVE_APPLY,
-          data,
-        }));
+        promises.push(
+          models.Activity.create({
+            CollectiveId: this.id,
+            type: activities.COLLECTIVE_APPLY,
+            data,
+          }),
+        );
       }
     }
 
