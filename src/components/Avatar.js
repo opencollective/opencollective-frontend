@@ -4,8 +4,7 @@ import styled from 'styled-components';
 import { backgroundImage, borders, borderColor, size, themeGet } from 'styled-system';
 import tag from 'clean-tag';
 import { Flex } from 'grid-styled';
-import { imagePreview } from '../lib/utils';
-import { defaultImage } from '../constants/collectives';
+import withFallbackImage from '../lib/withFallbackImage';
 
 const getInitials = name => (
   name
@@ -35,20 +34,19 @@ StyledAvatar.defaultProps = {
 };
 
 const Avatar = ({ src, type = 'USER', radius, name, ...styleProps }) => {
-  const image = imagePreview(src, defaultImage[type], { width: radius });
   return (
     <StyledAvatar
-      backgroundImage={`url(${image})`}
+      backgroundImage={`url(${src})`}
       size={radius}
       type={type}
       {...styleProps}
     >
-      {!image && type === 'USER' && name && (
+      {!src && type === 'USER' && name && (
         <span>{getInitials(name)}</span>
       )}
     </StyledAvatar>
   );
-};
+}
 
 Avatar.propTypes = {
   name: PropTypes.string,
@@ -56,4 +54,4 @@ Avatar.propTypes = {
   type: PropTypes.oneOf(['USER', 'COLLECTIVE', 'ORGANIZATION', 'CHAPTER']),
 };
 
-export default Avatar;
+export default withFallbackImage(Avatar);

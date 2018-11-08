@@ -70,7 +70,7 @@ Financial contribution: ${percentage}% (${formatCurrency(
             `}
           </style>
           <Link route="collective" params={{ slug: org.slug }} title={title} passHref>
-            <Logo src={org.image} height={36} />
+            <Logo src={org.image} type={org.type} website={org.website} height={36} />
           </Link>
         </div>
       </div>

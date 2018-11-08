@@ -1,26 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { defaultImage } from '../constants/collectives';
-import { imagePreview, getDomain } from '../lib/utils';
+// import { defaultImage } from '../constants/collectives';
+// import { imagePreview, getDomain } from '../lib/utils';
+import withFallbackImage from '../lib/withFallbackImage';
 
-const Logo = ({ src, style = {}, height, type = 'ORGANIZATION', website }) => {
+const Logo = ({ src, style = {}, height }) => {
   style.maxHeight = style.height || height;
-  if (!src && website && type === 'ORGANIZATION') {
-    src = `https://logo.clearbit.com/${getDomain(website)}`;
-  }
   const backgroundStyle = { height };
   if (height && parseInt(height, 10) == height) {
     backgroundStyle.minWidth = parseInt(height, 10) / 2;
   }
-  if (!src) {
-    if (defaultImage[type]) {
-      backgroundStyle.backgroundImage = `url(${defaultImage[type]})`;
-    }
-  }
-  const image = imagePreview(src, defaultImage[type], {
-    height: style.maxHeight,
-  });
   return (
     <div className="Logo" style={backgroundStyle}>
       <style jsx>
@@ -40,7 +30,7 @@ const Logo = ({ src, style = {}, height, type = 'ORGANIZATION', website }) => {
           }
         `}
       </style>
-      <img className="logo" src={image} style={style} />
+      <img className="logo" src={src} style={style} />
     </div>
   );
 };
@@ -49,8 +39,6 @@ Logo.propTypes = {
   src: PropTypes.string,
   style: PropTypes.object,
   height: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-  type: PropTypes.string,
-  website: PropTypes.string,
 };
 
-export default Logo;
+export default withFallbackImage(Logo);

@@ -93,6 +93,7 @@ class TierCard extends React.Component {
                     <Logo
                       src={fromCollective.image}
                       website={fromCollective.website}
+                      type={fromCollective.type}
                       height={32}
                     />
                   )}
