@@ -205,7 +205,7 @@ async function create(args, remoteUser) {
     description = `${formatCurrency(
       args.monthlyLimitPerMember,
       args.currency,
-    )} monthly card from ${collective.name}`;
+    )} Monthly Gift Card from ${collective.name}`;
   }
 
   // creates a new Virtual card Payment method

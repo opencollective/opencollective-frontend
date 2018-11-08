@@ -171,8 +171,8 @@ describe('opencollective.virtualcard', () => {
         expect(
           moment(paymentMethod.expiryDate).format('YYYY-MM-DD'),
         ).to.be.equal(expiryDate);
-        expect(paymentMethod.description).to.contain('card from');
-        expect(paymentMethod.description).to.not.contain('monthly card');
+        expect(paymentMethod.description).to.contain('Gift Card from');
+        expect(paymentMethod.description).to.not.contain('Monthly Gift Card');
       }); /** End Of "should create a U$100 virtual card payment method defining an expiry date" */
 
       it('should create a virtual card with monthly limit member of U$100 per month', async () => {
@@ -198,7 +198,7 @@ describe('opencollective.virtualcard', () => {
         );
         // if there is a monthlyLimitPerMember balance must not exist
         expect(paymentMethod.balance).to.not.exist;
-        expect(paymentMethod.description).to.contain('monthly card from');
+        expect(paymentMethod.description).to.contain('Monthly Gift Card from');
       }); /** End Of "should create a virtual card with monthly limit member of U$100 per month" */
 
       it('should create a virtual card with monthly limit member of U$100 per month defining an expiry date', async () => {
