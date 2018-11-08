@@ -196,17 +196,24 @@ export default {
       hostStripeAccount,
       chargeId,
     );
-    const balance = await stripeGateway.retrieveBalanceTransaction(
+    const charge = await stripeGateway.retrieveCharge(
+      hostStripeAccount,
+      chargeId,
+    );
+    const refundBalance = await stripeGateway.retrieveBalanceTransaction(
       hostStripeAccount,
       refund.balance_transaction,
     );
-    const fees = stripeGateway.extractFees(balance);
+    const fees = stripeGateway.extractFees(refundBalance);
 
     /* Create negative transactions for the received transaction */
     const refundTransaction = await paymentsLib.createRefundTransaction(
       transaction,
       fees.stripeFee,
-      { refund, balance },
+      {
+        refund,
+        balanceTransaction: refundBalance,
+      },
       user,
     );
 
@@ -214,6 +221,10 @@ export default {
     return paymentsLib.associateTransactionRefundId(
       transaction,
       refundTransaction,
+      {
+        ...transaction.data,
+        charge,
+      }
     );
   },
 
@@ -233,21 +244,24 @@ export default {
     const hostStripeAccount = await collective.getHostStripeAccount();
 
     /* Refund both charge & application fee */
-    const refund = await stripeGateway.retrieveRefundFromChargeId(
-      hostStripeAccount,
-      chargeId,
-    );
-    const balance = await stripeGateway.retrieveBalanceTransaction(
+    const { charge, refund } = await stripeGateway.retrieveChargeWithRefund(hostStripeAccount, chargeId);
+    if (!refund) {
+      throw new Error('No refunds found in stripe.');
+    }
+    const refundBalance = await stripeGateway.retrieveBalanceTransaction(
       hostStripeAccount,
       refund.balance_transaction,
     );
-    const fees = stripeGateway.extractFees(balance);
+    const fees = stripeGateway.extractFees(refundBalance);
 
     /* Create negative transactions for the received transaction */
     const refundTransaction = await paymentsLib.createRefundTransaction(
       transaction,
       fees.stripeFee,
-      { refund, balance },
+      {
+        refund,
+        balanceTransaction: refundBalance,
+      },
       user,
     );
 
@@ -255,6 +269,10 @@ export default {
     return paymentsLib.associateTransactionRefundId(
       transaction,
       refundTransaction,
+      {
+        ...transaction.data,
+        charge,
+      },
     );
   },
 
