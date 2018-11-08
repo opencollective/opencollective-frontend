@@ -5,8 +5,7 @@
  * from status 'ACTIVE' to status 'CANCELLED'
  *  1) Refund transactions
  *  2) Mark Orders as cancelled
- *  2) Get transactions ORders and Mark the order Subscriptions of orders as isActive False and deactivedAt now()
- * 
+ *  3) Get transactions ORders and Mark the order Subscriptions of orders as isActive False and deactivedAt now()
  */
 import Promise from 'bluebird';
 import debug from 'debug';
@@ -54,11 +53,13 @@ async function refundTransaction(transaction) {
     await order.save();
     debugRefund('updating subscription to be deactived');
     
-    // mark subscriptions with isActive as false and deactivedAt now.
-    const subscription = await models.Subscription.findById(order.SubscriptionId);
-    subscription.isActive = false;
-    subscription.deactivatedAt = new Date();
-    await subscription.save();
+    // if the order has a subscription, mark it with isActive as false and deactivedAt now.
+    if (order.SubscriptionId) {
+      const subscription = await models.Subscription.findById(order.SubscriptionId);
+      subscription.isActive = false;
+      subscription.deactivatedAt = new Date();
+      await subscription.save();
+    }
   }
   return models.Transaction.findById(transaction.id);
 }
