@@ -10,8 +10,20 @@ import Button from './Button';
 import storage from '../lib/storage';
 import withIntl from '../lib/withIntl';
 
-const HTMLEditor = dynamic(import('./HTMLEditor'));
-const MarkdownEditor = dynamic(import('./MarkdownEditor'));
+// Dynamic imports: this components have a huge impact on bundle size and are externalized
+// We use the DYNAMIC_IMPORT env variable to skip dynamic while using Jest
+let HTMLEditor, MarkdownEditor;
+if (process.env.DYNAMIC_IMPORT) {
+  HTMLEditor = dynamic(() =>
+    import(/* webpackChunkName: 'HTMLEditor' */ './HTMLEditor'),
+  );
+  MarkdownEditor = dynamic(() =>
+    import(/* webpackChunkName: 'MarkdownEditor' */ './MarkdownEditor'),
+  );
+} else {
+  HTMLEditor = require('./HTMLEditor').default;
+  MarkdownEditor = require('./MarkdownEditor').default;
+}
 
 class EditUpdateForm extends React.Component {
   static propTypes = {
