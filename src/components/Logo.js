@@ -1,8 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-// import { defaultImage } from '../constants/collectives';
-// import { imagePreview, getDomain } from '../lib/utils';
 import withFallbackImage from '../lib/withFallbackImage';
 
 const Logo = ({ src, style = {}, height }) => {
