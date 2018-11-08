@@ -721,7 +721,7 @@ describe('opencollective.virtualcard', () => {
           'You received $100 from collective1 to donate on Open Collective',
         );
         expect(sendEmailSpy.firstCall.args[2]).to.contain(
-          'next=/redeemed?amount=10000&currency=USD&emitterName=collective1&emitterSlug=collective1&name=New%20User',
+          `next=/redeemed?code=${virtualCardCode}`,
         );
         expect(sendEmailSpy.firstCall.args[2]).to.contain(
           collective1.image.substr(collective1.image.lastIndexOf('/') + 1),
