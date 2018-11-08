@@ -12,7 +12,7 @@ import debug from 'debug';
 import models from '../server/models';
 import * as libPayments from '../server/lib/payments';
 
-const fromCollectiveIds = process.env.FROM_COLLECTIVE_IDS || [21715];
+const fromCollectiveIds = process.env.FROM_COLLECTIVE_IDS || [23461];
 const debugRefund = debug('refundTransactions');
 
 async function refundTransaction(transaction) {
@@ -73,11 +73,17 @@ async function run() {
     },
     include: [models.Order, models.PaymentMethod],
   });
-  // TO DO: instead of consider only the first of the above array, we'll consider all
-  // doing this because we are carefully and slowly running this script in PROD
-  const mapResult = await Promise.map([transactions[0]], refundTransaction);
-  debugRefund(`mapResult(tip: result transactions need to have RefundTransactionId set): ${JSON.stringify(mapResult, null,2)}`);
-  process.exit(0);
+  try {
+    const mapResult = await Promise.map(transactions, refundTransaction);
+    debugRefund(`Script finished successfully,
+      mapResult(tip: result transactions need to have RefundTransactionId set):
+      ${JSON.stringify(mapResult, null,2)}`
+    );
+    process.exit(0);
+  } catch (error) {
+    debugRefund('Error executing script',error);
+    process.exit(1);
+  }
 }
 
 run();
