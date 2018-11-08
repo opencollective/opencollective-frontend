@@ -61,6 +61,7 @@
   "transaction.refund.yes.btn": "Yes, refund!",
   "transaction.refund.no.btn": "no",
   "expense.reject.btn": "reject",
+  "transaction.usingGiftCardFrom": "using a gift card from {collectiveLink}",
   "transaction.closeDetails": "Close Details",
   "transaction.viewDetails": "View Details",
   "transaction.hostFeeInHostCurrency": "{hostFeePercent} host fee",

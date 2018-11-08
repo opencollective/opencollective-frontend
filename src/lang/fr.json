@@ -61,6 +61,7 @@
   "transaction.refund.yes.btn": "Oui, rembourser!",
   "transaction.refund.no.btn": "non",
   "expense.reject.btn": "refuser",
+  "transaction.usingGiftCardFrom": "avec un chèque cadeau de {collectiveLink}",
   "transaction.closeDetails": "Fermer les détails",
   "transaction.viewDetails": "Voir les détails",
   "transaction.hostFeeInHostCurrency": "{hostFeePercent} commission de l'hôte",
