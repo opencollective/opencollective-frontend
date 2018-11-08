@@ -1,10 +1,25 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import styled, { css } from 'styled-components';
 
 import ReactTooltip from 'react-tooltip';
+import { Question } from 'styled-icons/fa-solid/Question.cjs';
 
-const darkIcon = '/static/icons/icon-help-dark.svg';
-const lightIcon = '/static/icons/icon-help-light.svg';
+const IconQuestion = styled(Question)`
+  padding: 0.2em;
+  vertical-align: middle;
+  border: 1px solid;
+  border-radius: 1em;
+  border-color: #55a4fb;
+  color: white;
+
+  ${props =>
+    props.isInverted &&
+    css`
+      border-color: white;
+      color: #55a4fb;
+    `};
+`;
 
 class HelpTooltip extends React.Component {
   static propTypes = {
@@ -15,7 +30,6 @@ class HelpTooltip extends React.Component {
   constructor(props) {
     super(props);
     this.id = `tooltip${Math.round(Math.random() * 10000000)}`;
-    this.iconsrc = props.className === 'dark' ? darkIcon : lightIcon;
     this.overlayStyle = { background: 'white', color: 'black' };
   }
 
@@ -24,6 +38,7 @@ class HelpTooltip extends React.Component {
   }
 
   render() {
+    const { children, className } = this.props;
     return (
       <div className="HelpTooltip">
         <style jsx global>
@@ -45,8 +60,6 @@ class HelpTooltip extends React.Component {
             .customTooltip.place-bottom::after {
               border-color: white transparent !important;
             }
-            .helpIcon {
-            }
           `}
         </style>
         {!this._isMounted && (
@@ -57,7 +70,7 @@ class HelpTooltip extends React.Component {
         {this._isMounted && (
           <div>
             <a data-tip data-for={this.id}>
-              <img src={this.iconsrc} className="helpIcon" />
+              <IconQuestion size="1.2em" isInverted={className !== 'dark'} />
             </a>
             <ReactTooltip
               id={this.id}
@@ -67,7 +80,7 @@ class HelpTooltip extends React.Component {
               className="customTooltip"
               overlayStyle={this.overlayStyle}
             >
-              {this.props.children}
+              {children}
             </ReactTooltip>
           </div>
         )}

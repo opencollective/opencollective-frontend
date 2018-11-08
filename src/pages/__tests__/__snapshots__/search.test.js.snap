@@ -32,24 +32,15 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   margin-right: 16px;
 }
 
-.c13 {
+.c14 {
   margin: 0;
   box-sizing: border-box;
   margin: 0px;
   padding: 0px;
 }
 
-.c14 {
+.c15 {
   box-sizing: border-box;
-  padding-left: 16px;
-  padding-right: 16px;
-}
-
-.c20 {
-  box-sizing: border-box;
-  width: 100%;
-  margin-left: auto;
-  margin-right: auto;
   padding-left: 16px;
   padding-right: 16px;
 }
@@ -57,22 +48,31 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
 .c21 {
   box-sizing: border-box;
   width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 16px;
+  padding-right: 16px;
 }
 
-.c23 {
+.c22 {
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.c24 {
   box-sizing: border-box;
   margin-top: 16px;
   margin-bottom: 16px;
 }
 
-.c28 {
+.c29 {
   box-sizing: border-box;
   width: 100%;
   padding-top: 16px;
   padding-bottom: 16px;
 }
 
-.c32 {
+.c33 {
   max-width: 1300px;
   box-sizing: border-box;
   margin-left: auto;
@@ -80,7 +80,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   padding: 8px;
 }
 
-.c39 {
+.c45 {
   box-sizing: border-box;
   margin-top: 16px;
   -webkit-flex: 1 1 auto;
@@ -91,7 +91,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   order: 3;
 }
 
-.c40 {
+.c46 {
   box-sizing: border-box;
   width: 50%;
   margin-bottom: 16px;
@@ -148,7 +148,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   display: flex;
 }
 
-.c12 {
+.c13 {
   margin: 0;
   display: -webkit-box;
   display: -webkit-flex;
@@ -160,7 +160,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   justify-content: space-around;
 }
 
-.c22 {
+.c23 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -171,7 +171,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   align-items: flex-end;
 }
 
-.c26 {
+.c27 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -185,7 +185,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   justify-content: center;
 }
 
-.c31 {
+.c32 {
   max-width: 1300px;
   display: -webkit-box;
   display: -webkit-flex;
@@ -204,7 +204,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   justify-content: space-between;
 }
 
-.c34 {
+.c35 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -215,7 +215,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   justify-content: center;
 }
 
-.c38 {
+.c44 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -229,7 +229,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   justify-content: center;
 }
 
-.c27 {
+.c28 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -247,7 +247,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   justify-content: center;
 }
 
-.c17 {
+.c18 {
   color: #46b0ed;
   display: inline-block;
   font-size: 1.2rem;
@@ -263,7 +263,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   cursor: pointer;
 }
 
-.c35 {
+.c36 {
   color: #6E747A;
   font-size: 1.4rem;
   line-height: Paragraph;
@@ -277,7 +277,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   text-align: center;
 }
 
-.c41 {
+.c47 {
   color: #C2C6CC;
   font-size: 1.2rem;
   line-height: Paragraph;
@@ -290,7 +290,13 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   text-align: center;
 }
 
-.c30 {
+.c11 {
+  display: inline-block;
+  vertical-align: -.125em;
+  overflow: hidden;
+}
+
+.c31 {
   border-top: 1px solid #aaaaaa;
   bottom: 0px;
   background-color: white;
@@ -299,7 +305,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   width: 100%;
 }
 
-.c33 {
+.c34 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -312,7 +318,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   width: 100%;
 }
 
-.c36 {
+.c37 {
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -334,7 +340,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   width: 100%;
 }
 
-.c18 {
+.c19 {
   position: relative;
   display: inline-block;
   height: 0.6rem;
@@ -342,28 +348,28 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   cursor: pointer;
 }
 
-.c18::before,
-.c18::after {
+.c19::before,
+.c19::after {
   content: '';
   position: absolute;
   top: 0;
 }
 
-.c18::before {
+.c19::before {
   border-left: 0.6rem solid transparent;
   border-right: 0.6rem solid transparent;
   border-top: 0.6rem solid #46b0ed;
   left: 0;
 }
 
-.c18::after {
+.c19::after {
   border-left: calc(0.6rem - 0.2rem) solid transparent;
   border-right: calc(0.6rem - 0.2rem) solid transparent;
   border-top: calc(0.6rem - 0.2rem) solid white;
   left: 0.2rem;
 }
 
-.c29 {
+.c30 {
   display: block;
   font-size: Paragraph;
   font-weight: bold;
@@ -375,24 +381,54 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   text-align: center;
 }
 
-.c43 {
+.c49 {
   list-style: none;
   margin-bottom: 8px;
   text-align: center;
 }
 
-.c11 {
+.c12 {
   list-style: none;
   min-width: 20rem;
   text-align: right;
 }
 
-.c15 {
+.c16 {
   color: #777777;
   font-size: 1.4rem;
 }
 
-.c37 {
+.c41 {
+  display: inline-block;
+  vertical-align: -.125em;
+  overflow: hidden;
+}
+
+.c39 {
+  display: inline-block;
+  vertical-align: -.125em;
+  overflow: hidden;
+}
+
+.c42 {
+  display: inline-block;
+  vertical-align: -.125em;
+  overflow: hidden;
+}
+
+.c40 {
+  display: inline-block;
+  vertical-align: -.125em;
+  overflow: hidden;
+}
+
+.c43 {
+  display: inline-block;
+  vertical-align: middle;
+  overflow: hidden;
+}
+
+.c38 {
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -412,12 +448,12 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   width: 48px;
 }
 
-.c37:hover,
-.c37:focus {
+.c38:hover,
+.c38:focus {
   opacity: 1;
 }
 
-.c44 {
+.c50 {
   color: #6e747a;
   display: block;
   fontsize: 1.4rem;
@@ -426,7 +462,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   padding: 0;
 }
 
-.c42 {
+.c48 {
   box-sizing: border-box;
   padding-left: 0px;
   padding-right: 8px;
@@ -443,7 +479,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   justify-content: center;
 }
 
-.c24.c24.c24 {
+.c25.c25.c25 {
   border: none;
   border-bottom: 2px solid #3385FF;
   border-radius: 0;
@@ -453,22 +489,22 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   padding: 0;
 }
 
-.c25.c25 {
+.c26.c26 {
   padding: 0 2rem;
 }
 
-.c19 {
+.c20 {
   max-width: 1200px;
 }
 
 @media screen and (min-width:40em) {
-  .c20 {
+  .c21 {
     width: 85%;
   }
 }
 
 @media screen and (min-width:52em) {
-  .c39 {
+  .c45 {
     -webkit-order: 2;
     -ms-flex-order: 2;
     order: 2;
@@ -476,13 +512,13 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c40 {
+  .c46 {
     width: 25%;
   }
 }
 
 @media screen and (min-width:40em) {
-  .c26 {
+  .c27 {
     -webkit-box-pack: center;
     -webkit-justify-content: center;
     -ms-flex-pack: center;
@@ -491,7 +527,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c26 {
+  .c27 {
     -webkit-box-pack: start;
     -webkit-justify-content: flex-start;
     -ms-flex-pack: start;
@@ -500,7 +536,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c31 {
+  .c32 {
     -webkit-flex-direction: row;
     -ms-flex-direction: row;
     flex-direction: row;
@@ -508,7 +544,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c31 {
+  .c32 {
     -webkit-align-items: flex-start;
     -webkit-box-align: flex-start;
     -ms-flex-align: flex-start;
@@ -517,7 +553,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c34 {
+  .c35 {
     -webkit-box-pack: start;
     -webkit-justify-content: flex-start;
     -ms-flex-pack: start;
@@ -526,25 +562,25 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c35 {
+  .c36 {
     text-align: left;
   }
 }
 
 @media screen and (min-width:52em) {
-  .c41 {
+  .c47 {
     text-align: left;
   }
 }
 
 @media screen and (min-width:52em) {
-  .c33 {
+  .c34 {
     width: 33.33333333333333%;
   }
 }
 
 @media screen and (min-width:52em) {
-  .c36 {
+  .c37 {
     -webkit-order: 3;
     -ms-flex-order: 3;
     order: 3;
@@ -576,19 +612,19 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
 }
 
 @media screen and (max-width:40em) {
-  .c16 {
+  .c17 {
     display: none;
   }
 }
 
 @media screen and (min-width:40em) and (max-width:52em) {
-  .c16 {
+  .c17 {
     display: none;
   }
 }
 
 @media screen and (min-width:52em) {
-  .c43 {
+  .c49 {
     text-align: left;
   }
 }
@@ -670,29 +706,19 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
               onClick={[Function]}
             >
               <svg
-                height={16.799999999999997}
-                version="1.1"
-                viewBox="0 0 20 14"
+                aria-hidden="true"
+                className="c11"
+                color="#aaaaaa"
+                fill="currentColor"
+                focusable="false"
+                height={24}
+                size={24}
+                viewBox="0 0 448 512"
                 width={24}
-                xmlns="http://www.w3.org/2000/svg"
               >
-                <title>
-                  menu icon
-                </title>
                 <path
-                  d="M19,6 L1,6 C0.4,6 0,6.4 0,7 C0,7.6 0.4,8 1,8 L19,8 C19.6,8 20,7.6 20,7 C20,6.4 19.6,6 19,6 Z"
-                  fill="#aaaaaa"
-                  fillRule="nonzero"
-                />
-                <path
-                  d="M0.85,2 L16.15,2 C16.66,2 17,1.6 17,1 C17,0.4 16.66,0 16.15,0 L0.85,0 C0.34,0 0,0.4 0,1 C0,1.6 0.34,2 0.85,2 Z"
-                  fill="#aaaaaa"
-                  fillRule="nonzero"
-                />
-                <path
-                  d="M16.15,12 L0.85,12 C0.34,12 0,12.4 0,13 C0,13.6 0.34,14 0.85,14 L16.15,14 C16.66,14 17,13.6 17,13 C17,12.4 16.66,12 16.15,12 Z"
-                  fill="#aaaaaa"
-                  fillRule="nonzero"
+                  d="M16 132h416c8.837 0 16-7.163 16-16V76c0-8.837-7.163-16-16-16H16C7.163 60 0 67.163 0 76v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16z"
+                  fill="currentColor"
                 />
               </svg>
             </a>
@@ -702,13 +728,13 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
           className="c4 c2"
         >
           <ul
-            className="c11 c12 c13"
+            className="c12 c13 c14"
           >
             <li
-              className="c14"
+              className="c15"
             >
               <a
-                className="c15"
+                className="c16"
                 href="/discover"
               >
                 <span>
@@ -717,10 +743,10 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
               </a>
             </li>
             <li
-              className="c14"
+              className="c15"
             >
               <a
-                className="c15"
+                className="c16"
                 href="/learn-more"
               >
                 <span>
@@ -729,10 +755,10 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
               </a>
             </li>
             <li
-              className="c14"
+              className="c15"
             >
               <a
-                className="c15"
+                className="c16"
                 href="https://medium.com/open-collective"
               >
                 <span>
@@ -750,15 +776,15 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
             onClick={[Function]}
           >
             <div
-              className="c16 c2"
+              className="c17 c2"
             >
               <p
-                className="LoginTopBarProfileButton-name c17"
+                className="LoginTopBarProfileButton-name c18"
                 cursor="pointer"
               />
             </div>
             <div
-              className="c18"
+              className="c19"
               color="#46b0ed"
               cursor="pointer"
               display="inline-block"
@@ -775,10 +801,10 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
     className="jsx-916984404"
   >
     <div
-      className="c19 c20"
+      className="c20 c21"
     >
       <div
-        className="c21"
+        className="c22"
       >
         <form
           method="GET"
@@ -794,10 +820,10 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
               Search Open Collective
             </label>
             <div
-              className="c22 c23 sc-bdVaJa c2"
+              className="c23 c24 sc-bdVaJa c2"
             >
               <input
-                className="c24 form-control"
+                className="c25 form-control"
                 defaultValue="test"
                 id="search"
                 name="q"
@@ -805,7 +831,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
                 type="search"
               />
               <button
-                className="jsx-1144918383 jsx-3101740563 Button blue c25"
+                className="jsx-1144918383 jsx-3101740563 Button blue c26"
                 onClick={[Function]}
                 type="submit"
               >
@@ -818,10 +844,10 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
         </form>
       </div>
       <div
-        className="c26 c2 sc-bdVaJa c2"
+        className="c27 c2 sc-bdVaJa c2"
       >
         <div
-          className="c27 c28 sc-bdVaJa c2"
+          className="c28 c29 sc-bdVaJa c2"
         >
           <p>
             <em>
@@ -831,7 +857,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
             </em>
           </p>
           <a
-            className="c29"
+            className="c30"
             href="createPledge"
             onClick={[Function]}
           >
@@ -842,17 +868,17 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
     </div>
   </main>
   <div
-    className="c30"
+    className="c31"
     id="footer"
   >
     <div
-      className="c31 c32 sc-bdVaJa c2"
+      className="c32 c33 sc-bdVaJa c2"
     >
       <div
-        className="c33"
+        className="c34"
       >
         <div
-          className="c34 c2 sc-bdVaJa c2"
+          className="c35 c2 sc-bdVaJa c2"
         >
           <object
             data="/static/images/opencollectivelogo-footer.svg"
@@ -861,249 +887,158 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
           />
         </div>
         <p
-          className="c35"
+          className="c36"
         >
           An organization for your community, transparent by design.
         </p>
       </div>
       <div
-        className="c36"
+        className="c37"
       >
         <a
-          className="c37"
+          className="c38"
           href="https://medium.com/open-collective"
         >
           <svg
-            height={15}
-            viewBox="0 0 32 32"
-            width={15}
+            aria-hidden="true"
+            className="c39"
+            color="#9399A3"
+            fill="currentColor"
+            focusable="false"
+            height={17}
+            size={17}
+            viewBox="0 0 512 512"
+            width={17}
           >
-            <title>
-              medium icon
-            </title>
             <path
-              d="M3.795 8.48c0.040-0.393-0.111-0.781-0.404-1.045l-2.987-3.6v-0.537h9.276l7.171 15.727 6.304-15.727h8.845v0.537l-2.556 2.449c-0.22 0.168-0.329 0.444-0.284 0.717v18c-0.045 0.272 0.064 0.547 0.284 0.716l2.493 2.449v0.537h-12.547v-0.537l2.583-2.509c0.253-0.253 0.253-0.328 0.253-0.717v-14.548l-7.187 18.251h-0.969l-8.367-18.251v12.232c-0.069 0.515 0.101 1.032 0.463 1.404l3.36 4.080v0.536h-9.527v-0.537l3.36-4.080c0.36-0.371 0.52-0.893 0.435-1.403v-14.144z"
-              fill="#9399A3"
+              d="M71.5 142.3c.6-5.9-1.7-11.8-6.1-15.8L20.3 72.1V64h140.2l108.4 237.7L364.2 64h133.7v8.1l-38.6 37c-3.3 2.5-5 6.7-4.3 10.8v272c-.7 4.1 1 8.3 4.3 10.8l37.7 37v8.1H307.3v-8.1l39.1-37.9c3.8-3.8 3.8-5 3.8-10.8V171.2L241.5 447.1h-14.7L100.4 171.2v184.9c-1.1 7.8 1.5 15.6 7 21.2l50.8 61.6v8.1h-144v-8L65 377.3c5.4-5.6 7.9-13.5 6.5-21.2V142.3z"
+              fill="currentColor"
             />
           </svg>
         </a>
         <a
-          className="c37"
+          className="c38"
           href="https://twitter.com/opencollect"
         >
           <svg
-            height={12.5}
-            version="1.1"
-            viewBox="0 0 18 15"
-            width={15}
-            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true"
+            className="c40"
+            color="#9399A3"
+            fill="currentColor"
+            focusable="false"
+            height={17}
+            size={17}
+            viewBox="0 0 512 512"
+            width={17}
           >
-            <title>
-              twitter icon
-            </title>
-            <g
-              fill="none"
-              fillRule="evenodd"
-              id="Homepage"
-              stroke="none"
-              strokeWidth="1"
-            >
-              <g
-                id="Homepage---XS-(small-handset)"
-                transform="translate(-97.000000, -9521.000000)"
-              >
-                <g
-                  id="JOIN-MOVEMENT"
-                  transform="translate(-69.000000, 3570.000000)"
-                >
-                  <g
-                    id="::-06---spread-the-word"
-                    transform="translate(85.000000, 5758.000000)"
-                  >
-                    <g
-                      id="::-button-(share-twitter)"
-                      transform="translate(44.000000, 176.000000)"
-                    >
-                      <path
-                        d="M55,18.7756985 C54.33775,19.0771597 53.626,19.2801846 52.879,19.3716996 C53.64175,18.9033581 54.22675,18.1612407 54.50275,17.2768521 C53.7895,17.710587 52.999,18.0258908 52.1575,18.1958472 C51.484,17.4598821 50.524,17 49.462,17 C47.42275,17 45.769,18.695719 45.769,20.7867214 C45.769,21.0835683 45.802,21.3727249 45.86425,21.649577 C42.79525,21.4919251 40.07425,19.9838503 38.2525,17.6928993 C37.93525,18.2519867 37.753,18.9025891 37.753,19.5970264 C37.753,20.9105358 38.40475,22.0694694 39.3955,22.748526 C38.79025,22.7285311 38.221,22.5585747 37.723,22.2748013 C37.723,22.290951 37.723,22.3063317 37.723,22.3224814 C37.723,24.1573955 38.99575,25.6877724 40.6855,26.0353755 C40.37575,26.1222763 40.0495,26.1684184 39.712,26.1684184 C39.47425,26.1684184 39.2425,26.1445783 39.0175,26.1007434 C39.48775,27.6049731 40.85125,28.7000769 42.4675,28.7308382 C41.20375,29.7467316 39.6115,30.351961 37.88125,30.351961 C37.5835,30.351961 37.2895,30.3342733 37,30.2988977 C38.63425,31.3732376 40.57525,32 42.661,32 C49.45375,32 53.16775,26.229941 53.16775,21.2258395 C53.16775,21.0620354 53.164,20.8982312 53.15725,20.7359651 C53.87875,20.2014868 54.505,19.5347347 55,18.7756985 Z"
-                        fill="#9399A3"
-                        fillRule="nonzero"
-                        id="twitter"
-                      />
-                    </g>
-                  </g>
-                </g>
-              </g>
-            </g>
+            <path
+              d="M459.37 151.716c.325 4.548.325 9.097.325 13.645 0 138.72-105.583 298.558-298.558 298.558-59.452 0-114.68-17.219-161.137-47.106 8.447.974 16.568 1.299 25.34 1.299 49.055 0 94.213-16.568 130.274-44.832-46.132-.975-84.792-31.188-98.112-72.772 6.498.974 12.995 1.624 19.818 1.624 9.421 0 18.843-1.3 27.614-3.573-48.081-9.747-84.143-51.98-84.143-102.985v-1.299c13.969 7.797 30.214 12.67 47.431 13.319-28.264-18.843-46.781-51.005-46.781-87.391 0-19.492 5.197-37.36 14.294-52.954 51.655 63.675 129.3 105.258 216.365 109.807-1.624-7.797-2.599-15.918-2.599-24.04 0-57.828 46.782-104.934 104.934-104.934 30.213 0 57.502 12.67 76.67 33.137 23.715-4.548 46.456-13.32 66.599-25.34-7.798 24.366-24.366 44.833-46.132 57.827 21.117-2.273 41.584-8.122 60.426-16.243-14.292 20.791-32.161 39.308-52.628 54.253z"
+              fill="currentColor"
+            />
           </svg>
         </a>
         <a
-          className="c37"
+          className="c38"
           href="https://github.com/opencollective"
         >
           <svg
-            height={15}
-            version="1.1"
-            viewBox="0 0 22 22"
-            width={15}
-            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true"
+            className="c41"
+            color="#9399A3"
+            fill="currentColor"
+            focusable="false"
+            height={17}
+            size={17}
+            viewBox="0 0 496 512"
+            width={17}
           >
-            <title>
-              github icon
-            </title>
-            <g
-              fill="none"
-              fillRule="evenodd"
-              id="Homepage"
-              stroke="none"
-              strokeWidth="1"
-            >
-              <g
-                id="Homepage---XS-(small-handset)"
-                transform="translate(-149.000000, -10919.000000)"
-              >
-                <g
-                  id="FOOTER"
-                  transform="translate(0.000000, 10758.000000)"
-                >
-                  <g
-                    id="::-social-networks"
-                    transform="translate(24.000000, 148.000000)"
-                  >
-                    <g
-                      id="::-icon-(github)"
-                      transform="translate(112.000000, 0.000000)"
-                    >
-                      <path
-                        d="M24,13 C17.9133333,13 13,17.962963 13,24.1111111 C13,29.2222222 16.4466667,33.6666667 21.36,34.9259259 C21.4333333,34.9259259 21.58,34.9259259 21.6533333,34.8518519 C21.7266667,34.7777778 21.8,34.7037037 21.8,34.5555556 L21.8,31.8888889 C21.8,31.8148148 21.7266667,31.6666667 21.7266667,31.5925926 C21.6533333,31.5185185 21.58,31.5185185 21.4333333,31.5185185 L20.7,31.5185185 C19.5266667,31.5185185 18.7933333,30.4074074 18.1333333,29.4444444 C17.9866667,29.2962963 17.9133333,29.0740741 17.7666667,28.9259259 C18.2066667,29.1481481 18.5,29.4444444 18.8666667,29.8148148 C19.38,30.3333333 19.8933333,30.8518519 20.7733333,30.8518519 C20.7733333,30.8518519 20.7733333,30.8518519 20.7733333,30.8518519 C21.14,30.8518519 21.8733333,30.4814815 21.8733333,29.3703704 L21.8733333,29 C21.8733333,28.8518519 21.8,28.7037037 21.58,28.6296296 C19.0866667,27.8888889 17.4733333,25.8888889 17.4733333,23.5925926 C17.4733333,22.4074074 17.9866667,21.2222222 18.8666667,20.3333333 C18.8666667,20.1851852 18.8666667,20.037037 18.8666667,19.8888889 C18.5,19.1481481 18.8666667,18.1111111 19.38,17.5185185 C19.8933333,17.7407407 20.4066667,18.3333333 20.8466667,18.7777778 C20.92,18.9259259 21.14,18.9259259 21.2866667,18.8518519 L21.5066667,18.7777778 C22.3133333,18.4814815 23.2666667,18.1111111 24.1466667,18.1111111 C25.0266667,18.1111111 25.98,18.4814815 26.7866667,18.7777778 L27.0066667,18.8518519 C27.1533333,18.9259259 27.3,18.8518519 27.4466667,18.7777778 C27.8866667,18.2592593 28.4,17.7407407 28.9133333,17.5185185 C29.4266667,18.1851852 29.7933333,19.1481481 29.4266667,19.8888889 C29.1333333,20.037037 29.1333333,20.1851852 29.2066667,20.3333333 C30.0866667,21.2962963 30.6,22.3333333 30.6,23.4444444 C30.6,25.8888889 28.7666667,28.037037 26.1266667,28.6296296 C25.98,28.6296296 25.9066667,28.7037037 25.9066667,28.8518519 C25.9066667,29 25.8333333,29.0740741 25.9066667,29.1481481 C26.1266667,29.5185185 26.2,30.2592593 26.2,31.2222222 C26.2,32.4814815 26.2,34.6296296 26.2,34.6296296 C26.2,34.7777778 26.2733333,34.8518519 26.3466667,34.9259259 C26.42,35 26.4933333,35 26.5666667,35 C26.5666667,35 26.64,35 26.64,35 C31.5533333,33.6666667 35,29.2222222 35,24.1111111 C35,17.962963 30.0866667,13 24,13 Z"
-                        fill="#9399A3"
-                        fillRule="nonzero"
-                        id="github"
-                      />
-                    </g>
-                  </g>
-                </g>
-              </g>
-            </g>
+            <path
+              d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"
+              fill="currentColor"
+            />
           </svg>
         </a>
         <a
-          className="c37"
+          className="c38"
           href="https://slack.opencollective.com"
         >
           <svg
-            height={15}
-            version="1.1"
-            viewBox="0 0 20 20"
-            width={15}
-            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true"
+            className="c42"
+            color="#9399A3"
+            fill="currentColor"
+            focusable="false"
+            height={17}
+            size={17}
+            viewBox="0 0 448 512"
+            width={17}
           >
-            <title>
-              slack icon
-            </title>
-            <g
-              fill="#9399A3"
-              id="slack"
-            >
-              <path
-                d="M19.1625,7.25 C21.225,14.125 19.62125,17.1 12.75,19.1625 C5.875,21.225 2.9,19.62125 0.8375,12.75 C-1.225,5.875 0.38,2.9 7.25,0.8375 C14.1225,-1.225 17.1,0.38 19.1625,7.25 Z M15.6875,11.7125 L15.695,11.73875 C16.2325,11.56375 16.5275,10.97625 16.345,10.42625 C16.16375,9.87625 15.57625,9.58875 15.0325,9.76375 L13.74,10.19375 L12.8775,7.6225 L14.175,7.185 C14.71625,7.005 15.01,6.4175 14.82875,5.8725 C14.64625,5.335 14.05875,5.04 13.51625,5.2225 L12.22,5.6475 L11.77,4.2975 C11.59,3.75 11.00125,3.4625 10.4575,3.6375 C9.9125,3.825 9.625,4.4125 9.8,4.95 L10.25,6.2875 L7.58875,7.1825 L7.13875,5.8425 C6.96375,5.3025 6.37625,5.00625 5.82625,5.19 C5.27625,5.37 4.98875,5.9575 5.16375,6.5025 L5.61375,7.84 L4.31375,8.2725 C3.76375,8.45625 3.47625,9.04375 3.65125,9.585 C3.78875,10.01 4.18875,10.27875 4.60125,10.29125 C4.72,10.29375 4.84,10.2775 4.9575,10.2375 L6.25,9.8 L7.07375,12.37375 L5.77375,12.81125 C5.23625,12.98625 4.93625,13.57375 5.12375,14.12375 C5.27375,14.54875 5.66125,14.82375 6.08625,14.83625 C6.21125,14.83625 6.32375,14.82375 6.44875,14.78625 L7.74875,14.34875 L8.19875,15.69875 C8.34875,16.12375 8.73625,16.39375 9.16125,16.40625 C9.28625,16.40875 9.39875,16.3925 9.52375,16.3525 C10.07375,16.17125 10.36125,15.58375 10.18625,15.04 L9.73625,13.7 L12.41125,12.805 L12.86125,14.145 C13.01125,14.57 13.39875,14.84 13.82375,14.8525 C13.94875,14.85625 14.06125,14.8375 14.18625,14.8 C14.72875,14.6175 15.0225,14.03 14.84125,13.4875 L14.39125,12.14625 L15.6875,11.7125 Z"
-              />
-              <polygon
-                points="8.2325 9.1625 9.095 11.73375 11.76625 10.83875 10.90375 8.27625 8.2325 9.17625"
-              />
-            </g>
+            <path
+              d="M244.2 217.5l19.3 57.7-59.8 20-19.3-57.7 59.8-20zm41.4 243.7C131.6 507.4 65 471.6 18.8 317.6S8.4 97 162.4 50.8C316.4 4.6 383 40.4 429.2 194.4c46.2 154 10.4 220.6-143.6 266.8zM366.2 265c-3.9-12.2-17.2-18.6-29.4-14.7l-29 9.7-19.3-57.7 29-9.7c12.2-3.9 18.6-17.2 14.7-29.4-3.9-12.2-17.2-18.6-29.4-14.7l-29 9.7-10-30.1c-3.9-12.2-17.2-18.6-29.4-14.7-12.2 3.9-18.6 17.2-14.7 29.4l10 30.1-59.8 20.1-10-30.1c-3.9-12.2-17.2-18.6-29.4-14.7-12.2 3.9-18.6 17.2-14.7 29.4l10 30.1-29 9.7c-12.2 3.9-18.6 17.2-14.7 29.4 3.2 9.3 12.2 15.4 21.5 15.8 4.3.6 7.7-1 36.9-10.7l19.3 57.7-29 9.7c-12.2 3.9-18.6 17.2-14.7 29.4 3.2 9.3 12.2 15.4 21.5 15.8 4.3.6 7.7-1 36.9-10.7l10 30.1c3.7 10.8 15.8 18.6 29.4 14.7 12.2-3.9 18.6-17.2 14.7-29.4l-10-30.1 59.8-20.1 10 30.1c3.7 10.8 15.8 18.6 29.4 14.7 12.2-3.9 18.6-17.2 14.7-29.4l-10-30.1 29-9.7c12.2-4.2 18.6-17.5 14.7-29.6z"
+              fill="currentColor"
+            />
           </svg>
         </a>
         <a
-          className="c37"
+          className="c38"
           href="mailto:info@opencollective.com"
         >
           <svg
-            height={13.125}
-            version="1.1"
-            viewBox="0 0 16 14"
-            width={15}
-            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true"
+            className="c43"
+            color="#9399A3"
+            fill="currentColor"
+            focusable="false"
+            height={19}
+            size={19}
+            viewBox="0 0 24 24"
+            width={19}
           >
-            <title>
-              email icon
-            </title>
-            <g
-              fill="none"
-              fillRule="evenodd"
-              id="Homepage"
-              stroke="none"
-              strokeWidth="1"
-            >
-              <g
-                id="Homepage---XS-(small-handset)"
-                transform="translate(-264.000000, -10923.000000)"
-              >
-                <g
-                  id="FOOTER"
-                  transform="translate(0.000000, 10758.000000)"
-                >
-                  <g
-                    id="::-social-networks"
-                    transform="translate(24.000000, 148.000000)"
-                  >
-                    <g
-                      id="::-icon-(email)"
-                      transform="translate(224.000000, 0.000000)"
-                    >
-                      <path
-                        d="M30.4,17 L17.6,17 C16.72,17 16.008,17.9 16.008,19 L16,29 C16,30.1 16.72,31 17.6,31 L30.4,31 C31.28,31 32,30.1 32,29 L32,19 C32,17.9 31.28,17 30.4,17 Z M30,21 L24,25 L18,21 L18,19 L24,23 L30,19 L30,21 Z"
-                        fill="#9399A3"
-                        fillRule="nonzero"
-                        id="email"
-                      />
-                    </g>
-                  </g>
-                </g>
-              </g>
-            </g>
+            <path
+              d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"
+            />
           </svg>
         </a>
       </div>
       <nav
-        className="c38 c39"
+        className="c44 c45"
       >
         <div
-          className="c40"
+          className="c46"
         >
           <p
-            className="c41"
+            className="c47"
           >
             PLATFORM
           </p>
           <ul
-            className="c42"
+            className="c48"
           >
             <li
-              className="c43"
+              className="c49"
             >
               <a
-                className="c44 "
+                className="c50 "
                 href="/discover"
               >
                 Discover
               </a>
             </li>
             <li
-              className="c43"
+              className="c49"
             >
               <a
-                className="c44 "
+                className="c50 "
                 href="/learn-more"
               >
                 How it Works
               </a>
             </li>
             <li
-              className="c43"
+              className="c49"
             >
               <a
-                className="c44 "
+                className="c50 "
                 href="/opensource"
                 onClick={[Function]}
               >
@@ -1111,10 +1046,10 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
               </a>
             </li>
             <li
-              className="c43"
+              className="c49"
             >
               <a
-                className="c44 "
+                className="c50 "
                 href="/signin"
                 onClick={[Function]}
               >
@@ -1122,10 +1057,10 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
               </a>
             </li>
             <li
-              className="c43"
+              className="c49"
             >
               <a
-                className="c44 "
+                className="c50 "
                 href="/signin"
                 onClick={[Function]}
               >
@@ -1135,21 +1070,21 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
           </ul>
         </div>
         <div
-          className="c40"
+          className="c46"
         >
           <p
-            className="c41"
+            className="c47"
           >
             JOIN THE MOVEMENT
           </p>
           <ul
-            className="c42"
+            className="c48"
           >
             <li
-              className="c43"
+              className="c49"
             >
               <a
-                className="c44 "
+                className="c50 "
                 href="/create"
                 onClick={[Function]}
               >
@@ -1157,10 +1092,10 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
               </a>
             </li>
             <li
-              className="c43"
+              className="c49"
             >
               <a
-                className="c44 "
+                className="c50 "
                 href="/become-a-sponsor"
                 onClick={[Function]}
               >
@@ -1168,10 +1103,10 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
               </a>
             </li>
             <li
-              className="c43"
+              className="c49"
             >
               <a
-                className="c44 "
+                className="c50 "
                 href="/chapters"
                 onClick={[Function]}
               >
@@ -1181,21 +1116,21 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
           </ul>
         </div>
         <div
-          className="c40"
+          className="c46"
         >
           <p
-            className="c41"
+            className="c47"
           >
             COMMUNITY
           </p>
           <ul
-            className="c42"
+            className="c48"
           >
             <li
-              className="c43"
+              className="c49"
             >
               <a
-                className="c44 "
+                className="c50 "
                 href="/opensource"
                 onClick={[Function]}
               >
@@ -1203,10 +1138,10 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
               </a>
             </li>
             <li
-              className="c43"
+              className="c49"
             >
               <a
-                className="c44 "
+                className="c50 "
                 href="https://github.com/opencollective/opencollective/issues"
                 onClick={[Function]}
               >
@@ -1214,10 +1149,10 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
               </a>
             </li>
             <li
-              className="c43"
+              className="c49"
             >
               <a
-                className="c44 "
+                className="c50 "
                 href="https://slack.opencollective.com"
                 onClick={[Function]}
               >
@@ -1225,10 +1160,10 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
               </a>
             </li>
             <li
-              className="c43"
+              className="c49"
             >
               <a
-                className="c44 "
+                className="c50 "
                 href="https://github.com/opencollective/opencollective/wiki"
                 onClick={[Function]}
               >
@@ -1236,10 +1171,10 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
               </a>
             </li>
             <li
-              className="c43"
+              className="c49"
             >
               <a
-                className="c44 "
+                className="c50 "
                 href="mailto:support@opencollective.com"
                 onClick={[Function]}
               >
@@ -1249,21 +1184,21 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
           </ul>
         </div>
         <div
-          className="c40"
+          className="c46"
         >
           <p
-            className="c41"
+            className="c47"
           >
             COMPANY
           </p>
           <ul
-            className="c42"
+            className="c48"
           >
             <li
-              className="c43"
+              className="c49"
             >
               <a
-                className="c44 "
+                className="c50 "
                 href="/about"
                 onClick={[Function]}
               >
@@ -1271,10 +1206,10 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
               </a>
             </li>
             <li
-              className="c43"
+              className="c49"
             >
               <a
-                className="c44 "
+                className="c50 "
                 href="/faq"
                 onClick={[Function]}
               >
@@ -1282,10 +1217,10 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
               </a>
             </li>
             <li
-              className="c43"
+              className="c49"
             >
               <a
-                className="c44 "
+                className="c50 "
                 href="https://medium.com/open-collective"
                 onClick={[Function]}
               >
@@ -1293,10 +1228,10 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
               </a>
             </li>
             <li
-              className="c43"
+              className="c49"
             >
               <a
-                className="c44 "
+                className="c50 "
                 href="/tos"
                 onClick={[Function]}
               >
@@ -1304,10 +1239,10 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
               </a>
             </li>
             <li
-              className="c43"
+              className="c49"
             >
               <a
-                className="c44 "
+                className="c50 "
                 href="/privacypolicy"
                 onClick={[Function]}
               >
@@ -1354,24 +1289,15 @@ exports[`Search Page renders empty results message 1`] = `
   margin-right: 16px;
 }
 
-.c13 {
+.c14 {
   margin: 0;
   box-sizing: border-box;
   margin: 0px;
   padding: 0px;
 }
 
-.c14 {
+.c15 {
   box-sizing: border-box;
-  padding-left: 16px;
-  padding-right: 16px;
-}
-
-.c20 {
-  box-sizing: border-box;
-  width: 100%;
-  margin-left: auto;
-  margin-right: auto;
   padding-left: 16px;
   padding-right: 16px;
 }
@@ -1379,22 +1305,31 @@ exports[`Search Page renders empty results message 1`] = `
 .c21 {
   box-sizing: border-box;
   width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 16px;
+  padding-right: 16px;
 }
 
-.c23 {
+.c22 {
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.c24 {
   box-sizing: border-box;
   margin-top: 16px;
   margin-bottom: 16px;
 }
 
-.c28 {
+.c29 {
   box-sizing: border-box;
   width: 100%;
   padding-top: 16px;
   padding-bottom: 16px;
 }
 
-.c31 {
+.c32 {
   max-width: 1300px;
   box-sizing: border-box;
   margin-left: auto;
@@ -1402,7 +1337,7 @@ exports[`Search Page renders empty results message 1`] = `
   padding: 8px;
 }
 
-.c38 {
+.c44 {
   box-sizing: border-box;
   margin-top: 16px;
   -webkit-flex: 1 1 auto;
@@ -1413,7 +1348,7 @@ exports[`Search Page renders empty results message 1`] = `
   order: 3;
 }
 
-.c39 {
+.c45 {
   box-sizing: border-box;
   width: 50%;
   margin-bottom: 16px;
@@ -1470,7 +1405,7 @@ exports[`Search Page renders empty results message 1`] = `
   display: flex;
 }
 
-.c12 {
+.c13 {
   margin: 0;
   display: -webkit-box;
   display: -webkit-flex;
@@ -1482,7 +1417,7 @@ exports[`Search Page renders empty results message 1`] = `
   justify-content: space-around;
 }
 
-.c22 {
+.c23 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -1493,7 +1428,7 @@ exports[`Search Page renders empty results message 1`] = `
   align-items: flex-end;
 }
 
-.c26 {
+.c27 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -1507,7 +1442,7 @@ exports[`Search Page renders empty results message 1`] = `
   justify-content: center;
 }
 
-.c30 {
+.c31 {
   max-width: 1300px;
   display: -webkit-box;
   display: -webkit-flex;
@@ -1526,7 +1461,7 @@ exports[`Search Page renders empty results message 1`] = `
   justify-content: space-between;
 }
 
-.c33 {
+.c34 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -1537,7 +1472,7 @@ exports[`Search Page renders empty results message 1`] = `
   justify-content: center;
 }
 
-.c37 {
+.c43 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -1551,7 +1486,7 @@ exports[`Search Page renders empty results message 1`] = `
   justify-content: center;
 }
 
-.c27 {
+.c28 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -1569,7 +1504,7 @@ exports[`Search Page renders empty results message 1`] = `
   justify-content: center;
 }
 
-.c17 {
+.c18 {
   color: #46b0ed;
   display: inline-block;
   font-size: 1.2rem;
@@ -1585,7 +1520,7 @@ exports[`Search Page renders empty results message 1`] = `
   cursor: pointer;
 }
 
-.c34 {
+.c35 {
   color: #6E747A;
   font-size: 1.4rem;
   line-height: Paragraph;
@@ -1599,7 +1534,7 @@ exports[`Search Page renders empty results message 1`] = `
   text-align: center;
 }
 
-.c40 {
+.c46 {
   color: #C2C6CC;
   font-size: 1.2rem;
   line-height: Paragraph;
@@ -1612,7 +1547,13 @@ exports[`Search Page renders empty results message 1`] = `
   text-align: center;
 }
 
-.c29 {
+.c11 {
+  display: inline-block;
+  vertical-align: -.125em;
+  overflow: hidden;
+}
+
+.c30 {
   border-top: 1px solid #aaaaaa;
   bottom: 0px;
   background-color: white;
@@ -1621,7 +1562,7 @@ exports[`Search Page renders empty results message 1`] = `
   width: 100%;
 }
 
-.c32 {
+.c33 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -1634,7 +1575,7 @@ exports[`Search Page renders empty results message 1`] = `
   width: 100%;
 }
 
-.c35 {
+.c36 {
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -1656,7 +1597,7 @@ exports[`Search Page renders empty results message 1`] = `
   width: 100%;
 }
 
-.c18 {
+.c19 {
   position: relative;
   display: inline-block;
   height: 0.6rem;
@@ -1664,45 +1605,75 @@ exports[`Search Page renders empty results message 1`] = `
   cursor: pointer;
 }
 
-.c18::before,
-.c18::after {
+.c19::before,
+.c19::after {
   content: '';
   position: absolute;
   top: 0;
 }
 
-.c18::before {
+.c19::before {
   border-left: 0.6rem solid transparent;
   border-right: 0.6rem solid transparent;
   border-top: 0.6rem solid #46b0ed;
   left: 0;
 }
 
-.c18::after {
+.c19::after {
   border-left: calc(0.6rem - 0.2rem) solid transparent;
   border-right: calc(0.6rem - 0.2rem) solid transparent;
   border-top: calc(0.6rem - 0.2rem) solid white;
   left: 0.2rem;
 }
 
-.c42 {
+.c48 {
   list-style: none;
   margin-bottom: 8px;
   text-align: center;
 }
 
-.c11 {
+.c12 {
   list-style: none;
   min-width: 20rem;
   text-align: right;
 }
 
-.c15 {
+.c16 {
   color: #777777;
   font-size: 1.4rem;
 }
 
-.c36 {
+.c40 {
+  display: inline-block;
+  vertical-align: -.125em;
+  overflow: hidden;
+}
+
+.c38 {
+  display: inline-block;
+  vertical-align: -.125em;
+  overflow: hidden;
+}
+
+.c41 {
+  display: inline-block;
+  vertical-align: -.125em;
+  overflow: hidden;
+}
+
+.c39 {
+  display: inline-block;
+  vertical-align: -.125em;
+  overflow: hidden;
+}
+
+.c42 {
+  display: inline-block;
+  vertical-align: middle;
+  overflow: hidden;
+}
+
+.c37 {
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -1722,12 +1693,12 @@ exports[`Search Page renders empty results message 1`] = `
   width: 48px;
 }
 
-.c36:hover,
-.c36:focus {
+.c37:hover,
+.c37:focus {
   opacity: 1;
 }
 
-.c43 {
+.c49 {
   color: #6e747a;
   display: block;
   fontsize: 1.4rem;
@@ -1736,7 +1707,7 @@ exports[`Search Page renders empty results message 1`] = `
   padding: 0;
 }
 
-.c41 {
+.c47 {
   box-sizing: border-box;
   padding-left: 0px;
   padding-right: 8px;
@@ -1753,7 +1724,7 @@ exports[`Search Page renders empty results message 1`] = `
   justify-content: center;
 }
 
-.c24.c24.c24 {
+.c25.c25.c25 {
   border: none;
   border-bottom: 2px solid #3385FF;
   border-radius: 0;
@@ -1763,22 +1734,22 @@ exports[`Search Page renders empty results message 1`] = `
   padding: 0;
 }
 
-.c25.c25 {
+.c26.c26 {
   padding: 0 2rem;
 }
 
-.c19 {
+.c20 {
   max-width: 1200px;
 }
 
 @media screen and (min-width:40em) {
-  .c20 {
+  .c21 {
     width: 85%;
   }
 }
 
 @media screen and (min-width:52em) {
-  .c38 {
+  .c44 {
     -webkit-order: 2;
     -ms-flex-order: 2;
     order: 2;
@@ -1786,13 +1757,13 @@ exports[`Search Page renders empty results message 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c39 {
+  .c45 {
     width: 25%;
   }
 }
 
 @media screen and (min-width:40em) {
-  .c26 {
+  .c27 {
     -webkit-box-pack: center;
     -webkit-justify-content: center;
     -ms-flex-pack: center;
@@ -1801,7 +1772,7 @@ exports[`Search Page renders empty results message 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c26 {
+  .c27 {
     -webkit-box-pack: start;
     -webkit-justify-content: flex-start;
     -ms-flex-pack: start;
@@ -1810,7 +1781,7 @@ exports[`Search Page renders empty results message 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c30 {
+  .c31 {
     -webkit-flex-direction: row;
     -ms-flex-direction: row;
     flex-direction: row;
@@ -1818,7 +1789,7 @@ exports[`Search Page renders empty results message 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c30 {
+  .c31 {
     -webkit-align-items: flex-start;
     -webkit-box-align: flex-start;
     -ms-flex-align: flex-start;
@@ -1827,7 +1798,7 @@ exports[`Search Page renders empty results message 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c33 {
+  .c34 {
     -webkit-box-pack: start;
     -webkit-justify-content: flex-start;
     -ms-flex-pack: start;
@@ -1836,25 +1807,25 @@ exports[`Search Page renders empty results message 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c34 {
+  .c35 {
     text-align: left;
   }
 }
 
 @media screen and (min-width:52em) {
-  .c40 {
+  .c46 {
     text-align: left;
   }
 }
 
 @media screen and (min-width:52em) {
-  .c32 {
+  .c33 {
     width: 33.33333333333333%;
   }
 }
 
 @media screen and (min-width:52em) {
-  .c35 {
+  .c36 {
     -webkit-order: 3;
     -ms-flex-order: 3;
     order: 3;
@@ -1886,19 +1857,19 @@ exports[`Search Page renders empty results message 1`] = `
 }
 
 @media screen and (max-width:40em) {
-  .c16 {
+  .c17 {
     display: none;
   }
 }
 
 @media screen and (min-width:40em) and (max-width:52em) {
-  .c16 {
+  .c17 {
     display: none;
   }
 }
 
 @media screen and (min-width:52em) {
-  .c42 {
+  .c48 {
     text-align: left;
   }
 }
@@ -1980,29 +1951,19 @@ exports[`Search Page renders empty results message 1`] = `
               onClick={[Function]}
             >
               <svg
-                height={16.799999999999997}
-                version="1.1"
-                viewBox="0 0 20 14"
+                aria-hidden="true"
+                className="c11"
+                color="#aaaaaa"
+                fill="currentColor"
+                focusable="false"
+                height={24}
+                size={24}
+                viewBox="0 0 448 512"
                 width={24}
-                xmlns="http://www.w3.org/2000/svg"
               >
-                <title>
-                  menu icon
-                </title>
                 <path
-                  d="M19,6 L1,6 C0.4,6 0,6.4 0,7 C0,7.6 0.4,8 1,8 L19,8 C19.6,8 20,7.6 20,7 C20,6.4 19.6,6 19,6 Z"
-                  fill="#aaaaaa"
-                  fillRule="nonzero"
-                />
-                <path
-                  d="M0.85,2 L16.15,2 C16.66,2 17,1.6 17,1 C17,0.4 16.66,0 16.15,0 L0.85,0 C0.34,0 0,0.4 0,1 C0,1.6 0.34,2 0.85,2 Z"
-                  fill="#aaaaaa"
-                  fillRule="nonzero"
-                />
-                <path
-                  d="M16.15,12 L0.85,12 C0.34,12 0,12.4 0,13 C0,13.6 0.34,14 0.85,14 L16.15,14 C16.66,14 17,13.6 17,13 C17,12.4 16.66,12 16.15,12 Z"
-                  fill="#aaaaaa"
-                  fillRule="nonzero"
+                  d="M16 132h416c8.837 0 16-7.163 16-16V76c0-8.837-7.163-16-16-16H16C7.163 60 0 67.163 0 76v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16z"
+                  fill="currentColor"
                 />
               </svg>
             </a>
@@ -2012,13 +1973,13 @@ exports[`Search Page renders empty results message 1`] = `
           className="c4 c2"
         >
           <ul
-            className="c11 c12 c13"
+            className="c12 c13 c14"
           >
             <li
-              className="c14"
+              className="c15"
             >
               <a
-                className="c15"
+                className="c16"
                 href="/discover"
               >
                 <span>
@@ -2027,10 +1988,10 @@ exports[`Search Page renders empty results message 1`] = `
               </a>
             </li>
             <li
-              className="c14"
+              className="c15"
             >
               <a
-                className="c15"
+                className="c16"
                 href="/learn-more"
               >
                 <span>
@@ -2039,10 +2000,10 @@ exports[`Search Page renders empty results message 1`] = `
               </a>
             </li>
             <li
-              className="c14"
+              className="c15"
             >
               <a
-                className="c15"
+                className="c16"
                 href="https://medium.com/open-collective"
               >
                 <span>
@@ -2060,15 +2021,15 @@ exports[`Search Page renders empty results message 1`] = `
             onClick={[Function]}
           >
             <div
-              className="c16 c2"
+              className="c17 c2"
             >
               <p
-                className="LoginTopBarProfileButton-name c17"
+                className="LoginTopBarProfileButton-name c18"
                 cursor="pointer"
               />
             </div>
             <div
-              className="c18"
+              className="c19"
               color="#46b0ed"
               cursor="pointer"
               display="inline-block"
@@ -2085,10 +2046,10 @@ exports[`Search Page renders empty results message 1`] = `
     className="jsx-916984404"
   >
     <div
-      className="c19 c20"
+      className="c20 c21"
     >
       <div
-        className="c21"
+        className="c22"
       >
         <form
           method="GET"
@@ -2104,10 +2065,10 @@ exports[`Search Page renders empty results message 1`] = `
               Search Open Collective
             </label>
             <div
-              className="c22 c23 sc-bdVaJa c2"
+              className="c23 c24 sc-bdVaJa c2"
             >
               <input
-                className="c24 form-control"
+                className="c25 form-control"
                 defaultValue="test"
                 id="search"
                 name="q"
@@ -2115,7 +2076,7 @@ exports[`Search Page renders empty results message 1`] = `
                 type="search"
               />
               <button
-                className="jsx-1144918383 jsx-3101740563 Button blue c25"
+                className="jsx-1144918383 jsx-3101740563 Button blue c26"
                 onClick={[Function]}
                 type="submit"
               >
@@ -2128,10 +2089,10 @@ exports[`Search Page renders empty results message 1`] = `
         </form>
       </div>
       <div
-        className="c26 c2 sc-bdVaJa c2"
+        className="c27 c2 sc-bdVaJa c2"
       >
         <div
-          className="c27 c28 sc-bdVaJa c2"
+          className="c28 c29 sc-bdVaJa c2"
         >
           <p>
             <em>
@@ -2145,17 +2106,17 @@ exports[`Search Page renders empty results message 1`] = `
     </div>
   </main>
   <div
-    className="c29"
+    className="c30"
     id="footer"
   >
     <div
-      className="c30 c31 sc-bdVaJa c2"
+      className="c31 c32 sc-bdVaJa c2"
     >
       <div
-        className="c32"
+        className="c33"
       >
         <div
-          className="c33 c2 sc-bdVaJa c2"
+          className="c34 c2 sc-bdVaJa c2"
         >
           <object
             data="/static/images/opencollectivelogo-footer.svg"
@@ -2164,249 +2125,158 @@ exports[`Search Page renders empty results message 1`] = `
           />
         </div>
         <p
-          className="c34"
+          className="c35"
         >
           An organization for your community, transparent by design.
         </p>
       </div>
       <div
-        className="c35"
+        className="c36"
       >
         <a
-          className="c36"
+          className="c37"
           href="https://medium.com/open-collective"
         >
           <svg
-            height={15}
-            viewBox="0 0 32 32"
-            width={15}
+            aria-hidden="true"
+            className="c38"
+            color="#9399A3"
+            fill="currentColor"
+            focusable="false"
+            height={17}
+            size={17}
+            viewBox="0 0 512 512"
+            width={17}
           >
-            <title>
-              medium icon
-            </title>
             <path
-              d="M3.795 8.48c0.040-0.393-0.111-0.781-0.404-1.045l-2.987-3.6v-0.537h9.276l7.171 15.727 6.304-15.727h8.845v0.537l-2.556 2.449c-0.22 0.168-0.329 0.444-0.284 0.717v18c-0.045 0.272 0.064 0.547 0.284 0.716l2.493 2.449v0.537h-12.547v-0.537l2.583-2.509c0.253-0.253 0.253-0.328 0.253-0.717v-14.548l-7.187 18.251h-0.969l-8.367-18.251v12.232c-0.069 0.515 0.101 1.032 0.463 1.404l3.36 4.080v0.536h-9.527v-0.537l3.36-4.080c0.36-0.371 0.52-0.893 0.435-1.403v-14.144z"
-              fill="#9399A3"
+              d="M71.5 142.3c.6-5.9-1.7-11.8-6.1-15.8L20.3 72.1V64h140.2l108.4 237.7L364.2 64h133.7v8.1l-38.6 37c-3.3 2.5-5 6.7-4.3 10.8v272c-.7 4.1 1 8.3 4.3 10.8l37.7 37v8.1H307.3v-8.1l39.1-37.9c3.8-3.8 3.8-5 3.8-10.8V171.2L241.5 447.1h-14.7L100.4 171.2v184.9c-1.1 7.8 1.5 15.6 7 21.2l50.8 61.6v8.1h-144v-8L65 377.3c5.4-5.6 7.9-13.5 6.5-21.2V142.3z"
+              fill="currentColor"
             />
           </svg>
         </a>
         <a
-          className="c36"
+          className="c37"
           href="https://twitter.com/opencollect"
         >
           <svg
-            height={12.5}
-            version="1.1"
-            viewBox="0 0 18 15"
-            width={15}
-            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true"
+            className="c39"
+            color="#9399A3"
+            fill="currentColor"
+            focusable="false"
+            height={17}
+            size={17}
+            viewBox="0 0 512 512"
+            width={17}
           >
-            <title>
-              twitter icon
-            </title>
-            <g
-              fill="none"
-              fillRule="evenodd"
-              id="Homepage"
-              stroke="none"
-              strokeWidth="1"
-            >
-              <g
-                id="Homepage---XS-(small-handset)"
-                transform="translate(-97.000000, -9521.000000)"
-              >
-                <g
-                  id="JOIN-MOVEMENT"
-                  transform="translate(-69.000000, 3570.000000)"
-                >
-                  <g
-                    id="::-06---spread-the-word"
-                    transform="translate(85.000000, 5758.000000)"
-                  >
-                    <g
-                      id="::-button-(share-twitter)"
-                      transform="translate(44.000000, 176.000000)"
-                    >
-                      <path
-                        d="M55,18.7756985 C54.33775,19.0771597 53.626,19.2801846 52.879,19.3716996 C53.64175,18.9033581 54.22675,18.1612407 54.50275,17.2768521 C53.7895,17.710587 52.999,18.0258908 52.1575,18.1958472 C51.484,17.4598821 50.524,17 49.462,17 C47.42275,17 45.769,18.695719 45.769,20.7867214 C45.769,21.0835683 45.802,21.3727249 45.86425,21.649577 C42.79525,21.4919251 40.07425,19.9838503 38.2525,17.6928993 C37.93525,18.2519867 37.753,18.9025891 37.753,19.5970264 C37.753,20.9105358 38.40475,22.0694694 39.3955,22.748526 C38.79025,22.7285311 38.221,22.5585747 37.723,22.2748013 C37.723,22.290951 37.723,22.3063317 37.723,22.3224814 C37.723,24.1573955 38.99575,25.6877724 40.6855,26.0353755 C40.37575,26.1222763 40.0495,26.1684184 39.712,26.1684184 C39.47425,26.1684184 39.2425,26.1445783 39.0175,26.1007434 C39.48775,27.6049731 40.85125,28.7000769 42.4675,28.7308382 C41.20375,29.7467316 39.6115,30.351961 37.88125,30.351961 C37.5835,30.351961 37.2895,30.3342733 37,30.2988977 C38.63425,31.3732376 40.57525,32 42.661,32 C49.45375,32 53.16775,26.229941 53.16775,21.2258395 C53.16775,21.0620354 53.164,20.8982312 53.15725,20.7359651 C53.87875,20.2014868 54.505,19.5347347 55,18.7756985 Z"
-                        fill="#9399A3"
-                        fillRule="nonzero"
-                        id="twitter"
-                      />
-                    </g>
-                  </g>
-                </g>
-              </g>
-            </g>
+            <path
+              d="M459.37 151.716c.325 4.548.325 9.097.325 13.645 0 138.72-105.583 298.558-298.558 298.558-59.452 0-114.68-17.219-161.137-47.106 8.447.974 16.568 1.299 25.34 1.299 49.055 0 94.213-16.568 130.274-44.832-46.132-.975-84.792-31.188-98.112-72.772 6.498.974 12.995 1.624 19.818 1.624 9.421 0 18.843-1.3 27.614-3.573-48.081-9.747-84.143-51.98-84.143-102.985v-1.299c13.969 7.797 30.214 12.67 47.431 13.319-28.264-18.843-46.781-51.005-46.781-87.391 0-19.492 5.197-37.36 14.294-52.954 51.655 63.675 129.3 105.258 216.365 109.807-1.624-7.797-2.599-15.918-2.599-24.04 0-57.828 46.782-104.934 104.934-104.934 30.213 0 57.502 12.67 76.67 33.137 23.715-4.548 46.456-13.32 66.599-25.34-7.798 24.366-24.366 44.833-46.132 57.827 21.117-2.273 41.584-8.122 60.426-16.243-14.292 20.791-32.161 39.308-52.628 54.253z"
+              fill="currentColor"
+            />
           </svg>
         </a>
         <a
-          className="c36"
+          className="c37"
           href="https://github.com/opencollective"
         >
           <svg
-            height={15}
-            version="1.1"
-            viewBox="0 0 22 22"
-            width={15}
-            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true"
+            className="c40"
+            color="#9399A3"
+            fill="currentColor"
+            focusable="false"
+            height={17}
+            size={17}
+            viewBox="0 0 496 512"
+            width={17}
           >
-            <title>
-              github icon
-            </title>
-            <g
-              fill="none"
-              fillRule="evenodd"
-              id="Homepage"
-              stroke="none"
-              strokeWidth="1"
-            >
-              <g
-                id="Homepage---XS-(small-handset)"
-                transform="translate(-149.000000, -10919.000000)"
-              >
-                <g
-                  id="FOOTER"
-                  transform="translate(0.000000, 10758.000000)"
-                >
-                  <g
-                    id="::-social-networks"
-                    transform="translate(24.000000, 148.000000)"
-                  >
-                    <g
-                      id="::-icon-(github)"
-                      transform="translate(112.000000, 0.000000)"
-                    >
-                      <path
-                        d="M24,13 C17.9133333,13 13,17.962963 13,24.1111111 C13,29.2222222 16.4466667,33.6666667 21.36,34.9259259 C21.4333333,34.9259259 21.58,34.9259259 21.6533333,34.8518519 C21.7266667,34.7777778 21.8,34.7037037 21.8,34.5555556 L21.8,31.8888889 C21.8,31.8148148 21.7266667,31.6666667 21.7266667,31.5925926 C21.6533333,31.5185185 21.58,31.5185185 21.4333333,31.5185185 L20.7,31.5185185 C19.5266667,31.5185185 18.7933333,30.4074074 18.1333333,29.4444444 C17.9866667,29.2962963 17.9133333,29.0740741 17.7666667,28.9259259 C18.2066667,29.1481481 18.5,29.4444444 18.8666667,29.8148148 C19.38,30.3333333 19.8933333,30.8518519 20.7733333,30.8518519 C20.7733333,30.8518519 20.7733333,30.8518519 20.7733333,30.8518519 C21.14,30.8518519 21.8733333,30.4814815 21.8733333,29.3703704 L21.8733333,29 C21.8733333,28.8518519 21.8,28.7037037 21.58,28.6296296 C19.0866667,27.8888889 17.4733333,25.8888889 17.4733333,23.5925926 C17.4733333,22.4074074 17.9866667,21.2222222 18.8666667,20.3333333 C18.8666667,20.1851852 18.8666667,20.037037 18.8666667,19.8888889 C18.5,19.1481481 18.8666667,18.1111111 19.38,17.5185185 C19.8933333,17.7407407 20.4066667,18.3333333 20.8466667,18.7777778 C20.92,18.9259259 21.14,18.9259259 21.2866667,18.8518519 L21.5066667,18.7777778 C22.3133333,18.4814815 23.2666667,18.1111111 24.1466667,18.1111111 C25.0266667,18.1111111 25.98,18.4814815 26.7866667,18.7777778 L27.0066667,18.8518519 C27.1533333,18.9259259 27.3,18.8518519 27.4466667,18.7777778 C27.8866667,18.2592593 28.4,17.7407407 28.9133333,17.5185185 C29.4266667,18.1851852 29.7933333,19.1481481 29.4266667,19.8888889 C29.1333333,20.037037 29.1333333,20.1851852 29.2066667,20.3333333 C30.0866667,21.2962963 30.6,22.3333333 30.6,23.4444444 C30.6,25.8888889 28.7666667,28.037037 26.1266667,28.6296296 C25.98,28.6296296 25.9066667,28.7037037 25.9066667,28.8518519 C25.9066667,29 25.8333333,29.0740741 25.9066667,29.1481481 C26.1266667,29.5185185 26.2,30.2592593 26.2,31.2222222 C26.2,32.4814815 26.2,34.6296296 26.2,34.6296296 C26.2,34.7777778 26.2733333,34.8518519 26.3466667,34.9259259 C26.42,35 26.4933333,35 26.5666667,35 C26.5666667,35 26.64,35 26.64,35 C31.5533333,33.6666667 35,29.2222222 35,24.1111111 C35,17.962963 30.0866667,13 24,13 Z"
-                        fill="#9399A3"
-                        fillRule="nonzero"
-                        id="github"
-                      />
-                    </g>
-                  </g>
-                </g>
-              </g>
-            </g>
+            <path
+              d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"
+              fill="currentColor"
+            />
           </svg>
         </a>
         <a
-          className="c36"
+          className="c37"
           href="https://slack.opencollective.com"
         >
           <svg
-            height={15}
-            version="1.1"
-            viewBox="0 0 20 20"
-            width={15}
-            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true"
+            className="c41"
+            color="#9399A3"
+            fill="currentColor"
+            focusable="false"
+            height={17}
+            size={17}
+            viewBox="0 0 448 512"
+            width={17}
           >
-            <title>
-              slack icon
-            </title>
-            <g
-              fill="#9399A3"
-              id="slack"
-            >
-              <path
-                d="M19.1625,7.25 C21.225,14.125 19.62125,17.1 12.75,19.1625 C5.875,21.225 2.9,19.62125 0.8375,12.75 C-1.225,5.875 0.38,2.9 7.25,0.8375 C14.1225,-1.225 17.1,0.38 19.1625,7.25 Z M15.6875,11.7125 L15.695,11.73875 C16.2325,11.56375 16.5275,10.97625 16.345,10.42625 C16.16375,9.87625 15.57625,9.58875 15.0325,9.76375 L13.74,10.19375 L12.8775,7.6225 L14.175,7.185 C14.71625,7.005 15.01,6.4175 14.82875,5.8725 C14.64625,5.335 14.05875,5.04 13.51625,5.2225 L12.22,5.6475 L11.77,4.2975 C11.59,3.75 11.00125,3.4625 10.4575,3.6375 C9.9125,3.825 9.625,4.4125 9.8,4.95 L10.25,6.2875 L7.58875,7.1825 L7.13875,5.8425 C6.96375,5.3025 6.37625,5.00625 5.82625,5.19 C5.27625,5.37 4.98875,5.9575 5.16375,6.5025 L5.61375,7.84 L4.31375,8.2725 C3.76375,8.45625 3.47625,9.04375 3.65125,9.585 C3.78875,10.01 4.18875,10.27875 4.60125,10.29125 C4.72,10.29375 4.84,10.2775 4.9575,10.2375 L6.25,9.8 L7.07375,12.37375 L5.77375,12.81125 C5.23625,12.98625 4.93625,13.57375 5.12375,14.12375 C5.27375,14.54875 5.66125,14.82375 6.08625,14.83625 C6.21125,14.83625 6.32375,14.82375 6.44875,14.78625 L7.74875,14.34875 L8.19875,15.69875 C8.34875,16.12375 8.73625,16.39375 9.16125,16.40625 C9.28625,16.40875 9.39875,16.3925 9.52375,16.3525 C10.07375,16.17125 10.36125,15.58375 10.18625,15.04 L9.73625,13.7 L12.41125,12.805 L12.86125,14.145 C13.01125,14.57 13.39875,14.84 13.82375,14.8525 C13.94875,14.85625 14.06125,14.8375 14.18625,14.8 C14.72875,14.6175 15.0225,14.03 14.84125,13.4875 L14.39125,12.14625 L15.6875,11.7125 Z"
-              />
-              <polygon
-                points="8.2325 9.1625 9.095 11.73375 11.76625 10.83875 10.90375 8.27625 8.2325 9.17625"
-              />
-            </g>
+            <path
+              d="M244.2 217.5l19.3 57.7-59.8 20-19.3-57.7 59.8-20zm41.4 243.7C131.6 507.4 65 471.6 18.8 317.6S8.4 97 162.4 50.8C316.4 4.6 383 40.4 429.2 194.4c46.2 154 10.4 220.6-143.6 266.8zM366.2 265c-3.9-12.2-17.2-18.6-29.4-14.7l-29 9.7-19.3-57.7 29-9.7c12.2-3.9 18.6-17.2 14.7-29.4-3.9-12.2-17.2-18.6-29.4-14.7l-29 9.7-10-30.1c-3.9-12.2-17.2-18.6-29.4-14.7-12.2 3.9-18.6 17.2-14.7 29.4l10 30.1-59.8 20.1-10-30.1c-3.9-12.2-17.2-18.6-29.4-14.7-12.2 3.9-18.6 17.2-14.7 29.4l10 30.1-29 9.7c-12.2 3.9-18.6 17.2-14.7 29.4 3.2 9.3 12.2 15.4 21.5 15.8 4.3.6 7.7-1 36.9-10.7l19.3 57.7-29 9.7c-12.2 3.9-18.6 17.2-14.7 29.4 3.2 9.3 12.2 15.4 21.5 15.8 4.3.6 7.7-1 36.9-10.7l10 30.1c3.7 10.8 15.8 18.6 29.4 14.7 12.2-3.9 18.6-17.2 14.7-29.4l-10-30.1 59.8-20.1 10 30.1c3.7 10.8 15.8 18.6 29.4 14.7 12.2-3.9 18.6-17.2 14.7-29.4l-10-30.1 29-9.7c12.2-4.2 18.6-17.5 14.7-29.6z"
+              fill="currentColor"
+            />
           </svg>
         </a>
         <a
-          className="c36"
+          className="c37"
           href="mailto:info@opencollective.com"
         >
           <svg
-            height={13.125}
-            version="1.1"
-            viewBox="0 0 16 14"
-            width={15}
-            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true"
+            className="c42"
+            color="#9399A3"
+            fill="currentColor"
+            focusable="false"
+            height={19}
+            size={19}
+            viewBox="0 0 24 24"
+            width={19}
           >
-            <title>
-              email icon
-            </title>
-            <g
-              fill="none"
-              fillRule="evenodd"
-              id="Homepage"
-              stroke="none"
-              strokeWidth="1"
-            >
-              <g
-                id="Homepage---XS-(small-handset)"
-                transform="translate(-264.000000, -10923.000000)"
-              >
-                <g
-                  id="FOOTER"
-                  transform="translate(0.000000, 10758.000000)"
-                >
-                  <g
-                    id="::-social-networks"
-                    transform="translate(24.000000, 148.000000)"
-                  >
-                    <g
-                      id="::-icon-(email)"
-                      transform="translate(224.000000, 0.000000)"
-                    >
-                      <path
-                        d="M30.4,17 L17.6,17 C16.72,17 16.008,17.9 16.008,19 L16,29 C16,30.1 16.72,31 17.6,31 L30.4,31 C31.28,31 32,30.1 32,29 L32,19 C32,17.9 31.28,17 30.4,17 Z M30,21 L24,25 L18,21 L18,19 L24,23 L30,19 L30,21 Z"
-                        fill="#9399A3"
-                        fillRule="nonzero"
-                        id="email"
-                      />
-                    </g>
-                  </g>
-                </g>
-              </g>
-            </g>
+            <path
+              d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"
+            />
           </svg>
         </a>
       </div>
       <nav
-        className="c37 c38"
+        className="c43 c44"
       >
         <div
-          className="c39"
+          className="c45"
         >
           <p
-            className="c40"
+            className="c46"
           >
             PLATFORM
           </p>
           <ul
-            className="c41"
+            className="c47"
           >
             <li
-              className="c42"
+              className="c48"
             >
               <a
-                className="c43 "
+                className="c49 "
                 href="/discover"
               >
                 Discover
               </a>
             </li>
             <li
-              className="c42"
+              className="c48"
             >
               <a
-                className="c43 "
+                className="c49 "
                 href="/learn-more"
               >
                 How it Works
               </a>
             </li>
             <li
-              className="c42"
+              className="c48"
             >
               <a
-                className="c43 "
+                className="c49 "
                 href="/opensource"
                 onClick={[Function]}
               >
@@ -2414,10 +2284,10 @@ exports[`Search Page renders empty results message 1`] = `
               </a>
             </li>
             <li
-              className="c42"
+              className="c48"
             >
               <a
-                className="c43 "
+                className="c49 "
                 href="/signin"
                 onClick={[Function]}
               >
@@ -2425,10 +2295,10 @@ exports[`Search Page renders empty results message 1`] = `
               </a>
             </li>
             <li
-              className="c42"
+              className="c48"
             >
               <a
-                className="c43 "
+                className="c49 "
                 href="/signin"
                 onClick={[Function]}
               >
@@ -2438,21 +2308,21 @@ exports[`Search Page renders empty results message 1`] = `
           </ul>
         </div>
         <div
-          className="c39"
+          className="c45"
         >
           <p
-            className="c40"
+            className="c46"
           >
             JOIN THE MOVEMENT
           </p>
           <ul
-            className="c41"
+            className="c47"
           >
             <li
-              className="c42"
+              className="c48"
             >
               <a
-                className="c43 "
+                className="c49 "
                 href="/create"
                 onClick={[Function]}
               >
@@ -2460,10 +2330,10 @@ exports[`Search Page renders empty results message 1`] = `
               </a>
             </li>
             <li
-              className="c42"
+              className="c48"
             >
               <a
-                className="c43 "
+                className="c49 "
                 href="/become-a-sponsor"
                 onClick={[Function]}
               >
@@ -2471,10 +2341,10 @@ exports[`Search Page renders empty results message 1`] = `
               </a>
             </li>
             <li
-              className="c42"
+              className="c48"
             >
               <a
-                className="c43 "
+                className="c49 "
                 href="/chapters"
                 onClick={[Function]}
               >
@@ -2484,21 +2354,21 @@ exports[`Search Page renders empty results message 1`] = `
           </ul>
         </div>
         <div
-          className="c39"
+          className="c45"
         >
           <p
-            className="c40"
+            className="c46"
           >
             COMMUNITY
           </p>
           <ul
-            className="c41"
+            className="c47"
           >
             <li
-              className="c42"
+              className="c48"
             >
               <a
-                className="c43 "
+                className="c49 "
                 href="/opensource"
                 onClick={[Function]}
               >
@@ -2506,10 +2376,10 @@ exports[`Search Page renders empty results message 1`] = `
               </a>
             </li>
             <li
-              className="c42"
+              className="c48"
             >
               <a
-                className="c43 "
+                className="c49 "
                 href="https://github.com/opencollective/opencollective/issues"
                 onClick={[Function]}
               >
@@ -2517,10 +2387,10 @@ exports[`Search Page renders empty results message 1`] = `
               </a>
             </li>
             <li
-              className="c42"
+              className="c48"
             >
               <a
-                className="c43 "
+                className="c49 "
                 href="https://slack.opencollective.com"
                 onClick={[Function]}
               >
@@ -2528,10 +2398,10 @@ exports[`Search Page renders empty results message 1`] = `
               </a>
             </li>
             <li
-              className="c42"
+              className="c48"
             >
               <a
-                className="c43 "
+                className="c49 "
                 href="https://github.com/opencollective/opencollective/wiki"
                 onClick={[Function]}
               >
@@ -2539,10 +2409,10 @@ exports[`Search Page renders empty results message 1`] = `
               </a>
             </li>
             <li
-              className="c42"
+              className="c48"
             >
               <a
-                className="c43 "
+                className="c49 "
                 href="mailto:support@opencollective.com"
                 onClick={[Function]}
               >
@@ -2552,21 +2422,21 @@ exports[`Search Page renders empty results message 1`] = `
           </ul>
         </div>
         <div
-          className="c39"
+          className="c45"
         >
           <p
-            className="c40"
+            className="c46"
           >
             COMPANY
           </p>
           <ul
-            className="c41"
+            className="c47"
           >
             <li
-              className="c42"
+              className="c48"
             >
               <a
-                className="c43 "
+                className="c49 "
                 href="/about"
                 onClick={[Function]}
               >
@@ -2574,10 +2444,10 @@ exports[`Search Page renders empty results message 1`] = `
               </a>
             </li>
             <li
-              className="c42"
+              className="c48"
             >
               <a
-                className="c43 "
+                className="c49 "
                 href="/faq"
                 onClick={[Function]}
               >
@@ -2585,10 +2455,10 @@ exports[`Search Page renders empty results message 1`] = `
               </a>
             </li>
             <li
-              className="c42"
+              className="c48"
             >
               <a
-                className="c43 "
+                className="c49 "
                 href="https://medium.com/open-collective"
                 onClick={[Function]}
               >
@@ -2596,10 +2466,10 @@ exports[`Search Page renders empty results message 1`] = `
               </a>
             </li>
             <li
-              className="c42"
+              className="c48"
             >
               <a
-                className="c43 "
+                className="c49 "
                 href="/tos"
                 onClick={[Function]}
               >
@@ -2607,10 +2477,10 @@ exports[`Search Page renders empty results message 1`] = `
               </a>
             </li>
             <li
-              className="c42"
+              className="c48"
             >
               <a
-                className="c43 "
+                className="c49 "
                 href="/privacypolicy"
                 onClick={[Function]}
               >
@@ -2649,14 +2519,14 @@ exports[`Search Page renders error message 1`] = `
   margin-right: 16px;
 }
 
-.c24 {
+.c25 {
   margin: 0;
   box-sizing: border-box;
   margin: 0px;
   padding: 0px;
 }
 
-.c25 {
+.c26 {
   box-sizing: border-box;
   padding-left: 16px;
   padding-right: 16px;
@@ -2667,7 +2537,7 @@ exports[`Search Page renders error message 1`] = `
   width: 100%;
 }
 
-.c30 {
+.c31 {
   max-width: 1300px;
   box-sizing: border-box;
   margin-left: auto;
@@ -2675,7 +2545,7 @@ exports[`Search Page renders error message 1`] = `
   padding: 8px;
 }
 
-.c37 {
+.c43 {
   box-sizing: border-box;
   margin-top: 16px;
   -webkit-flex: 1 1 auto;
@@ -2686,7 +2556,7 @@ exports[`Search Page renders error message 1`] = `
   order: 3;
 }
 
-.c38 {
+.c44 {
   box-sizing: border-box;
   width: 50%;
   margin-bottom: 16px;
@@ -2775,7 +2645,7 @@ exports[`Search Page renders error message 1`] = `
   display: flex;
 }
 
-.c23 {
+.c24 {
   margin: 0;
   display: -webkit-box;
   display: -webkit-flex;
@@ -2798,7 +2668,7 @@ exports[`Search Page renders error message 1`] = `
   justify-content: center;
 }
 
-.c29 {
+.c30 {
   max-width: 1300px;
   display: -webkit-box;
   display: -webkit-flex;
@@ -2817,7 +2687,7 @@ exports[`Search Page renders error message 1`] = `
   justify-content: space-between;
 }
 
-.c32 {
+.c33 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -2828,7 +2698,7 @@ exports[`Search Page renders error message 1`] = `
   justify-content: center;
 }
 
-.c36 {
+.c42 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -2857,7 +2727,7 @@ exports[`Search Page renders error message 1`] = `
   justify-content: space-between;
 }
 
-.c33 {
+.c34 {
   color: #6E747A;
   font-size: 1.4rem;
   line-height: Paragraph;
@@ -2871,7 +2741,7 @@ exports[`Search Page renders error message 1`] = `
   text-align: center;
 }
 
-.c39 {
+.c45 {
   color: #C2C6CC;
   font-size: 1.2rem;
   line-height: Paragraph;
@@ -2884,7 +2754,13 @@ exports[`Search Page renders error message 1`] = `
   text-align: center;
 }
 
-.c28 {
+.c22 {
+  display: inline-block;
+  vertical-align: -.125em;
+  overflow: hidden;
+}
+
+.c29 {
   border-top: 1px solid #aaaaaa;
   bottom: 0px;
   background-color: white;
@@ -2893,7 +2769,7 @@ exports[`Search Page renders error message 1`] = `
   width: 100%;
 }
 
-.c31 {
+.c32 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -2906,7 +2782,7 @@ exports[`Search Page renders error message 1`] = `
   width: 100%;
 }
 
-.c34 {
+.c35 {
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -2928,7 +2804,7 @@ exports[`Search Page renders error message 1`] = `
   width: 100%;
 }
 
-.c27 {
+.c28 {
   border: 1px solid #D5DAE0;
   border-radius: 20px;
   color: #3385FF;
@@ -2940,7 +2816,7 @@ exports[`Search Page renders error message 1`] = `
   padding-bottom: 8px;
 }
 
-.c41 {
+.c47 {
   list-style: none;
   margin-bottom: 8px;
   text-align: center;
@@ -2977,18 +2853,48 @@ exports[`Search Page renders error message 1`] = `
   min-width: 10rem;
 }
 
-.c22 {
+.c23 {
   list-style: none;
   min-width: 20rem;
   text-align: right;
 }
 
-.c26 {
+.c27 {
   color: #777777;
   font-size: 1.4rem;
 }
 
-.c35 {
+.c39 {
+  display: inline-block;
+  vertical-align: -.125em;
+  overflow: hidden;
+}
+
+.c37 {
+  display: inline-block;
+  vertical-align: -.125em;
+  overflow: hidden;
+}
+
+.c40 {
+  display: inline-block;
+  vertical-align: -.125em;
+  overflow: hidden;
+}
+
+.c38 {
+  display: inline-block;
+  vertical-align: -.125em;
+  overflow: hidden;
+}
+
+.c41 {
+  display: inline-block;
+  vertical-align: middle;
+  overflow: hidden;
+}
+
+.c36 {
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -3008,12 +2914,12 @@ exports[`Search Page renders error message 1`] = `
   width: 48px;
 }
 
-.c35:hover,
-.c35:focus {
+.c36:hover,
+.c36:focus {
   opacity: 1;
 }
 
-.c42 {
+.c48 {
   color: #6e747a;
   display: block;
   fontsize: 1.4rem;
@@ -3022,7 +2928,7 @@ exports[`Search Page renders error message 1`] = `
   padding: 0;
 }
 
-.c40 {
+.c46 {
   box-sizing: border-box;
   padding-left: 0px;
   padding-right: 8px;
@@ -3040,7 +2946,7 @@ exports[`Search Page renders error message 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c37 {
+  .c43 {
     -webkit-order: 2;
     -ms-flex-order: 2;
     order: 2;
@@ -3048,13 +2954,13 @@ exports[`Search Page renders error message 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c38 {
+  .c44 {
     width: 25%;
   }
 }
 
 @media screen and (min-width:52em) {
-  .c29 {
+  .c30 {
     -webkit-flex-direction: row;
     -ms-flex-direction: row;
     flex-direction: row;
@@ -3062,7 +2968,7 @@ exports[`Search Page renders error message 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c29 {
+  .c30 {
     -webkit-align-items: flex-start;
     -webkit-box-align: flex-start;
     -ms-flex-align: flex-start;
@@ -3071,7 +2977,7 @@ exports[`Search Page renders error message 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c32 {
+  .c33 {
     -webkit-box-pack: start;
     -webkit-justify-content: flex-start;
     -ms-flex-pack: start;
@@ -3080,25 +2986,25 @@ exports[`Search Page renders error message 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c33 {
+  .c34 {
     text-align: left;
   }
 }
 
 @media screen and (min-width:52em) {
-  .c39 {
+  .c45 {
     text-align: left;
   }
 }
 
 @media screen and (min-width:52em) {
-  .c31 {
+  .c32 {
     width: 33.33333333333333%;
   }
 }
 
 @media screen and (min-width:52em) {
-  .c34 {
+  .c35 {
     -webkit-order: 3;
     -ms-flex-order: 3;
     order: 3;
@@ -3130,7 +3036,7 @@ exports[`Search Page renders error message 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c41 {
+  .c47 {
     text-align: left;
   }
 }
@@ -3264,29 +3170,19 @@ exports[`Search Page renders error message 1`] = `
               onClick={[Function]}
             >
               <svg
-                height={16.799999999999997}
-                version="1.1"
-                viewBox="0 0 20 14"
+                aria-hidden="true"
+                className="c22"
+                color="#aaaaaa"
+                fill="currentColor"
+                focusable="false"
+                height={24}
+                size={24}
+                viewBox="0 0 448 512"
                 width={24}
-                xmlns="http://www.w3.org/2000/svg"
               >
-                <title>
-                  menu icon
-                </title>
                 <path
-                  d="M19,6 L1,6 C0.4,6 0,6.4 0,7 C0,7.6 0.4,8 1,8 L19,8 C19.6,8 20,7.6 20,7 C20,6.4 19.6,6 19,6 Z"
-                  fill="#aaaaaa"
-                  fillRule="nonzero"
-                />
-                <path
-                  d="M0.85,2 L16.15,2 C16.66,2 17,1.6 17,1 C17,0.4 16.66,0 16.15,0 L0.85,0 C0.34,0 0,0.4 0,1 C0,1.6 0.34,2 0.85,2 Z"
-                  fill="#aaaaaa"
-                  fillRule="nonzero"
-                />
-                <path
-                  d="M16.15,12 L0.85,12 C0.34,12 0,12.4 0,13 C0,13.6 0.34,14 0.85,14 L16.15,14 C16.66,14 17,13.6 17,13 C17,12.4 16.66,12 16.15,12 Z"
-                  fill="#aaaaaa"
-                  fillRule="nonzero"
+                  d="M16 132h416c8.837 0 16-7.163 16-16V76c0-8.837-7.163-16-16-16H16C7.163 60 0 67.163 0 76v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16z"
+                  fill="currentColor"
                 />
               </svg>
             </a>
@@ -3296,13 +3192,13 @@ exports[`Search Page renders error message 1`] = `
           className="c4 c2"
         >
           <ul
-            className="c22 c23 c24"
+            className="c23 c24 c25"
           >
             <li
-              className="c25"
+              className="c26"
             >
               <a
-                className="c26"
+                className="c27"
                 href="/discover"
               >
                 <span>
@@ -3311,10 +3207,10 @@ exports[`Search Page renders error message 1`] = `
               </a>
             </li>
             <li
-              className="c25"
+              className="c26"
             >
               <a
-                className="c26"
+                className="c27"
                 href="/learn-more"
               >
                 <span>
@@ -3323,10 +3219,10 @@ exports[`Search Page renders error message 1`] = `
               </a>
             </li>
             <li
-              className="c25"
+              className="c26"
             >
               <a
-                className="c26"
+                className="c27"
                 href="https://medium.com/open-collective"
               >
                 <span>
@@ -3340,7 +3236,7 @@ exports[`Search Page renders error message 1`] = `
           className="LoginTopBarProfileButton"
         >
           <a
-            className="c27"
+            className="c28"
             href="/signin?next=%2F"
             onClick={[Function]}
           >
@@ -3370,17 +3266,17 @@ exports[`Search Page renders error message 1`] = `
     </div>
   </main>
   <div
-    className="c28"
+    className="c29"
     id="footer"
   >
     <div
-      className="c29 c30 sc-bdVaJa c2"
+      className="c30 c31 sc-bdVaJa c2"
     >
       <div
-        className="c31"
+        className="c32"
       >
         <div
-          className="c32 c2 sc-bdVaJa c2"
+          className="c33 c2 sc-bdVaJa c2"
         >
           <object
             data="/static/images/opencollectivelogo-footer.svg"
@@ -3389,249 +3285,158 @@ exports[`Search Page renders error message 1`] = `
           />
         </div>
         <p
-          className="c33"
+          className="c34"
         >
           An organization for your community, transparent by design.
         </p>
       </div>
       <div
-        className="c34"
+        className="c35"
       >
         <a
-          className="c35"
+          className="c36"
           href="https://medium.com/open-collective"
         >
           <svg
-            height={15}
-            viewBox="0 0 32 32"
-            width={15}
+            aria-hidden="true"
+            className="c37"
+            color="#9399A3"
+            fill="currentColor"
+            focusable="false"
+            height={17}
+            size={17}
+            viewBox="0 0 512 512"
+            width={17}
           >
-            <title>
-              medium icon
-            </title>
             <path
-              d="M3.795 8.48c0.040-0.393-0.111-0.781-0.404-1.045l-2.987-3.6v-0.537h9.276l7.171 15.727 6.304-15.727h8.845v0.537l-2.556 2.449c-0.22 0.168-0.329 0.444-0.284 0.717v18c-0.045 0.272 0.064 0.547 0.284 0.716l2.493 2.449v0.537h-12.547v-0.537l2.583-2.509c0.253-0.253 0.253-0.328 0.253-0.717v-14.548l-7.187 18.251h-0.969l-8.367-18.251v12.232c-0.069 0.515 0.101 1.032 0.463 1.404l3.36 4.080v0.536h-9.527v-0.537l3.36-4.080c0.36-0.371 0.52-0.893 0.435-1.403v-14.144z"
-              fill="#9399A3"
+              d="M71.5 142.3c.6-5.9-1.7-11.8-6.1-15.8L20.3 72.1V64h140.2l108.4 237.7L364.2 64h133.7v8.1l-38.6 37c-3.3 2.5-5 6.7-4.3 10.8v272c-.7 4.1 1 8.3 4.3 10.8l37.7 37v8.1H307.3v-8.1l39.1-37.9c3.8-3.8 3.8-5 3.8-10.8V171.2L241.5 447.1h-14.7L100.4 171.2v184.9c-1.1 7.8 1.5 15.6 7 21.2l50.8 61.6v8.1h-144v-8L65 377.3c5.4-5.6 7.9-13.5 6.5-21.2V142.3z"
+              fill="currentColor"
             />
           </svg>
         </a>
         <a
-          className="c35"
+          className="c36"
           href="https://twitter.com/opencollect"
         >
           <svg
-            height={12.5}
-            version="1.1"
-            viewBox="0 0 18 15"
-            width={15}
-            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true"
+            className="c38"
+            color="#9399A3"
+            fill="currentColor"
+            focusable="false"
+            height={17}
+            size={17}
+            viewBox="0 0 512 512"
+            width={17}
           >
-            <title>
-              twitter icon
-            </title>
-            <g
-              fill="none"
-              fillRule="evenodd"
-              id="Homepage"
-              stroke="none"
-              strokeWidth="1"
-            >
-              <g
-                id="Homepage---XS-(small-handset)"
-                transform="translate(-97.000000, -9521.000000)"
-              >
-                <g
-                  id="JOIN-MOVEMENT"
-                  transform="translate(-69.000000, 3570.000000)"
-                >
-                  <g
-                    id="::-06---spread-the-word"
-                    transform="translate(85.000000, 5758.000000)"
-                  >
-                    <g
-                      id="::-button-(share-twitter)"
-                      transform="translate(44.000000, 176.000000)"
-                    >
-                      <path
-                        d="M55,18.7756985 C54.33775,19.0771597 53.626,19.2801846 52.879,19.3716996 C53.64175,18.9033581 54.22675,18.1612407 54.50275,17.2768521 C53.7895,17.710587 52.999,18.0258908 52.1575,18.1958472 C51.484,17.4598821 50.524,17 49.462,17 C47.42275,17 45.769,18.695719 45.769,20.7867214 C45.769,21.0835683 45.802,21.3727249 45.86425,21.649577 C42.79525,21.4919251 40.07425,19.9838503 38.2525,17.6928993 C37.93525,18.2519867 37.753,18.9025891 37.753,19.5970264 C37.753,20.9105358 38.40475,22.0694694 39.3955,22.748526 C38.79025,22.7285311 38.221,22.5585747 37.723,22.2748013 C37.723,22.290951 37.723,22.3063317 37.723,22.3224814 C37.723,24.1573955 38.99575,25.6877724 40.6855,26.0353755 C40.37575,26.1222763 40.0495,26.1684184 39.712,26.1684184 C39.47425,26.1684184 39.2425,26.1445783 39.0175,26.1007434 C39.48775,27.6049731 40.85125,28.7000769 42.4675,28.7308382 C41.20375,29.7467316 39.6115,30.351961 37.88125,30.351961 C37.5835,30.351961 37.2895,30.3342733 37,30.2988977 C38.63425,31.3732376 40.57525,32 42.661,32 C49.45375,32 53.16775,26.229941 53.16775,21.2258395 C53.16775,21.0620354 53.164,20.8982312 53.15725,20.7359651 C53.87875,20.2014868 54.505,19.5347347 55,18.7756985 Z"
-                        fill="#9399A3"
-                        fillRule="nonzero"
-                        id="twitter"
-                      />
-                    </g>
-                  </g>
-                </g>
-              </g>
-            </g>
+            <path
+              d="M459.37 151.716c.325 4.548.325 9.097.325 13.645 0 138.72-105.583 298.558-298.558 298.558-59.452 0-114.68-17.219-161.137-47.106 8.447.974 16.568 1.299 25.34 1.299 49.055 0 94.213-16.568 130.274-44.832-46.132-.975-84.792-31.188-98.112-72.772 6.498.974 12.995 1.624 19.818 1.624 9.421 0 18.843-1.3 27.614-3.573-48.081-9.747-84.143-51.98-84.143-102.985v-1.299c13.969 7.797 30.214 12.67 47.431 13.319-28.264-18.843-46.781-51.005-46.781-87.391 0-19.492 5.197-37.36 14.294-52.954 51.655 63.675 129.3 105.258 216.365 109.807-1.624-7.797-2.599-15.918-2.599-24.04 0-57.828 46.782-104.934 104.934-104.934 30.213 0 57.502 12.67 76.67 33.137 23.715-4.548 46.456-13.32 66.599-25.34-7.798 24.366-24.366 44.833-46.132 57.827 21.117-2.273 41.584-8.122 60.426-16.243-14.292 20.791-32.161 39.308-52.628 54.253z"
+              fill="currentColor"
+            />
           </svg>
         </a>
         <a
-          className="c35"
+          className="c36"
           href="https://github.com/opencollective"
         >
           <svg
-            height={15}
-            version="1.1"
-            viewBox="0 0 22 22"
-            width={15}
-            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true"
+            className="c39"
+            color="#9399A3"
+            fill="currentColor"
+            focusable="false"
+            height={17}
+            size={17}
+            viewBox="0 0 496 512"
+            width={17}
           >
-            <title>
-              github icon
-            </title>
-            <g
-              fill="none"
-              fillRule="evenodd"
-              id="Homepage"
-              stroke="none"
-              strokeWidth="1"
-            >
-              <g
-                id="Homepage---XS-(small-handset)"
-                transform="translate(-149.000000, -10919.000000)"
-              >
-                <g
-                  id="FOOTER"
-                  transform="translate(0.000000, 10758.000000)"
-                >
-                  <g
-                    id="::-social-networks"
-                    transform="translate(24.000000, 148.000000)"
-                  >
-                    <g
-                      id="::-icon-(github)"
-                      transform="translate(112.000000, 0.000000)"
-                    >
-                      <path
-                        d="M24,13 C17.9133333,13 13,17.962963 13,24.1111111 C13,29.2222222 16.4466667,33.6666667 21.36,34.9259259 C21.4333333,34.9259259 21.58,34.9259259 21.6533333,34.8518519 C21.7266667,34.7777778 21.8,34.7037037 21.8,34.5555556 L21.8,31.8888889 C21.8,31.8148148 21.7266667,31.6666667 21.7266667,31.5925926 C21.6533333,31.5185185 21.58,31.5185185 21.4333333,31.5185185 L20.7,31.5185185 C19.5266667,31.5185185 18.7933333,30.4074074 18.1333333,29.4444444 C17.9866667,29.2962963 17.9133333,29.0740741 17.7666667,28.9259259 C18.2066667,29.1481481 18.5,29.4444444 18.8666667,29.8148148 C19.38,30.3333333 19.8933333,30.8518519 20.7733333,30.8518519 C20.7733333,30.8518519 20.7733333,30.8518519 20.7733333,30.8518519 C21.14,30.8518519 21.8733333,30.4814815 21.8733333,29.3703704 L21.8733333,29 C21.8733333,28.8518519 21.8,28.7037037 21.58,28.6296296 C19.0866667,27.8888889 17.4733333,25.8888889 17.4733333,23.5925926 C17.4733333,22.4074074 17.9866667,21.2222222 18.8666667,20.3333333 C18.8666667,20.1851852 18.8666667,20.037037 18.8666667,19.8888889 C18.5,19.1481481 18.8666667,18.1111111 19.38,17.5185185 C19.8933333,17.7407407 20.4066667,18.3333333 20.8466667,18.7777778 C20.92,18.9259259 21.14,18.9259259 21.2866667,18.8518519 L21.5066667,18.7777778 C22.3133333,18.4814815 23.2666667,18.1111111 24.1466667,18.1111111 C25.0266667,18.1111111 25.98,18.4814815 26.7866667,18.7777778 L27.0066667,18.8518519 C27.1533333,18.9259259 27.3,18.8518519 27.4466667,18.7777778 C27.8866667,18.2592593 28.4,17.7407407 28.9133333,17.5185185 C29.4266667,18.1851852 29.7933333,19.1481481 29.4266667,19.8888889 C29.1333333,20.037037 29.1333333,20.1851852 29.2066667,20.3333333 C30.0866667,21.2962963 30.6,22.3333333 30.6,23.4444444 C30.6,25.8888889 28.7666667,28.037037 26.1266667,28.6296296 C25.98,28.6296296 25.9066667,28.7037037 25.9066667,28.8518519 C25.9066667,29 25.8333333,29.0740741 25.9066667,29.1481481 C26.1266667,29.5185185 26.2,30.2592593 26.2,31.2222222 C26.2,32.4814815 26.2,34.6296296 26.2,34.6296296 C26.2,34.7777778 26.2733333,34.8518519 26.3466667,34.9259259 C26.42,35 26.4933333,35 26.5666667,35 C26.5666667,35 26.64,35 26.64,35 C31.5533333,33.6666667 35,29.2222222 35,24.1111111 C35,17.962963 30.0866667,13 24,13 Z"
-                        fill="#9399A3"
-                        fillRule="nonzero"
-                        id="github"
-                      />
-                    </g>
-                  </g>
-                </g>
-              </g>
-            </g>
+            <path
+              d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"
+              fill="currentColor"
+            />
           </svg>
         </a>
         <a
-          className="c35"
+          className="c36"
           href="https://slack.opencollective.com"
         >
           <svg
-            height={15}
-            version="1.1"
-            viewBox="0 0 20 20"
-            width={15}
-            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true"
+            className="c40"
+            color="#9399A3"
+            fill="currentColor"
+            focusable="false"
+            height={17}
+            size={17}
+            viewBox="0 0 448 512"
+            width={17}
           >
-            <title>
-              slack icon
-            </title>
-            <g
-              fill="#9399A3"
-              id="slack"
-            >
-              <path
-                d="M19.1625,7.25 C21.225,14.125 19.62125,17.1 12.75,19.1625 C5.875,21.225 2.9,19.62125 0.8375,12.75 C-1.225,5.875 0.38,2.9 7.25,0.8375 C14.1225,-1.225 17.1,0.38 19.1625,7.25 Z M15.6875,11.7125 L15.695,11.73875 C16.2325,11.56375 16.5275,10.97625 16.345,10.42625 C16.16375,9.87625 15.57625,9.58875 15.0325,9.76375 L13.74,10.19375 L12.8775,7.6225 L14.175,7.185 C14.71625,7.005 15.01,6.4175 14.82875,5.8725 C14.64625,5.335 14.05875,5.04 13.51625,5.2225 L12.22,5.6475 L11.77,4.2975 C11.59,3.75 11.00125,3.4625 10.4575,3.6375 C9.9125,3.825 9.625,4.4125 9.8,4.95 L10.25,6.2875 L7.58875,7.1825 L7.13875,5.8425 C6.96375,5.3025 6.37625,5.00625 5.82625,5.19 C5.27625,5.37 4.98875,5.9575 5.16375,6.5025 L5.61375,7.84 L4.31375,8.2725 C3.76375,8.45625 3.47625,9.04375 3.65125,9.585 C3.78875,10.01 4.18875,10.27875 4.60125,10.29125 C4.72,10.29375 4.84,10.2775 4.9575,10.2375 L6.25,9.8 L7.07375,12.37375 L5.77375,12.81125 C5.23625,12.98625 4.93625,13.57375 5.12375,14.12375 C5.27375,14.54875 5.66125,14.82375 6.08625,14.83625 C6.21125,14.83625 6.32375,14.82375 6.44875,14.78625 L7.74875,14.34875 L8.19875,15.69875 C8.34875,16.12375 8.73625,16.39375 9.16125,16.40625 C9.28625,16.40875 9.39875,16.3925 9.52375,16.3525 C10.07375,16.17125 10.36125,15.58375 10.18625,15.04 L9.73625,13.7 L12.41125,12.805 L12.86125,14.145 C13.01125,14.57 13.39875,14.84 13.82375,14.8525 C13.94875,14.85625 14.06125,14.8375 14.18625,14.8 C14.72875,14.6175 15.0225,14.03 14.84125,13.4875 L14.39125,12.14625 L15.6875,11.7125 Z"
-              />
-              <polygon
-                points="8.2325 9.1625 9.095 11.73375 11.76625 10.83875 10.90375 8.27625 8.2325 9.17625"
-              />
-            </g>
+            <path
+              d="M244.2 217.5l19.3 57.7-59.8 20-19.3-57.7 59.8-20zm41.4 243.7C131.6 507.4 65 471.6 18.8 317.6S8.4 97 162.4 50.8C316.4 4.6 383 40.4 429.2 194.4c46.2 154 10.4 220.6-143.6 266.8zM366.2 265c-3.9-12.2-17.2-18.6-29.4-14.7l-29 9.7-19.3-57.7 29-9.7c12.2-3.9 18.6-17.2 14.7-29.4-3.9-12.2-17.2-18.6-29.4-14.7l-29 9.7-10-30.1c-3.9-12.2-17.2-18.6-29.4-14.7-12.2 3.9-18.6 17.2-14.7 29.4l10 30.1-59.8 20.1-10-30.1c-3.9-12.2-17.2-18.6-29.4-14.7-12.2 3.9-18.6 17.2-14.7 29.4l10 30.1-29 9.7c-12.2 3.9-18.6 17.2-14.7 29.4 3.2 9.3 12.2 15.4 21.5 15.8 4.3.6 7.7-1 36.9-10.7l19.3 57.7-29 9.7c-12.2 3.9-18.6 17.2-14.7 29.4 3.2 9.3 12.2 15.4 21.5 15.8 4.3.6 7.7-1 36.9-10.7l10 30.1c3.7 10.8 15.8 18.6 29.4 14.7 12.2-3.9 18.6-17.2 14.7-29.4l-10-30.1 59.8-20.1 10 30.1c3.7 10.8 15.8 18.6 29.4 14.7 12.2-3.9 18.6-17.2 14.7-29.4l-10-30.1 29-9.7c12.2-4.2 18.6-17.5 14.7-29.6z"
+              fill="currentColor"
+            />
           </svg>
         </a>
         <a
-          className="c35"
+          className="c36"
           href="mailto:info@opencollective.com"
         >
           <svg
-            height={13.125}
-            version="1.1"
-            viewBox="0 0 16 14"
-            width={15}
-            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true"
+            className="c41"
+            color="#9399A3"
+            fill="currentColor"
+            focusable="false"
+            height={19}
+            size={19}
+            viewBox="0 0 24 24"
+            width={19}
           >
-            <title>
-              email icon
-            </title>
-            <g
-              fill="none"
-              fillRule="evenodd"
-              id="Homepage"
-              stroke="none"
-              strokeWidth="1"
-            >
-              <g
-                id="Homepage---XS-(small-handset)"
-                transform="translate(-264.000000, -10923.000000)"
-              >
-                <g
-                  id="FOOTER"
-                  transform="translate(0.000000, 10758.000000)"
-                >
-                  <g
-                    id="::-social-networks"
-                    transform="translate(24.000000, 148.000000)"
-                  >
-                    <g
-                      id="::-icon-(email)"
-                      transform="translate(224.000000, 0.000000)"
-                    >
-                      <path
-                        d="M30.4,17 L17.6,17 C16.72,17 16.008,17.9 16.008,19 L16,29 C16,30.1 16.72,31 17.6,31 L30.4,31 C31.28,31 32,30.1 32,29 L32,19 C32,17.9 31.28,17 30.4,17 Z M30,21 L24,25 L18,21 L18,19 L24,23 L30,19 L30,21 Z"
-                        fill="#9399A3"
-                        fillRule="nonzero"
-                        id="email"
-                      />
-                    </g>
-                  </g>
-                </g>
-              </g>
-            </g>
+            <path
+              d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"
+            />
           </svg>
         </a>
       </div>
       <nav
-        className="c36 c37"
+        className="c42 c43"
       >
         <div
-          className="c38"
+          className="c44"
         >
           <p
-            className="c39"
+            className="c45"
           >
             PLATFORM
           </p>
           <ul
-            className="c40"
+            className="c46"
           >
             <li
-              className="c41"
+              className="c47"
             >
               <a
-                className="c42 "
+                className="c48 "
                 href="/discover"
               >
                 Discover
               </a>
             </li>
             <li
-              className="c41"
+              className="c47"
             >
               <a
-                className="c42 "
+                className="c48 "
                 href="/learn-more"
               >
                 How it Works
               </a>
             </li>
             <li
-              className="c41"
+              className="c47"
             >
               <a
-                className="c42 "
+                className="c48 "
                 href="/opensource"
                 onClick={[Function]}
               >
@@ -3639,10 +3444,10 @@ exports[`Search Page renders error message 1`] = `
               </a>
             </li>
             <li
-              className="c41"
+              className="c47"
             >
               <a
-                className="c42 "
+                className="c48 "
                 href="/signin"
                 onClick={[Function]}
               >
@@ -3650,10 +3455,10 @@ exports[`Search Page renders error message 1`] = `
               </a>
             </li>
             <li
-              className="c41"
+              className="c47"
             >
               <a
-                className="c42 "
+                className="c48 "
                 href="/signin"
                 onClick={[Function]}
               >
@@ -3663,21 +3468,21 @@ exports[`Search Page renders error message 1`] = `
           </ul>
         </div>
         <div
-          className="c38"
+          className="c44"
         >
           <p
-            className="c39"
+            className="c45"
           >
             JOIN THE MOVEMENT
           </p>
           <ul
-            className="c40"
+            className="c46"
           >
             <li
-              className="c41"
+              className="c47"
             >
               <a
-                className="c42 "
+                className="c48 "
                 href="/create"
                 onClick={[Function]}
               >
@@ -3685,10 +3490,10 @@ exports[`Search Page renders error message 1`] = `
               </a>
             </li>
             <li
-              className="c41"
+              className="c47"
             >
               <a
-                className="c42 "
+                className="c48 "
                 href="/become-a-sponsor"
                 onClick={[Function]}
               >
@@ -3696,10 +3501,10 @@ exports[`Search Page renders error message 1`] = `
               </a>
             </li>
             <li
-              className="c41"
+              className="c47"
             >
               <a
-                className="c42 "
+                className="c48 "
                 href="/chapters"
                 onClick={[Function]}
               >
@@ -3709,21 +3514,21 @@ exports[`Search Page renders error message 1`] = `
           </ul>
         </div>
         <div
-          className="c38"
+          className="c44"
         >
           <p
-            className="c39"
+            className="c45"
           >
             COMMUNITY
           </p>
           <ul
-            className="c40"
+            className="c46"
           >
             <li
-              className="c41"
+              className="c47"
             >
               <a
-                className="c42 "
+                className="c48 "
                 href="/opensource"
                 onClick={[Function]}
               >
@@ -3731,10 +3536,10 @@ exports[`Search Page renders error message 1`] = `
               </a>
             </li>
             <li
-              className="c41"
+              className="c47"
             >
               <a
-                className="c42 "
+                className="c48 "
                 href="https://github.com/opencollective/opencollective/issues"
                 onClick={[Function]}
               >
@@ -3742,10 +3547,10 @@ exports[`Search Page renders error message 1`] = `
               </a>
             </li>
             <li
-              className="c41"
+              className="c47"
             >
               <a
-                className="c42 "
+                className="c48 "
                 href="https://slack.opencollective.com"
                 onClick={[Function]}
               >
@@ -3753,10 +3558,10 @@ exports[`Search Page renders error message 1`] = `
               </a>
             </li>
             <li
-              className="c41"
+              className="c47"
             >
               <a
-                className="c42 "
+                className="c48 "
                 href="https://github.com/opencollective/opencollective/wiki"
                 onClick={[Function]}
               >
@@ -3764,10 +3569,10 @@ exports[`Search Page renders error message 1`] = `
               </a>
             </li>
             <li
-              className="c41"
+              className="c47"
             >
               <a
-                className="c42 "
+                className="c48 "
                 href="mailto:support@opencollective.com"
                 onClick={[Function]}
               >
@@ -3777,21 +3582,21 @@ exports[`Search Page renders error message 1`] = `
           </ul>
         </div>
         <div
-          className="c38"
+          className="c44"
         >
           <p
-            className="c39"
+            className="c45"
           >
             COMPANY
           </p>
           <ul
-            className="c40"
+            className="c46"
           >
             <li
-              className="c41"
+              className="c47"
             >
               <a
-                className="c42 "
+                className="c48 "
                 href="/about"
                 onClick={[Function]}
               >
@@ -3799,10 +3604,10 @@ exports[`Search Page renders error message 1`] = `
               </a>
             </li>
             <li
-              className="c41"
+              className="c47"
             >
               <a
-                className="c42 "
+                className="c48 "
                 href="/faq"
                 onClick={[Function]}
               >
@@ -3810,10 +3615,10 @@ exports[`Search Page renders error message 1`] = `
               </a>
             </li>
             <li
-              className="c41"
+              className="c47"
             >
               <a
-                className="c42 "
+                className="c48 "
                 href="https://medium.com/open-collective"
                 onClick={[Function]}
               >
@@ -3821,10 +3626,10 @@ exports[`Search Page renders error message 1`] = `
               </a>
             </li>
             <li
-              className="c41"
+              className="c47"
             >
               <a
-                className="c42 "
+                className="c48 "
                 href="/tos"
                 onClick={[Function]}
               >
@@ -3832,10 +3637,10 @@ exports[`Search Page renders error message 1`] = `
               </a>
             </li>
             <li
-              className="c41"
+              className="c47"
             >
               <a
-                className="c42 "
+                className="c48 "
                 href="/privacypolicy"
                 onClick={[Function]}
               >
@@ -3882,24 +3687,15 @@ exports[`Search Page renders loading grid SVG 1`] = `
   margin-right: 16px;
 }
 
-.c13 {
+.c14 {
   margin: 0;
   box-sizing: border-box;
   margin: 0px;
   padding: 0px;
 }
 
-.c14 {
+.c15 {
   box-sizing: border-box;
-  padding-left: 16px;
-  padding-right: 16px;
-}
-
-.c20 {
-  box-sizing: border-box;
-  width: 100%;
-  margin-left: auto;
-  margin-right: auto;
   padding-left: 16px;
   padding-right: 16px;
 }
@@ -3907,22 +3703,31 @@ exports[`Search Page renders loading grid SVG 1`] = `
 .c21 {
   box-sizing: border-box;
   width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 16px;
+  padding-right: 16px;
 }
 
-.c23 {
+.c22 {
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.c24 {
   box-sizing: border-box;
   margin-top: 16px;
   margin-bottom: 16px;
 }
 
-.c28 {
+.c29 {
   box-sizing: border-box;
   width: 100%;
   padding-top: 16px;
   padding-bottom: 16px;
 }
 
-.c31 {
+.c32 {
   max-width: 1300px;
   box-sizing: border-box;
   margin-left: auto;
@@ -3930,7 +3735,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
   padding: 8px;
 }
 
-.c38 {
+.c44 {
   box-sizing: border-box;
   margin-top: 16px;
   -webkit-flex: 1 1 auto;
@@ -3941,7 +3746,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
   order: 3;
 }
 
-.c39 {
+.c45 {
   box-sizing: border-box;
   width: 50%;
   margin-bottom: 16px;
@@ -3998,7 +3803,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
   display: flex;
 }
 
-.c12 {
+.c13 {
   margin: 0;
   display: -webkit-box;
   display: -webkit-flex;
@@ -4010,7 +3815,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
   justify-content: space-around;
 }
 
-.c22 {
+.c23 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -4021,7 +3826,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
   align-items: flex-end;
 }
 
-.c26 {
+.c27 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -4035,7 +3840,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
   justify-content: center;
 }
 
-.c27 {
+.c28 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -4046,7 +3851,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
   justify-content: center;
 }
 
-.c30 {
+.c31 {
   max-width: 1300px;
   display: -webkit-box;
   display: -webkit-flex;
@@ -4065,7 +3870,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
   justify-content: space-between;
 }
 
-.c33 {
+.c34 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -4076,7 +3881,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
   justify-content: center;
 }
 
-.c37 {
+.c43 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -4090,7 +3895,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
   justify-content: center;
 }
 
-.c17 {
+.c18 {
   color: #46b0ed;
   display: inline-block;
   font-size: 1.2rem;
@@ -4106,7 +3911,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
   cursor: pointer;
 }
 
-.c34 {
+.c35 {
   color: #6E747A;
   font-size: 1.4rem;
   line-height: Paragraph;
@@ -4120,7 +3925,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
   text-align: center;
 }
 
-.c40 {
+.c46 {
   color: #C2C6CC;
   font-size: 1.2rem;
   line-height: Paragraph;
@@ -4133,7 +3938,13 @@ exports[`Search Page renders loading grid SVG 1`] = `
   text-align: center;
 }
 
-.c29 {
+.c11 {
+  display: inline-block;
+  vertical-align: -.125em;
+  overflow: hidden;
+}
+
+.c30 {
   border-top: 1px solid #aaaaaa;
   bottom: 0px;
   background-color: white;
@@ -4142,7 +3953,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
   width: 100%;
 }
 
-.c32 {
+.c33 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -4155,7 +3966,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
   width: 100%;
 }
 
-.c35 {
+.c36 {
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -4177,7 +3988,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
   width: 100%;
 }
 
-.c18 {
+.c19 {
   position: relative;
   display: inline-block;
   height: 0.6rem;
@@ -4185,45 +3996,75 @@ exports[`Search Page renders loading grid SVG 1`] = `
   cursor: pointer;
 }
 
-.c18::before,
-.c18::after {
+.c19::before,
+.c19::after {
   content: '';
   position: absolute;
   top: 0;
 }
 
-.c18::before {
+.c19::before {
   border-left: 0.6rem solid transparent;
   border-right: 0.6rem solid transparent;
   border-top: 0.6rem solid #46b0ed;
   left: 0;
 }
 
-.c18::after {
+.c19::after {
   border-left: calc(0.6rem - 0.2rem) solid transparent;
   border-right: calc(0.6rem - 0.2rem) solid transparent;
   border-top: calc(0.6rem - 0.2rem) solid white;
   left: 0.2rem;
 }
 
-.c42 {
+.c48 {
   list-style: none;
   margin-bottom: 8px;
   text-align: center;
 }
 
-.c11 {
+.c12 {
   list-style: none;
   min-width: 20rem;
   text-align: right;
 }
 
-.c15 {
+.c16 {
   color: #777777;
   font-size: 1.4rem;
 }
 
-.c36 {
+.c40 {
+  display: inline-block;
+  vertical-align: -.125em;
+  overflow: hidden;
+}
+
+.c38 {
+  display: inline-block;
+  vertical-align: -.125em;
+  overflow: hidden;
+}
+
+.c41 {
+  display: inline-block;
+  vertical-align: -.125em;
+  overflow: hidden;
+}
+
+.c39 {
+  display: inline-block;
+  vertical-align: -.125em;
+  overflow: hidden;
+}
+
+.c42 {
+  display: inline-block;
+  vertical-align: middle;
+  overflow: hidden;
+}
+
+.c37 {
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -4243,12 +4084,12 @@ exports[`Search Page renders loading grid SVG 1`] = `
   width: 48px;
 }
 
-.c36:hover,
-.c36:focus {
+.c37:hover,
+.c37:focus {
   opacity: 1;
 }
 
-.c43 {
+.c49 {
   color: #6e747a;
   display: block;
   fontsize: 1.4rem;
@@ -4257,7 +4098,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
   padding: 0;
 }
 
-.c41 {
+.c47 {
   box-sizing: border-box;
   padding-left: 0px;
   padding-right: 8px;
@@ -4274,7 +4115,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
   justify-content: center;
 }
 
-.c24.c24.c24 {
+.c25.c25.c25 {
   border: none;
   border-bottom: 2px solid #3385FF;
   border-radius: 0;
@@ -4284,22 +4125,22 @@ exports[`Search Page renders loading grid SVG 1`] = `
   padding: 0;
 }
 
-.c25.c25 {
+.c26.c26 {
   padding: 0 2rem;
 }
 
-.c19 {
+.c20 {
   max-width: 1200px;
 }
 
 @media screen and (min-width:40em) {
-  .c20 {
+  .c21 {
     width: 85%;
   }
 }
 
 @media screen and (min-width:52em) {
-  .c38 {
+  .c44 {
     -webkit-order: 2;
     -ms-flex-order: 2;
     order: 2;
@@ -4307,13 +4148,13 @@ exports[`Search Page renders loading grid SVG 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c39 {
+  .c45 {
     width: 25%;
   }
 }
 
 @media screen and (min-width:40em) {
-  .c26 {
+  .c27 {
     -webkit-box-pack: center;
     -webkit-justify-content: center;
     -ms-flex-pack: center;
@@ -4322,7 +4163,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c26 {
+  .c27 {
     -webkit-box-pack: start;
     -webkit-justify-content: flex-start;
     -ms-flex-pack: start;
@@ -4331,7 +4172,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c30 {
+  .c31 {
     -webkit-flex-direction: row;
     -ms-flex-direction: row;
     flex-direction: row;
@@ -4339,7 +4180,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c30 {
+  .c31 {
     -webkit-align-items: flex-start;
     -webkit-box-align: flex-start;
     -ms-flex-align: flex-start;
@@ -4348,7 +4189,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c33 {
+  .c34 {
     -webkit-box-pack: start;
     -webkit-justify-content: flex-start;
     -ms-flex-pack: start;
@@ -4357,25 +4198,25 @@ exports[`Search Page renders loading grid SVG 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c34 {
+  .c35 {
     text-align: left;
   }
 }
 
 @media screen and (min-width:52em) {
-  .c40 {
+  .c46 {
     text-align: left;
   }
 }
 
 @media screen and (min-width:52em) {
-  .c32 {
+  .c33 {
     width: 33.33333333333333%;
   }
 }
 
 @media screen and (min-width:52em) {
-  .c35 {
+  .c36 {
     -webkit-order: 3;
     -ms-flex-order: 3;
     order: 3;
@@ -4407,19 +4248,19 @@ exports[`Search Page renders loading grid SVG 1`] = `
 }
 
 @media screen and (max-width:40em) {
-  .c16 {
+  .c17 {
     display: none;
   }
 }
 
 @media screen and (min-width:40em) and (max-width:52em) {
-  .c16 {
+  .c17 {
     display: none;
   }
 }
 
 @media screen and (min-width:52em) {
-  .c42 {
+  .c48 {
     text-align: left;
   }
 }
@@ -4501,29 +4342,19 @@ exports[`Search Page renders loading grid SVG 1`] = `
               onClick={[Function]}
             >
               <svg
-                height={16.799999999999997}
-                version="1.1"
-                viewBox="0 0 20 14"
+                aria-hidden="true"
+                className="c11"
+                color="#aaaaaa"
+                fill="currentColor"
+                focusable="false"
+                height={24}
+                size={24}
+                viewBox="0 0 448 512"
                 width={24}
-                xmlns="http://www.w3.org/2000/svg"
               >
-                <title>
-                  menu icon
-                </title>
                 <path
-                  d="M19,6 L1,6 C0.4,6 0,6.4 0,7 C0,7.6 0.4,8 1,8 L19,8 C19.6,8 20,7.6 20,7 C20,6.4 19.6,6 19,6 Z"
-                  fill="#aaaaaa"
-                  fillRule="nonzero"
-                />
-                <path
-                  d="M0.85,2 L16.15,2 C16.66,2 17,1.6 17,1 C17,0.4 16.66,0 16.15,0 L0.85,0 C0.34,0 0,0.4 0,1 C0,1.6 0.34,2 0.85,2 Z"
-                  fill="#aaaaaa"
-                  fillRule="nonzero"
-                />
-                <path
-                  d="M16.15,12 L0.85,12 C0.34,12 0,12.4 0,13 C0,13.6 0.34,14 0.85,14 L16.15,14 C16.66,14 17,13.6 17,13 C17,12.4 16.66,12 16.15,12 Z"
-                  fill="#aaaaaa"
-                  fillRule="nonzero"
+                  d="M16 132h416c8.837 0 16-7.163 16-16V76c0-8.837-7.163-16-16-16H16C7.163 60 0 67.163 0 76v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16z"
+                  fill="currentColor"
                 />
               </svg>
             </a>
@@ -4533,13 +4364,13 @@ exports[`Search Page renders loading grid SVG 1`] = `
           className="c4 c2"
         >
           <ul
-            className="c11 c12 c13"
+            className="c12 c13 c14"
           >
             <li
-              className="c14"
+              className="c15"
             >
               <a
-                className="c15"
+                className="c16"
                 href="/discover"
               >
                 <span>
@@ -4548,10 +4379,10 @@ exports[`Search Page renders loading grid SVG 1`] = `
               </a>
             </li>
             <li
-              className="c14"
+              className="c15"
             >
               <a
-                className="c15"
+                className="c16"
                 href="/learn-more"
               >
                 <span>
@@ -4560,10 +4391,10 @@ exports[`Search Page renders loading grid SVG 1`] = `
               </a>
             </li>
             <li
-              className="c14"
+              className="c15"
             >
               <a
-                className="c15"
+                className="c16"
                 href="https://medium.com/open-collective"
               >
                 <span>
@@ -4581,15 +4412,15 @@ exports[`Search Page renders loading grid SVG 1`] = `
             onClick={[Function]}
           >
             <div
-              className="c16 c2"
+              className="c17 c2"
             >
               <p
-                className="LoginTopBarProfileButton-name c17"
+                className="LoginTopBarProfileButton-name c18"
                 cursor="pointer"
               />
             </div>
             <div
-              className="c18"
+              className="c19"
               color="#46b0ed"
               cursor="pointer"
               display="inline-block"
@@ -4606,10 +4437,10 @@ exports[`Search Page renders loading grid SVG 1`] = `
     className="jsx-916984404"
   >
     <div
-      className="c19 c20"
+      className="c20 c21"
     >
       <div
-        className="c21"
+        className="c22"
       >
         <form
           method="GET"
@@ -4625,10 +4456,10 @@ exports[`Search Page renders loading grid SVG 1`] = `
               Search Open Collective
             </label>
             <div
-              className="c22 c23 sc-bdVaJa c2"
+              className="c23 c24 sc-bdVaJa c2"
             >
               <input
-                className="c24 form-control"
+                className="c25 form-control"
                 defaultValue=""
                 id="search"
                 name="q"
@@ -4636,7 +4467,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
                 type="search"
               />
               <button
-                className="jsx-1144918383 jsx-3101740563 Button blue c25"
+                className="jsx-1144918383 jsx-3101740563 Button blue c26"
                 onClick={[Function]}
                 type="submit"
               >
@@ -4649,10 +4480,10 @@ exports[`Search Page renders loading grid SVG 1`] = `
         </form>
       </div>
       <div
-        className="c26 c2 sc-bdVaJa c2"
+        className="c27 c2 sc-bdVaJa c2"
       >
         <div
-          className="c27 c28 sc-bdVaJa c2"
+          className="c28 c29 sc-bdVaJa c2"
         >
           <svg
             fill="#3385FF"
@@ -4794,17 +4625,17 @@ exports[`Search Page renders loading grid SVG 1`] = `
     </div>
   </main>
   <div
-    className="c29"
+    className="c30"
     id="footer"
   >
     <div
-      className="c30 c31 sc-bdVaJa c2"
+      className="c31 c32 sc-bdVaJa c2"
     >
       <div
-        className="c32"
+        className="c33"
       >
         <div
-          className="c33 c2 sc-bdVaJa c2"
+          className="c34 c2 sc-bdVaJa c2"
         >
           <object
             data="/static/images/opencollectivelogo-footer.svg"
@@ -4813,249 +4644,158 @@ exports[`Search Page renders loading grid SVG 1`] = `
           />
         </div>
         <p
-          className="c34"
+          className="c35"
         >
           An organization for your community, transparent by design.
         </p>
       </div>
       <div
-        className="c35"
+        className="c36"
       >
         <a
-          className="c36"
+          className="c37"
           href="https://medium.com/open-collective"
         >
           <svg
-            height={15}
-            viewBox="0 0 32 32"
-            width={15}
+            aria-hidden="true"
+            className="c38"
+            color="#9399A3"
+            fill="currentColor"
+            focusable="false"
+            height={17}
+            size={17}
+            viewBox="0 0 512 512"
+            width={17}
           >
-            <title>
-              medium icon
-            </title>
             <path
-              d="M3.795 8.48c0.040-0.393-0.111-0.781-0.404-1.045l-2.987-3.6v-0.537h9.276l7.171 15.727 6.304-15.727h8.845v0.537l-2.556 2.449c-0.22 0.168-0.329 0.444-0.284 0.717v18c-0.045 0.272 0.064 0.547 0.284 0.716l2.493 2.449v0.537h-12.547v-0.537l2.583-2.509c0.253-0.253 0.253-0.328 0.253-0.717v-14.548l-7.187 18.251h-0.969l-8.367-18.251v12.232c-0.069 0.515 0.101 1.032 0.463 1.404l3.36 4.080v0.536h-9.527v-0.537l3.36-4.080c0.36-0.371 0.52-0.893 0.435-1.403v-14.144z"
-              fill="#9399A3"
+              d="M71.5 142.3c.6-5.9-1.7-11.8-6.1-15.8L20.3 72.1V64h140.2l108.4 237.7L364.2 64h133.7v8.1l-38.6 37c-3.3 2.5-5 6.7-4.3 10.8v272c-.7 4.1 1 8.3 4.3 10.8l37.7 37v8.1H307.3v-8.1l39.1-37.9c3.8-3.8 3.8-5 3.8-10.8V171.2L241.5 447.1h-14.7L100.4 171.2v184.9c-1.1 7.8 1.5 15.6 7 21.2l50.8 61.6v8.1h-144v-8L65 377.3c5.4-5.6 7.9-13.5 6.5-21.2V142.3z"
+              fill="currentColor"
             />
           </svg>
         </a>
         <a
-          className="c36"
+          className="c37"
           href="https://twitter.com/opencollect"
         >
           <svg
-            height={12.5}
-            version="1.1"
-            viewBox="0 0 18 15"
-            width={15}
-            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true"
+            className="c39"
+            color="#9399A3"
+            fill="currentColor"
+            focusable="false"
+            height={17}
+            size={17}
+            viewBox="0 0 512 512"
+            width={17}
           >
-            <title>
-              twitter icon
-            </title>
-            <g
-              fill="none"
-              fillRule="evenodd"
-              id="Homepage"
-              stroke="none"
-              strokeWidth="1"
-            >
-              <g
-                id="Homepage---XS-(small-handset)"
-                transform="translate(-97.000000, -9521.000000)"
-              >
-                <g
-                  id="JOIN-MOVEMENT"
-                  transform="translate(-69.000000, 3570.000000)"
-                >
-                  <g
-                    id="::-06---spread-the-word"
-                    transform="translate(85.000000, 5758.000000)"
-                  >
-                    <g
-                      id="::-button-(share-twitter)"
-                      transform="translate(44.000000, 176.000000)"
-                    >
-                      <path
-                        d="M55,18.7756985 C54.33775,19.0771597 53.626,19.2801846 52.879,19.3716996 C53.64175,18.9033581 54.22675,18.1612407 54.50275,17.2768521 C53.7895,17.710587 52.999,18.0258908 52.1575,18.1958472 C51.484,17.4598821 50.524,17 49.462,17 C47.42275,17 45.769,18.695719 45.769,20.7867214 C45.769,21.0835683 45.802,21.3727249 45.86425,21.649577 C42.79525,21.4919251 40.07425,19.9838503 38.2525,17.6928993 C37.93525,18.2519867 37.753,18.9025891 37.753,19.5970264 C37.753,20.9105358 38.40475,22.0694694 39.3955,22.748526 C38.79025,22.7285311 38.221,22.5585747 37.723,22.2748013 C37.723,22.290951 37.723,22.3063317 37.723,22.3224814 C37.723,24.1573955 38.99575,25.6877724 40.6855,26.0353755 C40.37575,26.1222763 40.0495,26.1684184 39.712,26.1684184 C39.47425,26.1684184 39.2425,26.1445783 39.0175,26.1007434 C39.48775,27.6049731 40.85125,28.7000769 42.4675,28.7308382 C41.20375,29.7467316 39.6115,30.351961 37.88125,30.351961 C37.5835,30.351961 37.2895,30.3342733 37,30.2988977 C38.63425,31.3732376 40.57525,32 42.661,32 C49.45375,32 53.16775,26.229941 53.16775,21.2258395 C53.16775,21.0620354 53.164,20.8982312 53.15725,20.7359651 C53.87875,20.2014868 54.505,19.5347347 55,18.7756985 Z"
-                        fill="#9399A3"
-                        fillRule="nonzero"
-                        id="twitter"
-                      />
-                    </g>
-                  </g>
-                </g>
-              </g>
-            </g>
+            <path
+              d="M459.37 151.716c.325 4.548.325 9.097.325 13.645 0 138.72-105.583 298.558-298.558 298.558-59.452 0-114.68-17.219-161.137-47.106 8.447.974 16.568 1.299 25.34 1.299 49.055 0 94.213-16.568 130.274-44.832-46.132-.975-84.792-31.188-98.112-72.772 6.498.974 12.995 1.624 19.818 1.624 9.421 0 18.843-1.3 27.614-3.573-48.081-9.747-84.143-51.98-84.143-102.985v-1.299c13.969 7.797 30.214 12.67 47.431 13.319-28.264-18.843-46.781-51.005-46.781-87.391 0-19.492 5.197-37.36 14.294-52.954 51.655 63.675 129.3 105.258 216.365 109.807-1.624-7.797-2.599-15.918-2.599-24.04 0-57.828 46.782-104.934 104.934-104.934 30.213 0 57.502 12.67 76.67 33.137 23.715-4.548 46.456-13.32 66.599-25.34-7.798 24.366-24.366 44.833-46.132 57.827 21.117-2.273 41.584-8.122 60.426-16.243-14.292 20.791-32.161 39.308-52.628 54.253z"
+              fill="currentColor"
+            />
           </svg>
         </a>
         <a
-          className="c36"
+          className="c37"
           href="https://github.com/opencollective"
         >
           <svg
-            height={15}
-            version="1.1"
-            viewBox="0 0 22 22"
-            width={15}
-            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true"
+            className="c40"
+            color="#9399A3"
+            fill="currentColor"
+            focusable="false"
+            height={17}
+            size={17}
+            viewBox="0 0 496 512"
+            width={17}
           >
-            <title>
-              github icon
-            </title>
-            <g
-              fill="none"
-              fillRule="evenodd"
-              id="Homepage"
-              stroke="none"
-              strokeWidth="1"
-            >
-              <g
-                id="Homepage---XS-(small-handset)"
-                transform="translate(-149.000000, -10919.000000)"
-              >
-                <g
-                  id="FOOTER"
-                  transform="translate(0.000000, 10758.000000)"
-                >
-                  <g
-                    id="::-social-networks"
-                    transform="translate(24.000000, 148.000000)"
-                  >
-                    <g
-                      id="::-icon-(github)"
-                      transform="translate(112.000000, 0.000000)"
-                    >
-                      <path
-                        d="M24,13 C17.9133333,13 13,17.962963 13,24.1111111 C13,29.2222222 16.4466667,33.6666667 21.36,34.9259259 C21.4333333,34.9259259 21.58,34.9259259 21.6533333,34.8518519 C21.7266667,34.7777778 21.8,34.7037037 21.8,34.5555556 L21.8,31.8888889 C21.8,31.8148148 21.7266667,31.6666667 21.7266667,31.5925926 C21.6533333,31.5185185 21.58,31.5185185 21.4333333,31.5185185 L20.7,31.5185185 C19.5266667,31.5185185 18.7933333,30.4074074 18.1333333,29.4444444 C17.9866667,29.2962963 17.9133333,29.0740741 17.7666667,28.9259259 C18.2066667,29.1481481 18.5,29.4444444 18.8666667,29.8148148 C19.38,30.3333333 19.8933333,30.8518519 20.7733333,30.8518519 C20.7733333,30.8518519 20.7733333,30.8518519 20.7733333,30.8518519 C21.14,30.8518519 21.8733333,30.4814815 21.8733333,29.3703704 L21.8733333,29 C21.8733333,28.8518519 21.8,28.7037037 21.58,28.6296296 C19.0866667,27.8888889 17.4733333,25.8888889 17.4733333,23.5925926 C17.4733333,22.4074074 17.9866667,21.2222222 18.8666667,20.3333333 C18.8666667,20.1851852 18.8666667,20.037037 18.8666667,19.8888889 C18.5,19.1481481 18.8666667,18.1111111 19.38,17.5185185 C19.8933333,17.7407407 20.4066667,18.3333333 20.8466667,18.7777778 C20.92,18.9259259 21.14,18.9259259 21.2866667,18.8518519 L21.5066667,18.7777778 C22.3133333,18.4814815 23.2666667,18.1111111 24.1466667,18.1111111 C25.0266667,18.1111111 25.98,18.4814815 26.7866667,18.7777778 L27.0066667,18.8518519 C27.1533333,18.9259259 27.3,18.8518519 27.4466667,18.7777778 C27.8866667,18.2592593 28.4,17.7407407 28.9133333,17.5185185 C29.4266667,18.1851852 29.7933333,19.1481481 29.4266667,19.8888889 C29.1333333,20.037037 29.1333333,20.1851852 29.2066667,20.3333333 C30.0866667,21.2962963 30.6,22.3333333 30.6,23.4444444 C30.6,25.8888889 28.7666667,28.037037 26.1266667,28.6296296 C25.98,28.6296296 25.9066667,28.7037037 25.9066667,28.8518519 C25.9066667,29 25.8333333,29.0740741 25.9066667,29.1481481 C26.1266667,29.5185185 26.2,30.2592593 26.2,31.2222222 C26.2,32.4814815 26.2,34.6296296 26.2,34.6296296 C26.2,34.7777778 26.2733333,34.8518519 26.3466667,34.9259259 C26.42,35 26.4933333,35 26.5666667,35 C26.5666667,35 26.64,35 26.64,35 C31.5533333,33.6666667 35,29.2222222 35,24.1111111 C35,17.962963 30.0866667,13 24,13 Z"
-                        fill="#9399A3"
-                        fillRule="nonzero"
-                        id="github"
-                      />
-                    </g>
-                  </g>
-                </g>
-              </g>
-            </g>
+            <path
+              d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"
+              fill="currentColor"
+            />
           </svg>
         </a>
         <a
-          className="c36"
+          className="c37"
           href="https://slack.opencollective.com"
         >
           <svg
-            height={15}
-            version="1.1"
-            viewBox="0 0 20 20"
-            width={15}
-            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true"
+            className="c41"
+            color="#9399A3"
+            fill="currentColor"
+            focusable="false"
+            height={17}
+            size={17}
+            viewBox="0 0 448 512"
+            width={17}
           >
-            <title>
-              slack icon
-            </title>
-            <g
-              fill="#9399A3"
-              id="slack"
-            >
-              <path
-                d="M19.1625,7.25 C21.225,14.125 19.62125,17.1 12.75,19.1625 C5.875,21.225 2.9,19.62125 0.8375,12.75 C-1.225,5.875 0.38,2.9 7.25,0.8375 C14.1225,-1.225 17.1,0.38 19.1625,7.25 Z M15.6875,11.7125 L15.695,11.73875 C16.2325,11.56375 16.5275,10.97625 16.345,10.42625 C16.16375,9.87625 15.57625,9.58875 15.0325,9.76375 L13.74,10.19375 L12.8775,7.6225 L14.175,7.185 C14.71625,7.005 15.01,6.4175 14.82875,5.8725 C14.64625,5.335 14.05875,5.04 13.51625,5.2225 L12.22,5.6475 L11.77,4.2975 C11.59,3.75 11.00125,3.4625 10.4575,3.6375 C9.9125,3.825 9.625,4.4125 9.8,4.95 L10.25,6.2875 L7.58875,7.1825 L7.13875,5.8425 C6.96375,5.3025 6.37625,5.00625 5.82625,5.19 C5.27625,5.37 4.98875,5.9575 5.16375,6.5025 L5.61375,7.84 L4.31375,8.2725 C3.76375,8.45625 3.47625,9.04375 3.65125,9.585 C3.78875,10.01 4.18875,10.27875 4.60125,10.29125 C4.72,10.29375 4.84,10.2775 4.9575,10.2375 L6.25,9.8 L7.07375,12.37375 L5.77375,12.81125 C5.23625,12.98625 4.93625,13.57375 5.12375,14.12375 C5.27375,14.54875 5.66125,14.82375 6.08625,14.83625 C6.21125,14.83625 6.32375,14.82375 6.44875,14.78625 L7.74875,14.34875 L8.19875,15.69875 C8.34875,16.12375 8.73625,16.39375 9.16125,16.40625 C9.28625,16.40875 9.39875,16.3925 9.52375,16.3525 C10.07375,16.17125 10.36125,15.58375 10.18625,15.04 L9.73625,13.7 L12.41125,12.805 L12.86125,14.145 C13.01125,14.57 13.39875,14.84 13.82375,14.8525 C13.94875,14.85625 14.06125,14.8375 14.18625,14.8 C14.72875,14.6175 15.0225,14.03 14.84125,13.4875 L14.39125,12.14625 L15.6875,11.7125 Z"
-              />
-              <polygon
-                points="8.2325 9.1625 9.095 11.73375 11.76625 10.83875 10.90375 8.27625 8.2325 9.17625"
-              />
-            </g>
+            <path
+              d="M244.2 217.5l19.3 57.7-59.8 20-19.3-57.7 59.8-20zm41.4 243.7C131.6 507.4 65 471.6 18.8 317.6S8.4 97 162.4 50.8C316.4 4.6 383 40.4 429.2 194.4c46.2 154 10.4 220.6-143.6 266.8zM366.2 265c-3.9-12.2-17.2-18.6-29.4-14.7l-29 9.7-19.3-57.7 29-9.7c12.2-3.9 18.6-17.2 14.7-29.4-3.9-12.2-17.2-18.6-29.4-14.7l-29 9.7-10-30.1c-3.9-12.2-17.2-18.6-29.4-14.7-12.2 3.9-18.6 17.2-14.7 29.4l10 30.1-59.8 20.1-10-30.1c-3.9-12.2-17.2-18.6-29.4-14.7-12.2 3.9-18.6 17.2-14.7 29.4l10 30.1-29 9.7c-12.2 3.9-18.6 17.2-14.7 29.4 3.2 9.3 12.2 15.4 21.5 15.8 4.3.6 7.7-1 36.9-10.7l19.3 57.7-29 9.7c-12.2 3.9-18.6 17.2-14.7 29.4 3.2 9.3 12.2 15.4 21.5 15.8 4.3.6 7.7-1 36.9-10.7l10 30.1c3.7 10.8 15.8 18.6 29.4 14.7 12.2-3.9 18.6-17.2 14.7-29.4l-10-30.1 59.8-20.1 10 30.1c3.7 10.8 15.8 18.6 29.4 14.7 12.2-3.9 18.6-17.2 14.7-29.4l-10-30.1 29-9.7c12.2-4.2 18.6-17.5 14.7-29.6z"
+              fill="currentColor"
+            />
           </svg>
         </a>
         <a
-          className="c36"
+          className="c37"
           href="mailto:info@opencollective.com"
         >
           <svg
-            height={13.125}
-            version="1.1"
-            viewBox="0 0 16 14"
-            width={15}
-            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true"
+            className="c42"
+            color="#9399A3"
+            fill="currentColor"
+            focusable="false"
+            height={19}
+            size={19}
+            viewBox="0 0 24 24"
+            width={19}
           >
-            <title>
-              email icon
-            </title>
-            <g
-              fill="none"
-              fillRule="evenodd"
-              id="Homepage"
-              stroke="none"
-              strokeWidth="1"
-            >
-              <g
-                id="Homepage---XS-(small-handset)"
-                transform="translate(-264.000000, -10923.000000)"
-              >
-                <g
-                  id="FOOTER"
-                  transform="translate(0.000000, 10758.000000)"
-                >
-                  <g
-                    id="::-social-networks"
-                    transform="translate(24.000000, 148.000000)"
-                  >
-                    <g
-                      id="::-icon-(email)"
-                      transform="translate(224.000000, 0.000000)"
-                    >
-                      <path
-                        d="M30.4,17 L17.6,17 C16.72,17 16.008,17.9 16.008,19 L16,29 C16,30.1 16.72,31 17.6,31 L30.4,31 C31.28,31 32,30.1 32,29 L32,19 C32,17.9 31.28,17 30.4,17 Z M30,21 L24,25 L18,21 L18,19 L24,23 L30,19 L30,21 Z"
-                        fill="#9399A3"
-                        fillRule="nonzero"
-                        id="email"
-                      />
-                    </g>
-                  </g>
-                </g>
-              </g>
-            </g>
+            <path
+              d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"
+            />
           </svg>
         </a>
       </div>
       <nav
-        className="c37 c38"
+        className="c43 c44"
       >
         <div
-          className="c39"
+          className="c45"
         >
           <p
-            className="c40"
+            className="c46"
           >
             PLATFORM
           </p>
           <ul
-            className="c41"
+            className="c47"
           >
             <li
-              className="c42"
+              className="c48"
             >
               <a
-                className="c43 "
+                className="c49 "
                 href="/discover"
               >
                 Discover
               </a>
             </li>
             <li
-              className="c42"
+              className="c48"
             >
               <a
-                className="c43 "
+                className="c49 "
                 href="/learn-more"
               >
                 How it Works
               </a>
             </li>
             <li
-              className="c42"
+              className="c48"
             >
               <a
-                className="c43 "
+                className="c49 "
                 href="/opensource"
                 onClick={[Function]}
               >
@@ -5063,10 +4803,10 @@ exports[`Search Page renders loading grid SVG 1`] = `
               </a>
             </li>
             <li
-              className="c42"
+              className="c48"
             >
               <a
-                className="c43 "
+                className="c49 "
                 href="/signin"
                 onClick={[Function]}
               >
@@ -5074,10 +4814,10 @@ exports[`Search Page renders loading grid SVG 1`] = `
               </a>
             </li>
             <li
-              className="c42"
+              className="c48"
             >
               <a
-                className="c43 "
+                className="c49 "
                 href="/signin"
                 onClick={[Function]}
               >
@@ -5087,21 +4827,21 @@ exports[`Search Page renders loading grid SVG 1`] = `
           </ul>
         </div>
         <div
-          className="c39"
+          className="c45"
         >
           <p
-            className="c40"
+            className="c46"
           >
             JOIN THE MOVEMENT
           </p>
           <ul
-            className="c41"
+            className="c47"
           >
             <li
-              className="c42"
+              className="c48"
             >
               <a
-                className="c43 "
+                className="c49 "
                 href="/create"
                 onClick={[Function]}
               >
@@ -5109,10 +4849,10 @@ exports[`Search Page renders loading grid SVG 1`] = `
               </a>
             </li>
             <li
-              className="c42"
+              className="c48"
             >
               <a
-                className="c43 "
+                className="c49 "
                 href="/become-a-sponsor"
                 onClick={[Function]}
               >
@@ -5120,10 +4860,10 @@ exports[`Search Page renders loading grid SVG 1`] = `
               </a>
             </li>
             <li
-              className="c42"
+              className="c48"
             >
               <a
-                className="c43 "
+                className="c49 "
                 href="/chapters"
                 onClick={[Function]}
               >
@@ -5133,21 +4873,21 @@ exports[`Search Page renders loading grid SVG 1`] = `
           </ul>
         </div>
         <div
-          className="c39"
+          className="c45"
         >
           <p
-            className="c40"
+            className="c46"
           >
             COMMUNITY
           </p>
           <ul
-            className="c41"
+            className="c47"
           >
             <li
-              className="c42"
+              className="c48"
             >
               <a
-                className="c43 "
+                className="c49 "
                 href="/opensource"
                 onClick={[Function]}
               >
@@ -5155,10 +4895,10 @@ exports[`Search Page renders loading grid SVG 1`] = `
               </a>
             </li>
             <li
-              className="c42"
+              className="c48"
             >
               <a
-                className="c43 "
+                className="c49 "
                 href="https://github.com/opencollective/opencollective/issues"
                 onClick={[Function]}
               >
@@ -5166,10 +4906,10 @@ exports[`Search Page renders loading grid SVG 1`] = `
               </a>
             </li>
             <li
-              className="c42"
+              className="c48"
             >
               <a
-                className="c43 "
+                className="c49 "
                 href="https://slack.opencollective.com"
                 onClick={[Function]}
               >
@@ -5177,10 +4917,10 @@ exports[`Search Page renders loading grid SVG 1`] = `
               </a>
             </li>
             <li
-              className="c42"
+              className="c48"
             >
               <a
-                className="c43 "
+                className="c49 "
                 href="https://github.com/opencollective/opencollective/wiki"
                 onClick={[Function]}
               >
@@ -5188,10 +4928,10 @@ exports[`Search Page renders loading grid SVG 1`] = `
               </a>
             </li>
             <li
-              className="c42"
+              className="c48"
             >
               <a
-                className="c43 "
+                className="c49 "
                 href="mailto:support@opencollective.com"
                 onClick={[Function]}
               >
@@ -5201,21 +4941,21 @@ exports[`Search Page renders loading grid SVG 1`] = `
           </ul>
         </div>
         <div
-          className="c39"
+          className="c45"
         >
           <p
-            className="c40"
+            className="c46"
           >
             COMPANY
           </p>
           <ul
-            className="c41"
+            className="c47"
           >
             <li
-              className="c42"
+              className="c48"
             >
               <a
-                className="c43 "
+                className="c49 "
                 href="/about"
                 onClick={[Function]}
               >
@@ -5223,10 +4963,10 @@ exports[`Search Page renders loading grid SVG 1`] = `
               </a>
             </li>
             <li
-              className="c42"
+              className="c48"
             >
               <a
-                className="c43 "
+                className="c49 "
                 href="/faq"
                 onClick={[Function]}
               >
@@ -5234,10 +4974,10 @@ exports[`Search Page renders loading grid SVG 1`] = `
               </a>
             </li>
             <li
-              className="c42"
+              className="c48"
             >
               <a
-                className="c43 "
+                className="c49 "
                 href="https://medium.com/open-collective"
                 onClick={[Function]}
               >
@@ -5245,10 +4985,10 @@ exports[`Search Page renders loading grid SVG 1`] = `
               </a>
             </li>
             <li
-              className="c42"
+              className="c48"
             >
               <a
-                className="c43 "
+                className="c49 "
                 href="/tos"
                 onClick={[Function]}
               >
@@ -5256,10 +4996,10 @@ exports[`Search Page renders loading grid SVG 1`] = `
               </a>
             </li>
             <li
-              className="c42"
+              className="c48"
             >
               <a
-                className="c43 "
+                className="c49 "
                 href="/privacypolicy"
                 onClick={[Function]}
               >
@@ -5306,24 +5046,15 @@ exports[`Search Page renders search results with pagination 1`] = `
   margin-right: 16px;
 }
 
-.c13 {
+.c14 {
   margin: 0;
   box-sizing: border-box;
   margin: 0px;
   padding: 0px;
 }
 
-.c14 {
+.c15 {
   box-sizing: border-box;
-  padding-left: 16px;
-  padding-right: 16px;
-}
-
-.c20 {
-  box-sizing: border-box;
-  width: 100%;
-  margin-left: auto;
-  margin-right: auto;
   padding-left: 16px;
   padding-right: 16px;
 }
@@ -5331,22 +5062,31 @@ exports[`Search Page renders search results with pagination 1`] = `
 .c21 {
   box-sizing: border-box;
   width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 16px;
+  padding-right: 16px;
 }
 
-.c23 {
+.c22 {
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.c24 {
   box-sizing: border-box;
   margin-top: 16px;
   margin-bottom: 16px;
 }
 
-.c30 {
+.c31 {
   box-sizing: border-box;
   width: 100%;
   padding-top: 16px;
   padding-bottom: 16px;
 }
 
-.c33 {
+.c34 {
   max-width: 1300px;
   box-sizing: border-box;
   margin-left: auto;
@@ -5354,7 +5094,7 @@ exports[`Search Page renders search results with pagination 1`] = `
   padding: 8px;
 }
 
-.c40 {
+.c46 {
   box-sizing: border-box;
   margin-top: 16px;
   -webkit-flex: 1 1 auto;
@@ -5365,13 +5105,13 @@ exports[`Search Page renders search results with pagination 1`] = `
   order: 3;
 }
 
-.c41 {
+.c47 {
   box-sizing: border-box;
   width: 50%;
   margin-bottom: 16px;
 }
 
-.c27 {
+.c28 {
   box-sizing: border-box;
   margin-left: 8px;
   margin-right: 8px;
@@ -5430,7 +5170,7 @@ exports[`Search Page renders search results with pagination 1`] = `
   display: flex;
 }
 
-.c12 {
+.c13 {
   margin: 0;
   display: -webkit-box;
   display: -webkit-flex;
@@ -5442,7 +5182,7 @@ exports[`Search Page renders search results with pagination 1`] = `
   justify-content: space-around;
 }
 
-.c22 {
+.c23 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -5453,62 +5193,7 @@ exports[`Search Page renders search results with pagination 1`] = `
   align-items: flex-end;
 }
 
-.c26 {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-flex-wrap: wrap;
-  -ms-flex-wrap: wrap;
-  flex-wrap: wrap;
-  -webkit-box-pack: center;
-  -webkit-justify-content: center;
-  -ms-flex-pack: center;
-  justify-content: center;
-}
-
-.c28 {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-pack: center;
-  -webkit-justify-content: center;
-  -ms-flex-pack: center;
-  justify-content: center;
-}
-
-.c32 {
-  max-width: 1300px;
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-flex-direction: column;
-  -ms-flex-direction: column;
-  flex-direction: column;
-  -webkit-align-items: center;
-  -webkit-box-align: center;
-  -ms-flex-align: center;
-  align-items: center;
-  -webkit-box-pack: justify;
-  -webkit-justify-content: space-between;
-  -ms-flex-pack: justify;
-  justify-content: space-between;
-}
-
-.c35 {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-pack: center;
-  -webkit-justify-content: center;
-  -ms-flex-pack: center;
-  justify-content: center;
-}
-
-.c39 {
+.c27 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -5527,6 +5212,61 @@ exports[`Search Page renders search results with pagination 1`] = `
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+}
+
+.c33 {
+  max-width: 1300px;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: justify;
+  -webkit-justify-content: space-between;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
+}
+
+.c36 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+}
+
+.c45 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-wrap: wrap;
+  -ms-flex-wrap: wrap;
+  flex-wrap: wrap;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+}
+
+.c30 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
   -webkit-flex-direction: column;
   -ms-flex-direction: column;
   flex-direction: column;
@@ -5540,7 +5280,7 @@ exports[`Search Page renders search results with pagination 1`] = `
   justify-content: center;
 }
 
-.c17 {
+.c18 {
   color: #46b0ed;
   display: inline-block;
   font-size: 1.2rem;
@@ -5556,7 +5296,7 @@ exports[`Search Page renders search results with pagination 1`] = `
   cursor: pointer;
 }
 
-.c36 {
+.c37 {
   color: #6E747A;
   font-size: 1.4rem;
   line-height: Paragraph;
@@ -5570,7 +5310,7 @@ exports[`Search Page renders search results with pagination 1`] = `
   text-align: center;
 }
 
-.c42 {
+.c48 {
   color: #C2C6CC;
   font-size: 1.2rem;
   line-height: Paragraph;
@@ -5583,7 +5323,13 @@ exports[`Search Page renders search results with pagination 1`] = `
   text-align: center;
 }
 
-.c31 {
+.c11 {
+  display: inline-block;
+  vertical-align: -.125em;
+  overflow: hidden;
+}
+
+.c32 {
   border-top: 1px solid #aaaaaa;
   bottom: 0px;
   background-color: white;
@@ -5592,7 +5338,7 @@ exports[`Search Page renders search results with pagination 1`] = `
   width: 100%;
 }
 
-.c34 {
+.c35 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -5605,7 +5351,7 @@ exports[`Search Page renders search results with pagination 1`] = `
   width: 100%;
 }
 
-.c37 {
+.c38 {
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -5627,7 +5373,7 @@ exports[`Search Page renders search results with pagination 1`] = `
   width: 100%;
 }
 
-.c18 {
+.c19 {
   position: relative;
   display: inline-block;
   height: 0.6rem;
@@ -5635,45 +5381,75 @@ exports[`Search Page renders search results with pagination 1`] = `
   cursor: pointer;
 }
 
-.c18::before,
-.c18::after {
+.c19::before,
+.c19::after {
   content: '';
   position: absolute;
   top: 0;
 }
 
-.c18::before {
+.c19::before {
   border-left: 0.6rem solid transparent;
   border-right: 0.6rem solid transparent;
   border-top: 0.6rem solid #46b0ed;
   left: 0;
 }
 
-.c18::after {
+.c19::after {
   border-left: calc(0.6rem - 0.2rem) solid transparent;
   border-right: calc(0.6rem - 0.2rem) solid transparent;
   border-top: calc(0.6rem - 0.2rem) solid white;
   left: 0.2rem;
 }
 
-.c44 {
+.c50 {
   list-style: none;
   margin-bottom: 8px;
   text-align: center;
 }
 
-.c11 {
+.c12 {
   list-style: none;
   min-width: 20rem;
   text-align: right;
 }
 
-.c15 {
+.c16 {
   color: #777777;
   font-size: 1.4rem;
 }
 
-.c38 {
+.c42 {
+  display: inline-block;
+  vertical-align: -.125em;
+  overflow: hidden;
+}
+
+.c40 {
+  display: inline-block;
+  vertical-align: -.125em;
+  overflow: hidden;
+}
+
+.c43 {
+  display: inline-block;
+  vertical-align: -.125em;
+  overflow: hidden;
+}
+
+.c41 {
+  display: inline-block;
+  vertical-align: -.125em;
+  overflow: hidden;
+}
+
+.c44 {
+  display: inline-block;
+  vertical-align: middle;
+  overflow: hidden;
+}
+
+.c39 {
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -5693,12 +5469,12 @@ exports[`Search Page renders search results with pagination 1`] = `
   width: 48px;
 }
 
-.c38:hover,
-.c38:focus {
+.c39:hover,
+.c39:focus {
   opacity: 1;
 }
 
-.c45 {
+.c51 {
   color: #6e747a;
   display: block;
   fontsize: 1.4rem;
@@ -5707,7 +5483,7 @@ exports[`Search Page renders search results with pagination 1`] = `
   padding: 0;
 }
 
-.c43 {
+.c49 {
   box-sizing: border-box;
   padding-left: 0px;
   padding-right: 8px;
@@ -5724,7 +5500,7 @@ exports[`Search Page renders search results with pagination 1`] = `
   justify-content: center;
 }
 
-.c24.c24.c24 {
+.c25.c25.c25 {
   border: none;
   border-bottom: 2px solid #3385FF;
   border-radius: 0;
@@ -5734,22 +5510,22 @@ exports[`Search Page renders search results with pagination 1`] = `
   padding: 0;
 }
 
-.c25.c25 {
+.c26.c26 {
   padding: 0 2rem;
 }
 
-.c19 {
+.c20 {
   max-width: 1200px;
 }
 
 @media screen and (min-width:40em) {
-  .c20 {
+  .c21 {
     width: 85%;
   }
 }
 
 @media screen and (min-width:52em) {
-  .c40 {
+  .c46 {
     -webkit-order: 2;
     -ms-flex-order: 2;
     order: 2;
@@ -5757,13 +5533,13 @@ exports[`Search Page renders search results with pagination 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c41 {
+  .c47 {
     width: 25%;
   }
 }
 
 @media screen and (min-width:40em) {
-  .c26 {
+  .c27 {
     -webkit-box-pack: center;
     -webkit-justify-content: center;
     -ms-flex-pack: center;
@@ -5772,7 +5548,7 @@ exports[`Search Page renders search results with pagination 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c26 {
+  .c27 {
     -webkit-box-pack: start;
     -webkit-justify-content: flex-start;
     -ms-flex-pack: start;
@@ -5781,7 +5557,7 @@ exports[`Search Page renders search results with pagination 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c32 {
+  .c33 {
     -webkit-flex-direction: row;
     -ms-flex-direction: row;
     flex-direction: row;
@@ -5789,7 +5565,7 @@ exports[`Search Page renders search results with pagination 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c32 {
+  .c33 {
     -webkit-align-items: flex-start;
     -webkit-box-align: flex-start;
     -ms-flex-align: flex-start;
@@ -5798,7 +5574,7 @@ exports[`Search Page renders search results with pagination 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c35 {
+  .c36 {
     -webkit-box-pack: start;
     -webkit-justify-content: flex-start;
     -ms-flex-pack: start;
@@ -5807,25 +5583,25 @@ exports[`Search Page renders search results with pagination 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c36 {
+  .c37 {
     text-align: left;
   }
 }
 
 @media screen and (min-width:52em) {
-  .c42 {
+  .c48 {
     text-align: left;
   }
 }
 
 @media screen and (min-width:52em) {
-  .c34 {
+  .c35 {
     width: 33.33333333333333%;
   }
 }
 
 @media screen and (min-width:52em) {
-  .c37 {
+  .c38 {
     -webkit-order: 3;
     -ms-flex-order: 3;
     order: 3;
@@ -5857,19 +5633,19 @@ exports[`Search Page renders search results with pagination 1`] = `
 }
 
 @media screen and (max-width:40em) {
-  .c16 {
+  .c17 {
     display: none;
   }
 }
 
 @media screen and (min-width:40em) and (max-width:52em) {
-  .c16 {
+  .c17 {
     display: none;
   }
 }
 
 @media screen and (min-width:52em) {
-  .c44 {
+  .c50 {
     text-align: left;
   }
 }
@@ -5951,29 +5727,19 @@ exports[`Search Page renders search results with pagination 1`] = `
               onClick={[Function]}
             >
               <svg
-                height={16.799999999999997}
-                version="1.1"
-                viewBox="0 0 20 14"
+                aria-hidden="true"
+                className="c11"
+                color="#aaaaaa"
+                fill="currentColor"
+                focusable="false"
+                height={24}
+                size={24}
+                viewBox="0 0 448 512"
                 width={24}
-                xmlns="http://www.w3.org/2000/svg"
               >
-                <title>
-                  menu icon
-                </title>
                 <path
-                  d="M19,6 L1,6 C0.4,6 0,6.4 0,7 C0,7.6 0.4,8 1,8 L19,8 C19.6,8 20,7.6 20,7 C20,6.4 19.6,6 19,6 Z"
-                  fill="#aaaaaa"
-                  fillRule="nonzero"
-                />
-                <path
-                  d="M0.85,2 L16.15,2 C16.66,2 17,1.6 17,1 C17,0.4 16.66,0 16.15,0 L0.85,0 C0.34,0 0,0.4 0,1 C0,1.6 0.34,2 0.85,2 Z"
-                  fill="#aaaaaa"
-                  fillRule="nonzero"
-                />
-                <path
-                  d="M16.15,12 L0.85,12 C0.34,12 0,12.4 0,13 C0,13.6 0.34,14 0.85,14 L16.15,14 C16.66,14 17,13.6 17,13 C17,12.4 16.66,12 16.15,12 Z"
-                  fill="#aaaaaa"
-                  fillRule="nonzero"
+                  d="M16 132h416c8.837 0 16-7.163 16-16V76c0-8.837-7.163-16-16-16H16C7.163 60 0 67.163 0 76v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16z"
+                  fill="currentColor"
                 />
               </svg>
             </a>
@@ -5983,13 +5749,13 @@ exports[`Search Page renders search results with pagination 1`] = `
           className="c4 c2"
         >
           <ul
-            className="c11 c12 c13"
+            className="c12 c13 c14"
           >
             <li
-              className="c14"
+              className="c15"
             >
               <a
-                className="c15"
+                className="c16"
                 href="/discover"
               >
                 <span>
@@ -5998,10 +5764,10 @@ exports[`Search Page renders search results with pagination 1`] = `
               </a>
             </li>
             <li
-              className="c14"
+              className="c15"
             >
               <a
-                className="c15"
+                className="c16"
                 href="/learn-more"
               >
                 <span>
@@ -6010,10 +5776,10 @@ exports[`Search Page renders search results with pagination 1`] = `
               </a>
             </li>
             <li
-              className="c14"
+              className="c15"
             >
               <a
-                className="c15"
+                className="c16"
                 href="https://medium.com/open-collective"
               >
                 <span>
@@ -6031,15 +5797,15 @@ exports[`Search Page renders search results with pagination 1`] = `
             onClick={[Function]}
           >
             <div
-              className="c16 c2"
+              className="c17 c2"
             >
               <p
-                className="LoginTopBarProfileButton-name c17"
+                className="LoginTopBarProfileButton-name c18"
                 cursor="pointer"
               />
             </div>
             <div
-              className="c18"
+              className="c19"
               color="#46b0ed"
               cursor="pointer"
               display="inline-block"
@@ -6056,10 +5822,10 @@ exports[`Search Page renders search results with pagination 1`] = `
     className="jsx-916984404"
   >
     <div
-      className="c19 c20"
+      className="c20 c21"
     >
       <div
-        className="c21"
+        className="c22"
       >
         <form
           method="GET"
@@ -6075,10 +5841,10 @@ exports[`Search Page renders search results with pagination 1`] = `
               Search Open Collective
             </label>
             <div
-              className="c22 c23 sc-bdVaJa c2"
+              className="c23 c24 sc-bdVaJa c2"
             >
               <input
-                className="c24 form-control"
+                className="c25 form-control"
                 defaultValue="Test"
                 id="search"
                 name="q"
@@ -6086,7 +5852,7 @@ exports[`Search Page renders search results with pagination 1`] = `
                 type="search"
               />
               <button
-                className="jsx-1144918383 jsx-3101740563 Button blue c25"
+                className="jsx-1144918383 jsx-3101740563 Button blue c26"
                 onClick={[Function]}
                 type="submit"
               >
@@ -6099,10 +5865,10 @@ exports[`Search Page renders search results with pagination 1`] = `
         </form>
       </div>
       <div
-        className="c26 c2 sc-bdVaJa c2"
+        className="c27 c2 sc-bdVaJa c2"
       >
         <div
-          className="c10 c27 sc-bdVaJa c2"
+          className="c10 c28 sc-bdVaJa c2"
         >
           <a
             href="/test-collective"
@@ -6161,7 +5927,7 @@ exports[`Search Page renders search results with pagination 1`] = `
         </div>
       </div>
       <div
-        className="c28 c2 sc-bdVaJa c2"
+        className="c29 c2 sc-bdVaJa c2"
       >
         <ul
           className="pagination"
@@ -6219,7 +5985,7 @@ exports[`Search Page renders search results with pagination 1`] = `
         </ul>
       </div>
       <div
-        className="c29 c30 sc-bdVaJa c2"
+        className="c30 c31 sc-bdVaJa c2"
       >
         <p>
           <em>
@@ -6230,17 +5996,17 @@ exports[`Search Page renders search results with pagination 1`] = `
     </div>
   </main>
   <div
-    className="c31"
+    className="c32"
     id="footer"
   >
     <div
-      className="c32 c33 sc-bdVaJa c2"
+      className="c33 c34 sc-bdVaJa c2"
     >
       <div
-        className="c34"
+        className="c35"
       >
         <div
-          className="c35 c2 sc-bdVaJa c2"
+          className="c36 c2 sc-bdVaJa c2"
         >
           <object
             data="/static/images/opencollectivelogo-footer.svg"
@@ -6249,249 +6015,158 @@ exports[`Search Page renders search results with pagination 1`] = `
           />
         </div>
         <p
-          className="c36"
+          className="c37"
         >
           An organization for your community, transparent by design.
         </p>
       </div>
       <div
-        className="c37"
+        className="c38"
       >
         <a
-          className="c38"
+          className="c39"
           href="https://medium.com/open-collective"
         >
           <svg
-            height={15}
-            viewBox="0 0 32 32"
-            width={15}
+            aria-hidden="true"
+            className="c40"
+            color="#9399A3"
+            fill="currentColor"
+            focusable="false"
+            height={17}
+            size={17}
+            viewBox="0 0 512 512"
+            width={17}
           >
-            <title>
-              medium icon
-            </title>
             <path
-              d="M3.795 8.48c0.040-0.393-0.111-0.781-0.404-1.045l-2.987-3.6v-0.537h9.276l7.171 15.727 6.304-15.727h8.845v0.537l-2.556 2.449c-0.22 0.168-0.329 0.444-0.284 0.717v18c-0.045 0.272 0.064 0.547 0.284 0.716l2.493 2.449v0.537h-12.547v-0.537l2.583-2.509c0.253-0.253 0.253-0.328 0.253-0.717v-14.548l-7.187 18.251h-0.969l-8.367-18.251v12.232c-0.069 0.515 0.101 1.032 0.463 1.404l3.36 4.080v0.536h-9.527v-0.537l3.36-4.080c0.36-0.371 0.52-0.893 0.435-1.403v-14.144z"
-              fill="#9399A3"
+              d="M71.5 142.3c.6-5.9-1.7-11.8-6.1-15.8L20.3 72.1V64h140.2l108.4 237.7L364.2 64h133.7v8.1l-38.6 37c-3.3 2.5-5 6.7-4.3 10.8v272c-.7 4.1 1 8.3 4.3 10.8l37.7 37v8.1H307.3v-8.1l39.1-37.9c3.8-3.8 3.8-5 3.8-10.8V171.2L241.5 447.1h-14.7L100.4 171.2v184.9c-1.1 7.8 1.5 15.6 7 21.2l50.8 61.6v8.1h-144v-8L65 377.3c5.4-5.6 7.9-13.5 6.5-21.2V142.3z"
+              fill="currentColor"
             />
           </svg>
         </a>
         <a
-          className="c38"
+          className="c39"
           href="https://twitter.com/opencollect"
         >
           <svg
-            height={12.5}
-            version="1.1"
-            viewBox="0 0 18 15"
-            width={15}
-            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true"
+            className="c41"
+            color="#9399A3"
+            fill="currentColor"
+            focusable="false"
+            height={17}
+            size={17}
+            viewBox="0 0 512 512"
+            width={17}
           >
-            <title>
-              twitter icon
-            </title>
-            <g
-              fill="none"
-              fillRule="evenodd"
-              id="Homepage"
-              stroke="none"
-              strokeWidth="1"
-            >
-              <g
-                id="Homepage---XS-(small-handset)"
-                transform="translate(-97.000000, -9521.000000)"
-              >
-                <g
-                  id="JOIN-MOVEMENT"
-                  transform="translate(-69.000000, 3570.000000)"
-                >
-                  <g
-                    id="::-06---spread-the-word"
-                    transform="translate(85.000000, 5758.000000)"
-                  >
-                    <g
-                      id="::-button-(share-twitter)"
-                      transform="translate(44.000000, 176.000000)"
-                    >
-                      <path
-                        d="M55,18.7756985 C54.33775,19.0771597 53.626,19.2801846 52.879,19.3716996 C53.64175,18.9033581 54.22675,18.1612407 54.50275,17.2768521 C53.7895,17.710587 52.999,18.0258908 52.1575,18.1958472 C51.484,17.4598821 50.524,17 49.462,17 C47.42275,17 45.769,18.695719 45.769,20.7867214 C45.769,21.0835683 45.802,21.3727249 45.86425,21.649577 C42.79525,21.4919251 40.07425,19.9838503 38.2525,17.6928993 C37.93525,18.2519867 37.753,18.9025891 37.753,19.5970264 C37.753,20.9105358 38.40475,22.0694694 39.3955,22.748526 C38.79025,22.7285311 38.221,22.5585747 37.723,22.2748013 C37.723,22.290951 37.723,22.3063317 37.723,22.3224814 C37.723,24.1573955 38.99575,25.6877724 40.6855,26.0353755 C40.37575,26.1222763 40.0495,26.1684184 39.712,26.1684184 C39.47425,26.1684184 39.2425,26.1445783 39.0175,26.1007434 C39.48775,27.6049731 40.85125,28.7000769 42.4675,28.7308382 C41.20375,29.7467316 39.6115,30.351961 37.88125,30.351961 C37.5835,30.351961 37.2895,30.3342733 37,30.2988977 C38.63425,31.3732376 40.57525,32 42.661,32 C49.45375,32 53.16775,26.229941 53.16775,21.2258395 C53.16775,21.0620354 53.164,20.8982312 53.15725,20.7359651 C53.87875,20.2014868 54.505,19.5347347 55,18.7756985 Z"
-                        fill="#9399A3"
-                        fillRule="nonzero"
-                        id="twitter"
-                      />
-                    </g>
-                  </g>
-                </g>
-              </g>
-            </g>
+            <path
+              d="M459.37 151.716c.325 4.548.325 9.097.325 13.645 0 138.72-105.583 298.558-298.558 298.558-59.452 0-114.68-17.219-161.137-47.106 8.447.974 16.568 1.299 25.34 1.299 49.055 0 94.213-16.568 130.274-44.832-46.132-.975-84.792-31.188-98.112-72.772 6.498.974 12.995 1.624 19.818 1.624 9.421 0 18.843-1.3 27.614-3.573-48.081-9.747-84.143-51.98-84.143-102.985v-1.299c13.969 7.797 30.214 12.67 47.431 13.319-28.264-18.843-46.781-51.005-46.781-87.391 0-19.492 5.197-37.36 14.294-52.954 51.655 63.675 129.3 105.258 216.365 109.807-1.624-7.797-2.599-15.918-2.599-24.04 0-57.828 46.782-104.934 104.934-104.934 30.213 0 57.502 12.67 76.67 33.137 23.715-4.548 46.456-13.32 66.599-25.34-7.798 24.366-24.366 44.833-46.132 57.827 21.117-2.273 41.584-8.122 60.426-16.243-14.292 20.791-32.161 39.308-52.628 54.253z"
+              fill="currentColor"
+            />
           </svg>
         </a>
         <a
-          className="c38"
+          className="c39"
           href="https://github.com/opencollective"
         >
           <svg
-            height={15}
-            version="1.1"
-            viewBox="0 0 22 22"
-            width={15}
-            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true"
+            className="c42"
+            color="#9399A3"
+            fill="currentColor"
+            focusable="false"
+            height={17}
+            size={17}
+            viewBox="0 0 496 512"
+            width={17}
           >
-            <title>
-              github icon
-            </title>
-            <g
-              fill="none"
-              fillRule="evenodd"
-              id="Homepage"
-              stroke="none"
-              strokeWidth="1"
-            >
-              <g
-                id="Homepage---XS-(small-handset)"
-                transform="translate(-149.000000, -10919.000000)"
-              >
-                <g
-                  id="FOOTER"
-                  transform="translate(0.000000, 10758.000000)"
-                >
-                  <g
-                    id="::-social-networks"
-                    transform="translate(24.000000, 148.000000)"
-                  >
-                    <g
-                      id="::-icon-(github)"
-                      transform="translate(112.000000, 0.000000)"
-                    >
-                      <path
-                        d="M24,13 C17.9133333,13 13,17.962963 13,24.1111111 C13,29.2222222 16.4466667,33.6666667 21.36,34.9259259 C21.4333333,34.9259259 21.58,34.9259259 21.6533333,34.8518519 C21.7266667,34.7777778 21.8,34.7037037 21.8,34.5555556 L21.8,31.8888889 C21.8,31.8148148 21.7266667,31.6666667 21.7266667,31.5925926 C21.6533333,31.5185185 21.58,31.5185185 21.4333333,31.5185185 L20.7,31.5185185 C19.5266667,31.5185185 18.7933333,30.4074074 18.1333333,29.4444444 C17.9866667,29.2962963 17.9133333,29.0740741 17.7666667,28.9259259 C18.2066667,29.1481481 18.5,29.4444444 18.8666667,29.8148148 C19.38,30.3333333 19.8933333,30.8518519 20.7733333,30.8518519 C20.7733333,30.8518519 20.7733333,30.8518519 20.7733333,30.8518519 C21.14,30.8518519 21.8733333,30.4814815 21.8733333,29.3703704 L21.8733333,29 C21.8733333,28.8518519 21.8,28.7037037 21.58,28.6296296 C19.0866667,27.8888889 17.4733333,25.8888889 17.4733333,23.5925926 C17.4733333,22.4074074 17.9866667,21.2222222 18.8666667,20.3333333 C18.8666667,20.1851852 18.8666667,20.037037 18.8666667,19.8888889 C18.5,19.1481481 18.8666667,18.1111111 19.38,17.5185185 C19.8933333,17.7407407 20.4066667,18.3333333 20.8466667,18.7777778 C20.92,18.9259259 21.14,18.9259259 21.2866667,18.8518519 L21.5066667,18.7777778 C22.3133333,18.4814815 23.2666667,18.1111111 24.1466667,18.1111111 C25.0266667,18.1111111 25.98,18.4814815 26.7866667,18.7777778 L27.0066667,18.8518519 C27.1533333,18.9259259 27.3,18.8518519 27.4466667,18.7777778 C27.8866667,18.2592593 28.4,17.7407407 28.9133333,17.5185185 C29.4266667,18.1851852 29.7933333,19.1481481 29.4266667,19.8888889 C29.1333333,20.037037 29.1333333,20.1851852 29.2066667,20.3333333 C30.0866667,21.2962963 30.6,22.3333333 30.6,23.4444444 C30.6,25.8888889 28.7666667,28.037037 26.1266667,28.6296296 C25.98,28.6296296 25.9066667,28.7037037 25.9066667,28.8518519 C25.9066667,29 25.8333333,29.0740741 25.9066667,29.1481481 C26.1266667,29.5185185 26.2,30.2592593 26.2,31.2222222 C26.2,32.4814815 26.2,34.6296296 26.2,34.6296296 C26.2,34.7777778 26.2733333,34.8518519 26.3466667,34.9259259 C26.42,35 26.4933333,35 26.5666667,35 C26.5666667,35 26.64,35 26.64,35 C31.5533333,33.6666667 35,29.2222222 35,24.1111111 C35,17.962963 30.0866667,13 24,13 Z"
-                        fill="#9399A3"
-                        fillRule="nonzero"
-                        id="github"
-                      />
-                    </g>
-                  </g>
-                </g>
-              </g>
-            </g>
+            <path
+              d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"
+              fill="currentColor"
+            />
           </svg>
         </a>
         <a
-          className="c38"
+          className="c39"
           href="https://slack.opencollective.com"
         >
           <svg
-            height={15}
-            version="1.1"
-            viewBox="0 0 20 20"
-            width={15}
-            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true"
+            className="c43"
+            color="#9399A3"
+            fill="currentColor"
+            focusable="false"
+            height={17}
+            size={17}
+            viewBox="0 0 448 512"
+            width={17}
           >
-            <title>
-              slack icon
-            </title>
-            <g
-              fill="#9399A3"
-              id="slack"
-            >
-              <path
-                d="M19.1625,7.25 C21.225,14.125 19.62125,17.1 12.75,19.1625 C5.875,21.225 2.9,19.62125 0.8375,12.75 C-1.225,5.875 0.38,2.9 7.25,0.8375 C14.1225,-1.225 17.1,0.38 19.1625,7.25 Z M15.6875,11.7125 L15.695,11.73875 C16.2325,11.56375 16.5275,10.97625 16.345,10.42625 C16.16375,9.87625 15.57625,9.58875 15.0325,9.76375 L13.74,10.19375 L12.8775,7.6225 L14.175,7.185 C14.71625,7.005 15.01,6.4175 14.82875,5.8725 C14.64625,5.335 14.05875,5.04 13.51625,5.2225 L12.22,5.6475 L11.77,4.2975 C11.59,3.75 11.00125,3.4625 10.4575,3.6375 C9.9125,3.825 9.625,4.4125 9.8,4.95 L10.25,6.2875 L7.58875,7.1825 L7.13875,5.8425 C6.96375,5.3025 6.37625,5.00625 5.82625,5.19 C5.27625,5.37 4.98875,5.9575 5.16375,6.5025 L5.61375,7.84 L4.31375,8.2725 C3.76375,8.45625 3.47625,9.04375 3.65125,9.585 C3.78875,10.01 4.18875,10.27875 4.60125,10.29125 C4.72,10.29375 4.84,10.2775 4.9575,10.2375 L6.25,9.8 L7.07375,12.37375 L5.77375,12.81125 C5.23625,12.98625 4.93625,13.57375 5.12375,14.12375 C5.27375,14.54875 5.66125,14.82375 6.08625,14.83625 C6.21125,14.83625 6.32375,14.82375 6.44875,14.78625 L7.74875,14.34875 L8.19875,15.69875 C8.34875,16.12375 8.73625,16.39375 9.16125,16.40625 C9.28625,16.40875 9.39875,16.3925 9.52375,16.3525 C10.07375,16.17125 10.36125,15.58375 10.18625,15.04 L9.73625,13.7 L12.41125,12.805 L12.86125,14.145 C13.01125,14.57 13.39875,14.84 13.82375,14.8525 C13.94875,14.85625 14.06125,14.8375 14.18625,14.8 C14.72875,14.6175 15.0225,14.03 14.84125,13.4875 L14.39125,12.14625 L15.6875,11.7125 Z"
-              />
-              <polygon
-                points="8.2325 9.1625 9.095 11.73375 11.76625 10.83875 10.90375 8.27625 8.2325 9.17625"
-              />
-            </g>
+            <path
+              d="M244.2 217.5l19.3 57.7-59.8 20-19.3-57.7 59.8-20zm41.4 243.7C131.6 507.4 65 471.6 18.8 317.6S8.4 97 162.4 50.8C316.4 4.6 383 40.4 429.2 194.4c46.2 154 10.4 220.6-143.6 266.8zM366.2 265c-3.9-12.2-17.2-18.6-29.4-14.7l-29 9.7-19.3-57.7 29-9.7c12.2-3.9 18.6-17.2 14.7-29.4-3.9-12.2-17.2-18.6-29.4-14.7l-29 9.7-10-30.1c-3.9-12.2-17.2-18.6-29.4-14.7-12.2 3.9-18.6 17.2-14.7 29.4l10 30.1-59.8 20.1-10-30.1c-3.9-12.2-17.2-18.6-29.4-14.7-12.2 3.9-18.6 17.2-14.7 29.4l10 30.1-29 9.7c-12.2 3.9-18.6 17.2-14.7 29.4 3.2 9.3 12.2 15.4 21.5 15.8 4.3.6 7.7-1 36.9-10.7l19.3 57.7-29 9.7c-12.2 3.9-18.6 17.2-14.7 29.4 3.2 9.3 12.2 15.4 21.5 15.8 4.3.6 7.7-1 36.9-10.7l10 30.1c3.7 10.8 15.8 18.6 29.4 14.7 12.2-3.9 18.6-17.2 14.7-29.4l-10-30.1 59.8-20.1 10 30.1c3.7 10.8 15.8 18.6 29.4 14.7 12.2-3.9 18.6-17.2 14.7-29.4l-10-30.1 29-9.7c12.2-4.2 18.6-17.5 14.7-29.6z"
+              fill="currentColor"
+            />
           </svg>
         </a>
         <a
-          className="c38"
+          className="c39"
           href="mailto:info@opencollective.com"
         >
           <svg
-            height={13.125}
-            version="1.1"
-            viewBox="0 0 16 14"
-            width={15}
-            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true"
+            className="c44"
+            color="#9399A3"
+            fill="currentColor"
+            focusable="false"
+            height={19}
+            size={19}
+            viewBox="0 0 24 24"
+            width={19}
           >
-            <title>
-              email icon
-            </title>
-            <g
-              fill="none"
-              fillRule="evenodd"
-              id="Homepage"
-              stroke="none"
-              strokeWidth="1"
-            >
-              <g
-                id="Homepage---XS-(small-handset)"
-                transform="translate(-264.000000, -10923.000000)"
-              >
-                <g
-                  id="FOOTER"
-                  transform="translate(0.000000, 10758.000000)"
-                >
-                  <g
-                    id="::-social-networks"
-                    transform="translate(24.000000, 148.000000)"
-                  >
-                    <g
-                      id="::-icon-(email)"
-                      transform="translate(224.000000, 0.000000)"
-                    >
-                      <path
-                        d="M30.4,17 L17.6,17 C16.72,17 16.008,17.9 16.008,19 L16,29 C16,30.1 16.72,31 17.6,31 L30.4,31 C31.28,31 32,30.1 32,29 L32,19 C32,17.9 31.28,17 30.4,17 Z M30,21 L24,25 L18,21 L18,19 L24,23 L30,19 L30,21 Z"
-                        fill="#9399A3"
-                        fillRule="nonzero"
-                        id="email"
-                      />
-                    </g>
-                  </g>
-                </g>
-              </g>
-            </g>
+            <path
+              d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"
+            />
           </svg>
         </a>
       </div>
       <nav
-        className="c39 c40"
+        className="c45 c46"
       >
         <div
-          className="c41"
+          className="c47"
         >
           <p
-            className="c42"
+            className="c48"
           >
             PLATFORM
           </p>
           <ul
-            className="c43"
+            className="c49"
           >
             <li
-              className="c44"
+              className="c50"
             >
               <a
-                className="c45 "
+                className="c51 "
                 href="/discover"
               >
                 Discover
               </a>
             </li>
             <li
-              className="c44"
+              className="c50"
             >
               <a
-                className="c45 "
+                className="c51 "
                 href="/learn-more"
               >
                 How it Works
               </a>
             </li>
             <li
-              className="c44"
+              className="c50"
             >
               <a
-                className="c45 "
+                className="c51 "
                 href="/opensource"
                 onClick={[Function]}
               >
@@ -6499,10 +6174,10 @@ exports[`Search Page renders search results with pagination 1`] = `
               </a>
             </li>
             <li
-              className="c44"
+              className="c50"
             >
               <a
-                className="c45 "
+                className="c51 "
                 href="/signin"
                 onClick={[Function]}
               >
@@ -6510,10 +6185,10 @@ exports[`Search Page renders search results with pagination 1`] = `
               </a>
             </li>
             <li
-              className="c44"
+              className="c50"
             >
               <a
-                className="c45 "
+                className="c51 "
                 href="/signin"
                 onClick={[Function]}
               >
@@ -6523,21 +6198,21 @@ exports[`Search Page renders search results with pagination 1`] = `
           </ul>
         </div>
         <div
-          className="c41"
+          className="c47"
         >
           <p
-            className="c42"
+            className="c48"
           >
             JOIN THE MOVEMENT
           </p>
           <ul
-            className="c43"
+            className="c49"
           >
             <li
-              className="c44"
+              className="c50"
             >
               <a
-                className="c45 "
+                className="c51 "
                 href="/create"
                 onClick={[Function]}
               >
@@ -6545,10 +6220,10 @@ exports[`Search Page renders search results with pagination 1`] = `
               </a>
             </li>
             <li
-              className="c44"
+              className="c50"
             >
               <a
-                className="c45 "
+                className="c51 "
                 href="/become-a-sponsor"
                 onClick={[Function]}
               >
@@ -6556,10 +6231,10 @@ exports[`Search Page renders search results with pagination 1`] = `
               </a>
             </li>
             <li
-              className="c44"
+              className="c50"
             >
               <a
-                className="c45 "
+                className="c51 "
                 href="/chapters"
                 onClick={[Function]}
               >
@@ -6569,21 +6244,21 @@ exports[`Search Page renders search results with pagination 1`] = `
           </ul>
         </div>
         <div
-          className="c41"
+          className="c47"
         >
           <p
-            className="c42"
+            className="c48"
           >
             COMMUNITY
           </p>
           <ul
-            className="c43"
+            className="c49"
           >
             <li
-              className="c44"
+              className="c50"
             >
               <a
-                className="c45 "
+                className="c51 "
                 href="/opensource"
                 onClick={[Function]}
               >
@@ -6591,10 +6266,10 @@ exports[`Search Page renders search results with pagination 1`] = `
               </a>
             </li>
             <li
-              className="c44"
+              className="c50"
             >
               <a
-                className="c45 "
+                className="c51 "
                 href="https://github.com/opencollective/opencollective/issues"
                 onClick={[Function]}
               >
@@ -6602,10 +6277,10 @@ exports[`Search Page renders search results with pagination 1`] = `
               </a>
             </li>
             <li
-              className="c44"
+              className="c50"
             >
               <a
-                className="c45 "
+                className="c51 "
                 href="https://slack.opencollective.com"
                 onClick={[Function]}
               >
@@ -6613,10 +6288,10 @@ exports[`Search Page renders search results with pagination 1`] = `
               </a>
             </li>
             <li
-              className="c44"
+              className="c50"
             >
               <a
-                className="c45 "
+                className="c51 "
                 href="https://github.com/opencollective/opencollective/wiki"
                 onClick={[Function]}
               >
@@ -6624,10 +6299,10 @@ exports[`Search Page renders search results with pagination 1`] = `
               </a>
             </li>
             <li
-              className="c44"
+              className="c50"
             >
               <a
-                className="c45 "
+                className="c51 "
                 href="mailto:support@opencollective.com"
                 onClick={[Function]}
               >
@@ -6637,21 +6312,21 @@ exports[`Search Page renders search results with pagination 1`] = `
           </ul>
         </div>
         <div
-          className="c41"
+          className="c47"
         >
           <p
-            className="c42"
+            className="c48"
           >
             COMPANY
           </p>
           <ul
-            className="c43"
+            className="c49"
           >
             <li
-              className="c44"
+              className="c50"
             >
               <a
-                className="c45 "
+                className="c51 "
                 href="/about"
                 onClick={[Function]}
               >
@@ -6659,10 +6334,10 @@ exports[`Search Page renders search results with pagination 1`] = `
               </a>
             </li>
             <li
-              className="c44"
+              className="c50"
             >
               <a
-                className="c45 "
+                className="c51 "
                 href="/faq"
                 onClick={[Function]}
               >
@@ -6670,10 +6345,10 @@ exports[`Search Page renders search results with pagination 1`] = `
               </a>
             </li>
             <li
-              className="c44"
+              className="c50"
             >
               <a
-                className="c45 "
+                className="c51 "
                 href="https://medium.com/open-collective"
                 onClick={[Function]}
               >
@@ -6681,10 +6356,10 @@ exports[`Search Page renders search results with pagination 1`] = `
               </a>
             </li>
             <li
-              className="c44"
+              className="c50"
             >
               <a
-                className="c45 "
+                className="c51 "
                 href="/tos"
                 onClick={[Function]}
               >
@@ -6692,10 +6367,10 @@ exports[`Search Page renders search results with pagination 1`] = `
               </a>
             </li>
             <li
-              className="c44"
+              className="c50"
             >
               <a
-                className="c45 "
+                className="c51 "
                 href="/privacypolicy"
                 onClick={[Function]}
               >

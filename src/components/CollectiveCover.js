@@ -8,6 +8,9 @@ import {
   FormattedTime,
 } from 'react-intl';
 import { get } from 'lodash';
+import { Github } from 'styled-icons/fa-brands/Github.cjs';
+import { Twitter } from 'styled-icons/fa-brands/Twitter.cjs';
+import { ExternalLinkAlt } from 'styled-icons/fa-solid/ExternalLinkAlt.cjs';
 import { prettyUrl, imagePreview } from '../lib/utils';
 import Currency from './Currency';
 import Avatar from './Avatar';
@@ -183,16 +186,6 @@ ${description}`;
               width: 100%;
               height: 100%;
               z-index: 0;
-            }
-            .twitterHandle {
-              background: url('/static/icons/twitter-handler.svg') no-repeat 0px
-                6px;
-              padding-left: 22px;
-            }
-            .website {
-              background: url('/static/icons/external-link.svg') no-repeat 0px
-                6px;
-              padding-left: 22px;
             }
             .host label {
               font-weight: 300;
@@ -432,7 +425,7 @@ ${description}`;
                           target="_blank"
                           rel="noopener noreferrer"
                         >
-                          @{twitterHandle}
+                          <Twitter size="1em" /> @{twitterHandle}
                         </a>
                       </div>
                     )}
@@ -443,7 +436,7 @@ ${description}`;
                           target="_blank"
                           rel="noopener noreferrer"
                         >
-                          {githubHandle}
+                          <Github size="1em" /> {githubHandle}
                         </a>
                       </div>
                     )}
@@ -454,7 +447,7 @@ ${description}`;
                           target="_blank"
                           rel="noopener noreferrer"
                         >
-                          {prettyUrl(website)}
+                          <ExternalLinkAlt size="1em" /> {prettyUrl(website)}
                         </a>
                       </div>
                     )}
