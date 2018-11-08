@@ -4,6 +4,7 @@
  * We also mark all those transactions Orders 
  * from status 'ACTIVE' to status 'CANCELLED'
  *  1) Refund transactions
+ *  2) Mark Orders as cancelled
  *  2) Get transactions ORders and Mark the order Subscriptions of orders as isActive False and deactivedAt now()
  * 
  */
@@ -11,25 +12,6 @@ import Promise from 'bluebird';
 import debug from 'debug';
 import models from '../server/models';
 import * as libPayments from '../server/lib/payments';
-
-// history: ,
-// count	collective	  FromCollectiveId	CollectiveId	email
-//                          23709 ------------------------------------------------------- OK
-// 191	  anonymous1309	    23461             13775	    rato07@yopmail.com_old ---------- 
-// 20	    anonymous1320	    23546             13775	    rato007@gmx.com_old ------------- 
-// 7	    anonymous1155	    21715             13775	    vitinholippi00973@gmail.com -----
-// DATABASE SCRIPTS
-// --------
-// ----  TOMORROW WITH PIA
-// -- getting all transactions from the FromCollectiveId 21715
-// select * from "Transactions" t 
-// left join "Orders" o on t."OrderId"=o.id 
-// left join "Subscriptions" s on o."SubscriptionId"=s.id 
-// where t."FromCollectiveId"=21715; -- and s."isActive"=true and t."TransactionGroup"='271eb993-9092-4f55-8014-ad0d7e58514a'
-// -- We have already refunded this transactions from FromCollectiveId 21715
-// select * from "Transactions" where id in (130697,130698);
-// -- and here are their refund transactions:
-// select * from "Transactions" where id in (134631, 134632);
 
 const fromCollectiveIds = process.env.FROM_COLLECTIVE_IDS || [21715];
 const debugRefund = debug('refundTransactions');
@@ -47,7 +29,7 @@ async function refundTransaction(transaction) {
   debugRefund(`stripeAccounts: ${JSON.stringify(stripeAccounts, null,2)}`);
   // If it's credit card then we will refund
   if (transaction.PaymentMethod && transaction.PaymentMethod.type === 'creditcard') {
-    debugRefund('refunding transaction...');
+    debugRefund('refunding transaction.', transaction);
     try {
       // try to do both stripe and database refunds
       const refundTransactions  = await paymentMethod.refundTransaction(transaction, {id: 18520});  
@@ -65,20 +47,18 @@ async function refundTransaction(transaction) {
       }
     }
   }
-
   const order = transaction.Order;
-  // We mark 
+  // We mark then Active Orders as CANCELLED and deactivated their subscriptions
   if (order && order.status === 'ACTIVE' && order.SubscriptionId) {
+    order.status = 'CANCELLED';
+    await order.save();
     debugRefund('updating subscription to be deactived');
-    // subscription
+    
+    // mark subscriptions with isActive as false and deactivedAt now.
     const subscription = await models.Subscription.findById(order.SubscriptionId);
     subscription.isActive = false;
     subscription.deactivatedAt = new Date();
-    
     await subscription.save();
-    const newSubscription = await models.Subscription.findById(order.SubscriptionId);
-    debugRefund(`UPDATED Subscripttion ${JSON.stringify(newSubscription, null,2)}`);
-    // mark isActive as false and deactivedAt now.
   }
   return models.Transaction.findById(transaction.id);
 }
