@@ -182,7 +182,7 @@ export async function createRefundTransaction(
   return models.Transaction.createDoubleEntry(userLedgerRefund);
 }
 
-export async function associateTransactionRefundId(transaction, refund) {
+export async function associateTransactionRefundId(transaction, refund, data) {
   const [tr1, tr2, tr3, tr4] = await models.Transaction.findAll({
     order: ['id'],
     where: {
@@ -192,6 +192,12 @@ export async function associateTransactionRefundId(transaction, refund) {
       ],
     },
   });
+  // After refunding a transaction, in some cases the data may
+  // be update as well(stripe data changes after refunds)
+  if (data) {
+    tr1.data = data;
+    tr2.data = data;
+  }
 
   tr1.RefundTransactionId = tr4.id;
   await tr1.save(); // User Ledger
