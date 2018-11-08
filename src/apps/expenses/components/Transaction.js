@@ -11,6 +11,7 @@ import { P, Span } from '../../../components/Text';
 
 import TransactionDetails from './TransactionDetails';
 import AmountCurrency from './AmountCurrency';
+import Link from '../../../components/Link';
 
 class Transaction extends React.Component {
   static propTypes = {
@@ -41,6 +42,10 @@ class Transaction extends React.Component {
       name: PropTypes.string.isRequired,
       slug: PropTypes.string.isRequired,
     }),
+    usingVirtualCardFromCollective: PropTypes.shape({
+      slug: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired,
+    }),
     collective: PropTypes.shape({
       id: PropTypes.number.isRequired,
       type: PropTypes.string.isRequired,
@@ -64,6 +69,7 @@ class Transaction extends React.Component {
       createdAt,
       currency,
       fromCollective,
+      usingVirtualCardFromCollective,
       collective,
       type,
       paymentProcessorFeeInHostCurrency,
@@ -106,6 +112,23 @@ class Transaction extends React.Component {
             <a href={`/${fromCollective.slug}`} title={fromCollective.name}>
               {fromCollective.name}
             </a>
+            {usingVirtualCardFromCollective && ' '}
+            {usingVirtualCardFromCollective && (
+              <FormattedMessage
+                id="transaction.usingGiftCardFrom"
+                defaultMessage="using a gift card from {collectiveLink}"
+                values={{
+                  collectiveLink: (
+                    <Link
+                      route="collective"
+                      params={{ slug: usingVirtualCardFromCollective.slug }}
+                    >
+                      {usingVirtualCardFromCollective.name}
+                    </Link>
+                  ),
+                }}
+              />
+            )}
             {' | '}
             <Moment relative={true} value={createdAt} />
             {paymentProcessorFeeInHostCurrency !== undefined && (

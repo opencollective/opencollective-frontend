@@ -28,6 +28,10 @@ export const transactionFields = `
     path
     image
   }
+  usingVirtualCardFromCollective {
+    slug
+    name
+  }
   host {
     id
     slug
