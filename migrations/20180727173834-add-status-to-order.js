@@ -34,6 +34,8 @@ module.exports = {
             const paidUpdate = models.Order.update(
               { status: status.PAID },
               {
+                fields: ['status'],
+                hooks: false,
                 where: {
                   id: {
                     [Op.in]: orders,
@@ -46,6 +48,8 @@ module.exports = {
             const errorUpdate = models.Order.update(
               { status: status.ERROR },
               {
+                fields: ['status'],
+                hooks: false,
                 where: {
                   id: {
                     [Op.notIn]: orders,
@@ -62,6 +66,7 @@ module.exports = {
               {
                 model: models.Order,
                 required: true,
+                attributes: ['id', 'status'],
               },
             ],
             where: {
@@ -73,6 +78,8 @@ module.exports = {
             return models.Order.update(
               { status: status.ACTIVE },
               {
+                fields: ['status'],
+                hooks: false,
                 where: {
                   id: {
                     [Op.in]: orders,
@@ -88,6 +95,7 @@ module.exports = {
                 {
                   model: models.Order,
                   required: true,
+                  attributes: ['id', 'status'],
                 },
               ],
               where: {
@@ -99,22 +107,26 @@ module.exports = {
           ).then(subscriptions => {
             const orders = subscriptions.map(sub => sub.Order.id);
             console.log(`Updating ${orders.length} orders to CANCELLED`);
-            return models.Order.update(
-              { status: status.CANCELLED },
-              {
-                where: {
-                  id: {
-                    [Op.in]: orders,
+              return models.Order.update(
+                { status: status.CANCELLED },
+                {
+                  fields: ['status'],
+                  hooks: false,
+                  where: {
+                    id: {
+                      [Op.in]: orders,
+                    },
                   },
+                  transaction,
                 },
-                transaction,
-              },
             );
           });
           const updateCancelledOrders = models.Order.update(
             { status: status.CANCELLED },
             {
               paranoid: false,
+              fields: ['status'],
+              hooks: false,
               where: {
                 deletedAt: {
                   [Op.not]: null,
@@ -130,7 +142,10 @@ module.exports = {
             updateActiveOrders,
             updateCancelledSubscriptionOrders,
             updateCancelledOrders,
-          ]);
+          ]).catch(e => {
+            console.error(e);
+            throw e;
+          });
         }),
       );
   },
