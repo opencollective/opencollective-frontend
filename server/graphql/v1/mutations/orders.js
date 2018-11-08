@@ -173,7 +173,11 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
     if (
       paymentRequired &&
       (!order.paymentMethod ||
-        !(order.paymentMethod.uuid || order.paymentMethod.token))
+        !(
+          order.paymentMethod.uuid ||
+          order.paymentMethod.token ||
+          order.paymentMethod.type === 'manual'
+        ))
     ) {
       throw new Error('This order requires a payment method');
     }
@@ -453,7 +457,11 @@ export async function updateOrder(remoteUser, order) {
   if (
     paymentRequired &&
     (!order.paymentMethod ||
-      !(order.paymentMethod.uuid || order.paymentMethod.token))
+      !(
+        order.paymentMethod.uuid ||
+        order.paymentMethod.token ||
+        order.paymentMethod.type === 'manual'
+      ))
   ) {
     throw new Error('This order requires a payment method');
   }
