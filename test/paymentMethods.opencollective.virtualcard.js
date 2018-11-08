@@ -497,6 +497,9 @@ describe('opencollective.virtualcard', () => {
         expect(creditTransaction.PaymentMethodId).to.be.equal(
           virtualCardPaymentMethod.id,
         );
+        expect(creditTransaction.UsingVirtualCardFromCollectiveId).to.be.equal(
+          virtualCardPaymentMethod.CollectiveId,
+        );
         expect(creditTransaction.FromCollectiveId).to.be.equal(
           userCollective.id,
         );

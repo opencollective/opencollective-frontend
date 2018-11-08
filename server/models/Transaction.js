@@ -84,6 +84,16 @@ export default (Sequelize, DataTypes) => {
         allowNull: true, // the opposite transaction that records the CREDIT to the User that submitted an expense doesn't have a HostCollectiveId, see https://github.com/opencollective/opencollective/issues/1154
       },
 
+      UsingVirtualCardFromCollectiveId: {
+        type: DataTypes.INTEGER,
+        references: { model: 'Collectives', key: 'id' },
+        onDelete: 'SET NULL',
+        onUpdate: 'CASCADE',
+        allowNull: true,
+        description:
+          'References the collective that created the virtual card used for this order',
+      },
+
       OrderId: {
         type: DataTypes.INTEGER,
         references: {
@@ -184,6 +194,8 @@ export default (Sequelize, DataTypes) => {
             CreatedByUserId: this.CreatedByUserId,
             FromCollectiveId: this.FromCollectiveId,
             CollectiveId: this.CollectiveId,
+            UsingVirtualCardFromCollectiveId: this
+              .UsingVirtualCardFromCollectiveId,
             platformFee: this.platformFee,
             hostFee: this.hostFee,
             paymentProcessorFeeInHostCurrency: this
@@ -212,6 +224,12 @@ export default (Sequelize, DataTypes) => {
    */
   Transaction.prototype.getUser = function() {
     return models.User.findById(this.CreatedByUserId);
+  };
+
+  Transaction.prototype.getVirtualCardEmitterCollective = function() {
+    if (this.UsingVirtualCardFromCollectiveId) {
+      return models.Collective.findById(this.UsingVirtualCardFromCollectiveId);
+    }
   };
 
   Transaction.prototype.getHostCollective = async function() {

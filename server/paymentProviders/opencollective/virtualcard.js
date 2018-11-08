@@ -132,7 +132,10 @@ async function processOrder(order) {
   order.paymentMethod = paymentMethod;
   // gets the Debit transaction generated through the TransactionGroup field.
   const updatedTransactions = await models.Transaction.update(
-    { PaymentMethodId: paymentMethod.id },
+    {
+      PaymentMethodId: paymentMethod.id,
+      UsingVirtualCardFromCollectiveId: paymentMethod.CollectiveId,
+    },
     {
       where: { TransactionGroup: creditTransaction.TransactionGroup },
       returning: true,
