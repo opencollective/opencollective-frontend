@@ -744,7 +744,6 @@ describe('Mutation Tests', () => {
 
         it('as a new organization', async () => {
           const order = {
-            user: { email: user2.email },
             fromCollective: {
               name: 'Google',
               website: 'https://google.com',
@@ -765,7 +764,7 @@ describe('Mutation Tests', () => {
             quantity: 2,
           };
           emailSendMessageSpy.resetHistory();
-          const result = await utils.graphqlQuery(query, { order });
+          const result = await utils.graphqlQuery(query, { order }, user2);
           result.errors && console.error(result.errors);
           expect(result.data).to.deep.equal({
             createOrder: {
@@ -820,7 +819,6 @@ describe('Mutation Tests', () => {
           await org.addUserWithRole(user2, roles.ADMIN);
 
           const order = {
-            user: { email: user2.email },
             fromCollective: {
               id: org.id,
             },
@@ -914,13 +912,12 @@ describe('Mutation Tests', () => {
           `;
 
           const order = {
-            user: { email: user2.email },
             collective: { id: event1.id },
             publicMessage: 'Looking forward!',
             tier: { id: 3 },
             quantity: 2,
           };
-          const result = await utils.graphqlQuery(query, { order });
+          const result = await utils.graphqlQuery(query, { order }, user2);
           result.errors && console.error(result.errors);
           expect(result.data).to.deep.equal({
             createOrder: {
@@ -944,7 +941,7 @@ describe('Mutation Tests', () => {
                 },
               },
               createdByUser: {
-                email: null,
+                email: user2.email,
                 id: 3,
               },
             },
@@ -1077,9 +1074,6 @@ describe('Mutation Tests', () => {
           `;
 
           const order = {
-            user: {
-              email: user2.email,
-            },
             paymentMethod: {
               token: 'tok_123456781234567812345678',
               service: 'stripe',
@@ -1093,7 +1087,7 @@ describe('Mutation Tests', () => {
             tier: { id: 4 },
             quantity: 2,
           };
-          const result = await utils.graphqlQuery(query, { order });
+          const result = await utils.graphqlQuery(query, { order }, user2);
           result.errors && console.error(result.errors[0]);
           expect(result.data).to.deep.equal({
             createOrder: {
@@ -1108,7 +1102,7 @@ describe('Mutation Tests', () => {
                 name: 'paid ticket',
               },
               createdByUser: {
-                email: null,
+                email: user2.email,
                 id: 3,
               },
               collective: {
@@ -1132,6 +1126,61 @@ describe('Mutation Tests', () => {
           expect(emailSendMessageSpy.firstCall.args[0]).to.equal(user1.email);
           expect(emailSendMessageSpy.firstCall.args[1]).to.contain(`Anish Bas joined ${event1.name} as backer`);
           expect(emailSendMessageSpy.firstCall.args[2]).to.contain('/scouts/events/jan-meetup');
+        });
+
+        it('from an existing but logged out user (should fail)', async () => {
+          const query = `
+            mutation createOrder($order: OrderInputType!) {
+              createOrder(order: $order) {
+                id,
+                createdByUser {
+                  id,
+                  email
+                },
+                tier {
+                  id,
+                  name,
+                  description,
+                  maxQuantity,
+                  stats {
+                    availableQuantity
+                  }
+                },
+                collective {
+                  id,
+                  slug
+                }
+              }
+            }
+          `;
+
+          const order = {
+            paymentMethod: {
+              token: 'tok_123456781234567812345678',
+              service: 'stripe',
+              name: '4242',
+              data: {
+                expMonth: 11,
+                expYear: 2020,
+              },
+            },
+            collective: { id: event1.id },
+            tier: { id: 4 },
+            quantity: 2,
+            user: { email: user2.email },
+          };
+
+          const loggedInUser = null;
+          const result = await utils.graphqlQuery(
+            query,
+            { order },
+            loggedInUser,
+          );
+          result.errors && console.error(result.errors[0]);
+          expect(result.errors).to.exist;
+          expect(result.errors[0].message).to.equal(
+            'An account already exists for this email address. Please login.',
+          );
         });
 
         it('from a new user', async () => {

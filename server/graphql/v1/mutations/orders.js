@@ -171,7 +171,20 @@ export async function createOrder(order, loaders, remoteUser) {
     // find or create user, check permissions to set `fromCollective`
     let user;
     if (order.user && order.user.email) {
-      user = await models.User.findOrCreateByEmail(order.user.email, {
+      // Form changes in frontend when trying to create an order with an
+      // existing email, asking user to login. So if user given in `order.user`
+      // already exists, that could mean two things:
+      // 1. Email is registered under another account as Paypal address.
+      // 2. We got a bad payload trying to impersonate another user.
+      const existingUser = await models.User.findByEmailOrPaypalEmail(
+        order.user.email,
+      );
+      if (existingUser) {
+        throw new Error(
+          'An account already exists for this email address. Please login.',
+        );
+      }
+      user = await models.User.createUserWithCollective({
         ...order.user,
         currency: order.currency,
         CreatedByUserId: remoteUser ? remoteUser.id : null,
