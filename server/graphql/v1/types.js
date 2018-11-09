@@ -949,13 +949,20 @@ export const TierType = new GraphQLObjectType({
         type: new GraphQLList(OrderType),
         args: {
           isActive: { type: GraphQLBoolean },
+          isProcessed: {
+            type: GraphQLBoolean,
+            description:
+              'only return orders that have been processed (fulfilled)',
+          },
           limit: { type: GraphQLInt },
         },
         resolve(tier, args) {
           const query = {
-            where: { processedAt: { [Op.ne]: null } },
             limit: args.limit,
           };
+          if (args.isProcessed) {
+            query.where = { processedAt: { [Op.ne]: null } };
+          }
           if (args.isActive) {
             query.include = [
               { model: models.Subscription, where: { isActive: true } },

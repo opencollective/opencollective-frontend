@@ -306,7 +306,7 @@ describe('Query Tests', () => {
           `;
           const req = utils.makeRequest(null);
           const result = await graphql(schema, query, null, req);
-          expect(result).to.deep.equal({
+          const expectedResult = {
             data: {
               allEvents: [
                 {
@@ -360,6 +360,15 @@ describe('Query Tests', () => {
                             'I have been working on open source for over a decade',
                           createdByUser: { id: 3, firstName: 'Xavier' },
                         },
+                        {
+                          id: 3,
+                          description:
+                            'I have been working on open source for over a decade',
+                          createdByUser: {
+                            id: 1,
+                            firstName: 'Phil',
+                          },
+                        },
                       ],
                     },
                     {
@@ -380,7 +389,8 @@ describe('Query Tests', () => {
                 },
               ],
             },
-          });
+          };
+          expect(result).to.deep.equal(expectedResult);
         });
       });
     });
