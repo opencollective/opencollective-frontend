@@ -131,7 +131,7 @@ class TransactionDetails extends React.Component {
     ]);
 
     let amountDetailsStr =
-      amountDetails.length > 1 ? amountDetails.join(' ') : null;
+      amountDetails.length > 1 ? amountDetails.join(' ') : '';
 
     if (
       ['ORGANIZATION', 'USER'].includes(collective.type) &&
