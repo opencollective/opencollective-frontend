@@ -126,7 +126,7 @@ class InvoicePage extends React.Component {
             }
 
             .footer {
-              position: absolute;
+              position: inherit;
               top: ${this.page.footerTop} ${this.dimensions.unit};
               width: ${this.page.width} ${this.dimensions.unit};
               margin: 0 -2rem;
