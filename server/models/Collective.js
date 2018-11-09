@@ -1400,10 +1400,10 @@ export default function(Sequelize, DataTypes) {
    * @param {*} creatorUser { id }
    */
   Collective.prototype.changeHost = async function(
-    newHostCollective,
+    newHostCollectiveId,
     creatorUser,
   ) {
-    if (!newHostCollective || !newHostCollective.id === this.id) {
+    if (newHostCollectiveId === this.id) {
       // do nothing
       return;
     }
@@ -1428,7 +1428,13 @@ export default function(Sequelize, DataTypes) {
     }
     this.HostCollectiveId = null;
     this.isActive = false; // we should rename isActive to isApproved (by the host)
-    if (newHostCollective.id) {
+    if (newHostCollectiveId) {
+      const newHostCollective = await models.Collective.findById(
+        newHostCollectiveId,
+      );
+      if (!newHostCollective) {
+        throw new Error('Host not found');
+      }
       return this.addHost(newHostCollective, creatorUser);
     } else {
       // if we remove the host

@@ -318,7 +318,7 @@ export function editCollective(_, args, req) {
         updatedCollectiveData.HostCollectiveId !== collective.HostCollectiveId
       ) {
         return collective.changeHost(
-          { id: updatedCollectiveData.HostCollectiveId },
+          updatedCollectiveData.HostCollectiveId,
           req.remoteUser,
         );
       }

@@ -1031,5 +1031,40 @@ describe('graphql.collective.test.js', () => {
 
       appStripe.customers.create.restore();
     });
+
+    it('apply to host', async () => {
+      const { hostCollective } = await store.newHost(
+        'brusselstogether',
+        'EUR',
+        5,
+      );
+
+      const collective = {
+        id: pubnubCollective.id,
+        HostCollectiveId: hostCollective.id,
+      };
+
+      const query = `
+    mutation editCollective($collective: CollectiveInputType!) {
+      editCollective(collective: $collective) {
+        id,
+        slug,
+        host {
+          id
+          slug
+          currency
+        }
+        currency,
+      }
+    }
+    `;
+      const res = await utils.graphqlQuery(query, { collective }, pubnubAdmin);
+      res.errors && console.error(res.errors);
+      expect(res.errors).to.not.exist;
+      const updatedCollective = res.data.editCollective;
+      console.log('>>> updatedCollective', updatedCollective);
+      expect(updatedCollective.host.id).to.equal(hostCollective.id);
+      expect(updatedCollective.currency).to.equal('EUR');
+    });
   });
 });
