@@ -114,12 +114,14 @@
     "lint": "eslint \"cypress/**/*.js\" \"src/**/*.js\" \"test/**/*.js\"",
     "lint:fix": "npm run lint -- --fix",
     "lint:quiet": "npm run lint -- --quiet",
-    "pretest": "npm run lint:quiet",
+    "pretest": "npm run lint:quiet && npm run prettier:check",
     "commit": "git-cz",
     "semantic-release": "semantic-release",
     "cypress": "TZ=UTC cypress run",
-    "prettier": "prettier \"cypress/**/*.js\" \"src/**/*.js\" \"test/**/*.js\" --write",
+    "prettier": "prettier \"cypress/**/*.js\" \"src/**/*.js\" \"test/**/*.js\"",
     "optimize-png": "npm install --no-save imagemin imagemin-optipng && babel-node ./scripts/optimize-png",
+    "prettier:write": "npm run prettier -- --write",
+    "prettier:check": "npm run prettier -- --list-different",
     "graphql:get-schema:dev": "npx graphql-cli get-schema -p opencollective -e dev"
   },
   "devDependencies": {
@@ -151,7 +153,7 @@
     "jest-styled-components": "^6.3.1",
     "jsdom": "^13.0.0",
     "mkdirp": "^0.5.1",
-    "prettier": "^1.15.2",
+    "prettier": "1.15.2",
     "raf": "^3.4.1",
     "raw-loader": "^0.5.1",
     "react-test-renderer": "^16.6.3",
@@ -165,9 +167,7 @@
       "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/test/mocks/fileMock.js",
       "\\.(css|less)$": "<rootDir>/test/mocks/styleMock.js"
     },
-    "setupFiles": [
-      "<rootDir>/test/setup.js"
-    ]
+    "setupFiles": ["<rootDir>/test/setup.js"]
   },
   "config": {
     "commitizen": {
@@ -186,8 +186,5 @@
       "webpack"
     ]
   },
-  "cacheDirectories": [
-    ".cache",
-    "node_modules"
-  ]
+  "cacheDirectories": [".cache", "node_modules"]
 }
