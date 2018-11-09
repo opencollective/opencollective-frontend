@@ -7,7 +7,7 @@ import gql from 'graphql-tag';
 import Avatar from './Avatar';
 import Link from './Link';
 import SmallButton from './SmallButton';
-import { get, pick } from 'lodash';
+import { pick } from 'lodash';
 import InputField from './InputField';
 
 class Comment extends React.Component {
@@ -68,21 +68,16 @@ class Comment extends React.Component {
   }
 
   async save() {
-    const comment = pick(this.state.comment, ['id', 'markdown', 'html']);
+    const comment = pick(this.state.comment, ['id', 'html']);
     await this.props.editComment(comment);
     this.setState({ modified: false, mode: 'details' });
   }
 
   render() {
-    const { intl, collective, LoggedInUser, editable } = this.props;
+    const { intl, LoggedInUser, editable } = this.props;
 
     const { comment } = this.state;
     if (!comment) return <div />;
-    const editor =
-      get(LoggedInUser, 'collective.settings.editor') === 'markdown' ||
-      get(collective, 'settings.editor') === 'markdown'
-        ? 'markdown'
-        : 'html';
 
     return (
       <div className={`comment ${this.state.mode}View`}>
@@ -209,9 +204,10 @@ class Comment extends React.Component {
               )}
               {this.state.mode === 'edit' && (
                 <InputField
-                  type={editor}
-                  defaultValue={comment[editor]}
-                  onChange={value => this.handleChange(editor, value)}
+                  name={`comment-${comment.id}`}
+                  type="html"
+                  defaultValue={comment.html}
+                  onChange={value => this.handleChange('html', value)}
                 />
               )}
             </div>
