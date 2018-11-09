@@ -231,7 +231,7 @@ describe('LibSubscription', () => {
       // template
       const order = {
         Subscription: { chargeRetryCount: 0 },
-        collective: { getRelatedCollectives: () => null },
+        collective: { getRelatedCollectives: () => Promise.resolve(null) },
         fromCollective: {},
         createdByUser: { email: 'test@oc.com', generateLoginLink: () => '/' },
       };
@@ -368,7 +368,7 @@ describe('LibSubscription', () => {
 
         // And that the payments library will return a transaction (to
         // be included in the email)
-        paymentsStub.returns({ info: 'Transaction' });
+        paymentsStub.resolves({ info: 'Transaction' });
 
         // When the order is processed
         const entry = await processOrderWithSubscription(
@@ -409,7 +409,7 @@ describe('LibSubscription', () => {
 
         // And that the payments library will return a transaction (to
         // be included in the email)
-        paymentsStub.returns({ info: 'Transaction' });
+        paymentsStub.resolves({ info: 'Transaction' });
 
         // When the order is processed
         const entry = await processOrderWithSubscription(
@@ -449,7 +449,7 @@ describe('LibSubscription', () => {
           .withArgs('payment.failed');
 
         // And that the payments library will throw an error
-        paymentsStub.throws('TypeError -- Whatever');
+        paymentsStub.rejects('TypeError -- Whatever');
 
         // When the order is processed
         const entry = await processOrderWithSubscription(
@@ -459,8 +459,7 @@ describe('LibSubscription', () => {
 
         // Expect the mock expectations to be verified. The right
         // email was sent.
-        // TODO: TEMPORARILY DISABLED.
-        // emailMock.verify();
+        emailMock.verify();
 
         // Expect the processOrder function was called
         expect(paymentsStub.called).to.be.true;
@@ -487,6 +486,8 @@ describe('LibSubscription', () => {
           '2018-04-17',
         );
 
+        paymentsStub.resolves({});
+
         // When the order is processed
         const entry = await processOrderWithSubscription(
           { dryRun: false },
@@ -511,7 +512,7 @@ describe('LibSubscription', () => {
         );
 
         // And that the payments library will throw an error
-        paymentsStub.throws('TypeError -- Whatever');
+        paymentsStub.rejects('TypeError -- Whatever');
 
         // When the order is processed
         const entry = await processOrderWithSubscription(
