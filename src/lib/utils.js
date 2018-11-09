@@ -69,7 +69,7 @@ export function getCurrencySymbol(currency) {
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
   });
-  return r.replace(/0$/, '');
+  return r.replace(/(^0\s)|(\s0$)/, '');
 }
 
 /** Retrieve variables set in the environment */
