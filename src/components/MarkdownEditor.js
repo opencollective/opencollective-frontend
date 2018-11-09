@@ -80,6 +80,10 @@ class MarkdownEditor extends React.Component {
             .public-DraftEditor-content {
               height: 100%;
             }
+            .react-mde .grip svg {
+              display: block;
+              margin: 0 auto;
+            }
           `}
         </style>
         <ReactMde
