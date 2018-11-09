@@ -146,9 +146,38 @@ export const StatsMemberType = new GraphQLObjectType({
           return member.id;
         },
       },
+      directDonations: {
+        type: GraphQLInt,
+        description: 'total amount donated directly by this member',
+        resolve(member, args, req) {
+          return (
+            member.directDonations ||
+            req.loaders.transactions.directDonationsFromTo.load({
+              FromCollectiveId: member.MemberCollectiveId,
+              CollectiveId: member.CollectiveId,
+            })
+          );
+        },
+      },
+      donationsThroughEmittedVirtualCards: {
+        type: GraphQLInt,
+        description: 'total amount donated by this member through gift cards',
+        resolve(member, args, req) {
+          return (
+            member.donationsThroughEmittedVirtualCards ||
+            req.loaders.transactions.donationsThroughEmittedVirtualCardsFromTo.load(
+              {
+                FromCollectiveId: member.MemberCollectiveId,
+                CollectiveId: member.CollectiveId,
+              },
+            )
+          );
+        },
+      },
       totalDonations: {
         type: GraphQLInt,
-        description: 'total amount donated by this member',
+        description:
+          'total amount donated by this member either directly or using a virtual card it has emitted',
         resolve(member, args, req) {
           return (
             member.totalDonations ||
