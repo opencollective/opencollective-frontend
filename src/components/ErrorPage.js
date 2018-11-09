@@ -25,7 +25,7 @@ class ErrorPage extends React.Component {
       loading: { id: 'page.loading', defaultMessage: 'Loading' },
       'loading.description': {
         id: 'pleasewait',
-        defaultMessage: 'please wait...',
+        defaultMessage: 'Please wait...',
       },
       'collective.is.not.host': {
         id: 'page.error.collective.is.not.host',

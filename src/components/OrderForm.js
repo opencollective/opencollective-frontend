@@ -165,7 +165,7 @@ class OrderForm extends React.Component {
       },
       'ocCard.loading': {
         id: 'pleasewait',
-        defaultMessage: 'please wait...',
+        defaultMessage: 'Please wait...',
       },
       'ocCard.amountremaining': {
         id: 'occard.amountremaining',
@@ -1466,7 +1466,7 @@ class OrderForm extends React.Component {
                               <div className="pleasewait">
                                 <FormattedMessage
                                   id="pleasewait"
-                                  defaultMessage="please wait..."
+                                  defaultMessage="Please wait..."
                                 />
                                 ...
                               </div>
