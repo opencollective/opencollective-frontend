@@ -106,7 +106,7 @@ export async function createExpense(remoteUser, expenseData) {
   }
 
   // Update remoteUser's paypal email if it has changed
-  if (get(expense, 'user.paypalEmail') !== remoteUser.paypalEmail) {
+  if (get(expenseData, 'user.paypalEmail') !== remoteUser.paypalEmail) {
     remoteUser.paypalEmail = get(expenseData, 'user.paypalEmail');
     remoteUser.save();
   }
