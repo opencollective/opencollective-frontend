@@ -17,6 +17,14 @@ import { extend, defaults, intersection } from 'lodash';
 
 import debugLib from 'debug';
 import { isValidEmail } from '../lib/utils';
+import LRU from 'lru-cache';
+
+// Create Cache Object to limit creation of Anonymous userCollectives /hour
+const anonymousLimitCache = LRU({
+  max: 1000,
+  maxAge: 1000 * 60 * 60, // we keep it max 1 hour
+});
+
 const debug = debugLib('user');
 
 /**
@@ -582,11 +590,39 @@ export default (Sequelize, DataTypes) => {
     });
   };
 
+  function checkAnonymousUser(userData) {
+    const count = anonymousLimitCache.get('anonymous');
+    if (count > 4) {
+      debug('anonymous check: MAX of Anonoymous userCollectives reached now');
+      throw new Error('Error while processing your request, please try again or contact support@opencollective.com');
+    }
+    let name = userData.firstName;
+    if (name && userData.lastName) {
+      name += ` ${userData.lastName}`;
+    }
+    const collectiveName = userData.name || name;
+    if (!collectiveName || collectiveName.trim().length === 0 || slugify(collectiveName).length === 0) {
+      if (count > 0) {
+        anonymousLimitCache.set('anonymous', count+1);
+      } else {
+        anonymousLimitCache.set('anonymous', 1);
+      }
+      debug(`anonymous check: Anonoymous userCollective is being created, increase anonymous cache to ${count+1}`);
+    } else {
+      debug(`anonymous check: A NON-anonymous user is being created, cache limit: ${count+1}`);
+    }
+    
+  }
+
   User.createUserWithCollective = userData => {
     if (!userData)
       return Promise.reject(
         new Error('Cannot create a user: no user data provided'),
       );
+    // checking if an anonymous user is being created in Non-test environments
+    if (process.env.NODE_ENV !== 'test' && process.env.NODE_ENV !== 'circleci') {
+      checkAnonymousUser(userData);
+    }
 
     let user;
     debug('createUserWithCollective', userData);
