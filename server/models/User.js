@@ -593,7 +593,8 @@ export default (Sequelize, DataTypes) => {
   function checkAnonymousUser(userData) {
     const count = anonymousLimitCache.get('anonymous');
     if (count > 4) {
-      debug('anonymous check: MAX of Anonoymous userCollectives reached now');
+      debug('anonymous check: MAX of Anonoymous userCollectives reached now',
+        anonymousLimitCache);
       throw new Error('Error while processing your request, please try again or contact support@opencollective.com');
     }
     let name = userData.firstName;
@@ -607,9 +608,11 @@ export default (Sequelize, DataTypes) => {
       } else {
         anonymousLimitCache.set('anonymous', 1);
       }
-      debug(`anonymous check: Anonoymous userCollective is being created, increase anonymous cache to ${count+1}`);
+      debug(`anonymous check: Anonoymous is being created, increase anonymous cache to ${count+1}`,
+        anonymousLimitCache);
     } else {
-      debug(`anonymous check: A NON-anonymous user is being created, cache limit: ${count+1}`);
+      debug(`anonymous check: A NON-anonymous user is being created, cache limit: ${count+1}`,
+        anonymousLimitCache);
     }
     
   }
