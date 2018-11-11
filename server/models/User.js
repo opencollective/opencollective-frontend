@@ -608,8 +608,8 @@ export default (Sequelize, DataTypes) => {
       } else {
         anonymousLimitCache.set('anonymous', 1);
       }
-      debug(`anonymous check: Anonoymous is being created, increase anonymous cache to ${count+1}`,
-        anonymousLimitCache);
+      debug(`anonymous check: Anonoymous is being created,
+        increase anonymous cache to ${count+1 || 1}`, anonymousLimitCache);
     } else {
       debug(`anonymous check: A NON-anonymous user is being created, cache limit: ${count+1}`,
         anonymousLimitCache);
