@@ -255,7 +255,7 @@ class Tier extends React.Component {
               color: var(--charcoal-grey-three);
             }
             .customAmount {
-              width: 12rem;
+              width: 13rem;
             }
             .customAmount .error {
               font-size: 11px;
@@ -326,7 +326,7 @@ class Tier extends React.Component {
               margin: 0.5rem 0;
             }
             .tier :global(.inputAmount) {
-              width: 12rem;
+              width: 13rem;
               margin: 0.2rem 0;
             }
             .tier :global(input[name='amount']) {
