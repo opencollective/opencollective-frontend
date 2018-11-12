@@ -9,19 +9,26 @@ import passport from 'passport';
 import connectSessionSequelize from 'connect-session-sequelize';
 import session from 'express-session';
 import helmet from 'helmet';
+import debug from 'debug';
+import cloudflareIps from 'cloudflare-ip/ips.json';
 import { Strategy as GitHubStrategy } from 'passport-github';
 import { Strategy as TwitterStrategy } from 'passport-twitter';
 import { Strategy as MeetupStrategy } from 'passport-meetup-oauth2';
+
+import forest from './forest';
+import lruCache from '../middleware/lru_cache';
 import { sequelize as db } from '../models';
 import { middleware } from '../graphql/loaders';
-import debug from 'debug';
-import lruCache from '../middleware/lru_cache';
 import { sanitizeForLogs } from '../lib/utils';
-import forest from './forest';
 
 const SequelizeStore = connectSessionSequelize(session.Store);
 
 export default function(app) {
+  app.set(
+    'trust proxy',
+    ['loopback', 'linklocal', 'uniquelocal'].concat(cloudflareIps),
+  );
+
   app.use(helmet());
 
   // Loaders are attached to the request to batch DB queries per request
