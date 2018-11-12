@@ -4,6 +4,10 @@ import uuidv1 from 'uuid/v1';
 import errors from '../lib/errors';
 import knox from '../gateways/knox';
 
+// Use a 2 minutes timeout for image upload requests as the default 25 seconds
+// often leads to failing requests.
+const IMAGE_UPLOAD_TIMEOUT = 2 * 60 * 1000;
+
 export default function uploadImage(req, res, next) {
   const { file } = req.files;
 
@@ -53,6 +57,8 @@ export default function uploadImage(req, res, next) {
     'Content-Type': file.mimetype,
     'x-amz-acl': 'public-read',
   });
+
+  req.setTimeout(IMAGE_UPLOAD_TIMEOUT);
 
   fs.createReadStream(file.path).pipe(put);
 
