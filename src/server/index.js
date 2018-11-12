@@ -4,14 +4,23 @@ import path from 'path';
 import http from 'http';
 import express from 'express';
 import next from 'next';
+import accepts from 'accepts';
+import cloudflareIps from 'cloudflare-ip/ips.json';
+
 import routes from './routes';
 import { loggerMiddleware, logger } from './logger';
-import accepts from 'accepts';
 import { getLocaleDataScript, getMessages, languages } from './intl';
+
+const server = express();
+
+server.set(
+  'trust proxy',
+  ['loopback', 'linklocal', 'uniquelocal'].concat(cloudflareIps),
+);
 
 const env = process.env.NODE_ENV || 'development';
 const dev = env === 'development' || env === 'docker';
-const server = express();
+
 const app = next({ dev, dir: path.dirname(__dirname) });
 server.next = app;
 

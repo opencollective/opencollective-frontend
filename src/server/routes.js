@@ -24,11 +24,22 @@ export default (server, app) => {
     );
   });
 
+  // NOTE: in production and staging environment, this is currently not used
+  // we use Cloudflare workers to route the request directly to the API
   server.all('/api/*', (req, res) => {
     const apiUrl = translateApiUrl(req.url);
     logger.debug('>>> API request %s', apiUrl);
     req
-      .pipe(request(apiUrl, { followRedirect: false }))
+      .pipe(
+        request(apiUrl, {
+          followRedirect: false,
+          headers: {
+            'oc-frontend-api-proxy': '1',
+            'oc-frontend-ip': req.ip,
+            'X-Forwarded-For': req.ip,
+          },
+        }),
+      )
       .on('error', e => {
         logger.error('>>> Error calling API %s', apiUrl, e);
         res.status(500).send(e);
