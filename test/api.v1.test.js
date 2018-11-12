@@ -53,7 +53,7 @@ describe('api.v1.test.js', () => {
   });
 
   before('create multiple transactions for collective', () => {
-    models.Transaction.createMany(transactionsData, {
+    return models.Transaction.createMany(transactionsData, {
       CollectiveId: collective.id,
       ...defaultAttributes,
     }).then(transactions => {

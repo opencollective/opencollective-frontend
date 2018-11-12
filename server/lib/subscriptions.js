@@ -145,10 +145,10 @@ export async function handleRetryStatus(order, transaction) {
       await sendThankYouEmail(order, transaction);
       break;
     case MAX_RETRIES:
-      cancelSubscriptionAndNotifyUser(order);
+      await cancelSubscriptionAndNotifyUser(order);
       break;
     default:
-      sendFailedEmail(order, false);
+      await sendFailedEmail(order, false);
       break;
   }
 }
@@ -261,13 +261,13 @@ export function groupProcessedOrders(orders) {
 /** Call cancelation function and then send confirmation email */
 export async function cancelSubscriptionAndNotifyUser(order) {
   cancelSubscription(order);
-  await sendFailedEmail(order, true);
+  return sendFailedEmail(order, true);
 }
 
 /** Send `payment.failed` email */
 export async function sendFailedEmail(order, lastAttempt) {
   const user = order.createdByUser;
-  await emailLib.send(
+  return emailLib.send(
     'payment.failed',
     user.email,
     {
@@ -295,7 +295,7 @@ export async function sendThankYouEmail(order, transaction) {
     3,
   );
   const user = order.createdByUser;
-  await emailLib.send(
+  return emailLib.send(
     'thankyou',
     user.email,
     {

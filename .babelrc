@@ -1,7 +1,21 @@
 {
-  "presets": ["es2015", "stage-0"],
+  "presets": [
+    [
+      "@babel/preset-env",
+      {
+        "targets": {
+          "node": true
+        }
+      }
+    ]
+  ],
   "plugins": [
     "add-module-exports",
-    "lodash"
+    "lodash",
+    "@babel/plugin-proposal-class-properties",
+    ["@babel/plugin-transform-async-to-generator", {
+      "module": "bluebird",
+      "method": "coroutine"
+    }]
   ]
 }

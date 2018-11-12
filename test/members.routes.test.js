@@ -160,12 +160,15 @@ describe('members.routes.test.js', () => {
         .end((e, res) => {
           expect(e).to.not.exist;
           expect(res.body).to.have.property('success', true);
-          users[1].getMemberships().then(memberships => {
-            expect(memberships[0].CollectiveId).to.equal(collective.id);
-            expect(memberships[0].role).to.equal(roles.ADMIN);
-            expect(memberships[1].role).to.equal(roles.BACKER);
-            done();
-          });
+          users[1]
+            .getMemberships()
+            .then(memberships => {
+              expect(memberships[0].CollectiveId).to.equal(collective.id);
+              expect(memberships[0].role).to.equal(roles.ADMIN);
+              expect(memberships[1].role).to.equal(roles.BACKER);
+              done();
+            })
+            .catch(done);
         });
     });
 

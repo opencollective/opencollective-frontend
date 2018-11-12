@@ -33,14 +33,14 @@ describe('discover', () => {
     transactionsData[8].CollectiveId = collective1.id;
     transactionsData[8].PaymentMethodId = paymentMethod1.id;
     models.Transaction.createDoubleEntry(transactionsData[8])
-      .tap(() => done())
+      .then(() => done())
       .catch(done);
   });
   beforeEach(done => {
     transactionsData[8].CollectiveId = collective2.id;
     transactionsData[8].PaymentMethodId = paymentMethod1.id;
     models.Transaction.createDoubleEntry(transactionsData[8])
-      .tap(() => done())
+      .then(() => done())
       .catch(done);
   });
 

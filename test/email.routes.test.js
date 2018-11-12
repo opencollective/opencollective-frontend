@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import app from '../server/index';
-import request from 'supertest-as-promised';
+import request from 'supertest';
 import Promise from 'bluebird';
 import sinon from 'sinon';
 import models from '../server/models';
@@ -285,9 +285,9 @@ describe('email.routes.test', () => {
         });
     });
 
-    it('approves an email sent to eventSlug@parentCollectiveSlug.opencollective.com', done => {
+    it('approves an email sent to eventSlug@parentCollectiveSlug.opencollective.com', () => {
       spy = sandbox.spy(emailLib, 'send');
-      request(app)
+      return request(app)
         .get(
           `/services/email/approve?messageId=abJwIjpmYWxzZSwiayI6Ijc3NjFlZTBjLTc1NGQtNGIwZi05ZDlkLWU1NTgxODJkMTlkOSIsInMiOiI2NDhjZDg1ZTE1IiwiYyI6InNhb3JkIn0=&approver=${encodeURIComponent(
             usersData[1].email,
@@ -300,7 +300,6 @@ describe('email.routes.test', () => {
           expect(
             [users[0].email, users[1].email].indexOf(spy.args[1][3].bcc) !== -1,
           ).to.be.true;
-          done();
         });
     });
   });
