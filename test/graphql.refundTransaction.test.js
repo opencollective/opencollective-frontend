@@ -101,13 +101,14 @@ async function setupTestObjects() {
 }
 
 function initStripeNock({ amount, fee, fee_details, net }) {
+  const refund = {
+    id: 're_1Bvu79LzdXg9xKNSFNBqv7Jn',
+    amount: 5000,
+    balance_transaction: 'txn_1Bvu79LzdXg9xKNSWEVCLSUu',
+  };
   nock('https://api.stripe.com:443')
     .post('/v1/refunds')
-    .reply(200, {
-      id: 're_1Bvu79LzdXg9xKNSFNBqv7Jn',
-      amount: 5000,
-      balance_transaction: 'txn_1Bvu79LzdXg9xKNSWEVCLSUu',
-    });
+    .reply(200, refund);
   nock('https://api.stripe.com:443')
     .get('/v1/balance/history/txn_1Bvu79LzdXg9xKNSWEVCLSUu')
     .reply(200, {
@@ -116,6 +117,20 @@ function initStripeNock({ amount, fee, fee_details, net }) {
       fee,
       fee_details,
       net,
+    });
+  nock('https://api.stripe.com:443')
+    .get('/v1/charges/ch_1Bs9ECBYycQg1OMfGIYoPFvk')
+    .reply(200, {
+      id: 'ch_1Bs9ECBYycQg1OMfGIYoPFvk',
+      amount,
+      fee,
+      fee_details,
+      refunds: {
+        object: 'list',
+        data: [
+          refund,
+        ],
+      },
     });
 }
 

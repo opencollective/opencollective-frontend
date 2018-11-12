@@ -196,17 +196,24 @@ export default {
       hostStripeAccount,
       chargeId,
     );
-    const balance = await stripeGateway.retrieveBalanceTransaction(
+    const charge = await stripeGateway.retrieveCharge(
+      hostStripeAccount,
+      chargeId,
+    );
+    const refundBalance = await stripeGateway.retrieveBalanceTransaction(
       hostStripeAccount,
       refund.balance_transaction,
     );
-    const fees = stripeGateway.extractFees(balance);
+    const fees = stripeGateway.extractFees(refundBalance);
 
     /* Create negative transactions for the received transaction */
     const refundTransaction = await paymentsLib.createRefundTransaction(
       transaction,
       fees.stripeFee,
-      { refund, balance },
+      {
+        refund,
+        balanceTransaction: refundBalance,
+      },
       user,
     );
 
@@ -214,6 +221,58 @@ export default {
     return paymentsLib.associateTransactionRefundId(
       transaction,
       refundTransaction,
+      {
+        ...transaction.data,
+        charge,
+      }
+    );
+  },
+
+  /** Refund a given transaction that was already refunded
+   * in stripe but not in our database
+   */
+  refundTransactionOnlyInDatabase: async (transaction, user) => {
+    /* What's going to be refunded */
+    const chargeId = _.result(transaction.data, 'charge.id');
+
+    /* From which stripe account it's going to be refunded */
+    const collective = await models.Collective.findById(
+      transaction.type === 'CREDIT'
+        ? transaction.CollectiveId
+        : transaction.FromCollectiveId,
+    );
+    const hostStripeAccount = await collective.getHostStripeAccount();
+
+    /* Refund both charge & application fee */
+    const { charge, refund } = await stripeGateway.retrieveChargeWithRefund(hostStripeAccount, chargeId);
+    if (!refund) {
+      throw new Error('No refunds found in stripe.');
+    }
+    const refundBalance = await stripeGateway.retrieveBalanceTransaction(
+      hostStripeAccount,
+      refund.balance_transaction,
+    );
+    const fees = stripeGateway.extractFees(refundBalance);
+
+    /* Create negative transactions for the received transaction */
+    const refundTransaction = await paymentsLib.createRefundTransaction(
+      transaction,
+      fees.stripeFee,
+      {
+        refund,
+        balanceTransaction: refundBalance,
+      },
+      user,
+    );
+
+    /* Associate RefundTransactionId to all the transactions created */
+    return paymentsLib.associateTransactionRefundId(
+      transaction,
+      refundTransaction,
+      {
+        ...transaction.data,
+        charge,
+      },
     );
   },
 

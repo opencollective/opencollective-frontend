@@ -2,7 +2,7 @@
  * All calls to stripe are meant to go through this gateway
  */
 
-import { includes } from 'lodash';
+import { includes, get } from 'lodash';
 import Stripe from 'stripe';
 import config from 'config';
 import debugLib from 'debug';
@@ -206,6 +206,21 @@ export const retrieveBalanceTransaction = (stripeAccount, txn) => {
   return appStripe.balance.retrieveTransaction(txn, {
     stripe_account: stripeAccount.username,
   });
+};
+
+/**
+ * Given a charge id, retrieves its correspind charge and refund data.
+ */
+export const retrieveChargeWithRefund = async (stripeAccount, chargeId) => {
+  const charge = await retrieveCharge(stripeAccount, chargeId);
+  if (!charge) {
+   throw Error(`charge id ${chargeId} not found`);
+  }
+  const refundId = get(charge, 'refunds.data[0].id');
+  const refund = await appStripe.refunds.retrieve(refundId, {
+    stripe_account: stripeAccount.username,
+  });
+  return { charge, refund };
 };
 
 /**
