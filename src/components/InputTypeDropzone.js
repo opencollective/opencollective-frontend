@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Dropzone from 'react-dropzone';
+import { get } from 'lodash';
 import { imagePreview } from '../lib/utils';
 import { upload } from '../lib/api';
 import withIntl from '../lib/withIntl';
@@ -59,13 +60,19 @@ class InputTypeDropzone extends React.Component {
     const file = files[0];
     upload(file)
       .then(fileUrl => {
-        this.setState({ value: fileUrl, url: fileUrl, loading: false });
+        this.setState({
+          value: fileUrl,
+          url: fileUrl,
+          loading: false,
+          error: null,
+        });
         return this.props.onChange(fileUrl);
       })
       .catch(err => {
         console.error('>>> error uploading image', file, err);
+        const message = get(err, ['json', 'error', 'fields', 'file']);
         this.setState({
-          error: 'error uploading image, please try again',
+          error: message || 'error uploading image, please try again',
           loading: false,
         });
       });
