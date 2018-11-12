@@ -23,6 +23,7 @@
     "bootstrap": "3.3.7",
     "classnames": "2.2.6",
     "clean-tag": "2.0.2",
+    "cloudflare-ip": "0.0.7",
     "cross-fetch": "2.2.3",
     "dotenv": "6.1.0",
     "draft-js": "0.10.5",
