@@ -55,7 +55,13 @@ const Avatar = ({ src, type = 'USER', radius, name, ...styleProps }) => {
 Avatar.propTypes = {
   name: PropTypes.string,
   src: PropTypes.string,
-  type: PropTypes.oneOf(['USER', 'COLLECTIVE', 'ORGANIZATION', 'CHAPTER']),
+  type: PropTypes.oneOf([
+    'USER',
+    'COLLECTIVE',
+    'ORGANIZATION',
+    'CHAPTER',
+    'ANONYMOUS',
+  ]),
 };
 
 export default withFallbackImage(Avatar);
