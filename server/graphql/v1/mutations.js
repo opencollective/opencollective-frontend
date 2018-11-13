@@ -223,7 +223,7 @@ const mutations = {
       },
     },
     resolve(_, args, req) {
-      return createOrder(args.order, req.loaders, req.remoteUser);
+      return createOrder(args.order, req.loaders, req.remoteUser, req.ip);
     },
   },
   updateOrder: {

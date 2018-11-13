@@ -19,51 +19,58 @@ import {
 } from '../../../lib/subscriptions';
 import LRU from 'lru-cache';
 
-// Create Orders Cache Object to limit FromCollective orders to up to 10 orders/hour
-const ordersLimitCache = LRU({
+// Create Orders Store Object to limit FromCollective orders to up to 10 orders/hour
+const ordersLimitStore = LRU({
   max: 1000,
   maxAge: 1000 * 60 * 60, // we keep it max 1 hour
 });
 
 const debugOrder = debug('order');
 
-function checkOrdersLimit(order) {
-  const fromCollectiveIdOrUserEmailKey = get(order, 'fromCollective.id') || get(order, 'user.email');
-  const collectiveIdKey = get(order, 'collective.id');
-  // First of all, check if creation of orders has reached a limit but disabling behaviour
-  // temporarily for "test" or "circleci" ENVs(both test environments) as most tests create more than 2 orders per (fromcollective,collective) and it fails
-  if (process.env.NODE_ENV !== 'test' && process.env.NODE_ENV !== 'circleci' &&
-      fromCollectiveIdOrUserEmailKey && collectiveIdKey) {
-    const fromCollectiveValue = ordersLimitCache.get(fromCollectiveIdOrUserEmailKey);
-    // Check if FromCollective reached max limit of orders per hour
-    if (fromCollectiveValue) {
-      if (fromCollectiveValue > 10) {
-        debugOrder(`Orders Cache: ${fromCollectiveIdOrUserEmailKey} has reached the hourly limit of donations`);
-        throw new Error('Error while processing your request, please try again or contact support@opencollective.com');
-      }
-      ordersLimitCache.set(fromCollectiveIdOrUserEmailKey, fromCollectiveValue + 1);
-    } else {
-      ordersLimitCache.set(fromCollectiveIdOrUserEmailKey, 1);
+function checkOrdersLimit(order, remoteUser, reqIp) {
+  if (process.env.NODE_ENV === 'test' || process.env.NODE_ENV === 'circleci') {
+    return;
+  }
+
+  const collectiveId = get(order, 'collective.id');
+  const fromCollectiveId = get(order, 'fromCollective.id');
+  const userEmail = get(order, 'user.email');
+
+  const limits = [];
+
+  if (fromCollectiveId) {
+    // Limit on authenticated users
+    limits.push({ key: fromCollectiveId, value: 10 });
+    limits.push({ key: `${fromCollectiveId}_${collectiveId}`, value: 2 });
+  } else {
+    // Limit on first time users
+    if (userEmail) {
+      limits.push({ key: userEmail, value: 10 });
+      limits.push({ key: `${userEmail}_${collectiveId}`, value: 2 });
     }
-    const fromCollectiveAndCollectiveValue = ordersLimitCache.get(`${fromCollectiveIdOrUserEmailKey}_${collectiveIdKey}`);
-    // Check if pair (FromCollective, Collective) reached max limit of orders per hour
-    if (fromCollectiveAndCollectiveValue) {
-      if (fromCollectiveAndCollectiveValue > 2) {
-        debugOrder(`Orders Cache: fromCollective Id ${fromCollectiveIdOrUserEmailKey} has reached the hourly
-          limit of donations for collective id ${collectiveIdKey}`);
-        throw new Error('Error while processing your request, please try again or contact support@opencollective.com');
-      }
-      ordersLimitCache.set(`${fromCollectiveIdOrUserEmailKey}_${collectiveIdKey}`, fromCollectiveAndCollectiveValue + 1);
-    } else {
-      ordersLimitCache.set(`${fromCollectiveIdOrUserEmailKey}_${collectiveIdKey}`, 1);
+    // Limit on IPs
+    if (reqIp) {
+      limits.push({ key: reqIp, value: 2 });
     }
-    debugOrder('Orders limit cache', ordersLimitCache);
+  }
+
+  for (const limit of limits) {
+    const count = ordersLimitStore.get(limit.key) || 0;
+    debugOrder(`${count} orders for limit '${limit.key}'`);
+    const limitReached = count >= limit.value;
+    ordersLimitStore.set(limit.key, count + 1);
+    if (limitReached) {
+      debugOrder(`Order limit reached for limit '${limit.key}'`);
+      throw new Error(
+        'Error while processing your request, please try again or contact support@opencollective.com',
+      );
+    }
   }
 }
 
-export async function createOrder(order, loaders, remoteUser) {
+export async function createOrder(order, loaders, remoteUser, reqIp) {
   debugOrder('Beginning creation of order', order);
-  checkOrdersLimit(order);
+  checkOrdersLimit(order, remoteUser, reqIp);
   try {
     if (
       order.paymentMethod &&
@@ -306,7 +313,7 @@ export async function createOrder(order, loaders, remoteUser) {
       description: order.description || defaultDescription,
       publicMessage: order.publicMessage,
       privateMessage: order.privateMessage,
-      processedAt: (paymentRequired || !collective.isActive) ? null : new Date(),
+      processedAt: paymentRequired || !collective.isActive ? null : new Date(),
       MatchingPaymentMethodId: order.MatchingPaymentMethodId,
     };
 
