@@ -28,6 +28,7 @@ import {
 } from '../lib/utils';
 import { getPaypal } from '../lib/paypal';
 import { getStripeToken } from '../lib/stripe';
+import { getRecaptcha, getRecaptchaSiteKey } from '../lib/recaptcha';
 import { checkUserExistence, signin } from '../lib/api';
 import { getOcCardBalanceQuery } from '../graphql/queries';
 
@@ -74,6 +75,7 @@ class OrderForm extends React.Component {
       paypalOrderRequest: null,
       order: order || {},
       result: {},
+      recaptchaToken: null,
     };
 
     this.state.order.totalAmount =
@@ -305,6 +307,21 @@ class OrderForm extends React.Component {
   componentDidMount() {
     this._isMounted = true;
     this.UNSAFE_componentWillReceiveProps(this.props);
+
+    // Recaptcha
+    getRecaptcha()
+      .then(recaptcha => {
+        recaptcha.ready(() => {
+          recaptcha
+            .execute(getRecaptchaSiteKey(), { action: 'OrderForm' })
+            .then(recaptchaToken => {
+              this.setState({ recaptchaToken });
+            });
+        });
+      })
+      .catch(err => {
+        console.log('Recaptcha error', err);
+      });
   }
 
   UNSAFE_componentWillReceiveProps(props) {
@@ -664,7 +681,13 @@ class OrderForm extends React.Component {
   };
 
   prepareOrderRequest = () => {
-    const { paymentMethod, order, fromCollective, user } = this.state;
+    const {
+      paymentMethod,
+      order,
+      fromCollective,
+      user,
+      recaptchaToken,
+    } = this.state;
     const { currency } = order.tier || this.props.collective;
     const quantity = get(order, 'tier.quantity') || order.quantity || 1;
     const orderRequest = {
@@ -673,6 +696,7 @@ class OrderForm extends React.Component {
       currency,
       paymentMethod,
       fromCollective,
+      recaptchaToken,
       collective: { id: this.props.collective.id },
       publicMessage: order.publicMessage,
       interval: order.interval || order.tier.interval,
