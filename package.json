@@ -61,6 +61,7 @@
     "limax": "^1.7.0",
     "lodash": "4.17.11",
     "lru-cache": "4.1.1",
+    "mem": "^4.0.0",
     "merge-options": "^1.0.1",
     "mime": "2.2.2",
     "moment": "2.19.3",

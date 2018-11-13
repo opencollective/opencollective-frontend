@@ -2,8 +2,8 @@ import models, { sequelize, Op } from '../models';
 import currencies from '../constants/currencies';
 import Promise from 'bluebird';
 import config from 'config';
-import { memoize, pick } from 'lodash';
-memoize.Cache = Map;
+import { pick } from 'lodash';
+import mem from 'mem';
 
 /*
 * Hacky way to do currency conversion
@@ -562,9 +562,8 @@ const getCollectivesOrderedByMonthlySpendingQuery = async ({
 
   return { total, collectives };
 };
-const getCollectivesOrderedByMonthlySpending = memoize(
+const getCollectivesOrderedByMonthlySpending = mem(
   getCollectivesOrderedByMonthlySpendingQuery,
-  JSON.stringify,
 );
 
 const getMembersOfCollectiveWithRole = CollectiveIds => {
@@ -901,10 +900,7 @@ const getCollectivesWithMinBackersQuery = async ({
 
   return { total, collectives };
 };
-const getCollectivesWithMinBackers = memoize(
-  getCollectivesWithMinBackersQuery,
-  JSON.stringify,
-);
+const getCollectivesWithMinBackers = mem(getCollectivesWithMinBackersQuery);
 
 const queries = {
   getPublicHostsByTotalCollectives,
