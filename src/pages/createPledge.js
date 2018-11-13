@@ -174,8 +174,11 @@ class CreatePledgePage extends React.Component {
       },
       totalAmount: Number(totalAmount.value) * 100,
       publicMessage: publicMessage.value,
-      interval: interval.value,
     };
+
+    if (interval.value !== 'none') {
+      order.interval = interval.value;
+    }
 
     if (data) {
       order.collective.id = data.Collective.id;
@@ -374,11 +377,15 @@ class CreatePledgePage extends React.Component {
                           name="fromCollective"
                           defaultValue={LoggedInUser.CollectiveId}
                         >
-                          {profiles.map(({ collective }) => (
-                            <option key={collective.name} value={collective.id}>
-                              {collective.name}
-                            </option>
-                          ))}
+                          <option key="monthly" value="month">
+                            Monthly
+                          </option>
+                          <option key="yearly" value="year">
+                            Yearly
+                          </option>
+                          <option key="none" value="none">
+                            One-Time
+                          </option>
                         </select>
                       </Flex>
                     )}
