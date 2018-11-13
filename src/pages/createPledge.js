@@ -291,91 +291,138 @@ class CreatePledgePage extends React.Component {
 
               {!loadingUserLogin &&
                 !LoggedInUser && (
-                  <P mt={[5, null, 4]} color="black.700" fontSize="LeadParagraph" lineHeight="LeadParagraph">
-                    <Link route="signin" params={{ next: slug ? `/${slug}/pledges/new` : '/pledges/new' }}><a>Sign up or login</a></Link> to create a pledge.
+                  <P
+                    mt={[5, null, 4]}
+                    color="black.700"
+                    fontSize="LeadParagraph"
+                    lineHeight="LeadParagraph"
+                  >
+                    <Link
+                      route="signin"
+                      params={{
+                        next: slug ? `/${slug}/pledges/new` : '/pledges/new',
+                      }}
+                    >
+                      <a>Sign up or login</a>
+                    </Link>{' '}
+                    to create a pledge.
                   </P>
-              )}
+                )}
 
               {!loadingUserLogin &&
                 LoggedInUser && (
-                <form onSubmit={this.createOrder.bind(this)}>
-                  {!slug && (
-                    <Box mb={3}>
-                      <H5 textAlign="left" mb={4}>
-                        Details of the new collective:
-                      </H5>
+                  <form onSubmit={this.createOrder.bind(this)}>
+                    {!slug && (
+                      <Box mb={3}>
+                        <H5 textAlign="left" mb={4}>
+                          Details of the new collective:
+                        </H5>
 
-                      <Container position="relative">
-                        <Container position="absolute" left={-45} top={0}>
-                          <img
-                            src="/static/icons/first-pledge-badge.svg"
-                            alt="first pledge"
-                          />
+                        <Container position="relative">
+                          <Container position="absolute" left={-45} top={0}>
+                            <img
+                              src="/static/icons/first-pledge-badge.svg"
+                              alt="first pledge"
+                            />
+                          </Container>
+
+                          <P fontWeight="bold">You are the first pledger!</P>
                         </Container>
 
-                        <P fontWeight="bold">You are the first pledger!</P>
-                      </Container>
+                        <P color="black.500" fontSize="Caption" mt={2}>
+                          You’ve earned the priviledge to name and describe this
+                          awesome cause. We’ll create a pledged collective page
+                          for it so other people can find it and pledge to it
+                          too.
+                        </P>
 
-                      <P color="black.500" fontSize="Caption" mt={2}>
-                        You’ve earned the priviledge to name and describe this
-                        awesome cause. We’ll create a pledged collective page for
-                        it so other people can find it and pledge to it too.
-                      </P>
+                        <Flex
+                          flexDirection={['column', null, 'row']}
+                          alignItems={['flex-start', null, 'flex-end']}
+                          mt={3}
+                          flexWrap="wrap"
+                        >
+                          <Flex flexDirection="column" mb={3} pr={[0, null, 3]}>
+                            <P {...labelStyles} htmlFor="name">
+                              Name
+                            </P>
+                            <TextInput
+                              name="name"
+                              id="name"
+                              defaultValue={name}
+                            />
+                          </Flex>
 
-                      <Flex
-                        flexDirection={['column', null, 'row']}
-                        alignItems={['flex-start', null, 'flex-end']}
-                        mt={3}
-                        flexWrap="wrap"
-                      >
-                        <Flex flexDirection="column" mb={3} pr={[0, null, 3]}>
-                          <P {...labelStyles} htmlFor="name">
-                            Name
-                          </P>
-                          <TextInput name="name" id="name" defaultValue={name} />
+                          <Flex flexDirection="column" mb={3}>
+                            <P {...labelStyles} htmlFor="slug">
+                              Collective URL
+                            </P>
+                            <StyledInputGroup
+                              prepend="https://opencollective.com/"
+                              id="slug"
+                              name="slug"
+                              defaultValue={slugify(name)}
+                            />
+                          </Flex>
                         </Flex>
 
                         <Flex flexDirection="column" mb={3}>
-                          <P {...labelStyles} htmlFor="slug">
-                            Collective URL
+                          <P {...labelStyles} htmlFor="website">
+                            GitHub URL - More collective types soon!
                           </P>
                           <StyledInputGroup
-                            prepend="https://opencollective.com/"
-                            id="slug"
-                            name="slug"
-                            defaultValue={slugify(name)}
+                            prepend="https://"
+                            id="website"
+                            name="website"
+                            placeholder="i.e. github.com/babel/babel"
                           />
                         </Flex>
-                      </Flex>
+                      </Box>
+                    )}
 
-                      <Flex flexDirection="column" mb={3}>
-                        <P {...labelStyles} htmlFor="website">
-                          GitHub URL - More collective types soon!
-                        </P>
-                        <StyledInputGroup
-                          prepend="https://"
-                          id="website"
-                          name="website"
-                          placeholder="i.e. github.com/babel/babel"
-                        />
-                      </Flex>
+                    <Box my={5}>
+                      <H5 textAlign="left" mb={3}>
+                        Pledge as:
+                      </H5>
+
+                      {LoggedInUser && (
+                        <Flex flexDirection="column" my={3}>
+                          <P {...labelStyles} htmlFor="fromCollective">
+                            Choose a profile
+                          </P>
+                          <select
+                            id="fromCollective"
+                            name="fromCollective"
+                            defaultValue={LoggedInUser.CollectiveId}
+                          >
+                            {profiles.map(({ collective }) => (
+                              <option
+                                key={collective.slug + collective.id}
+                                value={collective.id}
+                              >
+                                {collective.name}
+                              </option>
+                            ))}
+                          </select>
+                        </Flex>
+                      )}
                     </Box>
-                  )}
 
-                  <Box my={5}>
-                    <H5 textAlign="left" mb={3}>
-                      Pledge as:
-                    </H5>
+                    <Box mb={5}>
+                      <H5 textAlign="left" mb={3}>
+                        Pledge details:
+                      </H5>
 
-                    {LoggedInUser && (
-                      <Flex flexDirection="column" my={3}>
-                        <P {...labelStyles} htmlFor="fromCollective">
-                          Choose a profile
+                      <AmountField LoggedInUser={LoggedInUser} />
+
+                      <Flex flexDirection="column" mb={3} width={200}>
+                        <P {...labelStyles} htmlFor="interval">
+                          Frequency
                         </P>
                         <select
-                          id="fromCollective"
-                          name="fromCollective"
-                          defaultValue={LoggedInUser.CollectiveId}
+                          id="interval"
+                          name="interval"
+                          defaultValue="monthly"
                         >
                           <option key="monthly" value="month">
                             Monthly
@@ -388,49 +435,19 @@ class CreatePledgePage extends React.Component {
                           </option>
                         </select>
                       </Flex>
-                    )}
-                  </Box>
 
-                  <Box mb={5}>
-                    <H5 textAlign="left" mb={3}>
-                      Pledge details:
-                    </H5>
+                      <WordCountTextarea />
+                    </Box>
 
-                    <AmountField LoggedInUser={LoggedInUser} />
-
-                    <Flex flexDirection="column" mb={3} width={200}>
-                      <P {...labelStyles} htmlFor="interval">
-                        Frequency
-                      </P>
-                      <select
-                        id="interval"
-                        name="interval"
-                        defaultValue="monthly"
-                      >
-                        <option key="monthly" value="month">
-                          Monthly
-                        </option>
-                        <option key="yearly" value="year">
-                          Yearly
-                        </option>
-                        <option key="none" value={null}>
-                          One-Time
-                        </option>
-                      </select>
-                    </Flex>
-
-                    <WordCountTextarea />
-                  </Box>
-
-                  <SubmitInput
-                    value={submitting ? 'Submitting...' : 'Make Pledge'}
-                    mt={4}
-                    mx={['auto', null, 0]}
-                    display="block"
-                    disabled={!LoggedInUser || submitting}
-                  />
-                </form>
-              )}
+                    <SubmitInput
+                      value={submitting ? 'Submitting...' : 'Make Pledge'}
+                      mt={4}
+                      mx={['auto', null, 0]}
+                      display="block"
+                      disabled={!LoggedInUser || submitting}
+                    />
+                  </form>
+                )}
 
               {errorMessage && (
                 <P color="red.500" mt={3}>
@@ -457,7 +474,10 @@ class CreatePledgePage extends React.Component {
                     {data.Collective.name}
                   </H3>
 
-                  <StyledLink fontSize="Paragraph" href={data.Collective.website}>
+                  <StyledLink
+                    fontSize="Paragraph"
+                    href={data.Collective.website}
+                  >
                     {data.Collective.website}
                   </StyledLink>
                 </Container>
@@ -576,7 +596,7 @@ class CreatePledgePage extends React.Component {
             )}
 
             <Container
-              clear={(!LoggedInUser && slug) ? 'both' : 'none'}
+              clear={!LoggedInUser && slug ? 'both' : 'none'}
               float={['none', null, 'right']}
               mt={5}
               px={[3, null, 5]}
@@ -590,8 +610,8 @@ class CreatePledgePage extends React.Component {
               <Details>
                 <summary>What is a pledge?</summary>A pledge allows supporters
                 (companies and individuals) to pledge funds towards a collective
-                that hasn’t been created yet. If you can’t find a collective you want
-                to support, pledge to it!
+                that hasn’t been created yet. If you can’t find a collective you
+                want to support, pledge to it!
               </Details>
 
               <Details>
