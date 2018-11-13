@@ -7,6 +7,7 @@ import { defineMessages, FormattedMessage } from 'react-intl';
 import withIntl from '../lib/withIntl';
 import InputField from './InputField';
 import { getCurrencySymbol, capitalize } from '../lib/utils';
+import PaymentMethodLabel from './PaymentMethodLabel';
 
 class EditPaymentMethod extends React.Component {
   static propTypes = {
@@ -61,11 +62,11 @@ class EditPaymentMethod extends React.Component {
 
   render() {
     const { intl, paymentMethod, currency } = this.props;
-    const label =
-      paymentMethod.data &&
-      `💳  \xA0\xA0${paymentMethod.data.brand} ${paymentMethod.name} - exp ${
-        paymentMethod.data.expMonth
-      }/${paymentMethod.data.expYear}`;
+    const { service, type, orders } = paymentMethod;
+    const hasOrders = orders && orders.length > 0;
+    const isStripeCreditCard = service === 'stripe' && type === 'creditcard';
+    const canRemove = !hasOrders && isStripeCreditCard;
+
     return (
       <div className="EditPaymentMethod">
         <style global jsx>
@@ -91,15 +92,23 @@ class EditPaymentMethod extends React.Component {
             <Row>
               <Col sm={12}>
                 <div className="form-group">
-                  <label className="col-sm-3 control-label">Credit Card</label>
+                  <label className="col-sm-2 control-label">
+                    <FormattedMessage
+                      id="paymentMethod.typeSelect"
+                      values={{ type }}
+                      defaultMessage="{type, select, virtualcard {Gift card} creditcard {Credit card} prepaid {Prepaid}}"
+                    />
+                  </label>
                   <Col sm={9}>
-                    <div className="name col">{label}</div>
-                    {paymentMethod.orders.length > 0 && (
+                    <div className="name col">
+                      <PaymentMethodLabel paymentMethod={paymentMethod} />
+                    </div>
+                    {hasOrders && (
                       <div className="actions">
                         <FormattedMessage
                           id="paymentMethod.activeSubscriptions"
                           defaultMessage="{n} active {n, plural, one {subscription} other {subscriptions}}"
-                          values={{ n: paymentMethod.orders.length }}
+                          values={{ n: orders.length }}
                         />
                         &nbsp;
                         <Button
@@ -120,7 +129,7 @@ class EditPaymentMethod extends React.Component {
                         </Button>
                       </div>
                     )}
-                    {paymentMethod.orders.length === 0 && (
+                    {canRemove && (
                       <div className="actions">
                         <Button
                           bsStyle="default"
@@ -139,26 +148,28 @@ class EditPaymentMethod extends React.Component {
             </Row>
           )}
           {this.props.monthlyLimitPerMember && (
-            <InputField
-              className="horizontal"
-              label={capitalize(
-                intl.formatMessage(
-                  this.messages['paymentMethod.monthlyLimitPerMember.label'],
-                ),
-              )}
-              type="currency"
-              name="monthlyLimitPerMember"
-              pre={getCurrencySymbol(currency)}
-              defaultValue={paymentMethod.monthlyLimitPerMember}
-              description={intl.formatMessage(
-                this.messages[
-                  'paymentMethod.monthlyLimitPerMember.description'
-                ],
-              )}
-              onChange={value =>
-                this.handleChange({ monthlyLimitPerMember: value })
-              }
-            />
+            <Row>
+              <InputField
+                className="horizontal"
+                label={capitalize(
+                  intl.formatMessage(
+                    this.messages['paymentMethod.monthlyLimitPerMember.label'],
+                  ),
+                )}
+                type="currency"
+                name="monthlyLimitPerMember"
+                pre={getCurrencySymbol(currency)}
+                defaultValue={paymentMethod.monthlyLimitPerMember}
+                description={intl.formatMessage(
+                  this.messages[
+                    'paymentMethod.monthlyLimitPerMember.description'
+                  ],
+                )}
+                onChange={value =>
+                  this.handleChange({ monthlyLimitPerMember: value })
+                }
+              />
+            </Row>
           )}
         </div>
       </div>
