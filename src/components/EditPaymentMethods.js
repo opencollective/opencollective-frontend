@@ -66,8 +66,9 @@ class EditPaymentMethods extends React.Component {
 
   renderPaymentMethod(paymentMethod, index) {
     const { collective } = this.props;
+    const keyId = paymentMethod.id || 'new';
     return (
-      <div className="paymentMethod" key={`paymentMethod-${index}`}>
+      <div className="paymentMethod" key={`paymentMethod-${keyId}`}>
         <EditPaymentMethod
           paymentMethod={paymentMethod}
           onChange={pm => this.editPaymentMethod(index, pm)}
