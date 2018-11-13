@@ -5,6 +5,7 @@ import { FormattedMessage } from 'react-intl';
 
 import Avatar from '../../../components/Avatar';
 import Container from '../../../components/Container';
+import Link from '../../../components/Link';
 import Moment from '../../../components/Moment';
 import { P, Span } from '../../../components/Text';
 
@@ -75,14 +76,21 @@ class Transaction extends React.Component {
     return (
       <Flex my={4}>
         <Container alignSelf="flex-start">
-          <a href={`/${fromCollective.slug}`} title={fromCollective.name}>
+          <Link
+            route="collective"
+            params={{ slug: fromCollective.slug }}
+            title={fromCollective.name}
+            passHref
+          >
             <Avatar
               src={fromCollective.image}
+              type={fromCollective.type}
+              name={fromCollective.name}
               id={fromCollective.id}
               radius={40}
               className="noFrame"
             />
-          </a>
+          </Link>
         </Container>
         <Container ml={3} width={1}>
           <Flex justifyContent="space-between" alignItems="baseline">

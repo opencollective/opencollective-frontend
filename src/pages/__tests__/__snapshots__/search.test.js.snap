@@ -5891,7 +5891,6 @@ exports[`Search Page renders search results with pagination 1`] = `
                     className="jsx-3454192051 Logo"
                     style={
                       Object {
-                        "backgroundImage": "url(/static/images/default-organization-logo.png)",
                         "height": 65,
                         "minWidth": 32.5,
                       }
@@ -5899,7 +5898,7 @@ exports[`Search Page renders search results with pagination 1`] = `
                   >
                     <img
                       className="jsx-3454192051 logo"
-                      src="/static/images/default-organization-logo.png"
+                      src={null}
                       style={
                         Object {
                           "maxHeight": 65,

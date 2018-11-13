@@ -74,7 +74,7 @@ class Link extends React.Component {
     } else {
       return (
         <router.Link
-          {...pick(this.props, ['route', 'params', 'href', 'scroll'])}
+          {...pick(this.props, ['route', 'params', 'href', 'scroll', 'passHref'])}
         >
           <a className={className} title={title}>
             {children}

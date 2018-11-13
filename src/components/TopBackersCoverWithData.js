@@ -69,8 +69,8 @@ Financial contribution: ${percentage}% (${formatCurrency(
               }
             `}
           </style>
-          <Link route={`/${org.slug}`} title={title}>
-            <Logo src={org.image} height={36} />
+          <Link route="collective" params={{ slug: org.slug }} title={title} passHref>
+            <Logo src={org.image} type={org.type} website={org.website} height={36} />
           </Link>
         </div>
       </div>
@@ -100,8 +100,8 @@ Financial contribution: ${percentage}% (${formatCurrency(
     const className = index >= 5 ? 'desktopOnly' : '';
     return (
       <div key={`topBacker-${index}`} className={`user backer ${className}`}>
-        <Link route={`/${user.slug}`} title={title}>
-          <Avatar src={user.image} radius={48} className="noFrame" />
+        <Link route="collective" params={{ slug: user.slug }} title={title} passHref>
+          <Avatar src={user.image} name={user.name} type={user.type} radius={48} size={[30, null, 48]} className="noFrame" />
         </Link>
       </div>
     );

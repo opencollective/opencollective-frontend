@@ -174,6 +174,8 @@ class Update extends React.Component {
           >
             <Avatar
               src={update.fromCollective.image}
+              type={update.fromCollective.type}
+              name={update.fromCollective.name}
               key={update.fromCollective.id}
               radius={40}
             />
