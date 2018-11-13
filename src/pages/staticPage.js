@@ -67,7 +67,8 @@ class StaticPage extends React.Component {
 
   async componentDidMount() {
     const { getLoggedInUser } = this.props;
-    const LoggedInUser = getLoggedInUser && (await getLoggedInUser());
+    const LoggedInUser =
+      getLoggedInUser && (await getLoggedInUser(this.setState.bind(this)));
     this.setState({ LoggedInUser });
   }
 

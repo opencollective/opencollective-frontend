@@ -43,7 +43,8 @@ class ClaimCollectivePage extends React.Component {
 
   async componentDidMount() {
     const { getLoggedInUser, token } = this.props;
-    const LoggedInUser = getLoggedInUser && (await getLoggedInUser());
+    const LoggedInUser =
+      getLoggedInUser && (await getLoggedInUser(this.setState.bind(this)));
     this.setState({
       LoggedInUser,
       loadingUserLogin: false,
@@ -83,12 +84,15 @@ class ClaimCollectivePage extends React.Component {
 
   render() {
     const { data, slug, token } = this.props;
-    const { error, LoggedInUser, loadingUserLogin, loadingRepos, repos } = this.state;
-
     const {
-      Collective: { id, name, website } = {},
-      loading,
-    } = data;
+      error,
+      LoggedInUser,
+      loadingUserLogin,
+      loadingRepos,
+      repos,
+    } = this.state;
+
+    const { Collective: { id, name, website } = {}, loading } = data;
 
     if (error) {
       data.error = data.error || error;
@@ -162,18 +166,13 @@ class ClaimCollectivePage extends React.Component {
                         with your GitHub account.
                       </H5>
 
-                      <P
-                        fontSize="LeadParagraph"
-                        textAlign="left"
-                        mb={2}
-                      >
+                      <P fontSize="LeadParagraph" textAlign="left" mb={2}>
                         Why are we asking you to do this?
                       </P>
 
-                      <P
-                        fontSize="Caption"
-                      >
-                        We need to validate that you have owner rights to the repository linked to this pledged collective.
+                      <P fontSize="Caption">
+                        We need to validate that you have owner rights to the
+                        repository linked to this pledged collective.
                       </P>
 
                       <P
@@ -182,12 +181,11 @@ class ClaimCollectivePage extends React.Component {
                         mb={2}
                         mt={3}
                       >
-                        Want to onboard an organization instead of a single repository?
+                        Want to onboard an organization instead of a single
+                        repository?
                       </P>
 
-                      <P
-                        fontSize="Caption"
-                      >
+                      <P fontSize="Caption">
                         Make sure to Grant access in the GitHub permission page.
                       </P>
 
@@ -239,22 +237,15 @@ class ClaimCollectivePage extends React.Component {
                       </svg>
                     </Flex>
 
-                    <H5
-                      fontWeight="medium"
-                      mb={4}
-                      textAlign="center"
-                    >
+                    <H5 fontWeight="medium" mb={4} textAlign="center">
                       Validation unsuccessful
                     </H5>
-                    <P
-                      textAlign="center"
-                      color="black.600"
-                      mb={4}
-                    >
+                    <P textAlign="center" color="black.600" mb={4}>
                       Sorry, we were unable to succesfully validated your admin
                       status. Try again, or if you believe this is a mistake,
-                      please get in touch with the repository owners.
-                      Make sure you granted us access as an organization if that&apos;s what you are trying to onboard. 
+                      please get in touch with the repository owners. Make sure
+                      you granted us access as an organization if that&apos;s
+                      what you are trying to onboard.
                     </P>
                     <StyledLink
                       buttonStyle="standard"
@@ -301,18 +292,10 @@ class ClaimCollectivePage extends React.Component {
                           />
                         </svg>
                       </Flex>
-                      <H5
-                        fontWeight="medium"
-                        mb={4}
-                        textAlign="center"
-                      >
+                      <H5 fontWeight="medium" mb={4} textAlign="center">
                         Congratulations!
                       </H5>
-                      <P
-                        textAlign="center"
-                        color="black.600"
-                        mb={4}
-                      >
+                      <P textAlign="center" color="black.600" mb={4}>
                         We have succesfully validated your admin status. Press
                         the button below to activate this open collective. It
                         will also email all pledgers to fulfill their pledges.

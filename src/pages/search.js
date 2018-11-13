@@ -82,7 +82,7 @@ class SearchPage extends React.Component {
   async componentDidMount() {
     const { getLoggedInUser } = this.props;
     try {
-      const LoggedInUser = await getLoggedInUser();
+      const LoggedInUser = await getLoggedInUser(this.setState.bind(this));
       this.setState({
         loadingUserLogin: false,
         LoggedInUser,
@@ -182,7 +182,11 @@ class SearchPage extends React.Component {
                       </em>
                     </p>
                     {usePledges && (
-                      <Link route="createPledge" params={{ name: term }} passHref>
+                      <Link
+                        route="createPledge"
+                        params={{ name: term }}
+                        passHref
+                      >
                         <StyledLink
                           display="block"
                           fontSize="Paragraph"
@@ -242,7 +246,8 @@ class SearchPage extends React.Component {
                 >
                   <p>
                     <em>
-                      If you don&apos;t see the collective you&apos;re searching for:
+                      If you don&apos;t see the collective you&apos;re searching
+                      for:
                     </em>
                   </p>
 

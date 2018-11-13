@@ -44,7 +44,7 @@ export default WrappedComponent => {
         }
       });
 
-    getLoggedInUser = async () => {
+    getLoggedInUser = async setState => {
       // only Client Side for now
       if (!process.browser || !window) {
         return null;
@@ -56,6 +56,8 @@ export default WrappedComponent => {
         storage.set('LoggedInUser', null);
         return null;
       }
+
+      this.props.client.onResetStore(() => setState({ LoggedInUser: null }));
 
       // refresh Access Token in the background if needed
       maybeRefreshAccessToken(token);

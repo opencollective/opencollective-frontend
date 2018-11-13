@@ -38,7 +38,7 @@ class Apps extends React.Component {
     const bustCache = new Date().getTime();
 
     const [LoggedInUser] = await Promise.all([
-      getLoggedInUser(),
+      getLoggedInUser(this.setState.bind(this)),
       this.props.data.refetch({ bustCache }), // Force Client side refetch
     ]);
 

@@ -32,7 +32,7 @@ class MarketingPage extends React.Component {
   }
 
   async componentDidMount() {
-    this.props.getLoggedInUser().then(LoggedInUser => {
+    this.props.getLoggedInUser(this.setState.bind(this)).then(LoggedInUser => {
       this.setState({ LoggedInUser });
     });
 

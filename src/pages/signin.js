@@ -12,6 +12,7 @@ import * as api from '../lib/api';
 import { isValidUrl } from '../lib/utils';
 
 import withIntl from '../lib/withIntl';
+import withData from '../lib/withData';
 
 class SigninPage extends React.Component {
   static getInitialProps({ query: { token, next } }) {
@@ -89,4 +90,4 @@ class SigninPage extends React.Component {
   }
 }
 
-export default withIntl(SigninPage);
+export default withIntl(withData(SigninPage));

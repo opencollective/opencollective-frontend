@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { withApollo } from 'react-apollo';
 import { Link } from '../server/pages';
 import { FormattedMessage, defineMessages } from 'react-intl';
 import withIntl from '../lib/withIntl';
@@ -58,11 +59,12 @@ class TopBarProfileMenu extends React.Component {
     document.removeEventListener('click', this.onClickOutside);
   }
 
-  logout = () => {
+  logout = async () => {
     this.setState({ showProfileMenu: false, status: 'loggingout' });
     window.localStorage.removeItem('accessToken');
     window.localStorage.removeItem('LoggedInUser');
-    window.location.reload();
+    await this.props.client.resetStore();
+    this.setState({ status: 'loggedout' });
   };
 
   onClickOutside = () => {
@@ -197,10 +199,7 @@ class TopBarProfileMenu extends React.Component {
                   >
                     <Flex alignItems="center">
                       <Avatar
-                        src={get(
-                          membership,
-                          'collective.image',
-                        )}
+                        src={get(membership, 'collective.image')}
                         type={get(membership, 'collective.type')}
                         name={get(membership, 'collective.name')}
                         radius="2.8rem"
@@ -267,10 +266,7 @@ class TopBarProfileMenu extends React.Component {
                   >
                     <Flex alignItems="center">
                       <Avatar
-                        src={get(
-                          membership,
-                          'collective.image',
-                        )}
+                        src={get(membership, 'collective.image')}
                         type={get(membership, 'collective.type')}
                         name={get(membership, 'collective.name')}
                         radius="2.8rem"
@@ -488,4 +484,4 @@ class TopBarProfileMenu extends React.Component {
   }
 }
 
-export default withIntl(TopBarProfileMenu);
+export default withIntl(withApollo(TopBarProfileMenu));

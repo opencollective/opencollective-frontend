@@ -49,7 +49,7 @@ class ActionPage extends React.Component {
       console.log('>>> error', JSON.stringify(error));
       this.setState({ loading: false, error: error.graphQLErrors[0] });
     }
-    const LoggedInUser = await getLoggedInUser();
+    const LoggedInUser = await getLoggedInUser(this.setState.bind(this));
     this.setState({ LoggedInUser });
   }
 

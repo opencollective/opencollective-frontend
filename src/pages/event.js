@@ -39,7 +39,7 @@ class EventPage extends React.Component {
     const { getLoggedInUser, data } = this.props;
     const event = data.Collective;
 
-    const LoggedInUser = await getLoggedInUser();
+    const LoggedInUser = await getLoggedInUser(this.setState.bind(this));
     this.setState({ LoggedInUser });
 
     if (LoggedInUser && LoggedInUser.canEditEvent(event)) {

@@ -140,7 +140,7 @@ class CreateOrderPage extends React.Component {
   async componentDidMount() {
     const { getLoggedInUser, data } = this.props;
     const newState = {};
-    newState.LoggedInUser = await getLoggedInUser();
+    newState.LoggedInUser = await getLoggedInUser(this.setState.bind(this));
     if (!data.Tier && data.fetchData) {
       data.fetchData();
     }

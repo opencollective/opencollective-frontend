@@ -138,7 +138,8 @@ class CreatePledgePage extends React.Component {
   async componentDidMount() {
     const { getLoggedInUser } = this.props;
     try {
-      const LoggedInUser = getLoggedInUser && (await getLoggedInUser());
+      const LoggedInUser =
+        getLoggedInUser && (await getLoggedInUser(this.setState.bind(this)));
       this.setState({
         loadingUserLogin: false,
         LoggedInUser,

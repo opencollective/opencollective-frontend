@@ -35,7 +35,7 @@ class CollectivePage extends React.Component {
 
   async componentDidMount() {
     const { getLoggedInUser, query, data = {} } = this.props;
-    const LoggedInUser = await getLoggedInUser();
+    const LoggedInUser = await getLoggedInUser(this.setState.bind(this));
     this.setState({ LoggedInUser });
     window.OC = window.OC || {};
     window.OC.LoggedInUser = LoggedInUser;
