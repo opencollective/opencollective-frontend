@@ -268,12 +268,19 @@ const getCollectiveToEditQuery = gql`
           }
         }
       }
-      paymentMethods(service: "stripe") {
+      paymentMethods(
+        types: ["creditcard", "virtualcard"]
+        hasBalanceAboveZero: true
+      ) {
         id
         uuid
         name
         data
         monthlyLimitPerMember
+        service
+        type
+        balance
+        currency
         orders(hasActiveSubscription: true) {
           id
         }
