@@ -1,23 +1,24 @@
 import { pick, omit, get } from 'lodash';
 import moment from 'moment';
 import uuidv4 from 'uuid/v4';
-
 import debug from 'debug';
 import Promise from 'bluebird';
+import LRU from 'lru-cache';
 
 import models from '../../../models';
-import { capitalize, pluralize } from '../../../lib/utils';
-import * as libPayments from '../../../lib/payments';
-import { types } from '../../../constants/collectives';
-import roles from '../../../constants/roles';
-import status from '../../../constants/order_status';
 import * as errors from '../../errors';
-import activities from '../../../constants/activities';
+import recaptcha from '../../../lib/recaptcha';
+import * as libPayments from '../../../lib/payments';
+import { capitalize, pluralize } from '../../../lib/utils';
 import {
   getNextChargeAndPeriodStartDates,
   getChargeRetryCount,
 } from '../../../lib/subscriptions';
-import LRU from 'lru-cache';
+
+import roles from '../../../constants/roles';
+import status from '../../../constants/order_status';
+import activities from '../../../constants/activities';
+import { types } from '../../../constants/collectives';
 
 // Create Orders Store Object to limit FromCollective orders to up to 10 orders/hour
 const ordersLimitStore = LRU({
@@ -68,9 +69,27 @@ function checkOrdersLimit(order, remoteUser, reqIp) {
   }
 }
 
+async function checkRecaptcha(order, remoteUser, reqIp) {
+  if (remoteUser) {
+    return;
+  }
+  if (!order.recaptchaToken) {
+    throw new Error(
+      'Error while processing your request (Recaptcha token missing), please try again or contact support@opencollective.com',
+    );
+  }
+
+  const response = recaptcha.verify(order.recaptchaToken, reqIp);
+
+  // TODO: check response and throw an error if needed
+
+  return response;
+}
+
 export async function createOrder(order, loaders, remoteUser, reqIp) {
   debugOrder('Beginning creation of order', order);
   checkOrdersLimit(order, remoteUser, reqIp);
+  const recaptchaResponse = await checkRecaptcha(order, remoteUser, reqIp);
   try {
     if (
       order.paymentMethod &&
@@ -315,6 +334,10 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
       privateMessage: order.privateMessage,
       processedAt: paymentRequired || !collective.isActive ? null : new Date(),
       MatchingPaymentMethodId: order.MatchingPaymentMethodId,
+      data: {
+        reqIp,
+        recaptchaResponse: recaptchaResponse,
+      },
     };
 
     if (

@@ -239,6 +239,7 @@ export const OrderInputType = new GraphQLInputObjectType({
     fromCollective: { type: CollectiveAttributesInputType },
     collective: { type: new GraphQLNonNull(CollectiveAttributesInputType) },
     tier: { type: TierInputType },
+    recaptchaToken: { type: GraphQLString },
   }),
 });
 
