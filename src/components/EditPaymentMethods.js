@@ -39,10 +39,16 @@ class EditPaymentMethods extends React.Component {
     });
   }
 
-  editPaymentMethod(index, obj) {
-    if (obj === null) return this.removePaymentMethod(index);
+  editPaymentMethod(paymentMethodId, paymentMethod) {
+    const index = !paymentMethodId
+      ? this.state.paymentMethods.findIndex(pm => !pm.id)
+      : this.state.paymentMethods.findIndex(pm => pm.id === paymentMethodId);
+
+    if (paymentMethod === null) {
+      return this.removePaymentMethod(index);
+    }
     const paymentMethods = [...this.state.paymentMethods];
-    paymentMethods[index] = { ...paymentMethods[index], ...obj };
+    paymentMethods[index] = { ...paymentMethods[index], ...paymentMethod };
     this.setState({ paymentMethods });
     this.onChange({ paymentMethods });
   }
@@ -64,14 +70,14 @@ class EditPaymentMethods extends React.Component {
     this.onChange({ paymentMethods });
   }
 
-  renderPaymentMethod(paymentMethod, index) {
+  renderPaymentMethod(paymentMethod) {
     const { collective } = this.props;
     const keyId = paymentMethod.id || 'new';
     return (
       <div className="paymentMethod" key={`paymentMethod-${keyId}`}>
         <EditPaymentMethod
           paymentMethod={paymentMethod}
-          onChange={pm => this.editPaymentMethod(index, pm)}
+          onChange={pm => this.editPaymentMethod(paymentMethod.id, pm)}
           editMode={paymentMethod.id ? false : true}
           monthlyLimitPerMember={collective.type === 'ORGANIZATION'}
           currency={collective.currency}
