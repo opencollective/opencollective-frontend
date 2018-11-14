@@ -39,7 +39,7 @@
     "grid-styled": "5.0.2",
     "html-pdf": "2.2.0",
     "intl": "1.2.5",
-    "jsonwebtoken": "8.3.0",
+    "jsonwebtoken": "8.4.0",
     "load-script": "^1.0.0",
     "lodash": "4.17.11",
     "lru-cache": "4.1.3",
