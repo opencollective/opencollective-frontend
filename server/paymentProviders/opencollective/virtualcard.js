@@ -248,7 +248,13 @@ async function create(args, remoteUser) {
  * @returns {models.PaymentMethod} return the virtual card payment method.
  */
 async function claim(args, remoteUser) {
-  // validate code
+  // Validate code format
+  const redeemCodeRegex = /^[a-zA-Z0-9]{8}$/;
+  if (!redeemCodeRegex.test(args.code)) {
+    throw Error(`Code "${args.code}" has invalid format`);
+  }
+
+  // Get code from DB
   const virtualCardPaymentMethod = await models.PaymentMethod.findOne({
     where: sequelize.and(
       sequelize.where(sequelize.cast(sequelize.col('uuid'), 'text'), {
