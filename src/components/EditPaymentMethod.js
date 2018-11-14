@@ -7,7 +7,7 @@ import { defineMessages, FormattedMessage } from 'react-intl';
 import withIntl from '../lib/withIntl';
 import InputField from './InputField';
 import { getCurrencySymbol, capitalize } from '../lib/utils';
-import PaymentMethodLabel from './PaymentMethodLabel';
+import { paymentMethodLabelWithIcon } from '../lib/payment_method_label';
 
 class EditPaymentMethod extends React.Component {
   static propTypes = {
@@ -101,7 +101,7 @@ class EditPaymentMethod extends React.Component {
                   </label>
                   <Col sm={9}>
                     <div className="name col">
-                      <PaymentMethodLabel paymentMethod={paymentMethod} />
+                      {paymentMethodLabelWithIcon(intl, paymentMethod)}
                     </div>
                     {hasOrders && (
                       <div className="actions">

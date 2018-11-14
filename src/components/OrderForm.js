@@ -1,5 +1,4 @@
 import React from 'react';
-import moment from 'moment';
 import PropTypes from 'prop-types';
 
 import { pick, get } from 'lodash';
@@ -29,6 +28,7 @@ import {
 import { getPaypal } from '../lib/paypal';
 import { getStripeToken } from '../lib/stripe';
 import { checkUserExistence, signin } from '../lib/api';
+import { paymentMethodLabelWithIcon } from '../lib/payment_method_label';
 
 class OrderForm extends React.Component {
   static propTypes = {
@@ -329,54 +329,11 @@ class OrderForm extends React.Component {
     this.paymentMethodTypeOptions = paymentMethodTypeOptions;
   };
 
-  paymentMethodName = pm => {
-    if (pm.type === 'virtualcard') {
-      return pm.name.replace('card from', 'Gift Card from');
-    } else {
-      return `${get(pm, 'data.brand', get(pm, 'type'))} ${pm.name}`;
-    }
-  };
-
-  paymentMethodExpiration = pm => {
-    /* The expiryDate field will show up for prepaid cards */
-    return pm.expiryDate
-      ? `- exp ${moment(pm.expiryDate).format('MM/Y')}`
-      : get(pm, 'data.expMonth') || get(pm, 'data.expYear')
-        ? `- exp ${get(pm, 'data.expMonth')}/${get(pm, 'data.expYear')}`
-        : '';
-  };
-
-  paymentMethodBalance = pm => {
-    /* Prepaid cards have their balance available */
-    if (pm.type === 'prepaid' || pm.type === 'virtualcard') {
-      if (pm.balance) {
-        return `(${formatCurrency(pm.balance, pm.currency)} left)`;
-      }
-    }
-    return '';
-  };
-
-  paymentMethodIcon = pm => {
-    if (pm.type === 'creditcard') {
-      return '💳';
-    }
-    if (pm.type === 'virtualcard') {
-      return '🎁';
-    }
-    return '';
-  };
-
   paymentMethodsOptionsForCollective = (paymentMethods, collective) => {
+    const { intl } = this.props;
     return paymentMethods.map(pm => {
       const value = pm.uuid;
-      const expiration = this.paymentMethodExpiration(pm);
-      const balance = this.paymentMethodBalance(pm);
-      const name = this.paymentMethodName(pm);
-      const icon = this.paymentMethodIcon(pm);
-      /* Assemble all the pieces in one string */
-      const label = `${icon} \xA0\xA0${
-        collective.name
-      } - ${name} ${expiration} ${balance}`;
+      const label = paymentMethodLabelWithIcon(intl, pm, collective.name);
       return { [value]: label };
     });
   };
