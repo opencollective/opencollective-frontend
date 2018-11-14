@@ -131,6 +131,10 @@ class OrderForm extends React.Component {
         id: 'creditcard.error',
         defaultMessage: 'Invalid credit card',
       },
+      'newcreditcard.label': {
+        id: 'newcreditcard.label',
+        defaultMessage: 'New Credit Card',
+      },
       'paymentMethod.type': {
         id: 'paymentMethod.type',
         defaultMessage: 'Payment method',
@@ -346,8 +350,18 @@ class OrderForm extends React.Component {
     /* Prepaid cards have their balance available */
     if (pm.type === 'prepaid' || pm.type === 'virtualcard') {
       if (pm.balance) {
-        return `(${formatCurrency(pm.balance, pm.currency)})`;
+        return `(${formatCurrency(pm.balance, pm.currency)} left)`;
       }
+    }
+    return '';
+  };
+
+  paymentMethodIcon = pm => {
+    if (pm.type === 'creditcard') {
+      return '💳';
+    }
+    if (pm.type === 'virtualcard') {
+      return '🎁';
     }
     return '';
   };
@@ -358,8 +372,9 @@ class OrderForm extends React.Component {
       const expiration = this.paymentMethodExpiration(pm);
       const balance = this.paymentMethodBalance(pm);
       const name = this.paymentMethodName(pm);
+      const icon = this.paymentMethodIcon(pm);
       /* Assemble all the pieces in one string */
-      const label = `💳 \xA0\xA0${
+      const label = `${icon} \xA0\xA0${
         collective.name
       } - ${name} ${expiration} ${balance}`;
       return { [value]: label };
@@ -403,7 +418,7 @@ class OrderForm extends React.Component {
     }
 
     if (paymentMethodsOptions.length > 0) {
-      paymentMethodsOptions.push({ other: 'other' });
+      paymentMethodsOptions.push({ other: '➕ \xA0\xA0New Credit Card' });
     }
 
     this.paymentMethodsOptions = paymentMethodsOptions;
@@ -874,7 +889,7 @@ class OrderForm extends React.Component {
           {showNewCreditCardForm && (
             <div>
               <InputField
-                label={intl.formatMessage(this.messages['creditcard.label'])}
+                label={intl.formatMessage(this.messages['newcreditcard.label'])}
                 type="creditcard"
                 name="creditcard"
                 className="horizontal"
