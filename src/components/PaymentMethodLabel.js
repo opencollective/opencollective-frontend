@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { injectIntl, intlShape, defineMessages } from 'react-intl';
 import moment from 'moment';
-import { get } from 'lodash';
+import { get, padStart } from 'lodash';
 import { formatCurrency } from '../lib/utils';
 
 /**
@@ -25,7 +25,7 @@ class PaymentMethodLabel extends React.Component {
   static messages = defineMessages({
     virtualcard: {
       id: 'paymentMethods.labelVirtualCard',
-      defaultMessage: '{name} ({balance} left)',
+      defaultMessage: '{name} {expiration} ({balance} left)',
       description: 'Label for gift cards',
     },
     creditcard: {
@@ -44,7 +44,10 @@ class PaymentMethodLabel extends React.Component {
     return pm.expiryDate
       ? `- exp ${moment(pm.expiryDate).format('MM/Y')}`
       : get(pm, 'data.expMonth') || get(pm, 'data.expYear')
-        ? `- exp ${get(pm, 'data.expMonth')}/${get(pm, 'data.expYear')}`
+        ? `- exp ${padStart(get(pm, 'data.expMonth'), 2, '0')}/${get(
+            pm,
+            'data.expYear',
+          )}`
         : '';
   };
 
@@ -56,6 +59,7 @@ class PaymentMethodLabel extends React.Component {
       return intl.formatMessage(PaymentMethodLabel.messages.virtualcard, {
         name: name.replace('card from', 'Gift Card from'),
         balance: formatCurrency(balance, currency),
+        expiration: this.paymentMethodExpiration(paymentMethod),
       });
     } else if (type === 'prepaid') {
       return intl.formatMessage(PaymentMethodLabel.messages.prepaid, {

@@ -285,6 +285,7 @@ const getCollectiveToEditQuery = gql`
         type
         balance
         currency
+        expiryDate
         orders(hasActiveSubscription: true) {
           id
         }

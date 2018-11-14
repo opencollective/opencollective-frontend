@@ -309,7 +309,7 @@
   "paymentMethod.activeSubscriptions": "{n} active {n, plural, one {subscription} other {subscriptions}}",
   "paymentMethods.add": "add another payment method",
   "paymentMethods.remove": "remove payment method",
-  "paymentMethods.labelVirtualCard": "{name} ({balance} left)",
+  "paymentMethods.labelVirtualCard": "{name} {expiration} ({balance} left)",
   "paymentMethods.labelCreditCard": "{name} {expiration}",
   "paymentMethods.labelPrepaid": "{name} ({balance} left)",
   "tier.type.tier": "generic tier",
