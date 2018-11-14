@@ -134,7 +134,7 @@ async function processOrder(order) {
   const updatedTransactions = await models.Transaction.update(
     {
       PaymentMethodId: paymentMethod.id,
-      UsingVirtualCardFromCollectiveId: paymentMethod.CollectiveId,
+      UsingVirtualCardFromCollectiveId: sourcePaymentMethod.CollectiveId,
     },
     {
       where: { TransactionGroup: creditTransaction.TransactionGroup },
