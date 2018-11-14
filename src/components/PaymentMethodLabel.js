@@ -24,18 +24,18 @@ class PaymentMethodLabel extends React.Component {
 
   static messages = defineMessages({
     virtualcard: {
-      id: 'paymentMethod.labelVirtualCard',
-      defaultMessage: '🎁\xA0\xA0{name} ({balance} left)',
+      id: 'paymentMethods.labelVirtualCard',
+      defaultMessage: '{name} ({balance} left)',
       description: 'Label for gift cards',
     },
     creditcard: {
-      id: 'paymentMethod.labelCreditCard',
-      defaultMessage: '💳\xA0\xA0{name} {expiration}',
+      id: 'paymentMethods.labelCreditCard',
+      defaultMessage: '{name} {expiration}',
       description: 'Label for stripe credit cards',
     },
     prepaid: {
-      id: 'paymentMethod.labelPrepaid',
-      defaultMessage: '🎟️\xA0\xA0{name} ({balance} left)',
+      id: 'paymentMethods.labelPrepaid',
+      defaultMessage: '{name} ({balance} left)',
     },
   });
 
@@ -48,7 +48,7 @@ class PaymentMethodLabel extends React.Component {
         : '';
   };
 
-  render() {
+  renderTranslatedString() {
     const { intl, paymentMethod } = this.props;
     const { type, balance, currency, name, data } = paymentMethod;
 
@@ -69,7 +69,26 @@ class PaymentMethodLabel extends React.Component {
       });
     }
 
-    return `NO TITLE YET: ${name}`;
+    return name;
+  }
+
+  getUnicodeIcon() {
+    switch (this.props.paymentMethod.type) {
+      case 'creditcard':
+        return '💳';
+      case 'virtualcard':
+        return '🎁';
+      case 'prepaid':
+        return '🎟️';
+      default:
+        return '💰';
+    }
+  }
+
+  render() {
+    const icon = this.getUnicodeIcon();
+    const label = this.renderTranslatedString();
+    return `${icon}\xA0\xA0${label}`;
   }
 }
 
