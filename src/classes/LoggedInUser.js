@@ -32,6 +32,7 @@ LoggedInUser.prototype.canEditCollective = function(collective) {
   if (!collective) return false;
   if (collective.type === 'EVENT') return this.canEditEvent(collective);
   return (
+    collective.id === this.CollectiveId ||
     get(collective, 'createdByUser.id') === this.id ||
     intersection(this.roles[collective.slug], ['HOST', 'ADMIN']).length > 0
   );
