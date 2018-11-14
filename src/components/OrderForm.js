@@ -133,15 +133,15 @@ class OrderForm extends React.Component {
       },
       'newcreditcard.label': {
         id: 'newcreditcard.label',
-        defaultMessage: 'New Credit Card',
+        defaultMessage: 'Credit Card',
       },
       'paymentMethod.type': {
         id: 'paymentMethod.type',
-        defaultMessage: 'Payment method',
+        defaultMessage: 'Payment Type',
       },
-      'paymentMethod.creditcard': {
-        id: 'paymentMethod.creditcard',
-        defaultMessage: 'credit card',
+      'paymentMethod.creditcardOrGiftcard': {
+        id: 'paymentMethod.creditcardOrGiftcard',
+        defaultMessage: 'Credit Card / Gift Card',
       },
       'paymentMethod.bitcoin': {
         id: 'paymentMethod.bitcoin',
@@ -149,7 +149,7 @@ class OrderForm extends React.Component {
       },
       'paymentMethod.paypal': {
         id: 'paymentMethod.paypal',
-        defaultMessage: 'paypal',
+        defaultMessage: 'Paypal',
       },
       'paymentMethod.manual': {
         id: 'paymentMethod.manual',
@@ -307,7 +307,7 @@ class OrderForm extends React.Component {
     const paymentMethodTypeOptions = [
       {
         creditcard: intl.formatMessage(
-          this.messages['paymentMethod.creditcard'],
+          this.messages['paymentMethod.creditcardOrGiftcard'],
         ),
       },
     ];
