@@ -648,6 +648,11 @@ export const CollectiveInterfaceType = new GraphQLInterfaceType({
           service: { type: GraphQLString },
           limit: { type: GraphQLInt },
           hasBalanceAboveZero: { type: GraphQLBoolean },
+          isConfirmed: {
+            type: GraphQLBoolean,
+            description: 'Only return confirmed payment methods',
+            defaultValue: true,
+          },
           types: {
             type: new GraphQLList(GraphQLString),
             description: 'Filter on given types (creditcard, virtualcard...)',
@@ -1184,6 +1189,7 @@ const CollectiveFields = () => {
         service: { type: GraphQLString },
         limit: { type: GraphQLInt },
         hasBalanceAboveZero: { type: GraphQLBoolean },
+        isConfirmed: { type: GraphQLBoolean, defaultValue: true },
         types: { type: new GraphQLList(GraphQLString) },
       },
       async resolve(collective, args, req) {
@@ -1200,6 +1206,11 @@ const CollectiveFields = () => {
         if (args.types) {
           paymentMethods = paymentMethods.filter(pm =>
             args.types.includes(pm.type),
+          );
+        }
+        if (args.isConfirmed !== undefined) {
+          paymentMethods = paymentMethods.filter(
+            pm => pm.isConfirmed() === args.isConfirmed,
           );
         }
         if (args.hasBalanceAboveZero) {

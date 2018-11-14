@@ -1324,6 +1324,14 @@ export const PaymentMethodType = new GraphQLObjectType({
           return paymentMethod.createdAt;
         },
       },
+      isConfirmed: {
+        type: GraphQLBoolean,
+        description:
+          'Will be true for virtual card if claimed. Always true for other payment methods.',
+        resolve(paymentMethod) {
+          return paymentMethod.isConfirmed();
+        },
+      },
       expiryDate: {
         type: GraphQLString,
         resolve(paymentMethod) {

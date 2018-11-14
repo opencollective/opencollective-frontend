@@ -466,6 +466,14 @@ export default function(Sequelize, DataTypes) {
   };
 
   /**
+   * Check if virtual card is claimed.
+   * Always return true for other payment methods.
+   */
+  PaymentMethod.prototype.isConfirmed = function() {
+    return this.type !== 'virtualcard' || this.confirmedAt !== null;
+  };
+
+  /**
    * Class Methods
    */
   PaymentMethod.createFromStripeSourceToken = PaymentMethodData => {
