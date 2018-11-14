@@ -10,6 +10,13 @@ if [ "$1" != "staging" ] && [ "$1" != "production" ]; then
   exit 1
 fi
 
+# ---- Variables ----
+
+LOCAL_BRANCH="origin/master"
+REMOTE_BRANCH="$1/master"
+SLACK_CHANNEL="C0RMV6F8C"
+GIT_LOG_FORMAT_SHELL='short'
+GIT_LOG_FORMAT_SLACK='format:<https://github.com/opencollective/opencollective-frontend/commit/%H|[%ci]> *%an* %n%s%n'
 
 # ---- Utils ----
 
@@ -35,15 +42,21 @@ function exit_success()
   exit 0
 }
 
-# ---- Show ths commits about to be pushed ----
+# ---- Show the commits about to be pushed ----
 
-echo "----------------"
-git --no-pager log $1/master..origin/master
-echo "----------------"
+# Update deploy remote
+echo "ℹ️  Fetching remote $1 state..."
+git fetch $1 > /dev/null
+
+echo ""
+echo "-------------- New commits --------------"
+git --no-pager log --pretty="${GIT_LOG_FORMAT_SHELL}" $REMOTE_BRANCH..$LOCAL_BRANCH
+echo "-----------------------------------------"
+echo ""
 
 # ---- Ask for confirmation ----
 
-echo "ℹ️  You're about to deploy the preceding commits from master branch to staging server."
+echo "ℹ️  You're about to deploy the preceding commits from master branch to $1 server."
 confirm "❔ Are you sure (yes/no) > " || exit 1
 
 # ---- Slack notification ----
@@ -58,16 +71,22 @@ if [ -z "$OC_SLACK_USER_TOKEN" ]; then
   exit_success
 fi
 
-ESCAPED_CHANGELOG=$(git --no-pager log $1/master..origin/master | sed 's/"/\\\\"/g')
+ESCAPED_CHANGELOG=$(
+  git log --pretty="${GIT_LOG_FORMAT_SLACK}" $REMOTE_BRANCH..$LOCAL_BRANCH \
+  | sed 's/"/\\\\"/g'
+)
 
 read -d '' PAYLOAD << EOF
   {
-    "channel": "C0RMV6F8C",
+    "channel": "${SLACK_CHANNEL}",
     "text": ":rocket: Deploying Frontend *master* branch to *${1}*",
     "as_user": true,
     "attachments": [{
-      "title": "Changelog",
-      "text": "${ESCAPED_CHANGELOG}"
+      "title": "📜 Changelog",
+      "text": "
+----------------------------------------
+${ESCAPED_CHANGELOG}
+"
     }]
   }
 EOF
