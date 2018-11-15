@@ -1,62 +1,78 @@
+import { memoize } from '../lib/cache';
 import queries from '../lib/queries';
 import models from '../models';
-import { memoize } from 'lodash';
-memoize.Cache = Map;
 
-const getTotalAnnualBudget = memoize(queries.getTotalAnnualBudget);
+const noCache = process.env.NO_CACHE;
+
+const oneHourInMilliseconds = 60 * 60 * 1000;
+
+const cacheRefreshInterval =
+  process.env.CACHE_REFRESH_INTERVAL || oneHourInMilliseconds;
+
+const homepageTags = ['open source', 'meetup'];
 
 /**
  * get total number of active collectives
  * (a collective is considered as active if it has ever received any funding from its host or through a order)
  */
-const getTotalCollectives = memoize(() => {
-  return queries.getTotalNumberOfActiveCollectives();
+const getTotalCollectives = memoize(queries.getTotalNumberOfActiveCollectives, {
+  key: 'homepage_total_collectives',
 });
 
-const getTotalDonors = memoize(() => {
-  return queries.getTotalNumberOfDonors();
+const getTotalDonors = memoize(queries.getTotalNumberOfDonors, {
+  key: 'homepage_total_donors',
 });
 
-const getTopCollectives = memoize(tag => {
-  return models.Collective.getCollectivesSummaryByTag(tag, 3, [], 100000, true);
+const getTotalAnnualBudget = memoize(queries.getTotalAnnualBudget, {
+  key: 'homepage_annual_budget',
 });
 
-const refreshCache = () => {
-  getTopCollectives.cache.clear();
-  getTotalCollectives.cache.clear();
-  getTotalDonors.cache.clear();
-  getTopCollectives('open source'),
-    getTopCollectives('meetup'),
-    getTotalDonors(),
-    getTotalCollectives();
+const getTopCollectives = memoize(
+  tag => models.Collective.getCollectivesSummaryByTag(tag, 3, [], 100000, true),
+  { key: 'homepage_top_collectives' },
+);
+
+const getTotalSponsors = memoize(queries.getTopSponsors, {
+  key: 'homepage_top_sponsors',
+});
+
+const clearCache = () => {
+  getTotalCollectives.clear();
+  getTotalDonors.clear();
+  getTotalAnnualBudget.clear();
+  getTopCollectives.clear(homepageTags[0]);
+  getTopCollectives.clear(homepageTags[1]);
+  getTotalSponsors.clear();
 };
 
-// We only use the cache on staging and production
-const useCache = ['production', 'staging'].indexOf(process.env.NODE_ENV) !== -1;
+const refreshCache = () => {
+  getTotalCollectives.refresh();
+  getTotalDonors.refresh();
+  getTotalAnnualBudget.refresh();
+  getTopCollectives.refresh(homepageTags[0]);
+  getTopCollectives.refresh(homepageTags[1]);
+  getTotalSponsors.refresh();
+};
 
-// Update the cache every hour
-if (useCache) {
-  getTotalCollectives();
-  getTopCollectives('open source');
-  getTopCollectives('meetup');
-  setInterval(refreshCache, 1000 * 60 * 60);
+// Update the cache now and every hour
+if (!noCache) {
+  refreshCache();
+  setInterval(refreshCache, cacheRefreshInterval);
 }
 
 export default (req, res, next) => {
   // We skip the cache when testing
-  if (!useCache) {
-    getTopCollectives.cache.clear();
-    getTotalCollectives.cache.clear();
-    getTotalDonors.cache.clear();
+  if (noCache) {
+    clearCache();
   }
 
   Promise.all([
     getTotalCollectives(),
     getTotalDonors(),
     getTotalAnnualBudget(),
-    getTopCollectives('open source'),
-    getTopCollectives('meetup'),
-    queries.getTopSponsors(),
+    getTopCollectives(homepageTags[0]),
+    getTopCollectives(homepageTags[1]),
+    getTotalSponsors(),
   ])
     .then(results => {
       const hp = {
@@ -73,5 +89,8 @@ export default (req, res, next) => {
       };
       res.send(hp);
     })
-    .catch(next);
+    .catch(err => {
+      console.log('Homepage Error', err);
+      next();
+    });
 };

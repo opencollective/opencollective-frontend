@@ -78,7 +78,7 @@ export async function fetchCollectiveId(collectiveSlug) {
   return collective.id;
 }
 
-export function memoize(key, func) {
+export function memoize(func, { key, maxAge = 0 }) {
   const cacheKey = args => {
     return args.length ? `${key}_${md5(JSON.stringify(args))}` : key;
   };
@@ -87,14 +87,14 @@ export function memoize(key, func) {
     let value = await cacheGet(cacheKey(arguments));
     if (value === undefined) {
       value = await func(...arguments);
-      cacheSet(cacheKey(arguments), value);
+      cacheSet(cacheKey(arguments), value, maxAge);
     }
     return value;
   };
 
   memoizedFunction.refresh = async function() {
     const value = await func(...arguments);
-    cacheSet(cacheKey(arguments), value);
+    cacheSet(cacheKey(arguments), value, maxAge);
   };
 
   memoizedFunction.clear = async function() {
