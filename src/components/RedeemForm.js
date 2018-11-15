@@ -26,8 +26,9 @@ class RedeemForm extends React.Component {
     onChange: PropTypes.func.isRequired,
   };
 
-  static getDerivedStateFromProps(nextProps) {
-    const { code, email, name, LoggedInUser } = nextProps;
+  static getDerivedStateFromProps(nextProps, nextState) {
+    const { LoggedInUser } = nextProps;
+    const code = nextState.form.code || nextProps.code;
 
     if (LoggedInUser) {
       return {
@@ -38,7 +39,13 @@ class RedeemForm extends React.Component {
         },
       };
     } else {
-      return { form: { code, email, name } };
+      return {
+        form: {
+          code,
+          email: nextState.form.email || nextProps.email,
+          name: nextState.form.name || nextProps.name,
+        },
+      };
     }
   }
 
@@ -53,7 +60,7 @@ class RedeemForm extends React.Component {
       code: { id: 'redeem.form.code.label', defaultMessage: 'Gift card code' },
     });
 
-    this.state = {};
+    this.state = { form: {} };
   }
 
   handleChange(fieldname, value) {
