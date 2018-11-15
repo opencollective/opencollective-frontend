@@ -17,7 +17,7 @@ import { Strategy as TwitterStrategy } from 'passport-twitter';
 import { Strategy as MeetupStrategy } from 'passport-meetup-oauth2';
 
 import forest from './forest';
-import lruCache from '../middleware/lru_cache';
+import cacheMiddleware from '../middleware/cache';
 import { sequelize as db } from '../models';
 import { middleware } from '../graphql/loaders';
 import { sanitizeForLogs } from '../lib/utils';
@@ -89,7 +89,7 @@ export default function(app) {
   // Cors.
   app.use(cors());
 
-  app.use(lruCache());
+  app.use(cacheMiddleware());
 
   app.use(multer());
 

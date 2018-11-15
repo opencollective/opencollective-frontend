@@ -11,6 +11,9 @@
       }
     }
   },
+  "memcached": {
+    "locations": "MEMCACHED_LOCATIONS"
+  },
   "keys": {
     "opencollective": {
       "api_key": "API_KEY",

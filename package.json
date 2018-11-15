@@ -68,6 +68,8 @@
     "limax": "^1.7.0",
     "lodash": "4.17.11",
     "lru-cache": "4.1.1",
+    "md5": "2.2.1",
+    "memcached-promisify": "2.0.0",
     "merge-options": "^1.0.1",
     "mime": "2.2.2",
     "moment": "2.19.3",
@@ -206,10 +208,7 @@
     "maildev": "maildev"
   },
   "nyc": {
-    "reporter": [
-      "lcov",
-      "text"
-    ],
+    "reporter": ["lcov", "text"],
     "cache": true
   },
   "license": "MIT",

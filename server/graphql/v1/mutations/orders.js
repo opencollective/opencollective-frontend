@@ -1,9 +1,9 @@
-import { pick, omit, get } from 'lodash';
 import moment from 'moment';
 import uuidv4 from 'uuid/v4';
 import debug from 'debug';
+import md5 from 'md5';
 import Promise from 'bluebird';
-import LRU from 'lru-cache';
+import { pick, omit, get } from 'lodash';
 
 import models from '../../../models';
 import * as errors from '../../errors';
@@ -20,11 +20,7 @@ import status from '../../../constants/order_status';
 import activities from '../../../constants/activities';
 import { types } from '../../../constants/collectives';
 
-// Create Orders Store Object to limit FromCollective orders to up to 10 orders/hour
-const ordersLimitStore = LRU({
-  max: 1000,
-  maxAge: 1000 * 60 * 60, // we keep it max 1 hour
-});
+const oneHourInSeconds = 60 * 60;
 
 const debugOrder = debug('order');
 
@@ -41,25 +37,41 @@ function checkOrdersLimit(order, remoteUser, reqIp) {
 
   if (fromCollectiveId) {
     // Limit on authenticated users
-    limits.push({ key: fromCollectiveId, value: 10 });
-    limits.push({ key: `${fromCollectiveId}_${collectiveId}`, value: 2 });
+    limits.push({
+      key: `order_limit_on_account_${fromCollectiveId}`,
+      value: 10,
+    });
+    limits.push({
+      key: `order_limit_on_account_${fromCollectiveId}_and_collective_${collectiveId}`,
+      value: 2,
+    });
   } else {
     // Limit on first time users
     if (userEmail) {
-      limits.push({ key: userEmail, value: 10 });
-      limits.push({ key: `${userEmail}_${collectiveId}`, value: 2 });
+      const emailHash = md5(userEmail);
+      limits.push({
+        key: `order_limit_on_email_${emailHash}`,
+        value: 10,
+      });
+      limits.push({
+        key: `order_limit_on_email_${emailHash}_and_collective_${collectiveId}`,
+        value: 2,
+      });
     }
     // Limit on IPs
     if (reqIp) {
-      limits.push({ key: reqIp, value: 2 });
+      limits.push({
+        key: `order_limit_on_ip_${md5(reqIp)}`,
+        value: 2,
+      });
     }
   }
 
   for (const limit of limits) {
-    const count = ordersLimitStore.get(limit.key) || 0;
+    const count = cache.get(limit.key) || 0;
     debugOrder(`${count} orders for limit '${limit.key}'`);
     const limitReached = count >= limit.value;
-    ordersLimitStore.set(limit.key, count + 1);
+    cache.set(limit.key, count + 1, oneHourInSeconds);
     if (limitReached) {
       debugOrder(`Order limit reached for limit '${limit.key}'`);
       throw new Error(
