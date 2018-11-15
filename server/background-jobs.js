@@ -58,7 +58,7 @@ const cacheEntries = [
 
 const refreshCache = async () => {
   Promise.each(cacheEntries, async entry => {
-    const res = await queries[`${entry.method}Query`](entry.params);
+    const res = queries[`${entry.method}Query`](entry.params);
     queries[entry.method].cache.set(JSON.stringify(entry.params), res);
   });
 };
