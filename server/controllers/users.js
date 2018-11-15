@@ -57,21 +57,16 @@ export const _create = user =>
 /**
  * Check existence of a user based on email
  */
-export const exists = (req, res) => {
+export const exists = async (req, res) => {
   const email = req.query.email.toLowerCase();
   if (!isValidEmail(email)) {
     return res.send({ exists: false });
-  }
-  const exists = cache.get(email);
-  if (exists !== undefined) {
-    return res.send({ exists });
   } else {
-    return models.User.findOne({ attributes: ['id'], where: { email } }).then(
-      user => {
-        cache.set(email, Boolean(user), tenMinutesInSeconds);
-        return res.send({ exists: Boolean(user) });
-      },
-    );
+    const user = await models.User.findOne({
+      attributes: ['id'],
+      where: { email },
+    });
+    return res.send({ exists: Boolean(user) });
   }
 };
 
