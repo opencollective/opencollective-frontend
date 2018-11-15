@@ -1,3 +1,4 @@
+import md5 from 'md5';
 import config from 'config';
 import debug from 'debug';
 import LRU from 'lru-cache';
@@ -75,6 +76,32 @@ export async function fetchCollectiveId(collectiveSlug) {
   });
   cacheSet(cacheKey, collective.id, oneDayInSeconds);
   return collective.id;
+}
+
+export function memoize(key, func) {
+  const cacheKey = args => {
+    return args.length ? `${key}_${md5(JSON.stringify(args))}` : key;
+  };
+
+  const memoizedFunction = async function() {
+    let value = await cacheGet(cacheKey(arguments));
+    if (value === undefined) {
+      value = await func(...arguments);
+      cacheSet(cacheKey(arguments), value);
+    }
+    return value;
+  };
+
+  memoizedFunction.refresh = async function() {
+    const value = await func(...arguments);
+    cacheSet(cacheKey(arguments), value);
+  };
+
+  memoizedFunction.clear = async function() {
+    cacheDel(cacheKey(arguments));
+  };
+
+  return memoizedFunction;
 }
 
 export default {
