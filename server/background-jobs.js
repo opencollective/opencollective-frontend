@@ -1,15 +1,16 @@
-import Promise from 'bluebird';
-
 import queries from './lib/queries';
 
-const useCache = ['production', 'staging'].includes(process.env.NODE_ENV);
-const CACHE_REFRESH_INTERVAL =
-  process.env.CACHE_REFRESH_INTERVAL || 1000 * 60 * 60;
+const noCache = process.env.NO_CACHE;
+
+const oneHourInMilliseconds = 60 * 60 * 1000;
+
+const cacheRefreshInterval =
+  process.env.CACHE_REFRESH_INTERVAL || oneHourInMilliseconds;
 
 // warming up the cache with the homepage queries
 const cacheEntries = [
   {
-    method: 'getCollectivesOrderedByMonthlySpending',
+    func: queries.getCollectivesOrderedByMonthlySpending,
     params: {
       type: 'COLLECTIVE',
       orderBy: 'monthlySpending',
@@ -20,7 +21,7 @@ const cacheEntries = [
     },
   },
   {
-    method: 'getCollectivesOrderedByMonthlySpending',
+    func: queries.getCollectivesOrderedByMonthlySpending,
     params: {
       type: 'ORGANIZATION',
       orderBy: 'monthlySpending',
@@ -31,7 +32,7 @@ const cacheEntries = [
     },
   },
   {
-    method: 'getCollectivesOrderedByMonthlySpending',
+    func: queries.getCollectivesOrderedByMonthlySpending,
     params: {
       type: 'USER',
       orderBy: 'monthlySpending',
@@ -42,7 +43,7 @@ const cacheEntries = [
     },
   },
   {
-    method: 'getCollectivesWithMinBackers',
+    func: queries.getCollectivesWithMinBackers,
     params: {
       type: 'COLLECTIVE',
       isActive: true,
@@ -57,17 +58,16 @@ const cacheEntries = [
 ];
 
 const refreshCache = async () => {
-  Promise.each(cacheEntries, async entry => {
-    const res = queries[`${entry.method}Query`](entry.params);
-    queries[entry.method].cache.set(JSON.stringify(entry.params), res);
-  });
+  for (const entry of cacheEntries) {
+    entry.func.refresh(entry.params);
+  }
 };
 
 export default () => {
   console.log('Starting Background Jobs.');
-  if (useCache) {
+  if (!noCache) {
     console.log('- starting refreshCache');
-    setInterval(refreshCache, CACHE_REFRESH_INTERVAL);
+    setInterval(refreshCache, cacheRefreshInterval);
     refreshCache();
   }
 };
