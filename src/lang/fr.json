@@ -683,7 +683,7 @@
   "redeem.form.redeem.btn": "redeem",
   "redeemed.subtitle.line1": "The card has been added to your account.",
   "redeemed.subtitle.line2": "You can now donate to any collective of your choice.",
-  "redeemed.findCollectives": "Find open collectives to support.",
+  "redeemed.findCollectives": "Trouver et soutenir de nouveaux collectifs.",
   "redeemed.backyourstack": "or discover the open source projects that your organization is depending on and that need funding on {link}",
   "redeemed.suggestions": "or you can choose from these awesome collectives that are doing great work:",
   "loginform.title": "S'identifier ou créer un compte"
