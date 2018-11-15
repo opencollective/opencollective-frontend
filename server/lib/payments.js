@@ -10,6 +10,7 @@ import { types } from '../constants/collectives';
 import status from '../constants/order_status';
 import roles from '../constants/roles';
 import activities from '../constants/activities';
+import roles from '../constants/roles';
 import paymentProviders from '../paymentProviders';
 import * as libsubscription from './subscriptions';
 import * as libtransactions from './transactions';
@@ -369,6 +370,24 @@ export const executeOrder = async (user, order, options) => {
   // created here it means that the payment went through so it's
   // safe to create subscription after this.
   order.interval && transaction && (await createSubscription(order));
+    .then(transaction => {
+      // If using a virtual card, we should also credit the organization that
+      // emitted the virtual card as a backer
+      if (transaction && transaction.UsingVirtualCardFromCollectiveId) {
+        order.collective.findOrAddUserWithRole(
+          {
+            id: user.id,
+            CollectiveId: transaction.UsingVirtualCardFromCollectiveId,
+          },
+          roles.BACKER,
+          {
+            CreatedByUserId: user.id,
+            TierId: order.TierId,
+          },
+        );
+      }
+      return transaction;
+    })
 };
 
 const validatePayment = payment => {

@@ -490,6 +490,8 @@ describe('opencollective.virtualcard', () => {
         order.createdByUser = user;
         order.paymentMethod = virtualCardPaymentMethod;
 
+        const virtualCardEmitterCollectiveId = paymentMethod1.CollectiveId;
+
         // checking if transaction generated(CREDIT) matches the correct payment method
         // amount, currency and collectives...
         const creditTransaction = await virtualcard.processOrder(order);
@@ -498,7 +500,7 @@ describe('opencollective.virtualcard', () => {
           virtualCardPaymentMethod.id,
         );
         expect(creditTransaction.UsingVirtualCardFromCollectiveId).to.be.equal(
-          virtualCardPaymentMethod.CollectiveId,
+          virtualCardEmitterCollectiveId,
         );
         expect(creditTransaction.FromCollectiveId).to.be.equal(
           userCollective.id,
@@ -517,6 +519,23 @@ describe('opencollective.virtualcard', () => {
         expect(virtualCardCurrentBalance.amount).to.be.equal(
           virtualCardPaymentMethod.initialBalance - ORDER_TOTAL_AMOUNT,
         );
+        // User should now be a member of collective
+        const userMember = models.Member.findOne({
+          where: {
+            CollectiveId: collective2.id,
+            MemberCollectiveId: userCollective.id,
+          },
+        });
+        expect(userMember).to.exist;
+
+        // Collective that emitted the VirtualCard should be a member too
+        const collectiveMember = models.Member.findOne({
+          where: {
+            CollectiveId: collective2.id,
+            MemberCollectiveId: virtualCardEmitterCollectiveId,
+          },
+        });
+        expect(collectiveMember).to.exist;
       }); /** End Of "Process order of a virtual card" */
     }); /** End Of "#processOrder" */
   }); /** End Of "paymentProviders.opencollective.virtualcard" */
