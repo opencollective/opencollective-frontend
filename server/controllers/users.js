@@ -4,10 +4,7 @@ import constants from '../constants/activities';
 import emailLib from '../lib/email';
 import models from '../models';
 import errors from '../lib/errors';
-import cache from '../lib/cache';
 import { isValidEmail } from '../lib/utils';
-
-const tenMinutesInSeconds = 60 * 10;
 
 const { User, Activity } = models;
 
@@ -147,7 +144,6 @@ export const signin = (req, res, next) => {
   return models.User.findOne({ where: { email: user.email.toLowerCase() } })
     .then(u => u || models.User.createUserWithCollective(user))
     .then(u => {
-      cache.set(u.email, true, tenMinutesInSeconds);
       loginLink = u.generateLoginLink(redirect || '/');
       return emailLib.send(
         'user.new.token',
