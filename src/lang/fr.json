@@ -105,7 +105,7 @@
   "collective.types.user": "{n, plural, one {personne} other {personnes}}",
   "addfunds.fromCollective.host": "hôte ({host})",
   "addfunds.fromCollective.other": "autre (veuillez spécifier)",
-  "host.apply.create.btn": "Cliquez ici pour créer un collectif",
+  "host.apply.create.btn": "Postuler pour créer un collectif",
   "host.hostFee.help": "The host fee is the fee that the host charges your collective to take care of paying out the expenses that have been approved and to take care of recording all transactions in their books to comply with local fiscal authorities.",
   "host.tos": "Conditions d'utilisation",
   "host.apply.btn": "Appliquer pour héberger votre collectif {collective}",
