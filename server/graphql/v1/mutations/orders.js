@@ -74,13 +74,15 @@ async function checkRecaptcha(order, remoteUser, reqIp) {
     return;
   }
 
-  if (remoteUser) {
-    return;
-  }
   if (!order.recaptchaToken) {
-    throw new Error(
-      'Error while processing your request (Recaptcha token missing), please try again or contact support@opencollective.com',
-    );
+    // Fail if Recaptcha is required
+    if (!remoteUser) {
+      throw new Error(
+        'Error while processing your request (Recaptcha token missing), please try again or contact support@opencollective.com',
+      );
+    }
+    // Otherwise, pass for now
+    return;
   }
 
   const response = recaptcha.verify(order.recaptchaToken, reqIp);
