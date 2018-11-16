@@ -514,7 +514,7 @@
   "update.publish.btn": "publier",
   "update.publish.backers": "Votre billet sera envoyé à vos {n} contributeurs",
   "redeem.form.code.label": "Le code de carte-cadeau",
-  "redeem.card.info": "C’est facile. Il ne faut que donner votre nom, prénom et l’adresse mail, taper le code de votre carte-cadeau et votre compte de collectif sera créé (si nécessaire). Le carte-cadeau sera automatiquement attaché à votre compte.",
+  "redeem.card.info": "C’est facile. Entrez juste votre nom, prénom et l’adresse mail, puis tapez le code de votre carte-cadeau et votre compte de collectif sera créé (si nécessaire). La carte-cadeau sera automatiquement attachée à votre compte.",
   "redeem.card.success.title": "Vous n'êtes qu'à un pas pour soutenir des initiatives d'Open Collective!",
   "redeem.card.success.instructions": "On a envoyé un e-mail à l'adresse {email} avec des instructions comment vérifier le nouveau compte de votre collectif et le montant de votre carte-cadeau.",
   "paymentMethod.bitcoin.error.invalidEmail": "On ne peut pas créer l'adresse bitcoin sans l'adresse e-mail valable.",
