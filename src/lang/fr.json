@@ -281,7 +281,7 @@
   "editCollective.host.pending": "Vous avez demandé pour être hébergé par {host} le {date}. Dès que l'hôte accepte, vous pourrez commencer à recevoir de l'argent pour votre collectif.",
   "editCollective.host.label": "Votre hôte est {host}. Il héberge {collectives, plural, one {un collectif} other {{collectives} collectifs}}",
   "editCollective.host.balance": "Votre hôte a {balance} au nom de votre collectif.",
-  "editCollective.host.change.balanceNotEmpty": "Si vous voudriez changer l’hôte, il faut premièrement vider votre solde en enregistrant vos dépenses ou en transférant les fonds à un autre collectif.",
+  "editCollective.host.change.balanceNotEmpty": "Si vous souhaitez changer d'hôte, il faut d'abord vider votre solde en enregistrant vos dépenses ou en transférant les fonds à un autre collectif.",
   "editCollective.host.removeBtn": "Supprimer l'hôte",
   "editCollective.host.change.removeFirst": "Une fois supprimée, vous ne serez plus capables de recevoir des donations. Vous seriez toutefois toujours capables de choisir un autre hôte pour votre collectif.",
   "collective.edit.host.noHost.title": "Pas d'hôte",
