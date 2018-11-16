@@ -84,5 +84,9 @@
   },
   "fixer": {
     "accessKey": "xxxxx"
+  },
+  "recaptcha": {
+    "siteKey": "6LcyeXoUAAAAAFtdHDZfsxncFUkD9NqydqbIFcCK",
+    "secretKey": "6LcyeXoUAAAAACqNaR6EZJ_LG0V0N35uNkab3ibj"
   }
 }
