@@ -679,7 +679,7 @@
   "expenses.byCategory": "Dépenses en {category}",
   "expenses.byRecipient": "Dépenses par {recipient}",
   "error.code.invalid": "Le code de carte-cadeau pas valable",
-  "redeem.subtitle.line1": "Open Collective aide des communautés - projets open-source, meetups etc - à collecter de l’argent et à opérer dans une façon transparente.",
+  "redeem.subtitle.line1": "Open Collective aide des communautés - projets open-source, meetups etc - à collecter de l’argent et à opérer de façon transparente.",
   "redeem.form.redeem.btn": "redeem",
   "redeemed.subtitle.line1": "La carte a été ajoutée à votre compte.",
   "redeemed.subtitle.line2": "Vous pouvez désormais faire les dons à n'importe quel collectif de votre choix.",
