@@ -64,6 +64,7 @@ class UpdatesPage extends React.Component {
               href: `/${collective.slug}#contribute`,
               label: 'contribute',
             }}
+            key={collective.slug}
           />
 
           <div className="content">

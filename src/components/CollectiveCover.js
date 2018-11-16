@@ -324,10 +324,17 @@ ${description}`;
           <div className="content">
             <Link route={href} className="goBack">
               {collective.type === 'USER' && (
-                <Avatar src={logo} className="logo" radius="10rem" {...pick(collective, ['type', 'name'])} />
+                <Avatar src={logo} className="logo" radius="10rem" key={logo} {...pick(collective, ['type', 'name'])} />
               )}
               {collective.type !== 'USER' && (
-                <Logo src={logo} className="logo" type={collective.type} website={collective.website} height="10rem" />
+                <Logo
+                  src={logo}
+                  className="logo"
+                  type={collective.type}
+                  website={collective.website}
+                  height="10rem"
+                  key={logo}
+                />
               )}
             </Link>
             <h1>{title}</h1>

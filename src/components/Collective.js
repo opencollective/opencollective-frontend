@@ -219,7 +219,7 @@ class Collective extends React.Component {
               error={this.state.error}
             />
 
-            <CollectiveCover collective={collective} cta={cta} LoggedInUser={LoggedInUser} />
+            <CollectiveCover collective={collective} cta={cta} LoggedInUser={LoggedInUser} key={collective.slug} />
 
             <div>
               <div>

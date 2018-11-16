@@ -61,7 +61,13 @@ class TransactionsPage extends React.Component {
         />
 
         <Body>
-          <CollectiveCover collective={collective} href={`/${collective.slug}`} cta={cta} LoggedInUser={LoggedInUser} />
+          <CollectiveCover
+            collective={collective}
+            href={`/${collective.slug}`}
+            cta={cta}
+            LoggedInUser={LoggedInUser}
+            key={collective.slug}
+          />
 
           <div className="content">
             <TransactionsWithData

@@ -542,6 +542,7 @@ class MenuBar extends React.Component {
                             src={collective.image}
                             type={collective.type}
                             name={collective.name}
+                            key={collective.image}
                             className="logo"
                             radius="4.8rem"
                           />
@@ -549,6 +550,7 @@ class MenuBar extends React.Component {
                         {collective.type !== 'USER' && (
                           <Logo
                             src={collective.image}
+                            key={collective.image}
                             className="logo"
                             type={collective.type}
                             website={collective.website}
