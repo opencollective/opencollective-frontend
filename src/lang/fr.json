@@ -561,7 +561,7 @@
   "signinup.description.label": "Rapide description",
   "signinup.description.description": "Présentez-vous en 60 caractères, ou moins!",
   "signinup.twitterHandle.label": "twitter",
-  "subscription.amountToDate": "Ont contribué jusqu'à présent",
+  "subscription.amountToDate": "ont contribué jusqu'à présent",
   "subscription.pastDue": "Past due. Please update payment method.",
   "subscription.pastDue.msg": "Mettre à jour le moyen de paiement",
   "subscription.whyPastDueTitle": "Mettre à jour le moyen de paiement",
