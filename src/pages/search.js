@@ -21,9 +21,7 @@ import colors from '../constants/colors';
 
 import { addSearchQueryData } from '../graphql/queries';
 
-import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
-import withLoggedInUser from '../lib/withLoggedInUser';
 
 const { USE_PLEDGES } = process.env;
 
@@ -63,7 +61,6 @@ class SearchPage extends React.Component {
     offset: PropTypes.number, // for addSearchQueryData
     router: PropTypes.object, // from next.js
     data: PropTypes.object.isRequired, // from withData
-    getLoggedInUser: PropTypes.func.isRequired, // from withLoggedInUser
     usePledges: PropTypes.bool,
   };
 
@@ -75,19 +72,6 @@ class SearchPage extends React.Component {
     loadingUserLogin: true,
     LoggedInUser: undefined,
   };
-
-  async componentDidMount() {
-    const { getLoggedInUser } = this.props;
-    try {
-      const LoggedInUser = await getLoggedInUser();
-      this.setState({
-        loadingUserLogin: false,
-        LoggedInUser,
-      });
-    } catch (error) {
-      this.setState({ loadingUserLogin: false });
-    }
-  }
 
   refetch = event => {
     event.preventDefault();
@@ -109,8 +93,9 @@ class SearchPage extends React.Component {
       data: { error, loading, search },
       term = '',
       usePledges,
+      loadingLoggedInUser,
+      LoggedInUser,
     } = this.props;
-    const { loadingUserLogin, LoggedInUser } = this.state;
 
     if (error) {
       return <ErrorPage data={this.props.data} />;
@@ -124,7 +109,7 @@ class SearchPage extends React.Component {
       <div>
         <Header
           title="Search"
-          className={loadingUserLogin ? 'loading' : ''}
+          className={loadingLoggedInUser ? 'loading' : ''}
           LoggedInUser={LoggedInUser}
           showSearch={false}
         />
@@ -196,6 +181,58 @@ class SearchPage extends React.Component {
                 <p>
                   <em>If you don&apos;t see the collective you&apos;re searching for:</em>
                 </p>
+                {usePledges && (
+                  <Link route="createPledge" params={{ name: term }} passHref>
+                    <StyledLink
+                      display="block"
+                      fontSize="Paragraph"
+                      fontWeight="bold"
+                      maxWidth="220px"
+                      py={2}
+                      px={4}
+                      textAlign="center"
+                      buttonStyle="primary"
+                    >
+                      Make a pledge
+                    </StyledLink>
+                  </Link>
+                )}
+              </Flex>
+            )}
+            {showCollectives && collectives.length !== 0 && total > limit && (
+              <Flex justifyContent="center">
+                <ul className="pagination">
+                  {Array(Math.ceil(total / limit))
+                    .fill(1)
+                    .map((n, i) => (
+                      <li
+                        key={i * limit}
+                        className={classNames({
+                          active: i * limit === offset,
+                        })}
+                      >
+                        <Link
+                          href={{
+                            query: {
+                              limit,
+                              offset: i * limit,
+                              q: term,
+                            },
+                          }}
+                        >
+                          <a>{`${n + i}`}</a>
+                        </Link>
+                      </li>
+                    ))}
+                </ul>
+              </Flex>
+            )}
+
+            {showCollectives && collectives.length !== 0 && (
+              <Flex py={3} width={1} justifyContent="center" flexDirection="column" alignItems="center">
+                <p>
+                  <em>If you don&apos;t see the collective you&apos;re searching for:</em>
+                </p>
 
                 {usePledges && (
                   <Link route="createPledge" params={{ name: term }} passHref>
@@ -225,4 +262,4 @@ class SearchPage extends React.Component {
 
 export { SearchPage as MockSearchPage };
 
-export default withData(withIntl(withLoggedInUser(addSearchQueryData(withRouter(SearchPage)))));
+export default withIntl(addSearchQueryData(withRouter(SearchPage)));

@@ -4,7 +4,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Head from 'next/head';
-import { ApolloProvider, getDataFromTree } from 'react-apollo';
+import { getDataFromTree } from 'react-apollo';
 
 import initClient from './initClient';
 
@@ -15,6 +15,12 @@ function getComponentDisplayName(Component) {
 
 export default ComposedComponent => {
   return class WithData extends React.Component {
+    static defaultProps = {
+      serverState: {
+        apollo: {},
+      },
+    };
+
     static async getInitialProps(ctx) {
       // Initial serverState with apollo (empty)
       let serverState = {
@@ -35,7 +41,7 @@ export default ComposedComponent => {
 
       // Run all GraphQL queries in the component tree
       // and extract the resulting data
-      const apollo = initClient(undefined, options);
+      const apollo = initClient(undefined);
       try {
         // create the url prop which is passed to every page
         const url = {
@@ -98,15 +104,11 @@ export default ComposedComponent => {
     constructor(props) {
       super(props);
       const { serverState } = this.props;
-      this.apollo = initClient(serverState.apollo.data, this.props.options);
+      this.apollo = initClient(serverState.apollo.data);
     }
 
     render() {
-      return (
-        <ApolloProvider client={this.apollo}>
-          <ComposedComponent {...this.props} client={this.apollo} />
-        </ApolloProvider>
-      );
+      return <ComposedComponent {...this.props} client={this.apollo} />;
     }
   };
 };

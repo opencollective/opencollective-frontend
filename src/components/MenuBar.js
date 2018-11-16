@@ -13,6 +13,7 @@ import { Pencil } from 'styled-icons/octicons/Pencil.cjs';
 
 import colors from '../constants/colors';
 import withIntl from '../lib/withIntl';
+import { withUser } from './UserProvider';
 
 import Avatar from './Avatar';
 import Logo from './Logo';
@@ -619,4 +620,4 @@ const addMutationForAddFundsToOrg = graphql(addFundsToOrgQuery, {
   }),
 });
 
-export default addMutationForAddFundsToOrg(withIntl(MenuBar));
+export default addMutationForAddFundsToOrg(withIntl(withUser(MenuBar)));

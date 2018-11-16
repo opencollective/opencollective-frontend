@@ -1,54 +1,49 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 
-import withData from '../lib/withData';
-import withLoggedInUser from '../lib/withLoggedInUser';
+import { withUser } from './UserProvider';
 
-import Body from './Body';
-import ErrorPage from './ErrorPage';
-import Footer from './Footer';
-import Header from './Header';
+import Body from '../components/Body';
+import ErrorPage from '../components/ErrorPage';
+import Footer from '../components/Footer';
+import Header from '../components/Header';
 
 class Page extends React.Component {
-  static propTypes = {
-    getLoggedInUser: PropTypes.func,
-    title: PropTypes.string,
-  };
-
-  state = {
-    error: null,
-    loadingLoggedInUser: true,
-    LoggedInUser: null,
-  };
-
-  async componentDidMount() {
-    const { getLoggedInUser } = this.props;
-    try {
-      const LoggedInUser = await getLoggedInUser();
-      this.setState({ LoggedInUser });
-    } catch (error) {
-      this.setState({ error });
-    } finally {
-      this.setState({ loadingLoggedInUser: false });
-    }
-  }
-
   render() {
-    const { children, title } = this.props;
-    const { error, loadingLoggedInUser, LoggedInUser } = this.state;
+    const { children, data, loadingLoggedInUser, LoggedInUser, title, showSearch } = this.props;
 
-    if (error) {
-      return <ErrorPage message={error.message} />;
+    if (data.error) {
+      return <ErrorPage data={data} LoggedInUser={LoggedInUser} />;
     }
+
+    const childProps = { LoggedInUser, loadingLoggedInUser };
 
     return (
       <Fragment>
-        <Header className={loadingLoggedInUser ? 'loading' : ''} LoggedInUser={LoggedInUser} title={title} />
-        <Body>{children(this.state)}</Body>
+        <Header
+          className={loadingLoggedInUser ? 'loading' : ''}
+          LoggedInUser={LoggedInUser}
+          showSearch={showSearch}
+          title={title}
+        />
+        <Body>{typeof children === 'function' ? children(childProps) : children}</Body>
         <Footer />
       </Fragment>
     );
   }
 }
 
-export default withData(withLoggedInUser(Page));
+Page.propTypes = {
+  data: PropTypes.shape({
+    error: PropTypes.shape({}),
+  }),
+  LoggedInUser: PropTypes.shape({}),
+  showSearch: PropTypes.bool,
+  title: PropTypes.string,
+};
+
+Page.defaultProps = {
+  showSearch: true,
+};
+
+export default withUser(Page);

@@ -40,7 +40,6 @@ const NavLink = styled.a`
 class TopBar extends React.Component {
   static propTypes = {
     className: PropTypes.string,
-    LoggedInUser: PropTypes.object,
     showSearch: PropTypes.bool,
   };
 
@@ -60,7 +59,7 @@ class TopBar extends React.Component {
   }
 
   render() {
-    const { className, LoggedInUser, showSearch } = this.props;
+    const { className, showSearch } = this.props;
     const shouldAnimate = Array.isArray(className) && className.includes('loading');
 
     return (
@@ -129,7 +128,7 @@ class TopBar extends React.Component {
             </NavList>
           </Hide>
 
-          <TopBarProfileMenu LoggedInUser={LoggedInUser} />
+          <TopBarProfileMenu />
         </Flex>
       </Flex>
     );

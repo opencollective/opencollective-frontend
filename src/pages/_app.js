@@ -3,6 +3,9 @@ import App, { Container } from 'next/app';
 import Router from 'next/router';
 import NProgress from 'nprogress';
 import { ThemeProvider } from 'styled-components';
+import { ApolloProvider } from 'react-apollo';
+import UserProvider from '../components/UserProvider';
+import withData from '../lib/withData';
 
 import theme from '../constants/theme';
 
@@ -18,7 +21,7 @@ Router.onRouteChangeError = () => NProgress.done();
 
 import { getGoogleMapsScriptUrl, loadGoogleMaps } from '../lib/google-maps';
 
-export default class OpenCollectiveFrontendApp extends App {
+class OpenCollectiveFrontendApp extends App {
   static async getInitialProps({ Component, ctx }) {
     let pageProps = {};
 
@@ -42,13 +45,17 @@ export default class OpenCollectiveFrontendApp extends App {
   }
 
   render() {
-    const { Component, pageProps, scripts } = this.props;
+    const { client, Component, pageProps, scripts } = this.props;
 
     return (
       <Container>
-        <ThemeProvider theme={theme}>
-          <Component {...pageProps} />
-        </ThemeProvider>
+        <ApolloProvider client={client}>
+          <ThemeProvider theme={theme}>
+            <UserProvider>
+              <Component {...pageProps} />
+            </UserProvider>
+          </ThemeProvider>
+        </ApolloProvider>
         {Object.keys(scripts).map(key => (
           <script key={key} type="text/javascript" src={scripts[key]} />
         ))}
@@ -56,3 +63,5 @@ export default class OpenCollectiveFrontendApp extends App {
     );
   }
 }
+
+export default withData(OpenCollectiveFrontendApp);

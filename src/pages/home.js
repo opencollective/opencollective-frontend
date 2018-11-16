@@ -31,9 +31,7 @@ import Carousel from '../components/Carousel';
 import Currency from '../components/Currency';
 import ErrorPage from '../components/ErrorPage';
 
-import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
-import withLoggedInUser from '../lib/withLoggedInUser';
 
 const carouselContent = [
   {
@@ -150,7 +148,6 @@ class HomePage extends React.Component {
 
   static propTypes = {
     data: PropTypes.object.isRequired, // from withData
-    getLoggedInUser: PropTypes.func.isRequired, // from withLoggedInUser
   };
 
   state = {
@@ -158,9 +155,6 @@ class HomePage extends React.Component {
   };
 
   async componentDidMount() {
-    const LoggedInUser = await this.props.getLoggedInUser();
-    this.setState({ LoggedInUser });
-
     // separate request to not block showing LoggedInUser
     const { stats } = await fetch(`${getBaseApiUrl()}/homepage`).then(response => response.json());
     this.setState({ stats });
@@ -171,6 +165,7 @@ class HomePage extends React.Component {
       return <ErrorPage data={this.props.data} />;
     }
 
+    const { LoggedInUser } = this.props;
     const {
       topSpenders: { collectives: topSpenders },
       backers: { collectives: backers },
@@ -184,7 +179,6 @@ class HomePage extends React.Component {
       transactions: { transactions },
     } = this.props.data;
     const {
-      LoggedInUser,
       stats: { totalAnnualBudget, totalCollectives, totalDonors },
     } = this.state;
 
@@ -876,4 +870,4 @@ const addHomeData = graphql(query);
 
 export { HomePage as MockHomePage };
 
-export default withData(withLoggedInUser(addHomeData(withIntl(HomePage))));
+export default addHomeData(withIntl(HomePage));
