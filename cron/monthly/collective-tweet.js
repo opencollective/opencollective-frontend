@@ -207,7 +207,7 @@ const sendTweet = async (twitterAccount, data) => {
 
   const template =
     stats.totalReceived === 0 ? 'monthlyStatsNoNewDonation' : 'monthlyStats';
-  const tweet = await twitter.compileTweet(template, replacements);
+  const tweet = twitter.compileTweet(template, replacements);
 
   // We thread the tweet with the previos monthly stats
   const in_reply_to_status_id = get(

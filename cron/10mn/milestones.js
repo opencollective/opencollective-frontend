@@ -188,7 +188,7 @@ const compileTweet = async (collective, template, twitterAccount) => {
     );
   }
 
-  let tweet = await twitter.compileTweet(
+  let tweet = twitter.compileTweet(
     template,
     replacements,
     get(twitterAccount, `settings.${template}.tweet`),
