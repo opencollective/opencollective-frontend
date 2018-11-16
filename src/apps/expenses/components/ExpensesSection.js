@@ -113,7 +113,11 @@ class ExpensesSection extends React.Component {
                       />
                     </h2>
                     {this.totalExpenses >= 5 && (
-                      <LinkButton className="light ViewAllExpensesBtn" href={`${collective.path}/expenses`}>
+                      <LinkButton
+                        className="light ViewAllExpensesBtn"
+                        route="expenses"
+                        params={{ collectiveSlug: collective.slug }}
+                      >
                         <FormattedMessage id="expenses.viewAll" defaultMessage="View All Expenses" />
                       </LinkButton>
                     )}

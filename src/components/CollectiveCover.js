@@ -96,7 +96,6 @@ ${description}`;
 
     const { company, type, website, twitterHandle, githubHandle, stats } = collective;
 
-    const href = this.props.href || collective.path || `/${collective.slug}`;
     const title = this.props.title || collective.name;
     const backgroundImage = imagePreview(
       collective.backgroundImage || get(collective, 'parentCollective.backgroundImage'),
@@ -331,7 +330,7 @@ ${description}`;
           <div className="backgroundCover" style={style} />
 
           <div className="content">
-            <Link route={href} className="goBack">
+            <Link route="collective" params={{ slug: collective.slug }} className="goBack">
               {collective.type === 'USER' && (
                 <Avatar src={logo} className="logo" radius="10rem" key={logo} {...pick(collective, ['type', 'name'])} />
               )}
