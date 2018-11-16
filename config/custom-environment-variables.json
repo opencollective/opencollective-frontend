@@ -18,6 +18,9 @@
       "secret": "JWT_SECRET"
     }
   },
+  "logs": {
+    "accessLogs": "ACCESS_LOGS"
+  },
   "stripe": {
     "secret": "STRIPE_SECRET",
     "key": "STRIPE_KEY",

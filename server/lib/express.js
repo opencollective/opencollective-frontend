@@ -11,6 +11,7 @@ import session from 'express-session';
 import helmet from 'helmet';
 import debug from 'debug';
 import cloudflareIps from 'cloudflare-ip/ips.json';
+import { get } from 'lodash';
 import { Strategy as GitHubStrategy } from 'passport-github';
 import { Strategy as TwitterStrategy } from 'passport-twitter';
 import { Strategy as MeetupStrategy } from 'passport-meetup-oauth2';
@@ -51,8 +52,8 @@ export default function(app) {
     });
   }
 
-  // Log requests if it's not the test environment
-  if (!['test', 'circleci'].includes(process.env.NODE_ENV)) {
+  // Log requests if enabled (default false)
+  if (get(config, 'logs.accessLogs')) {
     app.use(morgan('combined'));
   }
 
