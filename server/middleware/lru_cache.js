@@ -21,6 +21,14 @@ export default () => {
 
   // TODO: Need to write tests for this cache
   return (req, res, next) => {
+    if (
+      process.env.NODE_ENV === 'circleci' ||
+      process.env.NODE_ENV === 'test'
+    ) {
+      next();
+      return;
+    }
+
     const temp = res.end;
 
     // only relevant for graphql queries, not mutations
