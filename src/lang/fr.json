@@ -14,7 +14,7 @@
   "expense.expensePolicy.add": "Ajouter des règles de dépense",
   "expense.expensePolicy": "Règles pour les dépenses",
   "expense.disclaimer": "Vous devez attacher un reçu ou une facture valide. On doit être capable de voir clairement le montant total, la date, le service fourni ou les choses achetées et l'adresse légale.",
-  "needHelp": "Besoin d'aide?",
+  "needHelp": "Besoin d'aide ?",
   "expense.attachment.description": "Attacher un reçu ou une facture (photo ou PDF)",
   "expense.description": "description",
   "expense.amount": "montant",
