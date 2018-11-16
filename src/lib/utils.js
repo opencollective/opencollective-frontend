@@ -1,4 +1,5 @@
 import { get } from 'lodash';
+import getSymbolFromCurrency from 'currency-symbol-map';
 
 import loadScript from 'load-script';
 
@@ -62,14 +63,19 @@ export const isValidEmail = email => {
   );
 };
 
+function getCurrencySymbolFallback(currency) {
+  return Number(0)
+    .toLocaleString('en-US', {
+      style: 'currency',
+      currency,
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    })
+    .replace(/(^0\s?)|(\s?0$)/, '');
+}
+
 export function getCurrencySymbol(currency) {
-  const r = Number(0).toLocaleString(currency, {
-    style: 'currency',
-    currency,
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  });
-  return r.replace(/(^0\s)|(\s0$)/, '');
+  return getSymbolFromCurrency(currency) || getCurrencySymbolFallback(currency);
 }
 
 /** Retrieve variables set in the environment */
