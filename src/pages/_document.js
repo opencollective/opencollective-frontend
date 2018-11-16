@@ -40,6 +40,9 @@ export default class IntlDocument extends Document {
       GOOGLE_MAPS_API_KEY:
         process.env.GOOGLE_MAPS_API_KEY ||
         'AIzaSyCRLIexl7EkMQk_0_yNsjO4Vqb_MccD-RI',
+      RECAPTCHA_SITE_KEY:
+        process.env.RECAPTCHA_SITE_KEY ||
+        '6LcyeXoUAAAAAFtdHDZfsxncFUkD9NqydqbIFcCK',
     };
   }
 
