@@ -131,6 +131,11 @@ export default function(Sequelize, DataTypes) {
         },
       },
 
+      data: {
+        type: DataTypes.JSON,
+        allowNull: true,
+      },
+
       createdAt: {
         type: DataTypes.DATE,
         defaultValue: Sequelize.NOW,
