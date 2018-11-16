@@ -283,7 +283,7 @@
   "editCollective.host.balance": "Votre hôte a {balance} au nom de votre collectif.",
   "editCollective.host.change.balanceNotEmpty": "Si vous souhaitez changer d'hôte, il faut d'abord vider votre solde en enregistrant vos dépenses ou en transférant les fonds à un autre collectif.",
   "editCollective.host.removeBtn": "Supprimer l'hôte",
-  "editCollective.host.change.removeFirst": "Une fois supprimée, vous ne serez plus capables de recevoir des donations. Vous seriez toutefois toujours capables de choisir un autre hôte pour votre collectif.",
+  "editCollective.host.change.removeFirst": "Une fois supprimée, vous ne serez plus capables de recevoir des dons. Vous seriez toutefois toujours capables de choisir un autre hôte pour votre collectif.",
   "collective.edit.host.noHost.title": "Pas d'hôte",
   "collective.edit.host.noHost.description": "Sans hôte, vous ne pouvez pas ramasser d’argent. Vous serez toutefois toujours capables d’utiliser les autres fonctions d’Open Collective telles que l’enregistrement des dépenses, la mise à jour des informations ou la création des événements.",
   "collective.edit.host.createHost.title": "Utiliser votre propre hôte",
