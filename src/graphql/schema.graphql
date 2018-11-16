@@ -1,5 +1,5 @@
 # source: http://localhost:3000/api/graphql
-# timestamp: Sat Oct 27 2018 13:55:20 GMT+0100 (British Summer Time)
+# timestamp: Fri Nov 16 2018 09:53:26 GMT+0100 (Central European Standard Time)
 
 """Application model"""
 type Application {
@@ -124,7 +124,7 @@ type Collective implements CollectiveInterface {
   website: String
   updates(limit: Int, offset: Int): [Event]
   events(limit: Int, offset: Int): [Event]
-  paymentMethods(service: String, limit: Int, hasBalanceAboveZero: Boolean): [PaymentMethodType]
+  paymentMethods(service: String, limit: Int, hasBalanceAboveZero: Boolean, isConfirmed: Boolean = true, types: [String]): [PaymentMethodType]
   connectedAccounts: [ConnectedAccountType]
   stats: CollectiveStatsType
 }
@@ -152,6 +152,7 @@ input CollectiveAttributesInputType {
   maxAmount: Int
   currency: String
   settings: JSON
+  tags: [String]
 }
 
 """Input type for CollectiveType"""
@@ -272,7 +273,17 @@ interface CollectiveInterface {
   website: String
   updates(limit: Int, offset: Int): [Event]
   events(limit: Int, offset: Int): [Event]
-  paymentMethods(service: String, limit: Int, hasBalanceAboveZero: Boolean): [PaymentMethodType]
+  paymentMethods(
+    service: String
+    limit: Int
+    hasBalanceAboveZero: Boolean
+
+    """Only return confirmed payment methods"""
+    isConfirmed: Boolean = true
+
+    """Filter on given types (creditcard, virtualcard...)"""
+    types: [String]
+  ): [PaymentMethodType]
   connectedAccounts: [ConnectedAccountType]
 }
 
@@ -513,7 +524,7 @@ type Event implements CollectiveInterface {
   website: String
   updates(limit: Int, offset: Int): [Event]
   events(limit: Int, offset: Int): [Event]
-  paymentMethods(service: String, limit: Int, hasBalanceAboveZero: Boolean): [PaymentMethodType]
+  paymentMethods(service: String, limit: Int, hasBalanceAboveZero: Boolean, isConfirmed: Boolean = true, types: [String]): [PaymentMethodType]
   connectedAccounts: [ConnectedAccountType]
   stats: CollectiveStatsType
 }
@@ -557,6 +568,7 @@ type Expense implements Transaction {
   host: User
   createdByUser: UserDetails
   fromCollective: CollectiveInterface
+  usingVirtualCardFromCollective: CollectiveInterface
   collective: CollectiveInterface
   createdAt: String
   updatedAt: String
@@ -810,6 +822,7 @@ type Order implements Transaction {
   host: User
   createdByUser: UserDetails
   fromCollective: CollectiveInterface
+  usingVirtualCardFromCollective: CollectiveInterface
   collective: CollectiveInterface
   createdAt: String
   updatedAt: String
@@ -1038,7 +1051,7 @@ type Organization implements CollectiveInterface {
   website: String
   updates(limit: Int, offset: Int): [Event]
   events(limit: Int, offset: Int): [Event]
-  paymentMethods(service: String, limit: Int, hasBalanceAboveZero: Boolean): [PaymentMethodType]
+  paymentMethods(service: String, limit: Int, hasBalanceAboveZero: Boolean, isConfirmed: Boolean = true, types: [String]): [PaymentMethodType]
   connectedAccounts: [ConnectedAccountType]
   stats: CollectiveStatsType
   email: String
@@ -1083,6 +1096,11 @@ type PaymentMethodType {
   id: Int
   uuid: String
   createdAt: String
+
+  """
+  Will be true for virtual card if claimed. Always true for other payment methods.
+  """
+  isConfirmed: Boolean
   expiryDate: String
   service: String
   SourcePaymentMethodId: Int
@@ -1165,7 +1183,7 @@ type Query {
     orderBy: OrderByType = {field: createdAt, direction: DESC}
   ): PaginatedExpenses
   Expense(id: Int!): ExpenseType
-  Transaction(id: Int!): Transaction
+  Transaction(id: Int, uuid: String): Transaction
   allCollectives(
     """Fetch all collectives that match at least one of the tags"""
     tags: [String]
@@ -1254,7 +1272,15 @@ type Query {
 type StatsMemberType {
   id: Int
 
-  """total amount donated by this member"""
+  """total amount donated directly by this member"""
+  directDonations: Int
+
+  """total amount donated by this member through gift cards"""
+  donationsThroughEmittedVirtualCards: Int
+
+  """
+  total amount donated by this member either directly or using a virtual card it has emitted
+  """
   totalDonations: Int
 
   """total amount raised by this member"""
@@ -1364,6 +1390,7 @@ interface Transaction {
   host: CollectiveInterface
   paymentMethod: PaymentMethodType
   fromCollective: CollectiveInterface
+  usingVirtualCardFromCollective: CollectiveInterface
   collective: CollectiveInterface
   type: String
   description: String
@@ -1542,7 +1569,7 @@ type User implements CollectiveInterface {
   website: String
   updates(limit: Int, offset: Int): [Event]
   events(limit: Int, offset: Int): [Event]
-  paymentMethods(service: String, limit: Int, hasBalanceAboveZero: Boolean): [PaymentMethodType]
+  paymentMethods(service: String, limit: Int, hasBalanceAboveZero: Boolean, isConfirmed: Boolean = true, types: [String]): [PaymentMethodType]
   connectedAccounts: [ConnectedAccountType]
   stats: CollectiveStatsType
   firstName: String

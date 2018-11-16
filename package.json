@@ -118,7 +118,8 @@
     "semantic-release": "semantic-release",
     "cypress": "TZ=UTC cypress run",
     "prettier": "prettier \"cypress/**/*.js\" \"src/**/*.js\" \"test/**/*.js\" --write",
-    "optimize-png": "npm install --no-save imagemin imagemin-optipng && babel-node ./scripts/optimize-png"
+    "optimize-png": "npm install --no-save imagemin imagemin-optipng && babel-node ./scripts/optimize-png",
+    "graphql:get-schema:dev": "npx graphql-cli get-schema -p opencollective -e dev"
   },
   "devDependencies": {
     "@babel/cli": "7.0.0",
