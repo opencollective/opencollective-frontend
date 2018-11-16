@@ -102,7 +102,7 @@ export function authorizeClientApp(req, res, next) {
   if (req.clientApp) {
     debug('auth')('Valid Client App');
     next();
-  } else if (apiKey === config.keys.opencollective.api_key) {
+  } else if (apiKey === config.keys.opencollective.apiKey) {
     debug('auth')(`Valid API key: ${apiKey}`);
     next();
   } else if (apiKey) {

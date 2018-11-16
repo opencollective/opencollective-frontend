@@ -1,10 +1,11 @@
 import crypto from 'crypto';
 
+import config from 'config';
 import Hashids from 'hashids';
 
 const alphabet = '1234567890abcdefghijklmnopqrstuvwxyz';
 
-let salt = process.env.HASHID_SALT;
+let salt = config.keys.opencollective.hashidSalt;
 if (!salt) {
   console.warn('Please define HASHID_SALT to get permanent public ids.');
   salt = crypto.randomBytes(64).toString('hex');

@@ -21,7 +21,7 @@ export function createJwt(subject, payload, expiresIn) {
 
 /** Verify JWToken */
 export function verifyJwt(token) {
-  return jwt.verify(token, config.keys.opencollective.secret);
+  return jwt.verify(token, config.keys.opencollective.jwtSecret);
 }
 
 /**

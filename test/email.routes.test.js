@@ -14,7 +14,7 @@ import nock from 'nock';
 import initNock from './email.routes.test.nock.js';
 
 const generateToken = (email, slug, template) => {
-  const uid = `${email}.${slug}.${template}.${config.keys.opencollective.secret}`;
+  const uid = `${email}.${slug}.${template}.${config.keys.opencollective.jwtSecret}`;
   return crypto
     .createHash('md5')
     .update(uid)

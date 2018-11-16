@@ -304,7 +304,7 @@ describe('users.routes.test.js', () => {
 
     it('fails if the user does not exist', done => {
       const fakeUser = { id: 12312312 };
-      const expiredToken = jwt.sign({ user: fakeUser }, config.keys.opencollective.secret, {
+      const expiredToken = jwt.sign({ user: fakeUser }, config.keys.opencollective.jwtSecret, {
         expiresIn: 100,
         subject: fakeUser.id,
         issuer: config.host.api,
@@ -325,7 +325,7 @@ describe('users.routes.test.js', () => {
     });
 
     it('sends an email with the new valid token', () => {
-      const expiredToken = jwt.sign({ user }, config.keys.opencollective.secret, {
+      const expiredToken = jwt.sign({ user }, config.keys.opencollective.jwtSecret, {
         expiresIn: -1,
         subject: user.id,
         issuer: config.host.api,

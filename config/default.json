@@ -14,15 +14,20 @@
       "logging": false
     }
   },
-  "cache": {
-    "middleware": false,
-    "homepage": {
-      "disabled": false,
-      "refreshInterval": 3600
+  "maintenancedb": {
+    "database": "postgres",
+    "username": "postgres",
+    "password": "",
+    "options": {
+      "host": "127.0.0.1"
     }
   },
-  "logs": {
-    "accessLogs": false
+  "keys": {
+    "opencollective": {
+      "apiKey": "dvl-1510egmf4a23d80342403fb599qd",
+      "sessionSecret": "mei0ieD3ahli9fengie7teeceeCaicho",
+      "hashidSalt": "aiwiurohyohleevoo4ohraigi3auTohz"
+    }
   },
   "host": {
     "api": "http://localhost:3060",
@@ -41,16 +46,19 @@
   "email": {
     "from": "Open Collective <info@opencollective.com>"
   },
-  "mailgun": {
-    "user": "",
-    "password": "",
-    "api_key": ""
+  "cache": {
+    "middleware": false,
+    "homepage": {
+      "disabled": false,
+      "refreshInterval": 3600
+    }
+  },
+  "logs": {
+    "accessLogs": false
   },
   "aws": {
     "s3": {
-      "bucket": "opencollective-test",
-      "secret": "unknown",
-      "key": "unknown"
+      "bucket": "opencollective-test"
     }
   },
   "paypal": {
@@ -66,43 +74,35 @@
     },
     "feeOC": 5,
     "payment": {
-      "environment": "sandbox",
-      "clientId": "xxx",
-      "clientSecret": "xxx"
+      "environment": "sandbox"
     }
   },
+  "github": {
+    "clientID": "UNDEFINED_GITHUB_CLIENT_ID",
+    "clientSecret": "UNDEFINED_GITHUB_CLIENT_SECRET"
+  },
+  "meetup": {
+    "clientID": "UNDEFINED_MEETUP_CLIENT_ID",
+    "clientSecret": "UNDEFINED_MEETUP_CLIENT_SECRET"
+  },
+  "twitter": {
+    "consumerKey": "UNDEFINED_TWITTER_CONSUMER_KEY",
+    "consumerSecret": "UNDEFINED_TWITTER_CONSUMER_SECRET"
+  },
+  "algolia": {
+    "index": "dvl_collectives"
+  },
+  "fixer": {
+    "accessKey": "UNDEFINED_FIXER_ACCESS_KEY"
+  },
   "stripe": {
-    "redirectUri": "http://localhost:3060/connected-accounts/stripe/callback",
-    "clientId": "xxx",
-    "secret": "xxx"
+    "clientId": "pk_test_5aBB887rPuzvWzbdRiSzV3QB",
+    "secret": "sk_test_o3A3GoHbeb113oq1aZbDJNJe",
+    "redirectUri": "http://localhost:3060/connected-accounts/stripe/callback"
   },
   "slack": {
     "privateActivityChannel": "#activity-private-test",
     "publicActivityChannel": "#activity-public-test"
-  },
-  "clearbit": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
-  "github": {
-    "clientID": "xxx",
-    "clientSecret": "xxxxx"
-  },
-  "meetup": {
-    "clientID": "xxxxx",
-    "clientSecret": "xxxxx"
-  },
-  "twitter": {
-    "consumerKey": "xxxx",
-    "consumerSecret": "xxxxx"
-  },
-  "expressperf": {
-    "api_key": ""
-  },
-  "algolia": {
-    "appId": "xxxxx",
-    "appKey": "xxxxx",
-    "index": "dvl_collectives"
-  },
-  "fixer": {
-    "accessKey": "xxxxx"
   },
   "recaptcha": {
     "siteKey": "6LcyeXoUAAAAAFtdHDZfsxncFUkD9NqydqbIFcCK",

@@ -18,7 +18,7 @@ describe('authlib', () => {
     const token = auth.createJwt('subject', { foo: 'bar' }, 5);
 
     // Then the token should be verifiable
-    const decoded = jwt.verify(token, config.keys.opencollective.secret);
+    const decoded = jwt.verify(token, config.keys.opencollective.jwtSecret);
     clock.restore();
 
     // And then it should contain all the important fields

@@ -114,7 +114,7 @@ export default function(app) {
   app.use(cookieParser());
   app.use(
     session({
-      secret: config.keys.opencollective.session_secret,
+      secret: config.keys.opencollective.sessionSecret,
       resave: false,
       cookie: { maxAge: 1000 * 60 * 5 },
       saveUninitialized: false,

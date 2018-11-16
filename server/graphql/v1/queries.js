@@ -1,7 +1,7 @@
-import algoliasearch from 'algoliasearch';
-import config from 'config';
 import Promise from 'bluebird';
+import { find, get, uniq } from 'lodash';
 
+import algolia from '../../lib/algolia';
 import errors from '../../lib/errors';
 
 import { GraphQLList, GraphQLNonNull, GraphQLString, GraphQLInt, GraphQLBoolean } from 'graphql';
@@ -38,12 +38,9 @@ import {
   PaymentMethodType,
 } from './types';
 
-import { find, get, uniq } from 'lodash';
 import models, { sequelize, Op } from '../../models';
 import rawQueries from '../../lib/queries';
 import { fetchCollectiveId } from '../../lib/cache';
-
-const { appId: ALGOLIA_APP_ID, appKey: ALGOLIA_KEY, index: ALGOLIA_INDEX } = config.algolia;
 
 const queries = {
   Collective: {
@@ -1146,8 +1143,10 @@ const queries = {
         };
       }
 
-      const client = algoliasearch(ALGOLIA_APP_ID, ALGOLIA_KEY);
-      const index = client.initIndex(ALGOLIA_INDEX);
+      const index = algolia.getIndex();
+      if (!index) {
+        return { collectives: [], limit, offset, total: 0 };
+      }
 
       const { hits, nbHits: total } = await index.search({
         query: term,

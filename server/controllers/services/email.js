@@ -14,7 +14,7 @@ const debugWebhook = debug('webhook');
 export const unsubscribe = (req, res, next) => {
   const { type, email, slug, token } = req.params;
 
-  const identifier = `${email}.${slug || 'any'}.${type}.${config.keys.opencollective.secret}`;
+  const identifier = `${email}.${slug || 'any'}.${type}.${config.keys.opencollective.jwtSecret}`;
   const computedToken = crypto
     .createHash('md5')
     .update(identifier)

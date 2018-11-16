@@ -18,21 +18,7 @@
   },
   "keys": {
     "opencollective": {
-      "api_key": "circleci-1510egmf4a23d80342403fb599qd",
-      "secret": "circleci-a6ad8e62b53b18b4c30295f45d849c1",
-      "session_secret": "circleci-i&j@/V6Wx.`g>Aq?qQQF(>u)/Erm;3A="
-    }
-  },
-  "stripe": {
-    "secret": "sk_test_3",
-    "clientId": "abc",
-    "key": "pk_test_5"
-  },
-  "aws": {
-    "s3": {
-      "bucket": "opencollective-test",
-      "secret": "unknown",
-      "key": "unknown"
+      "apiKey": "circleci-1510egmf4a23d80342403fb599qd"
     }
   }
 }
