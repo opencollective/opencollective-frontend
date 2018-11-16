@@ -290,7 +290,7 @@
   "collective.edit.host.createHost.description": "You can create your own host as an individual or as an organization. You will be responsible for keeping custody of the funds raised by this collective and for paying out the expenses that have been approved.",
   "moreInfo": "Plus d'info",
   "collective.edit.host.findHost.title": "Postuler à un hôte déja existant",
-  "collective.edit.host.findHost.description": "Avec cette option, tout est fait pour vous. Vous ne devez pas créer un compte bancaire ou s’inquiéter de comptabilité ou de facturation. Tout est réglé par une organisation non-gouvernementale déjà existante qui joue le rôle de votre hôte fiscal. Note: la plupart des hôtes prennent une commission pour la couverture de frais généraux administratifs.",
+  "collective.edit.host.findHost.description": "Avec cette option, tout est fait pour vous. Pas besoin de créer un compte bancaire ou de vous préoccuper de la comptabilité ou de la facturation. Tout est géré par une organisation non-gouvernementale déjà existante qui joue le rôle de votre hôte fiscal. Note: la plupart des hôtes prennent une commission pour la couverture de frais généraux administratifs.",
   "collective.edit.host.suggestedHosts.title": "Suggestions",
   "collective.edit.host.viewAllHosts": "Voir tous les hôtes",
   "collective.edit.host.suggestedHosts.description": "Basé sur la devise de votre collectif ({currency}) et ses tags ({tags})",
