@@ -9,6 +9,7 @@
     "npm": "6.1.0"
   },
   "dependencies": {
+    "@babel/node": "7.0.0",
     "algoliasearch": "3.24.9",
     "apollo-errors": "1.9.0",
     "apollo-server-express": "2.0.5",
@@ -101,7 +102,6 @@
   "devDependencies": {
     "@babel/cli": "7.1.5",
     "@babel/core": "7.1.5",
-    "@babel/node": "7.0.0",
     "@babel/plugin-proposal-class-properties": "7.1.0",
     "@babel/plugin-transform-async-to-generator": "7.1.0",
     "@babel/polyfill": "7.0.0",
