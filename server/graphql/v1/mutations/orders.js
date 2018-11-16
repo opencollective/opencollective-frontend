@@ -70,6 +70,10 @@ function checkOrdersLimit(order, remoteUser, reqIp) {
 }
 
 async function checkRecaptcha(order, remoteUser, reqIp) {
+  if (process.env.NODE_ENV === 'test' || process.env.NODE_ENV === 'circleci') {
+    return;
+  }
+
   if (remoteUser) {
     return;
   }
