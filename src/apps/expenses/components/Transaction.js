@@ -11,7 +11,6 @@ import { P, Span } from '../../../components/Text';
 
 import TransactionDetails from './TransactionDetails';
 import AmountCurrency from './AmountCurrency';
-import Link from '../../../components/Link';
 
 class Transaction extends React.Component {
   static propTypes = {
