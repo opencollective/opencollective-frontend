@@ -23,6 +23,7 @@ module.exports = {
       .then(() =>
         queryInterface.sequelize.transaction(transaction => {
           const updatePaidOrders = models.Transaction.findAll({
+            attributes: ['OrderId'],
             where: {
               OrderId: {
                 [Op.not]: null,
@@ -107,18 +108,18 @@ module.exports = {
           ).then(subscriptions => {
             const orders = subscriptions.map(sub => sub.Order.id);
             console.log(`Updating ${orders.length} orders to CANCELLED`);
-              return models.Order.update(
-                { status: status.CANCELLED },
-                {
-                  fields: ['status'],
-                  hooks: false,
-                  where: {
-                    id: {
-                      [Op.in]: orders,
-                    },
+            return models.Order.update(
+              { status: status.CANCELLED },
+              {
+                fields: ['status'],
+                hooks: false,
+                where: {
+                  id: {
+                    [Op.in]: orders,
                   },
-                  transaction,
                 },
+                transaction,
+              },
             );
           });
           const updateCancelledOrders = models.Order.update(
