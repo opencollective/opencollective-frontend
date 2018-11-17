@@ -60,7 +60,7 @@ async function getBalance(paymentMethod) {
     }
   }
   const balance = {
-    amount: initialBalance + spent,
+    amount: Math.round(initialBalance + spent),
     currency: paymentMethod.currency,
   };
   return balance;
