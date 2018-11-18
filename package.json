@@ -153,7 +153,7 @@
     "raf": "^3.4.1",
     "raw-loader": "^0.5.1",
     "react-test-renderer": "^16.6.3",
-    "regenerator-runtime": "^0.12.1",
+    "regenerator-runtime": "^0.13.1",
     "sinon": "^7.1.1",
     "url-loader": "^1.1.2",
     "webpack-bundle-analyzer": "^3.0.3"
