@@ -682,8 +682,8 @@
   "redeem.subtitle.line1": "Open Collective aide des communautés - projets open-source, meetups etc - à collecter de l’argent et à opérer de façon transparente.",
   "redeem.form.redeem.btn": "redeem",
   "redeemed.subtitle.line1": "La carte a été ajoutée à votre compte.",
-  "redeemed.subtitle.line2": "Vous pouvez désormais faire les dons à n'importe quel collectif de votre choix.",
-  "redeemed.findCollectives": "Trouver de nouveaux collectifs.",
+  "redeemed.subtitle.line2": "Vous pouvez désormais donner au(x) collectif(s) de votre choix.",
+  "redeemed.findCollectives": "Trouver et soutenir de nouveaux collectifs.",
   "redeemed.backyourstack": "or discover the open source projects that your organization is depending on and that need funding on {link}",
   "redeemed.suggestions": "ou vous pouvez choisir parmi tous ces collectifs listés ci-dessous",
   "loginform.title": "S'identifier ou créer un compte"
