@@ -42,9 +42,11 @@ StyledAvatar.defaultProps = {
 const Avatar = ({ src, type = 'USER', radius, name, ...styleProps }) => {
   return (
     <StyledAvatar
-      backgroundImage={`url(${src})`}
       size={radius}
       type={type}
+      style={{
+        backgroundImage: `url(${src})`,
+      }}
       {...styleProps}
     >
       {!src && type === 'USER' && name && <span>{getInitials(name)}</span>}
