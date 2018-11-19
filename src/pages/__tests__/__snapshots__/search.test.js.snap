@@ -5898,7 +5898,6 @@ exports[`Search Page renders search results with pagination 1`] = `
                   >
                     <img
                       className="jsx-3454192051 logo"
-                      src={null}
                       style={
                         Object {
                           "maxHeight": 65,
