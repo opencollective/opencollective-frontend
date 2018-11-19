@@ -74,7 +74,7 @@
     "react-tag-input": "5.2.3",
     "react-tooltip": "3.9.0",
     "recompose": "0.30.0",
-    "rehype-react": "3.0.3",
+    "rehype-react": "3.1.0",
     "rehype-sanitize": "2.0.2",
     "remark-parse": "6.0.3",
     "remark-rehype": "3.0.1",
