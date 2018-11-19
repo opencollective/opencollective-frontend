@@ -173,11 +173,20 @@ export const readFee = (amount, feeStr) => {
   }
 };
 
+export const getTerminalCols = () => {
+  let length = 40;
+  if (process.platform === 'win32') {
+    return length;
+  }
+  try {
+    length = parseInt(execSync('tput cols').toString());
+  } catch {
+    return length;
+  }
+};
+
 export const separator = length => {
-  const terminalCols =
-    process.platform === 'win32'
-      ? length || 40
-      : length || parseInt(execSync(`tput cols`).toString());
+  const terminalCols = length || getTerminalCols();
 
   let separator = '';
   for (let i = 0; i < terminalCols; i++) {
