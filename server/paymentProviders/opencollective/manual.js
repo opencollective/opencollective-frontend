@@ -50,7 +50,6 @@ async function processOrder(order) {
   };
 
   const creditTransaction = await models.Transaction.createFromPayload(payload);
-  console.log(">> creditTransaction", creditTransaction.dataValues);
   return creditTransaction;
 }
 

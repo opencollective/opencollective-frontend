@@ -337,7 +337,7 @@ export default function(Sequelize, DataTypes) {
         this.type !== 'manual'
       ) {
         throw new Error(
-          `You don't have enough permissions to use this payment method (you need to be an admin of the collective that owns this payment method)`,
+          "You don't have enough permissions to use this payment method (you need to be an admin of the collective that owns this payment method)",
         );
       }
     }
