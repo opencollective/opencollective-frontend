@@ -6,6 +6,7 @@ import Promise from 'bluebird';
 import Stripe from 'stripe';
 import { graphql } from 'graphql';
 import { isArray, values, get, cloneDeep } from 'lodash';
+import { execSync } from 'child_process';
 
 /* Test data */
 import jsonData from './mocks/data';
@@ -170,6 +171,28 @@ export const readFee = (amount, feeStr) => {
     /* The `* 100` is for converting from cents */
     return parseFloat(feeStr) * 100;
   }
+};
+
+export const getTerminalCols = () => {
+  let length = 40;
+  if (process.platform === 'win32') {
+    return length;
+  }
+  try {
+    length = parseInt(execSync('tput cols').toString());
+  } catch {
+    return length;
+  }
+};
+
+export const separator = length => {
+  const terminalCols = length || getTerminalCols();
+
+  let separator = '';
+  for (let i = 0; i < terminalCols; i++) {
+    separator += '-';
+  }
+  console.log(`\n${separator}\n`);
 };
 
 /* ---- Stripe Helpers ---- */

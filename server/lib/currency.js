@@ -59,7 +59,10 @@ export function getFxRate(fromCurrency, toCurrency, date = 'latest') {
       .catch(e => {
         console.error('Unable to fetch fxrate', e.message);
         // for testing in airplane mode
-        if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
+        if (
+          !process.env.NODE_ENV ||
+          ['test', 'development'].includes(process.env.NODE_ENV)
+        ) {
           console.log(
             '>>> development environment -> returning 1.1 instead of throwing the error',
             e,

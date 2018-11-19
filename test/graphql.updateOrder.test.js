@@ -138,7 +138,8 @@ describe('updateOrder', () => {
     );
   });
 
-  it('updates an order as logged in user', async () => {
+  it('pay a PENDING order with a credit card', async () => {
+    expect(existingOrder.status).to.equal('PENDING');
     order.id = existingOrder.id;
     order.totalAmount = existingOrder.totalAmount;
     order.paymentMethod = pick(paymentMethod, [
@@ -159,13 +160,12 @@ describe('updateOrder', () => {
 
     // When the query is executed
     const res = await utils.graphqlQuery(updateOrderQuery, { order }, user2);
-
+    res.errors && console.log(res.errors);
     // Then there should be no errors
     expect(res.errors).to.not.exist;
     expect(res.data.updateOrder.status).to.equal('PAID');
     expect(res.data.updateOrder.subscription).to.not.exist;
 
-    // And then the creator of the order should be user
     const orderForCollective = res.data.updateOrder.collective;
     const transaction = await models.Transaction.findOne({
       where: {
@@ -190,8 +190,6 @@ describe('updateOrder', () => {
       transaction.data.balanceTransaction.net +
         transaction.hostFeeInHostCurrency,
     ).to.equal(transaction.netAmountInCollectiveCurrency);
-    // make sure the payment has been recorded in the connected
-    // Stripe Account of the host
     expect(transaction.data.charge.currency).to.equal('eur');
   });
 

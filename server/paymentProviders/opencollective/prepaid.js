@@ -1,5 +1,4 @@
 import models from '../../models';
-import roles from '../../constants/roles';
 import * as libpayments from '../../lib/payments';
 import * as currency from '../../lib/currency';
 import { TransactionTypes, OC_FEE_PERCENT } from '../../constants/transactions';
@@ -30,12 +29,15 @@ async function getBalance(paymentMethod) {
     where: {
       PaymentMethodId: paymentMethod.id,
       type: 'DEBIT',
-    }
+    },
   });
   let spent = 0;
-  for ( const transaction of allTransactions) {
+  for (const transaction of allTransactions) {
     if (transaction.currency != paymentMethod.currency) {
-      const fxRate = await currency.getFxRate(transaction.currency, paymentMethod.currency);
+      const fxRate = await currency.getFxRate(
+        transaction.currency,
+        paymentMethod.currency,
+      );
       spent += transaction.netAmountInCollectiveCurrency * fxRate;
     } else {
       spent += transaction.netAmountInCollectiveCurrency;
@@ -101,19 +103,6 @@ async function processOrder(order) {
       description: order.description,
     },
   });
-
-  // add roles
-  await order.collective.findOrAddUserWithRole(
-    { id: user.id, CollectiveId: order.fromCollective.id },
-    roles.BACKER,
-    {
-      CreatedByUserId: user.id,
-      TierId: order.TierId,
-    },
-  );
-
-  // Mark order row as processed
-  await order.update({ processedAt: new Date() });
 
   // Mark paymentMethod as confirmed
   order.paymentMethod.update({ confirmedAt: new Date() });

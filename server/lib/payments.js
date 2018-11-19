@@ -8,6 +8,7 @@ import models from '../models';
 import emailLib from './email';
 import { types } from '../constants/collectives';
 import status from '../constants/order_status';
+import roles from '../constants/roles';
 import activities from '../constants/activities';
 import paymentProviders from '../paymentProviders';
 import * as libsubscription from './subscriptions';
@@ -69,8 +70,21 @@ export function findPaymentMethodProvider(paymentMethod) {
  *  the `PaymentMethods` table.
  */
 export async function processOrder(order, options) {
-  const paymentMethod = findPaymentMethodProvider(order.paymentMethod);
-  return await paymentMethod.processOrder(order, options);
+  const paymentMethodProvider = findPaymentMethodProvider(order.paymentMethod);
+  if (get(paymentMethodProvider, 'features.waitToCharge')) {
+    return sendOrderProcessingEmail(order, options);
+  } else {
+    return await paymentMethodProvider.processOrder(order, options);
+  }
+}
+
+export async function updateOrderStatus(order, transaction) {
+  if (transaction) {
+    await order.update({
+      status: status.PAID,
+      processedAt: new Date(),
+    });
+  }
 }
 
 /** Refund a transaction
@@ -214,13 +228,101 @@ export async function associateTransactionRefundId(transaction, refund, data) {
   return find([tr1, tr2, tr3, tr4], { id: transaction.id });
 }
 
+export const sendEmailNotifications = (order, transaction) => {
+  // for gift cards and manual payment methods
+  if (!transaction) {
+    sendOrderProcessingEmail(order);
+    if (isProvider('opencollective.giftcard', order.paymentMethod)) {
+      sendSupportEmailForManualIntervention(order); // async
+    }
+  } else {
+    order.transaction = transaction;
+    sendOrderConfirmedEmail(order); // async
+  }
+};
+
+export const addBackerToCollective = async (user, collective, TierId) => {
+  return await collective.findOrAddUserWithRole(user, roles.BACKER, {
+    CreatedByUserId: user.id,
+    TierId,
+  });
+};
+
+export const processMatchingFund = async (order, options) => {
+  const matchingFundCollective = await models.Collective.findById(
+    order.matchingFund.CollectiveId,
+  );
+  // if there is a matching fund, we execute the order
+  // also adds the owner of the matching fund as a BACKER of collective
+  const matchingOrder = {
+    ...pick(order, ['id', 'collective', 'tier', 'currency']),
+    totalAmount: order.totalAmount * order.matchingFund.matching,
+    paymentMethod: order.matchingFund,
+    FromCollectiveId: order.matchingFund.CollectiveId,
+    fromCollective: matchingFundCollective,
+    description: `Matching ${order.matchingFund.matching}x ${
+      order.fromCollective.name
+    }'s donation`,
+    createdByUser: await matchingFundCollective.getUser(),
+  };
+
+  // processOrder expects an update function to update `order.processedAt`
+  matchingOrder.update = () => {};
+
+  return paymentProviders[order.paymentMethod.service].types[
+    order.paymentMethod.type || 'default'
+  ]
+    .processOrder(matchingOrder, options) // eslint-disable-line import/namespace
+    .then(transaction => {
+      sendOrderConfirmedEmail({ ...order, transaction }); // async
+      return null;
+    });
+};
+
+export const createSubscription = async order => {
+  const subscription = await models.Subscription.create({
+    amount: order.totalAmount,
+    interval: order.interval,
+    currency: order.currency,
+  });
+  // The order instance doesn't have the Subscription field
+  // here because it was just created and no models were
+  // included so we're doing that manually here. Not the
+  // cutest but works.
+  order.Subscription = subscription;
+  const updatedDates = libsubscription.getNextChargeAndPeriodStartDates(
+    'new',
+    order,
+  );
+  order.Subscription.nextChargeDate = updatedDates.nextChargeDate;
+  order.Subscription.nextPeriodStart =
+    updatedDates.nextPeriodStart || order.Subscription.nextPeriodStart;
+
+  // Both subscriptions and one time donations are charged
+  // immediatelly and there won't be a better time to update
+  // this field after this. Please notice that it will change
+  // when the issue #729 is tackled.
+  // https://github.com/opencollective/opencollective/issues/729
+  order.Subscription.chargeNumber = 1;
+  order.Subscription.activate();
+  await order.update({
+    status: status.ACTIVE,
+    SubscriptionId: order.Subscription.id,
+  });
+};
+
 /**
  * Execute an order as user using paymentMethod
  * Note: validation of the paymentMethod happens in `models.Order.setPaymentMethod`. Not here anymore.
  * @param {Object} order { tier, description, totalAmount, currency, interval (null|month|year), paymentMethod }
  * @param {Object} options { hostFeePercent, platformFeePercent} (only for add funds and if remoteUser is admin of host or root)
  */
-export const executeOrder = (user, order, options) => {
+export const executeOrder = async (user, order, options) => {
+  if (!(user instanceof models.User)) {
+    return Promise.reject(
+      new Error('user should be an instance of the User model'),
+    );
+  }
   if (!(order instanceof models.Order)) {
     return Promise.reject(
       new Error('order should be an instance of the Order model'),
@@ -251,109 +353,22 @@ export const executeOrder = (user, order, options) => {
     return Promise.reject(error);
   }
 
-  return order
-    .populate()
-    .then(() => {
-      if (payment.interval) {
-        // @lincoln: shouldn't this section be executed after we successfully charge the user for the first payment? (ie. after `processOrder`)
-        return order
-          .getSubscription({ rejectOnEmpty: true })
-          .catch(() => models.Subscription.create(payment))
-          .then(subscription => {
-            // The order instance doesn't have the Subscription field
-            // here because it was just created and no models were
-            // included so we're doing that manually here. Not the
-            // cutest but works.
-            order.Subscription = subscription;
-            const updatedDates = libsubscription.getNextChargeAndPeriodStartDates(
-              'new',
-              order,
-            );
-            order.Subscription.nextChargeDate = updatedDates.nextChargeDate;
-            order.Subscription.nextPeriodStart =
-              updatedDates.nextPeriodStart ||
-              order.Subscription.nextPeriodStart;
+  await order.populate();
 
-            // Both subscriptions and one time donations are charged
-            // immediatelly and there won't be a better time to update
-            // this field after this. Please notice that it will change
-            // when the issue #729 is tackled.
-            // https://github.com/opencollective/opencollective/issues/729
-            order.Subscription.chargeNumber = 1;
-            return subscription.save();
-          })
-          .then(subscription => {
-            return order.update({ SubscriptionId: subscription.id });
-          });
-      }
-      return null;
-    })
-    .then(() => {
-      return processOrder(order, options)
-        .tap(() =>
-          order.update({
-            status: order.SubscriptionId ? status.ACTIVE : status.PAID,
-          }),
-        )
-        .tap(async () => {
-          if (!order.matchingFund) return null;
-          const matchingFundCollective = await models.Collective.findById(
-            order.matchingFund.CollectiveId,
-          );
-          // if there is a matching fund, we execute the order
-          // also adds the owner of the matching fund as a BACKER of collective
-          const matchingOrder = {
-            ...pick(order, ['id', 'collective', 'tier', 'currency']),
-            totalAmount: order.totalAmount * order.matchingFund.matching,
-            paymentMethod: order.matchingFund,
-            FromCollectiveId: order.matchingFund.CollectiveId,
-            fromCollective: matchingFundCollective,
-            description: `Matching ${order.matchingFund.matching}x ${
-              order.fromCollective.name
-            }'s donation`,
-            createdByUser: await matchingFundCollective.getUser(),
-          };
+  const transaction = await processOrder(order, options);
+  order.matchingFund && (await processMatchingFund(order, options));
+  transaction && (await updateOrderStatus(order, transaction));
+  await addBackerToCollective(
+    { id: user.id, CollectiveId: order.FromCollectiveId },
+    order.collective,
+    get(order, 'tier.id'),
+  );
+  sendEmailNotifications(order, transaction);
 
-          // processOrder expects an update function to update `order.processedAt`
-          matchingOrder.update = () => {};
-
-          return paymentProviders[order.paymentMethod.service].types[
-            order.paymentMethod.type || 'default'
-          ]
-            .processOrder(matchingOrder, options) // eslint-disable-line import/namespace
-            .then(transaction => {
-              sendOrderConfirmedEmail({ ...order, transaction }); // async
-              return null;
-            });
-        });
-    })
-    .then(transaction => {
-      // for gift cards
-      if (
-        !transaction &&
-        isProvider('opencollective.giftcard', order.paymentMethod)
-      ) {
-        sendOrderProcessingEmail(order).then(() =>
-          sendSupportEmailForManualIntervention(order),
-        ); // async
-      } else if (
-        !transaction &&
-        order.paymentMethod.service === 'stripe' &&
-        order.paymentMethod.type === 'bitcoin'
-      ) {
-        sendOrderProcessingEmail(order); // async
-      } else {
-        order.transaction = transaction;
-        sendOrderConfirmedEmail(order); // async
-      }
-      return transaction;
-    })
-    .tap(async transaction => {
-      // Credit card charges are synchronous. If the transaction is
-      // created here it means that the payment went through so it's
-      // safe to enable subscriptions after this.
-      if (payment.interval && transaction) await order.Subscription.activate();
-    });
+  // Credit card charges are synchronous. If the transaction is
+  // created here it means that the payment went through so it's
+  // safe to create subscription after this.
+  order.interval && transaction && (await createSubscription(order));
 };
 
 const validatePayment = payment => {
@@ -429,15 +444,16 @@ const sendOrderConfirmedEmail = async order => {
         matching: order.matchingFund.matching,
         amount: order.matchingFund.matching * order.totalAmount,
       };
-    }
-
-    // sending the order confirmed email to the matching fund owner or to the donor
-    if (
-      get(order, 'transaction.FromCollectiveId') ===
-      get(order, 'matchingFund.CollectiveId')
-    ) {
-      const recipients = await matchingFundCollective.getEmails();
-      return emailLib.send('donationmatched', recipients, data, emailOptions);
+      // sending the order confirmed email to the matching fund owner or to the donor
+      if (
+        get(order, 'transaction.FromCollectiveId') ===
+        get(order, 'matchingFund.CollectiveId')
+      ) {
+        const recipients = await matchingFundCollective.getEmails();
+        return emailLib.send('donationmatched', recipients, data, emailOptions);
+      } else {
+        return emailLib.send('thankyou', user.email, data, emailOptions);
+      }
     } else {
       return emailLib.send('thankyou', user.email, data, emailOptions);
     }
@@ -460,7 +476,7 @@ const sendOrderProcessingEmail = order => {
   const user = order.createdByUser;
 
   return emailLib.send(
-    'processing',
+    'order.processing',
     user.email,
     {
       order: order.info,

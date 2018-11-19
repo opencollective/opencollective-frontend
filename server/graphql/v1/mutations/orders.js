@@ -173,7 +173,11 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
     if (
       paymentRequired &&
       (!order.paymentMethod ||
-        !(order.paymentMethod.uuid || order.paymentMethod.token))
+        !(
+          order.paymentMethod.uuid ||
+          order.paymentMethod.token ||
+          order.paymentMethod.type === 'manual'
+        ))
     ) {
       throw new Error('This order requires a payment method');
     }
@@ -344,6 +348,7 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
         reqIp,
         recaptchaResponse: recaptchaResponse,
       },
+      status: status.PENDING, // default status, will get updated after the order is processed
     };
 
     if (
@@ -384,7 +389,8 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
       });
       await orderCreated.update({ SubscriptionId: subscription.id });
     } else if (collective.type === types.EVENT) {
-      // Free ticket, add user as an ATTENDEE
+      // Free ticket, mark as processed and add user as an ATTENDEE
+      await orderCreated.update({ processedAt: new Date() });
       const UserId = remoteUser ? remoteUser.id : user.id;
       await collective.addUserWithRole(user, roles.ATTENDEE);
       await models.Activity.create({
@@ -452,7 +458,11 @@ export async function updateOrder(remoteUser, order) {
   if (
     paymentRequired &&
     (!order.paymentMethod ||
-      !(order.paymentMethod.uuid || order.paymentMethod.token))
+      !(
+        order.paymentMethod.uuid ||
+        order.paymentMethod.token ||
+        order.paymentMethod.type === 'manual'
+      ))
   ) {
     throw new Error('This order requires a payment method');
   }

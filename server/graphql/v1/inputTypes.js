@@ -46,7 +46,10 @@ export const PaymentMethodInputType = new GraphQLInputObjectType({
     uuid: { type: GraphQLString }, // used to fetch an existing payment method
     token: { type: GraphQLString },
     service: { type: GraphQLString },
-    type: { type: GraphQLString, description: 'creditcard or bitcoin' },
+    type: {
+      type: GraphQLString,
+      description: 'creditcard, bitcoin, prepaid, manual',
+    },
     customerId: { type: GraphQLString },
     data: { type: GraphQLJSON },
     name: { type: GraphQLString },
