@@ -40,15 +40,13 @@ StyledAvatar.defaultProps = {
 };
 
 const Avatar = ({ src, type = 'USER', radius, name, ...styleProps }) => {
+  const style = {};
+  // Avoid setting null/undefined background images
+  if (src) {
+    style.backgroundImage = `url(${src})`;
+  }
   return (
-    <StyledAvatar
-      size={radius}
-      type={type}
-      style={{
-        backgroundImage: `url(${src})`,
-      }}
-      {...styleProps}
-    >
+    <StyledAvatar size={radius} type={type} style={style} {...styleProps}>
       {!src && type === 'USER' && name && <span>{getInitials(name)}</span>}
     </StyledAvatar>
   );

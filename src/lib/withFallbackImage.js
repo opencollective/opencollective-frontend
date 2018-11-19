@@ -3,6 +3,8 @@ import fetch from 'cross-fetch';
 import { defaultImage } from '../constants/collectives';
 import { getDomain, imagePreview } from './utils';
 
+const fallbackFetchEnabled = false;
+
 export default ChildComponent =>
   withState('src', 'setSrc', ({ src }) => src)(
     ({
@@ -25,7 +27,7 @@ export default ChildComponent =>
         src = `https://logo.clearbit.com/${getDomain(website)}`;
       }
 
-      if (src && src !== fallback) {
+      if (fallbackFetchEnabled && src && src !== fallback) {
         // due to CORS issues, we should use the Image error event in the browser
         if (process.browser) {
           const img = new Image();
@@ -46,10 +48,16 @@ export default ChildComponent =>
         }
       }
 
-      const image = imagePreview(src, fallback, {
-        width: radius,
-        height,
-      });
+      let image;
+      if (!src) {
+        image = fallback;
+      } else {
+        image = imagePreview(src, fallback, {
+          width: radius,
+          height,
+        });
+      }
+
       const childProps = {
         ...props,
         src: image,
