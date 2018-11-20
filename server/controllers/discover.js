@@ -26,12 +26,13 @@ export default (req, res, next) => {
     'desc',
     offset,
   )
-    .then(collectives => {
+    .then(({ collectives, total }) => {
       const di = {
         show,
         sort,
         offset,
         collectives,
+        total,
       };
       res.send(di);
     })
