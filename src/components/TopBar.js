@@ -110,9 +110,11 @@ class TopBar extends React.Component {
           <Hide xs>
             <NavList is="ul" p={0} m={0} justifyContent="space-around" css="margin: 0;">
               <Box is="li" px={3}>
-                <NavLink href="/discover">
-                  <FormattedMessage id="menu.discover" defaultMessage="Discover" />
-                </NavLink>
+                <Link route="discover" passHref>
+                  <NavLink>
+                    <FormattedMessage id="menu.discover" defaultMessage="Discover" />
+                  </NavLink>
+                </Link>
               </Box>
               <Box is="li" px={3}>
                 <NavLink href="/learn-more">
