@@ -111,6 +111,7 @@ class ErrorPage extends React.Component {
 
   render() {
     const { LoggedInUser } = this.props;
+
     const component = this.getErrorComponent();
 
     return (

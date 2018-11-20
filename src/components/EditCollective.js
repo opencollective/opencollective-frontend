@@ -11,6 +11,7 @@ import { getStripeToken } from '../lib/stripe';
 import { defineMessages } from 'react-intl';
 import withIntl from '../lib/withIntl';
 import { Router } from '../server/pages';
+import Loading from './Loading';
 
 class EditCollective extends React.Component {
   static propTypes = {
@@ -18,6 +19,7 @@ class EditCollective extends React.Component {
     LoggedInUser: PropTypes.object.isRequired,
     editCollective: PropTypes.func.isRequired,
     deleteCollective: PropTypes.func.isRequired,
+    loggedInEditDataLoaded: PropTypes.bool.isRequired,
   };
 
   constructor(props) {
@@ -195,7 +197,7 @@ class EditCollective extends React.Component {
   }
 
   render() {
-    const { LoggedInUser, collective } = this.props;
+    const { LoggedInUser, collective, loggedInEditDataLoaded } = this.props;
 
     if (!collective || !collective.slug) return <div />;
 
@@ -229,7 +231,7 @@ class EditCollective extends React.Component {
           twitterHandle={collective.twitterHandle}
           image={collective.image || collective.backgroundImage}
           className={this.state.status}
-          LoggedInUser={this.props.LoggedInUser}
+          LoggedInUser={LoggedInUser}
         />
 
         <Body>
@@ -251,25 +253,27 @@ class EditCollective extends React.Component {
                 <SignInForm next={`/${collective.slug}/edit`} />
               </div>
             )}
-            {canEditCollective && (
-              <div>
-                <EditCollectiveForm
-                  collective={collective}
-                  LoggedInUser={LoggedInUser}
-                  onSubmit={this.editCollective}
-                  status={this.state.status}
-                />
-                <div className="actions">
-                  {collective.type === 'EVENT' && (
-                    <a onClick={this.deleteCollective}>delete event</a>
-                  )}
-                  <div className="result">
-                    <div className="success">{this.state.result.success}</div>
-                    <div className="error">{this.state.result.error}</div>
+            {canEditCollective && !loggedInEditDataLoaded && <Loading />}
+            {canEditCollective &&
+              loggedInEditDataLoaded && (
+                <div>
+                  <EditCollectiveForm
+                    collective={collective}
+                    LoggedInUser={LoggedInUser}
+                    onSubmit={this.editCollective}
+                    status={this.state.status}
+                  />
+                  <div className="actions">
+                    {collective.type === 'EVENT' && (
+                      <a onClick={this.deleteCollective}>delete event</a>
+                    )}
+                    <div className="result">
+                      <div className="success">{this.state.result.success}</div>
+                      <div className="error">{this.state.result.error}</div>
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
+              )}
           </div>
         </Body>
         <Footer />

@@ -22,7 +22,7 @@ class Transaction extends React.Component {
     description: PropTypes.string,
     currency: PropTypes.string.isRequired,
     attachment: PropTypes.string,
-    uuid: PropTypes.number,
+    uuid: PropTypes.string,
     netAmountInCollectiveCurrency: PropTypes.number,
     platformFeeInHostCurrency: PropTypes.number,
     paymentProcessorFeeInHostCurrency: PropTypes.number,
@@ -40,6 +40,10 @@ class Transaction extends React.Component {
       image: PropTypes.string,
       name: PropTypes.string.isRequired,
       slug: PropTypes.string.isRequired,
+    }),
+    usingVirtualCardFromCollective: PropTypes.shape({
+      slug: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired,
     }),
     collective: PropTypes.shape({
       id: PropTypes.number.isRequired,
@@ -64,6 +68,7 @@ class Transaction extends React.Component {
       createdAt,
       currency,
       fromCollective,
+      usingVirtualCardFromCollective,
       collective,
       type,
       paymentProcessorFeeInHostCurrency,
@@ -106,6 +111,23 @@ class Transaction extends React.Component {
             <a href={`/${fromCollective.slug}`} title={fromCollective.name}>
               {fromCollective.name}
             </a>
+            {usingVirtualCardFromCollective && ' '}
+            {usingVirtualCardFromCollective && (
+              <FormattedMessage
+                id="transaction.usingGiftCardFrom"
+                defaultMessage="using a gift card from {collectiveLink}"
+                values={{
+                  collectiveLink: (
+                    <Link
+                      route="collective"
+                      params={{ slug: usingVirtualCardFromCollective.slug }}
+                    >
+                      {usingVirtualCardFromCollective.name}
+                    </Link>
+                  ),
+                }}
+              />
+            )}
             {' | '}
             <Moment relative={true} value={createdAt} />
             {paymentProcessorFeeInHostCurrency !== undefined && (

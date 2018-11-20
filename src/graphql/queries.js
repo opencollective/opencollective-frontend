@@ -17,6 +17,9 @@ export const transactionFields = `
   paymentProcessorFeeInHostCurrency
   paymentMethod {
     service
+    type
+    name
+    data
   }
   fromCollective {
     id
@@ -24,6 +27,10 @@ export const transactionFields = `
     slug
     path
     image
+  }
+  usingVirtualCardFromCollective {
+    slug
+    name
   }
   host {
     id
@@ -79,10 +86,12 @@ export const getLoggedInUserQuery = gql`
           id
           uuid
           currency
-          type
-          service
           name
+          service
+          type
           data
+          balance
+          expiryDate
         }
         connectedAccounts {
           service
@@ -263,12 +272,20 @@ const getCollectiveToEditQuery = gql`
           }
         }
       }
-      paymentMethods(service: "stripe") {
+      paymentMethods(
+        types: ["creditcard", "virtualcard"]
+        hasBalanceAboveZero: true
+      ) {
         id
         uuid
         name
         data
         monthlyLimitPerMember
+        service
+        type
+        balance
+        currency
+        expiryDate
         orders(hasActiveSubscription: true) {
           id
         }
@@ -610,20 +627,6 @@ const getCollectiveCoverQuery = gql`
           image
         }
       }
-    }
-  }
-`;
-
-export const getOcCardBalanceQuery = gql`
-  query checkOcPaymentMethod($token: String!) {
-    ocPaymentMethod(token: $token) {
-      id
-      name
-      currency
-      balance
-      uuid
-      service
-      type
     }
   }
 `;

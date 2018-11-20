@@ -45,7 +45,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   padding-right: 16px;
 }
 
-.c21 {
+.c19 {
   box-sizing: border-box;
   width: 100%;
   margin-left: auto;
@@ -54,25 +54,25 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   padding-right: 16px;
 }
 
-.c22 {
+.c20 {
   box-sizing: border-box;
   width: 100%;
 }
 
-.c24 {
+.c22 {
   box-sizing: border-box;
   margin-top: 16px;
   margin-bottom: 16px;
 }
 
-.c29 {
+.c27 {
   box-sizing: border-box;
   width: 100%;
   padding-top: 16px;
   padding-bottom: 16px;
 }
 
-.c33 {
+.c31 {
   max-width: 1300px;
   box-sizing: border-box;
   margin-left: auto;
@@ -80,7 +80,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   padding: 8px;
 }
 
-.c45 {
+.c43 {
   box-sizing: border-box;
   margin-top: 16px;
   -webkit-flex: 1 1 auto;
@@ -91,7 +91,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   order: 3;
 }
 
-.c46 {
+.c44 {
   box-sizing: border-box;
   width: 50%;
   margin-bottom: 16px;
@@ -160,7 +160,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   justify-content: space-around;
 }
 
-.c23 {
+.c21 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -171,7 +171,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   align-items: flex-end;
 }
 
-.c27 {
+.c25 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -185,7 +185,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   justify-content: center;
 }
 
-.c32 {
+.c30 {
   max-width: 1300px;
   display: -webkit-box;
   display: -webkit-flex;
@@ -204,7 +204,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   justify-content: space-between;
 }
 
-.c35 {
+.c33 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -215,7 +215,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   justify-content: center;
 }
 
-.c44 {
+.c42 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -229,7 +229,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   justify-content: center;
 }
 
-.c28 {
+.c26 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -247,23 +247,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   justify-content: center;
 }
 
-.c18 {
-  color: #46b0ed;
-  display: inline-block;
-  font-size: 1.2rem;
-  font-weight: bold;
-  line-height: Paragraph;
-  -webkit-letter-spacing: 1px;
-  -moz-letter-spacing: 1px;
-  -ms-letter-spacing: 1px;
-  letter-spacing: 1px;
-  margin: 0px;
-  margin-left: 8px;
-  margin-right: 8px;
-  cursor: pointer;
-}
-
-.c36 {
+.c34 {
   color: #6E747A;
   font-size: 1.4rem;
   line-height: Paragraph;
@@ -277,7 +261,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   text-align: center;
 }
 
-.c47 {
+.c45 {
   color: #C2C6CC;
   font-size: 1.2rem;
   line-height: Paragraph;
@@ -296,7 +280,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   overflow: hidden;
 }
 
-.c31 {
+.c29 {
   border-top: 1px solid #aaaaaa;
   bottom: 0px;
   background-color: white;
@@ -305,7 +289,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   width: 100%;
 }
 
-.c34 {
+.c32 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -318,7 +302,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   width: 100%;
 }
 
-.c37 {
+.c35 {
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -340,36 +324,19 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   width: 100%;
 }
 
-.c19 {
-  position: relative;
+.c17 {
+  border: 1px solid #D5DAE0;
+  border-radius: 20px;
+  color: #3385FF;
   display: inline-block;
-  height: 0.6rem;
-  width: 1.4rem;
-  cursor: pointer;
+  font-size: 1.4rem;
+  padding-left: 16px;
+  padding-right: 16px;
+  padding-top: 8px;
+  padding-bottom: 8px;
 }
 
-.c19::before,
-.c19::after {
-  content: '';
-  position: absolute;
-  top: 0;
-}
-
-.c19::before {
-  border-left: 0.6rem solid transparent;
-  border-right: 0.6rem solid transparent;
-  border-top: 0.6rem solid #46b0ed;
-  left: 0;
-}
-
-.c19::after {
-  border-left: calc(0.6rem - 0.2rem) solid transparent;
-  border-right: calc(0.6rem - 0.2rem) solid transparent;
-  border-top: calc(0.6rem - 0.2rem) solid white;
-  left: 0.2rem;
-}
-
-.c30 {
+.c28 {
   display: block;
   font-size: Paragraph;
   font-weight: bold;
@@ -381,7 +348,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   text-align: center;
 }
 
-.c49 {
+.c47 {
   list-style: none;
   margin-bottom: 8px;
   text-align: center;
@@ -398,19 +365,13 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   font-size: 1.4rem;
 }
 
-.c41 {
-  display: inline-block;
-  vertical-align: -.125em;
-  overflow: hidden;
-}
-
 .c39 {
   display: inline-block;
   vertical-align: -.125em;
   overflow: hidden;
 }
 
-.c42 {
+.c37 {
   display: inline-block;
   vertical-align: -.125em;
   overflow: hidden;
@@ -422,13 +383,19 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   overflow: hidden;
 }
 
-.c43 {
+.c38 {
+  display: inline-block;
+  vertical-align: -.125em;
+  overflow: hidden;
+}
+
+.c41 {
   display: inline-block;
   vertical-align: middle;
   overflow: hidden;
 }
 
-.c38 {
+.c36 {
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -448,12 +415,12 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   width: 48px;
 }
 
-.c38:hover,
-.c38:focus {
+.c36:hover,
+.c36:focus {
   opacity: 1;
 }
 
-.c50 {
+.c48 {
   color: #6e747a;
   display: block;
   fontsize: 1.4rem;
@@ -462,7 +429,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   padding: 0;
 }
 
-.c48 {
+.c46 {
   box-sizing: border-box;
   padding-left: 0px;
   padding-right: 8px;
@@ -479,7 +446,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   justify-content: center;
 }
 
-.c25.c25.c25 {
+.c23.c23.c23 {
   border: none;
   border-bottom: 2px solid #3385FF;
   border-radius: 0;
@@ -489,22 +456,22 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   padding: 0;
 }
 
-.c26.c26 {
+.c24.c24 {
   padding: 0 2rem;
 }
 
-.c20 {
+.c18 {
   max-width: 1200px;
 }
 
 @media screen and (min-width:40em) {
-  .c21 {
+  .c19 {
     width: 85%;
   }
 }
 
 @media screen and (min-width:52em) {
-  .c45 {
+  .c43 {
     -webkit-order: 2;
     -ms-flex-order: 2;
     order: 2;
@@ -512,13 +479,13 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c46 {
+  .c44 {
     width: 25%;
   }
 }
 
 @media screen and (min-width:40em) {
-  .c27 {
+  .c25 {
     -webkit-box-pack: center;
     -webkit-justify-content: center;
     -ms-flex-pack: center;
@@ -527,7 +494,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c27 {
+  .c25 {
     -webkit-box-pack: start;
     -webkit-justify-content: flex-start;
     -ms-flex-pack: start;
@@ -536,7 +503,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c32 {
+  .c30 {
     -webkit-flex-direction: row;
     -ms-flex-direction: row;
     flex-direction: row;
@@ -544,7 +511,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c32 {
+  .c30 {
     -webkit-align-items: flex-start;
     -webkit-box-align: flex-start;
     -ms-flex-align: flex-start;
@@ -553,7 +520,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c35 {
+  .c33 {
     -webkit-box-pack: start;
     -webkit-justify-content: flex-start;
     -ms-flex-pack: start;
@@ -562,25 +529,25 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c36 {
-    text-align: left;
-  }
-}
-
-@media screen and (min-width:52em) {
-  .c47 {
-    text-align: left;
-  }
-}
-
-@media screen and (min-width:52em) {
   .c34 {
+    text-align: left;
+  }
+}
+
+@media screen and (min-width:52em) {
+  .c45 {
+    text-align: left;
+  }
+}
+
+@media screen and (min-width:52em) {
+  .c32 {
     width: 33.33333333333333%;
   }
 }
 
 @media screen and (min-width:52em) {
-  .c37 {
+  .c35 {
     -webkit-order: 3;
     -ms-flex-order: 3;
     order: 3;
@@ -611,20 +578,8 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
   }
 }
 
-@media screen and (max-width:40em) {
-  .c17 {
-    display: none;
-  }
-}
-
-@media screen and (min-width:40em) and (max-width:52em) {
-  .c17 {
-    display: none;
-  }
-}
-
 @media screen and (min-width:52em) {
-  .c49 {
+  .c47 {
     text-align: left;
   }
 }
@@ -771,28 +726,15 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
         <div
           className="LoginTopBarProfileButton"
         >
-          <div
-            className="c3 c2 sc-bdVaJa c2"
+          <a
+            className="c17"
+            href="/signin?next=%2F"
             onClick={[Function]}
           >
-            <div
-              className="c17 c2"
-            >
-              <p
-                className="LoginTopBarProfileButton-name c18"
-                cursor="pointer"
-              />
-            </div>
-            <div
-              className="c19"
-              color="#46b0ed"
-              cursor="pointer"
-              display="inline-block"
-              height="0.6rem"
-              strokeWidth="0.2rem"
-              width="1.4rem"
-            />
-          </div>
+            <span>
+              Login
+            </span>
+          </a>
         </div>
       </div>
     </div>
@@ -801,10 +743,10 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
     className="jsx-916984404"
   >
     <div
-      className="c20 c21"
+      className="c18 c19"
     >
       <div
-        className="c22"
+        className="c20"
       >
         <form
           method="GET"
@@ -820,10 +762,10 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
               Search Open Collective
             </label>
             <div
-              className="c23 c24 sc-bdVaJa c2"
+              className="c21 c22 sc-bdVaJa c2"
             >
               <input
-                className="c25 form-control"
+                className="c23 form-control"
                 defaultValue="test"
                 id="search"
                 name="q"
@@ -831,7 +773,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
                 type="search"
               />
               <button
-                className="jsx-1144918383 jsx-3101740563 Button blue c26"
+                className="jsx-1144918383 jsx-3101740563 Button blue c24"
                 onClick={[Function]}
                 type="submit"
               >
@@ -844,10 +786,10 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
         </form>
       </div>
       <div
-        className="c27 c2 sc-bdVaJa c2"
+        className="c25 c2 sc-bdVaJa c2"
       >
         <div
-          className="c28 c29 sc-bdVaJa c2"
+          className="c26 c27 sc-bdVaJa c2"
         >
           <p>
             <em>
@@ -857,7 +799,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
             </em>
           </p>
           <a
-            className="c30"
+            className="c28"
             href="createPledge"
             onClick={[Function]}
           >
@@ -868,17 +810,17 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
     </div>
   </main>
   <div
-    className="c31"
+    className="c29"
     id="footer"
   >
     <div
-      className="c32 c33 sc-bdVaJa c2"
+      className="c30 c31 sc-bdVaJa c2"
     >
       <div
-        className="c34"
+        className="c32"
       >
         <div
-          className="c35 c2 sc-bdVaJa c2"
+          className="c33 c2 sc-bdVaJa c2"
         >
           <object
             data="/static/images/opencollectivelogo-footer.svg"
@@ -887,21 +829,21 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
           />
         </div>
         <p
-          className="c36"
+          className="c34"
         >
           An organization for your community, transparent by design.
         </p>
       </div>
       <div
-        className="c37"
+        className="c35"
       >
         <a
-          className="c38"
+          className="c36"
           href="https://medium.com/open-collective"
         >
           <svg
             aria-hidden="true"
-            className="c39"
+            className="c37"
             color="#9399A3"
             fill="currentColor"
             focusable="false"
@@ -917,12 +859,12 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
           </svg>
         </a>
         <a
-          className="c38"
+          className="c36"
           href="https://twitter.com/opencollect"
         >
           <svg
             aria-hidden="true"
-            className="c40"
+            className="c38"
             color="#9399A3"
             fill="currentColor"
             focusable="false"
@@ -938,12 +880,12 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
           </svg>
         </a>
         <a
-          className="c38"
+          className="c36"
           href="https://github.com/opencollective"
         >
           <svg
             aria-hidden="true"
-            className="c41"
+            className="c39"
             color="#9399A3"
             fill="currentColor"
             focusable="false"
@@ -959,12 +901,12 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
           </svg>
         </a>
         <a
-          className="c38"
+          className="c36"
           href="https://slack.opencollective.com"
         >
           <svg
             aria-hidden="true"
-            className="c42"
+            className="c40"
             color="#9399A3"
             fill="currentColor"
             focusable="false"
@@ -980,12 +922,12 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
           </svg>
         </a>
         <a
-          className="c38"
+          className="c36"
           href="mailto:info@opencollective.com"
         >
           <svg
             aria-hidden="true"
-            className="c43"
+            className="c41"
             color="#9399A3"
             fill="currentColor"
             focusable="false"
@@ -1001,44 +943,44 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
         </a>
       </div>
       <nav
-        className="c44 c45"
+        className="c42 c43"
       >
         <div
-          className="c46"
+          className="c44"
         >
           <p
-            className="c47"
+            className="c45"
           >
             PLATFORM
           </p>
           <ul
-            className="c48"
+            className="c46"
           >
             <li
-              className="c49"
+              className="c47"
             >
               <a
-                className="c50 "
+                className="c48 "
                 href="/discover"
               >
                 Discover
               </a>
             </li>
             <li
-              className="c49"
+              className="c47"
             >
               <a
-                className="c50 "
+                className="c48 "
                 href="/learn-more"
               >
                 How it Works
               </a>
             </li>
             <li
-              className="c49"
+              className="c47"
             >
               <a
-                className="c50 "
+                className="c48 "
                 href="/opensource"
                 onClick={[Function]}
               >
@@ -1046,10 +988,10 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
               </a>
             </li>
             <li
-              className="c49"
+              className="c47"
             >
               <a
-                className="c50 "
+                className="c48 "
                 href="/signin"
                 onClick={[Function]}
               >
@@ -1057,10 +999,10 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
               </a>
             </li>
             <li
-              className="c49"
+              className="c47"
             >
               <a
-                className="c50 "
+                className="c48 "
                 href="/signin"
                 onClick={[Function]}
               >
@@ -1070,21 +1012,21 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
           </ul>
         </div>
         <div
-          className="c46"
+          className="c44"
         >
           <p
-            className="c47"
+            className="c45"
           >
             JOIN THE MOVEMENT
           </p>
           <ul
-            className="c48"
+            className="c46"
           >
             <li
-              className="c49"
+              className="c47"
             >
               <a
-                className="c50 "
+                className="c48 "
                 href="/create"
                 onClick={[Function]}
               >
@@ -1092,10 +1034,10 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
               </a>
             </li>
             <li
-              className="c49"
+              className="c47"
             >
               <a
-                className="c50 "
+                className="c48 "
                 href="/become-a-sponsor"
                 onClick={[Function]}
               >
@@ -1103,10 +1045,10 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
               </a>
             </li>
             <li
-              className="c49"
+              className="c47"
             >
               <a
-                className="c50 "
+                className="c48 "
                 href="/chapters"
                 onClick={[Function]}
               >
@@ -1116,21 +1058,21 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
           </ul>
         </div>
         <div
-          className="c46"
+          className="c44"
         >
           <p
-            className="c47"
+            className="c45"
           >
             COMMUNITY
           </p>
           <ul
-            className="c48"
+            className="c46"
           >
             <li
-              className="c49"
+              className="c47"
             >
               <a
-                className="c50 "
+                className="c48 "
                 href="/opensource"
                 onClick={[Function]}
               >
@@ -1138,10 +1080,10 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
               </a>
             </li>
             <li
-              className="c49"
+              className="c47"
             >
               <a
-                className="c50 "
+                className="c48 "
                 href="https://github.com/opencollective/opencollective/issues"
                 onClick={[Function]}
               >
@@ -1149,10 +1091,10 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
               </a>
             </li>
             <li
-              className="c49"
+              className="c47"
             >
               <a
-                className="c50 "
+                className="c48 "
                 href="https://slack.opencollective.com"
                 onClick={[Function]}
               >
@@ -1160,10 +1102,10 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
               </a>
             </li>
             <li
-              className="c49"
+              className="c47"
             >
               <a
-                className="c50 "
+                className="c48 "
                 href="https://github.com/opencollective/opencollective/wiki"
                 onClick={[Function]}
               >
@@ -1171,10 +1113,10 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
               </a>
             </li>
             <li
-              className="c49"
+              className="c47"
             >
               <a
-                className="c50 "
+                className="c48 "
                 href="mailto:support@opencollective.com"
                 onClick={[Function]}
               >
@@ -1184,21 +1126,21 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
           </ul>
         </div>
         <div
-          className="c46"
+          className="c44"
         >
           <p
-            className="c47"
+            className="c45"
           >
             COMPANY
           </p>
           <ul
-            className="c48"
+            className="c46"
           >
             <li
-              className="c49"
+              className="c47"
             >
               <a
-                className="c50 "
+                className="c48 "
                 href="/about"
                 onClick={[Function]}
               >
@@ -1206,10 +1148,10 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
               </a>
             </li>
             <li
-              className="c49"
+              className="c47"
             >
               <a
-                className="c50 "
+                className="c48 "
                 href="/faq"
                 onClick={[Function]}
               >
@@ -1217,10 +1159,10 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
               </a>
             </li>
             <li
-              className="c49"
+              className="c47"
             >
               <a
-                className="c50 "
+                className="c48 "
                 href="https://medium.com/open-collective"
                 onClick={[Function]}
               >
@@ -1228,10 +1170,10 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
               </a>
             </li>
             <li
-              className="c49"
+              className="c47"
             >
               <a
-                className="c50 "
+                className="c48 "
                 href="/tos"
                 onClick={[Function]}
               >
@@ -1239,10 +1181,10 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
               </a>
             </li>
             <li
-              className="c49"
+              className="c47"
             >
               <a
-                className="c50 "
+                className="c48 "
                 href="/privacypolicy"
                 onClick={[Function]}
               >
@@ -1302,7 +1244,7 @@ exports[`Search Page renders empty results message 1`] = `
   padding-right: 16px;
 }
 
-.c21 {
+.c19 {
   box-sizing: border-box;
   width: 100%;
   margin-left: auto;
@@ -1311,25 +1253,25 @@ exports[`Search Page renders empty results message 1`] = `
   padding-right: 16px;
 }
 
-.c22 {
+.c20 {
   box-sizing: border-box;
   width: 100%;
 }
 
-.c24 {
+.c22 {
   box-sizing: border-box;
   margin-top: 16px;
   margin-bottom: 16px;
 }
 
-.c29 {
+.c27 {
   box-sizing: border-box;
   width: 100%;
   padding-top: 16px;
   padding-bottom: 16px;
 }
 
-.c32 {
+.c30 {
   max-width: 1300px;
   box-sizing: border-box;
   margin-left: auto;
@@ -1337,7 +1279,7 @@ exports[`Search Page renders empty results message 1`] = `
   padding: 8px;
 }
 
-.c44 {
+.c42 {
   box-sizing: border-box;
   margin-top: 16px;
   -webkit-flex: 1 1 auto;
@@ -1348,7 +1290,7 @@ exports[`Search Page renders empty results message 1`] = `
   order: 3;
 }
 
-.c45 {
+.c43 {
   box-sizing: border-box;
   width: 50%;
   margin-bottom: 16px;
@@ -1417,7 +1359,7 @@ exports[`Search Page renders empty results message 1`] = `
   justify-content: space-around;
 }
 
-.c23 {
+.c21 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -1428,7 +1370,7 @@ exports[`Search Page renders empty results message 1`] = `
   align-items: flex-end;
 }
 
-.c27 {
+.c25 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -1442,7 +1384,7 @@ exports[`Search Page renders empty results message 1`] = `
   justify-content: center;
 }
 
-.c31 {
+.c29 {
   max-width: 1300px;
   display: -webkit-box;
   display: -webkit-flex;
@@ -1461,7 +1403,7 @@ exports[`Search Page renders empty results message 1`] = `
   justify-content: space-between;
 }
 
-.c34 {
+.c32 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -1472,7 +1414,7 @@ exports[`Search Page renders empty results message 1`] = `
   justify-content: center;
 }
 
-.c43 {
+.c41 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -1486,7 +1428,7 @@ exports[`Search Page renders empty results message 1`] = `
   justify-content: center;
 }
 
-.c28 {
+.c26 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -1504,23 +1446,7 @@ exports[`Search Page renders empty results message 1`] = `
   justify-content: center;
 }
 
-.c18 {
-  color: #46b0ed;
-  display: inline-block;
-  font-size: 1.2rem;
-  font-weight: bold;
-  line-height: Paragraph;
-  -webkit-letter-spacing: 1px;
-  -moz-letter-spacing: 1px;
-  -ms-letter-spacing: 1px;
-  letter-spacing: 1px;
-  margin: 0px;
-  margin-left: 8px;
-  margin-right: 8px;
-  cursor: pointer;
-}
-
-.c35 {
+.c33 {
   color: #6E747A;
   font-size: 1.4rem;
   line-height: Paragraph;
@@ -1534,7 +1460,7 @@ exports[`Search Page renders empty results message 1`] = `
   text-align: center;
 }
 
-.c46 {
+.c44 {
   color: #C2C6CC;
   font-size: 1.2rem;
   line-height: Paragraph;
@@ -1553,7 +1479,7 @@ exports[`Search Page renders empty results message 1`] = `
   overflow: hidden;
 }
 
-.c30 {
+.c28 {
   border-top: 1px solid #aaaaaa;
   bottom: 0px;
   background-color: white;
@@ -1562,7 +1488,7 @@ exports[`Search Page renders empty results message 1`] = `
   width: 100%;
 }
 
-.c33 {
+.c31 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -1575,7 +1501,7 @@ exports[`Search Page renders empty results message 1`] = `
   width: 100%;
 }
 
-.c36 {
+.c34 {
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -1597,36 +1523,19 @@ exports[`Search Page renders empty results message 1`] = `
   width: 100%;
 }
 
-.c19 {
-  position: relative;
+.c17 {
+  border: 1px solid #D5DAE0;
+  border-radius: 20px;
+  color: #3385FF;
   display: inline-block;
-  height: 0.6rem;
-  width: 1.4rem;
-  cursor: pointer;
+  font-size: 1.4rem;
+  padding-left: 16px;
+  padding-right: 16px;
+  padding-top: 8px;
+  padding-bottom: 8px;
 }
 
-.c19::before,
-.c19::after {
-  content: '';
-  position: absolute;
-  top: 0;
-}
-
-.c19::before {
-  border-left: 0.6rem solid transparent;
-  border-right: 0.6rem solid transparent;
-  border-top: 0.6rem solid #46b0ed;
-  left: 0;
-}
-
-.c19::after {
-  border-left: calc(0.6rem - 0.2rem) solid transparent;
-  border-right: calc(0.6rem - 0.2rem) solid transparent;
-  border-top: calc(0.6rem - 0.2rem) solid white;
-  left: 0.2rem;
-}
-
-.c48 {
+.c46 {
   list-style: none;
   margin-bottom: 8px;
   text-align: center;
@@ -1643,19 +1552,13 @@ exports[`Search Page renders empty results message 1`] = `
   font-size: 1.4rem;
 }
 
-.c40 {
-  display: inline-block;
-  vertical-align: -.125em;
-  overflow: hidden;
-}
-
 .c38 {
   display: inline-block;
   vertical-align: -.125em;
   overflow: hidden;
 }
 
-.c41 {
+.c36 {
   display: inline-block;
   vertical-align: -.125em;
   overflow: hidden;
@@ -1667,13 +1570,19 @@ exports[`Search Page renders empty results message 1`] = `
   overflow: hidden;
 }
 
-.c42 {
+.c37 {
+  display: inline-block;
+  vertical-align: -.125em;
+  overflow: hidden;
+}
+
+.c40 {
   display: inline-block;
   vertical-align: middle;
   overflow: hidden;
 }
 
-.c37 {
+.c35 {
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -1693,12 +1602,12 @@ exports[`Search Page renders empty results message 1`] = `
   width: 48px;
 }
 
-.c37:hover,
-.c37:focus {
+.c35:hover,
+.c35:focus {
   opacity: 1;
 }
 
-.c49 {
+.c47 {
   color: #6e747a;
   display: block;
   fontsize: 1.4rem;
@@ -1707,7 +1616,7 @@ exports[`Search Page renders empty results message 1`] = `
   padding: 0;
 }
 
-.c47 {
+.c45 {
   box-sizing: border-box;
   padding-left: 0px;
   padding-right: 8px;
@@ -1724,7 +1633,7 @@ exports[`Search Page renders empty results message 1`] = `
   justify-content: center;
 }
 
-.c25.c25.c25 {
+.c23.c23.c23 {
   border: none;
   border-bottom: 2px solid #3385FF;
   border-radius: 0;
@@ -1734,22 +1643,22 @@ exports[`Search Page renders empty results message 1`] = `
   padding: 0;
 }
 
-.c26.c26 {
+.c24.c24 {
   padding: 0 2rem;
 }
 
-.c20 {
+.c18 {
   max-width: 1200px;
 }
 
 @media screen and (min-width:40em) {
-  .c21 {
+  .c19 {
     width: 85%;
   }
 }
 
 @media screen and (min-width:52em) {
-  .c44 {
+  .c42 {
     -webkit-order: 2;
     -ms-flex-order: 2;
     order: 2;
@@ -1757,13 +1666,13 @@ exports[`Search Page renders empty results message 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c45 {
+  .c43 {
     width: 25%;
   }
 }
 
 @media screen and (min-width:40em) {
-  .c27 {
+  .c25 {
     -webkit-box-pack: center;
     -webkit-justify-content: center;
     -ms-flex-pack: center;
@@ -1772,7 +1681,7 @@ exports[`Search Page renders empty results message 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c27 {
+  .c25 {
     -webkit-box-pack: start;
     -webkit-justify-content: flex-start;
     -ms-flex-pack: start;
@@ -1781,7 +1690,7 @@ exports[`Search Page renders empty results message 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c31 {
+  .c29 {
     -webkit-flex-direction: row;
     -ms-flex-direction: row;
     flex-direction: row;
@@ -1789,7 +1698,7 @@ exports[`Search Page renders empty results message 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c31 {
+  .c29 {
     -webkit-align-items: flex-start;
     -webkit-box-align: flex-start;
     -ms-flex-align: flex-start;
@@ -1798,7 +1707,7 @@ exports[`Search Page renders empty results message 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c34 {
+  .c32 {
     -webkit-box-pack: start;
     -webkit-justify-content: flex-start;
     -ms-flex-pack: start;
@@ -1807,25 +1716,25 @@ exports[`Search Page renders empty results message 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c35 {
-    text-align: left;
-  }
-}
-
-@media screen and (min-width:52em) {
-  .c46 {
-    text-align: left;
-  }
-}
-
-@media screen and (min-width:52em) {
   .c33 {
+    text-align: left;
+  }
+}
+
+@media screen and (min-width:52em) {
+  .c44 {
+    text-align: left;
+  }
+}
+
+@media screen and (min-width:52em) {
+  .c31 {
     width: 33.33333333333333%;
   }
 }
 
 @media screen and (min-width:52em) {
-  .c36 {
+  .c34 {
     -webkit-order: 3;
     -ms-flex-order: 3;
     order: 3;
@@ -1856,20 +1765,8 @@ exports[`Search Page renders empty results message 1`] = `
   }
 }
 
-@media screen and (max-width:40em) {
-  .c17 {
-    display: none;
-  }
-}
-
-@media screen and (min-width:40em) and (max-width:52em) {
-  .c17 {
-    display: none;
-  }
-}
-
 @media screen and (min-width:52em) {
-  .c48 {
+  .c46 {
     text-align: left;
   }
 }
@@ -2016,28 +1913,15 @@ exports[`Search Page renders empty results message 1`] = `
         <div
           className="LoginTopBarProfileButton"
         >
-          <div
-            className="c3 c2 sc-bdVaJa c2"
+          <a
+            className="c17"
+            href="/signin?next=%2F"
             onClick={[Function]}
           >
-            <div
-              className="c17 c2"
-            >
-              <p
-                className="LoginTopBarProfileButton-name c18"
-                cursor="pointer"
-              />
-            </div>
-            <div
-              className="c19"
-              color="#46b0ed"
-              cursor="pointer"
-              display="inline-block"
-              height="0.6rem"
-              strokeWidth="0.2rem"
-              width="1.4rem"
-            />
-          </div>
+            <span>
+              Login
+            </span>
+          </a>
         </div>
       </div>
     </div>
@@ -2046,10 +1930,10 @@ exports[`Search Page renders empty results message 1`] = `
     className="jsx-916984404"
   >
     <div
-      className="c20 c21"
+      className="c18 c19"
     >
       <div
-        className="c22"
+        className="c20"
       >
         <form
           method="GET"
@@ -2065,10 +1949,10 @@ exports[`Search Page renders empty results message 1`] = `
               Search Open Collective
             </label>
             <div
-              className="c23 c24 sc-bdVaJa c2"
+              className="c21 c22 sc-bdVaJa c2"
             >
               <input
-                className="c25 form-control"
+                className="c23 form-control"
                 defaultValue="test"
                 id="search"
                 name="q"
@@ -2076,7 +1960,7 @@ exports[`Search Page renders empty results message 1`] = `
                 type="search"
               />
               <button
-                className="jsx-1144918383 jsx-3101740563 Button blue c26"
+                className="jsx-1144918383 jsx-3101740563 Button blue c24"
                 onClick={[Function]}
                 type="submit"
               >
@@ -2089,10 +1973,10 @@ exports[`Search Page renders empty results message 1`] = `
         </form>
       </div>
       <div
-        className="c27 c2 sc-bdVaJa c2"
+        className="c25 c2 sc-bdVaJa c2"
       >
         <div
-          className="c28 c29 sc-bdVaJa c2"
+          className="c26 c27 sc-bdVaJa c2"
         >
           <p>
             <em>
@@ -2106,17 +1990,17 @@ exports[`Search Page renders empty results message 1`] = `
     </div>
   </main>
   <div
-    className="c30"
+    className="c28"
     id="footer"
   >
     <div
-      className="c31 c32 sc-bdVaJa c2"
+      className="c29 c30 sc-bdVaJa c2"
     >
       <div
-        className="c33"
+        className="c31"
       >
         <div
-          className="c34 c2 sc-bdVaJa c2"
+          className="c32 c2 sc-bdVaJa c2"
         >
           <object
             data="/static/images/opencollectivelogo-footer.svg"
@@ -2125,21 +2009,21 @@ exports[`Search Page renders empty results message 1`] = `
           />
         </div>
         <p
-          className="c35"
+          className="c33"
         >
           An organization for your community, transparent by design.
         </p>
       </div>
       <div
-        className="c36"
+        className="c34"
       >
         <a
-          className="c37"
+          className="c35"
           href="https://medium.com/open-collective"
         >
           <svg
             aria-hidden="true"
-            className="c38"
+            className="c36"
             color="#9399A3"
             fill="currentColor"
             focusable="false"
@@ -2155,12 +2039,12 @@ exports[`Search Page renders empty results message 1`] = `
           </svg>
         </a>
         <a
-          className="c37"
+          className="c35"
           href="https://twitter.com/opencollect"
         >
           <svg
             aria-hidden="true"
-            className="c39"
+            className="c37"
             color="#9399A3"
             fill="currentColor"
             focusable="false"
@@ -2176,12 +2060,12 @@ exports[`Search Page renders empty results message 1`] = `
           </svg>
         </a>
         <a
-          className="c37"
+          className="c35"
           href="https://github.com/opencollective"
         >
           <svg
             aria-hidden="true"
-            className="c40"
+            className="c38"
             color="#9399A3"
             fill="currentColor"
             focusable="false"
@@ -2197,12 +2081,12 @@ exports[`Search Page renders empty results message 1`] = `
           </svg>
         </a>
         <a
-          className="c37"
+          className="c35"
           href="https://slack.opencollective.com"
         >
           <svg
             aria-hidden="true"
-            className="c41"
+            className="c39"
             color="#9399A3"
             fill="currentColor"
             focusable="false"
@@ -2218,12 +2102,12 @@ exports[`Search Page renders empty results message 1`] = `
           </svg>
         </a>
         <a
-          className="c37"
+          className="c35"
           href="mailto:info@opencollective.com"
         >
           <svg
             aria-hidden="true"
-            className="c42"
+            className="c40"
             color="#9399A3"
             fill="currentColor"
             focusable="false"
@@ -2239,44 +2123,44 @@ exports[`Search Page renders empty results message 1`] = `
         </a>
       </div>
       <nav
-        className="c43 c44"
+        className="c41 c42"
       >
         <div
-          className="c45"
+          className="c43"
         >
           <p
-            className="c46"
+            className="c44"
           >
             PLATFORM
           </p>
           <ul
-            className="c47"
+            className="c45"
           >
             <li
-              className="c48"
+              className="c46"
             >
               <a
-                className="c49 "
+                className="c47 "
                 href="/discover"
               >
                 Discover
               </a>
             </li>
             <li
-              className="c48"
+              className="c46"
             >
               <a
-                className="c49 "
+                className="c47 "
                 href="/learn-more"
               >
                 How it Works
               </a>
             </li>
             <li
-              className="c48"
+              className="c46"
             >
               <a
-                className="c49 "
+                className="c47 "
                 href="/opensource"
                 onClick={[Function]}
               >
@@ -2284,10 +2168,10 @@ exports[`Search Page renders empty results message 1`] = `
               </a>
             </li>
             <li
-              className="c48"
+              className="c46"
             >
               <a
-                className="c49 "
+                className="c47 "
                 href="/signin"
                 onClick={[Function]}
               >
@@ -2295,10 +2179,10 @@ exports[`Search Page renders empty results message 1`] = `
               </a>
             </li>
             <li
-              className="c48"
+              className="c46"
             >
               <a
-                className="c49 "
+                className="c47 "
                 href="/signin"
                 onClick={[Function]}
               >
@@ -2308,21 +2192,21 @@ exports[`Search Page renders empty results message 1`] = `
           </ul>
         </div>
         <div
-          className="c45"
+          className="c43"
         >
           <p
-            className="c46"
+            className="c44"
           >
             JOIN THE MOVEMENT
           </p>
           <ul
-            className="c47"
+            className="c45"
           >
             <li
-              className="c48"
+              className="c46"
             >
               <a
-                className="c49 "
+                className="c47 "
                 href="/create"
                 onClick={[Function]}
               >
@@ -2330,10 +2214,10 @@ exports[`Search Page renders empty results message 1`] = `
               </a>
             </li>
             <li
-              className="c48"
+              className="c46"
             >
               <a
-                className="c49 "
+                className="c47 "
                 href="/become-a-sponsor"
                 onClick={[Function]}
               >
@@ -2341,10 +2225,10 @@ exports[`Search Page renders empty results message 1`] = `
               </a>
             </li>
             <li
-              className="c48"
+              className="c46"
             >
               <a
-                className="c49 "
+                className="c47 "
                 href="/chapters"
                 onClick={[Function]}
               >
@@ -2354,21 +2238,21 @@ exports[`Search Page renders empty results message 1`] = `
           </ul>
         </div>
         <div
-          className="c45"
+          className="c43"
         >
           <p
-            className="c46"
+            className="c44"
           >
             COMMUNITY
           </p>
           <ul
-            className="c47"
+            className="c45"
           >
             <li
-              className="c48"
+              className="c46"
             >
               <a
-                className="c49 "
+                className="c47 "
                 href="/opensource"
                 onClick={[Function]}
               >
@@ -2376,10 +2260,10 @@ exports[`Search Page renders empty results message 1`] = `
               </a>
             </li>
             <li
-              className="c48"
+              className="c46"
             >
               <a
-                className="c49 "
+                className="c47 "
                 href="https://github.com/opencollective/opencollective/issues"
                 onClick={[Function]}
               >
@@ -2387,10 +2271,10 @@ exports[`Search Page renders empty results message 1`] = `
               </a>
             </li>
             <li
-              className="c48"
+              className="c46"
             >
               <a
-                className="c49 "
+                className="c47 "
                 href="https://slack.opencollective.com"
                 onClick={[Function]}
               >
@@ -2398,10 +2282,10 @@ exports[`Search Page renders empty results message 1`] = `
               </a>
             </li>
             <li
-              className="c48"
+              className="c46"
             >
               <a
-                className="c49 "
+                className="c47 "
                 href="https://github.com/opencollective/opencollective/wiki"
                 onClick={[Function]}
               >
@@ -2409,10 +2293,10 @@ exports[`Search Page renders empty results message 1`] = `
               </a>
             </li>
             <li
-              className="c48"
+              className="c46"
             >
               <a
-                className="c49 "
+                className="c47 "
                 href="mailto:support@opencollective.com"
                 onClick={[Function]}
               >
@@ -2422,21 +2306,21 @@ exports[`Search Page renders empty results message 1`] = `
           </ul>
         </div>
         <div
-          className="c45"
+          className="c43"
         >
           <p
-            className="c46"
+            className="c44"
           >
             COMPANY
           </p>
           <ul
-            className="c47"
+            className="c45"
           >
             <li
-              className="c48"
+              className="c46"
             >
               <a
-                className="c49 "
+                className="c47 "
                 href="/about"
                 onClick={[Function]}
               >
@@ -2444,10 +2328,10 @@ exports[`Search Page renders empty results message 1`] = `
               </a>
             </li>
             <li
-              className="c48"
+              className="c46"
             >
               <a
-                className="c49 "
+                className="c47 "
                 href="/faq"
                 onClick={[Function]}
               >
@@ -2455,10 +2339,10 @@ exports[`Search Page renders empty results message 1`] = `
               </a>
             </li>
             <li
-              className="c48"
+              className="c46"
             >
               <a
-                className="c49 "
+                className="c47 "
                 href="https://medium.com/open-collective"
                 onClick={[Function]}
               >
@@ -2466,10 +2350,10 @@ exports[`Search Page renders empty results message 1`] = `
               </a>
             </li>
             <li
-              className="c48"
+              className="c46"
             >
               <a
-                className="c49 "
+                className="c47 "
                 href="/tos"
                 onClick={[Function]}
               >
@@ -2477,10 +2361,10 @@ exports[`Search Page renders empty results message 1`] = `
               </a>
             </li>
             <li
-              className="c48"
+              className="c46"
             >
               <a
-                className="c49 "
+                className="c47 "
                 href="/privacypolicy"
                 onClick={[Function]}
               >
@@ -3700,7 +3584,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
   padding-right: 16px;
 }
 
-.c21 {
+.c19 {
   box-sizing: border-box;
   width: 100%;
   margin-left: auto;
@@ -3709,25 +3593,25 @@ exports[`Search Page renders loading grid SVG 1`] = `
   padding-right: 16px;
 }
 
-.c22 {
+.c20 {
   box-sizing: border-box;
   width: 100%;
 }
 
-.c24 {
+.c22 {
   box-sizing: border-box;
   margin-top: 16px;
   margin-bottom: 16px;
 }
 
-.c29 {
+.c27 {
   box-sizing: border-box;
   width: 100%;
   padding-top: 16px;
   padding-bottom: 16px;
 }
 
-.c32 {
+.c30 {
   max-width: 1300px;
   box-sizing: border-box;
   margin-left: auto;
@@ -3735,7 +3619,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
   padding: 8px;
 }
 
-.c44 {
+.c42 {
   box-sizing: border-box;
   margin-top: 16px;
   -webkit-flex: 1 1 auto;
@@ -3746,7 +3630,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
   order: 3;
 }
 
-.c45 {
+.c43 {
   box-sizing: border-box;
   width: 50%;
   margin-bottom: 16px;
@@ -3815,7 +3699,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
   justify-content: space-around;
 }
 
-.c23 {
+.c21 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -3826,7 +3710,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
   align-items: flex-end;
 }
 
-.c27 {
+.c25 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -3840,7 +3724,1316 @@ exports[`Search Page renders loading grid SVG 1`] = `
   justify-content: center;
 }
 
+.c26 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+}
+
+.c29 {
+  max-width: 1300px;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: justify;
+  -webkit-justify-content: space-between;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
+}
+
+.c32 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+}
+
+.c41 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-wrap: wrap;
+  -ms-flex-wrap: wrap;
+  flex-wrap: wrap;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+}
+
+.c33 {
+  color: #6E747A;
+  font-size: 1.4rem;
+  line-height: Paragraph;
+  -webkit-letter-spacing: -0.2px;
+  -moz-letter-spacing: -0.2px;
+  -ms-letter-spacing: -0.2px;
+  letter-spacing: -0.2px;
+  margin: 0px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  text-align: center;
+}
+
+.c44 {
+  color: #C2C6CC;
+  font-size: 1.2rem;
+  line-height: Paragraph;
+  -webkit-letter-spacing: 1px;
+  -moz-letter-spacing: 1px;
+  -ms-letter-spacing: 1px;
+  letter-spacing: 1px;
+  margin: 0px;
+  padding-bottom: 16px;
+  text-align: center;
+}
+
+.c11 {
+  display: inline-block;
+  vertical-align: -.125em;
+  overflow: hidden;
+}
+
 .c28 {
+  border-top: 1px solid #aaaaaa;
+  bottom: 0px;
+  background-color: white;
+  min-height: 7.5rem;
+  padding: 1rem;
+  width: 100%;
+}
+
+.c31 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  max-width: 300px;
+  margin-top: 16px;
+  width: 100%;
+}
+
+.c34 {
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: space-evenly;
+  -webkit-justify-content: space-evenly;
+  -ms-flex-pack: space-evenly;
+  justify-content: space-evenly;
+  max-width: 300px;
+  -webkit-order: 2;
+  -ms-flex-order: 2;
+  order: 2;
+  margin-top: 16px;
+  margin-bottom: 16px;
+  width: 100%;
+}
+
+.c17 {
+  border: 1px solid #D5DAE0;
+  border-radius: 20px;
+  color: #3385FF;
+  display: inline-block;
+  font-size: 1.4rem;
+  padding-left: 16px;
+  padding-right: 16px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+.c46 {
+  list-style: none;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.c12 {
+  list-style: none;
+  min-width: 20rem;
+  text-align: right;
+}
+
+.c16 {
+  color: #777777;
+  font-size: 1.4rem;
+}
+
+.c38 {
+  display: inline-block;
+  vertical-align: -.125em;
+  overflow: hidden;
+}
+
+.c36 {
+  display: inline-block;
+  vertical-align: -.125em;
+  overflow: hidden;
+}
+
+.c39 {
+  display: inline-block;
+  vertical-align: -.125em;
+  overflow: hidden;
+}
+
+.c37 {
+  display: inline-block;
+  vertical-align: -.125em;
+  overflow: hidden;
+}
+
+.c40 {
+  display: inline-block;
+  vertical-align: middle;
+  overflow: hidden;
+}
+
+.c35 {
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  border: 1px solid #9399a3;
+  border-radius: 50%;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  height: 48px;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  opacity: 0.6;
+  width: 48px;
+}
+
+.c35:hover,
+.c35:focus {
+  opacity: 1;
+}
+
+.c47 {
+  color: #6e747a;
+  display: block;
+  fontsize: 1.4rem;
+  fontweight: 400;
+  margin: 0;
+  padding: 0;
+}
+
+.c45 {
+  box-sizing: border-box;
+  padding-left: 0px;
+  padding-right: 8px;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+}
+
+.c23.c23.c23 {
+  border: none;
+  border-bottom: 2px solid #3385FF;
+  border-radius: 0;
+  box-shadow: none;
+  display: block;
+  height: 3.4rem;
+  padding: 0;
+}
+
+.c24.c24 {
+  padding: 0 2rem;
+}
+
+.c18 {
+  max-width: 1200px;
+}
+
+@media screen and (min-width:40em) {
+  .c19 {
+    width: 85%;
+  }
+}
+
+@media screen and (min-width:52em) {
+  .c42 {
+    -webkit-order: 2;
+    -ms-flex-order: 2;
+    order: 2;
+  }
+}
+
+@media screen and (min-width:52em) {
+  .c43 {
+    width: 25%;
+  }
+}
+
+@media screen and (min-width:40em) {
+  .c25 {
+    -webkit-box-pack: center;
+    -webkit-justify-content: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+  }
+}
+
+@media screen and (min-width:52em) {
+  .c25 {
+    -webkit-box-pack: start;
+    -webkit-justify-content: flex-start;
+    -ms-flex-pack: start;
+    justify-content: flex-start;
+  }
+}
+
+@media screen and (min-width:52em) {
+  .c29 {
+    -webkit-flex-direction: row;
+    -ms-flex-direction: row;
+    flex-direction: row;
+  }
+}
+
+@media screen and (min-width:52em) {
+  .c29 {
+    -webkit-align-items: flex-start;
+    -webkit-box-align: flex-start;
+    -ms-flex-align: flex-start;
+    align-items: flex-start;
+  }
+}
+
+@media screen and (min-width:52em) {
+  .c32 {
+    -webkit-box-pack: start;
+    -webkit-justify-content: flex-start;
+    -ms-flex-pack: start;
+    justify-content: flex-start;
+  }
+}
+
+@media screen and (min-width:52em) {
+  .c33 {
+    text-align: left;
+  }
+}
+
+@media screen and (min-width:52em) {
+  .c44 {
+    text-align: left;
+  }
+}
+
+@media screen and (min-width:52em) {
+  .c31 {
+    width: 33.33333333333333%;
+  }
+}
+
+@media screen and (min-width:52em) {
+  .c34 {
+    -webkit-order: 3;
+    -ms-flex-order: 3;
+    order: 3;
+  }
+}
+
+@media screen and (max-width:40em) {
+  .c4 {
+    display: none;
+  }
+}
+
+@media screen and (min-width:40em) and (max-width:52em) {
+  .c8 {
+    display: none;
+  }
+}
+
+@media screen and (min-width:52em) and (max-width:64em) {
+  .c8 {
+    display: none;
+  }
+}
+
+@media screen and (min-width:64em) {
+  .c8 {
+    display: none;
+  }
+}
+
+@media screen and (min-width:52em) {
+  .c46 {
+    text-align: left;
+  }
+}
+
+<div>
+  <header>
+    <div
+      id="top"
+    />
+    <div
+      className="c0 c1 sc-bdVaJa c2"
+    >
+      <a
+        className="c3 c2"
+        href="/"
+        onClick={[Function]}
+      >
+        <img
+          alt="Open Collective logo"
+          className=""
+          height="24"
+          src="/static/images/opencollective-icon.svg"
+          width="24"
+        />
+        <div
+          className="c4 c2"
+        >
+          <div
+            className="c5"
+          >
+            <img
+              height="16px"
+              src="/static/images/logotype.svg"
+            />
+          </div>
+        </div>
+      </a>
+      <div
+        className="c6 c7 sc-bdVaJa c2"
+      >
+        <div
+          className="c8 c2"
+        >
+          <div
+            className="c9"
+          >
+            <a
+              className="c10 c2"
+              onClick={[Function]}
+            >
+              <svg
+                height={24}
+                version="1.1"
+                viewBox="10 10 30 30"
+                width={24}
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <title>
+                  magnifying glass icon
+                </title>
+                <path
+                  d="M28.5404814,30.1903972 C26.7995948,31.5736628 24.5962981,32.4 22.2,32.4 C16.5666956,32.4 12,27.8333044 12,22.2 C12,16.5666956 16.5666956,12 22.2,12 C27.8333044,12 32.4,16.5666956 32.4,22.2 C32.4,24.5962981 31.5736628,26.7995948 30.1903972,28.5404814 L35.6582912,34.0083754 C36.1139029,34.4639871 36.1139029,35.2026796 35.6582912,35.6582912 C35.2026796,36.1139029 34.4639871,36.1139029 34.0083754,35.6582912 L28.5404814,30.1903972 Z M22.2,30 C26.507821,30 30,26.507821 30,22.2 C30,17.892179 26.507821,14.4 22.2,14.4 C17.892179,14.4 14.4,17.892179 14.4,22.2 C14.4,26.507821 17.892179,30 22.2,30 Z"
+                  fill="#aaaaaa"
+                  fillRule="nonzero"
+                  id="magnifying-glass"
+                />
+              </svg>
+            </a>
+          </div>
+        </div>
+        <div
+          className="c8 c2"
+        >
+          <div
+            className="c9"
+          >
+            <a
+              className="c10 c2"
+              onClick={[Function]}
+            >
+              <svg
+                aria-hidden="true"
+                className="c11"
+                color="#aaaaaa"
+                fill="currentColor"
+                focusable="false"
+                height={24}
+                size={24}
+                viewBox="0 0 448 512"
+                width={24}
+              >
+                <path
+                  d="M16 132h416c8.837 0 16-7.163 16-16V76c0-8.837-7.163-16-16-16H16C7.163 60 0 67.163 0 76v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16z"
+                  fill="currentColor"
+                />
+              </svg>
+            </a>
+          </div>
+        </div>
+        <div
+          className="c4 c2"
+        >
+          <ul
+            className="c12 c13 c14"
+          >
+            <li
+              className="c15"
+            >
+              <a
+                className="c16"
+                href="/discover"
+              >
+                <span>
+                  Discover
+                </span>
+              </a>
+            </li>
+            <li
+              className="c15"
+            >
+              <a
+                className="c16"
+                href="/learn-more"
+              >
+                <span>
+                  How it Works
+                </span>
+              </a>
+            </li>
+            <li
+              className="c15"
+            >
+              <a
+                className="c16"
+                href="https://medium.com/open-collective"
+              >
+                <span>
+                  Blog
+                </span>
+              </a>
+            </li>
+          </ul>
+        </div>
+        <div
+          className="LoginTopBarProfileButton"
+        >
+          <a
+            className="c17"
+            href="/signin?next=%2F"
+            onClick={[Function]}
+          >
+            <span>
+              Login
+            </span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </header>
+  <main
+    className="jsx-916984404"
+  >
+    <div
+      className="c18 c19"
+    >
+      <div
+        className="c20"
+      >
+        <form
+          method="GET"
+          onSubmit={[Function]}
+        >
+          <div
+            className="form-group form-group-lg"
+          >
+            <label
+              className="h1 control-label"
+              htmlFor="search"
+            >
+              Search Open Collective
+            </label>
+            <div
+              className="c21 c22 sc-bdVaJa c2"
+            >
+              <input
+                className="c23 form-control"
+                defaultValue=""
+                id="search"
+                name="q"
+                placeholder="open source"
+                type="search"
+              />
+              <button
+                className="jsx-1144918383 jsx-3101740563 Button blue c24"
+                onClick={[Function]}
+                type="submit"
+              >
+                <span
+                  className="fa fa-search"
+                />
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div
+        className="c25 c2 sc-bdVaJa c2"
+      >
+        <div
+          className="c26 c27 sc-bdVaJa c2"
+        >
+          <svg
+            fill="#3385FF"
+            height={100}
+            viewBox="0 0 105 105"
+            width={100}
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <circle
+              cx="12.5"
+              cy="12.5"
+              r="12.5"
+            >
+              <animate
+                attributeName="fill-opacity"
+                begin="0s"
+                calcMode="linear"
+                dur="1s"
+                repeatCount="indefinite"
+                values="1;.2;1"
+              />
+            </circle>
+            <circle
+              cx="12.5"
+              cy="52.5"
+              fillOpacity=".5"
+              r="12.5"
+            >
+              <animate
+                attributeName="fill-opacity"
+                begin="100ms"
+                calcMode="linear"
+                dur="1s"
+                repeatCount="indefinite"
+                values="1;.2;1"
+              />
+            </circle>
+            <circle
+              cx="52.5"
+              cy="12.5"
+              r="12.5"
+            >
+              <animate
+                attributeName="fill-opacity"
+                begin="300ms"
+                calcMode="linear"
+                dur="1s"
+                repeatCount="indefinite"
+                values="1;.2;1"
+              />
+            </circle>
+            <circle
+              cx="52.5"
+              cy="52.5"
+              r="12.5"
+            >
+              <animate
+                attributeName="fill-opacity"
+                begin="600ms"
+                calcMode="linear"
+                dur="1s"
+                repeatCount="indefinite"
+                values="1;.2;1"
+              />
+            </circle>
+            <circle
+              cx="92.5"
+              cy="12.5"
+              r="12.5"
+            >
+              <animate
+                attributeName="fill-opacity"
+                begin="800ms"
+                calcMode="linear"
+                dur="1s"
+                repeatCount="indefinite"
+                values="1;.2;1"
+              />
+            </circle>
+            <circle
+              cx="92.5"
+              cy="52.5"
+              r="12.5"
+            >
+              <animate
+                attributeName="fill-opacity"
+                begin="400ms"
+                calcMode="linear"
+                dur="1s"
+                repeatCount="indefinite"
+                values="1;.2;1"
+              />
+            </circle>
+            <circle
+              cx="12.5"
+              cy="92.5"
+              r="12.5"
+            >
+              <animate
+                attributeName="fill-opacity"
+                begin="700ms"
+                calcMode="linear"
+                dur="1s"
+                repeatCount="indefinite"
+                values="1;.2;1"
+              />
+            </circle>
+            <circle
+              cx="52.5"
+              cy="92.5"
+              r="12.5"
+            >
+              <animate
+                attributeName="fill-opacity"
+                begin="500ms"
+                calcMode="linear"
+                dur="1s"
+                repeatCount="indefinite"
+                values="1;.2;1"
+              />
+            </circle>
+            <circle
+              cx="92.5"
+              cy="92.5"
+              r="12.5"
+            >
+              <animate
+                attributeName="fill-opacity"
+                begin="200ms"
+                calcMode="linear"
+                dur="1s"
+                repeatCount="indefinite"
+                values="1;.2;1"
+              />
+            </circle>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </main>
+  <div
+    className="c28"
+    id="footer"
+  >
+    <div
+      className="c29 c30 sc-bdVaJa c2"
+    >
+      <div
+        className="c31"
+      >
+        <div
+          className="c32 c2 sc-bdVaJa c2"
+        >
+          <object
+            data="/static/images/opencollectivelogo-footer.svg"
+            height="20"
+            type="image/svg+xml"
+          />
+        </div>
+        <p
+          className="c33"
+        >
+          An organization for your community, transparent by design.
+        </p>
+      </div>
+      <div
+        className="c34"
+      >
+        <a
+          className="c35"
+          href="https://medium.com/open-collective"
+        >
+          <svg
+            aria-hidden="true"
+            className="c36"
+            color="#9399A3"
+            fill="currentColor"
+            focusable="false"
+            height={17}
+            size={17}
+            viewBox="0 0 512 512"
+            width={17}
+          >
+            <path
+              d="M71.5 142.3c.6-5.9-1.7-11.8-6.1-15.8L20.3 72.1V64h140.2l108.4 237.7L364.2 64h133.7v8.1l-38.6 37c-3.3 2.5-5 6.7-4.3 10.8v272c-.7 4.1 1 8.3 4.3 10.8l37.7 37v8.1H307.3v-8.1l39.1-37.9c3.8-3.8 3.8-5 3.8-10.8V171.2L241.5 447.1h-14.7L100.4 171.2v184.9c-1.1 7.8 1.5 15.6 7 21.2l50.8 61.6v8.1h-144v-8L65 377.3c5.4-5.6 7.9-13.5 6.5-21.2V142.3z"
+              fill="currentColor"
+            />
+          </svg>
+        </a>
+        <a
+          className="c35"
+          href="https://twitter.com/opencollect"
+        >
+          <svg
+            aria-hidden="true"
+            className="c37"
+            color="#9399A3"
+            fill="currentColor"
+            focusable="false"
+            height={17}
+            size={17}
+            viewBox="0 0 512 512"
+            width={17}
+          >
+            <path
+              d="M459.37 151.716c.325 4.548.325 9.097.325 13.645 0 138.72-105.583 298.558-298.558 298.558-59.452 0-114.68-17.219-161.137-47.106 8.447.974 16.568 1.299 25.34 1.299 49.055 0 94.213-16.568 130.274-44.832-46.132-.975-84.792-31.188-98.112-72.772 6.498.974 12.995 1.624 19.818 1.624 9.421 0 18.843-1.3 27.614-3.573-48.081-9.747-84.143-51.98-84.143-102.985v-1.299c13.969 7.797 30.214 12.67 47.431 13.319-28.264-18.843-46.781-51.005-46.781-87.391 0-19.492 5.197-37.36 14.294-52.954 51.655 63.675 129.3 105.258 216.365 109.807-1.624-7.797-2.599-15.918-2.599-24.04 0-57.828 46.782-104.934 104.934-104.934 30.213 0 57.502 12.67 76.67 33.137 23.715-4.548 46.456-13.32 66.599-25.34-7.798 24.366-24.366 44.833-46.132 57.827 21.117-2.273 41.584-8.122 60.426-16.243-14.292 20.791-32.161 39.308-52.628 54.253z"
+              fill="currentColor"
+            />
+          </svg>
+        </a>
+        <a
+          className="c35"
+          href="https://github.com/opencollective"
+        >
+          <svg
+            aria-hidden="true"
+            className="c38"
+            color="#9399A3"
+            fill="currentColor"
+            focusable="false"
+            height={17}
+            size={17}
+            viewBox="0 0 496 512"
+            width={17}
+          >
+            <path
+              d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"
+              fill="currentColor"
+            />
+          </svg>
+        </a>
+        <a
+          className="c35"
+          href="https://slack.opencollective.com"
+        >
+          <svg
+            aria-hidden="true"
+            className="c39"
+            color="#9399A3"
+            fill="currentColor"
+            focusable="false"
+            height={17}
+            size={17}
+            viewBox="0 0 448 512"
+            width={17}
+          >
+            <path
+              d="M244.2 217.5l19.3 57.7-59.8 20-19.3-57.7 59.8-20zm41.4 243.7C131.6 507.4 65 471.6 18.8 317.6S8.4 97 162.4 50.8C316.4 4.6 383 40.4 429.2 194.4c46.2 154 10.4 220.6-143.6 266.8zM366.2 265c-3.9-12.2-17.2-18.6-29.4-14.7l-29 9.7-19.3-57.7 29-9.7c12.2-3.9 18.6-17.2 14.7-29.4-3.9-12.2-17.2-18.6-29.4-14.7l-29 9.7-10-30.1c-3.9-12.2-17.2-18.6-29.4-14.7-12.2 3.9-18.6 17.2-14.7 29.4l10 30.1-59.8 20.1-10-30.1c-3.9-12.2-17.2-18.6-29.4-14.7-12.2 3.9-18.6 17.2-14.7 29.4l10 30.1-29 9.7c-12.2 3.9-18.6 17.2-14.7 29.4 3.2 9.3 12.2 15.4 21.5 15.8 4.3.6 7.7-1 36.9-10.7l19.3 57.7-29 9.7c-12.2 3.9-18.6 17.2-14.7 29.4 3.2 9.3 12.2 15.4 21.5 15.8 4.3.6 7.7-1 36.9-10.7l10 30.1c3.7 10.8 15.8 18.6 29.4 14.7 12.2-3.9 18.6-17.2 14.7-29.4l-10-30.1 59.8-20.1 10 30.1c3.7 10.8 15.8 18.6 29.4 14.7 12.2-3.9 18.6-17.2 14.7-29.4l-10-30.1 29-9.7c12.2-4.2 18.6-17.5 14.7-29.6z"
+              fill="currentColor"
+            />
+          </svg>
+        </a>
+        <a
+          className="c35"
+          href="mailto:info@opencollective.com"
+        >
+          <svg
+            aria-hidden="true"
+            className="c40"
+            color="#9399A3"
+            fill="currentColor"
+            focusable="false"
+            height={19}
+            size={19}
+            viewBox="0 0 24 24"
+            width={19}
+          >
+            <path
+              d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"
+            />
+          </svg>
+        </a>
+      </div>
+      <nav
+        className="c41 c42"
+      >
+        <div
+          className="c43"
+        >
+          <p
+            className="c44"
+          >
+            PLATFORM
+          </p>
+          <ul
+            className="c45"
+          >
+            <li
+              className="c46"
+            >
+              <a
+                className="c47 "
+                href="/discover"
+              >
+                Discover
+              </a>
+            </li>
+            <li
+              className="c46"
+            >
+              <a
+                className="c47 "
+                href="/learn-more"
+              >
+                How it Works
+              </a>
+            </li>
+            <li
+              className="c46"
+            >
+              <a
+                className="c47 "
+                href="/opensource"
+                onClick={[Function]}
+              >
+                Use Cases
+              </a>
+            </li>
+            <li
+              className="c46"
+            >
+              <a
+                className="c47 "
+                href="/signin"
+                onClick={[Function]}
+              >
+                Sign Up
+              </a>
+            </li>
+            <li
+              className="c46"
+            >
+              <a
+                className="c47 "
+                href="/signin"
+                onClick={[Function]}
+              >
+                Login
+              </a>
+            </li>
+          </ul>
+        </div>
+        <div
+          className="c43"
+        >
+          <p
+            className="c44"
+          >
+            JOIN THE MOVEMENT
+          </p>
+          <ul
+            className="c45"
+          >
+            <li
+              className="c46"
+            >
+              <a
+                className="c47 "
+                href="/create"
+                onClick={[Function]}
+              >
+                Create a Collective
+              </a>
+            </li>
+            <li
+              className="c46"
+            >
+              <a
+                className="c47 "
+                href="/become-a-sponsor"
+                onClick={[Function]}
+              >
+                Become a Sponsor
+              </a>
+            </li>
+            <li
+              className="c46"
+            >
+              <a
+                className="c47 "
+                href="/chapters"
+                onClick={[Function]}
+              >
+                Create a chapter
+              </a>
+            </li>
+          </ul>
+        </div>
+        <div
+          className="c43"
+        >
+          <p
+            className="c44"
+          >
+            COMMUNITY
+          </p>
+          <ul
+            className="c45"
+          >
+            <li
+              className="c46"
+            >
+              <a
+                className="c47 "
+                href="/opensource"
+                onClick={[Function]}
+              >
+                Open Source
+              </a>
+            </li>
+            <li
+              className="c46"
+            >
+              <a
+                className="c47 "
+                href="https://github.com/opencollective/opencollective/issues"
+                onClick={[Function]}
+              >
+                Report an issue
+              </a>
+            </li>
+            <li
+              className="c46"
+            >
+              <a
+                className="c47 "
+                href="https://slack.opencollective.com"
+                onClick={[Function]}
+              >
+                Slack
+              </a>
+            </li>
+            <li
+              className="c46"
+            >
+              <a
+                className="c47 "
+                href="https://github.com/opencollective/opencollective/wiki"
+                onClick={[Function]}
+              >
+                Wiki
+              </a>
+            </li>
+            <li
+              className="c46"
+            >
+              <a
+                className="c47 "
+                href="mailto:support@opencollective.com"
+                onClick={[Function]}
+              >
+                Email Support
+              </a>
+            </li>
+          </ul>
+        </div>
+        <div
+          className="c43"
+        >
+          <p
+            className="c44"
+          >
+            COMPANY
+          </p>
+          <ul
+            className="c45"
+          >
+            <li
+              className="c46"
+            >
+              <a
+                className="c47 "
+                href="/about"
+                onClick={[Function]}
+              >
+                About
+              </a>
+            </li>
+            <li
+              className="c46"
+            >
+              <a
+                className="c47 "
+                href="/faq"
+                onClick={[Function]}
+              >
+                FAQ
+              </a>
+            </li>
+            <li
+              className="c46"
+            >
+              <a
+                className="c47 "
+                href="https://medium.com/open-collective"
+                onClick={[Function]}
+              >
+                Blog
+              </a>
+            </li>
+            <li
+              className="c46"
+            >
+              <a
+                className="c47 "
+                href="/tos"
+                onClick={[Function]}
+              >
+                Terms of Service
+              </a>
+            </li>
+            <li
+              className="c46"
+            >
+              <a
+                className="c47 "
+                href="/privacypolicy"
+                onClick={[Function]}
+              >
+                Privacy Policy
+              </a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`Search Page renders search results with pagination 1`] = `
+.c1 {
+  box-sizing: border-box;
+  padding-left: 16px;
+  padding-right: 16px;
+  padding-top: 16px;
+  padding-bottom: 16px;
+}
+
+.c2 {
+  box-sizing: border-box;
+}
+
+.c5 {
+  box-sizing: border-box;
+  margin-left: 8px;
+  margin-right: 8px;
+}
+
+.c7 {
+  box-sizing: border-box;
+  -webkit-flex: 1 1 auto;
+  -ms-flex: 1 1 auto;
+  flex: 1 1 auto;
+}
+
+.c9 {
+  box-sizing: border-box;
+  margin-left: 16px;
+  margin-right: 16px;
+}
+
+.c14 {
+  margin: 0;
+  box-sizing: border-box;
+  margin: 0px;
+  padding: 0px;
+}
+
+.c15 {
+  box-sizing: border-box;
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+.c19 {
+  box-sizing: border-box;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+.c20 {
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.c22 {
+  box-sizing: border-box;
+  margin-top: 16px;
+  margin-bottom: 16px;
+}
+
+.c29 {
+  box-sizing: border-box;
+  width: 100%;
+  padding-top: 16px;
+  padding-bottom: 16px;
+}
+
+.c32 {
+  max-width: 1300px;
+  box-sizing: border-box;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 8px;
+}
+
+.c44 {
+  box-sizing: border-box;
+  margin-top: 16px;
+  -webkit-flex: 1 1 auto;
+  -ms-flex: 1 1 auto;
+  flex: 1 1 auto;
+  -webkit-order: 3;
+  -ms-flex-order: 3;
+  order: 3;
+}
+
+.c45 {
+  box-sizing: border-box;
+  width: 50%;
+  margin-bottom: 16px;
+}
+
+.c26 {
+  box-sizing: border-box;
+  margin-left: 8px;
+  margin-right: 8px;
+  margin-top: 16px;
+  margin-bottom: 16px;
+}
+
+.c0 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-direction: row;
+  -ms-flex-direction: row;
+  flex-direction: row;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: space-around;
+  -webkit-justify-content: space-around;
+  -ms-flex-pack: space-around;
+  justify-content: space-around;
+}
+
+.c3 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+}
+
+.c6 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: end;
+  -webkit-justify-content: flex-end;
+  -ms-flex-pack: end;
+  justify-content: flex-end;
+}
+
+.c10 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+}
+
+.c13 {
+  margin: 0;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: space-around;
+  -webkit-justify-content: space-around;
+  -ms-flex-pack: space-around;
+  justify-content: space-around;
+}
+
+.c21 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: flex-end;
+  -webkit-box-align: flex-end;
+  -ms-flex-align: flex-end;
+  align-items: flex-end;
+}
+
+.c25 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-wrap: wrap;
+  -ms-flex-wrap: wrap;
+  flex-wrap: wrap;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+}
+
+.c27 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -3895,20 +5088,22 @@ exports[`Search Page renders loading grid SVG 1`] = `
   justify-content: center;
 }
 
-.c18 {
-  color: #46b0ed;
-  display: inline-block;
-  font-size: 1.2rem;
-  font-weight: bold;
-  line-height: Paragraph;
-  -webkit-letter-spacing: 1px;
-  -moz-letter-spacing: 1px;
-  -ms-letter-spacing: 1px;
-  letter-spacing: 1px;
-  margin: 0px;
-  margin-left: 8px;
-  margin-right: 8px;
-  cursor: pointer;
+.c28 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
 }
 
 .c35 {
@@ -3988,33 +5183,16 @@ exports[`Search Page renders loading grid SVG 1`] = `
   width: 100%;
 }
 
-.c19 {
-  position: relative;
+.c17 {
+  border: 1px solid #D5DAE0;
+  border-radius: 20px;
+  color: #3385FF;
   display: inline-block;
-  height: 0.6rem;
-  width: 1.4rem;
-  cursor: pointer;
-}
-
-.c19::before,
-.c19::after {
-  content: '';
-  position: absolute;
-  top: 0;
-}
-
-.c19::before {
-  border-left: 0.6rem solid transparent;
-  border-right: 0.6rem solid transparent;
-  border-top: 0.6rem solid #46b0ed;
-  left: 0;
-}
-
-.c19::after {
-  border-left: calc(0.6rem - 0.2rem) solid transparent;
-  border-right: calc(0.6rem - 0.2rem) solid transparent;
-  border-top: calc(0.6rem - 0.2rem) solid white;
-  left: 0.2rem;
+  font-size: 1.4rem;
+  padding-left: 16px;
+  padding-right: 16px;
+  padding-top: 8px;
+  padding-bottom: 8px;
 }
 
 .c48 {
@@ -4115,7 +5293,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
   justify-content: center;
 }
 
-.c25.c25.c25 {
+.c23.c23.c23 {
   border: none;
   border-bottom: 2px solid #3385FF;
   border-radius: 0;
@@ -4125,16 +5303,16 @@ exports[`Search Page renders loading grid SVG 1`] = `
   padding: 0;
 }
 
-.c26.c26 {
+.c24.c24 {
   padding: 0 2rem;
 }
 
-.c20 {
+.c18 {
   max-width: 1200px;
 }
 
 @media screen and (min-width:40em) {
-  .c21 {
+  .c19 {
     width: 85%;
   }
 }
@@ -4154,7 +5332,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
 }
 
 @media screen and (min-width:40em) {
-  .c27 {
+  .c25 {
     -webkit-box-pack: center;
     -webkit-justify-content: center;
     -ms-flex-pack: center;
@@ -4163,7 +5341,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c27 {
+  .c25 {
     -webkit-box-pack: start;
     -webkit-justify-content: flex-start;
     -ms-flex-pack: start;
@@ -4243,18 +5421,6 @@ exports[`Search Page renders loading grid SVG 1`] = `
 
 @media screen and (min-width:64em) {
   .c8 {
-    display: none;
-  }
-}
-
-@media screen and (max-width:40em) {
-  .c17 {
-    display: none;
-  }
-}
-
-@media screen and (min-width:40em) and (max-width:52em) {
-  .c17 {
     display: none;
   }
 }
@@ -4407,28 +5573,15 @@ exports[`Search Page renders loading grid SVG 1`] = `
         <div
           className="LoginTopBarProfileButton"
         >
-          <div
-            className="c3 c2 sc-bdVaJa c2"
+          <a
+            className="c17"
+            href="/signin?next=%2F"
             onClick={[Function]}
           >
-            <div
-              className="c17 c2"
-            >
-              <p
-                className="LoginTopBarProfileButton-name c18"
-                cursor="pointer"
-              />
-            </div>
-            <div
-              className="c19"
-              color="#46b0ed"
-              cursor="pointer"
-              display="inline-block"
-              height="0.6rem"
-              strokeWidth="0.2rem"
-              width="1.4rem"
-            />
-          </div>
+            <span>
+              Login
+            </span>
+          </a>
         </div>
       </div>
     </div>
@@ -4437,10 +5590,10 @@ exports[`Search Page renders loading grid SVG 1`] = `
     className="jsx-916984404"
   >
     <div
-      className="c20 c21"
+      className="c18 c19"
     >
       <div
-        className="c22"
+        className="c20"
       >
         <form
           method="GET"
@@ -4456,18 +5609,18 @@ exports[`Search Page renders loading grid SVG 1`] = `
               Search Open Collective
             </label>
             <div
-              className="c23 c24 sc-bdVaJa c2"
+              className="c21 c22 sc-bdVaJa c2"
             >
               <input
-                className="c25 form-control"
-                defaultValue=""
+                className="c23 form-control"
+                defaultValue="Test"
                 id="search"
                 name="q"
                 placeholder="open source"
                 type="search"
               />
               <button
-                className="jsx-1144918383 jsx-3101740563 Button blue c26"
+                className="jsx-1144918383 jsx-3101740563 Button blue c24"
                 onClick={[Function]}
                 type="submit"
               >
@@ -4480,147 +5633,131 @@ exports[`Search Page renders loading grid SVG 1`] = `
         </form>
       </div>
       <div
-        className="c27 c2 sc-bdVaJa c2"
+        className="c25 c2 sc-bdVaJa c2"
       >
         <div
-          className="c28 c29 sc-bdVaJa c2"
+          className="c10 c26 sc-bdVaJa c2"
         >
-          <svg
-            fill="#3385FF"
-            height={100}
-            viewBox="0 0 105 105"
-            width={100}
-            xmlns="http://www.w3.org/2000/svg"
+          <a
+            href="/test-collective"
+            onClick={[Function]}
           >
-            <circle
-              cx="12.5"
-              cy="12.5"
-              r="12.5"
+            <div
+              className="jsx-136688120 CollectiveCard undefined"
             >
-              <animate
-                attributeName="fill-opacity"
-                begin="0s"
-                calcMode="linear"
-                dur="1s"
-                repeatCount="indefinite"
-                values="1;.2;1"
+              <div
+                className="jsx-136688120 head"
+              >
+                <div
+                  className="jsx-136688120 background"
+                  style={Object {}}
+                />
+                <div
+                  className="jsx-136688120 logo"
+                >
+                  <div
+                    className="jsx-3454192051 Logo"
+                    style={
+                      Object {
+                        "height": 65,
+                        "minWidth": 32.5,
+                      }
+                    }
+                  >
+                    <img
+                      className="jsx-3454192051 logo"
+                      style={
+                        Object {
+                          "maxHeight": 65,
+                        }
+                      }
+                    />
+                  </div>
+                </div>
+              </div>
+              <div
+                className="jsx-136688120 body"
+              >
+                <div
+                  className="jsx-136688120 name"
+                />
+                <div
+                  className="jsx-136688120 description"
+                />
+              </div>
+              <div
+                className="jsx-136688120 footer"
               />
-            </circle>
-            <circle
-              cx="12.5"
-              cy="52.5"
-              fillOpacity=".5"
-              r="12.5"
-            >
-              <animate
-                attributeName="fill-opacity"
-                begin="100ms"
-                calcMode="linear"
-                dur="1s"
-                repeatCount="indefinite"
-                values="1;.2;1"
-              />
-            </circle>
-            <circle
-              cx="52.5"
-              cy="12.5"
-              r="12.5"
-            >
-              <animate
-                attributeName="fill-opacity"
-                begin="300ms"
-                calcMode="linear"
-                dur="1s"
-                repeatCount="indefinite"
-                values="1;.2;1"
-              />
-            </circle>
-            <circle
-              cx="52.5"
-              cy="52.5"
-              r="12.5"
-            >
-              <animate
-                attributeName="fill-opacity"
-                begin="600ms"
-                calcMode="linear"
-                dur="1s"
-                repeatCount="indefinite"
-                values="1;.2;1"
-              />
-            </circle>
-            <circle
-              cx="92.5"
-              cy="12.5"
-              r="12.5"
-            >
-              <animate
-                attributeName="fill-opacity"
-                begin="800ms"
-                calcMode="linear"
-                dur="1s"
-                repeatCount="indefinite"
-                values="1;.2;1"
-              />
-            </circle>
-            <circle
-              cx="92.5"
-              cy="52.5"
-              r="12.5"
-            >
-              <animate
-                attributeName="fill-opacity"
-                begin="400ms"
-                calcMode="linear"
-                dur="1s"
-                repeatCount="indefinite"
-                values="1;.2;1"
-              />
-            </circle>
-            <circle
-              cx="12.5"
-              cy="92.5"
-              r="12.5"
-            >
-              <animate
-                attributeName="fill-opacity"
-                begin="700ms"
-                calcMode="linear"
-                dur="1s"
-                repeatCount="indefinite"
-                values="1;.2;1"
-              />
-            </circle>
-            <circle
-              cx="52.5"
-              cy="92.5"
-              r="12.5"
-            >
-              <animate
-                attributeName="fill-opacity"
-                begin="500ms"
-                calcMode="linear"
-                dur="1s"
-                repeatCount="indefinite"
-                values="1;.2;1"
-              />
-            </circle>
-            <circle
-              cx="92.5"
-              cy="92.5"
-              r="12.5"
-            >
-              <animate
-                attributeName="fill-opacity"
-                begin="200ms"
-                calcMode="linear"
-                dur="1s"
-                repeatCount="indefinite"
-                values="1;.2;1"
-              />
-            </circle>
-          </svg>
+            </div>
+          </a>
         </div>
+      </div>
+      <div
+        className="c27 c2 sc-bdVaJa c2"
+      >
+        <ul
+          className="pagination"
+        >
+          <li
+            className="active"
+          >
+            <a
+              href="?limit=20&offset=0&q=Test"
+              onClick={[Function]}
+            >
+              1
+            </a>
+          </li>
+          <li
+            className=""
+          >
+            <a
+              href="?limit=20&offset=20&q=Test"
+              onClick={[Function]}
+            >
+              2
+            </a>
+          </li>
+          <li
+            className=""
+          >
+            <a
+              href="?limit=20&offset=40&q=Test"
+              onClick={[Function]}
+            >
+              3
+            </a>
+          </li>
+          <li
+            className=""
+          >
+            <a
+              href="?limit=20&offset=60&q=Test"
+              onClick={[Function]}
+            >
+              4
+            </a>
+          </li>
+          <li
+            className=""
+          >
+            <a
+              href="?limit=20&offset=80&q=Test"
+              onClick={[Function]}
+            >
+              5
+            </a>
+          </li>
+        </ul>
+      </div>
+      <div
+        className="c28 c29 sc-bdVaJa c2"
+      >
+        <p>
+          <em>
+            If you don't see the collective you're searching for:
+          </em>
+        </p>
       </div>
     </div>
   </main>
@@ -5000,1375 +6137,6 @@ exports[`Search Page renders loading grid SVG 1`] = `
             >
               <a
                 className="c49 "
-                href="/privacypolicy"
-                onClick={[Function]}
-              >
-                Privacy Policy
-              </a>
-            </li>
-          </ul>
-        </div>
-      </nav>
-    </div>
-  </div>
-</div>
-`;
-
-exports[`Search Page renders search results with pagination 1`] = `
-.c1 {
-  box-sizing: border-box;
-  padding-left: 16px;
-  padding-right: 16px;
-  padding-top: 16px;
-  padding-bottom: 16px;
-}
-
-.c2 {
-  box-sizing: border-box;
-}
-
-.c5 {
-  box-sizing: border-box;
-  margin-left: 8px;
-  margin-right: 8px;
-}
-
-.c7 {
-  box-sizing: border-box;
-  -webkit-flex: 1 1 auto;
-  -ms-flex: 1 1 auto;
-  flex: 1 1 auto;
-}
-
-.c9 {
-  box-sizing: border-box;
-  margin-left: 16px;
-  margin-right: 16px;
-}
-
-.c14 {
-  margin: 0;
-  box-sizing: border-box;
-  margin: 0px;
-  padding: 0px;
-}
-
-.c15 {
-  box-sizing: border-box;
-  padding-left: 16px;
-  padding-right: 16px;
-}
-
-.c21 {
-  box-sizing: border-box;
-  width: 100%;
-  margin-left: auto;
-  margin-right: auto;
-  padding-left: 16px;
-  padding-right: 16px;
-}
-
-.c22 {
-  box-sizing: border-box;
-  width: 100%;
-}
-
-.c24 {
-  box-sizing: border-box;
-  margin-top: 16px;
-  margin-bottom: 16px;
-}
-
-.c31 {
-  box-sizing: border-box;
-  width: 100%;
-  padding-top: 16px;
-  padding-bottom: 16px;
-}
-
-.c34 {
-  max-width: 1300px;
-  box-sizing: border-box;
-  margin-left: auto;
-  margin-right: auto;
-  padding: 8px;
-}
-
-.c46 {
-  box-sizing: border-box;
-  margin-top: 16px;
-  -webkit-flex: 1 1 auto;
-  -ms-flex: 1 1 auto;
-  flex: 1 1 auto;
-  -webkit-order: 3;
-  -ms-flex-order: 3;
-  order: 3;
-}
-
-.c47 {
-  box-sizing: border-box;
-  width: 50%;
-  margin-bottom: 16px;
-}
-
-.c28 {
-  box-sizing: border-box;
-  margin-left: 8px;
-  margin-right: 8px;
-  margin-top: 16px;
-  margin-bottom: 16px;
-}
-
-.c0 {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-flex-direction: row;
-  -ms-flex-direction: row;
-  flex-direction: row;
-  -webkit-align-items: center;
-  -webkit-box-align: center;
-  -ms-flex-align: center;
-  align-items: center;
-  -webkit-box-pack: space-around;
-  -webkit-justify-content: space-around;
-  -ms-flex-pack: space-around;
-  justify-content: space-around;
-}
-
-.c3 {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-align-items: center;
-  -webkit-box-align: center;
-  -ms-flex-align: center;
-  align-items: center;
-}
-
-.c6 {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-align-items: center;
-  -webkit-box-align: center;
-  -ms-flex-align: center;
-  align-items: center;
-  -webkit-box-pack: end;
-  -webkit-justify-content: flex-end;
-  -ms-flex-pack: end;
-  justify-content: flex-end;
-}
-
-.c10 {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-}
-
-.c13 {
-  margin: 0;
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-pack: space-around;
-  -webkit-justify-content: space-around;
-  -ms-flex-pack: space-around;
-  justify-content: space-around;
-}
-
-.c23 {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-align-items: flex-end;
-  -webkit-box-align: flex-end;
-  -ms-flex-align: flex-end;
-  align-items: flex-end;
-}
-
-.c27 {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-flex-wrap: wrap;
-  -ms-flex-wrap: wrap;
-  flex-wrap: wrap;
-  -webkit-box-pack: center;
-  -webkit-justify-content: center;
-  -ms-flex-pack: center;
-  justify-content: center;
-}
-
-.c29 {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-pack: center;
-  -webkit-justify-content: center;
-  -ms-flex-pack: center;
-  justify-content: center;
-}
-
-.c33 {
-  max-width: 1300px;
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-flex-direction: column;
-  -ms-flex-direction: column;
-  flex-direction: column;
-  -webkit-align-items: center;
-  -webkit-box-align: center;
-  -ms-flex-align: center;
-  align-items: center;
-  -webkit-box-pack: justify;
-  -webkit-justify-content: space-between;
-  -ms-flex-pack: justify;
-  justify-content: space-between;
-}
-
-.c36 {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-pack: center;
-  -webkit-justify-content: center;
-  -ms-flex-pack: center;
-  justify-content: center;
-}
-
-.c45 {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-flex-wrap: wrap;
-  -ms-flex-wrap: wrap;
-  flex-wrap: wrap;
-  -webkit-box-pack: center;
-  -webkit-justify-content: center;
-  -ms-flex-pack: center;
-  justify-content: center;
-}
-
-.c30 {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-flex-direction: column;
-  -ms-flex-direction: column;
-  flex-direction: column;
-  -webkit-align-items: center;
-  -webkit-box-align: center;
-  -ms-flex-align: center;
-  align-items: center;
-  -webkit-box-pack: center;
-  -webkit-justify-content: center;
-  -ms-flex-pack: center;
-  justify-content: center;
-}
-
-.c18 {
-  color: #46b0ed;
-  display: inline-block;
-  font-size: 1.2rem;
-  font-weight: bold;
-  line-height: Paragraph;
-  -webkit-letter-spacing: 1px;
-  -moz-letter-spacing: 1px;
-  -ms-letter-spacing: 1px;
-  letter-spacing: 1px;
-  margin: 0px;
-  margin-left: 8px;
-  margin-right: 8px;
-  cursor: pointer;
-}
-
-.c37 {
-  color: #6E747A;
-  font-size: 1.4rem;
-  line-height: Paragraph;
-  -webkit-letter-spacing: -0.2px;
-  -moz-letter-spacing: -0.2px;
-  -ms-letter-spacing: -0.2px;
-  letter-spacing: -0.2px;
-  margin: 0px;
-  padding-top: 8px;
-  padding-bottom: 8px;
-  text-align: center;
-}
-
-.c48 {
-  color: #C2C6CC;
-  font-size: 1.2rem;
-  line-height: Paragraph;
-  -webkit-letter-spacing: 1px;
-  -moz-letter-spacing: 1px;
-  -ms-letter-spacing: 1px;
-  letter-spacing: 1px;
-  margin: 0px;
-  padding-bottom: 16px;
-  text-align: center;
-}
-
-.c11 {
-  display: inline-block;
-  vertical-align: -.125em;
-  overflow: hidden;
-}
-
-.c32 {
-  border-top: 1px solid #aaaaaa;
-  bottom: 0px;
-  background-color: white;
-  min-height: 7.5rem;
-  padding: 1rem;
-  width: 100%;
-}
-
-.c35 {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-flex-direction: column;
-  -ms-flex-direction: column;
-  flex-direction: column;
-  max-width: 300px;
-  margin-top: 16px;
-  width: 100%;
-}
-
-.c38 {
-  -webkit-align-items: center;
-  -webkit-box-align: center;
-  -ms-flex-align: center;
-  align-items: center;
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-pack: space-evenly;
-  -webkit-justify-content: space-evenly;
-  -ms-flex-pack: space-evenly;
-  justify-content: space-evenly;
-  max-width: 300px;
-  -webkit-order: 2;
-  -ms-flex-order: 2;
-  order: 2;
-  margin-top: 16px;
-  margin-bottom: 16px;
-  width: 100%;
-}
-
-.c19 {
-  position: relative;
-  display: inline-block;
-  height: 0.6rem;
-  width: 1.4rem;
-  cursor: pointer;
-}
-
-.c19::before,
-.c19::after {
-  content: '';
-  position: absolute;
-  top: 0;
-}
-
-.c19::before {
-  border-left: 0.6rem solid transparent;
-  border-right: 0.6rem solid transparent;
-  border-top: 0.6rem solid #46b0ed;
-  left: 0;
-}
-
-.c19::after {
-  border-left: calc(0.6rem - 0.2rem) solid transparent;
-  border-right: calc(0.6rem - 0.2rem) solid transparent;
-  border-top: calc(0.6rem - 0.2rem) solid white;
-  left: 0.2rem;
-}
-
-.c50 {
-  list-style: none;
-  margin-bottom: 8px;
-  text-align: center;
-}
-
-.c12 {
-  list-style: none;
-  min-width: 20rem;
-  text-align: right;
-}
-
-.c16 {
-  color: #777777;
-  font-size: 1.4rem;
-}
-
-.c42 {
-  display: inline-block;
-  vertical-align: -.125em;
-  overflow: hidden;
-}
-
-.c40 {
-  display: inline-block;
-  vertical-align: -.125em;
-  overflow: hidden;
-}
-
-.c43 {
-  display: inline-block;
-  vertical-align: -.125em;
-  overflow: hidden;
-}
-
-.c41 {
-  display: inline-block;
-  vertical-align: -.125em;
-  overflow: hidden;
-}
-
-.c44 {
-  display: inline-block;
-  vertical-align: middle;
-  overflow: hidden;
-}
-
-.c39 {
-  -webkit-align-items: center;
-  -webkit-box-align: center;
-  -ms-flex-align: center;
-  align-items: center;
-  border: 1px solid #9399a3;
-  border-radius: 50%;
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  height: 48px;
-  -webkit-box-pack: center;
-  -webkit-justify-content: center;
-  -ms-flex-pack: center;
-  justify-content: center;
-  opacity: 0.6;
-  width: 48px;
-}
-
-.c39:hover,
-.c39:focus {
-  opacity: 1;
-}
-
-.c51 {
-  color: #6e747a;
-  display: block;
-  fontsize: 1.4rem;
-  fontweight: 400;
-  margin: 0;
-  padding: 0;
-}
-
-.c49 {
-  box-sizing: border-box;
-  padding-left: 0px;
-  padding-right: 8px;
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-flex-direction: column;
-  -ms-flex-direction: column;
-  flex-direction: column;
-  -webkit-box-pack: center;
-  -webkit-justify-content: center;
-  -ms-flex-pack: center;
-  justify-content: center;
-}
-
-.c25.c25.c25 {
-  border: none;
-  border-bottom: 2px solid #3385FF;
-  border-radius: 0;
-  box-shadow: none;
-  display: block;
-  height: 3.4rem;
-  padding: 0;
-}
-
-.c26.c26 {
-  padding: 0 2rem;
-}
-
-.c20 {
-  max-width: 1200px;
-}
-
-@media screen and (min-width:40em) {
-  .c21 {
-    width: 85%;
-  }
-}
-
-@media screen and (min-width:52em) {
-  .c46 {
-    -webkit-order: 2;
-    -ms-flex-order: 2;
-    order: 2;
-  }
-}
-
-@media screen and (min-width:52em) {
-  .c47 {
-    width: 25%;
-  }
-}
-
-@media screen and (min-width:40em) {
-  .c27 {
-    -webkit-box-pack: center;
-    -webkit-justify-content: center;
-    -ms-flex-pack: center;
-    justify-content: center;
-  }
-}
-
-@media screen and (min-width:52em) {
-  .c27 {
-    -webkit-box-pack: start;
-    -webkit-justify-content: flex-start;
-    -ms-flex-pack: start;
-    justify-content: flex-start;
-  }
-}
-
-@media screen and (min-width:52em) {
-  .c33 {
-    -webkit-flex-direction: row;
-    -ms-flex-direction: row;
-    flex-direction: row;
-  }
-}
-
-@media screen and (min-width:52em) {
-  .c33 {
-    -webkit-align-items: flex-start;
-    -webkit-box-align: flex-start;
-    -ms-flex-align: flex-start;
-    align-items: flex-start;
-  }
-}
-
-@media screen and (min-width:52em) {
-  .c36 {
-    -webkit-box-pack: start;
-    -webkit-justify-content: flex-start;
-    -ms-flex-pack: start;
-    justify-content: flex-start;
-  }
-}
-
-@media screen and (min-width:52em) {
-  .c37 {
-    text-align: left;
-  }
-}
-
-@media screen and (min-width:52em) {
-  .c48 {
-    text-align: left;
-  }
-}
-
-@media screen and (min-width:52em) {
-  .c35 {
-    width: 33.33333333333333%;
-  }
-}
-
-@media screen and (min-width:52em) {
-  .c38 {
-    -webkit-order: 3;
-    -ms-flex-order: 3;
-    order: 3;
-  }
-}
-
-@media screen and (max-width:40em) {
-  .c4 {
-    display: none;
-  }
-}
-
-@media screen and (min-width:40em) and (max-width:52em) {
-  .c8 {
-    display: none;
-  }
-}
-
-@media screen and (min-width:52em) and (max-width:64em) {
-  .c8 {
-    display: none;
-  }
-}
-
-@media screen and (min-width:64em) {
-  .c8 {
-    display: none;
-  }
-}
-
-@media screen and (max-width:40em) {
-  .c17 {
-    display: none;
-  }
-}
-
-@media screen and (min-width:40em) and (max-width:52em) {
-  .c17 {
-    display: none;
-  }
-}
-
-@media screen and (min-width:52em) {
-  .c50 {
-    text-align: left;
-  }
-}
-
-<div>
-  <header>
-    <div
-      id="top"
-    />
-    <div
-      className="c0 c1 sc-bdVaJa c2"
-    >
-      <a
-        className="c3 c2"
-        href="/"
-        onClick={[Function]}
-      >
-        <img
-          alt="Open Collective logo"
-          className=""
-          height="24"
-          src="/static/images/opencollective-icon.svg"
-          width="24"
-        />
-        <div
-          className="c4 c2"
-        >
-          <div
-            className="c5"
-          >
-            <img
-              height="16px"
-              src="/static/images/logotype.svg"
-            />
-          </div>
-        </div>
-      </a>
-      <div
-        className="c6 c7 sc-bdVaJa c2"
-      >
-        <div
-          className="c8 c2"
-        >
-          <div
-            className="c9"
-          >
-            <a
-              className="c10 c2"
-              onClick={[Function]}
-            >
-              <svg
-                height={24}
-                version="1.1"
-                viewBox="10 10 30 30"
-                width={24}
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <title>
-                  magnifying glass icon
-                </title>
-                <path
-                  d="M28.5404814,30.1903972 C26.7995948,31.5736628 24.5962981,32.4 22.2,32.4 C16.5666956,32.4 12,27.8333044 12,22.2 C12,16.5666956 16.5666956,12 22.2,12 C27.8333044,12 32.4,16.5666956 32.4,22.2 C32.4,24.5962981 31.5736628,26.7995948 30.1903972,28.5404814 L35.6582912,34.0083754 C36.1139029,34.4639871 36.1139029,35.2026796 35.6582912,35.6582912 C35.2026796,36.1139029 34.4639871,36.1139029 34.0083754,35.6582912 L28.5404814,30.1903972 Z M22.2,30 C26.507821,30 30,26.507821 30,22.2 C30,17.892179 26.507821,14.4 22.2,14.4 C17.892179,14.4 14.4,17.892179 14.4,22.2 C14.4,26.507821 17.892179,30 22.2,30 Z"
-                  fill="#aaaaaa"
-                  fillRule="nonzero"
-                  id="magnifying-glass"
-                />
-              </svg>
-            </a>
-          </div>
-        </div>
-        <div
-          className="c8 c2"
-        >
-          <div
-            className="c9"
-          >
-            <a
-              className="c10 c2"
-              onClick={[Function]}
-            >
-              <svg
-                aria-hidden="true"
-                className="c11"
-                color="#aaaaaa"
-                fill="currentColor"
-                focusable="false"
-                height={24}
-                size={24}
-                viewBox="0 0 448 512"
-                width={24}
-              >
-                <path
-                  d="M16 132h416c8.837 0 16-7.163 16-16V76c0-8.837-7.163-16-16-16H16C7.163 60 0 67.163 0 76v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16z"
-                  fill="currentColor"
-                />
-              </svg>
-            </a>
-          </div>
-        </div>
-        <div
-          className="c4 c2"
-        >
-          <ul
-            className="c12 c13 c14"
-          >
-            <li
-              className="c15"
-            >
-              <a
-                className="c16"
-                href="/discover"
-              >
-                <span>
-                  Discover
-                </span>
-              </a>
-            </li>
-            <li
-              className="c15"
-            >
-              <a
-                className="c16"
-                href="/learn-more"
-              >
-                <span>
-                  How it Works
-                </span>
-              </a>
-            </li>
-            <li
-              className="c15"
-            >
-              <a
-                className="c16"
-                href="https://medium.com/open-collective"
-              >
-                <span>
-                  Blog
-                </span>
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div
-          className="LoginTopBarProfileButton"
-        >
-          <div
-            className="c3 c2 sc-bdVaJa c2"
-            onClick={[Function]}
-          >
-            <div
-              className="c17 c2"
-            >
-              <p
-                className="LoginTopBarProfileButton-name c18"
-                cursor="pointer"
-              />
-            </div>
-            <div
-              className="c19"
-              color="#46b0ed"
-              cursor="pointer"
-              display="inline-block"
-              height="0.6rem"
-              strokeWidth="0.2rem"
-              width="1.4rem"
-            />
-          </div>
-        </div>
-      </div>
-    </div>
-  </header>
-  <main
-    className="jsx-916984404"
-  >
-    <div
-      className="c20 c21"
-    >
-      <div
-        className="c22"
-      >
-        <form
-          method="GET"
-          onSubmit={[Function]}
-        >
-          <div
-            className="form-group form-group-lg"
-          >
-            <label
-              className="h1 control-label"
-              htmlFor="search"
-            >
-              Search Open Collective
-            </label>
-            <div
-              className="c23 c24 sc-bdVaJa c2"
-            >
-              <input
-                className="c25 form-control"
-                defaultValue="Test"
-                id="search"
-                name="q"
-                placeholder="open source"
-                type="search"
-              />
-              <button
-                className="jsx-1144918383 jsx-3101740563 Button blue c26"
-                onClick={[Function]}
-                type="submit"
-              >
-                <span
-                  className="fa fa-search"
-                />
-              </button>
-            </div>
-          </div>
-        </form>
-      </div>
-      <div
-        className="c27 c2 sc-bdVaJa c2"
-      >
-        <div
-          className="c10 c28 sc-bdVaJa c2"
-        >
-          <a
-            href="/test-collective"
-            onClick={[Function]}
-          >
-            <div
-              className="jsx-136688120 CollectiveCard undefined"
-            >
-              <div
-                className="jsx-136688120 head"
-              >
-                <div
-                  className="jsx-136688120 background"
-                  style={Object {}}
-                />
-                <div
-                  className="jsx-136688120 logo"
-                >
-                  <div
-                    className="jsx-3454192051 Logo"
-                    style={
-                      Object {
-                        "height": 65,
-                        "minWidth": 32.5,
-                      }
-                    }
-                  >
-                    <img
-                      className="jsx-3454192051 logo"
-                      style={
-                        Object {
-                          "maxHeight": 65,
-                        }
-                      }
-                    />
-                  </div>
-                </div>
-              </div>
-              <div
-                className="jsx-136688120 body"
-              >
-                <div
-                  className="jsx-136688120 name"
-                />
-                <div
-                  className="jsx-136688120 description"
-                />
-              </div>
-              <div
-                className="jsx-136688120 footer"
-              />
-            </div>
-          </a>
-        </div>
-      </div>
-      <div
-        className="c29 c2 sc-bdVaJa c2"
-      >
-        <ul
-          className="pagination"
-        >
-          <li
-            className="active"
-          >
-            <a
-              href="?limit=20&offset=0&q=Test"
-              onClick={[Function]}
-            >
-              1
-            </a>
-          </li>
-          <li
-            className=""
-          >
-            <a
-              href="?limit=20&offset=20&q=Test"
-              onClick={[Function]}
-            >
-              2
-            </a>
-          </li>
-          <li
-            className=""
-          >
-            <a
-              href="?limit=20&offset=40&q=Test"
-              onClick={[Function]}
-            >
-              3
-            </a>
-          </li>
-          <li
-            className=""
-          >
-            <a
-              href="?limit=20&offset=60&q=Test"
-              onClick={[Function]}
-            >
-              4
-            </a>
-          </li>
-          <li
-            className=""
-          >
-            <a
-              href="?limit=20&offset=80&q=Test"
-              onClick={[Function]}
-            >
-              5
-            </a>
-          </li>
-        </ul>
-      </div>
-      <div
-        className="c30 c31 sc-bdVaJa c2"
-      >
-        <p>
-          <em>
-            If you don't see the collective you're searching for:
-          </em>
-        </p>
-      </div>
-    </div>
-  </main>
-  <div
-    className="c32"
-    id="footer"
-  >
-    <div
-      className="c33 c34 sc-bdVaJa c2"
-    >
-      <div
-        className="c35"
-      >
-        <div
-          className="c36 c2 sc-bdVaJa c2"
-        >
-          <object
-            data="/static/images/opencollectivelogo-footer.svg"
-            height="20"
-            type="image/svg+xml"
-          />
-        </div>
-        <p
-          className="c37"
-        >
-          An organization for your community, transparent by design.
-        </p>
-      </div>
-      <div
-        className="c38"
-      >
-        <a
-          className="c39"
-          href="https://medium.com/open-collective"
-        >
-          <svg
-            aria-hidden="true"
-            className="c40"
-            color="#9399A3"
-            fill="currentColor"
-            focusable="false"
-            height={17}
-            size={17}
-            viewBox="0 0 512 512"
-            width={17}
-          >
-            <path
-              d="M71.5 142.3c.6-5.9-1.7-11.8-6.1-15.8L20.3 72.1V64h140.2l108.4 237.7L364.2 64h133.7v8.1l-38.6 37c-3.3 2.5-5 6.7-4.3 10.8v272c-.7 4.1 1 8.3 4.3 10.8l37.7 37v8.1H307.3v-8.1l39.1-37.9c3.8-3.8 3.8-5 3.8-10.8V171.2L241.5 447.1h-14.7L100.4 171.2v184.9c-1.1 7.8 1.5 15.6 7 21.2l50.8 61.6v8.1h-144v-8L65 377.3c5.4-5.6 7.9-13.5 6.5-21.2V142.3z"
-              fill="currentColor"
-            />
-          </svg>
-        </a>
-        <a
-          className="c39"
-          href="https://twitter.com/opencollect"
-        >
-          <svg
-            aria-hidden="true"
-            className="c41"
-            color="#9399A3"
-            fill="currentColor"
-            focusable="false"
-            height={17}
-            size={17}
-            viewBox="0 0 512 512"
-            width={17}
-          >
-            <path
-              d="M459.37 151.716c.325 4.548.325 9.097.325 13.645 0 138.72-105.583 298.558-298.558 298.558-59.452 0-114.68-17.219-161.137-47.106 8.447.974 16.568 1.299 25.34 1.299 49.055 0 94.213-16.568 130.274-44.832-46.132-.975-84.792-31.188-98.112-72.772 6.498.974 12.995 1.624 19.818 1.624 9.421 0 18.843-1.3 27.614-3.573-48.081-9.747-84.143-51.98-84.143-102.985v-1.299c13.969 7.797 30.214 12.67 47.431 13.319-28.264-18.843-46.781-51.005-46.781-87.391 0-19.492 5.197-37.36 14.294-52.954 51.655 63.675 129.3 105.258 216.365 109.807-1.624-7.797-2.599-15.918-2.599-24.04 0-57.828 46.782-104.934 104.934-104.934 30.213 0 57.502 12.67 76.67 33.137 23.715-4.548 46.456-13.32 66.599-25.34-7.798 24.366-24.366 44.833-46.132 57.827 21.117-2.273 41.584-8.122 60.426-16.243-14.292 20.791-32.161 39.308-52.628 54.253z"
-              fill="currentColor"
-            />
-          </svg>
-        </a>
-        <a
-          className="c39"
-          href="https://github.com/opencollective"
-        >
-          <svg
-            aria-hidden="true"
-            className="c42"
-            color="#9399A3"
-            fill="currentColor"
-            focusable="false"
-            height={17}
-            size={17}
-            viewBox="0 0 496 512"
-            width={17}
-          >
-            <path
-              d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"
-              fill="currentColor"
-            />
-          </svg>
-        </a>
-        <a
-          className="c39"
-          href="https://slack.opencollective.com"
-        >
-          <svg
-            aria-hidden="true"
-            className="c43"
-            color="#9399A3"
-            fill="currentColor"
-            focusable="false"
-            height={17}
-            size={17}
-            viewBox="0 0 448 512"
-            width={17}
-          >
-            <path
-              d="M244.2 217.5l19.3 57.7-59.8 20-19.3-57.7 59.8-20zm41.4 243.7C131.6 507.4 65 471.6 18.8 317.6S8.4 97 162.4 50.8C316.4 4.6 383 40.4 429.2 194.4c46.2 154 10.4 220.6-143.6 266.8zM366.2 265c-3.9-12.2-17.2-18.6-29.4-14.7l-29 9.7-19.3-57.7 29-9.7c12.2-3.9 18.6-17.2 14.7-29.4-3.9-12.2-17.2-18.6-29.4-14.7l-29 9.7-10-30.1c-3.9-12.2-17.2-18.6-29.4-14.7-12.2 3.9-18.6 17.2-14.7 29.4l10 30.1-59.8 20.1-10-30.1c-3.9-12.2-17.2-18.6-29.4-14.7-12.2 3.9-18.6 17.2-14.7 29.4l10 30.1-29 9.7c-12.2 3.9-18.6 17.2-14.7 29.4 3.2 9.3 12.2 15.4 21.5 15.8 4.3.6 7.7-1 36.9-10.7l19.3 57.7-29 9.7c-12.2 3.9-18.6 17.2-14.7 29.4 3.2 9.3 12.2 15.4 21.5 15.8 4.3.6 7.7-1 36.9-10.7l10 30.1c3.7 10.8 15.8 18.6 29.4 14.7 12.2-3.9 18.6-17.2 14.7-29.4l-10-30.1 59.8-20.1 10 30.1c3.7 10.8 15.8 18.6 29.4 14.7 12.2-3.9 18.6-17.2 14.7-29.4l-10-30.1 29-9.7c12.2-4.2 18.6-17.5 14.7-29.6z"
-              fill="currentColor"
-            />
-          </svg>
-        </a>
-        <a
-          className="c39"
-          href="mailto:info@opencollective.com"
-        >
-          <svg
-            aria-hidden="true"
-            className="c44"
-            color="#9399A3"
-            fill="currentColor"
-            focusable="false"
-            height={19}
-            size={19}
-            viewBox="0 0 24 24"
-            width={19}
-          >
-            <path
-              d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"
-            />
-          </svg>
-        </a>
-      </div>
-      <nav
-        className="c45 c46"
-      >
-        <div
-          className="c47"
-        >
-          <p
-            className="c48"
-          >
-            PLATFORM
-          </p>
-          <ul
-            className="c49"
-          >
-            <li
-              className="c50"
-            >
-              <a
-                className="c51 "
-                href="/discover"
-              >
-                Discover
-              </a>
-            </li>
-            <li
-              className="c50"
-            >
-              <a
-                className="c51 "
-                href="/learn-more"
-              >
-                How it Works
-              </a>
-            </li>
-            <li
-              className="c50"
-            >
-              <a
-                className="c51 "
-                href="/opensource"
-                onClick={[Function]}
-              >
-                Use Cases
-              </a>
-            </li>
-            <li
-              className="c50"
-            >
-              <a
-                className="c51 "
-                href="/signin"
-                onClick={[Function]}
-              >
-                Sign Up
-              </a>
-            </li>
-            <li
-              className="c50"
-            >
-              <a
-                className="c51 "
-                href="/signin"
-                onClick={[Function]}
-              >
-                Login
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div
-          className="c47"
-        >
-          <p
-            className="c48"
-          >
-            JOIN THE MOVEMENT
-          </p>
-          <ul
-            className="c49"
-          >
-            <li
-              className="c50"
-            >
-              <a
-                className="c51 "
-                href="/create"
-                onClick={[Function]}
-              >
-                Create a Collective
-              </a>
-            </li>
-            <li
-              className="c50"
-            >
-              <a
-                className="c51 "
-                href="/become-a-sponsor"
-                onClick={[Function]}
-              >
-                Become a Sponsor
-              </a>
-            </li>
-            <li
-              className="c50"
-            >
-              <a
-                className="c51 "
-                href="/chapters"
-                onClick={[Function]}
-              >
-                Create a chapter
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div
-          className="c47"
-        >
-          <p
-            className="c48"
-          >
-            COMMUNITY
-          </p>
-          <ul
-            className="c49"
-          >
-            <li
-              className="c50"
-            >
-              <a
-                className="c51 "
-                href="/opensource"
-                onClick={[Function]}
-              >
-                Open Source
-              </a>
-            </li>
-            <li
-              className="c50"
-            >
-              <a
-                className="c51 "
-                href="https://github.com/opencollective/opencollective/issues"
-                onClick={[Function]}
-              >
-                Report an issue
-              </a>
-            </li>
-            <li
-              className="c50"
-            >
-              <a
-                className="c51 "
-                href="https://slack.opencollective.com"
-                onClick={[Function]}
-              >
-                Slack
-              </a>
-            </li>
-            <li
-              className="c50"
-            >
-              <a
-                className="c51 "
-                href="https://github.com/opencollective/opencollective/wiki"
-                onClick={[Function]}
-              >
-                Wiki
-              </a>
-            </li>
-            <li
-              className="c50"
-            >
-              <a
-                className="c51 "
-                href="mailto:support@opencollective.com"
-                onClick={[Function]}
-              >
-                Email Support
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div
-          className="c47"
-        >
-          <p
-            className="c48"
-          >
-            COMPANY
-          </p>
-          <ul
-            className="c49"
-          >
-            <li
-              className="c50"
-            >
-              <a
-                className="c51 "
-                href="/about"
-                onClick={[Function]}
-              >
-                About
-              </a>
-            </li>
-            <li
-              className="c50"
-            >
-              <a
-                className="c51 "
-                href="/faq"
-                onClick={[Function]}
-              >
-                FAQ
-              </a>
-            </li>
-            <li
-              className="c50"
-            >
-              <a
-                className="c51 "
-                href="https://medium.com/open-collective"
-                onClick={[Function]}
-              >
-                Blog
-              </a>
-            </li>
-            <li
-              className="c50"
-            >
-              <a
-                className="c51 "
-                href="/tos"
-                onClick={[Function]}
-              >
-                Terms of Service
-              </a>
-            </li>
-            <li
-              className="c50"
-            >
-              <a
-                className="c51 "
                 href="/privacypolicy"
                 onClick={[Function]}
               >

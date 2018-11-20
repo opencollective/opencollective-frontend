@@ -18,25 +18,49 @@ const Description = styled(P)`
 
 class RedeemForm extends React.Component {
   static propTypes = {
+    intl: PropTypes.object.isRequired,
     code: PropTypes.string,
     email: PropTypes.string,
     name: PropTypes.string,
+    LoggedInUser: PropTypes.object,
     onChange: PropTypes.func.isRequired,
   };
 
+  static getDerivedStateFromProps(nextProps, nextState) {
+    const { LoggedInUser } = nextProps;
+    const code = nextState.form.code || nextProps.code;
+
+    if (LoggedInUser) {
+      return {
+        form: {
+          code,
+          email: LoggedInUser.email,
+          name: LoggedInUser.collective.name,
+        },
+      };
+    } else {
+      return {
+        form: {
+          code,
+          email: nextState.form.email || nextProps.email,
+          name: nextState.form.name || nextProps.name,
+        },
+      };
+    }
+  }
+
   constructor(props) {
     super(props);
-    const { code, email } = props;
+
     this.handleChange = this.handleChange.bind(this);
-    this.state = {
-      form: { code, email },
-    };
 
     this.messages = defineMessages({
       email: { id: 'user.email.label', defaultMessage: 'email' },
       name: { id: 'user.name.label', defaultMessage: 'name' },
-      code: { id: 'redeem.form.code.label', defaultMessage: 'Gift card code' },
+      code: { id: 'redeem.form.code.label', defaultMessage: 'Gift Card code' },
     });
+
+    this.state = { form: {} };
   }
 
   handleChange(fieldname, value) {
@@ -47,15 +71,24 @@ class RedeemForm extends React.Component {
   }
 
   render() {
-    const { intl, code, email, name } = this.props;
+    const { intl, LoggedInUser } = this.props;
+    const { code, email, name } = this.state.form;
 
     return (
       <div>
         <Description>
-          <FormattedMessage
-            id="redeem.card.info"
-            defaultMessage="It’s easy. Just provide your name and email address, enter your gift code and your open collective account will be created (if needed) and the gift card will be automatically attached to your account."
-          />
+          {!LoggedInUser && (
+            <FormattedMessage
+              id="redeem.card.info"
+              defaultMessage="It’s easy. Just provide your name and email address, enter your gift code and your open collective account will be created (if needed) and the gift card will be automatically attached to your account."
+            />
+          )}
+          {LoggedInUser && (
+            <FormattedMessage
+              id="redeem.card.authenticated"
+              defaultMessage="You are currently authenticated. Sign Out first if you want to redeem with another account."
+            />
+          )}
         </Description>
         <Flex flexDirection="column">
           <InputField
@@ -63,6 +96,7 @@ class RedeemForm extends React.Component {
             name="name"
             type="name"
             defaultValue={name}
+            disabled={LoggedInUser}
             onChange={value => this.handleChange('name', value)}
           />
           <InputField
@@ -70,6 +104,7 @@ class RedeemForm extends React.Component {
             name="email"
             type="email"
             defaultValue={email}
+            disabled={LoggedInUser}
             onChange={value => this.handleChange('email', value)}
           />
           <InputField

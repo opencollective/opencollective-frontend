@@ -137,6 +137,24 @@ const editCollectiveQuery = gql`
         currency
         maxQuantity
       }
+      paymentMethods(
+        types: ["creditcard", "virtualcard"]
+        hasBalanceAboveZero: true
+      ) {
+        id
+        uuid
+        name
+        data
+        monthlyLimitPerMember
+        service
+        type
+        balance
+        currency
+        expiryDate
+        orders(hasActiveSubscription: true) {
+          id
+        }
+      }
     }
   }
 `;

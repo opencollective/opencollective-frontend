@@ -1,5 +1,5 @@
 # source: http://localhost:3000/api/graphql
-# timestamp: Fri Oct 12 2018 18:04:01 GMT+0200 (Central European Summer Time)
+# timestamp: Fri Nov 16 2018 09:53:26 GMT+0100 (Central European Standard Time)
 
 """Application model"""
 type Application {
@@ -109,9 +109,7 @@ type Collective implements CollectiveInterface {
   followers(limit: Int, offset: Int): [CollectiveInterface]
   maxQuantity: Int
   tiers(id: Int, slug: String): [Tier]
-  orders(
-    status: OrderStatus
-  ): [OrderType]
+  orders(status: OrderStatus): [OrderType]
   ordersFromCollective(subscriptionsOnly: Boolean): [OrderType]
   transactions(
     """type of transaction (DEBIT/CREDIT)"""
@@ -126,7 +124,7 @@ type Collective implements CollectiveInterface {
   website: String
   updates(limit: Int, offset: Int): [Event]
   events(limit: Int, offset: Int): [Event]
-  paymentMethods(service: String, limit: Int, hasBalanceAboveZero: Boolean): [PaymentMethodType]
+  paymentMethods(service: String, limit: Int, hasBalanceAboveZero: Boolean, isConfirmed: Boolean = true, types: [String]): [PaymentMethodType]
   connectedAccounts: [ConnectedAccountType]
   stats: CollectiveStatsType
 }
@@ -154,6 +152,7 @@ input CollectiveAttributesInputType {
   maxAmount: Int
   currency: String
   settings: JSON
+  tags: [String]
 }
 
 """Input type for CollectiveType"""
@@ -263,9 +262,7 @@ interface CollectiveInterface {
   followers(limit: Int, offset: Int): [CollectiveInterface]
   maxQuantity: Int
   tiers(id: Int, slug: String): [Tier]
-  orders(
-    status: OrderStatus
-  ): [OrderType]
+  orders(status: OrderStatus): [OrderType]
   ordersFromCollective(subscriptionsOnly: Boolean): [OrderType]
   stats: CollectiveStatsType
   transactions(type: String, limit: Int, offset: Int): [Transaction]
@@ -276,7 +273,17 @@ interface CollectiveInterface {
   website: String
   updates(limit: Int, offset: Int): [Event]
   events(limit: Int, offset: Int): [Event]
-  paymentMethods(service: String, limit: Int, hasBalanceAboveZero: Boolean): [PaymentMethodType]
+  paymentMethods(
+    service: String
+    limit: Int
+    hasBalanceAboveZero: Boolean
+
+    """Only return confirmed payment methods"""
+    isConfirmed: Boolean = true
+
+    """Filter on given types (creditcard, virtualcard...)"""
+    types: [String]
+  ): [PaymentMethodType]
   connectedAccounts: [ConnectedAccountType]
 }
 
@@ -502,9 +509,7 @@ type Event implements CollectiveInterface {
   followers(limit: Int, offset: Int): [CollectiveInterface]
   maxQuantity: Int
   tiers(id: Int, slug: String): [Tier]
-  orders(
-    status: OrderStatus
-  ): [OrderType]
+  orders(status: OrderStatus): [OrderType]
   ordersFromCollective(subscriptionsOnly: Boolean): [OrderType]
   transactions(
     """type of transaction (DEBIT/CREDIT)"""
@@ -519,7 +524,7 @@ type Event implements CollectiveInterface {
   website: String
   updates(limit: Int, offset: Int): [Event]
   events(limit: Int, offset: Int): [Event]
-  paymentMethods(service: String, limit: Int, hasBalanceAboveZero: Boolean): [PaymentMethodType]
+  paymentMethods(service: String, limit: Int, hasBalanceAboveZero: Boolean, isConfirmed: Boolean = true, types: [String]): [PaymentMethodType]
   connectedAccounts: [ConnectedAccountType]
   stats: CollectiveStatsType
 }
@@ -563,6 +568,7 @@ type Expense implements Transaction {
   host: User
   createdByUser: UserDetails
   fromCollective: CollectiveInterface
+  usingVirtualCardFromCollective: CollectiveInterface
   collective: CollectiveInterface
   createdAt: String
   updatedAt: String
@@ -720,6 +726,7 @@ type Mutation {
   createCollective(collective: CollectiveInputType!): CollectiveInterface
   editCollective(collective: CollectiveInputType!): CollectiveInterface
   deleteCollective(id: Int!): CollectiveInterface
+  claimCollective(id: Int!): CollectiveInterface
 
   """Approve a collective"""
   approveCollective(id: Int!): CollectiveInterface
@@ -752,8 +759,9 @@ type Mutation {
   deleteApplication(id: String!): Application
   createPaymentMethod(
     type: String!
-    amount: Int!
     currency: String!
+    amount: Int
+    monthlyLimitPerMember: Int
 
     """
     Limit this payment method to make donations to collectives having those tags
@@ -773,7 +781,6 @@ type Mutation {
     expiryDate: String
   ): PaymentMethodType
   claimPaymentMethod(code: String!, user: UserInputType): PaymentMethodType
-  claimCollective(id: Int!): CollectiveInterface
 }
 
 """Order model"""
@@ -815,6 +822,7 @@ type Order implements Transaction {
   host: User
   createdByUser: UserDetails
   fromCollective: CollectiveInterface
+  usingVirtualCardFromCollective: CollectiveInterface
   collective: CollectiveInterface
   createdAt: String
   updatedAt: String
@@ -853,6 +861,7 @@ enum OrderDirection {
 
 """Input type for OrderType"""
 input OrderInputType {
+  id: Int
   quantity: Int
   totalAmount: Int
   hostFeePercent: Int
@@ -1027,9 +1036,7 @@ type Organization implements CollectiveInterface {
   followers(limit: Int, offset: Int): [CollectiveInterface]
   maxQuantity: Int
   tiers(id: Int, slug: String): [Tier]
-  orders(
-    status: OrderStatus
-  ): [OrderType]
+  orders(status: OrderStatus): [OrderType]
   ordersFromCollective(subscriptionsOnly: Boolean): [OrderType]
   transactions(
     """type of transaction (DEBIT/CREDIT)"""
@@ -1044,7 +1051,7 @@ type Organization implements CollectiveInterface {
   website: String
   updates(limit: Int, offset: Int): [Event]
   events(limit: Int, offset: Int): [Event]
-  paymentMethods(service: String, limit: Int, hasBalanceAboveZero: Boolean): [PaymentMethodType]
+  paymentMethods(service: String, limit: Int, hasBalanceAboveZero: Boolean, isConfirmed: Boolean = true, types: [String]): [PaymentMethodType]
   connectedAccounts: [ConnectedAccountType]
   stats: CollectiveStatsType
   email: String
@@ -1089,6 +1096,11 @@ type PaymentMethodType {
   id: Int
   uuid: String
   createdAt: String
+
+  """
+  Will be true for virtual card if claimed. Always true for other payment methods.
+  """
+  isConfirmed: Boolean
   expiryDate: String
   service: String
   SourcePaymentMethodId: Int
@@ -1106,6 +1118,7 @@ type PaymentMethodType {
   """Returns the balance in the currency of this paymentMethod"""
   balance: Int
   collective: CollectiveInterface
+  emitter: CollectiveInterface
   limitedToTags: JSON
   limitedToCollectiveIds: [Int]
   limitedToHostCollectiveIds: [Int]
@@ -1170,7 +1183,7 @@ type Query {
     orderBy: OrderByType = {field: createdAt, direction: DESC}
   ): PaginatedExpenses
   Expense(id: Int!): ExpenseType
-  Transaction(id: Int!): Transaction
+  Transaction(id: Int, uuid: String): Transaction
   allCollectives(
     """Fetch all collectives that match at least one of the tags"""
     tags: [String]
@@ -1240,7 +1253,7 @@ type Query {
   ): [Member]
   allEvents(slug: String, limit: Int, offset: Int): [CollectiveInterface]
   ocPaymentMethod(token: String!): PaymentMethodType
-  PaymentMethod(id: Int!): PaymentMethodType
+  PaymentMethod(id: Int, code: String): PaymentMethodType
   search(
     """
     Fetch collectives related to this term based on name, description, tags, slug, mission, and location
@@ -1259,7 +1272,15 @@ type Query {
 type StatsMemberType {
   id: Int
 
-  """total amount donated by this member"""
+  """total amount donated directly by this member"""
+  directDonations: Int
+
+  """total amount donated by this member through gift cards"""
+  donationsThroughEmittedVirtualCards: Int
+
+  """
+  total amount donated by this member either directly or using a virtual card it has emitted
+  """
   totalDonations: Int
 
   """total amount raised by this member"""
@@ -1369,6 +1390,7 @@ interface Transaction {
   host: CollectiveInterface
   paymentMethod: PaymentMethodType
   fromCollective: CollectiveInterface
+  usingVirtualCardFromCollective: CollectiveInterface
   collective: CollectiveInterface
   type: String
   description: String
@@ -1532,9 +1554,7 @@ type User implements CollectiveInterface {
   followers(limit: Int, offset: Int): [CollectiveInterface]
   maxQuantity: Int
   tiers(id: Int, slug: String): [Tier]
-  orders(
-    status: OrderStatus
-  ): [OrderType]
+  orders(status: OrderStatus): [OrderType]
   ordersFromCollective(subscriptionsOnly: Boolean): [OrderType]
   transactions(
     """type of transaction (DEBIT/CREDIT)"""
@@ -1549,7 +1569,7 @@ type User implements CollectiveInterface {
   website: String
   updates(limit: Int, offset: Int): [Event]
   events(limit: Int, offset: Int): [Event]
-  paymentMethods(service: String, limit: Int, hasBalanceAboveZero: Boolean): [PaymentMethodType]
+  paymentMethods(service: String, limit: Int, hasBalanceAboveZero: Boolean, isConfirmed: Boolean = true, types: [String]): [PaymentMethodType]
   connectedAccounts: [ConnectedAccountType]
   stats: CollectiveStatsType
   firstName: String

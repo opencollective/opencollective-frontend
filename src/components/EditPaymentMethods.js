@@ -11,14 +11,12 @@ class EditPaymentMethods extends React.Component {
     paymentMethods: PropTypes.arrayOf(PropTypes.object).isRequired,
     collective: PropTypes.object.isRequired,
     onChange: PropTypes.func.isRequired,
+    intl: PropTypes.object.isRequired,
   };
 
   constructor(props) {
     super(props);
 
-    this.state = {};
-    this.state.paymentMethods =
-      props.paymentMethods.length === 0 ? [{}] : props.paymentMethods;
     this.renderPaymentMethod = this.renderPaymentMethod.bind(this);
     this.addPaymentMethod = this.addPaymentMethod.bind(this);
     this.removePaymentMethod = this.removePaymentMethod.bind(this);
@@ -39,38 +37,49 @@ class EditPaymentMethods extends React.Component {
     });
   }
 
-  editPaymentMethod(index, obj) {
-    if (obj === null) return this.removePaymentMethod(index);
-    const paymentMethods = [...this.state.paymentMethods];
-    paymentMethods[index] = { ...paymentMethods[index], ...obj };
-    this.setState({ paymentMethods });
+  /** Returns payment methods from props or a list with an empty entry if empty */
+  loadPaymentMethodsFromProps(props) {
+    return props.paymentMethods.length === 0 ? [{}] : props.paymentMethods;
+  }
+
+  editPaymentMethod(paymentMethodId, paymentMethod) {
+    const paymentMethods = [...this.props.paymentMethods];
+
+    const index = !paymentMethodId
+      ? paymentMethods.findIndex(pm => !pm.id)
+      : paymentMethods.findIndex(pm => pm.id === paymentMethodId);
+
+    if (paymentMethod === null) {
+      return this.removePaymentMethod(index);
+    }
+
+    paymentMethods[index] = { ...paymentMethods[index], ...paymentMethod };
     this.onChange({ paymentMethods });
   }
 
   addPaymentMethod(paymentMethod) {
-    const paymentMethods = [...this.state.paymentMethods];
-    paymentMethods.push(paymentMethod || {});
-    this.setState({ paymentMethods });
+    const newPm = paymentMethod || {};
+    this.onChange({ paymentMethods: [...this.props.paymentMethods, newPm] });
   }
 
   removePaymentMethod(index) {
-    let paymentMethods = this.state.paymentMethods;
+    let paymentMethods = this.props.paymentMethods;
     if (index < 0 || index > paymentMethods.length) return;
     paymentMethods = [
       ...paymentMethods.slice(0, index),
       ...paymentMethods.slice(index + 1),
     ];
-    this.setState({ paymentMethods });
     this.onChange({ paymentMethods });
   }
 
-  renderPaymentMethod(paymentMethod, index) {
+  renderPaymentMethod(paymentMethod) {
     const { collective } = this.props;
+    const keyId = paymentMethod.id || 'new';
     return (
-      <div className="paymentMethod" key={`paymentMethod-${index}`}>
+      <div className="paymentMethod" key={`paymentMethod-${keyId}`}>
         <EditPaymentMethod
           paymentMethod={paymentMethod}
-          onChange={pm => this.editPaymentMethod(index, pm)}
+          onChange={pm => this.editPaymentMethod(paymentMethod.id, pm)}
           editMode={paymentMethod.id ? false : true}
           monthlyLimitPerMember={collective.type === 'ORGANIZATION'}
           currency={collective.currency}
@@ -81,9 +90,9 @@ class EditPaymentMethods extends React.Component {
   }
 
   render() {
-    const { intl } = this.props;
+    const { intl, paymentMethods = [] } = this.props;
     const hasNewPaymentMethod = Boolean(
-      this.state.paymentMethods.find(pm => !pm.id),
+      this.props.paymentMethods.find(pm => !pm.id),
     );
 
     return (
@@ -99,7 +108,6 @@ class EditPaymentMethods extends React.Component {
             }
             .editPaymentMethodsActions {
               text-align: right;
-              margin-top: -1rem;
             }
             :global(.paymentMethod) {
               margin: 3rem 0;
@@ -108,12 +116,11 @@ class EditPaymentMethods extends React.Component {
         </style>
 
         <div className="paymentMethods">
-          <h2>{this.props.title}</h2>
-          {this.state.paymentMethods.map(this.renderPaymentMethod)}
+          {paymentMethods.map(this.renderPaymentMethod)}
         </div>
         {!hasNewPaymentMethod && (
           <div className="editPaymentMethodsActions">
-            <Button bsStyle="primary" onClick={() => this.addPaymentMethod({})}>
+            <Button bsStyle="primary" onClick={() => this.addPaymentMethod()}>
               {intl.formatMessage(this.messages['paymentMethods.add'])}
             </Button>
           </div>

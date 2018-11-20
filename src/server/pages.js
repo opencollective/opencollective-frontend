@@ -12,8 +12,8 @@ pages
     '/:path(faq)/:pageSlug(collectives|backers|expenses|hosts|becoming-an-open-collective-host)?',
     'staticPage',
   )
-  .add('redeem', '/redeem')
-  .add('redeemed', '/redeemed')
+  .add('redeem', '/redeem/:code?')
+  .add('redeemed', '/redeemed/:code?')
   .add('signin', '/signin/:token?')
   .add('subscriptions_redirect', '/subscriptions', 'subscriptions-redirect')
   .add('search', '/search')

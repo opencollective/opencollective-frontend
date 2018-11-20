@@ -66,6 +66,16 @@ class TransactionDetails extends React.Component {
     };
   }
 
+  paymentMethodName = pm => {
+    if (pm.type === 'virtualcard') {
+      return pm.name.replace('card from', 'Gift Card from');
+    } else if (pm.type === 'creditcard') {
+      return `${get(pm, 'data.brand', get(pm, 'type'))} ${pm.name}`;
+    } else {
+      return capitalize(pm.service);
+    }
+  };
+
   /**
    * Amount details:
    * /airbnb/transactions DEBITS AirBnB gives $1,000 to Webpack
@@ -252,7 +262,7 @@ class TransactionDetails extends React.Component {
               defaultMessage="payment method"
             />
           </label>
-          {paymentMethod && capitalize(paymentMethod.service)}
+          {paymentMethod && this.paymentMethodName(paymentMethod)}
         </div>
         {hostCurrencyFxRate &&
           hostCurrencyFxRate !== 1 && (

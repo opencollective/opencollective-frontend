@@ -199,15 +199,13 @@ class EditCollectiveForm extends React.Component {
     }
   }
 
-  UNSAFE_componentWillReceiveProps(nextProps) {
-    if (
-      nextProps.collective &&
-      (!this.props.collective ||
-        nextProps.collective.name != this.props.collective.name)
-    ) {
+  componentDidUpdate(oldProps) {
+    const { collective } = this.props;
+    if (oldProps.collective !== collective) {
       this.setState({
-        collective: nextProps.collective,
-        tiers: nextProps.collective.tiers,
+        collective: collective,
+        tiers: collective.tiers,
+        paymentMethods: collective.paymentMethods,
       });
     }
   }
