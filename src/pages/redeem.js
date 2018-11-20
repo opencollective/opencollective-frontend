@@ -122,7 +122,7 @@ class RedeemPage extends React.Component {
       },
       'error.code.invalid': {
         id: 'error.code.invalid',
-        defaultMessage: 'Invalid gift card code',
+        defaultMessage: 'Invalid Gift Card code',
       },
     });
   }
@@ -183,7 +183,7 @@ class RedeemPage extends React.Component {
     return (
       <div className="RedeemedPage">
         <Header
-          title="Redeem gift card"
+          title="Redeem Gift Card"
           description="Use your gift card to support open source projects that you are contributing to."
           LoggedInUser={LoggedInUser}
         />

@@ -57,7 +57,7 @@ class RedeemForm extends React.Component {
     this.messages = defineMessages({
       email: { id: 'user.email.label', defaultMessage: 'email' },
       name: { id: 'user.name.label', defaultMessage: 'name' },
-      code: { id: 'redeem.form.code.label', defaultMessage: 'Gift card code' },
+      code: { id: 'redeem.form.code.label', defaultMessage: 'Gift Card code' },
     });
 
     this.state = { form: {} };
