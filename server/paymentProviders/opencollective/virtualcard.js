@@ -110,7 +110,7 @@ async function processOrder(order) {
   // Making sure the SourcePaymentMethodId is Set(requirement for virtual cards)
   if (!get(paymentMethod, 'SourcePaymentMethodId')) {
     throw new Error(
-      'Virtual Card payment method must have a value a "SourcePaymentMethodId" defined',
+      'Gift Card payment method must have a value a "SourcePaymentMethodId" defined',
     );
   }
   // finding Source Payment method and update order payment method properties
@@ -185,7 +185,7 @@ async function create(args, remoteUser) {
       throw Error(
         `Collective id ${
           collective.id
-        } needs to have a credit card to create virtual cards.`,
+        } needs to have a Credit Card attached to create Gift Cards.`,
       );
     }
     SourcePaymentMethodId = sourcePaymentMethod.id;
@@ -251,7 +251,7 @@ async function claim(args, remoteUser) {
   // Validate code format
   const redeemCodeRegex = /^[a-zA-Z0-9]{8}$/;
   if (!redeemCodeRegex.test(args.code)) {
-    throw Error(`Code "${args.code}" has invalid format`);
+    throw Error(`Gift Card code "${args.code}" has invalid format`);
   }
 
   // Get code from DB
@@ -265,7 +265,7 @@ async function claim(args, remoteUser) {
     ),
   });
   if (!virtualCardPaymentMethod) {
-    throw Error(`Code "${args.code}" invalid: No virtual card Found`);
+    throw Error(`Gift Card code "${args.code}" is invalid`);
   }
   const sourcePaymentMethod = await models.PaymentMethod.findById(
     virtualCardPaymentMethod.SourcePaymentMethodId,
@@ -276,7 +276,7 @@ async function claim(args, remoteUser) {
     !sourcePaymentMethod ||
     sourcePaymentMethod.CollectiveId !== virtualCardPaymentMethod.CollectiveId
   ) {
-    throw Error('Virtual card already claimed.');
+    throw Error('Gift Card already redeemed');
   }
   // find or creating a user with its collective
   const user =
