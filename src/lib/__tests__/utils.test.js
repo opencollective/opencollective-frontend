@@ -11,4 +11,10 @@ describe('utils lib', () => {
     const arr = [undefined];
     expect(utils.capitalize(arr)).toEqual('');
   });
+
+  test('getCurrencySymbol', () => {
+    expect(utils.getCurrencySymbol('USD')).toEqual('$');
+    expect(utils.getCurrencySymbol('EUR')).toEqual('€');
+    expect(utils.getCurrencySymbol('JPY')).toEqual('¥');
+  });
 });
