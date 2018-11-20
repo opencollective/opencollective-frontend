@@ -11,6 +11,7 @@ import { addCollectiveData } from '../graphql/queries';
 import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
 import withLoggedInUser from '../lib/withLoggedInUser';
+import { ssrNotFoundError } from '../lib/nextjs_utils';
 
 class CollectivePage extends React.Component {
   static getInitialProps({ req, res, query }) {
@@ -60,6 +61,7 @@ class CollectivePage extends React.Component {
     const { LoggedInUser } = this.state;
 
     if (!data.Collective) {
+      ssrNotFoundError(data);
       return <ErrorPage LoggedInUser={LoggedInUser} data={data} />;
     }
 
