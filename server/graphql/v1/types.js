@@ -1104,6 +1104,10 @@ export const OrderType = new GraphQLObjectType({
           'Collective ordering (most of the time it will be the collective of the createdByUser)',
         type: CollectiveInterfaceType,
         resolve(order, args, req) {
+          if (!order.FromCollectiveId) {
+            console.warn('There is no FromCollectiveId for order', order.id);
+            return null;
+          }
           return req.loaders.collective.findById.load(order.FromCollectiveId);
         },
       },
