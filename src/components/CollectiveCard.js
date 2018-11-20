@@ -6,6 +6,7 @@ import Link from './Link';
 import Logo from './Logo';
 import { get } from 'lodash';
 import { firstSentence, imagePreview } from '../lib/utils';
+import { defaultBackgroundImage } from '../constants/collectives';
 
 class CollectiveCard extends React.Component {
   static propTypes = {
@@ -51,9 +52,10 @@ class CollectiveCard extends React.Component {
       {};
     const backgroundImage = imagePreview(
       collective.backgroundImage || get(collective, 'parentCollective.backgroundImage'),
-      null,
+      defaultBackgroundImage['COLLECTIVE'],
       { width: 400 },
     );
+
     if (!coverStyle.backgroundImage && backgroundImage) {
       coverStyle.backgroundImage = `url('${backgroundImage}')`;
       coverStyle.backgroundSize = 'cover';
@@ -65,13 +67,15 @@ class CollectiveCard extends React.Component {
       (collective.longDescription && firstSentence(collective.longDescription, 80));
     const description = collective.description;
 
-    let route = this.props.collective.path || `/${this.props.collective.slug}`;
+    const params = {
+      slug: collective.slug,
+    };
     if (LoggedInUser) {
-      route += `?referral=${LoggedInUser.CollectiveId}`;
+      params.referral = LoggedInUser.CollectiveId;
     }
 
     return (
-      <Link route={route} target="_top">
+      <Link route="collective" target="_top" params={params}>
         <div className={`CollectiveCard ${collective.type}`}>
           <style jsx>
             {`
