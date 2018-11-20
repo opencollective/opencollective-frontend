@@ -1,6 +1,6 @@
 import Promise from 'bluebird';
 import config from 'config';
-import { pick } from 'lodash';
+import { get, pick } from 'lodash';
 
 import { memoize } from './cache';
 import currencies from '../constants/currencies';
@@ -390,7 +390,7 @@ const getCollectivesWithBalance = async (where = {}, options) => {
 /**
  * Get top collectives based on total donations
  */
-const getCollectivesByTag = (
+const getCollectivesByTag = async (
   tag,
   limit,
   excludeList,
@@ -427,7 +427,14 @@ const getCollectivesByTag = (
     tag = [tag];
   }
 
-  return sequelize.query(
+  const params = {
+    bind: { tag },
+    model: models.Collective,
+  };
+
+  const allFields = 'c.*, td.*';
+
+  const sql = fields =>
     `
     WITH "totalDonations" AS (
       SELECT t."CollectiveId", SUM("netAmountInCollectiveCurrency") as "totalDonations"
@@ -443,15 +450,21 @@ const getCollectivesByTag = (
         ${tagClause}
         GROUP BY t."CollectiveId"
     )
-    select c.*, td.* FROM "totalDonations" td LEFT JOIN "Collectives" c on td."CollectiveId" = c.id ${minTotalDonationInCentsClause}
-    ORDER ${orderClause} ${orderDirection} NULLS LAST LIMIT ${limit} OFFSET ${offset ||
-      0}
-  `.replace(/\s\s+/g, ' '), // this is to remove the new lines and save log space.
-    {
-      bind: { tag },
-      model: models.Collective,
-    },
-  );
+    select ${fields} FROM "totalDonations" td LEFT JOIN "Collectives" c on td."CollectiveId" = c.id ${minTotalDonationInCentsClause}
+    ORDER ${orderClause} ${orderDirection} NULLS LAST
+  `.replace(/\s\s+/g, ' '); // this is to remove the new lines and save log space.
+
+  const [[totalResult], collectives] = await Promise.all([
+    sequelize.query(`${sql('COUNT(c.*) OVER() as "total"')} LIMIT 1`, params),
+    sequelize.query(
+      `${sql(allFields)} LIMIT ${limit} OFFSET ${offset || 0}`,
+      params,
+    ),
+  ]);
+
+  const total = totalResult ? get(totalResult, 'dataValues.total') : 0;
+
+  return { total, collectives };
 };
 
 /**
@@ -901,17 +914,12 @@ const getCollectivesWithMinBackersQuery = async ({
     ORDER BY c."${orderBy}" ${orderDirection} NULLS LAST
   `.replace(/\s\s+/g, ' ');
 
-  const [
-    [
-      {
-        dataValues: { total },
-      },
-    ],
-    collectives,
-  ] = await Promise.all([
+  const [[totalResult], collectives] = await Promise.all([
     sequelize.query(`${sql('COUNT(c.*) OVER() as "total"')} LIMIT 1`, params),
     sequelize.query(`${sql('c.*')} LIMIT ${limit} OFFSET ${offset}`, params),
   ]);
+
+  const total = totalResult ? get(totalResult, 'dataValues.total') : 0;
 
   return { total, collectives };
 };
