@@ -981,17 +981,6 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
             >
               <a
                 className="c48 "
-                href="/opensource"
-                onClick={[Function]}
-              >
-                Use Cases
-              </a>
-            </li>
-            <li
-              className="c47"
-            >
-              <a
-                className="c48 "
                 href="/signin"
                 onClick={[Function]}
               >
@@ -2161,17 +2150,6 @@ exports[`Search Page renders empty results message 1`] = `
             >
               <a
                 className="c47 "
-                href="/opensource"
-                onClick={[Function]}
-              >
-                Use Cases
-              </a>
-            </li>
-            <li
-              className="c46"
-            >
-              <a
-                className="c47 "
                 href="/signin"
                 onClick={[Function]}
               >
@@ -3314,17 +3292,6 @@ exports[`Search Page renders error message 1`] = `
                 href="/learn-more"
               >
                 How it Works
-              </a>
-            </li>
-            <li
-              className="c47"
-            >
-              <a
-                className="c48 "
-                href="/opensource"
-                onClick={[Function]}
-              >
-                Use Cases
               </a>
             </li>
             <li
@@ -4615,17 +4582,6 @@ exports[`Search Page renders loading grid SVG 1`] = `
                 href="/learn-more"
               >
                 How it Works
-              </a>
-            </li>
-            <li
-              className="c46"
-            >
-              <a
-                className="c47 "
-                href="/opensource"
-                onClick={[Function]}
-              >
-                Use Cases
               </a>
             </li>
             <li
@@ -5926,17 +5882,6 @@ exports[`Search Page renders search results with pagination 1`] = `
                 href="/learn-more"
               >
                 How it Works
-              </a>
-            </li>
-            <li
-              className="c48"
-            >
-              <a
-                className="c49 "
-                href="/opensource"
-                onClick={[Function]}
-              >
-                Use Cases
               </a>
             </li>
             <li

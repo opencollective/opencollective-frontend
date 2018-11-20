@@ -49,7 +49,6 @@ const navigation = {
   PLATFORM: {
     Discover: '/discover',
     'How it Works': '/learn-more',
-    'Use Cases': '/opensource',
     'Sign Up': '/signin',
     Login: '/signin',
   },
