@@ -308,7 +308,21 @@ class OrderForm extends React.Component {
     this._isMounted = true;
     this.UNSAFE_componentWillReceiveProps(this.props);
 
-    // Recaptcha
+    this.fetchRecaptchaToken();
+  }
+
+  UNSAFE_componentWillReceiveProps(props) {
+    const { LoggedInUser } = props;
+    if (!LoggedInUser) return;
+    if (!this._isMounted) return; // Fixes error: Can only update a mounted or mounting component
+    this.setState({ LoggedInUser, isNewUser: !LoggedInUser });
+    this.populateProfiles(LoggedInUser);
+    setTimeout(() => this.selectProfile(LoggedInUser.CollectiveId), 0); // need to pass a cycle to let setState take effect
+  }
+
+  // All the following methods are arrow functions and auto-bind
+
+  fetchRecaptchaToken = () => {
     getRecaptcha()
       .then(recaptcha => {
         recaptcha.ready(() => {
@@ -322,18 +336,7 @@ class OrderForm extends React.Component {
       .catch(err => {
         console.log('Recaptcha error', err);
       });
-  }
-
-  UNSAFE_componentWillReceiveProps(props) {
-    const { LoggedInUser } = props;
-    if (!LoggedInUser) return;
-    if (!this._isMounted) return; // Fixes error: Can only update a mounted or mounting component
-    this.setState({ LoggedInUser, isNewUser: !LoggedInUser });
-    this.populateProfiles(LoggedInUser);
-    setTimeout(() => this.selectProfile(LoggedInUser.CollectiveId), 0); // need to pass a cycle to let setState take effect
-  }
-
-  // All the following methods are arrow functions and auto-bind
+  };
 
   /** Interval set either in the tier or in the order object */
   interval = () =>
@@ -710,8 +713,12 @@ class OrderForm extends React.Component {
   };
 
   /** Call the underlying onSubmit method with an order request  */
-  submitOrder = async orderRequest =>
-    this.props.onSubmit(orderRequest || this.prepareOrderRequest());
+  submitOrder = async orderRequest => {
+    await this.props.onSubmit(orderRequest || this.prepareOrderRequest());
+
+    // Refetch a Recaptcha Token because one can only be used once
+    this.fetchRecaptchaToken();
+  };
 
   /** Submit order built with PayPal payment method */
   submitPayPalOrder = async () =>
