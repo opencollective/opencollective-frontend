@@ -43,11 +43,6 @@ const testStripeAccounts = {
   },
 };
 
-testStripeAccounts.wwcode = {
-  ...testStripeAccounts.opensource,
-  CollectiveId: 9804,
-};
-
 const done = err => {
   if (err) console.log('err', err);
   console.log('done!');
@@ -57,7 +52,7 @@ const done = err => {
 const createConnectedAccount = hostname => {
   return models.ConnectedAccount.create(testStripeAccounts[hostname]).catch(
     e => {
-      // will fail if the host is not present (e.g. when migrating wwcode_test)
+      // will fail if the host is not present
       console.log(
         `[warning] Unable to create a connected account for ${hostname}`,
       );
@@ -73,6 +68,5 @@ models.ConnectedAccount.destroy({ where: { service: 'stripe' }, force: true })
   .then(() => createConnectedAccount('opensource_dvl'))
   .then(() => createConnectedAccount('other'))
   .then(() => createConnectedAccount('brussesltogether'))
-  .then(() => createConnectedAccount('wwcode'))
   .then(() => done())
   .catch(done);
