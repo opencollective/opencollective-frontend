@@ -3,7 +3,7 @@
 usage() {
   echo "Usage: db_restore.sh -d DBNAME -U dbuser -f DBDUMP_FILE";
   echo "e.g.";
-  echo "> db_restore.sh -d wwcode_test -U dbuser -f opencollective-api/test/dbdumps/wwcode_test.pgsql"
+  echo "> db_restore.sh -d opencollective_dvl -U dbuser -f opencollective-api/test/dbdumps/opencollective_dvl.pgsql"
   exit 0;
 }
 
