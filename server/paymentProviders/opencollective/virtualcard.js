@@ -38,7 +38,7 @@ async function getBalance(paymentMethod) {
     const date = new Date();
     const firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
     const lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0);
-    lastDay.setHours(23,59,59,999);
+    lastDay.setHours(23, 59, 59, 999);
     // update query to filter result through the dates
     query = { ...query, createdAt: { [Op.between]: [firstDay, lastDay] } };
   }
@@ -48,16 +48,19 @@ async function getBalance(paymentMethod) {
     where: query,
   });
   let spent = 0;
-  for ( const transaction of allTransactions) {
+  for (const transaction of allTransactions) {
     if (transaction.currency != paymentMethod.currency) {
-      const fxRate = await currency.getFxRate(transaction.currency, paymentMethod.currency);
+      const fxRate = await currency.getFxRate(
+        transaction.currency,
+        paymentMethod.currency,
+      );
       spent += transaction.netAmountInCollectiveCurrency * fxRate;
     } else {
       spent += transaction.netAmountInCollectiveCurrency;
     }
   }
   const balance = {
-    amount: initialBalance + spent,
+    amount: Math.round(initialBalance + spent),
     currency: paymentMethod.currency,
   };
   return balance;
@@ -83,12 +86,17 @@ async function processOrder(order) {
   // Checking if balance is ok or will still be after completing the order
   const balance = await getBalance(paymentMethod);
   if (!balance || balance.amount <= 0) {
-    throw new Error('This payment method has no balance to complete this order');
+    throw new Error(
+      'This payment method has no balance to complete this order',
+    );
   }
   // converting(or keeping if it's the same currency) order amount to the payment method currency
   let orderAmountInPaymentMethodCurrency = order.totalAmount;
   if (order.currency != paymentMethod.currency) {
-    const fxRate = await currency.getFxRate(order.currency, paymentMethod.currency);
+    const fxRate = await currency.getFxRate(
+      order.currency,
+      paymentMethod.currency,
+    );
     orderAmountInPaymentMethodCurrency = order.totalAmount * fxRate;
   }
   if (balance.amount - orderAmountInPaymentMethodCurrency < 0) {
@@ -102,7 +110,7 @@ async function processOrder(order) {
   // Making sure the SourcePaymentMethodId is Set(requirement for virtual cards)
   if (!get(paymentMethod, 'SourcePaymentMethodId')) {
     throw new Error(
-      'Virtual Card payment method must have a value a "SourcePaymentMethodId" defined',
+      'Gift Card payment method must have a value a "SourcePaymentMethodId" defined',
     );
   }
   // finding Source Payment method and update order payment method properties
@@ -124,7 +132,10 @@ async function processOrder(order) {
   order.paymentMethod = paymentMethod;
   // gets the Debit transaction generated through the TransactionGroup field.
   const updatedTransactions = await models.Transaction.update(
-    { PaymentMethodId: paymentMethod.id },
+    {
+      PaymentMethodId: paymentMethod.id,
+      UsingVirtualCardFromCollectiveId: sourcePaymentMethod.CollectiveId,
+    },
     {
       where: { TransactionGroup: creditTransaction.TransactionGroup },
       returning: true,
@@ -174,10 +185,17 @@ async function create(args, remoteUser) {
       throw Error(
         `Collective id ${
           collective.id
-        } needs to have a credit card to create virtual cards.`,
+        } needs to have a Credit Card attached to create Gift Cards.`,
       );
     }
     SourcePaymentMethodId = sourcePaymentMethod.id;
+  } else {
+    sourcePaymentMethod = await models.PaymentMethod.findById(
+      args.PaymentMethodId,
+    );
+    if (sourcePaymentMethod.CollectiveId !== collective.id) {
+      throw Error('Invalid PaymentMethodId');
+    }
   }
   const expiryDate = args.expiryDate
     ? moment(args.expiryDate).format()
@@ -188,11 +206,16 @@ async function create(args, remoteUser) {
   // consider monthlyLimitPerMember times the months from now until the expiry date
   let monthlyLimitPerMember;
   let amount = args.amount;
-  let description = `${formatCurrency(amount, args.currency)} card from ${collective.name}`;
+  let description = `${formatCurrency(amount, args.currency)} Gift Card from ${
+    collective.name
+  }`;
   if (args.monthlyLimitPerMember) {
     monthlyLimitPerMember = args.monthlyLimitPerMember;
     amount = null;
-    description = `${formatCurrency(args. monthlyLimitPerMember, args.currency)} monthly card from ${collective.name}`;
+    description = `${formatCurrency(
+      args.monthlyLimitPerMember,
+      args.currency,
+    )} Monthly Gift Card from ${collective.name}`;
   }
 
   // creates a new Virtual card Payment method
@@ -225,7 +248,13 @@ async function create(args, remoteUser) {
  * @returns {models.PaymentMethod} return the virtual card payment method.
  */
 async function claim(args, remoteUser) {
-  // validate code
+  // Validate code format
+  const redeemCodeRegex = /^[a-zA-Z0-9]{8}$/;
+  if (!redeemCodeRegex.test(args.code)) {
+    throw Error(`Gift Card code "${args.code}" has invalid format`);
+  }
+
+  // Get code from DB
   const virtualCardPaymentMethod = await models.PaymentMethod.findOne({
     where: sequelize.and(
       sequelize.where(sequelize.cast(sequelize.col('uuid'), 'text'), {
@@ -236,20 +265,27 @@ async function claim(args, remoteUser) {
     ),
   });
   if (!virtualCardPaymentMethod) {
-    throw Error(`Code "${args.code}" invalid: No virtual card Found`);
+    throw Error(`Gift Card code "${args.code}" is invalid`);
   }
   const sourcePaymentMethod = await models.PaymentMethod.findById(
     virtualCardPaymentMethod.SourcePaymentMethodId,
   );
   // if the virtual card PM Collective Id is different than the Source PM Collective Id
   // it means this virtual card was already claimend
-  if (!sourcePaymentMethod || sourcePaymentMethod.CollectiveId !== virtualCardPaymentMethod.CollectiveId) {
-    throw Error('Virtual card already claimed.');
+  if (
+    !sourcePaymentMethod ||
+    sourcePaymentMethod.CollectiveId !== virtualCardPaymentMethod.CollectiveId
+  ) {
+    throw Error('Gift Card already redeemed');
   }
   // find or creating a user with its collective
-  const user = remoteUser || await models.User.findOrCreateByEmail(get(args, 'user.email'), args.user);
+  const user =
+    remoteUser ||
+    (await models.User.findOrCreateByEmail(get(args, 'user.email'), args.user));
   if (!user) {
-    throw Error(`Please provide user details or make this request as a logged in user.`);
+    throw Error(
+      'Please provide user details or make this request as a logged in user.',
+    );
   }
   // updating virtual card with collective Id of the user
   await virtualCardPaymentMethod.update({

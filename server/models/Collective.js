@@ -1320,7 +1320,10 @@ export default function(Sequelize, DataTypes) {
 
     let isActive = false;
     if (creatorUser.isAdmin) {
-      if (this.ParentCollectiveId && creatorUser.isAdmin(this.ParentCollectiveId)) {
+      if (
+        this.ParentCollectiveId &&
+        creatorUser.isAdmin(this.ParentCollectiveId)
+      ) {
         isActive = true;
       } else if (creatorUser.isAdmin(hostCollective.id)) {
         isActive = true;
@@ -1380,11 +1383,13 @@ export default function(Sequelize, DataTypes) {
             ]),
           },
         };
-        promises.push(models.Activity.create({
-          CollectiveId: this.id,
-          type: activities.COLLECTIVE_APPLY,
-          data,
-        }));
+        promises.push(
+          models.Activity.create({
+            CollectiveId: this.id,
+            type: activities.COLLECTIVE_APPLY,
+            data,
+          }),
+        );
       }
     }
 
@@ -1769,15 +1774,16 @@ export default function(Sequelize, DataTypes) {
     }).then(result => Promise.resolve(parseInt(result.toJSON().total, 10)));
   };
 
-  // Get the total amount spent
+  /**
+   * Get the total amount spent by this collective, either directly or by
+   * others through generated VirtualCards.
+   */
   Collective.prototype.getTotalAmountSpent = function(startDate, endDate) {
     endDate = endDate || new Date();
-    const where = {
-      type: 'DEBIT',
-      createdAt: { [Op.lt]: endDate },
-      CollectiveId: this.id,
-    };
-    if (startDate) where.createdAt[Op.gte] = startDate;
+    const createdAt = startDate
+      ? { [Op.lt]: endDate, [Op.gte]: startDate }
+      : { [Op.lt]: endDate };
+
     return models.Transaction.find({
       attributes: [
         [
@@ -1789,7 +1795,15 @@ export default function(Sequelize, DataTypes) {
           'total',
         ],
       ],
-      where,
+
+      where: {
+        type: 'DEBIT',
+        createdAt: createdAt,
+        [Op.or]: {
+          CollectiveId: this.id,
+          UsingVirtualCardFromCollectiveId: this.id,
+        },
+      },
     }).then(result => Promise.resolve(-parseInt(result.toJSON().total, 10)));
   };
 

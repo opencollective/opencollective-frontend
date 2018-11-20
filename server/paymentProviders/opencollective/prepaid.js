@@ -44,7 +44,7 @@ async function getBalance(paymentMethod) {
     }
   }
   return {
-    amount: paymentMethod.initialBalance + spent,
+    amount: Math.round(paymentMethod.initialBalance + spent),
     currency: paymentMethod.currency,
   };
 }

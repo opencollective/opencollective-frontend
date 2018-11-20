@@ -107,7 +107,7 @@ const mutations = {
     },
     resolve(...args) {
       return claimCollective(...args);
-    }
+    },
   },
   approveCollective: {
     type: CollectiveInterfaceType,
@@ -432,10 +432,12 @@ const mutations = {
     resolve: async (_, args, req) => {
       // either amount or monthlyLimitPerMember needs to be present
       if (!args.amount && !args.monthlyLimitPerMember) {
-        throw Error('you need to define either the amount or the monthlyLimitPerMember of the payment method.');
+        throw Error(
+          'you need to define either the amount or the monthlyLimitPerMember of the payment method.',
+        );
       }
       return createPaymentMethod(args, req.remoteUser);
-    } ,
+    },
   },
   claimPaymentMethod: {
     type: PaymentMethodType,

@@ -358,12 +358,26 @@ export const executeOrder = async (user, order, options) => {
   const transaction = await processOrder(order, options);
   order.matchingFund && (await processMatchingFund(order, options));
   transaction && (await updateOrderStatus(order, transaction));
+
+  // Register user as collective backer
   await addBackerToCollective(
     { id: user.id, CollectiveId: order.FromCollectiveId },
     order.collective,
     get(order, 'tier.id'),
   );
   sendEmailNotifications(order, transaction);
+
+  // Register VirtualCard emitter as collective backer too
+  if (transaction && transaction.UsingVirtualCardFromCollectiveId) {
+    addBackerToCollective(
+      {
+        id: user.id,
+        CollectiveId: transaction.UsingVirtualCardFromCollectiveId,
+      },
+      order.collective,
+      get(order, 'tier.id'),
+    );
+  }
 
   // Credit card charges are synchronous. If the transaction is
   // created here it means that the payment went through so it's

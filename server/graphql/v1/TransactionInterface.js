@@ -50,6 +50,7 @@ export const TransactionInterfaceType = new GraphQLInterfaceType({
       host: { type: CollectiveInterfaceType },
       paymentMethod: { type: PaymentMethodType },
       fromCollective: { type: CollectiveInterfaceType },
+      usingVirtualCardFromCollective: { type: CollectiveInterfaceType },
       collective: { type: CollectiveInterfaceType },
       type: { type: GraphQLString },
       description: { type: GraphQLString },
@@ -164,6 +165,12 @@ const TransactionFields = () => {
       type: CollectiveInterfaceType,
       resolve(transaction) {
         return transaction.getFromCollective();
+      },
+    },
+    usingVirtualCardFromCollective: {
+      type: CollectiveInterfaceType,
+      resolve(transaction) {
+        return transaction.getVirtualCardEmitterCollective();
       },
     },
     collective: {

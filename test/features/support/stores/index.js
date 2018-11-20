@@ -327,3 +327,22 @@ export async function stripeOneTimeDonation(opt) {
     sandbox.restore();
   }
 }
+
+/**
+ * Create a new test credit card (payment method)
+ */
+export function createCreditCard(collectiveId, otherParams = {}) {
+  return models.PaymentMethod.create(
+    Object.assign(
+      {
+        name: '4242',
+        service: 'stripe',
+        type: 'creditcard',
+        token: 'tok_123456781234567812345678',
+        CollectiveId: collectiveId,
+        monthlyLimitPerMember: null,
+      },
+      otherParams,
+    ),
+  );
+}

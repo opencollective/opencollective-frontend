@@ -92,11 +92,11 @@ export const createOrUpdate = (req, res, next, accessToken, data, emails) => {
             caId,
             data.profile.username,
           );
-          const newLocation = redirect ?
-            `${redirect}?token=${token}` : 
-            `${
-              config.host.website
-            }/github/apply/${token}?utm_source=${utm_source}`;
+          const newLocation = redirect
+            ? `${redirect}?token=${token}`
+            : `${
+                config.host.website
+              }/github/apply/${token}?utm_source=${utm_source}`;
 
           res.redirect(newLocation);
         })

@@ -494,7 +494,7 @@ describe('GraphQL Expenses API', () => {
         description: 'Test expense for pizza',
         privateMessage: 'Private instructions to reimburse this expense',
         attachment:
-        'https://opencollective-production.s3-us-west-1.amazonaws.com/imagejpg_969a1f70-9d47-11e5-80cb-dba89a9a10b0.jpg',
+          'https://opencollective-production.s3-us-west-1.amazonaws.com/imagejpg_969a1f70-9d47-11e5-80cb-dba89a9a10b0.jpg',
         incurredAt: new Date(),
         collective: { id: collective.id },
       };

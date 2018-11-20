@@ -438,7 +438,7 @@ export async function claimCollective(_, args, req) {
   // set collective as active
   // create default tiers
   const host = await models.Collective.findById(
-    defaultHostCollective('opensource').CollectiveId
+    defaultHostCollective('opensource').CollectiveId,
   );
   collective = await collective.addHost(host, {
     ...req.remoteUser.minimal,

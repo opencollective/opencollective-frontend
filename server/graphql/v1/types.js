@@ -146,9 +146,38 @@ export const StatsMemberType = new GraphQLObjectType({
           return member.id;
         },
       },
+      directDonations: {
+        type: GraphQLInt,
+        description: 'total amount donated directly by this member',
+        resolve(member, args, req) {
+          return (
+            member.directDonations ||
+            req.loaders.transactions.directDonationsFromTo.load({
+              FromCollectiveId: member.MemberCollectiveId,
+              CollectiveId: member.CollectiveId,
+            })
+          );
+        },
+      },
+      donationsThroughEmittedVirtualCards: {
+        type: GraphQLInt,
+        description: 'total amount donated by this member through gift cards',
+        resolve(member, args, req) {
+          return (
+            member.donationsThroughEmittedVirtualCards ||
+            req.loaders.transactions.donationsThroughEmittedVirtualCardsFromTo.load(
+              {
+                FromCollectiveId: member.MemberCollectiveId,
+                CollectiveId: member.CollectiveId,
+              },
+            )
+          );
+        },
+      },
       totalDonations: {
         type: GraphQLInt,
-        description: 'total amount donated by this member',
+        description:
+          'total amount donated by this member either directly or using a virtual card it has emitted',
         resolve(member, args, req) {
           return (
             member.totalDonations ||
@@ -1295,6 +1324,14 @@ export const PaymentMethodType = new GraphQLObjectType({
           return paymentMethod.createdAt;
         },
       },
+      isConfirmed: {
+        type: GraphQLBoolean,
+        description:
+          'Will be true for virtual card if claimed. Always true for other payment methods.',
+        resolve(paymentMethod) {
+          return paymentMethod.isConfirmed();
+        },
+      },
       expiryDate: {
         type: GraphQLString,
         resolve(paymentMethod) {
@@ -1391,6 +1428,22 @@ export const PaymentMethodType = new GraphQLObjectType({
           return req.loaders.collective.findById.load(
             paymentMethod.CollectiveId,
           );
+        },
+      },
+      emitter: {
+        type: CollectiveInterfaceType,
+        async resolve(paymentMethod, args, req) {
+          // TODO: could we have a getter for SourcePaymentMethod?
+          if (paymentMethod.SourcePaymentMethodId) {
+            const sourcePaymentMethod = await models.PaymentMethod.findById(
+              paymentMethod.SourcePaymentMethodId,
+            );
+            if (sourcePaymentMethod) {
+              return req.loaders.collective.findById.load(
+                sourcePaymentMethod.CollectiveId,
+              );
+            }
+          }
         },
       },
       limitedToTags: {

@@ -71,18 +71,14 @@ export async function claimPaymentMethod(args, remoteUser) {
     currency,
     name,
     expiryDate,
-   } = paymentMethod;
+  } = paymentMethod;
   const amount = initialBalance || monthlyLimitPerMember;
-  const emitter = await models.Collective.findById(paymentMethod.sourcePaymentMethod.CollectiveId);
-  const userCollective = await user.getCollective();
-  const userName = userCollective.name && userCollective.name.match(/anonymous/i) ? '' : userCollective.name;
+  const emitter = await models.Collective.findById(
+    paymentMethod.sourcePaymentMethod.CollectiveId,
+  );
 
   const qs = queryString.stringify({
-    name: userName,
-    amount: amount,
-    currency,
-    emitterSlug: emitter.slug,
-    emitterName: emitter.name,
+    code: paymentMethod.uuid.substring(0, 8),
   });
   emailLib.send('user.card.claimed', user.email, {
     loginLink: user.generateLoginLink(`/redeemed?${qs}`),

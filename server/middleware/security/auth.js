@@ -37,6 +37,9 @@ export async function checkClientApp(req, res, next) {
         req.remoteUser = await models.User.findOne({
           where: { CollectiveId: collectiveId },
         });
+        if (req.remoteUser) {
+          await req.remoteUser.populateRoles();
+        }
       }
       next();
     } else {

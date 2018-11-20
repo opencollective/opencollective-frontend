@@ -591,7 +591,8 @@ const getMembersOfCollectiveWithRole = CollectiveIds => {
 };
 
 /**
- * Returns all the users of a collective with their `totalDonations` and `role` (HOST/ADMIN/BACKER)
+ * Returns all the members of a collective with their `totalDonations` and
+ * `role` (HOST/ADMIN/BACKER)
  */
 const getMembersWithTotalDonations = (where, options = {}) => {
   const untilCondition = table => {
@@ -635,26 +636,37 @@ const getMembersWithTotalDonations = (where, options = {}) => {
     typeof where[memberCondAttribute] === 'number'
       ? [where[memberCondAttribute]]
       : where[memberCondAttribute];
+
   const selector = `member."${groupBy}" as "${groupBy}", max(member."${memberCondAttribute}") as "${memberCondAttribute}"`;
+
+  // Stats query builder to get stats about transactions
+  const buildTransactionsStatsQuery = sourceCollectiveIdColName => `
+    SELECT
+      "${sourceCollectiveIdColName}",
+      ${
+        transactionType === 'DEBIT'
+          ? 'SUM("netAmountInCollectiveCurrency") * -1'
+          : 'SUM("amount")'
+      } as "totalDonations",
+      max("createdAt") as "lastDonation",
+      min("createdAt") as "firstDonation"
+    FROM "Transactions" t
+    WHERE t."CollectiveId" IN (:collectiveids)
+    AND t.amount ${
+      transactionType === 'CREDIT' ? '>=' : '<='
+    } 0 ${untilCondition('t')}
+    AND t."deletedAt" IS NULL
+    GROUP BY t."${sourceCollectiveIdColName}"
+  `;
+
   const query = `
-    WITH stats AS (
-      SELECT
-        max("FromCollectiveId") as "FromCollectiveId",
-        SUM("${
-          transactionType === 'DEBIT'
-            ? 'netAmountInCollectiveCurrency'
-            : 'amount'
-        }") ${transactionType === 'DEBIT' ? '* -1' : ''} as "totalDonations",
-        max("createdAt") as "lastDonation",
-        min("createdAt") as "firstDonation"
-      FROM "Transactions" t
-      WHERE t."CollectiveId" IN (:collectiveids)
-      AND t.amount ${
-        transactionType === 'CREDIT' ? '>=' : '<='
-      } 0 ${untilCondition('t')}
-      AND t."deletedAt" IS NULL
-      GROUP BY t."FromCollectiveId"
-    )
+    WITH
+      DirectStats AS (
+        ${buildTransactionsStatsQuery('FromCollectiveId')}
+      ),
+      IndirectStats AS (
+        ${buildTransactionsStatsQuery('UsingVirtualCardFromCollectiveId')}
+      )
     SELECT
       ${selector},
       member.role,
@@ -674,11 +686,14 @@ const getMembersWithTotalDonations = (where, options = {}) => {
       max(c.currency) as currency,
       max(u.email) as email,
       max(c."twitterHandle") as "twitterHandle",
-      COALESCE(max(s."totalDonations"), 0) as "totalDonations",
-      max(s."firstDonation") as "firstDonation",
-      max(s."lastDonation") as "lastDonation"
+      COALESCE(max(dstats."totalDonations"), 0) as "directDonations",
+      COALESCE(max(istats."totalDonations"), 0) as "donationsThroughEmittedVirtualCards",
+      COALESCE(max(dstats."totalDonations"), 0) +  COALESCE(max(istats."totalDonations"), 0) as "totalDonations",
+      LEAST(Max(dstats."firstDonation"), Max(istats."firstDonation")) AS "firstDonation",
+      GREATEST(Max(dstats."lastDonation"), Max(istats."lastDonation")) AS "lastDonation"
     FROM "Collectives" c
-    LEFT JOIN stats s ON c.id = s."FromCollectiveId"
+    LEFT JOIN DirectStats dstats ON c.id = dstats."FromCollectiveId"
+    LEFT JOIN IndirectStats istats ON c.id = istats."UsingVirtualCardFromCollectiveId"
     LEFT JOIN "Members" member ON c.id = member."${groupBy}"
     LEFT JOIN "Users" u ON c.id = u."CollectiveId"
     WHERE member."${memberCondAttribute}" IN (:collectiveids)

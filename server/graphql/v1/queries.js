@@ -1085,10 +1085,25 @@ const queries = {
   PaymentMethod: {
     type: PaymentMethodType,
     args: {
-      id: { type: new GraphQLNonNull(GraphQLInt) },
+      id: { type: GraphQLInt },
+      code: { type: GraphQLString },
     },
     resolve(_, args) {
-      return models.PaymentMethod.findById(args.id);
+      if (args.id) {
+        return models.PaymentMethod.findById(args.id);
+      } else if (args.code) {
+        return models.PaymentMethod.findOne({
+          where: sequelize.and(
+            sequelize.where(sequelize.cast(sequelize.col('uuid'), 'text'), {
+              [Op.like]: `${args.code}%`,
+            }),
+            { service: 'opencollective' },
+            { type: 'virtualcard' },
+          ),
+        });
+      } else {
+        return new Error('Please provide an id or a code.');
+      }
     },
   },
 
