@@ -29,7 +29,7 @@ currency=order.currency}}} donation to {{collective.name}} is pending
 
 <h2>Help us raise more money!</h2>
 <p>Share this URL: <a href="https://opencollective.com/{{collective.slug}}/donate?referral={{fromCollective.id}}">https://opencollective.com/{{collective.slug}}/donate?referral={{fromCollective.id}}</a><br />
-The total amount that you will help us raise will be shown on your profile! <a href="https://opencollective.com/{{fromCollective.slug}}">https://opencollective.com/{{fromCollective.slug}}</a>
+  The total amount that you will help us raise will be shown on your profile! <a href="https://opencollective.com/{{fromCollective.slug}}">https://opencollective.com/{{fromCollective.slug}}</a>
 </p>
 
 <p>Warmly,</p>
@@ -39,9 +39,9 @@ The total amount that you will help us raise will be shown on your profile! <a h
 </p>
 
 {{#if recommendedCollectives.length}}
-  {{> recommendedcollectives}}
+{{> recommendedcollectives}}
 {{else if relatedCollectives.length}}
-  {{> relatedcollectives}}
+{{> relatedcollectives}}
 {{/if}}
 
 {{> footer}}
