@@ -1,6 +1,7 @@
 import React from 'react';
 import { mount } from 'enzyme';
 import { IntlProvider } from 'react-intl';
+import { merge } from 'lodash';
 
 import PaymentMethodChooser from '../PaymentMethodChooser';
 
@@ -14,6 +15,7 @@ describe('PaymentMethodChooser.test.js', () => {
 
   const defaultPaymentMethod = {
     service: 'stripe',
+    type: 'creditcard',
     name: '4242',
     data: { brand: 'VISA', expMonth: '01', expYear: '2020' },
   };
@@ -21,6 +23,7 @@ describe('PaymentMethodChooser.test.js', () => {
   const defaultValues = {
     paymentMethodInUse: {
       service: 'stripe',
+      type: 'creditcard',
       name: '5555',
       data: { brand: 'VISA', expMonth: '02', expYear: '2021' },
     },
@@ -41,7 +44,7 @@ describe('PaymentMethodChooser.test.js', () => {
     const component = mountComponent(values);
 
     expect(component.find('.paymentmethod-info').text()).toContain(
-      '(credit card info not available)',
+      '(payment method info not available)',
     );
   });
 
@@ -49,7 +52,35 @@ describe('PaymentMethodChooser.test.js', () => {
     const component = mountComponent(defaultValues);
 
     expect(component.find('.paymentmethod-info').text()).toContain(
-      '💳   VISA ***5555 (Exp: 02/2021)',
+      '💳\xA0\xA0VISA **** 5555 - exp 02/2021',
+    );
+  });
+
+  it('displays American Express cards with an abbreviated label', () => {
+    const component = mountComponent(
+      merge(defaultValues, {
+        paymentMethodInUse: { data: { brand: 'American Express' } },
+      }),
+    );
+
+    expect(component.find('.paymentmethod-info').text()).toContain(
+      '💳\xA0\xA0AMEX **** 5555 - exp 02/2021',
+    );
+  });
+
+  it('truncate brand if too long', () => {
+    const component = mountComponent(
+      merge(defaultValues, {
+        paymentMethodInUse: {
+          data: {
+            brand: 'The bank of the people who like long descriptions',
+          },
+        },
+      }),
+    );
+
+    expect(component.find('.paymentmethod-info').text()).toContain(
+      '💳\xA0\xA0THE BANK... **** 5555 - exp 02/2021',
     );
   });
 

@@ -36,6 +36,10 @@ const messages = defineMessages({
     id: 'paymentMethods.labelCollective',
     defaultMessage: '{balance} available',
   },
+  unavailable: {
+    id: 'paymentMethods.labelUnavailable',
+    defaultMessage: '(payment method info not available)',
+  },
 });
 
 /**
@@ -56,6 +60,21 @@ function paymentMethodExpiration(pm) {
 }
 
 /**
+ * Format a credit card brand for label, truncating the name if too long
+ * or using abreviations like "AMEX" for American Express.
+ * @param {string} brand
+ */
+function formatCreditCardBrand(brand) {
+  brand = brand.toUpperCase();
+  if (brand === 'AMERICAN EXPRESS') {
+    return 'AMEX';
+  } else if (brand.length > 10) {
+    brand = `${brand.slice(0, 8)}...`;
+  }
+  return brand;
+}
+
+/**
  * Generate a pretty label for given payment method or return its name if type
  * is unknown.
  *
@@ -65,8 +84,9 @@ function paymentMethodExpiration(pm) {
  */
 export function paymentMethodLabel(intl, paymentMethod, collectiveName = null) {
   const { type, balance, currency, name, data } = paymentMethod;
-
+  const brand = data && data.brand && formatCreditCardBrand(data.brand);
   let label = null;
+
   if (type === 'virtualcard') {
     label = intl.formatMessage(messages.virtualcard, {
       name: name.replace('card from', 'Gift Card from'),
@@ -75,12 +95,12 @@ export function paymentMethodLabel(intl, paymentMethod, collectiveName = null) {
     });
   } else if (type === 'prepaid') {
     label = intl.formatMessage(messages.prepaid, {
-      name: `${(data && data.brand) || type} ${name}`,
+      name: `${brand || type} ${name}`,
       balance: formatCurrency(balance, currency),
     });
   } else if (type === 'creditcard') {
     label = intl.formatMessage(messages.creditcard, {
-      name: `${(data && data.brand) || type} ${name}`,
+      name: `${brand || type} **** ${name}`,
       expiration: paymentMethodExpiration(paymentMethod),
     });
   } else if (type === 'collective') {
@@ -88,6 +108,8 @@ export function paymentMethodLabel(intl, paymentMethod, collectiveName = null) {
       name: `Collective ${name}`,
       balance: formatCurrency(balance, currency),
     });
+  } else if (!name) {
+    label = intl.formatMessage(messages.unavailable);
   } else {
     label = name;
   }

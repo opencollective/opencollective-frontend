@@ -685,19 +685,25 @@ export const getSubscriptionsQuery = gql`
         paymentMethod {
           id
           uuid
-          data
+          currency
           name
           service
           type
+          data
+          balance
+          expiryDate
         }
       }
       paymentMethods {
         id
         uuid
+        currency
+        name
         service
         type
         data
-        name
+        balance
+        expiryDate
       }
       ... on User {
         memberOf(limit: 60) {
