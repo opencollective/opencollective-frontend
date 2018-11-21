@@ -186,6 +186,7 @@ class EditTiers extends React.Component {
         name: 'presets',
         pre: getCurrencySymbol(props.currency),
         type: 'component',
+        options: { step: 1 },
         component: InputFieldPresets,
         label: intl.formatMessage(this.messages['presets.label']),
         when: tier => tier._amountType === 'flexible',

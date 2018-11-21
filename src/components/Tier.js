@@ -440,6 +440,7 @@ class Tier extends React.Component {
                         name="amount"
                         className="inputAmount"
                         min={tier.presets && tier.presets[0]}
+                        options={{ step: 1 }}
                         pre={getCurrencySymbol(currency)}
                         type="currency"
                         value={amount}
