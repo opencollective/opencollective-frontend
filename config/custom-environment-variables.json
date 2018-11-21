@@ -11,8 +11,10 @@
       }
     }
   },
-  "memcached": {
-    "locations": "MEMCACHED_LOCATIONS"
+  "memcache": {
+    "servers": "MEMCACHE_SERVERS",
+    "username": "MEMCACHE_USERNAME",
+    "password": "MEMCACHE_PASSWORD"
   },
   "keys": {
     "opencollective": {

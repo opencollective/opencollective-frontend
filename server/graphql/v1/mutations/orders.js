@@ -7,6 +7,7 @@ import { pick, omit, get } from 'lodash';
 
 import models from '../../../models';
 import * as errors from '../../errors';
+import cache from '../../../lib/cache';
 import recaptcha from '../../../lib/recaptcha';
 import * as libPayments from '../../../lib/payments';
 import { capitalize, pluralize } from '../../../lib/utils';

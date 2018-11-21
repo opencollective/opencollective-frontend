@@ -2,63 +2,84 @@ import md5 from 'md5';
 import config from 'config';
 import debug from 'debug';
 import LRU from 'lru-cache';
-import Memcached from 'memcached-promisify';
+import memjs from 'memjs';
 import { get, has } from 'lodash';
 
 import models from '../models';
 
 const debugCache = debug('cache');
 
-const lru = LRU({ max: 1000 });
+const lruCache = new LRU({ max: 1000 });
 
 const oneDayInSeconds = 60 * 60 * 24;
 
-let memcached;
-if (has(config, 'memcached.locations')) {
-  memcached = new Memcached(get(config, 'memcached.locations'));
+let memcache;
+if (has(config, 'memcache.servers')) {
+  debugCache(
+    'Memcache configuration detected, using memcache as cache backend.',
+  );
+  const options = {};
+  if (has(config, 'memcache.username') && has(config, 'memcache.password')) {
+    options.username = get(config, 'memcache.username');
+    options.password = get(config, 'memcache.password');
+  }
+  memcache = memjs.Client.create(get(config, 'memcache.servers'), options);
 }
 
 async function cacheGet(key) {
   debugCache(`get ${key}`);
-  if (memcached) {
-    return memcached.get(key);
-  } else if (lru) {
-    return lru.get(key);
+  if (memcache) {
+    const data = await memcache.get(key);
+    if (data.value) {
+      const value = data.value.toString();
+      try {
+        return JSON.parse(value);
+      } catch (err) {
+        debugCache(`Invalid JSON (${value}): ${err}`);
+      }
+    }
+  } else if (lruCache) {
+    return lruCache.get(key);
   }
 }
 
 async function cacheSet(key, value, maxAgeInSeconds = 0) {
-  debugCache(`set ${key} ${value}`);
-  if (memcached) {
-    return memcached.set(key, value, maxAgeInSeconds);
-  } else if (lru) {
-    return lru.set(key, value, maxAgeInSeconds * 1000);
+  debugCache(`set ${key}`);
+  // debugCache(`set ${key} ${value}`);
+  if (memcache) {
+    if (value !== undefined) {
+      memcache.set(key, JSON.stringify(value), { expires: maxAgeInSeconds });
+    }
+  } else if (lruCache) {
+    lruCache.set(key, value, maxAgeInSeconds * 1000);
   }
 }
 
 async function cacheDel(key) {
   debugCache(`del ${key}`);
-  if (memcached) {
-    return memcached.del(key);
-  } else if (lru) {
-    return lru.del(key);
+  if (memcache) {
+    memcache.delete(key);
+  } else if (lruCache) {
+    lruCache.del(key);
   }
 }
 
 async function cacheClear() {
   debugCache('clear');
-  if (lru) {
-    return lru.reset();
+  if (memcache) {
+    memcache.flush();
+  } else if (lruCache) {
+    lruCache.reset();
   }
 }
 
 async function cacheHas(key) {
   debugCache(`has ${key}`);
-  if (memcached) {
-    const value = await memcached.get(key);
+  if (memcache) {
+    const value = await memcache.get(key);
     return value !== undefined;
-  } else if (lru) {
-    return lru.has(key);
+  } else if (lruCache) {
+    return lruCache.has(key);
   } else {
     return false;
   }
