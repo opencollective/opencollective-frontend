@@ -200,14 +200,22 @@ describe('createOrder', () => {
       name: 'Open Collective 501c3',
       settings: {
         paymentMethods: {
-          manual: { instructions: 'Please send a wire to XXXX' },
+          manual: {
+            instructions:
+              'Please send a wire to XXXX with the mention: {collective} {tier} order: {OrderId} {unknownVariable}',
+          },
         },
       },
     });
     const collective = await models.Collective.create({
-      slug: 'test',
+      slug: 'webpack',
       name: 'test',
       isActive: true,
+    });
+    const tier = await models.Tier.create({
+      slug: 'backer',
+      name: 'best backer',
+      CollectiveId: collective.id,
     });
     await collective.addHost(host);
     await collective.update({ isActive: true });
@@ -221,7 +229,7 @@ describe('createOrder', () => {
       email: 'jsmith@email.com',
       twitterHandle: 'johnsmith',
     };
-
+    thisOrder.tier = { id: tier.id };
     const res = await utils.graphqlQuery(createOrderQuery, {
       order: thisOrder,
     });
@@ -236,6 +244,9 @@ describe('createOrder', () => {
     expect(emailSendMessageSpy.callCount).to.equal(2);
     expect(emailSendMessageSpy.secondCall.args[0]).to.equal(
       thisOrder.user.email,
+    );
+    expect(emailSendMessageSpy.secondCall.args[2]).to.match(
+      /Please send a wire to XXXX with the mention: webpack backer order: [0-9]+/,
     );
     expect(emailSendMessageSpy.secondCall.args[1]).to.equal(
       'ACTION REQUIRED: your $1,543 donation to test is pending',

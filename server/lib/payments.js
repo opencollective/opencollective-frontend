@@ -487,22 +487,32 @@ const sendOrderProcessingEmail = async order => {
   const { collective, fromCollective } = order;
   const user = order.createdByUser;
   const host = await collective.getHostCollective();
-  return emailLib.send(
-    'order.processing',
-    user.email,
-    {
-      order: order.info,
-      user: user.info,
-      collective: collective.info,
-      host: host.info,
-      fromCollective: fromCollective.minimal,
-      instructions: get(host, 'settings.paymentMethods.manual.instructions'),
-      subscriptionsLink: user.generateLoginLink(
-        `/${fromCollective.slug}/subscriptions`,
-      ),
-    },
-    {
-      from: `${collective.name} <hello@${collective.slug}.opencollective.com>`,
-    },
-  );
+  const data = {
+    order: order.info,
+    user: user.info,
+    collective: collective.info,
+    host: host.info,
+    fromCollective: fromCollective.minimal,
+    subscriptionsLink: user.generateLoginLink(
+      `/${fromCollective.slug}/subscriptions`,
+    ),
+  };
+  const instructions = get(host, 'settings.paymentMethods.manual.instructions');
+  if (instructions) {
+    const formatValues = {
+      orderid: order.id,
+      collective: order.collective.slug,
+      tier: get(order, 'tier.slug') || get(order, 'tier.name'),
+    };
+    data.instructions = instructions.replace(/{([\s\S]+?)}/g, (match, p1) => {
+      if (p1) {
+        const key = p1.toLowerCase();
+        if (formatValues[key]) return formatValues[key];
+      }
+      return match;
+    });
+  }
+  return emailLib.send('order.processing', user.email, data, {
+    from: `${collective.name} <hello@${collective.slug}.opencollective.com>`,
+  });
 };
