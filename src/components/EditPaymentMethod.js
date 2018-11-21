@@ -119,7 +119,7 @@ class EditPaymentMethod extends React.Component {
                               `/subscriptions?collectiveSlug=${
                                 this.props.slug
                               }`,
-                              `/subscriptions/${this.props.slug}`,
+                              `/${this.props.slug}/subscriptions`,
                             )
                           }
                         >
