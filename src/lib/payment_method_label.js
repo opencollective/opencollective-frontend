@@ -32,6 +32,10 @@ const messages = defineMessages({
     id: 'paymentMethods.labelPrepaid',
     defaultMessage: '{name} ({balance} left)',
   },
+  collective: {
+    id: 'paymentMethods.labelCollective',
+    defaultMessage: '{balance} available',
+  },
 });
 
 /**
@@ -44,11 +48,11 @@ function paymentMethodExpiration(pm) {
   return pm.expiryDate
     ? `- exp ${moment(pm.expiryDate).format('MM/Y')}`
     : get(pm, 'data.expMonth') || get(pm, 'data.expYear')
-      ? `- exp ${padStart(get(pm, 'data.expMonth'), 2, '0')}/${get(
-          pm,
-          'data.expYear',
-        )}`
-      : '';
+    ? `- exp ${padStart(get(pm, 'data.expMonth'), 2, '0')}/${get(
+        pm,
+        'data.expYear',
+      )}`
+    : '';
 }
 
 /**
@@ -79,6 +83,11 @@ export function paymentMethodLabel(intl, paymentMethod, collectiveName = null) {
       name: `${(data && data.brand) || type} ${name}`,
       expiration: paymentMethodExpiration(paymentMethod),
     });
+  } else if (type === 'collective') {
+    label = intl.formatMessage(messages.collective, {
+      name: `Collective ${name}`,
+      balance: formatCurrency(balance, currency),
+    });
   } else {
     label = name;
   }
@@ -98,6 +107,8 @@ export function paymentMethodUnicodeIcon(paymentMethod) {
       return '🎁';
     case 'prepaid':
       return '🎟️';
+    case 'collective':
+      return '💸';
     default:
       return '💰';
   }
