@@ -48,17 +48,15 @@ export function isProvider(fqn, paymentMethod) {
  * @return the payment method's JS module.
  */
 export function findPaymentMethodProvider(paymentMethod) {
-  const provider = paymentMethod ? paymentMethod.service : 'manual';
-  const methodType = paymentMethod.type || 'default';
+  const provider = get(paymentMethod, 'service') || 'opencollective';
+  const methodType = get(paymentMethod, 'type') || 'default';
   let paymentMethodProvider = paymentProviders[provider];
   if (!paymentMethodProvider) {
-    throw new Error(`No payment provider found for ${this.service}`);
+    throw new Error(`No payment provider found for ${provider}`);
   }
   paymentMethodProvider = paymentMethodProvider.types[methodType]; // eslint-disable-line import/namespace
   if (!paymentMethodProvider) {
-    throw new Error(
-      `No payment provider found for ${this.service}:${this.type}`,
-    );
+    throw new Error(`No payment provider found for ${provider}:${methodType}`);
   }
   return paymentMethodProvider;
 }

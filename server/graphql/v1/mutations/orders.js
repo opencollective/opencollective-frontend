@@ -369,7 +369,11 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
     }
 
     if (paymentRequired) {
-      await orderCreated.setPaymentMethod(order.paymentMethod);
+      if (get(order, 'paymentMethod.type') === 'manual') {
+        orderCreated.paymentMethod = order.paymentMethod;
+      } else {
+        await orderCreated.setPaymentMethod(order.paymentMethod);
+      }
       // also adds the user as a BACKER of collective
       await libPayments.executeOrder(
         remoteUser || user,
@@ -473,7 +477,11 @@ export async function updateOrder(remoteUser, order) {
 
   if (paymentRequired) {
     existingOrder.interval = order.interval;
-    await existingOrder.setPaymentMethod(order.paymentMethod);
+    if (get(order, 'paymentMethod.type') === 'manual') {
+      existingOrder.paymentMethod = order.paymentMethod;
+    } else {
+      await existingOrder.setPaymentMethod(order.paymentMethod);
+    }
     // also adds the user as a BACKER of collective
     await libPayments.executeOrder(
       remoteUser,

@@ -77,11 +77,7 @@ const constants = Object.freeze({
 });
 
 describe('createOrder', () => {
-  let sandbox,
-    tweetStatusSpy,
-    fearlesscitiesbrussels,
-    emailSendMessageSpy,
-    hostCollective;
+  let sandbox, tweetStatusSpy, fearlesscitiesbrussels, emailSendMessageSpy;
 
   before(() => {
     nock('http://data.fixer.io')
@@ -117,10 +113,7 @@ describe('createOrder', () => {
     emailSendMessageSpy = sandbox.spy(emailLib, 'sendMessage');
 
     // Given a collective (with a host)
-    ({
-      fearlesscitiesbrussels,
-      hostCollective,
-    } = await store.newCollectiveWithHost(
+    ({ fearlesscitiesbrussels } = await store.newCollectiveWithHost(
       'fearlesscitiesbrussels',
       'EUR',
       'EUR',
@@ -209,12 +202,7 @@ describe('createOrder', () => {
     });
     const thisOrder = cloneDeep(baseOrder);
     delete thisOrder.paymentMethod;
-    const pm = await models.PaymentMethod.create({
-      service: 'opencollective',
-      type: 'manual',
-      CollectiveId: hostCollective.id,
-    });
-    thisOrder.paymentMethod = { uuid: pm.uuid };
+    thisOrder.paymentMethod = { type: 'manual' };
     thisOrder.collective.id = collective.id;
     thisOrder.user = {
       firstName: 'John',
@@ -226,6 +214,7 @@ describe('createOrder', () => {
     const res = await utils.graphqlQuery(createOrderQuery, {
       order: thisOrder,
     });
+    res.errors && console.error(res.errors);
     expect(res.errors).to.not.exist;
     expect(res.data.createOrder.status).to.equal('PENDING');
     const transactionsCount = await models.Transaction.count({
@@ -263,6 +252,7 @@ describe('createOrder', () => {
     const res = await utils.graphqlQuery(createOrderQuery, { order });
 
     // Then there should be no errors
+    res.errors && console.error(res.errors);
     expect(res.errors).to.not.exist;
 
     const fromCollective = res.data.createOrder.fromCollective;
