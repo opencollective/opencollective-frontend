@@ -483,10 +483,10 @@ const sendSupportEmailForManualIntervention = order => {
 };
 
 // Assumes one-time payments,
-const sendOrderProcessingEmail = order => {
+const sendOrderProcessingEmail = async order => {
   const { collective, fromCollective } = order;
   const user = order.createdByUser;
-
+  const host = await collective.getHostCollective();
   return emailLib.send(
     'order.processing',
     user.email,
@@ -494,7 +494,9 @@ const sendOrderProcessingEmail = order => {
       order: order.info,
       user: user.info,
       collective: collective.info,
+      host: host.info,
       fromCollective: fromCollective.minimal,
+      instructions: get(host, 'settings.paymentMethods.manual.instructions'),
       subscriptionsLink: user.generateLoginLink(
         `/${fromCollective.slug}/subscriptions`,
       ),
