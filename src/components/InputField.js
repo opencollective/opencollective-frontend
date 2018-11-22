@@ -176,9 +176,22 @@ class InputField extends React.Component {
     return true;
   }
 
+  roundCurrencyValue(value) {
+    if (value === null) {
+      return null;
+    } else if (get(this.props.options, 'step') === 1) {
+      // Value must be an increment of 1, truncate the two last digits
+      return Math.trunc(value / 100) * 100;
+    }
+    return value;
+  }
+
   handleChange(value) {
-    if (this.props.type === 'number') {
+    const { type } = this.props;
+    if (type === 'number') {
       value = parseInt(value) || null;
+    } else if (type === 'currency') {
+      value = this.roundCurrencyValue(value);
     }
     if (this.validate(value)) {
       this.setState({ validationState: null });
