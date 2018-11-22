@@ -69,7 +69,10 @@ export function findPaymentMethodProvider(paymentMethod) {
  */
 export async function processOrder(order, options) {
   const paymentMethodProvider = findPaymentMethodProvider(order.paymentMethod);
-  if (get(paymentMethodProvider, 'features.waitToCharge')) {
+  if (
+    get(paymentMethodProvider, 'features.waitToCharge') &&
+    !get(order, 'paymentMethod.paid')
+  ) {
     return;
   } else {
     return await paymentMethodProvider.processOrder(order, options);

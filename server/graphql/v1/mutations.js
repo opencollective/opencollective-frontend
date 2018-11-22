@@ -12,6 +12,7 @@ import {
   refundTransaction,
   addFundsToOrg,
   updateOrder,
+  markOrderAsPaid,
 } from './mutations/orders';
 import { createMember, removeMember } from './mutations/members';
 import { editTiers } from './mutations/tiers';
@@ -154,6 +155,15 @@ const mutations = {
     },
     resolve(_, args, req) {
       return payExpense(req.remoteUser, args.id, args.fee);
+    },
+  },
+  markOrderAsPaid: {
+    type: OrderType,
+    args: {
+      id: { type: new GraphQLNonNull(GraphQLInt) },
+    },
+    resolve(_, args, req) {
+      return markOrderAsPaid(req.remoteUser, args.id);
     },
   },
   createExpense: {
