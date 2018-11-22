@@ -1,4 +1,5 @@
 import url from 'url';
+import LRUCache from 'lru-cache';
 import { get, pick } from 'lodash';
 
 import { logger } from '../logger';
@@ -6,7 +7,7 @@ import { queryString } from '../lib/utils';
 import { fetchCollective, fetchMembers } from '../lib/graphql';
 
 // Cache the list of members of a collective to avoid requesting it for every single /:collectiveSlug/backers/:position/avatar
-const cache = require('lru-cache')({
+const cache = new LRUCache({
   max: 5000,
   maxAge: 1000 * 60 * 10,
 });
