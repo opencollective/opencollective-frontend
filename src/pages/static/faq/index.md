@@ -5,7 +5,7 @@
 - [for collectives](collectives)
 - [for submitting expenses and invoices to a collective](expenses)
 - [for backers](backers) (individuals and organizations)
-- [for host](hosts)
+- [for hosts](hosts)
 
 ### Where can I read more about Open Collective?
 
