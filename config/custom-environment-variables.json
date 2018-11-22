@@ -23,6 +23,9 @@
       "secret": "JWT_SECRET"
     }
   },
+  "cache": {
+    "middleware": "CACHE_MIDDLEWARE"
+  },
   "logs": {
     "accessLogs": "ACCESS_LOGS"
   },

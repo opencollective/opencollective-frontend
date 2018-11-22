@@ -11,7 +11,6 @@ import session from 'express-session';
 import helmet from 'helmet';
 import debug from 'debug';
 import cloudflareIps from 'cloudflare-ip/ips.json';
-import { get } from 'lodash';
 import { Strategy as GitHubStrategy } from 'passport-github';
 import { Strategy as TwitterStrategy } from 'passport-twitter';
 import { Strategy as MeetupStrategy } from 'passport-meetup-oauth2';
@@ -53,7 +52,7 @@ export default function(app) {
   }
 
   // Log requests if enabled (default false)
-  if (get(config, 'logs.accessLogs')) {
+  if (config.get('logs.accessLogs')) {
     app.use(morgan('combined'));
   }
 
@@ -89,7 +88,10 @@ export default function(app) {
   // Cors.
   app.use(cors());
 
-  app.use(cacheMiddleware());
+  // Cache Middleware
+  if (config.get('cache.middleware')) {
+    app.use(cacheMiddleware());
+  }
 
   app.use(multer());
 

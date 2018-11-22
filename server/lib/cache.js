@@ -3,7 +3,6 @@ import config from 'config';
 import debug from 'debug';
 import LRU from 'lru-cache';
 import memjs from 'memjs';
-import { get, has } from 'lodash';
 
 import models from '../models';
 
@@ -14,16 +13,16 @@ const lruCache = new LRU({ max: 1000 });
 const oneDayInSeconds = 60 * 60 * 24;
 
 let memcache;
-if (has(config, 'memcache.servers')) {
+if (config.has('memcache.servers')) {
   debugCache(
     'Memcache configuration detected, using memcache as cache backend.',
   );
   const options = {};
-  if (has(config, 'memcache.username') && has(config, 'memcache.password')) {
-    options.username = get(config, 'memcache.username');
-    options.password = get(config, 'memcache.password');
+  if (config.has('memcache.username') && config.has('memcache.password')) {
+    options.username = config.get('memcache.username');
+    options.password = config.get('memcache.password');
   }
-  memcache = memjs.Client.create(get(config, 'memcache.servers'), options);
+  memcache = memjs.Client.create(config.get('memcache.servers'), options);
 }
 
 async function cacheGet(key) {
