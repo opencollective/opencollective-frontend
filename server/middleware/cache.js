@@ -1,12 +1,17 @@
 import debug from 'debug';
+import LRUCache from 'lru-cache';
 
-import cache from '../lib/cache';
 import { hashCode } from '../lib/utils';
 import { EventEmitter } from 'events';
 
-const debugCache = debug('cache');
+const debugCache = debug('cacheMiddleware');
 
-const fiveSecondsInSeconds = 5;
+const fiveSecondsInMilliseconds = 5 * 1000;
+
+const cache = new LRUCache({
+  max: 1000,
+  maxAge: fiveSecondsInMilliseconds,
+});
 
 export default () => {
   /*
@@ -51,7 +56,7 @@ export default () => {
       } else {
         cached = new EventEmitter();
         cached.status = 'running';
-        cache.set(checksum, cached, fiveSecondsInSeconds);
+        cache.set(checksum, cached);
         req.cached = cached;
       }
     }
@@ -64,7 +69,7 @@ export default () => {
           req.cached.contentType = 'application/json; charset=utf-8';
         }
         req.cached.emit('finished');
-        debug('set cache', req.checksum, req.cached);
+        debugCache('set cache', req.checksum, req.cached);
         cache.set(req.checksum, req.cached);
       }
       temp.apply(this, arguments);
