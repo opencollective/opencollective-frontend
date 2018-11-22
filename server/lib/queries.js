@@ -566,11 +566,6 @@ const getCollectivesOrderedByMonthlySpendingQuery = async ({
   return { total, collectives };
 };
 
-const getCollectivesOrderedByMonthlySpending = memoize(
-  getCollectivesOrderedByMonthlySpendingQuery,
-  { key: 'collectives_ordered_by_monthly_spending', maxAge: twoHoursInSeconds },
-);
-
 const getMembersOfCollectiveWithRole = CollectiveIds => {
   const collectiveids =
     typeof CollectiveIds === 'number' ? [CollectiveIds] : CollectiveIds;
@@ -921,9 +916,34 @@ const getCollectivesWithMinBackersQuery = async ({
   return { total, collectives };
 };
 
+const serializeCollectivesResult = JSON.stringify;
+
+const unserializeCollectivesResult = string => {
+  const result = JSON.parse(string);
+  result.collectives = result.collectives.map(collective =>
+    models.Collective.build(collective),
+  );
+  return result;
+};
+
+const getCollectivesOrderedByMonthlySpending = memoize(
+  getCollectivesOrderedByMonthlySpendingQuery,
+  {
+    key: 'collectives_ordered_by_monthly_spending',
+    maxAge: twoHoursInSeconds,
+    serialize: serializeCollectivesResult,
+    unserialize: unserializeCollectivesResult,
+  },
+);
+
 const getCollectivesWithMinBackers = memoize(
   getCollectivesWithMinBackersQuery,
-  { key: 'collectives_with_min_backers', maxAge: twoHoursInSeconds },
+  {
+    key: 'collectives_with_min_backers',
+    maxAge: twoHoursInSeconds,
+    serialize: serializeCollectivesResult,
+    unserialize: unserializeCollectivesResult,
+  },
 );
 
 const queries = {

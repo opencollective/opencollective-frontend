@@ -25,14 +25,14 @@ if (config.has('memcache.servers')) {
   memcache = memjs.Client.create(config.get('memcache.servers'), options);
 }
 
-async function cacheGet(key) {
+async function cacheGet(key, { unserialize = JSON.parse } = {}) {
   debugCache(`get ${key}`);
   if (memcache) {
     const data = await memcache.get(key);
     if (data.value) {
       const value = data.value.toString();
       try {
-        return JSON.parse(value);
+        return unserialize(value);
       } catch (err) {
         debugCache(`Invalid JSON (${value}): ${err}`);
       }
@@ -42,12 +42,17 @@ async function cacheGet(key) {
   }
 }
 
-async function cacheSet(key, value, maxAgeInSeconds = 0) {
+async function cacheSet(
+  key,
+  value,
+  maxAgeInSeconds = 0,
+  { serialize = JSON.stringify } = {},
+) {
   debugCache(`set ${key}`);
   // debugCache(`set ${key} ${value}`);
   if (memcache) {
     if (value !== undefined) {
-      memcache.set(key, JSON.stringify(value), { expires: maxAgeInSeconds });
+      memcache.set(key, serialize(value), { expires: maxAgeInSeconds });
     }
   } else if (lruCache) {
     lruCache.set(key, value, maxAgeInSeconds * 1000);
@@ -98,23 +103,23 @@ export async function fetchCollectiveId(collectiveSlug) {
   return collective.id;
 }
 
-export function memoize(func, { key, maxAge = 0 }) {
+export function memoize(func, { key, maxAge = 0, serialize, unserialize }) {
   const cacheKey = args => {
     return args.length ? `${key}_${md5(JSON.stringify(args))}` : key;
   };
 
   const memoizedFunction = async function() {
-    let value = await cacheGet(cacheKey(arguments));
+    let value = await cacheGet(cacheKey(arguments), { unserialize });
     if (value === undefined) {
       value = await func(...arguments);
-      cacheSet(cacheKey(arguments), value, maxAge);
+      cacheSet(cacheKey(arguments), value, maxAge, { serialize });
     }
     return value;
   };
 
   memoizedFunction.refresh = async function() {
     const value = await func(...arguments);
-    cacheSet(cacheKey(arguments), value, maxAge);
+    cacheSet(cacheKey(arguments), value, maxAge, { serialize });
   };
 
   memoizedFunction.clear = async function() {

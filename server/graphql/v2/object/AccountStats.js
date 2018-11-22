@@ -1,4 +1,4 @@
-import { get } from 'lodash';
+import { get, has } from 'lodash';
 
 import { GraphQLInt, GraphQLObjectType } from 'graphql';
 
@@ -35,7 +35,7 @@ export const AccountStats = new GraphQLObjectType({
         type: Amount,
         resolve(collective) {
           // if we fetched the collective with the raw query to sort them by their monthly spending we don't need to recompute it
-          if (get(collective, 'dataValues.monthlySpending')) {
+          if (has(collective, 'dataValues.monthlySpending')) {
             return get(collective, 'dataValues.monthlySpending');
           } else {
             return collective.getMonthlySpending();
