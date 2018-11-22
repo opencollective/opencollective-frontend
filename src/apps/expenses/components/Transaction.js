@@ -60,6 +60,52 @@ class Transaction extends React.Component {
 
   state = { showDetails: false };
 
+  /**
+   * Render a link to the collective that made the transaction and show the
+   * gift card emitter if any has been used
+   */
+  renderPaymentOrigin() {
+    const { usingVirtualCardFromCollective, fromCollective, type } = this.props;
+
+    // If not using a VirtualCard, fromCollective will always represent the
+    // collective that made the payment.
+    if (!usingVirtualCardFromCollective) {
+      return (
+        <Link route="collective" params={{ slug: fromCollective.slug }}>
+          {fromCollective.name}
+        </Link>
+      );
+    }
+
+    // If using a VirtualCard and this is the debit transaction, `fromCollective`
+    // will point to the collective who received the money while `collective`
+    // will represent the collective (usually a user) who made the donation.
+    const isDebit = type === 'DEBIT';
+    const originCollective = isDebit ? this.props.collective : fromCollective;
+
+    return (
+      <span>
+        <Link route="collective" params={{ slug: originCollective.slug }}>
+          {originCollective.name}
+        </Link>{' '}
+        <FormattedMessage
+          id="transaction.usingGiftCardFrom"
+          defaultMessage="using a gift card from {collectiveLink}"
+          values={{
+            collectiveLink: (
+              <Link
+                route="collective"
+                params={{ slug: usingVirtualCardFromCollective.slug }}
+              >
+                {usingVirtualCardFromCollective.name}
+              </Link>
+            ),
+          }}
+        />
+      </span>
+    );
+  }
+
   render() {
     const {
       amount,
@@ -68,12 +114,10 @@ class Transaction extends React.Component {
       createdAt,
       currency,
       fromCollective,
-      usingVirtualCardFromCollective,
       collective,
       type,
       paymentProcessorFeeInHostCurrency,
     } = this.props;
-
     const amountToDisplay = ['ORGANIZATION', 'USER'].includes(collective.type)
       ? netAmountInCollectiveCurrency
       : amount;
@@ -108,26 +152,7 @@ class Transaction extends React.Component {
             <AmountCurrency amount={amountToDisplay} currency={currency} />
           </Flex>
           <Container fontSize="1.2rem" color="#AEB2B8">
-            <a href={`/${fromCollective.slug}`} title={fromCollective.name}>
-              {fromCollective.name}
-            </a>
-            {usingVirtualCardFromCollective && ' '}
-            {usingVirtualCardFromCollective && (
-              <FormattedMessage
-                id="transaction.usingGiftCardFrom"
-                defaultMessage="using a gift card from {collectiveLink}"
-                values={{
-                  collectiveLink: (
-                    <Link
-                      route="collective"
-                      params={{ slug: usingVirtualCardFromCollective.slug }}
-                    >
-                      {usingVirtualCardFromCollective.name}
-                    </Link>
-                  ),
-                }}
-              />
-            )}
+            {this.renderPaymentOrigin()}
             {' | '}
             <Moment relative={true} value={createdAt} />
             {paymentProcessorFeeInHostCurrency !== undefined && (
