@@ -1214,6 +1214,12 @@ export const OrderType = new GraphQLObjectType({
           return order.createdAt;
         },
       },
+      updatedAt: {
+        type: GraphQLString,
+        resolve(order) {
+          return order.updatedAt;
+        },
+      },
       // TODO: two fields below (isPastDue & isSubscriptionActive) an possibly be combined as one
       // Leaving them separate for now to make it easy for logged in vs logged out data
       isPastDue: {

@@ -478,6 +478,52 @@ const queries = {
   },
 
   /*
+   * Given a collective slug, returns all orders
+   */
+  allOrders: {
+    type: new GraphQLList(OrderType),
+    args: {
+      CollectiveId: { type: GraphQLInt },
+      collectiveSlug: { type: GraphQLString },
+      includeHostedCollectives: { type: GraphQLBoolean },
+      status: {
+        type: GraphQLString,
+        description:
+          'Filter by status (PAID, PENDING, ERROR, ACTIVE, CANCELLED)',
+      },
+      limit: { type: GraphQLInt },
+      offset: { type: GraphQLInt },
+    },
+    async resolve(_, args) {
+      const query = { where: {} };
+      const CollectiveId =
+        args.CollectiveId || (await fetchCollectiveId(args.collectiveSlug));
+      if (args.status) query.where.status = args.status;
+      if (args.category) query.where.category = { [Op.iLike]: args.category };
+      if (args.limit) query.limit = args.limit;
+      if (args.offset) query.offset = args.offset;
+      query.order = [['id', 'DESC']];
+      const getCollectiveIds = () => {
+        // if is host, we get all the orders across all the hosted collectives
+        if (args.includeHostedCollectives) {
+          return models.Member.findAll({
+            where: {
+              MemberCollectiveId: CollectiveId,
+              role: 'HOST',
+            },
+          }).map(member => member.CollectiveId);
+        } else {
+          return Promise.resolve([CollectiveId]);
+        }
+      };
+      return getCollectiveIds().then(collectiveIds => {
+        query.where.CollectiveId = { [Op.in]: collectiveIds };
+        return models.Order.findAll(query);
+      });
+    },
+  },
+
+  /*
    * Given a collective slug, returns all expenses
    */
   allExpenses: {
