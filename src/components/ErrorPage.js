@@ -16,6 +16,8 @@ class ErrorPage extends React.Component {
     data: PropTypes.object, // we can pass the data object of Apollo to detect and handle GraphQL errors
     intl: PropTypes.object.isRequired,
     LoggedInUser: PropTypes.object,
+    /** Define if error should be logged to console. Default: true */
+    log: PropTypes.bool,
   };
 
   constructor(props) {
@@ -50,9 +52,9 @@ class ErrorPage extends React.Component {
   }
 
   getErrorComponent() {
-    const { message, data, loading } = this.props;
+    const { message, data, loading, log = true } = this.props;
 
-    if (get(data, 'error')) {
+    if (log && get(data, 'error')) {
       if (data.error.message !== 'Test error') {
         // That might not be the right place to log the error. Remove?
         console.error(data.error);
