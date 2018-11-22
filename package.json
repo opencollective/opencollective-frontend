@@ -78,7 +78,7 @@
     "rehype-react": "3.1.0",
     "rehype-sanitize": "2.0.2",
     "remark-parse": "6.0.3",
-    "remark-rehype": "3.0.2",
+    "remark-rehype": "4.0.0",
     "request": "2.88.0",
     "sanitize-html": "1.19.1",
     "showdown": "1.9.0",
