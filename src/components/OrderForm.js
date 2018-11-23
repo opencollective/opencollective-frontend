@@ -1016,20 +1016,18 @@ class OrderForm extends React.Component {
               section="userDetails"
               subtitle={
                 <div>
-                  {order.tier.type !== 'TICKET' &&
-                    !LoggedInUser && (
-                      <FormattedMessage
-                        id="tier.order.userdetails.description"
-                        defaultMessage="If you wish to remain anonymous, only provide an email address without any other personal details."
-                      />
-                    )}
-                  {order.tier.type !== 'TICKET' &&
-                    LoggedInUser && (
-                      <FormattedMessage
-                        id="tier.order.userdetails.description.loggedin"
-                        defaultMessage="If you wish to remain anonymous, logout and use another email address without providing any other personal details."
-                      />
-                    )}
+                  {order.tier.type !== 'TICKET' && !LoggedInUser && (
+                    <FormattedMessage
+                      id="tier.order.userdetails.description"
+                      defaultMessage="If you wish to remain anonymous, only provide an email address without any other personal details."
+                    />
+                  )}
+                  {order.tier.type !== 'TICKET' && LoggedInUser && (
+                    <FormattedMessage
+                      id="tier.order.userdetails.description.loggedin"
+                      defaultMessage="If you wish to remain anonymous, logout and use another email address without providing any other personal details."
+                    />
+                  )}
                 </div>
               }
             />
@@ -1058,24 +1056,23 @@ class OrderForm extends React.Component {
                 </Row>
               ))}
 
-            {!requireLogin &&
-              this.fromCollectiveOptions.length > 1 && (
-                <InputField
-                  className="horizontal"
-                  type="select"
-                  label={intl.formatMessage(
-                    this.messages[
-                      order.tier.type === 'TICKET'
-                        ? 'order.rsvpAs'
-                        : 'order.contributeAs'
-                    ],
-                  )}
-                  name="fromCollectiveSelector"
-                  onChange={CollectiveId => this.selectProfile(CollectiveId)}
-                  options={this.fromCollectiveOptions}
-                  defaultValue={get(order, 'fromCollective.id')}
-                />
-              )}
+            {!requireLogin && this.fromCollectiveOptions.length > 1 && (
+              <InputField
+                className="horizontal"
+                type="select"
+                label={intl.formatMessage(
+                  this.messages[
+                    order.tier.type === 'TICKET'
+                      ? 'order.rsvpAs'
+                      : 'order.contributeAs'
+                  ],
+                )}
+                name="fromCollectiveSelector"
+                onChange={CollectiveId => this.selectProfile(CollectiveId)}
+                options={this.fromCollectiveOptions}
+                defaultValue={get(order, 'fromCollective.id')}
+              />
+            )}
 
             {!LoggedInUser &&
               this.state.isNewUser &&
@@ -1100,12 +1097,11 @@ class OrderForm extends React.Component {
               )}
           </section>
 
-          {!fromCollective.id &&
-            this.state.orgDetails.show && (
-              <CreateOrganizationForm
-                onChange={org => this.handleChange('fromCollective', org)}
-              />
-            )}
+          {!fromCollective.id && this.state.orgDetails.show && (
+            <CreateOrganizationForm
+              onChange={org => this.handleChange('fromCollective', org)}
+            />
+          )}
 
           {!requireLogin && (
             <div>
