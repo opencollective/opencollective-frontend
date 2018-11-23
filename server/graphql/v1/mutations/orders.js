@@ -390,7 +390,7 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
       await orderCreated.update({ SubscriptionId: subscription.id });
     } else if (collective.type === types.EVENT) {
       // Free ticket, mark as processed and add user as an ATTENDEE
-      await orderCreated.update({ processedAt: new Date() });
+      await orderCreated.update({ status: 'PAID', processedAt: new Date() });
       const UserId = remoteUser ? remoteUser.id : user.id;
       await collective.addUserWithRole(user, roles.ATTENDEE);
       await models.Activity.create({
