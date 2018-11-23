@@ -6,7 +6,7 @@ module.exports = {
       'Transactions',
       ['PaymentMethodId', 'type', 'deletedAt'],
       {
-        indexName: 'PaymentMethodId',
+        indexName: 'PaymentMethodId-type',
         indicesType: 'INDEX',
       },
     );
