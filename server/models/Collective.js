@@ -653,11 +653,18 @@ export default function(Sequelize, DataTypes) {
     if (this.getDataValue('image')) return this.image;
 
     const checkAndUpdateImage = image => {
-      return fetch(image).then(response => {
-        if (response.status === 200) {
-          return this.update({ image });
-        }
-      });
+      return fetch(image)
+        .then(response => {
+          if (response.status === 200) {
+            return this.update({ image });
+          }
+        })
+        .catch(e => {
+          console.error(
+            `models/Collective: checkAndUpdateImage> Unable to fetch the image ${image}`,
+            e,
+          );
+        });
     };
 
     if (this.type === 'ORGANIZATION' && this.website) {
