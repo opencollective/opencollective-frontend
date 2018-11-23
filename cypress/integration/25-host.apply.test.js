@@ -10,15 +10,16 @@ const fill = (fieldname, value) => {
 const init = (skip_signin = false) => {
   if (skip_signin) {
     cy.visit(
-      'http://localhost:3000/signin/eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzY29wZSI6ImxvZ2luIiwiaWQiOjk0NzQsImVtYWlsIjoidGVzdHVzZXIrYWRtaW5Ab3BlbmNvbGxlY3RpdmUuY29tIiwiaWF0IjoxNTE1NDA5ODkxLCJleHAiOjE1MTgwMDE4OTEsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6MzA2MCIsInN1YiI6OTQ3NH0.FdisGSpfUyCgVJaWnnV5hp_IhRfO4_27kDc6DcCwqcI?next=/brusselstogether/apply',
+      'http://localhost:3000/signin/eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzY29wZSI6ImxvZ2luIiwiaWQiOjk0NzQsImVtYWlsIjoidGVzdHVzZXIrYWRtaW5Ab3BlbmNvbGxlY3RpdmUuY29tIiwiaWF0IjoxNTE1NDA5ODkxLCJleHAiOjE1MTgwMDE4OTEsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6MzA2MCIsInN1YiI6OTQ3NH0.FdisGSpfUyCgVJaWnnV5hp_IhRfO4_27kDc6DcCwqcI?next=/brusselstogetherasbl/apply',
     );
   } else {
-    cy.visit(`${WEBSITE_URL}/brusselstogether`);
+    cy.visit(`${WEBSITE_URL}/brusselstogetherasbl`);
     cy.get('#hosting h1').contains('We are hosting 2 collectives');
     cy.get('.CollectiveCover button')
       .contains('Apply to create a collective')
       .click({ force: true });
-    fill('email', 'testuser+admin@opencollective.com');
+    cy.wait(500);
+    fill('email', 'testuser@opencollective.com');
     cy.get('.LoginForm button').click();
   }
 };
@@ -42,7 +43,7 @@ describe('apply to host', () => {
     cy.url().then(currentUrl => {
       const CollectiveId = currentUrl.match(/CollectiveId=([0-9]+)/)[1];
       return cy.visit(
-        `${WEBSITE_URL}/brusselstogether/collectives/${CollectiveId}/approve`,
+        `${WEBSITE_URL}/brusselstogetherasbl/collectives/${CollectiveId}/approve`,
       );
     });
     cy.get('.error .message').contains(
