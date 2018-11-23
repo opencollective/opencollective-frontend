@@ -598,6 +598,7 @@
   "contribution": "{n, plural, one {contribution} other {contributions}}",
   "tier.error.hostMissing": "Your collective needs a host before you can start accepting money.",
   "tier.error.collectiveInactive": "Your collective needs to be activated by your host before you can start accepting money.",
+  "tier.error.outOfStock": "This tier already ran out! ({availableQuantity} available out of {maxQuantity})",
   "tier.contribute": "contribute",
   "menu.homepage": "Go to Open Collective Homepage",
   "menu.discover": "Discover",
