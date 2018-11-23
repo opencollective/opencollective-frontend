@@ -19,6 +19,7 @@ import roles from '../../../constants/roles';
 import status from '../../../constants/order_status';
 import activities from '../../../constants/activities';
 import { types } from '../../../constants/collectives';
+import { executeOrder } from '../../../lib/payments';
 
 // Create Orders Store Object to limit FromCollective orders to up to 10 orders/hour
 const ordersLimitStore = LRU({
@@ -369,7 +370,11 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
     }
 
     if (paymentRequired) {
-      await orderCreated.setPaymentMethod(order.paymentMethod);
+      if (get(order, 'paymentMethod.type') === 'manual') {
+        orderCreated.paymentMethod = order.paymentMethod;
+      } else {
+        await orderCreated.setPaymentMethod(order.paymentMethod);
+      }
       // also adds the user as a BACKER of collective
       await libPayments.executeOrder(
         remoteUser || user,
@@ -473,7 +478,11 @@ export async function updateOrder(remoteUser, order) {
 
   if (paymentRequired) {
     existingOrder.interval = order.interval;
-    await existingOrder.setPaymentMethod(order.paymentMethod);
+    if (get(order, 'paymentMethod.type') === 'manual') {
+      existingOrder.paymentMethod = order.paymentMethod;
+    } else {
+      await existingOrder.setPaymentMethod(order.paymentMethod);
+    }
     // also adds the user as a BACKER of collective
     await libPayments.executeOrder(
       remoteUser,
@@ -730,4 +739,45 @@ export async function addFundsToOrg(args, remoteUser) {
     updatedAt: new Date(),
   });
   return paymentMethod;
+}
+
+export async function markOrderAsPaid(remoteUser, id) {
+  if (!remoteUser) {
+    throw new errors.Unauthorized();
+  }
+
+  // fetch the order
+  const order = await models.Order.findById(id);
+  if (!order) {
+    throw new errors.NotFound({ message: 'Order not found' });
+  }
+  if (order.status !== 'PENDING') {
+    throw new errors.ValidationFailed({
+      message: "The order's status must be PENDING",
+    });
+  }
+  const HostCollectiveId = await models.Collective.getHostCollectiveId(
+    order.CollectiveId,
+  );
+  if (!remoteUser.isAdmin(HostCollectiveId)) {
+    throw new errors.Unauthorized({
+      message:
+        'You must be logged in as an admin of the host of the collective',
+    });
+  }
+
+  order.paymentMethod = {
+    service: 'opencollective',
+    type: 'manual',
+    paid: true,
+  };
+  /**
+   * Takes care of:
+   * - creating the transactions
+   * - add backer as a BACKER in the Members table
+   * - send confirmation email
+   * - update order.status and order.processedAt
+   */
+  await executeOrder(remoteUser, order);
+  return order;
 }

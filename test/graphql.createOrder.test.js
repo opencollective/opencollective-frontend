@@ -77,11 +77,7 @@ const constants = Object.freeze({
 });
 
 describe('createOrder', () => {
-  let sandbox,
-    tweetStatusSpy,
-    fearlesscitiesbrussels,
-    emailSendMessageSpy,
-    hostCollective;
+  let sandbox, tweetStatusSpy, fearlesscitiesbrussels, emailSendMessageSpy;
 
   before(() => {
     nock('http://data.fixer.io')
@@ -117,10 +113,7 @@ describe('createOrder', () => {
     emailSendMessageSpy = sandbox.spy(emailLib, 'sendMessage');
 
     // Given a collective (with a host)
-    ({
-      fearlesscitiesbrussels,
-      hostCollective,
-    } = await store.newCollectiveWithHost(
+    ({ fearlesscitiesbrussels } = await store.newCollectiveWithHost(
       'fearlesscitiesbrussels',
       'EUR',
       'EUR',
@@ -201,20 +194,34 @@ describe('createOrder', () => {
     expect(res.data.createOrder.subscription.interval).to.equal('month');
   });
 
-  it('creates a pending order (pledge) if the collective is active and no payment method attached', async () => {
+  it('creates a pending order if the collective is active and the payment method type is manual', async () => {
+    const host = await models.Collective.create({
+      slug: 'host',
+      name: 'Open Collective 501c3',
+      settings: {
+        paymentMethods: {
+          manual: {
+            instructions:
+              'Please send a wire to XXXX with the mention: {collective} {tier} order: {OrderId} {unknownVariable}',
+          },
+        },
+      },
+    });
     const collective = await models.Collective.create({
-      slug: 'test',
+      slug: 'webpack',
       name: 'test',
       isActive: true,
     });
+    const tier = await models.Tier.create({
+      slug: 'backer',
+      name: 'best backer',
+      CollectiveId: collective.id,
+    });
+    await collective.addHost(host);
+    await collective.update({ isActive: true });
     const thisOrder = cloneDeep(baseOrder);
     delete thisOrder.paymentMethod;
-    const pm = await models.PaymentMethod.create({
-      service: 'opencollective',
-      type: 'manual',
-      CollectiveId: hostCollective.id,
-    });
-    thisOrder.paymentMethod = { uuid: pm.uuid };
+    thisOrder.paymentMethod = { type: 'manual' };
     thisOrder.collective.id = collective.id;
     thisOrder.user = {
       firstName: 'John',
@@ -222,16 +229,28 @@ describe('createOrder', () => {
       email: 'jsmith@email.com',
       twitterHandle: 'johnsmith',
     };
-
+    thisOrder.tier = { id: tier.id };
     const res = await utils.graphqlQuery(createOrderQuery, {
       order: thisOrder,
     });
+    res.errors && console.error(res.errors);
     expect(res.errors).to.not.exist;
     expect(res.data.createOrder.status).to.equal('PENDING');
     const transactionsCount = await models.Transaction.count({
       where: { OrderId: res.data.createOrder.id },
     });
     expect(transactionsCount).to.equal(0);
+    await utils.waitForCondition(() => emailSendMessageSpy.callCount > 1);
+    expect(emailSendMessageSpy.callCount).to.equal(2);
+    expect(emailSendMessageSpy.secondCall.args[0]).to.equal(
+      thisOrder.user.email,
+    );
+    expect(emailSendMessageSpy.secondCall.args[2]).to.match(
+      /Please send a wire to XXXX with the mention: webpack backer order: [0-9]+/,
+    );
+    expect(emailSendMessageSpy.secondCall.args[1]).to.equal(
+      'ACTION REQUIRED: your $1,543 donation to test is pending',
+    );
   });
 
   it('creates an order as new user and sends a tweet', async () => {
@@ -263,6 +282,7 @@ describe('createOrder', () => {
     const res = await utils.graphqlQuery(createOrderQuery, { order });
 
     // Then there should be no errors
+    res.errors && console.error(res.errors);
     expect(res.errors).to.not.exist;
 
     const fromCollective = res.data.createOrder.fromCollective;
