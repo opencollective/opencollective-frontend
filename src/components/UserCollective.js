@@ -358,11 +358,11 @@ class UserCollective extends React.Component {
             />
 
             <div>
-              {(get(query, 'status') === 'orderCreated' ||
-                get(query, 'status') === 'orderProcessing') && (
+              {get(query, 'OrderId') && (
                 <OrderCreated
                   order={order}
-                  type={query.type}
+                  paymentMethodType={query.paymentMethodType}
+                  collectiveType={query.collectiveType}
                   status={query.status}
                 />
               )}

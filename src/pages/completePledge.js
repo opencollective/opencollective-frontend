@@ -46,10 +46,11 @@ class CompletePledgePage extends React.Component {
 
       Router.pushRoute('collective', {
         slug: completedPledge.fromCollective.slug,
-        status: 'orderCreated',
+        status: completedPledge.status,
         CollectiveId: order.collective.id,
+        collectiveType: data.Order.collective.type,
+        OrderId: completedPledge.id,
         TierId: order.tier && order.tier.id,
-        type: data.Order.collective.type,
         totalAmount: order.totalAmount,
       });
     } catch (error) {

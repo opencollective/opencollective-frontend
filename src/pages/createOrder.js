@@ -195,13 +195,16 @@ class CreateOrderPage extends React.Component {
         const redirectTo = `${redirect}?transactionid=${transaction.id}`;
         window.location.href = redirectTo;
       } else {
-        Router.pushRoute('collective', {
+        await Router.pushRoute('collective', {
           slug: orderCreated.fromCollective.slug,
-          status: 'orderCreated',
+          status: orderCreated.status,
           CollectiveId: order.collective.id,
-          TierId: order.tier && order.tier.id,
-          type: data.Collective.type,
+          collectiveType: data.Collective.type,
+          OrderId: orderCreated.id,
+          TierId: get(order, 'tier.id'),
           totalAmount: order.totalAmount,
+          paymentMethodType: order.paymentMethod.type,
+        });
         });
       }
     } catch (e) {
