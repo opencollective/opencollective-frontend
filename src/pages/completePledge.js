@@ -106,13 +106,12 @@ class CompletePledgePage extends React.Component {
           <Container maxWidth={1200} px={4} py={5}>
             <H1>Complete Your Pledge</H1>
 
-            {!loadingUserLogin &&
-              !LoggedInUser && (
-                <Fragment>
-                  <p>You must be signed in to complete your pledge</p>
-                  <SignInForm />
-                </Fragment>
-              )}
+            {!loadingUserLogin && !LoggedInUser && (
+              <Fragment>
+                <p>You must be signed in to complete your pledge</p>
+                <SignInForm />
+              </Fragment>
+            )}
 
             {pledgeComplete && (
               <P fontWeight="bold" textAlign="center" mt={4}>

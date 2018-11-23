@@ -110,6 +110,11 @@ class Expense extends React.Component {
       view,
     } = this.props;
 
+    if (!expense.fromCollective) {
+      console.error('No FromCollective for expense', expense);
+      return <div />;
+    }
+
     const title = expense.description;
     const status = expense.status.toLowerCase();
 
@@ -350,21 +355,18 @@ class Expense extends React.Component {
                     </a>
                   </span>
                 )}
-              {mode !== 'edit' &&
-                view === 'list' && (
-                  <span>
-                    {' | '}
-                    <a className="toggleDetails" onClick={this.toggleDetails}>
-                      {intl.formatMessage(
-                        this.messages[
-                          `${
-                            mode === 'details' ? 'closeDetails' : 'viewDetails'
-                          }`
-                        ],
-                      )}
-                    </a>
-                  </span>
-                )}
+              {mode !== 'edit' && view === 'list' && (
+                <span>
+                  {' | '}
+                  <a className="toggleDetails" onClick={this.toggleDetails}>
+                    {intl.formatMessage(
+                      this.messages[
+                        `${mode === 'details' ? 'closeDetails' : 'viewDetails'}`
+                      ],
+                    )}
+                  </a>
+                </span>
+              )}
             </div>
           </div>
 
@@ -378,20 +380,19 @@ class Expense extends React.Component {
 
           {editable && (
             <div className="actions">
-              {mode === 'edit' &&
-                this.state.modified && (
-                  <div>
-                    <div className="leftColumn" />
-                    <div className="rightColumn">
-                      <SmallButton className="primary save" onClick={this.save}>
-                        <FormattedMessage
-                          id="expense.save"
-                          defaultMessage="save"
-                        />
-                      </SmallButton>
-                    </div>
+              {mode === 'edit' && this.state.modified && (
+                <div>
+                  <div className="leftColumn" />
+                  <div className="rightColumn">
+                    <SmallButton className="primary save" onClick={this.save}>
+                      <FormattedMessage
+                        id="expense.save"
+                        defaultMessage="save"
+                      />
+                    </SmallButton>
                   </div>
-                )}
+                </div>
+              )}
               {mode !== 'edit' &&
                 LoggedInUser &&
                 LoggedInUser.canApproveExpense(expense) && (
