@@ -1,13 +1,8 @@
+import config from 'config';
+
 import { memoize } from '../lib/cache';
 import queries from '../lib/queries';
 import models from '../models';
-
-const noCache = process.env.NO_CACHE;
-
-const oneHourInMilliseconds = 60 * 60 * 1000;
-
-const cacheRefreshInterval =
-  process.env.CACHE_REFRESH_INTERVAL || oneHourInMilliseconds;
 
 const homepageTags = ['open source', 'meetup'];
 
@@ -55,14 +50,14 @@ const refreshCache = () => {
 };
 
 // Update the cache now and every hour
-if (!noCache) {
+if (!config.cache.homepage.disabled) {
   refreshCache();
-  setInterval(refreshCache, cacheRefreshInterval);
+  setInterval(refreshCache, config.cache.homepage.refreshInterval * 1000);
 }
 
 export default (req, res, next) => {
   // We skip the cache when testing
-  if (noCache) {
+  if (config.cache.homepage.disabled) {
     clearCache();
   }
 

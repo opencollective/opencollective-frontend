@@ -1,14 +1,9 @@
+import config from 'config';
+
 import queries from './lib/queries';
 
-const noCache = process.env.NO_CACHE;
-
-const oneHourInMilliseconds = 60 * 60 * 1000;
-
-const cacheRefreshInterval =
-  process.env.CACHE_REFRESH_INTERVAL || oneHourInMilliseconds;
-
 // warming up the cache with the homepage queries
-const cacheEntries = [
+const cacheHomepageEntries = [
   {
     func: queries.getCollectivesOrderedByMonthlySpending,
     params: {
@@ -57,17 +52,20 @@ const cacheEntries = [
   },
 ];
 
-const refreshCache = async () => {
-  for (const entry of cacheEntries) {
+const cacheHomepageRefresh = async () => {
+  for (const entry of cacheHomepageEntries) {
     entry.func.refresh(entry.params);
   }
 };
 
 export default () => {
   console.log('Starting Background Jobs.');
-  if (!noCache) {
-    console.log('- starting refreshCache');
-    setInterval(refreshCache, cacheRefreshInterval);
-    refreshCache();
+  if (!config.cache.homepage.disabled) {
+    console.log('- starting cacheHomepageRefresh');
+    setInterval(
+      cacheHomepageRefresh,
+      config.cache.homepage.refreshInterval * 1000,
+    );
+    cacheHomepageRefresh();
   }
 };

@@ -24,7 +24,11 @@
     }
   },
   "cache": {
-    "middleware": "CACHE_MIDDLEWARE"
+    "middleware": "CACHE_MIDDLEWARE",
+    "homepage": {
+      "disabled": "CACHE_HOMEPAGE_DISABLED",
+      "refreshInterval": "CACHE_HOMEPAGE_REFRESH_INTERVAL"
+    }
   },
   "logs": {
     "accessLogs": "ACCESS_LOGS"
