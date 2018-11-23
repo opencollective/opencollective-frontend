@@ -14,6 +14,7 @@ import cloudflareIps from 'cloudflare-ip/ips.json';
 import { Strategy as GitHubStrategy } from 'passport-github';
 import { Strategy as TwitterStrategy } from 'passport-twitter';
 import { Strategy as MeetupStrategy } from 'passport-meetup-oauth2';
+import { get } from 'lodash';
 
 import forest from './forest';
 import cacheMiddleware from '../middleware/cache';
@@ -52,7 +53,7 @@ export default function(app) {
   }
 
   // Log requests if enabled (default false)
-  if (config.get('logs.accessLogs')) {
+  if (get(config, 'logs.accessLogs')) {
     app.use(morgan('combined'));
   }
 
@@ -89,7 +90,7 @@ export default function(app) {
   app.use(cors());
 
   // Cache Middleware
-  if (config.get('cache.middleware')) {
+  if (get(config, 'cache.middleware')) {
     app.use(cacheMiddleware());
   }
 

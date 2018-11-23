@@ -10,6 +10,7 @@ import pg from 'pg';
 import format from 'pg-format';
 import { promisify } from 'util';
 import { exec } from 'child_process';
+import { has, get } from 'lodash';
 
 /** Load a dump file into the current database.
  *
@@ -53,9 +54,11 @@ export async function loadDB(name) {
  *  defaults to 5432.
  */
 export function getDBConf(name) {
-  if (!config.has(name)) throw new Error(`Configuration missing key "${name}"`);
-  const { database, username, password } = config.get(name);
-  const { host, port } = config.get(`${name}.options`);
+  if (!has(config, name)) {
+    throw new Error(`Configuration missing key "${name}"`);
+  }
+  const { database, username, password } = get(config, name);
+  const { host, port } = get(config, [name, 'options']);
   return { database, username, password, host, port: port || 5432 };
 }
 
