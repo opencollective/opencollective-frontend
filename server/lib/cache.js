@@ -18,7 +18,7 @@ export async function fetchCollectiveId(collectiveSlug) {
 
   const collective = await models.Collective.findOne({
     attributes: ['id'],
-    where: { slug: collectiveSlug },
+    where: { slug: collectiveSlug.toLowerCase() },
   });
 
   debug('cache')(

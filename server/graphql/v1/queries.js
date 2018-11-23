@@ -889,14 +889,12 @@ const queries = {
       }
 
       if (args.collectiveSlug) {
-        args.CollectiveId = await fetchCollectiveId(
-          args.collectiveSlug.toLowerCase(),
-        );
+        args.CollectiveId = await fetchCollectiveId(args.collectiveSlug);
       }
 
       if (args.memberCollectiveSlug) {
         args.MemberCollectiveId = await fetchCollectiveId(
-          args.memberCollectiveSlug.toLowerCase(),
+          args.memberCollectiveSlug,
         );
       }
 
