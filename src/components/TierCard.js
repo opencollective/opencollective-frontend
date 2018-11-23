@@ -54,6 +54,11 @@ class TierCard extends React.Component {
         defaultMessage:
           'Your collective needs to be activated by your host before you can start accepting money.',
       },
+      'tier.error.outOfStock': {
+        id: 'tier.error.outOfStock',
+        defaultMessage:
+          'This tier already ran out! ({availableQuantity} available out of {maxQuantity})',
+      },
     });
   }
 
@@ -84,10 +89,20 @@ class TierCard extends React.Component {
               className="image"
               key={`${tier.slug}-fromCollective-${fromCollective.id}`}
             >
-              <Link route="collective" params={{ slug: fromCollective.slug }} passHref>
+              <Link
+                route="collective"
+                params={{ slug: fromCollective.slug }}
+                passHref
+              >
                 <a title={fromCollective.name}>
                   {fromCollectiveTypeArray.indexOf('USER') !== -1 && (
-                    <Avatar src={fromCollective.image} radius={32} type={fromCollective.type} name={fromCollective.name} ml="-15px" />
+                    <Avatar
+                      src={fromCollective.image}
+                      radius={32}
+                      type={fromCollective.type}
+                      name={fromCollective.name}
+                      ml="-15px"
+                    />
                   )}
                   {fromCollectiveTypeArray.indexOf('USER') === -1 && (
                     <Logo
@@ -111,16 +126,29 @@ class TierCard extends React.Component {
     const amount = tier.presets
       ? Math.min(tier.presets[0], tier.amount)
       : tier.amount;
-    const disabled = amount > 0 && !collective.isActive;
+    const disabled =
+      (amount > 0 && !collective.isActive) ||
+      tier.stats.availableQuantity === 0;
     const totalOrders = tier.stats.totalOrders;
     let errorMsg;
     if (!collective.host) {
       errorMsg = 'hostMissing';
     } else if (!collective.isActive) {
       errorMsg = 'collectiveInactive';
+    } else if (tier.stats.availableQuantity === 0) {
+      errorMsg = 'outOfStock';
     }
+
+    const formatValues = {
+      maxQuantity: tier.maxQuantity,
+      availableQuantity: tier.stats.availableQuantity,
+    };
+
     const tooltip = disabled
-      ? intl.formatMessage(this.messages[`tier.error.${errorMsg}`])
+      ? intl.formatMessage(
+          this.messages[`tier.error.${errorMsg}`],
+          formatValues,
+        )
       : '';
 
     const linkRoute = {
@@ -288,10 +316,7 @@ class TierCard extends React.Component {
           <div className="limited">
             <FormattedMessage
               id="tier.limited"
-              values={{
-                maxQuantity: tier.maxQuantity,
-                availableQuantity: tier.stats.availableQuantity,
-              }}
+              values={formatValues}
               defaultMessage="LIMITED: {availableQuantity} LEFT OUT OF {maxQuantity}"
             />
           </div>

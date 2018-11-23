@@ -594,6 +594,7 @@
   "contribution": "{n, plural, one {contribution} other {contributions}}",
   "tier.error.hostMissing": "Tu colectivo necesita un host para poder aceptar contribuciones.",
   "tier.error.collectiveInactive": "Tu colectivo necesita ser activado por tu host para poder recibir contribuciones.",
+  "tier.error.outOfStock": "This tier already ran out! ({availableQuantity} available out of {maxQuantity})",
   "tier.contribute": "contribuye",
   "menu.homepage": "Ir a la página de inicio deOpen Collective",
   "menu.discover": "descubrir",
