@@ -594,6 +594,7 @@
   "contribution": "{n, plural, one {contribution} other {contributions}}",
   "tier.error.hostMissing": "Your collective needs a host before you can start accepting money.",
   "tier.error.collectiveInactive": "Your collective needs to be activated by your host before you can start accepting money.",
+  "tier.error.outOfStock": "This tier already ran out! ({availableQuantity} available out of {maxQuantity})",
   "tier.contribute": "貢献する",
   "menu.homepage": "トップページに戻る",
   "menu.discover": "探す",
