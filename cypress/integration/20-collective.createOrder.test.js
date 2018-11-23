@@ -28,12 +28,42 @@ describe('collective.createOrder page', () => {
     cy.get('.submit button').click();
     cy.wait(6500);
     cy.location().should(location => {
-      expect(location.search).to.eq(
-        '?status=orderCreated&CollectiveId=43&type=COLLECTIVE&totalAmount=5000',
+      expect(location.search).to.match(
+        /\?status=PAID&CollectiveId=[0-9]+&collectiveType=COLLECTIVE&OrderId=[0-9]+&totalAmount=5000&paymentMethodType=creditcard/,
       );
     });
     cy.get('p.thankyou');
     cy.get('.message').contains('apex');
+  });
+
+  it('makes an order logged out as a new user with a manual payment method', () => {
+    const email = `testuser+${Math.round(Math.random() * 1000000)}@gmail.com`;
+    cy.visit(`${WEBSITE_URL}/veganizerbxl/donate/100`);
+    cy.get(".inputField textarea[name='publicMessage']").type('public message');
+    fill('email', email);
+    fill('firstName', 'Xavier');
+    fill('lastName', 'Damman');
+    fill('website', 'http://xdamman.com');
+    fill('twitterHandle', 'xdamman');
+    fill('description', 'short description');
+    cy.get('select[name="paymentMethodTypeSelector"]').select('manual');
+    cy.get('.manualPaymentMethod .instructions').contains(
+      'Instructions to make the payment of €100.00 will be sent to your email address',
+    );
+    cy.get('.manualPaymentMethod .instructions').contains(
+      'Your order will be pending until the funds have been received by the host (BrusselsTogether ASBL)',
+    );
+    cy.get('.submit button').click();
+    cy.wait(1000);
+    cy.location().should(location => {
+      expect(location.search).to.match(
+        /\?status=PENDING&CollectiveId=[0-9]+&collectiveType=COLLECTIVE&OrderId=[0-9]+&totalAmount=10000&paymentMethodType=manual/,
+      );
+    });
+    cy.get('p.thankyou');
+    cy.get('.message').contains(
+      'Your donation is pending. Please follow the instructions in the confirmation email to manually pay the host of the collective.',
+    );
   });
 
   it('makes an order logged out as a new user with a redirect url', () => {
@@ -49,15 +79,19 @@ describe('collective.createOrder page', () => {
     fill('twitterHandle', 'xdamman');
     fill('description', 'short description');
     cy.get('.submit button').click();
-    cy.wait(6500);
+    cy.wait(2500);
+    cy.get('.result .success').contains(
+      'Order processed successfully. Redirecting you to localhost...',
+    );
     cy.location().should(location => {
       expect(location.search).to.match(/\?transactionid=[0-9]+/);
     });
   });
 
   it('makes an order as a new organization', () => {
+    const email = `testuser+${Math.round(Math.random() * 1000000)}@gmail.com`;
     cy.visit(`${WEBSITE_URL}/apex/donate`);
-    cy.get('.inputField.email input').type('testuser@opencollective.com');
+    cy.get('.inputField.email input').type(email);
     cy.wait(400);
     cy.get('.actions .submit button').click();
     cy.get('.result .error').contains('Credit card missing');

@@ -35,8 +35,8 @@ describe('event.createOrder page', () => {
     cy.get('.OrderCreated').contains('Thank you for your RSVP! See you soon!');
     cy.get('.OrderCreated').contains('/opensource/events/webpack-webinar');
     cy.location().should(location => {
-      expect(location.search).to.eq(
-        '?status=orderCreated&CollectiveId=8735&TierId=78&type=EVENT&totalAmount=0',
+      expect(location.search).to.match(
+        /\?status=PAID&CollectiveId=[0-9]+&collectiveType=EVENT&OrderId=[0-9]+&TierId=[0-9]+&totalAmount=0/,
       );
     });
   });
