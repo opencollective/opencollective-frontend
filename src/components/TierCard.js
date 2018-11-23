@@ -89,10 +89,20 @@ class TierCard extends React.Component {
               className="image"
               key={`${tier.slug}-fromCollective-${fromCollective.id}`}
             >
-              <Link route="collective" params={{ slug: fromCollective.slug }} passHref>
+              <Link
+                route="collective"
+                params={{ slug: fromCollective.slug }}
+                passHref
+              >
                 <a title={fromCollective.name}>
                   {fromCollectiveTypeArray.indexOf('USER') !== -1 && (
-                    <Avatar src={fromCollective.image} radius={32} type={fromCollective.type} name={fromCollective.name} ml="-15px" />
+                    <Avatar
+                      src={fromCollective.image}
+                      radius={32}
+                      type={fromCollective.type}
+                      name={fromCollective.name}
+                      ml="-15px"
+                    />
                   )}
                   {fromCollectiveTypeArray.indexOf('USER') === -1 && (
                     <Logo
