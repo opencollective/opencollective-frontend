@@ -7,6 +7,7 @@ const createOrderQuery = gql`
     createOrder(order: $order) {
       id
       createdAt
+      status
       createdByUser {
         id
       }
