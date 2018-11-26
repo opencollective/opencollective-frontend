@@ -21,6 +21,10 @@ export const transactionFields = `
     name
     data
   }
+  collective {
+    slug
+    name
+  }
   fromCollective {
     id
     name
@@ -53,8 +57,8 @@ export const transactionFields = `
 
 /* eslint-disable graphql/template-strings, graphql/no-deprecated-fields, graphql/capitalized-type-name, graphql/named-operations */
 export const getTransactionsQuery = gql`
-query Transactions($CollectiveId: Int!, $type: String, $limit: Int, $offset: Int, $dateFrom: String, $dateTo: String) {
-  allTransactions(CollectiveId: $CollectiveId, type: $type, limit: $limit, offset: $offset, dateFrom: $dateFrom, dateTo: $dateTo) {
+query Transactions($CollectiveId: Int!, $type: String, $limit: Int, $offset: Int, $dateFrom: String, $dateTo: String, $includeVirtualCards: Boolean = false) {
+  allTransactions(CollectiveId: $CollectiveId, type: $type, limit: $limit, offset: $offset, dateFrom: $dateFrom, dateTo: $dateTo, includeVirtualCards: $includeVirtualCards) {
     ${transactionFields}
     refundTransaction {
       ${transactionFields}

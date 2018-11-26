@@ -67,6 +67,7 @@ export const addTransactionsData = graphql(getTransactionsQuery, {
         CollectiveId: props.collective.id,
         offset: 0,
         limit: props.limit || TRANSACTIONS_PER_PAGE * 2,
+        includeVirtualCards: true,
       },
     };
   },
