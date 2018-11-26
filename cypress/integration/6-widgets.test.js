@@ -5,7 +5,7 @@ const WEBSITE_URL =
 
 describe('widgets', () => {
   it('shows the collectives hosted by the host', () => {
-    cy.visit(`${WEBSITE_URL}/brusselstogether/collectives.html?role=host`);
+    cy.visit(`${WEBSITE_URL}/brusselstogetherasbl/collectives.html?role=host`);
     cy.get('.CollectiveCard')
       .its('length')
       .should('be.gt', 1);

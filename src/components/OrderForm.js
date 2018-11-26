@@ -53,9 +53,7 @@ class OrderForm extends React.Component {
       loginSent: false,
       user: {},
       fromCollective: {},
-      paymentMethod: {
-        type: 'creditcard',
-      },
+      paymentMethod: {},
       creditcard: {
         show: !this.props.redeemFlow,
         save: true,
@@ -716,7 +714,7 @@ class OrderForm extends React.Component {
         window.location.hostname === 'localhost');
 
     const { intl } = this.props;
-    const { order, user, creditcard } = this.state;
+    const { order, user, paymentMethod, creditcard } = this.state;
     const newState = { ...this.state };
 
     // validate email
@@ -755,7 +753,7 @@ class OrderForm extends React.Component {
     }
 
     // validate payment method
-    if (order.totalAmount > 0) {
+    if (order.totalAmount > 0 && paymentMethod.type !== 'manual') {
       if (creditcard.uuid && creditcard.uuid.length === 36) {
         newState.paymentMethod = { uuid: creditcard.uuid };
         this.setState(newState);
@@ -1018,20 +1016,18 @@ class OrderForm extends React.Component {
               section="userDetails"
               subtitle={
                 <div>
-                  {order.tier.type !== 'TICKET' &&
-                    !LoggedInUser && (
-                      <FormattedMessage
-                        id="tier.order.userdetails.description"
-                        defaultMessage="If you wish to remain anonymous, only provide an email address without any other personal details."
-                      />
-                    )}
-                  {order.tier.type !== 'TICKET' &&
-                    LoggedInUser && (
-                      <FormattedMessage
-                        id="tier.order.userdetails.description.loggedin"
-                        defaultMessage="If you wish to remain anonymous, logout and use another email address without providing any other personal details."
-                      />
-                    )}
+                  {order.tier.type !== 'TICKET' && !LoggedInUser && (
+                    <FormattedMessage
+                      id="tier.order.userdetails.description"
+                      defaultMessage="If you wish to remain anonymous, only provide an email address without any other personal details."
+                    />
+                  )}
+                  {order.tier.type !== 'TICKET' && LoggedInUser && (
+                    <FormattedMessage
+                      id="tier.order.userdetails.description.loggedin"
+                      defaultMessage="If you wish to remain anonymous, logout and use another email address without providing any other personal details."
+                    />
+                  )}
                 </div>
               }
             />
@@ -1060,24 +1056,23 @@ class OrderForm extends React.Component {
                 </Row>
               ))}
 
-            {!requireLogin &&
-              this.fromCollectiveOptions.length > 1 && (
-                <InputField
-                  className="horizontal"
-                  type="select"
-                  label={intl.formatMessage(
-                    this.messages[
-                      order.tier.type === 'TICKET'
-                        ? 'order.rsvpAs'
-                        : 'order.contributeAs'
-                    ],
-                  )}
-                  name="fromCollectiveSelector"
-                  onChange={CollectiveId => this.selectProfile(CollectiveId)}
-                  options={this.fromCollectiveOptions}
-                  defaultValue={get(order, 'fromCollective.id')}
-                />
-              )}
+            {!requireLogin && this.fromCollectiveOptions.length > 1 && (
+              <InputField
+                className="horizontal"
+                type="select"
+                label={intl.formatMessage(
+                  this.messages[
+                    order.tier.type === 'TICKET'
+                      ? 'order.rsvpAs'
+                      : 'order.contributeAs'
+                  ],
+                )}
+                name="fromCollectiveSelector"
+                onChange={CollectiveId => this.selectProfile(CollectiveId)}
+                options={this.fromCollectiveOptions}
+                defaultValue={get(order, 'fromCollective.id')}
+              />
+            )}
 
             {!LoggedInUser &&
               this.state.isNewUser &&
@@ -1102,12 +1097,11 @@ class OrderForm extends React.Component {
               )}
           </section>
 
-          {!fromCollective.id &&
-            this.state.orgDetails.show && (
-              <CreateOrganizationForm
-                onChange={org => this.handleChange('fromCollective', org)}
-              />
-            )}
+          {!fromCollective.id && this.state.orgDetails.show && (
+            <CreateOrganizationForm
+              onChange={org => this.handleChange('fromCollective', org)}
+            />
+          )}
 
           {!requireLogin && (
             <div>
@@ -1267,21 +1261,19 @@ class OrderForm extends React.Component {
                           __html: intl.formatMessage(
                             {
                               id: 'host.paymentMethod.manual.instructions',
-                              defaultMessage: get(
-                                collective.host,
-                                'settings.paymentMethods.manual.instructions',
-                              ),
+                              defaultMessage:
+                                'Instructions to make the payment of {amount} will be sent to your email address {email}. Your order will be pending until the funds have been received by the host ({host}).',
                             },
                             {
                               amount: formatCurrency(
                                 order.totalAmount,
                                 order.tier.currency,
                               ),
-                              email: get(this.state, 'user.email', '').replace(
-                                '@',
-                                ' at ',
-                              ),
+                              email:
+                                get(this.state, 'user.email', '') ||
+                                get(LoggedInUser, 'email', ''),
                               collective: collective.slug,
+                              host: get(collective, 'host.name'),
                               TierId: order.tier.id,
                             },
                           ),
@@ -1292,82 +1284,76 @@ class OrderForm extends React.Component {
                 </section>
               )}
 
-              {this.state.paymentMethod.type !== 'manual' && (
-                <Row key="summary-info">
-                  <Col sm={2} />
-                  <Col sm={10}>
-                    {order.totalAmount > 0 &&
-                      !collective.host && (
-                        <div className="error">
-                          <FormattedMessage
-                            id="order.error.hostRequired"
-                            defaultMessage="This collective doesn't have a host that can receive money on their behalf"
-                          />
+              <Row key="summary-info">
+                <Col sm={2} />
+                <Col sm={10}>
+                  {order.totalAmount > 0 && !collective.host && (
+                    <div className="error">
+                      <FormattedMessage
+                        id="order.error.hostRequired"
+                        defaultMessage="This collective doesn't have a host that can receive money on their behalf"
+                      />
+                    </div>
+                  )}
+
+                  {(collective.host || order.totalAmount === 0) &&
+                    !this.isPayPalSelected() && (
+                      <div className="actions">
+                        <div className="submit">
+                          <ActionButton
+                            className="blue"
+                            onClick={this.handleSubmit}
+                            disabled={this.state.loading}
+                          >
+                            {this.state.loading ? (
+                              <FormattedMessage
+                                id="form.processing"
+                                defaultMessage="processing"
+                              />
+                            ) : (
+                              order.tier.button ||
+                              capitalize(
+                                intl.formatMessage(
+                                  this.messages['order.button'],
+                                ),
+                              )
+                            )}
+                          </ActionButton>
+                          {this.state.loading && (
+                            <div className="pleasewait">
+                              <FormattedMessage
+                                id="pleasewait"
+                                defaultMessage="Please wait..."
+                              />
+                              ...
+                            </div>
+                          )}
                         </div>
-                      )}
 
-                    {(collective.host || order.totalAmount === 0) &&
-                      !this.isPayPalSelected() && (
-                        <div className="actions">
-                          <div className="submit">
-                            <ActionButton
-                              className="blue"
-                              onClick={this.handleSubmit}
-                              disabled={this.state.loading}
-                            >
-                              {this.state.loading ? (
-                                <FormattedMessage
-                                  id="form.processing"
-                                  defaultMessage="processing"
-                                />
-                              ) : (
-                                order.tier.button ||
-                                capitalize(
-                                  intl.formatMessage(
-                                    this.messages['order.button'],
-                                  ),
-                                )
-                              )}
-                            </ActionButton>
-                            {this.state.loading && (
-                              <div className="pleasewait">
-                                <FormattedMessage
-                                  id="pleasewait"
-                                  defaultMessage="Please wait..."
-                                />
-                                ...
-                              </div>
-                            )}
-                          </div>
+                        {order.totalAmount > 0 &&
+                          this.renderDisclaimer({
+                            hostname: collective.host.name,
+                            amount: formatCurrency(order.totalAmount, currency),
+                            interval: order.interval || order.tier.interval,
+                            collective: collective.name,
+                          })}
 
-                          {order.totalAmount > 0 &&
-                            this.renderDisclaimer({
-                              hostname: collective.host.name,
-                              amount: formatCurrency(
-                                order.totalAmount,
-                                currency,
-                              ),
-                              interval: order.interval || order.tier.interval,
-                              collective: collective.name,
-                            })}
-
-                          <div className="result">
-                            {this.state.result.success && (
-                              <div className="success">
-                                {this.state.result.success}
-                              </div>
-                            )}
-                            {this.state.result.error && (
-                              <div className="error">
-                                {this.state.result.error}
-                              </div>
-                            )}
-                          </div>
+                        <div className="result">
+                          {this.state.result.success && (
+                            <div className="success">
+                              {this.state.result.success}
+                            </div>
+                          )}
+                          {this.state.result.error && (
+                            <div className="error">
+                              {this.state.result.error}
+                            </div>
+                          )}
                         </div>
-                      )}
-                  </Col>
-                </Row>
-              )}
+                      </div>
+                    )}
+                </Col>
+              </Row>
             </div>
           )}
         </Form>

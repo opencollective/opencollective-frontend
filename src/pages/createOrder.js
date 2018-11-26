@@ -20,7 +20,7 @@ import storage from '../lib/storage';
 import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
 import withLoggedInUser from '../lib/withLoggedInUser';
-import { isValidUrl } from '../lib/utils';
+import { isValidUrl, getDomain } from '../lib/utils';
 
 class CreateOrderPage extends React.Component {
   static getInitialProps({
@@ -119,7 +119,12 @@ class CreateOrderPage extends React.Component {
       'payment.title': { id: 'tier.name.payment', defaultMessage: 'payment' },
       'order.success': {
         id: 'tier.order.success',
-        defaultMessage: 'order processed successfully',
+        defaultMessage: 'Order processed successfully',
+      },
+      'order.successRedirect': {
+        id: 'tier.order.successRedirect',
+        defaultMessage:
+          'Order processed successfully. Redirecting you to {domain}...',
       },
       'order.error': {
         id: 'tier.order.error',
@@ -182,27 +187,44 @@ class CreateOrderPage extends React.Component {
     }
     try {
       this.setState({ loading: true });
-      console.log('>>> createOrder', order);
       const res = await this.props.createOrder(order);
       const orderCreated = res.data.createOrder;
-      this.setState({
-        loading: false,
-        order,
-        result: { success: intl.formatMessage(this.messages['order.success']) },
-      });
       if (redirect && isValidUrl(redirect)) {
-        const transaction = orderCreated.transactions[0];
-        const redirectTo = `${redirect}?transactionid=${transaction.id}`;
+        const domain = getDomain(redirect);
+        this.setState({
+          loading: false,
+          order,
+          result: {
+            success: intl.formatMessage(
+              this.messages['order.successRedirect'],
+              { domain },
+            ),
+          },
+        });
+        const redirectTo = `${redirect}?transactionid=${get(
+          orderCreated,
+          'transactions[0].id',
+        )}&status=${orderCreated.status}`;
         window.location.href = redirectTo;
       } else {
-        Router.pushRoute('collective', {
+        await Router.pushRoute('collective', {
           slug: orderCreated.fromCollective.slug,
-          status: 'orderCreated',
+          status: orderCreated.status,
           CollectiveId: order.collective.id,
-          TierId: order.tier && order.tier.id,
-          type: data.Collective.type,
+          collectiveType: data.Collective.type,
+          OrderId: orderCreated.id,
+          TierId: get(order, 'tier.id'),
           totalAmount: order.totalAmount,
+          paymentMethodType: order.paymentMethod.type,
         });
+        this.setState({
+          loading: false,
+          order,
+          result: {
+            success: intl.formatMessage(this.messages['order.success']),
+          },
+        });
+        window.scrollTo(0, 0);
       }
     } catch (e) {
       console.error('>>> createOrder error: ', e);

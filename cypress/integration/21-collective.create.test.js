@@ -16,7 +16,7 @@ const init = (skip_signin = false) => {
     );
   } else {
     cy.visit(`${WEBSITE_URL}/create`);
-    fill('email', 'testuser+admin@opencollective.com');
+    fill('email', 'testuser@opencollective.com');
     cy.get('.LoginForm button').click();
   }
 };

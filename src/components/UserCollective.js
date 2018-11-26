@@ -358,11 +358,11 @@ class UserCollective extends React.Component {
             />
 
             <div>
-              {(get(query, 'status') === 'orderCreated' ||
-                get(query, 'status') === 'orderProcessing') && (
+              {get(query, 'OrderId') && (
                 <OrderCreated
                   order={order}
-                  type={query.type}
+                  paymentMethodType={query.paymentMethodType}
+                  collectiveType={query.collectiveType}
                   status={query.status}
                 />
               )}
@@ -370,22 +370,21 @@ class UserCollective extends React.Component {
               {/* Make sure we don't show an empty div.content if no description unless canEditCollective */}
               {(collective.longDescription || canEditCollective) && (
                 <div className="content">
-                  {isProfileEmpty &&
-                    canEditCollective && (
-                      <div className="message">
-                        <div className="editBtn">
-                          <Button
-                            onClick={() =>
-                              Router.pushRoute(`/${collective.slug}/edit`)
-                            }
-                          >
-                            {intl.formatMessage(
-                              this.messages[`${type}.collective.edit`],
-                            )}
-                          </Button>
-                        </div>
+                  {isProfileEmpty && canEditCollective && (
+                    <div className="message">
+                      <div className="editBtn">
+                        <Button
+                          onClick={() =>
+                            Router.pushRoute(`/${collective.slug}/edit`)
+                          }
+                        >
+                          {intl.formatMessage(
+                            this.messages[`${type}.collective.edit`],
+                          )}
+                        </Button>
                       </div>
-                    )}
+                    </div>
+                  )}
                   {collective.longDescription && (
                     <LongDescription
                       longDescription={collective.longDescription}
@@ -406,21 +405,20 @@ class UserCollective extends React.Component {
                       }
                     />
                   </h1>
-                  {LoggedInUser &&
-                    LoggedInUser.canEditCollective(collective) && (
-                      <div className="adminActions" id="adminActions">
-                        <ul>
-                          <li>
-                            <Link route={`/${collective.slug}/dashboard`}>
-                              <FormattedMessage
-                                id="host.dashboard"
-                                defaultMessage="Dashboard"
-                              />
-                            </Link>
-                          </li>
-                        </ul>
-                      </div>
-                    )}
+                  {LoggedInUser && LoggedInUser.canEditCollective(collective) && (
+                    <div className="adminActions" id="adminActions">
+                      <ul>
+                        <li>
+                          <Link route={`/${collective.slug}/dashboard`}>
+                            <FormattedMessage
+                              id="host.dashboard"
+                              defaultMessage="Dashboard"
+                            />
+                          </Link>
+                        </li>
+                      </ul>
+                    </div>
+                  )}
                   <div className="cardsList">
                     <CollectivesWithData
                       HostCollectiveId={collective.id}

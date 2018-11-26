@@ -6,6 +6,7 @@ import gql from 'graphql-tag';
 import { get } from 'lodash';
 
 import ExpensesWithData from '../apps/expenses/components/ExpensesWithData';
+import OrdersWithData from '../apps/expenses/components/OrdersWithData';
 import ExpensesStatsWithData from '../apps/expenses/components/ExpensesStatsWithData';
 
 import Header from '../components/Header';
@@ -18,6 +19,7 @@ import CollectivePicker from '../components/CollectivePickerWithData';
 import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
 import withLoggedInUser from '../lib/withLoggedInUser';
+import { FormattedMessage } from 'react-intl';
 
 class HostExpensesPage extends React.Component {
   static getInitialProps({ query: { hostCollectiveSlug } }) {
@@ -75,7 +77,30 @@ class HostExpensesPage extends React.Component {
               width: 50%;
               max-width: 75%;
             }
-
+            .columns {
+              display: flex;
+              max-width: 1080px;
+            }
+            .col {
+              width: 50%;
+              max-width: 488px;
+              min-width: 300px;
+            }
+            .col.first {
+              margin-right: 104px;
+            }
+            .col .header {
+              display: flex;
+              align-items: baseline;
+              justify-content: space-between;
+            }
+            h2 {
+              line-height: 24px;
+              color: black;
+              font-weight: 500;
+              font-size: 2rem;
+              margin-bottom: 4.8rem;
+            }
             @media (max-width: 600px) {
               .columns {
                 flex-direction: column-reverse;
@@ -115,14 +140,42 @@ class HostExpensesPage extends React.Component {
           )}
 
           <div className="content">
-            <div className="col large pullLeft">
-              <ExpensesWithData
-                collective={selectedCollective}
-                includeHostedCollectives={includeHostedCollectives}
-                LoggedInUser={this.state.LoggedInUser}
-                filters={true}
-                editable={true}
-              />
+            <div className="columns">
+              <div id="expenses" className="first col">
+                <div className="header">
+                  <h2>
+                    <FormattedMessage
+                      id="collective.expenses.title"
+                      values={{ n: this.totalExpenses }}
+                      defaultMessage="{n, plural, one {Latest expense} other {Latest expenses}}"
+                    />
+                  </h2>
+                </div>
+                <ExpensesWithData
+                  collective={selectedCollective}
+                  includeHostedCollectives={includeHostedCollectives}
+                  LoggedInUser={this.state.LoggedInUser}
+                  filters={true}
+                  editable={true}
+                />
+              </div>
+              <div id="orders" className="second col">
+                <div className="header">
+                  <h2>
+                    <FormattedMessage
+                      id="collective.orders.title"
+                      values={{ n: this.totalOrders }}
+                      defaultMessage="{n, plural, one {Latest order} other {Latest orders}}"
+                    />
+                  </h2>
+                </div>
+                <OrdersWithData
+                  collective={selectedCollective}
+                  includeHostedCollectives={includeHostedCollectives}
+                  filters={true}
+                  LoggedInUser={this.state.LoggedInUser}
+                />
+              </div>
             </div>
 
             {this.state.selectedCollective && (

@@ -1,5 +1,5 @@
 # source: http://localhost:3000/api/graphql
-# timestamp: Fri Nov 16 2018 09:53:26 GMT+0100 (Central European Standard Time)
+# timestamp: Fri Nov 23 2018 14:35:35 GMT+0800 (Central Indonesia Time)
 
 """Application model"""
 type Application {
@@ -734,6 +734,7 @@ type Mutation {
   approveExpense(id: Int!): ExpenseType
   rejectExpense(id: Int!): ExpenseType
   payExpense(id: Int!, fee: Int!): ExpenseType
+  markOrderAsPaid(id: Int!): OrderType
   createExpense(expense: ExpenseInputType!): ExpenseType
   editExpense(expense: ExpenseInputType!): ExpenseType
   deleteExpense(id: Int!): ExpenseType
@@ -884,6 +885,7 @@ input OrderInputType {
   fromCollective: CollectiveAttributesInputType
   collective: CollectiveAttributesInputType!
   tier: TierInputType
+  recaptchaToken: String
 }
 
 """Possible statuses for an Order"""
@@ -960,6 +962,7 @@ type OrderType {
   ): [Transaction]
   currency: String
   createdAt: String
+  updatedAt: String
 
   """Whether this subscription is past due or not"""
   isPastDue: Boolean
@@ -1080,7 +1083,7 @@ input PaymentMethodInputType {
   token: String
   service: String
 
-  """creditcard or bitcoin"""
+  """creditcard, bitcoin, prepaid, manual"""
   type: String
   customerId: String
   data: JSON
@@ -1168,6 +1171,16 @@ type Query {
   Application(id: Int): Application
   allComments(ExpenseId: Int, UpdateId: Int, limit: Int, offset: Int): [UpdateType]
   allUpdates(CollectiveId: Int!, includeHostedCollectives: Boolean, limit: Int, offset: Int): [UpdateType]
+  allOrders(
+    CollectiveId: Int
+    collectiveSlug: String
+    includeHostedCollectives: Boolean
+
+    """Filter by status (PAID, PENDING, ERROR, ACTIVE, CANCELLED)"""
+    status: String
+    limit: Int
+    offset: Int
+  ): [OrderType]
   allExpenses(CollectiveId: Int!, includeHostedCollectives: Boolean, status: String, category: String, FromCollectiveId: Int, fromCollectiveSlug: String, limit: Int, offset: Int): [ExpenseType]
   expenses(
     CollectiveId: Int
@@ -1332,7 +1345,13 @@ type Tier {
   endsAt: String
   collective: CollectiveInterface
   event: CollectiveInterface
-  orders(isActive: Boolean, limit: Int): [OrderType]
+  orders(
+    isActive: Boolean
+
+    """only return orders that have been processed (fulfilled)"""
+    isProcessed: Boolean
+    limit: Int
+  ): [OrderType]
   stats: TierStatsType
 }
 
