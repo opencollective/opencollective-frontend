@@ -59,6 +59,7 @@ describe('discover', () => {
           expect(body.sort).equal('most popular');
           expect(body.collectives).to.be.Array;
           expect(body.collectives.length).equal(2);
+          expect(body.total).equal(2);
           expect(ids.indexOf(collective1.id)).not.equal(-1);
           expect(ids.indexOf(collective2.id)).not.equal(-1);
           expect(ids[0]).equal(collective1.id); // Newest (created second)
@@ -78,6 +79,7 @@ describe('discover', () => {
           expect(body.sort).equal('most popular');
           expect(body.collectives).to.be.Array;
           expect(body.collectives.length).equal(1);
+          expect(body.total).equal(1);
           expect(ids.indexOf(collective1.id)).not.equal(-1);
           expect(ids.indexOf(collective2.id)).equal(-1);
           expect(ids[0]).equal(collective1.id);
@@ -96,6 +98,7 @@ describe('discover', () => {
           expect(body.sort).equal('most popular');
           expect(body.collectives).to.be.Array;
           expect(body.collectives.length).equal(1);
+          expect(body.total).equal(1);
           expect(ids.indexOf(collective1.id)).equal(-1);
           expect(ids.indexOf(collective2.id)).not.equal(-1);
           expect(ids[0]).equal(collective2.id);
@@ -113,6 +116,7 @@ describe('discover', () => {
           expect(body.sort).equal('most popular');
           expect(body.collectives).to.be.Array;
           expect(body.collectives.length).equal(0);
+          expect(body.total).equal(0);
           done();
         });
     });
@@ -128,6 +132,7 @@ describe('discover', () => {
           expect(body.sort).equal('newest');
           expect(body.collectives).to.be.Array;
           expect(body.collectives.length).equal(2);
+          expect(body.total).equal(2);
           expect(ids.indexOf(collective1.id)).not.equal(-1);
           expect(ids.indexOf(collective2.id)).not.equal(-1);
           expect(ids[0]).equal(collective2.id); // Newest (created last)
@@ -147,6 +152,7 @@ describe('discover', () => {
           expect(body.sort).equal('most popular');
           expect(body.collectives).to.be.Array;
           expect(body.collectives.length).equal(2);
+          expect(body.total).equal(2);
           expect(ids.indexOf(collective1.id)).not.equal(-1);
           expect(ids.indexOf(collective2.id)).not.equal(-1);
           expect(ids[0]).equal(collective1.id); // Most popular
