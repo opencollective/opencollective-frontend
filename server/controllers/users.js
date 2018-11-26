@@ -5,12 +5,6 @@ import emailLib from '../lib/email';
 import models from '../models';
 import errors from '../lib/errors';
 import { isValidEmail } from '../lib/utils';
-import LRU from 'lru-cache';
-
-const cache = LRU({
-  max: 1000,
-  maxAge: 1000 * 60 * 10, // we keep it max 10mn
-});
 
 const { User, Activity } = models;
 
@@ -60,21 +54,16 @@ export const _create = user =>
 /**
  * Check existence of a user based on email
  */
-export const exists = (req, res) => {
+export const exists = async (req, res) => {
   const email = req.query.email.toLowerCase();
   if (!isValidEmail(email)) {
     return res.send({ exists: false });
-  }
-  const exists = cache.get(email);
-  if (exists !== undefined) {
-    return res.send({ exists });
   } else {
-    return models.User.findOne({ attributes: ['id'], where: { email } }).then(
-      user => {
-        cache.set(email, Boolean(user));
-        return res.send({ exists: Boolean(user) });
-      },
-    );
+    const user = await models.User.findOne({
+      attributes: ['id'],
+      where: { email },
+    });
+    return res.send({ exists: Boolean(user) });
   }
 };
 
@@ -155,7 +144,6 @@ export const signin = (req, res, next) => {
   return models.User.findOne({ where: { email: user.email.toLowerCase() } })
     .then(u => u || models.User.createUserWithCollective(user))
     .then(u => {
-      cache.set(u.email, true);
       loginLink = u.generateLoginLink(redirect || '/');
       return emailLib.send(
         'user.new.token',

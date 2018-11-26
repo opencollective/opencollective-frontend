@@ -35,7 +35,7 @@ import { ApplicationType } from './Application';
 import { types } from '../../constants/collectives';
 import models, { Op } from '../../models';
 import roles from '../../constants/roles';
-import { get, sortBy } from 'lodash';
+import { get, has, sortBy } from 'lodash';
 
 export const TypeOfCollectiveType = new GraphQLEnumType({
   name: 'TypeOfCollective',
@@ -418,9 +418,11 @@ export const CollectiveStatsType = new GraphQLObjectType({
         type: GraphQLInt,
         resolve(collective) {
           // if we fetched the collective with the raw query to sort them by their monthly spending we don't need to recompute it
-          if (get(collective, 'dataValues.monthlySpending'))
+          if (has(collective, 'dataValues.monthlySpending')) {
             return get(collective, 'dataValues.monthlySpending');
-          return collective.getMonthlySpending();
+          } else {
+            return collective.getMonthlySpending();
+          }
         },
       },
       totalAmountSpent: {

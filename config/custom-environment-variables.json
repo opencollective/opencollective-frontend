@@ -11,11 +11,23 @@
       }
     }
   },
+  "memcache": {
+    "servers": "MEMCACHE_SERVERS",
+    "username": "MEMCACHE_USERNAME",
+    "password": "MEMCACHE_PASSWORD"
+  },
   "keys": {
     "opencollective": {
       "api_key": "API_KEY",
       "session_secret": "SESSION_SECRET",
       "secret": "JWT_SECRET"
+    }
+  },
+  "cache": {
+    "middleware": "CACHE_MIDDLEWARE",
+    "homepage": {
+      "disabled": "CACHE_HOMEPAGE_DISABLED",
+      "refreshInterval": "CACHE_HOMEPAGE_REFRESH_INTERVAL"
     }
   },
   "logs": {

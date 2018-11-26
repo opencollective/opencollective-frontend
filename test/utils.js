@@ -16,7 +16,7 @@ import userlib from '../server/lib/userlib';
 import schema from '../server/graphql/v1/schema';
 import { loaders } from '../server/graphql/loaders';
 import { sequelize } from '../server/models';
-import * as libcache from '../server/lib/cache';
+import cache from '../server/lib/cache';
 import * as libpayments from '../server/lib/payments';
 import * as stripeGateway from '../server/paymentProviders/stripe/gateway';
 import * as db_restore from '../scripts/db_restore';
@@ -45,7 +45,7 @@ export const clearbitStubBeforeEach = sandbox => {
 
 export const clearbitStubAfterEach = sandbox => sandbox.restore();
 
-export const resetCaches = () => libcache.clearCache();
+export const resetCaches = () => cache.clear();
 
 export const resetTestDB = () =>
   sequelize.sync({ force: true }).catch(e => {

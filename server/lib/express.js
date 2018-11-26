@@ -11,13 +11,13 @@ import session from 'express-session';
 import helmet from 'helmet';
 import debug from 'debug';
 import cloudflareIps from 'cloudflare-ip/ips.json';
-import { get } from 'lodash';
 import { Strategy as GitHubStrategy } from 'passport-github';
 import { Strategy as TwitterStrategy } from 'passport-twitter';
 import { Strategy as MeetupStrategy } from 'passport-meetup-oauth2';
+import { get } from 'lodash';
 
 import forest from './forest';
-import lruCache from '../middleware/lru_cache';
+import cacheMiddleware from '../middleware/cache';
 import { sequelize as db } from '../models';
 import { middleware } from '../graphql/loaders';
 import { sanitizeForLogs } from '../lib/utils';
@@ -89,7 +89,10 @@ export default function(app) {
   // Cors.
   app.use(cors());
 
-  app.use(lruCache());
+  // Cache Middleware
+  if (get(config, 'cache.middleware')) {
+    app.use(cacheMiddleware());
+  }
 
   app.use(multer());
 

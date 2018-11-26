@@ -1,15 +1,11 @@
-import Promise from 'bluebird';
+import config from 'config';
 
 import queries from './lib/queries';
 
-const useCache = ['production', 'staging'].includes(process.env.NODE_ENV);
-const CACHE_REFRESH_INTERVAL =
-  process.env.CACHE_REFRESH_INTERVAL || 1000 * 60 * 60;
-
 // warming up the cache with the homepage queries
-const cacheEntries = [
+const cacheHomepageEntries = [
   {
-    method: 'getCollectivesOrderedByMonthlySpending',
+    func: queries.getCollectivesOrderedByMonthlySpending,
     params: {
       type: 'COLLECTIVE',
       orderBy: 'monthlySpending',
@@ -20,7 +16,7 @@ const cacheEntries = [
     },
   },
   {
-    method: 'getCollectivesOrderedByMonthlySpending',
+    func: queries.getCollectivesOrderedByMonthlySpending,
     params: {
       type: 'ORGANIZATION',
       orderBy: 'monthlySpending',
@@ -31,7 +27,7 @@ const cacheEntries = [
     },
   },
   {
-    method: 'getCollectivesOrderedByMonthlySpending',
+    func: queries.getCollectivesOrderedByMonthlySpending,
     params: {
       type: 'USER',
       orderBy: 'monthlySpending',
@@ -42,7 +38,7 @@ const cacheEntries = [
     },
   },
   {
-    method: 'getCollectivesWithMinBackers',
+    func: queries.getCollectivesWithMinBackers,
     params: {
       type: 'COLLECTIVE',
       isActive: true,
@@ -56,18 +52,20 @@ const cacheEntries = [
   },
 ];
 
-const refreshCache = async () => {
-  Promise.each(cacheEntries, async entry => {
-    const res = queries[`${entry.method}Query`](entry.params);
-    queries[entry.method].cache.set(JSON.stringify(entry.params), res);
-  });
+const cacheHomepageRefresh = async () => {
+  for (const entry of cacheHomepageEntries) {
+    entry.func.refresh(entry.params);
+  }
 };
 
 export default () => {
   console.log('Starting Background Jobs.');
-  if (useCache) {
-    console.log('- starting refreshCache');
-    setInterval(refreshCache, CACHE_REFRESH_INTERVAL);
-    refreshCache();
+  if (!config.cache.homepage.disabled) {
+    console.log('- starting cacheHomepageRefresh');
+    setInterval(
+      cacheHomepageRefresh,
+      config.cache.homepage.refreshInterval * 1000,
+    );
+    cacheHomepageRefresh();
   }
 };

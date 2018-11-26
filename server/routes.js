@@ -28,7 +28,6 @@ import ifParam from './middleware/if_param';
 import * as aN from './middleware/security/authentication';
 import * as auth from './middleware/security/auth';
 import errorHandler from './middleware/error_handler';
-import cache from './middleware/cache';
 import * as params from './middleware/params';
 import errors from './lib/errors';
 import { formatError } from 'apollo-errors';
@@ -42,6 +41,14 @@ import { ApolloServer } from 'apollo-server-express';
 
 import graphqlSchemaV1 from './graphql/v1/schema';
 import graphqlSchemaV2 from './graphql/v2/schema';
+
+const cacheControlMaxAge = maxAge => {
+  maxAge = maxAge || 5;
+  return (req, res, next) => {
+    res.setHeader('Cache-Control', `public, max-age=${maxAge}`);
+    next();
+  };
+};
 
 /**
  * NotImplemented response.
@@ -249,12 +256,12 @@ export default app => {
   app.get('/groups/:collectiveid', collectives.getOne);
   app.get(
     '/groups/:collectiveid/:tierSlug(backers|users)',
-    cache(60),
+    cacheControlMaxAge(60),
     collectives.getUsers,
   ); // Get collective backers
   app.get(
     '/groups/:collectiveid/:tierSlug(backers|users).csv',
-    cache(60),
+    cacheControlMaxAge(60),
     mw.format('csv'),
     collectives.getUsers,
   );

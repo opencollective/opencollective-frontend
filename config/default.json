@@ -14,6 +14,13 @@
       "logging": false
     }
   },
+  "cache": {
+    "middleware": false,
+    "homepage": {
+      "disabled": false,
+      "refreshInterval": 3600
+    }
+  },
   "logs": {
     "accessLogs": false
   },
