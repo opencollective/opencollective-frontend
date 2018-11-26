@@ -35,7 +35,7 @@ import { ApplicationType } from './Application';
 import { types } from '../../constants/collectives';
 import models, { Op } from '../../models';
 import roles from '../../constants/roles';
-import { get } from 'lodash';
+import { get, sortBy } from 'lodash';
 
 export const TypeOfCollectiveType = new GraphQLEnumType({
   name: 'TypeOfCollective',
@@ -70,6 +70,16 @@ export const CollectiveOrderFieldType = new GraphQLEnumType({
     },
     updatedAt: {
       description: 'Order collectives by updated time.',
+    },
+  },
+});
+
+export const PaymentMethodOrderFieldType = new GraphQLEnumType({
+  name: 'PaymenMethodOrderField',
+  description: 'Properties by which PaymenMethods can be ordered',
+  values: {
+    type: {
+      description: 'Order payment methods by type (creditcard, virtualcard...)',
     },
   },
 });
@@ -657,6 +667,11 @@ export const CollectiveInterfaceType = new GraphQLInterfaceType({
             type: new GraphQLList(GraphQLString),
             description: 'Filter on given types (creditcard, virtualcard...)',
           },
+          orderBy: {
+            type: PaymentMethodOrderFieldType,
+            description:
+              'Order entries based on given column. Set to null for no ordering.',
+          },
         },
       },
       connectedAccounts: { type: new GraphQLList(ConnectedAccountType) },
@@ -1191,6 +1206,10 @@ const CollectiveFields = () => {
         hasBalanceAboveZero: { type: GraphQLBoolean },
         isConfirmed: { type: GraphQLBoolean, defaultValue: true },
         types: { type: new GraphQLList(GraphQLString) },
+        orderBy: {
+          type: PaymentMethodOrderFieldType,
+          defaultValue: 'type',
+        },
       },
       async resolve(collective, args, req) {
         if (!req.remoteUser || !req.remoteUser.isAdmin(collective.id))
@@ -1228,6 +1247,10 @@ const CollectiveFields = () => {
         if (args.limit) {
           paymentMethods = paymentMethods.slice(0, args.limit);
         }
+        if (args.orderBy) {
+          paymentMethods = sortBy(paymentMethods, args.orderBy);
+        }
+
         return paymentMethods;
       },
     },
