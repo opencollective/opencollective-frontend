@@ -29,6 +29,15 @@
     "webapp": "http://localhost:3000/app",
     "website": "http://localhost:3000"
   },
+  "limits": {
+    "ordersPerHour": {
+      "perAccount": 10,
+      "perAccountForCollective": 2,
+      "perEmail": 10,
+      "perEmailForCollective": 2,
+      "perIp": 5
+    }
+  },
   "email": {
     "from": "Open Collective <info@opencollective.com>"
   },
