@@ -43,8 +43,19 @@ pages
     '/:parentCollectiveSlug?/:collectiveType(events)?/:collectiveSlug/:table(expenses)/:id/:action(approve|reject)',
     'action',
   )
-  .add('host.collectives.approve', '/:hostCollectiveSlug/:table(collectives)/:id/:action(approve)', 'action')
-  .add('transactions', '/:parentCollectiveSlug?/:collectiveType(events)?/:collectiveSlug/transactions')
+  .add(
+    'host.collectives.approve',
+    '/:hostCollectiveSlug/:table(collectives)/:id/:action(approve)',
+    'action',
+  )
+  .add(
+    'transactions',
+    '/:parentCollectiveSlug?/:collectiveType(events)?/:collectiveSlug/transactions',
+  )
+  .add(
+    'transactionsOld',
+    '/:parentCollectiveSlug?/:collectiveType(events)?/:collectiveSlug/transactionsOld',
+  )
   .add('createUpdate', '/:collectiveSlug/updates/new')
   .add('updates', '/:collectiveSlug/updates')
   .add('update', '/:collectiveSlug/updates/:updateSlug')
