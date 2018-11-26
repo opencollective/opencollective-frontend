@@ -67,6 +67,18 @@ query Transactions($CollectiveId: Int!, $type: String, $limit: Int, $offset: Int
   }
 }
 `;
+
+/* eslint-disable graphql/template-strings, graphql/no-deprecated-fields, graphql/capitalized-type-name, graphql/named-operations */
+export const getOldTransactionsQuery = gql`
+query Transactions($CollectiveId: Int!, $type: String, $limit: Int, $offset: Int, $dateFrom: String, $dateTo: String) {
+  allTransactionsOld(CollectiveId: $CollectiveId, type: $type, limit: $limit, offset: $offset, dateFrom: $dateFrom, dateTo: $dateTo) {
+    ${transactionFields}
+    refundTransaction {
+      ${transactionFields}
+    }
+  }
+}
+`;
 /* eslint-enable graphql/template-strings, graphql/no-deprecated-fields, graphql/capitalized-type-name, graphql/named-operations */
 
 export const getLoggedInUserQuery = gql`
