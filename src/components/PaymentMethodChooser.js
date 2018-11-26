@@ -5,6 +5,7 @@ import { defineMessages } from 'react-intl';
 import withIntl from '../lib/withIntl';
 import InputField from './InputField';
 import { getStripeToken } from '../lib/stripe';
+import { paymentMethodLabelWithIcon } from '../lib/payment_method_label';
 
 import SmallButton from './SmallButton';
 
@@ -40,7 +41,7 @@ class PaymentMethodChooser extends React.Component {
     this.messages = defineMessages({
       'paymentMethod.add': {
         id: 'paymentMethod.add',
-        defaultMessage: 'Add credit card',
+        defaultMessage: 'New Credit Card',
       },
       'paymentMethod.save': { id: 'save', defaultMessage: 'save' },
       'paymentMethod.cancel': {
@@ -63,10 +64,6 @@ class PaymentMethodChooser extends React.Component {
         id: 'paymentMethod.whyUnknown',
         defaultMessage:
           "This subscription was created using an early version of our site when we didn't store credit card numbers. We suggest that you update this subscription with a newer credit card.",
-      },
-      'paymentMethod.cardUnavailable': {
-        id: 'paymentMethod.cardUnavailable',
-        defaultMessage: '(credit card info not available)',
       },
     });
   }
@@ -178,38 +175,6 @@ class PaymentMethodChooser extends React.Component {
     await this.props.onSubmit(card);
   }
 
-  generatePMString(pm) {
-    const { intl } = this.props;
-
-    if (pm.service === 'opencollective') {
-      return `${pm.name} (${pm.service} ${pm.type})`;
-    }
-
-    const defaultString = intl.formatMessage(
-      this.messages['paymentMethod.cardUnavailable'],
-    );
-
-    if (!pm.name || !pm.data) return defaultString;
-
-    const pmData = Object.assign({}, pm.data);
-    // Deal with long names
-    if (pmData.brand.toLowerCase() === 'american express') {
-      pmData.brand = 'AMEX';
-    } else if (pmData.brand.length > 10) {
-      pmData.brand = `${pmData.brand.slice(0, 8)}...`;
-    }
-
-    const expiryString =
-      pmData.expMonth && pmData.expYear
-        ? ` (${intl.formatMessage(this.messages['paymentMethod.expire'])}: ${
-            pmData.expMonth
-          }/${pmData.expYear})`
-        : '';
-
-    return `💳 \xA0\xA0${pmData.brand.toUpperCase()} ***${pm.name ||
-      pmData.last4}${expiryString}`;
-  }
-
   populatePaymentMethods() {
     const { intl } = this.props;
     let paymentMethods = [],
@@ -218,10 +183,8 @@ class PaymentMethodChooser extends React.Component {
     const generateOptions = paymentMethods => {
       return paymentMethods.map(pm => {
         const value = pm.uuid;
-        const label = this.generatePMString(pm);
-        const option = {};
-        option[value] = label;
-        return option;
+        const label = paymentMethodLabelWithIcon(intl, pm);
+        return { [value]: label };
       });
     };
 
@@ -231,7 +194,9 @@ class PaymentMethodChooser extends React.Component {
     paymentMethodsOptions = generateOptions(paymentMethods);
 
     paymentMethodsOptions.push({
-      add: intl.formatMessage(this.messages['paymentMethod.add']),
+      add: `➕\xA0\xA0${intl.formatMessage(
+        this.messages['paymentMethod.add'],
+      )}`,
     });
 
     return paymentMethodsOptions;
@@ -240,7 +205,8 @@ class PaymentMethodChooser extends React.Component {
   render() {
     const { intl } = this.props;
 
-    const paymentMethodString = this.generatePMString(
+    const paymentMethodString = paymentMethodLabelWithIcon(
+      intl,
       this.props.paymentMethodInUse,
     );
 
