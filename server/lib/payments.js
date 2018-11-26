@@ -79,12 +79,20 @@ export async function processOrder(order, options) {
   }
 }
 
-export async function updateOrderStatus(order, transaction) {
+/**
+ * If the transaction is not null, this function will mark the order as
+ * paid and will ensure the payment method used for it does not belong
+ * to the order referral. If it does, the field will be nulled.
+ */
+export async function updateOrderWithTransaction(order, transaction) {
   if (transaction) {
-    await order.update({
-      status: status.PAID,
-      processedAt: new Date(),
-    });
+    const updateParams = { status: status.PAID, processedAt: new Date() };
+    const pmEmitterId = transaction.UsingVirtualCardFromCollectiveId;
+    if (pmEmitterId && pmEmitterId === order.ReferralCollectiveId) {
+      updateParams.ReferralCollectiveId = null;
+    }
+
+    await order.update(updateParams);
   }
 }
 
@@ -358,7 +366,7 @@ export const executeOrder = async (user, order, options) => {
 
   const transaction = await processOrder(order, options);
   order.matchingFund && (await processMatchingFund(order, options));
-  transaction && (await updateOrderStatus(order, transaction));
+  transaction && (await updateOrderWithTransaction(order, transaction));
 
   // Register user as collective backer
   await addBackerToCollective(
