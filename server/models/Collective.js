@@ -1944,7 +1944,7 @@ export default function(Sequelize, DataTypes) {
       true,
       orderBy,
       orderDir,
-    );
+    ).then(({ collectives }) => collectives);
   };
 
   // get the host of the parent collective if any, or of this collective
@@ -2049,7 +2049,7 @@ export default function(Sequelize, DataTypes) {
         [this.id],
         0,
         false,
-      );
+      ).then(({ collectives }) => collectives);
     }
     return Promise.resolve();
   };
@@ -2197,7 +2197,7 @@ export default function(Sequelize, DataTypes) {
         orderDir,
         offset,
       )
-      .then(collectives => {
+      .then(({ collectives, total }) => {
         debug(
           'getCollectivesSummaryByTag',
           collectives && collectives.length,
@@ -2246,7 +2246,10 @@ export default function(Sequelize, DataTypes) {
               return collectiveInfo;
             });
           }),
-        );
+        ).then(allCollectives => ({
+          total,
+          collectives: allCollectives,
+        }));
       });
   };
 
