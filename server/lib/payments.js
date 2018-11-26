@@ -48,17 +48,15 @@ export function isProvider(fqn, paymentMethod) {
  * @return the payment method's JS module.
  */
 export function findPaymentMethodProvider(paymentMethod) {
-  const provider = paymentMethod ? paymentMethod.service : 'manual';
-  const methodType = paymentMethod.type || 'default';
+  const provider = get(paymentMethod, 'service') || 'opencollective';
+  const methodType = get(paymentMethod, 'type') || 'default';
   let paymentMethodProvider = paymentProviders[provider];
   if (!paymentMethodProvider) {
-    throw new Error(`No payment provider found for ${this.service}`);
+    throw new Error(`No payment provider found for ${provider}`);
   }
   paymentMethodProvider = paymentMethodProvider.types[methodType]; // eslint-disable-line import/namespace
   if (!paymentMethodProvider) {
-    throw new Error(
-      `No payment provider found for ${this.service}:${this.type}`,
-    );
+    throw new Error(`No payment provider found for ${provider}:${methodType}`);
   }
   return paymentMethodProvider;
 }
@@ -71,8 +69,11 @@ export function findPaymentMethodProvider(paymentMethod) {
  */
 export async function processOrder(order, options) {
   const paymentMethodProvider = findPaymentMethodProvider(order.paymentMethod);
-  if (get(paymentMethodProvider, 'features.waitToCharge')) {
-    return sendOrderProcessingEmail(order, options);
+  if (
+    get(paymentMethodProvider, 'features.waitToCharge') &&
+    !get(order, 'paymentMethod.paid')
+  ) {
+    return;
   } else {
     return await paymentMethodProvider.processOrder(order, options);
   }
@@ -485,24 +486,36 @@ const sendSupportEmailForManualIntervention = order => {
 };
 
 // Assumes one-time payments,
-const sendOrderProcessingEmail = order => {
+const sendOrderProcessingEmail = async order => {
   const { collective, fromCollective } = order;
   const user = order.createdByUser;
-
-  return emailLib.send(
-    'order.processing',
-    user.email,
-    {
-      order: order.info,
-      user: user.info,
-      collective: collective.info,
-      fromCollective: fromCollective.minimal,
-      subscriptionsLink: user.generateLoginLink(
-        `/${fromCollective.slug}/subscriptions`,
-      ),
-    },
-    {
-      from: `${collective.name} <hello@${collective.slug}.opencollective.com>`,
-    },
-  );
+  const host = await collective.getHostCollective();
+  const data = {
+    order: order.info,
+    user: user.info,
+    collective: collective.info,
+    host: host.info,
+    fromCollective: fromCollective.minimal,
+    subscriptionsLink: user.generateLoginLink(
+      `/${fromCollective.slug}/subscriptions`,
+    ),
+  };
+  const instructions = get(host, 'settings.paymentMethods.manual.instructions');
+  if (instructions) {
+    const formatValues = {
+      orderid: order.id,
+      collective: order.collective.slug,
+      tier: get(order, 'tier.slug') || get(order, 'tier.name'),
+    };
+    data.instructions = instructions.replace(/{([\s\S]+?)}/g, (match, p1) => {
+      if (p1) {
+        const key = p1.toLowerCase();
+        if (formatValues[key]) return formatValues[key];
+      }
+      return match;
+    });
+  }
+  return emailLib.send('order.processing', user.email, data, {
+    from: `${collective.name} <hello@${collective.slug}.opencollective.com>`,
+  });
 };

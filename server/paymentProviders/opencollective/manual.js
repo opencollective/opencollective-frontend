@@ -23,14 +23,25 @@ async function getBalance() {
  */
 async function processOrder(order) {
   // gets the Credit transaction generated
-  const payload = pick(order, ['CreatedByUserId', 'FromCollectiveId', 'CollectiveId', 'PaymentMethodId']);
+  const payload = pick(order, [
+    'CreatedByUserId',
+    'FromCollectiveId',
+    'CollectiveId',
+    'PaymentMethodId',
+  ]);
   const host = await order.collective.getHostCollective();
 
   if (host.currency !== order.currency) {
-    throw Error(`Cannot manually record a transaction in a different currency than the currency of the host ${host.currency}`);
+    throw Error(
+      `Cannot manually record a transaction in a different currency than the currency of the host ${
+        host.currency
+      }`,
+    );
   }
 
-  const hostFeeInHostCurrency = -(Math.round(order.collective.hostFeePercent * order.totalAmount));
+  const hostFeeInHostCurrency = -Math.round(
+    (order.collective.hostFeePercent / 100) * order.totalAmount,
+  );
   const platformFeeInHostCurrency = 0;
   const paymentProcessorFeeInHostCurrency = 0;
 
@@ -41,7 +52,8 @@ async function processOrder(order) {
     currency: order.currency,
     hostCurrency: host.currency,
     hostCurrencyFxRate: 1,
-    netAmountInCollectiveCurrency: order.totalAmount - hostFeeInHostCurrency - platformFeeInHostCurrency,
+    netAmountInCollectiveCurrency:
+      order.totalAmount - hostFeeInHostCurrency - platformFeeInHostCurrency,
     amountInHostCurrency: order.totalAmount,
     hostFeeInHostCurrency,
     platformFeeInHostCurrency,
