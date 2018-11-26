@@ -53,7 +53,9 @@ class OrderForm extends React.Component {
       loginSent: false,
       user: {},
       fromCollective: {},
-      paymentMethod: {},
+      paymentMethod: {
+        type: 'creditcard',
+      },
       creditcard: {
         show: !this.props.redeemFlow,
         save: true,
