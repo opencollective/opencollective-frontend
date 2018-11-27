@@ -48,14 +48,9 @@ class EditCollective extends React.Component {
     }
 
     if (typeof CollectiveInputType.tags === 'string') {
-      CollectiveInputType.tags = CollectiveInputType.tags
-        .split(',')
-        .map(t => t.trim());
+      CollectiveInputType.tags = CollectiveInputType.tags.split(',').map(t => t.trim());
     }
-    if (
-      CollectiveInputType.backgroundImage ===
-      defaultBackgroundImage[CollectiveInputType.type]
-    ) {
+    if (CollectiveInputType.backgroundImage === defaultBackgroundImage[CollectiveInputType.type]) {
       delete CollectiveInputType.backgroundImage;
     }
 
@@ -110,9 +105,7 @@ class EditCollective extends React.Component {
     } catch (e) {
       this.setState({
         result: {
-          error: `${intl.formatMessage(
-            this.messages['creditcard.error'],
-          )}: ${e}`,
+          error: `${intl.formatMessage(this.messages['creditcard.error'])}: ${e}`,
         },
       });
       return false;
@@ -163,10 +156,7 @@ class EditCollective extends React.Component {
       }, 3000);
     } catch (err) {
       console.error('>>> editCollective error:', JSON.stringify(err));
-      const errorMsg =
-        err.graphQLErrors && err.graphQLErrors[0]
-          ? err.graphQLErrors[0].message
-          : err.message;
+      const errorMsg = err.graphQLErrors && err.graphQLErrors[0] ? err.graphQLErrors[0].message : err.message;
       this.setState({ status: null, result: { error: errorMsg } });
       throw new Error(errorMsg);
     }
@@ -186,10 +176,7 @@ class EditCollective extends React.Component {
         Router.pushRoute(collectiveRoute);
       } catch (err) {
         console.error('>>> deleteCollective error: ', JSON.stringify(err));
-        const errorMsg =
-          err.graphQLErrors && err.graphQLErrors[0]
-            ? err.graphQLErrors[0].message
-            : err.message;
+        const errorMsg = err.graphQLErrors && err.graphQLErrors[0] ? err.graphQLErrors[0].message : err.message;
         this.setState({ result: { error: errorMsg } });
         throw new Error(errorMsg);
       }
@@ -202,8 +189,7 @@ class EditCollective extends React.Component {
     if (!collective || !collective.slug) return <div />;
 
     const title = `Edit ${collective.name} ${collective.type.toLowerCase()}`;
-    const canEditCollective =
-      LoggedInUser && LoggedInUser.canEditCollective(collective);
+    const canEditCollective = LoggedInUser && LoggedInUser.canEditCollective(collective);
 
     return (
       <div className="EditCollective">
@@ -235,12 +221,7 @@ class EditCollective extends React.Component {
         />
 
         <Body>
-          <CollectiveCover
-            href={`/${collective.slug}`}
-            collective={collective}
-            title={title}
-            className="small"
-          />
+          <CollectiveCover href={`/${collective.slug}`} collective={collective} title={title} className="small" />
 
           <div className="content">
             {!canEditCollective && (
@@ -254,26 +235,23 @@ class EditCollective extends React.Component {
               </div>
             )}
             {canEditCollective && !loggedInEditDataLoaded && <Loading />}
-            {canEditCollective &&
-              loggedInEditDataLoaded && (
-                <div>
-                  <EditCollectiveForm
-                    collective={collective}
-                    LoggedInUser={LoggedInUser}
-                    onSubmit={this.editCollective}
-                    status={this.state.status}
-                  />
-                  <div className="actions">
-                    {collective.type === 'EVENT' && (
-                      <a onClick={this.deleteCollective}>delete event</a>
-                    )}
-                    <div className="result">
-                      <div className="success">{this.state.result.success}</div>
-                      <div className="error">{this.state.result.error}</div>
-                    </div>
+            {canEditCollective && loggedInEditDataLoaded && (
+              <div>
+                <EditCollectiveForm
+                  collective={collective}
+                  LoggedInUser={LoggedInUser}
+                  onSubmit={this.editCollective}
+                  status={this.state.status}
+                />
+                <div className="actions">
+                  {collective.type === 'EVENT' && <a onClick={this.deleteCollective}>delete event</a>}
+                  <div className="result">
+                    <div className="success">{this.state.result.success}</div>
+                    <div className="error">{this.state.result.error}</div>
                   </div>
                 </div>
-              )}
+              </div>
+            )}
           </div>
         </Body>
         <Footer />

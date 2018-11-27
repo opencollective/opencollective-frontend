@@ -110,10 +110,7 @@ class ExpensePage extends React.Component {
               <div className="col large">
                 <div className="viewAllExpenses">
                   <Link route={`/${collective.slug}/expenses`}>
-                    <FormattedMessage
-                      id="expenses.viewAll"
-                      defaultMessage="View All Expenses"
-                    />
+                    <FormattedMessage id="expenses.viewAll" defaultMessage="View All Expenses" />
                   </Link>
                 </div>
 
@@ -123,12 +120,8 @@ class ExpensePage extends React.Component {
                   view="details"
                   LoggedInUser={this.state.LoggedInUser}
                   allowPayAction={!this.state.isPayActionLocked}
-                  lockPayAction={() =>
-                    this.setState({ isPayActionLocked: true })
-                  }
-                  unlockPayAction={() =>
-                    this.setState({ isPayActionLocked: false })
-                  }
+                  lockPayAction={() => this.setState({ isPayActionLocked: true })}
+                  unlockPayAction={() => this.setState({ isPayActionLocked: false })}
                 />
               </div>
 
@@ -143,6 +136,4 @@ class ExpensePage extends React.Component {
   }
 }
 
-export default withData(
-  withIntl(withLoggedInUser(addCollectiveCoverData(ExpensePage))),
-);
+export default withData(withIntl(withLoggedInUser(addCollectiveCoverData(ExpensePage))));

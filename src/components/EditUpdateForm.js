@@ -14,12 +14,8 @@ import withIntl from '../lib/withIntl';
 // We use the DYNAMIC_IMPORT env variable to skip dynamic while using Jest
 let HTMLEditor, MarkdownEditor;
 if (process.env.DYNAMIC_IMPORT) {
-  HTMLEditor = dynamic(() =>
-    import(/* webpackChunkName: 'HTMLEditor' */ './HTMLEditor'),
-  );
-  MarkdownEditor = dynamic(() =>
-    import(/* webpackChunkName: 'MarkdownEditor' */ './MarkdownEditor'),
-  );
+  HTMLEditor = dynamic(() => import(/* webpackChunkName: 'HTMLEditor' */ './HTMLEditor'));
+  MarkdownEditor = dynamic(() => import(/* webpackChunkName: 'MarkdownEditor' */ './MarkdownEditor'));
 } else {
   HTMLEditor = require('./HTMLEditor').default;
   MarkdownEditor = require('./MarkdownEditor').default;
@@ -44,14 +40,11 @@ class EditUpdateForm extends React.Component {
 
     this.state = {
       modified: false,
-      update: props.update
-        ? pick(props.update, 'title', 'html', 'markdown')
-        : {},
+      update: props.update ? pick(props.update, 'title', 'html', 'markdown') : {},
       loading: false,
     };
 
-    this.storageKey = `EditUpdateForm#${get(this.props, 'update.id') ||
-      get(this.props, 'collective.slug')}`;
+    this.storageKey = `EditUpdateForm#${get(this.props, 'update.id') || get(this.props, 'collective.slug')}`;
   }
 
   componentDidMount() {
@@ -174,41 +167,20 @@ class EditUpdateForm extends React.Component {
                 />
               )}
               {editor === 'html' && (
-                <HTMLEditor
-                  onChange={html => this.handleChange('html', html)}
-                  defaultValue={update.html}
-                />
+                <HTMLEditor onChange={html => this.handleChange('html', html)} defaultValue={update.html} />
               )}
             </div>
           </div>
 
           <div className="row actions">
-            <Button
-              className="bluewhite"
-              type="submit"
-              disabled={this.state.loading}
-            >
-              {this.state.loading && (
-                <FormattedMessage
-                  id="form.processing"
-                  defaultMessage="processing"
-                />
-              )}
-              {!this.state.loading && (
-                <FormattedMessage
-                  id="update.new.save"
-                  defaultMessage="Save Update"
-                />
-              )}
+            <Button className="bluewhite" type="submit" disabled={this.state.loading}>
+              {this.state.loading && <FormattedMessage id="form.processing" defaultMessage="processing" />}
+              {!this.state.loading && <FormattedMessage id="update.new.save" defaultMessage="Save Update" />}
             </Button>
           </div>
 
           <div className="row">
-            <div className="col large">
-              {this.state.error && (
-                <div className="error">{this.state.error}</div>
-              )}
-            </div>
+            <div className="col large">{this.state.error && <div className="error">{this.state.error}</div>}</div>
           </div>
         </form>
       </div>

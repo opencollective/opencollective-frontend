@@ -46,9 +46,7 @@
   }
 
   const init = () => {
-    const scriptsNodesArray = [].slice.call(
-      document.querySelectorAll('script'),
-    );
+    const scriptsNodesArray = [].slice.call(document.querySelectorAll('script'));
     const regex = new RegExp('{{host}}'.replace(/^https?:\/\//, ''), 'i');
     scriptsNodesArray.map(s => {
       const src = s.getAttribute('src');

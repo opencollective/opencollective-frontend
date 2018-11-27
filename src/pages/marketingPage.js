@@ -58,14 +58,8 @@ class MarketingPage extends React.Component {
         <div>
           <Header LoggedInUser={LoggedInUser} />
           <Body>
-            <style
-              type="text/css"
-              dangerouslySetInnerHTML={{ __html: style }}
-            />
-            <div
-              className={className}
-              dangerouslySetInnerHTML={{ __html: html }}
-            />
+            <style type="text/css" dangerouslySetInnerHTML={{ __html: style }} />
+            <div className={className} dangerouslySetInnerHTML={{ __html: html }} />
           </Body>
           <Footer />
         </div>

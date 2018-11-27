@@ -52,10 +52,7 @@ function paymentMethodExpiration(pm) {
   return pm.expiryDate
     ? `- exp ${moment(pm.expiryDate).format('MM/Y')}`
     : get(pm, 'data.expMonth') || get(pm, 'data.expYear')
-    ? `- exp ${padStart(get(pm, 'data.expMonth'), 2, '0')}/${get(
-        pm,
-        'data.expYear',
-      )}`
+    ? `- exp ${padStart(get(pm, 'data.expMonth'), 2, '0')}/${get(pm, 'data.expYear')}`
     : '';
 }
 
@@ -143,11 +140,7 @@ export function paymentMethodUnicodeIcon(paymentMethod) {
  * @param {PaymentMethod} paymentMethod
  * @param {string} collectiveName an optional name to prefix the payment method
  */
-export function paymentMethodLabelWithIcon(
-  intl,
-  paymentMethod,
-  collectiveName = null,
-) {
+export function paymentMethodLabelWithIcon(intl, paymentMethod, collectiveName = null) {
   const icon = paymentMethodUnicodeIcon(paymentMethod);
   const label = paymentMethodLabel(intl, paymentMethod, collectiveName);
   return `${icon}\xA0\xA0${label}`;

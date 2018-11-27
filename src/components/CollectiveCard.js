@@ -26,33 +26,18 @@ class CollectiveCard extends React.Component {
     if (!tierName) {
       switch (role) {
         case 'HOST':
-          tierName = (
-            <FormattedMessage id="membership.role.host" defaultMessage="host" />
-          );
+          tierName = <FormattedMessage id="membership.role.host" defaultMessage="host" />;
           break;
         case 'ADMIN':
-          tierName = (
-            <FormattedMessage
-              id="roles.admin.label"
-              defaultMessage="Core Contributor"
-            />
-          );
+          tierName = <FormattedMessage id="roles.admin.label" defaultMessage="Core Contributor" />;
           break;
         case 'MEMBER':
-          tierName = (
-            <FormattedMessage
-              id="roles.member.label"
-              defaultMessage="Contributor"
-            />
-          );
+          tierName = <FormattedMessage id="roles.member.label" defaultMessage="Contributor" />;
           break;
         default:
           tierName =
             collective.type === 'ORGANIZATION' ? (
-              <FormattedMessage
-                id="tier.name.sponsor"
-                defaultMessage="sponsor"
-              />
+              <FormattedMessage id="tier.name.sponsor" defaultMessage="sponsor" />
             ) : (
               <FormattedMessage id="tier.name.backer" defaultMessage="backer" />
             );
@@ -65,8 +50,7 @@ class CollectiveCard extends React.Component {
       get(collective.parentCollective, 'settings.style.hero.cover') ||
       {};
     const backgroundImage = imagePreview(
-      collective.backgroundImage ||
-        get(collective, 'parentCollective.backgroundImage'),
+      collective.backgroundImage || get(collective, 'parentCollective.backgroundImage'),
       null,
       { width: 400 },
     );
@@ -78,8 +62,7 @@ class CollectiveCard extends React.Component {
 
     const truncatedDescription =
       (collective.description && firstSentence(collective.description, 80)) ||
-      (collective.longDescription &&
-        firstSentence(collective.longDescription, 80));
+      (collective.longDescription && firstSentence(collective.longDescription, 80));
     const description = collective.description;
 
     let route = this.props.collective.path || `/${this.props.collective.slug}`;
@@ -240,12 +223,7 @@ class CollectiveCard extends React.Component {
           <div className="head">
             <div className="background" style={coverStyle} />
             <div className="logo">
-              <Logo
-                src={collective.image}
-                type={collective.type}
-                website={collective.website}
-                height={65}
-              />
+              <Logo src={collective.image} type={collective.type} website={collective.website} height={65} />
             </div>
           </div>
           <div className="body">
@@ -255,142 +233,106 @@ class CollectiveCard extends React.Component {
             </div>
           </div>
           <div className="footer">
-            {collective.type === 'COLLECTIVE' &&
-              get(collective, 'stats.backers.all') && (
-                <div className="stats">
-                  <div className="backers">
-                    <div className="value">{collective.stats.backers.all}</div>
-                    <div className="label">
-                      <FormattedMessage
-                        id="collective.card.stats.backers"
-                        defaultMessage="{n, plural, one {backer} other {backers}}"
-                        values={{ n: collective.stats.backers.all }}
-                      />
-                    </div>
-                  </div>
-                  <div className="yearlyBudget">
-                    <div className="value">
-                      <Currency
-                        value={collective.stats.yearlyBudget}
-                        currency={collective.currency}
-                      />
-                    </div>
-                    <div className="label">
-                      <FormattedMessage
-                        id="collective.card.stats.yearlyBudget"
-                        defaultMessage={'yearly budget'}
-                      />
-                    </div>
+            {collective.type === 'COLLECTIVE' && get(collective, 'stats.backers.all') && (
+              <div className="stats">
+                <div className="backers">
+                  <div className="value">{collective.stats.backers.all}</div>
+                  <div className="label">
+                    <FormattedMessage
+                      id="collective.card.stats.backers"
+                      defaultMessage="{n, plural, one {backer} other {backers}}"
+                      values={{ n: collective.stats.backers.all }}
+                    />
                   </div>
                 </div>
-              )}
-            {collective.stats &&
-              collective.memberOf &&
-              collective.type === 'ORGANIZATION' && (
-                <div className="stats">
-                  <div className="backers">
-                    <div className="value">{collective.memberOf.length}</div>
-                    <div className="label">
-                      <FormattedMessage
-                        id="collective.card.memberOf.count"
-                        defaultMessage="{n, plural, one {collective} other {collectives}} backed"
-                        values={{ n: collective.memberOf.length }}
-                      />
-                    </div>
+                <div className="yearlyBudget">
+                  <div className="value">
+                    <Currency value={collective.stats.yearlyBudget} currency={collective.currency} />
                   </div>
-                  <div className="yearlyBudget">
-                    <div className="value">
-                      <Currency
-                        value={collective.stats.totalAmountSpent}
-                        currency={collective.currency}
-                      />
-                    </div>
-                    <div className="label">
-                      <FormattedMessage
-                        id="collective.card.stats.totalAmountSpent"
-                        defaultMessage="contributed"
-                      />
-                    </div>
+                  <div className="label">
+                    <FormattedMessage id="collective.card.stats.yearlyBudget" defaultMessage={'yearly budget'} />
                   </div>
                 </div>
-              )}
-            {collective.stats &&
-              collective.stats.collectives && (
-                <div className="stats">
-                  <div className="backers">
-                    <div className="value">
-                      {get(collective, 'stats.collectives.hosted')}
-                    </div>
-                    <div className="label">
-                      <FormattedMessage
-                        id="collective.card.collectives.count"
-                        defaultMessage="{n, plural, one {collective} other {collectives}} hosted"
-                        values={{
-                          n: get(collective, 'stats.collectives.hosted'),
-                        }}
-                      />
-                    </div>
-                  </div>
-                  <div className="currency">
-                    <div className="value">{collective.currency}</div>
-                    <div className="label">
-                      <FormattedMessage
-                        id="currency"
-                        defaultMessage="currency"
-                      />
-                    </div>
+              </div>
+            )}
+            {collective.stats && collective.memberOf && collective.type === 'ORGANIZATION' && (
+              <div className="stats">
+                <div className="backers">
+                  <div className="value">{collective.memberOf.length}</div>
+                  <div className="label">
+                    <FormattedMessage
+                      id="collective.card.memberOf.count"
+                      defaultMessage="{n, plural, one {collective} other {collectives}} backed"
+                      values={{ n: collective.memberOf.length }}
+                    />
                   </div>
                 </div>
-              )}
+                <div className="yearlyBudget">
+                  <div className="value">
+                    <Currency value={collective.stats.totalAmountSpent} currency={collective.currency} />
+                  </div>
+                  <div className="label">
+                    <FormattedMessage id="collective.card.stats.totalAmountSpent" defaultMessage="contributed" />
+                  </div>
+                </div>
+              </div>
+            )}
+            {collective.stats && collective.stats.collectives && (
+              <div className="stats">
+                <div className="backers">
+                  <div className="value">{get(collective, 'stats.collectives.hosted')}</div>
+                  <div className="label">
+                    <FormattedMessage
+                      id="collective.card.collectives.count"
+                      defaultMessage="{n, plural, one {collective} other {collectives}} hosted"
+                      values={{
+                        n: get(collective, 'stats.collectives.hosted'),
+                      }}
+                    />
+                  </div>
+                </div>
+                <div className="currency">
+                  <div className="value">{collective.currency}</div>
+                  <div className="label">
+                    <FormattedMessage id="currency" defaultMessage="currency" />
+                  </div>
+                </div>
+              </div>
+            )}
             {membership && (
               <div className="membership">
                 <div className="role">{tierName}</div>
                 {membership.createdAt && (
                   <div className="since">
-                    <FormattedMessage
-                      id="membership.since"
-                      defaultMessage={'since'}
-                    />
+                    <FormattedMessage id="membership.since" defaultMessage={'since'} />
                     &nbsp;
-                    <FormattedDate
-                      value={membership.createdAt}
-                      month="long"
-                      year="numeric"
-                    />
+                    <FormattedDate value={membership.createdAt} month="long" year="numeric" />
                   </div>
                 )}
               </div>
             )}
-            {role === 'BACKER' &&
-              get(membership, 'stats.totalDonations') > 0 && (
-                <div className="totalDonations">
-                  <div className="totalDonationsAmount">
-                    <Currency
-                      value={get(membership, 'stats.totalDonations')}
-                      currency={get(membership, 'collective.currency')}
-                    />
-                  </div>
-                  <FormattedMessage
-                    id="membership.totalDonations.title"
-                    defaultMessage={'amount contributed'}
+            {role === 'BACKER' && get(membership, 'stats.totalDonations') > 0 && (
+              <div className="totalDonations">
+                <div className="totalDonationsAmount">
+                  <Currency
+                    value={get(membership, 'stats.totalDonations')}
+                    currency={get(membership, 'collective.currency')}
                   />
                 </div>
-              )}
-            {role === 'FUNDRAISER' &&
-              get(membership, 'stats.totalRaised') > 0 && (
-                <div className="totalRaised">
-                  <div className="totalRaisedAmount">
-                    <Currency
-                      value={get(membership, 'stats.totalRaised')}
-                      currency={get(membership, 'collective.currency')}
-                    />
-                  </div>
-                  <FormattedMessage
-                    id="membership.totalRaised.title"
-                    defaultMessage={'amount raised'}
+                <FormattedMessage id="membership.totalDonations.title" defaultMessage={'amount contributed'} />
+              </div>
+            )}
+            {role === 'FUNDRAISER' && get(membership, 'stats.totalRaised') > 0 && (
+              <div className="totalRaised">
+                <div className="totalRaisedAmount">
+                  <Currency
+                    value={get(membership, 'stats.totalRaised')}
+                    currency={get(membership, 'collective.currency')}
                   />
                 </div>
-              )}
+                <FormattedMessage id="membership.totalRaised.title" defaultMessage={'amount raised'} />
+              </div>
+            )}
           </div>
         </div>
       </Link>

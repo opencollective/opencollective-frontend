@@ -40,11 +40,7 @@ const handleSubmit = event => {
 
 const SearchForm = ({ fontSize, onSubmit = handleSubmit }) => (
   <form action="/search" method="GET" onSubmit={onSubmit}>
-    <SearchInputContainer
-      alignItems="center"
-      justifyContent="space-between"
-      p={1}
-    >
+    <SearchInputContainer alignItems="center" justifyContent="space-between" p={1}>
       <SearchInput
         is="input"
         type="search"

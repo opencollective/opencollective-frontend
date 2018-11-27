@@ -4,12 +4,7 @@ import Modal from './Modal';
 import AddToCalendar from 'react-add-to-calendar';
 
 import Currency from './Currency';
-import {
-  FormattedMessage,
-  FormattedDate,
-  FormattedTime,
-  injectIntl,
-} from 'react-intl';
+import { FormattedMessage, FormattedDate, FormattedTime, injectIntl } from 'react-intl';
 
 class TicketsConfirmed extends React.Component {
   static propTypes = {
@@ -183,15 +178,10 @@ class TicketsConfirmed extends React.Component {
               </div>
               <div className="amount">
                 {response.tier.amount > 0 && (
-                  <Currency
-                    value={response.quantity * response.tier.amount}
-                    currency={response.tier.currency}
-                  />
+                  <Currency value={response.quantity * response.tier.amount} currency={response.tier.currency} />
                 )}
                 {!response.tier.amount ||
-                  (response.tier.amount === 0 && (
-                    <FormattedMessage id="amount.free" defaultMessage="free" />
-                  ))}
+                  (response.tier.amount === 0 && <FormattedMessage id="amount.free" defaultMessage="free" />)}
               </div>
             </div>
             <div className="content">
@@ -207,10 +197,7 @@ class TicketsConfirmed extends React.Component {
                   />
                 </div>
                 <div className="time">
-                  <FormattedTime
-                    value={event.startsAt}
-                    timeZone={event.timezone}
-                  />
+                  <FormattedTime value={event.startsAt} timeZone={event.timezone} />
                 </div>
               </div>
               <div className="location">
@@ -225,17 +212,12 @@ class TicketsConfirmed extends React.Component {
                 <FormattedMessage
                   id="TicketsConfirmed.ConfirmationSent"
                   values={{ email: response.user.email }}
-                  defaultMessage={
-                    'A confirmation email has been sent to your address {email}'
-                  }
+                  defaultMessage={'A confirmation email has been sent to your address {email}'}
                 />
               )}
             </p>
             <p>
-              <FormattedMessage
-                id="TicketsConfirmed.SeeYouSoon"
-                defaultMessage="See you soon!"
-              />
+              <FormattedMessage id="TicketsConfirmed.SeeYouSoon" defaultMessage="See you soon!" />
             </p>
             <div className="AddToCalendarBtn">
               <AddToCalendar event={this.addToCalendarEvent} />

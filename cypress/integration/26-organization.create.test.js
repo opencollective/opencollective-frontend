@@ -1,7 +1,4 @@
-const WEBSITE_URL =
-  process.env.WEBSITE_URL ||
-  'http://localhost:3000' ||
-  'https://staging.opencollective.com';
+const WEBSITE_URL = process.env.WEBSITE_URL || 'http://localhost:3000' || 'https://staging.opencollective.com';
 
 const fill = (fieldname, value) => {
   cy.get(`.inputField.${fieldname} input`).type(value);
@@ -32,9 +29,7 @@ describe('create an organization', () => {
     cy.get('.UserCollectivePage .CollectiveCover h1', {
       timeout: 10000,
     }).contains('New org');
-    cy.get('.UserCollectivePage .CollectiveCover .website').contains(
-      'newco.com',
-    );
+    cy.get('.UserCollectivePage .CollectiveCover .website').contains('newco.com');
     cy.get('.NotificationBar h1').contains('success');
   });
 });

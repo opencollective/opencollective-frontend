@@ -1,7 +1,4 @@
-const WEBSITE_URL =
-  process.env.WEBSITE_URL ||
-  'http://localhost:3000' ||
-  'https://staging.opencollective.com';
+const WEBSITE_URL = process.env.WEBSITE_URL || 'http://localhost:3000' || 'https://staging.opencollective.com';
 
 const fill = (fieldname, value) => {
   cy.get(`.inputField.${fieldname} input`).type(value);
@@ -68,9 +65,7 @@ describe('collective.createOrder page', () => {
 
   it('makes an order logged out as a new user with a redirect url', () => {
     const email = `testuser+${Math.round(Math.random() * 1000000)}@gmail.com`;
-    cy.visit(
-      `${WEBSITE_URL}/apex/donate?test=e2e&redirect=http://localhost:3000/callback`,
-    );
+    cy.visit(`${WEBSITE_URL}/apex/donate?test=e2e&redirect=http://localhost:3000/callback`);
     cy.get(".inputField textarea[name='publicMessage']").type('public message');
     fill('email', email);
     fill('firstName', 'Xavier');
@@ -80,9 +75,7 @@ describe('collective.createOrder page', () => {
     fill('description', 'short description');
     cy.get('.submit button').click();
     cy.wait(2500);
-    cy.get('.result .success').contains(
-      'Order processed successfully. Redirecting you to localhost...',
-    );
+    cy.get('.result .success').contains('Order processed successfully. Redirecting you to localhost...');
     cy.location().should(location => {
       expect(location.search).to.match(/\?transactionid=[0-9]+/);
     });
@@ -100,20 +93,14 @@ describe('collective.createOrder page', () => {
       .blur();
     cy.wait(500);
     cy.get('.actions .submit button').click();
-    cy.get('.result .error').contains(
-      'Please provide a name for the new organization',
-    );
+    cy.get('.result .error').contains('Please provide a name for the new organization');
     cy.get('.organizationDetailsForm .organization_name input')
       .type('new org')
       .blur();
     cy.wait(400);
     cy.get('.actions .submit button').click();
-    cy.get('.result .error').contains(
-      'Please provide a website for the new organization',
-    );
-    cy.get('.organizationDetailsForm .organization_website input').type(
-      'neworg.com',
-    );
+    cy.get('.result .error').contains('Please provide a website for the new organization');
+    cy.get('.organizationDetailsForm .organization_website input').type('neworg.com');
     cy.wait(400);
     cy.get('.actions .submit button').click();
     cy.get('.result .error').contains('Credit card missing');

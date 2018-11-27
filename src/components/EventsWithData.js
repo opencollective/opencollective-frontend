@@ -20,8 +20,7 @@ class EventsWithData extends React.Component {
 
   componentDidMount() {
     const { onChange } = this.props;
-    this.isIframe =
-      window.self !== window.top && window.location.hostname !== 'localhost'; // cypress is using an iframe for e2e testing;
+    this.isIframe = window.self !== window.top && window.location.hostname !== 'localhost'; // cypress is using an iframe for e2e testing;
     onChange && this.node && onChange({ height: this.node.offsetHeight });
   }
 
@@ -60,21 +59,10 @@ class EventsWithData extends React.Component {
           {event.name}
         </a>
         , &nbsp;
-        {!event.startsAt &&
-          console.warn(
-            `EventsWithData: event.startsAt should not be empty. event.id: ${
-              event.id
-            }`,
-          )}
+        {!event.startsAt && console.warn(`EventsWithData: event.startsAt should not be empty. event.id: ${event.id}`)}
         {event.startsAt && (
           <React.Fragment>
-            <FormattedDate
-              value={event.startsAt}
-              timeZone={event.timezone}
-              day="numeric"
-              month="long"
-            />
-            , &nbsp;
+            <FormattedDate value={event.startsAt} timeZone={event.timezone} day="numeric" month="long" />, &nbsp;
           </React.Fragment>
         )}
         {event.location.name}
@@ -131,29 +119,24 @@ class EventsWithData extends React.Component {
           `}
         </style>
         <div className="events">
-          {futureEvents.length === 0 &&
-            pastEvents.length === 0 &&
-            this.isIframe && (
-              <div className="createEvent">
-                <p>
-                  <FormattedMessage
-                    id="events.widget.noEventScheduled"
-                    defaultMessage={'No event has been scheduled yet.'}
-                  />
-                </p>
-                <a
-                  href={`/${this.props.collectiveSlug}/events/new`}
-                  onClick={this.createEvent}
-                  className="btn btn-default"
-                  target="_top"
-                >
-                  <FormattedMessage
-                    id="events.widget.createEvent"
-                    defaultMessage={'Create an Event'}
-                  />
-                </a>
-              </div>
-            )}
+          {futureEvents.length === 0 && pastEvents.length === 0 && this.isIframe && (
+            <div className="createEvent">
+              <p>
+                <FormattedMessage
+                  id="events.widget.noEventScheduled"
+                  defaultMessage={'No event has been scheduled yet.'}
+                />
+              </p>
+              <a
+                href={`/${this.props.collectiveSlug}/events/new`}
+                onClick={this.createEvent}
+                className="btn btn-default"
+                target="_top"
+              >
+                <FormattedMessage id="events.widget.createEvent" defaultMessage={'Create an Event'} />
+              </a>
+            </div>
+          )}
           {(futureEvents.length > 0 || pastEvents.length > 0) && (
             <div>
               <div className="title">
@@ -161,9 +144,7 @@ class EventsWithData extends React.Component {
                   <FormattedMessage
                     id="events.title.futureEvents"
                     values={{ n: futureEvents.length }}
-                    defaultMessage={
-                      'Next {n, plural, one {event} other {events}}'
-                    }
+                    defaultMessage={'Next {n, plural, one {event} other {events}}'}
                   />
                 </h2>
                 {this.isIframe && (
@@ -174,10 +155,7 @@ class EventsWithData extends React.Component {
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      <FormattedMessage
-                        id="events.widget.createEvent"
-                        defaultMessage={'Create an Event'}
-                      />
+                      <FormattedMessage id="events.widget.createEvent" defaultMessage={'Create an Event'} />
                     </a>
                   </div>
                 )}
@@ -193,9 +171,7 @@ class EventsWithData extends React.Component {
                       <FormattedMessage
                         id="events.title.pastEvents"
                         values={{ n: pastEvents.length }}
-                        defaultMessage={
-                          'Past {n, plural, one {event} other {events}}'
-                        }
+                        defaultMessage={'Past {n, plural, one {event} other {events}}'}
                       />
                     </h2>
                   </div>

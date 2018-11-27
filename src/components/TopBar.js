@@ -61,17 +61,10 @@ class TopBar extends React.Component {
 
   render() {
     const { className, LoggedInUser, showSearch } = this.props;
-    const shouldAnimate =
-      Array.isArray(className) && className.includes('loading');
+    const shouldAnimate = Array.isArray(className) && className.includes('loading');
 
     return (
-      <Flex
-        px={3}
-        py={showSearch ? 2 : 3}
-        alignItems="center"
-        flexDirection="row"
-        justifyContent="space-around"
-      >
+      <Flex px={3} py={showSearch ? 2 : 3} alignItems="center" flexDirection="row" justifyContent="space-around">
         <Link route="home" passHref>
           <Flex is="a" alignItems="center">
             <Logo width="24" height="24" animate={shouldAnimate} />
@@ -115,27 +108,15 @@ class TopBar extends React.Component {
           </Hide>
 
           <Hide xs>
-            <NavList
-              is="ul"
-              p={0}
-              m={0}
-              justifyContent="space-around"
-              css="margin: 0;"
-            >
+            <NavList is="ul" p={0} m={0} justifyContent="space-around" css="margin: 0;">
               <Box is="li" px={3}>
                 <NavLink href="/discover">
-                  <FormattedMessage
-                    id="menu.discover"
-                    defaultMessage="Discover"
-                  />
+                  <FormattedMessage id="menu.discover" defaultMessage="Discover" />
                 </NavLink>
               </Box>
               <Box is="li" px={3}>
                 <NavLink href="/learn-more">
-                  <FormattedMessage
-                    id="menu.howItWorks"
-                    defaultMessage="How it Works"
-                  />
+                  <FormattedMessage id="menu.howItWorks" defaultMessage="How it Works" />
                 </NavLink>
               </Box>
               <Box is="li" px={3}>

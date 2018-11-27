@@ -6,10 +6,7 @@ import EditCollective from '../components/EditCollective';
 import ErrorPage from '../components/ErrorPage';
 
 import { addCollectiveToEditData } from '../graphql/queries';
-import {
-  addEditCollectiveMutation,
-  addDeleteCollectiveMutation,
-} from '../graphql/mutations';
+import { addEditCollectiveMutation, addDeleteCollectiveMutation } from '../graphql/mutations';
 
 import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
@@ -82,6 +79,4 @@ const addGraphQL = compose(
   addDeleteCollectiveMutation,
 );
 
-export default withData(
-  withIntl(withLoggedInUser(addGraphQL(EditCollectivePage))),
-);
+export default withData(withIntl(withLoggedInUser(addGraphQL(EditCollectivePage))));

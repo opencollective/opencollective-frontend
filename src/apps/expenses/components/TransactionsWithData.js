@@ -27,14 +27,7 @@ class TransactionsWithData extends React.Component {
   }
 
   render() {
-    const {
-      data,
-      LoggedInUser,
-      collective,
-      fetchMore,
-      showCSVlink,
-      filters,
-    } = this.props;
+    const { data, LoggedInUser, collective, fetchMore, showCSVlink, filters } = this.props;
 
     if (data.error) {
       console.error('graphql error>>>', data.error.message);
@@ -85,10 +78,7 @@ export const addTransactionsData = graphql(getTransactionsQuery, {
           }
           return Object.assign({}, previousResult, {
             // Append the new posts results to the old one
-            allTransactions: [
-              ...previousResult.allTransactions,
-              ...fetchMoreResult.allTransactions,
-            ],
+            allTransactions: [...previousResult.allTransactions, ...fetchMoreResult.allTransactions],
           });
         },
       });

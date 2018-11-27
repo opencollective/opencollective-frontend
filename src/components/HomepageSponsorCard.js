@@ -10,27 +10,9 @@ import { Link } from '../server/pages';
 import StyledLink from './StyledLink';
 import { P } from './Text';
 
-const SponsorCard = ({
-  currency,
-  image,
-  name,
-  slug,
-  stats: { totalAmountSpent },
-  type,
-}) => (
-  <Container
-    bg="white.full"
-    borderRadius="8px"
-    border="1px solid"
-    borderColor="black.transparent.20"
-    minHeight="100%"
-  >
-    <Container
-      display="flex"
-      justifyContent="space-between"
-      alignItems="center"
-      pt={3}
-    >
+const SponsorCard = ({ currency, image, name, slug, stats: { totalAmountSpent }, type }) => (
+  <Container bg="white.full" borderRadius="8px" border="1px solid" borderColor="black.transparent.20" minHeight="100%">
+    <Container display="flex" justifyContent="space-between" alignItems="center" pt={3}>
       <Container bg="black.200" height="1px" width={0.25} />
 
       <Link route="collective" params={{ slug }} passHref>
@@ -61,13 +43,7 @@ const SponsorCard = ({
 
     <P textAlign="center" mt={2} px={2} pb={3}>
       Total donated:{' '}
-      <Currency
-        fontWeight="bold"
-        value={totalAmountSpent}
-        currency={currency}
-        precision={0}
-        abbreviate
-      />
+      <Currency fontWeight="bold" value={totalAmountSpent} currency={currency} precision={0} abbreviate />
     </P>
   </Container>
 );

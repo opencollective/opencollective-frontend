@@ -6,10 +6,7 @@ import { ApolloClient } from 'apollo-client';
 import { HttpLink } from 'apollo-link-http';
 import { ApolloLink } from 'apollo-link';
 import { onError } from 'apollo-link-error';
-import {
-  InMemoryCache,
-  IntrospectionFragmentMatcher,
-} from 'apollo-cache-inmemory';
+import { InMemoryCache, IntrospectionFragmentMatcher } from 'apollo-cache-inmemory';
 
 import { getGraphqlUrl } from './utils';
 
@@ -37,10 +34,7 @@ function createClient(initialState, options = {}) {
 
   const cache = new InMemoryCache({
     dataIdFromObject: result =>
-      `${result.__typename}:${result.id ||
-        result.name ||
-        result.slug ||
-        Math.floor(Math.random() * 1000000)}`,
+      `${result.__typename}:${result.id || result.name || result.slug || Math.floor(Math.random() * 1000000)}`,
     fragmentMatcher,
   });
 
@@ -49,9 +43,7 @@ function createClient(initialState, options = {}) {
       graphQLErrors.map(error => {
         if (error) {
           const { message, locations, path } = error;
-          console.error(
-            `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`,
-          );
+          console.error(`[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`);
           return;
         }
 
@@ -89,8 +81,7 @@ export default function initClient(initialState, options = {}) {
 
   // Reuse client on the client-side
   if (!apolloClient) {
-    options.accessToken =
-      process.browser && window.localStorage.getItem('accessToken');
+    options.accessToken = process.browser && window.localStorage.getItem('accessToken');
     apolloClient = createClient(initialState, options);
   }
 

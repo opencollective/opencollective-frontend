@@ -80,11 +80,7 @@ class SubscriptionCard extends React.Component {
     const { intl } = this.props;
     this.setState({ loading: true, result: {} });
     try {
-      await this.props.updateSubscription(
-        this.props.subscription.id,
-        paymentMethod,
-        amount,
-      );
+      await this.props.updateSubscription(this.props.subscription.id, paymentMethod, amount);
       this.setState({
         loading: false,
         visibleState: this.stateConstants.normal,
@@ -130,8 +126,7 @@ class SubscriptionCard extends React.Component {
     const coverStyle = { ...get(collective, 'settings.style.hero.cover') };
     const backgroundImage = imagePreview(
       collective.backgroundImage,
-      collective.type === 'COLLECTIVE' &&
-        defaultBackgroundImage[collective.type],
+      collective.type === 'COLLECTIVE' && defaultBackgroundImage[collective.type],
       { width: 400 },
     );
     if (!coverStyle.backgroundImage && backgroundImage) {
@@ -142,36 +137,25 @@ class SubscriptionCard extends React.Component {
 
     const description =
       (collective.description && firstSentence(collective.description, 64)) ||
-      (collective.longDescription &&
-        firstSentence(collective.longDescription, 64));
+      (collective.longDescription && firstSentence(collective.longDescription, 64));
 
     let frequency = 'mo.';
     if (subscription.interval === 'year') {
       frequency = 'yr.';
     }
 
-    const canEditSubscription =
-      LoggedInUser && LoggedInUser.canEditSubscription(subscription);
+    const canEditSubscription = LoggedInUser && LoggedInUser.canEditSubscription(subscription);
 
     const menuItemStyle = { margin: '0rem', fontSize: '12px' };
 
     const popover = (
-      <Popover
-        id="popover-positioned-bottom"
-        title={intl.formatMessage(
-          this.messages['subscription.whyPastDueTitle'],
-        )}
-      >
+      <Popover id="popover-positioned-bottom" title={intl.formatMessage(this.messages['subscription.whyPastDueTitle'])}>
         {intl.formatMessage(this.messages['subscription.whyPastDueText'])}
       </Popover>
     );
 
     return (
-      <div
-        className={`SubscriptionCard ${
-          subscription.isPastDue ? 'past-due' : ''
-        }`}
-      >
+      <div className={`SubscriptionCard ${subscription.isPastDue ? 'past-due' : ''}`}>
         <style jsx>
           {`
             .SubscriptionCard {
@@ -440,83 +424,51 @@ class SubscriptionCard extends React.Component {
           {subscription.isPastDue && (
             <div className="polygon">
               <img
-                title={intl.formatMessage(
-                  this.messages['subscription.pastDue'],
-                )}
+                title={intl.formatMessage(this.messages['subscription.pastDue'])}
                 src="/static/images/attention-badge.svg"
               />
             </div>
           )}
 
-          {canEditSubscription &&
-            (subscription.isSubscriptionActive || subscription.status === 'PENDING') && (
-              <div
-                className={`actions ${this.state.showMenu ? 'selected' : ''}`}
-                onClick={() =>
-                  this.setState({ showMenu: !this.state.showMenu })
-                }
+          {canEditSubscription && (subscription.isSubscriptionActive || subscription.status === 'PENDING') && (
+            <div
+              className={`actions ${this.state.showMenu ? 'selected' : ''}`}
+              onClick={() => this.setState({ showMenu: !this.state.showMenu })}
+            >
+              <Dropdown
+                id="dropdown-custom"
+                className="dropdown-toggle"
+                style={{ width: '100%' }}
+                open={this.state.showMenu}
+                onToggle={() => this.setState({ showMenu: !this.state.showMenu })}
+                onSelect={eventKey => this.setState({ visibleState: eventKey, result: {} })}
+                pullRight
               >
-                <Dropdown
-                  id="dropdown-custom"
-                  className="dropdown-toggle"
-                  style={{ width: '100%' }}
-                  open={this.state.showMenu}
-                  onToggle={() =>
-                    this.setState({ showMenu: !this.state.showMenu })
-                  }
-                  onSelect={eventKey =>
-                    this.setState({ visibleState: eventKey, result: {} })
-                  }
-                  pullRight
-                >
-                  <CustomToggle bsRole="toggle">
-                    <img
-                      className="actions-image"
-                      src={'/static/images/glyph-more.svg'}
-                    />
-                  </CustomToggle>
-                  <Dropdown.Menu className="menu-item">
-                    {subscription.status !== 'PENDING' && [
-                      <MenuItem
-                        style={menuItemStyle}
-                        eventKey={this.stateConstants.editPaymentMethod}
-                      >
-                        <FormattedMessage
-                          id="subscription.menu.editPaymentMethod"
-                          defaultMessage="Update payment method"
-                        />
-                      </MenuItem>,
-                      <MenuItem
-                        style={menuItemStyle}
-                        eventKey={this.stateConstants.editAmount}
-                      >
-                        <FormattedMessage
-                          id="subscription.menu.editAmount"
-                          defaultMessage="Update amount"
-                        />
-                      </MenuItem>,
-                      <MenuItem style={{ margin: '2px' }} divider />
-                    ]}
-                    <MenuItem
-                      style={menuItemStyle}
-                      eventKey={this.stateConstants.cancelConf}
-                    >
+                <CustomToggle bsRole="toggle">
+                  <img className="actions-image" src={'/static/images/glyph-more.svg'} />
+                </CustomToggle>
+                <Dropdown.Menu className="menu-item">
+                  {subscription.status !== 'PENDING' && [
+                    <MenuItem style={menuItemStyle} eventKey={this.stateConstants.editPaymentMethod}>
                       <FormattedMessage
-                        id="subscription.menu.cancel"
-                        defaultMessage="Cancel contribution"
+                        id="subscription.menu.editPaymentMethod"
+                        defaultMessage="Update payment method"
                       />
-                    </MenuItem>
-                  </Dropdown.Menu>
-                </Dropdown>
-              </div>
-            )}
+                    </MenuItem>,
+                    <MenuItem style={menuItemStyle} eventKey={this.stateConstants.editAmount}>
+                      <FormattedMessage id="subscription.menu.editAmount" defaultMessage="Update amount" />
+                    </MenuItem>,
+                    <MenuItem style={{ margin: '2px' }} divider />,
+                  ]}
+                  <MenuItem style={menuItemStyle} eventKey={this.stateConstants.cancelConf}>
+                    <FormattedMessage id="subscription.menu.cancel" defaultMessage="Cancel contribution" />
+                  </MenuItem>
+                </Dropdown.Menu>
+              </Dropdown>
+            </div>
+          )}
           <div className="logo">
-            <Logo
-              src={collective.image}
-              type={collective.type}
-              website={collective.website}
-              height={65}
-            />
+            <Logo src={collective.image} type={collective.type} website={collective.website} height={65} />
           </div>
         </div>
 
@@ -532,9 +484,7 @@ class SubscriptionCard extends React.Component {
             {this.state.visibleState === this.stateConstants.editAmount && (
               <div className="editAmount">
                 <div className="inputAmount">
-                  <span className="currency">
-                    {getCurrencySymbol(subscription.currency)}
-                  </span>
+                  <span className="currency">{getCurrencySymbol(subscription.currency)}</span>
                   <input
                     type="number"
                     step="1"
@@ -543,49 +493,29 @@ class SubscriptionCard extends React.Component {
                     value={this.state.amountValue}
                     onChange={this.handleAmountChange}
                   />
-                  <span className="frequency">
-                    {subscription.interval === 'year' ? 'Yearly' : 'Monthly'}
-                  </span>
+                  <span className="frequency">{subscription.interval === 'year' ? 'Yearly' : 'Monthly'}</span>
                 </div>
                 <div className="update-buttons">
-                  <SmallButton
-                    className="no"
-                    bsStyle="primary"
-                    onClick={this.resetState}
-                  >
-                    <FormattedMessage
-                      id="subscription.updateAmount.cancel.btn"
-                      defaultMessage="Cancel"
-                    />
+                  <SmallButton className="no" bsStyle="primary" onClick={this.resetState}>
+                    <FormattedMessage id="subscription.updateAmount.cancel.btn" defaultMessage="Cancel" />
                   </SmallButton>
                   <SmallButton
                     className="yes"
                     bsStyle="primary"
                     disabled={
-                      !this.state.amountValueInteger ||
-                      this.state.amountValueInteger == subscription.totalAmount
+                      !this.state.amountValueInteger || this.state.amountValueInteger == subscription.totalAmount
                     }
                     onClick={this.updateAmount}
                   >
-                    <FormattedMessage
-                      id="subscription.updateAmount.update.btn"
-                      defaultMessage="Update"
-                    />
+                    <FormattedMessage id="subscription.updateAmount.update.btn" defaultMessage="Update" />
                   </SmallButton>
                 </div>
               </div>
             )}
             {this.state.visibleState !== this.stateConstants.editAmount && (
-              <div
-                className={`amount-frequency ${
-                  subscription.isPastDue ? 'past-due' : ''
-                }`}
-              >
+              <div className={`amount-frequency ${subscription.isPastDue ? 'past-due' : ''}`}>
                 <span className="amount">
-                  <Currency
-                    value={subscription.totalAmount}
-                    currency={subscription.currency}
-                  />
+                  <Currency value={subscription.totalAmount} currency={subscription.currency} />
                 </span>
                 <span className="currency-frequency">
                   {' '}
@@ -600,99 +530,65 @@ class SubscriptionCard extends React.Component {
             Object.keys(subscription.stats).length > 0 && (
               <div className="contribution">
                 <span className="totalAmount">
-                  <Currency
-                    value={get(subscription, 'stats.totalDonations')}
-                    currency={subscription.currency}
-                  />
+                  <Currency value={get(subscription, 'stats.totalDonations')} currency={subscription.currency} />
                   &nbsp;
                 </span>
                 <span className="total-amount-text">
-                  {intl.formatMessage(
-                    this.messages['subscription.amountToDate'],
-                  )}
+                  {intl.formatMessage(this.messages['subscription.amountToDate'])}
                 </span>
               </div>
             )}
 
           {(this.state.visibleState === this.stateConstants.normal ||
-            this.state.visibleState ===
-              this.stateConstants.editPaymentMethod) &&
+            this.state.visibleState === this.stateConstants.editPaymentMethod) &&
             subscription.paymentMethod &&
             canEditSubscription && (
               <div className="paymentMethod">
                 <PaymentMethodChooser
                   paymentMethodInUse={subscription.paymentMethod}
                   paymentMethodsList={this.props.paymentMethods}
-                  editMode={
-                    this.state.visibleState ===
-                    this.stateConstants.editPaymentMethod
-                  }
+                  editMode={this.state.visibleState === this.stateConstants.editPaymentMethod}
                   onCancel={this.resetState}
                   onSubmit={this.updatePaymentMethod}
                 />
               </div>
             )}
 
-          {this.state.visibleState === this.stateConstants.normal &&
-            subscription.isPastDue && (
-              <div className="past-due-msg">
-                <span
-                  onClick={() =>
-                    this.setState({
-                      visibleState: this.stateConstants.editPaymentMethod,
-                    })
-                  }
-                >
-                  {' '}
-                  {intl.formatMessage(
-                    this.messages['subscription.pastDue.msg'],
-                  )}
-                  &nbsp;&nbsp;
-                </span>
-                <OverlayTrigger
-                  trigger="click"
-                  placement={'bottom'}
-                  overlay={popover}
-                  rootClose
-                >
-                  <img
-                    className="help-image"
-                    src="/static/images/help-icon.svg"
-                  />
-                </OverlayTrigger>
-              </div>
-            )}
+          {this.state.visibleState === this.stateConstants.normal && subscription.isPastDue && (
+            <div className="past-due-msg">
+              <span
+                onClick={() =>
+                  this.setState({
+                    visibleState: this.stateConstants.editPaymentMethod,
+                  })
+                }
+              >
+                {' '}
+                {intl.formatMessage(this.messages['subscription.pastDue.msg'])}
+                &nbsp;&nbsp;
+              </span>
+              <OverlayTrigger trigger="click" placement={'bottom'} overlay={popover} rootClose>
+                <img className="help-image" src="/static/images/help-icon.svg" />
+              </OverlayTrigger>
+            </div>
+          )}
 
           {this.state.visibleState === this.stateConstants.cancelConf && (
             <div className="cancel">
               Cancel this subscription?
               <div className="cancel-buttons">
-                <SmallButton
-                  className="no"
-                  bsStyle="primary"
-                  onClick={this.resetState}
-                >
-                  <FormattedMessage
-                    id="subscription.cancel.no.btn"
-                    defaultMessage="no"
-                  />
+                <SmallButton className="no" bsStyle="primary" onClick={this.resetState}>
+                  <FormattedMessage id="subscription.cancel.no.btn" defaultMessage="no" />
                 </SmallButton>
-                <CancelSubscriptionBtn
-                  id={subscription.id}
-                  onError={this.onError}
-                />
+                <CancelSubscriptionBtn id={subscription.id} onError={this.onError} />
               </div>
             </div>
           )}
 
           <div className="result">
             {this.state.loading && <div className="loading">Processing...</div>}
-            {this.state.result.success && (
-              <div className="success">{this.state.result.success}</div>
-            )}
-            {this.state.result.error && (
-              <div className="error">{this.state.result.error}</div>
-            )}
+            {this.state.result.success && <div className="success">{this.state.result.success}</div>}
+            {this.state.result.error && <div className="error">{this.state.result.error}</div>}
           </div>
         </div>
       </div>
@@ -701,16 +597,8 @@ class SubscriptionCard extends React.Component {
 }
 
 const updateSubscriptionQuery = gql`
-  mutation updateSubscription(
-    $id: Int!
-    $paymentMethod: PaymentMethodInputType
-    $amount: Int
-  ) {
-    updateSubscription(
-      id: $id
-      paymentMethod: $paymentMethod
-      amount: $amount
-    ) {
+  mutation updateSubscription($id: Int!, $paymentMethod: PaymentMethodInputType, $amount: Int) {
+    updateSubscription(id: $id, paymentMethod: $paymentMethod, amount: $amount) {
       id
       currency
       totalAmount
@@ -773,9 +661,7 @@ const addMutation = graphql(updateSubscriptionQuery, {
           }
 
           if (amount !== undefined) {
-            const originalOrder = data.Collective.ordersFromCollective.find(
-              order => order.id === id,
-            );
+            const originalOrder = data.Collective.ordersFromCollective.find(order => order.id === id);
             // copy it and mark it as unactive (will be in the canceled list)
             const canceledOrder = cloneDeep(originalOrder);
             canceledOrder.isSubscriptionActive = false;

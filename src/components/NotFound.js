@@ -28,11 +28,7 @@ const NotFound = ({ slug }) => {
       {slug && (
         <p>
           <Button href={`/search?q=${slug}`} className="blue">
-            <FormattedMessage
-              id="notFound.search"
-              defaultMessage="search for {term} "
-              values={{ term: slug }}
-            />
+            <FormattedMessage id="notFound.search" defaultMessage="search for {term} " values={{ term: slug }} />
           </Button>
         </p>
       )}

@@ -21,12 +21,7 @@ class EventsSection extends React.Component {
     if (LoggedInUser && LoggedInUser.canEditCollective(collective)) {
       action = {
         href: `/${collective.slug}/events/new`,
-        label: (
-          <FormattedMessage
-            id="sections.events.new"
-            defaultMessage="Create an Event"
-          />
-        ),
+        label: <FormattedMessage id="sections.events.new" defaultMessage="Create an Event" />,
       };
     }
 

@@ -1,7 +1,4 @@
-const WEBSITE_URL =
-  process.env.WEBSITE_URL ||
-  'http://localhost:3000' ||
-  'https://staging.opencollective.com';
+const WEBSITE_URL = process.env.WEBSITE_URL || 'http://localhost:3000' || 'https://staging.opencollective.com';
 
 const fill = (fieldname, value) => {
   cy.get(`.inputField.${fieldname} input`).type(value);
@@ -31,9 +28,7 @@ describe('create an update', () => {
     cy.wait(1000);
     cy.get('.UpdatePage .title', { timeout: 10000 }).contains('New update');
     cy.get('.UpdatePage .meta').contains('draft');
-    cy.get('.UpdatePage .PublishUpdateBtn').contains(
-      'Your update will be sent to',
-    );
+    cy.get('.UpdatePage .PublishUpdateBtn').contains('Your update will be sent to');
     cy.get('.UpdatePage button.publish').click();
     cy.get('.UpdatePage .meta')
       .contains('draft')

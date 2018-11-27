@@ -88,10 +88,7 @@ class SubscriptionsPage extends React.Component {
               </div>
 
               <div className="Subscriptions-listing">
-                <SubscriptionsWithData
-                  slug={slug}
-                  LoggedInUser={this.state.LoggedInUser}
-                />
+                <SubscriptionsWithData slug={slug} LoggedInUser={this.state.LoggedInUser} />
               </div>
             </div>
           </div>

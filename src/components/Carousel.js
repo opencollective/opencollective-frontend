@@ -40,10 +40,7 @@ const Controls = ({ currentSlide, goToSlide, slideCount, slidesToScroll }) => (
   <List>
     {getIndexes(slideCount, slidesToScroll).map(index => (
       <ListItem key={index}>
-        <Dot
-          active={currentSlide === index}
-          onClick={goToSlide.bind(null, index)}
-        >
+        <Dot active={currentSlide === index} onClick={goToSlide.bind(null, index)}>
           &bull;
         </Dot>
       </ListItem>

@@ -25,11 +25,7 @@ class ApproveExpenseBtn extends React.Component {
   render() {
     return (
       <div className="ApproveExpenseBtn">
-        <SmallButton
-          className="approve"
-          bsStyle="success"
-          onClick={this.onClick}
-        >
+        <SmallButton className="approve" bsStyle="success" onClick={this.onClick}>
           <FormattedMessage id="expense.approve.btn" defaultMessage="approve" />
         </SmallButton>
       </div>

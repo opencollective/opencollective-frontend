@@ -45,9 +45,7 @@ class Error extends React.Component {
         variables: { slug: parsedUrl[1] },
       };
 
-      return (
-        <ErrorPage LoggedInUser={LoggedInUser} data={errorData} log={false} />
-      );
+      return <ErrorPage LoggedInUser={LoggedInUser} data={errorData} log={false} />;
     }
     return <ErrorPage LoggedInUser={LoggedInUser} />;
   }

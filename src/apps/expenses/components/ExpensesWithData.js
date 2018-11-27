@@ -25,15 +25,7 @@ class ExpensesWithData extends React.Component {
   }
 
   render() {
-    const {
-      data,
-      LoggedInUser,
-      collective,
-      host,
-      view,
-      includeHostedCollectives,
-      filters,
-    } = this.props;
+    const { data, LoggedInUser, collective, host, view, includeHostedCollectives, filters } = this.props;
 
     if (data.error) {
       console.error('graphql error>>>', data.error.message);
@@ -159,10 +151,7 @@ export const addExpensesData = graphql(getExpensesQuery, {
           }
           return Object.assign({}, previousResult, {
             // Append the new posts results to the old one
-            allExpenses: [
-              ...previousResult.allExpenses,
-              ...fetchMoreResult.allExpenses,
-            ],
+            allExpenses: [...previousResult.allExpenses, ...fetchMoreResult.allExpenses],
           });
         },
       });

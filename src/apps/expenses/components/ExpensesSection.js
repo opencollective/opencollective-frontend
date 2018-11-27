@@ -31,12 +31,7 @@ class ExpensesSection extends React.Component {
     if (LoggedInUser && LoggedInUser.canEditCollective(collective)) {
       action = {
         href: `/${collective.slug}/expenses/new`,
-        label: (
-          <FormattedMessage
-            id="expense.new.submit"
-            defaultMessage="Submit Expense"
-          />
-        ),
+        label: <FormattedMessage id="expense.new.submit" defaultMessage="Submit Expense" />,
       };
     }
 
@@ -53,10 +48,7 @@ class ExpensesSection extends React.Component {
           <SectionTitle
             section="budget"
             values={{
-              balance: formatCurrency(
-                get(collective, 'stats.balance'),
-                collective.currency,
-              ),
+              balance: formatCurrency(get(collective, 'stats.balance'), collective.currency),
             }}
             action={action}
           />
@@ -121,23 +113,12 @@ class ExpensesSection extends React.Component {
                       />
                     </h2>
                     {this.totalExpenses >= 5 && (
-                      <LinkButton
-                        className="light ViewAllExpensesBtn"
-                        href={`${collective.path}/expenses`}
-                      >
-                        <FormattedMessage
-                          id="expenses.viewAll"
-                          defaultMessage="View All Expenses"
-                        />
+                      <LinkButton className="light ViewAllExpensesBtn" href={`${collective.path}/expenses`}>
+                        <FormattedMessage id="expenses.viewAll" defaultMessage="View All Expenses" />
                       </LinkButton>
                     )}
                   </div>
-                  <ExpensesWithData
-                    collective={collective}
-                    LoggedInUser={LoggedInUser}
-                    view="compact"
-                    limit={5}
-                  />
+                  <ExpensesWithData collective={collective} LoggedInUser={LoggedInUser} view="compact" limit={5} />
                 </div>
               )}
 
@@ -152,14 +133,8 @@ class ExpensesSection extends React.Component {
                       />
                     </h2>
                     {this.totalTransactions >= 5 && (
-                      <LinkButton
-                        className="light ViewAllTransactionsBtn"
-                        href={`${collective.path}/transactions`}
-                      >
-                        <FormattedMessage
-                          id="transactions.viewAll"
-                          defaultMessage="View All Transactions"
-                        />
+                      <LinkButton className="light ViewAllTransactionsBtn" href={`${collective.path}/transactions`}>
+                        <FormattedMessage id="transactions.viewAll" defaultMessage="View All Transactions" />
                       </LinkButton>
                     )}
                   </div>

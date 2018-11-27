@@ -78,9 +78,7 @@ class InvoicePage extends React.Component {
         date: moment(createdAt).format('l'),
         description: transaction.description,
         collective: (
-          <a href={`https://opencollective.com/${transaction.collective.slug}`}>
-            {transaction.collective.name}
-          </a>
+          <a href={`https://opencollective.com/${transaction.collective.slug}`}>{transaction.collective.name}</a>
         ),
         amount: formatCurrency(transaction.amount, transaction.currency),
       });
@@ -92,12 +90,13 @@ class InvoicePage extends React.Component {
     });
 
     this.hostBillingAddress = {
-      __html: `${invoice.host.location.name || ''}\n${invoice.host.location
-        .address || ''}`.replace(/\n/g, '<br />'),
+      __html: `${invoice.host.location.name || ''}\n${invoice.host.location.address || ''}`.replace(/\n/g, '<br />'),
     };
     this.fromCollectiveBillingAddress = {
-      __html: `${invoice.fromCollective.location.name || ''}\n${invoice
-        .fromCollective.location.address || ''}`.replace(/\n/g, '<br />'),
+      __html: `${invoice.fromCollective.location.name || ''}\n${invoice.fromCollective.location.address || ''}`.replace(
+        /\n/g,
+        '<br />',
+      ),
     };
   }
 
@@ -107,8 +106,7 @@ class InvoicePage extends React.Component {
     const coverStyle = { ...get(invoice.host, 'settings.style.hero.cover') };
     const backgroundImage = imagePreview(
       invoice.host.backgroundImage,
-      invoice.host.type === 'COLLECTIVE' &&
-        defaultBackgroundImage[invoice.host.type],
+      invoice.host.type === 'COLLECTIVE' && defaultBackgroundImage[invoice.host.type],
       { width: 400, baseUrl },
     );
     if (!coverStyle.backgroundImage && backgroundImage) {
@@ -148,11 +146,7 @@ class InvoicePage extends React.Component {
                 <div
                   className="logo"
                   style={{
-                    backgroundImage: `url('${imagePreview(
-                      invoice.host.image,
-                      null,
-                      { height: 200, baseUrl },
-                    )}')`,
+                    backgroundImage: `url('${imagePreview(invoice.host.image, null, { height: 200, baseUrl })}')`,
                   }}
                 />
               </div>
@@ -160,10 +154,7 @@ class InvoicePage extends React.Component {
 
             <div className="collectiveInfo">
               <h1>{invoice.host.name}</h1>
-              <a
-                href={`https://opencollective.com/${invoice.host.slug}`}
-                className="website"
-              >
+              <a href={`https://opencollective.com/${invoice.host.slug}`} className="website">
                 https://opencollective.com/
                 {invoice.host.slug}
               </a>
@@ -186,18 +177,14 @@ class InvoicePage extends React.Component {
                 <h2>Bill to:</h2>
                 {invoice.fromCollective.name}
                 <br />
-                <div
-                  dangerouslySetInnerHTML={this.fromCollectiveBillingAddress}
-                />
+                <div dangerouslySetInnerHTML={this.fromCollectiveBillingAddress} />
               </div>
             </div>
 
             <Table
               columns={this.columns}
               data={this.data}
-              rowClassName={(row, index) =>
-                index === this.data.length - 1 ? 'footer' : ''
-              }
+              rowClassName={(row, index) => (index === this.data.length - 1 ? 'footer' : '')}
             />
           </div>
 
@@ -224,26 +211,16 @@ class InvoicePage extends React.Component {
 
   renderTransaction = (transaction, index) => {
     if (!transaction || !transaction.createdAt) {
-      console.error(
-        '>>> renderTransaction error: invalid transaction object',
-        transaction,
-      );
+      console.error('>>> renderTransaction error: invalid transaction object', transaction);
       return;
     }
     return (
       <div className="transaction" key={index}>
         <div className="createdAt">
-          <FormattedDate
-            value={new Date(transaction.createdAt)}
-            day="numeric"
-            month="long"
-            year="numeric"
-          />
+          <FormattedDate value={new Date(transaction.createdAt)} day="numeric" month="long" year="numeric" />
         </div>
         <div className="description">{transaction.description}</div>
-        <div className="amount">
-          {formatCurrency(transaction.amount, transaction.currency)}
-        </div>
+        <div className="amount">{formatCurrency(transaction.amount, transaction.currency)}</div>
       </div>
     );
   };
@@ -265,48 +242,39 @@ class InvoicePage extends React.Component {
               font-family: 'Inter UI';
               font-style: normal;
               font-weight: 400;
-              src: url('/static/fonts/inter-ui/Inter-UI-Regular.woff2')
-                  format('woff2'),
-                url('/static/fonts/inter-ui/Inter-UI-Regular.woff')
-                  format('woff');
+              src: url('/static/fonts/inter-ui/Inter-UI-Regular.woff2') format('woff2'),
+                url('/static/fonts/inter-ui/Inter-UI-Regular.woff') format('woff');
             }
 
             @font-face {
               font-family: 'Inter UI';
               font-style: italic;
               font-weight: 400;
-              src: url('/static/fonts/inter-ui/Inter-UI-Italic.woff2')
-                  format('woff2'),
-                url('/static/fonts/inter-ui/Inter-UI-Italic.woff')
-                  format('woff');
+              src: url('/static/fonts/inter-ui/Inter-UI-Italic.woff2') format('woff2'),
+                url('/static/fonts/inter-ui/Inter-UI-Italic.woff') format('woff');
             }
 
             @font-face {
               font-family: 'Inter UI';
               font-style: normal;
               font-weight: 500;
-              src: url('/static/fonts/inter-ui/Inter-UI-Medium.woff2')
-                  format('woff2'),
-                url('/static/fonts/inter-ui/Inter-UI-Medium.woff')
-                  format('woff');
+              src: url('/static/fonts/inter-ui/Inter-UI-Medium.woff2') format('woff2'),
+                url('/static/fonts/inter-ui/Inter-UI-Medium.woff') format('woff');
             }
 
             @font-face {
               font-family: 'Inter UI';
               font-style: italic;
               font-weight: 500;
-              src: url('/static/fonts/inter-ui/Inter-UI-MediumItalic.woff2')
-                  format('woff2'),
-                url('/static/fonts/inter-ui/Inter-UI-MediumItalic.woff')
-                  format('woff');
+              src: url('/static/fonts/inter-ui/Inter-UI-MediumItalic.woff2') format('woff2'),
+                url('/static/fonts/inter-ui/Inter-UI-MediumItalic.woff') format('woff');
             }
 
             @font-face {
               font-family: 'Inter UI';
               font-style: normal;
               font-weight: 700;
-              src: url('/static/fonts/inter-ui/Inter-UI-Bold.woff2')
-                  format('woff2'),
+              src: url('/static/fonts/inter-ui/Inter-UI-Bold.woff2') format('woff2'),
                 url('/static/fonts/inter-ui/Inter-UI-Bold.woff') format('woff');
             }
 
@@ -314,18 +282,15 @@ class InvoicePage extends React.Component {
               font-family: 'Inter UI';
               font-style: italic;
               font-weight: 700;
-              src: url('/static/fonts/inter-ui/Inter-UI-BoldItalic.woff2')
-                  format('woff2'),
-                url('/static/fonts/inter-ui/Inter-UI-BoldItalic.woff')
-                  format('woff');
+              src: url('/static/fonts/inter-ui/Inter-UI-BoldItalic.woff2') format('woff2'),
+                url('/static/fonts/inter-ui/Inter-UI-BoldItalic.woff') format('woff');
             }
 
             @font-face {
               font-family: 'Inter UI';
               font-style: normal;
               font-weight: 900;
-              src: url('/static/fonts/inter-ui/Inter-UI-Black.woff2')
-                  format('woff2'),
+              src: url('/static/fonts/inter-ui/Inter-UI-Black.woff2') format('woff2'),
                 url('/static/fonts/inter-ui/Inter-UI-Black.woff') format('woff');
             }
 
@@ -333,10 +298,8 @@ class InvoicePage extends React.Component {
               font-family: 'Inter UI';
               font-style: italic;
               font-weight: 900;
-              src: url('/static/fonts/inter-ui/Inter-UI-BlackItalic.woff2')
-                  format('woff2'),
-                url('/static/fonts/inter-ui/Inter-UI-BlackItalic.woff')
-                  format('woff');
+              src: url('/static/fonts/inter-ui/Inter-UI-BlackItalic.woff2') format('woff2'),
+                url('/static/fonts/inter-ui/Inter-UI-BlackItalic.woff') format('woff');
             }
 
             html {

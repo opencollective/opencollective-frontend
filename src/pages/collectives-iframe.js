@@ -8,9 +8,7 @@ import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
 
 class CollectivesIframe extends React.Component {
-  static getInitialProps({
-    query: { collectiveSlug, id, role, orderBy, limit },
-  }) {
+  static getInitialProps({ query: { collectiveSlug, id, role, orderBy, limit } }) {
     return { collectiveSlug, id, role, orderBy, limit };
   }
 
@@ -40,8 +38,7 @@ class CollectivesIframe extends React.Component {
 
   render() {
     const { collectiveSlug, role, limit } = this.props;
-    const orderBy =
-      this.props.orderBy || role === 'HOST' ? 'balance' : 'totalDonations';
+    const orderBy = this.props.orderBy || role === 'HOST' ? 'balance' : 'totalDonations';
     return (
       <div>
         <Head>

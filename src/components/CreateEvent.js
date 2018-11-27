@@ -52,9 +52,9 @@ class CreateEvent extends React.Component {
     try {
       const res = await this.props.createCollective(EventInputType);
       const event = res.data.createCollective;
-      const eventUrl = `${window.location.protocol}//${window.location.host}/${
-        parentCollective.slug
-      }/events/${event.slug}`;
+      const eventUrl = `${window.location.protocol}//${window.location.host}/${parentCollective.slug}/events/${
+        event.slug
+      }`;
       this.setState({
         status: 'idle',
         result: { success: `Event created successfully: ${eventUrl}` },
@@ -62,10 +62,7 @@ class CreateEvent extends React.Component {
       window.location.replace(eventUrl);
     } catch (err) {
       console.error('>>> createEvent error: ', JSON.stringify(err));
-      const errorMsg =
-        err.graphQLErrors && err.graphQLErrors[0]
-          ? err.graphQLErrors[0].message
-          : err.message;
+      const errorMsg = err.graphQLErrors && err.graphQLErrors[0] ? err.graphQLErrors[0].message : err.message;
       this.setState({ result: { error: errorMsg } });
       throw new Error(errorMsg);
     }
@@ -79,8 +76,7 @@ class CreateEvent extends React.Component {
 
   render() {
     const { parentCollective, LoggedInUser } = this.props;
-    const canCreateEvent =
-      LoggedInUser && LoggedInUser.canEditCollective(parentCollective);
+    const canCreateEvent = LoggedInUser && LoggedInUser.canEditCollective(parentCollective);
 
     const collective = parentCollective || {};
     const title = `Create a New ${collective.name} Event`;
@@ -141,14 +137,8 @@ class CreateEvent extends React.Component {
                   />
                 </p>
                 <p>
-                  <Button
-                    bsStyle="primary"
-                    href={`/signin?next=/${collective.slug}/events/new`}
-                  >
-                    <FormattedMessage
-                      id="login.button"
-                      defaultMessage="login"
-                    />
+                  <Button bsStyle="primary" href={`/signin?next=/${collective.slug}/events/new`}>
+                    <FormattedMessage id="login.button" defaultMessage="login" />
                   </Button>
                 </p>
               </div>

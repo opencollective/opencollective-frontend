@@ -33,10 +33,7 @@ class CreateOrganization extends React.Component {
   }
 
   async createCollective(CollectiveInputType) {
-    if (
-      !CollectiveInputType.tos ||
-      (get(this.props.host, 'settings.tos') && !CollectiveInputType.hostTos)
-    ) {
+    if (!CollectiveInputType.tos || (get(this.props.host, 'settings.tos') && !CollectiveInputType.hostTos)) {
       this.error('Please accept the terms of service');
       return;
     }
@@ -48,11 +45,9 @@ class CreateOrganization extends React.Component {
     try {
       const res = await this.props.createCollective(CollectiveInputType);
       const collective = res.data.createCollective;
-      const collectiveUrl = `${window.location.protocol}//${
-        window.location.host
-      }/${collective.slug}?status=collectiveCreated&CollectiveId=${
-        collective.id
-      }`;
+      const collectiveUrl = `${window.location.protocol}//${window.location.host}/${
+        collective.slug
+      }?status=collectiveCreated&CollectiveId=${collective.id}`;
       this.setState({
         status: 'idle',
         result: {
@@ -66,10 +61,7 @@ class CreateOrganization extends React.Component {
       });
     } catch (err) {
       console.error('>>> createOrganization error: ', JSON.stringify(err));
-      const errorMsg =
-        err.graphQLErrors && err.graphQLErrors[0]
-          ? err.graphQLErrors[0].message
-          : err.message;
+      const errorMsg = err.graphQLErrors && err.graphQLErrors[0] ? err.graphQLErrors[0].message : err.message;
       this.setState({ result: { error: errorMsg } });
       throw new Error(errorMsg);
     }
@@ -111,11 +103,7 @@ class CreateOrganization extends React.Component {
           `}
         </style>
 
-        <Header
-          title={title}
-          className={this.state.status}
-          LoggedInUser={LoggedInUser}
-        />
+        <Header title={title} className={this.state.status} LoggedInUser={LoggedInUser} />
 
         <Body>
           <CollectiveCover

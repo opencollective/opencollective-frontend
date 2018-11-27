@@ -19,9 +19,7 @@ export default (server, app) => {
   server.get('/static/*', maxAge(7200));
 
   server.get('/favicon.*', maxAge(300000), (req, res) => {
-    return res.sendFile(
-      path.join(__dirname, '../static/images/favicon.ico.png'),
-    );
+    return res.sendFile(path.join(__dirname, '../static/images/favicon.ico.png'));
   });
 
   // NOTE: in production and staging environment, this is currently not used
@@ -66,16 +64,10 @@ export default (server, app) => {
    * `/:collectiveSlug/members/:backerType(all|users|organizations)`
    */
 
-  server.get(
-    '/:collectiveSlug/:backerType/:position/website(.:format(png|jpg|svg))?',
-    controllers.collectives.website,
-  );
+  server.get('/:collectiveSlug/:backerType/:position/website(.:format(png|jpg|svg))?', controllers.collectives.website);
 
   server.get('/:collectiveSlug.:format(json)', controllers.collectives.info);
-  server.get(
-    '/:collectiveSlug/members.:format(json|csv)',
-    controllers.members.list,
-  );
+  server.get('/:collectiveSlug/members.:format(json|csv)', controllers.members.list);
   server.get(
     '/:collectiveSlug/members/:backerType(all|users|organizations).:format(json|csv)',
     controllers.members.list,
@@ -97,105 +89,73 @@ export default (server, app) => {
     controllers.transactions.invoice,
   );
 
-  server.get(
-    '/:collectiveSlug/:verb(contribute|donate)/button:size(|@2x).png',
-    (req, res) => {
-      const color = req.query.color === 'blue' ? 'blue' : 'white';
-      res.sendFile(
-        path.join(
-          __dirname,
-          `../static/images/buttons/${req.params.verb}-button-${color}${
-            req.params.size
-          }.png`,
-        ),
-      );
-    },
-  );
+  server.get('/:collectiveSlug/:verb(contribute|donate)/button:size(|@2x).png', (req, res) => {
+    const color = req.query.color === 'blue' ? 'blue' : 'white';
+    res.sendFile(
+      path.join(__dirname, `../static/images/buttons/${req.params.verb}-button-${color}${req.params.size}.png`),
+    );
+  });
 
   server.get('/:collectiveSlug/events.:format(json)', controllers.events.list);
-  server.get(
-    '/:collectiveSlug/events/:eventSlug.:format(json)',
-    controllers.events.info,
-  );
+  server.get('/:collectiveSlug/events/:eventSlug.:format(json)', controllers.events.info);
   server.get(
     '/:collectiveSlug/events/:eventSlug/:role(attendees|followers|organizers|all).:format(json|csv)',
     controllers.members.list,
   );
-  server.get(
-    '/:collectiveSlug/events/:eventSlug/nametags.:format(pdf|html)',
-    (req, res, next) => {
-      const { collectiveSlug, eventSlug, pageFormat, format } = req.params;
-      const params = { ...req.params, ...req.query };
-      app.renderToHTML(req, res, '/nametags', params).then(html => {
-        if (format === 'html') {
-          return res.send(html);
+  server.get('/:collectiveSlug/events/:eventSlug/nametags.:format(pdf|html)', (req, res, next) => {
+    const { collectiveSlug, eventSlug, pageFormat, format } = req.params;
+    const params = { ...req.params, ...req.query };
+    app.renderToHTML(req, res, '/nametags', params).then(html => {
+      if (format === 'html') {
+        return res.send(html);
+      }
+
+      const options = {
+        pageFormat: pageFormat === 'A4' ? 'A4' : 'Letter',
+        renderDelay: 3000,
+      };
+      // html = html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,'');
+      const filename = `${moment().format('YYYYMMDD')}-${collectiveSlug}-${eventSlug}-attendees.pdf`;
+
+      res.setHeader('content-type', 'application/pdf');
+      res.setHeader('content-disposition', `inline; filename="${filename}"`); // or attachment?
+      pdf.create(html, options).toStream((err, stream) => {
+        if (err) {
+          logger.error('>>> Error while generating pdf at %s', req.url, err);
+          return next(err);
         }
-
-        const options = {
-          pageFormat: pageFormat === 'A4' ? 'A4' : 'Letter',
-          renderDelay: 3000,
-        };
-        // html = html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,'');
-        const filename = `${moment().format(
-          'YYYYMMDD',
-        )}-${collectiveSlug}-${eventSlug}-attendees.pdf`;
-
-        res.setHeader('content-type', 'application/pdf');
-        res.setHeader('content-disposition', `inline; filename="${filename}"`); // or attachment?
-        pdf.create(html, options).toStream((err, stream) => {
-          if (err) {
-            logger.error('>>> Error while generating pdf at %s', req.url, err);
-            return next(err);
-          }
-          stream.pipe(res);
-        });
+        stream.pipe(res);
       });
-    },
-  );
+    });
+  });
 
-  server.get(
-    '/:collectiveSlug/:verb(contribute|donate)/button.js',
-    (req, res) => {
-      const content = fs.readFileSync(
-        path.join(__dirname, '../templates/button.js'),
-        'utf8',
-      );
-      const compiled = template(content, { interpolate: /{{([\s\S]+?)}}/g });
-      res.setHeader('content-type', 'application/javascript');
-      res.send(
-        compiled({
-          collectiveSlug: req.params.collectiveSlug,
-          verb: req.params.verb,
-          host:
-            process.env.WEBSITE_URL ||
-            `http://localhost:${process.env.PORT || 3000}`,
-        }),
-      );
-    },
-  );
+  server.get('/:collectiveSlug/:verb(contribute|donate)/button.js', (req, res) => {
+    const content = fs.readFileSync(path.join(__dirname, '../templates/button.js'), 'utf8');
+    const compiled = template(content, { interpolate: /{{([\s\S]+?)}}/g });
+    res.setHeader('content-type', 'application/javascript');
+    res.send(
+      compiled({
+        collectiveSlug: req.params.collectiveSlug,
+        verb: req.params.verb,
+        host: process.env.WEBSITE_URL || `http://localhost:${process.env.PORT || 3000}`,
+      }),
+    );
+  });
 
-  server.get(
-    '/:collectiveSlug/:widget(widget|events|collectives|banner).js',
-    (req, res) => {
-      const content = fs.readFileSync(
-        path.join(__dirname, '../templates/widget.js'),
-        'utf8',
-      );
-      const compiled = template(content, { interpolate: /{{([\s\S]+?)}}/g });
-      res.setHeader('content-type', 'application/javascript');
-      res.send(
-        compiled({
-          style: '{}',
-          ...req.query,
-          collectiveSlug: req.params.collectiveSlug,
-          widget: req.params.widget,
-          host:
-            process.env.WEBSITE_URL ||
-            `http://localhost:${process.env.PORT || 3000}`,
-        }),
-      );
-    },
-  );
+  server.get('/:collectiveSlug/:widget(widget|events|collectives|banner).js', (req, res) => {
+    const content = fs.readFileSync(path.join(__dirname, '../templates/widget.js'), 'utf8');
+    const compiled = template(content, { interpolate: /{{([\s\S]+?)}}/g });
+    res.setHeader('content-type', 'application/javascript');
+    res.send(
+      compiled({
+        style: '{}',
+        ...req.query,
+        collectiveSlug: req.params.collectiveSlug,
+        widget: req.params.widget,
+        host: process.env.WEBSITE_URL || `http://localhost:${process.env.PORT || 3000}`,
+      }),
+    );
+  });
 
   return pages.getRequestHandler(server.next);
 };

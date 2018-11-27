@@ -69,13 +69,7 @@ class CompletePledgePage extends React.Component {
         data.error = data.error || error;
       }
 
-      return (
-        <ErrorPage
-          loading={loading || loadingUserLogin}
-          data={data}
-          message={error && error.message}
-        />
-      );
+      return <ErrorPage loading={loading || loadingUserLogin} data={data} message={error && error.message} />;
     }
 
     if (Order) {
@@ -92,16 +86,11 @@ class CompletePledgePage extends React.Component {
 
     const pledgeComplete = Order && ['ACTIVE', 'PAID'].includes(Order.status);
     const collectiveActive = get(Order, 'collective.isActive');
-    const showForm =
-      LoggedInUser && !pledgeComplete && get(Order, 'collective.isActive');
+    const showForm = LoggedInUser && !pledgeComplete && get(Order, 'collective.isActive');
 
     return (
       <Fragment>
-        <Header
-          className={loadingUserLogin ? 'loading' : ''}
-          LoggedInUser={LoggedInUser}
-          title="Complete Pledge"
-        />
+        <Header className={loadingUserLogin ? 'loading' : ''} LoggedInUser={LoggedInUser} title="Complete Pledge" />
         <Body>
           <Container maxWidth={1200} px={4} py={5}>
             <H1>Complete Your Pledge</H1>
@@ -115,15 +104,14 @@ class CompletePledgePage extends React.Component {
 
             {pledgeComplete && (
               <P fontWeight="bold" textAlign="center" mt={4}>
-                This pledge has already been completed. No action needed at this
-                time.
+                This pledge has already been completed. No action needed at this time.
               </P>
             )}
 
             {!collectiveActive && (
               <P fontWeight="bold" textAlign="center" mt={4}>
-                The {get(Order, 'collective.name')} collective has not been
-                claimed. You will be notified once that occurs.
+                The {get(Order, 'collective.name')} collective has not been claimed. You will be notified once that
+                occurs.
               </P>
             )}
 

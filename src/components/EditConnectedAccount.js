@@ -31,8 +31,7 @@ class EditConnectedAccount extends React.Component {
       },
       'collective.connectedAccounts.stripe.description': {
         id: 'collective.connectedAccounts.stripe.description',
-        defaultMessage:
-          'Connect a Stripe account to create collectives and start accepting donations on their behalf.',
+        defaultMessage: 'Connect a Stripe account to create collectives and start accepting donations on their behalf.',
       },
       'collective.connectedAccounts.stripe.connected': {
         id: 'collective.connectedAccounts.stripe.connected',
@@ -44,13 +43,11 @@ class EditConnectedAccount extends React.Component {
       },
       'collective.connectedAccounts.twitter.description': {
         id: 'collective.connectedAccounts.twitter.description',
-        defaultMessage:
-          'Connect a Twitter account to automatically thank new backers',
+        defaultMessage: 'Connect a Twitter account to automatically thank new backers',
       },
       'collective.connectedAccounts.twitter.connected': {
         id: 'collective.connectedAccounts.twitter.connected',
-        defaultMessage:
-          'Twitter account @{username} connected on {createdAt, date, short}',
+        defaultMessage: 'Twitter account @{username} connected on {createdAt, date, short}',
       },
       'collective.connectedAccounts.github.button': {
         id: 'collective.connectedAccounts.github.button',
@@ -58,13 +55,11 @@ class EditConnectedAccount extends React.Component {
       },
       'collective.connectedAccounts.github.description': {
         id: 'collective.connectedAccounts.github.description',
-        defaultMessage:
-          'Connect a GitHub account to verify your identity and add it to your profile',
+        defaultMessage: 'Connect a GitHub account to verify your identity and add it to your profile',
       },
       'collective.connectedAccounts.github.connected': {
         id: 'collective.connectedAccounts.github.connected',
-        defaultMessage:
-          'GitHub account {username} connected on {createdAt, date, short}',
+        defaultMessage: 'GitHub account {username} connected on {createdAt, date, short}',
       },
     });
     this.services = ['stripe', 'paypal', 'twitter', 'github'];
@@ -74,15 +69,11 @@ class EditConnectedAccount extends React.Component {
     const { collective, options } = this.props;
 
     if (service === 'github' || service === 'twitter') {
-      const redirect = `${window.location.protocol}//${window.location.host}/${
-        collective.slug
-      }/edit#connectedAccounts`;
+      const redirect = `${window.location.protocol}//${window.location.host}/${collective.slug}/edit#connectedAccounts`;
       return window.location.replace(
-        `/api/connected-accounts/${service}/oauthUrl?CollectiveId=${
-          collective.id
-        }&redirect=${encodeURIComponent(redirect)}&access_token=${
-          localStorage.accessToken
-        }`,
+        `/api/connected-accounts/${service}/oauthUrl?CollectiveId=${collective.id}&redirect=${encodeURIComponent(
+          redirect,
+        )}&access_token=${localStorage.accessToken}`,
       );
     }
 
@@ -109,43 +100,24 @@ class EditConnectedAccount extends React.Component {
         {!connectedAccount && (
           <div>
             <HelpBlock>
-              {intl.formatMessage(
-                this.messages[
-                  `collective.connectedAccounts.${service}.description`
-                ],
-              )}
+              {intl.formatMessage(this.messages[`collective.connectedAccounts.${service}.description`])}
             </HelpBlock>
             <Button onClick={() => this.connect(service)}>
-              {intl.formatMessage(
-                this.messages[`collective.connectedAccounts.${service}.button`],
-              )}
+              {intl.formatMessage(this.messages[`collective.connectedAccounts.${service}.button`])}
             </Button>
           </div>
         )}
         {connectedAccount && (
           <div>
-            <div>
-              {intl.formatMessage(
-                this.messages[
-                  `collective.connectedAccounts.${service}.connected`
-                ],
-                vars,
-              )}
-            </div>
+            <div>{intl.formatMessage(this.messages[`collective.connectedAccounts.${service}.connected`], vars)}</div>
             <Button onClick={() => this.connect(service)}>
-              {intl.formatMessage(
-                this.messages['collective.connectedAccounts.reconnect.button'],
-              )}
+              {intl.formatMessage(this.messages['collective.connectedAccounts.reconnect.button'])}
             </Button>
           </div>
         )}
-        {connectedAccount &&
-          connectedAccount.service === 'twitter' && (
-            <EditTwitterAccount
-              collective={collective}
-              connectedAccount={connectedAccount}
-            />
-          )}
+        {connectedAccount && connectedAccount.service === 'twitter' && (
+          <EditTwitterAccount collective={collective} connectedAccount={connectedAccount} />
+        )}
       </div>
     );
   }

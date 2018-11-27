@@ -1,7 +1,4 @@
-const WEBSITE_URL =
-  process.env.WEBSITE_URL ||
-  'http://localhost:3000' ||
-  'https://staging.opencollective.com';
+const WEBSITE_URL = process.env.WEBSITE_URL || 'http://localhost:3000' || 'https://staging.opencollective.com';
 
 const notFoundSlug = 'a-collective-that-does-not-exist';
 const notFoundURL = `${WEBSITE_URL}/${notFoundSlug}`;

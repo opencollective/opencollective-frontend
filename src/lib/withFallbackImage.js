@@ -7,16 +7,7 @@ const fallbackFetchEnabled = false;
 
 export default ChildComponent =>
   withState('src', 'setSrc', ({ src }) => src)(
-    ({
-      src,
-      setSrc,
-      type = 'USER',
-      radius,
-      height,
-      website,
-      name,
-      ...props
-    }) => {
+    ({ src, setSrc, type = 'USER', radius, height, website, name, ...props }) => {
       if (name === 'anonymous') {
         type = name.toUpperCase();
       }

@@ -43,17 +43,13 @@ describe('PaymentMethodChooser.test.js', () => {
 
     const component = mountComponent(values);
 
-    expect(component.find('.paymentmethod-info').text()).toContain(
-      '(payment method info not available)',
-    );
+    expect(component.find('.paymentmethod-info').text()).toContain('(payment method info not available)');
   });
 
   it('displays paymentMethodInUse correctly', () => {
     const component = mountComponent(defaultValues);
 
-    expect(component.find('.paymentmethod-info').text()).toContain(
-      '💳\xA0\xA0VISA **** 5555 - exp 02/2021',
-    );
+    expect(component.find('.paymentmethod-info').text()).toContain('💳\xA0\xA0VISA **** 5555 - exp 02/2021');
   });
 
   it('displays American Express cards with an abbreviated label', () => {
@@ -63,9 +59,7 @@ describe('PaymentMethodChooser.test.js', () => {
       }),
     );
 
-    expect(component.find('.paymentmethod-info').text()).toContain(
-      '💳\xA0\xA0AMEX **** 5555 - exp 02/2021',
-    );
+    expect(component.find('.paymentmethod-info').text()).toContain('💳\xA0\xA0AMEX **** 5555 - exp 02/2021');
   });
 
   it('truncate brand if too long', () => {
@@ -79,9 +73,7 @@ describe('PaymentMethodChooser.test.js', () => {
       }),
     );
 
-    expect(component.find('.paymentmethod-info').text()).toContain(
-      '💳\xA0\xA0THE BANK... **** 5555 - exp 02/2021',
-    );
+    expect(component.find('.paymentmethod-info').text()).toContain('💳\xA0\xA0THE BANK... **** 5555 - exp 02/2021');
   });
 
   it('shows selector when editMode is true', () => {

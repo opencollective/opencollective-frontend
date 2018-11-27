@@ -192,9 +192,7 @@ describe('OrderForm component', () => {
         }
       }
       expect(component.find('.creditcardSelector').exists()).toBeTrue;
-      expect(component.find('.creditcardSelector').html()).toContain(
-        LoggedInUser.paymentMethods[0].identifier,
-      );
+      expect(component.find('.creditcardSelector').html()).toContain(LoggedInUser.paymentMethods[0].identifier);
       setTimeout(() => {
         component.find('.submit button').simulate('click');
         setTimeout(() => {

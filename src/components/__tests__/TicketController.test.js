@@ -14,10 +14,7 @@ describe('TicketController', () => {
       if (DEBUG) console.log('> onChange', value);
       expect(value).toEqual(1);
     };
-    ticketCtlr = ReactDOM.render(
-      <TicketController value={2} onChange={onChange} />,
-      div,
-    );
+    ticketCtlr = ReactDOM.render(<TicketController value={2} onChange={onChange} />, div);
     ticketCtlr.changeValue(-1);
   });
 
@@ -26,10 +23,7 @@ describe('TicketController', () => {
       if (DEBUG) console.log('> onChange', value);
       expect(value).toEqual(3);
     };
-    ticketCtlr = ReactDOM.render(
-      <TicketController value={2} onChange={onChange} />,
-      div,
-    );
+    ticketCtlr = ReactDOM.render(<TicketController value={2} onChange={onChange} />, div);
     ticketCtlr.changeValue(1);
   });
 
@@ -38,10 +32,7 @@ describe('TicketController', () => {
       if (DEBUG) console.log('> onChange', value);
       expect(value).toEqual(1);
     };
-    ticketCtlr = ReactDOM.render(
-      <TicketController value={1} onChange={onChange} />,
-      div,
-    );
+    ticketCtlr = ReactDOM.render(<TicketController value={1} onChange={onChange} />, div);
     ticketCtlr.changeValue(-1);
   });
 });

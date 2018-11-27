@@ -1,7 +1,4 @@
-const WEBSITE_URL =
-  process.env.WEBSITE_URL ||
-  'http://localhost:3000' ||
-  'https://staging.opencollective.com';
+const WEBSITE_URL = process.env.WEBSITE_URL || 'http://localhost:3000' || 'https://staging.opencollective.com';
 const random = Math.round(Math.random() * 100000);
 const expenseDescription = `New expense ${random}`;
 
@@ -41,9 +38,7 @@ const uploadReceipt = (dropzoneElement = '.InputTypeDropzone') => {
 describe('new expense', () => {
   it('requires to login to submit an expense', () => {
     cy.visit(`${WEBSITE_URL}/testcollective/expenses/new`);
-    cy.get('.CreateExpenseForm').contains(
-      'Sign up or login to submit an expense',
-    );
+    cy.get('.CreateExpenseForm').contains('Sign up or login to submit an expense');
     cy.get('.inputField.email input').type('testuser+admin@opencollective.com');
     cy.get('.login').click();
     cy.wait(300);
@@ -60,23 +55,16 @@ describe('new expense', () => {
     cy.get('.error').should('have.text', 'Missing attachment');
     uploadReceipt();
     cy.get('.inputField.paypalEmail input').type('{selectall}{del}');
-    cy.get('.error').should(
-      'have.text',
-      'Please provide your PayPal email address (or change the payout method)',
-    );
+    cy.get('.error').should('have.text', 'Please provide your PayPal email address (or change the payout method)');
     cy.get('.inputField.paypalEmail input').type('paypal@test.com');
-    cy.get('.inputField.privateMessage textarea').type(
-      'Some private note for the host',
-    );
+    cy.get('.inputField.privateMessage textarea').type('Some private note for the host');
     cy.get('button[type=submit]').click();
     cy.screenshot('expenseCreatedPaypalLoggedOut');
     cy.get('.expenseCreated').contains('success');
     cy.get('.whiteblue.viewAllExpenses').click();
     cy.wait(300);
     cy.get('.itemsList .expense', { timeout: 10000 });
-    cy.get('.Expenses .expense:first .description').contains(
-      expenseDescription,
-    );
+    cy.get('.Expenses .expense:first .description').contains(expenseDescription);
     cy.get('.Expenses .expense:first .status').contains('pending');
     cy.get('.Expenses .expense:first .meta').contains('Team');
   });
@@ -91,13 +79,8 @@ describe('new expense', () => {
     cy.wait(500);
     cy.get('.CommentForm .actions .Button.save', { timeout: 5000 }).click();
     cy.wait(300);
-    cy.get('.Comments .itemsList .comment', { timeout: 5000 }).should(
-      'have.length',
-      1,
-    );
-    cy.get('.Comments .itemsList .comment:first .description').contains(
-      'This is a first comment',
-    );
+    cy.get('.Comments .itemsList .comment', { timeout: 5000 }).should('have.length', 1);
+    cy.get('.Comments .itemsList .comment:first .description').contains('This is a first comment');
     cy.get('.desktopOnly .submitExpense').click();
     cy.get('.descriptionField input').should('have.value', '');
     cy.get('.amountField input').should('have.value', '');
@@ -114,33 +97,23 @@ describe('new expense', () => {
     cy.get('.LoginTopBarProfileButton').contains('testuseradmin', {
       timeout: 15000,
     });
-    cy.get('.inputField.privateMessage textarea').type(
-      'Some private note for the host',
-    );
+    cy.get('.inputField.privateMessage textarea').type('Some private note for the host');
     cy.get('button[type=submit]').click();
     cy.screenshot('expenseCreatedLoggedIn');
     cy.get('.expenseCreated').contains('success');
     cy.get('.whiteblue.viewAllExpenses').click();
     cy.wait(300);
     cy.get('.itemsList .expense', { timeout: 10000 });
-    cy.get('.Expenses .expense:first .description').contains(
-      expenseDescription,
-    );
+    cy.get('.Expenses .expense:first .description').contains(expenseDescription);
     cy.get('.Expenses .expense:first .status').contains('pending');
-    cy.get('.Expenses .expense:first .privateMessage').contains(
-      'Some private note for the host',
-    );
+    cy.get('.Expenses .expense:first .privateMessage').contains('Some private note for the host');
     cy.get('.Expenses .expense:first .ApproveExpenseBtn button').click();
     cy.get('.Expenses .expense:first .status').contains('approved');
     cy.screenshot('expenseApproved');
     cy.get('.Expenses .expense:first .toggleEditExpense').click();
-    cy.get('.Expenses .expense:first .inputField.description input').type(
-      ' edited',
-    );
+    cy.get('.Expenses .expense:first .inputField.description input').type(' edited');
     cy.get('.Expenses .expense:first .inputField.amount input').type('13');
-    cy.get('.Expenses .expense:first .inputField.category select').select(
-      'Team',
-    );
+    cy.get('.Expenses .expense:first .inputField.category select').select('Team');
     cy.get('.Expenses .expense:first .inputField.privateMessage textarea').type(
       '{selectall}Another private note (edited)',
     );
@@ -155,8 +128,6 @@ describe('new expense', () => {
     cy.screenshot('expenseSaved');
     cy.get('.Expenses .expense:first .ApproveExpenseBtn button').click();
     cy.wait(300);
-    cy.get('.Expenses .expense:first .status', { timeout: 5000 }).contains(
-      'approved',
-    );
+    cy.get('.Expenses .expense:first .status', { timeout: 5000 }).contains('approved');
   });
 });

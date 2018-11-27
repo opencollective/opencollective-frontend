@@ -70,9 +70,7 @@ class InputTypeCreditCard extends React.Component {
 
   render() {
     const options = this.props.options || [];
-    const showNewCreditCardForm = !(
-      this.state.uuid && this.state.uuid.length === 36
-    );
+    const showNewCreditCardForm = !(this.state.uuid && this.state.uuid.length === 36);
 
     return (
       <div className="CreditCardForm">
@@ -107,9 +105,9 @@ class InputTypeCreditCard extends React.Component {
           >
             {options.map(option => {
               const value = option.uuid;
-              const label = `${option.data.brand} ${option.data.funding} ${
-                option.data.identifier
-              } ${option.data.expMonth}/${option.data.expYear}`;
+              const label = `${option.data.brand} ${option.data.funding} ${option.data.identifier} ${
+                option.data.expMonth
+              }/${option.data.expYear}`;
               return <option value={value}>{`💳 ${label}`}</option>;
             })}
             <option value="">other</option>

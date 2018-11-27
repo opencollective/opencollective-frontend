@@ -1,12 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import withIntl from '../lib/withIntl';
-import {
-  defineMessages,
-  FormattedMessage,
-  FormattedDate,
-  FormattedTime,
-} from 'react-intl';
+import { defineMessages, FormattedMessage, FormattedDate, FormattedTime } from 'react-intl';
 import { Github } from 'styled-icons/fa-brands/Github.cjs';
 import { Twitter } from 'styled-icons/fa-brands/Twitter.cjs';
 import { ExternalLinkAlt } from 'styled-icons/fa-solid/ExternalLinkAlt.cjs';
@@ -49,22 +44,14 @@ class CollectiveCover extends React.Component {
 
     this.description = props.description || props.collective.description;
     if (props.collective.type === 'EVENT') {
-      const eventLocationRoute = props.href
-        ? `${props.href}#location`
-        : '#location';
+      const eventLocationRoute = props.href ? `${props.href}#location` : '#location';
       this.description = (
         <div>
-          {props.collective.description && (
-            <div className="eventDescription">
-              {props.collective.description}
-            </div>
-          )}
+          {props.collective.description && <div className="eventDescription">{props.collective.description}</div>}
           <Link route={eventLocationRoute}>
             {!props.collective.startsAt &&
               console.warn(
-                `Event: props.collective.startsAt should not be empty. props.collective.id: ${
-                  props.collective.id
-                }`,
+                `Event: props.collective.startsAt should not be empty. props.collective.id: ${props.collective.id}`,
               )}
             {props.collective.startsAt && (
               <React.Fragment>
@@ -76,10 +63,7 @@ class CollectiveCover extends React.Component {
                   month="long"
                 />
                 , &nbsp;
-                <FormattedTime
-                  value={props.collective.startsAt}
-                  timeZone={props.collective.timezone}
-                />
+                <FormattedTime value={props.collective.startsAt} timeZone={props.collective.timezone} />
                 &nbsp; - &nbsp;
               </React.Fragment>
             )}
@@ -95,11 +79,7 @@ class CollectiveCover extends React.Component {
     let tooltip = member.member.name;
     if (this.messages[member.role]) {
       tooltip += `
-${
-        this.messages[member.role]
-          ? intl.formatMessage(this.messages[member.role])
-          : member.role
-      }`;
+${this.messages[member.role] ? intl.formatMessage(this.messages[member.role]) : member.role}`;
     }
     const description = member.description || member.member.description;
     if (description) {
@@ -112,26 +92,17 @@ ${description}`;
   render() {
     const { collective, className, LoggedInUser, intl } = this.props;
 
-    const {
-      company,
-      type,
-      website,
-      twitterHandle,
-      githubHandle,
-      stats,
-    } = collective;
+    const { company, type, website, twitterHandle, githubHandle, stats } = collective;
 
     const href = this.props.href || collective.path || `/${collective.slug}`;
     const title = this.props.title || collective.name;
     const backgroundImage = imagePreview(
-      collective.backgroundImage ||
-        get(collective, 'parentCollective.backgroundImage'),
+      collective.backgroundImage || get(collective, 'parentCollective.backgroundImage'),
       defaultBackgroundImage[collective.type],
       { height: 500 },
     );
     const customStyles =
-      get(collective, 'settings.style.hero.cover') ||
-      get(collective.parentCollective, 'settings.style.hero.cover');
+      get(collective, 'settings.style.hero.cover') || get(collective.parentCollective, 'settings.style.hero.cover');
     const style = {
       backgroundImage: `url('${backgroundImage}')`,
       backgroundPosition: 'center center',
@@ -147,9 +118,7 @@ ${description}`;
         const label = this.props.cta.label;
         cta = (
           <Button className="blue" href={this.props.cta.href}>
-            {this.messages[label]
-              ? intl.formatMessage(this.messages[label])
-              : label}
+            {this.messages[label] ? intl.formatMessage(this.messages[label]) : label}
           </Button>
         );
       } else {
@@ -208,8 +177,7 @@ ${description}`;
             .content,
             .content a {
               color: white;
-              text-shadow: 1px 0 1px rgba(0, 0, 0, 0.8),
-                0 -1px 1px rgba(0, 0, 0, 0.8), 0 1px 1px rgba(0, 0, 0, 0.8),
+              text-shadow: 1px 0 1px rgba(0, 0, 0, 0.8), 0 -1px 1px rgba(0, 0, 0, 0.8), 0 1px 1px rgba(0, 0, 0, 0.8),
                 -1px 0 1px rgba(0, 0, 0, 0.8);
             }
             .defaultBackgroundImage .content,
@@ -356,57 +324,32 @@ ${description}`;
           <div className="content">
             <Link route={href} className="goBack">
               {collective.type === 'USER' && (
-                <Avatar
-                  src={logo}
-                  className="logo"
-                  radius="10rem"
-                  {...pick(collective, ['type', 'name'])}
-                />
+                <Avatar src={logo} className="logo" radius="10rem" {...pick(collective, ['type', 'name'])} />
               )}
               {collective.type !== 'USER' && (
-                <Logo
-                  src={logo}
-                  className="logo"
-                  type={collective.type}
-                  website={collective.website}
-                  height="10rem"
-                />
+                <Logo src={logo} className="logo" type={collective.type} website={collective.website} height="10rem" />
               )}
             </Link>
             <h1>{title}</h1>
-            {this.description && (
-              <p className="description">{this.description}</p>
-            )}
+            {this.description && <p className="description">{this.description}</p>}
             {className !== 'small' && (
               <div>
-                {company &&
-                  company.substr(0, 1) === '@' && (
-                    <p className="company">
-                      <Link route={`/${company.substr(1)}`}>
-                        {company.substr(1)}
-                      </Link>
-                    </p>
-                  )}
-                {company &&
-                  company.substr(0, 1) !== '@' && (
-                    <p className="company">{company}</p>
-                  )}
+                {company && company.substr(0, 1) === '@' && (
+                  <p className="company">
+                    <Link route={`/${company.substr(1)}`}>{company.substr(1)}</Link>
+                  </p>
+                )}
+                {company && company.substr(0, 1) !== '@' && <p className="company">{company}</p>}
                 {collective.type !== 'EVENT' && (
                   <div className="contact">
-                    {collective.host &&
-                      collective.isActive && (
-                        <div className="host">
-                          <label>
-                            <FormattedMessage
-                              id="collective.cover.hostedBy"
-                              defaultMessage="Hosted by"
-                            />
-                          </label>
-                          <Link route={`/${collective.host.slug}`}>
-                            {collective.host.name}{' '}
-                          </Link>
-                        </div>
-                      )}
+                    {collective.host && collective.isActive && (
+                      <div className="host">
+                        <label>
+                          <FormattedMessage id="collective.cover.hostedBy" defaultMessage="Hosted by" />
+                        </label>
+                        <Link route={`/${collective.host.slug}`}>{collective.host.name} </Link>
+                      </div>
+                    )}
                     {collective.host &&
                       !collective.isActive &&
                       LoggedInUser &&
@@ -418,40 +361,26 @@ ${description}`;
                               defaultMessage="Pending approval from"
                             />
                           </label>
-                          <Link route={`/${collective.host.slug}`}>
-                            {collective.host.name}{' '}
-                          </Link>
+                          <Link route={`/${collective.host.slug}`}>{collective.host.name} </Link>
                         </div>
                       )}
                     {twitterHandle && (
                       <div className="twitterHandle">
-                        <a
-                          href={`https://twitter.com/${twitterHandle}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
+                        <a href={`https://twitter.com/${twitterHandle}`} target="_blank" rel="noopener noreferrer">
                           <Twitter size="1em" /> @{twitterHandle}
                         </a>
                       </div>
                     )}
                     {githubHandle && (
                       <div className="githubHandle">
-                        <a
-                          href={`https://github.com/${githubHandle}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
+                        <a href={`https://github.com/${githubHandle}`} target="_blank" rel="noopener noreferrer">
                           <Github size="1em" /> {githubHandle}
                         </a>
                       </div>
                     )}
                     {website && (
                       <div className="website">
-                        <a
-                          href={website}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
+                        <a href={website} target="_blank" rel="noopener noreferrer">
                           <ExternalLinkAlt size="1em" /> {prettyUrl(website)}
                         </a>
                       </div>
@@ -461,14 +390,11 @@ ${description}`;
                 {collective.type === 'EVENT' && (
                   <div className="contact">
                     <div className="parentCollective">
-                      <Link route={`/${collective.parentCollective.slug}`}>
-                        {collective.parentCollective.name}
-                      </Link>
+                      <Link route={`/${collective.parentCollective.slug}`}>{collective.parentCollective.name}</Link>
                     </div>
                   </div>
                 )}
-                {collective.type !== 'COLLECTIVE' &&
-                  cta && <div className="cta">{cta}</div>}
+                {collective.type !== 'COLLECTIVE' && cta && <div className="cta">{cta}</div>}
               </div>
             )}
           </div>
@@ -480,10 +406,7 @@ ${description}`;
               <div className="statsContainer">
                 <div className="stat">
                   <div className="totalAmountSpent value">
-                    <Currency
-                      value={stats.totalAmountSpent}
-                      currency={collective.currency}
-                    />
+                    <Currency value={stats.totalAmountSpent} currency={collective.currency} />
                   </div>
                   <FormattedMessage
                     id="collective.stats.totalAmountSpent.label"
@@ -493,10 +416,7 @@ ${description}`;
                 {stats.totalAmountRaised > 0 && (
                   <div className="stat">
                     <div className="totalAmountRaised value">
-                      <Currency
-                        value={stats.totalAmountRaised}
-                        currency={collective.currency}
-                      />
+                      <Currency value={stats.totalAmountRaised} currency={collective.currency} />
                     </div>
                     <FormattedMessage
                       id="collective.stats.totalAmountRaised.label"
@@ -507,41 +427,24 @@ ${description}`;
               </div>
             )}
 
-          {collective.type === 'COLLECTIVE' &&
-            collective.isActive &&
-            collective.host && (
-              <div className="statsContainer">
-                {className !== 'small' &&
-                  collective.type === 'COLLECTIVE' && (
-                    <div className="topContributors">
-                      <TopBackersCoverWithData
-                        collective={this.props.collective}
-                        LoggedInUser={LoggedInUser}
-                        limit={10}
-                      />
-                    </div>
-                  )}
+          {collective.type === 'COLLECTIVE' && collective.isActive && collective.host && (
+            <div className="statsContainer">
+              {className !== 'small' && collective.type === 'COLLECTIVE' && (
+                <div className="topContributors">
+                  <TopBackersCoverWithData collective={this.props.collective} LoggedInUser={LoggedInUser} limit={10} />
+                </div>
+              )}
 
-                {className !== 'small' &&
-                  collective.type === 'COLLECTIVE' && (
-                    <GoalsCover
-                      collective={collective}
-                      LoggedInUser={LoggedInUser}
-                    />
-                  )}
+              {className !== 'small' && collective.type === 'COLLECTIVE' && (
+                <GoalsCover collective={collective} LoggedInUser={LoggedInUser} />
+              )}
 
-                {cta && <div className="cta">{cta}</div>}
-              </div>
-            )}
+              {cta && <div className="cta">{cta}</div>}
+            </div>
+          )}
         </div>
 
-        {className !== 'small' && (
-          <MenuBar
-            collective={collective}
-            LoggedInUser={LoggedInUser}
-            cta={cta}
-          />
-        )}
+        {className !== 'small' && <MenuBar collective={collective} LoggedInUser={LoggedInUser} cta={cta} />}
       </div>
     );
   }

@@ -41,9 +41,7 @@ class ConnectPaypal extends React.Component {
     if (!collective || !collective.paymentMethods) {
       return <div />;
     }
-    const paypalPaymentMethod = collective.paymentMethods.find(
-      pm => pm.service === 'paypal',
-    );
+    const paypalPaymentMethod = collective.paymentMethods.find(pm => pm.service === 'paypal');
 
     return (
       <div className="CollectivesContainer">
@@ -87,15 +85,9 @@ class ConnectPaypal extends React.Component {
           {paypalPaymentMethod && (
             <div style={{ textAlign: 'center' }}>
               <div className="balance">
-                <FormattedMessage
-                  id="host.dashboard.paypal.balance"
-                  defaultMessage="PayPal card balance:"
-                />
+                <FormattedMessage id="host.dashboard.paypal.balance" defaultMessage="PayPal card balance:" />
                 <div className="amount">
-                  <Currency
-                    value={paypalPaymentMethod.balance}
-                    currency={paypalPaymentMethod.currency}
-                  />
+                  <Currency value={paypalPaymentMethod.balance} currency={paypalPaymentMethod.currency} />
                 </div>
                 <div>
                   <SmallButton

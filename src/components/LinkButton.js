@@ -4,11 +4,7 @@ import Link from './Link';
 class LinkButton extends React.Component {
   render() {
     return (
-      <div
-        className={`LinkButton ${this.props.className} ${
-          this.props.disabled ? 'disabled' : ''
-        }`}
-      >
+      <div className={`LinkButton ${this.props.className} ${this.props.disabled ? 'disabled' : ''}`}>
         <style global jsx>
           {`
             .LinkButton > a {

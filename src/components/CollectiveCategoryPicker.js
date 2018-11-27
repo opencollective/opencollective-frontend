@@ -69,11 +69,7 @@ class CollectiveCategoryPicker extends React.Component {
     const { intl } = this.props;
 
     return (
-      <div
-        className="category"
-        onClick={() => this.handleChange(category)}
-        key={`pickCategory-${category}`}
-      >
+      <div className="category" onClick={() => this.handleChange(category)} key={`pickCategory-${category}`}>
         <style jsx>
           {`
             .category {
@@ -122,9 +118,7 @@ class CollectiveCategoryPicker extends React.Component {
 
         {this.state.category && (
           <div>
-            <label>
-              {intl.formatMessage(this.messages['category.label'])}:
-            </label>
+            <label>{intl.formatMessage(this.messages['category.label'])}:</label>
             {intl.formatMessage(this.messages[this.state.category])} (
             <a onClick={() => this.handleChange(null)}>change</a>)
           </div>

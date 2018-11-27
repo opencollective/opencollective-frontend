@@ -65,84 +65,68 @@ class UserCollective extends React.Component {
       },
       'user.collective.memberOf.collective.host.title': {
         id: 'user.collective.memberOf.collective.host.title',
-        defaultMessage:
-          "I'm hosting {n, plural, one {this collective} other {these {n} collectives}}",
+        defaultMessage: "I'm hosting {n, plural, one {this collective} other {these {n} collectives}}",
       },
       'user.collective.memberOf.organization.admin.title': {
         id: 'user.collective.memberOf.organization.admin.title',
-        defaultMessage:
-          "I'm an administrator of {n, plural, one {this organization} other {these {n} organizations}}",
+        defaultMessage: "I'm an administrator of {n, plural, one {this organization} other {these {n} organizations}}",
       },
       'user.collective.memberOf.organization.member.title': {
         id: 'user.collective.memberOf.organization.member.title',
-        defaultMessage:
-          "I'm a member of {n, plural, one {this organization} other {these {n} organizations}}",
+        defaultMessage: "I'm a member of {n, plural, one {this organization} other {these {n} organizations}}",
       },
       'user.collective.memberOf.collective.admin.title': {
         id: 'user.collective.memberOf.collective.admin.title',
-        defaultMessage:
-          "I'm a core contributor of {n, plural, one {this collective} other {these {n} collectives}}",
+        defaultMessage: "I'm a core contributor of {n, plural, one {this collective} other {these {n} collectives}}",
       },
       'user.collective.memberOf.collective.member.title': {
         id: 'user.collective.memberOf.collective.member.title',
-        defaultMessage:
-          "I'm a member of {n, plural, one {this collective} other {these {n} collectives}}",
+        defaultMessage: "I'm a member of {n, plural, one {this collective} other {these {n} collectives}}",
       },
       'user.collective.memberOf.collective.backer.title': {
         id: 'user.collective.memberOf.collective.backer.title',
-        defaultMessage:
-          "I'm backing {n, plural, one {this collective} other {these {n} collectives}}",
+        defaultMessage: "I'm backing {n, plural, one {this collective} other {these {n} collectives}}",
       },
       'user.collective.memberOf.event.attendee.title': {
         id: 'user.collective.memberOf.event.attendee.title',
-        defaultMessage:
-          "I've attended {n, plural, one {this event} other {these {n} events}}",
+        defaultMessage: "I've attended {n, plural, one {this event} other {these {n} events}}",
       },
       'user.collective.memberOf.collective.fundraiser.title': {
         id: 'user.collective.memberOf.collective.fundraiser.title',
-        defaultMessage:
-          "I've helped raise money for {n, plural, one {this collective} other {these {n} collectives}}",
+        defaultMessage: "I've helped raise money for {n, plural, one {this collective} other {these {n} collectives}}",
       },
       'user.collective.memberOf.collective.fundraiser.LoggedInDescription': {
-        id:
-          'user.collective.memberOf.collective.fundraiser.LoggedInDescription',
+        id: 'user.collective.memberOf.collective.fundraiser.LoggedInDescription',
         defaultMessage:
           'Share the URL in the email receipt for each of your donation to track how much money you helped raised! (Alternatively, you can also click on any collective that you are contributing to on this page. We will add your referral id to the URL.)',
       },
       'user.collective.memberOf.collective.follower.title': {
         id: 'user.collective.memberOf.collective.follower.title',
-        defaultMessage:
-          "I'm following {n, plural, one {this collective} other {these {n} collectives}}",
+        defaultMessage: "I'm following {n, plural, one {this collective} other {these {n} collectives}}",
       },
       'organization.collective.memberOf.collective.host.title': {
         id: 'organization.collective.memberOf.collective.host.title',
-        defaultMessage:
-          'We are hosting {n, plural, one {this collective} other {{n} collectives}}',
+        defaultMessage: 'We are hosting {n, plural, one {this collective} other {{n} collectives}}',
       },
       'organization.collective.memberOf.collective.admin.title': {
         id: 'organization.collective.memberOf.collective.admin.title',
-        defaultMessage:
-          'We are a core contributor of {n, plural, one {this collective} other {these {n} collectives}}',
+        defaultMessage: 'We are a core contributor of {n, plural, one {this collective} other {these {n} collectives}}',
       },
       'organization.collective.memberOf.collective.member.title': {
         id: 'organization.collective.memberOf.collective.member.title',
-        defaultMessage:
-          'We are a member of {n, plural, one {this collective} other {these {n} collectives}}',
+        defaultMessage: 'We are a member of {n, plural, one {this collective} other {these {n} collectives}}',
       },
       'organization.collective.memberOf.collective.backer.title': {
         id: 'organization.collective.memberOf.collective.backer.title',
-        defaultMessage:
-          'We are backing {n, plural, one {this collective} other {these {n} collectives}}',
+        defaultMessage: 'We are backing {n, plural, one {this collective} other {these {n} collectives}}',
       },
       'organization.collective.memberOf.collective.follower.title': {
         id: 'organization.collective.memberOf.collective.follower.title',
-        defaultMessage:
-          'We are following {n, plural, one {this collective} other {these {n} collectives}}',
+        defaultMessage: 'We are following {n, plural, one {this collective} other {these {n} collectives}}',
       },
       'organization.collective.memberOf.collective.fundraiser.title': {
         id: 'organization.collective.memberOf.collective.fundraiser.title',
-        defaultMessage:
-          "We've helped raise money for {n, plural, one {this collective} other {these {n} collectives}}",
+        defaultMessage: "We've helped raise money for {n, plural, one {this collective} other {these {n} collectives}}",
       },
       'section.host': { id: 'section.host', defaultMessage: 'Hosting' },
       'section.admin': {
@@ -175,9 +159,7 @@ class UserCollective extends React.Component {
     const renderRoleForType = memberOfCollectiveType => {
       if (role === 'ADMIN' && memberOfCollectiveType === 'EVENT') return;
 
-      let memberships = memberOfByRole[role].filter(
-        m => get(m, 'collective.type') === memberOfCollectiveType,
-      );
+      let memberships = memberOfByRole[role].filter(m => get(m, 'collective.type') === memberOfCollectiveType);
       memberships = uniqBy(memberships, member => member.collective.id);
       if (memberships.length === 0) return;
 
@@ -185,9 +167,7 @@ class UserCollective extends React.Component {
       const collectiveType = memberOfCollectiveType.toLowerCase();
       const titleMessageId = `section.${role.toLowerCase()}`;
       const values = { n: memberships.length };
-      const title =
-        this.messages[titleMessageId] &&
-        intl.formatMessage(this.messages[titleMessageId], values);
+      const title = this.messages[titleMessageId] && intl.formatMessage(this.messages[titleMessageId], values);
       if (!title) return;
       const subtitleMessageId = `${type}.collective.memberOf.${collectiveType}.${role.toLowerCase()}.title`;
       const loggedInSubtitleMessageId = `${type}.collective.memberOf.${collectiveType}.${role.toLowerCase()}.LoggedInDescription`;
@@ -198,19 +178,11 @@ class UserCollective extends React.Component {
       }
 
       return (
-        <section
-          id={role.toLowerCase()}
-          className={collectiveType}
-          key={`${role}-${memberOfCollectiveType}`}
-        >
+        <section id={role.toLowerCase()} className={collectiveType} key={`${role}-${memberOfCollectiveType}`}>
           <div className="content">
             <SectionTitle title={title} subtitle={subtitle} />
 
-            <Memberships
-              className={role}
-              LoggedInUser={LoggedInUser}
-              memberships={memberships}
-            />
+            <Memberships className={role} LoggedInUser={LoggedInUser} memberships={memberships} />
           </div>
         </section>
       );
@@ -234,11 +206,8 @@ class UserCollective extends React.Component {
     if (LoggedInUser) {
       this.classNames.push('LoggedInUser');
     }
-    const isProfileEmpty = !(
-      collective.description || collective.longDescription
-    );
-    const canEditCollective =
-      LoggedInUser && LoggedInUser.canEditCollective(collective);
+    const isProfileEmpty = !(collective.description || collective.longDescription);
+    const canEditCollective = LoggedInUser && LoggedInUser.canEditCollective(collective);
     const type = collective.type.toLowerCase();
     let cta;
     if (collective.canApply) {
@@ -247,24 +216,15 @@ class UserCollective extends React.Component {
 
     const notification = {};
     if (query && query.CollectiveId) {
-      if (
-        query.status === 'collectiveCreated' &&
-        collective.type === 'ORGANIZATION'
-      ) {
-        notification.title = intl.formatMessage(
-          this.messages['organization.created'],
-        );
-        notification.description = intl.formatMessage(
-          this.messages['organization.created.description'],
-        );
+      if (query.status === 'collectiveCreated' && collective.type === 'ORGANIZATION') {
+        notification.title = intl.formatMessage(this.messages['organization.created']);
+        notification.description = intl.formatMessage(this.messages['organization.created.description']);
       }
       Object.assign(order, {
         ...order,
         ...pick(query || {}, 'totalAmount', 'CollectiveId', 'TierId'),
         collective: (
-          (collective.memberOf || []).find(
-            m => get(m, 'collective.id') === parseInt(query.CollectiveId),
-          ) || {}
+          (collective.memberOf || []).find(m => get(m, 'collective.id') === parseInt(query.CollectiveId)) || {}
         ).collective,
       });
     }
@@ -328,10 +288,7 @@ class UserCollective extends React.Component {
         <Header
           title={collective.name}
           description={collective.description || collective.longDescription}
-          twitterHandle={
-            collective.twitterHandle ||
-            get(collective.parentCollective, 'twitterHandle')
-          }
+          twitterHandle={collective.twitterHandle || get(collective.parentCollective, 'twitterHandle')}
           image={get(collective.parentCollective, 'image')}
           className={this.state.status}
           LoggedInUser={LoggedInUser}
@@ -347,15 +304,9 @@ class UserCollective extends React.Component {
               error={this.state.error}
             />
 
-            {this.props.message && (
-              <MessageModal message={this.props.message} />
-            )}
+            {this.props.message && <MessageModal message={this.props.message} />}
 
-            <CollectiveCover
-              collective={collective}
-              cta={cta}
-              LoggedInUser={LoggedInUser}
-            />
+            <CollectiveCover collective={collective} cta={cta} LoggedInUser={LoggedInUser} />
 
             <div>
               {get(query, 'OrderId') && (
@@ -373,14 +324,8 @@ class UserCollective extends React.Component {
                   {isProfileEmpty && canEditCollective && (
                     <div className="message">
                       <div className="editBtn">
-                        <Button
-                          onClick={() =>
-                            Router.pushRoute(`/${collective.slug}/edit`)
-                          }
-                        >
-                          {intl.formatMessage(
-                            this.messages[`${type}.collective.edit`],
-                          )}
+                        <Button onClick={() => Router.pushRoute(`/${collective.slug}/edit`)}>
+                          {intl.formatMessage(this.messages[`${type}.collective.edit`])}
                         </Button>
                       </div>
                     </div>
@@ -400,9 +345,7 @@ class UserCollective extends React.Component {
                     <FormattedMessage
                       id="organization.collective.memberOf.collective.host.title"
                       values={{ n: collective.stats.collectives.hosted }}
-                      defaultMessage={
-                        'We are hosting {n, plural, one {this collective} other {{n} collectives}}'
-                      }
+                      defaultMessage={'We are hosting {n, plural, one {this collective} other {{n} collectives}}'}
                     />
                   </h1>
                   {LoggedInUser && LoggedInUser.canEditCollective(collective) && (
@@ -410,10 +353,7 @@ class UserCollective extends React.Component {
                       <ul>
                         <li>
                           <Link route={`/${collective.slug}/dashboard`}>
-                            <FormattedMessage
-                              id="host.dashboard"
-                              defaultMessage="Dashboard"
-                            />
+                            <FormattedMessage id="host.dashboard" defaultMessage="Dashboard" />
                           </Link>
                         </li>
                       </ul>
@@ -459,10 +399,7 @@ class UserCollective extends React.Component {
                     <FormattedMessage
                       id="organization.supercollective.title"
                       values={{
-                        tags: get(
-                          collective,
-                          'settings.superCollectiveTags',
-                        ).join(', '),
+                        tags: get(collective, 'settings.superCollectiveTags').join(', '),
                         n: collective.stats.collectives.memberOf,
                       }}
                       defaultMessage={'{tags} collectives'}
@@ -479,9 +416,7 @@ class UserCollective extends React.Component {
                 </section>
               )}
 
-              {Object.keys(memberOfByRole).map(
-                role => role !== 'HOST' && this.renderRole(role),
-              )}
+              {Object.keys(memberOfByRole).map(role => role !== 'HOST' && this.renderRole(role))}
             </div>
           </div>
         </Body>

@@ -24,8 +24,7 @@ class CreateCollectiveCover extends React.Component {
       },
       'collective.create.description': {
         id: 'collective.create.description',
-        defaultMessage:
-          'The place for your community to collect money and share your finance in full transparency.',
+        defaultMessage: 'The place for your community to collect money and share your finance in full transparency.',
       },
     });
 
@@ -33,12 +32,8 @@ class CreateCollectiveCover extends React.Component {
       type: 'COLLECTIVE',
       settings: {
         apply: {
-          title: this.props.intl.formatMessage(
-            this.messages['collective.create.title'],
-          ),
-          description: this.props.intl.formatMessage(
-            this.messages['collective.create.description'],
-          ),
+          title: this.props.intl.formatMessage(this.messages['collective.create.title']),
+          description: this.props.intl.formatMessage(this.messages['collective.create.description']),
         },
       },
     };

@@ -51,10 +51,7 @@ class AddFundsSourcePicker extends React.Component {
 
   renderSourceEntry(fromCollective) {
     return (
-      <option
-        key={`${fromCollective.type}-${fromCollective.id}`}
-        value={fromCollective.id}
-      >
+      <option key={`${fromCollective.type}-${fromCollective.id}`} value={fromCollective.id}>
         {fromCollective.name}
       </option>
     );
@@ -66,11 +63,7 @@ class AddFundsSourcePicker extends React.Component {
       data: { loading, PaymentMethod },
     } = this.props;
     if (loading) return <div />;
-    const fromCollectives = get(
-      PaymentMethod,
-      'fromCollectives.collectives',
-      [],
-    ).filter(c => c.id !== host.id);
+    const fromCollectives = get(PaymentMethod, 'fromCollectives.collectives', []).filter(c => c.id !== host.id);
     this.fromCollectivesByType = {
       ORGANIZATION: [],
       COLLECTIVE: [],
@@ -85,27 +78,19 @@ class AddFundsSourcePicker extends React.Component {
         placeholder="select"
         onChange={this.onChange}
       >
-        <FormattedMessage
-          id="addfunds.fromCollective.host"
-          values={{ host: host.name }}
-          defaultMessage="Host ({host})"
-        >
+        <FormattedMessage id="addfunds.fromCollective.host" values={{ host: host.name }} defaultMessage="Host ({host})">
           {message => <option value={host.id}>{message}</option>}
         </FormattedMessage>
 
         {this.fromCollectivesByType['COLLECTIVE'].length > 0 && (
           <optgroup label={this.getGroupLabel('COLLECTIVE')}>
-            {this.fromCollectivesByType['COLLECTIVE'].map(
-              this.renderSourceEntry,
-            )}
+            {this.fromCollectivesByType['COLLECTIVE'].map(this.renderSourceEntry)}
           </optgroup>
         )}
 
         {this.fromCollectivesByType['ORGANIZATION'].length > 0 && (
           <optgroup label={this.getGroupLabel('ORGANIZATION')}>
-            {this.fromCollectivesByType['ORGANIZATION'].map(
-              this.renderSourceEntry,
-            )}
+            {this.fromCollectivesByType['ORGANIZATION'].map(this.renderSourceEntry)}
           </optgroup>
         )}
 
@@ -116,10 +101,7 @@ class AddFundsSourcePicker extends React.Component {
         )}
 
         <optgroup label="OTHER">
-          <FormattedMessage
-            id="addfunds.fromCollective.other"
-            defaultMessage="other (please specify)"
-          >
+          <FormattedMessage id="addfunds.fromCollective.other" defaultMessage="other (please specify)">
             {message => <option value="other">{message}</option>}
           </FormattedMessage>
         </optgroup>
@@ -191,18 +173,12 @@ const addOrganizationsData = graphql(getSourcesQuery, {
   }),
 });
 
-export const AddFundsSourcePickerWithData = withIntl(
-  addOrganizationsData(AddFundsSourcePicker),
-);
+export const AddFundsSourcePickerWithData = withIntl(addOrganizationsData(AddFundsSourcePicker));
 
-export const AddFundsSourcePickerForUserWithData = withIntl(
-  AddFundsSourcePickerForUser,
-);
+export const AddFundsSourcePickerForUserWithData = withIntl(AddFundsSourcePickerForUser);
 
 // for testing
 export const MockAddFundsSourcePicker = withIntl(AddFundsSourcePicker);
-export const MockAddFundsSourcePickerForUser = withIntl(
-  AddFundsSourcePickerForUser,
-);
+export const MockAddFundsSourcePickerForUser = withIntl(AddFundsSourcePickerForUser);
 
 export default AddFundsSourcePickerWithData;

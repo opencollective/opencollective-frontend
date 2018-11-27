@@ -5,10 +5,7 @@ import { graphql } from 'react-apollo';
 import { FormattedMessage } from 'react-intl';
 
 import withIntl from '../../../lib/withIntl';
-import {
-  getTransactionsQuery,
-  transactionFields,
-} from '../../../graphql/queries';
+import { getTransactionsQuery, transactionFields } from '../../../graphql/queries';
 
 import SmallButton from '../../../components/SmallButton';
 
@@ -112,10 +109,7 @@ class RefundTransactionBtn extends React.Component {
                 bsSize="xsmall"
                 onClick={() => ::this.setShowingState({ confirmRefund: true })}
               >
-                <FormattedMessage
-                  id="transaction.refund.btn"
-                  defaultMessage="refund"
-                />
+                <FormattedMessage id="transaction.refund.btn" defaultMessage="refund" />
               </SmallButton>
             </div>
           </div>
@@ -125,16 +119,8 @@ class RefundTransactionBtn extends React.Component {
           <div className="confirmation">
             <strong>Do you really want to refund this transaction?</strong>
             <div className="confirmation-buttons">
-              <SmallButton
-                className="refund"
-                bsStyle="danger"
-                bsSize="xsmall"
-                onClick={() => this.onClickRefund()}
-              >
-                <FormattedMessage
-                  id="transaction.refund.yes.btn"
-                  defaultMessage="Yes, refund!"
-                />
+              <SmallButton className="refund" bsStyle="danger" bsSize="xsmall" onClick={() => this.onClickRefund()}>
+                <FormattedMessage id="transaction.refund.yes.btn" defaultMessage="Yes, refund!" />
               </SmallButton>
               <SmallButton
                 className="no"
@@ -142,10 +128,7 @@ class RefundTransactionBtn extends React.Component {
                 bsSize="xsmall"
                 onClick={() => this.setShowingState({ canRefund: true })}
               >
-                <FormattedMessage
-                  id="transaction.refund.no.btn"
-                  defaultMessage="no"
-                />
+                <FormattedMessage id="transaction.refund.no.btn" defaultMessage="no" />
               </SmallButton>
             </div>
           </div>

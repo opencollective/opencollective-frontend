@@ -172,40 +172,24 @@ class Comment extends React.Component {
           <div className="header">
             <div className="meta">
               <span className="createdAt">
-                <FormattedDate
-                  value={comment.createdAt}
-                  day="numeric"
-                  month="numeric"
-                />
+                <FormattedDate value={comment.createdAt} day="numeric" month="numeric" />
               </span>{' '}
               |&nbsp;
               <span className="metaItem">
-                <Link route={`/${comment.fromCollective.slug}`}>
-                  {comment.fromCollective.name}
-                </Link>
+                <Link route={`/${comment.fromCollective.slug}`}>{comment.fromCollective.name}</Link>
               </span>
-              {editable &&
-                LoggedInUser &&
-                LoggedInUser.canEditComment(comment) && (
-                  <span>
-                    {' '}
-                    |{' '}
-                    <a className="toggleEditComment" onClick={this.toggleEdit}>
-                      {intl.formatMessage(
-                        this.messages[
-                          `${
-                            this.state.mode === 'edit' ? 'cancelEdit' : 'edit'
-                          }`
-                        ],
-                      )}
-                    </a>
-                  </span>
-                )}
+              {editable && LoggedInUser && LoggedInUser.canEditComment(comment) && (
+                <span>
+                  {' '}
+                  |{' '}
+                  <a className="toggleEditComment" onClick={this.toggleEdit}>
+                    {intl.formatMessage(this.messages[`${this.state.mode === 'edit' ? 'cancelEdit' : 'edit'}`])}
+                  </a>
+                </span>
+              )}
             </div>
             <div className="description">
-              {this.state.mode !== 'edit' && (
-                <div dangerouslySetInnerHTML={{ __html: comment.html }} />
-              )}
+              {this.state.mode !== 'edit' && <div dangerouslySetInnerHTML={{ __html: comment.html }} />}
               {this.state.mode === 'edit' && (
                 <InputField
                   name={`comment-${comment.id}`}
@@ -221,11 +205,7 @@ class Comment extends React.Component {
             <div className="actions">
               {this.state.mode === 'edit' && (
                 <div>
-                  <SmallButton
-                    className="primary save"
-                    onClick={this.save}
-                    disabled={!this.state.modified}
-                  >
+                  <SmallButton className="primary save" onClick={this.save} disabled={!this.state.modified}>
                     <FormattedMessage id="save" defaultMessage="save" />
                   </SmallButton>
                 </div>

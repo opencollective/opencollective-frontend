@@ -14,23 +14,12 @@ import StyledLink from './StyledLink';
 import Currency from './Currency';
 
 const hasGoals = (settings = {}) =>
-  get(settings, 'goals', []).length > 0 &&
-  !isEqual(get(settings, 'goals', [])[0], {});
+  get(settings, 'goals', []).length > 0 && !isEqual(get(settings, 'goals', [])[0], {});
 
 const getGoalPercentage = ({ type, amount }, { balance, yearlyBudget }) =>
   type === 'balance' ? balance / amount : yearlyBudget / amount;
 
-const CollectiveStatsCard = ({
-  backgroundImage,
-  description,
-  image,
-  name,
-  settings,
-  slug,
-  stats,
-  currency,
-  type,
-}) => (
+const CollectiveStatsCard = ({ backgroundImage, description, image, name, settings, slug, stats, currency, type }) => (
   <Container
     bg="white"
     borderRadius="8px"
@@ -42,11 +31,7 @@ const CollectiveStatsCard = ({
     overflow="hidden"
   >
     <Container
-      backgroundImage={`url(${imagePreview(
-        backgroundImage,
-        defaultBackgroundImage[type],
-        { width: 224 },
-      )})`}
+      backgroundImage={`url(${imagePreview(backgroundImage, defaultBackgroundImage[type], { width: 224 })})`}
       backgroundSize="cover"
       backgroundRepeat="no-repeat"
       backgroundPosition="center center"
@@ -93,14 +78,7 @@ const CollectiveStatsCard = ({
       {description}
     </P>
 
-    <Container
-      bg="#E8E9EB"
-      height={4}
-      borderRadius={2}
-      mx={3}
-      position="relative"
-      mt={3}
-    >
+    <Container bg="#E8E9EB" height={4} borderRadius={2} mx={3} position="relative" mt={3}>
       {hasGoals(settings) && (
         <Container
           bg="#3385FF"
@@ -123,10 +101,7 @@ const CollectiveStatsCard = ({
 
     {hasGoals(settings) && [
       <P key="progress" textAlign="center" fontSize="1.2rem" my={2}>
-        <Span fontWeight="bold">
-          {Math.round(getGoalPercentage(settings.goals[0], stats) * 100)}%
-        </Span>{' '}
-        progress to:
+        <Span fontWeight="bold">{Math.round(getGoalPercentage(settings.goals[0], stats) * 100)}%</Span> progress to:
       </P>,
       <P key="goal" textAlign="center" fontSize="1.2rem" px={2} color="#3385FF">
         {settings.goals[0].title}
@@ -136,30 +111,15 @@ const CollectiveStatsCard = ({
     <Container display="flex" borderTop="1px solid #E3E4E6" py={2} mt={3}>
       {get(stats, 'backers.all', 0) || get(stats, 'backers.all', 0) ? (
         [
-          <Flex
-            width={0.5}
-            alignItems="center"
-            flexDirection="column"
-            key="backers"
-          >
+          <Flex width={0.5} alignItems="center" flexDirection="column" key="backers">
             <P fontSize="1.2rem" fontWeight="bold">
               {get(stats, 'backers.all', 0)}
             </P>
             <P fontSize="1.2rem">backers</P>
           </Flex>,
-          <Flex
-            width={0.5}
-            alignItems="center"
-            flexDirection="column"
-            key="monthly spending"
-          >
+          <Flex width={0.5} alignItems="center" flexDirection="column" key="monthly spending">
             <P fontSize="1.2rem" fontWeight="bold">
-              <Currency
-                value={get(stats, 'monthlySpending', 0)}
-                currency={currency}
-                precision={0}
-                abbreviate
-              />
+              <Currency value={get(stats, 'monthlySpending', 0)} currency={currency} precision={0} abbreviate />
             </P>
             <P fontSize="1.2rem">monthly spending</P>
           </Flex>,

@@ -15,8 +15,7 @@ class Members extends React.Component {
     members.sort((a, b) => b.stats.totalDonations - a.stats.totalDonations);
     if (!members || members.length === 0) return <div />;
     const size = members.length > 50 ? 'small' : 'large';
-    const viewMode =
-      className && className.match(/sponsor/i) ? 'ORGANIZATION' : 'USER';
+    const viewMode = className && className.match(/sponsor/i) ? 'ORGANIZATION' : 'USER';
 
     return (
       <div className={`Members ${this.props.className}`}>

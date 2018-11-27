@@ -12,8 +12,7 @@ class Modal extends React.Component {
   }
 
   render() {
-    if (typeof document !== 'undefined')
-      document.body.classList[this.props.show ? 'add' : 'remove']('showModal');
+    if (typeof document !== 'undefined') document.body.classList[this.props.show ? 'add' : 'remove']('showModal');
 
     const style = {
       display: this.props.show ? 'block' : 'none',
@@ -87,11 +86,7 @@ class Modal extends React.Component {
           <div className="TitleBar">{this.props.title}</div>
           <div className="content">{this.props.children}</div>
         </div>
-        <div
-          className="Modal-overlay"
-          onClick={this.props.onClose}
-          style={style}
-        />
+        <div className="Modal-overlay" onClick={this.props.onClose} style={style} />
       </div>
     );
   }

@@ -86,6 +86,4 @@ class CollectivePage extends React.Component {
   }
 }
 
-export default withData(
-  withIntl(withLoggedInUser(addCollectiveData(CollectivePage))),
-);
+export default withData(withIntl(withLoggedInUser(addCollectiveData(CollectivePage))));

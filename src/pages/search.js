@@ -131,16 +131,9 @@ class SearchPage extends React.Component {
             <Box width={1}>
               <form method="GET" onSubmit={this.refetch}>
                 <FormGroup controlId="search" bsSize="large">
-                  <ControlLabel className="h1">
-                    Search Open Collective
-                  </ControlLabel>
+                  <ControlLabel className="h1">Search Open Collective</ControlLabel>
                   <Flex alignItems="flex-end" my={3}>
-                    <SearchInput
-                      type="search"
-                      name="q"
-                      placeholder="open source"
-                      defaultValue={term}
-                    />
+                    <SearchInput type="search" name="q" placeholder="open source" defaultValue={term} />
                     <SearchButton type="submit">
                       <span className="fa fa-search" />
                     </SearchButton>
@@ -148,10 +141,7 @@ class SearchPage extends React.Component {
                 </FormGroup>
               </form>
             </Box>
-            <Flex
-              justifyContent={['center', 'center', 'flex-start']}
-              flexWrap="wrap"
-            >
+            <Flex justifyContent={['center', 'center', 'flex-start']} flexWrap="wrap">
               {loading && (
                 <Flex py={3} width={1} justifyContent="center">
                   <LoadingGrid />
@@ -165,87 +155,15 @@ class SearchPage extends React.Component {
                 ))}
 
               {/* TODO: add suggested collectives when the result is empty */}
-              {showCollectives &&
-                collectives.length === 0 && (
-                  <Flex
-                    py={3}
-                    width={1}
-                    justifyContent="center"
-                    flexDirection="column"
-                    alignItems="center"
-                  >
-                    <p>
-                      <em>
-                        No collectives found matching your query: &quot;
-                        {term}
-                        &quot;
-                      </em>
-                    </p>
-                    {usePledges && (
-                      <Link route="createPledge" params={{ name: term }} passHref>
-                        <StyledLink
-                          display="block"
-                          fontSize="Paragraph"
-                          fontWeight="bold"
-                          maxWidth="220px"
-                          py={2}
-                          px={4}
-                          textAlign="center"
-                          buttonStyle="primary"
-                        >
-                          Make a pledge
-                        </StyledLink>
-                      </Link>
-                    )}
-                  </Flex>
-                )}
-            </Flex>
-            {showCollectives &&
-              collectives.length !== 0 &&
-              total > limit && (
-                <Flex justifyContent="center">
-                  <ul className="pagination">
-                    {Array(Math.ceil(total / limit))
-                      .fill(1)
-                      .map((n, i) => (
-                        <li
-                          key={i * limit}
-                          className={classNames({
-                            active: i * limit === offset,
-                          })}
-                        >
-                          <Link
-                            href={{
-                              query: {
-                                limit,
-                                offset: i * limit,
-                                q: term,
-                              },
-                            }}
-                          >
-                            <a>{`${n + i}`}</a>
-                          </Link>
-                        </li>
-                      ))}
-                  </ul>
-                </Flex>
-              )}
-
-            {showCollectives &&
-              collectives.length !== 0 && (
-                <Flex
-                  py={3}
-                  width={1}
-                  justifyContent="center"
-                  flexDirection="column"
-                  alignItems="center"
-                >
+              {showCollectives && collectives.length === 0 && (
+                <Flex py={3} width={1} justifyContent="center" flexDirection="column" alignItems="center">
                   <p>
                     <em>
-                      If you don&apos;t see the collective you&apos;re searching for:
+                      No collectives found matching your query: &quot;
+                      {term}
+                      &quot;
                     </em>
                   </p>
-
                   {usePledges && (
                     <Link route="createPledge" params={{ name: term }} passHref>
                       <StyledLink
@@ -264,6 +182,60 @@ class SearchPage extends React.Component {
                   )}
                 </Flex>
               )}
+            </Flex>
+            {showCollectives && collectives.length !== 0 && total > limit && (
+              <Flex justifyContent="center">
+                <ul className="pagination">
+                  {Array(Math.ceil(total / limit))
+                    .fill(1)
+                    .map((n, i) => (
+                      <li
+                        key={i * limit}
+                        className={classNames({
+                          active: i * limit === offset,
+                        })}
+                      >
+                        <Link
+                          href={{
+                            query: {
+                              limit,
+                              offset: i * limit,
+                              q: term,
+                            },
+                          }}
+                        >
+                          <a>{`${n + i}`}</a>
+                        </Link>
+                      </li>
+                    ))}
+                </ul>
+              </Flex>
+            )}
+
+            {showCollectives && collectives.length !== 0 && (
+              <Flex py={3} width={1} justifyContent="center" flexDirection="column" alignItems="center">
+                <p>
+                  <em>If you don&apos;t see the collective you&apos;re searching for:</em>
+                </p>
+
+                {usePledges && (
+                  <Link route="createPledge" params={{ name: term }} passHref>
+                    <StyledLink
+                      display="block"
+                      fontSize="Paragraph"
+                      fontWeight="bold"
+                      maxWidth="220px"
+                      py={2}
+                      px={4}
+                      textAlign="center"
+                      buttonStyle="primary"
+                    >
+                      Make a pledge
+                    </StyledLink>
+                  </Link>
+                )}
+              </Flex>
+            )}
           </Container>
         </Body>
         <Footer />
@@ -274,6 +246,4 @@ class SearchPage extends React.Component {
 
 export { SearchPage as MockSearchPage };
 
-export default withData(
-  withIntl(withLoggedInUser(addSearchQueryData(withRouter(SearchPage)))),
-);
+export default withData(withIntl(withLoggedInUser(addSearchQueryData(withRouter(SearchPage)))));

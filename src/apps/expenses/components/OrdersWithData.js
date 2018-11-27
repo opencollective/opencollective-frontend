@@ -22,14 +22,7 @@ class OrdersWithData extends React.Component {
   }
 
   render() {
-    const {
-      data,
-      LoggedInUser,
-      collective,
-      view,
-      includeHostedCollectives,
-      filters,
-    } = this.props;
+    const { data, LoggedInUser, collective, view, includeHostedCollectives, filters } = this.props;
 
     if (data.error) {
       console.error('graphql error>>>', data.error.message);
@@ -57,13 +50,7 @@ class OrdersWithData extends React.Component {
 }
 
 const getOrdersQuery = gql`
-  query allOrders(
-    $CollectiveId: Int
-    $status: String
-    $limit: Int
-    $offset: Int
-    $includeHostedCollectives: Boolean
-  ) {
+  query allOrders($CollectiveId: Int, $status: String, $limit: Int, $offset: Int, $includeHostedCollectives: Boolean) {
     allOrders(
       CollectiveId: $CollectiveId
       status: $status
@@ -147,10 +134,7 @@ export const addOrdersData = graphql(getOrdersQuery, {
           }
           return Object.assign({}, previousResult, {
             // Append the new posts results to the old one
-            allOrders: [
-              ...previousResult.allOrders,
-              ...fetchMoreResult.allOrders,
-            ],
+            allOrders: [...previousResult.allOrders, ...fetchMoreResult.allOrders],
           });
         },
       });

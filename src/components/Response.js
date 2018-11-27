@@ -82,14 +82,7 @@ class Response extends React.Component {
             `}
           </style>
           <div className="Response">
-            {status === 'INTERESTED' && (
-              <object
-                title={title}
-                type="image/svg+xml"
-                data={star}
-                className="star"
-              />
-            )}
+            {status === 'INTERESTED' && <object title={title} type="image/svg+xml" data={star} className="star" />}
             <img src={image} />
             <div className="bubble">
               <div className="name">{name}</div>

@@ -33,10 +33,7 @@ class Overlay extends React.Component {
   async download(invoice) {
     this.setState({ loading: invoice.slug });
     const { fromCollectiveSlug } = this.props;
-    const file = await api.get(
-      `/${fromCollectiveSlug}/invoices/${invoice.slug}.pdf`,
-      { format: 'blob' },
-    );
+    const file = await api.get(`/${fromCollectiveSlug}/invoices/${invoice.slug}.pdf`, { format: 'blob' });
     this.setState({ loading: false });
     return saveAs(file, `${invoice.slug}.pdf`);
   }
@@ -83,9 +80,7 @@ class Overlay extends React.Component {
 
   renderMonth(month) {
     const invoices = this.props.data.allInvoices.filter(
-      i =>
-        Number(i.year) === Number(this.state.year) &&
-        Number(i.month) === Number(month),
+      i => Number(i.year) === Number(this.state.year) && Number(i.month) === Number(month),
     );
     const month2digit = month < 10 ? `0${month}` : month;
     return (
@@ -97,11 +92,7 @@ class Overlay extends React.Component {
             }
           `}
         </style>
-        <h2>
-          {moment(new Date(`${this.state.year}-${month2digit}-01`)).format(
-            'MMMM',
-          )}
-        </h2>
+        <h2>{moment(new Date(`${this.state.year}-${month2digit}-01`)).format('MMMM')}</h2>
         {invoices.map(this.renderInvoice)}
       </div>
     );
@@ -113,11 +104,7 @@ class Overlay extends React.Component {
 
     if (data.loading) {
       return (
-        <Popover
-          id="downloadInvoicesPopover"
-          title="Download invoices"
-          {...forwardedProps}
-        >
+        <Popover id="downloadInvoicesPopover" title="Download invoices" {...forwardedProps}>
           <div>
             <FormattedMessage id="loading" defaultMessage="loading" />
             ...
@@ -127,23 +114,11 @@ class Overlay extends React.Component {
     }
     const invoices = data.allInvoices;
     const years = uniq(invoices.map(i => i.year));
-    const months = uniq(
-      invoices
-        .filter(i => Number(i.year) === Number(this.state.year))
-        .map(i => i.month),
-    );
+    const months = uniq(invoices.filter(i => Number(i.year) === Number(this.state.year)).map(i => i.month));
 
     return (
-      <Popover
-        id="downloadInvoicesPopover"
-        title="Download invoices"
-        {...forwardedProps}
-      >
-        <InputField
-          type="select"
-          options={this.arrayToFormOptions(years)}
-          onChange={year => this.setState({ year })}
-        />
+      <Popover id="downloadInvoicesPopover" title="Download invoices" {...forwardedProps}>
+        <InputField type="select" options={this.arrayToFormOptions(years)} onChange={year => this.setState({ year })} />
         <div>{months.map(this.renderMonth)}</div>
       </Popover>
     );
@@ -174,25 +149,10 @@ class PopoverButton extends React.Component {
   render() {
     const overlay = <Overlay {...this.props} />;
     return (
-      <OverlayTrigger
-        trigger="click"
-        placement="bottom"
-        overlay={overlay}
-        rootClose
-      >
-        <a
-          className="download-invoices"
-          role="button"
-          style={{ float: 'right', fontSize: '12px', padding: 7 }}
-        >
-          <img
-            src="/static/images/icons/download.svg"
-            style={{ paddingRight: 5 }}
-          />
-          <FormattedMessage
-            id="transactions.downloadinvoicesbutton"
-            defaultMessage="Download Receipts"
-          />
+      <OverlayTrigger trigger="click" placement="bottom" overlay={overlay} rootClose>
+        <a className="download-invoices" role="button" style={{ float: 'right', fontSize: '12px', padding: 7 }}>
+          <img src="/static/images/icons/download.svg" style={{ paddingRight: 5 }} />
+          <FormattedMessage id="transactions.downloadinvoicesbutton" defaultMessage="Download Receipts" />
         </a>
       </OverlayTrigger>
     );

@@ -48,6 +48,4 @@ class EditEventPage extends React.Component {
   }
 }
 
-export default withData(
-  withIntl(withLoggedInUser(addEventCollectiveData(EditEventPage))),
-);
+export default withData(withIntl(withLoggedInUser(addEventCollectiveData(EditEventPage))));

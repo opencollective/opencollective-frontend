@@ -26,8 +26,7 @@ class CollectiveCardWithRedeem extends React.Component {
     const coverStyle = { ...get(collective, 'settings.style.hero.cover') };
     const backgroundImage = imagePreview(
       collective.backgroundImage,
-      collective.type === 'COLLECTIVE' &&
-        defaultBackgroundImage[collective.type],
+      collective.type === 'COLLECTIVE' && defaultBackgroundImage[collective.type],
       { width: 400 },
     );
     if (!coverStyle.backgroundImage && backgroundImage) {
@@ -38,8 +37,7 @@ class CollectiveCardWithRedeem extends React.Component {
 
     const description =
       (collective.description && firstSentence(collective.description, 64)) ||
-      (collective.longDescription &&
-        firstSentence(collective.longDescription, 64));
+      (collective.longDescription && firstSentence(collective.longDescription, 64));
 
     return (
       <div className={`CollectiveCard ${collective.type}`}>
@@ -193,10 +191,7 @@ class CollectiveCardWithRedeem extends React.Component {
           <div>
             <div className="head">
               <div className="background" style={coverStyle} />
-              <div
-                className="image"
-                style={{ backgroundImage: `url(${logo})` }}
-              />
+              <div className="image" style={{ backgroundImage: `url(${logo})` }} />
             </div>
             <div className="body">
               <div className="name">{collective.name}</div>
@@ -206,9 +201,7 @@ class CollectiveCardWithRedeem extends React.Component {
               {collective.stats && (
                 <div className="stats">
                   <div className="backers">
-                    <div className="value">
-                      {collective.stats.backers.users}
-                    </div>
+                    <div className="value">{collective.stats.backers.users}</div>
                     <div className="label">
                       <FormattedMessage
                         id="collective.stats.backers.users"
@@ -217,9 +210,7 @@ class CollectiveCardWithRedeem extends React.Component {
                     </div>
                   </div>
                   <div className="organizations">
-                    <div className="value">
-                      {collective.stats.backers.organizations}
-                    </div>
+                    <div className="value">{collective.stats.backers.organizations}</div>
                     <div className="label">
                       <FormattedMessage
                         id="collective.stats.backers.organizations"

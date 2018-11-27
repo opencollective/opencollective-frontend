@@ -60,49 +60,27 @@ class PledgedCollective extends React.Component {
               <H2 is="h1">{collective.name}</H2>
 
               <Box mb={4} mt={3}>
-                <StyledLink
-                  href={collective.website}
-                  color="primary.500"
-                  fontSize="Caption"
-                >
-                  <img src="/static/icons/external-link.svg" alt="link icon" />{' '}
-                  {collective.website}
+                <StyledLink href={collective.website} color="primary.500" fontSize="Caption">
+                  <img src="/static/icons/external-link.svg" alt="link icon" /> {collective.website}
                 </StyledLink>
               </Box>
             </Flex>
           </Container>
 
-          <Container
-            display="flex"
-            justifyContent="center"
-            position="relative"
-            top={-30}
-          >
-            <Link
-              route="createCollectivePledge"
-              params={{ slug: collective.slug }}
-              passHref
-            >
+          <Container display="flex" justifyContent="center" position="relative" top={-30}>
+            <Link route="createCollectivePledge" params={{ slug: collective.slug }} passHref>
               <StyledLink buttonStyle="primary" buttonSize="large">
                 Make a pledge
               </StyledLink>
             </Link>
           </Container>
 
-          <Container
-            display="flex"
-            alignItems="center"
-            flexDirection="column"
-            maxWidth={800}
-            mx="auto"
-            mt={4}
-            px={3}
-          >
+          <Container display="flex" alignItems="center" flexDirection="column" maxWidth={800} mx="auto" mt={4} px={3}>
             <H3 fontWeight="normal">
               <FormattedMessage
                 id="pledge.stats"
                 values={{
-                  both: (pledgeStats.ORGANIZATION + pledgeStats.COLLECTIVE) && pledgeStats.USER ? 1 : 0,
+                  both: pledgeStats.ORGANIZATION + pledgeStats.COLLECTIVE && pledgeStats.USER ? 1 : 0,
                   orgCount: pledgeStats.ORGANIZATION + pledgeStats.COLLECTIVE,
                   userCount: pledgeStats.USER,
                   totalCount: pledgeStats.ORGANIZATION + pledgeStats.COLLECTIVE + pledgeStats.USER,
@@ -112,49 +90,24 @@ class PledgedCollective extends React.Component {
                 }
               />{' '}
               already pledged a total of{' '}
-              <Currency
-                fontWeight="bold"
-                value={pledgeStats.total}
-                currency={collective.currency}
-                precision={0}
-              />{' '}
+              <Currency fontWeight="bold" value={pledgeStats.total} currency={collective.currency} precision={0} />{' '}
               {collective.currency}.
             </H3>
 
             <P color="black.600" fontSize="Caption" my={4}>
-              A pledge is a way for the community to show interest in supporting a
-              cause or project that is not yet on Open Collective, just like{' '}
-              <strong>{collective.name}</strong>
-              . This will incentivize them to create a collective for
-              their activities and offer you much more visibility on how your
-              money is spent to advance their cause. Once they create it, you
-              will receive an email to ask you to fulfill your pledge.
+              A pledge is a way for the community to show interest in supporting a cause or project that is not yet on
+              Open Collective, just like <strong>{collective.name}</strong>. This will incentivize them to create a
+              collective for their activities and offer you much more visibility on how your money is spent to advance
+              their cause. Once they create it, you will receive an email to ask you to fulfill your pledge.
             </P>
           </Container>
 
-          <Container
-            display="flex"
-            flexWrap="wrap"
-            maxWidth={800}
-            mx="auto"
-            mb={5}
-            px={3}
-          >
+          <Container display="flex" flexWrap="wrap" maxWidth={800} mx="auto" mb={5} px={3}>
             {pledges.map((pledge, index) => (
-              <Container
-                width={[0.5, null, 0.25]}
-                mb={2}
-                position="relative"
-                px={1}
-                minWidth={160}
-                key={pledge.id}
-              >
+              <Container width={[0.5, null, 0.25]} mb={2} position="relative" px={1} minWidth={160} key={pledge.id}>
                 {index === 0 && (
                   <Container position="absolute" right={15} top={-10}>
-                    <img
-                      src="/static/icons/first-pledge-badge.svg"
-                      alt="first pledge"
-                    />
+                    <img src="/static/icons/first-pledge-badge.svg" alt="first pledge" />
                   </Container>
                 )}
                 <PledgeCard {...pledge} />
@@ -181,25 +134,14 @@ class PledgedCollective extends React.Component {
                   Do you own <strong>{collective.name}</strong>?
                 </H5>
                 <P fontSize="Caption" color="black.500">
-                  You can claim this collective! You will be able to start raising funds and manage your expenses transparently. We will contact the organizations and individuals who made commitment for them to fulfill their pledge.
+                  You can claim this collective! You will be able to start raising funds and manage your expenses
+                  transparently. We will contact the organizations and individuals who made commitment for them to
+                  fulfill their pledge.
                 </P>
               </Box>
-              <Flex
-                width={[1, null, 0.35]}
-                justifyContent="center"
-                mt={[4, null, 0]}
-              >
-                <Link
-                  route="claimCollective"
-                  params={{ collectiveSlug: collective.slug }}
-                  passHref
-                >
-                  <StyledLink
-                    textAlign="center"
-                    width={1}
-                    buttonSize="medium"
-                    buttonStyle="standard"
-                  >
+              <Flex width={[1, null, 0.35]} justifyContent="center" mt={[4, null, 0]}>
+                <Link route="claimCollective" params={{ collectiveSlug: collective.slug }} passHref>
+                  <StyledLink textAlign="center" width={1} buttonSize="medium" buttonStyle="standard">
                     Claim this collective
                   </StyledLink>
                 </Link>

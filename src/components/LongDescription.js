@@ -28,9 +28,7 @@ class LongDescription extends React.Component {
   }
 
   render() {
-    const sections = processMarkdown(
-      this.props.longDescription || '',
-    ).sections.filter(s => s.markdown);
+    const sections = processMarkdown(this.props.longDescription || '').sections.filter(s => s.markdown);
     return (
       <div className="longDescription">
         <style jsx>
@@ -58,25 +56,12 @@ class LongDescription extends React.Component {
           `}
         </style>
         {sections.map(section => (
-          <section
-            key={section.id || 'about'}
-            id={section.id || 'about'}
-            className="longDescription"
-          >
+          <section key={section.id || 'about'} id={section.id || 'about'} className="longDescription">
             <SectionTitle
-              title={
-                section.title || (
-                  <FormattedMessage
-                    id="collective.about.title"
-                    defaultMessage="About"
-                  />
-                )
-              }
+              title={section.title || <FormattedMessage id="collective.about.title" defaultMessage="About" />}
               subtitle={section.title ? '' : this.props.defaultSubtitle}
             />
-            <div className="markdown">
-              {converter.processSync(section.markdown).contents}
-            </div>
+            <div className="markdown">{converter.processSync(section.markdown).contents}</div>
           </section>
         ))}
       </div>

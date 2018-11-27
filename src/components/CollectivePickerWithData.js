@@ -29,13 +29,11 @@ class CollectivePickerWithData extends React.Component {
     this.messages = defineMessages({
       'badge.tooltip.pending': {
         id: 'expenses.badge.tooltip.pending',
-        defaultMessage:
-          '{pending} {pending, plural, one {expense} other {expenses}} pending approval',
+        defaultMessage: '{pending} {pending, plural, one {expense} other {expenses}} pending approval',
       },
       'badge.tooltip.approved': {
         id: 'expenses.badge.tooltip.approved',
-        defaultMessage:
-          '{approved} {approved, plural, one {expense} other {expenses}} ready to be paid',
+        defaultMessage: '{approved} {approved, plural, one {expense} other {expenses}} ready to be paid',
       },
       'addFunds.error.amountMustBeGreatherThanZero': {
         id: 'addFunds.error.amountMustBeGreatherThanZero',
@@ -43,8 +41,7 @@ class CollectivePickerWithData extends React.Component {
       },
       'addFunds.error.missingEmail': {
         id: 'addFunds.error.missingEmail',
-        defaultMessage:
-          'Please provide an email address to identify the source of the money.',
+        defaultMessage: 'Please provide an email address to identify the source of the money.',
       },
     });
   }
@@ -58,28 +55,19 @@ class CollectivePickerWithData extends React.Component {
     const { intl } = this.props;
 
     if (form.totalAmount === 0) {
-      const error = intl.formatMessage(
-        this.messages['addFunds.error.amountMustBeGreatherThanZero'],
-      );
+      const error = intl.formatMessage(this.messages['addFunds.error.amountMustBeGreatherThanZero']);
       this.setState({ error });
       return console.error(error);
     }
     if (form.FromCollectiveId === 'other' && !form.email) {
-      const error = intl.formatMessage(
-        this.messages['addFunds.error.missingEmail'],
-      );
+      const error = intl.formatMessage(this.messages['addFunds.error.missingEmail']);
       this.setState({ error });
       return console.error(error);
     }
 
     this.setState({ loading: true });
     const hostCollective = this.hostCollective;
-    const order = pick(form, [
-      'totalAmount',
-      'description',
-      'hostFeePercent',
-      'platformFeePercent',
-    ]);
+    const order = pick(form, ['totalAmount', 'description', 'hostFeePercent', 'platformFeePercent']);
     order.collective = {
       id: this.state.CollectiveId,
     };
@@ -103,18 +91,13 @@ class CollectivePickerWithData extends React.Component {
       };
     }
 
-    const pm = hostCollective.paymentMethods.find(
-      pm => pm.service === 'opencollective',
-    );
+    const pm = hostCollective.paymentMethods.find(pm => pm.service === 'opencollective');
     if (!pm) {
       this.setState({
         error: "This host doesn't have an opencollective payment method",
         loading: false,
       });
-      return console.error(
-        '>>> payment methods: ',
-        hostCollective.paymentMethods,
-      );
+      return console.error('>>> payment methods: ', hostCollective.paymentMethods);
     }
     order.paymentMethod = {
       uuid: pm.uuid,
@@ -134,33 +117,21 @@ class CollectivePickerWithData extends React.Component {
 
   onChange(CollectiveId) {
     const collectives = this.hostCollective.collectives.collectives;
-    const selectedCollective =
-      CollectiveId > 0 && collectives.find(c => c.id === CollectiveId);
+    const selectedCollective = CollectiveId > 0 && collectives.find(c => c.id === CollectiveId);
     this.setState({ CollectiveId });
     this.props.onChange(selectedCollective);
   }
 
   renderCollectiveMenuItem(collective, className) {
     const { intl } = this.props;
-    const badgeCount =
-      collective.stats.expenses.pending + collective.stats.expenses.approved;
+    const badgeCount = collective.stats.expenses.pending + collective.stats.expenses.approved;
 
     const tooltipArray = [];
     if (collective.stats.expenses.pending > 0) {
-      tooltipArray.push(
-        intl.formatMessage(
-          this.messages['badge.tooltip.pending'],
-          collective.stats.expenses,
-        ),
-      );
+      tooltipArray.push(intl.formatMessage(this.messages['badge.tooltip.pending'], collective.stats.expenses));
     }
     if (collective.stats.expenses.approved > 0) {
-      tooltipArray.push(
-        intl.formatMessage(
-          this.messages['badge.tooltip.approved'],
-          collective.stats.expenses,
-        ),
-      );
+      tooltipArray.push(intl.formatMessage(this.messages['badge.tooltip.approved'], collective.stats.expenses));
     }
     const tooltip = tooltipArray.join(', ') || '';
 
@@ -216,15 +187,9 @@ class CollectivePickerWithData extends React.Component {
           <div className="collectiveName">{collective.name}</div>
           <div className="balance">
             <label>
-              <FormattedMessage
-                id="expenses.balance.label"
-                defaultMessage="balance:"
-              />
+              <FormattedMessage id="expenses.balance.label" defaultMessage="balance:" />
             </label>
-            <Currency
-              value={collective.stats.balance}
-              currency={collective.currency}
-            />
+            <Currency value={collective.stats.balance} currency={collective.currency} />
           </div>
         </div>
         {badgeCount > 0 && <Badge pullRight={true}>{badgeCount}</Badge>}
@@ -242,17 +207,12 @@ class CollectivePickerWithData extends React.Component {
 
     const collectives = [...this.hostCollective.collectives.collectives];
 
-    const selectedCollective = collectives.find(
-      c => c.id === this.state.CollectiveId,
-    );
+    const selectedCollective = collectives.find(c => c.id === this.state.CollectiveId);
     const selectedTitle = selectedCollective ? (
       this.renderCollectiveMenuItem(selectedCollective, 'selected')
     ) : (
       <div className="defaultTitle">
-        <FormattedMessage
-          id="expenses.allCollectives"
-          defaultMessage="All Collectives"
-        />
+        <FormattedMessage id="expenses.allCollectives" defaultMessage="All Collectives" />
       </div>
     );
 
@@ -335,10 +295,7 @@ class CollectivePickerWithData extends React.Component {
           <div>
             <div className="title">
               <h1>
-                <FormattedMessage
-                  id="expenses.collectivePicker.title"
-                  defaultMessage="Finances"
-                />
+                <FormattedMessage id="expenses.collectivePicker.title" defaultMessage="Finances" />
               </h1>
               <h2>
                 <FormattedMessage
@@ -350,48 +307,27 @@ class CollectivePickerWithData extends React.Component {
             </div>
             {collectives.length > 0 && (
               <div className="collectivesFilter">
-                <DropdownButton
-                  id="collectivePicker"
-                  bsStyle="default"
-                  title={selectedTitle}
-                  onSelect={this.onChange}
-                >
+                <DropdownButton id="collectivePicker" bsStyle="default" title={selectedTitle} onSelect={this.onChange}>
                   {this.state.CollectiveId && (
                     <MenuItem key={null} eventKey={null}>
-                      <FormattedMessage
-                        id="expenses.allCollectives"
-                        defaultMessage="All Collectives"
-                      />
+                      <FormattedMessage id="expenses.allCollectives" defaultMessage="All Collectives" />
                     </MenuItem>
                   )}
                   {collectives.map(collective => (
-                    <MenuItem
-                      key={collective.id}
-                      eventKey={collective.id}
-                      title={collective.name}
-                    >
+                    <MenuItem key={collective.id} eventKey={collective.id} title={collective.name}>
                       {this.renderCollectiveMenuItem(collective)}
                     </MenuItem>
                   ))}
                 </DropdownButton>
-                {selectedCollective &&
-                  !this.state.showAddFunds &&
-                  ::this.canEdit() && (
-                    <a className="addFundsLink" onClick={this.toggleAddFunds}>
-                      <FormattedMessage
-                        id="addfunds.submit"
-                        defaultMessage="Add Funds"
-                      />
-                    </a>
-                  )}
+                {selectedCollective && !this.state.showAddFunds && ::this.canEdit() && (
+                  <a className="addFundsLink" onClick={this.toggleAddFunds}>
+                    <FormattedMessage id="addfunds.submit" defaultMessage="Add Funds" />
+                  </a>
+                )}
               </div>
             )}
           </div>
-          <div className="right">
-            {::this.canEdit() && (
-              <ConnectPaypal collective={this.hostCollective} />
-            )}
-          </div>
+          <div className="right">{::this.canEdit() && <ConnectPaypal collective={this.hostCollective} />}</div>
         </div>
         <div>
           {selectedCollective && this.state.showAddFunds && (

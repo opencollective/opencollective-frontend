@@ -126,17 +126,11 @@ class CommentForm extends React.Component {
           <div className="header">
             <div className="meta">
               <span className="createdAt">
-                <FormattedDate
-                  value={comment.createdAt}
-                  day="numeric"
-                  month="numeric"
-                />
+                <FormattedDate value={comment.createdAt} day="numeric" month="numeric" />
               </span>{' '}
               |&nbsp;
               <span className="metaItem">
-                <Link route={`/${comment.fromCollective.slug}`}>
-                  {comment.fromCollective.name}
-                </Link>
+                <Link route={`/${comment.fromCollective.slug}`}>{comment.fromCollective.name}</Link>
               </span>
             </div>
             <div className="description">

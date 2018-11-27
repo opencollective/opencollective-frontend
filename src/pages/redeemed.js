@@ -70,9 +70,7 @@ const Hero = styled(Box)`
 `;
 
 class RedeemedPage extends React.Component {
-  static getInitialProps({
-    query: { code, amount, name, emitterSlug, emitterName },
-  }) {
+  static getInitialProps({ query: { code, amount, name, emitterSlug, emitterName } }) {
     return {
       code,
       amount: amount && Number(amount),
@@ -128,35 +126,24 @@ class RedeemedPage extends React.Component {
     });
 
     if (code) {
-      client
-        .query({ query: paymentMethodQuery, variables: { code } })
-        .then(result => {
-          const { PaymentMethod } = result.data;
-          if (PaymentMethod) {
-            this.setState({
-              amount:
-                PaymentMethod.initialBalance ||
-                PaymentMethod.monthlyLimitPerMember,
-              name: PaymentMethod.collective.name,
-              collective: PaymentMethod.collective,
-              emitter: PaymentMethod.emitter,
-              currency: PaymentMethod.currency,
-              loading: false,
-            });
-          }
-        });
+      client.query({ query: paymentMethodQuery, variables: { code } }).then(result => {
+        const { PaymentMethod } = result.data;
+        if (PaymentMethod) {
+          this.setState({
+            amount: PaymentMethod.initialBalance || PaymentMethod.monthlyLimitPerMember,
+            name: PaymentMethod.collective.name,
+            collective: PaymentMethod.collective,
+            emitter: PaymentMethod.emitter,
+            currency: PaymentMethod.currency,
+            loading: false,
+          });
+        }
+      });
     }
   }
 
   render() {
-    const {
-      amount,
-      emitter,
-      collective,
-      currency,
-      LoggedInUser,
-      loading,
-    } = this.state;
+    const { amount, emitter, collective, currency, LoggedInUser, loading } = this.state;
 
     let error;
     if (get(LoggedInUser, 'collective.id') !== get(collective, 'id')) {
@@ -173,61 +160,49 @@ class RedeemedPage extends React.Component {
 
         <Body>
           <Flex alignItems="center" flexDirection="column">
-            <Hero
-              minHeight={['300px', null, '380px']}
-              backgroundSize={['auto 300px', 'auto 380px']}
-            >
+            <Hero minHeight={['300px', null, '380px']} backgroundSize={['auto 300px', 'auto 380px']}>
               <Flex alignItems="center" flexDirection="column">
                 <Box mt={5}>
-                  <Title fontSize={['3rem', null, '4rem']}>
-                    Gift Card Redeemed! 🎉
-                  </Title>
+                  <Title fontSize={['3rem', null, '4rem']}>Gift Card Redeemed! 🎉</Title>
                 </Box>
 
                 {error && (
                   <Box mt={2}>
-                    <Subtitle
-                      fontSize={['1.5rem', null, '2rem']}
-                      maxWidth={['90%', '640px']}
-                    >
+                    <Subtitle fontSize={['1.5rem', null, '2rem']} maxWidth={['90%', '640px']}>
                       Error: {error}
                     </Subtitle>
                   </Box>
                 )}
 
-                {!loading &&
-                  !error && (
-                    <Fragment>
-                      <Box mt={2}>
-                        <Subtitle
-                          fontSize={['1.5rem', null, '2rem']}
-                          maxWidth={['90%', '640px']}
-                        >
-                          <Box>
-                            <FormattedMessage
-                              id="redeemed.subtitle.line1"
-                              defaultMessage="The card has been added to your account."
-                            />
-                          </Box>
-                          <Box>
-                            <FormattedMessage
-                              id="redeemed.subtitle.line2"
-                              defaultMessage="You can now donate to any collective of your choice."
-                            />
-                          </Box>
-                        </Subtitle>
-                      </Box>
+                {!loading && !error && (
+                  <Fragment>
+                    <Box mt={2}>
+                      <Subtitle fontSize={['1.5rem', null, '2rem']} maxWidth={['90%', '640px']}>
+                        <Box>
+                          <FormattedMessage
+                            id="redeemed.subtitle.line1"
+                            defaultMessage="The card has been added to your account."
+                          />
+                        </Box>
+                        <Box>
+                          <FormattedMessage
+                            id="redeemed.subtitle.line2"
+                            defaultMessage="You can now donate to any collective of your choice."
+                          />
+                        </Box>
+                      </Subtitle>
+                    </Box>
 
-                      <Box mt={[4, 5]}>
-                        <GiftCard
-                          amount={amount}
-                          currency={currency || 'USD'}
-                          emitter={emitter}
-                          collective={collective}
-                        />
-                      </Box>
-                    </Fragment>
-                  )}
+                    <Box mt={[4, 5]}>
+                      <GiftCard
+                        amount={amount}
+                        currency={currency || 'USD'}
+                        emitter={emitter}
+                        collective={collective}
+                      />
+                    </Box>
+                  </Fragment>
+                )}
               </Flex>
             </Hero>
 
@@ -251,9 +226,7 @@ class RedeemedPage extends React.Component {
                   id="redeemed.backyourstack"
                   defaultMessage="or discover the open source projects that your organization is depending on and that need funding on {link}"
                   values={{
-                    link: (
-                      <a href="https://backyourstack.com">BackYourStack.com</a>
-                    ),
+                    link: <a href="https://backyourstack.com">BackYourStack.com</a>,
                   }}
                 />
               </P>

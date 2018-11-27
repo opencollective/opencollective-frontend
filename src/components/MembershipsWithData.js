@@ -90,39 +90,24 @@ class MembershipsWithData extends React.Component {
 
         <div className="Collectives cardsList">
           {memberships.map(membership => (
-            <Membership
-              key={membership.id}
-              membership={membership}
-              LoggedInUser={LoggedInUser}
-            />
+            <Membership key={membership.id} membership={membership} LoggedInUser={LoggedInUser} />
           ))}
         </div>
-        {memberships.length % 10 === 0 &&
-          memberships.length >= limit && (
-            <div className="loadMoreBtn">
-              <Button bsStyle="default" onClick={this.fetchMore}>
-                {this.state.loading && (
-                  <FormattedMessage id="loading" defaultMessage="loading" />
-                )}
-                {!this.state.loading && (
-                  <FormattedMessage id="loadMore" defaultMessage="load more" />
-                )}
-              </Button>
-            </div>
-          )}
+        {memberships.length % 10 === 0 && memberships.length >= limit && (
+          <div className="loadMoreBtn">
+            <Button bsStyle="default" onClick={this.fetchMore}>
+              {this.state.loading && <FormattedMessage id="loading" defaultMessage="loading" />}
+              {!this.state.loading && <FormattedMessage id="loadMore" defaultMessage="load more" />}
+            </Button>
+          </div>
+        )}
       </div>
     );
   }
 }
 
 const getMembershipsQuery = gql`
-  query Members(
-    $memberCollectiveSlug: String
-    $role: String
-    $limit: Int
-    $offset: Int
-    $orderBy: String
-  ) {
+  query Members($memberCollectiveSlug: String, $role: String, $limit: Int, $offset: Int, $orderBy: String) {
     allMembers(
       memberCollectiveSlug: $memberCollectiveSlug
       role: $role
@@ -187,10 +172,7 @@ export const addMembershipsData = graphql(getMembershipsQuery, {
           }
           return Object.assign({}, previousResult, {
             // Append the new posts results to the old one
-            allMembers: [
-              ...previousResult.allMembers,
-              ...fetchMoreResult.allMembers,
-            ],
+            allMembers: [...previousResult.allMembers, ...fetchMoreResult.allMembers],
           });
         },
       });

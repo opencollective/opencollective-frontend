@@ -23,7 +23,6 @@ const textDecoration = style({
   prop: 'textDecoration',
 });
 
-
 const StyledLink = styled(tag.a)`
   ${bgColor}
   ${border}

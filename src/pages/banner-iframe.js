@@ -98,10 +98,7 @@ class BannerIframe extends React.Component {
       <div className="iframeContainer" ref={node => (this.node = node)}>
         <Head>
           <meta name="viewport" content="width=device-width, initial-scale=1" />
-          <link
-            rel="stylesheet"
-            href="https://fonts.googleapis.com/css?family=Lato:400,700,900"
-          />
+          <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,900" />
           <title>{`${collectiveSlug} collectives`}</title>
         </Head>
         <style jsx global>
@@ -110,48 +107,39 @@ class BannerIframe extends React.Component {
               font-family: 'Inter UI';
               font-style: normal;
               font-weight: 400;
-              src: url('/static/fonts/inter-ui/Inter-UI-Regular.woff2')
-                  format('woff2'),
-                url('/static/fonts/inter-ui/Inter-UI-Regular.woff')
-                  format('woff');
+              src: url('/static/fonts/inter-ui/Inter-UI-Regular.woff2') format('woff2'),
+                url('/static/fonts/inter-ui/Inter-UI-Regular.woff') format('woff');
             }
 
             @font-face {
               font-family: 'Inter UI';
               font-style: italic;
               font-weight: 400;
-              src: url('/static/fonts/inter-ui/Inter-UI-Italic.woff2')
-                  format('woff2'),
-                url('/static/fonts/inter-ui/Inter-UI-Italic.woff')
-                  format('woff');
+              src: url('/static/fonts/inter-ui/Inter-UI-Italic.woff2') format('woff2'),
+                url('/static/fonts/inter-ui/Inter-UI-Italic.woff') format('woff');
             }
 
             @font-face {
               font-family: 'Inter UI';
               font-style: normal;
               font-weight: 500;
-              src: url('/static/fonts/inter-ui/Inter-UI-Medium.woff2')
-                  format('woff2'),
-                url('/static/fonts/inter-ui/Inter-UI-Medium.woff')
-                  format('woff');
+              src: url('/static/fonts/inter-ui/Inter-UI-Medium.woff2') format('woff2'),
+                url('/static/fonts/inter-ui/Inter-UI-Medium.woff') format('woff');
             }
 
             @font-face {
               font-family: 'Inter UI';
               font-style: italic;
               font-weight: 500;
-              src: url('/static/fonts/inter-ui/Inter-UI-MediumItalic.woff2')
-                  format('woff2'),
-                url('/static/fonts/inter-ui/Inter-UI-MediumItalic.woff')
-                  format('woff');
+              src: url('/static/fonts/inter-ui/Inter-UI-MediumItalic.woff2') format('woff2'),
+                url('/static/fonts/inter-ui/Inter-UI-MediumItalic.woff') format('woff');
             }
 
             @font-face {
               font-family: 'Inter UI';
               font-style: normal;
               font-weight: 700;
-              src: url('/static/fonts/inter-ui/Inter-UI-Bold.woff2')
-                  format('woff2'),
+              src: url('/static/fonts/inter-ui/Inter-UI-Bold.woff2') format('woff2'),
                 url('/static/fonts/inter-ui/Inter-UI-Bold.woff') format('woff');
             }
 
@@ -159,18 +147,15 @@ class BannerIframe extends React.Component {
               font-family: 'Inter UI';
               font-style: italic;
               font-weight: 700;
-              src: url('/static/fonts/inter-ui/Inter-UI-BoldItalic.woff2')
-                  format('woff2'),
-                url('/static/fonts/inter-ui/Inter-UI-BoldItalic.woff')
-                  format('woff');
+              src: url('/static/fonts/inter-ui/Inter-UI-BoldItalic.woff2') format('woff2'),
+                url('/static/fonts/inter-ui/Inter-UI-BoldItalic.woff') format('woff');
             }
 
             @font-face {
               font-family: 'Inter UI';
               font-style: normal;
               font-weight: 900;
-              src: url('/static/fonts/inter-ui/Inter-UI-Black.woff2')
-                  format('woff2'),
+              src: url('/static/fonts/inter-ui/Inter-UI-Black.woff2') format('woff2'),
                 url('/static/fonts/inter-ui/Inter-UI-Black.woff') format('woff');
             }
 
@@ -178,10 +163,8 @@ class BannerIframe extends React.Component {
               font-family: 'Inter UI';
               font-style: italic;
               font-weight: 900;
-              src: url('/static/fonts/inter-ui/Inter-UI-BlackItalic.woff2')
-                  format('woff2'),
-                url('/static/fonts/inter-ui/Inter-UI-BlackItalic.woff')
-                  format('woff');
+              src: url('/static/fonts/inter-ui/Inter-UI-BlackItalic.woff2') format('woff2'),
+                url('/static/fonts/inter-ui/Inter-UI-BlackItalic.woff') format('woff');
             }
 
             body {
@@ -189,9 +172,7 @@ class BannerIframe extends React.Component {
               height: 100%;
               padding: 0;
               margin: 0;
-              font-family: ${style.body && `${style.body.fontFamily},`}
-                  'Inter UI',
-                Helvetica, sans-serif;
+              font-family: ${style.body && `${style.body.fontFamily},`} 'Inter UI', Helvetica, sans-serif;
               font-weight: 300;
               font-size: 1rem;
               line-height: 1.5;
@@ -304,10 +285,7 @@ class BannerIframe extends React.Component {
                 rel="noopener noreferrer"
                 style={style.a}
               >
-                <FormattedMessage
-                  id="widget.becomeSponsor"
-                  defaultMessage="Become a sponsor"
-                />
+                <FormattedMessage id="widget.becomeSponsor" defaultMessage="Become a sponsor" />
               </a>
             </div>
             <MembersWithData
@@ -326,9 +304,7 @@ class BannerIframe extends React.Component {
               <FormattedMessage
                 id="collective.section.backers.users.title"
                 values={{ n: backers.users, collective: collective.name }}
-                defaultMessage={
-                  '{n} {n, plural, one {person is} other {people are}} supporting {collective}'
-                }
+                defaultMessage={'{n} {n, plural, one {person is} other {people are}} supporting {collective}'}
               />
             </h2>
 
@@ -339,10 +315,7 @@ class BannerIframe extends React.Component {
                 rel="noopener noreferrer"
                 style={style.a}
               >
-                <FormattedMessage
-                  id="widget.becomeBacker"
-                  defaultMessage="Become a backer"
-                />
+                <FormattedMessage id="widget.becomeBacker" defaultMessage="Become a backer" />
               </a>
             </div>
             <MembersWithData

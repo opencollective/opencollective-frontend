@@ -15,9 +15,7 @@ const loadGoogleMapsAsync = () =>
       resolve();
     };
 
-    loadScriptAsync(
-      `${getGoogleMapsScriptUrl()}&callback=${callbackName}`,
-    ).catch(err => {
+    loadScriptAsync(`${getGoogleMapsScriptUrl()}&callback=${callbackName}`).catch(err => {
       reject(err);
     });
   });

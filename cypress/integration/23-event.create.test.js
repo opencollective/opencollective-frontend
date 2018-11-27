@@ -1,7 +1,4 @@
-const WEBSITE_URL =
-  process.env.WEBSITE_URL ||
-  'http://localhost:3000' ||
-  'https://staging.opencollective.com';
+const WEBSITE_URL = process.env.WEBSITE_URL || 'http://localhost:3000' || 'https://staging.opencollective.com';
 
 const longDescription = 'This is a longer description in **markdown**';
 
@@ -45,9 +42,7 @@ describe('event.create.test.js', () => {
     cy.get('#location .address').contains('Lesbroussart');
     cy.get('#location .address').contains('1050');
     cy.get('.EditTiers .tier .inputField.name input').type('Free ticket');
-    cy.get('.EditTiers .tier .inputField.description textarea').type(
-      'Free ticket for students',
-    );
+    cy.get('.EditTiers .tier .inputField.description textarea').type('Free ticket for students');
     cy.get('.EditTiers .tier .inputField.maxQuantity input').type('10');
     cy.get('.addTier').click();
     cy.get('.EditTiers .tier')
@@ -73,9 +68,7 @@ describe('event.create.test.js', () => {
     cy.wait(300);
     cy.get('.desktopOnly .editCollective a').click();
     cy.wait(1000);
-    cy.get('.inputs .inputField.name input', { timeout: 10000 }).type(
-      `{selectall}${updatedTitle}`,
-    );
+    cy.get('.inputs .inputField.name input', { timeout: 10000 }).type(`{selectall}${updatedTitle}`);
     cy.get('.EditTiers .tier:nth-child(2) .removeTier').click();
     cy.wait(300);
     cy.get('.actions button').click();

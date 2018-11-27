@@ -189,22 +189,14 @@ class RedeemPage extends React.Component {
         />
         <Body>
           <Flex alignItems="center" flexDirection="column">
-            <Hero
-              minHeight={['500px', null, '700px']}
-              backgroundSize={['auto 300px', 'auto 380px']}
-            >
+            <Hero minHeight={['500px', null, '700px']} backgroundSize={['auto 300px', 'auto 380px']}>
               <Flex alignItems="center" flexDirection="column">
                 <Box mt={5}>
-                  <Title fontSize={['3rem', null, '4rem']}>
-                    Redeem Gift Card
-                  </Title>
+                  <Title fontSize={['3rem', null, '4rem']}>Redeem Gift Card</Title>
                 </Box>
 
                 <Box mt={2}>
-                  <Subtitle
-                    fontSize={['1.5rem', null, '2rem']}
-                    maxWidth={['90%', '640px']}
-                  >
+                  <Subtitle fontSize={['1.5rem', null, '2rem']} maxWidth={['90%', '640px']}>
                     <Box>
                       <FormattedMessage
                         id="redeem.subtitle.line1"
@@ -216,11 +208,7 @@ class RedeemPage extends React.Component {
 
                 <Box mt={[4, 5]}>
                   <Flex justifyContent="center" flexDirection="column">
-                    <Container
-                      background="white"
-                      borderRadius="16px"
-                      width="400px"
-                    >
+                    <Container background="white" borderRadius="16px" width="400px">
                       <ShadowBox py="24px" px="32px">
                         {this.state.view === 'form' && (
                           <RedeemForm
@@ -231,27 +219,16 @@ class RedeemPage extends React.Component {
                             onChange={this.handleChange}
                           />
                         )}
-                        {this.state.view === 'success' && (
-                          <RedeemSuccess email={email} />
-                        )}
+                        {this.state.view === 'success' && <RedeemSuccess email={email} />}
                       </ShadowBox>
                     </Container>
                     {this.state.view === 'form' && (
                       <Box my={3} align="center">
-                        <BlueButton
-                          onClick={this.handleSubmit}
-                          disabled={this.state.loading}
-                        >
+                        <BlueButton onClick={this.handleSubmit} disabled={this.state.loading}>
                           {this.state.loading ? (
-                            <FormattedMessage
-                              id="form.processing"
-                              defaultMessage="processing"
-                            />
+                            <FormattedMessage id="form.processing" defaultMessage="processing" />
                           ) : (
-                            <FormattedMessage
-                              id="redeem.form.redeem.btn"
-                              defaultMessage="redeem"
-                            />
+                            <FormattedMessage id="redeem.form.redeem.btn" defaultMessage="redeem" />
                           )}
                         </BlueButton>
                         {this.state.error && <Error>{this.state.error}</Error>}

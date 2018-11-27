@@ -100,9 +100,7 @@ class EditPaymentMethod extends React.Component {
                     />
                   </label>
                   <Col sm={9}>
-                    <div className="name col">
-                      {paymentMethodLabelWithIcon(intl, paymentMethod)}
-                    </div>
+                    <div className="name col">{paymentMethodLabelWithIcon(intl, paymentMethod)}</div>
                     {hasOrders && (
                       <div className="actions">
                         <FormattedMessage
@@ -116,29 +114,19 @@ class EditPaymentMethod extends React.Component {
                           bsSize="xsmall"
                           onClick={() =>
                             Router.push(
-                              `/subscriptions?collectiveSlug=${
-                                this.props.slug
-                              }`,
+                              `/subscriptions?collectiveSlug=${this.props.slug}`,
                               `/${this.props.slug}/subscriptions`,
                             )
                           }
                         >
-                          {intl.formatMessage(
-                            this.messages['paymentMethod.editSubscriptions'],
-                          )}
+                          {intl.formatMessage(this.messages['paymentMethod.editSubscriptions'])}
                         </Button>
                       </div>
                     )}
                     {canRemove && (
                       <div className="actions">
-                        <Button
-                          bsStyle="default"
-                          bsSize="xsmall"
-                          onClick={() => this.removePaymentMethod({})}
-                        >
-                          {intl.formatMessage(
-                            this.messages['paymentMethod.remove'],
-                          )}
+                        <Button bsStyle="default" bsSize="xsmall" onClick={() => this.removePaymentMethod({})}>
+                          {intl.formatMessage(this.messages['paymentMethod.remove'])}
                         </Button>
                       </div>
                     )}
@@ -151,23 +139,13 @@ class EditPaymentMethod extends React.Component {
             <Row>
               <InputField
                 className="horizontal"
-                label={capitalize(
-                  intl.formatMessage(
-                    this.messages['paymentMethod.monthlyLimitPerMember.label'],
-                  ),
-                )}
+                label={capitalize(intl.formatMessage(this.messages['paymentMethod.monthlyLimitPerMember.label']))}
                 type="currency"
                 name="monthlyLimitPerMember"
                 pre={getCurrencySymbol(currency)}
                 defaultValue={paymentMethod.monthlyLimitPerMember}
-                description={intl.formatMessage(
-                  this.messages[
-                    'paymentMethod.monthlyLimitPerMember.description'
-                  ],
-                )}
-                onChange={value =>
-                  this.handleChange({ monthlyLimitPerMember: value })
-                }
+                description={intl.formatMessage(this.messages['paymentMethod.monthlyLimitPerMember.description'])}
+                onChange={value => this.handleChange({ monthlyLimitPerMember: value })}
               />
             </Row>
           )}

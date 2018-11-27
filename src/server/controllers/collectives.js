@@ -34,9 +34,7 @@ export async function info(req, res, next) {
     balance: collective.stats.balance,
     yearlyIncome: collective.stats.yearlyBudget,
     backersCount: collective.stats.backers.all,
-    contributorsCount: Object.keys(
-      get(collective, 'data.githubContributors') || {},
-    ).length,
+    contributorsCount: Object.keys(get(collective, 'data.githubContributors') || {}).length,
   };
 
   res.send(response);
@@ -46,9 +44,7 @@ export async function website(req, res) {
   req.params.isActive = true;
   const { collectiveSlug, tierSlug, backerType, isActive } = req.params;
 
-  let users = cache.get(
-    queryString.stringify({ collectiveSlug, tierSlug, backerType, isActive }),
-  );
+  let users = cache.get(queryString.stringify({ collectiveSlug, tierSlug, backerType, isActive }));
   if (!users) {
     try {
       users = await fetchMembers(req.params);
@@ -76,9 +72,7 @@ export async function website(req, res) {
   const selector = tierSlug || backerType;
   let redirectUrl = `${WEBSITE_URL}/${user.slug}`;
   if (selector.match(/sponsor/)) {
-    user.twitter = user.twitterHandle
-      ? `https://twitter.com/${user.twitterHandle}`
-      : null;
+    user.twitter = user.twitterHandle ? `https://twitter.com/${user.twitterHandle}` : null;
     redirectUrl = user.website || user.twitter || `${WEBSITE_URL}/${user.slug}`;
   }
 

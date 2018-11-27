@@ -38,9 +38,7 @@ class MenuBar extends React.Component {
   constructor(props) {
     super(props);
 
-    const menuItems = [
-      { anchor: 'about', link: `${props.collective.path}#about`, position: 0 },
-    ];
+    const menuItems = [{ anchor: 'about', link: `${props.collective.path}#about`, position: 0 }];
 
     if (props.collective.type === 'COLLECTIVE') {
       menuItems.push({
@@ -138,10 +136,7 @@ class MenuBar extends React.Component {
 
     const { collective } = this.props;
     if (!collective) {
-      console.error(
-        '>>> this is a weird error, collective should always be set',
-        this.props,
-      );
+      console.error('>>> this is a weird error, collective should always be set', this.props);
       return;
     }
 
@@ -196,17 +191,9 @@ class MenuBar extends React.Component {
     if (selectedMenuItem) {
       const anchor = `#${selectedMenuItem.anchor}`;
       this.setState({ selectedAnchor: selectedMenuItem.anchor });
-      history.replaceState(
-        { ...history.state, as: location.pathname + anchor },
-        undefined,
-        anchor,
-      );
+      history.replaceState({ ...history.state, as: location.pathname + anchor }, undefined, anchor);
     } else {
-      history.replaceState(
-        history.state,
-        undefined,
-        window.location.pathname + window.location.search,
-      );
+      history.replaceState(history.state, undefined, window.location.pathname + window.location.search);
     }
   };
 
@@ -271,11 +258,7 @@ class MenuBar extends React.Component {
     }
 
     const AddFundsModal = () => (
-      <Modal
-        show={this.state.showAddFunds}
-        onHide={this.hideAddFunds}
-        style={{ zIndex: 999999 }}
-      >
+      <Modal show={this.state.showAddFunds} onHide={this.hideAddFunds} style={{ zIndex: 999999 }}>
         <Modal.Body>
           <Row>
             <Col sm={12}>
@@ -311,11 +294,7 @@ class MenuBar extends React.Component {
           <Row>
             <Col sm={2} />
             <Col sm={10}>
-              {this.state.error && (
-                <div style={{ color: 'red', fontWeight: 'bold' }}>
-                  {this.state.error}
-                </div>
-              )}
+              {this.state.error && <div style={{ color: 'red', fontWeight: 'bold' }}>{this.state.error}</div>}
             </Col>
           </Row>
         </Modal.Body>
@@ -344,57 +323,35 @@ class MenuBar extends React.Component {
           `}
         </style>
         {this.state.sticky && cta && cta}
-        {['COLLECTIVE', 'EVENT'].indexOf(collective.type) !== -1 &&
-          (
-            <Button
-              className="submitExpense darkBackground"
-              href={`${collective.path}/expenses/new`}
-            >
-              <FormattedMessage
-                id="menu.submitExpense"
-                defaultMessage="Submit Expense"
-            />
+        {['COLLECTIVE', 'EVENT'].indexOf(collective.type) !== -1 && (
+          <Button className="submitExpense darkBackground" href={`${collective.path}/expenses/new`}>
+            <FormattedMessage id="menu.submitExpense" defaultMessage="Submit Expense" />
           </Button>
         )}
 
         {LoggedInUser &&
         LoggedInUser.isRoot() /* Only Site admins can do that for now */ &&
         LoggedInUser.hostsUserIsAdminOf() /* Don't show button if user isn't admin anywhere */ &&
-        collective.type ===
-          'ORGANIZATION' /* We can only create a prepaid card for an organization */ &&
+        collective.type === 'ORGANIZATION' /* We can only create a prepaid card for an organization */ &&
         !collective.isHost /* If the collective being browsed is a host, don't show either */ && (
-        <div>
-              <div className="item editCollective">
-                <AddFundsModal />
-                <Button
-                  className="addFunds darkBackground"
-                  onClick={() => this.setState({ showAddFunds: true })}
-                >
-                  <FormattedMessage
-                    id="menu.addFunds"
-                    defaultMessage="Add funds"
-                  />
-                </Button>
-              </div>
-            </div>
-          )}
-        {collective.isHost &&
-          LoggedInUser &&
-          LoggedInUser.canEditCollective(collective) && (
             <div>
               <div className="item editCollective">
-                <Button
-                  className="darkBackground"
-                  href={`/${collective.slug}/dashboard`}
-                >
-                  <FormattedMessage
-                    id="host.dashboard"
-                    defaultMessage="Dashboard"
-                  />
+                <AddFundsModal />
+                <Button className="addFunds darkBackground" onClick={() => this.setState({ showAddFunds: true })}>
+                  <FormattedMessage id="menu.addFunds" defaultMessage="Add funds" />
                 </Button>
               </div>
             </div>
           )}
+        {collective.isHost && LoggedInUser && LoggedInUser.canEditCollective(collective) && (
+          <div>
+            <div className="item editCollective">
+              <Button className="darkBackground" href={`/${collective.slug}/dashboard`}>
+                <FormattedMessage id="host.dashboard" defaultMessage="Dashboard" />
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
     );
   };
@@ -443,41 +400,32 @@ class MenuBar extends React.Component {
         </style>
         {this.state.menuItems.map((item, index) => (
           <div
-            className={`item ${item.anchor} ${this.state.selectedAnchor ===
-              item.anchor && 'selected'}`}
+            className={`item ${item.anchor} ${this.state.selectedAnchor === item.anchor && 'selected'}`}
             key={`item-${index}-${item.link}`}
           >
             <Link route={item.link} animate={{ offset }}>
-              {this.messages[item.anchor]
-                ? intl.formatMessage(this.messages[item.anchor])
-                : item.title || item.anchor}
+              {this.messages[item.anchor] ? intl.formatMessage(this.messages[item.anchor]) : item.title || item.anchor}
             </Link>
           </div>
         ))}
-        {LoggedInUser &&
-          LoggedInUser.canEditCollective(collective) && (
-            <div className="admin">
-              {['USER', 'ORGANIZATION'].indexOf(collective.type) !== -1 && (
-                <div className="item transactions">
-                  <Link route={`${collective.path}/transactions`}>
-                    <FormattedMessage
-                      id="menu.transactions"
-                      defaultMessage="transactions"
-                    />
-                  </Link>
-                </div>
-              )}
-              <div className="separator" />
-              <div className="item editCollective">
-                <Link route={`${collective.path}/edit`}>
-                  <PencilIcon size="1.75em" />
-                  {intl.formatMessage(
-                    this.messages[`menu.edit.${collective.type.toLowerCase()}`],
-                  )}
+        {LoggedInUser && LoggedInUser.canEditCollective(collective) && (
+          <div className="admin">
+            {['USER', 'ORGANIZATION'].indexOf(collective.type) !== -1 && (
+              <div className="item transactions">
+                <Link route={`${collective.path}/transactions`}>
+                  <FormattedMessage id="menu.transactions" defaultMessage="transactions" />
                 </Link>
               </div>
+            )}
+            <div className="separator" />
+            <div className="item editCollective">
+              <Link route={`${collective.path}/edit`}>
+                <PencilIcon size="1.75em" />
+                {intl.formatMessage(this.messages[`menu.edit.${collective.type.toLowerCase()}`])}
+              </Link>
             </div>
-          )}
+          </div>
+        )}
       </div>
     );
   };
@@ -653,12 +601,7 @@ class MenuBar extends React.Component {
 }
 
 const addFundsToOrgQuery = gql`
-  mutation addFundsToOrg(
-    $totalAmount: Int!
-    $CollectiveId: Int!
-    $HostCollectiveId: Int!
-    $description: String
-  ) {
+  mutation addFundsToOrg($totalAmount: Int!, $CollectiveId: Int!, $HostCollectiveId: Int!, $description: String) {
     addFundsToOrg(
       totalAmount: $totalAmount
       CollectiveId: $CollectiveId

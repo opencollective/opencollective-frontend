@@ -3,13 +3,7 @@ import PropTypes from 'prop-types';
 import colors from '../constants/colors';
 
 import { defineMessages, injectIntl } from 'react-intl';
-import {
-  formatCurrency,
-  formatDate,
-  firstSentence,
-  singular,
-  capitalize,
-} from '../lib/utils';
+import { formatCurrency, formatDate, firstSentence, singular, capitalize } from '../lib/utils';
 import Link from './Link';
 import CollectiveCard from './CollectiveCard';
 import Avatar from './Avatar';
@@ -42,9 +36,7 @@ class Member extends React.Component {
     const membership = { ...this.props.member };
     membership.collective = collective;
     const { member, description } = membership;
-    const viewMode =
-      this.props.viewMode ||
-      (get(member, 'type') === 'USER' ? 'USER' : 'ORGANIZATION');
+    const viewMode = this.props.viewMode || (get(member, 'type') === 'USER' ? 'USER' : 'ORGANIZATION');
     const user = member.user || {};
     const name =
       (member.name && member.name.match(/^null/) ? null : member.name) ||
@@ -55,20 +47,16 @@ class Member extends React.Component {
     const tierName = membership.tier
       ? singular(membership.tier.name)
       : this.messages[membership.role]
-        ? intl.formatMessage(this.messages[membership.role])
-        : membership.role;
+      ? intl.formatMessage(this.messages[membership.role])
+      : membership.role;
     const className = this.props.className || '';
     let memberSinceStr = '';
     if (tierName) {
       memberSinceStr = capitalize(tierName);
     }
-    memberSinceStr += ` ${intl.formatMessage(
-      this.messages['membership.since'],
-    )} ${formatDate(membership.createdAt)}`;
+    memberSinceStr += ` ${intl.formatMessage(this.messages['membership.since'])} ${formatDate(membership.createdAt)}`;
     const totalDonationsStr = membership.stats
-      ? `${intl.formatMessage(
-          this.messages['membership.totalDonations'],
-        )}: ${formatCurrency(
+      ? `${intl.formatMessage(this.messages['membership.totalDonations'])}: ${formatCurrency(
           membership.stats.totalDonations,
           collective.currency,
           { precision: 0 },
@@ -91,9 +79,7 @@ ${totalDonationsStr}`;
     }
 
     return (
-      <div
-        className={`Member ${className} ${member.type} viewMode-${viewMode}`}
-      >
+      <div className={`Member ${className} ${member.type} viewMode-${viewMode}`}>
         <style jsx>
           {`
             .Member {
@@ -144,12 +130,7 @@ ${totalDonationsStr}`;
         </style>
         <div>
           {viewMode === 'USER' && (
-            <Link
-              route={'collective'}
-              params={{ slug: this.props.member.member.slug }}
-              target="_top"
-              title={title}
-            >
+            <Link route={'collective'} params={{ slug: this.props.member.member.slug }} target="_top" title={title}>
               <Avatar src={member.image} radius={45} name={name} type={member.type} mt={2} className="noFrame" />
               <div className="bubble">
                 <div className="name">{name}</div>
@@ -160,19 +141,14 @@ ${totalDonationsStr}`;
                   {memberSinceStr}
                 </div>
                 {totalDonationsStr && (
-                  <div
-                    className="meta totalDonations"
-                    style={{ color: colors.darkgray }}
-                  >
+                  <div className="meta totalDonations" style={{ color: colors.darkgray }}>
                     {totalDonationsStr}
                   </div>
                 )}
               </div>
             </Link>
           )}
-          {viewMode === 'ORGANIZATION' && (
-            <CollectiveCard collective={member} membership={membership} />
-          )}
+          {viewMode === 'ORGANIZATION' && <CollectiveCard collective={member} membership={membership} />}
         </div>
       </div>
     );

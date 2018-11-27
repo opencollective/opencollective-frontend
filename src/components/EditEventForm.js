@@ -52,10 +52,7 @@ class EditEventForm extends React.Component {
   }
 
   UNSAFE_componentWillReceiveProps(nextProps) {
-    if (
-      nextProps.event &&
-      (!this.props.event || nextProps.event.name != this.props.event.name)
-    ) {
+    if (nextProps.event && (!this.props.event || nextProps.event.name != this.props.event.name)) {
       this.setState({ event: nextProps.event, tiers: nextProps.event.tiers });
     }
   }
@@ -102,11 +99,7 @@ class EditEventForm extends React.Component {
     if (!event.parentCollective) return <div />;
 
     const isNew = !(event && event.id);
-    const submitBtnLabel = loading
-      ? 'loading'
-      : isNew
-        ? 'Create Event'
-        : 'Save';
+    const submitBtnLabel = loading ? 'loading' : isNew ? 'Create Event' : 'Save';
     const defaultStartsAt = new Date();
     defaultStartsAt.setHours(19);
     defaultStartsAt.setMinutes(0);
@@ -145,9 +138,7 @@ class EditEventForm extends React.Component {
         options: { timezone: event.timezone },
         placeholder: '',
         validate: date => {
-          const yesterday = new Date(
-            this.state.event.startsAt || defaultStartsAt,
-          );
+          const yesterday = new Date(this.state.event.startsAt || defaultStartsAt);
           yesterday.setDate(yesterday.getDate() - 1);
           return date.isAfter(yesterday);
         },
@@ -164,9 +155,7 @@ class EditEventForm extends React.Component {
         field.label = intl.formatMessage(this.messages[`${field.name}.label`]);
       }
       if (this.messages[`${field.name}.description`]) {
-        field.description = intl.formatMessage(
-          this.messages[`${field.name}.description`],
-        );
+        field.description = intl.formatMessage(this.messages[`${field.name}.description`]);
       }
       return field;
     });
@@ -215,9 +204,7 @@ class EditEventForm extends React.Component {
             {this.fields.map(field => (
               <InputField
                 key={field.name}
-                defaultValue={
-                  this.state.event[field.name] || field.defaultValue
-                }
+                defaultValue={this.state.event[field.name] || field.defaultValue}
                 validate={field.validate}
                 ref={field.name}
                 name={field.name}
@@ -243,12 +230,7 @@ class EditEventForm extends React.Component {
           />
         </div>
         <div className="actions">
-          <Button
-            className="blue"
-            label={submitBtnLabel}
-            onClick={this.handleSubmit}
-            disabled={loading}
-          />
+          <Button className="blue" label={submitBtnLabel} onClick={this.handleSubmit} disabled={loading} />
         </div>
       </div>
     );

@@ -41,15 +41,8 @@ class CreateEventPage extends React.Component {
       return <ErrorPage loading={this.state.loading} data={data} />;
     }
 
-    return (
-      <CreateEvent
-        parentCollective={data.Collective}
-        LoggedInUser={this.state.LoggedInUser}
-      />
-    );
+    return <CreateEvent parentCollective={data.Collective} LoggedInUser={this.state.LoggedInUser} />;
   }
 }
 
-export default withData(
-  withIntl(withLoggedInUser(addCollectiveData(CreateEventPage))),
-);
+export default withData(withIntl(withLoggedInUser(addCollectiveData(CreateEventPage))));

@@ -1,7 +1,4 @@
-const WEBSITE_URL =
-  process.env.WEBSITE_URL ||
-  'http://localhost:3000' ||
-  'https://staging.opencollective.com';
+const WEBSITE_URL = process.env.WEBSITE_URL || 'http://localhost:3000' || 'https://staging.opencollective.com';
 
 const collectiveName = 'New collective';
 
@@ -60,15 +57,11 @@ describe('create a collective', () => {
       .click();
     cy.wait(300);
     cy.get('.ApplyToHostBtn', { timeout: 15000 }).contains('0% host fee');
-    cy.get('.LoggedInUser .ApplyToHostBtn .Button:enabled').contains(
-      'Apply to host your collective New collective',
-    );
+    cy.get('.LoggedInUser .ApplyToHostBtn .Button:enabled').contains('Apply to host your collective New collective');
     cy.get('.LoggedInUser .ApplyToHostBtn .Button:enabled').click({
       force: true,
     });
-    cy.get('.LoggedInUser .ApplyToHostBtn').contains(
-      `Application pending for ${collectiveName}`,
-    );
+    cy.get('.LoggedInUser .ApplyToHostBtn').contains(`Application pending for ${collectiveName}`);
     // Go back to collective page
     cy.get('.LoggedInUser .ApplyToHostBtn a')
       .first()
