@@ -202,7 +202,7 @@ describe('createOrder', () => {
         paymentMethods: {
           manual: {
             instructions:
-              'Please send a wire to XXXX with the mention: {collective} {tier} order: {OrderId} {unknownVariable}',
+              'Please send a wire to XXXX for the amount of {amount} with the mention: {collective} {tier} order: {OrderId} {unknownVariable}',
           },
         },
       },
@@ -246,7 +246,7 @@ describe('createOrder', () => {
       thisOrder.user.email,
     );
     expect(emailSendMessageSpy.secondCall.args[2]).to.match(
-      /Please send a wire to XXXX with the mention: webpack backer order: [0-9]+/,
+      /Please send a wire to XXXX for the amount of \$1,543 with the mention: webpack backer order: [0-9]+/,
     );
     expect(emailSendMessageSpy.secondCall.args[1]).to.equal(
       'ACTION REQUIRED: your $1,543 donation to test is pending',

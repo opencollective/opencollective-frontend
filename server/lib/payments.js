@@ -14,6 +14,7 @@ import paymentProviders from '../paymentProviders';
 import * as libsubscription from './subscriptions';
 import * as libtransactions from './transactions';
 import { getRecommendedCollectives } from './data';
+import { formatCurrency } from '../lib/utils';
 
 /** Check if paymentMethod has a given fully qualified name
  *
@@ -512,6 +513,7 @@ const sendOrderProcessingEmail = async order => {
   if (instructions) {
     const formatValues = {
       orderid: order.id,
+      amount: formatCurrency(order.totalAmount, order.currency),
       collective: order.collective.slug,
       tier: get(order, 'tier.slug') || get(order, 'tier.name'),
     };
