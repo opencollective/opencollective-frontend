@@ -340,10 +340,7 @@ class TopBarProfileMenu extends React.Component {
     let status;
     if (this.state.status) {
       status = this.state.status;
-    } else if (
-      (loading || loadingLoggedInUser) &&
-      typeof LoggedInUser === 'undefined'
-    ) {
+    } else if ((loading || loadingLoggedInUser) && typeof LoggedInUser === 'undefined') {
       status = 'loading';
     } else if (!LoggedInUser) {
       status = 'loggedout';

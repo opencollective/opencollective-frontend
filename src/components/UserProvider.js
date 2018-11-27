@@ -69,9 +69,7 @@ class UserProvider extends React.Component {
 
   render() {
     return (
-      <UserContext.Provider
-        value={{ ...this.state, logout: this.logout, login: this.login }}
-      >
+      <UserContext.Provider value={{ ...this.state, logout: this.logout, login: this.login }}>
         {this.props.children}
       </UserContext.Provider>
     );
@@ -81,16 +79,10 @@ class UserProvider extends React.Component {
 const { Consumer: UserConsumer } = UserContext;
 
 const withUser = WrappedComponent => {
-  const WithUser = props => (
-    <UserConsumer>
-      {context => <WrappedComponent {...context} {...props} />}
-    </UserConsumer>
-  );
+  const WithUser = props => <UserConsumer>{context => <WrappedComponent {...context} {...props} />}</UserConsumer>;
 
   WithUser.getInitialProps = async context => {
-    return WrappedComponent.getInitialProps
-      ? await WrappedComponent.getInitialProps(context)
-      : {};
+    return WrappedComponent.getInitialProps ? await WrappedComponent.getInitialProps(context) : {};
   };
 
   return WithUser;
