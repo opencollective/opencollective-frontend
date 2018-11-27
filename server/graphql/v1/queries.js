@@ -126,7 +126,10 @@ const queries = {
         attributes: ['createdAt', 'HostCollectiveId', 'amountInHostCurrency', 'hostCurrency'],
         where: {
           type: 'CREDIT',
-          FromCollectiveId: fromCollective.id,
+          [Op.or]: {
+            FromCollectiveId: fromCollective.id,
+            UsingVirtualCardFromCollectiveId: fromCollective.id,
+          },
         },
       });
       const hostsById = {};
@@ -142,9 +145,7 @@ const queries = {
         const year = createdAt.getFullYear();
         const month = createdAt.getMonth() + 1;
         const month2digit = month < 10 ? `0${month}` : `${month}`;
-        const slug = `${year}${month2digit}.${
-          hostsById[HostCollectiveId].slug
-        }.${fromCollective.slug}`;
+        const slug = `${year}${month2digit}.${hostsById[HostCollectiveId].slug}.${fromCollective.slug}`;
         const totalAmount = invoicesByKey[slug]
           ? invoicesByKey[slug].totalAmount + transaction.amountInHostCurrency
           : transaction.amountInHostCurrency;
@@ -172,20 +173,14 @@ const queries = {
     args: {
       invoiceSlug: {
         type: new GraphQLNonNull(GraphQLString),
-        description:
-          'Slug of the invoice. Format: :year:2digitMonth.:hostSlug.:fromCollectiveSlug',
+        description: 'Slug of the invoice. Format: :year:2digitMonth.:hostSlug.:fromCollectiveSlug',
       },
     },
     async resolve(_, args, req) {
       const year = args.invoiceSlug.substr(0, 4);
       const month = args.invoiceSlug.substr(4, 2);
-      const hostSlug = args.invoiceSlug.substring(
-        7,
-        args.invoiceSlug.lastIndexOf('.'),
-      );
-      const fromCollectiveSlug = args.invoiceSlug.substr(
-        args.invoiceSlug.lastIndexOf('.') + 1,
-      );
+      const hostSlug = args.invoiceSlug.substring(7, args.invoiceSlug.lastIndexOf('.'));
+      const fromCollectiveSlug = args.invoiceSlug.substr(args.invoiceSlug.lastIndexOf('.') + 1);
       if (!hostSlug || year < 2015 || (month < 1 || month > 12)) {
         throw new errors.ValidationFailed(
           'Invalid invoiceSlug format. Should be :year:2digitMonth.:hostSlug.:fromCollectiveSlug',
@@ -195,9 +190,7 @@ const queries = {
         where: { slug: fromCollectiveSlug },
       });
       if (!fromCollective) {
-        throw new errors.NotFound(
-          `User or organization not found for slug ${fromCollectiveSlug}`,
-        );
+        throw new errors.NotFound(`User or organization not found for slug ${fromCollectiveSlug}`);
       }
       const host = await models.Collective.findBySlug(hostSlug);
       if (!host) {
@@ -212,7 +205,10 @@ const queries = {
       endsAt.setMonth(startsAt.getMonth() + 1);
 
       const where = {
-        FromCollectiveId: fromCollective.id,
+        [Op.or]: {
+          FromCollectiveId: fromCollective.id,
+          UsingVirtualCardFromCollectiveId: fromCollective.id,
+        },
         HostCollectiveId: host.id,
         createdAt: { [Op.gte]: startsAt, [Op.lt]: endsAt },
         type: 'CREDIT',

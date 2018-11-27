@@ -360,7 +360,10 @@ export const InvoiceType = new GraphQLObjectType({
           const endsAt = new Date(startsAt);
           endsAt.setMonth(startsAt.getMonth() + 1);
           const where = {
-            FromCollectiveId: invoice.FromCollectiveId,
+            [Op.or]: {
+              FromCollectiveId: invoice.FromCollectiveId,
+              UsingVirtualCardFromCollectiveId: invoice.FromCollectiveId,
+            },
             type: 'CREDIT',
             createdAt: { [Op.gte]: startsAt, [Op.lt]: endsAt },
           };
