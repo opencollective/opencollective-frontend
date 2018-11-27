@@ -1,8 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Error from './Error';
 import withIntl from '../lib/withIntl';
-import { graphql, compose } from 'react-apollo';
+import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import { DropdownButton, MenuItem, Badge } from 'react-bootstrap';
 import Currency from './Currency';
@@ -13,7 +12,7 @@ import { pick } from 'lodash';
 
 class CollectivePickerWithData extends React.Component {
   static propTypes = {
-    hostCollectiveSlug: PropTypes.string.isRequired,
+    host: PropTypes.object.isRequired,
     onChange: PropTypes.func,
   };
 
@@ -234,17 +233,10 @@ class CollectivePickerWithData extends React.Component {
   }
 
   render() {
-    const {
-      data: { loading, error, Collective },
-    } = this.props;
+    const { host } = this.props;
 
-    if (error) {
-      console.error('graphql error>>>', error.message);
-      return <Error message="GraphQL error" />;
-    }
-
-    this.hostCollective = Collective || this.hostCollective;
-    if (loading || !this.hostCollective) {
+    this.hostCollective = host;
+    if (!this.hostCollective) {
       return <div />;
     }
 
@@ -402,110 +394,26 @@ class CollectivePickerWithData extends React.Component {
           </div>
         </div>
         <div>
-          {selectedCollective &&
-            this.state.showAddFunds && (
-              <div>
-                <AddFundsForm
-                  collective={selectedCollective}
-                  host={this.hostCollective}
-                  onSubmit={this.addFunds}
-                  onCancel={this.toggleAddFunds}
-                  loading={this.state.loading}
-                  LoggedInUser={this.props.LoggedInUser}
-                />
-                <div className="results">
-                  <div className="error">{this.state.error}</div>
-                </div>
+          {selectedCollective && this.state.showAddFunds && (
+            <div>
+              <AddFundsForm
+                collective={selectedCollective}
+                host={this.hostCollective}
+                onSubmit={this.addFunds}
+                onCancel={this.toggleAddFunds}
+                loading={this.state.loading}
+                LoggedInUser={this.props.LoggedInUser}
+              />
+              <div className="results">
+                <div className="error">{this.state.error}</div>
               </div>
-            )}
+            </div>
+          )}
         </div>
       </div>
     );
   }
 }
-
-const getCollectivesQuery = gql`
-  query Collective(
-    $hostCollectiveSlug: String
-    $orderBy: CollectiveOrderField
-    $orderDirection: OrderDirection
-  ) {
-    Collective(slug: $hostCollectiveSlug) {
-      id
-      slug
-      name
-      paymentMethods {
-        id
-        uuid
-        service
-        createdAt
-        balance
-        currency
-      }
-      collectives(orderBy: $orderBy, orderDirection: $orderDirection) {
-        total
-        collectives {
-          id
-          slug
-          name
-          currency
-          hostFeePercent
-          stats {
-            id
-            balance
-            expenses {
-              id
-              all
-              pending
-              paid
-              rejected
-              approved
-            }
-          }
-        }
-      }
-    }
-  }
-`;
-
-const COLLECTIVES_PER_PAGE = 20;
-export const addCollectivesData = graphql(getCollectivesQuery, {
-  options(props) {
-    return {
-      variables: {
-        hostCollectiveSlug: props.hostCollectiveSlug,
-        offset: 0,
-        limit: props.limit || COLLECTIVES_PER_PAGE * 2,
-        includeHostedCollectives: true,
-        orderBy: 'name',
-        orderDirection: 'ASC',
-      },
-    };
-  },
-  props: ({ data }) => ({
-    data,
-    fetchMore: () => {
-      return data.fetchMore({
-        variables: {
-          offset: data.allCollectives.length,
-          limit: COLLECTIVES_PER_PAGE,
-        },
-        updateQuery: (previousResult, { fetchMoreResult }) => {
-          if (!fetchMoreResult) {
-            return previousResult;
-          }
-          return Object.assign({}, previousResult, {
-            // Append the new posts results to the old one
-            allCollectives: [
-              ...previousResult.allCollectives,
-              ...fetchMoreResult.allCollectives,
-            ],
-          });
-        },
-      });
-    },
-  }),
-});
 
 const createOrderQuery = gql`
   mutation createOrder($order: OrderInputType!) {
@@ -530,9 +438,4 @@ const addMutation = graphql(createOrderQuery, {
   }),
 });
 
-const addGraphQL = compose(
-  addMutation,
-  addCollectivesData,
-);
-
-export default addGraphQL(withIntl(CollectivePickerWithData));
+export default addMutation(withIntl(CollectivePickerWithData));
