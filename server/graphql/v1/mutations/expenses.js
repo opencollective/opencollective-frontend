@@ -246,6 +246,55 @@ async function payExpenseUpdate(expense) {
   return updatedExpense;
 }
 
+async function markAsPaid(host, expense, options = {}) {
+  return await createTransactionFromPaidExpense(
+    host,
+    null,
+    expense,
+    null,
+    null,
+    expense.UserId,
+    options.paymentProcessorFee,
+  );
+}
+
+async function payExpenseWithPayPal(remoteUser, expense, host, paymentMethod) {
+  try {
+    const paymentResponse = await paymentProviders[expense.payoutMethod].types[
+      'adaptive'
+    ].pay(
+      expense.collective,
+      expense,
+      expense.paypalEmail,
+      paymentMethod.token,
+    );
+    const preapprovalDetailsResponse = await paypalAdaptive.preapprovalDetails(
+      paymentMethod.token,
+    );
+    await createTransactionFromPaidExpense(
+      host,
+      paymentMethod,
+      expense,
+      paymentResponse,
+      preapprovalDetailsResponse,
+      expense.UserId,
+    );
+    expense.setPaid(remoteUser.id);
+  } catch (err) {
+    if (
+      err.message.indexOf(
+        'The total amount of all payments exceeds the maximum total amount for all payments',
+      ) !== -1
+    ) {
+      return new errors.BadRequest(
+        'Not enough funds in your existing Paypal preapproval. Please refill your PayPal payment balance.',
+      );
+    } else {
+      return new errors.BadRequest(err.message);
+    }
+  }
+}
+
 export async function payExpense(remoteUser, expenseId, paymentProcessorFee) {
   if (!remoteUser) {
     throw new errors.Unauthorized('You need to be logged in to pay an expense');
@@ -330,56 +379,22 @@ export async function payExpense(remoteUser, expenseId, paymentProcessorFee) {
     );
   }
   if (expense.payoutMethod === 'paypal') {
-    const paypalEmail = await expense.getPaypalEmail();
+    expense.paypalEmail = await expense.getPaypalEmail();
     const paymentMethod = await host.getPaymentMethod({
       service: expense.payoutMethod,
     });
-    try {
-      const paymentResponse = await paymentProviders[
-        expense.payoutMethod
-      ].types['adaptive'].pay(
-        expense.collective,
-        expense,
-        paypalEmail,
-        paymentMethod.token,
-      );
-      const preapprovalDetailsResponse = await paypalAdaptive.preapprovalDetails(
-        paymentMethod.token,
-      );
-      await createTransactionFromPaidExpense(
-        host,
-        paymentMethod,
-        expense,
-        paymentResponse,
-        preapprovalDetailsResponse,
-        expense.UserId,
-      );
-      expense.setPaid(remoteUser.id);
-    } catch (err) {
-      if (
-        err.message.indexOf(
-          'The total amount of all payments exceeds the maximum total amount for all payments',
-        ) !== -1
-      ) {
-        return new errors.BadRequest(
-          'Not enough funds in your existing Paypal preapproval. Please refill your PayPal payment balance.',
-        );
-      } else {
-        return new errors.BadRequest(err.message);
-      }
+    // If the expense has been filed with the same paypal email than the host paypal
+    // then we simply mark the expense as paid
+    if (expense.paypalEmail === paymentMethod.name) {
+      await markAsPaid(host, expense);
+    } else {
+      await payExpenseWithPayPal(remoteUser, expense, host, paymentMethod);
     }
   }
+
   // note: we need to check for manual and other for legacy reasons
   if (expense.payoutMethod === 'manual' || expense.payoutMethod === 'other') {
-    await createTransactionFromPaidExpense(
-      host,
-      null,
-      expense,
-      null,
-      null,
-      expense.UserId,
-      paymentProcessorFee,
-    );
+    await markAsPaid(host, expense, { paymentProcessorFee });
   }
 
   return payExpenseUpdate(expense);
