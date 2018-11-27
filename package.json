@@ -128,8 +128,10 @@
     "eslint-plugin-node": "^7.0.1",
     "eslint-plugin-react": "^7.11.1",
     "graphiql": "0.11.11",
+    "husky": "^1.2.0",
     "jsdoc": "3.5.5",
     "jsdoc-simple-theme": "1.2.6",
+    "lint-staged": "^8.1.0",
     "maildev": "^1.0.0-rc3",
     "mocha": "5.1.1",
     "mocha-circleci-reporter": "0.0.3",
@@ -138,7 +140,7 @@
     "nodemon": "1.12.5",
     "nsp": "3.2.1",
     "nyc": "13.1.0",
-    "prettier": "^1.14.2",
+    "prettier": "1.15.2",
     "prompts": "^1.0.0",
     "react": "16.3.2",
     "react-dom": "16.3.2",
@@ -161,9 +163,11 @@
     "lint": "eslint .",
     "lint:fix": "npm run lint -- --fix",
     "lint:quiet": "npm run lint -- --quiet",
-    "prettier": "prettier \"**/*.js\" --ignore-path .eslintignore --write",
+    "prettier": "prettier \"**/*.js\" --ignore-path .eslintignore",
+    "prettier:write": "npm run prettier -- --write",
+    "prettier:check": "npm run prettier -- --list-different",
     "nsp": "nsp check",
-    "pretest": "npm run lint:quiet",
+    "pretest": "npm run lint:quiet && npm run prettier:check",
     "test": "TZ=UTC nyc npm run test:dev && npm run coverage",
     "test:server": "./scripts/db_restore.sh -d opencollective_dvl -f test/dbdumps/opencollective_dvl.pgsql && PG_DATABASE=opencollective_dvl npm run dev",
     "test:dev": "npm run test:unit:dev && npm run test:bdd:dev",
@@ -208,11 +212,16 @@
     "maildev": "maildev"
   },
   "nyc": {
-    "reporter": [
-      "lcov",
-      "text"
-    ],
+    "reporter": ["lcov", "text"],
     "cache": true
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.js": ["prettier --write", "git add"]
   },
   "license": "MIT",
   "repository": {
