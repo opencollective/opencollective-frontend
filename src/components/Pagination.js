@@ -24,12 +24,7 @@ const Pagination = ({ router, limit, offset, total }) => {
   return (
     <Flex alignItems="center">
       {currentPage > 1 && (
-        <Link
-          route={route.slice(1)}
-          scroll={false}
-          params={{ ...query, offset: offset - limit }}
-          passHref
-        >
+        <Link route={route.slice(1)} scroll={false} params={{ ...query, offset: offset - limit }} passHref>
           <StyledLink buttonStyle="standard" buttonSize="small">
             Previous
           </StyledLink>
@@ -51,12 +46,7 @@ const Pagination = ({ router, limit, offset, total }) => {
         <Span>of {totalPages}</Span>
       </Flex>
       {currentPage < totalPages && (
-        <Link
-          route={route.slice(1)}
-          scroll={false}
-          params={{ ...query, offset: offset + limit }}
-          passHref
-        >
+        <Link route={route.slice(1)} scroll={false} params={{ ...query, offset: offset + limit }} passHref>
           <StyledLink buttonStyle="standard" buttonSize="small">
             Next
           </StyledLink>

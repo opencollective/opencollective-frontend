@@ -28,9 +28,7 @@ const fetchCollectives = lifecycle({
 
     try {
       const endpoints = [`/discover?${queryString(params)}`, '/groups/tags'];
-      const [data, tags] = await Promise.all(
-        endpoints.map(e => fetch(`${getBaseApiUrl()}${e}`).then(r => r.json())),
-      );
+      const [data, tags] = await Promise.all(endpoints.map(e => fetch(`${getBaseApiUrl()}${e}`).then(r => r.json())));
       this.setState({
         ...pick(data, ['offset', 'total']),
         ...params,
@@ -54,9 +52,7 @@ const fetchCollectives = lifecycle({
       };
 
       try {
-        const response = await fetch(
-          `${getBaseApiUrl()}/discover?${queryString(params)}`,
-        );
+        const response = await fetch(`${getBaseApiUrl()}/discover?${queryString(params)}`);
         const data = await response.json();
         this.setState({
           ...pick(data, ['offset', 'total']),
@@ -95,15 +91,7 @@ const handleChange = withHandlers({
   },
 });
 
-const DiscoverPage = ({
-  collectives,
-  onChange,
-  offset,
-  total,
-  show,
-  sort,
-  tags = [],
-}) => {
+const DiscoverPage = ({ collectives, onChange, offset, total, show, sort, tags = [] }) => {
   const tagOptions = ['all'].concat(tags.map(tag => tag.toLowerCase()).sort());
   const limit = 12;
 
@@ -123,11 +111,7 @@ const DiscoverPage = ({
             justifyContent="center"
             textAlign="center"
           >
-            <H1
-              color="white.full"
-              fontSize={['H3', null, 'H2']}
-              lineHeight={['H3', null, 'H2']}
-            >
+            <H1 color="white.full" fontSize={['H3', null, 'H2']} lineHeight={['H3', null, 'H2']}>
               Discover awesome collectives to support
             </H1>
             <P color="white.full" fontSize="H4" lineHeight="H4" mt={4}>
@@ -146,25 +130,9 @@ const DiscoverPage = ({
             top={-120}
             width={1}
           >
-            <Flex
-              width={[1, 0.8, 0.6]}
-              justifyContent="space-evenly"
-              flexWrap="wrap"
-              mb={4}
-            >
-              <Flex
-                width={[1, null, 0.5]}
-                justifyContent="center"
-                alignItems="center"
-                mb={[3, null, 0]}
-              >
-                <P
-                  is="label"
-                  htmlFor="sort"
-                  color="white.full"
-                  fontSize="LeadParagraph"
-                  pr={2}
-                >
+            <Flex width={[1, 0.8, 0.6]} justifyContent="space-evenly" flexWrap="wrap" mb={4}>
+              <Flex width={[1, null, 0.5]} justifyContent="center" alignItems="center" mb={[3, null, 0]}>
+                <P is="label" htmlFor="sort" color="white.full" fontSize="LeadParagraph" pr={2}>
                   Sort By
                 </P>
                 <select name="sort" id="sort" value={sort} onChange={onChange}>
@@ -173,18 +141,8 @@ const DiscoverPage = ({
                 </select>
               </Flex>
 
-              <Flex
-                width={[1, null, 0.5]}
-                justifyContent="center"
-                alignItems="center"
-              >
-                <P
-                  is="label"
-                  htmlFor="show"
-                  color="white.full"
-                  fontSize="LeadParagraph"
-                  pr={2}
-                >
+              <Flex width={[1, null, 0.5]} justifyContent="center" alignItems="center">
+                <P is="label" htmlFor="show" color="white.full" fontSize="LeadParagraph" pr={2}>
                   Show
                 </P>
                 <select name="show" id="show" value={show} onChange={onChange}>
@@ -201,26 +159,14 @@ const DiscoverPage = ({
               <Fragment>
                 <Flex flexWrap="wrap" width={1} justifyContent="center">
                   {collectives.map(c => (
-                    <Flex
-                      key={c.id}
-                      width={[1, 1 / 2, 1 / 4]}
-                      mb={3}
-                      justifyContent="center"
-                    >
-                      <CollectiveCard
-                        collective={c}
-                        LoggedInUser={LoggedInUser}
-                      />
+                    <Flex key={c.id} width={[1, 1 / 2, 1 / 4]} mb={3} justifyContent="center">
+                      <CollectiveCard collective={c} LoggedInUser={LoggedInUser} />
                     </Flex>
                   ))}
                 </Flex>
                 {total > limit && (
                   <Flex justifyContent="center" mt={3}>
-                    <Pagination
-                      offset={Number(offset)}
-                      total={total}
-                      limit={limit}
-                    />
+                    <Pagination offset={Number(offset)} total={total} limit={limit} />
                   </Flex>
                 )}
               </Fragment>

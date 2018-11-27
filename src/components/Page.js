@@ -43,11 +43,7 @@ class Page extends React.Component {
 
     return (
       <Fragment>
-        <Header
-          className={loadingLoggedInUser ? 'loading' : ''}
-          LoggedInUser={LoggedInUser}
-          title={title}
-        />
+        <Header className={loadingLoggedInUser ? 'loading' : ''} LoggedInUser={LoggedInUser} title={title} />
         <Body>{children(this.state)}</Body>
         <Footer />
       </Fragment>
