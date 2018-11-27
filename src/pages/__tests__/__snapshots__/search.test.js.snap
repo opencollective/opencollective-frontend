@@ -5720,6 +5720,73 @@ exports[`Search Page renders search results with pagination 1`] = `
           </em>
         </p>
       </div>
+      <div
+        className="c27 c2 sc-bdVaJa c2"
+      >
+        <ul
+          className="pagination"
+        >
+          <li
+            className="active"
+          >
+            <a
+              href="?limit=20&offset=0&q=Test"
+              onClick={[Function]}
+            >
+              1
+            </a>
+          </li>
+          <li
+            className=""
+          >
+            <a
+              href="?limit=20&offset=20&q=Test"
+              onClick={[Function]}
+            >
+              2
+            </a>
+          </li>
+          <li
+            className=""
+          >
+            <a
+              href="?limit=20&offset=40&q=Test"
+              onClick={[Function]}
+            >
+              3
+            </a>
+          </li>
+          <li
+            className=""
+          >
+            <a
+              href="?limit=20&offset=60&q=Test"
+              onClick={[Function]}
+            >
+              4
+            </a>
+          </li>
+          <li
+            className=""
+          >
+            <a
+              href="?limit=20&offset=80&q=Test"
+              onClick={[Function]}
+            >
+              5
+            </a>
+          </li>
+        </ul>
+      </div>
+      <div
+        className="c28 c29 sc-bdVaJa c2"
+      >
+        <p>
+          <em>
+            If you don't see the collective you're searching for:
+          </em>
+        </p>
+      </div>
     </div>
   </main>
   <div
